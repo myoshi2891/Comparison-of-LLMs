@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>git worktree × 4プラットフォーム並列開発ガイド</title>
+    <title>git worktree × 4プラットフォーム ドキュメント並列開発ガイド</title>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Sans+JP:wght@400;500;700&display=swap');
@@ -667,18 +667,18 @@
       <div class="hdr-bar">
         <div class="hdr-bar-l">
           <span><span class="dot"></span>SYSTEM: READY</span>
-          <span>BRANCH: feature/parallel-dev</span>
+          <span>BRANCH: feature/docs-update</span>
           <span>WORKTREES: 4</span>
         </div>
         <span>git worktree × 4-Platform Guide</span>
       </div>
       <div class="hdr-hero">
         <div>
-          <h1><span class="accent">git worktree</span><br />並列開発 完全導入ガイド</h1>
+          <h1><span class="accent">git worktree</span><br />ドキュメント並列開発ガイド</h1>
           <p class="hdr-sub">
             Claude / Gemini / Codex / GitHub Copilot ——<br />
-            4つのAIプラットフォームサイトを1リポジトリで同時並列開発するための<br />
-            設計・セットアップ・運用の全工程をステップバイステップで解説する。
+            4プラットフォームのドキュメント（agent.html / skill.html 計8ファイル）を<br />
+            AI ツールと WebSearch で並列更新するための完全ガイド。
           </p>
         </div>
         <div class="badges">
@@ -699,7 +699,7 @@
             <div class="step-title">git worktree とは何か — なぜ並列開発に有効か</div>
             <div class="step-desc">
               通常の git clone
-              との根本的な違いと、4プラットフォーム同時開発における優位性を理解する。
+              との根本的な違いと、4プラットフォームのドキュメント並列更新における優位性を理解する。
             </div>
           </div>
         </div>
@@ -769,7 +769,7 @@
               font-size="13"
               font-weight="700"
             >
-              site-claude/
+              docs-claude/
             </text>
             <rect
               x="33"
@@ -811,7 +811,7 @@
               font-size="13"
               font-weight="700"
             >
-              site-gemini/
+              docs-gemini/
             </text>
             <rect
               x="221"
@@ -852,7 +852,7 @@
               font-size="13"
               font-weight="700"
             >
-              site-codex/
+              docs-codex/
             </text>
             <rect
               x="33"
@@ -890,7 +890,7 @@
               font-size="13"
               font-weight="700"
             >
-              site-copilot/
+              docs-copilot/
             </text>
             <rect
               x="221"
@@ -983,7 +983,7 @@
               font-size="14"
               font-weight="700"
             >
-              ai-sites/ ← .git（唯一・共有）
+              ai-docs/ ← .git（唯一・共有）
             </text>
             <text x="646" y="100" text-anchor="middle" fill="#56d364" font-size="11">
               全 WT が同じコミット履歴を参照する
@@ -1011,7 +1011,7 @@
               shared/
             </text>
             <text x="646" y="157" text-anchor="middle" fill="#ffffff" font-size="10">
-              共通コンポーネント（全 WT から参照）
+              共通リソース: common-header.js / .css（全 WT から参照）
             </text>
 
             <!-- worktrees label -->
@@ -1041,7 +1041,7 @@
               claude/
             </text>
             <text x="548" y="237" text-anchor="middle" fill="#ffffff" font-size="11">
-              feat/claude-site
+              feat/claude-docs
             </text>
             <text x="548" y="256" text-anchor="middle" fill="#ff9f6a" font-size="10">
               Claude Code 起動中 ▶
@@ -1068,7 +1068,7 @@
               gemini/
             </text>
             <text x="744" y="237" text-anchor="middle" fill="#ffffff" font-size="11">
-              feat/gemini-site
+              feat/gemini-docs
             </text>
             <text x="744" y="256" text-anchor="middle" fill="#79b8ff" font-size="10">
               Antigravity 起動中 ▶
@@ -1095,7 +1095,7 @@
               codex/
             </text>
             <text x="548" y="327" text-anchor="middle" fill="#ffffff" font-size="11">
-              feat/codex-site
+              feat/codex-docs
             </text>
             <text x="548" y="346" text-anchor="middle" fill="#56d364" font-size="10">
               Codex CLI 起動中 ▶
@@ -1122,7 +1122,7 @@
               copilot/
             </text>
             <text x="744" y="327" text-anchor="middle" fill="#ffffff" font-size="11">
-              feat/copilot-site
+              feat/copilot-docs
             </text>
             <text x="744" y="346" text-anchor="middle" fill="#e2a8ff" font-size="10">
               VS Code 起動中 ▶
@@ -1271,37 +1271,37 @@
         <h3>ブランチ戦略（Git グラフ）</h3>
         <div class="mmd-box">
           <div class="mmd-lbl">
-            ▸ main を源流として 4 プラットフォームへ派生 — 共通変更は merge で全 WT に同期
+            ▸ dev を源流として 4 プラットフォームのドキュメントブランチへ派生 — 共通リソース変更は merge で全 WT に同期
           </div>
           <div class="mermaid">
 %%{init: {'logLevel': 'error', 'gitGraph': {'rotateCommitLabel': false}}}%%
 gitGraph LR:
 commit id: "chore: init"
 commit id: "feat: shared/"
-branch feat/claude-site
-checkout feat/claude-site
-commit id: "CLAUDE.md"
-commit id: "claude v1"
+branch feat/claude-docs
+checkout feat/claude-docs
+commit id: "agent.html v1"
+commit id: "skill.html v1"
 checkout main
-branch feat/gemini-site
-checkout feat/gemini-site
-commit id: "GEMINI.md"
-commit id: "gemini v1"
+branch feat/gemini-docs
+checkout feat/gemini-docs
+commit id: "agent.html v1"
+commit id: "skill.html v1"
 checkout main
-branch feat/codex-site
-checkout feat/codex-site
-commit id: "AGENTS.md"
-commit id: "codex v1"
+branch feat/codex-docs
+checkout feat/codex-docs
+commit id: "agent.html v1"
+commit id: "skill.html v1"
 checkout main
-branch feat/copilot-site
-checkout feat/copilot-site
-commit id: "copilot-instr"
+branch feat/copilot-docs
+checkout feat/copilot-docs
+commit id: "agent.html v1"
 checkout main
-commit id: "fix(shared): nav"
-checkout feat/claude-site
-merge main id: "sync nav"
-checkout feat/gemini-site
-merge main id: "sync nav "
+commit id: "fix(shared): header"
+checkout feat/claude-docs
+merge main id: "sync header"
+checkout feat/gemini-docs
+merge main id: "sync header "
           </div>
         </div>
 
@@ -1310,7 +1310,7 @@ merge main id: "sync nav "
             <span>Terminal — リポジトリ初期化</span><span class="cb-tag">bash</span>
           </div>
           <pre><span class="sy-cm"># ── リポジトリ作成 ────────────────────────────────────────────────</span>
-mkdir ai-sites && cd ai-sites
+mkdir ai-docs && cd ai-docs
 git init
 git commit --allow-empty -m <span class="sy-st">"chore: initial commit"</span>
 
@@ -1319,10 +1319,10 @@ mkdir -p shared/{components,styles,utils} docs scripts .github/workflows
 git add . && git commit -m <span class="sy-st">"feat: add shared structure"</span>
 
 <span class="sy-cm"># ── 4 プラットフォーム用ブランチを作成 ──────────────────────────</span>
-git branch <span class="sy-cl">feat/claude-site</span>
-git branch <span class="sy-ge">feat/gemini-site</span>
-git branch <span class="sy-co">feat/codex-site</span>
-git branch <span class="sy-cp">feat/copilot-site</span>
+git branch <span class="sy-cl">feat/claude-docs</span>
+git branch <span class="sy-ge">feat/gemini-docs</span>
+git branch <span class="sy-co">feat/codex-docs</span>
+git branch <span class="sy-cp">feat/copilot-docs</span>
 
 git branch -a   <span class="sy-cm"># 確認</span></pre>
         </div>
@@ -1367,10 +1367,10 @@ git branch -a   <span class="sy-cm"># 確認</span></pre>
 flowchart TD
 A([git init\n空コミット]) --> B[shared/ 作成\ngit commit]
 B --> C{git branch × 4\n4ブランチ作成}
-C -->|claude| D1[git worktree add\nworktrees/claude\nfeat/claude-site]
-C -->|gemini| D2[git worktree add\nworktrees/gemini\nfeat/gemini-site]
-C -->|codex| D3[git worktree add\nworktrees/codex\nfeat/codex-site]
-C -->|copilot| D4[git worktree add\nworktrees/copilot\nfeat/copilot-site]
+C -->|claude| D1[git worktree add\nworktrees/claude\nfeat/claude-docs]
+C -->|gemini| D2[git worktree add\nworktrees/gemini\nfeat/gemini-docs]
+C -->|codex| D3[git worktree add\nworktrees/codex\nfeat/codex-docs]
+C -->|copilot| D4[git worktree add\nworktrees/copilot\nfeat/copilot-docs]
 D1 --> E1[cd worktrees/claude\nclaude .]
 D2 --> E2[cd worktrees/gemini\nantigravity .]
 D3 --> E3[cd worktrees/codex\ncodex]
@@ -1392,23 +1392,23 @@ style E4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff
         <div class="cb">
           <div class="cb-hdr"><span>Terminal</span><span class="cb-tag">bash</span></div>
           <pre><span class="sy-cm"># シグネチャ: git worktree add &lt;チェックアウト先パス&gt; &lt;ブランチ名&gt;</span>
-git worktree add worktrees/<span class="sy-cl">claude</span>   <span class="sy-cl">feat/claude-site</span>
-git worktree add worktrees/<span class="sy-ge">gemini</span>   <span class="sy-ge">feat/gemini-site</span>
-git worktree add worktrees/<span class="sy-co">codex</span>    <span class="sy-co">feat/codex-site</span>
-git worktree add worktrees/<span class="sy-cp">copilot</span>  <span class="sy-cp">feat/copilot-site</span>
+git worktree add worktrees/<span class="sy-cl">claude</span>   <span class="sy-cl">feat/claude-docs</span>
+git worktree add worktrees/<span class="sy-ge">gemini</span>   <span class="sy-ge">feat/gemini-docs</span>
+git worktree add worktrees/<span class="sy-co">codex</span>    <span class="sy-co">feat/codex-docs</span>
+git worktree add worktrees/<span class="sy-cp">copilot</span>  <span class="sy-cp">feat/copilot-docs</span>
 
 <span class="sy-cm"># 確認</span>
 git worktree list
-<span class="sy-cm"># /home/user/ai-sites                    abc1234 [main]
-# /home/user/ai-sites/worktrees/claude   def5678 [feat/claude-site]
-# /home/user/ai-sites/worktrees/gemini   ghi9012 [feat/gemini-site]
-# /home/user/ai-sites/worktrees/codex    jkl3456 [feat/codex-site]
-# /home/user/ai-sites/worktrees/copilot  mno7890 [feat/copilot-site]</span></pre>
+<span class="sy-cm"># /home/user/ai-docs                    abc1234 [main]
+# /home/user/ai-docs/worktrees/claude   def5678 [feat/claude-docs]
+# /home/user/ai-docs/worktrees/gemini   ghi9012 [feat/gemini-docs]
+# /home/user/ai-docs/worktrees/codex    jkl3456 [feat/codex-docs]
+# /home/user/ai-docs/worktrees/copilot  mno7890 [feat/copilot-docs]</span></pre>
         </div>
 
         <h3>セットアップ後のディレクトリ構造</h3>
         <div class="svg-box">
-          <div class="svg-lbl">▸ ai-sites/ 全体のファイルツリー（セットアップ完了後）</div>
+          <div class="svg-lbl">▸ ai-docs/ 全体のファイルツリー（セットアップ完了後）</div>
           <svg
             viewBox="0 0 780 440"
             xmlns="http://www.w3.org/2000/svg"
@@ -1433,7 +1433,7 @@ git worktree list
               font-size="14"
               font-weight="700"
             >
-              ai-sites/
+              ai-docs/
             </text>
             <text x="198" y="28" fill="#cdd9e5" font-size="11">← main ブランチ（メイン WT）</text>
 
@@ -1492,7 +1492,7 @@ git worktree list
               shared/
             </text>
             <text x="185" y="146" fill="#ffffff" font-size="11">
-              ← 共通コンポーネント（全 WT が参照）
+              ← 共通リソース: common-header.js / .css（全 WT が参照）
             </text>
 
             <!-- scripts/ -->
@@ -1546,7 +1546,7 @@ git worktree list
             >
               claude/
             </text>
-            <text x="213" y="288" fill="#ffffff" font-size="11">feat/claude-site / CLAUDE.md</text>
+            <text x="213" y="288" fill="#ffffff" font-size="11">feat/claude-docs / CLAUDE.md</text>
 
             <!-- gemini/ -->
             <line x1="84" y1="322" x2="114" y2="322" stroke="#444c56" stroke-width="1" />
@@ -1570,7 +1570,7 @@ git worktree list
             >
               gemini/
             </text>
-            <text x="213" y="326" fill="#ffffff" font-size="11">feat/gemini-site / GEMINI.md</text>
+            <text x="213" y="326" fill="#ffffff" font-size="11">feat/gemini-docs / GEMINI.md</text>
 
             <!-- codex/ -->
             <line x1="84" y1="360" x2="114" y2="360" stroke="#444c56" stroke-width="1" />
@@ -1594,7 +1594,7 @@ git worktree list
             >
               codex/
             </text>
-            <text x="213" y="364" fill="#ffffff" font-size="11">feat/codex-site / AGENTS.md</text>
+            <text x="213" y="364" fill="#ffffff" font-size="11">feat/codex-docs / AGENTS.md</text>
 
             <!-- copilot/ -->
             <line x1="84" y1="398" x2="114" y2="398" stroke="#444c56" stroke-width="1" />
@@ -1619,7 +1619,7 @@ git worktree list
               copilot/
             </text>
             <text x="213" y="402" fill="#ffffff" font-size="11">
-              feat/copilot-site / .github/copilot-instructions.md
+              feat/copilot-docs / .github/copilot-instructions.md
             </text>
           </svg>
         </div>
@@ -1633,7 +1633,7 @@ git worktree list
 set -euo pipefail
 
 PLATFORMS_KEYS=(<span class="sy-cl">claude</span> <span class="sy-ge">gemini</span> <span class="sy-co">codex</span> <span class="sy-cp">copilot</span>)
-PLATFORMS_VALUES=(<span class="sy-cl">feat/claude-site</span> <span class="sy-ge">feat/gemini-site</span> <span class="sy-co">feat/codex-site</span> <span class="sy-cp">feat/copilot-site</span>)
+PLATFORMS_VALUES=(<span class="sy-cl">feat/claude-docs</span> <span class="sy-ge">feat/gemini-docs</span> <span class="sy-co">feat/codex-docs</span> <span class="sy-cp">feat/copilot-docs</span>)
 
 mkdir -p worktrees
 
@@ -1653,6 +1653,60 @@ done
 
 git worktree list</pre>
         </div>
+
+        <h3>ドキュメント構造とファイル配置</h3>
+        <div class="plg">
+          <div class="plc">
+            <div class="plh">
+              <div class="pld" style="background: var(--cl)"></div>
+              Claude / worktrees/claude/
+            </div>
+            <div class="pli"><code>claude/agent.html</code> — エージェント最適化ガイド</div>
+            <div class="pli"><code>claude/skill.html</code> — スキル展開ガイド</div>
+            <div class="pli">共通: <code>../shared/common-header.js</code></div>
+            <div class="pli">共通: <code>../shared/common-header.css</code></div>
+          </div>
+          <div class="plc">
+            <div class="plh">
+              <div class="pld" style="background: var(--ge)"></div>
+              Gemini / worktrees/gemini/
+            </div>
+            <div class="pli"><code>gemini/agent.html</code> — エージェント最適化ガイド</div>
+            <div class="pli"><code>gemini/skill.html</code> — スキル展開ガイド</div>
+            <div class="pli">共通: <code>../shared/common-header.js</code></div>
+            <div class="pli">共通: <code>../shared/common-header.css</code></div>
+          </div>
+          <div class="plc">
+            <div class="plh">
+              <div class="pld" style="background: var(--co)"></div>
+              Codex / worktrees/codex/
+            </div>
+            <div class="pli"><code>codex/agent.html</code> — エージェント最適化ガイド</div>
+            <div class="pli"><code>codex/skill.html</code> — スキル展開ガイド</div>
+            <div class="pli">共通: <code>../shared/common-header.js</code></div>
+            <div class="pli">共通: <code>../shared/common-header.css</code></div>
+          </div>
+          <div class="plc">
+            <div class="plh">
+              <div class="pld" style="background: var(--cp)"></div>
+              Copilot / worktrees/copilot/
+            </div>
+            <div class="pli"><code>copilot/agent.html</code> — エージェント最適化ガイド</div>
+            <div class="pli"><code>copilot/skill.html</code> — スキル展開ガイド</div>
+            <div class="pli">共通: <code>../shared/common-header.js</code></div>
+            <div class="pli">共通: <code>../shared/common-header.css</code></div>
+          </div>
+        </div>
+
+        <div class="ib ib-ok">
+          <span>✅</span>
+          <div>
+            <strong>WebSearch 活用:</strong> 各 WT で AI ツールを起動し、
+            <code>WebSearch</code> で最新情報（API 変更、新機能、ベストプラクティス等）を調査しながら
+            agent.html と skill.html を更新します。Claude Code は <code>/search</code> コマンド、
+            Antigravity は組み込み検索、Copilot は <code>@web</code> を活用できます。
+          </div>
+        </div>
       </section>
 
       <!-- ══════════ STEP 03 ══════════ -->
@@ -1670,22 +1724,22 @@ git worktree list</pre>
           <div class="mmd-lbl">▸ 並列作業 → 共通変更同期 → PR — シーケンス図</div>
           <div class="mermaid">
 sequenceDiagram
-participant M as main（メイン WT）
-participant C as claude/ Claude Code
-participant G as gemini/ Antigravity
-participant X as codex/ Codex CLI
-participant P as copilot/ VS Code
-Note over C,P: 4 ターミナルで同時並列作業（ブランチ切替ゼロ）
-C->>C: feat: claude サイト実装
-G->>G: feat: gemini サイト実装
-X->>X: feat: codex サイト実装
-P->>P: feat: copilot サイト実装
-M->>M: feat(shared): nav 更新
+participant M as dev（メイン WT）
+participant C as claude/ Claude Code + WebSearch
+participant G as gemini/ Antigravity + WebSearch
+participant X as codex/ Codex CLI + WebSearch
+participant P as copilot/ VS Code + Copilot Chat
+Note over C,P: 4 ターミナルで同時並列作業（WebSearch で最新情報取得）
+C->>C: docs: agent.html 更新
+G->>G: docs: skill.html 更新
+X->>X: docs: agent.html 更新
+P->>P: docs: skill.html 更新
+M->>M: fix(shared): header CSS
 Note over M,P: scripts/sync-all.sh 実行
-M-->>C: git merge main
-M-->>G: git merge main
-M-->>X: git merge main
-M-->>P: git merge main
+M-->>C: git merge dev
+M-->>G: git merge dev
+M-->>X: git merge dev
+M-->>P: git merge dev
 C->>C: git push → PR 作成
 G->>G: git push → PR 作成
 X->>X: git push → PR 作成
@@ -1782,7 +1836,7 @@ cd "$ROOT" && git worktree list</pre>
           <div>
             <div class="step-title">メリット・デメリット — 導入判断の材料</div>
             <div class="step-desc">
-              4 プラットフォーム並列開発における worktree の優位性と注意すべき落とし穴。
+              4 プラットフォームのドキュメント並列更新における worktree の優位性と注意すべき落とし穴。
             </div>
           </div>
         </div>
@@ -1996,9 +2050,9 @@ style GOOD fill:#101c10,stroke:#56d364,color:#56d364
           <div class="rule">
             <div class="rule-icon" style="color: var(--warn)">⚠️</div>
             <div>
-              <strong>ルール 3: shared/ への変更は main ブランチ経由のみ</strong
+              <strong>ルール 3: shared/ (common-header リソース) への変更は dev ブランチ経由のみ</strong
               ><span
-                >各 WT から直接 shared/ を変更すると merge コンフリクトが多発する。<code
+                >各 WT から直接 shared/ 内の共通リソースを変更すると merge コンフリクトが多発する。<code
                   >CODEOWNERS</code
                 >
                 で特定のレビュアーを指定するだけでなく、保護ブランチや Ruleset の設定で
@@ -2031,7 +2085,7 @@ style GOOD fill:#101c10,stroke:#56d364,color:#56d364
             <div>
               <strong>ルール 6: AI エージェントはワークツリーのルートから必ず起動する</strong
               ><span
-                >メインルート（ai-sites/）から起動すると全 WT
+                >メインルート（ai-docs/）から起動すると全 WT
                 横断でファイルを変更するリスクがある。<code>cd worktrees/claude && claude</code>
                 のように WT 内から起動する。</span
               >
@@ -2143,50 +2197,50 @@ style D4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff
           <div class="cb-hdr">
             <span>.github/workflows/parallel-deploy.yml</span><span class="cb-tag">yaml</span>
           </div>
-          <pre><span class="sy-kw">name</span>: Parallel Platform Deploy
+          <pre><span class="sy-kw">name</span>: Parallel Docs Validation
 <span class="sy-kw">on</span>:
   push:
     branches:
-      - <span class="sy-st">'feat/claude-site'</span>
-      - <span class="sy-st">'feat/gemini-site'</span>
-      - <span class="sy-st">'feat/codex-site'</span>
-      - <span class="sy-st">'feat/copilot-site'</span>
-      - <span class="sy-st">'main'</span>
+      - <span class="sy-st">'feat/*-docs'</span>
+      - <span class="sy-st">'dev'</span>  <span class="sy-cm"># dev へのマージ時も検証</span>
+  pull_request:
+    branches:
+      - <span class="sy-st">'main'</span>  <span class="sy-cm"># main への PR 時も検証</span>
 
 <span class="sy-kw">jobs</span>:
-  build-and-deploy:
+  validate-docs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         platform: [<span class="sy-cl">claude</span>, <span class="sy-ge">gemini</span>, <span class="sy-co">codex</span>, <span class="sy-cp">copilot</span>]
-      fail-fast: false   <span class="sy-cm"># 1 つ失敗しても他は継続</span>
+      fail-fast: false
 
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: <span class="sy-st">'refs/heads/main'</span>
-          fetch-depth: 0   <span class="sy-cm"># 全履歴を取得（worktree で必要）</span>
+          fetch-depth: 0
 
       - name: Setup worktree
         run: |
           git worktree add /tmp/${{ matrix.platform }} \
-            feat/${{ matrix.platform }}-site
-          cd /tmp/${{ matrix.platform }}
-          git fetch origin main
-          git merge origin/main --no-edit
+            feat/${{ matrix.platform }}-docs || echo "Branch may not exist yet"
 
-      - name: Build
+      - name: Validate HTML
         working-directory: /tmp/${{ matrix.platform }}
-        run: npm ci && npm run build
-
-      - name: Deploy
-        working-directory: /tmp/${{ matrix.platform }}
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          npx vercel deploy --prod \
-            --token ${{ secrets.VERCEL_TOKEN }}</pre>
+          npx vnu --skip-non-html ${{ matrix.platform }}/agent.html
+          npx vnu --skip-non-html ${{ matrix.platform }}/skill.html
+
+      - name: Check Links
+        working-directory: /tmp/${{ matrix.platform }}
+        run: |
+          npx lychee ${{ matrix.platform }}/*.html
+
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        working-directory: /tmp/${{ matrix.platform }}
+        run: |
+          echo "Deploy docs to GitHub Pages"</pre>
         </div>
       </section>
 
@@ -2196,17 +2250,17 @@ style D4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff
         <div class="final-body">
           git worktree は
           <strong>「同一リポジトリを複数の作業ディレクトリで同時並行作業する」</strong>
-          最もクリーンな解決策です。 4 プラットフォームの AI
-          エージェントを同時稼働させる今回のシナリオでは、<strong
+          最もクリーンな解決策です。 4 プラットフォームのドキュメント（agent.html / skill.html 計8ファイル）を
+          AI ツールと WebSearch で並列更新する今回のシナリオでは、<strong
             >clone × 4 よりも worktree × 4 が明確に優位</strong
           >です。 ただし
           <strong
-            >① 同一ブランチの重複チェックアウト禁止 ② shared/ は main 経由のみ変更 ③ 削除時は git
-            worktree remove 必須</strong
+            >① 同一ブランチの重複チェックアウト禁止 ② shared/ (common-header リソース) は dev 経由のみ変更
+            ③ 削除時は git worktree remove 必須</strong
           >
-          の 3 ルールをチーム全員が守ることが成功の条件です。 AI
-          エージェントは各ワークツリーのルートから起動し、AGENTS.md / CLAUDE.md 等の設定ファイルを各
-          WT に配置することで、
+          の 3 ルールを守ることが成功の条件です。
+          各 WT で Claude Code / Antigravity / Codex / Copilot を起動し、WebSearch で最新情報を調査しながら
+          agent.html と skill.html を更新することで、
           <strong>4 ツール × 並列 = 最大スループット</strong> の開発体験が実現します。
         </div>
       </div>
@@ -2214,7 +2268,7 @@ style D4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff
     <!-- /wrap -->
 
     <footer>
-      <span>git worktree × 4-Platform Parallel Development Guide</span>
+      <span>git worktree × 4-Platform Docs Parallel Update Guide</span>
       <span>git 2.5+ required · No additional install needed</span>
     </footer>
   </body>
