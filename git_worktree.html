@@ -1303,34 +1303,15 @@
             merge で全 WT に同期
           </div>
           <div class="mermaid">
-%%{init: {'logLevel': 'error', 'gitGraph': {'rotateCommitLabel': false}}}%%
-gitGraph LR:
-commit id: "chore: init"
-commit id: "feat: shared/"
-branch feat/claude-docs
-checkout feat/claude-docs
-commit id: "agent.html v1"
-commit id: "skill.html v1"
-checkout main
-branch feat/gemini-docs
-checkout feat/gemini-docs
-commit id: "agent.html v1"
-commit id: "skill.html v1"
-checkout main
-branch feat/codex-docs
-checkout feat/codex-docs
-commit id: "agent.html v1"
-commit id: "skill.html v1"
-checkout main
-branch feat/copilot-docs
-checkout feat/copilot-docs
-commit id: "agent.html v1"
-checkout main
-commit id: "fix(shared): header"
-checkout feat/claude-docs
-merge main id: "sync header"
-checkout feat/gemini-docs
-merge main id: "sync header "
+            %%{init: {'logLevel': 'error', 'gitGraph': {'rotateCommitLabel': false}}}%% gitGraph LR:
+            commit id: "chore: init" commit id: "feat: shared/" branch feat/claude-docs checkout
+            feat/claude-docs commit id: "agent.html v1" commit id: "skill.html v1" checkout dev
+            branch feat/gemini-docs checkout feat/gemini-docs commit id: "agent.html v1" commit id:
+            "skill.html v1" checkout dev branch feat/codex-docs checkout feat/codex-docs commit id:
+            "agent.html v1" commit id: "skill.html v1" checkout dev branch feat/copilot-docs
+            checkout feat/copilot-docs commit id: "agent.html v1" checkout dev commit id:
+            "fix(shared): header" checkout feat/claude-docs merge dev id: "sync header" checkout
+            feat/gemini-docs merge dev id: "sync header "
           </div>
         </div>
 
@@ -1393,28 +1374,24 @@ git branch -a   <span class="sy-cm"># 確認</span></pre>
         <div class="mmd-box">
           <div class="mmd-lbl">▸ worktree セットアップフロー — コマンド実行順序</div>
           <div class="mermaid">
-flowchart TD
-A([git init\n空コミット]) --> B[shared/ 作成\ngit commit]
-B --> C{git branch × 4\n4ブランチ作成}
-C -->|claude| D1[git worktree add\nworktrees/claude\nfeat/claude-docs]
-C -->|gemini| D2[git worktree add\nworktrees/gemini\nfeat/gemini-docs]
-C -->|codex| D3[git worktree add\nworktrees/codex\nfeat/codex-docs]
-C -->|copilot| D4[git worktree add\nworktrees/copilot\nfeat/copilot-docs]
-D1 --> E1[cd worktrees/claude\nclaude .]
-D2 --> E2[cd worktrees/gemini\nantigravity .]
-D3 --> E3[cd worktrees/codex\ncodex]
-D4 --> E4[cd worktrees/copilot\ncode .]
-style A fill:#21262d,stroke:#56d364,color:#ffffff
-style B fill:#21262d,stroke:#444c56,color:#ffffff
-style C fill:#1f2d14,stroke:#56d364,color:#ffffff
-style D1 fill:#2a1a10,stroke:#ff9f6a,color:#ffffff
-style D2 fill:#101828,stroke:#79b8ff,color:#ffffff
-style D3 fill:#101e12,stroke:#56d364,color:#ffffff
-style D4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff
-style E1 fill:#2a1a10,stroke:#ff9f6a,color:#ffffff
-style E2 fill:#101828,stroke:#79b8ff,color:#ffffff
-style E3 fill:#101e12,stroke:#56d364,color:#ffffff
-style E4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff
+            flowchart TD A([git init\n空コミット]) --> B[shared/ 作成\ngit commit] B --> C{git
+            branch × 4\n4ブランチ作成} C -->|claude| D1[git worktree
+            add\nworktrees/claude\nfeat/claude-docs] C -->|gemini| D2[git worktree
+            add\nworktrees/gemini\nfeat/gemini-docs] C -->|codex| D3[git worktree
+            add\nworktrees/codex\nfeat/codex-docs] C -->|copilot| D4[git worktree
+            add\nworktrees/copilot\nfeat/copilot-docs] D1 --> E1[cd worktrees/claude\nclaude .] D2
+            --> E2[cd worktrees/gemini\nantigravity .] D3 --> E3[cd worktrees/codex\ncodex] D4 -->
+            E4[cd worktrees/copilot\ncode .] style A fill:#21262d,stroke:#56d364,color:#ffffff style
+            B fill:#21262d,stroke:#444c56,color:#ffffff style C
+            fill:#1f2d14,stroke:#56d364,color:#ffffff style D1
+            fill:#2a1a10,stroke:#ff9f6a,color:#ffffff style D2
+            fill:#101828,stroke:#79b8ff,color:#ffffff style D3
+            fill:#101e12,stroke:#56d364,color:#ffffff style D4
+            fill:#1c1028,stroke:#e2a8ff,color:#ffffff style E1
+            fill:#2a1a10,stroke:#ff9f6a,color:#ffffff style E2
+            fill:#101828,stroke:#79b8ff,color:#ffffff style E3
+            fill:#101e12,stroke:#56d364,color:#ffffff style E4
+            fill:#1c1028,stroke:#e2a8ff,color:#ffffff
           </div>
         </div>
 
@@ -1428,7 +1405,7 @@ git worktree add worktrees/<span class="sy-cp">copilot</span>  <span class="sy-c
 
 <span class="sy-cm"># 確認</span>
 git worktree list
-<span class="sy-cm"># /home/user/ai-docs                    abc1234 [main]
+<span class="sy-cm"># /home/user/ai-docs                    abc1234 [dev]
 # /home/user/ai-docs/worktrees/claude   def5678 [feat/claude-docs]
 # /home/user/ai-docs/worktrees/gemini   ghi9012 [feat/gemini-docs]
 # /home/user/ai-docs/worktrees/codex    jkl3456 [feat/codex-docs]
@@ -1753,27 +1730,14 @@ git worktree list</pre>
         <div class="mmd-box">
           <div class="mmd-lbl">▸ 並列作業 → 共通変更同期 → PR — シーケンス図</div>
           <div class="mermaid">
-sequenceDiagram
-participant M as dev（メイン WT）
-participant C as claude/ Claude Code + WebSearch
-participant G as gemini/ Antigravity + WebSearch
-participant X as codex/ Codex CLI + WebSearch
-participant P as copilot/ VS Code + Copilot Chat
-Note over C,P: 4ターミナルで同時並列作業（WebSearch で最新情報取得）
-C->>C: docs: agent.html 更新
-G->>G: docs: skill.html 更新
-X->>X: docs: agent.html 更新
-P->>P: docs: skill.html 更新
-M->>M: fix(shared): header CSS
-Note over M,P: scripts/sync-all.sh 実行
-M-->>C: git merge dev
-M-->>G: git merge dev
-M-->>X: git merge dev
-M-->>P: git merge dev
-C->>C: git push → PR 作成
-G->>G: git push → PR 作成
-X->>X: git push → PR 作成
-P->>P: git push → PR 作成
+            sequenceDiagram participant M as dev（メイン WT） participant C as claude/ Claude Code +
+            WebSearch participant G as gemini/ Antigravity + WebSearch participant X as codex/ Codex
+            CLI + WebSearch participant P as copilot/ VS Code + Copilot Chat Note over C,P:
+            4ターミナルで同時並列作業（WebSearch で最新情報取得） C->>C: docs: agent.html 更新
+            G->>G: docs: skill.html 更新 X->>X: docs: agent.html 更新 P->>P: docs: skill.html 更新
+            M->>M: fix(shared): header CSS Note over M,P: scripts/sync-all.sh 実行 M-->>C: git merge
+            dev M-->>G: git merge dev M-->>X: git merge dev M-->>P: git merge dev C->>C: git push →
+            PR 作成 G->>G: git push → PR 作成 X->>X: git push → PR 作成 P->>P: git push → PR 作成
           </div>
         </div>
 
@@ -2022,35 +1986,23 @@ cd "$ROOT" && git worktree list</pre>
         <div class="mmd-box">
           <div class="mmd-lbl">▸ よくあるミスと正しい対処フロー</div>
           <div class="mermaid">
-flowchart LR
-subgraph BAD["❌ よくあるミス"]
-direction TB
-E1["同一ブランチを\n別 WT で checkout"]
-E2["rm -rf で WT\nディレクトリを削除"]
-E3["shared/ を各 WT から\n直接変更"]
-E4["AI エージェントを\nルート直下から起動"]
-end
-subgraph GOOD["✅ 正しい対処"]
-direction TB
-F1["git worktree list で確認\n各 WT に別ブランチを割当"]
-F2["git worktree remove\ngit worktree prune"]
-F3["main で変更 → commit\nsync-all.sh で全 WT 反映"]
-F4["cd worktrees/claude から\n各ツールを起動"]
-end
-E1 -->|fatal: already checked out| F1
-E2 -->|.git にメタデータが残存| F2
-E3 -->|merge コンフリクト多発| F3
-E4 -->|全 WT 横断の誤変更リスク| F4
-style E1 fill:#2a1515,stroke:#ff7b72,color:#ffffff
-style E2 fill:#2a1515,stroke:#ff7b72,color:#ffffff
-style E3 fill:#2a1515,stroke:#ff7b72,color:#ffffff
-style E4 fill:#2a1515,stroke:#ff7b72,color:#ffffff
-style F1 fill:#152515,stroke:#56d364,color:#ffffff
-style F2 fill:#152515,stroke:#56d364,color:#ffffff
-style F3 fill:#152515,stroke:#56d364,color:#ffffff
-style F4 fill:#152515,stroke:#56d364,color:#ffffff
-style BAD fill:#1c1010,stroke:#ff7b72,color:#ff7b72
-style GOOD fill:#101c10,stroke:#56d364,color:#56d364
+            flowchart LR subgraph BAD["❌ よくあるミス"] direction TB E1["同一ブランチを\n別 WT で
+            checkout"] E2["rm -rf で WT\nディレクトリを削除"] E3["shared/ を各 WT から\n直接変更"]
+            E4["AI エージェントを\nルート直下から起動"] end subgraph GOOD["✅ 正しい対処"] direction
+            TB F1["git worktree list で確認\n各 WT に別ブランチを割当"] F2["git worktree remove\ngit
+            worktree prune"] F3["main で変更 → commit\nsync-all.sh で全 WT 反映"] F4["cd
+            worktrees/claude から\n各ツールを起動"] end E1 -->|fatal: already checked out| F1 E2
+            -->|.git にメタデータが残存| F2 E3 -->|merge コンフリクト多発| F3 E4 -->|全 WT
+            横断の誤変更リスク| F4 style E1 fill:#2a1515,stroke:#ff7b72,color:#ffffff style E2
+            fill:#2a1515,stroke:#ff7b72,color:#ffffff style E3
+            fill:#2a1515,stroke:#ff7b72,color:#ffffff style E4
+            fill:#2a1515,stroke:#ff7b72,color:#ffffff style F1
+            fill:#152515,stroke:#56d364,color:#ffffff style F2
+            fill:#152515,stroke:#56d364,color:#ffffff style F3
+            fill:#152515,stroke:#56d364,color:#ffffff style F4
+            fill:#152515,stroke:#56d364,color:#ffffff style BAD
+            fill:#1c1010,stroke:#ff7b72,color:#ff7b72 style GOOD
+            fill:#101c10,stroke:#56d364,color:#56d364
           </div>
         </div>
 
@@ -2198,29 +2150,22 @@ done && git worktree prune && echo "<span class="sy-ok">All removed.</span>"</pr
         <div class="mmd-box">
           <div class="mmd-lbl">▸ GitHub Actions — matrix 並列パイプライン</div>
           <div class="mermaid">
-flowchart LR
-T(["push to\nfeat/* or main"])
-T --> J[detect-platform job]
-J --> M{"matrix strategy\nfail-fast: false\n4 並列実行"}
-M --> B1["build: claude\ngit worktree add"]
-M --> B2["build: gemini\ngit worktree add"]
-M --> B3["build: codex\ngit worktree add"]
-M --> B4["build: copilot\ngit worktree add"]
-B1 --> D1[Deploy\nclaude site]
-B2 --> D2[Deploy\ngemini site]
-B3 --> D3[Deploy\ncodex site]
-B4 --> D4[Deploy\ncopilot site]
-style T fill:#21262d,stroke:#444c56,color:#ffffff
-style J fill:#21262d,stroke:#e3b341,color:#ffffff
-style M fill:#1f2d14,stroke:#56d364,color:#ffffff
-style B1 fill:#2a1a10,stroke:#ff9f6a,color:#ffffff
-style B2 fill:#101828,stroke:#79b8ff,color:#ffffff
-style B3 fill:#101e12,stroke:#56d364,color:#ffffff
-style B4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff
-style D1 fill:#2a1a10,stroke:#ff9f6a,color:#ffffff
-style D2 fill:#101828,stroke:#79b8ff,color:#ffffff
-style D3 fill:#101e12,stroke:#56d364,color:#ffffff
-style D4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff
+            flowchart LR T(["push to\nfeat/* or main"]) T --> J[detect-platform job] J --> M{"matrix
+            strategy\nfail-fast: false\n4 並列実行"} M --> B1["build: claude\ngit worktree add"] M
+            --> B2["build: gemini\ngit worktree add"] M --> B3["build: codex\ngit worktree add"] M
+            --> B4["build: copilot\ngit worktree add"] B1 --> D1[Deploy\nclaude site] B2 -->
+            D2[Deploy\ngemini site] B3 --> D3[Deploy\ncodex site] B4 --> D4[Deploy\ncopilot site]
+            style T fill:#21262d,stroke:#444c56,color:#ffffff style J
+            fill:#21262d,stroke:#e3b341,color:#ffffff style M
+            fill:#1f2d14,stroke:#56d364,color:#ffffff style B1
+            fill:#2a1a10,stroke:#ff9f6a,color:#ffffff style B2
+            fill:#101828,stroke:#79b8ff,color:#ffffff style B3
+            fill:#101e12,stroke:#56d364,color:#ffffff style B4
+            fill:#1c1028,stroke:#e2a8ff,color:#ffffff style D1
+            fill:#2a1a10,stroke:#ff9f6a,color:#ffffff style D2
+            fill:#101828,stroke:#79b8ff,color:#ffffff style D3
+            fill:#101e12,stroke:#56d364,color:#ffffff style D4
+            fill:#1c1028,stroke:#e2a8ff,color:#ffffff
           </div>
         </div>
 
@@ -2267,13 +2212,7 @@ style D4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff
       - name: Check Links
         uses: lycheeverse/lychee-action@v2
         with:
-          args: /tmp/${{ matrix.platform }}/*.html
-
-      - name: Deploy to GitHub Pages
-        if: github.ref == 'refs/heads/main'
-        working-directory: /tmp/${{ matrix.platform }}
-        run: |
-          echo "Deploy docs to GitHub Pages"</pre>
+          args: /tmp/${{ matrix.platform }}/*.html</pre>
         </div>
       </section>
 
