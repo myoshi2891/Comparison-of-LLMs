@@ -24,7 +24,7 @@
       document.head.appendChild(link);
 
       const script = document.createElement('script');
-      script.type = 'module';
+      script.defer = true;
       script.src = prefix + 'shared/common-header.js';
       document.head.appendChild(script);
     </script>
