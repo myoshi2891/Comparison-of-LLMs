@@ -2275,7 +2275,7 @@ style D4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff
         if: steps.setup-wt.outputs.exists == 'true'
         uses: lycheeverse/lychee-action@v2
         with:
-          args: /tmp/${{ matrix.platform }}/*.html</pre>
+          args: /tmp/${{ matrix.platform }}/**/*.html</pre>
         </div>
       </section>
 
