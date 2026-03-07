@@ -2196,6 +2196,8 @@ done && git worktree prune && echo "<span class="sy-ok">All removed.</span>"</pr
         with:
           fetch-depth: 0
 
+      - uses: oven-sh/setup-bun@v2
+
       - name: Setup worktree
         run: |
           git worktree add /tmp/${{ matrix.platform }} \
@@ -2204,8 +2206,8 @@ done && git worktree prune && echo "<span class="sy-ok">All removed.</span>"</pr
       - name: Validate HTML
         working-directory: /tmp/${{ matrix.platform }}
         run: |
-          npx vnu-jar --skip-non-html ${{ matrix.platform }}/agent.html
-          npx vnu-jar --skip-non-html ${{ matrix.platform }}/skill.html
+          bunx vnu-jar --skip-non-html ${{ matrix.platform }}/agent.html
+          bunx vnu-jar --skip-non-html ${{ matrix.platform }}/skill.html
 
       - name: Check Links
         uses: lycheeverse/lychee-action@v2
