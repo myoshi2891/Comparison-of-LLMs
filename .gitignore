@@ -67,3 +67,6 @@ pnpm-debug.log*
 
 # temp files
 links.md
+
+# Claude Code local settings (personal, not shared)
+CLAUDE.local.md
