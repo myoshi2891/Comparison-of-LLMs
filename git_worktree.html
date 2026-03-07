@@ -1,0 +1,2146 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>git worktree × 4プラットフォーム並列開発ガイド</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+      /* ══════════════════════════════════════════════
+   COLOR SYSTEM — 全テキスト最大コントラスト保証
+   ============================================== */
+      :root {
+        /* 背景レイヤー */
+        --bg0: #0d1117; /* ページ背景 */
+        --bg1: #161b22; /* カード背景 */
+        --bg2: #21262d; /* ヘッダバー・テーブルヘッダ */
+        --bg3: #2d333b; /* ホバー・コードヘッダ */
+        --sep: #444c56; /* 区切り線 */
+
+        /* ★ テキスト — 全て WCAG AA 以上保証 */
+        --tx: #ffffff; /* 見出し・強調：コントラスト比 16:1 */
+        --tb: #e6edf3; /* 本文：13:1 */
+        --ts: #cdd9e5; /* 補足・ラベル：9:1 */
+
+        /* プラットフォームカラー（明るめ・読みやすい） */
+        --cl: #ff9f6a; /* Claude  - オレンジ */
+        --ge: #79b8ff; /* Gemini  - ブルー */
+        --co: #56d364; /* Codex   - グリーン */
+        --cp: #e2a8ff; /* Copilot - パープル */
+
+        /* ステータスカラー */
+        --ok: #56d364;
+        --warn: #e3b341;
+        --err: #ff7b72;
+      }
+
+      /* ══ BASE ══ */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg0);
+        color: var(--tb);
+        font-family: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
+        font-weight: 400;
+        line-height: 1.85;
+        font-size: 15px;
+      }
+      strong {
+        color: var(--tx);
+        font-weight: 700;
+      }
+      p {
+        color: var(--tb);
+        margin-bottom: 1rem;
+      }
+      code {
+        font-family: 'IBM Plex Mono', 'Courier New', monospace;
+        font-size: 0.82em;
+        background: rgba(255, 255, 255, 0.12);
+        color: var(--tx);
+        padding: 0.12rem 0.4rem;
+        border-radius: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      h3 {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--tx);
+        margin: 2.5rem 0 0.9rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 1px solid var(--sep);
+      }
+
+      /* ══ HEADER ══ */
+      header {
+        background: #090e17;
+        border-bottom: 2px solid var(--sep);
+      }
+      .hdr-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.7rem 2rem;
+        border-bottom: 1px solid var(--sep);
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.72rem;
+        color: var(--ts); /* ts = #cdd9e5, readable */
+      }
+      .hdr-bar-l {
+        display: flex;
+        gap: 1.5rem;
+      }
+      .dot {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--ok);
+        margin-right: 0.4rem;
+        animation: blink 2s ease-in-out infinite;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.25;
+        }
+      }
+
+      .hdr-hero {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 2rem;
+        align-items: end;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 3.5rem 2rem;
+      }
+      .hdr-hero h1 {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: clamp(1.9rem, 4vw, 3rem);
+        font-weight: 700;
+        color: var(--tx);
+        line-height: 1.1;
+      }
+      .accent {
+        color: var(--warn);
+      }
+      .hdr-sub {
+        font-size: 0.94rem;
+        color: var(--ts);
+        margin-top: 0.9rem;
+        line-height: 1.8;
+        max-width: 520px;
+      }
+
+      .badges {
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+        align-items: flex-end;
+      }
+      .badge {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 0.35rem 1rem;
+        border: 1px solid;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .badge::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+      .b-cl {
+        color: var(--cl);
+        border-color: color-mix(in srgb, var(--cl) 50%, transparent);
+        background: color-mix(in srgb, var(--cl) 12%, transparent);
+      }
+      .b-cl::before {
+        background: var(--cl);
+      }
+      .b-ge {
+        color: var(--ge);
+        border-color: color-mix(in srgb, var(--ge) 50%, transparent);
+        background: color-mix(in srgb, var(--ge) 12%, transparent);
+      }
+      .b-ge::before {
+        background: var(--ge);
+      }
+      .b-co {
+        color: var(--co);
+        border-color: color-mix(in srgb, var(--co) 50%, transparent);
+        background: color-mix(in srgb, var(--co) 12%, transparent);
+      }
+      .b-co::before {
+        background: var(--co);
+      }
+      .b-cp {
+        color: var(--cp);
+        border-color: color-mix(in srgb, var(--cp) 50%, transparent);
+        background: color-mix(in srgb, var(--cp) 12%, transparent);
+      }
+      .b-cp::before {
+        background: var(--cp);
+      }
+
+      /* ══ LAYOUT ══ */
+      .wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+
+      /* ══ STEP SECTION ══ */
+      .step {
+        border-top: 1px solid var(--sep);
+        padding: 4rem 0;
+      }
+      .step-hdr {
+        display: grid;
+        grid-template-columns: 4.5rem 1fr;
+        gap: 2rem;
+        align-items: start;
+        margin-bottom: 2.5rem;
+      }
+      /* ★ step番号：薄いがデコレーション用 */
+      .step-n {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 3.5rem;
+        font-weight: 700;
+        color: var(--sep);
+        line-height: 1;
+      }
+      .step-title {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--tx);
+        margin-bottom: 0.4rem;
+      }
+      .step-desc {
+        font-size: 0.94rem;
+        color: var(--ts);
+        line-height: 1.8;
+      }
+
+      /* ══ CODE BLOCKS ══ */
+      .cb {
+        background: #010409;
+        border: 1px solid var(--sep);
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 1.3rem 0;
+      }
+      .cb-hdr {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.55rem 1.2rem;
+        background: var(--bg2);
+        border-bottom: 1px solid var(--sep);
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.72rem;
+        color: var(--ts);
+      }
+      .cb-tag {
+        font-size: 0.65rem;
+        padding: 0.1rem 0.5rem;
+        border: 1px solid var(--sep);
+        border-radius: 3px;
+        color: var(--ts);
+      }
+      pre {
+        padding: 1.4rem 1.6rem;
+        font-family: 'IBM Plex Mono', 'Courier New', monospace;
+        font-size: 0.8rem;
+        line-height: 1.95;
+        color: #e6edf3; /* ★ ベーステキスト: 明るい白 */
+        overflow-x: auto;
+        white-space: pre;
+      }
+      /* ★ シンタックスカラー — 全て読みやすい明るさ */
+      .sy-cm {
+        color: #9da5b4;
+        font-style: italic;
+      } /* コメント: 十分明るい灰 */
+      .sy-kw {
+        color: #79b8ff;
+        font-weight: 700;
+      } /* キーワード: 明るい青 */
+      .sy-st {
+        color: #e3b341;
+      } /* 文字列: 黄 */
+      .sy-ok {
+        color: #56d364;
+        font-weight: 700;
+      } /* 成功: 緑 */
+      .sy-er {
+        color: #ff7b72;
+        font-weight: 700;
+      } /* エラー: 赤 */
+      .sy-cl {
+        color: var(--cl);
+        font-weight: 700;
+      } /* Claude */
+      .sy-ge {
+        color: var(--ge);
+        font-weight: 700;
+      } /* Gemini */
+      .sy-co {
+        color: var(--co);
+        font-weight: 700;
+      } /* Codex */
+      .sy-cp {
+        color: var(--cp);
+        font-weight: 700;
+      } /* Copilot */
+
+      /* ══ MERMAID CONTAINER ══ */
+      .mmd-box {
+        background: var(--bg1);
+        border: 1px solid var(--sep);
+        border-radius: 8px;
+        padding: 1.8rem 1.5rem;
+        margin: 1.5rem 0;
+        overflow-x: auto;
+      }
+      .mmd-lbl {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--ts);
+        margin-bottom: 1.4rem;
+      }
+      .mermaid {
+        display: flex;
+        justify-content: center;
+      }
+
+      /* ══ SVG CONTAINER ══ */
+      .svg-box {
+        background: var(--bg1);
+        border: 1px solid var(--sep);
+        border-radius: 8px;
+        padding: 1.8rem 1.5rem;
+        margin: 1.5rem 0;
+        overflow-x: auto;
+      }
+      .svg-lbl {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--ts);
+        margin-bottom: 1.4rem;
+      }
+      .svg-box svg {
+        display: block;
+        margin: 0 auto;
+        max-width: 100%;
+        height: auto;
+      }
+
+      /* ══ TABLE ══ */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1.4rem 0;
+        font-size: 0.9rem;
+      }
+      th {
+        background: var(--bg2);
+        color: var(--tx);
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 0.75rem 1rem;
+        text-align: left;
+        border-bottom: 2px solid var(--sep);
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #30363d;
+        color: var(--tb);
+        vertical-align: top;
+      }
+      td:first-child {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.77rem;
+        color: var(--warn);
+        white-space: nowrap;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover td {
+        background: rgba(255, 255, 255, 0.025);
+      }
+
+      /* ══ INFO BOX ══ */
+      .ib {
+        border-radius: 6px;
+        padding: 1rem 1.3rem;
+        margin: 1rem 0;
+        display: flex;
+        gap: 0.9rem;
+        font-size: 0.92rem;
+        line-height: 1.8;
+        color: var(--tb);
+      }
+      .ib span:first-child {
+        flex-shrink: 0;
+      }
+      .ib-warn {
+        background: rgba(227, 179, 65, 0.08);
+        border: 1px solid rgba(227, 179, 65, 0.4);
+      }
+      .ib-ok {
+        background: rgba(86, 211, 100, 0.08);
+        border: 1px solid rgba(86, 211, 100, 0.4);
+      }
+      .ib-err {
+        background: rgba(255, 123, 114, 0.08);
+        border: 1px solid rgba(255, 123, 114, 0.4);
+      }
+
+      /* ══ MERIT / DEMERIT GRID ══ */
+      .mdg {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1px;
+        background: var(--sep);
+        border: 1px solid var(--sep);
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 1.5rem 0;
+      }
+      .mdc {
+        background: var(--bg1);
+      }
+      .mdh {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.74rem;
+        font-weight: 700;
+        padding: 0.9rem 1.3rem;
+        border-bottom: 1px solid var(--sep);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .mdh-ok {
+        color: var(--ok);
+        background: rgba(86, 211, 100, 0.08);
+      }
+      .mdh-err {
+        color: var(--err);
+        background: rgba(255, 123, 114, 0.08);
+      }
+      .mdb {
+        padding: 0.8rem 1.3rem;
+      }
+      .mdi {
+        display: flex;
+        gap: 0.75rem;
+        padding: 0.65rem 0;
+        border-bottom: 1px solid #30363d;
+        color: var(--tb);
+      }
+      .mdi:last-child {
+        border-bottom: none;
+      }
+      .mdi-icon {
+        flex-shrink: 0;
+      }
+      .mdi strong {
+        color: var(--tx);
+        font-weight: 700;
+        display: block;
+        margin-bottom: 0.2rem;
+        font-size: 0.9rem;
+      }
+      .mdi span {
+        color: var(--ts);
+        font-size: 0.83rem;
+        line-height: 1.65;
+      }
+
+      /* ══ PLATFORM FILE GRID ══ */
+      .plg {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(255px, 1fr));
+        gap: 1px;
+        background: var(--sep);
+        border: 1px solid var(--sep);
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 1.5rem 0;
+      }
+      .plc {
+        background: var(--bg1);
+        padding: 1.4rem;
+      }
+      .plh {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.78rem;
+        font-weight: 700;
+        margin-bottom: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        color: var(--tx);
+      }
+      .pld {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .pli {
+        font-size: 0.86rem;
+        color: var(--ts);
+        padding: 0.28rem 0;
+        border-bottom: 1px solid #30363d;
+      }
+      .pli:last-child {
+        border-bottom: none;
+      }
+      .pli code {
+        color: var(--tx);
+      }
+
+      /* ══ RULE CHECKLIST ══ */
+      .rules {
+        border: 1px solid var(--sep);
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 1.5rem 0;
+      }
+      .rule {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem 1.3rem;
+        border-bottom: 1px solid #30363d;
+        font-size: 0.91rem;
+        color: var(--tb);
+        transition: background 0.15s;
+      }
+      .rule:hover {
+        background: var(--bg3);
+      }
+      .rule:last-child {
+        border-bottom: none;
+      }
+      .rule-icon {
+        flex-shrink: 0;
+        font-size: 1.1rem;
+      }
+      .rule strong {
+        color: var(--tx);
+        font-weight: 700;
+        display: block;
+        margin-bottom: 0.22rem;
+      }
+      .rule span {
+        color: var(--ts);
+        font-size: 0.84rem;
+        line-height: 1.7;
+      }
+
+      /* ══ FINAL BANNER ══ */
+      .final {
+        border: 1px solid rgba(227, 179, 65, 0.45);
+        border-radius: 8px;
+        background: rgba(227, 179, 65, 0.06);
+        padding: 2rem;
+        margin: 3rem 0;
+      }
+      .final-title {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--warn);
+        margin-bottom: 0.75rem;
+      }
+      .final-body {
+        font-size: 0.93rem;
+        color: var(--tb);
+        line-height: 1.9;
+        max-width: 850px;
+      }
+
+      footer {
+        border-top: 1px solid var(--sep);
+        padding: 1.5rem 2rem;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.7rem;
+        color: var(--ts);
+        display: flex;
+        justify-content: space-between;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'base',
+        themeVariables: {
+          /* ★ Mermaid: 全テキスト白で統一 */
+          primaryColor: '#21262d',
+          primaryTextColor: '#ffffff',
+          primaryBorderColor: '#444c56',
+          lineColor: '#cdd9e5',
+          secondaryColor: '#2d333b',
+          tertiaryColor: '#161b22',
+          background: '#161b22',
+          mainBkg: '#21262d',
+          nodeBorder: '#444c56',
+          clusterBkg: '#1c2128',
+          clusterBorder: '#444c56',
+          titleColor: '#ffffff',
+          edgeLabelBackground: '#2d333b',
+          nodeTextColor: '#ffffff',
+          labelTextColor: '#ffffff',
+          fontFamily: 'IBM Plex Mono, monospace',
+          fontSize: '14px',
+          /* gitGraph colors */
+          git0: '#ff9f6a',
+          git1: '#79b8ff',
+          git2: '#56d364',
+          git3: '#e2a8ff',
+          git4: '#e3b341',
+          gitBranchLabel0: '#ffffff',
+          gitBranchLabel1: '#ffffff',
+          gitBranchLabel2: '#ffffff',
+          gitBranchLabel3: '#ffffff',
+          gitInv0: '#ffffff',
+          gitInv1: '#ffffff',
+          gitInv2: '#ffffff',
+          gitInv3: '#ffffff',
+          commitLabelColor: '#ffffff',
+          commitLabelBackground: '#21262d',
+          commitLabelFontSize: '12px',
+          /* sequence */
+          actorBkg: '#21262d',
+          actorBorder: '#444c56',
+          actorTextColor: '#ffffff',
+          actorLineColor: '#444c56',
+          signalColor: '#cdd9e5',
+          signalTextColor: '#ffffff',
+          labelBoxBkgColor: '#21262d',
+          labelBoxBorderColor: '#444c56',
+          labelTextColor: '#ffffff',
+          loopTextColor: '#ffffff',
+          noteBkgColor: '#2d333b',
+          noteTextColor: '#ffffff',
+          noteBorderColor: '#444c56',
+          activationBkgColor: '#2d333b',
+          activationBorderColor: '#444c56',
+        },
+      });
+    </script>
+
+    <!-- ═══ HEADER ═══ -->
+    <header>
+      <div class="hdr-bar">
+        <div class="hdr-bar-l">
+          <span><span class="dot"></span>SYSTEM: READY</span>
+          <span>BRANCH: feature/parallel-dev</span>
+          <span>WORKTREES: 4</span>
+        </div>
+        <span>git worktree × 4-Platform Guide</span>
+      </div>
+      <div class="hdr-hero">
+        <div>
+          <h1><span class="accent">git worktree</span><br />並列開発 完全導入ガイド</h1>
+          <p class="hdr-sub">
+            Claude / Gemini / Codex / GitHub Copilot ——<br />
+            4つのAIプラットフォームサイトを1リポジトリで同時並列開発するための<br />
+            設計・セットアップ・運用の全工程をステップバイステップで解説する。
+          </p>
+        </div>
+        <div class="badges">
+          <div class="badge b-cl">Claude Code</div>
+          <div class="badge b-ge">Google Antigravity</div>
+          <div class="badge b-co">OpenAI Codex</div>
+          <div class="badge b-cp">GitHub Copilot</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="wrap">
+      <!-- ══════════ STEP 00 ══════════ -->
+      <section class="step" id="s00">
+        <div class="step-hdr">
+          <div class="step-n">00</div>
+          <div>
+            <div class="step-title">git worktree とは何か — なぜ並列開発に有効か</div>
+            <div class="step-desc">
+              通常の git clone
+              との根本的な違いと、4プラットフォーム同時開発における優位性を理解する。
+            </div>
+          </div>
+        </div>
+
+        <p>
+          <strong>git worktree</strong>
+          は、1つのリポジトリ（<code>.git</code>）を共有しながら、<strong
+            >複数のディレクトリで別々のブランチを同時チェックアウトできる</strong
+          >
+          Git 標準機能です。Git
+          2.5（2015年）から搭載されており、追加インストール不要で利用できます。
+        </p>
+
+        <!-- ── SVG: 構造比較図 ── -->
+        <div class="svg-box">
+          <div class="svg-lbl">
+            ▸ 構造比較 — clone × 4（アンチパターン） vs worktree × 4（推奨）
+          </div>
+          <svg
+            viewBox="0 0 860 390"
+            xmlns="http://www.w3.org/2000/svg"
+            font-family="IBM Plex Mono, Courier New, monospace"
+          >
+            <!-- ▌LEFT PANEL: clone × 4 ▐ -->
+            <rect
+              x="4"
+              y="4"
+              width="400"
+              height="382"
+              rx="8"
+              fill="#1c0f0f"
+              stroke="#ff7b72"
+              stroke-width="1.5"
+            />
+
+            <!-- パネルタイトル -->
+            <text
+              x="204"
+              y="32"
+              text-anchor="middle"
+              fill="#ff7b72"
+              font-size="14"
+              font-weight="700"
+            >
+              ❌ clone × 4（アンチパターン）
+            </text>
+            <text x="204" y="50" text-anchor="middle" fill="#cdd9e5" font-size="11">
+              .git が 4 つ独立 — 共通変更を毎回 4 箇所に手動コピー
+            </text>
+
+            <!-- repo: claude -->
+            <rect
+              x="20"
+              y="64"
+              width="172"
+              height="130"
+              rx="5"
+              fill="#241510"
+              stroke="#ff9f6a"
+              stroke-width="1.5"
+            />
+            <text
+              x="106"
+              y="86"
+              text-anchor="middle"
+              fill="#ff9f6a"
+              font-size="13"
+              font-weight="700"
+            >
+              site-claude/
+            </text>
+            <rect
+              x="33"
+              y="93"
+              width="146"
+              height="22"
+              rx="3"
+              fill="#3a1f10"
+              stroke="#ff7b72"
+              stroke-width="1"
+            />
+            <text x="106" y="108" text-anchor="middle" fill="#ff7b72" font-size="12">
+              .git（独立コピー）
+            </text>
+            <text x="106" y="130" text-anchor="middle" fill="#ffffff" font-size="11">履歴 A</text>
+            <text x="106" y="148" text-anchor="middle" fill="#e3b341" font-size="10">
+              毎回手動で共通変更を反映
+            </text>
+            <text x="106" y="183" text-anchor="middle" fill="#ff7b72" font-size="10">
+              ↑ 4 つ全部に繰り返す必要あり
+            </text>
+
+            <!-- repo: gemini -->
+            <rect
+              x="208"
+              y="64"
+              width="172"
+              height="130"
+              rx="5"
+              fill="#10101e"
+              stroke="#79b8ff"
+              stroke-width="1.5"
+            />
+            <text
+              x="294"
+              y="86"
+              text-anchor="middle"
+              fill="#79b8ff"
+              font-size="13"
+              font-weight="700"
+            >
+              site-gemini/
+            </text>
+            <rect
+              x="221"
+              y="93"
+              width="146"
+              height="22"
+              rx="3"
+              fill="#18182a"
+              stroke="#79b8ff"
+              stroke-width="1"
+            />
+            <text x="294" y="108" text-anchor="middle" fill="#ff7b72" font-size="12">
+              .git（独立コピー）
+            </text>
+            <text x="294" y="130" text-anchor="middle" fill="#ffffff" font-size="11">
+              履歴 B（clone後に乖離）
+            </text>
+            <text x="294" y="150" text-anchor="middle" fill="#cdd9e5" font-size="10">
+              履歴が diverged
+            </text>
+
+            <!-- repo: codex -->
+            <rect
+              x="20"
+              y="210"
+              width="172"
+              height="130"
+              rx="5"
+              fill="#0f1e10"
+              stroke="#56d364"
+              stroke-width="1.5"
+            />
+            <text
+              x="106"
+              y="232"
+              text-anchor="middle"
+              fill="#56d364"
+              font-size="13"
+              font-weight="700"
+            >
+              site-codex/
+            </text>
+            <rect
+              x="33"
+              y="239"
+              width="146"
+              height="22"
+              rx="3"
+              fill="#152015"
+              stroke="#56d364"
+              stroke-width="1"
+            />
+            <text x="106" y="254" text-anchor="middle" fill="#ff7b72" font-size="12">
+              .git（独立コピー）
+            </text>
+            <text x="106" y="276" text-anchor="middle" fill="#ffffff" font-size="11">
+              履歴 C（diverged）
+            </text>
+
+            <!-- repo: copilot -->
+            <rect
+              x="208"
+              y="210"
+              width="172"
+              height="130"
+              rx="5"
+              fill="#160f1c"
+              stroke="#e2a8ff"
+              stroke-width="1.5"
+            />
+            <text
+              x="294"
+              y="232"
+              text-anchor="middle"
+              fill="#e2a8ff"
+              font-size="13"
+              font-weight="700"
+            >
+              site-copilot/
+            </text>
+            <rect
+              x="221"
+              y="239"
+              width="146"
+              height="22"
+              rx="3"
+              fill="#20152a"
+              stroke="#e2a8ff"
+              stroke-width="1"
+            />
+            <text x="294" y="254" text-anchor="middle" fill="#ff7b72" font-size="12">
+              .git（独立コピー）
+            </text>
+            <text x="294" y="276" text-anchor="middle" fill="#ffffff" font-size="11">
+              履歴 D（diverged）
+            </text>
+
+            <!-- 痛みの矢印 -->
+            <path
+              d="M192 128 Q204 155 208 128"
+              fill="none"
+              stroke="#ff7b72"
+              stroke-width="1.5"
+              stroke-dasharray="4,3"
+              marker-end="url(#arr-r)"
+            />
+            <path
+              d="M106 194 Q204 210 294 210"
+              fill="none"
+              stroke="#ff7b72"
+              stroke-width="1.5"
+              stroke-dasharray="4,3"
+              marker-end="url(#arr-r)"
+            />
+
+            <text
+              x="204"
+              y="362"
+              text-anchor="middle"
+              fill="#ff7b72"
+              font-size="13"
+              font-weight="700"
+            >
+              😵 同期が地獄 — ディスク 4 倍消費
+            </text>
+
+            <!-- ▌RIGHT PANEL: worktree × 4 ▐ -->
+            <rect
+              x="436"
+              y="4"
+              width="420"
+              height="382"
+              rx="8"
+              fill="#0a160e"
+              stroke="#56d364"
+              stroke-width="1.5"
+            />
+
+            <text
+              x="646"
+              y="32"
+              text-anchor="middle"
+              fill="#56d364"
+              font-size="14"
+              font-weight="700"
+            >
+              ✅ worktree × 4（推奨）
+            </text>
+            <text x="646" y="50" text-anchor="middle" fill="#cdd9e5" font-size="11">
+              .git は 1 つ共有 — 全ワークツリーが同じ履歴を参照
+            </text>
+
+            <!-- 唯一の .git -->
+            <rect
+              x="454"
+              y="62"
+              width="384"
+              height="48"
+              rx="6"
+              fill="#0d2a14"
+              stroke="#56d364"
+              stroke-width="2.5"
+            />
+            <text
+              x="646"
+              y="83"
+              text-anchor="middle"
+              fill="#ffffff"
+              font-size="14"
+              font-weight="700"
+            >
+              ai-sites/ ← .git（唯一・共有）
+            </text>
+            <text x="646" y="100" text-anchor="middle" fill="#56d364" font-size="11">
+              全 WT が同じコミット履歴を参照する
+            </text>
+
+            <!-- shared/ -->
+            <rect
+              x="556"
+              y="126"
+              width="180"
+              height="36"
+              rx="4"
+              fill="#202010"
+              stroke="#e3b341"
+              stroke-width="1.5"
+            />
+            <text
+              x="646"
+              y="144"
+              text-anchor="middle"
+              fill="#e3b341"
+              font-size="13"
+              font-weight="700"
+            >
+              shared/
+            </text>
+            <text x="646" y="157" text-anchor="middle" fill="#ffffff" font-size="10">
+              共通コンポーネント（全 WT から参照）
+            </text>
+
+            <!-- worktrees label -->
+            <text x="646" y="184" text-anchor="middle" fill="#cdd9e5" font-size="11">
+              worktrees/ ← .gitignore 対象
+            </text>
+
+            <!-- 4 cards -->
+            <rect
+              x="454"
+              y="194"
+              width="188"
+              height="78"
+              rx="5"
+              fill="#241510"
+              stroke="#ff9f6a"
+              stroke-width="2"
+            />
+            <text
+              x="548"
+              y="218"
+              text-anchor="middle"
+              fill="#ff9f6a"
+              font-size="13"
+              font-weight="700"
+            >
+              claude/
+            </text>
+            <text x="548" y="237" text-anchor="middle" fill="#ffffff" font-size="11">
+              feat/claude-site
+            </text>
+            <text x="548" y="256" text-anchor="middle" fill="#ff9f6a" font-size="10">
+              Claude Code 起動中 ▶
+            </text>
+
+            <rect
+              x="650"
+              y="194"
+              width="188"
+              height="78"
+              rx="5"
+              fill="#10101e"
+              stroke="#79b8ff"
+              stroke-width="2"
+            />
+            <text
+              x="744"
+              y="218"
+              text-anchor="middle"
+              fill="#79b8ff"
+              font-size="13"
+              font-weight="700"
+            >
+              gemini/
+            </text>
+            <text x="744" y="237" text-anchor="middle" fill="#ffffff" font-size="11">
+              feat/gemini-site
+            </text>
+            <text x="744" y="256" text-anchor="middle" fill="#79b8ff" font-size="10">
+              Antigravity 起動中 ▶
+            </text>
+
+            <rect
+              x="454"
+              y="284"
+              width="188"
+              height="78"
+              rx="5"
+              fill="#0f1e10"
+              stroke="#56d364"
+              stroke-width="2"
+            />
+            <text
+              x="548"
+              y="308"
+              text-anchor="middle"
+              fill="#56d364"
+              font-size="13"
+              font-weight="700"
+            >
+              codex/
+            </text>
+            <text x="548" y="327" text-anchor="middle" fill="#ffffff" font-size="11">
+              feat/codex-site
+            </text>
+            <text x="548" y="346" text-anchor="middle" fill="#56d364" font-size="10">
+              Codex CLI 起動中 ▶
+            </text>
+
+            <rect
+              x="650"
+              y="284"
+              width="188"
+              height="78"
+              rx="5"
+              fill="#160f1c"
+              stroke="#e2a8ff"
+              stroke-width="2"
+            />
+            <text
+              x="744"
+              y="308"
+              text-anchor="middle"
+              fill="#e2a8ff"
+              font-size="13"
+              font-weight="700"
+            >
+              copilot/
+            </text>
+            <text x="744" y="327" text-anchor="middle" fill="#ffffff" font-size="11">
+              feat/copilot-site
+            </text>
+            <text x="744" y="346" text-anchor="middle" fill="#e2a8ff" font-size="10">
+              VS Code 起動中 ▶
+            </text>
+
+            <!-- 接続線 -->
+            <line
+              x1="646"
+              y1="110"
+              x2="646"
+              y2="126"
+              stroke="#56d364"
+              stroke-width="2"
+              marker-end="url(#arr-g)"
+            />
+            <line
+              x1="646"
+              y1="162"
+              x2="646"
+              y2="183"
+              stroke="#cdd9e5"
+              stroke-width="1"
+              stroke-dasharray="3,3"
+            />
+            <line
+              x1="646"
+              y1="183"
+              x2="548"
+              y2="194"
+              stroke="#ff9f6a"
+              stroke-width="1.5"
+              marker-end="url(#arr-g)"
+            />
+            <line
+              x1="646"
+              y1="183"
+              x2="744"
+              y2="194"
+              stroke="#79b8ff"
+              stroke-width="1.5"
+              marker-end="url(#arr-g)"
+            />
+            <line
+              x1="548"
+              y1="183"
+              x2="548"
+              y2="284"
+              stroke="#56d364"
+              stroke-width="1.5"
+              marker-end="url(#arr-g)"
+            />
+            <line
+              x1="744"
+              y1="183"
+              x2="744"
+              y2="284"
+              stroke="#e2a8ff"
+              stroke-width="1.5"
+              marker-end="url(#arr-g)"
+            />
+
+            <text
+              x="646"
+              y="380"
+              text-anchor="middle"
+              fill="#56d364"
+              font-size="13"
+              font-weight="700"
+            >
+              🚀 並列作業 · 履歴一元化 · ディスク節約
+            </text>
+
+            <!-- マーカー定義 -->
+            <defs>
+              <marker id="arr-g" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                <polygon points="0 0,8 3,0 6" fill="#56d364" />
+              </marker>
+              <marker id="arr-r" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                <polygon points="0 0,8 3,0 6" fill="#ff7b72" />
+              </marker>
+            </defs>
+          </svg>
+        </div>
+
+        <h3>clone × 4 との決定的な違い</h3>
+        <table>
+          <tr>
+            <th>観点</th>
+            <th>git clone × 4</th>
+            <th>git worktree × 4</th>
+          </tr>
+          <tr>
+            <td>.git の数</td>
+            <td>4 つ（独立・完全コピー）</td>
+            <td><strong>1 つ（共有）</strong></td>
+          </tr>
+          <tr>
+            <td>ディスク使用量</td>
+            <td>全体の 4× 相当</td>
+            <td><strong>追加分のみ（〜10% 増）</strong></td>
+          </tr>
+          <tr>
+            <td>共通変更の反映</td>
+            <td>4 箇所に手動コピー必須</td>
+            <td><strong>merge/rebase で即時反映</strong></td>
+          </tr>
+          <tr>
+            <td>ブランチ切替コスト</td>
+            <td>不要（独立）</td>
+            <td><strong>ゼロ（常時並列チェックアウト）</strong></td>
+          </tr>
+          <tr>
+            <td>stash 共有</td>
+            <td>不可</td>
+            <td><strong>可能（.git が共通）</strong></td>
+          </tr>
+          <tr>
+            <td>AI エージェント活用</td>
+            <td>各ツールが別リポジトリ認識</td>
+            <td><strong>全ツールが同一履歴を参照</strong></td>
+          </tr>
+        </table>
+      </section>
+
+      <!-- ══════════ STEP 01 ══════════ -->
+      <section class="step" id="s01">
+        <div class="step-hdr">
+          <div class="step-n">01</div>
+          <div>
+            <div class="step-title">リポジトリ初期設定とブランチ戦略</div>
+            <div class="step-desc">
+              メインリポジトリの作成から 4 プラットフォーム用ブランチの設計まで。
+            </div>
+          </div>
+        </div>
+
+        <h3>ブランチ戦略（Git グラフ）</h3>
+        <div class="mmd-box">
+          <div class="mmd-lbl">
+            ▸ main を源流として 4 プラットフォームへ派生 — 共通変更は merge で全 WT に同期
+          </div>
+          <div class="mermaid">
+            %%{init: {'logLevel': 'error', 'gitGraph': {'rotateCommitLabel': false}}}%% gitGraph LR:
+            commit id: "chore: init" commit id: "feat: shared/" branch feat/claude-site checkout
+            feat/claude-site commit id: "CLAUDE.md" commit id: "claude v1" checkout main branch
+            feat/gemini-site checkout feat/gemini-site commit id: "GEMINI.md" commit id: "gemini v1"
+            checkout main branch feat/codex-site checkout feat/codex-site commit id: "AGENTS.md"
+            commit id: "codex v1" checkout main branch feat/copilot-site checkout feat/copilot-site
+            commit id: "copilot-instr" checkout main commit id: "fix(shared): nav" checkout
+            feat/claude-site merge main id: "sync nav" checkout feat/gemini-site merge main id:
+            "sync nav "
+          </div>
+        </div>
+
+        <div class="cb">
+          <div class="cb-hdr">
+            <span>Terminal — リポジトリ初期化</span><span class="cb-tag">bash</span>
+          </div>
+          <pre><span class="sy-cm"># ── リポジトリ作成 ────────────────────────────────────────────────</span>
+mkdir ai-sites && cd ai-sites
+git init
+git commit --allow-empty -m <span class="sy-st">"chore: initial commit"</span>
+
+<span class="sy-cm"># ── 共通ディレクトリを main に作成 ───────────────────────────────</span>
+mkdir -p shared/{components,styles,utils} docs scripts .github/workflows
+git add . && git commit -m <span class="sy-st">"feat: add shared structure"</span>
+
+<span class="sy-cm"># ── 4 プラットフォーム用ブランチを作成 ──────────────────────────</span>
+git branch <span class="sy-cl">feat/claude-site</span>
+git branch <span class="sy-ge">feat/gemini-site</span>
+git branch <span class="sy-co">feat/codex-site</span>
+git branch <span class="sy-cp">feat/copilot-site</span>
+
+git branch -a   <span class="sy-cm"># 確認</span></pre>
+        </div>
+
+        <div class="cb">
+          <div class="cb-hdr">
+            <span>.gitignore — 必須設定</span><span class="cb-tag">config</span>
+          </div>
+          <pre><span class="sy-cm"># git worktree のチェックアウト先を追跡対象から除外（必須）</span>
+<span class="sy-st">worktrees/</span>
+<span class="sy-st">node_modules/</span>
+<span class="sy-st">*.log</span>
+<span class="sy-st">.DS_Store</span></pre>
+        </div>
+
+        <div class="ib ib-warn">
+          <span>⚠️</span>
+          <div>
+            <strong>必須：</strong> <code>worktrees/</code> を
+            <code>.gitignore</code> に追加しないと、git がワークツリー内の
+            <code>.git</code> ファイルを「入れ子リポジトリ」として誤認識しエラーになります。
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════ STEP 02 ══════════ -->
+      <section class="step" id="s02">
+        <div class="step-hdr">
+          <div class="step-n">02</div>
+          <div>
+            <div class="step-title">worktree の追加 — 4 プラットフォームを一括セットアップ</div>
+            <div class="step-desc">
+              git worktree add コマンドでディレクトリを作成し各ブランチをチェックアウトする。
+            </div>
+          </div>
+        </div>
+
+        <!-- Mermaid: セットアップフロー -->
+        <div class="mmd-box">
+          <div class="mmd-lbl">▸ worktree セットアップフロー — コマンド実行順序</div>
+          <div class="mermaid">
+            flowchart TD A([git init\n空コミット]) --> B[shared/ 作成\ngit commit] B --> C{git
+            branch × 4\n4ブランチ作成} C -->|claude| D1[git worktree
+            add\nworktrees/claude\nfeat/claude-site] C -->|gemini| D2[git worktree
+            add\nworktrees/gemini\nfeat/gemini-site] C -->|codex| D3[git worktree
+            add\nworktrees/codex\nfeat/codex-site] C -->|copilot| D4[git worktree
+            add\nworktrees/copilot\nfeat/copilot-site] D1 --> E1[cd worktrees/claude\nclaude .] D2
+            --> E2[cd worktrees/gemini\nantigravity .] D3 --> E3[cd worktrees/codex\ncodex] D4 -->
+            E4[cd worktrees/copilot\ncode .] style A fill:#21262d,stroke:#56d364,color:#ffffff style
+            B fill:#21262d,stroke:#444c56,color:#ffffff style C
+            fill:#1f2d14,stroke:#56d364,color:#ffffff style D1
+            fill:#2a1a10,stroke:#ff9f6a,color:#ffffff style D2
+            fill:#101828,stroke:#79b8ff,color:#ffffff style D3
+            fill:#101e12,stroke:#56d364,color:#ffffff style D4
+            fill:#1c1028,stroke:#e2a8ff,color:#ffffff style E1
+            fill:#2a1a10,stroke:#ff9f6a,color:#ffffff style E2
+            fill:#101828,stroke:#79b8ff,color:#ffffff style E3
+            fill:#101e12,stroke:#56d364,color:#ffffff style E4
+            fill:#1c1028,stroke:#e2a8ff,color:#ffffff
+          </div>
+        </div>
+
+        <div class="cb">
+          <div class="cb-hdr"><span>Terminal</span><span class="cb-tag">bash</span></div>
+          <pre><span class="sy-cm"># シグネチャ: git worktree add &lt;チェックアウト先パス&gt; &lt;ブランチ名&gt;</span>
+git worktree add worktrees/<span class="sy-cl">claude</span>   <span class="sy-cl">feat/claude-site</span>
+git worktree add worktrees/<span class="sy-ge">gemini</span>   <span class="sy-ge">feat/gemini-site</span>
+git worktree add worktrees/<span class="sy-co">codex</span>    <span class="sy-co">feat/codex-site</span>
+git worktree add worktrees/<span class="sy-cp">copilot</span>  <span class="sy-cp">feat/copilot-site</span>
+
+<span class="sy-cm"># 確認</span>
+git worktree list
+<span class="sy-cm"># /home/user/ai-sites                    abc1234 [main]
+# /home/user/ai-sites/worktrees/claude   def5678 [feat/claude-site]
+# /home/user/ai-sites/worktrees/gemini   ghi9012 [feat/gemini-site]
+# /home/user/ai-sites/worktrees/codex    jkl3456 [feat/codex-site]
+# /home/user/ai-sites/worktrees/copilot  mno7890 [feat/copilot-site]</span></pre>
+        </div>
+
+        <h3>セットアップ後のディレクトリ構造</h3>
+        <div class="svg-box">
+          <div class="svg-lbl">▸ ai-sites/ 全体のファイルツリー（セットアップ完了後）</div>
+          <svg
+            viewBox="0 0 780 320"
+            xmlns="http://www.w3.org/2000/svg"
+            font-family="IBM Plex Mono, Courier New, monospace"
+          >
+            <!-- root box -->
+            <rect
+              x="8"
+              y="8"
+              width="180"
+              height="30"
+              rx="5"
+              fill="#0d2a14"
+              stroke="#56d364"
+              stroke-width="2"
+            />
+            <text
+              x="98"
+              y="28"
+              text-anchor="middle"
+              fill="#56d364"
+              font-size="14"
+              font-weight="700"
+            >
+              ai-sites/
+            </text>
+            <text x="198" y="28" fill="#cdd9e5" font-size="11">← main ブランチ（メイン WT）</text>
+
+            <!-- vertical stem -->
+            <line x1="36" y1="38" x2="36" y2="310" stroke="#444c56" stroke-width="1.5" />
+
+            <!-- .git -->
+            <line x1="36" y1="68" x2="66" y2="68" stroke="#444c56" stroke-width="1.3" />
+            <rect
+              x="66"
+              y="55"
+              width="155"
+              height="26"
+              rx="4"
+              fill="#0d2a14"
+              stroke="#56d364"
+              stroke-width="2"
+            />
+            <text
+              x="143"
+              y="72"
+              text-anchor="middle"
+              fill="#56d364"
+              font-size="13"
+              font-weight="700"
+            >
+              .git/（共有・唯一）
+            </text>
+            <text x="230" y="72" fill="#ffffff" font-size="11">← 全 WT が参照</text>
+
+            <!-- .gitignore -->
+            <line x1="36" y1="105" x2="66" y2="105" stroke="#444c56" stroke-width="1.3" />
+            <text x="70" y="109" fill="#ffffff" font-size="13">.gitignore</text>
+            <text x="195" y="109" fill="#e3b341" font-size="11">← worktrees/ を除外（必須）</text>
+
+            <!-- shared/ -->
+            <line x1="36" y1="142" x2="66" y2="142" stroke="#444c56" stroke-width="1.3" />
+            <rect
+              x="66"
+              y="129"
+              width="110"
+              height="26"
+              rx="4"
+              fill="#202010"
+              stroke="#e3b341"
+              stroke-width="1.5"
+            />
+            <text
+              x="121"
+              y="146"
+              text-anchor="middle"
+              fill="#e3b341"
+              font-size="13"
+              font-weight="700"
+            >
+              shared/
+            </text>
+            <text x="185" y="146" fill="#ffffff" font-size="11">
+              ← 共通コンポーネント（全 WT が参照）
+            </text>
+
+            <!-- scripts/ -->
+            <line x1="36" y1="180" x2="66" y2="180" stroke="#444c56" stroke-width="1.3" />
+            <text x="70" y="184" fill="#ffffff" font-size="13">scripts/</text>
+            <line x1="84" y1="189" x2="84" y2="210" stroke="#444c56" stroke-width="1.1" />
+            <line x1="84" y1="200" x2="110" y2="200" stroke="#444c56" stroke-width="1.1" />
+            <text x="114" y="204" fill="#56d364" font-size="12">setup-worktrees.sh</text>
+            <line x1="84" y1="210" x2="110" y2="213" stroke="#444c56" stroke-width="1.1" />
+            <text x="114" y="217" fill="#56d364" font-size="12">sync-all.sh</text>
+
+            <!-- worktrees/ label -->
+            <line x1="36" y1="242" x2="66" y2="242" stroke="#444c56" stroke-width="1.3" />
+            <rect
+              x="66"
+              y="229"
+              width="120"
+              height="26"
+              rx="4"
+              fill="#1c2230"
+              stroke="#444c56"
+              stroke-width="1"
+            />
+            <text x="126" y="246" text-anchor="middle" fill="#cdd9e5" font-size="12">
+              worktrees/
+            </text>
+            <text x="196" y="246" fill="#cdd9e5" font-size="11">← .gitignore 対象</text>
+
+            <!-- sub-stem for worktrees -->
+            <line x1="84" y1="255" x2="84" y2="310" stroke="#444c56" stroke-width="1.1" />
+
+            <!-- claude/ -->
+            <line x1="84" y1="268" x2="114" y2="268" stroke="#444c56" stroke-width="1" />
+            <rect
+              x="114"
+              y="257"
+              width="90"
+              height="22"
+              rx="3"
+              fill="#241510"
+              stroke="#ff9f6a"
+              stroke-width="1.8"
+            />
+            <text
+              x="159"
+              y="272"
+              text-anchor="middle"
+              fill="#ff9f6a"
+              font-size="12"
+              font-weight="700"
+            >
+              claude/
+            </text>
+            <text x="213" y="272" fill="#ffffff" font-size="11">feat/claude-site / CLAUDE.md</text>
+
+            <!-- gemini/ -->
+            <line x1="84" y1="286" x2="114" y2="286" stroke="#444c56" stroke-width="1" />
+            <rect
+              x="114"
+              y="275"
+              width="90"
+              height="22"
+              rx="3"
+              fill="#10101e"
+              stroke="#79b8ff"
+              stroke-width="1.8"
+            />
+            <text
+              x="159"
+              y="290"
+              text-anchor="middle"
+              fill="#79b8ff"
+              font-size="12"
+              font-weight="700"
+            >
+              gemini/
+            </text>
+            <text x="213" y="290" fill="#ffffff" font-size="11">feat/gemini-site / GEMINI.md</text>
+
+            <!-- codex/ -->
+            <line x1="84" y1="300" x2="114" y2="300" stroke="#444c56" stroke-width="1" />
+            <rect
+              x="114"
+              y="289"
+              width="90"
+              height="22"
+              rx="3"
+              fill="#0f1e10"
+              stroke="#56d364"
+              stroke-width="1.8"
+            />
+            <text
+              x="159"
+              y="304"
+              text-anchor="middle"
+              fill="#56d364"
+              font-size="12"
+              font-weight="700"
+            >
+              codex/
+            </text>
+            <text x="213" y="304" fill="#ffffff" font-size="11">feat/codex-site / AGENTS.md</text>
+
+            <!-- copilot/ -->
+            <line x1="84" y1="310" x2="114" y2="310" stroke="#444c56" stroke-width="1" />
+            <rect
+              x="114"
+              y="299"
+              width="90"
+              height="22"
+              rx="3"
+              fill="#160f1c"
+              stroke="#e2a8ff"
+              stroke-width="1.8"
+            />
+            <text
+              x="159"
+              y="314"
+              text-anchor="middle"
+              fill="#e2a8ff"
+              font-size="12"
+              font-weight="700"
+            >
+              copilot/
+            </text>
+            <text x="213" y="314" fill="#ffffff" font-size="11">
+              feat/copilot-site / copilot-instructions.md
+            </text>
+          </svg>
+        </div>
+
+        <div class="cb">
+          <div class="cb-hdr">
+            <span>scripts/setup-worktrees.sh — 一括セットアップ</span
+            ><span class="cb-tag">bash</span>
+          </div>
+          <pre><span class="sy-kw">#!/bin/bash</span>
+set -euo pipefail
+
+declare -A PLATFORMS=(
+  [<span class="sy-cl">claude</span>]="<span class="sy-cl">feat/claude-site</span>"
+  [<span class="sy-ge">gemini</span>]="<span class="sy-ge">feat/gemini-site</span>"
+  [<span class="sy-co">codex</span>]="<span class="sy-co">feat/codex-site</span>"
+  [<span class="sy-cp">copilot</span>]="<span class="sy-cp">feat/copilot-site</span>"
+)
+
+mkdir -p worktrees
+
+for PLATFORM in "${!PLATFORMS[@]}"; do
+  BRANCH="${PLATFORMS[$PLATFORM]}"
+  TARGET="worktrees/$PLATFORM"
+
+  [ -d "$TARGET" ] && { echo "⏭  $PLATFORM: skip"; continue; }
+
+  git show-ref --verify --quiet "refs/heads/$BRANCH" || \
+    git branch "$BRANCH" main
+
+  git worktree add "$TARGET" "$BRANCH"
+  echo "<span class="sy-ok">✓</span>  $PLATFORM → $TARGET ($BRANCH)"
+done
+
+git worktree list</pre>
+        </div>
+      </section>
+
+      <!-- ══════════ STEP 03 ══════════ -->
+      <section class="step" id="s03">
+        <div class="step-hdr">
+          <div class="step-n">03</div>
+          <div>
+            <div class="step-title">日常の並列開発ワークフロー</div>
+            <div class="step-desc">各ワークツリーでの作業・共通変更の反映・PR までの全フロー。</div>
+          </div>
+        </div>
+
+        <!-- Mermaid: シーケンス図 -->
+        <div class="mmd-box">
+          <div class="mmd-lbl">▸ 並列作業 → 共通変更同期 → PR — シーケンス図</div>
+          <div class="mermaid">
+            sequenceDiagram participant M as main（メイン WT） participant C as claude/ Claude Code
+            participant G as gemini/ Antigravity participant X as codex/ Codex CLI participant P as
+            copilot/ VS Code Note over C,P: 4 ターミナルで同時並列作業（ブランチ切替ゼロ） C->>C:
+            feat: claude サイト実装 G->>G: feat: gemini サイト実装 X->>X: feat: codex サイト実装
+            P->>P: feat: copilot サイト実装 M->>M: feat(shared): nav 更新 Note over M,P:
+            scripts/sync-all.sh 実行 M-->>C: git merge main M-->>G: git merge main M-->>X: git merge
+            main M-->>P: git merge main C->>C: git push → PR 作成 G->>G: git push → PR 作成 X->>X:
+            git push → PR 作成 P->>P: git push → PR 作成
+          </div>
+        </div>
+
+        <h3>各プラットフォームへの AI 設定ファイル配置</h3>
+        <div class="plg">
+          <div class="plc">
+            <div class="plh">
+              <div class="pld" style="background: var(--cl)"></div>
+              Claude / worktrees/claude/
+            </div>
+            <div class="pli"><code>CLAUDE.md</code> — プロジェクト永続メモリ</div>
+            <div class="pli"><code>AGENTS.md</code> — オープン標準（兼用）</div>
+            <div class="pli"><code>.claude/skills/*/SKILL.md</code></div>
+            <div class="pli"><code>.claude/commands/</code> — カスタムコマンド</div>
+          </div>
+          <div class="plc">
+            <div class="plh">
+              <div class="pld" style="background: var(--ge)"></div>
+              Antigravity / worktrees/gemini/
+            </div>
+            <div class="pli"><code>GEMINI.md</code> — グローバルメモリ</div>
+            <div class="pli"><code>.agent/rules/</code> — パッシブルール</div>
+            <div class="pli"><code>.agent/skills/*/SKILL.md</code></div>
+            <div class="pli"><code>.agent/workflows/</code> — アクティブ手順</div>
+          </div>
+          <div class="plc">
+            <div class="plh">
+              <div class="pld" style="background: var(--co)"></div>
+              Codex / worktrees/codex/
+            </div>
+            <div class="pli"><code>AGENTS.md</code> — オープン標準（主）</div>
+            <div class="pli"><code>.agents/skills/*/SKILL.md</code></div>
+            <div class="pli"><code>docs/REQUIREMENTS.md</code></div>
+            <div class="pli"><code>docs/AGENT_TASKS.md</code></div>
+          </div>
+          <div class="plc">
+            <div class="plh">
+              <div class="pld" style="background: var(--cp)"></div>
+              Copilot / worktrees/copilot/
+            </div>
+            <div class="pli"><code>.github/copilot-instructions.md</code></div>
+            <div class="pli"><code>.github/instructions/*.md</code></div>
+            <div class="pli"><code>.github/prompts/*.prompt.md</code></div>
+            <div class="pli"><code>.github/chatmodes/*.chatmode.md</code></div>
+          </div>
+        </div>
+
+        <div class="cb">
+          <div class="cb-hdr">
+            <span>scripts/sync-all.sh — 全 WT 一括同期</span><span class="cb-tag">bash</span>
+          </div>
+          <pre><span class="sy-kw">#!/bin/bash</span>
+set -euo pipefail
+ROOT="$(git rev-parse --show-toplevel)"
+WORKTREES=(<span class="sy-cl">claude</span> <span class="sy-ge">gemini</span> <span class="sy-co">codex</span> <span class="sy-cp">copilot</span>)
+
+for WT in "${WORKTREES[@]}"; do
+  echo "━━━ Syncing: $WT ━━━━━━━━━━━━━━━━━━"
+  cd "$ROOT/worktrees/$WT"
+
+  if ! git diff --quiet; then
+    git stash push -m <span class="sy-st">"auto: $WT before sync"</span>
+    STASHED=true
+  else
+    STASHED=false
+  fi
+
+  git merge main --no-edit && \
+    echo "<span class="sy-ok">  ✓ $WT: synced</span>" || \
+    echo "<span class="sy-er">  ✗ $WT: CONFLICT — 手動解決が必要</span>"
+
+  [ "$STASHED" = true ] && git stash pop
+done
+
+cd "$ROOT" && git worktree list</pre>
+        </div>
+      </section>
+
+      <!-- ══════════ STEP 04 ══════════ -->
+      <section class="step" id="s04">
+        <div class="step-hdr">
+          <div class="step-n">04</div>
+          <div>
+            <div class="step-title">メリット・デメリット — 導入判断の材料</div>
+            <div class="step-desc">
+              4 プラットフォーム並列開発における worktree の優位性と注意すべき落とし穴。
+            </div>
+          </div>
+        </div>
+
+        <div class="mdg">
+          <div class="mdc">
+            <div class="mdh mdh-ok">✅ メリット</div>
+            <div class="mdb">
+              <div class="mdi">
+                <div class="mdi-icon">🚀</div>
+                <div>
+                  <strong>真の並列開発（stash・切替ゼロ）</strong
+                  ><span
+                    >4 ターミナルで同時に別ブランチを操作。AI エージェントを 4
+                    つ同時起動できる。ブランチ切替コストが完全にゼロ。</span
+                  >
+                </div>
+              </div>
+              <div class="mdi">
+                <div class="mdi-icon">💾</div>
+                <div>
+                  <strong>ディスク・メモリを大幅節約</strong
+                  ><span
+                    >.git オブジェクトを共有するため clone×4
+                    に比べてディスク使用量が大幅に少ない（差分のみ追加）。</span
+                  >
+                </div>
+              </div>
+              <div class="mdi">
+                <div class="mdi-icon">🔗</div>
+                <div>
+                  <strong>共通変更が一元管理</strong
+                  ><span
+                    >shared/ の変更を main で 1 回 commit → sync-all.sh で全 WT
+                    に反映。手動コピー完全不要。</span
+                  >
+                </div>
+              </div>
+              <div class="mdi">
+                <div class="mdi-icon">📜</div>
+                <div>
+                  <strong>Git 履歴の一元化</strong
+                  ><span
+                    >全プラットフォームの変更履歴が 1 リポジトリに集約。git log / bisect / blame
+                    が横断的に使える。</span
+                  >
+                </div>
+              </div>
+              <div class="mdi">
+                <div class="mdi-icon">🤖</div>
+                <div>
+                  <strong>AI エージェントとの最良の相性</strong
+                  ><span
+                    >各 WT に設定ファイルを配置するだけで、AI が同一の git
+                    履歴を参照しながら独立した作業を実行できる。</span
+                  >
+                </div>
+              </div>
+              <div class="mdi">
+                <div class="mdi-icon">🔀</div>
+                <div>
+                  <strong>stash が全 WT 間で共有</strong
+                  ><span
+                    >全 WT が同じ .git を参照するため、WT をまたいで stash
+                    を参照・適用できる。</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mdc">
+            <div class="mdh mdh-err">❌ デメリット・注意点</div>
+            <div class="mdb">
+              <div class="mdi">
+                <div class="mdi-icon">🔒</div>
+                <div>
+                  <strong>同一ブランチの重複チェックアウト不可</strong
+                  ><span
+                    >同じブランチを 2 つの WT で同時チェックアウトできない。--force
+                    は破壊的なので絶対禁止。</span
+                  >
+                </div>
+              </div>
+              <div class="mdi">
+                <div class="mdi-icon">⚡</div>
+                <div>
+                  <strong>hook が全 WT に影響する</strong
+                  ><span
+                    >.git/hooks は全 WT 共有。pre-commit が全 WT
+                    で実行される。個別設定には追加ロジックが必要。</span
+                  >
+                </div>
+              </div>
+              <div class="mdi">
+                <div class="mdi-icon">📁</div>
+                <div>
+                  <strong>IDE が混乱しやすい</strong
+                  ><span
+                    >VS Code がメインルートを認識し、worktrees/ 配下を正しく扱えない場合がある。WT
+                    ごとに別ウィンドウで開くことを推奨。</span
+                  >
+                </div>
+              </div>
+              <div class="mdi">
+                <div class="mdi-icon">🔀</div>
+                <div>
+                  <strong>merge コンフリクトのリスク</strong
+                  ><span
+                    >4 ブランチが並行して shared/ を変更すると main merge
+                    時に複数コンフリクトが発生。CODEOWNERS での管理必須。</span
+                  >
+                </div>
+              </div>
+              <div class="mdi">
+                <div class="mdi-icon">🧹</div>
+                <div>
+                  <strong>WT 削除手順が特殊</strong
+                  ><span
+                    >rm -rf だけでは git の追跡が残る。git worktree remove または git worktree prune
+                    が必要。</span
+                  >
+                </div>
+              </div>
+              <div class="mdi">
+                <div class="mdi-icon">📊</div>
+                <div>
+                  <strong>gc / fetch が重くなりうる</strong
+                  ><span
+                    >多数の WT 存在時に git gc や git fetch が遅くなる。定期的な git worktree prune
+                    が必要。</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════ STEP 05 ══════════ -->
+      <section class="step" id="s05">
+        <div class="step-hdr">
+          <div class="step-n">05</div>
+          <div>
+            <div class="step-title">導入時の注意点 — 絶対に守る 7 つのルール</div>
+            <div class="step-desc">
+              チームで worktree を運用する際に全員が合意すべき制約と落とし穴の回避策。
+            </div>
+          </div>
+        </div>
+
+        <!-- Mermaid: エラーと対処 -->
+        <div class="mmd-box">
+          <div class="mmd-lbl">▸ よくあるミスと正しい対処フロー</div>
+          <div class="mermaid">
+            flowchart LR subgraph BAD["❌ よくあるミス"] direction TB E1["同一ブランチを\n別 WT で
+            checkout"] E2["rm -rf で WT\nディレクトリを削除"] E3["shared/ を各 WT から\n直接変更"]
+            E4["AI エージェントを\nルート直下から起動"] end subgraph GOOD["✅ 正しい対処"] direction
+            TB F1["git worktree list で確認\n各 WT に別ブランチを割当"] F2["git worktree remove\ngit
+            worktree prune"] F3["main で変更 → commit\nsync-all.sh で全 WT 反映"] F4["cd
+            worktrees/claude から\n各ツールを起動"] end E1 -->|fatal: already checked out| F1 E2
+            -->|.git にメタデータが残存| F2 E3 -->|merge コンフリクト多発| F3 E4 -->|全 WT
+            横断の誤変更リスク| F4 style E1 fill:#2a1515,stroke:#ff7b72,color:#ffffff style E2
+            fill:#2a1515,stroke:#ff7b72,color:#ffffff style E3
+            fill:#2a1515,stroke:#ff7b72,color:#ffffff style E4
+            fill:#2a1515,stroke:#ff7b72,color:#ffffff style F1
+            fill:#152515,stroke:#56d364,color:#ffffff style F2
+            fill:#152515,stroke:#56d364,color:#ffffff style F3
+            fill:#152515,stroke:#56d364,color:#ffffff style F4
+            fill:#152515,stroke:#56d364,color:#ffffff style BAD
+            fill:#1c1010,stroke:#ff7b72,color:#ff7b72 style GOOD
+            fill:#101c10,stroke:#56d364,color:#56d364
+          </div>
+        </div>
+
+        <div class="rules">
+          <div class="rule">
+            <div class="rule-icon" style="color: var(--err)">🚫</div>
+            <div>
+              <strong>ルール 1: 同一ブランチを複数 WT にチェックアウトしない</strong
+              ><span
+                ><code>--force</code> フラグは .git の整合性を破壊するため絶対禁止。<code
+                  >git worktree list</code
+                >
+                で現状確認してから追加する。</span
+              >
+            </div>
+          </div>
+          <div class="rule">
+            <div class="rule-icon" style="color: var(--warn)">⚠️</div>
+            <div>
+              <strong>ルール 2: WT の削除は必ず git worktree remove を使う</strong
+              ><span
+                ><code>rm -rf worktrees/claude</code> だけでは .git
+                内のメタデータが残存する。削除後は
+                <code>git worktree prune</code> で必ずクリーンアップする。</span
+              >
+            </div>
+          </div>
+          <div class="rule">
+            <div class="rule-icon" style="color: var(--warn)">⚠️</div>
+            <div>
+              <strong>ルール 3: shared/ への変更は main ブランチ経由のみ</strong
+              ><span
+                >各 WT から直接 shared/ を変更すると merge コンフリクトが多発する。<code
+                  >CODEOWNERS</code
+                >
+                で shared/ の変更権限を main のみに制限する。</span
+              >
+            </div>
+          </div>
+          <div class="rule">
+            <div class="rule-icon" style="color: var(--ge)">🔍</div>
+            <div>
+              <strong>ルール 4: git stash のメッセージには WT 名を含める</strong
+              ><span
+                >stash は全 WT 共通の .git に保存されるため混在する。例:
+                <code>git stash push -m "claude: WIP nav"</code></span
+              >
+            </div>
+          </div>
+          <div class="rule">
+            <div class="rule-icon" style="color: var(--co)">📋</div>
+            <div>
+              <strong>ルール 5: pre-commit hook は全 WT で動作することを前提に設計する</strong
+              ><span
+                >hooks/ は全 WT で共有。特定 WT だけ除外したい場合は
+                <code>$GIT_DIR</code> 変数で判定するロジックを hook に追加する。</span
+              >
+            </div>
+          </div>
+          <div class="rule">
+            <div class="rule-icon" style="color: var(--cp)">🤖</div>
+            <div>
+              <strong>ルール 6: AI エージェントはワークツリーのルートから必ず起動する</strong
+              ><span
+                >メインルート（ai-sites/）から起動すると全 WT
+                横断でファイルを変更するリスクがある。<code>cd worktrees/claude && claude</code>
+                のように WT 内から起動する。</span
+              >
+            </div>
+          </div>
+          <div class="rule">
+            <div class="rule-icon" style="color: var(--ok)">🔄</div>
+            <div>
+              <strong>ルール 7: 定期的に git worktree prune を実行する</strong
+              ><span
+                >削除済み WT のメタデータが蓄積するため、週次または CI で
+                <code>git worktree prune && git fetch --prune</code>
+                を実行してリポジトリを健全に保つ。</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <h3>よくあるエラーと対処法</h3>
+        <table>
+          <tr>
+            <th>エラーメッセージ</th>
+            <th>原因</th>
+            <th>対処法</th>
+          </tr>
+          <tr>
+            <td>fatal: already checked out</td>
+            <td>同ブランチを別 WT でも checkout しようとした</td>
+            <td><code>git worktree list</code> で確認し、各 WT に別ブランチを使う</td>
+          </tr>
+          <tr>
+            <td>fatal: already exists</td>
+            <td>対象ディレクトリが既に存在する</td>
+            <td><code>rm -rf worktrees/xxx && git worktree prune</code> 後に再実行</td>
+          </tr>
+          <tr>
+            <td>error: worktree locked</td>
+            <td>別プロセスが使用中でロックされた</td>
+            <td><code>git worktree unlock worktrees/xxx</code> または再起動</td>
+          </tr>
+          <tr>
+            <td>CONFLICT in shared/</td>
+            <td>複数 WT が同じ shared/ ファイルを変更</td>
+            <td>CODEOWNERS で shared/ への直接変更を禁止し main 経由のみに制限</td>
+          </tr>
+        </table>
+
+        <div class="cb">
+          <div class="cb-hdr"><span>Cleanup Commands</span><span class="cb-tag">bash</span></div>
+          <pre><span class="sy-cm"># 安全に削除（未コミット変更がない場合）</span>
+git worktree remove worktrees/claude
+
+<span class="sy-cm"># 強制削除（未コミット変更も削除）</span>
+git worktree remove --force worktrees/claude
+
+<span class="sy-cm"># 削除済みディレクトリの参照を git から掃除</span>
+git worktree prune
+git worktree prune --dry-run   <span class="sy-cm"># 確認してから実行</span>
+
+<span class="sy-cm"># 全 WT を一括削除（リセット）</span>
+for WT in claude gemini codex copilot; do
+  git worktree remove --force "worktrees/$WT" 2>/dev/null || true
+done && git worktree prune && echo "<span class="sy-ok">All removed.</span>"</pre>
+        </div>
+      </section>
+
+      <!-- ══════════ STEP 06 ══════════ -->
+      <section class="step" id="s06">
+        <div class="step-hdr">
+          <div class="step-n">06</div>
+          <div>
+            <div class="step-title">GitHub Actions との統合 — 4 プラットフォームの並列 CI</div>
+            <div class="step-desc">
+              matrix strategy による効率的な並列ビルド・デプロイパイプライン。
+            </div>
+          </div>
+        </div>
+
+        <div class="mmd-box">
+          <div class="mmd-lbl">▸ GitHub Actions — matrix 並列パイプライン</div>
+          <div class="mermaid">
+            flowchart LR T(["push to\nfeat/* or main"]) T --> J[detect-platform job] J --> M{"matrix
+            strategy\nfail-fast: false\n4 並列実行"} M --> B1["build: claude\ngit worktree add"] M
+            --> B2["build: gemini\ngit worktree add"] M --> B3["build: codex\ngit worktree add"] M
+            --> B4["build: copilot\ngit worktree add"] B1 --> D1[Deploy\nclaude site] B2 -->
+            D2[Deploy\ngemini site] B3 --> D3[Deploy\ncodex site] B4 --> D4[Deploy\ncopilot site]
+            style T fill:#21262d,stroke:#444c56,color:#ffffff style J
+            fill:#21262d,stroke:#e3b341,color:#ffffff style M
+            fill:#1f2d14,stroke:#56d364,color:#ffffff style B1
+            fill:#2a1a10,stroke:#ff9f6a,color:#ffffff style B2
+            fill:#101828,stroke:#79b8ff,color:#ffffff style B3
+            fill:#101e12,stroke:#56d364,color:#ffffff style B4
+            fill:#1c1028,stroke:#e2a8ff,color:#ffffff style D1
+            fill:#2a1a10,stroke:#ff9f6a,color:#ffffff style D2
+            fill:#101828,stroke:#79b8ff,color:#ffffff style D3
+            fill:#101e12,stroke:#56d364,color:#ffffff style D4
+            fill:#1c1028,stroke:#e2a8ff,color:#ffffff
+          </div>
+        </div>
+
+        <div class="cb">
+          <div class="cb-hdr">
+            <span>.github/workflows/parallel-deploy.yml</span><span class="cb-tag">yaml</span>
+          </div>
+          <pre><span class="sy-kw">name</span>: Parallel Platform Deploy
+<span class="sy-kw">on</span>:
+  push:
+    branches:
+      - <span class="sy-st">'feat/claude-site'</span>
+      - <span class="sy-st">'feat/gemini-site'</span>
+      - <span class="sy-st">'feat/codex-site'</span>
+      - <span class="sy-st">'feat/copilot-site'</span>
+      - <span class="sy-st">'main'</span>
+
+<span class="sy-kw">jobs</span>:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [<span class="sy-cl">claude</span>, <span class="sy-ge">gemini</span>, <span class="sy-co">codex</span>, <span class="sy-cp">copilot</span>]
+      fail-fast: false   <span class="sy-cm"># 1 つ失敗しても他は継続</span>
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   <span class="sy-cm"># 全履歴を取得（worktree で必要）</span>
+
+      - name: Setup worktree
+        run: |
+          git worktree add /tmp/${{ matrix.platform }} \
+            feat/${{ matrix.platform }}-site
+
+      - name: Build
+        working-directory: /tmp/${{ matrix.platform }}
+        run: npm ci && npm run build
+
+      - name: Deploy
+        working-directory: /tmp/${{ matrix.platform }}
+        run: |
+          npx vercel deploy --prod \
+            --token ${{ secrets.VERCEL_TOKEN }} \
+            --name ai-sites-${{ matrix.platform }}</pre>
+        </div>
+      </section>
+
+      <!-- ══════════ FINAL BANNER ══════════ -->
+      <div class="final">
+        <div class="final-title">// 導入判断サマリー</div>
+        <div class="final-body">
+          git worktree は
+          <strong>「同一リポジトリを複数の作業ディレクトリで同時並行作業する」</strong>
+          最もクリーンな解決策です。 4 プラットフォームの AI
+          エージェントを同時稼働させる今回のシナリオでは、<strong
+            >clone × 4 よりも worktree × 4 が明確に優位</strong
+          >です。 ただし
+          <strong
+            >① 同一ブランチの重複チェックアウト禁止 ② shared/ は main 経由のみ変更 ③ 削除時は git
+            worktree remove 必須</strong
+          >
+          の 3 ルールをチーム全員が守ることが成功の条件です。 AI
+          エージェントは各ワークツリーのルートから起動し、AGENTS.md / CLAUDE.md 等の設定ファイルを各
+          WT に配置することで、
+          <strong>4 ツール × 並列 = 最大スループット</strong> の開発体験が実現します。
+        </div>
+      </div>
+    </div>
+    <!-- /wrap -->
+
+    <footer>
+      <span>git worktree × 4-Platform Parallel Development Guide</span>
+      <span>git 2.5+ required · No additional install needed</span>
+    </footer>
+  </body>
+</html>

@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-02-28",
-  "jpy_rate": 155.98,
-  "jpy_rate_date": "2026-02-27",
+  "generated_at": "2026-03-07",
+  "jpy_rate": 157.92,
+  "jpy_rate_date": "2026-03-06",
   "api_models": [
     {
       "provider": "Anthropic",
@@ -111,7 +111,7 @@
       "price_out": 14.0,
       "sub_ja": "最新フラッグシップ / Feb 2026",
       "sub_en": "Latest flagship / Feb 2026",
-      "scrape_status": "manual"
+      "scrape_status": "fallback"
     },
     {
       "provider": "OpenAI",
@@ -122,7 +122,7 @@
       "price_out": 168.0,
       "sub_ja": "最高品質推論 / Feb 2026",
       "sub_en": "Highest quality reasoning / Feb 2026",
-      "scrape_status": "manual"
+      "scrape_status": "fallback"
     },
     {
       "provider": "OpenAI",
@@ -309,7 +309,7 @@
       "price_out": 3.2,
       "sub_ja": "マルチモーダル / 300K ctx",
       "sub_en": "Multimodal / 300K ctx",
-      "scrape_status": "fallback"
+      "scrape_status": "success"
     },
     {
       "provider": "AWS",
