@@ -1,3 +1,3 @@
-from __future__ import annotations
-
 """LLM-Studies Scraper パッケージ。"""
+
+from __future__ import annotations

@@ -280,7 +280,7 @@
       }
       /* ★ シンタックスカラー — 全て読みやすい明るさ */
       .sy-cm {
-        color: #9da5b4;
+        color: #c0c8d8;
         font-style: italic;
       } /* コメント: 十分明るい灰 */
       .sy-kw {
@@ -1587,7 +1587,7 @@ git worktree list
               copilot/
             </text>
             <text x="213" y="314" fill="#ffffff" font-size="11">
-              feat/copilot-site / copilot-instructions.md
+              feat/copilot-site / .github/copilot-instructions.md
             </text>
           </svg>
         </div>
@@ -1600,17 +1600,14 @@ git worktree list
           <pre><span class="sy-kw">#!/bin/bash</span>
 set -euo pipefail
 
-declare -A PLATFORMS=(
-  [<span class="sy-cl">claude</span>]="<span class="sy-cl">feat/claude-site</span>"
-  [<span class="sy-ge">gemini</span>]="<span class="sy-ge">feat/gemini-site</span>"
-  [<span class="sy-co">codex</span>]="<span class="sy-co">feat/codex-site</span>"
-  [<span class="sy-cp">copilot</span>]="<span class="sy-cp">feat/copilot-site</span>"
-)
+PLATFORMS_KEYS=(<span class="sy-cl">claude</span> <span class="sy-ge">gemini</span> <span class="sy-co">codex</span> <span class="sy-cp">copilot</span>)
+PLATFORMS_VALUES=(<span class="sy-cl">feat/claude-site</span> <span class="sy-ge">feat/gemini-site</span> <span class="sy-co">feat/codex-site</span> <span class="sy-cp">feat/copilot-site</span>)
 
 mkdir -p worktrees
 
-for PLATFORM in "${!PLATFORMS[@]}"; do
-  BRANCH="${PLATFORMS[$PLATFORM]}"
+for i in "${!PLATFORMS_KEYS[@]}"; do
+  PLATFORM="${PLATFORMS_KEYS[$i]}"
+  BRANCH="${PLATFORMS_VALUES[$i]}"
   TARGET="worktrees/$PLATFORM"
 
   [ -d "$TARGET" ] && { echo "⏭  $PLATFORM: skip"; continue; }
@@ -1708,18 +1705,19 @@ for WT in "${WORKTREES[@]}"; do
   echo "━━━ Syncing: $WT ━━━━━━━━━━━━━━━━━━"
   cd "$ROOT/worktrees/$WT"
 
-  if ! git diff --quiet; then
-    git stash push -m <span class="sy-st">"auto: $WT before sync"</span>
+  if [ -n "$(git status --porcelain)" ]; then
+    git stash push -u -m <span class="sy-st">"auto: $WT before sync"</span>
     STASHED=true
   else
     STASHED=false
   fi
 
-  git merge main --no-edit && \
-    echo "<span class="sy-ok">  ✓ $WT: synced</span>" || \
+  if git merge main --no-edit; then
+    echo "<span class="sy-ok">  ✓ $WT: synced</span>"
+    [ "$STASHED" = true ] && git stash pop
+  else
     echo "<span class="sy-er">  ✗ $WT: CONFLICT — 手動解決が必要</span>"
-
-  [ "$STASHED" = true ] && git stash pop
+  fi
 done
 
 cd "$ROOT" && git worktree list</pre>
@@ -2095,6 +2093,7 @@ done && git worktree prune && echo "<span class="sy-ok">All removed.</span>"</pr
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: <span class="sy-st">'refs/heads/main'</span>
           fetch-depth: 0   <span class="sy-cm"># 全履歴を取得（worktree で必要）</span>
 
       - name: Setup worktree
