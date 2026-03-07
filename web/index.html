@@ -24,7 +24,7 @@
       document.head.appendChild(link);
 
       const script = document.createElement('script');
-      script.defer = true;
+      // 動的スクリプトでは defer は効果がないため除外（classic script として document.currentScript を利用）
       script.src = prefix + 'shared/common-header.js';
       document.head.appendChild(script);
     </script>

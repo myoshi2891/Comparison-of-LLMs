@@ -1732,12 +1732,12 @@ git worktree list</pre>
           <div class="mermaid">
             sequenceDiagram participant M as dev（メイン WT） participant C as claude/ Claude Code +
             WebSearch participant G as gemini/ Antigravity + WebSearch participant X as codex/ Codex
-            CLI + WebSearch participant P as copilot/ VS Code + Copilot Chat Note over C,P: 4
-            ターミナルで同時並列作業（WebSearch で最新情報取得） C->>C: docs: agent.html 更新 G->>G:
-            docs: skill.html 更新 X->>X: docs: agent.html 更新 P->>P: docs: skill.html 更新 M->>M:
-            fix(shared): header CSS Note over M,P: scripts/sync-all.sh 実行 M-->>C: git merge dev
-            M-->>G: git merge dev M-->>X: git merge dev M-->>P: git merge dev C->>C: git push → PR
-            作成 G->>G: git push → PR 作成 X->>X: git push → PR 作成 P->>P: git push → PR 作成
+            CLI + WebSearch participant P as copilot/ VS Code + Copilot Chat Note over C,P:
+            4ターミナルで同時並列作業（WebSearch で最新情報取得） C->>C: docs: agent.html 更新
+            G->>G: docs: skill.html 更新 X->>X: docs: agent.html 更新 P->>P: docs: skill.html 更新
+            M->>M: fix(shared): header CSS Note over M,P: scripts/sync-all.sh 実行 M-->>C: git merge
+            dev M-->>G: git merge dev M-->>X: git merge dev M-->>P: git merge dev C->>C: git push →
+            PR 作成 G->>G: git push → PR 作成 X->>X: git push → PR 作成 P->>P: git push → PR 作成
           </div>
         </div>
 
