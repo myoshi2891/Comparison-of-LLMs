@@ -5,7 +5,6 @@ on:
   pull_request:
 
 jobs:
-
   # -------------------------
   # 変更ファイル検出（最重要）
   # -------------------------
@@ -72,7 +71,7 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: '3.12'
 
       - name: Install uv
         run: pip install uv
@@ -82,7 +81,6 @@ jobs:
         with:
           path: |
             ~/.cache/uv
-            scraper/.venv
           key: uv-${{ runner.os }}-${{ hashFiles('scraper/uv.lock') }}
 
       - name: Install deps
