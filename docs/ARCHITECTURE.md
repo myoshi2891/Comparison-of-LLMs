@@ -99,6 +99,7 @@ flowchart TD
 ├── common-header.js             # 静的 HTML 用共通ヘッダー注入スクリプト (ドロップダウンナビゲーション + 免責事項バナー)
 ├── common-header.css            # 共通ヘッダー + 免責事項スタイル (レスポンシブ対応)
 ├── nav-links.json               # ナビリンク構造の外部設定 (任意、なければデフォルト値を使用)
+├── git_worktree.html            # git worktree × 4プラットフォーム並列開発ガイド (Mermaid v10 + 手書き SVG、共通ヘッダー参照)
 ├── claude/                      # Claude ドキュメント (skill.html / agent.html)
 ├── gemini/                      # Gemini ドキュメント (skill.html / agent.html)
 ├── codex/                       # Codex ドキュメント (skill.html / agent.html)
@@ -110,6 +111,7 @@ flowchart TD
 │   ├── requirements.md          # 詳細要件定義 (FR/NFR ID付き)
 │   ├── design.md                # 技術設計ドキュメント (設計判断と根拠)
 │   ├── tasks.md                 # 実装ロードマップ (依存関係付き)
+│   ├── GIT_WORKTREE.md          # git worktree 並列開発 運用ガイド (クイックリファレンス)
 │   ├── ARCHITECTURE.md          # 本ファイル (構造の事実)
 │   └── TESTING.md               # テスト戦略・ガイドライン
 ├── links.md                     # 公式料金ページ参考リンク集
