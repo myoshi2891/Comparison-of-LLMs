@@ -181,3 +181,31 @@ Build:    cd web && bun run build
 ### パッチ戦略
 
 small diff > medium diff > large diff — 常に最小の差分を選択。
+
+### 静的 HTML ドキュメント
+
+本リポジトリにはビルドパイプライン外の静的 HTML ドキュメントが存在する:
+
+| ファイル | 内容 | 行数目安 | 注意点 |
+| --------- | ------ | --------- | -------- |
+| `git_worktree.html` | git worktree 並列開発ガイド | ~2200行 | Mermaid v10 + 手書き SVG |
+| `claude/skill.html` | Claude スキル展開ガイド | ~1500行 | 共通ヘッダー参照 |
+| `claude/agent.html` | Claude エージェント最適化 | ~1500行 | 共通ヘッダー参照 |
+| `gemini/skill.html` | Gemini スキル展開ガイド | 同上 | 同上 |
+| `codex/skill.html` | Codex スキル展開ガイド | 同上 | 同上 |
+| `copilot/skill.html` | Copilot スキル展開ガイド | 同上 | 同上 |
+
+#### HTML ドキュメント編集時の注意
+
+- Mermaid v10 の `<div class="mermaid">` 内コンテンツは**左端揃え必須**（HTML インデントが構文エラーの原因になる）
+- SVG の `viewBox` 高さとコンテンツ座標の整合性を常に確認
+- SVG `<marker>` の色は対応する `<line>` の `stroke` 色と一致させる
+<!-- - Playwright で検証する際は `browser_take_screenshot` のターゲット要素指定を使う（全体スナップショットはトークン大量消費） -->
+- Playwright MCP ツールはこのプロジェクトでは使用しない（トークン大量消費のため）。HTML の目視確認はユーザーが手動で行う
+
+### トークン効率ガイドライン
+
+- 単一ファイルの修正には Task エージェントを使わず直接 Read → Edit する
+<!-- - content-heavy HTML（500行超）を Playwright で開く場合、`browser_snapshot` を避ける -->
+- Playwright MCP ツールを使用しない（検証はユーザーが手動で行う）
+- 同一ファイルの重複読み込みを避ける（エージェントに読ませたら再度読まない）

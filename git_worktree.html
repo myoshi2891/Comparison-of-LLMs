@@ -1154,7 +1154,7 @@
               y2="194"
               stroke="#ff9f6a"
               stroke-width="1.5"
-              marker-end="url(#arr-g)"
+              marker-end="url(#arr-cl)"
             />
             <line
               x1="646"
@@ -1163,7 +1163,7 @@
               y2="194"
               stroke="#79b8ff"
               stroke-width="1.5"
-              marker-end="url(#arr-g)"
+              marker-end="url(#arr-ge)"
             />
             <line
               x1="548"
@@ -1181,7 +1181,7 @@
               y2="284"
               stroke="#e2a8ff"
               stroke-width="1.5"
-              marker-end="url(#arr-g)"
+              marker-end="url(#arr-cp)"
             />
 
             <text
@@ -1202,6 +1202,15 @@
               </marker>
               <marker id="arr-r" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
                 <polygon points="0 0,8 3,0 6" fill="#ff7b72" />
+              </marker>
+              <marker id="arr-cl" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                <polygon points="0 0,8 3,0 6" fill="#ff9f6a" />
+              </marker>
+              <marker id="arr-ge" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                <polygon points="0 0,8 3,0 6" fill="#79b8ff" />
+              </marker>
+              <marker id="arr-cp" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                <polygon points="0 0,8 3,0 6" fill="#e2a8ff" />
               </marker>
             </defs>
           </svg>
@@ -1265,15 +1274,34 @@
             ▸ main を源流として 4 プラットフォームへ派生 — 共通変更は merge で全 WT に同期
           </div>
           <div class="mermaid">
-            %%{init: {'logLevel': 'error', 'gitGraph': {'rotateCommitLabel': false}}}%% gitGraph LR:
-            commit id: "chore: init" commit id: "feat: shared/" branch feat/claude-site checkout
-            feat/claude-site commit id: "CLAUDE.md" commit id: "claude v1" checkout main branch
-            feat/gemini-site checkout feat/gemini-site commit id: "GEMINI.md" commit id: "gemini v1"
-            checkout main branch feat/codex-site checkout feat/codex-site commit id: "AGENTS.md"
-            commit id: "codex v1" checkout main branch feat/copilot-site checkout feat/copilot-site
-            commit id: "copilot-instr" checkout main commit id: "fix(shared): nav" checkout
-            feat/claude-site merge main id: "sync nav" checkout feat/gemini-site merge main id:
-            "sync nav "
+%%{init: {'logLevel': 'error', 'gitGraph': {'rotateCommitLabel': false}}}%%
+gitGraph LR:
+commit id: "chore: init"
+commit id: "feat: shared/"
+branch feat/claude-site
+checkout feat/claude-site
+commit id: "CLAUDE.md"
+commit id: "claude v1"
+checkout main
+branch feat/gemini-site
+checkout feat/gemini-site
+commit id: "GEMINI.md"
+commit id: "gemini v1"
+checkout main
+branch feat/codex-site
+checkout feat/codex-site
+commit id: "AGENTS.md"
+commit id: "codex v1"
+checkout main
+branch feat/copilot-site
+checkout feat/copilot-site
+commit id: "copilot-instr"
+checkout main
+commit id: "fix(shared): nav"
+checkout feat/claude-site
+merge main id: "sync nav"
+checkout feat/gemini-site
+merge main id: "sync nav "
           </div>
         </div>
 
@@ -1336,24 +1364,28 @@ git branch -a   <span class="sy-cm"># 確認</span></pre>
         <div class="mmd-box">
           <div class="mmd-lbl">▸ worktree セットアップフロー — コマンド実行順序</div>
           <div class="mermaid">
-            flowchart TD A([git init\n空コミット]) --> B[shared/ 作成\ngit commit] B --> C{git
-            branch × 4\n4ブランチ作成} C -->|claude| D1[git worktree
-            add\nworktrees/claude\nfeat/claude-site] C -->|gemini| D2[git worktree
-            add\nworktrees/gemini\nfeat/gemini-site] C -->|codex| D3[git worktree
-            add\nworktrees/codex\nfeat/codex-site] C -->|copilot| D4[git worktree
-            add\nworktrees/copilot\nfeat/copilot-site] D1 --> E1[cd worktrees/claude\nclaude .] D2
-            --> E2[cd worktrees/gemini\nantigravity .] D3 --> E3[cd worktrees/codex\ncodex] D4 -->
-            E4[cd worktrees/copilot\ncode .] style A fill:#21262d,stroke:#56d364,color:#ffffff style
-            B fill:#21262d,stroke:#444c56,color:#ffffff style C
-            fill:#1f2d14,stroke:#56d364,color:#ffffff style D1
-            fill:#2a1a10,stroke:#ff9f6a,color:#ffffff style D2
-            fill:#101828,stroke:#79b8ff,color:#ffffff style D3
-            fill:#101e12,stroke:#56d364,color:#ffffff style D4
-            fill:#1c1028,stroke:#e2a8ff,color:#ffffff style E1
-            fill:#2a1a10,stroke:#ff9f6a,color:#ffffff style E2
-            fill:#101828,stroke:#79b8ff,color:#ffffff style E3
-            fill:#101e12,stroke:#56d364,color:#ffffff style E4
-            fill:#1c1028,stroke:#e2a8ff,color:#ffffff
+flowchart TD
+A([git init\n空コミット]) --> B[shared/ 作成\ngit commit]
+B --> C{git branch × 4\n4ブランチ作成}
+C -->|claude| D1[git worktree add\nworktrees/claude\nfeat/claude-site]
+C -->|gemini| D2[git worktree add\nworktrees/gemini\nfeat/gemini-site]
+C -->|codex| D3[git worktree add\nworktrees/codex\nfeat/codex-site]
+C -->|copilot| D4[git worktree add\nworktrees/copilot\nfeat/copilot-site]
+D1 --> E1[cd worktrees/claude\nclaude .]
+D2 --> E2[cd worktrees/gemini\nantigravity .]
+D3 --> E3[cd worktrees/codex\ncodex]
+D4 --> E4[cd worktrees/copilot\ncode .]
+style A fill:#21262d,stroke:#56d364,color:#ffffff
+style B fill:#21262d,stroke:#444c56,color:#ffffff
+style C fill:#1f2d14,stroke:#56d364,color:#ffffff
+style D1 fill:#2a1a10,stroke:#ff9f6a,color:#ffffff
+style D2 fill:#101828,stroke:#79b8ff,color:#ffffff
+style D3 fill:#101e12,stroke:#56d364,color:#ffffff
+style D4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff
+style E1 fill:#2a1a10,stroke:#ff9f6a,color:#ffffff
+style E2 fill:#101828,stroke:#79b8ff,color:#ffffff
+style E3 fill:#101e12,stroke:#56d364,color:#ffffff
+style E4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff
           </div>
         </div>
 
@@ -1378,7 +1410,7 @@ git worktree list
         <div class="svg-box">
           <div class="svg-lbl">▸ ai-sites/ 全体のファイルツリー（セットアップ完了後）</div>
           <svg
-            viewBox="0 0 780 320"
+            viewBox="0 0 780 440"
             xmlns="http://www.w3.org/2000/svg"
             font-family="IBM Plex Mono, Courier New, monospace"
           >
@@ -1406,7 +1438,7 @@ git worktree list
             <text x="198" y="28" fill="#cdd9e5" font-size="11">← main ブランチ（メイン WT）</text>
 
             <!-- vertical stem -->
-            <line x1="36" y1="38" x2="36" y2="310" stroke="#444c56" stroke-width="1.5" />
+            <line x1="36" y1="38" x2="36" y2="430" stroke="#444c56" stroke-width="1.5" />
 
             <!-- .git -->
             <line x1="36" y1="68" x2="66" y2="68" stroke="#444c56" stroke-width="1.3" />
@@ -1473,10 +1505,10 @@ git worktree list
             <text x="114" y="217" fill="#56d364" font-size="12">sync-all.sh</text>
 
             <!-- worktrees/ label -->
-            <line x1="36" y1="242" x2="66" y2="242" stroke="#444c56" stroke-width="1.3" />
+            <line x1="36" y1="250" x2="66" y2="250" stroke="#444c56" stroke-width="1.3" />
             <rect
               x="66"
-              y="229"
+              y="237"
               width="120"
               height="26"
               rx="4"
@@ -1484,19 +1516,19 @@ git worktree list
               stroke="#444c56"
               stroke-width="1"
             />
-            <text x="126" y="246" text-anchor="middle" fill="#cdd9e5" font-size="12">
+            <text x="126" y="254" text-anchor="middle" fill="#cdd9e5" font-size="12">
               worktrees/
             </text>
-            <text x="196" y="246" fill="#cdd9e5" font-size="11">← .gitignore 対象</text>
+            <text x="196" y="254" fill="#cdd9e5" font-size="11">← .gitignore 対象</text>
 
             <!-- sub-stem for worktrees -->
-            <line x1="84" y1="255" x2="84" y2="310" stroke="#444c56" stroke-width="1.1" />
+            <line x1="84" y1="263" x2="84" y2="420" stroke="#444c56" stroke-width="1.1" />
 
             <!-- claude/ -->
-            <line x1="84" y1="268" x2="114" y2="268" stroke="#444c56" stroke-width="1" />
+            <line x1="84" y1="284" x2="114" y2="284" stroke="#444c56" stroke-width="1" />
             <rect
               x="114"
-              y="257"
+              y="273"
               width="90"
               height="22"
               rx="3"
@@ -1506,7 +1538,7 @@ git worktree list
             />
             <text
               x="159"
-              y="272"
+              y="288"
               text-anchor="middle"
               fill="#ff9f6a"
               font-size="12"
@@ -1514,13 +1546,13 @@ git worktree list
             >
               claude/
             </text>
-            <text x="213" y="272" fill="#ffffff" font-size="11">feat/claude-site / CLAUDE.md</text>
+            <text x="213" y="288" fill="#ffffff" font-size="11">feat/claude-site / CLAUDE.md</text>
 
             <!-- gemini/ -->
-            <line x1="84" y1="286" x2="114" y2="286" stroke="#444c56" stroke-width="1" />
+            <line x1="84" y1="322" x2="114" y2="322" stroke="#444c56" stroke-width="1" />
             <rect
               x="114"
-              y="275"
+              y="311"
               width="90"
               height="22"
               rx="3"
@@ -1530,7 +1562,7 @@ git worktree list
             />
             <text
               x="159"
-              y="290"
+              y="326"
               text-anchor="middle"
               fill="#79b8ff"
               font-size="12"
@@ -1538,13 +1570,13 @@ git worktree list
             >
               gemini/
             </text>
-            <text x="213" y="290" fill="#ffffff" font-size="11">feat/gemini-site / GEMINI.md</text>
+            <text x="213" y="326" fill="#ffffff" font-size="11">feat/gemini-site / GEMINI.md</text>
 
             <!-- codex/ -->
-            <line x1="84" y1="300" x2="114" y2="300" stroke="#444c56" stroke-width="1" />
+            <line x1="84" y1="360" x2="114" y2="360" stroke="#444c56" stroke-width="1" />
             <rect
               x="114"
-              y="289"
+              y="349"
               width="90"
               height="22"
               rx="3"
@@ -1554,7 +1586,7 @@ git worktree list
             />
             <text
               x="159"
-              y="304"
+              y="364"
               text-anchor="middle"
               fill="#56d364"
               font-size="12"
@@ -1562,13 +1594,13 @@ git worktree list
             >
               codex/
             </text>
-            <text x="213" y="304" fill="#ffffff" font-size="11">feat/codex-site / AGENTS.md</text>
+            <text x="213" y="364" fill="#ffffff" font-size="11">feat/codex-site / AGENTS.md</text>
 
             <!-- copilot/ -->
-            <line x1="84" y1="310" x2="114" y2="310" stroke="#444c56" stroke-width="1" />
+            <line x1="84" y1="398" x2="114" y2="398" stroke="#444c56" stroke-width="1" />
             <rect
               x="114"
-              y="299"
+              y="387"
               width="90"
               height="22"
               rx="3"
@@ -1578,7 +1610,7 @@ git worktree list
             />
             <text
               x="159"
-              y="314"
+              y="402"
               text-anchor="middle"
               fill="#e2a8ff"
               font-size="12"
@@ -1586,7 +1618,7 @@ git worktree list
             >
               copilot/
             </text>
-            <text x="213" y="314" fill="#ffffff" font-size="11">
+            <text x="213" y="402" fill="#ffffff" font-size="11">
               feat/copilot-site / .github/copilot-instructions.md
             </text>
           </svg>
@@ -1637,14 +1669,27 @@ git worktree list</pre>
         <div class="mmd-box">
           <div class="mmd-lbl">▸ 並列作業 → 共通変更同期 → PR — シーケンス図</div>
           <div class="mermaid">
-            sequenceDiagram participant M as main（メイン WT） participant C as claude/ Claude Code
-            participant G as gemini/ Antigravity participant X as codex/ Codex CLI participant P as
-            copilot/ VS Code Note over C,P: 4 ターミナルで同時並列作業（ブランチ切替ゼロ） C->>C:
-            feat: claude サイト実装 G->>G: feat: gemini サイト実装 X->>X: feat: codex サイト実装
-            P->>P: feat: copilot サイト実装 M->>M: feat(shared): nav 更新 Note over M,P:
-            scripts/sync-all.sh 実行 M-->>C: git merge main M-->>G: git merge main M-->>X: git merge
-            main M-->>P: git merge main C->>C: git push → PR 作成 G->>G: git push → PR 作成 X->>X:
-            git push → PR 作成 P->>P: git push → PR 作成
+sequenceDiagram
+participant M as main（メイン WT）
+participant C as claude/ Claude Code
+participant G as gemini/ Antigravity
+participant X as codex/ Codex CLI
+participant P as copilot/ VS Code
+Note over C,P: 4 ターミナルで同時並列作業（ブランチ切替ゼロ）
+C->>C: feat: claude サイト実装
+G->>G: feat: gemini サイト実装
+X->>X: feat: codex サイト実装
+P->>P: feat: copilot サイト実装
+M->>M: feat(shared): nav 更新
+Note over M,P: scripts/sync-all.sh 実行
+M-->>C: git merge main
+M-->>G: git merge main
+M-->>X: git merge main
+M-->>P: git merge main
+C->>C: git push → PR 作成
+G->>G: git push → PR 作成
+X->>X: git push → PR 作成
+P->>P: git push → PR 作成
           </div>
         </div>
 
@@ -1892,23 +1937,35 @@ cd "$ROOT" && git worktree list</pre>
         <div class="mmd-box">
           <div class="mmd-lbl">▸ よくあるミスと正しい対処フロー</div>
           <div class="mermaid">
-            flowchart LR subgraph BAD["❌ よくあるミス"] direction TB E1["同一ブランチを\n別 WT で
-            checkout"] E2["rm -rf で WT\nディレクトリを削除"] E3["shared/ を各 WT から\n直接変更"]
-            E4["AI エージェントを\nルート直下から起動"] end subgraph GOOD["✅ 正しい対処"] direction
-            TB F1["git worktree list で確認\n各 WT に別ブランチを割当"] F2["git worktree remove\ngit
-            worktree prune"] F3["main で変更 → commit\nsync-all.sh で全 WT 反映"] F4["cd
-            worktrees/claude から\n各ツールを起動"] end E1 -->|fatal: already checked out| F1 E2
-            -->|.git にメタデータが残存| F2 E3 -->|merge コンフリクト多発| F3 E4 -->|全 WT
-            横断の誤変更リスク| F4 style E1 fill:#2a1515,stroke:#ff7b72,color:#ffffff style E2
-            fill:#2a1515,stroke:#ff7b72,color:#ffffff style E3
-            fill:#2a1515,stroke:#ff7b72,color:#ffffff style E4
-            fill:#2a1515,stroke:#ff7b72,color:#ffffff style F1
-            fill:#152515,stroke:#56d364,color:#ffffff style F2
-            fill:#152515,stroke:#56d364,color:#ffffff style F3
-            fill:#152515,stroke:#56d364,color:#ffffff style F4
-            fill:#152515,stroke:#56d364,color:#ffffff style BAD
-            fill:#1c1010,stroke:#ff7b72,color:#ff7b72 style GOOD
-            fill:#101c10,stroke:#56d364,color:#56d364
+flowchart LR
+subgraph BAD["❌ よくあるミス"]
+direction TB
+E1["同一ブランチを\n別 WT で checkout"]
+E2["rm -rf で WT\nディレクトリを削除"]
+E3["shared/ を各 WT から\n直接変更"]
+E4["AI エージェントを\nルート直下から起動"]
+end
+subgraph GOOD["✅ 正しい対処"]
+direction TB
+F1["git worktree list で確認\n各 WT に別ブランチを割当"]
+F2["git worktree remove\ngit worktree prune"]
+F3["main で変更 → commit\nsync-all.sh で全 WT 反映"]
+F4["cd worktrees/claude から\n各ツールを起動"]
+end
+E1 -->|fatal: already checked out| F1
+E2 -->|.git にメタデータが残存| F2
+E3 -->|merge コンフリクト多発| F3
+E4 -->|全 WT 横断の誤変更リスク| F4
+style E1 fill:#2a1515,stroke:#ff7b72,color:#ffffff
+style E2 fill:#2a1515,stroke:#ff7b72,color:#ffffff
+style E3 fill:#2a1515,stroke:#ff7b72,color:#ffffff
+style E4 fill:#2a1515,stroke:#ff7b72,color:#ffffff
+style F1 fill:#152515,stroke:#56d364,color:#ffffff
+style F2 fill:#152515,stroke:#56d364,color:#ffffff
+style F3 fill:#152515,stroke:#56d364,color:#ffffff
+style F4 fill:#152515,stroke:#56d364,color:#ffffff
+style BAD fill:#1c1010,stroke:#ff7b72,color:#ff7b72
+style GOOD fill:#101c10,stroke:#56d364,color:#56d364
           </div>
         </div>
 
@@ -2056,22 +2113,29 @@ done && git worktree prune && echo "<span class="sy-ok">All removed.</span>"</pr
         <div class="mmd-box">
           <div class="mmd-lbl">▸ GitHub Actions — matrix 並列パイプライン</div>
           <div class="mermaid">
-            flowchart LR T(["push to\nfeat/* or main"]) T --> J[detect-platform job] J --> M{"matrix
-            strategy\nfail-fast: false\n4 並列実行"} M --> B1["build: claude\ngit worktree add"] M
-            --> B2["build: gemini\ngit worktree add"] M --> B3["build: codex\ngit worktree add"] M
-            --> B4["build: copilot\ngit worktree add"] B1 --> D1[Deploy\nclaude site] B2 -->
-            D2[Deploy\ngemini site] B3 --> D3[Deploy\ncodex site] B4 --> D4[Deploy\ncopilot site]
-            style T fill:#21262d,stroke:#444c56,color:#ffffff style J
-            fill:#21262d,stroke:#e3b341,color:#ffffff style M
-            fill:#1f2d14,stroke:#56d364,color:#ffffff style B1
-            fill:#2a1a10,stroke:#ff9f6a,color:#ffffff style B2
-            fill:#101828,stroke:#79b8ff,color:#ffffff style B3
-            fill:#101e12,stroke:#56d364,color:#ffffff style B4
-            fill:#1c1028,stroke:#e2a8ff,color:#ffffff style D1
-            fill:#2a1a10,stroke:#ff9f6a,color:#ffffff style D2
-            fill:#101828,stroke:#79b8ff,color:#ffffff style D3
-            fill:#101e12,stroke:#56d364,color:#ffffff style D4
-            fill:#1c1028,stroke:#e2a8ff,color:#ffffff
+flowchart LR
+T(["push to\nfeat/* or main"])
+T --> J[detect-platform job]
+J --> M{"matrix strategy\nfail-fast: false\n4 並列実行"}
+M --> B1["build: claude\ngit worktree add"]
+M --> B2["build: gemini\ngit worktree add"]
+M --> B3["build: codex\ngit worktree add"]
+M --> B4["build: copilot\ngit worktree add"]
+B1 --> D1[Deploy\nclaude site]
+B2 --> D2[Deploy\ngemini site]
+B3 --> D3[Deploy\ncodex site]
+B4 --> D4[Deploy\ncopilot site]
+style T fill:#21262d,stroke:#444c56,color:#ffffff
+style J fill:#21262d,stroke:#e3b341,color:#ffffff
+style M fill:#1f2d14,stroke:#56d364,color:#ffffff
+style B1 fill:#2a1a10,stroke:#ff9f6a,color:#ffffff
+style B2 fill:#101828,stroke:#79b8ff,color:#ffffff
+style B3 fill:#101e12,stroke:#56d364,color:#ffffff
+style B4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff
+style D1 fill:#2a1a10,stroke:#ff9f6a,color:#ffffff
+style D2 fill:#101828,stroke:#79b8ff,color:#ffffff
+style D3 fill:#101e12,stroke:#56d364,color:#ffffff
+style D4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff
           </div>
         </div>
 
