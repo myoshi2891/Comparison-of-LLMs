@@ -43,6 +43,8 @@ bash update.sh
     - `index.html` 内でルートディレクトリの `common-header.js` および `common-header.css` を動的に読み込み、共通ナビゲーションを提供。
 3. **共通ヘッダー & 仕様書 (Root)**:
     - `common-header.*` により、Reactアプリと静的な各種ドキュメント（`claude/skill.html` など）間で共通のレスポンシブなナビゲーションヘッダー（ドロップダウンメニュー付き）を実現。
+4. **開発ワークフローガイド**:
+    - `git_worktree.html`: git worktree を活用した4プラットフォーム（Claude / Gemini / Codex / Copilot）並列開発ガイド。Mermaid v10 ダイアグラムと手書き SVG による視覚的な解説。
 
 ## 開発者向けガイド
 

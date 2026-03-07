@@ -1,7 +1,7 @@
 # spec.md — AI Model Cost Calculator 仕様書
 
 > **目的**: プロジェクトの「何を」「なぜ」を定義する。全ての要件・設計・タスク文書の起点。
-> **最終更新**: 2026-02-28
+> **最終更新**: 2026-03-08
 
 ---
 
@@ -115,18 +115,19 @@
 
 ### 3.7 ドキュメントサイト
 
-各 AI ツールの SDD（Spec-Driven Development）ベストプラクティスガイドをホスティング:
+各 AI ツールの SDD（Spec-Driven Development）ベストプラクティスガイドと開発ワークフローガイドをホスティング:
 
-| パス | 内容 |
-| ------ | ------ |
-| `/claude/skill.html` | Claude Code スキル・SDD ガイド |
-| `/claude/agent.html` | Claude Code サブエージェント・Agent Teams ガイド |
-| `/gemini/skill.html` | Gemini / Antigravity スキル・ルール・ワークフロー ガイド |
-| `/gemini/agent.html` | Gemini サブエージェント・A2A プロトコル ガイド |
-| `/codex/skill.html` | OpenAI Codex スキルガイド |
-| `/codex/agent.html` | OpenAI Codex エージェントガイド |
-| `/copilot/skill.html` | GitHub Copilot スキルガイド |
-| `/copilot/agent.html` | GitHub Copilot エージェントガイド |
+| パス | 内容 | 備考 |
+| ------ | ------ | ------ |
+| `/git_worktree.html` | git worktree × 4プラットフォーム 並列開発ガイド | Mermaid v10 + 手書き SVG、~2200行 |
+| `/claude/skill.html` | Claude Code スキル・SDD ガイド | 共通ヘッダー参照 |
+| `/claude/agent.html` | Claude Code サブエージェント・Agent Teams ガイド | 共通ヘッダー参照 |
+| `/gemini/skill.html` | Gemini / Antigravity スキル・ルール・ワークフロー ガイド | 共通ヘッダー参照 |
+| `/gemini/agent.html` | Gemini サブエージェント・A2A プロトコル ガイド | 共通ヘッダー参照 |
+| `/codex/skill.html` | OpenAI Codex スキルガイド | 共通ヘッダー参照 |
+| `/codex/agent.html` | OpenAI Codex エージェントガイド | 共通ヘッダー参照 |
+| `/copilot/skill.html` | GitHub Copilot スキルガイド | 共通ヘッダー参照 |
+| `/copilot/agent.html` | GitHub Copilot エージェントガイド | 共通ヘッダー参照 |
 
 ---
 
@@ -181,5 +182,6 @@
 | `docs/requirements.md` | 詳細要件定義（FR/NFR） |
 | `docs/design.md` | 技術設計ドキュメント |
 | `docs/tasks.md` | 実装ロードマップ |
+| `docs/GIT_WORKTREE.md` | git worktree 並列開発 運用ガイド |
 | `links.md` | 公式料金ページ参考リンク集 |
 | `research.md` | 改善調査レポート |
