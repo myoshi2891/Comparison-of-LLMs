@@ -2109,7 +2109,7 @@ done && git worktree prune && echo "<span class="sy-ok">All removed.</span>"</pr
             feat/${{ matrix.platform }}-site
           cd /tmp/${{ matrix.platform }}
           git fetch origin main
-          git merge origin/main
+          git merge origin/main --no-edit
 
       - name: Build
         working-directory: /tmp/${{ matrix.platform }}
