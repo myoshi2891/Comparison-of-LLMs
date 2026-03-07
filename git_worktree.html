@@ -2254,17 +2254,25 @@ style D4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff
       - uses: oven-sh/setup-bun@v2
 
       - name: Setup worktree
+        id: setup-wt
         run: |
-          git worktree add /tmp/${{ matrix.platform }} \
-            feat/${{ matrix.platform }}-docs || echo "Branch may not exist yet"
+          BRANCH="feat/${{ matrix.platform }}-docs"
+          if git show-ref --verify --quiet "refs/remotes/origin/$BRANCH" || git show-ref --verify --quiet "refs/heads/$BRANCH"; then
+            git worktree add /tmp/${{ matrix.platform }} "$BRANCH"
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Validate HTML
+        if: steps.setup-wt.outputs.exists == 'true'
         working-directory: /tmp/${{ matrix.platform }}
         run: |
           bunx vnu-jar --skip-non-html ${{ matrix.platform }}/agent.html
           bunx vnu-jar --skip-non-html ${{ matrix.platform }}/skill.html
 
       - name: Check Links
+        if: steps.setup-wt.outputs.exists == 'true'
         uses: lycheeverse/lychee-action@v2
         with:
           args: /tmp/${{ matrix.platform }}/*.html</pre>
