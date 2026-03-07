@@ -1714,7 +1714,13 @@ for WT in "${WORKTREES[@]}"; do
 
   if git merge main --no-edit; then
     echo "<span class="sy-ok">  ✓ $WT: synced</span>"
-    [ "$STASHED" = true ] && git stash pop
+    if [ "$STASHED" = true ]; then
+      if git stash apply; then
+        git stash drop
+      else
+        echo "<span class="sy-er">  ✗ $WT: STASH APPLY FAILED — 手動解決が必要</span>"
+      fi
+    fi
   else
     echo "<span class="sy-er">  ✗ $WT: CONFLICT — 手動解決が必要</span>"
   fi
@@ -1841,7 +1847,7 @@ cd "$ROOT" && git worktree list</pre>
                   <strong>merge コンフリクトのリスク</strong
                   ><span
                     >4 ブランチが並行して shared/ を変更すると main merge
-                    時に複数コンフリクトが発生。CODEOWNERS での管理必須。</span
+                    時に複数コンフリクトが発生。保護ブランチ設定が必要。</span
                   >
                 </div>
               </div>
@@ -1938,7 +1944,8 @@ cd "$ROOT" && git worktree list</pre>
                 >各 WT から直接 shared/ を変更すると merge コンフリクトが多発する。<code
                   >CODEOWNERS</code
                 >
-                で shared/ の変更権限を main のみに制限する。</span
+                で特定のレビュアーを指定するだけでなく、保護ブランチや Ruleset の設定で
+                「PRマージ必須」「特定ユーザーのみ変更可」を強制することが必須。</span
               >
             </div>
           </div>
@@ -2011,7 +2018,7 @@ cd "$ROOT" && git worktree list</pre>
           <tr>
             <td>CONFLICT in shared/</td>
             <td>複数 WT が同じ shared/ ファイルを変更</td>
-            <td>CODEOWNERS で shared/ への直接変更を禁止し main 経由のみに制限</td>
+            <td>CODEOWNERS + 保護ブランチで shared/ への直接変更を禁止し main 経由のみに制限</td>
           </tr>
         </table>
 
@@ -2100,6 +2107,9 @@ done && git worktree prune && echo "<span class="sy-ok">All removed.</span>"</pr
         run: |
           git worktree add /tmp/${{ matrix.platform }} \
             feat/${{ matrix.platform }}-site
+          cd /tmp/${{ matrix.platform }}
+          git fetch origin main
+          git merge origin/main
 
       - name: Build
         working-directory: /tmp/${{ matrix.platform }}
@@ -2107,10 +2117,12 @@ done && git worktree prune && echo "<span class="sy-ok">All removed.</span>"</pr
 
       - name: Deploy
         working-directory: /tmp/${{ matrix.platform }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
           npx vercel deploy --prod \
-            --token ${{ secrets.VERCEL_TOKEN }} \
-            --name ai-sites-${{ matrix.platform }}</pre>
+            --token ${{ secrets.VERCEL_TOKEN }}</pre>
         </div>
       </section>
 
