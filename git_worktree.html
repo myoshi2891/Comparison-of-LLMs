@@ -1303,7 +1303,7 @@
             merge で全 WT に同期
           </div>
           <pre class="mermaid">
-%%{init: {'logLevel': 'error', 'gitGraph': {'rotateCommitLabel': false}}}%%
+%%{init: {'logLevel': 'error', 'gitGraph': {'rotateCommitLabel': false, 'mainBranchName': 'dev'}}}%%
 gitGraph LR:
 commit id: "chore: init"
 commit id: "feat: shared/"
@@ -1343,7 +1343,7 @@ mkdir ai-docs && cd ai-docs
 git init
 git commit --allow-empty -m <span class="sy-st">"chore: initial commit"</span>
 
-<span class="sy-cm"># ── 共通ディレクトリを main に作成 ───────────────────────────────</span>
+<span class="sy-cm"># ── 共通ディレクトリを dev に作成 ───────────────────────────────</span>
 mkdir -p shared/{components,styles,utils} docs scripts .github/workflows
 git add . && git commit -m <span class="sy-st">"feat: add shared structure"</span>
 
@@ -1464,7 +1464,7 @@ git worktree list
             >
               ai-docs/
             </text>
-            <text x="198" y="28" fill="#cdd9e5" font-size="11">← main ブランチ（メイン WT）</text>
+            <text x="198" y="28" fill="#cdd9e5" font-size="11">← dev ブランチ（メイン WT）</text>
 
             <!-- vertical stem -->
             <line x1="36" y1="38" x2="36" y2="430" stroke="#444c56" stroke-width="1.5" />
@@ -1841,7 +1841,7 @@ for WT in "${WORKTREES[@]}"; do
     STASHED=false
   fi
 
-  if git merge main --no-edit; then
+  if git merge dev --no-edit; then
     echo "<span class="sy-ok">  ✓ $WT: synced</span>"
     if [ "$STASHED" = true ]; then
       if git stash apply; then
@@ -1901,7 +1901,7 @@ cd "$ROOT" && git worktree list</pre>
                 <div>
                   <strong>共通変更が一元管理</strong
                   ><span
-                    >shared/ の変更を main で 1 回 commit → sync-all.sh で全 WT
+                    >shared/ の変更を dev で 1 回 commit → sync-all.sh で全 WT
                     に反映。手動コピー完全不要。</span
                   >
                 </div>
@@ -1976,7 +1976,7 @@ cd "$ROOT" && git worktree list</pre>
                 <div>
                   <strong>merge コンフリクトのリスク</strong
                   ><span
-                    >4 ブランチが並行して shared/ を変更すると main merge
+                    >4 ブランチが並行して shared/ を変更すると dev merge
                     時に複数コンフリクトが発生。保護ブランチ設定が必要。</span
                   >
                 </div>
@@ -2034,7 +2034,7 @@ subgraph GOOD["✅ 正しい対処"]
 direction TB
 F1["git worktree list で確認\n各 WT に別ブランチを割当"]
 F2["git worktree remove\ngit worktree prune"]
-F3["main で変更 → commit\nsync-all.sh で全 WT 反映"]
+F3["dev で変更 → commit\nsync-all.sh で全 WT 反映"]
 F4["cd worktrees/claude から\n各ツールを起動"]
 end
 E1 -->|fatal: already checked out| F1
@@ -2160,7 +2160,7 @@ style GOOD fill:#101c10,stroke:#56d364,color:#56d364
           <tr>
             <td>CONFLICT in shared/</td>
             <td>複数 WT が同じ shared/ ファイルを変更</td>
-            <td>CODEOWNERS + 保護ブランチで shared/ への直接変更を禁止し main 経由のみに制限</td>
+            <td>CODEOWNERS + 保護ブランチで shared/ への直接変更を禁止し dev 経由のみに制限</td>
           </tr>
         </table>
 
@@ -2199,7 +2199,7 @@ done && git worktree prune && echo "<span class="sy-ok">All removed.</span>"</pr
           <div class="mmd-lbl">▸ GitHub Actions — matrix 並列パイプライン</div>
           <pre class="mermaid">
 flowchart LR
-T(["push to\nfeat/* or main"])
+T(["push to\nfeat/* or dev"])
 T --> J[detect-platform job]
 J --> M{"matrix strategy\nfail-fast: false\n4 並列実行"}
 M --> B1["build: claude\ngit worktree add"]
@@ -2236,7 +2236,7 @@ style D4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff
       - <span class="sy-st">'dev'</span>  <span class="sy-cm"># dev へのマージ時も検証</span>
   pull_request:
     branches:
-      - <span class="sy-st">'main'</span>  <span class="sy-cm"># main への PR 時も検証</span>
+      - <span class="sy-st">'dev'</span>  <span class="sy-cm"># dev への PR 時も検証</span>
 
 <span class="sy-kw">jobs</span>:
   validate-docs:
