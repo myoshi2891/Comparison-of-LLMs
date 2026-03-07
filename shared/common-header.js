@@ -78,6 +78,7 @@
         { name: 'Agent', href: '/copilot/agent.html' },
       ],
     },
+    { name: 'Git Worktree', href: '/git_worktree.html' },
   ];
 
   // href が安全なプロトコルかを検証（javascript: 等を排除）

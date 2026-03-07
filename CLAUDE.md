@@ -197,7 +197,8 @@ small diff > medium diff > large diff — 常に最小の差分を選択。
 
 #### HTML ドキュメント編集時の注意
 
-- Mermaid v10 の `<div class="mermaid">` 内コンテンツは**左端揃え必須**（HTML インデントが構文エラーの原因になる）
+- Mermaid v10 の `<div class="mermaid">` 内コンテンツは**左端揃え（インデントなしのカラム0配置）必須**。HTML インデントが混ざると構文エラーの原因になる。
+- Mermaid 各ステートメントは必ず**改行で分離**すること。（例: `gitGraph LR:` の後に改行。1行に連結するとエラーになる）
 - SVG の `viewBox` 高さとコンテンツ座標の整合性を常に確認
 - SVG `<marker>` の色は対応する `<line>` の `stroke` 色と一致させる
 <!-- - Playwright で検証する際は `browser_take_screenshot` のターゲット要素指定を使う（全体スナップショットはトークン大量消費） -->

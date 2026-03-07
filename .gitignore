@@ -70,3 +70,6 @@ links.md
 
 # Claude Code local settings (personal, not shared)
 CLAUDE.local.md
+
+# git worktree のチェックアウト先を追跡対象から除外（必須）
+worktrees/
