@@ -81,6 +81,27 @@
         padding-bottom: 0.4rem;
         border-bottom: 1px solid var(--sep);
       }
+      h4 {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--tx);
+        margin: 1.5rem 0 0.6rem;
+      }
+
+      /* ══ LINKS ══ */
+      a {
+        color: #58a6ff;
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+      a:hover {
+        color: #79c0ff;
+        text-decoration: underline;
+      }
+      a:visited {
+        color: #a371f7;
+      }
 
       /* ══ HEADER ══ */
       header {
@@ -600,6 +621,9 @@
         justify-content: space-between;
       }
     </style>
+    <!-- Common Header Assets -->
+    <link rel="stylesheet" href="shared/common-header.css">
+    <script src="shared/common-header.js" defer></script>
   </head>
   <body>
     <script>
@@ -1704,7 +1728,7 @@ git worktree list</pre>
             <strong>WebSearch 活用:</strong> 各 WT で AI ツールを起動し、
             <code>WebSearch</code> で最新情報（API 変更、新機能、ベストプラクティス等）を調査しながら
             agent.html と skill.html を更新します。Claude Code は <code>/search</code> コマンド、
-            Antigravity は組み込み検索、Copilot は <code>@web</code> を活用できます。
+            Antigravity は組み込み検索でそれぞれ最新情報を取得できます。
           </div>
         </div>
       </section>
@@ -2241,6 +2265,284 @@ style D4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff
         working-directory: /tmp/${{ matrix.platform }}
         run: |
           echo "Deploy docs to GitHub Pages"</pre>
+        </div>
+      </section>
+
+      <!-- ══════════ REFERENCES ══════════ -->
+      <section class="step" id="ref">
+        <div class="step-hdr">
+          <div class="step-n">参考</div>
+          <div>
+            <div class="step-title">参考リンク集</div>
+            <div class="step-desc">各ステップで使用する公式ドキュメントと関連リソース。</div>
+          </div>
+        </div>
+
+        <div class="ib ib-info">
+          <span>ℹ️</span>
+          <div>
+            <strong>方針:</strong> 各ベンダー公式ドキュメントを最上位に記載し、
+            補足情報は「公式 GitHub リポジトリ」または「公式ブログ」のみを採用。
+            非公式サイト・コミュニティサイトは除外。
+          </div>
+        </div>
+
+        <h3>STEP 00: git worktree とは何か</h3>
+        <div class="step-subsection">
+          <h4>Git 公式（最優先）</h4>
+          <ul>
+            <li><a href="https://git-scm.com/docs/git-worktree" target="_blank" rel="noopener">git-worktree — Git 公式リファレンス</a></li>
+            <li><a href="https://git-scm.com/docs/gitrepository-layout#Documentation/gitrepository-layout.txt-worktrees" target="_blank" rel="noopener">gitrepository-layout — linked worktrees の内部構造</a></li>
+            <li><a href="https://github.com/git/git/blob/master/Documentation/RelNotes/2.5.0.txt" target="_blank" rel="noopener">Git 2.5.0 リリースノート（worktree 導入）</a></li>
+            <li><a href="https://git-scm.com/docs/gitignore" target="_blank" rel="noopener">.gitignore — Git 公式リファレンス</a></li>
+          </ul>
+        </div>
+
+        <h3>STEP 01: ブランチ戦略設計</h3>
+        <div class="step-subsection">
+          <h4>Git 公式</h4>
+          <ul>
+            <li><a href="https://git-scm.com/docs/git-branch" target="_blank" rel="noopener">git-branch — Git 公式リファレンス</a></li>
+          </ul>
+          <h4>GitHub 公式</h4>
+          <ul>
+            <li><a href="https://docs.github.com/en/get-started/quickstart/github-flow" target="_blank" rel="noopener">GitHub Flow — GitHub Docs</a></li>
+            <li><a href="https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners" target="_blank" rel="noopener">CODEOWNERS について — GitHub Docs</a></li>
+          </ul>
+        </div>
+
+        <h3>STEP 02: worktree セットアップ</h3>
+        <div class="step-subsection">
+          <h4>Git 公式</h4>
+          <ul>
+            <li><a href="https://git-scm.com/docs/git-worktree#Documentation/git-worktree.txt-addltpathgtltcommit-ishgt" target="_blank" rel="noopener">git worktree add</a></li>
+            <li><a href="https://git-scm.com/docs/git-worktree#Documentation/git-worktree.txt-list" target="_blank" rel="noopener">git worktree list</a></li>
+          </ul>
+        </div>
+
+        <h3>STEP 03: 日常ワークフロー / AI 設定ファイル</h3>
+
+        <div class="step-subsection">
+          <h4>■ Anthropic — Claude Code</h4>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+            <thead>
+              <tr style="background: var(--bg-1);">
+                <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid var(--bg-2);">ファイル</th>
+                <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid var(--bg-2);">公式ドキュメント</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><code>CLAUDE.md</code> / auto memory</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://code.claude.com/docs/en/memory" target="_blank" rel="noopener">Memory — Claude Code 公式</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);">Claude Code 概要</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://docs.anthropic.com/en/docs/claude-code/overview" target="_blank" rel="noopener">Claude Code Overview — Anthropic Docs</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);">カスタムコマンド</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://docs.anthropic.com/en/docs/claude-code/slash-commands" target="_blank" rel="noopener">Slash Commands — Claude Code 公式</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);">Settings / 設定ファイル</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://docs.anthropic.com/en/docs/claude-code/settings" target="_blank" rel="noopener">Settings — Claude Code 公式</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);">SDK（TypeScript / Python）</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://docs.anthropic.com/en/docs/claude-code/sdk" target="_blank" rel="noopener">Claude Code SDK — Anthropic Docs</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem;">GitHub リポジトリ</td>
+                <td style="padding: 0.5rem;"><a href="https://github.com/anthropics/claude-code" target="_blank" rel="noopener">anthropics/claude-code — GitHub</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="step-subsection">
+          <h4>■ OpenAI — Codex CLI</h4>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+            <thead>
+              <tr style="background: var(--bg-1);">
+                <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid var(--bg-2);">ファイル</th>
+                <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid var(--bg-2);">公式ドキュメント</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);">Codex CLI 概要</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://developers.openai.com/codex/cli/" target="_blank" rel="noopener">Codex CLI — developers.openai.com</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><code>AGENTS.md</code> 詳細仕様</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://developers.openai.com/codex/guides/agents-md/" target="_blank" rel="noopener">Custom instructions with AGENTS.md — OpenAI 公式</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);">AGENTS.md オープン形式</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://github.com/openai/agents.md" target="_blank" rel="noopener">openai/agents.md — GitHub（OpenAI 公式リポジトリ）</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><code>SKILL.md</code> — Skills</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://developers.openai.com/codex/skills/" target="_blank" rel="noopener">Agent Skills — developers.openai.com</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);">CLI コマンドリファレンス</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://developers.openai.com/codex/cli/reference/" target="_blank" rel="noopener">Command line options — OpenAI 公式</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);">CLI 機能一覧</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://developers.openai.com/codex/cli/features/" target="_blank" rel="noopener">Codex CLI features — OpenAI 公式</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);">Agents SDK 連携</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://developers.openai.com/codex/guides/agents-sdk" target="_blank" rel="noopener">Use Codex with the Agents SDK — OpenAI 公式</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);">Codex モデル一覧</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://developers.openai.com/codex/models/" target="_blank" rel="noopener">Codex Models — developers.openai.com</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);">Codex 紹介ブログ</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://openai.com/index/introducing-codex/" target="_blank" rel="noopener">Introducing Codex — openai.com</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem;">GitHub リポジトリ</td>
+                <td style="padding: 0.5rem;"><a href="https://github.com/openai/codex" target="_blank" rel="noopener">openai/codex — GitHub</a></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="ib ib-info" style="margin-top: 1rem;">
+            <span>ℹ️</span>
+            <div>
+              <strong>補足:</strong> <code>agents.md/AGENTS.md</code> の仕様は OpenAI が主導する
+              <code>github.com/openai/agents.md</code> が一次ソースです。
+              複数のコーディングエージェント（Codex, Amp, Jules, Cursor, Factory など）
+              が協働して策定したオープン形式です。
+            </div>
+          </div>
+        </div>
+
+        <div class="step-subsection">
+          <h4>■ Google — Gemini CLI / Gemini Code Assist</h4>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+            <thead>
+              <tr style="background: var(--bg-1);">
+                <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid var(--bg-2);">ファイル</th>
+                <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid var(--bg-2);">公式ドキュメント</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);">Gemini CLI 概要</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://docs.cloud.google.com/gemini/docs/codeassist/gemini-cli" target="_blank" rel="noopener">Gemini CLI — Google Cloud Docs</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><code>GEMINI.md</code> / <code>AGENT.md</code></td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://docs.cloud.google.com/gemini/docs/codeassist/use-agentic-chat-pair-programmer" target="_blank" rel="noopener">Use the Gemini Code Assist agent mode — Google Cloud Docs</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);">Agent モード概要</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://cloud.google.com/gemini/docs/codeassist/agent-mode" target="_blank" rel="noopener">Agent mode overview — Google Cloud Docs</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);">Gemini for Google Cloud（ルート）</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://cloud.google.com/gemini/docs" target="_blank" rel="noopener">Gemini for Google Cloud Docs</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);">リリースノート</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://docs.cloud.google.com/gemini/docs/codeassist/release-notes" target="_blank" rel="noopener">Gemini Code Assist release notes — Google Cloud</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem;">Gemini CLI 学習コース（公式ブログ）</td>
+                <td style="padding: 0.5rem;"><a href="https://cloud.google.com/blog/topics/developers-practitioners/mastering-gemini-cli-your-complete-guide-from-installation-to-advanced-use-cases" target="_blank" rel="noopener">Mastering Gemini CLI — Google Cloud Blog</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="step-subsection">
+          <h4>■ Microsoft / GitHub — GitHub Copilot</h4>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+            <thead>
+              <tr style="background: var(--bg-1);">
+                <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid var(--bg-2);">ファイル</th>
+                <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid var(--bg-2);">公式ドキュメント</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><code>copilot-instructions.md</code></td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://docs.github.com/copilot/customizing-copilot/adding-custom-instructions-for-github-copilot" target="_blank" rel="noopener">Adding repository custom instructions — GitHub Docs</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);">カスタム指示の設定（全体）</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://docs.github.com/en/copilot/how-tos/configure-custom-instructions" target="_blank" rel="noopener">Configure custom instructions — GitHub Docs</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><code>.instructions.md</code>（パス指定）</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://docs.github.com/en/copilot/tutorials/customization-library/custom-instructions/your-first-custom-instructions" target="_blank" rel="noopener">Your first custom instructions — GitHub Docs</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><code>.prompt.md</code>（プロンプトファイル）</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://docs.github.com/en/copilot/tutorials/customization-library/prompt-files/your-first-prompt-file" target="_blank" rel="noopener">Your first prompt file — GitHub Docs</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><code>AGENTS.md</code>（Copilot CLI 対応）</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://docs.github.com/en/copilot/how-tos/copilot-cli/add-repository-instructions" target="_blank" rel="noopener">Adding custom instructions for GitHub Copilot CLI — GitHub Docs</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);">カスタム指示サポート一覧</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://docs.github.com/en/copilot/reference/custom-instructions-support" target="_blank" rel="noopener">Support for different types of custom instructions — GitHub Docs</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);">コードレビューでの活用</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid var(--bg-2);"><a href="https://docs.github.com/en/copilot/tutorials/use-custom-instructions" target="_blank" rel="noopener">Using custom instructions for Copilot code review — GitHub Docs</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem;">組織カスタム指示</td>
+                <td style="padding: 0.5rem;"><a href="https://docs.github.com/en/copilot/how-tos/configure-custom-instructions/add-organization-instructions" target="_blank" rel="noopener">Adding organization custom instructions — GitHub Docs</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>STEP 04〜05: git worktree 操作・エラー対処</h3>
+        <div class="step-subsection">
+          <h4>Git 公式</h4>
+          <ul>
+            <li><a href="https://git-scm.com/docs/git-worktree#Documentation/git-worktree.txt-remove" target="_blank" rel="noopener">git worktree remove</a></li>
+            <li><a href="https://git-scm.com/docs/git-worktree#Documentation/git-worktree.txt-prune" target="_blank" rel="noopener">git worktree prune</a></li>
+            <li><a href="https://git-scm.com/docs/git-worktree#Documentation/git-worktree.txt-lock" target="_blank" rel="noopener">git worktree lock / unlock</a></li>
+            <li><a href="https://git-scm.com/docs/git-stash" target="_blank" rel="noopener">git stash — Git 公式</a></li>
+            <li><a href="https://git-scm.com/docs/githooks" target="_blank" rel="noopener">githooks — Git hooks 公式</a></li>
+          </ul>
+        </div>
+
+        <h3>STEP 06: GitHub Actions 統合</h3>
+        <div class="step-subsection">
+          <h4>GitHub 公式</h4>
+          <ul>
+            <li><a href="https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/running-variations-of-jobs-in-a-workflow" target="_blank" rel="noopener">matrix strategy — GitHub Actions 公式</a></li>
+            <li><a href="https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/running-variations-of-jobs-in-a-workflow#handling-failures" target="_blank" rel="noopener">fail-fast の制御</a></li>
+            <li><a href="https://github.com/actions/checkout" target="_blank" rel="noopener">actions/checkout@v4（fetch-depth）— GitHub</a></li>
+          </ul>
+          <h4>Vercel 公式</h4>
+          <ul>
+            <li><a href="https://vercel.com/docs/cli/deploy" target="_blank" rel="noopener">Vercel CLI deploy — Vercel 公式</a></li>
+          </ul>
+        </div>
+
+        <h3>全般: ダイアグラム・フォント・アクセシビリティ</h3>
+        <div class="step-subsection">
+          <ul>
+            <li><a href="https://mermaid.js.org/" target="_blank" rel="noopener">Mermaid.js 公式ドキュメント</a></li>
+            <li><a href="https://mermaid.js.org/syntax/gitgraph.html" target="_blank" rel="noopener">Mermaid — gitGraph 構文</a></li>
+            <li><a href="https://mermaid.js.org/syntax/flowchart.html" target="_blank" rel="noopener">Mermaid — flowchart 構文</a></li>
+            <li><a href="https://mermaid.js.org/syntax/sequenceDiagram.html" target="_blank" rel="noopener">Mermaid — sequenceDiagram 構文</a></li>
+            <li><a href="https://fonts.google.com/specimen/IBM+Plex+Mono" target="_blank" rel="noopener">IBM Plex Mono — Google Fonts</a></li>
+            <li><a href="https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html" target="_blank" rel="noopener">WCAG 2.1 コントラスト比ガイドライン — W3C</a></li>
+          </ul>
         </div>
       </section>
 
