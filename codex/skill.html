@@ -1278,7 +1278,7 @@ CREATE INDEX CONCURRENTLY idx_users_last_login ON users(last_login_at);
       <span class="ii">🔍</span>
       <div>
         <strong>Agents SDK 組み込みトレーシング（2026年〜）</strong><br>
-        Agents SDKには<strong>built-in tracing</strong>が統合されており、マルチエージェントフローの可視化・デバッグ・評価・ファインチューニングをワンストップで行えます。また<code>spawn_agents_on_csv</code>でCSVからエージェントをファンアウトしETA付き進捗追跡が可能です。サブエージェントへのニックネーム付与と子スレッド承認プロンプト表示により、複雑なパイプラインの追跡も容易になっています。
+        Agents SDKには<strong>built-in tracing</strong>が統合されており、マルチエージェントフローの可視化・デバッグ・評価・ファインチューニングをワンストップで行えます。一方、<code>spawn_agents_on_csv</code>によるCSVからのエージェントファンアウトとETA付き進捗追跡は<strong>Codex CLI（rust-v0.105.0+）固有の機能</strong>です（<a href="https://github.com/openai/codex/releases" target="_blank" rel="noopener noreferrer">Codex CLI リリースノート</a>）。
       </div>
     </div>
   </section>

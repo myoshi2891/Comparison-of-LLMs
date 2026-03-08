@@ -9,12 +9,12 @@ for WT in "${WORKTREES[@]}"; do
   cd "$ROOT/worktrees/$WT"
 
   STASH_ID=""
-  if [ -n "$(git status --porcelain)" ]; then
-    git stash push -u -m "auto: $WT before sync"
+  STASHED=false
+  STASH_OUT=$(git stash push -u -m "auto: $WT before sync" 2>&1)
+  STASH_EXIT=$?
+  if [ $STASH_EXIT -eq 0 ] && [ "$STASH_OUT" != "No local changes to save" ]; then
     STASH_ID=$(git stash list --format='%gd' -1)
     STASHED=true
-  else
-    STASHED=false
   fi
 
   if git merge dev --no-edit; then
