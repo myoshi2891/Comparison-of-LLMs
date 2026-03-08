@@ -596,8 +596,14 @@ Next.js 15 + Supabase + Stripe。マルチテナント SaaS。
         <tr><th>フィールド</th><th>必須</th><th>値の例</th><th>説明</th></tr>
         <tr><td><code>name</code></td><td><span class="badge badge-orange">必須</span></td><td><code>code-reviewer</code></td><td>エージェント識別子（ハイフン区切り推奨）</td></tr>
         <tr><td><code>description</code></td><td><span class="badge badge-orange">必須</span></td><td>"PRのコードレビューを実施する"</td><td>Claude がどのタスクでこのエージェントを呼ぶかの判断基準</td></tr>
-        <tr><td><code>tools</code></td><td>任意</td><td><code>Read, Glob, Grep</code></td><td>許可ツール。省略するとメインと同じツールセットを継承</td></tr>
-        <tr><td><code>model</code></td><td>任意</td><td><code>sonnet</code> / <code>haiku</code> / <code>opus</code></td><td>使用モデル。コスト最適化に活用</td></tr>
+        <tr><td><code>tools</code></td><td>任意</td><td><code>Read, Glob, Grep</code></td><td>許可ツール allowlist。省略すると全ツールが有効になる</td></tr>
+        <tr><td><code>disallowedTools</code></td><td>任意</td><td><code>Bash, Write</code></td><td>禁止ツール denylist。<code>tools</code> の補完として「これだけ除外」したい場合に簡潔</td></tr>
+        <tr><td><code>model</code></td><td>任意</td><td><code>sonnet</code> / <code>haiku</code> / <code>opus</code> / <code>inherit</code></td><td>使用モデル。<code>inherit</code> は親セッションと同じモデルを使用。省略時も <code>inherit</code> と同じ動作</td></tr>
+        <tr><td><code>permissionMode</code></td><td>任意</td><td><code>default</code> / <code>acceptEdits</code></td><td>ツール権限の確認モード。<code>acceptEdits</code> で編集系ツールを自動承認</td></tr>
+        <tr><td><code>mcpServers</code></td><td>任意</td><td><code>[{name: "github"}]</code></td><td>このサブエージェント専用の MCP サーバーを指定</td></tr>
+        <tr><td><code>hooks</code></td><td>任意</td><td>—</td><td>エージェント稼働中のみ有効なフックを定義。終了時に自動クリーンアップ</td></tr>
+        <tr><td><code>maxTurns</code></td><td>任意</td><td><code>10</code></td><td>サブエージェントの最大ターン数。無限ループ防止に有効</td></tr>
+        <tr><td><code>skills</code></td><td>任意</td><td><code>[database-migration]</code></td><td>サブエージェントに読み込む SKILL.md を明示指定</td></tr>
         <tr><td><code>memory</code></td><td>任意</td><td><code>user</code> / <code>project</code> / <code>local</code></td><td>MEMORY.md のスコープ</td></tr>
       </table>
     </div>
@@ -1052,9 +1058,9 @@ pm-spec → architect-review → implementer → code-reviewer
     <span class="hl-cmt">// 環境変数でも設定可: export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1</span>
   },
 
-  <span class="hl-cmt">// テイムメイトの表示モード</span>
-  <span class="hl-cmt">// "auto" = tmux 使用中は split panes、それ以外は in-process（デフォルト）</span>
-  <span class="hl-cmt">// "split" = tmux / iTerm2 の分割ペイン（要 tmux or iTerm2 + it2 CLI）</span>
+  <span class="hl-cmt">// テイムメイトの表示モード（"teammateMode" フィールドで設定）</span>
+  <span class="hl-cmt">// "tmux" = tmux / iTerm2 の分割ペイン（要 tmux or iTerm2 + it2 CLI）</span>
+  <span class="hl-cmt">// 未指定 = tmux 使用中は自動で split panes、それ以外は in-process</span>
 
   <span class="hl-key">"hooks"</span>: {
     <span class="hl-cmt">// ── TeammateIdle: テイムメイトがアイドル直前に実行 ──────────────</span>
@@ -1449,7 +1455,7 @@ pm-spec → architect-review → implementer → code-reviewer
     <div class="source-grid">
       <div class="source-card">
         <div class="source-title">🔵 Anthropic 公式: Sub-agents ドキュメント</div>
-        <div class="source-url"><a href="https://code.claude.com/docs/en/sub-agents" target="_blank" rel="noopener noreferrer">https://code.claude.com/docs/en/sub-agents</a></div>
+        <div class="source-url"><a href="https://docs.anthropic.com/en/docs/claude-code/sub-agents" target="_blank" rel="noopener noreferrer">https://docs.anthropic.com/en/docs/claude-code/sub-agents</a></div>
         <div class="source-desc">YAML frontmatter・ツール設定・memory scope の公式仕様</div>
       </div>
       <div class="source-card">
@@ -1491,7 +1497,7 @@ pm-spec → architect-review → implementer → code-reviewer
       <!-- NEW: Agent Teams sources -->
       <div class="source-card" style="border-color:rgba(52,211,153,0.4);">
         <div class="source-title" style="color:#34d399;">🟢 Anthropic 公式: Agent Teams ドキュメント</div>
-        <div class="source-url"><a href="https://code.claude.com/docs/en/agent-teams" target="_blank" rel="noopener noreferrer">https://code.claude.com/docs/en/agent-teams</a></div>
+        <div class="source-url"><a href="https://docs.anthropic.com/en/docs/claude-code/agent-teams" target="_blank" rel="noopener noreferrer">https://docs.anthropic.com/en/docs/claude-code/agent-teams</a></div>
         <div class="source-desc">Agent Teams 公式仕様：リード/テイムメイト・共有タスクリスト・TeammateIdle/TaskCompleted フック・CLAUDE.md の自動ロード・クリーンアップ手順</div>
       </div>
       <div class="source-card" style="border-color:rgba(52,211,153,0.4);">
