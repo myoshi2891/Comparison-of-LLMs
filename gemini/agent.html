@@ -1161,8 +1161,8 @@
         <span class="topbar-title">Gemini Agent Dev Guide</span>
       </div>
       <span class="topbar-subtitle"
-        >Gemini CLI · ADK · Code Assist · A2A Protocol · AgentEngine — 2026年2月
-        マルチエージェント完全版</span
+        >Gemini CLI · ADK · Code Assist · A2A Protocol · AgentEngine — 2026年3月
+        Gemini 3.1対応版</span
       >
     </div>
 
@@ -1170,7 +1170,7 @@
       <!-- HERO -->
       <div class="hero">
         <div class="hero-eyebrow">
-          🤖 Google Gemini 完全ガイド — 2026年2月 A2A / AgentEngine 対応版
+          🤖 Google Gemini 完全ガイド — 2026年3月 Gemini 3.1 / A2A / AgentEngine 対応版
         </div>
         <h1>
           マルチエージェント開発における<br /><span>Markdownファイル & 設定ファイル</span>
@@ -2182,11 +2182,11 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td><code>gemini-2.0-flash</code></td>
+              <tr style="opacity:0.6">
+                <td><code>gemini-2.0-flash</code><br><small style="color:#e53935">⚠️ 2026-03-31廃止</small></td>
                 <td>高速・低コスト</td>
                 <td>コードベース探索、ファイル検索、単純変換</td>
-                <td><span class="chip chip-green">最速</span> 探索・軽量タスク向け</td>
+                <td><span class="chip chip-green">最速</span> 廃止前は探索用途のみ。<code>gemini-2.5-flash</code>へ移行推奨</td>
               </tr>
               <tr>
                 <td><code>gemini-2.5-flash</code></td>
@@ -2195,10 +2195,22 @@
                 <td><span class="chip chip-blue">推奨デフォルト</span> コスパ最良</td>
               </tr>
               <tr>
+                <td><code>gemini-3-flash-preview</code></td>
+                <td>次世代バランス</td>
+                <td>コードレビュー、テスト生成、実装（最新推論力）</td>
+                <td><span class="chip chip-blue">新世代デフォルト候補</span> 2.5-flash の後継</td>
+              </tr>
+              <tr>
                 <td><code>gemini-2.5-pro</code></td>
                 <td>高精度・複雑推論</td>
                 <td>アーキテクチャ設計、セキュリティ監査、ADR作成</td>
                 <td><span class="chip chip-purple">最高精度</span> 高コスト</td>
+              </tr>
+              <tr>
+                <td><code>gemini-3.1-pro-preview</code></td>
+                <td>最新高精度推論</td>
+                <td>アーキテクチャ設計、セキュリティ監査（ARC-AGI-2: 77.1%）</td>
+                <td><span class="chip chip-purple">新世代最高精度</span> 3 Proの2倍超推論力</td>
               </tr>
             </tbody>
           </table>
@@ -2230,7 +2242,7 @@
               <li>description が曖昧（「なんでもやる」エージェント）</li>
               <li>ParallelAgent で同じ output_key を使う（上書き発生）</li>
               <li>LoopAgent の終了条件を設定しない（無限ループ）</li>
-              <li>全エージェントに gemini-2.5-pro を使う（コスト爆発）</li>
+              <li>全エージェントに gemini-2.5-pro / gemini-3.1-pro-preview を使う（コスト爆発）</li>
               <li>ルートエージェントが直接コードを書く（委譲しない）</li>
               <li>10件以上のサブエージェントを ParallelAgent で同時起動</li>
             </ul>
@@ -3092,7 +3104,7 @@
               <li>GEMINI.md にリモートエンドポイント URL を書かない（管理外に散乱）</li>
               <li>ParallelAgent で同じ output_key を使う（上書き競合・最大の地雷）</li>
               <li>LoopAgent の終了条件・max_iterations を設定しない（無限ループ）</li>
-              <li>全リモートエージェントに gemini-2.5-pro（コスト爆発）</li>
+              <li>全リモートエージェントに gemini-2.5-pro / gemini-3.1-pro-preview（コスト爆発）</li>
               <li>エージェント間のファイル所有権を定義しない（書き込み競合）</li>
               <li>A2A タイムアウト・フォールバック戦略を GEMINI.md に記載しない</li>
             </ul>
@@ -3498,6 +3510,34 @@
               Discovery Service パターンの実装コード・RemoteA2aAgent
               の動的生成・ハードコードなしオーケストレーション・A2A
               のフレームワーク非依存性実証（2025年12月）
+            </div>
+          </div>
+          <div class="src-card src-card-new">
+            <div class="src-icon">🟥</div>
+            <div class="src-title">
+              Gemini モデル一覧 — Gemini API 公式（2026年3月現在）
+            </div>
+            <div class="src-url">
+              <a href="https://ai.google.dev/gemini-api/docs/models" target="_blank"
+                >ai.google.dev/gemini-api/docs/models</a
+              >
+            </div>
+            <div class="src-desc">
+              gemini-3.1-pro-preview / gemini-3-flash-preview / gemini-2.5-flash 等の現行モデルID・コンテキスト長・価格の公式一覧
+            </div>
+          </div>
+          <div class="src-card src-card-new">
+            <div class="src-icon">⛔</div>
+            <div class="src-title">
+              Gemini deprecations — モデル廃止スケジュール（Gemini API 公式）
+            </div>
+            <div class="src-url">
+              <a href="https://ai.google.dev/gemini-api/docs/deprecations" target="_blank"
+                >ai.google.dev/gemini-api/docs/deprecations</a
+              >
+            </div>
+            <div class="src-desc">
+              gemini-2.0-flash 廃止予定（2026-03-31）・gemini-3-pro-preview 廃止（2026-03-09）等の公式廃止スケジュール
             </div>
           </div>
         </div>
