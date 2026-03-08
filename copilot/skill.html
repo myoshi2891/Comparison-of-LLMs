@@ -437,7 +437,7 @@ tr:hover td { background: rgba(13,20,32,.5); }
   <h2 class="stitle"><span class="num">01.</span>GitHub Copilotの全体アーキテクチャと他ツール比較</h2>
 
   <p>
-    GitHub Copilotは2025年に<strong>Copilot Coding Agent</strong>（GitHub.com上でIssueを割り当てるとPRを自動作成）と<strong>Agent Mode</strong>（VS Code内でマルチファイル編集を自律実行）を正式リリースし、単なるコード補完から<strong>フルエージェント開発プラットフォーム</strong>へ進化しました。カスタマイズ可能なマークダウンファイルは2025年以降に急速に拡充されています。
+    GitHub Copilotは2025年に<strong>Copilot Coding Agent</strong>（GitHub.com上でIssueを割り当てるとPRを自動作成）と<strong>Agent Mode</strong>（VS Code内でマルチファイル編集を自律実行）を正式リリースし、単なるコード補完から<strong>フルエージェント開発プラットフォーム</strong>へ進化しました。2026年にはさらに：<strong>Copilot CLI</strong>（ターミナルネイティブ自律エージェント、2026年2月GA）・<strong>Coding Agentモデルピッカー</strong>（全プラン展開、Dec 2025〜Feb 2026）・<strong>PR自己レビュー機能</strong>（PR作成前に自動フィードバック・反復）が追加され、エコシステムは急速に拡張中です。
   </p>
 
   <table>
@@ -1105,7 +1105,7 @@ constitution.md を必ず先に読む。
 <span class="c-gh">name</span>: <span class="c-st">"Developer Agent"</span>
 <span class="c-gh">description</span>: <span class="c-st">"実装専任エージェント。
   plan.mdとtasks.mdに従ってコードを書く"</span>
-<span class="c-gh">model</span>: <span class="c-st">"gpt-4.1"</span>
+<span class="c-gh">model</span>: <span class="c-st">"claude-sonnet-4-6"</span>
 <span class="c-gh">tools</span>: [<span class="c-st">"edit/editFiles"</span>, <span class="c-st">"search/codebase"</span>,
          <span class="c-st">"terminal/runInTerminal"</span>]
 <span class="c-ky">---</span>
@@ -1131,7 +1131,7 @@ plan.md に従って実装する。
   <h2 class="stitle"><span class="num">08.</span>SKILL.md — Progressive Disclosure ナレッジ</h2>
 
   <p>
-    <code>.github/skills/&lt;name&gt;/SKILL.md</code>はClaude Code・Antigravity・OpenAI Codexと<strong>完全に同一のオープン規格</strong>を採用しています（元はAnthropicが考案）。Copilot Coding AgentとVS Code Agent Modeで動作し、エージェントが意図を検知したときのみオンデマンドでロードされます（[9]）。
+    <code>.github/skills/&lt;name&gt;/SKILL.md</code>はClaude Code・Antigravity・OpenAI Codexと<strong>完全に同一のオープン規格</strong>を採用しています（元はAnthropicが考案）。Copilot Coding Agent・VS Code Agent Mode・<strong>Copilot CLI</strong>（2025年12月〜、[15]）で動作し、エージェントが意図を検知したときのみオンデマンドでロードされます（[9]）。個人スキルは<code>~/.copilot/skills/&lt;name&gt;/SKILL.md</code>に配置するとプロジェクトをまたいで利用できます。
   </p>
 
   <div class="fc">
@@ -1181,8 +1181,8 @@ plan.md に従って実装する。
       <div class="ib ig">
         <span class="ii">💡</span>
         <div>
-          <strong>SKILL.mdはClaude Codeからそのままコピー可能</strong><br>
-          既にClaude Codeで<code>.claude/skills/</code>に作成したSKILL.mdを<code>.github/skills/</code>にそのままコピーするだけで動作します。4プラットフォーム間で完全に同一規格なので、ツール切り替え時の書き直しが不要です（[9]）。
+          <strong>SKILL.mdはClaude Codeとパスを共有できる（コピー不要）</strong><br>
+          Copilotは<code>.claude/skills/</code>を<strong>自動ピックアップ</strong>するため、Claude Codeで作成したSKILL.mdをコピーなしにそのまま利用できます（[15]）。<code>.github/skills/</code>への配置も引き続き有効。4プラットフォーム間で完全に同一規格なので、ツール切り替え時の書き直しが不要です（[9]）。
         </div>
       </div>
     </div>
@@ -1195,7 +1195,7 @@ plan.md に従って実装する。
   <h2 class="stitle"><span class="num">09.</span>AGENTS.md — オープン標準統合レイヤー</h2>
 
   <p>
-    GitHub CopilotはLinux Foundation傘下のAAIF（Agentic AI Foundation）が管理する<strong>AGENTS.mdオープン標準をネイティブサポート</strong>しています。プロジェクトルートの<code>AGENTS.md</code>を<code>copilot-instructions.md</code>と並行して読み込みます（[3]）。また<code>CLAUDE.md</code>・<code>GEMINI.md</code>もGitHub.comのCopilot設定経由でサポート可能です。
+    GitHub CopilotはLinux Foundation傘下のAAIF（Agentic AI Foundation）が管理する<strong>AGENTS.mdオープン標準をネイティブサポート</strong>しています。プロジェクトルートの<code>AGENTS.md</code>を<code>copilot-instructions.md</code>と並行して自動読み込みします（[3], [16]）。<code>CLAUDE.md</code>・<code>GEMINI.md</code>も<strong>Copilot Coding Agentがネイティブかつ自動で読み込む</strong>ことが公式確認されています（[16]）。追加設定不要でマルチツール環境に対応します。
   </p>
 
   <div class="sk-banner">
@@ -1217,7 +1217,7 @@ plan.md に従って実装する。
 <span class="c-hd">## Forbidden</span>           <span class="c-cm">← 全ツール共通の禁止事項</span>
 
 <span class="c-cm"># .github/copilot-instructions.md（Copilot専用）</span>
-@AGENTS.md                <span class="c-cm">← AGENTS.mdをインポート（全内容を継承）</span>
+<span class="c-cm"># AGENTS.md は Coding Agent が自動読込（明示的インポート構文は不要）</span>
 <span class="c-hd">## PR Instructions</span>     <span class="c-cm">← Copilot Coding Agent専用のPR形式</span>
 <span class="c-hd">## VS Code Settings</span>    <span class="c-cm">← IDE固有の補足情報</span></pre>
   </div>
@@ -1580,6 +1580,27 @@ KPI: 在庫ミス率90%削減・セットアップ10分以内
       <div>
         <a href="https://docs.github.com/en/copilot/get-started/best-practices" target="_blank" rel="noopener noreferrer">Best practices for using GitHub Copilot — GitHub Docs（公式）</a>
         <span class="sd">Copilot全体のベストプラクティス。タスク粒度・プロンプトエンジニアリング・セキュリティ検証・自動テスト統合</span>
+      </div>
+    </div>
+    <div class="src">
+      <span class="sn">[15]</span>
+      <div>
+        <a href="https://github.blog/changelog/2025-12-18-github-copilot-now-supports-agent-skills/" target="_blank" rel="noopener noreferrer">GitHub Copilot now supports Agent Skills — GitHub Changelog (Dec 2025)</a>
+        <span class="sd">Agent Skills 正式サポート。.github/skills/・~/.copilot/skills/ パス。.claude/skills/ 自動ピックアップ。Copilot CLI・Coding Agent・VS Code Agent Mode での動作</span>
+      </div>
+    </div>
+    <div class="src">
+      <span class="sn">[16]</span>
+      <div>
+        <a href="https://github.blog/changelog/2025-08-28-copilot-coding-agent-now-supports-agents-md-custom-instructions/" target="_blank" rel="noopener noreferrer">Copilot coding agent now supports AGENTS.md custom instructions — GitHub Changelog (Aug 2025)</a>
+        <span class="sd">AGENTS.md・CLAUDE.md・GEMINI.md の Copilot Coding Agent ネイティブ自動読み込みを公式確認。追加設定不要</span>
+      </div>
+    </div>
+    <div class="src">
+      <span class="sn">[17]</span>
+      <div>
+        <a href="https://github.blog/changelog/2026-02-25-github-copilot-cli-is-now-generally-available/" target="_blank" rel="noopener noreferrer">GitHub Copilot CLI is now generally available — GitHub Changelog (Feb 2026)</a>
+        <span class="sd">Copilot CLI GA。Autopilot モード・バックグラウンド委任（& プレフィックス）・モデル選択・クロスセッションメモリ・カスタムエージェント/スキル対応</span>
       </div>
     </div>
   </div>
