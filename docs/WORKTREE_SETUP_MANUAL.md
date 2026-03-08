@@ -61,13 +61,20 @@ git worktree list
 > **重要**: メインルート (`LLM-Studies/`) からではなく、必ず WT ルートから起動すること。
 
 ```bash
+# ターミナル 1
 cd worktrees/claude  && claude .
+
+# ターミナル 2
 cd worktrees/gemini  && claude .
+
+# ターミナル 3
 cd worktrees/codex   && claude .
+
+# ターミナル 4
 cd worktrees/copilot && claude .
 ```
 
-それぞれ別のターミナルタブ/ウィンドウで実行すると並列作業がしやすい。
+それぞれ別のターミナルタブ/ウィンドウで実行すること。
 
 ### Step 5 — 各 WT で編集・コミット
 
@@ -193,9 +200,9 @@ git worktree list   # メインのみ残っていれば OK
 
 各 WT ルートに `CLAUDE.local.md` を作成する。`claude .` 起動時に自動読み込みされ、**毎回プロンプトで説明する手間を省く**。
 
-> `worktrees/` はメインリポジトリの `.gitignore` 対象だが、各 WT は独立したブランチのチェックアウトなので、WT ルートに作成した `CLAUDE.local.md` は `feat/{platform}-docs` ブランチに commit できる。
+> **重要**: `CLAUDE.local.md` は個人用のローカルファイルであり、**commit してはいけない**（`.gitignore` に追加すること）。共有すべきルールはリポジトリレベルの `CLAUDE.md` に統合し、`CLAUDE.local.md` からは `@path/to/file` 構文で参照する。たとえば `CLAUDE.local.md` に `@CLAUDE.md` と記述するだけで共通ルールを引き継ぎつつ個人設定を上書きできる。commit する対象は `CLAUDE.md` のみ。
 
-以下のテンプレートを `{platform}` を置換してそれぞれの WT ルートに配置する:
+以下のテンプレートを `{platform}` を置換してそれぞれの WT ルートに配置する（`.gitignore` への追記も忘れずに）:
 
 ````markdown
 # CLAUDE.local.md — {platform} WT 専用コンテキスト

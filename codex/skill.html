@@ -425,7 +425,7 @@
       </div>
       <div class="mc">
         <div class="mc-tag" style="color:var(--blue)">💻 Codex CLI</div>
-        <p>ターミナルで動作するオープンソースエージェント（<code>npm install @openai/codex</code>）。ローカルリポジトリを直接操作。TUI（テキストUI）とHeadlessモードを持つ。<strong>Fast modeがデフォルト有効</strong>、音声入力（スペースキー長押しで録音・文字起こし）対応。</p>
+        <p>ターミナルで動作するオープンソースエージェント（<code>npm install @openai/codex</code>）。ローカルリポジトリを直接操作。TUI（テキストUI）とHeadlessモードを持つ。デフォルトの <code>service_tier</code> は <code>flex</code>（標準モード）。<strong>Fast modeはオプトイン</strong>で、セッション内の <code>/fast</code> コマンドで明示的に有効化する（GPT-5.4で利用可能、約1.5倍速だがクレジット消費約2倍）。音声入力（スペースキー長押しで録音・文字起こし）対応。</p>
       </div>
       <div class="mc">
         <div class="mc-tag" style="color:var(--purple)">🤖 Agents SDK</div>
@@ -562,7 +562,7 @@
     <h2 class="sec-title"><span class="num">03.</span>AGENTS.md — プロジェクト永続メモリ（オープン標準）</h2>
 
     <p>
-      AGENTS.mdはClaude CodeのCLAUDE.mdに相当する<strong style="color:var(--text-bright)">Codexの最重要ファイル</strong>です。Codexはタスクを開始する前に必ずAGENTS.mdを読み込み、コーディング規約・テストコマンド・PR手順などのコンテキストを取得します。公式システムメッセージにも「AGENTS.mdに記載されたテストを全件実行する」と明記されています。
+      AGENTS.mdはClaude CodeのCLAUDE.mdに相当する<strong style="color:var(--text-bright)">Codexの最重要ファイル</strong>です。Codexはタスクを開始する前に必ずAGENTS.mdを読み込み、コーディング規約・テストコマンド・PR手順などのコンテキストを取得します。ただしAGENTS.mdはテストを自動実行しないため、「ファイルを変更したら必ず npm test を実行すること」のように<strong>テストコマンドを明示的に記述</strong>する必要があります。コマンドが未記載だとテストが省略されます。
     </p>
 
     <h3>読み込み優先度チェーン</h3>
@@ -646,7 +646,8 @@ ECサイトのバックエンドAPI（Go製マイクロサービス）。
 - docs/      — 仕様書群（spec / requirements / design / tasks）
 
 <span class="c-hd">## Build & Test Commands</span>
-<span class="c-cm"># ★最重要: codex-1のシステムメッセージがここに書かれたテストを全件実行する</span>
+<span class="c-cm"># ★重要: AGENTS.md はテストを自動実行しない。明示的にコマンドを記述すること</span>
+<span class="c-cm"># 例: 「ファイルを変更したら必ず以下のコマンドを実行すること」</span>
 - Build:    `go build ./...`
 - Test all: `go test ./... -race -timeout 120s`
 - Lint:     `golangci-lint run`
@@ -1357,7 +1358,7 @@ CREATE INDEX CONCURRENTLY idx_users_last_login ON users(last_login_at);
         <span class="sn">[2]</span>
         <div>
           <a href="https://openai.com/index/introducing-codex/" target="_blank" rel="noopener noreferrer">Introducing Codex — OpenAI Blog (May 2025)</a>
-          <span class="sd">codex-1（o3ベース）の初期仕様・AGENTS.md公式サポート発表・SWE-Bench 72.1%スコア（2025年5月時点）・codex-1システムメッセージ公開。現行最新モデルはGPT-5.3-Codex</span>
+          <span class="sd">codex-1（o3ベース）の初期仕様・AGENTS.md公式サポート発表・SWE-Bench 72.1%スコアはいずれも2025年5月時点での報告。codex-1システムメッセージ公開。</span>
         </div>
       </div>
       <div class="src">
