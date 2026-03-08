@@ -1072,7 +1072,7 @@
               feat/claude-docs
             </text>
             <text x="548" y="256" text-anchor="middle" fill="#ff9f6a" font-size="10">
-              Claude Code 起動中 ▶
+              ランチャー起動中 ▶
             </text>
 
             <rect
@@ -1099,7 +1099,7 @@
               feat/gemini-docs
             </text>
             <text x="744" y="256" text-anchor="middle" fill="#79b8ff" font-size="10">
-              Claude Code 起動中 ▶
+              ランチャー起動中 ▶
             </text>
 
             <rect
@@ -1126,7 +1126,7 @@
               feat/codex-docs
             </text>
             <text x="548" y="346" text-anchor="middle" fill="#56d364" font-size="10">
-              Claude Code 起動中 ▶
+              ランチャー起動中 ▶
             </text>
 
             <rect
@@ -1153,7 +1153,7 @@
               feat/copilot-docs
             </text>
             <text x="744" y="346" text-anchor="middle" fill="#e2a8ff" font-size="10">
-              Claude Code 起動中 ▶
+              ランチャー起動中 ▶
             </text>
 
             <!-- 接続線 -->
@@ -1755,10 +1755,10 @@ git worktree list</pre>
           <pre class="mermaid">
 sequenceDiagram
 participant M as dev（メイン WT）
-participant C as claude/ Claude Code + WebSearch
-participant G as gemini/ Claude Code + WebSearch
-participant X as codex/ Claude Code + WebSearch
-participant P as copilot/ Claude Code + WebSearch
+participant C as claude/ エージェント + WebSearch
+participant G as gemini/ エージェント + WebSearch
+participant X as codex/ エージェント + WebSearch
+participant P as copilot/ エージェント + WebSearch
 Note over C,P: 4ターミナルで同時並列作業（WebSearch で最新情報取得）
 C->>C: docs: agent.html 更新
 G->>G: docs: skill.html 更新
@@ -2963,7 +2963,7 @@ style D4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff
             >① 同一ブランチの重複チェックアウト禁止 ② shared/ (common-header リソース) は dev
             経由のみ変更 ③ 削除時は git worktree remove 必須</strong
           >
-          の 3 ルールを守ることが成功の条件です。 各 WT で Claude Code を起動し、WebSearch で最新情報を調査しながら agent.html と skill.html
+          の 3 ルールを守ることが成功の条件です。 各 WT で AI エージェントを起動し、WebSearch で最新情報を調査しながら agent.html と skill.html
           を更新することで、
           <strong>4 ツール × 並列 = 最大スループット</strong> の開発体験が実現します。
         </div>

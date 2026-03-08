@@ -1685,7 +1685,7 @@
               ># config.toml の [agents.roles.reviewer].config_file から参照される</span
             >
 
-            <span class="cm">model</span> = <span class="cs">"gpt-5"</span>
+            <span class="cm">model</span> = <span class="cs">"gpt-5.4"</span>
             <span class="cc"># 高精度モデルをレビューに使用</span>
             <span class="cm">model_reasoning_effort</span> = <span class="cs">"high"</span>
             <span class="cc"># 詳細推論</span> <span class="cm">approval_policy</span> =
@@ -1781,7 +1781,8 @@
           <span class="alert-icon">🔍</span>
           <div class="alert-body">
             <strong>Agents SDK 組み込みトレーシング（2026年〜）</strong>
-            Agents SDK には <strong>built-in tracing</strong> が統合されており、マルチエージェントフローの可視化・デバッグ・評価・ファインチューニングをワンストップで行えます。また <code>spawn_agents_on_csv</code> で CSV からエージェントをファンアウトし ETA 付き進捗追跡が可能。サブエージェントへのニックネーム付与と子スレッド承認プロンプト表示により複雑なパイプラインの追跡も容易になっています。
+            Agents SDK には <strong>built-in tracing</strong> が統合されており、generation step・tool calls・handoffs・guardrails・カスタムイベントトレーシング・trace dashboard・trace grading をワンストップで行えます（<a href="https://openai.github.io/openai-agents-python/tracing/" target="_blank" rel="noopener noreferrer">Agents SDK tracing ドキュメント</a>）。<br>
+            一方、<code>spawn_agents_on_csv</code> による CSV からのエージェントファンアウトと ETA 付き進捗追跡は <strong>Codex CLI（rust-v0.105.0+）固有の機能</strong>です（<a href="https://github.com/openai/codex/releases" target="_blank" rel="noopener noreferrer">Codex CLI リリースノート</a>）。
           </div>
         </div>
 

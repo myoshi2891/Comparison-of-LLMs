@@ -94,19 +94,21 @@ cd /path/to/LLM-Studies   # または git worktree list でパスを確認
 
 git checkout dev
 # 共通ファイルを編集
-git add common-header.js common-header.css
+git add shared/common-header.js shared/common-header.css
 git commit -m "chore: update common-header"
 ```
 
 ### Step 7 — 全 WT に dev の変更を反映 (`sync-all.sh`)
 
-`docs/GIT_WORKTREE.md` の Section 3 に定義された `sync-all.sh` を使う:
+`sync-all.sh` は各 WT で `git merge dev --no-edit` を実行する（ファイルをコピーするわけではない）。
 
 ```bash
 bash sync-all.sh
 ```
 
-コンフリクトが発生した場合は、出力に `CONFLICT` が表示されるので手動解決する。
+- **共有ファイルは自動コピーされない**: `shared/common-header.js` 等は dev へのコミット後、merge によって各 WT に反映される。
+- **コンフリクト**: 出力に `CONFLICT` が表示された場合は手動解決が必要。各 WT で `git status` を確認し、競合ファイルを編集後 `git merge --continue` を実行すること。
+- **推奨ワークフロー**: 共有ファイルを変更した場合は、まず dev で commit し、次に `sync-all.sh` を実行して各 WT に merge する。
 
 ---
 

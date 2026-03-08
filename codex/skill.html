@@ -1290,8 +1290,8 @@ CREATE INDEX CONCURRENTLY idx_users_last_login ON users(last_login_at);
     <div class="bps">
       <div class="bp-c bp-oai">
         <div class="bp-n">01</div>
-        <h4>AGENTS.mdにテストコマンドを必ず書く</h4>
-        <p>CodexのシステムメッセージはAGENTS.mdに書かれたテストを「全件実行」する。コマンドが未記載だとテストがスキップされる。</p>
+        <h4>AGENTS.mdにテストコマンドを明示的に書く</h4>
+        <p>AGENTS.md はテストを自動実行しない。「ファイルを変更したら必ず npm test を実行すること」のようにテストコマンドを明示的に記述し、Codex がそのシェルツール許可フローに従って実行できるよう指示する。コマンドが未記載だとテストが省略される。</p>
       </div>
       <div class="bp-c bp-blue">
         <div class="bp-n">02</div>
