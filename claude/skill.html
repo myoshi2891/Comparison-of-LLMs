@@ -977,7 +977,7 @@ Goで実装し、単体テストも作成してください。テストはすべ
     <h2 class="section-title"><span class="num">07.</span>MEMORY.md — 自動メモリシステム</h2>
 
     <p>
-      Claude Codeが<strong style="color:var(--text-bright)">自動的に書き込む</strong>メモリファイル。人間が書くCLAUDE.mdとは異なり、Claudeが作業中に発見したパターン・学習・洞察を記録します（2025年後半から段階的ロールアウト）。
+      Claude Codeが<strong style="color:var(--text-bright)">自動的に書き込む</strong>メモリファイル。人間が書くCLAUDE.mdとは異なり、Claudeが作業中に発見したパターン・学習・洞察を記録します（2026年現在 GA・デフォルト有効）。
     </p>
 
     <div class="file-card">
@@ -1004,8 +1004,8 @@ Goで実装し、単体テストも作成してください。テストはすべ
             <p><code>debugging.md</code>, <code>api-conventions.md</code> 等のファイルはオンデマンド読み込み。indexとして参照される。</p>
           </div>
           <div class="mini-card">
-            <h4>✏️ 手動編集も可</h4>
-            <p><code>/memory</code> コマンドでファイルセレクターが開き、人間が直接編集可能。<code>#</code> ショートカットでその場追記。</p>
+            <h4>✏️ 手動編集 &amp; トグル</h4>
+            <p><code>/memory</code> コマンドでファイルセレクター &amp; auto memory トグルが開く。<code>settings.json</code> の <code>autoMemoryEnabled</code> でプロジェクト単位のオン/オフも可能。</p>
           </div>
         </div>
 
@@ -1129,10 +1129,12 @@ KPI: 在庫ミス率を90%削減
             </div>
             <span>.claude/skills/database-migration/SKILL.md</span>
           </div>
-          <pre><span class="hd"># Database Migration Skill</span>
+          <pre><span class="cmt">---</span>
+<span class="cmt">description: DBスキーマ変更を伴う実装タスクで呼び出す。</span>
+<span class="cmt">             マイグレーションファイルの作成・適用手順を提供する。</span>
+<span class="cmt">---</span>
 
-<span class="hd">## いつ使うか</span>
-DBスキーマ変更を伴う実装タスクで使用。
+<span class="hd"># Database Migration Skill</span>
 
 <span class="hd">## 手順</span>
 1. `migrations/`配下に `YYYYMMDD_description.up.sql` を作成
@@ -1154,7 +1156,10 @@ CREATE INDEX idx_products_preorder ON products(is_preorder) WHERE is_preorder = 
 
         <div class="info-box info-tip">
           <span class="info-icon">💡</span>
-          <div>SKILL.mdは<strong>関連性があるときだけClaudeが自動適用</strong>、または <code>/skill-name</code> で明示的に呼び出せます。プロジェクト固有のものも、チーム共有のグローバルなものも作成可能です。</div>
+          <div>SKILL.mdは<strong>関連性があるときだけClaudeが自動適用</strong>、または <code>/skill-name</code> で明示的に呼び出せます。配置場所は 2 種類：<br>
+          • <strong>プロジェクト</strong>: <code>.claude/skills/&lt;name&gt;/SKILL.md</code>（リポジトリ内、チーム共有）<br>
+          • <strong>個人</strong>: <code>~/.claude/skills/&lt;name&gt;/SKILL.md</code>（全プロジェクト横断）<br>
+          <code>--add-dir</code> で追加したディレクトリ内の <code>.claude/skills/</code> も自動ロードされます（2026年2月〜）。</div>
         </div>
       </div>
     </div>
@@ -1199,7 +1204,7 @@ CREATE INDEX idx_products_preorder ON products(is_preorder) WHERE is_preorder = 
       <div class="principle p-purple">
         <div class="principle-num">07</div>
         <h4>サブエージェントでコンテキスト分離</h4>
-        <p>各タスクを独立したコンテキストで処理。メインセッションのノイズを防ぐ。</p>
+        <p>各タスクを独立したコンテキストで処理。メインセッションのノイズを防ぐ。真の並列実行が必要な場合は <strong>Agent Teams</strong>（experimental, 2026年2月〜）も選択肢。</p>
       </div>
       <div class="principle p-green">
         <div class="principle-num">08</div>
@@ -1254,7 +1259,7 @@ CREATE INDEX idx_products_preorder ON products(is_preorder) WHERE is_preorder = 
       <div class="source-item">
         <span class="source-num">[5]</span>
         <div>
-          <a href="https://code.claude.com/docs/en/best-practices" target="_blank" rel="noopener noreferrer">Best Practices for Claude Code — 公式ドキュメント</a>
+          <a href="https://docs.anthropic.com/en/docs/claude-code/best-practices" target="_blank" rel="noopener noreferrer">Best Practices for Claude Code — 公式ドキュメント</a>
           <div class="source-desc">CLAUDE.mdの過剰記述アンチパターン、Hooks vs CLAUDE.md、SKILL.md活用法</div>
         </div>
       </div>
@@ -1268,7 +1273,7 @@ CREATE INDEX idx_products_preorder ON products(is_preorder) WHERE is_preorder = 
       <div class="source-item">
         <span class="source-num">[7]</span>
         <div>
-          <a href="https://code.claude.com/docs/en/memory" target="_blank" rel="noopener noreferrer">Manage Claude's Memory — 公式ドキュメント</a>
+          <a href="https://docs.anthropic.com/en/docs/claude-code/memory" target="_blank" rel="noopener noreferrer">Manage Claude's Memory — 公式ドキュメント</a>
           <div class="source-desc">CLAUDE.md階層構造、MEMORY.md仕様、@import構文、CLAUDE.local.md</div>
         </div>
       </div>

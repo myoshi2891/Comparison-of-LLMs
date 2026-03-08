@@ -803,7 +803,7 @@
         </p>
         <div class="hero-meta">
           <span class="hero-tag">Codex CLI (Rust製)</span>
-          <span class="hero-tag">codex-1 (o3-based)</span>
+          <span class="hero-tag">GPT-5.3-Codex (SWE-Bench Pro: 56.8%)</span>
           <span class="hero-tag">Multi-Agent (Experimental)</span>
           <span class="hero-tag">Skills / SKILL.md</span>
           <span class="hero-tag">Agents SDK + MCP</span>
@@ -1585,7 +1585,7 @@
             <div class="role-desc">
               汎用コーディングエージェント。メインのタスク実行ロール。workspace-write sandbox。
             </div>
-            <div class="role-ex">model = "gpt-5-codex"<br />sandbox = "workspace-write"</div>
+            <div class="role-ex">model = "gpt-5.3-codex"<br />sandbox = "workspace-write"</div>
           </div>
           <div class="role-card">
             <div class="role-icon">📋</div>
@@ -1593,7 +1593,7 @@
             <div class="role-desc">
               コードレビュー専用。Read-only で never approval。高精度モデルで品質確認。
             </div>
-            <div class="role-ex">model = "gpt-5-pro"<br />approval_policy = "never"</div>
+            <div class="role-ex">model = "gpt-5.4"<br />approval_policy = "never"</div>
           </div>
         </div>
 
@@ -1608,7 +1608,7 @@
               ># Codex がこのプロジェクトを trusted と判断した場合のみロードされる</span
             >
 
-            <span class="cm">model</span> = <span class="cs">"gpt-5-codex"</span>
+            <span class="cm">model</span> = <span class="cs">"gpt-5.3-codex"</span>
             <span class="cc"># プロジェクトデフォルトモデル</span>
             <span class="cm">approval_policy</span> = <span class="cs">"on-request"</span>
             <span class="cc"># インタラクティブ実行向け</span>
@@ -1685,7 +1685,7 @@
               ># config.toml の [agents.roles.reviewer].config_file から参照される</span
             >
 
-            <span class="cm">model</span> = <span class="cs">"gpt-5"</span>
+            <span class="cm">model</span> = <span class="cs">"gpt-5.4"</span>
             <span class="cc"># 高精度モデルをレビューに使用</span>
             <span class="cm">model_reasoning_effort</span> = <span class="cs">"high"</span>
             <span class="cc"># 詳細推論</span> <span class="cm">approval_policy</span> =
@@ -1748,7 +1748,7 @@
               のみを真実の情報源として実装してください。 担当ディレクトリ: /frontend 成果物: -
               index.html — メインページ構造 - styles.css — スタイルシート - main.js —
               インタラクション 実装完了後は transfer_to_project_manager を呼び出すこと。 """</span
-            >, <span class="cm">model</span>=<span class="cs">"gpt-5"</span>,
+            >, <span class="cm">model</span>=<span class="cs">"gpt-5.3-codex"</span>,
             <span class="cm">mcp_servers</span>=[codex_mcp], ) backend_agent = Agent(
             <span class="cm">name</span>=<span class="cs">"Backend Developer"</span>,
             <span class="cm">instructions</span>=RECOMMENDED_PROMPT_PREFIX +
@@ -1757,7 +1757,7 @@
               に記述されたエンドポイントのみを実装してください。 担当ディレクトリ: /backend 成果物:
               - server.js — API実装 (GET /health, GET/POST /scores) - package.json — start
               スクリプトを含める 実装完了後は transfer_to_project_manager を呼び出すこと。 """</span
-            >, <span class="cm">model</span>=<span class="cs">"gpt-5"</span>,
+            >, <span class="cm">model</span>=<span class="cs">"gpt-5.3-codex"</span>,
             <span class="cm">mcp_servers</span>=[codex_mcp], )
 
             <span class="cc"># ── Project Manager（司令塔）────────────────────────────────</span>
@@ -1771,9 +1771,18 @@
               各エージェントへの具体的な指示 3. TEST.md — テスト計画（Tester エージェント向け）
               ファイル作成後、各チームメンバーに transfer で引き渡し、
               成果物の確認を行い、品質基準を満たしたら完了とする。 """</span
-            >, <span class="cm">model</span>=<span class="cs">"gpt-5"</span>,
+            >, <span class="cm">model</span>=<span class="cs">"gpt-5.4"</span>,
             <span class="cm">mcp_servers</span>=[codex_mcp],
             <span class="cm">handoffs</span>=[frontend_agent, backend_agent], )
+          </div>
+        </div>
+
+        <div class="alert ai">
+          <span class="alert-icon">🔍</span>
+          <div class="alert-body">
+            <strong>Agents SDK 組み込みトレーシング（2026年〜）</strong>
+            Agents SDK には <strong>built-in tracing</strong> が統合されており、generation step・tool calls・handoffs・guardrails・カスタムイベントトレーシング・trace dashboard・trace grading をワンストップで行えます（<a href="https://openai.github.io/openai-agents-python/tracing/" target="_blank" rel="noopener noreferrer">Agents SDK tracing ドキュメント</a>）。<br>
+            一方、<code>spawn_agents_on_csv</code> による CSV からのエージェントファンアウトと ETA 付き進捗追跡は <strong>Codex CLI（rust-v0.105.0+）固有の機能</strong>です（<a href="https://github.com/openai/codex/releases" target="_blank" rel="noopener noreferrer">Codex CLI リリースノート</a>）。
           </div>
         </div>
 
@@ -1892,16 +1901,22 @@
                 <td><span class="badge b-blue">推奨デフォルト</span></td>
               </tr>
               <tr>
-                <td><code>gpt-5-codex</code></td>
+                <td><code>gpt-5.3-codex</code></td>
                 <td>コーディング特化</td>
                 <td>複雑な実装・リファクタリング</td>
                 <td><span class="badge b-green">コーディング最適化</span></td>
               </tr>
               <tr>
-                <td><code>gpt-5</code> / <code>gpt-5-pro</code></td>
+                <td><code>gpt-5.4</code></td>
                 <td>高精度推論</td>
                 <td>reviewer・アーキテクチャ設計</td>
                 <td><span class="badge b-purple">最高精度</span> 高コスト</td>
+              </tr>
+              <tr>
+                <td><code>gpt-5.3-codex-spark</code> <span class="badge b-orange">research preview</span> <span class="badge b-gray">Pro 限定／段階展開中</span></td>
+                <td>リアルタイム・低レイテンシ</td>
+                <td>インタラクティブ補完・高速ループ</td>
+                <td><span class="badge b-teal">1000+ tokens/sec</span> 軽量版</td>
               </tr>
             </tbody>
           </table>
@@ -1916,7 +1931,7 @@
               >codex --profile deep-review</code
             >
             のように切り替えられます。通常開発は <code>gpt-4.1</code>、セキュリティレビューは
-            <code>gpt-5-pro + reasoning_effort=high</code>
+            <code>gpt-5.4 + reasoning_effort=high</code>
             のように使い分けることでコストを大幅に削減できます。
           </div>
         </div>

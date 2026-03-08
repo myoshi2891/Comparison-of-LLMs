@@ -54,13 +54,22 @@ git worktree list
 
 ### 2.4 AI エージェントの起動
 
-各 WT のルートから起動する（メインルートから起動しないこと）:
+各 WT のルートから起動する（メインルートから起動しないこと）。
+
+> **注意**: `claude .` は対話的に実行されるため、1つのシェルで順次実行すると最初のコマンドで処理が止まる。**各 WT を別ターミナルで起動すること**。
 
 ```bash
-cd worktrees/claude  && claude .        # Claude Code
-cd worktrees/gemini  && antigravity .   # Google Antigravity
-cd worktrees/codex   && codex           # OpenAI Codex
-cd worktrees/copilot && code .          # VS Code + Copilot
+# ターミナル 1
+cd worktrees/claude  && claude .
+
+# ターミナル 2
+cd worktrees/gemini  && claude .
+
+# ターミナル 3
+cd worktrees/codex   && claude .
+
+# ターミナル 4
+cd worktrees/copilot && claude .
 ```
 
 ---

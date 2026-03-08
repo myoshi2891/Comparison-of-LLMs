@@ -415,17 +415,17 @@
     <h2 class="sec-title"><span class="num">01.</span>OpenAI Codexとは — Cloud版 vs CLI版 vs Agents SDK</h2>
 
     <p>
-      OpenAI Codexは2025年5月にリリースされた<strong style="color:var(--text-bright)">クラウドベースのソフトウェアエンジニアリングエージェント</strong>です。かつての「コード補完モデル」とは全く別物で、<code>codex-1</code>（o3をソフトウェアエンジニアリング向けに強化したモデル）を搭載し、GitHubリポジトリを自律的に操作・PR提案まで行います。
+      OpenAI Codexは2025年5月にリリースされた<strong style="color:var(--text-bright)">クラウドベースのソフトウェアエンジニアリングエージェント</strong>です。かつての「コード補完モデル」とは全く別物で、2026年2月に<code>GPT-5.3-Codex</code>（GPT-5.2-Codex比25%高速、SWE-Bench ProでSoTA）が導入され、現行の推奨モデルは<code>GPT-5.4</code>です。GitHubリポジトリを自律的に操作・PR提案まで行います。
     </p>
 
     <div class="g3">
       <div class="mc">
         <div class="mc-tag" style="color:var(--oai)">☁️ Cloud Codex</div>
-        <p>ChatGPT（Pro/Plus/Business/Enterprise）のサイドバーから利用。クラウドサンドボックスでタスクを並列実行。GitHub連携でPRを自動作成。</p>
+        <p>専用<strong>Codex App</strong>（Web・デスクトップ、2026年3月Windows版リリース）から利用。クラウドサンドボックスでタスクを並列実行。GitHub連携でPRを自動作成。ChatGPTサイドバーからも引き続き利用可。</p>
       </div>
       <div class="mc">
         <div class="mc-tag" style="color:var(--blue)">💻 Codex CLI</div>
-        <p>ターミナルで動作するオープンソースエージェント（<code>npm install @openai/codex</code>）。ローカルリポジトリを直接操作。TUI（テキストUI）とHeadlessモードを持つ。</p>
+        <p>ターミナルで動作するオープンソースエージェント（<code>npm install @openai/codex</code>）。ローカルリポジトリを直接操作。TUI（テキストUI）とHeadlessモードを持つ。デフォルトの <code>service_tier</code> は <code>flex</code>（標準モード）。<strong>Fast modeはオプトイン</strong>で、セッション内の <code>/fast</code> コマンドで明示的に有効化する（GPT-5.4で利用可能、約1.5倍速だがクレジット消費約2倍）。音声入力（スペースキー長押しで録音・文字起こし）対応。</p>
       </div>
       <div class="mc">
         <div class="mc-tag" style="color:var(--purple)">🤖 Agents SDK</div>
@@ -562,7 +562,7 @@
     <h2 class="sec-title"><span class="num">03.</span>AGENTS.md — プロジェクト永続メモリ（オープン標準）</h2>
 
     <p>
-      AGENTS.mdはClaude CodeのCLAUDE.mdに相当する<strong style="color:var(--text-bright)">Codexの最重要ファイル</strong>です。Codexはタスクを開始する前に必ずAGENTS.mdを読み込み、コーディング規約・テストコマンド・PR手順などのコンテキストを取得します。公式システムメッセージにも「AGENTS.mdに記載されたテストを全件実行する」と明記されています。
+      AGENTS.mdはClaude CodeのCLAUDE.mdに相当する<strong style="color:var(--text-bright)">Codexの最重要ファイル</strong>です。Codexはタスクを開始する前に必ずAGENTS.mdを読み込み、コーディング規約・テストコマンド・PR手順などのコンテキストを取得します。ただしAGENTS.mdはテストを自動実行しないため、「ファイルを変更したら必ず npm test を実行すること」のように<strong>テストコマンドを明示的に記述</strong>する必要があります。コマンドが未記載だとテストが省略されます。
     </p>
 
     <h3>読み込み優先度チェーン</h3>
@@ -612,7 +612,7 @@
           <div class="fc-path">./AGENTS.md (プロジェクトルート) — git管理・チーム共有</div>
           <div class="fc-meta">
             <span class="fc-tag" style="background:rgba(16,163,127,.1);color:var(--oai)">オープン標準</span>
-            <span class="fc-tag" style="background:rgba(59,130,246,.1);color:var(--blue)">codex-1起動時自動読み込み</span>
+            <span class="fc-tag" style="background:rgba(59,130,246,.1);color:var(--blue)">Codex起動時自動読み込み</span>
             <span class="fc-tag" style="background:rgba(139,92,246,.1);color:var(--purple)">32KiB上限</span>
           </div>
         </div>
@@ -646,7 +646,8 @@ ECサイトのバックエンドAPI（Go製マイクロサービス）。
 - docs/      — 仕様書群（spec / requirements / design / tasks）
 
 <span class="c-hd">## Build & Test Commands</span>
-<span class="c-cm"># ★最重要: codex-1のシステムメッセージがここに書かれたテストを全件実行する</span>
+<span class="c-cm"># ★重要: AGENTS.md はテストを自動実行しない。明示的にコマンドを記述すること</span>
+<span class="c-cm"># 例: 「ファイルを変更したら必ず以下のコマンドを実行すること」</span>
 - Build:    `go build ./...`
 - Test all: `go test ./... -race -timeout 120s`
 - Lint:     `golangci-lint run`
@@ -1272,6 +1273,14 @@ CREATE INDEX CONCURRENTLY idx_users_last_login ON users(last_login_at);
         公式サンプルコードでは<code>design_spec.mdが存在することを確認してから並列ハンドオフ</code>と明示されています。AGENT_TASKS.mdに「依存ファイルが存在しない場合は停止」と書くことで、前フェーズ未完了での実装開始を防ぎます（[5]）。
       </div>
     </div>
+
+    <div class="ib i-blue">
+      <span class="ii">🔍</span>
+      <div>
+        <strong>Agents SDK 組み込みトレーシング（2026年〜）</strong><br>
+        Agents SDKには<strong>built-in tracing</strong>が統合されており、マルチエージェントフローの可視化・デバッグ・評価・ファインチューニングをワンストップで行えます。一方、<code>spawn_agents_on_csv</code>によるCSVからのエージェントファンアウトとETA付き進捗追跡は<strong>Codex CLI（rust-v0.105.0+）固有の機能</strong>です（<a href="https://github.com/openai/codex/releases" target="_blank" rel="noopener noreferrer">Codex CLI リリースノート</a>）。
+      </div>
+    </div>
   </section>
 
   <!-- ── SECTION 11: BEST PRACTICES ── -->
@@ -1282,8 +1291,8 @@ CREATE INDEX CONCURRENTLY idx_users_last_login ON users(last_login_at);
     <div class="bps">
       <div class="bp-c bp-oai">
         <div class="bp-n">01</div>
-        <h4>AGENTS.mdにテストコマンドを必ず書く</h4>
-        <p>codex-1のシステムメッセージはAGENTS.mdに書かれたテストを「全件実行」する。コマンドが未記載だとテストがスキップされる。</p>
+        <h4>AGENTS.mdにテストコマンドを明示的に書く</h4>
+        <p>AGENTS.md はテストを自動実行しない。「ファイルを変更したら必ず npm test を実行すること」のようにテストコマンドを明示的に記述し、Codex がそのシェルツール許可フローに従って実行できるよう指示する。コマンドが未記載だとテストが省略される。</p>
       </div>
       <div class="bp-c bp-blue">
         <div class="bp-n">02</div>
@@ -1349,7 +1358,7 @@ CREATE INDEX CONCURRENTLY idx_users_last_login ON users(last_login_at);
         <span class="sn">[2]</span>
         <div>
           <a href="https://openai.com/index/introducing-codex/" target="_blank" rel="noopener noreferrer">Introducing Codex — OpenAI Blog (May 2025)</a>
-          <span class="sd">codex-1（o3ベース）の仕様・AGENTS.md公式サポート発表・SWE-Bench 72.1%スコア・codex-1システムメッセージ公開</span>
+          <span class="sd">codex-1（o3ベース）の初期仕様・AGENTS.md公式サポート発表・SWE-Bench 72.1%スコアはいずれも2025年5月時点での報告。codex-1システムメッセージ公開。</span>
         </div>
       </div>
       <div class="src">
@@ -1398,7 +1407,7 @@ CREATE INDEX CONCURRENTLY idx_users_last_login ON users(last_login_at);
         <span class="sn">[9]</span>
         <div>
           <a href="https://developers.openai.com/blog/openai-for-developers-2025/" target="_blank" rel="noopener noreferrer">OpenAI for Developers in 2025 — OpenAI Developer Blog</a>
-          <span class="sd">GPT-5.2-Codex・AGENTS.mdオープン標準化の経緯・Agents SDK・AgentKit・2025年の変遷</span>
+          <span class="sd">AGENTS.mdオープン標準化の経緯・Agents SDK・AgentKit・2025年の主要な変遷・GPT-5.2-Codex（初期Cloud Codexモデル）</span>
         </div>
       </div>
       <div class="src">
@@ -1448,6 +1457,13 @@ CREATE INDEX CONCURRENTLY idx_users_last_login ON users(last_login_at);
         <div>
           <a href="https://blog.fsck.com/2025/10/27/skills-for-openai-codex/" target="_blank" rel="noopener noreferrer">Porting Skills (and Superpowers) to OpenAI Codex — blog.fsck.com (Oct 2025)</a>
           <span class="sd">SKILL.mdのオープン規格（Claude Code/Antigravity/Codex共通）・スキルを「フランチャイズのバインダー」と比喩した設計思想</span>
+        </div>
+      </div>
+      <div class="src">
+        <span class="sn">[17]</span>
+        <div>
+          <a href="https://openai.com/index/introducing-gpt-5-3-codex/" target="_blank" rel="noopener noreferrer">Introducing GPT-5.3-Codex — OpenAI Blog (2026)</a>
+          <span class="sd">GPT-5.3-Codexの仕様（GPT-5.2-Codex比25%高速・SWE-Bench Pro SoTA）・GPT-5.3-Codex-Spark（1000+ tokens/sec）・GPT-5.4との統合経緯</span>
         </div>
       </div>
     </div>
