@@ -57,10 +57,10 @@ git worktree list
 各 WT のルートから起動する（メインルートから起動しないこと）:
 
 ```bash
-cd worktrees/claude  && claude .        # Claude Code
-cd worktrees/gemini  && antigravity .   # Google Antigravity
-cd worktrees/codex   && codex           # OpenAI Codex
-cd worktrees/copilot && code .          # VS Code + Copilot
+cd worktrees/claude  && claude .
+cd worktrees/gemini  && claude .
+cd worktrees/codex   && claude .
+cd worktrees/copilot && claude .
 ```
 
 ---
