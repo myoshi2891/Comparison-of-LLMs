@@ -10,7 +10,7 @@ for WT in "${WORKTREES[@]}"; do
 
   STASH_ID=""
   STASHED=false
-  STASH_OUT=$(git stash push -u -m "auto: $WT before sync" 2>&1)
+  STASH_OUT=$(LC_ALL=C git stash push -u -m "auto: $WT before sync" 2>&1)
   STASH_EXIT=$?
   if [ $STASH_EXIT -eq 0 ] && [ "$STASH_OUT" != "No local changes to save" ]; then
     STASH_ID=$(git stash list --format='%gd' -1)
