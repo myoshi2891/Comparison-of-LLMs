@@ -30,7 +30,7 @@ allowed-tools:
 
 既存プロバイダーの実装を参照する:
 
-```
+```text
 scraper/src/scraper/providers/anthropic.py  ← 推奨テンプレート
 ```
 

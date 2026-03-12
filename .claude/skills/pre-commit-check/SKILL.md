@@ -51,6 +51,7 @@ pytest が実行される。全テスト PASS を確認する。
 以下のファイルが意図せず変更されていないか `git diff` で確認する:
 
 - `web/vite.config.ts`
+- `web/vitest.config.ts`
 - `web/tsconfig.json`
 - `web/tsconfig.app.json`
 - `scraper/pyproject.toml`

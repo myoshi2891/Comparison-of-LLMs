@@ -27,7 +27,7 @@ allowed-tools:
 
 既存ツールの実装を参照する:
 
-```
+```text
 scraper/src/scraper/tools/cursor.py  ← 推奨テンプレート
 ```
 

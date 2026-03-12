@@ -277,14 +277,19 @@
       .section {
         padding: 3.5rem 0;
         border-top: 1px solid var(--border2);
-        opacity: 0;
-        transform: translateY(20px);
+        opacity: 1;
+        transform: translateY(0);
         transition:
           opacity 0.5s ease,
           transform 0.5s ease;
       }
 
-      .section.visible {
+      .js .section {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      .js .section.visible {
         opacity: 1;
         transform: translateY(0);
       }
@@ -2286,6 +2291,9 @@ mindmap
         flowchart: { useMaxWidth: true, htmlLabels: true },
         sequence: { useMaxWidth: true },
       });
+
+      // ── JS有効時のクラス追加 ──
+      document.documentElement.classList.add('js');
 
       // ── スクロール進捗バー ──
       window.addEventListener('scroll', () => {
