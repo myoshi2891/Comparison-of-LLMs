@@ -73,3 +73,7 @@ CLAUDE.local.md
 
 # git worktree のチェックアウト先を追跡対象から除外（必須）
 worktrees/
+sample-docs
+
+# Claude Code local settings
+.claude/settings.local.json

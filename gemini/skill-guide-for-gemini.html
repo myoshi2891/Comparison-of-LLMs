@@ -1,0 +1,1623 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SKILL.md 完全ガイド — Gemini CLI & Antigravity</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Mermaid -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+
+    <!-- React + Babel -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Prism.js -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markdown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
+
+    <style>
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: 'Noto Sans JP', sans-serif;
+      }
+      .outfit {
+        font-family: 'Outfit', sans-serif;
+      }
+      .mono {
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      /* Prism toolbar */
+      .code-toolbar > .toolbar {
+        top: 0.6em;
+        right: 0.8em;
+        opacity: 1 !important;
+      }
+      .code-toolbar > .toolbar .toolbar-item a,
+      .code-toolbar > .toolbar .toolbar-item button,
+      .code-toolbar > .toolbar .toolbar-item span {
+        background: #10b981 !important;
+        color: white !important;
+        border-radius: 6px !important;
+        padding: 3px 10px !important;
+        font-size: 12px !important;
+        border: none !important;
+        cursor: pointer !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+      }
+      .code-toolbar > .toolbar .toolbar-item button:hover,
+      .code-toolbar > .toolbar .toolbar-item a:hover {
+        background: #059669 !important;
+        color: white !important;
+      }
+
+      /* Mermaid */
+      .mermaid {
+        display: flex;
+        justify-content: center;
+        overflow-x: auto;
+      }
+      .mermaid svg {
+        max-width: 100%;
+        height: auto;
+      }
+
+      /* Highlight animation */
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .fade-in {
+        animation: fadeInUp 0.5s ease both;
+      }
+
+      /* Step number badge */
+      .step-badge {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+      }
+
+      /* File tree */
+      .file-tree {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.85rem;
+        line-height: 1.8;
+      }
+      .file-tree .dir {
+        color: #0ea5e9;
+        font-weight: 700;
+      }
+      .file-tree .required {
+        color: #10b981;
+        font-weight: 700;
+      }
+      .file-tree .optional {
+        color: #94a3b8;
+      }
+
+      /* Progress bar animation */
+      @keyframes growWidth {
+        from {
+          width: 0;
+        }
+      }
+      .animate-grow {
+        animation: growWidth 1s ease forwards;
+      }
+
+      /* Tag badge */
+      .tag {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 9999px;
+        font-size: 0.72rem;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body class="bg-[linear-gradient(135deg,#f0fdf4,#e0f2fe,#f0fdf4)] min-h-screen">
+    <div class="max-w-5xl mx-auto px-4 py-10">
+      <!-- ========== HEADER ========== -->
+      <header
+        id="header"
+        class="mb-8 rounded-2xl p-8 shadow-[0_10px_30px_rgba(16,185,129,0.14)] bg-[linear-gradient(135deg,#d1fae5,#bfdbfe)]"
+      >
+        <div class="flex flex-wrap items-center gap-3 mb-3">
+          <span class="bg-emerald-600 text-white text-sm font-bold px-3 py-1 rounded-full"
+            >Google Gemini / Antigravity</span
+          >
+          <span class="bg-sky-500 text-white text-sm font-bold px-3 py-1 rounded-full"
+            >初学者向け完全ガイド</span
+          >
+          <span class="bg-violet-500 text-white text-sm font-bold px-3 py-1 rounded-full"
+            >2026年版</span
+          >
+        </div>
+        <h1 class="outfit text-[2.6rem] font-extrabold text-teal-900 mb-1 leading-tight">
+          SKILL.md<br />
+          <span class="text-[1.6rem] text-teal-700 font-bold">完全解剖ガイド</span>
+        </h1>
+        <p class="text-lg text-cyan-700 font-semibold mt-2">
+          AIエージェントに「専門知識の教科書」を渡す — Gemini CLI &amp; Antigravity 対応版
+        </p>
+
+        <nav class="flex flex-wrap gap-3 mt-6">
+          <a
+            href="#overview"
+            class="inline-block px-4 py-2 font-semibold text-slate-700 no-underline rounded-lg border-2 border-slate-200 bg-white transition hover:shadow-[0_6px_16px_rgba(15,118,110,0.20)] hover:-translate-y-0.5 hover:bg-[linear-gradient(180deg,#e8fff6,#c8f1e1)] hover:border-teal-600 text-sm"
+            >🌐 概要</a
+          >
+          <a
+            href="#why"
+            class="inline-block px-4 py-2 font-semibold text-slate-700 no-underline rounded-lg border-2 border-slate-200 bg-white transition hover:shadow-[0_6px_16px_rgba(15,118,110,0.20)] hover:-translate-y-0.5 hover:bg-[linear-gradient(180deg,#e8fff6,#c8f1e1)] hover:border-teal-600 text-sm"
+            >❓ なぜ必要か</a
+          >
+          <a
+            href="#structure"
+            class="inline-block px-4 py-2 font-semibold text-slate-700 no-underline rounded-lg border-2 border-slate-200 bg-white transition hover:shadow-[0_6px_16px_rgba(15,118,110,0.20)] hover:-translate-y-0.5 hover:bg-[linear-gradient(180deg,#e8fff6,#c8f1e1)] hover:border-teal-600 text-sm"
+            >📁 構造</a
+          >
+          <a
+            href="#howto"
+            class="inline-block px-4 py-2 font-semibold text-slate-700 no-underline rounded-lg border-2 border-slate-200 bg-white transition hover:shadow-[0_6px_16px_rgba(15,118,110,0.20)] hover:-translate-y-0.5 hover:bg-[linear-gradient(180deg,#e8fff6,#c8f1e1)] hover:border-teal-600 text-sm"
+            >✍️ 書き方</a
+          >
+          <a
+            href="#steps"
+            class="inline-block px-4 py-2 font-semibold text-slate-700 no-underline rounded-lg border-2 border-slate-200 bg-white transition hover:shadow-[0_6px_16px_rgba(15,118,110,0.20)] hover:-translate-y-0.5 hover:bg-[linear-gradient(180deg,#e8fff6,#c8f1e1)] hover:border-teal-600 text-sm"
+            >🚀 ステップ解説</a
+          >
+          <a
+            href="#install"
+            class="inline-block px-4 py-2 font-semibold text-slate-700 no-underline rounded-lg border-2 border-slate-200 bg-white transition hover:shadow-[0_6px_16px_rgba(15,118,110,0.20)] hover:-translate-y-0.5 hover:bg-[linear-gradient(180deg,#e8fff6,#c8f1e1)] hover:border-teal-600 text-sm"
+            >📦 インストール</a
+          >
+          <a
+            href="#examples"
+            class="inline-block px-4 py-2 font-semibold text-slate-700 no-underline rounded-lg border-2 border-slate-200 bg-white transition hover:shadow-[0_6px_16px_rgba(15,118,110,0.20)] hover:-translate-y-0.5 hover:bg-[linear-gradient(180deg,#e8fff6,#c8f1e1)] hover:border-teal-600 text-sm"
+            >💡 実例集</a
+          >
+          <a
+            href="#checklist"
+            class="inline-block px-4 py-2 font-semibold text-slate-700 no-underline rounded-lg border-2 border-slate-200 bg-white transition hover:shadow-[0_6px_16px_rgba(15,118,110,0.20)] hover:-translate-y-0.5 hover:bg-[linear-gradient(180deg,#e8fff6,#c8f1e1)] hover:border-teal-600 text-sm"
+            >✅ チェックリスト</a
+          >
+        </nav>
+      </header>
+
+      <!-- ========== OVERVIEW ========== -->
+      <section id="overview" class="bg-white rounded-2xl p-8 mb-8 shadow">
+        <h2
+          class="outfit text-[1.9rem] font-bold text-cyan-700 mb-4 pb-2 border-b-[3px] border-emerald-200"
+        >
+          🌐 SKILL.md とは何か
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div
+            class="rounded-2xl p-5 bg-[linear-gradient(135deg,#d1fae5,#a7f3d0)] border-2 border-emerald-300 text-center"
+          >
+            <div class="text-4xl mb-2">📄</div>
+            <div class="font-bold text-emerald-900 text-base mb-1">Markdownファイル</div>
+            <div class="text-emerald-800 text-sm">
+              AIエージェントへの「取扱説明書」。YAMLヘッダー＋指示本文で構成
+            </div>
+          </div>
+          <div
+            class="rounded-2xl p-5 bg-[linear-gradient(135deg,#bfdbfe,#93c5fd)] border-2 border-sky-300 text-center"
+          >
+            <div class="text-4xl mb-2">🧠</div>
+            <div class="font-bold text-sky-900 text-base mb-1">専門知識パッケージ</div>
+            <div class="text-sky-800 text-sm">
+              再利用可能な知識の塊。一度書けばどのプロジェクトでも使い回せる
+            </div>
+          </div>
+          <div
+            class="rounded-2xl p-5 bg-[linear-gradient(135deg,#ede9fe,#ddd6fe)] border-2 border-violet-300 text-center"
+          >
+            <div class="text-4xl mb-2">🌐</div>
+            <div class="font-bold text-violet-900 text-base mb-1">オープンスタンダード</div>
+            <div class="text-violet-800 text-sm">
+              Gemini CLI・Antigravity・Claude Code など主要ツール共通対応
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-xl bg-slate-50 border-2 border-slate-200 p-5 mb-6">
+          <div class="font-bold text-slate-700 mb-3 text-base">💬 一言で言うと？</div>
+          <blockquote class="text-xl font-bold text-teal-800 border-l-4 border-emerald-400 pl-4">
+            AIエージェントに「専門知識の教科書」を渡す仕組みです。<br />
+            必要なときだけ読み込まれるので、効率よく高精度な応答が得られます。
+          </blockquote>
+        </div>
+
+        <!-- Mermaid: 2ツール比較 -->
+        <h3 class="outfit font-bold text-teal-800 text-lg mb-3">
+          Gemini CLI vs Antigravity — 対応ツール比較
+        </h3>
+        <div class="mermaid">
+graph LR
+SKILL["📄 SKILL.md\nオープンスタンダード"]
+subgraph GC["💻 Gemini CLI"]
+GCi["ターミナルネイティブ\nAIエージェント"]
+end
+subgraph AG["🚀 Antigravity"]
+AGi["エージェントファースト IDE\nVSCodeフォーク"]
+end
+subgraph CC["🤖 Claude Code"]
+CCi["Anthropic製\nコーディングエージェント"]
+end
+SKILL --> GC
+SKILL --> AG
+SKILL --> CC
+style SKILL fill:#d1fae5,stroke:#059669,color:#065f46
+style GCi fill:#bfdbfe,stroke:#0284c7,color:#0c4a6e
+style AGi fill:#ede9fe,stroke:#7c3aed,color:#3b0764
+style CCi fill:#fef3c7,stroke:#d97706,color:#78350f
+        </div>
+
+        <div class="mt-6 overflow-x-auto">
+          <table class="w-full text-sm border-collapse">
+            <thead>
+              <tr class="bg-[linear-gradient(135deg,#d1fae5,#bfdbfe)]">
+                <th class="border border-slate-200 px-4 py-2 text-left font-bold text-teal-900">
+                  項目
+                </th>
+                <th class="border border-slate-200 px-4 py-2 text-center font-bold text-sky-900">
+                  Gemini CLI
+                </th>
+                <th class="border border-slate-200 px-4 py-2 text-center font-bold text-violet-900">
+                  Antigravity
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="hover:bg-slate-50">
+                <td class="border border-slate-200 px-4 py-2 font-semibold text-slate-700">形態</td>
+                <td class="border border-slate-200 px-4 py-2 text-center text-slate-600">
+                  ターミナルアプリ
+                </td>
+                <td class="border border-slate-200 px-4 py-2 text-center text-slate-600">
+                  IDE（エディタ）
+                </td>
+              </tr>
+              <tr class="bg-slate-50 hover:bg-white">
+                <td class="border border-slate-200 px-4 py-2 font-semibold text-slate-700">
+                  グローバルスキルパス
+                </td>
+                <td class="border border-slate-200 px-4 py-2 text-center mono text-sky-700 text-xs">
+                  ~/.gemini/skills/
+                </td>
+                <td
+                  class="border border-slate-200 px-4 py-2 text-center mono text-violet-700 text-xs"
+                >
+                  ~/.gemini/antigravity/skills/
+                </td>
+              </tr>
+              <tr class="hover:bg-slate-50">
+                <td class="border border-slate-200 px-4 py-2 font-semibold text-slate-700">
+                  ワークスペーススキルパス
+                </td>
+                <td class="border border-slate-200 px-4 py-2 text-center mono text-sky-700 text-xs">
+                  .gemini/skills/
+                </td>
+                <td
+                  class="border border-slate-200 px-4 py-2 text-center mono text-violet-700 text-xs"
+                >
+                  .agent/skills/
+                </td>
+              </tr>
+              <tr class="bg-slate-50 hover:bg-white">
+                <td class="border border-slate-200 px-4 py-2 font-semibold text-slate-700">
+                  インストールコマンド
+                </td>
+                <td class="border border-slate-200 px-4 py-2 text-center mono text-sky-700 text-xs">
+                  gemini skills install
+                </td>
+                <td class="border border-slate-200 px-4 py-2 text-center text-slate-600 text-xs">
+                  GUI または CLI
+                </td>
+              </tr>
+              <tr class="hover:bg-slate-50">
+                <td class="border border-slate-200 px-4 py-2 font-semibold text-slate-700">
+                  SKILL.md サポート
+                </td>
+                <td
+                  class="border border-slate-200 px-4 py-2 text-center text-emerald-600 font-bold"
+                >
+                  ✅ フル対応
+                </td>
+                <td
+                  class="border border-slate-200 px-4 py-2 text-center text-emerald-600 font-bold"
+                >
+                  ✅ フル対応
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ========== WHY ========== -->
+      <section id="why" class="bg-white rounded-2xl p-8 mb-8 shadow">
+        <h2
+          class="outfit text-[1.9rem] font-bold text-cyan-700 mb-4 pb-2 border-b-[3px] border-emerald-200"
+        >
+          ❓ なぜ SKILL.md が必要なのか
+        </h2>
+
+        <div class="rounded-xl bg-red-50 border-2 border-red-200 p-5 mb-6">
+          <div class="font-bold text-red-700 mb-2 text-base">
+            🔥 コンテキスト飽和（Context Saturation）問題
+          </div>
+          <p class="text-slate-600 text-sm leading-7">
+            AIエージェントに「すべてのドキュメントを読ませる」アプローチでは、モデルの注意機構（Attention
+            Mechanism）が分散し、重要な情報を見落としたり推論精度が著しく低下します。
+            また大量のトークン消費によって速度低下・コスト増大が起きます。
+          </p>
+        </div>
+
+        <div class="mermaid mb-6">
+graph TD
+subgraph 従来の方法["❌ 従来の方法（非効率）"]
+A1["👤 ユーザー指示"] --> B1["AIエージェント"]
+B1 --> C1["📚 ドキュメント全体を読む\n（大量トークン消費）"]
+C1 --> D1["🔥 コンテキスト飽和\n精度低下・速度低下"]
+end
+subgraph skill_way["✅ SKILL.md を使う方法（効率的）"]
+A2["👤 ユーザー指示"] --> B2["AIエージェント"]
+B2 -->|"関連スキルを\nオンデマンド検索"| C2["📄 SKILL.md だけ読む\n（最小トークン消費）"]
+C2 --> D2["⚡ 高精度・高速・低コスト"]
+end
+style D1 fill:#fecaca,stroke:#dc2626,color:#7f1d1d
+style D2 fill:#d1fae5,stroke:#059669,color:#065f46
+style C2 fill:#bfdbfe,stroke:#0284c7,color:#0c4a6e
+        </div>
+
+        <h3 class="outfit font-bold text-teal-800 text-lg mb-3">
+          📊 プログレッシブ・ディスクロージャー — 3段階読み込みの仕組み
+        </h3>
+        <p class="text-slate-600 text-sm leading-7 mb-4">
+          SKILL.md
+          は「必要なときだけ、必要な分だけ」読み込まれます。この3段階設計によってトークン消費を極限まで抑えています。
+        </p>
+
+        <div class="mermaid mb-6">
+graph LR
+L1["🏷️ レベル1: メタデータ\nname + description\n常にコンテキストにある\n～100 tokens\nセッション開始時に読込"]
+L2["📄 レベル2: SKILL.md 本文\nスキルが呼ばれたときのみ\n5,000 tokens以内推奨\n具体的な手順・制約"]
+L3["📚 レベル3: 参照ファイル\n本文から参照された時のみ\n容量無制限\nAPIドキュメント等"]
+L1 -->|"スキルが選ばれたとき"| L2
+L2 -->|"本文から参照されたとき"| L3
+style L1 fill:#fef3c7,stroke:#f59e0b,color:#78350f
+style L2 fill:#bfdbfe,stroke:#0284c7,color:#0c4a6e
+style L3 fill:#d1fae5,stroke:#059669,color:#065f46
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="rounded-xl p-4 bg-amber-50 border-2 border-amber-200">
+            <div class="font-bold text-amber-800 text-sm mb-1">レベル1 / 常駐</div>
+            <div class="text-amber-700 text-xs leading-6">
+              セッション開始時に全スキルのメタデータをロード。1スキル約100トークンなので数十〜数百スキルを待機させてもOK
+            </div>
+          </div>
+          <div class="rounded-xl p-4 bg-sky-50 border-2 border-sky-200">
+            <div class="font-bold text-sky-800 text-sm mb-1">レベル2 / オンデマンド</div>
+            <div class="text-sky-700 text-xs leading-6">
+              ユーザーの入力とdescriptionを意味論的に照合し、最適なスキルを特定。activate_skillツールで本文を展開
+            </div>
+          </div>
+          <div class="rounded-xl p-4 bg-emerald-50 border-2 border-emerald-200">
+            <div class="font-bold text-emerald-800 text-sm mb-1">レベル3 / 動的参照</div>
+            <div class="text-emerald-700 text-xs leading-6">
+              本文中で参照された外部ファイルのみを動的に読み込む。スクリプトは実行結果のみがトークン消費
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== STRUCTURE ========== -->
+      <section id="structure" class="bg-white rounded-2xl p-8 mb-8 shadow">
+        <h2
+          class="outfit text-[1.9rem] font-bold text-cyan-700 mb-4 pb-2 border-b-[3px] border-emerald-200"
+        >
+          📁 ディレクトリ構造と SKILL.md の解剖
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <!-- File tree -->
+          <div>
+            <h3 class="font-bold text-teal-800 mb-3 text-base">ディレクトリ構成</h3>
+            <div class="rounded-xl bg-slate-900 p-6 file-tree text-slate-200">
+              <pre class="m-0 bg-transparent text-sm leading-8">
+<span class="dir">📁 my-skill/</span>
+├── <span class="required">📄 SKILL.md</span>        <span style="color:#64748b">← 必須・スキルの脳</span>
+├── <span class="optional">📁 scripts/</span>        <span style="color:#64748b">← 任意</span>
+│   ├── <span class="optional">run.py</span>
+│   └── <span class="optional">util.sh</span>
+├── <span class="optional">📁 references/</span>     <span style="color:#64748b">← 任意</span>
+│   └── <span class="optional">api-docs.md</span>
+└── <span class="optional">📁 assets/</span>         <span style="color:#64748b">← 任意</span>
+    └── <span class="optional">template.tsx</span>
+</pre>
+            </div>
+            <div class="mt-3 space-y-2">
+              <div class="flex items-center gap-2 text-sm">
+                <span class="w-3 h-3 rounded-full bg-emerald-500 flex-shrink-0"></span>
+                <span class="font-bold text-emerald-700">SKILL.md</span>
+                <span class="text-slate-500">— 必須。YAMLメタデータ＋指示本文</span>
+              </div>
+              <div class="flex items-center gap-2 text-sm">
+                <span class="w-3 h-3 rounded-full bg-sky-400 flex-shrink-0"></span>
+                <span class="font-bold text-sky-700">scripts/</span>
+                <span class="text-slate-500">— 自動実行スクリプト（Python/Bash）</span>
+              </div>
+              <div class="flex items-center gap-2 text-sm">
+                <span class="w-3 h-3 rounded-full bg-violet-400 flex-shrink-0"></span>
+                <span class="font-bold text-violet-700">references/</span>
+                <span class="text-slate-500">— 参照ドキュメント（必要時のみ読込）</span>
+              </div>
+              <div class="flex items-center gap-2 text-sm">
+                <span class="w-3 h-3 rounded-full bg-slate-400 flex-shrink-0"></span>
+                <span class="font-bold text-slate-700">assets/</span>
+                <span class="text-slate-500">— テンプレート・静的ファイル</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- SKILL.md anatomy -->
+          <div>
+            <h3 class="font-bold text-teal-800 mb-3 text-base">SKILL.md の構成</h3>
+            <div class="space-y-2">
+              <div class="rounded-xl p-4 bg-amber-50 border-2 border-amber-300">
+                <div class="font-bold text-amber-800 text-sm mb-1">
+                  🔑 YAMLフロントマター（必須）
+                </div>
+                <div class="text-amber-700 text-xs leading-6">
+                  <code class="bg-amber-100 px-1 rounded">---</code>
+                  で囲まれたYAML形式のメタデータ。<br />
+                  <strong>name</strong>（識別子）と
+                  <strong>description</strong>（トリガー条件）が最重要
+                </div>
+              </div>
+              <div class="text-center text-slate-400 font-bold">↕</div>
+              <div class="rounded-xl p-4 bg-sky-50 border-2 border-sky-300">
+                <div class="font-bold text-sky-800 text-sm mb-1">📝 マークダウン本文（必須）</div>
+                <div class="text-sky-700 text-xs leading-6">
+                  エージェントへの具体的な指示。以下のセクションで構成：<br />
+                  Overview → Before Starting → Step-by-Step → Examples → Rules
+                </div>
+              </div>
+              <div class="text-center text-slate-400 font-bold">↕</div>
+              <div class="rounded-xl p-4 bg-emerald-50 border-2 border-emerald-300">
+                <div class="font-bold text-emerald-800 text-sm mb-1">
+                  🔗 参照ファイルリンク（任意）
+                </div>
+                <div class="text-emerald-700 text-xs leading-6">
+                  本文中で
+                  <code class="bg-emerald-100 px-1 rounded">references/api-docs.md</code>
+                  のように外部ファイルを参照。必要時だけ読込
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- YAML Front Matter detail -->
+        <h3 class="outfit font-bold text-teal-800 text-lg mb-3">YAMLフロントマター 詳細解説</h3>
+        <pre class="line-numbers"><code class="language-yaml">---
+# ✅ 必須: スキルの一意な識別子（ケバブケース・英語小文字）
+name: git-commit-formatter
+
+# ✅ 必須: エージェントへのトリガー条件（最重要！）
+#    「いつ」「どんな言葉が出たら」このスキルを使うかを明記する
+description: |
+  Gitコミットメッセージを Conventional Commits 仕様に整形する。
+  「コミット」「commit」「コミットメッセージ」などが出たら必ず使用。
+  コード変更の記録・バージョン管理作業で呼び出すこと。
+
+# 任意: 依存関係（一部ツールでサポート）
+compatibility:
+  - git
+  - node >= 18
+
+# 任意: 手動呼び出し専用にする（危険な操作に有効）
+# disable-model-invocation: true
+---</code></pre>
+
+        <div class="mt-4 rounded-xl bg-red-50 border-2 border-red-200 p-4">
+          <div class="font-bold text-red-700 mb-2">
+            ⚠️ description はエージェントの「発動スイッチ」
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+            <div class="rounded-lg bg-red-100 p-3">
+              <div class="font-bold text-red-700 mb-1">❌ 悪い例（曖昧）</div>
+              <code class="text-xs text-red-800">description: コードをレビューするスキル。</code>
+              <div class="text-red-600 text-xs mt-1">→ AIがいつ使うか判断できない</div>
+            </div>
+            <div class="rounded-lg bg-emerald-100 p-3">
+              <div class="font-bold text-emerald-700 mb-1">✅ 良い例（具体的）</div>
+              <code class="text-xs text-emerald-800"
+                >description: |<br />
+                コードレビューを実行する。<br />
+                "review","レビュー","PR確認"が出たら必ず使う。</code
+              >
+              <div class="text-emerald-600 text-xs mt-1">→ トリガーが明確で確実に呼ばれる</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== HOW TO WRITE ========== -->
+      <section id="howto" class="bg-white rounded-2xl p-8 mb-8 shadow">
+        <h2
+          class="outfit text-[1.9rem] font-bold text-cyan-700 mb-4 pb-2 border-b-[3px] border-emerald-200"
+        >
+          ✍️ SKILL.md の書き方（推奨テンプレート）
+        </h2>
+
+        <p class="text-slate-600 text-sm leading-7 mb-5">
+          効果的な SKILL.md
+          は以下の標準セクション構成に従います。各セクションの役割を理解して記述しましょう。
+        </p>
+
+        <div class="mermaid mb-6">
+graph LR
+A["---\nYAML\nフロントマター\n---"]
+B["# Title\nスキル名"]
+C["## Overview\n目的・概要（1〜2文）"]
+D["## Before Starting\n前提条件・必要な入力"]
+E["## Step-by-Step Guide\n具体的な実行手順\n（最重要）"]
+F["## Examples\n入力例と出力例\nFew-shot学習"]
+G["## Rules\n禁止事項と推奨事項\n❌と✅"]
+A --> B --> C --> D --> E --> F --> G
+style A fill:#fef3c7,stroke:#f59e0b,color:#78350f
+style E fill:#d1fae5,stroke:#059669,color:#065f46
+style G fill:#ede9fe,stroke:#7c3aed,color:#3b0764
+        </div>
+
+        <!-- Complete sample -->
+        <h3 class="outfit font-bold text-teal-800 text-lg mb-3">
+          ✅ 完全なサンプル — frontend-reviewer スキル
+        </h3>
+        <pre class="line-numbers"><code class="language-markdown">---
+name: frontend-reviewer
+description: |
+  ReactおよびTypeScriptのフロントエンドコードをレビューし、
+  コンポーネント設計・パフォーマンス・アクセシビリティ(a11y)の
+  観点から品質を向上させる際に使用する。
+  「コードレビュー」「レビュー」「PR確認」が出たら使うこと。
+---
+
+# Frontend Code Reviewer
+
+## Overview
+Reactコンポーネントに対して一貫性のある厳格なレビューを行い、
+パフォーマンス・型安全性・アクセシビリティを向上させる。
+
+## Before Starting
+レビューを開始する前に以下を確認すること：
+- レビュー対象ファイルのパスをユーザーから取得
+- 依存するフックやユーティリティファイルも一緒に読み込む
+
+## Step-by-Step Guide
+1. **文脈と依存関係の解析**: 対象ファイルと依存関係を追跡して読み込む
+2. **静的解析のシミュレーション**: 型の安全性とReactの依存配列を検証
+3. **パフォーマンス評価**: useMemo/useCallbackの欠落を特定
+4. **a11y確認**: WAI-ARIA属性・キーボードナビゲーションを確認
+5. **アーティファクト生成**: 修正後のコードスニペットと共に提示
+
+## Examples
+**Input**: `UserProfile.tsx`のパフォーマンスをレビューして
+
+**Output Structure**:
+1. 概要: 現在の実装におけるボトルネック
+2. 修正案: `React.memo`の適用箇所と修正コード
+3. 副作用の検証: 修正による影響範囲
+
+## Rules
+❌ 絶対に行わないこと:
+- ビジネスロジックの意図を推測して勝手に変更すること
+- 不明な点を質問せずに仮定で進めること
+
+✅ 必ず行うこと:
+- 変更提案の根拠として公式ドキュメントを引用
+- `references/css-guidelines.md` を参照してスタイルをレビュー</code></pre>
+      </section>
+
+      <!-- ========== STEPS (React component) ========== -->
+      <section id="steps" class="bg-white rounded-2xl p-8 mb-8 shadow">
+        <h2
+          class="outfit text-[1.9rem] font-bold text-cyan-700 mb-4 pb-2 border-b-[3px] border-emerald-200"
+        >
+          🚀 ステップバイステップ — 初めてのスキル作成
+        </h2>
+        <div id="steps-app"></div>
+      </section>
+
+      <!-- ========== INSTALL ========== -->
+      <section id="install" class="bg-white rounded-2xl p-8 mb-8 shadow">
+        <h2
+          class="outfit text-[1.9rem] font-bold text-cyan-700 mb-4 pb-2 border-b-[3px] border-emerald-200"
+        >
+          📦 スキルのインストール方法
+        </h2>
+
+        <h3 class="outfit font-bold text-teal-800 text-lg mb-3">スコープ選択（どこに置くか）</h3>
+
+        <div class="mermaid mb-6">
+graph TB
+Root["📂 スキルの配置場所"]
+Root --> Global["🌍 グローバルスコープ\n全プロジェクトで有効"]
+Root --> Local["📁 ワークスペーススコープ\nそのプロジェクトのみ"]
+Global --> G1["~/.gemini/skills/\nGemini CLI グローバル"]
+Global --> G2["~/.gemini/antigravity/skills/\nAntigravity グローバル"]
+Local --> L1[".gemini/skills/\nGemini CLI ローカル"]
+Local --> L2[".agent/skills/\nAntigravity ローカル"]
+G1 -.->|"向いているスキル例"| GU["汎用スキル\nコードレビュー・コミット\nフォーマット等"]
+L1 -.->|"向いているスキル例"| LU["プロジェクト専用\nデプロイ手順・独自API仕様等"]
+style Global fill:#bfdbfe,stroke:#0284c7,color:#0c4a6e
+style Local fill:#d1fae5,stroke:#059669,color:#065f46
+style GU fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
+style LU fill:#ecfdf5,stroke:#059669,color:#065f46
+        </div>
+
+        <!-- Gemini CLI commands -->
+        <h3 class="outfit font-bold text-teal-800 text-lg mb-3">Gemini CLI コマンド一覧</h3>
+        <pre class="line-numbers"><code class="language-bash"># ✅ Git リポジトリからインストール
+gemini skills install https://github.com/example/my-skills.git
+
+# ✅ サブディレクトリを指定してインストール
+gemini skills install https://github.com/example/skills.git --path skills/firebase
+
+# ✅ ローカルディレクトリからインストール
+gemini skills install ./my-local-skill/
+
+# ✅ インストール済みスキルを一覧表示
+gemini skills list
+
+# ✅ セッション中にスキルを無効化
+/skills disable &lt;スキル番号&gt;
+
+# ✅ スキルを更新
+gemini skills update</code></pre>
+
+        <!-- npx skills CLI -->
+        <h3 class="outfit font-bold text-teal-800 text-lg mt-6 mb-3">
+          skills CLI（統合管理ツール）
+        </h3>
+        <p class="text-slate-600 text-sm leading-7 mb-3">
+          <code class="bg-slate-100 px-2 py-0.5 rounded font-mono text-sm">npx skills</code>
+          コマンドを使うと、Gemini CLI と Antigravity の両方に同時にスキルを追加できます。
+        </p>
+        <pre class="line-numbers"><code class="language-bash"># Gemini CLI と Antigravity 両方に追加
+npx skills add firebase/agent-skills -a gemini-cli -a antigravity
+
+# スキルを検索
+npx skills find flutter
+
+# スキルを削除
+npx skills remove firebase/agent-skills
+
+# インストール済みスキルを一覧表示
+npx skills list</code></pre>
+
+        <!-- Antigravity -->
+        <h3 class="outfit font-bold text-teal-800 text-lg mt-6 mb-3">Antigravity への手動コピー</h3>
+        <pre
+          class="line-numbers"
+        ><code class="language-bash"># グローバルインストール（全プロジェクトで使えるようにする）
+cp -r my-skill/ ~/.gemini/antigravity/skills/
+
+# ワークスペースインストール（このプロジェクトだけ）
+cp -r my-skill/ .agent/skills/</code></pre>
+
+        <!-- Agent lifecycle -->
+        <h3 class="outfit font-bold text-teal-800 text-lg mt-6 mb-3">
+          スキルが呼び出されるまでの流れ
+        </h3>
+        <div class="mermaid">
+sequenceDiagram
+actor User as 👤 ユーザー
+participant Agent as 🤖 AIエージェント
+participant Meta as 📋 メタデータ
+participant Body as 📄 SKILL.md本文
+participant Refs as 📁 参照ファイル
+Note over Agent,Meta: 1. ディスカバリーフェーズ
+Agent->>Meta: skills/配下を走査しnameとdescriptionを抽出
+Meta-->>Agent: メタデータをシステムプロンプトに注入
+User->>Agent: "このコードをレビューして"
+Note over Agent: 2. アクティベーション判断
+Agent->>Agent: プロンプトとdescriptionを照合
+Agent->>Agent: "frontend-reviewer"が最適と判断
+Note over Agent,Body: 3. 承認とコンテキスト展開
+Agent->>User: ツール実行の承認を求める
+User->>Agent: 承認 ✅
+Agent->>Body: SKILL.md本文を読み込む
+Body-->>Agent: 手順・制約をコンテキストに展開
+Note over Agent,Refs: 4. 動的リソース読み込み
+Agent->>Refs: references/css-guidelines.md を読む
+Refs-->>Agent: スタイルガイドラインを取得
+Note over Agent,User: 5. 実行と結果返却
+Agent->>User: SKILL.mdの手順に従いレビュー結果を提示
+        </div>
+      </section>
+
+      <!-- ========== EXAMPLES ========== -->
+      <section id="examples" class="bg-white rounded-2xl p-8 mb-8 shadow">
+        <h2
+          class="outfit text-[1.9rem] font-bold text-cyan-700 mb-4 pb-2 border-b-[3px] border-emerald-200"
+        >
+          💡 パターン別 実例集
+        </h2>
+
+        <!-- Pattern tabs via React -->
+        <div id="examples-app"></div>
+      </section>
+
+      <!-- ========== CHECKLIST ========== -->
+      <section id="checklist" class="bg-white rounded-2xl p-8 mb-8 shadow">
+        <h2
+          class="outfit text-[1.9rem] font-bold text-cyan-700 mb-4 pb-2 border-b-[3px] border-emerald-200"
+        >
+          ✅ ベストプラクティス &amp; チェックリスト
+        </h2>
+
+        <!-- Anti-patterns -->
+        <h3 class="outfit font-bold text-teal-800 text-lg mb-3">❌ よくある失敗パターン</h3>
+        <div class="mermaid mb-6">
+graph TD
+A["よくある失敗"] --> B["description が曖昧すぎる\n→ スキルが呼ばれない"]
+A --> C["SKILL.md が長すぎる\n→ コンテキストを圧迫"]
+A --> D["スキルを入れすぎる\n→ AIが混乱\n目安: 10〜15個以内"]
+A --> E["スクリプトに\nハードコードされた値\n→ 再利用できない"]
+A --> F["name がディレクトリ名と\n不一致\n→ 発見されない"]
+style B fill:#fecaca,stroke:#dc2626,color:#7f1d1d
+style C fill:#fecaca,stroke:#dc2626,color:#7f1d1d
+style D fill:#fecaca,stroke:#dc2626,color:#7f1d1d
+style E fill:#fecaca,stroke:#dc2626,color:#7f1d1d
+style F fill:#fecaca,stroke:#dc2626,color:#7f1d1d
+        </div>
+
+        <!-- Checklist React component -->
+        <div id="checklist-app"></div>
+
+        <!-- Skill count guide -->
+        <h3 class="outfit font-bold text-teal-800 text-lg mt-6 mb-3">📊 スキル数の目安</h3>
+        <div class="space-y-2">
+          <div class="flex items-center gap-3">
+            <span class="text-sm text-slate-500 w-20 text-right">1〜5個</span>
+            <div class="flex-1 bg-slate-100 rounded-full h-4 overflow-hidden">
+              <div class="h-4 rounded-full bg-sky-300 animate-grow" style="width: 70%"></div>
+            </div>
+            <span class="text-sm text-sky-700 font-bold">普通</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-sm text-slate-500 w-20 text-right">6〜10個</span>
+            <div class="flex-1 bg-slate-100 rounded-full h-4 overflow-hidden">
+              <div class="h-4 rounded-full bg-emerald-400 animate-grow" style="width: 90%"></div>
+            </div>
+            <span class="text-sm text-emerald-700 font-bold">最適 ⭐</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-sm text-slate-500 w-20 text-right">11〜20個</span>
+            <div class="flex-1 bg-slate-100 rounded-full h-4 overflow-hidden">
+              <div class="h-4 rounded-full bg-yellow-400 animate-grow" style="width: 80%"></div>
+            </div>
+            <span class="text-sm text-yellow-700 font-bold">やや多め</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-sm text-slate-500 w-20 text-right">30個以上</span>
+            <div class="flex-1 bg-slate-100 rounded-full h-4 overflow-hidden">
+              <div class="h-4 rounded-full bg-red-400 animate-grow" style="width: 40%"></div>
+            </div>
+            <span class="text-sm text-red-700 font-bold">非推奨</span>
+          </div>
+        </div>
+
+        <!-- Quick reference -->
+        <h3 class="outfit font-bold text-teal-800 text-lg mt-6 mb-3">📋 クイックリファレンス</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm border-collapse">
+            <thead>
+              <tr class="bg-[linear-gradient(135deg,#d1fae5,#bfdbfe)]">
+                <th class="border border-slate-200 px-4 py-2 text-left font-bold text-teal-900">
+                  ツール
+                </th>
+                <th class="border border-slate-200 px-4 py-2 text-left font-bold text-teal-900">
+                  グローバルパス
+                </th>
+                <th class="border border-slate-200 px-4 py-2 text-left font-bold text-teal-900">
+                  ローカルパス
+                </th>
+                <th class="border border-slate-200 px-4 py-2 text-left font-bold text-teal-900">
+                  インストールコマンド
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="hover:bg-slate-50">
+                <td class="border border-slate-200 px-4 py-2 font-bold text-sky-700">Gemini CLI</td>
+                <td class="border border-slate-200 px-4 py-2 mono text-xs">~/.gemini/skills/</td>
+                <td class="border border-slate-200 px-4 py-2 mono text-xs">.gemini/skills/</td>
+                <td class="border border-slate-200 px-4 py-2 mono text-xs">
+                  gemini skills install &lt;url&gt;
+                </td>
+              </tr>
+              <tr class="bg-slate-50 hover:bg-white">
+                <td class="border border-slate-200 px-4 py-2 font-bold text-violet-700">
+                  Antigravity
+                </td>
+                <td class="border border-slate-200 px-4 py-2 mono text-xs">
+                  ~/.gemini/antigravity/skills/
+                </td>
+                <td class="border border-slate-200 px-4 py-2 mono text-xs">.agent/skills/</td>
+                <td class="border border-slate-200 px-4 py-2 mono text-xs">
+                  cp -r skill/ ~/.gemini/antigravity/skills/
+                </td>
+              </tr>
+              <tr class="hover:bg-slate-50">
+                <td class="border border-slate-200 px-4 py-2 font-bold text-emerald-700">
+                  両方同時
+                </td>
+                <td class="border border-slate-200 px-4 py-2 text-slate-500 text-xs" colspan="2">
+                  — npx skills CLI を使用 —
+                </td>
+                <td class="border border-slate-200 px-4 py-2 mono text-xs">
+                  npx skills add &lt;name&gt; -a gemini-cli -a antigravity
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ========== FOOTER ========== -->
+      <footer class="text-center text-slate-500 text-sm py-8">
+        <div class="mb-2 font-bold text-teal-700">
+          SKILL.md 完全ガイド — Gemini CLI &amp; Antigravity 対応版
+        </div>
+        <div>
+          Based on official documentation from Google Gemini, Antigravity, and Agent Skills Open
+          Standard
+        </div>
+      </footer>
+    </div>
+    <!-- end max-w-5xl -->
+
+    <!-- ========== REACT COMPONENTS ========== -->
+    <script type="text/babel">
+      const { useState, useEffect, useRef } = React;
+
+      // ==============================
+      // Steps component
+      // ==============================
+      const stepsData = [
+        {
+          step: 1,
+          title: 'ディレクトリを作成する',
+          desc: 'スキルを格納するディレクトリを作成します。スキル名と一致させることが重要です。グローバル用なら ~/.agents/skills/、プロジェクト専用なら .gemini/skills/ 配下に作成します。',
+          tag: 'セットアップ',
+          tagColor: 'bg-sky-100 text-sky-700',
+          code: `# グローバルスコープ（全プロジェクトで使える）
+mkdir -p ~/.agents/skills/my-first-skill
+
+# ワークスペーススコープ（このプロジェクトのみ）
+mkdir -p .gemini/skills/my-first-skill
+
+# ディレクトリに移動
+cd ~/.agents/skills/my-first-skill`,
+          lang: 'bash',
+          tip: '💡 ディレクトリ名 = スキルのname フィールドと完全一致させること！',
+        },
+        {
+          step: 2,
+          title: 'YAMLフロントマターを記述する',
+          desc: 'SKILL.md ファイルを作成し、まず --- で囲んだ YAML メタデータを書きます。name（識別子）と description（トリガー条件）が最重要です。description はエージェントが「いつこのスキルを使うか」を判断するための発動スイッチです。',
+          tag: 'メタデータ',
+          tagColor: 'bg-amber-100 text-amber-700',
+          code: `---
+# スキルの一意な識別子（ケバブケース）
+name: my-first-skill
+
+# 【最重要】いつ・どんな言葉で呼ばれるかを明記
+description: |
+  初めてのスキルテスト用。
+  「テスト」「hello」「最初のスキル」が出たら使うこと。
+---`,
+          lang: 'yaml',
+          tip: '💡 description に具体的なキーワードを入れると、AIが確実に呼び出してくれます。',
+        },
+        {
+          step: 3,
+          title: 'マークダウン本文を書く',
+          desc: 'YAML フロントマターの下に、エージェントへの指示をマークダウン形式で記述します。Overview（概要）→ Step-by-Step（手順）→ Rules（制約）の順で書くのが推奨パターンです。',
+          tag: '指示本文',
+          tagColor: 'bg-emerald-100 text-emerald-700',
+          code: `# My First Skill
+
+## Overview
+このスキルは初学者向けのサンプルスキルです。
+挨拶メッセージを生成する方法を示します。
+
+## Step-by-Step Guide
+1. ユーザーの名前を確認する（不明な場合は質問する）
+2. 日本語で丁寧な挨拶文を生成する
+3. スキルが正常に動作したことを確認する
+
+## Examples
+**Input**: 「田中さんに挨拶して」
+**Output**: 「田中さん、こんにちは！本日もよろしくお願いします。」
+
+## Rules
+❌ 行わないこと:
+- ユーザーの名前を勝手に推測すること
+
+✅ 必ず行うこと:
+- 敬語を使った丁寧な表現を選ぶ`,
+          lang: 'markdown',
+          tip: '💡 Rules セクションに ❌（禁止事項）と ✅（推奨事項）を明記するとエージェントが迷いません。',
+        },
+        {
+          step: 4,
+          title: 'スキルを検証する',
+          desc: '作成したスキルがツールに認識されているか確認します。Gemini CLI では gemini skills list コマンドでリストを確認できます。自分のスキルが一覧に表示されれば成功です！',
+          tag: '検証',
+          tagColor: 'bg-violet-100 text-violet-700',
+          code: `# Gemini CLI でスキル一覧を確認
+gemini skills list
+
+# 期待される出力例:
+# ✅ my-first-skill     - 初めてのスキルテスト用
+# ✅ git-commit-formatter - コミットメッセージを整形
+# ...
+
+# 実際にテスト
+gemini "テスト！最初のスキルを呼び出して"`,
+          lang: 'bash',
+          tip: '💡 スキルが表示されない場合は name フィールドとディレクトリ名が一致しているか確認してください。',
+        },
+        {
+          step: 5,
+          title: 'スキルを進化させる',
+          desc: '基本スキルが動いたら、scripts/ ディレクトリにPythonやBashスクリプトを追加して「決定論的な処理」を加えましょう。また references/ に参照ドキュメントを追加することで、エージェントに専門知識を動的に与えられます。',
+          tag: '発展',
+          tagColor: 'bg-rose-100 text-rose-700',
+          code: `# スクリプトを追加して決定論的な処理を強制
+mkdir scripts references
+
+# スクリプト例: バリデーション
+cat > scripts/validate.py << 'EOF'
+import sys
+# 入力を検証して決定論的な結果を返す
+print("✅ バリデーション成功")
+EOF
+
+# 参照ドキュメントを追加
+cat > references/guidelines.md << 'EOF'
+# コーディングガイドライン
+- PEP8 準拠
+- 型アノテーション必須
+EOF`,
+          lang: 'bash',
+          tip: '💡 スクリプトを使うと、AIの「推測」を排除して確実に正確な結果を得られます。',
+        },
+      ];
+
+      function StepViz({ step }) {
+        const colors = [
+          'bg-sky-100 border-sky-300',
+          'bg-amber-100 border-amber-300',
+          'bg-emerald-100 border-emerald-300',
+          'bg-violet-100 border-violet-300',
+          'bg-rose-100 border-rose-300',
+        ];
+        return (
+          <div className={['rounded-xl p-4 border-2 text-center mt-4', colors[step - 1]].join(' ')}>
+            <div className="text-3xl mb-2">
+              {step === 1 ? '📁' : step === 2 ? '📝' : step === 3 ? '✍️' : step === 4 ? '🔍' : '🚀'}
+            </div>
+            <div className="font-bold text-slate-700 text-sm">
+              {step === 1
+                ? 'ディレクトリ作成完了！'
+                : step === 2
+                  ? 'YAMLフロントマター完成！'
+                  : step === 3
+                    ? '指示本文完成！'
+                    : step === 4
+                      ? 'スキル認識確認中...'
+                      : 'スキル進化中！'}
+            </div>
+          </div>
+        );
+      }
+
+      function StepsApp() {
+        const [activeStep, setActiveStep] = useState(1);
+        const [isPlaying, setIsPlaying] = useState(false);
+        const timerRef = useRef(null);
+
+        const currentStep = stepsData.find((s) => s.step === activeStep);
+
+        useEffect(() => {
+          if (isPlaying) {
+            timerRef.current = setTimeout(() => {
+              if (activeStep === stepsData.length) {
+                setActiveStep(1);
+                setIsPlaying(false);
+              } else {
+                setActiveStep((prev) => prev + 1);
+              }
+            }, 2000);
+          }
+          return () => {
+            if (timerRef.current) clearTimeout(timerRef.current);
+          };
+        }, [isPlaying, activeStep]);
+
+        useEffect(() => {
+          // Re-highlight after step change
+          setTimeout(() => {
+            if (window.Prism) window.Prism.highlightAll();
+          }, 50);
+        }, [activeStep]);
+
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-8 mt-2">
+            {/* Left: step list */}
+            <div>
+              <h3 className="mt-0 mb-4 text-teal-800 text-xl font-semibold">ステップ一覧</h3>
+              <div className="space-y-2">
+                {stepsData.map((step) => {
+                  const isActive = activeStep === step.step;
+                  return (
+                    <button
+                      key={step.step}
+                      type="button"
+                      className={[
+                        'w-full text-left text-[0.95rem] rounded-xl border-2 transition cursor-pointer px-4 py-3',
+                        'bg-white border-slate-200 hover:border-emerald-500 hover:translate-x-1',
+                        isActive
+                          ? 'bg-[linear-gradient(135deg,#d1fae5,#a7f3d0)] border-emerald-500 shadow-[0_4px_12px_rgba(16,185,129,0.20)]'
+                          : '',
+                      ].join(' ')}
+                      onClick={() => {
+                        setActiveStep(step.step);
+                        setIsPlaying(false);
+                      }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={[
+                            'step-badge text-white text-xs',
+                            isActive ? 'bg-emerald-500' : 'bg-slate-300',
+                          ].join(' ')}
+                        >
+                          {step.step}
+                        </div>
+                        <div>
+                          <div
+                            className={[
+                              'font-bold text-sm',
+                              isActive ? 'text-emerald-900' : 'text-teal-800',
+                            ].join(' ')}
+                          >
+                            {step.title}
+                          </div>
+                          <span className={['tag mt-0.5', step.tagColor].join(' ')}>
+                            {step.tag}
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Right: detail */}
+            <div>
+              <div className="rounded-2xl p-6 border-2 border-emerald-200 bg-[linear-gradient(135deg,#ecfdf5,#f0f9ff)]">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="step-badge bg-emerald-500 text-white text-sm">
+                    {currentStep.step}
+                  </div>
+                  <h3 className="mt-0 text-teal-800 text-lg font-bold">{currentStep.title}</h3>
+                </div>
+                <p className="text-slate-600 leading-7 text-sm mt-2">{currentStep.desc}</p>
+                <div className="mt-3 rounded-lg bg-white border border-emerald-200 px-4 py-2 text-emerald-700 text-xs font-semibold">
+                  {currentStep.tip}
+                </div>
+              </div>
+
+              <StepViz step={activeStep} />
+
+              <div className="mt-4">
+                <pre
+                  className="line-numbers rounded-xl overflow-auto text-sm"
+                  style={{ margin: 0 }}
+                >
+                  <code className={`language-${currentStep.lang}`}>{currentStep.code}</code>
+                </pre>
+              </div>
+
+              <div className="flex flex-wrap justify-center gap-2 mt-4">
+                <button
+                  type="button"
+                  className="px-5 py-2.5 rounded-xl font-semibold text-white transition disabled:opacity-50 shadow hover:-translate-y-0.5 bg-[linear-gradient(135deg,#10b981,#059669)] text-sm"
+                  onClick={() => setIsPlaying(true)}
+                  disabled={isPlaying}
+                >
+                  ▶ Play
+                </button>
+                <button
+                  type="button"
+                  className="px-5 py-2.5 rounded-xl font-semibold text-white transition disabled:opacity-50 shadow hover:-translate-y-0.5 bg-[linear-gradient(135deg,#0ea5e9,#0284c7)] text-sm"
+                  onClick={() => {
+                    setActiveStep((s) => Math.max(1, s - 1));
+                    setIsPlaying(false);
+                  }}
+                  disabled={activeStep === 1}
+                >
+                  ◀ Prev
+                </button>
+                <button
+                  type="button"
+                  className="px-5 py-2.5 rounded-xl font-semibold text-white transition disabled:opacity-50 shadow hover:-translate-y-0.5 bg-[linear-gradient(135deg,#0ea5e9,#0284c7)] text-sm"
+                  onClick={() => {
+                    setActiveStep((s) => Math.min(stepsData.length, s + 1));
+                    setIsPlaying(false);
+                  }}
+                  disabled={activeStep === stepsData.length}
+                >
+                  Next ▶
+                </button>
+                <button
+                  type="button"
+                  className="px-5 py-2.5 rounded-xl font-semibold text-slate-700 transition shadow hover:-translate-y-0.5 bg-white border-2 border-slate-200 text-sm"
+                  onClick={() => {
+                    setActiveStep(1);
+                    setIsPlaying(false);
+                  }}
+                >
+                  ↺ Reset
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // ==============================
+      // Examples component
+      // ==============================
+      const patternsData = [
+        {
+          id: 'basic',
+          label: 'Basic（SKILL.mdのみ）',
+          emoji: '📄',
+          desc: '最もシンプルな形。プロンプトエンジニアリングだけで完結するスキル。',
+          structure: `my-skill/\n└── 📄 SKILL.md  ← これだけ！`,
+          code: `---
+name: git-commit-formatter
+description: |
+  Gitコミットメッセージを Conventional Commits 仕様に整形する。
+  「コミット」「commit」「コミットメッセージ」などが出たら使用。
+---
+
+# Git コミットフォーマッター
+
+## ルール
+コミットメッセージは必ず以下の形式にすること:
+
+\`\`\`
+<type>(<scope>): <subject>
+
+[optional body]
+[optional footer]
+\`\`\`
+
+## type の種類
+- feat: 新機能
+- fix: バグ修正
+- docs: ドキュメント変更
+- style: フォーマット変更
+- refactor: リファクタリング`,
+          lang: 'markdown',
+        },
+        {
+          id: 'reference',
+          label: 'Reference（+参照ドキュメント）',
+          emoji: '📚',
+          desc: 'APIドキュメントや仕様書を参照しながら動作するスキル。大きな参照ファイルを分離して、必要なときだけ読み込みます。',
+          structure: `api-integrator/\n├── 📄 SKILL.md\n└── 📁 references/\n    └── api-spec.md  ← API仕様書`,
+          code: `---
+name: api-integrator
+description: |
+  外部APIとの統合コードを生成する。
+  「API連携」「HTTP リクエスト」「fetch」などが出たら使用。
+---
+
+# API インテグレーター
+
+## 手順
+1. \`references/api-spec.md\` を読み込んでAPIの仕様を確認する
+2. ユーザーが求めるエンドポイントを特定する
+3. 仕様に基づき正確なコードを生成する
+
+## Rules
+❌ 推測でコードを書かないこと
+✅ 必ず参照ファイルを読んでから実装すること`,
+          lang: 'markdown',
+        },
+        {
+          id: 'tool',
+          label: 'Tool Use（+スクリプト）',
+          emoji: '⚙️',
+          desc: 'PythonやBashスクリプトを実行するスキル。AIの確率論的な推測を排除し、確実に正確な結果を得られます。',
+          structure: `db-migrator/\n├── 📄 SKILL.md\n└── 📁 scripts/\n    └── migrate.py  ← 実行スクリプト`,
+          code: `---
+name: db-migrator
+description: |
+  データベースマイグレーションを実行する。
+  「マイグレーション」「DB更新」「スキーマ変更」が出たら使用。
+---
+
+# DB マイグレーター
+
+## 実行方法
+以下のスクリプトを使ってマイグレーションを実行する:
+
+\`\`\`bash
+python scripts/migrate.py --env <environment> --version <version>
+\`\`\`
+
+## 引数
+- --env: 環境（dev / staging / prod）
+- --version: マイグレーションバージョン番号
+
+## 手順
+1. ユーザーの指示から env と version を読み取る
+2. スクリプトを実行する前に確認を求める
+3. エラーが出た場合はロールバックコマンドを提示する`,
+          lang: 'markdown',
+        },
+        {
+          id: 'allinone',
+          label: 'All-in-One（全要素）',
+          emoji: '🚀',
+          desc: '最も高度なパターン。スクリプト・参照ドキュメント・アセットを全て組み合わせた本格的なスキル。',
+          structure: `full-stack-generator/\n├── 📄 SKILL.md\n├── 📁 scripts/\n│   └── scaffold.py\n├── 📁 references/\n│   └── best-practices.md\n└── 📁 assets/\n    └── template.tsx`,
+          code: `---
+name: full-stack-generator
+description: |
+  React + TypeScript のフルスタックアプリを生成する。
+  「アプリを作って」「スキャフォールド」「雛形生成」が出たら使用。
+---
+
+# Full Stack Generator
+
+## Overview
+ベストプラクティスに基づいたReact+TypeScriptアプリの
+雛形を自動生成する。
+
+## Step-by-Step Guide
+1. \`references/best-practices.md\` を読み込む
+2. ユーザーの要件を確認する
+3. \`python scripts/scaffold.py --name <app-name>\` を実行
+4. \`assets/template.tsx\` を参考にコンポーネントを生成
+
+## Rules
+✅ 必ずスクリプトを使って一貫した構造を生成すること
+❌ 手動でファイルを生成しないこと（一貫性が壊れる）`,
+          lang: 'markdown',
+        },
+      ];
+
+      function ExamplesApp() {
+        const [active, setActive] = useState('basic');
+        const current = patternsData.find((p) => p.id === active);
+
+        useEffect(() => {
+          setTimeout(() => {
+            if (window.Prism) window.Prism.highlightAll();
+          }, 50);
+        }, [active]);
+
+        return (
+          <div>
+            <div className="flex flex-wrap gap-2 mb-6">
+              {patternsData.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => setActive(p.id)}
+                  className={[
+                    'px-4 py-2 rounded-xl font-semibold text-sm border-2 transition hover:-translate-y-0.5',
+                    active === p.id
+                      ? 'bg-[linear-gradient(135deg,#d1fae5,#a7f3d0)] border-emerald-500 text-emerald-900 shadow'
+                      : 'bg-white border-slate-200 text-slate-600 hover:border-emerald-400',
+                  ].join(' ')}
+                >
+                  {p.emoji} {p.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="rounded-2xl p-5 border-2 border-emerald-200 bg-[linear-gradient(135deg,#ecfdf5,#f0f9ff)] mb-4">
+              <div className="text-2xl mb-1">{current.emoji}</div>
+              <div className="font-bold text-teal-800 text-base mb-1">{current.label}</div>
+              <p className="text-slate-600 text-sm">{current.desc}</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <div className="font-bold text-slate-700 text-sm mb-2">📁 ディレクトリ構成</div>
+                <div className="rounded-xl bg-slate-900 p-4 mono text-sm text-slate-200 whitespace-pre leading-7">
+                  {current.structure}
+                </div>
+              </div>
+              <div className="flex items-center justify-center">
+                <div className="text-center p-4 rounded-xl bg-emerald-50 border-2 border-emerald-200 w-full">
+                  <div className="text-4xl mb-2">{current.emoji}</div>
+                  <div className="font-bold text-emerald-800 text-sm">
+                    このパターンが向いている場合
+                  </div>
+                  <div className="text-emerald-700 text-xs mt-2 leading-6">
+                    {current.id === 'basic'
+                      ? 'シンプルな指示・フォーマット変換・テキスト生成'
+                      : current.id === 'reference'
+                        ? '仕様書・APIドキュメント参照が必要なタスク'
+                        : current.id === 'tool'
+                          ? 'バリデーション・テスト実行・繰り返し作業の自動化'
+                          : '複雑なワークフロー・チーム全体での知識共有・プロジェクト固有の高度な自動化'}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="font-bold text-slate-700 text-sm mb-2">📄 SKILL.md サンプル</div>
+            <pre className="line-numbers rounded-xl overflow-auto text-sm" style={{ margin: 0 }}>
+              <code className={`language-${current.lang}`}>{current.code}</code>
+            </pre>
+          </div>
+        );
+      }
+
+      // ==============================
+      // Checklist component
+      // ==============================
+      const checkItems = [
+        {
+          id: 1,
+          cat: '作成',
+          text: 'name はハイフン区切りの英語小文字になっているか',
+          tip: '例: git-commit-formatter ✅　GIT_Commit ❌',
+        },
+        {
+          id: 2,
+          cat: '作成',
+          text: 'name とディレクトリ名が完全一致しているか',
+          tip: '不一致だとエージェントがスキルを発見できない',
+        },
+        {
+          id: 3,
+          cat: '作成',
+          text: 'description にトリガーとなるキーワードが含まれているか',
+          tip: '「〜が出たら必ず使うこと」のような明示的な指示を入れる',
+        },
+        {
+          id: 4,
+          cat: '品質',
+          text: 'SKILL.md 本文は 500 行以内に収まっているか',
+          tip: '長すぎるとコンテキストを圧迫する。大きな参照は references/ に分離',
+        },
+        {
+          id: 5,
+          cat: '品質',
+          text: '大きな参照ファイルは references/ に分離しているか',
+          tip: '本文中から参照するだけで、必要時だけ読み込まれる',
+        },
+        {
+          id: 6,
+          cat: '品質',
+          text: 'スクリプトは引数で動作を変えられる設計になっているか',
+          tip: 'ハードコードされた値は再利用性を下げる',
+        },
+        {
+          id: 7,
+          cat: 'テスト',
+          text: 'gemini skills list でスキルが表示されるか確認したか',
+          tip: '表示されない場合はパスやnameの確認を',
+        },
+        {
+          id: 8,
+          cat: 'テスト',
+          text: '実際にエージェントに呼び出されるかテストしたか',
+          tip: 'descriptionのキーワードを含むプロンプトで動作確認',
+        },
+        {
+          id: 9,
+          cat: '運用',
+          text: 'アクティブなスキルは 15 個以内に抑えているか',
+          tip: '多すぎるとAIが混乱し精度が低下する',
+        },
+        {
+          id: 10,
+          cat: '運用',
+          text: '使わなくなったスキルは無効化・削除しているか',
+          tip: '/skills disable コマンドで無効化できる',
+        },
+      ];
+
+      const catColors = {
+        作成: 'bg-sky-100 text-sky-700',
+        品質: 'bg-emerald-100 text-emerald-700',
+        テスト: 'bg-amber-100 text-amber-700',
+        運用: 'bg-violet-100 text-violet-700',
+      };
+
+      function ChecklistApp() {
+        const [checked, setChecked] = useState({});
+        const total = checkItems.length;
+        const done = Object.values(checked).filter(Boolean).length;
+        const pct = Math.round((done / total) * 100);
+
+        const toggle = (id) => setChecked((prev) => ({ ...prev, [id]: !prev[id] }));
+
+        return (
+          <div>
+            {/* Progress */}
+            <div className="mb-5 rounded-xl bg-slate-50 border border-slate-200 p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-bold text-slate-700 text-sm">完了度</span>
+                <span
+                  className={[
+                    'font-bold text-lg',
+                    pct === 100 ? 'text-emerald-600' : 'text-sky-600',
+                  ].join(' ')}
+                >
+                  {pct}%
+                </span>
+              </div>
+              <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                <div
+                  className={[
+                    'h-3 rounded-full transition-all duration-500',
+                    pct === 100 ? 'bg-emerald-500' : 'bg-sky-400',
+                  ].join(' ')}
+                  style={{ width: `${pct}%` }}
+                ></div>
+              </div>
+              <div className="text-xs text-slate-500 mt-1">
+                {done} / {total} 項目完了
+              </div>
+              {pct === 100 && (
+                <div className="mt-2 text-emerald-600 font-bold text-sm">
+                  🎉 すべてのチェックが完了しました！スキルをリリースできます。
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              {checkItems.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() => toggle(item.id)}
+                  className={[
+                    'flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition',
+                    checked[item.id]
+                      ? 'bg-emerald-50 border-emerald-300'
+                      : 'bg-white border-slate-200 hover:border-emerald-300',
+                  ].join(' ')}
+                >
+                  <div
+                    className={[
+                      'w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition',
+                      checked[item.id] ? 'bg-emerald-500 border-emerald-500' : 'border-slate-300',
+                    ].join(' ')}
+                  >
+                    {checked[item.id] && <span className="text-white text-xs font-bold">✓</span>}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className={['tag', catColors[item.cat]].join(' ')}>{item.cat}</span>
+                      <span
+                        className={[
+                          'text-sm font-semibold',
+                          checked[item.id] ? 'text-emerald-800 line-through' : 'text-slate-700',
+                        ].join(' ')}
+                      >
+                        {item.text}
+                      </span>
+                    </div>
+                    <div className="text-xs text-slate-500 mt-1">{item.tip}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      // Mount all components
+      ReactDOM.createRoot(document.getElementById('steps-app')).render(<StepsApp />);
+      ReactDOM.createRoot(document.getElementById('examples-app')).render(<ExamplesApp />);
+      ReactDOM.createRoot(document.getElementById('checklist-app')).render(<ChecklistApp />);
+    </script>
+
+    <script>
+      // Initialize Mermaid
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'neutral',
+        themeVariables: {
+          primaryColor: '#d1fae5',
+          primaryTextColor: '#065f46',
+          primaryBorderColor: '#059669',
+          lineColor: '#64748b',
+          secondaryColor: '#bfdbfe',
+          tertiaryColor: '#ede9fe',
+          edgeLabelBackground: '#f8fafc',
+          clusterBkg: '#f8fafc',
+          clusterBorder: '#cbd5e1',
+          fontSize: '14px',
+        },
+        flowchart: { htmlLabels: true, curve: 'basis' },
+        sequence: { diagramMarginX: 20, diagramMarginY: 20 },
+      });
+
+      // Prism highlight after React renders
+      setTimeout(() => {
+        Prism.highlightAll();
+      }, 500);
+    </script>
+  </body>
+</html>
