@@ -1,0 +1,2420 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SKILL.md 完全解剖ガイド | Gemini CLI & Antigravity 中級者以上向け</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+    <style>
+      :root {
+        --bg: #07090f;
+        --bg-2: #0d1117;
+        --bg-3: #161b22;
+        --bg-4: #1c2230;
+        --border: #21293a;
+        --border-2: #2d3748;
+        --cyan: #00d4aa;
+        --cyan-dim: rgba(0, 212, 170, 0.12);
+        --cyan-glow: rgba(0, 212, 170, 0.3);
+        --orange: #f97316;
+        --orange-dim: rgba(249, 115, 22, 0.12);
+        --blue: #3b82f6;
+        --blue-dim: rgba(59, 130, 246, 0.12);
+        --purple: #a855f7;
+        --purple-dim: rgba(168, 85, 247, 0.12);
+        --red: #ef4444;
+        --green: #22c55e;
+        --text: #e2e8f0;
+        --text-muted: #64748b;
+        --text-subtle: #94a3b8;
+        --radius: 12px;
+        --radius-lg: 20px;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 16px;
+        line-height: 1.7;
+        overflow-x: hidden;
+      }
+
+      /* ── Progress Bar ─────────────────────────────── */
+      #progress-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        width: 0%;
+        background: linear-gradient(90deg, var(--cyan), var(--orange));
+        z-index: 9999;
+        transition: width 0.1s linear;
+      }
+
+      /* ── Sticky Nav ───────────────────────────────── */
+      nav {
+        position: sticky;
+        top: 0;
+        background: rgba(7, 9, 15, 0.85);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--border);
+        z-index: 1000;
+        padding: 0 24px;
+      }
+
+      .nav-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 56px;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+
+      .nav-inner::-webkit-scrollbar {
+        display: none;
+      }
+
+      .nav-logo {
+        font-family: 'Syne', sans-serif;
+        font-weight: 800;
+        font-size: 14px;
+        color: var(--cyan);
+        white-space: nowrap;
+        margin-right: 16px;
+        letter-spacing: 0.5px;
+      }
+
+      nav a {
+        color: var(--text-subtle);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+        white-space: nowrap;
+        padding: 5px 10px;
+        border-radius: 6px;
+        transition: all 0.2s;
+      }
+
+      nav a:hover {
+        color: var(--cyan);
+        background: var(--cyan-dim);
+      }
+
+      /* ── Layout ───────────────────────────────────── */
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      section {
+        padding: 80px 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      section:last-of-type {
+        border-bottom: none;
+      }
+
+      /* ── Hero ─────────────────────────────────────── */
+      .hero {
+        padding: 100px 0 80px;
+        position: relative;
+        overflow: hidden;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .hero::before {
+        content: '';
+        position: absolute;
+        top: -200px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 800px;
+        height: 500px;
+        background: radial-gradient(ellipse at center, rgba(0, 212, 170, 0.08) 0%, transparent 70%);
+        pointer-events: none;
+      }
+
+      .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--cyan-dim);
+        border: 1px solid rgba(0, 212, 170, 0.3);
+        color: var(--cyan);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        font-weight: 500;
+        padding: 6px 14px;
+        border-radius: 100px;
+        margin-bottom: 28px;
+        letter-spacing: 0.5px;
+      }
+
+      .hero-badge::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        background: var(--cyan);
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.5;
+          transform: scale(0.8);
+        }
+      }
+
+      .hero h1 {
+        font-family: 'Syne', sans-serif;
+        font-size: clamp(36px, 5vw, 64px);
+        font-weight: 800;
+        line-height: 1.1;
+        letter-spacing: -1px;
+        margin-bottom: 20px;
+      }
+
+      .hero h1 .accent {
+        color: var(--cyan);
+      }
+      .hero h1 .accent-o {
+        color: var(--orange);
+      }
+
+      .hero-sub {
+        font-size: 18px;
+        color: var(--text-subtle);
+        max-width: 600px;
+        margin-bottom: 40px;
+        line-height: 1.6;
+      }
+
+      .hero-meta {
+        display: flex;
+        gap: 24px;
+        flex-wrap: wrap;
+      }
+
+      .hero-chip {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: var(--text-subtle);
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      .hero-chip .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+
+      /* ── Section Header ───────────────────────────── */
+      .section-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 40px;
+      }
+
+      .section-badge {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 6px;
+        white-space: nowrap;
+        margin-top: 6px;
+      }
+
+      .badge-cyan {
+        background: var(--cyan-dim);
+        color: var(--cyan);
+        border: 1px solid rgba(0, 212, 170, 0.25);
+      }
+      .badge-orange {
+        background: var(--orange-dim);
+        color: var(--orange);
+        border: 1px solid rgba(249, 115, 22, 0.25);
+      }
+      .badge-blue {
+        background: var(--blue-dim);
+        color: var(--blue);
+        border: 1px solid rgba(59, 130, 246, 0.25);
+      }
+      .badge-purple {
+        background: var(--purple-dim);
+        color: var(--purple);
+        border: 1px solid rgba(168, 85, 247, 0.25);
+      }
+
+      .section-title {
+        font-family: 'Syne', sans-serif;
+        font-size: clamp(22px, 3vw, 34px);
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: -0.5px;
+      }
+
+      .section-title span {
+        color: var(--cyan);
+      }
+
+      .section-desc {
+        color: var(--text-subtle);
+        font-size: 16px;
+        max-width: 680px;
+        margin-top: 8px;
+        line-height: 1.6;
+      }
+
+      /* ── Cards ────────────────────────────────────── */
+      .card {
+        background: var(--bg-3);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 28px;
+        transition:
+          border-color 0.2s,
+          transform 0.2s;
+      }
+
+      .card:hover {
+        border-color: var(--border-2);
+      }
+
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+      }
+
+      .card-grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+
+      @media (max-width: 768px) {
+        .card-grid-3 {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .card-icon {
+        font-size: 28px;
+        margin-bottom: 12px;
+      }
+
+      .card h3 {
+        font-family: 'Syne', sans-serif;
+        font-size: 17px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: var(--text);
+      }
+
+      .card p {
+        font-size: 14px;
+        color: var(--text-subtle);
+        line-height: 1.6;
+      }
+
+      /* ── Step Cards ───────────────────────────────── */
+      .steps {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        position: relative;
+      }
+
+      .steps::before {
+        content: '';
+        position: absolute;
+        left: 22px;
+        top: 44px;
+        bottom: 44px;
+        width: 1px;
+        background: linear-gradient(to bottom, var(--cyan), transparent);
+      }
+
+      .step {
+        display: flex;
+        gap: 24px;
+        padding: 28px 0;
+        position: relative;
+      }
+
+      .step-num {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        background: var(--bg-3);
+        border: 2px solid var(--cyan);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--cyan);
+        position: relative;
+        z-index: 1;
+      }
+
+      .step-body {
+        flex: 1;
+      }
+
+      .step-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: var(--text);
+      }
+
+      .step-desc {
+        font-size: 15px;
+        color: var(--text-subtle);
+        line-height: 1.7;
+      }
+
+      /* ── Code Blocks ──────────────────────────────── */
+      .code-wrap {
+        background: #0d1117;
+        border: 1px solid var(--border-2);
+        border-radius: var(--radius);
+        overflow: hidden;
+        margin: 16px 0;
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      .code-header {
+        background: #161b22;
+        padding: 10px 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .mac-dots {
+        display: flex;
+        gap: 6px;
+      }
+
+      .mac-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+      }
+
+      .dot-red {
+        background: #ff5f57;
+      }
+      .dot-yellow {
+        background: #ffbd2e;
+      }
+      .dot-green {
+        background: #28c840;
+      }
+
+      .code-lang {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-left: auto;
+        font-weight: 500;
+      }
+
+      .code-body {
+        padding: 20px;
+        overflow-x: auto;
+        font-size: 13.5px;
+        line-height: 1.7;
+        color: #e2e8f0;
+        white-space: pre;
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      .code-body .c-comment {
+        color: #6b7280;
+      }
+      .code-body .c-key {
+        color: #93c5fd;
+      }
+      .code-body .c-val {
+        color: #86efac;
+      }
+      .code-body .c-str {
+        color: #fcd34d;
+      }
+      .code-body .c-op {
+        color: #f9a8d4;
+      }
+      .code-body .c-cmd {
+        color: #67e8f9;
+      }
+      .code-body .c-head {
+        color: var(--orange);
+      }
+      .code-body .c-type {
+        color: var(--purple);
+      }
+
+      /* ── Mermaid ──────────────────────────────────── */
+      .mermaid-wrap {
+        background: var(--bg-2);
+        border: 1px solid var(--border-2);
+        border-radius: var(--radius-lg);
+        padding: 32px 24px 36px;
+        margin: 24px 0;
+        overflow-x: auto;
+        text-align: center;
+      }
+
+      .mermaid-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .mermaid-label::before,
+      .mermaid-label::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+
+      .mermaid-wrap .mermaid {
+        display: inline-block;
+      }
+      .mermaid-wrap .mermaid svg {
+        display: block;
+        max-width: none !important;
+      }
+
+      /* ── Tables ───────────────────────────────────── */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 24px 0;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+
+      th {
+        background: var(--bg-3);
+        color: var(--text);
+        font-family: 'Syne', sans-serif;
+        font-weight: 600;
+        font-size: 13px;
+        padding: 14px 18px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-2);
+      }
+
+      td {
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-subtle);
+        vertical-align: top;
+        line-height: 1.6;
+      }
+
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover td {
+        background: var(--bg-3);
+        color: var(--text);
+      }
+
+      code {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12.5px;
+        background: var(--bg-3);
+        border: 1px solid var(--border-2);
+        color: var(--cyan);
+        padding: 2px 7px;
+        border-radius: 5px;
+      }
+
+      /* ── Comparison Cards ─────────────────────────── */
+      .compare-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin: 24px 0;
+      }
+
+      @media (max-width: 640px) {
+        .compare-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .compare-card {
+        background: var(--bg-3);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        border: 1px solid var(--border);
+      }
+
+      .compare-card.good {
+        border-color: rgba(34, 197, 94, 0.35);
+      }
+      .compare-card.bad {
+        border-color: rgba(239, 68, 68, 0.25);
+      }
+
+      .compare-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: 'Syne', sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 14px;
+      }
+
+      .compare-title.ok {
+        color: var(--green);
+      }
+      .compare-title.ng {
+        color: var(--red);
+      }
+
+      .compare-card pre {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12.5px;
+        color: var(--text-subtle);
+        line-height: 1.7;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+
+      /* ── Callout ──────────────────────────────────── */
+      .callout {
+        border-left: 3px solid var(--cyan);
+        background: var(--cyan-dim);
+        padding: 16px 20px;
+        border-radius: 0 var(--radius) var(--radius) 0;
+        margin: 20px 0;
+        font-size: 14.5px;
+        color: var(--text-subtle);
+        line-height: 1.6;
+      }
+
+      .callout.warn {
+        border-color: var(--orange);
+        background: var(--orange-dim);
+      }
+
+      .callout strong {
+        color: var(--text);
+      }
+
+      /* ── Pattern Tabs ─────────────────────────────── */
+      .tabs {
+        margin: 24px 0;
+      }
+
+      .tab-list {
+        display: flex;
+        gap: 4px;
+        background: var(--bg-3);
+        border-radius: var(--radius);
+        padding: 4px;
+        margin-bottom: 20px;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+
+      .tab-list::-webkit-scrollbar {
+        display: none;
+      }
+
+      .tab-btn {
+        flex: 1;
+        min-width: fit-content;
+        padding: 9px 16px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--text-muted);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13.5px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+
+      .tab-btn.active {
+        background: var(--bg);
+        color: var(--cyan);
+        border: 1px solid var(--border-2);
+      }
+
+      .tab-panel {
+        display: none;
+      }
+      .tab-panel.active {
+        display: block;
+      }
+
+      /* ── Checklist ────────────────────────────────── */
+      .checklist {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin: 24px 0;
+      }
+
+      .check-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        background: var(--bg-3);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px 18px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .check-item:hover {
+        border-color: var(--border-2);
+      }
+
+      .check-box {
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+        border: 2px solid var(--border-2);
+        border-radius: 5px;
+        margin-top: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+      }
+
+      .check-item.checked .check-box {
+        background: var(--cyan);
+        border-color: var(--cyan);
+      }
+
+      .check-item.checked .check-box::after {
+        content: '✓';
+        color: var(--bg);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .check-item.checked .check-text {
+        color: var(--text-muted);
+        text-decoration: line-through;
+      }
+
+      .check-text {
+        font-size: 14.5px;
+        color: var(--text);
+        line-height: 1.5;
+      }
+
+      /* ── Scope Grid ───────────────────────────────── */
+      .scope-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin: 24px 0;
+      }
+
+      @media (max-width: 640px) {
+        .scope-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .scope-card {
+        background: var(--bg-3);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+      }
+
+      .scope-card.global {
+        border-top: 3px solid var(--cyan);
+      }
+      .scope-card.workspace {
+        border-top: 3px solid var(--orange);
+      }
+
+      .scope-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 12px;
+      }
+
+      .scope-label.c {
+        color: var(--cyan);
+      }
+      .scope-label.o {
+        color: var(--orange);
+      }
+
+      .scope-card h3 {
+        font-family: 'Syne', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+
+      .scope-card ul {
+        list-style: none;
+        padding: 0;
+        margin: 14px 0 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .scope-card li {
+        font-size: 13.5px;
+        color: var(--text-subtle);
+        padding-left: 16px;
+        position: relative;
+        line-height: 1.5;
+      }
+
+      .scope-card li::before {
+        content: '→';
+        position: absolute;
+        left: 0;
+        color: var(--border-2);
+        font-size: 12px;
+      }
+
+      /* ── Path Box ─────────────────────────────────── */
+      .path-box {
+        background: #0d1117;
+        border: 1px solid var(--border-2);
+        border-radius: var(--radius);
+        padding: 12px 16px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12.5px;
+        color: var(--cyan);
+        margin-top: 12px;
+        line-height: 1.8;
+      }
+
+      /* ── Fade In ──────────────────────────────────── */
+      .fade-in {
+        opacity: 0;
+        transform: translateY(20px);
+        transition:
+          opacity 0.5s ease,
+          transform 0.5s ease;
+      }
+
+      .fade-in.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* ── Divider ──────────────────────────────────── */
+      .divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--border-2), transparent);
+        margin: 32px 0;
+      }
+
+      /* ── Footer ───────────────────────────────────── */
+      footer {
+        background: var(--bg-2);
+        border-top: 1px solid var(--border);
+        padding: 48px 24px;
+        text-align: center;
+      }
+
+      footer p {
+        font-size: 13px;
+        color: var(--text-muted);
+      }
+
+      footer .footer-logo {
+        font-family: 'Syne', sans-serif;
+        font-weight: 800;
+        font-size: 18px;
+        color: var(--cyan);
+        margin-bottom: 12px;
+      }
+
+      /* ── Tag ──────────────────────────────────────── */
+      .tag {
+        display: inline-block;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 3px 9px;
+        border-radius: 5px;
+        margin: 2px;
+      }
+
+      .tag-g {
+        background: rgba(34, 197, 94, 0.15);
+        color: var(--green);
+        border: 1px solid rgba(34, 197, 94, 0.25);
+      }
+      .tag-r {
+        background: rgba(239, 68, 68, 0.12);
+        color: var(--red);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+      }
+
+      .inline-em {
+        color: var(--cyan);
+        font-weight: 600;
+      }
+
+      p {
+        margin-bottom: 12px;
+      }
+      p:last-child {
+        margin-bottom: 0;
+      }
+
+      h4 {
+        font-family: 'Syne', sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        margin: 24px 0 10px;
+        color: var(--text);
+      }
+
+      ul.body-list {
+        list-style: none;
+        padding: 0;
+        margin: 12px 0;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+
+      ul.body-list li {
+        font-size: 14.5px;
+        color: var(--text-subtle);
+        padding-left: 20px;
+        position: relative;
+        line-height: 1.6;
+      }
+
+      ul.body-list li::before {
+        content: '▸';
+        position: absolute;
+        left: 0;
+        color: var(--cyan);
+        font-size: 11px;
+        top: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="progress-bar"></div>
+
+    <nav>
+      <div class="nav-inner">
+        <div class="nav-logo">SKILL.md</div>
+        <a href="#sec-why">なぜ必要か</a>
+        <a href="#sec-tools">3ツール比較</a>
+        <a href="#sec-progressive">段階的読込</a>
+        <a href="#sec-structure">構造解剖</a>
+        <a href="#sec-syntax">書き方</a>
+        <a href="#sec-patterns">パターン</a>
+        <a href="#sec-install">インストール</a>
+        <a href="#sec-scope">スコープ</a>
+        <a href="#sec-lifecycle">実行ライフサイクル</a>
+        <a href="#sec-mcp">MCP連携</a>
+        <a href="#sec-best">ベストプラクティス</a>
+      </div>
+    </nav>
+
+    <!-- ────────────────── HERO ────────────────────── -->
+    <div class="hero">
+      <div class="container">
+        <div class="hero-badge">SKILL.md DEEP DIVE — 中級者以上向け</div>
+        <h1>
+          <span class="accent">Agent Skills</span> の<br />
+          <span class="accent-o">完全解剖</span>ガイド
+        </h1>
+        <p class="hero-sub">
+          Google Gemini CLI・Antigravity IDE における <code>SKILL.md</code> の設計思想、
+          アーキテクチャ、実装パターン、運用まで。エージェント駆動開発を次のレベルに引き上げるすべての知識を網羅する。
+        </p>
+        <div class="hero-meta">
+          <div class="hero-chip">
+            <div class="dot" style="background: var(--cyan)"></div>
+            Gemini CLI
+          </div>
+          <div class="hero-chip">
+            <div class="dot" style="background: var(--orange)"></div>
+            Antigravity IDE
+          </div>
+          <div class="hero-chip">
+            <div class="dot" style="background: var(--blue)"></div>
+            Agent Skills Standard
+          </div>
+          <div class="hero-chip">
+            <div class="dot" style="background: var(--purple)"></div>
+            MCP Integration
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ────────────────── S1: WHY ──────────────────── -->
+    <section id="sec-why">
+      <div class="container">
+        <div class="section-header fade-in">
+          <span class="section-badge badge-cyan">01 / BACKGROUND</span>
+          <div>
+            <h2 class="section-title">なぜ <span>SKILL.md</span> が必要か</h2>
+            <p class="section-desc">
+              コンテキストウィンドウが大容量になっても、なぜ「すべてを読ませる」アプローチは破綻するのか。コンテキスト飽和問題と解決策を理解する。
+            </p>
+          </div>
+        </div>
+
+        <div class="card-grid fade-in" style="margin-bottom: 32px">
+          <div class="card">
+            <div class="card-icon">🔥</div>
+            <h3>コンテキスト飽和（Context Saturation）</h3>
+            <p>
+              ドキュメント・コーディング規約・設計書をすべてエージェントに与えると、Attention
+              Mechanismが分散し、重要な情報を見落とす。トークン消費が爆発し、推論精度が低下する。
+            </p>
+          </div>
+          <div class="card">
+            <div class="card-icon">⚡</div>
+            <h3>オンデマンド専門知識</h3>
+            <p>
+              SKILL.md は必要なタイミングでのみコンテキストに展開される。セッション中は<strong
+                style="color: var(--text)"
+                >名前と説明（約100トークン）</strong
+              >のみが常駐し、発動時に本文を読み込む設計。
+            </p>
+          </div>
+          <div class="card">
+            <div class="card-icon">🔄</div>
+            <h3>再利用可能なナレッジ</h3>
+            <p>
+              一度書けば複数プロジェクト・複数ツール（Gemini CLI / Antigravity / Claude Code /
+              GitHub Copilot）で共通利用できるオープンスタンダード。
+            </p>
+          </div>
+        </div>
+
+        <div class="mermaid-wrap fade-in">
+          <div class="mermaid-label">WITHOUT vs WITH SKILL.md</div>
+          <!-- prettier-ignore -->
+          <div class="mermaid">
+graph LR
+subgraph Without["Without SKILL.md"]
+A1[User] -->|Prompt| B1[AI Agent]
+B1 --> C1[Load ALL docs]
+C1 --> D1[High token cost<br/>Low precision]
+end
+subgraph With["With SKILL.md"]
+A2[User] -->|Prompt| B2[AI Agent]
+B2 -->|Search relevant skills| C2[Load only SKILL.md]
+C2 --> D2[Low token cost<br/>High precision]
+end
+style D1 fill:#3d1515,stroke:#ef4444,color:#fca5a5
+style D2 fill:#0d2e1a,stroke:#22c55e,color:#86efac
+style C2 fill:#0d2330,stroke:#3b82f6,color:#93c5fd
+</div>
+        </div>
+
+        <div class="callout fade-in">
+          <strong>核心的な洞察:</strong>
+          モデルのコンテキストウィンドウが100万トークンになっても、「何もかもを与える」ことは解決策にならない。<span
+            class="inline-em"
+            >注意機構の分散</span
+          >という本質的な問題は変わらないからだ。SKILL.md
+          は「何をいつ与えるか」を制御するアーキテクチャである。
+        </div>
+      </div>
+    </section>
+
+    <!-- ────────────────── S2: TOOLS ─────────────────── -->
+    <section id="sec-tools">
+      <div class="container">
+        <div class="section-header fade-in">
+          <span class="section-badge badge-orange">02 / ECOSYSTEM</span>
+          <div>
+            <h2 class="section-title">3ツールの<span>アーキテクチャ</span>比較</h2>
+            <p class="section-desc">
+              Gemini CLI と Antigravity IDE
+              はどう違い、どう共通するのか。スキルのポータビリティを理解する。
+            </p>
+          </div>
+        </div>
+
+        <div class="mermaid-wrap fade-in">
+          <div class="mermaid-label">ECOSYSTEM OVERVIEW</div>
+          <!-- prettier-ignore -->
+          <div class="mermaid">
+graph TB
+subgraph GeminiModel["Google Gemini Model Layer"]
+GM[Gemini 3 Pro / Flash]
+end
+subgraph GCLI["Gemini CLI — Terminal Native"]
+GC[Terminal Agent]
+GCP["Path: ~/.gemini/skills/<br/>.gemini/skills/"]
+GCC["Commands: gemini skills install"]
+end
+subgraph AG["Antigravity IDE — Agent-First"]
+AGC[IDE Agent]
+AGP["Path: ~/.gemini/antigravity/skills/<br/>.agent/skills/"]
+AGM["Agent Manager Dashboard"]
+end
+GM --> GC
+GM --> AGC
+SKILL["SKILL.md — Shared Open Standard"] --> GC
+SKILL --> AGC
+style SKILL fill:#0d2330,stroke:#00d4aa,color:#00d4aa
+style GM fill:#1a1030,stroke:#a855f7,color:#c4b5fd
+</div>
+        </div>
+
+        <div class="table-wrap fade-in">
+          <table>
+            <thead>
+              <tr>
+                <th>比較項目</th>
+                <th>Gemini CLI</th>
+                <th>Antigravity IDE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong style="color: var(--text)">形態</strong></td>
+                <td>ターミナルアプリ</td>
+                <td>IDEエディタ（VSCode fork）</td>
+              </tr>
+              <tr>
+                <td><strong style="color: var(--text)">対象ユーザー</strong></td>
+                <td>CLIを好む開発者・自動化エンジニア</td>
+                <td>GUI環境・ビジュアルなフィードバックを重視する開発者</td>
+              </tr>
+              <tr>
+                <td><strong style="color: var(--text)">グローバルスキルパス</strong></td>
+                <td><code>~/.gemini/skills/</code></td>
+                <td><code>~/.gemini/antigravity/skills/</code></td>
+              </tr>
+              <tr>
+                <td><strong style="color: var(--text)">ワークスペーススキルパス</strong></td>
+                <td><code>.gemini/skills/</code></td>
+                <td><code>.agent/skills/</code></td>
+              </tr>
+              <tr>
+                <td><strong style="color: var(--text)">並列エージェント管理</strong></td>
+                <td>tmux / 複数ターミナルウィンドウ</td>
+                <td>Agent Manager ダッシュボード（GUI）</td>
+              </tr>
+              <tr>
+                <td><strong style="color: var(--text)">オーケストレーション</strong></td>
+                <td>パイプ処理・シェルスクリプト連携</td>
+                <td>非同期マルチエージェント + アーティファクト管理</td>
+              </tr>
+              <tr>
+                <td><strong style="color: var(--text)">学習機能（Learning）</strong></td>
+                <td>セッション内のみ</td>
+                <td>ナレッジベースへの永続的な蓄積と再利用</td>
+              </tr>
+              <tr>
+                <td><strong style="color: var(--text)">SKILL.md サポート</strong></td>
+                <td><span class="tag tag-g">✓ FULL</span></td>
+                <td><span class="tag tag-g">✓ FULL</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout fade-in">
+          <strong>ポータビリティの保証:</strong> SKILL.md はプレーンなMarkdown + YAML
+          フォーマット。Gemini CLI、Antigravity、Claude Code、GitHub Copilot、Cursor
+          等、主要なAIコーディングアシスタントで共通利用できるオープンスタンダードとして設計されている。作ったスキルは投資として機能する。
+        </div>
+      </div>
+    </section>
+
+    <!-- ────────────────── S3: PROGRESSIVE ──────────── -->
+    <section id="sec-progressive">
+      <div class="container">
+        <div class="section-header fade-in">
+          <span class="section-badge badge-blue">03 / ARCHITECTURE</span>
+          <div>
+            <h2 class="section-title">プログレッシブ・<span>ディスクロージャー</span></h2>
+            <p class="section-desc">
+              SKILL.md
+              の最重要設計原理。3段階の段階的読み込みによって、コンテキスト消費を最小化しながら、必要な時に必要な情報だけを提供する仕組み。
+            </p>
+          </div>
+        </div>
+
+        <div class="mermaid-wrap fade-in">
+          <div class="mermaid-label">3-LEVEL PROGRESSIVE DISCLOSURE</div>
+          <!-- prettier-ignore -->
+          <div class="mermaid">
+graph LR
+L1["Level 1 — Always Loaded<br/>name + description only<br/>~100 tokens per skill<br/>Stays in context always"]
+L2["Level 2 — On Demand<br/>SKILL.md full body<br/>Max 500 lines recommended<br/>Loaded only when activated"]
+L3["Level 3 — Dynamic<br/>references/ and scripts/<br/>Read or executed on demand<br/>Source code NOT in context"]
+L1 -->|"Agent matches prompt<br/>activate_skill called"| L2
+L2 -->|"SKILL.md references<br/>external files"| L3
+style L1 fill:#1a2a1a,stroke:#22c55e,color:#86efac
+style L2 fill:#0d1e2a,stroke:#3b82f6,color:#93c5fd
+style L3 fill:#1a1030,stroke:#a855f7,color:#c4b5fd
+</div>
+        </div>
+
+        <div class="card-grid fade-in">
+          <div class="card" style="border-left: 3px solid var(--green)">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px">
+              <div
+                style="
+                  font-family: 'JetBrains Mono', monospace;
+                  font-size: 11px;
+                  color: var(--green);
+                  font-weight: 600;
+                "
+              >
+                LEVEL 1
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted)">常時コンテキスト常駐</div>
+            </div>
+            <h3>メタデータのロード</h3>
+            <p>
+              セッション開始時に、全スキルの <code>name</code> と
+              <code>description</code>
+              のみがシステムプロンプトに注入される。スキル100個あっても約10,000トークン程度の軽量な状態。エージェントはこの情報でスキル一覧を「知っている」。
+            </p>
+          </div>
+          <div class="card" style="border-left: 3px solid var(--blue)">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px">
+              <div
+                style="
+                  font-family: 'JetBrains Mono', monospace;
+                  font-size: 11px;
+                  color: var(--blue);
+                  font-weight: 600;
+                "
+              >
+                LEVEL 2
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted)">アクティベーション時のみ</div>
+            </div>
+            <h3>SKILL.md 本文の展開</h3>
+            <p>
+              ユーザーのプロンプトとスキルの description
+              を意味論的に照合し、最も関連するスキルを特定。<code>activate_skill</code>
+              ツールが呼ばれて初めて SKILL.md
+              の本文（5,000トークン未満推奨）がコンテキストに展開される。
+            </p>
+          </div>
+          <div class="card" style="border-left: 3px solid var(--purple)">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px">
+              <div
+                style="
+                  font-family: 'JetBrains Mono', monospace;
+                  font-size: 11px;
+                  color: var(--purple);
+                  font-weight: 600;
+                "
+              >
+                LEVEL 3
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted)">動的アクセス</div>
+            </div>
+            <h3>リソースの動的実行</h3>
+            <p>
+              references/ 内のドキュメントはBashでの読み取り時のみ消費。scripts/
+              内のスクリプトはソースコードではなく<strong style="color: var(--text)"
+                >実行結果のみ</strong
+              >がコンテキストに入る。実質的に無制限の処理能力を「軽量に」実現。
+            </p>
+          </div>
+        </div>
+
+        <div class="callout warn fade-in" style="margin-top: 24px">
+          <strong>決定論的ツールの統合:</strong>
+          LLMは本質的に確率論的（非決定論的）。同じ入力でも異なる出力を返す可能性がある。scripts/
+          にPython/Bashスクリプトを同梱し SKILL.md から呼び出すことで、<span
+            style="color: var(--orange)"
+            >検証処理を決定論的</span
+          >にし、出力の一貫性と精度を飛躍的に高めることができる。
+        </div>
+      </div>
+    </section>
+
+    <!-- ────────────────── S4: STRUCTURE ─────────────── -->
+    <section id="sec-structure">
+      <div class="container">
+        <div class="section-header fade-in">
+          <span class="section-badge badge-purple">04 / ANATOMY</span>
+          <div>
+            <h2 class="section-title">ディレクトリ<span>構造</span>の解剖</h2>
+            <p class="section-desc">
+              一つのAgent
+              Skillは単一ファイルではなく、自己完結型のディレクトリとして構成される。各要素の役割と設計意図を理解する。
+            </p>
+          </div>
+        </div>
+
+        <div class="mermaid-wrap fade-in">
+          <div class="mermaid-label">SKILL DIRECTORY STRUCTURE</div>
+          <!-- prettier-ignore -->
+          <div class="mermaid">
+graph TD
+ROOT["my-skill/"]
+ROOT --> SKILL_MD["SKILL.md — REQUIRED<br/>Brain of the skill<br/>YAML frontmatter + Markdown body"]
+ROOT --> SCRIPTS["scripts/ — OPTIONAL<br/>Python / Bash / Node scripts<br/>Executed deterministically"]
+ROOT --> REFS["references/ — OPTIONAL<br/>API docs, guidelines, specs<br/>Read on demand only"]
+ROOT --> ASSETS["assets/ — OPTIONAL<br/>Templates, images<br/>Static files"]
+SCRIPTS --> PY["run.py"]
+SCRIPTS --> SH["validate.sh"]
+REFS --> DOC["api-spec.md"]
+REFS --> TMPL["best-practices.md"]
+ASSETS --> IMG["template.tsx"]
+style SKILL_MD fill:#0d2330,stroke:#00d4aa,color:#00d4aa
+style ROOT fill:#1c2230,stroke:#2d3748,color:#e2e8f0
+style SCRIPTS fill:#1a1a10,stroke:#f97316,color:#fdba74
+style REFS fill:#0d1e2a,stroke:#3b82f6,color:#93c5fd
+style ASSETS fill:#1a1030,stroke:#a855f7,color:#c4b5fd
+</div>
+        </div>
+
+        <div class="code-wrap fade-in">
+          <div class="code-header">
+            <div class="mac-dots">
+              <div class="mac-dot dot-red"></div>
+              <div class="mac-dot dot-yellow"></div>
+              <div class="mac-dot dot-green"></div>
+            </div>
+            <span class="code-lang">shell — Directory Layout</span>
+          </div>
+          <div class="code-body">
+            <span class="c-comment"># 典型的なスキルのディレクトリ構成</span>
+            <span class="c-val">my-skill/</span>
+            ├── <span class="c-key">SKILL.md</span>
+            <span class="c-comment"># 【必須】エージェントへの指示・メタデータ</span> ├──
+            <span class="c-op">scripts/</span>
+            <span class="c-comment"># 【任意】決定論的な検証・自動化スクリプト</span> │ ├──
+            <span class="c-cmd">run.py</span> │ └── <span class="c-cmd">validate.sh</span> ├──
+            <span class="c-op">references/</span>
+            <span class="c-comment"># 【任意】オンデマンド参照ドキュメント</span> │ ├──
+            <span class="c-cmd">api-spec.md</span> │ └──
+            <span class="c-cmd">best-practices.md</span> └── <span class="c-op">assets/</span>
+            <span class="c-comment"># 【任意】出力テンプレート・静的ファイル</span> └──
+            <span class="c-cmd">template.tsx</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ────────────────── S5: SYNTAX ────────────────── -->
+    <section id="sec-syntax">
+      <div class="container">
+        <div class="section-header fade-in">
+          <span class="section-badge badge-cyan">05 / SYNTAX</span>
+          <div>
+            <h2 class="section-title">SKILL.md の<span>書き方</span>完全ガイド</h2>
+            <p class="section-desc">
+              YAMLフロントマターの設計から、エージェントを確実に動かすマークダウン本文の構造まで。中級者が陥りやすいミスも解説する。
+            </p>
+          </div>
+        </div>
+
+        <h4 class="fade-in">1. YAMLフロントマター（メタデータ定義）</h4>
+        <p class="fade-in" style="color: var(--text-subtle); font-size: 15px; margin-bottom: 16px">
+          ファイル最上部に配置し、トリプルダッシュ（<code>---</code>）で囲む。エージェントがスキルを「見つける」ためのルーティング情報。
+        </p>
+
+        <div class="code-wrap fade-in">
+          <div class="code-header">
+            <div class="mac-dots">
+              <div class="mac-dot dot-red"></div>
+              <div class="mac-dot dot-yellow"></div>
+              <div class="mac-dot dot-green"></div>
+            </div>
+            <span class="code-lang">yaml — SKILL.md Frontmatter</span>
+          </div>
+          <div class="code-body">
+            <span class="c-comment">---</span>
+            <span class="c-key">name</span>: <span class="c-val">frontend-reviewer</span>
+            <span class="c-comment"># 必須: ケバブケース・英語小文字・64文字以内</span>
+
+            <span class="c-key">description</span>: |
+            <span class="c-comment"># 必須: エージェントのトリガー条件（最重要）</span>
+            <span class="c-val">ReactおよびTypeScriptプロジェクトの</span>
+            <span class="c-val">フロントエンドコードをレビューし、</span>
+            <span class="c-val">コンポーネント設計・パフォーマンス・</span>
+            <span class="c-val">アクセシビリティの観点から品質を向上させる。</span>
+            <span class="c-val">コードレビュー、PR確認、品質チェック、</span>
+            <span class="c-val">という言葉が出たら必ずこのスキルを使うこと。</span>
+
+            <span class="c-key">disable-model-invocation</span>: <span class="c-val">false</span>
+            <span class="c-comment"># trueにすると自動発動を無効化（危険操作スキルに）</span>
+            <span class="c-key">category</span>: <span class="c-val">code-quality</span>
+            <span class="c-comment"># 任意: 整理用カテゴリ</span>
+            <span class="c-comment">---</span>
+          </div>
+        </div>
+
+        <div class="divider fade-in"></div>
+
+        <h4 class="fade-in">2. description フィールドの設計が成否を決める</h4>
+        <p class="fade-in" style="color: var(--text-subtle); font-size: 15px; margin-bottom: 20px">
+          description は人間向けの説明文ではなく、<span class="inline-em"
+            >エージェントへのトリガー条件の定義</span
+          >。曖昧すぎるとスキルが呼ばれない（アンダートリガー）。具体的なキーワードを含めることが必須。
+        </p>
+
+        <div class="compare-grid fade-in">
+          <div class="compare-card bad">
+            <div class="compare-title ng">❌ アンダートリガー（呼ばれない）</div>
+            <pre>
+name: security-auditor
+description: |
+  セキュリティ監査を行うスキル。</pre
+            >
+          </div>
+          <div class="compare-card good">
+            <div class="compare-title ok">✅ 正しいトリガー設計</div>
+            <pre>
+name: security-auditor
+description: |
+  コードのセキュリティ監査を実施する。
+  脆弱性チェック、OWASP Top 10の検証、
+  セキュリティ、認証、XSS、SQLi、
+  という言葉が出たら必ず使うこと。</pre
+            >
+          </div>
+        </div>
+
+        <div class="divider fade-in"></div>
+
+        <h4 class="fade-in">3. マークダウン本文の推奨スキーマ</h4>
+        <p class="fade-in" style="color: var(--text-subtle); font-size: 15px; margin-bottom: 16px">
+          本文はエージェントへの「行動仕様書」。以下の標準構造に従うことで、エージェントの動作が安定する。
+        </p>
+
+        <div class="code-wrap fade-in">
+          <div class="code-header">
+            <div class="mac-dots">
+              <div class="mac-dot dot-red"></div>
+              <div class="mac-dot dot-yellow"></div>
+              <div class="mac-dot dot-green"></div>
+            </div>
+            <span class="code-lang">markdown — SKILL.md Body Template</span>
+          </div>
+          <div class="code-body">
+            <span class="c-head"># スキル名</span>
+
+            <span class="c-head">## Overview</span>
+            <span class="c-val">このスキルが達成する目的を1〜2文で。</span>
+
+            <span class="c-head">## Before Starting（前提条件）</span>
+            <span class="c-val">- ユーザーから提供されるべき入力情報</span>
+            <span class="c-val">- 事前に必要な準備・確認事項</span>
+
+            <span class="c-head">## Step-by-Step Guide（実行手順）</span>
+            <span class="c-comment"># ← 核心部分。抽象的な思考でなく具体的なアクションを定義</span>
+
+            <span class="c-val">1. **ファイルの解析**: 対象ファイルと依存モジュールを読み込む</span>
+            <span class="c-val">2. **静的解析**: 型安全性とReact依存配列の完全性を検証</span>
+            <span class="c-val">3. **パフォーマンス評価**: 不要な再レンダリングを特定</span>
+            <span class="c-val"
+              >4. **アーティファクト生成**: 修正後のコードスニペットと共に提示</span
+            >
+
+            <span class="c-head">## Examples（Few-shot 使用例）</span>
+            <span class="c-comment"># ← LLMはここを見て期待される振る舞いを模倣する</span>
+
+            <span class="c-val">**Input**: `UserProfile.tsx`をレビューして</span>
+            <span class="c-val">**Output Structure**:</span>
+            <span class="c-val">1. ボトルネック概要</span>
+            <span class="c-val">2. 修正案とコード</span>
+            <span class="c-val">3. 影響範囲の考察</span>
+
+            <span class="c-head">## Rules（制約事項）</span>
+
+            <span class="c-val"
+              >- ❌ ビジネスロジックを推測で変更しないこと → 不明点はask_userで確認</span
+            >
+            <span class="c-val">- ✅ 修正根拠として公式ドキュメントを引用すること</span>
+            <span class="c-val">- ✅ 破壊的変更の前には必ず確認を求めること</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ────────────────── S6: PATTERNS ──────────────── -->
+    <section id="sec-patterns">
+      <div class="container">
+        <div class="section-header fade-in">
+          <span class="section-badge badge-orange">06 / PATTERNS</span>
+          <div>
+            <h2 class="section-title">実装<span>パターン</span>4選</h2>
+            <p class="section-desc">
+              シンプルなプロンプト型から、スクリプト統合・ドキュメント参照を組み合わせた高度なパターンまで。用途に応じた選択基準も解説する。
+            </p>
+          </div>
+        </div>
+
+        <div class="tabs fade-in">
+          <div class="tab-list">
+            <button type="button" class="tab-btn active" onclick="switchTab('p1')">Pattern 1: Basic</button>
+            <button type="button" class="tab-btn" onclick="switchTab('p2')">Pattern 2: Reference</button>
+            <button type="button" class="tab-btn" onclick="switchTab('p3')">Pattern 3: Tool Use</button>
+            <button type="button" class="tab-btn" onclick="switchTab('p4')">Pattern 4: All-in-One</button>
+          </div>
+
+          <div id="p1" class="tab-panel active">
+            <div class="callout">
+              <strong>Pattern 1 — Basic（SKILL.md のみ）</strong><br />
+              最もシンプルな構成。プロンプトエンジニアリングだけで完結するスキル。コーディング規約の強制、フォーマット統一、定型レビューに最適。
+            </div>
+            <div class="code-wrap">
+              <div class="code-header">
+                <div class="mac-dots">
+                  <div class="mac-dot dot-red"></div>
+                  <div class="mac-dot dot-yellow"></div>
+                  <div class="mac-dot dot-green"></div>
+                </div>
+                <span class="code-lang">git-commit-formatter/SKILL.md</span>
+              </div>
+              <div class="code-body">
+                <span class="c-comment">---</span>
+                <span class="c-key">name</span>: <span class="c-val">git-commit-formatter</span>
+                <span class="c-key">description</span>: |
+                <span class="c-val"
+                  >Gitコミットメッセージを Conventional Commits 仕様に従って整形する。</span
+                >
+                <span class="c-val"
+                  >コミット、git commit、コミットメッセージという言葉が出たら必ず使うこと。</span
+                >
+                <span class="c-comment">---</span>
+
+                <span class="c-head"># Git コミットフォーマッター</span>
+
+                <span class="c-head">## ルール</span>
+                <span class="c-val">形式: `&lt;type&gt;(&lt;scope&gt;): &lt;subject&gt;`</span>
+
+                <span class="c-head">## type の種類</span>
+                <span class="c-val">- `feat`: 新機能</span>
+                <span class="c-val">- `fix`: バグ修正</span>
+                <span class="c-val">- `docs`: ドキュメント変更</span>
+                <span class="c-val">- `refactor`: リファクタリング</span>
+                <span class="c-val">- `test`: テスト追加・修正</span>
+
+                <span class="c-head">## Examples</span>
+                <span class="c-val">feat(auth): ログイン機能を追加</span>
+                <span class="c-val">fix(api): レート制限のバグを修正</span>
+              </div>
+            </div>
+            <div style="margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap">
+              <span class="tag tag-g">軽量</span>
+              <span class="tag tag-g">即効性あり</span>
+              <span class="tag tag-g">初心者にも適用可</span>
+            </div>
+          </div>
+
+          <div id="p2" class="tab-panel">
+            <div class="callout">
+              <strong>Pattern 2 — Reference（SKILL.md + /references）</strong><br />
+              仕様書やAPIドキュメントを参照しながら動作するスキル。SKILL.md
+              本文には「何を参照すべきか」だけを記述し、詳細は references/
+              に分離。コンテキストを汚染せずに豊富な知識を提供できる。
+            </div>
+            <div style="margin-bottom: 16px">
+              <div class="path-box">
+                api-integrator/<br />
+                ├── SKILL.md<br />
+                └── references/<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;└── api-spec.md ← API仕様書（オンデマンド参照）
+              </div>
+            </div>
+            <div class="code-wrap">
+              <div class="code-header">
+                <div class="mac-dots">
+                  <div class="mac-dot dot-red"></div>
+                  <div class="mac-dot dot-yellow"></div>
+                  <div class="mac-dot dot-green"></div>
+                </div>
+                <span class="code-lang">api-integrator/SKILL.md</span>
+              </div>
+              <div class="code-body">
+                <span class="c-comment">---</span>
+                <span class="c-key">name</span>: <span class="c-val">api-integrator</span>
+                <span class="c-key">description</span>: |
+                <span class="c-val"
+                  >外部APIとの統合コードを生成する。APIの仕様に基づき正確なコードを作成する。</span
+                >
+                <span class="c-val"
+                  >API連携、HTTPリクエスト、fetch、axios という言葉が出たら使用。</span
+                >
+                <span class="c-comment">---</span>
+
+                <span class="c-head"># API インテグレーター</span>
+
+                <span class="c-head">## 手順</span>
+                <span class="c-val"
+                  >1. `references/api-spec.md` を読み込んでAPIの仕様を確認する</span
+                >
+                <span class="c-val">2. ユーザーが求めるエンドポイントを特定する</span>
+                <span class="c-val">3. 仕様に基づき型安全なコードを生成する</span>
+
+                <span class="c-head">## Rules</span>
+                <span class="c-val">- 必ず参照ファイルを読んでから実装すること</span>
+                <span class="c-val">- 推測でAPIを呼び出さないこと</span>
+              </div>
+            </div>
+            <div style="margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap">
+              <span class="tag tag-g">仕様書との整合性</span>
+              <span class="tag tag-g">コンテキスト節約</span>
+              <span class="tag tag-g">大規模ドキュメントに有効</span>
+            </div>
+          </div>
+
+          <div id="p3" class="tab-panel">
+            <div class="callout">
+              <strong>Pattern 3 — Tool Use（SKILL.md + /scripts）</strong><br />
+              スクリプトを実行するスキル。LLMの確率論的な出力ではなく、決定論的な検証処理を実現。CI/CDパイプラインへの組み込み、繰り返し作業の自動化に最適。
+            </div>
+            <div style="margin-bottom: 16px">
+              <div class="path-box">
+                db-migrator/<br />
+                ├── SKILL.md<br />
+                └── scripts/<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;└── migrate.py ← 実際に実行されるスクリプト
+              </div>
+            </div>
+            <div class="code-wrap">
+              <div class="code-header">
+                <div class="mac-dots">
+                  <div class="mac-dot dot-red"></div>
+                  <div class="mac-dot dot-yellow"></div>
+                  <div class="mac-dot dot-green"></div>
+                </div>
+                <span class="code-lang">db-migrator/SKILL.md</span>
+              </div>
+              <div class="code-body">
+                <span class="c-comment">---</span>
+                <span class="c-key">name</span>: <span class="c-val">db-migrator</span>
+                <span class="c-key">description</span>: |
+                <span class="c-val">データベースマイグレーションを実行する。</span>
+                <span class="c-val"
+                  >マイグレーション、DB更新、スキーマ変更という言葉が出たら使用。</span
+                >
+                <span class="c-key">disable-model-invocation</span>: <span class="c-val">true</span>
+                <span class="c-comment"># 自動発動を無効化（危険操作）</span>
+                <span class="c-comment">---</span>
+
+                <span class="c-head"># DB マイグレーター</span>
+
+                <span class="c-head">## 実行コマンド</span>
+                <span class="c-val">```bash</span>
+                <span class="c-cmd"
+                  >python scripts/migrate.py --env &lt;environment&gt; --version
+                  &lt;version&gt;</span
+                >
+                <span class="c-val">```</span>
+
+                <span class="c-head">## 引数</span>
+                <span class="c-val">- `--env`: 環境（dev / staging / prod）</span>
+                <span class="c-val">- `--version`: マイグレーションバージョン番号</span>
+
+                <span class="c-head">## Rules</span>
+                <span class="c-val">- スクリプト実行前に必ずユーザーに確認を求めること</span>
+                <span class="c-val">- prod環境は二重確認必須</span>
+                <span class="c-val">- エラー時はロールバックコマンドを提示すること</span>
+              </div>
+            </div>
+            <div style="margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap">
+              <span class="tag tag-g">決定論的</span>
+              <span class="tag tag-g">自動化に最強</span>
+              <span class="tag tag-r">危険操作はdisable-model-invocation必須</span>
+            </div>
+          </div>
+
+          <div id="p4" class="tab-panel">
+            <div class="callout">
+              <strong>Pattern 4 — All-in-One（全要素の組み合わせ）</strong><br />
+              SKILL.md + scripts/ + references/ + assets/
+              を全て活用する最高度のパターン。複雑なドメイン知識・自動検証・出力テンプレートを統合したエンタープライズレベルのスキル。
+            </div>
+            <div style="margin-bottom: 16px">
+              <div class="path-box">
+                full-stack-generator/<br />
+                ├── SKILL.md ← 統合指示書<br />
+                ├── scripts/<br />
+                │&nbsp;&nbsp;&nbsp;└── scaffold.py ← 決定論的スキャフォールディング<br />
+                ├── references/<br />
+                │&nbsp;&nbsp;&nbsp;└── best-practices.md ← チームコーディング規約<br />
+                └── assets/<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;└── template.tsx ← 出力テンプレート
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>要素</th>
+                    <th>役割</th>
+                    <th>トークン消費</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>SKILL.md</code></td>
+                    <td>全体の指揮・手順定義</td>
+                    <td>常時 Level1, 発動時 Level2</td>
+                  </tr>
+                  <tr>
+                    <td><code>scripts/scaffold.py</code></td>
+                    <td>ファイル生成・検証の自動化</td>
+                    <td>実行結果のみ</td>
+                  </tr>
+                  <tr>
+                    <td><code>references/best-practices.md</code></td>
+                    <td>チーム固有の規約参照</td>
+                    <td>参照時のみ</td>
+                  </tr>
+                  <tr>
+                    <td><code>assets/template.tsx</code></td>
+                    <td>出力ファイルのひな形</td>
+                    <td>使用時のみ</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap">
+              <span class="tag tag-g">最大の能力</span>
+              <span class="tag tag-g">エンタープライズ向け</span>
+              <span class="tag tag-r">設計コストが高い</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ────────────────── S7: INSTALL ───────────────── -->
+    <section id="sec-install">
+      <div class="container">
+        <div class="section-header fade-in">
+          <span class="section-badge badge-blue">07 / INSTALLATION</span>
+          <div>
+            <h2 class="section-title">スキルの<span>インストール</span>方法</h2>
+            <p class="section-desc">
+              Git
+              リポジトリ、ローカルディレクトリ、統合CLIツール。3つのインストール手段と、それぞれの使いどころ。
+            </p>
+          </div>
+        </div>
+
+        <div class="steps fade-in">
+          <div class="step">
+            <div class="step-num">01</div>
+            <div class="step-body">
+              <div class="step-title">Gemini CLI — コマンドでインストール</div>
+              <p class="step-desc">
+                最もスタンダードな方法。チームで共有するスキルはGitリポジトリに置き、URLを指定してインストールする。
+              </p>
+              <div class="code-wrap" style="margin-top: 16px">
+                <div class="code-header">
+                  <div class="mac-dots">
+                    <div class="mac-dot dot-red"></div>
+                    <div class="mac-dot dot-yellow"></div>
+                    <div class="mac-dot dot-green"></div>
+                  </div>
+                  <span class="code-lang">shell — Gemini CLI Commands</span>
+                </div>
+                <div class="code-body">
+                  <span class="c-comment"># Git リポジトリからインストール</span>
+                  <span class="c-cmd">gemini skills install</span>
+                  <span class="c-val">https://github.com/example/my-skills.git</span>
+
+                  <span class="c-comment"># サブパスを指定してインストール</span>
+                  <span class="c-cmd">gemini skills install</span>
+                  <span class="c-val">https://github.com/example/skills.git</span>
+                  <span class="c-key">--path</span> skills/firebase
+
+                  <span class="c-comment"># ローカルディレクトリからインストール</span>
+                  <span class="c-cmd">gemini skills install</span>
+                  <span class="c-val">./my-local-skill/</span>
+
+                  <span class="c-comment"># インストール済みスキルを一覧表示</span>
+                  <span class="c-cmd">gemini skills list</span>
+
+                  <span class="c-comment"># セッション中にスキルを一時無効化</span>
+                  <span class="c-cmd">/skills disable</span>
+                  <span class="c-val">&lt;スキル番号&gt;</span>
+
+                  <span class="c-comment"># スキルを最新版に更新</span>
+                  <span class="c-cmd">gemini skills update</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">02</div>
+            <div class="step-body">
+              <div class="step-title">Antigravity — ファイルコピーで配置</div>
+              <p class="step-desc">
+                Antigravity IDE
+                ではGUIまたはファイルコピーでスキルを配置する。グローバルかワークスペースかを意識して配置先を決める。
+              </p>
+              <div class="code-wrap" style="margin-top: 16px">
+                <div class="code-header">
+                  <div class="mac-dots">
+                    <div class="mac-dot dot-red"></div>
+                    <div class="mac-dot dot-yellow"></div>
+                    <div class="mac-dot dot-green"></div>
+                  </div>
+                  <span class="code-lang">shell — Antigravity Placement</span>
+                </div>
+                <div class="code-body">
+                  <span class="c-comment"
+                    ># グローバルインストール（全プロジェクトで使えるようにする）</span
+                  >
+                  <span class="c-cmd">cp -r</span> my-skill/
+                  <span class="c-val">~/.gemini/antigravity/skills/</span>
+
+                  <span class="c-comment"
+                    ># ワークスペースインストール（このプロジェクトのみ）</span
+                  >
+                  <span class="c-cmd">cp -r</span> my-skill/
+                  <span class="c-val">.agent/skills/</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">03</div>
+            <div class="step-body">
+              <div class="step-title">skills CLI — 統合管理ツール（最も便利）</div>
+              <p class="step-desc">
+                Gemini CLI と Antigravity
+                両方に同時にスキルを追加できる統合管理ツール。コミュニティスキルの検索・インストールも可能。
+              </p>
+              <div class="code-wrap" style="margin-top: 16px">
+                <div class="code-header">
+                  <div class="mac-dots">
+                    <div class="mac-dot dot-red"></div>
+                    <div class="mac-dot dot-yellow"></div>
+                    <div class="mac-dot dot-green"></div>
+                  </div>
+                  <span class="code-lang">shell — skills CLI (npx)</span>
+                </div>
+                <div class="code-body">
+                  <span class="c-comment"># Firebase スキルを両ツールに同時追加</span>
+                  <span class="c-cmd">npx skills add</span>
+                  <span class="c-val">firebase/agent-skills</span>
+                  <span class="c-key">-a</span> gemini-cli <span class="c-key">-a</span> antigravity
+
+                  <span class="c-comment"># スキルを検索</span>
+                  <span class="c-cmd">npx skills find</span> <span class="c-val">flutter</span>
+
+                  <span class="c-comment"># スキルを削除</span>
+                  <span class="c-cmd">npx skills remove</span>
+                  <span class="c-val">firebase/agent-skills</span>
+
+                  <span class="c-comment"># インストール済みスキル一覧</span>
+                  <span class="c-cmd">npx skills list</span>
+
+                  <span class="c-comment"
+                    ># コミュニティのawesome-skillsバンドルを一括インストール</span
+                  >
+                  <span class="c-cmd">npx antigravity-awesome-skills</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ────────────────── S8: SCOPE ─────────────────── -->
+    <section id="sec-scope">
+      <div class="container">
+        <div class="section-header fade-in">
+          <span class="section-badge badge-purple">08 / SCOPE</span>
+          <div>
+            <h2 class="section-title">スコープと<span>配置場所</span>の設計</h2>
+            <p class="section-desc">
+              グローバルスコープとワークスペーススコープの使い分けと、同名スキルが競合した場合の優先順位（オーバーライドルール）を理解する。
+            </p>
+          </div>
+        </div>
+
+        <div class="mermaid-wrap fade-in">
+          <div class="mermaid-label">SCOPE HIERARCHY — OVERRIDE RULES</div>
+          <!-- prettier-ignore -->
+          <div class="mermaid">
+graph TB
+subgraph GlobalScope["Global Scope — All Projects"]
+G1["~/.gemini/skills/<br/>Gemini CLI Global"]
+G2["~/.gemini/antigravity/skills/<br/>Antigravity Global"]
+end
+subgraph WorkspaceScope["Workspace Scope — This Project Only"]
+W1[".gemini/skills/<br/>Gemini CLI Local"]
+W2[".agent/skills/<br/>Antigravity Local"]
+end
+WorkspaceScope -->|"Higher priority<br/>Overrides global<br/>if same name"| OVERRIDE["Override"]
+GlobalScope --> OVERRIDE
+OVERRIDE --> USE["Active Skill"]
+style OVERRIDE fill:#1a1a10,stroke:#f97316,color:#fdba74
+style USE fill:#0d2330,stroke:#00d4aa,color:#00d4aa
+style WorkspaceScope fill:#0d1a10,stroke:#22c55e
+style GlobalScope fill:#0d1020,stroke:#3b82f6
+</div>
+        </div>
+
+        <div class="scope-grid fade-in">
+          <div class="scope-card global">
+            <div class="scope-label c">GLOBAL SCOPE</div>
+            <h3>グローバルスキル</h3>
+            <p style="font-size: 14px; color: var(--text-subtle)">
+              すべてのプロジェクトで利用可能な汎用スキル。個人の開発スタイルを定義する。
+            </p>
+            <div class="path-box">
+              ~/.gemini/skills/<br />
+              ~/.gemini/antigravity/skills/
+            </div>
+            <ul>
+              <li>Gitコミット規約フォーマッター</li>
+              <li>コードレビュー標準チェック</li>
+              <li>JSON/YAML フォーマッター</li>
+              <li>テスト生成の標準化</li>
+            </ul>
+          </div>
+          <div class="scope-card workspace">
+            <div class="scope-label o">WORKSPACE SCOPE</div>
+            <h3>ワークスペーススキル</h3>
+            <p style="font-size: 14px; color: var(--text-subtle)">
+              特定プロジェクトのみで有効なスキル。Gitにコミットしてチーム全体で共有できる。
+            </p>
+            <div class="path-box">
+              .gemini/skills/<br />
+              .agent/skills/
+            </div>
+            <ul>
+              <li>このアプリのデプロイ手順</li>
+              <li>プロジェクト固有のAPI仕様</li>
+              <li>チーム独自のコーディング規約</li>
+              <li>内部データベースのマイグレーション</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="callout fade-in" style="margin-top: 24px">
+          <strong>オーバーライドルール:</strong> 同名のスキルが複数スコープに存在する場合、<span
+            class="inline-em"
+            >ワークスペース（上位）が優先</span
+          >される。これにより、グローバルで定義した汎用スキルをプロジェクト単位でカスタマイズすることが可能。
+        </div>
+      </div>
+    </section>
+
+    <!-- ────────────────── S9: LIFECYCLE ─────────────── -->
+    <section id="sec-lifecycle">
+      <div class="container">
+        <div class="section-header fade-in">
+          <span class="section-badge badge-cyan">09 / LIFECYCLE</span>
+          <div>
+            <h2 class="section-title">実行<span>ライフサイクル</span>の全貌</h2>
+            <p class="section-desc">
+              Discovery → Activation → Consent → Injection → Execution
+              の5フェーズを理解することで、スキルのデバッグと設計が格段に改善される。
+            </p>
+          </div>
+        </div>
+
+        <div class="mermaid-wrap fade-in">
+          <div class="mermaid-label">EXECUTION LIFECYCLE — SEQUENCE DIAGRAM</div>
+          <!-- prettier-ignore -->
+          <div class="mermaid">
+sequenceDiagram
+participant User as Developer
+participant IDE as CLI or IDE Interface
+participant Agent as Agent Core
+participant FS as Local File System
+Note over Agent,FS: Phase 1 — Discovery
+Agent->>FS: Scan .agents/skills/ hierarchy
+FS-->>Agent: Extract name + description from each SKILL.md
+Agent->>Agent: Inject metadata into system prompt static
+User->>IDE: "Review this code for performance issues"
+IDE->>Agent: Forward prompt
+Note over Agent: Phase 2 — Activation Logic
+Agent->>Agent: Semantically match prompt vs all skill descriptions
+Agent->>Agent: Identify best skill and call activate_skill tool
+Note over Agent,User: Phase 3 — Consent and Security
+Agent->>IDE: Request tool execution with skill details
+IDE->>User: Show approval prompt with skill name and directory path
+User->>IDE: Approve execution
+IDE-->>Agent: Approval signal received
+Note over Agent,FS: Phase 4 — Context Injection
+Agent->>FS: Obtain read permission for skill directory
+FS-->>Agent: Return SKILL.md body and referenced assets
+Agent->>Agent: Expand detailed instructions into context window
+Note over Agent,User: Phase 5 — Execution
+Agent->>Agent: Follow Step-by-Step from SKILL.md
+Agent->>FS: Execute scripts if needed via bash
+FS-->>Agent: Return execution results only not source code
+Agent->>IDE: Generate artifacts and analysis results
+IDE->>User: Report task completion
+</div>
+        </div>
+
+        <div class="card-grid fade-in" style="margin-top: 24px">
+          <div class="card" style="border-top: 2px solid var(--green)">
+            <h3
+              style="
+                color: var(--green);
+                font-size: 14px;
+                font-family: 'JetBrains Mono', monospace;
+                font-weight: 600;
+                margin-bottom: 12px;
+              "
+            >
+              Phase 3: Consent
+            </h3>
+            <p>
+              スキルがアクティブになる際、UIにスキル名・目的・アクセスするディレクトリパスが明示され、ユーザーの承認を求める確認プロンプトが表示される。悪意あるスクリプトの意図しない実行を防ぐセキュリティモデル。
+            </p>
+          </div>
+          <div class="card" style="border-top: 2px solid var(--blue)">
+            <h3
+              style="
+                color: var(--blue);
+                font-size: 14px;
+                font-family: 'JetBrains Mono', monospace;
+                font-weight: 600;
+                margin-bottom: 12px;
+              "
+            >
+              Phase 4: Context Injection
+            </h3>
+            <p>
+              スクリプトはソースコードではなく<strong style="color: var(--text)"
+                >実行結果のみ</strong
+              >がコンテキストに入る。これによりレベル3（scripts/）は実質的にコンテキスト無制限で複雑な処理を実現できる。
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ────────────────── S10: MCP ───────────────────── -->
+    <section id="sec-mcp">
+      <div class="container">
+        <div class="section-header fade-in">
+          <span class="section-badge badge-orange">10 / MCP INTEGRATION</span>
+          <div>
+            <h2 class="section-title">MCP との<span>相乗効果</span></h2>
+            <p class="section-desc">
+              Agent Skills と MCP（Model Context
+              Protocol）は競合しない。「知識と判断力（SKILL.md）」と「ツールとデータ（MCP）」を統合することで真の力を発揮する。
+            </p>
+          </div>
+        </div>
+
+        <div class="mermaid-wrap fade-in">
+          <div class="mermaid-label">AGENT SKILLS + MCP INTEGRATION</div>
+          <!-- prettier-ignore -->
+          <div class="mermaid">
+graph TB
+subgraph MCPLayer["MCP Layer — Tools and Dynamic Data"]
+MCP1["MCP Server<br/>Search latest API docs"]
+MCP2["MCP Server<br/>Query remote database"]
+MCP3["MCP Server<br/>External service calls"]
+end
+subgraph SkillLayer["SKILL.md Layer — Knowledge and Judgment"]
+SK1["When to use which MCP tool"]
+SK2["How to apply project-specific constraints"]
+SK3["Naming conventions and security policies"]
+end
+Agent["AI Agent Core"]
+Result["High Quality Output<br/>Always up-to-date data<br/>Project-aware context"]
+MCPLayer -->|Dynamic real-time data| Agent
+SkillLayer -->|Structured guidance framework| Agent
+Agent --> Result
+style SkillLayer fill:#0d2330,stroke:#00d4aa
+style MCPLayer fill:#1a1030,stroke:#a855f7
+style Result fill:#0d2e1a,stroke:#22c55e,color:#86efac
+</div>
+        </div>
+
+        <div class="compare-grid fade-in">
+          <div class="compare-card" style="border-color: var(--purple-dim)">
+            <div class="compare-title" style="color: var(--purple)">🔌 MCP サーバーの役割</div>
+            <pre style="color: var(--text-subtle); font-size: 13px; line-height: 1.7">
+エージェントへの「手足とデータパイプライン」
+
+• 最新のAPI仕様を検索（Search）
+• リモートDBへのクエリ発行（Fetch）
+• 外部サービスとのリアルタイム連携
+
+→ 静的ファイルでは提供できない
+　動的機能を付与する</pre
+            >
+          </div>
+          <div class="compare-card" style="border-color: var(--cyan-dim)">
+            <div class="compare-title" style="color: var(--cyan)">🧠 SKILL.md の役割</div>
+            <pre style="color: var(--text-subtle); font-size: 13px; line-height: 1.7">
+エージェントへの「知識と判断力」
+
+• 何を調べるべきか（What）
+• いつ調べるべきか（When）
+• 取得したデータをどう適用するか（How）
+
+→ MCPで取得した生データに
+　「文脈と制約」を与える</pre
+            >
+          </div>
+        </div>
+
+        <div class="callout fade-in">
+          <strong>実装例 — クラウドプロビジョニングスキル:</strong><br />
+          <em style="color: var(--text-subtle); font-size: 14px"
+            >"クラウドのプロビジョニングを行う際は、まずMCPツールを利用して最新のリファレンスを検索し、そのデータに基づいて、このプロジェクト独自の命名規則とセキュリティポリシーに沿ってTerraformコードを生成せよ"</em
+          >
+          <br /><br />
+          MCPが<span class="inline-em">最新データを取得</span>し、SKILL.md が<span class="inline-em"
+            >プロジェクト制約を適用</span
+          >する。この分業により、「常に最新・常にプロジェクト仕様に準拠」した出力が自動的に実現される。
+        </div>
+      </div>
+    </section>
+
+    <!-- ────────────────── S11: BEST PRACTICES ───────── -->
+    <section id="sec-best">
+      <div class="container">
+        <div class="section-header fade-in">
+          <span class="section-badge badge-purple">11 / BEST PRACTICES</span>
+          <div>
+            <h2 class="section-title">ベストプラクティス と<span>チェックリスト</span></h2>
+            <p class="section-desc">
+              中級者が陥りやすいアンチパターンと、公開・運用前に確認すべきチェックリスト。スキル数の適切な管理方法も解説する。
+            </p>
+          </div>
+        </div>
+
+        <h4 class="fade-in" style="margin-bottom: 20px">アンチパターン vs ベストプラクティス</h4>
+        <div class="compare-grid fade-in">
+          <div class="compare-card bad">
+            <div class="compare-title ng">❌ よくある失敗パターン</div>
+            <pre>
+• description が曖昧すぎる
+  → スキルが発動しない
+
+• SKILL.md が 500 行を超える
+  → コンテキストを圧迫
+
+• スクリプトにハードコードされた値
+  → 再利用できない
+
+• スキルを 20 個以上有効にしている
+  → AIが混乱し精度低下
+
+• 全ての情報を SKILL.md 本文に書く
+  → references/ を活用すべき
+
+• 危険操作スキルに自動発動を許可
+  → disable-model-invocation 必須</pre
+            >
+          </div>
+          <div class="compare-card good">
+            <div class="compare-title ok">✅ ベストプラクティス</div>
+            <pre>
+• description にトリガーワードを明記
+  → 「この言葉が出たら使うこと」
+
+• 大きな参照資料は references/ に分離
+  → 本文は指示のみ、詳細は動的参照
+
+• スクリプトは引数で動作変更可能に
+  → --env dev|staging|prod 等
+
+• アクティブスキルは 10〜15 個以内
+  → 使わないスキルは disable
+
+• Few-shot例を Examples セクションに
+  → モデルが期待動作を模倣する
+
+• disable-model-invocation で安全管理
+  → 破壊的操作は手動発動のみに</pre
+            >
+          </div>
+        </div>
+
+        <div class="divider fade-in"></div>
+
+        <h4 class="fade-in">スキル数とパフォーマンスの目安</h4>
+        <div class="mermaid-wrap fade-in">
+          <div class="mermaid-label">SKILL COUNT vs PERFORMANCE</div>
+          <!-- prettier-ignore -->
+          <div class="mermaid">
+graph LR
+A["1-5 skills<br/>Good but<br/>underutilized"]
+B["6-15 skills<br/>OPTIMAL ZONE<br/>Best performance"]
+C["16-25 skills<br/>Degrading<br/>slightly"]
+D["25 plus skills<br/>Significant<br/>confusion"]
+A -->|Add more| B
+B -->|Too many| C
+C -->|Overload| D
+style B fill:#0d2e1a,stroke:#22c55e,color:#86efac
+style D fill:#3d1515,stroke:#ef4444,color:#fca5a5
+style A fill:#1a1a10,stroke:#f97316,color:#fdba74
+style C fill:#1a1020,stroke:#a855f7,color:#c4b5fd
+</div>
+        </div>
+
+        <div class="divider fade-in"></div>
+
+        <h4 class="fade-in">公開・運用前チェックリスト</h4>
+        <p style="font-size: 14px; color: var(--text-subtle); margin-bottom: 20px" class="fade-in">
+          項目をクリックしてチェックを記録できます。
+        </p>
+        <div class="checklist fade-in" id="checklist">
+          <div class="check-item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleCheck(this); }">
+            <div class="check-box"></div>
+            <div class="check-text">
+              <code>name</code> はハイフン区切りの英語小文字か（64文字以内・予約語なし）
+            </div>
+          </div>
+          <div class="check-item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleCheck(this); }">
+            <div class="check-box"></div>
+            <div class="check-text">
+              <code>description</code>
+              に具体的なトリガーキーワードが含まれているか（「この言葉が出たら使うこと」）
+            </div>
+          </div>
+          <div class="check-item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleCheck(this); }">
+            <div class="check-box"></div>
+            <div class="check-text">
+              SKILL.md 本文は 500 行以内か（参照資料は references/ に分離済みか）
+            </div>
+          </div>
+          <div class="check-item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleCheck(this); }">
+            <div class="check-box"></div>
+            <div class="check-text">
+              スクリプトはハードコードされた値ではなく引数で動作変更できるか
+            </div>
+          </div>
+          <div class="check-item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleCheck(this); }">
+            <div class="check-box"></div>
+            <div class="check-text">
+              危険な操作（DB削除・インフラ変更等）のスキルに
+              <code>disable-model-invocation: true</code> が設定されているか
+            </div>
+          </div>
+          <div class="check-item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleCheck(this); }">
+            <div class="check-box"></div>
+            <div class="check-text">
+              Few-shot の Examples セクションが含まれているか（期待する入出力の例示）
+            </div>
+          </div>
+          <div class="check-item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleCheck(this); }">
+            <div class="check-box"></div>
+            <div class="check-text">
+              Rules セクションで ❌禁止事項 と ✅推奨行動 が明確に定義されているか
+            </div>
+          </div>
+          <div class="check-item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleCheck(this); }">
+            <div class="check-box"></div>
+            <div class="check-text">
+              実際にエージェントから呼び出されるかテストしたか（<code>gemini skills list</code>
+              で確認）
+            </div>
+          </div>
+          <div class="check-item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleCheck(this); }">
+            <div class="check-box"></div>
+            <div class="check-text">アクティブなスキルの合計数が 15 個以内に収まっているか</div>
+          </div>
+          <div class="check-item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleCheck(this); }">
+            <div class="check-box"></div>
+            <div class="check-text">
+              ワークスペーススキルは
+              <code>.gitignore</code> から除外され、チームで共有できるようにコミットされているか
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ────────────────── FOOTER ──────────────────────── -->
+    <footer>
+      <div class="footer-logo">SKILL.md</div>
+      <p>Google Gemini CLI &amp; Antigravity IDE — Agent Skills 完全解剖ガイド</p>
+      <p style="margin-top: 8px; font-size: 12px">
+        Based on Agent Skills Open Standard | Gemini CLI | Antigravity IDE | MCP Integration
+      </p>
+    </footer>
+
+    <script>
+      // ── Progress Bar ────────────────────────────────
+      const progressBar = document.getElementById('progress-bar');
+      window.addEventListener('scroll', () => {
+        if (!progressBar) return;
+        const total = document.documentElement.scrollHeight - window.innerHeight;
+        if (total <= 0) {
+          progressBar.style.width = '100%';
+        } else {
+          progressBar.style.width = (window.scrollY / total) * 100 + '%';
+        }
+      });
+
+      // ── Fade In Observer ─────────────────────────────
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add('visible');
+              observer.unobserve(e.target);
+            }
+          });
+        },
+        { threshold: 0.08, rootMargin: '0px 0px -30px 0px' },
+      );
+
+      document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
+
+      // ── Tab Switcher ─────────────────────────────────
+      function switchTab(id) {
+        document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        const idx = ['p1', 'p2', 'p3', 'p4'].indexOf(id);
+        document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+      }
+
+      // ── Checklist ────────────────────────────────────
+      function toggleCheck(el) {
+        el.classList.toggle('checked');
+        el.setAttribute('aria-checked', el.classList.contains('checked'));
+      }
+
+      // ── Mermaid Init ─────────────────────────────────
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        themeVariables: {
+          background: '#0d1117',
+          primaryColor: '#0d2330',
+          primaryTextColor: '#e2e8f0',
+          primaryBorderColor: '#2d3748',
+          lineColor: '#64748b',
+          secondaryColor: '#1c2230',
+          tertiaryColor: '#161b22',
+          edgeLabelBackground: '#161b22',
+          nodeTextColor: '#e2e8f0',
+          clusterBkg: '#0d1117',
+          clusterBorder: '#2d3748',
+          titleColor: '#e2e8f0',
+          actorBkg: '#1c2230',
+          actorBorder: '#2d3748',
+          actorTextColor: '#e2e8f0',
+          actorLineColor: '#64748b',
+          signalColor: '#94a3b8',
+          signalTextColor: '#e2e8f0',
+          noteBkgColor: '#1c2230',
+          noteTextColor: '#94a3b8',
+          noteBorderColor: '#2d3748',
+          labelBoxBkgColor: '#161b22',
+          labelBoxBorderColor: '#2d3748',
+          labelTextColor: '#e2e8f0',
+          loopTextColor: '#e2e8f0',
+        },
+        flowchart: { curve: 'basis', padding: 20 },
+        sequence: { width: 200, height: 50, boxMargin: 10, useMaxWidth: false },
+      });
+
+      const SCALE = 0.88;
+
+      function resizeMermaidSvgs() {
+        document.querySelectorAll('.mermaid svg').forEach((svg) => {
+          if (svg.dataset.resized) return;
+          const vb = svg.viewBox?.baseVal;
+          let w = vb?.width > 10 ? vb.width : parseFloat(svg.getAttribute('width') || '800');
+          let h = vb?.height > 10 ? vb.height : parseFloat(svg.getAttribute('height') || '400');
+          if (!vb || vb.width < 10) svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+          svg.setAttribute('width', Math.round(w * SCALE));
+          svg.setAttribute('height', Math.round(h * SCALE));
+          svg.style.maxWidth = 'none';
+          svg.dataset.resized = '1';
+        });
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        mermaid
+          .run({ querySelector: '.mermaid' })
+          .then(() => setTimeout(resizeMermaidSvgs, 150))
+          .catch(() => setTimeout(resizeMermaidSvgs, 900));
+      });
+    </script>
+  </body>
+</html>

@@ -20,7 +20,7 @@ allowed-tools:
 新規ドキュメント作成時は既存ファイルを参照する:
 
 | ドキュメント種別 | テンプレート |
-|---|---|
+| --- | --- |
 | スキルガイド | `claude/skill.html` |
 | エージェントガイド | `claude/agent.html` |
 | スキルガイド（詳細版） | `claude/skill-guide-for-claude.html` |

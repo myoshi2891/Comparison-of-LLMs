@@ -1,0 +1,2598 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SKILL.md 中級者完全攻略ガイド — Claude Code</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js" integrity="sha384-+NGfjU8KzpDLXRHduEqW+ZiJr2rIg+cidUVk7B51R5xK7cHwMKQfrdFwGdrq1Bcz" crossorigin="anonymous"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+
+      :root {
+        --bg-base: #0d1117;
+        --bg-surface: #161b24;
+        --bg-card: #1c2333;
+        --bg-card-hover: #222d42;
+        --border: rgba(255, 255, 255, 0.13);
+        --border-accent: rgba(100, 200, 255, 0.45);
+        --text-primary: #f0f6ff;
+        --text-secondary: #b0c4de;
+        --text-muted: #7a90b0;
+        --accent-blue: #79c0ff;
+        --accent-cyan: #56d8c8;
+        --accent-purple: #d2a8ff;
+        --accent-green: #7ee787;
+        --accent-orange: #ffa657;
+        --accent-red: #ff7b72;
+        --accent-pink: #f778ba;
+        --glow-blue: rgba(121, 192, 255, 0.18);
+        --glow-cyan: rgba(86, 216, 200, 0.15);
+        --glow-purple: rgba(210, 168, 255, 0.15);
+        --code-bg: #0a0f1a;
+        --code-border: rgba(121, 192, 255, 0.3);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--bg-base);
+        color: var(--text-primary);
+        font-family: 'Noto Sans JP', sans-serif;
+        font-weight: 300;
+        line-height: 1.8;
+        font-size: 15px;
+        overflow-x: hidden;
+      }
+
+      /* ── Background ── */
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(
+            ellipse 800px 600px at 20% 10%,
+            rgba(99, 179, 237, 0.05) 0%,
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 600px 400px at 80% 80%,
+            rgba(183, 148, 244, 0.04) 0%,
+            transparent 60%
+          );
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* ── Layout ── */
+      .wrapper {
+        position: relative;
+        z-index: 1;
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      /* ── Hero ── */
+      .hero {
+        padding: 80px 0 60px;
+        text-align: center;
+        position: relative;
+      }
+
+      .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(99, 179, 237, 0.1);
+        border: 1px solid rgba(99, 179, 237, 0.25);
+        border-radius: 100px;
+        padding: 6px 16px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        color: var(--accent-blue);
+        letter-spacing: 0.05em;
+        margin-bottom: 28px;
+      }
+
+      .hero-badge::before {
+        content: '';
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--accent-cyan);
+        box-shadow: 0 0 8px var(--accent-cyan);
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.4;
+        }
+      }
+
+      .hero h1 {
+        font-family: 'Syne', sans-serif;
+        font-weight: 800;
+        font-size: clamp(36px, 6vw, 64px);
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+        margin-bottom: 20px;
+        background: linear-gradient(
+          135deg,
+          #e8edf5 0%,
+          var(--accent-blue) 50%,
+          var(--accent-cyan) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .hero-sub {
+        font-size: 17px;
+        color: var(--text-primary);
+        max-width: 620px;
+        margin: 0 auto 40px;
+        font-weight: 300;
+        line-height: 1.7;
+      }
+
+      .hero-meta {
+        display: flex;
+        justify-content: center;
+        gap: 24px;
+        flex-wrap: wrap;
+      }
+
+      .hero-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--text-muted);
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      .hero-meta-item span {
+        color: var(--accent-green);
+      }
+
+      /* ── TOC ── */
+      .toc {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 32px;
+        margin: 0 0 64px;
+      }
+
+      .toc-title {
+        font-family: 'Syne', sans-serif;
+        font-weight: 700;
+        font-size: 13px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--accent-cyan);
+        margin-bottom: 20px;
+      }
+
+      .toc-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 8px;
+      }
+
+      .toc-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        border-radius: 8px;
+        text-decoration: none;
+        color: var(--text-primary);
+        font-size: 13.5px;
+        transition: all 0.2s;
+      }
+
+      .toc-item:hover {
+        background: rgba(99, 179, 237, 0.08);
+        color: var(--accent-blue);
+      }
+
+      .toc-num {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--text-muted);
+        min-width: 22px;
+      }
+
+      /* ── Section ── */
+      .section {
+        margin-bottom: 80px;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 32px;
+      }
+
+      .section-num {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--text-muted);
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        padding: 4px 10px;
+        border-radius: 6px;
+        white-space: nowrap;
+      }
+
+      .section h2 {
+        font-family: 'Syne', sans-serif;
+        font-weight: 700;
+        font-size: clamp(22px, 3vw, 30px);
+        letter-spacing: -0.01em;
+        color: var(--text-primary);
+      }
+
+      .section-line {
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+
+      /* ── Cards ── */
+      .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 28px;
+        margin-bottom: 20px;
+        transition: border-color 0.2s;
+      }
+
+      .card:hover {
+        border-color: var(--border-accent);
+      }
+
+      .card-title {
+        font-family: 'Syne', sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 10px;
+        border-radius: 100px;
+        font-size: 11px;
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 400;
+      }
+
+      .tag-blue {
+        background: rgba(99, 179, 237, 0.12);
+        color: var(--accent-blue);
+        border: 1px solid rgba(99, 179, 237, 0.2);
+      }
+      .tag-cyan {
+        background: rgba(79, 209, 197, 0.12);
+        color: var(--accent-cyan);
+        border: 1px solid rgba(79, 209, 197, 0.2);
+      }
+      .tag-purple {
+        background: rgba(183, 148, 244, 0.12);
+        color: var(--accent-purple);
+        border: 1px solid rgba(183, 148, 244, 0.2);
+      }
+      .tag-green {
+        background: rgba(104, 211, 145, 0.12);
+        color: var(--accent-green);
+        border: 1px solid rgba(104, 211, 145, 0.2);
+      }
+      .tag-orange {
+        background: rgba(246, 173, 85, 0.12);
+        color: var(--accent-orange);
+        border: 1px solid rgba(246, 173, 85, 0.2);
+      }
+      .tag-red {
+        background: rgba(252, 129, 129, 0.12);
+        color: var(--accent-red);
+        border: 1px solid rgba(252, 129, 129, 0.2);
+      }
+
+      /* ── Code ── */
+      .code-block {
+        background: var(--code-bg);
+        border: 1px solid var(--code-border);
+        border-radius: 12px;
+        overflow: hidden;
+        margin: 16px 0;
+        font-size: 13px;
+      }
+
+      .code-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 16px;
+        background: rgba(255, 255, 255, 0.03);
+        border-bottom: 1px solid var(--code-border);
+      }
+
+      .code-lang {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--accent-cyan);
+        letter-spacing: 0.05em;
+      }
+
+      .code-dots {
+        display: flex;
+        gap: 6px;
+      }
+
+      .code-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+
+      .code-dot:nth-child(1) {
+        background: #ff5f57;
+      }
+      .code-dot:nth-child(2) {
+        background: #febc2e;
+      }
+      .code-dot:nth-child(3) {
+        background: #28c840;
+      }
+
+      .code-content {
+        padding: 20px;
+        overflow-x: auto;
+      }
+
+      .code-content pre {
+        font-family: 'JetBrains Mono', monospace;
+        line-height: 1.7;
+        color: #d0e8ff;
+        white-space: pre;
+      }
+
+      .hl-key {
+        color: #b794f4;
+      }
+      .hl-str {
+        color: #68d391;
+      }
+      .hl-comment {
+        color: #6a8eae;
+        font-style: italic;
+      }
+      .hl-num {
+        color: #f6ad55;
+      }
+      .hl-head {
+        color: #63b3ed;
+        font-weight: 600;
+      }
+      .hl-tag {
+        color: #fc8181;
+      }
+
+      /* ── Alert / Callout ── */
+      .callout {
+        border-left: 3px solid;
+        padding: 16px 20px;
+        border-radius: 0 10px 10px 0;
+        margin: 16px 0;
+        font-size: 14px;
+      }
+
+      .callout-tip {
+        border-color: var(--accent-cyan);
+        background: rgba(79, 209, 197, 0.07);
+      }
+      .callout-warn {
+        border-color: var(--accent-orange);
+        background: rgba(246, 173, 85, 0.07);
+      }
+      .callout-info {
+        border-color: var(--accent-blue);
+        background: rgba(99, 179, 237, 0.07);
+      }
+      .callout-danger {
+        border-color: var(--accent-red);
+        background: rgba(252, 129, 129, 0.07);
+      }
+
+      .callout-icon {
+        font-size: 16px;
+        margin-right: 8px;
+      }
+
+      /* ── Bar Chart ── */
+      .chart-wrap {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 28px 28px 20px;
+        margin: 20px 0;
+      }
+
+      .chart-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        letter-spacing: 0.03em;
+        margin-bottom: 12px;
+      }
+
+      .chart-legend {
+        display: flex;
+        gap: 24px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--text-secondary);
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      .legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+
+      .bar-chart {
+        display: flex;
+        gap: 12px;
+        align-items: stretch;
+        height: 220px;
+      }
+
+      .bar-y-labels {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding-bottom: 28px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--text-muted);
+        min-width: 38px;
+      }
+
+      .bar-area {
+        flex: 1;
+        position: relative;
+        border-left: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .baseline-line {
+        position: absolute;
+        left: 0;
+        right: 0;
+        border-top: 2px dashed rgba(252, 129, 129, 0.5);
+        z-index: 2;
+      }
+
+      .baseline-label {
+        position: absolute;
+        right: 8px;
+        top: -18px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--accent-red);
+        white-space: nowrap;
+      }
+
+      .bars {
+        display: flex;
+        align-items: flex-end;
+        height: calc(100% - 28px);
+        padding: 0 16px;
+        gap: 24px;
+      }
+
+      .bar-group {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+
+      .bar-stack {
+        width: 48px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        height: 100%;
+      }
+
+      .bar-fill {
+        width: 100%;
+        border-radius: 4px 4px 0 0;
+        transition: height 1s ease;
+      }
+
+      .bar-new {
+        background: linear-gradient(to top, var(--accent-cyan), rgba(79, 209, 197, 0.5));
+        box-shadow: 0 0 12px rgba(79, 209, 197, 0.3);
+      }
+
+      .bar-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--text-muted);
+        text-align: center;
+        line-height: 1.4;
+        position: absolute;
+        bottom: 0;
+      }
+
+      .bar-group {
+        position: relative;
+      }
+
+      .bar-val {
+        color: var(--accent-cyan);
+        font-weight: 600;
+      }
+
+      /* ── Quadrant Chart ── */
+      .quadrant-wrap {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 28px;
+        margin: 20px 0;
+      }
+
+      .quadrant-container {
+        position: relative;
+        width: 100%;
+        padding-bottom: 60%;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 8px 0 16px;
+      }
+
+      .quad-bg {
+        position: absolute;
+        width: 50%;
+        height: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: 12px;
+        line-height: 1.5;
+        font-family: 'Noto Sans JP', sans-serif;
+        color: var(--text-muted);
+        padding: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .quad-tl {
+        top: 0;
+        left: 0;
+        background: rgba(183, 148, 244, 0.06);
+        color: var(--accent-purple);
+      }
+      .quad-tr {
+        top: 0;
+        right: 0;
+        background: rgba(252, 129, 129, 0.06);
+        color: var(--accent-red);
+      }
+      .quad-bl {
+        bottom: 0;
+        left: 0;
+        background: rgba(104, 211, 145, 0.06);
+        color: var(--accent-green);
+      }
+      .quad-br {
+        bottom: 0;
+        right: 0;
+        background: rgba(79, 209, 197, 0.06);
+        color: var(--accent-cyan);
+      }
+
+      .quad-axis-x-left,
+      .quad-axis-x-right {
+        position: absolute;
+        bottom: -22px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        color: var(--text-muted);
+      }
+      .quad-axis-x-left {
+        left: 0;
+      }
+      .quad-axis-x-right {
+        right: 0;
+      }
+
+      .quad-axis-y-top,
+      .quad-axis-y-bottom {
+        position: absolute;
+        left: -36px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        color: var(--text-muted);
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+      }
+      .quad-axis-y-top {
+        top: 0;
+      }
+      .quad-axis-y-bottom {
+        bottom: 0;
+      }
+
+      /* cross lines */
+      .quadrant-container::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background: rgba(255, 255, 255, 0.12);
+        z-index: 1;
+      }
+      .quadrant-container::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.12);
+        z-index: 1;
+      }
+
+      .quad-dot {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--dot-color, var(--accent-cyan));
+        z-index: 3;
+        transform: translate(-50%, -50%);
+        cursor: pointer;
+        transition: transform 0.2s;
+        box-shadow: 0 0 8px currentColor;
+      }
+
+      
+      .quad-dot:focus {
+        outline: 2px solid var(--accent-blue);
+        outline-offset: 4px;
+      }
+      .quad-dot:hover {
+        transform: translate(-50%, -50%) scale(1.5);
+      }
+
+      .quad-dot::after {
+        content: attr(data-label);
+        position: absolute;
+        left: 16px;
+        top: -4px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        padding: 3px 8px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--text-primary);
+        white-space: nowrap;
+        opacity: 0;
+        transition: opacity 0.2s;
+        pointer-events: none;
+        z-index: 10;
+      }
+
+      .quad-dot:hover::after {
+        opacity: 1;
+      }
+
+      .quad-legend {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-top: 32px;
+      }
+
+      /* ── Mermaid wrapper ── */
+      .mermaid-wrap {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 28px 16px 32px;
+        margin: 24px 0;
+        overflow-x: auto;
+        text-align: center;
+      }
+
+      /* mermaid container: inline-block so it hugs the SVG */
+      .mermaid-wrap .mermaid {
+        display: inline-block;
+      }
+
+      /* SVG itself: no clamping — JS sets explicit width/height */
+      .mermaid-wrap .mermaid svg {
+        display: block;
+        max-width: none !important;
+      }
+
+      /* ── Table ── */
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+        margin: 16px 0;
+      }
+
+      .data-table th {
+        background: rgba(99, 179, 237, 0.1);
+        color: var(--accent-blue);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-accent);
+      }
+
+      .data-table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+        color: var(--text-primary);
+        line-height: 1.6;
+      }
+
+      .data-table td:first-child {
+        color: var(--accent-cyan);
+        font-weight: 500;
+      }
+      .data-table tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      code {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        background: rgba(99, 179, 237, 0.1);
+        border: 1px solid rgba(99, 179, 237, 0.18);
+        padding: 2px 7px;
+        border-radius: 5px;
+        color: var(--accent-blue);
+      }
+
+      /* ── Step indicator ── */
+      .steps {
+        position: relative;
+        padding-left: 36px;
+      }
+
+      .steps::before {
+        content: '';
+        position: absolute;
+        left: 14px;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background: linear-gradient(to bottom, var(--accent-blue), transparent);
+      }
+
+      .step {
+        position: relative;
+        margin-bottom: 28px;
+      }
+
+      .step::before {
+        content: attr(data-n);
+        position: absolute;
+        left: -36px;
+        top: 0;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: var(--bg-card);
+        border: 1.5px solid var(--accent-blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--accent-blue);
+        line-height: 1;
+        text-align: center;
+        padding-top: 7px;
+      }
+
+      .step-title {
+        font-family: 'Syne', sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+        margin-bottom: 8px;
+        color: var(--text-primary);
+      }
+
+      /* ── Grid ── */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+
+      @media (max-width: 768px) {
+        .grid-2,
+        .grid-3 {
+          grid-template-columns: 1fr;
+        }
+        .hero-meta {
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+        }
+      }
+
+      /* ── Comparison ── */
+      .compare-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin: 16px 0;
+      }
+
+      @media (max-width: 640px) {
+        .compare-row {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .compare-box {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+      }
+
+      .compare-box.bad {
+        border-top: 2px solid var(--accent-red);
+      }
+      .compare-box.good {
+        border-top: 2px solid var(--accent-green);
+      }
+
+      .compare-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        margin-bottom: 12px;
+        font-weight: 600;
+      }
+
+      .compare-box.bad .compare-label {
+        color: var(--accent-red);
+      }
+      .compare-box.good .compare-label {
+        color: var(--accent-green);
+      }
+
+      /* ── Field reference ── */
+      .field-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin-bottom: 12px;
+      }
+
+      .field-name {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 14px;
+        color: var(--accent-cyan);
+        font-weight: 600;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .field-required {
+        font-size: 10px;
+        padding: 2px 7px;
+        border-radius: 4px;
+        background: rgba(252, 129, 129, 0.15);
+        color: var(--accent-red);
+        border: 1px solid rgba(252, 129, 129, 0.2);
+        font-family: 'Noto Sans JP', sans-serif;
+      }
+
+      .field-optional {
+        font-size: 10px;
+        padding: 2px 7px;
+        border-radius: 4px;
+        background: rgba(79, 209, 197, 0.1);
+        color: var(--accent-cyan);
+        border: 1px solid rgba(79, 209, 197, 0.2);
+        font-family: 'Noto Sans JP', sans-serif;
+      }
+
+      .field-constraint {
+        font-size: 12px;
+        color: var(--text-muted);
+        font-family: 'JetBrains Mono', monospace;
+        margin-bottom: 8px;
+      }
+
+      .field-desc {
+        font-size: 13.5px;
+        color: var(--text-secondary);
+        line-height: 1.7;
+      }
+
+      /* ── Debug table ── */
+      .flag-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 18px 22px;
+        margin-bottom: 12px;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 16px;
+        align-items: start;
+      }
+
+      .flag-name {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        color: var(--accent-orange);
+        white-space: nowrap;
+        background: rgba(246, 173, 85, 0.08);
+        border: 1px solid rgba(246, 173, 85, 0.2);
+        padding: 6px 12px;
+        border-radius: 7px;
+      }
+
+      /* ── Footer ── */
+      .footer {
+        border-top: 1px solid var(--border);
+        padding: 40px 0;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 13px;
+      }
+
+      /* ── Scroll progress ── */
+      #progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+        z-index: 1000;
+        transition: width 0.1s;
+        box-shadow: 0 0 8px var(--accent-cyan);
+      }
+
+      /* ── Nav ── */
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(13, 17, 23, 0.92);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--border);
+        padding: 14px 0;
+      }
+
+      .nav-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      .nav-logo {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 13px;
+        color: var(--accent-blue);
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      .nav-logo span {
+        color: var(--text-muted);
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 4px;
+      }
+
+      .nav-link {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--text-muted);
+        text-decoration: none;
+        padding: 5px 10px;
+        border-radius: 6px;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+
+      .nav-link:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-primary);
+      }
+
+      @media (max-width: 600px) {
+        .nav-links {
+          display: none;
+        }
+      }
+
+      /* ── Trigger flow ── */
+      .trigger-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin: 16px 0;
+      }
+
+      @media (max-width: 600px) {
+        .trigger-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .trigger-box {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+      }
+
+      .trigger-type {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .trigger-box.under .trigger-type {
+        color: var(--accent-red);
+      }
+      .trigger-box.over .trigger-type {
+        color: var(--accent-orange);
+      }
+
+      p {
+        margin-bottom: 12px;
+        color: var(--text-secondary);
+      }
+
+      strong {
+        color: var(--text-primary);
+        font-weight: 500;
+      }
+
+      h3 {
+        font-family: 'Syne', sans-serif;
+        font-weight: 700;
+        font-size: 18px;
+        color: var(--text-primary);
+        margin: 28px 0 14px;
+      }
+
+      ul,
+      ol {
+        padding-left: 20px;
+        color: var(--text-secondary);
+        margin-bottom: 12px;
+      }
+      li {
+        margin-bottom: 6px;
+      }
+
+      .dot-blue {
+        color: var(--accent-blue);
+      }
+      .dot-cyan {
+        color: var(--accent-cyan);
+      }
+      .dot-purple {
+        color: var(--accent-purple);
+      }
+      .dot-green {
+        color: var(--accent-green);
+      }
+      .dot-orange {
+        color: var(--accent-orange);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="progress"></div>
+
+    <nav>
+      <div class="nav-inner">
+        <a href="#" class="nav-logo">SKILL<span>.md</span> — 中級者ガイド</a>
+        <div class="nav-links">
+          <a href="#arch" class="nav-link">01 アーキテクチャ</a>
+          <a href="#yaml" class="nav-link">02 YAML</a>
+          <a href="#instruction" class="nav-link">03 インストラクション設計</a>
+          <a href="#args" class="nav-link">04 引数</a>
+          <a href="#fork" class="nav-link">05 Fork</a>
+          <a href="#trigger" class="nav-link">06 トリガーチューニング</a>
+          <a href="#debug" class="nav-link">07 デバッグ</a>
+          <a href="#enterprise" class="nav-link">08 Enterprise</a>
+          <a href="#self" class="nav-link">09 自己改善型スキル</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="wrapper">
+      <!-- ── Hero ── -->
+      <div class="hero">
+        <div class="hero-badge">Claude Code v2.1.x 対応 — 2026年3月最終更新</div>
+        <h1>SKILL.md<br />中級者完全攻略ガイド</h1>
+        <p class="hero-sub">
+          プログレッシブ・ディスクロージャー、トークン経済、動的コンテキスト注入、<code
+            >context: fork</code
+          >、<br />エンタープライズプロビジョニングまで網羅した実践リファレンス
+        </p>
+        <div class="hero-meta">
+          <div class="hero-meta-item">対象 <span>中級〜上級エンジニア</span></div>
+          <div class="hero-meta-item">難易度 <span>★★★☆☆</span></div>
+          <div class="hero-meta-item">推定読了 <span>25〜35 分</span></div>
+        </div>
+      </div>
+
+      <!-- ── TOC ── -->
+      <div class="toc">
+        <div class="toc-title">// 目次</div>
+        <div class="toc-grid">
+          <a href="#arch" class="toc-item"
+            ><span class="toc-num">01</span> 3層アーキテクチャとトークン経済</a
+          >
+          <a href="#yaml" class="toc-item"
+            ><span class="toc-num">02</span> YAMLフロントマター全フィールド詳解</a
+          >
+          <a href="#instruction" class="toc-item"
+            ><span class="toc-num">03</span> インストラクション設計パターン</a
+          >
+          <a href="#args" class="toc-item"
+            ><span class="toc-num">04</span> 動的コンテキスト・引数処理</a
+          >
+          <a href="#fork" class="toc-item"
+            ><span class="toc-num">05</span> context:fork vs Subagents</a
+          >
+          <a href="#trigger" class="toc-item"
+            ><span class="toc-num">06</span> トリガーチューニング戦略</a
+          >
+          <a href="#debug" class="toc-item"
+            ><span class="toc-num">07</span> デバッグ・CLIフラグ完全表</a
+          >
+          <a href="#enterprise" class="toc-item"
+            ><span class="toc-num">08</span> Enterpriseプロビジョニング</a
+          >
+          <a href="#self" class="toc-item"
+            ><span class="toc-num">09</span> 自己改善型スキルパターン</a
+          >
+        </div>
+      </div>
+
+      <!-- ── Section 01 ── -->
+      <div class="section" id="arch">
+        <div class="section-header">
+          <div class="section-num">SECTION 01</div>
+          <h2>3層アーキテクチャとトークン経済</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <p>
+          SKILL.md
+          が単なる「プロンプトの保存場所」と異なる最大の理由は、<strong>プログレッシブ・ディスクロージャー（段階的開示）</strong>アーキテクチャを採用している点にある。大規模言語モデルはコンテキストウィンドウに詰め込まれた情報全体にアテンションを割り当てるため、不要な情報はノイズとなり推論精度を下げる。
+        </p>
+
+        <div class="mermaid-wrap">
+<!-- prettier-ignore -->
+          <div class="mermaid">
+graph TB
+subgraph L1["Level 1 - 常時ロード 約100 tokens/skill"]
+M1["YAMLフロントマター<br>name と description のみ<br>全スキルをインデックス登録"]
+end
+subgraph L2["Level 2 - トリガー時ロード 約5000 tokens"]
+M2["SKILL.md 本文<br>手順 ルール<br>出力フォーマット<br>推奨 500行未満"]
+end
+subgraph L3["Level 3 - オンデマンドロード<br>無制限"]
+M3["外部スクリプト / references<br>実行結果のみコンテキストへ返却"]
+end
+U(["ユーザーリクエスト"]) --> A{"説明文と照合"}
+A -- 一致 --> L2
+L2 --> L3
+L1 -- 起動時インデックス --> A
+style L1 fill:#1a3a5c,stroke:#63b3ed,color:#ffffff
+style L2 fill:#1a4040,stroke:#4fd1c5,color:#ffffff
+style L3 fill:#2d1f4a,stroke:#b794f4,color:#ffffff
+          </div>
+        </div>
+
+        <h3>各レベルの定量比較 — スキル数とトークン消費量</h3>
+        <div class="chart-wrap">
+          <div class="chart-title">スキル数とトークン消費量の関係 (単位: K tokens)</div>
+          <div class="chart-legend">
+            <span class="legend-item"
+              ><span class="legend-dot" style="background: var(--accent-cyan)"></span>Level
+              1のみ（SKILL.md方式）</span
+            >
+            <span class="legend-item"
+              ><span class="legend-dot" style="background: var(--accent-red); opacity: 0.7"></span
+              >従来の一括ロード方式</span
+            >
+          </div>
+          <div class="bar-chart">
+            <div class="bar-y-labels">
+              <span>100K</span><span>75K</span><span>50K</span><span>25K</span><span>0</span>
+            </div>
+            <div class="bar-area">
+              <!-- baseline (従来方式) -->
+              <div class="baseline-line" style="bottom: 55%" title="従来方式: 常に55K以上">
+                <span class="baseline-label">従来方式 55K（固定）</span>
+              </div>
+              <div class="bars">
+                <div class="bar-group">
+                  <div class="bar-stack">
+                    <div class="bar-fill bar-new" style="height: 1%" title="1K tokens"></div>
+                  </div>
+                  <div class="bar-label">10スキル<br /><span class="bar-val">〜1K</span></div>
+                </div>
+                <div class="bar-group">
+                  <div class="bar-stack">
+                    <div class="bar-fill bar-new" style="height: 5%" title="5K tokens"></div>
+                  </div>
+                  <div class="bar-label">50スキル<br /><span class="bar-val">〜5K</span></div>
+                </div>
+                <div class="bar-group">
+                  <div class="bar-stack">
+                    <div class="bar-fill bar-new" style="height: 10%" title="10K tokens"></div>
+                  </div>
+                  <div class="bar-label">100スキル<br /><span class="bar-val">〜10K</span></div>
+                </div>
+                <div class="bar-group">
+                  <div class="bar-stack">
+                    <div class="bar-fill bar-new" style="height: 20%" title="20K tokens"></div>
+                  </div>
+                  <div class="bar-label">200スキル<br /><span class="bar-val">〜20K</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout callout-info">
+          <span class="callout-icon">💡</span>
+          <strong>ポイント：</strong>Level
+          1のみの消費（シアンの棒）は200スキルでも20Kトークン程度。従来方式（赤の破線）では55K以上を<strong>常時</strong>消費し続ける。これがスケーラビリティの本質。
+        </div>
+
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-title"><span class="dot-blue">◆</span> Level 1 — メタデータ</div>
+            <p style="font-size: 13px">
+              セッション開始時に全スキルの <code>name</code> と
+              <code>description</code>
+              のみをインデックスへ登録。<strong>1スキルあたり約100トークン</strong>のみ消費。
+            </p>
+            <div class="tag tag-blue">常時ロード</div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span class="dot-cyan">◆</span> Level 2 — インストラクション
+            </div>
+            <p style="font-size: 13px">
+              トリガー判定が通過した瞬間に
+              <code>SKILL.md</code>
+              本文を展開。公式推奨は<strong>500行（約5,000トークン）未満</strong>。
+            </p>
+            <div class="tag tag-cyan">トリガー時</div>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="dot-purple">◆</span> Level 3 — リソース</div>
+            <p style="font-size: 13px">
+              外部スクリプト・参照ドキュメントはエージェントが必要と判断した時のみ読み込み。スクリプトは<strong>実行結果のみ</strong>を返却。
+            </p>
+            <div class="tag tag-purple">オンデマンド</div>
+          </div>
+        </div>
+
+        <h3>実行シーケンス</h3>
+        <div class="mermaid-wrap">
+<!-- prettier-ignore -->
+          <div class="mermaid">
+sequenceDiagram
+participant U as ユーザー
+participant CC as Claude Code
+participant L1 as L1 YAML Meta
+participant L2 as L2 SKILL.md
+participant L3 as L3 Scripts
+
+Note over CC,L1: セッション初期化フェーズ
+CC->>L1: 全スキルをスキャン
+L1-->>CC: name+description のみ登録 100tokens/skill
+U->>CC: READMEを作成してほしい
+
+Note over CC: 推論フェーズ description と意図を照合
+CC->>L2: readme-writer SKILL.md を読み込み
+L2-->>CC: 手順書全文をコンテキストへ展開
+CC->>L3: references/style.md を要求
+L3-->>CC: スタイルガイドラインを返却
+CC->>L3: scripts/validate.sh を実行
+L3-->>CC: 実行結果のみを返却
+CC-->>U: ガイドラインに準拠したREADME
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Section 02 ── -->
+      <div class="section" id="yaml">
+        <div class="section-header">
+          <div class="section-num">SECTION 02</div>
+          <h2>YAMLフロントマター — 全フィールド詳解</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <p>
+          YAMLフロントマターは、エージェントのスキル選択ロジック全体の<strong>唯一の手がかり</strong>となる。各フィールドの仕様と制約を正確に理解することが、信頼性の高いスキル構築の前提となる。
+        </p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots">
+              <div class="code-dot"></div>
+              <div class="code-dot"></div>
+              <div class="code-dot"></div>
+            </div>
+            <div class="code-lang">YAML — フロントマター完全例</div>
+          </div>
+          <div class="code-content">
+            <pre><span class="hl-comment">---</span>
+<span class="hl-key">name</span>: <span class="hl-str">security-audit</span>               <span class="hl-comment"># ⚠️ 最大64文字。小文字英数字とハイフンのみ</span>
+<span class="hl-key">description</span>: <span class="hl-str">&gt;</span>                          <span class="hl-comment"># ⚠️ 最大1024文字。三人称視点で記述</span>
+  <span class="hl-str">プロジェクト全体のセキュリティ監査を行う。</span>
+  <span class="hl-str">「セキュリティをチェックして」「脆弱性を探して」</span>
+  <span class="hl-str">「OWASP Top 10 で確認して」といった発話で使用する。</span>
+  <span class="hl-str">Pull Request のレビュー前にも自動で使用すること。</span>
+<span class="hl-key">allowed-tools</span>:                       <span class="hl-comment"># 使用可能ツールをホワイトリスト制限</span>
+  - <span class="hl-str">Read</span>
+  - <span class="hl-str">Grep</span>
+  - <span class="hl-str">Glob</span>
+<span class="hl-key">invocation</span>: <span class="hl-str">automatic</span>                <span class="hl-comment"># automatic(デフォルト) | explicit</span>
+<span class="hl-key">disable-model-invocation</span>: <span class="hl-num">false</span>      <span class="hl-comment"># true にすると /コマンドのみ実行可</span>
+<span class="hl-key">context</span>: <span class="hl-str">fork</span>                        <span class="hl-comment"># fork | inherit（省略でinherit）</span>
+<span class="hl-key">agent</span>: <span class="hl-str">Explore</span>                       <span class="hl-comment"># general-purpose | Explore | Plan</span>
+<span class="hl-key">dependencies</span>:                        <span class="hl-comment"># 必要パッケージ（オプション）</span>
+  - <span class="hl-str">python&gt;=3.8</span>
+<span class="hl-comment">---</span></pre>
+          </div>
+        </div>
+
+        <h3>フィールド仕様一覧</h3>
+
+        <div class="field-card">
+          <div class="field-name"><code>name</code> <span class="field-required">必須</span></div>
+          <div class="field-constraint">
+            最大64文字 | 文字種: [a-z0-9-] | 予約語禁止: anthropic, claude
+          </div>
+          <div class="field-desc">
+            スラッシュコマンドの名前になる（<code>/security-audit</code>）。命名規則は
+            <strong>動名詞パターン</strong>（<code>processing-pdfs</code>,
+            <code>reviewing-code</code>）が公式推奨。
+          </div>
+        </div>
+
+        <div class="field-card">
+          <div class="field-name">
+            <code>description</code> <span class="field-required">必須</span>
+          </div>
+          <div class="field-constraint">最大1024文字 | XMLタグ禁止 | 三人称視点で記述</div>
+          <div class="field-desc">
+            エージェントが「いつこのスキルを起動すべきか」を判断する<strong>唯一の情報源</strong>。実行する内容だけでなく、具体的なトリガーキーワードや状況を詳細に含めること。エージェントは「やや起動したがらない」傾向があるため、やや強引に書くことが推奨される。
+          </div>
+        </div>
+
+        <div class="field-card">
+          <div class="field-name">
+            <code>allowed-tools</code> <span class="field-optional">任意</span>
+          </div>
+          <div class="field-constraint">配列形式 | 省略すると全ツールが使用可</div>
+          <div class="field-desc">
+            スキル実行中にエージェントがアクセスできるツールを制限するホワイトリスト。読み取り専用スキルには
+            <code>[Read, Grep, Glob]</code> のみ許可するセーフモードが推奨される。
+          </div>
+        </div>
+
+        <div class="field-card">
+          <div class="field-name">
+            <code>disable-model-invocation</code> <span class="field-optional">任意</span>
+          </div>
+          <div class="field-constraint">boolean | デフォルト: false</div>
+          <div class="field-desc">
+            <code>true</code> にすると Claude の自動判断による起動を完全に無効化し、ユーザーが
+            <code>/スキル名</code>
+            と明示的に入力した場合のみ実行される。本番デプロイ等の<strong>破壊的操作</strong>を持つスキルに必須。
+          </div>
+        </div>
+
+        <div class="field-card">
+          <div class="field-name">
+            <code>context</code> <span class="field-optional">任意</span>
+          </div>
+          <div class="field-constraint">inherit（デフォルト） | fork</div>
+          <div class="field-desc">
+            <code>fork</code>
+            にすると、メインの会話コンテキストとは独立した環境でタスクを実行。詳細は Section 05
+            で解説。
+          </div>
+        </div>
+
+        <div class="field-card">
+          <div class="field-name"><code>agent</code> <span class="field-optional">任意</span></div>
+          <div class="field-constraint">general-purpose | Explore | Plan</div>
+          <div class="field-desc">
+            <code>context: fork</code>
+            使用時に、起動するサブエージェントの種類を指定。コードベース探索には
+            <code>Explore</code>、計画策定には <code>Plan</code>、汎用タスクには
+            <code>general-purpose</code>。
+          </div>
+        </div>
+
+        <div class="field-card">
+          <div class="field-name">
+            <code>dependencies</code> <span class="field-optional">任意</span>
+          </div>
+          <div class="field-constraint">配列形式 | semver対応</div>
+          <div class="field-desc">
+            スキルの実行に必要なソフトウェアパッケージを明示する。エンタープライズ展開時の依存関係管理に活用できる。
+          </div>
+        </div>
+
+        <div class="mermaid-wrap">
+<!-- prettier-ignore -->
+          <div class="mermaid">
+graph LR
+A["invocation: automatic<br>Claudeが自動判断"] --> C{"実行判定"}
+B["disable-model-invocation: true<br>手動コマンドのみ"] --> C
+C --> D["context: inherit<br>メイン会話に統合"]
+C --> E["context: fork<br>独立したサブコンテキスト"]
+E --> F["agent: general-purpose"]
+E --> G["agent: Explore<br>コードベース探索特化"]
+E --> H["agent: Plan<br>計画策定特化"]
+style A fill:#1a4040,stroke:#4fd1c5,color:#ffffff
+style B fill:#4a1a1a,stroke:#fc8181,color:#ffffff
+style D fill:#1a3a5c,stroke:#63b3ed,color:#ffffff
+style E fill:#2d1f4a,stroke:#b794f4,color:#ffffff
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Section 03 ── -->
+      <div class="section" id="instruction">
+        <div class="section-header">
+          <div class="section-num">SECTION 03</div>
+          <h2>インストラクション設計 — 自由度のコントロール</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <p>
+          インストラクション本文の設計において最も重要な原則は、タスクの特性に応じて<strong>エージェントへの裁量の幅（自由度）</strong>を適切にコントロールすることだ。
+        </p>
+
+        <div class="quadrant-wrap">
+          <div class="chart-title" style="text-align: center; margin-bottom: 16px">
+            エージェント自由度 vs タスクの破壊性（リスク）
+          </div>
+          <div class="quadrant-container">
+            <!-- 4象限の背景 -->
+            <div class="quad-bg quad-tl">
+              <span>推奨: 厳密手順<br />+ ガードレール</span>
+            </div>
+            <div class="quad-bg quad-tr">
+              <span>⚠️ 危険ゾーン<br />（避けるべき）</span>
+            </div>
+            <div class="quad-bg quad-bl">
+              <span>✅ OK<br />ガイドラインで十分</span>
+            </div>
+            <div class="quad-bg quad-br">
+              <span>✅ 最適<br />高い自由度を活用</span>
+            </div>
+            <!-- 軸ラベル -->
+            <div class="quad-axis-x-left">← 低い自由度（厳密手順）</div>
+            <div class="quad-axis-x-right">高い自由度（ガイドライン）→</div>
+            <div class="quad-axis-y-top">高リスク ↑</div>
+            <div class="quad-axis-y-bottom">↓ 低リスク</div>
+            <!-- プロット点 -->
+            <div
+              class="quad-dot" role="button" tabindex="0" aria-label="DBマイグレーション"
+              style="left: 15%; top: 10%"
+              data-label="DBマイグレーション"
+              data-color="var(--accent-red)"
+            ></div>
+            <div
+              class="quad-dot" role="button" tabindex="0" aria-label="本番デプロイ"
+              style="left: 15%; top: 18%"
+              data-label="本番デプロイ"
+              data-color="var(--accent-red)"
+            ></div>
+            <div
+              class="quad-dot" role="button" tabindex="0" aria-label="セキュリティスキャン"
+              style="left: 50%; top: 43%"
+              data-label="セキュリティスキャン"
+              data-color="var(--accent-orange)"
+            ></div>
+            <div
+              class="quad-dot" role="button" tabindex="0" aria-label="コードレビュー"
+              style="left: 70%; top: 72%"
+              data-label="コードレビュー"
+              data-color="var(--accent-cyan)"
+            ></div>
+            <div
+              class="quad-dot" role="button" tabindex="0" aria-label="テキスト要約"
+              style="left: 85%; top: 78%"
+              data-label="テキスト要約"
+              data-color="var(--accent-green)"
+            ></div>
+            <div
+              class="quad-dot" role="button" tabindex="0" aria-label="READMEアップデート"
+              style="left: 78%; top: 75%"
+              data-label="READMEアップデート"
+              data-color="var(--accent-green)"
+            ></div>
+          </div>
+          <div class="quad-legend">
+            <span class="legend-item"
+              ><span class="legend-dot" style="background: var(--accent-red)"></span>Low Freedom
+              必須</span
+            >
+            <span class="legend-item"
+              ><span class="legend-dot" style="background: var(--accent-orange)"></span>Medium
+              Freedom</span
+            >
+            <span class="legend-item"
+              ><span class="legend-dot" style="background: var(--accent-cyan)"></span>High Freedom
+              推奨</span
+            >
+            <span class="legend-item"
+              ><span class="legend-dot" style="background: var(--accent-green)"></span>High Freedom
+              最適</span
+            >
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-title"><span class="tag tag-green">High Freedom</span></div>
+            <p style="font-size: 13px">
+              テキスト要約・コードレビューなど、複数のアプローチが許容されるタスク。<strong>高レベルなガイドライン</strong>を与え、エージェントの推論能力を最大活用。
+            </p>
+            <div style="font-size: 12px; color: var(--text-muted)">
+              → 「〇〇の観点でレビューせよ」
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="tag tag-orange">Medium Freedom</span></div>
+            <p style="font-size: 13px">
+              定型レポート生成など、好ましいフォーマットが存在するタスク。<strong>テンプレートやパラメータ化された擬似コード</strong>を提供。
+            </p>
+            <div style="font-size: 12px; color: var(--text-muted)">
+              → 出力テンプレートを明示する
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="tag tag-red">Low Freedom</span></div>
+            <p style="font-size: 13px">
+              DBマイグレーション・本番デプロイなど、わずかなミスが致命的なタスク。<strong>判断の余地を一切与えず</strong>、厳密な手順書と検証ガードレールのみ。
+            </p>
+            <div style="font-size: 12px; color: var(--text-muted)">
+              → スクリプトと検証ステップを明示
+            </div>
+          </div>
+        </div>
+
+        <h3>ファイル参照の設計ルール</h3>
+        <div class="callout callout-warn">
+          <span class="callout-icon">⚠️</span>
+          <strong>重要：</strong>外部ファイル参照は必ず「1階層（One level
+          deep）」に留めること。<code>SKILL.md → A.md → B.md</code>
+          のような深いネスト構造は、エージェントのプレビュー読み込み時に情報が不完全になるリスクを生む。
+        </div>
+
+        <div class="mermaid-wrap">
+<!-- prettier-ignore -->
+          <div class="mermaid">
+graph TD
+S["SKILL.md<br>本文 500行未満"] --> R1["references/api-spec.md<br>詳細なAPI仕様"]
+S --> R2["references/style-guide.md<br>コーディング規約"]
+S --> SC["scripts/validate.sh<br>検証スクリプト"]
+R1 -. NG ネスト禁止 .-> R3["references/detail/deep.md"]
+R2 -. NG ネスト禁止 .-> R4["references/sub/more.md"]
+style S fill:#1a4040,stroke:#4fd1c5,color:#ffffff
+style R1 fill:#1a3a5c,stroke:#63b3ed,color:#ffffff
+style R2 fill:#1a3a5c,stroke:#63b3ed,color:#ffffff
+style SC fill:#2d1f4a,stroke:#b794f4,color:#ffffff
+style R3 fill:#4a1a1a,stroke:#fc8181,color:#ffffff
+style R4 fill:#4a1a1a,stroke:#fc8181,color:#ffffff
+          </div>
+        </div>
+
+        <h3>推奨ファイル構造（完全形）</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots">
+              <div class="code-dot"></div>
+              <div class="code-dot"></div>
+              <div class="code-dot"></div>
+            </div>
+            <div class="code-lang">Directory Structure</div>
+          </div>
+          <div class="code-content">
+            <pre><span class="hl-str">~/.claude/skills/security-audit/</span>
+<span class="hl-comment">├── SKILL.md              ← 本体（500行未満）</span>
+<span class="hl-comment">├── references/</span>
+<span class="hl-comment">│   ├── owasp-top10.md    ← 参照資料（TOC必須）</span>
+<span class="hl-comment">│   └── severity-matrix.md</span>
+<span class="hl-comment">└── scripts/</span>
+<span class="hl-comment">    ├── scan.sh           ← Claudeが実行するスクリプト</span>
+<span class="hl-comment">    └── report.py         ← レポート生成</span></pre>
+          </div>
+        </div>
+        <div class="callout callout-tip">
+          <span class="callout-icon">✅</span>
+          100行を超える参照ファイルには、ファイル冒頭に<strong>目次（TOC）</strong>を設置すること。エージェントがファイル全体のスコープを正確に把握できるようになる。
+        </div>
+      </div>
+
+      <!-- ── Section 04 ── -->
+      <div class="section" id="args">
+        <div class="section-header">
+          <div class="section-num">SECTION 04</div>
+          <h2>動的コンテキスト注入 & 引数処理メカニズム</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <p>
+          SKILL.md
+          は静的なドキュメントではない。ユーザーからの引数を受け取り、実行前にシステムの最新状態をシェルスクリプトで取得する<strong>動的な実行基盤</strong>として機能する。
+        </p>
+
+        <h3>引数処理の3パターン</h3>
+
+        <div class="steps">
+          <div class="step" data-n="1">
+            <div class="step-title">$ARGUMENTS — 全引数を一括受け取り</div>
+            <p>
+              ユーザーが <code>/skill-name src/main.py</code> と入力した際、<code>src/main.py</code>
+              の文字列が <code>$ARGUMENTS</code> として展開される。
+            </p>
+            <div class="code-block">
+              <div class="code-header">
+                <div class="code-dots">
+                  <div class="code-dot"></div>
+                  <div class="code-dot"></div>
+                  <div class="code-dot"></div>
+                </div>
+                <div class="code-lang">SKILL.md — $ARGUMENTS 使用例</div>
+              </div>
+              <div class="code-content">
+                <pre><span class="hl-head">## 解析対象ファイル</span>
+
+ユーザーが指定したファイルを解析せよ: <span class="hl-tag">$ARGUMENTS</span>
+
+指定がない場合は現在のディレクトリ全体を対象とする。</pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="step" data-n="2">
+            <div class="step-title">$1, $2, $3 — 位置パラメータで個別受け取り</div>
+            <p>複数の引数を個別に処理したい場合に使用。シェルスクリプトと同様の記法。</p>
+            <div class="code-block">
+              <div class="code-header">
+                <div class="code-dots">
+                  <div class="code-dot"></div>
+                  <div class="code-dot"></div>
+                  <div class="code-dot"></div>
+                </div>
+                <div class="code-lang">SKILL.md — 位置パラメータ使用例</div>
+              </div>
+              <div class="code-content">
+                <pre><span class="hl-comment"># 呼び出し例: /deploy production v2.1.3</span>
+
+<span class="hl-head">## デプロイ設定</span>
+
+- 対象環境: <span class="hl-tag">$1</span>       <span class="hl-comment"># production</span>
+- バージョン: <span class="hl-tag">$2</span>      <span class="hl-comment"># v2.1.3</span>
+- 追加オプション: <span class="hl-tag">$3</span>   <span class="hl-comment"># （未指定の場合は空）</span></pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="step" data-n="3">
+            <div class="step-title">! `command` — 動的コンテキスト事前注入（最強）</div>
+            <p>
+              これが最も強力なメカニズム。感嘆符 +
+              バッククォート構文を使うと、エージェントが本文を認識する<strong>前</strong>のプリプロセッシング段階でシェルコマンドが実行され、その結果が本文にレンダリングされる。
+            </p>
+            <div class="callout callout-tip">
+              <span class="callout-icon">⚡</span>
+              エージェントへの「コマンドを実行して調べてください」という指示と、それに伴う推論ステップ・ツール呼び出しのレイテンシを<strong>完全に排除</strong>できる。
+            </div>
+            <div class="code-block">
+              <div class="code-header">
+                <div class="code-dots">
+                  <div class="code-dot"></div>
+                  <div class="code-dot"></div>
+                  <div class="code-dot"></div>
+                </div>
+                <div class="code-lang">SKILL.md — 動的コンテキスト注入の完全例</div>
+              </div>
+              <div class="code-content">
+                <pre><span class="hl-head">## 実行コンテキスト（プリプロセッシングで自動入力済み）</span>
+
+<span class="hl-comment"># ↓ エージェントが読み込む前に実際のシステム情報に置換される</span>
+現在のOS情報:
+<span class="hl-tag">! `uname -a`</span>
+
+最新のGitコミット:
+<span class="hl-tag">! `git log -1 --oneline`</span>
+
+現在のブランチ:
+<span class="hl-tag">! `git branch --show-current`</span>
+
+解析対象: <span class="hl-tag">$1</span>
+
+<span class="hl-comment"># ↑ エージェントはこの確定データに基づいて分析を開始する</span>
+<span class="hl-comment"># 自らコマンドを実行して確認するステップが不要になる</span>
+
+<span class="hl-head">## 指示</span>
+
+上記の確定したコンテキストを前提として、以下の分析を実施せよ...
+</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3>3パターンの比較</h3>
+        <div class="mermaid-wrap">
+<!-- prettier-ignore -->
+          <div class="mermaid">
+graph LR
+subgraph P1["ARGUMENTS - 全引数を一括受け取り"]
+A1["ユーザー入力テキスト全体<br>シンプルな用途に最適"]
+end
+subgraph P2["位置引数 1 2 3 - 個別受け取り"]
+A2["複数引数を個別に処理<br>順序が決まっている場合"]
+end
+subgraph P3["事前注入 - バッククォート構文"]
+A3["システム状態を事前確定<br>推論ステップを省略<br>最高精度 最低レイテンシ"]
+end
+P1 -- 基本 --> P2
+P2 -- 高度 --> P3
+style P1 fill:#1a3a5c,stroke:#63b3ed,color:#ffffff
+style P2 fill:#1a4040,stroke:#4fd1c5,color:#ffffff
+style P3 fill:#2d1f4a,stroke:#b794f4,color:#ffffff
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Section 05 ── -->
+      <div class="section" id="fork">
+        <div class="section-header">
+          <div class="section-num">SECTION 05</div>
+          <h2>context:fork vs カスタムSubagents — 境界線を引く</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <p>
+          「コンテキストを分離してタスクを実行する」という目的は共通だが、<strong>設計思想・予測可能性・デバッグ難易度</strong>が根本的に異なる。
+        </p>
+
+        <div class="mermaid-wrap">
+<!-- prettier-ignore -->
+          <div class="mermaid">
+sequenceDiagram
+participant User as ユーザー
+participant Main as メインコンテキスト
+participant Fork as フォークコンテキスト
+
+Note over User,Fork: context:fork パターン
+User->>Main: /security-audit 実行
+Main->>Fork: 現在のコンテキストをスナップショット
+Note over Fork: SKILL.md の手順を実行
+Fork-->>Main: 最終結果のみを返却
+Note over Main: 途中経過は破棄 メインは汚染されない
+Main-->>User: クリーンな監査レポート
+          </div>
+        </div>
+
+        <h3>詳細比較表</h3>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>比較項目</th>
+              <th>context: fork を用いたスキル</th>
+              <th>カスタムSubagents (.claude/agents/*.md)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>設計思想</td>
+              <td>定義済みワークフローを安全に一時分離実行</td>
+              <td>自律性の高いワークフローをゼロから定義・オーケストレーション</td>
+            </tr>
+            <tr>
+              <td>タスク定義</td>
+              <td>SKILL.md がそのまま指示書として機能</td>
+              <td>メインがその都度「委譲メッセージ」を動的生成</td>
+            </tr>
+            <tr>
+              <td>コンテキスト引き継ぎ</td>
+              <td>親のスナップショットをそのまま引き継ぐ</td>
+              <td>完全にクリーンな初期状態から開始</td>
+            </tr>
+            <tr>
+              <td>予測可能性</td>
+              <td><span class="tag tag-green">高い</span> — 入力・指示が固定</td>
+              <td><span class="tag tag-orange">低い</span> — 委譲メッセージが変化</td>
+            </tr>
+            <tr>
+              <td>デバッグ難易度</td>
+              <td><span class="tag tag-green">容易</span> — 原因究明が直線的</td>
+              <td><span class="tag tag-red">困難</span> — 挙動に揺らぎが出やすい</td>
+            </tr>
+            <tr>
+              <td>柔軟性・自律性</td>
+              <td><span class="tag tag-orange">低い</span> — バッチ処理的</td>
+              <td><span class="tag tag-green">高い</span> — 実行経路を動的に構築</td>
+            </tr>
+            <tr>
+              <td>推奨ユースケース</td>
+              <td>セキュリティ監査、ドキュメント生成、静的解析</td>
+              <td>複雑な意思決定が必要な多段階タスク</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>使い分けのフローチャート</h3>
+        <div class="mermaid-wrap">
+<!-- prettier-ignore -->
+          <div class="mermaid">
+flowchart TD
+A["タスクの性質を評価"] --> B{"手順は固定されているか？"}
+B -- Yes --> C{"メインのコンテキストを<br>汚染したくないか？"}
+B -- No --> D{"複雑な自律判断が<br>必要か？"}
+C -- Yes --> E["context: fork スキル<br>推奨 監査 分析 生成"]
+C -- No --> F["context: inherit スキル<br>通常のインライン実行"]
+D -- Yes --> G["カスタムSubagent<br>推奨 多段階タスク"]
+D -- No --> H["通常のスキルで十分"]
+style E fill:#1a4040,stroke:#4fd1c5,color:#ffffff
+style G fill:#2d1f4a,stroke:#b794f4,color:#ffffff
+          </div>
+        </div>
+
+        <h3>context:fork の実装例</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots">
+              <div class="code-dot"></div>
+              <div class="code-dot"></div>
+              <div class="code-dot"></div>
+            </div>
+            <div class="code-lang">YAML — context:fork 設定</div>
+          </div>
+          <div class="code-content">
+            <pre><span class="hl-comment">---</span>
+<span class="hl-key">name</span>: <span class="hl-str">security-audit</span>
+<span class="hl-key">description</span>: <span class="hl-str">プロジェクト全体のセキュリティ監査をバックグラウンドで実行する</span>
+<span class="hl-key">context</span>: <span class="hl-str">fork</span>           <span class="hl-comment"># ← メインコンテキストをスナップショット</span>
+<span class="hl-key">agent</span>: <span class="hl-str">Explore</span>          <span class="hl-comment"># ← コードベース探索に特化したサブエージェント</span>
+<span class="hl-key">disable-model-invocation</span>: <span class="hl-num">true</span>  <span class="hl-comment"># ← 意図しない自動起動を防止</span>
+<span class="hl-comment">---</span>
+
+<span class="hl-head"># セキュリティ監査プロセス</span>
+
+<span class="hl-comment"># このスキルは fork されたコンテキストで実行される</span>
+<span class="hl-comment"># すべての調査ログはメインに返さず、最終結果のみを返却する</span>
+
+現在のシステム情報: <span class="hl-tag">! `git log --since="1 week ago" --oneline`</span>
+
+<span class="hl-head">## 監査手順</span>
+
+1. OWASP Top 10 の各カテゴリに従ってコードをスキャン
+2. `references/severity-matrix.md` に基づいて重大度を評価
+3. 検証スクリプトを実行: <span class="hl-tag">! `scripts/scan.sh`</span>
+4. 結果を Markdown テーブル形式で返却する</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Section 06 ── -->
+      <div class="section" id="trigger">
+        <div class="section-header">
+          <div class="section-num">SECTION 06</div>
+          <h2>トリガーチューニング戦略</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <p>
+          スキルが期待通りにトリガーされないケースは大きく2種類に分類できる。それぞれに対して異なるアプローチが必要だ。
+        </p>
+
+        <div class="mermaid-wrap">
+<!-- prettier-ignore -->
+          <div class="mermaid">
+graph TD
+A["スキルのトリガー問題"] --> B["アンダートリガー<br>発動すべき状況で不発"]
+A --> C["オーバートリガー<br>無関係な文脈で誤発動"]
+B --> B1["原因: description が曖昧<br>語彙的な乖離"]
+B --> B2["解決: トリガーキーワードを追加<br>同義語 専門用語を列挙"]
+C --> C1["原因: description が広範すぎる<br>一般的すぎる単語"]
+C --> C2["解決: 条件を絞り込む<br>ネガティブトリガーを追加"]
+style B fill:#4a1a1a,stroke:#fc8181,color:#ffffff
+style C fill:#3a2a00,stroke:#f6ad55,color:#ffffff
+style B2 fill:#1a4040,stroke:#4fd1c5,color:#ffffff
+style C2 fill:#1a4040,stroke:#4fd1c5,color:#ffffff
+          </div>
+        </div>
+
+        <div class="trigger-grid">
+          <div class="trigger-box under">
+            <div class="trigger-type">❌ アンダートリガー（不発）</div>
+            <p style="font-size: 13px">
+              本来スキルで処理すべき要求に対して、通常の推論のみで対処しようとし失敗する。ユーザーが手動で
+              <code>/skill-name</code> を入力しなければならない状態。
+            </p>
+            <div class="compare-box bad" style="margin-top: 10px">
+              <div class="compare-label">❌ 悪い description</div>
+              <p style="font-size: 12px">「デプロイメントのチェックリストを生成する」</p>
+            </div>
+            <div class="compare-box good" style="margin-top: 10px">
+              <div class="compare-label">✅ 改善後</div>
+              <p style="font-size: 12px">
+                「デプロイメントのチェックリストを生成する。ユーザーが<strong>『デプロイ』『ローンチ』『本番環境へ反映』『リリースの準備ができたか』</strong>などに言及した場合、明示的にチェックリストを要求されていなくても、必ずこのスキルを自動で使用して検証プロセスを開始すること」
+              </p>
+            </div>
+          </div>
+          <div class="trigger-box over">
+            <div class="trigger-type">⚠️ オーバートリガー（誤発動）</div>
+            <p style="font-size: 13px">
+              全く関係のない質問に対して意図せずスキルが起動し、会話の文脈が破壊される。ユーザーがスキル自体を無効化してしまう原因になる。
+            </p>
+            <div class="compare-box bad" style="margin-top: 10px">
+              <div class="compare-label">❌ 悪い description</div>
+              <p style="font-size: 12px">「コードに関することなら何でも使用する」</p>
+            </div>
+            <div class="compare-box good" style="margin-top: 10px">
+              <div class="compare-label">✅ 改善後（ネガティブトリガー追加）</div>
+              <p style="font-size: 12px">
+                「...コードの<strong>セキュリティ脆弱性</strong>を調査するときに使用する。機能の説明や一般的なコーディング質問の場合は<strong>使用しないこと</strong>」
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <h3>Description チューニングのベストプラクティス</h3>
+        <div class="card">
+          <ol style="font-size: 14px; color: var(--text-secondary)">
+            <li style="margin-bottom: 10px">
+              実行する内容だけでなく、<strong>具体的なトリガーキーワード</strong>（ユーザーが自然言語で入力しそうな言葉）を列挙する
+            </li>
+            <li style="margin-bottom: 10px">
+              関連する<strong>技術的専門用語の同義語</strong>を複数含める（例：「デプロイ」「ローンチ」「リリース」「本番反映」）
+            </li>
+            <li style="margin-bottom: 10px">
+              <strong>明示的に要求されなくても起動すべき状況</strong
+              >を記述する（「〜に言及した場合は〜すること」）
+            </li>
+            <li style="margin-bottom: 10px">
+              <strong>ネガティブトリガー</strong>で誤発動を防ぐ（「〜の場合は使用しないこと」）
+            </li>
+            <li>
+              エージェントはやや起動したがらない傾向のため、<strong>「やや強引」</strong>に記述することが推奨されている
+            </li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- ── Section 07 ── -->
+      <div class="section" id="debug">
+        <div class="section-header">
+          <div class="section-num">SECTION 07</div>
+          <h2>デバッグ技術 — CLI フラグ完全リファレンス</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <p>
+          スキルが期待通りに動作しない場合、Claude Code の CLI
+          フラグを使用してエージェントのブラックボックス化された推論プロセスを可視化できる。
+        </p>
+
+        <div class="flag-card">
+          <div class="flag-name">--debug</div>
+          <div>
+            <div
+              style="
+                font-size: 14px;
+                color: var(--text-primary);
+                font-weight: 500;
+                margin-bottom: 6px;
+              "
+            >
+              フルデバッグモード
+            </div>
+            <div style="font-size: 13px; color: var(--text-secondary)">
+              システム全体のデバッグを有効化。エージェントがどのスキルを評価し、どのツールを呼び出し、どのようなプロンプトを構築しているかの詳細なログをターミナルにストリーミング出力する。
+            </div>
+            <div class="code-block" style="margin-top: 10px">
+              <div class="code-content">
+                <pre>claude <span class="hl-tag">--debug</span>
+<span class="hl-comment"># ← スキルが起動しない原因、スクリプト実行エラーの特定に最適</span></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flag-card">
+          <div class="flag-name">--debug "api,hooks"</div>
+          <div>
+            <div
+              style="
+                font-size: 14px;
+                color: var(--text-primary);
+                font-weight: 500;
+                margin-bottom: 6px;
+              "
+            >
+              カテゴリ絞り込みデバッグ
+            </div>
+            <div style="font-size: 13px; color: var(--text-secondary)">
+              特定のログカテゴリのみにフィルタリングして表示。感嘆符で除外も可能。
+            </div>
+            <div class="code-block" style="margin-top: 10px">
+              <div class="code-content">
+                <pre>claude <span class="hl-tag">--debug</span> <span class="hl-str">"api,hooks"</span>   <span class="hl-comment"># API通信とフック処理のみ</span>
+claude <span class="hl-tag">--debug</span> <span class="hl-str">"!statsig"</span>    <span class="hl-comment"># statsig ログを除外</span></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flag-card">
+          <div class="flag-name">--disable-slash-commands</div>
+          <div>
+            <div
+              style="
+                font-size: 14px;
+                color: var(--text-primary);
+                font-weight: 500;
+                margin-bottom: 6px;
+              "
+            >
+              スキル一時無効化
+            </div>
+            <div style="font-size: 13px; color: var(--text-secondary)">
+              現在のセッションにおいて全スキルとスラッシュコマンドを強制無効化。特定スキルが干渉していないか切り分けるための一時的な回避策。
+            </div>
+            <div class="code-block" style="margin-top: 10px">
+              <div class="code-content">
+                <pre>claude <span class="hl-tag">--disable-slash-commands</span>
+<span class="hl-comment"># ← スキルが干渉してピュアなLLM対話が妨げられている場合</span></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flag-card">
+          <div class="flag-name">--disallowedTools</div>
+          <div>
+            <div
+              style="
+                font-size: 14px;
+                color: var(--text-primary);
+                font-weight: 500;
+                margin-bottom: 6px;
+              "
+            >
+              ツール強制禁止
+            </div>
+            <div style="font-size: 13px; color: var(--text-secondary)">
+              指定したツールをモデルのコンテキストから完全削除。開発中に破壊的なコマンドを絶対に実行させないための強力なセーフティネット。
+            </div>
+            <div class="code-block" style="margin-top: 10px">
+              <div class="code-content">
+                <pre>claude <span class="hl-tag">--disallowedTools</span> <span class="hl-str">"Bash(git push *)"</span> <span class="hl-str">"Edit"</span>
+<span class="hl-comment"># ← git push と直接ファイル編集を完全禁止</span></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3>デバッグフロー</h3>
+        <div class="mermaid-wrap">
+<!-- prettier-ignore -->
+          <div class="mermaid">
+flowchart TD
+A["スキルが期待通りに動かない"] --> B{"どの段階で失敗？"}
+B --> C["スキルがトリガーされない<br>トリガーフェーズ"]
+B --> D["スキルは起動するが<br>出力が不正確 実行フェーズ"]
+C --> C1["--debug で確認<br>どのスキルを評価したか？"]
+C1 --> C2{"description に<br>トリガーワードあるか？"}
+C2 -- No --> C3["description を書き直す<br>キーワード 同義語を追加"]
+C2 -- Yes --> C4["/skill-name で手動実行<br>ファイルパスの確認"]
+D --> D1["--debug api,hooks で<br>実行ログを詳細確認"]
+D1 --> D2["インストラクション内に<br>エラーハンドリングを追加"]
+D2 --> D3["フィードバックループを<br>本文に明示する"]
+style C fill:#4a1a1a,stroke:#fc8181,color:#ffffff
+style D fill:#3a2a00,stroke:#f6ad55,color:#ffffff
+style C3 fill:#1a4040,stroke:#4fd1c5,color:#ffffff
+style D3 fill:#1a4040,stroke:#4fd1c5,color:#ffffff
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Section 08 ── -->
+      <div class="section" id="enterprise">
+        <div class="section-header">
+          <div class="section-num">SECTION 08</div>
+          <h2>Enterpriseプロビジョニング — 組織全体への展開</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <p>
+          TeamプランおよびEnterpriseプランでは、管理者が検証済みスキルを全社に一括展開できる。個人スキルと比較して、<strong>セキュリティ・コンプライアンス・運用管理</strong>の観点が加わる。
+        </p>
+
+        <div class="callout callout-danger">
+          <span class="callout-icon">🔐</span>
+          <strong>前提条件：</strong
+          >プロビジョニングを実行するには、組織レベルで「コード実行とファイル作成（Code execution
+          and file creation）」機能が明示的に有効化されている必要がある。
+        </div>
+
+        <h3>プロビジョニング手順</h3>
+        <div class="steps">
+          <div class="step" data-n="1">
+            <div class="step-title">スキルのパッケージ化</div>
+            <p>
+              スキルディレクトリ全体を、<strong
+                >ディレクトリ名と完全一致する名前の ZIP ファイル</strong
+              >に圧縮する。ZIP のルート階層がスキルディレクトリ自体であることを確認する。
+            </p>
+            <div class="code-block">
+              <div class="code-content">
+                <pre><span class="hl-comment"># 正しい構造の確認</span>
+unzip -l team-reviewer.zip
+<span class="hl-comment"># 期待される出力:</span>
+<span class="hl-str">team-reviewer/SKILL.md</span>
+<span class="hl-str">team-reviewer/references/checklist.md</span>
+<span class="hl-str">team-reviewer/scripts/lint.sh</span>
+
+<span class="hl-comment"># ZIPを作成</span>
+cd ~/.claude/skills
+zip -r team-reviewer.zip team-reviewer/</pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="step" data-n="2">
+            <div class="step-title">アップロードと展開</div>
+            <p>
+              管理者が
+              <strong>Organization settings &gt; Skills</strong> にナビゲートし、「Organization
+              skills」セクションから ZIP ファイルをアップロード。
+            </p>
+            <div class="callout callout-info">
+              <span class="callout-icon">ℹ️</span>
+              アップロード後、全ユーザーの環境に即座にプロビジョニングされる。ロールバックは ZIP
+              を削除することで実行可能。
+            </div>
+          </div>
+
+          <div class="step" data-n="3">
+            <div class="step-title">デフォルトステータスの戦略設計</div>
+            <p>各スキルを「デフォルト有効」か「デフォルト無効」かを選択する。</p>
+            <div class="mermaid-wrap">
+<!-- prettier-ignore -->
+              <div class="mermaid">
+graph LR
+subgraph ON["デフォルト 有効"]
+A1["コーディング規約チェッカー"]
+A2["ドキュメント生成フォーマッター"]
+A3["コミットメッセージ検証"]
+end
+subgraph OFF["デフォルト 無効 User Control"]
+B1["本番DBマイグレーション"]
+B2["インフラデプロイ"]
+B3["クレデンシャル管理"]
+end
+style ON fill:#1a4040,stroke:#4fd1c5,color:#ffffff
+style OFF fill:#4a1a1a,stroke:#fc8181,color:#ffffff
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3>ネットワーク制御オプション</h3>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>設定</th>
+              <th>説明</th>
+              <th>推奨ユースケース</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>完全オフライン</td>
+              <td>外部通信を一切ブロックするサンドボックス環境</td>
+              <td>機密プロジェクト・金融機関・政府機関</td>
+            </tr>
+            <tr>
+              <td>パッケージマネージャー限定</td>
+              <td>npm / PyPI 等の指定リポジトリのみ許可</td>
+              <td>一般企業の開発環境</td>
+            </tr>
+            <tr>
+              <td>ドメインリスト制御</td>
+              <td>ホワイトリスト/ブラックリストによる細粒度制御</td>
+              <td>外部API連携が必要な場合</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── Section 09 ── -->
+      <div class="section" id="self">
+        <div class="section-header">
+          <div class="section-num">SECTION 09</div>
+          <h2>自己改善型スキル — 最先端パターン</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <p>
+          コミュニティで実践が始まっている最先端のアプローチ。スキル実行後に「リフレクションスキル」を走らせ、<strong
+            >エージェント自身が SKILL.md を書き換えてアップデート</strong
+          >するループを構築する。
+        </p>
+
+        <div class="mermaid-wrap">
+<!-- prettier-ignore -->
+          <div class="mermaid">
+graph TD
+A["タスク実行スキル<br>通常のSKILL.md"] -->|完了| B["リフレクションスキルを起動"]
+B --> C["直前のGitログ エラー履歴を分析<br>git log と エラーログ確認"]
+C --> D{"改善点の検出"}
+D -- あり --> E["SKILL.md を自動書き換え<br>手順 ルール キーワードを更新"]
+D -- なし --> F["変更なしで終了"]
+E --> A
+style A fill:#1a4040,stroke:#4fd1c5,color:#ffffff
+style B fill:#2d1f4a,stroke:#b794f4,color:#ffffff
+style E fill:#1a3a5c,stroke:#63b3ed,color:#ffffff
+          </div>
+        </div>
+
+        <div class="callout callout-tip">
+          <span class="callout-icon">🚀</span>
+          <strong>なぜ強力か：</strong>SKILL.md
+          は自然言語の集まりであり、プログラムコードの修正と異なり、コンパイルエラーや依存関係の破壊を気にせず、数行の文章を追加するだけで安全かつ容易にエージェントの振る舞いを進化させられる。
+        </div>
+
+        <h3>リフレクションスキルの実装例</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots">
+              <div class="code-dot"></div>
+              <div class="code-dot"></div>
+              <div class="code-dot"></div>
+            </div>
+            <div class="code-lang">~/.claude/skills/reflect-and-improve/SKILL.md</div>
+          </div>
+          <div class="code-content">
+            <pre><span class="hl-comment">---</span>
+<span class="hl-key">name</span>: <span class="hl-str">reflect-and-improve</span>
+<span class="hl-key">description</span>: <span class="hl-str">&gt;</span>
+  <span class="hl-str">タスク完了後に呼び出され、直前のセッションを振り返り、</span>
+  <span class="hl-str">使用されたスキルの SKILL.md を自動改善する。</span>
+  <span class="hl-str">「改善して」「学習させて」と言われた場合に使用する。</span>
+<span class="hl-key">allowed-tools</span>: [<span class="hl-str">Read</span>, <span class="hl-str">Write</span>, <span class="hl-str">Bash</span>]
+<span class="hl-key">disable-model-invocation</span>: <span class="hl-num">true</span>   <span class="hl-comment"># 明示的呼び出しのみ</span>
+<span class="hl-comment">---</span>
+
+<span class="hl-head"># リフレクション & 自己改善プロセス</span>
+
+<span class="hl-head">## 収集するコンテキスト</span>
+
+最近の Git ログ（直前20件）:
+<span class="hl-tag">! `git log -20 --oneline 2>/dev/null || echo "Not a git repo"`</span>
+
+エラーログ（存在する場合）:
+<span class="hl-tag">! `cat ~/.claude/skill-errors.log 2>/dev/null || echo "No error log"`</span>
+
+<span class="hl-head">## 改善手順</span>
+
+1. 上記のログから繰り返し発生しているパターンを分析する
+2. 改善が必要な SKILL.md を特定する
+3. 以下の観点で改善案を策定する:
+   - description にキーワードが不足していないか？
+   - 手順に抜けがないか？
+   - エラーが繰り返す箇所にガードレールを追加できるか？
+4. ユーザーに改善案を提示し、承認を得てから SKILL.md を更新する
+
+<span class="hl-head">## 注意事項</span>
+
+- 必ず変更前後の diff を提示する
+- ユーザーの明示的な承認なしに SKILL.md を書き換えないこと</pre>
+          </div>
+        </div>
+
+        <h3>中級者が今すぐ実践すべきアクション</h3>
+        <div class="card">
+          <div class="steps">
+            <div class="step" data-n="1">
+              <div class="step-title">日常業務から反復タスクを1つ選ぶ</div>
+              <p>入力と出力の形式が決まっており、かつ反復的なタスクを特定する。</p>
+            </div>
+            <div class="step" data-n="2">
+              <div class="step-title">/skill-creator でスキルを自動生成する</div>
+              <p>
+                組み込みメタスキルを使うことで、公式ベストプラクティスに準拠した雛形を数分で生成できる。
+              </p>
+            </div>
+            <div class="step" data-n="3">
+              <div class="step-title">実運用でトリガー挙動を観察する</div>
+              <p>
+                <code>--debug</code> フラグを使い、アンダートリガー・オーバートリガーを検出して
+                description をチューニングする。
+              </p>
+            </div>
+            <div class="step" data-n="4">
+              <div class="step-title">エラーハンドリングとガードレールを追加する</div>
+              <p>
+                実際のエラーパターンに基づき、インストラクション内にフィードバックループと検証ステップを組み込む。
+              </p>
+            </div>
+            <div class="step" data-n="5">
+              <div class="step-title">リフレクションスキルで自己改善ループを構築する</div>
+              <p>
+                セッション後に自動的に SKILL.md
+                をアップデートする仕組みを導入し、継続的に品質を高める。
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Footer ── -->
+      <div class="footer">
+        <p>Claude Code SKILL.md 中級者完全攻略ガイド</p>
+        <p style="margin-top: 6px; font-size: 12px">Claude Code v2.1.x 対応 ｜ 2026年3月更新</p>
+        <p style="margin-top: 12px; font-size: 11px; color: var(--text-muted)">
+          参考:
+          <a
+            href="https://code.claude.com/docs/en/skills"
+            style="color: var(--accent-blue); text-decoration: none"
+            >code.claude.com/docs/en/skills</a
+          >
+          ｜
+          <a
+            href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview"
+            style="color: var(--accent-blue); text-decoration: none"
+            >Agent Skills Overview</a
+          >
+        </p>
+      </div>
+    </div>
+    <!-- /wrapper -->
+
+    <script>
+      // ─────────────────────────────────────────────
+      // Mermaid: render with generous base config
+      // ─────────────────────────────────────────────
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        themeVariables: {
+          background: '#0e1420',
+          primaryColor: '#1e3a5c',
+          primaryTextColor: '#f0f6ff',
+          primaryBorderColor: '#79c0ff',
+          lineColor: '#7090b0',
+          secondaryColor: '#1a4040',
+          tertiaryColor: '#2d1f4a',
+          noteBkgColor: '#1e3050',
+          noteTextColor: '#f0f6ff',
+          noteBorderColor: '#79c0ff',
+          actorBkg: '#1c2f4a',
+          actorBorder: '#79c0ff',
+          actorTextColor: '#f0f6ff',
+          actorLineColor: '#79c0ff',
+          signalColor: '#56d8c8',
+          signalTextColor: '#f0f6ff',
+          labelBoxBkgColor: '#161b24',
+          labelBoxBorderColor: '#7090b0',
+          labelTextColor: '#f0f6ff',
+          loopTextColor: '#f0f6ff',
+          activationBorderColor: '#79c0ff',
+          activationBkgColor: '#1e3a5c',
+          sequenceNumberColor: '#f0f6ff',
+          fontSize: '20px',
+          fontFamily: '"Noto Sans JP", sans-serif',
+        },
+        flowchart: {
+          curve: 'basis',
+          padding: 32,
+          nodeSpacing: 60,
+          rankSpacing: 70,
+          htmlLabels: true,
+        },
+        sequence: {
+          actorMargin: 80,
+          boxMargin: 16,
+          fontSize: 18,
+          actorFontSize: 18,
+          noteFontSize: 16,
+          messageMargin: 35,
+          mirrorActors: false,
+        },
+        fontSize: 20,
+      });
+
+      // ─────────────────────────────────────────────
+      // Scale: after render, expand SVG width/height
+      // attributes directly — viewBox stays intact so
+      // the browser scales ALL content proportionally.
+      // This is the only reliable way to resize Mermaid SVGs.
+      // ─────────────────────────────────────────────
+      const MERMAID_SCALE = 0.7;
+
+      function expandMermaidSvgs() {
+        document.querySelectorAll('.mermaid-wrap .mermaid svg').forEach((svg) => {
+          if (svg.dataset.expanded) return;
+
+          // Prefer viewBox for true intrinsic size
+          const vb = svg.viewBox && svg.viewBox.baseVal;
+          let natW = vb && vb.width > 10 ? vb.width : parseFloat(svg.getAttribute('width') || '0');
+          let natH =
+            vb && vb.height > 10 ? vb.height : parseFloat(svg.getAttribute('height') || '0');
+
+          if (!natW || natW < 20) natW = 900;
+          if (!natH || natH < 20) natH = 450;
+
+          // Ensure viewBox is set so scaling works correctly
+          if (!vb || vb.width < 10) {
+            svg.setAttribute('viewBox', `0 0 ${natW} ${natH}`);
+          }
+
+          // Set the new physical dimensions — browser scales content to fit
+          const newW = Math.round(natW * MERMAID_SCALE);
+          const newH = Math.round(natH * MERMAID_SCALE);
+          svg.setAttribute('width', newW);
+          svg.setAttribute('height', newH);
+          svg.style.width = newW + 'px';
+          svg.style.height = newH + 'px';
+          svg.style.maxWidth = 'none';
+          svg.dataset.expanded = '1';
+        });
+      }
+
+      // Run mermaid then expand
+      mermaid
+        .run({ querySelector: '.mermaid' })
+        .then(() => {
+          setTimeout(expandMermaidSvgs, 120);
+        })
+        .catch(() => {
+          setTimeout(expandMermaidSvgs, 900);
+        });
+
+      // ─────────────────────────────────────────────
+      // Quadrant dot colors
+      // ─────────────────────────────────────────────
+      document.querySelectorAll('.quad-dot').forEach((dot) => {
+        const c = dot.getAttribute('data-color');
+        if (c) dot.style.background = c;
+      });
+
+      // ─────────────────────────────────────────────
+      // Scroll progress bar
+      // ─────────────────────────────────────────────
+      const progressBar = document.getElementById('progress');
+      window.addEventListener('scroll', () => {
+        if (!progressBar) return;
+        const total = document.body.scrollHeight - window.innerHeight;
+        if (total <= 0) {
+          progressBar.style.width = '100%';
+        } else {
+          progressBar.style.width = (window.scrollY / total) * 100 + '%';
+        }
+      });
+
+      // ─────────────────────────────────────────────
+      // Fade-in on scroll (sections & cards only —
+      // NOT .mermaid elements to avoid fighting scale)
+      // ─────────────────────────────────────────────
+      const fadeObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.style.opacity = '1';
+              e.target.style.transform = 'translateY(0)';
+            }
+          });
+        },
+        { threshold: 0.05 },
+      );
+
+      document.querySelectorAll('.section, .card, .field-card, .flag-card, .step').forEach((el) => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(18px)';
+        el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        fadeObserver.observe(el);
+      });
+    </script>
+  </body>
+</html>
