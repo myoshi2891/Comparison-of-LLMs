@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SKILL.md 中級者完全攻略ガイド — Claude Code</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js" integrity="sha384-+NGfjU8KzpDLXRHduEqW+ZiJr2rIg+cidUVk7B51R5xK7cHwMKQfrdFwGdrq1Bcz" crossorigin="anonymous"></script>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
 
@@ -703,6 +703,11 @@
         box-shadow: 0 0 8px currentColor;
       }
 
+      
+      .quad-dot:focus {
+        outline: 2px solid var(--accent-blue);
+        outline-offset: 4px;
+      }
       .quad-dot:hover {
         transform: translate(-50%, -50%) scale(1.5);
       }
@@ -1561,37 +1566,37 @@ style E fill:#2d1f4a,stroke:#b794f4,color:#ffffff
             <div class="quad-axis-y-bottom">↓ 低リスク</div>
             <!-- プロット点 -->
             <div
-              class="quad-dot"
+              class="quad-dot" role="button" tabindex="0" aria-label="DBマイグレーション"
               style="left: 15%; top: 10%"
               data-label="DBマイグレーション"
               data-color="var(--accent-red)"
             ></div>
             <div
-              class="quad-dot"
+              class="quad-dot" role="button" tabindex="0" aria-label="本番デプロイ"
               style="left: 15%; top: 18%"
               data-label="本番デプロイ"
               data-color="var(--accent-red)"
             ></div>
             <div
-              class="quad-dot"
+              class="quad-dot" role="button" tabindex="0" aria-label="セキュリティスキャン"
               style="left: 50%; top: 43%"
               data-label="セキュリティスキャン"
               data-color="var(--accent-orange)"
             ></div>
             <div
-              class="quad-dot"
+              class="quad-dot" role="button" tabindex="0" aria-label="コードレビュー"
               style="left: 70%; top: 72%"
               data-label="コードレビュー"
               data-color="var(--accent-cyan)"
             ></div>
             <div
-              class="quad-dot"
+              class="quad-dot" role="button" tabindex="0" aria-label="テキスト要約"
               style="left: 85%; top: 78%"
               data-label="テキスト要約"
               data-color="var(--accent-green)"
             ></div>
             <div
-              class="quad-dot"
+              class="quad-dot" role="button" tabindex="0" aria-label="READMEアップデート"
               style="left: 78%; top: 75%"
               data-label="READMEアップデート"
               data-color="var(--accent-green)"
@@ -2557,8 +2562,13 @@ style E fill:#1a3a5c,stroke:#63b3ed,color:#ffffff
       // ─────────────────────────────────────────────
       const progressBar = document.getElementById('progress');
       window.addEventListener('scroll', () => {
+        if (!progressBar) return;
         const total = document.body.scrollHeight - window.innerHeight;
-        progressBar.style.width = (window.scrollY / total) * 100 + '%';
+        if (total <= 0) {
+          progressBar.style.width = '100%';
+        } else {
+          progressBar.style.width = (window.scrollY / total) * 100 + '%';
+        }
       });
 
       // ─────────────────────────────────────────────

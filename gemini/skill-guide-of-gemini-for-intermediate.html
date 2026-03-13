@@ -2317,10 +2317,15 @@ style C fill:#1a1020,stroke:#a855f7,color:#c4b5fd
 
     <script>
       // ── Progress Bar ────────────────────────────────
+      const progressBar = document.getElementById('progress-bar');
       window.addEventListener('scroll', () => {
-        const docH = document.documentElement.scrollHeight - window.innerHeight;
-        const pct = (window.scrollY / docH) * 100;
-        document.getElementById('progress-bar').style.width = pct + '%';
+        if (!progressBar) return;
+        const total = document.documentElement.scrollHeight - window.innerHeight;
+        if (total <= 0) {
+          progressBar.style.width = '100%';
+        } else {
+          progressBar.style.width = (window.scrollY / total) * 100 + '%';
+        }
       });
 
       // ── Fade In Observer ─────────────────────────────

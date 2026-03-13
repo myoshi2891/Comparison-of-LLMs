@@ -29,8 +29,9 @@ description: |
    - 例: `(lambda: scrape_anthropic(existing_api), "Anthropic")` のように関数をラップしてリストに追加する。これにより、既存の `_run_scraper()` のループ内で自動的に実行されるようになる。
 
 4. **テストの実行**
-   - 特定のスクレイパーだけをテスト起動して動作を確認する。
-   - コマンド: `cd scraper && uv run python -m scraper.main --provider <プロバイダー名>` (または該当する検証コマンド)
+   - 特定のスクレイパーだけをテストしたい場合、CLIには `--provider` のようなオプションは存在しないため、一時的に `main.py` の `_scrape_all()` 内のリストを対象プロバイダーのみに書き換えて実行する。
+   - テストコマンド: `cd scraper && uv run python -m scraper.main --output test_output.json`
+   - 動作確認後、必ず `main.py` の変更を元に戻すこと。
 
 ## 注意事項
 
