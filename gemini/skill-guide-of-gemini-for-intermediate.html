@@ -1524,10 +1524,10 @@ description: |
 
         <div class="tabs fade-in">
           <div class="tab-list">
-            <button class="tab-btn active" onclick="switchTab('p1')">Pattern 1: Basic</button>
-            <button class="tab-btn" onclick="switchTab('p2')">Pattern 2: Reference</button>
-            <button class="tab-btn" onclick="switchTab('p3')">Pattern 3: Tool Use</button>
-            <button class="tab-btn" onclick="switchTab('p4')">Pattern 4: All-in-One</button>
+            <button type="button" class="tab-btn active" onclick="switchTab('p1')">Pattern 1: Basic</button>
+            <button type="button" class="tab-btn" onclick="switchTab('p2')">Pattern 2: Reference</button>
+            <button type="button" class="tab-btn" onclick="switchTab('p3')">Pattern 3: Tool Use</button>
+            <button type="button" class="tab-btn" onclick="switchTab('p4')">Pattern 4: All-in-One</button>
           </div>
 
           <div id="p1" class="tab-panel active">
@@ -2240,62 +2240,62 @@ style C fill:#1a1020,stroke:#a855f7,color:#c4b5fd
           項目をクリックしてチェックを記録できます。
         </p>
         <div class="checklist fade-in" id="checklist">
-          <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleCheck(this); }">
             <div class="check-box"></div>
             <div class="check-text">
               <code>name</code> はハイフン区切りの英語小文字か（64文字以内・予約語なし）
             </div>
           </div>
-          <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleCheck(this); }">
             <div class="check-box"></div>
             <div class="check-text">
               <code>description</code>
               に具体的なトリガーキーワードが含まれているか（「この言葉が出たら使うこと」）
             </div>
           </div>
-          <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleCheck(this); }">
             <div class="check-box"></div>
             <div class="check-text">
               SKILL.md 本文は 500 行以内か（参照資料は references/ に分離済みか）
             </div>
           </div>
-          <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleCheck(this); }">
             <div class="check-box"></div>
             <div class="check-text">
               スクリプトはハードコードされた値ではなく引数で動作変更できるか
             </div>
           </div>
-          <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleCheck(this); }">
             <div class="check-box"></div>
             <div class="check-text">
               危険な操作（DB削除・インフラ変更等）のスキルに
               <code>disable-model-invocation: true</code> が設定されているか
             </div>
           </div>
-          <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleCheck(this); }">
             <div class="check-box"></div>
             <div class="check-text">
               Few-shot の Examples セクションが含まれているか（期待する入出力の例示）
             </div>
           </div>
-          <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleCheck(this); }">
             <div class="check-box"></div>
             <div class="check-text">
               Rules セクションで ❌禁止事項 と ✅推奨行動 が明確に定義されているか
             </div>
           </div>
-          <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleCheck(this); }">
             <div class="check-box"></div>
             <div class="check-text">
               実際にエージェントから呼び出されるかテストしたか（<code>gemini skills list</code>
               で確認）
             </div>
           </div>
-          <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleCheck(this); }">
             <div class="check-box"></div>
             <div class="check-text">アクティブなスキルの合計数が 15 個以内に収まっているか</div>
           </div>
-          <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleCheck(this); }">
             <div class="check-box"></div>
             <div class="check-text">
               ワークスペーススキルは
@@ -2350,6 +2350,7 @@ style C fill:#1a1020,stroke:#a855f7,color:#c4b5fd
       // ── Checklist ────────────────────────────────────
       function toggleCheck(el) {
         el.classList.toggle('checked');
+        el.setAttribute('aria-checked', el.classList.contains('checked'));
       }
 
       // ── Mermaid Init ─────────────────────────────────

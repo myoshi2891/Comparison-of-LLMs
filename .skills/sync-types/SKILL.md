@@ -36,4 +36,5 @@ description: |
   - `list[X]` → `X[]`
   - `X | None` → `X | null`
 - **Optional の扱い**: Python の `field: X | None = None` は TypeScript では `field: X | null` とする。`field?: X`（undefined許容）にはしない。
+  - *補足*: JSONのデシリアライズ時に値が `undefined` になる可能性に対処するため、フロントエンド側で入力JSONを正規化して `undefined` を `null` に変換するか、ランタイムの型マッパーで欠損フィールドに `null` をセットする処理を推奨する。
 - **デフォルト値**: Python 側でデフォルト値があっても、出力される JSON には含まれるため、TypeScript 側は非 Optional（必須）として定義する。
