@@ -119,7 +119,7 @@ if __name__ == "__main__":
                 f.write(fixed)
             print(f"\n✅ Fixed and saved: {path}")
         else:
-            print("✅ No indentation issues found.")
+            print("✅ No Mermaid formatting issues found.")
     except (OSError, UnicodeError) as e:
         print(f"❌ Error processing {path}: {e}", file=sys.stderr)
         sys.exit(1)
