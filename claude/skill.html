@@ -1,609 +1,878 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Claude Code AI仕様駆動開発 — マークダウンファイル完全ガイド</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&family=Playfair+Display:wght@700&display=swap');
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Claude Code AI仕様駆動開発 — マークダウンファイル完全ガイド</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&family=Playfair+Display:wght@700&display=swap');
 
-  :root {
-    --bg: #0a0c10;
-    --surface: #111318;
-    --surface2: #1a1d24;
-    --border: #2a2d38;
-    --accent: #4f8ef7;
-    --accent2: #7c5cbf;
-    --accent3: #2ec9a0;
-    --accent4: #f7914f;
-    --accent5: #f74f4f;
-    --text: #edf0f8;
-    --text-dim: #b4bcd2;
-    --text-bright: #ffffff;
-    --tag-bg: #1e2435;
-  }
+      :root {
+        --bg: #0a0c10;
+        --surface: #111318;
+        --surface2: #1a1d24;
+        --border: #2a2d38;
+        --accent: #4f8ef7;
+        --accent2: #7c5cbf;
+        --accent3: #2ec9a0;
+        --accent4: #f7914f;
+        --accent5: #f74f4f;
+        --text: #edf0f8;
+        --text-dim: #b4bcd2;
+        --text-bright: #ffffff;
+        --tag-bg: #1e2435;
+      }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Noto Sans JP', sans-serif;
-    font-weight: 300;
-    line-height: 1.8;
-    min-height: 100vh;
-  }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'Noto Sans JP', sans-serif;
+        font-weight: 300;
+        line-height: 1.8;
+        min-height: 100vh;
+      }
 
-  /* ── HEADER ── */
-  header {
-    background: linear-gradient(135deg, #0d1021 0%, #0f1628 50%, #0a1018 100%);
-    border-bottom: 1px solid var(--border);
-    padding: 3rem 2rem 4rem;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  header::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(79,142,247,0.12) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .header-eyebrow {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.75rem;
-    letter-spacing: 0.2em;
-    color: var(--accent);
-    text-transform: uppercase;
-    margin-bottom: 1rem;
-  }
-  header h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(1.8rem, 4vw, 3rem);
-    font-weight: 700;
-    color: var(--text-bright);
-    line-height: 1.2;
-    margin-bottom: 0.8rem;
-  }
-  header h1 span { color: var(--accent); }
-  .header-sub {
-    font-size: 0.95rem;
-    color: var(--text-dim);
-    max-width: 580px;
-    margin: 0 auto 1.8rem;
-  }
-  .badge-row {
-    display: flex;
-    gap: 0.6rem;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  .badge {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem;
-    padding: 0.3rem 0.8rem;
-    border-radius: 2rem;
-    border: 1px solid;
-  }
-  .badge-blue { border-color: var(--accent); color: var(--accent); background: rgba(79,142,247,0.08); }
-  .badge-purple { border-color: var(--accent2); color: var(--accent2); background: rgba(124,92,191,0.08); }
-  .badge-green { border-color: var(--accent3); color: var(--accent3); background: rgba(46,201,160,0.08); }
+      /* ── HEADER ── */
+      header {
+        background: linear-gradient(135deg, #0d1021 0%, #0f1628 50%, #0a1018 100%);
+        border-bottom: 1px solid var(--border);
+        padding: 3rem 2rem 4rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+      header::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse 80% 60% at 50% 0%,
+          rgba(79, 142, 247, 0.12) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+      .header-eyebrow {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.75rem;
+        letter-spacing: 0.2em;
+        color: var(--accent);
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+      }
+      header h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(1.8rem, 4vw, 3rem);
+        font-weight: 700;
+        color: var(--text-bright);
+        line-height: 1.2;
+        margin-bottom: 0.8rem;
+      }
+      header h1 span {
+        color: var(--accent);
+      }
+      .header-sub {
+        font-size: 0.95rem;
+        color: var(--text-dim);
+        max-width: 580px;
+        margin: 0 auto 1.8rem;
+      }
+      .badge-row {
+        display: flex;
+        gap: 0.6rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .badge {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        padding: 0.3rem 0.8rem;
+        border-radius: 2rem;
+        border: 1px solid;
+      }
+      .badge-blue {
+        border-color: var(--accent);
+        color: var(--accent);
+        background: rgba(79, 142, 247, 0.08);
+      }
+      .badge-purple {
+        border-color: var(--accent2);
+        color: var(--accent2);
+        background: rgba(124, 92, 191, 0.08);
+      }
+      .badge-green {
+        border-color: var(--accent3);
+        color: var(--accent3);
+        background: rgba(46, 201, 160, 0.08);
+      }
+      .badge-orange {
+        border-color: var(--accent4);
+        color: var(--accent4);
+        background: rgba(247, 145, 79, 0.08);
+      }
 
-  /* ── LAYOUT ── */
-  main {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 3rem 1.5rem 6rem;
-  }
+      /* ── LAYOUT ── */
+      main {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 3rem 1.5rem 6rem;
+      }
 
-  /* ── TOC ── */
-  .toc {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--accent);
-    border-radius: 8px;
-    padding: 1.5rem 2rem;
-    margin-bottom: 3rem;
-  }
-  .toc h2 {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.8rem;
-    letter-spacing: 0.15em;
-    color: var(--accent);
-    text-transform: uppercase;
-    margin-bottom: 1rem;
-  }
-  .toc ol { list-style: none; counter-reset: toc; }
-  .toc li { counter-increment: toc; display: flex; align-items: baseline; gap: 0.5rem; padding: 0.2rem 0; }
-  .toc li::before {
-    content: counter(toc, decimal-leading-zero);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.72rem;
-    color: var(--text-dim);
-    min-width: 2rem;
-  }
-  .toc a { color: var(--text); text-decoration: none; font-size: 0.9rem; }
-  .toc a:hover { color: var(--accent); }
+      /* ── TOC ── */
+      .toc {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: 8px;
+        padding: 1.5rem 2rem;
+        margin-bottom: 3rem;
+      }
+      .toc h2 {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.8rem;
+        letter-spacing: 0.15em;
+        color: var(--accent);
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+      }
+      .toc ol {
+        list-style: none;
+        counter-reset: toc;
+      }
+      .toc li {
+        counter-increment: toc;
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+        padding: 0.2rem 0;
+      }
+      .toc li::before {
+        content: counter(toc, decimal-leading-zero);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.72rem;
+        color: var(--text-dim);
+        min-width: 2rem;
+      }
+      .toc a {
+        color: var(--text);
+        text-decoration: none;
+        font-size: 0.9rem;
+      }
+      .toc a:hover {
+        color: var(--accent);
+      }
 
-  /* ── SECTION ── */
-  section { margin-bottom: 4rem; }
-  .section-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.72rem;
-    letter-spacing: 0.18em;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    margin-bottom: 0.5rem;
-  }
-  h2.section-title {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: var(--text-bright);
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.8rem;
-    border-bottom: 1px solid var(--border);
-  }
-  h2.section-title .num {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.9rem;
-    color: var(--accent);
-    margin-right: 0.5rem;
-  }
-  h3 {
-    font-size: 1.1rem;
-    font-weight: 500;
-    color: var(--text-bright);
-    margin: 1.8rem 0 0.8rem;
-  }
-  p { margin-bottom: 1rem; font-size: 0.95rem; color: var(--text); }
+      /* ── SECTION ── */
+      section {
+        margin-bottom: 4rem;
+      }
+      .section-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.72rem;
+        letter-spacing: 0.18em;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+      }
+      h2.section-title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--text-bright);
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.8rem;
+        border-bottom: 1px solid var(--border);
+      }
+      h2.section-title .num {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.9rem;
+        color: var(--accent);
+        margin-right: 0.5rem;
+      }
+      h3 {
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: var(--text-bright);
+        margin: 1.8rem 0 0.8rem;
+      }
+      p {
+        margin-bottom: 1rem;
+        font-size: 0.95rem;
+        color: var(--text);
+      }
 
-  /* ── FLOW DIAGRAM ── */
-  .flow-diagram {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 2rem;
-    margin: 2rem 0;
-    overflow-x: auto;
-  }
-  .flow-title {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.72rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-bottom: 1.5rem;
-  }
-  .flow-steps {
-    display: flex;
-    align-items: center;
-    gap: 0;
-    flex-wrap: nowrap;
-    min-width: max-content;
-  }
-  .flow-step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.4rem;
-  }
-  .step-box {
-    padding: 0.7rem 1.1rem;
-    border-radius: 8px;
-    font-size: 0.82rem;
-    font-weight: 500;
-    text-align: center;
-    white-space: nowrap;
-    border: 1px solid;
-    min-width: 110px;
-  }
-  .step-file {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.65rem;
-    color: var(--text-dim);
-  }
-  .step-blue { background: rgba(79,142,247,0.12); border-color: rgba(79,142,247,0.4); color: var(--accent); }
-  .step-purple { background: rgba(124,92,191,0.12); border-color: rgba(124,92,191,0.4); color: var(--accent2); }
-  .step-green { background: rgba(46,201,160,0.12); border-color: rgba(46,201,160,0.4); color: var(--accent3); }
-  .step-orange { background: rgba(247,145,79,0.12); border-color: rgba(247,145,79,0.4); color: var(--accent4); }
-  .step-red { background: rgba(247,79,79,0.12); border-color: rgba(247,79,79,0.4); color: var(--accent5); }
-  .flow-arrow {
-    padding: 0 0.3rem;
-    color: var(--text-dim);
-    font-size: 1.2rem;
-    margin-top: -1.5rem;
-  }
+      /* ── FLOW DIAGRAM ── */
+      .flow-diagram {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 2rem;
+        margin: 2rem 0;
+        overflow-x: auto;
+      }
+      .flow-title {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.72rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        margin-bottom: 1.5rem;
+      }
+      .flow-steps {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        flex-wrap: nowrap;
+        min-width: max-content;
+      }
+      .flow-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.4rem;
+      }
+      .step-box {
+        padding: 0.7rem 1.1rem;
+        border-radius: 8px;
+        font-size: 0.82rem;
+        font-weight: 500;
+        text-align: center;
+        white-space: nowrap;
+        border: 1px solid;
+        min-width: 110px;
+      }
+      .step-file {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.65rem;
+        color: var(--text-dim);
+      }
+      .step-blue {
+        background: rgba(79, 142, 247, 0.12);
+        border-color: rgba(79, 142, 247, 0.4);
+        color: var(--accent);
+      }
+      .step-purple {
+        background: rgba(124, 92, 191, 0.12);
+        border-color: rgba(124, 92, 191, 0.4);
+        color: var(--accent2);
+      }
+      .step-green {
+        background: rgba(46, 201, 160, 0.12);
+        border-color: rgba(46, 201, 160, 0.4);
+        color: var(--accent3);
+      }
+      .step-orange {
+        background: rgba(247, 145, 79, 0.12);
+        border-color: rgba(247, 145, 79, 0.4);
+        color: var(--accent4);
+      }
+      .step-red {
+        background: rgba(247, 79, 79, 0.12);
+        border-color: rgba(247, 79, 79, 0.4);
+        color: var(--accent5);
+      }
+      .flow-arrow {
+        padding: 0 0.3rem;
+        color: var(--text-dim);
+        font-size: 1.2rem;
+        margin-top: -1.5rem;
+      }
 
-  /* ── FILE CARD ── */
-  .file-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 2rem;
-  }
-  .file-card-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid var(--border);
-  }
-  .file-icon {
-    width: 38px;
-    height: 38px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-    flex-shrink: 0;
-  }
-  .file-name {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--text-bright);
-  }
-  .file-role {
-    font-size: 0.78rem;
-    color: var(--text-dim);
-    margin-top: 0.1rem;
-  }
-  .file-card-body { padding: 1.5rem; }
-  
-  /* ── CODE BLOCK ── */
-  .code-block {
-    background: #0d0f14;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-    margin: 1rem 0;
-  }
-  .code-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.5rem 1rem;
-    background: var(--surface2);
-    border-bottom: 1px solid var(--border);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem;
-    color: var(--text-dim);
-  }
-  .code-dots { display: flex; gap: 5px; }
-  .code-dot {
-    width: 10px; height: 10px; border-radius: 50%;
-  }
-  pre {
-    padding: 1.2rem 1.5rem;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.78rem;
-    line-height: 1.7;
-    color: #e8eef6;
-    overflow-x: auto;
-    white-space: pre;
-  }
-  .kw { color: #7c5cbf; }
-  .str { color: #2ec9a0; }
-  .cmt { color: #8a9ab4; font-style: italic; }
-  .hd { color: var(--accent); font-weight: 600; }
-  .hl { color: var(--accent4); }
+      /* ── FILE CARD ── */
+      .file-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+      }
+      .file-card-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .file-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+      }
+      .file-name {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-bright);
+      }
+      .file-role {
+        font-size: 0.78rem;
+        color: var(--text-dim);
+        margin-top: 0.1rem;
+      }
+      .file-card-body {
+        padding: 1.5rem;
+      }
 
-  /* ── HIERARCHY DIAGRAM ── */
-  .hierarchy {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 1.5rem;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.82rem;
-    line-height: 2;
-    margin: 1.5rem 0;
-  }
-  .h-item { display: flex; align-items: center; gap: 0.5rem; }
-  .h-indent1 { padding-left: 1.5rem; }
-  .h-indent2 { padding-left: 3rem; }
-  .h-indent3 { padding-left: 4.5rem; }
-  .h-folder { color: var(--accent4); }
-  .h-file-blue { color: var(--accent); }
-  .h-file-green { color: var(--accent3); }
-  .h-file-purple { color: var(--accent2); }
-  .h-file-gray { color: var(--text-dim); }
-  .h-desc { color: var(--text-dim); font-size: 0.7rem; }
+      /* ── CODE BLOCK ── */
+      .code-block {
+        background: #0d0f14;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 1rem 0;
+      }
+      .code-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem 1rem;
+        background: var(--surface2);
+        border-bottom: 1px solid var(--border);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        color: var(--text-dim);
+      }
+      .code-dots {
+        display: flex;
+        gap: 5px;
+      }
+      .code-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      pre {
+        padding: 1.2rem 1.5rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.78rem;
+        line-height: 1.7;
+        color: #e8eef6;
+        overflow-x: auto;
+        white-space: pre;
+      }
+      .kw {
+        color: #7c5cbf;
+      }
+      .str {
+        color: #2ec9a0;
+      }
+      .cmt {
+        color: #8a9ab4;
+        font-style: italic;
+      }
+      .hd {
+        color: var(--accent);
+        font-weight: 600;
+      }
+      .hl {
+        color: var(--accent4);
+      }
 
-  /* ── INFO BOX ── */
-  .info-box {
-    border-radius: 8px;
-    padding: 1rem 1.2rem;
-    margin: 1rem 0;
-    display: flex;
-    gap: 0.8rem;
-    font-size: 0.88rem;
-  }
-  .info-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.1rem; }
-  .info-tip { background: rgba(46,201,160,0.08); border: 1px solid rgba(46,201,160,0.25); color: var(--text); }
-  .info-warn { background: rgba(247,145,79,0.08); border: 1px solid rgba(247,145,79,0.25); color: var(--text); }
-  .info-note { background: rgba(79,142,247,0.08); border: 1px solid rgba(79,142,247,0.25); color: var(--text); }
+      /* ── HIERARCHY DIAGRAM ── */
+      .hierarchy {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.5rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.82rem;
+        line-height: 2;
+        margin: 1.5rem 0;
+      }
+      .h-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .h-indent1 {
+        padding-left: 1.5rem;
+      }
+      .h-indent2 {
+        padding-left: 3rem;
+      }
+      .h-indent3 {
+        padding-left: 4.5rem;
+      }
+      .h-folder {
+        color: var(--accent4);
+      }
+      .h-file-blue {
+        color: var(--accent);
+      }
+      .h-file-green {
+        color: var(--accent3);
+      }
+      .h-file-purple {
+        color: var(--accent2);
+      }
+      .h-file-gray {
+        color: var(--text-dim);
+      }
+      .h-desc {
+        color: var(--text-dim);
+        font-size: 0.7rem;
+      }
 
-  /* ── GRID ── */
-  .grid-2 {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1rem;
-    margin: 1.5rem 0;
-  }
-  .mini-card {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 1.1rem;
-  }
-  .mini-card h4 {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.78rem;
-    color: var(--accent);
-    margin-bottom: 0.5rem;
-  }
-  .mini-card p { font-size: 0.83rem; color: var(--text-dim); margin: 0; }
+      /* ── INFO BOX ── */
+      .info-box {
+        border-radius: 8px;
+        padding: 1rem 1.2rem;
+        margin: 1rem 0;
+        display: flex;
+        gap: 0.8rem;
+        font-size: 0.88rem;
+      }
+      .info-icon {
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        margin-top: 0.1rem;
+      }
+      .info-tip {
+        background: rgba(46, 201, 160, 0.08);
+        border: 1px solid rgba(46, 201, 160, 0.25);
+        color: var(--text);
+      }
+      .info-warn {
+        background: rgba(247, 145, 79, 0.08);
+        border: 1px solid rgba(247, 145, 79, 0.25);
+        color: var(--text);
+      }
+      .info-note {
+        background: rgba(79, 142, 247, 0.08);
+        border: 1px solid rgba(79, 142, 247, 0.25);
+        color: var(--text);
+      }
 
-  /* ── TABLE ── */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 1.5rem 0;
-    font-size: 0.85rem;
-  }
-  th {
-    background: var(--surface2);
-    color: var(--text-bright);
-    font-weight: 500;
-    padding: 0.7rem 1rem;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-    font-size: 0.8rem;
-  }
-  td {
-    padding: 0.7rem 1rem;
-    border-bottom: 1px solid rgba(42,45,56,0.5);
-    color: var(--text);
-    vertical-align: top;
-  }
-  td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--accent3); }
-  tr:last-child td { border-bottom: none; }
+      /* ── GRID ── */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .mini-card {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.1rem;
+      }
+      .mini-card h4 {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.78rem;
+        color: var(--accent);
+        margin-bottom: 0.5rem;
+      }
+      .mini-card p {
+        font-size: 0.83rem;
+        color: var(--text-dim);
+        margin: 0;
+      }
 
-  /* ── SOURCES ── */
-  .sources {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 1.5rem 2rem;
-    margin-top: 3rem;
-  }
-  .sources h3 { margin-top: 0; font-size: 0.9rem; color: var(--text-dim); margin-bottom: 1rem; }
-  .source-item {
-    display: flex;
-    align-items: baseline;
-    gap: 0.8rem;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid rgba(42,45,56,0.5);
-    font-size: 0.82rem;
-  }
-  .source-item:last-child { border-bottom: none; }
-  .source-num {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem;
-    color: var(--text-dim);
-    min-width: 2rem;
-  }
-  .source-item a { color: var(--accent); text-decoration: none; word-break: break-all; }
-  .source-item a:hover { text-decoration: underline; }
-  .source-desc { color: var(--text-dim); font-size: 0.78rem; }
+      /* ── TABLE ── */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1.5rem 0;
+        font-size: 0.85rem;
+      }
+      th {
+        background: var(--surface2);
+        color: var(--text-bright);
+        font-weight: 500;
+        padding: 0.7rem 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.8rem;
+      }
+      td {
+        padding: 0.7rem 1rem;
+        border-bottom: 1px solid rgba(42, 45, 56, 0.5);
+        color: var(--text);
+        vertical-align: top;
+      }
+      td:first-child {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.78rem;
+        color: var(--accent3);
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
 
-  /* ── PRINCIPLE GRID ── */
-  .principles {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1rem;
-    margin: 1.5rem 0;
-  }
-  .principle {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 1.2rem;
-    position: relative;
-    overflow: hidden;
-  }
-  .principle::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-  }
-  .p-blue::before { background: var(--accent); }
-  .p-purple::before { background: var(--accent2); }
-  .p-green::before { background: var(--accent3); }
-  .p-orange::before { background: var(--accent4); }
-  .p-red::before { background: var(--accent5); }
-  .principle-num {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1.8rem;
-    font-weight: 600;
-    opacity: 0.08;
-    position: absolute;
-    top: 0.5rem;
-    right: 0.8rem;
-    line-height: 1;
-    color: white;
-  }
-  .principle h4 { font-size: 0.88rem; font-weight: 500; color: var(--text-bright); margin-bottom: 0.4rem; }
-  .principle p { font-size: 0.78rem; color: var(--text-dim); margin: 0; }
+      /* ── SOURCES ── */
+      .sources {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.5rem 2rem;
+        margin-top: 3rem;
+      }
+      .sources h3 {
+        margin-top: 0;
+        font-size: 0.9rem;
+        color: var(--text-dim);
+        margin-bottom: 1rem;
+      }
+      .source-item {
+        display: flex;
+        align-items: baseline;
+        gap: 0.8rem;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(42, 45, 56, 0.5);
+        font-size: 0.82rem;
+      }
+      .source-item:last-child {
+        border-bottom: none;
+      }
+      .source-num {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        color: var(--text-dim);
+        min-width: 2rem;
+      }
+      .source-item a {
+        color: var(--accent);
+        text-decoration: none;
+        word-break: break-all;
+      }
+      .source-item a:hover {
+        text-decoration: underline;
+      }
+      .source-desc {
+        color: var(--text-dim);
+        font-size: 0.78rem;
+      }
 
-  @media (prefers-reduced-motion: reduce) {
-    html { scroll-behavior: auto; }
-    *, *::before, *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
-  }
-</style>
-  <!-- Common Header Assets -->
-  <link rel="stylesheet" href="../shared/common-header.css">
-  <script src="../shared/common-header.js" defer></script>
-</head>
-<body>
+      /* ── PRINCIPLE GRID ── */
+      .principles {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .principle {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.2rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .principle::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+      }
+      .p-blue::before {
+        background: var(--accent);
+      }
+      .p-purple::before {
+        background: var(--accent2);
+      }
+      .p-green::before {
+        background: var(--accent3);
+      }
+      .p-orange::before {
+        background: var(--accent4);
+      }
+      .p-red::before {
+        background: var(--accent5);
+      }
+      .principle-num {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1.8rem;
+        font-weight: 600;
+        opacity: 0.08;
+        position: absolute;
+        top: 0.5rem;
+        right: 0.8rem;
+        line-height: 1;
+        color: white;
+      }
+      .principle h4 {
+        font-size: 0.88rem;
+        font-weight: 500;
+        color: var(--text-bright);
+        margin-bottom: 0.4rem;
+      }
+      .principle p {
+        font-size: 0.78rem;
+        color: var(--text-dim);
+        margin: 0;
+      }
 
-<header>
-  <div class="header-eyebrow">Claude Code × Spec-Driven Development</div>
-  <h1>AI仕様駆動開発における<br><span>マークダウンファイル</span> 完全ガイド</h1>
-  <p class="header-sub">各ファイルの役割・構造・ベストプラクティスをステップバイステップで解説。根拠ソース付き。</p>
-  <div class="badge-row">
-    <span class="badge badge-blue">Claude Code</span>
-    <span class="badge badge-purple">Spec-Driven Development</span>
-    <span class="badge badge-green">2025–2026 最新版</span>
-  </div>
-</header>
-
-<main>
-
-  <!-- TOC -->
-  <nav class="toc">
-    <h2>目次</h2>
-    <ol>
-      <li><a href="#overview">AI仕様駆動開発の全体像とファイル構成</a></li>
-      <li><a href="#claude-md">CLAUDE.md — プロジェクト永続メモリ</a></li>
-      <li><a href="#spec-md">spec.md / spec-init — 仕様書の起点</a></li>
-      <li><a href="#requirements-md">requirements.md — 要求定義</a></li>
-      <li><a href="#design-md">design.md — 技術設計書</a></li>
-      <li><a href="#tasks-md">tasks.md — タスク分解と追跡</a></li>
-      <li><a href="#memory-md">MEMORY.md — 自動メモリシステム</a></li>
-      <li><a href="#steering">Steering Files — チーム横断コンテキスト</a></li>
-      <li><a href="#skill-md">SKILL.md — 再利用ナレッジ</a></li>
-      <li><a href="#best-practices">横断ベストプラクティス10則</a></li>
-      <li><a href="#sources">参考ソース一覧</a></li>
-    </ol>
-  </nav>
-
-  <!-- ── SECTION 1: OVERVIEW ── -->
-  <section id="overview">
-    <div class="section-label">Section 01</div>
-    <h2 class="section-title"><span class="num">01.</span>AI仕様駆動開発の全体像とファイル構成</h2>
-
-    <p>
-      AI仕様駆動開発（SDD: Spec-Driven Development）では、<strong style="color:var(--text-bright)">「コードは仕様から生成される成果物」</strong>という考え方のもと、人間が主導して仕様書群を整備し、AIがその仕様に忠実に実装します。行き当たりばったりの「バイブコーディング」と決別し、再現性・品質・チーム共有を実現するアーキテクチャです。
-    </p>
-
-    <!-- Flow Diagram -->
-    <div class="flow-diagram">
-      <div class="flow-title">▸ SDD 4フェーズ ワークフロー</div>
-      <div class="flow-steps">
-        <div class="flow-step">
-          <div class="step-box step-blue">Phase 1<br>要求定義</div>
-          <div class="step-file">spec.md<br>requirements.md</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">
-          <div class="step-box step-purple">Phase 2<br>技術設計</div>
-          <div class="step-file">design.md<br>architecture.md</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">
-          <div class="step-box step-green">Phase 3<br>タスク分解</div>
-          <div class="step-file">tasks.md</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">
-          <div class="step-box step-orange">Phase 4<br>実装・検証</div>
-          <div class="step-file">review.md<br>コード</div>
-        </div>
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+    <!-- Common Header Assets -->
+    <link rel="stylesheet" href="../shared/common-header.css" />
+    <script src="../shared/common-header.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <div class="header-eyebrow">Claude Code × Spec-Driven Development</div>
+      <h1>AI仕様駆動開発における<br /><span>マークダウンファイル</span> 完全ガイド</h1>
+      <p class="header-sub">
+        各ファイルの役割・構造・ベストプラクティスをステップバイステップで解説。根拠ソース付き。
+      </p>
+      <div class="badge-row">
+        <span class="badge badge-blue">Claude Code v2.1.76</span>
+        <span class="badge badge-purple">Spec-Driven Development</span>
+        <span class="badge badge-green">March 2026 最新版</span>
+        <span class="badge badge-orange">Opus 4.6 対応</span>
       </div>
-    </div>
+    </header>
 
-    <!-- Directory Structure -->
-    <h3>推奨ディレクトリ構成</h3>
-    <div class="hierarchy">
-      <div class="h-item"><span class="h-folder">📁</span> <span>your-project/</span></div>
-      <div class="h-item h-indent1"><span class="h-file-blue">📄</span> <span class="h-file-blue">CLAUDE.md</span> <span class="h-desc">— Claude用プロジェクト永続メモリ（必須）</span></div>
-      <div class="h-item h-indent1"><span class="h-file-blue">📄</span> <span class="h-file-blue">CLAUDE.local.md</span> <span class="h-desc">— 個人用設定（.gitignore自動追加）</span></div>
-      <div class="h-item h-indent1"><span class="h-folder">📁</span> <span>.claude/</span></div>
-      <div class="h-item h-indent2"><span class="h-folder">📁</span> <span>commands/</span> <span class="h-desc">— カスタムスラッシュコマンド</span></div>
-      <div class="h-item h-indent2"><span class="h-folder">📁</span> <span>steering/</span></div>
-      <div class="h-item h-indent3"><span class="h-file-purple">📄</span> <span class="h-file-purple">product.md</span> <span class="h-desc">— プロダクトビジョン</span></div>
-      <div class="h-item h-indent3"><span class="h-file-purple">📄</span> <span class="h-file-purple">tech.md</span> <span class="h-desc">— 技術スタック制約</span></div>
-      <div class="h-item h-indent3"><span class="h-file-purple">📄</span> <span class="h-file-purple">structure.md</span> <span class="h-desc">— コード構造規約</span></div>
-      <div class="h-item h-indent2"><span class="h-folder">📁</span> <span>skills/</span></div>
-      <div class="h-item h-indent3"><span class="h-file-green">📄</span> <span class="h-file-green">SKILL.md</span> <span class="h-desc">— 再利用ナレッジ</span></div>
-      <div class="h-item h-indent1"><span class="h-folder">📁</span> <span>docs/</span></div>
-      <div class="h-item h-indent2"><span class="h-file-blue">📄</span> <span class="h-file-blue">spec.md</span> <span class="h-desc">— 仕様の起点（概要）</span></div>
-      <div class="h-item h-indent2"><span class="h-file-purple">📄</span> <span class="h-file-purple">requirements.md</span> <span class="h-desc">— 機能/非機能要件</span></div>
-      <div class="h-item h-indent2"><span class="h-file-purple">📄</span> <span class="h-file-purple">design.md</span> <span class="h-desc">— 技術設計書</span></div>
-      <div class="h-item h-indent2"><span class="h-file-green">📄</span> <span class="h-file-green">tasks.md</span> <span class="h-desc">— タスクチェックリスト</span></div>
-      <div class="h-item h-indent1"><span class="h-folder">📁</span> <span>~/.claude/projects/&lt;project&gt;/memory/</span></div>
-      <div class="h-item h-indent2"><span class="h-file-gray">📄</span> <span class="h-file-gray">MEMORY.md</span> <span class="h-desc">— Claude自動生成メモリ（インデックス）</span></div>
-      <div class="h-item h-indent2"><span class="h-file-gray">📄</span> <span class="h-file-gray">debugging.md, api-conventions.md ...</span></div>
-    </div>
-  </section>
+    <main>
+      <!-- TOC -->
+      <nav class="toc">
+        <h2>目次</h2>
+        <ol>
+          <li><a href="#overview">AI仕様駆動開発の全体像とファイル構成</a></li>
+          <li><a href="#claude-md">CLAUDE.md — プロジェクト永続メモリ</a></li>
+          <li><a href="#spec-md">spec.md / spec-init — 仕様書の起点</a></li>
+          <li><a href="#requirements-md">requirements.md — 要求定義</a></li>
+          <li><a href="#design-md">design.md — 技術設計書</a></li>
+          <li><a href="#tasks-md">tasks.md — タスク分解と追跡</a></li>
+          <li><a href="#memory-md">MEMORY.md — 自動メモリシステム</a></li>
+          <li><a href="#steering">Steering Files — チーム横断コンテキスト</a></li>
+          <li><a href="#skill-md">SKILL.md — 再利用ナレッジ（2026年大幅強化）</a></li>
+          <li><a href="#new-2026">2026年3月 新機能まとめ</a></li>
+          <li><a href="#best-practices">横断ベストプラクティス10則</a></li>
+          <li><a href="#sources">参考ソース一覧</a></li>
+        </ol>
+      </nav>
 
-  <!-- ── SECTION 2: CLAUDE.MD ── -->
-  <section id="claude-md">
-    <div class="section-label">Section 02</div>
-    <h2 class="section-title"><span class="num">02.</span>CLAUDE.md — プロジェクト永続メモリ</h2>
+      <!-- ── SECTION 1: OVERVIEW ── -->
+      <section id="overview">
+        <div class="section-label">Section 01</div>
+        <h2 class="section-title">
+          <span class="num">01.</span>AI仕様駆動開発の全体像とファイル構成
+        </h2>
 
-    <p>
-      Claude Codeが<strong style="color:var(--text-bright)">起動時に自動読み込みする最重要ファイル</strong>。プロジェクトの「永続的な脳」として機能し、セッションをまたいでコンテキストを維持します。ディレクトリ階層に応じた読み込み優先度があります。
-    </p>
+        <p>
+          AI仕様駆動開発（SDD: Spec-Driven Development）では、<strong
+            style="color: var(--text-bright)"
+            >「コードは仕様から生成される成果物」</strong
+          >という考え方のもと、人間が主導して仕様書群を整備し、AIがその仕様に忠実に実装します。行き当たりばったりの「バイブコーディング」と決別し、再現性・品質・チーム共有を実現するアーキテクチャです。
+        </p>
 
-    <div class="file-card">
-      <div class="file-card-header">
-        <div class="file-icon" style="background:rgba(79,142,247,0.15); border:1px solid rgba(79,142,247,0.3);">📋</div>
-        <div>
-          <div class="file-name">CLAUDE.md</div>
-          <div class="file-role">プロジェクト永続メモリ / 最優先読み込みファイル</div>
-        </div>
-      </div>
-      <div class="file-card-body">
-        <h3>読み込み優先度（下 → 上が優先）</h3>
-        <table>
-          <tr>
-            <th>パス</th><th>スコープ</th><th>用途</th>
-          </tr>
-          <tr>
-            <td>~/.claude/CLAUDE.md</td>
-            <td>グローバル</td>
-            <td>個人の全プロジェクト横断設定</td>
-          </tr>
-          <tr>
-            <td>/project-root/CLAUDE.md</td>
-            <td>プロジェクト</td>
-            <td>チーム共有のプロジェクト規約（最重要）</td>
-          </tr>
-          <tr>
-            <td>CLAUDE.local.md</td>
-            <td>個人/プロジェクト</td>
-            <td>個人設定（.gitignore自動追加）</td>
-          </tr>
-          <tr>
-            <td>src/CLAUDE.md</td>
-            <td>サブディレクトリ</td>
-            <td>モジュール別補足（オンデマンド読み込み）</td>
-          </tr>
-        </table>
-
-        <h3>ベストプラクティス構成テンプレート</h3>
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-dots">
-              <div class="code-dot" style="background:#f74f4f"></div>
-              <div class="code-dot" style="background:#f7914f"></div>
-              <div class="code-dot" style="background:#2ec9a0"></div>
+        <!-- Flow Diagram -->
+        <div class="flow-diagram">
+          <div class="flow-title">▸ SDD 4フェーズ ワークフロー</div>
+          <div class="flow-steps">
+            <div class="flow-step">
+              <div class="step-box step-blue">Phase 1<br />要求定義</div>
+              <div class="step-file">spec.md<br />requirements.md</div>
             </div>
-            <span>CLAUDE.md</span>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="step-box step-purple">Phase 2<br />技術設計</div>
+              <div class="step-file">design.md<br />architecture.md</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="step-box step-green">Phase 3<br />タスク分解</div>
+              <div class="step-file">tasks.md</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="step-box step-orange">Phase 4<br />実装・検証</div>
+              <div class="step-file">review.md<br />コード</div>
+            </div>
           </div>
-          <pre><span class="hd"># Project: [プロジェクト名]</span>
+        </div>
+
+        <!-- Directory Structure -->
+        <h3>推奨ディレクトリ構成</h3>
+        <div class="hierarchy">
+          <div class="h-item"><span class="h-folder">📁</span> <span>your-project/</span></div>
+          <div class="h-item h-indent1">
+            <span class="h-file-blue">📄</span> <span class="h-file-blue">CLAUDE.md</span>
+            <span class="h-desc">— Claude用プロジェクト永続メモリ（必須）</span>
+          </div>
+          <div class="h-item h-indent1">
+            <span class="h-file-blue">📄</span> <span class="h-file-blue">CLAUDE.local.md</span>
+            <span class="h-desc">— 個人用設定（.gitignore自動追加）</span>
+          </div>
+          <div class="h-item h-indent1"><span class="h-folder">📁</span> <span>.claude/</span></div>
+          <div class="h-item h-indent2">
+            <span class="h-folder">📁</span> <span>commands/</span>
+            <span class="h-desc">— カスタムスラッシュコマンド（legacy: skills/推奨）</span>
+          </div>
+          <div class="h-item h-indent2">
+            <span class="h-folder">📁</span> <span>rules/</span>
+            <span class="h-desc"
+              >— 条件付きルールファイル（paths: フロントマターで制御）<span
+                style="color: var(--accent4)"
+                >★2026</span
+              ></span
+            >
+          </div>
+          <div class="h-item h-indent3">
+            <span class="h-file-purple">📄</span> <span class="h-file-purple">api-rules.md</span>
+            <span class="h-desc">— APIディレクトリ専用ルール</span>
+          </div>
+          <div class="h-item h-indent2">
+            <span class="h-folder">📁</span> <span>steering/</span>
+          </div>
+          <div class="h-item h-indent3">
+            <span class="h-file-purple">📄</span> <span class="h-file-purple">product.md</span>
+            <span class="h-desc">— プロダクトビジョン</span>
+          </div>
+          <div class="h-item h-indent3">
+            <span class="h-file-purple">📄</span> <span class="h-file-purple">tech.md</span>
+            <span class="h-desc">— 技術スタック制約</span>
+          </div>
+          <div class="h-item h-indent3">
+            <span class="h-file-purple">📄</span> <span class="h-file-purple">structure.md</span>
+            <span class="h-desc">— コード構造規約</span>
+          </div>
+          <div class="h-item h-indent2">
+            <span class="h-folder">📁</span> <span>skills/</span>
+            <span class="h-desc"
+              >— 再利用ナレッジ（推奨）<span style="color: var(--accent4)">★2026</span></span
+            >
+          </div>
+          <div class="h-item h-indent3">
+            <span class="h-file-green">📄</span> <span class="h-file-green">deploy/SKILL.md</span>
+            <span class="h-desc">— デプロイ手順スキル</span>
+          </div>
+          <div class="h-item h-indent2">
+            <span class="h-folder">📁</span> <span>agents/</span>
+            <span class="h-desc"
+              >— サブエージェント定義<span style="color: var(--accent4)">★2026</span></span
+            >
+          </div>
+          <div class="h-item h-indent3">
+            <span class="h-file-green">📄</span> <span class="h-file-green">review-agent.md</span>
+            <span class="h-desc">— コードレビュー専用エージェント</span>
+          </div>
+          <div class="h-item h-indent1"><span class="h-folder">📁</span> <span>docs/</span></div>
+          <div class="h-item h-indent2">
+            <span class="h-file-blue">📄</span> <span class="h-file-blue">spec.md</span>
+            <span class="h-desc">— 仕様の起点（概要）</span>
+          </div>
+          <div class="h-item h-indent2">
+            <span class="h-file-purple">📄</span> <span class="h-file-purple">requirements.md</span>
+            <span class="h-desc">— 機能/非機能要件</span>
+          </div>
+          <div class="h-item h-indent2">
+            <span class="h-file-purple">📄</span> <span class="h-file-purple">design.md</span>
+            <span class="h-desc">— 技術設計書</span>
+          </div>
+          <div class="h-item h-indent2">
+            <span class="h-file-green">📄</span> <span class="h-file-green">tasks.md</span>
+            <span class="h-desc">— タスクチェックリスト</span>
+          </div>
+          <div class="h-item h-indent1">
+            <span class="h-folder">📁</span> <span>~/.claude/projects/&lt;project&gt;/memory/</span>
+          </div>
+          <div class="h-item h-indent2">
+            <span class="h-file-gray">📄</span> <span class="h-file-gray">MEMORY.md</span>
+            <span class="h-desc">— Claude自動生成メモリ（インデックス）</span>
+          </div>
+          <div class="h-item h-indent2">
+            <span class="h-file-gray">📄</span>
+            <span class="h-file-gray">debugging.md, api-conventions.md ...</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION 2: CLAUDE.MD ── -->
+      <section id="claude-md">
+        <div class="section-label">Section 02</div>
+        <h2 class="section-title">
+          <span class="num">02.</span>CLAUDE.md — プロジェクト永続メモリ
+        </h2>
+
+        <p>
+          Claude Codeが<strong style="color: var(--text-bright)"
+            >起動時に自動読み込みする最重要ファイル</strong
+          >。プロジェクトの「永続的な脳」として機能し、セッションをまたいでコンテキストを維持します。ディレクトリ階層に応じた読み込み優先度があります。
+        </p>
+
+        <div class="file-card">
+          <div class="file-card-header">
+            <div
+              class="file-icon"
+              style="
+                background: rgba(79, 142, 247, 0.15);
+                border: 1px solid rgba(79, 142, 247, 0.3);
+              "
+            >
+              📋
+            </div>
+            <div>
+              <div class="file-name">CLAUDE.md</div>
+              <div class="file-role">プロジェクト永続メモリ / 最優先読み込みファイル</div>
+            </div>
+          </div>
+          <div class="file-card-body">
+            <h3>読み込み優先度（下 → 上が優先）</h3>
+            <table>
+              <tr>
+                <th>パス</th>
+                <th>スコープ</th>
+                <th>用途</th>
+              </tr>
+              <tr>
+                <td>~/.claude/CLAUDE.md</td>
+                <td>グローバル</td>
+                <td>個人の全プロジェクト横断設定</td>
+              </tr>
+              <tr>
+                <td>/project-root/CLAUDE.md</td>
+                <td>プロジェクト</td>
+                <td>チーム共有のプロジェクト規約（最重要）</td>
+              </tr>
+              <tr>
+                <td>CLAUDE.local.md</td>
+                <td>個人/プロジェクト</td>
+                <td>個人設定（.gitignore自動追加）</td>
+              </tr>
+              <tr>
+                <td>src/CLAUDE.md</td>
+                <td>サブディレクトリ</td>
+                <td>モジュール別補足（オンデマンド読み込み）</td>
+              </tr>
+            </table>
+
+            <h3>ベストプラクティス構成テンプレート</h3>
+            <div class="code-block">
+              <div class="code-header">
+                <div class="code-dots">
+                  <div class="code-dot" style="background: #f74f4f"></div>
+                  <div class="code-dot" style="background: #f7914f"></div>
+                  <div class="code-dot" style="background: #2ec9a0"></div>
+                </div>
+                <span>CLAUDE.md</span>
+              </div>
+              <pre><span class="hd"># Project: [プロジェクト名]</span>
 
 <span class="hd">## 🎯 Project Overview</span>
 <span class="cmt"># 1〜2文でプロダクトの目的を記述。Claudeが全判断の基準にする。</span>
@@ -638,62 +907,94 @@ ECサイトのバックエンドAPI。Go製マイクロサービス構成。
 <span class="cmt"># 絶対に破ってはいけないルール</span>
 - DBのmigrations/フォルダへの直接書き込み禁止
 - secrets/配下ファイルは読み取りのみ</pre>
-        </div>
-
-        <div class="info-box info-warn">
-          <span class="info-icon">⚠️</span>
-          <div><strong>アンチパターン：過剰記述</strong><br>CLAUDE.mdが長すぎると、重要なルールが「ノイズ」に埋もれてClaudeが無視します。公式ドキュメントは「Claudeがすでに正しくできることは書かない。Hooksで強制できるなら削除する」と推奨しています。目安は<strong>500行以内</strong>。</div>
-        </div>
-
-        <div class="info-box info-tip">
-          <span class="info-icon">💡</span>
-          <div><strong>@import構文</strong>でファイルを参照可能。<code>@docs/git-instructions.md</code> のように書くと、その内容がコンテキストに注入されます。相対パスは「そのファイルからの相対」になります。</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── SECTION 3: SPEC.MD ── -->
-  <section id="spec-md">
-    <div class="section-label">Section 03</div>
-    <h2 class="section-title"><span class="num">03.</span>spec.md — 仕様書の起点</h2>
-
-    <p>
-      SDDの出発点となるファイル。アプリケーションの<strong style="color:var(--text-bright)">「何を作るか」を人間とClaudeが合意するための設計図</strong>。ここが明確であるほど、後続のrequirements.md・design.md・tasks.mdの品質が高まります。
-    </p>
-
-    <div class="file-card">
-      <div class="file-card-header">
-        <div class="file-icon" style="background:rgba(124,92,191,0.15); border:1px solid rgba(124,92,191,0.3);">📝</div>
-        <div>
-          <div class="file-name">spec.md</div>
-          <div class="file-role">仕様書の起点 / プロダクト概要</div>
-        </div>
-      </div>
-      <div class="file-card-body">
-
-        <h3>2つのアプローチ</h3>
-        <div class="grid-2">
-          <div class="mini-card">
-            <h4>🤖 AI生成 → 人間レビュー</h4>
-            <p>「TODOアプリ（優先度・日付・タグ機能付き）のspecを作成して」と依頼し、Claudeが草案を作成。人間が仮定の修正・エッジケースの追加を行う。速度重視。</p>
-          </div>
-          <div class="mini-card">
-            <h4>✍️ 手動作成 → AI補完</h4>
-            <p>自分でspec.mdを書き込み、Claudeに「このspecの抜け漏れを指摘して」と依頼。品質重視。複雑なドメイン知識を持つ場合に適する。</p>
-          </div>
-        </div>
-
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-dots">
-              <div class="code-dot" style="background:#f74f4f"></div>
-              <div class="code-dot" style="background:#f7914f"></div>
-              <div class="code-dot" style="background:#2ec9a0"></div>
             </div>
-            <span>docs/spec.md — テンプレート</span>
+
+            <div class="info-box info-warn">
+              <span class="info-icon">⚠️</span>
+              <div>
+                <strong>アンチパターン：過剰記述</strong
+                ><br />CLAUDE.mdが長すぎると、重要なルールが「ノイズ」に埋もれてClaudeが無視します。公式ドキュメントは「Claudeがすでに正しくできることは書かない。Hooksで強制できるなら削除する」と推奨しています。目安は<strong>500行以内</strong>。
+              </div>
+            </div>
+
+            <div class="info-box info-tip">
+              <span class="info-icon">💡</span>
+              <div>
+                <strong>@import構文</strong>でファイルを参照可能。<code
+                  >@docs/git-instructions.md</code
+                >
+                のように書くと、その内容がコンテキストに注入されます。相対パスは「そのファイルからの相対」になります。
+              </div>
+            </div>
+
+            <div class="info-box info-note">
+              <span class="info-icon">🆕</span>
+              <div>
+                <strong>2026年3月 更新：HTMLコメント非表示化</strong><br />CLAUDE.mdの
+                <code>&lt;!-- ... --&gt;</code>
+                HTMLコメントは、自動注入時にClaudeに見えなくなりました。ただし
+                <code>Read</code>
+                ツールで読み取ると引き続き可視です。コメントを整理情報として活用できます。
+              </div>
+            </div>
           </div>
-          <pre><span class="hd"># [機能名] 仕様書</span>
+        </div>
+      </section>
+
+      <!-- ── SECTION 3: SPEC.MD ── -->
+      <section id="spec-md">
+        <div class="section-label">Section 03</div>
+        <h2 class="section-title"><span class="num">03.</span>spec.md — 仕様書の起点</h2>
+
+        <p>
+          SDDの出発点となるファイル。アプリケーションの<strong style="color: var(--text-bright)"
+            >「何を作るか」を人間とClaudeが合意するための設計図</strong
+          >。ここが明確であるほど、後続のrequirements.md・design.md・tasks.mdの品質が高まります。
+        </p>
+
+        <div class="file-card">
+          <div class="file-card-header">
+            <div
+              class="file-icon"
+              style="
+                background: rgba(124, 92, 191, 0.15);
+                border: 1px solid rgba(124, 92, 191, 0.3);
+              "
+            >
+              📝
+            </div>
+            <div>
+              <div class="file-name">spec.md</div>
+              <div class="file-role">仕様書の起点 / プロダクト概要</div>
+            </div>
+          </div>
+          <div class="file-card-body">
+            <h3>2つのアプローチ</h3>
+            <div class="grid-2">
+              <div class="mini-card">
+                <h4>🤖 AI生成 → 人間レビュー</h4>
+                <p>
+                  「TODOアプリ（優先度・日付・タグ機能付き）のspecを作成して」と依頼し、Claudeが草案を作成。人間が仮定の修正・エッジケースの追加を行う。速度重視。
+                </p>
+              </div>
+              <div class="mini-card">
+                <h4>✍️ 手動作成 → AI補完</h4>
+                <p>
+                  自分でspec.mdを書き込み、Claudeに「このspecの抜け漏れを指摘して」と依頼。品質重視。複雑なドメイン知識を持つ場合に適する。
+                </p>
+              </div>
+            </div>
+
+            <div class="code-block">
+              <div class="code-header">
+                <div class="code-dots">
+                  <div class="code-dot" style="background: #f74f4f"></div>
+                  <div class="code-dot" style="background: #f7914f"></div>
+                  <div class="code-dot" style="background: #2ec9a0"></div>
+                </div>
+                <span>docs/spec.md — テンプレート</span>
+              </div>
+              <pre><span class="hd"># [機能名] 仕様書</span>
 
 <span class="hd">## 概要</span>
 <span class="cmt"># 何を・なぜ・誰のために作るかを2〜4文で記述</span>
@@ -723,53 +1024,67 @@ ECサイトのバックエンドAPI。Go製マイクロサービス構成。
 - [ ] プリオーダー完了後、確認メールが届く
 - [ ] 在庫0状態でもカートに追加できる
 - [ ] 管理画面で注文一覧が確認できる</pre>
-        </div>
-
-        <div class="info-box info-note">
-          <span class="info-icon">ℹ️</span>
-          <div><strong>重要:</strong> spec.mdは実装中も<strong>継続的に更新</strong>します。「コードが変わったらspecも変える」という規律がプロジェクトの健全性を保ちます。</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── SECTION 4: REQUIREMENTS.MD ── -->
-  <section id="requirements-md">
-    <div class="section-label">Section 04</div>
-    <h2 class="section-title"><span class="num">04.</span>requirements.md — 要求定義</h2>
-
-    <p>
-      spec.mdをClaudeが解析し、<strong style="color:var(--text-bright)">機能要件・非機能要件・システムスコープに分解した詳細ドキュメント</strong>。ステークホルダーと実装チームの「契約書」として機能します。
-    </p>
-
-    <div class="file-card">
-      <div class="file-card-header">
-        <div class="file-icon" style="background:rgba(247,145,79,0.15); border:1px solid rgba(247,145,79,0.3);">📋</div>
-        <div>
-          <div class="file-name">requirements.md</div>
-          <div class="file-role">機能要件 / 非機能要件 / 受け入れ基準</div>
-        </div>
-      </div>
-      <div class="file-card-body">
-
-        <h3>生成プロンプト例</h3>
-        <div class="code-block">
-          <div class="code-header"><span>Claude Codeへの指示</span></div>
-          <pre>claude -p "docs/spec.md を解析し、機能要件と非機能要件に分解した
-requirements.md を生成してください。
-各要件にはID(REQ-001形式)と受け入れ基準を付与してください。"</pre>
-        </div>
-
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-dots">
-              <div class="code-dot" style="background:#f74f4f"></div>
-              <div class="code-dot" style="background:#f7914f"></div>
-              <div class="code-dot" style="background:#2ec9a0"></div>
             </div>
-            <span>docs/requirements.md — テンプレート</span>
+
+            <div class="info-box info-note">
+              <span class="info-icon">ℹ️</span>
+              <div>
+                <strong>重要:</strong>
+                spec.mdは実装中も<strong>継続的に更新</strong>します。「コードが変わったらspecも変える」という規律がプロジェクトの健全性を保ちます。
+              </div>
+            </div>
           </div>
-          <pre><span class="hd"># 要求定義書</span>
+        </div>
+      </section>
+
+      <!-- ── SECTION 4: REQUIREMENTS.MD ── -->
+      <section id="requirements-md">
+        <div class="section-label">Section 04</div>
+        <h2 class="section-title"><span class="num">04.</span>requirements.md — 要求定義</h2>
+
+        <p>
+          spec.mdをClaudeが解析し、<strong style="color: var(--text-bright)"
+            >機能要件・非機能要件・システムスコープに分解した詳細ドキュメント</strong
+          >。ステークホルダーと実装チームの「契約書」として機能します。
+        </p>
+
+        <div class="file-card">
+          <div class="file-card-header">
+            <div
+              class="file-icon"
+              style="
+                background: rgba(247, 145, 79, 0.15);
+                border: 1px solid rgba(247, 145, 79, 0.3);
+              "
+            >
+              📋
+            </div>
+            <div>
+              <div class="file-name">requirements.md</div>
+              <div class="file-role">機能要件 / 非機能要件 / 受け入れ基準</div>
+            </div>
+          </div>
+          <div class="file-card-body">
+            <h3>生成プロンプト例</h3>
+            <div class="code-block">
+              <div class="code-header"><span>Claude Codeへの指示</span></div>
+              <pre>
+claude -p "docs/spec.md を解析し、機能要件と非機能要件に分解した
+requirements.md を生成してください。
+各要件にはID(REQ-001形式)と受け入れ基準を付与してください。"</pre
+              >
+            </div>
+
+            <div class="code-block">
+              <div class="code-header">
+                <div class="code-dots">
+                  <div class="code-dot" style="background: #f74f4f"></div>
+                  <div class="code-dot" style="background: #f7914f"></div>
+                  <div class="code-dot" style="background: #2ec9a0"></div>
+                </div>
+                <span>docs/requirements.md — テンプレート</span>
+              </div>
+              <pre><span class="hd"># 要求定義書</span>
 
 <span class="hd">## 機能要件（Functional Requirements）</span>
 
@@ -798,54 +1113,69 @@ requirements.md を生成してください。
 <span class="hd">## スコープ外（Out of Scope）</span>
 - モバイルアプリ対応（今フェーズはWeb only）
 - 複数通貨対応</pre>
+            </div>
+
+            <div class="info-box info-tip">
+              <span class="info-icon">💡</span>
+              <div>
+                要件に<strong>優先度（P0/P1/P2）</strong>と<strong>ID（FR-001形式）</strong>を付けることで、tasks.mdでのトレーサビリティを確保できます。
+              </div>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <div class="info-box info-tip">
-          <span class="info-icon">💡</span>
-          <div>要件に<strong>優先度（P0/P1/P2）</strong>と<strong>ID（FR-001形式）</strong>を付けることで、tasks.mdでのトレーサビリティを確保できます。</div>
-        </div>
-      </div>
-    </div>
-  </section>
+      <!-- ── SECTION 5: DESIGN.MD ── -->
+      <section id="design-md">
+        <div class="section-label">Section 05</div>
+        <h2 class="section-title">
+          <span class="num">05.</span>design.md / architecture.md — 技術設計書
+        </h2>
 
-  <!-- ── SECTION 5: DESIGN.MD ── -->
-  <section id="design-md">
-    <div class="section-label">Section 05</div>
-    <h2 class="section-title"><span class="num">05.</span>design.md / architecture.md — 技術設計書</h2>
+        <p>
+          requirements.mdをもとにClaudeが生成する<strong style="color: var(--text-bright)"
+            >システムアーキテクチャ・API設計・データモデルの詳細設計書</strong
+          >。Mermaid記法のシーケンス図やER図を含めることで視覚的な理解を促します。
+        </p>
 
-    <p>
-      requirements.mdをもとにClaudeが生成する<strong style="color:var(--text-bright)">システムアーキテクチャ・API設計・データモデルの詳細設計書</strong>。Mermaid記法のシーケンス図やER図を含めることで視覚的な理解を促します。
-    </p>
-
-    <div class="file-card">
-      <div class="file-card-header">
-        <div class="file-icon" style="background:rgba(46,201,160,0.15); border:1px solid rgba(46,201,160,0.3);">🏛</div>
-        <div>
-          <div class="file-name">design.md / architecture.md</div>
-          <div class="file-role">システム設計 / API / データモデル</div>
-        </div>
-      </div>
-      <div class="file-card-body">
-
-        <h3>設計書生成プロンプト例</h3>
-        <div class="code-block">
-          <div class="code-header"><span>Claude Codeへの指示</span></div>
-          <pre>claude -p "requirements.md に基づいてdesign.mdを作成してください。
+        <div class="file-card">
+          <div class="file-card-header">
+            <div
+              class="file-icon"
+              style="
+                background: rgba(46, 201, 160, 0.15);
+                border: 1px solid rgba(46, 201, 160, 0.3);
+              "
+            >
+              🏛
+            </div>
+            <div>
+              <div class="file-name">design.md / architecture.md</div>
+              <div class="file-role">システム設計 / API / データモデル</div>
+            </div>
+          </div>
+          <div class="file-card-body">
+            <h3>設計書生成プロンプト例</h3>
+            <div class="code-block">
+              <div class="code-header"><span>Claude Codeへの指示</span></div>
+              <pre>
+claude -p "requirements.md に基づいてdesign.mdを作成してください。
 マイクロサービスアーキテクチャを提案し、
 各サービスのAPIエンドポイント、データモデル（DDL）、
-チェックアウトフローのシーケンス図（Mermaid形式）を含めてください。"</pre>
-        </div>
-
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-dots">
-              <div class="code-dot" style="background:#f74f4f"></div>
-              <div class="code-dot" style="background:#f7914f"></div>
-              <div class="code-dot" style="background:#2ec9a0"></div>
+チェックアウトフローのシーケンス図（Mermaid形式）を含めてください。"</pre
+              >
             </div>
-            <span>docs/design.md — テンプレート</span>
-          </div>
-          <pre><span class="hd"># 技術設計書</span>
+
+            <div class="code-block">
+              <div class="code-header">
+                <div class="code-dots">
+                  <div class="code-dot" style="background: #f74f4f"></div>
+                  <div class="code-dot" style="background: #f7914f"></div>
+                  <div class="code-dot" style="background: #2ec9a0"></div>
+                </div>
+                <span>docs/design.md — テンプレート</span>
+              </div>
+              <pre><span class="hd"># 技術設計書</span>
 
 <span class="hd">## アーキテクチャ概要</span>
 マイクロサービス構成。API Gateway → User Service / Order Service / Inventory Service
@@ -887,45 +1217,56 @@ sequenceDiagram
 | API     | Go + chi | 軽量・高速 |
 | DB      | PostgreSQL | ACID準拠 |
 | Cache   | Redis | 原子的在庫ロック |</pre>
-        </div>
-
-        <div class="info-box info-note">
-          <span class="info-icon">ℹ️</span>
-          <div>architecture.mdは実装を進めながら<strong>人間とClaudeが共同編集</strong>します。「3〜4タスク完了後にClaudeにコードレビューとarchitecture.md更新を依頼する」サイクルが効果的です（[9]）。</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── SECTION 6: TASKS.MD ── -->
-  <section id="tasks-md">
-    <div class="section-label">Section 06</div>
-    <h2 class="section-title"><span class="num">06.</span>tasks.md — タスク分解と追跡</h2>
-
-    <p>
-      design.mdからClaudeが生成する<strong style="color:var(--text-bright)">実装の「道路地図」</strong>。各タスクは独立してテスト可能な粒度に分解され、チェックボックスで進捗を追跡します。セッション間でClaudeの「記憶喪失」を防ぐ最重要ファイルです。
-    </p>
-
-    <div class="file-card">
-      <div class="file-card-header">
-        <div class="file-icon" style="background:rgba(46,201,160,0.15); border:1px solid rgba(46,201,160,0.3);">✅</div>
-        <div>
-          <div class="file-name">tasks.md</div>
-          <div class="file-role">実装タスクチェックリスト / 進捗追跡</div>
-        </div>
-      </div>
-      <div class="file-card-body">
-
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-dots">
-              <div class="code-dot" style="background:#f74f4f"></div>
-              <div class="code-dot" style="background:#f7914f"></div>
-              <div class="code-dot" style="background:#2ec9a0"></div>
             </div>
-            <span>docs/tasks.md</span>
+
+            <div class="info-box info-note">
+              <span class="info-icon">ℹ️</span>
+              <div>
+                architecture.mdは実装を進めながら<strong>人間とClaudeが共同編集</strong>します。「3〜4タスク完了後にClaudeにコードレビューとarchitecture.md更新を依頼する」サイクルが効果的です（[9]）。
+              </div>
+            </div>
           </div>
-          <pre><span class="hd"># 実装タスクリスト</span>
+        </div>
+      </section>
+
+      <!-- ── SECTION 6: TASKS.MD ── -->
+      <section id="tasks-md">
+        <div class="section-label">Section 06</div>
+        <h2 class="section-title"><span class="num">06.</span>tasks.md — タスク分解と追跡</h2>
+
+        <p>
+          design.mdからClaudeが生成する<strong style="color: var(--text-bright)"
+            >実装の「道路地図」</strong
+          >。各タスクは独立してテスト可能な粒度に分解され、チェックボックスで進捗を追跡します。セッション間でClaudeの「記憶喪失」を防ぐ最重要ファイルです。
+        </p>
+
+        <div class="file-card">
+          <div class="file-card-header">
+            <div
+              class="file-icon"
+              style="
+                background: rgba(46, 201, 160, 0.15);
+                border: 1px solid rgba(46, 201, 160, 0.3);
+              "
+            >
+              ✅
+            </div>
+            <div>
+              <div class="file-name">tasks.md</div>
+              <div class="file-role">実装タスクチェックリスト / 進捗追跡</div>
+            </div>
+          </div>
+          <div class="file-card-body">
+            <div class="code-block">
+              <div class="code-header">
+                <div class="code-dots">
+                  <div class="code-dot" style="background: #f74f4f"></div>
+                  <div class="code-dot" style="background: #f7914f"></div>
+                  <div class="code-dot" style="background: #2ec9a0"></div>
+                </div>
+                <span>docs/tasks.md</span>
+              </div>
+              <pre><span class="hd"># 実装タスクリスト</span>
 <span class="cmt"># 各タスクは単独でテスト可能な粒度にする</span>
 
 <span class="hd">## Phase 1: 基盤構築</span>
@@ -947,78 +1288,125 @@ sequenceDiagram
 <span class="hd">## ブロッカー</span>
 <span class="cmt"># Claudeが詰まった問題を記録。後続セッションへの引き継ぎ情報</span>
 - Task 4: Redis Luaスクリプトのタイムアウト処理要調査</pre>
-        </div>
+            </div>
 
-        <h3>Claudeへのタスク実行指示パターン</h3>
-        <div class="code-block">
-          <div class="code-header"><span>Claude Codeへの指示</span></div>
-          <pre>design.md のアーキテクチャを把握してください。
+            <h3>Claudeへのタスク実行指示パターン</h3>
+            <div class="code-block">
+              <div class="code-header"><span>Claude Codeへの指示</span></div>
+              <pre>
+design.md のアーキテクチャを把握してください。
 tasks.md のTask 3を実行: 「PostgreSQLマイグレーション作成」
 Goで実装し、単体テストも作成してください。テストはすべてパスさせること。
-完了後にgit commitしてください。</pre>
-        </div>
-
-        <div class="info-box info-tip">
-          <span class="info-icon">💡</span>
-          <div><strong>サブエージェント活用</strong>: <code>implement @docs/tasks.md - use the task tool, each task should only be done by a subagent, do a commit before continuing</code> と指示することで、各タスクを独立したコンテキストウィンドウで処理し、コンテキスト汚染を防げます（[1]）。</div>
-        </div>
-
-        <div class="info-box info-warn">
-          <span class="info-icon">⚠️</span>
-          <div><strong>コンテキスト管理</strong>: tasks.mdとarchitecture.mdに重要事項が記載されていれば、<strong>コンテキストクリア（/clear）しても大丈夫</strong>。セッションをまたぐ情報はこれらのファイルに書き出しておきます（[9]）。</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── SECTION 7: MEMORY.MD ── -->
-  <section id="memory-md">
-    <div class="section-label">Section 07</div>
-    <h2 class="section-title"><span class="num">07.</span>MEMORY.md — 自動メモリシステム</h2>
-
-    <p>
-      Claude Codeが<strong style="color:var(--text-bright)">自動的に書き込む</strong>メモリファイル。人間が書くCLAUDE.mdとは異なり、Claudeが作業中に発見したパターン・学習・洞察を記録します（2026年現在 GA・デフォルト有効）。
-    </p>
-
-    <div class="file-card">
-      <div class="file-card-header">
-        <div class="file-icon" style="background:rgba(124,92,191,0.15); border:1px solid rgba(124,92,191,0.3);">🧠</div>
-        <div>
-          <div class="file-name">MEMORY.md</div>
-          <div class="file-role">Claude自動生成メモリ / インデックスファイル</div>
-        </div>
-      </div>
-      <div class="file-card-body">
-
-        <div class="grid-2">
-          <div class="mini-card">
-            <h4>📍 保存場所</h4>
-            <p><code>~/.claude/projects/&lt;project&gt;/memory/MEMORY.md</code><br>gitリポジトリルートで一意のディレクトリが決定される。</p>
-          </div>
-          <div class="mini-card">
-            <h4>⚡ 読み込み仕様</h4>
-            <p>MEMORY.mdの<strong>先頭200行</strong>のみが毎セッション自動注入。200行超の詳細はトピックファイルに分割。</p>
-          </div>
-          <div class="mini-card">
-            <h4>📁 トピックファイル</h4>
-            <p><code>debugging.md</code>, <code>api-conventions.md</code> 等のファイルはオンデマンド読み込み。indexとして参照される。</p>
-          </div>
-          <div class="mini-card">
-            <h4>✏️ 手動編集 &amp; トグル</h4>
-            <p><code>/memory</code> コマンドでファイルセレクター &amp; auto memory トグルが開く。<code>settings.json</code> の <code>autoMemoryEnabled</code> でプロジェクト単位のオン/オフも可能。</p>
-          </div>
-        </div>
-
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-dots">
-              <div class="code-dot" style="background:#f74f4f"></div>
-              <div class="code-dot" style="background:#f7914f"></div>
-              <div class="code-dot" style="background:#2ec9a0"></div>
+完了後にgit commitしてください。</pre
+              >
             </div>
-            <span>~/.claude/projects/myapp/memory/MEMORY.md — 構造例</span>
+
+            <div class="info-box info-tip">
+              <span class="info-icon">💡</span>
+              <div>
+                <strong>サブエージェント活用</strong>:
+                <code
+                  >implement @docs/tasks.md - use the task tool, each task should only be done by a
+                  subagent, do a commit before continuing</code
+                >
+                と指示することで、各タスクを独立したコンテキストウィンドウで処理し、コンテキスト汚染を防げます（[1]）。
+              </div>
+            </div>
+
+            <div class="info-box info-warn">
+              <span class="info-icon">⚠️</span>
+              <div>
+                <strong>コンテキスト管理</strong>:
+                tasks.mdとarchitecture.mdに重要事項が記載されていれば、<strong>コンテキストクリア（/clear）しても大丈夫</strong>。セッションをまたぐ情報はこれらのファイルに書き出しておきます（[9]）。
+              </div>
+            </div>
           </div>
-          <pre><span class="hd"># Project Memory Index</span>
+        </div>
+      </section>
+
+      <!-- ── SECTION 7: MEMORY.MD ── -->
+      <section id="memory-md">
+        <div class="section-label">Section 07</div>
+        <h2 class="section-title"><span class="num">07.</span>MEMORY.md — 自動メモリシステム</h2>
+
+        <p>
+          Claude Codeが<strong style="color: var(--text-bright)">自動的に書き込む</strong
+          >メモリファイル。人間が書くCLAUDE.mdとは異なり、Claudeが作業中に発見したパターン・学習・洞察を記録します（2026年現在
+          GA・デフォルト有効）。
+        </p>
+
+        <div class="file-card">
+          <div class="file-card-header">
+            <div
+              class="file-icon"
+              style="
+                background: rgba(124, 92, 191, 0.15);
+                border: 1px solid rgba(124, 92, 191, 0.3);
+              "
+            >
+              🧠
+            </div>
+            <div>
+              <div class="file-name">MEMORY.md</div>
+              <div class="file-role">Claude自動生成メモリ / インデックスファイル</div>
+            </div>
+          </div>
+          <div class="file-card-body">
+            <div class="grid-2">
+              <div class="mini-card">
+                <h4>📍 保存場所</h4>
+                <p>
+                  <code>~/.claude/projects/&lt;project&gt;/memory/MEMORY.md</code
+                  ><br />gitリポジトリルートで一意のディレクトリが決定される。
+                </p>
+              </div>
+              <div class="mini-card">
+                <h4>⚡ 読み込み仕様</h4>
+                <p>
+                  MEMORY.mdの<strong>先頭200行</strong>のみが毎セッション自動注入。200行超の詳細はトピックファイルに分割。
+                </p>
+              </div>
+              <div class="mini-card">
+                <h4>📁 トピックファイル</h4>
+                <p>
+                  <code>debugging.md</code>,
+                  <code>api-conventions.md</code>
+                  等のファイルはオンデマンド読み込み。indexとして参照される。
+                </p>
+              </div>
+              <div class="mini-card">
+                <h4>✏️ 手動編集 &amp; トグル</h4>
+                <p>
+                  <code>/memory</code> コマンドでファイルセレクター &amp; auto memory
+                  トグルが開く。<code>settings.json</code> の
+                  <code>autoMemoryEnabled</code> でプロジェクト単位のオン/オフも可能。
+                </p>
+              </div>
+              <div class="mini-card">
+                <h4>🆕 autoMemoryDirectory</h4>
+                <p>
+                  <code>autoMemoryDirectory</code>
+                  設定でメモリ保存先ディレクトリをカスタマイズ可能（2026年3月〜）。チームでメモリ先を統一したい場合に活用。
+                </p>
+              </div>
+              <div class="mini-card">
+                <h4>🕐 最終更新タイムスタンプ</h4>
+                <p>
+                  メモリファイルに最終更新日時が自動付与されるようになりました。Claudeが「どの記憶が新鮮か」を判断できます（2026年3月〜）。
+                </p>
+              </div>
+            </div>
+
+            <div class="code-block">
+              <div class="code-header">
+                <div class="code-dots">
+                  <div class="code-dot" style="background: #f74f4f"></div>
+                  <div class="code-dot" style="background: #f7914f"></div>
+                  <div class="code-dot" style="background: #2ec9a0"></div>
+                </div>
+                <span>~/.claude/projects/myapp/memory/MEMORY.md — 構造例</span>
+              </div>
+              <pre><span class="hd"># Project Memory Index</span>
 <span class="cmt"># このファイルは先頭200行のみ毎回読み込まれる</span>
 
 <span class="hd">## Current State</span>
@@ -1041,97 +1429,258 @@ Goで実装し、単体テストも作成してください。テストはすべ
 <span class="hd">## User Preferences</span>
 - コードレビュー: Quality > Speed
 - テスト: TDD必須（まずテストを書く）</pre>
-        </div>
+            </div>
 
-        <div class="info-box info-note">
-          <span class="info-icon">ℹ️</span>
-          <div>known-gotchas.mdへの追記は <code># Add to known-gotchas: サーバーレス関数はメモリを共有しない</code> のように<code>#</code>ショートカットで即座に行えます。</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── SECTION 8: STEERING FILES ── -->
-  <section id="steering">
-    <div class="section-label">Section 08</div>
-    <h2 class="section-title"><span class="num">08.</span>Steering Files — チーム横断コンテキスト</h2>
-
-    <p>
-      <code>.claude/steering/</code>配下に置く<strong style="color:var(--text-bright)">チーム全体で共有する長期的コンテキストファイル群</strong>。product.md・tech.md・structure.mdの3ファイルが基本セットです。
-    </p>
-
-    <div class="grid-2">
-      <div class="file-card">
-        <div class="file-card-header">
-          <div class="file-icon" style="background:rgba(247,79,79,0.15); border:1px solid rgba(247,79,79,0.3);">🎯</div>
-          <div>
-            <div class="file-name">product.md</div>
-            <div class="file-role">プロダクトビジョン・ペルソナ</div>
+            <div class="info-box info-note">
+              <span class="info-icon">ℹ️</span>
+              <div>
+                known-gotchas.mdへの追記は
+                <code># Add to known-gotchas: サーバーレス関数はメモリを共有しない</code>
+                のように<code>#</code>ショートカットで即座に行えます。
+              </div>
+            </div>
           </div>
         </div>
-        <div class="file-card-body">
-          <div class="code-block">
-            <div class="code-header"><span>.claude/steering/product.md</span></div>
-            <pre><span class="hd"># Product Vision</span>
+      </section>
+
+      <!-- ── SECTION 8: STEERING FILES ── -->
+      <section id="steering">
+        <div class="section-label">Section 08</div>
+        <h2 class="section-title">
+          <span class="num">08.</span>Steering Files &amp; Rules — チーム横断コンテキスト
+        </h2>
+
+        <p>
+          <code>.claude/steering/</code>配下に置く<strong style="color: var(--text-bright)"
+            >チーム全体で共有する長期的コンテキストファイル群</strong
+          >。product.md・tech.md・structure.mdの3ファイルが基本セットです。2026年から
+          <code>.claude/rules/</code> ディレクトリによる<strong style="color: var(--accent4)"
+            >条件付きルール</strong
+          >も利用可能になりました。
+        </p>
+
+        <div class="grid-2">
+          <div class="file-card">
+            <div class="file-card-header">
+              <div
+                class="file-icon"
+                style="
+                  background: rgba(247, 79, 79, 0.15);
+                  border: 1px solid rgba(247, 79, 79, 0.3);
+                "
+              >
+                🎯
+              </div>
+              <div>
+                <div class="file-name">product.md</div>
+                <div class="file-role">プロダクトビジョン・ペルソナ</div>
+              </div>
+            </div>
+            <div class="file-card-body">
+              <div class="code-block">
+                <div class="code-header"><span>.claude/steering/product.md</span></div>
+                <pre><span class="hd"># Product Vision</span>
 中小EC向けの在庫管理SaaS。
 ペルソナ: IT非専門の店舗オーナー
 KPI: 在庫ミス率を90%削減
 競合優位: セットアップ10分以内</pre>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      <div class="file-card">
-        <div class="file-card-header">
-          <div class="file-icon" style="background:rgba(46,201,160,0.15); border:1px solid rgba(46,201,160,0.3);">⚙️</div>
-          <div>
-            <div class="file-name">tech.md</div>
-            <div class="file-role">技術スタック制約・禁止事項</div>
-          </div>
-        </div>
-        <div class="file-card-body">
-          <div class="code-block">
-            <div class="code-header"><span>.claude/steering/tech.md</span></div>
-            <pre><span class="hd"># Tech Constraints</span>
+          <div class="file-card">
+            <div class="file-card-header">
+              <div
+                class="file-icon"
+                style="
+                  background: rgba(46, 201, 160, 0.15);
+                  border: 1px solid rgba(46, 201, 160, 0.3);
+                "
+              >
+                ⚙️
+              </div>
+              <div>
+                <div class="file-name">tech.md</div>
+                <div class="file-role">技術スタック制約・禁止事項</div>
+              </div>
+            </div>
+            <div class="file-card-body">
+              <div class="code-block">
+                <div class="code-header"><span>.claude/steering/tech.md</span></div>
+                <pre><span class="hd"># Tech Constraints</span>
 必須: Go 1.23, PostgreSQL 16
 禁止: ORM使用（raw SQLのみ）
 禁止: グローバル変数
 テスト: 最低カバレッジ80%</pre>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── SECTION 9: SKILL.MD ── -->
-  <section id="skill-md">
-    <div class="section-label">Section 09</div>
-    <h2 class="section-title"><span class="num">09.</span>SKILL.md — 再利用ナレッジ</h2>
-
-    <p>
-      <code>.claude/skills/</code>配下に置く<strong style="color:var(--text-bright)">ドメイン知識・繰り返しワークフローのカプセル化ファイル</strong>。チームの「ベストプラクティスのライブラリ」として機能します。
-    </p>
-
-    <div class="file-card">
-      <div class="file-card-header">
-        <div class="file-icon" style="background:rgba(79,142,247,0.15); border:1px solid rgba(79,142,247,0.3);">🎓</div>
-        <div>
-          <div class="file-name">SKILL.md</div>
-          <div class="file-role">再利用ナレッジ / チームノウハウ</div>
-        </div>
-      </div>
-      <div class="file-card-body">
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-dots">
-              <div class="code-dot" style="background:#f74f4f"></div>
-              <div class="code-dot" style="background:#f7914f"></div>
-              <div class="code-dot" style="background:#2ec9a0"></div>
+              </div>
             </div>
-            <span>.claude/skills/database-migration/SKILL.md</span>
           </div>
-          <pre><span class="cmt">---</span>
-<span class="cmt">description: DBスキーマ変更を伴う実装タスクで呼び出す。</span>
-<span class="cmt">             マイグレーションファイルの作成・適用手順を提供する。</span>
+        </div>
+
+        <!-- Rules files -->
+        <div class="file-card" style="margin-top: 1.5rem">
+          <div class="file-card-header">
+            <div
+              class="file-icon"
+              style="
+                background: rgba(247, 145, 79, 0.15);
+                border: 1px solid rgba(247, 145, 79, 0.3);
+              "
+            >
+              📐
+            </div>
+            <div>
+              <div class="file-name">
+                .claude/rules/*.md
+                <span
+                  style="
+                    font-size: 0.7rem;
+                    color: var(--accent4);
+                    font-weight: 400;
+                    margin-left: 0.5rem;
+                  "
+                  >★ 2026年新機能</span
+                >
+              </div>
+              <div class="file-role">条件付きルールファイル — パス・状況に応じて自動適用</div>
+            </div>
+          </div>
+          <div class="file-card-body">
+            <p style="font-size: 0.88rem">
+              CLAUDE.mdの全セッション適用と異なり、<code>paths:</code> フロントマターで<strong
+                style="color: var(--text-bright)"
+                >特定ディレクトリ・ファイルに対してのみ適用されるルール</strong
+              >を定義できます。巨大モノレポでのモジュール別ルール管理に最適です。
+            </p>
+            <div class="code-block">
+              <div class="code-header">
+                <div class="code-dots">
+                  <div class="code-dot" style="background: #f74f4f"></div>
+                  <div class="code-dot" style="background: #f7914f"></div>
+                  <div class="code-dot" style="background: #2ec9a0"></div>
+                </div>
+                <span>.claude/rules/api-rules.md — 条件付きルール例</span>
+              </div>
+              <pre><span class="cmt">---</span>
+<span class="cmt">description: API層のコーディングルール</span>
+<span class="cmt">paths:</span>
+<span class="cmt">  - "src/api/**"</span>
+<span class="cmt">  - "src/handlers/**"</span>
+<span class="cmt">---</span>
+
+<span class="hd"># API Layer Rules</span>
+
+<span class="hd">## 必須事項</span>
+- すべてのエンドポイントにOpenAPI形式のコメントを付ける
+- 入力バリデーションは必ずhandler層で行う
+- エラーレスポンスは統一フォーマット: {error, code, message}
+
+<span class="hd">## 禁止事項</span>
+- ビジネスロジックをhandler層に書かない（service層に委譲）
+- 直接DBアクセス（repositoryを経由すること）</pre>
+            </div>
+            <div class="info-box info-tip">
+              <span class="info-icon">💡</span>
+              <div>
+                <code>paths:</code>
+                に一致するファイルにClaudeが触れるとき、このルールが自動注入されます。<strong>InstructionsLoadedフック</strong>でルールの読み込みをフック処理することも可能です。
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION 9: SKILL.MD ── -->
+      <section id="skill-md">
+        <div class="section-label">Section 09</div>
+        <h2 class="section-title">
+          <span class="num">09.</span>SKILL.md — 再利用ナレッジ
+          <span style="font-size: 0.75rem; color: var(--accent4)">2026年大幅強化</span>
+        </h2>
+
+        <p>
+          <code>.claude/skills/</code>配下に置く<strong style="color: var(--text-bright)"
+            >ドメイン知識・繰り返しワークフローのカプセル化ファイル</strong
+          >。チームの「ベストプラクティスのライブラリ」として機能します。<strong
+            style="color: var(--accent4)"
+            >2026年2月より全プランで無料利用可能</strong
+          >になり、フロントマターオプションも大幅に強化されました。
+        </p>
+
+        <!-- フロントマター全オプション解説 -->
+        <h3>
+          フロントマター全オプション一覧
+          <span style="font-size: 0.72rem; color: var(--accent4)">2026年3月時点</span>
+        </h3>
+        <table>
+          <tr>
+            <th>キー</th>
+            <th>型</th>
+            <th>説明</th>
+          </tr>
+          <tr>
+            <td>name</td>
+            <td>string</td>
+            <td>スキルの識別名（スラッシュコマンド <code>/name</code> で呼び出し可能）</td>
+          </tr>
+          <tr>
+            <td>description</td>
+            <td>string</td>
+            <td>自動トリガー条件を記述。Claudeがこのテキストで関連性を判断する（最重要）</td>
+          </tr>
+          <tr>
+            <td>invocation</td>
+            <td><code>explicit</code></td>
+            <td>自動適用を無効化し、明示的な呼び出しのみに限定する</td>
+          </tr>
+          <tr>
+            <td>allowed-tools</td>
+            <td>string[]</td>
+            <td>このスキル内でClaudeが使用できるツールを制限する（セキュリティ強化）</td>
+          </tr>
+          <tr>
+            <td>version</td>
+            <td>string</td>
+            <td>スキルのバージョン管理。チームでの変更追跡に活用（2026年2月〜）</td>
+          </tr>
+        </table>
+
+        <div class="file-card">
+          <div class="file-card-header">
+            <div
+              class="file-icon"
+              style="
+                background: rgba(79, 142, 247, 0.15);
+                border: 1px solid rgba(79, 142, 247, 0.3);
+              "
+            >
+              🎓
+            </div>
+            <div>
+              <div class="file-name">SKILL.md</div>
+              <div class="file-role">再利用ナレッジ / チームノウハウ — フロントマター完全版</div>
+            </div>
+          </div>
+          <div class="file-card-body">
+            <h3>① 自動トリガー型スキル（基本パターン）</h3>
+            <div class="code-block">
+              <div class="code-header">
+                <div class="code-dots">
+                  <div class="code-dot" style="background: #f74f4f"></div>
+                  <div class="code-dot" style="background: #f7914f"></div>
+                  <div class="code-dot" style="background: #2ec9a0"></div>
+                </div>
+                <span>.claude/skills/database-migration/SKILL.md</span>
+              </div>
+              <pre><span class="cmt">---</span>
+<span class="cmt">name: database-migration</span>
+<span class="cmt">description: &gt;</span>
+<span class="cmt">  DBスキーマ変更を伴う実装タスクで呼び出す。</span>
+<span class="cmt">  「マイグレーション作成」「テーブル追加」「カラム変更」</span>
+<span class="cmt">  「スキーマ更新」と言われたときに使用する。</span>
+<span class="cmt">allowed-tools:</span>
+<span class="cmt">  - Read</span>
+<span class="cmt">  - Write</span>
+<span class="cmt">  - Bash</span>
 <span class="cmt">---</span>
 
 <span class="hd"># Database Migration Skill</span>
@@ -1144,177 +1693,457 @@ KPI: 在庫ミス率を90%削減
 
 <span class="hd">## 禁止事項</span>
 - 既存マイグレーションファイルの編集
-- NULL制約の後付け（データがある場合）
+- NULL制約の後付け（データがある場合）</pre>
+            </div>
 
-<span class="hd">## コード例</span>
-```sql
--- 20241201_add_preorder_flag.up.sql
-ALTER TABLE products ADD COLUMN is_preorder BOOLEAN DEFAULT FALSE;
-CREATE INDEX idx_products_preorder ON products(is_preorder) WHERE is_preorder = TRUE;
-```</pre>
+            <h3>② 明示呼び出し専用スキル（<code>invocation: explicit</code>）</h3>
+            <div class="code-block">
+              <div class="code-header">
+                <div class="code-dots">
+                  <div class="code-dot" style="background: #f74f4f"></div>
+                  <div class="code-dot" style="background: #f7914f"></div>
+                  <div class="code-dot" style="background: #2ec9a0"></div>
+                </div>
+                <span>.claude/skills/pre-commit-check/SKILL.md</span>
+              </div>
+              <pre><span class="cmt">---</span>
+<span class="cmt">name: pre-commit-check</span>
+<span class="cmt">description: &gt;</span>
+<span class="cmt">  コミット前に全テスト・ビルドを実行する。</span>
+<span class="cmt">  /pre-commit-check コマンドでのみ呼び出す。</span>
+<span class="cmt">invocation: explicit</span>
+<span class="cmt">allowed-tools:</span>
+<span class="cmt">  - Bash</span>
+<span class="cmt">  - Read</span>
+<span class="cmt">  - Grep</span>
+<span class="cmt">---</span>
+
+<span class="hd"># コミット前チェック</span>
+
+<span class="hd">## 実行手順</span>
+
+<span class="kw">### Step 1: フロントエンドビルド</span>
+`cd web && bun run build`
+
+<span class="kw">### Step 2: フロントエンドテスト</span>
+`cd web && bun test`
+
+<span class="kw">### Step 3: バックエンドテスト</span>
+`cd scraper && uv run pytest`
+
+<span class="hd">## 判定基準</span>
+全ステップ成功 → 「コミット OK」と報告
+いずれか失敗 → 停止してエラー内容を報告</pre>
+            </div>
+
+            <div class="info-box info-tip">
+              <span class="info-icon">💡</span>
+              <div>
+                <strong>配置場所は 3 種類（2026年2月〜）：</strong><br />
+                • <strong>プロジェクト</strong>:
+                <code>.claude/skills/&lt;name&gt;/SKILL.md</code>（リポジトリ内、チーム共有）<br />
+                • <strong>個人</strong>:
+                <code>~/.claude/skills/&lt;name&gt;/SKILL.md</code>（全プロジェクト横断）<br />
+                • <strong>追加ディレクトリ</strong>:
+                <code>--add-dir /path/to/dir</code> で指定したディレクトリ内の
+                <code>.claude/skills/</code> も自動ロード<br />
+                <code>invocation: explicit</code> のスキルは
+                <code>/skill-name</code> での手動呼び出しのみ有効になります。
+              </div>
+            </div>
+
+            <div class="info-box info-warn">
+              <span class="info-icon">⚠️</span>
+              <div>
+                <strong>description は「トリガー文書」として書く</strong><br />
+                Claudeは
+                <code>description</code>
+                フィールドを読んで「このスキルを今呼ぶべきか」を判断します。単なる説明文ではなく、<strong>どんな状況・キーワードで使うか</strong>を具体的に列挙するのがベストプラクティスです。このファイルのSKILL.mdが実例として参考になります。
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION 10: NEW 2026 FEATURES ── -->
+      <section id="new-2026">
+        <div class="section-label">Section 10</div>
+        <h2 class="section-title"><span class="num">10.</span>2026年3月 新機能まとめ</h2>
+
+        <p>
+          Claude Code は
+          2026年に入り急速に進化しています。SDD実践に影響する主要な新機能を整理します。
+        </p>
+
+        <div class="principles">
+          <div class="principle p-orange">
+            <div class="principle-num">NEW</div>
+            <h4>🤝 Agent Teams（マルチエージェント）</h4>
+            <p>
+              複数のClaudeインスタンスが並列で協調作業。<code>claude --team</code>
+              で起動。tasks.mdのタスクを各エージェントに割り当て可能。
+            </p>
+          </div>
+          <div class="principle p-blue">
+            <div class="principle-num">NEW</div>
+            <h4>📐 .claude/rules/ — 条件付きルール</h4>
+            <p>
+              <code>paths:</code>
+              フロントマターで特定ディレクトリのみに適用されるルールを定義。モノレポの部分適用に最適。
+            </p>
+          </div>
+          <div class="principle p-purple">
+            <div class="principle-num">NEW</div>
+            <h4>🪝 InstructionsLoaded フック</h4>
+            <p>
+              CLAUDE.md・SKILL.md読み込み完了後に任意のスクリプトを実行できる新フックイベント。環境変数の動的注入などに活用。
+            </p>
+          </div>
+          <div class="principle p-green">
+            <div class="principle-num">UPD</div>
+            <h4>🧠 MEMORY.md — autoMemoryDirectory</h4>
+            <p>
+              メモリ保存先をカスタムディレクトリに変更可能に。最終更新タイムスタンプが自動付与されるようになった。
+            </p>
+          </div>
+          <div class="principle p-red">
+            <div class="principle-num">UPD</div>
+            <h4>🎓 SKILL.md — version フィールド追加</h4>
+            <p>
+              フロントマターに
+              <code>version: "1.2.0"</code>
+              を記載可能。チームでのスキル変更追跡・互換性管理に活用できる。
+            </p>
+          </div>
+          <div class="principle p-blue">
+            <div class="principle-num">UPD</div>
+            <h4>🔦 CLAUDE.md — HTMLコメント非表示</h4>
+            <p>
+              自動注入時に
+              <code>&lt;!-- --&gt;</code>
+              コメントがClaudeに見えなくなった。コメントを整理用メモとして自由に記述できる。
+            </p>
+          </div>
+          <div class="principle p-purple">
+            <div class="principle-num">NEW</div>
+            <h4>🤖 .claude/agents/ — サブエージェント定義</h4>
+            <p>
+              特定用途のサブエージェント（コードレビュー専用・テスト専用など）を事前定義し、<code
+                >/agent-name</code
+              >
+              で呼び出し可能。
+            </p>
+          </div>
+          <div class="principle p-orange">
+            <div class="principle-num">NEW</div>
+            <h4>🌐 Web Fetch ツール（組み込み）</h4>
+            <p>
+              外部ドキュメント・APIリファレンスをセッション内で直接取得・参照できるWeb
+              Fetchが標準ツールとして追加。
+            </p>
+          </div>
         </div>
 
-        <div class="info-box info-tip">
-          <span class="info-icon">💡</span>
-          <div>SKILL.mdは<strong>関連性があるときだけClaudeが自動適用</strong>、または <code>/skill-name</code> で明示的に呼び出せます。配置場所は 2 種類：<br>
-          • <strong>プロジェクト</strong>: <code>.claude/skills/&lt;name&gt;/SKILL.md</code>（リポジトリ内、チーム共有）<br>
-          • <strong>個人</strong>: <code>~/.claude/skills/&lt;name&gt;/SKILL.md</code>（全プロジェクト横断）<br>
-          <code>--add-dir</code> で追加したディレクトリ内の <code>.claude/skills/</code> も自動ロードされます（2026年2月〜）。</div>
+        <div class="info-box info-note" style="margin-top: 1.5rem">
+          <span class="info-icon">📅</span>
+          <div>
+            上記は <strong>2026年3月21日</strong> 時点の情報です。Claude
+            Codeは活発に開発が進んでいるため、最新情報は
+            <a
+              href="https://docs.anthropic.com/en/docs/claude-code"
+              target="_blank"
+              rel="noopener"
+              style="color: var(--accent)"
+              >公式ドキュメント</a
+            >
+            および
+            <a
+              href="https://github.com/anthropics/claude-code/releases"
+              target="_blank"
+              rel="noopener"
+              style="color: var(--accent)"
+              >GitHubリリースノート</a
+            >
+            を参照してください。
+          </div>
         </div>
-      </div>
-    </div>
-  </section>
+      </section>
 
-  <!-- ── SECTION 10: BEST PRACTICES ── -->
-  <section id="best-practices">
-    <div class="section-label">Section 10</div>
-    <h2 class="section-title"><span class="num">10.</span>横断ベストプラクティス 10則</h2>
+      <!-- ── SECTION 11: BEST PRACTICES ── -->
+      <section id="best-practices">
+        <div class="section-label">Section 11</div>
+        <h2 class="section-title"><span class="num">11.</span>横断ベストプラクティス 10則</h2>
 
-    <div class="principles">
-      <div class="principle p-blue">
-        <div class="principle-num">01</div>
-        <h4>CLAUDE.mdは500行以内に</h4>
-        <p>重要ルールが埋もれないよう厳選。Hooksで強制できるルールはCLAUDE.mdから削除する。</p>
-      </div>
-      <div class="principle p-purple">
-        <div class="principle-num">02</div>
-        <h4>Spec First, Code Second</h4>
-        <p>コードを一行も書く前にspec.md→requirements.md→design.md→tasks.mdを準備。</p>
-      </div>
-      <div class="principle p-green">
-        <div class="principle-num">03</div>
-        <h4>specを生きたドキュメントに</h4>
-        <p>コードが変わったらspec/design.mdも更新。「コードとspecの乖離」がプロジェクト腐敗の原因。</p>
-      </div>
-      <div class="principle p-orange">
-        <div class="principle-num">04</div>
-        <h4>タスクは独立・テスト可能に</h4>
-        <p>tasks.mdの各タスクはそれ単体でテストできる粒度に。依存関係は明示する。</p>
-      </div>
-      <div class="principle p-red">
-        <div class="principle-num">05</div>
-        <h4>コンテキストを意識して管理</h4>
-        <p>重要情報はファイルに書き出しておく。/clearしてもtasks.md+design.mdで再現可能にする。</p>
-      </div>
-      <div class="principle p-blue">
-        <div class="principle-num">06</div>
-        <h4>@import構文を活用</h4>
-        <p>CLAUDE.mdで@docs/design.mdなど参照。大きな情報はCLAUDE.mdに直書きせず参照する。</p>
-      </div>
-      <div class="principle p-purple">
-        <div class="principle-num">07</div>
-        <h4>サブエージェントでコンテキスト分離</h4>
-        <p>各タスクを独立したコンテキストで処理。メインセッションのノイズを防ぐ。真の並列実行が必要な場合は <strong>Agent Teams</strong>（experimental, 2026年2月〜）も選択肢。</p>
-      </div>
-      <div class="principle p-green">
-        <div class="principle-num">08</div>
-        <h4>コードレビューを3〜4タスクごとに</h4>
-        <p>「design.mdに基づいてTask 1〜3のコードをレビューし、必要ならdesign.mdを更新して」</p>
-      </div>
-      <div class="principle p-orange">
-        <div class="principle-num">09</div>
-        <h4>CLAUDE.local.mdで個人設定を分離</h4>
-        <p>チームに見せたくない個人設定はCLAUDE.local.mdへ。.gitignoreに自動追加される。</p>
-      </div>
-      <div class="principle p-red">
-        <div class="principle-num">10</div>
-        <h4>Hooksで強制・CLAUDE.mdは指針</h4>
-        <p>「必ずやること」はHooksで確実化。CLAUDE.mdは「指針」、Hooksは「強制」。</p>
-      </div>
-    </div>
-  </section>
+        <div class="principles">
+          <div class="principle p-blue">
+            <div class="principle-num">01</div>
+            <h4>CLAUDE.mdは500行以内に</h4>
+            <p>重要ルールが埋もれないよう厳選。Hooksで強制できるルールはCLAUDE.mdから削除する。</p>
+          </div>
+          <div class="principle p-purple">
+            <div class="principle-num">02</div>
+            <h4>Spec First, Code Second</h4>
+            <p>コードを一行も書く前にspec.md→requirements.md→design.md→tasks.mdを準備。</p>
+          </div>
+          <div class="principle p-green">
+            <div class="principle-num">03</div>
+            <h4>specを生きたドキュメントに</h4>
+            <p>
+              コードが変わったらspec/design.mdも更新。「コードとspecの乖離」がプロジェクト腐敗の原因。
+            </p>
+          </div>
+          <div class="principle p-orange">
+            <div class="principle-num">04</div>
+            <h4>タスクは独立・テスト可能に</h4>
+            <p>tasks.mdの各タスクはそれ単体でテストできる粒度に。依存関係は明示する。</p>
+          </div>
+          <div class="principle p-red">
+            <div class="principle-num">05</div>
+            <h4>コンテキストを意識して管理</h4>
+            <p>
+              重要情報はファイルに書き出しておく。/clearしてもtasks.md+design.mdで再現可能にする。
+            </p>
+          </div>
+          <div class="principle p-blue">
+            <div class="principle-num">06</div>
+            <h4>@import構文を活用</h4>
+            <p>CLAUDE.mdで@docs/design.mdなど参照。大きな情報はCLAUDE.mdに直書きせず参照する。</p>
+          </div>
+          <div class="principle p-purple">
+            <div class="principle-num">07</div>
+            <h4>サブエージェントでコンテキスト分離</h4>
+            <p>
+              各タスクを独立したコンテキストで処理。メインセッションのノイズを防ぐ。真の並列実行が必要な場合は
+              <strong>Agent Teams</strong>（experimental, 2026年2月〜）も選択肢。
+            </p>
+          </div>
+          <div class="principle p-green">
+            <div class="principle-num">08</div>
+            <h4>コードレビューを3〜4タスクごとに</h4>
+            <p>「design.mdに基づいてTask 1〜3のコードをレビューし、必要ならdesign.mdを更新して」</p>
+          </div>
+          <div class="principle p-orange">
+            <div class="principle-num">09</div>
+            <h4>CLAUDE.local.mdで個人設定を分離</h4>
+            <p>チームに見せたくない個人設定はCLAUDE.local.mdへ。.gitignoreに自動追加される。</p>
+          </div>
+          <div class="principle p-red">
+            <div class="principle-num">10</div>
+            <h4>Hooksで強制・CLAUDE.mdは指針</h4>
+            <p>「必ずやること」はHooksで確実化。CLAUDE.mdは「指針」、Hooksは「強制」。</p>
+          </div>
+        </div>
+      </section>
 
-  <!-- ── SOURCES ── -->
-  <section id="sources">
-    <div class="sources">
-      <h3>📚 参考ソース一覧（公式・二次情報を含む）</h3>
-      <div class="source-item">
-        <span class="source-num">[1]</span>
-        <div>
-          <a href="https://alexop.dev/posts/spec-driven-development-claude-code-in-action/" target="_blank" rel="noopener noreferrer">Spec-Driven Development with Claude Code in Action — alexop.dev (2026)</a>
-          <div class="source-desc">サブエージェントを使ったSDD実践例、task tool活用パターン</div>
+      <!-- ── SOURCES ── -->
+      <section id="sources">
+        <div class="sources">
+          <h3>📚 参考ソース一覧（公式・二次情報を含む）</h3>
+          <div class="source-item">
+            <span class="source-num">[1]</span>
+            <div>
+              <a
+                href="https://alexop.dev/posts/spec-driven-development-claude-code-in-action/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Spec-Driven Development with Claude Code in Action — alexop.dev (2026)</a
+              >
+              <div class="source-desc">
+                サブエージェントを使ったSDD実践例、task tool活用パターン
+              </div>
+            </div>
+          </div>
+          <div class="source-item">
+            <span class="source-num">[2]</span>
+            <div>
+              <a
+                href="https://medium.com/@universe3523/spec-driven-development-with-claude-code-206bf56955d0"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Spec Driven Development with Claude Code — Medium (Jan 2026)</a
+              >
+              <div class="source-desc">
+                Requirements Agent / Design Agent / Implementation Agentの役割分担
+              </div>
+            </div>
+          </div>
+          <div class="source-item">
+            <span class="source-num">[3]</span>
+            <div>
+              <a
+                href="https://agentfactory.panaversity.org/docs/General-Agents-Foundations/spec-driven-development"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Chapter 5: Spec-Driven Development with Claude Code — Agent Factory</a
+              >
+              <div class="source-desc">
+                CLAUDE.md, Subagents, Tasks, HooksのネイティブClaude Code機能によるSDD
+              </div>
+            </div>
+          </div>
+          <div class="source-item">
+            <span class="source-num">[4]</span>
+            <div>
+              <a
+                href="https://github.com/Pimzino/claude-code-spec-workflow"
+                target="_blank"
+                rel="noopener noreferrer"
+                >claude-code-spec-workflow — GitHub (Pimzino)</a
+              >
+              <div class="source-desc">
+                Requirements→Design→Tasks→Implementation の自動化ワークフロー、ディレクトリ構成
+              </div>
+            </div>
+          </div>
+          <div class="source-item">
+            <span class="source-num">[5]</span>
+            <div>
+              <a
+                href="https://docs.anthropic.com/en/docs/claude-code/best-practices"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Best Practices for Claude Code — 公式ドキュメント</a
+              >
+              <div class="source-desc">
+                CLAUDE.mdの過剰記述アンチパターン、Hooks vs CLAUDE.md、SKILL.md活用法
+              </div>
+            </div>
+          </div>
+          <div class="source-item">
+            <span class="source-num">[6]</span>
+            <div>
+              <a
+                href="https://tessl.io/blog/spec-driven-dev-with-claude-code/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Unlocking Claude Code: Spec-Driven Development — tessl.io (Jun 2025)</a
+              >
+              <div class="source-desc">spec.mdの作成方法、継続的更新の重要性</div>
+            </div>
+          </div>
+          <div class="source-item">
+            <span class="source-num">[7]</span>
+            <div>
+              <a
+                href="https://docs.anthropic.com/en/docs/claude-code/memory"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Manage Claude's Memory — 公式ドキュメント</a
+              >
+              <div class="source-desc">
+                CLAUDE.md階層構造、MEMORY.md仕様、@import構文、CLAUDE.local.md
+              </div>
+            </div>
+          </div>
+          <div class="source-item">
+            <span class="source-num">[8]</span>
+            <div>
+              <a
+                href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Effective Context Engineering for AI Agents — Anthropic Engineering</a
+              >
+              <div class="source-desc">ハイブリッドメモリ戦略、コンテキスト管理の設計思想</div>
+            </div>
+          </div>
+          <div class="source-item">
+            <span class="source-num">[9]</span>
+            <div>
+              <a
+                href="https://brianchambers.substack.com/p/chamber-of-tech-secrets-54-spec-driven"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Spec-driven Development — Chamber of Tech Secrets #54 (Jul 2025)</a
+              >
+              <div class="source-desc">
+                architecture.md共同編集パターン、コンテキスト管理の実践的tips
+              </div>
+            </div>
+          </div>
+          <div class="source-item">
+            <span class="source-num">[10]</span>
+            <div>
+              <a href="https://github.com/gotalab/cc-sdd" target="_blank" rel="noopener noreferrer"
+                >cc-sdd — GitHub (gotalab)</a
+              >
+              <div class="source-desc">
+                Kiro式SDD、steering→spec-init→design→tasks→impl ワークフロー
+              </div>
+            </div>
+          </div>
+          <div class="source-item">
+            <span class="source-num">[11]</span>
+            <div>
+              <a
+                href="https://medium.com/@porter.nicholas/teaching-claude-to-remember-part-2-remember-everything-memory-system-1b496d1f0022"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Teaching Claude To Remember Part 2 — Medium (Dec 2025)</a
+              >
+              <div class="source-desc">
+                project-context.md / known-gotchas.md の具体的設計パターン
+              </div>
+            </div>
+          </div>
+          <div class="source-item">
+            <span class="source-num">[12]</span>
+            <div>
+              <a
+                href="https://www.anthropic.com/engineering/claude-code-best-practices"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Claude Code: Best Practices for Agentic Coding — Anthropic Engineering</a
+              >
+              <div class="source-desc">Anthropic公式のClaude Codeベストプラクティス</div>
+            </div>
+          </div>
+          <div class="source-item">
+            <span class="source-num">[13]</span>
+            <div>
+              <a
+                href="https://docs.anthropic.com/en/docs/claude-code/hooks"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Claude Code Hooks — 公式ドキュメント (2026)</a
+              >
+              <div class="source-desc">
+                InstructionsLoadedフック、PostToolUseフック、フックイベント全種類の説明
+              </div>
+            </div>
+          </div>
+          <div class="source-item">
+            <span class="source-num">[14]</span>
+            <div>
+              <a
+                href="https://docs.anthropic.com/en/docs/claude-code/skills"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Claude Code Skills — 公式ドキュメント (2026)</a
+              >
+              <div class="source-desc">
+                SKILL.mdフロントマター全オプション、invocation:
+                explicit、allowed-tools、versionフィールド
+              </div>
+            </div>
+          </div>
+          <div class="source-item">
+            <span class="source-num">[15]</span>
+            <div>
+              <a
+                href="https://github.com/anthropics/claude-code/releases"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Claude Code Releases — GitHub (2026)</a
+              >
+              <div class="source-desc">
+                v2.1.x系リリースノート: Agent
+                Teams、.claude/rules/、.claude/agents/、autoMemoryDirectory対応
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="source-item">
-        <span class="source-num">[2]</span>
-        <div>
-          <a href="https://medium.com/@universe3523/spec-driven-development-with-claude-code-206bf56955d0" target="_blank" rel="noopener noreferrer">Spec Driven Development with Claude Code — Medium (Jan 2026)</a>
-          <div class="source-desc">Requirements Agent / Design Agent / Implementation Agentの役割分担</div>
-        </div>
-      </div>
-      <div class="source-item">
-        <span class="source-num">[3]</span>
-        <div>
-          <a href="https://agentfactory.panaversity.org/docs/General-Agents-Foundations/spec-driven-development" target="_blank" rel="noopener noreferrer">Chapter 5: Spec-Driven Development with Claude Code — Agent Factory</a>
-          <div class="source-desc">CLAUDE.md, Subagents, Tasks, HooksのネイティブClaude Code機能によるSDD</div>
-        </div>
-      </div>
-      <div class="source-item">
-        <span class="source-num">[4]</span>
-        <div>
-          <a href="https://github.com/Pimzino/claude-code-spec-workflow" target="_blank" rel="noopener noreferrer">claude-code-spec-workflow — GitHub (Pimzino)</a>
-          <div class="source-desc">Requirements→Design→Tasks→Implementation の自動化ワークフロー、ディレクトリ構成</div>
-        </div>
-      </div>
-      <div class="source-item">
-        <span class="source-num">[5]</span>
-        <div>
-          <a href="https://docs.anthropic.com/en/docs/claude-code/best-practices" target="_blank" rel="noopener noreferrer">Best Practices for Claude Code — 公式ドキュメント</a>
-          <div class="source-desc">CLAUDE.mdの過剰記述アンチパターン、Hooks vs CLAUDE.md、SKILL.md活用法</div>
-        </div>
-      </div>
-      <div class="source-item">
-        <span class="source-num">[6]</span>
-        <div>
-          <a href="https://tessl.io/blog/spec-driven-dev-with-claude-code/" target="_blank" rel="noopener noreferrer">Unlocking Claude Code: Spec-Driven Development — tessl.io (Jun 2025)</a>
-          <div class="source-desc">spec.mdの作成方法、継続的更新の重要性</div>
-        </div>
-      </div>
-      <div class="source-item">
-        <span class="source-num">[7]</span>
-        <div>
-          <a href="https://docs.anthropic.com/en/docs/claude-code/memory" target="_blank" rel="noopener noreferrer">Manage Claude's Memory — 公式ドキュメント</a>
-          <div class="source-desc">CLAUDE.md階層構造、MEMORY.md仕様、@import構文、CLAUDE.local.md</div>
-        </div>
-      </div>
-      <div class="source-item">
-        <span class="source-num">[8]</span>
-        <div>
-          <a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents" target="_blank" rel="noopener noreferrer">Effective Context Engineering for AI Agents — Anthropic Engineering</a>
-          <div class="source-desc">ハイブリッドメモリ戦略、コンテキスト管理の設計思想</div>
-        </div>
-      </div>
-      <div class="source-item">
-        <span class="source-num">[9]</span>
-        <div>
-          <a href="https://brianchambers.substack.com/p/chamber-of-tech-secrets-54-spec-driven" target="_blank" rel="noopener noreferrer">Spec-driven Development — Chamber of Tech Secrets #54 (Jul 2025)</a>
-          <div class="source-desc">architecture.md共同編集パターン、コンテキスト管理の実践的tips</div>
-        </div>
-      </div>
-      <div class="source-item">
-        <span class="source-num">[10]</span>
-        <div>
-          <a href="https://github.com/gotalab/cc-sdd" target="_blank" rel="noopener noreferrer">cc-sdd — GitHub (gotalab)</a>
-          <div class="source-desc">Kiro式SDD、steering→spec-init→design→tasks→impl ワークフロー</div>
-        </div>
-      </div>
-      <div class="source-item">
-        <span class="source-num">[11]</span>
-        <div>
-          <a href="https://medium.com/@porter.nicholas/teaching-claude-to-remember-part-2-remember-everything-memory-system-1b496d1f0022" target="_blank" rel="noopener noreferrer">Teaching Claude To Remember Part 2 — Medium (Dec 2025)</a>
-          <div class="source-desc">project-context.md / known-gotchas.md の具体的設計パターン</div>
-        </div>
-      </div>
-      <div class="source-item">
-        <span class="source-num">[12]</span>
-        <div>
-          <a href="https://www.anthropic.com/engineering/claude-code-best-practices" target="_blank" rel="noopener noreferrer">Claude Code: Best Practices for Agentic Coding — Anthropic Engineering</a>
-          <div class="source-desc">Anthropic公式のClaude Codeベストプラクティス</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-</main>
-</body>
+      </section>
+    </main>
+  </body>
 </html>

@@ -1147,7 +1147,7 @@
       }
     </style>
     <!-- Common Header Assets -->
-    <link rel="stylesheet" href="../shared/common-header.css">
+    <link rel="stylesheet" href="../shared/common-header.css" />
     <script src="../shared/common-header.js" defer></script>
   </head>
   <body>
@@ -1161,8 +1161,8 @@
         <span class="topbar-title">Gemini Agent Dev Guide</span>
       </div>
       <span class="topbar-subtitle"
-        >Gemini CLI · ADK · Code Assist · A2A Protocol · AgentEngine — 2026年3月
-        Gemini 3.1対応版</span
+        >Gemini CLI v0.34.0 · ADK 2.0 Alpha · Code Assist · A2A / AP2 / A2UI · AgentEngine —
+        2026年3月21日更新</span
       >
     </div>
 
@@ -1170,7 +1170,8 @@
       <!-- HERO -->
       <div class="hero">
         <div class="hero-eyebrow">
-          🤖 Google Gemini 完全ガイド — 2026年3月 Gemini 3.1 / A2A / AgentEngine 対応版
+          🤖 Google Gemini 完全ガイド — 2026年3月21日最新版 Gemini CLI v0.34.0 / ADK 2.0 Alpha /
+          A2A+AP2+A2UI 対応
         </div>
         <h1>
           マルチエージェント開発における<br /><span>Markdownファイル & 設定ファイル</span>
@@ -1184,11 +1185,12 @@
           >まで ── Gemini エコシステムの全ファイルを体系的に解説します。
         </p>
         <div class="hero-chips">
-          <span class="hero-chip">Gemini CLI</span>
+          <span class="hero-chip">Gemini CLI v0.34.0</span>
           <span class="hero-chip">Gemini Code Assist</span>
-          <span class="hero-chip">ADK (Python/Go/Java)</span>
-          <span class="hero-chip">A2A Protocol (Linux Foundation)</span>
+          <span class="hero-chip">ADK 2.0 Alpha (Python/TS/Go/Java)</span>
+          <span class="hero-chip">A2A / AP2 / A2UI / AG-UI</span>
           <span class="hero-chip">AgentEngine (Vertex AI)</span>
+          <span class="hero-chip">Plan Mode</span>
           <span class="hero-chip">MCP Integration</span>
           <span class="hero-chip">Android Studio</span>
         </div>
@@ -1897,6 +1899,14 @@
             Claude の <code>.claude/agents/*.md</code> に相当します。<code>description</code>
             フィールドが AutoFlow ルーティングの判断基準になるため、特に重要です。
           </p>
+          <p style="margin-top: 10px">
+            <strong>2026年3月現在のADK最新状況：</strong> <strong>ADK TypeScript 1.0</strong> が GA
+            になり、TS/JS プロジェクトでも
+            <code>@google/adk</code> パッケージで同等の機能が利用可能です。また
+            <strong>ADK Python 2.0 Alpha</strong
+            >（グラフベースのワークフロー定義）が公開中で、より複雑なエージェント DAG
+            の記述が可能になりました。
+          </p>
         </div>
 
         <div class="alert alert-warn">
@@ -1927,7 +1937,8 @@
             <span class="ck">from</span> agents.reviewer.agent
             <span class="ck">import</span> reviewer_agent root_agent = LlmAgent(
             <span class="cm">name</span>=<span class="cs">"orchestrator"</span>,
-            <span class="cm">model</span>=<span class="cs">"gemini-2.5-flash"</span>,
+            <span class="cm">model</span>=<span class="cs">"gemini-3-flash-preview"</span>,
+            <span class="cc"># v0.29.0〜 CLI デフォルト</span>
             <span class="cm">description</span>=<span class="cs"
               >"ユーザーの要求を分析し、適切なサブエージェントに委譲するコーディネーター。"</span
             >, <span class="cm">instruction</span>=<span class="cs"
@@ -1956,7 +1967,7 @@
             <span class="ck">from</span> google.adk.tools
             <span class="ck">import</span> google_search reviewer_agent = LlmAgent(
             <span class="cm">name</span>=<span class="cs">"reviewer"</span>,
-            <span class="cm">model</span>=<span class="cs">"gemini-2.5-flash"</span>,
+            <span class="cm">model</span>=<span class="cs">"gemini-3-flash-preview"</span>,
             <span class="cc"># コスト最適化</span> <span class="cm">description</span>=<span
               class="cs"
               >""" コードレビューを実施するエージェント。 以下の場合に呼び出す: - Pull Request
@@ -2065,6 +2076,10 @@
           <div class="code-body">
             { <span class="cm">"contextFileName"</span>: [<span class="cs">"GEMINI.md"</span>,
             <span class="cs">"AGENTS.md"</span>], <span class="cc">// 複数ファイル対応</span>
+            <span class="cm">"planMode"</span>: <span class="ck">true</span>,
+            <span class="cc"
+              >// Plan Mode デフォルト有効（v0.29.0〜）：read-only で安全に計画立案</span
+            >
             <span class="cm">"mcpServers"</span>: { <span class="cm">"filesystem"</span>: {
             <span class="cm">"command"</span>: <span class="cs">"npx"</span>,
             <span class="cm">"args"</span>: [<span class="cs">"-y"</span>,
@@ -2085,13 +2100,20 @@
         <div class="alert alert-success">
           <span class="alert-icon">✅</span>
           <div class="alert-content">
-            <strong>/memory コマンドでコンテキストを動的管理</strong>
+            <strong
+              >/memory・/plan・/rewind —
+              コンテキスト＆セッション管理コマンド（2026年3月現在）</strong
+            >
             Gemini CLI の
             <code>/memory show</code> で現在ロードされている全コンテキストを確認できます。<code
               >/memory refresh</code
             >
             で再スキャン、<code>/memory add &lt;text&gt;</code> でグローバル GEMINI.md
-            に即時追記が可能です。これを活用することでデバッグが大幅に楽になります。
+            に即時追記が可能です。<br />
+            <code>/plan</code>（v0.29.0〜）を使うと <strong>Plan Mode</strong>（read-only
+            環境）に入り、実装前に安全にコードベース分析・変更計画の立案ができます（v0.33.0〜はリサーチサブエージェントも内蔵）。<br />
+            <code>/rewind</code
+            >（v0.27.0〜）でセッション履歴を遡ることができ、誤った操作のロールバックに使えます。
           </div>
         </div>
       </div>
@@ -2182,35 +2204,56 @@
               </tr>
             </thead>
             <tbody>
-              <tr style="opacity:0.6">
-                <td><code>gemini-2.0-flash</code><br><small style="color:#e53935">⚠️ 2026-06-01廃止</small></td>
+              <tr style="opacity: 0.6">
+                <td>
+                  <code>gemini-2.0-flash</code><br /><small style="color: #e53935"
+                    >⚠️ 2026-06-01廃止</small
+                  >
+                </td>
                 <td>高速・低コスト</td>
                 <td>コードベース探索、ファイル検索、単純変換</td>
-                <td><span class="chip chip-green">最速</span> 廃止前は探索用途のみ。<code>gemini-2.5-flash</code>へ移行推奨</td>
+                <td>
+                  <span class="chip chip-green">最速</span>
+                  廃止前は探索用途のみ。<code>gemini-2.5-flash</code>へ移行推奨
+                </td>
               </tr>
               <tr>
                 <td><code>gemini-2.5-flash</code></td>
                 <td>バランス重視</td>
                 <td>コードレビュー、テスト生成、実装、コーディネーター</td>
-                <td><span class="chip chip-blue">推奨デフォルト</span> コスパ最良</td>
+                <td><span class="chip chip-blue">安定デフォルト</span> コスパ最良</td>
               </tr>
               <tr>
-                <td><code>gemini-3-flash-preview</code></td>
+                <td>
+                  <code>gemini-3-flash-preview</code><br /><small style="color: #1e8e3e"
+                    >✅ CLI デフォルト（v0.29.0〜）</small
+                  >
+                </td>
                 <td>次世代バランス</td>
-                <td>コードレビュー、テスト生成、実装（最新推論力）</td>
-                <td><span class="chip chip-blue">新世代デフォルト候補</span> 2.5-flash の後継</td>
+                <td>コードレビュー、テスト生成、実装、コーディネーター</td>
+                <td>
+                  <span class="chip chip-blue">推奨デフォルト</span> SWE-bench 76%（2.5
+                  Pro相当）・低レイテンシ
+                </td>
               </tr>
               <tr>
                 <td><code>gemini-2.5-pro</code></td>
                 <td>高精度・複雑推論</td>
                 <td>アーキテクチャ設計、セキュリティ監査、ADR作成</td>
-                <td><span class="chip chip-purple">最高精度</span> 高コスト</td>
+                <td><span class="chip chip-purple">最高精度（旧世代）</span> 高コスト</td>
               </tr>
               <tr>
-                <td><code>gemini-3.1-pro-preview</code></td>
+                <td>
+                  <code>gemini-3.1-pro-preview</code><br /><small style="color: #1e8e3e"
+                    >✅ CLI v0.31.0〜対応</small
+                  >
+                </td>
                 <td>最新高精度推論</td>
                 <td>アーキテクチャ設計、セキュリティ監査（ARC-AGI-2: 77.1%）</td>
-                <td><span class="chip chip-purple">新世代最高精度</span> 3 Proの2倍超推論力</td>
+                <td>
+                  <span class="chip chip-purple">新世代最高精度</span> Gemini 3 Proの2倍超推論力。AI
+                  Ultra / 有料APIキー限定
+                </td>
               </tr>
             </tbody>
           </table>
@@ -2237,7 +2280,7 @@
             </ul>
           </div>
           <div class="pat pat-ng">
-            <div class="pat-label">✗ ADK agent.py の Anti-Patterns</div>
+            <div class="pat-label">✗ ADK agent.py / agent.ts の Anti-Patterns</div>
             <ul>
               <li>description が曖昧（「なんでもやる」エージェント）</li>
               <li>ParallelAgent で同じ output_key を使う（上書き発生）</li>
@@ -2245,6 +2288,8 @@
               <li>全エージェントに gemini-2.5-pro / gemini-3.1-pro-preview を使う（コスト爆発）</li>
               <li>ルートエージェントが直接コードを書く（委譲しない）</li>
               <li>10件以上のサブエージェントを ParallelAgent で同時起動</li>
+              <li>ADK 2.0 Alpha のグラフAPIを本番に使う（まだ安定版ではない）</li>
+              <li>Plan Mode を無効化したまま本番コードベースを変更させる</li>
             </ul>
           </div>
         </div>
@@ -2297,10 +2342,17 @@
                 <td>ツール固有の構文を混在</td>
               </tr>
               <tr>
-                <td><code>agents/*/agent.py</code></td>
-                <td>ADK</td>
+                <td>
+                  <code>agents/*/agent.py</code><br /><small
+                    >（または <code>agent.ts</code>）</small
+                  >
+                </td>
+                <td>ADK Python / ADK TypeScript</td>
                 <td>各サブエージェント（独立コンテキスト）</td>
-                <td>description 明確化・output_key 一意設定・ツール最小化</td>
+                <td>
+                  description 明確化・output_key 一意設定・ツール最小化。TSは
+                  <code>@google/adk</code>
+                </td>
                 <td>曖昧なdescription・output_key重複</td>
               </tr>
               <tr>
@@ -2314,7 +2366,7 @@
                 <td><code>settings.json</code></td>
                 <td>CLI/IDE</td>
                 <td>Geminiランタイム</td>
-                <td>MCP設定・除外ツール・checkpointing の制御</td>
+                <td>MCP設定・除外ツール・checkpointing・planMode の制御</td>
                 <td>直接APIキーを記述する</td>
               </tr>
               <tr>
@@ -2332,30 +2384,37 @@
       <hr />
 
       <!-- ═══════════════════════════════════════════════════════════════════
-           マルチエージェント & A2A セクション（2026年2月 追記）
+           マルチエージェント & A2A セクション（2026年3月21日 最新版）
            ═══════════════════════════════════════════════════════════════════ -->
 
       <!-- ── Section 10: Sub vs Multi 根本的な違い ── -->
       <div class="section section-ma">
         <div class="section-head">
           <span class="section-num">10</span>
-          <h2>サブエージェント vs マルチエージェント — ADK × A2A × MCP の3層構造</h2>
+          <h2>サブエージェント vs マルチエージェント — ADK × A2A × MCP × AP2/A2UI の4層構造</h2>
         </div>
 
         <div class="ma-banner">
           <div class="ma-eyebrow">
-            🌐 ADK Python v1.0 GA (2025年5月 Google I/O) · A2A Protocol (Linux Foundation 移管済み)
+            🌐 ADK Python 1.x GA (2025年5月 Google I/O) · ADK Python 2.0
+            Alpha（グラフワークフロー）公開中 · ADK TypeScript GA · A2A Protocol (Linux Foundation
+            移管済み) · AP2 / A2UI 新プロトコル追加（2026年3月）
           </div>
-          <h3>Google が推奨する 3層アーキテクチャ</h3>
+          <h3>Google が推奨する 4層アーキテクチャ（2026年3月更新）</h3>
           <p>
             Google のマルチエージェント設計は
             <strong>ADK（エージェント内部ロジック）</strong>・<strong
               >A2A プロトコル（エージェント間通信）</strong
-            >・<strong>MCP（外部ツール・データ接続）</strong> の3層で構成されます。 A2A は
-            Atlassian・SAP・Salesforce・ServiceNow など
+            >・<strong>MCP（外部ツール・データ接続）</strong>・<strong
+              >AP2 / A2UI（決済・UI）</strong
+            >
+            の4層で構成されます。 A2A は Atlassian・SAP・Salesforce・ServiceNow など
             <strong>50 以上のパートナー</strong>が対応するオープンスタンダードです。 ADK の
             <code>RemoteA2aAgent</code>
-            を使えば、リモートエージェントへの接続がローカルのツール呼び出しと同じ感覚で実装できます。
+            を使えば、リモートエージェントへの接続がローカルのツール呼び出しと同じ感覚で実装できます。2026年3月18日のブログでは新たに<strong>
+              AP2（決済認証プロトコル）・A2UI（エージェント→UI
+              コンポーネント生成）・AG-UI（ストリーミングUI）</strong
+            >も公開されました。
           </p>
         </div>
 
@@ -2398,6 +2457,61 @@
                 = エージェント接続）。
               </div>
               <span class="layer-file">settings.json → mcpServers</span>
+            </div>
+          </div>
+          <div
+            class="layer-row"
+            style="
+              background: rgba(232, 113, 10, 0.07);
+              border: 1.5px solid rgba(232, 113, 10, 0.35);
+              border-radius: 10px;
+              padding: 14px 16px;
+              margin-bottom: 10px;
+            "
+          >
+            <div
+              class="layer-badge"
+              style="
+                background: #e8710a;
+                font-size: 10px;
+                padding: 3px 7px;
+                border-radius: 6px;
+                color: #fff;
+                font-weight: 700;
+                white-space: nowrap;
+                flex-shrink: 0;
+              "
+            >
+              AP2/A2UI
+            </div>
+            <div class="layer-title" style="color: #fb923c">
+              💳 決済認証 &amp; UI 生成プロトコル（2026年3月18日 新公開）
+            </div>
+            <div class="layer-body">
+              <div class="layer-desc" style="color: #94a3b8">
+                <strong>AP2</strong>:
+                エージェントが決済・認証フローを標準化されたプロトコルで実行。<strong>A2UI</strong>（AG-UI）:
+                エージェントがフロントエンド UI コンポーネントをストリーミング生成・更新。 ADK の
+                <code>AgentUITransport</code> で React 等フロントエンドと統合可能。
+              </div>
+              <span
+                class="layer-file"
+                style="
+                  background: rgba(232, 113, 10, 0.15);
+                  border-color: rgba(232, 113, 10, 0.4);
+                  color: #fb923c;
+                "
+                >AP2: payment_auth フロー定義</span
+              >
+              <span
+                class="layer-file"
+                style="
+                  background: rgba(232, 113, 10, 0.15);
+                  border-color: rgba(232, 113, 10, 0.4);
+                  color: #fb923c;
+                "
+                >A2UI: AgentUITransport + UI イベントストリーム</span
+              >
             </div>
           </div>
         </div>
@@ -3104,7 +3218,9 @@
               <li>GEMINI.md にリモートエンドポイント URL を書かない（管理外に散乱）</li>
               <li>ParallelAgent で同じ output_key を使う（上書き競合・最大の地雷）</li>
               <li>LoopAgent の終了条件・max_iterations を設定しない（無限ループ）</li>
-              <li>全リモートエージェントに gemini-2.5-pro / gemini-3.1-pro-preview（コスト爆発）</li>
+              <li>
+                全リモートエージェントに gemini-2.5-pro / gemini-3.1-pro-preview（コスト爆発）
+              </li>
               <li>エージェント間のファイル所有権を定義しない（書き込み競合）</li>
               <li>A2A タイムアウト・フォールバック戦略を GEMINI.md に記載しない</li>
             </ul>
@@ -3514,16 +3630,18 @@
           </div>
           <div class="src-card src-card-new">
             <div class="src-icon">🟥</div>
-            <div class="src-title">
-              Gemini モデル一覧 — Gemini API 公式（2026年3月現在）
-            </div>
+            <div class="src-title">Gemini モデル一覧 — Gemini API 公式（2026年3月現在）</div>
             <div class="src-url">
-              <a href="https://ai.google.dev/gemini-api/docs/models" target="_blank" rel="noopener noreferrer"
+              <a
+                href="https://ai.google.dev/gemini-api/docs/models"
+                target="_blank"
+                rel="noopener noreferrer"
                 >ai.google.dev/gemini-api/docs/models</a
               >
             </div>
             <div class="src-desc">
-              gemini-3.1-pro-preview / gemini-3-flash-preview / gemini-2.5-flash 等の現行モデルID・コンテキスト長・価格の公式一覧
+              gemini-3.1-pro-preview / gemini-3-flash-preview / gemini-2.5-flash
+              等の現行モデルID・コンテキスト長・価格の公式一覧
             </div>
           </div>
           <div class="src-card src-card-new">
@@ -3532,12 +3650,70 @@
               Gemini deprecations — モデル廃止スケジュール（Gemini API 公式）
             </div>
             <div class="src-url">
-              <a href="https://ai.google.dev/gemini-api/docs/deprecations" target="_blank" rel="noopener noreferrer"
+              <a
+                href="https://ai.google.dev/gemini-api/docs/deprecations"
+                target="_blank"
+                rel="noopener noreferrer"
                 >ai.google.dev/gemini-api/docs/deprecations</a
               >
             </div>
             <div class="src-desc">
-              gemini-2.0-flash 廃止予定（2026-06-01）・gemini-3-pro-preview 廃止（2026-03-09）等の公式廃止スケジュール
+              gemini-2.0-flash 廃止予定（2026-06-01）・gemini-3-pro-preview
+              廃止（2026-03-09）等の公式廃止スケジュール
+            </div>
+          </div>
+          <div class="src-card src-card-new">
+            <div class="src-icon">🟦</div>
+            <div class="src-title">
+              ADK TypeScript / JavaScript SDK — 公式 npm パッケージ（@google/adk）
+            </div>
+            <div class="src-url">
+              <a
+                href="https://github.com/google/adk-typescript"
+                target="_blank"
+                rel="noopener noreferrer"
+                >github.com/google/adk-typescript</a
+              >
+            </div>
+            <div class="src-desc">
+              ADK TypeScript 1.0 GA。Python と同等の LlmAgent / SequentialAgent / ParallelAgent /
+              LoopAgent API・A2A サポート・npm install @google/adk
+            </div>
+          </div>
+          <div class="src-card src-card-new">
+            <div class="src-icon">🟧</div>
+            <div class="src-title">
+              Google Developers Blog: AP2 / A2UI / AG-UI 新プロトコル発表（2026年3月18日）
+            </div>
+            <div class="src-url">
+              <a
+                href="https://developers.googleblog.com/en/new-agent-protocols-ap2-a2ui-ag-ui/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >developers.googleblog.com/en/new-agent-protocols-ap2-a2ui-ag-ui/</a
+              >
+            </div>
+            <div class="src-desc">
+              AP2（決済・認証フロープロトコル）・A2UI / AG-UI（エージェント→UI
+              ストリーミング生成）の設計思想・ADK AgentUITransport との統合方法
+            </div>
+          </div>
+          <div class="src-card src-card-new">
+            <div class="src-icon">🟩</div>
+            <div class="src-title">
+              ADK Python 2.0 Alpha — グラフベースワークフロー（公式ドキュメント）
+            </div>
+            <div class="src-url">
+              <a
+                href="https://google.github.io/adk-docs/agents/workflow-agents/graph/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >google.github.io/adk-docs/agents/workflow-agents/graph/</a
+              >
+            </div>
+            <div class="src-desc">
+              ADK 2.0 Alpha の GraphAgent API。DAG
+              形式でエージェントフローを定義・条件分岐ノード・並列ブランチ・ループをコードで宣言的に記述
             </div>
           </div>
         </div>

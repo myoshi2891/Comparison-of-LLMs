@@ -55,6 +55,8 @@
       children: [
         { name: 'Skill', href: '/claude/skill.html' },
         { name: 'Agent', href: '/claude/agent.html' },
+        { name: 'Skill Guide', href: '/claude/skill-guide-for-claude.html' },
+        { name: 'Skill Guide (中級)', href: '/claude/skill-guide-of-claude-for-intermediate.html' },
       ],
     },
     {
@@ -62,6 +64,8 @@
       children: [
         { name: 'Skill', href: '/gemini/skill.html' },
         { name: 'Agent', href: '/gemini/agent.html' },
+        { name: 'Skill Guide', href: '/gemini/skill-guide-for-gemini.html' },
+        { name: 'Skill Guide (中級)', href: '/gemini/skill-guide-of-gemini-for-intermediate.html' },
       ],
     },
     {

@@ -1,532 +1,1120 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Google Antigravity × Gemini — AI仕様駆動開発 マークダウンファイル完全ガイド</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;600;700&display=swap');
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Google Antigravity × Gemini — AI仕様駆動開発 マークダウンファイル完全ガイド</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;600;700&display=swap');
 
-  :root {
-    --bg: #06080f;
-    --surface: #0d1119;
-    --surface2: #161c27;
-    --border: #232b3a;
-    --g-blue: #4285f4;
-    --g-green: #34a853;
-    --g-yellow: #fbbc04;
-    --g-red: #ea4335;
-    --g-cyan: #00bcd4;
-    --g-purple: #7c4dff;
-    --text: #e8eef6;
-    --text-dim: #a4b4cc;
-    --text-bright: #f0f4ff;
-  }
+      :root {
+        --bg: #06080f;
+        --surface: #0d1119;
+        --surface2: #161c27;
+        --border: #232b3a;
+        --g-blue: #4285f4;
+        --g-green: #34a853;
+        --g-yellow: #fbbc04;
+        --g-red: #ea4335;
+        --g-cyan: #00bcd4;
+        --g-purple: #7c4dff;
+        --text: #e8eef6;
+        --text-dim: #a4b4cc;
+        --text-bright: #f0f4ff;
+      }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Noto Sans JP', sans-serif;
-    font-weight: 300;
-    line-height: 1.8;
-    min-height: 100vh;
-  }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'Noto Sans JP', sans-serif;
+        font-weight: 300;
+        line-height: 1.8;
+        min-height: 100vh;
+      }
 
-  /* ── HEADER ── */
-  header {
-    position: relative;
-    overflow: hidden;
-    padding: 4rem 2rem 5rem;
-    text-align: center;
-    background: linear-gradient(160deg, #07101f 0%, #060b16 60%, #07080e 100%);
-    border-bottom: 1px solid var(--border);
-  }
-  .google-glow {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 60% 40% at 25% 0%, rgba(66,133,244,0.14) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 35% at 75% 0%, rgba(52,168,83,0.10) 0%, transparent 60%),
-      radial-gradient(ellipse 40% 30% at 50% 100%, rgba(251,188,4,0.07) 0%, transparent 60%);
-    pointer-events: none;
-  }
-  .header-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--g-blue);
-    margin-bottom: 1.2rem;
-    padding: 0.3rem 0.8rem;
-    border: 1px solid rgba(66,133,244,0.3);
-    border-radius: 2rem;
-    background: rgba(66,133,244,0.06);
-  }
-  header h1 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(1.7rem, 4vw, 3rem);
-    font-weight: 700;
-    color: var(--text-bright);
-    line-height: 1.15;
-    margin-bottom: 1rem;
-  }
-  .rainbow-text {
-    background: linear-gradient(90deg, #4285f4, #34a853, #fbbc04, #ea4335, #7c4dff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .header-sub {
-    font-size: 0.93rem;
-    color: var(--text-dim);
-    max-width: 600px;
-    margin: 0 auto 2rem;
-  }
-  .platform-badges {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  .pb { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; padding: 0.25rem 0.7rem; border-radius: 2rem; border: 1px solid; }
-  .pb-blue { border-color: rgba(66,133,244,0.5); color: var(--g-blue); background: rgba(66,133,244,0.08); }
-  .pb-green { border-color: rgba(52,168,83,0.5); color: var(--g-green); background: rgba(52,168,83,0.08); }
-  .pb-yellow { border-color: rgba(251,188,4,0.5); color: var(--g-yellow); background: rgba(251,188,4,0.08); }
-  .pb-red { border-color: rgba(234,67,53,0.5); color: var(--g-red); background: rgba(234,67,53,0.08); }
-  .pb-purple { border-color: rgba(124,77,255,0.5); color: var(--g-purple); background: rgba(124,77,255,0.08); }
+      /* ── HEADER ── */
+      header {
+        position: relative;
+        overflow: hidden;
+        padding: 4rem 2rem 5rem;
+        text-align: center;
+        background: linear-gradient(160deg, #07101f 0%, #060b16 60%, #07080e 100%);
+        border-bottom: 1px solid var(--border);
+      }
+      .google-glow {
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(ellipse 60% 40% at 25% 0%, rgba(66, 133, 244, 0.14) 0%, transparent 60%),
+          radial-gradient(ellipse 50% 35% at 75% 0%, rgba(52, 168, 83, 0.1) 0%, transparent 60%),
+          radial-gradient(ellipse 40% 30% at 50% 100%, rgba(251, 188, 4, 0.07) 0%, transparent 60%);
+        pointer-events: none;
+      }
+      .header-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--g-blue);
+        margin-bottom: 1.2rem;
+        padding: 0.3rem 0.8rem;
+        border: 1px solid rgba(66, 133, 244, 0.3);
+        border-radius: 2rem;
+        background: rgba(66, 133, 244, 0.06);
+      }
+      header h1 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: clamp(1.7rem, 4vw, 3rem);
+        font-weight: 700;
+        color: var(--text-bright);
+        line-height: 1.15;
+        margin-bottom: 1rem;
+      }
+      .rainbow-text {
+        background: linear-gradient(90deg, #4285f4, #34a853, #fbbc04, #ea4335, #7c4dff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .header-sub {
+        font-size: 0.93rem;
+        color: var(--text-dim);
+        max-width: 600px;
+        margin: 0 auto 2rem;
+      }
+      .platform-badges {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .pb {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.68rem;
+        padding: 0.25rem 0.7rem;
+        border-radius: 2rem;
+        border: 1px solid;
+      }
+      .pb-blue {
+        border-color: rgba(66, 133, 244, 0.5);
+        color: var(--g-blue);
+        background: rgba(66, 133, 244, 0.08);
+      }
+      .pb-green {
+        border-color: rgba(52, 168, 83, 0.5);
+        color: var(--g-green);
+        background: rgba(52, 168, 83, 0.08);
+      }
+      .pb-yellow {
+        border-color: rgba(251, 188, 4, 0.5);
+        color: var(--g-yellow);
+        background: rgba(251, 188, 4, 0.08);
+      }
+      .pb-red {
+        border-color: rgba(234, 67, 53, 0.5);
+        color: var(--g-red);
+        background: rgba(234, 67, 53, 0.08);
+      }
+      .pb-purple {
+        border-color: rgba(124, 77, 255, 0.5);
+        color: var(--g-purple);
+        background: rgba(124, 77, 255, 0.08);
+      }
 
-  /* ── LAYOUT ── */
-  main { max-width: 1120px; margin: 0 auto; padding: 3rem 1.5rem 6rem; }
+      /* ── LAYOUT ── */
+      main {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 3rem 1.5rem 6rem;
+      }
 
-  /* ── TOC ── */
-  .toc {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--g-blue);
-    border-radius: 10px;
-    padding: 1.5rem 2rem;
-    margin-bottom: 3rem;
-  }
-  .toc-label { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; letter-spacing: 0.2em; color: var(--g-blue); text-transform: uppercase; margin-bottom: 1rem; }
-  .toc ol { list-style: none; counter-reset: toc; }
-  .toc li { counter-increment: toc; display: flex; align-items: baseline; gap: 0.5rem; padding: 0.2rem 0; font-size: 0.88rem; }
-  .toc li::before { content: counter(toc, decimal-leading-zero); font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-dim); min-width: 2rem; }
-  .toc a { color: var(--text); text-decoration: none; }
-  .toc a:hover { color: var(--g-blue); }
+      /* ── TOC ── */
+      .toc {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--g-blue);
+        border-radius: 10px;
+        padding: 1.5rem 2rem;
+        margin-bottom: 3rem;
+      }
+      .toc-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.2em;
+        color: var(--g-blue);
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+      }
+      .toc ol {
+        list-style: none;
+        counter-reset: toc;
+      }
+      .toc li {
+        counter-increment: toc;
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+        padding: 0.2rem 0;
+        font-size: 0.88rem;
+      }
+      .toc li::before {
+        content: counter(toc, decimal-leading-zero);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        color: var(--text-dim);
+        min-width: 2rem;
+      }
+      .toc a {
+        color: var(--text);
+        text-decoration: none;
+      }
+      .toc a:hover {
+        color: var(--g-blue);
+      }
 
-  /* ── SECTION ── */
-  section { margin-bottom: 4.5rem; }
-  .sec-label { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; letter-spacing: 0.18em; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.4rem; }
-  h2.sec-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.55rem; font-weight: 700; color: var(--text-bright); margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 1px solid var(--border); }
-  h2.sec-title .num { font-family: 'JetBrains Mono', monospace; font-size: 0.88rem; color: var(--g-blue); margin-right: 0.5rem; }
-  h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-bright); margin: 2rem 0 0.7rem; }
-  p { margin-bottom: 0.9rem; font-size: 0.93rem; color: var(--text); }
+      /* ── SECTION ── */
+      section {
+        margin-bottom: 4.5rem;
+      }
+      .sec-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.18em;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        margin-bottom: 0.4rem;
+      }
+      h2.sec-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.55rem;
+        font-weight: 700;
+        color: var(--text-bright);
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.8rem;
+        border-bottom: 1px solid var(--border);
+      }
+      h2.sec-title .num {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.88rem;
+        color: var(--g-blue);
+        margin-right: 0.5rem;
+      }
+      h3 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--text-bright);
+        margin: 2rem 0 0.7rem;
+      }
+      p {
+        margin-bottom: 0.9rem;
+        font-size: 0.93rem;
+        color: var(--text);
+      }
 
-  /* ── FILE CARD ── */
-  .file-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 2rem;
-  }
-  .fc-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid var(--border);
-  }
-  .fc-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
-  .fc-name { font-family: 'JetBrains Mono', monospace; font-size: 0.92rem; font-weight: 600; color: var(--text-bright); }
-  .fc-path { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--text-dim); margin-top: 0.1rem; }
-  .fc-body { padding: 1.5rem; }
+      /* ── FILE CARD ── */
+      .file-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+      }
+      .fc-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .fc-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+      }
+      .fc-name {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.92rem;
+        font-weight: 600;
+        color: var(--text-bright);
+      }
+      .fc-path {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.68rem;
+        color: var(--text-dim);
+        margin-top: 0.1rem;
+      }
+      .fc-body {
+        padding: 1.5rem;
+      }
 
-  /* ── CODE BLOCK ── */
-  .code-block { background: #060810; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin: 1rem 0; }
-  .cb-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.45rem 1rem;
-    background: var(--surface2);
-    border-bottom: 1px solid var(--border);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.68rem;
-    color: var(--text-dim);
-  }
-  .cb-dots { display: flex; gap: 4px; }
-  .cbd { width: 9px; height: 9px; border-radius: 50%; }
-  pre { padding: 1.2rem 1.5rem; font-family: 'JetBrains Mono', monospace; font-size: 0.77rem; line-height: 1.75; color: #dce6f4; overflow-x: auto; white-space: pre; }
-  .kw { color: var(--g-purple); }
-  .str { color: var(--g-green); }
-  .cmt { color: #7a9abe; font-style: italic; }
-  .hd { color: var(--g-blue); font-weight: 600; }
-  .hl { color: var(--g-yellow); }
-  .hl2 { color: var(--g-red); }
+      /* ── CODE BLOCK ── */
+      .code-block {
+        background: #060810;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 1rem 0;
+      }
+      .cb-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.45rem 1rem;
+        background: var(--surface2);
+        border-bottom: 1px solid var(--border);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.68rem;
+        color: var(--text-dim);
+      }
+      .cb-dots {
+        display: flex;
+        gap: 4px;
+      }
+      .cbd {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+      }
+      pre {
+        padding: 1.2rem 1.5rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.77rem;
+        line-height: 1.75;
+        color: #dce6f4;
+        overflow-x: auto;
+        white-space: pre;
+      }
+      .kw {
+        color: var(--g-purple);
+      }
+      .str {
+        color: var(--g-green);
+      }
+      .cmt {
+        color: #7a9abe;
+        font-style: italic;
+      }
+      .hd {
+        color: var(--g-blue);
+        font-weight: 600;
+      }
+      .hl {
+        color: var(--g-yellow);
+      }
+      .hl2 {
+        color: var(--g-red);
+      }
 
-  /* ── HIERARCHY ── */
-  .hierarchy {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 1.5rem;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.8rem;
-    line-height: 2.2;
-    margin: 1.5rem 0;
-  }
-  .hi { display: flex; align-items: center; gap: 0.5rem; }
-  .hi1 { padding-left: 1.5rem; }
-  .hi2 { padding-left: 3rem; }
-  .hi3 { padding-left: 4.5rem; }
-  .hi4 { padding-left: 6rem; }
-  .h-fold { color: var(--g-yellow); }
-  .h-b { color: var(--g-blue); }
-  .h-g { color: var(--g-green); }
-  .h-r { color: var(--g-red); }
-  .h-p { color: var(--g-purple); }
-  .h-c { color: var(--g-cyan); }
-  .h-d { color: var(--text-dim); font-size: 0.68rem; }
+      /* ── HIERARCHY ── */
+      .hierarchy {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.5rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.8rem;
+        line-height: 2.2;
+        margin: 1.5rem 0;
+      }
+      .hi {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .hi1 {
+        padding-left: 1.5rem;
+      }
+      .hi2 {
+        padding-left: 3rem;
+      }
+      .hi3 {
+        padding-left: 4.5rem;
+      }
+      .hi4 {
+        padding-left: 6rem;
+      }
+      .h-fold {
+        color: var(--g-yellow);
+      }
+      .h-b {
+        color: var(--g-blue);
+      }
+      .h-g {
+        color: var(--g-green);
+      }
+      .h-r {
+        color: var(--g-red);
+      }
+      .h-p {
+        color: var(--g-purple);
+      }
+      .h-c {
+        color: var(--g-cyan);
+      }
+      .h-d {
+        color: var(--text-dim);
+        font-size: 0.68rem;
+      }
 
-  /* ── INFO BOX ── */
-  .info-box { border-radius: 8px; padding: 1rem 1.2rem; margin: 1rem 0; display: flex; gap: 0.8rem; font-size: 0.87rem; }
-  .ii { font-size: 1rem; flex-shrink: 0; margin-top: 0.1rem; }
-  .i-tip { background: rgba(52,168,83,0.07); border: 1px solid rgba(52,168,83,0.22); }
-  .i-warn { background: rgba(251,188,4,0.07); border: 1px solid rgba(251,188,4,0.22); }
-  .i-note { background: rgba(66,133,244,0.07); border: 1px solid rgba(66,133,244,0.22); }
-  .i-crit { background: rgba(234,67,53,0.07); border: 1px solid rgba(234,67,53,0.22); }
+      /* ── INFO BOX ── */
+      .info-box {
+        border-radius: 8px;
+        padding: 1rem 1.2rem;
+        margin: 1rem 0;
+        display: flex;
+        gap: 0.8rem;
+        font-size: 0.87rem;
+      }
+      .ii {
+        font-size: 1rem;
+        flex-shrink: 0;
+        margin-top: 0.1rem;
+      }
+      .i-tip {
+        background: rgba(52, 168, 83, 0.07);
+        border: 1px solid rgba(52, 168, 83, 0.22);
+      }
+      .i-warn {
+        background: rgba(251, 188, 4, 0.07);
+        border: 1px solid rgba(251, 188, 4, 0.22);
+      }
+      .i-note {
+        background: rgba(66, 133, 244, 0.07);
+        border: 1px solid rgba(66, 133, 244, 0.22);
+      }
+      .i-crit {
+        background: rgba(234, 67, 53, 0.07);
+        border: 1px solid rgba(234, 67, 53, 0.22);
+      }
 
-  /* ── FLOW ── */
-  .flow-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; margin: 2rem 0; overflow-x: auto; }
-  .flow-label { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 1.5rem; }
-  .flow { display: flex; align-items: center; gap: 0; min-width: max-content; }
-  .fstep { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
-  .fbox {
-    padding: 0.65rem 1rem;
-    border-radius: 8px;
-    font-size: 0.78rem;
-    font-weight: 500;
-    text-align: center;
-    white-space: nowrap;
-    border: 1px solid;
-    min-width: 105px;
-    line-height: 1.4;
-  }
-  .fb-b { background: rgba(66,133,244,0.1); border-color: rgba(66,133,244,0.4); color: var(--g-blue); }
-  .fb-g { background: rgba(52,168,83,0.1); border-color: rgba(52,168,83,0.4); color: var(--g-green); }
-  .fb-y { background: rgba(251,188,4,0.1); border-color: rgba(251,188,4,0.4); color: var(--g-yellow); }
-  .fb-r { background: rgba(234,67,53,0.1); border-color: rgba(234,67,53,0.4); color: var(--g-red); }
-  .fb-p { background: rgba(124,77,255,0.1); border-color: rgba(124,77,255,0.4); color: var(--g-purple); }
-  .ffile { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--text-dim); text-align: center; }
-  .farrow { padding: 0 0.3rem; color: var(--text-dim); font-size: 1.1rem; margin-top: -1.5rem; }
+      /* ── FLOW ── */
+      .flow-wrap {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 2rem;
+        margin: 2rem 0;
+        overflow-x: auto;
+      }
+      .flow-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        margin-bottom: 1.5rem;
+      }
+      .flow {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        min-width: max-content;
+      }
+      .fstep {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.4rem;
+      }
+      .fbox {
+        padding: 0.65rem 1rem;
+        border-radius: 8px;
+        font-size: 0.78rem;
+        font-weight: 500;
+        text-align: center;
+        white-space: nowrap;
+        border: 1px solid;
+        min-width: 105px;
+        line-height: 1.4;
+      }
+      .fb-b {
+        background: rgba(66, 133, 244, 0.1);
+        border-color: rgba(66, 133, 244, 0.4);
+        color: var(--g-blue);
+      }
+      .fb-g {
+        background: rgba(52, 168, 83, 0.1);
+        border-color: rgba(52, 168, 83, 0.4);
+        color: var(--g-green);
+      }
+      .fb-y {
+        background: rgba(251, 188, 4, 0.1);
+        border-color: rgba(251, 188, 4, 0.4);
+        color: var(--g-yellow);
+      }
+      .fb-r {
+        background: rgba(234, 67, 53, 0.1);
+        border-color: rgba(234, 67, 53, 0.4);
+        color: var(--g-red);
+      }
+      .fb-p {
+        background: rgba(124, 77, 255, 0.1);
+        border-color: rgba(124, 77, 255, 0.4);
+        color: var(--g-purple);
+      }
+      .ffile {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.62rem;
+        color: var(--text-dim);
+        text-align: center;
+      }
+      .farrow {
+        padding: 0 0.3rem;
+        color: var(--text-dim);
+        font-size: 1.1rem;
+        margin-top: -1.5rem;
+      }
 
-  /* ── GRID ── */
-  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
-  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
-  .mini-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 1.1rem; }
-  .mc-tag { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--g-blue); margin-bottom: 0.4rem; font-weight: 600; }
-  .mini-card p { font-size: 0.82rem; color: var(--text-dim); margin: 0; line-height: 1.6; }
+      /* ── GRID ── */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .mini-card {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.1rem;
+      }
+      .mc-tag {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.72rem;
+        color: var(--g-blue);
+        margin-bottom: 0.4rem;
+        font-weight: 600;
+      }
+      .mini-card p {
+        font-size: 0.82rem;
+        color: var(--text-dim);
+        margin: 0;
+        line-height: 1.6;
+      }
 
-  /* ── COMPARISON TABLE ── */
-  table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.84rem; }
-  th { background: var(--surface2); color: var(--text-bright); font-family: 'Space Grotesk', sans-serif; font-weight: 600; padding: 0.7rem 1rem; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.78rem; letter-spacing: 0.04em; }
-  td { padding: 0.7rem 1rem; border-bottom: 1px solid rgba(35,43,58,0.6); color: var(--text); vertical-align: top; font-size: 0.82rem; }
-  td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--g-green); }
-  tr:last-child td { border-bottom: none; }
+      /* ── COMPARISON TABLE ── */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1.5rem 0;
+        font-size: 0.84rem;
+      }
+      th {
+        background: var(--surface2);
+        color: var(--text-bright);
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600;
+        padding: 0.7rem 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.78rem;
+        letter-spacing: 0.04em;
+      }
+      td {
+        padding: 0.7rem 1rem;
+        border-bottom: 1px solid rgba(35, 43, 58, 0.6);
+        color: var(--text);
+        vertical-align: top;
+        font-size: 0.82rem;
+      }
+      td:first-child {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.75rem;
+        color: var(--g-green);
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
 
-  /* ── SKILLS PATTERN GRID ── */
-  .pattern-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
-  .pattern-card {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 1.1rem;
-    position: relative;
-    overflow: hidden;
-  }
-  .pattern-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
-  .pc-b::before { background: var(--g-blue); }
-  .pc-g::before { background: var(--g-green); }
-  .pc-y::before { background: var(--g-yellow); }
-  .pc-r::before { background: var(--g-red); }
-  .pc-p::before { background: var(--g-purple); }
-  .pattern-num { font-family: 'JetBrains Mono', monospace; font-size: 1.6rem; opacity: 0.06; position: absolute; top: 0.4rem; right: 0.7rem; line-height: 1; color: white; font-weight: 600; }
-  .pattern-card h4 { font-family: 'Space Grotesk', sans-serif; font-size: 0.84rem; font-weight: 600; color: var(--text-bright); margin-bottom: 0.4rem; }
-  .pattern-card p { font-size: 0.76rem; color: var(--text-dim); margin: 0; line-height: 1.55; }
-  .pc-struct { font-family: 'JetBrains Mono', monospace; font-size: 0.66rem; color: var(--text-dim); margin-top: 0.5rem; }
+      /* ── SKILLS PATTERN GRID ── */
+      .pattern-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .pattern-card {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.1rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .pattern-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+      }
+      .pc-b::before {
+        background: var(--g-blue);
+      }
+      .pc-g::before {
+        background: var(--g-green);
+      }
+      .pc-y::before {
+        background: var(--g-yellow);
+      }
+      .pc-r::before {
+        background: var(--g-red);
+      }
+      .pc-p::before {
+        background: var(--g-purple);
+      }
+      .pattern-num {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1.6rem;
+        opacity: 0.06;
+        position: absolute;
+        top: 0.4rem;
+        right: 0.7rem;
+        line-height: 1;
+        color: white;
+        font-weight: 600;
+      }
+      .pattern-card h4 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.84rem;
+        font-weight: 600;
+        color: var(--text-bright);
+        margin-bottom: 0.4rem;
+      }
+      .pattern-card p {
+        font-size: 0.76rem;
+        color: var(--text-dim);
+        margin: 0;
+        line-height: 1.55;
+      }
+      .pc-struct {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.66rem;
+        color: var(--text-dim);
+        margin-top: 0.5rem;
+      }
 
-  /* ── ARTIFACT CARDS ── */
-  .artifact-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.8rem; margin: 1.5rem 0; }
-  .art-card {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-  }
-  .art-icon { font-size: 1.2rem; }
-  .art-name { font-family: 'Space Grotesk', sans-serif; font-size: 0.85rem; font-weight: 600; color: var(--text-bright); }
-  .art-desc { font-size: 0.76rem; color: var(--text-dim); line-height: 1.5; }
-  .art-auto { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--g-green); margin-top: 0.2rem; }
+      /* ── ARTIFACT CARDS ── */
+      .artifact-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0.8rem;
+        margin: 1.5rem 0;
+      }
+      .art-card {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+      .art-icon {
+        font-size: 1.2rem;
+      }
+      .art-name {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-bright);
+      }
+      .art-desc {
+        font-size: 0.76rem;
+        color: var(--text-dim);
+        line-height: 1.5;
+      }
+      .art-auto {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.62rem;
+        color: var(--g-green);
+        margin-top: 0.2rem;
+      }
 
-  /* ── PRINCIPLE CARDS ── */
-  .principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
-  .principle { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; position: relative; overflow: hidden; }
-  .principle::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
-  .p-b::before { background: var(--g-blue); }
-  .p-g::before { background: var(--g-green); }
-  .p-y::before { background: var(--g-yellow); }
-  .p-r::before { background: var(--g-red); }
-  .p-p::before { background: var(--g-purple); }
-  .p-c::before { background: var(--g-cyan); }
-  .pnum { font-family: 'JetBrains Mono', monospace; font-size: 1.8rem; font-weight: 600; opacity: 0.06; position: absolute; top: 0.3rem; right: 0.8rem; line-height: 1; color: white; }
-  .principle h4 { font-family: 'Space Grotesk', sans-serif; font-size: 0.87rem; font-weight: 600; color: var(--text-bright); margin-bottom: 0.4rem; }
-  .principle p { font-size: 0.78rem; color: var(--text-dim); margin: 0; line-height: 1.55; }
+      /* ── PRINCIPLE CARDS ── */
+      .principles {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .principle {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.2rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .principle::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+      }
+      .p-b::before {
+        background: var(--g-blue);
+      }
+      .p-g::before {
+        background: var(--g-green);
+      }
+      .p-y::before {
+        background: var(--g-yellow);
+      }
+      .p-r::before {
+        background: var(--g-red);
+      }
+      .p-p::before {
+        background: var(--g-purple);
+      }
+      .p-c::before {
+        background: var(--g-cyan);
+      }
+      .pnum {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1.8rem;
+        font-weight: 600;
+        opacity: 0.06;
+        position: absolute;
+        top: 0.3rem;
+        right: 0.8rem;
+        line-height: 1;
+        color: white;
+      }
+      .principle h4 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.87rem;
+        font-weight: 600;
+        color: var(--text-bright);
+        margin-bottom: 0.4rem;
+      }
+      .principle p {
+        font-size: 0.78rem;
+        color: var(--text-dim);
+        margin: 0;
+        line-height: 1.55;
+      }
 
-  /* ── SOURCES ── */
-  .sources { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 2rem; margin-top: 3rem; }
-  .sources h3 { font-family: 'Space Grotesk', sans-serif; font-size: 0.88rem; color: var(--text-dim); margin-bottom: 1.2rem; }
-  .src { display: flex; align-items: baseline; gap: 0.8rem; padding: 0.5rem 0; border-bottom: 1px solid rgba(35,43,58,0.5); font-size: 0.8rem; }
-  .src:last-child { border-bottom: none; }
-  .snum { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--text-dim); min-width: 2rem; }
-  .src a { color: var(--g-blue); text-decoration: none; word-break: break-all; }
-  .src a:hover { text-decoration: underline; }
-  .sdesc { color: var(--text-dim); font-size: 0.74rem; display: block; margin-top: 0.1rem; }
+      /* ── SOURCES ── */
+      .sources {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem 2rem;
+        margin-top: 3rem;
+      }
+      .sources h3 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.88rem;
+        color: var(--text-dim);
+        margin-bottom: 1.2rem;
+      }
+      .src {
+        display: flex;
+        align-items: baseline;
+        gap: 0.8rem;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(35, 43, 58, 0.5);
+        font-size: 0.8rem;
+      }
+      .src:last-child {
+        border-bottom: none;
+      }
+      .snum {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.68rem;
+        color: var(--text-dim);
+        min-width: 2rem;
+      }
+      .src a {
+        color: var(--g-blue);
+        text-decoration: none;
+        word-break: break-all;
+      }
+      .src a:hover {
+        text-decoration: underline;
+      }
+      .sdesc {
+        color: var(--text-dim);
+        font-size: 0.74rem;
+        display: block;
+        margin-top: 0.1rem;
+      }
 
-  @media (prefers-reduced-motion: reduce) {
-    html { scroll-behavior: auto; }
-    *, *::before, *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
-  }
-</style>
-  <!-- Common Header Assets -->
-  <link rel="stylesheet" href="../shared/common-header.css">
-  <script src="../shared/common-header.js" defer></script>
-</head>
-<body>
-
-<header>
-  <div class="google-glow"></div>
-  <div class="header-tag">Google Antigravity × Gemini 3 Pro</div>
-  <h1>AI仕様駆動開発における<br><span class="rainbow-text">マークダウンファイル</span><br>完全ガイド</h1>
-  <p class="header-sub">Rules / Skills / Workflows / Artifacts — Antigravityの全マークダウンファイルの役割・構造・ベストプラクティスを根拠ソース付きで徹底解説</p>
-  <div class="platform-badges">
-    <span class="pb pb-blue">Google Antigravity</span>
-    <span class="pb pb-green">Gemini 3 Pro</span>
-    <span class="pb pb-yellow">Agent-First IDE</span>
-    <span class="pb pb-red">Spec-Driven Dev</span>
-    <span class="pb pb-purple">Nov 2025 GA</span>
-  </div>
-</header>
-
-<main>
-
-  <!-- TOC -->
-  <nav class="toc">
-    <div class="toc-label">目次</div>
-    <ol>
-      <li><a href="#overview">Google Antigravityとは — Claude Codeとの比較</a></li>
-      <li><a href="#directory">全体ファイル構成とディレクトリ</a></li>
-      <li><a href="#gemini-md">GEMINI.md — グローバル永続メモリ</a></li>
-      <li><a href="#rules">Rules (.agent/rules/) — 受動的制約・システムプロンプト</a></li>
-      <li><a href="#skills">SKILL.md (.agent/skills/) — 進歩的開示ナレッジ</a></li>
-      <li><a href="#workflows">Workflows (.agent/workflows/) — 能動的手順書</a></li>
-      <li><a href="#context">Knowledge Base (.context/) — 自動注入コンテキスト</a></li>
-      <li><a href="#artifacts">Artifacts — エージェント自動生成マークダウン</a></li>
-      <li><a href="#sdd">SDD仕様書群 (spec / requirements / design / tasks)</a></li>
-      <li><a href="#best-practices">横断ベストプラクティス10則</a></li>
-      <li><a href="#sources">参考ソース一覧</a></li>
-    </ol>
-  </nav>
-
-  <!-- ── SECTION 1 ── -->
-  <section id="overview">
-    <div class="sec-label">Section 01</div>
-    <h2 class="sec-title"><span class="num">01.</span>Google Antigravityとは — Claude Codeとの比較</h2>
-
-    <p>
-      Google Antigravityは<strong style="color:var(--text-bright)">2025年11月18日にGemini 3と同時発表</strong>されたエージェント・ファースト型IDEです。VS Codeのフォークをベースに、Claude CodeのようなCLIツールではなく<strong style="color:var(--text-bright)">フルIDEとして「エージェントが主役」のパラダイム</strong>を実装しています。
-    </p>
-
-    <table>
-      <tr>
-        <th>特性</th>
-        <th>Google Antigravity</th>
-        <th>Claude Code</th>
-      </tr>
-      <tr>
-        <td>種別</td>
-        <td>Agent-First IDE（VSCode fork）</td>
-        <td>CLI / ターミナルエージェント</td>
-      </tr>
-      <tr>
-        <td>主要AI</td>
-        <td>Gemini 3.1 Pro / Flash（+ Claude Sonnet 4.5）<br><small style="color:var(--text-muted)">※Gemini 3 Proは2026-03-09廃止</small></td>
-        <td>Claude Opus / Sonnet / Haiku</td>
-      </tr>
-      <tr>
-        <td>永続記憶</td>
-        <td>GEMINI.md + Knowledge Base + Rules</td>
-        <td>CLAUDE.md + MEMORY.md</td>
-      </tr>
-      <tr>
-        <td>ナレッジ拡張</td>
-        <td>SKILL.md（進歩的開示）</td>
-        <td>SKILL.md（同一規格）</td>
-      </tr>
-      <tr>
-        <td>手順自動化</td>
-        <td>Workflows (.md)</td>
-        <td>Custom Commands (.md)</td>
-      </tr>
-      <tr>
-        <td>ブラウザ自動化</td>
-        <td>Browser Subagent（ネイティブ）</td>
-        <td>なし（MCP経由）</td>
-      </tr>
-      <tr>
-        <td>マルチエージェント</td>
-        <td>Agent Manager（並列・非同期）</td>
-        <td>サブエージェント（限定的）</td>
-      </tr>
-      <tr>
-        <td>エビデンス生成</td>
-        <td>Artifacts（自動）</td>
-        <td>なし（手動）</td>
-      </tr>
-      <tr>
-        <td>価格</td>
-        <td>無料（Public Preview中）<br><small style="color:var(--text-muted)">Google AI Pro/Ultra加入者は優先枠（クォータ5時間ごとリフレッシュ）</small></td>
-        <td>Anthropicプランに依存</td>
-      </tr>
-    </table>
-
-    <div class="info-box i-note">
-      <span class="ii">ℹ️</span>
-      <div><strong>SKILL.mdは共通規格</strong>です。AntigravityとClaude Codeは同一のSKILL.md形式を採用しており、ファイルを両プラットフォーム間でほぼそのまま移植できます（<a href="https://github.com/sickn33/antigravity-awesome-skills" target="_blank" rel="noopener noreferrer" style="color:var(--g-blue)">antigravity-awesome-skills</a>参照）。</div>
-    </div>
-  </section>
-
-  <!-- ── SECTION 2 ── -->
-  <section id="directory">
-    <div class="sec-label">Section 02</div>
-    <h2 class="sec-title"><span class="num">02.</span>全体ファイル構成とディレクトリ</h2>
-
-    <div class="flow-wrap">
-      <div class="flow-label">▸ SDD × Antigravity 4フェーズフロー</div>
-      <div class="flow">
-        <div class="fstep">
-          <div class="fbox fb-b">Phase 1<br>仕様策定</div>
-          <div class="ffile">spec.md<br>requirements.md</div>
-        </div>
-        <div class="farrow">→</div>
-        <div class="fstep">
-          <div class="fbox fb-g">Phase 2<br>設計</div>
-          <div class="ffile">design.md<br>.antigravity/rules.md</div>
-        </div>
-        <div class="farrow">→</div>
-        <div class="fstep">
-          <div class="fbox fb-y">Phase 3<br>エージェント実行</div>
-          <div class="ffile">tasks.md<br>workflows/</div>
-        </div>
-        <div class="farrow">→</div>
-        <div class="fstep">
-          <div class="fbox fb-r">Phase 4<br>検証</div>
-          <div class="ffile">Artifacts<br>Browser Agent</div>
-        </div>
-        <div class="farrow">→</div>
-        <div class="fstep">
-          <div class="fbox fb-p">フィードバック<br>ループ</div>
-          <div class="ffile">Knowledge<br>更新</div>
-        </div>
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+    <!-- Common Header Assets -->
+    <link rel="stylesheet" href="../shared/common-header.css" />
+    <script src="../shared/common-header.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <div class="google-glow"></div>
+      <div class="header-tag">Google Antigravity × Gemini 3.1 Pro</div>
+      <h1>
+        AI仕様駆動開発における<br /><span class="rainbow-text">マークダウンファイル</span
+        ><br />完全ガイド
+      </h1>
+      <p class="header-sub">
+        Rules / Skills / Workflows / Artifacts —
+        Antigravityの全マークダウンファイルの役割・構造・ベストプラクティスを根拠ソース付きで徹底解説
+      </p>
+      <div class="platform-badges">
+        <span class="pb pb-blue">Google Antigravity</span>
+        <span class="pb pb-green">Gemini 3.1 Pro</span>
+        <span class="pb pb-yellow">Agent-First IDE</span>
+        <span class="pb pb-red">Spec-Driven Dev</span>
+        <span class="pb pb-purple">Nov 2025 GA</span>
       </div>
-    </div>
+    </header>
 
-    <h3>推奨ディレクトリ構成（全体）</h3>
-    <div class="hierarchy">
-      <div class="hi"><span class="h-fold">📁</span> <span>your-project/</span></div>
+    <main>
+      <!-- TOC -->
+      <nav class="toc">
+        <div class="toc-label">目次</div>
+        <ol>
+          <li><a href="#overview">Google Antigravityとは — Claude Codeとの比較</a></li>
+          <li><a href="#directory">全体ファイル構成とディレクトリ</a></li>
+          <li><a href="#gemini-md">GEMINI.md — グローバル永続メモリ</a></li>
+          <li><a href="#rules">Rules (.agent/rules/) — 受動的制約・システムプロンプト</a></li>
+          <li><a href="#skills">SKILL.md (.agent/skills/) — 進歩的開示ナレッジ</a></li>
+          <li><a href="#workflows">Workflows (.agent/workflows/) — 能動的手順書</a></li>
+          <li><a href="#context">Knowledge Base (.context/) — 自動注入コンテキスト</a></li>
+          <li><a href="#artifacts">Artifacts — エージェント自動生成マークダウン</a></li>
+          <li><a href="#sdd">SDD仕様書群 (spec / requirements / design / tasks)</a></li>
+          <li><a href="#best-practices">横断ベストプラクティス10則</a></li>
+          <li><a href="#sources">参考ソース一覧</a></li>
+        </ol>
+      </nav>
 
-      <div class="hi hi1"><span class="h-fold">📁</span> <span>.agent/</span> <span class="h-d">— Antigravity ワークスペース設定（最重要）</span></div>
-      <div class="hi hi2"><span class="h-fold">📁</span> <span>rules/</span></div>
-      <div class="hi hi3"><span class="h-b">📄</span> <span class="h-b">always-on.md</span> <span class="h-d">— 常時適用ルール</span></div>
-      <div class="hi hi3"><span class="h-b">📄</span> <span class="h-b">go-style.md</span> <span class="h-d">— 言語別スタイルルール</span></div>
-      <div class="hi hi2"><span class="h-fold">📁</span> <span>skills/</span></div>
-      <div class="hi hi3"><span class="h-fold">📁</span> <span>db-migration/</span></div>
-      <div class="hi hi4"><span class="h-g">📄</span> <span class="h-g">SKILL.md</span> <span class="h-d">— スキル定義（必須）</span></div>
-      <div class="hi hi4"><span class="h-fold">📁</span> <span>scripts/</span> <span class="h-d">— 実行スクリプト（任意）</span></div>
-      <div class="hi hi4"><span class="h-fold">📁</span> <span>references/</span> <span class="h-d">— 参考ドキュメント（任意）</span></div>
-      <div class="hi hi2"><span class="h-fold">📁</span> <span>workflows/</span></div>
-      <div class="hi hi3"><span class="h-r">📄</span> <span class="h-r">deploy.md</span> <span class="h-d">— /deploy コマンド</span></div>
-      <div class="hi hi3"><span class="h-r">📄</span> <span class="h-r">review.md</span> <span class="h-d">— /review コマンド</span></div>
+      <!-- ── SECTION 1 ── -->
+      <section id="overview">
+        <div class="sec-label">Section 01</div>
+        <h2 class="sec-title">
+          <span class="num">01.</span>Google Antigravityとは — Claude Codeとの比較
+        </h2>
 
-      <div class="hi hi1"><span class="h-fold">📁</span> <span>.context/</span> <span class="h-d">— Knowledge Base（自動注入）</span></div>
-      <div class="hi hi2"><span class="h-c">📄</span> <span class="h-c">architecture.md</span></div>
-      <div class="hi hi2"><span class="h-c">📄</span> <span class="h-c">api-conventions.md</span></div>
+        <p>
+          Google Antigravityは<strong style="color: var(--text-bright)"
+            >2025年11月18日にGemini 3と同時発表</strong
+          >されたエージェント・ファースト型IDEです。VS Codeのフォークをベースに、Claude
+          CodeのようなCLIツールではなく<strong style="color: var(--text-bright)"
+            >フルIDEとして「エージェントが主役」のパラダイム</strong
+          >を実装しています。
+        </p>
 
-      <div class="hi hi1"><span class="h-fold">📁</span> <span>.antigravity/</span></div>
-      <div class="hi hi2"><span class="h-p">📄</span> <span class="h-p">rules.md</span> <span class="h-d">— IDE統合ルール（.cursorrules互換）</span></div>
-
-      <div class="hi hi1"><span class="h-fold">📁</span> <span>docs/</span> <span class="h-d">— SDD仕様書群</span></div>
-      <div class="hi hi2"><span class="h-b">📄</span> <span class="h-b">spec.md</span></div>
-      <div class="hi hi2"><span class="h-b">📄</span> <span class="h-b">requirements.md</span></div>
-      <div class="hi hi2"><span class="h-b">📄</span> <span class="h-b">design.md</span></div>
-      <div class="hi hi2"><span class="h-g">📄</span> <span class="h-g">tasks.md</span></div>
-
-      <div class="hi hi1" style="margin-top:0.5rem"><span>~/.gemini/</span> <span class="h-d">— グローバルスコープ</span></div>
-      <div class="hi hi2"><span class="h-b">📄</span> <span class="h-b">GEMINI.md</span> <span class="h-d">— 全プロジェクト共通ルール</span></div>
-      <div class="hi hi2"><span class="h-fold">📁</span> <span>antigravity/skills/</span> <span class="h-d">— グローバルスキル（Antigravity IDE）</span></div>
-      <div class="hi hi2"><span class="h-fold">📁</span> <span>antigravity/global_workflows/</span> <span class="h-d">— グローバルワークフロー</span></div>
-      <div class="hi hi2" style="color:var(--text-muted)"><span class="h-fold">📁</span> <span>skills/</span> <span class="h-d">— グローバルスキル（Gemini CLI用、antigravity/ サブパスなし）</span></div>
-    </div>
-  </section>
-
-  <!-- ── SECTION 3: GEMINI.MD ── -->
-  <section id="gemini-md">
-    <div class="sec-label">Section 03</div>
-    <h2 class="sec-title"><span class="num">03.</span>GEMINI.md — グローバル永続メモリ</h2>
-
-    <p>
-      Claude Codeの<code>CLAUDE.md</code>に相当する<strong style="color:var(--text-bright)">グローバル永続メモリファイル</strong>。<code>~/.gemini/GEMINI.md</code>に配置し、全プロジェクト・全エージェントセッションに横断的に注入されます。プロジェクト固有のルールは後述の<code>.agent/rules/</code>に分離します。
-    </p>
-
-    <div class="file-card">
-      <div class="fc-header">
-        <div class="fc-icon" style="background:rgba(66,133,244,0.12); border:1px solid rgba(66,133,244,0.3);">🌐</div>
-        <div>
-          <div class="fc-name">GEMINI.md</div>
-          <div class="fc-path">~/.gemini/GEMINI.md</div>
-        </div>
-      </div>
-      <div class="fc-body">
-        <h3>スコープと読み込み優先度</h3>
         <table>
-          <tr><th>ファイル</th><th>スコープ</th><th>目的</th></tr>
-          <tr><td>~/.gemini/GEMINI.md</td><td>グローバル</td><td>全プロジェクト共通のワーキングスタイル・禁止事項</td></tr>
-          <tr><td>.agent/rules/always-on.md</td><td>ワークスペース</td><td>プロジェクト固有の常時ルール（優先）</td></tr>
-          <tr><td>.antigravity/rules.md</td><td>IDE統合</td><td>Antigravity IDE固有の動作設定</td></tr>
+          <tr>
+            <th>特性</th>
+            <th>Google Antigravity</th>
+            <th>Claude Code</th>
+          </tr>
+          <tr>
+            <td>種別</td>
+            <td>Agent-First IDE（VSCode fork）</td>
+            <td>CLI / ターミナルエージェント</td>
+          </tr>
+          <tr>
+            <td>主要AI</td>
+            <td>
+              Gemini 3.1 Pro (High/Low) / Gemini 3 Flash<br />+ Claude Sonnet 4.6 / Claude Opus 4.6
+              / GPT-OSS 120B<br /><small style="color: var(--text-dim)"
+                >※Gemini 3 Pro廃止済（2026-03-09）</small
+              >
+            </td>
+            <td>Claude Opus / Sonnet / Haiku</td>
+          </tr>
+          <tr>
+            <td>永続記憶</td>
+            <td>GEMINI.md + Knowledge Base + Rules</td>
+            <td>CLAUDE.md + MEMORY.md</td>
+          </tr>
+          <tr>
+            <td>ナレッジ拡張</td>
+            <td>SKILL.md（進歩的開示）</td>
+            <td>SKILL.md（同一規格）</td>
+          </tr>
+          <tr>
+            <td>手順自動化</td>
+            <td>Workflows (.md)</td>
+            <td>Custom Commands (.md)</td>
+          </tr>
+          <tr>
+            <td>ブラウザ自動化</td>
+            <td>Browser Subagent（ネイティブ）</td>
+            <td>なし（MCP経由）</td>
+          </tr>
+          <tr>
+            <td>マルチエージェント</td>
+            <td>Agent Manager（並列・非同期）</td>
+            <td>サブエージェント（限定的）</td>
+          </tr>
+          <tr>
+            <td>エビデンス生成</td>
+            <td>Artifacts（自動）</td>
+            <td>なし（手動）</td>
+          </tr>
+          <tr>
+            <td>価格</td>
+            <td>
+              無料（Public Preview中）<br /><small style="color: var(--text-dim)"
+                >Google AI Pro ($19.99/月) / Ultra ($250/月) 加入者は優先枠<br />※2026年3月現在、Pro加入者でも最大7日間のレートリミットロックが報告されている</small
+              >
+            </td>
+            <td>Anthropicプランに依存</td>
+          </tr>
         </table>
 
-        <div class="code-block">
-          <div class="cb-header">
-            <div class="cb-dots">
-              <div class="cbd" style="background:#ea4335"></div>
-              <div class="cbd" style="background:#fbbc04"></div>
-              <div class="cbd" style="background:#34a853"></div>
-            </div>
-            <span>~/.gemini/GEMINI.md — ベストプラクティステンプレート</span>
+        <div class="info-box i-note">
+          <span class="ii">ℹ️</span>
+          <div>
+            <strong>SKILL.mdは共通規格</strong>です。AntigravityとClaude
+            Codeは同一のSKILL.md形式を採用しており、ファイルを両プラットフォーム間でほぼそのまま移植できます（<a
+              href="https://github.com/sickn33/antigravity-awesome-skills"
+              target="_blank"
+              rel="noopener noreferrer"
+              style="color: var(--g-blue)"
+              >antigravity-awesome-skills</a
+            >参照）。また、<strong>v1.20.3（2026-03-05）以降はAGENTS.mdにも対応</strong>し、Claude
+            Code（CLAUDE.md）など他のエージェントツールとのルール共有が可能になりました。
           </div>
-          <pre><span class="hd"># Global Developer Profile</span>
+        </div>
+      </section>
+
+      <!-- ── SECTION 2 ── -->
+      <section id="directory">
+        <div class="sec-label">Section 02</div>
+        <h2 class="sec-title"><span class="num">02.</span>全体ファイル構成とディレクトリ</h2>
+
+        <div class="flow-wrap">
+          <div class="flow-label">▸ SDD × Antigravity 4フェーズフロー</div>
+          <div class="flow">
+            <div class="fstep">
+              <div class="fbox fb-b">Phase 1<br />仕様策定</div>
+              <div class="ffile">spec.md<br />requirements.md</div>
+            </div>
+            <div class="farrow">→</div>
+            <div class="fstep">
+              <div class="fbox fb-g">Phase 2<br />設計</div>
+              <div class="ffile">design.md<br />.antigravity/rules.md</div>
+            </div>
+            <div class="farrow">→</div>
+            <div class="fstep">
+              <div class="fbox fb-y">Phase 3<br />エージェント実行</div>
+              <div class="ffile">tasks.md<br />workflows/</div>
+            </div>
+            <div class="farrow">→</div>
+            <div class="fstep">
+              <div class="fbox fb-r">Phase 4<br />検証</div>
+              <div class="ffile">Artifacts<br />Browser Agent</div>
+            </div>
+            <div class="farrow">→</div>
+            <div class="fstep">
+              <div class="fbox fb-p">フィードバック<br />ループ</div>
+              <div class="ffile">Knowledge<br />更新</div>
+            </div>
+          </div>
+        </div>
+
+        <h3>推奨ディレクトリ構成（全体）</h3>
+        <div class="hierarchy">
+          <div class="hi"><span class="h-fold">📁</span> <span>your-project/</span></div>
+
+          <div class="hi hi1">
+            <span class="h-fold">📁</span> <span>.agent/</span>
+            <span class="h-d">— Antigravity ワークスペース設定（最重要）</span>
+          </div>
+          <div class="hi hi2"><span class="h-fold">📁</span> <span>rules/</span></div>
+          <div class="hi hi3">
+            <span class="h-b">📄</span> <span class="h-b">always-on.md</span>
+            <span class="h-d">— 常時適用ルール</span>
+          </div>
+          <div class="hi hi3">
+            <span class="h-b">📄</span> <span class="h-b">go-style.md</span>
+            <span class="h-d">— 言語別スタイルルール</span>
+          </div>
+          <div class="hi hi2"><span class="h-fold">📁</span> <span>skills/</span></div>
+          <div class="hi hi3"><span class="h-fold">📁</span> <span>db-migration/</span></div>
+          <div class="hi hi4">
+            <span class="h-g">📄</span> <span class="h-g">SKILL.md</span>
+            <span class="h-d">— スキル定義（必須）</span>
+          </div>
+          <div class="hi hi4">
+            <span class="h-fold">📁</span> <span>scripts/</span>
+            <span class="h-d">— 実行スクリプト（任意）</span>
+          </div>
+          <div class="hi hi4">
+            <span class="h-fold">📁</span> <span>references/</span>
+            <span class="h-d">— 参考ドキュメント（任意）</span>
+          </div>
+          <div class="hi hi2"><span class="h-fold">📁</span> <span>workflows/</span></div>
+          <div class="hi hi3">
+            <span class="h-r">📄</span> <span class="h-r">deploy.md</span>
+            <span class="h-d">— /deploy コマンド</span>
+          </div>
+          <div class="hi hi3">
+            <span class="h-r">📄</span> <span class="h-r">review.md</span>
+            <span class="h-d">— /review コマンド</span>
+          </div>
+
+          <div class="hi hi1">
+            <span class="h-fold">📁</span> <span>.context/</span>
+            <span class="h-d">— Knowledge Base（自動注入）</span>
+          </div>
+          <div class="hi hi2">
+            <span class="h-c">📄</span> <span class="h-c">architecture.md</span>
+          </div>
+          <div class="hi hi2">
+            <span class="h-c">📄</span> <span class="h-c">api-conventions.md</span>
+          </div>
+
+          <div class="hi hi1"><span class="h-fold">📁</span> <span>.antigravity/</span></div>
+          <div class="hi hi2">
+            <span class="h-p">📄</span> <span class="h-p">rules.md</span>
+            <span class="h-d">— IDE統合ルール（.cursorrules互換）</span>
+          </div>
+
+          <div class="hi hi1">
+            <span class="h-fold">📁</span> <span>docs/</span> <span class="h-d">— SDD仕様書群</span>
+          </div>
+          <div class="hi hi2"><span class="h-b">📄</span> <span class="h-b">spec.md</span></div>
+          <div class="hi hi2">
+            <span class="h-b">📄</span> <span class="h-b">requirements.md</span>
+          </div>
+          <div class="hi hi2"><span class="h-b">📄</span> <span class="h-b">design.md</span></div>
+          <div class="hi hi2"><span class="h-g">📄</span> <span class="h-g">tasks.md</span></div>
+
+          <div class="hi hi1" style="margin-top: 0.5rem">
+            <span>~/.gemini/</span> <span class="h-d">— グローバルスコープ</span>
+          </div>
+          <div class="hi hi2">
+            <span class="h-b">📄</span> <span class="h-b">GEMINI.md</span>
+            <span class="h-d">— 全プロジェクト共通ルール</span>
+          </div>
+          <div class="hi hi2">
+            <span class="h-fold">📁</span> <span>antigravity/skills/</span>
+            <span class="h-d">— グローバルスキル（Antigravity IDE）</span>
+          </div>
+          <div class="hi hi2">
+            <span class="h-fold">📁</span> <span>antigravity/global_workflows/</span>
+            <span class="h-d">— グローバルワークフロー</span>
+          </div>
+          <div class="hi hi2" style="color: var(--text-muted)">
+            <span class="h-fold">📁</span> <span>skills/</span>
+            <span class="h-d">— グローバルスキル（Gemini CLI用、antigravity/ サブパスなし）</span>
+          </div>
+
+          <div class="hi hi1" style="margin-top: 0.5rem">
+            <span class="h-g">📄</span> <span class="h-g">AGENTS.md</span>
+            <span class="h-d"
+              >— クロスツール共有ルール（v1.20.3～対応、プロジェクトルートに配置）</span
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION 3: GEMINI.MD ── -->
+      <section id="gemini-md">
+        <div class="sec-label">Section 03</div>
+        <h2 class="sec-title"><span class="num">03.</span>GEMINI.md — グローバル永続メモリ</h2>
+
+        <p>
+          Claude Codeの<code>CLAUDE.md</code>に相当する<strong style="color: var(--text-bright)"
+            >グローバル永続メモリファイル</strong
+          >。<code>~/.gemini/GEMINI.md</code>に配置し、全プロジェクト・全エージェントセッションに横断的に注入されます。プロジェクト固有のルールは後述の<code>.agent/rules/</code>に分離します。
+        </p>
+
+        <div class="file-card">
+          <div class="fc-header">
+            <div
+              class="fc-icon"
+              style="
+                background: rgba(66, 133, 244, 0.12);
+                border: 1px solid rgba(66, 133, 244, 0.3);
+              "
+            >
+              🌐
+            </div>
+            <div>
+              <div class="fc-name">GEMINI.md</div>
+              <div class="fc-path">~/.gemini/GEMINI.md</div>
+            </div>
+          </div>
+          <div class="fc-body">
+            <h3>スコープと読み込み優先度</h3>
+            <table>
+              <tr>
+                <th>ファイル</th>
+                <th>スコープ</th>
+                <th>目的</th>
+              </tr>
+              <tr>
+                <td>~/.gemini/GEMINI.md</td>
+                <td>グローバル</td>
+                <td>全プロジェクト共通のワーキングスタイル・禁止事項</td>
+              </tr>
+              <tr>
+                <td>AGENTS.md（プロジェクトルート）</td>
+                <td>クロスツール</td>
+                <td>Claude Code等と共有できるルール（v1.20.3～対応）</td>
+              </tr>
+              <tr>
+                <td>.agent/rules/always-on.md</td>
+                <td>ワークスペース</td>
+                <td>プロジェクト固有の常時ルール（優先）</td>
+              </tr>
+              <tr>
+                <td>.antigravity/rules.md</td>
+                <td>IDE統合</td>
+                <td>Antigravity IDE固有の動作設定</td>
+              </tr>
+            </table>
+
+            <div class="code-block">
+              <div class="cb-header">
+                <div class="cb-dots">
+                  <div class="cbd" style="background: #ea4335"></div>
+                  <div class="cbd" style="background: #fbbc04"></div>
+                  <div class="cbd" style="background: #34a853"></div>
+                </div>
+                <span>~/.gemini/GEMINI.md — ベストプラクティステンプレート</span>
+              </div>
+              <pre><span class="hd"># Global Developer Profile</span>
 
 <span class="hd">## 🎯 My Working Style</span>
 <span class="cmt"># エージェントへの"個人プロファイル"を記述</span>
@@ -550,56 +1138,89 @@
 - タスク開始前にImplementation Planを必ず生成すること
 - 不確実な場合は実装前に確認（"Always Proceed"禁止）
 - git commitはタスク単位で細かく行う</pre>
-        </div>
-
-        <div class="info-box i-warn">
-          <span class="ii">⚠️</span>
-          <div><strong>アンチパターン:</strong> GEMINI.mdにプロジェクト固有のDB設定やAPIエンドポイントを書かない。グローバルファイルはプロジェクト固有情報を持つべきではありません。プロジェクト情報は<code>.agent/rules/</code>または<code>.context/</code>へ。</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── SECTION 4: RULES ── -->
-  <section id="rules">
-    <div class="sec-label">Section 04</div>
-    <h2 class="sec-title"><span class="num">04.</span>Rules (.agent/rules/) — 受動的制約・バックグラウンドシステムプロンプト</h2>
-
-    <p>
-      Antigravityの<strong style="color:var(--text-bright)">Rulesは「常にバックグラウンドで動作するシステムプロンプト」</strong>です。Claude CodeのCLAUDE.mdとは異なり、<strong>ファイル単位でルールを分割・個別に有効化</strong>できる点が特徴です。
-    </p>
-
-    <div class="file-card">
-      <div class="fc-header">
-        <div class="fc-icon" style="background:rgba(234,67,53,0.12); border:1px solid rgba(234,67,53,0.3);">📜</div>
-        <div>
-          <div class="fc-name">Rules Files</div>
-          <div class="fc-path">.agent/rules/*.md</div>
-        </div>
-      </div>
-      <div class="fc-body">
-
-        <h3>Rules vs SKILL.md — 使い分け早見表</h3>
-        <table>
-          <tr><th>観点</th><th>Rules (.agent/rules/)</th><th>SKILL.md (.agent/skills/)</th></tr>
-          <tr><td>起動タイミング</td><td>常時（または設定条件で）</td><td>意図が合致したときのみ</td></tr>
-          <tr><td>コンテキスト消費</td><td>高（毎回注入）</td><td>低（オンデマンド）</td></tr>
-          <tr><td>用途</td><td>コーディング規約・禁止事項</td><td>専門ワークフロー・知識</td></tr>
-          <tr><td>推奨内容</td><td>「〜してはいけない」ルール</td><td>「〜する方法」の手順</td></tr>
-        </table>
-
-        <h3>ベストプラクティス: ルールファイルを機能別に分割</h3>
-
-        <div class="code-block">
-          <div class="cb-header">
-            <div class="cb-dots">
-              <div class="cbd" style="background:#ea4335"></div>
-              <div class="cbd" style="background:#fbbc04"></div>
-              <div class="cbd" style="background:#34a853"></div>
             </div>
-            <span>.agent/rules/always-on.md — 常時適用ルール</span>
+
+            <div class="info-box i-warn">
+              <span class="ii">⚠️</span>
+              <div>
+                <strong>アンチパターン:</strong>
+                GEMINI.mdにプロジェクト固有のDB設定やAPIエンドポイントを書かない。グローバルファイルはプロジェクト固有情報を持つべきではありません。プロジェクト情報は<code>.agent/rules/</code>または<code>.context/</code>へ。
+              </div>
+            </div>
           </div>
-          <pre><span class="hd">---</span>
+        </div>
+      </section>
+
+      <!-- ── SECTION 4: RULES ── -->
+      <section id="rules">
+        <div class="sec-label">Section 04</div>
+        <h2 class="sec-title">
+          <span class="num">04.</span>Rules (.agent/rules/) —
+          受動的制約・バックグラウンドシステムプロンプト
+        </h2>
+
+        <p>
+          Antigravityの<strong style="color: var(--text-bright)"
+            >Rulesは「常にバックグラウンドで動作するシステムプロンプト」</strong
+          >です。Claude
+          CodeのCLAUDE.mdとは異なり、<strong>ファイル単位でルールを分割・個別に有効化</strong>できる点が特徴です。
+        </p>
+
+        <div class="file-card">
+          <div class="fc-header">
+            <div
+              class="fc-icon"
+              style="background: rgba(234, 67, 53, 0.12); border: 1px solid rgba(234, 67, 53, 0.3)"
+            >
+              📜
+            </div>
+            <div>
+              <div class="fc-name">Rules Files</div>
+              <div class="fc-path">.agent/rules/*.md</div>
+            </div>
+          </div>
+          <div class="fc-body">
+            <h3>Rules vs SKILL.md — 使い分け早見表</h3>
+            <table>
+              <tr>
+                <th>観点</th>
+                <th>Rules (.agent/rules/)</th>
+                <th>SKILL.md (.agent/skills/)</th>
+              </tr>
+              <tr>
+                <td>起動タイミング</td>
+                <td>常時（または設定条件で）</td>
+                <td>意図が合致したときのみ</td>
+              </tr>
+              <tr>
+                <td>コンテキスト消費</td>
+                <td>高（毎回注入）</td>
+                <td>低（オンデマンド）</td>
+              </tr>
+              <tr>
+                <td>用途</td>
+                <td>コーディング規約・禁止事項</td>
+                <td>専門ワークフロー・知識</td>
+              </tr>
+              <tr>
+                <td>推奨内容</td>
+                <td>「〜してはいけない」ルール</td>
+                <td>「〜する方法」の手順</td>
+              </tr>
+            </table>
+
+            <h3>ベストプラクティス: ルールファイルを機能別に分割</h3>
+
+            <div class="code-block">
+              <div class="cb-header">
+                <div class="cb-dots">
+                  <div class="cbd" style="background: #ea4335"></div>
+                  <div class="cbd" style="background: #fbbc04"></div>
+                  <div class="cbd" style="background: #34a853"></div>
+                </div>
+                <span>.agent/rules/always-on.md — 常時適用ルール</span>
+              </div>
+              <pre><span class="hd">---</span>
 <span class="str">activation: always</span>
 <span class="hd">---</span>
 
@@ -619,18 +1240,18 @@
 - ORM使用禁止（raw SQLのみ）
 - グローバル変数の新規追加禁止
 - panic()の使用禁止（エラーを返せ）</pre>
-        </div>
-
-        <div class="code-block">
-          <div class="cb-header">
-            <div class="cb-dots">
-              <div class="cbd" style="background:#ea4335"></div>
-              <div class="cbd" style="background:#fbbc04"></div>
-              <div class="cbd" style="background:#34a853"></div>
             </div>
-            <span>.agent/rules/go-style.md — 言語別ルール（Go専用）</span>
-          </div>
-          <pre><span class="hd">---</span>
+
+            <div class="code-block">
+              <div class="cb-header">
+                <div class="cb-dots">
+                  <div class="cbd" style="background: #ea4335"></div>
+                  <div class="cbd" style="background: #fbbc04"></div>
+                  <div class="cbd" style="background: #34a853"></div>
+                </div>
+                <span>.agent/rules/go-style.md — 言語別ルール（Go専用）</span>
+              </div>
+              <pre><span class="hd">---</span>
 <span class="str">activation: fileMatch</span>
 <span class="str">pattern: "**/*.go"</span>
 <span class="hd">---</span>
@@ -642,39 +1263,50 @@
 - インターフェース: 受け取る側（呼び出し元）で定義
 - コンテキスト: 全関数の第1引数はctx context.Context
 - ゴルーチンリーク: defer cancel()を必ず書く</pre>
+            </div>
+
+            <div class="info-box i-tip">
+              <span class="ii">💡</span>
+              <div>
+                <code>activation: fileMatch</code>
+                で<strong>特定ファイルを編集するときだけルールを適用</strong>できます。Goファイル編集時のみGoルールを、TypeScriptファイル時のみTSルールを注入することでコンテキストを節約できます。
+              </div>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <div class="info-box i-tip">
-          <span class="ii">💡</span>
-          <div><code>activation: fileMatch</code> で<strong>特定ファイルを編集するときだけルールを適用</strong>できます。Goファイル編集時のみGoルールを、TypeScriptファイル時のみTSルールを注入することでコンテキストを節約できます。</div>
-        </div>
-      </div>
-    </div>
-  </section>
+      <!-- ── SECTION 5: SKILLS ── -->
+      <section id="skills">
+        <div class="sec-label">Section 05</div>
+        <h2 class="sec-title">
+          <span class="num">05.</span>SKILL.md — 進歩的開示ナレッジ（最重要）
+        </h2>
 
-  <!-- ── SECTION 5: SKILLS ── -->
-  <section id="skills">
-    <div class="sec-label">Section 05</div>
-    <h2 class="sec-title"><span class="num">05.</span>SKILL.md — 進歩的開示ナレッジ（最重要）</h2>
+        <p>
+          AntigravityのSkillsは<strong style="color: var(--text-bright)"
+            >「Progressive Disclosure（進歩的開示）」</strong
+          >という設計思想に基づきます。全てのナレッジをコンテキストに常時注入するのではなく、<strong>エージェントがユーザーの意図を検知したときのみ対応するスキルをロード</strong>する仕組みです。これによりコンテキスト消費を最小化し、応答速度と精度を向上させます。
+        </p>
 
-    <p>
-      AntigravityのSkillsは<strong style="color:var(--text-bright)">「Progressive Disclosure（進歩的開示）」</strong>という設計思想に基づきます。全てのナレッジをコンテキストに常時注入するのではなく、<strong>エージェントがユーザーの意図を検知したときのみ対応するスキルをロード</strong>する仕組みです。これによりコンテキスト消費を最小化し、応答速度と精度を向上させます。
-    </p>
-
-    <div class="file-card">
-      <div class="fc-header">
-        <div class="fc-icon" style="background:rgba(52,168,83,0.12); border:1px solid rgba(52,168,83,0.3);">🎓</div>
-        <div>
-          <div class="fc-name">SKILL.md</div>
-          <div class="fc-path">.agent/skills/&lt;skill-name&gt;/SKILL.md</div>
-        </div>
-      </div>
-      <div class="fc-body">
-
-        <h3>スキルディレクトリ構造</h3>
-        <div class="code-block">
-          <div class="cb-header"><span>スキルの標準ディレクトリ構造</span></div>
-          <pre>.agent/skills/
+        <div class="file-card">
+          <div class="fc-header">
+            <div
+              class="fc-icon"
+              style="background: rgba(52, 168, 83, 0.12); border: 1px solid rgba(52, 168, 83, 0.3)"
+            >
+              🎓
+            </div>
+            <div>
+              <div class="fc-name">SKILL.md</div>
+              <div class="fc-path">.agent/skills/&lt;skill-name&gt;/SKILL.md</div>
+            </div>
+          </div>
+          <div class="fc-body">
+            <h3>スキルディレクトリ構造</h3>
+            <div class="code-block">
+              <div class="cb-header"><span>スキルの標準ディレクトリ構造</span></div>
+              <pre>.agent/skills/
 └── db-migration/
     ├── SKILL.md        <span class="cmt"># 必須: メタデータ + 指示（スキルの「脳」）</span>
     ├── scripts/        <span class="cmt"># 任意: Python/Bash/Goスクリプト</span>
@@ -682,19 +1314,19 @@
     ├── references/     <span class="cmt"># 任意: ドキュメント・テンプレート</span>
     │   └── migration-spec.md
     └── assets/         <span class="cmt"># 任意: 静的ファイル</span></pre>
-        </div>
-
-        <h3>SKILL.mdの完全テンプレート</h3>
-        <div class="code-block">
-          <div class="cb-header">
-            <div class="cb-dots">
-              <div class="cbd" style="background:#ea4335"></div>
-              <div class="cbd" style="background:#fbbc04"></div>
-              <div class="cbd" style="background:#34a853"></div>
             </div>
-            <span>.agent/skills/db-migration/SKILL.md</span>
-          </div>
-          <pre><span class="hd">---</span>
+
+            <h3>SKILL.mdの完全テンプレート</h3>
+            <div class="code-block">
+              <div class="cb-header">
+                <div class="cb-dots">
+                  <div class="cbd" style="background: #ea4335"></div>
+                  <div class="cbd" style="background: #fbbc04"></div>
+                  <div class="cbd" style="background: #34a853"></div>
+                </div>
+                <span>.agent/skills/db-migration/SKILL.md</span>
+              </div>
+              <pre><span class="hd">---</span>
 <span class="str">name: db-migration</span>
 <span class="cmt"># ↑ スキルの一意識別子（ハイフン区切り）</span>
 <span class="str">description: >
@@ -735,90 +1367,110 @@ CREATE INDEX idx_users_last_login ON users(last_login_at);
 - NULL制約の後付けはデータ移行計画なしに行わない
 - 本番環境への直接適用は人間の承認が必要
 - `DROP TABLE` は人間確認なしに実行禁止</pre>
-        </div>
-
-        <h3>5つのスキルパターン</h3>
-        <div class="pattern-grid">
-          <div class="pattern-card pc-b">
-            <div class="pattern-num">01</div>
-            <h4>Basic Router</h4>
-            <p>SKILL.mdのみ。指示と制約をテキストで記述。最もシンプル。</p>
-            <div class="pc-struct">SKILL.md only</div>
-          </div>
-          <div class="pattern-card pc-g">
-            <div class="pattern-num">02</div>
-            <h4>Reference Pattern</h4>
-            <p>references/にドキュメントを置き、SKILL.mdから参照。静的知識の拡張。</p>
-            <div class="pc-struct">SKILL.md + references/</div>
-          </div>
-          <div class="pattern-card pc-y">
-            <div class="pattern-num">03</div>
-            <h4>Few-shot Pattern</h4>
-            <p>examples/にInput/Outputのペアを複数用意。精度の向上。</p>
-            <div class="pc-struct">SKILL.md + examples/</div>
-          </div>
-          <div class="pattern-card pc-r">
-            <div class="pattern-num">04</div>
-            <h4>Tool Use Pattern</h4>
-            <p>scripts/に実行可能なスクリプトを置く。LLMが苦手な計算・DB操作を外出し。</p>
-            <div class="pc-struct">SKILL.md + scripts/</div>
-          </div>
-          <div class="pattern-card pc-p">
-            <div class="pattern-num">05</div>
-            <h4>All-in-One Pattern</h4>
-            <p>全ディレクトリを組み合わせた最強パターン。複雑な業務ロジックに対応。</p>
-            <div class="pc-struct">SKILL.md + all dirs</div>
-          </div>
-        </div>
-
-        <h3>グローバルvs.ワークスペーススキル</h3>
-        <div class="grid-2">
-          <div class="mini-card">
-            <div class="mc-tag">🌐 グローバルスキル</div>
-            <p>~/.gemini/antigravity/skills/（Antigravity IDE）<br>~/.gemini/skills/（Gemini CLI）<br>「JSON整形」「UUID生成」「コードレビュー」など、全プロジェクトで使う汎用スキル。GitHubからスキルセットをクローンして配置可能。</p>
-          </div>
-          <div class="mini-card">
-            <div class="mc-tag">📁 ワークスペーススキル</div>
-            <p>&lt;project&gt;/.agent/skills/<br>「このプロジェクトのデプロイ手順」「社内フレームワークのボイラープレート生成」など、プロジェクト固有のスキル。チームでgit管理。</p>
-          </div>
-        </div>
-
-        <div class="info-box i-crit">
-          <span class="ii">🔑</span>
-          <div><strong>descriptionが命</strong>: SKILL.mdのdescriptionフィールドはエージェントが「いつこのスキルを使うか」を判断するための<strong>意味的トリガー</strong>です。「Executes read-only SQL queries to retrieve user data for debugging」のように「何を・いつ・なぜ」を具体的に書くほど精度が向上します。曖昧なdescriptionはスキルが全く呼ばれないか、誤った状況で呼ばれる原因になります（[11]）。</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── SECTION 6: WORKFLOWS ── -->
-  <section id="workflows">
-    <div class="sec-label">Section 06</div>
-    <h2 class="sec-title"><span class="num">06.</span>Workflows (.agent/workflows/) — 能動的手順書</h2>
-
-    <p>
-      <strong style="color:var(--text-bright)">WorkflowsはRulesの「受動的制約」とは対照的な「能動的手順書」</strong>です。<code>/workflow-name</code> のようにスラッシュコマンドでトリガーし、エージェントが定義された手順を順番に実行します。繰り返し実施するタスク（デプロイ・レビュー・リリースノート作成等）を自動化するのに最適です。
-    </p>
-
-    <div class="file-card">
-      <div class="fc-header">
-        <div class="fc-icon" style="background:rgba(234,67,53,0.12); border:1px solid rgba(234,67,53,0.3);">⚡</div>
-        <div>
-          <div class="fc-name">Workflow Files</div>
-          <div class="fc-path">.agent/workflows/*.md</div>
-        </div>
-      </div>
-      <div class="fc-body">
-        <div class="code-block">
-          <div class="cb-header">
-            <div class="cb-dots">
-              <div class="cbd" style="background:#ea4335"></div>
-              <div class="cbd" style="background:#fbbc04"></div>
-              <div class="cbd" style="background:#34a853"></div>
             </div>
-            <span>.agent/workflows/deploy.md — /deployコマンド</span>
+
+            <h3>5つのスキルパターン</h3>
+            <div class="pattern-grid">
+              <div class="pattern-card pc-b">
+                <div class="pattern-num">01</div>
+                <h4>Basic Router</h4>
+                <p>SKILL.mdのみ。指示と制約をテキストで記述。最もシンプル。</p>
+                <div class="pc-struct">SKILL.md only</div>
+              </div>
+              <div class="pattern-card pc-g">
+                <div class="pattern-num">02</div>
+                <h4>Reference Pattern</h4>
+                <p>references/にドキュメントを置き、SKILL.mdから参照。静的知識の拡張。</p>
+                <div class="pc-struct">SKILL.md + references/</div>
+              </div>
+              <div class="pattern-card pc-y">
+                <div class="pattern-num">03</div>
+                <h4>Few-shot Pattern</h4>
+                <p>examples/にInput/Outputのペアを複数用意。精度の向上。</p>
+                <div class="pc-struct">SKILL.md + examples/</div>
+              </div>
+              <div class="pattern-card pc-r">
+                <div class="pattern-num">04</div>
+                <h4>Tool Use Pattern</h4>
+                <p>scripts/に実行可能なスクリプトを置く。LLMが苦手な計算・DB操作を外出し。</p>
+                <div class="pc-struct">SKILL.md + scripts/</div>
+              </div>
+              <div class="pattern-card pc-p">
+                <div class="pattern-num">05</div>
+                <h4>All-in-One Pattern</h4>
+                <p>全ディレクトリを組み合わせた最強パターン。複雑な業務ロジックに対応。</p>
+                <div class="pc-struct">SKILL.md + all dirs</div>
+              </div>
+            </div>
+
+            <h3>グローバルvs.ワークスペーススキル</h3>
+            <div class="grid-2">
+              <div class="mini-card">
+                <div class="mc-tag">🌐 グローバルスキル</div>
+                <p>
+                  ~/.gemini/antigravity/skills/（Antigravity IDE）<br />~/.gemini/skills/（Gemini
+                  CLI）<br />「JSON整形」「UUID生成」「コードレビュー」など、全プロジェクトで使う汎用スキル。GitHubからスキルセットをクローンして配置可能。
+                </p>
+              </div>
+              <div class="mini-card">
+                <div class="mc-tag">📁 ワークスペーススキル</div>
+                <p>
+                  &lt;project&gt;/.agent/skills/<br />「このプロジェクトのデプロイ手順」「社内フレームワークのボイラープレート生成」など、プロジェクト固有のスキル。チームでgit管理。
+                </p>
+              </div>
+            </div>
+
+            <div class="info-box i-crit">
+              <span class="ii">🔑</span>
+              <div>
+                <strong>descriptionが命</strong>:
+                SKILL.mdのdescriptionフィールドはエージェントが「いつこのスキルを使うか」を判断するための<strong>意味的トリガー</strong>です。「Executes
+                read-only SQL queries to retrieve user data for
+                debugging」のように「何を・いつ・なぜ」を具体的に書くほど精度が向上します。曖昧なdescriptionはスキルが全く呼ばれないか、誤った状況で呼ばれる原因になります（[11]）。
+              </div>
+            </div>
           </div>
-          <pre><span class="hd"># Deploy Workflow</span>
+        </div>
+      </section>
+
+      <!-- ── SECTION 6: WORKFLOWS ── -->
+      <section id="workflows">
+        <div class="sec-label">Section 06</div>
+        <h2 class="sec-title">
+          <span class="num">06.</span>Workflows (.agent/workflows/) — 能動的手順書
+        </h2>
+
+        <p>
+          <strong style="color: var(--text-bright)"
+            >WorkflowsはRulesの「受動的制約」とは対照的な「能動的手順書」</strong
+          >です。<code>/workflow-name</code>
+          のようにスラッシュコマンドでトリガーし、エージェントが定義された手順を順番に実行します。繰り返し実施するタスク（デプロイ・レビュー・リリースノート作成等）を自動化するのに最適です。
+        </p>
+
+        <div class="file-card">
+          <div class="fc-header">
+            <div
+              class="fc-icon"
+              style="background: rgba(234, 67, 53, 0.12); border: 1px solid rgba(234, 67, 53, 0.3)"
+            >
+              ⚡
+            </div>
+            <div>
+              <div class="fc-name">Workflow Files</div>
+              <div class="fc-path">.agent/workflows/*.md</div>
+            </div>
+          </div>
+          <div class="fc-body">
+            <div class="code-block">
+              <div class="cb-header">
+                <div class="cb-dots">
+                  <div class="cbd" style="background: #ea4335"></div>
+                  <div class="cbd" style="background: #fbbc04"></div>
+                  <div class="cbd" style="background: #34a853"></div>
+                </div>
+                <span>.agent/workflows/deploy.md — /deployコマンド</span>
+              </div>
+              <pre><span class="hd"># Deploy Workflow</span>
 <span class="cmt"># トリガー: `/deploy` と入力するとエージェントがこの手順を実行</span>
 
 <span class="hd">## 引数</span>
@@ -835,18 +1487,18 @@ CREATE INDEX idx_users_last_login ON users(last_login_at);
    - production: ユーザーに確認を求めてから実行
 7. ヘルスチェックエンドポイントを確認: `curl https://$ENV.myapp.com/health`
 8. Artifacts（デプロイサマリー）を生成してユーザーに提示する</pre>
-        </div>
-
-        <div class="code-block">
-          <div class="cb-header">
-            <div class="cb-dots">
-              <div class="cbd" style="background:#ea4335"></div>
-              <div class="cbd" style="background:#fbbc04"></div>
-              <div class="cbd" style="background:#34a853"></div>
             </div>
-            <span>.agent/workflows/review.md — /reviewコマンド</span>
-          </div>
-          <pre><span class="hd"># Code Review Workflow</span>
+
+            <div class="code-block">
+              <div class="cb-header">
+                <div class="cb-dots">
+                  <div class="cbd" style="background: #ea4335"></div>
+                  <div class="cbd" style="background: #fbbc04"></div>
+                  <div class="cbd" style="background: #34a853"></div>
+                </div>
+                <span>.agent/workflows/review.md — /reviewコマンド</span>
+              </div>
+              <pre><span class="hd"># Code Review Workflow</span>
 
 <span class="hd">## 手順</span>
 1. `git diff main` で変更差分を取得する
@@ -858,61 +1510,81 @@ CREATE INDEX idx_users_last_login ON users(last_login_at);
 3. 問題があれば重大度(P0/P1/P2)付きでリストアップ
 4. `docs/tasks.md` に未対応課題として追記する
 5. Implementation Artifactとしてレビュー結果を出力</pre>
-        </div>
-
-        <h3>ワークフローのチェーン化</h3>
-        <div class="info-box i-tip">
-          <span class="ii">💡</span>
-          <div>ワークフロー内から別のワークフローを呼び出すことができます（<strong>チェーン化</strong>）。例: "Ship Feature"ワークフローの中で<code>/review</code>を呼び出し、通過したら<code>/deploy staging</code>を実行する構成が可能です（[15]）。</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── SECTION 7: CONTEXT / KNOWLEDGE BASE ── -->
-  <section id="context">
-    <div class="sec-label">Section 07</div>
-    <h2 class="sec-title"><span class="num">07.</span>Knowledge Base (.context/) — 自動注入コンテキスト</h2>
-
-    <p>
-      Antigravityのもう一つの強力な機能が<strong style="color:var(--text-bright)">Knowledge Base（ナレッジベース）</strong>です。エージェントが作業を通じて学習したパターン・プロジェクト固有の慣習・重要な洞察を<code>.context/</code>配下のMarkdownファイルに保存し、次セッションで自動的に参照します。
-    </p>
-
-    <div class="file-card">
-      <div class="fc-header">
-        <div class="fc-icon" style="background:rgba(0,188,212,0.12); border:1px solid rgba(0,188,212,0.3);">🧠</div>
-        <div>
-          <div class="fc-name">Knowledge Base</div>
-          <div class="fc-path">.context/*.md</div>
-        </div>
-      </div>
-      <div class="fc-body">
-
-        <div class="grid-3">
-          <div class="mini-card">
-            <div class="mc-tag">🤖 自動更新</div>
-            <p>エージェントが作業中に「有用なパターン」を発見すると自動的にナレッジベースに追記。Claude CodeのMEMORY.mdに相当。</p>
-          </div>
-          <div class="mini-card">
-            <div class="mc-tag">✍️ 手動追加も可</div>
-            <p>人間が直接<code>.context/</code>配下にMarkdownファイルを作成・編集できる。特定の知識を確実に記録したい場合に使用。</p>
-          </div>
-          <div class="mini-card">
-            <div class="mc-tag">📊 セマンティック検索</div>
-            <p>ナレッジベースはベクター埋め込みで検索されるため、「DB」に関するタスクで自動的にapi-conventions.mdが参照される。</p>
-          </div>
-        </div>
-
-        <div class="code-block">
-          <div class="cb-header">
-            <div class="cb-dots">
-              <div class="cbd" style="background:#ea4335"></div>
-              <div class="cbd" style="background:#fbbc04"></div>
-              <div class="cbd" style="background:#34a853"></div>
             </div>
-            <span>.context/architecture.md — アーキテクチャコンテキスト</span>
+
+            <h3>ワークフローのチェーン化</h3>
+            <div class="info-box i-tip">
+              <span class="ii">💡</span>
+              <div>
+                ワークフロー内から別のワークフローを呼び出すことができます（<strong>チェーン化</strong>）。例:
+                "Ship Feature"ワークフローの中で<code>/review</code>を呼び出し、通過したら<code
+                  >/deploy staging</code
+                >を実行する構成が可能です（[15]）。
+              </div>
+            </div>
           </div>
-          <pre><span class="hd"># System Architecture Context</span>
+        </div>
+      </section>
+
+      <!-- ── SECTION 7: CONTEXT / KNOWLEDGE BASE ── -->
+      <section id="context">
+        <div class="sec-label">Section 07</div>
+        <h2 class="sec-title">
+          <span class="num">07.</span>Knowledge Base (.context/) — 自動注入コンテキスト
+        </h2>
+
+        <p>
+          Antigravityのもう一つの強力な機能が<strong style="color: var(--text-bright)"
+            >Knowledge Base（ナレッジベース）</strong
+          >です。エージェントが作業を通じて学習したパターン・プロジェクト固有の慣習・重要な洞察を<code>.context/</code>配下のMarkdownファイルに保存し、次セッションで自動的に参照します。
+        </p>
+
+        <div class="file-card">
+          <div class="fc-header">
+            <div
+              class="fc-icon"
+              style="background: rgba(0, 188, 212, 0.12); border: 1px solid rgba(0, 188, 212, 0.3)"
+            >
+              🧠
+            </div>
+            <div>
+              <div class="fc-name">Knowledge Base</div>
+              <div class="fc-path">.context/*.md</div>
+            </div>
+          </div>
+          <div class="fc-body">
+            <div class="grid-3">
+              <div class="mini-card">
+                <div class="mc-tag">🤖 自動更新</div>
+                <p>
+                  エージェントが作業中に「有用なパターン」を発見すると自動的にナレッジベースに追記。Claude
+                  CodeのMEMORY.mdに相当。
+                </p>
+              </div>
+              <div class="mini-card">
+                <div class="mc-tag">✍️ 手動追加も可</div>
+                <p>
+                  人間が直接<code>.context/</code>配下にMarkdownファイルを作成・編集できる。特定の知識を確実に記録したい場合に使用。
+                </p>
+              </div>
+              <div class="mini-card">
+                <div class="mc-tag">📊 セマンティック検索</div>
+                <p>
+                  ナレッジベースはベクター埋め込みで検索されるため、「DB」に関するタスクで自動的にapi-conventions.mdが参照される。
+                </p>
+              </div>
+            </div>
+
+            <div class="code-block">
+              <div class="cb-header">
+                <div class="cb-dots">
+                  <div class="cbd" style="background: #ea4335"></div>
+                  <div class="cbd" style="background: #fbbc04"></div>
+                  <div class="cbd" style="background: #34a853"></div>
+                </div>
+                <span>.context/architecture.md — アーキテクチャコンテキスト</span>
+              </div>
+              <pre><span class="hd"># System Architecture Context</span>
 <span class="cmt"># このファイルはエージェントと人間が共同で保守する</span>
 
 <span class="hd">## Current Stack</span>
@@ -931,94 +1603,127 @@ CREATE INDEX idx_users_last_login ON users(last_login_at);
 - Cloud SQLのUnix socket接続は/cloudsql/{conn-name}を使う
 - gRPCのDeadlineはcontext経由で伝播させること（直接設定禁止）
 - Cloud RunのCOLD START: 初回リクエストで500ms遅延が発生する</pre>
-        </div>
-
-        <div class="info-box i-note">
-          <span class="ii">ℹ️</span>
-          <div>ナレッジベースは<code>product-guidelines.md</code>のような重厚なファイルを人間が手動で維持する必要を<strong>大幅に削減</strong>します。エージェントが自律的に学習・記録するため「コードとドキュメントの乖離」問題が軽減されます（[13]）。</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── SECTION 8: ARTIFACTS ── -->
-  <section id="artifacts">
-    <div class="sec-label">Section 08</div>
-    <h2 class="sec-title"><span class="num">08.</span>Artifacts — エージェント自動生成マークダウン</h2>
-
-    <p>
-      AntigravityのArtifactsは、<strong style="color:var(--text-bright)">エージェントが自律的に作業を進める際の「信頼の証拠」</strong>として機能します。「エージェントが何をしたか・なぜそう判断したか」をMarkdownや画像・動画で可視化することで「Trust Gap」を埋めます。SDDの文脈では<strong>人間がレビューすべきゲートポイント</strong>として重要です。
-    </p>
-
-    <div class="artifact-row">
-      <div class="art-card">
-        <span class="art-icon">📋</span>
-        <div class="art-name">Task List</div>
-        <div class="art-desc">エージェントがコードを書く前に生成する構造化計画。Research → Implementation → Verification のフェーズを明示。</div>
-        <div class="art-auto">✦ 自動生成</div>
-      </div>
-      <div class="art-card">
-        <span class="art-icon">🏛</span>
-        <div class="art-name">Implementation Plan</div>
-        <div class="art-desc">コードベースへの変更を事前に詳述する技術設計書。どのファイルをなぜ変更するかを人間がレビュー可能な形式で提示。</div>
-        <div class="art-auto">✦ 自動生成</div>
-      </div>
-      <div class="art-card">
-        <span class="art-icon">📊</span>
-        <div class="art-name">Walkthrough</div>
-        <div class="art-desc">完了した変更のサマリー。変更ファイル一覧・主要な設計判断の理由・テスト結果を含む。</div>
-        <div class="art-auto">✦ 自動生成</div>
-      </div>
-      <div class="art-card">
-        <span class="art-icon">📸</span>
-        <div class="art-name">Screenshots</div>
-        <div class="art-desc">Browser Subagentが撮影したUIの視覚的エビデンス。フロントエンド変更の検証に使用。</div>
-        <div class="art-auto">✦ Browser Agent自動撮影</div>
-      </div>
-      <div class="art-card">
-        <span class="art-icon">🎬</span>
-        <div class="art-name">Browser Recordings</div>
-        <div class="art-desc">UI操作のビデオ録画。E2Eフローの証明として機能。人間がレビュー後にフィードバックをインラインコメントで残せる。</div>
-        <div class="art-auto">✦ Browser Agent自動録画</div>
-      </div>
-    </div>
-
-    <div class="info-box i-warn">
-      <span class="ii">⚠️</span>
-      <div><strong>SDD最重要原則: Artifactを読め</strong><br>多くのユーザーがTask ListやImplementation Planを「なんとなく承認」してコーディング速度を上げようとします。しかしSDDではここが<strong>最重要レビューポイント</strong>です。「コードは後で直せる。設計の誤りは高くつく」— Artifactを厳密に検査することがバグを未然に防ぐ最善策です（[15]）。</div>
-    </div>
-  </section>
-
-  <!-- ── SECTION 9: SDD SPEC FILES ── -->
-  <section id="sdd">
-    <div class="sec-label">Section 09</div>
-    <h2 class="sec-title"><span class="num">09.</span>SDD仕様書群 (docs/) — Antigravity特有の活用法</h2>
-
-    <p>
-      AntigravityのSDD（仕様駆動開発）では、<strong style="color:var(--text-bright)">spec.md / requirements.md / design.md / tasks.md を「エージェントがArtifactを生成する基礎資料」として活用</strong>します。エージェントが自律的にImplementation Planを作成するためにこれらのファイルを自動参照します。
-    </p>
-
-    <div class="file-card">
-      <div class="fc-header">
-        <div class="fc-icon" style="background:rgba(251,188,4,0.12); border:1px solid rgba(251,188,4,0.3);">📚</div>
-        <div>
-          <div class="fc-name">SDD仕様書群</div>
-          <div class="fc-path">docs/ — Antigravity Agent が自動参照</div>
-        </div>
-      </div>
-      <div class="fc-body">
-
-        <h3>Antigravity流SDDの特徴: 「Rulesで仕様書を自動参照させる」</h3>
-        <div class="code-block">
-          <div class="cb-header">
-            <div class="cb-dots">
-              <div class="cbd" style="background:#ea4335"></div>
-              <div class="cbd" style="background:#fbbc04"></div>
-              <div class="cbd" style="background:#34a853"></div>
             </div>
-            <span>.agent/rules/always-on.md（仕様書参照ルール追加）</span>
+
+            <div class="info-box i-note">
+              <span class="ii">ℹ️</span>
+              <div>
+                ナレッジベースは<code>product-guidelines.md</code>のような重厚なファイルを人間が手動で維持する必要を<strong>大幅に削減</strong>します。エージェントが自律的に学習・記録するため「コードとドキュメントの乖離」問題が軽減されます（[13]）。
+              </div>
+            </div>
           </div>
-          <pre><span class="hd">## Spec-Driven Development Rules</span>
+        </div>
+      </section>
+
+      <!-- ── SECTION 8: ARTIFACTS ── -->
+      <section id="artifacts">
+        <div class="sec-label">Section 08</div>
+        <h2 class="sec-title">
+          <span class="num">08.</span>Artifacts — エージェント自動生成マークダウン
+        </h2>
+
+        <p>
+          AntigravityのArtifactsは、<strong style="color: var(--text-bright)"
+            >エージェントが自律的に作業を進める際の「信頼の証拠」</strong
+          >として機能します。「エージェントが何をしたか・なぜそう判断したか」をMarkdownや画像・動画で可視化することで「Trust
+          Gap」を埋めます。SDDの文脈では<strong>人間がレビューすべきゲートポイント</strong>として重要です。
+        </p>
+
+        <div class="artifact-row">
+          <div class="art-card">
+            <span class="art-icon">📋</span>
+            <div class="art-name">Task List</div>
+            <div class="art-desc">
+              エージェントがコードを書く前に生成する構造化計画。Research → Implementation →
+              Verification のフェーズを明示。
+            </div>
+            <div class="art-auto">✦ 自動生成</div>
+          </div>
+          <div class="art-card">
+            <span class="art-icon">🏛</span>
+            <div class="art-name">Implementation Plan</div>
+            <div class="art-desc">
+              コードベースへの変更を事前に詳述する技術設計書。どのファイルをなぜ変更するかを人間がレビュー可能な形式で提示。
+            </div>
+            <div class="art-auto">✦ 自動生成</div>
+          </div>
+          <div class="art-card">
+            <span class="art-icon">📊</span>
+            <div class="art-name">Walkthrough</div>
+            <div class="art-desc">
+              完了した変更のサマリー。変更ファイル一覧・主要な設計判断の理由・テスト結果を含む。
+            </div>
+            <div class="art-auto">✦ 自動生成</div>
+          </div>
+          <div class="art-card">
+            <span class="art-icon">📸</span>
+            <div class="art-name">Screenshots</div>
+            <div class="art-desc">
+              Browser Subagentが撮影したUIの視覚的エビデンス。フロントエンド変更の検証に使用。
+            </div>
+            <div class="art-auto">✦ Browser Agent自動撮影</div>
+          </div>
+          <div class="art-card">
+            <span class="art-icon">🎬</span>
+            <div class="art-name">Browser Recordings</div>
+            <div class="art-desc">
+              UI操作のビデオ録画。E2Eフローの証明として機能。人間がレビュー後にフィードバックをインラインコメントで残せる。
+            </div>
+            <div class="art-auto">✦ Browser Agent自動録画</div>
+          </div>
+        </div>
+
+        <div class="info-box i-warn">
+          <span class="ii">⚠️</span>
+          <div>
+            <strong>SDD最重要原則: Artifactを読め</strong><br />多くのユーザーがTask
+            ListやImplementation
+            Planを「なんとなく承認」してコーディング速度を上げようとします。しかしSDDではここが<strong>最重要レビューポイント</strong>です。「コードは後で直せる。設計の誤りは高くつく」—
+            Artifactを厳密に検査することがバグを未然に防ぐ最善策です（[15]）。
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION 9: SDD SPEC FILES ── -->
+      <section id="sdd">
+        <div class="sec-label">Section 09</div>
+        <h2 class="sec-title">
+          <span class="num">09.</span>SDD仕様書群 (docs/) — Antigravity特有の活用法
+        </h2>
+
+        <p>
+          AntigravityのSDD（仕様駆動開発）では、<strong style="color: var(--text-bright)"
+            >spec.md / requirements.md / design.md / tasks.md
+            を「エージェントがArtifactを生成する基礎資料」として活用</strong
+          >します。エージェントが自律的にImplementation
+          Planを作成するためにこれらのファイルを自動参照します。
+        </p>
+
+        <div class="file-card">
+          <div class="fc-header">
+            <div
+              class="fc-icon"
+              style="background: rgba(251, 188, 4, 0.12); border: 1px solid rgba(251, 188, 4, 0.3)"
+            >
+              📚
+            </div>
+            <div>
+              <div class="fc-name">SDD仕様書群</div>
+              <div class="fc-path">docs/ — Antigravity Agent が自動参照</div>
+            </div>
+          </div>
+          <div class="fc-body">
+            <h3>Antigravity流SDDの特徴: 「Rulesで仕様書を自動参照させる」</h3>
+            <div class="code-block">
+              <div class="cb-header">
+                <div class="cb-dots">
+                  <div class="cbd" style="background: #ea4335"></div>
+                  <div class="cbd" style="background: #fbbc04"></div>
+                  <div class="cbd" style="background: #34a853"></div>
+                </div>
+                <span>.agent/rules/always-on.md（仕様書参照ルール追加）</span>
+              </div>
+              <pre><span class="hd">## Spec-Driven Development Rules</span>
 <span class="cmt"># Rulesに仕様書の存在と読み込み順序を明示</span>
 
 新機能を実装する前に必ず以下を確認すること:
@@ -1029,18 +1734,18 @@ CREATE INDEX idx_users_last_login ON users(last_login_at);
 
 実装後は `docs/tasks.md` の対象タスクをチェック済みにすること。
 仕様書と実装が乖離した場合は、人間に確認を求めること。</pre>
-        </div>
-
-        <div class="code-block">
-          <div class="cb-header">
-            <div class="cb-dots">
-              <div class="cbd" style="background:#ea4335"></div>
-              <div class="cbd" style="background:#fbbc04"></div>
-              <div class="cbd" style="background:#34a853"></div>
             </div>
-            <span>docs/tasks.md — マルチエージェント対応版</span>
-          </div>
-          <pre><span class="hd"># タスクリスト（Agent Manager対応）</span>
+
+            <div class="code-block">
+              <div class="cb-header">
+                <div class="cb-dots">
+                  <div class="cbd" style="background: #ea4335"></div>
+                  <div class="cbd" style="background: #fbbc04"></div>
+                  <div class="cbd" style="background: #34a853"></div>
+                </div>
+                <span>docs/tasks.md — マルチエージェント対応版</span>
+              </div>
+              <pre><span class="hd"># タスクリスト（Agent Manager対応）</span>
 
 <span class="hd">## 🟢 Phase 1: 認証基盤（Agent A担当）</span>
 - [x] Task 1.1: JWTミドルウェア実装
@@ -1060,209 +1765,409 @@ CREATE INDEX idx_users_last_login ON users(last_login_at);
 <span class="cmt"># エージェントが生成したArtifactへのリンクを記録</span>
 - Task 1.1: Implementation Plan → artifacts/task-1-1-plan.md
 - Task 1.2: Walkthrough → artifacts/task-1-2-walkthrough.md</pre>
-        </div>
+            </div>
 
-        <div class="info-box i-tip">
-          <span class="ii">💡</span>
-          <div><strong>Antigravity固有の強み: マルチエージェント並列タスク</strong><br>tasks.mdでPhase 1とPhase 2の依存関係を明示することで、Agent Managerが<strong>Phase 1をAgent Aに、Phase 2をAgent Bに並列割り当て</strong>できます。Claude Codeにはないアンチグラビティ固有の強力な機能です（[2]）。</div>
+            <div class="info-box i-tip">
+              <span class="ii">💡</span>
+              <div>
+                <strong>Antigravity固有の強み: マルチエージェント並列タスク</strong
+                ><br />tasks.mdでPhase 1とPhase 2の依存関係を明示することで、Agent Managerが<strong
+                  >Phase 1をAgent Aに、Phase 2をAgent Bに並列割り当て</strong
+                >できます。Claude Codeにはないアンチグラビティ固有の強力な機能です（[2]）。
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </section>
+      </section>
 
-  <!-- ── SECTION 10: BEST PRACTICES ── -->
-  <section id="best-practices">
-    <div class="sec-label">Section 10</div>
-    <h2 class="sec-title"><span class="num">10.</span>横断ベストプラクティス 10則</h2>
+      <!-- ── SECTION 10: BEST PRACTICES ── -->
+      <section id="best-practices">
+        <div class="sec-label">Section 10</div>
+        <h2 class="sec-title"><span class="num">10.</span>横断ベストプラクティス 10則</h2>
 
-    <div class="principles">
-      <div class="principle p-b">
-        <div class="pnum">01</div>
-        <h4>descriptionがSKILL.mdの命</h4>
-        <p>意味的トリガーとして機能するdescriptionを徹底的に具体化。「何を・いつ・なぜ」を英語で記述すると精度が向上する。</p>
-      </div>
-      <div class="principle p-g">
-        <div class="pnum">02</div>
-        <h4>Rules ≠ SKILL.md: 用途を厳守</h4>
-        <p>「常に守るルール」はRules、「特定タスクの知識」はSKILL.md。混在するとコンテキスト汚染が発生する。</p>
-      </div>
-      <div class="principle p-y">
-        <div class="pnum">03</div>
-        <h4>Artifactレビューを省略しない</h4>
-        <p>Task ListとImplementation Planは必ずレビュー。ここで設計ミスを検出することがバグコスト最小化の鍵。</p>
-      </div>
-      <div class="principle p-r">
-        <div class="pnum">04</div>
-        <h4>fileMatchで言語別ルールを分離</h4>
-        <p>activation: fileMatchを使い、Go/TS/Pythonなど言語別にルールを切り替え。全言語に共通ルールを書かない。</p>
-      </div>
-      <div class="principle p-p">
-        <div class="pnum">05</div>
-        <h4>Global vs Workspace の使い分け</h4>
-        <p>汎用スキル（JSON整形・git commit等）はグローバル。プロジェクト固有（内製フレームワーク等）はワークスペース。</p>
-      </div>
-      <div class="principle p-c">
-        <div class="pnum">06</div>
-        <h4>tasks.mdに並列情報を明示</h4>
-        <p>「Agent A担当」「Agent B担当（並列可）」を記述することでAgent Managerが最適にタスクを分配できる。</p>
-      </div>
-      <div class="principle p-b">
-        <div class="pnum">07</div>
-        <h4>.context/でspec乖離を防ぐ</h4>
-        <p>Known GotchasをKnowledge Baseに記録。エージェントが同じ過ちを繰り返すことを防ぎ、ドキュメントの自動進化を促す。</p>
-      </div>
-      <div class="principle p-g">
-        <div class="pnum">08</div>
-        <h4>Workflowsで繰り返しを撲滅</h4>
-        <p>毎回同じ手順を口頭で指示するものはWorkflowに書く。/deploy、/review、/release-notes を整備する。</p>
-      </div>
-      <div class="principle p-y">
-        <div class="pnum">09</div>
-        <h4>少数精鋭のスキルから始める</h4>
-        <p>スキルは5〜10個から始め、実際に使われたものを磨く。使われないスキルはdescriptionを改善するか削除する。</p>
-      </div>
-      <div class="principle p-r">
-        <div class="pnum">10</div>
-        <h4>Rulesは「Why」を書く</h4>
-        <p>「ORM使用禁止」だけでなく「なぜ禁止か（パフォーマンス測定で20x遅延を確認したため）」を書くとエージェントの判断精度が上がる。</p>
-      </div>
-    </div>
-  </section>
+        <div class="principles">
+          <div class="principle p-b">
+            <div class="pnum">01</div>
+            <h4>descriptionがSKILL.mdの命</h4>
+            <p>
+              意味的トリガーとして機能するdescriptionを徹底的に具体化。「何を・いつ・なぜ」を英語で記述すると精度が向上する。
+            </p>
+          </div>
+          <div class="principle p-g">
+            <div class="pnum">02</div>
+            <h4>Rules ≠ SKILL.md: 用途を厳守</h4>
+            <p>
+              「常に守るルール」はRules、「特定タスクの知識」はSKILL.md。混在するとコンテキスト汚染が発生する。
+            </p>
+          </div>
+          <div class="principle p-y">
+            <div class="pnum">03</div>
+            <h4>Artifactレビューを省略しない</h4>
+            <p>
+              Task ListとImplementation
+              Planは必ずレビュー。ここで設計ミスを検出することがバグコスト最小化の鍵。
+            </p>
+          </div>
+          <div class="principle p-r">
+            <div class="pnum">04</div>
+            <h4>fileMatchで言語別ルールを分離</h4>
+            <p>
+              activation:
+              fileMatchを使い、Go/TS/Pythonなど言語別にルールを切り替え。全言語に共通ルールを書かない。
+            </p>
+          </div>
+          <div class="principle p-p">
+            <div class="pnum">05</div>
+            <h4>Global vs Workspace の使い分け</h4>
+            <p>
+              汎用スキル（JSON整形・git
+              commit等）はグローバル。プロジェクト固有（内製フレームワーク等）はワークスペース。
+            </p>
+          </div>
+          <div class="principle p-c">
+            <div class="pnum">06</div>
+            <h4>tasks.mdに並列情報を明示</h4>
+            <p>
+              「Agent A担当」「Agent B担当（並列可）」を記述することでAgent
+              Managerが最適にタスクを分配できる。
+            </p>
+          </div>
+          <div class="principle p-b">
+            <div class="pnum">07</div>
+            <h4>.context/でspec乖離を防ぐ</h4>
+            <p>
+              Known GotchasをKnowledge
+              Baseに記録。エージェントが同じ過ちを繰り返すことを防ぎ、ドキュメントの自動進化を促す。
+            </p>
+          </div>
+          <div class="principle p-g">
+            <div class="pnum">08</div>
+            <h4>Workflowsで繰り返しを撲滅</h4>
+            <p>
+              毎回同じ手順を口頭で指示するものはWorkflowに書く。/deploy、/review、/release-notes
+              を整備する。
+            </p>
+          </div>
+          <div class="principle p-y">
+            <div class="pnum">09</div>
+            <h4>少数精鋭のスキルから始める</h4>
+            <p>
+              スキルは5〜10個から始め、実際に使われたものを磨く。使われないスキルはdescriptionを改善するか削除する。
+            </p>
+          </div>
+          <div class="principle p-r">
+            <div class="pnum">10</div>
+            <h4>Rulesは「Why」を書く</h4>
+            <p>
+              「ORM使用禁止」だけでなく「なぜ禁止か（パフォーマンス測定で20x遅延を確認したため）」を書くとエージェントの判断精度が上がる。
+            </p>
+          </div>
+        </div>
+      </section>
 
-  <!-- ── SOURCES ── -->
-  <section id="sources">
-    <div class="sources">
-      <h3>📚 参考ソース一覧（公式・二次情報を含む）</h3>
+      <!-- ── SOURCES ── -->
+      <section id="sources">
+        <div class="sources">
+          <h3>📚 参考ソース一覧（公式・二次情報を含む）</h3>
 
-      <div class="src">
-        <span class="snum">[1]</span>
-        <div>
-          <a href="https://developers.googleblog.com/build-with-google-antigravity-our-new-agentic-development-platform/" target="_blank" rel="noopener noreferrer">Build with Google Antigravity — Google Developers Blog (Nov 2025)</a>
-          <span class="sdesc">Antigravity公式発表。エージェントファーストパラダイム・Artifacts・Knowledge Baseの設計思想</span>
+          <div class="src">
+            <span class="snum">[1]</span>
+            <div>
+              <a
+                href="https://developers.googleblog.com/build-with-google-antigravity-our-new-agentic-development-platform/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Build with Google Antigravity — Google Developers Blog (Nov 2025)</a
+              >
+              <span class="sdesc"
+                >Antigravity公式発表。エージェントファーストパラダイム・Artifacts・Knowledge
+                Baseの設計思想</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[2]</span>
+            <div>
+              <a
+                href="https://medium.com/google-cloud/benefits-and-challenges-of-spec-driven-development-and-how-antigravity-is-changing-the-game-3343a6942330"
+                target="_blank"
+                rel="noopener noreferrer"
+                >How Google Antigravity is changing spec-driven development — Google Cloud Medium
+                (Jan 2026)</a
+              >
+              <span class="sdesc"
+                >Artifacts（Task List / Implementation Plan / Walkthrough）のSDD活用、Knowledge
+                Baseによる自動学習</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[3]</span>
+            <div>
+              <a
+                href="https://codelabs.developers.google.com/getting-started-google-antigravity"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Getting Started with Google Antigravity — Google Codelabs</a
+              >
+              <span class="sdesc"
+                >公式チュートリアル。Skills・Rules・Workflows・Artifactsの設定方法。GEMINI.md・.agent/ディレクトリ構造</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[4]</span>
+            <div>
+              <a
+                href="https://codelabs.developers.google.com/getting-started-with-antigravity-skills"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Authoring Google Antigravity Skills — Google Codelabs</a
+              >
+              <span class="sdesc"
+                >SKILL.mdの完全仕様。スキルディレクトリ構造（SKILL.md / scripts / references /
+                assets）・5パターン詳解</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[5]</span>
+            <div>
+              <a
+                href="https://medium.com/google-cloud/tutorial-getting-started-with-antigravity-skills-864041811e0d"
+                target="_blank"
+                rel="noopener noreferrer"
+                >How to Build Custom Skills in Google Antigravity — Google Cloud Medium (Jan
+                2026)</a
+              >
+              <span class="sdesc"
+                >Progressive Disclosure設計思想。scripts/サブディレクトリのTool Use
+                Pattern詳細。グローバル/ワークスペーススコープ</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[6]</span>
+            <div>
+              <a
+                href="https://iamulya.one/posts/advanced-tips-for-mastering-google-antigravity/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Advanced Tips for Mastering Google Antigravity — Amulya Bhatia (Jan 2026)</a
+              >
+              <span class="sdesc"
+                >Rules vs Workflows の使い分け。fileMatch
+                activation。マルチエージェント並列処理。Workflowsチェーン化</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[7]</span>
+            <div>
+              <a
+                href="https://www.shipai.dev/blog/google-antigravity-agentic-ide-guide"
+                target="_blank"
+                rel="noopener noreferrer"
+                >What Is Google Antigravity? Google's Agent-First IDE Explained — ShipAI</a
+              >
+              <span class="sdesc"
+                >エージェントファーストパラダイムの概念説明。人間がアーキテクトになる役割変化</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[8]</span>
+            <div>
+              <a
+                href="https://github.com/study8677/antigravity-workspace-template"
+                target="_blank"
+                rel="noopener noreferrer"
+                >antigravity-workspace-template — GitHub (study8677)</a
+              >
+              <span class="sdesc"
+                >.antigravity/rules.md + .cursorrules
+                の統合テンプレート。ゼロコンフィグワークスペース設計</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[9]</span>
+            <div>
+              <a
+                href="https://en.wikipedia.org/wiki/Google_Antigravity"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Google Antigravity — Wikipedia</a
+              >
+              <span class="sdesc"
+                >発表経緯・技術仕様。対応モデル：Claude Sonnet 4.6 / Claude Opus 4.6 /
+                GPT-OSS-120B（2026年3月時点）</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[10]</span>
+            <div>
+              <a href="https://antigravity.google/" target="_blank" rel="noopener noreferrer"
+                >Google Antigravity 公式サイト — antigravity.google</a
+              >
+              <span class="sdesc">ダウンロード・公式ドキュメント・機能一覧</span>
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[11]</span>
+            <div>
+              <a
+                href="https://vertu.com/lifestyle/mastering-google-antigravity-skills-a-comprehensive-guide-to-agentic-extensions-in-2026/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Master Google Antigravity Skills — VERTU (2026)</a
+              >
+              <span class="sdesc"
+                >SKILL.mdのdescriptionフィールドの意味的トリガー機能。Few-Shot examplesの効果</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[12]</span>
+            <div>
+              <a
+                href="https://github.com/sickn33/antigravity-awesome-skills"
+                target="_blank"
+                rel="noopener noreferrer"
+                >antigravity-awesome-skills — GitHub (800+ Skills Collection)</a
+              >
+              <span class="sdesc"
+                >SKILL.mdのユニバーサル規格（Claude Code / Antigravity /
+                Cursor共通）。コミュニティスキルライブラリ</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[13]</span>
+            <div>
+              <a
+                href="https://github.com/guanyang/antigravity-skills"
+                target="_blank"
+                rel="noopener noreferrer"
+                >antigravity-skills — GitHub (guanyang)</a
+              >
+              <span class="sdesc"
+                >subagent-driven-development・doc-coauthoring等の専門スキル集。Skills×ワークフロー統合設計</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[14]</span>
+            <div>
+              <a
+                href="https://leaveit2ai.com/ai-tools/code-development/antigravity"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Google Antigravity Review 2026 — leaveit2ai.com</a
+              >
+              <span class="sdesc"
+                >Agent Manager（Mission Control）の詳細レビュー。Trust-Building
+                Artifactsの実際の動作</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[15]</span>
+            <div>
+              <a
+                href="https://www.linkedin.com/posts/iromin_tutorial-getting-started-with-antigravity-activity-7417162852693721088-vkcD"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Google Antigravity Agent Skills Tutorial — Romin Irani (LinkedIn, Jan 2026)</a
+              >
+              <span class="sdesc"
+                >Skills vs MCP Server Tools の使い分け。Basic Router / Reference / Few-shot / Tool
+                Use / All-in-Oneの5パターン解説</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[16]</span>
+            <div>
+              <a
+                href="https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-pro/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Gemini 3.1 Pro: A smarter model for your most complex tasks — Google Blog (Feb
+                2026)</a
+              >
+              <span class="sdesc"
+                >Gemini 3.1 ProリリースアナウンスとAntigravity/Gemini CLI/Vertex
+                AIへの展開。ARC-AGI-2スコア77.1%（Gemini 3
+                Proの2倍以上の推論性能）。Antigravity・Android Studio・Google AI
+                Studioで利用可能</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[17]</span>
+            <div>
+              <a
+                href="https://ai.google.dev/gemini-api/docs/deprecations"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Gemini deprecations | Gemini API | Google AI for Developers</a
+              >
+              <span class="sdesc"
+                >Gemini 3 Pro Preview廃止スケジュール（2026-03-09）。Gemini 3.1 Pro
+                Previewへの移行案内</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[18]</span>
+            <div>
+              <a
+                href="https://geminicli.com/docs/cli/skills/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Agent Skills | Gemini CLI 公式ドキュメント</a
+              >
+              <span class="sdesc"
+                >Gemini
+                CLI（ターミナルCLI）のスキル仕様。~/.gemini/skills/パス・activate_skillツール・v0.25.0でデフォルト有効化</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[19]</span>
+            <div>
+              <a
+                href="https://aitoolanalysis.com/google-antigravity-review/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Google Antigravity Review 2026 (v1.20.3 Updated) — AI Tool Analysis (Mar 2026)</a
+              >
+              <span class="sdesc"
+                >v1.20.3（2026-03-05）の変更点詳細。AGENTS.mdサポート追加・トークン計算バグ修正・Auto-continueのデフォルト有効化。現在サポートされるモデル一覧（Gemini
+                3.1 Pro High/Low・Gemini 3 Flash・Claude Sonnet 4.6・Claude Opus 4.6・GPT-OSS
+                120B）</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[20]</span>
+            <div>
+              <a
+                href="https://en.wikipedia.org/wiki/Google_Antigravity"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Google Antigravity — Wikipedia（2026年3月更新）</a
+              >
+              <span class="sdesc"
+                >Claude Sonnet 4.6・Claude Opus 4.6・GPT-OSS-120Bのサポート追加。SWE-bench Verified
+                76.2%スコア。Windsurf fork説など発表経緯の最新情報</span
+              >
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="src">
-        <span class="snum">[2]</span>
-        <div>
-          <a href="https://medium.com/google-cloud/benefits-and-challenges-of-spec-driven-development-and-how-antigravity-is-changing-the-game-3343a6942330" target="_blank" rel="noopener noreferrer">How Google Antigravity is changing spec-driven development — Google Cloud Medium (Jan 2026)</a>
-          <span class="sdesc">Artifacts（Task List / Implementation Plan / Walkthrough）のSDD活用、Knowledge Baseによる自動学習</span>
-        </div>
-      </div>
-      <div class="src">
-        <span class="snum">[3]</span>
-        <div>
-          <a href="https://codelabs.developers.google.com/getting-started-google-antigravity" target="_blank" rel="noopener noreferrer">Getting Started with Google Antigravity — Google Codelabs</a>
-          <span class="sdesc">公式チュートリアル。Skills・Rules・Workflows・Artifactsの設定方法。GEMINI.md・.agent/ディレクトリ構造</span>
-        </div>
-      </div>
-      <div class="src">
-        <span class="snum">[4]</span>
-        <div>
-          <a href="https://codelabs.developers.google.com/getting-started-with-antigravity-skills" target="_blank" rel="noopener noreferrer">Authoring Google Antigravity Skills — Google Codelabs</a>
-          <span class="sdesc">SKILL.mdの完全仕様。スキルディレクトリ構造（SKILL.md / scripts / references / assets）・5パターン詳解</span>
-        </div>
-      </div>
-      <div class="src">
-        <span class="snum">[5]</span>
-        <div>
-          <a href="https://medium.com/google-cloud/tutorial-getting-started-with-antigravity-skills-864041811e0d" target="_blank" rel="noopener noreferrer">How to Build Custom Skills in Google Antigravity — Google Cloud Medium (Jan 2026)</a>
-          <span class="sdesc">Progressive Disclosure設計思想。scripts/サブディレクトリのTool Use Pattern詳細。グローバル/ワークスペーススコープ</span>
-        </div>
-      </div>
-      <div class="src">
-        <span class="snum">[6]</span>
-        <div>
-          <a href="https://iamulya.one/posts/advanced-tips-for-mastering-google-antigravity/" target="_blank" rel="noopener noreferrer">Advanced Tips for Mastering Google Antigravity — Amulya Bhatia (Jan 2026)</a>
-          <span class="sdesc">Rules vs Workflows の使い分け。fileMatch activation。マルチエージェント並列処理。Workflowsチェーン化</span>
-        </div>
-      </div>
-      <div class="src">
-        <span class="snum">[7]</span>
-        <div>
-          <a href="https://www.shipai.dev/blog/google-antigravity-agentic-ide-guide" target="_blank" rel="noopener noreferrer">What Is Google Antigravity? Google's Agent-First IDE Explained — ShipAI</a>
-          <span class="sdesc">エージェントファーストパラダイムの概念説明。人間がアーキテクトになる役割変化</span>
-        </div>
-      </div>
-      <div class="src">
-        <span class="snum">[8]</span>
-        <div>
-          <a href="https://github.com/study8677/antigravity-workspace-template" target="_blank" rel="noopener noreferrer">antigravity-workspace-template — GitHub (study8677)</a>
-          <span class="sdesc">.antigravity/rules.md + .cursorrules の統合テンプレート。ゼロコンフィグワークスペース設計</span>
-        </div>
-      </div>
-      <div class="src">
-        <span class="snum">[9]</span>
-        <div>
-          <a href="https://en.wikipedia.org/wiki/Google_Antigravity" target="_blank" rel="noopener noreferrer">Google Antigravity — Wikipedia</a>
-          <span class="sdesc">発表経緯・技術仕様・Claude Sonnet / OpenAIモデルサポート</span>
-        </div>
-      </div>
-      <div class="src">
-        <span class="snum">[10]</span>
-        <div>
-          <a href="https://antigravity.google/" target="_blank" rel="noopener noreferrer">Google Antigravity 公式サイト — antigravity.google</a>
-          <span class="sdesc">ダウンロード・公式ドキュメント・機能一覧</span>
-        </div>
-      </div>
-      <div class="src">
-        <span class="snum">[11]</span>
-        <div>
-          <a href="https://vertu.com/lifestyle/mastering-google-antigravity-skills-a-comprehensive-guide-to-agentic-extensions-in-2026/" target="_blank" rel="noopener noreferrer">Master Google Antigravity Skills — VERTU (2026)</a>
-          <span class="sdesc">SKILL.mdのdescriptionフィールドの意味的トリガー機能。Few-Shot examplesの効果</span>
-        </div>
-      </div>
-      <div class="src">
-        <span class="snum">[12]</span>
-        <div>
-          <a href="https://github.com/sickn33/antigravity-awesome-skills" target="_blank" rel="noopener noreferrer">antigravity-awesome-skills — GitHub (800+ Skills Collection)</a>
-          <span class="sdesc">SKILL.mdのユニバーサル規格（Claude Code / Antigravity / Cursor共通）。コミュニティスキルライブラリ</span>
-        </div>
-      </div>
-      <div class="src">
-        <span class="snum">[13]</span>
-        <div>
-          <a href="https://github.com/guanyang/antigravity-skills" target="_blank" rel="noopener noreferrer">antigravity-skills — GitHub (guanyang)</a>
-          <span class="sdesc">subagent-driven-development・doc-coauthoring等の専門スキル集。Skills×ワークフロー統合設計</span>
-        </div>
-      </div>
-      <div class="src">
-        <span class="snum">[14]</span>
-        <div>
-          <a href="https://leaveit2ai.com/ai-tools/code-development/antigravity" target="_blank" rel="noopener noreferrer">Google Antigravity Review 2026 — leaveit2ai.com</a>
-          <span class="sdesc">Agent Manager（Mission Control）の詳細レビュー。Trust-Building Artifactsの実際の動作</span>
-        </div>
-      </div>
-      <div class="src">
-        <span class="snum">[15]</span>
-        <div>
-          <a href="https://www.linkedin.com/posts/iromin_tutorial-getting-started-with-antigravity-activity-7417162852693721088-vkcD" target="_blank" rel="noopener noreferrer">Google Antigravity Agent Skills Tutorial — Romin Irani (LinkedIn, Jan 2026)</a>
-          <span class="sdesc">Skills vs MCP Server Tools の使い分け。Basic Router / Reference / Few-shot / Tool Use / All-in-Oneの5パターン解説</span>
-        </div>
-      </div>
-      <div class="src">
-        <span class="snum">[16]</span>
-        <div>
-          <a href="https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-pro/" target="_blank" rel="noopener noreferrer">Gemini 3.1 Pro: A smarter model for your most complex tasks — Google Blog (Feb 2026)</a>
-          <span class="sdesc">Gemini 3.1 ProリリースアナウンスとAntigravity/Gemini CLI/Vertex AIへの展開。ARC-AGI-2スコア77.1%（3 Proの2倍以上）</span>
-        </div>
-      </div>
-      <div class="src">
-        <span class="snum">[17]</span>
-        <div>
-          <a href="https://ai.google.dev/gemini-api/docs/deprecations" target="_blank" rel="noopener noreferrer">Gemini deprecations | Gemini API | Google AI for Developers</a>
-          <span class="sdesc">Gemini 3 Pro Preview廃止スケジュール（2026-03-09）。Gemini 3.1 Pro Previewへの移行案内</span>
-        </div>
-      </div>
-      <div class="src">
-        <span class="snum">[18]</span>
-        <div>
-          <a href="https://geminicli.com/docs/cli/skills/" target="_blank" rel="noopener noreferrer">Agent Skills | Gemini CLI 公式ドキュメント</a>
-          <span class="sdesc">Gemini CLI（ターミナルCLI）のスキル仕様。~/.gemini/skills/パス・activate_skillツール・v0.25.0でデフォルト有効化</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-</main>
-</body>
+      </section>
+    </main>
+  </body>
 </html>
