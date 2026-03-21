@@ -441,7 +441,7 @@ graph TD
     FM --> CTX["🔀 context\nfork: 独立したコンテキストで実行\ninherit: メイン会話を引き継ぐ（デフォルト）"]
     FM --> AG["🤖 agent\ngeneral-purpose（デフォルト）\nExplore / Plan / カスタム"]
     FM --> VER["🏷️ version\nスキルのバージョン管理\n例: version: '1.2.0'"]
-    FM --> EFF["⚡ effort\nthinking deepth (Opus 4.6)\nlow / medium（デフォルト）/ high"]
+    FM --> EFF["⚡ effort\nthinking depth (Opus 4.6)\nlow / medium（デフォルト）/ high"]
 
     style FM fill:#fff3cd,stroke:#ffc107
 ```

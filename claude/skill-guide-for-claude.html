@@ -814,9 +814,9 @@ A["😤 毎回説明する\n従来の方法"]
 B["💬 Claude"]
 C["📄 SKILL.md\nに手順を書く"]
 D["✅ 高品質な出力"]
-A -->|非効率| B
-C -->|自動読み込み| B
-B --> D
+A --&gt;|非効率| B
+C --&gt;|自動読み込み| B
+B --&gt; D
 style A fill:#2a1c1c,stroke:#f85149,color:#e6edf3
 style C fill:#1c2a1c,stroke:#3fb950,color:#e6edf3
 style D fill:#1c2033,stroke:#58a6ff,color:#e6edf3
@@ -848,12 +848,12 @@ F["🔌 MCP Servers\n外部ツール連携"]
 H["🧩 Plugins .claude/plugins/\nplugin.json — サードパーティ拡張"]
 end
 G["🚀 Claude Code 起動"]
-G -->|自動読み込み| A
-G -->|自動読み込み| B
-G -->|必要時に動的読み込み| C
-G -->|タスク実行時| E
-G -->|設定した連携| F
-G -->|プラグイン登録| H
+G --&gt;|自動読み込み| A
+G --&gt;|自動読み込み| B
+G --&gt;|必要時に動的読み込み| C
+G --&gt;|タスク実行時| E
+G --&gt;|設定した連携| F
+G --&gt;|プラグイン登録| H
 style MEM fill:#1a2535,stroke:#3b5270,color:#e6edf3
 style EXT fill:#1a2535,stroke:#3b5270,color:#e6edf3
             </div>
@@ -974,17 +974,17 @@ participant L1 as Level 1 (YAML)
 participant L2 as Level 2 (本文)
 participant L3 as Level 3 (スクリプト)
 Note over C,L1: セッション開始フェーズ
-C->>L1: 全スキルのメタデータをスキャン
-L1-->>C: name と description のみ登録（~100 tokens/スキル）
-User->>C: READMEを作成してください
+C-&gt;&gt;L1: 全スキルのメタデータをスキャン
+L1--&gt;&gt;C: name と description のみ登録（~100 tokens/スキル）
+User-&gt;&gt;C: READMEを作成してください
 Note over C: ユーザーの意図と description を照合して判断
-C->>L2: readme-writer スキルの本文を読み込み
-L2-->>C: 指示内容をコンテキストに展開
-C->>L3: references/style.md を読み込み
-L3-->>C: スタイルガイドラインを返す
-C->>L3: scripts/validate.sh を実行
-L3-->>C: 実行結果のみを返す（コードは不要）
-C-->>User: ガイドラインに準拠したREADMEを出力
+C-&gt;&gt;L2: readme-writer スキルの本文を読み込み
+L2--&gt;&gt;C: 指示内容をコンテキストに展開
+C-&gt;&gt;L3: references/style.md を読み込み
+L3--&gt;&gt;C: スタイルガイドラインを返す
+C-&gt;&gt;L3: scripts/validate.sh を実行
+L3--&gt;&gt;C: 実行結果のみを返す（コードは不要）
+C--&gt;&gt;User: ガイドラインに準拠したREADMEを出力
             </div>
           </div>
           <div class="callout callout-tip">
@@ -1007,7 +1007,7 @@ C-->>User: ガイドラインに準拠したREADMEを出力
 graph TD
 A["YAMLフロントマター\nname: スキル名\ndescription: いつ使うかの説明\nallowed-tools: Read, Write"]
 B["マークダウン本文（手順書）\nStep 1: 〇〇をする\nStep 2: 〇〇をする\n出力フォーマット ..."]
-A --> B
+A --&gt; B
 style A fill:#1c2a1c,stroke:#3fb950,color:#e6edf3
 style B fill:#1c2530,stroke:#58a6ff,color:#e6edf3
             </div>
@@ -1100,8 +1100,8 @@ graph LR
 E["🏢 Enterprise\n（最高優先度）"]
 P["👤 Personal\n~/.claude/skills/"]
 PR["📁 Project\n.claude/skills/"]
-E -->|上書き| P
-P -->|上書き| PR
+E --&gt;|上書き| P
+P --&gt;|上書き| PR
 style E fill:#2a1c1c,stroke:#f85149,color:#e6edf3
 style P fill:#1c2530,stroke:#58a6ff,color:#e6edf3
 style PR fill:#1c2a1c,stroke:#3fb950,color:#e6edf3
@@ -1152,13 +1152,13 @@ participant U as 👤 ユーザー
 participant CC as ⚡ Claude Code
 participant SK as 📚 Skills一覧
 participant SM as 📄 SKILL.md
-U->>CC: 「このコードをレビューして」
-CC->>SK: 利用可能なスキルを確認
-SK-->>CC: code-review, deploy, api-docs ...
+U-&gt;&gt;CC: 「このコードをレビューして」
+CC-&gt;&gt;SK: 利用可能なスキルを確認
+SK--&gt;&gt;CC: code-review, deploy, api-docs ...
 Note over CC: description とユーザーの意図を照合
-CC->>SM: code-review/SKILL.md を読み込む
-SM-->>CC: レビュー手順・観点・出力形式を返す
-CC->>U: 手順に従ったコードレビュー結果
+CC-&gt;&gt;SM: code-review/SKILL.md を読み込む
+SM--&gt;&gt;CC: レビュー手順・観点・出力形式を返す
+CC-&gt;&gt;U: 手順に従ったコードレビュー結果
             </div>
           </div>
           <h3>2つの呼び出し方法</h3>
@@ -1430,13 +1430,13 @@ style SKILLMD fill:#1c2a1c,stroke:#3fb950,color:#e6edf3
             <div class="mermaid">
 graph TD
 FM["--- YAMLフロントマター ---"]
-FM --> N["📛 name\nスキル名・/slash-commandの名前になる\n最大64文字、小文字・数字・ハイフンのみ"]
-FM --> D["📝 description\n最重要 いつ使うかをClaudeが判断する\n最大1024文字。具体的なトリガーワードを含める"]
-FM --> AT["🔒 allowed-tools\nスキルで使えるツールを制限\n例: Read, Write, Bash, Grep, Glob"]
-FM --> INV["⚡ invocation\nautomatic: Claude自動判断（デフォルト）\nexplicit: /コマンドのみ実行"]
-FM --> CTX["🔀 context\nfork: 独立したコンテキストで実行\ninherit: メイン会話を引き継ぐ（デフォルト）"]
-FM --> AG["🤖 agent\ngeneral-purpose（デフォルト）\nExplore / Plan / カスタム"]
-FM --> VER["🏷️ version\nスキルのバージョン管理\n例: version: 1.0.0"]
+FM --&gt; N["📛 name\nスキル名・/slash-commandの名前になる\n最大64文字、小文字・数字・ハイフンのみ"]
+FM --&gt; D["📝 description\n最重要 いつ使うかをClaudeが判断する\n最大1024文字。具体的なトリガーワードを含める"]
+FM --&gt; AT["🔒 allowed-tools\nスキルで使えるツールを制限\n例: Read, Write, Bash, Grep, Glob"]
+FM --&gt; INV["⚡ invocation\nautomatic: Claude自動判断（デフォルト）\nexplicit: /コマンドのみ実行"]
+FM --&gt; CTX["🔀 context\nfork: 独立したコンテキストで実行\ninherit: メイン会話を引き継ぐ（デフォルト）"]
+FM --&gt; AG["🤖 agent\ngeneral-purpose（デフォルト）\nExplore / Plan / カスタム"]
+FM --&gt; VER["🏷️ version\nスキルのバージョン管理\n例: version: 1.0.0"]
 style FM fill:#1c2a1c,stroke:#3fb950,color:#e6edf3
             </div>
           </div>
@@ -1596,9 +1596,9 @@ B["🐍 scripts/extract.py\n（実行スクリプト）"]
 C["📋 references/format.md\n（参考資料・仕様書）"]
 D["🗂️ assets/template.html\n（出力テンプレート）"]
 end
-A -->|指示する| B
-A -->|参照する| C
-A -->|使用する| D
+A --&gt;|指示する| B
+A --&gt;|参照する| C
+A --&gt;|使用する| D
 style DIR fill:#1a2030,stroke:#58a6ff,color:#e6edf3
             </div>
           </div>
@@ -1644,9 +1644,9 @@ style DIR fill:#1a2030,stroke:#58a6ff,color:#e6edf3
           <div class="mermaid-wrap">
             <div class="mermaid">
 graph LR
-A["短すぎる\n&lt; 10行"] -->|不十分| B["❌ Claudeが\n何をすべきか不明"]
-C["適切\n50〜500行"] -->|最適| D["✅ 明確な指示で\n一貫した出力"]
-E["長すぎる\n&gt; 5000行"] -->|コンテキスト肥大| F["❌ 重要な指示が\n埋もれる"]
+A["短すぎる\n&lt; 10行"] --&gt;|不十分| B["❌ Claudeが\n何をすべきか不明"]
+C["適切\n50〜500行"] --&gt;|最適| D["✅ 明確な指示で\n一貫した出力"]
+E["長すぎる\n&gt; 5000行"] --&gt;|コンテキスト肥大| F["❌ 重要な指示が\n埋もれる"]
 style B fill:#2a1c1c,stroke:#f85149,color:#e6edf3
 style D fill:#1c2a1c,stroke:#3fb950,color:#e6edf3
 style F fill:#2a1c1c,stroke:#f85149,color:#e6edf3
@@ -1696,16 +1696,16 @@ style F fill:#2a1c1c,stroke:#f85149,color:#e6edf3
           <div class="mermaid-wrap">
             <div class="mermaid">
 flowchart TD
-A["スキルが正常に動作しない"] --> B{問題の種類}
-B -->|発動すべきで発動しない| C["アンダートリガー"]
-B -->|無関係な時に発動する| D["オーバートリガー"]
-B -->|発動はするが結果が悪い| E["実行フェーズの問題"]
-C --> C1["descriptionにトリガーワードを追記"]
-C --> C2["/スキル名 で手動呼び出してテスト"]
-D --> D1["トリガー条件を絞り込む"]
-D --> D2["ネガティブトリガーを追加"]
-E --> E1["インストラクションを見直す"]
-E --> E2["claude --debug で詳細ログを確認"]
+A["スキルが正常に動作しない"] --&gt; B{問題の種類}
+B --&gt;|発動すべきで発動しない| C["アンダートリガー"]
+B --&gt;|無関係な時に発動する| D["オーバートリガー"]
+B --&gt;|発動はするが結果が悪い| E["実行フェーズの問題"]
+C --&gt; C1["descriptionにトリガーワードを追記"]
+C --&gt; C2["/スキル名 で手動呼び出してテスト"]
+D --&gt; D1["トリガー条件を絞り込む"]
+D --&gt; D2["ネガティブトリガーを追加"]
+E --&gt; E1["インストラクションを見直す"]
+E --&gt; E2["claude --debug で詳細ログを確認"]
 style C fill:#2a2010,stroke:#fbbf24,color:#e6edf3
 style D fill:#2a2010,stroke:#fbbf24,color:#e6edf3
 style E fill:#1c2530,stroke:#58a6ff,color:#e6edf3
@@ -1875,12 +1875,12 @@ style E fill:#1c2530,stroke:#58a6ff,color:#e6edf3
 graph LR
 A["✅ デフォルト有効\n（Enabled by default）"]
 B["❌ デフォルト無効\n（Disabled by default）"]
-A --> A1["コーディング規約チェッカー"]
-A --> A2["議事録フォーマッター"]
-A --> A3["ドキュメント生成ツール"]
-B --> B1["本番環境デプロイスキル"]
-B --> B2["DBマイグレーションスキル"]
-B --> B3["インフラ操作スキル"]
+A --&gt; A1["コーディング規約チェッカー"]
+A --&gt; A2["議事録フォーマッター"]
+A --&gt; A3["ドキュメント生成ツール"]
+B --&gt; B1["本番環境デプロイスキル"]
+B --&gt; B2["DBマイグレーションスキル"]
+B --&gt; B3["インフラ操作スキル"]
 style A fill:#1c2a1c,stroke:#3fb950,color:#e6edf3
 style B fill:#2a1c1c,stroke:#f85149,color:#e6edf3
             </div>

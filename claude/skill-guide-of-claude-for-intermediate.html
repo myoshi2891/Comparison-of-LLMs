@@ -1029,7 +1029,7 @@
       }
 
       /* ── Nav ── */
-      nav {
+      .page-toc {
         position: sticky;
         top: 0;
         z-index: 100;
@@ -1172,7 +1172,7 @@
   <body>
     <div id="progress"></div>
 
-    <nav>
+    <nav class="page-toc" aria-label="On-page table of contents">
       <div class="nav-inner">
         <a href="#" class="nav-logo">SKILL<span>.md</span> — 中級者ガイド</a>
         <div class="nav-links">
@@ -1572,8 +1572,7 @@ style E fill:#2d1f4a,stroke:#b794f4,color:#ffffff
             <!-- プロット点 -->
             <div
               class="quad-dot"
-              role="button"
-              tabindex="0"
+              role="img"
               aria-label="DBマイグレーション"
               style="left: 15%; top: 10%"
               data-label="DBマイグレーション"
@@ -1581,8 +1580,7 @@ style E fill:#2d1f4a,stroke:#b794f4,color:#ffffff
             ></div>
             <div
               class="quad-dot"
-              role="button"
-              tabindex="0"
+              role="img"
               aria-label="本番デプロイ"
               style="left: 15%; top: 18%"
               data-label="本番デプロイ"
@@ -1590,8 +1588,7 @@ style E fill:#2d1f4a,stroke:#b794f4,color:#ffffff
             ></div>
             <div
               class="quad-dot"
-              role="button"
-              tabindex="0"
+              role="img"
               aria-label="セキュリティスキャン"
               style="left: 50%; top: 43%"
               data-label="セキュリティスキャン"
@@ -1599,8 +1596,7 @@ style E fill:#2d1f4a,stroke:#b794f4,color:#ffffff
             ></div>
             <div
               class="quad-dot"
-              role="button"
-              tabindex="0"
+              role="img"
               aria-label="コードレビュー"
               style="left: 70%; top: 72%"
               data-label="コードレビュー"
@@ -1608,8 +1604,7 @@ style E fill:#2d1f4a,stroke:#b794f4,color:#ffffff
             ></div>
             <div
               class="quad-dot"
-              role="button"
-              tabindex="0"
+              role="img"
               aria-label="テキスト要約"
               style="left: 85%; top: 78%"
               data-label="テキスト要約"
@@ -1617,8 +1612,7 @@ style E fill:#2d1f4a,stroke:#b794f4,color:#ffffff
             ></div>
             <div
               class="quad-dot"
-              role="button"
-              tabindex="0"
+              role="img"
               aria-label="READMEアップデート"
               style="left: 78%; top: 75%"
               data-label="READMEアップデート"
@@ -2535,14 +2529,14 @@ end
 subgraph LOOP["/loop 30m で定期実行"]
 R["reflect-and-improve スキル<br>→ SKILL.md を自己更新"]
 end
-L -->|タスク割り当て| T1
-L -->|タスク割り当て| T2
-L -->|タスク割り当て| T3
-T1 -->|起動時自動ロード| S1
-T2 -->|起動時自動ロード| S2
-T3 -->|起動時自動ロード| S1
-T3 --> R
-R --> S3
+L --&gt;|タスク割り当て| T1
+L --&gt;|タスク割り当て| T2
+L --&gt;|タスク割り当て| T3
+T1 --&gt;|起動時自動ロード| S1
+T2 --&gt;|起動時自動ロード| S2
+T3 --&gt;|起動時自動ロード| S1
+T3 --&gt; R
+R --&gt; S3
 style LEAD fill:#1a3a5c,stroke:#63b3ed,color:#ffffff
 style SKILLS fill:#1a4040,stroke:#4fd1c5,color:#ffffff
 style TEAM fill:#2d1f4a,stroke:#b794f4,color:#ffffff

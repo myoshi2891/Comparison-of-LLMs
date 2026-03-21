@@ -949,11 +949,11 @@ Agent->>User: SKILL.mdの手順に従いレビュー結果を提示
         <div class="mermaid mb-6">
 graph TD
 A["よくある失敗"]
-A --> B["description が曖昧すぎる\n→ スキルが呼ばれない"]
-A --> C["SKILL.md が長すぎる\n→ コンテキストを圧迫"]
-A --> D["スキルを入れすぎる\n→ AIが混乱\n目安: 10〜15個以内"]
-A --> E["スクリプトに\nハードコードされた値\n→ 再利用できない"]
-A --> F["name がディレクトリ名と\n不一致\n→ 発見されない"]
+A --&gt; B["description が曖昧すぎる\n→ スキルが呼ばれない"]
+A --&gt; C["SKILL.md が長すぎる\n→ コンテキストを圧迫"]
+A --&gt; D["スキルを入れすぎる\n→ AIが混乱\n目安: 10〜15個以内"]
+A --&gt; E["スクリプトに\nハードコードされた値\n→ 再利用できない"]
+A --&gt; F["name がディレクトリ名と\n不一致\n→ 発見されない"]
 style B fill:#fecaca,stroke:#dc2626,color:#7f1d1d
 style C fill:#fecaca,stroke:#dc2626,color:#7f1d1d
 style D fill:#fecaca,stroke:#dc2626,color:#7f1d1d

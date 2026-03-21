@@ -16,7 +16,9 @@ def fix_mermaid_blocks(html: str) -> tuple[str, list[str]]:
     report: list[str] = []
 
     def fix_block(m: re.Match[str]) -> str:
-        inner = m.group(1)
+        open_tag = m.group(1)
+        inner = m.group(2)
+        close_tag = m.group(3)
         raw_lines = inner.split("\n")
 
         # 最初の非空行でダイアグラム種別を判定
@@ -44,13 +46,18 @@ def fix_mermaid_blocks(html: str) -> tuple[str, list[str]]:
                 f"[{diagram_type}]: {fixed_count} line(s) de-indented"
             )
 
-        return f'<div class="mermaid">' + "\n".join(fixed) + "</div>"
+        return open_tag + "\n".join(fixed) + close_tag
 
+    # class 属性に "mermaid" トークンを含む <div> を柔軟にマッチ
+    # （属性順序・引用符の違い・追加クラスに対応）
     fixed_html = re.sub(
-        r'<div class="mermaid">(.*?)</div>',
+        r'(<div\b[^>]*\bclass\s*=\s*'
+        r"""(?:"[^"]*\bmermaid\b[^"]*"|'[^']*\bmermaid\b[^']*'"""
+        r'|[^\s>]*\bmermaid\b[^\s>]*)'
+        r'[^>]*>)(.*?)(</div>)',
         fix_block,
         html,
-        flags=re.DOTALL,
+        flags=re.DOTALL | re.IGNORECASE,
     )
     return fixed_html, report
 

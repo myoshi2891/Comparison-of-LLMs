@@ -1042,7 +1042,7 @@ pm-spec → architect-review → implementer → code-reviewer
   <!-- AT-1. Agent Teams 概要 -->
   <div class="section section-team">
     <div class="section-title">
-      <span class="num">10</span>
+      <span class="num">11</span>
       Agent Teams とは — サブエージェントとの根本的な違い
     </div>
 
@@ -1142,7 +1142,7 @@ pm-spec → architect-review → implementer → code-reviewer
 
   <!-- AT-2. settings.json / 有効化 -->
   <div class="section section-team">
-    <div class="section-title"><span class="num">11</span>Agent Teams の有効化と <span class="mono">settings.json</span> 設定</div>
+    <div class="section-title"><span class="num">12</span>Agent Teams の有効化と <span class="mono">settings.json</span> 設定</div>
 
     <div class="tip tip-warn">
       <span class="tip-icon">⚠️</span>
@@ -1210,7 +1210,7 @@ pm-spec → architect-review → implementer → code-reviewer
 
   <!-- AT-3. Agent Teams 向け CLAUDE.md 設計 -->
   <div class="section section-team">
-    <div class="section-title"><span class="num">12</span>Agent Teams 向け <span class="mono">CLAUDE.md</span> 設計 — 最重要ポイント</div>
+    <div class="section-title"><span class="num">13</span>Agent Teams 向け <span class="mono">CLAUDE.md</span> 設計 — 最重要ポイント</div>
 
     <div class="tip tip-success">
       <span class="tip-icon">✅</span>
@@ -1277,7 +1277,7 @@ pm-spec → architect-review → implementer → code-reviewer
 
   <!-- AT-4. Task List ファイル設計 -->
   <div class="section section-team">
-    <div class="section-title"><span class="num">13</span>タスクリストファイル設計 — <span class="mono">~/.claude/tasks/{team}/*.json</span></div>
+    <div class="section-title"><span class="num">14</span>タスクリストファイル設計 — <span class="mono">~/.claude/tasks/{team}/*.json</span></div>
 
     <div class="card">
       <p>Agent Teams のタスクは <code>~/.claude/tasks/{team-name}/</code> 配下の JSON ファイルとして管理されます。タスクは <strong>pending → in_progress → completed</strong> の3状態を遷移し、ファイルロックによる競合防止が組み込まれています。<code>description</code> フィールドが実質的にテイムメイトへのプロンプトとなるため、内容の精度がパフォーマンスを左右します。</p>
@@ -1349,7 +1349,7 @@ pm-spec → architect-review → implementer → code-reviewer
 
   <!-- AT-5. hooks 設計 -->
   <div class="section section-team">
-    <div class="section-title"><span class="num">14</span>Agent Teams Hooks 設計 — 品質ゲートの自動化</div>
+    <div class="section-title"><span class="num">15</span>Agent Teams Hooks 設計 — 品質ゲートの自動化</div>
 
     <div class="card">
       <p>Claude Code は Agent Teams 向けに <code>TeammateIdle</code>・<code>TaskCompleted</code> の2つのフックイベントを提供します（v2.1.33+）。フックは<strong>命令的（Imperative）</strong>であり、シェルコマンドを実行してその結果（終了コード）で Claude の動作を制御します。14種類あるフックイベント全体（SessionStart・PreToolUse 等）と組み合わせることで、チーム全体に一貫した品質ポリシーを強制できます。</p>
@@ -1451,7 +1451,7 @@ pm-spec → architect-review → implementer → code-reviewer
 
   <!-- AT-6. Use Cases & Prompts -->
   <div class="section section-team">
-    <div class="section-title"><span class="num">15</span>Agent Teams のユースケース別プロンプトパターン</div>
+    <div class="section-title"><span class="num">16</span>Agent Teams のユースケース別プロンプトパターン</div>
 
     <div class="usecase-grid">
       <div class="uc">
@@ -1496,7 +1496,7 @@ pm-spec → architect-review → implementer → code-reviewer
 
   <!-- AT-7. Updated Summary Table -->
   <div class="section section-team">
-    <div class="section-title"><span class="num">16</span>まとめ：全 Markdown + 設定ファイルの役割（Agent Teams 追記版）</div>
+    <div class="section-title"><span class="num">17</span>まとめ：全 Markdown + 設定ファイルの役割（Agent Teams 追記版）</div>
     <div class="table-wrap">
       <table>
         <tr>
