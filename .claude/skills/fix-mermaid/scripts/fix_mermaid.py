@@ -11,29 +11,29 @@ mindmap は内部インデントを保持（階層構造が構文上の意味を
 import re
 import sys
 
+# 新しい Mermaid ステートメントの開始パターン（モジュールロード時に1度だけコンパイル）
+_new_stmt_re = re.compile(
+    r'^(\w+\s*-[->.>]|Note\b|participant\b|actor\b|alt\b|else\b'
+    r'|opt\b|loop\b|rect\b|par\b|end\b|%%|activate\b|deactivate\b'
+    r'|subgraph\b|style\b|classDef\b|linkStyle\b)',
+    re.IGNORECASE,
+)
+# 前行が未完了のシーケンス図フラグメント
+_seq_frag_re = re.compile(
+    r'^(Note\s+(over|left\s+of|right\s+of)\b'
+    r'|participant\b|actor\b|alt\b|loop\b|rect\b)',
+    re.IGNORECASE,
+)
+
 
 def fix_mermaid_blocks(html: str) -> tuple[str, list[str]]:
     report: list[str] = []
-
-    # 新しい Mermaid ステートメントの開始パターン
-    _new_stmt_re = re.compile(
-        r'^(\w+\s*-[->.>]|Note\b|participant\b|actor\b|alt\b|else\b'
-        r'|opt\b|loop\b|rect\b|par\b|end\b|%%|activate\b|deactivate\b'
-        r'|subgraph\b|style\b|classDef\b|linkStyle\b)',
-        re.IGNORECASE,
-    )
-    # 前行が未完了のシーケンス図フラグメント
-    _seq_frag_re = re.compile(
-        r'^(Note\s+(over|left\s+of|right\s+of)\b'
-        r'|participant\b|actor\b|alt\b|loop\b|rect\b)',
-        re.IGNORECASE,
-    )
 
     def fix_block(m: re.Match[str]) -> str:
         open_tag = m.group(1)
         inner = m.group(2)
         close_tag = m.group(3)
-        raw_lines = inner.split("\n")
+        raw_lines = inner.replace("\r\n", "\n").replace("\r", "\n").split("\n")
 
         # 最初の非空・非ディレクティブ行でダイアグラム種別を判定
         # %%{init...}%% 等のディレクティブ/コメント行はスキップ
@@ -97,16 +97,20 @@ if __name__ == "__main__":
         sys.exit(1)
 
     path = sys.argv[1]
-    with open(path, encoding="utf-8") as f:
-        html = f.read()
+    try:
+        with open(path, encoding="utf-8") as f:
+            html = f.read()
 
-    fixed, report = fix_mermaid_blocks(html)
+        fixed, report = fix_mermaid_blocks(html)
 
-    if report:
-        for line in report:
-            print(line)
-        with open(path, "w", encoding="utf-8") as f:
-            f.write(fixed)
-        print(f"\n✅ Fixed and saved: {path}")
-    else:
-        print("✅ No indentation issues found.")
+        if report:
+            for line in report:
+                print(line)
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(fixed)
+            print(f"\n✅ Fixed and saved: {path}")
+        else:
+            print("✅ No indentation issues found.")
+    except (OSError, UnicodeError) as e:
+        print(f"❌ Error processing {path}: {e}", file=sys.stderr)
+        sys.exit(1)

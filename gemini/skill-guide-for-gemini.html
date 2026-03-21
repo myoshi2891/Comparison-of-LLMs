@@ -1100,9 +1100,7 @@ style F fill:#fecaca,stroke:#dc2626,color:#7f1d1d
               <li class="flex items-start gap-2">
                 <span class="text-sky-500 font-bold mt-0.5">v0.29.0</span
                 ><span
-                  ><strong>/plan（Plan Mode）</strong> 追加・デフォルトモデルを
-                  <code class="bg-slate-100 px-1 rounded text-xs">gemini-3-flash-preview</code>
-                  に変更</span
+                  >Gemini 3 をデフォルトモデルに採用（<code class="bg-slate-100 px-1 rounded text-xs">Auto (Gemini 3)</code>）</span
                 >
               </li>
               <li class="flex items-start gap-2">
@@ -1116,8 +1114,7 @@ style F fill:#fecaca,stroke:#dc2626,color:#7f1d1d
               <li class="flex items-start gap-2">
                 <span class="text-sky-500 font-bold mt-0.5">v0.31.0</span
                 ><span
-                  ><strong>gemini-3.1-pro-preview</strong> サポート追加（AI Ultra / 有料 API
-                  限定）</span
+                  ><strong>gemini-3.1-pro-preview</strong> サポート追加（段階的ロールアウト・一部アカウントで利用可）</span
                 >
               </li>
               <li class="flex items-start gap-2">
@@ -1128,7 +1125,7 @@ style F fill:#fecaca,stroke:#dc2626,color:#7f1d1d
               </li>
               <li class="flex items-start gap-2">
                 <span class="text-sky-500 font-bold mt-0.5">v0.34.0</span
-                ><span>安定性・パフォーマンス改善、スキルロード高速化</span>
+                ><span>Plan Mode がデフォルト有効化、サンドボックス化・セキュリティ強化</span>
               </li>
             </ul>
           </div>
@@ -1192,6 +1189,11 @@ style F fill:#fecaca,stroke:#dc2626,color:#7f1d1d
                 >
                   ステータス
                 </th>
+                <th
+                  class="border border-orange-200 px-4 py-2 text-center font-bold text-orange-900"
+                >
+                  対応ツール
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -1208,6 +1210,9 @@ style F fill:#fecaca,stroke:#dc2626,color:#7f1d1d
                     >✅ デフォルト推奨</span
                   >
                 </td>
+                <td class="border border-orange-100 px-4 py-2 text-center">
+                  <span class="bg-teal-100 text-teal-700 font-bold px-2 py-0.5 rounded-full text-xs">Gemini CLI</span>
+                </td>
               </tr>
               <tr class="bg-orange-50 hover:bg-white">
                 <td class="border border-orange-100 px-4 py-2 mono text-xs text-slate-700">
@@ -1222,6 +1227,9 @@ style F fill:#fecaca,stroke:#dc2626,color:#7f1d1d
                     >⭐ 新世代最高精度</span
                   >
                 </td>
+                <td class="border border-orange-100 px-4 py-2 text-center">
+                  <span class="bg-teal-100 text-teal-700 font-bold px-2 py-0.5 rounded-full text-xs">Gemini CLI</span>
+                </td>
               </tr>
               <tr class="hover:bg-orange-50">
                 <td class="border border-orange-100 px-4 py-2 mono text-xs text-slate-700">
@@ -1234,6 +1242,9 @@ style F fill:#fecaca,stroke:#dc2626,color:#7f1d1d
                   <span class="bg-sky-100 text-sky-700 font-bold px-2 py-0.5 rounded-full text-xs"
                     >✅ 安定版</span
                   >
+                </td>
+                <td class="border border-orange-100 px-4 py-2 text-center">
+                  <span class="bg-teal-100 text-teal-700 font-bold px-2 py-0.5 rounded-full text-xs">Gemini CLI</span>
                 </td>
               </tr>
               <tr class="bg-orange-50 hover:bg-white">
@@ -1250,6 +1261,9 @@ style F fill:#fecaca,stroke:#dc2626,color:#7f1d1d
                     >⚠️ 2026-06-01 廃止予定</span
                   >
                 </td>
+                <td class="border border-orange-100 px-4 py-2 text-center">
+                  <span class="bg-teal-100 text-teal-700 font-bold px-2 py-0.5 rounded-full text-xs">Gemini CLI</span>
+                </td>
               </tr>
               <tr class="hover:bg-orange-50">
                 <td class="border border-orange-100 px-4 py-2 mono text-xs text-slate-700">
@@ -1264,6 +1278,9 @@ style F fill:#fecaca,stroke:#dc2626,color:#7f1d1d
                     >✅ 対応</span
                   >
                 </td>
+                <td class="border border-orange-100 px-4 py-2 text-center">
+                  <span class="bg-violet-100 text-violet-700 font-bold px-2 py-0.5 rounded-full text-xs">Antigravity</span>
+                </td>
               </tr>
               <tr class="bg-orange-50 hover:bg-white">
                 <td class="border border-orange-100 px-4 py-2 mono text-xs text-slate-700">
@@ -1277,6 +1294,9 @@ style F fill:#fecaca,stroke:#dc2626,color:#7f1d1d
                     class="bg-yellow-100 text-yellow-700 font-bold px-2 py-0.5 rounded-full text-xs"
                     >✅ 対応</span
                   >
+                </td>
+                <td class="border border-orange-100 px-4 py-2 text-center">
+                  <span class="bg-violet-100 text-violet-700 font-bold px-2 py-0.5 rounded-full text-xs">Antigravity</span>
                 </td>
               </tr>
             </tbody>
