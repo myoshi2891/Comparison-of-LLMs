@@ -64,14 +64,18 @@ def fix_mermaid_blocks(html: str) -> tuple[str, list[str]]:
                     or is_incomplete_frag
                 ) and not _new_stmt_re.match(stripped)
 
+                changed = False
                 if is_cont and fixed:
                     fixed[-1] = prev + ' ' + stripped
+                    changed = True
                 elif is_mindmap:
                     # mindmap: インデントは Mermaid 構文なので保持
                     fixed.append(ln)
                 else:
                     fixed.append(stripped)
-                fixed_count += 1
+                    changed = True
+                if changed:
+                    fixed_count += 1
             else:
                 fixed.append(ln)
 
