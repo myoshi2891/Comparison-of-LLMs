@@ -187,7 +187,7 @@
           <span class="bg-indigo-500 text-white text-sm font-bold px-3 py-1 rounded-full"
             >Antigravity v1.20.3</span
           >
-          <span class="bg-orange-500 text-white text-sm font-bold px-3 py-1 rounded-full"
+          <span class="bg-orange-500 text-white text-sm font-bold px-3 py-1 rounded-full" data-last-updated="prefix"
             >最終更新 2026-03-21</span
           >
         </div>
@@ -354,8 +354,8 @@ style CCi fill:#fef3c7,stroke:#d97706,color:#78350f
                   >
                   <div class="text-xs text-slate-400 mt-0.5">2026-03-17</div>
                   <div class="text-xs text-slate-500 mt-0.5">
-                    <a href="https://github.com/google-gemini/gemini-cli/releases" class="hover:text-sky-500" target="_blank" rel="noopener">Releases</a>
-                    · <a href="https://geminicli.com/docs/changelogs/" class="hover:text-sky-500" target="_blank" rel="noopener">Changelog</a>
+                    <a href="https://github.com/google-gemini/gemini-cli/releases" class="hover:text-sky-500" target="_blank" rel="noopener noreferrer">Releases</a>
+                    · <a href="https://geminicli.com/docs/changelogs/" class="hover:text-sky-500" target="_blank" rel="noopener noreferrer">Changelog</a>
                   </div>
                 </td>
                 <td class="border border-slate-200 px-4 py-2 text-center">
@@ -365,7 +365,7 @@ style CCi fill:#fef3c7,stroke:#d97706,color:#78350f
                   >
                   <div class="text-xs text-slate-400 mt-0.5">2026-03-05</div>
                   <div class="text-xs text-slate-500 mt-0.5">
-                    <a href="https://antigravity.google/changelog" class="hover:text-violet-500" target="_blank" rel="noopener">Changelog</a>
+                    <a href="https://antigravity.google/changelog" class="hover:text-violet-500" target="_blank" rel="noopener noreferrer">Changelog</a>
                   </div>
                 </td>
               </tr>
@@ -440,7 +440,7 @@ style CCi fill:#fef3c7,stroke:#d97706,color:#78350f
                 </td>
                 <td class="border border-slate-200 px-4 py-2 text-center mono text-sky-700 text-xs">
                   gemini-3.1-pro-preview<br /><span class="text-slate-400"
-                    >(v0.31.0〜, <a href="https://ai.google.dev/gemini-api/docs/models" class="underline hover:text-sky-500" target="_blank" rel="noopener">アクセス要件を確認</a>)</span
+                    >(v0.31.0〜, <a href="https://ai.google.dev/gemini-api/docs/models" class="underline hover:text-sky-500" target="_blank" rel="noopener noreferrer">アクセス要件を確認</a>)</span
                   >
                 </td>
                 <td
@@ -1211,7 +1211,7 @@ style F fill:#fecaca,stroke:#dc2626,color:#7f1d1d
                   >
                 </td>
                 <td class="border border-orange-100 px-4 py-2 text-center">
-                  <span class="bg-teal-100 text-teal-700 font-bold px-2 py-0.5 rounded-full text-xs">Gemini CLI</span>
+                  <span class="bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full text-xs">両方</span>
                 </td>
               </tr>
               <tr class="bg-orange-50 hover:bg-white">
@@ -1228,7 +1228,7 @@ style F fill:#fecaca,stroke:#dc2626,color:#7f1d1d
                   >
                 </td>
                 <td class="border border-orange-100 px-4 py-2 text-center">
-                  <span class="bg-teal-100 text-teal-700 font-bold px-2 py-0.5 rounded-full text-xs">Gemini CLI</span>
+                  <span class="bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full text-xs">両方</span>
                 </td>
               </tr>
               <tr class="hover:bg-orange-50">
@@ -1313,7 +1313,7 @@ style F fill:#fecaca,stroke:#dc2626,color:#7f1d1d
           Based on official documentation from Google Gemini, Antigravity, and Agent Skills Open
           Standard
         </div>
-        <div class="text-xs text-slate-400">最終更新: 2026年3月21日</div>
+        <div class="text-xs text-slate-400" data-last-updated="footer">最終更新: 2026年3月21日</div>
       </footer>
     </div>
     <!-- end max-w-5xl -->
@@ -1998,6 +1998,15 @@ description: |
     </script>
 
     <script>
+      // 日付定数（更新時はここだけ変更）
+      const LAST_UPDATED = '2026-03-21';
+      document.querySelectorAll('[data-last-updated]').forEach(el => {
+        const type = el.getAttribute('data-last-updated');
+        const [y, m, d] = LAST_UPDATED.split('-');
+        if (type === 'prefix') el.textContent = `最終更新 ${LAST_UPDATED}`;
+        else if (type === 'footer') el.textContent = `最終更新: ${y}年${Number(m)}月${Number(d)}日`;
+      });
+
       // Initialize Mermaid
       mermaid.initialize({
         startOnLoad: true,
