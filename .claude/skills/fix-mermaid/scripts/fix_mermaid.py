@@ -27,9 +27,34 @@ _seq_frag_re = re.compile(
 
 
 def fix_mermaid_blocks(html: str) -> tuple[str, list[str]]:
+    """
+    Normalize and fix indentation and wrapped-line formatting inside Mermaid `<div class="mermaid">` blocks found in an HTML string.
+    
+    Processes each `<div>` whose `class` attribute contains the `mermaid` token: normalizes line endings, preserves indentation for `mindmap*` diagrams, removes unintended leading indentation for other diagram types, and merges lines that are continuations of a previous statement (e.g., sequence diagram fragments where a previous line ends with `:` or is an incomplete fragment). Tracks per-block modification counts and returns both the updated HTML and a report of changes.
+    
+    Parameters:
+        html (str): The input HTML content to scan and fix.
+    
+    Returns:
+        tuple[str, list[str]]: A pair where the first element is the possibly modified HTML string and the second is a list of report lines (one per modified Mermaid block) describing the diagram type and number of lines changed; the report list is empty if no changes were made.
+    """
     report: list[str] = []
 
     def fix_block(m: re.Match[str]) -> str:
+        """
+        Process a matched Mermaid <div> block and return a reconstructed block with normalized and fixed inner lines.
+        
+        The function normalizes line endings for the block's inner content, determines the diagram type from the first non-empty, non-`%%` line, and repairs broken line indentation/wrapping inside the Mermaid source:
+        - For diagram types whose first line starts with `mindmap` (case-insensitive), inner line indentation is preserved.
+        - For other diagrams, leading indentation is removed from wrapped lines and lines that are continuation fragments (e.g., when the previous logical line ends with `:` or is an incomplete sequence fragment) are joined into the previous line, while avoiding joins that would start a new Mermaid statement.
+        If any lines are changed, a report entry describing the diagram type and number of modified lines is appended to the module-level `report` list.
+        
+        Parameters:
+            m (re.Match[str]): A regex match with three capture groups: the opening `<div ...>` tag, the inner content of the div, and the closing `</div>` tag.
+        
+        Returns:
+            str: The reconstructed full `<div>` block (opening tag + fixed inner content + closing tag).
+        """
         open_tag = m.group(1)
         inner = m.group(2)
         close_tag = m.group(3)
