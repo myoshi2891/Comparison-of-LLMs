@@ -2,7 +2,7 @@
 Mermaid v10 インデント修正スクリプト
 
 HTML ファイルのすべての <div class="mermaid"> ブロックを一括検査・修正する。
-mindmap は内部インデントを保持（階層構造が構文上の意味を持つため）。
+mindmap は内部インデントを保持 (階層構造が構文上の意味を持つため)。
 
 使い方:
     python3 fix_mermaid.py path/to/your-file.html
@@ -11,7 +11,7 @@ mindmap は内部インデントを保持（階層構造が構文上の意味を
 import re
 import sys
 
-# 新しい Mermaid ステートメントの開始パターン（モジュールロード時に1度だけコンパイル）
+# 新しい Mermaid ステートメントの開始パターン (モジュールロード時に1度だけコンパイル)
 _new_stmt_re = re.compile(
     r'^(\w+\s*-[->.>]|Note\b|participant\b|actor\b|alt\b|else\b'
     r'|opt\b|loop\b|rect\b|par\b|end\b|%%|activate\b|deactivate\b'
@@ -81,13 +81,13 @@ def fix_mermaid_blocks(html: str) -> tuple[str, list[str]]:
 
         if fixed_count > 0:
             report.append(
-                f"[{diagram_type}]: {fixed_count} line(s) de-indented"
+                f"[{diagram_type}]: {fixed_count} line(s) modified"
             )
 
         return open_tag + "\n".join(fixed) + close_tag
 
     # class 属性に "mermaid" トークンを含む <div> を柔軟にマッチ
-    # （属性順序・引用符の違い・追加クラスに対応）
+    # (属性順序・引用符の違い・追加クラスに対応)
     fixed_html = re.sub(
         r'(<div\b[^>]*\bclass\s*=\s*'
         r"""(?:"[^"]*\bmermaid\b[^"]*"|'[^']*\bmermaid\b[^']*'"""
