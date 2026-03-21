@@ -42,7 +42,7 @@ def fix_mermaid_blocks(html: str) -> tuple[str, list[str]]:
              if line.strip() and not line.strip().startswith("%%")),
             "",
         )
-        is_mindmap = diagram_type.startswith("mindmap")
+        is_mindmap = diagram_type.lower().startswith("mindmap")
 
         fixed: list[str] = []
         fixed_count = 0

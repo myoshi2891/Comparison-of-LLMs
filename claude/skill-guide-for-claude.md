@@ -487,7 +487,7 @@ allowed-tools:
 # コードベース全体監査
 
 現在のGitログ:
-! `git log --since="1 week ago" --oneline`
+`git log --since="1 week ago" --oneline`
 
 ## 監査手順
 
