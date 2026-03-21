@@ -708,7 +708,7 @@ mindmap
       SKILL.mdは必要時のみ
       SKILL.mdはスクリプト同梱可
     関連機能
-      Agent Teams -- team
+      Agent Teams --team
       plugin install でプラグイン追加
       /loop で定期実行
       /effort で思考深度制御
