@@ -51,28 +51,27 @@ def fix_mermaid_blocks(html: str) -> tuple[str, list[str]]:
             stripped = ln.lstrip()
             leading = len(ln) - len(stripped)
             if leading > 0 and stripped:
-                if is_mindmap:
+                # HTML フォーマッターによる行分割の検出・結合
+                prev = fixed[-1].rstrip() if fixed else ""
+                # _seq_frag_re は「未完了」のフラグメントのみ対象
+                # 例: "Note over A,B:" (未完了) vs "Note over A,B: msg" (完了)
+                frag_match = _seq_frag_re.match(prev)
+                is_incomplete_frag = bool(
+                    frag_match and not re.search(r':\s*\S', prev)
+                )
+                is_cont = (
+                    prev.endswith(':')
+                    or is_incomplete_frag
+                ) and not _new_stmt_re.match(stripped)
+
+                if is_cont and fixed:
+                    fixed[-1] = prev + ' ' + stripped
+                elif is_mindmap:
                     # mindmap: インデントは Mermaid 構文なので保持
                     fixed.append(ln)
                 else:
-                    # HTML フォーマッターによる行分割の検出・結合
-                    prev = fixed[-1].rstrip() if fixed else ""
-                    # _seq_frag_re は「未完了」のフラグメントのみ対象
-                    # 例: "Note over A,B:" (未完了) vs "Note over A,B: msg" (完了)
-                    frag_match = _seq_frag_re.match(prev)
-                    is_incomplete_frag = bool(
-                        frag_match and not re.search(r':\s*\S', prev)
-                    )
-                    is_cont = (
-                        prev.endswith(':')
-                        or is_incomplete_frag
-                    ) and not _new_stmt_re.match(stripped)
-
-                    if is_cont and fixed:
-                        fixed[-1] = prev + ' ' + stripped
-                    else:
-                        fixed.append(stripped)
-                    fixed_count += 1
+                    fixed.append(stripped)
+                fixed_count += 1
             else:
                 fixed.append(ln)
 
