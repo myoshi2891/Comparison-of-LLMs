@@ -35,8 +35,13 @@ def fix_mermaid_blocks(html: str) -> tuple[str, list[str]]:
         close_tag = m.group(3)
         raw_lines = inner.split("\n")
 
-        # 最初の非空行でダイアグラム種別を判定
-        diagram_type = next((line.strip() for line in raw_lines if line.strip()), "")
+        # 最初の非空・非ディレクティブ行でダイアグラム種別を判定
+        # %%{init...}%% 等のディレクティブ/コメント行はスキップ
+        diagram_type = next(
+            (line.strip() for line in raw_lines
+             if line.strip() and not line.strip().startswith("%%")),
+            "",
+        )
         is_mindmap = diagram_type.startswith("mindmap")
 
         fixed: list[str] = []
