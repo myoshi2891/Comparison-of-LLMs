@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SKILL.md 中級者完全攻略ガイド — Claude Code</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js" integrity="sha384-+NGfjU8KzpDLXRHduEqW+ZiJr2rIg+cidUVk7B51R5xK7cHwMKQfrdFwGdrq1Bcz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
 
@@ -703,11 +703,6 @@
         box-shadow: 0 0 8px currentColor;
       }
 
-      
-      .quad-dot:focus {
-        outline: 2px solid var(--accent-blue);
-        outline-offset: 4px;
-      }
       .quad-dot:hover {
         transform: translate(-50%, -50%) scale(1.5);
       }
@@ -1026,7 +1021,7 @@
       }
 
       /* ── Nav ── */
-      nav {
+      .page-toc {
         position: sticky;
         top: 0;
         z-index: 100;
@@ -1163,11 +1158,13 @@
         color: var(--accent-orange);
       }
     </style>
+    <link rel="stylesheet" href="../shared/common-header.css" />
+    <script src="../shared/common-header.js" defer></script>
   </head>
   <body>
     <div id="progress"></div>
 
-    <nav>
+    <nav class="page-toc" aria-label="On-page table of contents">
       <div class="nav-inner">
         <a href="#" class="nav-logo">SKILL<span>.md</span> — 中級者ガイド</a>
         <div class="nav-links">
@@ -1249,7 +1246,7 @@
         </p>
 
         <div class="mermaid-wrap">
-<!-- prettier-ignore -->
+          <!-- prettier-ignore -->
           <div class="mermaid">
 graph TB
 subgraph L1["Level 1 - 常時ロード 約100 tokens/skill"]
@@ -1361,7 +1358,7 @@ style L3 fill:#2d1f4a,stroke:#b794f4,color:#ffffff
 
         <h3>実行シーケンス</h3>
         <div class="mermaid-wrap">
-<!-- prettier-ignore -->
+          <!-- prettier-ignore -->
           <div class="mermaid">
 sequenceDiagram
 participant U as ユーザー
@@ -1511,7 +1508,7 @@ CC-->>U: ガイドラインに準拠したREADME
         </div>
 
         <div class="mermaid-wrap">
-<!-- prettier-ignore -->
+          <!-- prettier-ignore -->
           <div class="mermaid">
 graph LR
 A["invocation: automatic<br>Claudeが自動判断"] --> C{"実行判定"}
@@ -1566,37 +1563,49 @@ style E fill:#2d1f4a,stroke:#b794f4,color:#ffffff
             <div class="quad-axis-y-bottom">↓ 低リスク</div>
             <!-- プロット点 -->
             <div
-              class="quad-dot" role="button" tabindex="0" aria-label="DBマイグレーション"
+              class="quad-dot"
+              role="img"
+              aria-label="DBマイグレーション"
               style="left: 15%; top: 10%"
               data-label="DBマイグレーション"
               data-color="var(--accent-red)"
             ></div>
             <div
-              class="quad-dot" role="button" tabindex="0" aria-label="本番デプロイ"
+              class="quad-dot"
+              role="img"
+              aria-label="本番デプロイ"
               style="left: 15%; top: 18%"
               data-label="本番デプロイ"
               data-color="var(--accent-red)"
             ></div>
             <div
-              class="quad-dot" role="button" tabindex="0" aria-label="セキュリティスキャン"
+              class="quad-dot"
+              role="img"
+              aria-label="セキュリティスキャン"
               style="left: 50%; top: 43%"
               data-label="セキュリティスキャン"
               data-color="var(--accent-orange)"
             ></div>
             <div
-              class="quad-dot" role="button" tabindex="0" aria-label="コードレビュー"
+              class="quad-dot"
+              role="img"
+              aria-label="コードレビュー"
               style="left: 70%; top: 72%"
               data-label="コードレビュー"
               data-color="var(--accent-cyan)"
             ></div>
             <div
-              class="quad-dot" role="button" tabindex="0" aria-label="テキスト要約"
+              class="quad-dot"
+              role="img"
+              aria-label="テキスト要約"
               style="left: 85%; top: 78%"
               data-label="テキスト要約"
               data-color="var(--accent-green)"
             ></div>
             <div
-              class="quad-dot" role="button" tabindex="0" aria-label="READMEアップデート"
+              class="quad-dot"
+              role="img"
+              aria-label="READMEアップデート"
               style="left: 78%; top: 75%"
               data-label="READMEアップデート"
               data-color="var(--accent-green)"
@@ -1661,7 +1670,7 @@ style E fill:#2d1f4a,stroke:#b794f4,color:#ffffff
         </div>
 
         <div class="mermaid-wrap">
-<!-- prettier-ignore -->
+          <!-- prettier-ignore -->
           <div class="mermaid">
 graph TD
 S["SKILL.md<br>本文 500行未満"] --> R1["references/api-spec.md<br>詳細なAPI仕様"]
@@ -1818,7 +1827,7 @@ style R4 fill:#4a1a1a,stroke:#fc8181,color:#ffffff
 
         <h3>3パターンの比較</h3>
         <div class="mermaid-wrap">
-<!-- prettier-ignore -->
+          <!-- prettier-ignore -->
           <div class="mermaid">
 graph LR
 subgraph P1["ARGUMENTS - 全引数を一括受け取り"]
@@ -1852,7 +1861,7 @@ style P3 fill:#2d1f4a,stroke:#b794f4,color:#ffffff
         </p>
 
         <div class="mermaid-wrap">
-<!-- prettier-ignore -->
+          <!-- prettier-ignore -->
           <div class="mermaid">
 sequenceDiagram
 participant User as ユーザー
@@ -1919,7 +1928,7 @@ Main-->>User: クリーンな監査レポート
 
         <h3>使い分けのフローチャート</h3>
         <div class="mermaid-wrap">
-<!-- prettier-ignore -->
+          <!-- prettier-ignore -->
           <div class="mermaid">
 flowchart TD
 A["タスクの性質を評価"] --> B{"手順は固定されているか？"}
@@ -1983,7 +1992,7 @@ style G fill:#2d1f4a,stroke:#b794f4,color:#ffffff
         </p>
 
         <div class="mermaid-wrap">
-<!-- prettier-ignore -->
+          <!-- prettier-ignore -->
           <div class="mermaid">
 graph TD
 A["スキルのトリガー問題"] --> B["アンダートリガー<br>発動すべき状況で不発"]
@@ -2173,7 +2182,7 @@ claude <span class="hl-tag">--debug</span> <span class="hl-str">"!statsig"</span
 
         <h3>デバッグフロー</h3>
         <div class="mermaid-wrap">
-<!-- prettier-ignore -->
+          <!-- prettier-ignore -->
           <div class="mermaid">
 flowchart TD
 A["スキルが期待通りに動かない"] --> B{"どの段階で失敗？"}
@@ -2256,7 +2265,7 @@ zip -r team-reviewer.zip team-reviewer/</pre>
             <div class="step-title">デフォルトステータスの戦略設計</div>
             <p>各スキルを「デフォルト有効」か「デフォルト無効」かを選択する。</p>
             <div class="mermaid-wrap">
-<!-- prettier-ignore -->
+              <!-- prettier-ignore -->
               <div class="mermaid">
 graph LR
 subgraph ON["デフォルト 有効"]
@@ -2320,7 +2329,7 @@ style OFF fill:#4a1a1a,stroke:#fc8181,color:#ffffff
         </p>
 
         <div class="mermaid-wrap">
-<!-- prettier-ignore -->
+          <!-- prettier-ignore -->
           <div class="mermaid">
 graph TD
 A["タスク実行スキル<br>通常のSKILL.md"] -->|完了| B["リフレクションスキルを起動"]
@@ -2423,6 +2432,161 @@ style E fill:#1a3a5c,stroke:#63b3ed,color:#ffffff
               </p>
             </div>
           </div>
+        </div>
+
+        <!-- ── 2026年3月 新コマンド ── -->
+        <h3>2026年3月 新コマンド — SKILL.md と組み合わせる</h3>
+
+        <div class="callout callout-info">
+          <span class="callout-icon">🆕</span>
+          <strong>v2.1.63〜v2.1.76 で追加された3つの即戦力コマンド：</strong>
+          <ul style="margin-top: 10px; padding-left: 20px; color: var(--text-secondary)">
+            <li style="margin-bottom: 8px">
+              <strong style="color: var(--accent-blue)">Voice mode（音声入力）</strong> —
+              <code>/voice</code> でトグル有効化。スペースキーを押しながら話し、離すと送信。
+              スキルのトリガーキーワードを口頭で発話してスキルを起動できる。
+              コード変数名・OAuth・JSON などの技術用語の認識精度も改善済み（v2.1.63）。
+            </li>
+            <li style="margin-bottom: 8px">
+              <strong style="color: var(--accent-green)">/loop — 定期繰り返しタスク</strong> —
+              <code>/loop 30m "タスク内容"</code> で cron ジョブ的な定期実行をスケジュール。
+              SKILL.md で定義した品質チェックや監視ルーチンを自動周回させると強力。
+            </li>
+            <li>
+              <strong style="color: var(--accent-orange)">/effort — Effort Level 制御</strong> —
+              <code>/effort low | medium | high | auto</code> で Opus 4.6
+              の思考深度をリアルタイム調整。 デフォルトは <code>medium</code>。スキルの frontmatter
+              に <code>effort: high</code> を付与すると、そのスキル起動時のみ deep thinking
+              が有効になる（v2.1.75）。
+            </li>
+          </ul>
+        </div>
+
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-title"><span class="dot-cyan">◆</span> Voice mode</div>
+            <p style="font-size: 13px">
+              <code>/voice</code> → スペースキー長押しで発話 → 離すと送信。
+              「コードレビューして」と声に出すだけでスキルがトリガーされる。
+            </p>
+            <div class="tag tag-blue">v2.1.63</div>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="dot-green">◆</span> /loop</div>
+            <p style="font-size: 13px">
+              <code>/loop 30m "pnpm test を実行して結果をレポートして"</code>
+              —— スキルで定義した手順を定期自動実行。CI 代替・監視・ヘルスチェックに最適。
+            </p>
+            <div class="tag tag-green">定期実行</div>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="dot-orange">◆</span> /effort</div>
+            <p style="font-size: 13px">
+              <code>/effort high</code> で次以降のターンを deep thinking モードに。
+              アーキテクチャ設計スキルや複雑デバッグスキルの精度が大幅向上する。
+            </p>
+            <div class="tag tag-orange">v2.1.75</div>
+          </div>
+        </div>
+
+        <!-- ── Agent Teams × SKILL.md ── -->
+        <h3>Agent Teams × SKILL.md 組み合わせパターン</h3>
+
+        <div class="callout callout-tip">
+          <span class="callout-icon">🤝</span>
+          <strong>Agent Teams とは：</strong>複数の Claude Code
+          インスタンスが<strong>独立したコンテキストウィンドウ</strong>を持ちながら、
+          共有タスクリストとダイレクトメッセージで連携する実験的機能（v2.1.32+）。
+          各テイムメイトは起動時に <code>CLAUDE.md</code>・Skills を自動ロードするため、
+          <strong>SKILL.md の精度がそのままチーム全体のパフォーマンスを決定する</strong>。
+        </div>
+
+        <div class="mermaid-wrap">
+          <!-- prettier-ignore -->
+          <div class="mermaid">
+graph TD
+subgraph LEAD["🎯 Team Lead（Delegate Mode ON）"]
+L["CLAUDE.md を読み込み<br>チーム全体のルールを把握"]
+end
+subgraph SKILLS["📄 共有 SKILL.md 群"]
+S1["pre-commit-check<br>SKILL.md"]
+S2["code-reviewer<br>SKILL.md"]
+S3["reflect-and-improve<br>SKILL.md"]
+end
+subgraph TEAM["👷 テイムメイト（独立コンテキスト）"]
+T1["Frontend<br>Teammate"]
+T2["Backend<br>Teammate"]
+T3["Test<br>Teammate"]
+end
+subgraph LOOP["/loop 30m で定期実行"]
+R["reflect-and-improve スキル<br>→ SKILL.md を自己更新"]
+end
+L --&gt;|タスク割り当て| T1
+L --&gt;|タスク割り当て| T2
+L --&gt;|タスク割り当て| T3
+T1 --&gt;|起動時自動ロード| S1
+T2 --&gt;|起動時自動ロード| S2
+T3 --&gt;|起動時自動ロード| S1
+T3 --&gt; R
+R --&gt; S3
+style LEAD fill:#1a3a5c,stroke:#63b3ed,color:#ffffff
+style SKILLS fill:#1a4040,stroke:#4fd1c5,color:#ffffff
+style TEAM fill:#2d1f4a,stroke:#b794f4,color:#ffffff
+style LOOP fill:#2d2010,stroke:#ffa657,color:#ffffff
+          </div>
+        </div>
+
+        <p>
+          以下は SKILL.md と Agent Teams・<code>/loop</code>・<code>/effort</code>
+          を組み合わせた実践的な CLAUDE.md 設定例：
+        </p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots">
+              <div class="code-dot"></div>
+              <div class="code-dot"></div>
+              <div class="code-dot"></div>
+            </div>
+            <div class="code-lang">CLAUDE.md — Agent Teams + SKILL.md 組み合わせ設定例</div>
+          </div>
+          <div class="code-content">
+            <pre><span class="hl-head"># PROJECT: my-saas-app</span>
+
+<span class="hl-head">## Agent Teams — File Ownership Rules</span>
+<span class="hl-comment"># テイムメイト間のファイル競合防止。各テイムメイトは起動時に SKILL.md を自動ロードする。</span>
+
+| Teammate Role     | 書き込み可能パス          | ロードされる SKILL.md        |
+|-------------------|--------------------------|------------------------------|
+| frontend-teammate | app/, components/        | code-reviewer, pre-commit-check |
+| backend-teammate  | supabase/functions/      | code-reviewer, pre-commit-check |
+| test-teammate     | tests/, **/*.test.ts     | pre-commit-check              |
+
+<span class="hl-head">## 定期品質チェック（/loop との組み合わせ）</span>
+<span class="hl-comment"># 以下のコマンドをセッション開始時に実行して品質を自動監視する:</span>
+<span class="hl-tag">/loop 30m "pre-commit-check スキルを実行してエラーがあればレポートして"</span>
+
+<span class="hl-head">## Effort Level ポリシー</span>
+<span class="hl-comment"># アーキテクチャ設計スキル・複雑デバッグは /effort high を付与:</span>
+<span class="hl-tag">/effort high</span> → architect-review スキル、security-audit スキル
+<span class="hl-tag">/effort medium</span> → code-reviewer スキル（デフォルト）
+<span class="hl-tag">/effort low</span> → ファイル検索・単純リファクタリング
+
+<span class="hl-head">## Task Done Definition（テイムメイト全員が守ること）</span>
+- [ ] <span class="hl-str">`pnpm test`</span> が PASS している
+- [ ] <span class="hl-str">`pre-commit-check`</span> スキルが「コミット OK」を返している
+- [ ] 担当ファイル以外を変更していない
+- [ ] 完了後に <span class="hl-str">`reflect-and-improve`</span> スキルを <span class="hl-tag">/loop</span> で定期起動して SKILL.md を自己進化させる</pre>
+          </div>
+        </div>
+
+        <div class="callout callout-warn">
+          <span class="callout-icon">⚠️</span>
+          <strong>Agent Teams 利用時の注意：</strong>
+          <code>CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1</code> を環境変数に設定し有効化が必要。
+          チームクリーンアップは必ず<strong>リード（Lead）から実行</strong>すること
+          （テイムメイトから実行するとリソース不整合が生じる）。 コスト感として通常セッションの
+          <strong>3〜4倍</strong>のトークンを消費する点を考慮した上で導入すること。
         </div>
       </div>
 

@@ -247,9 +247,9 @@
 
   <!-- HERO -->
   <div class="hero">
-    <div class="hero-badge">🤖 Claude Code 完全ガイド — 2026年 Agent Teams 対応版</div>
+    <div class="hero-badge">🤖 Claude Code 完全ガイド — 2026年3月 v2.1.76 最新対応版</div>
     <h1>サブエージェント + Agent Teams 開発における<br>Markdownファイル ベストプラクティス</h1>
-    <p>CLAUDE.md・エージェント定義 .md・MEMORY.md・README.md ── それぞれの役割と書き方を体系的に解説します。さらに <strong>2026年2月リリースの Agent Teams（実験的機能）</strong>における CLAUDE.md 設計・タスクファイル管理・hooks 設定の最新ベストプラクティスを追記しています。</p>
+    <p>CLAUDE.md・エージェント定義 .md・MEMORY.md・README.md ── それぞれの役割と書き方を体系的に解説します。<strong>2026年3月の v2.1.76 大型アップデート</strong>（Voice mode・/loop・/effort・ultrathink・1M コンテキスト・HTTP hooks・MCP elicitation・Agent Teams 安定化）に完全対応した最新版です。</p>
   </div>
 
   <!-- 1. アーキテクチャ全体像 -->
@@ -581,6 +581,14 @@ Next.js 15 + Supabase + Stripe。マルチテナント SaaS。
         <code>frontend/CLAUDE.md</code> や <code>backend/CLAUDE.md</code> に分割すると、そのディレクトリで作業する際だけ追加コンテキストが読み込まれます。グローバル CLAUDE.md は薄く、局所設定は局所ファイルへ。
       </div>
     </div>
+
+    <div class="tip tip-warn">
+      <span class="tip-icon">⚠️</span>
+      <div class="tip-content">
+        <strong>v2.1.75+ 変更: HTML コメントは Claude に見えない</strong>
+        <code>CLAUDE.md</code> 内の <code>&lt;!-- ... --&gt;</code> HTML コメントは、自動インジェクト時に Claude のコンテキストから除外されるようになりました（v2.1.75+）。<code>Read</code> ツールで明示的に読んだ場合は表示されます。コメントとして残したいメモは引き続き使えますが、Claude に読んでほしい指示は通常のMarkdown形式で書くことを強く推奨します。
+      </div>
+    </div>
   </div>
 
   <!-- 3. サブエージェント定義 .md -->
@@ -777,6 +785,14 @@ MEMORY.md が 200行を超えた場合は要約・整理してください。</d
   <div class="section">
     <div class="section-title"><span class="num">6</span>コスト最適なモデル選択戦略</div>
 
+    <div class="tip tip-danger">
+      <span class="tip-icon">🚨</span>
+      <div class="tip-content">
+        <strong>Opus 4 / Opus 4.1 廃止済み（2026年3月）</strong>
+        Claude Code v2.1.68 以降、<code>claude-opus-4</code> と <code>claude-opus-4.1</code> はファーストパーティ API から削除されました。<code>model: opus</code> または <code>model: inherit</code> の設定があった場合は自動的に <code>Opus 4.6</code> へ移行されています。
+      </div>
+    </div>
+
     <div class="table-wrap">
       <table>
         <tr>
@@ -792,18 +808,38 @@ MEMORY.md が 200行を超えた場合は要約・整理してください。</d
           <td><span class="badge badge-green">最速</span> 探索タスク向け</td>
         </tr>
         <tr>
-          <td><code>sonnet</code></td>
+          <td><code>sonnet</code> (4.6)</td>
           <td>バランス重視</td>
           <td>コードレビュー、テスト生成、実装</td>
-          <td><span class="badge badge-blue">推奨デフォルト</span></td>
+          <td><span class="badge badge-blue">推奨デフォルト</span> 1M トークンコンテキスト (beta)</td>
         </tr>
         <tr>
-          <td><code>opus</code></td>
+          <td><code>opus</code> (4.6)</td>
           <td>複雑な判断</td>
           <td>アーキテクチャ設計、セキュリティ監査</td>
-          <td><span class="badge badge-purple">高精度</span> 高コスト</td>
+          <td><span class="badge badge-purple">高精度</span> デフォルトは <strong>medium effort</strong>。1M コンテキスト (Max/Team/Enterprise)</td>
         </tr>
       </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚡ Effort Level 設計（v2.1.68+）</div>
+      <p>Opus 4.6 の thinking 深度は <strong>/effort コマンド</strong>で制御できます。デフォルトは <code>medium</code> です（Max・Team プランのみ）。</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Effort Level</th><th>コマンド</th><th>用途</th><th>コスト</th></tr>
+          <tr><td><code>low</code> (○)</td><td><code>/effort low</code></td><td>単純な質問・リネーム・フォーマット</td><td><span class="badge badge-green">最安</span></td></tr>
+          <tr><td><code>medium</code> (◐)</td><td><code>/effort medium</code> / デフォルト</td><td>コードレビュー・テスト生成・通常実装</td><td><span class="badge badge-blue">推奨</span></td></tr>
+          <tr><td><code>high</code> (●)</td><td><code>/effort high</code> または <code>ultrathink</code></td><td>アーキテクチャ設計・複雑なデバッグ</td><td><span class="badge badge-purple">高コスト</span></td></tr>
+        </table>
+      </div>
+      <div class="tip tip-info" style="margin-top:12px;">
+        <span class="tip-icon">💡</span>
+        <div class="tip-content">
+          <strong>ultrathink キーワード（v2.1.68 で再導入）</strong>
+          プロンプトに <code>ultrathink</code> を含めると、<strong>次のターンのみ</strong> high effort（最大 31,999 トークン thinking budget）が有効になります。永続的な effort 変更には <code>/effort high</code>、リセットには <code>/effort auto</code> を使用してください。<br>例: <code>"この認証フローを設計して ultrathink"</code>
+        </div>
+      </div>
     </div>
 
     <div class="tip tip-info">
@@ -845,9 +881,77 @@ MEMORY.md が 200行を超えた場合は要約・整理してください。</d
     </div>
   </div>
 
-  <!-- 8. README.md -->
+  <!-- 8. 2026年3月 新機能・コマンド -->
   <div class="section">
-    <div class="section-title"><span class="num">8</span><span class="mono">.claude/README.md</span> — エージェント構成ドキュメント</div>
+    <div class="section-title"><span class="num">8</span>2026年3月 新機能・コマンド (v2.1.63〜v2.1.76)</div>
+
+    <div class="at-banner" style="background: linear-gradient(135deg, #0a1929 0%, #0d1117 50%, #0a1929 100%); border-color: rgba(96,165,250,0.4);">
+      <div class="at-badge" style="background: rgba(96,165,250,0.15); border-color: rgba(96,165,250,0.4); color: #60a5fa;">🚀 v2.1.76 · 2026年3月 大型アップデート</div>
+      <h3 style="color: #fff;">Voice mode・/loop・/effort・1M コンテキスト・HTTP hooks が一斉リリース</h3>
+      <p>2026年3月は Claude Code にとって最大規模のアップデート月でした。音声入力・定期タスク・努力レベル制御・100万トークンコンテキスト・新しい hooks システムが統合されました。</p>
+    </div>
+
+    <div class="usecase-grid">
+      <div class="uc">
+        <div class="uc-icon">🎙️</div>
+        <div class="uc-title">Voice Mode（音声入力） — v2.1.63</div>
+        <div class="uc-desc">push-to-talk 方式の音声入力。<code>/voice</code> で有効化、スペースキーを押しながら話して離すと送信。コード変数名・OAuth・JSON などの技術用語の認識精度も改善済み。</div>
+        <div class="uc-prompt">/voice        ← トグルで有効化<br>スペースキー押下 → 話す → 離す</div>
+      </div>
+      <div class="uc">
+        <div class="uc-icon">🔁</div>
+        <div class="uc-title">/loop — 定期繰り返しタスク</div>
+        <div class="uc-desc">cron ジョブのように定期実行するタスクをスケジュール。定期ビルドチェック・テスト実行・モニタリングの自動化に。</div>
+        <div class="uc-prompt">/loop 30m "pnpm test を実行して結果をレポートして"</div>
+      </div>
+      <div class="uc">
+        <div class="uc-icon">⚡</div>
+        <div class="uc-title">/effort — Effort Level 制御 — v2.1.75</div>
+        <div class="uc-desc">Opus 4.6 の思考深度をリアルタイムで変更。デフォルトは <code>medium</code>（速度とコストのバランス）。セッション内でいつでも変更可能。</div>
+        <div class="uc-prompt">/effort low     ← 高速・低コスト<br>/effort medium  ← デフォルト<br>/effort high    ← 深い分析<br>/effort auto    ← リセット</div>
+      </div>
+      <div class="uc">
+        <div class="uc-icon">🧠</div>
+        <div class="uc-title">1M トークン コンテキスト — v2.1.75</div>
+        <div class="uc-desc">Opus 4.6 が Max・Team・Enterprise プランで最大 100万トークンのコンテキストウィンドウをサポート。大規模コードベースを丸ごとロードして作業可能に。</div>
+        <div class="uc-prompt">最大出力: Opus 4.6 → 64k tokens (デフォルト)<br>上限: Opus 4.6 / Sonnet 4.6 → 128k tokens</div>
+      </div>
+      <div class="uc">
+        <div class="uc-icon">🌐</div>
+        <div class="uc-title">HTTP Hooks — v2.1.63</div>
+        <div class="uc-desc">hooks でシェルコマンドの代わりに URL へ JSON を POST できるようになりました。CI/CD・Slack 通知・外部 Webhook との連携がローカルスクリプト不要で実現。</div>
+        <div class="uc-prompt">"type": "http",<br>"url": "https://hooks.example.com/claude",<br>"method": "POST"</div>
+      </div>
+      <div class="uc">
+        <div class="uc-icon">🗜️</div>
+        <div class="uc-title">PostCompact Hook + MCP Elicitation</div>
+        <div class="uc-desc"><b>PostCompact</b>: 会話圧縮後に発火する新フック。圧縮後のコンテキスト検証に使用。<b>MCP Elicitation</b>: MCP サーバーがタスク実行中にフォームやURLで構造化入力を要求できる機能。</div>
+        <div class="uc-prompt">"PostCompact": [{ "hooks": [{ "type": "command",<br>  "command": "bash -c 'validate_context.sh'" }]}]</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 16px;">
+      <div class="card-title">🆕 その他の新コマンド・設定（2026年3月）</div>
+      <div class="table-wrap">
+        <table>
+          <tr><th>コマンド / 設定</th><th>バージョン</th><th>説明</th></tr>
+          <tr><td><code>/color</code></td><td>v2.1.75</td><td>現在のセッションのプロンプトバーに色を設定。並列セッション実行時に視覚的に区別できる</td></tr>
+          <tr><td><code>/simplify</code></td><td>v2.1.63</td><td>選択コードをシンプル化するバンドルコマンド</td></tr>
+          <tr><td><code>/batch</code></td><td>v2.1.63</td><td>複数ファイルへの一括操作</td></tr>
+          <tr><td><code>/branch</code></td><td>v2.1.76</td><td>git ブランチ操作の簡易コマンド</td></tr>
+          <tr><td><code>/context</code></td><td>v2.1.74</td><td>コンテキスト状況の確認 + 最適化の提案（メモリ肥大・重いツールの検出）</td></tr>
+          <tr><td><code>claude -n "name"</code></td><td>v2.1.75</td><td>起動時にセッション名を設定（<code>-n</code> / <code>--name</code> フラグ）</td></tr>
+          <tr><td><code>autoMemoryDirectory</code></td><td>v2.1.74</td><td>自動メモリ保存先ディレクトリをカスタマイズ（settings.json）</td></tr>
+          <tr><td><code>worktree.sparsePaths</code></td><td>v2.1.75</td><td>大規模モノレポで必要なディレクトリだけ sparse-checkout する設定</td></tr>
+          <tr><td><code>effort</code> frontmatter</td><td>v2.1.76</td><td>スキルおよびスラッシュコマンドに effort レベルを frontmatter で指定可能</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. README.md -->
+  <div class="section">
+    <div class="section-title"><span class="num">9</span><span class="mono">.claude/README.md</span> — エージェント構成ドキュメント</div>
 
     <div class="card">
       <p>チームメンバーが「どのエージェントが何をするか」を把握できる人間向けドキュメントです。エージェントが増えてきたら必ず作成しましょう。</p>
@@ -886,7 +990,7 @@ pm-spec → architect-review → implementer → code-reviewer
 
   <!-- Summary table -->
   <div class="section">
-    <div class="section-title"><span class="num">9</span>まとめ：各 Markdown の役割と設計原則</div>
+    <div class="section-title"><span class="num">10</span>まとめ：各 Markdown の役割と設計原則</div>
     <div class="table-wrap">
       <table>
         <tr>
@@ -938,12 +1042,12 @@ pm-spec → architect-review → implementer → code-reviewer
   <!-- AT-1. Agent Teams 概要 -->
   <div class="section section-team">
     <div class="section-title">
-      <span class="num">10</span>
+      <span class="num">11</span>
       Agent Teams とは — サブエージェントとの根本的な違い
     </div>
 
     <div class="at-banner">
-      <div class="at-badge">🧪 Experimental · 2026年2月 Opus 4.6 同時リリース</div>
+      <div class="at-badge">🧪 Research Preview · 2026年2月 Opus 4.6 同時リリース → 2026年3月 安定化</div>
       <h3>Agent Teams：複数の Claude Code セッションがチームとして協調する</h3>
       <p>Agent Teams は、複数の Claude Code インスタンスが<strong>独立したコンテキストウィンドウ</strong>を持ちながら、<strong>共有タスクリスト・ダイレクトメッセージ</strong>で連携する実験的機能です。サブエージェントが「親に報告するだけの孤立ワーカー」であるのに対し、Agent Teams のテイムメイトは<strong>お互いに直接通信し、タスクを自律的にクレームし、仮説を議論しながら</strong>作業します。デフォルト無効（フィーチャーフラグ）。Anthropic は 16 並列インスタンスで 10万行の C コンパイラをビルドする実証実験を行いました（コスト: $20,000 / 2週間）。</p>
     </div>
@@ -1038,13 +1142,13 @@ pm-spec → architect-review → implementer → code-reviewer
 
   <!-- AT-2. settings.json / 有効化 -->
   <div class="section section-team">
-    <div class="section-title"><span class="num">11</span>Agent Teams の有効化と <span class="mono">settings.json</span> 設定</div>
+    <div class="section-title"><span class="num">12</span>Agent Teams の有効化と <span class="mono">settings.json</span> 設定</div>
 
     <div class="tip tip-warn">
       <span class="tip-icon">⚠️</span>
       <div class="tip-content">
-        <strong>デフォルト無効・実験的機能</strong>
-        Agent Teams はデフォルトで無効。有効にするには <code>settings.json</code> または環境変数で <code>CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1</code> を設定します。セッション再開・タスク調整・シャットダウンの挙動に既知の制限があります。必ずリードからクリーンアップを実行してください（テイムメイトから実行するとリソースが不整合になります）。
+        <strong>デフォルト無効・Research Preview</strong>
+        Agent Teams はデフォルトで無効。有効にするには <code>settings.json</code> または環境変数で <code>CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1</code> を設定します。v2.1.76 で多くのバグ（Bedrock/Vertex/Foundry での起動失敗、テイムメイトペイン未クローズ等）が修正されより安定しました。セッション再開・タスク調整・シャットダウンの挙動に留意し、必ずリードからクリーンアップを実行してください（テイムメイトから実行するとリソースが不整合になります）。また、<code>/plugin uninstall</code> はチームメイト設定に影響しないよう <code>.claude/settings.local.json</code> を更新するようになりました。
       </div>
     </div>
 
@@ -1099,14 +1203,14 @@ pm-spec → architect-review → implementer → code-reviewer
       <span class="tip-icon">💡</span>
       <div class="tip-content">
         <strong>ショートカットキー（In-process モード）</strong>
-        <code>Shift+↑/↓</code> でテイムメイトを切り替え、<code>Enter</code> で選択、<code>Esc</code> で中断、<code>Ctrl+T</code> でタスクリストを表示。<code>Shift+Tab</code> で Delegate Mode ON/OFF を切り替えられます（ON にするとリードは実装せず調整専任になります）。
+        <code>Shift+↓</code> でテイムメイトを切り替え（v2.1.x でナビゲーションが簡略化）、<code>Enter</code> で選択、<code>Esc</code> で中断、<code>Ctrl+T</code> でタスクリストを表示。<code>Shift+Tab</code> で Delegate Mode ON/OFF を切り替えられます（ON にするとリードは実装せず調整専任になります）。
       </div>
     </div>
   </div>
 
   <!-- AT-3. Agent Teams 向け CLAUDE.md 設計 -->
   <div class="section section-team">
-    <div class="section-title"><span class="num">12</span>Agent Teams 向け <span class="mono">CLAUDE.md</span> 設計 — 最重要ポイント</div>
+    <div class="section-title"><span class="num">13</span>Agent Teams 向け <span class="mono">CLAUDE.md</span> 設計 — 最重要ポイント</div>
 
     <div class="tip tip-success">
       <span class="tip-icon">✅</span>
@@ -1173,7 +1277,7 @@ pm-spec → architect-review → implementer → code-reviewer
 
   <!-- AT-4. Task List ファイル設計 -->
   <div class="section section-team">
-    <div class="section-title"><span class="num">13</span>タスクリストファイル設計 — <span class="mono">~/.claude/tasks/{team}/*.json</span></div>
+    <div class="section-title"><span class="num">14</span>タスクリストファイル設計 — <span class="mono">~/.claude/tasks/{team}/*.json</span></div>
 
     <div class="card">
       <p>Agent Teams のタスクは <code>~/.claude/tasks/{team-name}/</code> 配下の JSON ファイルとして管理されます。タスクは <strong>pending → in_progress → completed</strong> の3状態を遷移し、ファイルロックによる競合防止が組み込まれています。<code>description</code> フィールドが実質的にテイムメイトへのプロンプトとなるため、内容の精度がパフォーマンスを左右します。</p>
@@ -1245,7 +1349,7 @@ pm-spec → architect-review → implementer → code-reviewer
 
   <!-- AT-5. hooks 設計 -->
   <div class="section section-team">
-    <div class="section-title"><span class="num">14</span>Agent Teams Hooks 設計 — 品質ゲートの自動化</div>
+    <div class="section-title"><span class="num">15</span>Agent Teams Hooks 設計 — 品質ゲートの自動化</div>
 
     <div class="card">
       <p>Claude Code は Agent Teams 向けに <code>TeammateIdle</code>・<code>TaskCompleted</code> の2つのフックイベントを提供します（v2.1.33+）。フックは<strong>命令的（Imperative）</strong>であり、シェルコマンドを実行してその結果（終了コード）で Claude の動作を制御します。14種類あるフックイベント全体（SessionStart・PreToolUse 等）と組み合わせることで、チーム全体に一貫した品質ポリシーを強制できます。</p>
@@ -1347,7 +1451,7 @@ pm-spec → architect-review → implementer → code-reviewer
 
   <!-- AT-6. Use Cases & Prompts -->
   <div class="section section-team">
-    <div class="section-title"><span class="num">15</span>Agent Teams のユースケース別プロンプトパターン</div>
+    <div class="section-title"><span class="num">16</span>Agent Teams のユースケース別プロンプトパターン</div>
 
     <div class="usecase-grid">
       <div class="uc">
@@ -1392,7 +1496,7 @@ pm-spec → architect-review → implementer → code-reviewer
 
   <!-- AT-7. Updated Summary Table -->
   <div class="section section-team">
-    <div class="section-title"><span class="num">16</span>まとめ：全 Markdown + 設定ファイルの役割（Agent Teams 追記版）</div>
+    <div class="section-title"><span class="num">17</span>まとめ：全 Markdown + 設定ファイルの役割（Agent Teams 追記版）</div>
     <div class="table-wrap">
       <table>
         <tr>
@@ -1451,7 +1555,7 @@ pm-spec → architect-review → implementer → code-reviewer
 
   <!-- Sources -->
   <div class="section">
-    <div class="section-title"><span class="num">📚</span>参考ソース（サブエージェント + Agent Teams 全ソース）</div>
+    <div class="section-title"><span class="num">📚</span>参考ソース（サブエージェント + Agent Teams + March 2026 Update）</div>
     <div class="source-grid">
       <div class="source-card">
         <div class="source-title">🔵 Anthropic 公式: Sub-agents ドキュメント</div>
@@ -1544,6 +1648,28 @@ pm-spec → architect-review → implementer → code-reviewer
         <div class="source-title" style="color:#34d399;">🟢 GitHub: AgentSpeak — Agent Teams トークン効率化プロトコル</div>
         <div class="source-url"><a href="https://github.com/yuvalsuede/claude-teams-language-protocol" target="_blank" rel="noopener noreferrer">https://github.com/yuvalsuede/claude-teams-language-protocol</a></div>
         <div class="source-desc">テイムメイト間メッセージを60〜70%削減する圧縮プロトコル・T# タスク参照・ファイルロック短縮表記・TaskCompleted/TeammateIdle フックとの統合</div>
+      </div>
+
+      <!-- NEW: March 2026 sources -->
+      <div class="source-card" style="border-color:rgba(96,165,250,0.4);">
+        <div class="source-title" style="color:#60a5fa;">🔵 Anthropic CHANGELOG: v2.1.76 March 2026</div>
+        <div class="source-url"><a href="https://code.claude.com/docs/en/changelog" target="_blank" rel="noopener noreferrer">https://code.claude.com/docs/en/changelog</a></div>
+        <div class="source-desc">v2.1.76 公式 changelog: /effort・PostCompact hook・MCP elicitation・1M context・HTTP hooks・ultrathink 再導入・Opus 4/4.1 廃止など3月アップデート全体</div>
+      </div>
+      <div class="source-card" style="border-color:rgba(96,165,250,0.3);">
+        <div class="source-title" style="color:#60a5fa;">🔵 TechCrunch: Claude Code Voice Mode 解説</div>
+        <div class="source-url"><a href="https://techcrunch.com/2026/03/03/claude-code-rolls-out-a-voice-mode-capability/" target="_blank" rel="noopener noreferrer">https://techcrunch.com/2026/03/03/claude-code-rolls-out-a-voice-mode-capability/</a></div>
+        <div class="source-desc">2026年3月3日リリースの Voice mode 詳報。push-to-talk 方式・段階的ロールアウト（初日5%）・Claude Code の run-rate 収益 $2.5B 突破などビジネス動向</div>
+      </div>
+      <div class="source-card" style="border-color:rgba(96,165,250,0.3);">
+        <div class="source-title" style="color:#60a5fa;">🔵 pasqualepillitteri.it: Claude Code March 2026 Complete Guide</div>
+        <div class="source-url"><a href="https://pasqualepillitteri.it/en/news/381/claude-code-march-2026-updates" target="_blank" rel="noopener noreferrer">https://pasqualepillitteri.it/en/news/381/claude-code-march-2026-updates</a></div>
+        <div class="source-desc">v2.1.63〜v2.1.76 全アップデート総まとめ。/voice・/loop・/effort・ultrathink・1M context・HTTP hooks・PostCompact hook・/color・/branch などの詳細解説</div>
+      </div>
+      <div class="source-card" style="border-color:rgba(96,165,250,0.3);">
+        <div class="source-title" style="color:#60a5fa;">🔵 claudefa.st: Claude Code Changelog (Community)</div>
+        <div class="source-url"><a href="https://claudefa.st/blog/guide/changelog" target="_blank" rel="noopener noreferrer">https://claudefa.st/blog/guide/changelog</a></div>
+        <div class="source-desc">コミュニティによる詳細な version history。Sonnet 4.6 1M context・auto-memory・Agent Teams Bedrock/Vertex 修正・スパース worktree など技術詳細</div>
       </div>
     </div>
   </div>
