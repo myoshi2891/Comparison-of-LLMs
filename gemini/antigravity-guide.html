@@ -1,0 +1,3000 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Google Antigravity — AI仕様駆動開発 ベストプラクティス完全ガイド</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #060911;
+        --bg2: #0c1120;
+        --bg3: #131b2e;
+        --bg4: #1a2440;
+        --border: #1e2d4a;
+        --border2: #2a3d5e;
+        --g-blue: #4285f4;
+        --g-green: #34a853;
+        --g-yellow: #fbbc04;
+        --g-red: #ea4335;
+        --g-cyan: #00bcd4;
+        --g-purple: #8b5cf6;
+        --text: #e2eaf8;
+        --text2: #9aafcc;
+        --text3: #5a7090;
+        --mono: 'JetBrains Mono', monospace;
+        --sans: 'Noto Sans JP', sans-serif;
+        --display: 'Syne', sans-serif;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--sans);
+        font-weight: 300;
+        line-height: 1.8;
+        overflow-x: hidden;
+      }
+
+      /* ─── PROGRESS BAR ─── */
+      #prog {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 2px;
+        width: 0;
+        background: linear-gradient(90deg, var(--g-blue), var(--g-green), var(--g-yellow));
+        z-index: 9999;
+        transition: width 0.1s;
+      }
+
+      /* ─── NAV ─── */
+      header + nav,
+      body > nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(6, 9, 17, 0.88);
+        backdrop-filter: blur(14px);
+        border-bottom: 1px solid var(--border);
+        padding: 0 24px;
+      }
+      .nav-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        height: 52px;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      .nav-inner::-webkit-scrollbar {
+        display: none;
+      }
+      .nav-logo {
+        font-family: var(--display);
+        font-weight: 800;
+        font-size: 14px;
+        white-space: nowrap;
+        margin-right: 16px;
+        background: linear-gradient(90deg, var(--g-blue), var(--g-green));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      nav a {
+        color: var(--text2);
+        text-decoration: none;
+        font-size: 12.5px;
+        font-weight: 500;
+        white-space: nowrap;
+        padding: 5px 10px;
+        border-radius: 6px;
+        transition: all 0.2s;
+      }
+      nav a:hover {
+        color: var(--g-blue);
+        background: rgba(66, 133, 244, 0.1);
+      }
+
+      /* ─── HERO ─── */
+      .hero {
+        position: relative;
+        overflow: hidden;
+        padding: 80px 24px 100px;
+        background: linear-gradient(160deg, #07101f 0%, #060911 60%, #080710 100%);
+        border-bottom: 1px solid var(--border);
+        text-align: center;
+      }
+      .hero-glow {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            ellipse 60% 40% at 20% -10%,
+            rgba(66, 133, 244, 0.14) 0%,
+            transparent 55%
+          ),
+          radial-gradient(ellipse 50% 35% at 80% -10%, rgba(52, 168, 83, 0.1) 0%, transparent 55%),
+          radial-gradient(ellipse 40% 30% at 50% 110%, rgba(251, 188, 4, 0.07) 0%, transparent 55%);
+      }
+      .hero-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--g-blue);
+        padding: 0.3rem 0.9rem;
+        border: 1px solid rgba(66, 133, 244, 0.35);
+        border-radius: 2rem;
+        background: rgba(66, 133, 244, 0.07);
+        margin-bottom: 1.4rem;
+      }
+      .hero-tag::before {
+        content: '';
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--g-blue);
+        animation: blink 2s infinite;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.4;
+          transform: scale(0.75);
+        }
+      }
+
+      .hero h1 {
+        font-family: var(--display);
+        font-size: clamp(2rem, 5vw, 3.4rem);
+        font-weight: 800;
+        line-height: 1.12;
+        letter-spacing: -0.02em;
+        margin-bottom: 1.2rem;
+        color: #f0f6ff;
+      }
+      .rainbow {
+        background: linear-gradient(90deg, #4285f4, #34a853, #fbbc04, #ea4335, #8b5cf6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .hero-sub {
+        font-size: 1rem;
+        color: var(--text2);
+        max-width: 620px;
+        margin: 0 auto 2rem;
+        line-height: 1.75;
+      }
+      .hero-chips {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .chip {
+        font-family: var(--mono);
+        font-size: 0.65rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 2rem;
+        border: 1px solid;
+      }
+      .cb {
+        border-color: rgba(66, 133, 244, 0.4);
+        color: var(--g-blue);
+        background: rgba(66, 133, 244, 0.08);
+      }
+      .cg {
+        border-color: rgba(52, 168, 83, 0.4);
+        color: var(--g-green);
+        background: rgba(52, 168, 83, 0.08);
+      }
+      .cy {
+        border-color: rgba(251, 188, 4, 0.4);
+        color: var(--g-yellow);
+        background: rgba(251, 188, 4, 0.08);
+      }
+      .cr {
+        border-color: rgba(234, 67, 53, 0.4);
+        color: var(--g-red);
+        background: rgba(234, 67, 53, 0.08);
+      }
+      .cp {
+        border-color: rgba(139, 92, 246, 0.4);
+        color: var(--g-purple);
+        background: rgba(139, 92, 246, 0.08);
+      }
+
+      /* ─── WRAPPER ─── */
+      .wrap {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 60px 24px 100px;
+      }
+
+      /* ─── SECTION ─── */
+      section {
+        margin-bottom: 72px;
+      }
+      .sec-label {
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.18em;
+        color: var(--text3);
+        text-transform: uppercase;
+        margin-bottom: 0.4rem;
+      }
+      .sec-title {
+        font-family: var(--display);
+        font-size: clamp(1.4rem, 3vw, 2rem);
+        font-weight: 700;
+        color: #edf3ff;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .sec-title .num {
+        font-family: var(--mono);
+        font-size: 0.85rem;
+        color: var(--g-blue);
+        margin-right: 0.5rem;
+      }
+      h3 {
+        font-family: var(--display);
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #ddeeff;
+        margin: 2rem 0 0.7rem;
+      }
+      p {
+        margin-bottom: 0.9rem;
+        font-size: 0.93rem;
+        color: var(--text);
+      }
+      p:last-child {
+        margin-bottom: 0;
+      }
+
+      /* ─── TOC ─── */
+      .toc {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--g-blue);
+        border-radius: 12px;
+        padding: 1.5rem 2rem;
+        margin-bottom: 3rem;
+      }
+      .toc-label {
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.18em;
+        color: var(--g-blue);
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+      }
+      .toc ol {
+        list-style: none;
+        counter-reset: toc;
+      }
+      .toc li {
+        counter-increment: toc;
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+        padding: 0.22rem 0;
+        font-size: 0.87rem;
+      }
+      .toc li::before {
+        content: counter(toc, decimal-leading-zero);
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        color: var(--text3);
+        min-width: 2rem;
+      }
+      .toc a {
+        color: var(--text);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .toc a:hover {
+        color: var(--g-blue);
+      }
+
+      /* ─── CARD ─── */
+      .card {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 1.5rem 2rem;
+        margin-bottom: 1.5rem;
+      }
+      .card p {
+        color: var(--text2);
+      }
+
+      /* ─── INFO BOX ─── */
+      .info {
+        border-radius: 10px;
+        padding: 1rem 1.2rem;
+        margin: 1rem 0;
+        display: flex;
+        gap: 0.8rem;
+        font-size: 0.875rem;
+      }
+      .info .ii {
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        margin-top: 0.1rem;
+      }
+      .i-note {
+        background: rgba(66, 133, 244, 0.07);
+        border: 1px solid rgba(66, 133, 244, 0.25);
+      }
+      .i-warn {
+        background: rgba(251, 188, 4, 0.07);
+        border: 1px solid rgba(251, 188, 4, 0.25);
+      }
+      .i-crit {
+        background: rgba(234, 67, 53, 0.07);
+        border: 1px solid rgba(234, 67, 53, 0.25);
+      }
+      .i-tip {
+        background: rgba(52, 168, 83, 0.07);
+        border: 1px solid rgba(52, 168, 83, 0.25);
+      }
+
+      /* ─── CODE ─── */
+      .code-wrap {
+        background: #050810;
+        border: 1px solid var(--border2);
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 1rem 0;
+      }
+      .cb-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.45rem 1rem;
+        background: var(--bg3);
+        border-bottom: 1px solid var(--border);
+        font-family: var(--mono);
+        font-size: 0.66rem;
+        color: var(--text3);
+      }
+      .cb-dots {
+        display: flex;
+        gap: 4px;
+      }
+      .cbd {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+      }
+      pre {
+        padding: 1.2rem 1.5rem;
+        font-family: var(--mono);
+        font-size: 0.77rem;
+        line-height: 1.8;
+        color: #ccd8ee;
+        overflow-x: auto;
+        white-space: pre;
+      }
+      .kw {
+        color: var(--g-purple);
+      }
+      .str {
+        color: var(--g-green);
+      }
+      .cmt {
+        color: #4a6080;
+        font-style: italic;
+      }
+      .hd {
+        color: var(--g-blue);
+        font-weight: 600;
+      }
+      .hl {
+        color: var(--g-yellow);
+      }
+      .hl2 {
+        color: var(--g-red);
+      }
+      .ok {
+        color: var(--g-green);
+      }
+      .ng {
+        color: var(--g-red);
+      }
+
+      /* ─── DIAGRAM FLOW ─── */
+      .flow-wrap {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 2rem;
+        margin: 1.5rem 0;
+        overflow-x: auto;
+      }
+      .flow-label {
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+        color: var(--text3);
+        margin-bottom: 1.5rem;
+      }
+      .flow {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        min-width: max-content;
+      }
+      .fstep {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.35rem;
+      }
+      .fbox {
+        padding: 0.6rem 1rem;
+        border-radius: 8px;
+        font-size: 0.77rem;
+        font-weight: 500;
+        text-align: center;
+        border: 1px solid;
+        min-width: 105px;
+        line-height: 1.4;
+      }
+      .fb-b {
+        background: rgba(66, 133, 244, 0.1);
+        border-color: rgba(66, 133, 244, 0.4);
+        color: var(--g-blue);
+      }
+      .fb-g {
+        background: rgba(52, 168, 83, 0.1);
+        border-color: rgba(52, 168, 83, 0.4);
+        color: var(--g-green);
+      }
+      .fb-y {
+        background: rgba(251, 188, 4, 0.1);
+        border-color: rgba(251, 188, 4, 0.4);
+        color: var(--g-yellow);
+      }
+      .fb-r {
+        background: rgba(234, 67, 53, 0.1);
+        border-color: rgba(234, 67, 53, 0.4);
+        color: var(--g-red);
+      }
+      .fb-p {
+        background: rgba(139, 92, 246, 0.1);
+        border-color: rgba(139, 92, 246, 0.4);
+        color: var(--g-purple);
+      }
+      .ffile {
+        font-family: var(--mono);
+        font-size: 0.6rem;
+        color: var(--text3);
+        text-align: center;
+      }
+      .farrow {
+        padding: 0 0.3rem;
+        color: var(--text3);
+        font-size: 1.1rem;
+        margin-top: -1.5rem;
+      }
+
+      /* ─── GRID ─── */
+      .grid2 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .grid3 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .mini-card {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.1rem;
+      }
+      .mc-tag {
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        color: var(--g-blue);
+        margin-bottom: 0.4rem;
+        font-weight: 500;
+      }
+      .mini-card p {
+        font-size: 0.82rem;
+        color: var(--text2);
+        margin: 0;
+        line-height: 1.6;
+      }
+
+      /* ─── TREE ─── */
+      .tree {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        line-height: 2.1;
+        overflow-x: auto;
+      }
+      .t-dir {
+        color: var(--g-blue);
+        font-weight: 600;
+      }
+      .t-req {
+        color: var(--g-green);
+        font-weight: 600;
+      }
+      .t-opt {
+        color: var(--text3);
+      }
+      .t-rule {
+        color: var(--g-red);
+        font-weight: 600;
+      }
+      .t-wf {
+        color: var(--g-yellow);
+        font-weight: 600;
+      }
+      .t-ctx {
+        color: var(--g-cyan);
+        font-weight: 600;
+      }
+      .t-sdd {
+        color: var(--g-blue);
+      }
+      .t-com {
+        color: var(--text3);
+        font-size: 0.66rem;
+        font-style: italic;
+      }
+
+      /* ─── COMPARE TABLE ─── */
+      .tbl {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.84rem;
+        margin: 1.5rem 0;
+      }
+      .tbl th {
+        background: var(--bg3);
+        color: #ddeeff;
+        font-family: var(--display);
+        font-weight: 600;
+        padding: 0.7rem 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.78rem;
+      }
+      .tbl td {
+        padding: 0.7rem 1rem;
+        border-bottom: 1px solid rgba(30, 45, 74, 0.6);
+        color: var(--text);
+        vertical-align: top;
+        font-size: 0.82rem;
+      }
+      .tbl td:first-child {
+        font-family: var(--mono);
+        font-size: 0.73rem;
+        color: var(--g-green);
+      }
+      .tbl tr:last-child td {
+        border-bottom: none;
+      }
+      .tbl tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .badge {
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: 0.6rem;
+        font-weight: 700;
+        padding: 1px 7px;
+        border-radius: 4px;
+        margin-left: 4px;
+        vertical-align: middle;
+      }
+      .badge-g {
+        background: rgba(52, 168, 83, 0.15);
+        color: var(--g-green);
+        border: 1px solid rgba(52, 168, 83, 0.3);
+      }
+      .badge-b {
+        background: rgba(66, 133, 244, 0.15);
+        color: var(--g-blue);
+        border: 1px solid rgba(66, 133, 244, 0.3);
+      }
+      .badge-y {
+        background: rgba(251, 188, 4, 0.15);
+        color: var(--g-yellow);
+        border: 1px solid rgba(251, 188, 4, 0.3);
+      }
+      .badge-r {
+        background: rgba(234, 67, 53, 0.15);
+        color: var(--g-red);
+        border: 1px solid rgba(234, 67, 53, 0.3);
+      }
+
+      /* ─── LEVEL CARDS ─── */
+      .level-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      @media (max-width: 640px) {
+        .level-row {
+          grid-template-columns: 1fr;
+        }
+      }
+      .lv {
+        border-radius: 12px;
+        padding: 1.2rem;
+        border: 1px solid var(--border);
+        background: var(--bg2);
+        position: relative;
+        overflow: hidden;
+      }
+      .lv::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+      }
+      .lv1::before {
+        background: var(--g-yellow);
+      }
+      .lv2::before {
+        background: var(--g-blue);
+      }
+      .lv3::before {
+        background: var(--g-green);
+      }
+      .lv-num {
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        opacity: 0.6;
+      }
+      .lv1 .lv-num {
+        color: var(--g-yellow);
+      }
+      .lv2 .lv-num {
+        color: var(--g-blue);
+      }
+      .lv3 .lv-num {
+        color: var(--g-green);
+      }
+      .lv h4 {
+        font-family: var(--display);
+        font-size: 0.92rem;
+        font-weight: 700;
+        color: #ddeeff;
+        margin-bottom: 0.4rem;
+      }
+      .lv p {
+        font-size: 0.78rem;
+        color: var(--text2);
+        margin: 0;
+        line-height: 1.6;
+      }
+
+      /* ─── PATTERN GRID ─── */
+      .pattern-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .pattern-card {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.1rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .pattern-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+      }
+      .pc-b::before {
+        background: var(--g-blue);
+      }
+      .pc-g::before {
+        background: var(--g-green);
+      }
+      .pc-y::before {
+        background: var(--g-yellow);
+      }
+      .pc-r::before {
+        background: var(--g-red);
+      }
+      .pc-p::before {
+        background: var(--g-purple);
+      }
+      .pn {
+        font-family: var(--mono);
+        font-size: 1.8rem;
+        opacity: 0.06;
+        position: absolute;
+        top: 2px;
+        right: 8px;
+        color: #fff;
+        font-weight: 700;
+      }
+      .pattern-card h4 {
+        font-family: var(--display);
+        font-size: 0.84rem;
+        font-weight: 700;
+        color: #ddeeff;
+        margin-bottom: 0.4rem;
+      }
+      .pattern-card p {
+        font-size: 0.75rem;
+        color: var(--text2);
+        margin: 0;
+        line-height: 1.55;
+      }
+      .pc-struct {
+        font-family: var(--mono);
+        font-size: 0.62rem;
+        color: var(--text3);
+        margin-top: 0.5rem;
+      }
+
+      /* ─── ARTIFACT CARDS ─── */
+      .art-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: 0.8rem;
+        margin: 1.5rem 0;
+      }
+      .art-card {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+      .art-icon {
+        font-size: 1.3rem;
+      }
+      .art-name {
+        font-family: var(--display);
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #ddeeff;
+      }
+      .art-desc {
+        font-size: 0.75rem;
+        color: var(--text2);
+        line-height: 1.5;
+      }
+      .art-auto {
+        font-family: var(--mono);
+        font-size: 0.6rem;
+        color: var(--g-green);
+        margin-top: 0.2rem;
+      }
+
+      /* ─── BP GRID ─── */
+      .bp-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .bp {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.2rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .bp::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+      }
+      .bp-b::before {
+        background: var(--g-blue);
+      }
+      .bp-g::before {
+        background: var(--g-green);
+      }
+      .bp-y::before {
+        background: var(--g-yellow);
+      }
+      .bp-r::before {
+        background: var(--g-red);
+      }
+      .bp-p::before {
+        background: var(--g-purple);
+      }
+      .bp-c::before {
+        background: var(--g-cyan);
+      }
+      .bpn {
+        font-family: var(--mono);
+        font-size: 1.9rem;
+        opacity: 0.06;
+        position: absolute;
+        top: 2px;
+        right: 8px;
+        color: #fff;
+        font-weight: 700;
+      }
+      .bp h4 {
+        font-family: var(--display);
+        font-size: 0.87rem;
+        font-weight: 700;
+        color: #ddeeff;
+        margin-bottom: 0.4rem;
+      }
+      .bp p {
+        font-size: 0.77rem;
+        color: var(--text2);
+        margin: 0;
+        line-height: 1.55;
+      }
+
+      /* ─── SOURCES ─── */
+      .sources {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 1.5rem 2rem;
+        margin-top: 3rem;
+      }
+      .src {
+        display: flex;
+        align-items: baseline;
+        gap: 0.8rem;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(30, 45, 74, 0.5);
+        font-size: 0.8rem;
+      }
+      .src:last-child {
+        border-bottom: none;
+      }
+      .snum {
+        font-family: var(--mono);
+        font-size: 0.66rem;
+        color: var(--text3);
+        min-width: 2rem;
+      }
+      .src a {
+        color: var(--g-blue);
+        text-decoration: none;
+        word-break: break-all;
+      }
+      .src a:hover {
+        text-decoration: underline;
+      }
+      .sdesc {
+        color: var(--text3);
+        font-size: 0.72rem;
+        display: block;
+        margin-top: 0.1rem;
+      }
+
+      /* ─── TABS ─── */
+      .tabs-wrap {
+        margin: 1.5rem 0;
+      }
+      .tab-list {
+        display: flex;
+        gap: 4px;
+        background: var(--bg3);
+        border-radius: 10px;
+        padding: 4px;
+        margin-bottom: 18px;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      .tab-list::-webkit-scrollbar {
+        display: none;
+      }
+      .tab-btn {
+        flex: 1;
+        min-width: fit-content;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 7px;
+        background: transparent;
+        color: var(--text3);
+        font-family: var(--sans);
+        font-size: 0.82rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+      .tab-btn.active {
+        background: var(--bg);
+        color: var(--g-blue);
+        border: 1px solid var(--border2);
+      }
+      .tab-panel {
+        display: none;
+      }
+      .tab-panel.active {
+        display: block;
+      }
+
+      /* ─── CHECKLIST ─── */
+      .checklist {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 1.5rem 0;
+      }
+      .check-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .check-item:hover {
+        border-color: var(--border2);
+      }
+      .check-box {
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+        border: 2px solid var(--border2);
+        border-radius: 5px;
+        margin-top: 1px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+      }
+      .check-item.checked .check-box {
+        background: var(--g-green);
+        border-color: var(--g-green);
+      }
+      .check-item.checked .check-box::after {
+        content: '✓';
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .check-item.checked .check-text {
+        color: var(--text3);
+        text-decoration: line-through;
+      }
+      .check-text {
+        font-size: 0.85rem;
+        color: var(--text);
+        line-height: 1.5;
+      }
+
+      /* ─── SCOPE GRID ─── */
+      .scope-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.2rem;
+        margin: 1.5rem 0;
+      }
+      @media (max-width: 640px) {
+        .scope-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .scope-card {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 1.4rem;
+      }
+      .sc-global {
+        border-top: 3px solid var(--g-blue);
+      }
+      .sc-local {
+        border-top: 3px solid var(--g-yellow);
+      }
+      .sc-label {
+        font-family: var(--mono);
+        font-size: 0.67rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 0.8rem;
+      }
+      .sc-g .sc-label {
+        color: var(--g-blue);
+      }
+      .sc-l .sc-label {
+        color: var(--g-yellow);
+      }
+      .scope-card h3 {
+        font-family: var(--display);
+        font-size: 1.05rem;
+        font-weight: 700;
+        margin-bottom: 0.6rem;
+        color: #ddeeff;
+      }
+      .scope-card ul {
+        list-style: none;
+        padding: 0;
+        margin-top: 0.8rem;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .scope-card li {
+        font-size: 0.82rem;
+        color: var(--text2);
+        padding-left: 14px;
+        position: relative;
+        line-height: 1.5;
+      }
+      .scope-card li::before {
+        content: '→';
+        position: absolute;
+        left: 0;
+        color: var(--border2);
+        font-size: 0.75rem;
+      }
+      .path-box {
+        background: #050810;
+        border: 1px solid var(--border2);
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        color: var(--g-blue);
+        margin-top: 0.8rem;
+        line-height: 1.9;
+      }
+
+      /* ─── FADE IN ─── */
+      .fade-in {
+        opacity: 0;
+        transform: translateY(16px);
+        transition:
+          opacity 0.5s ease,
+          transform 0.5s ease;
+      }
+      .fade-in.vis {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* ─── FOOTER ─── */
+      footer {
+        background: var(--bg2);
+        border-top: 1px solid var(--border);
+        padding: 40px 24px;
+        text-align: center;
+      }
+      footer p {
+        font-size: 0.78rem;
+        color: var(--text3);
+      }
+      .footer-logo {
+        font-family: var(--display);
+        font-weight: 800;
+        font-size: 1.2rem;
+        background: linear-gradient(90deg, var(--g-blue), var(--g-green));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.6rem;
+      }
+
+      /* ─── MISC ─── */
+      code {
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        background: var(--bg3);
+        border: 1px solid var(--border2);
+        border-radius: 4px;
+        padding: 1px 6px;
+        color: var(--g-cyan);
+      }
+      strong {
+        color: #edf3ff;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="prog"></div>
+
+    <!-- NAV -->
+    <nav>
+      <div class="nav-inner">
+        <div class="nav-logo">Antigravity Guide</div>
+        <a href="#overview">概要</a>
+        <a href="#directory">構成</a>
+        <a href="#gemini-md">GEMINI.md</a>
+        <a href="#skills">SKILL.md</a>
+        <a href="#rules">Rules</a>
+        <a href="#workflows">Workflows</a>
+        <a href="#artifacts">Artifacts</a>
+        <a href="#models">モデル</a>
+        <a href="#best-practices">10則</a>
+        <a href="#sources">ソース</a>
+      </div>
+    </nav>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="hero-glow"></div>
+      <div class="hero-tag">Google Antigravity × Gemini 3.1 Pro</div>
+      <h1>
+        AI仕様駆動開発における<br /><span class="rainbow">Google Antigravity</span
+        ><br />ベストプラクティス完全ガイド
+      </h1>
+      <p class="hero-sub">
+        初学者でもステップバイステップで理解できる — GEMINI.md から
+        SKILL.md・Rules・Workflows・Artifacts まで、
+        Antigravityエコシステムの全体を根拠ソース付きで徹底解説
+      </p>
+      <div class="hero-chips">
+        <span class="chip cb">Google Antigravity</span>
+        <span class="chip cg">Gemini 3.1 Pro</span>
+        <span class="chip cy">Agent-First IDE</span>
+        <span class="chip cr">Spec-Driven Dev</span>
+        <span class="chip cp">v1.20.3 対応</span>
+      </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="wrap">
+      <!-- TOC -->
+      <nav class="toc fade-in">
+        <div class="toc-label">目次</div>
+        <ol>
+          <li><a href="#overview">Google Antigravity とは — 従来IDEとの比較</a></li>
+          <li><a href="#directory">全体ファイル構成と推奨ディレクトリ</a></li>
+          <li><a href="#gemini-md">GEMINI.md — グローバル永続メモリ</a></li>
+          <li><a href="#skills">SKILL.md — 進歩的開示ナレッジ（最重要）</a></li>
+          <li><a href="#rules">Rules — 受動的制約・バックグラウンドシステムプロンプト</a></li>
+          <li><a href="#workflows">Workflows — 能動的手順書</a></li>
+          <li><a href="#artifacts">Artifacts — エージェント自動生成の証拠</a></li>
+          <li><a href="#models">対応モデルと料金</a></li>
+          <li><a href="#best-practices">横断ベストプラクティス 10則</a></li>
+          <li><a href="#sources">参考ソース一覧</a></li>
+        </ol>
+      </nav>
+
+      <!-- ── SECTION 1: OVERVIEW ── -->
+      <section id="overview" class="fade-in">
+        <div class="sec-label">Section 01</div>
+        <h2 class="sec-title">
+          <span class="num">01.</span>Google Antigravity とは — 従来IDEとの比較
+        </h2>
+
+        <p>
+          Google Antigravityは<strong>2025年11月18日にGemini 3と同時発表</strong
+          >されたエージェント・ファースト型IDEです。 VS Codeのフォークをベースに、Claude
+          CodeのようなCLIツールではなく<strong>フルIDEとして「エージェントが主役」のパラダイム</strong>を実装しています。
+          人間の役割は「コードを書く人」から「アーキテクトとして指揮する人」へと変わります。
+        </p>
+
+        <div class="flow-wrap fade-in">
+          <div class="flow-label">▸ 従来IDE vs Antigravity — パラダイムの違い</div>
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 1fr auto 1fr;
+              gap: 1.5rem;
+              align-items: center;
+            "
+          >
+            <div>
+              <div
+                style="
+                  font-family: var(--mono);
+                  font-size: 0.68rem;
+                  color: var(--text3);
+                  text-transform: uppercase;
+                  letter-spacing: 0.12em;
+                  margin-bottom: 1rem;
+                "
+              >
+                ❌ 従来のIDE
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 0.6rem">
+                <div
+                  style="
+                    background: rgba(90, 112, 144, 0.12);
+                    border: 1px solid rgba(90, 112, 144, 0.25);
+                    border-radius: 8px;
+                    padding: 0.6rem 1rem;
+                    font-size: 0.78rem;
+                    color: var(--text2);
+                  "
+                >
+                  👤 人間 — コードを書く主役
+                </div>
+                <div style="text-align: center; color: var(--text3)">↓</div>
+                <div
+                  style="
+                    background: rgba(90, 112, 144, 0.08);
+                    border: 1px solid rgba(90, 112, 144, 0.2);
+                    border-radius: 8px;
+                    padding: 0.6rem 1rem;
+                    font-size: 0.78rem;
+                    color: var(--text3);
+                  "
+                >
+                  🤖 AI補完 — 提案するだけ
+                </div>
+                <div style="text-align: center; color: var(--text3)">↓</div>
+                <div
+                  style="
+                    background: rgba(90, 112, 144, 0.08);
+                    border: 1px solid rgba(90, 112, 144, 0.2);
+                    border-radius: 8px;
+                    padding: 0.6rem 1rem;
+                    font-size: 0.78rem;
+                    color: var(--text3);
+                  "
+                >
+                  ✅ コード完成（人間が判断・実行）
+                </div>
+              </div>
+            </div>
+            <div
+              style="
+                font-family: var(--display);
+                font-size: 1.4rem;
+                font-weight: 700;
+                color: var(--text3);
+                text-align: center;
+              "
+            >
+              VS
+            </div>
+            <div>
+              <div
+                style="
+                  font-family: var(--mono);
+                  font-size: 0.68rem;
+                  color: var(--g-green);
+                  text-transform: uppercase;
+                  letter-spacing: 0.12em;
+                  margin-bottom: 1rem;
+                "
+              >
+                ✅ Google Antigravity
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 0.6rem">
+                <div
+                  style="
+                    background: rgba(139, 92, 246, 0.1);
+                    border: 1px solid rgba(139, 92, 246, 0.3);
+                    border-radius: 8px;
+                    padding: 0.6rem 1rem;
+                    font-size: 0.78rem;
+                    color: var(--g-purple);
+                  "
+                >
+                  🤖 AIエージェント — 自律的に計画・実行・検証
+                </div>
+                <div style="text-align: center; color: var(--text3)">↓</div>
+                <div
+                  style="
+                    background: rgba(251, 188, 4, 0.08);
+                    border: 1px solid rgba(251, 188, 4, 0.25);
+                    border-radius: 8px;
+                    padding: 0.6rem 1rem;
+                    font-size: 0.78rem;
+                    color: var(--g-yellow);
+                  "
+                >
+                  👤 人間（アーキテクト）— 方針を決め・レビューする
+                </div>
+                <div style="text-align: center; color: var(--text3)">↓</div>
+                <div
+                  style="
+                    background: rgba(52, 168, 83, 0.08);
+                    border: 1px solid rgba(52, 168, 83, 0.25);
+                    border-radius: 8px;
+                    padding: 0.6rem 1rem;
+                    font-size: 0.78rem;
+                    color: var(--g-green);
+                  "
+                >
+                  📊 Artifact生成 — 証拠付きで結果を可視化
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3>Antigravity vs Claude Code — 比較表</h3>
+        <table class="tbl">
+          <tr>
+            <th>特性</th>
+            <th>Google Antigravity</th>
+            <th>Claude Code</th>
+          </tr>
+          <tr>
+            <td>種別</td>
+            <td>Agent-First IDE（VSCode fork）</td>
+            <td>CLI / ターミナルエージェント</td>
+          </tr>
+          <tr>
+            <td>主要AI</td>
+            <td>Gemini 3.1 Pro / 3 Flash + Claude Sonnet 4.6 / Opus 4.6 / GPT-OSS 120B</td>
+            <td>Claude Opus / Sonnet / Haiku</td>
+          </tr>
+          <tr>
+            <td>永続記憶</td>
+            <td>GEMINI.md + Knowledge Base + Rules</td>
+            <td>CLAUDE.md + MEMORY.md</td>
+          </tr>
+          <tr>
+            <td>ナレッジ拡張</td>
+            <td>SKILL.md（進歩的開示）</td>
+            <td>SKILL.md（同一規格）</td>
+          </tr>
+          <tr>
+            <td>手順自動化</td>
+            <td>Workflows (.md)</td>
+            <td>Custom Commands (.md)</td>
+          </tr>
+          <tr>
+            <td>ブラウザ自動化</td>
+            <td>Browser Subagent（ネイティブ）</td>
+            <td>なし（MCP経由）</td>
+          </tr>
+          <tr>
+            <td>エビデンス生成</td>
+            <td>Artifacts（自動）</td>
+            <td>なし（手動）</td>
+          </tr>
+          <tr>
+            <td>価格</td>
+            <td>無料（Public Preview中） / Google AI Pro $19.99/月</td>
+            <td>Anthropicプランに依存</td>
+          </tr>
+        </table>
+
+        <div class="info i-note fade-in">
+          <span class="ii">ℹ️</span>
+          <div>
+            <strong>SKILL.mdは共通規格</strong>です。AntigravityとClaude
+            Codeは同一のSKILL.md形式を採用しており、ファイルを両プラットフォーム間でほぼそのまま移植できます。
+            また<strong>v1.20.3（2026-03-05）以降はAGENTS.mdにも対応</strong>し、他のエージェントツールとのルール共有が可能になりました。
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION 2: DIRECTORY ── -->
+      <section id="directory" class="fade-in">
+        <div class="sec-label">Section 02</div>
+        <h2 class="sec-title"><span class="num">02.</span>全体ファイル構成と推奨ディレクトリ</h2>
+
+        <p>
+          プロジェクトを始めたら、まずこのディレクトリ構成を作りましょう。5種類のファイル群がAntigravityの中核を成します。
+        </p>
+
+        <div class="flow-wrap fade-in">
+          <div class="flow-label">▸ SDD × Antigravity 4フェーズフロー</div>
+          <div class="flow">
+            <div class="fstep">
+              <div class="fbox fb-b">Phase 1<br />仕様策定</div>
+              <div class="ffile">spec.md<br />requirements.md</div>
+            </div>
+            <div class="farrow">→</div>
+            <div class="fstep">
+              <div class="fbox fb-g">Phase 2<br />設計</div>
+              <div class="ffile">design.md<br />always-on.md</div>
+            </div>
+            <div class="farrow">→</div>
+            <div class="fstep">
+              <div class="fbox fb-y">Phase 3<br />エージェント実行</div>
+              <div class="ffile">tasks.md<br />workflows/</div>
+            </div>
+            <div class="farrow">→</div>
+            <div class="fstep">
+              <div class="fbox fb-r">Phase 4<br />検証</div>
+              <div class="ffile">Artifacts<br />Browser Agent</div>
+            </div>
+            <div class="farrow">→</div>
+            <div class="fstep">
+              <div class="fbox fb-p">フィードバック<br />ループ</div>
+              <div class="ffile">Knowledge<br />更新</div>
+            </div>
+          </div>
+        </div>
+
+        <h3>推奨ディレクトリ構成</h3>
+        <style>
+          .ftree {
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            line-height: 1;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.4rem 1.6rem;
+          }
+          .ftr {
+            display: flex;
+            align-items: baseline;
+            gap: 0;
+            min-height: 28px;
+          }
+          .ftr-indent {
+            display: flex;
+            align-items: stretch;
+          }
+          .ftr-guide {
+            width: 20px;
+            min-width: 20px;
+            position: relative;
+          }
+          .ftr-guide.vline::before {
+            content: '';
+            position: absolute;
+            left: 9px;
+            top: -14px;
+            bottom: -14px;
+            width: 1px;
+            background: var(--border2);
+          }
+          .ftr-guide.last::before {
+            bottom: 50%;
+          }
+          .ftr-guide.elbow::after {
+            content: '';
+            position: absolute;
+            left: 9px;
+            top: 50%;
+            width: 10px;
+            height: 1px;
+            background: var(--border2);
+          }
+          .ftr-guide.elbow.last::before {
+            content: '';
+            position: absolute;
+            left: 9px;
+            top: -14px;
+            bottom: 50%;
+            width: 1px;
+            background: var(--border2);
+          }
+          .ftr-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 0;
+            flex-wrap: wrap;
+          }
+          .ftr-label {
+            font-size: 0.8rem;
+            white-space: nowrap;
+          }
+          .ftr-label.dir {
+            color: var(--g-blue);
+            font-weight: 600;
+          }
+          .ftr-label.dir-sub {
+            color: #5a87c0;
+            font-weight: 600;
+          }
+          .ftr-label.f-req {
+            color: var(--g-green);
+            font-weight: 600;
+          }
+          .ftr-label.f-rule {
+            color: var(--g-red);
+          }
+          .ftr-label.f-wf {
+            color: var(--g-yellow);
+          }
+          .ftr-label.f-ctx {
+            color: var(--g-cyan);
+          }
+          .ftr-label.f-opt {
+            color: var(--text3);
+          }
+          .ftr-label.f-sdd {
+            color: #7aacf0;
+          }
+          .ftr-label.f-sdd2 {
+            color: var(--g-green);
+          }
+          .ftr-comment {
+            font-size: 0.72rem;
+            color: var(--text3);
+            white-space: nowrap;
+            font-style: italic;
+          }
+          .ftr-badge {
+            font-size: 0.62rem;
+            padding: 1px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+          }
+          .fb-important {
+            background: rgba(66, 133, 244, 0.12);
+            color: var(--g-blue);
+            border: 1px solid rgba(66, 133, 244, 0.25);
+          }
+          .fb-new {
+            background: rgba(251, 188, 4, 0.12);
+            color: var(--g-yellow);
+            border: 1px solid rgba(251, 188, 4, 0.25);
+          }
+          .fb-req {
+            background: rgba(52, 168, 83, 0.12);
+            color: var(--g-green);
+            border: 1px solid rgba(52, 168, 83, 0.25);
+          }
+        </style>
+        <div class="ftree fade-in">
+          <!-- ROOT -->
+          <div class="ftr">
+            <div class="ftr-name">
+              <span class="ftr-label dir">📁 your-project/</span>
+            </div>
+          </div>
+
+          <!-- .agent/ -->
+          <div class="ftr">
+            <div class="ftr-indent"><div class="ftr-guide vline elbow"></div></div>
+            <div class="ftr-name">
+              <span class="ftr-label dir">📁 .agent/</span>
+              <span class="ftr-badge fb-important">Antigravity中心設定</span>
+            </div>
+          </div>
+
+          <!-- rules/ -->
+          <div class="ftr">
+            <div class="ftr-indent">
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide vline elbow"></div>
+            </div>
+            <div class="ftr-name">
+              <span class="ftr-label dir-sub">📁 rules/</span>
+              <span class="ftr-comment">← 受動的制約（常時バックグラウンドで動作）</span>
+            </div>
+          </div>
+
+          <!-- rules/always-on.md -->
+          <div class="ftr">
+            <div class="ftr-indent">
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide vline elbow"></div>
+            </div>
+            <div class="ftr-name">
+              <span class="ftr-label f-rule">📄 always-on.md</span>
+              <span class="ftr-comment">← activation: always — 常時適用（禁止事項等）</span>
+            </div>
+          </div>
+
+          <!-- rules/typescript.md -->
+          <div class="ftr">
+            <div class="ftr-indent">
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide elbow last"></div>
+            </div>
+            <div class="ftr-name">
+              <span class="ftr-label f-rule">📄 typescript.md</span>
+              <span class="ftr-comment">← activation: fileMatch *.ts — 条件適用</span>
+            </div>
+          </div>
+
+          <!-- skills/ -->
+          <div class="ftr">
+            <div class="ftr-indent">
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide vline elbow"></div>
+            </div>
+            <div class="ftr-name">
+              <span class="ftr-label dir-sub">📁 skills/</span>
+              <span class="ftr-comment">← 進歩的開示ナレッジ（オンデマンド）</span>
+            </div>
+          </div>
+
+          <!-- skills/db-migration/ -->
+          <div class="ftr">
+            <div class="ftr-indent">
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide vline elbow"></div>
+            </div>
+            <div class="ftr-name">
+              <span class="ftr-label dir-sub">📁 db-migration/</span>
+              <span class="ftr-comment">← スキルディレクトリ（name と一致させる）</span>
+            </div>
+          </div>
+
+          <!-- SKILL.md -->
+          <div class="ftr">
+            <div class="ftr-indent">
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide vline elbow"></div>
+            </div>
+            <div class="ftr-name">
+              <span class="ftr-label f-req">📄 SKILL.md</span>
+              <span class="ftr-badge fb-req">必須</span>
+              <span class="ftr-comment">← スキルの脳（name / description / 手順）</span>
+            </div>
+          </div>
+
+          <!-- scripts/ -->
+          <div class="ftr">
+            <div class="ftr-indent">
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide vline elbow"></div>
+            </div>
+            <div class="ftr-name">
+              <span class="ftr-label f-opt">📁 scripts/</span>
+              <span class="ftr-comment">← 任意: 決定論的スクリプト（Python/Bash）</span>
+            </div>
+          </div>
+
+          <!-- references/ -->
+          <div class="ftr">
+            <div class="ftr-indent">
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide elbow last"></div>
+            </div>
+            <div class="ftr-name">
+              <span class="ftr-label f-opt">📁 references/</span>
+              <span class="ftr-comment">← 任意: 参照ドキュメント（オンデマンド読込）</span>
+            </div>
+          </div>
+
+          <!-- workflows/ -->
+          <div class="ftr">
+            <div class="ftr-indent">
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide elbow last"></div>
+            </div>
+            <div class="ftr-name">
+              <span class="ftr-label dir-sub">📁 workflows/</span>
+              <span class="ftr-comment">← 能動的手順書（スラッシュコマンドで起動）</span>
+            </div>
+          </div>
+
+          <!-- deploy.md -->
+          <div class="ftr">
+            <div class="ftr-indent">
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide vline elbow"></div>
+            </div>
+            <div class="ftr-name">
+              <span class="ftr-label f-wf">📄 deploy.md</span>
+              <span class="ftr-comment">← /deploy コマンドで実行</span>
+            </div>
+          </div>
+
+          <!-- review.md -->
+          <div class="ftr">
+            <div class="ftr-indent">
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide elbow last"></div>
+            </div>
+            <div class="ftr-name">
+              <span class="ftr-label f-wf">📄 review.md</span>
+              <span class="ftr-comment">← /review コマンドで実行</span>
+            </div>
+          </div>
+
+          <!-- .context/ -->
+          <div class="ftr">
+            <div class="ftr-indent"><div class="ftr-guide vline elbow"></div></div>
+            <div class="ftr-name">
+              <span class="ftr-label dir" style="color: var(--g-cyan)">📁 .context/</span>
+              <span class="ftr-comment">← Knowledge Base（エージェントが自動学習・蓄積）</span>
+            </div>
+          </div>
+
+          <!-- architecture.md -->
+          <div class="ftr">
+            <div class="ftr-indent">
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide vline elbow"></div>
+            </div>
+            <div class="ftr-name">
+              <span class="ftr-label f-ctx">📄 architecture.md</span>
+              <span class="ftr-comment">← システム構成・技術スタック情報</span>
+            </div>
+          </div>
+
+          <!-- gotchas.md -->
+          <div class="ftr">
+            <div class="ftr-indent">
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide elbow last"></div>
+            </div>
+            <div class="ftr-name">
+              <span class="ftr-label f-ctx">📄 gotchas.md</span>
+              <span class="ftr-comment">← 発見した落とし穴を記録（自動更新）</span>
+            </div>
+          </div>
+
+          <!-- docs/ -->
+          <div class="ftr">
+            <div class="ftr-indent"><div class="ftr-guide vline elbow"></div></div>
+            <div class="ftr-name">
+              <span class="ftr-label dir">📁 docs/</span>
+              <span class="ftr-comment">← SDD仕様書群</span>
+            </div>
+          </div>
+
+          <!-- spec.md -->
+          <div class="ftr">
+            <div class="ftr-indent">
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide vline elbow"></div>
+            </div>
+            <div class="ftr-name">
+              <span class="ftr-label f-sdd">📄 spec.md</span>
+              <span class="ftr-comment">← 何を・なぜ（プロダクト仕様）</span>
+            </div>
+          </div>
+
+          <!-- design.md -->
+          <div class="ftr">
+            <div class="ftr-indent">
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide vline elbow"></div>
+            </div>
+            <div class="ftr-name">
+              <span class="ftr-label f-sdd">📄 design.md</span>
+              <span class="ftr-comment">← 技術設計・アーキテクチャ判断</span>
+            </div>
+          </div>
+
+          <!-- tasks.md -->
+          <div class="ftr">
+            <div class="ftr-indent">
+              <div class="ftr-guide vline"></div>
+              <div class="ftr-guide elbow last"></div>
+            </div>
+            <div class="ftr-name">
+              <span class="ftr-label f-sdd2">📄 tasks.md</span>
+              <span class="ftr-comment">← タスク管理・依存関係・並列情報</span>
+            </div>
+          </div>
+
+          <!-- GEMINI.md -->
+          <div class="ftr">
+            <div class="ftr-indent"><div class="ftr-guide vline elbow"></div></div>
+            <div class="ftr-name">
+              <span class="ftr-label f-req">📄 GEMINI.md</span>
+              <span class="ftr-badge fb-req">常時ロード</span>
+              <span class="ftr-comment">← プロジェクト共通メモリ（全セッションで注入）</span>
+            </div>
+          </div>
+
+          <!-- AGENTS.md -->
+          <div class="ftr">
+            <div class="ftr-indent"><div class="ftr-guide elbow last"></div></div>
+            <div class="ftr-name">
+              <span class="ftr-label f-opt">📄 AGENTS.md</span>
+              <span class="ftr-badge fb-new">v1.20.3〜</span>
+              <span class="ftr-comment">← クロスツール共有（Claude Code / Cursor等と共通）</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid2 fade-in">
+          <div class="mini-card">
+            <div class="mc-tag">🌐 グローバル設定</div>
+            <p>
+              <code>~/.gemini/GEMINI.md</code
+              ><br />全プロジェクト共通のワーキングスタイル・禁止事項を記述。プロジェクト固有情報は書かないこと。
+            </p>
+          </div>
+          <div class="mini-card">
+            <div class="mc-tag">🆕 v1.20.3 新機能</div>
+            <p>
+              <code>AGENTS.md</code>対応開始。プロジェクトルートに置くだけでClaude
+              Code・Codex・Cursor等と共通ルールを共有可能。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION 3: GEMINI.md ── -->
+      <section id="gemini-md" class="fade-in">
+        <div class="sec-label">Section 03</div>
+        <h2 class="sec-title"><span class="num">03.</span>GEMINI.md — グローバル永続メモリ</h2>
+
+        <p>
+          Claude
+          Codeの<code>CLAUDE.md</code>に相当する<strong>グローバル永続メモリファイル</strong>。
+          <code>~/.gemini/GEMINI.md</code
+          >に配置し、全プロジェクト・全エージェントセッションに横断的に注入されます。
+          プロジェクト固有のルールは後述の<code>.agent/rules/</code>に分離します。
+        </p>
+
+        <div class="tabs-wrap fade-in">
+          <div class="tab-list">
+            <button type="button" class="tab-btn active" onclick="switchTab(this, 't1', 'g1')">
+              ✅ ベストプラクティス例
+            </button>
+            <button type="button" class="tab-btn" onclick="switchTab(this, 't1', 'g2')">
+              ❌ アンチパターン例
+            </button>
+          </div>
+          <div id="g1" class="tab-panel active">
+            <div class="code-wrap">
+              <div class="cb-head">
+                <div class="cb-dots">
+                  <div class="cbd" style="background: #ea4335"></div>
+                  <div class="cbd" style="background: #fbbc04"></div>
+                  <div class="cbd" style="background: #34a853"></div>
+                </div>
+                <span>~/.gemini/GEMINI.md — ベストプラクティステンプレート</span>
+              </div>
+              <pre><span class="hd"># PROJECT: my-saas-app</span>
+
+<span class="hd">## プロジェクト概要（2〜4文で）</span>
+Next.js 15 + Supabase のマルチテナント SaaS。
+本番: Vercel / DB: PostgreSQL (pgvector付き)
+
+<span class="hd">## 技術スタック</span>
+- Frontend: Next.js 15 App Router, TypeScript
+- Backend: Supabase Edge Functions
+- Auth: Supabase Auth + Row Level Security
+
+<span class="hd">## ビルド・テストコマンド</span>
+- ビルド: <span class="str">`pnpm build`</span>
+- テスト: <span class="str">`pnpm test`</span>
+- Lint: <span class="str">`pnpm lint`</span>
+
+<span class="hd">## ⚠️ 禁止操作（絶対厳守）</span>
+<span class="hl2">- `supabase db reset` は絶対に実行しない（本番データ消去）</span>
+<span class="hl2">- `.env.production` の読み書き禁止</span>
+<span class="hl2">- `--force` フラグは使わない</span>
+
+<span class="hd">## エージェント委譲ルール</span>
+- タスクが3件以上かつ独立している → 並列実行
+- タスクに依存関係がある → 順次実行
+- 不確実な場合は実装前に確認すること
+
+<span class="hd">## @import（モジュール分割）</span>
+<span class="str">@./docs/architecture.md</span>
+<span class="str">@./docs/api-conventions.md</span></pre>
+            </div>
+          </div>
+          <div id="g2" class="tab-panel">
+            <div class="code-wrap" style="border-color: rgba(234, 67, 53, 0.35)">
+              <div class="cb-head">
+                <div class="cb-dots">
+                  <div class="cbd" style="background: #ea4335"></div>
+                  <div class="cbd" style="background: #fbbc04"></div>
+                  <div class="cbd" style="background: #34a853"></div>
+                </div>
+                <span>❌ やってはいけない例</span>
+              </div>
+              <pre><span class="hd"># My Project</span>
+
+<span class="cmt"># ❌ コードスニペットを大量に貼り付ける（トークン浪費）</span>
+<span class="hl2">function myUtil() {
+  const data = fetch('/api/data');
+  ... 300行のコード ...
+}</span>
+
+<span class="cmt"># ❌ APIキーや機密情報を直接記載</span>
+<span class="hl2">SUPABASE_KEY=eyJhbGci...（シークレット）</span>
+
+<span class="cmt"># ❌ 変更履歴を蓄積させる（Gitで管理すること）</span>
+<span class="hl2">2026-01-15: ○○を修正した
+2026-01-20: △△を追加した</span>
+
+<span class="cmt"># ❌ プロジェクト固有情報をグローバルGEMINI.mdに書く</span>
+<span class="hl2">本番DBのIP: 192.168.1.100</span></pre>
+            </div>
+            <div class="info i-warn" style="margin-top: 0.8rem">
+              <span class="ii">⚠️</span>
+              <div>
+                機密情報は<code>.geminiignore</code>で除外し、変更履歴はGitで管理。大きな資料は<code>@./docs/guide.md</code>のように@importで分割参照しましょう。
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info i-warn fade-in">
+          <span class="ii">⚠️</span>
+          <div>
+            <strong>アンチパターン:</strong>
+            GEMINI.mdにプロジェクト固有のDB設定やAPIエンドポイントを書かない。
+            グローバルファイルはプロジェクト固有情報を持つべきではありません。プロジェクト情報は<code>.agent/rules/</code>または<code>.context/</code>へ。
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION 4: SKILL.md ── -->
+      <section id="skills" class="fade-in">
+        <div class="sec-label">Section 04</div>
+        <h2 class="sec-title">
+          <span class="num">04.</span>SKILL.md — 進歩的開示ナレッジ（最重要）
+        </h2>
+
+        <p>
+          AntigravityのSkillsは<strong>「Progressive Disclosure（進歩的開示）」</strong
+          >という設計思想に基づきます。
+          全てのナレッジをコンテキストに常時注入するのではなく、<strong>エージェントがユーザーの意図を検知したときのみ対応するスキルをロード</strong>する仕組みです。
+          これによりコンテキスト消費を最小化し、応答速度と精度を向上させます。
+        </p>
+
+        <h3>3段階の段階的読み込み</h3>
+        <div class="level-row fade-in">
+          <div class="lv lv1">
+            <div class="lv-num">LEVEL 1 — 常時常駐</div>
+            <h4>メタデータのみ</h4>
+            <p>
+              セッション開始時に全スキルの<code>name</code>と<code>description</code>のみがシステムプロンプトに注入される。スキル100個あっても約10,000トークン程度の軽量な状態。
+            </p>
+          </div>
+          <div class="lv lv2">
+            <div class="lv-num">LEVEL 2 — オンデマンド</div>
+            <h4>SKILL.md本文の展開</h4>
+            <p>
+              ユーザーのプロンプトとdescriptionを意味論的に照合し、<code>activate_skill</code>ツールで本文（5,000トークン以内推奨）をコンテキストに展開。
+            </p>
+          </div>
+          <div class="lv lv3">
+            <div class="lv-num">LEVEL 3 — 動的参照</div>
+            <h4>リソースの動的実行</h4>
+            <p>
+              references/内のドキュメントはBashで動的読み取り。scripts/内のスクリプトはソースコードではなく<strong>実行結果のみ</strong>がコンテキストに入る。実質無制限。
+            </p>
+          </div>
+        </div>
+
+        <h3>SKILL.md の完全テンプレート</h3>
+
+        <div class="info i-crit fade-in">
+          <span class="ii">🔑</span>
+          <div>
+            <strong>descriptionが命：</strong>
+            SKILL.mdのdescriptionフィールドはエージェントが「いつこのスキルを使うか」を判断するための<strong>意味的トリガー</strong>です。
+            「何を・いつ・なぜ」を具体的に書くほど精度が向上します。曖昧なdescriptionはスキルが全く呼ばれないか、誤った状況で呼ばれる原因になります。
+          </div>
+        </div>
+
+        <div class="code-wrap fade-in">
+          <div class="cb-head">
+            <div class="cb-dots">
+              <div class="cbd" style="background: #ea4335"></div>
+              <div class="cbd" style="background: #fbbc04"></div>
+              <div class="cbd" style="background: #34a853"></div>
+            </div>
+            <span>.agent/skills/db-migration/SKILL.md — 完全テンプレート</span>
+          </div>
+          <pre><span class="hd">---</span>
+<span class="hl">name</span>: <span class="str">db-migration</span>  <span class="cmt"># ← ハイフン区切り英語小文字・ディレクトリ名と完全一致させる</span>
+
+<span class="hl">description</span>: <span class="cmt"># ← 【最重要】AIのトリガー条件。具体的なキーワードを入れる！</span>
+  <span class="str">PostgreSQLのスキーマ変更（マイグレーション）を実行する。</span>
+  <span class="str">「テーブルを追加」「カラムを追加」「インデックスを作成」</span>
+  <span class="str">「DBのスキーマを変更して」という指示が出たら必ずこのスキルを使うこと。</span>
+<span class="hd">---</span>
+
+<span class="hd"># DB Migration Skill</span>
+
+<span class="hd">## Goal（このスキルの目的）</span>
+PostgreSQL スキーマ変更をプロジェクト標準の手順で安全に実行する。
+
+<span class="hd">## Before Starting（前提条件）</span>
+- 変更対象のテーブル名・カラム名・データ型をユーザーから確認すること
+
+<span class="hd">## Step-by-Step Guide（具体的な手順）</span>
+1. <span class="str">`migrations/`</span> 配下に <span class="str">`YYYYMMDD_HHMMSS_description.up.sql`</span> を作成
+2. ロールバック用 <span class="str">`.down.sql`</span> を必ず同時に作成
+3. 整合性チェックを実行: <span class="str">`python scripts/check.py`</span>
+4. レビュー後に適用: <span class="str">`python scripts/migrate.py --apply`</span>
+5. 完了後にtasks.mdの該当タスクをチェック済みにする
+
+<span class="hd">## Examples（Few-shot：具体的な入出力例）</span>
+<span class="cmt"># ここに例を書くとAIが期待する動作を模倣する</span>
+<span class="str">**Input**: "usersテーブルにlast_login_atカラムを追加して"</span>
+<span class="str">**Output**: migrations/20260101_add_last_login_at.up.sql を生成</span>
+
+<span class="hd">## Rules（制約事項）</span>
+<span class="hl2">❌ 既存マイグレーションファイルを絶対に編集しない</span>
+<span class="hl2">❌ 本番環境への直接適用は人間確認なしに禁止</span>
+<span class="ok">✅ ロールバックファイルは必ずセットで作成する</span>
+<span class="ok">✅ NULL制約の後付けはデータ移行計画なしに行わない</span></pre>
+        </div>
+
+        <h3>descriptionの書き方 — 良い例 vs 悪い例</h3>
+        <div
+          style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0"
+          class="fade-in"
+        >
+          <div
+            style="
+              background: rgba(234, 67, 53, 0.07);
+              border: 1px solid rgba(234, 67, 53, 0.25);
+              border-radius: 10px;
+              padding: 1rem 1.2rem;
+            "
+          >
+            <div
+              style="
+                font-size: 0.7rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+                color: var(--g-red);
+                margin-bottom: 0.6rem;
+              "
+            >
+              ❌ アンダートリガー（呼ばれない）
+            </div>
+            <pre
+              style="background: transparent; padding: 0; font-size: 0.77rem; color: var(--text2)"
+            >
+name: security-auditor
+description: |
+  セキュリティ監査を行うスキル。</pre
+            >
+            <div style="font-size: 0.75rem; color: var(--g-red); margin-top: 0.6rem">
+              → AIがいつ使うか判断できない
+            </div>
+          </div>
+          <div
+            style="
+              background: rgba(52, 168, 83, 0.07);
+              border: 1px solid rgba(52, 168, 83, 0.25);
+              border-radius: 10px;
+              padding: 1rem 1.2rem;
+            "
+          >
+            <div
+              style="
+                font-size: 0.7rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+                color: var(--g-green);
+                margin-bottom: 0.6rem;
+              "
+            >
+              ✅ 正しいトリガー設計
+            </div>
+            <pre
+              style="background: transparent; padding: 0; font-size: 0.77rem; color: var(--text2)"
+            >
+name: security-auditor
+description: |
+  コードのセキュリティ監査を実施する。
+  脆弱性チェック、OWASP Top 10の検証、
+  セキュリティ、認証、XSS、SQLi、
+  という言葉が出たら必ず使うこと。</pre
+            >
+            <div style="font-size: 0.75rem; color: var(--g-green); margin-top: 0.6rem">
+              → トリガーが明確で確実に呼ばれる
+            </div>
+          </div>
+        </div>
+
+        <h3>5つのスキルパターン</h3>
+        <div class="pattern-grid fade-in">
+          <div class="pattern-card pc-b">
+            <div class="pn">01</div>
+            <h4>Basic Router</h4>
+            <p>SKILL.mdのみ。指示と制約をテキストで記述。最もシンプル。</p>
+            <div class="pc-struct">SKILL.md only</div>
+          </div>
+          <div class="pattern-card pc-g">
+            <div class="pn">02</div>
+            <h4>Reference Pattern</h4>
+            <p>references/にドキュメントを置き、SKILL.mdから参照。静的知識の拡張。</p>
+            <div class="pc-struct">SKILL.md + references/</div>
+          </div>
+          <div class="pattern-card pc-y">
+            <div class="pn">03</div>
+            <h4>Few-shot Pattern</h4>
+            <p>examples/にInput/Outputのペアを複数用意。精度の向上。</p>
+            <div class="pc-struct">SKILL.md + examples/</div>
+          </div>
+          <div class="pattern-card pc-r">
+            <div class="pn">04</div>
+            <h4>Tool Use Pattern</h4>
+            <p>scripts/に実行可能なスクリプトを置く。LLMが苦手な計算・DB操作を外出し。</p>
+            <div class="pc-struct">SKILL.md + scripts/</div>
+          </div>
+          <div class="pattern-card pc-p">
+            <div class="pn">05</div>
+            <h4>All-in-One Pattern</h4>
+            <p>全ディレクトリを組み合わせた最強パターン。複雑な業務ロジックに対応。</p>
+            <div class="pc-struct">SKILL.md + all dirs</div>
+          </div>
+        </div>
+
+        <h3>スキルのスコープ設計</h3>
+        <div class="scope-grid fade-in">
+          <div class="scope-card sc-global sc-g">
+            <div class="sc-label">🌐 グローバルスキル</div>
+            <h3>全プロジェクトで有効</h3>
+            <p style="font-size: 0.82rem; color: var(--text2)">
+              すべてのプロジェクトで利用可能な汎用スキル。
+            </p>
+            <div class="path-box">~/.gemini/antigravity/skills/<br />（Antigravity IDE）</div>
+            <ul>
+              <li>Gitコミット規約フォーマッター</li>
+              <li>コードレビュー標準チェック</li>
+              <li>JSON/YAML フォーマッター</li>
+              <li>テスト生成の標準化</li>
+            </ul>
+          </div>
+          <div class="scope-card sc-local sc-l">
+            <div class="sc-label">📁 ワークスペーススキル</div>
+            <h3>このプロジェクトのみ</h3>
+            <p style="font-size: 0.82rem; color: var(--text2)">
+              特定プロジェクトのみで有効。チームでgit管理。
+            </p>
+            <div class="path-box">.agent/skills/<br />（プロジェクト内）</div>
+            <ul>
+              <li>このアプリのデプロイ手順</li>
+              <li>プロジェクト固有のAPI仕様</li>
+              <li>チーム独自のコーディング規約</li>
+              <li>内部DBのマイグレーション</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION 5: RULES ── -->
+      <section id="rules" class="fade-in">
+        <div class="sec-label">Section 05</div>
+        <h2 class="sec-title"><span class="num">05.</span>Rules (.agent/rules/) — 受動的制約</h2>
+
+        <p>
+          Antigravityの<strong>Rulesは「常にバックグラウンドで動作するシステムプロンプト」</strong>です。
+          ファイル単位でルールを分割・個別に有効化できる点が特徴です。
+        </p>
+
+        <h3>Rules vs SKILL.md — 使い分け早見表</h3>
+        <table class="tbl fade-in">
+          <tr>
+            <th>観点</th>
+            <th>Rules (.agent/rules/)</th>
+            <th>SKILL.md (.agent/skills/)</th>
+          </tr>
+          <tr>
+            <td>起動タイミング</td>
+            <td>常時（または設定条件で）</td>
+            <td>意図が合致したときのみ</td>
+          </tr>
+          <tr>
+            <td>コンテキスト消費</td>
+            <td>高（毎回注入）</td>
+            <td>低（オンデマンド）</td>
+          </tr>
+          <tr>
+            <td>用途</td>
+            <td>コーディング規約・禁止事項</td>
+            <td>専門ワークフロー・知識</td>
+          </tr>
+          <tr>
+            <td>推奨内容</td>
+            <td>「〜してはいけない」ルール</td>
+            <td>「〜する方法」の手順</td>
+          </tr>
+        </table>
+
+        <div class="code-wrap fade-in">
+          <div class="cb-head">
+            <div class="cb-dots">
+              <div class="cbd" style="background: #ea4335"></div>
+              <div class="cbd" style="background: #fbbc04"></div>
+              <div class="cbd" style="background: #34a853"></div>
+            </div>
+            <span>.agent/rules/always-on.md — 常時適用ルール</span>
+          </div>
+          <pre><span class="hd">---</span>
+<span class="hl">activation</span>: <span class="str">always</span>
+<span class="hd">---</span>
+
+<span class="hd"># Project Core Rules</span>
+
+<span class="hd">## Architecture</span>
+- このプロジェクトはマイクロサービス構成（Go + gRPC）
+- サービス間通信はgRPCのみ（REST禁止）
+
+<span class="hd">## Security Constraints</span>
+- 認証なしのエンドポイントを新規作成しない
+- パスワードは必ずbcrypt (cost=12)でハッシュ化
+- JWTの有効期限は1時間以内
+
+<span class="hd">## Forbidden Actions</span>
+<span class="hl2">- ORM使用禁止（raw SQLのみ） ← なぜ: パフォーマンス測定で20x遅延を確認した</span>
+<span class="hl2">- グローバル変数の新規追加禁止</span>
+<span class="hl2">- panic()の使用禁止（エラーを返せ）</span></pre>
+        </div>
+
+        <div class="code-wrap fade-in">
+          <div class="cb-head">
+            <div class="cb-dots">
+              <div class="cbd" style="background: #ea4335"></div>
+              <div class="cbd" style="background: #fbbc04"></div>
+              <div class="cbd" style="background: #34a853"></div>
+            </div>
+            <span>.agent/rules/typescript.md — 言語別ルール（fileMatch使用）</span>
+          </div>
+          <pre><span class="hd">---</span>
+<span class="hl">activation</span>: <span class="str">fileMatch</span>
+<span class="hl">pattern</span>: <span class="str">"**/*.ts"</span>  <span class="cmt"># ← TypeScriptファイル編集時のみ適用される</span>
+<span class="hd">---</span>
+
+<span class="hd"># TypeScript Coding Standards</span>
+
+- strict: true を必ず有効にする
+- enum / namespace は使用禁止（erasableSyntaxOnly）
+- エラーは throw ではなく Result&lt;T,E&gt; 型で返す
+- never型を活用して網羅性チェックを徹底する</pre>
+        </div>
+
+        <div class="info i-tip fade-in">
+          <span class="ii">💡</span>
+          <div>
+            <code>activation: fileMatch</code
+            >で<strong>特定ファイルを編集するときだけルールを適用</strong>できます。
+            Goファイル編集時のみGoルールを、TypeScriptファイル時のみTSルールを注入することでコンテキストを節約できます。
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION 6: WORKFLOWS ── -->
+      <section id="workflows" class="fade-in">
+        <div class="sec-label">Section 06</div>
+        <h2 class="sec-title">
+          <span class="num">06.</span>Workflows (.agent/workflows/) — 能動的手順書
+        </h2>
+
+        <p>
+          <strong>WorkflowsはRulesの「受動的制約」とは対照的な「能動的手順書」</strong>です。
+          <code>/workflow-name</code>
+          のようにスラッシュコマンドでトリガーし、エージェントが定義された手順を順番に実行します。
+        </p>
+
+        <div class="code-wrap fade-in">
+          <div class="cb-head">
+            <div class="cb-dots">
+              <div class="cbd" style="background: #ea4335"></div>
+              <div class="cbd" style="background: #fbbc04"></div>
+              <div class="cbd" style="background: #34a853"></div>
+            </div>
+            <span>.agent/workflows/deploy.md — /deployコマンド</span>
+          </div>
+          <pre><span class="hd"># Deploy Workflow</span>
+<span class="cmt"># トリガー: チャットで `/deploy staging` と入力するとエージェントがこの手順を実行</span>
+
+<span class="hd">## 引数</span>
+- <span class="str">`$ENV`</span>: ターゲット環境 (staging | production)
+
+<span class="hd">## 手順</span>
+1. <span class="str">`git status`</span> でコミット漏れがないことを確認する
+2. テストを全件実行: <span class="str">`go test ./... -race`</span>
+3. テストが失敗した場合は即座に停止してユーザーに報告する
+4. Dockerイメージをビルド: <span class="str">`docker build -t app:$(git rev-parse --short HEAD) .`</span>
+5. $ENV環境にデプロイ:
+   - staging: <span class="str">`kubectl apply -f k8s/staging.yaml`</span>
+   - production: <span class="hl2">ユーザーに確認を求めてから実行すること</span>
+6. ヘルスチェック: <span class="str">`curl https://$ENV.myapp.com/health`</span>
+7. Artifacts（デプロイサマリー）を生成してユーザーに提示する</pre>
+        </div>
+
+        <div class="code-wrap fade-in">
+          <div class="cb-head">
+            <div class="cb-dots">
+              <div class="cbd" style="background: #ea4335"></div>
+              <div class="cbd" style="background: #fbbc04"></div>
+              <div class="cbd" style="background: #34a853"></div>
+            </div>
+            <span>.agent/workflows/review.md — /reviewコマンド</span>
+          </div>
+          <pre><span class="hd"># Code Review Workflow</span>
+
+<span class="hd">## 手順</span>
+1. <span class="str">`git diff main`</span> で変更差分を取得する
+2. 以下の観点でコードレビューを実施:
+   - セキュリティ: SQLインジェクション・XSS・認証漏れ
+   - パフォーマンス: N+1クエリ・不要なアロケーション
+   - 設計: SRPの遵守・依存方向・インターフェース設計
+   - テスト: エッジケースのカバレッジ
+3. 問題があれば重大度(P0/P1/P2)付きでリストアップ
+4. <span class="str">`docs/tasks.md`</span> に未対応課題として追記する
+5. Implementation Artifactとしてレビュー結果を出力</pre>
+        </div>
+
+        <div class="info i-tip fade-in">
+          <span class="ii">💡</span>
+          <div>
+            ワークフロー内から別のワークフローを呼び出すことができます（<strong>チェーン化</strong>）。
+            例: "Ship Feature"ワークフローの中で<code>/review</code>を呼び出し、通過したら<code
+              >/deploy staging</code
+            >を実行する構成が可能です。
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION 7: ARTIFACTS ── -->
+      <section id="artifacts" class="fade-in">
+        <div class="sec-label">Section 07</div>
+        <h2 class="sec-title">
+          <span class="num">07.</span>Artifacts — エージェント自動生成の証拠
+        </h2>
+
+        <p>
+          AntigravityのArtifactsは、<strong>エージェントが自律的に作業を進める際の「信頼の証拠」</strong>として機能します。
+          「エージェントが何をしたか・なぜそう判断したか」をMarkdownや画像・動画で可視化することで「Trust
+          Gap」を埋めます。
+        </p>
+
+        <div class="art-row fade-in">
+          <div class="art-card">
+            <span class="art-icon">📋</span>
+            <div class="art-name">Task List</div>
+            <div class="art-desc">
+              エージェントがコードを書く前に生成する構造化計画。Research → Implementation →
+              Verification のフェーズを明示。
+            </div>
+            <div class="art-auto">✦ 自動生成</div>
+          </div>
+          <div class="art-card">
+            <span class="art-icon">🏛</span>
+            <div class="art-name">Implementation Plan</div>
+            <div class="art-desc">
+              コードベースへの変更を事前に詳述する技術設計書。どのファイルをなぜ変更するかを人間がレビュー可能な形式で提示。
+            </div>
+            <div class="art-auto">✦ 自動生成</div>
+          </div>
+          <div class="art-card">
+            <span class="art-icon">📊</span>
+            <div class="art-name">Walkthrough</div>
+            <div class="art-desc">
+              完了した変更のサマリー。変更ファイル一覧・主要な設計判断の理由・テスト結果を含む。
+            </div>
+            <div class="art-auto">✦ 自動生成</div>
+          </div>
+          <div class="art-card">
+            <span class="art-icon">📸</span>
+            <div class="art-name">Screenshots</div>
+            <div class="art-desc">
+              Browser Subagentが撮影したUIの視覚的エビデンス。フロントエンド変更の検証に使用。
+            </div>
+            <div class="art-auto">✦ Browser Agent自動撮影</div>
+          </div>
+          <div class="art-card">
+            <span class="art-icon">🎬</span>
+            <div class="art-name">Browser Recordings</div>
+            <div class="art-desc">
+              UI操作のビデオ録画。E2Eフローの証明として機能。人間がレビュー後にフィードバックをインラインコメントで残せる。
+            </div>
+            <div class="art-auto">✦ Browser Agent自動録画</div>
+          </div>
+        </div>
+
+        <div class="info i-crit fade-in">
+          <span class="ii">⚠️</span>
+          <div>
+            <strong>SDD最重要原則: Artifactを読め</strong><br />
+            多くのユーザーがTask ListやImplementation
+            Planを「なんとなく承認」してコーディング速度を上げようとします。
+            しかしSDDではここが<strong>最重要レビューポイント</strong>です。
+            「コードは後で直せる。設計の誤りは高くつく」——
+            Artifactを厳密に検査することがバグを未然に防ぐ最善策です。
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION 8: MODELS ── -->
+      <section id="models" class="fade-in">
+        <div class="sec-label">Section 08</div>
+        <h2 class="sec-title"><span class="num">08.</span>対応モデルと料金（2026年3月現在）</h2>
+
+        <table class="tbl fade-in">
+          <tr>
+            <th>モデルID</th>
+            <th>推奨用途</th>
+            <th>ステータス</th>
+          </tr>
+          <tr>
+            <td>gemini-3-flash-preview</td>
+            <td>コードレビュー・テスト・実装・日常タスク</td>
+            <td><span class="badge badge-g">✅ デフォルト推奨</span></td>
+          </tr>
+          <tr>
+            <td>gemini-3.1-pro-preview</td>
+            <td>アーキテクチャ設計・セキュリティ監査（ARC-AGI-2: 77.1%）</td>
+            <td><span class="badge badge-b">⭐ 新世代最高精度</span></td>
+          </tr>
+          <tr>
+            <td>gemini-2.5-flash</td>
+            <td>安定運用・コスパ重視</td>
+            <td><span class="badge badge-g">✅ 安定版</span></td>
+          </tr>
+          <tr>
+            <td>gemini-2.0-flash</td>
+            <td>（廃止予定）</td>
+            <td><span class="badge badge-r">⚠️ 2026-06-01 廃止予定</span></td>
+          </tr>
+          <tr>
+            <td>claude-sonnet-4-6</td>
+            <td>Anthropicモデル（Antigravity対応）</td>
+            <td><span class="badge badge-y">Anthropic対応</span></td>
+          </tr>
+          <tr>
+            <td>claude-opus-4-6</td>
+            <td>Anthropic最高精度（Antigravity対応）</td>
+            <td><span class="badge badge-y">Anthropic対応</span></td>
+          </tr>
+          <tr>
+            <td>gpt-oss-120b</td>
+            <td>OpenAI対応</td>
+            <td><span class="badge badge-b">OpenAI対応</span></td>
+          </tr>
+        </table>
+
+        <div class="grid3 fade-in">
+          <div class="mini-card" style="border: 1px solid var(--border); text-align: center">
+            <div class="mc-tag" style="text-align: center">Free</div>
+            <div style="font-size: 1.8rem; font-weight: 700; color: #edf3ff; margin: 0.3rem 0">
+              $0
+            </div>
+            <p>Public Preview中<br />利用可能（待機あり）</p>
+          </div>
+          <div
+            class="mini-card"
+            style="border: 1px solid rgba(66, 133, 244, 0.35); text-align: center"
+          >
+            <div class="mc-tag" style="text-align: center; color: var(--g-blue)">Google AI Pro</div>
+            <div style="font-size: 1.8rem; font-weight: 700; color: #edf3ff; margin: 0.3rem 0">
+              $19.99<span style="font-size: 1rem">/月</span>
+            </div>
+            <p>優先アクセス枠<br />レートリミット緩和</p>
+          </div>
+          <div
+            class="mini-card"
+            style="border: 1px solid rgba(251, 188, 4, 0.3); text-align: center"
+          >
+            <div class="mc-tag" style="text-align: center; color: var(--g-yellow)">
+              Google AI Ultra
+            </div>
+            <div style="font-size: 1.8rem; font-weight: 700; color: #edf3ff; margin: 0.3rem 0">
+              $250<span style="font-size: 1rem">/月</span>
+            </div>
+            <p>最優先アクセス<br />Gemini 3.1 Pro利用可</p>
+          </div>
+        </div>
+        <p style="font-size: 0.78rem; color: var(--text3); margin-top: 0.5rem">
+          ※ 2026年3月現在、Pro加入者でも最大7日間のレートリミットロックが報告されています
+        </p>
+      </section>
+
+      <!-- ── SECTION 9: BEST PRACTICES ── -->
+      <section id="best-practices" class="fade-in">
+        <div class="sec-label">Section 09</div>
+        <h2 class="sec-title"><span class="num">09.</span>横断ベストプラクティス 10則</h2>
+
+        <div class="bp-grid fade-in">
+          <div class="bp bp-b">
+            <div class="bpn">01</div>
+            <h4>descriptionがSKILL.mdの命</h4>
+            <p>
+              意味的トリガーとして機能するdescriptionを徹底的に具体化。「何を・いつ・なぜ」を英語・日本語問わず記述すると精度が向上する。
+            </p>
+          </div>
+          <div class="bp bp-g">
+            <div class="bpn">02</div>
+            <h4>Rules ≠ SKILL.md: 用途を厳守</h4>
+            <p>
+              「常に守るルール」はRules、「特定タスクの知識」はSKILL.md。混在するとコンテキスト汚染が発生する。
+            </p>
+          </div>
+          <div class="bp bp-y">
+            <div class="bpn">03</div>
+            <h4>Artifactレビューを省略しない</h4>
+            <p>
+              Task ListとImplementation
+              Planは必ずレビュー。ここで設計ミスを検出することがバグコスト最小化の鍵。
+            </p>
+          </div>
+          <div class="bp bp-r">
+            <div class="bpn">04</div>
+            <h4>fileMatchで言語別ルールを分離</h4>
+            <p>
+              activation:
+              fileMatchを使い、Go/TS/Pythonなど言語別にルールを切り替え。全言語に共通ルールを書かない。
+            </p>
+          </div>
+          <div class="bp bp-p">
+            <div class="bpn">05</div>
+            <h4>スキルは10〜15個以内に絞る</h4>
+            <p>
+              アクティブなスキルが増えすぎるとAIが混乱し精度が低下する。使わないスキルは/skills
+              disableコマンドで無効化。
+            </p>
+          </div>
+          <div class="bp bp-c">
+            <div class="bpn">06</div>
+            <h4>.context/でナレッジを蓄積する</h4>
+            <p>
+              Known GotchasをKnowledge
+              Baseに記録。エージェントが同じ過ちを繰り返さず、ドキュメントの自動進化を促す。
+            </p>
+          </div>
+          <div class="bp bp-b">
+            <div class="bpn">07</div>
+            <h4>Workflowsで繰り返し作業を撲滅</h4>
+            <p>
+              毎回同じ手順を口頭で指示するものはWorkflowに書く。/deploy、/review、/release-notesを整備する。
+            </p>
+          </div>
+          <div class="bp bp-g">
+            <div class="bpn">08</div>
+            <h4>GEMINI.mdは「薄く・分割して」</h4>
+            <p>
+              @./docs/guide.mdのように@importでファイルを分割参照。1ファイルに全部詰め込まないことがコンテキスト節約の鍵。
+            </p>
+          </div>
+          <div class="bp bp-y">
+            <div class="bpn">09</div>
+            <h4>Rulesには「Why」を書く</h4>
+            <p>
+              「ORM使用禁止」だけでなく「なぜ禁止か（パフォーマンス測定で20x遅延を確認）」を書くとエージェントの判断精度が上がる。
+            </p>
+          </div>
+          <div class="bp bp-r">
+            <div class="bpn">10</div>
+            <h4>tasks.mdに並列情報を明示する</h4>
+            <p>
+              「Agent A担当」「Agent B担当（並列可）」を記述することでAgent
+              Managerが最適にタスクを分配できる。
+            </p>
+          </div>
+        </div>
+
+        <h3>公開・運用前チェックリスト</h3>
+        <div class="checklist fade-in" id="checklist">
+          <div
+            class="check-item"
+            role="checkbox"
+            tabindex="0"
+            aria-checked="false"
+            onclick="toggleCheck(this)"
+            onkeydown="
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleCheck(this);
+              }
+            "
+          >
+            <div class="check-box"></div>
+            <div class="check-text">
+              <code>name</code> はハイフン区切りの英語小文字か（64文字以内）
+            </div>
+          </div>
+          <div
+            class="check-item"
+            role="checkbox"
+            tabindex="0"
+            aria-checked="false"
+            onclick="toggleCheck(this)"
+            onkeydown="
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleCheck(this);
+              }
+            "
+          >
+            <div class="check-box"></div>
+            <div class="check-text">
+              <code>description</code> に具体的なトリガーキーワードが含まれているか
+            </div>
+          </div>
+          <div
+            class="check-item"
+            role="checkbox"
+            tabindex="0"
+            aria-checked="false"
+            onclick="toggleCheck(this)"
+            onkeydown="
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleCheck(this);
+              }
+            "
+          >
+            <div class="check-box"></div>
+            <div class="check-text">
+              SKILL.md 本文は 500 行以内か（参照資料は references/ に分離済みか）
+            </div>
+          </div>
+          <div
+            class="check-item"
+            role="checkbox"
+            tabindex="0"
+            aria-checked="false"
+            onclick="toggleCheck(this)"
+            onkeydown="
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleCheck(this);
+              }
+            "
+          >
+            <div class="check-box"></div>
+            <div class="check-text">
+              スクリプトはハードコードされた値ではなく引数で動作変更できるか
+            </div>
+          </div>
+          <div
+            class="check-item"
+            role="checkbox"
+            tabindex="0"
+            aria-checked="false"
+            onclick="toggleCheck(this)"
+            onkeydown="
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleCheck(this);
+              }
+            "
+          >
+            <div class="check-box"></div>
+            <div class="check-text">
+              危険な操作のスキルに <code>disable-model-invocation: true</code> が設定されているか
+            </div>
+          </div>
+          <div
+            class="check-item"
+            role="checkbox"
+            tabindex="0"
+            aria-checked="false"
+            onclick="toggleCheck(this)"
+            onkeydown="
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleCheck(this);
+              }
+            "
+          >
+            <div class="check-box"></div>
+            <div class="check-text">
+              Few-shot の Examples セクションが含まれているか（入出力の例示）
+            </div>
+          </div>
+          <div
+            class="check-item"
+            role="checkbox"
+            tabindex="0"
+            aria-checked="false"
+            onclick="toggleCheck(this)"
+            onkeydown="
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleCheck(this);
+              }
+            "
+          >
+            <div class="check-box"></div>
+            <div class="check-text">
+              Rules セクションで ❌禁止事項 と ✅推奨行動 が明確に定義されているか
+            </div>
+          </div>
+          <div
+            class="check-item"
+            role="checkbox"
+            tabindex="0"
+            aria-checked="false"
+            onclick="toggleCheck(this)"
+            onkeydown="
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleCheck(this);
+              }
+            "
+          >
+            <div class="check-box"></div>
+            <div class="check-text">アクティブなスキルの合計数が 15 個以内に収まっているか</div>
+          </div>
+          <div
+            class="check-item"
+            role="checkbox"
+            tabindex="0"
+            aria-checked="false"
+            onclick="toggleCheck(this)"
+            onkeydown="
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleCheck(this);
+              }
+            "
+          >
+            <div class="check-box"></div>
+            <div class="check-text">
+              ワークスペーススキルはチームで共有できるようにGitにコミットされているか
+            </div>
+          </div>
+          <div
+            class="check-item"
+            role="checkbox"
+            tabindex="0"
+            aria-checked="false"
+            onclick="toggleCheck(this)"
+            onkeydown="
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleCheck(this);
+              }
+            "
+          >
+            <div class="check-box"></div>
+            <div class="check-text">
+              AGENTS.md にクロスツール共有ルールを記述し他ツールでも動作確認したか（v1.20.3〜）
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION 10: SOURCES ── -->
+      <section id="sources" class="fade-in">
+        <div class="sec-label">Section 10</div>
+        <h2 class="sec-title"><span class="num">10.</span>参考ソース一覧（公式・一次情報優先）</h2>
+
+        <div class="sources fade-in">
+          <div class="src">
+            <span class="snum">[1]</span>
+            <div>
+              <a
+                href="https://developers.googleblog.com/build-with-google-antigravity-our-new-agentic-development-platform/"
+                target="_blank"
+                rel="noopener"
+                >Build with Google Antigravity — Google Developers Blog (Nov 2025)</a
+              ><span class="sdesc"
+                >Antigravity公式発表。エージェントファーストパラダイム・Artifacts・Knowledge
+                Baseの設計思想</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[2]</span>
+            <div>
+              <a
+                href="https://medium.com/google-cloud/benefits-and-challenges-of-spec-driven-development-and-how-antigravity-is-changing-the-game-3343a6942330"
+                target="_blank"
+                rel="noopener"
+                >How Google Antigravity is changing spec-driven development — Google Cloud Medium
+                (Jan 2026)</a
+              ><span class="sdesc"
+                >Artifacts（Task List / Implementation Plan / Walkthrough）のSDD活用、Knowledge
+                Baseによる自動学習</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[3]</span>
+            <div>
+              <a
+                href="https://codelabs.developers.google.com/getting-started-google-antigravity"
+                target="_blank"
+                rel="noopener"
+                >Getting Started with Google Antigravity — Google Codelabs</a
+              ><span class="sdesc"
+                >公式チュートリアル。Skills・Rules・Workflows・Artifactsの設定方法。GEMINI.md・.agent/ディレクトリ構造</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[4]</span>
+            <div>
+              <a
+                href="https://codelabs.developers.google.com/getting-started-with-antigravity-skills"
+                target="_blank"
+                rel="noopener"
+                >Authoring Google Antigravity Skills — Google Codelabs</a
+              ><span class="sdesc"
+                >SKILL.mdの完全仕様。スキルディレクトリ構造（SKILL.md / scripts / references /
+                assets）・5パターン詳解</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[5]</span>
+            <div>
+              <a
+                href="https://medium.com/google-cloud/tutorial-getting-started-with-antigravity-skills-864041811e0d"
+                target="_blank"
+                rel="noopener"
+                >How to Build Custom Skills in Google Antigravity — Google Cloud Medium (Jan
+                2026)</a
+              ><span class="sdesc"
+                >Progressive Disclosure設計思想。scripts/サブディレクトリのTool Use
+                Pattern詳細。グローバル/ワークスペーススコープ</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[6]</span>
+            <div>
+              <a
+                href="https://iamulya.one/posts/advanced-tips-for-mastering-google-antigravity/"
+                target="_blank"
+                rel="noopener"
+                >Advanced Tips for Mastering Google Antigravity — Amulya Bhatia (Jan 2026)</a
+              ><span class="sdesc"
+                >Rules vs Workflows の使い分け。fileMatch
+                activation。マルチエージェント並列処理。Workflowsチェーン化</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[7]</span>
+            <div>
+              <a
+                href="https://github.com/sickn33/antigravity-awesome-skills"
+                target="_blank"
+                rel="noopener"
+                >antigravity-awesome-skills — GitHub (800+ Skills Collection)</a
+              ><span class="sdesc"
+                >SKILL.mdのユニバーサル規格（Claude Code / Antigravity /
+                Cursor共通）。コミュニティスキルライブラリ</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[8]</span>
+            <div>
+              <a
+                href="https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-pro/"
+                target="_blank"
+                rel="noopener"
+                >Gemini 3.1 Pro: A smarter model — Google Blog (Feb 2026)</a
+              ><span class="sdesc"
+                >Gemini 3.1 ProリリースアナウンスとAntigravityへの展開。ARC-AGI-2スコア77.1%</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[9]</span>
+            <div>
+              <a
+                href="https://ai.google.dev/gemini-api/docs/deprecations"
+                target="_blank"
+                rel="noopener"
+                >Gemini deprecations — Gemini API Docs</a
+              ><span class="sdesc"
+                >Gemini 3 Pro Preview廃止スケジュール（2026-03-09）。Gemini 3.1 Pro
+                Previewへの移行案内</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[10]</span>
+            <div>
+              <a
+                href="https://aitoolanalysis.com/google-antigravity-review/"
+                target="_blank"
+                rel="noopener"
+                >Google Antigravity Review 2026 (v1.20.3 Updated) — AI Tool Analysis (Mar 2026)</a
+              ><span class="sdesc"
+                >v1.20.3の変更点詳細。AGENTS.mdサポート追加・Auto-continueのデフォルト有効化。サポートモデル一覧</span
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-logo">Google Antigravity Guide</div>
+      <p>
+        Google Antigravity v1.20.3 / Gemini CLI v0.34.0 — AI仕様駆動開発
+        ベストプラクティス完全ガイド
+      </p>
+      <p style="margin-top: 6px; font-size: 0.7rem">最終更新: 2026年3月22日</p>
+    </footer>
+
+    <script>
+      /* Progress bar */
+      const prog = document.getElementById('prog');
+      window.addEventListener('scroll', () => {
+        const total = document.documentElement.scrollHeight - window.innerHeight;
+        prog.style.width = (total > 0 ? (window.scrollY / total) * 100 : 0) + '%';
+      });
+
+      /* Fade-in observer */
+      const obs = new IntersectionObserver(
+        (entries) =>
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add('vis');
+              obs.unobserve(e.target);
+            }
+          }),
+        { threshold: 0.07, rootMargin: '0px 0px -20px 0px' },
+      );
+      document.querySelectorAll('.fade-in').forEach((el) => obs.observe(el));
+
+      /* Tabs */
+      function switchTab(btn, groupId, panelId) {
+        const container = btn.closest('.tabs-wrap');
+        container.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+        container.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(panelId).classList.add('active');
+      }
+
+      /* Checklist */
+      function toggleCheck(el) {
+        el.classList.toggle('checked');
+        el.setAttribute('aria-checked', el.classList.contains('checked'));
+      }
+    </script>
+  </body>
+</html>
