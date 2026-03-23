@@ -1370,7 +1370,8 @@
             <ul class="plan-features">
               <li>無制限のインライン補完</li>
               <li>月300回のプレミアムリクエスト</li>
-              <li>エージェントモード利用可</li>
+              <li>Coding Agent（コーディングエージェント）</li>
+              <li>Code Review（コードレビュー）</li>
               <li>30日間無料トライアルあり</li>
             </ul>
             <span class="tag pro" style="margin-top: 12px; display: inline-block">RECOMMENDED</span>
@@ -1384,7 +1385,8 @@
             <ul class="plan-features">
               <li>月1,500回のプレミアムリクエスト</li>
               <li>全モデルへのアクセス</li>
-              <li>Claude Opus 4.6・o3対応</li>
+              <li>Claude Opus 4.6・o3・GPT-5.4対応</li>
+              <li>Copilot CLI（GA版）</li>
               <li>最大限の柔軟性</li>
             </ul>
             <span class="tag beta" style="margin-top: 12px; display: inline-block">POWER</span>
@@ -1413,6 +1415,8 @@
               <li>ナレッジベース機能</li>
               <li>カスタムモデル訓練</li>
               <li>GitHub.com Chat統合</li>
+              <li>Copilot CLI（GA版）</li>
+              <li>GitHub Spark統合</li>
               <li>月1,000プレミアムリクエスト</li>
             </ul>
             <span class="tag new" style="margin-top: 12px; display: inline-block">ENTERPRISE</span>
@@ -1731,7 +1735,7 @@ code --install-extension GitHub.copilot-chat</pre>
                 プランモード（Plan Mode） <span class="tag new">2026</span>
               </div>
               <div class="step-body">
-                コードを書く前に実装計画を作成し、承認後に実装を進める機能。Shift+Tab でトグル切替。
+                コードを書く前に実装計画を作成し、承認後に実装を進める機能。Chat UI で Plan エージェントを選択するか、/plan コマンドで起動。
                 複雑な機能実装前に計画をレビューできるため、手戻りを大幅に削減できます。
               </div>
               <div class="code-block">
@@ -1739,7 +1743,7 @@ code --install-extension GitHub.copilot-chat</pre>
                   <span class="code-lang">COPILOT CHAT — Plan Mode</span>
                   <div class="code-dots"><span></span><span></span><span></span></div>
                 </div>
-                <pre><span class="cmt"># Shift+Tab でPlan Modeに切り替えた後</span>
+                <pre><span class="cmt"># Chat UI で Plan エージェントを選択、または /plan と入力</span>
 <span class="str">OAuth2認証（Google・GitHubプロバイダー）を実装して</span>
 
 <span class="cmt"># Copilotが以下のような計画を作成してくれます：</span>
@@ -1749,7 +1753,7 @@ code --install-extension GitHub.copilot-chat</pre>
 <span class="op">-</span> [ ] GitHubプロバイダー設定
 <span class="op">-</span> [ ] コールバックルート実装
 <span class="op">-</span> [ ] セッション管理の設定
-<span class="cmt"># → 承認後に実装開始（Ctrl+Y で計画を編集可能）</span></pre>
+<span class="cmt"># → 承認後に実装開始（Chat UI でプランを編集・承認可能）</span></pre>
               </div>
             </div>
           </div>
@@ -1790,10 +1794,10 @@ code --install-extension GitHub.copilot-chat</pre>
                 <pre>{
   <span class="str">"servers"</span>: {
     <span class="str">"github"</span>: {
-      <span class="str">"command"</span>: <span class="str">"npx"</span>,
-      <span class="str">"args"</span>: [<span class="str">"-y"</span>, <span class="str">"@modelcontextprotocol/server-github"</span>],
-      <span class="str">"env"</span>: {
-        <span class="str">"GITHUB_PERSONAL_ACCESS_TOKEN"</span>: <span class="str">"${input:githubToken}"</span>
+      <span class="str">"type"</span>: <span class="str">"http"</span>,
+      <span class="str">"url"</span>: <span class="str">"https://api.githubcopilot.com/mcp/"</span>,
+      <span class="str">"headers"</span>: {
+        <span class="str">"X-MCP-Toolsets"</span>: <span class="str">"default,copilot_spaces"</span>
       }
     }
   }
@@ -2129,9 +2133,9 @@ code --install-extension GitHub.copilot-chat</pre>
           <tbody>
             <tr>
               <td>
-                <span class="model-name">GPT-4.1</span><br /><span class="tag new">標準</span>
+                <span class="model-name">GPT-5.3-Codex</span><br /><span class="tag new">LTS標準</span>
               </td>
-              <td>バランス型。コーディング全般に優秀</td>
+              <td>長期サポート（〜2027/2）。コーディング全般に優秀</td>
               <td>日常的なコーディング補助・説明</td>
               <td><span class="tag free">Free〜</span></td>
               <td>
@@ -2157,7 +2161,21 @@ code --install-extension GitHub.copilot-chat</pre>
             </tr>
             <tr>
               <td>
-                <span class="model-name">Claude Sonnet</span><br /><span class="tag pro"
+                <span class="model-name">Claude Haiku 4.5</span><br /><span class="tag free">軽量</span>
+              </td>
+              <td>軽量・高速。Anthropic製の効率的モデル</td>
+              <td>シンプルな質問・繰り返し作業</td>
+              <td><span class="tag free">Free〜</span></td>
+              <td>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar" style="width: 95%"></div>
+                </div>
+                最速
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span class="model-name">Claude Sonnet 4.6</span><br /><span class="tag pro"
                   >中〜上級</span
                 >
               </td>
@@ -2191,7 +2209,7 @@ code --install-extension GitHub.copilot-chat</pre>
               <td>
                 <span class="model-name">o3</span><br /><span class="tag beta">推論特化</span>
               </td>
-              <td>段階的推論に優れた最新モデル</td>
+              <td>段階的推論に優れたモデル（Autoモード推奨）</td>
               <td>アルゴリズム設計・数学的処理</td>
               <td><span class="tag beta">Pro+のみ</span></td>
               <td>

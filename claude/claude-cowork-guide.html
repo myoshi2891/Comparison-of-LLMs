@@ -2206,27 +2206,29 @@ style G fill:#152a15,stroke:#3fb950,color:#e6edf3`,
       };
 
       // ─── Mermaid initialisation (startOnLoad:false → we render manually) ──
-      mermaid.initialize({
-        startOnLoad: false,
-        theme: 'dark',
-        themeVariables: {
-          background: '#0d1117',
-          primaryColor: '#1c2333',
-          primaryTextColor: '#e6edf3',
-          primaryBorderColor: '#30363d',
-          lineColor: '#8b949e',
-          secondaryColor: '#161b22',
-          tertiaryColor: '#0d1117',
-          fontFamily: "'Noto Sans JP', sans-serif",
-          fontSize: '14px',
-          nodeTextColor: '#e6edf3',
-          clusterBkg: '#1a2535',
-          titleColor: '#cdd9e5',
-          edgeLabelBackground: '#161b22',
-        },
-        flowchart: { useMaxWidth: true, htmlLabels: false },
-        sequence: { useMaxWidth: true },
-      });
+      if (typeof window.mermaid !== 'undefined') {
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'dark',
+          themeVariables: {
+            background: '#0d1117',
+            primaryColor: '#1c2333',
+            primaryTextColor: '#e6edf3',
+            primaryBorderColor: '#30363d',
+            lineColor: '#8b949e',
+            secondaryColor: '#161b22',
+            tertiaryColor: '#0d1117',
+            fontFamily: "'Noto Sans JP', sans-serif",
+            fontSize: '14px',
+            nodeTextColor: '#e6edf3',
+            clusterBkg: '#1a2535',
+            titleColor: '#cdd9e5',
+            edgeLabelBackground: '#161b22',
+          },
+          flowchart: { useMaxWidth: true, htmlLabels: false },
+          sequence: { useMaxWidth: true },
+        });
+      }
 
       // ─── Render all diagrams ───────────────────────────────────────────────
       (async () => {
@@ -2272,8 +2274,11 @@ Diagram render error: ${(e.message || '').substring(0, 200)}
       // ─── Read progress bar ────────────────────────────────────────────────
       window.addEventListener('scroll', () => {
         const h = document.documentElement;
-        const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
-        document.getElementById('readProgressFill').style.width = pct + '%';
+        const total = h.scrollHeight - h.clientHeight;
+        let pct = total > 0 ? (h.scrollTop / total) * 100 : 0;
+        pct = Math.max(0, Math.min(100, pct));
+        const fill = document.getElementById('readProgressFill');
+        if (fill) fill.style.width = pct + '%';
       });
 
       // ─── Active top-nav highlight ─────────────────────────────────────────
