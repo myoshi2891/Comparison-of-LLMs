@@ -2234,7 +2234,7 @@ style G fill:#152a15,stroke:#3fb950,color:#e6edf3`,
       }
 
       // ─── Render all diagrams ───────────────────────────────────────────────
-      (async () => {
+      document.addEventListener('DOMContentLoaded', async () => {
         // CDN読み込み失敗時のフォールバック
         if (typeof window.mermaid === 'undefined') {
           for (const [id] of Object.entries(DIAGRAMS)) {
@@ -2272,7 +2272,7 @@ Diagram render error: ${(e.message || '').substring(0, 200)}
 </pre>`;
           }
         }
-      })();
+      });
 
       // ─── Read progress bar ────────────────────────────────────────────────
       window.addEventListener('scroll', () => {

@@ -84,12 +84,22 @@ grep -n "</head>" <ファイルパス>
 
 #### 2-1. 該当カテゴリを特定
 
-| カテゴリ | 行番号範囲 | 例 |
+`shared/common-header.js` の `defaultLinks` 配列から、追加先カテゴリを検索します:
+
+| カテゴリ | 検索キー | 例 |
 | --------- | ----------- | ----- |
-| Claude | 54-61行目 | claude-cowork-guide.html |
-| Gemini | 63-70行目 | antigravity-guide.html |
-| Codex | 72-77行目 | codex の各ドキュメント |
-| Copilot | 79-87行目 | github-copilot.html |
+| Claude | `name: 'Claude'` | claude-cowork-guide.html |
+| Gemini | `name: 'Gemini'` | antigravity-guide.html |
+| Codex | `name: 'Codex'` | codex の各ドキュメント |
+| Copilot | `name: 'Copilot'` | github-copilot.html |
+
+**検索方法**:
+
+```bash
+grep -n "name: 'Claude'" shared/common-header.js
+```
+
+返された行番号付近を Read ツールで確認し、`children` 配列を特定します。
 
 #### 2-2. リンクを追加
 
