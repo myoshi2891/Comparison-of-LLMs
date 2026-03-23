@@ -1,0 +1,2658 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GitHub Copilot 完全ガイド 2026 | ベストプラクティス</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg-primary: #0a0e17;
+        --bg-secondary: #0f1520;
+        --bg-card: #111827;
+        --bg-card-hover: #1a2540;
+        --accent-cyan: #00d4ff;
+        --accent-blue: #3b82f6;
+        --accent-green: #10b981;
+        --accent-purple: #8b5cf6;
+        --accent-yellow: #f59e0b;
+        --accent-red: #ef4444;
+        --text-primary: #e2e8f0;
+        --text-secondary: #94a3b8;
+        --text-muted: #475569;
+        --border: rgba(0, 212, 255, 0.15);
+        --border-bright: rgba(0, 212, 255, 0.4);
+        --glow: 0 0 20px rgba(0, 212, 255, 0.15);
+        --glow-strong: 0 0 40px rgba(0, 212, 255, 0.3);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: 'Noto Sans JP', sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        overflow-x: hidden;
+        line-height: 1.7;
+      }
+
+      /* ─── Background Grid ─── */
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+        background-size: 40px 40px;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* ─── Noise Texture Overlay ─── */
+      body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        opacity: 0.025;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* ─── Header ─── */
+      header {
+        position: relative;
+        z-index: 10;
+        padding: 80px 40px 60px;
+        text-align: center;
+        background: linear-gradient(180deg, rgba(0, 212, 255, 0.06) 0%, transparent 100%);
+        border-bottom: 1px solid var(--border);
+        overflow: hidden;
+      }
+
+      header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(0, 212, 255, 0.08) 0%, transparent 70%);
+        pointer-events: none;
+      }
+
+      .header-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        background: rgba(0, 212, 255, 0.1);
+        border: 1px solid var(--border-bright);
+        border-radius: 100px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--accent-cyan);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 24px;
+        animation: pulse-badge 3s ease infinite;
+      }
+
+      @keyframes pulse-badge {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.3);
+        }
+        50% {
+          box-shadow: 0 0 0 8px rgba(0, 212, 255, 0);
+        }
+      }
+
+      .badge-dot {
+        width: 6px;
+        height: 6px;
+        background: var(--accent-cyan);
+        border-radius: 50%;
+        animation: blink 1.5s ease infinite;
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.2;
+        }
+      }
+
+      h1 {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        font-weight: 700;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+        margin-bottom: 16px;
+      }
+
+      h1 .accent {
+        color: var(--accent-cyan);
+      }
+      h1 .dim {
+        color: var(--text-secondary);
+      }
+
+      .header-subtitle {
+        font-size: 1.05rem;
+        color: var(--text-secondary);
+        max-width: 600px;
+        margin: 0 auto 32px;
+        font-weight: 300;
+      }
+
+      .header-stats {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        flex-wrap: wrap;
+      }
+
+      .stat-item {
+        text-align: center;
+      }
+
+      .stat-num {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--accent-cyan);
+        display: block;
+      }
+
+      .stat-label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      /* ─── Navigation ─── */
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(10, 14, 23, 0.92);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border);
+        padding: 0 40px;
+        display: flex;
+        gap: 0;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+
+      nav::-webkit-scrollbar {
+        display: none;
+      }
+
+      .nav-item {
+        padding: 14px 20px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        color: var(--text-muted);
+        text-decoration: none;
+        white-space: nowrap;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        letter-spacing: 0.05em;
+      }
+
+      .nav-item:hover,
+      .nav-item.active {
+        color: var(--accent-cyan);
+        border-bottom-color: var(--accent-cyan);
+      }
+
+      /* ─── Main Layout ─── */
+      main {
+        position: relative;
+        z-index: 1;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      /* ─── Section ─── */
+      .section {
+        padding: 72px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        opacity: 1;
+        transform: translateY(0);
+        transition:
+          opacity 0.6s ease,
+          transform 0.6s ease;
+      }
+
+      .section.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .section-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 40px;
+      }
+
+      .section-number {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--accent-cyan);
+        background: rgba(0, 212, 255, 0.08);
+        border: 1px solid var(--border);
+        padding: 4px 10px;
+        border-radius: 4px;
+        letter-spacing: 0.1em;
+        white-space: nowrap;
+        margin-top: 6px;
+      }
+
+      .section-title {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: clamp(1.4rem, 3vw, 1.9rem);
+        font-weight: 700;
+        color: var(--text-primary);
+        line-height: 1.3;
+      }
+
+      .section-title span {
+        color: var(--accent-cyan);
+      }
+
+      .section-desc {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        margin-top: 8px;
+        max-width: 700px;
+      }
+
+      /* ─── Cards Grid ─── */
+      .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 16px;
+      }
+
+      .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 24px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .card:hover {
+        border-color: var(--border-bright);
+        background: var(--bg-card-hover);
+        transform: translateY(-2px);
+        box-shadow: var(--glow);
+      }
+
+      .card:hover::before {
+        opacity: 1;
+      }
+
+      .card-icon {
+        font-size: 1.8rem;
+        margin-bottom: 14px;
+        display: block;
+      }
+
+      .card-title {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+      }
+
+      .card-body {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.7;
+      }
+
+      /* ─── Plan Cards ─── */
+      .plans-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+      }
+
+      .plan-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 24px 20px;
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .plan-card.featured {
+        border-color: var(--accent-cyan);
+        background: rgba(0, 212, 255, 0.05);
+        box-shadow: var(--glow);
+      }
+
+      .plan-card.featured::after {
+        content: '⭐ おすすめ';
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        font-size: 10px;
+        color: var(--accent-cyan);
+        font-family: 'JetBrains Mono', monospace;
+        background: rgba(0, 212, 255, 0.15);
+        padding: 2px 8px;
+        border-radius: 100px;
+        letter-spacing: 0.05em;
+      }
+
+      .plan-card:hover {
+        border-color: var(--border-bright);
+        transform: translateY(-3px);
+        box-shadow: var(--glow-strong);
+      }
+
+      .plan-name {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        margin-bottom: 8px;
+      }
+
+      .plan-price {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        line-height: 1;
+      }
+
+      .plan-price .currency {
+        font-size: 1rem;
+        color: var(--text-secondary);
+      }
+      .plan-price .period {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        font-weight: 400;
+      }
+
+      .plan-target {
+        font-size: 0.78rem;
+        color: var(--text-secondary);
+        margin: 12px 0;
+        padding: 8px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 6px;
+      }
+
+      .plan-features {
+        list-style: none;
+        text-align: left;
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin-top: 14px;
+      }
+
+      .plan-features li {
+        padding: 4px 0;
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
+      }
+
+      .plan-features li::before {
+        content: '✓';
+        color: var(--accent-green);
+        font-family: 'JetBrains Mono', monospace;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      /* ─── Steps ─── */
+      .steps-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .step {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 24px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .step:hover {
+        border-color: var(--border-bright);
+        box-shadow: var(--glow);
+      }
+
+      .step-num {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--accent-cyan);
+        background: rgba(0, 212, 255, 0.1);
+        border: 1px solid var(--border);
+        min-width: 52px;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        flex-shrink: 0;
+      }
+
+      .step-content {
+      }
+
+      .step-title {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+      }
+
+      .step-body {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.7;
+      }
+
+      .step-sub {
+        margin-top: 12px;
+        padding-left: 0;
+      }
+
+      .step-sub li {
+        font-size: 0.82rem;
+        color: var(--text-secondary);
+        padding: 3px 0;
+        list-style: none;
+        display: flex;
+        gap: 8px;
+      }
+
+      .step-sub li::before {
+        content: '▸';
+        color: var(--accent-cyan);
+        flex-shrink: 0;
+      }
+
+      /* ─── Code Block ─── */
+      .code-block {
+        background: #060a12;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 16px 0;
+        position: relative;
+      }
+
+      .code-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 16px;
+        background: rgba(255, 255, 255, 0.03);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .code-lang {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--accent-cyan);
+        letter-spacing: 0.1em;
+      }
+
+      .code-dots {
+        display: flex;
+        gap: 6px;
+      }
+
+      .code-dots span {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+
+      .code-dots span:nth-child(1) {
+        background: #ef4444;
+      }
+      .code-dots span:nth-child(2) {
+        background: #f59e0b;
+      }
+      .code-dots span:nth-child(3) {
+        background: #10b981;
+      }
+
+      pre {
+        padding: 20px;
+        overflow-x: auto;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 13px;
+        line-height: 1.7;
+        color: #a8d8ea;
+      }
+
+      .kw {
+        color: #c792ea;
+      }
+      .fn {
+        color: #82aaff;
+      }
+      .str {
+        color: #c3e88d;
+      }
+      .cmt {
+        color: #546e7a;
+        font-style: italic;
+      }
+      .num {
+        color: #f78c6c;
+      }
+      .op {
+        color: #89ddff;
+      }
+
+      /* ─── Prompt Tips ─── */
+      .prompt-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      @media (max-width: 700px) {
+        .prompt-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .prompt-box {
+        border-radius: 10px;
+        padding: 20px;
+        border: 1px solid;
+      }
+
+      .prompt-box.bad {
+        background: rgba(239, 68, 68, 0.05);
+        border-color: rgba(239, 68, 68, 0.2);
+      }
+
+      .prompt-box.good {
+        background: rgba(16, 185, 129, 0.05);
+        border-color: rgba(16, 185, 129, 0.2);
+      }
+
+      .prompt-box-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 700;
+      }
+
+      .prompt-box.bad .prompt-box-label {
+        color: var(--accent-red);
+      }
+      .prompt-box.good .prompt-box-label {
+        color: var(--accent-green);
+      }
+
+      .prompt-text {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12.5px;
+        color: var(--text-primary);
+        line-height: 1.7;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 12px 14px;
+        border-radius: 6px;
+      }
+
+      /* ─── Tips Accordion ─── */
+      .accordion-item {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        margin-bottom: 10px;
+        overflow: hidden;
+        transition: border-color 0.2s ease;
+      }
+
+      .accordion-item:hover {
+        border-color: var(--border-bright);
+      }
+
+      .accordion-header {
+        padding: 18px 24px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 0.925rem;
+        font-weight: 500;
+        color: var(--text-primary);
+        user-select: none;
+        transition: background 0.2s ease;
+        /* button のデフォルトスタイルをリセット */
+        background: none;
+        border: none;
+        width: 100%;
+        text-align: left;
+      }
+
+      .accordion-header:hover {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .accordion-icon {
+        font-size: 1.2rem;
+        flex-shrink: 0;
+      }
+
+      .accordion-arrow {
+        margin-left: auto;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        transition: transform 0.3s ease;
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      .accordion-item.open .accordion-arrow {
+        transform: rotate(180deg);
+      }
+
+      .accordion-body {
+        display: none;
+        padding: 0 24px 20px;
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.75;
+      }
+
+      .accordion-item.open .accordion-body {
+        display: block;
+      }
+
+      /* ─── Warning / Info Box ─── */
+      .alert-box {
+        border-radius: 10px;
+        padding: 16px 20px;
+        display: flex;
+        gap: 14px;
+        margin: 16px 0;
+        font-size: 0.875rem;
+      }
+
+      .alert-box.warning {
+        background: rgba(245, 158, 11, 0.07);
+        border: 1px solid rgba(245, 158, 11, 0.25);
+        color: #fbbf24;
+      }
+
+      .alert-box.info {
+        background: rgba(59, 130, 246, 0.07);
+        border: 1px solid rgba(59, 130, 246, 0.25);
+        color: #93c5fd;
+      }
+
+      .alert-box.success {
+        background: rgba(16, 185, 129, 0.07);
+        border: 1px solid rgba(16, 185, 129, 0.25);
+        color: #6ee7b7;
+      }
+
+      .alert-icon {
+        font-size: 1.1rem;
+        flex-shrink: 0;
+      }
+
+      .alert-content {
+        line-height: 1.65;
+      }
+
+      /* ─── Source Table ─── */
+      .source-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .source-item {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 14px 18px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+      }
+
+      .source-item:hover {
+        border-color: var(--border-bright);
+        box-shadow: var(--glow);
+        background: var(--bg-card-hover);
+      }
+
+      .source-icon {
+        font-size: 1.2rem;
+        flex-shrink: 0;
+      }
+
+      .source-info {
+      }
+
+      .source-title {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.82rem;
+        color: var(--accent-cyan);
+        font-weight: 700;
+        display: block;
+        margin-bottom: 3px;
+      }
+
+      .source-url {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      .source-badge {
+        margin-left: auto;
+        font-size: 10px;
+        font-family: 'JetBrains Mono', monospace;
+        color: var(--text-muted);
+        background: rgba(255, 255, 255, 0.05);
+        padding: 3px 8px;
+        border-radius: 4px;
+        white-space: nowrap;
+      }
+
+      /* ─── Feature Tag ─── */
+      .tag {
+        display: inline-block;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        padding: 3px 8px;
+        border-radius: 4px;
+        letter-spacing: 0.08em;
+        margin: 2px;
+      }
+
+      .tag.new {
+        background: rgba(16, 185, 129, 0.15);
+        color: var(--accent-green);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+      }
+      .tag.beta {
+        background: rgba(245, 158, 11, 0.15);
+        color: var(--accent-yellow);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+      }
+      .tag.pro {
+        background: rgba(139, 92, 246, 0.15);
+        color: var(--accent-purple);
+        border: 1px solid rgba(139, 92, 246, 0.3);
+      }
+      .tag.free {
+        background: rgba(59, 130, 246, 0.15);
+        color: var(--accent-blue);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+      }
+
+      /* ─── Timeline ─── */
+      .timeline {
+        position: relative;
+        padding-left: 32px;
+      }
+
+      .timeline::before {
+        content: '';
+        position: absolute;
+        left: 8px;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background: linear-gradient(180deg, var(--accent-cyan), transparent);
+      }
+
+      .timeline-item {
+        position: relative;
+        padding-bottom: 28px;
+      }
+
+      .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -28px;
+        top: 6px;
+        width: 10px;
+        height: 10px;
+        background: var(--accent-cyan);
+        border-radius: 50%;
+        box-shadow: 0 0 8px var(--accent-cyan);
+      }
+
+      .timeline-year {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--accent-cyan);
+        letter-spacing: 0.1em;
+        margin-bottom: 4px;
+      }
+
+      .timeline-desc {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+      }
+
+      /* ─── Checklist ─── */
+      .checklist {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .check-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px 16px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+
+      .check-item:hover {
+        border-color: var(--border-bright);
+        color: var(--text-primary);
+      }
+
+      .check-item input[type='checkbox'] {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--accent-cyan);
+        flex-shrink: 0;
+        margin-top: 1px;
+        cursor: pointer;
+      }
+
+      .check-item.checked {
+        background: rgba(0, 212, 255, 0.05);
+        border-color: rgba(0, 212, 255, 0.2);
+      }
+
+      .check-item.checked label {
+        color: var(--text-primary);
+      }
+
+      /* ─── TOC ─── */
+      .toc {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 28px 32px;
+        margin-bottom: 56px;
+      }
+
+      .toc-title {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        color: var(--accent-cyan);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: 16px;
+      }
+
+      .toc-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 6px;
+      }
+
+      .toc-link {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        padding: 6px 10px;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .toc-link:hover {
+        color: var(--accent-cyan);
+        background: rgba(0, 212, 255, 0.07);
+      }
+
+      .toc-link-num {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        color: var(--text-muted);
+      }
+
+      /* ─── Footer ─── */
+      footer {
+        text-align: center;
+        padding: 48px 24px;
+        border-top: 1px solid var(--border);
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        font-family: 'JetBrains Mono', monospace;
+        position: relative;
+        z-index: 1;
+      }
+
+      footer a {
+        color: var(--accent-cyan);
+        text-decoration: none;
+      }
+
+      /* ─── Responsive ─── */
+      @media (max-width: 768px) {
+        header {
+          padding: 50px 20px 40px;
+        }
+        nav {
+          padding: 0 16px;
+        }
+        main {
+          padding: 0 16px;
+        }
+        .section {
+          padding: 48px 0;
+        }
+        .header-stats {
+          gap: 24px;
+        }
+        .step {
+          flex-direction: column;
+          gap: 12px;
+        }
+        .cards-grid {
+          grid-template-columns: 1fr;
+        }
+        .plans-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .plans-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* ─── Animations ─── */
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(24px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .fade-in {
+        animation: fadeInUp 0.7s ease forwards;
+      }
+
+      .delay-1 {
+        animation-delay: 0.1s;
+      }
+      .delay-2 {
+        animation-delay: 0.2s;
+      }
+      .delay-3 {
+        animation-delay: 0.3s;
+      }
+
+      /* ─── Divider ─── */
+      .divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+        opacity: 0.2;
+        margin: 24px 0;
+      }
+
+      /* ─── Inline highlight ─── */
+      code {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.85em;
+        background: rgba(0, 212, 255, 0.1);
+        color: var(--accent-cyan);
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+
+      /* ─── Model Table ─── */
+      .model-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+        margin-top: 8px;
+      }
+
+      .model-table th {
+        text-align: left;
+        padding: 10px 14px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .model-table td {
+        padding: 12px 14px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        color: var(--text-secondary);
+        vertical-align: top;
+      }
+
+      .model-table tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .model-name {
+        font-family: 'JetBrains Mono', monospace;
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+
+      /* Progress bar */
+      .progress-bar-wrap {
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 100px;
+        height: 5px;
+        overflow: hidden;
+        margin-top: 6px;
+        width: 120px;
+      }
+
+      .progress-bar {
+        height: 100%;
+        border-radius: 100px;
+        background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
+      }
+    </style>
+    <!-- Common Header Assets -->
+    <link rel="stylesheet" href="../shared/common-header.css" />
+    <script src="../shared/common-header.js" defer></script>
+  </head>
+  <body>
+    <!-- ═══════════════════════════════════════════
+     HEADER
+═══════════════════════════════════════════ -->
+    <header>
+      <div class="fade-in">
+        <div class="header-badge">
+          <span class="badge-dot"></span>
+          Updated: March 2026
+        </div>
+      </div>
+      <h1 class="fade-in delay-1">
+        <span class="dim">// </span><span class="accent">GitHub Copilot</span><br />
+        完全ベストプラクティスガイド
+      </h1>
+      <p class="header-subtitle fade-in delay-2">
+        2026年3月最新版 — 初学者からエキスパートまで対応した<br />
+        ステップバイステップのAIコーディングアシスタント活用法
+      </p>
+      <div class="header-stats fade-in delay-3">
+        <div class="stat-item">
+          <span class="stat-num">55%</span>
+          <span class="stat-label">コーディング生産性向上</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">5</span>
+          <span class="stat-label">プランバリエーション</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">10+</span>
+          <span class="stat-label">対応IDE数</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">75%</span>
+          <span class="stat-label">開発者満足度向上</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════
+     NAVIGATION
+═══════════════════════════════════════════ -->
+    <nav>
+      <a class="nav-item active" href="#overview">01_概要</a>
+      <a class="nav-item" href="#plans">02_プラン選択</a>
+      <a class="nav-item" href="#setup">03_セットアップ</a>
+      <a class="nav-item" href="#prompting">04_プロンプト技術</a>
+      <a class="nav-item" href="#features">05_主要機能</a>
+      <a class="nav-item" href="#tips">06_ベストプラクティス</a>
+      <a class="nav-item" href="#security">07_セキュリティ</a>
+      <a class="nav-item" href="#models">08_AIモデル選択</a>
+      <a class="nav-item" href="#checklist">09_チェックリスト</a>
+      <a class="nav-item" href="#sources">10_参考ソース</a>
+    </nav>
+
+    <!-- ═══════════════════════════════════════════
+     MAIN CONTENT
+═══════════════════════════════════════════ -->
+    <main>
+      <!-- TOC -->
+      <div class="toc" style="margin-top: 56px">
+        <div class="toc-title">// 目次 — Table of Contents</div>
+        <div class="toc-grid">
+          <a class="toc-link" href="#overview"
+            ><span class="toc-link-num">01</span> GitHub Copilotとは？</a
+          >
+          <a class="toc-link" href="#plans"
+            ><span class="toc-link-num">02</span> プラン比較・選び方</a
+          >
+          <a class="toc-link" href="#setup"
+            ><span class="toc-link-num">03</span> インストール手順</a
+          >
+          <a class="toc-link" href="#prompting"
+            ><span class="toc-link-num">04</span> 効果的なプロンプト</a
+          >
+          <a class="toc-link" href="#features"
+            ><span class="toc-link-num">05</span> 2026年の主要機能</a
+          >
+          <a class="toc-link" href="#tips"
+            ><span class="toc-link-num">06</span> 10のベストプラクティス</a
+          >
+          <a class="toc-link" href="#security"
+            ><span class="toc-link-num">07</span> セキュリティ注意点</a
+          >
+          <a class="toc-link" href="#models"
+            ><span class="toc-link-num">08</span> AIモデル選択ガイド</a
+          >
+          <a class="toc-link" href="#checklist"
+            ><span class="toc-link-num">09</span> 導入チェックリスト</a
+          >
+          <a class="toc-link" href="#sources"
+            ><span class="toc-link-num">10</span> 参考ソース一覧</a
+          >
+        </div>
+      </div>
+
+      <!-- ═══ 01: OVERVIEW ═══ -->
+      <section class="section" id="overview">
+        <div class="section-header">
+          <span class="section-number">01</span>
+          <div>
+            <h2 class="section-title">GitHub Copilotとは<span>？</span></h2>
+            <p class="section-desc">AIを活用したコーディングアシスタントの全体像を理解しましょう</p>
+          </div>
+        </div>
+
+        <div class="cards-grid" style="margin-bottom: 32px">
+          <div class="card">
+            <span class="card-icon">🤖</span>
+            <div class="card-title">AIペアプログラマー</div>
+            <div class="card-body">
+              GitHub
+              Copilotは、コードを書く際にリアルタイムで提案を行うAIアシスタントです。行全体や関数全体の補完、コードの説明、バグ修正まで幅広くサポートします。
+            </div>
+          </div>
+          <div class="card">
+            <span class="card-icon">⚡</span>
+            <div class="card-title">55%の生産性向上</div>
+            <div class="card-body">
+              GitHub社の調査では、Copilot利用者はコード作成速度が最大55%向上し、開発者満足度が75%向上したと報告されています。
+            </div>
+          </div>
+          <div class="card">
+            <span class="card-icon">🌐</span>
+            <div class="card-title">あらゆる環境で利用可能</div>
+            <div class="card-body">
+              VS Code、JetBrains、Xcode、Neovim、Visual Studio、Eclipse、Azure Data
+              Studio、さらにターミナル（CLI）まで対応しています。
+            </div>
+          </div>
+          <div class="card">
+            <span class="card-icon">🔗</span>
+            <div class="card-title">GitHub完全統合（2026年）</div>
+            <div class="card-body">
+              2026年時点では、コードレビューエージェント、MCPサポート、Copilot
+              Spaces、エージェントモードなど強力な機能が追加されています。
+            </div>
+          </div>
+        </div>
+
+        <div class="section-header" style="margin-bottom: 20px; margin-top: 40px">
+          <div>
+            <h3
+              style="
+                font-family: 'JetBrains Mono', monospace;
+                font-size: 1rem;
+                color: var(--text-secondary);
+              "
+            >
+              // 進化の歴史
+            </h3>
+          </div>
+        </div>
+
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-year">2022年6月</div>
+            <div class="timeline-desc">
+              GitHub Copilot正式リリース。インラインコード補完に特化した革命的なツールとして登場
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2023年</div>
+            <div class="timeline-desc">
+              Copilot Chat追加。コードの質問・説明がチャット形式でできるようになった
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2024年</div>
+            <div class="timeline-desc">
+              Copilot Workspace（Issue→PR自動化）、Enterpriseティア登場
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2025年</div>
+            <div class="timeline-desc">
+              マルチモデルサポート（GPT、Claude、Gemini選択可）、エージェントモード追加
+            </div>
+          </div>
+          <div class="timeline-item" style="padding-bottom: 0">
+            <div class="timeline-year">2026年 — 現在</div>
+            <div class="timeline-desc">
+              コードレビューエージェント、MCPサポート、Extensionsエコシステム、Copilot
+              CLI強化版（GPT-4.1対応）
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ 02: PLANS ═══ -->
+      <section class="section" id="plans">
+        <div class="section-header">
+          <span class="section-number">02</span>
+          <div>
+            <h2 class="section-title">プラン比較<span> ＆ </span>選び方</h2>
+            <p class="section-desc">
+              2026年3月現在、5つのプランが提供されています。あなたに最適なプランを選びましょう
+            </p>
+          </div>
+        </div>
+
+        <div class="plans-grid">
+          <div class="plan-card">
+            <div class="plan-name">Free</div>
+            <div class="plan-price">
+              <span class="currency">$</span>0<span class="period">/月</span>
+            </div>
+            <div class="plan-target">まず試してみたい方・学習目的</div>
+            <ul class="plan-features">
+              <li>月2,000回のインライン補完</li>
+              <li>月50回のプレミアムリクエスト</li>
+              <li>基本的なChats機能</li>
+            </ul>
+            <span class="tag free" style="margin-top: 12px; display: inline-block">FREE</span>
+          </div>
+          <div class="plan-card featured">
+            <div class="plan-name">Pro</div>
+            <div class="plan-price">
+              <span class="currency">$</span>10<span class="period">/月</span>
+            </div>
+            <div class="plan-target">個人開発者・フリーランス向け</div>
+            <ul class="plan-features">
+              <li>無制限のインライン補完</li>
+              <li>月300回のプレミアムリクエスト</li>
+              <li>Coding Agent（コーディングエージェント）</li>
+              <li>Code Review（コードレビュー）</li>
+              <li>30日間無料トライアルあり</li>
+            </ul>
+            <span class="tag pro" style="margin-top: 12px; display: inline-block">RECOMMENDED</span>
+          </div>
+          <div class="plan-card">
+            <div class="plan-name">Pro+</div>
+            <div class="plan-price">
+              <span class="currency">$</span>39<span class="period">/月</span>
+            </div>
+            <div class="plan-target">ヘビーユーザー・上級者向け</div>
+            <ul class="plan-features">
+              <li>月1,500回のプレミアムリクエスト</li>
+              <li>全モデルへのアクセス</li>
+              <li>Claude Opus 4.6・o3・GPT-5.4対応</li>
+              <li>Copilot CLI（GA版）</li>
+              <li>最大限の柔軟性</li>
+            </ul>
+            <span class="tag beta" style="margin-top: 12px; display: inline-block">POWER</span>
+          </div>
+          <div class="plan-card">
+            <div class="plan-name">Business</div>
+            <div class="plan-price">
+              <span class="currency">$</span>19<span class="period">/ユーザー/月</span>
+            </div>
+            <div class="plan-target">チーム・中小組織向け</div>
+            <ul class="plan-features">
+              <li>組織全体の一元管理</li>
+              <li>ポリシー制御・監査ログ</li>
+              <li>IP補償（著作権保護）</li>
+              <li>SAML SSO対応</li>
+            </ul>
+            <span class="tag pro" style="margin-top: 12px; display: inline-block">TEAM</span>
+          </div>
+          <div class="plan-card">
+            <div class="plan-name">Enterprise</div>
+            <div class="plan-price">
+              <span class="currency">$</span>39<span class="period">/ユーザー/月</span>
+            </div>
+            <div class="plan-target">大企業・コンプライアンス重視</div>
+            <ul class="plan-features">
+              <li>ナレッジベース機能</li>
+              <li>カスタムモデル訓練</li>
+              <li>GitHub.com Chat統合</li>
+              <li>Copilot CLI（GA版）</li>
+              <li>GitHub Spark統合</li>
+              <li>月1,000プレミアムリクエスト</li>
+            </ul>
+            <span class="tag new" style="margin-top: 12px; display: inline-block">ENTERPRISE</span>
+          </div>
+        </div>
+
+        <div class="alert-box info" style="margin-top: 16px; font-size: 0.875rem">
+          <span class="alert-icon">📅</span>
+          <div class="alert-content">
+            <strong>最終更新:</strong> 2026年3月<br />
+            <strong>参考:</strong>
+            <a href="https://github.com/features/copilot/plans" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: underline">GitHub Copilot Plans & Pricing</a>,
+            <a href="https://docs.github.com/en/copilot/get-started/plans" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: underline">Plans for GitHub Copilot - GitHub Docs</a>
+          </div>
+        </div>
+
+        <div class="alert-box warning" style="margin-top: 24px">
+          <span class="alert-icon">⚠️</span>
+          <div class="alert-content">
+            <strong>重要：</strong> EnterpriseプランはGitHub Enterprise
+            Cloud（$21/ユーザー/月）が前提条件です。合計コストは<strong>$60/ユーザー/月</strong>になります。<br />
+            学生・教師・オープンソースメンテナはProプランが<strong>無料</strong>で利用できます。GitHub
+            Student Developer Packを確認してください。
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ 03: SETUP ═══ -->
+      <section class="section" id="setup">
+        <div class="section-header">
+          <span class="section-number">03</span>
+          <div>
+            <h2 class="section-title">ステップバイステップ<span>セットアップ</span></h2>
+            <p class="section-desc">VS Codeを例にした導入手順です。10分で完了できます</p>
+          </div>
+        </div>
+
+        <div class="steps-list">
+          <div class="step">
+            <div class="step-num">01</div>
+            <div class="step-content">
+              <div class="step-title">GitHubアカウントの準備</div>
+              <div class="step-body">
+                <a href="https://github.com" style="color: var(--accent-cyan)">github.com</a>
+                にアクセスしてアカウントを作成（既存アカウントでも可）。
+                プランを選択します。初めての方は<strong>Copilot Free</strong
+                >からスタートがおすすめです。
+              </div>
+              <ul class="step-sub">
+                <li>github.com → Settings → Copilot → 有効化</li>
+                <li>学生の方はGitHub Student Developer Pack（無料Pro）を申請</li>
+                <li>Proプランの30日間無料トライアルも活用可能</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">02</div>
+            <div class="step-content">
+              <div class="step-title">VS Code拡張機能のインストール</div>
+              <div class="step-body">
+                VS Codeを開き、拡張機能マーケットプレイスから「GitHub
+                Copilot」を検索してインストールします。
+              </div>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">TERMINAL</span>
+                  <div class="code-dots"><span></span><span></span><span></span></div>
+                </div>
+                <pre><span class="cmt"># VS Code コマンドパレットから実行（Ctrl/Cmd + P）</span>
+ext install GitHub.copilot
+ext install GitHub.copilot-chat
+
+<span class="cmt"># または コマンドラインから</span>
+code --install-extension GitHub.copilot
+code --install-extension GitHub.copilot-chat</pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">03</div>
+            <div class="step-content">
+              <div class="step-title">GitHubアカウントでサインイン</div>
+              <div class="step-body">
+                VS Code左下のアカウントアイコン、またはコマンドパレットから「GitHub Copilot: Sign in
+                to GitHub」を実行。ブラウザでOAuth認証を完了します。
+              </div>
+              <ul class="step-sub">
+                <li>Ctrl/Cmd + Shift + P → "GitHub Copilot: Sign in"</li>
+                <li>ブラウザが開くのでGitHubアカウントで承認</li>
+                <li>認証後、エディタに戻ると右下にCopilotアイコンが表示</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">04</div>
+            <div class="step-content">
+              <div class="step-title">動作確認 — はじめてのコード補完</div>
+              <div class="step-body">
+                Pythonファイルを作成し、コメントを書いてTabキーを押すと補完が表示されます。
+              </div>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">PYTHON — hello_copilot.py</span>
+                  <div class="code-dots"><span></span><span></span><span></span></div>
+                </div>
+                <pre><span class="cmt"># フィボナッチ数列を返す関数を作成する</span>
+<span class="kw">def</span> <span class="fn">fibonacci</span>(n: <span class="fn">int</span>) -&gt; <span class="fn">list</span>[<span class="fn">int</span>]:
+    <span class="cmt"># ↑ ここでTabを押すとCopilotが補完してくれます！</span>
+    result = [<span class="num">0</span>, <span class="num">1</span>]
+    <span class="kw">while</span> <span class="fn">len</span>(result) &lt; n:
+        result.append(result[<span class="op">-</span><span class="num">1</span>] <span class="op">+</span> result[<span class="op">-</span><span class="num">2</span>])
+    <span class="kw">return</span> result[<span class="op">:</span>n]</pre>
+              </div>
+              <div class="alert-box success" style="margin-top: 12px">
+                <span class="alert-icon">✅</span>
+                <div class="alert-content">
+                  補完を<strong>受け入れる</strong>：Tab キー　　　<strong>却下する</strong>：Esc
+                  キー　　　<strong>次の候補</strong>：Alt+] / Option+]
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">05</div>
+            <div class="step-content">
+              <div class="step-title">Copilot Chatを使ってみる</div>
+              <div class="step-body">
+                サイドバーのCopilotアイコンをクリック、またはCtrl/Cmd+Shift+Iでチャット画面を開きます。
+              </div>
+              <ul class="step-sub">
+                <li><code>/explain</code> — 選択したコードを日本語で説明してもらう</li>
+                <li><code>/fix</code> — バグを自動修正してもらう</li>
+                <li><code>/tests</code> — 単体テストを自動生成</li>
+                <li><code>/doc</code> — ドキュメントコメントを自動生成</li>
+                <li><code>@workspace</code> — プロジェクト全体を参照して質問</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">06</div>
+            <div class="step-content">
+              <div class="step-title">カスタム指示ファイルの設定（推奨）</div>
+              <div class="step-body">
+                プロジェクトルートに
+                <code>.github/copilot-instructions.md</code>
+                を作成すると、Copilotにプロジェクト固有の指示を与えられます。
+              </div>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">.github/copilot-instructions.md</span>
+                  <div class="code-dots"><span></span><span></span><span></span></div>
+                </div>
+                <pre><span class="cmt">## ビルドコマンド</span>
+<span class="op">-</span> `npm run build` - プロジェクトをビルド
+<span class="op">-</span> `npm run test` - テストを実行
+<span class="op">-</span> `npm run lint:fix` - Lint自動修正
+
+<span class="cmt">## コードスタイル</span>
+<span class="op">-</span> TypeScript strict modeを使用
+<span class="op">-</span> 関数コンポーネントをクラスより優先
+<span class="op">-</span> 公開APIには必ずJSDocコメントを付与
+
+<span class="cmt">## ワークフロー</span>
+<span class="op">-</span> コミットはConventional Commits形式
+<span class="op">-</span> ブランチはmainから作成</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ 04: PROMPTING ═══ -->
+      <section class="section" id="prompting">
+        <div class="section-header">
+          <span class="section-number">04</span>
+          <div>
+            <h2 class="section-title">効果的な<span>プロンプト技術</span></h2>
+            <p class="section-desc">
+              AIへの指示の質がアウトプットの質を決定します。良い例と悪い例を比較しましょう
+            </p>
+          </div>
+        </div>
+
+        <div class="alert-box info" style="margin-bottom: 28px">
+          <span class="alert-icon">💡</span>
+          <div class="alert-content">
+            <strong>プロンプトエンジニアリングの3原則：</strong>
+            ①タスクを細分化する　②要件を具体的に書く　③入出力の例を示す
+          </div>
+        </div>
+
+        <h3
+          style="
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            letter-spacing: 0.05em;
+          "
+        >
+          // BAD vs GOOD — プロンプト比較
+        </h3>
+
+        <div class="prompt-grid">
+          <div class="prompt-box bad">
+            <div class="prompt-box-label">❌ BAD — 漠然とした指示</div>
+            <div class="prompt-text">ユーザー認証を作って</div>
+          </div>
+          <div class="prompt-box good">
+            <div class="prompt-box-label">✅ GOOD — 具体的な指示</div>
+            <div class="prompt-text">
+              Next.js 14 + TypeScriptで、メールとパスワードによるJWT認証を実装して。 -
+              bcryptでパスワードハッシュ化 - accessToken (15分) / refreshToken (7日) の2トークン方式
+              - エラーはカスタムエラークラスで返す - Zodでバリデーション
+              型定義とユニットテストも含めて
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-grid" style="margin-top: 16px">
+          <div class="prompt-box bad">
+            <div class="prompt-box-label">❌ BAD — コンテキスト不足</div>
+            <div class="prompt-text">このコードのバグを直して</div>
+          </div>
+          <div class="prompt-box good">
+            <div class="prompt-box-label">✅ GOOD — コンテキスト付き</div>
+            <div class="prompt-text">
+              @workspace の src/api/users.ts、135行目でTypeErrorが発生しています。 「Cannot read
+              properties of undefined (reading 'id')」というエラーです。 ユーザーが存在しない場合の
+              null チェックが漏れていると思います。
+              修正案と、同様のパターンが他にないか確認してください
+            </div>
+          </div>
+        </div>
+
+        <div class="divider" style="margin: 32px 0"></div>
+
+        <h3
+          style="
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            letter-spacing: 0.05em;
+          "
+        >
+          // スラッシュコマンド チートシート
+        </h3>
+
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-title"><code>/explain</code></div>
+            <div class="card-body">
+              選択したコードの動作を詳細に説明します。チームへの共有や自分の理解確認に最適。
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title"><code>/fix</code></div>
+            <div class="card-body">
+              バグや問題を検出して修正案を提示。エラーメッセージと一緒に使うと精度が上がります。
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title"><code>/tests</code></div>
+            <div class="card-body">
+              Jest・Vitest等でユニットテストを自動生成。エッジケースも考慮したテストコードが得られます。
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title"><code>/doc</code></div>
+            <div class="card-body">
+              JSDoc・Docstring等のドキュメントコメントを生成。API仕様書の自動化に役立ちます。
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title"><code>@workspace</code></div>
+            <div class="card-body">
+              プロジェクト全体のファイルを参照して回答。「このプロジェクトで〇〇を実装するには？」という質問に対応。
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title"><code>@terminal</code></div>
+            <div class="card-body">
+              ターミナルの出力内容やエラーを参照して助言。シェルコマンドの問題解決に便利です。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ 05: FEATURES ═══ -->
+      <section class="section" id="features">
+        <div class="section-header">
+          <span class="section-number">05</span>
+          <div>
+            <h2 class="section-title">2026年の<span>主要機能</span></h2>
+            <p class="section-desc">最新バージョンで追加された強力な機能を活用しましょう</p>
+          </div>
+        </div>
+
+        <div class="steps-list">
+          <div class="step">
+            <div class="step-num">🤖</div>
+            <div class="step-content">
+              <div class="step-title">エージェントモード <span class="tag new">NEW</span></div>
+              <div class="step-body">
+                自律的に複数ファイルを横断して編集・テスト実行・バグ修正まで行う高度な自動化機能。
+                「ユーザー認証モジュールを実装して」と指示するだけで、ファイル作成からテストまで一括実行します。
+              </div>
+              <ul class="step-sub">
+                <li>複数ファイルの同時編集が可能</li>
+                <li>テスト実行結果を見てコードを自動修正</li>
+                <li>プレミアムリクエストを複数消費する点に注意</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">📋</div>
+            <div class="step-content">
+              <div class="step-title">
+                プランモード（Plan Mode） <span class="tag new">2026</span>
+              </div>
+              <div class="step-body">
+                コードを書く前に実装計画を作成し、承認後に実装を進める機能。Chat UI で Plan エージェントを選択するか、/plan コマンドで起動。
+                複雑な機能実装前に計画をレビューできるため、手戻りを大幅に削減できます。
+              </div>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">COPILOT CHAT — Plan Mode</span>
+                  <div class="code-dots"><span></span><span></span><span></span></div>
+                </div>
+                <pre><span class="cmt"># Chat UI で Plan エージェントを選択、または /plan と入力</span>
+<span class="str">OAuth2認証（Google・GitHubプロバイダー）を実装して</span>
+
+<span class="cmt"># Copilotが以下のような計画を作成してくれます：</span>
+<span class="kw">## 実装計画: OAuth2認証</span>
+<span class="op">-</span> [ ] NextAuth.jsのインストールと設定
+<span class="op">-</span> [ ] Google OAuth設定ファイル作成
+<span class="op">-</span> [ ] GitHubプロバイダー設定
+<span class="op">-</span> [ ] コールバックルート実装
+<span class="op">-</span> [ ] セッション管理の設定
+<span class="cmt"># → 承認後に実装開始（Chat UI でプランを編集・承認可能）</span></pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">🔍</div>
+            <div class="step-content">
+              <div class="step-title">
+                コードレビューエージェント <span class="tag new">2026</span>
+              </div>
+              <div class="step-body">
+                Pull
+                Requestに対して自動でコードレビューを行うエージェント。セキュリティ問題・バグ・コードスタイルの問題を自動検出して指摘します。
+              </div>
+              <ul class="step-sub">
+                <li>GitHub PR上で直接レビューコメントを生成</li>
+                <li>GitHub Advanced Securityとの連携でセキュリティスキャン</li>
+                <li>コーディング規約違反の自動検出</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">🔌</div>
+            <div class="step-content">
+              <div class="step-title">
+                MCPサポート（Model Context Protocol） <span class="tag new">2026</span>
+              </div>
+              <div class="step-body">
+                外部ツール（Asana、Jira、Figma等）とCopilotを直接連携できる新しいプロトコル。
+                Copilot CLIのGitHub MCP serverでは、Copilot Spacesのツールも含まれています。
+              </div>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">.vscode/mcp.json — MCP設定例</span>
+                  <div class="code-dots"><span></span><span></span><span></span></div>
+                </div>
+                <pre>{
+  <span class="str">"servers"</span>: {
+    <span class="str">"github"</span>: {
+      <span class="str">"type"</span>: <span class="str">"http"</span>,
+      <span class="str">"url"</span>: <span class="str">"https://api.githubcopilot.com/mcp/"</span>,
+      <span class="str">"headers"</span>: {
+        <span class="str">"X-MCP-Toolsets"</span>: <span class="str">"default,copilot_spaces"</span>
+      }
+    }
+  }
+}</pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">💾</div>
+            <div class="step-content">
+              <div class="step-title">
+                Copilot Spaces（コンテキスト管理） <span class="tag new">2026</span>
+              </div>
+              <div class="step-body">
+                プロジェクト固有のコンテキストを記憶・参照する機能。コードベースの知識を蓄積し、より的確な提案を生成します。
+              </div>
+              <ul class="step-sub">
+                <li>リポジトリを横断した知識ベースの構築</li>
+                <li>クロスエージェントメモリ：CLI・IDE・コードレビュー間で学習を共有</li>
+                <li>Enterpriseプランではカスタムファインチューニングモデルも利用可能</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ 06: BEST PRACTICES ═══ -->
+      <section class="section" id="tips">
+        <div class="section-header">
+          <span class="section-number">06</span>
+          <div>
+            <h2 class="section-title">10の<span>ベストプラクティス</span></h2>
+            <p class="section-desc">
+              GitHub公式ドキュメントと現場エンジニアの知見を集約した実践的なガイドライン
+            </p>
+          </div>
+        </div>
+
+        <div class="accordion-item open">
+          <button type="button" class="accordion-header" aria-expanded="true" aria-controls="accordion-panel-1" onclick="toggleAccordion(this)">
+            <span class="accordion-icon">📂</span>
+            <span><strong>01.</strong> 関連ファイルを開き、不要なファイルを閉じる</span>
+            <span class="accordion-arrow">▼</span>
+          </button>
+          <div class="accordion-body" id="accordion-panel-1">
+            Copilotは現在エディタで開いているファイルをコンテキストとして利用します。
+            <strong>実装対象のファイルと関連する型定義・テストファイルだけを開く</strong
+            >ことで、より正確な補完が得られます。
+            逆に無関係なファイルが大量に開いているとコンテキストが汚染されます。
+            <div class="alert-box info" style="margin-top: 12px">
+              <span class="alert-icon">💡</span>
+              <div class="alert-content">
+                VS Codeの「エクスプローラー → タブ管理」で不要なファイルを整理しましょう
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button type="button" class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-2" onclick="toggleAccordion(this)">
+            <span class="accordion-icon">📝</span>
+            <span><strong>02.</strong> 具体的なコメントでコンテキストを提供する</span>
+            <span class="accordion-arrow">▼</span>
+          </button>
+          <div class="accordion-body" id="accordion-panel-2">
+            コードを書く前に、意図を説明するコメントを先に書くと、Copilotの補完精度が劇的に向上します。
+            「何をするか」だけでなく「なぜそうするか」「どんな制約があるか」も書くとさらに効果的です。
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">EXAMPLE</span>
+                <div class="code-dots"><span></span><span></span><span></span></div>
+              </div>
+              <pre><span class="cmt">/**
+ * レート制限付きAPIクライアント
+ * - 1分間に最大100リクエスト
+ * - 指数バックオフで自動リトライ（最大3回）
+ * - タイムアウトは10秒
+ * - エラー時はカスタムAPIErrorをthrow
+ */</span>
+<span class="kw">class</span> <span class="fn">RateLimitedApiClient</span> {</pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button type="button" class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-3" onclick="toggleAccordion(this)">
+            <span class="accordion-icon">🧩</span>
+            <span><strong>03.</strong> タスクを小さな単位に分解する</span>
+            <span class="accordion-arrow">▼</span>
+          </button>
+          <div class="accordion-body" id="accordion-panel-3">
+            「ECサイト全体を作って」ではなく「商品一覧APIを作って」→「カート機能を追加して」→「決済フローを実装して」と
+            <strong>小さなステップに分解</strong>することでCopilotの精度が大幅に向上します。
+            複雑なタスクほどプランモードを活用して計画を立てましょう。
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button type="button" class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-4" onclick="toggleAccordion(this)">
+            <span class="accordion-icon">✅</span>
+            <span><strong>04.</strong> 提案コードを必ず理解してから採用する</span>
+            <span class="accordion-arrow">▼</span>
+          </button>
+          <div class="accordion-body" id="accordion-panel-4">
+            Copilotは強力なツールですが<strong>間違いを犯すことがあります</strong>。
+            提案されたコードを「なぜこのロジックになっているか」を自分で理解してから採用することが必須です。
+            特に、セキュリティに関わる部分（認証・暗号化・SQL）は細心の注意を払いましょう。
+            <div class="alert-box warning" style="margin-top: 12px">
+              <span class="alert-icon">⚠️</span>
+              <div class="alert-content">
+                Copilotは「コパイロット（副操縦士）」です。「オートパイロット（自動操縦）」ではありません。最終判断は常にあなたが行います。
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button type="button" class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-5" onclick="toggleAccordion(this)">
+            <span class="accordion-icon">🎯</span>
+            <span><strong>05.</strong> ペルソナを設定してChat品質を上げる</span>
+            <span class="accordion-arrow">▼</span>
+          </button>
+          <div class="accordion-body" id="accordion-panel-5">
+            Chatに「あなたはコード品質と可読性を重視するシニアTypeScriptエンジニアです」などのペルソナを設定すると、
+            より専門的な視点からのレビューや提案が得られます。
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">CHAT PROMPT</span>
+                <div class="code-dots"><span></span><span></span><span></span></div>
+              </div>
+              <pre><span class="str">あなたはGolangのパフォーマンス最適化を専門とする
+シニアバックエンドエンジニアです。
+以下のコードのボトルネックを分析して改善案を提示してください...</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button type="button" class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-6" onclick="toggleAccordion(this)">
+            <span class="accordion-icon">🔄</span>
+            <span><strong>06.</strong> TDD（テスト駆動開発）と組み合わせる</span>
+            <span class="accordion-arrow">▼</span>
+          </button>
+          <div class="accordion-body" id="accordion-panel-6">
+            テストを先に書き、Copilotにテストを通す実装を生成させるTDDワークフローは非常に効果的です。
+            テストがあることでCopilotが生成したコードの品質を自動検証できます。
+            <code>/tests</code>コマンドでテストを先生成し、その後実装を書くアプローチも有効です。
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button type="button" class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-7" onclick="toggleAccordion(this)">
+            <span class="accordion-icon">📚</span>
+            <span><strong>07.</strong> copilot-instructions.mdを活用する</span>
+            <span class="accordion-arrow">▼</span>
+          </button>
+          <div class="accordion-body" id="accordion-panel-7">
+            プロジェクト固有のルール（コーディング規約・ライブラリ選定・命名規則）を
+            <code>.github/copilot-instructions.md</code>に記述することで、
+            チーム全員が一貫した品質のコードをCopilotから得られます。
+            指示は<strong>簡潔・具体的</strong>に書くことが重要です。長すぎると効果が薄れます。
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button type="button" class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-8" onclick="toggleAccordion(this)">
+            <span class="accordion-icon">🌐</span>
+            <span><strong>08.</strong> コンテキストウィンドウを意識する</span>
+            <span class="accordion-arrow">▼</span>
+          </button>
+          <div class="accordion-body" id="accordion-panel-8">
+            Copilot CLIではトークン上限の95%に近づくと自動圧縮（Auto-compaction）が発動します。
+            長いセッションでは重要な文脈が失われることがあります。
+            複雑なタスクでは<strong>定期的に新しいチャットセッションを始める</strong>か、
+            重要なコンテキストを<code>copilot-instructions.md</code>に記録しておきましょう。
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button type="button" class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-9" onclick="toggleAccordion(this)">
+            <span class="accordion-icon">🚀</span>
+            <span><strong>09.</strong> WRAPフレームワークで効果的なIssueを書く</span>
+            <span class="accordion-arrow">▼</span>
+          </button>
+          <div class="accordion-body" id="accordion-panel-9">
+            GitHub Copilotエージェントが最も効果を発揮するのは、明確に記述されたIssueです。
+            GitHub公式が推奨する<strong>WRAPフレームワーク</strong>を活用しましょう：
+            <div class="cards-grid" style="margin-top: 14px; grid-template-columns: repeat(2, 1fr)">
+              <div class="card" style="padding: 16px">
+                <div class="card-title" style="color: var(--accent-cyan)">W — What (何を)</div>
+                <div class="card-body">達成したいことを具体的に書く</div>
+              </div>
+              <div class="card" style="padding: 16px">
+                <div class="card-title" style="color: var(--accent-cyan)">R — Reason (なぜ)</div>
+                <div class="card-body">背景・理由・ユーザーへの影響を書く</div>
+              </div>
+              <div class="card" style="padding: 16px">
+                <div class="card-title" style="color: var(--accent-cyan)">
+                  A — Acceptance (完了条件)
+                </div>
+                <div class="card-body">どうなれば完了か明確にする</div>
+              </div>
+              <div class="card" style="padding: 16px">
+                <div class="card-title" style="color: var(--accent-cyan)">
+                  P — Prior Context (前提)
+                </div>
+                <div class="card-body">関連コード・制約・参考情報を添付</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button type="button" class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-10" onclick="toggleAccordion(this)">
+            <span class="accordion-icon">📊</span>
+            <span><strong>10.</strong> プレミアムリクエストの使用量を監視する</span>
+            <span class="accordion-arrow">▼</span>
+          </button>
+          <div class="accordion-body" id="accordion-panel-10">
+            Chat・エージェントモード・コードレビューはプレミアムリクエストを消費します。
+            上限を超えると<strong>$0.04/リクエスト</strong>の追加費用が発生します。
+            月ごとのリセットタイミング（1日UTC深夜）を把握し、 Settings → Copilot → Usage
+            で使用量を定期確認しましょう。
+            <div class="alert-box info" style="margin-top: 12px">
+              <span class="alert-icon">💡</span>
+              <div class="alert-content">
+                通常のコード補完（インライン補完）はプレミアムリクエストを消費しません（Freeプランを除く）
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ 07: SECURITY ═══ -->
+      <section class="section" id="security">
+        <div class="section-header">
+          <span class="section-number">07</span>
+          <div>
+            <h2 class="section-title">セキュリティと<span>注意事項</span></h2>
+            <p class="section-desc">AIが生成したコードを安全に活用するための必須知識</p>
+          </div>
+        </div>
+
+        <div class="cards-grid">
+          <div class="card">
+            <span class="card-icon">🔐</span>
+            <div class="card-title">脆弱なコードパターンを認識する</div>
+            <div class="card-body">
+              Copilotはハードコードされた認証情報、SQLインジェクション、パストラバーサルなど一般的な脆弱性をフィルタリングしますが、
+              <strong>すべての脆弱性を防げるわけではありません</strong
+              >。セキュリティ関連のコードは必ず手動レビューしてください。
+            </div>
+          </div>
+          <div class="card">
+            <span class="card-icon">📜</span>
+            <div class="card-title">著作権・ライセンス確認</div>
+            <div class="card-body">
+              Copilotはパブリックリポジトリのコードで学習しています。生成されたコードが既存のOSSコードに類似する可能性があります。
+              Business/EnterpriseプランのIP補償を活用しつつ、重要なコードは確認しましょう。
+            </div>
+          </div>
+          <div class="card">
+            <span class="card-icon">🏢</span>
+            <div class="card-title">機密情報をChatに貼らない</div>
+            <div class="card-body">
+              APIキー・パスワード・個人情報などの機密データをCopilot
+              Chatに直接貼り付けることは避けてください。
+              Enterpriseプランではデータ保護協定（DPA）により適切に管理されますが、基本的な慎重さが重要です。
+            </div>
+          </div>
+          <div class="card">
+            <span class="card-icon">🧪</span>
+            <div class="card-title">必ずテストを実行する</div>
+            <div class="card-body">
+              Copilotが生成したコードは、既存のテスト・コードスキャン・セキュリティテストなど
+              <strong>通常の品質管理プロセスをすべて通過させてください</strong
+              >。AI生成だからといって例外にしないこと。
+            </div>
+          </div>
+          <div class="card">
+            <span class="card-icon">⚙️</span>
+            <div class="card-title">除外ファイルを設定する</div>
+            <div class="card-body">
+              機密性の高いファイル（<code>.env</code>・設定ファイル・秘密鍵）はCopilotが参照しないよう
+              <code>.copilotignore</code
+              >またはOrganization設定で除外できます（Business/Enterpriseプラン）。
+            </div>
+          </div>
+          <div class="card">
+            <span class="card-icon">🔄</span>
+            <div class="card-title">古いAPIパターンに注意</div>
+            <div class="card-body">
+              Copilotの学習データには古いAPIやライブラリバージョンが含まれています。
+              生成されたコードが使用している外部ライブラリの最新バージョンと互換性があるか必ず確認しましょう。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ 08: MODELS ═══ -->
+      <section class="section" id="models">
+        <div class="section-header">
+          <span class="section-number">08</span>
+          <div>
+            <h2 class="section-title">AIモデル<span>選択ガイド</span></h2>
+            <p class="section-desc">
+              2026年のCopilotはマルチモデル対応。用途に応じた最適なモデルを選びましょう
+            </p>
+          </div>
+        </div>
+
+        <div class="alert-box info" style="margin-bottom: 24px">
+          <span class="alert-icon">ℹ️</span>
+          <div class="alert-content">
+            <strong>プレミアムリクエストと通常リクエストの違い：</strong><br />
+            高度なモデル（GPT-4.1, Claude
+            Opus等）を使用するChat/エージェントモードは「プレミアムリクエスト」を消費します。
+            インラインコード補完は通常消費しません。モデルによって1リクエストあたりの消費量が異なります。
+          </div>
+        </div>
+
+        <table class="model-table">
+          <thead>
+            <tr>
+              <th>モデル</th>
+              <th>特性</th>
+              <th>最適な用途</th>
+              <th>利用可能プラン</th>
+              <th>速度</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <span class="model-name">GPT-5.3-Codex</span><br /><span class="tag new">LTS標準</span>
+              </td>
+              <td>長期サポート（〜2027/2）。コーディング全般に優秀</td>
+              <td>日常的なコーディング補助・説明</td>
+              <td><span class="tag free">Free〜</span></td>
+              <td>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar" style="width: 85%"></div>
+                </div>
+                速い
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span class="model-name">GPT-4o mini</span><br /><span class="tag free">軽量</span>
+              </td>
+              <td>軽量・高速。プレミアムリクエスト消費が少ない</td>
+              <td>シンプルな質問・繰り返し作業</td>
+              <td><span class="tag free">Free〜</span></td>
+              <td>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar" style="width: 100%"></div>
+                </div>
+                最速
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span class="model-name">Claude Haiku 4.5</span><br /><span class="tag free">軽量</span>
+              </td>
+              <td>軽量・高速。Anthropic製の効率的モデル</td>
+              <td>シンプルな質問・繰り返し作業</td>
+              <td><span class="tag free">Free〜</span></td>
+              <td>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar" style="width: 95%"></div>
+                </div>
+                最速
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span class="model-name">Claude Sonnet 4.6</span><br /><span class="tag pro"
+                  >中〜上級</span
+                >
+              </td>
+              <td>コード品質・説明能力が高い。Anthropic製</td>
+              <td>コードレビュー・アーキテクチャ設計</td>
+              <td><span class="tag pro">Pro〜</span></td>
+              <td>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar" style="width: 75%"></div>
+                </div>
+                普通
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span class="model-name">Claude Opus 4.6</span><br /><span class="tag beta"
+                  >最上級</span
+                >
+              </td>
+              <td>最高品質の推論・複雑なロジック分析</td>
+              <td>難解なバグ解析・複雑な設計判断</td>
+              <td><span class="tag beta">Pro+のみ</span></td>
+              <td>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar" style="width: 40%"></div>
+                </div>
+                遅め
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span class="model-name">Gemini 2.5 Pro</span><br /><span class="tag new">GA</span>
+              </td>
+              <td>最新Gemini。強力な推論・コーディング能力。Google製</td>
+              <td>複雑なタスク・数学・科学的処理</td>
+              <td><span class="tag pro">Pro〜</span></td>
+              <td>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar" style="width: 60%"></div>
+                </div>
+                普通
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span class="model-name">Gemini 3 Pro</span><br /><span class="tag beta">Preview</span>
+              </td>
+              <td>次世代Gemini（プレビュー版）。Google製</td>
+              <td>最先端の推論・コーディング</td>
+              <td><span class="tag beta">Pro+〜</span></td>
+              <td>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar" style="width: 55%"></div>
+                </div>
+                普通〜遅
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span class="model-name">Grok Code Fast 1</span><br /><span class="tag new">高速</span>
+              </td>
+              <td>xAI製。高速コーディング特化。データ保持なし</td>
+              <td>迅速なコード生成・反復開発</td>
+              <td><span class="tag free">Free〜</span></td>
+              <td>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar" style="width: 90%"></div>
+                </div>
+                高速
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span class="model-name">Raptor mini</span><br /><span class="tag beta">Preview</span>
+              </td>
+              <td>超軽量プレビューモデル。制限なし使用可</td>
+              <td>実験的用途・頻繁な問い合わせ</td>
+              <td><span class="tag free">Free〜</span></td>
+              <td>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar" style="width: 100%"></div>
+                </div>
+                最速
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="alert-box info" style="margin-top: 16px; font-size: 0.875rem">
+          <span class="alert-icon">📅</span>
+          <div class="alert-content">
+            <strong>最終更新:</strong> 2026年3月<br />
+            <strong>参考:</strong>
+            <a href="https://docs.github.com/en/copilot/reference/ai-models/supported-models" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: underline">Supported AI models - GitHub Docs</a>,
+            <a href="https://github.blog/changelog/2026-03-18-gpt-5-3-codex-long-term-support-in-github-copilot/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: underline">GPT-5.3-Codex LTS - GitHub Changelog</a>
+          </div>
+        </div>
+
+        <div class="alert-box success" style="margin-top: 20px">
+          <span class="alert-icon">💡</span>
+          <div class="alert-content">
+            <strong>モデル選択の基本戦略：</strong>
+            日常のコーディングはGPT-4.1、複雑なアーキテクチャ設計はClaude Sonnet、
+            難解なバグや高度な推論が必要な場合のみOpus/o3を使用することで、プレミアムリクエストを効率的に使えます。
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ 09: CHECKLIST ═══ -->
+      <section class="section" id="checklist">
+        <div class="section-header">
+          <span class="section-number">09</span>
+          <div>
+            <h2 class="section-title">導入<span>チェックリスト</span></h2>
+            <p class="section-desc">
+              Copilotを最大限活用するための確認項目。クリックでチェックできます
+            </p>
+          </div>
+        </div>
+
+        <h3
+          style="
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--accent-cyan);
+            margin-bottom: 12px;
+            letter-spacing: 0.08em;
+          "
+        >
+          // 初期セットアップ
+        </h3>
+        <div class="checklist" id="checklist-setup">
+          <label class="check-item"
+            ><input type="checkbox" onchange="toggleCheck(this)" />
+            <span>GitHubアカウントを作成し、Copilotプランを有効化した</span></label
+          >
+          <label class="check-item"
+            ><input type="checkbox" onchange="toggleCheck(this)" />
+            <span
+              >VS Code（またはJetBrains等）にGitHub Copilot拡張機能をインストールした</span
+            ></label
+          >
+          <label class="check-item"
+            ><input type="checkbox" onchange="toggleCheck(this)" />
+            <span>Copilot Chat拡張機能もインストールし、動作確認した</span></label
+          >
+          <label class="check-item"
+            ><input type="checkbox" onchange="toggleCheck(this)" />
+            <span>プロジェクトに .github/copilot-instructions.md を作成した</span></label
+          >
+          <label class="check-item"
+            ><input type="checkbox" onchange="toggleCheck(this)" />
+            <span>学生・教師の場合、GitHub Educationの無料プランを申請した</span></label
+          >
+        </div>
+
+        <h3
+          style="
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--accent-cyan);
+            margin: 24px 0 12px;
+            letter-spacing: 0.08em;
+          "
+        >
+          // 日常的な活用習慣
+        </h3>
+        <div class="checklist">
+          <label class="check-item"
+            ><input type="checkbox" onchange="toggleCheck(this)" />
+            <span>コードを書く前に意図を説明するコメントを先に書く習慣を身につけた</span></label
+          >
+          <label class="check-item"
+            ><input type="checkbox" onchange="toggleCheck(this)" />
+            <span>Copilotの提案を採用する前に必ず理解・レビューしている</span></label
+          >
+          <label class="check-item"
+            ><input type="checkbox" onchange="toggleCheck(this)" />
+            <span>/explain, /fix, /tests などのスラッシュコマンドを使いこなしている</span></label
+          >
+          <label class="check-item"
+            ><input type="checkbox" onchange="toggleCheck(this)" />
+            <span>複雑な実装ではプランモード（/plan または Plan エージェント選択）を使って計画を立てている</span></label
+          >
+          <label class="check-item"
+            ><input type="checkbox" onchange="toggleCheck(this)" />
+            <span>月のプレミアムリクエスト使用量を定期的に確認している</span></label
+          >
+        </div>
+
+        <h3
+          style="
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--accent-cyan);
+            margin: 24px 0 12px;
+            letter-spacing: 0.08em;
+          "
+        >
+          // セキュリティ・品質
+        </h3>
+        <div class="checklist">
+          <label class="check-item"
+            ><input type="checkbox" onchange="toggleCheck(this)" />
+            <span>APIキー・パスワード等の機密情報をChatに貼り付けていない</span></label
+          >
+          <label class="check-item"
+            ><input type="checkbox" onchange="toggleCheck(this)" />
+            <span>生成されたコードに対して既存のテスト・Lintを必ず実行している</span></label
+          >
+          <label class="check-item"
+            ><input type="checkbox" onchange="toggleCheck(this)" />
+            <span>セキュリティ関連コード（認証・暗号化・DB操作）は手動レビューしている</span></label
+          >
+          <label class="check-item"
+            ><input type="checkbox" onchange="toggleCheck(this)" />
+            <span>必要に応じて .copilotignore で機密ファイルを除外設定した</span></label
+          >
+        </div>
+      </section>
+
+      <!-- ═══ 10: SOURCES ═══ -->
+      <section class="section" id="sources">
+        <div class="section-header">
+          <span class="section-number">10</span>
+          <div>
+            <h2 class="section-title">参考<span>ソース一覧</span></h2>
+            <p class="section-desc">
+              本ガイドの根拠となる公式ドキュメントおよび最新情報ソース（2026年3月時点）
+            </p>
+          </div>
+        </div>
+
+        <h3
+          style="
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--accent-cyan);
+            margin-bottom: 14px;
+            letter-spacing: 0.08em;
+          "
+        >
+          // 公式ドキュメント
+        </h3>
+        <div class="source-list">
+          <a
+            class="source-item"
+            href="https://docs.github.com/en/copilot/get-started/best-practices"
+            target="_blank" rel="noopener noreferrer"
+          >
+            <span class="source-icon">📖</span>
+            <div class="source-info">
+              <span class="source-title">GitHub Copilot ベストプラクティス（公式）</span>
+              <span class="source-url">docs.github.com/en/copilot/get-started/best-practices</span>
+            </div>
+            <span class="source-badge">GitHub Docs</span>
+          </a>
+          <a
+            class="source-item"
+            href="https://docs.github.com/en/copilot/get-started/plans"
+            target="_blank" rel="noopener noreferrer"
+          >
+            <span class="source-icon">💳</span>
+            <div class="source-info">
+              <span class="source-title">GitHub Copilot プラン一覧（公式）</span>
+              <span class="source-url">docs.github.com/en/copilot/get-started/plans</span>
+            </div>
+            <span class="source-badge">GitHub Docs</span>
+          </a>
+          <a
+            class="source-item"
+            href="https://docs.github.com/en/copilot/how-tos/copilot-cli/cli-best-practices"
+            target="_blank" rel="noopener noreferrer"
+          >
+            <span class="source-icon">💻</span>
+            <div class="source-info">
+              <span class="source-title">GitHub Copilot CLI ベストプラクティス（公式）</span>
+              <span class="source-url"
+                >docs.github.com/en/copilot/how-tos/copilot-cli/cli-best-practices</span
+              >
+            </div>
+            <span class="source-badge">GitHub Docs</span>
+          </a>
+          <a class="source-item" href="https://github.com/features/copilot" target="_blank" rel="noopener noreferrer">
+            <span class="source-icon">🚀</span>
+            <div class="source-info">
+              <span class="source-title">GitHub Copilot 公式フィーチャーページ</span>
+              <span class="source-url">github.com/features/copilot</span>
+            </div>
+            <span class="source-badge">GitHub.com</span>
+          </a>
+          <a class="source-item" href="https://github.com/features/copilot/plans" target="_blank" rel="noopener noreferrer">
+            <span class="source-icon">💰</span>
+            <div class="source-info">
+              <span class="source-title">GitHub Copilot 料金プランページ</span>
+              <span class="source-url">github.com/features/copilot/plans</span>
+            </div>
+            <span class="source-badge">GitHub.com</span>
+          </a>
+          <a
+            class="source-item"
+            href="https://github.com/features/copilot/whats-new"
+            target="_blank" rel="noopener noreferrer"
+          >
+            <span class="source-icon">🆕</span>
+            <div class="source-info">
+              <span class="source-title">GitHub Copilot 新機能ページ</span>
+              <span class="source-url">github.com/features/copilot/whats-new</span>
+            </div>
+            <span class="source-badge">GitHub.com</span>
+          </a>
+        </div>
+
+        <h3
+          style="
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--accent-cyan);
+            margin: 24px 0 14px;
+            letter-spacing: 0.08em;
+          "
+        >
+          // GitHub Blog & Changelog
+        </h3>
+        <div class="source-list">
+          <a
+            class="source-item"
+            href="https://github.blog/ai-and-ml/github-copilot/"
+            target="_blank" rel="noopener noreferrer"
+          >
+            <span class="source-icon">📝</span>
+            <div class="source-info">
+              <span class="source-title">GitHub Blog — AI & Copilot 技術ガイド</span>
+              <span class="source-url">github.blog/ai-and-ml/github-copilot/</span>
+            </div>
+            <span class="source-badge">Blog</span>
+          </a>
+          <a
+            class="source-item"
+            href="https://github.blog/changelog/2026-01-14-github-copilot-cli-enhanced-agents-context-management-and-new-ways-to-install/"
+            target="_blank" rel="noopener noreferrer"
+          >
+            <span class="source-icon">📋</span>
+            <div class="source-info">
+              <span class="source-title"
+                >Copilot CLI 強化: エージェント・コンテキスト管理（2026年1月）</span
+              >
+              <span class="source-url">github.blog/changelog/2026-01-14-...</span>
+            </div>
+            <span class="source-badge">Changelog</span>
+          </a>
+          <a class="source-item" href="https://github.com/github/awesome-copilot" target="_blank" rel="noopener noreferrer">
+            <span class="source-icon">⭐</span>
+            <div class="source-info">
+              <span class="source-title">Awesome Copilot — コミュニティ作成の設定集</span>
+              <span class="source-url">github.com/github/awesome-copilot</span>
+            </div>
+            <span class="source-badge">GitHub</span>
+          </a>
+        </div>
+
+        <h3
+          style="
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--accent-cyan);
+            margin: 24px 0 14px;
+            letter-spacing: 0.08em;
+          "
+        >
+          // 料金・比較情報
+        </h3>
+        <div class="source-list">
+          <a
+            class="source-item"
+            href="https://docs.github.com/en/copilot/concepts/billing/billing-for-individuals"
+            target="_blank" rel="noopener noreferrer"
+          >
+            <span class="source-icon">📊</span>
+            <div class="source-info">
+              <span class="source-title">個人向けCopilot課金の詳細（公式）</span>
+              <span class="source-url"
+                >docs.github.com/en/copilot/concepts/billing/billing-for-individuals</span
+              >
+            </div>
+            <span class="source-badge">GitHub Docs</span>
+          </a>
+          <a
+            class="source-item"
+            href="https://docs.github.com/en/copilot/concepts/billing/organizations-and-enterprises"
+            target="_blank" rel="noopener noreferrer"
+          >
+            <span class="source-icon">🏢</span>
+            <div class="source-info">
+              <span class="source-title">組織・Enterprise向けCopilot課金の詳細（公式）</span>
+              <span class="source-url"
+                >docs.github.com/en/copilot/concepts/billing/organizations-and-enterprises</span
+              >
+            </div>
+            <span class="source-badge">GitHub Docs</span>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <!-- ═══════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════ -->
+    <footer>
+      <p>// GitHub Copilot 完全ベストプラクティスガイド</p>
+      <p style="margin-top: 8px; color: var(--text-muted)">
+        Last updated: <span style="color: var(--accent-cyan)">March 2026</span> &nbsp;|&nbsp;
+        Sources: <a href="https://docs.github.com/en/copilot" target="_blank" rel="noopener noreferrer">GitHub Docs</a> &amp;
+        <a href="https://github.blog/ai-and-ml/github-copilot/" target="_blank" rel="noopener noreferrer">GitHub Blog</a>
+      </p>
+      <p style="margin-top: 12px; font-size: 0.7rem; color: var(--text-muted)">
+        ※ 本ガイドの情報は2026年3月時点のものです。最新情報は公式ドキュメントをご確認ください。
+      </p>
+    </footer>
+
+    <script>
+      // ─── Accordion Toggle ───
+      function toggleAccordion(button) {
+        const item = button.parentElement;
+        const isOpen = item.classList.toggle('open');
+        button.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      }
+
+      // ─── Checklist Toggle ───
+      function toggleCheck(checkbox) {
+        const label = checkbox.closest('label');
+        label.classList.toggle('checked', checkbox.checked);
+      }
+
+      // ─── Scroll Animation ───
+      const sections = document.querySelectorAll('.section');
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+            }
+          });
+        },
+        { threshold: 0.08 },
+      );
+      sections.forEach((s) => observer.observe(s));
+
+      // ─── Active Nav ───
+      const navItems = document.querySelectorAll('.nav-item');
+      window.addEventListener(
+        'scroll',
+        () => {
+          let current = '';
+          sections.forEach((s) => {
+            const top = s.offsetTop - 120;
+            if (window.scrollY >= top) current = s.id;
+          });
+          navItems.forEach((item) => {
+            item.classList.toggle('active', item.getAttribute('href') === '#' + current);
+          });
+        },
+        { passive: true },
+      );
+    </script>
+  </body>
+</html>
