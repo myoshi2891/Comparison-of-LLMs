@@ -9,7 +9,7 @@
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.3/dist/mermaid.min.js" defer></script>
     <style>
       :root {
         --bg: #07090f;
@@ -2230,6 +2230,17 @@ style G fill:#152a15,stroke:#3fb950,color:#e6edf3`,
 
       // ─── Render all diagrams ───────────────────────────────────────────────
       (async () => {
+        // CDN読み込み失敗時のフォールバック
+        if (typeof window.mermaid === 'undefined') {
+          for (const [id] of Object.entries(DIAGRAMS)) {
+            const el = document.getElementById(id);
+            if (el) {
+              el.innerHTML = '<div style="padding:1rem;color:#888;font-size:14px;">⚠️ ダイアグラムの読み込みに失敗しました（Mermaid CDNに接続できません）</div>';
+            }
+          }
+          return;
+        }
+
         for (const [id, src] of Object.entries(DIAGRAMS)) {
           const el = document.getElementById(id);
           if (!el) continue;
