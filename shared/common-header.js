@@ -57,6 +57,7 @@
         { name: 'Agent', href: '/claude/agent.html' },
         { name: 'Skill Guide', href: '/claude/skill-guide-for-claude.html' },
         { name: 'Skill Guide (中級)', href: '/claude/skill-guide-of-claude-for-intermediate.html' },
+        { name: 'Cowork Guide', href: '/claude/claude-cowork-guide.html' },
       ],
     },
     {
@@ -66,6 +67,7 @@
         { name: 'Agent', href: '/gemini/agent.html' },
         { name: 'Skill Guide', href: '/gemini/skill-guide-for-gemini.html' },
         { name: 'Skill Guide (中級)', href: '/gemini/skill-guide-of-gemini-for-intermediate.html' },
+        { name: 'Antigravity', href: '/gemini/antigravity-guide.html' },
       ],
     },
     {
@@ -80,6 +82,8 @@
       children: [
         { name: 'Skill', href: '/copilot/skill.html' },
         { name: 'Agent', href: '/copilot/agent.html' },
+        { name: 'Markdown Guide', href: '/copilot/markdown-file-guide.html' },
+        { name: 'GitHub Copilot', href: '/copilot/github-copilot.html' },
       ],
     },
     { name: 'Git Worktree', href: '/git_worktree.html' },

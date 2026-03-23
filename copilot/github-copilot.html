@@ -1145,6 +1145,9 @@
         background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
       }
     </style>
+    <!-- Common Header Assets -->
+    <link rel="stylesheet" href="../shared/common-header.css" />
+    <script src="../shared/common-header.js" defer></script>
   </head>
   <body>
     <!-- ═══════════════════════════════════════════
@@ -1420,6 +1423,16 @@
               <li>月1,000プレミアムリクエスト</li>
             </ul>
             <span class="tag new" style="margin-top: 12px; display: inline-block">ENTERPRISE</span>
+          </div>
+        </div>
+
+        <div class="alert-box info" style="margin-top: 16px; font-size: 0.875rem">
+          <span class="alert-icon">📅</span>
+          <div class="alert-content">
+            <strong>最終更新:</strong> 2026年3月<br />
+            <strong>参考:</strong>
+            <a href="https://github.com/features/copilot/plans" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: underline">GitHub Copilot Plans & Pricing</a>,
+            <a href="https://docs.github.com/en/copilot/get-started/plans" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: underline">Plans for GitHub Copilot - GitHub Docs</a>
           </div>
         </div>
 
@@ -1838,7 +1851,7 @@ code --install-extension GitHub.copilot-chat</pre>
         </div>
 
         <div class="accordion-item open">
-          <button class="accordion-header" aria-expanded="true" aria-controls="accordion-panel-1" onclick="toggleAccordion(this)">
+          <button type="button" class="accordion-header" aria-expanded="true" aria-controls="accordion-panel-1" onclick="toggleAccordion(this)">
             <span class="accordion-icon">📂</span>
             <span><strong>01.</strong> 関連ファイルを開き、不要なファイルを閉じる</span>
             <span class="accordion-arrow">▼</span>
@@ -1858,7 +1871,7 @@ code --install-extension GitHub.copilot-chat</pre>
         </div>
 
         <div class="accordion-item">
-          <button class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-2" onclick="toggleAccordion(this)">
+          <button type="button" class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-2" onclick="toggleAccordion(this)">
             <span class="accordion-icon">📝</span>
             <span><strong>02.</strong> 具体的なコメントでコンテキストを提供する</span>
             <span class="accordion-arrow">▼</span>
@@ -1884,7 +1897,7 @@ code --install-extension GitHub.copilot-chat</pre>
         </div>
 
         <div class="accordion-item">
-          <button class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-3" onclick="toggleAccordion(this)">
+          <button type="button" class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-3" onclick="toggleAccordion(this)">
             <span class="accordion-icon">🧩</span>
             <span><strong>03.</strong> タスクを小さな単位に分解する</span>
             <span class="accordion-arrow">▼</span>
@@ -1897,7 +1910,7 @@ code --install-extension GitHub.copilot-chat</pre>
         </div>
 
         <div class="accordion-item">
-          <button class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-4" onclick="toggleAccordion(this)">
+          <button type="button" class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-4" onclick="toggleAccordion(this)">
             <span class="accordion-icon">✅</span>
             <span><strong>04.</strong> 提案コードを必ず理解してから採用する</span>
             <span class="accordion-arrow">▼</span>
@@ -1916,7 +1929,7 @@ code --install-extension GitHub.copilot-chat</pre>
         </div>
 
         <div class="accordion-item">
-          <button class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-5" onclick="toggleAccordion(this)">
+          <button type="button" class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-5" onclick="toggleAccordion(this)">
             <span class="accordion-icon">🎯</span>
             <span><strong>05.</strong> ペルソナを設定してChat品質を上げる</span>
             <span class="accordion-arrow">▼</span>
@@ -1937,7 +1950,7 @@ code --install-extension GitHub.copilot-chat</pre>
         </div>
 
         <div class="accordion-item">
-          <button class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-6" onclick="toggleAccordion(this)">
+          <button type="button" class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-6" onclick="toggleAccordion(this)">
             <span class="accordion-icon">🔄</span>
             <span><strong>06.</strong> TDD（テスト駆動開発）と組み合わせる</span>
             <span class="accordion-arrow">▼</span>
@@ -1950,7 +1963,7 @@ code --install-extension GitHub.copilot-chat</pre>
         </div>
 
         <div class="accordion-item">
-          <button class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-7" onclick="toggleAccordion(this)">
+          <button type="button" class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-7" onclick="toggleAccordion(this)">
             <span class="accordion-icon">📚</span>
             <span><strong>07.</strong> copilot-instructions.mdを活用する</span>
             <span class="accordion-arrow">▼</span>
@@ -1964,7 +1977,7 @@ code --install-extension GitHub.copilot-chat</pre>
         </div>
 
         <div class="accordion-item">
-          <button class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-8" onclick="toggleAccordion(this)">
+          <button type="button" class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-8" onclick="toggleAccordion(this)">
             <span class="accordion-icon">🌐</span>
             <span><strong>08.</strong> コンテキストウィンドウを意識する</span>
             <span class="accordion-arrow">▼</span>
@@ -1978,7 +1991,7 @@ code --install-extension GitHub.copilot-chat</pre>
         </div>
 
         <div class="accordion-item">
-          <button class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-9" onclick="toggleAccordion(this)">
+          <button type="button" class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-9" onclick="toggleAccordion(this)">
             <span class="accordion-icon">🚀</span>
             <span><strong>09.</strong> WRAPフレームワークで効果的なIssueを書く</span>
             <span class="accordion-arrow">▼</span>
@@ -2012,7 +2025,7 @@ code --install-extension GitHub.copilot-chat</pre>
         </div>
 
         <div class="accordion-item">
-          <button class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-10" onclick="toggleAccordion(this)">
+          <button type="button" class="accordion-header" aria-expanded="false" aria-controls="accordion-panel-10" onclick="toggleAccordion(this)">
             <span class="accordion-icon">📊</span>
             <span><strong>10.</strong> プレミアムリクエストの使用量を監視する</span>
             <span class="accordion-arrow">▼</span>
@@ -2207,36 +2220,72 @@ code --install-extension GitHub.copilot-chat</pre>
             </tr>
             <tr>
               <td>
-                <span class="model-name">o3</span><br /><span class="tag beta">推論特化</span>
+                <span class="model-name">Gemini 2.5 Pro</span><br /><span class="tag new">GA</span>
               </td>
-              <td>段階的推論に優れたモデル（Autoモード推奨）</td>
-              <td>アルゴリズム設計・数学的処理</td>
-              <td><span class="tag beta">Pro+のみ</span></td>
+              <td>最新Gemini。強力な推論・コーディング能力。Google製</td>
+              <td>複雑なタスク・数学・科学的処理</td>
+              <td><span class="tag pro">Pro〜</span></td>
               <td>
                 <div class="progress-bar-wrap">
-                  <div class="progress-bar" style="width: 30%"></div>
+                  <div class="progress-bar" style="width: 60%"></div>
                 </div>
-                低速
+                普通
               </td>
             </tr>
             <tr>
               <td>
-                <span class="model-name">Gemini 1.5 Pro</span><br /><span class="tag pro"
-                  >長文脈</span
-                >
+                <span class="model-name">Gemini 3 Pro</span><br /><span class="tag beta">Preview</span>
               </td>
-              <td>大規模コンテキスト対応。Google製</td>
-              <td>大きなコードベースの横断分析</td>
-              <td><span class="tag pro">Pro〜</span></td>
+              <td>次世代Gemini（プレビュー版）。Google製</td>
+              <td>最先端の推論・コーディング</td>
+              <td><span class="tag beta">Pro+〜</span></td>
               <td>
                 <div class="progress-bar-wrap">
-                  <div class="progress-bar" style="width: 65%"></div>
+                  <div class="progress-bar" style="width: 55%"></div>
                 </div>
                 普通〜遅
               </td>
             </tr>
+            <tr>
+              <td>
+                <span class="model-name">Grok Code Fast 1</span><br /><span class="tag new">高速</span>
+              </td>
+              <td>xAI製。高速コーディング特化。データ保持なし</td>
+              <td>迅速なコード生成・反復開発</td>
+              <td><span class="tag free">Free〜</span></td>
+              <td>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar" style="width: 90%"></div>
+                </div>
+                高速
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span class="model-name">Raptor mini</span><br /><span class="tag beta">Preview</span>
+              </td>
+              <td>超軽量プレビューモデル。制限なし使用可</td>
+              <td>実験的用途・頻繁な問い合わせ</td>
+              <td><span class="tag free">Free〜</span></td>
+              <td>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar" style="width: 100%"></div>
+                </div>
+                最速
+              </td>
+            </tr>
           </tbody>
         </table>
+
+        <div class="alert-box info" style="margin-top: 16px; font-size: 0.875rem">
+          <span class="alert-icon">📅</span>
+          <div class="alert-content">
+            <strong>最終更新:</strong> 2026年3月<br />
+            <strong>参考:</strong>
+            <a href="https://docs.github.com/en/copilot/reference/ai-models/supported-models" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: underline">Supported AI models - GitHub Docs</a>,
+            <a href="https://github.blog/changelog/2026-03-18-gpt-5-3-codex-long-term-support-in-github-copilot/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: underline">GPT-5.3-Codex LTS - GitHub Changelog</a>
+          </div>
+        </div>
 
         <div class="alert-box success" style="margin-top: 20px">
           <span class="alert-icon">💡</span>
@@ -2322,7 +2371,7 @@ code --install-extension GitHub.copilot-chat</pre>
           >
           <label class="check-item"
             ><input type="checkbox" onchange="toggleCheck(this)" />
-            <span>複雑な実装ではプランモード（Shift+Tab）を使って計画を立てている</span></label
+            <span>複雑な実装ではプランモード（/plan または Plan エージェント選択）を使って計画を立てている</span></label
           >
           <label class="check-item"
             ><input type="checkbox" onchange="toggleCheck(this)" />
