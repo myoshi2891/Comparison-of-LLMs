@@ -298,7 +298,7 @@
   const line1 = document.createElement('span');
   line1.className = 'ch-disclaimer-line';
   line1.textContent =
-    '\u26A0 本サイトは個人開発の参考用に作成したものです。必ず各社公式ページで最新の料金をご確認ください。';
+    '\u26A0 本サイトは個人開発の参考用に作成したものです。必ず各社公式ページで最新の料金/仕様をご確認ください。';
   const line2 = document.createElement('span');
   line2.className = 'ch-disclaimer-line';
   line2.textContent =

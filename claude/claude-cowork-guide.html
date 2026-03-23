@@ -2208,8 +2208,20 @@ style F fill:#152a15,stroke:#3fb950,color:#e6edf3
 style G fill:#152a15,stroke:#3fb950,color:#e6edf3`,
       };
 
-      // ─── Mermaid initialisation (startOnLoad:false → we render manually) ──
-      if (typeof window.mermaid !== 'undefined') {
+      // ─── Mermaid initialisation & diagram rendering ────────────────────────
+      document.addEventListener('DOMContentLoaded', async () => {
+        // CDN読み込み失敗時のフォールバック
+        if (typeof window.mermaid === 'undefined') {
+          for (const [id] of Object.entries(DIAGRAMS)) {
+            const el = document.getElementById(id);
+            if (el) {
+              el.innerHTML = '<div style="padding:1rem;color:#888;font-size:14px;">⚠️ ダイアグラムの読み込みに失敗しました（Mermaid CDNに接続できません）</div>';
+            }
+          }
+          return;
+        }
+
+        // Mermaid を初期化（レンダリング前に必ず実行）
         mermaid.initialize({
           startOnLoad: false,
           theme: 'dark',
@@ -2231,21 +2243,8 @@ style G fill:#152a15,stroke:#3fb950,color:#e6edf3`,
           flowchart: { useMaxWidth: true, htmlLabels: false },
           sequence: { useMaxWidth: true },
         });
-      }
 
-      // ─── Render all diagrams ───────────────────────────────────────────────
-      document.addEventListener('DOMContentLoaded', async () => {
-        // CDN読み込み失敗時のフォールバック
-        if (typeof window.mermaid === 'undefined') {
-          for (const [id] of Object.entries(DIAGRAMS)) {
-            const el = document.getElementById(id);
-            if (el) {
-              el.innerHTML = '<div style="padding:1rem;color:#888;font-size:14px;">⚠️ ダイアグラムの読み込みに失敗しました（Mermaid CDNに接続できません）</div>';
-            }
-          }
-          return;
-        }
-
+        // 全ダイアグラムをレンダリング
         for (const [id, src] of Object.entries(DIAGRAMS)) {
           const el = document.getElementById(id);
           if (!el) continue;
