@@ -795,19 +795,448 @@
     <div class="wrap">
       <!-- HERO -->
       <div class="hero">
-        <div class="hero-badge">⚙ OpenAI Codex 完全ガイド</div>
-        <h1>サブエージェント開発における<br /><em>Markdownファイル</em><br />ベストプラクティス</h1>
+        <div class="hero-badge">⚙ OpenAI Codex 完全ガイド — 2026年3月最新版</div>
+        <h1>サブエージェント開発における<br /><em>AGENTS.md</em><br />完全ベストプラクティス</h1>
         <p>
-          AGENTS.md・AGENTS.override.md・SKILL.md・.codex/config.toml・REQUIREMENTS.md ── Codex
-          エコシステム固有のファイル体系と、マルチエージェントワークフロー設計のベストプラクティスを体系的に解説します。
+          初学者向け7ステップ入門 ／
+          AGENTS.md・AGENTS.override.md・SKILL.md・config.toml・REQUIREMENTS.md ── Codex
+          エコシステム固有のファイル体系と、マルチエージェントワークフロー設計のベストプラクティスを初学者向けにステップバイステップで体系的に解説します。
         </p>
         <div class="hero-meta">
+          <span class="hero-tag">初学者向け 7ステップ入門</span>
           <span class="hero-tag">Codex CLI (Rust製)</span>
           <span class="hero-tag">GPT-5.3-Codex (SWE-Bench Pro: 56.8%)</span>
           <span class="hero-tag">Multi-Agent (Experimental)</span>
           <span class="hero-tag">Skills / SKILL.md</span>
           <span class="hero-tag">Agents SDK + MCP</span>
-          <span class="hero-tag">Cloud Tasks</span>
+          <span class="hero-tag">PM駆動 SDD パターン</span>
+        </div>
+      </div>
+
+      <!-- 0. STEP BY STEP BEGINNER GUIDE -->
+      <div class="sec">
+        <div class="sec-head">
+          <span class="sec-num" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9)"
+            >0</span
+          >
+          <h2>初学者向け：7ステップ入門ガイド</h2>
+          <small>ここから始めれば迷わない</small>
+        </div>
+
+        <div class="alert ag">
+          <span class="alert-icon">🎯</span>
+          <div class="alert-body">
+            <strong>このセクションを最初に読んでください</strong>
+            Codex のファイル体系は複雑に見えますが、正しい順序で設定すれば迷いません。Step 1 → 7
+            を順番に実施するだけでサブエージェント開発が動き始めます。
+          </div>
+        </div>
+
+        <!-- Step 1 -->
+        <div class="card" style="border-left: 3px solid var(--oai); margin-bottom: 12px">
+          <div class="card-title">
+            <span
+              style="
+                background: var(--oai);
+                color: #000;
+                border-radius: 50%;
+                width: 26px;
+                height: 26px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 13px;
+                font-weight: 800;
+                flex-shrink: 0;
+              "
+              >1</span
+            >
+            グローバル設定を作る <span class="badge b-green">所要時間: 5分</span>
+          </div>
+          <p>
+            まず
+            <code
+              style="
+                font-family: 'JetBrains Mono', monospace;
+                background: var(--surface2);
+                border: 1px solid var(--border2);
+                border-radius: 4px;
+                padding: 1px 6px;
+                font-size: 12.5px;
+                color: var(--oai);
+              "
+              >~/.codex/AGENTS.md</code
+            >
+            を作成し、自分のすべてのプロジェクトに共通するルールを書きます。これが「あなたの作業スタイルの設定ファイル」です。
+          </p>
+          <div class="code-wrap">
+            <div class="code-bar">
+              <span>~/.codex/AGENTS.md（グローバル設定）</span
+              ><span class="code-lang">Markdown</span>
+            </div>
+            <div class="code-body">
+              <span class="ch"># Global Working Agreements</span>
+
+              <span class="cm">## Language</span>
+              コメントとコミットメッセージは日本語で書くこと。
+
+              <span class="cm">## Code Style</span>
+              - インデント: 2スペース（TypeScript / JavaScript） -
+              関数名はキャメルケース、定数はスネークケース大文字
+
+              <span class="cm">## General Rules</span>
+              - テストなしでコードをコミットしない - TODO コメントは残さない（実装するか Issue
+              を立てる）
+            </div>
+          </div>
+          <div class="alert ag" style="margin-top: 12px; margin-bottom: 0">
+            <span class="alert-icon">💡</span>
+            <div class="alert-body">
+              <strong>ポイント</strong
+              >：ここにはプロジェクトに関係ない「個人の作業習慣」のみ書く。プロジェクト固有の内容は次ステップへ。
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="card" style="border-left: 3px solid #3b82f6; margin-bottom: 12px">
+          <div class="card-title">
+            <span
+              style="
+                background: #3b82f6;
+                color: #fff;
+                border-radius: 50%;
+                width: 26px;
+                height: 26px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 13px;
+                font-weight: 800;
+                flex-shrink: 0;
+              "
+              >2</span
+            >
+            プロジェクトルートに AGENTS.md を作る <span class="badge b-blue">最重要ファイル</span>
+          </div>
+          <p>
+            プロジェクトの
+            <code
+              style="
+                font-family: 'JetBrains Mono', monospace;
+                background: var(--surface2);
+                border: 1px solid var(--border2);
+                border-radius: 4px;
+                padding: 1px 6px;
+                font-size: 12.5px;
+                color: var(--oai);
+              "
+              >/init</code
+            >
+            コマンドで自動生成するか、手動で作成します。<strong>テストコマンドの記述が最重要</strong>です。Codex
+            はこれを見てテストを自動実行します。
+          </p>
+          <div class="code-wrap">
+            <div class="code-bar">
+              <span>./AGENTS.md（プロジェクトルート）</span><span class="code-lang">Markdown</span>
+            </div>
+            <div class="code-body">
+              <span class="ch"># PROJECT: my-app</span>
+
+              <span class="cm">## Overview</span>
+              Next.js 15 + Supabase の SaaS アプリ。
+
+              <span class="cw">## ⚠ Build & Test（必ず実行すること）</span>
+              - テスト: <span class="cs">`pnpm test`</span> ← 変更後は必ずこれを実行 - ビルド:
+              <span class="cs">`pnpm build`</span> - Lint: <span class="cs">`pnpm lint`</span> ← PR
+              前に必ず実行
+
+              <span class="cm">## Architecture</span>
+              - frontend/ → Next.js ページ・コンポーネント - backend/ → API
+              ルート・サーバーサイド処理 - db/ → Supabase マイグレーション
+
+              <span class="cm">## Forbidden</span>
+              - `.env.production` の読み書き禁止 - `db reset` は絶対に実行しない
+            </div>
+          </div>
+          <div class="alert aw" style="margin-top: 12px; margin-bottom: 0">
+            <span class="alert-icon">⚠️</span>
+            <div class="alert-body">
+              <strong>32 KiB 上限に注意</strong>：このファイルが肥大化したら、詳細手順を
+              SKILL.md（Step 5）に分離してください。テストコマンドと禁止事項を優先的に上に書くこと。
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="card" style="border-left: 3px solid #8b5cf6; margin-bottom: 12px">
+          <div class="card-title">
+            <span
+              style="
+                background: #8b5cf6;
+                color: #fff;
+                border-radius: 50%;
+                width: 26px;
+                height: 26px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 13px;
+                font-weight: 800;
+                flex-shrink: 0;
+              "
+              >3</span
+            >
+            サービス別サブディレクトリに AGENTS.md を追加する
+            <span class="badge b-purple">サブエージェント対応</span>
+          </div>
+          <p>
+            マイクロサービス・モノレポ構成の場合、サービスごとにルールが異なります。各サブディレクトリの
+            <code>AGENTS.md</code>
+            には<strong>そのサービス固有のルールだけを書き、ルートと重複させない</strong>のが原則です。
+          </p>
+          <div class="code-wrap">
+            <div class="code-bar">
+              <span>./services/payments/AGENTS.md（サービス固有）</span
+              ><span class="code-lang">Markdown</span>
+            </div>
+            <div class="code-body">
+              <span class="ch"># Payments Service</span>
+              <span class="cc"
+                ># ルートの AGENTS.md に加えて、このファイルのルールが適用される</span
+              >
+
+              <span class="cm">## Service-Specific Commands</span>
+              - テスト: <span class="cs">`make test-payments`</span> ← このサービスは make を使う -
+              型生成: <span class="cs">`pnpm stripe:types`</span>
+
+              <span class="cm">## Domain Constraints</span>
+              - このディレクトリ内のファイルのみ変更すること - Stripe API は v2 のみ使用（v1 API
+              は廃止済み） - PCI-DSS: カード番号をログに出力しない
+
+              <span class="cm">## Sub-agent Handoff</span>
+              このサービスのタスク完了後は AGENT_TASKS.md を更新し、 PM エージェントに
+              transfer_to_project_manager で引き渡すこと。
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="card" style="border-left: 3px solid #f59e0b; margin-bottom: 12px">
+          <div class="card-title">
+            <span
+              style="
+                background: #f59e0b;
+                color: #000;
+                border-radius: 50%;
+                width: 26px;
+                height: 26px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 13px;
+                font-weight: 800;
+                flex-shrink: 0;
+              "
+              >4</span
+            >
+            config.toml でサブエージェントロールを定義する
+            <span class="badge b-amber">マルチエージェント</span>
+          </div>
+          <p>
+            サブエージェントを使う場合は
+            <code>.codex/config.toml</code>
+            で各ロールのモデル・サンドボックス・承認ポリシーを定義します。<strong>ロール定義なしにサブエージェントをスポーンしてはいけません</strong>（Anti-Pattern）。
+          </p>
+          <div class="code-wrap">
+            <div class="code-bar">
+              <span>.codex/config.toml（最小構成）</span><span class="code-lang">TOML</span>
+            </div>
+            <div class="code-body">
+              <span class="cc"># 最小限のマルチエージェント設定</span> [<span class="cm"
+                >features</span
+              >] <span class="cm">multi_agents</span> = <span class="ck">true</span>
+
+              [<span class="cm">agents</span>] <span class="cm">max_concurrent</span> =
+              <span class="cv">4</span> <span class="cc"># 同時実行上限</span>
+              <span class="cm">max_depth</span> = <span class="cv">1</span>
+              <span class="cc"># 孫エージェントは禁止（推奨）</span>
+
+              <span class="cc"># 軽量探索ロール（コード読み専用）</span>
+              [<span class="cm">agents.roles.explorer</span>] <span class="cm">description</span> =
+              <span class="cs">"コードベース探索・ファイル検索専門。実装しない。"</span>
+              <span class="cm">config_file</span> =
+              <span class="cs">".codex/roles/explorer.toml"</span>
+
+              <span class="cc"># レビューロール（書き込み禁止）</span>
+              [<span class="cm">agents.roles.reviewer</span>] <span class="cm">description</span> =
+              <span class="cs">"PR前のコードレビュー専門。コードは変更しない。"</span>
+              <span class="cm">config_file</span> =
+              <span class="cs">".codex/roles/reviewer.toml"</span>
+            </div>
+          </div>
+          <div class="alert ae" style="margin-top: 12px; margin-bottom: 0">
+            <span class="alert-icon">🚨</span>
+            <div class="alert-body">
+              <strong>サブエージェントは承認を継承しない</strong>：各ロールの config.toml で必ず
+              <code>approval_policy = "never"</code>
+              を指定すること。未設定のまま実行すると承認待ちで処理がブロックされます。
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="card" style="border-left: 3px solid #14b8a6; margin-bottom: 12px">
+          <div class="card-title">
+            <span
+              style="
+                background: #14b8a6;
+                color: #000;
+                border-radius: 50%;
+                width: 26px;
+                height: 26px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 13px;
+                font-weight: 800;
+                flex-shrink: 0;
+              "
+              >5</span
+            >
+            専門タスクを SKILL.md にスキル化する <span class="badge b-teal">コンテキスト節約</span>
+          </div>
+          <p>
+            AGENTS.md
+            が肥大化してきたら、繰り返し実施する専門タスク（DBマイグレーション・コードレビュー・テスト生成など）を
+            <code>.agents/skills/</code> 配下の SKILL.md
+            に分離します。スキルは<strong>該当タスクのときだけロードされる</strong>ため、コンテキストウィンドウを節約できます。
+          </p>
+          <div class="code-wrap">
+            <div class="code-bar">
+              <span>.agents/skills/db-migration/SKILL.md（例）</span
+              ><span class="code-lang">Markdown + YAML frontmatter</span>
+            </div>
+            <div class="code-body">
+              <span class="cs">---</span> <span class="cm">name</span>:
+              <span class="cv">db-migration</span> <span class="cm">description</span>:
+              <span class="cv"
+                >| DB スキーマ変更・マイグレーションファイル作成のスキル。 以下の場合にトリガーする:
+                - テーブルの追加・変更・削除を依頼された -
+                マイグレーションファイルの作成を求められた 以下の場合はトリガーしない: -
+                シードデータの挿入 - アプリケーションレベルのデータ変換</span
+              >
+              <span class="cs">---</span>
+
+              <span class="ch">## Instructions</span>
+              1. <span class="cs">`migrations/`</span> に
+              <span class="cs">`YYYYMMDD_description.up.sql`</span> を作成 2. ロールバック用
+              <span class="cs">`.down.sql`</span> を必ず同時作成 3. チェック:
+              <span class="cs">`python scripts/check_migration.py --env staging`</span> 4.
+              本番適用は人間レビュー後のみ
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 6 -->
+        <div class="card" style="border-left: 3px solid #ef4444; margin-bottom: 12px">
+          <div class="card-title">
+            <span
+              style="
+                background: #ef4444;
+                color: #fff;
+                border-radius: 50%;
+                width: 26px;
+                height: 26px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 13px;
+                font-weight: 800;
+                flex-shrink: 0;
+              "
+              >6</span
+            >
+            PM 駆動ワークフローを組む <span class="badge b-red">Agents SDK</span>
+          </div>
+          <p>
+            複数エージェントを使う場合、<strong
+              >Project Manager エージェントに REQUIREMENTS.md と AGENT_TASKS.md を生成させる</strong
+            >のが Codex
+            公式推奨パターンです。各サブエージェントはこの2ファイルを「唯一の真実の情報源」として実装します。
+          </p>
+          <div class="pat-grid">
+            <div class="pat pat-ok">
+              <div class="pat-label">✅ PM 駆動パターン（推奨）</div>
+              <ul>
+                <li>PM が REQUIREMENTS.md を生成</li>
+                <li>PM が AGENT_TASKS.md を生成（役割分担を明記）</li>
+                <li>各エージェントは AGENT_TASKS.md のみを参照して実装</li>
+                <li>完了後に PM が成果物を確認・統合</li>
+              </ul>
+            </div>
+            <div class="pat pat-ng">
+              <div class="pat-label">✗ 直接指示パターン（非推奨）</div>
+              <ul>
+                <li>PM なしで各エージェントが直接タスクを受け取る</li>
+                <li>エージェント間の依存関係が暗黙的になる</li>
+                <li>どのエージェントが何を実装したか追跡できない</li>
+                <li>成果物の整合性確認が困難</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 7 -->
+        <div class="card" style="border-left: 3px solid #6b7280; margin-bottom: 0">
+          <div class="card-title">
+            <span
+              style="
+                background: #6b7280;
+                color: #fff;
+                border-radius: 50%;
+                width: 26px;
+                height: 26px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 13px;
+                font-weight: 800;
+                flex-shrink: 0;
+              "
+              >7</span
+            >
+            /init + /review で品質を維持する <span class="badge b-purple">継続的改善</span>
+          </div>
+          <p>設定が完了したら、定期的に以下のスラッシュコマンドで品質を維持します。</p>
+          <div class="tbl-wrap" style="margin-top: 12px">
+            <table>
+              <thead>
+                <tr>
+                  <th>コマンド</th>
+                  <th>タイミング</th>
+                  <th>効果</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>/init</code></td>
+                  <td>プロジェクト開始時・大きなリファクタ後</td>
+                  <td>コードベースを再探索して AGENTS.md の雛形を再生成</td>
+                </tr>
+                <tr>
+                  <td><code>/review</code></td>
+                  <td>PR 作成前</td>
+                  <td>変更差分をコードレビュースキルでチェック</td>
+                </tr>
+                <tr>
+                  <td><code>/experimental</code></td>
+                  <td>マルチエージェント初回有効化時</td>
+                  <td>TUI から multi_agents フラグを ON にする</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -1450,6 +1879,204 @@
         </div>
       </div>
 
+      <!-- 3. SUB-AGENT AGENTS.md DEEP DIVE -->
+      <div class="sec">
+        <div class="sec-head">
+          <span class="sec-num" style="background: linear-gradient(135deg, #6366f1, #4f46e5)"
+            >2.5</span
+          >
+          <h2>サブエージェント向け AGENTS.md 設計パターン詳解</h2>
+          <small>役割別・依存関係・ハンドオフの設計</small>
+        </div>
+
+        <div class="card">
+          <p>
+            サブエージェント開発において、AGENTS.md
+            は単なる「ルール書き」ではありません。<strong>各エージェントが自律的に動くための「コンテキスト・コントラクト」</strong>です。設計の要点は「そのエージェントが何を知るべきか」と「何を知るべきでないか」の両方を明示することです。
+          </p>
+        </div>
+
+        <!-- Role-specific AGENTS.md -->
+        <div class="card">
+          <div class="card-title">🗂 役割別 AGENTS.md 設計マトリクス</div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>エージェントロール</th>
+                  <th>AGENTS.md に書くべき内容</th>
+                  <th>参照すべきファイル</th>
+                  <th>ドメイン境界</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="badge b-green">PM</span> Project Manager</td>
+                  <td>成果物ファイル名・フォーマット・品質基準・ゲート条件</td>
+                  <td>ユーザー要件のみ</td>
+                  <td>全ディレクトリへの読み書き</td>
+                </tr>
+                <tr>
+                  <td><span class="badge b-blue">FE</span> Frontend Developer</td>
+                  <td>フレームワーク規約・コンポーネント設計ルール・スタイルガイド</td>
+                  <td>REQUIREMENTS.md, AGENT_TASKS.md, design_spec.md</td>
+                  <td>frontend/ のみ</td>
+                </tr>
+                <tr>
+                  <td><span class="badge b-purple">BE</span> Backend Developer</td>
+                  <td>API設計規約・エラーハンドリング規則・認証フロー</td>
+                  <td>REQUIREMENTS.md, AGENT_TASKS.md</td>
+                  <td>backend/, lib/server/ のみ</td>
+                </tr>
+                <tr>
+                  <td><span class="badge b-amber">DB</span> DB Migrator</td>
+                  <td>マイグレーション命名規則・ロールバック必須ルール・本番適用禁止</td>
+                  <td>REQUIREMENTS.md の DB スキーマ定義のみ</td>
+                  <td>migrations/, schema/ のみ</td>
+                </tr>
+                <tr>
+                  <td><span class="badge b-teal">QA</span> Tester</td>
+                  <td>テストフレームワーク・カバレッジ要件・テスト命名規則</td>
+                  <td>TEST.md, REQUIREMENTS.md</td>
+                  <td>tests/, *.spec.ts のみ</td>
+                </tr>
+                <tr>
+                  <td><span class="badge b-red">SEC</span> Security Reviewer</td>
+                  <td>チェックリスト（OWASP Top 10 等）・報告フォーマット</td>
+                  <td>差分ファイルのみ（Read-Only）</td>
+                  <td>書き込み禁止</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PM AGENTS.md template -->
+        <div class="card">
+          <div class="card-title">📋 PM エージェント用 AGENTS.md テンプレート</div>
+          <div class="code-wrap">
+            <div class="code-bar">
+              <span>docs/pm/AGENTS.md（PM エージェント専用）</span
+              ><span class="code-lang">Markdown</span>
+            </div>
+            <div class="code-body">
+              <span class="ch"># Project Manager Agent</span>
+
+              <span class="cm">## Role</span>
+              あなたは PM エージェントです。タスクを受けたら下記の3ファイルを必ず作成し、
+              各専門エージェントにハンドオフしてください。
+
+              <span class="cw"
+                >## Required Output Files（ゲート: これが存在しないと次フェーズに進めない）</span
+              >
+              1. <span class="cs">REQUIREMENTS.md</span> — 製品目標・機能要件・制約・技術スタック 2.
+              <span class="cs">AGENT_TASKS.md</span> — 各エージェントへの具体的指示（曖昧さゼロ） 3.
+              <span class="cs">TEST.md</span> — 受け入れ基準・テスト計画（Tester 向け）
+
+              <span class="cm">## AGENT_TASKS.md フォーマット（必ず守ること）</span>
+              <span class="cs">```</span>
+              ## [ロール名] - 担当: [何をするか 1〜2文] - 成果物: [ファイルパス・形式を明示] - 参照:
+              [参照すべきファイル] - 制約: [やってはいけないこと]
+              <span class="cs">```</span>
+
+              <span class="cm">## Handoff Gate（以下を確認してからハンドオフ）</span>
+              - [ ] 全成果物ファイルが存在する - [ ] テストが全件パスしている - [ ] domain boundary
+              の侵犯がない - [ ] AGENT_TASKS.md の全チェックボックスが完了している
+
+              <span class="cm">## Forbidden</span>
+              - 成果物ファイルなしでサブエージェントを起動しない -
+              依存関係のあるタスクを同時並列スポーンしない
+            </div>
+          </div>
+        </div>
+
+        <!-- Handoff AGENTS.md -->
+        <div class="card">
+          <div class="card-title">🔀 ハンドオフ設計のベストプラクティス</div>
+          <div class="pat-grid">
+            <div class="pat pat-ok">
+              <div class="pat-label">✅ 良いハンドオフ設計</div>
+              <ul>
+                <li>transfer 関数のみを使う（メッセージ直渡し禁止）</li>
+                <li>引き継ぎ先ファイルのパスを AGENTS.md に明記</li>
+                <li>ゲート条件（チェックボックス）を AGENTS.md に定義</li>
+                <li>完了後は AGENT_TASKS.md のチェックを更新</li>
+                <li>依存タスクは順次スポーン（直列）</li>
+              </ul>
+            </div>
+            <div class="pat pat-ng">
+              <div class="pat-label">✗ 悪いハンドオフ設計</div>
+              <ul>
+                <li>ハンドオフ先をメッセージで直接渡す</li>
+                <li>ゲート条件なしで並列スポーン</li>
+                <li>AGENTS.md に引き継ぎ情報を書かない</li>
+                <li>完了確認なしで次フェーズに進む</li>
+                <li>max_depth を 3 以上に設定する</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="code-wrap" style="margin-top: 16px">
+            <div class="code-bar">
+              <span>ハンドオフ AGENTS.md — design_spec 待機パターン</span
+              ><span class="code-lang">Markdown</span>
+            </div>
+            <div class="code-body">
+              <span class="cm">## Handoff Protocol (Frontend / Backend 共通)</span>
+              <span class="cc"># このファイルが存在することを確認してから実装を開始すること</span>
+
+              <span class="cw">**依存ファイル確認（実装開始前にチェック）:**</span>
+              - [ ] <span class="cs">REQUIREMENTS.md</span> が存在する - [ ]
+              <span class="cs">AGENT_TASKS.md</span> が存在し、自分の担当セクションが記載されている
+              - [ ] <span class="cs">design_spec.md</span> が存在する（Frontend は必須）
+
+              <span class="cc"
+                ># 上記ファイルが存在しない場合は実装を開始せず PM に確認すること</span
+              >
+
+              <span class="cm">## Completion Handoff</span>
+              実装完了後は以下を実施してから transfer_to_project_manager を呼ぶ: 1.
+              テストを実行し全件パスを確認 2. AGENT_TASKS.md の自分のチェックボックスを完了にする 3.
+              成果物ファイルのパス一覧を引き継ぎメモに記載
+            </div>
+          </div>
+        </div>
+
+        <!-- Domain isolation -->
+        <div class="card">
+          <div class="card-title">🏗 ドメイン分離パターン — サブディレクトリ AGENTS.md の活用</div>
+          <div class="alert ai" style="margin-bottom: 16px">
+            <span class="alert-icon">🔑</span>
+            <div class="alert-body">
+              <strong>原則：サブエージェントは自分のドメイン外を知らなくてよい</strong>。Frontend
+              エージェントはDB スキーマを知る必要がなく、Backend
+              エージェントはUIコンポーネント名を知る必要はありません。AGENTS.md
+              で「このエージェントが見るべきものと見てはいけないもの」を明示的に定義することで、エージェントの誤動作を防ぎます。
+            </div>
+          </div>
+          <div class="code-wrap">
+            <div class="code-bar">
+              <span>モノレポ構成でのドメイン分離例</span><span class="code-lang">File Tree</span>
+            </div>
+            <div class="code-body">
+              <span class="cm">my-app/</span> ├── AGENTS.md
+              <span class="cc"># ← 全エージェント共通（概要・テストコマンド）</span> ├──
+              <span class="cw">frontend/</span> │ ├── AGENTS.md
+              <span class="cc"># ← Frontend エージェント専用ルール</span> │ │
+              <span class="cc"># 「frontend/ のみ変更可」と明記</span> │ └── components/ ├──
+              <span class="cv">backend/</span> │ ├── AGENTS.md
+              <span class="cc"># ← Backend エージェント専用ルール</span> │ │
+              <span class="cc"># 「backend/ のみ変更可」と明記</span> │ └── api/ ├──
+              <span class="cm">services/</span> │ └── payments/ │ ├── AGENTS.md
+              <span class="cc"># ← Payments サービス固有ルール</span> │ └── AGENTS.override.md
+              <span class="cc"># ← 本番障害時の緊急上書き（平時は不要）</span> └── .codex/ ├──
+              config.toml <span class="cc"># ← マルチエージェントロール定義</span> └── roles/ ├──
+              explorer.toml └── reviewer.toml
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- 3. SKILL.md -->
       <div class="sec">
         <div class="sec-head">
@@ -1781,8 +2408,21 @@
           <span class="alert-icon">🔍</span>
           <div class="alert-body">
             <strong>Agents SDK 組み込みトレーシング（2026年〜）</strong>
-            Agents SDK には <strong>built-in tracing</strong> が統合されており、generation step・tool calls・handoffs・guardrails・カスタムイベントトレーシング・trace dashboard・trace grading をワンストップで行えます（<a href="https://openai.github.io/openai-agents-python/tracing/" target="_blank" rel="noopener noreferrer">Agents SDK tracing ドキュメント</a>）。<br>
-            一方、<code>spawn_agents_on_csv</code> による CSV からのエージェントファンアウトと ETA 付き進捗追跡は <strong>Codex CLI（rust-v0.105.0+）固有の機能</strong>です（<a href="https://github.com/openai/codex/releases" target="_blank" rel="noopener noreferrer">Codex CLI リリースノート</a>）。
+            Agents SDK には <strong>built-in tracing</strong> が統合されており、generation
+            step・tool calls・handoffs・guardrails・カスタムイベントトレーシング・trace
+            dashboard・trace grading をワンストップで行えます（<a
+              href="https://openai.github.io/openai-agents-python/tracing/"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Agents SDK tracing ドキュメント</a
+            >）。<br />
+            一方、<code>spawn_agents_on_csv</code> による CSV からのエージェントファンアウトと ETA
+            付き進捗追跡は <strong>Codex CLI（rust-v0.105.0+）固有の機能</strong>です（<a
+              href="https://github.com/openai/codex/releases"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Codex CLI リリースノート</a
+            >）。
           </div>
         </div>
 
@@ -1913,7 +2553,11 @@
                 <td><span class="badge b-purple">最高精度</span> 高コスト</td>
               </tr>
               <tr>
-                <td><code>gpt-5.3-codex-spark</code> <span class="badge b-orange">research preview</span> <span class="badge b-gray">Pro 限定／段階展開中</span></td>
+                <td>
+                  <code>gpt-5.3-codex-spark</code>
+                  <span class="badge b-orange">research preview</span>
+                  <span class="badge b-gray">Pro 限定／段階展開中</span>
+                </td>
                 <td>リアルタイム・低レイテンシ</td>
                 <td>インタラクティブ補完・高速ループ</td>
                 <td><span class="badge b-teal">1000+ tokens/sec</span> 軽量版</td>
@@ -2235,6 +2879,115 @@
             <div class="src-desc">
               長時間実行エージェントのための SKILL.md 活用・コンパクション戦略・shell
               スキルのベストプラクティス
+            </div>
+          </div>
+
+          <!-- NEW SOURCES -->
+          <div class="src-card" style="border-color: rgba(16, 163, 127, 0.35)">
+            <div class="src-icon">🤝</div>
+            <div class="src-title">OpenAI 公式: Agents SDK — Handoffs</div>
+            <div class="src-url">
+              <a
+                href="https://openai.github.io/openai-agents-python/handoffs/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >openai.github.io/openai-agents-python/handoffs/</a
+              >
+            </div>
+            <div class="src-desc">
+              transfer
+              関数によるサブエージェントへのハンドオフ実装・入力フィルタリング・引き継ぎコンテキスト設計の公式仕様
+            </div>
+          </div>
+          <div class="src-card" style="border-color: rgba(16, 163, 127, 0.35)">
+            <div class="src-icon">🛡</div>
+            <div class="src-title">OpenAI 公式: Agents SDK — Guardrails</div>
+            <div class="src-url">
+              <a
+                href="https://openai.github.io/openai-agents-python/guardrails/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >openai.github.io/openai-agents-python/guardrails/</a
+              >
+            </div>
+            <div class="src-desc">
+              入力・出力ガードレール・tripwire による安全なサブエージェント実行の公式ドキュメント
+            </div>
+          </div>
+          <div class="src-card" style="border-color: rgba(16, 163, 127, 0.35)">
+            <div class="src-icon">🔭</div>
+            <div class="src-title">OpenAI 公式: Agents SDK — Tracing</div>
+            <div class="src-url">
+              <a
+                href="https://openai.github.io/openai-agents-python/tracing/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >openai.github.io/openai-agents-python/tracing/</a
+              >
+            </div>
+            <div class="src-desc">
+              built-in tracing・generation step / tool call / handoff
+              の可視化・カスタムイベントトレーシング・trace grading の公式仕様
+            </div>
+          </div>
+          <div class="src-card" style="border-color: rgba(16, 163, 127, 0.35)">
+            <div class="src-icon">📦</div>
+            <div class="src-title">OpenAI 公式: Agents SDK — Context Management</div>
+            <div class="src-url">
+              <a
+                href="https://openai.github.io/openai-agents-python/context/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >openai.github.io/openai-agents-python/context/</a
+              >
+            </div>
+            <div class="src-desc">
+              RunContextWrapper・コンテキスト注入・サブエージェント間のデータ共有パターンの公式仕様
+            </div>
+          </div>
+          <div class="src-card" style="border-color: rgba(16, 163, 127, 0.35)">
+            <div class="src-icon">🔀</div>
+            <div class="src-title">
+              OpenAI Cookbook: SDD (Spec-Driven Development) with Codex + Agents SDK
+            </div>
+            <div class="src-url">
+              <a
+                href="https://cookbook.openai.com/examples/codex/codex_mcp_agents_sdk/sdd_with_codex_agents_sdk"
+                target="_blank"
+                rel="noopener noreferrer"
+                >cookbook.openai.com/…/sdd_with_codex_agents_sdk</a
+              >
+            </div>
+            <div class="src-desc">
+              PM エージェントによる REQUIREMENTS.md / AGENT_TASKS.md
+              自動生成・ゲート条件付きハンドオフ・SDD パイプラインの実装例
+            </div>
+          </div>
+          <div class="src-card" style="border-color: rgba(16, 163, 127, 0.35)">
+            <div class="src-icon">🌐</div>
+            <div class="src-title">AGENTS.md Open Standard — Linux Foundation (AAIF)</div>
+            <div class="src-url">
+              <a href="https://agents.md/" target="_blank" rel="noopener noreferrer">agents.md/</a>
+            </div>
+            <div class="src-desc">
+              AGENTS.md のオープン標準仕様・Codex / Cursor / Claude Code / Google Jules / Amp
+              での採用状況・40,000+ OSS プロジェクトでの利用実績
+            </div>
+          </div>
+          <div class="src-card" style="border-color: rgba(16, 163, 127, 0.35)">
+            <div class="src-icon">⚙️</div>
+            <div class="src-title">OpenAI 公式: Codex CLI — Sandbox &amp; Security</div>
+            <div class="src-url">
+              <a
+                href="https://developers.openai.com/codex/security/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >developers.openai.com/codex/security/</a
+              >
+            </div>
+            <div class="src-desc">
+              sandbox_mode（read-only / workspace-write / network-sandbox）・network_access
+              設定・サブエージェントのセキュリティモデルの公式仕様
             </div>
           </div>
         </div>
