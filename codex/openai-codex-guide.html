@@ -823,6 +823,62 @@
         font-size: 12px;
         margin-bottom: 8px;
       }
+
+      /* GUIDE UTILITIES */
+      .guide-card {
+        padding: 16px;
+        background: var(--bg3);
+        border-radius: 10px;
+        border: 1px solid rgba(0, 212, 255, 0.1);
+      }
+      .guide-icon {
+        font-family: var(--mono);
+        font-size: 20px;
+        margin-bottom: 8px;
+      }
+      .guide-title {
+        font-family: var(--mono);
+        font-size: 13px;
+        margin-bottom: 6px;
+      }
+      .guide-body {
+        font-size: 13px;
+        color: var(--text2);
+      }
+      .guide-code {
+        font-family: var(--mono);
+        background: rgba(255, 255, 255, 0.08);
+        padding: 1px 4px;
+        border-radius: 3px;
+      }
+
+      /* GUIDE CARD COMPONENTS */
+      .guide-card {
+        padding: 16px;
+        background: var(--bg3);
+        border-radius: 10px;
+        border: 1px solid rgba(0, 212, 255, 0.1);
+      }
+      .guide-icon {
+        font-family: var(--mono);
+        font-size: 20px;
+        margin-bottom: 8px;
+      }
+      .guide-title {
+        font-family: var(--mono);
+        font-size: 13px;
+        margin-bottom: 6px;
+      }
+      .guide-body {
+        font-size: 13px;
+        color: var(--text2);
+      }
+      .guide-code {
+        font-family: var(--mono);
+        background: rgba(255, 255, 255, 0.08);
+        padding: 1px 4px;
+        border-radius: 3px;
+      }
     </style>
   </head>
   <body>
@@ -875,6 +931,7 @@
           <a href="#agents-md">AGENTS.md</a>
           <a href="#workflow">ワークフロー</a>
           <a href="#advanced">上級テクニック</a>
+          <a href="#dodont">Do/Don't</a>
           <a href="#sources">参考文献</a>
         </div>
       </nav>
@@ -886,8 +943,8 @@
           <div class="section-header">
             <div class="step-num">0</div>
             <div>
-              <div class="section-title">OpenAI Codex とは何か？</div>
-              <div class="section-desc">まず全体像を把握しよう</div>
+              <h2 class="section-title">OpenAI Codex とは何か？</h2>
+              <p class="section-desc">まず全体像を把握しよう</p>
             </div>
           </div>
 
@@ -989,8 +1046,8 @@
           <div class="section-header">
             <div class="step-num">1</div>
             <div>
-              <div class="section-title">セットアップ</div>
-              <div class="section-desc">Codex CLI を5分でインストールする</div>
+              <h2 class="section-title">セットアップ</h2>
+              <p class="section-desc">Codex CLI を5分でインストールする</p>
             </div>
           </div>
 
@@ -1125,8 +1182,8 @@ npm --version</pre>
           <div class="section-header">
             <div class="step-num">2</div>
             <div>
-              <div class="section-title">モデル選択</div>
-              <div class="section-desc">タスクに応じて最適なモデルを使い分ける</div>
+              <h2 class="section-title">モデル選択</h2>
+              <p class="section-desc">タスクに応じて最適なモデルを使い分ける</p>
             </div>
           </div>
 
@@ -1225,8 +1282,8 @@ npm --version</pre>
           <div class="section-header">
             <div class="step-num">3</div>
             <div>
-              <div class="section-title">プロンプト設計のベストプラクティス</div>
-              <div class="section-desc">「何をしたいか」を正確に伝える4つの要素</div>
+              <h2 class="section-title">プロンプト設計のベストプラクティス</h2>
+              <p class="section-desc">「何をしたいか」を正確に伝える4つの要素</p>
             </div>
           </div>
 
@@ -1251,104 +1308,40 @@ npm --version</pre>
               ✦ 良いプロンプトの4要素（公式ガイドより）
             </div>
             <div class="card-grid">
-              <div
-                style="
-                  padding: 16px;
-                  background: var(--bg3);
-                  border-radius: 10px;
-                  border: 1px solid rgba(0, 212, 255, 0.1);
-                "
-              >
-                <div style="font-family: var(--mono); font-size: 20px; margin-bottom: 8px">🎯</div>
-                <div
-                  style="
-                    font-family: var(--mono);
-                    font-size: 13px;
-                    color: var(--accent);
-                    margin-bottom: 6px;
-                  "
-                >
+              <div class="guide-card">
+                <div class="guide-icon">🎯</div>
+                <div class="guide-title" style="color: var(--accent)">
                   1. コンテキスト (Context)
                 </div>
-                <div style="font-size: 13px; color: var(--text2)">
-                  関連するファイル・フォルダ・ドキュメント・エラー情報を伝える。<code
-                    style="
-                      font-family: var(--mono);
-                      background: rgba(255, 255, 255, 0.08);
-                      padding: 1px 4px;
-                      border-radius: 3px;
-                    "
-                    >@filename</code
-                  >
+                <div class="guide-body">
+                  関連するファイル・フォルダ・ドキュメント・エラー情報を伝える。<code class="guide-code">@filename</code>
                   でファイルをメンション可能。
                 </div>
               </div>
-              <div
-                style="
-                  padding: 16px;
-                  background: var(--bg3);
-                  border-radius: 10px;
-                  border: 1px solid rgba(0, 212, 255, 0.1);
-                "
-              >
-                <div style="font-family: var(--mono); font-size: 20px; margin-bottom: 8px">📋</div>
-                <div
-                  style="
-                    font-family: var(--mono);
-                    font-size: 13px;
-                    color: var(--accent2);
-                    margin-bottom: 6px;
-                  "
-                >
+              <div class="guide-card">
+                <div class="guide-icon">📋</div>
+                <div class="guide-title" style="color: var(--accent2)">
                   2. タスク (Task)
                 </div>
-                <div style="font-size: 13px; color: var(--text2)">
+                <div class="guide-body">
                   何を実装・修正・説明してほしいかを具体的に書く。「なんとなく直して」より「〇〇という理由でXXを修正して」が効果的。
                 </div>
               </div>
-              <div
-                style="
-                  padding: 16px;
-                  background: var(--bg3);
-                  border-radius: 10px;
-                  border: 1px solid rgba(0, 212, 255, 0.1);
-                "
-              >
-                <div style="font-family: var(--mono); font-size: 20px; margin-bottom: 8px">✅</div>
-                <div
-                  style="
-                    font-family: var(--mono);
-                    font-size: 13px;
-                    color: var(--accent3);
-                    margin-bottom: 6px;
-                  "
-                >
+              <div class="guide-card">
+                <div class="guide-icon">✅</div>
+                <div class="guide-title" style="color: var(--accent3)">
                   3. 完了条件 (Done criteria)
                 </div>
-                <div style="font-size: 13px; color: var(--text2)">
+                <div class="guide-body">
                   「何をもって成功とするか」を定義する。テストが通るか、特定の出力が得られるかなど。
                 </div>
               </div>
-              <div
-                style="
-                  padding: 16px;
-                  background: var(--bg3);
-                  border-radius: 10px;
-                  border: 1px solid rgba(0, 212, 255, 0.1);
-                "
-              >
-                <div style="font-family: var(--mono); font-size: 20px; margin-bottom: 8px">🚧</div>
-                <div
-                  style="
-                    font-family: var(--mono);
-                    font-size: 13px;
-                    color: var(--accent4);
-                    margin-bottom: 6px;
-                  "
-                >
+              <div class="guide-card">
+                <div class="guide-icon">🚧</div>
+                <div class="guide-title" style="color: var(--accent4)">
                   4. 制約 (Constraints)
                 </div>
-                <div style="font-size: 13px; color: var(--text2)">
+                <div class="guide-body">
                   やってほしくないこと・守るべきルールを明示。「既存のAPIを変更しない」「依存関係を増やさない」など。
                 </div>
               </div>
@@ -1431,8 +1424,8 @@ Node.js + Express + TypeScript プロジェクトです。
           <div class="section-header">
             <div class="step-num">4</div>
             <div>
-              <div class="section-title">AGENTS.md の活用</div>
-              <div class="section-desc">Codexにプロジェクトのルールを「記憶」させる最強の方法</div>
+              <h2 class="section-title">AGENTS.md の活用</h2>
+              <p class="section-desc">Codexにプロジェクトのルールを「記憶」させる最強の方法</p>
             </div>
           </div>
 
@@ -1584,8 +1577,8 @@ Node.js + Express + TypeScript プロジェクトです。
           <div class="section-header">
             <div class="step-num">5</div>
             <div>
-              <div class="section-title">実践ワークフロー</div>
-              <div class="section-desc">1日の開発ルーティンに Codex を組み込む</div>
+              <h2 class="section-title">実践ワークフロー</h2>
+              <p class="section-desc">1日の開発ルーティンに Codex を組み込む</p>
             </div>
           </div>
 
@@ -1702,8 +1695,8 @@ Node.js + Express + TypeScript プロジェクトです。
           <div class="section-header">
             <div class="step-num">6</div>
             <div>
-              <div class="section-title">上級テクニック</div>
-              <div class="section-desc">MCP・Skills・Automations・画像入力</div>
+              <h2 class="section-title">上級テクニック</h2>
+              <p class="section-desc">MCP・Skills・Automations・画像入力</p>
             </div>
           </div>
 
@@ -1841,8 +1834,8 @@ Node.js + Express + TypeScript プロジェクトです。
           <div class="section-header">
             <div class="step-num">7</div>
             <div>
-              <div class="section-title">やること・やってはいけないこと</div>
-              <div class="section-desc">公式ベストプラクティスまとめ</div>
+              <h2 class="section-title">やること・やってはいけないこと</h2>
+              <p class="section-desc">公式ベストプラクティスまとめ</p>
             </div>
           </div>
 
@@ -2040,8 +2033,8 @@ Node.js + Express + TypeScript プロジェクトです。
               📚
             </div>
             <div>
-              <div class="section-title">参考文献・ソース</div>
-              <div class="section-desc">この記事の根拠となる公式情報源</div>
+              <h2 class="section-title">参考文献・ソース</h2>
+              <p class="section-desc">この記事の根拠となる公式情報源</p>
             </div>
           </div>
 
@@ -2209,7 +2202,7 @@ Node.js + Express + TypeScript プロジェクトです。
 
       // Active nav link
       const navLinks = document.querySelectorAll('nav a');
-      const sectionEls = document.querySelectorAll('[id]');
+      const sectionEls = document.querySelectorAll('.section[id]');
       
       let scrollTimeout;
       window.addEventListener('scroll', () => {
