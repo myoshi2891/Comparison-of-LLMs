@@ -753,6 +753,7 @@
 
       .source-info {
         flex: 1;
+        min-width: 0;
       }
 
       .source-title {
@@ -767,6 +768,7 @@
         font-size: 11px;
         color: var(--text3);
         margin-top: 2px;
+        overflow-wrap: anywhere;
       }
 
       .source-arrow {
@@ -875,6 +877,24 @@
         background: rgba(255, 255, 255, 0.08);
         padding: 1px 4px;
         border-radius: 3px;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+        .js-enabled .section {
+          opacity: 1 !important;
+          transform: none !important;
+          transition: none !important;
+        }
       }
     </style>
     <!-- Common Header Assets -->
@@ -1195,8 +1215,7 @@ npm --version</pre>
           </div>
 
           <p style="color: var(--text2); font-size: 14px; margin-bottom: 20px">
-            2026年3月現在、Codex
-            では以下のモデルが利用可能です。適切なモデル選択がコスト効率と品質に直結します。
+            2026年3月現在、代表的な推奨モデルは以下です。適切なモデル選択がコスト効率と品質に直結します。注: 表示は主要な推奨モデルの例であり、他の利用可能なモデルも存在します。
           </p>
 
           <div class="model-grid">
@@ -1668,6 +1687,10 @@ wait</pre>
             >
               ✦ コードレビューを Codex に任せる
             </div>
+            <p style="font-size: 14px; color: var(--text2); margin-bottom: 16px">
+              コードレビューは対話モード（スラッシュコマンド）で行う方法と、ワンショットの CLI コマンド（自動化向け）で行う方法があります。
+            </p>
+
             <div class="code-wrap">
               <div class="code-header">
                 <div class="code-dots">
@@ -1675,12 +1698,22 @@ wait</pre>
                   <div class="code-dot"></div>
                   <div class="code-dot"></div>
                 </div>
-                <div class="code-lang">bash</div>
+                <div class="code-lang">対話モード（codex 起動後に実行）</div>
               </div>
-              <pre><span class="cm"># コミット前にレビュー実行</span>
-<span class="fn">codex</span> <span class="op">/review</span>
-
-<span class="cm"># または exec コマンドでスクリプト化</span>
+              <pre><span class="cm"># インタラクティブセッション内で実行</span>
+<span class="op">/review</span></pre>
+            </div>
+            
+            <div class="code-wrap" style="margin-top: 16px;">
+              <div class="code-header">
+                <div class="code-dots">
+                  <div class="code-dot"></div>
+                  <div class="code-dot"></div>
+                  <div class="code-dot"></div>
+                </div>
+                <div class="code-lang">bash — 自動化（ワンショット実行）</div>
+              </div>
+              <pre><span class="cm"># CIやスクリプトで一括実行</span>
 <span class="fn">codex</span> exec <span class="str">"git diff HEAD~1 をレビューして、潜在的なバグとセキュリティ問題を報告して"</span></pre>
             </div>
           </div>
