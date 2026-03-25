@@ -541,6 +541,21 @@
         margin-top: 2px;
       }
 
+      .check-icon-error {
+        width: 20px;
+        height: 20px;
+        border-radius: 6px;
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        color: var(--accent5);
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+
       /* COMPARISON TABLE */
       .table-wrap {
         overflow-x: auto;
@@ -1695,9 +1710,9 @@ Node.js + Express + TypeScript プロジェクトです。
                 <pre
                   style="font-size: 12px"
                 ><span class="cm"># config.toml でMCPサーバーを設定</span>
-<span class="pn">[[</span><span class="kw">mcp_servers</span><span class="pn">]]</span>
-<span class="fn">name</span> = <span class="str">"github"</span>
-<span class="fn">command</span> = <span class="str">"npx @modelcontextprotocol/server-github"</span></pre>
+<span class="pn">[</span><span class="kw">mcp_servers.github</span><span class="pn">]</span>
+<span class="fn">command</span> = <span class="str">"npx"</span>
+<span class="fn">args</span> = <span class="pn">[</span><span class="str">"@modelcontextprotocol/server-github"</span><span class="pn">]</span></pre>
               </div>
             </div>
 
@@ -1872,127 +1887,37 @@ Node.js + Express + TypeScript プロジェクトです。
               </div>
               <ul class="checklist">
                 <li>
-                  <div
-                    style="
-                      width: 20px;
-                      height: 20px;
-                      border-radius: 6px;
-                      background: rgba(239, 68, 68, 0.15);
-                      border: 1px solid rgba(239, 68, 68, 0.3);
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      font-size: 11px;
-                      color: var(--accent5);
-                      flex-shrink: 0;
-                      margin-top: 2px;
-                    "
-                  >
+                  <div class="check-icon-error">
                     ✗
                   </div>
                   プロンプトに毎回同じルールを書く（AGENTS.md に移す）
                 </li>
                 <li>
-                  <div
-                    style="
-                      width: 20px;
-                      height: 20px;
-                      border-radius: 6px;
-                      background: rgba(239, 68, 68, 0.15);
-                      border: 1px solid rgba(239, 68, 68, 0.3);
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      font-size: 11px;
-                      color: var(--accent5);
-                      flex-shrink: 0;
-                      margin-top: 2px;
-                    "
-                  >
+                  <div class="check-icon-error">
                     ✗
                   </div>
                   Codex の作業を1ステップずつ監視する（並列活用できない）
                 </li>
                 <li>
-                  <div
-                    style="
-                      width: 20px;
-                      height: 20px;
-                      border-radius: 6px;
-                      background: rgba(239, 68, 68, 0.15);
-                      border: 1px solid rgba(239, 68, 68, 0.3);
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      font-size: 11px;
-                      color: var(--accent5);
-                      flex-shrink: 0;
-                      margin-top: 2px;
-                    "
-                  >
+                  <div class="check-icon-error">
                     ✗
                   </div>
                   テスト環境がないまま複雑な実装タスクを渡す
                 </li>
                 <li>
-                  <div
-                    style="
-                      width: 20px;
-                      height: 20px;
-                      border-radius: 6px;
-                      background: rgba(239, 68, 68, 0.15);
-                      border: 1px solid rgba(239, 68, 68, 0.3);
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      font-size: 11px;
-                      color: var(--accent5);
-                      flex-shrink: 0;
-                      margin-top: 2px;
-                    "
-                  >
+                  <div class="check-icon-error">
                     ✗
                   </div>
                   レビューなしで本番環境にマージする
                 </li>
                 <li>
-                  <div
-                    style="
-                      width: 20px;
-                      height: 20px;
-                      border-radius: 6px;
-                      background: rgba(239, 68, 68, 0.15);
-                      border: 1px solid rgba(239, 68, 68, 0.3);
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      font-size: 11px;
-                      color: var(--accent5);
-                      flex-shrink: 0;
-                      margin-top: 2px;
-                    "
-                  >
+                  <div class="check-icon-error">
                     ✗
                   </div>
                   1スレッドにプロジェクト全体を扱わせる
                 </li>
                 <li>
-                  <div
-                    style="
-                      width: 20px;
-                      height: 20px;
-                      border-radius: 6px;
-                      background: rgba(239, 68, 68, 0.15);
-                      border: 1px solid rgba(239, 68, 68, 0.3);
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      font-size: 11px;
-                      color: var(--accent5);
-                      flex-shrink: 0;
-                      margin-top: 2px;
-                    "
-                  >
+                  <div class="check-icon-error">
                     ✗
                   </div>
                   --yolo フラグを本番コードに使う（サンドボックスを無効化）
