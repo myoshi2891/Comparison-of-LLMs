@@ -75,6 +75,7 @@
       children: [
         { name: 'Skill', href: '/codex/skill.html' },
         { name: 'Agent', href: '/codex/agent.html' },
+        { name: 'Codex Guide', href: '/codex/openai-codex-guide.html' },
       ],
     },
     {
