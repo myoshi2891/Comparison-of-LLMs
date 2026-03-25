@@ -40,6 +40,7 @@
 
       html {
         scroll-behavior: smooth;
+        scroll-padding-top: 100px;
       }
 
       body {
@@ -263,6 +264,10 @@
         color: var(--accent);
       }
 
+      .nav-inner a.is-active {
+        color: var(--accent);
+      }
+
       /* MAIN */
       main {
         max-width: 1100px;
@@ -273,16 +278,19 @@
       /* SECTION */
       .section {
         margin-bottom: 80px;
-        opacity: 0;
-        transform: translateY(30px);
         transition:
           opacity 0.6s ease,
           transform 0.6s ease;
       }
 
-      .section.visible {
+      .js-enabled .section {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      .js-enabled .section.visible {
         opacity: 1;
-        transform: none;
+        transform: translateY(0);
       }
 
       .section-header {
@@ -1601,17 +1609,17 @@ Node.js + Express + TypeScript プロジェクトです。
                 <div class="code-lang">bash — 朝のバッチタスク例</div>
               </div>
               <pre><span class="cm"># タスク1: TypeScript エラー修正</span>
-<span class="fn">codex</span> <span class="str">"@src/onboarding/validator.ts の TypeScript エラーをすべて修正して。型安全性を保つこと"</span>
+            <span class="fn">codex</span> <span class="str">"@src/onboarding/validator.ts の TypeScript エラーをすべて修正して。型安全性を保つこと"</span> &
 
-<span class="cm"># タスク2: スキーマ更新対応</span>
-<span class="fn">codex</span> <span class="str">"@api/webhooks.ts を新しいイベントスキーマに対応させて。@docs/schema-v2.md を参照"</span>
+            <span class="cm"># タスク2: スキーマ更新対応</span>
+            <span class="fn">codex</span> <span class="str">"@api/webhooks.ts を新しいイベントスキーマに対応させて。@docs/schema-v2.md を参照"</span> &
 
-<span class="cm"># タスク3: テストカバレッジ向上</span>
-<span class="fn">codex</span> <span class="str">"@src/components/AdminDashboard.tsx のエラーバウンダリを改善して"</span>
+            <span class="cm"># タスク3: テストカバレッジ向上</span>
+            <span class="fn">codex</span> <span class="str">"@src/components/AdminDashboard.tsx のエラーバウンダリを改善して"</span> &
 
-<span class="cm"># ↑ これらが並列実行される間に他の作業を進められる</span></pre>
-            </div>
-          </div>
+            <span class="cm"># ↑ 全てのバックグラウンドプロセスの完了を待機する</span>
+            wait</pre>
+            </div>          </div>
 
           <div class="card">
             <div
@@ -1633,21 +1641,21 @@ Node.js + Express + TypeScript プロジェクトです。
                   <th>推奨場面</th>
                 </tr>
                 <tr>
-                  <td><span class="tag tag-plan">suggest</span></td>
-                  <td><code style="font-family: var(--mono)">codex</code></td>
-                  <td style="color: var(--text2)">変更前に毎回確認</td>
+                  <td><span class="tag tag-plan">untrusted</span></td>
+                  <td><code style="font-family: var(--mono)">--ask-for-approval untrusted</code><br><code style="font-family: var(--mono)">--sandbox read-only</code></td>
+                  <td style="color: var(--text2)">すべての操作を毎回確認</td>
                   <td>初めてのリポジトリ・重要な変更</td>
                 </tr>
                 <tr>
                   <td><span class="tag tag-tip">on-request</span></td>
-                  <td><code style="font-family: var(--mono)">codex --local</code></td>
-                  <td style="color: var(--text2)">ローカル書き込みは許可、外部は確認</td>
+                  <td><code style="font-family: var(--mono)">--ask-for-approval on-request</code><br><code style="font-family: var(--mono)">--sandbox workspace-write</code><br><span style="font-size: 11px; color: var(--text3)">※ --full-auto の実態</span></td>
+                  <td style="color: var(--text2)">ワークスペース内書き込みは許可、外部操作・ネットワークは確認</td>
                   <td>日常的な開発作業</td>
                 </tr>
                 <tr>
-                  <td><span class="tag tag-new">auto-edit</span></td>
-                  <td><code style="font-family: var(--mono)">--full-auto</code></td>
-                  <td style="color: var(--text2)">ほぼ自動承認</td>
+                  <td><span class="tag tag-new">never</span></td>
+                  <td><code style="font-family: var(--mono)">--ask-for-approval never</code><br><code style="font-family: var(--mono)">--sandbox danger-full-access</code></td>
+                  <td style="color: var(--text2)">全操作を自動承認（危険）</td>
                   <td>CI/CD・信頼済みワークフロー</td>
                 </tr>
               </table>
@@ -1714,7 +1722,7 @@ Node.js + Express + TypeScript プロジェクトです。
                 ><span class="cm"># config.toml でMCPサーバーを設定</span>
 <span class="pn">[</span><span class="kw">mcp_servers.github</span><span class="pn">]</span>
 <span class="fn">command</span> = <span class="str">"npx"</span>
-<span class="fn">args</span> = <span class="pn">[</span><span class="str">"@modelcontextprotocol/server-github"</span><span class="pn">]</span></pre>
+<span class="fn">args</span> = <span class="pn">[</span><span class="str">"-y"</span>, <span class="str">"@modelcontextprotocol/server-github"</span><span class="pn">]</span></pre>
               </div>
             </div>
 
@@ -1732,9 +1740,11 @@ Node.js + Express + TypeScript プロジェクトです。
                 繰り返し実行するワークフローをスキルとして定義。チームで共有することでオンボーディングも効率化。
               </p>
               <div class="code-wrap">
-                <pre style="font-size: 12px"><span class="cm"># ~/.agents/skills/add-tests.md</span>
-<span class="kw">## タスク</span>
-指定ファイルのユニットテストを追加する
+                <pre style="font-size: 12px"><span class="cm"># ~/.agents/skills/add-tests/SKILL.md</span>
+---
+name: add-tests
+description: 指定ファイルのユニットテストを追加する
+---
 <span class="kw">## 手順</span>
 1. 既存テストのパターンを確認
 2. 境界値・エラーケースを網羅
@@ -2088,6 +2098,8 @@ Node.js + Express + TypeScript プロジェクトです。
     </div>
 
     <script>
+      document.documentElement.classList.add('js-enabled');
+
       // Intersection Observer for section animations
       const sections = document.querySelectorAll('.section');
       const observer = new IntersectionObserver(
@@ -2107,24 +2119,33 @@ Node.js + Express + TypeScript プロジェクトです。
       const navLinks = document.querySelectorAll('.nav-inner a');
       const sectionEls = document.querySelectorAll('.section[id]');
       
+      function updateNavActive() {
+        let current = '';
+        sectionEls.forEach((el) => {
+          if (el.getBoundingClientRect().top < 120) {
+            current = el.id;
+          }
+        });
+        navLinks.forEach((link) => {
+          if (link.getAttribute('href') === '#' + current) {
+            link.classList.add('is-active');
+          } else {
+            link.classList.remove('is-active');
+          }
+        });
+      }
+
       let scrollTimeout;
       window.addEventListener('scroll', () => {
         if (!scrollTimeout) {
           scrollTimeout = requestAnimationFrame(() => {
-            let current = '';
-            sectionEls.forEach((el) => {
-              if (el.getBoundingClientRect().top < 120) {
-                current = el.id;
-              }
-            });
-            navLinks.forEach((link) => {
-              link.style.color =
-                link.getAttribute('href') === '#' + current ? 'var(--accent)' : 'var(--text3)';
-            });
+            updateNavActive();
             scrollTimeout = null;
           });
         }
       });
+      window.addEventListener('hashchange', updateNavActive);
+      updateNavActive();
     </script>
   </body>
 </html>
