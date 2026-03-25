@@ -1033,9 +1033,16 @@
             <div class="callout callout-info">
               <div class="callout-icon">💡</div>
               <div>
-                <strong>プラン確認：</strong>ChatGPT Plus / Pro / Business / Edu / Enterprise
-                に含まれています。追加料金なしで利用可能です（API利用はOpenAI
-                APIレートに準じます）。
+                <strong>プラン確認：</strong>
+                <ul style="margin-top: 8px; margin-left: 20px; font-size: 13px;">
+                  <li><strong>Plus:</strong> 週間リミットあり（例: 10〜25コードレビュー）</li>
+                  <li><strong>Pro:</strong> 週間リミットあり（例: 100〜250）</li>
+                  <li><strong>Business:</strong> プランに含まれるが、上限超過時はクレジット購入が必要</li>
+                  <li><strong>Enterprise:</strong> クレジットベースの利用（無制限利用の保証なし）</li>
+                </ul>
+                <div style="margin-top: 8px; font-size: 13px;">
+                  ※ 上限超過時のAPI利用は、OpenAI APIレートやクレジット課金に従います。
+                </div>
               </div>
             </div>
           </div>
@@ -1465,23 +1472,11 @@ Node.js + Express + TypeScript プロジェクトです。
                       color: var(--accent);
                       min-width: 200px;
                     "
-                    >~/.codex/AGENTS.override.md</span
+                    >~/.codex/AGENTS.override.md<br>または ~/.codex/AGENTS.md</span
                   >
                   <span style="font-size: 12px; color: var(--text2)"
-                    >グローバル一時オーバーライド</span
+                    >グローバル設定（override 優先）</span
                   >
-                </div>
-                <div style="display: flex; gap: 12px; align-items: center">
-                  <span
-                    style="
-                      font-family: var(--mono);
-                      font-size: 12px;
-                      color: var(--accent);
-                      min-width: 200px;
-                    "
-                    >~/.codex/AGENTS.md</span
-                  >
-                  <span style="font-size: 12px; color: var(--text2)">グローバルデフォルト設定</span>
                 </div>
                 <div style="display: flex; gap: 12px; align-items: center">
                   <span
@@ -1642,20 +1637,20 @@ wait</pre>
                 </tr>
                 <tr>
                   <td><span class="tag tag-plan">untrusted</span></td>
-                  <td><code style="font-family: var(--mono)">--ask-for-approval untrusted</code><br><code style="font-family: var(--mono)">--sandbox read-only</code></td>
-                  <td style="color: var(--text2)">すべての操作を毎回確認</td>
+                  <td><code style="font-family: var(--mono)">--ask-for-approval untrusted</code><br><code style="font-family: var(--mono)">--sandbox read-only</code> (推奨)</td>
+                  <td style="color: var(--text2)">すべての操作を毎回確認（既知の安全な読み取り操作を除く）。適切な sandbox と組み合わせて使用。</td>
                   <td>初めてのリポジトリ・重要な変更</td>
                 </tr>
                 <tr>
                   <td><span class="tag tag-tip">on-request</span></td>
-                  <td><code style="font-family: var(--mono)">--ask-for-approval on-request</code><br><code style="font-family: var(--mono)">--sandbox workspace-write</code><br><span style="font-size: 11px; color: var(--text3)">※ --full-auto の実態</span></td>
-                  <td style="color: var(--text2)">ワークスペース内書き込みは許可、外部操作・ネットワークは確認</td>
+                  <td><code style="font-family: var(--mono)">--ask-for-approval on-request</code><br><code style="font-family: var(--mono)">--sandbox workspace-write</code> (推奨)<br><span style="font-size: 11px; color: var(--text3)">※ --full-auto の実態</span></td>
+                  <td style="color: var(--text2)">ワークスペース内書き込みは許可、外部操作・ネットワークは確認。</td>
                   <td>日常的な開発作業</td>
                 </tr>
                 <tr>
                   <td><span class="tag tag-new">never</span></td>
-                  <td><code style="font-family: var(--mono)">--ask-for-approval never</code><br><code style="font-family: var(--mono)">--sandbox danger-full-access</code></td>
-                  <td style="color: var(--text2)">全操作を自動承認（危険）</td>
+                  <td><code style="font-family: var(--mono)">--ask-for-approval never</code><br><span style="font-size: 11px; color: var(--text3)">※ 任意の sandbox と併用可能</span></td>
+                  <td style="color: var(--text2)">承認プロンプトをスキップ。完全なバイパスには別途 <code style="font-size:11px">--sandbox danger-full-access</code> が必要。</td>
                   <td>CI/CD・信頼済みワークフロー</td>
                 </tr>
               </table>
@@ -2098,22 +2093,27 @@ description: 指定ファイルのユニットテストを追加する
     </div>
 
     <script>
-      document.documentElement.classList.add('js-enabled');
+      try {
+        if ('IntersectionObserver' in window) {
+          // Intersection Observer for section animations
+          const sections = document.querySelectorAll('.section');
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add('visible');
+                }
+              });
+            },
+            { threshold: 0.08, rootMargin: '0px 0px -40px 0px' },
+          );
 
-      // Intersection Observer for section animations
-      const sections = document.querySelectorAll('.section');
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('visible');
-            }
-          });
-        },
-        { threshold: 0.08, rootMargin: '0px 0px -40px 0px' },
-      );
-
-      sections.forEach((s) => observer.observe(s));
+          sections.forEach((s) => observer.observe(s));
+          document.documentElement.classList.add('js-enabled');
+        }
+      } catch (e) {
+        console.warn('IntersectionObserver init failed, animations disabled.', e);
+      }
 
       // Active nav link
       const navLinks = document.querySelectorAll('.nav-inner a');
