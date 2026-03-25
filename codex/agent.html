@@ -475,6 +475,16 @@
         color: #2dd4bf;
         border: 1px solid rgba(20, 184, 166, 0.3);
       }
+      .b-orange {
+        background: rgba(249, 115, 22, 0.15);
+        color: #fb923c;
+        border: 1px solid rgba(249, 115, 22, 0.3);
+      }
+      .b-gray {
+        background: rgba(107, 114, 128, 0.15);
+        color: #9ca3af;
+        border: 1px solid rgba(107, 114, 128, 0.3);
+      }
 
       /* ── alert boxes ── */
       .alert {
@@ -1057,8 +1067,8 @@
                 >features</span
               >] <span class="cm">multi_agents</span> = <span class="ck">true</span>
 
-              [<span class="cm">agents</span>] <span class="cm">max_concurrent</span> =
-              <span class="cv">4</span> <span class="cc"># 同時実行上限</span>
+              [<span class="cm">agents</span>] <span class="cm">max_threads</span> =
+              <span class="cv">4</span> <span class="cc"># 同時実行上限（デフォルト: 6）</span>
               <span class="cm">max_depth</span> = <span class="cv">1</span>
               <span class="cc"># 孫エージェントは禁止（推奨）</span>
 

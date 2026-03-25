@@ -216,7 +216,7 @@
       }
 
       /* NAV */
-      nav {
+      nav.page-nav {
         position: sticky;
         top: calc(var(--ch-height) + var(--ch-disclaimer-height, 0px));
         z-index: 100;
@@ -881,8 +881,8 @@
             <div class="stat-label">最新モデル</div>
           </div>
           <div class="stat">
-            <div class="stat-val">192K</div>
-            <div class="stat-label">最大コンテキスト</div>
+            <div class="stat-val">1,050,000</div>
+            <div class="stat-label">最大コンテキスト (tokens)</div>
           </div>
           <div class="stat">
             <div class="stat-val">7</div>
@@ -896,7 +896,7 @@
       </header>
 
       <!-- NAV -->
-      <nav>
+      <nav class="page-nav">
         <div class="nav-inner">
           <div class="nav-logo">CODEX GUIDE</div>
           <a href="#what">概要</a>
@@ -1235,8 +1235,9 @@ npm --version</pre>
 <span class="op">/model</span> gpt-5.4-mini
 
 <span class="cm"># config.toml で永続設定 (~/.codex/config.toml)</span>
-<span class="pn">[</span><span class="kw">model</span><span class="pn">]</span>
-<span class="fn">default</span> = <span class="str">"gpt-5.4"</span></pre>
+<span class="fn">model</span> = <span class="str">"gpt-5.4"</span>
+<span class="cm"># オプション: レビュー専用モデル</span>
+<span class="fn">review_model</span> = <span class="str">"gpt-5.4-mini"</span></pre>
             </div>
           </div>
 
