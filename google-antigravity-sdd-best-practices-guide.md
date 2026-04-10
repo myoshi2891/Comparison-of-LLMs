@@ -686,12 +686,16 @@ pipeline = GraphAgent(
 
 ```python
 # ❌ 全エージェントに最高精度モデルを使う（コスト爆発）
-all_agents_pro = LlmAgent(model='gemini-3.1-pro-preview', ...)
+all_agents_pro = LlmAgent(
+    model='gemini-3.1-pro-preview',
+    name='all-pro-agent',
+    instruction='...',
+)
 
 # ✅ 役割に応じてモデルを使い分ける
-orchestrator = LlmAgent(model='gemini-3-flash-preview', ...)  # 軽量でルーティング
-implementer  = LlmAgent(model='gemini-3-flash-preview', ...)  # 実装はバランス型
-architect    = LlmAgent(model='gemini-3.1-pro-preview', ...)  # 設計だけ高精度モデル
+orchestrator = LlmAgent(model='gemini-3-flash-preview', name='orchestrator', instruction='...')  # 軽量でルーティング
+implementer  = LlmAgent(model='gemini-3-flash-preview', name='implementer',  instruction='...')   # 実装はバランス型
+architect    = LlmAgent(model='gemini-3.1-pro-preview', name='architect',    instruction='...')   # 設計だけ高精度モデル
 ```
 
 ### プラン・料金
