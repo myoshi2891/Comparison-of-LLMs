@@ -1,4 +1,4 @@
-# Gemini.md
+# GEMINI.md
 
 AI モデルの時間別コスト計算機における Gemini (Code Assist / ADK / CLI) 向けプロジェクト仕様・コンテキストファイルです。
 
