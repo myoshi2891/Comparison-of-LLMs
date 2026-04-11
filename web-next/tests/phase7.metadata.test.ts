@@ -91,25 +91,36 @@ describe("Phase 7 - metadata.alternates", () => {
 });
 
 describe("Phase 7 - metadata.openGraph", () => {
+  // OpenGraph は type プロパティで判別される union 型。構造アサートを
+  // 型安全に書くためにテスト局所で loose 型へキャストする。
+  type LooseOg = {
+    type?: string;
+    siteName?: string;
+    locale?: string;
+    alternateLocale?: string[];
+    title?: string;
+    description?: string;
+    url?: string;
+  };
+  const og = metadata.openGraph as LooseOg;
+
   it("declares website type and brand siteName", () => {
-    expect(metadata.openGraph?.type).toBe("website");
-    expect(metadata.openGraph?.siteName).toBe("AI Cost Simulator");
+    expect(og.type).toBe("website");
+    expect(og.siteName).toBe("AI Cost Simulator");
   });
 
   it("uses ja_JP as primary locale with en_US alternate", () => {
-    const og = metadata.openGraph as { locale?: string; alternateLocale?: string[] };
     expect(og.locale).toBe("ja_JP");
     expect(og.alternateLocale).toContain("en_US");
   });
 
   it("mirrors title & description from i18n for og:title / og:description", () => {
-    const og = metadata.openGraph as { title?: string; description?: string };
     expect(og.title).toBe(t("heroTitle", "ja"));
     expect(og.description).toBe(t("heroDesc", "ja"));
   });
 
   it("defines a root-relative url so metadataBase resolves it", () => {
-    expect(metadata.openGraph?.url).toBe("/");
+    expect(og.url).toBe("/");
   });
 });
 

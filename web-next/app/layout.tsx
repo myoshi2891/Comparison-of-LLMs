@@ -1,11 +1,7 @@
-import type { Metadata } from "next";
 import { jetbrainsMono, notoSansJp, syne } from "@/lib/fonts";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: "AI Cost Simulator",
-  description: "AIモデル時間別コスト計算機 (USD/JPY)",
-};
+export { metadata, viewport } from "@/lib/metadata";
 
 export default function RootLayout({
   children,
