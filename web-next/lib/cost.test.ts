@@ -191,4 +191,29 @@ describe("fmtJPY", () => {
     // 1000 * 150 = 150000 → ¥150,000
     expect(fmtJPY(1000, 150)).toBe("¥150,000");
   });
+
+  describe("jpyRate guard (Phase 4 refactor)", () => {
+    it("returns ¥— when jpyRate is 0 (rate fetch failed)", () => {
+      // Previously this silently returned '¥0', masking a broken rate
+      expect(fmtJPY(100, 0)).toBe("¥—");
+    });
+
+    it("returns ¥— when jpyRate is negative", () => {
+      expect(fmtJPY(100, -1)).toBe("¥—");
+    });
+
+    it("returns ¥— when jpyRate is NaN", () => {
+      expect(fmtJPY(100, Number.NaN)).toBe("¥—");
+    });
+
+    it("returns ¥— when jpyRate is Infinity", () => {
+      expect(fmtJPY(100, Number.POSITIVE_INFINITY)).toBe("¥—");
+    });
+
+    it("invalid rate takes precedence over zero v", () => {
+      // Even if v is 0 (would normally be '¥0'), an invalid rate
+      // signals we can't make any JPY claim at all.
+      expect(fmtJPY(0, 0)).toBe("¥—");
+    });
+  });
 });

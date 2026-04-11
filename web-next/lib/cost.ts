@@ -61,8 +61,15 @@ export function fmtUSD(v: number): string {
   return `$${v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
 }
 
-/** JPY 金額をフォーマット */
+/**
+ * JPY 金額をフォーマット
+ *
+ * `jpyRate <= 0` は「為替レート取得失敗」を示す無効値として扱い、
+ * `¥—` を返す。これがないと `v > 0` でも `v * 0 = 0` で `¥0` を返してしまい、
+ * 「価格がゼロ」と「レート不明」が区別不能になる（defense in depth）。
+ */
 export function fmtJPY(v: number, jpyRate: number): string {
+  if (!Number.isFinite(jpyRate) || jpyRate <= 0) return "¥—";
   const j = v * jpyRate;
   if (j <= 0) return "¥0";
   if (j < 1) return "<¥1";
