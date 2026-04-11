@@ -1,12 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  PERIODS,
-  calcApiCost,
-  calcSubCost,
-  colorIndex,
-  fmtJPY,
-  fmtUSD,
-} from "@/lib/cost";
+import { calcApiCost, calcSubCost, colorIndex, fmtJPY, fmtUSD, PERIODS } from "@/lib/cost";
 
 describe("PERIODS", () => {
   it("exports seven time periods from 1h to 12mo", () => {
