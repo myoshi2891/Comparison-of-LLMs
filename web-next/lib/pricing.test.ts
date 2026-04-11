@@ -63,15 +63,11 @@ describe("ApiModelSchema", () => {
   });
 
   it("rejects negative price_in", () => {
-    expect(() =>
-      ApiModelSchema.parse({ ...validApiModel, price_in: -1 }),
-    ).toThrow();
+    expect(() => ApiModelSchema.parse({ ...validApiModel, price_in: -1 })).toThrow();
   });
 
   it("rejects negative price_out", () => {
-    expect(() =>
-      ApiModelSchema.parse({ ...validApiModel, price_out: -0.01 }),
-    ).toThrow();
+    expect(() => ApiModelSchema.parse({ ...validApiModel, price_out: -0.01 })).toThrow();
   });
 
   it("accepts zero prices (free tier)", () => {
@@ -85,9 +81,7 @@ describe("ApiModelSchema", () => {
   });
 
   it("rejects invalid scrape_status", () => {
-    expect(() =>
-      ApiModelSchema.parse({ ...validApiModel, scrape_status: "draft" }),
-    ).toThrow();
+    expect(() => ApiModelSchema.parse({ ...validApiModel, scrape_status: "draft" })).toThrow();
   });
 });
 
@@ -102,15 +96,11 @@ describe("SubToolSchema", () => {
   });
 
   it("rejects negative monthly", () => {
-    expect(() =>
-      SubToolSchema.parse({ ...validSubTool, monthly: -5 }),
-    ).toThrow();
+    expect(() => SubToolSchema.parse({ ...validSubTool, monthly: -5 })).toThrow();
   });
 
   it("rejects monthly as string", () => {
-    expect(() =>
-      SubToolSchema.parse({ ...validSubTool, monthly: "20" }),
-    ).toThrow();
+    expect(() => SubToolSchema.parse({ ...validSubTool, monthly: "20" })).toThrow();
   });
 });
 
@@ -134,7 +124,7 @@ describe("PricingDataSchema", () => {
 
   it("rejects non-array api_models", () => {
     expect(() =>
-      PricingDataSchema.parse({ ...validPricingData, api_models: "not-array" }),
+      PricingDataSchema.parse({ ...validPricingData, api_models: "not-array" })
     ).toThrow();
   });
 
