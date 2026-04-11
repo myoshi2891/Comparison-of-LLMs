@@ -3,15 +3,18 @@
 /*
  * 移行元: web/src/index.css (227 lines)
  *
- * 変更点:
- * - 旧 Google Fonts CDN の @import を削除。フォントは next/font 経由で
- *   self-host し、--font-sans / --font-mono / --font-display CSS 変数を
- *   app/layout.tsx の <html> に適用する。
- * - font-family: 'Noto Sans JP', sans-serif →
- *   font-family: var(--font-sans), sans-serif
- *   のように変数参照に置換。
- * - その他の design tokens / class 定義は Phase 6 時点で逐語移植。
- *   Tailwind v4 @theme inline との統合は次の Refactor コミットで実施。
+ * 設計:
+ * - :root に legacy design tokens (--bg, --acc, --txt 等) を定義。
+ *   既存の .hero / .panel 等の class 定義から var(--acc) の形で
+ *   参照される (後方互換)。
+ * - @theme inline で legacy tokens を Tailwind v4 の
+ *   --color-* / --font-* 名前空間にエイリアス。これにより
+ *   bg-acc / text-acc / font-display 等のユーティリティが
+ *   自動生成され、Phase 8 以降で Atomic UI を Tailwind で
+ *   記述できるようになる。
+ * - フォントは next/font/google (lib/fonts.ts) で self-host し、
+ *   --font-sans / --font-mono / --font-display を <html> に
+ *   className 経由で注入。CSS 側は var(--font-sans) で参照する。
  */
 
 :root {
@@ -35,6 +38,40 @@
   --prp: #a78bfa;
   --teal: #2dd4bf;
   --orng: #fb923c;
+}
+
+/*
+ * Tailwind v4 theme: legacy tokens → --color-* へエイリアス。
+ * これで bg-acc / text-txt2 / border-brd 等の utility クラスが
+ * 自動生成され、Phase 8 以降の Atomic UI を Tailwind で書ける。
+ *
+ * フォント系の --font-sans/--font-mono/--font-display は next/font が
+ * <html> 要素に直接注入しており、CSS 側は var(--font-sans) で参照する。
+ * Tailwind の font-sans utility を使う場合は同名の循環参照になるため、
+ * ここでは theme にマッピングせず、必要なら font-[var(--font-sans)] 形式
+ * か専用の `--font-*` エイリアスを別途追加する方針とする。
+ */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg2: var(--bg2);
+  --color-srf: var(--srf);
+  --color-srf2: var(--srf2);
+  --color-brd: var(--brd);
+  --color-brd2: var(--brd2);
+  --color-txt: var(--txt);
+  --color-txt2: var(--txt2);
+  --color-txt3: var(--txt3);
+  --color-acc: var(--acc);
+  --color-acc2: var(--acc2);
+  --color-grn: var(--grn);
+  --color-grn2: var(--grn2);
+  --color-ylw: var(--ylw);
+  --color-ylw2: var(--ylw2);
+  --color-red: var(--red);
+  --color-red2: var(--red2);
+  --color-prp: var(--prp);
+  --color-teal: var(--teal);
+  --color-orng: var(--orng);
 }
 
 *,
