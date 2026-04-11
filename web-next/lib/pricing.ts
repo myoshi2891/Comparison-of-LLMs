@@ -51,3 +51,19 @@ export const PricingDataSchema: z.ZodType<PricingData> = z.object({
 export function parsePricingData(input: unknown): PricingData {
   return PricingDataSchema.parse(input);
 }
+
+/**
+ * 型定義と Zod スキーマの乖離を **コンパイル時** に検出するパリティチェック。
+ * どちらか一方だけ変更するとここで型エラーになる。ランタイムコードには
+ * 影響しない（`never` 型の定数は tree-shake される）。
+ */
+type _AssertParity = [
+  ApiModel extends z.infer<typeof ApiModelSchema> ? true : never,
+  z.infer<typeof ApiModelSchema> extends ApiModel ? true : never,
+  SubTool extends z.infer<typeof SubToolSchema> ? true : never,
+  z.infer<typeof SubToolSchema> extends SubTool ? true : never,
+  PricingData extends z.infer<typeof PricingDataSchema> ? true : never,
+  z.infer<typeof PricingDataSchema> extends PricingData ? true : never,
+];
+const _parityCheck: _AssertParity = [true, true, true, true, true, true];
+void _parityCheck;
