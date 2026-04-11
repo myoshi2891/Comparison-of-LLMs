@@ -22,14 +22,35 @@
 import type { Metadata, Viewport } from "next";
 import { t } from "./i18n";
 
-const SITE_ORIGIN = "https://comparison-of-llms.netlify.app";
+const DEFAULT_ORIGIN = "https://comparison-of-llms.netlify.app";
 const BRAND = "AI Cost Simulator";
+
+/**
+ * `metadataBase` 用 URL を環境変数優先で解決する。
+ *
+ * - 優先: `process.env.NEXT_PUBLIC_SITE_URL`（Netlify のプレビュー URL
+ *   など、デプロイ先で動的に書き換えたい場合に使う）
+ * - フォールバック: `DEFAULT_ORIGIN`（本番 Netlify URL）
+ * - 無効な URL 文字列を env に入れられた場合は throw せずフォールバック。
+ *   ビルドを失敗させるより、本番 origin に縮退して生存させる方が安全。
+ */
+function resolveSiteOrigin(): URL {
+  const raw = process.env.NEXT_PUBLIC_SITE_URL;
+  if (raw && raw.length > 0) {
+    try {
+      return new URL(raw);
+    } catch {
+      // 無効 URL はフォールバックへ。
+    }
+  }
+  return new URL(DEFAULT_ORIGIN);
+}
 
 const heroTitleJa = t("heroTitle", "ja");
 const heroDescJa = t("heroDesc", "ja");
 
 export const metadata: Metadata = {
-  metadataBase: new URL(SITE_ORIGIN),
+  metadataBase: resolveSiteOrigin(),
   title: {
     default: heroTitleJa,
     template: `%s | ${BRAND}`,
