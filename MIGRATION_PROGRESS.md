@@ -6,9 +6,9 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- **最新 HEAD**: `6e6c5bd` (Phase 9 ApiTable Green 完了)
-- **次の作業**: **Phase 10 Compose `app/page.tsx`**（全コンポーネントを合成し、Client/Server 境界を確立）
-- **検証状態**: lint / typecheck / test (309 passed) / build すべて green
+- **最新 HEAD**: `0cb392b` (Phase 10 page.tsx Green 完了)
+- **次の作業**: **Phase 11 視覚パリティ検証**（`bun run dev` でレガシーとの視覚比較）
+- **検証状��**: lint / typecheck / test (329 passed) / build すべて green
 
 ## フェーズ進捗
 
@@ -23,7 +23,7 @@
 | 7 | Layout + Metadata API | 完了 | `0182d4b`, `02a6fe6`, `c30c4d3` |
 | 8 | Atomic UI Components (×6) | 完了 | 下記「Phase 8 コミット表」参照 |
 | 9 | Table components (ApiTable / SubTable) | 完了 | 下記「Phase 9 コミット表」参照 |
-| 10 | Compose `app/page.tsx` | 未着手 | — |
+| 10 | Compose `app/page.tsx` | 完了 | `4ffdc70`, `0cb392b` |
 | 11 | 視覚パリティ検証 | 未着手 | — |
 | 12 | 統合テスト | 未着手 | — |
 | 13 | Deployment (netlify.toml) | 未着手 | — |
@@ -35,7 +35,7 @@
 web-next/
 ├── app/
 │   ├── layout.tsx           # Phase 7: metadata/viewport を lib/metadata から再エクスポート
-│   ├── page.tsx             # scaffold デフォルト（Phase 10 で差し替え予定）
+│   ├── page.tsx             # Phase 10: Server Component (Zod 検証 → HomePage 委譲)
 │   └── globals.css          # Phase 6: legacy 227-line CSS 移植 + @theme inline
 ├── lib/
 │   ├── cost.ts              # 6 純粋関数（calcApiCost / calcSubCost / colorIndex / fmtUSD / fmtJPY / PERIODS）
@@ -64,24 +64,29 @@ web-next/
 │   ├── SubTable.tsx         # Server Component（Phase 9: サブスクプラン比較表）
 │   ├── SubTable.test.tsx    # 21 tests
 │   ├── ApiTable.tsx         # Client Component（Phase 9: 列ソート付き API モデル比較表）
-│   └── ApiTable.test.tsx    # 25 tests
+│   ├── ApiTable.test.tsx    # 25 tests
+│   ├── HomePage.tsx         # Client Component（Phase 10: 全 state 管理 + コンポーネント合成）
+│   └── HomePage.test.tsx    # 16 tests
 ├── types/
 │   └── pricing.ts           # PricingData / ApiModel / SubTool（Pydantic と同期）
 ├── tests/
 │   ├── setup.ts             # @testing-library/jest-dom + afterEach cleanup
 │   ├── smoke.test.tsx       # 環境疎通確認 1 test
 │   ├── phase6.css.test.ts   # 81 tests (globals.css / lib/fonts.ts / layout.tsx 契約)
-│   └── phase7.metadata.test.ts  # 23 tests (metadata / viewport / layout 再エクスポート契約)
+│   ├── phase7.metadata.test.ts  # 23 tests (metadata / viewport / layout 再エクスポート契約)
+│   └── phase10.page.test.ts # 4 tests (page.tsx 静的契約: Server Component + Zod + data)
+├── data/
+│   └── pricing.json         # Phase 10: ビルド時 static import 用 (web/src/data/ からコピー)
 ├── biome.json               # space 2 / 100 col / noExplicitAny / noDoubleEquals / etc.
 ├── vitest.config.ts         # jsdom + @ alias
 ├── tsconfig.json            # strict + noUnusedLocals + erasableSyntaxOnly 他
 └── package.json             # scripts: dev / build / test / lint / typecheck
 ```
 
-**テスト数**: 309
+**テスト数**: 329
 (40 cost + 19 pricing + 1 smoke + 7 i18n plain + 10 i18n rich + 81 phase6 css + 23 phase7 metadata
  + 10 DualCell + 8 LanguageToggle + 12 Hero + 11 MathSection + 18 RefLinks + 23 ScenarioSelector
- + 21 SubTable + 25 ApiTable)
+ + 21 SubTable + 25 ApiTable + 4 phase10 page + 16 HomePage)
 
 ## 確定した設計判断（`docs/NEXTJS_MIGRATION_PLAN.md` ステップ 0）
 
@@ -214,7 +219,7 @@ web-next/
 ### ScenarioSelector（Client Component の型安全化）
 
 - レガシーの `T[key as keyof typeof T][lang] as string` 型アサーションを `t(key, lang)` に置き換え
-- `sc_${ScenarioKey}` をテンプレートリテラル型 `ScLabelKey = \`sc_${ScenarioKey}\`` で表現し、`t()` の第一引数を型安全に固定
+- `sc_${ScenarioKey}` をテンプレートリテラル型 `ScLabelKey = \`sc_${ScenarioKey}\``で表現し、`t()` の第一引数を型安全に固定
 - `<label>` の Biome `noLabelWithoutControl` に対応するため `useId()` で ID を 2 本発行し、数値 `<input>` と `htmlFor` で紐付け（range は視覚的な隣接で代替）
 - `.scenarios` コンテナへスコープしたテキスト検索で、assumption-bar のラベル echo と取り違えるテスト衝突を回避
 
@@ -250,15 +255,51 @@ web-next/
 - `biome-ignore lint/suspicious/noArrayIndexKey` を `grp-${idx}` / `row-${idx}` に付与（SubTable と同一パターン）
 - 25 件の契約テスト: root 構造 (4) + ソート表示 (5) + グループヘッダ (3) + モデルセル (5) + 最安行 (3) + DualCell 配線 (2) + sort title a11y (2) + 静的検査 (1)
 
+## Phase 10 の成果（Compose app/page.tsx）
+
+### アーキテクチャ
+
+```
+app/page.tsx (Server Component)
+  └── parsePricingData(pricingJson)  ← Zod ランタイム検証
+  └── <HomePage data={pricing} />   ← Client Component へ委譲
+
+components/HomePage.tsx ("use client")
+  ├── useState × 5 (lang, tab, scenario, inputTokens, outputTokens)
+  ├── <LanguageToggle />
+  ├── <Hero />
+  ├── <ScenarioSelector />
+  ├── time-badges + tabs UI
+  ├── <ApiTable /> | <SubTable />
+  ├── tRich("apiNote"/"subNote") note-box
+  ├── <MathSection />
+  ├── <RefLinks />
+  ├── tRich("disclaimer") disclaimer-box
+  └── <footer>
+```
+
+### キー設計判断
+
+1. **Server/Client 2 層分離**: page.tsx (Server) がデータ検証、HomePage (Client) が状態管理。SSG ビルド時に Zod が不正データを検出する Phase 3 の投資を回収
+2. **生 HTML 注入の完全撲滅**: レガシーの `apiNote`/`subNote`/`disclaimer` 3 箇所を `tRich()` に置換。Phase 5 先行投資の最大の回収ポイント
+3. **pricing.json は web-next/data/ にコピー**: web/ との独立性を維持。update.sh の更新は Phase 13/14 で対応
+
+### Phase 10 コミット表
+
+| ステップ | コミット | 内容 |
+|---------|---------|------|
+| Red | `4ffdc70` | 20 件の契約テスト (page.tsx 静的 4 + HomePage 16) |
+| Green | `0cb392b` | page.tsx + HomePage.tsx 実装 |
+
 ## 検証コマンド
 
 ```bash
 cd web-next
 bun run lint        # Biome check
 bun run typecheck   # tsc --noEmit
-bun run test        # Vitest (309 tests)
+bun run test        # Vitest (329 tests)
 bun run build       # Next.js build
-bun run dev         # 開発サーバー（Phase 10 以降で意味を持つ）
+bun run dev         # 開発サーバー（Phase 11 視覚パリティ検証で使用）
 ```
 
 ## 次回セッションでの再開プロンプト
@@ -269,23 +310,16 @@ bun run dev         # 開発サーバー（Phase 10 以降で意味を持つ）
 Next.js 移行プロジェクトの作業を再開してください。
 
 - 現在のブランチ: feat/nextjs-migration
-- 最新 HEAD: 6e6c5bd (Phase 9 ApiTable Green 完了)
+- 最新 HEAD: 0cb392b (Phase 10 page.tsx Green 完了)
 - 移行計画: docs/NEXTJS_MIGRATION_PLAN.md
 - 進捗トラッカー: MIGRATION_PROGRESS.md
 
-上記 2 ファイルを読んで現在地を把握した上で、Phase 10
-(app/page.tsx の合成) に進んでください。
+上記 2 ファイルを読んで現在地を把握した上で、Phase 11
+(視覚パリティ検証) に進んでください。
 
-Phase 10 の目標:
-- app/page.tsx で全コンポーネントを合成
-- pricing.json を static import → Zod 検証
-- Client/Server 境界の確立
-  - Server: Hero, MathSection, RefLinks, SubTable, DualCell
-  - Client: LanguageToggle, ScenarioSelector, ApiTable
-- useState で lang / scenario / inputTokens / outputTokens を管理
-- レガシー: web/src/App.tsx
-
-実装前にレガシー App.tsx を読んで、状態管理の全体像と
-コンポーネント配置を整理してから着手してください。
-TDD + Atomic Commit (Red → Green) のルールを継続。
+Phase 11 の目標:
+- `bun run dev` でレガシー (web/) と新版 (web-next/) を同時起動
+- ピクセル単位でなく「機能的に同等」レベルの視覚パリティを確認
+- 差異があればコンポーネント単位で修正
+- JA/EN 切替・タブ切替・シナリオ選択が正常動作することを確認
 ```
