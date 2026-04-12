@@ -83,6 +83,10 @@ describe("ApiModelSchema", () => {
   it("rejects invalid scrape_status", () => {
     expect(() => ApiModelSchema.parse({ ...validApiModel, scrape_status: "draft" })).toThrow();
   });
+
+  it("rejects unknown extra fields (strict schema)", () => {
+    expect(() => ApiModelSchema.parse({ ...validApiModel, extra_field: "x" })).toThrow();
+  });
 });
 
 describe("SubToolSchema", () => {
@@ -101,6 +105,10 @@ describe("SubToolSchema", () => {
 
   it("rejects monthly as string", () => {
     expect(() => SubToolSchema.parse({ ...validSubTool, monthly: "20" })).toThrow();
+  });
+
+  it("rejects unknown extra fields (strict schema)", () => {
+    expect(() => SubToolSchema.parse({ ...validSubTool, extra_field: "x" })).toThrow();
   });
 });
 
@@ -134,5 +142,24 @@ describe("PricingDataSchema", () => {
       api_models: [{ ...validApiModel, price_in: -1 }],
     };
     expect(() => PricingDataSchema.parse(badNested)).toThrow();
+  });
+
+  it("rejects unknown extra fields (strict schema)", () => {
+    expect(() => PricingDataSchema.parse({ ...validPricingData, extra_field: "x" })).toThrow();
+  });
+
+  it("rejects invalid generated_at format", () => {
+    expect(() =>
+      PricingDataSchema.parse({ ...validPricingData, generated_at: "2026-03-07T14:30:00Z" })
+    ).toThrow();
+    expect(() =>
+      PricingDataSchema.parse({ ...validPricingData, generated_at: "not-a-date" })
+    ).toThrow();
+  });
+
+  it("rejects invalid jpy_rate_date format", () => {
+    expect(() =>
+      PricingDataSchema.parse({ ...validPricingData, jpy_rate_date: "03/07/2026" })
+    ).toThrow();
   });
 });

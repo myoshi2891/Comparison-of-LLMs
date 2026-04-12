@@ -12,37 +12,48 @@ import type { ApiModel, PricingData, SubTool } from "@/types/pricing";
 
 export const ScrapeStatusSchema = z.enum(["success", "fallback", "manual"]);
 
-export const ApiModelSchema: z.ZodType<ApiModel> = z.object({
-  provider: z.string(),
-  name: z.string(),
-  tag: z.string(),
-  cls: z.string(),
-  price_in: z.number().nonnegative(),
-  price_out: z.number().nonnegative(),
-  sub_ja: z.string(),
-  sub_en: z.string(),
-  scrape_status: ScrapeStatusSchema,
-});
+/** YYYY-MM-DD 形式の日付文字列バリデーター */
+const dateString = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format, expected YYYY-MM-DD");
 
-export const SubToolSchema: z.ZodType<SubTool> = z.object({
-  group: z.string(),
-  name: z.string(),
-  monthly: z.number().nonnegative(),
-  annual: z.number().nonnegative().nullable(),
-  tag: z.string(),
-  cls: z.string(),
-  note_ja: z.string(),
-  note_en: z.string(),
-  scrape_status: ScrapeStatusSchema,
-});
+export const ApiModelSchema: z.ZodType<ApiModel> = z
+  .object({
+    provider: z.string(),
+    name: z.string(),
+    tag: z.string(),
+    cls: z.string(),
+    price_in: z.number().nonnegative(),
+    price_out: z.number().nonnegative(),
+    sub_ja: z.string(),
+    sub_en: z.string(),
+    scrape_status: ScrapeStatusSchema,
+  })
+  .strict();
 
-export const PricingDataSchema: z.ZodType<PricingData> = z.object({
-  generated_at: z.string(),
-  jpy_rate: z.number().positive(),
-  jpy_rate_date: z.string(),
-  api_models: z.array(ApiModelSchema),
-  sub_tools: z.array(SubToolSchema),
-});
+export const SubToolSchema: z.ZodType<SubTool> = z
+  .object({
+    group: z.string(),
+    name: z.string(),
+    monthly: z.number().nonnegative(),
+    annual: z.number().nonnegative().nullable(),
+    tag: z.string(),
+    cls: z.string(),
+    note_ja: z.string(),
+    note_en: z.string(),
+    scrape_status: ScrapeStatusSchema,
+  })
+  .strict();
+
+export const PricingDataSchema: z.ZodType<PricingData> = z
+  .object({
+    generated_at: dateString,
+    jpy_rate: z.number().positive(),
+    jpy_rate_date: dateString,
+    api_models: z.array(ApiModelSchema),
+    sub_tools: z.array(SubToolSchema),
+  })
+  .strict();
 
 /**
  * `unknown` 入力を検証し、失敗時は詳細メッセージを投げる。

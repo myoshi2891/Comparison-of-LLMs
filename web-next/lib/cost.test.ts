@@ -165,6 +165,20 @@ describe("fmtUSD", () => {
     expect(fmtUSD(1234.56)).toBe("$1,234.56");
     expect(fmtUSD(1_234_567.89)).toBe("$1,234,567.89");
   });
+
+  describe("non-finite guard", () => {
+    it("returns $0.00 for NaN", () => {
+      expect(fmtUSD(Number.NaN)).toBe("$0.00");
+    });
+
+    it("returns $0.00 for Infinity", () => {
+      expect(fmtUSD(Number.POSITIVE_INFINITY)).toBe("$0.00");
+    });
+
+    it("returns $0.00 for -Infinity", () => {
+      expect(fmtUSD(Number.NEGATIVE_INFINITY)).toBe("$0.00");
+    });
+  });
 });
 
 describe("fmtJPY", () => {
@@ -214,6 +228,20 @@ describe("fmtJPY", () => {
       // Even if v is 0 (would normally be '¥0'), an invalid rate
       // signals we can't make any JPY claim at all.
       expect(fmtJPY(0, 0)).toBe("¥—");
+    });
+  });
+
+  describe("non-finite v guard", () => {
+    it("returns ¥— when v is NaN", () => {
+      expect(fmtJPY(Number.NaN, 150)).toBe("¥—");
+    });
+
+    it("returns ¥— when v is Infinity", () => {
+      expect(fmtJPY(Number.POSITIVE_INFINITY, 150)).toBe("¥—");
+    });
+
+    it("returns ¥— when v is -Infinity", () => {
+      expect(fmtJPY(Number.NEGATIVE_INFINITY, 150)).toBe("¥—");
     });
   });
 });

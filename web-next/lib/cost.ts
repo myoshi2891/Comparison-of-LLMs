@@ -56,6 +56,7 @@ export function colorIndex(v: number): number {
 
 /** USD 金額をフォーマット */
 export function fmtUSD(v: number): string {
+  if (!Number.isFinite(v)) return "$0.00";
   if (v <= 0) return "$0.00";
   if (v < 0.005) return "<$0.01";
   return `$${v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
@@ -67,8 +68,10 @@ export function fmtUSD(v: number): string {
  * `jpyRate <= 0` は「為替レート取得失敗」を示す無効値として扱い、
  * `¥—` を返す。これがないと `v > 0` でも `v * 0 = 0` で `¥0` を返してしまい、
  * 「価格がゼロ」と「レート不明」が区別不能になる（defense in depth）。
+ * `v` が非有限値 (NaN / Infinity) の場合も同様に `¥—` を返す。
  */
 export function fmtJPY(v: number, jpyRate: number): string {
+  if (!Number.isFinite(v)) return "¥—";
   if (!Number.isFinite(jpyRate) || jpyRate <= 0) return "¥—";
   const j = v * jpyRate;
   if (j <= 0) return "¥0";
