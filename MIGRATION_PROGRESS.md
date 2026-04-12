@@ -6,9 +6,9 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- **最新 HEAD**: `0d281e8` (Phase 9 SubTable Green 完了)
-- **次の作業**: **Phase 9 ApiTable**（Client Component、列ソート `useState` を持つ）
-- **検証状態**: lint / typecheck / test (284 passed) / build すべて green
+- **最新 HEAD**: `6e6c5bd` (Phase 9 ApiTable Green 完了)
+- **次の作業**: **Phase 10 Compose `app/page.tsx`**（全コンポーネントを合成し、Client/Server 境界を確立）
+- **検証状態**: lint / typecheck / test (309 passed) / build すべて green
 
 ## フェーズ進捗
 
@@ -22,7 +22,7 @@
 | 6 | Global CSS + `next/font` | 完了 | `a1da834`, `f089489`, `f923d85` |
 | 7 | Layout + Metadata API | 完了 | `0182d4b`, `02a6fe6`, `c30c4d3` |
 | 8 | Atomic UI Components (×6) | 完了 | 下記「Phase 8 コミット表」参照 |
-| 9 | Table components (ApiTable / SubTable) | **進行中 1/2** | 下記「Phase 9 コミット表」参照 |
+| 9 | Table components (ApiTable / SubTable) | 完了 | 下記「Phase 9 コミット表」参照 |
 | 10 | Compose `app/page.tsx` | 未着手 | — |
 | 11 | 視覚パリティ検証 | 未着手 | — |
 | 12 | 統合テスト | 未着手 | — |
@@ -62,7 +62,9 @@ web-next/
 │   ├── ScenarioSelector.tsx # Client Component（useState + useId でラベル紐付け）
 │   ├── ScenarioSelector.test.tsx  # 23 tests
 │   ├── SubTable.tsx         # Server Component（Phase 9: サブスクプラン比較表）
-│   └── SubTable.test.tsx    # 21 tests
+│   ├── SubTable.test.tsx    # 21 tests
+│   ├── ApiTable.tsx         # Client Component（Phase 9: 列ソート付き API モデル比較表）
+│   └── ApiTable.test.tsx    # 25 tests
 ├── types/
 │   └── pricing.ts           # PricingData / ApiModel / SubTool（Pydantic と同期）
 ├── tests/
@@ -76,10 +78,10 @@ web-next/
 └── package.json             # scripts: dev / build / test / lint / typecheck
 ```
 
-**テスト数**: 284
+**テスト数**: 309
 (40 cost + 19 pricing + 1 smoke + 7 i18n plain + 10 i18n rich + 81 phase6 css + 23 phase7 metadata
  + 10 DualCell + 8 LanguageToggle + 12 Hero + 11 MathSection + 18 RefLinks + 23 ScenarioSelector
- + 21 SubTable)
+ + 21 SubTable + 25 ApiTable)
 
 ## 確定した設計判断（`docs/NEXTJS_MIGRATION_PLAN.md` ステップ 0）
 
@@ -221,14 +223,14 @@ web-next/
 ### コンポーネント依存順
 
 1. **SubTable** (Server) — state を持たず純粋に presentational なので先行 ✅
-2. **ApiTable** (Client) — 列ソートのため `useState` × 2 必須、次回セッションで着手
+2. **ApiTable** (Client) — 列ソートのため `useState` × 2 必須 ✅
 
 ### Phase 9 コミット表
 
 | # | コンポーネント | 種別 | Red | Green | Refactor |
 |---|------|------|-----|-------|----------|
 | 1 | SubTable | Server | `eadaabc` | `0d281e8` | — |
-| 2 | ApiTable | Client | — | — | — |
+| 2 | ApiTable | Client | `424b68b` | `6e6c5bd` | — |
 
 ### SubTable（Server Component）
 
@@ -238,13 +240,15 @@ web-next/
 - `tools.map((tool, idx) =>` の `grp-${idx}` / `row-${idx}` 外側キーは `biome-ignore lint/suspicious/noArrayIndexKey` をトップダウンで付与（レガシー互換維持のため）
 - 12mo 列 (`p.hours >= 8760`) かつ `annual != null && annual < monthly * 12` のとき `.sub-flat` で年払 annualNote を表示する挙動を 21 件の契約テストで固定
 
-### 次回セッション予定: ApiTable
+### ApiTable（Client Component）
 
-- **Client Component 必須**（`useState<number | null>` で `sortCol`、`useState(1)` で `sortDir`）
-- **列ソートトグル**: 同じ列を再クリック → 昇降反転、別列クリック → `sortDir=1` にリセット
-- **最安行判定**: `min30 = Math.min(...rows.map(r => r.costs[4]))`（30 日列で比較、`.cheapest-row` + `.cheapest-badge` を付与）
-- **model-sub フォーマット**: `$X in / $Y out /1M | ¥A / ¥B`
-- テスト設計は本セッション中に 21 件程度をドラフト済み → 次回そのまま Red 着地を想定
+- レガシー `web/src/components/ApiTable.tsx` から移植
+- `T.colX[lang]` → `t("colX", lang)` に統一（Phase 5 i18n API）
+- `COL_KEYS` typed array で列キーを型安全に管理（レガシーの `as const` 配列を置換）
+- 期間セルのキーは `PERIODS[ci].key` を使用（SubTable と同一パターン）
+- `PROVIDER_COLORS` マップは 7 プロバイダー分のハードコード色を維持
+- `biome-ignore lint/suspicious/noArrayIndexKey` を `grp-${idx}` / `row-${idx}` に付与（SubTable と同一パターン）
+- 25 件の契約テスト: root 構造 (4) + ソート表示 (5) + グループヘッダ (3) + モデルセル (5) + 最安行 (3) + DualCell 配線 (2) + sort title a11y (2) + 静的検査 (1)
 
 ## 検証コマンド
 
@@ -252,7 +256,7 @@ web-next/
 cd web-next
 bun run lint        # Biome check
 bun run typecheck   # tsc --noEmit
-bun run test        # Vitest (284 tests)
+bun run test        # Vitest (309 tests)
 bun run build       # Next.js build
 bun run dev         # 開発サーバー（Phase 10 以降で意味を持つ）
 ```
@@ -265,28 +269,23 @@ bun run dev         # 開発サーバー（Phase 10 以降で意味を持つ）
 Next.js 移行プロジェクトの作業を再開してください。
 
 - 現在のブランチ: feat/nextjs-migration
-- 最新 HEAD: 0d281e8 (Phase 9 SubTable Green 完了)
+- 最新 HEAD: 6e6c5bd (Phase 9 ApiTable Green 完了)
 - 移行計画: docs/NEXTJS_MIGRATION_PLAN.md
 - 進捗トラッカー: MIGRATION_PROGRESS.md
 
-上記 2 ファイルを読んで現在地を把握した上で、Phase 9 の
-残り 1 コンポーネント (ApiTable) を TDD + Atomic Commit
-のルール（Red → Green の 2 コミット単位）で進めてください。
+上記 2 ファイルを読んで現在地を把握した上で、Phase 10
+(app/page.tsx の合成) に進んでください。
 
-Component: ApiTable
-- Client Component ("use client" 必須)
-- useState<number | null>(null) で sortCol
-- useState(1) で sortDir
-- 列ヘッダの onClick でソートトグル
-  - 同じ列再クリック → 昇降反転
-  - 別列クリック → sortDir=1 にリセット
-- min30 = Math.min(...rows.map(r => r.costs[4])) で最安行判定
-- .cheapest-row クラス + .cheapest-badge span を付与
-- model-sub フォーマット: "$X in / $Y out /1M | ¥A / ¥B"
-- レガシー: web/src/components/ApiTable.tsx
+Phase 10 の目標:
+- app/page.tsx で全コンポーネントを合成
+- pricing.json を static import → Zod 検証
+- Client/Server 境界の確立
+  - Server: Hero, MathSection, RefLinks, SubTable, DualCell
+  - Client: LanguageToggle, ScenarioSelector, ApiTable
+- useState で lang / scenario / inputTokens / outputTokens を管理
+- レガシー: web/src/App.tsx
 
-実装前にレガシーを読んで、Props 契約と Red テストのケース設計
-（列ソート/最安判定/グループヘッダ/DualCell 配線など）を提示
-してから着手してください。Phase 9 が完了したら Phase 10
-(app/page.tsx の合成) に進む段取りです。
+実装前にレガシー App.tsx を読んで、状態管理の全体像と
+コンポーネント配置を整理してから着手してください。
+TDD + Atomic Commit (Red → Green) のルールを継続。
 ```
