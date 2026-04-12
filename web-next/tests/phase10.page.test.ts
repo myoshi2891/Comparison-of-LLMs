@@ -19,8 +19,9 @@ const pageSource = readFileSync(join(__dirname, "../app/page.tsx"), "utf8");
 
 describe("Phase 10 - page.tsx static contract", () => {
   it("does not declare 'use client' (Server Component)", () => {
-    const head = pageSource.slice(0, 200);
-    expect(head).not.toMatch(/["']use client["']/);
+    // コメント・空行を除いた最初の有効行で判定
+    const firstStmt = pageSource.replace(/^\s*(\/\/[^\n]*\n|\/\*[\s\S]*?\*\/\s*\n?)*/g, "");
+    expect(firstStmt).not.toMatch(/^["']use client["']/);
   });
 
   it("imports parsePricingData for Zod validation", () => {

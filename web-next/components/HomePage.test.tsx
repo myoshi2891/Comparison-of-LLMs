@@ -59,8 +59,9 @@ const testPricing: PricingData = {
 describe("HomePage - static source safety", () => {
   it("source declares 'use client' (Client Component)", () => {
     const source = readFileSync(join(__dirname, "HomePage.tsx"), "utf8");
-    const head = source.slice(0, 200);
-    expect(head).toMatch(/["']use client["']/);
+    // コメント・空行を除いた最初の有効行で判定
+    const firstStmt = source.replace(/^\s*(\/\/[^\n]*\n|\/\*[\s\S]*?\*\/\s*\n?)*/g, "");
+    expect(firstStmt).toMatch(/^["']use client["']/);
   });
 });
 
@@ -120,9 +121,10 @@ describe("HomePage - tab switching", () => {
 
   it("renders ApiTable in API tab", () => {
     const { container } = render(<HomePage data={testPricing} />);
-    // ApiTable は .table-wrap を描画
-    const tableWraps = container.querySelectorAll(".table-wrap");
-    expect(tableWraps.length).toBeGreaterThanOrEqual(1);
+    // フィクスチャの API モデル名が描画されていること
+    expect(container.textContent).toContain("GPT-4o");
+    // Sub タブのフィクスチャ内容は描画されていないこと (条件付きレンダリング)
+    expect(container.querySelector(".table-wrap")?.textContent).not.toContain("Cursor");
   });
 
   it("clicking Sub tab shows SubTable and hides ApiTable", () => {
@@ -132,8 +134,8 @@ describe("HomePage - tab switching", () => {
     // Sub タブが active に
     expect(tabs[1].className).toContain("active");
     expect(tabs[0].className).not.toContain("active");
-    // SubTable の .table-wrap が描画される
-    expect(container.querySelector(".table-wrap")).not.toBeNull();
+    // フィクスチャの Sub ツール名が描画されていること
+    expect(container.textContent).toContain("Cursor");
   });
 });
 

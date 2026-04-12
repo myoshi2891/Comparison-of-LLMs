@@ -7,7 +7,7 @@
  * - sortCol: ソート対象の列インデックス (null = 未ソート)
  * - sortDir: 1 = 昇順、-1 = 降順
  *
- * 最安行判定: costs[4] (30 日列) の最小値を持つ行に
+ * 最安行判定: 30 日列 (PERIODS から動的に導出) の最小値を持つ行に
  * .cheapest-row クラスと .cheapest-badge を付与。
  */
 
@@ -17,6 +17,9 @@ import type { Lang } from "@/lib/i18n";
 import { t } from "@/lib/i18n";
 import type { ApiModel } from "@/types/pricing";
 import { DualCell } from "./DualCell";
+
+/** 30 日列のインデックス — PERIODS 配列順の変更に追従 */
+const IDX_30D = PERIODS.findIndex((p) => p.key === "30d");
 
 const PROVIDER_COLORS: Record<string, string> = {
   OpenAI: "#10b981",
@@ -63,7 +66,7 @@ export function ApiTable({ lang, models, inputTokens, outputTokens, jpyRate }: P
     rows.sort((a, b) => sortDir * (a.costs[sortCol] - b.costs[sortCol]));
   }
 
-  const min30 = Math.min(...rows.map((r) => r.costs[4]));
+  const min30 = Math.min(...rows.map((r) => r.costs[IDX_30D]));
 
   const toggleSort = (colIdx: number) => {
     if (sortCol === colIdx) {
@@ -99,7 +102,7 @@ export function ApiTable({ lang, models, inputTokens, outputTokens, jpyRate }: P
           {rows.map((m, idx) => {
             const isNewProvider = m.provider !== lastProvider;
             lastProvider = m.provider;
-            const isCheap = m.costs[4] === min30;
+            const isCheap = m.costs[IDX_30D] === min30;
             const sub = lang === "ja" ? m.sub_ja : m.sub_en;
             const color = PROVIDER_COLORS[m.provider] ?? "#aaa";
 

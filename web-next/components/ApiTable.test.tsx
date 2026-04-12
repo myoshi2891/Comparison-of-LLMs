@@ -481,7 +481,8 @@ describe("ApiTable - sort title a11y", () => {
 describe("ApiTable - static source safety", () => {
   it("source declares 'use client' (Client Component)", () => {
     const source = readFileSync(join(__dirname, "ApiTable.tsx"), "utf8");
-    const head = source.slice(0, 200);
-    expect(head).toMatch(/["']use client["']/);
+    // コメント・空行を除いた最初の有効行で判定
+    const firstStmt = source.replace(/^\s*(\/\/[^\n]*\n|\/\*[\s\S]*?\*\/\s*\n?)*/g, "");
+    expect(firstStmt).toMatch(/^["']use client["']/);
   });
 });

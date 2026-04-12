@@ -85,8 +85,8 @@ web-next/
 
 **テスト数**: 329
 (40 cost + 19 pricing + 1 smoke + 7 i18n plain + 10 i18n rich + 81 phase6 css + 23 phase7 metadata
- + 10 DualCell + 8 LanguageToggle + 12 Hero + 11 MathSection + 18 RefLinks + 23 ScenarioSelector
- + 21 SubTable + 25 ApiTable + 4 phase10 page + 16 HomePage)
+- 10 DualCell + 8 LanguageToggle + 12 Hero + 11 MathSection + 18 RefLinks + 23 ScenarioSelector
+- 21 SubTable + 25 ApiTable + 4 phase10 page + 16 HomePage)
 
 ## 確定した設計判断（`docs/NEXTJS_MIGRATION_PLAN.md` ステップ 0）
 
@@ -219,7 +219,7 @@ web-next/
 ### ScenarioSelector（Client Component の型安全化）
 
 - レガシーの `T[key as keyof typeof T][lang] as string` 型アサーションを `t(key, lang)` に置き換え
-- `sc_${ScenarioKey}` をテンプレートリテラル型 `ScLabelKey = \`sc_${ScenarioKey}\``で表現し、`t()` の第一引数を型安全に固定
+- `` `sc_${ScenarioKey}` `` をテンプレートリテラル型 `` ScLabelKey = `sc_${ScenarioKey}` `` で表現し、`t()` の第一引数を型安全に固定
 - `<label>` の Biome `noLabelWithoutControl` に対応するため `useId()` で ID を 2 本発行し、数値 `<input>` と `htmlFor` で紐付け（range は視覚的な隣接で代替）
 - `.scenarios` コンテナへスコープしたテキスト検索で、assumption-bar のラベル echo と取り違えるテスト衝突を回避
 
