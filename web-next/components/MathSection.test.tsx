@@ -72,9 +72,12 @@ describe("MathSection - dynamic jpyRate embedding", () => {
   });
 
   it("reflects a different jpyRate without stale value", () => {
-    const { container } = render(<MathSection lang="ja" jpyRate={200.5} />);
+    const { container, rerender } = render(<MathSection lang="ja" jpyRate={152.34} />);
     const cards = container.querySelectorAll(".math-card");
     const rateCard = Array.from(cards).find((c) => c.textContent?.includes("USD/JPY"));
+    expect(rateCard?.textContent).toContain("152.34");
+
+    rerender(<MathSection lang="ja" jpyRate={200.5} />);
     expect(rateCard?.textContent).toContain("200.50");
     expect(rateCard?.textContent).not.toContain("152.34");
   });

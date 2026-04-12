@@ -40,9 +40,9 @@ export function Hero({ lang, data, apiCount, toolCount }: Props) {
         <h1>{tRich("heroTitle", lang)}</h1>
         <p className="hero-desc">{tRich("heroDesc", lang)}</p>
         <div className="hero-meta">
-          <span>Step 1: {lang === "ja" ? "使用シナリオを選択" : "Select a usage scenario"}</span>
-          <span>Step 2: {lang === "ja" ? "必要に応じてカスタム設定" : "Customize if needed"}</span>
-          <span>Step 3: {lang === "ja" ? "時間別コスト表を確認" : "Review the cost table"}</span>
+          <span>{t("step1", lang)}</span>
+          <span>{t("step2", lang)}</span>
+          <span>{t("step3", lang)}</span>
           <span>{metaModels}</span>
         </div>
         <div className="rate-badge">

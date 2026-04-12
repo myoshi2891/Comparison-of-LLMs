@@ -15,16 +15,27 @@
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
+import type { Metadata, Viewport } from "next";
 import { T, t } from "@/lib/i18n";
-import { metadata, viewport } from "@/lib/metadata";
 
 const repoRoot = join(__dirname, "..");
 
 let layoutTsx = "";
+let metadata!: Metadata;
+let viewport!: Viewport;
 
-beforeAll(() => {
+beforeAll(async () => {
   layoutTsx = readFileSync(join(repoRoot, "app/layout.tsx"), "utf8");
+  // NEXT_PUBLIC_SITE_URL を確定値に固定してから動的 import する。
+  // 静的 import だとモジュール評価時の env に依存し metadataBase の
+  // https アサートが flaky になるため、vi.resetModules() で
+  // キャッシュを破棄してから再ロードする。
+  process.env.NEXT_PUBLIC_SITE_URL = "https://comparison-of-llms.netlify.app";
+  vi.resetModules();
+  const mod = await import("@/lib/metadata");
+  metadata = mod.metadata;
+  viewport = mod.viewport;
 });
 
 describe("Phase 7 - metadata.title", () => {
@@ -102,7 +113,13 @@ describe("Phase 7 - metadata.openGraph", () => {
     description?: string;
     url?: string;
   };
-  const og = metadata.openGraph as LooseOg;
+  // describe スコープのトップレベルはテスト収集フェーズで実行されるため
+  // beforeAll より前に動く。outer beforeAll で metadata を代入した後に
+  // 参照するよう、ネストした beforeAll で og を初期化する。
+  let og!: LooseOg;
+  beforeAll(() => {
+    og = metadata.openGraph as LooseOg;
+  });
 
   it("declares website type and brand siteName", () => {
     expect(og.type).toBe("website");

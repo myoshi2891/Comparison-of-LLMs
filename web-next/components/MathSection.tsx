@@ -42,12 +42,12 @@ export function MathSection({ lang, jpyRate }: Props) {
             {"\n\n"}
             <span className="comment">
               {ja
-                ? `// 日本円換算 (レート: ${rateRounded} JPY/USD)`
-                : `// JPY conversion (rate: ${rateRounded} JPY/USD)`}
+                ? `// 日本円換算/h (レート: ${rateRounded} JPY/USD)`
+                : `// JPY conversion/h (rate: ${rateRounded} JPY/USD)`}
             </span>
             {"\n"}
-            <span className="var">cost_jpy</span> <span className="op">=</span>{" "}
-            <span className="var">cost_usd</span> <span className="op">×</span>{" "}
+            <span className="var">cost_jpy/h</span> <span className="op">=</span>{" "}
+            <span className="var">cost_usd/h</span> <span className="op">×</span>{" "}
             <span className="num">{rateRounded}</span>
             {"\n\n"}
             <span className="comment">{ja ? "// 各期間の換算 (hours)" : "// Period hours"}</span>

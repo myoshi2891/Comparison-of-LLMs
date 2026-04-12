@@ -236,6 +236,9 @@ export const T = {
   subNote,
   refNote,
   disclaimer,
+  step1: { ja: "Step 1: 使用シナリオを選択", en: "Step 1: Select a usage scenario" },
+  step2: { ja: "Step 2: 必要に応じてカスタム設定", en: "Step 2: Customize if needed" },
+  step3: { ja: "Step 3: 時間別コスト表を確認", en: "Step 3: Review the cost table" },
   updatedAt: { ja: "価格更新:", en: "Prices updated:" },
 } as const satisfies Record<string, Entry>;
 

@@ -38,7 +38,10 @@ function resolveSiteOrigin(): URL {
   const raw = process.env.NEXT_PUBLIC_SITE_URL;
   if (raw && raw.length > 0) {
     try {
-      return new URL(raw);
+      const url = new URL(raw);
+      if ((url.protocol === "http:" || url.protocol === "https:") && url.host.length > 0) {
+        return url;
+      }
     } catch {
       // 無効 URL はフォールバックへ。
     }
