@@ -21,6 +21,7 @@ import { join } from "node:path";
 import { fireEvent, render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { HomePage } from "@/components/HomePage";
+import { PERIODS } from "@/lib/cost";
 import type { PricingData } from "@/types/pricing";
 
 // 最小限のテスト用 pricing データ
@@ -94,10 +95,10 @@ describe("HomePage - component wiring", () => {
 });
 
 describe("HomePage - time badges", () => {
-  it("renders 7 time-badge elements", () => {
+  it("renders time-badge elements matching PERIODS count", () => {
     const { container } = render(<HomePage data={testPricing} />);
     const badges = container.querySelectorAll(".time-badge");
-    expect(badges.length).toBe(7);
+    expect(badges.length).toBe(PERIODS.length);
   });
 
   it("displays cellNote text (Japanese)", () => {

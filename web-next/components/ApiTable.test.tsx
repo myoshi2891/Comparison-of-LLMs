@@ -160,8 +160,8 @@ describe("ApiTable - sort indicators", () => {
       />
     );
     const headers = container.querySelectorAll("thead th");
-    // 2 番目のヘッダ (col1h) をクリック
-    fireEvent.click(headers[1]);
+    // 2 番目のヘッダ内 button (col1h) をクリック
+    fireEvent.click(headers[1].querySelector("button") as HTMLElement);
     expect(headers[1].textContent).toContain("▲");
   });
 
@@ -176,8 +176,8 @@ describe("ApiTable - sort indicators", () => {
       />
     );
     const headers = container.querySelectorAll("thead th");
-    fireEvent.click(headers[1]);
-    fireEvent.click(headers[1]);
+    fireEvent.click(headers[1].querySelector("button") as HTMLElement);
+    fireEvent.click(headers[1].querySelector("button") as HTMLElement);
     expect(headers[1].textContent).toContain("▼");
   });
 
@@ -193,9 +193,9 @@ describe("ApiTable - sort indicators", () => {
     );
     const headers = container.querySelectorAll("thead th");
     // col1h をクリック → ▲
-    fireEvent.click(headers[1]);
+    fireEvent.click(headers[1].querySelector("button") as HTMLElement);
     // col8h をクリック → col1h の ▲ 消える、col8h に ▲
-    fireEvent.click(headers[2]);
+    fireEvent.click(headers[2].querySelector("button") as HTMLElement);
     expect(headers[1].textContent).not.toContain("▲");
     expect(headers[1].textContent).not.toContain("▼");
     expect(headers[2].textContent).toContain("▲");
@@ -213,7 +213,7 @@ describe("ApiTable - sort indicators", () => {
     );
     const headers = container.querySelectorAll("thead th");
     // col1h (index 1) をクリックして昇順ソート
-    fireEvent.click(headers[1]);
+    fireEvent.click(headers[1].querySelector("button") as HTMLElement);
     const dataRows = Array.from(container.querySelectorAll("tbody tr")).filter(
       (r) => !r.classList.contains("group-header")
     );
@@ -459,8 +459,8 @@ describe("ApiTable - sort title a11y", () => {
       />
     );
     const headers = container.querySelectorAll("thead th");
-    // 期間ヘッダ (index 1-7) に title がある
-    expect(headers[1]?.getAttribute("title")).toContain("クリックでソート");
+    // 期間ヘッダ内 button に title がある
+    expect(headers[1]?.querySelector("button")?.getAttribute("title")).toContain("クリックでソート");
   });
 
   it("period headers have sort title attribute (English)", () => {
@@ -474,7 +474,7 @@ describe("ApiTable - sort title a11y", () => {
       />
     );
     const headers = container.querySelectorAll("thead th");
-    expect(headers[1]?.getAttribute("title")).toContain("Click to sort");
+    expect(headers[1]?.querySelector("button")?.getAttribute("title")).toContain("Click to sort");
   });
 });
 

@@ -149,7 +149,7 @@ describe("SubTable - tool rows", () => {
     expect(proRow?.querySelector(".model-sub")?.textContent).toContain("¥1,500");
   });
 
-  it("paid tool with annual shows '| 年払 $8.00/mo (¥1,200)' in ja", () => {
+  it("paid tool with annual shows '| 年払 $8.00/yr (¥1,200)' in ja", () => {
     const { container } = render(<SubTable lang="ja" tools={sampleTools} jpyRate={150} />);
     const rows = container.querySelectorAll("tbody tr");
     const proRow = Array.from(rows).find((r) =>
@@ -157,7 +157,7 @@ describe("SubTable - tool rows", () => {
     );
     const subText = proRow?.querySelector(".model-sub")?.textContent ?? "";
     expect(subText).toContain("年払");
-    expect(subText).toContain("$8.00/mo");
+    expect(subText).toContain("$8.00/yr");
   });
 
   it("paid tool with annual shows 'Annual' in en", () => {

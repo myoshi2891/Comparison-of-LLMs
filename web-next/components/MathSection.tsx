@@ -19,7 +19,7 @@ export function MathSection({ lang, jpyRate }: Props) {
   const ja = lang === "ja";
 
   return (
-    <div className="math-section section" style={{ marginTop: "36px" }}>
+    <div className="math-section section">
       <div className="math-title">{t("mathTitle", lang)}</div>
       <div className="math-grid">
         {/* カード1: API コスト基本計算式 */}

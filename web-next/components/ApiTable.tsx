@@ -88,12 +88,19 @@ export function ApiTable({ lang, models, inputTokens, outputTokens, jpyRate }: P
             {COL_KEYS.map((key, i) => (
               <th
                 key={key}
-                onClick={() => toggleSort(i)}
-                style={{ cursor: "pointer" }}
-                title={lang === "ja" ? "クリックでソート" : "Click to sort"}
+                aria-sort={
+                  sortCol === i ? (sortDir > 0 ? "ascending" : "descending") : "none"
+                }
               >
-                {t(key, lang)}
-                {sortCol === i ? (sortDir > 0 ? " ▲" : " ▼") : ""}
+                <button
+                  type="button"
+                  onClick={() => toggleSort(i)}
+                  style={{ cursor: "pointer" }}
+                  title={lang === "ja" ? "クリックでソート" : "Click to sort"}
+                >
+                  {t(key, lang)}
+                  {sortCol === i ? (sortDir > 0 ? " ▲" : " ▼") : ""}
+                </button>
               </th>
             ))}
           </tr>

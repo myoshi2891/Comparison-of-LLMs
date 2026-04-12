@@ -39,13 +39,18 @@ export function calcApiCost(
  */
 export function calcSubCost(monthly: number, annual: number | null, hours: number): number {
   if (monthly === 0 && (!annual || annual === 0)) return 0;
-  if (hours <= 720) return (monthly * hours) / 720;
   if (hours >= 8760 && annual != null) return annual;
+  if (hours <= 720) {
+    if (monthly > 0) return (monthly * hours) / 720;
+    // monthly === 0 && annual > 0: 年額を時間按分
+    if (annual != null) return (annual * hours) / 8760;
+  }
   return monthly * (hours / 720);
 }
 
 /** コスト値を色クラスインデックス (0-10) に変換 */
 export function colorIndex(v: number): number {
+  if (!Number.isFinite(v)) return 0;
   if (v <= 0) return 0;
   const thresholds = [0.01, 0.1, 1, 5, 20, 100, 500, 2000, 10000, 50000];
   for (let i = 0; i < thresholds.length; i++) {

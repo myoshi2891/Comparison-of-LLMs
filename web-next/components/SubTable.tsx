@@ -61,14 +61,13 @@ export function SubTable({ lang, tools, jpyRate }: Props) {
             const color = GROUP_COLORS[tool.group] ?? "#aaa";
             const note = lang === "ja" ? tool.note_ja : tool.note_en;
 
-            const mJPY = Math.round(tool.monthly * jpyRate).toLocaleString("ja-JP");
             const mStr =
-              tool.monthly === 0 ? t("free", lang) : `${fmtUSD(tool.monthly)}/mo (¥${mJPY})`;
+              tool.monthly === 0
+                ? t("free", lang)
+                : `${fmtUSD(tool.monthly)}/mo (${fmtJPY(tool.monthly, jpyRate)})`;
             const aStr =
               tool.annual != null
-                ? ` | ${t("annualLabel", lang)} ${fmtUSD(tool.annual)}/mo (¥${Math.round(
-                    tool.annual * jpyRate
-                  ).toLocaleString("ja-JP")})`
+                ? ` | ${t("annualLabel", lang)} ${fmtUSD(tool.annual)}/yr (${fmtJPY(tool.annual, jpyRate)})`
                 : "";
 
             return [

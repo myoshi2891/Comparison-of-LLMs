@@ -371,6 +371,10 @@ body {
   border-radius: 2px;
   outline: none;
 }
+.input-row input[type="range"]:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
+}
 .input-row input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 14px;
@@ -392,8 +396,10 @@ body {
   outline: none;
   text-align: right;
 }
-.input-row input[type="number"]:focus {
+.input-row input[type="number"]:focus-visible {
   border-color: var(--acc);
+  outline: 2px solid var(--acc);
+  outline-offset: 1px;
 }
 .input-row .unit {
   font-size: 11px;

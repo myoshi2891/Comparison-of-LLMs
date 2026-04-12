@@ -16,7 +16,7 @@
  *   T[key as keyof typeof T][lang] as string の型アサーションを排除
  */
 
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import type { Lang } from "@/lib/i18n";
 import { t } from "@/lib/i18n";
 
@@ -61,6 +61,14 @@ export function ScenarioSelector({
   const [customInput, setCustomInput] = useState(150_000);
   const [customOutput, setCustomOutput] = useState(50_000);
   const inputFieldId = useId();
+
+  // scenario が "custom" のとき、外部 props の値と内部状態を同期する。
+  // 親がストレージから復元した値を渡してきた場合に初期状態と乖離しないようにする。
+  useEffect(() => {
+    if (scenario !== "custom") return;
+    if (currentInput !== customInput) setCustomInput(currentInput);
+    if (currentOutput !== customOutput) setCustomOutput(currentOutput);
+  }, [scenario, currentInput, currentOutput, customInput, customOutput]);
   const outputFieldId = useId();
 
   const selectScenario = (key: ScenarioKey) => {

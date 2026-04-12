@@ -93,6 +93,16 @@ describe("calcSubCost", () => {
     const monthlyExtrapolated = 20 * (2920 / 720);
     expect(calcSubCost(20, 192, 2920)).toBeCloseTo(monthlyExtrapolated, 10);
   });
+
+  it("prorates annual when monthly is 0 and annual is positive (short duration)", () => {
+    // monthly=0, annual=100, hours=360: 年額を時間按分 100 * 360 / 8760
+    expect(calcSubCost(0, 100, 360)).toBeCloseTo((100 * 360) / 8760, 10);
+  });
+
+  it("returns annual price when monthly is 0 and annual is positive (full year)", () => {
+    // monthly=0, annual=100, hours=8760: 年払いをそのまま返す
+    expect(calcSubCost(0, 100, 8760)).toBe(100);
+  });
 });
 
 describe("colorIndex", () => {
