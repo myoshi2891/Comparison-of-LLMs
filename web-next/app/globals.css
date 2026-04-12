@@ -130,6 +130,10 @@ body {
   background: var(--brd2);
   color: var(--txt);
 }
+.lang-btn:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: -2px;
+}
 
 /* ── HERO ── */
 .hero {
@@ -186,7 +190,7 @@ body {
   background: var(--acc);
 }
 .hero h1 {
-  font-family: var(--font-display), "Syne", sans-serif;
+  font-family: var(--font-display), Syne, sans-serif;
   font-size: clamp(22px, 3.4vw, 42px);
   font-weight: 800;
   line-height: 1.08;
@@ -260,7 +264,7 @@ body {
   margin-bottom: 24px;
 }
 .panel-title {
-  font-family: var(--font-display), "Syne", sans-serif;
+  font-family: var(--font-display), Syne, sans-serif;
   font-size: 13px;
   font-weight: 700;
   color: var(--txt2);
@@ -303,6 +307,10 @@ body {
 .scenario-btn:hover {
   border-color: var(--acc);
   color: var(--txt);
+}
+.scenario-btn:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
 }
 .scenario-btn.active {
   border-color: var(--acc);
@@ -432,7 +440,7 @@ body {
   padding: 9px 20px;
   border-radius: 8px 8px 0 0;
   cursor: pointer;
-  font-family: var(--font-display), "Syne", sans-serif;
+  font-family: var(--font-display), Syne, sans-serif;
   font-size: 13px;
   font-weight: 600;
   border: 1px solid var(--brd);
@@ -448,6 +456,10 @@ body {
 }
 .tab-btn:hover:not(.active) {
   color: var(--txt);
+}
+.tab-btn:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: -2px;
 }
 
 /* ── TABLE ── */
@@ -787,7 +799,7 @@ td:not(:first-child) {
   padding: 24px 26px;
 }
 .math-title {
-  font-family: var(--font-display), "Syne", sans-serif;
+  font-family: var(--font-display), Syne, sans-serif;
   font-size: 15px;
   font-weight: 700;
   margin-bottom: 18px;
@@ -816,7 +828,7 @@ td:not(:first-child) {
   font-weight: 700;
   color: var(--acc2);
   margin-bottom: 10px;
-  font-family: var(--font-display), "Syne", sans-serif;
+  font-family: var(--font-display), Syne, sans-serif;
 }
 .formula {
   font-family: var(--font-mono), "JetBrains Mono", monospace;
@@ -851,7 +863,7 @@ td:not(:first-child) {
   padding: 22px 26px;
 }
 .ref-title {
-  font-family: var(--font-display), "Syne", sans-serif;
+  font-family: var(--font-display), Syne, sans-serif;
   font-size: 14px;
   font-weight: 700;
   margin-bottom: 14px;
@@ -882,7 +894,7 @@ td:not(:first-child) {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin-bottom: 8px;
-  font-family: var(--font-display), "Syne", sans-serif;
+  font-family: var(--font-display), Syne, sans-serif;
 }
 .ref-link {
   display: flex;
@@ -901,6 +913,13 @@ td:not(:first-child) {
   word-break: break-all;
 }
 .ref-link a:hover {
+  border-color: var(--acc);
+  background: rgba(59, 130, 246, 0.08);
+  color: var(--txt);
+}
+.ref-link a:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
   border-color: var(--acc);
   background: rgba(59, 130, 246, 0.08);
   color: var(--txt);
@@ -926,7 +945,7 @@ footer {
   font-family: var(--font-mono), "JetBrains Mono", monospace;
 }
 
-@keyframes fadeUp {
+@keyframes fade-up {
   from {
     opacity: 0;
     transform: translateY(12px);
@@ -937,7 +956,7 @@ footer {
   }
 }
 .section {
-  animation: fadeUp 0.4s ease both;
+  animation: fade-up 0.4s ease both;
 }
 .section-tabs {
   margin-top: 8px;
