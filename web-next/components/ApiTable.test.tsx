@@ -82,7 +82,7 @@ describe("ApiTable - root structure", () => {
         inputTokens={INPUT_TOKENS}
         outputTokens={OUTPUT_TOKENS}
         jpyRate={JPY_RATE}
-      />,
+      />
     );
     expect(container.querySelector(".table-wrap")).not.toBeNull();
     expect(container.querySelector(".table-wrap table")).not.toBeNull();
@@ -98,7 +98,7 @@ describe("ApiTable - root structure", () => {
         inputTokens={INPUT_TOKENS}
         outputTokens={OUTPUT_TOKENS}
         jpyRate={JPY_RATE}
-      />,
+      />
     );
     const headerCells = container.querySelectorAll("thead th");
     expect(headerCells.length).toBe(8);
@@ -112,7 +112,7 @@ describe("ApiTable - root structure", () => {
         inputTokens={INPUT_TOKENS}
         outputTokens={OUTPUT_TOKENS}
         jpyRate={JPY_RATE}
-      />,
+      />
     );
     const firstTh = container.querySelector("thead th");
     expect(firstTh?.textContent).toContain("モデル");
@@ -126,7 +126,7 @@ describe("ApiTable - root structure", () => {
         inputTokens={INPUT_TOKENS}
         outputTokens={OUTPUT_TOKENS}
         jpyRate={JPY_RATE}
-      />,
+      />
     );
     const firstTh = container.querySelector("thead th");
     expect(firstTh?.textContent).toContain("Model");
@@ -142,7 +142,7 @@ describe("ApiTable - sort indicators", () => {
         inputTokens={INPUT_TOKENS}
         outputTokens={OUTPUT_TOKENS}
         jpyRate={JPY_RATE}
-      />,
+      />
     );
     const headerText = container.querySelector("thead")?.textContent ?? "";
     expect(headerText).not.toContain("▲");
@@ -157,7 +157,7 @@ describe("ApiTable - sort indicators", () => {
         inputTokens={INPUT_TOKENS}
         outputTokens={OUTPUT_TOKENS}
         jpyRate={JPY_RATE}
-      />,
+      />
     );
     const headers = container.querySelectorAll("thead th");
     // 2 番目のヘッダ (col1h) をクリック
@@ -173,7 +173,7 @@ describe("ApiTable - sort indicators", () => {
         inputTokens={INPUT_TOKENS}
         outputTokens={OUTPUT_TOKENS}
         jpyRate={JPY_RATE}
-      />,
+      />
     );
     const headers = container.querySelectorAll("thead th");
     fireEvent.click(headers[1]);
@@ -189,7 +189,7 @@ describe("ApiTable - sort indicators", () => {
         inputTokens={INPUT_TOKENS}
         outputTokens={OUTPUT_TOKENS}
         jpyRate={JPY_RATE}
-      />,
+      />
     );
     const headers = container.querySelectorAll("thead th");
     // col1h をクリック → ▲
@@ -209,13 +209,13 @@ describe("ApiTable - sort indicators", () => {
         inputTokens={INPUT_TOKENS}
         outputTokens={OUTPUT_TOKENS}
         jpyRate={JPY_RATE}
-      />,
+      />
     );
     const headers = container.querySelectorAll("thead th");
     // col1h (index 1) をクリックして昇順ソート
     fireEvent.click(headers[1]);
     const dataRows = Array.from(container.querySelectorAll("tbody tr")).filter(
-      (r) => !r.classList.contains("group-header"),
+      (r) => !r.classList.contains("group-header")
     );
     const names = dataRows.map((r) => r.querySelector(".model-name")?.textContent ?? "");
     // price_in=1/out=2 の GPT-4o が最安 → 先頭
@@ -234,7 +234,7 @@ describe("ApiTable - group header rows", () => {
         inputTokens={INPUT_TOKENS}
         outputTokens={OUTPUT_TOKENS}
         jpyRate={JPY_RATE}
-      />,
+      />
     );
     const groupHeaders = container.querySelectorAll("tr.group-header");
     // OpenAI と Anthropic の 2 グループ
@@ -249,7 +249,7 @@ describe("ApiTable - group header rows", () => {
         inputTokens={INPUT_TOKENS}
         outputTokens={OUTPUT_TOKENS}
         jpyRate={JPY_RATE}
-      />,
+      />
     );
     const groupHeaders = container.querySelectorAll("tr.group-header td");
     expect(groupHeaders[0]?.textContent).toContain("●");
@@ -265,11 +265,11 @@ describe("ApiTable - group header rows", () => {
         inputTokens={INPUT_TOKENS}
         outputTokens={OUTPUT_TOKENS}
         jpyRate={JPY_RATE}
-      />,
+      />
     );
     // OpenAI は 2 モデルあるが group-header は 1 つだけ
     const openaiHeaders = Array.from(container.querySelectorAll("tr.group-header td")).filter(
-      (el) => el.textContent?.includes("OpenAI"),
+      (el) => el.textContent?.includes("OpenAI")
     );
     expect(openaiHeaders.length).toBe(1);
   });
@@ -284,7 +284,7 @@ describe("ApiTable - model cell", () => {
         inputTokens={INPUT_TOKENS}
         outputTokens={OUTPUT_TOKENS}
         jpyRate={JPY_RATE}
-      />,
+      />
     );
     const names = container.querySelectorAll(".model-name");
     expect(names.length).toBe(3);
@@ -299,10 +299,10 @@ describe("ApiTable - model cell", () => {
         inputTokens={INPUT_TOKENS}
         outputTokens={OUTPUT_TOKENS}
         jpyRate={JPY_RATE}
-      />,
+      />
     );
     const rows = Array.from(container.querySelectorAll("tbody tr")).filter(
-      (r) => !r.classList.contains("group-header"),
+      (r) => !r.classList.contains("group-header")
     );
     // GPT-4o: price_in=1, price_out=2, jpyRate=150
     const sub = rows[0]?.querySelector(".model-sub")?.textContent ?? "";
@@ -321,7 +321,7 @@ describe("ApiTable - model cell", () => {
         inputTokens={INPUT_TOKENS}
         outputTokens={OUTPUT_TOKENS}
         jpyRate={JPY_RATE}
-      />,
+      />
     );
     const tags = container.querySelectorAll(".model-tag");
     expect(tags.length).toBe(3);
@@ -337,7 +337,7 @@ describe("ApiTable - model cell", () => {
         inputTokens={INPUT_TOKENS}
         outputTokens={OUTPUT_TOKENS}
         jpyRate={JPY_RATE}
-      />,
+      />
     );
     expect(container.textContent).toContain("最新フラッグシップ");
     expect(container.textContent).toContain("軽量版");
@@ -351,7 +351,7 @@ describe("ApiTable - model cell", () => {
         inputTokens={INPUT_TOKENS}
         outputTokens={OUTPUT_TOKENS}
         jpyRate={JPY_RATE}
-      />,
+      />
     );
     expect(container.textContent).toContain("Latest flagship");
     expect(container.textContent).toContain("Lightweight");
@@ -367,7 +367,7 @@ describe("ApiTable - cheapest row", () => {
         inputTokens={INPUT_TOKENS}
         outputTokens={OUTPUT_TOKENS}
         jpyRate={JPY_RATE}
-      />,
+      />
     );
     const cheapestRows = container.querySelectorAll("tr.cheapest-row");
     expect(cheapestRows.length).toBeGreaterThanOrEqual(1);
@@ -386,7 +386,7 @@ describe("ApiTable - cheapest row", () => {
         inputTokens={INPUT_TOKENS}
         outputTokens={OUTPUT_TOKENS}
         jpyRate={JPY_RATE}
-      />,
+      />
     );
     const badge = container.querySelector(".cheapest-badge");
     expect(badge).not.toBeNull();
@@ -401,10 +401,10 @@ describe("ApiTable - cheapest row", () => {
         inputTokens={INPUT_TOKENS}
         outputTokens={OUTPUT_TOKENS}
         jpyRate={JPY_RATE}
-      />,
+      />
     );
     const dataRows = Array.from(container.querySelectorAll("tbody tr")).filter(
-      (r) => !r.classList.contains("group-header") && !r.classList.contains("cheapest-row"),
+      (r) => !r.classList.contains("group-header") && !r.classList.contains("cheapest-row")
     );
     for (const row of dataRows) {
       expect(row.querySelector(".cheapest-badge")).toBeNull();
@@ -421,7 +421,7 @@ describe("ApiTable - DualCell period cells", () => {
         inputTokens={INPUT_TOKENS}
         outputTokens={OUTPUT_TOKENS}
         jpyRate={JPY_RATE}
-      />,
+      />
     );
     // 3 data rows × 7 period cells = 21 DualCell instances
     const cells = container.querySelectorAll("tbody tr:not(.group-header) .cost-wrap");
@@ -436,10 +436,10 @@ describe("ApiTable - DualCell period cells", () => {
         inputTokens={INPUT_TOKENS}
         outputTokens={OUTPUT_TOKENS}
         jpyRate={JPY_RATE}
-      />,
+      />
     );
     const dataRows = Array.from(container.querySelectorAll("tbody tr")).filter(
-      (r) => !r.classList.contains("group-header"),
+      (r) => !r.classList.contains("group-header")
     );
     for (const row of dataRows) {
       expect(row.querySelectorAll(".cost-wrap").length).toBe(7);
@@ -456,7 +456,7 @@ describe("ApiTable - sort title a11y", () => {
         inputTokens={INPUT_TOKENS}
         outputTokens={OUTPUT_TOKENS}
         jpyRate={JPY_RATE}
-      />,
+      />
     );
     const headers = container.querySelectorAll("thead th");
     // 期間ヘッダ (index 1-7) に title がある
@@ -471,7 +471,7 @@ describe("ApiTable - sort title a11y", () => {
         inputTokens={INPUT_TOKENS}
         outputTokens={OUTPUT_TOKENS}
         jpyRate={JPY_RATE}
-      />,
+      />
     );
     const headers = container.querySelectorAll("thead th");
     expect(headers[1]?.getAttribute("title")).toContain("Click to sort");
