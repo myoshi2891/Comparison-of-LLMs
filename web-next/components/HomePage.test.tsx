@@ -83,7 +83,7 @@ describe("HomePage - component wiring", () => {
 
   it("renders MathSection", () => {
     const { container } = render(<HomePage data={testPricing} />);
-    expect(container.querySelector(".math-cards")).not.toBeNull();
+    expect(container.querySelector(".math-section")).not.toBeNull();
   });
 
   it("renders RefLinks", () => {
