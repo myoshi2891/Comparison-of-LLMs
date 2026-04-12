@@ -18,7 +18,7 @@
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { SCENARIOS, type ScenarioKey, ScenarioSelector } from "@/components/ScenarioSelector";
 
@@ -65,21 +65,28 @@ describe("ScenarioSelector - scenario buttons", () => {
     expect(buttons.length).toBe(6);
   });
 
-  it("renders Japanese scenario labels", () => {
-    render(<ScenarioSelector {...DEFAULT_PROPS} lang="ja" onScenarioChange={vi.fn()} />);
-    expect(screen.getByText(/Nano — 超軽量/)).toBeInTheDocument();
-    expect(screen.getByText(/Light — 軽量/)).toBeInTheDocument();
-    expect(screen.getByText(/Standard — 標準/)).toBeInTheDocument();
-    expect(screen.getByText(/Heavy — 重量/)).toBeInTheDocument();
-    expect(screen.getByText(/Agentic — 自律AI/)).toBeInTheDocument();
-    expect(screen.getByText(/Custom — カスタム/)).toBeInTheDocument();
+  it("renders Japanese scenario labels inside .scenarios container", () => {
+    // アサンプションバーと重複しないよう .scenarios スコープに限定する。
+    const { container } = render(
+      <ScenarioSelector {...DEFAULT_PROPS} lang="ja" onScenarioChange={vi.fn()} />
+    );
+    const scenariosText = container.querySelector(".scenarios")?.textContent ?? "";
+    expect(scenariosText).toContain("Nano — 超軽量");
+    expect(scenariosText).toContain("Light — 軽量");
+    expect(scenariosText).toContain("Standard — 標準");
+    expect(scenariosText).toContain("Heavy — 重量");
+    expect(scenariosText).toContain("Agentic — 自律AI");
+    expect(scenariosText).toContain("Custom — カスタム");
   });
 
-  it("renders English scenario labels", () => {
-    render(<ScenarioSelector {...DEFAULT_PROPS} lang="en" onScenarioChange={vi.fn()} />);
-    expect(screen.getByText(/Nano — Ultra Light/)).toBeInTheDocument();
-    expect(screen.getByText(/Standard — Normal/)).toBeInTheDocument();
-    expect(screen.getByText(/Agentic — Autonomous AI/)).toBeInTheDocument();
+  it("renders English scenario labels inside .scenarios container", () => {
+    const { container } = render(
+      <ScenarioSelector {...DEFAULT_PROPS} lang="en" onScenarioChange={vi.fn()} />
+    );
+    const scenariosText = container.querySelector(".scenarios")?.textContent ?? "";
+    expect(scenariosText).toContain("Nano — Ultra Light");
+    expect(scenariosText).toContain("Standard — Normal");
+    expect(scenariosText).toContain("Agentic — Autonomous AI");
   });
 
   it("all scenario buttons carry type='button' attribute", () => {
