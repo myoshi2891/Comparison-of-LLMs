@@ -157,8 +157,8 @@ describe("RefLinks - static source safety", () => {
 
   it("source file does not declare a 'use client' directive (Server Component)", () => {
     const source = readFileSync(join(__dirname, "RefLinks.tsx"), "utf8");
-    // ファイル先頭 200 文字以内の "use client" / 'use client' ディレクティブを検査。
-    const head = source.slice(0, 200);
-    expect(head).not.toMatch(/["']use client["']/);
+    // コメント・空行を除いた最初の有効行で判定。
+    const firstStmt = source.replace(/^\s*(\/\/[^\n]*\n|\/\*[\s\S]*?\*\/\s*\n?)*/g, "");
+    expect(firstStmt).not.toMatch(/^["']use client["']/);
   });
 });

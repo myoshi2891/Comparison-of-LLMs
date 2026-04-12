@@ -27,6 +27,8 @@ interface RefEntry {
 interface RefCard {
   readonly title: string;
   readonly links: readonly RefEntry[];
+  /** true のとき title を言語別に動的生成する (為替レートカード) */
+  readonly isFx?: true;
 }
 
 const CARDS: readonly RefCard[] = [
@@ -59,8 +61,8 @@ const CARDS: readonly RefCard[] = [
       {
         href: "https://docs.anthropic.com/en/docs/about-claude/models",
         label: "docs.anthropic.com/about-claude/models",
-        desc_ja: "最新モデル一覧 (Opus 4.6 / Sonnet 4.6 / Haiku 4.5)",
-        desc_en: "Latest models (Opus 4.6 / Sonnet 4.6 / Haiku 4.5)",
+        desc_ja: "最新モデル一覧・コンテキスト長",
+        desc_en: "Latest models & context lengths",
       },
     ],
   },
@@ -104,8 +106,8 @@ const CARDS: readonly RefCard[] = [
       {
         href: "https://x.ai/api",
         label: "x.ai/api",
-        desc_ja: "Grok API料金 (Grok 4 / Grok 4 Fast)",
-        desc_en: "Grok API pricing (Grok 4 / Grok 4 Fast)",
+        desc_ja: "Grok API料金・最新モデル一覧",
+        desc_en: "Grok API pricing & latest models",
       },
       {
         href: "https://docs.x.ai/docs/models",
@@ -121,8 +123,8 @@ const CARDS: readonly RefCard[] = [
       {
         href: "https://platform.deepseek.com/api-docs/pricing",
         label: "platform.deepseek.com/api-docs/pricing",
-        desc_ja: "DeepSeek V3.2 / R1 API料金",
-        desc_en: "DeepSeek V3.2 / R1 API pricing",
+        desc_ja: "DeepSeek API料金・最新モデル",
+        desc_en: "DeepSeek API pricing & latest models",
       },
       {
         href: "https://github.com/deepseek-ai/DeepSeek-V3",
@@ -280,13 +282,13 @@ const CARDS: readonly RefCard[] = [
       {
         href: "https://one.google.com/about/google-ai-plans/",
         label: "one.google.com/about/google-ai-plans",
-        desc_ja: "Gemini 3.1 Pro / Deep Think / Jules (コーディング) 対応",
-        desc_en: "Gemini 3.1 Pro / Deep Think / Jules (coding) included",
+        desc_ja: "最新 Gemini モデル・コーディング機能を含む",
+        desc_en: "Latest Gemini models & coding features included",
       },
     ],
   },
   {
-    // ci === 15 でレガシー同様に言語別に差し替える (下記 render 内参照)。
+    isFx: true,
     title: "💱 ",
     links: [
       {
@@ -311,8 +313,9 @@ export function RefLinks({ lang }: Props) {
       <div className="ref-title">{t("refTitle", lang)}</div>
       <div className="ref-grid">
         {CARDS.map((card, ci) => {
-          const title =
-            ci === 15 ? `💱 ${lang === "ja" ? "為替レート参考" : "FX Rate Reference"}` : card.title;
+          const title = card.isFx
+            ? `💱 ${lang === "ja" ? "為替レート参考" : "FX Rate Reference"}`
+            : card.title;
           return (
             // biome-ignore lint/suspicious/noArrayIndexKey: CARDS は不変配列で index がそのまま安定キー
             <div key={ci} className="ref-card">

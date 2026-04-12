@@ -62,7 +62,8 @@ export function SubTable({ lang, tools, jpyRate }: Props) {
             const note = lang === "ja" ? tool.note_ja : tool.note_en;
 
             const mJPY = Math.round(tool.monthly * jpyRate).toLocaleString("ja-JP");
-            const mStr = tool.monthly === 0 ? "FREE" : `${fmtUSD(tool.monthly)}/mo (¥${mJPY})`;
+            const mStr =
+              tool.monthly === 0 ? t("free", lang) : `${fmtUSD(tool.monthly)}/mo (¥${mJPY})`;
             const aStr =
               tool.annual != null
                 ? ` | ${t("annualLabel", lang)} ${fmtUSD(tool.annual)}/mo (¥${Math.round(

@@ -231,6 +231,7 @@ export const T = {
   },
   cheapestBadge: { ja: "最安", en: "Cheapest" },
   annualLabel: { ja: "年払", en: "Annual" },
+  free: { ja: "FREE", en: "FREE" },
   apiNote,
   subNote,
   refNote,
