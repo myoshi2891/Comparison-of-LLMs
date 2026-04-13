@@ -110,6 +110,7 @@ export function ScenarioSelector({
             <button
               key={key}
               type="button"
+              aria-pressed={scenario === key}
               className={`scenario-btn${scenario === key ? " active" : ""}`}
               onClick={() => selectScenario(key)}
             >

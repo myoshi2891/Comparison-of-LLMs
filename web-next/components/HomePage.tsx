@@ -76,9 +76,13 @@ export function HomePage({ data }: Props) {
           </div>
 
           {/* タブ切り替え */}
-          <div className="tabs">
+          <div className="tabs" role="tablist">
             <button
               type="button"
+              id="tab-api"
+              role="tab"
+              aria-selected={tab === "api"}
+              aria-controls="tabpanel-api"
               className={`tab-btn${tab === "api" ? " active" : ""}`}
               onClick={() => setTab("api")}
             >
@@ -86,6 +90,10 @@ export function HomePage({ data }: Props) {
             </button>
             <button
               type="button"
+              id="tab-sub"
+              role="tab"
+              aria-selected={tab === "sub"}
+              aria-controls="tabpanel-sub"
               className={`tab-btn${tab === "sub" ? " active" : ""}`}
               onClick={() => setTab("sub")}
             >
@@ -95,7 +103,7 @@ export function HomePage({ data }: Props) {
 
           {/* API テーブル */}
           {tab === "api" && (
-            <>
+            <div role="tabpanel" id="tabpanel-api" aria-labelledby="tab-api">
               <ApiTable
                 lang={lang}
                 models={api_models}
@@ -104,15 +112,15 @@ export function HomePage({ data }: Props) {
                 jpyRate={jpy_rate}
               />
               <div className="note-box">{tRich("apiNote", lang)}</div>
-            </>
+            </div>
           )}
 
           {/* サブスク テーブル */}
           {tab === "sub" && (
-            <>
+            <div role="tabpanel" id="tabpanel-sub" aria-labelledby="tab-sub">
               <SubTable lang={lang} tools={sub_tools} jpyRate={jpy_rate} />
               <div className="note-box info">{tRich("subNote", lang)}</div>
-            </>
+            </div>
           )}
         </div>
 
@@ -128,7 +136,7 @@ export function HomePage({ data }: Props) {
         <span>
           {t("footerSummary", lang)
             .replace("{date}", data.generated_at.slice(0, 10))
-            .replace("{jpy}", jpy_rate.toFixed(0))}
+            .replace("{jpy}", Number.isFinite(jpy_rate) && jpy_rate > 0 ? jpy_rate.toFixed(0) : "—")}
         </span>
         <span>{t("footerFormula", lang)}</span>
       </footer>
