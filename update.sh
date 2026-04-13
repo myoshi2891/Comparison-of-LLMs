@@ -9,6 +9,7 @@ SCRIPT_DIR="$(pwd)"
 SCRAPER_DIR="${SCRIPT_DIR}/scraper"
 WEB_DIR="${SCRIPT_DIR}/web"
 DATA_JSON="${WEB_DIR}/src/data/pricing.json"
+DATA_JSON_NEXT="${SCRIPT_DIR}/web-next/data/pricing.json"
 OUTPUT_HTML="${SCRIPT_DIR}/index.html"
 OUTPUT_JSON="${SCRIPT_DIR}/pricing.json"
 
@@ -43,6 +44,7 @@ echo ""
 echo ">>> [3/3] 成果物コピー"
 cp "${WEB_DIR}/dist/index.html" "${OUTPUT_HTML}"
 cp "${DATA_JSON}" "${OUTPUT_JSON}"
+cp "${DATA_JSON}" "${DATA_JSON_NEXT}"
 
 shopt -s nullglob
 favicons=("${WEB_DIR}/dist/"*.png "${WEB_DIR}/dist/"*.ico)
