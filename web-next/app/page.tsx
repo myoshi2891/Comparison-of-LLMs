@@ -18,6 +18,11 @@ import { parsePricingData } from "@/lib/pricing";
 
 const pricing = parsePricingData(pricingJson);
 
+/**
+ * Root server page that renders the HomePage with validated pricing data.
+ *
+ * @returns A JSX element that renders `HomePage` with the validated `pricing` passed as its `data` prop.
+ */
 export default function Page() {
   return <HomePage data={pricing} />;
 }

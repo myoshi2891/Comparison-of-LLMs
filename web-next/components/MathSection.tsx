@@ -14,6 +14,17 @@ interface Props {
   jpyRate: number;
 }
 
+/**
+ * Renders a presentational "math" information section showing API cost formulas, scenario token assumptions,
+ * USD/JPY exchange rate, and Vertex AI vs Google AI Studio notes, with inline Japanese/English copy.
+ *
+ * The component displays a rounded JPY rate (two decimals) when `jpyRate` is a finite number greater than 0;
+ * otherwise it shows an em dash ("—").
+ *
+ * @param lang - Language code; when `"ja"` the component renders Japanese text, otherwise English.
+ * @param jpyRate - USD→JPY exchange rate used for display; shown with two decimal places when > 0 and finite.
+ * @returns The React element for the math section containing four informational cards.
+ */
 export function MathSection({ lang, jpyRate }: Props) {
   const rateRounded =
     Number.isFinite(jpyRate) && jpyRate > 0 ? jpyRate.toFixed(2) : "—";

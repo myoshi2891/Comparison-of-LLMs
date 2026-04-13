@@ -21,6 +21,19 @@ interface Props {
   toolCount: number;
 }
 
+/**
+ * Render the top-page hero section with localized text, model counts, and exchange-rate metadata.
+ *
+ * This Server Component displays eyebrow text, a rich title and description, step labels combined with a localized
+ * meta-models string (populated with `apiCount` and `toolCount`), a rate badge showing `1 USD = ... JPY` with a
+ * localized date string, and an "updated at" date derived from `data.generated_at`.
+ *
+ * @param lang - Current language for localization keys
+ * @param data - Pricing and rate information (used for JPY rate, rate date, and generation timestamp)
+ * @param apiCount - Number of APIs to insert into the localized meta-models string
+ * @param toolCount - Number of tools to insert into the localized meta-models string
+ * @returns The hero section as a React element
+ */
 export function Hero({ lang, data, apiCount, toolCount }: Props) {
   const metaModels = t("metaModels", lang)
     .replace("{n}", String(apiCount))

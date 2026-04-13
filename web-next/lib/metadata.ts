@@ -26,13 +26,11 @@ const DEFAULT_ORIGIN = "https://comparison-of-llms.netlify.app";
 const BRAND = "AI Cost Simulator";
 
 /**
- * `metadataBase` 用 URL を環境変数優先で解決する。
+ * Resolve the site's origin URL, preferring an environment override.
  *
- * - 優先: `process.env.NEXT_PUBLIC_SITE_URL`（Netlify のプレビュー URL
- *   など、デプロイ先で動的に書き換えたい場合に使う）
- * - フォールバック: `DEFAULT_ORIGIN`（本番 Netlify URL）
- * - 無効な URL 文字列を env に入れられた場合は throw せずフォールバック。
- *   ビルドを失敗させるより、本番 origin に縮退して生存させる方が安全。
+ * Attempts to parse NEXT_PUBLIC_SITE_URL and returns it when it is a valid `http:` or `https:` URL with a host; otherwise falls back to the hardcoded default origin. Invalid or missing environment values do not throw — the default origin is returned.
+ *
+ * @returns The resolved origin as a `URL` instance
  */
 function resolveSiteOrigin(): URL {
   const raw = process.env.NEXT_PUBLIC_SITE_URL;
