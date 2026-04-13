@@ -31,6 +31,11 @@ export const SCENARIOS: Record<ScenarioKey, { input: number; output: number; col
   custom: { input: 150_000, output: 50_000, color: "#a78bfa" },
 };
 
+const INPUT_MIN = 1_000;
+const INPUT_MAX = 2_000_000;
+const OUTPUT_MIN = 1_000;
+const OUTPUT_MAX = 1_000_000;
+
 const SCENARIO_ORDER: readonly ScenarioKey[] = [
   "nano",
   "light",
@@ -81,13 +86,15 @@ export function ScenarioSelector({
   };
 
   const updateCustomInput = (val: number) => {
-    setCustomInput(val);
-    if (scenario === "custom") onScenarioChange("custom", val, customOutput);
+    const clamped = Number.isNaN(val) ? INPUT_MIN : Math.min(INPUT_MAX, Math.max(INPUT_MIN, val));
+    setCustomInput(clamped);
+    if (scenario === "custom") onScenarioChange("custom", clamped, customOutput);
   };
 
   const updateCustomOutput = (val: number) => {
-    setCustomOutput(val);
-    if (scenario === "custom") onScenarioChange("custom", customInput, val);
+    const clamped = Number.isNaN(val) ? OUTPUT_MIN : Math.min(OUTPUT_MAX, Math.max(OUTPUT_MIN, val));
+    setCustomOutput(clamped);
+    if (scenario === "custom") onScenarioChange("custom", customInput, clamped);
   };
 
   const ratio = currentOutput > 0 ? `${(currentInput / currentOutput).toFixed(1)}:1` : "–";
@@ -131,8 +138,8 @@ export function ScenarioSelector({
                 <input
                   type="range"
                   aria-label={t("inputLabel", lang)}
-                  min={1000}
-                  max={2_000_000}
+                  min={INPUT_MIN}
+                  max={INPUT_MAX}
                   step={1000}
                   value={customInput}
                   onChange={(e) => updateCustomInput(Number(e.target.value))}
@@ -140,8 +147,8 @@ export function ScenarioSelector({
                 <input
                   id={inputFieldId}
                   type="number"
-                  min={0}
-                  max={10_000_000}
+                  min={INPUT_MIN}
+                  max={INPUT_MAX}
                   step={1000}
                   value={customInput}
                   onChange={(e) => updateCustomInput(Number(e.target.value))}
@@ -155,8 +162,8 @@ export function ScenarioSelector({
                 <input
                   type="range"
                   aria-label={t("outputLabel", lang)}
-                  min={1000}
-                  max={1_000_000}
+                  min={OUTPUT_MIN}
+                  max={OUTPUT_MAX}
                   step={1000}
                   value={customOutput}
                   onChange={(e) => updateCustomOutput(Number(e.target.value))}
@@ -164,8 +171,8 @@ export function ScenarioSelector({
                 <input
                   id={outputFieldId}
                   type="number"
-                  min={0}
-                  max={5_000_000}
+                  min={OUTPUT_MIN}
+                  max={OUTPUT_MAX}
                   step={1000}
                   value={customOutput}
                   onChange={(e) => updateCustomOutput(Number(e.target.value))}

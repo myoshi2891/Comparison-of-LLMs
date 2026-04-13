@@ -317,7 +317,7 @@
       "tag": "Nova",
       "cls": "tag-bal",
       "price_in": 0.88,
-      "price_out": 3.3600000000000003,
+      "price_out": 3.36,
       "sub_ja": "マルチモーダル / 300K ctx",
       "sub_en": "Multimodal / 300K ctx",
       "scrape_status": "success"
@@ -327,7 +327,7 @@
       "name": "Amazon Nova Micro",
       "tag": "Cheapest",
       "cls": "tag-mini",
-      "price_in": 0.034999999999999996,
+      "price_in": 0.035,
       "price_out": 0.176,
       "sub_ja": "Bedrock最安モデル",
       "sub_en": "Lowest-cost Bedrock model",

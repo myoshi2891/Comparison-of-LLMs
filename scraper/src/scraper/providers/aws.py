@@ -125,7 +125,7 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
                             )
                         else:
                             multiplier = 1_000_000
-                        price_1m = usd_per_unit * multiplier
+                        price_1m = round(usd_per_unit * multiplier, 6)
 
                         # Prefer us-east-1 (USE1) for price consistency
                         # Also prefer rows that don't have extra qualifiers in usage type

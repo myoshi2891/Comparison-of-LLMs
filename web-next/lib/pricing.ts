@@ -12,10 +12,13 @@ import type { ApiModel, PricingData, SubTool } from "@/types/pricing";
 
 export const ScrapeStatusSchema = z.enum(["success", "fallback", "manual"]);
 
-/** YYYY-MM-DD 形式の日付文字列バリデーター */
+/** YYYY-MM-DD 形式の日付文字列バリデーター（jpy_rate_date 用） */
 const dateString = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format, expected YYYY-MM-DD");
+
+/** ISO 8601 datetime 文字列バリデーター（generated_at 用） */
+const datetimeString = z.iso.datetime({ offset: true });
 
 export const ApiModelSchema: z.ZodType<ApiModel> = z
   .object({
@@ -47,7 +50,7 @@ export const SubToolSchema: z.ZodType<SubTool> = z
 
 export const PricingDataSchema: z.ZodType<PricingData> = z
   .object({
-    generated_at: dateString,
+    generated_at: datetimeString,
     jpy_rate: z.number().positive(),
     jpy_rate_date: dateString,
     api_models: z.array(ApiModelSchema),
