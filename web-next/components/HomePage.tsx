@@ -126,10 +126,11 @@ export function HomePage({ data }: Props) {
 
       <footer>
         <span>
-          AI Cost Calculator v5 — {data.generated_at.slice(0, 10)} | USD + JPY (1 USD ={" "}
-          {jpy_rate.toFixed(0)} JPY)
+          {t("footerSummary", lang)
+            .replace("{date}", data.generated_at.slice(0, 10))
+            .replace("{jpy}", jpy_rate.toFixed(0))}
         </span>
-        <span>cost = (IN/1M × price_in + OUT/1M × price_out) × hours × JPY_rate</span>
+        <span>{t("footerFormula", lang)}</span>
       </footer>
     </>
   );

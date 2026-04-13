@@ -13,9 +13,9 @@ import { describe, expect, it } from "vitest";
 import { T, type TranslationKey, t } from "@/lib/i18n";
 
 describe("i18n - key coverage", () => {
-  it("has exactly 43 translation keys", () => {
+  it("has exactly 45 translation keys", () => {
     // 将来キーが増減したら本アサートを意識的に更新する (契約変更ゲート)。
-    expect(Object.keys(T).length).toBe(43);
+    expect(Object.keys(T).length).toBe(45);
   });
 
   it("returns non-empty ja and en strings for every key", () => {

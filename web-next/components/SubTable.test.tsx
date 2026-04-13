@@ -224,7 +224,7 @@ describe("SubTable - DualCell period cells", () => {
     );
     const annualNoteEls = proRow?.querySelectorAll(".sub-flat") ?? [];
     // 12mo 列のみ 1 件存在する
-    expect(annualNoteEls.length).toBeGreaterThanOrEqual(1);
+    expect(annualNoteEls.length).toBe(1);
     expect(annualNoteEls[annualNoteEls.length - 1]?.textContent).toContain("年払");
   });
 

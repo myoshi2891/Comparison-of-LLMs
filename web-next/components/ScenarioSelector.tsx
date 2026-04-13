@@ -129,6 +129,7 @@ export function ScenarioSelector({
               <div className="input-row">
                 <input
                   type="range"
+                  aria-label={t("inputLabel", lang)}
                   min={1000}
                   max={2_000_000}
                   step={1000}
@@ -152,6 +153,7 @@ export function ScenarioSelector({
               <div className="input-row">
                 <input
                   type="range"
+                  aria-label={t("outputLabel", lang)}
                   min={1000}
                   max={1_000_000}
                   step={1000}

@@ -240,6 +240,14 @@ export const T = {
   step2: { ja: "Step 2: 必要に応じてカスタム設定", en: "Step 2: Customize if needed" },
   step3: { ja: "Step 3: 時間別コスト表を確認", en: "Step 3: Review the cost table" },
   updatedAt: { ja: "価格更新:", en: "Prices updated:" },
+  footerSummary: {
+    ja: "AI Cost Calculator v5 — {date} | USD + JPY (1 USD = {jpy} 円)",
+    en: "AI Cost Calculator v5 — {date} | USD + JPY (1 USD = {jpy} JPY)",
+  },
+  footerFormula: {
+    ja: "cost = (IN/1M × price_in + OUT/1M × price_out) × hours × JPY_rate",
+    en: "cost = (IN/1M × price_in + OUT/1M × price_out) × hours × JPY_rate",
+  },
 } as const satisfies Record<string, Entry>;
 
 export type TranslationKey = keyof typeof T;

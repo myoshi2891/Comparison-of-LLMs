@@ -101,10 +101,7 @@ export function SubTable({ lang, tools, jpyRate }: Props) {
                   const usd = calcSubCost(tool.monthly, tool.annual, p.hours);
                   const annualNote =
                     p.hours >= 8760 && tool.annual != null && tool.annual < tool.monthly * 12
-                      ? `${t("annualLabel", lang)} ${fmtUSD(tool.annual)}/yr (¥${fmtJPY(
-                          tool.annual,
-                          jpyRate
-                        ).replace("¥", "")})`
+                      ? `${t("annualLabel", lang)} ${fmtUSD(tool.annual)}/yr (${fmtJPY(tool.annual, jpyRate)})`
                       : null;
                   return (
                     <td key={p.key}>

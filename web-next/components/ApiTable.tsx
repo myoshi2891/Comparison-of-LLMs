@@ -12,7 +12,7 @@
  */
 
 import { useState } from "react";
-import { calcApiCost, PERIODS } from "@/lib/cost";
+import { calcApiCost, fmtJPY, PERIODS } from "@/lib/cost";
 import type { Lang } from "@/lib/i18n";
 import { t } from "@/lib/i18n";
 import type { ApiModel } from "@/types/pricing";
@@ -140,8 +140,8 @@ export function ApiTable({ lang, models, inputTokens, outputTokens, jpyRate }: P
                       )}
                     </span>
                     <span className="model-sub">
-                      ${m.price_in} in / ${m.price_out} out /1M &nbsp;|&nbsp; ¥
-                      {Math.round(m.price_in * jpyRate)} / ¥{Math.round(m.price_out * jpyRate)}
+                      ${m.price_in} in / ${m.price_out} out /1M &nbsp;|&nbsp;{" "}
+                      {fmtJPY(m.price_in, jpyRate)} / {fmtJPY(m.price_out, jpyRate)}
                     </span>
                     <span className={`model-tag ${m.cls}`}>{m.tag}</span>
                     <span
