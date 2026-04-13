@@ -63,8 +63,8 @@ export function ScenarioSelector({
   scenario,
   onScenarioChange,
 }: Props) {
-  const [customInput, setCustomInput] = useState(150_000);
-  const [customOutput, setCustomOutput] = useState(50_000);
+  const [customInput, setCustomInput] = useState(SCENARIOS.custom.input);
+  const [customOutput, setCustomOutput] = useState(SCENARIOS.custom.output);
   const inputFieldId = useId();
   const outputFieldId = useId();
 
@@ -98,7 +98,6 @@ export function ScenarioSelector({
   };
 
   const ratio = currentOutput > 0 ? `${(currentInput / currentOutput).toFixed(1)}:1` : "–";
-  const costPerH = "(IN/1M × $price_in + OUT/1M × $price_out) × h";
   const scenarioLabelKey: ScLabelKey = `sc_${scenario}`;
 
   return (
@@ -153,7 +152,7 @@ export function ScenarioSelector({
                   value={customInput}
                   onChange={(e) => updateCustomInput(Number(e.target.value))}
                 />
-                <span className="unit">tok/h</span>
+                <span className="unit">{t("tokenPerHourUnit", lang)}</span>
               </div>
             </div>
             <div className="input-group">
@@ -177,7 +176,7 @@ export function ScenarioSelector({
                   value={customOutput}
                   onChange={(e) => updateCustomOutput(Number(e.target.value))}
                 />
-                <span className="unit">tok/h</span>
+                <span className="unit">{t("tokenPerHourUnit", lang)}</span>
               </div>
             </div>
           </div>
@@ -193,7 +192,7 @@ export function ScenarioSelector({
         <span className="sep">·</span>
         <span className="lbl">{t("ab_formula", lang)}</span>
         <span className="val" style={{ fontSize: "10px" }}>
-          {costPerH}
+          {t("costPerH", lang)}
         </span>
       </div>
     </div>

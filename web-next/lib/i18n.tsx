@@ -209,6 +209,11 @@ export const T = {
   ab_scenario: { ja: "現在のシナリオ:", en: "Scenario:" },
   ab_ratio: { ja: "I:O 比率:", en: "I:O Ratio:" },
   ab_formula: { ja: "計算式:", en: "Formula:" },
+  costPerH: {
+    ja: "(IN/1M × $price_in + OUT/1M × $price_out) × h",
+    en: "(IN/1M × $price_in + OUT/1M × $price_out) × h",
+  },
+  tokenPerHourUnit: { ja: "tok/h", en: "tok/h" },
   cellNote: {
     ja: "← 連続使用時の累積コスト · 上段 USD / 下段 JPY",
     en: "← Cumulative cost (continuous use) · Upper: USD / Lower: JPY",

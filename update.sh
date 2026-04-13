@@ -44,6 +44,7 @@ echo ""
 echo ">>> [3/3] 成果物コピー"
 cp "${WEB_DIR}/dist/index.html" "${OUTPUT_HTML}"
 cp "${DATA_JSON}" "${OUTPUT_JSON}"
+mkdir -p "$(dirname "${DATA_JSON_NEXT}")"
 cp "${DATA_JSON}" "${DATA_JSON_NEXT}"
 
 shopt -s nullglob

@@ -18,10 +18,7 @@ const dateString = z
   .regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format, expected YYYY-MM-DD");
 
 /** YYYY-MM-DD または 'fallback' を許容するバリデーター（jpy_rate_date 用） */
-const jpyRateDateString = z.union([
-  z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format, expected YYYY-MM-DD"),
-  z.literal("fallback"),
-]);
+const jpyRateDateString = z.union([dateString, z.literal("fallback")]);
 
 export const ApiModelSchema: z.ZodType<ApiModel> = z
   .object({
