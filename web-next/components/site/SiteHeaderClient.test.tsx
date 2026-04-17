@@ -25,7 +25,6 @@ import { join } from "node:path";
 import { fireEvent, render } from "@testing-library/react";
 import type { ReactElement, ReactNode } from "react";
 import { describe, expect, it } from "vitest";
-// @ts-expect-error - Phase A Green で実装される。Red 期間中の module-not-found を許容する。
 import { SiteHeaderClient as RawClient } from "@/components/site/SiteHeaderClient";
 
 const SiteHeaderClient = RawClient as unknown as (props: { children: ReactNode }) => ReactElement;
