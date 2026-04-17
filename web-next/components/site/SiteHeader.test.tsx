@@ -26,8 +26,12 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { render } from "@testing-library/react";
+import type { ReactElement } from "react";
 import { describe, expect, it } from "vitest";
-import { SiteHeader } from "@/components/site/SiteHeader";
+// @ts-expect-error - Phase A Green で実装される。Red 期間中の module-not-found を許容する。
+import { SiteHeader as RawSiteHeader } from "@/components/site/SiteHeader";
+
+const SiteHeader = RawSiteHeader as unknown as (props: { pathname: string }) => ReactElement;
 
 describe("Phase A - SiteHeader root structure", () => {
   it("renders <nav id=common-header aria-label='Main Navigation'>", () => {

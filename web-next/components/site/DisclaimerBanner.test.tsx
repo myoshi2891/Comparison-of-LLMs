@@ -18,8 +18,12 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { render } from "@testing-library/react";
+import type { ReactElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DisclaimerBanner } from "@/components/site/DisclaimerBanner";
+// @ts-expect-error - Phase A Green で実装される。Red 期間中の module-not-found を許容する。
+import { DisclaimerBanner as RawBanner } from "@/components/site/DisclaimerBanner";
+
+const DisclaimerBanner = RawBanner as unknown as () => ReactElement;
 
 // jsdom は ResizeObserver を実装しないため、テスト用の最小モックを注入する。
 // observe() 時に即座にコールバックを呼び、syncDisclaimerHeight のロジックを発火させる。
@@ -32,8 +36,12 @@ class MockResizeObserver {
     // レイアウトは jsdom で計算されないため、contentRect を仮値で用意する。
     this.cb([{ target, contentRect: { height: 72 } } as unknown as ResizeObserverEntry], this);
   }
-  unobserve() {}
-  disconnect() {}
+  unobserve() {
+    /* no-op mock */
+  }
+  disconnect() {
+    /* no-op mock */
+  }
 }
 
 beforeEach(() => {

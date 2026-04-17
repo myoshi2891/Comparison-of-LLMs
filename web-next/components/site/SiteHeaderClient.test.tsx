@@ -23,8 +23,12 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fireEvent, render } from "@testing-library/react";
+import type { ReactElement, ReactNode } from "react";
 import { describe, expect, it } from "vitest";
-import { SiteHeaderClient } from "@/components/site/SiteHeaderClient";
+// @ts-expect-error - Phase A Green で実装される。Red 期間中の module-not-found を許容する。
+import { SiteHeaderClient as RawClient } from "@/components/site/SiteHeaderClient";
+
+const SiteHeaderClient = RawClient as unknown as (props: { children: ReactNode }) => ReactElement;
 
 /**
  * 最小のテスト用 children:
@@ -34,14 +38,25 @@ import { SiteHeaderClient } from "@/components/site/SiteHeaderClient";
  */
 const minimalNavDom = (
   <nav id="common-header" className="ch-nav" aria-label="Main Navigation">
-    <button className="ch-hamburger" aria-controls="ch-menu" aria-expanded="false" aria-label="Toggle menu">
+    <button
+      type="button"
+      className="ch-hamburger"
+      aria-controls="ch-menu"
+      aria-expanded="false"
+      aria-label="Toggle menu"
+    >
       <span className="ch-bar" />
       <span className="ch-bar" />
       <span className="ch-bar" />
     </button>
     <ul id="ch-menu" className="ch-links">
       <li className="ch-dropdown">
-        <button className="ch-dropdown-toggle" aria-expanded="false" aria-haspopup="true">
+        <button
+          type="button"
+          className="ch-dropdown-toggle"
+          aria-expanded="false"
+          aria-haspopup="true"
+        >
           <span>Claude</span>
         </button>
         <ul className="ch-submenu">

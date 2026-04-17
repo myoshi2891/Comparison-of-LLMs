@@ -19,7 +19,16 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { navLinks, NavLinkSchema } from "@/components/site/nav-links";
+// @ts-expect-error - Phase A Green で実装される。Red 期間中の module-not-found を許容する。
+import { NavLinkSchema as RawSchema, navLinks as rawNavLinks } from "@/components/site/nav-links";
+
+// Phase A Green が確定する契約のローカル型 (tsc の implicit-any を抑制するため)。
+type NavLeaf = { name: string; href: string };
+type NavDropdown = { name: string; children: NavLeaf[] };
+type NavEntry = NavLeaf | NavDropdown;
+type SchemaLike = { parse: (input: unknown) => NavEntry };
+const navLinks = rawNavLinks as unknown as readonly NavEntry[];
+const NavLinkSchema = RawSchema as unknown as SchemaLike;
 
 describe("Phase A - nav-links export shape", () => {
   it("exports navLinks as a readonly array", () => {
@@ -90,9 +99,7 @@ describe("Phase A - Zod schema validation", () => {
   });
 
   it("rejects entries with javascript: protocol href (XSS guard)", () => {
-    expect(() =>
-      NavLinkSchema.parse({ name: "Evil", href: "javascript:alert(1)" })
-    ).toThrow();
+    expect(() => NavLinkSchema.parse({ name: "Evil", href: "javascript:alert(1)" })).toThrow();
   });
 
   it("rejects entries with protocol-relative // href", () => {
