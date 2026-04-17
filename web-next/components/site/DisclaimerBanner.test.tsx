@@ -20,7 +20,6 @@ import { join } from "node:path";
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-// @ts-expect-error - Phase A Green で実装される。Red 期間中の module-not-found を許容する。
 import { DisclaimerBanner as RawBanner } from "@/components/site/DisclaimerBanner";
 
 const DisclaimerBanner = RawBanner as unknown as () => ReactElement;
