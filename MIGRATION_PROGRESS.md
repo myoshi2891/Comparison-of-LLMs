@@ -9,10 +9,11 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- **最新 HEAD**: Phase A Green 完了（`db67dd0`）。`nav-links` / `DisclaimerBanner` / `SiteHeaderClient` / `SiteHeader` を実装し、`app/layout.tsx` に統合、`globals.css` に `ch-*` クラスを移植済
-- **次の作業**: Phase B（プロバイダー `skill.html` × 4 の web-next 移行）。`claude/skill` → `gemini/skill` → `codex/skill` → `copilot/skill` の順で 1 ページずつ TDD 移行する
+- **最新 HEAD**: Phase B-1 完了（`8515ec3`）。`legacy/claude/skill.html`（2149 行）を `web-next/app/claude/skill/page.tsx` + `page.module.css` として Server Component で移植済
+- **次の作業**: Phase B-2（`legacy/gemini/skill.html` → `web-next/app/gemini/skill/page.tsx`）。区切りのため新セッションで再開予定
 - **検証状態（Phase 1–14）**: `bun run build` 成功、`bun run test` **361 件中 360 passed**（失敗 1 件は既知の `lib/i18n.test.ts` key count — 別 Issue）、`uv run pytest` 5/5 passed
 - **検証状態（Phase A Green）**: `bun run test` **405 件中 404 passed**（失敗 1 件は既知の i18n key count、Phase A Red 由来の 38 ケースはすべて green 化）。`bun run build` / `bun run typecheck` / Phase A 新規ファイルの Biome すべて通過。既知の 6 printWidth エラーは別 Issue
+- **検証状態（Phase B-1）**: `bun run test` **413 件中 413 passed**（i18n key count ドリフト `b984f16` で同期修正済、Phase B-1 Red 由来 8 ケースは Green 化）。`bun run build` で `/claude/skill` が静的プリレンダリング成功、`bun run typecheck` / Phase B-1 新規ファイルの Biome すべて通過
 
 ## フェーズ進捗
 
@@ -33,7 +34,7 @@
 | 13 | Deployment (netlify.toml) | 完了 | `1e99e3f` |
 | 14 | カットオーバー (web/ → legacy/) | **完了** | `6372fe4`, `a5f2332` |
 | A | Common Infrastructure (SiteHeader / DisclaimerBanner / nav-links) | **完了** | Red: `cf36235`, `646bdcb`, `af8cb2a`, `3eadda9`, `c55a21f`, `441b0cb` / Green: `4cc8068`, `7ee1a49`, `83cda74`, `e43b389`, `a619f6c`, `db67dd0` |
-| B | Provider skill.html × 4 (`claude` / `gemini` / `codex` / `copilot`) | 未着手 | — |
+| B | Provider skill.html × 4 (`claude` / `gemini` / `codex` / `copilot`) | 進行中（B-1 完了 / B-2〜B-4 未着手） | B-1: Red `d4735b4` / Green `8515ec3` / chore `b984f16` |
 | C | Provider agent.html × 4 | 未着手 | — |
 | D | Long-form guides × 9（MDX 検討含む） | 未着手 | — |
 | E | git_worktree.html（Mermaid + SVG） | 未着手 | — |
