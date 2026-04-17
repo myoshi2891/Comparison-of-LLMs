@@ -19,7 +19,6 @@
  */
 
 import { describe, expect, it } from "vitest";
-// @ts-expect-error - Phase A Green で実装される。Red 期間中の module-not-found を許容する。
 import { NavLinkSchema as RawSchema, navLinks as rawNavLinks } from "@/components/site/nav-links";
 
 // Phase A Green が確定する契約のローカル型 (tsc の implicit-any を抑制するため)。
