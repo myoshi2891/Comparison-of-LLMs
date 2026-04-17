@@ -1,16 +1,19 @@
-// Phase A [Red] contract test. Expected to FAIL until Green phase
-// implements components/site/SiteHeader.tsx (RSC structure) and
-// components/site/SiteHeaderClient.tsx (client handlers).
+// Phase A [Green] contract test.
+//
+// Red 初稿では「SiteHeader は RSC 必須」と決めていたが、Next.js 16 App Router +
+// output: 'export' の環境では RSC から pathname を参照する手段がなく
+// (`usePathname` は Client 専用。`headers()` は SSG と相性が悪い)、
+// SiteHeader は Client Component とし `usePathname()` で現在地を読むように
+// 契約を反転した。構造・active 判定・GitHub 外部リンクの契約は Red のまま据え置き。
 
 /**
- * Phase A 契約テスト (SiteHeader / RSC 構造)。
+ * Phase A 契約テスト (SiteHeader / 構造 + active 判定)。
  *
  * 役割分担:
- * - SiteHeader (Server Component): マークアップ・active 判定・
- *   navLinks の展開・GitHub 外部リンクの注入。
+ * - SiteHeader (Client Component): usePathname で現在地を取得しつつ、
+ *   マークアップ・active 判定・navLinks の展開・GitHub 外部リンクの注入を担当。
  * - SiteHeaderClient (Client Component): hamburger/dropdown の
- *   開閉・Escape・外側クリックなど DOM インタラクション。本テストは
- *   RSC 側の契約のみ固定する。
+ *   開閉・Escape・外側クリックなど DOM インタラクションだけを束ねる。
  *
  * 固定する契約:
  * - ルート `<nav id="common-header" aria-label="Main Navigation" class="ch-nav">`。
@@ -21,6 +24,7 @@
  * - 親 dropdown トグルにも ch-active が波及 (isParentActive 相当)。
  * - GitHub 外部リンクが末尾に target/rel 付きで描画される。
  * - 静的検査: 生 HTML 注入 API 名をソースに含まない (XSS 不使用証明)。
+ * - 静的検査: `"use client"` ディレクティブが先頭にある (usePathname 依存のため必須)。
  */
 
 import { readFileSync } from "node:fs";
@@ -28,7 +32,6 @@ import { join } from "node:path";
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it } from "vitest";
-// @ts-expect-error - Phase A Green で実装される。Red 期間中の module-not-found を許容する。
 import { SiteHeader as RawSiteHeader } from "@/components/site/SiteHeader";
 
 const SiteHeader = RawSiteHeader as unknown as (props: { pathname: string }) => ReactElement;
@@ -124,9 +127,9 @@ describe("Phase A - SiteHeader static source safety", () => {
     expect(source).not.toContain(unsafeApiName);
   });
 
-  it("source file does not declare 'use client' (RSC is mandatory)", () => {
+  it("declares 'use client' on the first effective line (usePathname requires Client)", () => {
     const source = readFileSync(join(__dirname, "SiteHeader.tsx"), "utf8");
     const firstStmt = source.replace(/^\s*(\/\/[^\n]*\n|\/\*[\s\S]*?\*\/\s*\n?)*/g, "");
-    expect(firstStmt).not.toMatch(/^["']use client["']/);
+    expect(firstStmt).toMatch(/^["']use client["']/);
   });
 });
