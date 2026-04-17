@@ -1,3 +1,5 @@
+> **2026-04-17 追記**: 本ドキュメントは Phase 1–14（コスト計算機ホームページの Next.js 化）のアーキテクト初期プロンプトとして発行された。Phase 14 完了時点で本文は **凍結扱い** となり、残る 18 枚のガイドページ移行計画は [`NEXTJS_PHASE_A_F_PLAN.md`](NEXTJS_PHASE_A_F_PLAN.md) に分離継続している。現行の進捗は [`../MIGRATION_PROGRESS.md`](../MIGRATION_PROGRESS.md) を参照のこと。
+
 ## 役割
 あなたはシニア・ソフトウェアアーキテクトとして、以下のサイトを最新スタックへ移行するプロジェクトのリーダーを担当します。
 対象サイト: https://comparison-of-llms.netlify.app/
