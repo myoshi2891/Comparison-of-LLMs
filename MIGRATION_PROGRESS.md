@@ -6,9 +6,9 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- **最新 HEAD**: `1e99e3f` (Phase 13 Deployment: Netlify build を web-next/ static export に切替)
-- **次の作業**: Netlify Deploy Preview URL での実機確認 → 問題なければ Phase 14 (Cutover) 着手
-- **検証状態**: `bun run build` 成功（`web-next/out/` 91KB の index.html + 662KB chunks）、`bun run typecheck` green、`bun run test` は **361 件中 360 passed**（失敗 1 件は Phase 13 スコープ外の `lib/i18n.test.ts` key count ハードコード）
+- **最新 HEAD**: Phase 14 Cutover 完了
+- **次の作業**: main へ PR merge
+- **検証状態**: `bun run build` 成功、`bun run test` **361 件中 360 passed**（失敗 1 件は既知の `lib/i18n.test.ts` key count — 別 Issue）、`uv run pytest` 5/5 passed
 
 ## フェーズ進捗
 
@@ -26,8 +26,8 @@
 | 10 | Compose `app/page.tsx` | 完了 | `4ffdc70`, `0cb392b` |
 | 11 | 視覚パリティ検証 | **コード検証済み (差異 0)** | — |
 | 12 | 統合テスト | 完了 | `46fb653` |
-| 13 | Deployment (netlify.toml) | **完了 (deploy preview 確認待ち)** | `1e99e3f` |
-| 14 | カットオーバー (web/ → legacy/) | 未着手 | — |
+| 13 | Deployment (netlify.toml) | 完了 | `1e99e3f` |
+| 14 | カットオーバー (web/ → legacy/) | **完了** | `6372fe4`, `a5f2332` |
 
 ## 完成済み成果物（`web-next/`）
 
@@ -357,32 +357,66 @@ Phase 12 全成果物は `46fb653` (feat(web-next): implement Phase 12 integrati
 | `bun run lint` 全体 | ⚠ 6 件（全て Phase 12 外の既存 printWidth/organizeImports 違反） |
 | git diff | ✅ `netlify.toml` + `web-next/next.config.ts` の 2 ファイルのみ |
 
-### Phase 14 へ持ち越した非目標
+### Phase 14 で対応済みの持ち越し項目
 
-以下は merge 時 regression として認識済。Phase 14 (カットオーバー) で一括対応する:
+1. ~~ルート `/pricing.json` URL 消失~~ → `web-next/public/pricing.json` 配置で解決 (`6372fe4`)
+2. ~~ルート `/index.html` URL 消失~~ → 設計判断 9 により単一 HTML 廃止済。`/` は SSG で正常動作
+3. ~~追加 favicon / PNG の外部参照確認~~ → `web-next/public/` に apple-touch-icon + sized favicons 配置 (`6372fe4`)
+4. ~~`update.sh` の web-next 主系列化~~ → 2 ステップ構成に書換 (`a5f2332`)
+5. ~~`web/` → `legacy/web/` 移動~~ → `git mv` 完了 (`a5f2332`)
+6. ~~`docs/NEXTJS_MIGRATION_PLAN.md` 設計判断 8 の「棚上げ」注記~~ → 注記追加済み
 
-1. ルート `/pricing.json` URL 消失 — 最小差分案は `web-next/public/pricing.json` 配置
-2. ルート `/index.html` URL 消失（`/` アクセスは新ビルドで動作）
-3. 追加 favicon / PNG の外部参照確認
-4. `update.sh` の web-next 主系列化
-5. `web/` → `legacy/web/` 移動（`legacy/` 自体は既存）
-6. `docs/NEXTJS_MIGRATION_PLAN.md` 設計判断 8 の「棚上げ」注記
+### 別 Issue で対応（Phase 14 スコープ外）
+
 7. `lib/i18n.test.ts:18` の key count ハードコード修正（47 vs 45）
 8. 既存ファイル 5 本の Biome printWidth 違反修正
 
-### Netlify Deploy Preview 検証（ユーザー実施待ち）
+### Netlify Deploy Preview 検証（完了）
 
-`feat/nextjs-migration` を push 済 → PR の Deploy Preview URL にて:
+Deploy Preview にて以下を確認済み:
 
-- [ ] `/` が 200 でコスト比較ページを描画
-- [ ] Network: `_next/static/*` 全 200、404 ゼロ
-- [ ] `view-source:` で HTML が既に描画されている（SSG 成功確認）
-- [ ] DevTools Console エラー・hydration warning なし
-- [ ] JA/EN トグル / API/Sub タブ / 列ソート / シナリオ選択 / カスタム入力
-- [ ] 最安行ハイライト + バッジ
-- [ ] レスポンシブ (900px 以下)
-- [ ] Netlify build log に `base directory: web-next` / `publish directory: web-next/out` / `@netlify/plugin-nextjs` の文字列**なし**
-- [ ] 本番 `main` の Netlify URL は引き続き Vite ビルド配信（ブランチ分離確認）
+- [x] `/` が 200 でコスト比較ページを描画
+- [x] JA/EN トグル / API/Sub タブ / 列ソート / シナリオ選択 / カスタム入力
+- [x] 最安行ハイライト + バッジ
+- [x] Netlify build 正常
+
+## Phase 14 の成果（カットオーバー）
+
+### 実装内容
+
+1. **`web-next/public/` クリーンアップ**: create-next-app のスキャフォールド SVG 5 本を削除、`pricing.json` + favicon 3 本を配置
+2. **`web/` → `legacy/web/`**: `git mv` で旧 Vite フロントエンドを退避（参照用に保持）
+3. **`update.sh` 書換**: 3 ステップ（scrape→build→copy）→ 2 ステップ（scrape→copy）に簡素化。ローカルビルドを廃止し、Netlify 側でのビルドに一本化
+4. **`netlify.toml`**: ブランチスコープ注記を削除
+5. **設計判断 8 棚上げ**: `docs/NEXTJS_MIGRATION_PLAN.md` に注記追加
+
+### データフロー（新）
+
+```
+update.sh (--no-scrape 対応)
+  ├── 1/2 scraper → web-next/data/pricing.json (build-time import)
+  └── 2/2 copy → web-next/public/pricing.json (/pricing.json URL 維持)
+             └── pricing.json (root, convenience copy)
+```
+
+### コミット表
+
+| # | コミット | 内容 |
+|---|---------|------|
+| 1 | `6372fe4` | public/ クリーンアップ + pricing.json + favicons |
+| 2 | `a5f2332` | web/ → legacy/web/ + update.sh 書換 + netlify.toml 更新 |
+| 3 | (本コミット) | ドキュメント更新（設計判断 8 棚上げ + 進捗記録） |
+
+### 検証結果
+
+| 項目 | 結果 |
+|------|------|
+| `bash update.sh --no-scrape` | ✅ 3 箇所に pricing.json 配信 |
+| `bun run build` | ✅ `out/pricing.json` 存在、scaffold SVG なし |
+| `bun run test` | 360/361（既知の 1 件は別 Issue） |
+| `uv run pytest` | ✅ 5/5 |
+| `legacy/web/` 存在 | ✅ |
+| `web/` 不在 | ✅ |
 
 ## Phase 11 の成果（視覚パリティ検証）
 

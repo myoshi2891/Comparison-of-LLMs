@@ -23,7 +23,7 @@
 5. **多言語戦略**: 既存の `web/src/i18n.ts`（`t(key, lang)` 関数 + `T` オブジェクト）を Next.js へどう移植するかを評価すること。`next-intl` などの専用ライブラリ採用か既存ロジック流用かを比較し、推奨を提示すること。
 6. **ビジネスロジックの配置**: `web/src/lib/cost.ts` の純粋関数群（`calcApiCost`, `calcSubCost`, `colorIndex`, `fmtUSD`, `fmtJPY`）を Next.js プロジェクトのどこに配置・カプセル化すべきかを提案すること。
 7. **`pricing.json` のデータ取得戦略**: SSG（ビルド時静的生成）・ISR（増分静的再生成）・クライアントサイドフェッチそれぞれのトレードオフを整理し、推奨方式を提示すること。
-8. **デプロイ移行パス**: 現行 Netlify の App Router サポート状況と Vercel への移行を比較し、SEO・ビルド時間・コストの観点で推奨を示すこと。
+8. **デプロイ移行パス** *(棚上げ — Phase 13 で `output: "export"` 純静的配信を採用し、`@netlify/plugin-nextjs` は不要と判断。Vercel 移行も現時点では不要。将来 SSR/ISR 導入時に再評価)*: 現行 Netlify の App Router サポート状況と Vercel への移行を比較し、SEO・ビルド時間・コストの観点で推奨を示すこと。
 9. **単一ファイル HTML 制約の解消**: 現行は `vite-plugin-singlefile` で単一 `index.html` を生成している。Next.js App Router ではこの要件を維持できないため、この制約を**廃止可能か否かを確認し**、代替の配布・デプロイ戦略を提案すること。
 
 ## ステップ 1〜N: 実装フェーズ (設計確定後に実行)
