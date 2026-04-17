@@ -1,7 +1,6 @@
 [build]
-  # Phase 13: Next.js App Router (web-next/) を静的エクスポートとして配信する。
-  # base を web-next に切替え、publish は base 相対で out ディレクトリを指す。
-  # feat/nextjs-migration ブランチでのみ有効 (main は Phase 14 まで従来の web/ ビルドを維持)。
+  # Next.js App Router (web-next/) を静的エクスポートとして配信する。
+  # base を web-next に設定し、publish は base 相対で out ディレクトリを指す。
   base    = "web-next"
   command = "bun install && bun run build"
   publish = "out"
