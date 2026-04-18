@@ -221,28 +221,9 @@ Phase A–F 遂行中、新規ガイドページ (`claude/`, `gemini/`, `codex/`
 
 ### 静的 HTML ドキュメント（legacy/ 配下、移行対象）
 
-以下の 18 HTML は `legacy/` 配下にあり、`.gitignore` により remote から隔離済。Phase A–F で `web-next/app/*` の page.tsx へ順次置換:
-
-| ファイル | 内容 | 行数目安 | 注意点 | 移行 Phase |
-| --------- | ------ | --------- | -------- | -------- |
-| `legacy/git_worktree.html` | git worktree 並列開発ガイド | ~2979行 | Mermaid v10 + 手書き SVG | E |
-| `legacy/claude/skill.html` | Claude スキル展開ガイド | ~2149行 | 共通ヘッダー参照 | B |
-| `legacy/claude/agent.html` | Claude エージェント最適化 | ~1678行 | 共通ヘッダー参照 | C |
-| `legacy/claude/skill-guide-for-claude.html` | Claude スキルガイド基礎編 | ~2070行 | `.md` SSoT あり → MDX 化候補 | D |
-| `legacy/claude/skill-guide-of-claude-for-intermediate.html` | 同中級編 | ~2762行 | 共通ヘッダー参照 | D |
-| `legacy/claude/claude-cowork-guide.html` | Claude 協働ガイド | ~2307行 | 共通ヘッダー参照 | D |
-| `legacy/gemini/skill.html` | Gemini スキル展開ガイド | ~2173行 | 共通ヘッダー参照 | B |
-| `legacy/gemini/agent.html` | Gemini エージェント最適化 | ~3723行 | 共通ヘッダー参照 | C |
-| `legacy/gemini/skill-guide-for-gemini.html` | Gemini スキルガイド基礎編 | ~2036行 | `.md` SSoT あり → MDX 化候補 | D |
-| `legacy/gemini/skill-guide-of-gemini-for-intermediate.html` | 同中級編 | ~2625行 | 共通ヘッダー参照 | D |
-| `legacy/gemini/antigravity-guide.html` | Antigravity 導入ガイド | ~3003行 | 共通ヘッダー参照 | D |
-| `legacy/codex/skill.html` | Codex スキル展開ガイド | ~2808行 | 共通ヘッダー参照 | B |
-| `legacy/codex/agent.html` | Codex エージェント最適化 | ~3007行 | 共通ヘッダー参照 | C |
-| `legacy/codex/openai-codex-guide.html` | OpenAI Codex ガイド | ~2184行 | 共通ヘッダー参照 | D |
-| `legacy/copilot/skill.html` | Copilot スキル展開ガイド | ~4195行 | 共通ヘッダー参照 | B |
-| `legacy/copilot/agent.html` | Copilot エージェント最適化 | ~2171行 | 共通ヘッダー参照 | C |
-| `legacy/copilot/markdown-file-guide.html` | マークダウンファイルガイド | ~3193行 | 共通ヘッダー参照 | D |
-| `legacy/copilot/github-copilot.html` | GitHub Copilot ガイド | ~2658行 | 共通ヘッダー参照 | D |
+`legacy/` 配下の **18 HTML** は `.gitignore` により remote から隔離済で、Phase A–F で `web-next/app/*` の page.tsx へ順次置換中。
+ファイル別の行数・注意点・移行 Phase 割当は **[`docs/NEXTJS_PHASE_A_F_PLAN.md`](docs/NEXTJS_PHASE_A_F_PLAN.md) §3.1** を参照。
+進捗は **[`MIGRATION_PROGRESS.md`](MIGRATION_PROGRESS.md)** を参照（頻繁に更新されるため CLAUDE.md にインラインしない — プロンプトキャッシュ安定性のため）。
 
 #### AI モデルバージョンの扱い
 
