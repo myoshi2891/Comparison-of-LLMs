@@ -18,6 +18,37 @@
 - **検証状態（Phase B-3）**: `bun run test` **429 件中 429 passed**（Phase B-3 Red 由来 8 ケースは Green 化）。`bun run build` で `/codex/skill` が静的プリレンダリング成功、`bun run typecheck` / Phase B-3 新規ファイルの Biome すべて通過
 - **検証状態（Phase B-4）**: `bun run test` **437 件中 437 passed**（Phase B-4 Red 由来 8 ケースは Green 化）。`bun run build` で `/copilot/skill` が静的プリレンダリング成功、`bun run typecheck` / Phase B-4 新規ファイルの Biome すべて通過、`uv run pytest` 5/5 passed
 
+## AI 作業ルール（Phase A–F 共通、**必読**）
+
+以下は Phase A–F 遂行中に判明した問題を受けて確定したルール。新規セッションは作業開始前に必ず目を通すこと。CLAUDE.md の「AI 変更ルール」を補完する。
+
+### R1. Biome フォーマット・lint の適用スコープ（Phase B-4 で判明）
+
+- **禁止**: リポジトリ全体を対象にする Biome `--write` 実行。具体的には以下のいずれも実行しない:
+  - `bun run lint:fix`（= `biome check . --write`）
+  - `bunx biome check --write`（パス引数なし、カレント全体）
+  - `bunx biome format --write`（同上）
+- **理由**: CLAUDE.md「リポジトリ全体の自動フォーマット禁止」ルール違反。このリポジトリには既存の printWidth / organizeImports 違反 6 件が残存しており（別 Issue 対応中）、全体 `--write` はそれらを含む無関係ファイルを意図せず書き換えてしまう
+- **実例**: Phase B-4 Green で `bun run lint:fix` を実行した結果、`components/ApiTable.tsx` / `ApiTable.test.tsx` / `HomePage.tsx` / `MathSection.tsx` / `ScenarioSelector.tsx` / `tests/phase7.metadata.test.ts` の 6 ファイルが fix 対象となり `git checkout --` で revert が必要になった
+- **正しい手順**:
+  1. `bun run lint` でまず全違反を一覧し、自分の作業範囲起点のものと pre-existing 6 件を切り分ける
+  2. 自分の作業範囲のみを明示的にパス指定して fix: 例 `bunx biome check --write app/<provider>/<slug>/page.tsx app/<provider>/<slug>/page.module.css app/<provider>/<slug>/page.test.tsx`
+  3. 再度 `bun run lint` を実行し、新規違反がゼロで pre-existing 6 件のみが残っていることを確認
+- **コミット前チェックとの関係**: CLAUDE.md の「既知の 6 件 printWidth 違反は別 Issue、新規違反がないこと」は「新規違反ゼロ」だけを担保すればよいという意味であり、全体 `--write` を意図していない
+
+### 今後のルール追加方針
+
+Phase A–F 作業中に AI エージェントの実装ミスや仕様齟齬が判明した場合、本セクションに **判明した時点で** `R2`, `R3`, ... として追記する。追記は以下のテンプレに従う:
+
+```
+### Rn. <ルール要約>（<判明したフェーズ>で判明）
+
+- **禁止 / 必須**: <何をしてはいけない / しなければならないか>
+- **理由**: <なぜこのルールが必要か。CLAUDE.md ルールや過去のインシデントとの関連>
+- **実例**: <実際に起こった問題の具体例>
+- **正しい手順**: <代わりに行うべき具体的手順>
+```
+
 ## フェーズ進捗
 
 | # | フェーズ | 状態 | コミット |
@@ -540,12 +571,12 @@ Next.js 移行プロジェクトの作業を再開してください。
 - 現在のブランチ: feat/nextjs-migration
 - 最新 HEAD:
 - 移行計画: docs/NEXTJS_PHASE_A_F_PLAN.md（Phase A–F）、docs/NEXTJS_MIGRATION_PLAN.md（Phase 1–14 凍結）
-- 進捗トラッカー: MIGRATION_PROGRESS.md
+- 進捗トラッカー: MIGRATION_PROGRESS.md（**「AI 作業ルール」セクションは作業開始前に必読**）
 - プロジェクト固有スキル: .claude/skills/nextjs-page-migration/SKILL.md
 
 既知の Phase 13 外ブレ（別 Issue で対応）:
 - lib/i18n.test.ts:18 の key count ハードコード (47 vs 45)
-- 一部既存ファイル 5 本の Biome printWidth 違反
+- 一部既存ファイル 5 本の Biome printWidth 違反（R1 により `lint:fix` 全体実行で巻き込まないこと）
 ```
 
 ## Phase B-4 完了 — セッション区切り
