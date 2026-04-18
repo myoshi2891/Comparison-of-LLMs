@@ -26,10 +26,16 @@ Phase 1–14 でコスト計算機ホームページは `web-next/` に移行済
 本スキルは **残り 18 枚のガイドページ** と **共通インフラ**（ヘッダー・ディスクレイマー）を
 `web-next/` App Router 配下へ TDD で移植する作業を標準化する。
 
-関連ドキュメント:
+## セッション開始時に必ず読むファイル（順序固定）
+
+1. **`MIGRATION_PROGRESS.md`** — 現在地（直近は Phase B-3: `legacy/codex/skill.html` → `/codex/skill`）と残タスク、既知の留保事項
+2. **このファイル（`.claude/skills/nextjs-page-migration/SKILL.md`）** — 9 ステップの移行手順と Phase 固有ルール
+
+この 2 ファイルを読めば、`docs/NEXTJS_PHASE_A_F_PLAN.md` 本体は参照不要な粒度で着手できる。計画全体や設計判断の経緯を追う必要がある場合のみ Plan を開く。
+
+関連ドキュメント（必要時のみ参照）:
 
 - `docs/NEXTJS_PHASE_A_F_PLAN.md` — Phase A–F 全体計画（設計判断・スコープ・工数）
-- `MIGRATION_PROGRESS.md` — 現在地と直近の留保事項
 - `docs/NEXTJS_MIGRATION_PLAN.md` — Phase 1–14 アーキテクト初期プロンプト（凍結）
 
 ## Phase と入出力の対応
@@ -55,14 +61,15 @@ Phase 1–14 でコスト計算機ホームページは `web-next/` に移行済
 
 ## Phase A の前提チェックリスト（Phase B 以降着手時）
 
-Phase B 以降に着手する前に以下を確認する:
+Phase A は **完了済み**（Green 最終 commit `db67dd0`）。以下はすべて `web-next/` にマウント済みのため、
+Phase B 以降のページは `<SiteHeader />` / `<DisclaimerBanner />` を **ページ側で再インクルードしない**:
 
-- [ ] `web-next/components/site/SiteHeader.tsx` が存在し、`app/layout.tsx` にマウントされている
-- [ ] `web-next/components/site/DisclaimerBanner.tsx` が `<body>` 冒頭に描画される
-- [ ] `web-next/components/site/nav-links.ts` に移行先 URL（clean URL 形式）が登録済み
-- [ ] `components/site/SiteHeader.test.tsx` 他 Phase A の契約テストがすべて Green
+- [x] `web-next/components/site/SiteHeader.tsx` + `SiteHeaderClient.tsx` — `app/layout.tsx` にマウント済
+- [x] `web-next/components/site/DisclaimerBanner.tsx` — `<body>` 冒頭に描画済
+- [x] `web-next/components/site/nav-links.ts` — 既存移行先 URL を Zod `NavLinkSchema[]` で保持
 
-未達の項目がある場合は Phase A の Green フェーズに戻って完了させる。
+新規ページを `nav-links.ts` へ追加するときは **同ファイルを編集**（親ディレクトリ単位でのドロップダウンに追記）。
+`legacy/shared/common-header.js` は編集しない（`.gitignore` 済・凍結）。
 
 ## 1 ページ移行の標準手順
 
@@ -95,9 +102,38 @@ wc -l legacy/<provider>/<file>.html
 
 ### Step 4: [Green] page.tsx の実装
 
-- Server Component デフォルト。`"use client"` は動的 UI が必要な場合のみ
+- **Server Component デフォルト**。Phase B（skill.html）では動的 UI が不要なため `"use client"` を一切使わない構成が
+  `/claude/skill`（`8515ec3`）と `/gemini/skill`（`037f45f`）で成立している。Phase C の agent.html 移植で
+  `useState` が必要になった場合のみ Client 分離を検討する
 - スタイル優先順位: Tailwind ユーティリティ → CSS Modules（`page.module.css`） → global CSS（避ける）
 - 外部リンクは `<a href="..." target="_blank" rel="noopener noreferrer">` を厳守
+- **ファイルレイアウト規約（B-1/B-2 で確立）**: `app/<provider>/<slug>/` 配下に
+  `page.tsx` / `page.module.css` / `page.test.tsx` の 3 点セットを **コロケーション**配置する
+  （独立ディレクトリにすることで `page.module.css` のクラス名衝突を自然に分離できる）
+- 新たに i18n キーを追加した場合、`lib/i18n.test.ts` の `expect(Object.keys(T).length).toBe(N)` を
+  **同じコミット内で N+k に更新**すること（B-1 で key count ドリフトが発生、別 commit `b984f16` で後追い同期した）
+
+#### Phase B で確立した 3 つの移植パターン（B-3 / B-4 でも踏襲）
+
+Phase B-1（`/claude/skill`）と B-2（`/gemini/skill`）で共通化された方針。B-3（`/codex/skill`）・B-4（`/copilot/skill`）でも
+そのまま適用できる：
+
+1. **Legacy `<style>` → `page.module.css` に逐語転写**
+   - legacy の `<style>` ブロック（数百行規模）を CSS Modules 1 ファイルへ 1:1 移植する
+   - ファイル冒頭にコメントで「元 HTML の行範囲」を記す（例: `legacy/claude/skill.html の <style> ブロック (行 7-630) を CSS Modules に転写`）
+   - クラス名の命名は legacy をそのまま継承（Biome の camelCase 規則は CSS Modules の export で吸収される）
+
+2. **ブランドカラートークンを `.root` スコープ内に閉じる**
+   - ページ固有の色変数（`--bg` / `--accent` / `--surface` 等）は `.root { ... }` の中で `--*` 定義
+   - `globals.css` の既存トークンを **絶対に上書きしない**（他ページへの影響を避けるため）
+   - `page.module.css` 冒頭コメントに「globals.css の値を上書きしない」旨を明記する運用
+   - 子要素は `.root *` または `.root .className` を経由するのでスコープが自然に閉じる
+
+3. **外部出典は `SOURCES: Source[]` 配列として先頭で構造化**
+   - `page.tsx` の先頭で `type Source = { num, href, title, desc }` を定義し、`const SOURCES: Source[] = [...]` として集約
+   - 末尾の sources セクションは `{SOURCES.map((s) => (...))}` でレンダリング（逐語 HTML を JSX で繰り返さない）
+   - Phase F の redirect 一覧作成時も同じ配列を機械的に走査できる（URL 一覧のシングルソース化）
+   - legacy HTML の `<a href="..." target="_blank" rel="noopener noreferrer">` 属性は **SOURCES 描画部で付与**
 
 ### Step 5: コードブロック（shiki）
 
