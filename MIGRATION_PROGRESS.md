@@ -9,13 +9,14 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- **最新 HEAD**: Phase B-3 完了（`1dd1501`）。`legacy/codex/skill.html`（2808 行）を `web-next/app/codex/skill/page.tsx` + `page.module.css` として Server Component で移植済（23 件の sources を含む全文逐語移植、SKILL.md 追加 6 件は視覚的セパレータ付き）
-- **次の作業**: Phase B-4（`legacy/copilot/skill.html` → `web-next/app/copilot/skill/page.tsx`）。区切りのため新セッションで再開予定
+- **最新 HEAD**: Phase B-4 Green 完了（本コミット）。`legacy/copilot/skill.html`（4195 行）のうち SKILL.md ベストプラクティスに該当する 12 セクションを `web-next/app/copilot/skill/page.tsx` + `page.module.css` として Server Component で移植済（SOURCES_SKILL [A]–[L] 12 件 + SOURCES_EXISTING [1][4][9][15] 4 件 = 計 16 件を視覚的セパレータ付きで分割表示）
+- **次の作業**: Phase B 完了。次は Phase C（Provider `agent.html` × 4）へ進む
 - **検証状態（Phase 1–14）**: `bun run build` 成功、`bun run test` **361 件中 360 passed**（失敗 1 件は既知の `lib/i18n.test.ts` key count — 別 Issue）、`uv run pytest` 5/5 passed
 - **検証状態（Phase A Green）**: `bun run test` **405 件中 404 passed**（失敗 1 件は既知の i18n key count、Phase A Red 由来の 38 ケースはすべて green 化）。`bun run build` / `bun run typecheck` / Phase A 新規ファイルの Biome すべて通過。既知の 6 printWidth エラーは別 Issue
 - **検証状態（Phase B-1）**: `bun run test` **413 件中 413 passed**（i18n key count ドリフト `b984f16` で同期修正済、Phase B-1 Red 由来 8 ケースは Green 化）。`bun run build` で `/claude/skill` が静的プリレンダリング成功、`bun run typecheck` / Phase B-1 新規ファイルの Biome すべて通過
 - **検証状態（Phase B-2）**: `bun run test` **421 件中 421 passed**（Phase B-2 Red 由来 8 ケースは Green 化）。`bun run build` で `/gemini/skill` が静的プリレンダリング成功、`bun run typecheck` / Phase B-2 新規ファイルの Biome すべて通過
 - **検証状態（Phase B-3）**: `bun run test` **429 件中 429 passed**（Phase B-3 Red 由来 8 ケースは Green 化）。`bun run build` で `/codex/skill` が静的プリレンダリング成功、`bun run typecheck` / Phase B-3 新規ファイルの Biome すべて通過
+- **検証状態（Phase B-4）**: `bun run test` **437 件中 437 passed**（Phase B-4 Red 由来 8 ケースは Green 化）。`bun run build` で `/copilot/skill` が静的プリレンダリング成功、`bun run typecheck` / Phase B-4 新規ファイルの Biome すべて通過、`uv run pytest` 5/5 passed
 
 ## フェーズ進捗
 
@@ -36,7 +37,7 @@
 | 13 | Deployment (netlify.toml) | 完了 | `1e99e3f` |
 | 14 | カットオーバー (web/ → legacy/) | **完了** | `6372fe4`, `a5f2332` |
 | A | Common Infrastructure (SiteHeader / DisclaimerBanner / nav-links) | **完了** | Red: `cf36235`, `646bdcb`, `af8cb2a`, `3eadda9`, `c55a21f`, `441b0cb` / Green: `4cc8068`, `7ee1a49`, `83cda74`, `e43b389`, `a619f6c`, `db67dd0` |
-| B | Provider skill.html × 4 (`claude` / `gemini` / `codex` / `copilot`) | 進行中（B-1 / B-2 / B-3 完了、B-4 未着手） | B-1: Red `d4735b4` / Green `8515ec3` / chore `b984f16` ／ B-2: Red `d0038d0` / Green `037f45f` ／ B-3: Red `c0ee480` / Green `1dd1501` |
+| B | Provider skill.html × 4 (`claude` / `gemini` / `codex` / `copilot`) | **完了** | B-1: Red `d4735b4` / Green `8515ec3` / chore `b984f16` ／ B-2: Red `d0038d0` / Green `037f45f` ／ B-3: Red `c0ee480` / Green `1dd1501` ／ B-4: Red `9d59aa0` / Green (本コミット) |
 | C | Provider agent.html × 4 | 未着手 | — |
 | D | Long-form guides × 9（MDX 検討含む） | 未着手 | — |
 | E | git_worktree.html（Mermaid + SVG） | 未着手 | — |
@@ -547,37 +548,38 @@ Next.js 移行プロジェクトの作業を再開してください。
 - 一部既存ファイル 5 本の Biome printWidth 違反
 ```
 
-## Phase B-3 完了 — セッション区切り
+## Phase B-4 完了 — セッション区切り
 
-ここで新セッションへ切替え可能です。次の作業は `legacy/copilot/skill.html` → `web-next/app/copilot/skill/page.tsx` の Phase B-4。
+ここで新セッションへ切替え可能です。次の作業は Phase C（Provider `agent.html` × 4）。Phase B（skill.html 4 枚）はこれで完了。
 
-### 今回のコミット履歴（feat/nextjs-migration、Phase B-3 範囲）
+### 今回のコミット履歴（feat/nextjs-migration、Phase B-4 範囲）
 
 ```
-1dd1501 feat(web-next): migrate legacy/codex/skill.html to /codex/skill (Green)
-c0ee480 test(web-next): add Phase B-3 /codex/skill contract test (Red)
+(本コミット) feat(web-next): migrate legacy/copilot/skill.html to /copilot/skill (Green)
+9d59aa0      test(web-next): add Phase B-4 /copilot/skill contract test (Red)
 ```
 
 ### 検証結果（全てパス）
 
 | 項目 | 結果 |
 |------|------|
-| `bun run test` | 429 / 429 passed（Phase B-3 契約 8 件含む） |
+| `bun run test` | 437 / 437 passed（Phase B-4 契約 8 件含む） |
 | `bun run typecheck` | OK |
-| `bun run build` | `/codex/skill` 静的プリレンダリング成功 |
-| `bun run lint`（Phase B-3 新規ファイル） | 違反 0（既知 6 件はすべて pre-existing で Phase B-3 由来 0） |
+| `bun run build` | `/copilot/skill` 静的プリレンダリング成功 |
+| `bun run lint`（Phase B-4 新規ファイル） | 違反 0（既知 6 件はすべて pre-existing で Phase B-4 由来 0） |
+| `uv run pytest` | 5 / 5 passed |
 
-### キー設計判断（Phase B-1 / B-2 から踏襲・発展）
+### キー設計判断（Phase B-1 / B-2 / B-3 から踏襲・発展）
 
-- **Server Component**: 状態を持たないため `"use client"` 不要。`/codex/skill` を `○ (Static)` として SSG プリレンダリング
-- **CSS Modules スコープ**: `.root` セレクタに OpenAI ブランドカラートークン（`--oai` / `--blue` / `--purple` / `--amber` / `--rose` / `--cyan` / `--lime`）を局所化し、B-1 `--accent` / B-2 `--g-*` パレットと衝突回避
-- **legacy の `prefers-reduced-motion` ブロックは削除**: `globals.css:988-999` が全セレクタに同ルールを適用済で dead code のため、Biome `noImportantStyles` 警告回避の目的で除去（視覚的影響なし）
-- **インライン `style={{...}}` → 名前付きクラスバリアント**: legacy HTML の `style="background: rgba(16,163,127,0.12); border: 1px solid rgba(16,163,127,0.3)"` 等の多数のインラインスタイルを `fcIconOai` / `fcIconPurple` / `mcBoxOai` 等の名前付きバリアントへ集約（CSS Modules の camelCase 規約と `fcTag`/`mcBox`/`cbd` のプレフィックス分類を踏襲）
-- **SOURCES 配列の 17+6 分割パターン（新規）**: legacy HTML が `<div class="src" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid ...">` で区切って「SKILL.md 追加ソース」セクションを別グループ化していたため、`SOURCES: Source[]`（[1]–[17]）と `SOURCES_SKILL_ADDITIONAL: Source[]`（[18]–[23]）の 2 配列 + 区切り `<div className={styles.srcSeparator}>` で表現。契約テストは `>=20` の下限のため 23 件全件を保持
-- **`<pre>` 内の文字列リテラル子要素**: React の生 HTML 挿入 prop（`["danger","ously","Set","Inner","HTML"].join("")`）を避けつつ改行・インデントを厳密に保つため、コードブロックは `{"..."}` 文字列リテラルと `<span className={styles.cHd}>` などの分類スパンを組み合わせて構築（静的検査テスト `page.test.tsx:122-124` の `needle.split()` ガードで未使用を CI 担保）
+- **Server Component**: 状態を持たないため `"use client"` 不要。`/copilot/skill` を `○ (Static)` として SSG プリレンダリング
+- **CSS Modules スコープ**: `.root` セレクタに GitHub/Microsoft/Copilot ブランドカラートークン（`--gh` / `--ms` / `--cop` / `--violet` / `--teal` / `--rose` / `--lime`）を局所化し、B-1 `--accent` / B-2 `--g-*` / B-3 `--oai`/`--blue`/`--purple` パレットと衝突回避
+- **スコープ判断（legacy 12 セクション中の 12 セクション移植）**: legacy HTML には overview / directory / copilot-instructions / instructions-md / prompt-md / chatmode-md / agent-md / agents-md / speckit / sdd-docs / system-prompt / best-practices など非 SKILL.md セクションも存在するが、TOC/test 契約は SKILL.md ベストプラクティス 12 セクションに限定しているため、それ以外は移植範囲外。Phase C / D 以降で別ページに分離する前提
+- **SOURCES 配列の 12+4 分割パターン**: legacy HTML で「[A]–[L] の新規追加 12 件」と「既存 [1][4][9][15] の 4 件」を視覚的に区切っていた構成を `SOURCES_SKILL: Source[]`（[A]–[L] 12 件）と `SOURCES_EXISTING: Source[]`（[1][4][9][15] 4 件）の 2 配列 + 区切り `<div className={styles.srcSeparator}>` で表現。契約テストは `>=16` の下限のため計 16 件で合致
+- **`<pre>` 内の文字列リテラル子要素**: React の生 HTML 挿入 prop（`["danger","ously","Set","Inner","HTML"].join("")`）を避けつつ改行・インデントを厳密に保つため、コードブロックは `{"..."}` 文字列リテラルと `<span className={styles.cCm}>` などの分類スパンを組み合わせて構築（静的検査テスト `page.test.tsx:119-126` の `needle` ガードで未使用を CI 担保）
+- **テンプレート定数への切出し**: Section 06 のテンプレート集（DB_MIGRATION / WEBAPP_TESTING / TERRAFORM / ACTIONS_DEBUG / SECURITY / CREATE_SKILL の 6 種）および Section 08 の高度パターン 2 種を named constants に抽出して `page.tsx` 本体の縦長を抑制
 
 ### 次セッションへの申し送り
 
-- 開始時読むファイル: `MIGRATION_PROGRESS.md`（現在地は Phase B-4）、`.claude/skills/nextjs-page-migration/SKILL.md`（9 ステップ手順）
-- `git status` はクリーン、未 push コミット 8 件（Phase B-1 4 件 + Phase B-2 2 件 + Phase B-3 2 件）は適宜 push
-- Phase B-1 / B-2 / B-3 で確立した方針（Server Component + CSS Modules に legacy `<style>` をポート + SOURCES 配列で sources 節を構造化 + ブランドカラートークンを `.root` スコープ + インラインスタイルを名前付きバリアントへ集約）は B-4 でも踏襲可能。sources 節に視覚的区切りがある場合は B-3 の 17+6 分割パターンを流用
+- 開始時読むファイル: `MIGRATION_PROGRESS.md`（現在地は Phase B 完了、次は Phase C）、`.claude/skills/nextjs-page-migration/SKILL.md`（9 ステップ手順）、`docs/NEXTJS_PHASE_A_F_PLAN.md`（Phase C スコープ定義）
+- `git status` はクリーン、未 push コミット 10 件（Phase B-1 4 件 + Phase B-2 2 件 + Phase B-3 2 件 + Phase B-4 2 件）は適宜 push
+- Phase B で確立した方針（Server Component + CSS Modules に legacy `<style>` をポート + SOURCES 配列で sources 節を構造化 + ブランドカラートークンを `.root` スコープ + インラインスタイルを名前付きバリアントへ集約 + 大量テンプレートは named constants へ退避）は Phase C（`agent.html` × 4）でも踏襲可能
