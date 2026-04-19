@@ -46,7 +46,7 @@
 | # | legacy パス | 新 URL | 行数 | H2 数 | code block 数 | source 数 | ブランドカラー |
 |---|---|---|---|---|---|---|---|
 | C-1 | `legacy/claude/agent.html` | `/claude/agent` | 1,678 | 0 | 30 | 23 | `--accent` `--accent2` `--accent3` `--accent4` |
-| C-2 | `legacy/gemini/agent.html` | `/gemini/agent` | 3,723 | 18 | 36 | 28 | Google Material（`--blue` `--green` `--yellow` `--red` `--purple` `--teal`） |
+| C-2 | `legacy/gemini/agent.html` | `/gemini/agent` | 3,723 | 18 | 36 | **25**（既存 12 + 新規 A2A 13; 当初 28 は誤り） | Google Material（`--blue` `--green` `--yellow` `--red` `--purple` `--teal`） |
 | C-3 | `legacy/codex/agent.html` | `/codex/agent` | 3,007 | 12 | 45 | 20 | OpenAI（`--oai` `--oai-dim` `--blue` `--purple` `--amber` `--red`） |
 | C-4 | `legacy/copilot/agent.html` | `/copilot/agent` | 2,171 | 20 | 63 | 16 | GitHub/MS（`--gh` `--gh-dark` `--gh-blue` `--gh-purple` `--gh-amber` `--gh-red` `--ms-blue`） |
 
@@ -213,14 +213,22 @@ function BpCard({ variant, title, desc }: { variant: "violet" | "teal" | ...; ti
 | Section 構造 | `<h2>` × 18（id 属性の有無は実装時 grep `id="[^"]*"' legacy/gemini/agent.html` で確認） |
 | EXPECTED_SECTION_IDS 戦略 | legacy に既存 id があれば採用、なければ synthetic（`s01` 〜 `s18`） |
 | 著者カラー | Google Material: `--blue: #1a73e8` / `--green: #1e8e3e` / `--yellow: #f9ab00` / `--red: #d93025` / `--purple: #7c3aed` / `--teal: #00897b` |
-| SOURCES 件数 | 28 件（Phase C 最多） |
-| SOURCES 分割方針 | 視覚セパレータの有無で判定（§3.2） |
+| SOURCES 件数 | **25 件**（既存 12 + 新規 A2A 13）。設計書当初の「28 件」は誤りで、grep で確認済み |
+| SOURCES 分割方針 | **2 分割確定**（`SOURCES_EXISTING`: 12 件 / `SOURCES_NEW`: 13 件 A2A 系）。CSS: `.srcSeparator` で区切り |
+| 契約テスト #7 の閾値 | `>= 25`（当初 `>= 28` から訂正済み、`page.test.tsx` 修正完了・未コミット） |
+| EXPECTED_SECTION_IDS | `["s01", ..., "s17", "sources"]`（18 件）。s01〜s17 は synthetic id（legacy HTML に id 属性なし） |
 | code block 数 | 36 件 |
-| named template constants | 8–10 件目安（中規模） |
-| metadata.title | `Gemini Code Assist エージェント開発ガイド \| LLM コスト計算機`（legacy `<title>` を優先） |
-| metadata.description | legacy の `<meta name="description">` を採用、無ければ `<h1>` 先頭文を要約して 150 字以内 |
-| 契約テスト #3 のキーワード | `Gemini`（legacy の `<h1>` で確認） |
-| 契約テスト #4 の id 数（N） | 18（synthetic 採用時） |
+| named template constants | 8–10 件目安（中規模）。コードブロック本文は文字列テンプレートリテラルで OK（white-space:pre が改行保持） |
+| metadata.title | `Gemini エージェント開発完全ガイド \| LLM コスト計算機` |
+| metadata.description | GEMINI.md・AGENTS.md・agent.py・A2A プロトコル（agent.json）・AgentEngine・マルチエージェント GEMINI.md を解説する 150 字以内の説明文 |
+| 契約テスト #3 のキーワード | `Gemini`（`<h1>` 内に含まれることを確認済み） |
+| 契約テスト #4 の id 数（N） | **18**（s01〜s17 の 17 件 + sources の 1 件） |
+| CSS Module 状態 | **作成済み・未コミット**（`page.module.css`、約 500 行、legacy `<style>` 行 7–1,148 を転写） |
+| page.tsx 状態 | **未作成**（Green 実装対象） |
+
+**セクション 10〜17 の注意**: マルチエージェント系セクションは `sectionMa` クラスを追加（緑アクセント、CSS で定義済み）。`className={\`${styles.section} ${styles.sectionMa}\`}` を使用。
+
+**外部リンクの所在**: ソースセクション（`id="sources"`）のみ。セクション本文内（コードブロック文字列等）に `<a>` 要素は不要。`Ext` ヘルパを sources のレンダリングのみで使用。
 
 ### 5.3 C-3 `/codex/agent`
 

@@ -107,14 +107,14 @@ describe("/gemini/agent - external link safety", () => {
     }
   });
 
-  it("sources section contains at least 28 external links", () => {
+  it("sources section contains at least 25 external links", () => {
     const { container } = render(<Page />);
     const sources = container.querySelector("#sources");
     expect(sources).not.toBeNull();
     const externals =
       sources?.querySelectorAll('a[href^="http"]') ??
       ([] as unknown as NodeListOf<HTMLAnchorElement>);
-    expect(externals.length).toBeGreaterThanOrEqual(28);
+    expect(externals.length).toBeGreaterThanOrEqual(25);
   });
 });
 
