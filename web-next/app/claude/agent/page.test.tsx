@@ -7,9 +7,11 @@
  * 固定する契約:
  * - `metadata` が export され、title に「サブエージェント」を含む
  * - `<h1>` が 1 つ存在し、`サブエージェント` を含む
- * - 11 個の section id が存在する (s01〜s10 + sources)
- *   (legacy は <div class="section"> × 11、id 属性なし → synthetic id 付与)
- * - 11 個の TOC リンクが `#section-id` 形式で存在する
+ * - 18 個の section id が存在する (s01〜s17 + sources)
+ *   (legacy は <div class="section"> × 11 +
+ *    <div class="section section-team"> × 7 + sources = 計 18 セクション、
+ *    id 属性なし → synthetic id 付与)
+ * - 18 個の TOC リンクが `#section-id` 形式で存在する
  * - 外部リンク (http/https) には全て `target="_blank"` かつ
  *   `rel="noopener noreferrer"` が付与されている
  * - `sources` セクション内に 23 件以上の外部リンクが存在する
@@ -39,6 +41,13 @@ const EXPECTED_SECTION_IDS = [
   "s08",
   "s09",
   "s10",
+  "s11",
+  "s12",
+  "s13",
+  "s14",
+  "s15",
+  "s16",
+  "s17",
   "sources",
 ] as const;
 
@@ -66,7 +75,7 @@ describe("/claude/agent - page structure", () => {
     expect(h1?.textContent).toMatch(/サブエージェント/);
   });
 
-  it("renders all 11 expected section ids", () => {
+  it("renders all 18 expected section ids", () => {
     const { container } = render(<Page />);
     for (const id of EXPECTED_SECTION_IDS) {
       const el = container.querySelector(`#${id}`);
@@ -74,7 +83,7 @@ describe("/claude/agent - page structure", () => {
     }
   });
 
-  it("renders TOC links pointing to all section anchors", () => {
+  it("renders 18 TOC links pointing to all section anchors", () => {
     const { container } = render(<Page />);
     const tocAnchors = container.querySelectorAll('nav a[href^="#"]');
     const tocHrefs = Array.from(tocAnchors).map((a) => a.getAttribute("href"));
