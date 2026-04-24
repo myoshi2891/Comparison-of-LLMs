@@ -219,12 +219,13 @@ function BpCard({ variant, title, desc }: { variant: "violet" | "teal" | ...; ti
 | EXPECTED_SECTION_IDS | `["s01", ..., "s17", "sources"]`（18 件）。s01〜s17 は synthetic id（legacy HTML に id 属性なし） |
 | code block 数 | 36 件 |
 | named template constants | 8–10 件目安（中規模）。コードブロック本文は文字列テンプレートリテラルで OK（white-space:pre が改行保持） |
-| metadata.title | `Gemini エージェント開発完全ガイド \| LLM コスト計算機` |
-| metadata.description | GEMINI.md・AGENTS.md・agent.py・A2A プロトコル（agent.json）・AgentEngine・マルチエージェント GEMINI.md を解説する 150 字以内の説明文 |
-| 契約テスト #3 のキーワード | `Gemini`（`<h1>` 内に含まれることを確認済み） |
+| metadata.title | `Gemini マルチエージェント開発 (ADK / A2A / AgentEngine) ベストプラクティス \| LLM コスト計算機`（実装値） |
+| metadata.description | Gemini CLI v0.34.0・ADK 2.0 Alpha・A2A / AP2 / A2UI プロトコル時代のサブエージェント / マルチエージェント開発で必要な GEMINI.md・AGENTS.md・agent.py・agent.json・.geminiignore・settings.json の役割と書き方を体系化したガイド |
+| 契約テスト #3 のキーワード | `Gemini`（legacy `<h1>` には未含のため Hero `<h1>` 先頭に "Gemini" を補填） |
 | 契約テスト #4 の id 数（N） | **18**（s01〜s17 の 17 件 + sources の 1 件） |
-| CSS Module 状態 | **作成済み・未コミット**（`page.module.css`、約 500 行、legacy `<style>` 行 7–1,148 を転写） |
-| page.tsx 状態 | **未作成**（Green 実装対象） |
+| CSS Module 状態 | **コミット済み**（`page.module.css`、1,329 行、`cb62441`） |
+| page.tsx 状態 | **作成済み・faithful 移植中**（Green `aa9c2ee` → s01 faithful `e9e9547` → s02 faithful `90b163e`、s03〜s17 + sources は縮約版残存）。詳細は MIGRATION_PROGRESS.md §「Phase C-2 faithful 移植継続ポイント」 |
+| faithful 移植ルール | **R2 厳守**: legacy HTML の全リスト項目・全コードブロック・全 SVG・全 alert・全 table を JSX に転写。要約・省略・縮約禁止（MIGRATION_PROGRESS.md §「AI 作業ルール R2」参照） |
 
 **セクション 10〜17 の注意**: マルチエージェント系セクションは `sectionMa` クラスを追加（緑アクセント、CSS で定義済み）。`className={\`${styles.section} ${styles.sectionMa}\`}` を使用。
 
@@ -395,6 +396,14 @@ cd ../scraper && uv run pytest
   - 「現在地」: 最新 HEAD と「次の作業」を更新
   - 「検証状態（Phase C-N）」: B-1〜B-4 と同形式で追加
   - 「フェーズ進捗」表の Phase C 行: per-page で `C-N: Red <hash> / Green <hash>` を追記
+
+### 9.1.5 faithful 移植 commit のたび（C-2 で確立した R2 ルール）
+
+C-2 以降、Green コミットだけでは完了とせず legacy HTML の全コンテンツを JSX に転写すること（要約・省略・縮約禁止）。1 セクションごとにコミットし、その都度:
+
+- `MIGRATION_PROGRESS.md` §「Phase C-N faithful 移植継続ポイント」のチェックリストを 1 行更新
+- 全テスト・lint 通過を verify したあとにコミット
+- ルール詳細: MIGRATION_PROGRESS.md §「AI 作業ルール R2」
 
 ### 9.2 Phase C 4 ページ全完了後
 

@@ -102,6 +102,10 @@ wc -l legacy/<provider>/<file>.html
 
 ### Step 4: [Green] page.tsx の実装
 
+> **R2（faithful 必須、Phase C-2 で確定）**: legacy HTML の **全リスト項目・全コードブロック・全 SVG・全 alert・全 table** を
+> JSX に転写すること。要約・省略・縮約は禁止。「契約テストが通る最小骨格」だけで Green を終わらせず、必ず legacy 全文を
+> 移植する。詳細は `MIGRATION_PROGRESS.md` §「AI 作業ルール R2」を参照。
+
 - **Server Component デフォルト**。Phase B（skill.html）では動的 UI が不要なため `"use client"` を一切使わない構成が
   `/claude/skill`（`8515ec3`）と `/gemini/skill`（`037f45f`）で成立している。Phase C の agent.html 移植で
   `useState` が必要になった場合のみ Client 分離を検討する
