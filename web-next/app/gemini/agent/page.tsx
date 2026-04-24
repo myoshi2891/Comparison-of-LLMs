@@ -781,38 +781,158 @@ export default function GeminiAgentPage() {
         <section id="s02" className={styles.section}>
           <div className={styles.sectionHead}>
             <span className={styles.sectionNum}>2</span>
-            <h2>{SECTION_TITLES[1]}</h2>
+            <h2>
+              <span className={styles.mono}>GEMINI.md</span> /{" "}
+              <span className={styles.mono}>AGENT.md</span> — コンテキストファイルの設計
+            </h2>
           </div>
-          <div className={`${styles.alert} ${styles.alertWarn}`}>
-            <span className={styles.alertIcon}>⚠️</span>
+
+          <div className={`${styles.alert} ${styles.alertInfo}`}>
+            <span className={styles.alertIcon}>ℹ️</span>
             <div className={styles.alertContent}>
-              <strong>コンテキストファイルは肥大化させない</strong>
-              GEMINI.md は毎セッションで自動ロードされます。コードスタイル・修正履歴などの瑣末情報を
-              詰め込みすぎると Gemini の指示追従性が劇的に低下します。
+              <strong>GEMINI.md vs AGENT.md — ツール別対応表</strong>
+              Gemini CLI は <code>GEMINI.md</code> がデフォルト。Gemini Code Assist (VS Code /
+              Cloud) は <code>GEMINI.md</code> か <code>AGENT.md</code> を使用。Android Studio は{" "}
+              <code>AGENTS.md</code> を採用。すべて <code>settings.json</code> の{" "}
+              <code>context.fileName</code> でカスタマイズ可能です。
             </div>
           </div>
+
           <div className={styles.card}>
             <div className={styles.cardTitle}>📋 GEMINI.md に書くべきこと / 書かないべきこと</div>
             <div className={styles.patGrid}>
               <div className={`${styles.pat} ${styles.patOk}`}>
                 <div className={styles.patLabel}>✅ 書くべき内容</div>
                 <ul>
-                  <li>プロジェクト概要（1〜3 文）</li>
-                  <li>技術スタック・主要ライブラリ</li>
-                  <li>サブエージェントのルーティングルール</li>
-                  <li>禁止コマンド・危険操作の明示</li>
-                  <li>ビルド / テスト / デプロイコマンド</li>
+                  <li>プロジェクト概要・目的（2〜4文）</li>
+                  <li>技術スタック・主要ライブラリのバージョン</li>
+                  <li>サブエージェント委譲ルール</li>
+                  <li>ビルド・テスト・デプロイコマンド</li>
+                  <li>禁止操作の明示（DB reset 等）</li>
+                  <li>
+                    <code>@./subdir/guide.md</code> でのモジュール分割参照
+                  </li>
+                  <li>コーディング規約（コンパクトに）</li>
+                  <li>重要ドキュメントへのパス参照</li>
                 </ul>
               </div>
               <div className={`${styles.pat} ${styles.patNg}`}>
                 <div className={styles.patLabel}>✗ 書かないべき内容</div>
                 <ul>
-                  <li>コードスタイル（linter に委ねる）</li>
-                  <li>長大なコードスニペット</li>
-                  <li>修正履歴・変更ログ</li>
-                  <li>「〜しないで」の禁止形のみの指示</li>
+                  <li>長大なコードスニペット（トークン浪費）</li>
+                  <li>過去の変更履歴・修正ログ</li>
+                  <li>ツール固有の設定（settings.json に分離）</li>
+                  <li>機密情報・API キー（.geminiignore で除外）</li>
+                  <li>すべての規約を1ファイルに詰め込む（@import で分割）</li>
+                  <li>否定形のみの指示（代替案をセットで示す）</li>
                 </ul>
               </div>
+            </div>
+          </div>
+
+          <div className={styles.card}>
+            <div className={styles.cardTitle}>
+              📄 実践的な GEMINI.md テンプレート（サブエージェント対応版）
+            </div>
+            <div className={styles.codeWrap}>
+              <div className={styles.codeBar}>
+                <span>GEMINI.md (project root)</span>
+                <span className={styles.lang}>Markdown</span>
+              </div>
+              <div className={styles.codeBody}>
+                <span className={styles.ch}># PROJECT: my-saas-app</span>
+                {"\n\n"}
+                <span className={styles.cm}>## Overview</span>
+                {"\n"}
+                {
+                  "Next.js 15 + Supabase + Stripe のマルチテナント SaaS。\n本番: Vercel Edge Runtime / DB: Supabase (PostgreSQL + pgvector)。\n\n"
+                }
+                <span className={styles.cm}>## Tech Stack</span>
+                {"\n"}
+                {"- Frontend: Next.js 15 App Router, TypeScript 5.x, Tailwind CSS\n"}
+                {"- Backend: Supabase Edge Functions (Deno 2.x)\n"}
+                {"- Auth: Supabase Auth + Row Level Security\n"}
+                {"- Payment: Stripe Checkout / Billing Portal / Webhooks\n"}
+                {"- AI: Gemini 2.5 Flash (via ADK), pgvector for embeddings\n\n"}
+                <span className={styles.cm}>## Build &amp; Test</span>
+                {"\n"}
+                {"- Build: "}
+                <span className={styles.cs}>`pnpm build`</span>
+                {"\n"}
+                {"- Test:  "}
+                <span className={styles.cs}>`pnpm test`</span>
+                {" (Vitest + Testing Library)\n"}
+                {"- ADK dev: "}
+                <span className={styles.cs}>`adk web`</span>
+                {" (Agent Dev UI on :8000)\n"}
+                {"- Lint:  "}
+                <span className={styles.cs}>`pnpm lint`</span>
+                {" — "}
+                <span className={styles.cw}>ESLint/Prettier に全面委任すること</span>
+                {"\n"}
+                {"- DB types: "}
+                <span className={styles.cs}>`pnpm supabase gen types`</span>
+                {"\n\n"}
+                <span className={styles.cm}>## Sub-Agent Routing</span>
+                {"\n"}
+                <span className={styles.cw}>Parallel dispatch 条件（すべて満たす場合のみ）:</span>
+                {"\n"}
+                {"- タスクが 3件以上かつ互いに独立\n"}
+                {"- 共有ファイル・共有状態なし\n"}
+                {"- ドメイン境界が明確 (frontend / backend / db / ai)\n"}
+                {"- ParallelAgent で書く場合: 各エージェントが"}
+                <span className={styles.cw}>異なるキーに書き込むこと</span>
+                {"\n\n"}
+                <span className={styles.cw}>Sequential dispatch（いずれかの条件で）:</span>
+                {"\n"}
+                {"- タスクに依存関係がある（B に A の出力が必要）\n"}
+                {"- 共有ファイルに触る処理がある\n\n"}
+                <span className={styles.cm}>## Domain Agents (ADK)</span>
+                {"\n"}
+                {"- "}
+                <span className={styles.ce}>orchestrator</span>
+                {" → ルーティングのみ、実装しない\n"}
+                {"- "}
+                <span className={styles.ce}>frontend-agent</span>
+                {" → app/, components/, styles/ のみ\n"}
+                {"- "}
+                <span className={styles.ce}>backend-agent</span>
+                {" → supabase/functions/, lib/server/ のみ\n"}
+                {"- "}
+                <span className={styles.ce}>ai-agent</span>
+                {" → lib/ai/, embeddings/, vector queries のみ\n"}
+                {"- "}
+                <span className={styles.ce}>db-agent</span>
+                {" → supabase/migrations/, schema のみ\n\n"}
+                <span className={styles.cm}>## Forbidden Operations</span>
+                {"\n"}
+                {"- "}
+                <span className={styles.cw}>`supabase db reset`</span>
+                {" は絶対に実行しない（本番データ消去）\n"}
+                {"- "}
+                <span className={styles.cw}>`.env.production`</span>
+                {" の読み書き禁止\n"}
+                {"- "}
+                <span className={styles.cw}>`--force`</span>
+                {" フラグは使わない、代わりに "}
+                <span className={styles.cs}>`--dry-run`</span>
+                {" で確認\n\n"}
+                <span className={styles.cm}>## @-imports (modular context)</span>
+                {"\n"}
+                {"@./docs/architecture.md\n"}
+                {"@./src/frontend/GEMINI.md\n"}
+                {"@./src/backend/GEMINI.md"}
+              </div>
+            </div>
+          </div>
+
+          <div className={`${styles.alert} ${styles.alertInfo}`}>
+            <span className={styles.alertIcon}>💡</span>
+            <div className={styles.alertContent}>
+              <strong>@-import 構文でファイルを分割する</strong>
+              <code>@./path/to/file.md</code> 構文で他のMarkdownファイルをインポートできます（
+              <code>.md</code>{" "}
+              ファイルのみ対応）。大きなプロジェクトでは「ルートは薄く、ドメイン別に分割」が鉄則です。CLIが正規表現でインライン展開するため、追加トークンコストなしで利用できます。
             </div>
           </div>
         </section>
