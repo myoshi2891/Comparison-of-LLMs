@@ -288,39 +288,492 @@ export default function GeminiAgentPage() {
             <span className={styles.sectionNum}>1</span>
             <h2>{SECTION_TITLES[0]}</h2>
           </div>
+
           <div className={styles.card}>
             <p>
               Gemini エコシステムでのサブエージェント開発では、
-              <strong>ツールによってコンテキストファイルの仕組みが異なります</strong>
+              <strong>ツールによって Markdown ファイルの仕組みが異なります</strong>
               。大きく 2 つのレイヤーに分けて理解することが重要です。
             </p>
           </div>
+
+          {/* Context Hierarchy Diagram */}
           <div className={styles.hierWrap}>
-            <div className={styles.hierTitle}>FILE HIERARCHY &amp; PRIORITY</div>
-            <div className={styles.hierCol}>
-              <div className={`${styles.hierBox} ${styles.hbGlobal}`}>
-                ~/.gemini/GEMINI.md
-                <div className={styles.hierLabel}>グローバル（全プロジェクト共通）</div>
+            <div className={styles.hierTitle}>
+              GEMINI.md コンテキスト階層 — 読み込み優先度（低 → 高）
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 6,
+                flexWrap: "wrap",
+              }}
+            >
+              <div className={styles.hierCol}>
+                <div className={`${styles.hierBox} ${styles.hbGlobal}`}>
+                  🌐 Global
+                  <br />
+                  <small>~/.gemini/GEMINI.md</small>
+                </div>
+                <div className={styles.hierArrowDown}>↓</div>
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: "rgba(255, 255, 255, 0.35)",
+                    textAlign: "center",
+                  }}
+                >
+                  全プロジェクト共通
+                  <br />
+                  デフォルト設定
+                </div>
               </div>
-              <div className={styles.hierArrowDown}>↓</div>
-              <div className={`${styles.hierBox} ${styles.hbProject}`}>
-                &lt;project&gt;/GEMINI.md
-                <div className={styles.hierLabel}>プロジェクトルート</div>
+              <div className={styles.hierConnector}>
+                <div className={styles.hierConnectorArrow}>→</div>
               </div>
-              <div className={styles.hierArrowDown}>↓</div>
-              <div className={`${styles.hierBox} ${styles.hbSub}`}>
-                &lt;project&gt;/&lt;subdir&gt;/GEMINI.md
-                <div className={styles.hierLabel}>サブディレクトリ局所設定</div>
+              <div className={styles.hierCol}>
+                <div className={`${styles.hierBox} ${styles.hbProject}`}>
+                  📁 Project Root
+                  <br />
+                  <small>./GEMINI.md</small>
+                </div>
+                <div className={styles.hierArrowDown}>↓</div>
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: "rgba(255, 255, 255, 0.35)",
+                    textAlign: "center",
+                  }}
+                >
+                  プロジェクト固有
+                  <br />
+                  （git root 検出）
+                </div>
               </div>
-              <div className={styles.hierArrowDown}>↓</div>
-              <div className={`${styles.hierBox} ${styles.hbAuto}`}>
-                AGENTS.md / agent.py
-                <div className={styles.hierLabel}>クロスツール / ADK ランタイム</div>
+              <div className={styles.hierConnector}>
+                <div className={styles.hierConnectorArrow}>→</div>
               </div>
+              <div className={styles.hierCol}>
+                <div className={`${styles.hierBox} ${styles.hbSub}`}>
+                  📂 Sub-directory
+                  <br />
+                  <small>src/GEMINI.md 等</small>
+                </div>
+                <div className={styles.hierArrowDown}>↓</div>
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: "rgba(255, 255, 255, 0.35)",
+                    textAlign: "center",
+                  }}
+                >
+                  モジュール固有
+                  <br />
+                  補足コンテキスト
+                </div>
+              </div>
+              <div className={styles.hierConnector}>
+                <div className={styles.hierConnectorArrow}>→</div>
+              </div>
+              <div className={styles.hierCol}>
+                <div className={`${styles.hierBox} ${styles.hbAuto}`}>
+                  🔍 Auto-scan
+                  <br />
+                  <small>ツールアクセス時に自動検出</small>
+                </div>
+                <div className={styles.hierArrowDown}>↓</div>
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: "rgba(255, 255, 255, 0.35)",
+                    textAlign: "center",
+                  }}
+                >
+                  ファイルアクセス時
+                  <br />
+                  動的ロード
+                </div>
+              </div>
+            </div>
+            <div className={styles.hierLabel}>
+              すべてのファイルが結合されてモデルに送信される（.gitignore / .geminiignore は除外）
             </div>
             <div className={styles.hierPriority}>
-              下位ファイルほど優先度が高く、上位設定をオーバーライドする
+              優先度：Auto-scan ＞ Sub-directory ＞ Project Root ＞
+              Global（より具体的なファイルが優先）
             </div>
+          </div>
+
+          {/* File tree SVG */}
+          <div className={styles.filetreeWrap}>
+            <div className={styles.filetreeHeader}>
+              <span className={styles.ftDot} style={{ background: "#f87171" }} />
+              <span className={styles.ftDot} style={{ background: "#fbbf24" }} />
+              <span className={styles.ftDot} style={{ background: "#34d399" }} />
+              <span
+                style={{
+                  marginLeft: 10,
+                  color: "#6b7280",
+                  fontSize: 12,
+                  fontFamily: "monospace",
+                }}
+              >
+                project-root/ — Gemini エコシステム ファイル構造
+              </span>
+            </div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 960 760"
+              width="100%"
+              style={{ display: "block" }}
+              fontFamily="'Google Sans Mono','Fira Code','SF Mono',monospace"
+              role="img"
+              aria-label="project-root のディレクトリ構造とファイル分類凡例"
+            >
+              <title>project-root のディレクトリ構造とファイル分類凡例</title>
+              <defs>
+                <linearGradient id="gb1" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style={{ stopColor: "#1a73e8" }} />
+                  <stop offset="100%" style={{ stopColor: "#4285f4" }} />
+                </linearGradient>
+                <linearGradient id="gb2" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style={{ stopColor: "#1e8e3e" }} />
+                  <stop offset="100%" style={{ stopColor: "#34a853" }} />
+                </linearGradient>
+                <linearGradient id="gb3" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style={{ stopColor: "#7c3aed" }} />
+                  <stop offset="100%" style={{ stopColor: "#8b5cf6" }} />
+                </linearGradient>
+                <linearGradient id="gb4" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style={{ stopColor: "#d93025" }} />
+                  <stop offset="100%" style={{ stopColor: "#ea4335" }} />
+                </linearGradient>
+                <linearGradient id="gb5" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style={{ stopColor: "#00897b" }} />
+                  <stop offset="100%" style={{ stopColor: "#26a69a" }} />
+                </linearGradient>
+              </defs>
+              <rect width="960" height="760" fill="#0a0e1a" />
+
+              {/* LEGEND */}
+              <rect
+                x="660"
+                y="18"
+                width="282"
+                height="230"
+                rx="10"
+                fill="#111827"
+                stroke="#1e2d52"
+                strokeWidth="1"
+              />
+              <text
+                x="801"
+                y="40"
+                textAnchor="middle"
+                fill="#6b7280"
+                fontSize="11"
+                letterSpacing="1"
+              >
+                LEGEND
+              </text>
+              <rect x="676" y="50" width="22" height="22" rx="5" fill="url(#gb1)" />
+              <text x="687" y="65" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ①
+              </text>
+              <text x="706" y="65" fontSize="12" fill="#e2e8f0">
+                GEMINI.md / AGENT.md
+              </text>
+              <rect x="676" y="82" width="22" height="22" rx="5" fill="url(#gb2)" />
+              <text x="687" y="97" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ②
+              </text>
+              <text x="706" y="97" fontSize="12" fill="#e2e8f0">
+                ADK agent.py（エージェント定義）
+              </text>
+              <rect x="676" y="114" width="22" height="22" rx="5" fill="url(#gb3)" />
+              <text x="687" y="129" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ③
+              </text>
+              <text x="706" y="129" fontSize="12" fill="#e2e8f0">
+                設定・制御ファイル
+              </text>
+              <rect x="676" y="146" width="22" height="22" rx="5" fill="url(#gb4)" />
+              <text x="687" y="161" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ④
+              </text>
+              <text x="706" y="161" fontSize="12" fill="#e2e8f0">
+                .geminiignore（除外ルール）
+              </text>
+              <rect x="676" y="178" width="22" height="22" rx="5" fill="url(#gb5)" />
+              <text x="687" y="193" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ⑤
+              </text>
+              <text x="706" y="193" fontSize="12" fill="#e2e8f0">
+                README.md（人間向け）
+              </text>
+              <rect x="676" y="210" width="58" height="22" rx="5" fill="#374151" />
+              <text
+                x="705"
+                y="225"
+                textAnchor="middle"
+                fill="#9ca3af"
+                fontSize="11"
+                fontWeight="700"
+              >
+                📁 DIR
+              </text>
+              <text x="742" y="225" fontSize="12" fill="#6b7280">
+                ディレクトリ
+              </text>
+
+              {/* TREE LINES */}
+              <line x1="44" y1="48" x2="44" y2="696" stroke="#1e2d52" strokeWidth="1.5" />
+              <line x1="44" y1="50" x2="70" y2="50" stroke="#1e2d52" strokeWidth="1.5" />
+              <line x1="44" y1="95" x2="70" y2="95" stroke="#1e2d52" strokeWidth="1.5" />
+              <line x1="44" y1="140" x2="70" y2="140" stroke="#1e2d52" strokeWidth="1.5" />
+              <line x1="44" y1="185" x2="70" y2="185" stroke="#1e2d52" strokeWidth="1.5" />
+              <line x1="44" y1="230" x2="70" y2="230" stroke="#1e2d52" strokeWidth="1.5" />
+              <line x1="86" y1="230" x2="86" y2="260" stroke="#1e2d52" strokeWidth="1.5" />
+              <line x1="86" y1="258" x2="112" y2="258" stroke="#1e2d52" strokeWidth="1.5" />
+              <line x1="44" y1="300" x2="70" y2="300" stroke="#1e2d52" strokeWidth="1.5" />
+              <line x1="86" y1="300" x2="86" y2="390" stroke="#1e2d52" strokeWidth="1.5" />
+              <line x1="86" y1="328" x2="112" y2="328" stroke="#1e2d52" strokeWidth="1.5" />
+              <line x1="86" y1="368" x2="112" y2="368" stroke="#1e2d52" strokeWidth="1.5" />
+              <line x1="128" y1="368" x2="128" y2="398" stroke="#1e2d52" strokeWidth="1.5" />
+              <line x1="128" y1="396" x2="154" y2="396" stroke="#1e2d52" strokeWidth="1.5" />
+              <line x1="44" y1="440" x2="70" y2="440" stroke="#1e2d52" strokeWidth="1.5" />
+              <line x1="86" y1="440" x2="86" y2="560" stroke="#1e2d52" strokeWidth="1.5" />
+              <line x1="86" y1="470" x2="112" y2="470" stroke="#1e2d52" strokeWidth="1.5" />
+              <line x1="86" y1="510" x2="112" y2="510" stroke="#1e2d52" strokeWidth="1.5" />
+              <line x1="86" y1="550" x2="112" y2="550" stroke="#1e2d52" strokeWidth="1.5" />
+              <line x1="44" y1="600" x2="70" y2="600" stroke="#1e2d52" strokeWidth="1.5" />
+              <line x1="86" y1="600" x2="86" y2="638" stroke="#1e2d52" strokeWidth="1.5" />
+              <line x1="86" y1="636" x2="112" y2="636" stroke="#1e2d52" strokeWidth="1.5" />
+              <line x1="44" y1="696" x2="70" y2="696" stroke="#1e2d52" strokeWidth="1.5" />
+
+              {/* ROOT */}
+              <text x="20" y="30" fontSize="16" fill="#4285f4">
+                📁
+              </text>
+              <text x="42" y="30" fontSize="14" fontWeight="700" fill="#60a5fa">
+                project-root/
+              </text>
+
+              {/* ROW 1: GEMINI.md root */}
+              <text x="78" y="56" fontSize="14" fill="#93c5fd">
+                📄
+              </text>
+              <text x="98" y="56" fontSize="13.5" fontWeight="700" fill="#93c5fd">
+                GEMINI.md
+              </text>
+              <rect x="194" y="41" width="22" height="22" rx="5" fill="url(#gb1)" />
+              <text x="205" y="56" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ①
+              </text>
+              <text x="224" y="56" fontSize="12" fill="#6b7280">
+                プロジェクト固有コンテキスト（常時ロード）
+              </text>
+              <text x="224" y="74" fontSize="11.5" fill="#4b5563">
+                ※ AGENT.md でも可（Code Assist / Android Studio）
+              </text>
+
+              {/* ROW 2: AGENTS.md */}
+              <text x="78" y="101" fontSize="14" fill="#86efac">
+                📄
+              </text>
+              <text x="98" y="101" fontSize="13.5" fontWeight="700" fill="#86efac">
+                AGENTS.md
+              </text>
+              <rect x="194" y="86" width="22" height="22" rx="5" fill="url(#gb1)" opacity="0.75" />
+              <text x="205" y="101" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ①
+              </text>
+              <text x="224" y="101" fontSize="12" fill="#6b7280">
+                クロスツール互換（Claude / Codex / Cursor と共有可）
+              </text>
+
+              {/* ROW 3: .geminiignore */}
+              <text x="78" y="146" fontSize="14" fill="#fca5a5">
+                🚫
+              </text>
+              <text x="98" y="146" fontSize="13.5" fontWeight="700" fill="#fca5a5">
+                .geminiignore
+              </text>
+              <rect x="218" y="131" width="22" height="22" rx="5" fill="url(#gb4)" />
+              <text x="229" y="146" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ④
+              </text>
+              <text x="248" y="146" fontSize="12" fill="#6b7280">
+                コンテキストから除外するファイル・フォルダ
+              </text>
+
+              {/* ROW 4: settings.json */}
+              <text x="78" y="191" fontSize="14" fill="#d1d5db">
+                ⚙️
+              </text>
+              <text x="98" y="191" fontSize="13.5" fontWeight="700" fill="#d1d5db">
+                settings.json
+              </text>
+              <rect x="216" y="176" width="22" height="22" rx="5" fill="url(#gb3)" />
+              <text x="227" y="191" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ③
+              </text>
+              <text x="246" y="191" fontSize="12" fill="#6b7280">
+                MCP設定・context.fileName・除外ツール設定
+              </text>
+
+              {/* ROW 5: .gemini/ dir */}
+              <text x="78" y="236" fontSize="14" fill="#60a5fa">
+                📁
+              </text>
+              <text x="98" y="236" fontSize="14" fontWeight="700" fill="#60a5fa">
+                .gemini/
+              </text>
+              <text x="184" y="236" fontSize="12" fill="#4b5563">
+                ← IDE統合時の設定ディレクトリ
+              </text>
+              <text x="120" y="264" fontSize="14" fill="#d1d5db">
+                ⚙️
+              </text>
+              <text x="140" y="264" fontSize="13" fill="#d1d5db">
+                settings.json
+              </text>
+              <rect x="238" y="249" width="22" height="22" rx="5" fill="url(#gb3)" opacity="0.75" />
+              <text x="249" y="264" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ③
+              </text>
+              <text x="268" y="264" fontSize="12" fill="#4b5563">
+                VS Code / IntelliJ 統合設定
+              </text>
+
+              {/* ROW 6: src/ dir */}
+              <text x="78" y="306" fontSize="14" fill="#60a5fa">
+                📁
+              </text>
+              <text x="98" y="306" fontSize="14" fontWeight="700" fill="#60a5fa">
+                src/
+              </text>
+              <text x="120" y="334" fontSize="14" fill="#93c5fd">
+                📄
+              </text>
+              <text x="140" y="334" fontSize="13" fontWeight="700" fill="#93c5fd">
+                GEMINI.md
+              </text>
+              <rect x="228" y="319" width="22" height="22" rx="5" fill="url(#gb1)" opacity="0.7" />
+              <text x="239" y="334" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ①
+              </text>
+              <text x="258" y="334" fontSize="12" fill="#6b7280">
+                src/ 固有のコーディング規約・依存関係
+              </text>
+              <text x="120" y="374" fontSize="13" fill="#60a5fa">
+                📂
+              </text>
+              <text x="140" y="374" fontSize="13" fontWeight="700" fill="#60a5fa">
+                frontend/
+              </text>
+              <text x="162" y="402" fontSize="13" fill="#93c5fd">
+                📄
+              </text>
+              <text x="182" y="402" fontSize="13" fill="#93c5fd">
+                GEMINI.md
+              </text>
+              <rect x="268" y="387" width="22" height="22" rx="5" fill="url(#gb1)" opacity="0.6" />
+              <text x="279" y="402" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ①
+              </text>
+              <text x="298" y="402" fontSize="12" fill="#6b7280">
+                React/Next.js固有ルール（自動スキャン）
+              </text>
+
+              {/* ROW 7: agents/ dir (ADK) */}
+              <text x="78" y="446" fontSize="14" fill="#4ade80">
+                📁
+              </text>
+              <text x="98" y="446" fontSize="14" fontWeight="700" fill="#4ade80">
+                agents/
+              </text>
+              <text x="184" y="446" fontSize="12" fill="#4b5563">
+                ← ADK サブエージェント定義
+              </text>
+              <text x="120" y="476" fontSize="14" fill="#86efac">
+                🐍
+              </text>
+              <text x="140" y="476" fontSize="13" fill="#86efac">
+                orchestrator/agent.py
+              </text>
+              <rect x="326" y="461" width="22" height="22" rx="5" fill="url(#gb2)" />
+              <text x="337" y="476" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ②
+              </text>
+              <text x="356" y="476" fontSize="12" fill="#6b7280">
+                ルートエージェント定義 (instruction フィールド)
+              </text>
+              <text x="120" y="516" fontSize="14" fill="#86efac">
+                🐍
+              </text>
+              <text x="140" y="516" fontSize="13" fill="#86efac">
+                researcher/agent.py
+              </text>
+              <rect x="310" y="501" width="22" height="22" rx="5" fill="url(#gb2)" opacity="0.75" />
+              <text x="321" y="516" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ②
+              </text>
+              <text x="340" y="516" fontSize="12" fill="#6b7280">
+                サブエージェント (LlmAgent)
+              </text>
+              <text x="120" y="556" fontSize="14" fill="#86efac">
+                🐍
+              </text>
+              <text x="140" y="556" fontSize="13" fill="#86efac">
+                reviewer/agent.py
+              </text>
+              <rect x="306" y="541" width="22" height="22" rx="5" fill="url(#gb2)" opacity="0.75" />
+              <text x="317" y="556" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ②
+              </text>
+              <text x="336" y="556" fontSize="12" fill="#6b7280">
+                サブエージェント (LlmAgent)
+              </text>
+
+              {/* evaluations */}
+              <text x="78" y="606" fontSize="14" fill="#60a5fa">
+                📁
+              </text>
+              <text x="98" y="606" fontSize="14" fontWeight="700" fill="#60a5fa">
+                evals/
+              </text>
+              <text x="120" y="642" fontSize="13" fill="#d1d5db">
+                📝
+              </text>
+              <text x="140" y="642" fontSize="13" fill="#d1d5db">
+                eval_set.json
+              </text>
+              <rect x="270" y="627" width="22" height="22" rx="5" fill="url(#gb3)" opacity="0.75" />
+              <text x="281" y="642" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ③
+              </text>
+              <text x="300" y="642" fontSize="12" fill="#6b7280">
+                ADK 評価データセット（adk eval で使用）
+              </text>
+
+              {/* README.md */}
+              <text x="78" y="702" fontSize="14" fill="#60a5fa">
+                📘
+              </text>
+              <text x="98" y="702" fontSize="14" fontWeight="700" fill="#93c5fd">
+                README.md
+              </text>
+              <rect x="204" y="687" width="22" height="22" rx="5" fill="url(#gb5)" />
+              <text x="215" y="702" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ⑤
+              </text>
+              <text x="234" y="702" fontSize="12" fill="#6b7280">
+                人間向け：エージェント構成・セットアップ手順
+              </text>
+            </svg>
           </div>
         </section>
 
