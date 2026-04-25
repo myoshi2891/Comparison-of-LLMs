@@ -1771,47 +1771,301 @@ export default function GeminiAgentPage() {
 
         {/* s10: 4層構造 */}
         <section id="s10" className={`${styles.section} ${styles.sectionMa}`}>
-          <div className={styles.maBanner}>
-            <div className={styles.maEyebrow}>MULTI-AGENT EXTENSION</div>
-            <div className={styles.sectionHead}>
-              <span className={styles.sectionNum}>10</span>
-              <h2>{SECTION_TITLES[9]}</h2>
-            </div>
+          <div className={styles.sectionHead}>
+            <span className={styles.sectionNum}>10</span>
+            <h2>サブエージェント vs マルチエージェント — ADK × A2A × MCP × AP2/A2UI の4層構造</h2>
           </div>
+
+          <div className={styles.maBanner}>
+            <div className={styles.maEyebrow}>
+              🌐 ADK Python 1.x GA (2025年5月 Google I/O) · ADK Python 2.0
+              Alpha（グラフワークフロー）公開中 · ADK TypeScript GA · A2A Protocol (Linux Foundation
+              移管済み) · AP2 / A2UI 新プロトコル追加（2026年3月）
+            </div>
+            <h3>Google が推奨する 4層アーキテクチャ（2026年3月更新）</h3>
+            <p>
+              Google のマルチエージェント設計は
+              <strong>ADK（エージェント内部ロジック）</strong>・
+              <strong>A2A プロトコル（エージェント間通信）</strong>・
+              <strong>MCP（外部ツール・データ接続）</strong>・
+              <strong>AP2 / A2UI（決済・UI）</strong>
+              の4層で構成されます。 A2A は Atlassian・SAP・Salesforce・ServiceNow など
+              <strong>50 以上のパートナー</strong>が対応するオープンスタンダードです。 ADK の{" "}
+              <code>RemoteA2aAgent</code>
+              を使えば、リモートエージェントへの接続がローカルのツール呼び出しと同じ感覚で実装できます。2026年3月18日のブログでは新たに
+              <strong>
+                AP2（決済認証プロトコル）・A2UI（エージェント→UI
+                コンポーネント生成）・AG-UI（ストリーミングUI）
+              </strong>
+              も公開されました。
+            </p>
+          </div>
+
+          {/* 3-layer stack */}
           <div className={styles.layerStack}>
             <div className={`${styles.layerRow} ${styles.lrAdk}`}>
-              <span className={`${styles.layerBadge} ${styles.lbAdk}`}>ADK</span>
-              <div>
-                <div className={styles.layerTitle}>サブエージェント層</div>
-                <div className={styles.layerBody}>
-                  <div className={styles.layerDesc}>同一プロセス内のエージェント協調</div>
-                  <div className={styles.layerFile}>
-                    <code>agent.py</code>
-                  </div>
+              <div className={`${styles.layerBadge} ${styles.lbAdk}`}>ADK</div>
+              <div className={styles.layerTitle}>🧠 エージェント内部ロジック</div>
+              <div className={styles.layerBody}>
+                <div className={styles.layerDesc}>
+                  agent.py の <code>instruction</code> / <code>tools</code> /{" "}
+                  <code>sub_agents</code> / <code>output_key</code> を定義。
+                  SequentialAgent・ParallelAgent・LoopAgent でワークフローを制御。
                 </div>
+                <span className={styles.layerFile}>agents/*/agent.py</span>
+                <span className={styles.layerFile}>agents/*/GEMINI.md</span>
               </div>
             </div>
             <div className={`${styles.layerRow} ${styles.lrA2a}`}>
-              <span className={`${styles.layerBadge} ${styles.lbA2a}`}>A2A</span>
-              <div>
-                <div className={styles.layerTitle}>マルチエージェント層</div>
-                <div className={styles.layerBody}>
-                  <div className={styles.layerDesc}>リモートエージェント間の HTTP プロトコル</div>
-                  <div className={styles.layerFile}>
-                    <code>agent.json</code> (Agent Card)
-                  </div>
+              <div className={`${styles.layerBadge} ${styles.lbA2a}`}>A2A</div>
+              <div className={styles.layerTitle}>🔗 エージェント間通信プロトコル</div>
+              <div className={styles.layerBody}>
+                <div className={styles.layerDesc}>
+                  Agent Card（agent.json）で能力を公開。<code>RemoteA2aAgent</code>
+                  でリモートエージェントをローカルツールとして利用。HTTPS + JSON-RPC 2.0
+                  で通信。フレームワーク・ベンダーを問わず相互接続可能。
                 </div>
+                <span className={styles.layerFile}>{"agents/{name}/agent.json"}</span>
+                <span className={styles.layerFile}>{"/.well-known/agent.json（自動生成）"}</span>
               </div>
             </div>
             <div className={`${styles.layerRow} ${styles.lrMcp}`}>
-              <span className={`${styles.layerBadge} ${styles.lbMcp}`}>MCP</span>
-              <div>
-                <div className={styles.layerTitle}>ツール接続層</div>
-                <div className={styles.layerBody}>
-                  <div className={styles.layerDesc}>外部ツール / リソース統合</div>
-                  <div className={styles.layerFile}>
-                    <code>mcp.json</code>
-                  </div>
+              <div className={`${styles.layerBadge} ${styles.lbMcp}`}>MCP</div>
+              <div className={styles.layerTitle}>🔧 外部ツール・データ接続</div>
+              <div className={styles.layerBody}>
+                <div className={styles.layerDesc}>
+                  エージェントが外部 API・DB・ファイルシステムに接続するための標準プロトコル。ADK は{" "}
+                  <code>MCPToolset</code> で透過的に統合。A2A と補完関係にある（MCP =
+                  ツール接続、A2A = エージェント接続）。
+                </div>
+                <span className={styles.layerFile}>{"settings.json → mcpServers"}</span>
+              </div>
+            </div>
+            <div
+              className={styles.layerRow}
+              style={{
+                background: "rgba(232,113,10,0.07)",
+                border: "1.5px solid rgba(232,113,10,0.35)",
+                borderRadius: 10,
+                padding: "14px 16px",
+                marginBottom: 10,
+              }}
+            >
+              <div
+                className={styles.layerBadge}
+                style={{
+                  background: "#e8710a",
+                  fontSize: 10,
+                  padding: "3px 7px",
+                  borderRadius: 6,
+                  color: "#fff",
+                  fontWeight: 700,
+                  whiteSpace: "nowrap",
+                  flexShrink: 0,
+                }}
+              >
+                AP2/A2UI
+              </div>
+              <div className={styles.layerTitle} style={{ color: "#fb923c" }}>
+                💳 決済認証 &amp; UI 生成プロトコル（2026年3月18日 新公開）
+              </div>
+              <div className={styles.layerBody}>
+                <div className={styles.layerDesc} style={{ color: "#94a3b8" }}>
+                  <strong>AP2</strong>:
+                  エージェントが決済・認証フローを標準化されたプロトコルで実行。
+                  <strong>A2UI</strong>（AG-UI）: エージェントがフロントエンド UI
+                  コンポーネントをストリーミング生成・更新。 ADK の <code>AgentUITransport</code> で
+                  React 等フロントエンドと統合可能。
+                </div>
+                <span
+                  className={styles.layerFile}
+                  style={{
+                    background: "rgba(232,113,10,0.15)",
+                    borderColor: "rgba(232,113,10,0.4)",
+                    color: "#fb923c",
+                  }}
+                >
+                  AP2: payment_auth フロー定義
+                </span>
+                <span
+                  className={styles.layerFile}
+                  style={{
+                    background: "rgba(232,113,10,0.15)",
+                    borderColor: "rgba(232,113,10,0.4)",
+                    color: "#fb923c",
+                  }}
+                >
+                  A2UI: AgentUITransport + UI イベントストリーム
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Sub vs Multi comparison */}
+          <div className={styles.cmp2Grid}>
+            <div className={`${styles.cmp2} ${styles.cmp2Sub}`}>
+              <div className={styles.cmp2Label}>🔵 ローカル サブエージェント（ADK 内部）</div>
+              <ul>
+                <li>
+                  <strong>同一プロセス内</strong>で動作（低レイテンシ）
+                </li>
+                <li>
+                  親エージェントの<strong>セッション状態を共有</strong>
+                </li>
+                <li>
+                  <code>sub_agents</code> パラメータで<strong>静的に定義</strong>
+                </li>
+                <li>SequentialAgent / ParallelAgent / LoopAgent で制御</li>
+                <li>
+                  <code>output_key</code> で結果を共有 state に書き込む
+                </li>
+                <li>チームが同じコードベースを管理する場合に適合</li>
+                <li>
+                  <strong>適用:</strong> 同一サービス内の処理分業・低レイテンシ重視
+                </li>
+              </ul>
+            </div>
+            <div className={`${styles.cmp2} ${styles.cmp2Mult}`}>
+              <div className={styles.cmp2Label}>🟢 リモート マルチエージェント（A2A 経由）</div>
+              <ul>
+                <li>
+                  <strong>異なるサービス・マシン</strong>上で動作（高スケーラビリティ）
+                </li>
+                <li>独立したセッション・コンテキストを保持</li>
+                <li>
+                  <code>RemoteA2aAgent</code> で<strong>動的ディスカバリー</strong>も可能
+                </li>
+                <li>Agent Card で能力を公開・JSON-RPC で通信</li>
+                <li>
+                  フレームワーク（ADK / LangGraph / CrewAI）を
+                  <strong>問わず相互接続</strong>
+                </li>
+                <li>
+                  <code>to_a2a()</code> で既存 ADK エージェントを即座に A2A 公開
+                </li>
+                <li>
+                  <strong>適用:</strong> クロスチーム・エンタープライズ・ベンダー横断ワークフロー
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Architecture diagram */}
+          <div className={styles.a2aArch}>
+            <div className={styles.a2aArchTitle}>
+              A2A MULTI-AGENT ARCHITECTURE — ADK + RemoteA2aAgent + AgentEngine (Vertex AI)
+            </div>
+            <div className={styles.a2aRow}>
+              <div className={`${styles.a2aBox} ${styles.abOrch}`}>
+                🎯 Orchestrator
+                <br />
+                <small style={{ fontWeight: 400, fontSize: 10.5, color: "rgba(255,255,255,0.55)" }}>
+                  LlmAgent (ADK)
+                  <br />
+                  ルートGEMINI.md 読込
+                </small>
+              </div>
+              <div className={styles.a2aArrow}>→</div>
+              <div className={`${styles.a2aBox} ${styles.abLocal}`}>
+                ⚙️ Local Sub-Agent
+                <br />
+                <small style={{ fontWeight: 400, fontSize: 10.5, color: "rgba(255,255,255,0.55)" }}>
+                  同一プロセス
+                  <br />
+                  sub_agents で定義
+                </small>
+              </div>
+              <div className={styles.a2aArrow} style={{ fontSize: 14, opacity: 0.5 }}>
+                +
+              </div>
+              <div className={`${styles.a2aBox} ${styles.abRemote}`}>
+                🌐 RemoteA2aAgent
+                <br />
+                <small style={{ fontWeight: 400, fontSize: 10.5, color: "rgba(255,255,255,0.55)" }}>
+                  A2A クライアントプロキシ
+                  <br />
+                  別サービス・別チーム
+                </small>
+              </div>
+            </div>
+            <div className={styles.a2aLabel}>
+              ↓ RemoteA2aAgent は開発者から見ると「ローカルのツール」と同じように扱える（network
+              通信を隠蔽）
+            </div>
+            <div className={styles.a2aRow}>
+              <div className={`${styles.a2aBox} ${styles.abCard}`}>
+                📋 Agent Card
+                <br />
+                <small style={{ fontWeight: 400, fontSize: 10.5, color: "rgba(255,255,255,0.55)" }}>
+                  agent.json
+                  <br />
+                  {"/.well-known/agent.json"}
+                  <br />
+                  能力・認証・URL
+                </small>
+              </div>
+              <div className={styles.a2aArrow}>→</div>
+              <div className={`${styles.a2aBox} ${styles.abRemote}`} style={{ minWidth: 140 }}>
+                🔒 A2A Server
+                <br />
+                <small style={{ fontWeight: 400, fontSize: 10.5, color: "rgba(255,255,255,0.55)" }}>
+                  to_a2a() または
+                  <br />
+                  adk api_server --a2a
+                  <br />
+                  で自動生成
+                </small>
+              </div>
+              <div className={styles.a2aArrow}>→</div>
+              <div className={`${styles.a2aBox} ${styles.abEngine}`}>
+                ☁️ AgentEngine
+                <br />
+                <small style={{ fontWeight: 400, fontSize: 10.5, color: "rgba(255,255,255,0.55)" }}>
+                  Vertex AI 管理型
+                  <br />
+                  本番スケール
+                  <br />
+                  デプロイ
+                </small>
+              </div>
+            </div>
+            <div className={styles.a2aLabel} style={{ marginTop: 8 }}>
+              GEMINI.md はすべてのエージェントが参照するコンテキスト。agent.json（Agent
+              Card）はリモートエージェントの公開「能力書」。
+            </div>
+          </div>
+
+          {/* Decision flow: local sub vs remote */}
+          <div className={styles.dflow}>
+            <div className={styles.dflowTitle}>
+              🔍 ローカル サブエージェント vs リモート A2A — 選択フロー
+            </div>
+            <div className={styles.dflowRow}>
+              <div className={styles.dnQ}>同じコードベースで管理できるか？</div>
+              <div className={styles.dnArr}>→ Yes</div>
+              <div className={styles.dnY}>ローカル sub_agents（ADK）</div>
+            </div>
+            <div className={styles.dnInd}>
+              <div className={styles.dflowRow}>
+                <div className={styles.dnQ}>異なるチーム / フレームワーク / マシン？</div>
+                <div className={styles.dnArr}>→ Yes</div>
+                <div className={styles.dnY}>RemoteA2aAgent（A2A Protocol）</div>
+              </div>
+              <div className={styles.dnInd}>
+                <div className={styles.dflowRow}>
+                  <div className={styles.dnQ}>Agent Card を自動生成したい？</div>
+                  <div className={styles.dnArr}>→ Yes</div>
+                  <div className={styles.dnY}>to_a2a(agent) 関数</div>
+                </div>
+                <div className={styles.dflowRow}>
+                  <div className={styles.dnQ}>複数エージェントを 1サーバーで管理？</div>
+                  <div className={styles.dnArr}>→ Yes</div>
+                  <div className={styles.dnY}>adk api_server --a2a + 各 agent.json</div>
+                </div>
+                <div className={styles.dflowRow}>
+                  <div className={styles.dnQ}>本番 / スケーラブルな運用？</div>
+                  <div className={styles.dnArr}>→ Yes</div>
+                  <div className={styles.dnY}>AgentEngine (Vertex AI) にデプロイ</div>
                 </div>
               </div>
             </div>
