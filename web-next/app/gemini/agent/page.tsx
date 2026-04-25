@@ -19,17 +19,6 @@ function Ext({ href, children }: { href: string; children: ReactNode }) {
   );
 }
 
-function CodeBlock({ lang, body }: { lang: string; body: ReactNode }) {
-  return (
-    <div className={styles.codeWrap}>
-      <div className={styles.codeBar}>
-        <span className={styles.lang}>{lang}</span>
-      </div>
-      <div className={styles.codeBody}>{body}</div>
-    </div>
-  );
-}
-
 // ── SECTION METADATA ────────────────────────────────────────────────
 
 const SECTION_IDS = [
@@ -2457,25 +2446,251 @@ export default function GeminiAgentPage() {
         <section id="s13" className={`${styles.section} ${styles.sectionMa}`}>
           <div className={styles.sectionHead}>
             <span className={styles.sectionNum}>13</span>
-            <h2>{SECTION_TITLES[12]}</h2>
+            <h2>
+              マルチエージェント <span className={styles.mono}>agent.py</span> — Orchestrator +
+              RemoteA2aAgent 実装パターン
+            </h2>
           </div>
-          <CodeBlock
-            lang="Python"
-            body={`from google.adk.agents import LlmAgent, RemoteA2aAgent
 
-purchasing = RemoteA2aAgent(
-    name="purchasing",
-    agent_card_url="https://agents.example.com/purchasing/agent.json",
-)
+          <div className={styles.card}>
+            <p>
+              A2A マルチエージェントでは
+              <strong>Orchestrator が RemoteA2aAgent を「ローカルのツール」として利用</strong>
+              します。 <code>RemoteA2aAgent</code> は Agent Card URL
+              を受け取り、ネットワーク通信・認証・データ形式変換をすべて隠蔽するため、
+              開発者はリモートエージェントへの接続をローカルのサブエージェント呼び出しと同じ感覚で実装できます。{" "}
+              <code>instruction</code> フィールドが実質的にそのエージェントの「内部
+              GEMINI.md」となるため、<strong>ルーティング判断の記述が最重要</strong>です。
+            </p>
+          </div>
 
-orchestrator = LlmAgent(
-    name="orchestrator",
-    model="gemini-2.5-pro",
-    sub_agents=[purchasing],
-    instruction="ユーザー要求に応じて適切なリモートエージェントへ委譲する",
-)
-`}
-          />
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>
+                agents/orchestrator/agent.py — A2A Orchestrator 実装（SequentialAgent +
+                RemoteA2aAgent）
+              </span>
+              <span className={styles.lang}>Python</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.ck}>from</span>
+              {" google.adk.agents "}
+              <span className={styles.ck}>import</span>
+              {" LlmAgent, SequentialAgent, ParallelAgent\n"}
+              <span className={styles.ck}>from</span>
+              {" google.adk.agents.remote_a2a_agent "}
+              <span className={styles.ck}>import</span>
+              {" RemoteA2aAgent\n\n"}
+              <span className={styles.cc}>
+                {"# ═══════════════════════════════════════════════════════════════════\n"}
+                {"# ① リモート エージェント（A2A Protocol 経由 — 別サービス・別チーム）\n"}
+                {"# RemoteA2aAgent: Agent Card URL を指定するだけで接続を確立する\n"}
+                {"# ═══════════════════════════════════════════════════════════════════"}
+              </span>
+              {"\ncode_review_remote = RemoteA2aAgent(\n"}
+              {"    "}
+              <span className={styles.cm}>name</span>
+              {"="}
+              <span className={styles.cs}>"code-review-agent"</span>
+              {",\n"}
+              {"    "}
+              <span className={styles.cc}>
+                # description が Orchestrator のルーティング判断基準（Agent Card と一致させる）
+              </span>
+              {"\n"}
+              {"    "}
+              <span className={styles.cm}>description</span>
+              {"="}
+              <span className={styles.cs}>
+                {
+                  '"""\nコードレビューを実施するリモート専門エージェント（別チーム管理）。\n【呼び出す場合】: PR 作成前のセキュリティ・品質チェック\n【呼び出さない場合】: コードの実装・修正（implementer を使う）\n出力: セキュリティスコア（0-100）・改善提案・重大度別バグ一覧\n"""'
+                }
+              </span>
+              {",\n"}
+              {"    "}
+              <span className={styles.cc}>
+                # Agent Card URL: /.well-known/agent.json を自動取得してスキルと認証を確認
+              </span>
+              {"\n"}
+              {"    "}
+              <span className={styles.cm}>agent_card_url</span>
+              {"="}
+              <span className={styles.cs}>
+                "https://review.internal.example.com/.well-known/agent.json"
+              </span>
+              {",\n}\nsecurity_scanner_remote = RemoteA2aAgent(\n    "}
+              <span className={styles.cm}>name</span>
+              {"="}
+              <span className={styles.cs}>"security-scanner"</span>
+              {",\n    "}
+              <span className={styles.cm}>description</span>
+              {"="}
+              <span className={styles.cs}>
+                {
+                  '"""\nセキュリティスキャン専門エージェント（本番デプロイ前に必ず呼ぶ）。\n【呼び出す場合】: 本番デプロイ前 / 認証・認可コードの変更後\n出力: CVE レポート・OWASP スコア・修正優先度マトリクス（JSON 形式）\n"""'
+                }
+              </span>
+              {",\n    "}
+              <span className={styles.cm}>agent_card_url</span>
+              {"="}
+              <span className={styles.cs}>
+                "https://security.internal.example.com/.well-known/agent.json"
+              </span>
+              {",\n)\n\n"}
+              <span className={styles.cc}>
+                {"# ═══════════════════════════════════════════════════════════════════\n"}
+                {"# ② ローカル サブエージェント（ADK 内部 — 同一サービス）\n"}
+                {"# ═══════════════════════════════════════════════════════════════════"}
+              </span>
+              {"\nspec_writer = LlmAgent(\n    "}
+              <span className={styles.cm}>name</span>
+              {"="}
+              <span className={styles.cs}>"spec-writer"</span>
+              {",\n    "}
+              <span className={styles.cm}>model</span>
+              {"="}
+              <span className={styles.cs}>"gemini-2.5-flash"</span>
+              {",  "}
+              <span className={styles.cc}># コスト最適化: Orchestratorより軽量モデルを使用</span>
+              {"\n    "}
+              <span className={styles.cm}>description</span>
+              {"="}
+              <span className={styles.cs}>
+                "新機能の仕様書を docs/specs/ に作成する。ステータスを READY_FOR_IMPL に設定する。"
+              </span>
+              {",\n    "}
+              <span className={styles.cm}>instruction</span>
+              {"="}
+              <span className={styles.cs}>
+                {
+                  '"""\nあなたは PM ロールの仕様書作成エージェントです。\n以下の形式で docs/specs/{feature-name}.md を作成してください:\n- 機能概要（2-3文）\n- 受け入れ条件（箇条書き）\n- API エンドポイント定義（OpenAPI 形式）\n- 非機能要件（パフォーマンス・セキュリティ）\n完了後、output_key "spec_document" にファイルパスを格納すること。\n"""'
+                }
+              </span>
+              {",\n    "}
+              <span className={styles.cm}>tools</span>
+              {"=["}
+              <span className={styles.cs}>"write_file"</span>
+              {", "}
+              <span className={styles.cs}>"read_file"</span>
+              {"],\n    "}
+              <span className={styles.cm}>output_key</span>
+              {"="}
+              <span className={styles.cs}>"spec_document"</span>
+              {",\n}\nimplementer = LlmAgent(\n    "}
+              <span className={styles.cm}>name</span>
+              {"="}
+              <span className={styles.cs}>"code-implementer"</span>
+              {",\n    "}
+              <span className={styles.cm}>model</span>
+              {"="}
+              <span className={styles.cs}>"gemini-2.5-flash"</span>
+              {",\n    "}
+              <span className={styles.cm}>description</span>
+              {"="}
+              <span className={styles.cs}>
+                "spec_document の仕様に従ってコードを実装する。src/ のみ変更可能。"
+              </span>
+              {",\n    "}
+              <span className={styles.cm}>instruction</span>
+              {"="}
+              <span className={styles.cs}>
+                {
+                  '"""\n{spec_document} の仕様に従って実装してください。\n【書き込み可能】: src/, tests/ のみ\n【禁止】: docs/, agent.json, .env の変更\n- TypeScript strict モード必須\n- エラーは Result<T,E> 型（throw 禁止）\n完了後 output_key "implementation_summary" に変更ファイル一覧を格納。\n"""'
+                }
+              </span>
+              {",\n    "}
+              <span className={styles.cm}>tools</span>
+              {"=["}
+              <span className={styles.cs}>"write_file"</span>
+              {", "}
+              <span className={styles.cs}>"read_file"</span>
+              {", "}
+              <span className={styles.cs}>"run_command"</span>
+              {"],\n    "}
+              <span className={styles.cm}>output_key</span>
+              {"="}
+              <span className={styles.cs}>"implementation_summary"</span>
+              {",\n)\n\n"}
+              <span className={styles.cc}>
+                {"# ═══════════════════════════════════════════════════════════════════\n"}
+                {"# ③ Orchestrator — Sequential: 仕様 → 実装 → レビュー → セキュリティの順\n"}
+                {"# ═══════════════════════════════════════════════════════════════════"}
+              </span>
+              {"\nroot_agent = SequentialAgent(\n    "}
+              <span className={styles.cm}>name</span>
+              {"="}
+              <span className={styles.cs}>"dev-orchestrator"</span>
+              {",\n    "}
+              <span className={styles.cm}>description</span>
+              {"="}
+              <span className={styles.cs}>"開発ワークフロー全体を制御するオーケストレータ"</span>
+              {",\n    "}
+              <span className={styles.cm}>sub_agents</span>
+              {"=[\n        spec_writer,             "}
+              <span className={styles.cc}># Step 1: 仕様書作成（ローカル）</span>
+              {"\n        implementer,             "}
+              <span className={styles.cc}># Step 2: 実装（ローカル）</span>
+              {"\n        code_review_remote,      "}
+              <span className={styles.cc}># Step 3: コードレビュー（A2A リモート）</span>
+              {"\n        security_scanner_remote, "}
+              <span className={styles.cc}># Step 4: セキュリティスキャン（A2A リモート）</span>
+              {"\n    ],\n)"}
+            </div>
+          </div>
+
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>
+                既存 ADK エージェントを A2A で即座に公開（to_a2a 関数 — Agent Card 自動生成）
+              </span>
+              <span className={styles.lang}>Python</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.ck}>from</span>
+              {" google.adk.a2a.utils "}
+              <span className={styles.ck}>import</span>
+              {" to_a2a\n"}
+              <span className={styles.ck}>import</span>
+              {" uvicorn\n\n"}
+              <span className={styles.cc}>
+                {"# 既存 ADK エージェントを 1行で A2A Server として公開\n"}
+                {"# /.well-known/agent.json エンドポイントが自動生成される\n"}
+                {"# agent.py の name / description / instruction から Agent Card を構築"}
+              </span>
+              {"\na2a_app = to_a2a(root_agent)  "}
+              <span className={styles.cc}># → FastAPI/Starlette アプリが返る</span>
+              {"\n\n"}
+              <span className={styles.ck}>if</span>
+              {" __name__ == "}
+              <span className={styles.cs}>"__main__"</span>
+              {":\n    uvicorn.run(a2a_app, host="}
+              <span className={styles.cs}>"0.0.0.0"</span>
+              {", port="}
+              <span className={styles.cv}>8001</span>
+              {")\n"}
+              <span className={styles.cc}>
+                # 起動後 http://localhost:8001/.well-known/agent.json で Agent Card を確認可能
+              </span>
+              {"\n\n"}
+              <span className={styles.cc}>
+                {"# ── adk api_server アプローチ（複数エージェントを1サーバーで管理）────────\n"}
+                {"# agents/\n"}
+                {"# ├── code-review/\n"}
+                {"# │   ├── agent.py\n"}
+                {"# │   └── agent.json  ← 手動作成。このファイルがある場合だけ A2A 公開される\n"}
+                {"# ├── security/\n"}
+                {"# │   ├── agent.py\n"}
+                {"# │   └── agent.json\n"}
+                {"# └── doc-writer/\n"}
+                {"#     ├── agent.py\n"}
+                {
+                  "#     └── agent.json  ← このディレクトリは agent.json がないので A2A 公開されない\n"
+                }
+                {"#\n"}
+                {"# 起動コマンド: adk api_server --a2a agents/ --port 8080"}
+              </span>
+            </div>
+          </div>
         </section>
 
         {/* s14: AgentEngine */}
