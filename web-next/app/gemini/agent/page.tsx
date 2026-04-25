@@ -2701,14 +2701,133 @@ export default function GeminiAgentPage() {
         <section id="s14" className={`${styles.section} ${styles.sectionMa}`}>
           <div className={styles.sectionHead}>
             <span className={styles.sectionNum}>14</span>
-            <h2>{SECTION_TITLES[13]}</h2>
+            <h2>
+              AgentEngine（Vertex AI）本番デプロイと <span className={styles.mono}>GEMINI.md</span>{" "}
+              連携
+            </h2>
           </div>
+
           <div className={styles.card}>
             <p>
-              AgentEngine (Vertex AI) は ADK
-              エージェントを本番運用するためのマネージドランタイムです。 GEMINI.md / agent.py
-              は変更なしでデプロイ可能で、A2A エンドポイントが自動付与されます。
+              Google Agent Engine（Vertex AI の管理型エージェント実行基盤）にデプロイすると、
+              エージェントはスケーラブルな HTTPS エンドポイントとして公開され、A2A
+              クライアントから呼び出せるようになります。 デプロイ後は
+              <strong>
+                GEMINI.md のリモートエージェント一覧テーブルに AgentEngine の URL を記載
+              </strong>
+              し、 Orchestrator が認識できるようにします。
             </p>
+          </div>
+
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>AgentEngine デプロイ（Vertex AI Python SDK）</span>
+              <span className={styles.lang}>Python</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.ck}>import</span>
+              {" vertexai\n"}
+              <span className={styles.ck}>from</span>
+              {" vertexai.preview "}
+              <span className={styles.ck}>import</span>
+              {" reasoning_engines\n"}
+              {"vertexai.init(project="}
+              <span className={styles.cs}>"my-gcp-project"</span>
+              {", location="}
+              <span className={styles.cs}>"us-central1"</span>
+              {")\n\n"}
+              <span className={styles.cc}>
+                {"# ADK エージェントを AgentEngine（管理型ランタイム）としてデプロイ"}
+              </span>
+              {"\ndeployed_agent = reasoning_engines.create(\n  "}
+              <span className={styles.cm}>reasoning_engine</span>
+              {"=root_agent,\n  "}
+              <span className={styles.cc}>{"# ADK エージェント（agent.py で定義）"}</span>
+              {"\n  "}
+              <span className={styles.cm}>display_name</span>
+              {"="}
+              <span className={styles.cs}>"Code Review Agent v2.1"</span>
+              {",\n  "}
+              <span className={styles.cm}>description</span>
+              {"="}
+              <span className={styles.cs}>
+                "PR レビューのセキュリティ・品質チェック専門エージェント（A2A 公開）"
+              </span>
+              {",\n  "}
+              <span className={styles.cm}>requirements</span>
+              {"=[\n    "}
+              <span className={styles.cs}>{'"google-cloud-aiplatform[adk,a2a]>=1.88"'}</span>
+              {",\n    "}
+              <span className={styles.cs}>{'"google-adk>=1.0.0"'}</span>
+              {",\n  ],\n)\n\n"}
+              <span className={styles.cc}>
+                {"# デプロイ後にエンドポイントを確認 → GEMINI.md に記載する"}
+              </span>
+              {"\n"}
+              <span className={styles.ck}>print</span>
+              {"(deployed_agent.resource_name)\n"}
+              <span className={styles.cc}>
+                {"# 出力: projects/123456/locations/us-central1/reasoningEngines/789"}
+              </span>
+              {"\n"}
+              <span className={styles.cc}>
+                {
+                  "# A2A URL 形式:\n# https://us-central1-aiplatform.googleapis.com/v1/{resource_name}/a2a"
+                }
+              </span>
+            </div>
+          </div>
+
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>
+                docs/agent-endpoints.md — GEMINI.md から @import するエンドポイント管理ファイル
+              </span>
+              <span className={styles.lang}>Markdown</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.ch}>
+                {"# Remote Agent Endpoints（AgentEngine / 自社サーバー）"}
+              </span>
+              {"\n"}
+              <span className={styles.cw}>
+                このファイルは GEMINI.md から @import される。エンドポイント変更時はここのみ更新。
+              </span>
+              {"\n\n"}
+              <span className={styles.ch}>{"## 本番環境（AgentEngine on Vertex AI）"}</span>
+              {"\n\n"}
+              {"| Agent | A2A Endpoint | Agent Card | ステータス |\n"}
+              {"|---|---|---|---|\n"}
+              {"| code-review-agent | "}
+              <span className={styles.cv}>
+                https://us-central1-aiplatform.googleapis.com/v1/projects/123/…/a2a
+              </span>
+              {" | "}
+              <span className={styles.cv}>/…/a2a/.well-known/agent.json</span>
+              {" | 🟢 稼働中 |\n"}
+              {"| security-scanner | "}
+              <span className={styles.cv}>https://security.internal.example.com</span>
+              {" | "}
+              <span className={styles.cv}>/.well-known/agent.json</span>
+              {" | 🟢 稼働中 |\n\n"}
+              <span className={styles.ch}>{"## Orchestrator のフォールバックルール"}</span>
+              {"\n"}
+              {"- AgentEngine タイムアウト（> 30秒） → ローカル実装フォールバックを試みる\n"}
+              {"- 認証エラー（401/403） → リトライせずユーザーに報告\n"}
+              {"- サービス不応答（503） → インシデントチャンネル（#agent-ops）に通知\n\n"}
+              <span className={styles.ch}>
+                {"## ローカル開発環境（adk web / adk api_server --a2a）"}
+              </span>
+              {"\n"}
+              {"| Agent | Local URL |\n"}
+              {"|---|---|\n"}
+              {"| code-review-agent | "}
+              <span className={styles.cv}>http://localhost:8001</span>
+              {" |\n"}
+              {"| security-scanner | "}
+              <span className={styles.cv}>http://localhost:8002</span>
+              {" |"}
+            </div>
           </div>
         </section>
 
