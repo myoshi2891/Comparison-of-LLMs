@@ -2076,27 +2076,232 @@ export default function GeminiAgentPage() {
         <section id="s11" className={`${styles.section} ${styles.sectionMa}`}>
           <div className={styles.sectionHead}>
             <span className={styles.sectionNum}>11</span>
-            <h2>{SECTION_TITLES[10]}</h2>
+            <h2>
+              A2A の核心：<span className={styles.mono}>agent.json</span>（Agent Card）—
+              リモートエージェントの「能力書」
+            </h2>
           </div>
+
           <div className={styles.card}>
             <p>
-              <code>agent.json</code> (Agent Card) は A2A プロトコルにおいて
-              <strong>リモートエージェントの能力 / エンドポイント / 認証要件を宣言</strong>
-              するメタデータです。 オーケストレーターはこれを読み取り、適切なエージェントへ
-              タスクをルーティングします。
+              <strong>Agent Card は A2A マルチエージェント設計で最も重要なファイルです。</strong>
+              他のエージェントがこのエージェントを
+              <em>発見（Discovery）→ 理解（Capability）→ 接続（Auth）</em>
+              するための唯一の情報源です。 ADK の <code>to_a2a(agent)</code> を使えば agent.py
+              の内容から<strong>自動生成</strong>されますが、
+              <code>adk api_server --a2a</code>
+              で複数エージェントを管理する場合は<strong>手動で作成</strong>して品質を担保します。
+            </p>
+            <p style={{ marginTop: 10 }}>
+              Agent Card の <code>description</code> と <code>skills</code> フィールドが
+              Orchestrator のルーティング判断基準となるため、 ADK の <code>agent.py</code> における{" "}
+              <code>description</code>
+              と同様に<strong>「いつ使う・いつ使わない」を明記</strong>することが最重要です。
             </p>
           </div>
-          <CodeBlock
-            lang="agent.json"
-            body={`{
-  "name": "purchasing_concierge",
-  "description": "在庫確認と発注を行うエージェント",
-  "url": "https://agents.example.com/purchasing",
-  "capabilities": ["inventory.lookup", "order.create"],
-  "auth": { "type": "oauth2" }
-}
-`}
-          />
+
+          <div className={`${styles.alert} ${styles.alertInfo}`}>
+            <div className={styles.alertIcon}>ℹ️</div>
+            <div className={styles.alertContent}>
+              <strong>自動公開エンドポイント</strong>
+              ADK の <code>A2AServer</code> または
+              <code>adk api_server --a2a</code> を起動すると、
+              <code>{"/.well-known/agent.json"}</code>
+              エンドポイントで Agent Card が自動公開されます（Swagger の AI
+              版）。クライアントエージェントはこの URL にアクセスして能力をディスカバリーします。
+            </div>
+          </div>
+
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>agents/code-review/agent.json — Agent Card ベストプラクティス</span>
+              <span className={styles.lang}>JSON</span>
+            </div>
+            <div className={styles.codeBody}>
+              {"{\n"}
+              {"  "}
+              <span className={styles.cm}>"name"</span>
+              {": "}
+              <span className={styles.cs}>"code-review-agent"</span>
+              {",\n"}
+              {"  "}
+              <span className={styles.cm}>"version"</span>
+              {": "}
+              <span className={styles.cs}>"2.1.0"</span>
+              {",\n\n"}
+              {"  "}
+              <span className={styles.cc}>
+                {"// ── 【最重要】Orchestrator がルーティング判断に使うフィールド ──────────"}
+              </span>
+              {"\n"}
+              {"  "}
+              <span className={styles.cm}>"description"</span>
+              {": "}
+              <span className={styles.cs}>
+                {
+                  '"コードレビューを実施する専門エージェント。\n  【呼び出す場合】:\n  - PR 作成前のセキュリティ・品質・パフォーマンスチェック\n  - TypeScript/Python/Go コードの静的解析レポートが必要な場合\n  - コード品質スコア（0-100）と改善提案が必要な場合\n  【呼び出さない場合】:\n  - コードの実装・修正 → code-implementer-agent を使う\n  - テスト生成 → test-generator-agent を使う\n  - ドキュメント作成 → doc-writer-agent を使う"'
+                }
+              </span>
+              {",\n\n"}
+              {"  "}
+              <span className={styles.cm}>"url"</span>
+              {": "}
+              <span className={styles.cs}>"https://code-review.internal.example.com"</span>
+              {",\n\n"}
+              {"  "}
+              <span className={styles.cc}>
+                {"// ── スキル定義（Orchestrator が能力を詳細に理解するために使用）────────"}
+              </span>
+              {"\n"}
+              {"  "}
+              <span className={styles.cm}>"skills"</span>
+              {": [\n"}
+              {"    { "}
+              <span className={styles.cm}>"id"</span>
+              {": "}
+              <span className={styles.cs}>"security-review"</span>
+              {", "}
+              <span className={styles.cm}>"name"</span>
+              {": "}
+              <span className={styles.cs}>"Security Review"</span>
+              {",\n"}
+              {"      "}
+              <span className={styles.cm}>"description"</span>
+              {": "}
+              <span className={styles.cs}>
+                "SQLインジェクション・XSS・SSRF・認証バイパスを自動検出する"
+              </span>
+              {",\n"}
+              {"      "}
+              <span className={styles.cm}>"tags"</span>
+              {": ["}
+              <span className={styles.cs}>"security"</span>
+              {", "}
+              <span className={styles.cs}>"vulnerability"</span>
+              {", "}
+              <span className={styles.cs}>"owasp"</span>
+              {"],\n"}
+              {"      "}
+              <span className={styles.cm}>"examples"</span>
+              {": ["}
+              <span className={styles.cs}>"このPRにSQLインジェクションのリスクはありますか？"</span>
+              {"] },\n"}
+              {"    { "}
+              <span className={styles.cm}>"id"</span>
+              {": "}
+              <span className={styles.cs}>"performance-review"</span>
+              {",\n"}
+              {"      "}
+              <span className={styles.cm}>"name"</span>
+              {": "}
+              <span className={styles.cs}>"Performance Review"</span>
+              {",\n"}
+              {"      "}
+              <span className={styles.cm}>"description"</span>
+              {": "}
+              <span className={styles.cs}>
+                "N+1クエリ・不要な再レンダリング・O(n²)アルゴリズムを検出する"
+              </span>
+              {",\n"}
+              {"      "}
+              <span className={styles.cm}>"tags"</span>
+              {": ["}
+              <span className={styles.cs}>"performance"</span>
+              {", "}
+              <span className={styles.cs}>"optimization"</span>
+              {", "}
+              <span className={styles.cs}>"complexity"</span>
+              {"] } ],\n\n"}
+              {"  "}
+              <span className={styles.cc}>
+                {"// ── 認証（A2A は OpenAPI 互換の securitySchemes を採用）───────────────"}
+              </span>
+              {"\n"}
+              {"  "}
+              <span className={styles.cm}>"securitySchemes"</span>
+              {": { "}
+              <span className={styles.cm}>"bearerAuth"</span>
+              {": {\n"}
+              {"    "}
+              <span className={styles.cm}>"type"</span>
+              {": "}
+              <span className={styles.cs}>"http"</span>
+              {",\n"}
+              {"    "}
+              <span className={styles.cm}>"scheme"</span>
+              {": "}
+              <span className={styles.cs}>"bearer"</span>
+              {",\n"}
+              {"    "}
+              <span className={styles.cm}>"bearerFormat"</span>
+              {": "}
+              <span className={styles.cs}>"JWT"</span>
+              {"\n"}
+              {"  } },\n"}
+              {"  "}
+              <span className={styles.cm}>"security"</span>
+              {": [{ "}
+              <span className={styles.cm}>"bearerAuth"</span>
+              {": [] }],\n\n"}
+              {"  "}
+              <span className={styles.cc}>
+                {"// ── 入出力形式 ─────────────────────────────────────────────────────────"}
+              </span>
+              {"\n"}
+              {"  "}
+              <span className={styles.cm}>"defaultInputModes"</span>
+              {": ["}
+              <span className={styles.cs}>"text/plain"</span>
+              {", "}
+              <span className={styles.cs}>"application/json"</span>
+              {"],\n"}
+              {"  "}
+              <span className={styles.cm}>"defaultOutputModes"</span>
+              {": ["}
+              <span className={styles.cs}>"text/plain"</span>
+              {", "}
+              <span className={styles.cs}>"application/json"</span>
+              {"],\n\n"}
+              {"  "}
+              <span className={styles.cm}>"provider"</span>
+              {": { "}
+              <span className={styles.cm}>"organization"</span>
+              {": "}
+              <span className={styles.cs}>"Platform Engineering Team"</span>
+              {", "}
+              <span className={styles.cm}>"url"</span>
+              {": "}
+              <span className={styles.cs}>"https://internal.example.com/agents"</span>
+              {" } }"}
+            </div>
+          </div>
+
+          <div className={styles.patGrid}>
+            <div className={`${styles.pat} ${styles.patOk}`}>
+              <div className={styles.patLabel}>✅ agent.json ベストプラクティス</div>
+              <ul>
+                <li>description に「いつ使う・いつ使わない」を両方記述</li>
+                <li>skills は機能単位で細かく分割（タグ・examples 付き）</li>
+                <li>securitySchemes を必ず設定（認証なし公開は危険）</li>
+                <li>
+                  version を semantic versioning で管理（破壊的変更 = メジャーバージョンアップ）
+                </li>
+                <li>examples フィールドで Orchestrator の理解を補助</li>
+                <li>provider に連絡先・組織情報を明記（オーナー不明問題を防止）</li>
+              </ul>
+            </div>
+            <div className={`${styles.pat} ${styles.patNg}`}>
+              <div className={styles.patLabel}>✗ agent.json Anti-Patterns</div>
+              <ul>
+                <li>description が「なんでもやります」（誤ルーティングの最大要因）</li>
+                <li>securitySchemes なしで公開（セキュリティリスク）</li>
+                <li>skills を定義しない（能力発見できず Orchestrator から使われない）</li>
+                <li>url が内部 IP / localhost のまま本番公開</li>
+                <li>version を更新せず API 変更（クライアントが無警告で壊れる）</li>
+                <li>description が agent.py の instruction と乖離している</li>
+              </ul>
+            </div>
+          </div>
         </section>
 
         {/* s12: マルチエージェント GEMINI.md */}
