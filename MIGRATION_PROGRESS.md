@@ -9,7 +9,7 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- **最新 HEAD**: `c8ef2b8`（C-2 faithful 移植 hero/s01〜s13 完了）。**C-2 faithful 移植継続中**（s14〜s17 + sources 残 → 下記「Phase C-2 faithful 移植継続ポイント」参照）
+- **最新 HEAD**: `e19c3c7`（C-2 faithful 移植 hero/s01〜s13 完了）。**C-2 faithful 移植継続中**（s14〜s17 + sources 残 → 下記「Phase C-2 faithful 移植継続ポイント」参照）
 - **未コミット作業**: なし（working tree クリーン）
 - **コミット済み（C-2 関連、新しい順）**:
   - `c8ef2b8` feat(web-next): faithful migration of /gemini/agent s13 (Orchestrator + RemoteA2aAgent) (+245/-30)
