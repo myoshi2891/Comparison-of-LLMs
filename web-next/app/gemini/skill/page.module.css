@@ -1,0 +1,809 @@
+/*
+ * /gemini/skill ページ固有スタイル。
+ * legacy/gemini/skill.html の <style> ブロック (行 7-779) を CSS Modules に転写。
+ * トークンは本ページ内に閉じたスコープで定義し、globals.css の値を上書きしない。
+ */
+
+.root {
+  --bg: #06080f;
+  --surface: #0d1119;
+  --surface2: #161c27;
+  --border: #232b3a;
+  --g-blue: #4285f4;
+  --g-green: #34a853;
+  --g-yellow: #fbbc04;
+  --g-red: #ea4335;
+  --g-cyan: #00bcd4;
+  --g-purple: #7c4dff;
+  --text: #e8eef6;
+  --text-dim: #a4b4cc;
+  --text-bright: #f0f4ff;
+
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Noto Sans JP", sans-serif;
+  font-weight: 300;
+  line-height: 1.8;
+  min-height: 100vh;
+}
+
+.root * {
+  box-sizing: border-box;
+}
+
+/* ── HEADER ── */
+.header {
+  position: relative;
+  overflow: hidden;
+  padding: 4rem 2rem 5rem;
+  text-align: center;
+  background: linear-gradient(160deg, #07101f 0%, #060b16 60%, #07080e 100%);
+  border-bottom: 1px solid var(--border);
+}
+.googleGlow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 25% 0%, rgba(66, 133, 244, 0.14) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 35% at 75% 0%, rgba(52, 168, 83, 0.1) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 50% 100%, rgba(251, 188, 4, 0.07) 0%, transparent 60%);
+  pointer-events: none;
+}
+.headerTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--g-blue);
+  margin-bottom: 1.2rem;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid rgba(66, 133, 244, 0.3);
+  border-radius: 2rem;
+  background: rgba(66, 133, 244, 0.06);
+  position: relative;
+}
+.headerTitle {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(1.7rem, 4vw, 3rem);
+  font-weight: 700;
+  color: var(--text-bright);
+  line-height: 1.15;
+  margin-bottom: 1rem;
+  position: relative;
+}
+.rainbowText {
+  background: linear-gradient(90deg, #4285f4, #34a853, #fbbc04, #ea4335, #7c4dff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.headerSub {
+  font-size: 0.93rem;
+  color: var(--text-dim);
+  max-width: 600px;
+  margin: 0 auto 2rem;
+  position: relative;
+}
+.platformBadges {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+}
+.pb {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.68rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 2rem;
+  border: 1px solid;
+}
+.pbBlue {
+  border-color: rgba(66, 133, 244, 0.5);
+  color: var(--g-blue);
+  background: rgba(66, 133, 244, 0.08);
+}
+.pbGreen {
+  border-color: rgba(52, 168, 83, 0.5);
+  color: var(--g-green);
+  background: rgba(52, 168, 83, 0.08);
+}
+.pbYellow {
+  border-color: rgba(251, 188, 4, 0.5);
+  color: var(--g-yellow);
+  background: rgba(251, 188, 4, 0.08);
+}
+.pbRed {
+  border-color: rgba(234, 67, 53, 0.5);
+  color: var(--g-red);
+  background: rgba(234, 67, 53, 0.08);
+}
+.pbPurple {
+  border-color: rgba(124, 77, 255, 0.5);
+  color: var(--g-purple);
+  background: rgba(124, 77, 255, 0.08);
+}
+
+/* ── LAYOUT ── */
+.main {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 6rem;
+}
+
+/* ── TOC ── */
+.toc {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--g-blue);
+  border-radius: 10px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 3rem;
+}
+.tocLabel {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--g-blue);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+.toc ol {
+  list-style: none;
+  counter-reset: toc;
+  margin: 0;
+  padding: 0;
+}
+.toc li {
+  counter-increment: toc;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.2rem 0;
+  font-size: 0.88rem;
+}
+.toc li::before {
+  content: counter(toc, decimal-leading-zero);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  min-width: 2rem;
+}
+.toc a {
+  color: var(--text);
+  text-decoration: none;
+}
+.toc a:hover {
+  color: var(--g-blue);
+}
+
+/* ── SECTION ── */
+.section {
+  margin-bottom: 4.5rem;
+}
+.secLabel {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+.secTitle {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--border);
+}
+.secTitle .num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.88rem;
+  color: var(--g-blue);
+  margin-right: 0.5rem;
+}
+.root h3 {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-bright);
+  margin: 2rem 0 0.7rem;
+}
+.root p {
+  margin-bottom: 0.9rem;
+  font-size: 0.93rem;
+  color: var(--text);
+}
+.strongBright {
+  color: var(--text-bright);
+}
+.smallDim {
+  color: var(--text-dim);
+}
+
+/* ── FILE CARD ── */
+.fileCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+.fcHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.fcIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.fcIconBlue {
+  background: rgba(66, 133, 244, 0.12);
+  border: 1px solid rgba(66, 133, 244, 0.3);
+}
+.fcIconRed {
+  background: rgba(234, 67, 53, 0.12);
+  border: 1px solid rgba(234, 67, 53, 0.3);
+}
+.fcIconGreen {
+  background: rgba(52, 168, 83, 0.12);
+  border: 1px solid rgba(52, 168, 83, 0.3);
+}
+.fcIconCyan {
+  background: rgba(0, 188, 212, 0.12);
+  border: 1px solid rgba(0, 188, 212, 0.3);
+}
+.fcIconYellow {
+  background: rgba(251, 188, 4, 0.12);
+  border: 1px solid rgba(251, 188, 4, 0.3);
+}
+.fcName {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-bright);
+}
+.fcPath {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  margin-top: 0.1rem;
+}
+.fcBody {
+  padding: 1.5rem;
+}
+
+/* ── CODE BLOCK ── */
+.codeBlock {
+  background: #060810;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+.cbHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 1rem;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  gap: 0.6rem;
+}
+.cbDots {
+  display: flex;
+  gap: 4px;
+}
+.cbd {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+.pre {
+  padding: 1.2rem 1.5rem;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.77rem;
+  line-height: 1.75;
+  color: #dce6f4;
+  overflow-x: auto;
+  white-space: pre;
+  margin: 0;
+}
+.kw {
+  color: var(--g-purple);
+}
+.str {
+  color: var(--g-green);
+}
+.cmt {
+  color: #7a9abe;
+  font-style: italic;
+}
+.hd {
+  color: var(--g-blue);
+  font-weight: 600;
+}
+.hl {
+  color: var(--g-yellow);
+}
+.hl2 {
+  color: var(--g-red);
+}
+
+/* ── HIERARCHY ── */
+.hierarchy {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.8rem;
+  line-height: 2.2;
+  margin: 1.5rem 0;
+}
+.hi {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.hi1 {
+  padding-left: 1.5rem;
+}
+.hi2 {
+  padding-left: 3rem;
+}
+.hi3 {
+  padding-left: 4.5rem;
+}
+.hi4 {
+  padding-left: 6rem;
+}
+.hFold {
+  color: var(--g-yellow);
+}
+.hB {
+  color: var(--g-blue);
+}
+.hG {
+  color: var(--g-green);
+}
+.hR {
+  color: var(--g-red);
+}
+.hP {
+  color: var(--g-purple);
+}
+.hC {
+  color: var(--g-cyan);
+}
+.hD {
+  color: var(--text-dim);
+  font-size: 0.68rem;
+}
+.hiTopGap {
+  margin-top: 0.5rem;
+}
+
+/* ── INFO BOX ── */
+.infoBox {
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  display: flex;
+  gap: 0.8rem;
+  font-size: 0.87rem;
+}
+.ii {
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+.iTip {
+  background: rgba(52, 168, 83, 0.07);
+  border: 1px solid rgba(52, 168, 83, 0.22);
+}
+.iWarn {
+  background: rgba(251, 188, 4, 0.07);
+  border: 1px solid rgba(251, 188, 4, 0.22);
+}
+.iNote {
+  background: rgba(66, 133, 244, 0.07);
+  border: 1px solid rgba(66, 133, 244, 0.22);
+}
+.iCrit {
+  background: rgba(234, 67, 53, 0.07);
+  border: 1px solid rgba(234, 67, 53, 0.22);
+}
+.root code {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.82em;
+  background: var(--surface2);
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  color: var(--g-blue);
+}
+
+/* ── FLOW ── */
+.flowWrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  margin: 2rem 0;
+  overflow-x: auto;
+}
+.flowLabel {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 1.5rem;
+}
+.flow {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  min-width: max-content;
+}
+.fstep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+.fbox {
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  border: 1px solid;
+  min-width: 105px;
+  line-height: 1.4;
+}
+.fbB {
+  background: rgba(66, 133, 244, 0.1);
+  border-color: rgba(66, 133, 244, 0.4);
+  color: var(--g-blue);
+}
+.fbG {
+  background: rgba(52, 168, 83, 0.1);
+  border-color: rgba(52, 168, 83, 0.4);
+  color: var(--g-green);
+}
+.fbY {
+  background: rgba(251, 188, 4, 0.1);
+  border-color: rgba(251, 188, 4, 0.4);
+  color: var(--g-yellow);
+}
+.fbR {
+  background: rgba(234, 67, 53, 0.1);
+  border-color: rgba(234, 67, 53, 0.4);
+  color: var(--g-red);
+}
+.fbP {
+  background: rgba(124, 77, 255, 0.1);
+  border-color: rgba(124, 77, 255, 0.4);
+  color: var(--g-purple);
+}
+.ffile {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.62rem;
+  color: var(--text-dim);
+  text-align: center;
+}
+.farrow {
+  padding: 0 0.3rem;
+  color: var(--text-dim);
+  font-size: 1.1rem;
+  margin-top: -1.5rem;
+}
+
+/* ── GRID ── */
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.grid3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.miniCard {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.1rem;
+}
+.mcTag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.72rem;
+  color: var(--g-blue);
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+}
+.miniCard p {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── COMPARISON TABLE ── */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.84rem;
+}
+.table th {
+  background: var(--surface2);
+  color: var(--text-bright);
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 600;
+  padding: 0.7rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+}
+.table td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid rgba(35, 43, 58, 0.6);
+  color: var(--text);
+  vertical-align: top;
+  font-size: 0.82rem;
+}
+.table td:first-child {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.75rem;
+  color: var(--g-green);
+}
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── SKILLS PATTERN GRID ── */
+.patternGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.patternCard {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.1rem;
+  position: relative;
+  overflow: hidden;
+}
+.patternCard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+.pcB::before {
+  background: var(--g-blue);
+}
+.pcG::before {
+  background: var(--g-green);
+}
+.pcY::before {
+  background: var(--g-yellow);
+}
+.pcR::before {
+  background: var(--g-red);
+}
+.pcP::before {
+  background: var(--g-purple);
+}
+.patternNum {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 1.6rem;
+  opacity: 0.06;
+  position: absolute;
+  top: 0.4rem;
+  right: 0.7rem;
+  line-height: 1;
+  color: white;
+  font-weight: 600;
+}
+.patternCard h4 {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-bright);
+  margin-bottom: 0.4rem;
+}
+.patternCard p {
+  font-size: 0.76rem;
+  color: var(--text-dim);
+  margin: 0;
+  line-height: 1.55;
+}
+.pcStruct {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.66rem;
+  color: var(--text-dim);
+  margin-top: 0.5rem;
+}
+
+/* ── ARTIFACT CARDS ── */
+.artifactRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.8rem;
+  margin: 1.5rem 0;
+}
+.artCard {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.artIcon {
+  font-size: 1.2rem;
+}
+.artName {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-bright);
+}
+.artDesc {
+  font-size: 0.76rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+.artAuto {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.62rem;
+  color: var(--g-green);
+  margin-top: 0.2rem;
+}
+
+/* ── PRINCIPLE CARDS ── */
+.principles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.principle {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.2rem;
+  position: relative;
+  overflow: hidden;
+}
+.principle::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+.pB::before {
+  background: var(--g-blue);
+}
+.pG::before {
+  background: var(--g-green);
+}
+.pY::before {
+  background: var(--g-yellow);
+}
+.pR::before {
+  background: var(--g-red);
+}
+.pP::before {
+  background: var(--g-purple);
+}
+.pC::before {
+  background: var(--g-cyan);
+}
+.pnum {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 1.8rem;
+  font-weight: 600;
+  opacity: 0.06;
+  position: absolute;
+  top: 0.3rem;
+  right: 0.8rem;
+  line-height: 1;
+  color: white;
+}
+.principle h4 {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.87rem;
+  font-weight: 600;
+  color: var(--text-bright);
+  margin-bottom: 0.4rem;
+}
+.principle p {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* ── SOURCES ── */
+.sources {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  margin-top: 3rem;
+}
+.sources h3 {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  margin-bottom: 1.2rem;
+  margin-top: 0;
+}
+.src {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(35, 43, 58, 0.5);
+  font-size: 0.8rem;
+}
+.src:last-child {
+  border-bottom: none;
+}
+.snum {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  min-width: 2rem;
+}
+.src a {
+  color: var(--g-blue);
+  text-decoration: none;
+  word-break: break-all;
+}
+.src a:hover {
+  text-decoration: underline;
+}
+.sdesc {
+  color: var(--text-dim);
+  font-size: 0.74rem;
+  display: block;
+  margin-top: 0.1rem;
+}
+.inlineLink {
+  color: var(--g-blue);
+}

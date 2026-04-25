@@ -1,10 +1,14 @@
 ---
 name: create-html-doc
 description: >
-  このプロジェクトの静的 HTML ドキュメント（skill.html, agent.html, skill-guide 等）を
-  新規作成または大幅修正する。「新しい HTML を作成」「ドキュメントページを追加」
-  「skill.html を作って」「agent.html を追加」「HTML ガイドを書いて」と言われたときに使用する。
-  共通ヘッダー・Mermaid v10・レスポンシブ CSS を含む完全なテンプレートを提供する。
+  [DEPRECATED — Phase A–F 移行期間中は使用しない]
+  Creates static HTML guide pages under legacy/, which is now frozen per the Phase A–F
+  migration policy (.gitignore + edit ban in CLAUDE.md). New guide pages must be written
+  as Next.js page.tsx under web-next/app/. Use /nextjs-page-migration for migration work,
+  or write a new page.tsx directly using DocLayout/CodeBlock/MermaidDiagram when adding
+  fresh content. This skill will be re-evaluated (or removed) after Phase F cutover.
+deprecated: true
+invocation: explicit
 allowed-tools:
   - Read
   - Write
@@ -12,6 +16,17 @@ allowed-tools:
   - Glob
   - Grep
 ---
+
+> ⚠️ **DEPRECATED (Phase A 以降)**: 本スキルは `legacy/` 配下への新規 HTML 作成を前提としていた。
+> Phase A–F 計画（`docs/NEXTJS_PHASE_A_F_PLAN.md`）により `legacy/` は凍結・編集禁止となり、
+> 新規ガイドページは `web-next/app/<provider>/<slug>/page.tsx` として作成する。
+>
+> - 新規ページ（Next.js 側）: `/nextjs-page-migration` スキルを参照
+> - Mermaid の構文ルールのみ再利用したい場合: `/fix-mermaid` または
+>   `web-next/components/docs/MermaidDiagram.tsx`（Phase E で追加予定）を参照
+> - 本スキルは Phase F カットオーバー後に削除または再定義する
+>
+> 以下の手順は **Phase F 完了までは実行しない**（参照用に保持）。
 
 # 静的 HTML ドキュメント作成スキル
 

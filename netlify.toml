@@ -1,9 +1,13 @@
 [build]
-  # webディレクトリ内でBunを使用して依存関係を解決・ビルドし、
-  # 必要な成果物（index.html, pricing.json, favicons）をプロジェクトルート（パブリッシュディレクトリ）にコピーします。
-  command = "cd web && bun install && bun run build && cp dist/index.html ../index.html && (cp dist/*.png ../ || true) && (cp dist/*.ico ../ || true) && (cp src/data/pricing.json ../pricing.json || true)"
-  publish = "."
+  # Next.js App Router (web-next/) を静的エクスポートとして配信する。
+  # base を web-next に設定し、publish は base 相対で out ディレクトリを指す。
+  base    = "web-next"
+  command = "bun install && bun run build"
+  publish = "out"
 
 [build.environment]
-  # Netlify環境でBunを使用するためのバージョン指定
-  BUN_VERSION = "1.3.9"
+  # Netlify でのランタイム指定
+  # - BUN_VERSION: web-next の依存解決・ビルドに使用
+  # - NODE_VERSION: Next.js 16 は Node 20+ を要求 (Bun は Node ランタイムを代替しない)
+  BUN_VERSION  = "1.3.9"
+  NODE_VERSION = "20"

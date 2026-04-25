@@ -1,0 +1,974 @@
+/*
+ * /codex/skill ページ固有スタイル。
+ * legacy/codex/skill.html の <style> ブロック (行 7-883) を CSS Modules に転写。
+ * トークンは本ページ内に閉じたスコープで定義し、globals.css の値を上書きしない。
+ */
+
+.root {
+  --bg: #050609;
+  --surface: #0b0d12;
+  --surface2: #121620;
+  --surface3: #1a2030;
+  --border: #1f2535;
+  --border2: #2a3348;
+
+  --oai: #10a37f;
+  --oai2: #0d8c6d;
+  --oai-dim: rgba(16, 163, 127, 0.15);
+
+  --blue: #3b82f6;
+  --purple: #8b5cf6;
+  --amber: #f59e0b;
+  --rose: #f43f5e;
+  --cyan: #06b6d4;
+  --lime: #84cc16;
+
+  --text: #e8eef6;
+  --text-dim: #a4b4cc;
+  --text-bright: #eef2ff;
+
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Noto Sans JP", sans-serif;
+  font-weight: 300;
+  line-height: 1.8;
+  min-height: 100vh;
+}
+
+.root *,
+.root *::before,
+.root *::after {
+  box-sizing: border-box;
+}
+
+/* ── HEADER ── */
+.header {
+  position: relative;
+  overflow: hidden;
+  background: #060810;
+  border-bottom: 1px solid var(--border);
+  padding: 4rem 2rem 5rem;
+  text-align: center;
+}
+.hdrBg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% -10%, rgba(16, 163, 127, 0.18) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 30% at 15% 100%, rgba(59, 130, 246, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 85% 100%, rgba(139, 92, 246, 0.08) 0%, transparent 60%);
+}
+.hdrEyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--oai);
+  border: 1px solid rgba(16, 163, 127, 0.3);
+  background: rgba(16, 163, 127, 0.06);
+  border-radius: 2rem;
+  padding: 0.3rem 0.9rem;
+  margin-bottom: 1.4rem;
+}
+.header h1 {
+  font-family: Syne, sans-serif;
+  font-size: clamp(1.8rem, 4.5vw, 3.2rem);
+  font-weight: 800;
+  color: var(--text-bright);
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+.oaiText {
+  color: var(--oai);
+}
+.hdrSub {
+  font-size: 0.93rem;
+  color: var(--text-dim);
+  max-width: 620px;
+  margin: 0 auto 2rem;
+  line-height: 1.7;
+}
+.badgeRow {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.badge {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.66rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 2rem;
+  border: 1px solid;
+}
+.bOai {
+  color: var(--oai);
+  border-color: rgba(16, 163, 127, 0.45);
+  background: rgba(16, 163, 127, 0.07);
+}
+.bBlue {
+  color: var(--blue);
+  border-color: rgba(59, 130, 246, 0.45);
+  background: rgba(59, 130, 246, 0.07);
+}
+.bPurple {
+  color: var(--purple);
+  border-color: rgba(139, 92, 246, 0.45);
+  background: rgba(139, 92, 246, 0.07);
+}
+.bAmber {
+  color: var(--amber);
+  border-color: rgba(245, 158, 11, 0.45);
+  background: rgba(245, 158, 11, 0.07);
+}
+.bRose {
+  color: var(--rose);
+  border-color: rgba(244, 63, 94, 0.45);
+  background: rgba(244, 63, 94, 0.07);
+}
+
+/* ── LAYOUT ── */
+.main {
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 6rem;
+}
+
+/* ── TOC ── */
+.toc {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--oai);
+  border-radius: 10px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 3.5rem;
+}
+.tocLbl {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  color: var(--oai);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+.toc ol {
+  list-style: none;
+  counter-reset: toc;
+  padding-left: 0;
+}
+.toc li {
+  counter-increment: toc;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.22rem 0;
+  font-size: 0.88rem;
+}
+.toc li::before {
+  content: counter(toc, decimal-leading-zero);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  min-width: 2.2rem;
+}
+.toc a {
+  color: var(--text);
+  text-decoration: none;
+}
+.toc a:hover {
+  color: var(--oai);
+}
+
+/* ── SECTION ── */
+.section {
+  margin-bottom: 4.5rem;
+}
+.secLabel {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+.secTitle {
+  font-family: Syne, sans-serif;
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: var(--text-bright);
+  margin-bottom: 1.4rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--border);
+}
+.num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.88rem;
+  color: var(--oai);
+  margin-right: 0.5rem;
+}
+.root h3 {
+  font-family: Syne, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin: 2rem 0 0.7rem;
+}
+.root p {
+  margin-bottom: 0.9rem;
+  font-size: 0.93rem;
+}
+
+.strongBright {
+  color: var(--text-bright);
+}
+
+/* ── FILE CARD ── */
+.fc {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+.fcHdr {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.fcIcon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.fcIconOai {
+  background: rgba(16, 163, 127, 0.12);
+  border: 1px solid rgba(16, 163, 127, 0.3);
+}
+.fcIconPurple {
+  background: rgba(139, 92, 246, 0.12);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+.fcIconAmber {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.fcIconBlue {
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+.fcIconCyan {
+  background: rgba(6, 182, 212, 0.12);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+.fcName {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-bright);
+}
+.fcPath {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.67rem;
+  color: var(--text-dim);
+  margin-top: 0.1rem;
+}
+.fcMeta {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+  flex-wrap: wrap;
+}
+.fcTag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.62rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+}
+.fcTagOai {
+  background: rgba(16, 163, 127, 0.1);
+  color: var(--oai);
+}
+.fcTagBlue {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--blue);
+}
+.fcTagPurple {
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--purple);
+}
+.fcTagAmber {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--amber);
+}
+.fcTagRose {
+  background: rgba(244, 63, 94, 0.1);
+  color: var(--rose);
+}
+.fcBody {
+  padding: 1.5rem;
+}
+
+/* ── CODE BLOCK ── */
+.cb {
+  background: #040508;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+.cbHdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 1rem;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.67rem;
+  color: var(--text-dim);
+}
+.cbDots {
+  display: flex;
+  gap: 4px;
+}
+.cbd {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+.cbdRed {
+  background: #f43f5e;
+}
+.cbdAmber {
+  background: #f59e0b;
+}
+.cbdOai {
+  background: #10a37f;
+}
+.cb pre {
+  padding: 1.2rem 1.5rem;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.76rem;
+  line-height: 1.78;
+  color: #dce6f4;
+  overflow-x: auto;
+  white-space: pre;
+  margin: 0;
+}
+.cHd {
+  color: var(--blue);
+  font-weight: 600;
+}
+.cOai {
+  color: var(--oai);
+  font-weight: 600;
+}
+.cStr {
+  color: var(--oai);
+}
+.cCm {
+  color: #7a9abe;
+  font-style: italic;
+}
+.cKw {
+  color: var(--purple);
+}
+.cHl {
+  color: var(--amber);
+}
+.cRose {
+  color: var(--rose);
+}
+
+/* ── DIRECTORY TREE ── */
+.tree {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.79rem;
+  line-height: 2.1;
+  margin: 1.5rem 0;
+}
+.t0 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.t1 {
+  padding-left: 1.5rem;
+}
+.t2 {
+  padding-left: 3rem;
+}
+.t3 {
+  padding-left: 4.5rem;
+}
+.t4 {
+  padding-left: 6rem;
+}
+.tf {
+  color: var(--amber);
+}
+.tb {
+  color: var(--blue);
+}
+.tg {
+  color: var(--oai);
+}
+.tp {
+  color: var(--purple);
+}
+.tr {
+  color: var(--rose);
+}
+.tc {
+  color: var(--cyan);
+}
+.tl {
+  color: var(--lime);
+}
+.td {
+  color: var(--text-dim);
+  font-size: 0.67rem;
+}
+.treeGroupSpacer {
+  margin-top: 0.5rem;
+}
+.treeDimPrefix {
+  color: var(--text-dim);
+}
+
+/* ── INFO BOXES ── */
+.ib {
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  display: flex;
+  gap: 0.8rem;
+  font-size: 0.87rem;
+}
+.ii {
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+.iOai {
+  background: rgba(16, 163, 127, 0.07);
+  border: 1px solid rgba(16, 163, 127, 0.22);
+}
+.iBlue {
+  background: rgba(59, 130, 246, 0.07);
+  border: 1px solid rgba(59, 130, 246, 0.22);
+}
+.iWarn {
+  background: rgba(245, 158, 11, 0.07);
+  border: 1px solid rgba(245, 158, 11, 0.22);
+}
+.iRose {
+  background: rgba(244, 63, 94, 0.07);
+  border: 1px solid rgba(244, 63, 94, 0.22);
+}
+.iPurp {
+  background: rgba(139, 92, 246, 0.07);
+  border: 1px solid rgba(139, 92, 246, 0.22);
+}
+
+/* ── FLOW ── */
+.flowWrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  margin: 2rem 0;
+  overflow-x: auto;
+}
+.flowLbl {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.69rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 1.5rem;
+}
+.flow {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  min-width: max-content;
+}
+.fst {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+.fbox {
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  font-size: 0.77rem;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  border: 1px solid;
+  min-width: 108px;
+  line-height: 1.4;
+}
+.fOai {
+  background: rgba(16, 163, 127, 0.1);
+  border-color: rgba(16, 163, 127, 0.4);
+  color: var(--oai);
+}
+.fBlue {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: var(--blue);
+}
+.fPurp {
+  background: rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.4);
+  color: var(--purple);
+}
+.fAmb {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: var(--amber);
+}
+.fRose {
+  background: rgba(244, 63, 94, 0.1);
+  border-color: rgba(244, 63, 94, 0.4);
+  color: var(--rose);
+}
+.fCyan {
+  background: rgba(6, 182, 212, 0.1);
+  border-color: rgba(6, 182, 212, 0.4);
+  color: var(--cyan);
+}
+.ffile {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.61rem;
+  color: var(--text-dim);
+  text-align: center;
+}
+.farr {
+  padding: 0 0.3rem;
+  color: var(--text-dim);
+  font-size: 1.1rem;
+  margin-top: -1.5rem;
+}
+
+/* ── GRID ── */
+.g2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.g3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.mc {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.1rem;
+}
+.mcBoxOai {
+  border: 1px solid rgba(16, 163, 127, 0.2);
+}
+.mcBoxBlue {
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+.mcBoxRose {
+  border: 1px solid rgba(244, 63, 94, 0.2);
+}
+.mcBoxPurple {
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+.mcTag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+.mcTagOai {
+  color: var(--oai);
+}
+.mcTagBlue {
+  color: var(--blue);
+}
+.mcTagPurple {
+  color: var(--purple);
+}
+.mcTagRose {
+  color: var(--rose);
+}
+.mc p {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── TABLE ── */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.83rem;
+}
+.table th {
+  background: var(--surface2);
+  color: var(--text-bright);
+  font-family: Syne, sans-serif;
+  font-weight: 700;
+  padding: 0.7rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.78rem;
+}
+.table td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid rgba(31, 37, 53, 0.7);
+  color: var(--text);
+  vertical-align: top;
+}
+.table td:first-child {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.75rem;
+  color: var(--oai);
+}
+.table tr:last-child td {
+  border-bottom: none;
+}
+.tdAccent {
+  color: var(--oai);
+  font-weight: 700;
+}
+
+/* ── PRECEDENCE DIAGRAM ── */
+.precDiagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem 2rem;
+  margin: 1.5rem 0;
+}
+.precLabel {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 1.2rem;
+}
+.precRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  margin-bottom: 0.4rem;
+  border: 1px solid;
+}
+.pr1 {
+  background: rgba(16, 163, 127, 0.08);
+  border-color: rgba(16, 163, 127, 0.25);
+}
+.pr2 {
+  background: rgba(59, 130, 246, 0.06);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+.pr3 {
+  background: rgba(139, 92, 246, 0.06);
+  border-color: rgba(139, 92, 246, 0.2);
+}
+.pr4 {
+  background: rgba(245, 158, 11, 0.06);
+  border-color: rgba(245, 158, 11, 0.2);
+}
+.precRank {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.68rem;
+  min-width: 2.5rem;
+  color: var(--text-dim);
+}
+.precFile {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-bright);
+}
+.precFileNote {
+  font-weight: 300;
+  font-size: 0.85em;
+}
+.precDesc {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+}
+.precArrow {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  padding: 0.2rem 0;
+  letter-spacing: 0.05em;
+  font-family: "JetBrains Mono", monospace;
+}
+.precFootnote {
+  margin-top: 1rem;
+  padding: 0.7rem 1rem;
+  background: rgba(16, 163, 127, 0.06);
+  border: 1px solid rgba(16, 163, 127, 0.2);
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+.precFootnote strong {
+  color: var(--oai);
+}
+
+/* ── PATTERN CARDS ── */
+.patterns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.patC {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.2rem;
+  position: relative;
+  overflow: hidden;
+}
+.patC::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+.ppOai::before {
+  background: var(--oai);
+}
+.ppBlue::before {
+  background: var(--blue);
+}
+.ppPurp::before {
+  background: var(--purple);
+}
+.ppAmb::before {
+  background: var(--amber);
+}
+.ppRose::before {
+  background: var(--rose);
+}
+.patNum {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 1.8rem;
+  font-weight: 600;
+  opacity: 0.05;
+  position: absolute;
+  top: 0.3rem;
+  right: 0.8rem;
+  line-height: 1;
+  color: white;
+}
+.patC h4 {
+  font-family: Syne, sans-serif;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 0.4rem;
+}
+.patC p {
+  font-size: 0.77rem;
+  color: var(--text-dim);
+  margin: 0;
+  line-height: 1.55;
+}
+.patStruct {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.63rem;
+  color: var(--text-dim);
+  margin-top: 0.5rem;
+}
+
+/* ── BEST PRACTICE GRID ── */
+.bps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.bpC {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.2rem;
+  position: relative;
+  overflow: hidden;
+}
+.bpC::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+.bpOai::before {
+  background: var(--oai);
+}
+.bpBlue::before {
+  background: var(--blue);
+}
+.bpPurp::before {
+  background: var(--purple);
+}
+.bpAmb::before {
+  background: var(--amber);
+}
+.bpRose::before {
+  background: var(--rose);
+}
+.bpCyan::before {
+  background: var(--cyan);
+}
+.bpN {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 1.8rem;
+  font-weight: 600;
+  opacity: 0.05;
+  position: absolute;
+  top: 0.3rem;
+  right: 0.8rem;
+  line-height: 1;
+  color: white;
+}
+.bpC h4 {
+  font-family: Syne, sans-serif;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 0.4rem;
+}
+.bpC p {
+  font-size: 0.77rem;
+  color: var(--text-dim);
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* ── OPEN STANDARD BANNER ── */
+.stdBanner {
+  background: linear-gradient(
+    135deg,
+    rgba(16, 163, 127, 0.12) 0%,
+    rgba(59, 130, 246, 0.08) 50%,
+    rgba(139, 92, 246, 0.08) 100%
+  );
+  border: 1px solid rgba(16, 163, 127, 0.3);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  margin: 2rem 0;
+  display: flex;
+  gap: 1.2rem;
+  align-items: flex-start;
+}
+.stdIcon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+.stdTitle {
+  font-family: Syne, sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text-bright);
+  margin-bottom: 0.3rem;
+}
+.stdDesc {
+  font-size: 0.86rem;
+  color: var(--text);
+  line-height: 1.65;
+}
+
+/* ── SOURCES ── */
+.sources {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  margin-top: 3rem;
+}
+.sources h3 {
+  font-family: Syne, sans-serif;
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  margin-bottom: 1.2rem;
+  font-weight: 700;
+}
+.src {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid rgba(31, 37, 53, 0.6);
+  font-size: 0.8rem;
+}
+.src:last-child {
+  border-bottom: none;
+}
+.sn {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.67rem;
+  color: var(--text-dim);
+  min-width: 2.2rem;
+}
+.src a {
+  color: var(--oai);
+  text-decoration: none;
+  word-break: break-all;
+}
+.src a:hover {
+  text-decoration: underline;
+}
+.sd {
+  color: var(--text-dim);
+  font-size: 0.73rem;
+  display: block;
+  margin-top: 0.1rem;
+}
+.srcSeparator {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid rgba(16, 163, 127, 0.25);
+}
+.srcSeparatorLabel {
+  color: var(--oai);
+  font-weight: 600;
+}
+.srcSeparatorDesc {
+  color: var(--text-dim);
+  font-size: 0.77rem;
+}
+
+/* prefers-reduced-motion は globals.css で全セレクタに適用済のため、
+   ページ固有の再宣言は不要 (Biome の noImportantStyles 警告を回避)。 */

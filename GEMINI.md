@@ -1,56 +1,37 @@
 # GEMINI.md
 
-AI モデルの時間別コスト計算機における Gemini (Code Assist / ADK / CLI) 向けプロジェクト仕様・コンテキストファイルです。
+GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
+本リポジトリでは **CLAUDE.md が正本** とし、GEMINI.md はその委譲 pointer として機能する。
 
-## プロジェクト概要・目的
+## 必読（順序固定、作業開始前に 3 点すべて読むこと）
 
-AI モデルの時間別コスト計算機プロジェクト。Pythonスクレイパーが各社料金ページから価格を自動取得して `pricing.json` を生成し、Reactフロントエンドがそれを読み込んで「単一ポータブルHTML」として出力します。
+1. [`CLAUDE.md`](CLAUDE.md) — リポジトリ全体の AI 編集ルール・アーキテクチャ・禁止事項
+2. [`MIGRATION_PROGRESS.md`](MIGRATION_PROGRESS.md) — 現在地（Phase A–F）・AI 作業ルール R1/R2・次の作業・再開プロンプト
+3. [`docs/NEXTJS_PHASE_A_F_PLAN.md`](docs/NEXTJS_PHASE_A_F_PLAN.md) — Phase A–F の全体計画。Phase C 以降は [`docs/NEXTJS_PHASE_C_DETAILED_DESIGN.md`](docs/NEXTJS_PHASE_C_DETAILED_DESIGN.md) も併読
 
-## 技術スタック・主要ライブラリ
+@./CLAUDE.md
+@./MIGRATION_PROGRESS.md
 
-- **バックエンド**: Python 3.12+, uv, Pydantic v2, Playwright, httpx (ディレクトリ: `scraper/`)
-- **フロントエンド**: React 19, TypeScript, Vite 7 (`vite-plugin-singlefile`), Bun (ディレクトリ: `web/`)
+## 絶対に守るべきルール（CLAUDE.md と MIGRATION_PROGRESS.md のサマリ）
 
-## ビルド・テスト・デプロイコマンド
+- **R1（Biome scope）**: `bun run lint:fix` / `bunx biome check --write`（パス引数なし）は **禁止**。必ずファイル単位でパス指定
+- **R2（faithful 必須）**: legacy HTML の移植では **要約・省略・縮約禁止**。全リスト項目・全コードブロック・全 SVG・全 alert・全 table を JSX に転写
+- **legacy/ 配下の編集禁止**（Phase A–F 中は凍結）
+- **ファイル全体の書き直し禁止**（明示指示がない限り）
+- **依存関係のアップグレード禁止**
+- **設定ファイル（next.config.ts / tsconfig.json / biome.json 等）の勝手な変更禁止**
 
-- **全体フル更新** (スクレイプ→ビルド→コピー): `bash update.sh`
-- **為替レートのみ更新** (スクレイプスキップ): `bash update.sh --no-scrape`
-- **スクレイパー単体起動**: `cd scraper && uv run python -m scraper.main --output ../pricing.json`
-- **フロントエンド開発サーバー**: `cd web && bun run dev`
-- **フロントエンドテスト**: `cd web && bun test`
-- **バックエンドテスト**: `cd scraper && uv run pytest`
+## 検証コマンド
 
-## コーディング規約 (コンパクト版)
+```bash
+cd web-next && bun run test        # 453/453 pass が期待値（Phase C-2 以降）
+cd web-next && bun run typecheck   # OK
+cd web-next && bun run build       # /gemini/agent 等が Static プリレンダリング
+cd web-next && bun run lint        # 既知 6 件のみ（新規違反ゼロが必須）
+cd scraper && uv run pytest        # 5/5
+```
 
-- **TypeScript**: `strict: true`, `erasableSyntaxOnly: true` (enum と namespace は使用禁止)。`any` 禁止(`unknown` + 型ガード推奨)。
-- **Python**: Pydantic v2 ベースのスキーマ定義。型ヒント必須 (Python 3.12+ の `|` 記法)。ファイル先頭に `from __future__ import annotations` を付与。
-- **データ型同期**: `scraper/src/scraper/models.py` と `web/src/types/pricing.ts` のスキーマは必ず同期させること。
+## 次セッション再開プロンプト
 
-## 禁止操作の明示 (Anti-Patterns)
-
-- ファイル全体の不要な書き直し・過剰なリファクタリング（明示的な指示がない限り禁止）
-- 依存関係の勝手なアップグレード
-- ビルドツール設定 (`vite`, `bun`, `pytest`, `tsconfig`) や CI ワークフローの無断変更
-- `.env` や機密情報のハードコード
-- ネットワークテストや重い統合テストの無断追加
-- `<div class="mermaid">` 内部コンテンツに対する インデントの追加 や ステートメントの1行連結（Mermaid はインデントなし・改行区切りの厳格な構文を要求するため）
-- **AI モデルのバージョン番号を文脈なくドキュメントや WebSearch クエリに固定すること**。AI の知識カットオフと実際の日付のギャップにより陳腐化している可能性がある。バージョン明記が不要なケースでは `latest` / `newest` + 年号を優先し、バージョン指定が必要かどうか判断が難しい場合はユーザーに確認する。
-
-## サブエージェント委譲ルール (Agent Routing)
-
-複雑なタスクは以下のようにサブエージェントに適切に委譲または分割して処理すること：
-
-- **Explore**: コードベースの全体探索、影響範囲の特定（Gemini Flash等の高速モデルを推奨）
-- **Plan**: 実装計画の策定、仕様の読み込み（読み取り専用）
-- **Code Reviewer**: 実装コードのレビュー
-- **Debugger**: バグ修正、エラー原因の特定とテストの実行
-
-## 重要ドキュメントへのパス参照
-
-詳細な仕様や設計情報が必要な場合は、以下のファイルを `@` 参照で読み込んでください。
-
-- カスタムルール・複数エージェント共通設定: `@AGENTS.md`
-- プロジェクト全体像・仕様: `@docs/spec.md`
-- アーキテクチャ図・構成: `@docs/ARCHITECTURE.md`
-- 実装ロードマップ: `@docs/tasks.md`
-- テスト戦略: `@docs/TESTING.md`
+MIGRATION_PROGRESS.md §「次回セッションでの再開プロンプト（任意の LLM 用、ツール非依存）」
+を参照。そのプロンプトをコピーすれば任意の Agent で作業再開可能。

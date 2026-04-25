@@ -57,7 +57,6 @@ pnpm-debug.log*
 # Data / Generated Assets (Root)
 # Set these if you want to keep generated assets out of Git
 /index.html
-/pricing.json
 /*.png
 /*.ico
 
@@ -75,5 +74,12 @@ CLAUDE.local.md
 worktrees/
 sample-docs
 
+# 旧 Vite/HTML 資産（Phase 14 カットオーバー済）。Phase A–F でガイドページを Next.js 化中。
+# 物理削除は避け、ローカル参照用に保持。以降の git add legacy/... は暗黙ブロックされる。
+# 注: 既に HEAD に commit 済のため、git rm --cached は実施していない（HEAD 履歴は保全）。
+legacy/
+
 # Claude Code local settings
 .claude/settings.local.json
+
+pricing_old.json

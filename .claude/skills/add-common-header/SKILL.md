@@ -1,18 +1,29 @@
 ---
 name: add-common-header
 description: >
-  Use this skill to add common header navigation and disclaimer banner to new HTML files.
-  Trigger when the user mentions: "共通ヘッダーを追加", "ヘッダーとディスクレイマーを設定",
-  "ナビゲーションメニューを追加", "新しいHTMLファイルをナビゲーションに追加",
-  "ドロップダウンメニューにリンクを追加", "add common header", "setup header and disclaimer",
-  or "add to navigation menu".
-  Inserts CSS/JS references before </head> tag and optionally adds links to
-  shared/common-header.js defaultLinks array.
+  [DEPRECATED — Phase A–F 移行期間中は使用しない]
+  This skill targets legacy/shared/common-header.{js,css}, which was superseded by
+  web-next/components/site/SiteHeader.tsx in Phase A (commit db67dd0). The legacy/
+  directory is now frozen (.gitignore) and editing it violates the CLAUDE.md migration
+  rules. For Next.js guide page navigation work, use /nextjs-page-migration instead.
+  This skill will be re-evaluated (or removed) after Phase F cutover.
+deprecated: true
+invocation: explicit
 allowed-tools:
   - Read
   - Edit
   - Bash
 ---
+
+> ⚠️ **DEPRECATED (Phase A 以降)**: 本スキルが対象とする `legacy/shared/common-header.{js,css}` は
+> Phase A（commit `db67dd0`）で `web-next/components/site/SiteHeader.tsx` + `DisclaimerBanner.tsx` +
+> `nav-links.ts` に置換された。`legacy/` は `.gitignore` 済で編集禁止。
+>
+> - Next.js 側のナビ更新: `web-next/components/site/nav-links.ts` を編集（Zod `NavLinkSchema[]` 準拠）
+> - ガイドページ移行: `/nextjs-page-migration` を使用
+> - 本スキルは Phase F カットオーバー後に削除または再定義する
+>
+> 以下の手順は **Phase F 完了までは実行しない**（参照用に保持）。
 
 # 共通ヘッダー・ディスクレイマー追加ガイド
 
