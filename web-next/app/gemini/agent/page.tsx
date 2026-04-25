@@ -1066,33 +1066,226 @@ export default function GeminiAgentPage() {
         <section id="s04" className={styles.section}>
           <div className={styles.sectionHead}>
             <span className={styles.sectionNum}>4</span>
-            <h2>{SECTION_TITLES[3]}</h2>
+            <h2>
+              ADK <span className={styles.mono}>agent.py</span> —
+              サブエージェント定義のベストプラクティス
+            </h2>
           </div>
+
           <div className={styles.card}>
             <p>
-              ADK (Agent Development Kit) では <code>agent.py</code>{" "}
-              がサブエージェントの定義本体です。
-              <code>LlmAgent</code> ・ <code>SequentialAgent</code> ・ <code>ParallelAgent</code> ・
-              <code>LoopAgent</code> を組み合わせて協調パイプラインを構築します。
+              Google ADK (Agent Development Kit) では、サブエージェントの「system prompt」は{" "}
+              <strong>
+                <code>instruction</code> フィールド
+              </strong>{" "}
+              に記述します。このフィールドが Claude の <code>.claude/agents/*.md</code>{" "}
+              に相当します。<code>description</code> フィールドが AutoFlow
+              ルーティングの判断基準になるため、特に重要です。
+            </p>
+            <p style={{ marginTop: 10 }}>
+              <strong>2026年3月現在のADK最新状況：</strong> <strong>ADK TypeScript 1.0</strong> が
+              GA になり、TS/JS プロジェクトでも <code>@google/adk</code>{" "}
+              パッケージで同等の機能が利用可能です。また <strong>ADK Python 2.0 Alpha</strong>
+              （グラフベースのワークフロー定義）が公開中で、より複雑なエージェント DAG
+              の記述が可能になりました。
             </p>
           </div>
-          <CodeBlock
-            lang="Python"
-            body={`from google.adk.agents import LlmAgent, SequentialAgent
 
-reviewer = LlmAgent(
-    name="code_reviewer",
-    model="gemini-2.5-pro",
-    instruction="セキュリティ・パフォーマンス・型安全性をチェックする",
-    tools=[read_file, grep],
-)
+          <div className={`${styles.alert} ${styles.alertWarn}`}>
+            <span className={styles.alertIcon}>⚠️</span>
+            <div className={styles.alertContent}>
+              <strong>description フィールドが「APIドキュメント」</strong>
+              LLM ルーティング（AutoFlow）では、<code>description</code>{" "}
+              の内容だけを見て「どのサブエージェントに委譲するか」を判断します。曖昧な description
+              は誤ルーティングの原因になります。「いつ・何のために呼ぶか」を具体的に記述してください。
+            </div>
+          </div>
 
-pipeline = SequentialAgent(
-    name="review_pipeline",
-    sub_agents=[reviewer, summarizer],
-)
-`}
-          />
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>agents/orchestrator/agent.py</span>
+              <span className={styles.lang}>Python / ADK</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.cc}>
+                # agents/orchestrator/agent.py — ルートエージェント（コーディネーター）
+              </span>
+              {"\n"}
+              <span className={styles.ck}>from</span>
+              {" google.adk.agents "}
+              <span className={styles.ck}>import</span>
+              {" LlmAgent\n\n"}
+              <span className={styles.cc}># サブエージェントをインポート（先に定義が必要）</span>
+              {"\n"}
+              <span className={styles.ck}>from</span>
+              {" agents.researcher.agent "}
+              <span className={styles.ck}>import</span>
+              {" researcher_agent\n"}
+              <span className={styles.ck}>from</span>
+              {" agents.implementer.agent "}
+              <span className={styles.ck}>import</span>
+              {" implementer_agent\n"}
+              <span className={styles.ck}>from</span>
+              {" agents.reviewer.agent "}
+              <span className={styles.ck}>import</span>
+              {" reviewer_agent\n\n"}
+              {"root_agent = LlmAgent(\n"}
+              {"    "}
+              <span className={styles.cm}>name</span>
+              {"="}
+              <span className={styles.cs}>"orchestrator"</span>
+              {",\n"}
+              {"    "}
+              <span className={styles.cm}>model</span>
+              {"="}
+              <span className={styles.cs}>"gemini-3-flash-preview"</span>
+              {",  "}
+              <span className={styles.cc}># v0.29.0〜 CLI デフォルト</span>
+              {"\n"}
+              {"    "}
+              <span className={styles.cm}>description</span>
+              {"="}
+              <span className={styles.cs}>
+                "ユーザーの要求を分析し、適切なサブエージェントに委譲するコーディネーター。"
+              </span>
+              {",\n"}
+              {"    "}
+              <span className={styles.cm}>instruction</span>
+              {"="}
+              <span className={styles.cs}>
+                {
+                  '"""\nあなたは開発チームのオーケストレーターです。\nユーザーの要求を分析し、以下のルールで適切なエージェントに委譲してください。\n\n## 委譲ルール\n- 調査・情報収集 → researcher_agent\n- コード実装 → implementer_agent\n- コードレビュー → reviewer_agent\n- 複合タスク → SequentialAgent で順番に処理\n\n## 禁止事項\n- 自身でコードを書かない（必ずサブエージェントに委譲）\n- 曖昧なタスクはそのまま渡さず、明確化してから委譲\n"""'
+                }
+              </span>
+              {",\n"}
+              {"    "}
+              <span className={styles.cm}>sub_agents</span>
+              {"=[\n"}
+              {"        researcher_agent,    "}
+              <span className={styles.cc}># 調査・情報収集</span>
+              {"\n"}
+              {"        implementer_agent,   "}
+              <span className={styles.cc}># コード実装</span>
+              {"\n"}
+              {"        reviewer_agent,      "}
+              <span className={styles.cc}># コードレビュー (Read-only)</span>
+              {"\n"}
+              {"    ],\n"}
+              {")"}
+            </div>
+          </div>
+
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>agents/reviewer/agent.py</span>
+              <span className={styles.lang}>Python / ADK</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.cc}>
+                # agents/reviewer/agent.py — 特化型サブエージェント（コードレビュー専用）
+              </span>
+              {"\n"}
+              <span className={styles.ck}>from</span>
+              {" google.adk.agents "}
+              <span className={styles.ck}>import</span>
+              {" LlmAgent\n"}
+              <span className={styles.ck}>from</span>
+              {" google.adk.tools "}
+              <span className={styles.ck}>import</span>
+              {" google_search\n\n"}
+              {"reviewer_agent = LlmAgent(\n"}
+              {"    "}
+              <span className={styles.cm}>name</span>
+              {"="}
+              <span className={styles.cs}>"reviewer"</span>
+              {",\n"}
+              {"    "}
+              <span className={styles.cm}>model</span>
+              {"="}
+              <span className={styles.cs}>"gemini-3-flash-preview"</span>
+              {",  "}
+              <span className={styles.cc}># コスト最適化</span>
+              {"\n"}
+              {"    "}
+              <span className={styles.cm}>description</span>
+              {"="}
+              <span className={styles.cs}>
+                {
+                  '"""\nコードレビューを実施するエージェント。\n以下の場合に呼び出す:\n- Pull Request 作成後\n- コード変更が完了した後\n- セキュリティ・パフォーマンス確認が必要な場合\nRead-only: コードの変更は行わず、レポートのみ出力する。\n"""'
+                }
+              </span>
+              {",\n"}
+              {"    "}
+              <span className={styles.cm}>instruction</span>
+              {"="}
+              <span className={styles.cs}>
+                {
+                  '"""\nあなたはシニアエンジニアのコードレビュアーです。\n提供されたコードを以下の観点でレビューしてください。\n\n## Review Checklist\n### 🔴 Security\n- SQLインジェクション / XSS リスク\n- 認証・認可の適切な実装\n- 秘密情報のハードコードがないか\n\n### 🟡 Performance\n- N+1 クエリの有無\n- 不要な再レンダリング (React)\n- 重い処理の非同期化\n\n### 🟢 Code Quality\n- TypeScript 型安全性\n- エラーハンドリングの網羅\n- テストカバレッジ\n\n## 出力フォーマット\n```\n## Code Review Report\n### 🔴 Critical (要対応)\n### 🟡 Warning (推奨対応)\n### 🟢 Good (良い点)\n```\n"""'
+                }
+              </span>
+              {",\n"}
+              {"    "}
+              <span className={styles.cm}>tools</span>
+              {"=[],  "}
+              <span className={styles.cc}># ツールなし: Read-only のレビューのみ</span>
+              {"\n"}
+              {"    "}
+              <span className={styles.cm}>output_key</span>
+              {"="}
+              <span className={styles.cs}>"review_result"</span>
+              {",  "}
+              <span className={styles.cc}># 共有状態への書き込みキー</span>
+              {"\n"}
+              {")"}
+            </div>
+          </div>
+
+          {/* ADK agent types */}
+          <div className={styles.card}>
+            <div className={styles.cardTitle}>🔀 ADK ワークフローエージェントの選択基準</div>
+            <div className={styles.agentGrid}>
+              <div className={styles.agentCard}>
+                <div className={styles.agentCardIcon}>⛓️</div>
+                <div className={styles.agentCardTitle}>SequentialAgent</div>
+                <div className={styles.agentCardDesc}>
+                  サブエージェントを順番に実行。前のエージェントの出力を次が受け取る。依存関係がある場合に使用。
+                </div>
+                <div className={styles.agentCardEx}>例: spec → design → implement → review</div>
+              </div>
+              <div className={styles.agentCard}>
+                <div className={styles.agentCardIcon}>⚡</div>
+                <div className={styles.agentCardTitle}>ParallelAgent</div>
+                <div className={styles.agentCardDesc}>
+                  すべてのサブエージェントを並列実行。共有状態に書くため
+                  <strong>必ず異なるキーを使う</strong>こと（レースコンディション防止）。
+                </div>
+                <div className={styles.agentCardEx}>
+                  例: frontend || backend || db（独立タスク）
+                </div>
+              </div>
+              <div className={styles.agentCard}>
+                <div className={styles.agentCardIcon}>🔁</div>
+                <div className={styles.agentCardTitle}>LoopAgent</div>
+                <div className={styles.agentCardDesc}>
+                  条件を満たすまでサブエージェントを繰り返し実行。反復精緻化・ポーリング・リトライに最適。
+                </div>
+                <div className={styles.agentCardEx}>
+                  例: draft → critique → refine（品質基準達成まで）
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className={`${styles.alert} ${styles.alertDanger}`}>
+            <span className={styles.alertIcon}>🚨</span>
+            <div className={styles.alertContent}>
+              <strong>ParallelAgent の罠：共有状態のレースコンディション</strong>
+              ParallelAgent の子エージェントは
+              <strong>同じ session state を共有します</strong>
+              。複数のエージェントが同じキーに書き込むと値が上書きされます。各エージェントには必ず{" "}
+              <code>output_key="unique_key_name"</code> のように一意なキーを設定してください。
+            </div>
+          </div>
         </section>
 
         {/* s05: .geminiignore / settings.json */}
