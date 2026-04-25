@@ -211,7 +211,7 @@ function BpCard({ variant, title, desc }: { variant: "violet" | "teal" | ...; ti
 | 新規 3 点 | `web-next/app/gemini/agent/{page.tsx,page.module.css,page.test.tsx}` |
 | Hero タイトル | （legacy `<h1>` を確認、Gemini Agent / Gemini Code Assist 系想定） |
 | Section 構造 | `<h2>` × 18（id 属性の有無は実装時 grep `id="[^"]*"' legacy/gemini/agent.html` で確認） |
-| EXPECTED_SECTION_IDS 戦略 | legacy に既存 id があれば採用、なければ synthetic（`s01` 〜 `s18`） |
+| EXPECTED_SECTION_IDS 戦略 | legacy に既存 id があれば採用、なければ synthetic（`s01` 〜 `s17` と `sources`） |
 | 著者カラー | Google Material: `--blue: #1a73e8` / `--green: #1e8e3e` / `--yellow: #f9ab00` / `--red: #d93025` / `--purple: #7c3aed` / `--teal: #00897b` |
 | SOURCES 件数 | **25 件**（既存 12 + 新規 A2A 13）。設計書当初の「28 件」は誤りで、grep で確認済み |
 | SOURCES 分割方針 | **2 分割確定**（`SOURCES_EXISTING`: 12 件 / `SOURCES_NEW`: 13 件 A2A 系）。CSS: `.srcSeparator` で区切り |

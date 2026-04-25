@@ -114,9 +114,8 @@ describe("/gemini/agent - external link safety", () => {
     const { container } = render(<Page />);
     const sources = container.querySelector("#sources");
     expect(sources).not.toBeNull();
-    const externals =
-      sources?.querySelectorAll('a[href^="http"]') ??
-      ([] as unknown as NodeListOf<HTMLAnchorElement>);
+    if (!sources) throw new Error("sources is null");
+    const externals = sources.querySelectorAll('a[href^="http"]');
     expect(externals.length).toBeGreaterThanOrEqual(25);
   });
 });

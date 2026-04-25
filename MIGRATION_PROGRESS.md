@@ -9,7 +9,7 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- **最新 HEAD**: `e19c3c7`（C-2 faithful 移植 hero/s01〜s13 完了）。**C-2 faithful 移植継続中**（s14〜s17 + sources 残 → 下記「Phase C-2 faithful 移植継続ポイント」参照）
+- **最新 HEAD**: `c8ef2b8`（C-2 faithful 移植 hero/s01〜s13 完了）。**C-2 faithful 移植継続中**（s14〜s17 + sources 残 → 下記「Phase C-2 faithful 移植継続ポイント」参照）
 - **未コミット作業**: なし（working tree クリーン）
 - **コミット済み（C-2 関連、新しい順）**:
   - `c8ef2b8` feat(web-next): faithful migration of /gemini/agent s13 (Orchestrator + RemoteA2aAgent) (+245/-30)
@@ -178,7 +178,7 @@ web-next/
 5. **i18n**: **next-intl は採用せず、既存 `T` オブジェクト継続**（理由: 39 キー・コンパイル時既知・単一ページ）
 6. **ビジネスロジック**: `lib/cost.ts` に純粋関数集約（React 非依存、Server/Client 両対応）
 7. **データ取得**: **SSG 採用**（`pricing.json` をビルド時 static import、Zod で検証）
-8. **デプロイ**: **Netlify 継続**（`@netlify/plugin-nextjs`、Vercel 移行なし）
+8. **デプロイ**: **Netlify 継続**（`output: 'export'` による完全 SSG、`@netlify/plugin-nextjs` は不採用。Vercel 移行なし）
 9. **単一 HTML 制約**: **廃止**（`output: 'export'` で Netlify CDN 配信）
 10. **フォント**: **`next/font/google` で self-host**（Phase 6）。Google CDN への @import を廃止し、`--font-sans` / `--font-mono` / `--font-display` を `<html>` に注入する方式に統一
 11. **Metadata**: **`generateMetadata` ではなく静的 `export const metadata`**（Phase 7）。理由: SSG 前提でリクエスト時情報が存在しない＋単一ページ設計で JA/EN が URL で分岐しない
@@ -571,7 +571,7 @@ update.sh (--no-scrape 対応)
 
 ```bash
 # レガシー
-cd web && bun run dev         # http://localhost:5173
+cd legacy/web && bun run dev         # http://localhost:5173
 
 # 新版
 cd web-next && bun run dev    # http://localhost:3000
@@ -606,14 +606,14 @@ Next.js 移行プロジェクトの作業を再開してください。
 
 - リポジトリ: LLM-Studies（Phase A–F の Next.js 移行作業中）
 - 現在のブランチ: feat/nextjs-migration
-- 最新 HEAD: 90b163e（C-2 Green 完了 + faithful 移植 hero/s01/s02 まで。git status は clean）
+- 最新 HEAD: c8ef2b8（C-2 faithful 移植 hero/s01〜s13 完了。git status は clean）
 - 移行計画: docs/NEXTJS_PHASE_A_F_PLAN.md（Phase A–F）
 - 進捗トラッカー: MIGRATION_PROGRESS.md（**作業開始前に必読**: §「AI 作業ルール」R1（Biome scope）/ R2（faithful 必須）/「Phase C-2 faithful 移植継続ポイント」）
 - Phase C 詳細設計: docs/NEXTJS_PHASE_C_DETAILED_DESIGN.md（§5.2 C-2）
 - プロジェクト固有スキル: .claude/skills/nextjs-page-migration/SKILL.md
 - リポジトリ規約: CLAUDE.md（AGENTS.md / GEMINI.md からも参照される。AI 共通の編集ルール）
 
-次の作業: web-next/app/gemini/agent/page.tsx の **s03 セクション以降を legacy HTML から省略なしで JSX 化**（s03〜s17 + sources、合計 16 セクション残）
+次の作業: web-next/app/gemini/agent/page.tsx の **s14 セクション以降を legacy HTML から省略なしで JSX 化**（s14〜s17 + sources、合計 5 セクション残）
 
 絶対遵守ルール（R2、Phase C-2 で確定）:
 - legacy/gemini/agent.html の対象セクションを Read で行範囲指定して全部読む

@@ -46,6 +46,17 @@
   box-sizing: border-box;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .root *,
+  .root *::before,
+  .root *::after {
+    transition: none;
+    animation-duration: 0.001ms;
+    animation-iteration-count: 1;
+    transform: none;
+  }
+}
+
 /* ── HEADER ── */
 .header {
   position: relative;

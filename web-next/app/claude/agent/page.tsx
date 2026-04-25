@@ -32,7 +32,11 @@ function TemplateBlock({
         <span>{title}</span>
         <span className={styles.codeLang}>{lang}</span>
       </div>
-      <div className={styles.codeBody}>{body}</div>
+      <div className={styles.codeBody}>
+        <pre>
+          <code>{body}</code>
+        </pre>
+      </div>
     </div>
   );
 }
