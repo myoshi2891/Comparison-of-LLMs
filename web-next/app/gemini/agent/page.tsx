@@ -2960,7 +2960,7 @@ export default function GeminiAgentPage() {
         <section id="s17" className={`${styles.section} ${styles.sectionMa}`}>
           <div className={styles.sectionHead}>
             <span className={styles.sectionNum}>17</span>
-            <h2>{SECTION_TITLES[16]}</h2>
+            <h2>全ファイル役割まとめ（マルチエージェント + A2A 対応版）</h2>
           </div>
           <div className={styles.tblWrap}>
             <table>
@@ -2968,58 +2968,112 @@ export default function GeminiAgentPage() {
                 <tr>
                   <th>ファイル</th>
                   <th>レイヤー</th>
-                  <th>役割</th>
+                  <th>読者</th>
+                  <th>マルチエージェントでの役割</th>
+                  <th>設計原則（追記）</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td>
-                    <code>GEMINI.md</code>
+                    <code>GEMINI.md</code> (root)
                   </td>
-                  <td>サブ / マルチ共通</td>
-                  <td>プロジェクト全体のコンテキスト</td>
+                  <td>ADK / CLI</td>
+                  <td>Orchestrator（常時ロード）</td>
+                  <td>
+                    ルーティングルール・ファイル所有権・リモートエンドポイント一覧・フォールバック戦略
+                  </td>
+                  <td>
+                    A2A エンドポイント URL テーブルと Quality Gates を必ず記載。@import で
+                    docs/agent-endpoints.md を分離
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>agents/*/GEMINI.md</code>
+                  </td>
+                  <td>ADK</td>
+                  <td>各エージェント（Auto-scan）</td>
+                  <td>サービス固有ルール。A2A エージェントごとに独立管理</td>
+                  <td>Auto-scan で動的ロード。ルート GEMINI.md との重複を避ける</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>agent.json</code>
+                    <br />
+                    （Agent Card）
+                  </td>
+                  <td>A2A</td>
+                  <td>リモートクライアントエージェント・Orchestrator</td>
+                  <td>能力公開・認証定義・スキル一覧（ディスカバリーの唯一の情報源）</td>
+                  <td>
+                    description・skills・securitySchemes は必須。version 管理を徹底。to_a2a()
+                    で自動生成も可
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>agents/*/agent.py</code>
+                  </td>
+                  <td>ADK</td>
+                  <td>各エージェントランタイム</td>
+                  <td>instruction（内部 GEMINI.md 相当）・RemoteA2aAgent 定義・output_key 管理</td>
+                  <td>output_key は一意に。RemoteA2aAgent の description に呼び出し条件を明記</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>docs/agent-endpoints.md</code>
+                  </td>
+                  <td>A2A / 運用</td>
+                  <td>Orchestrator（@import）+ 人間</td>
+                  <td>AgentEngine URL・ローカル開発 URL・フォールバックルールを一元管理</td>
+                  <td>GEMINI.md から @import。エンドポイント変更はこのファイルのみ更新</td>
                 </tr>
                 <tr>
                   <td>
                     <code>AGENTS.md</code>
                   </td>
-                  <td>サブ / マルチ共通</td>
-                  <td>クロスツール共通指示</td>
-                </tr>
-                <tr>
+                  <td>共通</td>
+                  <td>全 AI ツール（クロスツール）</td>
+                  <td>A2A エージェント一覧・ADK パイプライン・AgentEngine エンドポイント概要</td>
                   <td>
-                    <code>agent.py</code>
+                    ツール固有の詳細（agent.json
+                    URL等）はここに書かず各ファイルへ。横断的ルールのみ記載
                   </td>
-                  <td>ADK</td>
-                  <td>サブエージェント / Orchestrator 定義</td>
-                </tr>
-                <tr>
-                  <td>
-                    <code>agent.json</code>
-                  </td>
-                  <td>A2A</td>
-                  <td>リモートエージェントの能力宣言</td>
-                </tr>
-                <tr>
-                  <td>
-                    <code>mcp.json</code>
-                  </td>
-                  <td>MCP</td>
-                  <td>外部ツール / リソース接続</td>
                 </tr>
                 <tr>
                   <td>
                     <code>.geminiignore</code>
                   </td>
                   <td>CLI</td>
-                  <td>走査範囲の制御</td>
+                  <td>コンテキストシステム</td>
+                  <td>agent.json（本番の認証情報含む）・.env・*.key を除外リストに追加</td>
+                  <td>
+                    <code>agent.json</code> に secrets が含まれる場合は必ず除外。node_modules・dist
+                    も忘れずに
+                  </td>
                 </tr>
                 <tr>
                   <td>
                     <code>settings.json</code>
                   </td>
                   <td>CLI / IDE</td>
-                  <td>挙動・モデル選択の制御</td>
+                  <td>Gemini ランタイム</td>
+                  <td>MCP サーバー・除外ツール・A2A クライアント設定を一元管理</td>
+                  <td>A2A サーバーの接続情報は env 変数で渡す（ハードコード禁止）</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>README.md</code>
+                  </td>
+                  <td>全ツール</td>
+                  <td>人間（チームメンバー）</td>
+                  <td>
+                    A2A エージェント一覧・agent.json URL・AgentEngine デプロイ手順・コスト試算
+                  </td>
+                  <td>
+                    マルチエージェントアーキテクチャ図・各エージェントのオーナーチーム・フォールバック手順を記載
+                  </td>
                 </tr>
               </tbody>
             </table>
