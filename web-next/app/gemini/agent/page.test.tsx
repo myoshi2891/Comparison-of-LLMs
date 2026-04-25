@@ -12,7 +12,7 @@
  * - 18 個の TOC リンクが `#section-id` 形式で存在する
  * - 外部リンク (http/https) には全て `target="_blank"` かつ
  *   `rel="noopener noreferrer"` が付与されている
- * - `sources` セクション内に 28 件以上の外部リンクが存在する
+ * - `sources` セクション内に 25 件以上の外部リンクが存在する
  * - 静的検査: 生 HTML 流し込み API (React の XSS 危険 prop) を使用していない
  */
 
@@ -85,6 +85,9 @@ describe("/gemini/agent - page structure", () => {
     const { container } = render(<Page />);
     const tocAnchors = container.querySelectorAll('nav a[href^="#"]');
     const tocHrefs = Array.from(tocAnchors).map((a) => a.getAttribute("href"));
+    const expectedHrefs = EXPECTED_SECTION_IDS.map((id) => `#${id}`);
+    expect(tocHrefs).toHaveLength(expectedHrefs.length);
+    expect(tocHrefs).toEqual(expect.arrayContaining(expectedHrefs));
     for (const id of EXPECTED_SECTION_IDS) {
       expect(tocHrefs, `TOC must link to #${id}`).toContain(`#${id}`);
     }

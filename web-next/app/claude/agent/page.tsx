@@ -1543,8 +1543,8 @@ export default function ClaudeAgentPage() {
                   <span className={styles.hlKey}>&quot;command&quot;</span>
                   {": "}
                   <span className={styles.hlStr}>
-                    &quot;bash -c 'if [ -f ./dist/output.js ]; then echo OK; else echo \\"Build
-                    artifact missing\\" &gt;&amp;2; exit 2; fi'&quot;
+                    &quot;bash -c 'if [ -f ./dist/output.js ]; then echo OK; else echo \"Build
+                    artifact missing\" &gt;&amp;2; exit 2; fi'&quot;
                   </span>
                   {"\n      }]\n    }],\n    "}
                   <span className={styles.hlKey}>&quot;TaskCompleted&quot;</span>
@@ -1558,8 +1558,8 @@ export default function ClaudeAgentPage() {
                   <span className={styles.hlKey}>&quot;command&quot;</span>
                   {": "}
                   <span className={styles.hlStr}>
-                    &quot;bash -c 'if ! pnpm test 2&gt;&amp;1; then echo \\"Tests failing — fix
-                    before closing task\\" &gt;&amp;2; exit 2; fi'&quot;
+                    &quot;bash -c 'if ! pnpm test 2&gt;&amp;1; then echo \"Tests failing — fix
+                    before closing task\" &gt;&amp;2; exit 2; fi'&quot;
                   </span>
                   {"\n      }]\n    }]\n  }\n}"}
                 </>

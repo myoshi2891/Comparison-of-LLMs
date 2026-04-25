@@ -46,7 +46,7 @@
 | # | legacy パス | 新 URL | 行数 | H2 数 | code block 数 | source 数 | ブランドカラー |
 |---|---|---|---|---|---|---|---|
 | C-1 | `legacy/claude/agent.html` | `/claude/agent` | 1,678 | 0 | 30 | 23 | `--accent` `--accent2` `--accent3` `--accent4` |
-| C-2 | `legacy/gemini/agent.html` | `/gemini/agent` | 3,723 | 18 | 36 | **25**（既存 12 + 新規 A2A 13; 当初 28 は誤り） | Google Material（`--blue` `--green` `--yellow` `--red` `--purple` `--teal`） |
+| C-2 | `legacy/gemini/agent.html` | `/gemini/agent` | 3,723 | 18 | 36 | **25**（既存 12 + 新規エージェント連携 13） | Google Material テーマカラー |
 | C-3 | `legacy/codex/agent.html` | `/codex/agent` | 3,007 | 12 | 45 | 20 | OpenAI（`--oai` `--oai-dim` `--blue` `--purple` `--amber` `--red`） |
 | C-4 | `legacy/copilot/agent.html` | `/copilot/agent` | 2,171 | 20 | 63 | 16 | GitHub/MS（`--gh` `--gh-dark` `--gh-blue` `--gh-purple` `--gh-amber` `--gh-red` `--ms-blue`） |
 
@@ -220,11 +220,11 @@ function BpCard({ variant, title, desc }: { variant: "violet" | "teal" | ...; ti
 | code block 数 | 36 件 |
 | named template constants | 8–10 件目安（中規模）。コードブロック本文は文字列テンプレートリテラルで OK（white-space:pre が改行保持） |
 | metadata.title | `Gemini マルチエージェント開発 (ADK / A2A / AgentEngine) ベストプラクティス \| LLM コスト計算機`（実装値） |
-| metadata.description | Gemini CLI v0.34.0・ADK 2.0 Alpha・A2A / AP2 / A2UI プロトコル時代のサブエージェント / マルチエージェント開発で必要な GEMINI.md・AGENTS.md・agent.py・agent.json・.geminiignore・settings.json の役割と書き方を体系化したガイド |
+| metadata.description | 最新の Gemini CLI (as of 2026-03)・最新の ADK (as of 2026-03)・最新のエージェント連携プロトコル (A2A/AP2/A2UI等) 時代のサブエージェント / マルチエージェント開発で必要な GEMINI.md・AGENTS.md・agent.py・agent.json・.geminiignore・settings.json の役割と書き方を体系化したガイド |
 | 契約テスト #3 のキーワード | `Gemini`（legacy `<h1>` には未含のため Hero `<h1>` 先頭に "Gemini" を補填） |
 | 契約テスト #4 の id 数（N） | **18**（s01〜s17 の 17 件 + sources の 1 件） |
 | CSS Module 状態 | **コミット済み**（`page.module.css`、1,329 行、`cb62441`） |
-| page.tsx 状態 | **作成済み・faithful 移植中**（Green `aa9c2ee` → s01 faithful `e9e9547` → s02 faithful `90b163e`、s03〜s17 + sources は縮約版残存）。詳細は MIGRATION_PROGRESS.md §「Phase C-2 faithful 移植継続ポイント」 |
+| page.tsx 状態 | **作成済み・faithful 移植中**（Green `aa9c2ee` → s01 `e9e9547` → s02 `90b163e` → s03 `8b582a3` → s04 `9d1a6bd` → s05 `60cf089` → s06 `1cd285f` → s07 `3a03261` → s08 `7e4aa2f` → s09 `c42542d` → s10 `fb235dc` → s11 `8e49dd4` → s12 `7ede8d7` → s13 `c8ef2b8`、s14〜s17 + sources は縮約版残存）。詳細は MIGRATION_PROGRESS.md §「Phase C-2 faithful 移植継続ポイント」 |
 | faithful 移植ルール | **R2 厳守**: legacy HTML の全リスト項目・全コードブロック・全 SVG・全 alert・全 table を JSX に転写。要約・省略・縮約禁止（MIGRATION_PROGRESS.md §「AI 作業ルール R2」参照） |
 
 **セクション 10〜17 の注意**: マルチエージェント系セクションは `sectionMa` クラスを追加（緑アクセント、CSS で定義済み）。`className={\`${styles.section} ${styles.sectionMa}\`}` を使用。

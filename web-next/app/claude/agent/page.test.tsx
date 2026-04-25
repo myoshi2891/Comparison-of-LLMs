@@ -87,6 +87,7 @@ describe("/claude/agent - page structure", () => {
     const { container } = render(<Page />);
     const tocAnchors = container.querySelectorAll('nav a[href^="#"]');
     const tocHrefs = Array.from(tocAnchors).map((a) => a.getAttribute("href"));
+    expect(tocHrefs).toHaveLength(EXPECTED_SECTION_IDS.length);
     for (const id of EXPECTED_SECTION_IDS) {
       expect(tocHrefs, `TOC must link to #${id}`).toContain(`#${id}`);
     }
@@ -112,10 +113,8 @@ describe("/claude/agent - external link safety", () => {
   it("sources section contains at least 23 external links", () => {
     const { container } = render(<Page />);
     const sources = container.querySelector("#sources");
-    expect(sources).not.toBeNull();
-    const externals =
-      sources?.querySelectorAll('a[href^="http"]') ??
-      ([] as unknown as NodeListOf<HTMLAnchorElement>);
+    if (!sources) throw new Error("#sources not found");
+    const externals = sources.querySelectorAll('a[href^="http"]');
     expect(externals.length).toBeGreaterThanOrEqual(23);
   });
 });

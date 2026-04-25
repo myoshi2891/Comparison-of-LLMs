@@ -145,13 +145,13 @@ build-time ハイライトとして `shiki` を採用する。
 
 - RSC 内で `async` ページコンポーネントから `shiki` の highlighter を取得し、Markdown/source を事前 HTML 化する
 - 得た HTML を React 要素として埋め込む際の **安全な流し込み API** の使い方は
-  既存の `web-next/components/CodeBlock.tsx`（Phase A Green で導入予定）を参照すること。
+  既存の `web-next/components/CodeBlock.tsx`（Phase A Green で導入済み）を参照すること。
   本 SKILL.md 内には該当 API のリテラル記述を置かない（XSS 監査の false positive 防止のため）
 - 入力はビルド時に確定する値（リポジトリ内ファイル）のみを許容し、ユーザー入力はハイライト対象に含めない
 
 ### Step 6: Mermaid ダイアグラム（Phase E）
 
-- `components/docs/MermaidDiagram.tsx`（Phase E Green で導入）が `next/dynamic` で `ssr: false` の
+- `components/docs/MermaidDiagram.tsx`（導入予定：Phase E）が `next/dynamic` で `ssr: false` の
   クライアント遅延ロードを提供する
 - Mermaid 記述は **左端揃え必須**（HTML インデントが混じると構文エラー）— legacy/ から
   貼り直す際はインデント除去を機械的に行う
@@ -194,7 +194,7 @@ bun run build       # Next.js production build (out/ 生成)
 
 - `legacy/` は `.gitignore` 済み。ローカルで編集しても push されない
 - `.gitignore` より先に commit 済みの legacy/ ファイルは HEAD に残存しているため、Phase F までは
-  削除せず参照用として保持する（Phase F で物理削除を検討）
+  削除せず参照用として保持する（Phase F でも物理削除は行わない）
 - 新規ガイドページを `legacy/` 配下に書かない（web-next 側のみに作成）
 
 ## pre-commit-check スキルとの連携

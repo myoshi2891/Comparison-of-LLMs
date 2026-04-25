@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title:
     "Gemini マルチエージェント開発 (ADK / A2A / AgentEngine) ベストプラクティス | LLM コスト計算機",
   description:
-    "Google Gemini CLI v0.34.0・ADK 2.0 Alpha・A2A / AP2 / A2UI プロトコル時代のサブエージェント / マルチエージェント開発で必要な GEMINI.md・AGENTS.md・agent.py・agent.json・.geminiignore・settings.json の役割と書き方を体系化したガイド。",
+    "最新の Google Gemini CLI (as of 2026-03)・最新の ADK (as of 2026-03)・最新のエージェント連携プロトコル (A2A/AP2/A2UI等) 時代のサブエージェント / マルチエージェント開発で必要な GEMINI.md・AGENTS.md・agent.py・agent.json・.geminiignore・settings.json の役割と書き方を体系化したガイド。",
 };
 
 type Source = { icon: string; title: string; href: string; desc: string };
@@ -41,7 +41,7 @@ const SECTION_IDS = [
   "s17",
 ] as const;
 
-const SECTION_TITLES: readonly string[] = [
+const SECTION_TITLES = [
   "全体アーキテクチャと各ファイルの位置づけ",
   "GEMINI.md / AGENT.md — コンテキストファイルの設計",
   "AGENTS.md — クロスツール互換戦略",
@@ -59,7 +59,11 @@ const SECTION_TITLES: readonly string[] = [
   "マルチエージェント ユースケース別 設計パターン",
   "マルチエージェント固有の Anti-Patterns — 設計・運用両面",
   "全ファイル役割まとめ（マルチエージェント + A2A 対応版）",
-];
+] as const;
+
+// Assert length matching at compile time
+const _assertLengthsMatch: (typeof SECTION_IDS)["length"] = SECTION_TITLES.length;
+void _assertLengthsMatch;
 
 // ── SOURCES (12 既存 + 13 新規 = 25 件) ──────────────────────────────
 

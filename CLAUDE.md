@@ -20,13 +20,13 @@ update.sh  ← オーケストレーター (scrape → copy)
 │       └── tools/               コーディングツール別スクレイパー (cursor, github_copilot, windsurf, claude_code, jetbrains, openai_codex, google_one, antigravity)
 ├── web-next/           Next.js 16 + React 19 + TypeScript + Tailwind v4 (bun)
 │   ├── app/
-│   │   ├── layout.tsx           ルートレイアウト (Phase A で SiteHeader/DisclaimerBanner 追加予定)
+│   │   ├── layout.tsx           ルートレイアウト (Phase A で SiteHeader/DisclaimerBanner 追加済み)
 │   │   ├── page.tsx             コスト計算機ホーム (Server Component + Zod 検証 → HomePage へ委譲)
 │   │   └── globals.css          Tailwind v4 + legacy design tokens (227 行)
 │   ├── components/
 │   │   ├── HomePage.tsx         Client Component (Phase 10)
 │   │   ├── ApiTable.tsx / SubTable.tsx / Hero.tsx / ...   (Phase 8-10 成果物)
-│   │   └── site/                Phase A 共通インフラ予定 (SiteHeader, DisclaimerBanner, nav-links)
+│   │   └── site/                Phase A 共通インフラ（追加済み） (SiteHeader, DisclaimerBanner, nav-links)
 │   ├── lib/
 │   │   ├── cost.ts              純粋関数 (calcApiCost / calcSubCost / colorIndex / fmtUSD / fmtJPY)
 │   │   ├── pricing.ts           Zod スキーマ + コンパイル時パリティアサート
@@ -36,7 +36,7 @@ update.sh  ← オーケストレーター (scrape → copy)
 │   ├── types/pricing.ts         Pydantic 同期型定義
 │   ├── data/pricing.json        ビルド時 static import 用 (update.sh がコピー)
 │   ├── public/pricing.json      /pricing.json URL 配信用 (update.sh がコピー)
-│   ├── tests/                   vitest (361 件中 360 passed — 既知 1 件の skip は別 Issue)
+│   ├── tests/                   vitest (最新のテスト結果や既知の Issue については CI または進捗ドキュメントを参照)
 │   ├── next.config.ts           output: 'export' + images.unoptimized
 │   ├── biome.json               Biome lint/format
 │   └── vitest.config.ts         jsdom + @ alias
@@ -44,9 +44,9 @@ update.sh  ← オーケストレーター (scrape → copy)
 ├── legacy/             旧 Vite/HTML 資産 (.gitignore 済、ローカル参照専用)
 │   ├── web/                     旧 Vite フロントエンド (Phase 14 でカットオーバー)
 │   ├── index.html               旧ホーム (単一ファイル)
-│   ├── shared/common-header.*   共通ヘッダー (Phase A で SiteHeader に置換予定)
-│   ├── claude/ gemini/ codex/ copilot/   18 HTML ガイド (Phase A–E で page.tsx 化予定)
-│   └── git_worktree.html        Mermaid v10 + 手書き SVG (Phase E 対象)
+│   ├── shared/common-header.*   共通ヘッダー (Phase A で SiteHeader に置換済み)
+│   ├── claude/ gemini/ codex/ copilot/   18 HTML ガイド (Phase B–E で page.tsx 化へ移行中)
+│   └── git_worktree.html        Mermaid v10 + 手書き SVG (Phase E は移行中)
 └── docs/
     ├── NEXTJS_MIGRATION_PLAN.md      アーキテクト初期プロンプト (Phase 1–14 完了で凍結)
     └── NEXTJS_PHASE_A_F_PLAN.md      Phase A–F 計画 (本 PR で新規)
@@ -105,8 +105,8 @@ bun run format      # Biome format --write
 ### テスト
 
 ```bash
-cd web-next && bun test       # フロントエンド (vitest, 361 件中 360 passed — 既知 1 件は別 Issue)
-cd scraper && uv run pytest   # バックエンド (pytest, 5/5)
+cd web-next && bun test       # フロントエンド (vitest, 最新のテスト結果や既知の Issue は CI 等を参照)
+cd scraper && uv run pytest   # バックエンド (pytest, テスト結果は CI 等を参照)
 ```
 
 ## 重要な設計判断
@@ -191,7 +191,7 @@ Build:     cd web-next && bun run build
 1. `cd web-next && bun run build` が成功
 2. `cd web-next && bun run test` が成功
 3. `cd web-next && bun run typecheck` が成功
-4. `cd web-next && bun run lint` が成功（既知の 6 件 printWidth 違反は別 Issue、新規違反がないこと）
+4. `cd web-next && bun run lint` が成功（既知の違反件数は CI または進捗ドキュメントを参照、新規違反がないこと）
 5. `cd scraper && uv run pytest` が成功
 6. import が有効
 7. 設定ファイルが意図せず変更されていない

@@ -1,0 +1,19 @@
+# .geminiignore — .gitignore と同じ書式
+# コンテキストから除外すべきファイル・フォルダ
+
+# 機密情報
+.env .env.*
+!.env.example  # example は例外で含める
+secrets/ *.key *.pem
+
+# ビルド成果物（大量のトークン浪費を防ぐ）
+.next/ dist/ build/ node_modules/ .pnpm-store/
+
+# 自動生成ファイル（LLMが読む必要がない）
+*.min.js *.min.css *.map supabase/.branches/ supabase/.temp/
+
+# バイナリ・メディア
+*.png *.jpg *.webp *.woff2 *.pdf
+
+# ログ・一時ファイル
+*.log .DS_Store coverage/
