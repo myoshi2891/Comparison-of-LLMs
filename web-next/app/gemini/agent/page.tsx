@@ -296,9 +296,7 @@ export default function GeminiAgentPage() {
           <ol>
             {SECTION_IDS.map((id, i) => (
               <li key={id}>
-                <a href={`#${id}`}>
-                  {i + 1}. {SECTION_TITLES[i]}
-                </a>
+                <a href={`#${id}`}>{SECTION_TITLES[i]}</a>
               </li>
             ))}
             <li>
@@ -1876,23 +1874,26 @@ export default function GeminiAgentPage() {
                 marginBottom: 10,
               }}
             >
-              <div
-                className={styles.layerBadge}
-                style={{
-                  background: "#e8710a",
-                  fontSize: 10,
-                  padding: "3px 7px",
-                  borderRadius: 6,
-                  color: "#fff",
-                  fontWeight: 700,
-                  whiteSpace: "nowrap",
-                  flexShrink: 0,
-                }}
-              >
-                AP2/A2UI
-              </div>
-              <div className={styles.layerTitle} style={{ color: "#fb923c" }}>
-                💳 決済認証 &amp; UI 生成プロトコル（2026年3月18日 新公開）
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <div
+                  className={styles.layerBadge}
+                  style={{
+                    background: "#e8710a",
+                    fontSize: 10,
+                    padding: "3px 7px",
+                    borderRadius: 6,
+                    color: "#fff",
+                    fontWeight: 700,
+                    whiteSpace: "nowrap",
+                    flexShrink: 0,
+                    width: "auto",
+                  }}
+                >
+                  AP2/A2UI
+                </div>
+                <div className={styles.layerTitle} style={{ color: "#fb923c" }}>
+                  💳 決済認証 &amp; UI 生成プロトコル（2026年3月18日 新公開）
+                </div>
               </div>
               <div className={styles.layerBody}>
                 <div className={styles.layerDesc} style={{ color: "#94a3b8" }}>
