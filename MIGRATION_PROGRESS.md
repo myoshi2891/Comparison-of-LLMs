@@ -611,24 +611,24 @@ Next.js 移行プロジェクトの作業を再開してください。
 
 - リポジトリ: LLM-Studies（Phase A–F の Next.js 移行作業中）
 - 現在のブランチ: feat/nextjs-migration
-- 最新 HEAD: 2893581（C-2 faithful 移植完了。git status は clean）
+- 最新 HEAD: d246685（C-2 完了、C-3 開始前。git status は clean）
 - 移行計画: docs/NEXTJS_PHASE_A_F_PLAN.md（Phase A–F）
 - 進捗トラッカー: MIGRATION_PROGRESS.md（**作業開始前に必読**: §「AI 作業ルール」R1（Biome scope）/ R2（faithful 必須）/「Phase C-2 faithful 移植継続ポイント」）
-- Phase C 詳細設計: docs/NEXTJS_PHASE_C_DETAILED_DESIGN.md（§5.2 C-2）
+- Phase C 詳細設計: docs/NEXTJS_PHASE_C_DETAILED_DESIGN.md（§5.3 C-3）
 - プロジェクト固有スキル: .claude/skills/nextjs-page-migration/SKILL.md
 - リポジトリ規約: CLAUDE.md（AGENTS.md / GEMINI.md からも参照される。AI 共通の編集ルール）
 
-次の作業: web-next/app/gemini/agent/page.tsx の **s14 セクション以降を legacy HTML から省略なしで JSX 化**（s14〜s17 + sources、合計 5 セクション残）
+次の作業: web-next/app/codex/agent/page.tsx の **s01 セクションから順に legacy HTML から省略なしで JSX 化**（全 12 セクション）
 
 絶対遵守ルール（R2、Phase C-2 で確定）:
-- legacy/gemini/agent.html の対象セクションを Read で行範囲指定して全部読む
+- legacy/codex/agent.html の対象セクションを Read で行範囲指定して全部読む
 - 全リスト項目・全コードブロック・全 SVG・全 alert・全 table を JSX に転写。要約・省略・縮約は禁止
 - 1 セクション完了ごとに以下を順に実行 → 全部 OK なら 1 コミット → 次のセクションへ:
-  1. cd web-next && bun run test app/gemini/agent/page.test.tsx
-  2. cd web-next && bunx biome check --write app/gemini/agent/page.tsx       # ← R1: 必ずパス指定
-  3. cd web-next && bunx biome check app/gemini/agent/page.tsx app/gemini/agent/page.module.css app/gemini/agent/page.test.tsx
+  1. cd web-next && bun run test app/codex/agent/page.test.tsx
+  2. cd web-next && bunx biome check --write app/codex/agent/page.tsx       # ← R1: 必ずパス指定
+  3. cd web-next && bunx biome check app/codex/agent/page.tsx app/codex/agent/page.module.css app/codex/agent/page.test.tsx
   4. cd web-next && bun run test       # 全 453 件が pass することを確認
-  5. git add web-next/app/gemini/agent/page.tsx && git commit -m "feat(web-next): faithful migration of /gemini/agent <section-id> (...)"
+  5. git add web-next/app/codex/agent/page.tsx && git commit -m "feat(web-next): faithful migration of /codex/agent <section-id> (...)"
 
 絶対禁止:
 - bun run lint:fix / bunx biome check --write （パス引数なし） — リポジトリ全体を書き換えるため（R1 違反）
@@ -637,32 +637,28 @@ Next.js 移行プロジェクトの作業を再開してください。
 - 既存ファイル（pricing.json / scraper / lib/cost.ts 等）への副作用的な変更
 
 セクション別 legacy 行範囲（次セッションが Read で指定する範囲）:
-| Section | legacy/gemini/agent.html 行範囲 | 特記事項 |
+| Section | legacy/codex/agent.html 行範囲 | 特記事項 |
 |---|---|---|
-| s03 | 1792-1888 | AGENTS.md interop |
-| s04 | 1889-2035 | ADK agent.py パターン |
-| s05 | 2036-2121 | .geminiignore / settings.json |
-| s06 | 2122-2189 | ルーティング決定ツリー（flow-wrap）|
-| s07 | 2190-2263 | コスト最適モデル選択（table）|
-| s08 | 2264-2298 | Anti-Patterns |
-| s09 | 2299-2390 | まとめ table |
-| s10 | 2391-2643 | ma-section 開始、ADK×A2A×MCP 4層構造（layer-stack）|
-| s11 | 2644-2777 | agent.json (Agent Card)、code block 含む |
-| s12 | 2778-2873 | マルチエージェント GEMINI.md |
-| s13 | 2874-3033 | Orchestrator + RemoteA2aAgent code block |
-| s14 | 3034-3123 | AgentEngine デプロイ |
-| s15 | 3124-3196 | uc-grid (ユースケース) |
-| s16 | 3197-3231 | マルチエージェント Anti-Patterns |
-| s17 | 3232-3333 | 全ファイル役割まとめ table |
-| sources | 3334-3722 | 25 件の src-card / src-card-new |
+| s01 | 827-1253 | 初学者向け：7ステップ入門ガイド |
+| s02 | 1254-1748 | 全体アーキテクチャと各ファイルの位置づけ |
+| s03 | 1749-1892 | AGENTS.md |
+| s04 | 1893-2090 | サブエージェント向け AGENTS.md 設計パターン詳解 |
+| s05 | 2091-2193 | SKILL.md — 遅延ロード型スキルの設計 |
+| s06 | 2194-2341 | config.toml — マルチエージェントロール定義 |
+| s07 | 2342-2450 | Agents SDK マルチエージェント — PM駆動ファイル生成パターン |
+| s08 | 2451-2523 | サブエージェント スポーン戦略の意思決定ツリー |
+| s09 | 2524-2594 | コスト最適なモデル選択戦略 |
+| s10 | 2595-2627 | 絶対に避けるべき Anti-Patterns |
+| s11 | 2628-2700 | まとめ：各ファイルの役割と設計原則 |
+| sources | 2701-3007 | 参考ソース（公式・一次情報優先） |
 
-参考: Phase C-1 の faithful 移植成果物 web-next/app/claude/agent/page.tsx（1907 行）が正本テンプレート。
+参考: Phase C-2 の faithful 移植成果物 web-next/app/gemini/agent/page.tsx が正本テンプレート。
 SVG・code block・table のパターンはそこを参照すること。
 
 検証コマンド早見表:
   cd web-next && bun run test          # 453/453 passed が期待値
   cd web-next && bun run typecheck     # OK
-  cd web-next && bun run build         # /gemini/agent を含む 10 ルートが ○ (Static)
+  cd web-next && bun run build         # /codex/agent を含む 10 ルートが ○ (Static)
   cd web-next && bun run lint          # 既知 6 件のみ（新規違反ゼロが必須）
   cd scraper && uv run pytest          # 5/5 passed
 
