@@ -28,7 +28,7 @@ Phase 1–14 でコスト計算機ホームページは `web-next/` に移行済
 
 ## セッション開始時に必ず読むファイル（順序固定）
 
-1. **`MIGRATION_PROGRESS.md`** — 現在地（直近は Phase B-3: `legacy/codex/skill.html` → `/codex/skill`）と残タスク、既知の留保事項
+1. **`MIGRATION_PROGRESS.md`** — 現在地・残タスク・既知の留保事項
 2. **このファイル（`.claude/skills/nextjs-page-migration/SKILL.md`）** — 9 ステップの移行手順と Phase 固有ルール
 
 この 2 ファイルを読めば、`docs/NEXTJS_PHASE_A_F_PLAN.md` 本体は参照不要な粒度で着手できる。計画全体や設計判断の経緯を追う必要がある場合のみ Plan を開く。
@@ -117,27 +117,6 @@ wc -l legacy/<provider>/<file>.html
 - 新たに i18n キーを追加した場合、`lib/i18n.test.ts` の `expect(Object.keys(T).length).toBe(N)` を
   **同じコミット内で N+k に更新**すること（B-1 で key count ドリフトが発生、別 commit `b984f16` で後追い同期した）
 
-#### Phase B で確立した 3 つの移植パターン（B-3 / B-4 でも踏襲）
-
-Phase B-1（`/claude/skill`）と B-2（`/gemini/skill`）で共通化された方針。B-3（`/codex/skill`）・B-4（`/copilot/skill`）でも
-そのまま適用できる：
-
-1. **Legacy `<style>` → `page.module.css` に逐語転写**
-   - legacy の `<style>` ブロック（数百行規模）を CSS Modules 1 ファイルへ 1:1 移植する
-   - ファイル冒頭にコメントで「元 HTML の行範囲」を記す（例: `legacy/claude/skill.html の <style> ブロック (行 7-630) を CSS Modules に転写`）
-   - クラス名の命名は legacy をそのまま継承（Biome の camelCase 規則は CSS Modules の export で吸収される）
-
-2. **ブランドカラートークンを `.root` スコープ内に閉じる**
-   - ページ固有の色変数（`--bg` / `--accent` / `--surface` 等）は `.root { ... }` の中で `--*` 定義
-   - `globals.css` の既存トークンを **絶対に上書きしない**（他ページへの影響を避けるため）
-   - `page.module.css` 冒頭コメントに「globals.css の値を上書きしない」旨を明記する運用
-   - 子要素は `.root *` または `.root .className` を経由するのでスコープが自然に閉じる
-
-3. **外部出典は `SOURCES: Source[]` 配列として先頭で構造化**
-   - `page.tsx` の先頭で `type Source = { num, href, title, desc }` を定義し、`const SOURCES: Source[] = [...]` として集約
-   - 末尾の sources セクションは `{SOURCES.map((s) => (...))}` でレンダリング（逐語 HTML を JSX で繰り返さない）
-   - Phase F の redirect 一覧作成時も同じ配列を機械的に走査できる（URL 一覧のシングルソース化）
-   - legacy HTML の `<a href="..." target="_blank" rel="noopener noreferrer">` 属性は **SOURCES 描画部で付与**
 
 ### Step 5: コードブロック（shiki）
 

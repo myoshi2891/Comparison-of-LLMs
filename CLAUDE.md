@@ -20,9 +20,10 @@ update.sh  ← オーケストレーター (scrape → copy)
 │       └── tools/               コーディングツール別スクレイパー (cursor, github_copilot, windsurf, claude_code, jetbrains, openai_codex, google_one, antigravity)
 ├── web-next/           Next.js 16 + React 19 + TypeScript + Tailwind v4 (bun)
 │   ├── app/
-│   │   ├── layout.tsx           ルートレイアウト (Phase A で SiteHeader/DisclaimerBanner 追加済み)
+│   │   ├── layout.tsx           ルートレイアウト (SiteHeader/DisclaimerBanner マウント済み)
 │   │   ├── page.tsx             コスト計算機ホーム (Server Component + Zod 検証 → HomePage へ委譲)
-│   │   └── globals.css          Tailwind v4 + legacy design tokens (227 行)
+│   │   ├── globals.css          Tailwind v4 + legacy design tokens (227 行)
+│   │   └── {claude,gemini,codex,copilot}/{skill,agent}/   Phase B–C 移行済みルート（詳細は MIGRATION_PROGRESS.md）
 │   ├── components/
 │   │   ├── HomePage.tsx         Client Component (Phase 10)
 │   │   ├── ApiTable.tsx / SubTable.tsx / Hero.tsx / ...   (Phase 8-10 成果物)
@@ -49,7 +50,7 @@ update.sh  ← オーケストレーター (scrape → copy)
 │   └── git_worktree.html        Mermaid v10 + 手書き SVG (Phase E は移行中)
 └── docs/
     ├── NEXTJS_MIGRATION_PLAN.md      アーキテクト初期プロンプト (Phase 1–14 完了で凍結)
-    └── NEXTJS_PHASE_A_F_PLAN.md      Phase A–F 計画 (本 PR で新規)
+    └── NEXTJS_PHASE_A_F_PLAN.md      Phase A–F 計画
 ```
 
 ## データフロー
@@ -215,7 +216,7 @@ Phase A–F 遂行中、新規ガイドページ (`claude/`, `gemini/`, `codex/`
 
 - 配置先: `web-next/app/<provider>/<slug>/page.tsx`（`.html` 拡張子は URL に含めない）
 - 旧 legacy URL (`.html` 付き) からの 301 リダイレクトは **Phase F で一括設定**（`netlify.toml [[redirects]]`）
-- 各ページは `DocLayout.tsx` / `CodeBlock.tsx`（shiki build-time）を再利用。Mermaid は `next/dynamic({ ssr: false })` で遅延ロード
+- 各ページは CSS Modules (`page.module.css`) + 契約テスト (`page.test.tsx`) で実装。`DocLayout.tsx` / `CodeBlock.tsx` は Phase D 以降で共通化を検討（現在未作成）。Mermaid は Phase E で `next/dynamic({ ssr: false })` の遅延ロードを導入
 - 契約テスト（タイトル・セクション数・外部リンク rel・metadata）を `page.test.tsx` に配置
 - プロジェクト固有スキル `/nextjs-page-migration` で 1 ページ移行手順を自動化可能
 
@@ -240,12 +241,10 @@ Phase A–F 遂行中、新規ガイドページ (`claude/`, `gemini/`, `codex/`
 - Mermaid 各ステートメントは必ず**改行で分離**すること。（例: `gitGraph LR:` の後に改行。1行に連結するとエラーになる）
 - SVG の `viewBox` 高さとコンテンツ座標の整合性を常に確認
 - SVG `<marker>` の色は対応する `<line>` の `stroke` 色と一致させる
-<!-- - Playwright で検証する際は `browser_take_screenshot` のターゲット要素指定を使う（全体スナップショットはトークン大量消費） -->
 - Playwright MCP ツールはこのプロジェクトでは使用しない（トークン大量消費のため）。HTML の目視確認はユーザーが手動で行う
 
 ### トークン効率ガイドライン
 
 - 単一ファイルの修正には Task エージェントを使わず直接 Read → Edit する
-<!-- - content-heavy HTML（500行超）を Playwright で開く場合、`browser_snapshot` を避ける -->
 - Playwright MCP ツールを使用しない（検証はユーザーが手動で行う）
 - 同一ファイルの重複読み込みを避ける（エージェントに読ませたら再度読まない）

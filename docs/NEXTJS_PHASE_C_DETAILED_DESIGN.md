@@ -14,19 +14,20 @@
 
 ### 1.1 現在地
 
-- **Phase B 完了**: `legacy/{claude,gemini,codex,copilot}/skill.html` × 4 を `web-next/app/<provider>/skill/page.tsx` へ移植済（B-1〜B-4）。
-- **次の作業**: Phase C — `legacy/{claude,gemini,codex,copilot}/agent.html` × 4 を `web-next/app/<provider>/agent/page.tsx` へ移植する。
-- **アプローチ**: Phase B-4（`web-next/app/copilot/skill/`）の実装パターンを **そのまま再適用**。差分は §1.3 の Phase C 固有事情のみ。
+- **Phase C-1 完了**: `legacy/claude/agent.html` → `/claude/agent` 移植済（`2b7a0fa`/`5394d9d`）
+- **Phase C-2 完了**: `legacy/gemini/agent.html` → `/gemini/agent` faithful 移植済（`9dfa184`/`aa9c2ee`〜`448368a`、全 3,722 行 JSX 化）
+- **次の作業**: C-3 — `/codex/agent`（§5.3 参照）
+- **テスト数**: 453（C-3 完了で 461、C-4 完了で 469 見込み）
 
 ### 1.2 セッション開始時に必読のファイル（順序固定）
 
-1. **[`../MIGRATION_PROGRESS.md`](../MIGRATION_PROGRESS.md)** — 「AI 作業ルール」R1（Biome scope）と現在地（Phase B-4 完了 / 437 件 passed）を確認
-2. **本ファイル** — Phase C 全体設計
+1. **[`../MIGRATION_PROGRESS.md`](../MIGRATION_PROGRESS.md)** — 「AI 作業ルール」R1（Biome scope）/ R2（faithful 必須）と現在地（C-2 完了 / 453 件 passed）を確認
+2. **本ファイル** — Phase C 全体設計（§5.3 C-3 を重点確認）
 3. **[`../.claude/skills/nextjs-page-migration/SKILL.md`](../.claude/skills/nextjs-page-migration/SKILL.md)** — 9 ステップ手順（Step 3 Red / Step 4 Green は本書 §4・§5 で具体化）
-4. **B-4 参考実装の 3 点セット**:
-   - [`../web-next/app/copilot/skill/page.tsx`](../web-next/app/copilot/skill/page.tsx) — Source 型 / SOURCES 配列 / TemplateBlock / BpCard ヘルパ
-   - [`../web-next/app/copilot/skill/page.module.css`](../web-next/app/copilot/skill/page.module.css) — `.root` スコープでのブランドカラー閉域
-   - [`../web-next/app/copilot/skill/page.test.tsx`](../web-next/app/copilot/skill/page.test.tsx) — Red 契約テスト 8 件の定型
+4. **C-2 正本テンプレート**（faithful 移植の参考実装）:
+   - [`../web-next/app/gemini/agent/page.tsx`](../web-next/app/gemini/agent/page.tsx) — Source 型 / SOURCES 配列 / Ext ヘルパ / sectionMa パターン
+   - [`../web-next/app/gemini/agent/page.module.css`](../web-next/app/gemini/agent/page.module.css) — `.root` スコープでのブランドカラー閉域
+   - [`../web-next/app/gemini/agent/page.test.tsx`](../web-next/app/gemini/agent/page.test.tsx) — Red 契約テスト 8 件の定型
 
 ### 1.3 Phase B 想定との差分（要注意）
 
