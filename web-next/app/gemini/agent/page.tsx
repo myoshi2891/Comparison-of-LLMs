@@ -2308,15 +2308,148 @@ export default function GeminiAgentPage() {
         <section id="s12" className={`${styles.section} ${styles.sectionMa}`}>
           <div className={styles.sectionHead}>
             <span className={styles.sectionNum}>12</span>
-            <h2>{SECTION_TITLES[11]}</h2>
+            <h2>
+              マルチエージェント向け <span className={styles.mono}>GEMINI.md</span> — Orchestrator
+              の「作戦指令書」
+            </h2>
           </div>
-          <div className={styles.card}>
-            <p>
-              Orchestrator 用の GEMINI.md には
-              <strong>各リモートエージェントの責務・呼び分け基準・失敗時の代替策</strong>
-              を明記します。「作戦指令書」として、どのエージェントを
-              いつ・なぜ呼ぶかを言語化するのが要点です。
-            </p>
+
+          <div className={`${styles.alert} ${styles.alertSuccess}`}>
+            <div className={styles.alertIcon}>✅</div>
+            <div className={styles.alertContent}>
+              <strong>GEMINI.md はマルチエージェント全体の品質ゲートウェイ</strong>
+              Orchestrator は GEMINI.md を読み込んで「どのエージェントをいつ呼ぶか」を判断します。
+              サブエージェントには独立した <code>agent.py instruction</code> がありますが、
+              <strong>Orchestrator のルーティング精度は GEMINI.md の記述品質で決まります。</strong>
+              A2A リモートエージェントのエンドポイント
+              URL・ファイル所有権・フォールバック戦略を必ず記載します。
+            </div>
+          </div>
+
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>GEMINI.md — マルチエージェント向け追記テンプレート（rootに追加）</span>
+              <span className={styles.lang}>Markdown</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.ch}># PROJECT: enterprise-dev-platform</span>
+              {"\n"}
+              <span className={styles.cc}>
+                ## Stack / Overview ... （既存セクションはそのまま）
+              </span>
+              {"\n\n"}
+              <span className={styles.ch}>
+                {"## ────────────────────────────────────────────────────────────\n"}
+                {"## Multi-Agent Configuration（マルチエージェント設定）\n"}
+                {"## ────────────────────────────────────────────────────────────"}
+              </span>
+              {"\n\n"}
+              <span className={styles.ch}>
+                ### ローカル サブエージェント（同一プロセス・ADK sub_agents）
+              </span>
+              {"\n"}
+              {"同一サービス内・低レイテンシが必要な場合に使用:\n"}
+              {"| Agent name | 役割 | 書き込み可能パス |\n"}
+              {"|---|---|---|\n"}
+              {"| "}
+              <span className={styles.cs}>spec-writer</span>
+              {" | 新機能の仕様書作成 | "}
+              <span className={styles.cs}>docs/specs/</span>
+              {" |\n"}
+              {"| "}
+              <span className={styles.cs}>code-implementer</span>
+              {" | コード実装 | "}
+              <span className={styles.cs}>src/, tests/</span>
+              {" |\n"}
+              {"| "}
+              <span className={styles.cs}>test-generator</span>
+              {" | テスト生成 | "}
+              <span className={styles.cs}>tests/</span>
+              {" |\n\n"}
+              <span className={styles.cw}>
+                ファイル所有権ルール: 担当外のパスへの書き込みは禁止。
+                同一ファイルへの複数エージェント同時書き込みは禁止。
+              </span>
+              {"\n\n"}
+              <span className={styles.ch}>### リモート エージェント（A2A Protocol 経由）</span>
+              {"\n"}
+              {"別チーム・別フレームワーク・専門性が必要な場合に使用:\n"}
+              {"| Agent name | Agent Card URL | 備考 |\n"}
+              {"|---|---|---|\n"}
+              {"| "}
+              <span className={styles.cs}>code-review-agent</span>
+              {" | "}
+              <span className={styles.cv}>
+                https://review.internal.example.com/.well-known/agent.json
+              </span>
+              {" | セキュリティ・品質レビュー |\n"}
+              {"| "}
+              <span className={styles.cs}>security-scanner</span>
+              {" | "}
+              <span className={styles.cv}>
+                https://security.internal.example.com/.well-known/agent.json
+              </span>
+              {" | 本番デプロイ前必須 |\n"}
+              {"| "}
+              <span className={styles.cs}>doc-generator</span>
+              {" | "}
+              <span className={styles.cv}>
+                https://docs.internal.example.com/.well-known/agent.json
+              </span>
+              {" | API ドキュメント生成 |\n\n"}
+              <span className={styles.ch}>### A2A 通信ルール</span>
+              {"\n"}
+              {"- リモートエージェント呼び出し前に Agent Card の "}
+              <span className={styles.cs}>skills</span>
+              {" を確認して適切なエージェントを選択\n"}
+              {"- タイムアウト（> 30秒）→ ローカルフォールバックを試みる\n"}
+              {"- 認証エラー → リトライせず即座にユーザーへ報告\n"}
+              {"- リモートエージェントが「Read-only」の場合、ファイル変更は要求しない\n\n"}
+              <span className={styles.ch}>### Quality Gates（全エージェント共通）</span>
+              {"\n"}
+              {"- コード変更後: "}
+              <span className={styles.cs}>`pytest tests/`</span>
+              {" と "}
+              <span className={styles.cs}>`ruff check .`</span>
+              {" を必ず実行\n"}
+              {"- 本番デプロイ前: "}
+              <span className={styles.cs}>security-scanner</span>
+              {" エージェントを**必ず**呼ぶ\n"}
+              {"- DB マイグレーション: "}
+              <span className={styles.cs}>db-agent</span>
+              {" 経由でのみ実行（直接 SQL は禁止）\n\n"}
+              <span className={styles.ch}>
+                ### @import で分割管理（GEMINI.md が肥大化した場合）
+              </span>
+              {"\n"}
+              <span className={styles.cc}>
+                # 各エージェントのルールが多い場合は以下のように分割
+              </span>
+              {"\n"}
+              <span className={styles.cm}>@import ./agents/orchestrator/GEMINI.md</span>
+              {"  "}
+              <span className={styles.cc}># Orchestratorルーティングルール</span>
+              {"\n"}
+              <span className={styles.cm}>@import ./agents/implementer/GEMINI.md</span>
+              {"  "}
+              <span className={styles.cc}># 実装エージェント固有ルール</span>
+              {"\n"}
+              <span className={styles.cm}>@import ./docs/agent-endpoints.md</span>
+              {"  "}
+              <span className={styles.cc}># リモートエンドポイント一覧</span>
+            </div>
+          </div>
+
+          <div className={`${styles.alert} ${styles.alertWarn}`}>
+            <div className={styles.alertIcon}>⚠️</div>
+            <div className={styles.alertContent}>
+              <strong>サービス固有 GEMINI.md の配置戦略（Auto-scan 活用）</strong>
+              マルチエージェントシステムではサービス数が増えるため GEMINI.md が肥大化しやすい。
+              <code>agents/code-review/GEMINI.md</code>（レビュー固有ルール）のように
+              <strong>エージェントディレクトリ内に配置</strong>し、
+              そのエージェントが作業するときのみ Auto-scan でロードされる構成を推奨。 ルート
+              GEMINI.md からは <code>@import</code> で共通部分のみを参照させる。
+            </div>
           </div>
         </section>
 
