@@ -2925,22 +2925,33 @@ export default function GeminiAgentPage() {
         <section id="s16" className={`${styles.section} ${styles.sectionMa}`}>
           <div className={styles.sectionHead}>
             <span className={styles.sectionNum}>16</span>
-            <h2>{SECTION_TITLES[15]}</h2>
+            <h2>マルチエージェント固有の Anti-Patterns — 設計・運用両面</h2>
           </div>
-          <div className={`${styles.alert} ${styles.alertDanger}`}>
-            <span className={styles.alertIcon}>🚫</span>
-            <div className={styles.alertContent}>
-              <strong>Agent Card を非公開にしない</strong>
-              <code>agent.json</code> は他エージェントが能力を発見する唯一の手段です。 認証は{" "}
-              <code>auth</code> フィールドで宣言し、カード自体は公開してください。
+
+          <div className={styles.patGrid}>
+            <div className={`${styles.pat} ${styles.patNg}`}>
+              <div className={styles.patLabel}>✗ agent.json / Agent Card の Anti-Patterns</div>
+              <ul>
+                <li>description が曖昧（「なんでもやります」A2A エージェント）</li>
+                <li>securitySchemes を設定しない（認証なし公開）</li>
+                <li>skills を定義しない（能力発見ができず Orchestrator から使われない）</li>
+                <li>agent.json の description と agent.py の instruction が乖離</li>
+                <li>version を更新せず破壊的変更（サイレントな障害の原因）</li>
+                <li>url が内部 IP のまま本番公開</li>
+              </ul>
             </div>
-          </div>
-          <div className={`${styles.alert} ${styles.alertWarn}`}>
-            <span className={styles.alertIcon}>⚠️</span>
-            <div className={styles.alertContent}>
-              <strong>同期呼び出しでループを作らない</strong>
-              Orchestrator → Remote → Orchestrator の循環は容易にデッドロックします。
-              非同期メッセージ + タイムアウトを基本にしてください。
+            <div className={`${styles.pat} ${styles.patNg}`}>
+              <div className={styles.patLabel}>✗ GEMINI.md / Orchestration の Anti-Patterns</div>
+              <ul>
+                <li>GEMINI.md にリモートエンドポイント URL を書かない（管理外に散乱）</li>
+                <li>ParallelAgent で同じ output_key を使う（上書き競合・最大の地雷）</li>
+                <li>LoopAgent の終了条件・max_iterations を設定しない（無限ループ）</li>
+                <li>
+                  全リモートエージェントに gemini-2.5-pro / gemini-3.1-pro-preview（コスト爆発）
+                </li>
+                <li>エージェント間のファイル所有権を定義しない（書き込み競合）</li>
+                <li>A2A タイムアウト・フォールバック戦略を GEMINI.md に記載しない</li>
+              </ul>
             </div>
           </div>
         </section>
