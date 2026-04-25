@@ -941,28 +941,125 @@ export default function GeminiAgentPage() {
         <section id="s03" className={styles.section}>
           <div className={styles.sectionHead}>
             <span className={styles.sectionNum}>3</span>
-            <h2>{SECTION_TITLES[2]}</h2>
+            <h2>
+              <span className={styles.mono}>AGENTS.md</span> — クロスツール互換戦略
+            </h2>
           </div>
+
           <div className={styles.card}>
             <p>
-              <code>AGENTS.md</code> は Gemini CLI / Android Studio / Codex / Cursor など
-              <strong>複数 AI ツールが共通で読む</strong>
-              ことを前提に標準化が進んでいるファイルです。 ツール固有指示は GEMINI.md に、共通指示は
-              AGENTS.md に分離するのが基本戦略となります。
+              チームで <strong>Claude Code・Gemini CLI・Cursor・Codex</strong> を混在して使う場合、
+              <code>AGENTS.md</code>{" "}
+              を共通エントリポイントとして採用する戦略が推奨されています。各ツール固有の設定は別ファイルに分離し、
+              <code>AGENTS.md</code> から参照します。
             </p>
           </div>
-          <CodeBlock
-            lang="Markdown"
-            body={`# AGENTS.md
-## Build & Test
-- Build: \`pnpm build\`
-- Test:  \`pnpm test\`
 
-## Conventions
-- TypeScript strict, no \`any\`
-- Result<T, E> でエラーを表現、throw 禁止
-`}
-          />
+          <div className={styles.tblWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>ツール</th>
+                  <th>デフォルトファイル</th>
+                  <th>代替ファイル</th>
+                  <th>カスタマイズ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Gemini CLI</td>
+                  <td>
+                    <code>GEMINI.md</code>
+                  </td>
+                  <td>
+                    <code>AGENTS.md</code>
+                  </td>
+                  <td>
+                    <code>settings.json context.fileName</code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Gemini Code Assist</td>
+                  <td>
+                    <code>GEMINI.md</code>
+                  </td>
+                  <td>
+                    <code>AGENT.md</code>
+                  </td>
+                  <td>IDE設定</td>
+                </tr>
+                <tr>
+                  <td>Android Studio (Gemini)</td>
+                  <td>
+                    <code>AGENTS.md</code>
+                  </td>
+                  <td>-</td>
+                  <td>複数ファイル自動スキャン</td>
+                </tr>
+                <tr>
+                  <td>Claude Code</td>
+                  <td>
+                    <code>CLAUDE.md</code>
+                  </td>
+                  <td>
+                    <code>AGENTS.md</code> (読む)
+                  </td>
+                  <td>-</td>
+                </tr>
+                <tr>
+                  <td>Codex</td>
+                  <td>
+                    <code>AGENTS.md</code>
+                  </td>
+                  <td>-</td>
+                  <td>-</td>
+                </tr>
+                <tr>
+                  <td>Cursor</td>
+                  <td>
+                    <code>.cursorrules</code>
+                  </td>
+                  <td>
+                    <code>AGENTS.md</code>
+                  </td>
+                  <td>-</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>AGENTS.md (共通エントリポイント)</span>
+              <span className={styles.lang}>Markdown</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.ch}># Agent Rules (Cross-tool shared)</span>
+              {"\n"}
+              <span className={styles.cc}>
+                # このファイルは GEMINI.md / CLAUDE.md / Cursor などすべてのツールで共通利用
+              </span>
+              {"\n\n"}
+              <span className={styles.cm}>## Universal Rules</span>
+              {"\n"}
+              {"- コードは TypeScript strict モード\n"}
+              {"- テストなしのコードを本番にマージしない\n"}
+              {"- DB マイグレーションは必ず dry-run で確認後に実行\n"}
+              {"- セキュリティ: SQL直結は禁止、Prepared Statement 必須\n\n"}
+              <span className={styles.cm}>## Tool-Specific Context</span>
+              {"\n"}
+              <span className={styles.cc}># Gemini 固有の追加設定は GEMINI.md を参照</span>
+              {"\n"}
+              {"@./GEMINI.md "}
+              <span className={styles.cc}># Gemini CLI/Code Assist のみ有効</span>
+              {"\n\n"}
+              <span className={styles.cm}>## Agent Domains</span>
+              {"\n"}
+              {"- frontend: app/, components/, styles/, public/\n"}
+              {"- backend: supabase/, lib/server/, api/\n"}
+              {"- database: supabase/migrations/, schema files"}
+            </div>
+          </div>
         </section>
 
         {/* s04: ADK agent.py */}
