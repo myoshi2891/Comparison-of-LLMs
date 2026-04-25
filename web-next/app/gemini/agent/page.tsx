@@ -1292,24 +1292,157 @@ export default function GeminiAgentPage() {
         <section id="s05" className={styles.section}>
           <div className={styles.sectionHead}>
             <span className={styles.sectionNum}>5</span>
-            <h2>{SECTION_TITLES[4]}</h2>
+            <h2>
+              <span className={styles.mono}>.geminiignore</span> と{" "}
+              <span className={styles.mono}>settings.json</span> — 制御ファイル設計
+            </h2>
           </div>
-          <div className={styles.card}>
-            <p>
-              <code>.geminiignore</code> はファイル走査範囲を絞り込み、
-              <code>settings.json</code> は CLI / Code Assist の挙動を制御します。 いずれも
-              GEMINI.md と組み合わせてセキュリティ境界を作るのが基本です。
-            </p>
+
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>.geminiignore</span>
+              <span className={styles.lang}>Ignore rules</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.cc}># .geminiignore — .gitignore と同じ書式</span>
+              {"\n"}
+              <span className={styles.cc}># コンテキストから除外すべきファイル・フォルダ</span>
+              {"\n\n"}
+              <span className={styles.cw}># 機密情報</span>
+              {"\n"}
+              {".env .env.*\n"}
+              <span className={styles.ck}>!.env.example</span>
+              {"  "}
+              <span className={styles.cc}># example は例外で含める</span>
+              {"\n"}
+              {"secrets/ *.key *.pem\n\n"}
+              <span className={styles.cw}># ビルド成果物（大量のトークン浪費を防ぐ）</span>
+              {"\n"}
+              {".next/ dist/ build/ node_modules/ .pnpm-store/\n\n"}
+              <span className={styles.cw}># 自動生成ファイル（LLMが読む必要がない）</span>
+              {"\n"}
+              {"*.min.js *.min.css *.map supabase/.branches/ supabase/.temp/\n\n"}
+              <span className={styles.cw}># バイナリ・メディア</span>
+              {"\n"}
+              {"*.png *.jpg *.webp *.woff2 *.pdf\n\n"}
+              <span className={styles.cw}># ログ・一時ファイル</span>
+              {"\n"}
+              {"*.log .DS_Store coverage/"}
+            </div>
           </div>
-          <CodeBlock
-            lang=".geminiignore"
-            body={`node_modules/
-.env*
-*.log
-dist/
-coverage/
-`}
-          />
+
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>settings.json (Gemini CLI / .gemini/)</span>
+              <span className={styles.lang}>JSON</span>
+            </div>
+            <div className={styles.codeBody}>
+              {"{\n"}
+              {"  "}
+              <span className={styles.cm}>"contextFileName"</span>
+              {": ["}
+              <span className={styles.cs}>"GEMINI.md"</span>
+              {", "}
+              <span className={styles.cs}>"AGENTS.md"</span>
+              {"],  "}
+              <span className={styles.cc}>{"// 複数ファイル対応"}</span>
+              {"\n"}
+              {"  "}
+              <span className={styles.cm}>"planMode"</span>
+              {": "}
+              <span className={styles.ck}>true</span>
+              {",\n"}
+              {"  "}
+              <span className={styles.cc}>
+                {"// Plan Mode デフォルト有効（v0.29.0〜）：read-only で安全に計画立案"}
+              </span>
+              {"\n"}
+              {"  "}
+              <span className={styles.cm}>"mcpServers"</span>
+              {": {\n"}
+              {"    "}
+              <span className={styles.cm}>"filesystem"</span>
+              {": {\n"}
+              {"      "}
+              <span className={styles.cm}>"command"</span>
+              {": "}
+              <span className={styles.cs}>"npx"</span>
+              {",\n"}
+              {"      "}
+              <span className={styles.cm}>"args"</span>
+              {": ["}
+              <span className={styles.cs}>"-y"</span>
+              {", "}
+              <span className={styles.cs}>"@modelcontextprotocol/server-filesystem"</span>
+              {", "}
+              <span className={styles.cs}>"./src"</span>
+              {"]\n"}
+              {"    },\n"}
+              {"    "}
+              <span className={styles.cm}>"github"</span>
+              {": {\n"}
+              {"      "}
+              <span className={styles.cm}>"command"</span>
+              {": "}
+              <span className={styles.cs}>"npx"</span>
+              {",\n"}
+              {"      "}
+              <span className={styles.cm}>"args"</span>
+              {": ["}
+              <span className={styles.cs}>"-y"</span>
+              {", "}
+              <span className={styles.cs}>"@modelcontextprotocol/server-github"</span>
+              {"],\n"}
+              {"      "}
+              <span className={styles.cm}>"env"</span>
+              {": {\n"}
+              {"        "}
+              <span className={styles.cm}>"GITHUB_TOKEN"</span>
+              {": "}
+              <span className={styles.cs}>
+                "${"{"}GITHUB_TOKEN{"}"}"
+              </span>
+              {"\n"}
+              {"      }\n"}
+              {"    }\n"}
+              {"  },\n"}
+              {"  "}
+              <span className={styles.cm}>"excludeTools"</span>
+              {": ["}
+              <span className={styles.cs}>"run_shell_command"</span>
+              {"],\n"}
+              {"  "}
+              <span className={styles.cc}>{"// セキュリティ: シェル実行を無効化"}</span>
+              {"\n"}
+              {"  "}
+              <span className={styles.cm}>"checkpointing"</span>
+              {": "}
+              <span className={styles.ck}>true</span>
+              {"\n"}
+              {"  "}
+              <span className={styles.cc}>{"// 変更前に自動チェックポイント保存"}</span>
+              {"\n}"}
+            </div>
+          </div>
+
+          <div className={`${styles.alert} ${styles.alertSuccess}`}>
+            <span className={styles.alertIcon}>✅</span>
+            <div className={styles.alertContent}>
+              <strong>
+                /memory・/plan・/rewind — コンテキスト＆セッション管理コマンド（2026年3月現在）
+              </strong>
+              Gemini CLI の <code>/memory show</code>{" "}
+              で現在ロードされている全コンテキストを確認できます。
+              <code>/memory refresh</code> で再スキャン、
+              <code>/memory add &lt;text&gt;</code> でグローバル GEMINI.md に即時追記が可能です。
+              <br />
+              <code>/plan</code>（v0.29.0〜）を使うと <strong>Plan Mode</strong>（read-only
+              環境）に入り、実装前に安全にコードベース分析・変更計画の立案ができます（v0.33.0〜はリサーチサブエージェントも内蔵）。
+              <br />
+              <code>/rewind</code>
+              （v0.27.0〜）でセッション履歴を遡ることができ、誤った操作のロールバックに使えます。
+            </div>
+          </div>
         </section>
 
         {/* s06: ルーティング設計 */}
