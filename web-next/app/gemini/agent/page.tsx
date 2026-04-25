@@ -1449,25 +1449,92 @@ export default function GeminiAgentPage() {
         <section id="s06" className={styles.section}>
           <div className={styles.sectionHead}>
             <span className={styles.sectionNum}>6</span>
-            <h2>{SECTION_TITLES[5]}</h2>
+            <h2>サブエージェント ルーティング設計の意思決定ツリー</h2>
           </div>
+
           <div className={styles.flowWrap}>
-            <div className={styles.flowTitle}>SUB-AGENT ROUTING DECISION TREE</div>
+            <div className={styles.flowTitle}>
+              ADK / Gemini サブエージェント ルーティング決定フロー
+            </div>
+
             <div className={styles.flowRow}>
-              <div className={styles.fnQ}>タスクが 3 件以上で互いに独立か?</div>
+              <div className={styles.fnQ}>タスクが 3件以上ある？</div>
               <div className={styles.fnArr}>→ NO →</div>
-              <div className={styles.fnN}>メインエージェントで処理</div>
+              <div className={styles.fnN}>単一エージェントで処理</div>
             </div>
-            <div className={styles.fnIndent}>↓ YES</div>
-            <div className={styles.flowRow}>
-              <div className={styles.fnQ}>タスク間に依存関係がある?</div>
-              <div className={styles.fnArr}>→ YES →</div>
-              <div className={styles.fnN}>SequentialAgent (直列)</div>
-            </div>
-            <div className={styles.fnIndent}>↓ NO</div>
-            <div className={styles.flowRow}>
-              <div className={styles.fnY}>✅ ParallelAgent (並列)</div>
-              <div className={styles.fnLabel}>frontend / backend / db を同時起動</div>
+
+            <div className={styles.fnIndent}>
+              <div className={styles.flowRow} style={{ marginTop: 12 }}>
+                <div className={styles.fnLabel}>↓ YES</div>
+              </div>
+              <div className={styles.flowRow}>
+                <div className={styles.fnQ}>
+                  タスク間に依存関係がある？
+                  <br />
+                  <small style={{ fontWeight: 400, fontSize: 11 }}>
+                    (B の処理に A の出力が必要)
+                  </small>
+                </div>
+                <div className={styles.fnArr}>→ YES →</div>
+                <div className={styles.fnN}>
+                  SequentialAgent
+                  <br />
+                  <small>A → B → C</small>
+                </div>
+              </div>
+
+              <div className={styles.fnIndent}>
+                <div className={styles.flowRow} style={{ marginTop: 12 }}>
+                  <div className={styles.fnLabel}>↓ NO</div>
+                </div>
+                <div className={styles.flowRow}>
+                  <div className={styles.fnQ}>
+                    繰り返し精緻化が必要？
+                    <br />
+                    <small style={{ fontWeight: 400, fontSize: 11 }}>
+                      (品質基準達成まで繰り返す)
+                    </small>
+                  </div>
+                  <div className={styles.fnArr}>→ YES →</div>
+                  <div className={styles.fnN}>
+                    LoopAgent
+                    <br />
+                    <small>draft → critique → refine</small>
+                  </div>
+                </div>
+
+                <div className={styles.fnIndent}>
+                  <div className={styles.flowRow} style={{ marginTop: 12 }}>
+                    <div className={styles.fnLabel}>↓ NO</div>
+                  </div>
+                  <div className={styles.flowRow}>
+                    <div className={styles.fnQ}>
+                      各エージェントが異なる
+                      <br />
+                      output_key に書き込む？
+                    </div>
+                    <div className={styles.fnArr}>→ NO →</div>
+                    <div className={styles.fnN}>
+                      output_key を設計し直す
+                      <br />
+                      <small>レースコンディション防止</small>
+                    </div>
+                  </div>
+
+                  <div className={styles.fnIndent}>
+                    <div className={styles.flowRow} style={{ marginTop: 12 }}>
+                      <div className={styles.fnLabel}>↓ YES</div>
+                    </div>
+                    <div className={styles.flowRow}>
+                      <div className={styles.fnY}>
+                        ✅ ParallelAgent
+                        <br />
+                        <small>A ‖ B ‖ C（並列実行）</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
