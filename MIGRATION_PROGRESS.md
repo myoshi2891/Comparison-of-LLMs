@@ -9,7 +9,7 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- **最新 HEAD**: `c8ef2b8`（C-2 faithful 移植 hero/s01〜s13 完了）。**C-2 faithful 移植継続中**（s14〜s17 + sources 残 → 下記「Phase C-2 faithful 移植継続ポイント」参照）
+- **最新 HEAD**: `b92a97f`（C-2 faithful 移植 hero/s01〜s13 完了）。**C-2 faithful 移植継続中**（s14〜s17 + sources 残 → 下記「Phase C-2 faithful 移植継続ポイント」参照）
 - **未コミット作業**: なし（working tree クリーン）
 - **コミット済み（C-2 関連、新しい順）**:
   - `c8ef2b8` feat(web-next): faithful migration of /gemini/agent s13 (Orchestrator + RemoteA2aAgent) (+245/-30)
@@ -606,7 +606,7 @@ Next.js 移行プロジェクトの作業を再開してください。
 
 - リポジトリ: LLM-Studies（Phase A–F の Next.js 移行作業中）
 - 現在のブランチ: feat/nextjs-migration
-- 最新 HEAD: c8ef2b8（C-2 faithful 移植 hero/s01〜s13 完了。git status は clean）
+- 最新 HEAD: b92a97f（C-2 faithful 移植 hero/s01〜s13 完了。git status は clean）
 - 移行計画: docs/NEXTJS_PHASE_A_F_PLAN.md（Phase A–F）
 - 進捗トラッカー: MIGRATION_PROGRESS.md（**作業開始前に必読**: §「AI 作業ルール」R1（Biome scope）/ R2（faithful 必須）/「Phase C-2 faithful 移植継続ポイント」）
 - Phase C 詳細設計: docs/NEXTJS_PHASE_C_DETAILED_DESIGN.md（§5.2 C-2）
