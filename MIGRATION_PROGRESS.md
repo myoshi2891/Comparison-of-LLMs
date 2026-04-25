@@ -9,7 +9,7 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- **最新 HEAD**: `448368a`（**C-2 faithful 移植 完了** — hero/s01〜s17 + sources 全件完了）。**次は C-3 `/codex/agent` の Red → Green → faithful 移植**
+- **最新 HEAD**: `2893581`（**C-2 faithful 移植 完了** — hero/s01〜s17 + sources 全件完了）。**次は C-3 `/codex/agent` の Red → Green → faithful 移植**
 - **未コミット作業**: なし（working tree クリーン）
 - **コミット済み（C-2 関連、新しい順）**:
   - `448368a` feat(web-next): faithful migration of /gemini/agent sources (25 src-cards with srcCardNew split)
@@ -611,7 +611,7 @@ Next.js 移行プロジェクトの作業を再開してください。
 
 - リポジトリ: LLM-Studies（Phase A–F の Next.js 移行作業中）
 - 現在のブランチ: feat/nextjs-migration
-- 最新 HEAD: 2da99d4（C-2 faithful 移植 hero/s01〜s13 完了。git status は clean）
+- 最新 HEAD: 2893581（C-2 faithful 移植完了。git status は clean）
 - 移行計画: docs/NEXTJS_PHASE_A_F_PLAN.md（Phase A–F）
 - 進捗トラッカー: MIGRATION_PROGRESS.md（**作業開始前に必読**: §「AI 作業ルール」R1（Biome scope）/ R2（faithful 必須）/「Phase C-2 faithful 移植継続ポイント」）
 - Phase C 詳細設計: docs/NEXTJS_PHASE_C_DETAILED_DESIGN.md（§5.2 C-2）
@@ -680,7 +680,7 @@ SVG・code block・table のパターンはそこを参照すること。
 
 ## Phase C-2 faithful 移植 — 完了記録
 
-### 最終状態（HEAD: `448368a`、working tree クリーン）
+### 最終状態（HEAD: `2893581`、working tree クリーン）
 
 | ファイル | 状態 | 内容 |
 |---|---|---|
