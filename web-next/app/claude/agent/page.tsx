@@ -498,7 +498,9 @@ const SECTION_IDS = [
   "s17",
 ] as const;
 
-const SECTION_TITLES = [
+type TupleStr<T extends readonly unknown[]> = { [K in keyof T]: string };
+
+const SECTION_TITLES: TupleStr<typeof SECTION_IDS> = [
   "全体アーキテクチャと各 Markdown の位置づけ",
   "CLAUDE.md — メインエージェントのグローバル設定",
   "サブエージェント定義 .claude/agents/*.md",

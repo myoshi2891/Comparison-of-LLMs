@@ -1,5 +1,5 @@
-// Phase C-2 [Red] contract test. Expected to FAIL until Green phase
-// implements app/gemini/agent/page.tsx.
+// Phase C-2 [Green] contract test.
+// Validates the successful implementation of app/gemini/agent/page.tsx.
 
 /**
  * Phase C-2 契約テスト (/gemini/agent)。

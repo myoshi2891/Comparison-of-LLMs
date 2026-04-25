@@ -959,7 +959,7 @@
   padding: 1.2rem 1rem;
   text-align: center;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   transition: border-color 0.2s;
 }
 .pdLevel:hover {
