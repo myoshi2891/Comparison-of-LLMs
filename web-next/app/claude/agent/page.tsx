@@ -470,7 +470,7 @@ const SOURCES: Source[] = [
   // additional source to reach 23
   {
     num: "23",
-    href: "https://docs.anthropic.com/en/docs/claude-code/agent-teams",
+    href: "https://docs.anthropic.com/en/docs/claude-code/agent-teams#settings-and-hooks",
     title: "🟢 Anthropic 公式: Agent Teams — Settings & Hooks リファレンス",
     desc: "settings.json の CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS 設定・TeammateIdle/TaskCompleted フックの exit code 仕様・クリーンアップ手順の詳細",
   },
