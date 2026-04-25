@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     "最新の Google Gemini CLI (as of 2026-03)・最新の ADK (as of 2026-03)・最新のエージェント連携プロトコル (A2A/AP2/A2UI等) 時代のサブエージェント / マルチエージェント開発で必要な GEMINI.md・AGENTS.md・agent.py・agent.json・.geminiignore・settings.json の役割と書き方を体系化したガイド。",
 };
 
-type Source = { icon: string; title: string; href: string; desc: string };
+type Source = { icon: string; title: string; href: string; display: string; desc: string };
 
 function Ext({ href, children }: { href: string; children: ReactNode }) {
   return (
@@ -65,158 +65,190 @@ const SECTION_TITLES = [
 const _assertLengthsMatch: (typeof SECTION_IDS)["length"] = SECTION_TITLES.length;
 void _assertLengthsMatch;
 
-// ── SOURCES (12 既存 + 13 新規 = 25 件) ──────────────────────────────
+// ── SOURCES (12 既存 + 13 新規 A2A = 25 件) ─────────────────────────
 
-const SOURCES: Source[] = [
+const SOURCES_EXISTING: Source[] = [
   {
     icon: "🔵",
     title: "Gemini CLI 公式: GEMINI.md ドキュメント",
     href: "https://google-gemini.github.io/gemini-cli/docs/cli/gemini-md.html",
-    desc: "GEMINI.md の階層・優先順位・命名ルールの一次情報",
+    display: "google-gemini.github.io/gemini-cli/docs/cli/gemini-md.html",
+    desc: "階層ロード仕様・@import構文・/memory コマンド・context.fileName 設定の公式リファレンス",
   },
   {
     icon: "🟢",
     title: "Google Developers: Gemini Code Assist agent mode",
     href: "https://developers.google.com/gemini-code-assist/docs/use-agentic-chat-pair-programmer",
-    desc: "Agent mode の動作と CLI / IDE 統合の概要",
+    display: "developers.google.com/gemini-code-assist/docs/use-agentic-chat-pair-programmer",
+    desc: "GEMINI.md / AGENT.md の使い方・IDE設定・MCP サーバー設定の公式ガイド",
   },
   {
     icon: "🟡",
     title: "Google Cloud Docs: Gemini Code Assist agent mode",
     href: "https://docs.cloud.google.com/gemini/docs/codeassist/use-agentic-chat-pair-programmer",
-    desc: "Cloud 側の公式ドキュメント。設定キーの正本",
+    display: "docs.cloud.google.com/gemini/docs/codeassist/use-agentic-chat-pair-programmer",
+    desc: "Cloud コンソール向けのエージェントモード設定・スコープ別 GEMINI.md 配置テーブル",
   },
   {
     icon: "🔴",
     title: "Android Developers: AGENTS.md ファイル",
     href: "https://developer.android.com/studio/gemini/agent-files",
-    desc: "Android Studio における AGENTS.md / GEMINI.md の使い分け",
+    display: "developer.android.com/studio/gemini/agent-files",
+    desc: "Android Studio での AGENTS.md 複数ファイル配置・自動スキャン仕様",
   },
   {
     icon: "🟣",
     title: "ADK 公式: Multi-agent systems",
     href: "https://google.github.io/adk-docs/agents/multi-agents/",
-    desc: "Agent Development Kit のマルチエージェント設計パターン",
+    display: "google.github.io/adk-docs/agents/multi-agents/",
+    desc: "SequentialAgent / ParallelAgent / LoopAgent / LLM委譲の公式仕様。sub_agents・output_key の設計指針",
   },
   {
     icon: "🟠",
     title: "Google Cloud Blog: Multi-agent patterns in ADK",
     href: "https://developers.googleblog.com/developers-guide-to-multi-agent-patterns-in-adk/",
-    desc: "Sequential / Parallel / LoopAgent の使い分け解説",
+    display: "developers.googleblog.com/developers-guide-to-multi-agent-patterns-in-adk/",
+    desc: "description フィールドの重要性・AutoFlow メカニズム・ParallelAgent のレースコンディション対策",
   },
   {
     icon: "⚪",
     title: "Google Cloud Blog: Building Collaborative AI (ADK)",
     href: "https://cloud.google.com/blog/topics/developers-practitioners/building-collaborative-ai-a-developers-guide-to-multi-agent-systems-with-adk",
-    desc: "ADK で協調エージェントを組み立てる開発者向けガイド",
+    display:
+      "cloud.google.com/blog/topics/developers-practitioners/building-collaborative-ai-a-developers-guide-to-multi-agent-systems-with-adk",
+    desc: "ADK エージェント階層・3種ワークフローエージェントの使い分け・通信メカニズムの詳解",
   },
   {
     icon: "🔵",
     title: "Addy Osmani: Gemini CLI Tips & Tricks",
     href: "https://addyosmani.com/blog/gemini-cli/",
-    desc: "Gemini CLI の実用 Tips と GEMINI.md 運用例",
+    display: "addyosmani.com/blog/gemini-cli/",
+    desc: "GEMINI.md 実践テクニック・チェックポイント・/restore コマンド・@ファイル参照のベストプラクティス",
   },
   {
     icon: "🟢",
     title: "Google Cloud Medium: GEMINI.md hierarchy Part 1",
     href: "https://medium.com/google-cloud/practical-gemini-cli-instruction-following-gemini-md-hierarchy-part-1-3ba241ac5496",
-    desc: "GEMINI.md 階層解決の挙動を実測ベースで解説",
+    display:
+      "medium.com/google-cloud/practical-gemini-cli-instruction-following-gemini-md-hierarchy-part-1",
+    desc: "GEMINI.md 階層の実験的検証・優先度・オーバーライド挙動の実践レポート",
   },
   {
     icon: "🟡",
     title: "GitHub: AGENTS.md 標準化ディスカッション",
     href: "https://github.com/google-gemini/gemini-cli/discussions/1471",
-    desc: "AGENTS.md をクロスツール標準にする議論スレッド",
+    display: "github.com/google-gemini/gemini-cli/discussions/1471",
+    desc: "クロスツール AGENTS.md 標準化の提案・Gemini / Claude / Codex / Cursor の相互運用戦略の議論",
   },
   {
     icon: "⚫",
     title: "Phil Schmid: Gemini CLI Cheatsheet",
     href: "https://www.philschmid.de/gemini-cli-cheatsheet",
-    desc: "コマンド・設定キー・ホットキーのチートシート",
+    display: "philschmid.de/gemini-cli-cheatsheet",
+    desc: "settings.json 全フィールド・.geminiignore・@import 構文の網羅的リファレンス",
   },
   {
     icon: "🔴",
     title: "Google Codelabs: Build Multi-Agent Systems with ADK",
     href: "https://codelabs.developers.google.com/codelabs/production-ready-ai-with-gc/3-developing-agents/build-a-multi-agent-system-with-adk",
-    desc: "本番環境向け ADK マルチエージェント構築の Codelab",
+    display: "codelabs.developers.google.com/…/build-a-multi-agent-system-with-adk",
+    desc: "SequentialAgent / LoopAgent 実装のハンズオン・session state キーテンプレート",
   },
+];
+
+const SOURCES_NEW: Source[] = [
   {
     icon: "🌐",
-    title: "ADK 公式: A2A Protocol 入門",
+    title: "ADK 公式: A2A Protocol 入門（Introduction to A2A）",
     href: "https://google.github.io/adk-docs/a2a/intro/",
-    desc: "Agent2Agent (A2A) プロトコルの概念と用語",
+    display: "google.github.io/adk-docs/a2a/intro/",
+    desc: "RemoteA2aAgent の仕組み・Exposing（to_a2a）vs Consuming・A2A Server のアーキテクチャ図の公式解説",
   },
   {
     icon: "🟢",
-    title: "ADK 公式: A2A Quickstart (Exposing)",
+    title: "ADK 公式: A2A Quickstart — エージェントを公開する（Exposing）",
     href: "https://google.github.io/adk-docs/a2a/quickstart-exposing/",
-    desc: "ローカル ADK エージェントを A2A エンドポイントとして公開する手順",
+    display: "google.github.io/adk-docs/a2a/quickstart-exposing/",
+    desc: "to_a2a() 関数・adk api_server --a2a・agent.json 配置ルール・Auto-generated Agent Card の仕様（公式一次情報）",
   },
   {
     icon: "🔵",
     title: "Google Blog: Agent2Agent (A2A) Protocol 発表",
     href: "https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/",
-    desc: "A2A 公開発表記事。設計思想と背景",
+    display: "developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/",
+    desc: "A2A の設計思想・Agent Card によるディスカバリー・50 以上のパートナー企業・MCP との補完関係の公式解説（2025年4月）",
   },
   {
     icon: "🟡",
     title: "Google Cloud Blog: ADK エージェントを A2A に変換する",
     href: "https://cloud.google.com/blog/products/ai-machine-learning/unlock-ai-agent-collaboration-convert-adk-agents-for-a2a",
-    desc: "既存 ADK エージェントを A2A 互換にする変換手順",
+    display: "cloud.google.com/blog/…/unlock-ai-agent-collaboration-convert-adk-agents-for-a2a",
+    desc: "AgentSkill・AgentCard 実装方法・AgentTaskManager・Orchestrator の Discovery パターン・コード実例（2025年7月）",
   },
   {
     icon: "🟣",
-    title: "Google Developers Blog: ADK + Interactions API",
+    title: "Google Developers Blog: ADK + Interactions API（Deep Research 連携）",
     href: "https://developers.googleblog.com/building-agents-with-the-adk-and-the-new-interactions-api/",
-    desc: "Interactions API を活用した ADK エージェント構築",
+    display: "developers.googleblog.com/building-agents-with-the-adk-and-the-new-interactions-api/",
+    desc: "InteractionsApiTransport で A2A ← → Gemini Deep Research Agent を接続する方法・A2A Extensions の活用（2025年12月）",
   },
   {
     icon: "🟠",
-    title: "Google Codelabs: A2A Purchasing Concierge",
+    title: "Google Codelabs: A2A Purchasing Concierge（クロスフレームワーク実例）",
     href: "https://codelabs.developers.google.com/intro-a2a-purchasing-concierge",
-    desc: "A2A 入門 Codelab。複数エージェント連携の手触り",
+    display: "codelabs.developers.google.com/intro-a2a-purchasing-concierge",
+    desc: "ADK（Orchestrator）+ CrewAI + LangGraph の A2A 接続・AgentEngine デプロイ・agent.json 実際のサンプル・A2A 通信フロー詳解",
   },
   {
     icon: "⚫",
-    title: "Harris Solangi: Building Connected AI Agents",
+    title: "Harris Solangi (Medium): Building Connected AI Agents — ADK & A2A",
     href: "https://harrissolangi.medium.com/building-connected-ai-agents-googles-adk-and-the-a2a-protocol-704ce3347cfc",
-    desc: "ADK + A2A による接続型エージェント設計の実践",
+    display:
+      "harrissolangi.medium.com/building-connected-ai-agents-googles-adk-and-the-a2a-protocol",
+    desc: 'ADK の "Agent Triangle" 原則・A2A ディスカバリーフロー・RemoteA2aAgent を「ローカルツール」として扱う設計哲学（2025年12月）',
   },
   {
     icon: "🔴",
-    title: "GitGuardian Blog: Multi-Agent Security Pipeline with A2A",
+    title: "GitGuardian Blog: Multi-Agent Security Pipeline with A2A（動的ディスカバリー実装）",
     href: "https://blog.gitguardian.com/building-a-multi-agent-security-pipeline-with-googles-a2a-protocol-and-gitguardian/",
-    desc: "A2A + GitGuardian でセキュリティ自動化パイプラインを構築",
+    display:
+      "blog.gitguardian.com/building-a-multi-agent-security-pipeline-with-googles-a2a-protocol-and-gitguardian/",
+    desc: "Discovery Service パターンの実装コード・RemoteA2aAgent の動的生成・ハードコードなしオーケストレーション・A2A のフレームワーク非依存性実証（2025年12月）",
   },
   {
     icon: "🟥",
-    title: "Gemini モデル一覧 (Gemini API 公式)",
+    title: "Gemini モデル一覧 — Gemini API 公式（2026年3月現在）",
     href: "https://ai.google.dev/gemini-api/docs/models",
-    desc: "現行 Gemini モデル ID と特性の一次情報",
+    display: "ai.google.dev/gemini-api/docs/models",
+    desc: "gemini-3.1-pro-preview / gemini-3-flash-preview / gemini-2.5-flash 等の現行モデルID・コンテキスト長・価格の公式一覧",
   },
   {
     icon: "⛔",
-    title: "Gemini deprecations (廃止スケジュール)",
+    title: "Gemini deprecations — モデル廃止スケジュール（Gemini API 公式）",
     href: "https://ai.google.dev/gemini-api/docs/deprecations",
-    desc: "旧モデルの廃止時期。本番運用前に必ず確認",
+    display: "ai.google.dev/gemini-api/docs/deprecations",
+    desc: "gemini-2.0-flash 廃止予定（2026-06-01）・gemini-3-pro-preview 廃止（2026-03-09）等の公式廃止スケジュール",
   },
   {
     icon: "🟦",
-    title: "ADK TypeScript / JavaScript SDK",
+    title: "ADK TypeScript / JavaScript SDK — 公式 npm パッケージ（@google/adk）",
     href: "https://github.com/google/adk-typescript",
-    desc: "Node.js / TypeScript 環境向け ADK 実装",
+    display: "github.com/google/adk-typescript",
+    desc: "ADK TypeScript 1.0 GA。Python と同等の LlmAgent / SequentialAgent / ParallelAgent / LoopAgent API・A2A サポート・npm install @google/adk",
   },
   {
     icon: "🟧",
-    title: "Google Developers Blog: AP2 / A2UI / AG-UI 新プロトコル",
+    title: "Google Developers Blog: AP2 / A2UI / AG-UI 新プロトコル発表（2026年3月18日）",
     href: "https://developers.googleblog.com/en/new-agent-protocols-ap2-a2ui-ag-ui/",
-    desc: "A2A の上位プロトコル群（AP2 / A2UI / AG-UI）の俯瞰",
+    display: "developers.googleblog.com/en/new-agent-protocols-ap2-a2ui-ag-ui/",
+    desc: "AP2（決済・認証フロープロトコル）・A2UI / AG-UI（エージェント→UI ストリーミング生成）の設計思想・ADK AgentUITransport との統合方法",
   },
   {
     icon: "🟩",
-    title: "ADK Python 2.0 Alpha (グラフベース)",
+    title: "ADK Python 2.0 Alpha — グラフベースワークフロー（公式ドキュメント）",
     href: "https://google.github.io/adk-docs/agents/workflow-agents/graph/",
-    desc: "ADK 2.0 のグラフベース ワークフローエージェント",
+    display: "google.github.io/adk-docs/agents/workflow-agents/graph/",
+    desc: "ADK 2.0 Alpha の GraphAgent API。DAG 形式でエージェントフローを定義・条件分岐ノード・並列ブランチ・ループをコードで宣言的に記述",
   },
 ];
 
@@ -3086,16 +3118,25 @@ export default function GeminiAgentPage() {
         <section id="sources" className={styles.section}>
           <div className={styles.sectionHead}>
             <span className={styles.sectionNum}>📚</span>
-            <h2>参考ソース（25 件 — Gemini CLI / ADK / A2A / AP2 / A2UI 対応）</h2>
+            <h2>参考ソース（公式・一次情報優先）</h2>
           </div>
           <div className={styles.srcGrid}>
-            {SOURCES.map((s) => (
+            {SOURCES_EXISTING.map((s) => (
               <div key={s.href} className={styles.srcCard}>
-                <div className={styles.srcTitle}>
-                  <span className={styles.srcIcon}>{s.icon}</span> {s.title}
-                </div>
+                <div className={styles.srcIcon}>{s.icon}</div>
+                <div className={styles.srcTitle}>{s.title}</div>
                 <div className={styles.srcUrl}>
-                  <Ext href={s.href}>{s.href}</Ext>
+                  <Ext href={s.href}>{s.display}</Ext>
+                </div>
+                <div className={styles.srcDesc}>{s.desc}</div>
+              </div>
+            ))}
+            {SOURCES_NEW.map((s) => (
+              <div key={s.href} className={`${styles.srcCard} ${styles.srcCardNew}`}>
+                <div className={styles.srcIcon}>{s.icon}</div>
+                <div className={styles.srcTitle}>{s.title}</div>
+                <div className={styles.srcUrl}>
+                  <Ext href={s.href}>{s.display}</Ext>
                 </div>
                 <div className={styles.srcDesc}>{s.desc}</div>
               </div>
