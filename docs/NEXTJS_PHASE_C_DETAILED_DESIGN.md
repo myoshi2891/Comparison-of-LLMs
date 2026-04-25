@@ -224,7 +224,7 @@ function BpCard({ variant, title, desc }: { variant: "violet" | "teal" | ...; ti
 | 契約テスト #3 のキーワード | `Gemini`（legacy `<h1>` には未含のため Hero `<h1>` 先頭に "Gemini" を補填） |
 | 契約テスト #4 の id 数（N） | **18**（s01〜s17 の 17 件 + sources の 1 件） |
 | CSS Module 状態 | **コミット済み**（`page.module.css`、1,329 行、`cb62441`） |
-| page.tsx 状態 | **作成済み・faithful 移植中**（Green `aa9c2ee` → s01 `e9e9547` → s02 `90b163e` → s03 `8b582a3` → s04 `9d1a6bd` → s05 `60cf089` → s06 `1cd285f` → s07 `3a03261` → s08 `7e4aa2f` → s09 `c42542d` → s10 `fb235dc` → s11 `8e49dd4` → s12 `7ede8d7` → s13 `c8ef2b8`、s14〜s17 + sources は縮約版残存）。詳細は MIGRATION_PROGRESS.md §「Phase C-2 faithful 移植継続ポイント」 |
+| page.tsx 状態 | **faithful 移植完了**（最新 `448368a`。hero/s01〜s17/sources 全件 commit 済み。SOURCES_EXISTING 12 件 + SOURCES_NEW 13 件 + srcCardNew 分割対応）。詳細は MIGRATION_PROGRESS.md §「Phase C-2 faithful 移植 — 完了記録」 |
 | faithful 移植ルール | **R2 厳守**: legacy HTML の全リスト項目・全コードブロック・全 SVG・全 alert・全 table を JSX に転写。要約・省略・縮約禁止（MIGRATION_PROGRESS.md §「AI 作業ルール R2」参照） |
 
 **セクション 10〜17 の注意**: マルチエージェント系セクションは `sectionMa` クラスを追加（緑アクセント、CSS で定義済み）。`className={\`${styles.section} ${styles.sectionMa}\`}` を使用。
