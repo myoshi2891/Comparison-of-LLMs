@@ -1666,52 +1666,99 @@ export default function GeminiAgentPage() {
         <section id="s09" className={styles.section}>
           <div className={styles.sectionHead}>
             <span className={styles.sectionNum}>9</span>
-            <h2>{SECTION_TITLES[8]}</h2>
+            <h2>まとめ：各ファイルの役割と設計原則</h2>
           </div>
+
           <div className={styles.tblWrap}>
             <table>
               <thead>
                 <tr>
                   <th>ファイル</th>
-                  <th>役割</th>
-                  <th>更新頻度</th>
+                  <th>ツール</th>
+                  <th>読者</th>
+                  <th>設計原則</th>
+                  <th>アンチパターン</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td>
-                    <code>GEMINI.md</code>
+                    <code>~/.gemini/GEMINI.md</code>
                   </td>
-                  <td>プロジェクト全体のコンテキスト</td>
-                  <td>低</td>
+                  <td>CLI</td>
+                  <td>全プロジェクト共通</td>
+                  <td>個人のグローバルデフォルト。IDE・言語の好みのみ</td>
+                  <td>プロジェクト固有の内容を書く</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>GEMINI.md</code> (root)
+                  </td>
+                  <td>CLI/Code Assist</td>
+                  <td>メインエージェント（常時ロード）</td>
+                  <td>プロジェクト概要・スタック・ルーティングルール・禁止操作</td>
+                  <td>コードスニペット・機密情報・肥大化</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>src/*/GEMINI.md</code>
+                  </td>
+                  <td>CLI/Code Assist</td>
+                  <td>そのモジュール作業時のみ（Auto-scan）</td>
+                  <td>ドメイン固有ルールのみ。root と重複させない</td>
+                  <td>rootと同じ内容の重複記述</td>
                 </tr>
                 <tr>
                   <td>
                     <code>AGENTS.md</code>
                   </td>
-                  <td>クロスツール共通指示</td>
-                  <td>低</td>
+                  <td>全ツール共通</td>
+                  <td>すべてのAIエージェント</td>
+                  <td>ツール横断の共通ルール。固有設定は@importで分離</td>
+                  <td>ツール固有の構文を混在</td>
                 </tr>
                 <tr>
                   <td>
-                    <code>agent.py</code>
+                    <code>agents/*/agent.py</code>
+                    <br />
+                    <small>
+                      （または <code>agent.ts</code>）
+                    </small>
                   </td>
-                  <td>ADK サブエージェント定義</td>
-                  <td>中</td>
+                  <td>ADK Python / ADK TypeScript</td>
+                  <td>各サブエージェント（独立コンテキスト）</td>
+                  <td>
+                    description 明確化・output_key 一意設定・ツール最小化。TSは{" "}
+                    <code>@google/adk</code>
+                  </td>
+                  <td>曖昧なdescription・output_key重複</td>
                 </tr>
                 <tr>
                   <td>
                     <code>.geminiignore</code>
                   </td>
-                  <td>走査範囲の制御</td>
-                  <td>低</td>
+                  <td>CLI/Code Assist</td>
+                  <td>コンテキストシステム</td>
+                  <td>機密・ビルド成果物・バイナリを除外してトークン節約</td>
+                  <td>作成しない（node_modules が全部ロードされる）</td>
                 </tr>
                 <tr>
                   <td>
                     <code>settings.json</code>
                   </td>
-                  <td>CLI / IDE 挙動制御</td>
-                  <td>低</td>
+                  <td>CLI/IDE</td>
+                  <td>Geminiランタイム</td>
+                  <td>MCP設定・除外ツール・checkpointing・planMode の制御</td>
+                  <td>直接APIキーを記述する</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>README.md</code>
+                  </td>
+                  <td>全ツール</td>
+                  <td>人間（チームメンバー）</td>
+                  <td>エージェント構成・ADKセットアップ・pipeline図</td>
+                  <td>エージェント数が多いのに作成しない</td>
                 </tr>
               </tbody>
             </table>
