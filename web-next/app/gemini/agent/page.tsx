@@ -2835,23 +2835,88 @@ export default function GeminiAgentPage() {
         <section id="s15" className={`${styles.section} ${styles.sectionMa}`}>
           <div className={styles.sectionHead}>
             <span className={styles.sectionNum}>15</span>
-            <h2>{SECTION_TITLES[14]}</h2>
+            <h2>マルチエージェント ユースケース別 設計パターン</h2>
           </div>
+
           <div className={styles.ucGrid}>
             <div className={styles.uc}>
-              <div className={styles.ucIcon}>🛒</div>
-              <div className={styles.ucTitle}>購買コンシェルジュ</div>
-              <div className={styles.ucDesc}>在庫確認 → 発注 → 通知の直列パイプライン</div>
+              <div className={styles.ucIcon}>🏢</div>
+              <div className={styles.ucTitle}>エンタープライズ クロスチーム協調</div>
+              <div className={styles.ucDesc}>
+                フロント・バックエンド・セキュリティチームがそれぞれ独立した A2A
+                エージェントを管理。Orchestrator が Agent Card
+                を使って最適なエージェントを自動選択。異なるフレームワーク（ADK / LangGraph /
+                CrewAI）間も A2A で接続可能。
+              </div>
+              <div className={styles.ucCode}>
+                Orchestrator (ADK)
+                <br />→ frontend-agent (LangGraph, A2A)
+                <br />→ backend-agent (ADK, A2A)
+                <br />→ security-agent (CrewAI, A2A)
+              </div>
             </div>
+
             <div className={styles.uc}>
               <div className={styles.ucIcon}>🔍</div>
-              <div className={styles.ucTitle}>セキュリティ監査</div>
-              <div className={styles.ucDesc}>SAST / SCA / Secret Scan を並列実行</div>
+              <div className={styles.ucTitle}>動的ディスカバリー（Discovery Service パターン）</div>
+              <div className={styles.ucDesc}>
+                Orchestrator がハードコードされたエージェントリストを持たず、Discovery Service
+                に問い合わせてリモートエージェントを動的に発見。
+                <code>RemoteA2aAgent</code>
+                を実行時に生成して <code>sub_agents</code> に追加する高度なパターン。
+              </div>
+              <div className={styles.ucCode}>
+                await discover_agents() # registry に問合せ
+                <br />→ RemoteA2aAgent を動的生成
+                <br />→ LlmAgent に tools として追加
+                <br />→ LLM が最適エージェントを自律選択
+              </div>
             </div>
+
             <div className={styles.uc}>
-              <div className={styles.ucIcon}>📊</div>
-              <div className={styles.ucTitle}>BI レポート生成</div>
-              <div className={styles.ucDesc}>SQL 生成 → 可視化 → レビューのループ</div>
+              <div className={styles.ucIcon}>🔄</div>
+              <div className={styles.ucTitle}>LoopAgent + A2A レビューループ</div>
+              <div className={styles.ucDesc}>
+                実装エージェント（ローカル）がコードを書き、レビューエージェント（リモート
+                A2A）が品質評価。評価スコアが閾値を超えるまで繰り返す品質保証ループ。LoopAgent の
+                <code>max_iterations</code> で無限ループを防止。
+              </div>
+              <div className={styles.ucCode}>
+                LoopAgent(
+                <br />
+                sub_agents=[
+                <br />
+                implementer, # ローカル
+                <br />
+                code_review_remote], # A2A リモート
+                <br />
+                max_iterations=5
+                <br />) # output_key "quality_score" が80以上で終了
+              </div>
+            </div>
+
+            <div className={styles.uc}>
+              <div className={styles.ucIcon}>⚡</div>
+              <div className={styles.ucTitle}>ParallelAgent + マルチリージョン分析</div>
+              <div className={styles.ucDesc}>
+                異なるリージョン・データセンターで動く分析エージェントを ParallelAgent
+                で同時呼び出し。<code>output_key</code>
+                を必ず一意にしてレースコンディションを防止。集計エージェントが並列結果を統合。
+              </div>
+              <div className={styles.ucCode}>
+                ParallelAgent(
+                <br />
+                sub_agents=[
+                <br />
+                RemoteA2aAgent(us_analyzer, # output_key="us_result"
+                <br />
+                agent_card_url=US_URL),
+                <br />
+                RemoteA2aAgent(eu_analyzer, # output_key="eu_result"
+                <br />
+                agent_card_url=EU_URL)]
+                <br />) # ⚠ output_key は必ず一意に！
+              </div>
             </div>
           </div>
         </section>
