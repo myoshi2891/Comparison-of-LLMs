@@ -1543,46 +1543,82 @@ export default function GeminiAgentPage() {
         <section id="s07" className={styles.section}>
           <div className={styles.sectionHead}>
             <span className={styles.sectionNum}>7</span>
-            <h2>{SECTION_TITLES[6]}</h2>
+            <h2>コスト最適なモデル選択戦略</h2>
           </div>
-          <div className={`${styles.alert} ${styles.alertDanger}`}>
-            <span className={styles.alertIcon}>🚨</span>
-            <div className={styles.alertContent}>
-              <strong>旧モデルの廃止スケジュールを必ず確認</strong>
-              Gemini モデルは半年〜1 年単位で deprecation が進みます。本番投入前に公式 deprecation
-              ページを確認してください。
-            </div>
-          </div>
+
           <div className={styles.tblWrap}>
             <table>
               <thead>
                 <tr>
-                  <th>モデル</th>
+                  <th>Model</th>
                   <th>用途</th>
-                  <th>サブエージェント例</th>
+                  <th>ADK agent.py サブエージェント例</th>
+                  <th>特徴</th>
                 </tr>
               </thead>
               <tbody>
+                <tr style={{ opacity: 0.6 }}>
+                  <td>
+                    <code>gemini-2.0-flash</code>
+                    <br />
+                    <small style={{ color: "#e53935" }}>⚠️ 2026-06-01廃止</small>
+                  </td>
+                  <td>高速・低コスト</td>
+                  <td>コードベース探索、ファイル検索、単純変換</td>
+                  <td>
+                    <span className={`${styles.chip} ${styles.chipGreen}`}>最速</span>
+                    廃止前は探索用途のみ。<code>gemini-2.5-flash</code>へ移行推奨
+                  </td>
+                </tr>
                 <tr>
                   <td>
                     <code>gemini-2.5-flash</code>
                   </td>
-                  <td>高速・低コスト</td>
-                  <td>コードベース探索、ファイル検索</td>
+                  <td>バランス重視</td>
+                  <td>コードレビュー、テスト生成、実装、コーディネーター</td>
+                  <td>
+                    <span className={`${styles.chip} ${styles.chipBlue}`}>安定デフォルト</span>{" "}
+                    コスパ最良
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>gemini-3-flash-preview</code>
+                    <br />
+                    <small style={{ color: "#1e8e3e" }}>✅ CLI デフォルト（v0.29.0〜）</small>
+                  </td>
+                  <td>次世代バランス</td>
+                  <td>コードレビュー、テスト生成、実装、コーディネーター</td>
+                  <td>
+                    <span className={`${styles.chip} ${styles.chipBlue}`}>推奨デフォルト</span>{" "}
+                    SWE-bench 76%（2.5 Pro相当）・低レイテンシ
+                  </td>
                 </tr>
                 <tr>
                   <td>
                     <code>gemini-2.5-pro</code>
                   </td>
-                  <td>バランス重視</td>
-                  <td>コードレビュー、テスト生成、実装</td>
+                  <td>高精度・複雑推論</td>
+                  <td>アーキテクチャ設計、セキュリティ監査、ADR作成</td>
+                  <td>
+                    <span className={`${styles.chip} ${styles.chipPurple}`}>
+                      最高精度（旧世代）
+                    </span>{" "}
+                    高コスト
+                  </td>
                 </tr>
                 <tr>
                   <td>
-                    <code>gemini-2.5-pro</code>（thinking 強化）
+                    <code>gemini-3.1-pro-preview</code>
+                    <br />
+                    <small style={{ color: "#1e8e3e" }}>✅ CLI v0.31.0〜対応</small>
                   </td>
-                  <td>難解な設計判断</td>
-                  <td>アーキテクト、ADR 作成</td>
+                  <td>最新高精度推論</td>
+                  <td>アーキテクチャ設計、セキュリティ監査（ARC-AGI-2: 77.1%）</td>
+                  <td>
+                    <span className={`${styles.chip} ${styles.chipPurple}`}>新世代最高精度</span>{" "}
+                    Gemini 3 Proの2倍超推論力。AI Ultra / 有料APIキー限定
+                  </td>
                 </tr>
               </tbody>
             </table>
