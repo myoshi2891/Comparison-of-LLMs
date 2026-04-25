@@ -1629,21 +1629,35 @@ export default function GeminiAgentPage() {
         <section id="s08" className={styles.section}>
           <div className={styles.sectionHead}>
             <span className={styles.sectionNum}>8</span>
-            <h2>{SECTION_TITLES[7]}</h2>
+            <h2>絶対に避けるべき Anti-Patterns</h2>
           </div>
-          <div className={`${styles.alert} ${styles.alertDanger}`}>
-            <span className={styles.alertIcon}>🚫</span>
-            <div className={styles.alertContent}>
-              <strong>サブエージェントに全ツール権限を渡さない</strong>
-              ADK / Gemini CLI ともデフォルトで全ツール有効になります。 Read-only
-              エージェントには明示的に allowlist を絞り込んでください。
+
+          <div className={styles.patGrid}>
+            <div className={`${styles.pat} ${styles.patNg}`}>
+              <div className={styles.patLabel}>✗ GEMINI.md の Anti-Patterns</div>
+              <ul>
+                <li>コードスタイル規約をすべて1ファイルに詰める（@import で分割）</li>
+                <li>長大なコードスニペットを埋め込む（トークン浪費）</li>
+                <li>機密情報・APIキーを記述（.geminiignore で除外）</li>
+                <li>否定形のみの指示（代替案をセットで示す）</li>
+                <li>修正履歴・変更ログを蓄積</li>
+                <li>ツール固有の設定を混在させる</li>
+              </ul>
             </div>
-          </div>
-          <div className={`${styles.alert} ${styles.alertWarn}`}>
-            <span className={styles.alertIcon}>⚠️</span>
-            <div className={styles.alertContent}>
-              <strong>GEMINI.md にコードスタイルを書かない</strong>
-              linter / formatter の責務を奪うとトークン消費とハルシネーションを増やします。
+            <div className={`${styles.pat} ${styles.patNg}`}>
+              <div className={styles.patLabel}>✗ ADK agent.py / agent.ts の Anti-Patterns</div>
+              <ul>
+                <li>description が曖昧（「なんでもやる」エージェント）</li>
+                <li>ParallelAgent で同じ output_key を使う（上書き発生）</li>
+                <li>LoopAgent の終了条件を設定しない（無限ループ）</li>
+                <li>
+                  全エージェントに gemini-2.5-pro / gemini-3.1-pro-preview を使う（コスト爆発）
+                </li>
+                <li>ルートエージェントが直接コードを書く（委譲しない）</li>
+                <li>10件以上のサブエージェントを ParallelAgent で同時起動</li>
+                <li>ADK 2.0 Alpha のグラフAPIを本番に使う（まだ安定版ではない）</li>
+                <li>Plan Mode を無効化したまま本番コードベースを変更させる</li>
+              </ul>
             </div>
           </div>
         </section>
