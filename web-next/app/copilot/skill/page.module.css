@@ -49,7 +49,11 @@
 @media (prefers-reduced-motion: reduce) {
   .root *,
   .root *::before,
-  .root *::after {
+  .root *::after,
+  .bp:hover,
+  .skcatItem:hover,
+  .pdLevel:hover,
+  .fc:hover {
     transition: none;
     animation-duration: 0.001ms;
     animation-iteration-count: 1;
@@ -224,7 +228,8 @@
   text-decoration: none;
   transition: color 0.15s;
 }
-.toc a:hover {
+.toc a:hover,
+.toc a:focus-visible {
   color: var(--ms);
 }
 
@@ -914,7 +919,8 @@
   word-break: break-all;
   transition: color 0.15s;
 }
-.src a:hover {
+.src a:hover,
+.src a:focus-visible {
   color: var(--gh);
 }
 .sd {
