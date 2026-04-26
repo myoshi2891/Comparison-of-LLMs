@@ -32,6 +32,12 @@ type RichEntry = {
 
 type Entry = PlainEntry | RichEntry;
 
+/**
+ * Determines whether a translation entry provides a JSX render factory.
+ *
+ * @param entry - The translation entry to inspect
+ * @returns `true` if `entry` is a `RichEntry` (has a `render` function), `false` otherwise
+ */
 function isRichEntry(entry: Entry): entry is RichEntry {
   return "render" in entry;
 }
@@ -268,9 +274,13 @@ export function t(key: TranslationKey, lang: Lang): string {
 }
 
 /**
- * React ノードとしての翻訳を返す。
- * PlainEntry の場合は文字列をそのまま返す (ReactNode として有効)。
- * RichEntry の場合は render(lang) を実行し JSX を合成する。
+ * Produce a translation as a React node for the given key and language.
+ *
+ * For plain entries this returns the raw string; for rich entries this returns the JSX produced by the entry's `render` function.
+ *
+ * @param key - The translation key to look up
+ * @param lang - Language code (`"ja"` or `"en"`)
+ * @returns A `ReactNode` containing the translation: a string for plain entries or rendered JSX for rich entries
  */
 export function tRich(key: TranslationKey, lang: Lang): ReactNode {
   const entry: Entry = T[key];

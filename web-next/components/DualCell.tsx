@@ -15,6 +15,18 @@ interface Props {
   annualNote?: string | null;
 }
 
+/**
+ * Render a stacked cost cell showing USD and converted JPY values with color-coded classes.
+ *
+ * Displays a USD value and its JPY equivalent in a single table cell; the visual classes applied
+ * are derived from the USD amount to indicate styling. If `annualNote` is provided and truthy,
+ * it is rendered as a supplementary sub-note.
+ *
+ * @param usd - The USD amount used for display and class selection
+ * @param jpyRate - The conversion rate used to compute and format the JPY value
+ * @param annualNote - Optional note to display beneath the amounts when present
+ * @returns A JSX element representing the composed cost cell containing USD, JPY, and optional note
+ */
 export function DualCell({ usd, jpyRate, annualNote }: Props) {
   const n = colorIndex(usd);
   return (
