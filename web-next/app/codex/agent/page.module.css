@@ -1,0 +1,814 @@
+/* legacy/codex/agent.html の <style> ブロック (行 7–786) を CSS Modules に転写。
+   globals.css の値を上書きしない。すべての変数定義と子セレクタは .root 配下に閉じる。
+   @import (Google Fonts) は削除済み — next/font/google (lib/fonts.ts) で代替。 */
+
+.root {
+  --bg: #0a0a0a;
+  --surface: #111111;
+  --surface2: #1a1a1a;
+  --surface3: #222222;
+  --border: #2a2a2a;
+  --border2: #333333;
+  --oai: #10a37f;
+  --oai-dim: #0d8a6b;
+  --oai-glow: rgba(16, 163, 127, 0.15);
+  --blue: #3b82f6;
+  --purple: #8b5cf6;
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --teal: #14b8a6;
+  --text: #f0f0f0;
+  --text2: #b8b8b8;
+  --text3: #959595;
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.root * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ── TOP NAV ── */
+.root .nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10, 10, 10, 0.88);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+:global(body.has-common-header) .root .nav {
+  top: var(--ch-height);
+}
+.root .nav-logo {
+  width: 28px;
+  height: 28px;
+  background: var(--oai);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.root .nav-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.root .nav-sep {
+  color: var(--text3);
+}
+.root .nav-sub {
+  font-size: 12px;
+  color: var(--text3);
+}
+.root .nav-right {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+}
+.root .nav-chip {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 2px 10px;
+  font-size: 11px;
+  color: var(--text3);
+}
+
+/* ── Wrapper ── */
+.root .wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 52px 24px 100px;
+}
+
+/* ── Hero ── */
+.root .hero {
+  position: relative;
+  background: linear-gradient(135deg, #0d1f18 0%, #050d0a 50%, #070512 100%);
+  border: 1px solid #1a3028;
+  border-radius: 20px;
+  padding: 56px 52px;
+  margin-bottom: 64px;
+  overflow: hidden;
+}
+.root .hero::before {
+  content: "";
+  position: absolute;
+  top: -100px;
+  right: -100px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(16, 163, 127, 0.1) 0%, transparent 60%);
+  pointer-events: none;
+}
+.root .hero::after {
+  content: "";
+  position: absolute;
+  bottom: -80px;
+  left: 20%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.07) 0%, transparent 65%);
+  pointer-events: none;
+}
+.root .hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(16, 163, 127, 0.12);
+  border: 1px solid rgba(16, 163, 127, 0.3);
+  border-radius: 24px;
+  padding: 5px 16px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--oai);
+  margin-bottom: 24px;
+}
+.root .hero h1 {
+  font-size: 2.7rem;
+  font-weight: 800;
+  line-height: 1.12;
+  margin-bottom: 20px;
+  letter-spacing: -0.02em;
+}
+.root .hero h1 em {
+  font-style: normal;
+  color: var(--oai);
+}
+.root .hero p {
+  color: var(--text2);
+  font-size: 1.05rem;
+  max-width: 640px;
+  line-height: 1.75;
+}
+.root .hero-meta {
+  display: flex;
+  gap: 10px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
+.root .hero-tag {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 4px 14px;
+  font-size: 12px;
+  color: var(--text2);
+}
+
+/* ── Section ── */
+.root .sec {
+  margin-bottom: 64px;
+}
+.root .sec-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 28px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border2);
+}
+.root .sec-num {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--oai), #0d8a6b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 800;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 0 16px rgba(16, 163, 127, 0.3);
+}
+.root .sec-head h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.root .sec-head small {
+  color: var(--text3);
+  font-size: 13px;
+  font-weight: 400;
+  margin-left: 6px;
+}
+
+/* ── Card ── */
+.root .card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px 32px;
+  margin-bottom: 20px;
+}
+.root .card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.root .card p {
+  color: var(--text2);
+  margin-bottom: 10px;
+}
+.root .card p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Hierarchy load diagram ── */
+.root .load-chain {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 32px;
+  margin: 20px 0;
+}
+.root .load-chain-title {
+  text-align: center;
+  color: var(--text3);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 28px;
+}
+.root .load-steps {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  justify-content: center;
+}
+.root .load-step {
+  flex: 1;
+  max-width: 200px;
+  text-align: center;
+  position: relative;
+}
+.root .load-box {
+  border-radius: 12px;
+  padding: 16px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  margin: 0 6px;
+}
+.root .lb-global {
+  background: rgba(16, 163, 127, 0.12);
+  border: 1.5px solid rgba(16, 163, 127, 0.35);
+  color: #34d399;
+}
+.root .lb-project {
+  background: rgba(59, 130, 246, 0.12);
+  border: 1.5px solid rgba(59, 130, 246, 0.35);
+  color: #60a5fa;
+}
+.root .lb-sub {
+  background: rgba(139, 92, 246, 0.12);
+  border: 1.5px solid rgba(139, 92, 246, 0.35);
+  color: #a78bfa;
+}
+.root .lb-override {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1.5px solid rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+}
+.root .load-box small {
+  display: block;
+  font-weight: 400;
+  color: var(--text3);
+  font-size: 11px;
+  margin-top: 4px;
+  font-family: "JetBrains Mono", monospace;
+}
+.root .load-arrow {
+  display: flex;
+  align-items: center;
+  color: var(--border2);
+  font-size: 24px;
+  flex-shrink: 0;
+  padding-bottom: 20px;
+}
+.root .load-note {
+  text-align: center;
+  color: var(--text3);
+  font-size: 11.5px;
+  margin-top: 20px;
+}
+.root .load-limit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 8px;
+  padding: 4px 12px;
+  font-size: 11.5px;
+  color: #fbbf24;
+  margin-top: 12px;
+}
+
+/* ── File Tree SVG ── */
+.root .filetree-outer {
+  background: #060606;
+  border: 1px solid #1e2228;
+  border-radius: 14px;
+  overflow: hidden;
+  margin: 20px 0;
+}
+.root .filetree-bar {
+  background: #111318;
+  border-bottom: 1px solid #1e2228;
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.root .fb-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+}
+
+/* ── Code blocks ── */
+.root .code-wrap {
+  background: #060606;
+  border: 1px solid #1e2228;
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 16px 0;
+}
+.root .code-bar {
+  background: #111318;
+  border-bottom: 1px solid #1e2228;
+  padding: 9px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text3);
+}
+.root .code-lang {
+  color: #818cf8;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.root .code-body {
+  padding: 22px 24px;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: 13px;
+  line-height: 1.85;
+  overflow-x: auto;
+  white-space: pre;
+  color: #d0d0d0;
+}
+.root .ck {
+  color: #ff7b72;
+}
+.root .cs {
+  color: #a5d6ff;
+}
+.root .cv {
+  color: #79c0ff;
+}
+.root .cc {
+  color: var(--text3);
+  font-style: italic;
+}
+.root .ch {
+  color: #f97316;
+  font-weight: 700;
+}
+.root .cm {
+  color: #34d399;
+  font-weight: 600;
+}
+.root .cw {
+  color: #fbbf24;
+}
+.root .ce {
+  color: #a78bfa;
+}
+.root .co {
+  color: #fb7185;
+}
+
+/* ── mono inline ── */
+.root .mono {
+  font-family: "JetBrains Mono", monospace;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 12.5px;
+  color: var(--oai);
+}
+
+/* ── badges ── */
+.root .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 5px;
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.root .b-green {
+  background: rgba(16, 163, 127, 0.15);
+  color: var(--oai);
+  border: 1px solid rgba(16, 163, 127, 0.3);
+}
+.root .b-blue {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+.root .b-purple {
+  background: rgba(139, 92, 246, 0.15);
+  color: #a78bfa;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+.root .b-amber {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.root .b-red {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+.root .b-teal {
+  background: rgba(20, 184, 166, 0.12);
+  color: #2dd4bf;
+  border: 1px solid rgba(20, 184, 166, 0.3);
+}
+.root .b-orange {
+  background: rgba(249, 115, 22, 0.15);
+  color: #fb923c;
+  border: 1px solid rgba(249, 115, 22, 0.3);
+}
+.root .b-gray {
+  background: rgba(107, 114, 128, 0.15);
+  color: #9ca3af;
+  border: 1px solid rgba(107, 114, 128, 0.3);
+}
+
+/* ── alert boxes ── */
+.root .alert {
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin: 16px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 13.5px;
+}
+.root .alert-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.root .ai {
+  background: rgba(59, 130, 246, 0.07);
+  border-left: 3px solid #3b82f6;
+}
+.root .aw {
+  background: rgba(245, 158, 11, 0.07);
+  border-left: 3px solid #f59e0b;
+}
+.root .ae {
+  background: rgba(239, 68, 68, 0.07);
+  border-left: 3px solid #ef4444;
+}
+.root .ag {
+  background: rgba(16, 163, 127, 0.07);
+  border-left: 3px solid var(--oai);
+}
+.root .alert-body strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+.root .alert-body {
+  color: var(--text2);
+}
+
+/* ── Best / Anti ── */
+.root .pat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 16px 0;
+}
+@media (max-width: 640px) {
+  .root .pat-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.root .pat {
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+.root .pat-ok {
+  background: rgba(16, 163, 127, 0.06);
+  border: 1px solid rgba(16, 163, 127, 0.25);
+}
+.root .pat-ng {
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+.root .pat-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  margin-bottom: 10px;
+}
+.root .pat-ok .pat-label {
+  color: var(--oai);
+}
+.root .pat-ng .pat-label {
+  color: #f87171;
+}
+.root .pat ul {
+  list-style: none;
+}
+.root .pat ul li {
+  font-size: 13.5px;
+  color: var(--text2);
+  padding: 3px 0;
+  padding-left: 20px;
+  position: relative;
+}
+.root .pat-ok ul li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--oai);
+  font-weight: 700;
+}
+.root .pat-ng ul li::before {
+  content: "✗";
+  position: absolute;
+  left: 0;
+  color: #f87171;
+  font-weight: 700;
+}
+
+/* ── multi-agent roles ── */
+.root .roles-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 16px 0;
+}
+@media (max-width: 640px) {
+  .root .roles-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.root .role-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  transition: border-color 0.2s;
+}
+.root .role-card:hover {
+  border-color: var(--oai);
+}
+.root .role-icon {
+  font-size: 26px;
+  margin-bottom: 10px;
+}
+.root .role-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+.root .role-desc {
+  font-size: 12.5px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+.root .role-ex {
+  margin-top: 10px;
+  font-size: 11.5px;
+  color: var(--text3);
+  background: var(--surface2);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: "JetBrains Mono", monospace;
+}
+
+/* ── Table ── */
+.root .tbl-wrap {
+  overflow-x: auto;
+  margin: 16px 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.root table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  background: var(--surface);
+}
+.root thead th {
+  background: var(--surface2);
+  color: var(--text3);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 10px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.root tbody td {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+  vertical-align: top;
+}
+.root tbody tr:last-child td {
+  border-bottom: none;
+}
+.root td code {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  color: var(--oai);
+}
+
+/* ── Decision flow ── */
+.root .dflow {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px 32px;
+  margin: 20px 0;
+}
+.root .dflow-title {
+  text-align: center;
+  color: var(--text3);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 24px;
+}
+.root .dflow-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+  flex-wrap: wrap;
+}
+.root .dn-q {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-weight: 600;
+  color: #60a5fa;
+  font-size: 13px;
+}
+.root .dn-y {
+  background: rgba(16, 163, 127, 0.1);
+  border: 1px solid rgba(16, 163, 127, 0.35);
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-weight: 600;
+  color: #34d399;
+  font-size: 13px;
+}
+.root .dn-n {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-weight: 600;
+  color: #f87171;
+  font-size: 13px;
+}
+.root .dn-arr {
+  color: var(--text3);
+  font-size: 20px;
+}
+.root .dn-indent {
+  border-left: 2px solid var(--border2);
+  padding-left: 24px;
+  margin-left: 18px;
+}
+
+/* ── source grid ── */
+.root .src-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.root .src-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+.root .src-card-new {
+  background: var(--surface);
+  border: 1px solid rgba(16, 163, 127, 0.35);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+.root .src-icon {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+.root .src-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--oai);
+  margin-bottom: 4px;
+}
+.root .src-url {
+  font-size: 11px;
+  color: var(--text3);
+  word-break: break-all;
+  font-family: "JetBrains Mono", monospace;
+  margin-bottom: 6px;
+}
+.root .src-desc {
+  font-size: 12px;
+  color: var(--text2);
+}
+.root .srcSeparator {
+  grid-column: 1 / -1;
+  border-top: 1px solid var(--border2);
+  margin: 8px 0;
+  padding-top: 8px;
+  font-size: 11px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.root hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 56px 0;
+}
+.root a {
+  color: var(--oai);
+  text-decoration: none;
+}
+.root a:hover {
+  text-decoration: underline;
+}
+
+/* ── TOC ── */
+.root .toc {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px 28px;
+  margin-bottom: 48px;
+}
+.root .toc a {
+  display: block;
+  padding: 5px 0;
+  font-size: 13.5px;
+  color: var(--text2);
+  border-bottom: 1px solid var(--border);
+}
+.root .toc a:last-child {
+  border-bottom: none;
+}
+.root .toc a:hover {
+  color: var(--oai);
+  text-decoration: none;
+}
