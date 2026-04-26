@@ -1274,16 +1274,410 @@ export default function CodexAgentPage() {
               <span className={styles.mono}>AGENTS.override.md</span> — コンテキスト設計
             </h2>
           </div>
-          <p>（faithful 移植 s03 — 後続コミットで充填）</p>
+          <div className={`${styles.alert} ${styles.ai}`}>
+            <span className={styles["alert-icon"]}>ℹ️</span>
+            <div className={styles["alert-body"]}>
+              <strong>Codex 固有：1ディレクトリ1ファイルのみ採用 + 32 KiB 上限</strong>
+              <code className={styles.mono}>AGENTS.override.md</code> →{" "}
+              <code className={styles.mono}>AGENTS.md</code> → fallback
+              の順でチェックし、最初にヒットしたファイルのみ読む（同一ディレクトリでのマージはしない）。全体の合計が
+              32 KiB を超えるとそれ以降を切り捨てる。
+              <code className={styles.mono}>config.toml</code> の{" "}
+              <code className={styles.mono}>project_doc_max_bytes = 65536</code> で引き上げ可能。
+            </div>
+          </div>
+
+          <div className={styles.card}>
+            <div className={styles["card-title"]}>
+              📋 AGENTS.md に書くべきこと / 書かないべきこと
+            </div>
+            <div className={styles["pat-grid"]}>
+              <div className={`${styles.pat} ${styles["pat-ok"]}`}>
+                <div className={styles["pat-label"]}>✅ 書くべき内容</div>
+                <ul>
+                  <li>プロジェクト概要・目的（2〜3文）</li>
+                  <li>ビルド・テスト・Lint コマンド（必須）</li>
+                  <li>テスト実行の要求（「変更後は必ずテストを実行」）</li>
+                  <li>PR メッセージのフォーマット・規約</li>
+                  <li>サブエージェント委譲ルール</li>
+                  <li>禁止操作・危険コマンドの明示</li>
+                  <li>コーディング規約（コンパクトに）</li>
+                  <li>重要ドキュメントへのパス参照</li>
+                </ul>
+              </div>
+              <div className={`${styles.pat} ${styles["pat-ng"]}`}>
+                <div className={styles["pat-label"]}>✗ 書かないべき内容</div>
+                <ul>
+                  <li>32 KiB を超える内容（スキルに分割）</li>
+                  <li>MCP / モデル設定（config.toml に分離）</li>
+                  <li>長大なコードスニペット</li>
+                  <li>特定タスク専用の詳細手順（SKILL.md へ）</li>
+                  <li>機密情報・APIキー</li>
+                  <li>修正履歴・変更ログの蓄積</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.card}>
+            <div className={styles["card-title"]}>
+              📄 実践的な AGENTS.md テンプレート（サブエージェント対応版）
+            </div>
+            <div className={styles["code-wrap"]}>
+              <div className={styles["code-bar"]}>
+                <span>AGENTS.md (project root)</span>
+                <span className={styles["code-lang"]}>Markdown</span>
+              </div>
+              <div className={styles["code-body"]}>
+                <span className={styles.ch}># PROJECT: my-saas-app</span>
+                {"\n\n"}
+                <span className={styles.cm}>## Overview</span>
+                {
+                  "\nNext.js 15 + Supabase + Stripe のマルチテナント SaaS。\n本番: Vercel Edge / DB: Supabase (PostgreSQL) / AI: OpenAI Responses API。\n\n"
+                }
+                <span className={styles.cm}>
+                  {"## Build & Test (CRITICAL: always run after changes)"}
+                </span>
+                {"\n- Build: "}
+                <span className={styles.cs}>{"`pnpm build`"}</span>
+                {"\n- Test: "}
+                <span className={styles.cs}>{"`pnpm test`"}</span>
+                {" — "}
+                <span className={styles.cw}>コード変更後は必ず実行すること</span>
+                {"\n- Lint: "}
+                <span className={styles.cs}>{"`pnpm lint`"}</span>
+                {" — "}
+                <span className={styles.cw}>PR前に必ず実行すること</span>
+                {"\n- DB types: "}
+                <span className={styles.cs}>{"`pnpm supabase gen types`"}</span>
+                {"\n- E2E: "}
+                <span className={styles.cs}>{"`pnpm test:e2e`"}</span>
+                {" (Playwright)\n\n"}
+                <span className={styles.cm}>## Multi-Agent Dispatch Rules</span>
+                {"\n"}
+                <span className={styles.cw}>Parallel spawn 条件（すべて満たす場合のみ）:</span>
+                {
+                  "\n- タスクが独立していて互いに依存しない\n- 異なるドメイン (frontend / backend / db) に閉じている\n- 同一ファイルへの書き込みが発生しない\n\n"
+                }
+                <span className={styles.cw}>Sequential / single-agent:</span>
+                {
+                  "\n- 依存関係がある（B に A の出力が必要）\n- 共有ファイルへの書き込みが発生する\n\n"
+                }
+                <span className={styles.cm}>## Domain Boundaries</span>
+                {
+                  "\n- frontend → app/, components/, styles/ のみ\n- backend → supabase/functions/, lib/server/ のみ\n- database → supabase/migrations/, schema/ のみ\n\n"
+                }
+                <span className={styles.cm}>## PR Message Format</span>
+                {"\n"}
+                <span className={styles.cs}>
+                  {
+                    "```\n## Summary\n[変更の概要 2〜3文]\n## Changes\n- [変更点1]\n- [変更点2]\n## Tests\n- [テスト内容]\n```"
+                  }
+                </span>
+                {"\n\n"}
+                <span className={styles.cm}>## Forbidden Operations</span>
+                {"\n- "}
+                <span className={styles.cw}>{"`supabase db reset`"}</span>
+                {" は絶対に実行しない\n- "}
+                <span className={styles.cw}>{"`.env.production`"}</span>
+                {" の読み書き禁止\n- 新しい本番依存関係の追加は確認を求めること"}
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.card}>
+            <div className={styles["card-title"]}>
+              ⚡ AGENTS.override.md — ホットスワップ型上書きパターン
+            </div>
+            <div className={styles["code-wrap"]}>
+              <div className={styles["code-bar"]}>
+                <span>services/payments/AGENTS.override.md</span>
+                <span className={styles["code-lang"]}>Markdown</span>
+              </div>
+              <div className={styles["code-body"]}>
+                <span className={styles.ch}># Payments Service — Emergency Override</span>
+                {"\n"}
+                <span className={styles.cc}>
+                  # このファイルが存在する間、payments/ での作業は下記ルールのみ適用される
+                </span>
+                {"\n"}
+                <span className={styles.cc}>
+                  # 通常の AGENTS.md はこのディレクトリでは読まれない
+                </span>
+                {"\n\n"}
+                <span className={styles.cm}>## Active Incident Protocol</span>
+                {"\n"}
+                <span className={styles.cw}>本番障害対応中。以下のルールを最優先で守ること:</span>
+                {"\n- テストコマンド: "}
+                <span className={styles.cs}>{"`make test-payments`"}</span>
+                {"（通常の `pnpm test` ではなく）\n- API キーのローテーションは "}
+                <span className={styles.cw}>セキュリティチャンネルに通知後のみ</span>
+                {" 実施\n- Stripe Webhook の変更は "}
+                <span className={styles.cw}>{"`--dry-run` フラグで確認後に実行"}</span>
+                {"\n- すべての変更を "}
+                <span className={styles.cw}>INCIDENT_LOG.md</span>
+                {" に記録すること\n\n"}
+                <span className={styles.cc}>
+                  # 障害解消後はこのファイルを削除して通常の AGENTS.md に戻す
+                </span>
+              </div>
+            </div>
+            <p style={{ color: "var(--text2)", fontSize: "13px", marginTop: "12px" }}>
+              🔑 <strong>使いどころ</strong>
+              ：特定サービスで一時的に異なるルールを適用したい場合（本番障害対応・セキュリティレビュー中・テストモードなど）に、
+              <code className={styles.mono}>AGENTS.md</code>{" "}
+              を編集せずにホットスワップできます。完了後は削除するだけで元に戻ります。
+            </p>
+          </div>
+
+          <div className={`${styles.alert} ${styles.ag}`}>
+            <span className={styles["alert-icon"]}>💡</span>
+            <div className={styles["alert-body"]}>
+              <strong>/init コマンドで AGENTS.md を自動生成する</strong>
+              <code className={styles.mono}>/init</code> をプロジェクトルートで実行すると、Codex
+              がコードベースを探索して AGENTS.md
+              の雛形を自動生成します。生成されたファイルをレビューして編集し、コミットすることで次回から継続的に利用できます。
+            </div>
+          </div>
         </section>
 
         {/* s04 */}
         <section id="s04" className={styles.sec}>
           <div className={styles["sec-head"]}>
-            <span className={styles["sec-num"]}>3</span>
+            <span
+              className={styles["sec-num"]}
+              style={{ background: "linear-gradient(135deg, #6366f1, #4f46e5)" }}
+            >
+              2.5
+            </span>
             <h2>サブエージェント向け AGENTS.md 設計パターン詳解</h2>
+            <small>役割別・依存関係・ハンドオフの設計</small>
           </div>
-          <p>（faithful 移植 s04 — 後続コミットで充填）</p>
+
+          <div className={styles.card}>
+            <p>
+              サブエージェント開発において、AGENTS.md は単なる「ルール書き」ではありません。
+              <strong>各エージェントが自律的に動くための「コンテキスト・コントラクト」</strong>
+              です。設計の要点は「そのエージェントが何を知るべきか」と「何を知るべきでないか」の両方を明示することです。
+            </p>
+          </div>
+
+          <div className={styles.card}>
+            <div className={styles["card-title"]}>🗂 役割別 AGENTS.md 設計マトリクス</div>
+            <div className={styles["tbl-wrap"]}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>エージェントロール</th>
+                    <th>AGENTS.md に書くべき内容</th>
+                    <th>参照すべきファイル</th>
+                    <th>ドメイン境界</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <span className={`${styles.badge} ${styles["b-green"]}`}>PM</span> Project
+                      Manager
+                    </td>
+                    <td>成果物ファイル名・フォーマット・品質基準・ゲート条件</td>
+                    <td>ユーザー要件のみ</td>
+                    <td>全ディレクトリへの読み書き</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span className={`${styles.badge} ${styles["b-blue"]}`}>FE</span> Frontend
+                      Developer
+                    </td>
+                    <td>フレームワーク規約・コンポーネント設計ルール・スタイルガイド</td>
+                    <td>REQUIREMENTS.md, AGENT_TASKS.md, design_spec.md</td>
+                    <td>frontend/ のみ</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span className={`${styles.badge} ${styles["b-purple"]}`}>BE</span> Backend
+                      Developer
+                    </td>
+                    <td>API設計規約・エラーハンドリング規則・認証フロー</td>
+                    <td>REQUIREMENTS.md, AGENT_TASKS.md</td>
+                    <td>backend/, lib/server/ のみ</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span className={`${styles.badge} ${styles["b-amber"]}`}>DB</span> DB Migrator
+                    </td>
+                    <td>マイグレーション命名規則・ロールバック必須ルール・本番適用禁止</td>
+                    <td>REQUIREMENTS.md の DB スキーマ定義のみ</td>
+                    <td>migrations/, schema/ のみ</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span className={`${styles.badge} ${styles["b-teal"]}`}>QA</span> Tester
+                    </td>
+                    <td>テストフレームワーク・カバレッジ要件・テスト命名規則</td>
+                    <td>TEST.md, REQUIREMENTS.md</td>
+                    <td>tests/, *.spec.ts のみ</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span className={`${styles.badge} ${styles["b-red"]}`}>SEC</span> Security
+                      Reviewer
+                    </td>
+                    <td>チェックリスト（OWASP Top 10 等）・報告フォーマット</td>
+                    <td>差分ファイルのみ（Read-Only）</td>
+                    <td>書き込み禁止</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className={styles.card}>
+            <div className={styles["card-title"]}>📋 PM エージェント用 AGENTS.md テンプレート</div>
+            <div className={styles["code-wrap"]}>
+              <div className={styles["code-bar"]}>
+                <span>docs/pm/AGENTS.md（PM エージェント専用）</span>
+                <span className={styles["code-lang"]}>Markdown</span>
+              </div>
+              <div className={styles["code-body"]}>
+                <span className={styles.ch}># Project Manager Agent</span>
+                {"\n\n"}
+                <span className={styles.cm}>## Role</span>
+                {
+                  "\nあなたは PM エージェントです。タスクを受けたら下記の3ファイルを必ず作成し、\n各専門エージェントにハンドオフしてください。\n\n"
+                }
+                <span className={styles.cw}>
+                  ## Required Output Files（ゲート: これが存在しないと次フェーズに進めない）
+                </span>
+                {"\n1. "}
+                <span className={styles.cs}>REQUIREMENTS.md</span>
+                {" — 製品目標・機能要件・制約・技術スタック\n2. "}
+                <span className={styles.cs}>AGENT_TASKS.md</span>
+                {" — 各エージェントへの具体的指示（曖昧さゼロ）\n3. "}
+                <span className={styles.cs}>TEST.md</span>
+                {" — 受け入れ基準・テスト計画（Tester 向け）\n\n"}
+                <span className={styles.cm}>## AGENT_TASKS.md フォーマット（必ず守ること）</span>
+                {"\n"}
+                <span className={styles.cs}>{"```"}</span>
+                {
+                  "\n## [ロール名]\n- 担当: [何をするか 1〜2文]\n- 成果物: [ファイルパス・形式を明示]\n- 参照: [参照すべきファイル]\n- 制約: [やってはいけないこと]\n"
+                }
+                <span className={styles.cs}>{"```"}</span>
+                {"\n\n"}
+                <span className={styles.cm}>## Handoff Gate（以下を確認してからハンドオフ）</span>
+                {
+                  "\n- [ ] 全成果物ファイルが存在する\n- [ ] テストが全件パスしている\n- [ ] domain boundary の侵犯がない\n- [ ] AGENT_TASKS.md の全チェックボックスが完了している\n\n"
+                }
+                <span className={styles.cm}>## Forbidden</span>
+                {
+                  "\n- 成果物ファイルなしでサブエージェントを起動しない\n- 依存関係のあるタスクを同時並列スポーンしない"
+                }
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.card}>
+            <div className={styles["card-title"]}>🔀 ハンドオフ設計のベストプラクティス</div>
+            <div className={styles["pat-grid"]}>
+              <div className={`${styles.pat} ${styles["pat-ok"]}`}>
+                <div className={styles["pat-label"]}>✅ 良いハンドオフ設計</div>
+                <ul>
+                  <li>transfer 関数のみを使う（メッセージ直渡し禁止）</li>
+                  <li>引き継ぎ先ファイルのパスを AGENTS.md に明記</li>
+                  <li>ゲート条件（チェックボックス）を AGENTS.md に定義</li>
+                  <li>完了後は AGENT_TASKS.md のチェックを更新</li>
+                  <li>依存タスクは順次スポーン（直列）</li>
+                </ul>
+              </div>
+              <div className={`${styles.pat} ${styles["pat-ng"]}`}>
+                <div className={styles["pat-label"]}>✗ 悪いハンドオフ設計</div>
+                <ul>
+                  <li>ハンドオフ先をメッセージで直接渡す</li>
+                  <li>ゲート条件なしで並列スポーン</li>
+                  <li>AGENTS.md に引き継ぎ情報を書かない</li>
+                  <li>完了確認なしで次フェーズに進む</li>
+                  <li>max_depth を 3 以上に設定する</li>
+                </ul>
+              </div>
+            </div>
+            <div className={styles["code-wrap"]} style={{ marginTop: "16px" }}>
+              <div className={styles["code-bar"]}>
+                <span>ハンドオフ AGENTS.md — design_spec 待機パターン</span>
+                <span className={styles["code-lang"]}>Markdown</span>
+              </div>
+              <div className={styles["code-body"]}>
+                <span className={styles.cm}>## Handoff Protocol (Frontend / Backend 共通)</span>
+                {"\n"}
+                <span className={styles.cc}>
+                  # このファイルが存在することを確認してから実装を開始すること
+                </span>
+                {"\n\n"}
+                <span className={styles.cw}>**依存ファイル確認（実装開始前にチェック）:**</span>
+                {"\n- [ ] "}
+                <span className={styles.cs}>REQUIREMENTS.md</span>
+                {" が存在する\n- [ ] "}
+                <span className={styles.cs}>AGENT_TASKS.md</span>
+                {" が存在し、自分の担当セクションが記載されている\n- [ ] "}
+                <span className={styles.cs}>design_spec.md</span>
+                {" が存在する（Frontend は必須）\n\n"}
+                <span className={styles.cc}>
+                  # 上記ファイルが存在しない場合は実装を開始せず PM に確認すること
+                </span>
+                {"\n\n"}
+                <span className={styles.cm}>## Completion Handoff</span>
+                {
+                  "\n実装完了後は以下を実施してから transfer_to_project_manager を呼ぶ:\n1. テストを実行し全件パスを確認\n2. AGENT_TASKS.md の自分のチェックボックスを完了にする\n3. 成果物ファイルのパス一覧を引き継ぎメモに記載"
+                }
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.card}>
+            <div className={styles["card-title"]}>
+              🏗 ドメイン分離パターン — サブディレクトリ AGENTS.md の活用
+            </div>
+            <div className={`${styles.alert} ${styles.ai}`} style={{ marginBottom: "16px" }}>
+              <span className={styles["alert-icon"]}>🔑</span>
+              <div className={styles["alert-body"]}>
+                <strong>原則：サブエージェントは自分のドメイン外を知らなくてよい</strong>。Frontend
+                エージェントはDB スキーマを知る必要がなく、Backend
+                エージェントはUIコンポーネント名を知る必要はありません。AGENTS.md
+                で「このエージェントが見るべきものと見てはいけないもの」を明示的に定義することで、エージェントの誤動作を防ぎます。
+              </div>
+            </div>
+            <div className={styles["code-wrap"]}>
+              <div className={styles["code-bar"]}>
+                <span>モノレポ構成でのドメイン分離例</span>
+                <span className={styles["code-lang"]}>File Tree</span>
+              </div>
+              <div className={styles["code-body"]}>
+                <span className={styles.cm}>my-app/</span>
+                {"\n├── AGENTS.md "}
+                <span className={styles.cc}># ← 全エージェント共通（概要・テストコマンド）</span>
+                {"\n├── "}
+                <span className={styles.cw}>frontend/</span>
+                {"\n│   ├── AGENTS.md "}
+                <span className={styles.cc}># ← Frontend エージェント専用ルール</span>
+                {"\n│   │   "}
+                <span className={styles.cc}># 「frontend/ のみ変更可」と明記</span>
+                {"\n│   └── components/\n├── "}
+                <span className={styles.cv}>backend/</span>
+                {"\n│   ├── AGENTS.md "}
+                <span className={styles.cc}># ← Backend エージェント専用ルール</span>
+                {"\n│   │   "}
+                <span className={styles.cc}># 「backend/ のみ変更可」と明記</span>
+                {"\n│   └── api/\n├── "}
+                <span className={styles.cm}>services/</span>
+                {"\n│   └── payments/\n│       ├── AGENTS.md "}
+                <span className={styles.cc}># ← Payments サービス固有ルール</span>
+                {"\n│       └── AGENTS.override.md "}
+                <span className={styles.cc}># ← 本番障害時の緊急上書き（平時は不要）</span>
+                {"\n└── .codex/\n    ├── config.toml "}
+                <span className={styles.cc}># ← マルチエージェントロール定義</span>
+                {"\n    └── roles/\n        ├── explorer.toml\n        └── reviewer.toml"}
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* s05 */}
