@@ -9,7 +9,7 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- **最新 HEAD**: `2893581`（**C-2 faithful 移植 完了** — hero/s01〜s17 + sources 全件完了）。**次は C-3 `/codex/agent` の Red → Green → faithful 移植**
+- **最新 HEAD**: `7b9242e`（**legacy cleanup 完了**）。**次は C-3 `/codex/agent` の Red → Green → faithful 移植**
 - **未コミット作業**: なし（working tree クリーン）
 - **次の作業**: C-3 `/codex/agent` の Red コミット → Green コミット → faithful 移植（s01〜s12 + sources）
 - **テスト数**: `bun run test` **453 件 pass**（失敗 1 件は既知の `lib/i18n.test.ts` key count — 別 Issue）
