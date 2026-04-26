@@ -253,7 +253,496 @@ export default function CodexAgentPage() {
             <h2>初学者向け：7ステップ入門ガイド</h2>
             <small>ここから始めれば迷わない</small>
           </div>
-          <p>（faithful 移植 s01 — 後続コミットで充填）</p>
+          <div className={`${styles.alert} ${styles.ag}`}>
+            <span className={styles["alert-icon"]}>🎯</span>
+            <div className={styles["alert-body"]}>
+              <strong>このセクションを最初に読んでください</strong>
+              Codex のファイル体系は複雑に見えますが、正しい順序で設定すれば迷いません。Step 1 → 7
+              を順番に実施するだけでサブエージェント開発が動き始めます。
+            </div>
+          </div>
+
+          {/* Step 1 */}
+          <div
+            className={styles.card}
+            style={{ borderLeft: "3px solid var(--oai)", marginBottom: "12px" }}
+          >
+            <div className={styles["card-title"]}>
+              <span
+                style={{
+                  background: "var(--oai)",
+                  color: "#000",
+                  borderRadius: "50%",
+                  width: "26px",
+                  height: "26px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "13px",
+                  fontWeight: 800,
+                  flexShrink: 0,
+                }}
+              >
+                1
+              </span>{" "}
+              グローバル設定を作る{" "}
+              <span className={`${styles.badge} ${styles["b-green"]}`}>所要時間: 5分</span>
+            </div>
+            <p>
+              まず <code className={styles.mono}>~/.codex/AGENTS.md</code>{" "}
+              を作成し、自分のすべてのプロジェクトに共通するルールを書きます。これが「あなたの作業スタイルの設定ファイル」です。
+            </p>
+            <div className={styles["code-wrap"]}>
+              <div className={styles["code-bar"]}>
+                <span>~/.codex/AGENTS.md（グローバル設定）</span>
+                <span className={styles["code-lang"]}>Markdown</span>
+              </div>
+              <div className={styles["code-body"]}>
+                <span className={styles.ch}># Global Working Agreements</span>
+                {"\n\n"}
+                <span className={styles.cm}>## Language</span>
+                {"\nコメントとコミットメッセージは日本語で書くこと。\n\n"}
+                <span className={styles.cm}>## Code Style</span>
+                {
+                  "\n- インデント: 2スペース（TypeScript / JavaScript）\n- 関数名はキャメルケース、定数はスネークケース大文字\n\n"
+                }
+                <span className={styles.cm}>## General Rules</span>
+                {
+                  "\n- テストなしでコードをコミットしない\n- TODO コメントは残さない（実装するか Issue を立てる）"
+                }
+              </div>
+            </div>
+            <div
+              className={`${styles.alert} ${styles.ag}`}
+              style={{ marginTop: "12px", marginBottom: 0 }}
+            >
+              <span className={styles["alert-icon"]}>💡</span>
+              <div className={styles["alert-body"]}>
+                <strong>ポイント</strong>
+                ：ここにはプロジェクトに関係ない「個人の作業習慣」のみ書く。プロジェクト固有の内容は次ステップへ。
+              </div>
+            </div>
+          </div>
+
+          {/* Step 2 */}
+          <div
+            className={styles.card}
+            style={{ borderLeft: "3px solid #3b82f6", marginBottom: "12px" }}
+          >
+            <div className={styles["card-title"]}>
+              <span
+                style={{
+                  background: "#3b82f6",
+                  color: "#fff",
+                  borderRadius: "50%",
+                  width: "26px",
+                  height: "26px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "13px",
+                  fontWeight: 800,
+                  flexShrink: 0,
+                }}
+              >
+                2
+              </span>{" "}
+              プロジェクトルートに AGENTS.md を作る{" "}
+              <span className={`${styles.badge} ${styles["b-blue"]}`}>最重要ファイル</span>
+            </div>
+            <p>
+              プロジェクトの <code className={styles.mono}>/init</code>{" "}
+              コマンドで自動生成するか、手動で作成します。
+              <strong>テストコマンドの記述が最重要</strong>
+              です。Codex はこれを見てテストを自動実行します。
+            </p>
+            <div className={styles["code-wrap"]}>
+              <div className={styles["code-bar"]}>
+                <span>./AGENTS.md（プロジェクトルート）</span>
+                <span className={styles["code-lang"]}>Markdown</span>
+              </div>
+              <div className={styles["code-body"]}>
+                <span className={styles.ch}># PROJECT: my-app</span>
+                {"\n\n"}
+                <span className={styles.cm}>## Overview</span>
+                {"\nNext.js 15 + Supabase の SaaS アプリ。\n\n"}
+                <span className={styles.cw}>{"## ⚠ Build & Test（必ず実行すること）"}</span>
+                {"\n- テスト: "}
+                <span className={styles.cs}>{"`pnpm test`"}</span>
+                {" ← 変更後は必ずこれを実行\n- ビルド: "}
+                <span className={styles.cs}>{"`pnpm build`"}</span>
+                {"\n- Lint: "}
+                <span className={styles.cs}>{"`pnpm lint`"}</span>
+                {" ← PR 前に必ず実行\n\n"}
+                <span className={styles.cm}>## Architecture</span>
+                {
+                  "\n- frontend/ → Next.js ページ・コンポーネント\n- backend/ → API ルート・サーバーサイド処理\n- db/ → Supabase マイグレーション\n\n"
+                }
+                <span className={styles.cm}>## Forbidden</span>
+                {"\n- `.env.production` の読み書き禁止\n- `db reset` は絶対に実行しない"}
+              </div>
+            </div>
+            <div
+              className={`${styles.alert} ${styles.aw}`}
+              style={{ marginTop: "12px", marginBottom: 0 }}
+            >
+              <span className={styles["alert-icon"]}>⚠️</span>
+              <div className={styles["alert-body"]}>
+                <strong>32 KiB 上限に注意</strong>
+                ：このファイルが肥大化したら、詳細手順を SKILL.md（Step
+                5）に分離してください。テストコマンドと禁止事項を優先的に上に書くこと。
+              </div>
+            </div>
+          </div>
+
+          {/* Step 3 */}
+          <div
+            className={styles.card}
+            style={{ borderLeft: "3px solid #8b5cf6", marginBottom: "12px" }}
+          >
+            <div className={styles["card-title"]}>
+              <span
+                style={{
+                  background: "#8b5cf6",
+                  color: "#fff",
+                  borderRadius: "50%",
+                  width: "26px",
+                  height: "26px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "13px",
+                  fontWeight: 800,
+                  flexShrink: 0,
+                }}
+              >
+                3
+              </span>{" "}
+              サービス別サブディレクトリに AGENTS.md を追加する{" "}
+              <span className={`${styles.badge} ${styles["b-purple"]}`}>サブエージェント対応</span>
+            </div>
+            <p>
+              マイクロサービス・モノレポ構成の場合、サービスごとにルールが異なります。各サブディレクトリの{" "}
+              <code className={styles.mono}>AGENTS.md</code> には
+              <strong>そのサービス固有のルールだけを書き、ルートと重複させない</strong>
+              のが原則です。
+            </p>
+            <div className={styles["code-wrap"]}>
+              <div className={styles["code-bar"]}>
+                <span>./services/payments/AGENTS.md（サービス固有）</span>
+                <span className={styles["code-lang"]}>Markdown</span>
+              </div>
+              <div className={styles["code-body"]}>
+                <span className={styles.ch}># Payments Service</span>
+                {"\n"}
+                <span className={styles.cc}>
+                  # ルートの AGENTS.md に加えて、このファイルのルールが適用される
+                </span>
+                {"\n\n"}
+                <span className={styles.cm}>## Service-Specific Commands</span>
+                {"\n- テスト: "}
+                <span className={styles.cs}>{"`make test-payments`"}</span>
+                {" ← このサービスは make を使う\n- 型生成: "}
+                <span className={styles.cs}>{"`pnpm stripe:types`"}</span>
+                {"\n\n"}
+                <span className={styles.cm}>## Domain Constraints</span>
+                {
+                  "\n- このディレクトリ内のファイルのみ変更すること\n- Stripe API は v2 のみ使用（v1 API は廃止済み）\n- PCI-DSS: カード番号をログに出力しない\n\n"
+                }
+                <span className={styles.cm}>## Sub-agent Handoff</span>
+                {
+                  "\nこのサービスのタスク完了後は AGENT_TASKS.md を更新し、\nPM エージェントに transfer_to_project_manager で引き渡すこと。"
+                }
+              </div>
+            </div>
+          </div>
+
+          {/* Step 4 */}
+          <div
+            className={styles.card}
+            style={{ borderLeft: "3px solid #f59e0b", marginBottom: "12px" }}
+          >
+            <div className={styles["card-title"]}>
+              <span
+                style={{
+                  background: "#f59e0b",
+                  color: "#000",
+                  borderRadius: "50%",
+                  width: "26px",
+                  height: "26px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "13px",
+                  fontWeight: 800,
+                  flexShrink: 0,
+                }}
+              >
+                4
+              </span>{" "}
+              config.toml でサブエージェントロールを定義する{" "}
+              <span className={`${styles.badge} ${styles["b-amber"]}`}>マルチエージェント</span>
+            </div>
+            <p>
+              サブエージェントを使う場合は <code className={styles.mono}>.codex/config.toml</code>{" "}
+              で各ロールのモデル・サンドボックス・承認ポリシーを定義します。
+              <strong>ロール定義なしにサブエージェントをスポーンしてはいけません</strong>
+              （Anti-Pattern）。
+            </p>
+            <div className={styles["code-wrap"]}>
+              <div className={styles["code-bar"]}>
+                <span>.codex/config.toml（最小構成）</span>
+                <span className={styles["code-lang"]}>TOML</span>
+              </div>
+              <div className={styles["code-body"]}>
+                <span className={styles.cc}># 最小限のマルチエージェント設定</span>
+                {"\n["}
+                <span className={styles.cm}>features</span>
+                {"]\n"}
+                <span className={styles.cm}>multi_agents</span>
+                {" = "}
+                <span className={styles.ck}>true</span>
+                {"\n\n["}
+                <span className={styles.cm}>agents</span>
+                {"]\n"}
+                <span className={styles.cm}>max_threads</span>
+                {" = "}
+                <span className={styles.cv}>4</span>
+                {"  "}
+                <span className={styles.cc}># 同時実行上限（デフォルト: 6）</span>
+                {"\n"}
+                <span className={styles.cm}>max_depth</span>
+                {" = "}
+                <span className={styles.cv}>1</span>
+                {"  "}
+                <span className={styles.cc}># 孫エージェントは禁止（推奨）</span>
+                {"\n\n"}
+                <span className={styles.cc}># 軽量探索ロール（コード読み専用）</span>
+                {"\n["}
+                <span className={styles.cm}>agents.roles.explorer</span>
+                {"]\n"}
+                <span className={styles.cm}>description</span>
+                {" = "}
+                <span className={styles.cs}>
+                  {'"コードベース探索・ファイル検索専門。実装しない。"'}
+                </span>
+                {"\n"}
+                <span className={styles.cm}>config_file</span>
+                {" = "}
+                <span className={styles.cs}>{'"".codex/roles/explorer.toml"'}</span>
+                {"\n\n"}
+                <span className={styles.cc}># レビューロール（書き込み禁止）</span>
+                {"\n["}
+                <span className={styles.cm}>agents.roles.reviewer</span>
+                {"]\n"}
+                <span className={styles.cm}>description</span>
+                {" = "}
+                <span className={styles.cs}>
+                  {'"PR前のコードレビュー専門。コードは変更しない。"'}
+                </span>
+                {"\n"}
+                <span className={styles.cm}>config_file</span>
+                {" = "}
+                <span className={styles.cs}>{'"".codex/roles/reviewer.toml"'}</span>
+              </div>
+            </div>
+            <div
+              className={`${styles.alert} ${styles.ae}`}
+              style={{ marginTop: "12px", marginBottom: 0 }}
+            >
+              <span className={styles["alert-icon"]}>🚨</span>
+              <div className={styles["alert-body"]}>
+                <strong>サブエージェントは承認を継承しない</strong>
+                ：各ロールの config.toml で必ず{" "}
+                <code className={styles.mono}>approval_policy = &quot;never&quot;</code>{" "}
+                を指定すること。未設定のまま実行すると承認待ちで処理がブロックされます。
+              </div>
+            </div>
+          </div>
+
+          {/* Step 5 */}
+          <div
+            className={styles.card}
+            style={{ borderLeft: "3px solid #14b8a6", marginBottom: "12px" }}
+          >
+            <div className={styles["card-title"]}>
+              <span
+                style={{
+                  background: "#14b8a6",
+                  color: "#000",
+                  borderRadius: "50%",
+                  width: "26px",
+                  height: "26px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "13px",
+                  fontWeight: 800,
+                  flexShrink: 0,
+                }}
+              >
+                5
+              </span>{" "}
+              専門タスクを SKILL.md にスキル化する{" "}
+              <span className={`${styles.badge} ${styles["b-teal"]}`}>コンテキスト節約</span>
+            </div>
+            <p>
+              AGENTS.md
+              が肥大化してきたら、繰り返し実施する専門タスク（DBマイグレーション・コードレビュー・テスト生成など）を{" "}
+              <code className={styles.mono}>.agents/skills/</code> 配下の SKILL.md
+              に分離します。スキルは
+              <strong>該当タスクのときだけロードされる</strong>
+              ため、コンテキストウィンドウを節約できます。
+            </p>
+            <div className={styles["code-wrap"]}>
+              <div className={styles["code-bar"]}>
+                <span>.agents/skills/db-migration/SKILL.md（例）</span>
+                <span className={styles["code-lang"]}>Markdown + YAML frontmatter</span>
+              </div>
+              <div className={styles["code-body"]}>
+                <span className={styles.cs}>---</span>
+                {"\n"}
+                <span className={styles.cm}>name</span>
+                {": "}
+                <span className={styles.cv}>db-migration</span>
+                {"\n"}
+                <span className={styles.cm}>description</span>
+                {
+                  ": |\n  DB スキーマ変更・マイグレーションファイル作成のスキル。\n  以下の場合にトリガーする:\n  - テーブルの追加・変更・削除を依頼された\n  - マイグレーションファイルの作成を求められた\n  以下の場合はトリガーしない:\n  - シードデータの挿入\n  - アプリケーションレベルのデータ変換\n"
+                }
+                <span className={styles.cs}>---</span>
+                {"\n\n"}
+                <span className={styles.ch}>## Instructions</span>
+                {"\n1. "}
+                <span className={styles.cs}>{"`migrations/`"}</span>
+                {" に "}
+                <span className={styles.cs}>{"`YYYYMMDD_description.up.sql`"}</span>
+                {" を作成\n2. ロールバック用 "}
+                <span className={styles.cs}>{"`.down.sql`"}</span>
+                {" を必ず同時作成\n3. チェック: "}
+                <span className={styles.cs}>
+                  {"`python scripts/check_migration.py --env staging`"}
+                </span>
+                {"\n4. 本番適用は人間レビュー後のみ"}
+              </div>
+            </div>
+          </div>
+
+          {/* Step 6 */}
+          <div
+            className={styles.card}
+            style={{ borderLeft: "3px solid #ef4444", marginBottom: "12px" }}
+          >
+            <div className={styles["card-title"]}>
+              <span
+                style={{
+                  background: "#ef4444",
+                  color: "#fff",
+                  borderRadius: "50%",
+                  width: "26px",
+                  height: "26px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "13px",
+                  fontWeight: 800,
+                  flexShrink: 0,
+                }}
+              >
+                6
+              </span>{" "}
+              PM 駆動ワークフローを組む{" "}
+              <span className={`${styles.badge} ${styles["b-red"]}`}>Agents SDK</span>
+            </div>
+            <p>
+              複数エージェントを使う場合、
+              <strong>
+                Project Manager エージェントに REQUIREMENTS.md と AGENT_TASKS.md を生成させる
+              </strong>
+              のが Codex
+              公式推奨パターンです。各サブエージェントはこの2ファイルを「唯一の真実の情報源」として実装します。
+            </p>
+            <div className={styles["pat-grid"]}>
+              <div className={`${styles.pat} ${styles["pat-ok"]}`}>
+                <div className={styles["pat-label"]}>✅ PM 駆動パターン（推奨）</div>
+                <ul>
+                  <li>PM が REQUIREMENTS.md を生成</li>
+                  <li>PM が AGENT_TASKS.md を生成（役割分担を明記）</li>
+                  <li>各エージェントは AGENT_TASKS.md のみを参照して実装</li>
+                  <li>完了後に PM が成果物を確認・統合</li>
+                </ul>
+              </div>
+              <div className={`${styles.pat} ${styles["pat-ng"]}`}>
+                <div className={styles["pat-label"]}>✗ 直接指示パターン（非推奨）</div>
+                <ul>
+                  <li>PM なしで各エージェントが直接タスクを受け取る</li>
+                  <li>エージェント間の依存関係が暗黙的になる</li>
+                  <li>どのエージェントが何を実装したか追跡できない</li>
+                  <li>成果物の整合性確認が困難</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Step 7 */}
+          <div className={styles.card} style={{ borderLeft: "3px solid #6b7280", marginBottom: 0 }}>
+            <div className={styles["card-title"]}>
+              <span
+                style={{
+                  background: "#6b7280",
+                  color: "#fff",
+                  borderRadius: "50%",
+                  width: "26px",
+                  height: "26px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "13px",
+                  fontWeight: 800,
+                  flexShrink: 0,
+                }}
+              >
+                7
+              </span>{" "}
+              /init + /review で品質を維持する{" "}
+              <span className={`${styles.badge} ${styles["b-purple"]}`}>継続的改善</span>
+            </div>
+            <p>設定が完了したら、定期的に以下のスラッシュコマンドで品質を維持します。</p>
+            <div className={styles["tbl-wrap"]} style={{ marginTop: "12px" }}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>コマンド</th>
+                    <th>タイミング</th>
+                    <th>効果</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <code className={styles.mono}>/init</code>
+                    </td>
+                    <td>プロジェクト開始時・大きなリファクタ後</td>
+                    <td>コードベースを再探索して AGENTS.md の雛形を再生成</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code className={styles.mono}>/review</code>
+                    </td>
+                    <td>PR 作成前</td>
+                    <td>変更差分をコードレビュースキルでチェック</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code className={styles.mono}>/experimental</code>
+                    </td>
+                    <td>マルチエージェント初回有効化時</td>
+                    <td>TUI から multi_agents フラグを ON にする</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </section>
 
         {/* s02 */}
