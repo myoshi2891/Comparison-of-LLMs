@@ -2229,19 +2229,196 @@ export default function CodexAgentPage() {
         {/* s08 */}
         <section id="s08" className={styles.sec}>
           <div className={styles["sec-head"]}>
-            <span className={styles["sec-num"]}>7</span>
+            <span className={styles["sec-num"]}>6</span>
             <h2>サブエージェント スポーン戦略の意思決定ツリー</h2>
           </div>
-          <p>（faithful 移植 s08 — 後続コミットで充填）</p>
+
+          <div className={styles.dflow}>
+            <div className={styles["dflow-title"]}>
+              CODEX マルチエージェント ルーティング決定フロー
+            </div>
+
+            <div className={styles["dflow-row"]}>
+              <div className={styles["dn-q"]}>タスクが複雑で並列化できる？</div>
+              <div className={styles["dn-arr"]}>→ NO →</div>
+              <div className={styles["dn-n"]}>
+                単一エージェントで処理
+                <br />
+                <small>（multi-agent 不要）</small>
+              </div>
+            </div>
+            <div className={styles["dn-indent"]}>
+              <div className={styles["dflow-row"]} style={{ marginTop: "12px" }}>
+                <span style={{ color: "var(--text3)", fontSize: "13px" }}>↓ YES</span>
+              </div>
+              <div className={styles["dflow-row"]}>
+                <div className={styles["dn-q"]}>
+                  探索・検索タスクを含む？
+                  <br />
+                  <small style={{ fontWeight: 400, fontSize: "11px" }}>
+                    (コードベース理解・ファイル検索)
+                  </small>
+                </div>
+                <div className={styles["dn-arr"]}>→ YES →</div>
+                <div className={styles["dn-y"]}>
+                  explorer ロールをスポーン
+                  <br />
+                  <small>軽量モデル × read-only</small>
+                </div>
+              </div>
+              <div className={styles["dn-indent"]}>
+                <div className={styles["dflow-row"]} style={{ marginTop: "12px" }}>
+                  <span style={{ color: "var(--text3)", fontSize: "13px" }}>↓ （探索後）</span>
+                </div>
+                <div className={styles["dflow-row"]}>
+                  <div className={styles["dn-q"]}>
+                    タスク間に依存関係がある？
+                    <br />
+                    <small style={{ fontWeight: 400, fontSize: "11px" }}>
+                      (B に A の出力が必要)
+                    </small>
+                  </div>
+                  <div className={styles["dn-arr"]}>→ YES →</div>
+                  <div className={styles["dn-n"]}>
+                    順次スポーン
+                    <br />
+                    <small>A→B→C（直列）</small>
+                  </div>
+                </div>
+                <div className={styles["dn-indent"]}>
+                  <div className={styles["dflow-row"]} style={{ marginTop: "12px" }}>
+                    <span style={{ color: "var(--text3)", fontSize: "13px" }}>↓ NO</span>
+                  </div>
+                  <div className={styles["dflow-row"]}>
+                    <div className={styles["dn-q"]}>
+                      ロール固有の config.toml
+                      <br />
+                      が設定されている？
+                    </div>
+                    <div className={styles["dn-arr"]}>→ NO →</div>
+                    <div className={styles["dn-n"]}>
+                      config.toml でロールを先に定義
+                      <br />
+                      <small>model / sandbox / approval を設定</small>
+                    </div>
+                  </div>
+                  <div className={styles["dn-indent"]}>
+                    <div className={styles["dflow-row"]} style={{ marginTop: "12px" }}>
+                      <span style={{ color: "var(--text3)", fontSize: "13px" }}>↓ YES</span>
+                    </div>
+                    <div className={styles["dflow-row"]}>
+                      <div className={styles["dn-y"]}>
+                        ✅ 並列スポーン
+                        <br />
+                        <small>各ロールを同時起動</small>
+                      </div>
+                      <div style={{ marginLeft: "16px", color: "var(--text3)", fontSize: "12px" }}>
+                        例: &quot;spawn one agent per point,
+                        <br />
+                        wait for all, summarize&quot;
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* s09 */}
         <section id="s09" className={styles.sec}>
           <div className={styles["sec-head"]}>
-            <span className={styles["sec-num"]}>8</span>
+            <span className={styles["sec-num"]}>7</span>
             <h2>コスト最適なモデル選択戦略</h2>
           </div>
-          <p>（faithful 移植 s09 — 後続コミットで充填）</p>
+
+          <div className={styles["tbl-wrap"]}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th>用途</th>
+                  <th>推奨ロール</th>
+                  <th>特徴</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <code>gpt-4.1-mini</code>
+                  </td>
+                  <td>高速・低コスト</td>
+                  <td>explorer（コード探索・検索）</td>
+                  <td>
+                    <span className={`${styles.badge} ${styles["b-teal"]}`}>最速</span>{" "}
+                    探索・軽量タスク
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>gpt-4.1</code>
+                  </td>
+                  <td>バランス重視</td>
+                  <td>実装・テスト生成・PR作成</td>
+                  <td>
+                    <span className={`${styles.badge} ${styles["b-blue"]}`}>推奨デフォルト</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>gpt-5.3-codex</code>
+                  </td>
+                  <td>コーディング特化</td>
+                  <td>複雑な実装・リファクタリング</td>
+                  <td>
+                    <span className={`${styles.badge} ${styles["b-green"]}`}>
+                      コーディング最適化
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>gpt-5.4</code>
+                  </td>
+                  <td>高精度推論</td>
+                  <td>reviewer・アーキテクチャ設計</td>
+                  <td>
+                    <span className={`${styles.badge} ${styles["b-purple"]}`}>最高精度</span>{" "}
+                    高コスト
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>gpt-5.3-codex-spark</code>
+                    <span className={`${styles.badge} ${styles["b-orange"]}`}>
+                      research preview
+                    </span>
+                    <span className={`${styles.badge} ${styles["b-gray"]}`}>
+                      Pro 限定／段階展開中
+                    </span>
+                  </td>
+                  <td>リアルタイム・低レイテンシ</td>
+                  <td>インタラクティブ補完・高速ループ</td>
+                  <td>
+                    <span className={`${styles.badge} ${styles["b-teal"]}`}>1000+ tokens/sec</span>{" "}
+                    軽量版
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={`${styles.alert} ${styles.ai}`}>
+            <span className={styles["alert-icon"]}>💡</span>
+            <div className={styles["alert-body"]}>
+              <strong>プロファイル機能でコスト最適化</strong>
+              <code>config.toml</code> の <code>[profiles]</code> で複数の設定プロファイルを定義し、
+              <code>codex --profile deep-review</code> のように切り替えられます。通常開発は{" "}
+              <code>gpt-4.1</code>、セキュリティレビューは{" "}
+              <code>gpt-5.4 + reasoning_effort=high</code>{" "}
+              のように使い分けることでコストを大幅に削減できます。
+            </div>
+          </div>
         </section>
 
         <hr />
@@ -2249,19 +2426,123 @@ export default function CodexAgentPage() {
         {/* s10 */}
         <section id="s10" className={styles.sec}>
           <div className={styles["sec-head"]}>
-            <span className={styles["sec-num"]}>9</span>
+            <span className={styles["sec-num"]}>8</span>
             <h2>絶対に避けるべき Anti-Patterns</h2>
           </div>
-          <p>（faithful 移植 s10 — 後続コミットで充填）</p>
+
+          <div className={styles["pat-grid"]}>
+            <div className={`${styles.pat} ${styles["pat-ng"]}`}>
+              <div className={styles["pat-label"]}>✗ AGENTS.md の Anti-Patterns</div>
+              <ul>
+                <li>空ファイルを作る（Codex がスキップするため無効）</li>
+                <li>32 KiB を超える内容を1ファイルに詰める</li>
+                <li>MCP設定・モデル設定を記述（config.toml に分離）</li>
+                <li>特定タスク専用の詳細手順（SKILL.md に分離）</li>
+                <li>修正履歴・変更ログの蓄積</li>
+                <li>機密情報・API キーの記述</li>
+              </ul>
+            </div>
+            <div className={`${styles.pat} ${styles["pat-ng"]}`}>
+              <div className={styles["pat-label"]}>✗ マルチエージェントの Anti-Patterns</div>
+              <ul>
+                <li>config.toml でロールを定義せずにスポーン</li>
+                <li>サブエージェントの approval_policy を未設定のまま使う</li>
+                <li>SKILL.md の description を曖昧にする（誤発動）</li>
+                <li>max_depth を深くしすぎる（デフォルト 1 推奨）</li>
+                <li>全ロールに gpt-5-pro を使う（コスト爆発）</li>
+                <li>AGENTS.override.md を削除せず放置（永続的な上書き）</li>
+              </ul>
+            </div>
+          </div>
         </section>
 
         {/* s11 */}
         <section id="s11" className={styles.sec}>
           <div className={styles["sec-head"]}>
-            <span className={styles["sec-num"]}>10</span>
+            <span className={styles["sec-num"]}>9</span>
             <h2>まとめ：各ファイルの役割と設計原則</h2>
           </div>
-          <p>（faithful 移植 s11 — 後続コミットで充填）</p>
+
+          <div className={styles["tbl-wrap"]}>
+            <table>
+              <thead>
+                <tr>
+                  <th>ファイル</th>
+                  <th>読者</th>
+                  <th>設計原則</th>
+                  <th>アンチパターン</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <code>~/.codex/AGENTS.md</code>
+                  </td>
+                  <td>全プロジェクト共通</td>
+                  <td>個人の Working agreements のみ。プロジェクト固有内容は書かない</td>
+                  <td>プロジェクト固有ルールを混在</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>AGENTS.md</code> (root)
+                  </td>
+                  <td>メインエージェント（常時ロード）</td>
+                  <td>32 KiB 以内。概要・テストコマンド・PR規約・禁止操作</td>
+                  <td>空ファイル・大量スニペット・config設定</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>subdir/AGENTS.md</code>
+                  </td>
+                  <td>そのディレクトリ作業時のみ</td>
+                  <td>サービス固有ルール。rootと重複させない</td>
+                  <td>rootと同じ内容の重複記述</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>AGENTS.override.md</code>
+                  </td>
+                  <td>エージェント（一時的に優先）</td>
+                  <td>緊急時・一時上書き専用。完了後は必ず削除</td>
+                  <td>通常運用で使い続ける</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>.agents/skills/*/SKILL.md</code>
+                  </td>
+                  <td>エージェント（遅延ロード）</td>
+                  <td>description を明確に。いつ使う/使わないかを記述</td>
+                  <td>曖昧な description・巨大な1ファイル</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>config.toml</code>
+                  </td>
+                  <td>Codex ランタイム</td>
+                  <td>モデル・ロール・MCP・sandbox を集中管理</td>
+                  <td>APIキーの直接記述</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>REQUIREMENTS.md</code>
+                    <br />
+                    <code>AGENT_TASKS.md</code>
+                  </td>
+                  <td>サブエージェント（Agents SDK）</td>
+                  <td>PMが自動生成。各エージェントの「唯一の真実」として機能</td>
+                  <td>PMなしに各エージェントが直接タスクを受け取る</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>README.md</code>
+                  </td>
+                  <td>人間（チームメンバー）</td>
+                  <td>エージェント構成・ロール一覧・セットアップ手順</td>
+                  <td>エージェント数が多いのに作成しない</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </section>
 
         <hr />
