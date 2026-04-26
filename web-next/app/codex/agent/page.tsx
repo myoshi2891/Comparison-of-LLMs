@@ -2083,10 +2083,147 @@ export default function CodexAgentPage() {
         {/* s07 */}
         <section id="s07" className={styles.sec}>
           <div className={styles["sec-head"]}>
-            <span className={styles["sec-num"]}>6</span>
+            <span className={styles["sec-num"]}>5</span>
             <h2>Agents SDK マルチエージェント — PM駆動ファイル生成パターン</h2>
           </div>
-          <p>（faithful 移植 s07 — 後続コミットで充填）</p>
+
+          <div className={styles.card}>
+            <p>
+              OpenAI Agents SDK を使ったマルチエージェント開発では、
+              <strong>Project Manager エージェントが司令塔</strong>となり、
+              <code>REQUIREMENTS.md</code>・<code>AGENT_TASKS.md</code>
+              といったMarkdownファイルを自動生成してチームメンバーエージェント（Designer / Frontend
+              / Backend / Tester）に引き渡します。これが Codex の最大の特徴です。
+            </p>
+          </div>
+
+          <div className={styles["code-wrap"]}>
+            <div className={styles["code-bar"]}>
+              <span>Agents SDK — PM駆動マルチエージェント実装例</span>
+              <span className={styles["code-lang"]}>Python</span>
+            </div>
+            <div className={styles["code-body"]}>
+              <span className={styles.ck}>from</span>
+              {" agents "}
+              <span className={styles.ck}>import</span>
+              {" Agent, Runner\n"}
+              <span className={styles.ck}>from</span>
+              {" codex_mcp\n"}
+              <span className={styles.ck}>import</span>
+              {" get_codex_mcp_server\n\n"}
+              <span className={styles.cm}>RECOMMENDED_PROMPT_PREFIX</span>
+              {" = "}
+              <span className={styles.cs}>
+                {
+                  '"""\nあなたはソフトウェア開発チームの専門エージェントです。\n引き継ぎには transfer 関数のみを使い、メッセージで直接渡さないこと。\n"""'
+                }
+              </span>
+              {"\n\n"}
+              <span className={styles.cc}>
+                # Codex を MCP サーバーとして使用（ファイルI/O を担当）
+              </span>
+              {"\ncodex_mcp = get_codex_mcp_server(\n    approval_policy="}
+              <span className={styles.cs}>"never"</span>
+              {",\n    sandbox="}
+              <span className={styles.cs}>"workspace-write"</span>
+              {"\n)\n\n"}
+              <span className={styles.cc}>
+                # ── 各専門エージェント定義 ────────────────────────────────
+              </span>
+              {"\nfrontend_agent = Agent(\n    "}
+              <span className={styles.cm}>name</span>
+              {"="}
+              <span className={styles.cs}>"Frontend Developer"</span>
+              {",\n    "}
+              <span className={styles.cm}>instructions</span>
+              {"=RECOMMENDED_PROMPT_PREFIX + "}
+              <span className={styles.cs}>
+                {
+                  '"""\nあなたはフロントエンド開発者です。\nAGENT_TASKS.md と REQUIREMENTS.md のみを真実の情報源として実装してください。\n担当ディレクトリ: /frontend\n成果物:\n- index.html — メインページ構造\n- styles.css — スタイルシート\n- main.js — インタラクション\n実装完了後は transfer_to_project_manager を呼び出すこと。\n"""'
+                }
+              </span>
+              {",\n    "}
+              <span className={styles.cm}>model</span>
+              {"="}
+              <span className={styles.cs}>"gpt-5.3-codex"</span>
+              {",\n    "}
+              <span className={styles.cm}>mcp_servers</span>
+              {"=[codex_mcp],\n)\nbackend_agent = Agent(\n    "}
+              <span className={styles.cm}>name</span>
+              {"="}
+              <span className={styles.cs}>"Backend Developer"</span>
+              {",\n    "}
+              <span className={styles.cm}>instructions</span>
+              {"=RECOMMENDED_PROMPT_PREFIX + "}
+              <span className={styles.cs}>
+                {
+                  '"""\nあなたはバックエンド開発者です。\nAGENT_TASKS.md に記述されたエンドポイントのみを実装してください。\n担当ディレクトリ: /backend\n成果物:\n- server.js — API実装 (GET /health, GET/POST /scores)\n- package.json — start スクリプトを含める\n実装完了後は transfer_to_project_manager を呼び出すこと。\n"""'
+                }
+              </span>
+              {",\n    "}
+              <span className={styles.cm}>model</span>
+              {"="}
+              <span className={styles.cs}>"gpt-5.3-codex"</span>
+              {",\n    "}
+              <span className={styles.cm}>mcp_servers</span>
+              {"=[codex_mcp],\n)\n\n"}
+              <span className={styles.cc}>
+                # ── Project Manager（司令塔）────────────────────────────────
+              </span>
+              {"\npm_agent = Agent(\n    "}
+              <span className={styles.cm}>name</span>
+              {"="}
+              <span className={styles.cs}>"Project Manager"</span>
+              {",\n    "}
+              <span className={styles.cm}>instructions</span>
+              {"=RECOMMENDED_PROMPT_PREFIX + "}
+              <span className={styles.cs}>
+                {
+                  '"""\nあなたは PM です。タスクを受け取ったら以下の3ファイルをプロジェクトルートに作成してください:\n1. REQUIREMENTS.md — 製品目標・対象ユーザー・主要機能・制約\n2. AGENT_TASKS.md — 各エージェントへの具体的な指示\n3. TEST.md — テスト計画（Tester エージェント向け）\nファイル作成後、各チームメンバーに transfer で引き渡し、\n成果物の確認を行い、品質基準を満たしたら完了とする。\n"""'
+                }
+              </span>
+              {",\n    "}
+              <span className={styles.cm}>model</span>
+              {"="}
+              <span className={styles.cs}>"gpt-5.4"</span>
+              {",\n    "}
+              <span className={styles.cm}>mcp_servers</span>
+              {"=[codex_mcp],\n    "}
+              <span className={styles.cm}>handoffs</span>
+              {"=[frontend_agent, backend_agent],\n)"}
+            </div>
+          </div>
+
+          <div className={`${styles.alert} ${styles.ai}`}>
+            <span className={styles["alert-icon"]}>🔍</span>
+            <div className={styles["alert-body"]}>
+              <strong>Agents SDK 組み込みトレーシング（2026年〜）</strong>
+              Agents SDK には <strong>built-in tracing</strong> が統合されており、generation
+              step・tool calls・handoffs・guardrails・カスタムイベントトレーシング・trace
+              dashboard・trace grading をワンストップで行えます（
+              <Ext href="https://openai.github.io/openai-agents-python/tracing/">
+                Agents SDK tracing ドキュメント
+              </Ext>
+              ）。
+              <br />
+              一方、<code>spawn_agents_on_csv</code> による CSV からのエージェントファンアウトと ETA
+              付き進捗追跡は <strong>Codex CLI（rust-v0.105.0+）固有の機能</strong>です（
+              <Ext href="https://github.com/openai/codex/releases">Codex CLI リリースノート</Ext>
+              ）。
+            </div>
+          </div>
+
+          <div className={`${styles.alert} ${styles.ae}`}>
+            <span className={styles["alert-icon"]}>🚨</span>
+            <div className={styles["alert-body"]}>
+              <strong>Sub-agents は親の承認を継承しない</strong>
+              サブエージェントは親のサンドボックスポリシーを継承しますが、
+              <strong>非インタラクティブな承認</strong>
+              で実行されます。承認が必要なアクションをサブエージェントが試みると、そのアクションは失敗してエラーが親ワークフローに返されます。各ロールの{" "}
+              <code>config.toml</code> で明示的に <code>approval_policy = &quot;never&quot;</code>{" "}
+              を指定するのがベストプラクティスです。
+            </div>
+          </div>
         </section>
 
         {/* s08 */}
