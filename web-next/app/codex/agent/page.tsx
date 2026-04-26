@@ -751,7 +751,518 @@ export default function CodexAgentPage() {
             <span className={styles["sec-num"]}>1</span>
             <h2>全体アーキテクチャと各ファイルの位置づけ</h2>
           </div>
-          <p>（faithful 移植 s02 — 後続コミットで充填）</p>
+          <div className={styles.card}>
+            <p>
+              Codex のファイル体系は <strong>他のツールと最も大きく異なります</strong>。Claude の{" "}
+              <code className={styles.mono}>CLAUDE.md</code>・Gemini の{" "}
+              <code className={styles.mono}>GEMINI.md</code> に相当するのが{" "}
+              <code className={styles.mono}>AGENTS.md</code> ですが、Codex にはそれに加えて{" "}
+              <strong>SKILL.md（遅延ロード型スキル）</strong>・
+              <strong>AGENTS.override.md（ホットスワップ型上書き）</strong>・
+              <strong>config.toml（エージェントロール定義）</strong> という独自の概念があります。
+            </p>
+          </div>
+
+          {/* Context load chain */}
+          <div className={styles["load-chain"]}>
+            <div className={styles["load-chain-title"]}>
+              AGENTS.md 読み込みチェーン — 低優先度 → 高優先度（後のファイルが前を上書き）
+            </div>
+            <div className={styles["load-steps"]}>
+              <div className={styles["load-step"]}>
+                <div className={`${styles["load-box"]} ${styles["lb-global"]}`}>
+                  🌐 Global
+                  <br />
+                  <small>~/.codex/AGENTS.md</small>
+                </div>
+                <div
+                  style={{
+                    fontSize: "11px",
+                    color: "var(--text3)",
+                    textAlign: "center",
+                    marginTop: "8px",
+                  }}
+                >
+                  全プロジェクト共通
+                  <br />
+                  Working agreements
+                </div>
+              </div>
+              <div className={styles["load-arrow"]}>→</div>
+              <div className={styles["load-step"]}>
+                <div className={`${styles["load-box"]} ${styles["lb-project"]}`}>
+                  📁 Git Root
+                  <br />
+                  <small>./AGENTS.md</small>
+                </div>
+                <div
+                  style={{
+                    fontSize: "11px",
+                    color: "var(--text3)",
+                    textAlign: "center",
+                    marginTop: "8px",
+                  }}
+                >
+                  プロジェクト固有
+                  <br />
+                  (.git を起点)
+                </div>
+              </div>
+              <div className={styles["load-arrow"]}>→</div>
+              <div className={styles["load-step"]}>
+                <div className={`${styles["load-box"]} ${styles["lb-sub"]}`}>
+                  📂 Subdir
+                  <br />
+                  <small>services/*/AGENTS.md</small>
+                </div>
+                <div
+                  style={{
+                    fontSize: "11px",
+                    color: "var(--text3)",
+                    textAlign: "center",
+                    marginTop: "8px",
+                  }}
+                >
+                  ディレクトリ固有
+                  <br />
+                  （CWDまで走査）
+                </div>
+              </div>
+              <div className={styles["load-arrow"]}>→</div>
+              <div className={styles["load-step"]}>
+                <div className={`${styles["load-box"]} ${styles["lb-override"]}`}>
+                  ⚡ Override
+                  <br />
+                  <small>AGENTS.override.md</small>
+                </div>
+                <div
+                  style={{
+                    fontSize: "11px",
+                    color: "var(--text3)",
+                    textAlign: "center",
+                    marginTop: "8px",
+                  }}
+                >
+                  緊急上書き
+                  <br />
+                  （同一ディレクトリ優先）
+                </div>
+              </div>
+            </div>
+            <div className={styles["load-note"]}>
+              各ディレクトリで <strong>AGENTS.override.md → AGENTS.md → fallback</strong>{" "}
+              の順にチェック。1ディレクトリ1ファイルのみ採用。
+              <br />
+              全ファイルを結合してモデルの最初のターンに渡す（空ファイルはスキップ）
+            </div>
+            <div style={{ textAlign: "center", marginTop: "12px" }}>
+              <div className={styles["load-limit"]}>
+                ⚠ デフォルト上限: 32 KiB（project_doc_max_bytes） —
+                超えたら分割するか上限を引き上げる
+              </div>
+            </div>
+          </div>
+
+          {/* File tree SVG */}
+          <div className={styles["filetree-outer"]}>
+            <div className={styles["filetree-bar"]}>
+              <span className={styles["fb-dot"]} style={{ background: "#ef4444" }} />
+              <span className={styles["fb-dot"]} style={{ background: "#f59e0b" }} />
+              <span className={styles["fb-dot"]} style={{ background: "#10a37f" }} />
+              <span
+                style={{
+                  marginLeft: "10px",
+                  color: "var(--text3)",
+                  fontSize: "12px",
+                  fontFamily: "'JetBrains Mono', monospace",
+                }}
+              >
+                project-root/ — Codex エコシステム ファイル構造
+              </span>
+            </div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 980 820"
+              width="100%"
+              style={{ display: "block" }}
+              fontFamily="'JetBrains Mono','Fira Code',monospace"
+              role="img"
+              aria-label="Codex エコシステム ファイル構造のファイルツリー図"
+            >
+              <title>Codex エコシステム ファイル構造</title>
+              <defs>
+                <linearGradient id="cg1" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style={{ stopColor: "#10a37f" }} />
+                  <stop offset="100%" style={{ stopColor: "#0d8a6b" }} />
+                </linearGradient>
+                <linearGradient id="cg2" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style={{ stopColor: "#3b82f6" }} />
+                  <stop offset="100%" style={{ stopColor: "#60a5fa" }} />
+                </linearGradient>
+                <linearGradient id="cg3" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style={{ stopColor: "#f59e0b" }} />
+                  <stop offset="100%" style={{ stopColor: "#fbbf24" }} />
+                </linearGradient>
+                <linearGradient id="cg4" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style={{ stopColor: "#8b5cf6" }} />
+                  <stop offset="100%" style={{ stopColor: "#a78bfa" }} />
+                </linearGradient>
+                <linearGradient id="cg5" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style={{ stopColor: "#ef4444" }} />
+                  <stop offset="100%" style={{ stopColor: "#f87171" }} />
+                </linearGradient>
+                <linearGradient id="cg6" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style={{ stopColor: "#14b8a6" }} />
+                  <stop offset="100%" style={{ stopColor: "#2dd4bf" }} />
+                </linearGradient>
+              </defs>
+              <rect width="980" height="820" fill="#060606" />
+
+              {/* LEGEND */}
+              <rect
+                x="670"
+                y="16"
+                width="296"
+                height="262"
+                rx="10"
+                fill="#111318"
+                stroke="#1e2228"
+                strokeWidth="1"
+              />
+              <text
+                x="818"
+                y="38"
+                textAnchor="middle"
+                fill="#484f58"
+                fontSize="11"
+                letterSpacing="1.5"
+              >
+                LEGEND
+              </text>
+              <rect x="686" y="50" width="22" height="22" rx="5" fill="url(#cg1)" />
+              <text x="697" y="65" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ①
+              </text>
+              <text x="716" y="65" fontSize="12" fill="#d0d0d0">
+                AGENTS.md（常時ロード）
+              </text>
+              <rect x="686" y="82" width="22" height="22" rx="5" fill="url(#cg3)" />
+              <text x="697" y="97" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ②
+              </text>
+              <text x="716" y="97" fontSize="12" fill="#d0d0d0">
+                AGENTS.override.md（緊急上書き）
+              </text>
+              <rect x="686" y="114" width="22" height="22" rx="5" fill="url(#cg2)" />
+              <text x="697" y="129" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ③
+              </text>
+              <text x="716" y="129" fontSize="12" fill="#d0d0d0">
+                SKILL.md（遅延ロード型スキル）
+              </text>
+              <rect x="686" y="146" width="22" height="22" rx="5" fill="url(#cg4)" />
+              <text x="697" y="161" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ④
+              </text>
+              <text x="716" y="161" fontSize="12" fill="#d0d0d0">
+                config.toml（エージェントロール）
+              </text>
+              <rect x="686" y="178" width="22" height="22" rx="5" fill="url(#cg5)" />
+              <text x="697" y="193" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ⑤
+              </text>
+              <text x="716" y="193" fontSize="12" fill="#d0d0d0">
+                PM生成ファイル（Agents SDK）
+              </text>
+              <rect x="686" y="210" width="22" height="22" rx="5" fill="url(#cg6)" />
+              <text x="697" y="225" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ⑥
+              </text>
+              <text x="716" y="225" fontSize="12" fill="#d0d0d0">
+                README.md（人間向け）
+              </text>
+              <rect x="686" y="242" width="52" height="22" rx="5" fill="#1e2228" />
+              <text
+                x="712"
+                y="257"
+                textAnchor="middle"
+                fill="#6b7280"
+                fontSize="11"
+                fontWeight="700"
+              >
+                📁 DIR
+              </text>
+              <text x="746" y="257" fontSize="12" fill="#484f58">
+                ディレクトリ
+              </text>
+
+              {/* TREE LINES */}
+              <line x1="44" y1="50" x2="44" y2="770" stroke="#1e2228" strokeWidth="1.5" />
+              <line x1="44" y1="52" x2="70" y2="52" stroke="#1e2228" strokeWidth="1.5" />
+              <line x1="44" y1="100" x2="70" y2="100" stroke="#1e2228" strokeWidth="1.5" />
+              <line x1="44" y1="150" x2="70" y2="150" stroke="#1e2228" strokeWidth="1.5" />
+              <line x1="44" y1="198" x2="70" y2="198" stroke="#1e2228" strokeWidth="1.5" />
+              {/* .codex/ spine */}
+              <line x1="86" y1="198" x2="86" y2="290" stroke="#1e2228" strokeWidth="1.5" />
+              <line x1="86" y1="228" x2="112" y2="228" stroke="#1e2228" strokeWidth="1.5" />
+              <line x1="86" y1="264" x2="112" y2="264" stroke="#1e2228" strokeWidth="1.5" />
+              {/* services/ */}
+              <line x1="44" y1="320" x2="70" y2="320" stroke="#1e2228" strokeWidth="1.5" />
+              <line x1="86" y1="320" x2="86" y2="400" stroke="#1e2228" strokeWidth="1.5" />
+              <line x1="86" y1="350" x2="112" y2="350" stroke="#1e2228" strokeWidth="1.5" />
+              <line x1="86" y1="388" x2="112" y2="388" stroke="#1e2228" strokeWidth="1.5" />
+              <line x1="128" y1="388" x2="128" y2="420" stroke="#1e2228" strokeWidth="1.5" />
+              <line x1="128" y1="418" x2="154" y2="418" stroke="#1e2228" strokeWidth="1.5" />
+              {/* .agents/ */}
+              <line x1="44" y1="460" x2="70" y2="460" stroke="#1e2228" strokeWidth="1.5" />
+              <line x1="86" y1="460" x2="86" y2="570" stroke="#1e2228" strokeWidth="1.5" />
+              <line x1="86" y1="490" x2="112" y2="490" stroke="#1e2228" strokeWidth="1.5" />
+              <line x1="86" y1="530" x2="112" y2="530" stroke="#1e2228" strokeWidth="1.5" />
+              <line x1="128" y1="530" x2="128" y2="570" stroke="#1e2228" strokeWidth="1.5" />
+              <line x1="128" y1="558" x2="154" y2="558" stroke="#1e2228" strokeWidth="1.5" />
+              {/* docs/ */}
+              <line x1="44" y1="620" x2="70" y2="620" stroke="#1e2228" strokeWidth="1.5" />
+              <line x1="86" y1="620" x2="86" y2="720" stroke="#1e2228" strokeWidth="1.5" />
+              <line x1="86" y1="648" x2="112" y2="648" stroke="#1e2228" strokeWidth="1.5" />
+              <line x1="86" y1="686" x2="112" y2="686" stroke="#1e2228" strokeWidth="1.5" />
+              <line x1="86" y1="724" x2="112" y2="724" stroke="#1e2228" strokeWidth="1.5" />
+              {/* README */}
+              <line x1="44" y1="770" x2="70" y2="770" stroke="#1e2228" strokeWidth="1.5" />
+
+              {/* ROOT */}
+              <text x="20" y="32" fontSize="16" fill="#10a37f">
+                📁
+              </text>
+              <text x="42" y="32" fontSize="14" fontWeight="700" fill="#34d399">
+                project-root/
+              </text>
+
+              {/* ROW 1: AGENTS.md (root) */}
+              <text x="78" y="58" fontSize="14" fill="#34d399">
+                📄
+              </text>
+              <text x="98" y="58" fontSize="13.5" fontWeight="700" fill="#34d399">
+                AGENTS.md
+              </text>
+              <rect x="196" y="43" width="22" height="22" rx="5" fill="url(#cg1)" />
+              <text x="207" y="58" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ①
+              </text>
+              <text x="226" y="58" fontSize="12" fill="#6b7280">
+                プロジェクト固有の常設指示（毎セッションロード）
+              </text>
+              <text x="226" y="74" fontSize="11" fill="#3a3a3a">
+                ※ /init コマンドで自動生成可
+              </text>
+
+              {/* ROW 2: AGENTS.override.md (root) */}
+              <text x="78" y="106" fontSize="14" fill="#fbbf24">
+                ⚡
+              </text>
+              <text x="98" y="106" fontSize="13.5" fontWeight="700" fill="#fbbf24">
+                AGENTS.override.md
+              </text>
+              <rect x="278" y="91" width="22" height="22" rx="5" fill="url(#cg3)" />
+              <text x="289" y="106" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ②
+              </text>
+              <text x="308" y="106" fontSize="12" fill="#6b7280">
+                緊急上書き用（AGENTS.md より先に読まれる）
+              </text>
+
+              {/* ROW 3: config.toml (root) */}
+              <text x="78" y="156" fontSize="14" fill="#a78bfa">
+                ⚙️
+              </text>
+              <text x="98" y="156" fontSize="13.5" fontWeight="700" fill="#a78bfa">
+                config.toml
+              </text>
+              <rect x="196" y="141" width="22" height="22" rx="5" fill="url(#cg4)" />
+              <text x="207" y="156" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ④
+              </text>
+              <text x="226" y="156" fontSize="12" fill="#6b7280">
+                モデル設定・エージェントロール・MCP・sandbox
+              </text>
+
+              {/* ROW 4: .codex/ dir */}
+              <text x="78" y="204" fontSize="14" fill="#60a5fa">
+                📁
+              </text>
+              <text x="98" y="204" fontSize="14" fontWeight="700" fill="#60a5fa">
+                .codex/
+              </text>
+              <text x="178" y="204" fontSize="12" fill="#3a3a3a">
+                ← プロジェクト固有設定レイヤー
+              </text>
+              {/* .codex/config.toml */}
+              <text x="120" y="234" fontSize="14" fill="#a78bfa">
+                ⚙️
+              </text>
+              <text x="140" y="234" fontSize="13" fill="#a78bfa">
+                config.toml
+              </text>
+              <rect x="232" y="219" width="22" height="22" rx="5" fill="url(#cg4)" opacity="0.75" />
+              <text x="243" y="234" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ④
+              </text>
+              <text x="262" y="234" fontSize="12" fill="#4a4a4a">
+                プロジェクト固有設定（trusted時のみ読込）
+              </text>
+              {/* .codex/AGENTS.md */}
+              <text x="120" y="270" fontSize="14" fill="#34d399">
+                📄
+              </text>
+              <text x="140" y="270" fontSize="13" fontWeight="700" fill="#34d399">
+                AGENTS.md
+              </text>
+              <rect x="228" y="255" width="22" height="22" rx="5" fill="url(#cg1)" opacity="0.7" />
+              <text x="239" y="270" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ①
+              </text>
+              <text x="258" y="270" fontSize="12" fill="#4a4a4a">
+                .codex層の補足指示
+              </text>
+
+              {/* ROW 5: services/ dir */}
+              <text x="78" y="326" fontSize="14" fill="#60a5fa">
+                📁
+              </text>
+              <text x="98" y="326" fontSize="14" fontWeight="700" fill="#60a5fa">
+                services/
+              </text>
+              {/* services/payments/ */}
+              <text x="120" y="356" fontSize="13" fill="#60a5fa">
+                📂
+              </text>
+              <text x="140" y="356" fontSize="13" fontWeight="700" fill="#60a5fa">
+                payments/
+              </text>
+              {/* services/auth/ */}
+              <text x="120" y="394" fontSize="13" fill="#60a5fa">
+                📂
+              </text>
+              <text x="140" y="394" fontSize="13" fontWeight="700" fill="#60a5fa">
+                auth/
+              </text>
+              <text x="162" y="424" fontSize="13" fill="#fbbf24">
+                ⚡
+              </text>
+              <text x="182" y="424" fontSize="13" fontWeight="700" fill="#fbbf24">
+                AGENTS.override.md
+              </text>
+              <rect x="350" y="409" width="22" height="22" rx="5" fill="url(#cg3)" opacity="0.8" />
+              <text x="361" y="424" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ②
+              </text>
+              <text x="380" y="424" fontSize="12" fill="#6b7280">
+                auth/ 固有ルールを緊急上書き
+              </text>
+
+              {/* ROW 6: .agents/ dir (Skills) */}
+              <text x="78" y="466" fontSize="14" fill="#60a5fa">
+                📁
+              </text>
+              <text x="98" y="466" fontSize="14" fontWeight="700" fill="#60a5fa">
+                .agents/
+              </text>
+              {/* .agents/skills/ dir */}
+              <text x="120" y="496" fontSize="13" fill="#60a5fa">
+                📂
+              </text>
+              <text x="140" y="496" fontSize="13" fontWeight="700" fill="#60a5fa">
+                skills/
+              </text>
+              <text x="220" y="496" fontSize="12" fill="#3a3a3a">
+                ← リポジトリ固有スキル置き場
+              </text>
+              {/* skill folder */}
+              <text x="120" y="536" fontSize="13" fill="#60a5fa">
+                📂
+              </text>
+              <text x="140" y="536" fontSize="13" fontWeight="700" fill="#60a5fa">
+                code-review/
+              </text>
+              <text x="162" y="564" fontSize="13" fill="#60a5fa">
+                📝
+              </text>
+              <text x="182" y="564" fontSize="13" fill="#60a5fa">
+                SKILL.md
+              </text>
+              <rect x="264" y="549" width="22" height="22" rx="5" fill="url(#cg2)" />
+              <text x="275" y="564" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ③
+              </text>
+              <text x="294" y="564" fontSize="12" fill="#6b7280">
+                スキル定義（必要時のみフル読込：遅延ロード）
+              </text>
+
+              {/* ROW 7: docs/ dir (Agents SDK) */}
+              <text x="78" y="626" fontSize="14" fill="#60a5fa">
+                📁
+              </text>
+              <text x="98" y="626" fontSize="14" fontWeight="700" fill="#60a5fa">
+                docs/
+              </text>
+              <text x="178" y="626" fontSize="12" fill="#3a3a3a">
+                ← Agents SDK マルチエージェント生成ファイル
+              </text>
+              <text x="120" y="654" fontSize="13" fill="#fb7185">
+                📋
+              </text>
+              <text x="140" y="654" fontSize="13" fill="#fb7185">
+                REQUIREMENTS.md
+              </text>
+              <rect x="302" y="639" width="22" height="22" rx="5" fill="url(#cg5)" />
+              <text x="313" y="654" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ⑤
+              </text>
+              <text x="332" y="654" fontSize="12" fill="#6b7280">
+                PM エージェントが自動生成する仕様書
+              </text>
+              <text x="120" y="692" fontSize="13" fill="#fb7185">
+                📋
+              </text>
+              <text x="140" y="692" fontSize="13" fill="#fb7185">
+                AGENT_TASKS.md
+              </text>
+              <rect x="298" y="677" width="22" height="22" rx="5" fill="url(#cg5)" opacity="0.85" />
+              <text x="309" y="692" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ⑤
+              </text>
+              <text x="328" y="692" fontSize="12" fill="#6b7280">
+                PM が各サブエージェントへの指示を記述
+              </text>
+              <text x="120" y="730" fontSize="13" fill="#fb7185">
+                📋
+              </text>
+              <text x="140" y="730" fontSize="13" fill="#fb7185">
+                TEST.md
+              </text>
+              <rect x="226" y="715" width="22" height="22" rx="5" fill="url(#cg5)" opacity="0.7" />
+              <text x="237" y="730" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ⑤
+              </text>
+              <text x="256" y="730" fontSize="12" fill="#6b7280">
+                Tester エージェントが生成するテスト計画
+              </text>
+
+              {/* ROW 8: README.md */}
+              <text x="78" y="776" fontSize="14" fill="#60a5fa">
+                📘
+              </text>
+              <text x="98" y="776" fontSize="14" fontWeight="700" fill="#2dd4bf">
+                README.md
+              </text>
+              <rect x="208" y="761" width="22" height="22" rx="5" fill="url(#cg6)" />
+              <text x="219" y="776" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ⑥
+              </text>
+              <text x="238" y="776" fontSize="12" fill="#6b7280">
+                人間向け：エージェント構成・セットアップ手順
+              </text>
+            </svg>
+          </div>
         </section>
 
         {/* s03 */}
