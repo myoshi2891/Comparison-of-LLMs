@@ -21,6 +21,13 @@ interface Props {
   onToggle: (lang: Lang) => void;
 }
 
+/**
+ * Renders a two-button language switch for Japanese ("JA") and English ("EN").
+ *
+ * @param lang - Current language value; expected to be `"ja"` or `"en"`. Determines which button is marked active.
+ * @param onToggle - Callback invoked with the selected language (`"ja"` or `"en"`) when a button is clicked.
+ * @returns The JSX element containing the language toggle buttons with the active state reflecting `lang`.
+ */
 export function LanguageToggle({ lang, onToggle }: Props) {
   return (
     <div className="lang-toggle">

@@ -38,6 +38,16 @@ interface Props {
   jpyRate: number;
 }
 
+/**
+ * Renders a subscription comparison table grouped by tool category with period cost columns.
+ *
+ * Renders a table that inserts a colored group header when the tool's group changes, shows each tool's name, tag, monthly/annual price (USD and JPY), and a column per period with computed subscription cost.
+ *
+ * @param lang - Locale key used for translations and selecting tool notes (e.g., "ja")
+ * @param tools - Array of subscription tool descriptors to render, in display order
+ * @param jpyRate - Exchange rate used to convert USD amounts to JPY for display
+ * @returns A JSX element containing the fully rendered comparison table
+ */
 export function SubTable({ lang, tools, jpyRate }: Props) {
   let lastGroup = "";
 

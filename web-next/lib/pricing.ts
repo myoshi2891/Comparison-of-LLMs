@@ -59,8 +59,10 @@ export const PricingDataSchema: z.ZodType<PricingData> = z
   .strict();
 
 /**
- * `unknown` 入力を検証し、失敗時は詳細メッセージを投げる。
- * Server Component から呼び出して SSG ビルド時に不正データを検出する。
+ * Validate the provided value against the pricing schema and return the parsed data.
+ *
+ * @param input - The value to validate (typically raw parsed JSON)
+ * @returns The validated PricingData object
  */
 export function parsePricingData(input: unknown): PricingData {
   return PricingDataSchema.parse(input);

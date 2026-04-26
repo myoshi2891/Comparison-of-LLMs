@@ -20,7 +20,16 @@ export const PERIODS = [
   { key: "12mo", hours: 8760 },
 ] as const;
 
-/** API モデルの時間別コスト (USD) を計算 */
+/**
+ * Compute the USD cost for API token usage over a time window.
+ *
+ * @param priceIn - Price in USD per 1,000,000 input tokens
+ * @param priceOut - Price in USD per 1,000,000 output tokens
+ * @param inputTokens - Total number of input tokens
+ * @param outputTokens - Total number of output tokens
+ * @param hours - Hours multiplier used to scale the calculated token cost
+ * @returns The total cost in USD
+ */
 export function calcApiCost(
   priceIn: number,
   priceOut: number,
@@ -32,10 +41,18 @@ export function calcApiCost(
 }
 
 /**
- * サブスクリプション按分コスト (USD) を計算。
- * - 720h (30日) 以下は月額を時間換算
- * - 8760h (1年) は年払い優先（annual が null でなければ）
- * - それ以外は月額 × 月数
+ * Calculate the prorated subscription cost in USD for a given time window.
+ *
+ * Uses these rules:
+ * - If both `monthly` is 0 and `annual` is null or 0, returns 0.
+ * - For periods >= 8760 hours, returns `annual` when it is provided.
+ * - For periods <= 720 hours, prorates `monthly` by hours; if `monthly` is 0 and `annual` is provided, prorates `annual` by hours.
+ * - Otherwise prorates `monthly` by (hours / 720).
+ *
+ * @param monthly - Monthly subscription price in USD
+ * @param annual - Annual subscription price in USD, or `null` if not available
+ * @param hours - Time window in hours used to prorate the subscription
+ * @returns The subscription cost in USD for the specified `hours`
  */
 export function calcSubCost(monthly: number, annual: number | null, hours: number): number {
   if (monthly === 0 && (!annual || annual === 0)) return 0;
@@ -48,7 +65,14 @@ export function calcSubCost(monthly: number, annual: number | null, hours: numbe
   return monthly * (hours / 720);
 }
 
-/** コスト値を色クラスインデックス (0-10) に変換 */
+/**
+ * Map a numeric cost to a discrete color-class index from 0 to 10.
+ *
+ * @param v - The cost value to bucket (expected in USD or same unit).
+ * @returns `0` for non-finite or non-positive values; otherwise the smallest index `i` (0–9)
+ * where `v` is less than the ascending thresholds [0.01, 0.1, 1, 5, 20, 100, 500, 2000, 10000, 50000];
+ * returns `10` if `v` is greater than or equal to the highest threshold.
+ */
 export function colorIndex(v: number): number {
   if (!Number.isFinite(v)) return 0;
   if (v <= 0) return 0;
@@ -59,7 +83,12 @@ export function colorIndex(v: number): number {
   return 10;
 }
 
-/** USD 金額をフォーマット */
+/**
+ * Formats a USD monetary value into a user-facing string with a dollar sign and thousands separators.
+ *
+ * @param v - The USD amount to format
+ * @returns The formatted USD string: `"$0.00"` for non-finite or non-positive values, `"<$0.01"` for values less than `0.005`, otherwise a dollar-prefixed string with two decimals and comma thousands separators
+ */
 export function fmtUSD(v: number): string {
   if (!Number.isFinite(v)) return "$0.00";
   if (v <= 0) return "$0.00";
@@ -68,12 +97,11 @@ export function fmtUSD(v: number): string {
 }
 
 /**
- * JPY 金額をフォーマット
+ * Format a numeric value as a JPY currency string using the provided exchange rate.
  *
- * `jpyRate <= 0` は「為替レート取得失敗」を示す無効値として扱い、
- * `¥—` を返す。これがないと `v > 0` でも `v * 0 = 0` で `¥0` を返してしまい、
- * 「価格がゼロ」と「レート不明」が区別不能になる（defense in depth）。
- * `v` が非有限値 (NaN / Infinity) の場合も同様に `¥—` を返す。
+ * @param v - The monetary amount to convert (base currency units)
+ * @param jpyRate - The JPY exchange rate to apply; treated as invalid when not finite or <= 0
+ * @returns `¥—` when `v` or `jpyRate` is invalid; `¥0` when the converted JPY is <= 0; `"<¥1"` when the converted JPY is greater than 0 but less than 1; otherwise the converted JPY rounded to the nearest integer and formatted with Japanese thousands separators, prefixed with `¥`
  */
 export function fmtJPY(v: number, jpyRate: number): string {
   if (!Number.isFinite(v)) return "¥—";

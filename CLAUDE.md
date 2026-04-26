@@ -106,7 +106,7 @@ bun run format      # Biome format --write
 ### テスト
 
 ```bash
-cd web-next && bun test       # フロントエンド (vitest, 最新のテスト結果や既知の Issue は CI 等を参照)
+cd web-next && bun run test   # フロントエンド (vitest, 最新のテスト結果や既知の Issue は CI 等を参照)
 cd scraper && uv run pytest   # バックエンド (pytest, テスト結果は CI 等を参照)
 ```
 

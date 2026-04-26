@@ -307,6 +307,16 @@ const CARDS: readonly RefCard[] = [
   },
 ];
 
+/**
+ * Renders a localized "reference links" section containing provider cards and an FX rate card.
+ *
+ * Renders 16 reference cards (15 provider cards plus one FX rate card). Each card displays a title
+ * and two external links with language-specific descriptions; the FX card title is localized based
+ * on `lang`. The section also includes a localized rich-text note produced by `tRich("refNote", lang)`.
+ *
+ * @param lang - Language code used to select localized titles and descriptions
+ * @returns A React element containing the complete reference links section
+ */
 export function RefLinks({ lang }: Props) {
   return (
     <div className="ref-section section" style={{ marginTop: "32px" }}>

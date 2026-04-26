@@ -56,6 +56,20 @@ interface Props {
   onScenarioChange: (key: ScenarioKey, input: number, output: number) => void;
 }
 
+/**
+ * Renders the Step 1 scenario selection UI with predefined scenario buttons and an optional custom input panel.
+ *
+ * Displays buttons for each scenario (including a "custom" option), shows per-scenario input/output rates, and when
+ * the "custom" scenario is active provides synchronized range and numeric controls for input and output. Invokes
+ * `onScenarioChange` when the selected scenario or the active custom values change.
+ *
+ * @param lang - Language code used for i18n lookups
+ * @param currentInput - Externally controlled input value (tokens per hour) shown in the UI and used to compute the ratio
+ * @param currentOutput - Externally controlled output value (tokens per hour) shown in the UI and used to compute the ratio; if <= 0 the ratio is shown as "–"
+ * @param scenario - Currently selected scenario key
+ * @param onScenarioChange - Callback invoked when the user selects a scenario or updates custom values; called with `(key, input, output)`
+ * @returns The component's JSX element rendering the scenario selector panel
+ */
 export function ScenarioSelector({
   lang,
   currentInput,

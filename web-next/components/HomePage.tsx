@@ -30,6 +30,12 @@ interface Props {
   data: PricingData;
 }
 
+/**
+ * Composes and renders the application's top-level homepage UI using validated pricing data.
+ *
+ * @param data - Zod-validated `PricingData` containing `jpy_rate`, `api_models`, `sub_tools`, and `generated_at`.
+ * @returns The HomePage component's rendered JSX tree (the page UI).
+ */
 export function HomePage({ data }: Props) {
   const [lang, setLang] = useState<Lang>("ja");
   const [tab, setTab] = useState<TabKey>("api");
