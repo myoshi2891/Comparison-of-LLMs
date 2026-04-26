@@ -1812,12 +1812,272 @@ export default function CodexAgentPage() {
         {/* s06 */}
         <section id="s06" className={styles.sec}>
           <div className={styles["sec-head"]}>
-            <span className={styles["sec-num"]}>5</span>
+            <span className={styles["sec-num"]}>4</span>
             <h2>
               <span className={styles.mono}>config.toml</span> — マルチエージェントロール定義
             </h2>
           </div>
-          <p>（faithful 移植 s06 — 後続コミットで充填）</p>
+
+          <div className={styles.card}>
+            <p>
+              Codex のマルチエージェントワークフローでは、各サブエージェントの定義は{" "}
+              <code>config.toml</code> の <code>[agents]</code> セクションで行います。各ロールには
+              <strong>専用の config.toml ファイル</strong>（<code>config_file</code>
+              ）を指定でき、それによってモデル・sandbox・承認ポリシーをロールごとに設定できます。
+            </p>
+          </div>
+
+          <div className={styles["roles-grid"]}>
+            <div className={styles["role-card"]}>
+              <div className={styles["role-icon"]}>🔍</div>
+              <div className={styles["role-name"]}>explorer（組み込み）</div>
+              <div className={styles["role-desc"]}>
+                コードベースの探索・検索専用。Haiku相当の軽量モデルで並列実行。Read-only sandbox。
+              </div>
+              <div className={styles["role-ex"]}>
+                model = &quot;gpt-4.1-mini&quot;
+                <br />
+                sandbox = &quot;read-only&quot;
+              </div>
+            </div>
+            <div className={styles["role-card"]}>
+              <div className={styles["role-icon"]}>🖊️</div>
+              <div className={styles["role-name"]}>default（組み込み）</div>
+              <div className={styles["role-desc"]}>
+                汎用コーディングエージェント。メインのタスク実行ロール。workspace-write sandbox。
+              </div>
+              <div className={styles["role-ex"]}>
+                model = &quot;gpt-5.3-codex&quot;
+                <br />
+                sandbox = &quot;workspace-write&quot;
+              </div>
+            </div>
+            <div className={styles["role-card"]}>
+              <div className={styles["role-icon"]}>📋</div>
+              <div className={styles["role-name"]}>reviewer（カスタム例）</div>
+              <div className={styles["role-desc"]}>
+                コードレビュー専用。Read-only で never approval。高精度モデルで品質確認。
+              </div>
+              <div className={styles["role-ex"]}>
+                model = &quot;gpt-5.4&quot;
+                <br />
+                approval_policy = &quot;never&quot;
+              </div>
+            </div>
+          </div>
+
+          <div className={styles["code-wrap"]}>
+            <div className={styles["code-bar"]}>
+              <span>.codex/config.toml（プロジェクト固有・マルチエージェント設定）</span>
+              <span className={styles["code-lang"]}>TOML</span>
+            </div>
+            <div className={styles["code-body"]}>
+              <span className={styles.cc}>
+                # .codex/config.toml — マルチエージェントワークフロー設定
+              </span>
+              {"\n"}
+              <span className={styles.cc}>
+                # Codex がこのプロジェクトを trusted と判断した場合のみロードされる
+              </span>
+              {"\n\n"}
+              <span className={styles.cm}>model</span>
+              {" = "}
+              <span className={styles.cs}>"gpt-5.3-codex"</span>
+              {"\n"}
+              <span className={styles.cc}># プロジェクトデフォルトモデル</span>
+              {"\n"}
+              <span className={styles.cm}>approval_policy</span>
+              {" = "}
+              <span className={styles.cs}>"on-request"</span>
+              {"\n"}
+              <span className={styles.cc}># インタラクティブ実行向け</span>
+              {"\n\n"}
+              <span className={styles.cc}>
+                # ── プロジェクトドキュメント設定 ──────────────────────────
+              </span>
+              {"\n"}
+              <span className={styles.cm}>project_doc_max_bytes</span>
+              {" = "}
+              <span className={styles.cv}>65536</span>
+              {"\n"}
+              <span className={styles.cc}># 64 KiB に引き上げ（大型プロジェクト向け）</span>
+              {"\n"}
+              <span className={styles.cm}>project_doc_fallback_filenames</span>
+              {" = ["}
+              <span className={styles.cs}>"TEAM_GUIDE.md"</span>
+              {", "}
+              <span className={styles.cs}>"CLAUDE.md"</span>
+              {"]"}
+              {"\n"}
+              <span className={styles.cc}>
+                # AGENTS.md がないディレクトリでは上記をフォールバックとして使用
+              </span>
+              {"\n\n"}
+              <span className={styles.cc}>
+                # ── マルチエージェント設定 ────────────────────────────────
+              </span>
+              {"\n["}
+              <span className={styles.cm}>features</span>
+              {"] "}
+              <span className={styles.cm}>multi_agents</span>
+              {" = "}
+              <span className={styles.ck}>true</span>
+              {"\n"}
+              <span className={styles.cc}># 実験的: TUIで /experimental から有効化</span>
+              {"\n\n["}
+              <span className={styles.cm}>agents</span>
+              {"] "}
+              <span className={styles.cm}>max_threads</span>
+              {" = "}
+              <span className={styles.cv}>6</span>
+              {"\n"}
+              <span className={styles.cc}># 同時実行スレッド数上限（デフォルト: 6）</span>
+              {"\n"}
+              <span className={styles.cm}>max_depth</span>
+              {" = "}
+              <span className={styles.cv}>2</span>
+              {"\n"}
+              <span className={styles.cc}># スポーン最大深度（root=0, 子=1, 孫=2）</span>
+              {"\n\n"}
+              <span className={styles.cc}>
+                # ── ロール定義 ────────────────────────────────────────────
+              </span>
+              {"\n["}
+              <span className={styles.cm}>agents.roles.explorer</span>
+              {"]"}
+              {"\n"}
+              <span className={styles.cc}># 組み込みロールのオーバーライド</span>
+              {"\n"}
+              <span className={styles.cm}>description</span>
+              {" = "}
+              <span className={styles.cs}>"コードベース探索・検索専門。実装は行わない。"</span>
+              {"\n"}
+              <span className={styles.cm}>config_file</span>
+              {" = "}
+              <span className={styles.cs}>".codex/roles/explorer.toml"</span>
+              {"\n\n["}
+              <span className={styles.cm}>agents.roles.reviewer</span>
+              {"]"}
+              {"\n"}
+              <span className={styles.cc}># カスタムロール: コードレビュー専用</span>
+              {"\n"}
+              <span className={styles.cm}>description</span>
+              {" = "}
+              <span className={styles.cs}>
+                {
+                  '"""\n  コードレビューを実施する専門エージェント。\n  以下の場合に呼び出す:\n  - コード変更が完了した後\n  - PR作成前のセキュリティ・品質チェック\n  - テストカバレッジ確認\n  Read-only: コードの変更は行わない。\n"""'
+                }
+              </span>
+              {"\n"}
+              <span className={styles.cm}>config_file</span>
+              {" = "}
+              <span className={styles.cs}>".codex/roles/reviewer.toml"</span>
+              {"\n\n["}
+              <span className={styles.cm}>agents.roles.db-migrator</span>
+              {"]"}
+              {"\n"}
+              <span className={styles.cc}># DBマイグレーション専用（慎重な承認ポリシー）</span>
+              {"\n"}
+              <span className={styles.cm}>description</span>
+              {" = "}
+              <span className={styles.cs}>
+                "DBスキーマ変更とマイグレーション専門。services/db/ のみ操作可能。"
+              </span>
+              {"\n"}
+              <span className={styles.cm}>config_file</span>
+              {" = "}
+              <span className={styles.cs}>".codex/roles/db-migrator.toml"</span>
+              {"\n\n"}
+              <span className={styles.cc}>
+                # ── MCP サーバー設定 ─────────────────────────────────────
+              </span>
+              {"\n["}
+              <span className={styles.cm}>mcp_servers.filesystem</span>
+              {"] "}
+              <span className={styles.cm}>command</span>
+              {" = "}
+              <span className={styles.cs}>"npx"</span>
+              {"\n"}
+              <span className={styles.cm}>args</span>
+              {" = ["}
+              <span className={styles.cs}>"-y"</span>
+              {", "}
+              <span className={styles.cs}>"@modelcontextprotocol/server-filesystem"</span>
+              {", "}
+              <span className={styles.cs}>"./src"</span>
+              {"]"}
+              {"\n["}
+              <span className={styles.cm}>mcp_servers.github</span>
+              {"]"}
+              {"\n"}
+              <span className={styles.cm}>command</span>
+              {" = "}
+              <span className={styles.cs}>"npx"</span>
+              {"\n"}
+              <span className={styles.cm}>args</span>
+              {" = ["}
+              <span className={styles.cs}>"-y"</span>
+              {", "}
+              <span className={styles.cs}>"@modelcontextprotocol/server-github"</span>
+              {"]"}
+              {"\n"}
+              <span className={styles.cm}>env</span>
+              {" = { "}
+              <span className={styles.cm}>GITHUB_TOKEN</span>
+              {" = "}
+              <span className={styles.cs}>
+                {'"$'}
+                {'{GITHUB_TOKEN}"'}
+              </span>
+              {" }"}
+            </div>
+          </div>
+
+          <div className={styles["code-wrap"]}>
+            <div className={styles["code-bar"]}>
+              <span>.codex/roles/reviewer.toml（ロール固有設定）</span>
+              <span className={styles["code-lang"]}>TOML</span>
+            </div>
+            <div className={styles["code-body"]}>
+              <span className={styles.cc}># reviewer ロールの専用設定ファイル</span>
+              {"\n"}
+              <span className={styles.cc}>
+                # config.toml の [agents.roles.reviewer].config_file から参照される
+              </span>
+              {"\n\n"}
+              <span className={styles.cm}>model</span>
+              {" = "}
+              <span className={styles.cs}>"gpt-5.4"</span>
+              {"\n"}
+              <span className={styles.cc}># 高精度モデルをレビューに使用</span>
+              {"\n"}
+              <span className={styles.cm}>model_reasoning_effort</span>
+              {" = "}
+              <span className={styles.cs}>"high"</span>
+              {"\n"}
+              <span className={styles.cc}># 詳細推論</span>
+              {"\n"}
+              <span className={styles.cm}>approval_policy</span>
+              {" = "}
+              <span className={styles.cs}>"never"</span>
+              {"\n"}
+              <span className={styles.cc}># 非インタラクティブ（親から承認を引き継がない）</span>
+              {"\n\n["}
+              <span className={styles.cm}>sandbox</span>
+              {"] "}
+              <span className={styles.cm}>sandbox_mode</span>
+              {" = "}
+              <span className={styles.cs}>"read-only"</span>
+              {"\n"}
+              <span className={styles.cc}># ファイル変更不可（レビューのみ）</span>
+              {"\n"}
+              <span className={styles.cm}>network_access</span>
+              {" = "}
+              <span className={styles.ck}>false</span>
+              {"\n"}
+              <span className={styles.cc}># ネットワーク遮断</span>
+            </div>
+          </div>
         </section>
 
         {/* s07 */}
