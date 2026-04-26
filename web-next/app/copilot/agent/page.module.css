@@ -1,0 +1,1426 @@
+/* legacy/copilot/agent.html の <style> ブロック (行 7–427) を CSS Modules に転写。
+   globals.css の値を上書きしない。すべての変数定義と子セレクタは .root 配下に閉じる。
+   @import (Google Fonts) は削除済み — next/font/google (lib/fonts.ts) で代替。 */
+
+.root {
+  --bg: #f3f4f6;
+  --surface: #ffffff;
+  --surface2: #f9fafb;
+  --surface3: #f1f3f5;
+  --border: #d0d7de;
+  --border2: #e1e4e8;
+  --gh: #1f883d;
+  --gh-dark: #196c2e;
+  --gh-glow: rgba(31, 136, 61, 0.15);
+  --gh-blue: #0969da;
+  --gh-purple: #8250df;
+  --gh-amber: #bf8700;
+  --gh-red: #cf222e;
+  --gh-teal: #0a7a5c;
+  --ms-blue: #0078d4;
+  --text: #24292f;
+  --text2: #57606a;
+  --text3: #6b7580;
+  --shadow: 0 1px 3px rgba(27, 31, 36, 0.12), 0 8px 24px rgba(66, 74, 83, 0.06);
+  --shadow-sm: 0 1px 0 rgba(27, 31, 36, 0.04), 0 1px 3px rgba(66, 74, 83, 0.08);
+
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.root * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ── TOP NAV ── */
+.root .nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #24292f;
+  padding: 0 32px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid #30363d;
+}
+
+.root .navOctocat {
+  font-size: 22px;
+}
+
+.root .navTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.root .navSep {
+  color: #484f58;
+  font-size: 16px;
+}
+
+.root .navSub {
+  font-size: 12px;
+  color: #8b949e;
+}
+
+.root .navRight {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+.root .navPill {
+  background: #30363d;
+  border: 1px solid #484f58;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-size: 11px;
+  color: #8b949e;
+  font-weight: 500;
+}
+
+.root .navPill.green {
+  background: rgba(31, 136, 61, 0.2);
+  border-color: rgba(31, 136, 61, 0.4);
+  color: #3fb950;
+}
+
+/* ── Wrapper ── */
+.root .wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 48px 24px 96px;
+}
+
+/* ── Hero ── */
+.root .hero {
+  background: linear-gradient(135deg, #24292f 0%, #1c2128 60%, #161b22 100%);
+  border-radius: 12px;
+  border: 1px solid #30363d;
+  padding: 52px 48px;
+  margin-bottom: 56px;
+  position: relative;
+  overflow: hidden;
+}
+
+.root .hero::before {
+  content: "";
+  position: absolute;
+  top: -80px;
+  right: -60px;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(31, 136, 61, 0.12) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.root .hero::after {
+  content: "";
+  position: absolute;
+  bottom: -60px;
+  left: 15%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(9, 105, 218, 0.1) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.root .heroBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(31, 136, 61, 0.15);
+  border: 1px solid rgba(31, 136, 61, 0.35);
+  border-radius: 24px;
+  padding: 5px 16px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #3fb950;
+  margin-bottom: 22px;
+}
+
+.root .hero h1 {
+  font-size: 2.6rem;
+  font-weight: 700;
+  line-height: 1.12;
+  margin-bottom: 18px;
+  color: #ffffff;
+  letter-spacing: -0.015em;
+}
+
+.root .hero h1 em {
+  font-style: normal;
+  color: #3fb950;
+}
+
+.root .hero p {
+  color: #8b949e;
+  font-size: 1.02rem;
+  max-width: 640px;
+  line-height: 1.75;
+}
+
+.root .heroChips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+
+.root .heroChip {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid #30363d;
+  border-radius: 16px;
+  padding: 4px 14px;
+  font-size: 12px;
+  color: #8b949e;
+  font-weight: 500;
+}
+
+/* ── Section ── */
+.root .sec {
+  margin-bottom: 60px;
+}
+
+.root .secHead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.root .secNum {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--gh);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 0 12px var(--gh-glow);
+}
+
+.root .secHead h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.root .secHead .note {
+  font-size: 12px;
+  color: var(--text3);
+  font-weight: 400;
+  margin-left: 8px;
+}
+
+/* ── Card ── */
+.root .card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 24px 28px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow-sm);
+}
+
+.root .cardTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.root .card p {
+  color: var(--text2);
+  margin-bottom: 10px;
+}
+
+.root .card p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Priority matrix (load order) ── */
+.root .matrix {
+  background: #24292f;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  padding: 28px 24px;
+  margin: 20px 0;
+}
+
+.root .matrixTitle {
+  text-align: center;
+  color: #484f58;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  margin-bottom: 24px;
+}
+
+.root .matrixRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.root .mxBox {
+  flex: 1;
+  min-width: 140px;
+  max-width: 200px;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.root .mxBox small {
+  display: block;
+  font-weight: 400;
+  font-family: "Cascadia Code", monospace;
+  font-size: 10.5px;
+  margin-top: 3px;
+  opacity: 0.7;
+}
+
+.root .mxOrg {
+  background: rgba(9, 105, 218, 0.15);
+  border: 1.5px solid rgba(9, 105, 218, 0.4);
+  color: #58a6ff;
+}
+
+.root .mxRepo {
+  background: rgba(31, 136, 61, 0.15);
+  border: 1.5px solid rgba(31, 136, 61, 0.4);
+  color: #3fb950;
+}
+
+.root .mxPath {
+  background: rgba(130, 80, 223, 0.15);
+  border: 1.5px solid rgba(130, 80, 223, 0.4);
+  color: #bc8cff;
+}
+
+.root .mxSkill {
+  background: rgba(191, 135, 0, 0.15);
+  border: 1.5px solid rgba(191, 135, 0, 0.4);
+  color: #d29922;
+}
+
+.root .mxArrow {
+  color: #30363d;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.root .matrixNote {
+  text-align: center;
+  color: #484f58;
+  font-size: 11.5px;
+  margin-top: 16px;
+}
+
+.root .matrixNote code {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid #484f58;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 12px;
+  color: #bc8cff;
+}
+
+/* ── File Tree SVG ── */
+.root .filetreeOuter {
+  background: #0d1117;
+  border: 1px solid #21262d;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 20px 0;
+}
+
+.root .filetreeBar {
+  background: #161b22;
+  border-bottom: 1px solid #21262d;
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.root .fbDot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+}
+
+/* ── Code blocks ── */
+.root .codeWrap {
+  background: #0d1117;
+  border: 1px solid #21262d;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 14px 0;
+}
+
+.root .codeBar {
+  background: #161b22;
+  border-bottom: 1px solid #21262d;
+  padding: 9px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #8b949e;
+}
+
+.root .codeLang {
+  color: #bc8cff;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.root .codeBody {
+  padding: 20px 22px;
+  font-family: "Cascadia Code", "Fira Code", "Consolas", monospace;
+  font-size: 13px;
+  line-height: 1.85;
+  overflow-x: auto;
+  white-space: pre;
+  color: #c9d1d9;
+}
+
+.root .ck {
+  color: #ff7b72;
+}
+
+.root .cs {
+  color: #a5d6ff;
+}
+
+.root .cv {
+  color: #79c0ff;
+}
+
+.root .cc {
+  color: #3b4750;
+  font-style: italic;
+}
+
+.root .ch {
+  color: #f0883e;
+  font-weight: 700;
+}
+
+.root .cm {
+  color: #7ee787;
+  font-weight: 600;
+}
+
+.root .cw {
+  color: #d29922;
+}
+
+.root .ce {
+  color: #bc8cff;
+}
+
+.root .cg {
+  color: #3fb950;
+}
+
+/* ── mono ── */
+.root .mono {
+  font-family: "Cascadia Code", "Consolas", monospace;
+  background: var(--surface3);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 12.5px;
+  color: var(--gh-blue);
+}
+
+/* ── badges ── */
+.root .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 20px;
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.root .bGreen {
+  background: rgba(31, 136, 61, 0.1);
+  color: var(--gh);
+  border: 1px solid rgba(31, 136, 61, 0.3);
+}
+
+.root .bBlue {
+  background: rgba(9, 105, 218, 0.1);
+  color: var(--gh-blue);
+  border: 1px solid rgba(9, 105, 218, 0.3);
+}
+
+.root .bPurple {
+  background: rgba(130, 80, 223, 0.1);
+  color: var(--gh-purple);
+  border: 1px solid rgba(130, 80, 223, 0.3);
+}
+
+.root .bAmber {
+  background: rgba(191, 135, 0, 0.1);
+  color: var(--gh-amber);
+  border: 1px solid rgba(191, 135, 0, 0.3);
+}
+
+.root .bRed {
+  background: rgba(207, 34, 46, 0.1);
+  color: var(--gh-red);
+  border: 1px solid rgba(207, 34, 46, 0.3);
+}
+
+.root .bTeal {
+  background: rgba(10, 122, 92, 0.1);
+  color: var(--gh-teal);
+  border: 1px solid rgba(10, 122, 92, 0.3);
+}
+
+.root .bMs {
+  background: rgba(0, 120, 212, 0.1);
+  color: var(--ms-blue);
+  border: 1px solid rgba(0, 120, 212, 0.3);
+}
+
+/* ── alerts ── */
+.root .alert {
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin: 14px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 13.5px;
+}
+
+.root .alertIcon {
+  font-size: 17px;
+  flex-shrink: 0;
+}
+
+.root .ai {
+  background: #ddf4ff;
+  border: 1px solid #b6e3ff;
+  border-left: 3px solid var(--gh-blue);
+}
+
+.root .aw {
+  background: #fff8c5;
+  border: 1px solid #f5e68e;
+  border-left: 3px solid var(--gh-amber);
+}
+
+.root .ae {
+  background: #ffebe9;
+  border: 1px solid #ffcecb;
+  border-left: 3px solid var(--gh-red);
+}
+
+.root .ag {
+  background: #dafbe1;
+  border: 1px solid #aceebb;
+  border-left: 3px solid var(--gh);
+}
+
+.root .alertBody strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+
+.root .alertBody {
+  color: var(--text2);
+}
+
+/* ── Best / Anti ── */
+.root .patGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 14px 0;
+}
+
+@media (max-width: 640px) {
+  .root .patGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.root .pat {
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+
+.root .patOk {
+  background: #dafbe1;
+  border: 1px solid #aceebb;
+}
+
+.root .patNg {
+  background: #ffebe9;
+  border: 1px solid #ffcecb;
+}
+
+.root .patLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+
+.root .patOk .patLabel {
+  color: var(--gh);
+}
+
+.root .patNg .patLabel {
+  color: var(--gh-red);
+}
+
+.root .pat ul {
+  list-style: none;
+}
+
+.root .pat ul li {
+  font-size: 13.5px;
+  color: var(--text2);
+  padding: 3px 0;
+  padding-left: 20px;
+  position: relative;
+}
+
+.root .patOk ul li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--gh);
+  font-weight: 700;
+}
+
+.root .patNg ul li::before {
+  content: "✗";
+  position: absolute;
+  left: 0;
+  color: var(--gh-red);
+  font-weight: 700;
+}
+
+/* ── Comparison table ── */
+.root .tblWrap {
+  overflow-x: auto;
+  margin: 14px 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.root table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  background: var(--surface);
+}
+
+.root thead th {
+  background: var(--surface2);
+  color: var(--text3);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 10px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+}
+
+.root tbody td {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border2);
+  color: var(--text2);
+  vertical-align: top;
+}
+
+.root tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.root tbody tr:hover td {
+  background: var(--surface2);
+}
+
+.root td code {
+  background: var(--surface3);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-family: "Cascadia Code", "Consolas", monospace;
+  font-size: 12px;
+  color: var(--gh-blue);
+}
+
+/* ── Agent role grid ── */
+.root .roleGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 14px 0;
+}
+
+@media (max-width: 640px) {
+  .root .roleGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.root .roleCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+
+.root .roleCard:hover {
+  border-color: var(--gh);
+  box-shadow: 0 0 0 3px rgba(31, 136, 61, 0.1);
+}
+
+.root .roleIcon {
+  font-size: 26px;
+  margin-bottom: 10px;
+}
+
+.root .roleName {
+  font-size: 13.5px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.root .roleTag {
+  display: inline-block;
+  background: var(--surface3);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  padding: 1px 7px;
+  font-size: 11px;
+  font-family: monospace;
+  color: var(--gh-blue);
+  margin-bottom: 8px;
+}
+
+.root .roleDesc {
+  font-size: 12.5px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+
+.root .roleEx {
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--text3);
+  background: var(--surface2);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: monospace;
+  border: 1px solid var(--border2);
+}
+
+/* ── Decision flow ── */
+.root .dflow {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin: 18px 0;
+}
+
+.root .dflowTitle {
+  text-align: center;
+  color: var(--text3);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 24px;
+  font-weight: 600;
+}
+
+.root .dflowRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+  flex-wrap: wrap;
+}
+
+.root .dnQ {
+  background: #ddf4ff;
+  border: 1px solid #b6e3ff;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-weight: 600;
+  color: var(--gh-blue);
+  font-size: 13px;
+}
+
+.root .dnY {
+  background: #dafbe1;
+  border: 1px solid #aceebb;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-weight: 600;
+  color: var(--gh);
+  font-size: 13px;
+}
+
+.root .dnN {
+  background: #ffebe9;
+  border: 1px solid #ffcecb;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-weight: 600;
+  color: var(--gh-red);
+  font-size: 13px;
+}
+
+.root .dnArr {
+  color: var(--text3);
+  font-size: 18px;
+}
+
+.root .dnIn {
+  border-left: 2px solid var(--border2);
+  padding-left: 22px;
+  margin-left: 18px;
+}
+
+/* ── Compatibility matrix ── */
+.root .compatGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 14px 0;
+}
+
+@media (max-width: 700px) {
+  .root .compatGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.root .compatCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 12px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.root .compatIcon {
+  font-size: 22px;
+  margin-bottom: 6px;
+}
+
+.root .compatName {
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+
+.root .compatFile {
+  font-size: 10.5px;
+  color: var(--text3);
+  font-family: monospace;
+  background: var(--surface2);
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+/* ── Source grid ── */
+.root .srcGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(288px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.root .srcCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow-sm);
+}
+
+.root .srcIcon {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.root .srcTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gh-blue);
+  margin-bottom: 4px;
+}
+
+.root .srcUrl {
+  font-size: 11px;
+  color: var(--text3);
+  word-break: break-all;
+  font-family: monospace;
+  margin-bottom: 6px;
+}
+
+.root .srcDesc {
+  font-size: 12px;
+  color: var(--text2);
+}
+
+.root hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 52px 0;
+}
+
+.root a {
+  color: var(--gh-blue);
+  text-decoration: none;
+}
+
+.root a:hover {
+  text-decoration: underline;
+}
+
+/* ═══ AGENT.MD EXTENDED STYLES ═══ */
+
+/* Step-by-step guide */
+.root .stepList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 18px 0;
+}
+
+.root .stepRow {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  padding: 18px 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  margin-bottom: -1px;
+  transition: background 0.15s;
+}
+
+.root .stepRow:first-child {
+  border-radius: 10px 10px 0 0;
+}
+
+.root .stepRow:last-child {
+  border-radius: 0 0 10px 10px;
+  margin-bottom: 0;
+}
+
+.root .stepRow:hover {
+  background: var(--surface2);
+}
+
+.root .stepCircle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.root .scG {
+  background: rgba(31, 136, 61, 0.12);
+  color: var(--gh);
+  border: 1.5px solid rgba(31, 136, 61, 0.3);
+}
+
+.root .scB {
+  background: rgba(9, 105, 218, 0.12);
+  color: var(--gh-blue);
+  border: 1.5px solid rgba(9, 105, 218, 0.3);
+}
+
+.root .scP {
+  background: rgba(130, 80, 223, 0.12);
+  color: var(--gh-purple);
+  border: 1.5px solid rgba(130, 80, 223, 0.3);
+}
+
+.root .scA {
+  background: rgba(191, 135, 0, 0.12);
+  color: var(--gh-amber);
+  border: 1.5px solid rgba(191, 135, 0, 0.3);
+}
+
+.root .scT {
+  background: rgba(10, 122, 92, 0.12);
+  color: var(--gh-teal);
+  border: 1.5px solid rgba(10, 122, 92, 0.3);
+}
+
+.root .scR {
+  background: rgba(207, 34, 46, 0.12);
+  color: var(--gh-red);
+  border: 1.5px solid rgba(207, 34, 46, 0.3);
+}
+
+.root .stepContent {
+  flex: 1;
+}
+
+.root .stepTtl {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 5px;
+}
+
+.root .stepBody {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.65;
+}
+
+/* Frontmatter field table */
+.root .fmTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 14px 0;
+  background: var(--surface);
+}
+
+.root .fmTable thead th {
+  background: var(--surface2);
+  color: var(--text3);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+}
+
+.root .fmTable tbody td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border2);
+  vertical-align: top;
+  color: var(--text2);
+}
+
+.root .fmTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.root .fmTable tbody tr:hover td {
+  background: var(--surface2);
+}
+
+.root .fmTable td:first-child {
+  font-family: "Cascadia Code", "Consolas", monospace;
+  font-size: 12px;
+  color: var(--gh-blue);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.root .fmTable td:nth-child(2) {
+  white-space: nowrap;
+}
+
+/* Handoff flow */
+.root .hfFlow {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: wrap;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin: 16px 0;
+  overflow-x: auto;
+}
+
+.root .hfAgent {
+  border-radius: 10px;
+  padding: 14px 18px;
+  min-width: 140px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.root .hfA {
+  background: rgba(9, 105, 218, 0.1);
+  border: 1.5px solid rgba(9, 105, 218, 0.35);
+  color: var(--gh-blue);
+}
+
+.root .hfB {
+  background: rgba(31, 136, 61, 0.1);
+  border: 1.5px solid rgba(31, 136, 61, 0.35);
+  color: var(--gh);
+}
+
+.root .hfC {
+  background: rgba(130, 80, 223, 0.1);
+  border: 1.5px solid rgba(130, 80, 223, 0.35);
+  color: var(--gh-purple);
+}
+
+.root .hfD {
+  background: rgba(191, 135, 0, 0.1);
+  border: 1.5px solid rgba(191, 135, 0, 0.35);
+  color: var(--gh-amber);
+}
+
+.root .hfAgent small {
+  display: block;
+  font-weight: 400;
+  font-size: 11px;
+  margin-top: 4px;
+  opacity: 0.7;
+  font-family: "Cascadia Code", monospace;
+}
+
+.root .hfArrow {
+  padding: 0 10px;
+  color: var(--text3);
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.root .hfBtn {
+  font-size: 10.5px;
+  font-weight: 600;
+  border-radius: 16px;
+  padding: 3px 10px;
+  background: var(--surface3);
+  border: 1px solid var(--border2);
+  color: var(--text3);
+  margin-top: 6px;
+  display: inline-block;
+}
+
+.root .hfBtn.auto {
+  background: rgba(31, 136, 61, 0.08);
+  border-color: rgba(31, 136, 61, 0.3);
+  color: var(--gh);
+}
+
+/* Tag pill */
+.root .tag {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 600;
+  border-radius: 16px;
+  padding: 2px 9px;
+  border: 1px solid;
+  margin: 1px;
+}
+
+.root .tagG {
+  background: rgba(31, 136, 61, 0.08);
+  color: var(--gh);
+  border-color: rgba(31, 136, 61, 0.3);
+}
+
+.root .tagB {
+  background: rgba(9, 105, 218, 0.08);
+  color: var(--gh-blue);
+  border-color: rgba(9, 105, 218, 0.3);
+}
+
+.root .tagP {
+  background: rgba(130, 80, 223, 0.08);
+  color: var(--gh-purple);
+  border-color: rgba(130, 80, 223, 0.3);
+}
+
+.root .tagA {
+  background: rgba(191, 135, 0, 0.08);
+  color: var(--gh-amber);
+  border-color: rgba(191, 135, 0, 0.3);
+}
+
+.root .tagR {
+  background: rgba(207, 34, 46, 0.08);
+  color: var(--gh-red);
+  border-color: rgba(207, 34, 46, 0.3);
+}
+
+.root .tagT {
+  background: rgba(10, 122, 92, 0.08);
+  color: var(--gh-teal);
+  border-color: rgba(10, 122, 92, 0.3);
+}
+
+.root .tagNew {
+  background: rgba(31, 136, 61, 0.15);
+  color: var(--gh);
+  border-color: rgba(31, 136, 61, 0.5);
+  font-style: normal;
+}
+
+/* 2-col grid */
+.root .g2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 14px 0;
+}
+
+@media (max-width: 640px) {
+  .root .g2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* scope card */
+.root .scopeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 14px 0;
+}
+
+@media (max-width: 700px) {
+  .root .scopeGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.root .scopeCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.root .scopeCardIcon {
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.root .scopeCardTtl {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 5px;
+}
+
+.root .scopeCardBody {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+
+/* Troubleshoot */
+.root .tsRow {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1.5fr;
+  gap: 0;
+  border-bottom: 1px solid var(--border2);
+}
+
+.root .tsRow:last-child {
+  border-bottom: none;
+}
+
+.root .tsRow > div {
+  padding: 10px 14px;
+  font-size: 12.5px;
+  vertical-align: top;
+}
+
+.root .tsSymptom {
+  color: var(--gh-red);
+  font-family: "Cascadia Code", monospace;
+  font-size: 11.5px;
+}
+
+.root .tsCause {
+  color: var(--gh-amber);
+  font-size: 12px;
+}
+
+.root .tsFix {
+  color: var(--text2);
+}
+
+/* NEW badge */
+.root .newB {
+  display: inline-block;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  padding: 1px 6px;
+  background: rgba(31, 136, 61, 0.15);
+  color: var(--gh);
+  border: 1px solid rgba(31, 136, 61, 0.4);
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+/* Best practice card grid */
+.root .bpGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.root .bpCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.root .bpCard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.root .bpG::before {
+  background: var(--gh);
+}
+
+.root .bpB::before {
+  background: var(--gh-blue);
+}
+
+.root .bpP::before {
+  background: var(--gh-purple);
+}
+
+.root .bpA::before {
+  background: var(--gh-amber);
+}
+
+.root .bpT::before {
+  background: var(--gh-teal);
+}
+
+.root .bpR::before {
+  background: var(--gh-red);
+}
+
+.root .bpNum {
+  font-size: 26px;
+  font-weight: 800;
+  opacity: 0.05;
+  position: absolute;
+  top: 4px;
+  right: 12px;
+  line-height: 1;
+}
+
+.root .bpCard h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.root .bpCard p {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── TOC nav ── */
+.root .toc {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-bottom: 40px;
+  box-shadow: var(--shadow-sm);
+}
+
+.root .tocTitle {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+  margin-bottom: 14px;
+}
+
+.root .toc a {
+  display: block;
+  font-size: 13.5px;
+  color: var(--text2);
+  padding: 4px 0;
+  border-radius: 4px;
+  text-decoration: none;
+}
+
+.root .toc a:hover {
+  color: var(--gh-blue);
+  text-decoration: none;
+}
