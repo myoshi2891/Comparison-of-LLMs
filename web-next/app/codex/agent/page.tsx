@@ -1683,12 +1683,130 @@ export default function CodexAgentPage() {
         {/* s05 */}
         <section id="s05" className={styles.sec}>
           <div className={styles["sec-head"]}>
-            <span className={styles["sec-num"]}>4</span>
+            <span className={styles["sec-num"]}>3</span>
             <h2>
               <span className={styles.mono}>SKILL.md</span> — 遅延ロード型スキルの設計
             </h2>
+            <small>Codex 独自の概念。Claude / Gemini にはない</small>
           </div>
-          <p>（faithful 移植 s05 — 後続コミットで充填）</p>
+
+          <div className={styles.card}>
+            <p>
+              <strong>SKILL.md は AGENTS.md と根本的に違います。</strong> AGENTS.md
+              は毎回フルロードされますが、SKILL.md は
+              <strong>タスクに合致すると判断されたときのみ</strong>
+              フル内容が読み込まれます（プログレッシブ・ディスクロージャー）。これによりコンテキストウィンドウを節約しながら、豊富な専門知識を持てます。
+            </p>
+          </div>
+
+          <div className={`${styles.alert} ${styles.aw}`}>
+            <span className={styles["alert-icon"]}>⚠️</span>
+            <div className={styles["alert-body"]}>
+              <strong>description フィールドが「スキルのAPIドキュメント」</strong>
+              Codex が「このスキルを使うかどうか」を判断するのは <code>description</code>{" "}
+              のみです（スキルメタデータ段階ではフル内容は読まない）。
+              <code>description</code>
+              には「いつ使うべきか・いつ使わないべきか」の境界を明確に書いてください。
+            </div>
+          </div>
+
+          <div className={styles["code-wrap"]}>
+            <div className={styles["code-bar"]}>
+              <span>.agents/skills/code-review/SKILL.md</span>
+              <span className={styles["code-lang"]}>Markdown + YAML frontmatter</span>
+            </div>
+            <div className={styles["code-body"]}>
+              <span className={styles.cs}>---</span>
+              {"\n"}
+              <span className={styles.cm}>name</span>
+              {": "}
+              <span className={styles.cv}>code-review</span>
+              {"\n"}
+              <span className={styles.cm}>description</span>
+              {": "}
+              <span className={styles.cv}>
+                {
+                  "| コードレビューを実施するスキル。以下の場合にトリガーする:\n  - PR を作成する前にレビューしてほしい\n  - セキュリティ・パフォーマンス・型安全性を確認してほしい\n  - コードの品質チェックを依頼された場合\n  以下の場合はトリガーしない:\n  - 単純なファイル作成・移動\n  - ドキュメントのみの変更\n  - 設定ファイルの軽微な変更"
+                }
+              </span>
+              {"\n"}
+              <span className={styles.cs}>---</span>
+              {"\n\n"}
+              <span className={styles.ch}>## Role</span>
+              {
+                "\nあなたはシニアエンジニアのコードレビュアーです。\n提供されたコードをセキュリティ・パフォーマンス・品質の観点でレビューします。\n\n"
+              }
+              <span className={styles.ch}>## Review Checklist</span>
+              {"\n\n"}
+              <span className={styles.cm}>### 🔴 Security（セキュリティ）</span>
+              {
+                "\n- SQLインジェクション / XSS / CSRF リスク\n- 認証・認可の適切な実装（エンドポイントごとの検証）\n- 秘密情報のハードコードなし\n- 入力バリデーション（zod スキーマ必須）\n\n"
+              }
+              <span className={styles.cm}>### 🟡 Performance（パフォーマンス）</span>
+              {
+                "\n- N+1 クエリ問題の有無\n- 不要な再レンダリング（React.memo / useMemo / useCallback）\n- 重い同期処理の非同期化\n\n"
+              }
+              <span className={styles.cm}>### 🟢 Code Quality（品質）</span>
+              {
+                "\n- TypeScript strict モードへの準拠\n- エラーハンドリングの網羅\n- テストカバレッジ（変更部分に対するテスト）\n- 命名規則の一貫性\n\n"
+              }
+              <span className={styles.ch}>## Output Format</span>
+              {"\n"}
+              <span className={styles.cs}>
+                {
+                  "```\n## Code Review Report — {filename}\n### 🔴 Critical (必ず修正)\n### 🟡 Warning (推奨修正)\n### 🟢 Good (良い点)\n### 📋 Summary\n```"
+                }
+              </span>
+            </div>
+          </div>
+
+          <div className={styles["code-wrap"]}>
+            <div className={styles["code-bar"]}>
+              <span>.agents/skills/code-review/agents/openai.yaml</span>
+              <span className={styles["code-lang"]}>YAML (UIメタデータ)</span>
+            </div>
+            <div className={styles["code-body"]}>
+              <span className={styles.cm}>display_name</span>
+              {": "}
+              <span className={styles.cv}>"Code Reviewer"</span>
+              {"\n"}
+              <span className={styles.cm}>icon</span>
+              {": "}
+              <span className={styles.cv}>"🔍"</span>
+              {"\n"}
+              <span className={styles.cm}>invocation_policy</span>
+              {": "}
+              <span className={styles.cv}>"implicit"</span>
+              {"\n"}
+              <span className={styles.cc}># description に一致すると自動発動</span>
+              {"\n"}
+              <span className={styles.cm}>tool_dependencies</span>
+              {": - "}
+              <span className={styles.cv}>read_file</span>
+              {" - "}
+              <span className={styles.cv}>search_files</span>
+              {"\n"}
+              <span className={styles.cm}>tags</span>
+              {": ["}
+              <span className={styles.cv}>"review"</span>
+              {", "}
+              <span className={styles.cv}>"quality"</span>
+              {", "}
+              <span className={styles.cv}>"security"</span>
+              {"]"}
+            </div>
+          </div>
+
+          <div className={`${styles.alert} ${styles.ag}`}>
+            <span className={styles["alert-icon"]}>✅</span>
+            <div className={styles["alert-body"]}>
+              <strong>スキルの配置場所 — スキャン優先度</strong>
+              Codex は <strong>CWDから上位</strong>に向かって <code>.agents/skills/</code>{" "}
+              をスキャンします。リポジトリ固有スキルは <code>.agents/skills/</code>、個人スキルは{" "}
+              <code>~/.codex/skills/</code>（<code>$CODEX_HOME/skills/</code>
+              ）に置きます。同名スキルが複数あるとマージではなく両方リストされます。
+            </div>
+          </div>
         </section>
 
         {/* s06 */}
