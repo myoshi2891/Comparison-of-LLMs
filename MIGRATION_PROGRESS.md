@@ -9,9 +9,9 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- **最新 HEAD**: `b920471`（**C-4 `/copilot/agent` Red scaffold 完了**）
+- **最新 HEAD**: `7266242`（**MIGRATION_PROGRESS.md 更新 — R3 スキルルール追加・C-4 状態記録**）
 - **未コミット作業**: なし（working tree クリーン）
-- **次の作業**: C-4 `/copilot/agent` の faithful 移植（hero+TOC → s01 → s02 … sources）— `/nextjs-page-migration` スキルを **必ず** 使って進めること
+- **次の作業**: C-4 `/copilot/agent` Green 実装（hero+TOC → s01 → … → sources の faithful 移植）— `/nextjs-page-migration` スキルを **必ず** 使って進めること
 - **テスト数**: `bun run test` **461 件 pass**（C-4 Red scaffold で 5 fail / 3 pass の状態）
 - **ビルド**: `bun run build` 成功・`bun run typecheck` 成功・`uv run pytest` 5/5 passed
 
@@ -107,11 +107,13 @@ web-next/
 ├── app/gemini/skill/        # Phase B-2
 ├── app/codex/skill/         # Phase B-3
 ├── app/copilot/skill/       # Phase B-4
-├── app/claude/agent/        # Phase C-1
-└── app/gemini/agent/        # Phase C-2（faithful 移植完了）
+├── app/claude/agent/        # Phase C-1（faithful 移植完了）
+├── app/gemini/agent/        # Phase C-2（faithful 移植完了）
+├── app/codex/agent/         # Phase C-3（faithful 移植完了）
+└── app/copilot/agent/       # Phase C-4（Red scaffold 完了・Green 実装中）
 ```
 
-**テスト数**: 453（Phase C-2 完了時点。詳細は `bun run test` で確認）
+**テスト数**: 461 pass（C-4 Red scaffold 状態。5 fail / 3 pass は C-4 契約テスト未実装のため）
 
 ## 確定した設計判断（`docs/NEXTJS_MIGRATION_PLAN.md` ステップ 0）
 
@@ -136,7 +138,7 @@ Next.js 移行プロジェクトの作業を再開してください。
 
 - リポジトリ: LLM-Studies（Phase A–F の Next.js 移行作業中）
 - 現在のブランチ: feat/nextjs-migration
-- 最新 HEAD: 22d8951（C-3 /codex/agent faithful 全件完了。git status は clean）
+- 最新 HEAD: 7266242（C-4 Red scaffold 完了・MIGRATION_PROGRESS.md 更新済み。git status は clean）
 - 移行計画: docs/NEXTJS_PHASE_A_F_PLAN.md（Phase A–F）
 - 進捗トラッカー: MIGRATION_PROGRESS.md（**作業開始前に必読**: §「AI 作業ルール」R1（Biome scope）/ R2（faithful 必須）/「Phase C-2 faithful 移植継続ポイント」）
 - Phase C 詳細設計: docs/NEXTJS_PHASE_C_DETAILED_DESIGN.md（§5.4 C-4）
@@ -168,21 +170,34 @@ C-4 作業手順:
 - legacy/ 配下の編集（CLAUDE.md「Phase A–F 中は legacy/ 凍結」）
 - 既存ファイル（pricing.json / scraper / lib/cost.ts 等）への副作用的な変更
 
-legacy/copilot/agent.html セクション構造（おおよその行範囲 — 作業開始時に Read で確認すること）:
-| Section | 概算行範囲 | タイトル（h2） |
+legacy/copilot/agent.html セクション構造（確定・全行範囲確認済み — 20 section IDs）:
+
+> ※ legacy は `<div class="sec">` × 11 だが、巨大 sec (行 879-1706 `id="agent-md-guide"`) が
+>   内部に 4-0〜4-9 の 10 サブセクション h2 を持つため **s04〜s13 に展開**。合計 s01〜s19 + sources = 20。
+
+| Section ID | 行範囲 | タイトル / 内容 |
 |---|---|---|
-| hero | 1-452 | ヒーロー + TOC |
-| s01 | 453-698 | 全体アーキテクチャと各ファイルの位置づけ |
-| s02 | 699-797 | .github/copilot-instructions.md |
-| s03 | 798-878 | .github/instructions/*.instructions.md |
-| s04 | 879-1708 | .github/agents/*.agent.md（サブセクション多数） |
-| s05 | 1709-1784 | .github/skills/*/SKILL.md |
-| s06 | 1785-1850 | *.prompt.md / *.chatmode.md |
-| s07 | 1851-1906 | AGENTS.md — クロスツール互換戦略 |
-| s08 | 1907-1972 | ファイル選択の意思決定ツリー |
-| s09 | 1973-2005 | 絶対に避けるべき Anti-Patterns |
-| s10 | 2006-2071 | まとめ：各ファイルの役割と設計原則 |
-| sources | 2072-2171 | 参考ソース（公式・一次情報優先）|
+| hero+TOC | 435-450 | Hero + 20 件 TOC リンク |
+| s01 | 453-696 | 全体アーキテクチャと各ファイルの位置づけ（優先度マトリクス + 195行SVGファイルツリー） |
+| s02 | 699-795 | .github/copilot-instructions.md — 常時ロード型グローバル指示（alert + patGrid + code） |
+| s03 | 798-876 | .github/instructions/*.instructions.md — パスマッチ型指示（card + 2 code + alert） |
+| s04 | 879-891 | .github/agents/*.agent.md — 概念 card（2 paragraphs） |
+| s05 | 893-923 | 4-1. 配置場所（スコープ別）— scopeGrid 3 cards + alert |
+| s06 | 926-1021 | 4-2. フロントマター完全仕様 — 全フィールド code（~80行）+ fmTable 10行 |
+| s07 | 1024-1183 | 4-3. ステップバイステップ作成ガイド（7ステップ）— stepList × 7（各 inline code） |
+| s08 | 1185-1270 | 4-4. Handoffs — hfFlow × 2 + planner.agent.md code |
+| s09 | 1272-1358 | 4-5. Subagents — card + g2（table + alert）+ thorough-reviewer code |
+| s10 | 1361-1415 | 4-6. MCP統合 — sentry-debugger code + ビルトイン alert |
+| s11 | 1417-1548 | 4-7. 実践テンプレート集（5種）— security-reviewer / docs-agent / implementer / triage-agent / readme-creator |
+| s12 | 1551-1616 | 4-8. .agent.md ベストプラクティス 12則 — bpGrid 12 cards |
+| s13 | 1618-1706 | 4-9. トラブルシューティング table 7行 + 4-10 Good/Anti patGrid + alert |
+| s14 | 1709-1781 | 5. .github/skills/*/SKILL.md — card + alert + playwright-skill code |
+| s15 | 1784-1847 | 6. *.prompt.md / *.chatmode.md — 2 code + comparison table |
+| s16 | 1850-1903 | 7. AGENTS.md — card + compatGrid 5 cards + alert |
+| s17 | 1906-1968 | 8. ファイル選択の意思決定ツリー — dflow（ネスト dflowRow 構造） |
+| s18 | 1972-2002 | 9. 絶対に避けるべき Anti-Patterns — patGrid 2 columns |
+| s19 | 2005-2066 | 10. まとめ — summary table 7行 + hr |
+| sources | 2071-2168 | 📚 参考ソース — srcGrid 15 src-cards（外部リンク 15 件）|
 
 検証コマンド早見表:
   cd web-next && bun run test          # 全件 pass が期待値
