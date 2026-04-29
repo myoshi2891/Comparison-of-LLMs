@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+# マージによって変更されたファイルの一覧を取得
+CHANGED_FILES=$(git diff --name-only ORIG_HEAD HEAD 2>/dev/null)
+
+if [ -z "$CHANGED_FILES" ]; then
+    exit 0
+fi
+
+# ソースコード関連のファイルが変更されたかチェック
+# 対象拡張子: ts / tsx / js / mjs / css / py（scraper を含む）
+HAS_SOURCE_CHANGES=0
+if echo "$CHANGED_FILES" | grep -E '\.(ts|tsx|js|mjs|css|py)$' > /dev/null; then
+    HAS_SOURCE_CHANGES=1
+fi
+
+# 仕様書（Markdown）が変更されたかチェック
+HAS_DOC_CHANGES=0
+if echo "$CHANGED_FILES" | grep -E '\.md$' > /dev/null; then
+    HAS_DOC_CHANGES=1
+fi
+
+# コードの変更はあるが、ドキュメントの変更がない場合に警告を出す
+if [ "$HAS_SOURCE_CHANGES" -eq 1 ] && [ "$HAS_DOC_CHANGES" -eq 0 ]; then
+    echo ""
+    echo -e "\033[1;33m⚠️  【警告】コードの変更がマージ（またはpull）されましたが、仕様書 (SKILL.md, GEMINI.md 等) が更新されていません！\033[0m"
+    echo -e "\033[1;33m⚠️  仕様の変更や新たなピットフォール（注意点）をドキュメントに追記する必要がないか精査してください。\033[0m"
+    echo ""
+fi
