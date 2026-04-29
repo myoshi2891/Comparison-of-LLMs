@@ -42,6 +42,7 @@ update.sh  ← オーケストレーター (scrape → copy)
 │   ├── biome.json               Biome lint/format
 │   └── vitest.config.ts         jsdom + @ alias
 ├── netlify.toml        Netlify デプロイ設定 (base=web-next, publish=out, Next.js SSG)
+├── .githooks/          共有 Git フック (post-merge: ソース変更時にドキュメント更新漏れを警告)
 ├── legacy/             旧 Vite/HTML 資産 (.gitignore 済、ローカル参照専用)
 │   ├── web/                     旧 Vite フロントエンド (Phase 14 でカットオーバー)
 │   ├── index.html               旧ホーム (単一ファイル)
@@ -73,6 +74,9 @@ cd scraper && uv sync && uv run playwright install chromium
 
 # フロントエンド
 cd web-next && bun install
+
+# Git フック（クローン後に一度だけ実行）
+git config core.hooksPath .githooks
 ```
 
 ### 全体更新（scrape → copy）
