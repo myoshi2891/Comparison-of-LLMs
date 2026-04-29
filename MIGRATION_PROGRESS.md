@@ -9,7 +9,7 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- **最新 HEAD**: `7266242`（**MIGRATION_PROGRESS.md 更新 — R3 スキルルール追加・C-4 状態記録**）
+- **最新 HEAD**: `d795c4e`（**MIGRATION_PROGRESS.md 更新 — HEAD 修正・C-4 セクションテーブル確定**）
 - **未コミット作業**: なし（working tree クリーン）
 - **次の作業**: C-4 `/copilot/agent` Green 実装（hero+TOC → s01 → … → sources の faithful 移植）— `/nextjs-page-migration` スキルを **必ず** 使って進めること
 - **テスト数**: `bun run test` **461 件 pass**（C-4 Red scaffold で 5 fail / 3 pass の状態）
@@ -138,7 +138,7 @@ Next.js 移行プロジェクトの作業を再開してください。
 
 - リポジトリ: LLM-Studies（Phase A–F の Next.js 移行作業中）
 - 現在のブランチ: feat/nextjs-migration
-- 最新 HEAD: 7266242（C-4 Red scaffold 完了・MIGRATION_PROGRESS.md 更新済み。git status は clean）
+- 最新 HEAD: d795c4e（C-4 Red scaffold 完了・MIGRATION_PROGRESS.md 更新済み。git status は clean）
 - 移行計画: docs/NEXTJS_PHASE_A_F_PLAN.md（Phase A–F）
 - 進捗トラッカー: MIGRATION_PROGRESS.md（**作業開始前に必読**: §「AI 作業ルール」R1（Biome scope）/ R2（faithful 必須）/「Phase C-2 faithful 移植継続ポイント」）
 - Phase C 詳細設計: docs/NEXTJS_PHASE_C_DETAILED_DESIGN.md（§5.4 C-4）

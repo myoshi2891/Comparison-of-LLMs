@@ -1,0 +1,58 @@
+---
+paths:
+  - "web-next/app/**/*.tsx"
+  - "web-next/app/**/*.test.tsx"
+  - "web-next/app/**/*.module.css"
+  - "MIGRATION_PROGRESS.md"
+---
+
+# MIGRATION_PROGRESS.md セッション終了前同期ルール
+
+Phase A–F の移行作業セッションでは、**セッションをコンパクトする必要が出てくる前に**
+必ず以下を実行してセッションを終えること。
+
+## 実行タイミング（いずれかで即実施）
+
+- 1セクション移植コミットが完了した直後（自然な区切り）
+- コンテキスト消費が大きくなってきた（ユーザーが新セッション開始を示唆）
+- ユーザーが「セッション終了」「仕様書更新して」と言った
+- 次の大きなセクション移植に入る前
+
+## 手順
+
+### 1. `## 現在地` セクションを更新
+
+```bash
+git rev-parse --short HEAD  # 最新 HEAD を取得
+cd web-next && bun run test  # pass 件数を確認
+```
+
+更新対象フィールド:
+
+| フィールド | 更新内容 |
+|---|---|
+| `最新 HEAD` | `git rev-parse --short HEAD` の実値 + コミットメッセージ要約 |
+| `次の作業` | 次セッションで **最初に** 取り掛かるセクション（例: `C-4 s02 faithful 移植`） |
+| `テスト数` | `bun run test` の pass 件数 |
+| `ビルド` | `bun run build` / `bun run typecheck` / `uv run pytest` の最新状態 |
+
+### 2. `## 次回セッションでの再開プロンプト` を同期
+
+`現在地` の値と一致するように再開プロンプト内の以下を書き換える:
+
+- `最新 HEAD: <hash>` の値
+- `次の作業:` の説明（セクション粒度で具体的に）
+- 未完了セクションの行範囲（移植が進んで変わった場合のみ）
+
+### 3. コミット
+
+```bash
+git add MIGRATION_PROGRESS.md
+git commit -m "chore(docs): update MIGRATION_PROGRESS.md — <作業内容の1行要約>"
+```
+
+## 禁止
+
+- HEAD 値をコミットせず新セッションに引き継ぐ（ズレが発生する）
+- 再開プロンプトと `現在地` が食い違ったままコミットする
+- このファイル更新のために `bun run lint:fix` や全体 Biome write を実行する（R1 違反）
