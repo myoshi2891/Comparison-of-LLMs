@@ -117,7 +117,6 @@ wc -l legacy/<provider>/<file>.html
 - 新たに i18n キーを追加した場合、`lib/i18n.test.ts` の `expect(Object.keys(T).length).toBe(N)` を
   **同じコミット内で N+k に更新**すること（B-1 で key count ドリフトが発生、別 commit `b984f16` で後追い同期した）
 
-
 ### Step 5: コードブロック（shiki）
 
 build-time ハイライトとして `shiki` を採用する。
@@ -175,6 +174,14 @@ bun run build       # Next.js production build (out/ 生成)
 - `.gitignore` より先に commit 済みの legacy/ ファイルは HEAD に残存しているため、Phase F までは
   削除せず参照用として保持する（Phase F でも物理削除は行わない）
 - 新規ガイドページを `legacy/` 配下に書かない（web-next 側のみに作成）
+
+## セッション終了前の仕様書同期
+
+1セクション移植コミットが完了したタイミング、またはコンテキスト逼迫を感じたタイミングで
+**必ず** `MIGRATION_PROGRESS.md` を更新してコミットする。
+
+手順の詳細は `.claude/rules/migration-progress-sync.md` を参照。
+更新対象: `現在地`（HEAD・次の作業・テスト数）+ `次回セッションでの再開プロンプト`。
 
 ## pre-commit-check スキルとの連携
 
