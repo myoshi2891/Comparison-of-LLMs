@@ -9,7 +9,7 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- **最新 HEAD**: `1a7e7e9`（**C-4 `/copilot/agent` s02 faithful 移植（alert + patGrid + code block）**）
+- **最新 HEAD**: `dbd1ba7`（**chore(rules): sync gate rule 追加**）
 - **未コミット作業**: なし（working tree クリーン）
 - **次の作業**: C-4 s03 実装（lines 798-876）— `.github/instructions/*.instructions.md`（card + 2 code + alert）
 - **テスト数**: `bun run test` **469 tests（全件 pass）** — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
