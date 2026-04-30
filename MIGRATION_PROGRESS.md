@@ -11,7 +11,7 @@
 - **ブランチ**: `feat/nextjs-migration`
 - **最新 HEAD**: `d795c4e`（**MIGRATION_PROGRESS.md 更新 — HEAD 修正・C-4 セクションテーブル確定**）
 - **未コミット作業**: なし（working tree クリーン）
-- **次の作業**: C-4 `/copilot/agent` Green 実装（hero+TOC → s01 → … → sources の faithful 移植）— `/nextjs-page-migration` スキルを **必ず** 使って進めること
+- **次の作業**: C-4 `/copilot/agent` Green 実装（**hero+TOC から開始**）— 全 20 セクション HTML 読み込み・クラスマッピング・TOC 設計は完了済み。次セッションは `page.tsx` 書き込みから即着手できる
 - **テスト数**: `bun run test` **461 件 pass**（C-4 Red scaffold で 5 fail / 3 pass の状態）
 - **ビルド**: `bun run build` 成功・`bun run typecheck` 成功・`uv run pytest` 5/5 passed
 
@@ -145,11 +145,11 @@ Next.js 移行プロジェクトの作業を再開してください。
 - プロジェクト固有スキル: .claude/skills/nextjs-page-migration/SKILL.md
 - リポジトリ規約: CLAUDE.md（AGENTS.md / GEMINI.md からも参照される。AI 共通の編集ルール）
 
-次の作業: **C-4 `/copilot/agent` Green 実装** — Red scaffold（b920471）は完了済み。hero+TOC → s01 → ... → sources の順に faithful 移植する
+次の作業: **C-4 `/copilot/agent` Green 実装（即着手可能）** — Red scaffold（b920471）完了済み。全 20 セクション HTML 確認済み・CSS クラスマッピング確定済み。`page.tsx` の書き込みを hero+TOC から開始する
 
 C-4 作業手順:
 - **最初に `/nextjs-page-migration` スキルを呼び出す**（Claude Code の場合は Skill ツール経由、他の Coding Agent は `.claude/skills/nextjs-page-migration/SKILL.md` を Read してから開始）
-- legacy/copilot/agent.html（2171行）を Read で全セクション確認済み（20 section ID: s01〜s19 + sources）
+- **legacy HTML の再読は不要**（全 2171 行を前セッションで確認済み）。TOC 20 件・CSS クラスマッピング・Sources 15 件はすべて把握済み
 - C-3 完成物 web-next/app/codex/agent/ が正本テンプレート（code-body パターン・Ext ヘルパー等）
 - docs/NEXTJS_PHASE_C_DETAILED_DESIGN.md §5.4 に C-4 の詳細設計あり（63 code blocks）
 
