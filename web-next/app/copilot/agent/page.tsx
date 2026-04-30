@@ -196,7 +196,467 @@ export default function CopilotAgentPage() {
         </nav>
 
         {/* Sections — faithful content filled in per-section commits */}
-        <section id="s01" className={styles.sec} />
+        <section id="s01" className={styles.sec}>
+          <div className={styles.secHead}>
+            <span className={styles.secNum}>1</span>
+            <h2>全体アーキテクチャと各ファイルの位置づけ</h2>
+          </div>
+          <div className={styles.card}>
+            <p>
+              GitHub Copilot は他のツールと比較して
+              <strong>最も多様なMarkdownファイル体系</strong>
+              を持ちます。「常時ロード型」「パスマッチ型」「オンデマンド型」「エージェント定義型」の4カテゴリが存在し、それぞれ役割が明確に分かれています。さらに{" "}
+              <strong>AGENTS.md</strong> によって Claude Code・Gemini CLI・Codex
+              とのクロスツール互換性も確保されています。
+            </p>
+          </div>
+          <div className={styles.matrix}>
+            <div className={styles.matrixTitle}>
+              カスタム指示の読み込み優先度 — 組織 → リポジトリ → パス → スキル（後が優先）
+            </div>
+            <div className={styles.matrixRow}>
+              <div className={`${styles.mxBox} ${styles.mxOrg}`}>
+                🏢 Organization
+                <br />
+                <small>org-level instructions</small>
+              </div>
+              <span className={styles.mxArrow}>→</span>
+              <div className={`${styles.mxBox} ${styles.mxRepo}`}>
+                📁 Repository
+                <br />
+                <small>
+                  copilot-instructions.md
+                  <br />
+                  AGENTS.md
+                </small>
+              </div>
+              <span className={styles.mxArrow}>→</span>
+              <div className={`${styles.mxBox} ${styles.mxPath}`}>
+                📂 Path-specific
+                <br />
+                <small>
+                  *.instructions.md
+                  <br />
+                  (applyTo)
+                </small>
+              </div>
+              <span className={styles.mxArrow}>→</span>
+              <div className={`${styles.mxBox} ${styles.mxSkill}`}>
+                ⚡ On-demand
+                <br />
+                <small>
+                  SKILL.md
+                  <br />
+                  （遅延ロード）
+                </small>
+              </div>
+            </div>
+            <div className={styles.matrixNote}>
+              Coding Agent の優先度: <strong>リポジトリ指示 → 組織指示</strong>
+              （リポジトリが最優先）
+              <br />
+              <code>excludeAgent</code>{" "}
+              プロパティで指示ファイルを特定エージェントから除外可能（2025年11月〜）
+            </div>
+          </div>
+          <div className={styles.filetreeOuter}>
+            <div className={styles.filetreeBar}>
+              <span className={styles.fbDot} style={{ background: "#ff6057" }} />
+              <span className={styles.fbDot} style={{ background: "#ffbd2e" }} />
+              <span className={styles.fbDot} style={{ background: "#27c93f" }} />
+              <span
+                style={{
+                  marginLeft: "10px",
+                  color: "#8b949e",
+                  fontSize: "12px",
+                  fontFamily: "'Cascadia Code','Consolas',monospace",
+                }}
+              >
+                project-root/ — GitHub Copilot エコシステム ファイル構造
+              </span>
+            </div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 1000 880"
+              width="100%"
+              style={{ display: "block" }}
+              fontFamily="'Cascadia Code','Consolas',monospace"
+              role="img"
+              aria-label="GitHub Copilot エコシステム ファイル構造ツリー図"
+            >
+              <title>GitHub Copilot エコシステム ファイル構造ツリー図</title>
+              <defs>
+                <linearGradient id="gh1" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style={{ stopColor: "#1f883d" }} />
+                  <stop offset="100%" style={{ stopColor: "#3fb950" }} />
+                </linearGradient>
+                <linearGradient id="gh2" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style={{ stopColor: "#0969da" }} />
+                  <stop offset="100%" style={{ stopColor: "#58a6ff" }} />
+                </linearGradient>
+                <linearGradient id="gh3" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style={{ stopColor: "#8250df" }} />
+                  <stop offset="100%" style={{ stopColor: "#bc8cff" }} />
+                </linearGradient>
+                <linearGradient id="gh4" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style={{ stopColor: "#bf8700" }} />
+                  <stop offset="100%" style={{ stopColor: "#d29922" }} />
+                </linearGradient>
+                <linearGradient id="gh5" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style={{ stopColor: "#cf222e" }} />
+                  <stop offset="100%" style={{ stopColor: "#f85149" }} />
+                </linearGradient>
+                <linearGradient id="gh6" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style={{ stopColor: "#0a7a5c" }} />
+                  <stop offset="100%" style={{ stopColor: "#2da672" }} />
+                </linearGradient>
+                <linearGradient id="gh7" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style={{ stopColor: "#0078d4" }} />
+                  <stop offset="100%" style={{ stopColor: "#58a6ff" }} />
+                </linearGradient>
+              </defs>
+              <rect width="1000" height="880" fill="#0d1117" />
+              <rect
+                x="668"
+                y="16"
+                width="316"
+                height="304"
+                rx="10"
+                fill="#161b22"
+                stroke="#21262d"
+                strokeWidth="1"
+              />
+              <text
+                x="826"
+                y="38"
+                textAnchor="middle"
+                fill="#484f58"
+                fontSize="11"
+                letterSpacing="1.5"
+              >
+                LEGEND
+              </text>
+              <rect x="684" y="50" width="22" height="22" rx="5" fill="url(#gh1)" />
+              <text x="695" y="65" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ①
+              </text>
+              <text x="714" y="65" fontSize="12" fill="#c9d1d9">
+                copilot-instructions.md（常時ロード）
+              </text>
+              <rect x="684" y="82" width="22" height="22" rx="5" fill="url(#gh2)" />
+              <text x="695" y="97" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ②
+              </text>
+              <text x="714" y="97" fontSize="12" fill="#c9d1d9">
+                *.instructions.md（パスマッチ型）
+              </text>
+              <rect x="684" y="114" width="22" height="22" rx="5" fill="url(#gh3)" />
+              <text x="695" y="129" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ③
+              </text>
+              <text x="714" y="129" fontSize="12" fill="#c9d1d9">
+                *.agent.md（エージェント定義）
+              </text>
+              <rect x="684" y="146" width="22" height="22" rx="5" fill="url(#gh4)" />
+              <text x="695" y="161" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ④
+              </text>
+              <text x="714" y="161" fontSize="12" fill="#c9d1d9">
+                SKILL.md（遅延ロード型スキル）
+              </text>
+              <rect x="684" y="178" width="22" height="22" rx="5" fill="url(#gh5)" />
+              <text x="695" y="193" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ⑤
+              </text>
+              <text x="714" y="193" fontSize="12" fill="#c9d1d9">
+                *.prompt.md（再利用可能プロンプト）
+              </text>
+              <rect x="684" y="210" width="22" height="22" rx="5" fill="url(#gh6)" />
+              <text x="695" y="225" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ⑥
+              </text>
+              <text x="714" y="225" fontSize="12" fill="#c9d1d9">
+                *.chatmode.md（カスタムチャットモード）
+              </text>
+              <rect x="684" y="242" width="22" height="22" rx="5" fill="url(#gh7)" />
+              <text x="695" y="257" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ⑦
+              </text>
+              <text x="714" y="257" fontSize="12" fill="#c9d1d9">
+                AGENTS.md（クロスツール共通）
+              </text>
+              <rect x="684" y="274" width="52" height="22" rx="5" fill="#1c2128" />
+              <text
+                x="710"
+                y="289"
+                textAnchor="middle"
+                fill="#6e7681"
+                fontSize="11"
+                fontWeight="700"
+              >
+                📁 DIR
+              </text>
+              <text x="744" y="289" fontSize="12" fill="#484f58">
+                ディレクトリ
+              </text>
+              <line x1="44" y1="50" x2="44" y2="846" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="44" y1="52" x2="70" y2="52" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="44" y1="100" x2="70" y2="100" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="86" y1="100" x2="86" y2="670" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="86" y1="132" x2="112" y2="132" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="86" y1="170" x2="112" y2="170" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="128" y1="170" x2="128" y2="238" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="128" y1="202" x2="154" y2="202" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="128" y1="236" x2="154" y2="236" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="86" y1="278" x2="112" y2="278" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="128" y1="278" x2="128" y2="384" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="128" y1="310" x2="154" y2="310" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="128" y1="348" x2="154" y2="348" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="128" y1="386" x2="154" y2="386" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="86" y1="428" x2="112" y2="428" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="128" y1="428" x2="128" y2="502" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="128" y1="460" x2="154" y2="460" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="170" y1="460" x2="170" y2="500" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="170" y1="498" x2="196" y2="498" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="86" y1="548" x2="112" y2="548" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="128" y1="548" x2="128" y2="584" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="128" y1="582" x2="154" y2="582" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="86" y1="626" x2="112" y2="626" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="128" y1="626" x2="128" y2="660" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="128" y1="658" x2="154" y2="658" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="44" y1="718" x2="70" y2="718" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="44" y1="846" x2="70" y2="846" stroke="#21262d" strokeWidth="1.5" />
+              <text x="20" y="30" fontSize="16" fill="#3fb950">
+                📁
+              </text>
+              <text x="42" y="30" fontSize="14" fontWeight="700" fill="#3fb950">
+                {"  project-root/"}
+              </text>
+              <text x="78" y="58" fontSize="14" fill="#7ee787">
+                📄
+              </text>
+              <text x="98" y="58" fontSize="13.5" fontWeight="700" fill="#7ee787">
+                AGENTS.md
+              </text>
+              <rect x="198" y="43" width="22" height="22" rx="5" fill="url(#gh7)" />
+              <text x="209" y="58" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ⑦
+              </text>
+              <text x="228" y="58" fontSize="12" fill="#6e7681">
+                クロスツール共通指示（Claude / Gemini / Codex と共有）
+              </text>
+              <text x="228" y="74" fontSize="11" fill="#2d3a4a">
+                {"  ※ Coding Agent が CLAUDE.md / GEMINI.md も自動認識"}
+              </text>
+              <text x="78" y="106" fontSize="14" fill="#58a6ff">
+                📁
+              </text>
+              <text x="98" y="106" fontSize="14" fontWeight="700" fill="#58a6ff">
+                .github/
+              </text>
+              <text x="120" y="138" fontSize="14" fill="#7ee787">
+                📄
+              </text>
+              <text x="140" y="138" fontSize="13.5" fontWeight="700" fill="#7ee787">
+                copilot-instructions.md
+              </text>
+              <rect x="334" y="123" width="22" height="22" rx="5" fill="url(#gh1)" />
+              <text x="345" y="138" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ①
+              </text>
+              <text x="364" y="138" fontSize="12" fill="#6e7681">
+                常時ロード：プロジェクト全体の共通指示
+              </text>
+              <text x="120" y="176" fontSize="14" fill="#58a6ff">
+                📂
+              </text>
+              <text x="140" y="176" fontSize="13.5" fontWeight="700" fill="#58a6ff">
+                instructions/
+              </text>
+              <text x="162" y="208" fontSize="13" fill="#79c0ff">
+                📄
+              </text>
+              <text x="182" y="208" fontSize="13" fill="#79c0ff">
+                frontend.instructions.md
+              </text>
+              <rect x="370" y="193" width="22" height="22" rx="5" fill="url(#gh2)" />
+              <text x="381" y="208" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ②
+              </text>
+              <text x="400" y="208" fontSize="12" fill="#6e7681">
+                {'applyTo: "src/components/**" でパスマッチ'}
+              </text>
+              <text x="162" y="242" fontSize="13" fill="#79c0ff">
+                📄
+              </text>
+              <text x="182" y="242" fontSize="13" fill="#79c0ff">
+                testing.instructions.md
+              </text>
+              <rect x="356" y="227" width="22" height="22" rx="5" fill="url(#gh2)" opacity="0.8" />
+              <text x="367" y="242" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ②
+              </text>
+              <text x="386" y="242" fontSize="12" fill="#6e7681">
+                {'applyTo: "**/*.test.*" / excludeAgent: "code-review"'}
+              </text>
+              <text x="120" y="284" fontSize="14" fill="#58a6ff">
+                📂
+              </text>
+              <text x="140" y="284" fontSize="13.5" fontWeight="700" fill="#58a6ff">
+                agents/
+              </text>
+              <text x="162" y="316" fontSize="13" fill="#bc8cff">
+                📝
+              </text>
+              <text x="182" y="316" fontSize="13" fill="#bc8cff">
+                test-agent.agent.md
+              </text>
+              <rect x="348" y="301" width="22" height="22" rx="5" fill="url(#gh3)" />
+              <text x="359" y="316" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ③
+              </text>
+              <text x="378" y="316" fontSize="12" fill="#6e7681">
+                @test-agent として呼び出せるQAエージェント
+              </text>
+              <text x="162" y="354" fontSize="13" fill="#bc8cff">
+                📝
+              </text>
+              <text x="182" y="354" fontSize="13" fill="#bc8cff">
+                docs-agent.agent.md
+              </text>
+              <rect x="348" y="339" width="22" height="22" rx="5" fill="url(#gh3)" opacity="0.8" />
+              <text x="359" y="354" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ③
+              </text>
+              <text x="378" y="354" fontSize="12" fill="#6e7681">
+                @docs-agent：ドキュメント生成専門
+              </text>
+              <text x="162" y="392" fontSize="13" fill="#bc8cff">
+                📝
+              </text>
+              <text x="182" y="392" fontSize="13" fill="#bc8cff">
+                security-agent.agent.md
+              </text>
+              <rect x="360" y="377" width="22" height="22" rx="5" fill="url(#gh3)" opacity="0.7" />
+              <text x="371" y="392" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ③
+              </text>
+              <text x="390" y="392" fontSize="12" fill="#6e7681">
+                @security-agent：セキュリティ監査専門
+              </text>
+              <text x="120" y="434" fontSize="14" fill="#58a6ff">
+                📂
+              </text>
+              <text x="140" y="434" fontSize="13.5" fontWeight="700" fill="#58a6ff">
+                skills/
+              </text>
+              <text x="220" y="434" fontSize="12" fill="#2d3a4a">
+                {"  ← anthropics/skills と共通フォーマット"}
+              </text>
+              <text x="162" y="466" fontSize="13" fill="#58a6ff">
+                📂
+              </text>
+              <text x="182" y="466" fontSize="13" fontWeight="700" fill="#58a6ff">
+                webapp-testing/
+              </text>
+              <text x="204" y="504" fontSize="13" fill="#d29922">
+                📝
+              </text>
+              <text x="224" y="504" fontSize="13" fill="#d29922">
+                SKILL.md
+              </text>
+              <rect x="304" y="489" width="22" height="22" rx="5" fill="url(#gh4)" />
+              <text x="315" y="504" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ④
+              </text>
+              <text x="334" y="504" fontSize="12" fill="#6e7681">
+                遅延ロード：Playwright テストスキル（マッチ時のみ）
+              </text>
+              <text x="120" y="554" fontSize="14" fill="#58a6ff">
+                📂
+              </text>
+              <text x="140" y="554" fontSize="13.5" fontWeight="700" fill="#58a6ff">
+                prompts/
+              </text>
+              <text x="162" y="588" fontSize="13" fill="#f85149">
+                📄
+              </text>
+              <text x="182" y="588" fontSize="13" fill="#f85149">
+                my-pull-requests.prompt.md
+              </text>
+              <rect x="390" y="573" width="22" height="22" rx="5" fill="url(#gh5)" />
+              <text x="401" y="588" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ⑤
+              </text>
+              <text x="420" y="588" fontSize="12" fill="#6e7681">
+                再利用プロンプト（/my-pull-requests で実行）
+              </text>
+              <text x="120" y="632" fontSize="14" fill="#58a6ff">
+                📂
+              </text>
+              <text x="140" y="632" fontSize="13.5" fontWeight="700" fill="#58a6ff">
+                chatmodes/
+              </text>
+              <text x="162" y="664" fontSize="13" fill="#2da672">
+                📄
+              </text>
+              <text x="182" y="664" fontSize="13" fill="#2da672">
+                databaseadmin.chatmode.md
+              </text>
+              <rect x="386" y="649" width="22" height="22" rx="5" fill="url(#gh6)" />
+              <text x="397" y="664" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ⑥
+              </text>
+              <text x="416" y="664" fontSize="12" fill="#6e7681">
+                DBA ペルソナ（ツール + 指示セット）
+              </text>
+              <text x="78" y="724" fontSize="14" fill="#7ee787">
+                📄
+              </text>
+              <text x="98" y="724" fontSize="13.5" fontWeight="700" fill="#58a6ff">
+                .github/copilot-instructions.md
+              </text>
+              <rect x="302" y="709" width="22" height="22" rx="5" fill="url(#gh1)" opacity="0.75" />
+              <text x="313" y="724" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ①
+              </text>
+              <text x="332" y="724" fontSize="12" fill="#6e7681">
+                （ルートの .github/ 内に配置）
+              </text>
+              <line x1="44" y1="760" x2="70" y2="760" stroke="#21262d" strokeWidth="1.5" />
+              <text x="78" y="766" fontSize="14" fill="#58a6ff">
+                📁
+              </text>
+              <text x="98" y="766" fontSize="14" fontWeight="700" fill="#58a6ff">
+                src/
+              </text>
+              <line x1="86" y1="766" x2="86" y2="802" stroke="#21262d" strokeWidth="1.5" />
+              <line x1="86" y1="800" x2="112" y2="800" stroke="#21262d" strokeWidth="1.5" />
+              <text x="120" y="806" fontSize="13" fill="#58a6ff">
+                📂
+              </text>
+              <text x="140" y="806" fontSize="13" fontWeight="700" fill="#58a6ff">
+                components/
+              </text>
+              <text x="240" y="806" fontSize="12" fill="#2d3a4a">
+                {"  ← frontend.instructions.md の applyTo 対象"}
+              </text>
+              <text x="78" y="852" fontSize="14" fill="#58a6ff">
+                📘
+              </text>
+              <text x="98" y="852" fontSize="14" fontWeight="700" fill="#2da672">
+                README.md
+              </text>
+              <rect x="204" y="837" width="22" height="22" rx="5" fill="url(#gh6)" />
+              <text x="215" y="852" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                ⑥
+              </text>
+              <text x="234" y="852" fontSize="12" fill="#6e7681">
+                人間向け：エージェント構成・セットアップ手順
+              </text>
+            </svg>
+          </div>
+        </section>
         <section id="s02" className={styles.sec} />
         <section id="s03" className={styles.sec} />
         <section id="s04" className={styles.sec} />
