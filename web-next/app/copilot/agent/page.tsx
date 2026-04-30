@@ -2105,9 +2105,146 @@ export default function CopilotAgentPage() {
             className={styles.secHead}
             style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
           >
-            <h2 style={{ fontSize: "1.1rem" }}>4-6. MCP統合</h2>
+            <h2 style={{ fontSize: "1.1rem" }}>
+              {"4-6. MCP統合 — エージェント専用MCPサーバー設定 "}
+              <span className={styles.newB}>NEW</span>
+            </h2>
           </div>
-          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+          <div className={styles.card}>
+            <p>
+              <code>mcp-servers</code>
+              {" フィールドで"}
+              <strong>{"このエージェント専用のMCPサーバー"}</strong>
+              {
+                "を設定できます。GitHub Copilot Coding Agent（GitHub.com）はMCPサーバーのtoolsのみサポート（resources・promptsは非対応）。リモートMCPのOAuth認証は現在未対応です。"
+              }
+            </p>
+          </div>
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>{".github/agents/sentry-debugger.agent.md — Sentry MCP連携エージェント"}</span>
+              <span className={styles.codeLang}>{"Markdown + YAML"}</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.cs}>---</span>
+              {"\n"}
+              <span className={styles.cm}>name</span>
+              {": "}
+              <span className={styles.cv}>{"'Sentry Debugger'"}</span>
+              {"\n"}
+              <span className={styles.cm}>description</span>
+              {": "}
+              <span className={styles.cv}>
+                {
+                  "'Analyzes Sentry errors and links them to code issues.\n  Use for: Sentry, error tracking, production bugs, exception analysis.'"
+                }
+              </span>
+              {"\n"}
+              <span className={styles.cm}>target</span>
+              {": "}
+              <span className={styles.cv}>{"'github-copilot'"}</span>
+              {"  "}
+              <span className={styles.cc}>{"# 必須: github-copilot | vscode"}</span>
+              {"\n"}
+              <span className={styles.cm}>tools</span>
+              {": ["}
+              <span className={styles.cv}>{"'read_file'"}</span>
+              {", "}
+              <span className={styles.cv}>{"'search'"}</span>
+              {", "}
+              <span className={styles.cv}>{"'sentry/get_issue_details'"}</span>
+              {", "}
+              <span className={styles.cv}>{"'sentry/get_issue_summary'"}</span>
+              {"]\n"}
+              <span className={styles.cm}>{"mcp-servers"}</span>
+              {":\n  "}
+              <span className={styles.cv}>sentry</span>
+              {":\n    "}
+              <span className={styles.cv}>type</span>
+              {": "}
+              <span className={styles.cv}>{"'local'"}</span>
+              {"           "}
+              <span className={styles.cc}>{"# 'local'=stdio互換, 'http', 'sse'"}</span>
+              {"\n    "}
+              <span className={styles.cv}>command</span>
+              {": "}
+              <span className={styles.cv}>{"'npx'"}</span>
+              {"\n    "}
+              <span className={styles.cv}>args</span>
+              {": ["}
+              <span className={styles.cv}>{"'@sentry/mcp-server@latest'"}</span>
+              {", "}
+              <span className={styles.cv}>{"'--host=$SENTRY_HOST'"}</span>
+              {"]\n    "}
+              <span className={styles.cv}>tools</span>
+              {": ["}
+              <span className={styles.cv}>{"'get_issue_details'"}</span>
+              {", "}
+              <span className={styles.cv}>{"'get_issue_summary'"}</span>
+              {"]   "}
+              <span className={styles.cc}>{"# ホワイトリスト推奨"}</span>
+              {"\n    "}
+              <span className={styles.cv}>env</span>
+              {":\n      "}
+              <span className={styles.cv}>SENTRY_HOST</span>
+              {": "}
+              <span className={styles.cv}>{"'https://yourcompany.sentry.io'"}</span>
+              {"\n      "}
+              <span className={styles.cv}>SENTRY_ACCESS_TOKEN</span>
+              {": "}
+              <span className={styles.cv}>{"'${{ secrets.COPILOT_MCP_SENTRY_TOKEN }}'"}</span>
+              {"\n      "}
+              <span className={styles.cc}>
+                {'# ↑ リポジトリSettings → Copilot → Coding Agent → "copilot" 環境に設定'}
+              </span>
+              {"\n      "}
+              <span className={styles.cc}>
+                {"# GitHub Actions構文: ${{ secrets.* }} / ${{ vars.* }}"}
+              </span>
+              {"\n      "}
+              <span className={styles.cc}>
+                {"# Claude Code構文: ${VAR} / ${VAR:-default} も使用可"}
+              </span>
+              {"\n"}
+              <span className={styles.cs}>---</span>
+              {"\n\n"}
+              <span className={styles.ch}>{"## Role"}</span>
+              {
+                "\nあなたは本番エラー調査の専門家です。Sentryのエラーを分析し、\nコードベースと照合して根本原因を特定します。\n\n"
+              }
+              <span className={styles.ch}>{"## Instructions"}</span>
+              {"\n1. "}
+              <span className={styles.cw}>get_issue_summary</span>
+              {
+                " でSentryイシューの概要を取得（ログ全量は取得しない）\n2. 問題のスタックトレースから関連ファイルを特定\n3. コードベースで該当箇所を読み取る\n4. 根本原因と修正案を提示する\n\n"
+              }
+              <span className={styles.ch}>{"## Constraints"}</span>
+              {"\n- "}
+              <span className={styles.cw}>{"コードを変更しない（調査・レポートのみ）"}</span>
+              {"\n- 完全なログが必要な場合のみ "}
+              <span className={styles.cw}>get_issue_details</span>
+              {" を使用\n- センシティブなデータ（PII等）をレポートに含めない"}
+            </div>
+          </div>
+          <div className={`${styles.alert} ${styles.ai}`}>
+            <span className={styles.alertIcon}>💡</span>
+            <div className={styles.alertBody}>
+              <strong>{"ビルトインMCPサーバー（追加設定不要）"}</strong>
+              {" Copilot Coding Agentには以下のMCPサーバーがビルトインで利用可能です（"}
+              <code>mcp-servers</code>
+              {"設定不要）："}
+              <code>github</code>
+              {"（Issue・PR・コード操作）・"}
+              <code>azure</code>
+              {"（Azure DevOps連携）・"}
+              <code>cloudflare</code>
+              {"。これらは "}
+              <code>tools</code>
+              {" フィールドに直接 "}
+              <code>{'"github/create_issue"'}</code>
+              {" のように指定するだけで使用できます。"}
+            </div>
+          </div>
         </section>
         <section id="s11" className={styles.sec}>
           <div
