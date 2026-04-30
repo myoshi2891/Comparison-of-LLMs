@@ -2826,9 +2826,109 @@ export default function CopilotAgentPage() {
         <hr />
         <section id="s14" className={styles.sec}>
           <div className={styles.secHead}>
-            <h2>5. .github/skills/*/SKILL.md</h2>
+            <span className={styles.secNum}>5</span>
+            <h2>
+              <span className={styles.mono}>.github/skills/*/SKILL.md</span>
+              {" — 遅延ロード型スキル（Open Standard）"}
+            </h2>
+            <span className={styles.note}>
+              2025年12月〜 · VS Code + Copilot CLI + Coding Agent 対応
+            </span>
           </div>
-          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+          <div className={styles.card}>
+            <p>
+              {"Agent Skills は "}
+              <strong>プロンプトに関連する場合のみ自動ロードされる「専門知識パッケージ」</strong>
+              {"です。"}
+              <code>copilot-instructions.md</code>
+              {
+                " が常時ロードされるのに対して、SKILL.md はタスクマッチ時のみロードされます（プログレッシブ・ディスクロージャー）。"
+              }
+              <strong>Anthropic の Claude Code と同じフォーマット</strong>
+              {"のオープンスタンダードであり、"}
+              <code>anthropics/skills</code>
+              {" リポジトリのスキルをそのまま使えます。"}
+            </p>
+          </div>
+          <div className={`${styles.alert} ${styles.ag}`}>
+            <span className={styles.alertIcon}>✅</span>
+            <div className={styles.alertBody}>
+              <strong>Claude Code の .claude/skills/ と互換性あり</strong>
+              <code>.claude/skills/</code>
+              {
+                " に配置したスキルは GitHub Copilot が自動的に認識します。スキルはクロスツールで動作するオープンスタンダードです。"
+              }
+              <code>github/awesome-copilot</code>
+              {" や "}
+              <code>anthropics/skills</code>
+              {" リポジトリのコミュニティスキルも利用できます。"}
+            </div>
+          </div>
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>.github/skills/playwright-testing/SKILL.md</span>
+              <span className={styles.codeLang}>Markdown + YAML frontmatter</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.cs}>---</span>
+              {"\n"}
+              <span className={styles.cm}>name</span>
+              {": "}
+              <span className={styles.cv}>playwright-testing</span>
+              {"\n"}
+              <span className={styles.cm}>description</span>
+              {": "}
+              <span className={styles.cv}>
+                {
+                  "|\n  Playwright を使った E2E テストを作成・実行するスキル。\n  以下の場合にトリガーする:\n  - ブラウザベースのテストを作成してほしい\n  - E2E テストを実行・デバッグしてほしい\n  - Playwright の設定・セットアップが必要\n  \n  以下の場合はトリガーしない:\n  - ユニットテスト（Vitest）の作成\n  - API テスト（supabase functions test）"
+                }
+              </span>
+              {"\n"}
+              <span className={styles.cs}>---</span>
+              {"\n\n"}
+              <span className={styles.ch}># Playwright E2E Testing</span>
+              {"\n\n"}
+              <span className={styles.cm}>## Setup</span>
+              {"\nインストール: "}
+              <span className={styles.cs}>{"`pnpm add -D @playwright/test`"}</span>
+              {"\n設定: playwright.config.ts（プロジェクトルート）\nブラウザインストール: "}
+              <span className={styles.cs}>{"`pnpm playwright install chromium`"}</span>
+              {"\n\n"}
+              <span className={styles.cm}>## Page Object Pattern</span>
+              {"\nすべての E2E テストはページオブジェクトパターンを使用する:\n\n"}
+              <span className={styles.cs}>
+                {
+                  "```typescript\n// tests/pages/LoginPage.ts\nexport class LoginPage {\n  constructor(private page: Page) {}\n  \n  async login(email: string, password: string) {\n    await this.page.getByTestId('email').fill(email)\n    await this.page.getByTestId('password').fill(password)\n    await this.page.getByTestId('submit').click()\n  }\n}\n```"
+                }
+              </span>
+              {"\n\n"}
+              <span className={styles.cm}>## Commands</span>
+              {"\n- 全 E2E 実行: "}
+              <span className={styles.cs}>{"`pnpm playwright test`"}</span>
+              {"\n- UI モード:   "}
+              <span className={styles.cs}>{"`pnpm playwright test --ui`"}</span>
+              {"\n- トレース記録: "}
+              <span className={styles.cs}>{"`pnpm playwright test --trace on`"}</span>
+              {"\n\n"}
+              <span className={styles.cm}>## Test Structure Rules</span>
+              {"\n- "}
+              <span className={styles.cs}>data-testid</span>
+              {" 属性でセレクタを指定（クラス名は変わりやすいため禁止）\n- "}
+              <span className={styles.cs}>beforeEach</span>
+              {
+                " でテスト状態をリセット\n- 各テストは独立して実行可能なこと（テスト間の依存禁止）\n\n"
+              }
+              <span className={styles.cc}>
+                {"# スキルディレクトリには追加リソースも含められる"}
+              </span>
+              {"\n"}
+              <span className={styles.cc}>
+                {"# ./test-template.ts  — テストテンプレート（参照可能）"}
+              </span>
+              {"\n"}
+              <span className={styles.cc}>{"# ./setup-guide.md    — 詳細セットアップガイド"}</span>
+            </div>
+          </div>
         </section>
         <section id="s15" className={styles.sec}>
           <div className={styles.secHead}>
