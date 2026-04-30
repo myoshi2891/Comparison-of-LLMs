@@ -928,7 +928,72 @@ export default function CopilotAgentPage() {
             </p>
           </div>
         </section>
-        <section id="s05" className={styles.sec} />
+        <section id="s05" className={styles.sec}>
+          <div
+            className={styles.secHead}
+            style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
+          >
+            <h2 style={{ fontSize: "1.1rem" }}>
+              {"4-1. 配置場所（スコープ別） "}
+              <span className={styles.newB}>2026 更新</span>
+            </h2>
+          </div>
+          <div className={styles.scopeGrid}>
+            <div className={styles.scopeCard}>
+              <div className={styles.scopeCardIcon}>📁</div>
+              <div className={styles.scopeCardTtl}>リポジトリレベル（推奨）</div>
+              <div className={styles.scopeCardBody}>
+                <code>.github/agents/AGENT-NAME.agent.md</code>
+                <br />
+                {"そのリポジトリのすべてのコラボレーターが利用可能。git管理でチーム共有。"}
+              </div>
+              <div style={{ marginTop: "8px" }}>
+                <span className={`${styles.tag} ${styles.tagG}`}>全プラン</span>
+              </div>
+            </div>
+            <div className={styles.scopeCard}>
+              <div className={styles.scopeCardIcon}>👤</div>
+              <div className={styles.scopeCardTtl}>ユーザーレベル（個人）</div>
+              <div className={styles.scopeCardBody}>
+                {"VS Code設定の「ユーザー」選択で作成。全ワークスペースで利用可能。"}
+                <code>chat.agentFilesLocations</code>
+                {"でカスタムパスも指定可。"}
+              </div>
+              <div style={{ marginTop: "8px" }}>
+                <span className={`${styles.tag} ${styles.tagB}`}>VS Code</span>
+              </div>
+            </div>
+            <div className={styles.scopeCard}>
+              <div className={styles.scopeCardIcon}>🏢</div>
+              <div className={styles.scopeCardTtl}>組織・Enterpriseレベル</div>
+              <div className={styles.scopeCardBody}>
+                <code>.github-private</code>
+                {"リポジトリの "}
+                <code>agents/</code>
+                {" に配置。組織全体・Enterprise全体に展開可能。"}
+              </div>
+              <div style={{ marginTop: "8px" }}>
+                <span className={`${styles.tag} ${styles.tagP}`}>Business/Enterprise</span>
+              </div>
+            </div>
+          </div>
+          <div className={`${styles.alert} ${styles.aw}`}>
+            <span className={styles.alertIcon}>⚠️</span>
+            <div className={styles.alertBody}>
+              <strong>ファイル名の制約：</strong>
+              {"ファイル名に使用できる文字は "}
+              <code>. - _ a-z A-Z 0-9</code>
+              {" のみ。スペース・日本語・記号（"}
+              <code>@</code>
+              {"等）は使用不可。エージェントの呼び出し名はファイル名（"}
+              <code>.agent.md</code>
+              {"除く）になります。例："}
+              <code>test-agent.agent.md</code>
+              {" → "}
+              <code>@test-agent</code>
+            </div>
+          </div>
+        </section>
         <section id="s06" className={styles.sec} />
         <section id="s07" className={styles.sec} />
         <section id="s08" className={styles.sec} />
