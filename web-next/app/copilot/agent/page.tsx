@@ -2565,9 +2565,123 @@ export default function CopilotAgentPage() {
             className={styles.secHead}
             style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
           >
-            <h2 style={{ fontSize: "1.1rem" }}>4-8. .agent.md ベストプラクティス 12則</h2>
+            <h2 style={{ fontSize: "1.1rem" }}>
+              {"4-8. .agent.md ベストプラクティス 12則 "}
+              <span className={styles.newB}>NEW</span>
+            </h2>
           </div>
-          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+          <div className={styles.bpGrid}>
+            <div className={`${styles.bpCard} ${styles.bpG}`}>
+              <div className={styles.bpNum}>01</div>
+              <h4>{"descriptionは「Focuses on X, does NOT do Y」形式で"}</h4>
+              <p>
+                {
+                  "2,500リポジトリの分析から、明確なdescriptionを持つエージェントほど誤呼び出しが少ない。50〜150文字で「使う場面」と「使わない場面」を両方書く。"
+                }
+              </p>
+            </div>
+            <div className={`${styles.bpCard} ${styles.bpB}`}>
+              <div className={styles.bpNum}>02</div>
+              <h4>{"ツールは最小権限の原則を徹底する"}</h4>
+              <p>
+                {
+                  "tools省略=全ツール許可は危険。セキュリティ審査エージェントは read_file+grep のみ。本番DB操作ツールは原則許可しない。必要に応じて人間確認ステップを本文に組み込む。"
+                }
+              </p>
+            </div>
+            <div className={`${styles.bpCard} ${styles.bpP}`}>
+              <div className={styles.bpNum}>03</div>
+              <h4>{"本文Constraintsセクションで「絶対に行わないこと」を明記"}</h4>
+              <p>
+                {
+                  "「ソースコードを変更しない」「本番DBには書き込まない」「テストを削除しない」などをConstraintsセクションに明示。LLMの非決定性に対する安全網として機能する。"
+                }
+              </p>
+            </div>
+            <div className={`${styles.bpCard} ${styles.bpA}`}>
+              <div className={styles.bpNum}>04</div>
+              <h4>{"handoffsはsend:false（手動承認）を原則にする"}</h4>
+              <p>
+                {
+                  "send:trueの自動送信は完全自動化できるが、予期しない変更につながるリスクがある。重要な処理の前は send:false でユーザー確認を挟む設計が安全。CI/CD用途のみsend:true。"
+                }
+              </p>
+            </div>
+            <div className={`${styles.bpCard} ${styles.bpT}`}>
+              <div className={styles.bpNum}>05</div>
+              <h4>{"サブエージェント専用は user-invocable: false にする"}</h4>
+              <p>
+                {
+                  "plannerから呼び出されるimplementerなど、直接呼び出し不要なエージェントは @メニューに表示しない。coordinatorがagents[]で明示すれば上書き可能。エコシステムをクリーンに保てる。"
+                }
+              </p>
+            </div>
+            <div className={`${styles.bpCard} ${styles.bpG}`}>
+              <div className={styles.bpNum}>06</div>
+              <h4>{"File Boundariesを本文に必ず書く"}</h4>
+              <p>
+                {
+                  "「書き込みは /tests/ のみ」「/docs/ 以外は読み取り専用」のように書き込み範囲を明示する。toolsでの制限に加え、本文でも自然言語で制約を再確認するダブルチェック体制が重要。"
+                }
+              </p>
+            </div>
+            <div className={`${styles.bpCard} ${styles.bpB}`}>
+              <div className={styles.bpNum}>07</div>
+              <h4>{"MCPシークレットはcopilot環境から取得する"}</h4>
+              <p>
+                {
+                  "mcp-servers の env に直接トークンを書かない。リポジトリ Settings → Copilot → Coding Agent の「copilot」環境に登録し、$"
+                }
+                {"{{ secrets.COPILOT_MCP_* }}"}
+                {" で参照する。gitにシークレットを含めない。"}
+              </p>
+            </div>
+            <div className={`${styles.bpCard} ${styles.bpR}`}>
+              <div className={styles.bpNum}>08</div>
+              <h4>{"handoffsはGitHub.com Coding Agentでは動作しない"}</h4>
+              <p>
+                {
+                  "handoffsとargument-hintはIDE専用機能（VS Code・JetBrains・Eclipse・Xcode）。GitHub.com上でIssueに割り当てる「Copilot Coding Agent」では無視される。プラットフォーム別の設計が必要。"
+                }
+              </p>
+            </div>
+            <div className={`${styles.bpCard} ${styles.bpP}`}>
+              <div className={styles.bpNum}>09</div>
+              <h4>{"modelはIDEで使用、GitHub.comでは無視"}</h4>
+              <p>
+                {
+                  "model指定はVS Code等のIDEカスタムエージェント専用。GitHub.comのCopilot Coding AgentはOrg/Repoの設定に従う。配列指定でフォールバックも設定可能: ['Claude Opus', 'GPT-5']"
+                }
+              </p>
+            </div>
+            <div className={`${styles.bpCard} ${styles.bpA}`}>
+              <div className={styles.bpNum}>10</div>
+              <h4>{"agentsでサブエージェントホワイトリストを制限する"}</h4>
+              <p>
+                {
+                  "agents[]を省略するとdisable-model-invocation:falseの全エージェントがサブエージェント対象になる。予期しない呼び出しを防ぐため、coordinatorエージェントは使用するサブエージェントを明示的に列挙する。"
+                }
+              </p>
+            </div>
+            <div className={`${styles.bpCard} ${styles.bpT}`}>
+              <div className={styles.bpNum}>11</div>
+              <h4>{"エージェントはgit管理してデフォルトブランチに置く"}</h4>
+              <p>
+                {
+                  "GitHub.com Copilot Coding AgentはデフォルトブランチのエージェントのみIssueトリアージUIに表示する。PR中のエージェントはIDE経由では使えるが、GitHub.comのAgentsパネルには表示されない。"
+                }
+              </p>
+            </div>
+            <div className={`${styles.bpCard} ${styles.bpG}`}>
+              <div className={styles.bpNum}>12</div>
+              <h4>{"Output Formatセクションで出力を標準化する"}</h4>
+              <p>
+                {
+                  "「テスト完了後は作成ファイル一覧・Pass/Fail数・カバレッジ変化を報告する」のように出力形式を明示する。チームメンバーがエージェントの成果物を予測・評価できるようになる。"
+                }
+              </p>
+            </div>
+          </div>
         </section>
         <section id="s13" className={styles.sec}>
           <div
