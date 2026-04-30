@@ -77,7 +77,13 @@ describe("/codex/agent - page structure", () => {
 
   it("renders 12 TOC links pointing to all section anchors", () => {
     const { container } = render(<Page />);
-    const tocAnchors = container.querySelectorAll('nav a[href^="#"]');
+    // CSS Modules のクラス名はハッシュ化されるため nav.toc は使えない。
+    // ページ内の全 nav のうち、hash リンク (#) を持つものを TOC nav として絞り込む。
+    const tocNav = Array.from(container.querySelectorAll("nav")).find((nav) =>
+      nav.querySelector('a[href^="#"]'),
+    );
+    expect(tocNav, "TOC nav element must exist").not.toBeUndefined();
+    const tocAnchors = tocNav?.querySelectorAll('a[href^="#"]') ?? [];
     const tocHrefs = Array.from(tocAnchors).map((a) => a.getAttribute("href"));
     const expectedHrefs = EXPECTED_SECTION_IDS.map((id) => `#${id}`);
     expect(tocHrefs).toHaveLength(expectedHrefs.length);

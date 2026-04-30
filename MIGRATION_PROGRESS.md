@@ -12,7 +12,7 @@
 - **最新 HEAD**: `d795c4e`（**MIGRATION_PROGRESS.md 更新 — HEAD 修正・C-4 セクションテーブル確定**）
 - **未コミット作業**: なし（working tree クリーン）
 - **次の作業**: C-4 `/copilot/agent` Green 実装（**hero+TOC から開始**）— 全 20 セクション HTML 読み込み・クラスマッピング・TOC 設計は完了済み。次セッションは `page.tsx` 書き込みから即着手できる
-- **テスト数**: `bun run test` **461 件 pass**（C-4 Red scaffold で 5 fail / 3 pass の状態）
+- **テスト数**: 現在フェーズ: `bun run test` **461 tests（C-4 Red scaffold 状態: 5 fail / 3 pass は C-4 契約テスト未実装のため）** — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
 - **ビルド**: `bun run build` 成功・`bun run typecheck` 成功・`uv run pytest` 5/5 passed
 
 ## AI 作業ルール（Phase A–F 共通、**必読**）
@@ -38,10 +38,22 @@
 - **理由**: Phase C-2 の Green コミット（`aa9c2ee`）では `legacy/gemini/agent.html` の 3,723 行に対し約 888 行の縮約版を提出してユーザーから差し戻された
 - **正しい手順**:
   1. `MIGRATION_PROGRESS.md` のセクション行範囲テーブルで **今から実装する 1 セクションの行範囲** を確認し、その範囲だけを `Read offset=<start> limit=<lines>` で読む。**ファイル全体・複数セクションの先読みは禁止**（→ R4）
-  2. 読んだ 1 セクション分の HTML を JSX に変換する（欠落ゼロ。内容を省略・要約しない）
-  3. `bun run test app/<provider>/<slug>/page.test.tsx` と `bunx biome check --write app/<provider>/<slug>/page.tsx` を実行（R1 遵守）
-  4. 全テスト・lint 通過を確認 → そのセクションだけで 1 commit
-  5. **次のセクションに進む直前に**その行範囲を Read して繰り返す（先読みしない）
+  2. 読んだ 1 セクション分の HTML を JSX に変換する
+  3. **自己検証（省略ゼロ確認）**: 変換後、以下の Bash コマンドで legacy と JSX の要素数を比較する。数が一致しない場合は JSX に欠落があるため追加してから次へ進む
+     ```bash
+     # セクション行範囲を <start>,<end> で指定して該当範囲のみ集計
+     sed -n '<start>,<end>p' legacy/copilot/agent.html | grep -c '<li>'
+     grep -c '<li>' web-next/app/copilot/agent/page.tsx
+     sed -n '<start>,<end>p' legacy/copilot/agent.html | grep -c 'code-body'
+     grep -c 'codeBody' web-next/app/copilot/agent/page.tsx
+     sed -n '<start>,<end>p' legacy/copilot/agent.html | grep -c '<tr'
+     grep -c '<tr' web-next/app/copilot/agent/page.tsx
+     sed -n '<start>,<end>p' legacy/copilot/agent.html | grep -c 'class="alert'
+     grep -c 'styles\.a[iwega]' web-next/app/copilot/agent/page.tsx
+     ```
+  4. `bun run test app/<provider>/<slug>/page.test.tsx` と `bunx biome check --write app/<provider>/<slug>/page.tsx` を実行（R1 遵守）
+  5. 全テスト・lint 通過を確認 → そのセクションだけで 1 commit
+  6. **次のセクションに進む直前に**その行範囲を Read して繰り返す（先読みしない）
 - **許容される正規化**:
   - HTML formatter 由来のインデント崩れは、CSS `white-space: pre` 配下で意図された見た目に合わせて正規化してよい
   - SVG 属性の kebab-case → camelCase 変換（`text-anchor` → `textAnchor` 等）
@@ -123,7 +135,7 @@ web-next/
 └── app/copilot/agent/       # Phase C-4（Red scaffold 完了・Green 実装中）
 ```
 
-**テスト数**: 461 pass（C-4 Red scaffold 状態。5 fail / 3 pass は C-4 契約テスト未実装のため）
+**テスト数**: 現在フェーズ: **461 tests（C-4 Red scaffold 状態: 5 fail / 3 pass は C-4 契約テスト未実装のため）** — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
 
 ## 確定した設計判断（`docs/NEXTJS_MIGRATION_PLAN.md` ステップ 0）
 

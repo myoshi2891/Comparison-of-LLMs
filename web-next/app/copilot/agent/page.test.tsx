@@ -118,7 +118,7 @@ describe("/copilot/agent - external link safety", () => {
     const sources = container.querySelector("#sources");
     expect(sources).not.toBeNull();
     if (!sources) throw new Error("sources is null");
-    const externals = sources.querySelectorAll('a[href^="http"]');
+    const externals = sources.querySelectorAll('a[href^="http://"], a[href^="https://"]');
     expect(externals.length).toBeGreaterThanOrEqual(15);
   });
 });

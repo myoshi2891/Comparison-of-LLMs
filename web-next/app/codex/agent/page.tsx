@@ -2564,7 +2564,7 @@ export default function CodexAgentPage() {
                 <div className={styles["src-desc"]}>{s.desc}</div>
               </div>
             ))}
-            <div className={styles.srcSeparator}>── Agents SDK 関連</div>
+            <div className={styles["src-separator"]}>── Agents SDK 関連</div>
             {SOURCES_NEW.map((s) => (
               <div key={s.href} className={styles["src-card-new"]}>
                 <div className={styles["src-icon"]}>{s.icon}</div>
