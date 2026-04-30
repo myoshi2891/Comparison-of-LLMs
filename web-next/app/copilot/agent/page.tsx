@@ -994,7 +994,396 @@ export default function CopilotAgentPage() {
             </div>
           </div>
         </section>
-        <section id="s06" className={styles.sec} />
+        <section id="s06" className={styles.sec}>
+          <div
+            className={styles.secHead}
+            style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
+          >
+            <h2 style={{ fontSize: "1.1rem" }}>
+              {"4-2. フロントマター完全仕様（全フィールド） "}
+              <span className={styles.newB}>NEW</span>
+            </h2>
+          </div>
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>.github/agents/my-agent.agent.md — 全フィールド仕様</span>
+              <span className={styles.codeLang}>YAML + Markdown</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.cs}>---</span>
+              {"\n"}
+              <span className={styles.cm}>name</span>
+              {": "}
+              <span className={styles.cv}>{"'My Agent'"}</span>
+              {"            "}
+              <span className={styles.cc}>{"# 任意: 表示名（省略時はファイル名ベース）"}</span>
+              {"\n"}
+              {"                              "}
+              <span className={styles.cc}>{"# 単一引用符推奨（awesome-copilot規約）"}</span>
+              {"\n\n"}
+              <span className={styles.cm}>description</span>
+              {": "}
+              <span className={styles.cv}>{"'エージェントの役割と能力の説明（必須）'"}</span>
+              {"\n"}
+              {"  "}
+              <span className={styles.cc}>{"# ★★★ 最重要フィールド ★★★"}</span>
+              {"\n"}
+              {"  "}
+              <span className={styles.cc}>
+                {"# エージェントが自動・手動選択される唯一の判断材料"}
+              </span>
+              {"\n"}
+              {"  "}
+              <span className={styles.cc}>
+                {"# 「いつ使う / いつ使わない」を50〜150文字で明確に"}
+              </span>
+              {"\n"}
+              {"  "}
+              <span className={styles.cc}>
+                {"# GitHub.com（Coding Agent）でのIssue割り当て時に参照される"}
+              </span>
+              {"\n\n"}
+              <span className={styles.cm}>target</span>
+              {": "}
+              <span className={styles.cv}>{"'github-copilot'"}</span>
+              {"  "}
+              <span className={styles.cc}>{"# 必須: github-copilot | vscode"}</span>
+              {"\n"}
+              {"                              "}
+              <span className={styles.cc}>{"# mcp-servers は github-copilot 専用"}</span>
+              {"\n\n"}
+              <span className={styles.cm}>model</span>
+              {": "}
+              <span className={styles.cv}>{"'claude-sonnet-4-6'"}</span>
+              {"   "}
+              <span className={styles.cc}>{"# 任意: 使用AIモデルを指定"}</span>
+              {"\n"}
+              {"                              "}
+              <span className={styles.cc}>{"# 配列で優先順位付きフォールバック指定も可:"}</span>
+              {"\n"}
+              {"  "}
+              <span className={styles.cc}>
+                {"# model: ['Claude Opus 4.5', 'GPT-5.2 (copilot)']"}
+              </span>
+              {"\n"}
+              {"  "}
+              <span className={styles.cc}>
+                {"# IDEカスタムエージェント専用（GitHub.comでは無視）"}
+              </span>
+              {"\n\n"}
+              <span className={styles.cm}>tools</span>
+              {":                       "}
+              <span className={styles.cc}>{"# 任意: 利用可能ツールのホワイトリスト"}</span>
+              {"\n"}
+              {"  - "}
+              <span className={styles.cv}>read_file</span>
+              {"               "}
+              <span className={styles.cc}>{"# 省略すると全ツール（組み込み＋MCP）が使用可"}</span>
+              {"\n"}
+              {"  - "}
+              <span className={styles.cv}>edit_file</span>
+              {"               "}
+              <span className={styles.cc}>{"# ★ 最小権限の原則: 必要なツールのみ許可"}</span>
+              {"\n"}
+              {"  - "}
+              <span className={styles.cv}>run_terminal_command</span>
+              {"    "}
+              <span className={styles.cc}>{'# MCP ツールは "サーバー名/ツール名" 形式'}</span>
+              {"\n"}
+              {"  - "}
+              <span className={styles.cv}>grep_search</span>
+              {"             "}
+              <span className={styles.cc}>{'# 例: "sentry/get_issue_details"'}</span>
+              {"\n"}
+              {"  - "}
+              <span className={styles.cv}>agent</span>
+              {"                   "}
+              <span className={styles.cc}>{"# ★ サブエージェントを使う場合は必須"}</span>
+              {"\n\n"}
+              <span className={styles.cm}>agents</span>
+              {":                     "}
+              <span className={styles.cc}>{"# 任意: 使用できるサブエージェントを制限"}</span>
+              {"\n"}
+              {"  - "}
+              <span className={styles.cv}>implementer</span>
+              {"             "}
+              <span className={styles.cc}>
+                {"# 省略時: disable-model-invocation:false の全エージェントが対象"}
+              </span>
+              {"\n"}
+              {"  - "}
+              <span className={styles.cv}>code-reviewer</span>
+              {"          "}
+              <span className={styles.cc}>{"# 明示することで予期しない呼び出しを防ぐ"}</span>
+              {"\n\n"}
+              <span className={styles.cm}>handoffs</span>
+              {":                   "}
+              <span className={styles.cc}>
+                {"# 任意: 次のエージェントへの誘導ボタン（IDE専用）"}
+              </span>
+              {"\n"}
+              {"  - "}
+              <span className={styles.cv}>label</span>
+              {": "}
+              <span className={styles.cv}>{"'Start Implementation'"}</span>
+              {"   "}
+              <span className={styles.cc}>{"# ボタンラベル"}</span>
+              {"\n"}
+              {"    "}
+              <span className={styles.cv}>agent</span>
+              {": "}
+              <span className={styles.cv}>implementer</span>
+              {"              "}
+              <span className={styles.cc}>{"# 遷移先エージェント名（ファイル名ベース）"}</span>
+              {"\n"}
+              {"    "}
+              <span className={styles.cv}>prompt</span>
+              {": "}
+              <span className={styles.cv}>{"'Now implement the plan.'"}</span>{" "}
+              <span className={styles.cc}>{"# 遷移後の入力欄に事前入力されるテキスト"}</span>
+              {"\n"}
+              {"    "}
+              <span className={styles.cv}>send</span>
+              {": "}
+              <span className={styles.cv}>false</span>
+              {"                      "}
+              <span className={styles.cc}>{"# false=手動送信, true=自動送信"}</span>
+              {"\n"}
+              {"  - "}
+              <span className={styles.cv}>label</span>
+              {": "}
+              <span className={styles.cv}>{"'Code Review'"}</span>
+              {"\n"}
+              {"    "}
+              <span className={styles.cv}>agent</span>
+              {": "}
+              <span className={styles.cv}>code-reviewer</span>
+              {"\n"}
+              {"    "}
+              <span className={styles.cv}>prompt</span>
+              {": "}
+              <span className={styles.cv}>{"'Review this implementation.'"}</span>
+              {"\n"}
+              {"    "}
+              <span className={styles.cv}>send</span>
+              {": "}
+              <span className={styles.cv}>false</span>
+              {"\n\n"}
+              <span className={styles.cm}>user-invocable</span>
+              {": "}
+              <span className={styles.cv}>true</span>
+              {"        "}
+              <span className={styles.cc}>{"# 任意（default: true）"}</span>
+              {"\n"}
+              {"                              "}
+              <span className={styles.cc}>
+                {"# false: @メニューに表示されないが、サブエージェントとしては使用可"}
+              </span>
+              {"\n"}
+              {"                              "}
+              <span className={styles.cc}>{"# 内部ワーカーエージェントに設定"}</span>
+              {"\n\n"}
+              <span className={styles.cm}>disable-model-invocation</span>
+              {": "}
+              <span className={styles.cv}>false</span>
+              {"  "}
+              <span className={styles.cc}>{"# 任意（default: false）"}</span>
+              {"\n"}
+              {"                              "}
+              <span className={styles.cc}>{"# true: モデルによる自動選択を完全無効化"}</span>
+              {"\n"}
+              {"                              "}
+              <span className={styles.cc}>{"# ※ agents[] に明示すれば上書き可能"}</span>
+              {"\n\n"}
+              <span className={styles.cm}>mcp-servers</span>
+              {":               "}
+              <span className={styles.cc}>{"# 任意: このエージェント専用MCPサーバー設定"}</span>
+              {"\n"}
+              {"  "}
+              <span className={styles.cv}>sentry</span>
+              {":\n    "}
+              <span className={styles.cv}>type</span>
+              {": "}
+              <span className={styles.cv}>{"'local'"}</span>
+              {"            "}
+              <span className={styles.cc}>{"# local（stdio互換）/ http / sse"}</span>
+              {"\n"}
+              {"    "}
+              <span className={styles.cv}>command</span>
+              {": "}
+              <span className={styles.cv}>{"'npx'"}</span>
+              {"\n    "}
+              <span className={styles.cv}>args</span>
+              {": ["}
+              <span className={styles.cv}>{"'@sentry/mcp-server@latest'"}</span>
+              {"]\n    "}
+              <span className={styles.cv}>tools</span>
+              {": ["}
+              <span className={styles.cv}>{"'get_issue_details'"}</span>
+              {", "}
+              <span className={styles.cv}>{"'get_issue_summary'"}</span>
+              {"]  "}
+              <span className={styles.cc}>{"# ホワイトリスト"}</span>
+              {"\n"}
+              {"    "}
+              <span className={styles.cv}>env</span>
+              {":\n      "}
+              <span className={styles.cv}>SENTRY_ACCESS_TOKEN</span>
+              {": "}
+              <span className={styles.cv}>{"'${{ secrets.COPILOT_MCP_SENTRY_TOKEN }}'"}</span>
+              {"\n"}
+              {"      "}
+              <span className={styles.cc}>
+                {'# シークレットはリポジトリの "copilot" 環境から取得'}
+              </span>
+              {"\n"}
+              <span className={styles.cs}>---</span>
+              {"\n\n"}
+              <span className={styles.cc}>{"# ↓ ここからMarkdown本文（最大30,000文字）"}</span>
+              {"\n"}
+              <span className={styles.ch}>{"## Role（役割）"}</span>
+              {"\n"}
+              {"エージェントの役割・専門性・振る舞いを自然言語で記述...\n\n"}
+              <span className={styles.cm}>{"## Instructions（手順）"}</span>
+              {"\n"}
+              {"具体的な作業手順・判断基準...\n\n"}
+              <span className={styles.cm}>{"## Constraints（制約）"}</span>
+              {"\n"}
+              {"絶対に行わないこと・アクセス制限...\n\n"}
+              <span className={styles.cm}>{"## Output Format（出力形式）"}</span>
+              {"\n"}
+              {"レポートや成果物のフォーマット..."}
+            </div>
+          </div>
+          <div className={styles.tblWrap}>
+            <table className={styles.fmTable}>
+              <thead>
+                <tr>
+                  <th>フィールド</th>
+                  <th>必須</th>
+                  <th>対応環境</th>
+                  <th>説明・ポイント</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>description</td>
+                  <td>
+                    <span className={`${styles.badge} ${styles.bRed}`}>必須</span>
+                  </td>
+                  <td>
+                    <span className={`${styles.tag} ${styles.tagG}`}>全環境</span>
+                  </td>
+                  <td>50〜150文字。「いつ使う/使わない」を明記。自動選択の唯一の判断材料</td>
+                </tr>
+                <tr>
+                  <td>target</td>
+                  <td>
+                    <span className={`${styles.badge} ${styles.bRed}`}>必須</span>
+                  </td>
+                  <td>
+                    <span className={`${styles.tag} ${styles.tagG}`}>全環境</span>
+                  </td>
+                  <td>
+                    {"実行環境指定: "}
+                    <code>github-copilot</code>
+                    {" または "}
+                    <code>vscode</code>
+                    {"。mcp-serversは github-copilot 専用"}
+                  </td>
+                </tr>
+                <tr>
+                  <td>name</td>
+                  <td>
+                    <span className={`${styles.badge} ${styles.bBlue}`}>任意</span>
+                  </td>
+                  <td>
+                    <span className={`${styles.tag} ${styles.tagG}`}>全環境</span>
+                  </td>
+                  <td>{"表示名。省略時はファイル名（test-agent.agent.md → test-agent）"}</td>
+                </tr>
+                <tr>
+                  <td>model</td>
+                  <td>
+                    <span className={`${styles.badge} ${styles.bBlue}`}>任意</span>
+                  </td>
+                  <td>
+                    <span className={`${styles.tag} ${styles.tagB}`}>IDE専用</span>
+                  </td>
+                  <td>AIモデル指定。配列でフォールバック順を設定可。GitHub.comでは無視</td>
+                </tr>
+                <tr>
+                  <td>tools</td>
+                  <td>
+                    <span className={`${styles.badge} ${styles.bBlue}`}>任意</span>
+                  </td>
+                  <td>
+                    <span className={`${styles.tag} ${styles.tagG}`}>全環境</span>
+                  </td>
+                  <td>
+                    {"省略=全ツール許可。最小権限の原則を適用。サブエージェント使用は "}
+                    <code>agent</code>
+                    {" ツールが必須"}
+                  </td>
+                </tr>
+                <tr>
+                  <td>agents</td>
+                  <td>
+                    <span className={`${styles.badge} ${styles.bBlue}`}>任意</span>
+                  </td>
+                  <td>
+                    <span className={`${styles.tag} ${styles.tagB}`}>IDE専用</span>
+                  </td>
+                  <td>使用できるサブエージェントのホワイトリスト。省略=全エージェント対象</td>
+                </tr>
+                <tr>
+                  <td>handoffs</td>
+                  <td>
+                    <span className={`${styles.badge} ${styles.bBlue}`}>任意</span>
+                  </td>
+                  <td>
+                    <span className={`${styles.tag} ${styles.tagB}`}>IDE専用</span>
+                  </td>
+                  <td>{"label・agent・prompt・send の4プロパティ。GitHub.comでは無視される"}</td>
+                </tr>
+                <tr>
+                  <td>user-invocable</td>
+                  <td>
+                    <span className={`${styles.badge} ${styles.bBlue}`}>任意</span>
+                  </td>
+                  <td>
+                    <span className={`${styles.tag} ${styles.tagG}`}>全環境</span>
+                  </td>
+                  <td>{"false で @メニューから非表示（サブエージェントとしては動作）"}</td>
+                </tr>
+                <tr>
+                  <td>disable-model-invocation</td>
+                  <td>
+                    <span className={`${styles.badge} ${styles.bBlue}`}>任意</span>
+                  </td>
+                  <td>
+                    <span className={`${styles.tag} ${styles.tagG}`}>全環境</span>
+                  </td>
+                  <td>{"true で自動選択を完全無効化。agents[]で明示すれば上書き可"}</td>
+                </tr>
+                <tr>
+                  <td>mcp-servers</td>
+                  <td>
+                    <span className={`${styles.badge} ${styles.bBlue}`}>任意</span>
+                  </td>
+                  <td>
+                    <span className={`${styles.tag} ${styles.tagB}`}>Copilot専用</span>
+                  </td>
+                  <td>
+                    {
+                      "エージェント固有のMCPサーバー設定（YAML形式）。target: github-copilot 時のみ有効。シークレットは copilot 環境から取得"
+                    }
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
         <section id="s07" className={styles.sec} />
         <section id="s08" className={styles.sec} />
         <section id="s09" className={styles.sec} />
