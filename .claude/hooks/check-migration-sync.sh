@@ -59,9 +59,27 @@ DIRTY_MIGRATION=$(git status --porcelain 2>/dev/null | grep -cE "web-next/app/.+
 
 NEEDS_SYNC=false
 SYNC_DETAIL=""
-if [ "${MIGRATION_IN_LAST:-0}" -gt 0 ] && [ "${PROGRESS_IN_LAST:-0}" -eq 0 ]; then
-    NEEDS_SYNC=true
-    SYNC_DETAIL="最終コミット: 移行ファイルあり / MIGRATION_PROGRESS.md 未更新"
+if [ "${MIGRATION_IN_LAST:-0}" -gt 0 ]; then
+    if [ "${PROGRESS_IN_LAST:-0}" -eq 0 ]; then
+        # MIGRATION_PROGRESS.md 自体がコミットに含まれていない
+        NEEDS_SYNC=true
+        SYNC_DETAIL="最終コミット: 移行ファイルあり / MIGRATION_PROGRESS.md 未更新"
+    else
+        # MIGRATION_PROGRESS.md がコミットに含まれているが、必須フィールドが変更されているか確認
+        # git diff で追加/変更行（+ で始まる行）に必須マーカーが含まれているかチェック
+        PROGRESS_DIFF=$(git diff HEAD^ HEAD -- "$REPO/MIGRATION_PROGRESS.md" 2>/dev/null || \
+                        git show HEAD -- "$REPO/MIGRATION_PROGRESS.md" 2>/dev/null || echo "")
+        REQUIRED_FIELDS_UPDATED=0
+        for marker in "最新 HEAD" "次の作業" "テスト数" "ビルド"; do
+            if echo "$PROGRESS_DIFF" | grep -qE "^\+.*${marker}"; then
+                REQUIRED_FIELDS_UPDATED=$(( REQUIRED_FIELDS_UPDATED + 1 ))
+            fi
+        done
+        if [ "$REQUIRED_FIELDS_UPDATED" -eq 0 ]; then
+            NEEDS_SYNC=true
+            SYNC_DETAIL="最終コミット: MIGRATION_PROGRESS.md に必須フィールド（最新 HEAD / 次の作業 / テスト数 / ビルド）の更新なし"
+        fi
+    fi
 fi
 if [ "${DIRTY_MIGRATION:-0}" -gt 0 ]; then
     NEEDS_SYNC=true
@@ -69,19 +87,27 @@ if [ "${DIRTY_MIGRATION:-0}" -gt 0 ]; then
 fi
 
 # ── 5. アラートレベルの判定 ──────────────────────────────────────────
-# CRITICAL: (tokens > 175K) または (未同期 かつ tokens > 140K)
-# WARNING:  (tokens > 140K) または (未同期 かつ tokens > 80K)
+# CRITICAL: (未同期 かつ tokens > 175K) または (未同期 かつ tokens > 140K)
+# WARNING:  (未同期 かつ tokens > 80K) または (tokens > 140K かつ 未同期)
+# TOKEN_HIGH: 同期済みだがトークンが多い（更新不要メッセージは出さない）
 # INFO:     未同期のみ（tokens 低い）
 # NONE:     同期済み かつ tokens 低い → 何も出力しない
+#
+# 注意: 「更新が必須」という表現は NEEDS_SYNC=true の場合のみ使用する。
+# トークンが多くても NEEDS_SYNC=false なら更新不要の通知のみ出す。
 
-if [ "$ESTIMATED_TOKENS" -gt "$CRITICAL_THRESHOLD" ] || \
-   { [ "$NEEDS_SYNC" = true ] && [ "$ESTIMATED_TOKENS" -gt "$WARN_THRESHOLD" ]; }; then
+if [ "$NEEDS_SYNC" = true ] && \
+   { [ "$ESTIMATED_TOKENS" -gt "$CRITICAL_THRESHOLD" ] || \
+     [ "$ESTIMATED_TOKENS" -gt "$WARN_THRESHOLD" ]; }; then
     LEVEL="CRITICAL"
-elif [ "$ESTIMATED_TOKENS" -gt "$WARN_THRESHOLD" ] || \
-     { [ "$NEEDS_SYNC" = true ] && [ "$ESTIMATED_TOKENS" -gt 80000 ]; }; then
+elif [ "$NEEDS_SYNC" = true ] && [ "$ESTIMATED_TOKENS" -gt 80000 ]; then
     LEVEL="WARNING"
 elif [ "$NEEDS_SYNC" = true ]; then
     LEVEL="INFO"
+elif [ "$ESTIMATED_TOKENS" -gt "$CRITICAL_THRESHOLD" ]; then
+    LEVEL="TOKEN_HIGH_CRITICAL"
+elif [ "$ESTIMATED_TOKENS" -gt "$WARN_THRESHOLD" ]; then
+    LEVEL="TOKEN_HIGH_WARNING"
 else
     exit 0  # 何も出力しない
 fi
@@ -97,6 +123,7 @@ SAFE_REMAINING=$(( REMAINING - UPDATE_COST ))
 
 case "$LEVEL" in
     CRITICAL)
+        # NEEDS_SYNC=true かつ tokens が高い場合のみ「更新が必須」を表示
         echo ""
         echo "🔴 MIGRATION ALERT ─────────────────────────────────────────────────"
         echo "   /compact 前に MIGRATION_PROGRESS.md の更新が必須です！"
@@ -114,6 +141,7 @@ case "$LEVEL" in
         echo "────────────────────────────────────────────────────────────────────"
         ;;
     WARNING)
+        # NEEDS_SYNC=true かつ tokens が中程度の場合のみ「更新タイミングを検討」を表示
         echo ""
         echo "🟡 MIGRATION WARNING ───────────────────────────────────────────────"
         echo "   MIGRATION_PROGRESS.md の更新タイミングを検討してください"
@@ -135,6 +163,27 @@ case "$LEVEL" in
         if [ -n "$TOKEN_LINE" ]; then
             echo "   ${TOKEN_LINE}"
         fi
+        ;;
+    TOKEN_HIGH_CRITICAL)
+        # NEEDS_SYNC=false だが tokens が非常に多い — 更新は不要だがコンテキスト節約を促す
+        echo ""
+        echo "🔴 TOKEN ALERT ─────────────────────────────────────────────────────"
+        echo "   コンテキスト使用量が上限に近づいています（MIGRATION_PROGRESS.md は同期済み）"
+        if [ -n "$TOKEN_LINE" ]; then
+            echo "   ${TOKEN_LINE}"
+        fi
+        echo "   新セッションへの移行を検討してください（更新作業は不要）"
+        echo "────────────────────────────────────────────────────────────────────"
+        ;;
+    TOKEN_HIGH_WARNING)
+        # NEEDS_SYNC=false だが tokens が多い — 情報提供のみ
+        echo ""
+        echo "🟡 TOKEN WARNING ───────────────────────────────────────────────────"
+        echo "   コンテキスト使用量が増加しています（MIGRATION_PROGRESS.md は同期済み）"
+        if [ -n "$TOKEN_LINE" ]; then
+            echo "   ${TOKEN_LINE}"
+        fi
+        echo "────────────────────────────────────────────────────────────────────"
         ;;
 esac
 

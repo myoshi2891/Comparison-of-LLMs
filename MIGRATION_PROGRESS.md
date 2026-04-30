@@ -43,14 +43,15 @@
 
      ```bash
      # セクション行範囲を <start>,<end> で指定して該当範囲のみ集計
+     SECTION_ID="s07"  # 実装中のセクション ID に変更すること
      sed -n '<start>,<end>p' legacy/copilot/agent.html | grep -c '<li>'
-     grep -c '<li>' web-next/app/copilot/agent/page.tsx
+     sed -n "/id=\"$SECTION_ID\"/,/<\/section>/p" web-next/app/copilot/agent/page.tsx | grep -c '<li>'
      sed -n '<start>,<end>p' legacy/copilot/agent.html | grep -c 'code-body'
-     grep -c 'codeBody' web-next/app/copilot/agent/page.tsx
+     sed -n "/id=\"$SECTION_ID\"/,/<\/section>/p" web-next/app/copilot/agent/page.tsx | grep -c 'codeBody'
      sed -n '<start>,<end>p' legacy/copilot/agent.html | grep -c '<tr'
-     grep -c '<tr' web-next/app/copilot/agent/page.tsx
+     sed -n "/id=\"$SECTION_ID\"/,/<\/section>/p" web-next/app/copilot/agent/page.tsx | grep -c '<tr'
      sed -n '<start>,<end>p' legacy/copilot/agent.html | grep -c 'class="alert'
-     grep -c 'styles\.a[iwega]' web-next/app/copilot/agent/page.tsx
+     sed -n "/id=\"$SECTION_ID\"/,/<\/section>/p" web-next/app/copilot/agent/page.tsx | grep -c 'styles\.a[iwega]'
      ```
 
   4. `bun run test app/<provider>/<slug>/page.test.tsx` と `bunx biome check --write app/<provider>/<slug>/page.tsx` を実行（R1 遵守）
@@ -182,10 +183,10 @@ C-4 作業手順:
 - 全リスト項目・全コードブロック・全 SVG・全 alert・全 table を JSX に転写。要約・省略・縮約は禁止
 - scaffold（Red コミット）→ 1 セクション単位 faithful 移植（Green コミット群）の順で進める
 - 1 セクション完了ごとに以下を順に実行 → 全部 OK なら 1 コミット → 次のセクションへ:
-  1. cd web-next && bun run test app/copilot/agent/page.test.tsx
-  2. cd web-next && bunx biome check --write app/copilot/agent/page.tsx       # ← R1: 必ずパス指定
-  3. cd web-next && bunx biome check app/copilot/agent/page.tsx app/copilot/agent/page.module.css app/copilot/agent/page.test.tsx
-  4. cd web-next && bun run test       # 全件が pass することを確認
+  1. (cd web-next && bun run test app/copilot/agent/page.test.tsx)
+  2. (cd web-next && bunx biome check --write app/copilot/agent/page.tsx)       # ← R1: 必ずパス指定
+  3. (cd web-next && bunx biome check app/copilot/agent/page.tsx app/copilot/agent/page.module.css app/copilot/agent/page.test.tsx)
+  4. (cd web-next && bun run test)       # 全件が pass することを確認
   5. git add web-next/app/copilot/agent/ && git commit -m "feat(web-next): faithful migration of /copilot/agent <section-id> (...)"
   6. **MIGRATION_PROGRESS.md を更新 → git commit**（HEAD・次の作業・テスト数を同期）← **次セクション HTML を Read する前の必須ゲート。これを完了するまで次セクションに進まない**
 
@@ -225,11 +226,11 @@ legacy/copilot/agent.html セクション構造（確定・全行範囲確認済
 | sources | 2071-2168 | 📚 参考ソース — srcGrid 15 src-cards（外部リンク 15 件）|
 
 検証コマンド早見表:
-  cd web-next && bun run test          # 全件 pass が期待値
-  cd web-next && bun run typecheck     # OK
-  cd web-next && bun run build         # /copilot/agent を含む全ルートが ○ (Static)
-  cd web-next && bun run lint          # 既知 6 件のみ（新規違反ゼロが必須）
-  cd scraper && uv run pytest          # 5/5 passed
+  (cd web-next && bun run test)          # 全件 pass が期待値
+  (cd web-next && bun run typecheck)     # OK
+  (cd web-next && bun run build)         # /copilot/agent を含む全ルートが ○ (Static)
+  (cd web-next && bun run lint)          # 既知 6 件のみ（新規違反ゼロが必須）
+  (cd scraper && uv run pytest)          # 5/5 passed
 
 既知の持越し（別 Issue で対応、本作業では触らない）:
 - lib/i18n.test.ts:18 の key count ハードコード

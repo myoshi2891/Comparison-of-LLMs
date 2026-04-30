@@ -5,7 +5,7 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   title: "GitHub Copilot コーディングエージェント開発ガイド | LLM コスト計算機",
   description:
-    "GitHub Copilot .agent.md の完全ベストプラクティスガイド。フロントマター全仕様・ステップバイステップ作成・Handoffs（エージェント連鎖）・Subagents（サブエージェント）・MCP統合・マルチエージェント設計パターン・トラブルシューティングを 2026年3月最新の公式ドキュメント準拠で解説。",
+    "GitHub Copilot .agent.md の完全ベストプラクティスガイド。フロントマター全仕様・ステップバイステップ作成・Handoffs（エージェント連鎖）・Subagents（サブエージェント）・MCP統合・マルチエージェント設計パターン・トラブルシューティングを 2026年版の公式ドキュメント準拠で解説。",
 };
 
 type Source = {
@@ -29,7 +29,7 @@ const TOC_ITEMS = [
   { id: "s10", label: "4-6. MCP統合" },
   { id: "s11", label: "4-7. 実践テンプレート集" },
   { id: "s12", label: "4-8. .agent.md ベストプラクティス 12則" },
-  { id: "s13", label: "4-9. トラブルシューティング / 4-10. Good/Anti patGrid" },
+  { id: "s13", label: "4-9. トラブルシューティング / 4-10. Good & Anti Patterns" },
   { id: "s14", label: "5. .github/skills/*/SKILL.md" },
   { id: "s15", label: "6. *.prompt.md / *.chatmode.md" },
   { id: "s16", label: "7. AGENTS.md" },
@@ -171,7 +171,7 @@ export default function CopilotAgentPage() {
             フロントマター全仕様 / ステップバイステップ作成 / Handoffs（エージェント連鎖） /
             Subagents（サブエージェント） / MCP統合 / マルチエージェント設計パターン /
             トラブルシューティング ——
-            2026年3月最新の公式ドキュメント準拠で初学者から上級者まで対応した決定版ガイド。
+            2026年版の公式ドキュメント準拠で初学者から上級者まで対応した決定版ガイド。
           </p>
           <div className={styles.heroChips}>
             <span className={styles.heroChip}>フロントマター完全仕様</span>
@@ -1384,27 +1384,115 @@ export default function CopilotAgentPage() {
             </table>
           </div>
         </section>
-        <section id="s07" className={styles.sec} />
-        <section id="s08" className={styles.sec} />
-        <section id="s09" className={styles.sec} />
-        <section id="s10" className={styles.sec} />
-        <section id="s11" className={styles.sec} />
-        <section id="s12" className={styles.sec} />
-        <section id="s13" className={styles.sec} />
+        <section id="s07" className={styles.sec}>
+          <div
+            className={styles.secHead}
+            style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
+          >
+            <h2 style={{ fontSize: "1.1rem" }}>4-3. ステップバイステップ作成ガイド</h2>
+          </div>
+          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+        </section>
+        <section id="s08" className={styles.sec}>
+          <div
+            className={styles.secHead}
+            style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
+          >
+            <h2 style={{ fontSize: "1.1rem" }}>4-4. Handoffs</h2>
+          </div>
+          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+        </section>
+        <section id="s09" className={styles.sec}>
+          <div
+            className={styles.secHead}
+            style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
+          >
+            <h2 style={{ fontSize: "1.1rem" }}>4-5. Subagents</h2>
+          </div>
+          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+        </section>
+        <section id="s10" className={styles.sec}>
+          <div
+            className={styles.secHead}
+            style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
+          >
+            <h2 style={{ fontSize: "1.1rem" }}>4-6. MCP統合</h2>
+          </div>
+          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+        </section>
+        <section id="s11" className={styles.sec}>
+          <div
+            className={styles.secHead}
+            style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
+          >
+            <h2 style={{ fontSize: "1.1rem" }}>4-7. 実践テンプレート集</h2>
+          </div>
+          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+        </section>
+        <section id="s12" className={styles.sec}>
+          <div
+            className={styles.secHead}
+            style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
+          >
+            <h2 style={{ fontSize: "1.1rem" }}>4-8. .agent.md ベストプラクティス 12則</h2>
+          </div>
+          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+        </section>
+        <section id="s13" className={styles.sec}>
+          <div
+            className={styles.secHead}
+            style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
+          >
+            <h2 style={{ fontSize: "1.1rem" }}>
+              4-9. トラブルシューティング / 4-10. Good &amp; Anti Patterns
+            </h2>
+          </div>
+          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+        </section>
         <hr />
-        <section id="s14" className={styles.sec} />
-        <section id="s15" className={styles.sec} />
-        <section id="s16" className={styles.sec} />
-        <section id="s17" className={styles.sec} />
-        <section id="s18" className={styles.sec} />
-        <section id="s19" className={styles.sec} />
+        <section id="s14" className={styles.sec}>
+          <div className={styles.secHead}>
+            <h2>5. .github/skills/*/SKILL.md</h2>
+          </div>
+          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+        </section>
+        <section id="s15" className={styles.sec}>
+          <div className={styles.secHead}>
+            <h2>6. *.prompt.md / *.chatmode.md</h2>
+          </div>
+          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+        </section>
+        <section id="s16" className={styles.sec}>
+          <div className={styles.secHead}>
+            <h2>7. AGENTS.md</h2>
+          </div>
+          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+        </section>
+        <section id="s17" className={styles.sec}>
+          <div className={styles.secHead}>
+            <h2>8. ファイル選択の意思決定ツリー</h2>
+          </div>
+          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+        </section>
+        <section id="s18" className={styles.sec}>
+          <div className={styles.secHead}>
+            <h2>9. 絶対に避けるべき Anti-Patterns</h2>
+          </div>
+          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+        </section>
+        <section id="s19" className={styles.sec}>
+          <div className={styles.secHead}>
+            <h2>10. まとめ</h2>
+          </div>
+          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+        </section>
         <hr />
 
         {/* Sources */}
         <section id="sources" className={styles.sec}>
           <div className={styles.secHead}>
             <span className={styles.secNum}>📚</span>
-            <h2>参考ソース（公式・一次情報優先）— 2026年3月更新版</h2>
+            <h2>参考ソース（公式・一次情報優先）— 2026年版</h2>
           </div>
           <div className={styles.srcGrid}>
             {SOURCES.map((src) => (
