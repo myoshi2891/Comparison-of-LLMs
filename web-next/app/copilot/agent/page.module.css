@@ -51,6 +51,10 @@
   border-bottom: 1px solid #30363d;
 }
 
+:global(body.has-common-header) .root .nav {
+  top: var(--ch-height);
+}
+
 .root .navOctocat {
   font-size: 22px;
 }

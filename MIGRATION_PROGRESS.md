@@ -11,7 +11,7 @@
 - **ブランチ**: `feat/nextjs-migration`
 - **最新 HEAD**: `e3405bd`（**feat(web-next): faithful migration of /copilot/agent s14**）
 - **未コミット作業**: なし（working tree クリーン）
-- **次の作業**: C-4 s15 実装（lines 1784-1847）— 6. *.prompt.md / *.chatmode.md — 2 code + comparison table
+- **次の作業**: C-4 s15 実装（lines 1784-1847）— 6. *.prompt.md /*.chatmode.md — 2 code + comparison table
 - **テスト数**: `bun run test` **469 tests（全件 pass）** — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
 - **ビルド**: `bun run build` 成功・`bun run typecheck` 成功・`uv run pytest` 5/5 passed
 

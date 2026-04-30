@@ -161,7 +161,7 @@ export default function CopilotAgentPage() {
       <div className={styles.wrap}>
         {/* Hero */}
         <div className={styles.hero}>
-          <div className={styles.heroBadge}>🐙 GitHub Copilot 完全ガイド 2026年3月版</div>
+          <div className={styles.heroBadge}>🐙 GitHub Copilot 完全ガイド 2026年版</div>
           <h1>
             GitHub Copilot <em>.agent.md</em> 完全
             <br />
