@@ -657,7 +657,127 @@ export default function CopilotAgentPage() {
             </svg>
           </div>
         </section>
-        <section id="s02" className={styles.sec} />
+        <section id="s02" className={styles.sec}>
+          <div className={styles.secHead}>
+            <span className={styles.secNum}>2</span>
+            <h2>
+              <span className={styles.mono}>.github/copilot-instructions.md</span>
+              {" — 常時ロード型グローバル指示"}
+            </h2>
+          </div>
+          <div className={`${styles.alert} ${styles.ai}`}>
+            <span className={styles.alertIcon}>ℹ️</span>
+            <div className={styles.alertBody}>
+              <strong>
+                必ず <code>.github/</code> 直下に配置する
+              </strong>
+              <code>copilot-instructions.md</code> はワークスペースルートの <code>.github/</code>{" "}
+              フォルダ内に置く必要があります。他の場所に置いても読み込まれません。この1ファイルが
+              Chat・Agent Mode・Code Review・Copilot Coding Agent のすべてで常時ロードされます。
+            </div>
+          </div>
+          <div className={styles.card}>
+            <div className={styles.cardTitle}>
+              📋 copilot-instructions.md に書くべきこと / 書かないべきこと
+            </div>
+            <div className={styles.patGrid}>
+              <div className={`${styles.pat} ${styles.patOk}`}>
+                <div className={styles.patLabel}>✅ 書くべき内容</div>
+                <ul>
+                  <li>プロジェクト概要・目的（2〜3文）</li>
+                  <li>技術スタック・主要バージョン</li>
+                  <li>ビルド・テスト・Lint コマンド</li>
+                  <li>コーディング規約（コンパクトに）</li>
+                  <li>PR メッセージのフォーマット</li>
+                  <li>サブエージェント委譲ルール</li>
+                  <li>禁止操作・危険コマンドの明示</li>
+                  <li>ペルソナの定義（「新人開発者向けに」等）</li>
+                </ul>
+              </div>
+              <div className={`${styles.pat} ${styles.patNg}`}>
+                <div className={styles.patLabel}>✗ 書かないべき内容</div>
+                <ul>
+                  <li>特定パスにしか使わない詳細ルール（*.instructions.md に分離）</li>
+                  <li>専門的な手順（SKILL.md に分離）</li>
+                  <li>長大なコードスニペット（コンテキスト浪費）</li>
+                  <li>機密情報・API キー</li>
+                  <li>修正履歴・変更ログ</li>
+                  <li>ツール設定（MCP は別ファイルへ）</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>.github/copilot-instructions.md</span>
+              <span className={styles.codeLang}>Markdown</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.ch}># PROJECT: my-saas-app</span>
+              {"\n\n"}
+              <span className={styles.cm}>## Overview</span>
+              {"\n"}
+              {"Next.js 15 App Router + Supabase + Stripe のマルチテナント SaaS。\n"}
+              {"本番: Vercel Edge Runtime / DB: Supabase (PostgreSQL) / AI: GitHub Models。\n\n"}
+              <span className={styles.cm}>## Tech Stack</span>
+              {"\n"}
+              {"- Frontend: Next.js 15 (App Router), TypeScript 5.x, Tailwind CSS\n"}
+              {"- Backend:  Supabase Edge Functions (Deno 2.x)\n"}
+              {"- Auth:     Supabase Auth + RLS (Row Level Security)\n"}
+              {"- Payment:  Stripe Checkout / Webhooks\n"}
+              {"- Testing:  Vitest (unit) + Playwright (E2E)\n\n"}
+              <span className={styles.cm}>## Persona</span>
+              {"\n"}
+              {"シニアフルスタックエンジニアとして振る舞うこと。\n"}
+              {"コードを変更する前に必ず計画を要約すること。\n\n"}
+              <span className={styles.cm}>## Build & Test (CRITICAL: run after every change)</span>
+              {"\n"}
+              {"- Build:    "}
+              <span className={styles.cs}>{"`pnpm build`"}</span>
+              {"\n- Test:     "}
+              <span className={styles.cs}>{"`pnpm test`"}</span>
+              {"  — "}
+              <span className={styles.cw}>変更後は必ず実行すること</span>
+              {"\n- E2E:      "}
+              <span className={styles.cs}>{"`pnpm test:e2e`"}</span>
+              {" (Playwright)\n- Lint:     "}
+              <span className={styles.cs}>{"`pnpm lint`"}</span>
+              {"    — "}
+              <span className={styles.cw}>PR前に必ず実行すること</span>
+              {"\n\n"}
+              <span className={styles.cm}>## Coding Standards</span>
+              {"\n"}
+              {"- TypeScript strict モード必須\n"}
+              {"- エラーは Result<T,E> 型でラップ（throw 禁止）\n"}
+              {"- Supabase クエリは必要カラムのみ .select('col1, col2')\n"}
+              {"- React Server Components を優先し 'use client' を最小化\n\n"}
+              <span className={styles.cm}>## Sub-Agent Dispatch (for Copilot Coding Agent)</span>
+              {"\n"}
+              <span className={styles.cw}>@test-agent</span>
+              {"  → テスト作成・実行・失敗分析\n"}
+              <span className={styles.cw}>@docs-agent</span>
+              {"  → ドキュメント生成・更新 (docs/ のみ)\n"}
+              <span className={styles.cw}>@security-agent</span>
+              {" → セキュリティ監査（コード変更なし）\n\n"}
+              <span className={styles.cm}>## PR Message Format</span>
+              {"\n"}
+              <span className={styles.cs}>
+                {
+                  "```\n## Summary\n[2〜3文の概要]\n\n## Changes\n- [変更点]\n\n## Tests\n- [テスト内容]\n```"
+                }
+              </span>
+              {"\n\n"}
+              <span className={styles.cm}>## Forbidden Operations</span>
+              {"\n"}
+              {"- "}
+              <span className={styles.cw}>{"`supabase db reset`"}</span>
+              {" は絶対に実行しない\n"}
+              {"- "}
+              <span className={styles.cw}>{"`.env.production`"}</span>
+              {" の読み書き禁止"}
+            </div>
+          </div>
+        </section>
         <section id="s03" className={styles.sec} />
         <section id="s04" className={styles.sec} />
         <section id="s05" className={styles.sec} />
