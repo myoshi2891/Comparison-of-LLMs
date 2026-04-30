@@ -2689,10 +2689,139 @@ export default function CopilotAgentPage() {
             style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
           >
             <h2 style={{ fontSize: "1.1rem" }}>
-              4-9. トラブルシューティング / 4-10. Good &amp; Anti Patterns
+              {"4-9. トラブルシューティング — よくある問題と解決策 "}
+              <span className={styles.newB}>NEW</span>
             </h2>
           </div>
-          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+          <div className={styles.tblWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>症状</th>
+                  <th>原因</th>
+                  <th>解決策</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <code>@エージェント名</code>
+                    {"がメニューに表示されない"}
+                  </td>
+                  <td>
+                    {
+                      "descriptionフィールドがない / ファイル名に不正文字 / デフォルトブランチ未コミット"
+                    }
+                  </td>
+                  <td>
+                    {
+                      "descriptionを追加、ファイル名を英数字・ハイフン・アンダースコアのみに変更、デフォルトブランチにpush"
+                    }
+                  </td>
+                </tr>
+                <tr>
+                  <td>{"エージェントが意図しないファイルを変更する"}</td>
+                  <td>{"toolsが無制限 / 本文にConstraintsがない"}</td>
+                  <td>
+                    {
+                      "toolsに必要なツールのみ明示。本文Constraintsセクションに「○○以外を変更しない」と明記"
+                    }
+                  </td>
+                </tr>
+                <tr>
+                  <td>{"handoffsボタンが表示されない"}</td>
+                  <td>{"GitHub.com（Coding Agent）で使用している / IDE未対応"}</td>
+                  <td>
+                    {
+                      "handoffsはIDE専用（VS Code・JetBrains等）。GitHub.comでは使用不可。IDE上で使用するか、AGENTS.md記述に変更"
+                    }
+                  </td>
+                </tr>
+                <tr>
+                  <td>{"MCPサーバーへの接続が失敗する"}</td>
+                  <td>{"シークレットが設定されていない / typeが間違っている"}</td>
+                  <td>
+                    {
+                      "リポジトリSettings → Copilot → Coding Agent → copilot環境にシークレットを登録。GitHub.comはlocalタイプ（stdioと互換）を使用"
+                    }
+                  </td>
+                </tr>
+                <tr>
+                  <td>{"サブエージェントが予期しないエージェントを呼び出す"}</td>
+                  <td>{"agents[]が未設定で全エージェントが対象になっている"}</td>
+                  <td>
+                    {"coordinatorエージェントのfrontmatterに "}
+                    <code>{"agents: [worker1, worker2]"}</code>
+                    {" を追加して使用エージェントを制限"}
+                  </td>
+                </tr>
+                <tr>
+                  <td>{"モデル指定が効かない"}</td>
+                  <td>{"GitHub.com Copilot Coding Agentで使用している"}</td>
+                  <td>
+                    {
+                      "model指定はIDEカスタムエージェント専用。GitHub.comではOrg/Repo設定のモデルが使用される"
+                    }
+                  </td>
+                </tr>
+                <tr>
+                  <td>{"エージェントが同じ指示を毎回繰り返す"}</td>
+                  <td>{"copilot-instructions.mdと内容が重複している"}</td>
+                  <td>
+                    {
+                      "エージェント固有の専門指示のみをagent.mdに書き、汎用ルールはcopilot-instructions.mdに集約して重複を避ける"
+                    }
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className={styles.card} style={{ marginTop: "20px" }}>
+            <div className={styles.cardTitle}>{"📊 Good vs Anti Pattern — .agent.md 設計比較"}</div>
+            <div className={styles.patGrid}>
+              <div className={`${styles.pat} ${styles.patOk}`}>
+                <div className={styles.patLabel}>{"✅ ベストプラクティス"}</div>
+                <ul>
+                  <li>{"1エージェント = 1専門領域（単一責任）"}</li>
+                  <li>{"descriptionに「Use for: ... / Does NOT:...」両方記載"}</li>
+                  <li>{"toolsを最小権限で明示"}</li>
+                  <li>{"本文にConstraints・File Boundaries・Output Format"}</li>
+                  <li>{"handoffs は send:false（手動承認）を原則"}</li>
+                  <li>{"サブエージェント専用は user-invocable: false"}</li>
+                  <li>{"MCPシークレットはcopilot環境変数で管理"}</li>
+                  <li>{"エージェントをgit管理・デフォルトブランチに配置"}</li>
+                </ul>
+              </div>
+              <div className={`${styles.pat} ${styles.patNg}`}>
+                <div className={styles.patLabel}>{"✗ アンチパターン"}</div>
+                <ul>
+                  <li>{"description が曖昧・短すぎる（1行）"}</li>
+                  <li>{"tools 省略（全ツール許可のまま）"}</li>
+                  <li>{"本番DBアクセスツールを制限なく許可"}</li>
+                  <li>{"「何でもやる汎用エージェント」を1つ作る"}</li>
+                  <li>{"handoffs を send:true にして確認なく自動実行"}</li>
+                  <li>{"MCPシークレットをYAMLに直書きしてgitにコミット"}</li>
+                  <li>{"copilot-instructions.mdと全く同じ内容を重複記述"}</li>
+                  <li>{"ファイル名に日本語・スペースを使用"}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div className={`${styles.alert} ${styles.ag}`}>
+            <span className={styles.alertIcon}>💡</span>
+            <div className={styles.alertBody}>
+              <strong>{"copilot-instructions.mdとの位置関係："}</strong>
+              {" エージェントのプロンプトはシステムプロンプト内で "}
+              <code>copilot-instructions.md</code>
+              {" の"}
+              <strong>{"下"}</strong>
+              {
+                "に配置されます。つまり全体のルールは常に尊重されつつ、エージェントがその振る舞いを拡張・上書きできます。エージェント固有のルールを "
+              }
+              <code>copilot-instructions.md</code>
+              {" に書く必要はありません（重複・コンテキスト汚染の原因になります）。"}
+            </div>
+          </div>
         </section>
         <hr />
         <section id="s14" className={styles.sec}>
