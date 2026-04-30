@@ -899,7 +899,35 @@ export default function CopilotAgentPage() {
             </div>
           </div>
         </section>
-        <section id="s04" className={styles.sec} />
+        <section id="s04" className={styles.sec}>
+          <div className={styles.secHead}>
+            <span className={styles.secNum}>4</span>
+            <h2>
+              <span className={styles.mono}>.github/agents/*.agent.md</span>
+              {" — カスタムエージェント完全ガイド"}
+            </h2>
+          </div>
+          <div className={styles.card}>
+            <div className={styles.cardTitle}>
+              🤖 .agent.md とは — 「専門チームメイト」を定義するファイル
+            </div>
+            <p>
+              <code>*.agent.md</code>
+              {"は"}
+              <strong>特定のペルソナ・ツールセット・指示・ハンドオフを持つ専門エージェント</strong>
+              {"を定義するMarkdownファイルです。定義したエージェントは "}
+              <code>@エージェント名</code>
+              {
+                " で呼び出せ、GitHub.com（Coding Agent）・VS Code・JetBrains・Eclipse・Xcodeのすべてで動作します。"
+              }
+            </p>
+            <p>
+              {"エージェントは「常に同じ指示とコンテキストを繰り返し与える」必要をなくし、"}
+              <strong>セキュリティレビュー専門・テスト専門・ドキュメント専門</strong>
+              {"など、役割ごとに特化した振る舞いを一度定義するだけで再利用できます。"}
+            </p>
+          </div>
+        </section>
         <section id="s05" className={styles.sec} />
         <section id="s06" className={styles.sec} />
         <section id="s07" className={styles.sec} />
