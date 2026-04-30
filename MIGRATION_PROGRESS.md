@@ -187,6 +187,7 @@ C-4 作業手順:
   3. cd web-next && bunx biome check app/copilot/agent/page.tsx app/copilot/agent/page.module.css app/copilot/agent/page.test.tsx
   4. cd web-next && bun run test       # 全件が pass することを確認
   5. git add web-next/app/copilot/agent/ && git commit -m "feat(web-next): faithful migration of /copilot/agent <section-id> (...)"
+  6. **MIGRATION_PROGRESS.md を更新 → git commit**（HEAD・次の作業・テスト数を同期）← **次セクション HTML を Read する前の必須ゲート。これを完了するまで次セクションに進まない**
 
 絶対禁止:
 - bun run lint:fix / bunx biome check --write （パス引数なし） — リポジトリ全体を書き換えるため（R1 違反）
