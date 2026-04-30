@@ -1732,9 +1732,206 @@ export default function CopilotAgentPage() {
             className={styles.secHead}
             style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
           >
-            <h2 style={{ fontSize: "1.1rem" }}>4-4. Handoffs</h2>
+            <h2 style={{ fontSize: "1.1rem" }}>
+              {"4-4. Handoffs — マルチエージェントワークフロー設計 "}
+              <span className={styles.newB}>NEW</span>
+            </h2>
           </div>
-          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+          <div className={styles.card}>
+            <p>
+              {"Handoffsは"}
+              <strong>{"エージェント間を決定論的に遷移させるUIメカニズム"}</strong>
+              {"です。LLMの非決定性（「次に何をすべきか」の判断）に依存せず、"}
+              <strong>{"ユーザーが各ステップで承認・確認できる"}</strong>
+              {"制御された連鎖が実現します。"}
+            </p>
+          </div>
+          <div style={{ margin: "16px 0" }}>
+            <div
+              style={{
+                fontSize: "11px",
+                textAlign: "center",
+                color: "var(--text3)",
+                textTransform: "uppercase",
+                letterSpacing: ".12em",
+                marginBottom: "16px",
+                fontWeight: 600,
+              }}
+            >
+              {"典型パターン 1 — 計画 → 実装 → レビュー（手動承認型）"}
+            </div>
+            <div className={styles.hfFlow}>
+              <div className={`${styles.hfAgent} ${styles.hfA}`}>
+                {"📐 planner"}
+                <br />
+                <small>{".agent.md"}</small>
+                <div className={styles.hfBtn}>{"実装を開始 →"}</div>
+              </div>
+              <div className={styles.hfArrow}>→</div>
+              <div className={`${styles.hfAgent} ${styles.hfB}`}>
+                {"⚙️ implementer"}
+                <br />
+                <small>{".agent.md"}</small>
+                <div className={styles.hfBtn}>{"レビューへ →"}</div>
+              </div>
+              <div className={styles.hfArrow}>→</div>
+              <div className={`${styles.hfAgent} ${styles.hfC}`}>
+                {"🔒 code-reviewer"}
+                <br />
+                <small>{".agent.md"}</small>
+                <div className={styles.hfBtn}>完了</div>
+              </div>
+            </div>
+            <div
+              style={{
+                fontSize: "11px",
+                textAlign: "center",
+                color: "var(--text3)",
+                marginTop: "8px",
+              }}
+            >
+              {"各ボタンは send:false（手動送信）— ユーザーが内容を確認してから次のステップへ"}
+            </div>
+          </div>
+          <div style={{ margin: "16px 0" }}>
+            <div
+              style={{
+                fontSize: "11px",
+                textAlign: "center",
+                color: "var(--text3)",
+                textTransform: "uppercase",
+                letterSpacing: ".12em",
+                marginBottom: "16px",
+                fontWeight: 600,
+              }}
+            >
+              {"典型パターン 2 — TDD（テスト先行）自動連鎖"}
+            </div>
+            <div className={styles.hfFlow}>
+              <div className={`${styles.hfAgent} ${styles.hfA}`}>
+                {"🔴 red-agent"}
+                <br />
+                <small>{"失敗テスト生成"}</small>
+                <div className={`${styles.hfBtn} ${styles.auto}`}>{"自動→"}</div>
+              </div>
+              <div className={styles.hfArrow}>→</div>
+              <div className={`${styles.hfAgent} ${styles.hfB}`}>
+                {"🟢 green-agent"}
+                <br />
+                <small>{"テストをパスする実装"}</small>
+                <div className={styles.hfBtn}>{"リファクタへ →"}</div>
+              </div>
+              <div className={styles.hfArrow}>→</div>
+              <div className={`${styles.hfAgent} ${styles.hfD}`}>
+                {"🔵 refactor-agent"}
+                <br />
+                <small>{"コード品質改善"}</small>
+                <div className={styles.hfBtn}>完了</div>
+              </div>
+            </div>
+            <div
+              style={{
+                fontSize: "11px",
+                textAlign: "center",
+                color: "var(--text3)",
+                marginTop: "8px",
+              }}
+            >
+              {
+                "Red→Green は send:true（自動）/ Green→Refactor は send:false（手動確認）の混合パターン"
+              }
+            </div>
+          </div>
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>{".github/agents/planner.agent.md — Handoffsを使った計画エージェント"}</span>
+              <span className={styles.codeLang}>{"Markdown + YAML"}</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.cs}>---</span>
+              {"\n"}
+              <span className={styles.cm}>name</span>
+              {": "}
+              <span className={styles.cv}>{"'Planner'"}</span>
+              {"\n"}
+              <span className={styles.cm}>description</span>
+              {": "}
+              <span className={styles.cv}>
+                {
+                  "'Generates implementation plans for new features or refactoring.\n  Does NOT write code. Use for: planning, architecture, design, spec.'"
+                }
+              </span>
+              {"\n"}
+              <span className={styles.cm}>target</span>
+              {": "}
+              <span className={styles.cv}>{"'github-copilot'"}</span>
+              {"  "}
+              <span className={styles.cc}>{"# 必須: github-copilot | vscode"}</span>
+              {"\n"}
+              <span className={styles.cm}>model</span>
+              {": ["}
+              <span className={styles.cv}>{"'Claude Opus 4.5'"}</span>
+              {", "}
+              <span className={styles.cv}>{"'GPT-5.2 (copilot)'"}</span>
+              {"]   "}
+              <span className={styles.cc}>{"# フォールバック順"}</span>
+              {"\n"}
+              <span className={styles.cm}>tools</span>
+              {": ["}
+              <span className={styles.cv}>{"'search/codebase'"}</span>
+              {", "}
+              <span className={styles.cv}>{"'web/fetch'"}</span>
+              {", "}
+              <span className={styles.cv}>{"'read_file'"}</span>
+              {"]  "}
+              <span className={styles.cc}>{"# 読み取り専用"}</span>
+              {"\n"}
+              <span className={styles.cm}>handoffs</span>
+              {":\n  - "}
+              <span className={styles.cm}>label</span>
+              {": "}
+              <span className={styles.cv}>{"'Implement Plan'"}</span>
+              {"\n    "}
+              <span className={styles.cm}>agent</span>
+              {": "}
+              <span className={styles.cv}>implementer</span>
+              {"\n    "}
+              <span className={styles.cm}>prompt</span>
+              {": "}
+              <span className={styles.cv}>
+                {"'Implement the plan outlined above. Follow the steps in order.'"}
+              </span>
+              {"\n    "}
+              <span className={styles.cm}>send</span>
+              {": "}
+              <span className={styles.cv}>{"false"}</span>
+              {"\n"}
+              <span className={styles.cs}>---</span>
+              {"\n\n"}
+              <span className={styles.ch}>{"## Role"}</span>
+              {
+                "\nあなたはシニアソフトウェアアーキテクトです。\nコードを書かず、実装計画の作成に専念します。\n\n"
+              }
+              <span className={styles.ch}>{"## Instructions"}</span>
+              {"\n1. コードベース全体（"}
+              <span className={styles.cw}>@workspace</span>
+              {
+                "）を分析して現状を把握する\n2. 要件と既存アーキテクチャの適合性を評価する\n3. 実装計画を以下の形式で作成する:\n\n"
+              }
+              <span className={styles.cs}>
+                {
+                  "```markdown\n## Implementation Plan: [機能名]\n\n### Overview\n[2〜3文の概要]\n\n### Requirements\n- [要件1]\n- [要件2]\n\n### Implementation Steps\n1. [Step 1: ファイル名と変更内容]\n2. [Step 2: ...]\n\n### Testing Strategy\n- [テスト方針]\n\n### Risk Assessment\n- [リスク要因と対策]\n```"
+                }
+              </span>
+              {"\n\n"}
+              <span className={styles.ch}>{"## Constraints"}</span>
+              {"\n- "}
+              <span className={styles.cw}>{"コードを書かない（計画のみ）"}</span>
+              {
+                "\n- 既存のアーキテクチャパターンに従う\n- 新規依存パッケージの追加は事前に確認を求める"
+              }
+            </div>
+          </div>
         </section>
         <section id="s09" className={styles.sec}>
           <div
