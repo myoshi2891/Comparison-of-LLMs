@@ -778,7 +778,127 @@ export default function CopilotAgentPage() {
             </div>
           </div>
         </section>
-        <section id="s03" className={styles.sec} />
+        <section id="s03" className={styles.sec}>
+          <div className={styles.secHead}>
+            <span className={styles.secNum}>3</span>
+            <h2>
+              <span className={styles.mono}>.github/instructions/*.instructions.md</span>
+              {" — パスマッチ型指示"}
+            </h2>
+            <span className={styles.note}>2025年7月〜 GA</span>
+          </div>
+          <div className={styles.card}>
+            <p>
+              <code>*.instructions.md</code> は YAML フロントマターの <code>applyTo</code>{" "}
+              でパスグロブを指定することで、
+              <strong>特定のファイル・ディレクトリを操作しているときのみ自動適用</strong>
+              されます。さらに <code>excludeAgent</code>{" "}
+              プロパティで特定のエージェント（coding-agent・code-review）から除外できます。
+            </p>
+          </div>
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>.github/instructions/frontend.instructions.md</span>
+              <span className={styles.codeLang}>Markdown + YAML</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.cs}>---</span>
+              {"\n"}
+              <span className={styles.cm}>applyTo</span>
+              {": "}
+              <span className={styles.cv}>{'"src/components/**,src/app/**"'}</span>
+              {"\n"}
+              <span className={styles.cc}>
+                {"# この指示は src/components/ と src/app/ への変更時のみ適用される"}
+              </span>
+              {"\n"}
+              <span className={styles.cc}>
+                {'# excludeAgent: "code-review"  # コードレビューから除外する場合'}
+              </span>
+              {"\n"}
+              <span className={styles.cs}>---</span>
+              {"\n\n"}
+              <span className={styles.ch}>{"## Frontend Development Rules"}</span>
+              {"\n\n"}
+              <span className={styles.cm}>{"### Component Structure"}</span>
+              {"\n"}
+              {"- React Server Components (RSC) を優先し、'use client' は最小限に\n"}
+              {"- コンポーネントは 150行以下に収める\n"}
+              {"- Props は明示的な TypeScript インターフェースを定義する\n"}
+              {"- CSS は Tailwind ユーティリティクラスのみ（インラインスタイル禁止）\n\n"}
+              <span className={styles.cm}>{"### Naming Conventions"}</span>
+              {"\n"}
+              {"- コンポーネントファイル: PascalCase.tsx (例: UserCard.tsx)\n"}
+              {"- ページファイル: page.tsx (Next.js App Router 規約)\n"}
+              {"- フック: use プレフィックス (例: useUserProfile)\n\n"}
+              <span className={styles.cm}>{"### DO THIS / NOT THIS"}</span>
+              {"\n"}
+              {"✅ 良い例:\n"}
+              <span className={styles.cs}>
+                {
+                  "```tsx\n// Server Component（デフォルト）\nexport default async function UserList() {\n  const users = await getUsers()\n  return <ul>{users.map(u => <UserItem key={u.id} user={u} />)}</ul>\n}\n```"
+                }
+              </span>
+              {"\n\n"}
+              {"❌ 悪い例:\n"}
+              <span className={styles.cs}>
+                {
+                  "```tsx\n// 不要な 'use client' の使用\n'use client'\nexport default function UserList() { ... } // fetchをuseEffectで行っている\n```"
+                }
+              </span>
+            </div>
+          </div>
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>.github/instructions/testing.instructions.md</span>
+              <span className={styles.codeLang}>Markdown + YAML</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.cs}>---</span>
+              {"\n"}
+              <span className={styles.cm}>applyTo</span>
+              {": "}
+              <span className={styles.cv}>
+                {'"**/*.test.ts,**/*.test.tsx,**/*.spec.ts,tests/**"'}
+              </span>
+              {"\n"}
+              <span className={styles.cm}>excludeAgent</span>
+              {": "}
+              <span className={styles.cv}>{'"code-review"'}</span>
+              {"\n"}
+              <span className={styles.cc}>
+                {"# Copilot code review はこの指示を読まない（テスト専用ルールを汚染しない）"}
+              </span>
+              {"\n"}
+              <span className={styles.cs}>---</span>
+              {"\n\n"}
+              <span className={styles.ch}>{"## Testing Standards"}</span>
+              {"\n\n"}
+              <span className={styles.cm}>{"### Unit Tests (Vitest)"}</span>
+              {"\n"}
+              {"- テストは AAA (Arrange / Act / Assert) 形式で記述\n"}
+              {"- モックは vi.mock() を使用、過剰なモックは避ける\n"}
+              {"- テスト名は「[条件] [状態] [期待結果]」形式\n\n"}
+              <span className={styles.cm}>{"### E2E Tests (Playwright)"}</span>
+              {"\n"}
+              {"- ページオブジェクトパターンを使用 (tests/pages/ に配置)\n"}
+              {"- data-testid 属性でセレクタを指定（クラス名ベースは禁止）\n"}
+              {"- 各テストは独立して実行できること（beforeEach で状態をリセット）"}
+            </div>
+          </div>
+          <div className={`${styles.alert} ${styles.ag}`}>
+            <span className={styles.alertIcon}>💡</span>
+            <div className={styles.alertBody}>
+              <strong>excludeAgent で指示の適用先をコントロールする（2025年11月〜）</strong>
+              <code>{'excludeAgent: "code-review"'}</code>
+              {" を設定するとコードレビューに、"}
+              <code>{'excludeAgent: "coding-agent"'}</code>
+              {
+                " を設定すると Copilot Coding Agent に指示が適用されなくなります。レビュー専用・実装専用の指示を分離するのに有効です。"
+              }
+            </div>
+          </div>
+        </section>
         <section id="s04" className={styles.sec} />
         <section id="s05" className={styles.sec} />
         <section id="s06" className={styles.sec} />
