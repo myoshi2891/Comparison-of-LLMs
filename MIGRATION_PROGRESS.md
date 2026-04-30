@@ -37,11 +37,11 @@
 - **必須**: legacy HTML の **全セクション・全リスト項目・全コードブロック・全 SVG・全 alert・全 table** を JSX に変換し、テキスト内容を 1 つも欠落させない
 - **理由**: Phase C-2 の Green コミット（`aa9c2ee`）では `legacy/gemini/agent.html` の 3,723 行に対し約 888 行の縮約版を提出してユーザーから差し戻された
 - **正しい手順**:
-  1. legacy の対象セクションの HTML を **すべて読む**（`Read` tool で行範囲指定）
-  2. 1 セクション単位で JSX 化（hero / s01 / s02 / ... / sources の単位）
-  3. 各セクション完了ごとに `bun run test app/<provider>/<slug>/page.test.tsx` と `bunx biome check --write app/<provider>/<slug>/page.tsx` を実行（R1 遵守）
+  1. `MIGRATION_PROGRESS.md` のセクション行範囲テーブルで **今から実装する 1 セクションの行範囲** を確認し、その範囲だけを `Read offset=<start> limit=<lines>` で読む。**ファイル全体・複数セクションの先読みは禁止**（→ R4）
+  2. 読んだ 1 セクション分の HTML を JSX に変換する（欠落ゼロ。内容を省略・要約しない）
+  3. `bun run test app/<provider>/<slug>/page.test.tsx` と `bunx biome check --write app/<provider>/<slug>/page.tsx` を実行（R1 遵守）
   4. 全テスト・lint 通過を確認 → そのセクションだけで 1 commit
-  5. 次のセクションへ
+  5. **次のセクションに進む直前に**その行範囲を Read して繰り返す（先読みしない）
 - **許容される正規化**:
   - HTML formatter 由来のインデント崩れは、CSS `white-space: pre` 配下で意図された見た目に合わせて正規化してよい
   - SVG 属性の kebab-case → camelCase 変換（`text-anchor` → `textAnchor` 等）
@@ -159,12 +159,12 @@ Next.js 移行プロジェクトの作業を再開してください。
 
 C-4 作業手順:
 - **最初に `/nextjs-page-migration` スキルを呼び出す**（Claude Code の場合は Skill ツール経由、他の Coding Agent は `.claude/skills/nextjs-page-migration/SKILL.md` を Read してから開始）
-- **legacy HTML の再読は不要**（全 2171 行を前セッションで確認済み）。TOC 20 件・CSS クラスマッピング・Sources 15 件はすべて把握済み
-- C-3 完成物 web-next/app/codex/agent/ が正本テンプレート（code-body パターン・Ext ヘルパー等）
+- **C-3 page.tsx の再読は不要**（→ SKILL.md §「Phase C 確立パターン」に Ext ヘルパー・コードブロック・TOC・SVG 変換ルールをまとめ済み）
+- **legacy HTML は実装直前に 1 セクション分だけ読む**（全先読み禁止 → R4）。行範囲は下表を参照
 - docs/NEXTJS_PHASE_C_DETAILED_DESIGN.md §5.4 に C-4 の詳細設計あり（63 code blocks）
 
-絶対遵守ルール（R2、Phase C-2 で確定）:
-- legacy/copilot/agent.html の対象セクションを Read で行範囲指定して全部読む
+絶対遵守ルール（R2 + R4）:
+- **今から実装する 1 セクションの行範囲だけを Read する**（ファイル全体・複数セクションの先読み禁止）
 - 全リスト項目・全コードブロック・全 SVG・全 alert・全 table を JSX に転写。要約・省略・縮約は禁止
 - scaffold（Red コミット）→ 1 セクション単位 faithful 移植（Green コミット群）の順で進める
 - 1 セクション完了ごとに以下を順に実行 → 全部 OK なら 1 コミット → 次のセクションへ:
