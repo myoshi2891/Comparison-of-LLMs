@@ -1389,9 +1389,343 @@ export default function CopilotAgentPage() {
             className={styles.secHead}
             style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
           >
-            <h2 style={{ fontSize: "1.1rem" }}>4-3. ステップバイステップ作成ガイド</h2>
+            <h2 style={{ fontSize: "1.1rem" }}>
+              {"4-3. ステップバイステップ作成ガイド（7ステップ） "}
+              <span className={styles.newB}>NEW</span>
+            </h2>
           </div>
-          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+          <div className={styles.stepList}>
+            <div className={styles.stepRow}>
+              <div className={`${styles.stepCircle} ${styles.scG}`}>01</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTtl}>エージェントの「単一責任」を決める</div>
+                <div className={styles.stepBody}>
+                  {"まず「このエージェントが"}
+                  <strong>{"何をするか / 何をしないか"}</strong>
+                  {
+                    "」を1文で言えるか確認します。「テスト生成 + コードレビュー + ドキュメント作成」を1エージェントにまとめるのはアンチパターン。"
+                  }
+                  <strong>{"1エージェント = 1専門領域"}</strong>
+                  {"に分割してください。"}
+                  <br />
+                  <br />
+                  {"✅ 良い例:「テストカバレッジを向上させる。本番コードは変更しない」"}
+                  <br />
+                  {"❌ 悪い例:「開発全般をサポートする」"}
+                </div>
+              </div>
+            </div>
+            <div className={styles.stepRow}>
+              <div className={`${styles.stepCircle} ${styles.scB}`}>02</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTtl}>ファイルを作成する</div>
+                <div className={styles.stepBody}>
+                  {
+                    "VS Codeでは Copilot Chat の「エージェント選択ドロップダウン → Configure Custom Agents... → Create new custom agent」から作成。または手動でファイルを作成してください。"
+                  }
+                  <div className={styles.codeWrap} style={{ marginTop: "10px" }}>
+                    <div className={styles.codeBar}>
+                      <span>TERMINAL</span>
+                    </div>
+                    <div className={styles.codeBody}>
+                      <span className={styles.cc}>
+                        {"# プロジェクト（リポジトリ）レベルのエージェント"}
+                      </span>
+                      {
+                        "\nmkdir -p .github/agents\ntouch .github/agents/security-reviewer.agent.md\n\n"
+                      }
+                      <span className={styles.cc}>{"# 個人レベル（VS Code設定から作成推奨）"}</span>
+                      {"\n"}
+                      <span className={styles.cc}>
+                        {'# Create new custom agent → "User" を選択'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className={styles.stepRow}>
+              <div className={`${styles.stepCircle} ${styles.scP}`}>03</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTtl}>{"description を丁寧に書く（最重要）"}</div>
+                <div className={styles.stepBody}>
+                  <code>description</code>
+                  {" はエージェントが自動選択・手動選択される唯一の判断材料です。"}
+                  <strong>{"「Focuses on X without doing Y」パターン"}</strong>
+                  {
+                    "が最も効果的です。2,500以上のリポジトリ分析から、descriptionが曖昧なエージェントほど誤呼び出しが多いことが判明しています。"
+                  }
+                  <div className={styles.codeWrap} style={{ marginTop: "10px" }}>
+                    <div className={styles.codeBar}>
+                      <span>{"description のベストプラクティス"}</span>
+                      <span className={styles.codeLang}>YAML</span>
+                    </div>
+                    <div className={styles.codeBody}>
+                      <span className={styles.cc}>{"✅ 明確な description（推奨）"}</span>
+                      {"\n"}
+                      <span className={styles.cm}>description</span>
+                      {": "}
+                      <span className={styles.cv}>
+                        {"'Security reviewer focused on OWASP Top 10 vulnerabilities."}
+                      </span>
+                      {"\n  "}
+                      <span className={styles.cv}>
+                        {"Reads code and generates audit reports. Does NOT modify any files.'"}
+                      </span>
+                      {"\n\n"}
+                      <span className={styles.cc}>{"❌ 曖昧な description（アンチパターン）"}</span>
+                      {"\n"}
+                      <span className={styles.cm}>description</span>
+                      {": "}
+                      <span className={styles.cv}>{"'コードを分析するエージェント'"}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className={styles.stepRow}>
+              <div className={`${styles.stepCircle} ${styles.scA}`}>04</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTtl}>ツールを最小権限で設定する</div>
+                <div className={styles.stepBody}>
+                  <code>tools</code>
+                  {" フィールドを省略すると全ツールが使用可能になります（便利だが危険）。"}
+                  <strong>{"必要最小限のツールのみ許可"}</strong>
+                  {"してください。特に本番DBや本番環境へのアクセスツールは慎重に扱います。"}
+                  <div className={styles.codeWrap} style={{ marginTop: "10px" }}>
+                    <div className={styles.codeBar}>
+                      <span>{"ツール設定パターン"}</span>
+                      <span className={styles.codeLang}>YAML</span>
+                    </div>
+                    <div className={styles.codeBody}>
+                      <span className={styles.cc}>
+                        {"# Read-Only エージェント（セキュリティ審査・レビュー用）"}
+                      </span>
+                      {"\n"}
+                      <span className={styles.cm}>tools</span>
+                      {": ["}
+                      <span className={styles.cv}>read_file</span>
+                      {", "}
+                      <span className={styles.cv}>grep_search</span>
+                      {", "}
+                      <span className={styles.cv}>list_directory</span>
+                      {"]\n\n"}
+                      <span className={styles.cc}>
+                        {"# Write限定エージェント（docs/のみ書き込み可）"}
+                      </span>
+                      {"\n"}
+                      <span className={styles.cm}>tools</span>
+                      {": ["}
+                      <span className={styles.cv}>read_file</span>
+                      {", "}
+                      <span className={styles.cv}>create_file</span>
+                      {", "}
+                      <span className={styles.cv}>edit_file</span>
+                      {"]\n"}
+                      <span className={styles.cc}>
+                        {
+                          "# → 本文で \"Write: /docs/ のみ\" と明示的に制約を追加\n\n# サブエージェントを呼び出す場合は 'agent' ツールが必須"
+                        }
+                      </span>
+                      {"\n"}
+                      <span className={styles.cm}>tools</span>
+                      {": ["}
+                      <span className={styles.cv}>read_file</span>
+                      {", "}
+                      <span className={styles.cv}>search</span>
+                      {", "}
+                      <span className={styles.cv}>agent</span>
+                      {"]\n\n"}
+                      <span className={styles.cc}>
+                        {"# MCPサーバーのツールを個別許可（完全なツール名はサーバー名/ツール名）"}
+                      </span>
+                      {"\n"}
+                      <span className={styles.cm}>tools</span>
+                      {": ["}
+                      <span className={styles.cv}>read_file</span>
+                      {", "}
+                      <span className={styles.cv}>{"sentry/get_issue_details"}</span>
+                      {", "}
+                      <span className={styles.cv}>{"sentry/get_issue_summary"}</span>
+                      {"]"}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className={styles.stepRow}>
+              <div className={`${styles.stepCircle} ${styles.scT}`}>05</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTtl}>{"本文（プロンプト）を構造化して書く"}</div>
+                <div className={styles.stepBody}>
+                  {"本文は最大"}
+                  <strong>{"30,000文字"}</strong>
+                  {"のMarkdownです。"}
+                  <strong>{"Role → Instructions → Constraints → Output Format"}</strong>
+                  {" の4セクション構成が推奨されます。"}
+                  <div className={styles.codeWrap} style={{ marginTop: "10px" }}>
+                    <div className={styles.codeBar}>
+                      <span>{"本文の推奨構成"}</span>
+                      <span className={styles.codeLang}>Markdown</span>
+                    </div>
+                    <div className={styles.codeBody}>
+                      <span className={styles.ch}>{"## Role"}</span>
+                      {
+                        "\nあなたは経験豊富なセキュリティエンジニアです。\nOWASP Top 10を基準にコードを監査します。\n\n"
+                      }
+                      <span className={styles.ch}>{"## Instructions"}</span>
+                      {
+                        "\n1. コードベースを読み取って脆弱性を特定する\n2. 各問題をCritical/High/Medium/Lowで分類する\n3. CWE番号を付与する\n4. 修正コード例を提示する\n\n"
+                      }
+                      <span className={styles.ch}>{"## Constraints（絶対に守ること）"}</span>
+                      {"\n- "}
+                      <span className={styles.cw}>{"コードを一切変更しない（Read-Only）"}</span>
+                      {"\n- "}
+                      <span className={styles.cw}>{"レポート出力のみ行う"}</span>
+                      {"\n- 確認していない脆弱性を断定しない\n\n"}
+                      <span className={styles.ch}>{"## Output Format"}</span>
+                      {"\n報告書は以下の形式:\n"}
+                      <span className={styles.cs}>
+                        {
+                          "## Security Audit Report\n| 重大度 | 問題 | CWE | 該当箇所 | 修正案 |\n|-------|-----|-----|---------|-------|"
+                        }
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className={styles.stepRow}>
+              <div className={`${styles.stepCircle} ${styles.scG}`}>06</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTtl}>{"動作確認 — エージェントを認識させる"}</div>
+                <div className={styles.stepBody}>
+                  {"ファイルをコミット・プッシュ後、以下で確認します。"}
+                  <div className={styles.codeWrap} style={{ marginTop: "10px" }}>
+                    <div className={styles.codeBar}>
+                      <span>{"確認方法（VS Code）"}</span>
+                    </div>
+                    <div className={styles.codeBody}>
+                      <span className={styles.cc}>{"# Copilot Chat を開く"}</span>
+                      {"\n"}
+                      <span className={styles.cc}>
+                        {"# エージェント選択ドロップダウンを開く → エージェントが表示されるか確認"}
+                      </span>
+                      {"\n"}
+                      <span className={styles.cc}>
+                        {"# または @security-reviewer と入力して候補が出るか確認"}
+                      </span>
+                      {"\n\n"}
+                      <span className={styles.cc}>{"# GitHub.com（Copilot Coding Agent）"}</span>
+                      {"\n"}
+                      <span className={styles.cc}>
+                        {'# Issue を作成 → Assignees の "Assign to Copilot" をクリック'}
+                      </span>
+                      {"\n"}
+                      <span className={styles.cc}>
+                        {"# → Agents パネルにエージェントが表示されるか確認"}
+                      </span>
+                      {"\n\n"}
+                      <span className={styles.cc}>{"# ★ 認識されない場合の確認事項:"}</span>
+                      {"\n"}
+                      <span className={styles.cc}>
+                        {"# 1. .github/agents/ 以下に配置されているか"}
+                      </span>
+                      {"\n"}
+                      <span className={styles.cc}>{"# 2. ファイル名が *.agent.md 形式か"}</span>
+                      {"\n"}
+                      <span className={styles.cc}>{"# 3. description フィールドが存在するか"}</span>
+                      {"\n"}
+                      <span className={styles.cc}>
+                        {"# 4. デフォルトブランチにコミットされているか（GitHub.com）"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className={styles.stepRow}>
+              <div className={`${styles.stepCircle} ${styles.scB}`}>07</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTtl}>
+                  {"Handoffs（ハンドオフ）を設定する（IDEのみ）"}
+                </div>
+                <div className={styles.stepBody}>
+                  {"複数エージェントを連鎖させる場合は "}
+                  <code>handoffs</code>
+                  {
+                    " プロパティで「次のエージェントへの誘導ボタン」を設定します。チャットレスポンスの下部にボタンが表示され、ユーザーが選択すると次のエージェントにコンテキストごと移行します。"
+                  }
+                  <div className={styles.codeWrap} style={{ marginTop: "10px" }}>
+                    <div className={styles.codeBar}>
+                      <span>{"handoffs 設定例"}</span>
+                      <span className={styles.codeLang}>YAML</span>
+                    </div>
+                    <div className={styles.codeBody}>
+                      <span className={styles.cm}>handoffs</span>
+                      {":\n  - "}
+                      <span className={styles.cm}>label</span>
+                      {": "}
+                      <span className={styles.cv}>{"'実装を開始'"}</span>
+                      {"         "}
+                      <span className={styles.cc}>{"# ボタンに表示されるテキスト"}</span>
+                      {"\n    "}
+                      <span className={styles.cm}>agent</span>
+                      {": "}
+                      <span className={styles.cv}>implementer</span>
+                      {"        "}
+                      <span className={styles.cc}>
+                        {"# 遷移先: .github/agents/implementer.agent.md"}
+                      </span>
+                      {"\n    "}
+                      <span className={styles.cm}>prompt</span>
+                      {": "}
+                      <span className={styles.cv}>{"'上記の計画に従って実装してください。'"}</span>
+                      {"\n    "}
+                      <span className={styles.cm}>send</span>
+                      {": "}
+                      <span className={styles.cv}>{"false"}</span>
+                      {"              "}
+                      <span className={styles.cc}>
+                        {"# false: ユーザーが確認後に手動送信（推奨）"}
+                      </span>
+                      {"\n                               "}
+                      <span className={styles.cc}>
+                        {"# true:  自動送信（完全自動化ワークフロー）"}
+                      </span>
+                      {"\n  - "}
+                      <span className={styles.cm}>label</span>
+                      {": "}
+                      <span className={styles.cv}>{"'コードレビューへ'"}</span>
+                      {"\n    "}
+                      <span className={styles.cm}>agent</span>
+                      {": "}
+                      <span className={styles.cv}>{"code-reviewer"}</span>
+                      {"\n    "}
+                      <span className={styles.cm}>prompt</span>
+                      {": "}
+                      <span className={styles.cv}>
+                        {"'実装内容のセキュリティとコード品質をレビューしてください。'"}
+                      </span>
+                      {"\n    "}
+                      <span className={styles.cm}>send</span>
+                      {": "}
+                      <span className={styles.cv}>{"false"}</span>
+                    </div>
+                  </div>
+                  <div className={`${styles.alert} ${styles.aw}`} style={{ marginTop: "10px" }}>
+                    <span className={styles.alertIcon}>⚠️</span>
+                    <div className={styles.alertBody}>
+                      <strong>{"handoffs は GitHub.com では無視されます。"}</strong>
+                      {
+                        " VS Code・JetBrains・Eclipse・Xcodeのみ有効です。GitHub.com（Copilot Coding Agent）のIssue処理フローでは使用できません。"
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
         <section id="s08" className={styles.sec}>
           <div
