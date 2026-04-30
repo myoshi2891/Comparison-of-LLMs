@@ -162,7 +162,7 @@ Next.js 移行プロジェクトの作業を再開してください。
 
 - リポジトリ: LLM-Studies（Phase A–F の Next.js 移行作業中）
 - 現在のブランチ: feat/nextjs-migration
-- 最新 HEAD: 1a7e7e9（C-4 s02 faithful 移植完了。git status は clean）
+- 最新 HEAD: 2b821c5（chore(hooks): sync gate hook 追加。git status は clean）
 - 移行計画: docs/NEXTJS_PHASE_A_F_PLAN.md（Phase A–F）
 - 進捗トラッカー: MIGRATION_PROGRESS.md（**作業開始前に必読**: §「AI 作業ルール」R1（Biome scope）/ R2（faithful 必須）/「Phase C-2 faithful 移植継続ポイント」）
 - Phase C 詳細設計: docs/NEXTJS_PHASE_C_DETAILED_DESIGN.md（§5.4 C-4）
