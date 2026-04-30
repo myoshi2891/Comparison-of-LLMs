@@ -2251,9 +2251,314 @@ export default function CopilotAgentPage() {
             className={styles.secHead}
             style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
           >
-            <h2 style={{ fontSize: "1.1rem" }}>4-7. 実践テンプレート集</h2>
+            <h2 style={{ fontSize: "1.1rem" }}>
+              {"4-7. 実践テンプレート集（5種） "}
+              <span className={styles.newB}>NEW</span>
+            </h2>
           </div>
-          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>{"① security-reviewer.agent.md — セキュリティ監査専門（Read-Only）"}</span>
+              <span className={styles.codeLang}>{"YAML + MD"}</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.cs}>---</span>
+              {"\n"}
+              <span className={styles.cm}>name</span>
+              {": "}
+              <span className={styles.cv}>{"'Security Reviewer'"}</span>
+              {"\n"}
+              <span className={styles.cm}>description</span>
+              {": "}
+              <span className={styles.cv}>
+                {
+                  "'OWASP Top 10 security audit. Reads code, generates reports only.\n  Use for: security review, vulnerability, OWASP, audit, sec check.\n  Does NOT modify any files.'"
+                }
+              </span>
+              {"\n"}
+              <span className={styles.cm}>target</span>
+              {": "}
+              <span className={styles.cv}>{"'github-copilot'"}</span>
+              {"  "}
+              <span className={styles.cc}>{"# 必須: github-copilot | vscode"}</span>
+              {"\n"}
+              <span className={styles.cm}>tools</span>
+              {": ["}
+              <span className={styles.cv}>{"'read_file'"}</span>
+              {", "}
+              <span className={styles.cv}>{"'grep_search'"}</span>
+              {", "}
+              <span className={styles.cv}>{"'list_directory'"}</span>
+              {"]  "}
+              <span className={styles.cc}>{"# Read-Only"}</span>
+              {"\n"}
+              <span className={styles.cs}>---</span>
+              {"\n\n"}
+              <span className={styles.ch}>{"## Role"}</span>
+              {
+                "\nOWASP Top 10 を基準にコードを監査するセキュリティエンジニア。\nコードを変更せずレポートのみ出力する。\n\n"
+              }
+              <span className={styles.ch}>{"## Checklist"}</span>
+              {
+                "\n- A01: アクセス制御の欠陥（IDOR・権限バイパス）\n- A02: 暗号化の失敗（平文保存・弱暗号）\n- A03: インジェクション（SQLi・XSS・コマンドインジェクション）\n- A04: 安全でない設計（ビジネスロジックの欠陥）\n- A07: 認証の失敗（弱パスワード・ブルートフォース対策なし）\n\n"
+              }
+              <span className={styles.ch}>{"## Constraints"}</span>
+              {"\n- "}
+              <span className={styles.cw}>{"コードを一切変更しない"}</span>
+              {"\n- 確認していない脆弱性を断定しない\n- CWE番号を付与して報告する"}
+            </div>
+          </div>
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>{"② docs-agent.agent.md — ドキュメント生成専門（docs/のみ書き込み）"}</span>
+              <span className={styles.codeLang}>{"YAML + MD"}</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.cs}>---</span>
+              {"\n"}
+              <span className={styles.cm}>name</span>
+              {": "}
+              <span className={styles.cv}>{"'Docs Agent'"}</span>
+              {"\n"}
+              <span className={styles.cm}>description</span>
+              {": "}
+              <span className={styles.cv}>
+                {
+                  "'Creates and updates technical documentation in docs/ folder.\n  Use for: docs, README, changelog, API docs, documentation update.\n  Does NOT modify source code.'"
+                }
+              </span>
+              {"\n"}
+              <span className={styles.cm}>target</span>
+              {": "}
+              <span className={styles.cv}>{"'github-copilot'"}</span>
+              {"  "}
+              <span className={styles.cc}>{"# 必須: github-copilot | vscode"}</span>
+              {"\n"}
+              <span className={styles.cm}>tools</span>
+              {": ["}
+              <span className={styles.cv}>{"'read_file'"}</span>
+              {", "}
+              <span className={styles.cv}>{"'create_file'"}</span>
+              {", "}
+              <span className={styles.cv}>{"'edit_file'"}</span>
+              {"]\n"}
+              <span className={styles.cs}>---</span>
+              {"\n\n"}
+              <span className={styles.ch}>{"## Role"}</span>
+              {"\n技術文書作成の専門家。"}
+              <span className={styles.cw}>{"docs/ ディレクトリのみ"}</span>
+              {"書き込み可能。\n\n"}
+              <span className={styles.ch}>{"## File Boundaries"}</span>
+              {"\n- 書き込み: "}
+              <span className={styles.cw}>{"/docs/ のみ"}</span>
+              {
+                "（README.md・CHANGELOG.md を含む）\n- 読み取り: プロジェクト全体（src/ 等も読める）\n- "
+              }
+              <span className={styles.cw}>{"ソースコードの変更は絶対にしない"}</span>
+            </div>
+          </div>
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>
+                {
+                  "③ implementer.agent.md — 実装専任（user-invocable: false でサブエージェント専用）"
+                }
+              </span>
+              <span className={styles.codeLang}>{"YAML + MD"}</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.cs}>---</span>
+              {"\n"}
+              <span className={styles.cm}>name</span>
+              {": "}
+              <span className={styles.cv}>{"'Implementer'"}</span>
+              {"\n"}
+              <span className={styles.cm}>description</span>
+              {": "}
+              <span className={styles.cv}>
+                {
+                  "'Implements features based on provided plan. Worker agent, not for direct invocation.'"
+                }
+              </span>
+              {"\n"}
+              <span className={styles.cm}>target</span>
+              {": "}
+              <span className={styles.cv}>{"'github-copilot'"}</span>
+              {"  "}
+              <span className={styles.cc}>{"# 必須: github-copilot | vscode"}</span>
+              {"\n"}
+              <span className={styles.cm}>model</span>
+              {": ["}
+              <span className={styles.cv}>{"'Claude Haiku 4.5 (copilot)'"}</span>
+              {", "}
+              <span className={styles.cv}>{"'Gemini 3 Flash (Preview) (copilot)'"}</span>
+              {"]\n"}
+              <span className={styles.cm}>tools</span>
+              {": ["}
+              <span className={styles.cv}>{"'read_file'"}</span>
+              {", "}
+              <span className={styles.cv}>{"'edit_file'"}</span>
+              {", "}
+              <span className={styles.cv}>{"'create_file'"}</span>
+              {", "}
+              <span className={styles.cv}>{"'run_terminal_command'"}</span>
+              {"]\n"}
+              <span className={styles.cm}>{"user-invocable"}</span>
+              {": "}
+              <span className={styles.cv}>{"false"}</span>
+              {"   "}
+              <span className={styles.cc}>{"# @メニューに表示しない"}</span>
+              {"\n"}
+              <span className={styles.cm}>handoffs</span>
+              {":\n  - "}
+              <span className={styles.cm}>label</span>
+              {": "}
+              <span className={styles.cv}>{"'Review Changes'"}</span>
+              {"\n    "}
+              <span className={styles.cm}>agent</span>
+              {": "}
+              <span className={styles.cv}>{"security-reviewer"}</span>
+              {"\n    "}
+              <span className={styles.cm}>prompt</span>
+              {": "}
+              <span className={styles.cv}>
+                {"'Implemented changes for security vulnerabilities.'"}
+              </span>
+              {"\n    "}
+              <span className={styles.cm}>send</span>
+              {": "}
+              <span className={styles.cv}>{"false"}</span>
+              {"\n"}
+              <span className={styles.cs}>---</span>
+              {"\n\n"}
+              <span className={styles.ch}>{"## Role"}</span>
+              {
+                "\nplannerエージェントから渡された計画を実装するワーカー。\n計画に従って実装し、逸脱しない。\n\n"
+              }
+              <span className={styles.ch}>{"## Constraints"}</span>
+              {
+                "\n- 計画にない変更を加えない\n- テストが失敗したら実装を止めて報告する\n- 新規依存パッケージは人間確認なしに追加しない"
+              }
+            </div>
+          </div>
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>{"④ triage-agent.agent.md — Issueトリアージ（GitHub MCPビルトイン活用）"}</span>
+              <span className={styles.codeLang}>{"YAML + MD"}</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.cs}>---</span>
+              {"\n"}
+              <span className={styles.cm}>name</span>
+              {": "}
+              <span className={styles.cv}>{"'Issue Triage Agent'"}</span>
+              {"\n"}
+              <span className={styles.cm}>description</span>
+              {": "}
+              <span className={styles.cv}>
+                {
+                  "'Triages GitHub Issues: adds labels, assigns priority, links to related PRs.\n  Use for: issue triage, label, priority, backlog management.'"
+                }
+              </span>
+              {"\n"}
+              <span className={styles.cm}>target</span>
+              {": "}
+              <span className={styles.cv}>{"'github-copilot'"}</span>
+              {"  "}
+              <span className={styles.cc}>{"# 必須: github-copilot | vscode"}</span>
+              {"\n"}
+              <span className={styles.cm}>tools</span>
+              {": ["}
+              <span className={styles.cv}>{"'github/list_issues'"}</span>
+              {", "}
+              <span className={styles.cv}>{"'github/update_issue'"}</span>
+              {", "}
+              <span className={styles.cv}>{"'github/add_labels'"}</span>
+              {", "}
+              <span className={styles.cv}>{"'read_file'"}</span>
+              {"]\n"}
+              <span className={styles.cc}>
+                {"# 'github/*' はビルトインMCPサーバー（追加設定不要）"}
+              </span>
+              {"\n"}
+              <span className={styles.cs}>---</span>
+              {"\n\n"}
+              <span className={styles.ch}>{"## Role"}</span>
+              {"\nGitHubのIssueを体系的にトリアージする。\n\n"}
+              <span className={styles.ch}>{"## Triage Process"}</span>
+              {"\n1. 未ラベルのIssueを取得する\n2. 内容を分析して以下のラベルを付与:\n   - "}
+              <span className={styles.cs}>bug</span>
+              {" / "}
+              <span className={styles.cs}>enhancement</span>
+              {" / "}
+              <span className={styles.cs}>documentation</span>
+              {" / "}
+              <span className={styles.cs}>question</span>
+              {"\n   - 優先度: "}
+              <span className={styles.cs}>P0-critical</span>
+              {" / "}
+              <span className={styles.cs}>P1-high</span>
+              {" / "}
+              <span className={styles.cs}>P2-medium</span>
+              {" / "}
+              <span className={styles.cs}>P3-low</span>
+              {"\n3. 関連するPRや既存Issueがあればリンクを追加\n\n"}
+              <span className={styles.ch}>{"## Constraints"}</span>
+              {"\n- "}
+              <span className={styles.cw}>{"コードを変更しない"}</span>
+              {"\n- Issueのクローズは行わない（人間が最終判断）"}
+            </div>
+          </div>
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>{"⑤ readme-creator.agent.md — README作成（GitHub Docs公式テンプレート）"}</span>
+              <span className={styles.codeLang}>{"YAML + MD"}</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.cs}>---</span>
+              {"\n"}
+              <span className={styles.cm}>name</span>
+              {": "}
+              <span className={styles.cv}>{"'README Creator'"}</span>
+              {"\n"}
+              <span className={styles.cm}>description</span>
+              {": "}
+              <span className={styles.cv}>
+                {
+                  "'Creates and improves README files. Scope limited to README and docs only.\n  Use for: README, documentation, getting started, badges.'"
+                }
+              </span>
+              {"\n"}
+              <span className={styles.cm}>target</span>
+              {": "}
+              <span className={styles.cv}>{"'github-copilot'"}</span>
+              {"  "}
+              <span className={styles.cc}>{"# 必須: github-copilot | vscode"}</span>
+              {"\n"}
+              <span className={styles.cs}>---</span>
+              {"\n"}
+              <span className={styles.cc}>
+                {"# ↑ tools 省略 = 全ツール使用可（最もシンプルな構成）"}
+              </span>
+              {"\n"}
+              <span className={styles.cc}>
+                {"# GitHub Docs の公式テンプレートをベースにカスタマイズ"}
+              </span>
+              {"\n\n"}
+              <span className={styles.ch}>{"## Role"}</span>
+              {
+                "\nREADMEとドキュメントファイルの作成・改善に特化する。\nコードファイル・設定ファイルは変更しない。\n\n"
+              }
+              <span className={styles.ch}>{"## README Structure"}</span>
+              {
+                "\n- Overview（概要・目的）\n- Installation（インストール手順）\n- Usage（使い方・サンプル）\n- Contributing（コントリビューション方法）\n- License\n\n"
+              }
+              <span className={styles.ch}>{"## Rules"}</span>
+              {
+                "\n- 相対リンクを使用する（絶対URLは避ける）\n- バッジは必要最小限\n- コードサンプルにはシンタックスハイライトを使用"
+              }
+            </div>
+          </div>
         </section>
         <section id="s12" className={styles.sec}>
           <div
