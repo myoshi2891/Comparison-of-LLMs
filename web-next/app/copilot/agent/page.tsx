@@ -1938,9 +1938,167 @@ export default function CopilotAgentPage() {
             className={styles.secHead}
             style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
           >
-            <h2 style={{ fontSize: "1.1rem" }}>4-5. Subagents</h2>
+            <h2 style={{ fontSize: "1.1rem" }}>
+              {"4-5. Subagents（サブエージェント）— 並列・分離実行 "}
+              <span className={styles.newB}>NEW</span>
+            </h2>
           </div>
-          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+          <div className={styles.card}>
+            <p>
+              {"Subagentsはメインエージェントから"}
+              <strong>{"独立したコンテキストで実行される子エージェント"}</strong>
+              {"です。Handoffsが「ユーザーが操作する順次遷移」であるのに対し、Subagentsは"}
+              <strong>{"「エージェントが自律的に委任する並列実行」"}</strong>
+              {"です。"}
+            </p>
+          </div>
+          <div className={styles.g2}>
+            <div className={styles.card}>
+              <div className={styles.cardTitle}>{"🔄 Handoffs vs Subagents — 使い分け"}</div>
+              <div className={styles.tblWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>観点</th>
+                      <th>Handoffs</th>
+                      <th>Subagents</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>制御</td>
+                      <td>{"ユーザーが各ステップを承認"}</td>
+                      <td>{"エージェントが自律委任"}</td>
+                    </tr>
+                    <tr>
+                      <td>実行</td>
+                      <td>{"順次（ユーザー操作後）"}</td>
+                      <td>{"並列実行可能"}</td>
+                    </tr>
+                    <tr>
+                      <td>コンテキスト</td>
+                      <td>{"前のセッションを引き継ぐ"}</td>
+                      <td>{"完全に独立・隔離"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"適した場面"}</td>
+                      <td>{"人間の承認が必要な作業"}</td>
+                      <td>{"調査・分析の並列実行"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"必要ツール"}</td>
+                      <td>{"不要（UIメカニズム）"}</td>
+                      <td>
+                        <code>{"tools: [agent]"}</code>
+                        {"が必須"}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div>
+              <div className={`${styles.alert} ${styles.ai}`}>
+                <span className={styles.alertIcon}>ℹ️</span>
+                <div className={styles.alertBody}>
+                  <strong>{"Subagentsの主なユースケース"}</strong>
+                  <ul style={{ marginTop: "8px", paddingLeft: "16px", fontSize: "13px" }}>
+                    <li>
+                      {"コードレビューを"}
+                      <strong>
+                        {"複数の視点（セキュリティ・パフォーマンス・可読性）で並列実行"}
+                      </strong>
+                    </li>
+                    <li>
+                      {"実装前の"}
+                      <strong>{"技術調査"}</strong>
+                      {"（複数ライブラリの比較など）"}
+                    </li>
+                    <li>
+                      {"大規模コードベースの"}
+                      <strong>{"並列分析"}</strong>
+                      {"（デッドコード・重複コード等）"}
+                    </li>
+                    <li>
+                      <strong>{"コンテキスト節約"}</strong>
+                      {
+                        "：サブエージェントは結果のみを返すため、メインエージェントのコンテキストが汚染されない"
+                      }
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>
+                {".github/agents/thorough-reviewer.agent.md — 並列Subagentでコードレビュー"}
+              </span>
+              <span className={styles.codeLang}>{"Markdown + YAML"}</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.cs}>---</span>
+              {"\n"}
+              <span className={styles.cm}>name</span>
+              {": "}
+              <span className={styles.cv}>{"'Thorough Reviewer'"}</span>
+              {"\n"}
+              <span className={styles.cm}>description</span>
+              {": "}
+              <span className={styles.cv}>
+                {
+                  "'Comprehensive code review using multiple parallel perspectives.\n  Use for: code review, PR review, quality check.'"
+                }
+              </span>
+              {"\n"}
+              <span className={styles.cm}>target</span>
+              {": "}
+              <span className={styles.cv}>{"'github-copilot'"}</span>
+              {"  "}
+              <span className={styles.cc}>{"# 必須: github-copilot | vscode"}</span>
+              {"\n"}
+              <span className={styles.cm}>tools</span>
+              {": ["}
+              <span className={styles.cv}>{"'read_file'"}</span>
+              {", "}
+              <span className={styles.cv}>{"'search'"}</span>
+              {", "}
+              <span className={styles.cv}>{"'agent'"}</span>
+              {"]   "}
+              <span className={styles.cc}>{"# 'agent' が必須"}</span>
+              {"\n"}
+              <span className={styles.cm}>agents</span>
+              {":                "}
+              <span className={styles.cc}>{"# 使用できるサブエージェントを制限"}</span>
+              {"\n  - "}
+              <span className={styles.cv}>correctness-reviewer</span>
+              {"\n  - "}
+              <span className={styles.cv}>security-reviewer</span>
+              {"\n  - "}
+              <span className={styles.cv}>performance-reviewer</span>
+              {"\n"}
+              <span className={styles.cs}>---</span>
+              {"\n\n"}
+              <span className={styles.ch}>{"## Role"}</span>
+              {"\nあなたは包括的なコードレビュアーです。\n複数の視点を"}
+              <strong>{"並列サブエージェント"}</strong>
+              {"として実行し、結果を統合します。\n\n"}
+              <span className={styles.ch}>{"## Instructions"}</span>
+              {"\nコードレビューを依頼されたら、以下の3つを"}
+              <strong>{"同時並列"}</strong>
+              {
+                "で実行する:\n\n1. correctness-reviewer サブエージェント:\n   「ロジックエラー・エッジケース・型の問題を分析してください」\n   \n2. security-reviewer サブエージェント:\n   「OWASP Top 10 に基づいてセキュリティ問題を特定してください」\n   \n3. performance-reviewer サブエージェント:\n   「パフォーマンスボトルネック・不要な再レンダリングを特定してください」\n\n各サブエージェントの結果を受け取ったら、統合レポートを作成する。\n\n"
+              }
+              <span className={styles.ch}>{"## Output Format"}</span>
+              {"\n"}
+              <span className={styles.cs}>
+                {
+                  "```markdown\n## Code Review Summary\n\n### Critical Issues\n[セキュリティ・バグ]\n\n### Improvements\n[パフォーマンス・品質]\n\n### Positive Observations\n[良かった点]\n```"
+                }
+              </span>
+            </div>
+          </div>
         </section>
         <section id="s10" className={styles.sec}>
           <div
