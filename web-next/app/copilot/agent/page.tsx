@@ -3160,9 +3160,108 @@ export default function CopilotAgentPage() {
         </section>
         <section id="s17" className={styles.sec}>
           <div className={styles.secHead}>
-            <h2>8. ファイル選択の意思決定ツリー</h2>
+            <span className={styles.secNum}>8</span>
+            <h2>ファイル選択の意思決定ツリー</h2>
           </div>
-          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+          <div className={styles.dflow}>
+            <div className={styles.dflowTitle}>どのMarkdownファイルを使うべきか — 決定フロー</div>
+            <div className={styles.dflowRow}>
+              <div className={styles.dnQ}>
+                すべてのファイル・コンテキストに
+                <br />
+                常時適用したい指示？
+              </div>
+              <div className={styles.dnArr}>→ YES →</div>
+              <div className={styles.dnY}>
+                copilot-instructions.md
+                <br />
+                <small>.github/ 直下に配置</small>
+              </div>
+            </div>
+            <div className={styles.dnIn} style={{ marginTop: "12px" }}>
+              <div className={styles.dflowRow}>
+                <span style={{ color: "var(--text3)", fontSize: "13px" }}>↓ NO</span>
+              </div>
+              <div className={styles.dflowRow}>
+                <div className={styles.dnQ}>
+                  特定のパス・ファイル種別にのみ
+                  <br />
+                  適用したい？（例: src/components/）
+                </div>
+                <div className={styles.dnArr}>→ YES →</div>
+                <div className={styles.dnY}>
+                  *.instructions.md
+                  <br />
+                  <small>applyTo + excludeAgent</small>
+                </div>
+              </div>
+              <div className={styles.dnIn} style={{ marginTop: "12px" }}>
+                <div className={styles.dflowRow}>
+                  <span style={{ color: "var(--text3)", fontSize: "13px" }}>↓ NO</span>
+                </div>
+                <div className={styles.dflowRow}>
+                  <div className={styles.dnQ}>
+                    専門的なペルソナ・ツールセット
+                    <br />
+                    を持つエージェントを定義したい？
+                  </div>
+                  <div className={styles.dnArr}>→ YES →</div>
+                  <div className={styles.dnY}>
+                    *.agent.md
+                    <br />
+                    <small>@エージェント名で呼び出し</small>
+                  </div>
+                </div>
+                <div className={styles.dnIn} style={{ marginTop: "12px" }}>
+                  <div className={styles.dflowRow}>
+                    <span style={{ color: "var(--text3)", fontSize: "13px" }}>↓ NO</span>
+                  </div>
+                  <div className={styles.dflowRow}>
+                    <div className={styles.dnQ}>
+                      マッチ時のみロードされる
+                      <br />
+                      専門知識（手順・コマンド等）？
+                    </div>
+                    <div className={styles.dnArr}>→ YES →</div>
+                    <div className={styles.dnY}>
+                      SKILL.md
+                      <br />
+                      <small>.github/skills/*/SKILL.md</small>
+                    </div>
+                  </div>
+                  <div className={styles.dnIn} style={{ marginTop: "12px" }}>
+                    <div className={styles.dflowRow}>
+                      <span style={{ color: "var(--text3)", fontSize: "13px" }}>↓ NO</span>
+                    </div>
+                    <div className={styles.dflowRow}>
+                      <div className={styles.dnQ}>
+                        繰り返し実行するタスク
+                        <br />を /コマンドで呼びたい？
+                      </div>
+                      <div className={styles.dnArr}>→ YES →</div>
+                      <div className={styles.dnY}>
+                        *.prompt.md
+                        <br />
+                        <small>.github/prompts/</small>
+                      </div>
+                    </div>
+                    <div className={styles.dnIn} style={{ marginTop: "12px" }}>
+                      <div className={styles.dflowRow}>
+                        <span style={{ color: "var(--text3)", fontSize: "13px" }}>↓ NO</span>
+                      </div>
+                      <div className={styles.dflowRow}>
+                        <div className={styles.dnY}>
+                          *.chatmode.md
+                          <br />
+                          <small>カスタムペルソナモード</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
         <section id="s18" className={styles.sec}>
           <div className={styles.secHead}>
