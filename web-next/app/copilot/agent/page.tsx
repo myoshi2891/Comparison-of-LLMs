@@ -3087,9 +3087,76 @@ export default function CopilotAgentPage() {
         </section>
         <section id="s16" className={styles.sec}>
           <div className={styles.secHead}>
-            <h2>7. AGENTS.md</h2>
+            <span className={styles.secNum}>7</span>
+            <h2>
+              <span className={styles.mono}>AGENTS.md</span>
+              {" — クロスツール互換戦略"}
+            </h2>
           </div>
-          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+          <div className={styles.card}>
+            <p>
+              {"Copilot Coding Agent は 2025年8月から "}
+              <code>AGENTS.md</code>
+              {" をサポートし、さらに "}
+              <strong>CLAUDE.md・GEMINI.md</strong>
+              {" も自動認識します。チームで複数のAIツールを使う場合、"}
+              <code>AGENTS.md</code>
+              {
+                " を共通エントリポイントにして、ツール固有の設定は別ファイルに分離する戦略が推奨されています。"
+              }
+            </p>
+          </div>
+          <div className={styles.compatGrid}>
+            <div className={styles.compatCard}>
+              <div className={styles.compatIcon}>🐙</div>
+              <div className={styles.compatName}>Copilot Coding Agent</div>
+              <div className={styles.compatFile}>copilot-instructions.md</div>
+              <div className={styles.compatFile}>AGENTS.md</div>
+              <div className={styles.compatFile}>CLAUDE.md</div>
+              <div className={styles.compatFile}>GEMINI.md</div>
+            </div>
+            <div className={styles.compatCard}>
+              <div className={styles.compatIcon}>🤖</div>
+              <div className={styles.compatName}>Claude Code</div>
+              <div className={styles.compatFile}>CLAUDE.md</div>
+              <div className={styles.compatFile}>AGENTS.md</div>
+            </div>
+            <div className={styles.compatCard}>
+              <div className={styles.compatIcon}>♊</div>
+              <div className={styles.compatName}>Gemini CLI</div>
+              <div className={styles.compatFile}>GEMINI.md</div>
+              <div className={styles.compatFile}>AGENTS.md</div>
+            </div>
+            <div className={styles.compatCard}>
+              <div className={styles.compatIcon}>⚙️</div>
+              <div className={styles.compatName}>Codex CLI</div>
+              <div className={styles.compatFile}>AGENTS.md</div>
+            </div>
+            <div className={styles.compatCard}>
+              <div className={styles.compatIcon}>⚡</div>
+              <div className={styles.compatName}>
+                {"Copilot CLI "}
+                <small style={{ fontSize: "10px", opacity: 0.7 }}>(GA Feb 2026)</small>
+              </div>
+              <div className={styles.compatFile}>copilot-instructions.md</div>
+              <div className={styles.compatFile}>AGENTS.md</div>
+              <div className={styles.compatFile}>CLAUDE.md</div>
+              <div className={styles.compatFile}>GEMINI.md</div>
+            </div>
+          </div>
+          <div className={`${styles.alert} ${styles.ai}`}>
+            <span className={styles.alertIcon}>💡</span>
+            <div className={styles.alertBody}>
+              <strong>Agentic Workflows（GitHub Actions 統合）</strong>
+              {
+                "AGENTS.md を使った GitHub Actions のマルチエージェントワークフロー（コードトリアージ・ドキュメント自動更新・品質チェック）が段階的に展開中です（2026年 Technical Preview）。Issues のラベル付けを "
+              }
+              <code>@triage-agent</code>
+              {" に、PR のドキュメント更新を "}
+              <code>@docs-agent</code>
+              {" に自動委譲する構成が可能になります。"}
+            </div>
+          </div>
         </section>
         <section id="s17" className={styles.sec}>
           <div className={styles.secHead}>
