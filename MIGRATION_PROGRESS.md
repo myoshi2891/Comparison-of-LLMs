@@ -11,7 +11,7 @@
 - **ブランチ**: `feat/nextjs-migration`
 - **最新 HEAD**: `724782c`（**chore(docs): C-4 s19 完了・sources 検証前同期**）
 - **未コミット作業**: なし（working tree クリーン）
-- **次の作業**: **C-4 完了 → C-5（/claude/agent）着手**。C-4 の全 20 セクション（s01-s19 + sources）移植済み。次は `legacy/claude/agent.html` の scaffold → faithful 移植
+- **次の作業**: **Phase C 完了 → Phase D 計画確認**。C-1〜C-4（claude/gemini/codex/copilot の agent.html）全 4 ページ移植完了。次は `docs/NEXTJS_PHASE_A_F_PLAN.md` §Phase D を確認して D-1 着手
 - **テスト数**: `bun run test` **469 tests（全件 pass）** — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
 - **ビルド**: `bun run build` 成功（12 ルート全 Static）・`bun run typecheck` 成功・`uv run pytest` 5/5 passed
 
@@ -135,7 +135,7 @@ web-next/
 ├── app/claude/agent/        # Phase C-1（faithful 移植完了）
 ├── app/gemini/agent/        # Phase C-2（faithful 移植完了）
 ├── app/codex/agent/         # Phase C-3（faithful 移植完了）
-└── app/copilot/agent/       # Phase C-4（Red scaffold 完了・Green 実装中）
+└── app/copilot/agent/       # Phase C-4（faithful 移植完了）
 ```
 
 **テスト数**: **469 tests（全件 pass）** — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
@@ -170,7 +170,7 @@ Next.js 移行プロジェクトの作業を再開してください。
 - プロジェクト固有スキル: .claude/skills/nextjs-page-migration/SKILL.md
 - リポジトリ規約: CLAUDE.md（AGENTS.md / GEMINI.md からも参照される。AI 共通の編集ルール）
 
-次の作業: **C-5 /claude/agent 着手（即着手可能）** — C-4（/copilot/agent）全 20 セクション移植完了（724782c）。次は `legacy/claude/agent.html` の scaffold → faithful 移植（`web-next/app/claude/agent/page.tsx`）
+次の作業: **Phase C 完了 → Phase D 着手**（即着手可能）— C-4（/copilot/agent）全 20 セクション移植完了（724782c）。C-1〜C-4 全 4 ページ完了。次は `docs/NEXTJS_PHASE_A_F_PLAN.md` §Phase D を確認して D-1 着手
 
 C-4 作業手順:
 - **最初に `/nextjs-page-migration` スキルを呼び出す**（Claude Code の場合は Skill ツール経由、他の Coding Agent は `.claude/skills/nextjs-page-migration/SKILL.md` を Read してから開始）
