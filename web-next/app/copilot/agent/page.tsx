@@ -2932,9 +2932,158 @@ export default function CopilotAgentPage() {
         </section>
         <section id="s15" className={styles.sec}>
           <div className={styles.secHead}>
-            <h2>6. *.prompt.md / *.chatmode.md</h2>
+            <span className={styles.secNum}>6</span>
+            <h2>
+              <span className={styles.mono}>*.prompt.md</span>
+              {" / "}
+              <span className={styles.mono}>*.chatmode.md</span>
+              {" — 再利用プロンプトとチャットモード"}
+            </h2>
           </div>
-          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>.github/prompts/my-pull-requests.prompt.md</span>
+              <span className={styles.codeLang}>Markdown + YAML（再利用プロンプト）</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.cs}>---</span>
+              {"\n"}
+              <span className={styles.cm}>mode</span>
+              {": "}
+              <span className={styles.cv}>agent</span>
+              {"\n"}
+              <span className={styles.cm}>tools</span>
+              {": ["}
+              <span className={styles.cs}>{"'githubRepo'"}</span>
+              {", "}
+              <span className={styles.cs}>{"'list_pull_requests'"}</span>
+              {", "}
+              <span className={styles.cs}>{"'get_pull_request'"}</span>
+              {", "}
+              <span className={styles.cs}>{"'request_copilot_review'"}</span>
+              {"]"}
+              {"\n"}
+              <span className={styles.cm}>description</span>
+              {": "}
+              <span className={styles.cv}>
+                {'"現在のリポジトリの自分のPR一覧を取得して状態を確認する"'}
+              </span>
+              {"\n"}
+              <span className={styles.cs}>---</span>
+              {"\n\n"}
+              {"現在のリポジトリ（"}
+              <span className={styles.cw}>#githubRepo</span>
+              {" でリポジトリ情報を取得）で、\n自分にアサインされた PR を "}
+              <span className={styles.cw}>#list_pull_requests</span>
+              {
+                " で取得してください。\n\n各 PR について以下を報告:\n- PR の目的・変更内容の概要\n- レビュー待ちの場合はそれを強調\n- CI チェックが失敗している場合は原因と修正案\n- Copilot レビューが未実施の場合は "
+              }
+              <span className={styles.cw}>#request_copilot_review</span>
+              {" を提案\n\n"}
+              <span className={styles.cc}>{"# 使い方: /my-pull-requests コマンドで実行"}</span>
+            </div>
+          </div>
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>.github/chatmodes/databaseadmin.chatmode.md</span>
+              <span className={styles.codeLang}>Markdown + YAML（カスタムチャットモード）</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.cs}>---</span>
+              {"\n"}
+              <span className={styles.cm}>name</span>
+              {": "}
+              <span className={styles.cv}>Database Admin</span>
+              {"\n"}
+              <span className={styles.cm}>description</span>
+              {": "}
+              <span className={styles.cv}>
+                PostgreSQL DBA の専門家としてデータベース管理を支援する
+              </span>
+              {"\n"}
+              <span className={styles.cm}>tools</span>
+              {": ["}
+              <span className={styles.cs}>{"'pgsql_connect'"}</span>
+              {", "}
+              <span className={styles.cs}>{"'pgsql_query'"}</span>
+              {", "}
+              <span className={styles.cs}>{"'read_file'"}</span>
+              {"]"}
+              {"\n"}
+              <span className={styles.cm}>icon</span>
+              {": "}
+              <span className={styles.cv}>database</span>
+              {"\n"}
+              <span className={styles.cs}>---</span>
+              {"\n\n"}
+              {"あなたは経験豊富な PostgreSQL DBA です。\n\n"}
+              <span className={styles.ch}>## Your Expertise</span>
+              {
+                "\n- クエリの最適化（EXPLAIN ANALYZE の読み方・インデックス設計）\n- スキーマ設計（正規化・非正規化の判断）\n- Supabase Row Level Security (RLS) ポリシー\n- マイグレーション計画（ゼロダウンタイム移行）\n\n"
+              }
+              <span className={styles.ch}>## Tools Available</span>
+              {"\n- "}
+              <span className={styles.cw}>pgsql_connect</span>
+              {": データベースへの接続\n- "}
+              <span className={styles.cw}>pgsql_query</span>
+              {":   SQL クエリの実行・確認\n\n"}
+              <span className={styles.ch}>## Safety Rules</span>
+              {"\n- "}
+              <span className={styles.cw}>DROP / TRUNCATE は必ず確認してから実行</span>
+              {"\n- 本番 DB への書き込みは提案するが自動実行しない\n- "}
+              <span className={styles.cw}>
+                すべてのマイグレーションは --dry-run で確認してから適用
+              </span>
+            </div>
+          </div>
+          <div className={styles.tblWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>ファイル種別</th>
+                  <th>配置場所</th>
+                  <th>呼び出し方</th>
+                  <th>用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <code>*.prompt.md</code>
+                  </td>
+                  <td>
+                    <code>.github/prompts/</code>
+                  </td>
+                  <td>
+                    <code>/コマンド名</code>
+                  </td>
+                  <td>繰り返し使うタスクを再利用プロンプトとして定義</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>*.chatmode.md</code>
+                  </td>
+                  <td>
+                    <code>.github/chatmodes/</code>
+                  </td>
+                  <td>モード切替 UI</td>
+                  <td>特定の DBA・セキュリティ等のペルソナモード定義</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>*.agent.md</code>
+                  </td>
+                  <td>
+                    <code>.github/agents/</code>
+                  </td>
+                  <td>
+                    <code>@エージェント名</code>
+                  </td>
+                  <td>ツール・MCP・指示を持つ専門エージェント定義</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </section>
         <section id="s16" className={styles.sec}>
           <div className={styles.secHead}>
