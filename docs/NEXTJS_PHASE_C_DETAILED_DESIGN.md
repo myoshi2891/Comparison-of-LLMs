@@ -12,17 +12,19 @@
 
 ## 1. Context
 
-### 1.1 現在地
+### 1.1 現在地（**Phase C 全完了**）
 
 - **Phase C-1 完了**: `legacy/claude/agent.html` → `/claude/agent` 移植済（`2b7a0fa`/`5394d9d`）
 - **Phase C-2 完了**: `legacy/gemini/agent.html` → `/gemini/agent` faithful 移植済（`9dfa184`/`aa9c2ee`〜`448368a`、全 3,722 行 JSX 化）
-- **次の作業**: C-3 — `/codex/agent`（§5.3 参照）
-- **テスト数**: 453（C-3 完了で 461、C-4 完了で 469 見込み）
+- **Phase C-3 完了**: `legacy/codex/agent.html` → `/codex/agent` faithful 移植済（Red `0758a35` / Green `6223842` / s01〜s08-s11 各コミット）
+- **Phase C-4 完了**: `legacy/copilot/agent.html` → `/copilot/agent` faithful 移植済（Red `b920471` / s01〜s19 + sources 全 20 セクション、最終 `c849377`）
+- **次の作業**: Phase D — 長文ガイド 9 ページ（`MIGRATION_PROGRESS.md` 再開プロンプト参照）
+- **テスト数**: 469（全件 pass）
 
 ### 1.2 セッション開始時に必読のファイル（順序固定）
 
-1. **[`../MIGRATION_PROGRESS.md`](../MIGRATION_PROGRESS.md)** — 「AI 作業ルール」R1（Biome scope）/ R2（faithful 必須）と現在地（C-2 完了 / 453 件 passed）を確認
-2. **本ファイル** — Phase C 全体設計（§5.3 C-3 を重点確認）
+1. **[`../MIGRATION_PROGRESS.md`](../MIGRATION_PROGRESS.md)** — 「AI 作業ルール」R1（Biome scope）/ R2（faithful 必須）と現在地を確認
+2. **本ファイル** — Phase C 全体設計（Phase C は完了済み。Phase D 以降は `NEXTJS_PHASE_A_F_PLAN.md` §Phase D を参照）
 3. **[`../.claude/skills/nextjs-page-migration/SKILL.md`](../.claude/skills/nextjs-page-migration/SKILL.md)** — 9 ステップ手順（Step 3 Red / Step 4 Green は本書 §4・§5 で具体化）
 4. **C-2 正本テンプレート**（faithful 移植の参考実装）:
    - [`../web-next/app/gemini/agent/page.tsx`](../web-next/app/gemini/agent/page.tsx) — Source 型 / SOURCES 配列 / Ext ヘルパ / sectionMa パターン
