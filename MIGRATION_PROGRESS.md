@@ -9,11 +9,11 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- **最新 HEAD**: `c849377`（**feat(web-next): faithful migration of /copilot/agent s19**）
+- **最新 HEAD**: `724782c`（**chore(docs): C-4 s19 完了・sources 検証前同期**）
 - **未コミット作業**: なし（working tree クリーン）
-- **次の作業**: C-4 sources 検証（lines 2071-2168 は既実装済み）→ 全セクション確認 → pre-commit-check → C-4 完了コミット
+- **次の作業**: **C-4 完了 → C-5（/claude/agent）着手**。C-4 の全 20 セクション（s01-s19 + sources）移植済み。次は `legacy/claude/agent.html` の scaffold → faithful 移植
 - **テスト数**: `bun run test` **469 tests（全件 pass）** — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
-- **ビルド**: `bun run build` 成功・`bun run typecheck` 成功・`uv run pytest` 5/5 passed
+- **ビルド**: `bun run build` 成功（12 ルート全 Static）・`bun run typecheck` 成功・`uv run pytest` 5/5 passed
 
 ## AI 作業ルール（Phase A–F 共通、**必読**）
 
@@ -163,14 +163,14 @@ Next.js 移行プロジェクトの作業を再開してください。
 
 - リポジトリ: LLM-Studies（Phase A–F の Next.js 移行作業中）
 - 現在のブランチ: feat/nextjs-migration
-- 最新 HEAD: c849377（feat(web-next): faithful migration of /copilot/agent s19。git status は clean）
+- 最新 HEAD: 724782c（chore(docs): C-4 s19 完了・C-4 全 20 セクション移植完了。git status は clean）
 - 移行計画: docs/NEXTJS_PHASE_A_F_PLAN.md（Phase A–F）
 - 進捗トラッカー: MIGRATION_PROGRESS.md（**作業開始前に必読**: §「AI 作業ルール」R1（Biome scope）/ R2（faithful 必須）/「Phase C-2 faithful 移植継続ポイント」）
 - Phase C 詳細設計: docs/NEXTJS_PHASE_C_DETAILED_DESIGN.md（§5.4 C-4）
 - プロジェクト固有スキル: .claude/skills/nextjs-page-migration/SKILL.md
 - リポジトリ規約: CLAUDE.md（AGENTS.md / GEMINI.md からも参照される。AI 共通の編集ルール）
 
-次の作業: **C-4 sources 検証 → pre-commit-check → C-4 完了**（即着手可能）— s19（c849377）完了済み。sources セクション（lines 2071-2168）は既実装済みなので検証のみ実施 → bun run build / typecheck / test / lint 全通過 → C-4 完了コミット
+次の作業: **C-5 /claude/agent 着手（即着手可能）** — C-4（/copilot/agent）全 20 セクション移植完了（724782c）。次は `legacy/claude/agent.html` の scaffold → faithful 移植（`web-next/app/claude/agent/page.tsx`）
 
 C-4 作業手順:
 - **最初に `/nextjs-page-migration` スキルを呼び出す**（Claude Code の場合は Skill ツール経由、他の Coding Agent は `.claude/skills/nextjs-page-migration/SKILL.md` を Read してから開始）
