@@ -11,6 +11,14 @@ export const metadata: Metadata = {
     "Claude Code に「専門的なスキル」を追加するための設定ファイル SKILL.md の概念・構造・活用方法を理解するための初学者向け完全ガイドです。",
 };
 
+/**
+ * Render the SKILL.md complete guide page layout with navigation and content.
+ *
+ * Renders a documentation-style page containing a sidebar with numbered navigation,
+ * a main area with a hero and content sections (including a client-only Mermaid diagram).
+ *
+ * @returns A React element representing the SKILL.md guide page.
+ */
 export default function Page() {
   return (
     <div className={styles.pageWrap}>
