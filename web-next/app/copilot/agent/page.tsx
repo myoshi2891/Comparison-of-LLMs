@@ -3265,9 +3265,33 @@ export default function CopilotAgentPage() {
         </section>
         <section id="s18" className={styles.sec}>
           <div className={styles.secHead}>
-            <h2>9. 絶対に避けるべき Anti-Patterns</h2>
+            <span className={styles.secNum}>9</span>
+            <h2>絶対に避けるべき Anti-Patterns</h2>
           </div>
-          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+          <div className={styles.patGrid}>
+            <div className={`${styles.pat} ${styles.patNg}`}>
+              <div className={styles.patLabel}>✗ copilot-instructions.md</div>
+              <ul>
+                <li>ファイルを .github/ 以外の場所に置く（読み込まれない）</li>
+                <li>特定パス専用ルールを記述（*.instructions.md へ）</li>
+                <li>専門手順・コマンドを詰め込む（SKILL.md へ）</li>
+                <li>長大なコードスニペット（コンテキスト圧迫）</li>
+                <li>機密情報・API キーの記述</li>
+                <li>指示が互いに矛盾する記述</li>
+              </ul>
+            </div>
+            <div className={`${styles.pat} ${styles.patNg}`}>
+              <div className={styles.patLabel}>✗ *.agent.md / SKILL.md</div>
+              <ul>
+                <li>description が曖昧（「何でもやります」エージェント）</li>
+                <li>ファイル境界を設定しないエージェント（無制限書き込み）</li>
+                <li>SKILL.md で applyTo なしに常時ロード状態にする</li>
+                <li>*.agent.md を .github/agents/ 以外に置く</li>
+                <li>excludeAgent を設定せず指示が混在する</li>
+                <li>agent.md ファイル名に許可外文字（スペース等）を使う</li>
+              </ul>
+            </div>
+          </div>
         </section>
         <section id="s19" className={styles.sec}>
           <div className={styles.secHead}>
