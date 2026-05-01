@@ -3295,9 +3295,114 @@ export default function CopilotAgentPage() {
         </section>
         <section id="s19" className={styles.sec}>
           <div className={styles.secHead}>
-            <h2>10. まとめ</h2>
+            <span className={styles.secNum}>10</span>
+            <h2>まとめ：各ファイルの役割と設計原則</h2>
           </div>
-          <p style={{ color: "var(--text2)", fontStyle: "italic" }}>移行中</p>
+          <div className={styles.tblWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>ファイル</th>
+                  <th>配置場所</th>
+                  <th>ロード方式</th>
+                  <th>設計原則</th>
+                  <th>アンチパターン</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <code>copilot-instructions.md</code>
+                  </td>
+                  <td>
+                    <code>.github/</code>
+                    {" 直下（必須）"}
+                  </td>
+                  <td>
+                    <span className={`${styles.badge} ${styles.bGreen}`}>常時</span>
+                  </td>
+                  <td>普遍的なルールのみ。プロジェクト概要・スタック・禁止操作</td>
+                  <td>パス固有ルール・専門手順の混在</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>*.instructions.md</code>
+                  </td>
+                  <td>
+                    <code>.github/instructions/</code>
+                  </td>
+                  <td>
+                    <span className={`${styles.badge} ${styles.bBlue}`}>applyTo</span>
+                  </td>
+                  <td>applyTo でパスを絞る。excludeAgent でエージェント除外</td>
+                  <td>applyTo なしの全体適用</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>*.agent.md</code>
+                  </td>
+                  <td>
+                    <code>.github/agents/</code>
+                  </td>
+                  <td>
+                    <span className={`${styles.badge} ${styles.bPurple}`}>@呼び出し</span>
+                  </td>
+                  <td>description 明確化・ツール最小化・境界（書き込み先）を明示</td>
+                  <td>曖昧なdescription・書き込み先無制限</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>SKILL.md</code>
+                  </td>
+                  <td>
+                    <code>.github/skills/*/</code>
+                  </td>
+                  <td>
+                    <span className={`${styles.badge} ${styles.bAmber}`}>遅延ロード</span>
+                  </td>
+                  <td>description で「いつ使う/使わない」を明確に記述</td>
+                  <td>description が曖昧・常時ロード設定</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>*.prompt.md</code>
+                  </td>
+                  <td>
+                    <code>.github/prompts/</code>
+                  </td>
+                  <td>
+                    <span className={`${styles.badge} ${styles.bRed}`}>/コマンド</span>
+                  </td>
+                  <td>繰り返しタスクの再利用化。mode と tools を明示</td>
+                  <td>1回しか使わないタスクを定義</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>*.chatmode.md</code>
+                  </td>
+                  <td>
+                    <code>.github/chatmodes/</code>
+                  </td>
+                  <td>
+                    <span className={`${styles.badge} ${styles.bTeal}`}>モード切替</span>
+                  </td>
+                  <td>特定ペルソナ（DBA・セキュリティ等）のツールセット定義</td>
+                  <td>過剰なツール許可</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>AGENTS.md</code>
+                  </td>
+                  <td>プロジェクトルート</td>
+                  <td>
+                    <span className={`${styles.badge} ${styles.bMs}`}>クロスツール</span>
+                  </td>
+                  <td>Claude/Gemini/Codex と共通の普遍ルール。ツール固有は別ファイル</td>
+                  <td>ツール固有構文の混在</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </section>
         <hr />
 
