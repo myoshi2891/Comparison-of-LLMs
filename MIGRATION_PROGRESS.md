@@ -44,15 +44,17 @@
 
      ```bash
      # セクション行範囲を <start>,<end> で指定して該当範囲のみ集計
-     SECTION_ID="s07"  # 実装中のセクション ID に変更すること
-     sed -n '<start>,<end>p' legacy/copilot/agent.html | grep -c '<li>'
-     sed -n "/id=\"$SECTION_ID\"/,/<\/section>/p" web-next/app/copilot/agent/page.tsx | grep -c '<li>'
-     sed -n '<start>,<end>p' legacy/copilot/agent.html | grep -c 'code-body'
-     sed -n "/id=\"$SECTION_ID\"/,/<\/section>/p" web-next/app/copilot/agent/page.tsx | grep -c 'codeBody'
-     sed -n '<start>,<end>p' legacy/copilot/agent.html | grep -c '<tr'
-     sed -n "/id=\"$SECTION_ID\"/,/<\/section>/p" web-next/app/copilot/agent/page.tsx | grep -c '<tr'
-     sed -n '<start>,<end>p' legacy/copilot/agent.html | grep -c 'class="alert'
-     sed -n "/id=\"$SECTION_ID\"/,/<\/section>/p" web-next/app/copilot/agent/page.tsx | grep -c 'styles\.a[iwega]'
+     SECTION_ID="s07"   # 実装中のセクション ID に変更すること
+     LEGACY_HTML="legacy/<provider>/<slug>.html"            # 例: legacy/claude/skill-guide-for-claude.html
+     PAGE_PATH="web-next/app/<provider>/<slug>/page.tsx"    # 例: web-next/app/claude/skill-guide/page.tsx
+     sed -n '<start>,<end>p' "$LEGACY_HTML" | grep -c '<li>'
+     sed -n "/id=\"$SECTION_ID\"/,/<\/section>/p" "$PAGE_PATH" | grep -c '<li>'
+     sed -n '<start>,<end>p' "$LEGACY_HTML" | grep -c 'code-body'
+     sed -n "/id=\"$SECTION_ID\"/,/<\/section>/p" "$PAGE_PATH" | grep -c 'codeBody'
+     sed -n '<start>,<end>p' "$LEGACY_HTML" | grep -c '<tr'
+     sed -n "/id=\"$SECTION_ID\"/,/<\/section>/p" "$PAGE_PATH" | grep -c '<tr'
+     sed -n '<start>,<end>p' "$LEGACY_HTML" | grep -c 'class="alert'
+     sed -n "/id=\"$SECTION_ID\"/,/<\/section>/p" "$PAGE_PATH" | grep -c 'styles\.a[iwega]'
      ```
 
   4. `bun run test app/<provider>/<slug>/page.test.tsx` と `bunx biome check --write app/<provider>/<slug>/page.tsx` を実行（R1 遵守）
