@@ -427,16 +427,18 @@ C-2 以降、Green コミットだけでは完了とせず legacy HTML の全コ
 
 ---
 
-## 10. 残留事項（実装時に判定）
+## 10. 残留事項（**全件解決済み — Phase C 完了**）
 
-| # | 項目 | 判定タイミング | 推奨 |
-|---|---|---|---|
-| 1 | SOURCES 分割方針（ページ毎） | 各ページ Red 着手時 | `Grep '──\|新規追加\|既存（一部抜粋）' legacy/<provider>/agent.html` で視覚セパレータの有無を確認、あれば 2 分割 |
-| 2 | named template constants の粒度 | Green 実装中、page.tsx の縦長を見ながら | C-1: 5–7 / C-2: 8–10 / C-3: 8–10 / C-4: 12–15 件目安。3 行未満のスニペットは本体直書き |
-| 3 | EXPECTED_SECTION_IDS の形式 | 各ページ Red 着手時 | C-1 は synthetic 確定。C-2/C-3/C-4 は legacy `id="..."` を grep し、ヒットあれば採用、なければ synthetic |
-| 4 | TOC の有無 | 各ページ Red 着手時 | legacy に `<nav>` / `<ul class="toc">` 等があれば踏襲、なければ §5.1 末尾の手順で新規生成 |
-| 5 | metadata.title / description | Red 着手時 | legacy の `<title>` / `<meta name="description">` を優先採用、無ければ §5 のページ別表のキーワードから合成（150 字以内） |
-| 6 | Hero バッジ・サブタイトル | Green 実装時 | legacy の `<div class="hero-badge">` / `<p>` を可能な限り原文維持。Phase B と同じく「逐語移植」優先 |
+Phase C-1〜C-4 全完了により、以下の残留事項はすべて実装時に判定・解決済み。
+
+| # | 項目 | 結果 |
+|---|---|---|
+| 1 | SOURCES 分割方針 | C-2: 2 分割（SOURCES_EXISTING 12 + SOURCES_NEW 13）、C-1/C-3/C-4: 単一配列 |
+| 2 | named template constants の粒度 | 各ページ実装時に調整済み |
+| 3 | EXPECTED_SECTION_IDS の形式 | 全ページ synthetic id（`s01`〜`sNN` + `sources`）を採用 |
+| 4 | TOC の有無 | 各ページで legacy に合わせて実装済み |
+| 5 | metadata.title / description | 各ページの `page.tsx` に確定値をコミット済み |
+| 6 | Hero バッジ・サブタイトル | 逐語移植済み |
 
 ---
 
@@ -445,3 +447,4 @@ C-2 以降、Green コミットだけでは完了とせず legacy HTML の全コ
 | 日付 | 内容 |
 |------|------|
 | 2026-04-19 | 初版作成（Phase B-4 完了を受けて Phase C 詳細設計を Sonnet 実装向けにまとめる） |
+| 2026-05-01 | Phase C 全完了（C-1〜C-4）。§1.1 現在地・§10 残留事項を完了状態に更新 |
