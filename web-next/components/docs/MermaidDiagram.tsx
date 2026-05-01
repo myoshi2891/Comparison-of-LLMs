@@ -3,6 +3,14 @@ import { useEffect, useRef } from "react";
 
 type Props = { chart: string };
 
+/**
+ * Render a Mermaid diagram from the provided Mermaid chart source and update it when `chart` changes.
+ *
+ * Dynamically loads the `mermaid` library, injects the `chart` source into an internal container, and triggers Mermaid to render the diagram. Rendering is skipped if the component unmounts before the library loads.
+ *
+ * @param chart - Mermaid diagram source text to render
+ * @returns The React element containing the rendered Mermaid diagram
+ */
 export default function MermaidDiagram({ chart }: Props) {
   const ref = useRef<HTMLDivElement>(null);
 
