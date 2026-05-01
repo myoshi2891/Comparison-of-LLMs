@@ -9,9 +9,9 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- **最新 HEAD**: `e3405bd`（**feat(web-next): faithful migration of /copilot/agent s14**）
+- **最新 HEAD**: `48d159d`（**feat(web-next): faithful migration of /copilot/agent s15**）
 - **未コミット作業**: なし（working tree クリーン）
-- **次の作業**: C-4 s15 実装（lines 1784-1847）— 6. *.prompt.md /*.chatmode.md — 2 code + comparison table
+- **次の作業**: C-4 s16 実装（lines 1850-1903）— 7. AGENTS.md — card + compatGrid 5 cards + alert
 - **テスト数**: `bun run test` **469 tests（全件 pass）** — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
 - **ビルド**: `bun run build` 成功・`bun run typecheck` 成功・`uv run pytest` 5/5 passed
 
@@ -163,14 +163,14 @@ Next.js 移行プロジェクトの作業を再開してください。
 
 - リポジトリ: LLM-Studies（Phase A–F の Next.js 移行作業中）
 - 現在のブランチ: feat/nextjs-migration
-- 最新 HEAD: e3405bd（feat(web-next): faithful migration of /copilot/agent s14。git status は clean）
+- 最新 HEAD: 48d159d（feat(web-next): faithful migration of /copilot/agent s15。git status は clean）
 - 移行計画: docs/NEXTJS_PHASE_A_F_PLAN.md（Phase A–F）
 - 進捗トラッカー: MIGRATION_PROGRESS.md（**作業開始前に必読**: §「AI 作業ルール」R1（Biome scope）/ R2（faithful 必須）/「Phase C-2 faithful 移植継続ポイント」）
 - Phase C 詳細設計: docs/NEXTJS_PHASE_C_DETAILED_DESIGN.md（§5.4 C-4）
 - プロジェクト固有スキル: .claude/skills/nextjs-page-migration/SKILL.md
 - リポジトリ規約: CLAUDE.md（AGENTS.md / GEMINI.md からも参照される。AI 共通の編集ルール）
 
-次の作業: **C-4 s15 実装（即着手可能）** — s14（e3405bd）完了済み。次は lines 1784-1847 6. *.prompt.md / *.chatmode.md — 2 code + comparison table
+次の作業: **C-4 s16 実装（即着手可能）** — s15（48d159d）完了済み。次は lines 1850-1903 7. AGENTS.md — card + compatGrid 5 cards + alert
 
 C-4 作業手順:
 - **最初に `/nextjs-page-migration` スキルを呼び出す**（Claude Code の場合は Skill ツール経由、他の Coding Agent は `.claude/skills/nextjs-page-migration/SKILL.md` を Read してから開始）
