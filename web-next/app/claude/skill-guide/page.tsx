@@ -178,6 +178,127 @@ style D fill:#1c2033,stroke:#58a6ff,color:#e6edf3`}
               />
             </div>
           </section>
+
+          {/* ── 02 全体アーキテクチャ ── */}
+          <section id="arch" className={styles.sec}>
+            <div className={styles.secHeader}>
+              <span className={styles.secNum}>02</span>
+              <h2>全体アーキテクチャを理解する</h2>
+            </div>
+            <p>
+              SKILL.md を理解するには、まず Claude Code
+              の「記憶・拡張システム」の全体像を把握しましょう。
+            </p>
+            <div className={styles.mermaidWrap}>
+              <MermaidDiagram
+                chart={`graph TD
+subgraph MEM["💾 記憶システム（Memory）"]
+A["📄 CLAUDE.md\\n常時読み込み\\nプロジェクト設定・規約"]
+B["🤖 Auto Memory\\n~/.claude/projects/.../MEMORY.md\\nClaude が自動で記録"]
+end
+subgraph EXT["🔧 拡張システム（Extensions）"]
+C["⚡ Skills .claude/skills/\\nSKILL.md — 専門スキル手順書"]
+E["🤖 Agents .claude/agents/\\nagent.md — サブエージェント"]
+F["🔌 MCP Servers\\n外部ツール連携"]
+H["🧩 Plugins .claude/plugins/\\nplugin.json — サードパーティ拡張"]
+end
+G["🚀 Claude Code 起動"]
+G -->|自動読み込み| A
+G -->|自動読み込み| B
+G -->|必要時に動的読み込み| C
+G -->|タスク実行時| E
+G -->|設定した連携| F
+G -->|プラグイン登録| H
+style MEM fill:#1a2535,stroke:#3b5270,color:#e6edf3
+style EXT fill:#1a2535,stroke:#3b5270,color:#e6edf3`}
+              />
+            </div>
+            <div className={`${styles.callout} ${styles.calloutInfo}`}>
+              <span className={styles.calloutIcon}>ℹ️</span>
+              <p>
+                旧バージョンの <code>.claude/commands/</code> によるスラッシュコマンドは現在{" "}
+                <code>skills/</code> に統合されています。<code>invocation: explicit</code>
+                を指定することで同等の手動呼び出し動作が得られます。
+              </p>
+            </div>
+            <h3>各要素の役割比較</h3>
+            <div className={styles.tableWrap}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>機能</th>
+                    <th>ファイル</th>
+                    <th>呼び出し元</th>
+                    <th>用途</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <strong>CLAUDE.md</strong>
+                    </td>
+                    <td>
+                      <code>CLAUDE.md</code>
+                    </td>
+                    <td>
+                      <span className={`${styles.badge} ${styles.badgeGreen}`}>自動・常時</span>
+                    </td>
+                    <td>プロジェクト規約・コーディングスタイル</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong>SKILL.md</strong>
+                    </td>
+                    <td>
+                      <code>skills/xxx/SKILL.md</code>
+                    </td>
+                    <td>
+                      <span className={`${styles.badge} ${styles.badgeBlue}`}>Claude が自動</span>
+                      {" / "}
+                      <span className={`${styles.badge} ${styles.badgePurple}`}>/コマンド</span>
+                    </td>
+                    <td>専門タスクの手順書・ワークフロー</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong>Agent</strong>
+                    </td>
+                    <td>
+                      <code>agents/xxx.md</code>
+                    </td>
+                    <td>
+                      <span className={`${styles.badge} ${styles.badgeOrange}`}>タスク実行時</span>
+                    </td>
+                    <td>サブエージェントの役割定義</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong>Plugin</strong>
+                    </td>
+                    <td>
+                      <code>plugins/xxx/plugin.json</code>
+                    </td>
+                    <td>
+                      <span className={`${styles.badge} ${styles.badgeOrange}`}>
+                        /plugin install
+                      </span>
+                    </td>
+                    <td>サードパーティ機能拡張</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong>MCP Servers</strong>
+                    </td>
+                    <td>設定ファイル</td>
+                    <td>
+                      <span className={`${styles.badge} ${styles.badgeOrange}`}>連携設定時</span>
+                    </td>
+                    <td>外部ツール・API連携</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </main>
       </div>
     </div>
