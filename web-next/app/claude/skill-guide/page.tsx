@@ -1011,6 +1011,161 @@ style SKILLMD fill:#1c2a1c,stroke:#3fb950,color:#e6edf3`}
               </div>
             </div>
           </section>
+
+          {/* ── 09 YAMLフロントマター 全フィールド解説 ── */}
+          <section id="yaml" className={styles.sec}>
+            <div className={styles.secHeader}>
+              <span className={styles.secNum}>09</span>
+              <h2>YAMLフロントマター 全フィールド解説</h2>
+            </div>
+            <div className={styles.mermaidWrap}>
+              <MermaidDiagram
+                chart={`graph TD
+FM["--- YAMLフロントマター ---"]
+FM --> N["📛 name\\nスキル名・/slash-commandの名前になる\\n最大64文字、小文字・数字・ハイフンのみ"]
+FM --> D["📝 description\\n最重要 いつ使うかをClaudeが判断する\\n最大1024文字。具体的なトリガーワードを含める"]
+FM --> AT["🔒 allowed-tools\\nスキルで使えるツールを制限\\n例: Read, Write, Bash, Grep, Glob"]
+FM --> INV["⚡ invocation\\nautomatic: Claude自動判断（デフォルト）\\nexplicit: /コマンドのみ実行"]
+FM --> CTX["🔀 context\\nfork: 独立したコンテキストで実行\\ninherit: メイン会話を引き継ぐ（デフォルト）"]
+FM --> AG["🤖 agent\\ngeneral-purpose（デフォルト）\\nExplore / Plan / カスタム"]
+FM --> VER["🏷️ version\\nスキルのバージョン管理\\n例: version: 1.0.0"]
+style FM fill:#1c2a1c,stroke:#3fb950,color:#e6edf3`}
+              />
+            </div>
+            <h3>完全な設定例</h3>
+            <div className={styles.codeBlock}>
+              <div className={styles.codeBlockHeader}>
+                <div className={styles.codeBlockDots}>
+                  <div className={`${styles.dot} ${styles.dotR}`} />
+                  <div className={`${styles.dot} ${styles.dotY}`} />
+                  <div className={`${styles.dot} ${styles.dotG}`} />
+                </div>
+                <span className={styles.codeBlockLang}>SKILL.md — YAMLフロントマター完全版</span>
+              </div>
+              <pre>
+                <code>
+                  <span className={styles.cmt}>---</span>
+                  {"\n"}
+                  <span className={styles.key}>name</span>
+                  {": "}
+                  <span className={styles.str}>security-audit</span>
+                  {"\n"}
+                  <span className={styles.key}>description</span>
+                  {": "}
+                  <span className={styles.str}>{">"}</span>
+                  {"\n"}
+                  {"  "}
+                  <span className={styles.str}>コードのセキュリティ監査を行う。</span>
+                  {"\n"}
+                  {"  "}
+                  <span className={styles.str}>
+                    「セキュリティをチェックして」「脆弱性を探して」と言われたときに使用する。
+                  </span>
+                  {"\n"}
+                  <span className={styles.key}>allowed-tools</span>
+                  {":\n"}
+                  {"  - "}
+                  <span className={styles.val}>Read</span>
+                  {"\n"}
+                  {"  - "}
+                  <span className={styles.val}>Grep</span>
+                  {"\n"}
+                  {"  - "}
+                  <span className={styles.val}>Glob</span>
+                  {"\n"}
+                  <span className={styles.key}>invocation</span>
+                  {": "}
+                  <span className={styles.val}>automatic</span>
+                  {"\n"}
+                  <span className={styles.key}>context</span>
+                  {": "}
+                  <span className={styles.val}>fork</span>
+                  {"\n"}
+                  <span className={styles.key}>agent</span>
+                  {": "}
+                  <span className={styles.val}>general-purpose</span>
+                  {"\n"}
+                  <span className={styles.key}>version</span>
+                  {": "}
+                  <span className={styles.str}>&quot;1.0.0&quot;</span>
+                  {"\n"}
+                  <span className={styles.cmt}>---</span>
+                </code>
+              </pre>
+            </div>
+            <h3>
+              <code>context: fork</code> の具体的な使用例
+            </h3>
+            <p>
+              <code>context: fork</code>
+              を指定すると、メイン会話のコンテキストを保持したまま独立した環境でスキルを実行します。完了後は
+              <strong>最終結果だけ</strong>がメインに返却されます。
+            </p>
+            <div className={styles.tableWrap}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>シーン</th>
+                    <th>context: fork が有効な理由</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>セキュリティ監査・静的解析</td>
+                    <td>大量の読み取りログがメイン会話を圧迫しない</td>
+                  </tr>
+                  <tr>
+                    <td>ドキュメント自動生成</td>
+                    <td>生成過程の試行錯誤をメインに残さない</td>
+                  </tr>
+                  <tr>
+                    <td>データ変換・バッチ処理</td>
+                    <td>中間成果物をコンテキストから除外できる</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>
+              <code>/skill-creator</code> コマンドでスキルを自動生成する
+            </h3>
+            <p>
+              Claude Code には
+              <code>/skill-creator</code>
+              という組み込みメタスキルが付属しています。自然言語で要件を伝えるだけで公式ベストプラクティスに準拠したスキルの雛形を生成できます。
+            </p>
+            <div className={styles.codeBlock}>
+              <div className={styles.codeBlockHeader}>
+                <div className={styles.codeBlockDots}>
+                  <div className={`${styles.dot} ${styles.dotR}`} />
+                  <div className={`${styles.dot} ${styles.dotY}`} />
+                  <div className={`${styles.dot} ${styles.dotG}`} />
+                </div>
+                <span className={styles.codeBlockLang}>Terminal</span>
+              </div>
+              <pre>
+                <code>
+                  <span className={styles.str}>{">"}</span>
+                  {" /skill-creator\n\n"}
+                  <span className={styles.cmt}># または自然言語で依頼</span>
+                  {"\n"}
+                  <span className={styles.str}>{">"}</span>
+                  {
+                    ' "/skill-creator を使って、UIデザインを最適化し\n   ブラウザで検証するスキルを作成して"'
+                  }
+                </code>
+              </pre>
+            </div>
+            <div className={`${styles.callout} ${styles.calloutTip}`}>
+              <span className={styles.calloutIcon}>💡</span>
+              <p>
+                Agent Teams (<code>--team</code>) 利用時は <code>/effort</code> コマンドで思考深度を{" "}
+                <code>low</code>・<code>medium</code>・<code>high</code>{" "}
+                から選択できます。スキル内に <code>effort: high</code> を frontmatter
+                で指定することも可能です（Opus 4.6 使用時のみ有効）。<code>/loop</code>{" "}
+                コマンドを使えばスキルを定期的に繰り返し実行させることもできます。
+              </p>
+            </div>
+          </section>
         </main>
       </div>
     </div>
