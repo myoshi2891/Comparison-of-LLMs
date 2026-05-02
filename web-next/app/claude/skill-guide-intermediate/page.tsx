@@ -512,7 +512,229 @@ style E fill:#2d1f4a,stroke:#b794f4,color:#ffffff`}
             <h2>インストラクション設計 — 自由度のコントロール</h2>
             <div className={styles.secLine} />
           </div>
-          {/* faithful content: D-2 Green s03 */}
+          <p>
+            インストラクション本文の設計において最も重要な原則は、タスクの特性に応じて
+            <strong>エージェントへの裁量の幅（自由度）</strong>を適切にコントロールすることだ。
+          </p>
+          <div className={styles.quadrantWrap}>
+            <div
+              className={styles.chartTitle}
+              style={{ textAlign: "center", marginBottom: "16px" }}
+            >
+              エージェント自由度 vs タスクの破壊性（リスク）
+            </div>
+            <div className={styles.quadrantContainer}>
+              <div className={`${styles.quadBg} ${styles.quadTl}`}>
+                <span>
+                  推奨: 厳密手順
+                  <br />+ ガードレール
+                </span>
+              </div>
+              <div className={`${styles.quadBg} ${styles.quadTr}`}>
+                <span>
+                  ⚠️ 危険ゾーン
+                  <br />
+                  （避けるべき）
+                </span>
+              </div>
+              <div className={`${styles.quadBg} ${styles.quadBl}`}>
+                <span>
+                  ✅ OK
+                  <br />
+                  ガイドラインで十分
+                </span>
+              </div>
+              <div className={`${styles.quadBg} ${styles.quadBr}`}>
+                <span>
+                  ✅ 最適
+                  <br />
+                  高い自由度を活用
+                </span>
+              </div>
+              <div className={styles.quadAxisXLeft}>← 低い自由度（厳密手順）</div>
+              <div className={styles.quadAxisXRight}>高い自由度（ガイドライン）→</div>
+              <div className={styles.quadAxisYTop}>高リスク ↑</div>
+              <div className={styles.quadAxisYBottom}>↓ 低リスク</div>
+              <div
+                className={styles.quadDot}
+                role="img"
+                aria-label="DBマイグレーション"
+                style={{ left: "15%", top: "10%", background: "var(--red)", color: "var(--red)" }}
+                data-label="DBマイグレーション"
+                data-color="var(--accent-red)"
+              />
+              <div
+                className={styles.quadDot}
+                role="img"
+                aria-label="本番デプロイ"
+                style={{ left: "15%", top: "18%", background: "var(--red)", color: "var(--red)" }}
+                data-label="本番デプロイ"
+                data-color="var(--accent-red)"
+              />
+              <div
+                className={styles.quadDot}
+                role="img"
+                aria-label="セキュリティスキャン"
+                style={{
+                  left: "50%",
+                  top: "43%",
+                  background: "var(--orange)",
+                  color: "var(--orange)",
+                }}
+                data-label="セキュリティスキャン"
+                data-color="var(--accent-orange)"
+              />
+              <div
+                className={styles.quadDot}
+                role="img"
+                aria-label="コードレビュー"
+                style={{ left: "70%", top: "72%", background: "var(--cyan)", color: "var(--cyan)" }}
+                data-label="コードレビュー"
+                data-color="var(--accent-cyan)"
+              />
+              <div
+                className={styles.quadDot}
+                role="img"
+                aria-label="テキスト要約"
+                style={{
+                  left: "85%",
+                  top: "78%",
+                  background: "var(--green)",
+                  color: "var(--green)",
+                }}
+                data-label="テキスト要約"
+                data-color="var(--accent-green)"
+              />
+              <div
+                className={styles.quadDot}
+                role="img"
+                aria-label="READMEアップデート"
+                style={{
+                  left: "78%",
+                  top: "75%",
+                  background: "var(--green)",
+                  color: "var(--green)",
+                }}
+                data-label="READMEアップデート"
+                data-color="var(--accent-green)"
+              />
+            </div>
+            <div className={styles.quadLegend}>
+              <span className={styles.legendItem}>
+                <span className={styles.legendDot} style={{ background: "var(--red)" }} />
+                Low Freedom 必須
+              </span>
+              <span className={styles.legendItem}>
+                <span className={styles.legendDot} style={{ background: "var(--orange)" }} />
+                Medium Freedom
+              </span>
+              <span className={styles.legendItem}>
+                <span className={styles.legendDot} style={{ background: "var(--cyan)" }} />
+                High Freedom 推奨
+              </span>
+              <span className={styles.legendItem}>
+                <span className={styles.legendDot} style={{ background: "var(--green)" }} />
+                High Freedom 最適
+              </span>
+            </div>
+          </div>
+          <div className={styles.grid3}>
+            <div className={styles.card}>
+              <div className={styles.cardTitle}>
+                <span className={`${styles.tag} ${styles.tagGreen}`}>High Freedom</span>
+              </div>
+              <p style={{ fontSize: "13px" }}>
+                テキスト要約・コードレビューなど、複数のアプローチが許容されるタスク。
+                <strong>高レベルなガイドライン</strong>
+                を与え、エージェントの推論能力を最大活用。
+              </p>
+              <div style={{ fontSize: "12px", color: "var(--text3)" }}>
+                → 「〇〇の観点でレビューせよ」
+              </div>
+            </div>
+            <div className={styles.card}>
+              <div className={styles.cardTitle}>
+                <span className={`${styles.tag} ${styles.tagOrange}`}>Medium Freedom</span>
+              </div>
+              <p style={{ fontSize: "13px" }}>
+                定型レポート生成など、好ましいフォーマットが存在するタスク。
+                <strong>テンプレートやパラメータ化された擬似コード</strong>を提供。
+              </p>
+              <div style={{ fontSize: "12px", color: "var(--text3)" }}>
+                → 出力テンプレートを明示する
+              </div>
+            </div>
+            <div className={styles.card}>
+              <div className={styles.cardTitle}>
+                <span className={`${styles.tag} ${styles.tagRed}`}>Low Freedom</span>
+              </div>
+              <p style={{ fontSize: "13px" }}>
+                DBマイグレーション・本番デプロイなど、わずかなミスが致命的なタスク。
+                <strong>判断の余地を一切与えず</strong>、厳密な手順書と検証ガードレールのみ。
+              </p>
+              <div style={{ fontSize: "12px", color: "var(--text3)" }}>
+                → スクリプトと検証ステップを明示
+              </div>
+            </div>
+          </div>
+          <h3>ファイル参照の設計ルール</h3>
+          <div className={`${styles.callout} ${styles.calloutWarn}`}>
+            <span className={styles.calloutIcon}>⚠️</span>
+            <strong>重要：</strong>外部ファイル参照は必ず「1階層（One level deep）」に留めること。
+            <code>SKILL.md → A.md → B.md</code>
+            のような深いネスト構造は、エージェントのプレビュー読み込み時に情報が不完全になるリスクを生む。
+          </div>
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram
+              chart={`graph TD
+S["SKILL.md<br>本文 500行未満"] --> R1["references/api-spec.md<br>詳細なAPI仕様"]
+S --> R2["references/style-guide.md<br>コーディング規約"]
+S --> SC["scripts/validate.sh<br>検証スクリプト"]
+R1 -. NG ネスト禁止 .-> R3["references/detail/deep.md"]
+R2 -. NG ネスト禁止 .-> R4["references/sub/more.md"]
+style S fill:#1a4040,stroke:#4fd1c5,color:#ffffff
+style R1 fill:#1a3a5c,stroke:#63b3ed,color:#ffffff
+style R2 fill:#1a3a5c,stroke:#63b3ed,color:#ffffff
+style SC fill:#2d1f4a,stroke:#b794f4,color:#ffffff
+style R3 fill:#4a1a1a,stroke:#fc8181,color:#ffffff
+style R4 fill:#4a1a1a,stroke:#fc8181,color:#ffffff`}
+            />
+          </div>
+          <h3>推奨ファイル構造（完全形）</h3>
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <div className={styles.codeDots}>
+                <div className={styles.codeDot} />
+                <div className={styles.codeDot} />
+                <div className={styles.codeDot} />
+              </div>
+              <span className={styles.codeLang}>Directory Structure</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.cs}>{"~/.claude/skills/security-audit/"}</span>
+              {"\n"}
+              <span className={styles.cc}>{"├── SKILL.md              ← 本体（500行未満）"}</span>
+              {"\n"}
+              <span className={styles.cc}>{"├── references/"}</span>
+              {"\n"}
+              <span className={styles.cc}>{"│   ├── owasp-top10.md    ← 参照資料（TOC必須）"}</span>
+              {"\n"}
+              <span className={styles.cc}>{"│   └── severity-matrix.md"}</span>
+              {"\n"}
+              <span className={styles.cc}>{"└── scripts/"}</span>
+              {"\n"}
+              <span className={styles.cc}>
+                {"    ├── scan.sh           ← Claudeが実行するスクリプト"}
+              </span>
+              {"\n"}
+              <span className={styles.cc}>{"    └── report.py         ← レポート生成"}</span>
+            </div>
+          </div>
+          <div className={`${styles.callout} ${styles.calloutTip}`}>
+            <span className={styles.calloutIcon}>✅</span>
+            100行を超える参照ファイルには、ファイル冒頭に<strong>目次（TOC）</strong>
+            を設置すること。エージェントがファイル全体のスコープを正確に把握できるようになる。
+          </div>
         </div>
 
         {/* ── Section 04: args ── */}
