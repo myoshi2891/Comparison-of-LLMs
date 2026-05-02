@@ -1,8 +1,18 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import Page from "./page";
+import Page, { metadata } from "./page";
 
 describe("/claude/skill-guide 契約テスト", () => {
+  it("metadata.title が非空文字列である", () => {
+    expect(typeof metadata.title).toBe("string");
+    expect((metadata.title as string).length).toBeGreaterThan(0);
+  });
+
+  it("metadata.description が非空文字列である", () => {
+    expect(typeof metadata.description).toBe("string");
+    expect((metadata.description as string).length).toBeGreaterThan(0);
+  });
+
   it("h1 に SKILL.md が含まれる", () => {
     const { container } = render(<Page />);
     expect(container.querySelector("h1")?.textContent).toContain("SKILL.md");
@@ -20,8 +30,9 @@ describe("/claude/skill-guide 契約テスト", () => {
 
   it("外部リンクに target=_blank と rel=noopener noreferrer が付与されている", () => {
     const { container } = render(<Page />);
-    const external = Array.from(container.querySelectorAll('a[target="_blank"]'));
+    const external = Array.from(container.querySelectorAll('a[href^="http"]'));
     for (const a of external) {
+      expect(a.getAttribute("target")).toBe("_blank");
       expect(a.getAttribute("rel")).toBe("noopener noreferrer");
     }
   });

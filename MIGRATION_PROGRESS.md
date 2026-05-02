@@ -44,6 +44,10 @@
 
      ```bash
      # セクション行範囲を <start>,<end> で指定して該当範囲のみ集計
+     # ⚠️ <start> と <end> はシェル変数ではなく数値リテラルのプレースホルダー。
+     #    MIGRATION_PROGRESS.md の「セクション行範囲」テーブルを参照して
+     #    実際の行番号（例: 2071, 2206）に置き換えてから実行すること。
+     #    SECTION_ID / LEGACY_HTML / PAGE_PATH は変数として使用する。
      SECTION_ID="s07"   # 実装中のセクション ID に変更すること
      LEGACY_HTML="legacy/<provider>/<slug>.html"            # 例: legacy/claude/skill-guide-for-claude.html
      PAGE_PATH="web-next/app/<provider>/<slug>/page.tsx"    # 例: web-next/app/claude/skill-guide/page.tsx
@@ -141,7 +145,7 @@ web-next/
 └── app/copilot/agent/       # Phase C-4（faithful 移植完了）
 ```
 
-**テスト数**: **473 tests（+1 failed / 474 total）** — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
+**テスト数**: **483 passed / 483 total（全 Green）** — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
 
 ## 確定した設計判断（`docs/NEXTJS_MIGRATION_PLAN.md` ステップ 0）
 
@@ -183,7 +187,7 @@ D-2 のファイル: `legacy/claude/skill-guide-of-claude-for-intermediate.html`
 - `MermaidDiagram` は `components/docs/MermaidDiagram.tsx` に実装済み（mermaid@10.9.5、next/dynamic ssr:false で使用）
 - セクション行範囲（D-2 実際の行番号）:
   - hero: 1186-1199 / toc: 1202-1233
-  - arch: 1236-1387（Section 01）← **次に実装する**
+  - arch: 1236-1387（Section 01）
   - yaml: 1388-1529（Section 02）
   - instruction: 1530-1717（Section 03）
   - args: 1718-1851（Section 04）
@@ -191,7 +195,7 @@ D-2 のファイル: `legacy/claude/skill-guide-of-claude-for-intermediate.html`
   - trigger: 1983-2070（Section 06）
   - debug: 2071-2206（Section 07）
   - enterprise: 2207-2317（Section 08）
-  - self: 2318-2761（Section 09）
+  - self: 2318-2761（Section 09）← **次に実装する**
 - CSS Module: `page.module.css` に全 CSS クラス定義済み（camelCase）
 - 外部リンク（フッターに 2 つ）: `target="_blank" rel="noopener noreferrer"` 付与済み
 - lint 既知違反: 7 件（旧記載「6 件」は誤記）
@@ -218,7 +222,7 @@ D-2 のファイル: `legacy/claude/skill-guide-of-claude-for-intermediate.html`
   (cd web-next && bun run test)          # 全件 pass が期待値（現在 483 件 全 pass）
   (cd web-next && bun run typecheck)     # OK
   (cd web-next && bun run build)         # 全ルートが ○ (Static)
-  (cd web-next && bun run lint)          # 既知 6 件のみ（新規違反ゼロが必須）
+  (cd web-next && bun run lint)          # 既知 7 件のみ（新規違反ゼロが必須）
   (cd scraper && uv run pytest)          # 5/5 passed
 
 既知の持越し（別 Issue で対応、本作業では触らない）:

@@ -1151,7 +1151,7 @@ style C2 fill:#1a4040,stroke:#4fd1c5,color:#ffffff`}
 
           <h3>Description チューニングのベストプラクティス</h3>
           <div className={styles.card}>
-            <ol style={{ fontSize: "14px", color: "var(--text-secondary)" }}>
+            <ol style={{ fontSize: "14px", color: "var(--text2)" }}>
               <li style={{ marginBottom: "10px" }}>
                 実行する内容だけでなく、
                 <strong>具体的なトリガーキーワード</strong>
@@ -1197,14 +1197,14 @@ style C2 fill:#1a4040,stroke:#4fd1c5,color:#ffffff`}
               <div
                 style={{
                   fontSize: "14px",
-                  color: "var(--text-primary)",
+                  color: "var(--text)",
                   fontWeight: 500,
                   marginBottom: "6px",
                 }}
               >
                 フルデバッグモード
               </div>
-              <div style={{ fontSize: "13px", color: "var(--text-secondary)" }}>
+              <div style={{ fontSize: "13px", color: "var(--text2)" }}>
                 システム全体のデバッグを有効化。エージェントがどのスキルを評価し、どのツールを呼び出し、どのようなプロンプトを構築しているかの詳細なログをターミナルにストリーミング出力する。
               </div>
               <div className={styles.codeBlock} style={{ marginTop: "10px" }}>
@@ -1228,14 +1228,14 @@ style C2 fill:#1a4040,stroke:#4fd1c5,color:#ffffff`}
               <div
                 style={{
                   fontSize: "14px",
-                  color: "var(--text-primary)",
+                  color: "var(--text)",
                   fontWeight: 500,
                   marginBottom: "6px",
                 }}
               >
                 カテゴリ絞り込みデバッグ
               </div>
-              <div style={{ fontSize: "13px", color: "var(--text-secondary)" }}>
+              <div style={{ fontSize: "13px", color: "var(--text2)" }}>
                 特定のログカテゴリのみにフィルタリングして表示。感嘆符で除外も可能。
               </div>
               <div className={styles.codeBlock} style={{ marginTop: "10px" }}>
@@ -1264,14 +1264,14 @@ style C2 fill:#1a4040,stroke:#4fd1c5,color:#ffffff`}
               <div
                 style={{
                   fontSize: "14px",
-                  color: "var(--text-primary)",
+                  color: "var(--text)",
                   fontWeight: 500,
                   marginBottom: "6px",
                 }}
               >
                 スキル一時無効化
               </div>
-              <div style={{ fontSize: "13px", color: "var(--text-secondary)" }}>
+              <div style={{ fontSize: "13px", color: "var(--text2)" }}>
                 現在のセッションにおいて全スキルとスラッシュコマンドを強制無効化。特定スキルが干渉していないか切り分けるための一時的な回避策。
               </div>
               <div className={styles.codeBlock} style={{ marginTop: "10px" }}>
@@ -1295,14 +1295,14 @@ style C2 fill:#1a4040,stroke:#4fd1c5,color:#ffffff`}
               <div
                 style={{
                   fontSize: "14px",
-                  color: "var(--text-primary)",
+                  color: "var(--text)",
                   fontWeight: 500,
                   marginBottom: "6px",
                 }}
               >
                 ツール強制禁止
               </div>
-              <div style={{ fontSize: "13px", color: "var(--text-secondary)" }}>
+              <div style={{ fontSize: "13px", color: "var(--text2)" }}>
                 指定したツールをモデルのコンテキストから完全削除。開発中に破壊的なコマンドを絶対に実行させないための強力なセーフティネット。
               </div>
               <div className={styles.codeBlock} style={{ marginTop: "10px" }}>

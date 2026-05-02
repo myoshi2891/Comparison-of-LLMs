@@ -33,7 +33,7 @@ git rev-parse --short HEAD                    # 最新 HEAD を取得
 (cd web-next && bun run build)                # ビルド成功を確認
 (cd web-next && bun run typecheck)            # 型エラーゼロを確認
 (cd web-next && bun run test)                 # pass 件数を確認
-(cd web-next && bun run lint)                 # 既知 6 件のみか確認
+(cd web-next && bun run lint)                 # 既知 7 件のみか確認
 (cd scraper && uv run pytest)                 # Python テスト 5/5 を確認
 ```
 
