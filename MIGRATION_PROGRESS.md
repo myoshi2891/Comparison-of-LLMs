@@ -9,9 +9,9 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- **最新 HEAD**: `d491da8`（**feat(web-next): D-2 Red scaffold — /claude/skill-guide-intermediate (5 contract tests pass)**）
+- **最新 HEAD**: `c3beb19`（**feat(web-next): D-2 Green s01 — /claude/skill-guide-intermediate arch (3-layer arch + token chart + sequence diagram)**）
 - **未コミット作業**: なし（working tree クリーン）
-- **次の作業**: **D-2 Green 移植開始 — Section 01 (arch: 1236-1387 行) から faithful 移植**
+- **次の作業**: **D-2 Green s02 移植 — Section 02 (yaml: 1388-1529 行) faithful 移植**
 - **テスト数**: `bun run test` **479 passed / 479 total（全 Green）** — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
 - **ビルド**: `bun run build` 成功（13 ルート全 Static）・`bun run typecheck` 成功・`uv run pytest` 5/5 passed
 - **lint 既知違反**: 7 件（MIGRATION_PROGRESS.md の旧記載「6 件」は誤記。正しくは 7 件）
@@ -166,13 +166,13 @@ Next.js 移行プロジェクトの作業を再開してください。
 
 - リポジトリ: LLM-Studies（Phase A–F の Next.js 移行作業中）
 - 現在のブランチ: feat/nextjs-migration
-- 最新 HEAD: d491da8（feat(web-next): D-2 Red scaffold — /claude/skill-guide-intermediate (5 contract tests pass)）
+- 最新 HEAD: c3beb19（feat(web-next): D-2 Green s01 — /claude/skill-guide-intermediate arch）
 - 移行計画: docs/NEXTJS_PHASE_A_F_PLAN.md（Phase A–F）§Phase D を参照
 - 進捗トラッカー: MIGRATION_PROGRESS.md（**作業開始前に必読**: §「AI 作業ルール」R1〜R4）
 - プロジェクト固有スキル: .claude/skills/nextjs-page-migration/SKILL.md
 - リポジトリ規約: CLAUDE.md（AGENTS.md / GEMINI.md からも参照される。AI 共通の編集ルール）
 
-次の作業: **D-2 (`/claude/skill-guide-intermediate`) Green 移植 — Section 01 (arch) から開始**。Red scaffold コミット済み（d491da8）。
+次の作業: **D-2 (`/claude/skill-guide-intermediate`) Green 移植 — Section 02 (yaml: 1388-1529 行) から再開**。s01 (arch) 完了済み（c3beb19）。
 Phase D の対象は長文ガイド 9 ページ（すべて `.html` → JSX 直接移植。**MDX・`.md` SSoT 方式は不採用**）:
 - Claude: skill-guide-for-claude ✅ / skill-guide-of-claude-for-intermediate (D-2: Red 完了・Green 着手) / claude-cowork-guide
 - Gemini: skill-guide-for-gemini / skill-guide-of-gemini-for-intermediate / antigravity-guide
