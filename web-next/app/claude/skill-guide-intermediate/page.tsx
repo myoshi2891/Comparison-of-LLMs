@@ -1186,7 +1186,160 @@ style C2 fill:#1a4040,stroke:#4fd1c5,color:#ffffff`}
             <h2>デバッグ技術 — CLI フラグ完全リファレンス</h2>
             <div className={styles.secLine} />
           </div>
-          {/* faithful content: D-2 Green s07 */}
+          <p>
+            スキルが期待通りに動作しない場合、Claude Code の CLI
+            フラグを使用してエージェントのブラックボックス化された推論プロセスを可視化できる。
+          </p>
+
+          <div className={styles.flagCard}>
+            <div className={styles.flagName}>--debug</div>
+            <div>
+              <div
+                style={{
+                  fontSize: "14px",
+                  color: "var(--text-primary)",
+                  fontWeight: 500,
+                  marginBottom: "6px",
+                }}
+              >
+                フルデバッグモード
+              </div>
+              <div style={{ fontSize: "13px", color: "var(--text-secondary)" }}>
+                システム全体のデバッグを有効化。エージェントがどのスキルを評価し、どのツールを呼び出し、どのようなプロンプトを構築しているかの詳細なログをターミナルにストリーミング出力する。
+              </div>
+              <div className={styles.codeBlock} style={{ marginTop: "10px" }}>
+                <div className={styles.codeContent}>
+                  <pre>
+                    {"claude "}
+                    <span className={styles.ck}>--debug</span>
+                    {"\n"}
+                    <span className={styles.cc}>
+                      {"# ← スキルが起動しない原因、スクリプト実行エラーの特定に最適"}
+                    </span>
+                  </pre>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.flagCard}>
+            <div className={styles.flagName}>--debug &quot;api,hooks&quot;</div>
+            <div>
+              <div
+                style={{
+                  fontSize: "14px",
+                  color: "var(--text-primary)",
+                  fontWeight: 500,
+                  marginBottom: "6px",
+                }}
+              >
+                カテゴリ絞り込みデバッグ
+              </div>
+              <div style={{ fontSize: "13px", color: "var(--text-secondary)" }}>
+                特定のログカテゴリのみにフィルタリングして表示。感嘆符で除外も可能。
+              </div>
+              <div className={styles.codeBlock} style={{ marginTop: "10px" }}>
+                <div className={styles.codeContent}>
+                  <pre>
+                    {"claude "}
+                    <span className={styles.ck}>--debug</span>{" "}
+                    <span className={styles.cs}>&quot;api,hooks&quot;</span>
+                    {"   "}
+                    <span className={styles.cc}># API通信とフック処理のみ</span>
+                    {"\n"}
+                    {"claude "}
+                    <span className={styles.ck}>--debug</span>{" "}
+                    <span className={styles.cs}>&quot;!statsig&quot;</span>
+                    {"    "}
+                    <span className={styles.cc}># statsig ログを除外</span>
+                  </pre>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.flagCard}>
+            <div className={styles.flagName}>--disable-slash-commands</div>
+            <div>
+              <div
+                style={{
+                  fontSize: "14px",
+                  color: "var(--text-primary)",
+                  fontWeight: 500,
+                  marginBottom: "6px",
+                }}
+              >
+                スキル一時無効化
+              </div>
+              <div style={{ fontSize: "13px", color: "var(--text-secondary)" }}>
+                現在のセッションにおいて全スキルとスラッシュコマンドを強制無効化。特定スキルが干渉していないか切り分けるための一時的な回避策。
+              </div>
+              <div className={styles.codeBlock} style={{ marginTop: "10px" }}>
+                <div className={styles.codeContent}>
+                  <pre>
+                    {"claude "}
+                    <span className={styles.ck}>--disable-slash-commands</span>
+                    {"\n"}
+                    <span className={styles.cc}>
+                      {"# ← スキルが干渉してピュアなLLM対話が妨げられている場合"}
+                    </span>
+                  </pre>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.flagCard}>
+            <div className={styles.flagName}>--disallowedTools</div>
+            <div>
+              <div
+                style={{
+                  fontSize: "14px",
+                  color: "var(--text-primary)",
+                  fontWeight: 500,
+                  marginBottom: "6px",
+                }}
+              >
+                ツール強制禁止
+              </div>
+              <div style={{ fontSize: "13px", color: "var(--text-secondary)" }}>
+                指定したツールをモデルのコンテキストから完全削除。開発中に破壊的なコマンドを絶対に実行させないための強力なセーフティネット。
+              </div>
+              <div className={styles.codeBlock} style={{ marginTop: "10px" }}>
+                <div className={styles.codeContent}>
+                  <pre>
+                    {"claude "}
+                    <span className={styles.ck}>--disallowedTools</span>{" "}
+                    <span className={styles.cs}>&quot;Bash(git push *)&quot;</span>{" "}
+                    <span className={styles.cs}>&quot;Edit&quot;</span>
+                    {"\n"}
+                    <span className={styles.cc}>{"# ← git push と直接ファイル編集を完全禁止"}</span>
+                  </pre>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h3>デバッグフロー</h3>
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram
+              chart={`flowchart TD
+A["スキルが期待通りに動かない"] --> B{"どの段階で失敗？"}
+B --> C["スキルがトリガーされない<br>トリガーフェーズ"]
+B --> D["スキルは起動するが<br>出力が不正確 実行フェーズ"]
+C --> C1["--debug で確認<br>どのスキルを評価したか？"]
+C1 --> C2{"description に<br>トリガーワードあるか？"}
+C2 -- No --> C3["description を書き直す<br>キーワード 同義語を追加"]
+C2 -- Yes --> C4["/skill-name で手動実行<br>ファイルパスの確認"]
+D --> D1["--debug api,hooks で<br>実行ログを詳細確認"]
+D1 --> D2["インストラクション内に<br>エラーハンドリングを追加"]
+D2 --> D3["フィードバックループを<br>本文に明示する"]
+style C fill:#4a1a1a,stroke:#fc8181,color:#ffffff
+style D fill:#3a2a00,stroke:#f6ad55,color:#ffffff
+style C3 fill:#1a4040,stroke:#4fd1c5,color:#ffffff
+style D3 fill:#1a4040,stroke:#4fd1c5,color:#ffffff`}
+            />
+          </div>
         </div>
 
         {/* ── Section 08: enterprise ── */}
