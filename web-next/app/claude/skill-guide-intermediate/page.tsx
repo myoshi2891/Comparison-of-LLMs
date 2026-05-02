@@ -1349,7 +1349,117 @@ style D3 fill:#1a4040,stroke:#4fd1c5,color:#ffffff`}
             <h2>Enterpriseプロビジョニング — 組織全体への展開</h2>
             <div className={styles.secLine} />
           </div>
-          {/* faithful content: D-2 Green s08 */}
+          <p>
+            TeamプランおよびEnterpriseプランでは、管理者が検証済みスキルを全社に一括展開できる。個人スキルと比較して、
+            <strong>セキュリティ・コンプライアンス・運用管理</strong>
+            の観点が加わる。
+          </p>
+
+          <div className={`${styles.callout} ${styles.calloutDanger}`}>
+            <span className={styles.calloutIcon}>🔐</span>
+            <strong>前提条件：</strong>
+            プロビジョニングを実行するには、組織レベルで「コード実行とファイル作成（Code execution
+            and file creation）」機能が明示的に有効化されている必要がある。
+          </div>
+
+          <h3>プロビジョニング手順</h3>
+          <div className={styles.steps}>
+            <div className={styles.step} data-n="1">
+              <div className={styles.stepTitle}>スキルのパッケージ化</div>
+              <p>
+                スキルディレクトリ全体を、
+                <strong>ディレクトリ名と完全一致する名前の ZIP ファイル</strong>
+                に圧縮する。ZIP のルート階層がスキルディレクトリ自体であることを確認する。
+              </p>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeContent}>
+                  <pre>
+                    <span className={styles.cc}># 正しい構造の確認</span>
+                    {"\n"}
+                    {"unzip -l team-reviewer.zip"}
+                    {"\n"}
+                    <span className={styles.cc}># 期待される出力:</span>
+                    {"\n"}
+                    <span className={styles.cs}>team-reviewer/SKILL.md</span>
+                    {"\n"}
+                    <span className={styles.cs}>team-reviewer/references/checklist.md</span>
+                    {"\n"}
+                    <span className={styles.cs}>team-reviewer/scripts/lint.sh</span>
+                    {"\n\n"}
+                    <span className={styles.cc}># ZIPを作成</span>
+                    {"\n"}
+                    {"cd ~/.claude/skills"}
+                    {"\n"}
+                    {"zip -r team-reviewer.zip team-reviewer/"}
+                  </pre>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.step} data-n="2">
+              <div className={styles.stepTitle}>アップロードと展開</div>
+              <p>
+                管理者が
+                <strong>Organization settings &gt; Skills</strong>
+                にナビゲートし、「Organization skills」セクションから ZIP ファイルをアップロード。
+              </p>
+              <div className={`${styles.callout} ${styles.calloutInfo}`}>
+                <span className={styles.calloutIcon}>ℹ️</span>
+                アップロード後、全ユーザーの環境に即座にプロビジョニングされる。ロールバックは ZIP
+                を削除することで実行可能。
+              </div>
+            </div>
+
+            <div className={styles.step} data-n="3">
+              <div className={styles.stepTitle}>デフォルトステータスの戦略設計</div>
+              <p>各スキルを「デフォルト有効」か「デフォルト無効」かを選択する。</p>
+              <div className={styles.mermaidWrap}>
+                <MermaidDiagram
+                  chart={`graph LR
+subgraph ON["デフォルト 有効"]
+A1["コーディング規約チェッカー"]
+A2["ドキュメント生成フォーマッター"]
+A3["コミットメッセージ検証"]
+end
+subgraph OFF["デフォルト 無効 User Control"]
+B1["本番DBマイグレーション"]
+B2["インフラデプロイ"]
+B3["クレデンシャル管理"]
+end
+style ON fill:#1a4040,stroke:#4fd1c5,color:#ffffff
+style OFF fill:#4a1a1a,stroke:#fc8181,color:#ffffff`}
+                />
+              </div>
+            </div>
+          </div>
+
+          <h3>ネットワーク制御オプション</h3>
+          <table className={styles.dataTable}>
+            <thead>
+              <tr>
+                <th>設定</th>
+                <th>説明</th>
+                <th>推奨ユースケース</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>完全オフライン</td>
+                <td>外部通信を一切ブロックするサンドボックス環境</td>
+                <td>機密プロジェクト・金融機関・政府機関</td>
+              </tr>
+              <tr>
+                <td>パッケージマネージャー限定</td>
+                <td>npm / PyPI 等の指定リポジトリのみ許可</td>
+                <td>一般企業の開発環境</td>
+              </tr>
+              <tr>
+                <td>ドメインリスト制御</td>
+                <td>ホワイトリスト/ブラックリストによる細粒度制御</td>
+                <td>外部API連携が必要な場合</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         {/* ── Section 09: self ── */}
