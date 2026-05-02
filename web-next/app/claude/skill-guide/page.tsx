@@ -1267,6 +1267,100 @@ style DIR fill:#1a2030,stroke:#58a6ff,color:#e6edf3`}
               </p>
             </div>
           </section>
+
+          {/* ── 12 ベストプラクティス ── */}
+          <section id="best" className={styles.sec}>
+            <div className={styles.secHeader}>
+              <span className={styles.secNum}>12</span>
+              <h2>ベストプラクティス</h2>
+            </div>
+            <h3>✅ description の書き方が最重要</h3>
+            <div className={styles.compare}>
+              <div className={`${styles.compareCard} ${styles.bad}`}>
+                <div className={styles.compareLabel}>❌ 悪い例（曖昧すぎる）</div>
+                <div className={styles.codeBlock} style={{ margin: 0 }}>
+                  <pre style={{ padding: "0.75rem", fontSize: "0.75rem" }}>
+                    <code>
+                      <span className={styles.key}>description</span>
+                      {": "}
+                      <span className={styles.str}>コードに関する作業をする</span>
+                    </code>
+                  </pre>
+                </div>
+              </div>
+              <div className={`${styles.compareCard} ${styles.good}`}>
+                <div className={styles.compareLabel}>✅ 良い例（トリガーワードを含む）</div>
+                <div className={styles.codeBlock} style={{ margin: 0 }}>
+                  <pre style={{ padding: "0.75rem", fontSize: "0.75rem" }}>
+                    <code>
+                      <span className={styles.key}>description</span>
+                      {": "}
+                      <span className={styles.str}>{">"}</span>
+                      {"\n  "}
+                      <span className={styles.str}>
+                        コードのセキュリティ・パフォーマンス・バグを包括的にレビューする。
+                      </span>
+                      {"\n  "}
+                      <span className={styles.str}>
+                        「レビューして」「確認して」「チェックして」という言葉をトリガーに使用する。
+                      </span>
+                      {"\n  "}
+                      <span className={styles.str}>Pull Request のレビューにも使用する。</span>
+                    </code>
+                  </pre>
+                </div>
+              </div>
+            </div>
+            <h3>✅ SKILL.md の適切なサイズ</h3>
+            <div className={styles.mermaidWrap}>
+              <MermaidDiagram
+                chart={`graph LR
+A["短すぎる\\n< 10行"] -->|不十分| B["❌ Claudeが\\n何をすべきか不明"]
+C["適切\\n50〜500行"] -->|最適| D["✅ 明確な指示で\\n一貫した出力"]
+E["長すぎる\\n> 5000行"] -->|コンテキスト肥大| F["❌ 重要な指示が\\n埋もれる"]
+style B fill:#2a1c1c,stroke:#f85149,color:#e6edf3
+style D fill:#1c2a1c,stroke:#3fb950,color:#e6edf3
+style F fill:#2a1c1c,stroke:#f85149,color:#e6edf3`}
+              />
+            </div>
+            <h3>✅ チェックリスト</h3>
+            <div className={styles.tableWrap}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>確認項目</th>
+                    <th>説明</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      ✅ <code>description</code> は具体的か
+                    </td>
+                    <td>トリガーとなる言葉・状況を含める</td>
+                  </tr>
+                  <tr>
+                    <td>✅ 手順は番号付きリストか</td>
+                    <td>箇条書きより番号付きが指示に従いやすい</td>
+                  </tr>
+                  <tr>
+                    <td>✅ 出力形式は明示されているか</td>
+                    <td>何を出力すべきか明確にする</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      ✅ <code>allowed-tools</code> は必要最小限か
+                    </td>
+                    <td>不要な権限は与えない（セキュリティ）</td>
+                  </tr>
+                  <tr>
+                    <td>✅ 本文は500行以内か</td>
+                    <td>冗長な説明は別ファイルに分ける</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </main>
       </div>
     </div>
