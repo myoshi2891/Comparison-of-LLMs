@@ -721,6 +721,95 @@ CC->>U: 手順に従ったコードレビュー結果`}
               </pre>
             </div>
           </section>
+
+          {/* ── 07 CLAUDE.md との違い ── */}
+          <section id="claudemd" className={styles.sec}>
+            <div className={styles.secHeader}>
+              <span className={styles.secNum}>07</span>
+              <h2>CLAUDE.md との違い</h2>
+            </div>
+            <p>初学者が最も混乱するのがこの違いです。</p>
+            <div className={`${styles.callout} ${styles.calloutTip}`}>
+              <span className={styles.calloutIcon}>🎯</span>
+              <p>
+                <strong>「常に守るべきルール」→ CLAUDE.md</strong>
+                <br />
+                <strong>「特定のタスクの詳しい手順」→ SKILL.md</strong>
+              </p>
+            </div>
+            <div className={styles.mermaidWrap}>
+              <MermaidDiagram
+                chart={`graph LR
+subgraph CLAUDEMD["📄 CLAUDE.md の領域\\n常時適用 × ルール・制約"]
+C1["コーディングスタイル"]
+C2["命名規則"]
+C3["コミット形式"]
+end
+subgraph SKILLMD["📄 SKILL.md の領域\\n必要な時だけ × 手順・プロセス"]
+S1["PDF作成手順"]
+S2["コードレビュー観点"]
+S3["APIドキュメント生成"]
+S4["デプロイ手順"]
+end
+style CLAUDEMD fill:#1c2530,stroke:#58a6ff,color:#e6edf3
+style SKILLMD fill:#1c2a1c,stroke:#3fb950,color:#e6edf3`}
+              />
+            </div>
+            <div className={styles.tableWrap}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>観点</th>
+                    <th>CLAUDE.md</th>
+                    <th>SKILL.md</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <strong>読み込みタイミング</strong>
+                    </td>
+                    <td>
+                      セッション開始時・
+                      <span className={`${styles.badge} ${styles.badgeRed}`}>常時</span>
+                    </td>
+                    <td>
+                      必要なときだけ（
+                      <span className={`${styles.badge} ${styles.badgeGreen}`}>オンデマンド</span>）
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong>内容</strong>
+                    </td>
+                    <td>常に守るべきルール・制約・コンテキスト</td>
+                    <td>特定タスクの詳細な手順書</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong>コンテキスト消費</strong>
+                    </td>
+                    <td>毎回消費（重くなりやすい）</td>
+                    <td>必要時のみ消費（効率的）</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong>スクリプト同梱</strong>
+                    </td>
+                    <td>❌ できない</td>
+                    <td>✅ できる</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong>推奨行数</strong>
+                    </td>
+                    <td>20〜200行</td>
+                    <td>500行未満（本文）</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </main>
       </div>
     </div>
