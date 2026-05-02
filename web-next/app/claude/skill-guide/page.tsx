@@ -392,6 +392,103 @@ C-->>User: ガイドラインに準拠したREADMEを出力`}
               </p>
             </div>
           </section>
+
+          {/* ── 04 SKILL.md の基本構造 ── */}
+          <section id="structure" className={styles.sec}>
+            <div className={styles.secHeader}>
+              <span className={styles.secNum}>04</span>
+              <h2>SKILL.md の基本構造</h2>
+            </div>
+            <p>
+              SKILL.md は <strong>2つのパート</strong> で構成されます。
+            </p>
+            <div className={styles.mermaidWrap}>
+              <MermaidDiagram
+                chart={`graph TD
+A["YAMLフロントマター\\nname: スキル名\\ndescription: いつ使うかの説明\\nallowed-tools: Read, Write"]
+B["マークダウン本文（手順書）\\nStep 1: 〇〇をする\\nStep 2: 〇〇をする\\n出力フォーマット ..."]
+A --> B
+style A fill:#1c2a1c,stroke:#3fb950,color:#e6edf3
+style B fill:#1c2530,stroke:#58a6ff,color:#e6edf3`}
+              />
+            </div>
+            <h3>実際のファイル例：コードレビュースキル</h3>
+            <div className={styles.codeBlock}>
+              <div className={styles.codeBlockHeader}>
+                <div className={styles.codeBlockDots}>
+                  <div className={`${styles.dot} ${styles.dotR}`} />
+                  <div className={`${styles.dot} ${styles.dotY}`} />
+                  <div className={`${styles.dot} ${styles.dotG}`} />
+                </div>
+                <span className={styles.codeBlockLang}>~/.claude/skills/code-review/SKILL.md</span>
+              </div>
+              <pre>
+                <code>
+                  <span className={styles.cmt}>
+                    {"--- ← YAMLフロントマター（Level 1 · 常時読み込み）"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.key}>name</span>
+                  {": "}
+                  <span className={styles.str}>code-review</span>
+                  {"\n"}
+                  <span className={styles.key}>description</span>
+                  {": "}
+                  <span className={styles.str}>{">"}</span>
+                  {"\n  "}
+                  <span className={styles.str}>
+                    {"コードのセキュリティ・バグ・パフォーマンス・スタイルをレビューする。"}
+                  </span>
+                  {"\n  "}
+                  <span className={styles.str}>
+                    {"「レビューして」「確認して」「チェックして」と言われたときに使用する。"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.key}>allowed-tools</span>
+                  {": "}
+                  <span className={styles.val}>[Read, Grep, Glob]</span>
+                  {"\n"}
+                  <span className={styles.cmt}>---</span>
+                  {"\n\n"}
+                  <span className={styles.hdr}># コードレビュースキル</span>
+                  {"\n\n"}
+                  <span className={styles.hdr}>## レビュー観点</span>
+                  {"\n\n"}
+                  {"1. "}
+                  <span className={styles.str}>**セキュリティ**</span>
+                  {": SQLインジェクション、XSS をチェック"}
+                  {"\n"}
+                  {"2. "}
+                  <span className={styles.str}>**バグ**</span>
+                  {": NULL参照、境界値、例外処理を確認"}
+                  {"\n"}
+                  {"3. "}
+                  <span className={styles.str}>**パフォーマンス**</span>
+                  {": N+1クエリ、不要なループを検出"}
+                  {"\n"}
+                  {"4. "}
+                  <span className={styles.str}>**スタイル**</span>
+                  {": プロジェクトの命名規則に従っているか確認"}
+                  {"\n\n"}
+                  <span className={styles.hdr}>## 出力フォーマット</span>
+                  {"\n\n"}
+                  {"- 🔴 重大: すぐに修正が必要"}
+                  {"\n"}
+                  {"- 🟡 警告: できれば修正を推奨"}
+                  {"\n"}
+                  {"- 🟢 提案: コード品質向上のヒント"}
+                </code>
+              </pre>
+            </div>
+            <div className={`${styles.callout} ${styles.calloutWarn}`}>
+              <span className={styles.calloutIcon}>⚠️</span>
+              <p>
+                <code>---</code> で囲まれたYAMLフロントマターは必須です。これがないと Claude
+                はスキルを認識できません。また、<code>name</code> と <code>description</code>{" "}
+                は最低限必要なフィールドです。
+              </p>
+            </div>
+          </section>
         </main>
       </div>
     </div>
