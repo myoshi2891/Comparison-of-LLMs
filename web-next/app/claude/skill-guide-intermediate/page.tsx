@@ -744,7 +744,152 @@ style R4 fill:#4a1a1a,stroke:#fc8181,color:#ffffff`}
             <h2>動的コンテキスト注入 &amp; 引数処理メカニズム</h2>
             <div className={styles.secLine} />
           </div>
-          {/* faithful content: D-2 Green s04 */}
+          <p>
+            SKILL.md
+            は静的なドキュメントではない。ユーザーからの引数を受け取り、実行前にシステムの最新状態をシェルスクリプトで取得する
+            <strong>動的な実行基盤</strong>として機能する。
+          </p>
+          <h3>引数処理の3パターン</h3>
+          <div className={styles.steps}>
+            <div className={styles.step} data-n="1">
+              <div className={styles.stepTitle}>$ARGUMENTS — 全引数を一括受け取り</div>
+              <p>
+                ユーザーが <code>/skill-name src/main.py</code> と入力した際、
+                <code>src/main.py</code> の文字列が <code>$ARGUMENTS</code> として展開される。
+              </p>
+              <div className={styles.codeWrap}>
+                <div className={styles.codeBar}>
+                  <div className={styles.codeDots}>
+                    <div className={styles.codeDot} />
+                    <div className={styles.codeDot} />
+                    <div className={styles.codeDot} />
+                  </div>
+                  <span className={styles.codeLang}>SKILL.md — $ARGUMENTS 使用例</span>
+                </div>
+                <div className={styles.codeBody}>
+                  <span className={styles.ch}>{"## 解析対象ファイル"}</span>
+                  {"\n\n"}
+                  {"ユーザーが指定したファイルを解析せよ: "}
+                  <span className={styles.cTag}>{"$ARGUMENTS"}</span>
+                  {"\n\n"}
+                  {"指定がない場合は現在のディレクトリ全体を対象とする。"}
+                </div>
+              </div>
+            </div>
+            <div className={styles.step} data-n="2">
+              <div className={styles.stepTitle}>$1, $2, $3 — 位置パラメータで個別受け取り</div>
+              <p>複数の引数を個別に処理したい場合に使用。シェルスクリプトと同様の記法。</p>
+              <div className={styles.codeWrap}>
+                <div className={styles.codeBar}>
+                  <div className={styles.codeDots}>
+                    <div className={styles.codeDot} />
+                    <div className={styles.codeDot} />
+                    <div className={styles.codeDot} />
+                  </div>
+                  <span className={styles.codeLang}>SKILL.md — 位置パラメータ使用例</span>
+                </div>
+                <div className={styles.codeBody}>
+                  <span className={styles.cc}>{"# 呼び出し例: /deploy production v2.1.3"}</span>
+                  {"\n\n"}
+                  <span className={styles.ch}>{"## デプロイ設定"}</span>
+                  {"\n\n"}
+                  {"- 対象環境: "}
+                  <span className={styles.cTag}>{"$1"}</span>
+                  {"       "}
+                  <span className={styles.cc}>{"# production"}</span>
+                  {"\n"}
+                  {"- バージョン: "}
+                  <span className={styles.cTag}>{"$2"}</span>
+                  {"      "}
+                  <span className={styles.cc}>{"# v2.1.3"}</span>
+                  {"\n"}
+                  {"- 追加オプション: "}
+                  <span className={styles.cTag}>{"$3"}</span>
+                  {"   "}
+                  <span className={styles.cc}>{"# （未指定の場合は空）"}</span>
+                </div>
+              </div>
+            </div>
+            <div className={styles.step} data-n="3">
+              <div className={styles.stepTitle}>
+                {"! `command` — 動的コンテキスト事前注入（最強）"}
+              </div>
+              <p>
+                これが最も強力なメカニズム。感嘆符 +
+                バッククォート構文を使うと、エージェントが本文を認識する
+                <strong>前</strong>
+                のプリプロセッシング段階でシェルコマンドが実行され、その結果が本文にレンダリングされる。
+              </p>
+              <div className={`${styles.callout} ${styles.calloutTip}`}>
+                <span className={styles.calloutIcon}>⚡</span>
+                エージェントへの「コマンドを実行して調べてください」という指示と、それに伴う推論ステップ・ツール呼び出しのレイテンシを
+                <strong>完全に排除</strong>できる。
+              </div>
+              <div className={styles.codeWrap}>
+                <div className={styles.codeBar}>
+                  <div className={styles.codeDots}>
+                    <div className={styles.codeDot} />
+                    <div className={styles.codeDot} />
+                    <div className={styles.codeDot} />
+                  </div>
+                  <span className={styles.codeLang}>SKILL.md — 動的コンテキスト注入の完全例</span>
+                </div>
+                <div className={styles.codeBody}>
+                  <span className={styles.ch}>
+                    {"## 実行コンテキスト（プリプロセッシングで自動入力済み）"}
+                  </span>
+                  {"\n\n"}
+                  <span className={styles.cc}>
+                    {"# ↓ エージェントが読み込む前に実際のシステム情報に置換される"}
+                  </span>
+                  {"\n"}
+                  {"現在のOS情報:\n"}
+                  <span className={styles.cTag}>{"! `uname -a`"}</span>
+                  {"\n\n"}
+                  {"最新のGitコミット:\n"}
+                  <span className={styles.cTag}>{"! `git log -1 --oneline`"}</span>
+                  {"\n\n"}
+                  {"現在のブランチ:\n"}
+                  <span className={styles.cTag}>{"! `git branch --show-current`"}</span>
+                  {"\n\n"}
+                  {"解析対象: "}
+                  <span className={styles.cTag}>{"$1"}</span>
+                  {"\n\n"}
+                  <span className={styles.cc}>
+                    {"# ↑ エージェントはこの確定データに基づいて分析を開始する"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.cc}>
+                    {"# 自らコマンドを実行して確認するステップが不要になる"}
+                  </span>
+                  {"\n\n"}
+                  <span className={styles.ch}>{"## 指示"}</span>
+                  {"\n\n"}
+                  {"上記の確定したコンテキストを前提として、以下の分析を実施せよ..."}
+                </div>
+              </div>
+            </div>
+          </div>
+          <h3>3パターンの比較</h3>
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram
+              chart={`graph LR
+subgraph P1["ARGUMENTS - 全引数を一括受け取り"]
+A1["ユーザー入力テキスト全体<br>シンプルな用途に最適"]
+end
+subgraph P2["位置引数 1 2 3 - 個別受け取り"]
+A2["複数引数を個別に処理<br>順序が決まっている場合"]
+end
+subgraph P3["事前注入 - バッククォート構文"]
+A3["システム状態を事前確定<br>推論ステップを省略<br>最高精度 最低レイテンシ"]
+end
+P1 -- 基本 --> P2
+P2 -- 高度 --> P3
+style P1 fill:#1a3a5c,stroke:#63b3ed,color:#ffffff
+style P2 fill:#1a4040,stroke:#4fd1c5,color:#ffffff
+style P3 fill:#2d1f4a,stroke:#b794f4,color:#ffffff`}
+            />
+          </div>
         </div>
 
         {/* ── Section 05: fork ── */}
