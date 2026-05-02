@@ -1361,6 +1361,74 @@ style F fill:#2a1c1c,stroke:#f85149,color:#e6edf3`}
               </table>
             </div>
           </section>
+
+          {/* ── 13 デバッグと最適化 ── */}
+          <section id="debug" className={styles.sec}>
+            <div className={styles.secHeader}>
+              <span className={styles.secNum}>13</span>
+              <h2>デバッグと最適化</h2>
+            </div>
+            <div className={styles.mermaidWrap}>
+              <MermaidDiagram
+                chart={`flowchart TD
+A["スキルが正常に動作しない"] --> B{問題の種類}
+B -->|発動すべきで発動しない| C["アンダートリガー"]
+B -->|無関係な時に発動する| D["オーバートリガー"]
+B -->|発動はするが結果が悪い| E["実行フェーズの問題"]
+C --> C1["descriptionにトリガーワードを追記"]
+C --> C2["/スキル名 で手動呼び出してテスト"]
+D --> D1["トリガー条件を絞り込む"]
+D --> D2["ネガティブトリガーを追加"]
+E --> E1["インストラクションを見直す"]
+E --> E2["claude --debug で詳細ログを確認"]
+style C fill:#2a2010,stroke:#fbbf24,color:#e6edf3
+style D fill:#2a2010,stroke:#fbbf24,color:#e6edf3
+style E fill:#1c2530,stroke:#58a6ff,color:#e6edf3`}
+              />
+            </div>
+            <h3>CLIデバッグフラグ一覧</h3>
+            <div className={styles.tableWrap}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>フラグ</th>
+                    <th>挙動</th>
+                    <th>主な用途</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <code>claude --debug</code>
+                    </td>
+                    <td>システム全体のデバッグログを出力</td>
+                    <td>スキルがトリガーされない原因調査</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code>claude --debug &quot;api,hooks&quot;</code>
+                    </td>
+                    <td>特定カテゴリのログのみ表示</td>
+                    <td>API通信・動的注入の挙動調査</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code>claude --disable-slash-commands</code>
+                    </td>
+                    <td>全スキルを無効化</td>
+                    <td>スキルの干渉を切り分けたい時</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code>claude --disallowedTools</code>
+                    </td>
+                    <td>指定ツールを使用不能に</td>
+                    <td>テスト環境での安全な検証</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </main>
       </div>
     </div>
