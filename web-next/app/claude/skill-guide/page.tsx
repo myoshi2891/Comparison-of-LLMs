@@ -1429,6 +1429,122 @@ style E fill:#1c2530,stroke:#58a6ff,color:#e6edf3`}
               </table>
             </div>
           </section>
+
+          {/* ── 14 よくあるミスと対処法 ── */}
+          <section id="mistakes" className={styles.sec}>
+            <div className={styles.secHeader}>
+              <span className={styles.secNum}>14</span>
+              <h2>よくあるミスと対処法</h2>
+            </div>
+            <h3>ミス① スキルが自動で呼ばれない</h3>
+            <div className={styles.compare}>
+              <div className={`${styles.compareCard} ${styles.bad}`}>
+                <div className={styles.compareLabel}>❌ よくある原因</div>
+                <ul
+                  style={{
+                    margin: 0,
+                    paddingLeft: "1.2rem",
+                    fontSize: "0.82rem",
+                    color: "var(--text2)",
+                  }}
+                >
+                  <li>description が曖昧・抽象的</li>
+                  <li>SKILL.md の配置が間違っている</li>
+                  <li>スキルが設定で無効化されている</li>
+                  <li>name に使えない文字が含まれる</li>
+                </ul>
+              </div>
+              <div className={`${styles.compareCard} ${styles.good}`}>
+                <div className={styles.compareLabel}>✅ 解決策</div>
+                <ul
+                  style={{
+                    margin: 0,
+                    paddingLeft: "1.2rem",
+                    fontSize: "0.82rem",
+                    color: "var(--text2)",
+                  }}
+                >
+                  <li>トリガーワードを具体的に追記</li>
+                  <li>skills/スキル名/SKILL.md の構造を確認</li>
+                  <li>Settings → Skills で有効化を確認</li>
+                  <li>/スキル名 で手動呼び出しテスト</li>
+                </ul>
+              </div>
+            </div>
+            <h3>ミス② 同名スキルの競合</h3>
+            <div className={styles.codeBlock}>
+              <div className={styles.codeBlockHeader}>
+                <div className={styles.codeBlockDots}>
+                  <div className={`${styles.dot} ${styles.dotR}`} />
+                  <div className={`${styles.dot} ${styles.dotY}`} />
+                  <div className={`${styles.dot} ${styles.dotG}`} />
+                </div>
+                <span className={styles.codeBlockLang}>競合の例</span>
+              </div>
+              <pre>
+                <code>
+                  {"~/.claude/skills/deploy/SKILL.md     "}
+                  <span className={styles.cmt}>← 個人スキル</span>
+                  {"\n.claude/skills/deploy/SKILL.md       "}
+                  <span className={styles.cmt}>← プロジェクトスキル（こちらが優先）</span>
+                  {"\n"}
+                  <span className={styles.cmt}>
+                    # 優先順位: enterprise {">"} personal {">"} project
+                  </span>
+                </code>
+              </pre>
+            </div>
+            <h3>ミス③ CLAUDE.md にすべてを書きすぎる</h3>
+            <div className={styles.compare}>
+              <div className={`${styles.compareCard} ${styles.bad}`}>
+                <div className={styles.compareLabel}>❌ よくあるミス</div>
+                <p style={{ fontSize: "0.82rem", color: "var(--text2)", margin: 0 }}>
+                  CLAUDE.md
+                  に詳細な手順書を書いてしまっている。毎回コンテキストを大量消費し、会話の精度が低下する。
+                </p>
+              </div>
+              <div className={`${styles.compareCard} ${styles.good}`}>
+                <div className={styles.compareLabel}>✅ 正しい分担</div>
+                <p style={{ fontSize: "0.82rem", color: "var(--text2)", margin: 0 }}>
+                  詳しい手順は
+                  <code>skills/my-procedure/SKILL.md</code>
+                  に移動する。トリガーされない限りコンテキストを消費しない。
+                </p>
+              </div>
+            </div>
+            <h3>ミス④ description に XMLタグを使う</h3>
+            <div className={styles.codeBlock}>
+              <div className={styles.codeBlockHeader}>
+                <div className={styles.codeBlockDots}>
+                  <div className={`${styles.dot} ${styles.dotR}`} />
+                  <div className={`${styles.dot} ${styles.dotY}`} />
+                  <div className={`${styles.dot} ${styles.dotG}`} />
+                </div>
+                <span className={styles.codeBlockLang}>YAML</span>
+              </div>
+              <pre>
+                <code>
+                  <span className={styles.cmt}># ❌ XMLタグは description に使えない</span>
+                  {"\n"}
+                  <span className={styles.key}>description</span>
+                  {": "}
+                  <span className={styles.str}>
+                    {"<task>"}コードをレビューする{"</task>"}
+                  </span>
+                  {"  "}
+                  <span className={styles.cmt}>← エラー</span>
+                  {"\n\n"}
+                  <span className={styles.cmt}># ✅ プレーンテキストで記述</span>
+                  {"\n"}
+                  <span className={styles.key}>description</span>
+                  {": "}
+                  <span className={styles.str}>
+                    コードのセキュリティ・バグを包括的にレビューする。
+                  </span>
+                </code>
+              </pre>
+            </div>
+          </section>
         </main>
       </div>
     </div>
