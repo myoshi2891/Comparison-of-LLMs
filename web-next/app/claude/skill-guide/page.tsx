@@ -810,6 +810,207 @@ style SKILLMD fill:#1c2a1c,stroke:#3fb950,color:#e6edf3`}
               </table>
             </div>
           </section>
+
+          {/* ── 08 ステップバイステップ：最初のスキルを作る ── */}
+          <section id="build" className={styles.sec}>
+            <div className={styles.secHeader}>
+              <span className={styles.secNum}>08</span>
+              <h2>ステップバイステップ：最初のスキルを作る</h2>
+            </div>
+            <p>「コードを分かりやすく説明する」スキルを実際に作ってみましょう。</p>
+            <div className={styles.steps}>
+              {/* Step 1 */}
+              <div className={styles.stepItem}>
+                <div className={styles.stepNum}>1</div>
+                <div className={styles.stepContent}>
+                  <div className={styles.stepTitle}>ディレクトリを作成する</div>
+                  <div className={styles.codeBlock}>
+                    <div className={styles.codeBlockHeader}>
+                      <div className={styles.codeBlockDots}>
+                        <div className={`${styles.dot} ${styles.dotR}`} />
+                        <div className={`${styles.dot} ${styles.dotY}`} />
+                        <div className={`${styles.dot} ${styles.dotG}`} />
+                      </div>
+                      <span className={styles.codeBlockLang}>Terminal</span>
+                    </div>
+                    <pre>
+                      <code>
+                        <span className={styles.tag}>$</span>
+                        {" mkdir -p "}
+                        <span className={styles.str}>~/.claude/skills/explain-code</span>
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+              </div>
+              {/* Step 2 */}
+              <div className={styles.stepItem}>
+                <div className={styles.stepNum}>2</div>
+                <div className={styles.stepContent}>
+                  <div className={styles.stepTitle}>SKILL.md ファイルを作成する</div>
+                  <div className={styles.codeBlock}>
+                    <div className={styles.codeBlockHeader}>
+                      <div className={styles.codeBlockDots}>
+                        <div className={`${styles.dot} ${styles.dotR}`} />
+                        <div className={`${styles.dot} ${styles.dotY}`} />
+                        <div className={`${styles.dot} ${styles.dotG}`} />
+                      </div>
+                      <span className={styles.codeBlockLang}>Terminal</span>
+                    </div>
+                    <pre>
+                      <code>
+                        <span className={styles.tag}>$</span>
+                        {" touch "}
+                        <span className={styles.str}>~/.claude/skills/explain-code/SKILL.md</span>
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+              </div>
+              {/* Step 3 */}
+              <div className={styles.stepItem}>
+                <div className={styles.stepNum}>3</div>
+                <div className={styles.stepContent}>
+                  <div className={styles.stepTitle}>YAMLフロントマターを書く</div>
+                  <div className={styles.stepDesc}>
+                    <code>name</code> と <code>description</code> を必ず記入。
+                    <strong>description はトリガーワードを具体的に含めることが最重要です。</strong>
+                  </div>
+                  <div className={styles.codeBlock}>
+                    <div className={styles.codeBlockHeader}>
+                      <div className={styles.codeBlockDots}>
+                        <div className={`${styles.dot} ${styles.dotR}`} />
+                        <div className={`${styles.dot} ${styles.dotY}`} />
+                        <div className={`${styles.dot} ${styles.dotG}`} />
+                      </div>
+                      <span className={styles.codeBlockLang}>SKILL.md — フロントマター部分</span>
+                    </div>
+                    <pre>
+                      <code>
+                        <span className={styles.cmt}>---</span>
+                        {"\n"}
+                        <span className={styles.key}>name</span>
+                        {": "}
+                        <span className={styles.str}>explain-code</span>
+                        {"\n"}
+                        <span className={styles.key}>description</span>
+                        {": "}
+                        <span className={styles.str}>{">"}</span>
+                        {"\n  "}
+                        <span className={styles.str}>
+                          {"コードの動作をビジュアル図解と例えを使って説明する。"}
+                        </span>
+                        {"\n  "}
+                        <span className={styles.str}>
+                          {"「どうやって動いてる？」「わかりやすく説明して」"}
+                        </span>
+                        {"\n  "}
+                        <span className={styles.str}>{"「教えて」と言われたときに使用する。"}</span>
+                        {"\n"}
+                        <span className={styles.cmt}>---</span>
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+              </div>
+              {/* Step 4 */}
+              <div className={styles.stepItem}>
+                <div className={styles.stepNum}>4</div>
+                <div className={styles.stepContent}>
+                  <div className={styles.stepTitle}>本文（指示書）を書く</div>
+                  <div className={styles.codeBlock}>
+                    <div className={styles.codeBlockHeader}>
+                      <div className={styles.codeBlockDots}>
+                        <div className={`${styles.dot} ${styles.dotR}`} />
+                        <div className={`${styles.dot} ${styles.dotY}`} />
+                        <div className={`${styles.dot} ${styles.dotG}`} />
+                      </div>
+                      <span className={styles.codeBlockLang}>SKILL.md — 本文部分</span>
+                    </div>
+                    <pre>
+                      <code>
+                        <span className={styles.hdr}># コード説明スキル</span>
+                        {"\n\n"}
+                        <span className={styles.hdr}>## 説明プロセス</span>
+                        {"\n\n"}
+                        {"1. "}
+                        <span className={styles.str}>**アナロジー（例え話）で始める**</span>
+                        {"\n   日常生活の何かに例えてから説明する"}
+                        {"\n"}
+                        {"2. "}
+                        <span className={styles.str}>**図を描く（ASCII アート）**</span>
+                        {"\n   コードの流れ・構造・関係性を視覚化する"}
+                        {"\n"}
+                        {"3. "}
+                        <span className={styles.str}>**ステップバイステップで解説する**</span>
+                        {"\n   コードを上から順に、何が起きているか説明"}
+                        {"\n"}
+                        {"4. "}
+                        <span className={styles.str}>**「落とし穴」を1つ挙げる**</span>
+                        {"\n   よくある誤解や注意すべき点を1つ教える"}
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+              </div>
+              {/* Step 5 */}
+              <div className={styles.stepItem}>
+                <div className={styles.stepNum}>5</div>
+                <div className={styles.stepContent}>
+                  <div className={styles.stepTitle}>動作確認する</div>
+                  <div className={styles.codeBlock}>
+                    <div className={styles.codeBlockHeader}>
+                      <div className={styles.codeBlockDots}>
+                        <div className={`${styles.dot} ${styles.dotR}`} />
+                        <div className={`${styles.dot} ${styles.dotY}`} />
+                        <div className={`${styles.dot} ${styles.dotG}`} />
+                      </div>
+                      <span className={styles.codeBlockLang}>Terminal</span>
+                    </div>
+                    <pre>
+                      <code>
+                        <span className={styles.tag}>$</span>
+                        {" claude"}
+                        {"\n"}
+                        <span className={styles.str}>{">"}</span>
+                        {" 「このコードはどうやって動いているの？」"}
+                        {"\n"}
+                        <span className={styles.str}>{">"}</span>
+                        {" /explain-code src/utils/parser.ts"}
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+              </div>
+              {/* Step 6 */}
+              <div className={styles.stepItem}>
+                <div className={styles.stepNum}>6</div>
+                <div className={styles.stepContent}>
+                  <div className={styles.stepTitle}>完成！ディレクトリ構造を確認</div>
+                  <div className={styles.codeBlock}>
+                    <div className={styles.codeBlockHeader}>
+                      <div className={styles.codeBlockDots}>
+                        <div className={`${styles.dot} ${styles.dotR}`} />
+                        <div className={`${styles.dot} ${styles.dotY}`} />
+                        <div className={`${styles.dot} ${styles.dotG}`} />
+                      </div>
+                      <span className={styles.codeBlockLang}>最終構造</span>
+                    </div>
+                    <pre>
+                      <code>
+                        {"~/.claude/skills/explain-code/"}
+                        {"\n"}
+                        {"└── "}
+                        <span className={styles.hdr}>SKILL.md</span>
+                        {"     "}
+                        <span className={styles.val}>✅ 完成！</span>
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
         </main>
       </div>
     </div>
