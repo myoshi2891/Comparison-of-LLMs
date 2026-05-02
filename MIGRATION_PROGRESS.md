@@ -9,10 +9,10 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- **最新 HEAD**: `96a8cdd`（**feat(web-next): D-2 Green s04 — /claude/skill-guide-intermediate args (3 arg patterns + dynamic context injection)**）
+- **最新 HEAD**: `4b37232`（**feat(web-next): D-2 Green s05 — /claude/skill-guide-intermediate fork (context:fork vs Subagents)**）
 - **未コミット作業**: なし（working tree クリーン）
-- **次の作業**: **D-2 Green s05 移植 — Section 05 (fork: 1852-1982 行) faithful 移植**
-- **テスト数**: `bun run test` **479 passed / 479 total（全 Green）** — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
+- **次の作業**: **D-2 Green s06 移植 — Section 06 (trigger: 1983-2070 行) faithful 移植**
+- **テスト数**: `bun run test` **483 passed / 483 total（全 Green）** — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
 - **ビルド**: `bun run build` 成功（13 ルート全 Static）・`bun run typecheck` 成功・`uv run pytest` 5/5 passed
 - **lint 既知違反**: 7 件（MIGRATION_PROGRESS.md の旧記載「6 件」は誤記。正しくは 7 件）
 
@@ -166,13 +166,13 @@ Next.js 移行プロジェクトの作業を再開してください。
 
 - リポジトリ: LLM-Studies（Phase A–F の Next.js 移行作業中）
 - 現在のブランチ: feat/nextjs-migration
-- 最新 HEAD: 96a8cdd（feat(web-next): D-2 Green s04 — /claude/skill-guide-intermediate args）
+- 最新 HEAD: 4b37232（feat(web-next): D-2 Green s05 — /claude/skill-guide-intermediate fork）
 - 移行計画: docs/NEXTJS_PHASE_A_F_PLAN.md（Phase A–F）§Phase D を参照
 - 進捗トラッカー: MIGRATION_PROGRESS.md（**作業開始前に必読**: §「AI 作業ルール」R1〜R4）
 - プロジェクト固有スキル: .claude/skills/nextjs-page-migration/SKILL.md
 - リポジトリ規約: CLAUDE.md（AGENTS.md / GEMINI.md からも参照される。AI 共通の編集ルール）
 
-次の作業: **D-2 (`/claude/skill-guide-intermediate`) Green 移植 — Section 05 (fork: 1852-1982 行) から再開**。s01〜s04 完了済み（96a8cdd）。
+次の作業: **D-2 (`/claude/skill-guide-intermediate`) Green 移植 — Section 06 (trigger: 1983-2070 行) から再開**。s01〜s05 完了済み（4b37232）。
 Phase D の対象は長文ガイド 9 ページ（すべて `.html` → JSX 直接移植。**MDX・`.md` SSoT 方式は不採用**）:
 - Claude: skill-guide-for-claude ✅ / skill-guide-of-claude-for-intermediate (D-2: Red 完了・Green 着手) / claude-cowork-guide
 - Gemini: skill-guide-for-gemini / skill-guide-of-gemini-for-intermediate / antigravity-guide
@@ -215,7 +215,7 @@ D-2 のファイル: `legacy/claude/skill-guide-of-claude-for-intermediate.html`
 - 既存ファイル（pricing.json / scraper / lib/cost.ts 等）への副作用的な変更
 
 検証コマンド早見表:
-  (cd web-next && bun run test)          # 全件 pass が期待値（現在 474 件 全 pass）
+  (cd web-next && bun run test)          # 全件 pass が期待値（現在 483 件 全 pass）
   (cd web-next && bun run typecheck)     # OK
   (cd web-next && bun run build)         # 全ルートが ○ (Static)
   (cd web-next && bun run lint)          # 既知 6 件のみ（新規違反ゼロが必須）
