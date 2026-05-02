@@ -1166,6 +1166,75 @@ style FM fill:#1c2a1c,stroke:#3fb950,color:#e6edf3`}
               </p>
             </div>
           </section>
+
+          {/* ── 10 引数と動的コンテキストの注入 ── */}
+          <section id="args" className={styles.sec}>
+            <div className={styles.secHeader}>
+              <span className={styles.secNum}>10</span>
+              <h2>引数と動的コンテキストの注入</h2>
+            </div>
+            <p>
+              SKILL.md
+              は静的な手順書だけではありません。ユーザーからの動的な入力値や、実行時のシステム状態をリアルタイムで取り込む強力な機能があります。
+            </p>
+            <h3>引数の受け取り方</h3>
+            <div className={styles.codeBlock}>
+              <div className={styles.codeBlockHeader}>
+                <div className={styles.codeBlockDots}>
+                  <div className={`${styles.dot} ${styles.dotR}`} />
+                  <div className={`${styles.dot} ${styles.dotY}`} />
+                  <div className={`${styles.dot} ${styles.dotG}`} />
+                </div>
+                <span className={styles.codeBlockLang}>SKILL.md — 引数処理</span>
+              </div>
+              <pre>
+                <code>
+                  {"以下のファイルを解説してください: "}
+                  <span className={styles.val}>$ARGUMENTS</span>
+                  {"\n"}
+                  <span className={styles.cmt}>
+                    # ↑ /explain-code src/main.py と実行すると &quot;src/main.py&quot; に置換される
+                  </span>
+                  {"\n\n対象ファイル: "}
+                  <span className={styles.val}>$1</span>
+                  {"   "}
+                  <span className={styles.cmt}># 最初の引数</span>
+                  {"\n比較対象:     "}
+                  <span className={styles.val}>$2</span>
+                  {"   "}
+                  <span className={styles.cmt}># 2番目の引数</span>
+                </code>
+              </pre>
+            </div>
+            <h3>動的コンテキストの事前注入（強力な機能）</h3>
+            <div className={`${styles.callout} ${styles.calloutInfo}`}>
+              <span className={styles.calloutIcon}>🚀</span>
+              <p>
+                <strong>バッククォート構文（! `command`）</strong>
+                を使うと、スキルが実行される「前」にシェルコマンドを実行し、その結果をプロンプトに自動で埋め込めます。
+              </p>
+            </div>
+            <div className={styles.codeBlock}>
+              <div className={styles.codeBlockHeader}>
+                <div className={styles.codeBlockDots}>
+                  <div className={`${styles.dot} ${styles.dotR}`} />
+                  <div className={`${styles.dot} ${styles.dotY}`} />
+                  <div className={`${styles.dot} ${styles.dotG}`} />
+                </div>
+                <span className={styles.codeBlockLang}>SKILL.md — 動的コンテキスト注入</span>
+              </div>
+              <pre>
+                <code>
+                  {"現在のOS情報:\n"}
+                  <span className={styles.val}>! `uname -a`</span>
+                  {"\n\n最新のコミット:\n"}
+                  <span className={styles.val}>! `git log -1 --oneline`</span>
+                  {"\n\n解析対象ファイル: "}
+                  <span className={styles.val}>$1</span>
+                </code>
+              </pre>
+            </div>
+          </section>
         </main>
       </div>
     </div>
