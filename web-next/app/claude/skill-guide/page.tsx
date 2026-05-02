@@ -1235,6 +1235,38 @@ style FM fill:#1c2a1c,stroke:#3fb950,color:#e6edf3`}
               </pre>
             </div>
           </section>
+
+          {/* ── 11 リソースファイルのバンドル ── */}
+          <section id="bundle" className={styles.sec}>
+            <div className={styles.secHeader}>
+              <span className={styles.secNum}>11</span>
+              <h2>リソースファイルのバンドル</h2>
+            </div>
+            <p>スキルには指示書だけでなく、スクリプトや参考資料もまとめられます。</p>
+            <div className={styles.mermaidWrap}>
+              <MermaidDiagram
+                chart={`graph LR
+subgraph DIR["📁 pdf-processor/ スキルディレクトリ"]
+A["📄 SKILL.md\\n（メインの指示書）"]
+B["🐍 scripts/extract.py\\n（実行スクリプト）"]
+C["📋 references/format.md\\n（参考資料・仕様書）"]
+D["🗂️ assets/template.html\\n（出力テンプレート）"]
+end
+A -->|指示する| B
+A -->|参照する| C
+A -->|使用する| D
+style DIR fill:#1a2030,stroke:#58a6ff,color:#e6edf3`}
+              />
+            </div>
+            <div className={`${styles.callout} ${styles.calloutWarn}`}>
+              <span className={styles.calloutIcon}>⚠️</span>
+              <p>
+                参照ファイルは必ず
+                <strong>1階層（One level deep）</strong>
+                にとどめること。深くネストされた参照は情報が不完全になるリスクがあります。100行を超える参照ファイルには冒頭に目次を設置してください。
+              </p>
+            </div>
+          </section>
         </main>
       </div>
     </div>
