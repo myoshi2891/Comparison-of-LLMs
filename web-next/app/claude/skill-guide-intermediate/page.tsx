@@ -318,7 +318,191 @@ CC-->>U: ガイドラインに準拠したREADME`}
             <h2>YAMLフロントマター — 全フィールド詳解</h2>
             <div className={styles.secLine} />
           </div>
-          {/* faithful content: D-2 Green s02 */}
+          <p>
+            YAMLフロントマターは、エージェントのスキル選択ロジック全体の
+            <strong>唯一の手がかり</strong>
+            となる。各フィールドの仕様と制約を正確に理解することが、信頼性の高いスキル構築の前提となる。
+          </p>
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <div className={styles.codeDots}>
+                <div className={styles.codeDot} />
+                <div className={styles.codeDot} />
+                <div className={styles.codeDot} />
+              </div>
+              <span className={styles.codeLang}>YAML — フロントマター完全例</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.cc}>---</span>
+              {"\n"}
+              <span className={styles.cm}>name</span>
+              {": "}
+              <span className={styles.cs}>security-audit</span>
+              {"               "}
+              <span className={styles.cc}># ⚠️ 最大64文字。小文字英数字とハイフンのみ</span>
+              {"\n"}
+              <span className={styles.cm}>description</span>
+              {": "}
+              <span className={styles.cs}>{">"}</span>
+              {"                          "}
+              <span className={styles.cc}># ⚠️ 最大1024文字。三人称視点で記述</span>
+              {"\n"}
+              {"  "}
+              <span className={styles.cs}>プロジェクト全体のセキュリティ監査を行う。</span>
+              {"\n"}
+              {"  "}
+              <span className={styles.cs}>「セキュリティをチェックして」「脆弱性を探して」</span>
+              {"\n"}
+              {"  "}
+              <span className={styles.cs}>「OWASP Top 10 で確認して」といった発話で使用する。</span>
+              {"\n"}
+              {"  "}
+              <span className={styles.cs}>Pull Request のレビュー前にも自動で使用すること。</span>
+              {"\n"}
+              <span className={styles.cm}>allowed-tools</span>
+              {":                       "}
+              <span className={styles.cc}># 使用可能ツールをホワイトリスト制限</span>
+              {"\n"}
+              {"  - "}
+              <span className={styles.cs}>Read</span>
+              {"\n"}
+              {"  - "}
+              <span className={styles.cs}>Grep</span>
+              {"\n"}
+              {"  - "}
+              <span className={styles.cs}>Glob</span>
+              {"\n"}
+              <span className={styles.cm}>invocation</span>
+              {": "}
+              <span className={styles.cs}>automatic</span>
+              {"                "}
+              <span className={styles.cc}># automatic(デフォルト) | explicit</span>
+              {"\n"}
+              <span className={styles.cm}>disable-model-invocation</span>
+              {": "}
+              <span className={styles.cv}>false</span>
+              {"      "}
+              <span className={styles.cc}># true にすると /コマンドのみ実行可</span>
+              {"\n"}
+              <span className={styles.cm}>context</span>
+              {": "}
+              <span className={styles.cs}>fork</span>
+              {"                        "}
+              <span className={styles.cc}># fork | inherit（省略でinherit）</span>
+              {"\n"}
+              <span className={styles.cm}>agent</span>
+              {": "}
+              <span className={styles.cs}>Explore</span>
+              {"                       "}
+              <span className={styles.cc}># general-purpose | Explore | Plan</span>
+              {"\n"}
+              <span className={styles.cm}>dependencies</span>
+              {":                        "}
+              <span className={styles.cc}># 必要パッケージ（オプション）</span>
+              {"\n"}
+              {"  - "}
+              <span className={styles.cs}>{"python>=3.8"}</span>
+              {"\n"}
+              <span className={styles.cc}>---</span>
+            </div>
+          </div>
+          <h3>フィールド仕様一覧</h3>
+          <div className={styles.fieldCard}>
+            <div className={styles.fieldName}>
+              <code>name</code> <span className={styles.fieldRequired}>必須</span>
+            </div>
+            <div className={styles.fieldConstraint}>
+              最大64文字 | 文字種: [a-z0-9-] | 予約語禁止: anthropic, claude
+            </div>
+            <div className={styles.fieldDesc}>
+              スラッシュコマンドの名前になる（<code>/security-audit</code>）。命名規則は
+              <strong>動名詞パターン</strong>（<code>processing-pdfs</code>,{" "}
+              <code>reviewing-code</code>）が公式推奨。
+            </div>
+          </div>
+          <div className={styles.fieldCard}>
+            <div className={styles.fieldName}>
+              <code>description</code> <span className={styles.fieldRequired}>必須</span>
+            </div>
+            <div className={styles.fieldConstraint}>
+              最大1024文字 | XMLタグ禁止 | 三人称視点で記述
+            </div>
+            <div className={styles.fieldDesc}>
+              エージェントが「いつこのスキルを起動すべきか」を判断する<strong>唯一の情報源</strong>
+              。実行する内容だけでなく、具体的なトリガーキーワードや状況を詳細に含めること。エージェントは「やや起動したがらない」傾向があるため、やや強引に書くことが推奨される。
+            </div>
+          </div>
+          <div className={styles.fieldCard}>
+            <div className={styles.fieldName}>
+              <code>allowed-tools</code> <span className={styles.fieldOptional}>任意</span>
+            </div>
+            <div className={styles.fieldConstraint}>配列形式 | 省略すると全ツールが使用可</div>
+            <div className={styles.fieldDesc}>
+              スキル実行中にエージェントがアクセスできるツールを制限するホワイトリスト。読み取り専用スキルには
+              <code>[Read, Grep, Glob]</code> のみ許可するセーフモードが推奨される。
+            </div>
+          </div>
+          <div className={styles.fieldCard}>
+            <div className={styles.fieldName}>
+              <code>disable-model-invocation</code>{" "}
+              <span className={styles.fieldOptional}>任意</span>
+            </div>
+            <div className={styles.fieldConstraint}>boolean | デフォルト: false</div>
+            <div className={styles.fieldDesc}>
+              <code>true</code> にすると Claude の自動判断による起動を完全に無効化し、ユーザーが{" "}
+              <code>/スキル名</code>
+              と明示的に入力した場合のみ実行される。本番デプロイ等の<strong>破壊的操作</strong>
+              を持つスキルに必須。
+            </div>
+          </div>
+          <div className={styles.fieldCard}>
+            <div className={styles.fieldName}>
+              <code>context</code> <span className={styles.fieldOptional}>任意</span>
+            </div>
+            <div className={styles.fieldConstraint}>inherit（デフォルト） | fork</div>
+            <div className={styles.fieldDesc}>
+              <code>fork</code>
+              にすると、メインの会話コンテキストとは独立した環境でタスクを実行。詳細は Section 05
+              で解説。
+            </div>
+          </div>
+          <div className={styles.fieldCard}>
+            <div className={styles.fieldName}>
+              <code>agent</code> <span className={styles.fieldOptional}>任意</span>
+            </div>
+            <div className={styles.fieldConstraint}>general-purpose | Explore | Plan</div>
+            <div className={styles.fieldDesc}>
+              <code>context: fork</code>
+              使用時に、起動するサブエージェントの種類を指定。コードベース探索には{" "}
+              <code>Explore</code>
+              、計画策定には <code>Plan</code>、汎用タスクには <code>general-purpose</code>。
+            </div>
+          </div>
+          <div className={styles.fieldCard}>
+            <div className={styles.fieldName}>
+              <code>dependencies</code> <span className={styles.fieldOptional}>任意</span>
+            </div>
+            <div className={styles.fieldConstraint}>配列形式 | semver対応</div>
+            <div className={styles.fieldDesc}>
+              スキルの実行に必要なソフトウェアパッケージを明示する。エンタープライズ展開時の依存関係管理に活用できる。
+            </div>
+          </div>
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram
+              chart={`graph LR
+A["invocation: automatic<br>Claudeが自動判断"] --> C{"実行判定"}
+B["disable-model-invocation: true<br>手動コマンドのみ"] --> C
+C --> D["context: inherit<br>メイン会話に統合"]
+C --> E["context: fork<br>独立したサブコンテキスト"]
+E --> F["agent: general-purpose"]
+E --> G["agent: Explore<br>コードベース探索特化"]
+E --> H["agent: Plan<br>計画策定特化"]
+style A fill:#1a4040,stroke:#4fd1c5,color:#ffffff
+style B fill:#4a1a1a,stroke:#fc8181,color:#ffffff
+style D fill:#1a3a5c,stroke:#63b3ed,color:#ffffff
+style E fill:#2d1f4a,stroke:#b794f4,color:#ffffff`}
+            />
+          </div>
         </div>
 
         {/* ── Section 03: instruction ── */}
