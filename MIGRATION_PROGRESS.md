@@ -9,9 +9,9 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- **最新 HEAD**: `040444c`（**feat(web-next): D-2 Green s03 — /claude/skill-guide-intermediate instruction (quadrant chart + freedom cards + file structure)**）
+- **最新 HEAD**: `96a8cdd`（**feat(web-next): D-2 Green s04 — /claude/skill-guide-intermediate args (3 arg patterns + dynamic context injection)**）
 - **未コミット作業**: なし（working tree クリーン）
-- **次の作業**: **D-2 Green s04 移植 — Section 04 (args: 1718-1851 行) faithful 移植**
+- **次の作業**: **D-2 Green s05 移植 — Section 05 (fork: 1852-1982 行) faithful 移植**
 - **テスト数**: `bun run test` **479 passed / 479 total（全 Green）** — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
 - **ビルド**: `bun run build` 成功（13 ルート全 Static）・`bun run typecheck` 成功・`uv run pytest` 5/5 passed
 - **lint 既知違反**: 7 件（MIGRATION_PROGRESS.md の旧記載「6 件」は誤記。正しくは 7 件）
@@ -166,13 +166,13 @@ Next.js 移行プロジェクトの作業を再開してください。
 
 - リポジトリ: LLM-Studies（Phase A–F の Next.js 移行作業中）
 - 現在のブランチ: feat/nextjs-migration
-- 最新 HEAD: 040444c（feat(web-next): D-2 Green s03 — /claude/skill-guide-intermediate instruction）
+- 最新 HEAD: 96a8cdd（feat(web-next): D-2 Green s04 — /claude/skill-guide-intermediate args）
 - 移行計画: docs/NEXTJS_PHASE_A_F_PLAN.md（Phase A–F）§Phase D を参照
 - 進捗トラッカー: MIGRATION_PROGRESS.md（**作業開始前に必読**: §「AI 作業ルール」R1〜R4）
 - プロジェクト固有スキル: .claude/skills/nextjs-page-migration/SKILL.md
 - リポジトリ規約: CLAUDE.md（AGENTS.md / GEMINI.md からも参照される。AI 共通の編集ルール）
 
-次の作業: **D-2 (`/claude/skill-guide-intermediate`) Green 移植 — Section 04 (args: 1718-1851 行) から再開**。s01〜s03 完了済み（040444c）。
+次の作業: **D-2 (`/claude/skill-guide-intermediate`) Green 移植 — Section 05 (fork: 1852-1982 行) から再開**。s01〜s04 完了済み（96a8cdd）。
 Phase D の対象は長文ガイド 9 ページ（すべて `.html` → JSX 直接移植。**MDX・`.md` SSoT 方式は不採用**）:
 - Claude: skill-guide-for-claude ✅ / skill-guide-of-claude-for-intermediate (D-2: Red 完了・Green 着手) / claude-cowork-guide
 - Gemini: skill-guide-for-gemini / skill-guide-of-gemini-for-intermediate / antigravity-guide
