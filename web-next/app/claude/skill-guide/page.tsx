@@ -489,6 +489,143 @@ style B fill:#1c2530,stroke:#58a6ff,color:#e6edf3`}
               </p>
             </div>
           </section>
+
+          {/* ── 05 ディレクトリ構造と優先順位 ── */}
+          <section id="directory" className={styles.sec}>
+            <div className={styles.secHeader}>
+              <span className={styles.secNum}>05</span>
+              <h2>ディレクトリ構造と優先順位</h2>
+            </div>
+            <p>
+              スキルを置く場所は <strong>3種類</strong> あり、適用範囲（スコープ）が異なります。
+            </p>
+            <div className={styles.tableWrap}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>スコープ</th>
+                    <th>パス</th>
+                    <th>用途</th>
+                    <th>共有</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <span className={`${styles.badge} ${styles.badgeRed}`}>Enterprise</span>{" "}
+                      最高優先
+                    </td>
+                    <td>管理者が設定</td>
+                    <td>組織全体で強制適用するスキル</td>
+                    <td>全ユーザー</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span className={`${styles.badge} ${styles.badgeBlue}`}>Personal</span>
+                    </td>
+                    <td>
+                      <code>~/.claude/skills/スキル名/</code>
+                    </td>
+                    <td>自分だけの全プロジェクト共通スキル</td>
+                    <td>個人のみ</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span className={`${styles.badge} ${styles.badgeGreen}`}>Project</span>
+                    </td>
+                    <td>
+                      <code>.claude/skills/スキル名/</code>
+                    </td>
+                    <td>プロジェクト固有・チーム共有スキル</td>
+                    <td>Git で共有</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className={styles.mermaidWrap}>
+              <MermaidDiagram
+                chart={`graph LR
+E["🏢 Enterprise\\n（最高優先度）"]
+P["👤 Personal\\n~/.claude/skills/"]
+PR["📁 Project\\n.claude/skills/"]
+E -->|上書き| P
+P -->|上書き| PR
+style E fill:#2a1c1c,stroke:#f85149,color:#e6edf3
+style P fill:#1c2530,stroke:#58a6ff,color:#e6edf3
+style PR fill:#1c2a1c,stroke:#3fb950,color:#e6edf3`}
+              />
+            </div>
+            <h3>実際のフォルダ構造</h3>
+            <div className={styles.codeBlock}>
+              <div className={styles.codeBlockHeader}>
+                <div className={styles.codeBlockDots}>
+                  <div className={`${styles.dot} ${styles.dotR}`} />
+                  <div className={`${styles.dot} ${styles.dotY}`} />
+                  <div className={`${styles.dot} ${styles.dotG}`} />
+                </div>
+                <span className={styles.codeBlockLang}>ディレクトリ構造例</span>
+              </div>
+              <pre>
+                <code>
+                  <span className={styles.cmt}>
+                    {"~/.claude/                      ← ホームディレクトリ（個人用）"}
+                  </span>
+                  {"\n"}
+                  {"├── CLAUDE.md                   "}
+                  <span className={styles.cmt}>← 全プロジェクト共通設定</span>
+                  {"\n"}
+                  {"└── "}
+                  <span className={styles.key}>skills/</span>
+                  {"                     "}
+                  <span className={styles.cmt}>← 個人スキルフォルダ</span>
+                  {"\n"}
+                  {"    ├── "}
+                  <span className={styles.val}>code-review/</span>
+                  {"\n"}
+                  {"    │   ├── "}
+                  <span className={styles.hdr}>SKILL.md</span>
+                  {"            "}
+                  <span className={styles.cmt}>← ★ これが主役！</span>
+                  {"\n"}
+                  {"    │   ├── checklist.md"}
+                  {"\n"}
+                  {"    │   └── scripts/"}
+                  {"\n"}
+                  {"    │       └── lint.sh"}
+                  {"\n"}
+                  {"    └── "}
+                  <span className={styles.val}>deploy/</span>
+                  {"\n"}
+                  {"        └── "}
+                  <span className={styles.hdr}>SKILL.md</span>
+                  {"\n"}
+                  {"\n"}
+                  <span className={styles.cmt}>
+                    {"your-project/                   ← プロジェクトルート"}
+                  </span>
+                  {"\n"}
+                  {"├── CLAUDE.md"}
+                  {"\n"}
+                  {"└── "}
+                  <span className={styles.key}>.claude/</span>
+                  {"\n"}
+                  {"    ├── "}
+                  <span className={styles.key}>skills/</span>
+                  {"             "}
+                  <span className={styles.cmt}>← プロジェクト専用スキル</span>
+                  {"\n"}
+                  {"    │   └── "}
+                  <span className={styles.val}>api-docs/</span>
+                  {"\n"}
+                  {"    │       └── "}
+                  <span className={styles.hdr}>SKILL.md</span>
+                  {"\n"}
+                  {"    └── plugins/               "}
+                  <span className={styles.cmt}>← プラグイン拡張</span>
+                </code>
+              </pre>
+            </div>
+          </section>
         </main>
       </div>
     </div>
