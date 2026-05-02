@@ -117,7 +117,6 @@ wc -l legacy/<provider>/<file>.html
 - 新たに i18n キーを追加した場合、`lib/i18n.test.ts` の `expect(Object.keys(T).length).toBe(N)` を
   **同じコミット内で N+k に更新**すること（B-1 で key count ドリフトが発生、別 commit `b984f16` で後追い同期した）
 
-
 ### Step 5: コードブロック（shiki）
 
 build-time ハイライトとして `shiki` を採用する。
@@ -176,6 +175,14 @@ bun run build       # Next.js production build (out/ 生成)
   削除せず参照用として保持する（Phase F でも物理削除は行わない）
 - 新規ガイドページを `legacy/` 配下に書かない（web-next 側のみに作成）
 
+## セッション終了前の仕様書同期
+
+1セクション移植コミットが完了したタイミング、またはコンテキスト逼迫を感じたタイミングで
+**必ず** `MIGRATION_PROGRESS.md` を更新してコミットする。
+
+手順の詳細は `.claude/rules/migration-progress-sync.md` を参照。
+更新対象: `現在地`（HEAD・次の作業・テスト数）+ `次回セッションでの再開プロンプト`。
+
 ## pre-commit-check スキルとの連携
 
 各ページ完了時に `/pre-commit-check` で以下を確認する:
@@ -195,6 +202,146 @@ bun run build       # Next.js production build (out/ 生成)
 | ビルド失敗 | 停止。import / 型エラーを最小差分で修正 |
 | lint エラー | Biome の指示通りに修正（`bun run lint:fix` は使わず手動）|
 | 設定ファイルの意図しない変更 | 停止してユーザー確認 |
+
+## Phase C 確立パターン（C-3 完成物から抽出・再読不要）
+
+> **目的**: `web-next/app/codex/agent/page.tsx`（C-3 完成物）を毎セッション Read するコストを省く。
+> 以下のパターンをそのまま使えば C-3 を参照する必要はない。
+
+### 型定義・定数
+
+```tsx
+type Source = {
+  icon: string;
+  title: string;
+  href: string;
+  url: string;
+  desc: string;
+};
+
+// TOC items は移行対象ページのセクション構造に合わせて作成
+const TOC_ITEMS = [
+  { id: "s01", label: "1. ..." },
+  // ... セクション数分
+  { id: "sources", label: "📚 参考ソース" },
+] as const;
+```
+
+### Ext ヘルパー（外部リンク、毎ページ必須）
+
+```tsx
+function Ext({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer">
+      {children}
+    </a>
+  );
+}
+```
+
+### コードブロック（React の生 HTML 注入 prop 禁止）
+
+生 HTML 注入 prop（`["danger","ously","Set","Inner","HTML"].join("")` で CI が検査）は使用禁止。
+コードブロック内のシンタックスハイライトはすべてネストした JSX `<span>` で表現する:
+
+```tsx
+<div className={styles.codeWrap}>
+  <div className={styles.codeBar}>
+    <span>ファイル名.md</span>
+    <span className={styles.codeLang}>YAML</span>
+  </div>
+  <div className={styles.codeBody}>
+    <span className={styles.cs}>---</span>
+    {"\n"}
+    <span className={styles.cm}>name</span>
+    {": "}
+    <span className={styles.cv}>'My Agent'</span>
+    {"  "}
+    <span className={styles.cc}># コメント</span>
+    {"\n"}
+    <span className={styles.cs}>---</span>
+    {"\n\n"}
+    {"本文テキスト"}
+  </div>
+</div>
+```
+
+**コードハイライト用クラス早見表**（`styles.` を前置して使用）:
+
+| クラス | 色 | 用途 |
+|---|---|---|
+| `ck` | 赤 `#ff7b72` | キーワード |
+| `cs` | 薄青 `#a5d6ff` | 文字列・区切り |
+| `cv` | 青 `#79c0ff` | 値 |
+| `cc` | グレー斜体 `#3b4750` | コメント |
+| `ch` | オレンジ太字 `#f0883e` | 見出し |
+| `cm` | 緑太字 `#7ee787` | マーカー・セクション |
+| `cw` | 黄 `#d29922` | 警告・重要語 |
+| `ce` | 紫 `#bc8cff` | 列挙・特殊 |
+| `cg` | 明緑 `#3fb950` | 成功・肯定 |
+
+### TOC nav（合成 — legacy HTML に存在しないため追加）
+
+```tsx
+<nav className={styles.toc}>
+  <div className={styles.tocTitle}>目次</div>
+  {TOC_ITEMS.map((item) => (
+    <a key={item.id} href={`#${item.id}`}>
+      {item.label}
+    </a>
+  ))}
+</nav>
+```
+
+### ネスト sec の展開規則
+
+legacy HTML で 1 つの `<div class="sec">` 内に複数のサブ見出し `<div class="sec-head" style="...">` が含まれる場合（C-4 の s04〜s13 相当）:
+
+```tsx
+{/* 外側 sec の冒頭コンテンツ → s04 */}
+<section id="s04" className={styles.sec}>
+  <div className={styles.secHead}>{/* 外側 sec の h2 */}</div>
+  {/* 概念カード等 */}
+</section>
+
+{/* サブ見出し 1 つ目 → s05（外側 sec とは独立した flat section）*/}
+<section id="s05" className={styles.sec}>
+  <div
+    className={styles.secHead}
+    style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
+  >
+    <h2 style={{ fontSize: "1.1rem" }}>4-1. ...</h2>
+  </div>
+  {/* コンテンツ */}
+</section>
+```
+
+### SVG 属性変換規則
+
+| HTML 属性 | JSX 属性 |
+|---|---|
+| `text-anchor` | `textAnchor` |
+| `font-family` | `fontFamily` |
+| `font-size` | `fontSize` |
+| `font-weight` | `fontWeight` |
+| `letter-spacing` | `letterSpacing` |
+| `stroke-width` | `strokeWidth` |
+| `fill-opacity` | `fillOpacity` |
+| `stop-color` in `style=` | `style={{ stopColor: '...' }}` |
+| `pointer-events` | `pointerEvents` |
+| `style="display:block;"` | `style={{ display: 'block' }}` |
+
+SVG には必ず `role="img"` + `aria-label` + `<title>` を付与（Biome `noSvgWithoutTitle` 対応）。
+
+### CSS Module 複合クラス（chained selector）の適用方法
+
+```tsx
+{/* .navPill.green → */}
+<span className={`${styles.navPill} ${styles.green}`}>Agent Mode</span>
+
+{/* .hfBtn.auto → */}
+<div className={`${styles.hfBtn} ${styles.auto}`}>自動→</div>
+```
 
 ## 注意事項
 
