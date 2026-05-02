@@ -1085,7 +1085,98 @@ style G fill:#2d1f4a,stroke:#b794f4,color:#ffffff`}
             <h2>トリガーチューニング戦略</h2>
             <div className={styles.secLine} />
           </div>
-          {/* faithful content: D-2 Green s06 */}
+          <p>
+            スキルが期待通りにトリガーされないケースは大きく2種類に分類できる。それぞれに対して異なるアプローチが必要だ。
+          </p>
+
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram
+              chart={`graph TD
+A["スキルのトリガー問題"] --> B["アンダートリガー<br>発動すべき状況で不発"]
+A --> C["オーバートリガー<br>無関係な文脈で誤発動"]
+B --> B1["原因: description が曖昧<br>語彙的な乖離"]
+B --> B2["解決: トリガーキーワードを追加<br>同義語 専門用語を列挙"]
+C --> C1["原因: description が広範すぎる<br>一般的すぎる単語"]
+C --> C2["解決: 条件を絞り込む<br>ネガティブトリガーを追加"]
+style B fill:#4a1a1a,stroke:#fc8181,color:#ffffff
+style C fill:#3a2a00,stroke:#f6ad55,color:#ffffff
+style B2 fill:#1a4040,stroke:#4fd1c5,color:#ffffff
+style C2 fill:#1a4040,stroke:#4fd1c5,color:#ffffff`}
+            />
+          </div>
+
+          <div className={styles.triggerGrid}>
+            <div className={`${styles.triggerBox} ${styles.under}`}>
+              <div className={styles.triggerType}>❌ アンダートリガー（不発）</div>
+              <p style={{ fontSize: "13px" }}>
+                本来スキルで処理すべき要求に対して、通常の推論のみで対処しようとし失敗する。ユーザーが手動で
+                <code>/skill-name</code>
+                を入力しなければならない状態。
+              </p>
+              <div className={`${styles.compareBox} ${styles.bad}`} style={{ marginTop: "10px" }}>
+                <div className={styles.compareLabel}>❌ 悪い description</div>
+                <p style={{ fontSize: "12px" }}>「デプロイメントのチェックリストを生成する」</p>
+              </div>
+              <div className={`${styles.compareBox} ${styles.good}`} style={{ marginTop: "10px" }}>
+                <div className={styles.compareLabel}>✅ 改善後</div>
+                <p style={{ fontSize: "12px" }}>
+                  「デプロイメントのチェックリストを生成する。ユーザーが
+                  <strong>
+                    『デプロイ』『ローンチ』『本番環境へ反映』『リリースの準備ができたか』
+                  </strong>
+                  などに言及した場合、明示的にチェックリストを要求されていなくても、必ずこのスキルを自動で使用して検証プロセスを開始すること」
+                </p>
+              </div>
+            </div>
+            <div className={`${styles.triggerBox} ${styles.over}`}>
+              <div className={styles.triggerType}>⚠️ オーバートリガー（誤発動）</div>
+              <p style={{ fontSize: "13px" }}>
+                全く関係のない質問に対して意図せずスキルが起動し、会話の文脈が破壊される。ユーザーがスキル自体を無効化してしまう原因になる。
+              </p>
+              <div className={`${styles.compareBox} ${styles.bad}`} style={{ marginTop: "10px" }}>
+                <div className={styles.compareLabel}>❌ 悪い description</div>
+                <p style={{ fontSize: "12px" }}>「コードに関することなら何でも使用する」</p>
+              </div>
+              <div className={`${styles.compareBox} ${styles.good}`} style={{ marginTop: "10px" }}>
+                <div className={styles.compareLabel}>✅ 改善後（ネガティブトリガー追加）</div>
+                <p style={{ fontSize: "12px" }}>
+                  「...コードの
+                  <strong>セキュリティ脆弱性</strong>
+                  を調査するときに使用する。機能の説明や一般的なコーディング質問の場合は
+                  <strong>使用しないこと</strong>」
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <h3>Description チューニングのベストプラクティス</h3>
+          <div className={styles.card}>
+            <ol style={{ fontSize: "14px", color: "var(--text-secondary)" }}>
+              <li style={{ marginBottom: "10px" }}>
+                実行する内容だけでなく、
+                <strong>具体的なトリガーキーワード</strong>
+                （ユーザーが自然言語で入力しそうな言葉）を列挙する
+              </li>
+              <li style={{ marginBottom: "10px" }}>
+                関連する
+                <strong>技術的専門用語の同義語</strong>
+                を複数含める（例：「デプロイ」「ローンチ」「リリース」「本番反映」）
+              </li>
+              <li style={{ marginBottom: "10px" }}>
+                <strong>明示的に要求されなくても起動すべき状況</strong>
+                を記述する（「〜に言及した場合は〜すること」）
+              </li>
+              <li style={{ marginBottom: "10px" }}>
+                <strong>ネガティブトリガー</strong>
+                で誤発動を防ぐ（「〜の場合は使用しないこと」）
+              </li>
+              <li>
+                エージェントはやや起動したがらない傾向のため、
+                <strong>「やや強引」</strong>
+                に記述することが推奨されている
+              </li>
+            </ol>
+          </div>
         </div>
 
         {/* ── Section 07: debug ── */}
