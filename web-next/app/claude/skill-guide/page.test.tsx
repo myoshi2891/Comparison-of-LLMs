@@ -13,9 +13,9 @@ describe("/claude/skill-guide 契約テスト", () => {
     expect(container.querySelector("h1")?.textContent).toContain("完全解説ガイド");
   });
 
-  it("h2 が 15 本（15 セクション）", () => {
+  it("h2 が 16 本（サイドバー 1 + セクション 15）", () => {
     const { container } = render(<Page />);
-    expect(container.querySelectorAll("h2").length).toBe(15);
+    expect(container.querySelectorAll("h2").length).toBe(16);
   });
 
   it("外部リンクに target=_blank と rel=noopener noreferrer が付与されている", () => {

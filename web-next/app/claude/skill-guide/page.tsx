@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
-
-// MermaidDiagram はクライアントサイドでのみ実行する必要があるため ssr: false
-const MermaidDiagram = dynamic(() => import("@/components/docs/MermaidDiagram"), { ssr: false });
 
 export const metadata: Metadata = {
   title: "SKILL.md 完全解説ガイド — Claude Code",
@@ -1544,6 +1541,214 @@ style E fill:#1c2530,stroke:#58a6ff,color:#e6edf3`}
                 </code>
               </pre>
             </div>
+          </section>
+
+          {/* ── 15 エンタープライズ展開とプロビジョニング ── */}
+          <section id="enterprise" className={styles.sec}>
+            <div className={styles.secHeader}>
+              <span className={styles.secNum}>15</span>
+              <h2>エンタープライズ展開とプロビジョニング</h2>
+            </div>
+            <p>
+              Team/Enterprise
+              プランでは、管理者が検証済みのスキルを組織全体に一括展開（プロビジョニング）できます。
+            </p>
+            <div className={styles.steps}>
+              <div className={styles.stepItem}>
+                <div className={styles.stepNum}>1</div>
+                <div className={styles.stepContent}>
+                  <div className={styles.stepTitle}>スキルのパッケージ化</div>
+                  <div className={styles.stepDesc}>
+                    スキルディレクトリを ZIP 圧縮する。ルートがディレクトリ名になるよう注意。
+                  </div>
+                  <div className={styles.codeBlock}>
+                    <pre style={{ padding: "0.75rem", fontSize: "0.75rem" }}>
+                      <code>
+                        <span className={styles.tag}>$</span>
+                        {" zip -r team-reviewer.zip team-reviewer/\n"}
+                        <span className={styles.cmt}>
+                          # 解凍結果: team-reviewer/SKILL.md ← この構造が必須
+                        </span>
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.stepItem}>
+                <div className={styles.stepNum}>2</div>
+                <div className={styles.stepContent}>
+                  <div className={styles.stepTitle}>アップロードと展開</div>
+                  <div className={styles.stepDesc}>
+                    管理者が Organization settings → Skills から ZIP
+                    ファイルをアップロードする。即座に全ユーザーに展開される。
+                  </div>
+                </div>
+              </div>
+              <div className={styles.stepItem}>
+                <div className={styles.stepNum}>3</div>
+                <div className={styles.stepContent}>
+                  <div className={styles.stepTitle}>デフォルトステータスの設定</div>
+                  <div className={styles.stepDesc}>
+                    全員に適用するスキルは「デフォルト有効」、一部のユーザーのみが使う破壊的スキルは「デフォルト無効」で展開する。
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className={styles.mermaidWrap}>
+              <MermaidDiagram
+                chart={`graph LR
+A["✅ デフォルト有効\\n（Enabled by default）"]
+B["❌ デフォルト無効\\n（Disabled by default）"]
+A --> A1["コーディング規約チェッカー"]
+A --> A2["議事録フォーマッター"]
+A --> A3["ドキュメント生成ツール"]
+B --> B1["本番環境デプロイスキル"]
+B --> B2["DBマイグレーションスキル"]
+B --> B3["インフラ操作スキル"]
+style A fill:#1c2a1c,stroke:#3fb950,color:#e6edf3
+style B fill:#2a1c1c,stroke:#f85149,color:#e6edf3`}
+              />
+            </div>
+            <h3 style={{ marginTop: "3rem" }}>📎 全体まとめ</h3>
+            <div className={styles.mermaidWrap}>
+              <MermaidDiagram
+                chart={`mindmap
+  root((SKILL.md))
+    何のため
+      専門タスクの手順書
+      一度書いて何度でも再利用
+      チームで共有可能
+    どこに置く
+      個人: ~/.claude/skills/スキル名/
+      プロジェクト: .claude/skills/スキル名/
+      Enterprise: 管理者が設定
+    何を書く
+      YAMLフロントマター
+        name スキル名
+        description いつ使うか
+        allowed-tools 使えるツール
+        context fork で独立実行
+      Markdown本文
+        手順・プロセス
+        出力フォーマット
+        注意事項
+    CLAUDE.mdとの違い
+      CLAUDE.mdは常時読み込み
+      SKILL.mdは必要時のみ
+      SKILL.mdはスクリプト同梱可`}
+              />
+            </div>
+            <div className={`${styles.callout} ${styles.calloutTip}`} style={{ marginTop: "2rem" }}>
+              <span className={styles.calloutIcon}>🏆</span>
+              <p>
+                <strong>最重要ポイント：</strong>
+                <br />
+                <code>description</code>
+                を丁寧に書くことが、スキルが自動で正しく呼び出されるかどうかを決定する最重要事項です。「どんな言葉・状況でこのスキルを使うべきか」を具体的に、やや強引なくらい詳しく書きましょう。
+              </p>
+            </div>
+            <h3 style={{ marginTop: "3rem" }}>📚 参考リンク</h3>
+            <div className={styles.tableWrap}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>リソース</th>
+                    <th>URL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Claude Code Skills 公式ドキュメント</td>
+                    <td>
+                      <a
+                        href="https://docs.anthropic.com/en/docs/claude-code/skills"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        docs.anthropic.com/…/skills
+                      </a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Agent Teams 公式ドキュメント</td>
+                    <td>
+                      <a
+                        href="https://docs.anthropic.com/en/docs/claude-code/agent-teams"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        docs.anthropic.com/…/agent-teams
+                      </a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Claude Code Hooks（HTTP hooks含む）</td>
+                    <td>
+                      <a
+                        href="https://docs.anthropic.com/en/docs/claude-code/hooks"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        docs.anthropic.com/…/hooks
+                      </a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Agent Skills 概要（Claude API）</td>
+                    <td>
+                      <a
+                        href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        platform.claude.com/…/overview
+                      </a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Claude Code Skills ヘルプ</td>
+                    <td>
+                      <a
+                        href="https://support.claude.com/en/articles/12512180-use-skills-in-claude"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        support.claude.com/…/use-skills
+                      </a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Claude Code カスタマイズ完全ガイド</td>
+                    <td>
+                      <a
+                        href="https://alexop.dev/posts/claude-code-customization-guide-claudemd-skills-subagents/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        alexop.dev/…/customization-guide
+                      </a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>詳細技術ガイド（deep-dive）</td>
+                    <td>
+                      <a href="./skill-guide-deep-dive.md">skill-guide-deep-dive.md</a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p
+              style={{
+                fontSize: "0.78rem",
+                color: "var(--text3)",
+                marginTop: "3rem",
+                textAlign: "center",
+                fontFamily: "'JetBrains Mono', monospace",
+              }}
+            >
+              最終更新: 2026年3月 · Claude Code v2.1.76 対応 · SKILL.md 完全解説ガイド
+            </p>
           </section>
         </main>
       </div>
