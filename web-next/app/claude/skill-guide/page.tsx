@@ -299,6 +299,99 @@ style EXT fill:#1a2535,stroke:#3b5270,color:#e6edf3`}
               </table>
             </div>
           </section>
+
+          {/* ── 03 トークン経済と3層アーキテクチャ ── */}
+          <section id="token" className={styles.sec}>
+            <div className={styles.secHeader}>
+              <span className={styles.secNum}>03</span>
+              <h2>トークン経済と3層アーキテクチャ</h2>
+            </div>
+            <p>
+              なぜ単一の巨大なプロンプトではなく、ディレクトリとファイル群による階層的な構造なのか？その答えが「
+              <strong>プログレッシブ・ディスクロージャー</strong>
+              」という設計思想です。
+            </p>
+            <div className={`${styles.callout} ${styles.calloutInfo}`}>
+              <span className={styles.calloutIcon}>🧠</span>
+              <p>
+                情報を無秩序にコンテキストへ詰め込むと「アテンション・バジェット（注意力の予算）」が枯渇し、モデルの推論精度が著しく低下します。SKILL.md
+                はこれを防ぐため、
+                <strong>必要な情報を必要なタイミングでのみ読み込む</strong>
+                3層構造を採用しています。
+              </p>
+            </div>
+            <h3>3層読み込みレベル</h3>
+            <div className={styles.tableWrap}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>レベル</th>
+                    <th>構成要素</th>
+                    <th>トークン消費</th>
+                    <th>読み込みタイミング</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <span className={`${styles.badge} ${styles.badgeGreen}`}>Level 1</span>{" "}
+                      メタデータ
+                    </td>
+                    <td>YAMLフロントマター（nameとdescription）</td>
+                    <td>~100 tokens/スキル</td>
+                    <td>Claude Code 起動時・常時</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span className={`${styles.badge} ${styles.badgeBlue}`}>Level 2</span>{" "}
+                      インストラクション
+                    </td>
+                    <td>SKILL.md のマークダウン本文（推奨500行未満）</td>
+                    <td>~5000 tokens</td>
+                    <td>スキルがトリガーされた瞬間のみ</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span className={`${styles.badge} ${styles.badgePurple}`}>Level 3</span>{" "}
+                      参照ファイル
+                    </td>
+                    <td>外部ドキュメント・実行スクリプト</td>
+                    <td>実質無制限</td>
+                    <td>エージェントが必要と判断した時のみ</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className={styles.mermaidWrap}>
+              <MermaidDiagram
+                chart={`sequenceDiagram
+participant User as 👤 ユーザー
+participant C as ⚡ Claude Code
+participant L1 as Level 1 (YAML)
+participant L2 as Level 2 (本文)
+participant L3 as Level 3 (スクリプト)
+Note over C,L1: セッション開始フェーズ
+C->>L1: 全スキルのメタデータをスキャン
+L1-->>C: name と description のみ登録（~100 tokens/スキル）
+User->>C: READMEを作成してください
+Note over C: ユーザーの意図と description を照合して判断
+C->>L2: readme-writer スキルの本文を読み込み
+L2-->>C: 指示内容をコンテキストに展開
+C->>L3: references/style.md を読み込み
+L3-->>C: スタイルガイドラインを返す
+C->>L3: scripts/validate.sh を実行
+L3-->>C: 実行結果のみを返す（コードは不要）
+C-->>User: ガイドラインに準拠したREADMEを出力`}
+              />
+            </div>
+            <div className={`${styles.callout} ${styles.calloutTip}`}>
+              <span className={styles.calloutIcon}>⚡</span>
+              <p>
+                この設計の最大の利点は<strong>スケーラビリティ</strong>
+                です。100個のスキルを追加しても、トリガーされないスキルのコストはほぼゼロ。メインの会話コンテキストを圧迫しません。
+              </p>
+            </div>
+          </section>
         </main>
       </div>
     </div>
