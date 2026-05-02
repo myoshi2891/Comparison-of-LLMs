@@ -626,6 +626,101 @@ style PR fill:#1c2a1c,stroke:#3fb950,color:#e6edf3`}
               </pre>
             </div>
           </section>
+
+          {/* ── 06 スキルが呼び出される仕組み ── */}
+          <section id="invoke" className={styles.sec}>
+            <div className={styles.secHeader}>
+              <span className={styles.secNum}>06</span>
+              <h2>スキルが呼び出される仕組み</h2>
+            </div>
+            <p>スキルが実行されるまでの流れを見てみましょう。</p>
+            <div className={styles.mermaidWrap}>
+              <MermaidDiagram
+                chart={`sequenceDiagram
+participant U as 👤 ユーザー
+participant CC as ⚡ Claude Code
+participant SK as 📚 Skills一覧
+participant SM as 📄 SKILL.md
+U->>CC: 「このコードをレビューして」
+CC->>SK: 利用可能なスキルを確認
+SK-->>CC: code-review, deploy, api-docs ...
+Note over CC: description とユーザーの意図を照合
+CC->>SM: code-review/SKILL.md を読み込む
+SM-->>CC: レビュー手順・観点・出力形式を返す
+CC->>U: 手順に従ったコードレビュー結果`}
+              />
+            </div>
+            <h3>2つの呼び出し方法</h3>
+            <div className={styles.cardGrid}>
+              <div className={styles.card}>
+                <div className={styles.cardIcon}>🤖</div>
+                <div className={styles.cardTitle}>方法①：Claude が自動判断（推奨）</div>
+                <div className={styles.cardDesc}>
+                  description
+                  を読んで、ユーザーの意図と一致すると判断したら自動で実行。ユーザーは何も意識する必要がない。
+                </div>
+                <div className={styles.codeBlock} style={{ marginTop: "0.75rem" }}>
+                  <pre style={{ padding: "0.75rem", fontSize: "0.75rem" }}>
+                    <code>
+                      <span className={styles.cmt}>ユーザー:</span>
+                      {" 「このPDFを解析して要約してくれ」"}
+                      {"\n"}
+                      <span className={styles.cmt}>Claude:</span>
+                      {"  "}
+                      <span className={styles.str}>(自動でpdfスキルを検出・実行)</span>
+                    </code>
+                  </pre>
+                </div>
+              </div>
+              <div className={styles.card}>
+                <div className={styles.cardIcon}>⌨️</div>
+                <div className={styles.cardTitle}>方法②：スラッシュコマンドで手動</div>
+                <div className={styles.cardDesc}>
+                  ユーザーが直接スキル名をコマンドとして入力して実行する。確実に特定のスキルを動かしたい時に使う。
+                </div>
+                <div className={styles.codeBlock} style={{ marginTop: "0.75rem" }}>
+                  <pre style={{ padding: "0.75rem", fontSize: "0.75rem" }}>
+                    <code>
+                      <span className={styles.cmt}>ユーザー:</span>
+                      {" /code-review src/auth/login.ts"}
+                      {"\n"}
+                      <span className={styles.cmt}>Claude:</span>
+                      {"  "}
+                      <span className={styles.str}>(code-reviewスキルを直接実行)</span>
+                    </code>
+                  </pre>
+                </div>
+              </div>
+            </div>
+            <h3>invocation フィールドで制御する</h3>
+            <div className={styles.codeBlock}>
+              <div className={styles.codeBlockHeader}>
+                <div className={styles.codeBlockDots}>
+                  <div className={`${styles.dot} ${styles.dotR}`} />
+                  <div className={`${styles.dot} ${styles.dotY}`} />
+                  <div className={`${styles.dot} ${styles.dotG}`} />
+                </div>
+                <span className={styles.codeBlockLang}>YAML frontmatter</span>
+              </div>
+              <pre>
+                <code>
+                  <span className={styles.cmt}># Claude が自動判断（デフォルト）</span>
+                  {"\n"}
+                  <span className={styles.key}>invocation</span>
+                  {": "}
+                  <span className={styles.val}>automatic</span>
+                  {"\n\n"}
+                  <span className={styles.cmt}>
+                    # /deploy と入力したときのみ実行（破壊的操作に推奨）
+                  </span>
+                  {"\n"}
+                  <span className={styles.key}>invocation</span>
+                  {": "}
+                  <span className={styles.val}>explicit</span>
+                </code>
+              </pre>
+            </div>
+          </section>
         </main>
       </div>
     </div>
