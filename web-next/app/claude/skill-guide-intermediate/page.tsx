@@ -899,7 +899,183 @@ style P3 fill:#2d1f4a,stroke:#b794f4,color:#ffffff`}
             <h2>{"context:fork vs カスタムSubagents — 境界線を引く"}</h2>
             <div className={styles.secLine} />
           </div>
-          {/* faithful content: D-2 Green s05 */}
+          <p>
+            「コンテキストを分離してタスクを実行する」という目的は共通だが、
+            <strong>設計思想・予測可能性・デバッグ難易度</strong>
+            が根本的に異なる。
+          </p>
+
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram
+              chart={`sequenceDiagram
+participant User as ユーザー
+participant Main as メインコンテキスト
+participant Fork as フォークコンテキスト
+
+Note over User,Fork: context:fork パターン
+User->>Main: /security-audit 実行
+Main->>Fork: 現在のコンテキストをスナップショット
+Note over Fork: SKILL.md の手順を実行
+Fork-->>Main: 最終結果のみを返却
+Note over Main: 途中経過は破棄 メインは汚染されない
+Main-->>User: クリーンな監査レポート`}
+            />
+          </div>
+
+          <h3>詳細比較表</h3>
+          <table className={styles.dataTable}>
+            <thead>
+              <tr>
+                <th>比較項目</th>
+                <th>context: fork を用いたスキル</th>
+                <th>カスタムSubagents (.claude/agents/*.md)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>設計思想</td>
+                <td>定義済みワークフローを安全に一時分離実行</td>
+                <td>自律性の高いワークフローをゼロから定義・オーケストレーション</td>
+              </tr>
+              <tr>
+                <td>タスク定義</td>
+                <td>SKILL.md がそのまま指示書として機能</td>
+                <td>メインがその都度「委譲メッセージ」を動的生成</td>
+              </tr>
+              <tr>
+                <td>コンテキスト引き継ぎ</td>
+                <td>親のスナップショットをそのまま引き継ぐ</td>
+                <td>完全にクリーンな初期状態から開始</td>
+              </tr>
+              <tr>
+                <td>予測可能性</td>
+                <td>
+                  <span className={styles.tagGreen}>高い</span>
+                  {" — 入力・指示が固定"}
+                </td>
+                <td>
+                  <span className={styles.tagOrange}>低い</span>
+                  {" — 委譲メッセージが変化"}
+                </td>
+              </tr>
+              <tr>
+                <td>デバッグ難易度</td>
+                <td>
+                  <span className={styles.tagGreen}>容易</span>
+                  {" — 原因究明が直線的"}
+                </td>
+                <td>
+                  <span className={styles.tagRed}>困難</span>
+                  {" — 挙動に揺らぎが出やすい"}
+                </td>
+              </tr>
+              <tr>
+                <td>柔軟性・自律性</td>
+                <td>
+                  <span className={styles.tagOrange}>低い</span>
+                  {" — バッチ処理的"}
+                </td>
+                <td>
+                  <span className={styles.tagGreen}>高い</span>
+                  {" — 実行経路を動的に構築"}
+                </td>
+              </tr>
+              <tr>
+                <td>推奨ユースケース</td>
+                <td>セキュリティ監査、ドキュメント生成、静的解析</td>
+                <td>複雑な意思決定が必要な多段階タスク</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>使い分けのフローチャート</h3>
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram
+              chart={`flowchart TD
+A["タスクの性質を評価"] --> B{"手順は固定されているか？"}
+B -- Yes --> C{"メインのコンテキストを<br>汚染したくないか？"}
+B -- No --> D{"複雑な自律判断が<br>必要か？"}
+C -- Yes --> E["context: fork スキル<br>推奨 監査 分析 生成"]
+C -- No --> F["context: inherit スキル<br>通常のインライン実行"]
+D -- Yes --> G["カスタムSubagent<br>推奨 多段階タスク"]
+D -- No --> H["通常のスキルで十分"]
+style E fill:#1a4040,stroke:#4fd1c5,color:#ffffff
+style G fill:#2d1f4a,stroke:#b794f4,color:#ffffff`}
+            />
+          </div>
+
+          <h3>context:fork の実装例</h3>
+          <div className={styles.codeBlock}>
+            <div className={styles.codeHeader}>
+              <div className={styles.codeDots}>
+                <div className={styles.codeDot} />
+                <div className={styles.codeDot} />
+                <div className={styles.codeDot} />
+              </div>
+              <div className={styles.codeLang}>YAML — context:fork 設定</div>
+            </div>
+            <div className={styles.codeContent}>
+              <pre>
+                <span className={styles.cs}>{"---"}</span>
+                {"\n"}
+                <span className={styles.cm}>name</span>
+                {": "}
+                <span className={styles.cv}>security-audit</span>
+                {"\n"}
+                <span className={styles.cm}>description</span>
+                {": "}
+                <span className={styles.cv}>
+                  プロジェクト全体のセキュリティ監査をバックグラウンドで実行する
+                </span>
+                {"\n"}
+                <span className={styles.cm}>context</span>
+                {": "}
+                <span className={styles.cv}>fork</span>
+                {"           "}
+                <span className={styles.cc}>{"# ← メインコンテキストをスナップショット"}</span>
+                {"\n"}
+                <span className={styles.cm}>agent</span>
+                {": "}
+                <span className={styles.cv}>Explore</span>
+                {"          "}
+                <span className={styles.cc}>
+                  {"# ← コードベース探索に特化したサブエージェント"}
+                </span>
+                {"\n"}
+                <span className={styles.cm}>disable-model-invocation</span>
+                {": "}
+                <span className={styles.cs}>true</span>
+                {"  "}
+                <span className={styles.cc}>{"# ← 意図しない自動起動を防止"}</span>
+                {"\n"}
+                <span className={styles.cs}>{"---"}</span>
+                {"\n\n"}
+                <span className={styles.ch}>{"# セキュリティ監査プロセス"}</span>
+                {"\n\n"}
+                <span className={styles.cc}>
+                  {"# このスキルは fork されたコンテキストで実行される"}
+                </span>
+                {"\n"}
+                <span className={styles.cc}>
+                  {"# すべての調査ログはメインに返さず、最終結果のみを返却する"}
+                </span>
+                {"\n\n"}
+                {"現在のシステム情報: "}
+                <span className={styles.ck}>{'! `git log --since="1 week ago" --oneline`'}</span>
+                {"\n\n"}
+                <span className={styles.ch}>{"## 監査手順"}</span>
+                {"\n\n"}
+                {"1. OWASP Top 10 の各カテゴリに従ってコードをスキャン"}
+                {"\n"}
+                {"2. `references/severity-matrix.md` に基づいて重大度を評価"}
+                {"\n"}
+                {"3. 検証スクリプトを実行: "}
+                <span className={styles.ck}>{"! `scripts/scan.sh`"}</span>
+                {"\n"}
+                {"4. 結果を Markdown テーブル形式で返却する"}
+              </pre>
+            </div>
+          </div>
         </div>
 
         {/* ── Section 06: trigger ── */}
