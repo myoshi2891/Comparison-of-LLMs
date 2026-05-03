@@ -17,6 +17,22 @@ end
 style WEB fill:#1a2530,stroke:#58a6ff,color:#e6edf3
 style CW fill:#2a1a0a,stroke:#f97316,color:#e6edf3`;
 
+const DIAG_1 = `sequenceDiagram
+participant U as ユーザー
+participant CW as Cowork
+participant FS as ファイルシステム
+participant AI as Claude AI
+U->>CW: Downloads の PDF を月別に整理して
+CW->>FS: フォルダの内容をスキャン
+FS-->>CW: ファイル一覧を返す
+CW->>AI: ファイル一覧と指示を送信
+AI-->>CW: 実行計画を生成
+Note over CW: 実行前に計画をユーザーに提示
+CW->>U: これを実行しますか
+U->>CW: OK
+CW->>FS: ファイルを移動・整理
+CW-->>U: 完了レポート`;
+
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -509,7 +525,59 @@ export default function Page() {
           </div>
         </section>
 
-        {/* sections s05–s11 will be added in subsequent Green commits */}
+        {/* ── 05 FILE TASKS ── */}
+        <section className={styles.section} id="file-tasks">
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionNum}>05</span>
+            <h2>ファイル・タスク自動化の仕組み</h2>
+          </div>
+          <p>Cowork がどのように動作するかを理解すると、より効果的に使えます。</p>
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram chart={DIAG_1} />
+          </div>
+          <h3>自動化トリガーの種類</h3>
+          <div className={styles.cardGrid}>
+            <div className={styles.card}>
+              <div className={styles.cardIcon}>🖱️</div>
+              <div className={styles.cardTitle}>手動実行</div>
+              <div className={styles.cardDesc}>
+                チャット欄に指示を入力して即座に実行。最もシンプルな使い方。
+              </div>
+            </div>
+            <div className={styles.card}>
+              <div className={styles.cardIcon}>📂</div>
+              <div className={styles.cardTitle}>フォルダ監視</div>
+              <div className={styles.cardDesc}>
+                「このフォルダにファイルが来たら自動で〇〇する」フォルダウォッチャー機能。
+              </div>
+            </div>
+            <div className={styles.card}>
+              <div className={styles.cardIcon}>⏰</div>
+              <div className={styles.cardTitle}>スケジュール実行</div>
+              <div className={styles.cardDesc}>
+                「毎週月曜9時に〇〇する」「毎日終業後にバックアップする」などの定期実行。
+              </div>
+            </div>
+            <div className={styles.card}>
+              <div className={styles.cardIcon}>⚡</div>
+              <div className={styles.cardTitle}>Skills 起動</div>
+              <div className={styles.cardDesc}>
+                定義済みの SKILL.md を呼び出して、標準化されたワークフローを実行。
+              </div>
+            </div>
+          </div>
+          <div className={`${styles.callout} ${styles.calloutWarn}`}>
+            <span className={styles.calloutIcon}>⚠️</span>
+            <p>
+              <strong>重要 — 「確認ファースト」の原則:</strong> Cowork
+              は破壊的な操作（ファイルの削除・上書き・大量移動）の前に
+              必ず確認ダイアログを表示します。最初のうちは「削除はしないで」「コピーだけして」など
+              安全な指示から始めることを強く推奨します。
+            </p>
+          </div>
+        </section>
+
+        {/* sections s06–s11 will be added in subsequent Green commits */}
       </div>
     </div>
   );
