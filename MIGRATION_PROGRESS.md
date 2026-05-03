@@ -9,7 +9,7 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- **最新 HEAD**: `b32b162`（**feat(web-next): faithful migration of /claude/claude-cowork-guide s11 (sources) — D-3 全セクション完了**）
+- **最新 HEAD**: `76e27f7`（**refactor(web-next): replace inline styles and improve a11y in Claude guides**）
 - **未コミット作業**: なし（working tree クリーン）
 - **次の作業**: **D-4 — `/gemini/skill-guide-for-gemini` Red scaffold + faithful 移植開始**
 - **テスト数**: `bun run test` **490 passed / 490 total（全 Green）** — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
