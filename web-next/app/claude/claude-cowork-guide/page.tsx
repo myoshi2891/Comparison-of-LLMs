@@ -915,7 +915,144 @@ allowed-tools:
           </div>
         </section>
 
-        {/* sections s09–s11 will be added in subsequent Green commits */}
+        {/* ── 09 BEST PRACTICES ── */}
+        <section className={styles.section} id="best-practices">
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionNum}>09</span>
+            <h2>ベストプラクティス 10 則</h2>
+          </div>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>原則</th>
+                  <th>理由・解説</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <span className={`${styles.badge} ${styles.badgeOrange}`}>01</span>
+                  </td>
+                  <td>
+                    <strong>最初は「読むだけ」から始める</strong>
+                  </td>
+                  <td>
+                    いきなりファイルを移動・削除する指示より、「一覧を教えて」「内容を要約して」から始め、動作を確認する。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <span className={`${styles.badge} ${styles.badgeOrange}`}>02</span>
+                  </td>
+                  <td>
+                    <strong>パスは具体的に指定する</strong>
+                  </td>
+                  <td>
+                    <code>~/Documents/Projects/2025/Q1/</code>
+                    のように絶対パスに近い形で指定すると誤操作が防げる。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <span className={`${styles.badge} ${styles.badgeOrange}`}>03</span>
+                  </td>
+                  <td>
+                    <strong>まずコピーを作ってから作業する</strong>
+                  </td>
+                  <td>
+                    「バックアップを ~/Backup/
+                    に作ってから整理して」のように、変更前のコピーを保持する習慣をつける。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <span className={`${styles.badge} ${styles.badgeGreen}`}>04</span>
+                  </td>
+                  <td>
+                    <strong>繰り返す作業は Skills 化する</strong>
+                  </td>
+                  <td>
+                    3回以上同じ指示をしたら SKILL.md に書き起こす。description
+                    にトリガーワードを具体的に書く。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <span className={`${styles.badge} ${styles.badgeGreen}`}>05</span>
+                  </td>
+                  <td>
+                    <strong>出力フォーマットを明示する</strong>
+                  </td>
+                  <td>
+                    「markdown で」「Excel の新しいシートに」「JSON
+                    で」など、出力形式を必ず指定する。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <span className={`${styles.badge} ${styles.badgeBlue}`}>06</span>
+                  </td>
+                  <td>
+                    <strong>スコープを絞って実行する</strong>
+                  </td>
+                  <td>
+                    「全フォルダ」より「今月分のみ」、「全ファイル」より「.pdf
+                    のみ」のように対象を絞る。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <span className={`${styles.badge} ${styles.badgeBlue}`}>07</span>
+                  </td>
+                  <td>
+                    <strong>ドライラン（確認のみ）を先に実行</strong>
+                  </td>
+                  <td>
+                    「実際に移動はしないで、何をするか計画だけ教えて」と先に確認してから本番実行する。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <span className={`${styles.badge} ${styles.badgePurple}`}>08</span>
+                  </td>
+                  <td>
+                    <strong>機密情報を含むフォルダは除外設定</strong>
+                  </td>
+                  <td>
+                    パスワード管理・個人情報・財務データフォルダはアクセス権限設定から除外する。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <span className={`${styles.badge} ${styles.badgePurple}`}>09</span>
+                  </td>
+                  <td>
+                    <strong>description は「やや強引に」書く</strong>
+                  </td>
+                  <td>
+                    Cowork（Claude）はスキルを自動発動させたがらない傾向があるため、トリガー条件を詳細かつ積極的に記述する。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <span className={`${styles.badge} ${styles.badgeBlue}`}>10</span>
+                  </td>
+                  <td>
+                    <strong>完了後は必ずログを残す</strong>
+                  </td>
+                  <td>
+                    「処理結果を ~/Logs/cowork-YYYY-MM-DD.txt
+                    に追記して」と指示して操作履歴を保持する。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* sections s10–s11 will be added in subsequent Green commits */}
       </div>
     </div>
   );
