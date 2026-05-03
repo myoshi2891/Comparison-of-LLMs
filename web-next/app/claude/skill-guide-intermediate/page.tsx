@@ -1469,7 +1469,358 @@ style OFF fill:#4a1a1a,stroke:#fc8181,color:#ffffff`}
             <h2>自己改善型スキル — 最先端パターン</h2>
             <div className={styles.secLine} />
           </div>
-          {/* faithful content: D-2 Green s09 */}
+          <p>
+            コミュニティで実践が始まっている最先端のアプローチ。スキル実行後に「リフレクションスキル」を走らせ、
+            <strong>エージェント自身が SKILL.md を書き換えてアップデート</strong>
+            するループを構築する。
+          </p>
+
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram
+              chart={`graph TD
+A["タスク実行スキル<br>通常のSKILL.md"] -->|完了| B["リフレクションスキルを起動"]
+B --> C["直前のGitログ エラー履歴を分析<br>git log と エラーログ確認"]
+C --> D{"改善点の検出"}
+D -- あり --> E["SKILL.md を自動書き換え<br>手順 ルール キーワードを更新"]
+D -- なし --> F["変更なしで終了"]
+E --> A
+style A fill:#1a4040,stroke:#4fd1c5,color:#ffffff
+style B fill:#2d1f4a,stroke:#b794f4,color:#ffffff
+style E fill:#1a3a5c,stroke:#63b3ed,color:#ffffff`}
+            />
+          </div>
+
+          <div className={`${styles.callout} ${styles.calloutTip}`}>
+            <span className={styles.calloutIcon}>🚀</span>
+            <strong>なぜ強力か：</strong>SKILL.md
+            は自然言語の集まりであり、プログラムコードの修正と異なり、コンパイルエラーや依存関係の破壊を気にせず、数行の文章を追加するだけで安全かつ容易にエージェントの振る舞いを進化させられる。
+          </div>
+
+          <h3>リフレクションスキルの実装例</h3>
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <div className={styles.codeDots}>
+                <div className={styles.codeDot} />
+                <div className={styles.codeDot} />
+                <div className={styles.codeDot} />
+              </div>
+              <span className={styles.codeLang}>~/.claude/skills/reflect-and-improve/SKILL.md</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.cc}>---</span>
+              {"\n"}
+              <span className={styles.cm}>name</span>
+              {": "}
+              <span className={styles.cs}>reflect-and-improve</span>
+              {"\n"}
+              <span className={styles.cm}>description</span>
+              {": "}
+              <span className={styles.cs}>{">"}</span>
+              {"\n"}
+              {"  "}
+              <span className={styles.cs}>
+                タスク完了後に呼び出され、直前のセッションを振り返り、
+              </span>
+              {"\n"}
+              {"  "}
+              <span className={styles.cs}>使用されたスキルの SKILL.md を自動改善する。</span>
+              {"\n"}
+              {"  "}
+              <span className={styles.cs}>
+                「改善して」「学習させて」と言われた場合に使用する。
+              </span>
+              {"\n"}
+              <span className={styles.cm}>allowed-tools</span>
+              {": ["}
+              <span className={styles.cs}>Read</span>
+              {", "}
+              <span className={styles.cs}>Write</span>
+              {", "}
+              <span className={styles.cs}>Bash</span>
+              {"]"}
+              {"\n"}
+              <span className={styles.cm}>disable-model-invocation</span>
+              {": "}
+              <span className={styles.cv}>true</span>
+              {"   "}
+              <span className={styles.cc}># 明示的呼び出しのみ</span>
+              {"\n"}
+              <span className={styles.cc}>---</span>
+              {"\n\n"}
+              <span className={styles.ch}># リフレクション & 自己改善プロセス</span>
+              {"\n\n"}
+              <span className={styles.ch}>## 収集するコンテキスト</span>
+              {"\n\n"}
+              {"最近の Git ログ（直前20件）:"}
+              {"\n"}
+              <span className={styles.cTag}>
+                {'! `git log -20 --oneline 2>/dev/null || echo "Not a git repo"`'}
+              </span>
+              {"\n\n"}
+              {"エラーログ（存在する場合）:"}
+              {"\n"}
+              <span className={styles.cTag}>
+                {'! `cat ~/.claude/skill-errors.log 2>/dev/null || echo "No error log"`'}
+              </span>
+              {"\n\n"}
+              <span className={styles.ch}>## 改善手順</span>
+              {"\n\n"}
+              {"1. 上記のログから繰り返し発生しているパターンを分析する"}
+              {"\n"}
+              {"2. 改善が必要な SKILL.md を特定する"}
+              {"\n"}
+              {"3. 以下の観点で改善案を策定する:"}
+              {"\n"}
+              {"   - description にキーワードが不足していないか？"}
+              {"\n"}
+              {"   - 手順に抜けがないか？"}
+              {"\n"}
+              {"   - エラーが繰り返す箇所にガードレールを追加できるか？"}
+              {"\n"}
+              {"4. ユーザーに改善案を提示し、承認を得てから SKILL.md を更新する"}
+              {"\n\n"}
+              <span className={styles.ch}>## 注意事項</span>
+              {"\n\n"}
+              {"- 必ず変更前後の diff を提示する"}
+              {"\n"}
+              {"- ユーザーの明示的な承認なしに SKILL.md を書き換えないこと"}
+            </div>
+          </div>
+
+          <h3>中級者が今すぐ実践すべきアクション</h3>
+          <div className={styles.card}>
+            <div className={styles.steps}>
+              <div className={styles.step} data-n="1">
+                <div className={styles.stepTitle}>日常業務から反復タスクを1つ選ぶ</div>
+                <p>入力と出力の形式が決まっており、かつ反復的なタスクを特定する。</p>
+              </div>
+              <div className={styles.step} data-n="2">
+                <div className={styles.stepTitle}>/skill-creator でスキルを自動生成する</div>
+                <p>
+                  組み込みメタスキルを使うことで、公式ベストプラクティスに準拠した雛形を数分で生成できる。
+                </p>
+              </div>
+              <div className={styles.step} data-n="3">
+                <div className={styles.stepTitle}>実運用でトリガー挙動を観察する</div>
+                <p>
+                  <code>--debug</code> フラグを使い、アンダートリガー・オーバートリガーを検出して
+                  description をチューニングする。
+                </p>
+              </div>
+              <div className={styles.step} data-n="4">
+                <div className={styles.stepTitle}>エラーハンドリングとガードレールを追加する</div>
+                <p>
+                  実際のエラーパターンに基づき、インストラクション内にフィードバックループと検証ステップを組み込む。
+                </p>
+              </div>
+              <div className={styles.step} data-n="5">
+                <div className={styles.stepTitle}>
+                  リフレクションスキルで自己改善ループを構築する
+                </div>
+                <p>
+                  セッション後に自動的に SKILL.md
+                  をアップデートする仕組みを導入し、継続的に品質を高める。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <h3>2026年3月 新コマンド — SKILL.md と組み合わせる</h3>
+
+          <div className={`${styles.callout} ${styles.calloutInfo}`}>
+            <span className={styles.calloutIcon}>🆕</span>
+            <strong>v2.1.63〜v2.1.76 で追加された3つの即戦力コマンド：</strong>
+            <ul style={{ marginTop: "10px", paddingLeft: "20px", color: "var(--text2)" }}>
+              <li style={{ marginBottom: "8px" }}>
+                <strong style={{ color: "var(--blue)" }}>Voice mode（音声入力）</strong> —{" "}
+                <code>/voice</code> でトグル有効化。スペースキーを押しながら話し、離すと送信。
+                スキルのトリガーキーワードを口頭で発話してスキルを起動できる。
+                コード変数名・OAuth・JSON などの技術用語の認識精度も改善済み（v2.1.63）。
+              </li>
+              <li style={{ marginBottom: "8px" }}>
+                <strong style={{ color: "var(--green)" }}>/loop — 定期繰り返しタスク</strong> —{" "}
+                <code>{'/loop 30m "タスク内容"'}</code> で cron ジョブ的な定期実行をスケジュール。
+                SKILL.md で定義した品質チェックや監視ルーチンを自動周回させると強力。
+              </li>
+              <li>
+                <strong style={{ color: "var(--orange)" }}>/effort — Effort Level 制御</strong> —{" "}
+                <code>/effort low | medium | high | auto</code> で Opus 4.6
+                の思考深度をリアルタイム調整。 デフォルトは <code>medium</code>。スキルの
+                frontmatter に <code>effort: high</code> を付与すると、そのスキル起動時のみ deep
+                thinking が有効になる（v2.1.75）。
+              </li>
+            </ul>
+          </div>
+
+          <div className={styles.grid3}>
+            <div className={styles.card}>
+              <div className={styles.cardTitle}>
+                <span className={styles.dotCyan}>◆</span> Voice mode
+              </div>
+              <p style={{ fontSize: "13px" }}>
+                <code>/voice</code> → スペースキー長押しで発話 → 離すと送信。
+                「コードレビューして」と声に出すだけでスキルがトリガーされる。
+              </p>
+              <div className={`${styles.tag} ${styles.tagBlue}`}>v2.1.63</div>
+            </div>
+            <div className={styles.card}>
+              <div className={styles.cardTitle}>
+                <span className={styles.dotGreen}>◆</span> /loop
+              </div>
+              <p style={{ fontSize: "13px" }}>
+                <code>{'/loop 30m "pnpm test を実行して結果をレポートして"'}</code>
+                —— スキルで定義した手順を定期自動実行。CI 代替・監視・ヘルスチェックに最適。
+              </p>
+              <div className={`${styles.tag} ${styles.tagGreen}`}>定期実行</div>
+            </div>
+            <div className={styles.card}>
+              <div className={styles.cardTitle}>
+                <span className={styles.dotOrange}>◆</span> /effort
+              </div>
+              <p style={{ fontSize: "13px" }}>
+                <code>/effort high</code> で次以降のターンを deep thinking モードに。
+                アーキテクチャ設計スキルや複雑デバッグスキルの精度が大幅向上する。
+              </p>
+              <div className={`${styles.tag} ${styles.tagOrange}`}>v2.1.75</div>
+            </div>
+          </div>
+
+          <h3>Agent Teams × SKILL.md 組み合わせパターン</h3>
+
+          <div className={`${styles.callout} ${styles.calloutTip}`}>
+            <span className={styles.calloutIcon}>🤝</span>
+            <strong>Agent Teams とは：</strong>複数の Claude Code インスタンスが
+            <strong>独立したコンテキストウィンドウ</strong>を持ちながら、
+            共有タスクリストとダイレクトメッセージで連携する実験的機能（v2.1.32+）。
+            各テイムメイトは起動時に <code>CLAUDE.md</code>・Skills を自動ロードするため、
+            <strong>SKILL.md の精度がそのままチーム全体のパフォーマンスを決定する</strong>。
+          </div>
+
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram
+              chart={`graph TD
+subgraph LEAD["🎯 Team Lead（Delegate Mode ON）"]
+L["CLAUDE.md を読み込み<br>チーム全体のルールを把握"]
+end
+subgraph SKILLS["📄 共有 SKILL.md 群"]
+S1["pre-commit-check<br>SKILL.md"]
+S2["code-reviewer<br>SKILL.md"]
+S3["reflect-and-improve<br>SKILL.md"]
+end
+subgraph TEAM["👷 テイムメイト（独立コンテキスト）"]
+T1["Frontend<br>Teammate"]
+T2["Backend<br>Teammate"]
+T3["Test<br>Teammate"]
+end
+subgraph LOOP["/loop 30m で定期実行"]
+R["reflect-and-improve スキル<br>→ SKILL.md を自己更新"]
+end
+L -->|タスク割り当て| T1
+L -->|タスク割り当て| T2
+L -->|タスク割り当て| T3
+T1 -->|起動時自動ロード| S1
+T2 -->|起動時自動ロード| S2
+T3 -->|起動時自動ロード| S1
+T3 --> R
+R --> S3
+style LEAD fill:#1a3a5c,stroke:#63b3ed,color:#ffffff
+style SKILLS fill:#1a4040,stroke:#4fd1c5,color:#ffffff
+style TEAM fill:#2d1f4a,stroke:#b794f4,color:#ffffff
+style LOOP fill:#2d2010,stroke:#ffa657,color:#ffffff`}
+            />
+          </div>
+
+          <p>
+            以下は SKILL.md と Agent Teams・<code>/loop</code>・<code>/effort</code>
+            を組み合わせた実践的な CLAUDE.md 設定例：
+          </p>
+
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <div className={styles.codeDots}>
+                <div className={styles.codeDot} />
+                <div className={styles.codeDot} />
+                <div className={styles.codeDot} />
+              </div>
+              <span className={styles.codeLang}>
+                CLAUDE.md — Agent Teams + SKILL.md 組み合わせ設定例
+              </span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.ch}># PROJECT: my-saas-app</span>
+              {"\n\n"}
+              <span className={styles.ch}>## Agent Teams — File Ownership Rules</span>
+              {"\n"}
+              <span className={styles.cc}>
+                # テイムメイト間のファイル競合防止。各テイムメイトは起動時に SKILL.md
+                を自動ロードする。
+              </span>
+              {"\n\n"}
+              {"| Teammate Role     | 書き込み可能パス          | ロードされる SKILL.md        |"}
+              {"\n"}
+              {"|-------------------|--------------------------|------------------------------|"}
+              {"\n"}
+              {"| frontend-teammate | app/, components/        | code-reviewer, pre-commit-check |"}
+              {"\n"}
+              {"| backend-teammate  | supabase/functions/      | code-reviewer, pre-commit-check |"}
+              {"\n"}
+              {"| test-teammate     | tests/, **/*.test.ts     | pre-commit-check              |"}
+              {"\n\n"}
+              <span className={styles.ch}>## 定期品質チェック（/loop との組み合わせ）</span>
+              {"\n"}
+              <span className={styles.cc}>
+                # 以下のコマンドをセッション開始時に実行して品質を自動監視する:
+              </span>
+              {"\n"}
+              <span className={styles.cTag}>
+                {'/loop 30m "pre-commit-check スキルを実行してエラーがあればレポートして"'}
+              </span>
+              {"\n\n"}
+              <span className={styles.ch}>## Effort Level ポリシー</span>
+              {"\n"}
+              <span className={styles.cc}>
+                # アーキテクチャ設計スキル・複雑デバッグは /effort high を付与:
+              </span>
+              {"\n"}
+              <span className={styles.cTag}>/effort high</span>
+              {" → architect-review スキル、security-audit スキル"}
+              {"\n"}
+              <span className={styles.cTag}>/effort medium</span>
+              {" → code-reviewer スキル（デフォルト）"}
+              {"\n"}
+              <span className={styles.cTag}>/effort low</span>
+              {" → ファイル検索・単純リファクタリング"}
+              {"\n\n"}
+              <span className={styles.ch}>
+                ## Task Done Definition（テイムメイト全員が守ること）
+              </span>
+              {"\n"}
+              {"- [ ] "}
+              <span className={styles.cs}>`pnpm test`</span>
+              {" が PASS している"}
+              {"\n"}
+              {"- [ ] "}
+              <span className={styles.cs}>`pre-commit-check`</span>
+              {" スキルが「コミット OK」を返している"}
+              {"\n"}
+              {"- [ ] 担当ファイル以外を変更していない"}
+              {"\n"}
+              {"- [ ] 完了後に "}
+              <span className={styles.cs}>`reflect-and-improve`</span>
+              {" スキルを "}
+              <span className={styles.cTag}>/loop</span>
+              {" で定期起動して SKILL.md を自己進化させる"}
+            </div>
+          </div>
+
+          <div className={`${styles.callout} ${styles.calloutWarn}`}>
+            <span className={styles.calloutIcon}>⚠️</span>
+            <strong>Agent Teams 利用時の注意：</strong>
+            <code>CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1</code> を環境変数に設定し有効化が必要。
+            チームクリーンアップは必ず<strong>リード（Lead）から実行</strong>すること
+            （テイムメイトから実行するとリソース不整合が生じる）。 コスト感として通常セッションの
+            <strong>3〜4倍</strong>のトークンを消費する点を考慮した上で導入すること。
+          </div>
         </div>
 
         {/* ── Footer ── */}
