@@ -647,7 +647,133 @@ export default function Page() {
           </div>
         </section>
 
-        {/* sections s07–s11 will be added in subsequent Green commits */}
+        {/* ── 07 WORKFLOW ── */}
+        <section className={styles.section} id="workflow">
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionNum}>07</span>
+            <h2>典型的なワークフロー — 実践例</h2>
+          </div>
+          <p>実際のビジネスシーンで Cowork をどう使うか、3つの具体例で解説します。</p>
+          <h3>例1: 週次進捗レポートの自動化</h3>
+          <div className={styles.steps}>
+            <div className={styles.stepItem}>
+              <div className={styles.stepNum}>1</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTitle}>作業ログの保存ルールを決める</div>
+                <div className={styles.stepDesc}>
+                  各メンバーが <code>~/TeamLogs/[名前]_YYYY-MM-DD.txt</code>{" "}
+                  に日次ログを保存するルールを決める。
+                </div>
+              </div>
+            </div>
+            <div className={styles.stepItem}>
+              <div className={styles.stepNum}>2</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTitle}>Cowork に指示して初回レポートを作成する</div>
+                <div className={styles.stepDesc}>
+                  <div className={styles.codeBlock} style={{ marginTop: "0.5rem" }}>
+                    <div className={styles.codeBlockHeader}>
+                      <div className={styles.codeBlockDots}>
+                        <div className={styles.dotR} />
+                        <div className={styles.dotY} />
+                        <div className={styles.dotG} />
+                      </div>
+                      <span className={styles.codeBlockLang}>Cowork チャット</span>
+                    </div>
+                    <pre>{`「~/TeamLogs/ 内の今週分のログをすべて読んで、
+メンバー別の進捗・完了タスク・ブロッカーを
+markdown 形式で ~/Reports/week-YYYY-WW.md に保存して」`}</pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className={styles.stepItem}>
+              <div className={styles.stepNum}>3</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTitle}>
+                  この手順を SKILL.md に定義してスケジュール化する
+                </div>
+                <div className={styles.stepDesc}>
+                  毎週金曜17時に自動実行するよう設定。翌週からは手動作業ゼロに。
+                </div>
+              </div>
+            </div>
+          </div>
+          <h3>例2: 請求書 PDF からのデータ抽出フロー</h3>
+          <div className={styles.flowStepsWrap}>
+            <div className={`${styles.fsStep} ${styles.fsStepBlue}`}>
+              <div className={styles.fsNum}>1</div>
+              <div className={styles.fsLabel}>
+                受信
+                <br />
+                <small>請求書 PDF</small>
+              </div>
+            </div>
+            <div className={styles.fsArrow}>→</div>
+            <div className={styles.fsStep}>
+              <div className={styles.fsNum}>2</div>
+              <div className={styles.fsLabel}>
+                フォルダ監視
+                <br />
+                <small>自動検知</small>
+              </div>
+            </div>
+            <div className={styles.fsArrow}>→</div>
+            <div className={styles.fsStep}>
+              <div className={styles.fsNum}>3</div>
+              <div className={styles.fsLabel}>
+                データ抽出
+                <br />
+                <small>取引先・金額・日付</small>
+              </div>
+            </div>
+            <div className={styles.fsArrow}>→</div>
+            <div className={styles.fsStep}>
+              <div className={styles.fsNum}>4</div>
+              <div className={styles.fsLabel}>
+                保存
+                <br />
+                <small>Accounting フォルダ</small>
+              </div>
+            </div>
+            <div className={styles.fsArrow}>→</div>
+            <div className={styles.fsStep}>
+              <div className={styles.fsNum}>5</div>
+              <div className={styles.fsLabel}>
+                xlsx 追記
+                <br />
+                <small>summary.xlsx</small>
+              </div>
+            </div>
+            <div className={styles.fsArrow}>→</div>
+            <div className={`${styles.fsStep} ${styles.fsStepGreen}`}>
+              <div className={styles.fsNum}>6</div>
+              <div className={styles.fsLabel}>
+                完了
+                <br />
+                <small>数秒で精算完了</small>
+              </div>
+            </div>
+          </div>
+          <h3>例3: プレゼン資料の品質チェック</h3>
+          <div className={styles.codeBlock}>
+            <div className={styles.codeBlockHeader}>
+              <div className={styles.codeBlockDots}>
+                <div className={styles.dotR} />
+                <div className={styles.dotY} />
+                <div className={styles.dotG} />
+              </div>
+              <span className={styles.codeBlockLang}>Cowork チャット — 指示例</span>
+            </div>
+            <pre>{`「~/Presentations/Q1-review.pptx を読んで、以下をチェックして：
+1. 誤字脱字
+2. 数字の一貫性（異なるスライドで同じ指標が違う数字になっていないか）
+3. 古い日付表記（2024年が残っていないか）
+結果を ~/Presentations/Q1-review-check.md に出力して」`}</pre>
+          </div>
+        </section>
+
+        {/* sections s08–s11 will be added in subsequent Green commits */}
       </div>
     </div>
   );
