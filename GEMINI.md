@@ -16,6 +16,7 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 
 - **R1（Biome scope）**: `bun run lint:fix` / `bunx biome check --write`（パス引数なし）は **禁止**。必ずファイル単位でパス指定
 - **R2（faithful 必須）**: legacy HTML の移植では **要約・省略・縮約禁止**。全リスト項目・全コードブロック・全 SVG・全 alert・全 table を JSX に転写
+- **R3（スキル優先）**: 新規ガイドページ移行を始める前に `.claude/skills/nextjs-page-migration/SKILL.md` を必ず読む
 - **legacy/ 配下の編集禁止**（Phase A–F 中は凍結）
 - **ファイル全体の書き直し禁止**（明示指示がない限り）
 - **依存関係のアップグレード禁止**
@@ -24,7 +25,7 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 ## 検証コマンド
 
 ```bash
-cd web-next && bun run test        # 453/453 pass が期待値（Phase C-2 以降）
+cd web-next && bun run test        # 461 pass が期待値（C-4 Red scaffold 込み）
 cd web-next && bun run typecheck   # OK
 cd web-next && bun run build       # /gemini/agent 等が Static プリレンダリング
 cd web-next && bun run lint        # 既知 6 件のみ（新規違反ゼロが必須）
