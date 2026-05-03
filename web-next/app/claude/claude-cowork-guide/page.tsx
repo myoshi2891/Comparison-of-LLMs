@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
 
@@ -44,7 +45,7 @@ style A fill:#1a2530,stroke:#58a6ff,color:#e6edf3
 style F fill:#152a15,stroke:#3fb950,color:#e6edf3
 style G fill:#152a15,stroke:#3fb950,color:#e6edf3`;
 
-function Ext({ href, children }: { href: string; children: React.ReactNode }) {
+function Ext({ href, children }: { href: string; children: ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
       {children}
@@ -335,10 +336,7 @@ export default function Page() {
                 <div className={styles.stepDesc}>
                   <Ext href="https://claude.ai">claude.ai</Ext> でアカウントを作成します。 Cowork は
                   Pro プラン以上（または Team/Enterprise）で利用できます。
-                  <div
-                    className={`${styles.callout} ${styles.calloutInfo}`}
-                    style={{ marginTop: "0.75rem" }}
-                  >
+                  <div className={`${styles.callout} ${styles.calloutInfo} ${styles.calloutMt}`}>
                     <span className={styles.calloutIcon}>ℹ️</span>
                     <p>
                       Beta 期間中はウェイトリストへの登録が必要な場合があります。
@@ -375,10 +373,7 @@ export default function Page() {
                 <div className={styles.stepTitle}>作業フォルダへのアクセス権限を設定</div>
                 <div className={styles.stepDesc}>
                   Cowork が操作するフォルダへのアクセス許可を設定します。
-                  <div
-                    className={`${styles.callout} ${styles.calloutWarn}`}
-                    style={{ marginTop: "0.75rem" }}
-                  >
+                  <div className={`${styles.callout} ${styles.calloutWarn} ${styles.calloutMt}`}>
                     <span className={styles.calloutIcon}>⚠️</span>
                     <p>
                       <strong>セキュリティ注意:</strong>
@@ -393,7 +388,7 @@ export default function Page() {
               <div className={styles.stepContent}>
                 <div className={styles.stepTitle}>動作確認 — 最初の指示を試す</div>
                 <div className={styles.stepDesc}>
-                  <div className={styles.codeBlock} style={{ marginTop: "0.5rem" }}>
+                  <div className={`${styles.codeBlock} ${styles.codeBlockMt}`}>
                     <div className={styles.codeBlockHeader}>
                       <div className={styles.codeBlockDots}>
                         <div className={styles.dotR} />
@@ -428,7 +423,7 @@ export default function Page() {
           <div className={styles.compare}>
             <div className={`${styles.compareCard} ${styles.compareCardBad}`}>
               <div className={styles.compareLabel}>❌ 曖昧な指示（うまくいかない例）</div>
-              <pre style={{ fontSize: "0.8rem", color: "var(--text2)", whiteSpace: "pre-wrap" }}>
+              <pre className={styles.preCustom}>
                 {`"ファイルを整理して"
 
 "レポートを作って"
@@ -438,7 +433,7 @@ export default function Page() {
             </div>
             <div className={`${styles.compareCard} ${styles.compareCardGood}`}>
               <div className={styles.compareLabel}>✅ 具体的な指示（うまくいく例）</div>
-              <pre style={{ fontSize: "0.8rem", color: "var(--text2)", whiteSpace: "pre-wrap" }}>
+              <pre className={styles.preCustom}>
                 {`"~/Downloads 内の PDF を
 ~/Documents/PDF_Archive/ に移動して"
 
@@ -682,7 +677,7 @@ export default function Page() {
               <div className={styles.stepContent}>
                 <div className={styles.stepTitle}>Cowork に指示して初回レポートを作成する</div>
                 <div className={styles.stepDesc}>
-                  <div className={styles.codeBlock} style={{ marginTop: "0.5rem" }}>
+                  <div className={`${styles.codeBlock} ${styles.codeBlockMt}`}>
                     <div className={styles.codeBlockHeader}>
                       <div className={styles.codeBlockDots}>
                         <div className={styles.dotR} />
@@ -1272,15 +1267,7 @@ allowed-tools:
               の公式情報を優先してください。
             </p>
           </div>
-          <p
-            style={{
-              fontSize: "0.78rem",
-              color: "var(--text3)",
-              marginTop: "3rem",
-              textAlign: "center",
-              fontFamily: "'JetBrains Mono', monospace",
-            }}
-          >
+          <p className={styles.footerNote}>
             Claude Cowork 完全入門ガイド · 2026年3月版 · 初学者向けベストプラクティス
           </p>
         </section>

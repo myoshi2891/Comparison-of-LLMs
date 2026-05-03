@@ -61,7 +61,7 @@
      sed -n "/id=\"$SECTION_ID\"/,/<\/section>/p" "$PAGE_PATH" | grep -c 'styles\.a[iwega]'
      ```
 
-  4. `bun run test app/<provider>/<slug>/page.test.tsx` と `bunx biome check --write app/<provider>/<slug>/page.tsx` を実行（R1 遵守）
+  4. `(cd web-next && bun run test app/<provider>/<slug>/page.test.tsx)` と `(cd web-next && bunx biome check --write app/<provider>/<slug>/page.tsx)` を実行（R1 遵守）
   5. 全テスト・lint 通過を確認 → そのセクションだけで 1 commit
   6. **次のセクションに進む直前に**その行範囲を Read して繰り返す（先読みしない）
 - **許容される正規化**:

@@ -372,12 +372,6 @@ CC-->>U: ガイドラインに準拠したREADME`}
               {"  - "}
               <span className={styles.cs}>Glob</span>
               {"\n"}
-              <span className={styles.cm}>invocation</span>
-              {": "}
-              <span className={styles.cs}>automatic</span>
-              {"                "}
-              <span className={styles.cc}># automatic(デフォルト) | explicit</span>
-              {"\n"}
               <span className={styles.cm}>disable-model-invocation</span>
               {": "}
               <span className={styles.cv}>false</span>
@@ -926,9 +920,9 @@ Main-->>User: クリーンな監査レポート`}
           <table className={styles.dataTable}>
             <thead>
               <tr>
-                <th>比較項目</th>
-                <th>context: fork を用いたスキル</th>
-                <th>カスタムSubagents (.claude/agents/*.md)</th>
+                <th scope="col">比較項目</th>
+                <th scope="col">context: fork を用いたスキル</th>
+                <th scope="col">カスタムSubagents (.claude/agents/*.md)</th>
               </tr>
             </thead>
             <tbody>
@@ -1437,9 +1431,9 @@ style OFF fill:#4a1a1a,stroke:#fc8181,color:#ffffff`}
           <table className={styles.dataTable}>
             <thead>
               <tr>
-                <th>設定</th>
-                <th>説明</th>
-                <th>推奨ユースケース</th>
+                <th scope="col">設定</th>
+                <th scope="col">説明</th>
+                <th scope="col">推奨ユースケース</th>
               </tr>
             </thead>
             <tbody>

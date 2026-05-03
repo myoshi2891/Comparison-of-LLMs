@@ -396,14 +396,17 @@
 }
 
 .dotR {
+  composes: dot;
   background: #ff5f57;
 }
 
 .dotY {
+  composes: dot;
   background: #ffbd2e;
 }
 
 .dotG {
+  composes: dot;
   background: #28c840;
 }
 
@@ -1016,6 +1019,21 @@
   .fsArrow {
     transform: rotate(90deg);
   }
+}
+
+/* ── INLINE STYLE OVERRIDES ── */
+.calloutMt {
+  margin-top: 0.75rem;
+}
+
+.codeBlockMt {
+  margin-top: 0.5rem;
+}
+
+.preCustom {
+  font-size: 0.8rem;
+  color: var(--text2);
+  white-space: pre-wrap;
 }
 
 /* ── FOOTER NOTE ── */
