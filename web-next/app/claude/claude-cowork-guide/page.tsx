@@ -773,7 +773,149 @@ markdown 形式で ~/Reports/week-YYYY-WW.md に保存して」`}</pre>
           </div>
         </section>
 
-        {/* sections s08–s11 will be added in subsequent Green commits */}
+        {/* ── 08 SKILL-WRITING ── */}
+        <section className={styles.section} id="skill-writing">
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionNum}>08</span>
+            <h2>Cowork 向け SKILL.md の書き方</h2>
+          </div>
+          <p>
+            Skills は Cowork と Claude Code の両方で動作するオープンスタンダードです。 Cowork
+            向けスキルを書く際のポイントを解説します。
+          </p>
+          <h3>SKILL.md の基本構造（Cowork 版）</h3>
+          <div className={styles.codeBlock}>
+            <div className={styles.codeBlockHeader}>
+              <div className={styles.codeBlockDots}>
+                <div className={styles.dotR} />
+                <div className={styles.dotY} />
+                <div className={styles.dotG} />
+              </div>
+              <span className={styles.codeBlockLang}>~/.claude/skills/monthly-report/SKILL.md</span>
+            </div>
+            <pre>{`---
+name: monthly-report
+description: >
+  月次売上レポートを自動生成する。
+  「月次レポート」「今月の売上まとめ」「月末レポート作成」と
+  言われたときに使用する。
+  ~/Sales/*.csv を読み込んで markdown レポートを作成する。
+allowed-tools:
+  - Read
+  - Write
+  - Bash
+---
+
+# 月次売上レポート作成スキル
+
+## 手順
+
+1. データ収集: ~/Sales/ フォルダ内の今月分 CSV を全て読み込む
+2. 集計計算:
+   - 今月の売上合計
+   - 先月比（%変化）
+   - 商品カテゴリ別の内訳
+   - Top 5 商品
+3. レポート生成: 以下のフォーマットで作成する
+4. 保存: ~/Reports/YYYY-MM-monthly-report.md として保存する
+
+## 出力フォーマット
+
+# YYYY年MM月 売上レポート
+## サマリー
+- 今月売上合計: ¥XXX,XXX
+- 先月比: +X%
+
+## カテゴリ別
+| カテゴリ | 売上 | 構成比 |
+|---------|------|--------|
+
+## 注意事項
+- 文字コードが UTF-8 でない場合は Shift-JIS として読み込む
+- 金額は円形式（¥X,XXX,XXX）で統一する`}</pre>
+          </div>
+          <h3>Cowork と Claude Code のスキルの書き方比較</h3>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>観点</th>
+                  <th>Cowork 向け</th>
+                  <th>Claude Code 向け</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>パス指定</strong>
+                  </td>
+                  <td>
+                    ホームディレクトリ基準（<code>~/Documents/</code>）
+                  </td>
+                  <td>
+                    リポジトリ基準（<code>./src/</code>）
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>対象ファイル</strong>
+                  </td>
+                  <td>PDF・Excel・Word など業務ファイル</td>
+                  <td>ソースコード・設定ファイル</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>description の書き方</strong>
+                  </td>
+                  <td>業務用語・日本語での自然なトリガーワード</td>
+                  <td>技術用語・コマンドライン的な表現</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>allowed-tools</strong>
+                  </td>
+                  <td>
+                    <code>Read, Write</code>（ファイル操作中心）
+                  </td>
+                  <td>
+                    <code>Read, Edit, Bash, Grep</code>（開発ツール多め）
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>スキルの配置場所</h3>
+          <div className={styles.codeBlock}>
+            <div className={styles.codeBlockHeader}>
+              <div className={styles.codeBlockDots}>
+                <div className={styles.dotR} />
+                <div className={styles.dotY} />
+                <div className={styles.dotG} />
+              </div>
+              <span className={styles.codeBlockLang}>推奨ディレクトリ構成</span>
+            </div>
+            <pre>{`~/.claude/                      ← 個人用（全デバイス共通）
+└── skills/
+    ├── monthly-report/
+    │   └── SKILL.md            ← 月次レポートスキル
+    ├── invoice-sorter/
+    │   ├── SKILL.md            ← 請求書仕分けスキル
+    │   └── scripts/
+    │       └── extract.py      ← 補助スクリプト（オプション）
+    └── weekly-cleanup/
+        └── SKILL.md            ← 週次フォルダ整理スキル`}</pre>
+          </div>
+          <div className={`${styles.callout} ${styles.calloutSuccess}`}>
+            <span className={styles.calloutIcon}>✅</span>
+            <p>
+              <strong>Tips:</strong> <code>~/.claude/skills/</code> に置いたスキルは Cowork・Claude
+              Code・claude.ai の全プラットフォームから呼び出し可能です。
+              一度書けば、どのデバイスでも再利用できます。
+            </p>
+          </div>
+        </section>
+
+        {/* sections s09–s11 will be added in subsequent Green commits */}
       </div>
     </div>
   );
