@@ -33,6 +33,17 @@ U->>CW: OK
 CW->>FS: ファイルを移動・整理
 CW-->>U: 完了レポート`;
 
+const DIAG_4 = `graph TD
+A["Inbox フォルダを監視"] --> B{新しいファイルを検知}
+B -->|PDF ファイル| C["invoice-sorter スキルを起動"]
+B -->|csv ファイル| D["data-import スキルを起動"]
+B -->|その他| E["Unsorted フォルダに移動"]
+C --> F["取引先別に Accounting フォルダに保存"]
+D --> G["Database-imports に保存して通知"]
+style A fill:#1a2530,stroke:#58a6ff,color:#e6edf3
+style F fill:#152a15,stroke:#3fb950,color:#e6edf3
+style G fill:#152a15,stroke:#3fb950,color:#e6edf3`;
+
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -1052,7 +1063,93 @@ allowed-tools:
           </div>
         </section>
 
-        {/* sections s10–s11 will be added in subsequent Green commits */}
+        {/* ── 10 ADVANCED ── */}
+        <section className={styles.section} id="advanced">
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionNum}>10</span>
+            <h2>応用パターン — さらに活用する</h2>
+          </div>
+          <h3>パターン1: フォルダ監視 × Skills の組み合わせ</h3>
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram chart={DIAG_4} />
+          </div>
+          <h3>パターン2: 段階的な処理パイプライン</h3>
+          <div className={styles.codeBlock}>
+            <div className={styles.codeBlockHeader}>
+              <div className={styles.codeBlockDots}>
+                <div className={styles.dotR} />
+                <div className={styles.dotY} />
+                <div className={styles.dotG} />
+              </div>
+              <span className={styles.codeBlockLang}>Cowork チャット — パイプライン指示</span>
+            </div>
+            <pre>{`「以下の3ステップを順番に実行して：
+
+ステップ1: ~/RawData/*.csv を ~/ProcessedData/ に変換
+  - 文字コードを UTF-8 に統一
+  - 空行・重複行を除去
+
+ステップ2: ~/ProcessedData/*.csv を集計して
+  ~/Summary/monthly-summary.xlsx を作成
+
+ステップ3: ~/Summary/monthly-summary.xlsx を読んで
+  ~/Reports/monthly-report.md にサマリーを書き出す
+
+各ステップ完了時に状況を報告してください」`}</pre>
+          </div>
+          <h3>パターン3: 自己改善型スキル（上級者向け）</h3>
+          <div className={`${styles.callout} ${styles.calloutInfo}`}>
+            <span className={styles.calloutIcon}>🚀</span>
+            <p>
+              <strong>自己改善型スキル:</strong>{" "}
+              毎月のレポート作成後に「このスキルの改善点を教えて。 もし毎回同じ修正をしているなら
+              SKILL.md を更新して」と指示することで、 SKILL.md が自動的に進化していきます。これを
+              <strong>「Self-Improving Skills」</strong> パターンと呼びます。
+            </p>
+          </div>
+          <h3>パターン4: チームへのスキル配布</h3>
+          <div className={styles.steps}>
+            <div className={styles.stepItem}>
+              <div className={styles.stepNum}>1</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTitle}>スキルを ZIP ファイルにまとめる</div>
+                <div className={styles.stepDesc}>
+                  <code>zip -r monthly-report.zip monthly-report/</code> で圧縮する。解凍結果が{" "}
+                  <code>monthly-report/SKILL.md</code> の構造になるよう確認する。
+                </div>
+              </div>
+            </div>
+            <div className={styles.stepItem}>
+              <div className={styles.stepNum}>2</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTitle}>チームメンバーに配布（共有ドライブ経由）</div>
+                <div className={styles.stepDesc}>
+                  Teams・Slack・Google Drive 経由で ZIP ファイルを配布する。
+                </div>
+              </div>
+            </div>
+            <div className={styles.stepItem}>
+              <div className={styles.stepNum}>3</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTitle}>各自が ~/.claude/skills/ に展開する</div>
+                <div className={styles.stepDesc}>
+                  全員が同じスキルを使うことで、アウトプットの品質が均一化される。
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className={`${styles.callout} ${styles.calloutInfo}`}>
+            <span className={styles.calloutIcon}>🏢</span>
+            <p>
+              <strong>Team / Enterprise プランでは:</strong> 管理者が Organization Skills として
+              全メンバーに一括配布・強制適用できます。
+              「デフォルト有効」か「ユーザー選択可」かを設定できるため、
+              必須ワークフローの標準化に活用できます。
+            </p>
+          </div>
+        </section>
+
+        {/* section s11 will be added in the subsequent Green commit */}
       </div>
     </div>
   );
