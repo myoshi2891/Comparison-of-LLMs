@@ -9,7 +9,7 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- **最新 HEAD**: `26be1c6`（**fix(web-next): exclude protocol-relative URLs from internal link checks in skill-guide tests**）
+- **最新 HEAD**: `9092259`（**chore(docs): update MIGRATION_PROGRESS.md — HEAD update (26be1c6)**）
 - **未コミット作業**: なし（working tree クリーン）
 - **次の作業**: **D-4 — `/gemini/skill-guide-for-gemini` Red scaffold + faithful 移植開始**
 - **テスト数**: `bun run test` **490 passed / 490 total（全 Green）** — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
