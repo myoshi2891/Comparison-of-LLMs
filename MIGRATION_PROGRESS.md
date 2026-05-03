@@ -9,7 +9,7 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- **最新 HEAD**: `76e27f7`（**refactor(web-next): replace inline styles and improve a11y in Claude guides**）
+- **最新 HEAD**: `26be1c6`（**fix(web-next): exclude protocol-relative URLs from internal link checks in skill-guide tests**）
 - **未コミット作業**: なし（working tree クリーン）
 - **次の作業**: **D-4 — `/gemini/skill-guide-for-gemini` Red scaffold + faithful 移植開始**
 - **テスト数**: `bun run test` **490 passed / 490 total（全 Green）** — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
@@ -173,13 +173,13 @@ Next.js 移行プロジェクトの作業を再開してください。
 
 - リポジトリ: LLM-Studies（Phase A–F の Next.js 移行作業中）
 - 現在のブランチ: feat/nextjs-migration
-- 最新 HEAD: b32b162（feat(web-next): faithful migration of /claude/claude-cowork-guide s11 — D-3 全完了）
+- 最新 HEAD: 26be1c6（fix(web-next): exclude protocol-relative URLs from internal link checks in skill-guide tests）
 - 移行計画: docs/NEXTJS_PHASE_A_F_PLAN.md（Phase A–F）§Phase D を参照
 - 進捗トラッカー: MIGRATION_PROGRESS.md（**作業開始前に必読**: §「AI 作業ルール」R1〜R4）
 - プロジェクト固有スキル: .claude/skills/nextjs-page-migration/SKILL.md
 - リポジトリ規約: CLAUDE.md（AGENTS.md / GEMINI.md からも参照される。AI 共通の編集ルール）
 
-次の作業: **D-4 — `/gemini/skill-guide-for-gemini` Red scaffold + faithful 移植開始**。D-1・D-2・D-3 完了済み（b32b162）。
+次の作業: **D-4 — `/gemini/skill-guide-for-gemini` Red scaffold + faithful 移植開始**。D-1・D-2・D-3 完了済み（26be1c6 時点）。
 Phase D の対象は長文ガイド 9 ページ（すべて `.html` → JSX 直接移植。**MDX・`.md` SSoT 方式は不採用**）:
 - Claude: skill-guide-for-claude ✅ / skill-guide-of-claude-for-intermediate ✅ / claude-cowork-guide ✅
 - Gemini: skill-guide-for-gemini / skill-guide-of-gemini-for-intermediate / antigravity-guide
