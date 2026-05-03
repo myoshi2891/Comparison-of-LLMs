@@ -293,7 +293,100 @@ export default function Page() {
           </div>
         </section>
 
-        {/* sections s03–s11 will be added in subsequent Green commits */}
+        {/* ── 03 SETUP ── */}
+        <section className={styles.section} id="setup">
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionNum}>03</span>
+            <h2>セットアップ手順</h2>
+          </div>
+          <p>Cowork のインストールから初期設定まで、ステップバイステップで解説します。</p>
+          <div className={styles.steps}>
+            <div className={styles.stepItem}>
+              <div className={styles.stepNum}>1</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTitle}>Anthropic アカウントを用意する</div>
+                <div className={styles.stepDesc}>
+                  <Ext href="https://claude.ai">claude.ai</Ext> でアカウントを作成します。 Cowork は
+                  Pro プラン以上（または Team/Enterprise）で利用できます。
+                  <div
+                    className={`${styles.callout} ${styles.calloutInfo}`}
+                    style={{ marginTop: "0.75rem" }}
+                  >
+                    <span className={styles.calloutIcon}>ℹ️</span>
+                    <p>
+                      Beta 期間中はウェイトリストへの登録が必要な場合があります。
+                      <Ext href="https://support.claude.com">support.claude.com</Ext>{" "}
+                      で最新状況を確認してください。
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className={styles.stepItem}>
+              <div className={styles.stepNum}>2</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTitle}>Cowork デスクトップアプリをダウンロード</div>
+                <div className={styles.stepDesc}>
+                  claude.ai のダッシュボードから「Cowork」を選択し、お使いの OS（macOS /
+                  Windows）用インストーラーをダウンロードします。
+                </div>
+              </div>
+            </div>
+            <div className={styles.stepItem}>
+              <div className={styles.stepNum}>3</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTitle}>インストールとサインイン</div>
+                <div className={styles.stepDesc}>
+                  インストーラーを実行してアプリをインストールします。起動後、Claude.ai
+                  と同じアカウントでサインインします。
+                </div>
+              </div>
+            </div>
+            <div className={styles.stepItem}>
+              <div className={styles.stepNum}>4</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTitle}>作業フォルダへのアクセス権限を設定</div>
+                <div className={styles.stepDesc}>
+                  Cowork が操作するフォルダへのアクセス許可を設定します。
+                  <div
+                    className={`${styles.callout} ${styles.calloutWarn}`}
+                    style={{ marginTop: "0.75rem" }}
+                  >
+                    <span className={styles.calloutIcon}>⚠️</span>
+                    <p>
+                      <strong>セキュリティ注意:</strong>
+                      必要最小限のフォルダのみアクセスを許可しましょう。機密情報を含むフォルダへのアクセスは慎重に検討してください。
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className={styles.stepItem}>
+              <div className={styles.stepNum}>5</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTitle}>動作確認 — 最初の指示を試す</div>
+                <div className={styles.stepDesc}>
+                  <div className={styles.codeBlock} style={{ marginTop: "0.5rem" }}>
+                    <div className={styles.codeBlockHeader}>
+                      <div className={styles.codeBlockDots}>
+                        <div className={styles.dotR} />
+                        <div className={styles.dotY} />
+                        <div className={styles.dotG} />
+                      </div>
+                      <span className={styles.codeBlockLang}>
+                        Cowork チャット欄（最初の動作確認）
+                      </span>
+                    </div>
+                    <pre>「デスクトップにある .txt ファイルの一覧を教えてください」</pre>
+                  </div>
+                  Cowork がファイル一覧を返してくれればセットアップ完了です。
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* sections s04–s11 will be added in subsequent Green commits */}
       </div>
     </div>
   );
