@@ -180,7 +180,120 @@ export default function Page() {
           </div>
         </section>
 
-        {/* sections s02–s11 will be added in subsequent Green commits */}
+        {/* ── 02 PRODUCTS ── */}
+        <section className={styles.section} id="products">
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionNum}>02</span>
+            <h2>Anthropic 製品ラインアップとの比較</h2>
+          </div>
+          <p>
+            Anthropic は Claude を複数の形態で提供しています。Cowork
+            は「デスクトップで動く非開発者向けツール」として独自のポジションを持ちます。
+          </p>
+          <div className={styles.productRow}>
+            <div className={styles.productCard}>
+              <div className={styles.productEmoji}>💬</div>
+              <div className={styles.productName}>Claude.ai</div>
+              <div className={styles.productTarget}>Web / Mobile Chat</div>
+              <div className={styles.productDesc}>日常的な質問・コード生成・文書作成</div>
+            </div>
+            <div className={`${styles.productCard} ${styles.productCardHighlight}`}>
+              <div className={styles.productEmoji}>🖥️</div>
+              <div className={styles.productName}>Cowork</div>
+              <div className={styles.productTarget}>Desktop App (Beta)</div>
+              <div className={styles.productDesc}>ファイル管理・タスク自動化（非開発者）</div>
+            </div>
+            <div className={styles.productCard}>
+              <div className={styles.productEmoji}>⌨️</div>
+              <div className={styles.productName}>Claude Code</div>
+              <div className={styles.productTarget}>CLI (Terminal)</div>
+              <div className={styles.productDesc}>コードベース全体の理解・リファクタリング</div>
+            </div>
+            <div className={styles.productCard}>
+              <div className={styles.productEmoji}>🌐</div>
+              <div className={styles.productName}>Claude in Chrome</div>
+              <div className={styles.productTarget}>Browser Extension (Beta)</div>
+              <div className={styles.productDesc}>Web ブラウジングの自動化エージェント</div>
+            </div>
+            <div className={styles.productCard}>
+              <div className={styles.productEmoji}>📊</div>
+              <div className={styles.productName}>Claude in Excel</div>
+              <div className={styles.productTarget}>Spreadsheet Agent (Beta)</div>
+              <div className={styles.productDesc}>スプレッドシート操作・データ分析</div>
+            </div>
+          </div>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>観点</th>
+                  <th>Claude.ai</th>
+                  <th>Cowork ★</th>
+                  <th>Claude Code</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>対象ユーザー</strong>
+                  </td>
+                  <td>誰でも</td>
+                  <td>
+                    <span className={`${styles.badge} ${styles.badgeOrange}`}>非開発者</span>
+                  </td>
+                  <td>
+                    <span className={`${styles.badge} ${styles.badgeBlue}`}>開発者</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>ファイル直接操作</strong>
+                  </td>
+                  <td>❌</td>
+                  <td>✅ ローカル直接</td>
+                  <td>✅ リポジトリ内</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>自動化・定期実行</strong>
+                  </td>
+                  <td>❌</td>
+                  <td>✅ トリガー設定可</td>
+                  <td>⚡ /loop コマンド</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Skills 連携</strong>
+                  </td>
+                  <td>✅ (claude.ai Skills)</td>
+                  <td>✅ SKILL.md 対応</td>
+                  <td>✅ SKILL.md ネイティブ</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>プログラミング知識</strong>
+                  </td>
+                  <td>不要</td>
+                  <td>
+                    <span className={`${styles.badge} ${styles.badgeGreen}`}>不要</span>
+                  </td>
+                  <td>必要（推奨）</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className={`${styles.callout} ${styles.calloutTip}`}>
+            <span className={styles.calloutIcon}>🎯</span>
+            <p>
+              <strong>選択指針:</strong>
+              「コードを書きたくないが、ファイル整理・定期レポートを自動化したい」なら
+              <strong>Cowork</strong> が最適解です。エンジニアリングチームには Claude Code、
+              日常的な質疑には Claude.ai を使い分けましょう。
+            </p>
+          </div>
+        </section>
+
+        {/* sections s03–s11 will be added in subsequent Green commits */}
       </div>
     </div>
   );
