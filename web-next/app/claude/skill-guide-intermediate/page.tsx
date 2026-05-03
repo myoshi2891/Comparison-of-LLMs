@@ -53,7 +53,7 @@ export default function Page() {
       <div className={styles.wrapper}>
         {/* ── Hero ── */}
         <div className={styles.hero}>
-          <div className={styles.heroBadge}>Claude Code v2.1.x 対応 — 2026年3月最終更新</div>
+          <div className={styles.heroBadge}>Claude Code（最新版）— 2026年3月時点</div>
           <h1>
             SKILL.md
             <br />
@@ -1821,7 +1821,7 @@ style LOOP fill:#2d2010,stroke:#ffa657,color:#ffffff`}
         <div className={styles.footer}>
           <p>Claude Code SKILL.md 中級者完全攻略ガイド</p>
           <p style={{ marginTop: "6px", fontSize: "12px" }}>
-            Claude Code v2.1.x 対応 ｜ 2026年3月更新
+            Claude Code（最新版）｜ 2026年3月時点
           </p>
           <p style={{ marginTop: "12px", fontSize: "11px", color: "var(--text3)" }}>
             参考:{" "}
