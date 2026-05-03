@@ -386,7 +386,130 @@ export default function Page() {
           </div>
         </section>
 
-        {/* sections s04–s11 will be added in subsequent Green commits */}
+        {/* ── 04 NATURAL LANGUAGE ── */}
+        <section className={styles.section} id="natural-language">
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionNum}>04</span>
+            <h2>自然言語による操作 — 基本的な使い方</h2>
+          </div>
+          <p>
+            Cowork の最大の特徴は
+            <strong>「話しかけるように指示するだけ」</strong> で複雑な作業を実行できることです。
+            コマンドや構文を覚える必要はありません。
+          </p>
+          <h3>指示の書き方パターン</h3>
+          <div className={styles.compare}>
+            <div className={`${styles.compareCard} ${styles.compareCardBad}`}>
+              <div className={styles.compareLabel}>❌ 曖昧な指示（うまくいかない例）</div>
+              <pre style={{ fontSize: "0.8rem", color: "var(--text2)", whiteSpace: "pre-wrap" }}>
+                {`"ファイルを整理して"
+
+"レポートを作って"
+
+"データをまとめて"`}
+              </pre>
+            </div>
+            <div className={`${styles.compareCard} ${styles.compareCardGood}`}>
+              <div className={styles.compareLabel}>✅ 具体的な指示（うまくいく例）</div>
+              <pre style={{ fontSize: "0.8rem", color: "var(--text2)", whiteSpace: "pre-wrap" }}>
+                {`"~/Downloads 内の PDF を
+~/Documents/PDF_Archive/ に移動して"
+
+"~/Sales の Excel を読んで
+今月の売上合計を表にまとめて"
+
+"~/Reports の txt を全部
+1つの markdown ファイルに結合して"`}
+              </pre>
+            </div>
+          </div>
+          <h3>良い指示の3原則</h3>
+          <div className={styles.cardGrid}>
+            <div className={styles.card}>
+              <div className={styles.cardIcon}>📍</div>
+              <div className={styles.cardTitle}>場所を具体的に</div>
+              <div className={styles.cardDesc}>
+                「デスクトップの〇〇フォルダ」「~/Documents/Projects/2025/」など、フルパスに近い表現で指定する。
+              </div>
+            </div>
+            <div className={styles.card}>
+              <div className={styles.cardIcon}>🎯</div>
+              <div className={styles.cardTitle}>出力形式を指定する</div>
+              <div className={styles.cardDesc}>
+                「PDF で」「markdown で」「Excel
+                の新しいシートに」など、返してほしい形式を明記する。
+              </div>
+            </div>
+            <div className={styles.card}>
+              <div className={styles.cardIcon}>📋</div>
+              <div className={styles.cardTitle}>条件・範囲を絞る</div>
+              <div className={styles.cardDesc}>
+                「今月分だけ」「.docx のみ」「10MB 以上は除く」などの条件を付け加える。
+              </div>
+            </div>
+          </div>
+          <h3>よく使う指示パターン集</h3>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>カテゴリ</th>
+                  <th>指示の例</th>
+                  <th>用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>ファイル整理</strong>
+                  </td>
+                  <td>
+                    <code>~/Downloads の PDF を ~/Archive/年月/ に日付別に整理して</code>
+                  </td>
+                  <td>ダウンロードフォルダの定期整理</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>一括変換</strong>
+                  </td>
+                  <td>
+                    <code>~/Docs 内の .docx を全部 PDF に変換して</code>
+                  </td>
+                  <td>書式統一・共有用変換</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>要約・抽出</strong>
+                  </td>
+                  <td>
+                    <code>~/Contracts/ の契約書から「契約期間」と「金額」を一覧表にして</code>
+                  </td>
+                  <td>大量文書からのデータ抽出</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>レポート生成</strong>
+                  </td>
+                  <td>
+                    <code>~/Logs の csv を読んで先週の KPI サマリーを markdown で作成して</code>
+                  </td>
+                  <td>週次・月次レポート自動化</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>重複検出</strong>
+                  </td>
+                  <td>
+                    <code>~/Photos/ の重複ファイルを探してリストアップして（削除はしないで）</code>
+                  </td>
+                  <td>ストレージ管理</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* sections s05–s11 will be added in subsequent Green commits */}
       </div>
     </div>
   );
