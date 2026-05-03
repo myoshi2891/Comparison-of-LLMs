@@ -577,7 +577,77 @@ export default function Page() {
           </div>
         </section>
 
-        {/* sections s06–s11 will be added in subsequent Green commits */}
+        {/* ── 06 SKILLS ── */}
+        <section className={styles.section} id="skills">
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionNum}>06</span>
+            <h2>Skills との連携 — 繰り返し作業を「定義」する</h2>
+          </div>
+          <p>
+            毎回同じ指示を打ち込むのは非効率です。Cowork は <strong>SKILL.md</strong>{" "}
+            を使って繰り返し作業を「再利用可能なスキル」として登録できます。
+          </p>
+          <div className={styles.skillCmp}>
+            <div className={`${styles.skillCmpCol} ${styles.cmpBad}`}>
+              <div className={styles.colTitle}>Skills なし（毎回入力）</div>
+              <div className={styles.cmpNode}>ユーザー</div>
+              <div className={styles.cmpArr}>
+                ↓ <span>毎回この長文を入力...</span>
+              </div>
+              <div className={styles.cmpNode}>Cowork</div>
+            </div>
+            <div className={styles.skillCmpVs}>VS</div>
+            <div className={`${styles.skillCmpCol} ${styles.cmpGood}`}>
+              <div className={styles.colTitle}>Skills あり（一言で完了）</div>
+              <div className={styles.cmpNode}>ユーザー</div>
+              <div className={styles.cmpArr}>
+                ↓ <span>/monthly-report</span>
+              </div>
+              <div className={`${styles.cmpNode} ${styles.cmpNodeAccent}`}>
+                SKILL.md<small>月次レポート手順書</small>
+              </div>
+              <div className={styles.cmpArr}>↓</div>
+              <div className={styles.cmpNode}>Cowork</div>
+              <div className={styles.cmpArr}>↓</div>
+              <div className={`${styles.cmpNode} ${styles.cmpNodeGreen}`}>月次レポート自動生成</div>
+            </div>
+          </div>
+          <h3>Skills でできること</h3>
+          <div className={styles.usecase}>
+            <div className={styles.usecaseHeader}>
+              <div className={styles.usecaseIcon}>📊</div>
+              <div className={styles.usecaseTitle}>月次レポートの自動生成</div>
+            </div>
+            <div className={styles.usecaseBody}>
+              毎月末に「~/Sales/*.csv を読んで、前月比・累計・Top5 商品を含む月次レポートを
+              ~/Reports/YYYY-MM-report.md に保存する」という手順を1つのスキルとして定義。 来月以降は{" "}
+              <code>/monthly-report</code> と入力するだけで完了。
+            </div>
+          </div>
+          <div className={styles.usecase}>
+            <div className={styles.usecaseHeader}>
+              <div className={styles.usecaseIcon}>📥</div>
+              <div className={styles.usecaseTitle}>受信メール添付ファイルの自動仕分け</div>
+            </div>
+            <div className={styles.usecaseBody}>
+              「~/Downloads に保存した請求書 PDF を読んで、取引先名・金額・日付を抽出し、
+              ~/Accounting/YYYY/MM/ に取引先名でリネームして保存する」スキルを登録。
+              月末の経費精算作業が数秒で完了。
+            </div>
+          </div>
+          <div className={styles.usecase}>
+            <div className={styles.usecaseHeader}>
+              <div className={styles.usecaseIcon}>🗂️</div>
+              <div className={styles.usecaseTitle}>プロジェクトフォルダの定期整理</div>
+            </div>
+            <div className={styles.usecaseBody}>
+              「~/Projects 内の各フォルダで、3ヶ月以上更新のないファイルを ~/Archive/ に移動し、
+              移動ログを ~/Projects/cleanup-log.txt に追記する」スキルをスケジュール実行に設定。
+            </div>
+          </div>
+        </section>
+
+        {/* sections s07–s11 will be added in subsequent Green commits */}
       </div>
     </div>
   );
