@@ -391,9 +391,9 @@ export default function Page() {
                   <div className={`${styles.codeBlock} ${styles.codeBlockMt}`}>
                     <div className={styles.codeBlockHeader}>
                       <div className={styles.codeBlockDots}>
-                        <div className={styles.dotR} />
-                        <div className={styles.dotY} />
-                        <div className={styles.dotG} />
+                        <div className={`${styles.dot} ${styles.dotR}`} />
+                        <div className={`${styles.dot} ${styles.dotY}`} />
+                        <div className={`${styles.dot} ${styles.dotG}`} />
                       </div>
                       <span className={styles.codeBlockLang}>
                         Cowork チャット欄（最初の動作確認）
@@ -680,9 +680,9 @@ export default function Page() {
                   <div className={`${styles.codeBlock} ${styles.codeBlockMt}`}>
                     <div className={styles.codeBlockHeader}>
                       <div className={styles.codeBlockDots}>
-                        <div className={styles.dotR} />
-                        <div className={styles.dotY} />
-                        <div className={styles.dotG} />
+                        <div className={`${styles.dot} ${styles.dotR}`} />
+                        <div className={`${styles.dot} ${styles.dotY}`} />
+                        <div className={`${styles.dot} ${styles.dotG}`} />
                       </div>
                       <span className={styles.codeBlockLang}>Cowork チャット</span>
                     </div>
@@ -765,9 +765,9 @@ markdown 形式で ~/Reports/week-YYYY-WW.md に保存して」`}</pre>
           <div className={styles.codeBlock}>
             <div className={styles.codeBlockHeader}>
               <div className={styles.codeBlockDots}>
-                <div className={styles.dotR} />
-                <div className={styles.dotY} />
-                <div className={styles.dotG} />
+                <div className={`${styles.dot} ${styles.dotR}`} />
+                <div className={`${styles.dot} ${styles.dotY}`} />
+                <div className={`${styles.dot} ${styles.dotG}`} />
               </div>
               <span className={styles.codeBlockLang}>Cowork チャット — 指示例</span>
             </div>
@@ -793,9 +793,9 @@ markdown 形式で ~/Reports/week-YYYY-WW.md に保存して」`}</pre>
           <div className={styles.codeBlock}>
             <div className={styles.codeBlockHeader}>
               <div className={styles.codeBlockDots}>
-                <div className={styles.dotR} />
-                <div className={styles.dotY} />
-                <div className={styles.dotG} />
+                <div className={`${styles.dot} ${styles.dotR}`} />
+                <div className={`${styles.dot} ${styles.dotY}`} />
+                <div className={`${styles.dot} ${styles.dotG}`} />
               </div>
               <span className={styles.codeBlockLang}>~/.claude/skills/monthly-report/SKILL.md</span>
             </div>
@@ -894,9 +894,9 @@ allowed-tools:
           <div className={styles.codeBlock}>
             <div className={styles.codeBlockHeader}>
               <div className={styles.codeBlockDots}>
-                <div className={styles.dotR} />
-                <div className={styles.dotY} />
-                <div className={styles.dotG} />
+                <div className={`${styles.dot} ${styles.dotR}`} />
+                <div className={`${styles.dot} ${styles.dotY}`} />
+                <div className={`${styles.dot} ${styles.dotG}`} />
               </div>
               <span className={styles.codeBlockLang}>推奨ディレクトリ構成</span>
             </div>
@@ -1072,9 +1072,9 @@ allowed-tools:
           <div className={styles.codeBlock}>
             <div className={styles.codeBlockHeader}>
               <div className={styles.codeBlockDots}>
-                <div className={styles.dotR} />
-                <div className={styles.dotY} />
-                <div className={styles.dotG} />
+                <div className={`${styles.dot} ${styles.dotR}`} />
+                <div className={`${styles.dot} ${styles.dotY}`} />
+                <div className={`${styles.dot} ${styles.dotG}`} />
               </div>
               <span className={styles.codeBlockLang}>Cowork チャット — パイプライン指示</span>
             </div>

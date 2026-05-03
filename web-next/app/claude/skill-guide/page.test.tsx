@@ -39,9 +39,10 @@ describe("/claude/skill-guide 契約テスト", () => {
 
   it("内部リンク（/ 始まり）に .html 拡張子がない", () => {
     const { container } = render(<Page />);
-    const internal = Array.from(container.querySelectorAll("a[href]")).filter((a) =>
-      (a.getAttribute("href") ?? "").startsWith("/")
-    );
+    const internal = Array.from(container.querySelectorAll("a[href]")).filter((a) => {
+      const href = a.getAttribute("href") ?? "";
+      return href.startsWith("/") && !href.startsWith("//");
+    });
     for (const a of internal) {
       expect(a.getAttribute("href")).not.toMatch(/\.html$/);
     }
