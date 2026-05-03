@@ -1149,7 +1149,141 @@ allowed-tools:
           </div>
         </section>
 
-        {/* section s11 will be added in the subsequent Green commit */}
+        {/* ── 11 SOURCES ── */}
+        <section className={styles.section} id="sources">
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionNum}>11</span>
+            <h2>ソース・参考リンク</h2>
+          </div>
+          <p>このガイドを作成するにあたり参照した公式ドキュメントとコミュニティリソースです。</p>
+          <h3>Anthropic 公式</h3>
+          <div className={styles.sourceGrid}>
+            <div className={styles.sourceCard}>
+              <div className={styles.sourceCat}>公式サポート</div>
+              <Ext href="https://support.claude.com">support.claude.com</Ext>
+              <div className={styles.sourceDesc}>
+                Claude および Cowork の利用ガイド・FAQ（最新情報はこちらを優先）
+              </div>
+            </div>
+            <div className={styles.sourceCard}>
+              <div className={styles.sourceCat}>公式 — Skills 作成</div>
+              <Ext href="https://support.claude.com/en/articles/12512198-how-to-create-custom-skills">
+                How to create custom Skills
+              </Ext>
+              <div className={styles.sourceDesc}>
+                Skills の作成方法・SKILL.md フォーマットの公式解説
+              </div>
+            </div>
+            <div className={styles.sourceCard}>
+              <div className={styles.sourceCat}>公式 — Skills 使い方</div>
+              <Ext href="https://support.claude.com/en/articles/12512180-use-skills-in-claude">
+                Use Skills in Claude
+              </Ext>
+              <div className={styles.sourceDesc}>Skills の使い方・Cowork での適用方法</div>
+            </div>
+            <div className={styles.sourceCard}>
+              <div className={styles.sourceCat}>公式 — 組織展開</div>
+              <Ext href="https://support.claude.com/en/articles/13119606-provisioning-and-managing-skills-for-your-organization">
+                Provisioning Skills for Your Organization
+              </Ext>
+              <div className={styles.sourceDesc}>
+                組織向けスキルの一括配布・管理方法（Team/Enterprise）
+              </div>
+            </div>
+            <div className={styles.sourceCard}>
+              <div className={styles.sourceCat}>公式 — Claude Code Skills</div>
+              <Ext href="https://docs.anthropic.com/en/docs/claude-code/skills">
+                docs.anthropic.com — Claude Code Skills
+              </Ext>
+              <div className={styles.sourceDesc}>
+                SKILL.md の技術仕様・フロントマター全フィールド詳細
+              </div>
+            </div>
+            <div className={styles.sourceCard}>
+              <div className={styles.sourceCat}>公式 — Agent Skills</div>
+              <Ext href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview">
+                platform.claude.com — Agent Skills Overview
+              </Ext>
+              <div className={styles.sourceDesc}>Agent Skills のアーキテクチャと設計思想</div>
+            </div>
+          </div>
+          <h3>コミュニティリソース</h3>
+          <div className={styles.sourceGrid}>
+            <div className={styles.sourceCard}>
+              <div className={styles.sourceCat}>Sherlock.xyz</div>
+              <Ext href="https://sherlock.xyz/post/how-to-write-skills-for-claude-code-and-cowork">
+                How to Write Skills for Claude Code and Cowork
+              </Ext>
+              <div className={styles.sourceDesc}>
+                Cowork と Claude Code 両対応スキルの実践的な書き方ガイド
+              </div>
+            </div>
+            <div className={styles.sourceCard}>
+              <div className={styles.sourceCat}>Medium — Bibek Poudel</div>
+              <Ext href="https://bibek-poudel.medium.com/the-skill-md-pattern-how-to-write-ai-agent-skills-that-actually-work-72a3169dd7ee">
+                The SKILL.md Pattern: How to Write AI Agent Skills That Actually Work
+              </Ext>
+              <div className={styles.sourceDesc}>実際に動くスキルを書くための実践的パターン集</div>
+            </div>
+            <div className={styles.sourceCard}>
+              <div className={styles.sourceCat}>YouTube チュートリアル</div>
+              <Ext href="https://www.youtube.com/watch?v=Fh-aBKrG5CI">
+                Create Your First SKILL.md File
+              </Ext>
+              <div className={styles.sourceDesc}>
+                SKILL.md 作成のステップバイステップ動画チュートリアル
+              </div>
+            </div>
+            <div className={styles.sourceCard}>
+              <div className={styles.sourceCat}>Reddit — r/ClaudeAI</div>
+              <Ext href="https://www.reddit.com/r/ClaudeAI/comments/1onjxs9/how_to_set_up_claude_skills_in_15_minutes_for/">
+                How to Set Up Claude Skills in 15 Minutes (for Non-Technical People)
+              </Ext>
+              <div className={styles.sourceDesc}>
+                非技術者向けのスキルセットアップ手順（コミュニティ投稿）
+              </div>
+            </div>
+            <div className={styles.sourceCard}>
+              <div className={styles.sourceCat}>GitHub — Anthropic 公式</div>
+              <Ext href="https://github.com/anthropics/skills">
+                anthropics/skills — Public Skills Repository
+              </Ext>
+              <div className={styles.sourceDesc}>
+                Anthropic 公式のスキルサンプル集。参考実装として活用可能
+              </div>
+            </div>
+            <div className={styles.sourceCard}>
+              <div className={styles.sourceCat}>GitHub — コミュニティ</div>
+              <Ext href="https://github.com/hesreallyhim/awesome-claude-code">
+                hesreallyhim/awesome-claude-code
+              </Ext>
+              <div className={styles.sourceDesc}>
+                コミュニティが作成したスキル・ツール集。Cowork 対応のものも多数収録
+              </div>
+            </div>
+          </div>
+          <div className={`${styles.callout} ${styles.calloutWarn}`}>
+            <span className={styles.calloutIcon}>⚠️</span>
+            <p>
+              <strong>最新情報の確認を推奨:</strong> Cowork は Beta
+              製品であり、仕様が急速に変わる場合があります。
+              本ガイドの内容と実際の動作が異なる場合は、
+              <Ext href="https://support.claude.com">support.claude.com</Ext>
+              の公式情報を優先してください。
+            </p>
+          </div>
+          <p
+            style={{
+              fontSize: "0.78rem",
+              color: "var(--text3)",
+              marginTop: "3rem",
+              textAlign: "center",
+              fontFamily: "'JetBrains Mono', monospace",
+            }}
+          >
+            Claude Cowork 完全入門ガイド · 2026年3月版 · 初学者向けベストプラクティス
+          </p>
+        </section>
       </div>
     </div>
   );
