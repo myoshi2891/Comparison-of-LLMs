@@ -580,6 +580,155 @@ export default function SkillGuideIntermediatePage() {
           </div>
         </div>
       </section>
+      {/* S5: SYNTAX */}
+      <section id="sec-syntax" className={styles.section}>
+        <div className={styles.container}>
+          <div className={styles.sectionHeader}>
+            <span className={`${styles.sectionBadge} ${styles.badgeCyan}`}>05 / SYNTAX</span>
+            <div>
+              <h2 className={styles.sectionTitle}>
+                SKILL.md の<span className={styles.sectionTitleSpan}>書き方</span>
+                完全ガイド
+              </h2>
+              <p className={styles.sectionDesc}>
+                YAMLフロントマターの設計から、エージェントを確実に動かすマークダウン本文の構造まで。中級者が陥りやすいミスも解説する。
+              </p>
+            </div>
+          </div>
+          <h4 className={styles.h4}>1. YAMLフロントマター（メタデータ定義）</h4>
+          <p style={{ color: "var(--text-subtle)", fontSize: "15px", marginBottom: "16px" }}>
+            ファイル最上部に配置し、トリプルダッシュ（
+            <code className={styles.inlineCode}>---</code>
+            ）で囲む。エージェントがスキルを「見つける」ためのルーティング情報。
+          </p>
+          <div className={styles.codeWrap}>
+            <div className={styles.codeHeader}>
+              <div className={styles.macDots}>
+                <div className={`${styles.macDot} ${styles.dotRed}`} />
+                <div className={`${styles.macDot} ${styles.dotYellow}`} />
+                <div className={`${styles.macDot} ${styles.dotGreen}`} />
+              </div>
+              <span className={styles.codeLang}>yaml — SKILL.md Frontmatter</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.cComment}>---</span>
+              {"\n"}
+              <span className={styles.cKey}>name</span>
+              {": "}
+              <span className={styles.cVal}>frontend-reviewer</span>
+              {"  "}
+              <span className={styles.cComment}># 必須: ケバブケース・英語小文字・64文字以内</span>
+              {"\n\n"}
+              <span className={styles.cKey}>description</span>
+              {": |\n"}
+              {"  "}
+              <span className={styles.cComment}># 必須: エージェントのトリガー条件（最重要）</span>
+              {"\n  "}
+              <span className={styles.cVal}>ReactおよびTypeScriptプロジェクトの</span>
+              {"\n  "}
+              <span className={styles.cVal}>フロントエンドコードをレビューし、</span>
+              {"\n  "}
+              <span className={styles.cVal}>コードレビュー、PR確認、品質チェック、</span>
+              {"\n  "}
+              <span className={styles.cVal}>という言葉が出たら必ずこのスキルを使うこと。</span>
+              {"\n\n"}
+              <span className={styles.cKey}>disable-model-invocation</span>
+              {": "}
+              <span className={styles.cVal}>false</span>
+              {"\n"}
+              <span className={styles.cComment}>
+                # trueにすると自動発動を無効化（危険操作スキルに）
+              </span>
+              {"\n"}
+              <span className={styles.cKey}>category</span>
+              {": "}
+              <span className={styles.cVal}>code-quality</span>
+              {"\n"}
+              <span className={styles.cComment}>---</span>
+            </div>
+          </div>
+          <div className={styles.divider} />
+          <h4 className={styles.h4}>2. description フィールドの設計が成否を決める</h4>
+          <div className={styles.compareGrid}>
+            <div className={`${styles.compareCard} ${styles.compareCardBad}`}>
+              <div className={`${styles.compareTitle} ${styles.compareTitleNg}`}>
+                ❌ アンダートリガー（呼ばれない）
+              </div>
+              <pre>{`name: security-auditor
+description: |
+  セキュリティ監査を行うスキル。`}</pre>
+            </div>
+            <div className={`${styles.compareCard} ${styles.compareCardGood}`}>
+              <div className={`${styles.compareTitle} ${styles.compareTitleOk}`}>
+                ✅ 正しいトリガー設計
+              </div>
+              <pre>{`name: security-auditor
+description: |
+  コードのセキュリティ監査を実施する。
+  脆弱性チェック、OWASP Top 10の検証、
+  セキュリティ、認証、XSS、SQLi、
+  という言葉が出たら必ず使うこと。`}</pre>
+            </div>
+          </div>
+          <div className={styles.divider} />
+          <h4 className={styles.h4}>3. マークダウン本文の推奨スキーマ</h4>
+          <div className={styles.codeWrap}>
+            <div className={styles.codeHeader}>
+              <div className={styles.macDots}>
+                <div className={`${styles.macDot} ${styles.dotRed}`} />
+                <div className={`${styles.macDot} ${styles.dotYellow}`} />
+                <div className={`${styles.macDot} ${styles.dotGreen}`} />
+              </div>
+              <span className={styles.codeLang}>markdown — SKILL.md Body Template</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.cHead}># スキル名</span>
+              {"\n\n"}
+              <span className={styles.cHead}>## Overview</span>
+              {"\n"}
+              <span className={styles.cVal}>このスキルが達成する目的を1〜2文で。</span>
+              {"\n\n"}
+              <span className={styles.cHead}>## Before Starting（前提条件）</span>
+              {"\n"}
+              <span className={styles.cVal}>- ユーザーから提供されるべき入力情報</span>
+              {"\n\n"}
+              <span className={styles.cHead}>## Step-by-Step Guide（実行手順）</span>
+              {"\n"}
+              <span className={styles.cComment}># 抽象的な思考でなく具体的なアクションを定義</span>
+              {"\n"}
+              <span className={styles.cVal}>
+                1. **ファイルの解析**: 対象ファイルと依存モジュールを読み込む
+              </span>
+              {"\n"}
+              <span className={styles.cVal}>
+                2. **静的解析**: 型安全性とReact依存配列の完全性を検証
+              </span>
+              {"\n"}
+              <span className={styles.cVal}>
+                3. **アーティファクト生成**: 修正後のコードスニペットと共に提示
+              </span>
+              {"\n\n"}
+              <span className={styles.cHead}>## Examples（Few-shot 使用例）</span>
+              {"\n"}
+              <span className={styles.cComment}># LLMはここを見て期待される振る舞いを模倣する</span>
+              {"\n"}
+              <span className={styles.cVal}>**Input**: `UserProfile.tsx`をレビューして</span>
+              {"\n"}
+              <span className={styles.cVal}>
+                **Output Structure**: 1.ボトルネック 2.修正案 3.影響範囲
+              </span>
+              {"\n\n"}
+              <span className={styles.cHead}>## Rules（制約事項）</span>
+              {"\n"}
+              <span className={styles.cVal}>- ❌ ビジネスロジックを推測で変更しないこと</span>
+              {"\n"}
+              <span className={styles.cVal}>- ✅ 修正根拠として公式ドキュメントを引用すること</span>
+              {"\n"}
+              <span className={styles.cVal}>- ✅ 破壊的変更の前には必ず確認を求めること</span>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
