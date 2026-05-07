@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import Page from "./page";
+import Page, { metadata } from "./page";
 
 describe("/gemini/skill-guide-intermediate", () => {
   it("h1 の見出しテキストが一致する", () => {
@@ -39,5 +39,14 @@ describe("/gemini/skill-guide-intermediate", () => {
       const hasLanguageClass = Array.from(block.classList).some((c) => c.startsWith("language-"));
       expect(hasLanguageClass).toBe(true);
     }
+  });
+
+  it("metadata の title と description が定義されている", () => {
+    expect(metadata.title).toBe(
+      "SKILL.md 完全解剖ガイド | Gemini CLI v0.34.0 & Antigravity v1.20.3 中級者以上向け"
+    );
+    expect(metadata.description).toBe(
+      "Google Gemini CLI・Antigravity IDE における SKILL.md の設計思想、アーキテクチャ、実装パターン、運用まで。エージェント駆動開発を次のレベルに引き上げるすべての知識を網羅する。"
+    );
   });
 });

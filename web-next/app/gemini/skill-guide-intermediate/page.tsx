@@ -1,12 +1,14 @@
-import MermaidDiagram from "@/components/docs/MermaidDiagram";
-import ChecklistApp from "./ChecklistApp";
-import PatternsApp from "./PatternsApp";
-import styles from "./page.module.css";
+import dynamic from 'next/dynamic';
+import ChecklistApp from './ChecklistApp';
+import PatternsApp from './PatternsApp';
+import styles from './page.module.css';
+
+const MermaidDiagram = dynamic(() => import('@/components/docs/MermaidDiagram'), { ssr: false });
 
 export const metadata = {
-  title: "SKILL.md 完全解剖ガイド | Gemini CLI v0.34.0 & Antigravity v1.20.3 中級者以上向け",
+  title: 'SKILL.md 完全解剖ガイド | Gemini CLI v0.34.0 & Antigravity v1.20.3 中級者以上向け',
   description:
-    "Google Gemini CLI・Antigravity IDE における SKILL.md の設計思想、アーキテクチャ、実装パターン、運用まで。エージェント駆動開発を次のレベルに引き上げるすべての知識を網羅する。",
+    'Google Gemini CLI・Antigravity IDE における SKILL.md の設計思想、アーキテクチャ、実装パターン、運用まで。エージェント駆動開発を次のレベルに引き上げるすべての知識を網羅する。',
 };
 
 const MERMAID_STRUCTURE = `graph TD
@@ -199,31 +201,31 @@ export default function SkillGuideIntermediatePage() {
           </div>
           <h1 className={styles.heroH1}>
             <span className={styles.accentCyan}>Agent Skills</span>
-            {" の"}
+            {' の'}
             <br />
             <span className={styles.accentOrange}>完全解剖</span>
-            {"ガイド"}
+            {'ガイド'}
           </h1>
           <p className={styles.heroSub}>
-            Google Gemini CLI・Antigravity IDE における{" "}
-            <code className={styles.inlineCode}>SKILL.md</code>{" "}
+            Google Gemini CLI・Antigravity IDE における{' '}
+            <code className={styles.inlineCode}>SKILL.md</code>{' '}
             の設計思想、アーキテクチャ、実装パターン、運用まで。エージェント駆動開発を次のレベルに引き上げるすべての知識を網羅する。
           </p>
           <div className={styles.heroMeta}>
             <div className={styles.heroChip}>
-              <div className={styles.dot} style={{ background: "var(--cyan)" }} />
+              <div className={styles.dot} style={{ background: 'var(--cyan)' }} />
               Gemini CLI v0.34.0
             </div>
             <div className={styles.heroChip}>
-              <div className={styles.dot} style={{ background: "var(--orange)" }} />
+              <div className={styles.dot} style={{ background: 'var(--orange)' }} />
               Antigravity v1.20.3
             </div>
             <div className={styles.heroChip}>
-              <div className={styles.dot} style={{ background: "var(--blue)" }} />
+              <div className={styles.dot} style={{ background: 'var(--blue)' }} />
               Agent Skills Standard
             </div>
             <div className={styles.heroChip}>
-              <div className={styles.dot} style={{ background: "var(--purple)" }} />
+              <div className={styles.dot} style={{ background: 'var(--purple)' }} />
               MCP Integration
             </div>
           </div>
@@ -257,7 +259,7 @@ export default function SkillGuideIntermediatePage() {
               </p>
             </div>
           </div>
-          <div className={styles.cardGrid} style={{ marginBottom: "32px" }}>
+          <div className={styles.cardGrid} style={{ marginBottom: '32px' }}>
             <div className={styles.card}>
               <div className={styles.cardIcon}>🔥</div>
               <h3>コンテキスト飽和（Context Saturation）</h3>
@@ -271,7 +273,7 @@ export default function SkillGuideIntermediatePage() {
               <h3>オンデマンド専門知識</h3>
               <p>
                 SKILL.md は必要なタイミングでのみコンテキストに展開される。セッション中は
-                <strong style={{ color: "var(--text)" }}>名前と説明（約100トークン）</strong>
+                <strong style={{ color: 'var(--text)' }}>名前と説明（約100トークン）</strong>
                 のみが常駐し、発動時に本文を読み込む設計。
               </p>
             </div>
@@ -289,7 +291,7 @@ export default function SkillGuideIntermediatePage() {
             <MermaidDiagram chart={MERMAID_WHY} />
           </div>
           <div className={styles.callout}>
-            <strong>核心的な洞察:</strong>{" "}
+            <strong>核心的な洞察:</strong>{' '}
             モデルのコンテキストウィンドウが100万トークンになっても、「何もかもを与える」ことは解決策にならない。
             <span className={styles.inlineEm}>注意機構の分散</span>
             という本質的な問題は変わらないからだ。SKILL.md
@@ -330,7 +332,7 @@ export default function SkillGuideIntermediatePage() {
               <tbody>
                 <tr>
                   <td>
-                    <strong style={{ color: "var(--text)" }}>バージョン</strong>
+                    <strong style={{ color: 'var(--text)' }}>バージョン</strong>
                   </td>
                   <td>
                     <code className={styles.inlineCode}>v0.34.0</code> (2026-03-18)
@@ -341,14 +343,14 @@ export default function SkillGuideIntermediatePage() {
                 </tr>
                 <tr>
                   <td>
-                    <strong style={{ color: "var(--text)" }}>形態</strong>
+                    <strong style={{ color: 'var(--text)' }}>形態</strong>
                   </td>
                   <td>ターミナルアプリ</td>
                   <td>IDEエディタ（VSCode fork）</td>
                 </tr>
                 <tr>
                   <td>
-                    <strong style={{ color: "var(--text)" }}>グローバルスキルパス</strong>
+                    <strong style={{ color: 'var(--text)' }}>グローバルスキルパス</strong>
                   </td>
                   <td>
                     <code className={styles.inlineCode}>~/.gemini/skills/</code>
@@ -359,7 +361,7 @@ export default function SkillGuideIntermediatePage() {
                 </tr>
                 <tr>
                   <td>
-                    <strong style={{ color: "var(--text)" }}>ワークスペーススキルパス</strong>
+                    <strong style={{ color: 'var(--text)' }}>ワークスペーススキルパス</strong>
                   </td>
                   <td>
                     <code className={styles.inlineCode}>.gemini/skills/</code>
@@ -370,7 +372,7 @@ export default function SkillGuideIntermediatePage() {
                 </tr>
                 <tr>
                   <td>
-                    <strong style={{ color: "var(--text)" }}>デフォルトモデル</strong>
+                    <strong style={{ color: 'var(--text)' }}>デフォルトモデル</strong>
                   </td>
                   <td>
                     <code className={styles.inlineCode}>gemini-3-flash-preview</code> (v0.29.0〜)
@@ -381,7 +383,7 @@ export default function SkillGuideIntermediatePage() {
                 </tr>
                 <tr>
                   <td>
-                    <strong style={{ color: "var(--text)" }}>最高精度モデル</strong>
+                    <strong style={{ color: 'var(--text)' }}>最高精度モデル</strong>
                   </td>
                   <td>
                     <code className={styles.inlineCode}>gemini-3.1-pro-preview</code> (v0.31.0〜)
@@ -392,13 +394,13 @@ export default function SkillGuideIntermediatePage() {
                 </tr>
                 <tr className={styles.rowNew}>
                   <td>
-                    <strong style={{ color: "var(--text)" }}>Plan Mode</strong>
+                    <strong style={{ color: 'var(--text)' }}>Plan Mode</strong>
                     <span className={styles.newBadge}>NEW</span>
                   </td>
                   <td>
                     <code className={styles.inlineCode}>/plan</code> コマンド (v0.29.0〜)
                     <br />
-                    <small style={{ color: "var(--text-muted)" }}>
+                    <small style={{ color: 'var(--text-muted)' }}>
                       v0.33.0〜リサーチサブエージェント内蔵
                     </small>
                   </td>
@@ -406,7 +408,7 @@ export default function SkillGuideIntermediatePage() {
                 </tr>
                 <tr className={styles.rowNew}>
                   <td>
-                    <strong style={{ color: "var(--text)" }}>skill-creator</strong>
+                    <strong style={{ color: 'var(--text)' }}>skill-creator</strong>
                     <span className={styles.newBadge}>NEW</span>
                   </td>
                   <td>標準搭載 (v0.26.0〜)</td>
@@ -414,7 +416,7 @@ export default function SkillGuideIntermediatePage() {
                 </tr>
                 <tr className={styles.rowNew}>
                   <td>
-                    <strong style={{ color: "var(--text)" }}>/rewind コマンド</strong>
+                    <strong style={{ color: 'var(--text)' }}>/rewind コマンド</strong>
                     <span className={styles.newBadge}>NEW</span>
                   </td>
                   <td>(v0.27.0〜)</td>
@@ -422,7 +424,7 @@ export default function SkillGuideIntermediatePage() {
                 </tr>
                 <tr className={styles.rowNew}>
                   <td>
-                    <strong style={{ color: "var(--text)" }}>AGENTS.md 対応</strong>
+                    <strong style={{ color: 'var(--text)' }}>AGENTS.md 対応</strong>
                     <span className={styles.newBadge}>NEW</span>
                   </td>
                   <td>✅ あり</td>
@@ -430,25 +432,25 @@ export default function SkillGuideIntermediatePage() {
                 </tr>
                 <tr>
                   <td>
-                    <strong style={{ color: "var(--text)" }}>対応モデル（他社）</strong>
+                    <strong style={{ color: 'var(--text)' }}>対応モデル（他社）</strong>
                   </td>
                   <td>—</td>
                   <td>
-                    <code className={styles.inlineCode}>claude-sonnet-4-6</code> /{" "}
-                    <code className={styles.inlineCode}>claude-opus-4-6</code> /{" "}
+                    <code className={styles.inlineCode}>claude-sonnet-4-6</code> /{' '}
+                    <code className={styles.inlineCode}>claude-opus-4-6</code> /{' '}
                     <code className={styles.inlineCode}>gpt-oss-120b</code>
                   </td>
                 </tr>
                 <tr>
                   <td>
-                    <strong style={{ color: "var(--text)" }}>学習機能</strong>
+                    <strong style={{ color: 'var(--text)' }}>学習機能</strong>
                   </td>
                   <td>セッション内のみ</td>
                   <td>ナレッジベースへの永続的な蓄積と再利用</td>
                 </tr>
                 <tr>
                   <td>
-                    <strong style={{ color: "var(--text)" }}>SKILL.md サポート</strong>
+                    <strong style={{ color: 'var(--text)' }}>SKILL.md サポート</strong>
                   </td>
                   <td>
                     <span className={`${styles.tag} ${styles.tagG}`}>✓ FULL</span>
@@ -490,56 +492,56 @@ export default function SkillGuideIntermediatePage() {
             <MermaidDiagram chart={MERMAID_PROGRESSIVE} />
           </div>
           <div className={styles.cardGrid}>
-            <div className={styles.card} style={{ borderLeft: "3px solid var(--green)" }}>
+            <div className={styles.card} style={{ borderLeft: '3px solid var(--green)' }}>
               <div
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  marginBottom: "12px",
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  marginBottom: '12px',
                 }}
               >
                 <div
                   style={{
                     fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: "11px",
-                    color: "var(--green)",
+                    fontSize: '11px',
+                    color: 'var(--green)',
                     fontWeight: 600,
                   }}
                 >
                   LEVEL 1
                 </div>
-                <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
                   常時コンテキスト常駐
                 </div>
               </div>
               <h3>メタデータのロード</h3>
               <p>
-                セッション開始時に全スキルの <code className={styles.inlineCode}>name</code> と{" "}
+                セッション開始時に全スキルの <code className={styles.inlineCode}>name</code> と{' '}
                 <code className={styles.inlineCode}>description</code>
                 のみがシステムプロンプトに注入される。スキル100個あっても約10,000トークン程度の軽量な状態。エージェントはこの情報でスキル一覧を「知っている」。
               </p>
             </div>
-            <div className={styles.card} style={{ borderLeft: "3px solid var(--blue)" }}>
+            <div className={styles.card} style={{ borderLeft: '3px solid var(--blue)' }}>
               <div
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  marginBottom: "12px",
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  marginBottom: '12px',
                 }}
               >
                 <div
                   style={{
                     fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: "11px",
-                    color: "var(--blue)",
+                    fontSize: '11px',
+                    color: 'var(--blue)',
                     fontWeight: 600,
                   }}
                 >
                   LEVEL 2
                 </div>
-                <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
                   アクティベーション時のみ
                 </div>
               </div>
@@ -552,40 +554,40 @@ export default function SkillGuideIntermediatePage() {
                 の本文（5,000トークン未満推奨）がコンテキストに展開される。
               </p>
             </div>
-            <div className={styles.card} style={{ borderLeft: "3px solid var(--purple)" }}>
+            <div className={styles.card} style={{ borderLeft: '3px solid var(--purple)' }}>
               <div
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  marginBottom: "12px",
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  marginBottom: '12px',
                 }}
               >
                 <div
                   style={{
                     fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: "11px",
-                    color: "var(--purple)",
+                    fontSize: '11px',
+                    color: 'var(--purple)',
                     fontWeight: 600,
                   }}
                 >
                   LEVEL 3
                 </div>
-                <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>動的アクセス</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>動的アクセス</div>
               </div>
               <h3>リソースの動的実行</h3>
               <p>
                 references/ 内のドキュメントはBashでの読み取り時のみ消費。scripts/
                 内のスクリプトはソースコードではなく
-                <strong style={{ color: "var(--text)" }}>実行結果のみ</strong>
+                <strong style={{ color: 'var(--text)' }}>実行結果のみ</strong>
                 がコンテキストに入る。実質的に無制限の処理能力を「軽量に」実現。
               </p>
             </div>
           </div>
-          <div className={`${styles.callout} ${styles.calloutWarn}`} style={{ marginTop: "24px" }}>
+          <div className={`${styles.callout} ${styles.calloutWarn}`} style={{ marginTop: '24px' }}>
             <strong>決定論的ツールの統合:</strong> LLMは本質的に確率論的（非決定論的）。scripts/
             にPython/Bashスクリプトを同梱し SKILL.md から呼び出すことで、
-            <span style={{ color: "var(--orange)" }}>検証処理を決定論的</span>
+            <span style={{ color: 'var(--orange)' }}>検証処理を決定論的</span>
             にし、出力の一貫性と精度を飛躍的に高めることができる。
           </div>
         </div>
@@ -621,42 +623,42 @@ export default function SkillGuideIntermediatePage() {
             </div>
             <div className={styles.codeBody}>
               <span className={styles.cComment}># 典型的なスキルのディレクトリ構成</span>
-              {"\n"}
+              {'\n'}
               <span className={styles.cVal}>my-skill/</span>
-              {"\n"}
-              {"├── "}
+              {'\n'}
+              {'├── '}
               <span className={styles.cKey}>SKILL.md</span>
-              {"     "}
+              {'     '}
               <span className={styles.cComment}># 【必須】エージェントへの指示・メタデータ</span>
-              {"\n"}
-              {"├── "}
+              {'\n'}
+              {'├── '}
               <span className={styles.cOp}>scripts/</span>
-              {"     "}
+              {'     '}
               <span className={styles.cComment}># 【任意】決定論的な検証・自動化スクリプト</span>
-              {"\n"}
-              {"│   ├── "}
+              {'\n'}
+              {'│   ├── '}
               <span className={styles.cCmd}>run.py</span>
-              {"\n"}
-              {"│   └── "}
+              {'\n'}
+              {'│   └── '}
               <span className={styles.cCmd}>validate.sh</span>
-              {"\n"}
-              {"├── "}
+              {'\n'}
+              {'├── '}
               <span className={styles.cOp}>references/</span>
-              {"  "}
+              {'  '}
               <span className={styles.cComment}># 【任意】オンデマンド参照ドキュメント</span>
-              {"\n"}
-              {"│   ├── "}
+              {'\n'}
+              {'│   ├── '}
               <span className={styles.cCmd}>api-spec.md</span>
-              {"\n"}
-              {"│   └── "}
+              {'\n'}
+              {'│   └── '}
               <span className={styles.cCmd}>best-practices.md</span>
-              {"\n"}
-              {"└── "}
+              {'\n'}
+              {'└── '}
               <span className={styles.cOp}>assets/</span>
-              {"      "}
+              {'      '}
               <span className={styles.cComment}># 【任意】出力テンプレート・静的ファイル</span>
-              {"\n"}
-              {"    └── "}
+              {'\n'}
+              {'    └── '}
               <span className={styles.cCmd}>template.tsx</span>
             </div>
           </div>
@@ -678,7 +680,7 @@ export default function SkillGuideIntermediatePage() {
             </div>
           </div>
           <h4 className={styles.h4}>1. YAMLフロントマター（メタデータ定義）</h4>
-          <p style={{ color: "var(--text-subtle)", fontSize: "15px", marginBottom: "16px" }}>
+          <p style={{ color: 'var(--text-subtle)', fontSize: '15px', marginBottom: '16px' }}>
             ファイル最上部に配置し、トリプルダッシュ（
             <code className={styles.inlineCode}>---</code>
             ）で囲む。エージェントがスキルを「見つける」ためのルーティング情報。
@@ -694,38 +696,38 @@ export default function SkillGuideIntermediatePage() {
             </div>
             <div className={styles.codeBody}>
               <span className={styles.cComment}>---</span>
-              {"\n"}
+              {'\n'}
               <span className={styles.cKey}>name</span>
-              {": "}
+              {': '}
               <span className={styles.cVal}>frontend-reviewer</span>
-              {"  "}
+              {'  '}
               <span className={styles.cComment}># 必須: ケバブケース・英語小文字・64文字以内</span>
-              {"\n\n"}
+              {'\n\n'}
               <span className={styles.cKey}>description</span>
-              {": |\n"}
-              {"  "}
+              {': |\n'}
+              {'  '}
               <span className={styles.cComment}># 必須: エージェントのトリガー条件（最重要）</span>
-              {"\n  "}
+              {'\n  '}
               <span className={styles.cVal}>ReactおよびTypeScriptプロジェクトの</span>
-              {"\n  "}
+              {'\n  '}
               <span className={styles.cVal}>フロントエンドコードをレビューし、</span>
-              {"\n  "}
+              {'\n  '}
               <span className={styles.cVal}>コードレビュー、PR確認、品質チェック、</span>
-              {"\n  "}
+              {'\n  '}
               <span className={styles.cVal}>という言葉が出たら必ずこのスキルを使うこと。</span>
-              {"\n\n"}
+              {'\n\n'}
               <span className={styles.cKey}>disable-model-invocation</span>
-              {": "}
+              {': '}
               <span className={styles.cVal}>false</span>
-              {"\n"}
+              {'\n'}
               <span className={styles.cComment}>
                 # trueにすると自動発動を無効化（危険操作スキルに）
               </span>
-              {"\n"}
+              {'\n'}
               <span className={styles.cKey}>category</span>
-              {": "}
+              {': '}
               <span className={styles.cVal}>code-quality</span>
-              {"\n"}
+              {'\n'}
               <span className={styles.cComment}>---</span>
             </div>
           </div>
@@ -765,47 +767,47 @@ description: |
             </div>
             <div className={styles.codeBody}>
               <span className={styles.cHead}># スキル名</span>
-              {"\n\n"}
+              {'\n\n'}
               <span className={styles.cHead}>## Overview</span>
-              {"\n"}
+              {'\n'}
               <span className={styles.cVal}>このスキルが達成する目的を1〜2文で。</span>
-              {"\n\n"}
+              {'\n\n'}
               <span className={styles.cHead}>## Before Starting（前提条件）</span>
-              {"\n"}
+              {'\n'}
               <span className={styles.cVal}>- ユーザーから提供されるべき入力情報</span>
-              {"\n\n"}
+              {'\n\n'}
               <span className={styles.cHead}>## Step-by-Step Guide（実行手順）</span>
-              {"\n"}
+              {'\n'}
               <span className={styles.cComment}># 抽象的な思考でなく具体的なアクションを定義</span>
-              {"\n"}
+              {'\n'}
               <span className={styles.cVal}>
                 1. **ファイルの解析**: 対象ファイルと依存モジュールを読み込む
               </span>
-              {"\n"}
+              {'\n'}
               <span className={styles.cVal}>
                 2. **静的解析**: 型安全性とReact依存配列の完全性を検証
               </span>
-              {"\n"}
+              {'\n'}
               <span className={styles.cVal}>
                 3. **アーティファクト生成**: 修正後のコードスニペットと共に提示
               </span>
-              {"\n\n"}
+              {'\n\n'}
               <span className={styles.cHead}>## Examples（Few-shot 使用例）</span>
-              {"\n"}
+              {'\n'}
               <span className={styles.cComment}># LLMはここを見て期待される振る舞いを模倣する</span>
-              {"\n"}
+              {'\n'}
               <span className={styles.cVal}>**Input**: `UserProfile.tsx`をレビューして</span>
-              {"\n"}
+              {'\n'}
               <span className={styles.cVal}>
                 **Output Structure**: 1.ボトルネック 2.修正案 3.影響範囲
               </span>
-              {"\n\n"}
+              {'\n\n'}
               <span className={styles.cHead}>## Rules（制約事項）</span>
-              {"\n"}
+              {'\n'}
               <span className={styles.cVal}>- ❌ ビジネスロジックを推測で変更しないこと</span>
-              {"\n"}
+              {'\n'}
               <span className={styles.cVal}>- ✅ 修正根拠として公式ドキュメントを引用すること</span>
-              {"\n"}
+              {'\n'}
               <span className={styles.cVal}>- ✅ 破壊的変更の前には必ず確認を求めること</span>
             </div>
           </div>
@@ -852,14 +854,14 @@ description: |
               <div className={styles.stepBody}>
                 <div className={styles.stepTitle}>
                   Gemini CLI — コマンドでインストール
-                  <span className={styles.newBadge} style={{ fontSize: "11px" }}>
+                  <span className={styles.newBadge} style={{ fontSize: '11px' }}>
                     v0.34.0
                   </span>
                 </div>
                 <p className={styles.stepDesc}>
                   最もスタンダードな方法。v0.26.0〜の新コマンドも含む完全リファレンス。
                 </p>
-                <div className={styles.codeWrap} style={{ marginTop: "16px" }}>
+                <div className={styles.codeWrap} style={{ marginTop: '16px' }}>
                   <div className={styles.codeHeader}>
                     <div className={styles.macDots}>
                       <div className={`${styles.macDot} ${styles.dotRed}`} />
@@ -872,68 +874,68 @@ description: |
                     <span className={styles.cComment}>
                       # スキルを Git リポジトリからインストール
                     </span>
-                    {"\n"}
-                    <span className={styles.cCmd}>gemini skills install</span>{" "}
+                    {'\n'}
+                    <span className={styles.cCmd}>gemini skills install</span>{' '}
                     <span className={styles.cVal}>https://github.com/example/my-skills.git</span>
-                    {"\n\n"}
+                    {'\n\n'}
                     <span className={styles.cComment}># サブパスを指定してインストール</span>
-                    {"\n"}
-                    <span className={styles.cCmd}>gemini skills install</span>{" "}
-                    <span className={styles.cVal}>https://github.com/example/skills.git</span>{" "}
+                    {'\n'}
+                    <span className={styles.cCmd}>gemini skills install</span>{' '}
+                    <span className={styles.cVal}>https://github.com/example/skills.git</span>{' '}
                     <span className={styles.cKey}>--path</span>
-                    {" skills/firebase\n\n"}
+                    {' skills/firebase\n\n'}
                     <span className={styles.cComment}># ローカルディレクトリからインストール</span>
-                    {"\n"}
-                    <span className={styles.cCmd}>gemini skills install</span>{" "}
+                    {'\n'}
+                    <span className={styles.cCmd}>gemini skills install</span>{' '}
                     <span className={styles.cVal}>./my-local-skill/</span>
-                    {"\n\n"}
+                    {'\n\n'}
                     <span className={styles.cComment}># インストール済みスキルを一覧表示</span>
-                    {"\n"}
+                    {'\n'}
                     <span className={styles.cCmd}>gemini skills list</span>
-                    {"\n\n"}
+                    {'\n\n'}
                     <span className={styles.cComment}># セッション中にスキルを一時無効化</span>
-                    {"\n"}
-                    <span className={styles.cCmd}>/skills disable</span>{" "}
-                    <span className={styles.cVal}>{"<スキル番号>"}</span>
-                    {"\n\n"}
+                    {'\n'}
+                    <span className={styles.cCmd}>/skills disable</span>{' '}
+                    <span className={styles.cVal}>{'<スキル番号>'}</span>
+                    {'\n\n'}
                     <span className={styles.cComment}># スキルを最新版に更新</span>
-                    {"\n"}
+                    {'\n'}
                     <span className={styles.cCmd}>gemini skills update</span>
-                    {"\n\n"}
+                    {'\n\n'}
                     <span className={styles.cNew}>
-                      {"──────────────────────────────────────────────────────────────"}
+                      {'──────────────────────────────────────────────────────────────'}
                     </span>
-                    {"\n"}
+                    {'\n'}
                     <span className={styles.cNew}>
-                      {"# 🆕 v0.26.0〜 skill-creator（スキル対話的自動生成）"}
+                      {'# 🆕 v0.26.0〜 skill-creator（スキル対話的自動生成）'}
                     </span>
-                    {"\n"}
+                    {'\n'}
                     <span className={styles.cComment}>
-                      {"# チャットで「新しいスキルを作成したい」と入力→自動起動"}
+                      {'# チャットで「新しいスキルを作成したい」と入力→自動起動'}
                     </span>
-                    {"\n\n"}
+                    {'\n\n'}
                     <span className={styles.cNew}>
-                      {"# 🆕 v0.27.0〜 /rewind（セッション履歴を遡る・ロールバック）"}
+                      {'# 🆕 v0.27.0〜 /rewind（セッション履歴を遡る・ロールバック）'}
                     </span>
-                    {"\n"}
+                    {'\n'}
                     <span className={styles.cCmd}>/rewind</span>
-                    {"\n\n"}
+                    {'\n\n'}
                     <span className={styles.cNew}>
-                      {"# 🆕 v0.29.0〜 /plan（Plan Mode: read-only で安全に変更計画立案）"}
+                      {'# 🆕 v0.29.0〜 /plan（Plan Mode: read-only で安全に変更計画立案）'}
                     </span>
-                    {"\n"}
+                    {'\n'}
                     <span className={styles.cCmd}>/plan</span>
-                    {"\n"}
+                    {'\n'}
                     <span className={styles.cComment}>
-                      {"# v0.33.0〜: リサーチサブエージェント・アノテーション機能を内蔵"}
+                      {'# v0.33.0〜: リサーチサブエージェント・アノテーション機能を内蔵'}
                     </span>
-                    {"\n\n"}
+                    {'\n\n'}
                     <span className={styles.cNew}>
-                      {"# 🆕 v0.30.0〜 Gemini CLI SDK（プログラムによるスキル生成）"}
+                      {'# 🆕 v0.30.0〜 Gemini CLI SDK（プログラムによるスキル生成）'}
                     </span>
-                    {"\n"}
+                    {'\n'}
                     <span className={styles.cComment}>
-                      {"# npm install @google/gemini-cli-sdk"}
+                      {'# npm install @google/gemini-cli-sdk'}
                     </span>
                   </div>
                 </div>
@@ -945,7 +947,7 @@ description: |
               <div className={styles.stepBody}>
                 <div className={styles.stepTitle}>
                   Antigravity — ファイルコピーで配置
-                  <span className={styles.newBadge} style={{ fontSize: "11px" }}>
+                  <span className={styles.newBadge} style={{ fontSize: '11px' }}>
                     v1.20.3
                   </span>
                 </div>
@@ -953,7 +955,7 @@ description: |
                   Antigravity IDE
                   ではGUIまたはファイルコピーでスキルを配置。v1.20.3〜はAGENTS.mdでクロスツール共有も可能。
                 </p>
-                <div className={styles.codeWrap} style={{ marginTop: "16px" }}>
+                <div className={styles.codeWrap} style={{ marginTop: '16px' }}>
                   <div className={styles.codeHeader}>
                     <div className={styles.macDots}>
                       <div className={`${styles.macDot} ${styles.dotRed}`} />
@@ -964,31 +966,31 @@ description: |
                   </div>
                   <div className={styles.codeBody}>
                     <span className={styles.cComment}>
-                      {"# グローバルインストール（全プロジェクトで使えるようにする）"}
+                      {'# グローバルインストール（全プロジェクトで使えるようにする）'}
                     </span>
-                    {"\n"}
+                    {'\n'}
                     <span className={styles.cCmd}>cp -r</span>
-                    {" my-skill/ "}
-                    <span className={styles.cVal}>{"~/.gemini/antigravity/skills/"}</span>
-                    {"\n\n"}
+                    {' my-skill/ '}
+                    <span className={styles.cVal}>{'~/.gemini/antigravity/skills/'}</span>
+                    {'\n\n'}
                     <span className={styles.cComment}>
-                      {"# ワークスペースインストール（このプロジェクトのみ）"}
+                      {'# ワークスペースインストール（このプロジェクトのみ）'}
                     </span>
-                    {"\n"}
+                    {'\n'}
                     <span className={styles.cCmd}>cp -r</span>
-                    {" my-skill/ "}
-                    <span className={styles.cVal}>{".agent/skills/"}</span>
-                    {"\n\n"}
+                    {' my-skill/ '}
+                    <span className={styles.cVal}>{'.agent/skills/'}</span>
+                    {'\n\n'}
                     <span className={styles.cNew}>
-                      {"# 🆕 v1.20.3〜 AGENTS.md でクロスツール共有"}
+                      {'# 🆕 v1.20.3〜 AGENTS.md でクロスツール共有'}
                     </span>
-                    {"\n"}
+                    {'\n'}
                     <span className={styles.cComment}>
-                      {"# プロジェクトルートに AGENTS.md を置くだけで"}
+                      {'# プロジェクトルートに AGENTS.md を置くだけで'}
                     </span>
-                    {"\n"}
+                    {'\n'}
                     <span className={styles.cComment}>
-                      {"# Antigravity / Claude Code / Codex など複数ツールで共有可能"}
+                      {'# Antigravity / Claude Code / Codex など複数ツールで共有可能'}
                     </span>
                   </div>
                 </div>
@@ -1003,7 +1005,7 @@ description: |
                   Gemini CLI と Antigravity 両方に同時にスキルを追加できる。コミュニティの 1,500+
                   スキルを一括インストール可能。
                 </p>
-                <div className={styles.codeWrap} style={{ marginTop: "16px" }}>
+                <div className={styles.codeWrap} style={{ marginTop: '16px' }}>
                   <div className={styles.codeHeader}>
                     <div className={styles.macDots}>
                       <div className={`${styles.macDot} ${styles.dotRed}`} />
@@ -1014,28 +1016,28 @@ description: |
                   </div>
                   <div className={styles.codeBody}>
                     <span className={styles.cComment}># Firebase スキルを両ツールに同時追加</span>
-                    {"\n"}
-                    <span className={styles.cCmd}>npx skills add</span>{" "}
-                    <span className={styles.cVal}>firebase/agent-skills</span>{" "}
+                    {'\n'}
+                    <span className={styles.cCmd}>npx skills add</span>{' '}
+                    <span className={styles.cVal}>firebase/agent-skills</span>{' '}
                     <span className={styles.cKey}>-a</span>
-                    {" gemini-cli "}
+                    {' gemini-cli '}
                     <span className={styles.cKey}>-a</span>
-                    {" antigravity\n\n"}
+                    {' antigravity\n\n'}
                     <span className={styles.cComment}># スキルを検索</span>
-                    {"\n"}
-                    <span className={styles.cCmd}>npx skills find</span>{" "}
+                    {'\n'}
+                    <span className={styles.cCmd}>npx skills find</span>{' '}
                     <span className={styles.cVal}>flutter</span>
-                    {"\n\n"}
+                    {'\n\n'}
                     <span className={styles.cComment}># インストール済みスキル一覧</span>
-                    {"\n"}
+                    {'\n'}
                     <span className={styles.cCmd}>npx skills list</span>
-                    {"\n\n"}
+                    {'\n\n'}
                     <span className={styles.cComment}>
                       {
-                        "# コミュニティの awesome-skills バンドルを一括インストール（1,500+ スキル）"
+                        '# コミュニティの awesome-skills バンドルを一括インストール（1,500+ スキル）'
                       }
                     </span>
-                    {"\n"}
+                    {'\n'}
                     <span className={styles.cCmd}>npx antigravity-awesome-skills</span>
                   </div>
                 </div>
@@ -1062,15 +1064,15 @@ description: |
             <div className={styles.mermaidLabel}>EXECUTION LIFECYCLE — SEQUENCE DIAGRAM</div>
             <MermaidDiagram chart={MERMAID_LIFECYCLE} />
           </div>
-          <div className={styles.cardGrid} style={{ marginTop: "24px" }}>
-            <div className={styles.card} style={{ borderTop: "2px solid var(--green)" }}>
+          <div className={styles.cardGrid} style={{ marginTop: '24px' }}>
+            <div className={styles.card} style={{ borderTop: '2px solid var(--green)' }}>
               <h3
                 style={{
-                  color: "var(--green)",
-                  fontSize: "14px",
+                  color: 'var(--green)',
+                  fontSize: '14px',
                   fontFamily: "'JetBrains Mono', monospace",
                   fontWeight: 600,
-                  marginBottom: "12px",
+                  marginBottom: '12px',
                 }}
               >
                 Phase 3: Consent
@@ -1079,21 +1081,21 @@ description: |
                 スキルがアクティブになる際、UIにスキル名・目的・アクセスするディレクトリパスが明示され承認を求める。悪意あるスクリプトの意図しない実行を防ぐセキュリティモデル。
               </p>
             </div>
-            <div className={styles.card} style={{ borderTop: "2px solid var(--blue)" }}>
+            <div className={styles.card} style={{ borderTop: '2px solid var(--blue)' }}>
               <h3
                 style={{
-                  color: "var(--blue)",
-                  fontSize: "14px",
+                  color: 'var(--blue)',
+                  fontSize: '14px',
                   fontFamily: "'JetBrains Mono', monospace",
                   fontWeight: 600,
-                  marginBottom: "12px",
+                  marginBottom: '12px',
                 }}
               >
                 Phase 4: Context Injection
               </h3>
               <p>
                 スクリプトはソースコードではなく
-                <strong style={{ color: "var(--text)" }}>実行結果のみ</strong>
+                <strong style={{ color: 'var(--text)' }}>実行結果のみ</strong>
                 がコンテキストに入る。これによりレベル3（scripts/）は実質的にコンテキスト無制限で複雑な処理を実現できる。
               </p>
             </div>
@@ -1122,13 +1124,13 @@ description: |
             <div className={`${styles.scopeCard} ${styles.scopeCardGlobal}`}>
               <div className={`${styles.scopeLabel} ${styles.scopeLabelC}`}>GLOBAL SCOPE</div>
               <h3>グローバルスキル</h3>
-              <p style={{ fontSize: "14px", color: "var(--text-subtle)" }}>
+              <p style={{ fontSize: '14px', color: 'var(--text-subtle)' }}>
                 すべてのプロジェクトで利用可能な汎用スキル。
               </p>
               <div className={styles.pathBox}>
-                {"~/.gemini/skills/"}
+                {'~/.gemini/skills/'}
                 <br />
-                {"~/.gemini/antigravity/skills/"}
+                {'~/.gemini/antigravity/skills/'}
               </div>
               <ul>
                 <li>Gitコミット規約フォーマッター</li>
@@ -1140,18 +1142,18 @@ description: |
             <div className={`${styles.scopeCard} ${styles.scopeCardWorkspace}`}>
               <div className={`${styles.scopeLabel} ${styles.scopeLabelO}`}>WORKSPACE SCOPE</div>
               <h3>ワークスペーススキル</h3>
-              <p style={{ fontSize: "14px", color: "var(--text-subtle)" }}>
+              <p style={{ fontSize: '14px', color: 'var(--text-subtle)' }}>
                 特定プロジェクトのみで有効。
-                <strong style={{ color: "var(--orange)" }}>
+                <strong style={{ color: 'var(--orange)' }}>
                   v1.20.3〜 AGENTS.md でクロスツール共有も可能
                 </strong>
               </p>
               <div className={styles.pathBox}>
-                {".gemini/skills/"}
+                {'.gemini/skills/'}
                 <br />
-                {".agent/skills/"}
+                {'.agent/skills/'}
                 <br />
-                {"AGENTS.md（クロスツール共有）"}
+                {'AGENTS.md（クロスツール共有）'}
               </div>
               <ul>
                 <li>このアプリのデプロイ手順</li>
@@ -1161,7 +1163,7 @@ description: |
               </ul>
             </div>
           </div>
-          <div className={styles.callout} style={{ marginTop: "24px" }}>
+          <div className={styles.callout} style={{ marginTop: '24px' }}>
             <strong>オーバーライドルール:</strong> 同名のスキルが複数スコープに存在する場合、
             <span className={styles.inlineEm}>ワークスペース（上位）が優先</span>
             される。v1.20.3〜ではAGENTS.mdも優先度ルールに組み込まれた。
@@ -1190,12 +1192,12 @@ description: |
             <MermaidDiagram chart={MERMAID_MCP} />
           </div>
           <div className={styles.compareGrid}>
-            <div className={styles.compareCard} style={{ borderColor: "var(--purple-dim)" }}>
-              <div className={styles.compareTitle} style={{ color: "var(--purple)" }}>
+            <div className={styles.compareCard} style={{ borderColor: 'var(--purple-dim)' }}>
+              <div className={styles.compareTitle} style={{ color: 'var(--purple)' }}>
                 🔌 MCP サーバーの役割
               </div>
               <pre
-                style={{ fontSize: "13px", lineHeight: "1.7" }}
+                style={{ fontSize: '13px', lineHeight: '1.7' }}
               >{`エージェントへの「手足とデータパイプライン」
 
 • 最新のAPI仕様を検索（Search）
@@ -1205,12 +1207,12 @@ description: |
 → 静的ファイルでは提供できない
 　動的機能を付与する`}</pre>
             </div>
-            <div className={styles.compareCard} style={{ borderColor: "var(--cyan-dim)" }}>
-              <div className={styles.compareTitle} style={{ color: "var(--cyan)" }}>
+            <div className={styles.compareCard} style={{ borderColor: 'var(--cyan-dim)' }}>
+              <div className={styles.compareTitle} style={{ color: 'var(--cyan)' }}>
                 🧠 SKILL.md の役割
               </div>
               <pre
-                style={{ fontSize: "13px", lineHeight: "1.7" }}
+                style={{ fontSize: '13px', lineHeight: '1.7' }}
               >{`エージェントへの「知識と判断力」
 
 • 何を調べるべきか（What）
@@ -1224,7 +1226,7 @@ description: |
           <div className={styles.callout}>
             <strong>実装例 — クラウドプロビジョニングスキル:</strong>
             <br />
-            <em style={{ color: "var(--text-subtle)", fontSize: "14px" }}>
+            <em style={{ color: 'var(--text-subtle)', fontSize: '14px' }}>
               "MCPツールを利用して最新のリファレンスを検索し、そのデータに基づいて、このプロジェクト独自の命名規則とセキュリティポリシーに沿ってTerraformコードを生成せよ"
             </em>
             <br />
@@ -1250,7 +1252,7 @@ description: |
               </p>
             </div>
           </div>
-          <h4 className={styles.h4} style={{ marginBottom: "20px" }}>
+          <h4 className={styles.h4} style={{ marginBottom: '20px' }}>
             アンチパターン vs ベストプラクティス
           </h4>
           <div className={styles.compareGrid}>
@@ -1309,7 +1311,7 @@ description: |
           <h4 className={styles.h4}>
             公開・運用前チェックリスト <span className={styles.newBadge}>2026-03-21 更新</span>
           </h4>
-          <p style={{ fontSize: "14px", color: "var(--text-subtle)", marginBottom: "20px" }}>
+          <p style={{ fontSize: '14px', color: 'var(--text-subtle)', marginBottom: '20px' }}>
             項目をクリックしてチェックを記録できます。
           </p>
           <ChecklistApp />
@@ -1320,7 +1322,7 @@ description: |
         id="sec-whatsnew"
         className={styles.section}
         style={{
-          background: "linear-gradient(180deg, rgba(249, 115, 22, 0.04) 0%, transparent 100%)",
+          background: 'linear-gradient(180deg, rgba(249, 115, 22, 0.04) 0%, transparent 100%)',
         }}
       >
         <div className={styles.container}>
@@ -1328,7 +1330,7 @@ description: |
             <span className={`${styles.sectionBadge} ${styles.badgeOrange}`}>12 / CHANGELOG</span>
             <div>
               <h2 className={styles.sectionTitle}>
-                <span style={{ color: "var(--orange)" }}>最新アップデート</span>（2026年3月21日）
+                <span style={{ color: 'var(--orange)' }}>最新アップデート</span>（2026年3月21日）
               </h2>
               <p className={styles.sectionDesc}>
                 Gemini CLI v0.26.0〜v0.34.0 および Antigravity v1.20.3 の主要変更点。SKILL.md
@@ -1336,13 +1338,13 @@ description: |
               </p>
             </div>
           </div>
-          <div className={styles.cardGrid} style={{ marginBottom: "32px" }}>
-            <div className={styles.card} style={{ borderTop: "3px solid var(--cyan)" }}>
+          <div className={styles.cardGrid} style={{ marginBottom: '32px' }}>
+            <div className={styles.card} style={{ borderTop: '3px solid var(--cyan)' }}>
               <h3
-                style={{ marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}
+                style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}
               >
-                <span style={{ color: "var(--cyan)" }}>Gemini CLI</span>
-                <code style={{ fontSize: "12px" }}>v0.26.0 → v0.34.0</code>
+                <span style={{ color: 'var(--cyan)' }}>Gemini CLI</span>
+                <code style={{ fontSize: '12px' }}>v0.26.0 → v0.34.0</code>
               </h3>
               <div className={styles.timeline}>
                 <div className={styles.tlItem}>
@@ -1397,12 +1399,12 @@ description: |
                 </div>
               </div>
             </div>
-            <div className={styles.card} style={{ borderTop: "3px solid var(--orange)" }}>
+            <div className={styles.card} style={{ borderTop: '3px solid var(--orange)' }}>
               <h3
-                style={{ marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}
+                style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}
               >
-                <span style={{ color: "var(--orange)" }}>Antigravity</span>
-                <code style={{ fontSize: "12px" }}>v1.20.3 (2026-03-05)</code>
+                <span style={{ color: 'var(--orange)' }}>Antigravity</span>
+                <code style={{ fontSize: '12px' }}>v1.20.3 (2026-03-05)</code>
               </h3>
               <div className={styles.timeline}>
                 <div className={styles.tlItem}>
@@ -1419,11 +1421,11 @@ description: |
                   </div>
                 </div>
               </div>
-              <div className={styles.divider} style={{ margin: "20px 0 16px" }} />
-              <h4 style={{ fontSize: "14px", marginBottom: "12px", color: "var(--text-subtle)" }}>
+              <div className={styles.divider} style={{ margin: '20px 0 16px' }} />
+              <h4 style={{ fontSize: '14px', marginBottom: '12px', color: 'var(--text-subtle)' }}>
                 サポートモデル（2026年3月）
               </h4>
-              <div className={styles.tableWrap} style={{ margin: "0" }}>
+              <div className={styles.tableWrap} style={{ margin: '0' }}>
                 <table>
                   <thead>
                     <tr>
