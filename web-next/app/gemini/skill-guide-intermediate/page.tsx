@@ -1,4 +1,5 @@
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import PatternsApp from "./PatternsApp";
 import styles from "./page.module.css";
 
 export const metadata = {
@@ -727,6 +728,23 @@ description: |
               <span className={styles.cVal}>- ✅ 破壊的変更の前には必ず確認を求めること</span>
             </div>
           </div>
+        </div>
+      </section>
+      {/* S6: PATTERNS */}
+      <section id="sec-patterns" className={styles.section}>
+        <div className={styles.container}>
+          <div className={styles.sectionHeader}>
+            <span className={`${styles.sectionBadge} ${styles.badgeOrange}`}>06 / PATTERNS</span>
+            <div>
+              <h2 className={styles.sectionTitle}>
+                実装<span className={styles.sectionTitleSpan}>パターン</span>4選
+              </h2>
+              <p className={styles.sectionDesc}>
+                シンプルなプロンプト型から、スクリプト統合・ドキュメント参照を組み合わせた高度なパターンまで。
+              </p>
+            </div>
+          </div>
+          <PatternsApp />
         </div>
       </section>
     </div>
