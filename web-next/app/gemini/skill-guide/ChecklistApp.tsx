@@ -101,14 +101,11 @@ const CHECK_ITEMS: CheckItem[] = [
 const TOTAL = CHECK_ITEMS.length;
 
 /**
- * Render an interactive checklist UI that tracks completed items and displays progress.
+ * Checklist UI component that tracks completed items and displays progress.
  *
- * The component maintains internal state mapping item IDs to their checked status, derives the
- * completed count and a rounded completion percentage, and allows toggling each item by clicking.
- * It displays a progress bar with a color change when completion reaches 100% and shows a success
- * message once all items are checked.
+ * Renders a list of checklist items with toggleable completion states, a progress bar showing the percentage complete, and a success message when all items are completed.
  *
- * @returns The rendered React element for the checklist and progress UI.
+ * @returns The React element for the checklist and progress interface.
  */
 export default function ChecklistApp() {
   const [checked, setChecked] = useState<Record<number, boolean>>({});

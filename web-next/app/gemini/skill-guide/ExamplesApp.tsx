@@ -311,21 +311,28 @@ const PATTERNS: Pattern[] = [
 ];
 
 /**
- * Render an interactive tabbed UI showcasing predefined SKILL.md pattern examples.
+ * Render the examples page with selectable SKILL.md pattern tabs.
  *
- * Maintains internal state for the active pattern, updates the displayed detail card,
- * directory structure, use case, and sample SKILL.md block when a tab is selected,
- * and supports keyboard navigation between tabs via ArrowRight, ArrowLeft, Home, and End
- * (focus moves to the newly selected tab).
+ * Displays a tab list of predefined patterns and a tabpanel showing the active
+ * pattern's detail card, directory structure, use case, and SKILL.md sample.
+ * The UI updates the displayed pattern when a tab is activated and supports
+ * keyboard navigation (ArrowRight, ArrowLeft, Home, End) between tabs.
  *
- * @returns A React element containing the examples page with tab buttons, a tabpanel
- * displaying the active pattern's details, a two-column layout for directory structure
- * and use case, and the corresponding SKILL.md sample block.
+ * @returns The root React element for the examples page containing the tab list, the active tabpanel, and the corresponding SKILL.md sample.
  */
 export default function ExamplesApp() {
   const [active, setActive] = useState("basic");
   const current = PATTERNS.find((p) => p.id === active) ?? PATTERNS[0];
 
+  /**
+   * Handle keyboard navigation for the tab list, updating the active tab and moving focus.
+   *
+   * Supports ArrowRight (next, wraps to first), ArrowLeft (previous, wraps to last), Home (first),
+   * and End (last). When a key is handled, prevents the default browser action, updates the active
+   * tab state, and shifts focus to the associated tab element with id `tab-<id>`.
+   *
+   * @param e - The keyboard event from the tab list
+   */
   function handleTabKeyDown(e: React.KeyboardEvent) {
     const ids = PATTERNS.map((p) => p.id);
     const idx = ids.indexOf(active);
