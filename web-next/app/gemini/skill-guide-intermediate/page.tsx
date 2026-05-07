@@ -7,6 +7,16 @@ export const metadata = {
     "Google Gemini CLI・Antigravity IDE における SKILL.md の設計思想、アーキテクチャ、実装パターン、運用まで。エージェント駆動開発を次のレベルに引き上げるすべての知識を網羅する。",
 };
 
+const MERMAID_PROGRESSIVE = `graph LR
+L1["Level 1 — Always Loaded<br />name + description only<br />~100 tokens per skill<br />Stays in context always"]
+L2["Level 2 — On Demand<br />SKILL.md full body<br />Max 500 lines recommended<br />Loaded only when activated"]
+L3["Level 3 — Dynamic<br />references/ and scripts/<br />Read or executed on demand<br />Source code NOT in context"]
+L1 -->|"Agent matches prompt<br />activate_skill called"| L2
+L2 -->|"SKILL.md references<br />external files"| L3
+style L1 fill:#1a2a1a,stroke:#22c55e,color:#86efac
+style L2 fill:#0d1e2a,stroke:#3b82f6,color:#93c5fd
+style L3 fill:#1a1030,stroke:#a855f7,color:#c4b5fd`;
+
 const MERMAID_ECOSYSTEM = `graph TB
 subgraph GeminiModel["Google Gemini Model Layer (2026-03)"]
 GM["gemini-3.1-pro-preview / gemini-3-flash-preview (default)<br />gemini-2.5-flash / gemini-2.5-pro"]
@@ -362,6 +372,127 @@ export default function SkillGuideIntermediatePage() {
             Copilot、Cursor等で共通利用できるオープンスタンダード。
             <span className={styles.inlineEm}>v1.20.3〜はAGENTS.mdによるクロスツール共有</span>
             も正式サポートされた。
+          </div>
+        </div>
+      </section>
+      {/* S3: PROGRESSIVE */}
+      <section id="sec-progressive" className={styles.section}>
+        <div className={styles.container}>
+          <div className={styles.sectionHeader}>
+            <span className={`${styles.sectionBadge} ${styles.badgeBlue}`}>03 / ARCHITECTURE</span>
+            <div>
+              <h2 className={styles.sectionTitle}>
+                プログレッシブ・
+                <span className={styles.sectionTitleSpan}>ディスクロージャー</span>
+              </h2>
+              <p className={styles.sectionDesc}>
+                SKILL.md
+                の最重要設計原理。3段階の段階的読み込みによって、コンテキスト消費を最小化しながら、必要な時に必要な情報だけを提供する仕組み。
+              </p>
+            </div>
+          </div>
+          <div className={styles.mermaidWrap}>
+            <div className={styles.mermaidLabel}>3-LEVEL PROGRESSIVE DISCLOSURE</div>
+            <MermaidDiagram chart={MERMAID_PROGRESSIVE} />
+          </div>
+          <div className={styles.cardGrid}>
+            <div className={styles.card} style={{ borderLeft: "3px solid var(--green)" }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  marginBottom: "12px",
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontSize: "11px",
+                    color: "var(--green)",
+                    fontWeight: 600,
+                  }}
+                >
+                  LEVEL 1
+                </div>
+                <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
+                  常時コンテキスト常駐
+                </div>
+              </div>
+              <h3>メタデータのロード</h3>
+              <p>
+                セッション開始時に全スキルの <code className={styles.inlineCode}>name</code> と{" "}
+                <code className={styles.inlineCode}>description</code>
+                のみがシステムプロンプトに注入される。スキル100個あっても約10,000トークン程度の軽量な状態。エージェントはこの情報でスキル一覧を「知っている」。
+              </p>
+            </div>
+            <div className={styles.card} style={{ borderLeft: "3px solid var(--blue)" }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  marginBottom: "12px",
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontSize: "11px",
+                    color: "var(--blue)",
+                    fontWeight: 600,
+                  }}
+                >
+                  LEVEL 2
+                </div>
+                <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
+                  アクティベーション時のみ
+                </div>
+              </div>
+              <h3>SKILL.md 本文の展開</h3>
+              <p>
+                ユーザーのプロンプトとスキルの description
+                を意味論的に照合し最も関連するスキルを特定。
+                <code className={styles.inlineCode}>activate_skill</code>
+                ツールが呼ばれて初めて SKILL.md
+                の本文（5,000トークン未満推奨）がコンテキストに展開される。
+              </p>
+            </div>
+            <div className={styles.card} style={{ borderLeft: "3px solid var(--purple)" }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  marginBottom: "12px",
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontSize: "11px",
+                    color: "var(--purple)",
+                    fontWeight: 600,
+                  }}
+                >
+                  LEVEL 3
+                </div>
+                <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>動的アクセス</div>
+              </div>
+              <h3>リソースの動的実行</h3>
+              <p>
+                references/ 内のドキュメントはBashでの読み取り時のみ消費。scripts/
+                内のスクリプトはソースコードではなく
+                <strong style={{ color: "var(--text)" }}>実行結果のみ</strong>
+                がコンテキストに入る。実質的に無制限の処理能力を「軽量に」実現。
+              </p>
+            </div>
+          </div>
+          <div className={`${styles.callout} ${styles.calloutWarn}`} style={{ marginTop: "24px" }}>
+            <strong>決定論的ツールの統合:</strong> LLMは本質的に確率論的（非決定論的）。scripts/
+            にPython/Bashスクリプトを同梱し SKILL.md から呼び出すことで、
+            <span style={{ color: "var(--orange)" }}>検証処理を決定論的</span>
+            にし、出力の一貫性と精度を飛躍的に高めることができる。
           </div>
         </div>
       </section>
