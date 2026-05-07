@@ -1,6 +1,7 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import Page, { metadata } from "./page";
+import styles from "./page.module.css";
 
 describe("/gemini/skill-guide-intermediate", () => {
   it("h1 の見出しテキストが一致する", () => {
@@ -32,13 +33,12 @@ describe("/gemini/skill-guide-intermediate", () => {
     }
   });
 
-  it("コードブロックに language-* クラスが付与されている", () => {
+  it("コードブロック（codeBody）が少なくとも 1 つ存在し、span 子要素を持つ", () => {
     const { container } = render(<Page />);
-    const codeBlocks = container.querySelectorAll("pre code");
-    for (const block of codeBlocks) {
-      const hasLanguageClass = Array.from(block.classList).some((c) => c.startsWith("language-"));
-      expect(hasLanguageClass).toBe(true);
-    }
+    const codeBodyDivs = container.querySelectorAll(`.${styles.codeBody}`);
+    expect(codeBodyDivs.length).toBeGreaterThan(0);
+    const firstBody = codeBodyDivs[0];
+    expect(firstBody?.querySelectorAll("span").length).toBeGreaterThan(0);
   });
 
   it("metadata の title と description が定義されている", () => {
