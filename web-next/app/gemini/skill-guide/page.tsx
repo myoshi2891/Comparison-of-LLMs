@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import ExamplesApp from "./ExamplesApp";
 import styles from "./page.module.css";
 import StepsApp from "./StepsApp";
 
@@ -929,9 +930,10 @@ export default function Page() {
         </div>
       </section>
 
-      {/* s08: examples — TODO: faithful migration */}
+      {/* s08: examples */}
       <section id="examples" className={styles.sec}>
         <h2 className={styles.secTitle}>💡 パターン別 実例集</h2>
+        <ExamplesApp />
       </section>
 
       {/* s09: checklist — TODO: faithful migration */}
