@@ -9,11 +9,11 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- **最新 HEAD**: `b44c895`（**feat(web-next): D-4 s11 — faithful migration of /gemini/skill-guide #footer**）
+- **最新 HEAD**: `bdad90f`（**fix(a11y): skill-guide の進捗バー role 追加とタブのキーボード操作対応**）
 - **未コミット作業**: なし（working tree クリーン）
 - **次の作業**: **D-5 scaffold — `/gemini/skill-guide-intermediate` Red コミット**（legacy: `legacy/gemini/skill-guide-of-gemini-for-intermediate.html`）
 - **テスト数**: `bun run test` **497 passed / 497 total（全 Green）**  — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
-- **ビルド**: `bun run build` ✅（D-4 s11 後に確認）・`bun run typecheck` ✅・`uv run pytest` 5/5 passed
+- **ビルド**: `bun run build` ✅（bdad90f 後に確認）・`bun run typecheck` ✅・`uv run pytest` 5/5 passed
 - **lint 既知違反**: 7 件
 
 ## AI 作業ルール（Phase A–F 共通、**必読**）
