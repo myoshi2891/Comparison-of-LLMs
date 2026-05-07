@@ -1,4 +1,5 @@
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import ChecklistApp from "./ChecklistApp";
 import PatternsApp from "./PatternsApp";
 import styles from "./page.module.css";
 
@@ -130,6 +131,19 @@ Agent --> Result
 style SkillLayer fill:#0d2330,stroke:#00d4aa
 style MCPLayer fill:#1a1030,stroke:#a855f7
 style Result fill:#0d2e1a,stroke:#22c55e,color:#86efac`;
+
+const MERMAID_BEST_PERF = `graph LR
+A["1-5 skills<br />Good but underutilized"]
+B["6-15 skills<br />OPTIMAL ZONE<br />Best performance"]
+C["16-25 skills<br />Degrading slightly"]
+D["25 plus skills<br />Significant confusion"]
+A -->|Add more| B
+B -->|Too many| C
+C -->|Overload| D
+style B fill:#0d2e1a,stroke:#22c55e,color:#86efac
+style D fill:#3d1515,stroke:#ef4444,color:#fca5a5
+style A fill:#1a1a10,stroke:#f97316,color:#fdba74
+style C fill:#1a1020,stroke:#a855f7,color:#c4b5fd`;
 
 export default function SkillGuideIntermediatePage() {
   return (
@@ -1218,6 +1232,87 @@ description: |
             MCPが<span className={styles.inlineEm}>最新データを取得</span>し、SKILL.md が
             <span className={styles.inlineEm}>プロジェクト制約を適用</span>する。
           </div>
+        </div>
+      </section>
+      {/* S11: BEST PRACTICES */}
+      <section id="sec-best" className={styles.section}>
+        <div className={styles.container}>
+          <div className={styles.sectionHeader}>
+            <span className={`${styles.sectionBadge} ${styles.badgePurple}`}>
+              11 / BEST PRACTICES
+            </span>
+            <div>
+              <h2 className={styles.sectionTitle}>
+                ベストプラクティス と<span className={styles.sectionTitleSpan}>チェックリスト</span>
+              </h2>
+              <p className={styles.sectionDesc}>
+                中級者が陥りやすいアンチパターンと、公開・運用前チェックリスト。v0.26.0〜の新機能を活用した品質管理も含む。
+              </p>
+            </div>
+          </div>
+          <h4 className={styles.h4} style={{ marginBottom: "20px" }}>
+            アンチパターン vs ベストプラクティス
+          </h4>
+          <div className={styles.compareGrid}>
+            <div className={`${styles.compareCard} ${styles.compareCardBad}`}>
+              <div className={`${styles.compareTitle} ${styles.compareTitleNg}`}>
+                ❌ よくある失敗パターン
+              </div>
+              <pre>{`• description が曖昧すぎる
+  → スキルが発動しない
+
+• SKILL.md が 500 行を超える
+  → コンテキストを圧迫
+
+• スクリプトにハードコードされた値
+  → 再利用できない
+
+• スキルを 20 個以上有効にしている
+  → AIが混乱し精度低下
+
+• 危険操作スキルに自動発動を許可
+  → disable-model-invocation 必須
+
+• /plan を使わず本番コードを変更
+  → 意図しない変更が発生するリスク`}</pre>
+            </div>
+            <div className={`${styles.compareCard} ${styles.compareCardGood}`}>
+              <div className={`${styles.compareTitle} ${styles.compareTitleOk}`}>
+                ✅ ベストプラクティス
+              </div>
+              <pre>{`• description にトリガーワードを明記
+  → 「この言葉が出たら使うこと」
+
+• 大きな参照資料は references/ に分離
+  → 本文は指示のみ
+
+• アクティブスキルは 10〜15 個以内
+  → 使わないスキルは disable
+
+• Few-shot 例を Examples セクションに
+  → モデルが期待動作を模倣する
+
+• /plan で変更前に安全に計画立案
+  → read-only で実装計画を確認
+
+• skill-creator でスキルを自動生成
+  → v0.26.0〜標準搭載`}</pre>
+            </div>
+          </div>
+          <div className={styles.divider} />
+          <h4 className={styles.h4}>スキル数とパフォーマンスの目安</h4>
+          <div className={styles.mermaidWrap}>
+            <div className={styles.mermaidLabel}>SKILL COUNT vs PERFORMANCE</div>
+            <MermaidDiagram chart={MERMAID_BEST_PERF} />
+          </div>
+          <div className={styles.divider} />
+          <h4 className={styles.h4}>
+            公開・運用前チェックリスト <span className={styles.newBadge}>2026-03-21 更新</span>
+          </h4>
+          <p style={{ fontSize: "14px", color: "var(--text-subtle)", marginBottom: "20px" }}>
+            項目をクリックしてチェックを記録できます。
+          </p>
+          <ChecklistApp />
         </div>
       </section>
     </div>
