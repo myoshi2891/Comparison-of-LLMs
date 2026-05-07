@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import ChecklistApp from "./ChecklistApp";
 import ExamplesApp from "./ExamplesApp";
 import styles from "./page.module.css";
 import StepsApp from "./StepsApp";
@@ -99,6 +100,19 @@ Agent->>Refs: references/css-guidelines.md を読む
 Refs-->>Agent: スタイルガイドラインを取得
 Note over Agent,User: 5. 実行と結果返却
 Agent->>User: SKILL.mdの手順に従いレビュー結果を提示`;
+
+const MERMAID_CHECKLIST_ANTIPATTERNS = `graph TD
+A["よくある失敗"]
+A --> B["description が曖昧すぎる\\n→ スキルが呼ばれない"]
+A --> C["SKILL.md が長すぎる\\n→ コンテキストを圧迫"]
+A --> D["スキルを入れすぎる\\n→ AIが混乱\\n目安: 10〜15個以内"]
+A --> E["スクリプトに\\nハードコードされた値\\n→ 再利用できない"]
+A --> F["name がディレクトリ名と\\n不一致\\n→ 発見されない"]
+style B fill:#fecaca,stroke:#dc2626,color:#7f1d1d
+style C fill:#fecaca,stroke:#dc2626,color:#7f1d1d
+style D fill:#fecaca,stroke:#dc2626,color:#7f1d1d
+style E fill:#fecaca,stroke:#dc2626,color:#7f1d1d
+style F fill:#fecaca,stroke:#dc2626,color:#7f1d1d`;
 
 export const metadata: Metadata = {
   title: "SKILL.md 完全ガイド — Gemini CLI & Antigravity",
@@ -936,9 +950,155 @@ export default function Page() {
         <ExamplesApp />
       </section>
 
-      {/* s09: checklist — TODO: faithful migration */}
+      {/* s09: checklist */}
       <section id="checklist" className={styles.sec}>
         <h2 className={styles.secTitle}>✅ ベストプラクティス &amp; チェックリスト</h2>
+
+        {/* Anti-patterns */}
+        <h3 className={styles.secH3}>❌ よくある失敗パターン</h3>
+        <div className={styles.mermaidWrap} style={{ marginBottom: "1.5rem" }}>
+          <MermaidDiagram chart={MERMAID_CHECKLIST_ANTIPATTERNS} />
+        </div>
+
+        {/* Interactive checklist */}
+        <ChecklistApp />
+
+        {/* Skill count guide */}
+        <h3 className={styles.secH3} style={{ marginTop: "1.5rem" }}>
+          📊 スキル数の目安
+        </h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+          <div className={styles.skillCountRow}>
+            <span className={styles.skillCountLabel}>1〜5個</span>
+            <div className={styles.skillCountBar}>
+              <div
+                className={styles.skillCountFill}
+                style={{ width: "70%", background: "#7dd3fc" }}
+              />
+            </div>
+            <span className={styles.skillCountStatus} style={{ color: "#0369a1" }}>
+              普通
+            </span>
+          </div>
+          <div className={styles.skillCountRow}>
+            <span className={styles.skillCountLabel}>6〜10個</span>
+            <div className={styles.skillCountBar}>
+              <div
+                className={styles.skillCountFill}
+                style={{ width: "90%", background: "#34d399" }}
+              />
+            </div>
+            <span className={styles.skillCountStatus} style={{ color: "#059669" }}>
+              最適 ⭐
+            </span>
+          </div>
+          <div className={styles.skillCountRow}>
+            <span className={styles.skillCountLabel}>11〜20個</span>
+            <div className={styles.skillCountBar}>
+              <div
+                className={styles.skillCountFill}
+                style={{ width: "80%", background: "#facc15" }}
+              />
+            </div>
+            <span className={styles.skillCountStatus} style={{ color: "#a16207" }}>
+              やや多め
+            </span>
+          </div>
+          <div className={styles.skillCountRow}>
+            <span className={styles.skillCountLabel}>30個以上</span>
+            <div className={styles.skillCountBar}>
+              <div
+                className={styles.skillCountFill}
+                style={{ width: "40%", background: "#f87171" }}
+              />
+            </div>
+            <span className={styles.skillCountStatus} style={{ color: "#b91c1c" }}>
+              非推奨
+            </span>
+          </div>
+        </div>
+
+        {/* Quick reference table */}
+        <h3 className={styles.secH3} style={{ marginTop: "1.5rem" }}>
+          📋 クイックリファレンス
+        </h3>
+        <div className={styles.tableWrap}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th
+                  className={`${styles.thGradient} ${styles.tdLeft}`}
+                  style={{ color: "#134e4a" }}
+                >
+                  ツール
+                </th>
+                <th
+                  className={`${styles.thGradient} ${styles.tdLeft}`}
+                  style={{ color: "#134e4a" }}
+                >
+                  グローバルパス
+                </th>
+                <th
+                  className={`${styles.thGradient} ${styles.tdLeft}`}
+                  style={{ color: "#134e4a" }}
+                >
+                  ローカルパス
+                </th>
+                <th
+                  className={`${styles.thGradient} ${styles.tdLeft}`}
+                  style={{ color: "#134e4a" }}
+                >
+                  インストールコマンド
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className={styles.tr}>
+                <td className={styles.tdLeft} style={{ fontWeight: 700, color: "#0369a1" }}>
+                  Gemini CLI
+                  <br />
+                  <span className={styles.textSlateLight}>v0.34.0</span>
+                </td>
+                <td className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}>
+                  ~/.gemini/skills/
+                </td>
+                <td className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}>
+                  .gemini/skills/
+                </td>
+                <td className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}>
+                  gemini skills install &lt;url&gt;
+                </td>
+              </tr>
+              <tr className={styles.trEven}>
+                <td className={styles.tdLeft} style={{ fontWeight: 700, color: "#6d28d9" }}>
+                  Antigravity
+                  <br />
+                  <span className={styles.textSlateLight}>v1.20.3</span>
+                </td>
+                <td className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}>
+                  ~/.gemini/antigravity/skills/
+                </td>
+                <td className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}>
+                  .agent/skills/
+                </td>
+                <td className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}>
+                  cp -r skill/ ~/.gemini/antigravity/skills/
+                </td>
+              </tr>
+              <tr className={styles.tr}>
+                <td className={styles.tdLeft} style={{ fontWeight: 700, color: "#059669" }}>
+                  両方同時
+                </td>
+                <td className={styles.textSlate} colSpan={2} style={{ textAlign: "center" }}>
+                  — npx skills CLI を使用 —
+                </td>
+                <td className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}>
+                  npx skills add &lt;name&gt; -a gemini-cli -a antigravity
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
 
       {/* s10: whatsnew — TODO: faithful migration */}
