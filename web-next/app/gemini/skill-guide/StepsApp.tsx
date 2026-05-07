@@ -13,7 +13,14 @@ type StepData = {
   tip: string;
 };
 
-/* ---- pre-rendered code blocks (JSX spans, no unsafe HTML injection) ---- */
+/**
+ * Renders a styled shell code block that demonstrates creating and navigating to skill directories.
+ *
+ * The snippet shows commands for creating a global skill directory (~/.agents/skills/my-first-skill),
+ * a workspace-scoped directory (.gemini/skills/my-first-skill), and an example `cd` into the global directory.
+ *
+ * @returns A JSX element containing the styled shell code block with the example `mkdir` and `cd` commands.
+ */
 
 function Code1() {
   return (
@@ -40,6 +47,14 @@ function Code1() {
   );
 }
 
+/**
+ * Render a styled code block showing an example YAML front matter for SKILL.md.
+ *
+ * The snippet demonstrates the required `name` field and a multi-line `description` field
+ * (using the `|` block scalar) as guidance for when and with what phrases the skill should trigger.
+ *
+ * @returns A JSX element containing a styled YAML code block that illustrates SKILL.md front matter with `name` and `description` entries.
+ */
 function Code2() {
   return (
     <div className={styles.codeWrap}>
@@ -74,6 +89,14 @@ function Code2() {
   );
 }
 
+/**
+ * Render a styled example block that displays the body of a sample `SKILL.md`.
+ *
+ * The block shows sections used in a skill's documentation: title, Overview,
+ * Step-by-Step Guide, Examples, and Rules (with do/don't guidance).
+ *
+ * @returns A JSX element containing a styled markdown-like code block for the SKILL.md body
+ */
 function Code3() {
   return (
     <div className={styles.codeWrap}>
@@ -112,6 +135,13 @@ function Code3() {
   );
 }
 
+/**
+ * Renders a styled shell code block that demonstrates using the Gemini CLI to list available skills and run a test skill.
+ *
+ * The block includes example commands (`gemini skills list` and a sample `gemini "テスト！最初のスキルを呼び出して"` invocation) and an example expected output listing skills.
+ *
+ * @returns A JSX element containing the formatted shell snippet and expected output comments.
+ */
 function Code4() {
   return (
     <div className={styles.codeWrap}>
@@ -141,6 +171,11 @@ function Code4() {
   );
 }
 
+/**
+ * Renders a styled shell code block demonstrating adding deterministic scripts and reference files.
+ *
+ * @returns A React node containing example shell commands that create `scripts/` and `references/` directories and write example files (`scripts/validate.py`, `references/guidelines.md`) via heredoc.
+ */
 function Code5() {
   return (
     <div className={styles.codeWrap}>
@@ -193,6 +228,12 @@ const VIZ_CONFIGS = [
   { bg: "#ffe4e6", border: "#fda4af", icon: "🚀", label: "スキル進化中！" },
 ] as const;
 
+/**
+ * Renders a small visual card representing the given step number.
+ *
+ * @param step - 1-based step index used to select the visualization configuration (valid range: 1..VIZ_CONFIGS.length)
+ * @returns A JSX element containing the step's icon and label styled according to the selected configuration
+ */
 function StepViz({ step }: { step: number }) {
   const cfg = VIZ_CONFIGS[step - 1];
   return (
@@ -251,6 +292,13 @@ const STEPS_DATA: StepData[] = [
   },
 ];
 
+/**
+ * Render an interactive multi-step skill guide with a step list, detail panel, visual step indicator, code examples, and playback controls.
+ *
+ * The component manages internal state for the currently active step and an autoplay mode that advances steps every 2 seconds until the last step, and provides manual controls (Play, Prev, Next, Reset) to navigate and control playback.
+ *
+ * @returns The rendered JSX element for the steps guide UI
+ */
 export default function StepsApp() {
   const [activeStep, setActiveStep] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);

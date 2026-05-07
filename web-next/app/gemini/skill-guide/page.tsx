@@ -120,6 +120,16 @@ export const metadata: Metadata = {
     "AIエージェントに「専門知識の教科書」を渡す仕組み — SKILL.md の構造・書き方・インストール手順を Gemini CLI & Antigravity 対応版で完全解説。",
 };
 
+/**
+ * Render the SKILL.md comprehensive guide page tailored for Gemini CLI and Antigravity.
+ *
+ * The page composes a full multi-section guide including hero, overview, rationale,
+ * SKILL.md anatomy, writing how-to, step-by-step creation, installation instructions,
+ * examples, best-practice checklist, supported-models changelog, and footer. It embeds
+ * mermaid diagrams and interactive subcomponents (StepsApp, ExamplesApp, ChecklistApp).
+ *
+ * @returns A React element representing the complete SKILL.md guide layout with sections, diagrams, tables, and embedded interactive components.
+ */
 export default function Page() {
   return (
     <div className={styles.wrap}>
