@@ -298,6 +298,7 @@ export default function StepsApp() {
                 type="button"
                 className={`${styles.stepItem}${isActive ? ` ${styles.stepItemActive}` : ""}`}
                 style={{ cursor: "pointer", width: "100%", textAlign: "left" }}
+                aria-current={isActive ? "step" : undefined}
                 onClick={() => {
                   setActiveStep(s.step);
                   setIsPlaying(false);

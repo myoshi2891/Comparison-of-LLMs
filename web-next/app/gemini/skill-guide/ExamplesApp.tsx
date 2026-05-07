@@ -284,11 +284,16 @@ export default function ExamplesApp() {
   return (
     <div>
       {/* Tab buttons */}
-      <div className={styles.patternTabs}>
+      <div className={styles.patternTabs} role="tablist">
         {PATTERNS.map((p) => (
           <button
             key={p.id}
+            id={`tab-${p.id}`}
             type="button"
+            role="tab"
+            aria-selected={active === p.id}
+            aria-controls={`panel-${p.id}`}
+            tabIndex={active === p.id ? 0 : -1}
             className={`${styles.patternTab}${active === p.id ? ` ${styles.patternTabActive}` : ""}`}
             onClick={() => setActive(p.id)}
           >
@@ -298,7 +303,12 @@ export default function ExamplesApp() {
       </div>
 
       {/* Detail card */}
-      <div className={styles.patternCard}>
+      <div
+        id={`panel-${active}`}
+        role="tabpanel"
+        aria-labelledby={`tab-${active}`}
+        className={styles.patternCard}
+      >
         <div style={{ fontSize: "1.5rem", marginBottom: "0.25rem" }}>{current.emoji}</div>
         <div
           style={{ fontWeight: 700, color: "#0f766e", fontSize: "1rem", marginBottom: "0.25rem" }}

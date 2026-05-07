@@ -343,6 +343,81 @@ SVG には必ず `role="img"` + `aria-label` + `<title>` を付与（Biome `noSv
 <div className={`${styles.hfBtn} ${styles.auto}`}>自動→</div>
 ```
 
+## Phase D 確立パターン — インタラクティブ UI の WAI-ARIA
+
+Phase D（skill-guide 系）では `useState` を持つ Client Component が多数登場する。
+以下の 3 パターンを正確に使い分けること（視覚的に「同じボタンで状態が変わる」UIでも意味が異なる）。
+
+### パターン 1: トグルボタン（on/off 二値）
+
+```tsx
+// 例: ChecklistApp のチェック項目
+<button
+  type="button"
+  aria-pressed={isChecked}   // boolean を直接渡す（"true"/"false" 文字列ではない）
+  onClick={() => toggle(item.id)}
+>
+  ...
+</button>
+```
+
+**選択理由**: `aria-pressed` はボタンが押下状態か否かを表す。チェックボックスの代替としてボタンを使う場合に適用する（`role="checkbox"` より実装が軽量で、スタイルの自由度が高い）。
+
+### パターン 2: タブ UI（パネル切り替え）
+
+```tsx
+// Roving tabindex パターン — WIA-ARIA Authoring Practices 準拠
+<div role="tablist">
+  {PATTERNS.map((p) => (
+    <button
+      key={p.id}
+      id={`tab-${p.id}`}
+      role="tab"
+      aria-selected={active === p.id}
+      aria-controls={`panel-${p.id}`}
+      tabIndex={active === p.id ? 0 : -1}   // 選択中のみ Tab 到達可能
+      onClick={() => setActive(p.id)}
+    >
+      {p.label}
+    </button>
+  ))}
+</div>
+
+{/* パネル側に対応 id を付与 */}
+<div
+  id={`panel-${active}`}
+  role="tabpanel"
+  aria-labelledby={`tab-${active}`}
+>
+  ...
+</div>
+```
+
+**選択理由**: `role="tab"` + `aria-selected` がスクリーンリーダーにタブ選択状態を伝える。`tabIndex={-1}` で非選択タブを Tab キーのフォーカス順から除外し、矢印キーでタブ間移動させる（Roving tabindex）。`aria-controls` / `aria-labelledby` のペアでタブとパネルを関連付ける。
+
+### パターン 3: ステップ / ウィザード（現在地の明示）
+
+```tsx
+// 例: StepsApp のステップ一覧
+<button
+  type="button"
+  aria-current={isActive ? "step" : undefined}  // false ではなく undefined で属性自体を消す
+  onClick={() => setActiveStep(s.step)}
+>
+  ...
+</button>
+```
+
+**選択理由**: `aria-current` は「現在地」を表す属性で、`"step"` はウィザード内の現在ステップを意味する（`"page"` はナビゲーション、`"tab"` はタブとは異なる）。`aria-selected` や `aria-pressed` ではなく `aria-current` を使うのは、複数選択ではなく「今ここにいる」という位置情報を伝えるため。`undefined` を渡すことで DOM 属性が出力されない（`false` だと `aria-current="false"` が出力される）。
+
+### 使い分け早見表
+
+| UI パターン | 正しい ARIA | 誤りやすい代替 |
+|---|---|---|
+| チェックボタン (on/off) | `aria-pressed={bool}` | `aria-checked`, `aria-selected` |
+| タブ切り替え | `role="tab"` + `aria-selected` | `aria-pressed`, `aria-current` |
+| ステップ現在地 | `aria-current="step"` | `aria-selected`, `aria-pressed` |
+
 ## 注意事項
 
 - このスキルは `invocation: explicit` — `/nextjs-page-migration` での手動呼び出しのみ

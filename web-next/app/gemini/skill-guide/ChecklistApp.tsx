@@ -169,6 +169,7 @@ export default function ChecklistApp() {
                 borderColor: isChecked ? "#86efac" : "#e2e8f0",
               }}
               onClick={() => toggle(item.id)}
+              aria-pressed={isChecked}
             >
               <div
                 className={styles.checkCircle}
