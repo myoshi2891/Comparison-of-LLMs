@@ -46,6 +46,19 @@ style L1 fill:#fef3c7,stroke:#f59e0b,color:#78350f
 style L2 fill:#bfdbfe,stroke:#0284c7,color:#0c4a6e
 style L3 fill:#d1fae5,stroke:#059669,color:#065f46`;
 
+const MERMAID_HOWTO = `graph LR
+A["---\\nYAML\\nフロントマター\\n---"]
+B["# Title\\nスキル名"]
+C["## Overview\\n目的・概要（1〜2文）"]
+D["## Before Starting\\n前提条件・必要な入力"]
+E["## Step-by-Step Guide\\n具体的な実行手順\\n（最重要）"]
+F["## Examples\\n入力例と出力例\\nFew-shot学習"]
+G["## Rules\\n禁止事項と推奨事項\\n❌と✅"]
+A --> B --> C --> D --> E --> F --> G
+style A fill:#fef3c7,stroke:#f59e0b,color:#78350f
+style E fill:#d1fae5,stroke:#059669,color:#065f46
+style G fill:#ede9fe,stroke:#7c3aed,color:#3b0764`;
+
 export const metadata: Metadata = {
   title: "SKILL.md 完全ガイド — Gemini CLI & Antigravity",
   description:
@@ -591,9 +604,125 @@ export default function Page() {
         </div>
       </section>
 
-      {/* s05: howto — TODO: faithful migration */}
+      {/* s05: howto */}
       <section id="howto" className={styles.sec}>
         <h2 className={styles.secTitle}>✍️ SKILL.md の書き方（推奨テンプレート）</h2>
+
+        <p
+          style={{
+            color: "#475569",
+            fontSize: "0.875rem",
+            lineHeight: 1.75,
+            marginBottom: "1.25rem",
+          }}
+        >
+          効果的な SKILL.md
+          は以下の標準セクション構成に従います。各セクションの役割を理解して記述しましょう。
+        </p>
+
+        {/* Mermaid: structure flow */}
+        <div className={styles.mermaidWrap}>
+          <MermaidDiagram chart={MERMAID_HOWTO} />
+        </div>
+
+        {/* Complete sample */}
+        <h3 className={styles.secH3}>✅ 完全なサンプル — frontend-reviewer スキル</h3>
+        <div className={styles.codeWrap}>
+          <div className={styles.codeBar}>
+            <span>SKILL.md</span>
+            <span className={styles.codeLang}>Markdown</span>
+          </div>
+          <div className={styles.codeBody}>
+            <span className={styles.cs}>---</span>
+            {"\n"}
+            <span className={styles.cm}>name</span>
+            {": "}
+            <span className={styles.cv}>frontend-reviewer</span>
+            {"\n"}
+            <span className={styles.cm}>description</span>
+            {": "}
+            <span className={styles.cs}>|</span>
+            {"\n"}
+            {"  "}
+            <span className={styles.cv}>
+              ReactおよびTypeScriptのフロントエンドコードをレビューし、
+            </span>
+            {"\n"}
+            {"  "}
+            <span className={styles.cv}>
+              コンポーネント設計・パフォーマンス・アクセシビリティ(a11y)の
+            </span>
+            {"\n"}
+            {"  "}
+            <span className={styles.cv}>観点から品質を向上させる際に使用する。</span>
+            {"\n"}
+            {"  "}
+            <span className={styles.cv}>
+              {"「コードレビュー」「レビュー」「PR確認」が出たら使うこと。"}
+            </span>
+            {"\n"}
+            <span className={styles.cs}>---</span>
+            {"\n\n"}
+            <span className={styles.ch}># Frontend Code Reviewer</span>
+            {"\n\n"}
+            <span className={styles.ch}>## Overview</span>
+            {"\n"}
+            {
+              "Reactコンポーネントに対して一貫性のある厳格なレビューを行い、\nパフォーマンス・型安全性・アクセシビリティを向上させる。"
+            }
+            {"\n\n"}
+            <span className={styles.ch}>## Before Starting</span>
+            {"\n"}
+            {
+              "レビューを開始する前に以下を確認すること：\n- レビュー対象ファイルのパスをユーザーから取得\n- 依存するフックやユーティリティファイルも一緒に読み込む"
+            }
+            {"\n\n"}
+            <span className={styles.ch}>## Step-by-Step Guide</span>
+            {"\n"}
+            {"1. "}
+            <span className={styles.cw}>**文脈と依存関係の解析**</span>
+            {": 対象ファイルと依存関係を追跡して読み込む\n"}
+            {"2. "}
+            <span className={styles.cw}>**静的解析のシミュレーション**</span>
+            {": 型の安全性とReactの依存配列を検証\n"}
+            {"3. "}
+            <span className={styles.cw}>**パフォーマンス評価**</span>
+            {": useMemo/useCallbackの欠落を特定\n"}
+            {"4. "}
+            <span className={styles.cw}>**a11y確認**</span>
+            {": WAI-ARIA属性・キーボードナビゲーションを確認\n"}
+            {"5. "}
+            <span className={styles.cw}>**アーティファクト生成**</span>
+            {": 修正後のコードスニペットと共に提示"}
+            {"\n\n"}
+            <span className={styles.ch}>## Examples</span>
+            {"\n"}
+            <span className={styles.cw}>**Input**</span>
+            {": "}
+            <span className={styles.cs}>{"`UserProfile.tsx`"}</span>
+            {"のパフォーマンスをレビューして\n\n"}
+            <span className={styles.cw}>**Output Structure**</span>
+            {":\n"}
+            {"1. 概要: 現在の実装におけるボトルネック\n"}
+            {"2. 修正案: "}
+            <span className={styles.cs}>{"`React.memo`"}</span>
+            {"の適用箇所と修正コード\n"}
+            {"3. 副作用の検証: 修正による影響範囲"}
+            {"\n\n"}
+            <span className={styles.ch}>## Rules</span>
+            {"\n"}
+            <span className={styles.ck}>❌</span>
+            {" 絶対に行わないこと:\n"}
+            {"- ビジネスロジックの意図を推測して勝手に変更すること\n"}
+            {"- 不明な点を質問せずに仮定で進めること\n\n"}
+            <span className={styles.cg}>✅</span>
+            {" 必ず行うこと:\n"}
+            {"- 変更提案の根拠として公式ドキュメントを引用\n"}
+            {"- "}
+            <span className={styles.cs}>{"`references/css-guidelines.md`"}</span>
+            {" を参照してスタイルをレビュー"}
+          </div>
+        </div>
       </section>
 
       {/* s06: steps — TODO: faithful migration */}
