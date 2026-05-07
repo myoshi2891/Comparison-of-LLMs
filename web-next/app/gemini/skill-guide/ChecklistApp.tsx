@@ -131,7 +131,14 @@ export default function ChecklistApp() {
             {pct}%
           </span>
         </div>
-        <div className={styles.checkProgressBar}>
+        <div
+          className={styles.checkProgressBar}
+          role="progressbar"
+          aria-valuenow={pct}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="チェックリスト完了率"
+        >
           <div
             className={styles.checkProgressFill}
             style={{

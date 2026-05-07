@@ -281,10 +281,30 @@ export default function ExamplesApp() {
   const [active, setActive] = useState("basic");
   const current = PATTERNS.find((p) => p.id === active) ?? PATTERNS[0];
 
+  function handleTabKeyDown(e: React.KeyboardEvent) {
+    const ids = PATTERNS.map((p) => p.id);
+    const idx = ids.indexOf(active);
+    let next: string | undefined;
+    if (e.key === "ArrowRight") {
+      next = ids[(idx + 1) % ids.length];
+    } else if (e.key === "ArrowLeft") {
+      next = ids[(idx - 1 + ids.length) % ids.length];
+    } else if (e.key === "Home") {
+      next = ids[0];
+    } else if (e.key === "End") {
+      next = ids[ids.length - 1];
+    }
+    if (next !== undefined) {
+      e.preventDefault();
+      setActive(next);
+      document.getElementById(`tab-${next}`)?.focus();
+    }
+  }
+
   return (
     <div>
       {/* Tab buttons */}
-      <div className={styles.patternTabs} role="tablist">
+      <div className={styles.patternTabs} role="tablist" onKeyDown={handleTabKeyDown}>
         {PATTERNS.map((p) => (
           <button
             key={p.id}
@@ -302,64 +322,67 @@ export default function ExamplesApp() {
         ))}
       </div>
 
-      {/* Detail card */}
-      <div
-        id={`panel-${active}`}
-        role="tabpanel"
-        aria-labelledby={`tab-${active}`}
-        className={styles.patternCard}
-      >
-        <div style={{ fontSize: "1.5rem", marginBottom: "0.25rem" }}>{current.emoji}</div>
-        <div
-          style={{ fontWeight: 700, color: "#0f766e", fontSize: "1rem", marginBottom: "0.25rem" }}
-        >
-          {current.label}
-        </div>
-        <p style={{ color: "#475569", fontSize: "0.875rem", margin: 0 }}>{current.desc}</p>
-      </div>
-
-      {/* 2-col grid: dir structure + use case */}
-      <div className={styles.patternGrid} style={{ marginBottom: "1rem" }}>
-        <div>
+      {/* Tabpanel — wraps all content controlled by active tab */}
+      <div id={`panel-${active}`} role="tabpanel" aria-labelledby={`tab-${active}`}>
+        {/* Detail card */}
+        <div className={styles.patternCard}>
+          <div style={{ fontSize: "1.5rem", marginBottom: "0.25rem" }}>{current.emoji}</div>
           <div
-            style={{
-              fontWeight: 700,
-              color: "#334155",
-              fontSize: "0.875rem",
-              marginBottom: "0.5rem",
-            }}
+            style={{ fontWeight: 700, color: "#0f766e", fontSize: "1rem", marginBottom: "0.25rem" }}
           >
-            📁 ディレクトリ構成
+            {current.label}
           </div>
-          <div className={styles.dirTree}>{current.structure}</div>
+          <p style={{ color: "#475569", fontSize: "0.875rem", margin: 0 }}>{current.desc}</p>
         </div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div className={styles.useCase} style={{ width: "100%" }}>
-            <div style={{ fontSize: "2.5rem", marginBottom: "0.5rem" }}>{current.emoji}</div>
-            <div style={{ fontWeight: 700, color: "#065f46", fontSize: "0.875rem" }}>
-              このパターンが向いている場合
-            </div>
+
+        {/* 2-col grid: dir structure + use case */}
+        <div className={styles.patternGrid} style={{ marginBottom: "1rem" }}>
+          <div>
             <div
               style={{
-                color: "#059669",
-                fontSize: "0.75rem",
-                marginTop: "0.5rem",
-                lineHeight: 1.75,
+                fontWeight: 700,
+                color: "#334155",
+                fontSize: "0.875rem",
+                marginBottom: "0.5rem",
               }}
             >
-              {current.useCase}
+              📁 ディレクトリ構成
+            </div>
+            <div className={styles.dirTree}>{current.structure}</div>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div className={styles.useCase} style={{ width: "100%" }}>
+              <div style={{ fontSize: "2.5rem", marginBottom: "0.5rem" }}>{current.emoji}</div>
+              <div style={{ fontWeight: 700, color: "#065f46", fontSize: "0.875rem" }}>
+                このパターンが向いている場合
+              </div>
+              <div
+                style={{
+                  color: "#059669",
+                  fontSize: "0.75rem",
+                  marginTop: "0.5rem",
+                  lineHeight: 1.75,
+                }}
+              >
+                {current.useCase}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Code block */}
-      <div
-        style={{ fontWeight: 700, color: "#334155", fontSize: "0.875rem", marginBottom: "0.5rem" }}
-      >
-        📄 SKILL.md サンプル
+        {/* Code block */}
+        <div
+          style={{
+            fontWeight: 700,
+            color: "#334155",
+            fontSize: "0.875rem",
+            marginBottom: "0.5rem",
+          }}
+        >
+          📄 SKILL.md サンプル
+        </div>
+        {current.codeNode}
       </div>
-      {current.codeNode}
     </div>
   );
 }
