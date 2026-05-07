@@ -111,6 +111,26 @@ style OVERRIDE fill:#1a1a10,stroke:#f97316,color:#fdba74
 style USE fill:#0d2330,stroke:#00d4aa,color:#00d4aa
 style W3 fill:#1a1a10,stroke:#f97316,color:#fdba74`;
 
+const MERMAID_MCP = `graph TB
+subgraph MCPLayer["MCP Layer — Tools and Dynamic Data"]
+MCP1["MCP Server: Search latest API docs"]
+MCP2["MCP Server: Query remote database"]
+MCP3["MCP Server: External service calls"]
+end
+subgraph SkillLayer["SKILL.md Layer — Knowledge and Judgment"]
+SK1["When to use which MCP tool"]
+SK2["How to apply project-specific constraints"]
+SK3["Naming conventions and security policies"]
+end
+Agent["AI Agent Core"]
+Result["High Quality Output<br />Always up-to-date data<br />Project-aware context"]
+MCPLayer -->|Dynamic real-time data| Agent
+SkillLayer -->|Structured guidance framework| Agent
+Agent --> Result
+style SkillLayer fill:#0d2330,stroke:#00d4aa
+style MCPLayer fill:#1a1030,stroke:#a855f7
+style Result fill:#0d2e1a,stroke:#22c55e,color:#86efac`;
+
 export default function SkillGuideIntermediatePage() {
   return (
     <div className={styles.page}>
@@ -1131,6 +1151,72 @@ description: |
             <strong>オーバーライドルール:</strong> 同名のスキルが複数スコープに存在する場合、
             <span className={styles.inlineEm}>ワークスペース（上位）が優先</span>
             される。v1.20.3〜ではAGENTS.mdも優先度ルールに組み込まれた。
+          </div>
+        </div>
+      </section>
+      {/* S10: MCP */}
+      <section id="sec-mcp" className={styles.section}>
+        <div className={styles.container}>
+          <div className={styles.sectionHeader}>
+            <span className={`${styles.sectionBadge} ${styles.badgeOrange}`}>
+              10 / MCP INTEGRATION
+            </span>
+            <div>
+              <h2 className={styles.sectionTitle}>
+                MCP との<span className={styles.sectionTitleSpan}>相乗効果</span>
+              </h2>
+              <p className={styles.sectionDesc}>
+                Agent Skills と MCP（Model Context
+                Protocol）は競合しない。「知識と判断力（SKILL.md）」と「ツールとデータ（MCP）」を統合することで真の力を発揮する。
+              </p>
+            </div>
+          </div>
+          <div className={styles.mermaidWrap}>
+            <div className={styles.mermaidLabel}>AGENT SKILLS + MCP INTEGRATION</div>
+            <MermaidDiagram chart={MERMAID_MCP} />
+          </div>
+          <div className={styles.compareGrid}>
+            <div className={styles.compareCard} style={{ borderColor: "var(--purple-dim)" }}>
+              <div className={styles.compareTitle} style={{ color: "var(--purple)" }}>
+                🔌 MCP サーバーの役割
+              </div>
+              <pre
+                style={{ fontSize: "13px", lineHeight: "1.7" }}
+              >{`エージェントへの「手足とデータパイプライン」
+
+• 最新のAPI仕様を検索（Search）
+• リモートDBへのクエリ発行（Fetch）
+• 外部サービスとのリアルタイム連携
+
+→ 静的ファイルでは提供できない
+　動的機能を付与する`}</pre>
+            </div>
+            <div className={styles.compareCard} style={{ borderColor: "var(--cyan-dim)" }}>
+              <div className={styles.compareTitle} style={{ color: "var(--cyan)" }}>
+                🧠 SKILL.md の役割
+              </div>
+              <pre
+                style={{ fontSize: "13px", lineHeight: "1.7" }}
+              >{`エージェントへの「知識と判断力」
+
+• 何を調べるべきか（What）
+• いつ調べるべきか（When）
+• 取得したデータをどう適用するか（How）
+
+→ MCPで取得した生データに
+　「文脈と制約」を与える`}</pre>
+            </div>
+          </div>
+          <div className={styles.callout}>
+            <strong>実装例 — クラウドプロビジョニングスキル:</strong>
+            <br />
+            <em style={{ color: "var(--text-subtle)", fontSize: "14px" }}>
+              "MCPツールを利用して最新のリファレンスを検索し、そのデータに基づいて、このプロジェクト独自の命名規則とセキュリティポリシーに沿ってTerraformコードを生成せよ"
+            </em>
+            <br />
+            <br />
+            MCPが<span className={styles.inlineEm}>最新データを取得</span>し、SKILL.md が
+            <span className={styles.inlineEm}>プロジェクト制約を適用</span>する。
           </div>
         </div>
       </section>
