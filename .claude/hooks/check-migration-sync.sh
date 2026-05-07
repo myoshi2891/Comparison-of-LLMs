@@ -1,28 +1,26 @@
 #!/usr/bin/env bash
-# Stop hook: migration sync checker + token estimator
+# Stop hook: migration sync checker + token estimator (v2)
 #
 # 発火タイミング: 各 Claude 応答後（Stop イベント）
 # 目的: /compact 前に MIGRATION_PROGRESS.md の更新が漏れないよう警告する
 #
-# 推定ロジック:
-#   - transcript_path のファイルサイズ ÷ 4 ≈ 使用トークン数
-#   - コンテキスト上限: 200,000 tokens (Sonnet 4.6 / Opus 4.7 共通)
-#   - MIGRATION_PROGRESS.md 更新に必要な推定トークン: 8,000 tokens
-#     （ファイル読み込み + build/test コマンド出力 + 編集 + コミット）
+# トークン推定ロジック (v2):
+#   - JSONL の最後の assistant メッセージから usage フィールドを読む
+#     total_input = input_tokens + cache_creation_input_tokens + cache_read_input_tokens
+#   - transcript_path が空/ファイル不在の場合、プロジェクトディレクトリの最新 JSONL にフォールバック
+#   - v1 の "wc -c / 4" は JSON overhead 97.7% を無視しており最大44倍の誤差があった
 
-set -euo pipefail
-
-# リポジトリルートを動的に取得（ハードコードなし → commit 可能）
+# set -e を使わず個別エラーハンドリング（サイレント終了防止）
 REPO="$(git rev-parse --show-toplevel 2>/dev/null)"
 [ -z "$REPO" ] && exit 0
 
 CONTEXT_LIMIT=200000
-WARN_THRESHOLD=140000     # 70%: 警告開始
-CRITICAL_THRESHOLD=175000 # 87.5%: 緊急
-UPDATE_COST=8000           # 更新作業の推定トークンコスト
+WARN_THRESHOLD=110000     # 55% — 早めに警告（更新作業後もバッファが十分残るよう）
+CRITICAL_THRESHOLD=150000 # 75%
+UPDATE_COST=8000           # MIGRATION_PROGRESS.md 更新作業の推定トークンコスト
 
 # ── 1. transcript_path を stdin JSON から取得 ─────────────────────────
-INPUT=$(cat)
+INPUT=$(cat 2>/dev/null || echo "")
 TRANSCRIPT_PATH=$(echo "$INPUT" | python3 -c "
 import sys, json
 try:
@@ -31,11 +29,38 @@ except Exception:
     print('')
 " 2>/dev/null || echo "")
 
-# ── 2. トークン使用量の推定（ファイルサイズ ÷ 4）──────────────────────
+# フォールバック: transcript_path が空の場合、プロジェクトディレクトリの最新 JSONL を使用
+CLAUDE_PROJECT_DIR="$HOME/.claude/projects/$(echo "$REPO" | sed 's|/|-|g')"
+if [ -z "$TRANSCRIPT_PATH" ] || [ ! -f "$TRANSCRIPT_PATH" ]; then
+    TRANSCRIPT_PATH=$(ls -t "$CLAUDE_PROJECT_DIR"/*.jsonl 2>/dev/null | head -1 || echo "")
+fi
+
+# ── 2. 実際の API トークン数を JSONL usage フィールドから取得 ─────────
 ESTIMATED_TOKENS=0
 if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
-    CHAR_COUNT=$(wc -c < "$TRANSCRIPT_PATH" | tr -d ' ')
-    ESTIMATED_TOKENS=$(( CHAR_COUNT / 4 ))
+    ESTIMATED_TOKENS=$(python3 -c "
+import json, sys
+last_input = 0
+try:
+    with open(sys.argv[1]) as f:
+        for line in f:
+            try:
+                obj = json.loads(line)
+                msg = obj.get('message', {})
+                if msg.get('role') == 'assistant':
+                    usage = msg.get('usage', {})
+                    if usage:
+                        total = (usage.get('input_tokens', 0) +
+                                 usage.get('cache_creation_input_tokens', 0) +
+                                 usage.get('cache_read_input_tokens', 0))
+                        if total > 0:
+                            last_input = total
+            except Exception:
+                pass
+except Exception:
+    pass
+print(last_input)
+" "$TRANSCRIPT_PATH" 2>/dev/null || echo "0")
 fi
 REMAINING=$(( CONTEXT_LIMIT - ESTIMATED_TOKENS ))
 
@@ -47,10 +72,7 @@ if [[ "$BRANCH" != *"nextjs-migration"* ]]; then
 fi
 
 # ── 4. git ベースの同期状態チェック ─────────────────────────────────
-# 最終コミット: 移行ファイルあり かつ MIGRATION_PROGRESS.md なし → 未同期
 LAST_CHANGED=$(git diff-tree --no-commit-id -r --name-only HEAD 2>/dev/null || echo "")
-# grep -c は0件でも "0" を stdout に出力して exit 1 → || echo "0" だと "0\n0" になる
-# || true で exit code だけ握りつぶし、stdout は grep の "0" をそのまま使う
 MIGRATION_IN_LAST=$(echo "$LAST_CHANGED" | grep -cE "^web-next/app/.+\.(tsx|css)$" 2>/dev/null || true)
 PROGRESS_IN_LAST=$(echo "$LAST_CHANGED" | grep -c "MIGRATION_PROGRESS.md" 2>/dev/null || true)
 
@@ -61,12 +83,9 @@ NEEDS_SYNC=false
 SYNC_DETAIL=""
 if [ "${MIGRATION_IN_LAST:-0}" -gt 0 ]; then
     if [ "${PROGRESS_IN_LAST:-0}" -eq 0 ]; then
-        # MIGRATION_PROGRESS.md 自体がコミットに含まれていない
         NEEDS_SYNC=true
         SYNC_DETAIL="最終コミット: 移行ファイルあり / MIGRATION_PROGRESS.md 未更新"
     else
-        # MIGRATION_PROGRESS.md がコミットに含まれているが、必須フィールドが変更されているか確認
-        # git diff で追加/変更行（+ で始まる行）に必須マーカーが含まれているかチェック
         PROGRESS_DIFF=$(git diff HEAD^ HEAD -- "$REPO/MIGRATION_PROGRESS.md" 2>/dev/null || \
                         git show HEAD -- "$REPO/MIGRATION_PROGRESS.md" 2>/dev/null || echo "")
         REQUIRED_FIELDS_UPDATED=0
@@ -87,20 +106,9 @@ if [ "${DIRTY_MIGRATION:-0}" -gt 0 ]; then
 fi
 
 # ── 5. アラートレベルの判定 ──────────────────────────────────────────
-# CRITICAL: (未同期 かつ tokens > 175K) または (未同期 かつ tokens > 140K)
-# WARNING:  (未同期 かつ tokens > 80K) または (tokens > 140K かつ 未同期)
-# TOKEN_HIGH: 同期済みだがトークンが多い（更新不要メッセージは出さない）
-# INFO:     未同期のみ（tokens 低い）
-# NONE:     同期済み かつ tokens 低い → 何も出力しない
-#
-# 注意: 「更新が必須」という表現は NEEDS_SYNC=true の場合のみ使用する。
-# トークンが多くても NEEDS_SYNC=false なら更新不要の通知のみ出す。
-
-if [ "$NEEDS_SYNC" = true ] && \
-   { [ "$ESTIMATED_TOKENS" -gt "$CRITICAL_THRESHOLD" ] || \
-     [ "$ESTIMATED_TOKENS" -gt "$WARN_THRESHOLD" ]; }; then
-    LEVEL="CRITICAL"
-elif [ "$NEEDS_SYNC" = true ] && [ "$ESTIMATED_TOKENS" -gt 80000 ]; then
+if [ "$NEEDS_SYNC" = true ] && [ "$ESTIMATED_TOKENS" -gt "$WARN_THRESHOLD" ]; then
+    LEVEL="CRITICAL"   # 同期未完了 + tokens高 → 即時対応必須
+elif [ "$NEEDS_SYNC" = true ] && [ "$ESTIMATED_TOKENS" -gt 60000 ]; then
     LEVEL="WARNING"
 elif [ "$NEEDS_SYNC" = true ]; then
     LEVEL="INFO"
@@ -108,8 +116,10 @@ elif [ "$ESTIMATED_TOKENS" -gt "$CRITICAL_THRESHOLD" ]; then
     LEVEL="TOKEN_HIGH_CRITICAL"
 elif [ "$ESTIMATED_TOKENS" -gt "$WARN_THRESHOLD" ]; then
     LEVEL="TOKEN_HIGH_WARNING"
+elif [ "$ESTIMATED_TOKENS" -gt 80000 ]; then
+    LEVEL="TOKEN_MEDIUM"  # 同期済み + 80K超 — 早期通知
 else
-    exit 0  # 何も出力しない
+    exit 0
 fi
 
 # ── 6. 警告メッセージの出力 ──────────────────────────────────────────
@@ -123,7 +133,6 @@ SAFE_REMAINING=$(( REMAINING - UPDATE_COST ))
 
 case "$LEVEL" in
     CRITICAL)
-        # NEEDS_SYNC=true かつ tokens が高い場合のみ「更新が必須」を表示
         echo ""
         echo "🔴 MIGRATION ALERT ─────────────────────────────────────────────────"
         echo "   /compact 前に MIGRATION_PROGRESS.md の更新が必須です！"
@@ -141,7 +150,6 @@ case "$LEVEL" in
         echo "────────────────────────────────────────────────────────────────────"
         ;;
     WARNING)
-        # NEEDS_SYNC=true かつ tokens が中程度の場合のみ「更新タイミングを検討」を表示
         echo ""
         echo "🟡 MIGRATION WARNING ───────────────────────────────────────────────"
         echo "   MIGRATION_PROGRESS.md の更新タイミングを検討してください"
@@ -165,7 +173,6 @@ case "$LEVEL" in
         fi
         ;;
     TOKEN_HIGH_CRITICAL)
-        # NEEDS_SYNC=false だが tokens が非常に多い — 更新は不要だがコンテキスト節約を促す
         echo ""
         echo "🔴 TOKEN ALERT ─────────────────────────────────────────────────────"
         echo "   コンテキスト使用量が上限に近づいています（MIGRATION_PROGRESS.md は同期済み）"
@@ -176,7 +183,6 @@ case "$LEVEL" in
         echo "────────────────────────────────────────────────────────────────────"
         ;;
     TOKEN_HIGH_WARNING)
-        # NEEDS_SYNC=false だが tokens が多い — 情報提供のみ
         echo ""
         echo "🟡 TOKEN WARNING ───────────────────────────────────────────────────"
         echo "   コンテキスト使用量が増加しています（MIGRATION_PROGRESS.md は同期済み）"
@@ -184,6 +190,10 @@ case "$LEVEL" in
             echo "   ${TOKEN_LINE}"
         fi
         echo "────────────────────────────────────────────────────────────────────"
+        ;;
+    TOKEN_MEDIUM)
+        echo ""
+        echo "💭 TOKEN NOTICE ─ ${TOKEN_LINE}"
         ;;
 esac
 
