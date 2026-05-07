@@ -21,6 +21,31 @@ style GCi fill:#bfdbfe,stroke:#0284c7,color:#0c4a6e
 style AGi fill:#ede9fe,stroke:#7c3aed,color:#3b0764
 style CCi fill:#fef3c7,stroke:#d97706,color:#78350f`;
 
+const MERMAID_WHY_COMPARE = `graph TD
+subgraph 従来の方法["❌ 従来の方法（非効率）"]
+A1["👤 ユーザー指示"] --> B1["AIエージェント"]
+B1 --> C1["📚 ドキュメント全体を読む\\n（大量トークン消費）"]
+C1 --> D1["🔥 コンテキスト飽和\\n精度低下・速度低下"]
+end
+subgraph skill_way["✅ SKILL.md を使う方法（効率的）"]
+A2["👤 ユーザー指示"] --> B2["AIエージェント"]
+B2 -->|"関連スキルを\\nオンデマンド検索"| C2["📄 SKILL.md だけ読む\\n（最小トークン消費）"]
+C2 --> D2["⚡ 高精度・高速・低コスト"]
+end
+style D1 fill:#fecaca,stroke:#dc2626,color:#7f1d1d
+style D2 fill:#d1fae5,stroke:#059669,color:#065f46
+style C2 fill:#bfdbfe,stroke:#0284c7,color:#0c4a6e`;
+
+const MERMAID_WHY_LEVELS = `graph LR
+L1["🏷️ レベル1: メタデータ\\nname + description\\n常にコンテキストにある\\n～100 tokens\\nセッション開始時に読込"]
+L2["📄 レベル2: SKILL.md 本文\\nスキルが呼ばれたときのみ\\n5,000 tokens以内推奨\\n具体的な手順・制約"]
+L3["📚 レベル3: 参照ファイル\\n本文から参照された時のみ\\n容量無制限\\nAPIドキュメント等"]
+L1 -->|"スキルが選ばれたとき"| L2
+L2 -->|"本文から参照されたとき"| L3
+style L1 fill:#fef3c7,stroke:#f59e0b,color:#78350f
+style L2 fill:#bfdbfe,stroke:#0284c7,color:#0c4a6e
+style L3 fill:#d1fae5,stroke:#059669,color:#065f46`;
+
 export const metadata: Metadata = {
   title: "SKILL.md 完全ガイド — Gemini CLI & Antigravity",
   description:
@@ -301,9 +326,62 @@ export default function Page() {
         </div>
       </section>
 
-      {/* s03: why — TODO: faithful migration */}
+      {/* s03: why */}
       <section id="why" className={styles.sec}>
         <h2 className={styles.secTitle}>❓ なぜ SKILL.md が必要なのか</h2>
+
+        {/* Red alert: context saturation */}
+        <div className={styles.alertRed}>
+          <div className={styles.alertRedTitle}>🔥 コンテキスト飽和（Context Saturation）問題</div>
+          <p className={styles.alertRedBody}>
+            AIエージェントに「すべてのドキュメントを読ませる」アプローチでは、モデルの注意機構（Attention
+            Mechanism）が分散し、重要な情報を見落としたり推論精度が著しく低下します。
+            また大量のトークン消費によって速度低下・コスト増大が起きます。
+          </p>
+        </div>
+
+        {/* Mermaid: 従来 vs SKILL.md */}
+        <div className={styles.mermaidWrap}>
+          <MermaidDiagram chart={MERMAID_WHY_COMPARE} />
+        </div>
+
+        {/* Progressive disclosure */}
+        <h3 className={styles.secH3}>
+          📊 プログレッシブ・ディスクロージャー — 3段階読み込みの仕組み
+        </h3>
+        <p
+          style={{ color: "#475569", fontSize: "0.875rem", lineHeight: 1.75, marginBottom: "1rem" }}
+        >
+          SKILL.md
+          は「必要なときだけ、必要な分だけ」読み込まれます。この3段階設計によってトークン消費を極限まで抑えています。
+        </p>
+
+        {/* Mermaid: L1/L2/L3 levels */}
+        <div className={styles.mermaidWrap}>
+          <MermaidDiagram chart={MERMAID_WHY_LEVELS} />
+        </div>
+
+        {/* 3-col level cards */}
+        <div className={styles.grid3}>
+          <div className={styles.cardAmberLight}>
+            <div className={styles.cardLabel}>レベル1 / 常駐</div>
+            <div className={styles.cardDesc}>
+              セッション開始時に全スキルのメタデータをロード。1スキル約100トークンなので数十〜数百スキルを待機させてもOK
+            </div>
+          </div>
+          <div className={styles.cardSkyLight}>
+            <div className={styles.cardLabel}>レベル2 / オンデマンド</div>
+            <div className={styles.cardDesc}>
+              ユーザーの入力とdescriptionを意味論的に照合し、最適なスキルを特定。activate_skillツールで本文を展開
+            </div>
+          </div>
+          <div className={styles.cardEmeraldLight}>
+            <div className={styles.cardLabel}>レベル3 / 動的参照</div>
+            <div className={styles.cardDesc}>
+              本文中で参照された外部ファイルのみを動的に読み込む。スクリプトは実行結果のみがトークン消費
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* s04: structure — TODO: faithful migration */}

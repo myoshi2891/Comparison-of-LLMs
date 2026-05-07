@@ -942,6 +942,88 @@
   margin-top: 1.5rem;
 }
 
+/* ===== why section light cards ===== */
+.cardAmberLight {
+  border-radius: 0.75rem;
+  padding: 1rem;
+  background: #fffbeb;
+  border: 2px solid #fde68a;
+}
+
+.cardAmberLight .cardLabel {
+  font-weight: 700;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+  color: #92400e;
+}
+
+.cardAmberLight .cardDesc {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: #b45309;
+}
+
+.cardSkyLight {
+  border-radius: 0.75rem;
+  padding: 1rem;
+  background: #f0f9ff;
+  border: 2px solid #bae6fd;
+}
+
+.cardSkyLight .cardLabel {
+  font-weight: 700;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+  color: #075985;
+}
+
+.cardSkyLight .cardDesc {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: #0369a1;
+}
+
+.cardEmeraldLight {
+  border-radius: 0.75rem;
+  padding: 1rem;
+  background: #f0fdf4;
+  border: 2px solid #bbf7d0;
+}
+
+.cardEmeraldLight .cardLabel {
+  font-weight: 700;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+  color: #14532d;
+}
+
+.cardEmeraldLight .cardDesc {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: #15803d;
+}
+
+.alertRed {
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  background: #fef2f2;
+  border: 2px solid #fca5a5;
+  margin-bottom: 1.5rem;
+}
+
+.alertRedTitle {
+  font-weight: 700;
+  color: #b91c1c;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.alertRedBody {
+  color: #475569;
+  font-size: 0.875rem;
+  line-height: 1.75;
+}
+
 /* ===== footer ===== */
 .footer {
   text-align: center;
