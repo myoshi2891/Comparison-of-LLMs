@@ -1101,9 +1101,584 @@ export default function Page() {
         </div>
       </section>
 
-      {/* s10: whatsnew — TODO: faithful migration */}
-      <section id="whatsnew" className={styles.sec}>
-        <h2 className={styles.secTitle}>🆕 最新アップデート（2026年3月21日時点）</h2>
+      {/* s10: whatsnew */}
+      <section
+        id="whatsnew"
+        className={styles.sec}
+        style={{
+          background: "linear-gradient(135deg,#fff7ed,#fef3c7)",
+          borderWidth: "2px",
+          borderStyle: "solid",
+          borderColor: "#fed7aa",
+        }}
+      >
+        <h2 className={styles.secTitle} style={{ color: "#c2410c", borderBottomColor: "#fed7aa" }}>
+          🆕 最新アップデート（2026年3月21日時点）
+        </h2>
+
+        {/* 2-col: Gemini CLI + Antigravity */}
+        <div className={styles.newGrid}>
+          {/* Gemini CLI */}
+          <div
+            className={styles.newCard}
+            style={{ borderColor: "#bae6fd", background: "#ffffff", padding: "1.25rem" }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                marginBottom: "0.75rem",
+              }}
+            >
+              <span
+                className={styles.badge}
+                style={{ background: "#0ea5e9", color: "#ffffff", padding: "0.25rem 0.75rem" }}
+              >
+                Gemini CLI
+              </span>
+              <span className={styles.badge} style={{ background: "#e0f2fe", color: "#0369a1" }}>
+                v0.34.0 (2026-03-17)
+              </span>
+            </div>
+            <ul
+              style={{
+                listStyle: "none",
+                padding: 0,
+                margin: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.5rem",
+                fontSize: "0.875rem",
+                color: "#475569",
+              }}
+            >
+              <li style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
+                <span
+                  style={{
+                    color: "#0ea5e9",
+                    fontWeight: 700,
+                    marginTop: "0.125rem",
+                    flexShrink: 0,
+                  }}
+                >
+                  v0.26.0
+                </span>
+                <span>
+                  <strong>skill-creator</strong> メタスキル標準搭載 + ジェネラリストエージェント追加
+                </span>
+              </li>
+              <li style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
+                <span
+                  style={{
+                    color: "#0ea5e9",
+                    fontWeight: 700,
+                    marginTop: "0.125rem",
+                    flexShrink: 0,
+                  }}
+                >
+                  v0.27.0
+                </span>
+                <span>
+                  <strong>/rewind</strong> コマンド追加（セッション履歴を遡る）
+                </span>
+              </li>
+              <li style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
+                <span
+                  style={{
+                    color: "#0ea5e9",
+                    fontWeight: 700,
+                    marginTop: "0.125rem",
+                    flexShrink: 0,
+                  }}
+                >
+                  v0.29.0
+                </span>
+                <span>
+                  Gemini 3 をデフォルトモデルに採用（
+                  <code
+                    style={{
+                      background: "#f1f5f9",
+                      padding: "0 0.25rem",
+                      borderRadius: "0.25rem",
+                      fontSize: "0.75rem",
+                    }}
+                  >
+                    Auto (Gemini 3)
+                  </code>
+                  ）
+                </span>
+              </li>
+              <li style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
+                <span
+                  style={{
+                    color: "#0ea5e9",
+                    fontWeight: 700,
+                    marginTop: "0.125rem",
+                    flexShrink: 0,
+                  }}
+                >
+                  v0.30.0
+                </span>
+                <span>
+                  <strong>Gemini CLI SDK</strong>（
+                  <code
+                    style={{
+                      background: "#f1f5f9",
+                      padding: "0 0.25rem",
+                      borderRadius: "0.25rem",
+                      fontSize: "0.75rem",
+                    }}
+                  >
+                    @google/gemini-cli-sdk
+                  </code>
+                  ）公開
+                </span>
+              </li>
+              <li style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
+                <span
+                  style={{
+                    color: "#0ea5e9",
+                    fontWeight: 700,
+                    marginTop: "0.125rem",
+                    flexShrink: 0,
+                  }}
+                >
+                  v0.31.0
+                </span>
+                <span>
+                  <strong>gemini-3.1-pro-preview</strong>{" "}
+                  サポート追加（段階的ロールアウト・一部アカウントで利用可）
+                </span>
+              </li>
+              <li style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
+                <span
+                  style={{
+                    color: "#0ea5e9",
+                    fontWeight: 700,
+                    marginTop: "0.125rem",
+                    flexShrink: 0,
+                  }}
+                >
+                  v0.33.0
+                </span>
+                <span>
+                  <strong>/plan にリサーチサブエージェント</strong>・アノテーション機能を追加
+                </span>
+              </li>
+              <li style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
+                <span
+                  style={{
+                    color: "#0ea5e9",
+                    fontWeight: 700,
+                    marginTop: "0.125rem",
+                    flexShrink: 0,
+                  }}
+                >
+                  v0.34.0
+                </span>
+                <span>Plan Mode がデフォルト有効化、サンドボックス化・セキュリティ強化</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Antigravity */}
+          <div
+            className={styles.newCard}
+            style={{ borderColor: "#ddd6fe", background: "#ffffff", padding: "1.25rem" }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                marginBottom: "0.75rem",
+              }}
+            >
+              <span
+                className={styles.badge}
+                style={{ background: "#8b5cf6", color: "#ffffff", padding: "0.25rem 0.75rem" }}
+              >
+                Antigravity
+              </span>
+              <span className={styles.badge} style={{ background: "#ede9fe", color: "#6d28d9" }}>
+                v1.20.3 (2026-03-05)
+              </span>
+            </div>
+            <ul
+              style={{
+                listStyle: "none",
+                padding: 0,
+                margin: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.5rem",
+                fontSize: "0.875rem",
+                color: "#475569",
+              }}
+            >
+              <li style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
+                <span
+                  style={{
+                    color: "#8b5cf6",
+                    fontWeight: 700,
+                    marginTop: "0.125rem",
+                    flexShrink: 0,
+                  }}
+                >
+                  v1.20.3
+                </span>
+                <span>
+                  <strong>AGENTS.md サポート</strong> 追加（Claude Code
+                  など他ツールとルール共有可能）
+                </span>
+              </li>
+              <li style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
+                <span
+                  style={{
+                    color: "#8b5cf6",
+                    fontWeight: 700,
+                    marginTop: "0.125rem",
+                    flexShrink: 0,
+                  }}
+                >
+                  v1.20.3
+                </span>
+                <span>
+                  トークン計算バグ修正・<strong>Auto-continue のデフォルト有効化</strong>
+                </span>
+              </li>
+              <li style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
+                <span
+                  style={{
+                    color: "#8b5cf6",
+                    fontWeight: 700,
+                    marginTop: "0.125rem",
+                    flexShrink: 0,
+                  }}
+                >
+                  現在
+                </span>
+                <span>
+                  対応モデル:{" "}
+                  {[
+                    "gemini-3.1-pro-preview",
+                    "gemini-3-flash-preview",
+                    "claude-sonnet-4-6",
+                    "claude-opus-4-6",
+                    "gpt-oss-120b",
+                  ]
+                    .map((m, _i) => (
+                      <code
+                        key={m}
+                        style={{
+                          background: "#f1f5f9",
+                          padding: "0 0.25rem",
+                          borderRadius: "0.25rem",
+                          fontSize: "0.75rem",
+                        }}
+                      >
+                        {m}
+                      </code>
+                    ))
+                    .reduce<React.ReactNode[]>((acc, el, i) => {
+                      if (i !== 0) acc.push(" / ");
+                      acc.push(el);
+                      return acc;
+                    }, [])}
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Model table */}
+        <h3 className={styles.secH3} style={{ color: "#9a3412", marginTop: "1.5rem" }}>
+          🤖 現在サポートされるモデル（2026年3月）
+        </h3>
+        <div className={`${styles.tableWrap} ${styles.modelTable}`}>
+          <table
+            className={styles.table}
+            style={{ background: "#ffffff", borderRadius: "0.75rem", overflow: "hidden" }}
+          >
+            <thead>
+              <tr style={{ background: "#ffedd5" }}>
+                <th
+                  className={styles.tdLeft}
+                  style={{
+                    border: "1px solid #fed7aa",
+                    padding: "0.5rem 1rem",
+                    fontWeight: 700,
+                    color: "#7c2d12",
+                  }}
+                >
+                  モデルID
+                </th>
+                <th
+                  style={{
+                    border: "1px solid #fed7aa",
+                    padding: "0.5rem 1rem",
+                    fontWeight: 700,
+                    color: "#7c2d12",
+                  }}
+                >
+                  推奨用途
+                </th>
+                <th
+                  style={{
+                    border: "1px solid #fed7aa",
+                    padding: "0.5rem 1rem",
+                    fontWeight: 700,
+                    color: "#7c2d12",
+                  }}
+                >
+                  ステータス
+                </th>
+                <th
+                  style={{
+                    border: "1px solid #fed7aa",
+                    padding: "0.5rem 1rem",
+                    fontWeight: 700,
+                    color: "#7c2d12",
+                  }}
+                >
+                  対応ツール
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td
+                  className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}
+                  style={{ border: "1px solid #fed7aa", padding: "0.5rem 1rem" }}
+                >
+                  gemini-3-flash-preview
+                </td>
+                <td
+                  className={styles.textSlate}
+                  style={{
+                    border: "1px solid #fed7aa",
+                    padding: "0.5rem 1rem",
+                    textAlign: "center",
+                  }}
+                >
+                  コードレビュー・テスト・実装・オーケストレーター
+                </td>
+                <td
+                  style={{
+                    border: "1px solid #fed7aa",
+                    padding: "0.5rem 1rem",
+                    textAlign: "center",
+                  }}
+                >
+                  <span className={`${styles.badge} ${styles.badgeGreen}`}>✅ デフォルト推奨</span>
+                </td>
+                <td
+                  style={{
+                    border: "1px solid #fed7aa",
+                    padding: "0.5rem 1rem",
+                    textAlign: "center",
+                  }}
+                >
+                  <span className={`${styles.badge} ${styles.badgeGreen}`}>両方</span>
+                </td>
+              </tr>
+              <tr style={{ background: "#fff7ed" }}>
+                <td
+                  className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}
+                  style={{ border: "1px solid #fed7aa", padding: "0.5rem 1rem" }}
+                >
+                  gemini-3.1-pro-preview
+                </td>
+                <td
+                  className={styles.textSlate}
+                  style={{
+                    border: "1px solid #fed7aa",
+                    padding: "0.5rem 1rem",
+                    textAlign: "center",
+                  }}
+                >
+                  アーキテクチャ設計・セキュリティ監査（ARC-AGI-2: 77.1%）
+                </td>
+                <td
+                  style={{
+                    border: "1px solid #fed7aa",
+                    padding: "0.5rem 1rem",
+                    textAlign: "center",
+                  }}
+                >
+                  <span className={`${styles.badge} ${styles.badgeViolet}`}>⭐ 新世代最高精度</span>
+                </td>
+                <td
+                  style={{
+                    border: "1px solid #fed7aa",
+                    padding: "0.5rem 1rem",
+                    textAlign: "center",
+                  }}
+                >
+                  <span className={`${styles.badge} ${styles.badgeGreen}`}>両方</span>
+                </td>
+              </tr>
+              <tr>
+                <td
+                  className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}
+                  style={{ border: "1px solid #fed7aa", padding: "0.5rem 1rem" }}
+                >
+                  gemini-2.5-flash
+                </td>
+                <td
+                  className={styles.textSlate}
+                  style={{
+                    border: "1px solid #fed7aa",
+                    padding: "0.5rem 1rem",
+                    textAlign: "center",
+                  }}
+                >
+                  安定運用・コスパ重視
+                </td>
+                <td
+                  style={{
+                    border: "1px solid #fed7aa",
+                    padding: "0.5rem 1rem",
+                    textAlign: "center",
+                  }}
+                >
+                  <span className={`${styles.badge} ${styles.badgeSky}`}>✅ 安定版</span>
+                </td>
+                <td
+                  style={{
+                    border: "1px solid #fed7aa",
+                    padding: "0.5rem 1rem",
+                    textAlign: "center",
+                  }}
+                >
+                  <span
+                    className={styles.badge}
+                    style={{ background: "#ccfbf1", color: "#0f766e" }}
+                  >
+                    Gemini CLI
+                  </span>
+                </td>
+              </tr>
+              <tr style={{ background: "#fff7ed" }}>
+                <td
+                  className={`${styles.tdLeft} ${styles.mono}`}
+                  style={{ border: "1px solid #fed7aa", padding: "0.5rem 1rem", color: "#94a3b8" }}
+                >
+                  gemini-2.0-flash
+                </td>
+                <td
+                  style={{
+                    border: "1px solid #fed7aa",
+                    padding: "0.5rem 1rem",
+                    textAlign: "center",
+                    color: "#94a3b8",
+                    fontSize: "0.75rem",
+                  }}
+                >
+                  （廃止予定）
+                </td>
+                <td
+                  style={{
+                    border: "1px solid #fed7aa",
+                    padding: "0.5rem 1rem",
+                    textAlign: "center",
+                  }}
+                >
+                  <span className={`${styles.badge} ${styles.badgeRose}`}>
+                    ⚠️ 2026-06-01 廃止予定
+                  </span>
+                </td>
+                <td
+                  style={{
+                    border: "1px solid #fed7aa",
+                    padding: "0.5rem 1rem",
+                    textAlign: "center",
+                  }}
+                >
+                  <span
+                    className={styles.badge}
+                    style={{ background: "#ccfbf1", color: "#0f766e" }}
+                  >
+                    Gemini CLI
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td
+                  className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}
+                  style={{ border: "1px solid #fed7aa", padding: "0.5rem 1rem" }}
+                >
+                  claude-sonnet-4-6
+                </td>
+                <td
+                  className={styles.textSlate}
+                  style={{
+                    border: "1px solid #fed7aa",
+                    padding: "0.5rem 1rem",
+                    textAlign: "center",
+                  }}
+                >
+                  Anthropic モデル（Antigravity 対応）
+                </td>
+                <td
+                  style={{
+                    border: "1px solid #fed7aa",
+                    padding: "0.5rem 1rem",
+                    textAlign: "center",
+                  }}
+                >
+                  <span className={`${styles.badge} ${styles.badgeAmber}`}>✅ 対応</span>
+                </td>
+                <td
+                  style={{
+                    border: "1px solid #fed7aa",
+                    padding: "0.5rem 1rem",
+                    textAlign: "center",
+                  }}
+                >
+                  <span className={`${styles.badge} ${styles.badgeViolet}`}>Antigravity</span>
+                </td>
+              </tr>
+              <tr style={{ background: "#fff7ed" }}>
+                <td
+                  className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}
+                  style={{ border: "1px solid #fed7aa", padding: "0.5rem 1rem" }}
+                >
+                  claude-opus-4-6
+                </td>
+                <td
+                  className={styles.textSlate}
+                  style={{
+                    border: "1px solid #fed7aa",
+                    padding: "0.5rem 1rem",
+                    textAlign: "center",
+                  }}
+                >
+                  Anthropic 最高精度（Antigravity 対応）
+                </td>
+                <td
+                  style={{
+                    border: "1px solid #fed7aa",
+                    padding: "0.5rem 1rem",
+                    textAlign: "center",
+                  }}
+                >
+                  <span className={`${styles.badge} ${styles.badgeAmber}`}>✅ 対応</span>
+                </td>
+                <td
+                  style={{
+                    border: "1px solid #fed7aa",
+                    padding: "0.5rem 1rem",
+                    textAlign: "center",
+                  }}
+                >
+                  <span className={`${styles.badge} ${styles.badgeViolet}`}>Antigravity</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
 
       {/* s11: footer */}
