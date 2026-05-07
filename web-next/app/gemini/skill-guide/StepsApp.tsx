@@ -48,12 +48,12 @@ function Code1() {
 }
 
 /**
- * Render a styled code block showing an example YAML front matter for SKILL.md.
+ * Render a syntax-styled YAML front matter example for SKILL.md.
  *
- * The snippet demonstrates the required `name` field and a multi-line `description` field
- * (using the `|` block scalar) as guidance for when and with what phrases the skill should trigger.
+ * The snippet illustrates the required `name` field and a multi-line `description`
+ * using the `|` block scalar to show example trigger phrases and guidance.
  *
- * @returns A JSX element containing a styled YAML code block that illustrates SKILL.md front matter with `name` and `description` entries.
+ * @returns A JSX element containing a styled YAML snippet illustrating `name` and a multi-line `description`
  */
 function Code2() {
   return (
@@ -90,12 +90,9 @@ function Code2() {
 }
 
 /**
- * Render a styled example block that displays the body of a sample `SKILL.md`.
+ * Render a styled markdown-like example block that demonstrates the body content of a sample `SKILL.md`.
  *
- * The block shows sections used in a skill's documentation: title, Overview,
- * Step-by-Step Guide, Examples, and Rules (with do/don't guidance).
- *
- * @returns A JSX element containing a styled markdown-like code block for the SKILL.md body
+ * @returns A JSX element containing a styled representation of the SKILL.md body with sections: title, Overview, Step-by-Step Guide, Examples, and Rules
  */
 function Code3() {
   return (
@@ -136,11 +133,12 @@ function Code3() {
 }
 
 /**
- * Renders a styled shell code block that demonstrates using the Gemini CLI to list available skills and run a test skill.
+ * Render a styled shell code block that demonstrates listing Gemini skills and invoking a test skill.
  *
- * The block includes example commands (`gemini skills list` and a sample `gemini "テスト！最初のスキルを呼び出して"` invocation) and an example expected output listing skills.
+ * The snippet shows the `gemini skills list` command, example expected output as comments, and an example
+ * `gemini "テスト！最初のスキルを呼び出して"` invocation.
  *
- * @returns A JSX element containing the formatted shell snippet and expected output comments.
+ * @returns A JSX element containing the formatted shell snippet and expected-output comments.
  */
 function Code4() {
   return (
@@ -174,7 +172,7 @@ function Code4() {
 /**
  * Renders a styled shell code block demonstrating adding deterministic scripts and reference files.
  *
- * @returns A React node containing example shell commands that create `scripts/` and `references/` directories and write example files (`scripts/validate.py`, `references/guidelines.md`) via heredoc.
+ * @returns The example shell commands that create `scripts/` and `references/` directories and write example files (`scripts/validate.py`, `references/guidelines.md`) using heredocs.
  */
 function Code5() {
   return (
@@ -293,11 +291,11 @@ const STEPS_DATA: StepData[] = [
 ];
 
 /**
- * Render an interactive multi-step skill guide with a step list, detail panel, visual step indicator, code examples, and playback controls.
+ * Render an interactive multi-step skill guide with navigation and playback controls.
  *
- * The component manages internal state for the currently active step and an autoplay mode that advances steps every 2 seconds until the last step, and provides manual controls (Play, Prev, Next, Reset) to navigate and control playback.
+ * Displays a left step list and a right detail panel showing the selected step's title, description, tip, visualization card, and code example; provides Play, Prev, Next, and Reset controls and an autoplay mode that advances through the steps.
  *
- * @returns The rendered JSX element for the steps guide UI
+ * @returns The JSX element for the steps guide UI
  */
 export default function StepsApp() {
   const [activeStep, setActiveStep] = useState(1);
