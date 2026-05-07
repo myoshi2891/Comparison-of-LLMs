@@ -64,6 +64,23 @@ style D1 fill:#3d1515,stroke:#ef4444,color:#fca5a5
 style D2 fill:#0d2e1a,stroke:#22c55e,color:#86efac
 style C2 fill:#0d2330,stroke:#3b82f6,color:#93c5fd`;
 
+const MERMAID_SCOPE = `graph TB
+subgraph GlobalScope["Global Scope — All Projects"]
+G1["~/.gemini/skills/ (Gemini CLI)"]
+G2["~/.gemini/antigravity/skills/ (Antigravity)"]
+end
+subgraph WorkspaceScope["Workspace Scope — This Project Only"]
+W1[".gemini/skills/ (Gemini CLI)"]
+W2[".agent/skills/ (Antigravity)"]
+W3["AGENTS.md — Cross-tool shared (v1.20.3+)"]
+end
+WorkspaceScope -->|"Higher priority<br />Overrides global"| OVERRIDE["Override"]
+GlobalScope --> OVERRIDE
+OVERRIDE --> USE["Active Skill"]
+style OVERRIDE fill:#1a1a10,stroke:#f97316,color:#fdba74
+style USE fill:#0d2330,stroke:#00d4aa,color:#00d4aa
+style W3 fill:#1a1a10,stroke:#f97316,color:#fdba74`;
+
 export default function SkillGuideIntermediatePage() {
   return (
     <div className={styles.page}>
@@ -960,6 +977,74 @@ description: |
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+      {/* S8: SCOPE */}
+      <section id="sec-scope" className={styles.section}>
+        <div className={styles.container}>
+          <div className={styles.sectionHeader}>
+            <span className={`${styles.sectionBadge} ${styles.badgePurple}`}>08 / SCOPE</span>
+            <div>
+              <h2 className={styles.sectionTitle}>
+                スコープと<span className={styles.sectionTitleSpan}>配置場所</span>の設計
+              </h2>
+              <p className={styles.sectionDesc}>
+                グローバルスコープとワークスペーススコープの使い分けと、v1.20.3で追加されたAGENTS.mdによるクロスツール共有を理解する。
+              </p>
+            </div>
+          </div>
+          <div className={styles.mermaidWrap}>
+            <div className={styles.mermaidLabel}>SCOPE HIERARCHY — OVERRIDE RULES (v1.20.3)</div>
+            <MermaidDiagram chart={MERMAID_SCOPE} />
+          </div>
+          <div className={styles.scopeGrid}>
+            <div className={`${styles.scopeCard} ${styles.scopeCardGlobal}`}>
+              <div className={`${styles.scopeLabel} ${styles.scopeLabelC}`}>GLOBAL SCOPE</div>
+              <h3>グローバルスキル</h3>
+              <p style={{ fontSize: "14px", color: "var(--text-subtle)" }}>
+                すべてのプロジェクトで利用可能な汎用スキル。
+              </p>
+              <div className={styles.pathBox}>
+                {"~/.gemini/skills/"}
+                <br />
+                {"~/.gemini/antigravity/skills/"}
+              </div>
+              <ul>
+                <li>Gitコミット規約フォーマッター</li>
+                <li>コードレビュー標準チェック</li>
+                <li>JSON/YAML フォーマッター</li>
+                <li>テスト生成の標準化</li>
+              </ul>
+            </div>
+            <div className={`${styles.scopeCard} ${styles.scopeCardWorkspace}`}>
+              <div className={`${styles.scopeLabel} ${styles.scopeLabelO}`}>WORKSPACE SCOPE</div>
+              <h3>ワークスペーススキル</h3>
+              <p style={{ fontSize: "14px", color: "var(--text-subtle)" }}>
+                特定プロジェクトのみで有効。
+                <strong style={{ color: "var(--orange)" }}>
+                  v1.20.3〜 AGENTS.md でクロスツール共有も可能
+                </strong>
+              </p>
+              <div className={styles.pathBox}>
+                {".gemini/skills/"}
+                <br />
+                {".agent/skills/"}
+                <br />
+                {"AGENTS.md（クロスツール共有）"}
+              </div>
+              <ul>
+                <li>このアプリのデプロイ手順</li>
+                <li>プロジェクト固有のAPI仕様</li>
+                <li>チーム独自のコーディング規約</li>
+                <li>内部DBのマイグレーション</li>
+              </ul>
+            </div>
+          </div>
+          <div className={styles.callout} style={{ marginTop: "24px" }}>
+            <strong>オーバーライドルール:</strong> 同名のスキルが複数スコープに存在する場合、
+            <span className={styles.inlineEm}>ワークスペース（上位）が優先</span>
+            される。v1.20.3〜ではAGENTS.mdも優先度ルールに組み込まれた。
           </div>
         </div>
       </section>

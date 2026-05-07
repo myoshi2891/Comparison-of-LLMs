@@ -752,6 +752,76 @@
   line-height: 1.8;
 }
 
+/* ===== Scope Grid (added for s08) ===== */
+.scopeGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin: 24px 0;
+}
+
+@media (max-width: 640px) {
+  .scopeGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.scopeCard {
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+
+.scopeCardGlobal {
+  border-color: rgba(0, 212, 170, 0.3);
+}
+
+.scopeCardWorkspace {
+  border-color: rgba(249, 115, 22, 0.3);
+}
+
+.scopeCard h3 {
+  font-family: "Syne", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 8px 0 6px;
+}
+
+.scopeCard ul {
+  margin: 12px 0 0;
+  padding-left: 20px;
+}
+
+.scopeCard li {
+  font-size: 13.5px;
+  color: var(--text-subtle);
+  line-height: 1.8;
+}
+
+.scopeLabel {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.scopeLabelC {
+  background: rgba(0, 212, 170, 0.12);
+  color: var(--cyan);
+  border: 1px solid rgba(0, 212, 170, 0.3);
+}
+
+.scopeLabelO {
+  background: rgba(249, 115, 22, 0.12);
+  color: var(--orange);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
 /* ===== Steps layout (added for s07) ===== */
 .steps {
   display: flex;
