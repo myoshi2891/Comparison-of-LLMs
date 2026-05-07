@@ -304,7 +304,12 @@ export default function ExamplesApp() {
   return (
     <div>
       {/* Tab buttons */}
-      <div className={styles.patternTabs} role="tablist" onKeyDown={handleTabKeyDown}>
+      <div
+        className={styles.patternTabs}
+        role="tablist"
+        aria-label="スキルパターン"
+        onKeyDown={handleTabKeyDown}
+      >
         {PATTERNS.map((p) => (
           <button
             key={p.id}
@@ -323,7 +328,8 @@ export default function ExamplesApp() {
       </div>
 
       {/* Tabpanel — wraps all content controlled by active tab */}
-      <div id={`panel-${active}`} role="tabpanel" aria-labelledby={`tab-${active}`}>
+      {/* biome-ignore lint/a11y/noNoninteractiveTabindex: tabpanel should be focusable for keyboard users to reach its content */}
+      <div id={`panel-${active}`} role="tabpanel" aria-labelledby={`tab-${active}`} tabIndex={0}>
         {/* Detail card */}
         <div className={styles.patternCard}>
           <div style={{ fontSize: "1.5rem", marginBottom: "0.25rem" }}>{current.emoji}</div>
