@@ -13,7 +13,15 @@ type Pattern = {
   codeNode: React.ReactNode;
 };
 
-/* ---- code blocks per pattern ---- */
+/**
+ * Render the "Basic" SKILL.md example block for the git-commit-formatter pattern.
+ *
+ * The block includes YAML-like frontmatter (name and description), a markdown
+ * title and rules section showing the required commit message format, and an
+ * example list of `type` values (`feat`, `fix`, `docs`, `style`, `refactor`).
+ *
+ * @returns A JSX element containing the styled SKILL.md sample for the Basic pattern.
+ */
 
 function CodeBasic() {
   return (
@@ -79,6 +87,13 @@ function CodeBasic() {
   );
 }
 
+/**
+ * Renders the "Reference" SKILL.md example block illustrating an API-integration workflow and its rules.
+ *
+ * The returned JSX is a static, render-only code sample that shows frontmatter, step-by-step instructions to read `references/api-spec.md`, guidance for selecting the correct endpoint, and rules that prohibit guessing.
+ *
+ * @returns The JSX element for the "Reference" SKILL.md sample block.
+ */
 function CodeReference() {
   return (
     <div className={styles.codeWrap}>
@@ -126,6 +141,14 @@ function CodeReference() {
   );
 }
 
+/**
+ * Render a styled SKILL.md sample demonstrating the Tool Use pattern for database migrations.
+ *
+ * Renders a static, styled code block that documents a database migration tool: frontmatter (name/description),
+ * an execution command example, argument descriptions, and a short step-by-step procedure.
+ *
+ * @returns A JSX element containing the formatted SKILL.md example for the "db-migrator" tool
+ */
 function CodeTool() {
   return (
     <div className={styles.codeWrap}>
@@ -179,6 +202,16 @@ function CodeTool() {
   );
 }
 
+/**
+ * Renders the "All-in-One" SKILL.md example block used in the patterns list.
+ *
+ * The output is a styled, read-only code-like block that shows a full-stack
+ * generator SKILL.md sample including frontmatter, overview, step-by-step guide,
+ * and rules.
+ *
+ * @returns A JSX element containing the formatted SKILL.md sample for the
+ * "All-in-One" pattern.
+ */
 function CodeAllInOne() {
   return (
     <div className={styles.codeWrap}>
@@ -277,6 +310,18 @@ const PATTERNS: Pattern[] = [
   },
 ];
 
+/**
+ * Render an interactive tabbed UI showcasing predefined SKILL.md pattern examples.
+ *
+ * Maintains internal state for the active pattern, updates the displayed detail card,
+ * directory structure, use case, and sample SKILL.md block when a tab is selected,
+ * and supports keyboard navigation between tabs via ArrowRight, ArrowLeft, Home, and End
+ * (focus moves to the newly selected tab).
+ *
+ * @returns A React element containing the examples page with tab buttons, a tabpanel
+ * displaying the active pattern's details, a two-column layout for directory structure
+ * and use case, and the corresponding SKILL.md sample block.
+ */
 export default function ExamplesApp() {
   const [active, setActive] = useState("basic");
   const current = PATTERNS.find((p) => p.id === active) ?? PATTERNS[0];
