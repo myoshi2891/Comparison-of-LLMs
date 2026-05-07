@@ -747,6 +747,222 @@ description: |
           <PatternsApp />
         </div>
       </section>
+      {/* S7: INSTALLATION */}
+      <section id="sec-install" className={styles.section}>
+        <div className={styles.container}>
+          <div className={styles.sectionHeader}>
+            <span className={`${styles.sectionBadge} ${styles.badgeBlue}`}>07 / INSTALLATION</span>
+            <div>
+              <h2 className={styles.sectionTitle}>
+                スキルの<span className={styles.sectionTitleSpan}>インストール</span>方法
+              </h2>
+              <p className={styles.sectionDesc}>
+                Git リポジトリ、ローカルディレクトリ、統合CLIツール。v0.26.0〜の新コマンド（
+                <code className={styles.inlineCode}>/plan</code>・
+                <code className={styles.inlineCode}>/rewind</code>
+                ・skill-creator）を含む完全ガイド。
+              </p>
+            </div>
+          </div>
+          <div className={styles.steps}>
+            {/* Step 01 */}
+            <div className={styles.step}>
+              <div className={styles.stepNum}>01</div>
+              <div className={styles.stepBody}>
+                <div className={styles.stepTitle}>
+                  Gemini CLI — コマンドでインストール
+                  <span className={styles.newBadge} style={{ fontSize: "11px" }}>
+                    v0.34.0
+                  </span>
+                </div>
+                <p className={styles.stepDesc}>
+                  最もスタンダードな方法。v0.26.0〜の新コマンドも含む完全リファレンス。
+                </p>
+                <div className={styles.codeWrap} style={{ marginTop: "16px" }}>
+                  <div className={styles.codeHeader}>
+                    <div className={styles.macDots}>
+                      <div className={`${styles.macDot} ${styles.dotRed}`} />
+                      <div className={`${styles.macDot} ${styles.dotYellow}`} />
+                      <div className={`${styles.macDot} ${styles.dotGreen}`} />
+                    </div>
+                    <span className={styles.codeLang}>shell — Gemini CLI Commands (v0.34.0)</span>
+                  </div>
+                  <div className={styles.codeBody}>
+                    <span className={styles.cComment}>
+                      # スキルを Git リポジトリからインストール
+                    </span>
+                    {"\n"}
+                    <span className={styles.cCmd}>gemini skills install</span>{" "}
+                    <span className={styles.cVal}>https://github.com/example/my-skills.git</span>
+                    {"\n\n"}
+                    <span className={styles.cComment}># サブパスを指定してインストール</span>
+                    {"\n"}
+                    <span className={styles.cCmd}>gemini skills install</span>{" "}
+                    <span className={styles.cVal}>https://github.com/example/skills.git</span>{" "}
+                    <span className={styles.cKey}>--path</span>
+                    {" skills/firebase\n\n"}
+                    <span className={styles.cComment}># ローカルディレクトリからインストール</span>
+                    {"\n"}
+                    <span className={styles.cCmd}>gemini skills install</span>{" "}
+                    <span className={styles.cVal}>./my-local-skill/</span>
+                    {"\n\n"}
+                    <span className={styles.cComment}># インストール済みスキルを一覧表示</span>
+                    {"\n"}
+                    <span className={styles.cCmd}>gemini skills list</span>
+                    {"\n\n"}
+                    <span className={styles.cComment}># セッション中にスキルを一時無効化</span>
+                    {"\n"}
+                    <span className={styles.cCmd}>/skills disable</span>{" "}
+                    <span className={styles.cVal}>{"<スキル番号>"}</span>
+                    {"\n\n"}
+                    <span className={styles.cComment}># スキルを最新版に更新</span>
+                    {"\n"}
+                    <span className={styles.cCmd}>gemini skills update</span>
+                    {"\n\n"}
+                    <span className={styles.cNew}>
+                      {"──────────────────────────────────────────────────────────────"}
+                    </span>
+                    {"\n"}
+                    <span className={styles.cNew}>
+                      {"# 🆕 v0.26.0〜 skill-creator（スキル対話的自動生成）"}
+                    </span>
+                    {"\n"}
+                    <span className={styles.cComment}>
+                      {"# チャットで「新しいスキルを作成したい」と入力→自動起動"}
+                    </span>
+                    {"\n\n"}
+                    <span className={styles.cNew}>
+                      {"# 🆕 v0.27.0〜 /rewind（セッション履歴を遡る・ロールバック）"}
+                    </span>
+                    {"\n"}
+                    <span className={styles.cCmd}>/rewind</span>
+                    {"\n\n"}
+                    <span className={styles.cNew}>
+                      {"# 🆕 v0.29.0〜 /plan（Plan Mode: read-only で安全に変更計画立案）"}
+                    </span>
+                    {"\n"}
+                    <span className={styles.cCmd}>/plan</span>
+                    {"\n"}
+                    <span className={styles.cComment}>
+                      {"# v0.33.0〜: リサーチサブエージェント・アノテーション機能を内蔵"}
+                    </span>
+                    {"\n\n"}
+                    <span className={styles.cNew}>
+                      {"# 🆕 v0.30.0〜 Gemini CLI SDK（プログラムによるスキル生成）"}
+                    </span>
+                    {"\n"}
+                    <span className={styles.cComment}>
+                      {"# npm install @google/gemini-cli-sdk"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Step 02 */}
+            <div className={styles.step}>
+              <div className={styles.stepNum}>02</div>
+              <div className={styles.stepBody}>
+                <div className={styles.stepTitle}>
+                  Antigravity — ファイルコピーで配置
+                  <span className={styles.newBadge} style={{ fontSize: "11px" }}>
+                    v1.20.3
+                  </span>
+                </div>
+                <p className={styles.stepDesc}>
+                  Antigravity IDE
+                  ではGUIまたはファイルコピーでスキルを配置。v1.20.3〜はAGENTS.mdでクロスツール共有も可能。
+                </p>
+                <div className={styles.codeWrap} style={{ marginTop: "16px" }}>
+                  <div className={styles.codeHeader}>
+                    <div className={styles.macDots}>
+                      <div className={`${styles.macDot} ${styles.dotRed}`} />
+                      <div className={`${styles.macDot} ${styles.dotYellow}`} />
+                      <div className={`${styles.macDot} ${styles.dotGreen}`} />
+                    </div>
+                    <span className={styles.codeLang}>shell — Antigravity Placement (v1.20.3)</span>
+                  </div>
+                  <div className={styles.codeBody}>
+                    <span className={styles.cComment}>
+                      {"# グローバルインストール（全プロジェクトで使えるようにする）"}
+                    </span>
+                    {"\n"}
+                    <span className={styles.cCmd}>cp -r</span>
+                    {" my-skill/ "}
+                    <span className={styles.cVal}>{"~/.gemini/antigravity/skills/"}</span>
+                    {"\n\n"}
+                    <span className={styles.cComment}>
+                      {"# ワークスペースインストール（このプロジェクトのみ）"}
+                    </span>
+                    {"\n"}
+                    <span className={styles.cCmd}>cp -r</span>
+                    {" my-skill/ "}
+                    <span className={styles.cVal}>{".agent/skills/"}</span>
+                    {"\n\n"}
+                    <span className={styles.cNew}>
+                      {"# 🆕 v1.20.3〜 AGENTS.md でクロスツール共有"}
+                    </span>
+                    {"\n"}
+                    <span className={styles.cComment}>
+                      {"# プロジェクトルートに AGENTS.md を置くだけで"}
+                    </span>
+                    {"\n"}
+                    <span className={styles.cComment}>
+                      {"# Antigravity / Claude Code / Codex など複数ツールで共有可能"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Step 03 */}
+            <div className={styles.step}>
+              <div className={styles.stepNum}>03</div>
+              <div className={styles.stepBody}>
+                <div className={styles.stepTitle}>skills CLI — 統合管理ツール（最も便利）</div>
+                <p className={styles.stepDesc}>
+                  Gemini CLI と Antigravity 両方に同時にスキルを追加できる。コミュニティの 1,500+
+                  スキルを一括インストール可能。
+                </p>
+                <div className={styles.codeWrap} style={{ marginTop: "16px" }}>
+                  <div className={styles.codeHeader}>
+                    <div className={styles.macDots}>
+                      <div className={`${styles.macDot} ${styles.dotRed}`} />
+                      <div className={`${styles.macDot} ${styles.dotYellow}`} />
+                      <div className={`${styles.macDot} ${styles.dotGreen}`} />
+                    </div>
+                    <span className={styles.codeLang}>shell — skills CLI (npx)</span>
+                  </div>
+                  <div className={styles.codeBody}>
+                    <span className={styles.cComment}># Firebase スキルを両ツールに同時追加</span>
+                    {"\n"}
+                    <span className={styles.cCmd}>npx skills add</span>{" "}
+                    <span className={styles.cVal}>firebase/agent-skills</span>{" "}
+                    <span className={styles.cKey}>-a</span>
+                    {" gemini-cli "}
+                    <span className={styles.cKey}>-a</span>
+                    {" antigravity\n\n"}
+                    <span className={styles.cComment}># スキルを検索</span>
+                    {"\n"}
+                    <span className={styles.cCmd}>npx skills find</span>{" "}
+                    <span className={styles.cVal}>flutter</span>
+                    {"\n\n"}
+                    <span className={styles.cComment}># インストール済みスキル一覧</span>
+                    {"\n"}
+                    <span className={styles.cCmd}>npx skills list</span>
+                    {"\n\n"}
+                    <span className={styles.cComment}>
+                      {
+                        "# コミュニティの awesome-skills バンドルを一括インストール（1,500+ スキル）"
+                      }
+                    </span>
+                    {"\n"}
+                    <span className={styles.cCmd}>npx antigravity-awesome-skills</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

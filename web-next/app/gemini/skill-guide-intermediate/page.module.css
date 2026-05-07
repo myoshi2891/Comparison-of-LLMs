@@ -751,3 +751,55 @@
   margin-top: 12px;
   line-height: 1.8;
 }
+
+/* ===== Steps layout (added for s07) ===== */
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.step {
+  display: flex;
+  gap: 20px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+
+.stepNum {
+  font-family: "Syne", sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--cyan);
+  opacity: 0.6;
+  min-width: 36px;
+  line-height: 1;
+  padding-top: 2px;
+}
+
+.stepBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.stepTitle {
+  font-family: "Syne", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.stepDesc {
+  font-size: 14px;
+  color: var(--text-subtle);
+  line-height: 1.7;
+  margin-bottom: 0;
+}
