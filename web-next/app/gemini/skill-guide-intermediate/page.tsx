@@ -64,6 +64,36 @@ style D1 fill:#3d1515,stroke:#ef4444,color:#fca5a5
 style D2 fill:#0d2e1a,stroke:#22c55e,color:#86efac
 style C2 fill:#0d2330,stroke:#3b82f6,color:#93c5fd`;
 
+const MERMAID_LIFECYCLE = `sequenceDiagram
+participant User as Developer
+participant IDE as CLI or IDE Interface
+participant Agent as Agent Core
+participant FS as Local File System
+Note over Agent,FS: Phase 1 — Discovery
+Agent->>FS: Scan .agents/skills/ hierarchy
+FS-->>Agent: Extract name + description from each SKILL.md
+Agent->>Agent: Inject metadata into system prompt static
+User->>IDE: "Review this code for performance issues"
+IDE->>Agent: Forward prompt
+Note over Agent: Phase 2 — Activation Logic
+Agent->>Agent: Semantically match prompt vs all skill descriptions
+Agent->>Agent: Identify best skill and call activate_skill tool
+Note over Agent,User: Phase 3 — Consent and Security
+Agent->>IDE: Request tool execution with skill details
+IDE->>User: Show approval prompt with skill name and directory path
+User->>IDE: Approve execution
+IDE-->>Agent: Approval signal received
+Note over Agent,FS: Phase 4 — Context Injection
+Agent->>FS: Obtain read permission for skill directory
+FS-->>Agent: Return SKILL.md body and referenced assets
+Agent->>Agent: Expand detailed instructions into context window
+Note over Agent,User: Phase 5 — Execution
+Agent->>Agent: Follow Step-by-Step from SKILL.md
+Agent->>FS: Execute scripts if needed via bash
+FS-->>Agent: Return execution results only not source code
+Agent->>IDE: Generate artifacts and analysis results
+IDE->>User: Report task completion`;
+
 const MERMAID_SCOPE = `graph TB
 subgraph GlobalScope["Global Scope — All Projects"]
 G1["~/.gemini/skills/ (Gemini CLI)"]
@@ -976,6 +1006,62 @@ description: |
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      {/* S9: LIFECYCLE */}
+      <section id="sec-lifecycle" className={styles.section}>
+        <div className={styles.container}>
+          <div className={styles.sectionHeader}>
+            <span className={`${styles.sectionBadge} ${styles.badgeCyan}`}>09 / LIFECYCLE</span>
+            <div>
+              <h2 className={styles.sectionTitle}>
+                実行<span className={styles.sectionTitleSpan}>ライフサイクル</span>の全貌
+              </h2>
+              <p className={styles.sectionDesc}>
+                Discovery → Activation → Consent → Injection → Execution の5フェーズを理解する。
+              </p>
+            </div>
+          </div>
+          <div className={styles.mermaidWrap}>
+            <div className={styles.mermaidLabel}>EXECUTION LIFECYCLE — SEQUENCE DIAGRAM</div>
+            <MermaidDiagram chart={MERMAID_LIFECYCLE} />
+          </div>
+          <div className={styles.cardGrid} style={{ marginTop: "24px" }}>
+            <div className={styles.card} style={{ borderTop: "2px solid var(--green)" }}>
+              <h3
+                style={{
+                  color: "var(--green)",
+                  fontSize: "14px",
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontWeight: 600,
+                  marginBottom: "12px",
+                }}
+              >
+                Phase 3: Consent
+              </h3>
+              <p>
+                スキルがアクティブになる際、UIにスキル名・目的・アクセスするディレクトリパスが明示され承認を求める。悪意あるスクリプトの意図しない実行を防ぐセキュリティモデル。
+              </p>
+            </div>
+            <div className={styles.card} style={{ borderTop: "2px solid var(--blue)" }}>
+              <h3
+                style={{
+                  color: "var(--blue)",
+                  fontSize: "14px",
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontWeight: 600,
+                  marginBottom: "12px",
+                }}
+              >
+                Phase 4: Context Injection
+              </h3>
+              <p>
+                スクリプトはソースコードではなく
+                <strong style={{ color: "var(--text)" }}>実行結果のみ</strong>
+                がコンテキストに入る。これによりレベル3（scripts/）は実質的にコンテキスト無制限で複雑な処理を実現できる。
+              </p>
             </div>
           </div>
         </div>
