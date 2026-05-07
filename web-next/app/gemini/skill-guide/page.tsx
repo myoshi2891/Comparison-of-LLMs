@@ -60,6 +60,45 @@ style A fill:#fef3c7,stroke:#f59e0b,color:#78350f
 style E fill:#d1fae5,stroke:#059669,color:#065f46
 style G fill:#ede9fe,stroke:#7c3aed,color:#3b0764`;
 
+const MERMAID_INSTALL_SCOPE = `graph TB
+Root["📂 スキルの配置場所"]
+Root --> Global["🌍 グローバルスコープ\\n全プロジェクトで有効"]
+Root --> Local["📁 ワークスペーススコープ\\nそのプロジェクトのみ"]
+Global --> G1["~/.gemini/skills/\\nGemini CLI グローバル"]
+Global --> G2["~/.gemini/antigravity/skills/\\nAntigravity グローバル"]
+Local --> L1[".gemini/skills/\\nGemini CLI ローカル"]
+Local --> L2[".agent/skills/\\nAntigravity ローカル"]
+G1 -.->|"向いているスキル例"| GU["汎用スキル\\nコードレビュー・コミット\\nフォーマット等"]
+L1 -.->|"向いているスキル例"| LU["プロジェクト専用\\nデプロイ手順・独自API仕様等"]
+style Global fill:#bfdbfe,stroke:#0284c7,color:#0c4a6e
+style Local fill:#d1fae5,stroke:#059669,color:#065f46
+style GU fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
+style LU fill:#ecfdf5,stroke:#059669,color:#065f46`;
+
+const MERMAID_INSTALL_LIFECYCLE = `sequenceDiagram
+actor User as 👤 ユーザー
+participant Agent as 🤖 AIエージェント
+participant Meta as 📋 メタデータ
+participant Body as 📄 SKILL.md本文
+participant Refs as 📁 参照ファイル
+Note over Agent,Meta: 1. ディスカバリーフェーズ
+Agent->>Meta: skills/配下を走査しnameとdescriptionを抽出
+Meta-->>Agent: メタデータをシステムプロンプトに注入
+User->>Agent: "このコードをレビューして"
+Note over Agent: 2. アクティベーション判断
+Agent->>Agent: プロンプトとdescriptionを照合
+Agent->>Agent: "frontend-reviewer"が最適と判断
+Note over Agent,Body: 3. 承認とコンテキスト展開
+Agent->>User: ツール実行の承認を求める
+User->>Agent: 承認 ✅
+Agent->>Body: SKILL.md本文を読み込む
+Body-->>Agent: 手順・制約をコンテキストに展開
+Note over Agent,Refs: 4. 動的リソース読み込み
+Agent->>Refs: references/css-guidelines.md を読む
+Refs-->>Agent: スタイルガイドラインを取得
+Note over Agent,User: 5. 実行と結果返却
+Agent->>User: SKILL.mdの手順に従いレビュー結果を提示`;
+
 export const metadata: Metadata = {
   title: "SKILL.md 完全ガイド — Gemini CLI & Antigravity",
   description:
@@ -732,9 +771,162 @@ export default function Page() {
         <StepsApp />
       </section>
 
-      {/* s07: install — TODO: faithful migration */}
+      {/* s07: install */}
       <section id="install" className={styles.sec}>
         <h2 className={styles.secTitle}>📦 スキルのインストール方法</h2>
+
+        <h3 className={styles.secH3}>スコープ選択（どこに置くか）</h3>
+        <div className={styles.mermaidWrap}>
+          <MermaidDiagram chart={MERMAID_INSTALL_SCOPE} />
+        </div>
+
+        {/* Gemini CLI commands */}
+        <h3 className={styles.secH3}>
+          Gemini CLI コマンド一覧
+          <span style={{ fontSize: "0.875rem", fontWeight: 400, color: "#64748b" }}>
+            {" "}
+            （v0.34.0 対応）
+          </span>
+        </h3>
+        <div className={styles.codeWrap}>
+          <div className={styles.codeBar}>
+            <span>shell</span>
+            <span className={styles.codeLang}>BASH</span>
+          </div>
+          <div className={styles.codeBody}>
+            <span className={styles.cc}>{"# ✅ Git リポジトリからインストール"}</span>
+            {"\n"}
+            <span className={styles.ck}>{"gemini"}</span>
+            {" skills install https://github.com/example/my-skills.git\n\n"}
+            <span className={styles.cc}>{"# ✅ サブディレクトリを指定してインストール"}</span>
+            {"\n"}
+            <span className={styles.ck}>{"gemini"}</span>
+            {" skills install https://github.com/example/skills.git --path skills/firebase\n\n"}
+            <span className={styles.cc}>{"# ✅ ローカルディレクトリからインストール"}</span>
+            {"\n"}
+            <span className={styles.ck}>{"gemini"}</span>
+            {" skills install ./my-local-skill/\n\n"}
+            <span className={styles.cc}>{"# ✅ インストール済みスキルを一覧表示"}</span>
+            {"\n"}
+            <span className={styles.ck}>{"gemini"}</span>
+            {" skills list\n\n"}
+            <span className={styles.cc}>{"# ✅ セッション中にスキルを無効化"}</span>
+            {"\n"}
+            {"/skills disable <スキル番号>\n\n"}
+            <span className={styles.cc}>{"# ✅ スキルを更新"}</span>
+            {"\n"}
+            <span className={styles.ck}>{"gemini"}</span>
+            {" skills update\n\n"}
+            <span className={styles.cc}>
+              {"# ──────────────────────────────────────────────────"}
+            </span>
+            {"\n"}
+            <span className={styles.cc}>{"# 🆕 v0.26.0〜 skill-creator（スキル自動生成）"}</span>
+            {"\n"}
+            <span className={styles.cc}>
+              {"# チャットで「新しいスキルを作成したい」と入力するだけで起動"}
+            </span>
+            {"\n\n"}
+            <span className={styles.cc}>{"# 🆕 v0.27.0〜 /rewind（セッション履歴を遡る）"}</span>
+            {"\n"}
+            {"/rewind\n\n"}
+            <span className={styles.cc}>
+              {"# 🆕 v0.29.0〜 /plan（Plan Mode: read-only で安全に変更計画を立案）"}
+            </span>
+            {"\n"}
+            {"/plan\n\n"}
+            <span className={styles.cc}>
+              {"# 🆕 v0.33.0〜 /plan にリサーチサブエージェント内蔵（さらに精密な計画）"}
+            </span>
+            {"\n"}
+            <span className={styles.cc}>
+              {"# /plan で起動後、自動的に深い調査・アノテーションが可能"}
+            </span>
+          </div>
+        </div>
+
+        {/* skills CLI */}
+        <h3 className={styles.secH3} style={{ marginTop: "1.5rem" }}>
+          skills CLI（統合管理ツール）
+        </h3>
+        <p
+          style={{
+            color: "#475569",
+            fontSize: "0.875rem",
+            lineHeight: 1.75,
+            marginBottom: "0.75rem",
+          }}
+        >
+          <code
+            style={{
+              background: "#f1f5f9",
+              padding: "0.125rem 0.5rem",
+              borderRadius: "0.25rem",
+              fontFamily: "var(--font-mono)",
+              fontSize: "0.875rem",
+            }}
+          >
+            npx skills
+          </code>{" "}
+          コマンドを使うと、Gemini CLI と Antigravity の両方に同時にスキルを追加できます。
+        </p>
+        <div className={styles.codeWrap}>
+          <div className={styles.codeBar}>
+            <span>shell</span>
+            <span className={styles.codeLang}>BASH</span>
+          </div>
+          <div className={styles.codeBody}>
+            <span className={styles.cc}>{"# Gemini CLI と Antigravity 両方に追加"}</span>
+            {"\n"}
+            <span className={styles.ck}>{"npx"}</span>
+            {" skills add firebase/agent-skills -a gemini-cli -a antigravity\n\n"}
+            <span className={styles.cc}>{"# スキルを検索"}</span>
+            {"\n"}
+            <span className={styles.ck}>{"npx"}</span>
+            {" skills find flutter\n\n"}
+            <span className={styles.cc}>{"# スキルを削除"}</span>
+            {"\n"}
+            <span className={styles.ck}>{"npx"}</span>
+            {" skills remove firebase/agent-skills\n\n"}
+            <span className={styles.cc}>{"# インストール済みスキルを一覧表示"}</span>
+            {"\n"}
+            <span className={styles.ck}>{"npx"}</span>
+            {" skills list"}
+          </div>
+        </div>
+
+        {/* Antigravity manual copy */}
+        <h3 className={styles.secH3} style={{ marginTop: "1.5rem" }}>
+          Antigravity への手動コピー
+        </h3>
+        <div className={styles.codeWrap}>
+          <div className={styles.codeBar}>
+            <span>shell</span>
+            <span className={styles.codeLang}>BASH</span>
+          </div>
+          <div className={styles.codeBody}>
+            <span className={styles.cc}>
+              {"# グローバルインストール（全プロジェクトで使えるようにする）"}
+            </span>
+            {"\n"}
+            <span className={styles.ck}>{"cp"}</span>
+            {" -r my-skill/ ~/.gemini/antigravity/skills/\n\n"}
+            <span className={styles.cc}>
+              {"# ワークスペースインストール（このプロジェクトだけ）"}
+            </span>
+            {"\n"}
+            <span className={styles.ck}>{"cp"}</span>
+            {" -r my-skill/ .agent/skills/"}
+          </div>
+        </div>
+
+        {/* Lifecycle diagram */}
+        <h3 className={styles.secH3} style={{ marginTop: "1.5rem" }}>
+          スキルが呼び出されるまでの流れ
+        </h3>
+        <div className={styles.mermaidWrap}>
+          <MermaidDiagram chart={MERMAID_INSTALL_LIFECYCLE} />
+        </div>
       </section>
 
       {/* s08: examples — TODO: faithful migration */}
