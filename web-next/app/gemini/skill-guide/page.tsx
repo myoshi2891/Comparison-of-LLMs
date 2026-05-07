@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
+import StepsApp from "./StepsApp";
 
 const MERMAID_OVERVIEW = `graph LR
 SKILL["📄 SKILL.md\\nオープンスタンダード"]
@@ -725,9 +726,10 @@ export default function Page() {
         </div>
       </section>
 
-      {/* s06: steps — TODO: faithful migration */}
+      {/* s06: steps */}
       <section id="steps" className={styles.sec}>
         <h2 className={styles.secTitle}>🚀 ステップバイステップ — 初めてのスキル作成</h2>
+        <StepsApp />
       </section>
 
       {/* s07: install — TODO: faithful migration */}
