@@ -20,7 +20,7 @@ export default function MermaidDiagram({ chart }: Props) {
       if (!active || !ref.current) return;
       m.default.initialize({
         startOnLoad: false,
-        theme: "dark",
+        theme: "default",
         flowchart: { useMaxWidth: true, htmlLabels: true },
         sequence: { useMaxWidth: true },
         mindmap: { useMaxWidth: true },
@@ -34,5 +34,5 @@ export default function MermaidDiagram({ chart }: Props) {
     };
   }, [chart]);
 
-  return <div className="mermaid" ref={ref} />;
+  return <div className="mermaid" ref={ref} style={{ width: "100%", minHeight: "4rem" }} />;
 }
