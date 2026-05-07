@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import styles from "./page.module.css";
 
 const PATTERNS = [
@@ -22,11 +22,12 @@ type PatternId = (typeof PATTERNS)[number]["id"];
  */
 export default function PatternsApp() {
   const [active, setActive] = useState<PatternId>("p1");
+  const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
 
   return (
     <div className={styles.tabs}>
       <div role="tablist" className={styles.tabList}>
-        {PATTERNS.map((p) => (
+        {PATTERNS.map((p, index) => (
           <button
             key={p.id}
             id={`tab-${p.id}`}
@@ -37,6 +38,19 @@ export default function PatternsApp() {
             tabIndex={active === p.id ? 0 : -1}
             className={`${styles.tabBtn}${active === p.id ? ` ${styles.tabBtnActive}` : ""}`}
             onClick={() => setActive(p.id)}
+            ref={(el) => {
+              tabsRef.current[index] = el;
+            }}
+            onKeyDown={(e) => {
+              let next = index;
+              if (e.key === "ArrowRight") next = (index + 1) % PATTERNS.length;
+              else if (e.key === "ArrowLeft")
+                next = (index - 1 + PATTERNS.length) % PATTERNS.length;
+              else return;
+              e.preventDefault();
+              setActive(PATTERNS[next].id);
+              tabsRef.current[next]?.focus();
+            }}
           >
             {p.label}
           </button>
