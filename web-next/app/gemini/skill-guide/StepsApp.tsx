@@ -48,12 +48,11 @@ function Code1() {
 }
 
 /**
- * Render a syntax-styled YAML front matter example for SKILL.md.
+ * Renders a syntax-styled YAML front matter example for SKILL.md.
  *
- * The snippet illustrates the required `name` field and a multi-line `description`
- * using the `|` block scalar to show example trigger phrases and guidance.
+ * The snippet shows the required `name` field and a multi-line `description` using the `|` block scalar to demonstrate trigger phrases and guidance.
  *
- * @returns A JSX element containing a styled YAML snippet illustrating `name` and a multi-line `description`
+ * @returns A JSX element containing a styled YAML snippet with `name` and a multi-line `description`
  */
 function Code2() {
   return (

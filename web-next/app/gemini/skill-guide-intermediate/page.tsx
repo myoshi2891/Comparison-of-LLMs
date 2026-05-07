@@ -147,6 +147,12 @@ style D fill:#3d1515,stroke:#ef4444,color:#fca5a5
 style A fill:#1a1a10,stroke:#f97316,color:#fdba74
 style C fill:#1a1020,stroke:#a855f7,color:#c4b5fd`;
 
+/**
+ * Renders the intermediate-plus "SKILL.md" full-page guide describing architecture, syntax,
+ * patterns, installation, scope, lifecycle, MCP integration, best practices, and changelog.
+ *
+ * @returns The React element for the complete guide page layout.
+ */
 export default function SkillGuideIntermediatePage() {
   return (
     <div className={styles.page}>

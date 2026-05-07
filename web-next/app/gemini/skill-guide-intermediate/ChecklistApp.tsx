@@ -102,6 +102,13 @@ const ITEMS: CheckItem[] = [
   },
 ];
 
+/**
+ * Renders an interactive checklist and manages which items are selected.
+ *
+ * Each checklist entry is displayed as a toggleable button; selection state is kept internally.
+ *
+ * @returns A React element representing the checklist UI
+ */
 export default function ChecklistApp() {
   const [checked, setChecked] = useState<Set<string>>(new Set());
 

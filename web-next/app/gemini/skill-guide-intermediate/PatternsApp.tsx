@@ -11,6 +11,15 @@ const PATTERNS = [
 
 type PatternId = (typeof PATTERNS)[number]["id"];
 
+/**
+ * Renders a tabbed UI demonstrating four predefined skill-guide patterns (p1–p4).
+ *
+ * Each tab is keyboard- and ARIA-friendly and selects one of four panels that describe
+ * different project patterns (Basic, Reference, Tool Use, All-in-One). The component
+ * manages internal selection state, defaulting to pattern "p1".
+ *
+ * @returns A React element containing the tablist and four accessible tab panels for patterns `p1`–`p4`.
+ */
 export default function PatternsApp() {
   const [active, setActive] = useState<PatternId>("p1");
 
