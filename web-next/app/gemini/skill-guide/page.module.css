@@ -268,8 +268,42 @@
   background: linear-gradient(135deg, #d1fae5, #bfdbfe);
 }
 
+.thTeal {
+  color: #134e4a;
+}
+
+.thSky {
+  color: #0c4a6e;
+}
+
+.thViolet {
+  color: #2e1065;
+}
+
 .tdLeft {
   text-align: left;
+}
+
+.trEven {
+  background: #f8fafc;
+}
+
+.trEven:hover {
+  background: #ffffff;
+}
+
+.tr:hover {
+  background: #f8fafc;
+}
+
+.textSlate {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.textSlateLight {
+  font-size: 0.75rem;
+  color: #94a3b8;
 }
 
 .badge {
