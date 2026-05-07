@@ -362,7 +362,7 @@ export default function ExamplesApp() {
             type="button"
             role="tab"
             aria-selected={active === p.id}
-            aria-controls={`panel-${p.id}`}
+            aria-controls="examples-panel"
             tabIndex={active === p.id ? 0 : -1}
             className={`${styles.patternTab}${active === p.id ? ` ${styles.patternTabActive}` : ""}`}
             onClick={() => setActive(p.id)}
@@ -374,7 +374,7 @@ export default function ExamplesApp() {
 
       {/* Tabpanel — wraps all content controlled by active tab */}
       {/* biome-ignore lint/a11y/noNoninteractiveTabindex: tabpanel should be focusable for keyboard users to reach its content */}
-      <div id={`panel-${active}`} role="tabpanel" aria-labelledby={`tab-${active}`} tabIndex={0}>
+      <div id="examples-panel" role="tabpanel" aria-labelledby={`tab-${active}`} tabIndex={0}>
         {/* Detail card */}
         <div className={styles.patternCard}>
           <div style={{ fontSize: "1.5rem", marginBottom: "0.25rem" }}>{current.emoji}</div>
