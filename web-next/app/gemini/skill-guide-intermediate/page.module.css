@@ -529,3 +529,91 @@
   color: var(--orange);
   border: 1px solid rgba(249, 115, 22, 0.2);
 }
+
+/* ===== Code Block (added for s04) ===== */
+.codeWrap {
+  background: #0d1117;
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin: 16px 0;
+  font-family: "JetBrains Mono", monospace;
+}
+
+.codeHeader {
+  background: #161b22;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.macDots {
+  display: flex;
+  gap: 6px;
+}
+
+.macDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.dotRed {
+  background: #ff5f57;
+}
+
+.dotYellow {
+  background: #ffbd2e;
+}
+
+.dotGreen {
+  background: #28c840;
+}
+
+.codeLang {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: auto;
+  font-weight: 500;
+}
+
+.codeBody {
+  padding: 20px;
+  overflow-x: auto;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: #e2e8f0;
+  white-space: pre;
+  font-family: "JetBrains Mono", monospace;
+}
+
+.cComment {
+  color: #6b7280;
+}
+
+.cKey {
+  color: #93c5fd;
+}
+
+.cVal {
+  color: #86efac;
+}
+
+.cOp {
+  color: #f9a8d4;
+}
+
+.cCmd {
+  color: #67e8f9;
+}
+
+.cHead {
+  color: var(--orange);
+}
+
+.cNew {
+  color: #fb923c;
+  font-weight: 600;
+}

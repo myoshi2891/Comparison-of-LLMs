@@ -7,6 +7,18 @@ export const metadata = {
     "Google Gemini CLI・Antigravity IDE における SKILL.md の設計思想、アーキテクチャ、実装パターン、運用まで。エージェント駆動開発を次のレベルに引き上げるすべての知識を網羅する。",
 };
 
+const MERMAID_STRUCTURE = `graph TD
+ROOT["my-skill/"]
+ROOT --> SKILL_MD["SKILL.md — REQUIRED<br />Brain of the skill<br />YAML frontmatter + Markdown body"]
+ROOT --> SCRIPTS["scripts/ — OPTIONAL<br />Python / Bash / Node scripts<br />Executed deterministically"]
+ROOT --> REFS["references/ — OPTIONAL<br />API docs, guidelines, specs<br />Read on demand only"]
+ROOT --> ASSETS["assets/ — OPTIONAL<br />Templates, images<br />Static files"]
+style SKILL_MD fill:#0d2330,stroke:#00d4aa,color:#00d4aa
+style ROOT fill:#1c2230,stroke:#2d3748,color:#e2e8f0
+style SCRIPTS fill:#1a1a10,stroke:#f97316,color:#fdba74
+style REFS fill:#0d1e2a,stroke:#3b82f6,color:#93c5fd
+style ASSETS fill:#1a1030,stroke:#a855f7,color:#c4b5fd`;
+
 const MERMAID_PROGRESSIVE = `graph LR
 L1["Level 1 — Always Loaded<br />name + description only<br />~100 tokens per skill<br />Stays in context always"]
 L2["Level 2 — On Demand<br />SKILL.md full body<br />Max 500 lines recommended<br />Loaded only when activated"]
@@ -493,6 +505,78 @@ export default function SkillGuideIntermediatePage() {
             にPython/Bashスクリプトを同梱し SKILL.md から呼び出すことで、
             <span style={{ color: "var(--orange)" }}>検証処理を決定論的</span>
             にし、出力の一貫性と精度を飛躍的に高めることができる。
+          </div>
+        </div>
+      </section>
+      {/* S4: STRUCTURE */}
+      <section id="sec-structure" className={styles.section}>
+        <div className={styles.container}>
+          <div className={styles.sectionHeader}>
+            <span className={`${styles.sectionBadge} ${styles.badgePurple}`}>04 / ANATOMY</span>
+            <div>
+              <h2 className={styles.sectionTitle}>
+                ディレクトリ
+                <span className={styles.sectionTitleSpan}>構造</span>の解剖
+              </h2>
+              <p className={styles.sectionDesc}>
+                一つのAgent
+                Skillは単一ファイルではなく、自己完結型のディレクトリとして構成される。各要素の役割と設計意図を理解する。
+              </p>
+            </div>
+          </div>
+          <div className={styles.mermaidWrap}>
+            <div className={styles.mermaidLabel}>SKILL DIRECTORY STRUCTURE</div>
+            <MermaidDiagram chart={MERMAID_STRUCTURE} />
+          </div>
+          <div className={styles.codeWrap}>
+            <div className={styles.codeHeader}>
+              <div className={styles.macDots}>
+                <div className={`${styles.macDot} ${styles.dotRed}`} />
+                <div className={`${styles.macDot} ${styles.dotYellow}`} />
+                <div className={`${styles.macDot} ${styles.dotGreen}`} />
+              </div>
+              <span className={styles.codeLang}>shell — Directory Layout</span>
+            </div>
+            <div className={styles.codeBody}>
+              <span className={styles.cComment}># 典型的なスキルのディレクトリ構成</span>
+              {"\n"}
+              <span className={styles.cVal}>my-skill/</span>
+              {"\n"}
+              {"├── "}
+              <span className={styles.cKey}>SKILL.md</span>
+              {"     "}
+              <span className={styles.cComment}># 【必須】エージェントへの指示・メタデータ</span>
+              {"\n"}
+              {"├── "}
+              <span className={styles.cOp}>scripts/</span>
+              {"     "}
+              <span className={styles.cComment}># 【任意】決定論的な検証・自動化スクリプト</span>
+              {"\n"}
+              {"│   ├── "}
+              <span className={styles.cCmd}>run.py</span>
+              {"\n"}
+              {"│   └── "}
+              <span className={styles.cCmd}>validate.sh</span>
+              {"\n"}
+              {"├── "}
+              <span className={styles.cOp}>references/</span>
+              {"  "}
+              <span className={styles.cComment}># 【任意】オンデマンド参照ドキュメント</span>
+              {"\n"}
+              {"│   ├── "}
+              <span className={styles.cCmd}>api-spec.md</span>
+              {"\n"}
+              {"│   └── "}
+              <span className={styles.cCmd}>best-practices.md</span>
+              {"\n"}
+              {"└── "}
+              <span className={styles.cOp}>assets/</span>
+              {"      "}
+              <span className={styles.cComment}># 【任意】出力テンプレート・静的ファイル</span>
+              {"\n"}
+              {"    └── "}
+              <span className={styles.cCmd}>template.tsx</span>
+            </div>
           </div>
         </div>
       </section>
