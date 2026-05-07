@@ -1024,6 +1024,167 @@
   line-height: 1.75;
 }
 
+/* ===== structure section ===== */
+.twoColGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+  .twoColGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.fileTreeHead {
+  font-weight: 700;
+  color: #0f766e;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.fileTreePre {
+  margin: 0;
+  background: transparent;
+  font-size: 0.875rem;
+  line-height: 2;
+}
+
+.legendList {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.legendDot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.anatStack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.anatConnect {
+  text-align: center;
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+.anatCard {
+  border-radius: 0.75rem;
+  padding: 1rem;
+  border: 2px solid;
+}
+
+.anatCardAmber {
+  background: #fffbeb;
+  border-color: #fcd34d;
+}
+
+.anatCardSky {
+  background: #f0f9ff;
+  border-color: #7dd3fc;
+}
+
+.anatCardEmerald {
+  background: #f0fdf4;
+  border-color: #6ee7b7;
+}
+
+.anatTitle {
+  font-weight: 700;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.anatBody {
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.codeInlineAmber {
+  border-radius: 0.25rem;
+  padding: 0 0.25rem;
+  background: #fef3c7;
+}
+
+.codeInlineEmerald {
+  border-radius: 0.25rem;
+  padding: 0 0.25rem;
+  background: #d1fae5;
+}
+
+.descWarnBox {
+  margin-top: 1rem;
+  border-radius: 0.75rem;
+  background: #fef2f2;
+  border: 2px solid #fca5a5;
+  padding: 1rem;
+}
+
+.descWarnTitle {
+  font-weight: 700;
+  color: #b91c1c;
+  margin-bottom: 0.5rem;
+}
+
+.descExGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+}
+
+@media (min-width: 768px) {
+  .descExGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.descExBad {
+  border-radius: 0.5rem;
+  background: #fee2e2;
+  padding: 0.75rem;
+}
+
+.descExGood {
+  border-radius: 0.5rem;
+  background: #d1fae5;
+  padding: 0.75rem;
+}
+
+.descExTitle {
+  font-weight: 700;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.descExCode {
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  display: block;
+}
+
+.descExNote {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
 /* ===== footer ===== */
 .footer {
   text-align: center;

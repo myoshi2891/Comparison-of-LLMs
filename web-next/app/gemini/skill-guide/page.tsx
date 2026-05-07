@@ -384,9 +384,211 @@ export default function Page() {
         </div>
       </section>
 
-      {/* s04: structure — TODO: faithful migration */}
+      {/* s04: structure */}
       <section id="structure" className={styles.sec}>
         <h2 className={styles.secTitle}>📁 ディレクトリ構造と SKILL.md の解剖</h2>
+
+        {/* 2-col: file tree + anatomy */}
+        <div className={styles.twoColGrid}>
+          {/* Left: file tree */}
+          <div>
+            <h3 className={styles.fileTreeHead}>ディレクトリ構成</h3>
+            <div className={styles.fileTree}>
+              <pre className={styles.fileTreePre}>
+                <span className={styles.ftDir}>📁 my-skill/</span>
+                {"\n"}
+                {"├── "}
+                <span className={styles.ftReq}>📄 SKILL.md</span>
+                {"        "}
+                <span className={styles.ftComment}>← 必須・スキルの脳</span>
+                {"\n"}
+                {"├── "}
+                <span className={styles.ftOpt}>📁 scripts/</span>
+                {"        "}
+                <span className={styles.ftComment}>← 任意</span>
+                {"\n"}
+                {"│   ├── "}
+                <span className={styles.ftOpt}>run.py</span>
+                {"\n"}
+                {"│   └── "}
+                <span className={styles.ftOpt}>util.sh</span>
+                {"\n"}
+                {"├── "}
+                <span className={styles.ftOpt}>📁 references/</span>
+                {"     "}
+                <span className={styles.ftComment}>← 任意</span>
+                {"\n"}
+                {"│   └── "}
+                <span className={styles.ftOpt}>api-docs.md</span>
+                {"\n"}
+                {"└── "}
+                <span className={styles.ftOpt}>📁 assets/</span>
+                {"         "}
+                <span className={styles.ftComment}>← 任意</span>
+                {"\n"}
+                {"    └── "}
+                <span className={styles.ftOpt}>template.tsx</span>
+              </pre>
+            </div>
+            <div className={styles.legendList}>
+              <div className={styles.legendItem}>
+                <span className={styles.legendDot} style={{ background: "#10b981" }} />
+                <span style={{ fontWeight: 700, color: "#047857" }}>SKILL.md</span>
+                <span style={{ color: "#64748b" }}>— 必須。YAMLメタデータ＋指示本文</span>
+              </div>
+              <div className={styles.legendItem}>
+                <span className={styles.legendDot} style={{ background: "#38bdf8" }} />
+                <span style={{ fontWeight: 700, color: "#0369a1" }}>scripts/</span>
+                <span style={{ color: "#64748b" }}>— 自動実行スクリプト（Python/Bash）</span>
+              </div>
+              <div className={styles.legendItem}>
+                <span className={styles.legendDot} style={{ background: "#a78bfa" }} />
+                <span style={{ fontWeight: 700, color: "#6d28d9" }}>references/</span>
+                <span style={{ color: "#64748b" }}>— 参照ドキュメント（必要時のみ読込）</span>
+              </div>
+              <div className={styles.legendItem}>
+                <span className={styles.legendDot} style={{ background: "#94a3b8" }} />
+                <span style={{ fontWeight: 700, color: "#334155" }}>assets/</span>
+                <span style={{ color: "#64748b" }}>— テンプレート・静的ファイル</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: SKILL.md anatomy */}
+          <div>
+            <h3 className={styles.fileTreeHead}>SKILL.md の構成</h3>
+            <div className={styles.anatStack}>
+              <div className={`${styles.anatCard} ${styles.anatCardAmber}`}>
+                <div className={styles.anatTitle} style={{ color: "#92400e" }}>
+                  🔑 YAMLフロントマター（必須）
+                </div>
+                <div className={styles.anatBody} style={{ color: "#b45309" }}>
+                  <code className={styles.codeInlineAmber}>---</code>
+                  で囲まれたYAML形式のメタデータ。
+                  <br />
+                  <strong>name</strong>（識別子）と
+                  <strong>description</strong>（トリガー条件）が最重要
+                </div>
+              </div>
+              <div className={styles.anatConnect}>↕</div>
+              <div className={`${styles.anatCard} ${styles.anatCardSky}`}>
+                <div className={styles.anatTitle} style={{ color: "#075985" }}>
+                  📝 マークダウン本文（必須）
+                </div>
+                <div className={styles.anatBody} style={{ color: "#0369a1" }}>
+                  エージェントへの具体的な指示。以下のセクションで構成：
+                  <br />
+                  Overview → Before Starting → Step-by-Step → Examples → Rules
+                </div>
+              </div>
+              <div className={styles.anatConnect}>↕</div>
+              <div className={`${styles.anatCard} ${styles.anatCardEmerald}`}>
+                <div className={styles.anatTitle} style={{ color: "#14532d" }}>
+                  🔗 参照ファイルリンク（任意）
+                </div>
+                <div className={styles.anatBody} style={{ color: "#15803d" }}>
+                  本文中で
+                  <code className={styles.codeInlineEmerald}>references/api-docs.md</code>
+                  のように外部ファイルを参照。必要時だけ読込
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* YAML front matter detail */}
+        <h3 className={styles.secH3}>YAMLフロントマター 詳細解説</h3>
+        <div className={styles.codeWrap}>
+          <div className={styles.codeBar}>
+            <span>SKILL.md</span>
+            <span className={styles.codeLang}>YAML</span>
+          </div>
+          <div className={styles.codeBody}>
+            <span className={styles.cs}>---</span>
+            {"\n"}
+            <span className={styles.cc}>
+              {"# ✅ 必須: スキルの一意な識別子（ケバブケース・英語小文字）"}
+            </span>
+            {"\n"}
+            <span className={styles.cm}>name</span>
+            {": "}
+            <span className={styles.cv}>git-commit-formatter</span>
+            {"\n\n"}
+            <span className={styles.cc}>
+              {"# ✅ 必須: エージェントへのトリガー条件（最重要！）"}
+            </span>
+            {"\n"}
+            <span className={styles.cc}>
+              {"#    「いつ」「どんな言葉が出たら」このスキルを使うかを明記する"}
+            </span>
+            {"\n"}
+            <span className={styles.cm}>description</span>
+            {": "}
+            <span className={styles.cs}>|</span>
+            {"\n"}
+            {"  "}
+            <span className={styles.cv}>
+              Gitコミットメッセージを Conventional Commits 仕様に整形する。
+            </span>
+            {"\n"}
+            {"  "}
+            <span className={styles.cv}>
+              {"「コミット」「commit」「コミットメッセージ」などが出たら必ず使用。"}
+            </span>
+            {"\n"}
+            {"  "}
+            <span className={styles.cv}>コード変更の記録・バージョン管理作業で呼び出すこと。</span>
+            {"\n\n"}
+            <span className={styles.cc}>{"# 任意: 依存関係（一部ツールでサポート）"}</span>
+            {"\n"}
+            <span className={styles.cm}>compatibility</span>
+            {":\n"}
+            {"  - "}
+            <span className={styles.cv}>git</span>
+            {"\n"}
+            {"  - "}
+            <span className={styles.cv}>{"node >= 18"}</span>
+            {"\n\n"}
+            <span className={styles.cc}>
+              {"# 任意: 手動呼び出し専用にする（危険な操作に有効）"}
+            </span>
+            {"\n"}
+            <span className={styles.cc}>{"# disable-model-invocation: true"}</span>
+            {"\n"}
+            <span className={styles.cs}>---</span>
+          </div>
+        </div>
+
+        {/* description warning */}
+        <div className={styles.descWarnBox}>
+          <div className={styles.descWarnTitle}>⚠️ description はエージェントの「発動スイッチ」</div>
+          <div className={styles.descExGrid}>
+            <div className={styles.descExBad}>
+              <div className={styles.descExTitle} style={{ color: "#b91c1c" }}>
+                ❌ 悪い例（曖昧）
+              </div>
+              <code className={styles.descExCode} style={{ color: "#7f1d1d" }}>
+                description: コードをレビューするスキル。
+              </code>
+              <div className={styles.descExNote} style={{ color: "#dc2626" }}>
+                → AIがいつ使うか判断できない
+              </div>
+            </div>
+            <div className={styles.descExGood}>
+              <div className={styles.descExTitle} style={{ color: "#14532d" }}>
+                ✅ 良い例（具体的）
+              </div>
+              <code className={styles.descExCode} style={{ color: "#14532d" }}>
+                {"description: |\n"}
+                {"コードレビューを実行する。\n"}
+                {'"review","レビュー","PR確認"が出たら必ず使う。'}
+              </code>
+              <div className={styles.descExNote} style={{ color: "#059669" }}>
+                → トリガーが明確で確実に呼ばれる
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* s05: howto — TODO: faithful migration */}
