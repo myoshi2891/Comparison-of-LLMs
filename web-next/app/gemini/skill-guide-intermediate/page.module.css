@@ -961,3 +961,47 @@
   padding: 1px 5px;
   border-radius: 3px;
 }
+
+/* ===== Timeline (added for s12) ===== */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.tlItem {
+  display: flex;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.tlItem:last-child {
+  border-bottom: none;
+}
+
+.tlVersion {
+  flex-shrink: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--cyan);
+  background: rgba(0, 212, 170, 0.1);
+  border: 1px solid rgba(0, 212, 170, 0.2);
+  border-radius: 4px;
+  padding: 2px 8px;
+  height: fit-content;
+  white-space: nowrap;
+}
+
+.tlVersionOrange {
+  color: var(--orange);
+  background: rgba(249, 115, 22, 0.1);
+  border-color: rgba(249, 115, 22, 0.2);
+}
+
+.tlText {
+  font-size: 14px;
+  color: var(--text-subtle);
+  line-height: 1.7;
+}

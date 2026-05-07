@@ -1315,6 +1315,193 @@ description: |
           <ChecklistApp />
         </div>
       </section>
+      {/* S12: WHAT'S NEW */}
+      <section
+        id="sec-whatsnew"
+        className={styles.section}
+        style={{
+          background: "linear-gradient(180deg, rgba(249, 115, 22, 0.04) 0%, transparent 100%)",
+        }}
+      >
+        <div className={styles.container}>
+          <div className={styles.sectionHeader}>
+            <span className={`${styles.sectionBadge} ${styles.badgeOrange}`}>12 / CHANGELOG</span>
+            <div>
+              <h2 className={styles.sectionTitle}>
+                <span style={{ color: "var(--orange)" }}>最新アップデート</span>（2026年3月21日）
+              </h2>
+              <p className={styles.sectionDesc}>
+                Gemini CLI v0.26.0〜v0.34.0 および Antigravity v1.20.3 の主要変更点。SKILL.md
+                の設計・運用に影響する機能を中心に整理する。
+              </p>
+            </div>
+          </div>
+          <div className={styles.cardGrid} style={{ marginBottom: "32px" }}>
+            <div className={styles.card} style={{ borderTop: "3px solid var(--cyan)" }}>
+              <h3
+                style={{ marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}
+              >
+                <span style={{ color: "var(--cyan)" }}>Gemini CLI</span>
+                <code style={{ fontSize: "12px" }}>v0.26.0 → v0.34.0</code>
+              </h3>
+              <div className={styles.timeline}>
+                <div className={styles.tlItem}>
+                  <div className={styles.tlVersion}>v0.26.0</div>
+                  <div className={styles.tlText}>
+                    <strong>skill-creator</strong> メタスキル標準搭載 +
+                    <strong>ジェネラリストエージェント</strong>
+                    追加。「新しいスキルを作りたい」と入力するだけで対話的にSKILL.mdを生成・改善
+                  </div>
+                </div>
+                <div className={styles.tlItem}>
+                  <div className={styles.tlVersion}>v0.27.0</div>
+                  <div className={styles.tlText}>
+                    <strong>/rewind</strong>
+                    コマンド追加。セッション履歴を遡り、誤操作をロールバック可能に
+                  </div>
+                </div>
+                <div className={styles.tlItem}>
+                  <div className={styles.tlVersion}>v0.29.0</div>
+                  <div className={styles.tlText}>
+                    <strong>/plan（Plan Mode）</strong>追加。read-only
+                    環境でコードベースを安全に分析・変更計画を立案。デフォルトモデルを
+                    <code>gemini-3-flash-preview</code> に変更
+                  </div>
+                </div>
+                <div className={styles.tlItem}>
+                  <div className={styles.tlVersion}>v0.30.0</div>
+                  <div className={styles.tlText}>
+                    <strong>Gemini CLI SDK</strong>（<code>@google/gemini-cli-sdk</code>
+                    ）公開。プログラムからスキルを生成・管理可能に
+                  </div>
+                </div>
+                <div className={styles.tlItem}>
+                  <div className={styles.tlVersion}>v0.31.0</div>
+                  <div className={styles.tlText}>
+                    <strong>gemini-3.1-pro-preview</strong> サポート追加（AI Ultra / 有料 API
+                    限定）。ARC-AGI-2スコア 77.1%
+                  </div>
+                </div>
+                <div className={styles.tlItem}>
+                  <div className={styles.tlVersion}>v0.33.0</div>
+                  <div className={styles.tlText}>
+                    <strong>/plan にリサーチサブエージェント</strong>
+                    ・アノテーション機能を統合。より深い計画立案が可能に
+                  </div>
+                </div>
+                <div className={styles.tlItem}>
+                  <div className={styles.tlVersion}>v0.34.0</div>
+                  <div className={styles.tlText}>
+                    安定性向上・スキルロード高速化・パフォーマンス改善（2026-03-18リリース）
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className={styles.card} style={{ borderTop: "3px solid var(--orange)" }}>
+              <h3
+                style={{ marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}
+              >
+                <span style={{ color: "var(--orange)" }}>Antigravity</span>
+                <code style={{ fontSize: "12px" }}>v1.20.3 (2026-03-05)</code>
+              </h3>
+              <div className={styles.timeline}>
+                <div className={styles.tlItem}>
+                  <div className={`${styles.tlVersion} ${styles.tlVersionOrange}`}>v1.20.3</div>
+                  <div className={styles.tlText}>
+                    <strong>AGENTS.md サポート</strong>正式追加。プロジェクトルートに置くだけで
+                    Claude Code / Codex / Cursor 等と共通ルールを共有できる
+                  </div>
+                </div>
+                <div className={styles.tlItem}>
+                  <div className={`${styles.tlVersion} ${styles.tlVersionOrange}`}>v1.20.3</div>
+                  <div className={styles.tlText}>
+                    トークン計算バグ修正・<strong>Auto-continue のデフォルト有効化</strong>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.divider} style={{ margin: "20px 0 16px" }} />
+              <h4 style={{ fontSize: "14px", marginBottom: "12px", color: "var(--text-subtle)" }}>
+                サポートモデル（2026年3月）
+              </h4>
+              <div className={styles.tableWrap} style={{ margin: "0" }}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>モデル</th>
+                      <th>ステータス</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <code>gemini-3-flash-preview</code>
+                      </td>
+                      <td>
+                        <span className={`${styles.tag} ${styles.tagG}`}>デフォルト推奨</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>gemini-3.1-pro-preview</code>
+                      </td>
+                      <td>
+                        <span className={`${styles.tag} ${styles.tagG}`}>新世代最高精度</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>gemini-2.5-flash</code>
+                      </td>
+                      <td>
+                        <span className={`${styles.tag} ${styles.tagG}`}>安定版</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>gemini-2.0-flash</code>
+                      </td>
+                      <td>
+                        <span className={`${styles.tag} ${styles.tagR}`}>2026-06-01 廃止予定</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>claude-sonnet-4-6</code>
+                      </td>
+                      <td>
+                        <span className={`${styles.tag} ${styles.tagO}`}>Anthropic 対応</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>claude-opus-4-6</code>
+                      </td>
+                      <td>
+                        <span className={`${styles.tag} ${styles.tagO}`}>Anthropic 最高精度</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>gpt-oss-120b</code>
+                      </td>
+                      <td>
+                        <span className={`${styles.tag} ${styles.tagO}`}>OpenAI 対応</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div className={styles.callout}>
+            <strong>SKILL.md への影響まとめ:</strong>
+            <code>/plan</code> を使えばスキルが本番コードを誤変更するリスクを事前に排除できる。
+            <code>skill-creator</code>
+            でSKILL.mdの品質チェックを自動化。<code>AGENTS.md</code>
+            でチームの規約を一元化すると、ツールをまたいだ一貫性が保てる。
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
