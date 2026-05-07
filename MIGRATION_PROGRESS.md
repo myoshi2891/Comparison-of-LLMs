@@ -9,7 +9,7 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- **最新 HEAD**: `afd2805`（**feat(web-next): fix section order in /gemini/skill-guide-intermediate and update tests**）
+- **最新 HEAD**: `e0c31e0`（**feat(web-next): add keyboard navigation to PatternsApp tabs in /gemini/skill-guide-intermediate**）
 - **未コミット作業**: なし（working tree クリーン）
 - **次の作業**: **D-6 — `/gemini/antigravity-guide` の faithful 移植開始**（`legacy/gemini/antigravity-guide.html` → `web-next/app/gemini/antigravity-guide/page.tsx`）
 - **テスト数**: `bun run test` **502 passed / 502 total（全 Green ✅）**  — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
