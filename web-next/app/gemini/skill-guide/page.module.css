@@ -1192,3 +1192,15 @@
   font-size: 0.875rem;
   padding: 2rem 0;
 }
+.footerTitle {
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  color: #0f766e;
+}
+.footerSub {
+  margin-bottom: 0.25rem;
+}
+.footerMeta {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}

@@ -1683,7 +1683,16 @@ export default function Page() {
 
       {/* s11: footer */}
       <footer className={styles.footer}>
-        <p>© 2026 SKILL.md 完全ガイド — Gemini CLI &amp; Antigravity 対応版</p>
+        <div className={styles.footerTitle}>
+          SKILL.md 完全ガイド — Gemini CLI v0.34.0 &amp; Antigravity v1.20.3 対応版
+        </div>
+        <div className={styles.footerSub}>
+          Based on official documentation from Google Gemini, Antigravity, and Agent Skills Open
+          Standard
+        </div>
+        <div className={styles.footerMeta} data-last-updated="footer">
+          最終更新: 2026年3月21日
+        </div>
       </footer>
     </div>
   );
