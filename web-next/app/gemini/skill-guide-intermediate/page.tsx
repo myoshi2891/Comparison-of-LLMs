@@ -7,6 +7,25 @@ export const metadata = {
     "Google Gemini CLI・Antigravity IDE における SKILL.md の設計思想、アーキテクチャ、実装パターン、運用まで。エージェント駆動開発を次のレベルに引き上げるすべての知識を網羅する。",
 };
 
+const MERMAID_ECOSYSTEM = `graph TB
+subgraph GeminiModel["Google Gemini Model Layer (2026-03)"]
+GM["gemini-3.1-pro-preview / gemini-3-flash-preview (default)<br />gemini-2.5-flash / gemini-2.5-pro"]
+end
+subgraph GCLI["Gemini CLI v0.34.0 — Terminal Native"]
+GC[Terminal Agent]
+GCC["skill-creator / /plan / /rewind / SDK"]
+end
+subgraph AG["Antigravity v1.20.3 — Agent-First IDE"]
+AGC[IDE Agent]
+AGM["Agent Manager + AGENTS.md support"]
+end
+GM --> GC
+GM --> AGC
+SKILL["SKILL.md — Shared Open Standard"] --> GC
+SKILL --> AGC
+style SKILL fill:#0d2330,stroke:#00d4aa,color:#00d4aa
+style GM fill:#1a1030,stroke:#a855f7,color:#c4b5fd`;
+
 const MERMAID_WHY = `graph LR
 subgraph Without["Without SKILL.md"]
 A1[User] -->|Prompt| B1[AI Agent]
@@ -171,6 +190,178 @@ export default function SkillGuideIntermediatePage() {
             <span className={styles.inlineEm}>注意機構の分散</span>
             という本質的な問題は変わらないからだ。SKILL.md
             は「何をいつ与えるか」を制御するアーキテクチャである。
+          </div>
+        </div>
+      </section>
+      {/* S2: TOOLS */}
+      <section id="sec-tools" className={styles.section}>
+        <div className={styles.container}>
+          <div className={styles.sectionHeader}>
+            <span className={`${styles.sectionBadge} ${styles.badgeOrange}`}>02 / ECOSYSTEM</span>
+            <div>
+              <h2 className={styles.sectionTitle}>
+                3ツールの
+                <span className={styles.sectionTitleSpan}>アーキテクチャ</span>
+                比較
+              </h2>
+              <p className={styles.sectionDesc}>
+                Gemini CLI と Antigravity IDE
+                はどう違い、どう共通するのか。2026年3月時点の最新バージョン情報と新機能を含む完全比較。
+              </p>
+            </div>
+          </div>
+          <div className={styles.mermaidWrap}>
+            <div className={styles.mermaidLabel}>ECOSYSTEM OVERVIEW — 2026年3月</div>
+            <MermaidDiagram chart={MERMAID_ECOSYSTEM} />
+          </div>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>比較項目</th>
+                  <th>Gemini CLI</th>
+                  <th>Antigravity IDE</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong style={{ color: "var(--text)" }}>バージョン</strong>
+                  </td>
+                  <td>
+                    <code className={styles.inlineCode}>v0.34.0</code> (2026-03-18)
+                  </td>
+                  <td>
+                    <code className={styles.inlineCode}>v1.20.3</code> (2026-03-05)
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong style={{ color: "var(--text)" }}>形態</strong>
+                  </td>
+                  <td>ターミナルアプリ</td>
+                  <td>IDEエディタ（VSCode fork）</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong style={{ color: "var(--text)" }}>グローバルスキルパス</strong>
+                  </td>
+                  <td>
+                    <code className={styles.inlineCode}>~/.gemini/skills/</code>
+                  </td>
+                  <td>
+                    <code className={styles.inlineCode}>~/.gemini/antigravity/skills/</code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong style={{ color: "var(--text)" }}>ワークスペーススキルパス</strong>
+                  </td>
+                  <td>
+                    <code className={styles.inlineCode}>.gemini/skills/</code>
+                  </td>
+                  <td>
+                    <code className={styles.inlineCode}>.agent/skills/</code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong style={{ color: "var(--text)" }}>デフォルトモデル</strong>
+                  </td>
+                  <td>
+                    <code className={styles.inlineCode}>gemini-3-flash-preview</code> (v0.29.0〜)
+                  </td>
+                  <td>
+                    <code className={styles.inlineCode}>gemini-3-flash-preview</code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong style={{ color: "var(--text)" }}>最高精度モデル</strong>
+                  </td>
+                  <td>
+                    <code className={styles.inlineCode}>gemini-3.1-pro-preview</code> (v0.31.0〜)
+                  </td>
+                  <td>
+                    <code className={styles.inlineCode}>gemini-3.1-pro-preview</code>
+                  </td>
+                </tr>
+                <tr className={styles.rowNew}>
+                  <td>
+                    <strong style={{ color: "var(--text)" }}>Plan Mode</strong>
+                    <span className={styles.newBadge}>NEW</span>
+                  </td>
+                  <td>
+                    <code className={styles.inlineCode}>/plan</code> コマンド (v0.29.0〜)
+                    <br />
+                    <small style={{ color: "var(--text-muted)" }}>
+                      v0.33.0〜リサーチサブエージェント内蔵
+                    </small>
+                  </td>
+                  <td>✅ あり</td>
+                </tr>
+                <tr className={styles.rowNew}>
+                  <td>
+                    <strong style={{ color: "var(--text)" }}>skill-creator</strong>
+                    <span className={styles.newBadge}>NEW</span>
+                  </td>
+                  <td>標準搭載 (v0.26.0〜)</td>
+                  <td>✅ あり</td>
+                </tr>
+                <tr className={styles.rowNew}>
+                  <td>
+                    <strong style={{ color: "var(--text)" }}>/rewind コマンド</strong>
+                    <span className={styles.newBadge}>NEW</span>
+                  </td>
+                  <td>(v0.27.0〜)</td>
+                  <td>—</td>
+                </tr>
+                <tr className={styles.rowNew}>
+                  <td>
+                    <strong style={{ color: "var(--text)" }}>AGENTS.md 対応</strong>
+                    <span className={styles.newBadge}>NEW</span>
+                  </td>
+                  <td>✅ あり</td>
+                  <td>✅ (v1.20.3〜)</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong style={{ color: "var(--text)" }}>対応モデル（他社）</strong>
+                  </td>
+                  <td>—</td>
+                  <td>
+                    <code className={styles.inlineCode}>claude-sonnet-4-6</code> /{" "}
+                    <code className={styles.inlineCode}>claude-opus-4-6</code> /{" "}
+                    <code className={styles.inlineCode}>gpt-oss-120b</code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong style={{ color: "var(--text)" }}>学習機能</strong>
+                  </td>
+                  <td>セッション内のみ</td>
+                  <td>ナレッジベースへの永続的な蓄積と再利用</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong style={{ color: "var(--text)" }}>SKILL.md サポート</strong>
+                  </td>
+                  <td>
+                    <span className={`${styles.tag} ${styles.tagG}`}>✓ FULL</span>
+                  </td>
+                  <td>
+                    <span className={`${styles.tag} ${styles.tagG}`}>✓ FULL</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className={styles.callout}>
+            <strong>ポータビリティの保証:</strong> SKILL.md はプレーンなMarkdown + YAML
+            フォーマット。Gemini CLI、Antigravity、Claude Code、GitHub
+            Copilot、Cursor等で共通利用できるオープンスタンダード。
+            <span className={styles.inlineEm}>v1.20.3〜はAGENTS.mdによるクロスツール共有</span>
+            も正式サポートされた。
           </div>
         </div>
       </section>
