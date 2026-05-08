@@ -9,11 +9,11 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- **最新 HEAD**: `e0c31e0`（**feat(web-next): add keyboard navigation to PatternsApp tabs in /gemini/skill-guide-intermediate**）
-- **未コミット作業**: なし（working tree クリーン）
-- **次の作業**: **D-6 — `/gemini/antigravity-guide` の faithful 移植開始**（`legacy/gemini/antigravity-guide.html` → `web-next/app/gemini/antigravity-guide/page.tsx`）
-- **テスト数**: `bun run test` **502 passed / 502 total（全 Green ✅）**  — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
-- **ビルド**: `bun run build` ✅・`bun run typecheck` ✅・`uv run pytest` 5/5 passed（afd2805 時点）
+- 最新 HEAD: 34e77db（feat(web-next): improve accessibility of PatternsApp tabs and sync progress）
+- 未コミット作業: なし（working tree クリーン）
+- 次の作業: **D-6 — `/gemini/antigravity-guide` の faithful 移植開始**（`legacy/gemini/antigravity-guide.html` → `web-next/app/gemini/antigravity-guide/page.tsx`）
+- テスト数: `bun run test` **502 passed / 502 total（全 Green ✅）**  — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
+- ビルド: `bun run build` ✅・`bun run typecheck` ✅・`uv run pytest` 5/5 passed（34e77db 時点）
 - **lint 既知違反**: 7 件
 
 ## AI 作業ルール（Phase A–F 共通、**必読**）

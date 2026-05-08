@@ -1,9 +1,7 @@
-import dynamic from "next/dynamic";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import ChecklistApp from "./ChecklistApp";
 import PatternsApp from "./PatternsApp";
 import styles from "./page.module.css";
-
-const MermaidDiagram = dynamic(() => import("@/components/docs/MermaidDiagram"), { ssr: false });
 
 export const metadata = {
   title: "SKILL.md 完全解剖ガイド | Gemini CLI v0.34.0 & Antigravity v1.20.3 中級者以上向け",
