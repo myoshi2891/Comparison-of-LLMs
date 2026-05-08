@@ -1778,9 +1778,124 @@ export default function Page() {
         <section id="s11">
           <div className={styles.slabel}>Section 11</div>
           <h2 className={styles.stitle}>
-            <span className={styles.num}>11.</span>SDD仕様書群 (constitution / spec / plan / tasks)
+            <span className={styles.num}>11.</span>SDD仕様書群 — spec / plan / tasks（Spec
+            Kit生成物）
           </h2>
-          {/* TODO: faithful content */}
+
+          <div className={styles.fc}>
+            <div className={styles.fcHdr}>
+              <div
+                className={styles.fci}
+                style={{
+                  background: "rgba(0, 120, 212, 0.12)",
+                  border: "1px solid rgba(0, 120, 212, 0.3)",
+                }}
+              >
+                📚
+              </div>
+              <div>
+                <div className={styles.fcName}>SDD仕様書群</div>
+                <div className={styles.fcPath}>
+                  {"features/{feature-name}/spec.md · plan.md · tasks.md"}
+                </div>
+              </div>
+            </div>
+            <div className={styles.fcBody}>
+              <div className={styles.cb}>
+                <div className={styles.cbHdr}>
+                  <div className={styles.dots}>
+                    <div className={styles.dot} style={{ background: "#f25c7a" }} />
+                    <div className={styles.dot} style={{ background: "#f0883e" }} />
+                    <div className={styles.dot} style={{ background: "#238636" }} />
+                  </div>
+                  <span>features/preorder/spec.md — /speckit.specifyが生成</span>
+                </div>
+                <pre>
+                  <span className={styles.cHd}>{"# Pre-Order Feature Spec"}</span>
+                  {"\n"}
+                  <span className={styles.cCm}>
+                    {"# Copilotが/speckit.specifyで生成。人間がレビューして確定。"}
+                  </span>
+                  {"\n\n"}
+                  <span className={styles.cHd}>{"## User Goals"}</span>
+                  {"\n"}
+                  {"- 在庫切れ商品を予約購入できる（CVR向上）"}
+                  {"\n"}
+                  {"- 予約状況をマイページで確認できる"}
+                  {"\n\n"}
+                  <span className={styles.cHd}>{"## Key Scenarios"}</span>
+                  {"\n"}
+                  {"1. ユーザーが在庫0商品の詳細ページを訪問し「予約する」を押す"}
+                  {"\n"}
+                  {"2. ログイン未完了の場合、認証後にカートへリダイレクト"}
+                  {"\n"}
+                  {"3. チェックアウト完了後、確認メールが届く"}
+                  {"\n\n"}
+                  <span className={styles.cHd}>{"## Acceptance Criteria"}</span>
+                  {"\n"}
+                  {"- [ ] 在庫0でも「予約する」ボタンが表示される"}
+                  {"\n"}
+                  {"- [ ] 同時100アクセスで在庫の二重予約が発生しない"}
+                  {"\n"}
+                  {"- [ ] 注文完了メールが60秒以内に届く"}
+                  {"\n\n"}
+                  <span className={styles.cHd}>{"## Out of Scope"}</span>
+                  {"\n"}
+                  {"- モバイルアプリ対応（今フェーズはWeb only）"}
+                </pre>
+              </div>
+
+              <div className={styles.cb}>
+                <div className={styles.cbHdr}>
+                  <div className={styles.dots}>
+                    <div className={styles.dot} style={{ background: "#f25c7a" }} />
+                    <div className={styles.dot} style={{ background: "#f0883e" }} />
+                    <div className={styles.dot} style={{ background: "#238636" }} />
+                  </div>
+                  <span>features/preorder/tasks.md — /speckit.tasksが生成</span>
+                </div>
+                <pre>
+                  <span className={styles.cHd}>{"# Pre-Order Tasks"}</span>
+                  {"\n"}
+                  <span className={styles.cCm}>
+                    {"# constitution.md・spec.md・plan.mdの整合性チェック済み"}
+                  </span>
+                  {"\n\n"}
+                  <span className={styles.cHd}>{"## Phase 1: DB・モデル"}</span>
+                  {"\n"}
+                  {
+                    "- [ ] Task 1.1: ordersテーブルにis_preorderカラム追加（db-migration SKILL使用）"
+                  }
+                  {"\n"}
+                  {"- [ ] Task 1.2: Inventory Serviceの在庫ロックロジック（Redis SETNX）"}
+                  {"\n\n"}
+                  <span className={styles.cHd}>{"## Phase 2: APIエンドポイント"}</span>
+                  {"\n"}
+                  {"- [ ] Task 2.1: POST /api/orders（プリオーダー対応）— "}
+                  <span className={styles.cCo}>{"依存: Task 1.2"}</span>
+                  {"\n"}
+                  {"- [ ] Task 2.2: GET  /api/orders/{id} ステータス確認"}
+                  {"\n"}
+                  {"- [ ] Task 2.3: Stripe Webhook受信処理"}
+                  {"\n\n"}
+                  <span className={styles.cHd}>{"## Phase 3: フロントエンド"}</span>
+                  {"\n"}
+                  {"- [ ] Task 3.1: 「予約する」ボタンコンポーネント — "}
+                  <span className={styles.cCo}>{"並列可"}</span>
+                  {"\n"}
+                  {"- [ ] Task 3.2: マイページ注文履歴表示 — "}
+                  <span className={styles.cCo}>{"並列可"}</span>
+                  {"\n\n"}
+                  <span className={styles.cHd}>{"## Phase 4: 検証"}</span>
+                  {"\n"}
+                  {"- [ ] Task 4.1: E2Eテスト（Playwright）— "}
+                  <span className={styles.cCo}>{"依存: Phase 2+3完了"}</span>
+                  {"\n"}
+                  {"- [ ] Task 4.2: 負荷テスト（k6, 1,000同時接続）"}
+                </pre>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* ── s12: SYSTEM-PROMPT ── */}
