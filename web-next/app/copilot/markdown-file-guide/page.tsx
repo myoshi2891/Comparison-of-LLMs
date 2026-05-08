@@ -1394,7 +1394,123 @@ export default function Page() {
             <span className={styles.num}>08.</span>
             <code>SKILL.md</code> — Progressive Disclosure ナレッジ
           </h2>
-          {/* TODO: faithful content */}
+
+          <p>
+            <code>{".github/skills/<name>/SKILL.md"}</code>はClaude Code・Antigravity・OpenAI
+            Codexと<strong>完全に同一のオープン規格</strong>
+            を採用しています（元はAnthropicが考案）。Copilot Coding Agent・VS Code Agent Mode・
+            <strong>Copilot CLI</strong>
+            （2025年12月18日〜、[15]）で動作し、エージェントが意図を検知したときのみオンデマンドでロードされます（[9]）。個人スキルは
+            <code>{"~/.copilot/skills/<name>/SKILL.md"}</code>
+            に配置するとプロジェクトをまたいで利用できます。
+          </p>
+
+          <div className={styles.fc}>
+            <div className={styles.fcHdr}>
+              <div
+                className={styles.fci}
+                style={{
+                  background: "rgba(35, 134, 54, 0.12)",
+                  border: "1px solid rgba(35, 134, 54, 0.3)",
+                }}
+              >
+                🎓
+              </div>
+              <div>
+                <div className={styles.fcName}>SKILL.md</div>
+                <div className={styles.fcPath}>{".github/skills/<skill-name>/SKILL.md"}</div>
+                <div className={styles.fcTags}>
+                  <span className={`${styles.fct} ${styles.fctG}`}>4ツール共通オープン規格</span>
+                  <span className={`${styles.fct} ${styles.fctM}`}>Coding Agent対応</span>
+                  <span className={`${styles.fct} ${styles.fctV}`}>Progressive Disclosure</span>
+                </div>
+              </div>
+            </div>
+            <div className={styles.fcBody}>
+              <div className={styles.cb}>
+                <div className={styles.cbHdr}>
+                  <div className={styles.dots}>
+                    <div className={styles.dot} style={{ background: "#f25c7a" }} />
+                    <div className={styles.dot} style={{ background: "#f0883e" }} />
+                    <div className={styles.dot} style={{ background: "#238636" }} />
+                  </div>
+                  <span>.github/skills/db-migration/SKILL.md — 完全テンプレート</span>
+                </div>
+                <pre>
+                  <span className={styles.cKy}>{"---"}</span>
+                  {"\n"}
+                  <span className={styles.cGh}>{"name"}</span>
+                  {": "}
+                  <span className={styles.cSt}>{"db-migration"}</span>
+                  {"\n"}
+                  <span className={styles.cGh}>{"description"}</span>
+                  {": "}
+                  <span className={styles.cSt}>{">"}</span>
+                  {"\n"}
+                  {"  "}
+                  <span className={styles.cSt}>
+                    {"Executes PostgreSQL schema migrations using the project's"}
+                  </span>
+                  {"\n"}
+                  {"  "}
+                  <span className={styles.cSt}>
+                    {"standard migration protocol. Use when the user asks to add"}
+                  </span>
+                  {"\n"}
+                  {"  "}
+                  <span className={styles.cSt}>
+                    {"tables, columns, indexes, or modify the DB schema."}
+                  </span>
+                  {"\n"}
+                  {"  "}
+                  <span className={styles.cSt}>
+                    {"Do NOT use for seed data or application-level transforms."}
+                  </span>
+                  {"\n"}
+                  <span className={styles.cCm}>
+                    {'# ↑ 意味的トリガー。"Use when / Do NOT use when" を明記'}
+                  </span>
+                  {"\n"}
+                  <span className={styles.cKy}>{"---"}</span>
+                  {"\n\n"}
+                  <span className={styles.cHd}>{"# Database Migration Skill"}</span>
+                  {"\n\n"}
+                  <span className={styles.cHd}>{"## Instructions"}</span>
+                  {"\n"}
+                  {"1. `migrations/` に `YYYYMMDD_HHMMSS_description.up.sql` を作成"}
+                  {"\n"}
+                  {"2. ロールバック用 `.down.sql` を必ず同時作成"}
+                  {"\n"}
+                  {"3. 整合性チェック: `python scripts/run_migration.py --check`"}
+                  {"\n"}
+                  {"4. 人間レビュー後に適用: `--apply`"}
+                  {"\n"}
+                  {"5. `features/.../tasks.md` の対象タスクをチェック済みに"}
+                  {"\n\n"}
+                  <span className={styles.cHd}>{"## Constraints"}</span>
+                  {"\n"}
+                  {"- 既存マイグレーションファイルを絶対に編集しない"}
+                  {"\n"}
+                  {"- `DROP TABLE` は人間確認なしに禁止"}
+                  {"\n"}
+                  {"- NULL制約後付けはデータ移行計画なしに行わない"}
+                </pre>
+              </div>
+
+              <div className={`${styles.ib} ${styles.ig}`}>
+                <span className={styles.ii}>💡</span>
+                <div>
+                  <strong>SKILL.mdはClaude Codeとパスを共有できる（コピー不要）</strong>
+                  <br />
+                  Copilotは<code>.claude/skills/</code>を<strong>自動ピックアップ</strong>
+                  するため、Claude
+                  Codeで作成したSKILL.mdをコピーなしにそのまま利用できます（[15]）。
+                  <code>.github/skills/</code>
+                  への配置も引き続き有効。4プラットフォーム間で完全に同一規格なので、ツール切り替え時の書き直しが不要です（[9]）。
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* ── s09: AGENTS-MD ── */}
