@@ -984,6 +984,24 @@
   margin-top: 16px;
 }
 
+.checklistGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.checklistHeading {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.85rem;
+  color: var(--accent-cyan);
+  margin-bottom: 12px;
+  letter-spacing: 0.08em;
+}
+
+.checklistHeading + .checklistGroup {
+  margin-bottom: 0;
+}
+
 .checkItem {
   display: flex;
   align-items: center;
@@ -994,6 +1012,7 @@
   border-radius: 6px;
   font-size: 0.88rem;
   color: var(--text2);
+  cursor: pointer;
 }
 
 .checkIcon {

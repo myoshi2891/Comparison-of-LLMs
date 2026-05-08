@@ -1450,10 +1450,86 @@ export default function GithubCopilotPage() {
             <span className={styles.secNum}>09</span>
             <div>
               <h2 className={styles.secTitle}>導入チェックリスト</h2>
-              <p className={styles.secDesc}>スムーズな導入のための完全チェックリスト</p>
+              <p className={styles.secDesc}>
+                Copilotを最大限活用するための確認項目。クリックでチェックできます
+              </p>
             </div>
           </div>
-          {/* s09 content — faithful migration pending */}
+
+          <h3 className={styles.checklistHeading}>{"// 初期セットアップ"}</h3>
+          <div className={styles.checklistGroup} id="checklist-setup">
+            <label className={styles.checkItem}>
+              <input type="checkbox" />
+              <span>GitHubアカウントを作成し、Copilotプランを有効化した</span>
+            </label>
+            <label className={styles.checkItem}>
+              <input type="checkbox" />
+              <span>VS Code（またはJetBrains等）にGitHub Copilot拡張機能をインストールした</span>
+            </label>
+            <label className={styles.checkItem}>
+              <input type="checkbox" />
+              <span>Copilot Chat拡張機能もインストールし、動作確認した</span>
+            </label>
+            <label className={styles.checkItem}>
+              <input type="checkbox" />
+              <span>プロジェクトに .github/copilot-instructions.md を作成した</span>
+            </label>
+            <label className={styles.checkItem}>
+              <input type="checkbox" />
+              <span>学生・教師の場合、GitHub Educationの無料プランを申請した</span>
+            </label>
+          </div>
+
+          <h3 className={styles.checklistHeading} style={{ margin: "24px 0 12px" }}>
+            {"// 日常的な活用習慣"}
+          </h3>
+          <div className={styles.checklistGroup}>
+            <label className={styles.checkItem}>
+              <input type="checkbox" />
+              <span>コードを書く前に意図を説明するコメントを先に書く習慣を身につけた</span>
+            </label>
+            <label className={styles.checkItem}>
+              <input type="checkbox" />
+              <span>Copilotの提案を採用する前に必ず理解・レビューしている</span>
+            </label>
+            <label className={styles.checkItem}>
+              <input type="checkbox" />
+              <span>/explain, /fix, /tests などのスラッシュコマンドを使いこなしている</span>
+            </label>
+            <label className={styles.checkItem}>
+              <input type="checkbox" />
+              <span>
+                複雑な実装ではプランモード（/plan または Plan
+                エージェント選択）を使って計画を立てている
+              </span>
+            </label>
+            <label className={styles.checkItem}>
+              <input type="checkbox" />
+              <span>月のプレミアムリクエスト使用量を定期的に確認している</span>
+            </label>
+          </div>
+
+          <h3 className={styles.checklistHeading} style={{ margin: "24px 0 12px" }}>
+            {"// セキュリティ・品質"}
+          </h3>
+          <div className={styles.checklistGroup}>
+            <label className={styles.checkItem}>
+              <input type="checkbox" />
+              <span>APIキー・パスワード等の機密情報をChatに貼り付けていない</span>
+            </label>
+            <label className={styles.checkItem}>
+              <input type="checkbox" />
+              <span>生成されたコードに対して既存のテスト・Lintを必ず実行している</span>
+            </label>
+            <label className={styles.checkItem}>
+              <input type="checkbox" />
+              <span>セキュリティ関連コード（認証・暗号化・DB操作）は手動レビューしている</span>
+            </label>
+            <label className={styles.checkItem}>
+              <input type="checkbox" />
+              <span>必要に応じて .copilotignore で機密ファイルを除外設定した</span>
+            </label>
+          </div>
         </section>
 
         {/* ─── sources ─── */}
