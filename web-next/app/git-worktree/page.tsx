@@ -1415,11 +1415,143 @@ P->>P: git push → PR 作成`}
             <div>
               <div className={styles.stepTitle}>メリット・デメリット — 導入判断の材料</div>
               <div className={styles.stepDesc}>
-                git worktree を採用する前に知っておくべき利点と制約。
+                4 プラットフォームのドキュメント並列更新における worktree
+                の優位性と注意すべき落とし穴。
               </div>
             </div>
           </div>
-          {/* faithful content — s04 移植時に実装 */}
+
+          <div className={styles.mdg}>
+            <div className={styles.mdc}>
+              <div className={`${styles.mdh} ${styles.mdhOk}`}>✅ メリット</div>
+              <div className={styles.mdb}>
+                <div className={styles.mdi}>
+                  <div className={styles.mdiIcon}>🚀</div>
+                  <div>
+                    <strong>真の並列開発（stash・切替ゼロ）</strong>
+                    <span>
+                      4 ターミナルで同時に別ブランチを操作。AI エージェントを 4
+                      つ同時起動できる。ブランチ切替コストが完全にゼロ。
+                    </span>
+                  </div>
+                </div>
+                <div className={styles.mdi}>
+                  <div className={styles.mdiIcon}>💾</div>
+                  <div>
+                    <strong>ディスク・メモリを大幅節約</strong>
+                    <span>
+                      .git オブジェクトを共有するため clone×4
+                      に比べてディスク使用量が大幅に少ない（差分のみ追加）。
+                    </span>
+                  </div>
+                </div>
+                <div className={styles.mdi}>
+                  <div className={styles.mdiIcon}>🔗</div>
+                  <div>
+                    <strong>共通変更が一元管理</strong>
+                    <span>
+                      shared/ の変更を dev で 1 回 commit → sync-all.sh で全 WT
+                      に反映。手動コピー完全不要。
+                    </span>
+                  </div>
+                </div>
+                <div className={styles.mdi}>
+                  <div className={styles.mdiIcon}>📜</div>
+                  <div>
+                    <strong>Git 履歴の一元化</strong>
+                    <span>
+                      全プラットフォームの変更履歴が 1 リポジトリに集約。git log / bisect / blame
+                      が横断的に使える。
+                    </span>
+                  </div>
+                </div>
+                <div className={styles.mdi}>
+                  <div className={styles.mdiIcon}>🤖</div>
+                  <div>
+                    <strong>AI エージェントとの最良の相性</strong>
+                    <span>
+                      各 WT に設定ファイルを配置するだけで、AI が同一の git
+                      履歴を参照しながら独立した作業を実行できる。
+                    </span>
+                  </div>
+                </div>
+                <div className={styles.mdi}>
+                  <div className={styles.mdiIcon}>🔀</div>
+                  <div>
+                    <strong>stash が全 WT 間で共有</strong>
+                    <span>
+                      全 WT が同じ .git を参照するため、WT をまたいで stash を参照・適用できる。
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className={styles.mdc}>
+              <div className={`${styles.mdh} ${styles.mdhErr}`}>❌ デメリット・注意点</div>
+              <div className={styles.mdb}>
+                <div className={styles.mdi}>
+                  <div className={styles.mdiIcon}>🔒</div>
+                  <div>
+                    <strong>同一ブランチの重複チェックアウト不可</strong>
+                    <span>
+                      同じブランチを 2 つの WT で同時チェックアウトできない。--force
+                      は破壊的なので絶対禁止。
+                    </span>
+                  </div>
+                </div>
+                <div className={styles.mdi}>
+                  <div className={styles.mdiIcon}>⚡</div>
+                  <div>
+                    <strong>hook が全 WT に影響する</strong>
+                    <span>
+                      .git/hooks は全 WT 共有。pre-commit が全 WT
+                      で実行される。個別設定には追加ロジックが必要。
+                    </span>
+                  </div>
+                </div>
+                <div className={styles.mdi}>
+                  <div className={styles.mdiIcon}>📁</div>
+                  <div>
+                    <strong>IDE が混乱しやすい</strong>
+                    <span>
+                      VS Code がメインルートを認識し、worktrees/ 配下を正しく扱えない場合がある。WT
+                      ごとに別ウィンドウで開くことを推奨。
+                    </span>
+                  </div>
+                </div>
+                <div className={styles.mdi}>
+                  <div className={styles.mdiIcon}>🔀</div>
+                  <div>
+                    <strong>merge コンフリクトのリスク</strong>
+                    <span>
+                      4 ブランチが並行して shared/ を変更すると dev merge
+                      時に複数コンフリクトが発生。保護ブランチ設定が必要。
+                    </span>
+                  </div>
+                </div>
+                <div className={styles.mdi}>
+                  <div className={styles.mdiIcon}>🧹</div>
+                  <div>
+                    <strong>WT 削除手順が特殊</strong>
+                    <span>
+                      rm -rf だけでは git の追跡が残る。git worktree remove または git worktree
+                      prune が必要。
+                    </span>
+                  </div>
+                </div>
+                <div className={styles.mdi}>
+                  <div className={styles.mdiIcon}>📊</div>
+                  <div>
+                    <strong>gc / fetch が重くなりうる</strong>
+                    <span>
+                      多数の WT 存在時に git gc や git fetch が遅くなる。定期的な git worktree prune
+                      が必要。
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* ══════════ STEP 05 ══════════ */}
