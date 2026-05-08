@@ -1231,7 +1231,217 @@ export default function GithubCopilotPage() {
               <p className={styles.secDesc}>タスクに最適なAIモデルの選び方</p>
             </div>
           </div>
-          {/* s08 content — faithful migration pending */}
+          <div className={styles.alertInfo} style={{ marginBottom: "24px" }}>
+            <span className={styles.alertIcon}>ℹ️</span>
+            <div className={styles.alertContent}>
+              <strong>プレミアムリクエストと通常リクエストの違い：</strong>
+              <br />
+              高度なモデル（GPT-4.1, Claude
+              Opus等）を使用するChat/エージェントモードは「プレミアムリクエスト」を消費します。
+              インラインコード補完は通常消費しません。モデルによって1リクエストあたりの消費量が異なります。
+            </div>
+          </div>
+
+          <table className={styles.modelTable}>
+            <thead>
+              <tr>
+                <th>モデル</th>
+                <th>特性</th>
+                <th>最適な用途</th>
+                <th>利用可能プラン</th>
+                <th>速度</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <span className={styles.modelName}>GPT-5.3-Codex</span>
+                  <br />
+                  <span className={`${styles.tag} ${styles.tagNew}`}>LTS標準</span>
+                </td>
+                <td>長期サポート（〜2027/2）。コーディング全般に優秀</td>
+                <td>日常的なコーディング補助・説明</td>
+                <td>
+                  <span className={`${styles.tag} ${styles.tagFree}`}>Free〜</span>
+                </td>
+                <td>
+                  <div className={styles.progressBarWrap}>
+                    <div className={styles.progressBarInner} style={{ width: "85%" }} />
+                  </div>
+                  速い
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span className={styles.modelName}>GPT-4o mini</span>
+                  <br />
+                  <span className={`${styles.tag} ${styles.tagFree}`}>軽量</span>
+                </td>
+                <td>軽量・高速。プレミアムリクエスト消費が少ない</td>
+                <td>シンプルな質問・繰り返し作業</td>
+                <td>
+                  <span className={`${styles.tag} ${styles.tagFree}`}>Free〜</span>
+                </td>
+                <td>
+                  <div className={styles.progressBarWrap}>
+                    <div className={styles.progressBarInner} style={{ width: "100%" }} />
+                  </div>
+                  最速
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span className={styles.modelName}>Claude Haiku 4.5</span>
+                  <br />
+                  <span className={`${styles.tag} ${styles.tagFree}`}>軽量</span>
+                </td>
+                <td>軽量・高速。Anthropic製の効率的モデル</td>
+                <td>シンプルな質問・繰り返し作業</td>
+                <td>
+                  <span className={`${styles.tag} ${styles.tagFree}`}>Free〜</span>
+                </td>
+                <td>
+                  <div className={styles.progressBarWrap}>
+                    <div className={styles.progressBarInner} style={{ width: "95%" }} />
+                  </div>
+                  最速
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span className={styles.modelName}>Claude Sonnet 4.6</span>
+                  <br />
+                  <span className={`${styles.tag} ${styles.tagPro}`}>中〜上級</span>
+                </td>
+                <td>コード品質・説明能力が高い。Anthropic製</td>
+                <td>コードレビュー・アーキテクチャ設計</td>
+                <td>
+                  <span className={`${styles.tag} ${styles.tagPro}`}>Pro〜</span>
+                </td>
+                <td>
+                  <div className={styles.progressBarWrap}>
+                    <div className={styles.progressBarInner} style={{ width: "75%" }} />
+                  </div>
+                  普通
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span className={styles.modelName}>Claude Opus 4.6</span>
+                  <br />
+                  <span className={`${styles.tag} ${styles.tagBeta}`}>最上級</span>
+                </td>
+                <td>最高品質の推論・複雑なロジック分析</td>
+                <td>難解なバグ解析・複雑な設計判断</td>
+                <td>
+                  <span className={`${styles.tag} ${styles.tagBeta}`}>Pro+のみ</span>
+                </td>
+                <td>
+                  <div className={styles.progressBarWrap}>
+                    <div className={styles.progressBarInner} style={{ width: "40%" }} />
+                  </div>
+                  遅め
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span className={styles.modelName}>Gemini 2.5 Pro</span>
+                  <br />
+                  <span className={`${styles.tag} ${styles.tagNew}`}>GA</span>
+                </td>
+                <td>最新Gemini。強力な推論・コーディング能力。Google製</td>
+                <td>複雑なタスク・数学・科学的処理</td>
+                <td>
+                  <span className={`${styles.tag} ${styles.tagPro}`}>Pro〜</span>
+                </td>
+                <td>
+                  <div className={styles.progressBarWrap}>
+                    <div className={styles.progressBarInner} style={{ width: "60%" }} />
+                  </div>
+                  普通
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span className={styles.modelName}>Gemini 3 Pro</span>
+                  <br />
+                  <span className={`${styles.tag} ${styles.tagBeta}`}>Preview</span>
+                </td>
+                <td>次世代Gemini（プレビュー版）。Google製</td>
+                <td>最先端の推論・コーディング</td>
+                <td>
+                  <span className={`${styles.tag} ${styles.tagBeta}`}>Pro+〜</span>
+                </td>
+                <td>
+                  <div className={styles.progressBarWrap}>
+                    <div className={styles.progressBarInner} style={{ width: "55%" }} />
+                  </div>
+                  普通〜遅
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span className={styles.modelName}>Grok Code Fast 1</span>
+                  <br />
+                  <span className={`${styles.tag} ${styles.tagNew}`}>高速</span>
+                </td>
+                <td>xAI製。高速コーディング特化。データ保持なし</td>
+                <td>迅速なコード生成・反復開発</td>
+                <td>
+                  <span className={`${styles.tag} ${styles.tagFree}`}>Free〜</span>
+                </td>
+                <td>
+                  <div className={styles.progressBarWrap}>
+                    <div className={styles.progressBarInner} style={{ width: "90%" }} />
+                  </div>
+                  高速
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span className={styles.modelName}>Raptor mini</span>
+                  <br />
+                  <span className={`${styles.tag} ${styles.tagBeta}`}>Preview</span>
+                </td>
+                <td>超軽量プレビューモデル。制限なし使用可</td>
+                <td>実験的用途・頻繁な問い合わせ</td>
+                <td>
+                  <span className={`${styles.tag} ${styles.tagFree}`}>Free〜</span>
+                </td>
+                <td>
+                  <div className={styles.progressBarWrap}>
+                    <div className={styles.progressBarInner} style={{ width: "100%" }} />
+                  </div>
+                  最速
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div className={styles.alertInfo} style={{ marginTop: "16px", fontSize: "0.875rem" }}>
+            <span className={styles.alertIcon}>📅</span>
+            <div className={styles.alertContent}>
+              <strong>最終更新:</strong> 2026年3月
+              <br />
+              <strong>参考:</strong>{" "}
+              <Ext href="https://docs.github.com/en/copilot/reference/ai-models/supported-models">
+                Supported AI models - GitHub Docs
+              </Ext>
+              ,{" "}
+              <Ext href="https://github.blog/changelog/2026-03-18-gpt-5-3-codex-long-term-support-in-github-copilot/">
+                GPT-5.3-Codex LTS - GitHub Changelog
+              </Ext>
+            </div>
+          </div>
+
+          <div className={styles.alertSuccess} style={{ marginTop: "20px" }}>
+            <span className={styles.alertIcon}>💡</span>
+            <div className={styles.alertContent}>
+              <strong>モデル選択の基本戦略：</strong>
+              日常のコーディングはGPT-4.1、複雑なアーキテクチャ設計はClaude Sonnet、
+              難解なバグや高度な推論が必要な場合のみOpus/o3を使用することで、プレミアムリクエストを効率的に使えます。
+            </div>
+          </div>
         </section>
 
         {/* ─── s09: checklist ─── */}

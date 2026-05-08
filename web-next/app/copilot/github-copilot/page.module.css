@@ -1001,6 +1001,57 @@
   flex-shrink: 0;
 }
 
+/* ─── Model Table ─── */
+.modelTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
+
+.modelTable th {
+  text-align: left;
+  padding: 10px 14px;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border2);
+}
+
+.modelTable td {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  color: var(--text2);
+  vertical-align: top;
+}
+
+.modelTable tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.modelName {
+  font-family: var(--font-mono), monospace;
+  color: var(--text1);
+  font-weight: 600;
+}
+
+.progressBarWrap {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 100px;
+  height: 5px;
+  overflow: hidden;
+  margin-top: 6px;
+  width: 120px;
+}
+
+.progressBarInner {
+  height: 100%;
+  border-radius: 100px;
+  background: linear-gradient(90deg, var(--accent), #3b82f6);
+}
+
 /* ─── Progress ─── */
 .progressWrap {
   margin: 16px 0;
