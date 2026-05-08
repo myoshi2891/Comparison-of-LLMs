@@ -695,7 +695,63 @@
   color: #ef4444;
 }
 
-/* ── Sources ─────────────────────────────────────────────── */
+/* ── Sources (link-card style) ───────────────────────────── */
+.srcList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.srcItemLink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: var(--cx-bg3);
+  border: 1px solid var(--cx-border);
+  border-radius: 10px;
+  text-decoration: none;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+
+.srcItemLink:hover {
+  border-color: rgba(0, 212, 255, 0.4);
+  background: rgba(0, 212, 255, 0.04);
+}
+
+.srcItemIcon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.srcItemInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.srcItemTitle {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 13px;
+  color: var(--cx-text);
+  font-weight: 600;
+}
+
+.srcItemUrl {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  color: var(--cx-text3);
+  margin-top: 2px;
+  overflow-wrap: anywhere;
+}
+
+.srcItemArrow {
+  font-size: 18px;
+  color: var(--cx-text3);
+}
+
+/* ── Sources (numbered, legacy) ──────────────────────────── */
 .sourcesList {
   display: flex;
   flex-direction: column;

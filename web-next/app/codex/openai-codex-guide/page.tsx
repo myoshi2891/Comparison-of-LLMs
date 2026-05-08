@@ -1225,36 +1225,259 @@ export default function Page() {
         </section>
 
         {/* SECTION 08: DODONT — TODO: faithful migration */}
+        {/* SECTION 08: DODONT */}
         <section id="dodont" className={styles.sec}>
           <div className={styles.secHeader}>
             <div className={styles.stepNum}>7</div>
             <div>
               <h2 className={styles.secTitle}>やること・やってはいけないこと</h2>
+              <p className={styles.secDesc}>公式ベストプラクティスまとめ</p>
             </div>
           </div>
-          <p style={{ color: "#94a3b8" }}>（実装予定）</p>
+
+          <div className={styles.cardGrid}>
+            <div className={styles.card} style={{ borderColor: "rgba(16,185,129,0.2)" }}>
+              <div
+                style={{
+                  fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
+                  fontSize: "13px",
+                  color: "#10b981",
+                  marginBottom: "16px",
+                }}
+              >
+                ✅ DO — やるべきこと
+              </div>
+              <ul className={styles.checklist}>
+                <li>
+                  <div className={styles.checkIcon}>✓</div>
+                  AGENTS.md で永続的なルールを管理する
+                </li>
+                <li>
+                  <div className={styles.checkIcon}>✓</div>
+                  タスクは1スレッド=1タスクに分ける（プロジェクト全体を1スレッドにしない）
+                </li>
+                <li>
+                  <div className={styles.checkIcon}>✓</div>
+                  テスト環境を整備してから Codex に渡す
+                </li>
+                <li>
+                  <div className={styles.checkIcon}>✓</div>
+                  Codex の作業と並行して自分の作業を進める
+                </li>
+                <li>
+                  <div className={styles.checkIcon}>✓</div>
+                  生成されたコードは必ず人間がレビューする
+                </li>
+                <li>
+                  <div className={styles.checkIcon}>✓</div>
+                  軽いタスクには mini モデルを使ってコスト節約
+                </li>
+                <li>
+                  <div className={styles.checkIcon}>✓</div>
+                  スクショ・デザインモックを画像入力として活用
+                </li>
+              </ul>
+            </div>
+
+            <div className={styles.card} style={{ borderColor: "rgba(239,68,68,0.2)" }}>
+              <div
+                style={{
+                  fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
+                  fontSize: "13px",
+                  color: "#ef4444",
+                  marginBottom: "16px",
+                }}
+              >
+                ❌ DON&apos;T — やってはいけないこと
+              </div>
+              <ul className={styles.checklist}>
+                <li>
+                  <div className={styles.checkIconError}>✗</div>
+                  プロンプトに毎回同じルールを書く（AGENTS.md に移す）
+                </li>
+                <li>
+                  <div className={styles.checkIconError}>✗</div>
+                  Codex の作業を1ステップずつ監視する（並列活用できない）
+                </li>
+                <li>
+                  <div className={styles.checkIconError}>✗</div>
+                  テスト環境がないまま複雑な実装タスクを渡す
+                </li>
+                <li>
+                  <div className={styles.checkIconError}>✗</div>
+                  レビューなしで本番環境にマージする
+                </li>
+                <li>
+                  <div className={styles.checkIconError}>✗</div>
+                  1スレッドにプロジェクト全体を扱わせる
+                </li>
+                <li>
+                  <div className={styles.checkIconError}>✗</div>
+                  --yolo フラグを本番コードに使う（サンドボックスを無効化）
+                </li>
+              </ul>
+            </div>
+          </div>
         </section>
 
-        {/* SECTION 09: SOURCES — TODO: faithful migration */}
+        {/* SECTION 09: SOURCES */}
         <section id="sources" className={styles.sec}>
           <div className={styles.secHeader}>
-            <div className={styles.stepNum}>8</div>
+            <div
+              className={styles.stepNum}
+              style={{ background: "linear-gradient(135deg, #64748b, #94a3b8)" }}
+            >
+              📚
+            </div>
             <div>
               <h2 className={styles.secTitle}>参考文献・ソース</h2>
+              <p className={styles.secDesc}>この記事の根拠となる公式情報源</p>
             </div>
           </div>
-          <div className={styles.sourcesList}>
-            <div className={styles.srcItem}>
-              <div className={styles.srcNum}>[1]</div>
-              <a
-                href="https://openai.com/codex"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.srcLink}
-              >
-                OpenAI Codex
-              </a>
-            </div>
+
+          <div className={styles.srcList}>
+            <a
+              href="https://developers.openai.com/codex"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.srcItemLink}
+            >
+              <div className={styles.srcItemIcon}>🌐</div>
+              <div className={styles.srcItemInfo}>
+                <div className={styles.srcItemTitle}>OpenAI Codex 公式ドキュメント</div>
+                <div className={styles.srcItemUrl}>https://developers.openai.com/codex</div>
+              </div>
+              <div className={styles.srcItemArrow}>↗</div>
+            </a>
+            <a
+              href="https://developers.openai.com/codex/learn/best-practices"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.srcItemLink}
+            >
+              <div className={styles.srcItemIcon}>📋</div>
+              <div className={styles.srcItemInfo}>
+                <div className={styles.srcItemTitle}>Codex ベストプラクティス（公式）</div>
+                <div className={styles.srcItemUrl}>
+                  https://developers.openai.com/codex/learn/best-practices
+                </div>
+              </div>
+              <div className={styles.srcItemArrow}>↗</div>
+            </a>
+            <a
+              href="https://developers.openai.com/codex/cli"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.srcItemLink}
+            >
+              <div className={styles.srcItemIcon}>💻</div>
+              <div className={styles.srcItemInfo}>
+                <div className={styles.srcItemTitle}>Codex CLI 公式ガイド</div>
+                <div className={styles.srcItemUrl}>https://developers.openai.com/codex/cli</div>
+              </div>
+              <div className={styles.srcItemArrow}>↗</div>
+            </a>
+            <a
+              href="https://developers.openai.com/codex/guides/agents-md"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.srcItemLink}
+            >
+              <div className={styles.srcItemIcon}>📝</div>
+              <div className={styles.srcItemInfo}>
+                <div className={styles.srcItemTitle}>AGENTS.md 活用ガイド（公式）</div>
+                <div className={styles.srcItemUrl}>
+                  https://developers.openai.com/codex/guides/agents-md
+                </div>
+              </div>
+              <div className={styles.srcItemArrow}>↗</div>
+            </a>
+            <a
+              href="https://developers.openai.com/codex/models"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.srcItemLink}
+            >
+              <div className={styles.srcItemIcon}>🧠</div>
+              <div className={styles.srcItemInfo}>
+                <div className={styles.srcItemTitle}>Codex モデル一覧（公式）</div>
+                <div className={styles.srcItemUrl}>https://developers.openai.com/codex/models</div>
+              </div>
+              <div className={styles.srcItemArrow}>↗</div>
+            </a>
+            <a
+              href="https://developers.openai.com/codex/changelog"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.srcItemLink}
+            >
+              <div className={styles.srcItemIcon}>📅</div>
+              <div className={styles.srcItemInfo}>
+                <div className={styles.srcItemTitle}>Codex 変更履歴（2026年3月更新）</div>
+                <div className={styles.srcItemUrl}>
+                  https://developers.openai.com/codex/changelog
+                </div>
+              </div>
+              <div className={styles.srcItemArrow}>↗</div>
+            </a>
+            <a
+              href="https://openai.com/index/introducing-codex/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.srcItemLink}
+            >
+              <div className={styles.srcItemIcon}>🚀</div>
+              <div className={styles.srcItemInfo}>
+                <div className={styles.srcItemTitle}>Codex 発表ブログ（OpenAI）</div>
+                <div className={styles.srcItemUrl}>https://openai.com/index/introducing-codex/</div>
+              </div>
+              <div className={styles.srcItemArrow}>↗</div>
+            </a>
+            <a
+              href="https://developers.openai.com/blog/openai-for-developers-2025/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.srcItemLink}
+            >
+              <div className={styles.srcItemIcon}>📈</div>
+              <div className={styles.srcItemInfo}>
+                <div className={styles.srcItemTitle}>OpenAI for Developers 2025年まとめ</div>
+                <div className={styles.srcItemUrl}>
+                  https://developers.openai.com/blog/openai-for-developers-2025/
+                </div>
+              </div>
+              <div className={styles.srcItemArrow}>↗</div>
+            </a>
+            <a
+              href="https://openai.com/index/unrolling-the-codex-agent-loop/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.srcItemLink}
+            >
+              <div className={styles.srcItemIcon}>🔄</div>
+              <div className={styles.srcItemInfo}>
+                <div className={styles.srcItemTitle}>Codex エージェントループ詳解（OpenAI）</div>
+                <div className={styles.srcItemUrl}>
+                  https://openai.com/index/unrolling-the-codex-agent-loop/
+                </div>
+              </div>
+              <div className={styles.srcItemArrow}>↗</div>
+            </a>
+            <a
+              href="https://help.openai.com/en/articles/9624314-model-release-notes"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.srcItemLink}
+            >
+              <div className={styles.srcItemIcon}>📰</div>
+              <div className={styles.srcItemInfo}>
+                <div className={styles.srcItemTitle}>OpenAI モデルリリースノート</div>
+                <div className={styles.srcItemUrl}>
+                  https://help.openai.com/en/articles/9624314-model-release-notes
+                </div>
+              </div>
+              <div className={styles.srcItemArrow}>↗</div>
+            </a>
           </div>
         </section>
       </main>
