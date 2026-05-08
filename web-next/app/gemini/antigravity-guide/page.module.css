@@ -701,6 +701,255 @@
   color: var(--g-red, #ea4335);
 }
 
+/* ── Level cards ────────────────────────────────────────── */
+.levelRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+@media (max-width: 640px) {
+  .levelRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.lv {
+  border-radius: 12px;
+  padding: 1.2rem;
+  border: 1px solid var(--border, #1e2d4a);
+  background: var(--bg2, #0c1120);
+  position: relative;
+  overflow: hidden;
+}
+
+.lv::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+
+.lv1::before {
+  background: var(--g-yellow, #fbbc04);
+}
+
+.lv2::before {
+  background: var(--g-blue, #4285f4);
+}
+
+.lv3::before {
+  background: var(--g-green, #34a853);
+}
+
+.lvNum {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  opacity: 0.6;
+}
+
+.lv1 .lvNum {
+  color: var(--g-yellow, #fbbc04);
+}
+
+.lv2 .lvNum {
+  color: var(--g-blue, #4285f4);
+}
+
+.lv3 .lvNum {
+  color: var(--g-green, #34a853);
+}
+
+.lv h4 {
+  font-family: var(--font-display, "Syne", sans-serif);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #ddeeff;
+  margin-bottom: 0.4rem;
+}
+
+.lv p {
+  font-size: 0.78rem;
+  color: var(--text2, #9aafcc);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Pattern cards ──────────────────────────────────────── */
+.patternGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.patternCard {
+  background: var(--bg3, #131b2e);
+  border: 1px solid var(--border, #1e2d4a);
+  border-radius: 12px;
+  padding: 1.1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.patternCard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+
+.pcB::before {
+  background: var(--g-blue, #4285f4);
+}
+
+.pcG::before {
+  background: var(--g-green, #34a853);
+}
+
+.pcY::before {
+  background: var(--g-yellow, #fbbc04);
+}
+
+.pcR::before {
+  background: var(--g-red, #ea4335);
+}
+
+.pcP::before {
+  background: var(--g-purple, #8b5cf6);
+}
+
+.pn {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 1.8rem;
+  opacity: 0.06;
+  position: absolute;
+  top: 2px;
+  right: 8px;
+  color: #fff;
+  font-weight: 700;
+}
+
+.patternCard h4 {
+  font-family: var(--font-display, "Syne", sans-serif);
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #ddeeff;
+  margin-bottom: 0.4rem;
+}
+
+.patternCard p {
+  font-size: 0.75rem;
+  color: var(--text2, #9aafcc);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.pcStruct {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.62rem;
+  color: var(--text3, #5a7090);
+  margin-top: 0.5rem;
+}
+
+/* ── Scope grid ─────────────────────────────────────────── */
+.scopeGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  margin: 1.5rem 0;
+}
+
+@media (max-width: 640px) {
+  .scopeGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.scopeCard {
+  background: var(--bg3, #131b2e);
+  border: 1px solid var(--border, #1e2d4a);
+  border-radius: 14px;
+  padding: 1.4rem;
+}
+
+.scGlobal {
+  border-top: 3px solid var(--g-blue, #4285f4);
+}
+
+.scLocal {
+  border-top: 3px solid var(--g-yellow, #fbbc04);
+}
+
+.scLabel {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.67rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.8rem;
+}
+
+.scG .scLabel {
+  color: var(--g-blue, #4285f4);
+}
+
+.scL .scLabel {
+  color: var(--g-yellow, #fbbc04);
+}
+
+.scopeCard h3 {
+  font-family: var(--font-display, "Syne", sans-serif);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 0.6rem;
+  color: #ddeeff;
+}
+
+.scopeCard ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.scopeCard li {
+  font-size: 0.82rem;
+  color: var(--text2, #9aafcc);
+  padding-left: 14px;
+  position: relative;
+  line-height: 1.5;
+}
+
+.scopeCard li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: var(--border2, #2a3d5e);
+  font-size: 0.75rem;
+}
+
+.pathBox {
+  background: #050810;
+  border: 1px solid var(--border2, #2a3d5e);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.75rem;
+  color: var(--g-blue, #4285f4);
+  margin-top: 0.8rem;
+  line-height: 1.9;
+}
+
 /* ── Flow diagram ─────────────────────────────────────── */
 .flow {
   display: flex;

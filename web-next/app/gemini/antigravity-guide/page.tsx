@@ -705,13 +705,310 @@ export default function Page() {
           </div>
         </section>
 
-        {/* SECTION 04: SKILLS — TODO: faithful migration */}
+        {/* SECTION 04: SKILLS */}
         <section id="skills" className={styles.sec}>
           <div className={styles.secLabel}>Section 04</div>
           <h2 className={styles.secTitle}>
             <span className={styles.num}>04.</span>SKILL.md — 進歩的開示ナレッジ（最重要）
           </h2>
-          <p>（実装予定）</p>
+
+          <p>
+            Antigravityの Skillsは
+            <strong>「Progressive Disclosure（進歩的開示）」</strong>
+            という設計思想に基づきます。 全てのナレッジをコンテキストに常時注入するのではなく、
+            <strong>エージェントがユーザーの意図を検知したときのみ対応するスキルをロード</strong>
+            する仕組みです。 これによりコンテキスト消費を最小化し、応答速度と精度を向上させます。
+          </p>
+
+          <h3>3段階の段階的読み込み</h3>
+          <div className={styles.levelRow}>
+            <div className={`${styles.lv} ${styles.lv1}`}>
+              <div className={styles.lvNum}>LEVEL 1 — 常時常駐</div>
+              <h4>メタデータのみ</h4>
+              <p>
+                セッション開始時に全スキルの<code>name</code>と<code>description</code>
+                のみがシステムプロンプトに注入される。スキル100個あっても約10,000トークン程度の軽量な状態。
+              </p>
+            </div>
+            <div className={`${styles.lv} ${styles.lv2}`}>
+              <div className={styles.lvNum}>LEVEL 2 — オンデマンド</div>
+              <h4>SKILL.md本文の展開</h4>
+              <p>
+                ユーザーのプロンプトとdescriptionを意味論的に照合し、
+                <code>activate_skill</code>
+                ツールで本文（5,000トークン以内推奨）をコンテキストに展開。
+              </p>
+            </div>
+            <div className={`${styles.lv} ${styles.lv3}`}>
+              <div className={styles.lvNum}>LEVEL 3 — 動的参照</div>
+              <h4>リソースの動的実行</h4>
+              <p>
+                references/内のドキュメントはBashで動的読み取り。scripts/内のスクリプトはソースコードではなく
+                <strong>実行結果のみ</strong>
+                がコンテキストに入る。実質無制限。
+              </p>
+            </div>
+          </div>
+
+          <h3>SKILL.md の完全テンプレート</h3>
+
+          <div className={`${styles.info} ${styles.iCrit}`}>
+            <span className={styles.infoIcon}>🔑</span>
+            <div>
+              <strong>descriptionが命：</strong>
+              SKILL.mdのdescriptionフィールドはエージェントが「いつこのスキルを使うか」を判断するための
+              <strong>意味的トリガー</strong>
+              です。 「何を・いつ・なぜ」を具体的に書くほど精度が向上します。
+              曖昧なdescriptionはスキルが全く呼ばれないか、誤った状況で呼ばれる原因になります。
+            </div>
+          </div>
+
+          <div className={styles.codeWrap}>
+            <div className={styles.cbHead}>
+              <div className={styles.cbDots}>
+                <div className={styles.cbd} style={{ background: "#ea4335" }} />
+                <div className={styles.cbd} style={{ background: "#fbbc04" }} />
+                <div className={styles.cbd} style={{ background: "#34a853" }} />
+              </div>
+              <span>.agent/skills/db-migration/SKILL.md — 完全テンプレート</span>
+            </div>
+            <pre className={styles.codeBody}>
+              <span className={styles.legHd}>{"---"}</span>
+              {"\n"}
+              <span className={styles.legHl}>{"name"}</span>
+              {": "}
+              <span className={styles.legStr}>{"db-migration"}</span>
+              {"  "}
+              <span className={styles.legCmt}>
+                {"# ← ハイフン区切り英語小文字・ディレクトリ名と完全一致させる"}
+              </span>
+              {"\n\n"}
+              <span className={styles.legHl}>{"description"}</span>
+              {": "}
+              <span className={styles.legCmt}>
+                {"# ← 【最重要】AIのトリガー条件。具体的なキーワードを入れる！"}
+              </span>
+              {"\n  "}
+              <span className={styles.legStr}>
+                {"PostgreSQLのスキーマ変更（マイグレーション）を実行する。"}
+              </span>
+              {"\n  "}
+              <span className={styles.legStr}>
+                {"「テーブルを追加」「カラムを追加」「インデックスを作成」"}
+              </span>
+              {"\n  "}
+              <span className={styles.legStr}>
+                {"「DBのスキーマを変更して」という指示が出たら必ずこのスキルを使うこと。"}
+              </span>
+              {"\n"}
+              <span className={styles.legHd}>{"---"}</span>
+              {"\n\n"}
+              <span className={styles.legHd}>{"# DB Migration Skill"}</span>
+              {"\n\n"}
+              <span className={styles.legHd}>{"## Goal（このスキルの目的）"}</span>
+              {"\nPostgreSQL スキーマ変更をプロジェクト標準の手順で安全に実行する。\n\n"}
+              <span className={styles.legHd}>{"## Before Starting（前提条件）"}</span>
+              {"\n- 変更対象のテーブル名・カラム名・データ型をユーザーから確認すること\n\n"}
+              <span className={styles.legHd}>{"## Step-by-Step Guide（具体的な手順）"}</span>
+              {"\n1. "}
+              <span className={styles.legStr}>{"`migrations/`"}</span>
+              {" 配下に "}
+              <span className={styles.legStr}>{"`YYYYMMDD_HHMMSS_description.up.sql`"}</span>
+              {" を作成\n2. ロールバック用 "}
+              <span className={styles.legStr}>{"`·down.sql`"}</span>
+              {" を必ず同時に作成\n3. 整合性チェックを実行: "}
+              <span className={styles.legStr}>{"`python scripts/check.py`"}</span>
+              {"\n4. レビュー後に適用: "}
+              <span className={styles.legStr}>{"`python scripts/migrate.py --apply`"}</span>
+              {"\n5. 完了後にtasks.mdの該当タスクをチェック済みにする\n\n"}
+              <span className={styles.legHd}>{"## Examples（Few-shot：具体的な入出力例）"}</span>
+              {"\n"}
+              <span className={styles.legCmt}>
+                {"# ここに例を書くとAIが期待する動作を模倣する"}
+              </span>
+              {"\n"}
+              <span className={styles.legStr}>
+                {'**Input**: "usersテーブルにlast_login_atカラムを追加して"'}
+              </span>
+              {"\n"}
+              <span className={styles.legStr}>
+                {"**Output**: migrations/20260101_add_last_login_at.up.sql を生成"}
+              </span>
+              {"\n\n"}
+              <span className={styles.legHd}>{"## Rules（制約事項）"}</span>
+              {"\n"}
+              <span className={styles.legHl2}>
+                {"❌ 既存マイグレーションファイルを絶対に編集しない"}
+              </span>
+              {"\n"}
+              <span className={styles.legHl2}>{"❌ 本番環境への直接適用は人間確認なしに禁止"}</span>
+              {"\n"}
+              <span className={styles.legOk}>
+                {"✅ ロールバックファイルは必ずセットで作成する"}
+              </span>
+              {"\n"}
+              <span className={styles.legOk}>
+                {"✅ NULL制約の後付けはデータ移行計画なしに行わない"}
+              </span>
+            </pre>
+          </div>
+
+          <h3>descriptionの書き方 — 良い例 vs 悪い例</h3>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "1rem",
+              margin: "1rem 0",
+            }}
+          >
+            <div
+              style={{
+                background: "rgba(234, 67, 53, 0.07)",
+                border: "1px solid rgba(234, 67, 53, 0.25)",
+                borderRadius: "10px",
+                padding: "1rem 1.2rem",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "0.7rem",
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                  color: "var(--g-red, #ea4335)",
+                  marginBottom: "0.6rem",
+                }}
+              >
+                ❌ アンダートリガー（呼ばれない）
+              </div>
+              <pre
+                style={{
+                  background: "transparent",
+                  padding: 0,
+                  fontSize: "0.77rem",
+                  color: "var(--text2, #9aafcc)",
+                }}
+              >{`name: security-auditor\ndescription: |\n  セキュリティ監査を行うスキル。`}</pre>
+              <div
+                style={{ fontSize: "0.75rem", color: "var(--g-red, #ea4335)", marginTop: "0.6rem" }}
+              >
+                → AIがいつ使うか判断できない
+              </div>
+            </div>
+            <div
+              style={{
+                background: "rgba(52, 168, 83, 0.07)",
+                border: "1px solid rgba(52, 168, 83, 0.25)",
+                borderRadius: "10px",
+                padding: "1rem 1.2rem",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "0.7rem",
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                  color: "var(--g-green, #34a853)",
+                  marginBottom: "0.6rem",
+                }}
+              >
+                ✅ 正しいトリガー設計
+              </div>
+              <pre
+                style={{
+                  background: "transparent",
+                  padding: 0,
+                  fontSize: "0.77rem",
+                  color: "var(--text2, #9aafcc)",
+                }}
+              >{`name: security-auditor\ndescription: |\n  コードのセキュリティ監査を実施する。\n  脆弱性チェック、OWASP Top 10の検証、\n  セキュリティ、認証、XSS、SQLi、\n  という言葉が出たら必ず使うこと。`}</pre>
+              <div
+                style={{
+                  fontSize: "0.75rem",
+                  color: "var(--g-green, #34a853)",
+                  marginTop: "0.6rem",
+                }}
+              >
+                → トリガーが明確で確実に呼ばれる
+              </div>
+            </div>
+          </div>
+
+          <h3>5つのスキルパターン</h3>
+          <div className={styles.patternGrid}>
+            <div className={`${styles.patternCard} ${styles.pcB}`}>
+              <div className={styles.pn}>01</div>
+              <h4>Basic Router</h4>
+              <p>SKILL.mdのみ。指示と制約をテキストで記述。最もシンプル。</p>
+              <div className={styles.pcStruct}>SKILL.md only</div>
+            </div>
+            <div className={`${styles.patternCard} ${styles.pcG}`}>
+              <div className={styles.pn}>02</div>
+              <h4>Reference Pattern</h4>
+              <p>references/にドキュメントを置き、SKILL.mdから参照。静的知識の拡張。</p>
+              <div className={styles.pcStruct}>SKILL.md + references/</div>
+            </div>
+            <div className={`${styles.patternCard} ${styles.pcY}`}>
+              <div className={styles.pn}>03</div>
+              <h4>Few-shot Pattern</h4>
+              <p>examples/にInput/Outputのペアを複数用意。精度の向上。</p>
+              <div className={styles.pcStruct}>SKILL.md + examples/</div>
+            </div>
+            <div className={`${styles.patternCard} ${styles.pcR}`}>
+              <div className={styles.pn}>04</div>
+              <h4>Tool Use Pattern</h4>
+              <p>scripts/に実行可能なスクリプトを置く。LLMが苦手な計算・DB操作を外出し。</p>
+              <div className={styles.pcStruct}>SKILL.md + scripts/</div>
+            </div>
+            <div className={`${styles.patternCard} ${styles.pcP}`}>
+              <div className={styles.pn}>05</div>
+              <h4>All-in-One Pattern</h4>
+              <p>全ディレクトリを組み合わせた最強パターン。複雑な業務ロジックに対応。</p>
+              <div className={styles.pcStruct}>SKILL.md + all dirs</div>
+            </div>
+          </div>
+
+          <h3>スキルのスコープ設計</h3>
+          <div className={styles.scopeGrid}>
+            <div className={`${styles.scopeCard} ${styles.scGlobal} ${styles.scG}`}>
+              <div className={styles.scLabel}>🌐 グローバルスキル</div>
+              <h3>全プロジェクトで有効</h3>
+              <p style={{ fontSize: "0.82rem", color: "var(--text2, #9aafcc)" }}>
+                すべてのプロジェクトで利用可能な汎用スキル。
+              </p>
+              <div className={styles.pathBox}>
+                ~/.gemini/antigravity/skills/
+                <br />
+                （Antigravity IDE）
+              </div>
+              <ul>
+                <li>Gitコミット規約フォーマッター</li>
+                <li>コードレビュー標準チェック</li>
+                <li>JSON/YAML フォーマッター</li>
+                <li>テスト生成の標準化</li>
+              </ul>
+            </div>
+            <div className={`${styles.scopeCard} ${styles.scLocal} ${styles.scL}`}>
+              <div className={styles.scLabel}>📁 ワークスペーススキル</div>
+              <h3>このプロジェクトのみ</h3>
+              <p style={{ fontSize: "0.82rem", color: "var(--text2, #9aafcc)" }}>
+                特定プロジェクトのみで有効。チームでgit管理。
+              </p>
+              <div className={styles.pathBox}>
+                .agent/skills/
+                <br />
+                （プロジェクト内）
+              </div>
+              <ul>
+                <li>このアプリのデプロイ手順</li>
+                <li>プロジェクト固有のAPI仕様</li>
+                <li>チーム独自のコーディング規約</li>
+                <li>内部DBのマイグレーション</li>
+              </ul>
+            </div>
+          </div>
         </section>
 
         {/* SECTION 05: RULES — TODO: faithful migration */}
