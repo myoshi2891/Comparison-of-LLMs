@@ -175,13 +175,13 @@ Next.js 移行プロジェクトの作業を再開してください。
 
 - リポジトリ: LLM-Studies（Phase A–F の Next.js 移行作業中）
 - 現在のブランチ: feat/nextjs-migration
-- 最新 HEAD: 7f65aa2（feat(web-next): D-5 s12 — faithful migration of /gemini/skill-guide-intermediate #sec-whatsnew）
+- 最新 HEAD: e0c31e0（feat(web-next): add keyboard navigation to PatternsApp tabs in /gemini/skill-guide-intermediate）
 - 移行計画: docs/NEXTJS_PHASE_A_F_PLAN.md（Phase A–F）§Phase D を参照
 - 進捗トラッカー: MIGRATION_PROGRESS.md（**作業開始前に必読**: §「AI 作業ルール」R1〜R4）
 - プロジェクト固有スキル: .claude/skills/nextjs-page-migration/SKILL.md
 - リポジトリ規約: CLAUDE.md（AGENTS.md / GEMINI.md からも参照される。AI 共通の編集ルール）
 
-次の作業: **D-6 — `/gemini/antigravity-guide` の scaffold（Red）→ faithful 移植開始**（`legacy/gemini/antigravity-guide.html` → `web-next/app/gemini/antigravity-guide/page.tsx`）。D-5 全 12 セクション完了（7f65aa2 時点）。
+次の作業: **D-6 — `/gemini/antigravity-guide` の scaffold（Red）→ faithful 移植開始**（`legacy/gemini/antigravity-guide.html` → `web-next/app/gemini/antigravity-guide/page.tsx`）。D-5 全 12 セクション完了（e0c31e0 時点）。
 Phase D の対象は長文ガイド 9 ページ（すべて `.html` → JSX 直接移植。**MDX・`.md` SSoT 方式は不採用**）:
 - Claude: skill-guide-for-claude ✅ / skill-guide-of-claude-for-intermediate ✅ / claude-cowork-guide ✅
 - Gemini: skill-guide-for-gemini ✅ / skill-guide-of-gemini-for-intermediate ✅ / antigravity-guide（**次の作業**）

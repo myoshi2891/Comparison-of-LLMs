@@ -26,7 +26,7 @@ export default function PatternsApp() {
 
   return (
     <div className={styles.tabs}>
-      <div role="tablist" className={styles.tabList}>
+      <div role="tablist" aria-label="Pattern tabs" className={styles.tabList}>
         {PATTERNS.map((p, index) => (
           <button
             key={p.id}
@@ -63,6 +63,7 @@ export default function PatternsApp() {
         role="tabpanel"
         aria-labelledby="tab-p1"
         className={active === "p1" ? styles.tabPanelActive : styles.tabPanel}
+        hidden={active !== "p1"}
       >
         <div className={styles.callout}>
           <strong>Pattern 1 — Basic（SKILL.md のみ）</strong>
@@ -121,6 +122,7 @@ export default function PatternsApp() {
         role="tabpanel"
         aria-labelledby="tab-p2"
         className={active === "p2" ? styles.tabPanelActive : styles.tabPanel}
+        hidden={active !== "p2"}
       >
         <div className={styles.callout}>
           <strong>Pattern 2 — Reference（SKILL.md + /references）</strong>
@@ -146,6 +148,7 @@ export default function PatternsApp() {
         role="tabpanel"
         aria-labelledby="tab-p3"
         className={active === "p3" ? styles.tabPanelActive : styles.tabPanel}
+        hidden={active !== "p3"}
       >
         <div className={styles.callout}>
           <strong>Pattern 3 — Tool Use（SKILL.md + /scripts）</strong>
@@ -174,6 +177,7 @@ export default function PatternsApp() {
         role="tabpanel"
         aria-labelledby="tab-p4"
         className={active === "p4" ? styles.tabPanelActive : styles.tabPanel}
+        hidden={active !== "p4"}
       >
         <div className={styles.callout}>
           <strong>Pattern 4 — All-in-One（全要素の組み合わせ）</strong>
