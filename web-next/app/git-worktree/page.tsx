@@ -1561,11 +1561,208 @@ P->>P: git push → PR 作成`}
             <div>
               <div className={styles.stepTitle}>導入時の注意点 — 絶対に守る 7 つのルール</div>
               <div className={styles.stepDesc}>
-                worktree 運用で失敗しないための必須ルールと落とし穴。
+                チームで worktree を運用する際に全員が合意すべき制約と落とし穴の回避策。
               </div>
             </div>
           </div>
-          {/* faithful content — s05 移植時に実装 */}
+
+          {/* Mermaid: エラーと対処 */}
+          <div className={styles.mmdBox}>
+            <div className={styles.mmdLbl}>▸ よくあるミスと正しい対処フロー</div>
+            <MermaidDiagram
+              chart={`flowchart LR
+subgraph BAD["❌ よくあるミス"]
+direction TB
+E1["同一ブランチを\\n別 WT で checkout"]
+E2["rm -rf で WT\\nディレクトリを削除"]
+E3["shared/ を各 WT から\\n直接変更"]
+E4["AI エージェントを\\nルート直下から起動"]
+end
+subgraph GOOD["✅ 正しい対処"]
+direction TB
+F1["git worktree list で確認\\n各 WT に別ブランチを割当"]
+F2["git worktree remove\\ngit worktree prune"]
+F3["dev で変更 → commit\\nsync-all.sh で全 WT 反映"]
+F4["cd worktrees/claude から\\n各ツールを起動"]
+end
+E1 -->|fatal: already checked out| F1
+E2 -->|.git にメタデータが残存| F2
+E3 -->|merge コンフリクト多発| F3
+E4 -->|全 WT 横断の誤変更リスク| F4
+style E1 fill:#2a1515,stroke:#ff7b72,color:#ffffff
+style E2 fill:#2a1515,stroke:#ff7b72,color:#ffffff
+style E3 fill:#2a1515,stroke:#ff7b72,color:#ffffff
+style E4 fill:#2a1515,stroke:#ff7b72,color:#ffffff
+style F1 fill:#152515,stroke:#56d364,color:#ffffff
+style F2 fill:#152515,stroke:#56d364,color:#ffffff
+style F3 fill:#152515,stroke:#56d364,color:#ffffff
+style F4 fill:#152515,stroke:#56d364,color:#ffffff
+style BAD fill:#1c1010,stroke:#ff7b72,color:#ff7b72
+style GOOD fill:#101c10,stroke:#56d364,color:#56d364`}
+            />
+          </div>
+
+          <div className={styles.rules}>
+            <div className={styles.rule}>
+              <div className={styles.ruleIcon} style={{ color: "var(--err)" }}>
+                🚫
+              </div>
+              <div>
+                <strong>ルール 1: 同一ブランチを複数 WT にチェックアウトしない</strong>
+                <span>
+                  <code>--force</code> フラグは .git の整合性を破壊するため絶対禁止。
+                  <code>git worktree list</code>
+                  で現状確認してから追加する。
+                </span>
+              </div>
+            </div>
+            <div className={styles.rule}>
+              <div className={styles.ruleIcon} style={{ color: "var(--warn)" }}>
+                ⚠️
+              </div>
+              <div>
+                <strong>ルール 2: WT の削除は必ず git worktree remove を使う</strong>
+                <span>
+                  <code>rm -rf worktrees/claude</code> だけでは .git
+                  内のメタデータが残存する。削除後は
+                  <code>git worktree prune</code> で必ずクリーンアップする。
+                </span>
+              </div>
+            </div>
+            <div className={styles.rule}>
+              <div className={styles.ruleIcon} style={{ color: "var(--warn)" }}>
+                ⚠️
+              </div>
+              <div>
+                <strong>
+                  ルール 3: shared/ (common-header リソース) への変更は dev ブランチ経由のみ
+                </strong>
+                <span>
+                  各 WT から直接 shared/ 内の共通リソースを変更すると merge コンフリクトが多発する。
+                  <code>CODEOWNERS</code>
+                  で特定のレビュアーを指定するだけでなく、保護ブランチや Ruleset の設定で
+                  「PRマージ必須」「特定ユーザーのみ変更可」を強制することが必須。
+                </span>
+              </div>
+            </div>
+            <div className={styles.rule}>
+              <div className={styles.ruleIcon} style={{ color: "var(--ge)" }}>
+                🔍
+              </div>
+              <div>
+                <strong>ルール 4: git stash のメッセージには WT 名を含める</strong>
+                <span>
+                  stash は全 WT 共通の .git に保存されるため混在する。例:
+                  <code>git stash push -m &quot;claude: WIP nav&quot;</code>
+                </span>
+              </div>
+            </div>
+            <div className={styles.rule}>
+              <div className={styles.ruleIcon} style={{ color: "var(--co)" }}>
+                📋
+              </div>
+              <div>
+                <strong>ルール 5: pre-commit hook は全 WT で動作することを前提に設計する</strong>
+                <span>
+                  hooks/ は全 WT で共有。特定 WT だけ除外したい場合は
+                  <code>$GIT_DIR</code> 変数で判定するロジックを hook に追加する。
+                </span>
+              </div>
+            </div>
+            <div className={styles.rule}>
+              <div className={styles.ruleIcon} style={{ color: "var(--cp)" }}>
+                🤖
+              </div>
+              <div>
+                <strong>ルール 6: AI エージェントはワークツリーのルートから必ず起動する</strong>
+                <span>
+                  メインルート（ai-docs/）から起動すると全 WT 横断でファイルを変更するリスクがある。
+                  <code>cd worktrees/claude &amp;&amp; claude</code>
+                  のように WT 内から起動する。
+                </span>
+              </div>
+            </div>
+            <div className={styles.rule}>
+              <div className={styles.ruleIcon} style={{ color: "var(--ok)" }}>
+                🔄
+              </div>
+              <div>
+                <strong>ルール 7: 定期的に git worktree prune を実行する</strong>
+                <span>
+                  削除済み WT のメタデータが蓄積するため、週次または CI で
+                  <code>git worktree prune &amp;&amp; git fetch --prune</code>
+                  を実行してリポジトリを健全に保つ。
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <h3>よくあるエラーと対処法</h3>
+          <table className={styles.tbl}>
+            <thead>
+              <tr>
+                <th>エラーメッセージ</th>
+                <th>原因</th>
+                <th>対処法</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>fatal: already checked out</td>
+                <td>同ブランチを別 WT でも checkout しようとした</td>
+                <td>
+                  <code>git worktree list</code> で確認し、各 WT に別ブランチを使う
+                </td>
+              </tr>
+              <tr>
+                <td>fatal: already exists</td>
+                <td>対象ディレクトリが既に存在する</td>
+                <td>
+                  <code>rm -rf worktrees/xxx &amp;&amp; git worktree prune</code> 後に再実行
+                </td>
+              </tr>
+              <tr>
+                <td>error: worktree locked</td>
+                <td>別プロセスが使用中でロックされた</td>
+                <td>
+                  <code>git worktree unlock worktrees/xxx</code> または再起動
+                </td>
+              </tr>
+              <tr>
+                <td>CONFLICT in shared/</td>
+                <td>複数 WT が同じ shared/ ファイルを変更</td>
+                <td>CODEOWNERS + 保護ブランチで shared/ への直接変更を禁止し dev 経由のみに制限</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div className={styles.cb}>
+            <div className={styles.cbHdr}>
+              <span>Cleanup Commands</span>
+              <span className={styles.cbTag}>bash</span>
+            </div>
+            <div className={styles.cbBody}>
+              <span className={styles.syCm}># 安全に削除（未コミット変更がない場合）</span>
+              {"\n"}
+              {"git worktree remove worktrees/claude\n\n"}
+              <span className={styles.syCm}># 強制削除（未コミット変更も削除）</span>
+              {"\n"}
+              {"git worktree remove --force worktrees/claude\n\n"}
+              <span className={styles.syCm}># 削除済みディレクトリの参照を git から掃除</span>
+              {"\n"}
+              {"git worktree prune\n"}
+              {"git worktree prune --dry-run   "}
+              <span className={styles.syCm}># 確認してから実行</span>
+              {"\n\n"}
+              <span className={styles.syCm}># 全 WT を一括削除（リセット）</span>
+              {"\n"}
+              {"for WT in claude gemini codex copilot; do\n"}
+              {'  git worktree remove --force "worktrees/$WT" 2>/dev/null || true\n'}
+              {'done && git worktree prune && echo "'}
+              <span className={styles.syOk}>All removed.</span>
+              {'"'}
+            </div>
+          </div>
         </section>
 
         {/* ══════════ STEP 06 ══════════ */}
