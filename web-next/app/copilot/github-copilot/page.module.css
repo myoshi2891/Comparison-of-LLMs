@@ -9,6 +9,7 @@
   --text1: #e2eaf6;
   --text2: #8892a4;
   --text3: #4a5568;
+  --text-muted: var(--text3);
 
   min-height: 100vh;
   background: var(--bg-primary);

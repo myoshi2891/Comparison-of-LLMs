@@ -20,6 +20,7 @@ export default function GeminiMdTabs() {
           onClick={() => setActive("g1")}
           onKeyDown={(e) => {
             if (e.key === "ArrowRight") {
+              e.preventDefault();
               setActive("g2");
               document.getElementById("tab-g2")?.focus();
             }
@@ -38,6 +39,7 @@ export default function GeminiMdTabs() {
           onClick={() => setActive("g2")}
           onKeyDown={(e) => {
             if (e.key === "ArrowLeft") {
+              e.preventDefault();
               setActive("g1");
               document.getElementById("tab-g1")?.focus();
             }

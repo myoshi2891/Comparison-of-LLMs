@@ -231,7 +231,7 @@ Phase E の確立パターン（MermaidDiagram）:
 - **Claude Code**: `/nextjs-page-migration` skill が使える（MDX・`.md` SSoT 方式は不採用。全ページ HTML → JSX 直接移植）
 - **Gemini CLI**: GEMINI.md が `@CLAUDE.md` を import する形にしてあるため、CLAUDE.md ルールが自動継承される
 - **Codex / Cursor**: AGENTS.md（CLAUDE.md と同等内容）を読み込ませる
-- **任意の Agent**: 上記プロンプトと CLAUDE.md・MIGRATION_PROGRESS.md・docs/NEXTJS_PHASE_A_F_PLAN.md §Phase E の 3 つを冒頭で読み込ませれば自走可能
+- **任意の Agent**: 上記プロンプトと CLAUDE.md・MIGRATION_PROGRESS.md・docs/NEXTJS_PHASE_A_F_PLAN.md §Phase F の 3 つを冒頭で読み込ませれば自走可能
 
 ## Phase C 完了記録（参照用アーカイブ）
 
