@@ -829,7 +829,261 @@ export default function Page() {
             <span className={styles.num}>05.</span>
             <code>.prompt.md</code> — 再利用タスクプロンプト
           </h2>
-          {/* TODO: faithful content */}
+
+          <p>
+            <code>.github/prompts/*.prompt.md</code>は
+            <strong>繰り返し使うタスクをコマンド化した再利用テンプレート</strong>です。VS Code
+            Copilot Chatで<code>/コマンド名</code>
+            として呼び出せ、フロントマターでAIモデル・ツール・実行モードを細かく制御できます（[6]）。
+          </p>
+
+          <div className={styles.fc}>
+            <div className={styles.fcHdr}>
+              <div
+                className={styles.fci}
+                style={{
+                  background: "rgba(240, 136, 62, 0.12)",
+                  border: "1px solid rgba(240, 136, 62, 0.3)",
+                }}
+              >
+                ⚡
+              </div>
+              <div>
+                <div className={styles.fcName}>.prompt.md</div>
+                <div className={styles.fcPath}>
+                  .github/prompts/*.prompt.md — /コマンドとして呼出
+                </div>
+                <div className={styles.fcTags}>
+                  <span className={`${styles.fct} ${styles.fctC}`}>モデル指定可</span>
+                  <span className={`${styles.fct} ${styles.fctM}`}>ask/edit/agentモード</span>
+                  <span className={`${styles.fct} ${styles.fctG}`}>ツール制御</span>
+                </div>
+              </div>
+            </div>
+            <div className={styles.fcBody}>
+              <h3>フロントマター全プロパティ</h3>
+              <div className={styles.cb}>
+                <div className={styles.cbHdr}>
+                  <span>フロントマター仕様（VS Code 1.10+）</span>
+                </div>
+                <pre>
+                  <span className={styles.cKy}>{"---"}</span>
+                  {"\n"}
+                  <span className={styles.cGh}>{"mode"}</span>
+                  {": "}
+                  <span className={styles.cSt}>{'"ask"'}</span>
+                  {" | "}
+                  <span className={styles.cSt}>{'"edit"'}</span>
+                  {" | "}
+                  <span className={styles.cSt}>{'"agent"'}</span>
+                  {"  "}
+                  <span className={styles.cCm}>{'# 実行モード（default: "agent"）'}</span>
+                  {"\n"}
+                  <span className={styles.cGh}>{"model"}</span>
+                  {": "}
+                  <span className={styles.cSt}>{'"gpt-4.1"'}</span>
+                  {" | "}
+                  <span className={styles.cSt}>{'"claude-opus-4-6"'}</span>
+                  {" | "}
+                  <span className={styles.cSt}>{'"gemini-3-pro"'}</span>
+                  {"\n"}
+                  {"                                          "}
+                  <span className={styles.cCm}>{"# タスク特化モデルを選択"}</span>
+                  {"\n"}
+                  <span className={styles.cGh}>{"tools"}</span>
+                  {": ["}
+                  <span className={styles.cSt}>{'"search/codebase"'}</span>
+                  {", "}
+                  <span className={styles.cSt}>{'"edit/editFiles"'}</span>
+                  {", "}
+                  <span className={styles.cSt}>{'"read/problems"'}</span>
+                  {"]"}
+                  {"\n"}
+                  <span className={styles.cGh}>{"description"}</span>
+                  {": "}
+                  <span className={styles.cSt}>{'"プロンプトの説明"'}</span>
+                  {"      "}
+                  <span className={styles.cCm}>{"# /コマンド選択画面に表示"}</span>
+                  {"\n"}
+                  <span className={styles.cKy}>{"---"}</span>
+                </pre>
+              </div>
+
+              <h3>GitHub Spec Kitの3コアプロンプト</h3>
+              <div className={styles.cb}>
+                <div className={styles.cbHdr}>
+                  <div className={styles.dots}>
+                    <div className={styles.dot} style={{ background: "#f25c7a" }} />
+                    <div className={styles.dot} style={{ background: "#f0883e" }} />
+                    <div className={styles.dot} style={{ background: "#238636" }} />
+                  </div>
+                  <span>.github/prompts/specify.prompt.md — /speckit.specify</span>
+                </div>
+                <pre>
+                  <span className={styles.cKy}>{"---"}</span>
+                  {"\n"}
+                  <span className={styles.cGh}>{"mode"}</span>
+                  {": "}
+                  <span className={styles.cSt}>{'"agent"'}</span>
+                  {"\n"}
+                  <span className={styles.cGh}>{"model"}</span>
+                  {": "}
+                  <span className={styles.cSt}>{'"claude-opus-4-6"'}</span>
+                  {"\n"}
+                  <span className={styles.cGh}>{"tools"}</span>
+                  {": ["}
+                  <span className={styles.cSt}>{'"search/codebase"'}</span>
+                  {", "}
+                  <span className={styles.cSt}>{'"read/problems"'}</span>
+                  {", "}
+                  <span className={styles.cSt}>{'"edit/editFiles"'}</span>
+                  {"]"}
+                  {"\n"}
+                  <span className={styles.cGh}>{"description"}</span>
+                  {": "}
+                  <span className={styles.cSt}>
+                    {'"Build a spec: user goals, scenarios, acceptance criteria"'}
+                  </span>
+                  {"\n"}
+                  <span className={styles.cKy}>{"---"}</span>
+                  {"\n\n"}
+                  <span className={styles.cHd}>{"# Spec Generation Prompt"}</span>
+                  {"\n\n"}
+                  {
+                    "`.specify/memory/constitution.md` を読み、プロジェクトの原則を理解してください。"
+                  }
+                  {"\n\n"}
+                  {"ユーザーが説明した機能について、以下の構造で仕様書を生成してください："}
+                  {"\n\n"}
+                  {"1. **明確化が必要な点を質問する**（過小仕様を防ぐ）"}
+                  {"\n"}
+                  {"2. 回答をもとに `.specify/templates/spec-template.md` に従って仕様書を作成"}
+                  {"\n"}
+                  {"3. 以下を必ず含める:"}
+                  {"\n"}
+                  {"   - ユーザー目標・シナリオ（実装詳細は含めない）"}
+                  {"\n"}
+                  {"   - 受け入れ基準（テスト可能な形式）"}
+                  {"\n"}
+                  {"   - スコープ外の明記"}
+                  {"\n"}
+                  {"4. `features/{feature-name}/spec.md` として保存"}
+                </pre>
+              </div>
+
+              <div className={styles.cb}>
+                <div className={styles.cbHdr}>
+                  <div className={styles.dots}>
+                    <div className={styles.dot} style={{ background: "#f25c7a" }} />
+                    <div className={styles.dot} style={{ background: "#f0883e" }} />
+                    <div className={styles.dot} style={{ background: "#238636" }} />
+                  </div>
+                  <span>.github/prompts/plan.prompt.md — /speckit.plan</span>
+                </div>
+                <pre>
+                  <span className={styles.cKy}>{"---"}</span>
+                  {"\n"}
+                  <span className={styles.cGh}>{"mode"}</span>
+                  {": "}
+                  <span className={styles.cSt}>{'"agent"'}</span>
+                  {"\n"}
+                  <span className={styles.cGh}>{"tools"}</span>
+                  {": ["}
+                  <span className={styles.cSt}>{'"search/codebase"'}</span>
+                  {", "}
+                  <span className={styles.cSt}>{'"read/problems"'}</span>
+                  {", "}
+                  <span className={styles.cSt}>{'"edit/editFiles"'}</span>
+                  {"]"}
+                  {"\n"}
+                  <span className={styles.cGh}>{"description"}</span>
+                  {": "}
+                  <span className={styles.cSt}>
+                    {'"Technical plan from spec. No new deps without justification."'}
+                  </span>
+                  {"\n"}
+                  <span className={styles.cKy}>{"---"}</span>
+                  {"\n\n"}
+                  <span className={styles.cHd}>{"# Technical Planning Prompt"}</span>
+                  {"\n\n"}
+                  {
+                    "`features/{feature-name}/spec.md` と `.specify/memory/constitution.md` を参照してください。"
+                  }
+                  {"\n\n"}
+                  {"既存のスタックとパターンを使い、最小依存で技術計画を策定します："}
+                  {"\n\n"}
+                  {"1. `.specify/templates/plan-template.md` に従って設計書を作成"}
+                  {"\n"}
+                  {"2. 必ず含める:"}
+                  {"\n"}
+                  {"   - アーキテクチャの決定と根拠"}
+                  {"\n"}
+                  {"   - 変更が必要なファイル一覧"}
+                  {"\n"}
+                  {"   - APIエンドポイント・データモデル"}
+                  {"\n"}
+                  {"   - セキュリティ・パフォーマンス考慮事項"}
+                  {"\n"}
+                  {"3. `features/{feature-name}/plan.md` として保存"}
+                </pre>
+              </div>
+
+              <div className={styles.cb}>
+                <div className={styles.cbHdr}>
+                  <div className={styles.dots}>
+                    <div className={styles.dot} style={{ background: "#f25c7a" }} />
+                    <div className={styles.dot} style={{ background: "#f0883e" }} />
+                    <div className={styles.dot} style={{ background: "#238636" }} />
+                  </div>
+                  <span>.github/prompts/tasks.prompt.md — /speckit.tasks</span>
+                </div>
+                <pre>
+                  <span className={styles.cKy}>{"---"}</span>
+                  {"\n"}
+                  <span className={styles.cGh}>{"mode"}</span>
+                  {": "}
+                  <span className={styles.cSt}>{'"agent"'}</span>
+                  {"\n"}
+                  <span className={styles.cGh}>{"description"}</span>
+                  {": "}
+                  <span className={styles.cSt}>
+                    {'"Break plan into implementable chunks. Check spec/plan/tasks consistency."'}
+                  </span>
+                  {"\n"}
+                  <span className={styles.cKy}>{"---"}</span>
+                  {"\n\n"}
+                  <span className={styles.cHd}>{"# Task Breakdown Prompt"}</span>
+                  {"\n\n"}
+                  {"`features/{feature-name}/spec.md` と `plan.md` を読んでください。"}
+                  {"\n\n"}
+                  {"1. `.specify/templates/tasks-template.md` に従ってタスクリストを作成"}
+                  {"\n"}
+                  {"2. 各タスクは単独でテスト可能な粒度にする"}
+                  {"\n"}
+                  {"3. 依存関係を明示する（並列可能なタスクを識別）"}
+                  {"\n"}
+                  {"4. constitution.md・spec.md・plan.mdとの一貫性チェックを実施"}
+                  {"\n"}
+                  {"   - ディレクトリの食い違い、ページネーション前提の不一致、未要件の検出"}
+                  {"\n"}
+                  {"5. `features/{feature-name}/tasks.md` として保存"}
+                </pre>
+              </div>
+
+              <div className={`${styles.ib} ${styles.im}`}>
+                <span className={styles.ii}>💡</span>
+                <div>
+                  <strong>モデルをタスクごとに使い分ける</strong>
+                  <br />
+                  <code>{'model: "claude-opus-4-6"'}</code>
+                  （深い推論が必要な設計フェーズ）、
+                  <code>{'model: "gpt-4.1"'}</code>
+                  （高速なコード生成フェーズ）のようにプロンプトごとに最適モデルを選べます。これはGitHub
+                  Copilot独自の強力な機能です（[8]）。
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* ── s06: CHATMODE-MD ── */}
