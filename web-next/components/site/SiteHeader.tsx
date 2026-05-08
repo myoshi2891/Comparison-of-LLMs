@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type NavLink, navLinks } from "./nav-links";
 import { SiteHeaderClient } from "./SiteHeaderClient";
@@ -20,6 +21,14 @@ function isParentActive(link: NavLink, pathname: string): boolean {
   return link.children.some((c) => isActivePath(c.href, pathname));
 }
 
+/**
+ * Render the site's header and primary navigation.
+ *
+ * Determines the active path by using `pathnameProp` if provided, otherwise `usePathname()` from the router, and falls back to `"/"` when neither is available. Renders the brand link, a hamburger toggle, navigation entries from `navLinks` (with dropdowns for items that have `children`), applies active classes and `aria-current="page"` for matching routes, and includes an external GitHub link.
+ *
+ * @param pathnameProp - Optional pathname to override the router-derived path; when omitted, the component uses the router pathname or `"/"` as a fallback.
+ * @returns The header element containing site branding, the navigation menu (including dropdowns and active-state handling), and an external GitHub link.
+ */
 export function SiteHeader({ pathname: pathnameProp }: { pathname?: string } = {}) {
   const fromHook = usePathname();
   const pathname = pathnameProp ?? fromHook ?? "/";
@@ -27,9 +36,9 @@ export function SiteHeader({ pathname: pathnameProp }: { pathname?: string } = {
   return (
     <SiteHeaderClient>
       <nav id="common-header" aria-label="Main Navigation" className="ch-nav">
-        <a className="ch-brand" href="/">
+        <Link className="ch-brand" href="/">
           LLM Studies
-        </a>
+        </Link>
         <button
           type="button"
           className="ch-hamburger"
@@ -60,13 +69,13 @@ export function SiteHeader({ pathname: pathnameProp }: { pathname?: string } = {
                       const active = isActivePath(c.href, pathname);
                       return (
                         <li key={c.href}>
-                          <a
+                          <Link
                             href={c.href}
                             className={active ? "ch-active" : undefined}
                             aria-current={active ? "page" : undefined}
                           >
                             {c.name}
-                          </a>
+                          </Link>
                         </li>
                       );
                     })}
@@ -77,13 +86,13 @@ export function SiteHeader({ pathname: pathnameProp }: { pathname?: string } = {
             const active = isActivePath(link.href, pathname);
             return (
               <li key={link.name}>
-                <a
+                <Link
                   href={link.href}
                   className={active ? "ch-active" : undefined}
                   aria-current={active ? "page" : undefined}
                 >
                   {link.name}
-                </a>
+                </Link>
               </li>
             );
           })}

@@ -1,0 +1,2458 @@
+import type { Metadata } from "next";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import styles from "./page.module.css";
+
+export const metadata: Metadata = {
+  title: "git worktree × 4プラットフォーム ドキュメント並列開発ガイド",
+  description:
+    "Claude / Gemini / Codex / GitHub Copilot — 4プラットフォームのドキュメントをAIツールとWebSearchで並列更新するための完全ガイド。git worktreeのセットアップから日常ワークフロー・GitHub Actions統合まで。",
+};
+
+function Ext({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer">
+      {children}
+    </a>
+  );
+}
+
+export default function GitWorktreePage() {
+  return (
+    <>
+      <div className={styles.page}>
+        {/* ═══ HEADER ═══ */}
+        <header className={styles.header}>
+          <div className={styles.hdrBar}>
+            <div className={styles.hdrBarL}>
+              <span>
+                <span className={styles.dot} />
+                SYSTEM: READY
+              </span>
+              <span>BRANCH: feature/docs-update</span>
+              <span>WORKTREES: 4</span>
+            </div>
+            <span>git worktree × 4-Platform Guide</span>
+          </div>
+          <div className={styles.hdrHero}>
+            <div>
+              <h1>
+                <span className={styles.accent}>git worktree</span>
+                <br />
+                ドキュメント並列開発ガイド
+              </h1>
+              <p className={styles.hdrSub}>
+                Claude / Gemini / Codex / GitHub Copilot ——
+                <br />
+                4プラットフォームのドキュメント（agent.html / skill.html 計8ファイル）を
+                <br />
+                AI ツールと WebSearch で並列更新するための完全ガイド。
+              </p>
+            </div>
+            <div className={styles.badges}>
+              <div className={`${styles.badge} ${styles.bCl}`}>Claude Code</div>
+              <div className={`${styles.badge} ${styles.bGe}`}>Google Antigravity</div>
+              <div className={`${styles.badge} ${styles.bCo}`}>OpenAI Codex</div>
+              <div className={`${styles.badge} ${styles.bCp}`}>GitHub Copilot</div>
+            </div>
+          </div>
+        </header>
+
+        <div className={styles.wrap}>
+          {/* ══════════ STEP 00 ══════════ */}
+          <section className={styles.step} id="s00">
+            <div className={styles.stepHdr}>
+              <div className={styles.stepN}>00</div>
+              <div>
+                <div className={styles.stepTitle}>git worktree とは何か — なぜ並列開発に有効か</div>
+                <div className={styles.stepDesc}>
+                  通常の git clone
+                  との根本的な違いと、4プラットフォームのドキュメント並列更新における優位性を理解する。
+                </div>
+              </div>
+            </div>
+
+            <p>
+              <strong>git worktree</strong>
+              は、1つのリポジトリ（<code>.git</code>）を共有しながら、
+              <strong>複数のディレクトリで別々のブランチを同時チェックアウトできる</strong>
+              Git 標準機能です。Git
+              2.5（2015年）から搭載されており、追加インストール不要で利用できます。
+            </p>
+
+            {/* ── SVG: 構造比較図 ── */}
+            <div className={styles.svgBox}>
+              <div className={styles.svgLbl}>
+                ▸ 構造比較 — clone × 4（アンチパターン） vs worktree × 4（推奨）
+              </div>
+              <svg
+                viewBox="0 0 860 390"
+                xmlns="http://www.w3.org/2000/svg"
+                fontFamily="IBM Plex Mono, Courier New, monospace"
+                role="img"
+                aria-label="clone × 4（アンチパターン）と worktree × 4（推奨）の構造比較図"
+              >
+                <title>clone × 4 vs worktree × 4 構造比較</title>
+                <defs>
+                  <marker
+                    id="arr-g"
+                    markerWidth="8"
+                    markerHeight="6"
+                    refX="7"
+                    refY="3"
+                    orient="auto"
+                  >
+                    <polygon points="0 0,8 3,0 6" fill="#56d364" />
+                  </marker>
+                  <marker
+                    id="arr-r"
+                    markerWidth="8"
+                    markerHeight="6"
+                    refX="7"
+                    refY="3"
+                    orient="auto"
+                  >
+                    <polygon points="0 0,8 3,0 6" fill="#ff7b72" />
+                  </marker>
+                  <marker
+                    id="arr-cl"
+                    markerWidth="8"
+                    markerHeight="6"
+                    refX="7"
+                    refY="3"
+                    orient="auto"
+                  >
+                    <polygon points="0 0,8 3,0 6" fill="#ff9f6a" />
+                  </marker>
+                  <marker
+                    id="arr-ge"
+                    markerWidth="8"
+                    markerHeight="6"
+                    refX="7"
+                    refY="3"
+                    orient="auto"
+                  >
+                    <polygon points="0 0,8 3,0 6" fill="#79b8ff" />
+                  </marker>
+                  <marker
+                    id="arr-cp"
+                    markerWidth="8"
+                    markerHeight="6"
+                    refX="7"
+                    refY="3"
+                    orient="auto"
+                  >
+                    <polygon points="0 0,8 3,0 6" fill="#e2a8ff" />
+                  </marker>
+                </defs>
+
+                {/* ▌LEFT PANEL: clone × 4 ▐ */}
+                <rect
+                  x="4"
+                  y="4"
+                  width="400"
+                  height="382"
+                  rx="8"
+                  fill="#1c0f0f"
+                  stroke="#ff7b72"
+                  strokeWidth="1.5"
+                />
+                <text
+                  x="204"
+                  y="32"
+                  textAnchor="middle"
+                  fill="#ff7b72"
+                  fontSize="14"
+                  fontWeight="700"
+                >
+                  ❌ clone × 4（アンチパターン）
+                </text>
+                <text x="204" y="50" textAnchor="middle" fill="#cdd9e5" fontSize="11">
+                  .git が 4 つ独立 — 共通変更を毎回 4 箇所に手動コピー
+                </text>
+
+                {/* repo: claude */}
+                <rect
+                  x="20"
+                  y="64"
+                  width="172"
+                  height="130"
+                  rx="5"
+                  fill="#241510"
+                  stroke="#ff9f6a"
+                  strokeWidth="1.5"
+                />
+                <text
+                  x="106"
+                  y="86"
+                  textAnchor="middle"
+                  fill="#ff9f6a"
+                  fontSize="13"
+                  fontWeight="700"
+                >
+                  docs-claude/
+                </text>
+                <rect
+                  x="33"
+                  y="93"
+                  width="146"
+                  height="22"
+                  rx="3"
+                  fill="#3a1f10"
+                  stroke="#ff7b72"
+                  strokeWidth="1"
+                />
+                <text x="106" y="108" textAnchor="middle" fill="#ff7b72" fontSize="12">
+                  .git（独立コピー）
+                </text>
+                <text x="106" y="130" textAnchor="middle" fill="#ffffff" fontSize="11">
+                  履歴 A
+                </text>
+                <text x="106" y="148" textAnchor="middle" fill="#e3b341" fontSize="10">
+                  毎回手動で共通変更を反映
+                </text>
+                <text x="106" y="183" textAnchor="middle" fill="#ff7b72" fontSize="10">
+                  ↑ 4 つ全部に繰り返す必要あり
+                </text>
+
+                {/* repo: gemini */}
+                <rect
+                  x="208"
+                  y="64"
+                  width="172"
+                  height="130"
+                  rx="5"
+                  fill="#10101e"
+                  stroke="#79b8ff"
+                  strokeWidth="1.5"
+                />
+                <text
+                  x="294"
+                  y="86"
+                  textAnchor="middle"
+                  fill="#79b8ff"
+                  fontSize="13"
+                  fontWeight="700"
+                >
+                  docs-gemini/
+                </text>
+                <rect
+                  x="221"
+                  y="93"
+                  width="146"
+                  height="22"
+                  rx="3"
+                  fill="#18182a"
+                  stroke="#79b8ff"
+                  strokeWidth="1"
+                />
+                <text x="294" y="108" textAnchor="middle" fill="#ff7b72" fontSize="12">
+                  .git（独立コピー）
+                </text>
+                <text x="294" y="130" textAnchor="middle" fill="#ffffff" fontSize="11">
+                  履歴 B（clone後に乖離）
+                </text>
+                <text x="294" y="150" textAnchor="middle" fill="#cdd9e5" fontSize="10">
+                  履歴が diverged
+                </text>
+
+                {/* repo: codex */}
+                <rect
+                  x="20"
+                  y="210"
+                  width="172"
+                  height="130"
+                  rx="5"
+                  fill="#0f1e10"
+                  stroke="#56d364"
+                  strokeWidth="1.5"
+                />
+                <text
+                  x="106"
+                  y="232"
+                  textAnchor="middle"
+                  fill="#56d364"
+                  fontSize="13"
+                  fontWeight="700"
+                >
+                  docs-codex/
+                </text>
+                <rect
+                  x="33"
+                  y="239"
+                  width="146"
+                  height="22"
+                  rx="3"
+                  fill="#152015"
+                  stroke="#56d364"
+                  strokeWidth="1"
+                />
+                <text x="106" y="254" textAnchor="middle" fill="#ff7b72" fontSize="12">
+                  .git（独立コピー）
+                </text>
+                <text x="106" y="276" textAnchor="middle" fill="#ffffff" fontSize="11">
+                  履歴 C（diverged）
+                </text>
+
+                {/* repo: copilot */}
+                <rect
+                  x="208"
+                  y="210"
+                  width="172"
+                  height="130"
+                  rx="5"
+                  fill="#160f1c"
+                  stroke="#e2a8ff"
+                  strokeWidth="1.5"
+                />
+                <text
+                  x="294"
+                  y="232"
+                  textAnchor="middle"
+                  fill="#e2a8ff"
+                  fontSize="13"
+                  fontWeight="700"
+                >
+                  docs-copilot/
+                </text>
+                <rect
+                  x="221"
+                  y="239"
+                  width="146"
+                  height="22"
+                  rx="3"
+                  fill="#20152a"
+                  stroke="#e2a8ff"
+                  strokeWidth="1"
+                />
+                <text x="294" y="254" textAnchor="middle" fill="#ff7b72" fontSize="12">
+                  .git（独立コピー）
+                </text>
+                <text x="294" y="276" textAnchor="middle" fill="#ffffff" fontSize="11">
+                  履歴 D（diverged）
+                </text>
+
+                {/* 痛みの矢印 */}
+                <path
+                  d="M192 128 Q204 155 208 128"
+                  fill="none"
+                  stroke="#ff7b72"
+                  strokeWidth="1.5"
+                  strokeDasharray="4,3"
+                  markerEnd="url(#arr-r)"
+                />
+                <path
+                  d="M106 194 Q204 210 294 210"
+                  fill="none"
+                  stroke="#ff7b72"
+                  strokeWidth="1.5"
+                  strokeDasharray="4,3"
+                  markerEnd="url(#arr-r)"
+                />
+                <text
+                  x="204"
+                  y="362"
+                  textAnchor="middle"
+                  fill="#ff7b72"
+                  fontSize="13"
+                  fontWeight="700"
+                >
+                  😵 同期が地獄 — ディスク 4 倍消費
+                </text>
+
+                {/* ▌RIGHT PANEL: worktree × 4 ▐ */}
+                <rect
+                  x="436"
+                  y="4"
+                  width="420"
+                  height="382"
+                  rx="8"
+                  fill="#0a160e"
+                  stroke="#56d364"
+                  strokeWidth="1.5"
+                />
+                <text
+                  x="646"
+                  y="32"
+                  textAnchor="middle"
+                  fill="#56d364"
+                  fontSize="14"
+                  fontWeight="700"
+                >
+                  ✅ worktree × 4（推奨）
+                </text>
+                <text x="646" y="50" textAnchor="middle" fill="#cdd9e5" fontSize="11">
+                  .git は 1 つ共有 — 全ワークツリーが同じ履歴を参照
+                </text>
+
+                {/* 唯一の .git */}
+                <rect
+                  x="454"
+                  y="62"
+                  width="384"
+                  height="48"
+                  rx="6"
+                  fill="#0d2a14"
+                  stroke="#56d364"
+                  strokeWidth="2.5"
+                />
+                <text
+                  x="646"
+                  y="83"
+                  textAnchor="middle"
+                  fill="#ffffff"
+                  fontSize="14"
+                  fontWeight="700"
+                >
+                  ai-docs/ ← .git（唯一・共有）
+                </text>
+                <text x="646" y="100" textAnchor="middle" fill="#56d364" fontSize="11">
+                  全 WT が同じコミット履歴を参照する
+                </text>
+
+                {/* shared/ */}
+                <rect
+                  x="556"
+                  y="126"
+                  width="180"
+                  height="36"
+                  rx="4"
+                  fill="#202010"
+                  stroke="#e3b341"
+                  strokeWidth="1.5"
+                />
+                <text
+                  x="646"
+                  y="144"
+                  textAnchor="middle"
+                  fill="#e3b341"
+                  fontSize="13"
+                  fontWeight="700"
+                >
+                  shared/
+                </text>
+                <text x="646" y="157" textAnchor="middle" fill="#ffffff" fontSize="10">
+                  共通リソース: common-header.js / .css（全 WT から参照）
+                </text>
+
+                {/* worktrees label */}
+                <text x="646" y="184" textAnchor="middle" fill="#cdd9e5" fontSize="11">
+                  worktrees/ ← .gitignore 対象
+                </text>
+
+                {/* 4 cards */}
+                <rect
+                  x="454"
+                  y="194"
+                  width="188"
+                  height="78"
+                  rx="5"
+                  fill="#241510"
+                  stroke="#ff9f6a"
+                  strokeWidth="2"
+                />
+                <text
+                  x="548"
+                  y="218"
+                  textAnchor="middle"
+                  fill="#ff9f6a"
+                  fontSize="13"
+                  fontWeight="700"
+                >
+                  claude/
+                </text>
+                <text x="548" y="237" textAnchor="middle" fill="#ffffff" fontSize="11">
+                  feat/claude-docs
+                </text>
+                <text x="548" y="256" textAnchor="middle" fill="#ff9f6a" fontSize="10">
+                  ランチャー起動中 ▶
+                </text>
+
+                <rect
+                  x="650"
+                  y="194"
+                  width="188"
+                  height="78"
+                  rx="5"
+                  fill="#10101e"
+                  stroke="#79b8ff"
+                  strokeWidth="2"
+                />
+                <text
+                  x="744"
+                  y="218"
+                  textAnchor="middle"
+                  fill="#79b8ff"
+                  fontSize="13"
+                  fontWeight="700"
+                >
+                  gemini/
+                </text>
+                <text x="744" y="237" textAnchor="middle" fill="#ffffff" fontSize="11">
+                  feat/gemini-docs
+                </text>
+                <text x="744" y="256" textAnchor="middle" fill="#79b8ff" fontSize="10">
+                  ランチャー起動中 ▶
+                </text>
+
+                <rect
+                  x="454"
+                  y="284"
+                  width="188"
+                  height="78"
+                  rx="5"
+                  fill="#0f1e10"
+                  stroke="#56d364"
+                  strokeWidth="2"
+                />
+                <text
+                  x="548"
+                  y="308"
+                  textAnchor="middle"
+                  fill="#56d364"
+                  fontSize="13"
+                  fontWeight="700"
+                >
+                  codex/
+                </text>
+                <text x="548" y="327" textAnchor="middle" fill="#ffffff" fontSize="11">
+                  feat/codex-docs
+                </text>
+                <text x="548" y="346" textAnchor="middle" fill="#56d364" fontSize="10">
+                  ランチャー起動中 ▶
+                </text>
+
+                <rect
+                  x="650"
+                  y="284"
+                  width="188"
+                  height="78"
+                  rx="5"
+                  fill="#160f1c"
+                  stroke="#e2a8ff"
+                  strokeWidth="2"
+                />
+                <text
+                  x="744"
+                  y="308"
+                  textAnchor="middle"
+                  fill="#e2a8ff"
+                  fontSize="13"
+                  fontWeight="700"
+                >
+                  copilot/
+                </text>
+                <text x="744" y="327" textAnchor="middle" fill="#ffffff" fontSize="11">
+                  feat/copilot-docs
+                </text>
+                <text x="744" y="346" textAnchor="middle" fill="#e2a8ff" fontSize="10">
+                  ランチャー起動中 ▶
+                </text>
+
+                {/* 接続線 */}
+                <line
+                  x1="646"
+                  y1="110"
+                  x2="646"
+                  y2="126"
+                  stroke="#56d364"
+                  strokeWidth="2"
+                  markerEnd="url(#arr-g)"
+                />
+                <line
+                  x1="646"
+                  y1="162"
+                  x2="646"
+                  y2="183"
+                  stroke="#cdd9e5"
+                  strokeWidth="1"
+                  strokeDasharray="3,3"
+                />
+                <line
+                  x1="646"
+                  y1="183"
+                  x2="548"
+                  y2="194"
+                  stroke="#ff9f6a"
+                  strokeWidth="1.5"
+                  markerEnd="url(#arr-cl)"
+                />
+                <line
+                  x1="646"
+                  y1="183"
+                  x2="744"
+                  y2="194"
+                  stroke="#79b8ff"
+                  strokeWidth="1.5"
+                  markerEnd="url(#arr-ge)"
+                />
+                <line
+                  x1="548"
+                  y1="183"
+                  x2="548"
+                  y2="284"
+                  stroke="#56d364"
+                  strokeWidth="1.5"
+                  markerEnd="url(#arr-g)"
+                />
+                <line
+                  x1="744"
+                  y1="183"
+                  x2="744"
+                  y2="284"
+                  stroke="#e2a8ff"
+                  strokeWidth="1.5"
+                  markerEnd="url(#arr-cp)"
+                />
+                <text
+                  x="646"
+                  y="380"
+                  textAnchor="middle"
+                  fill="#56d364"
+                  fontSize="13"
+                  fontWeight="700"
+                >
+                  🚀 並列作業 · 履歴一元化 · ディスク節約
+                </text>
+              </svg>
+            </div>
+
+            <h3>clone × 4 との決定的な違い</h3>
+            <table className={styles.tbl}>
+              <thead>
+                <tr>
+                  <th>観点</th>
+                  <th>git clone × 4</th>
+                  <th>git worktree × 4</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>.git の数</td>
+                  <td>4 つ（独立・完全コピー）</td>
+                  <td>
+                    <strong>1 つ（共有）</strong>
+                  </td>
+                </tr>
+                <tr>
+                  <td>ディスク使用量</td>
+                  <td>全体の 4× 相当</td>
+                  <td>
+                    <strong>追加分のみ（〜10% 増）</strong>
+                  </td>
+                </tr>
+                <tr>
+                  <td>共通変更の反映</td>
+                  <td>4 箇所に手動コピー必須</td>
+                  <td>
+                    <strong>merge/rebase で即時反映</strong>
+                  </td>
+                </tr>
+                <tr>
+                  <td>ブランチ切替コスト</td>
+                  <td>不要（独立）</td>
+                  <td>
+                    <strong>ゼロ（常時並列チェックアウト）</strong>
+                  </td>
+                </tr>
+                <tr>
+                  <td>stash 共有</td>
+                  <td>不可</td>
+                  <td>
+                    <strong>可能（.git が共通）</strong>
+                  </td>
+                </tr>
+                <tr>
+                  <td>AI エージェント活用</td>
+                  <td>各ツールが別リポジトリ認識</td>
+                  <td>
+                    <strong>全ツールが同一履歴を参照</strong>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          {/* ══════════ STEP 01 ══════════ */}
+          <section className={styles.step} id="s01">
+            <div className={styles.stepHdr}>
+              <div className={styles.stepN}>01</div>
+              <div>
+                <div className={styles.stepTitle}>リポジトリ初期設定とブランチ戦略</div>
+                <div className={styles.stepDesc}>
+                  メインリポジトリの作成から 4 プラットフォーム用ブランチの設計まで。
+                </div>
+              </div>
+            </div>
+
+            <h3>ブランチ戦略（Git グラフ）</h3>
+            <div className={styles.mmdBox}>
+              <div className={styles.mmdLbl}>
+                ▸ dev を源流として 4 プラットフォームのドキュメントブランチへ派生 —
+                共通リソース変更は merge で全 WT に同期
+              </div>
+              <MermaidDiagram
+                chart={`%%{init: {'logLevel': 'error', 'gitGraph': {'rotateCommitLabel': false, 'mainBranchName': 'dev'}}}%%
+gitGraph LR:
+commit id: "chore: init"
+commit id: "feat: shared/"
+branch feat/claude-docs
+checkout feat/claude-docs
+commit id: "agent.html v1"
+commit id: "skill.html v1"
+checkout dev
+branch feat/gemini-docs
+checkout feat/gemini-docs
+commit id: "agent.html v1"
+commit id: "skill.html v1"
+checkout dev
+branch feat/codex-docs
+checkout feat/codex-docs
+commit id: "agent.html v1"
+commit id: "skill.html v1"
+checkout dev
+branch feat/copilot-docs
+checkout feat/copilot-docs
+commit id: "agent.html v1"
+checkout dev
+commit id: "fix(shared): header"
+checkout feat/claude-docs
+merge dev id: "sync header"
+checkout feat/gemini-docs
+merge dev id: "sync header "`}
+              />
+            </div>
+
+            <div className={styles.cb}>
+              <div className={styles.cbHdr}>
+                <span>Terminal — リポジトリ初期化</span>
+                <span className={styles.cbTag}>bash</span>
+              </div>
+              <div className={styles.cbBody}>
+                <span className={styles.syCm}>
+                  # ── リポジトリ作成 ────────────────────────────────────────────────
+                </span>
+                {"\n"}
+                {"mkdir ai-docs && cd ai-docs\n"}
+                {"git init\n"}
+                {"git commit --allow-empty -m "}
+                <span className={styles.sySt}>"chore: initial commit"</span>
+                {"\n\n"}
+                <span className={styles.syCm}>
+                  # ── 共通ディレクトリを dev に作成 ───────────────────────────────
+                </span>
+                {"\n"}
+                {"mkdir -p shared/{components,styles,utils} docs scripts .github/workflows\n"}
+                {"git add . && git commit -m "}
+                <span className={styles.sySt}>"feat: add shared structure"</span>
+                {"\n\n"}
+                <span className={styles.syCm}>
+                  # ── 4 プラットフォーム用ブランチを作成 ──────────────────────────
+                </span>
+                {"\n"}
+                {"git branch "}
+                <span className={styles.syCl}>feat/claude-docs</span>
+                {"\n"}
+                {"git branch "}
+                <span className={styles.syGe}>feat/gemini-docs</span>
+                {"\n"}
+                {"git branch "}
+                <span className={styles.syCo}>feat/codex-docs</span>
+                {"\n"}
+                {"git branch "}
+                <span className={styles.syCp}>feat/copilot-docs</span>
+                {"\n\n"}
+                {"git branch -a   "}
+                <span className={styles.syCm}># 確認</span>
+              </div>
+            </div>
+
+            <div className={styles.cb}>
+              <div className={styles.cbHdr}>
+                <span>.gitignore — 必須設定</span>
+                <span className={styles.cbTag}>config</span>
+              </div>
+              <div className={styles.cbBody}>
+                <span className={styles.syCm}>
+                  # git worktree のチェックアウト先を追跡対象から除外（必須）
+                </span>
+                {"\n"}
+                <span className={styles.sySt}>{"worktrees/"}</span>
+                {"\n"}
+                <span className={styles.sySt}>{"node_modules/"}</span>
+                {"\n"}
+                <span className={styles.sySt}>{"*.log"}</span>
+                {"\n"}
+                <span className={styles.sySt}>{".DS_Store"}</span>
+              </div>
+            </div>
+
+            <div className={`${styles.ib} ${styles.ibWarn}`}>
+              <span>⚠️</span>
+              <div>
+                <strong>必須：</strong> <code>worktrees/</code> を<code>.gitignore</code>{" "}
+                に追加しないと、git がワークツリー内の
+                <code>.git</code> ファイルを「入れ子リポジトリ」として誤認識しエラーになります。
+              </div>
+            </div>
+          </section>
+
+          {/* ══════════ STEP 02 ══════════ */}
+          <section className={styles.step} id="s02">
+            <div className={styles.stepHdr}>
+              <div className={styles.stepN}>02</div>
+              <div>
+                <div className={styles.stepTitle}>
+                  worktree の追加 — 4 プラットフォームを一括セットアップ
+                </div>
+                <div className={styles.stepDesc}>
+                  git worktree add コマンドでディレクトリを作成し各ブランチをチェックアウトする。
+                </div>
+              </div>
+            </div>
+
+            {/* Mermaid: セットアップフロー */}
+            <div className={styles.mmdBox}>
+              <div className={styles.mmdLbl}>▸ worktree セットアップフロー — コマンド実行順序</div>
+              <MermaidDiagram
+                chart={`flowchart TD
+A([git init\\n空コミット]) --> B[shared/ 作成\\ngit commit]
+B --> C{git branch × 4\\n4ブランチ作成}
+C -->|claude| D1[git worktree add\\nworktrees/claude\\nfeat/claude-docs]
+C -->|gemini| D2[git worktree add\\nworktrees/gemini\\nfeat/gemini-docs]
+C -->|codex| D3[git worktree add\\nworktrees/codex\\nfeat/codex-docs]
+C -->|copilot| D4[git worktree add\\nworktrees/copilot\\nfeat/copilot-docs]
+D1 --> E1[cd worktrees/claude\\nclaude .]
+D2 --> E2[cd worktrees/gemini\\nclaude .]
+D3 --> E3[cd worktrees/codex\\nclaude .]
+D4 --> E4[cd worktrees/copilot\\nclaude .]
+style A fill:#21262d,stroke:#56d364,color:#ffffff
+style B fill:#21262d,stroke:#444c56,color:#ffffff
+style C fill:#1f2d14,stroke:#56d364,color:#ffffff
+style D1 fill:#2a1a10,stroke:#ff9f6a,color:#ffffff
+style D2 fill:#101828,stroke:#79b8ff,color:#ffffff
+style D3 fill:#101e12,stroke:#56d364,color:#ffffff
+style D4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff
+style E1 fill:#2a1a10,stroke:#ff9f6a,color:#ffffff
+style E2 fill:#101828,stroke:#79b8ff,color:#ffffff
+style E3 fill:#101e12,stroke:#56d364,color:#ffffff
+style E4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff`}
+              />
+            </div>
+
+            <div className={styles.cb}>
+              <div className={styles.cbHdr}>
+                <span>Terminal</span>
+                <span className={styles.cbTag}>bash</span>
+              </div>
+              <div className={styles.cbBody}>
+                <span className={styles.syCm}>
+                  # シグネチャ: git worktree add &lt;チェックアウト先パス&gt; &lt;ブランチ名&gt;
+                </span>
+                {"\n"}
+                {"git worktree add worktrees/"}
+                <span className={styles.syCl}>claude</span>
+                {"   "}
+                <span className={styles.syCl}>feat/claude-docs</span>
+                {"\n"}
+                {"git worktree add worktrees/"}
+                <span className={styles.syGe}>gemini</span>
+                {"   "}
+                <span className={styles.syGe}>feat/gemini-docs</span>
+                {"\n"}
+                {"git worktree add worktrees/"}
+                <span className={styles.syCo}>codex</span>
+                {"    "}
+                <span className={styles.syCo}>feat/codex-docs</span>
+                {"\n"}
+                {"git worktree add worktrees/"}
+                <span className={styles.syCp}>copilot</span>
+                {"  "}
+                <span className={styles.syCp}>feat/copilot-docs</span>
+                {"\n\n"}
+                <span className={styles.syCm}># 確認</span>
+                {"\n"}
+                {"git worktree list\n"}
+                <span className={styles.syCm}>
+                  {
+                    "# /home/user/ai-docs                    abc1234 [dev]\n# /home/user/ai-docs/worktrees/claude   def5678 [feat/claude-docs]\n# /home/user/ai-docs/worktrees/gemini   ghi9012 [feat/gemini-docs]\n# /home/user/ai-docs/worktrees/codex    jkl3456 [feat/codex-docs]\n# /home/user/ai-docs/worktrees/copilot  mno7890 [feat/copilot-docs]"
+                  }
+                </span>
+              </div>
+            </div>
+
+            <h3>セットアップ後のディレクトリ構造</h3>
+            <div className={styles.svgBox}>
+              <div className={styles.svgLbl}>
+                ▸ ai-docs/ 全体のファイルツリー（セットアップ完了後）
+              </div>
+              <svg
+                viewBox="0 0 780 440"
+                xmlns="http://www.w3.org/2000/svg"
+                fontFamily="IBM Plex Mono, Courier New, monospace"
+                role="img"
+                aria-label="ai-docs/ 全体のファイルツリー（セットアップ完了後）"
+              >
+                <title>ai-docs/ ディレクトリ構造</title>
+                {/* root box */}
+                <rect
+                  x="8"
+                  y="8"
+                  width="180"
+                  height="30"
+                  rx="5"
+                  fill="#0d2a14"
+                  stroke="#56d364"
+                  strokeWidth="2"
+                />
+                <text
+                  x="98"
+                  y="28"
+                  textAnchor="middle"
+                  fill="#56d364"
+                  fontSize="14"
+                  fontWeight="700"
+                >
+                  ai-docs/
+                </text>
+                <text x="198" y="28" fill="#cdd9e5" fontSize="11">
+                  ← dev ブランチ（メイン WT）
+                </text>
+
+                {/* vertical stem */}
+                <line x1="36" y1="38" x2="36" y2="430" stroke="#444c56" strokeWidth="1.5" />
+
+                {/* .git */}
+                <line x1="36" y1="68" x2="66" y2="68" stroke="#444c56" strokeWidth="1.3" />
+                <rect
+                  x="66"
+                  y="55"
+                  width="155"
+                  height="26"
+                  rx="4"
+                  fill="#0d2a14"
+                  stroke="#56d364"
+                  strokeWidth="2"
+                />
+                <text
+                  x="143"
+                  y="72"
+                  textAnchor="middle"
+                  fill="#56d364"
+                  fontSize="13"
+                  fontWeight="700"
+                >
+                  .git/（共有・唯一）
+                </text>
+                <text x="230" y="72" fill="#ffffff" fontSize="11">
+                  ← 全 WT が参照
+                </text>
+
+                {/* .gitignore */}
+                <line x1="36" y1="105" x2="66" y2="105" stroke="#444c56" strokeWidth="1.3" />
+                <text x="70" y="109" fill="#ffffff" fontSize="13">
+                  .gitignore
+                </text>
+                <text x="195" y="109" fill="#e3b341" fontSize="11">
+                  ← worktrees/ を除外（必須）
+                </text>
+
+                {/* shared/ */}
+                <line x1="36" y1="142" x2="66" y2="142" stroke="#444c56" strokeWidth="1.3" />
+                <rect
+                  x="66"
+                  y="129"
+                  width="110"
+                  height="26"
+                  rx="4"
+                  fill="#202010"
+                  stroke="#e3b341"
+                  strokeWidth="1.5"
+                />
+                <text
+                  x="121"
+                  y="146"
+                  textAnchor="middle"
+                  fill="#e3b341"
+                  fontSize="13"
+                  fontWeight="700"
+                >
+                  shared/
+                </text>
+                <text x="185" y="146" fill="#ffffff" fontSize="11">
+                  ← 共通リソース: common-header.js / .css（全 WT が参照）
+                </text>
+
+                {/* scripts/ */}
+                <line x1="36" y1="180" x2="66" y2="180" stroke="#444c56" strokeWidth="1.3" />
+                <text x="70" y="184" fill="#ffffff" fontSize="13">
+                  scripts/
+                </text>
+                <line x1="84" y1="189" x2="84" y2="210" stroke="#444c56" strokeWidth="1.1" />
+                <line x1="84" y1="200" x2="110" y2="200" stroke="#444c56" strokeWidth="1.1" />
+                <text x="114" y="204" fill="#56d364" fontSize="12">
+                  setup-worktrees.sh
+                </text>
+                <line x1="84" y1="210" x2="110" y2="213" stroke="#444c56" strokeWidth="1.1" />
+                <text x="114" y="217" fill="#56d364" fontSize="12">
+                  sync-all.sh
+                </text>
+
+                {/* worktrees/ label */}
+                <line x1="36" y1="250" x2="66" y2="250" stroke="#444c56" strokeWidth="1.3" />
+                <rect
+                  x="66"
+                  y="237"
+                  width="120"
+                  height="26"
+                  rx="4"
+                  fill="#1c2230"
+                  stroke="#444c56"
+                  strokeWidth="1"
+                />
+                <text x="126" y="254" textAnchor="middle" fill="#cdd9e5" fontSize="12">
+                  worktrees/
+                </text>
+                <text x="196" y="254" fill="#cdd9e5" fontSize="11">
+                  ← .gitignore 対象
+                </text>
+
+                {/* sub-stem for worktrees */}
+                <line x1="84" y1="263" x2="84" y2="420" stroke="#444c56" strokeWidth="1.1" />
+
+                {/* claude/ */}
+                <line x1="84" y1="284" x2="114" y2="284" stroke="#444c56" strokeWidth="1" />
+                <rect
+                  x="114"
+                  y="273"
+                  width="90"
+                  height="22"
+                  rx="3"
+                  fill="#241510"
+                  stroke="#ff9f6a"
+                  strokeWidth="1.8"
+                />
+                <text
+                  x="159"
+                  y="288"
+                  textAnchor="middle"
+                  fill="#ff9f6a"
+                  fontSize="12"
+                  fontWeight="700"
+                >
+                  claude/
+                </text>
+                <text x="213" y="288" fill="#ffffff" fontSize="11">
+                  feat/claude-docs / CLAUDE.md
+                </text>
+
+                {/* gemini/ */}
+                <line x1="84" y1="322" x2="114" y2="322" stroke="#444c56" strokeWidth="1" />
+                <rect
+                  x="114"
+                  y="311"
+                  width="90"
+                  height="22"
+                  rx="3"
+                  fill="#10101e"
+                  stroke="#79b8ff"
+                  strokeWidth="1.8"
+                />
+                <text
+                  x="159"
+                  y="326"
+                  textAnchor="middle"
+                  fill="#79b8ff"
+                  fontSize="12"
+                  fontWeight="700"
+                >
+                  gemini/
+                </text>
+                <text x="213" y="326" fill="#ffffff" fontSize="11">
+                  feat/gemini-docs / GEMINI.md
+                </text>
+
+                {/* codex/ */}
+                <line x1="84" y1="360" x2="114" y2="360" stroke="#444c56" strokeWidth="1" />
+                <rect
+                  x="114"
+                  y="349"
+                  width="90"
+                  height="22"
+                  rx="3"
+                  fill="#0f1e10"
+                  stroke="#56d364"
+                  strokeWidth="1.8"
+                />
+                <text
+                  x="159"
+                  y="364"
+                  textAnchor="middle"
+                  fill="#56d364"
+                  fontSize="12"
+                  fontWeight="700"
+                >
+                  codex/
+                </text>
+                <text x="213" y="364" fill="#ffffff" fontSize="11">
+                  feat/codex-docs / AGENTS.md
+                </text>
+
+                {/* copilot/ */}
+                <line x1="84" y1="398" x2="114" y2="398" stroke="#444c56" strokeWidth="1" />
+                <rect
+                  x="114"
+                  y="387"
+                  width="90"
+                  height="22"
+                  rx="3"
+                  fill="#160f1c"
+                  stroke="#e2a8ff"
+                  strokeWidth="1.8"
+                />
+                <text
+                  x="159"
+                  y="402"
+                  textAnchor="middle"
+                  fill="#e2a8ff"
+                  fontSize="12"
+                  fontWeight="700"
+                >
+                  copilot/
+                </text>
+                <text x="213" y="402" fill="#ffffff" fontSize="11">
+                  feat/copilot-docs / .github/copilot-instructions.md
+                </text>
+              </svg>
+            </div>
+
+            <div className={styles.cb}>
+              <div className={styles.cbHdr}>
+                <span>scripts/setup-worktrees.sh — 一括セットアップ</span>
+                <span className={styles.cbTag}>bash</span>
+              </div>
+              <div className={styles.cbBody}>
+                <span className={styles.syKw}>#!/bin/bash</span>
+                {"\n"}
+                {"set -euo pipefail\n\n"}
+                {"PLATFORMS_KEYS=("}
+                <span className={styles.syCl}>claude</span>{" "}
+                <span className={styles.syGe}>gemini</span>{" "}
+                <span className={styles.syCo}>codex</span>{" "}
+                <span className={styles.syCp}>copilot</span>
+                {")\n"}
+                {"PLATFORMS_VALUES=("}
+                <span className={styles.syCl}>feat/claude-docs</span>{" "}
+                <span className={styles.syGe}>feat/gemini-docs</span>{" "}
+                <span className={styles.syCo}>feat/codex-docs</span>{" "}
+                <span className={styles.syCp}>feat/copilot-docs</span>
+                {")\n\n"}
+                {"mkdir -p worktrees\n\n"}
+                {
+                  // biome-ignore lint/suspicious/noTemplateCurlyInString: bash associative array syntax
+                  'for i in "${!PLATFORMS_KEYS[@]}"; do\n'
+                }
+                {
+                  // biome-ignore lint/suspicious/noTemplateCurlyInString: bash array variable syntax
+                  '  PLATFORM="${PLATFORMS_KEYS[$i]}"\n'
+                }
+                {
+                  // biome-ignore lint/suspicious/noTemplateCurlyInString: bash array variable syntax
+                  '  BRANCH="${PLATFORMS_VALUES[$i]}"\n'
+                }
+                {'  TARGET="worktrees/$PLATFORM"\n\n'}
+                {'  [ -d "$TARGET" ] && { echo "⏭  $PLATFORM: skip"; continue; }\n\n'}
+                {'  git show-ref --verify --quiet "refs/heads/$BRANCH" ||\\\n'}
+                {'    git branch "$BRANCH" dev\n\n'}
+                {'  git worktree add "$TARGET" "$BRANCH"\n'}
+                {'  echo "'}
+                <span className={styles.syOk}>✓</span>
+                {'  $PLATFORM → $TARGET ($BRANCH)"\n'}
+                {"done\n\n"}
+                {"git worktree list"}
+              </div>
+            </div>
+
+            <h3>ドキュメント構造とファイル配置</h3>
+            <div className={styles.plg}>
+              <div className={styles.plc}>
+                <div className={styles.plh}>
+                  <div className={styles.pld} style={{ background: "var(--cl)" }} />
+                  Claude / worktrees/claude/
+                </div>
+                <div className={styles.pli}>
+                  <code>claude/agent.html</code> — エージェント最適化ガイド
+                </div>
+                <div className={styles.pli}>
+                  <code>claude/skill.html</code> — スキル展開ガイド
+                </div>
+                <div className={styles.pli}>
+                  共通: <code>../shared/common-header.js</code>
+                </div>
+                <div className={styles.pli}>
+                  共通: <code>../shared/common-header.css</code>
+                </div>
+              </div>
+              <div className={styles.plc}>
+                <div className={styles.plh}>
+                  <div className={styles.pld} style={{ background: "var(--ge)" }} />
+                  Gemini / worktrees/gemini/
+                </div>
+                <div className={styles.pli}>
+                  <code>gemini/agent.html</code> — エージェント最適化ガイド
+                </div>
+                <div className={styles.pli}>
+                  <code>gemini/skill.html</code> — スキル展開ガイド
+                </div>
+                <div className={styles.pli}>
+                  共通: <code>../shared/common-header.js</code>
+                </div>
+                <div className={styles.pli}>
+                  共通: <code>../shared/common-header.css</code>
+                </div>
+              </div>
+              <div className={styles.plc}>
+                <div className={styles.plh}>
+                  <div className={styles.pld} style={{ background: "var(--co)" }} />
+                  Codex / worktrees/codex/
+                </div>
+                <div className={styles.pli}>
+                  <code>codex/agent.html</code> — エージェント最適化ガイド
+                </div>
+                <div className={styles.pli}>
+                  <code>codex/skill.html</code> — スキル展開ガイド
+                </div>
+                <div className={styles.pli}>
+                  共通: <code>../shared/common-header.js</code>
+                </div>
+                <div className={styles.pli}>
+                  共通: <code>../shared/common-header.css</code>
+                </div>
+              </div>
+              <div className={styles.plc}>
+                <div className={styles.plh}>
+                  <div className={styles.pld} style={{ background: "var(--cp)" }} />
+                  Copilot / worktrees/copilot/
+                </div>
+                <div className={styles.pli}>
+                  <code>copilot/agent.html</code> — エージェント最適化ガイド
+                </div>
+                <div className={styles.pli}>
+                  <code>copilot/skill.html</code> — スキル展開ガイド
+                </div>
+                <div className={styles.pli}>
+                  共通: <code>../shared/common-header.js</code>
+                </div>
+                <div className={styles.pli}>
+                  共通: <code>../shared/common-header.css</code>
+                </div>
+              </div>
+            </div>
+
+            <div className={`${styles.ib} ${styles.ibOk}`}>
+              <span>✅</span>
+              <div>
+                <strong>WebSearch 活用:</strong> 各 WT で AI ツールを起動し、
+                <code>WebSearch</code> で最新情報（API
+                変更、新機能、ベストプラクティス等）を調査しながら agent.html と skill.html
+                を更新します。Claude Code は <code>/search</code> コマンド、 Antigravity
+                は組み込み検索でそれぞれ最新情報を取得できます。
+              </div>
+            </div>
+          </section>
+
+          {/* ══════════ STEP 03 ══════════ */}
+          <section className={styles.step} id="s03">
+            <div className={styles.stepHdr}>
+              <div className={styles.stepN}>03</div>
+              <div>
+                <div className={styles.stepTitle}>日常の並列開発ワークフロー</div>
+                <div className={styles.stepDesc}>
+                  各ワークツリーでの作業・共通変更の反映・PR までの全フロー。
+                </div>
+              </div>
+            </div>
+
+            {/* Mermaid: シーケンス図 */}
+            <div className={styles.mmdBox}>
+              <div className={styles.mmdLbl}>▸ 並列作業 → 共通変更同期 → PR — シーケンス図</div>
+              <MermaidDiagram
+                chart={`sequenceDiagram
+participant M as dev（メイン WT）
+participant C as claude/ エージェント + WebSearch
+participant G as gemini/ エージェント + WebSearch
+participant X as codex/ エージェント + WebSearch
+participant P as copilot/ エージェント + WebSearch
+Note over C,P: 4ターミナルで同時並列作業（WebSearch で最新情報取得）
+C->>C: docs: agent.html 更新
+G->>G: docs: skill.html 更新
+X->>X: docs: agent.html 更新
+P->>P: docs: skill.html 更新
+M->>M: fix(shared): header CSS
+Note over M,P: scripts/sync-all.sh 実行
+M-->>C: git merge dev
+M-->>G: git merge dev
+M-->>X: git merge dev
+M-->>P: git merge dev
+C->>C: git push → PR 作成
+G->>G: git push → PR 作成
+X->>X: git push → PR 作成
+P->>P: git push → PR 作成`}
+              />
+            </div>
+
+            <h3>各プラットフォームへの AI 設定ファイル配置</h3>
+            <div className={styles.plg}>
+              <div className={styles.plc}>
+                <div className={styles.plh}>
+                  <div className={styles.pld} style={{ background: "var(--cl)" }} />
+                  Claude / worktrees/claude/
+                </div>
+                <div className={styles.pli}>
+                  <code>CLAUDE.md</code> — プロジェクト永続メモリ
+                </div>
+                <div className={styles.pli}>
+                  <code>AGENTS.md</code> — オープン標準（兼用）
+                </div>
+                <div className={styles.pli}>
+                  <code>.claude/skills/*/SKILL.md</code>
+                </div>
+                <div className={styles.pli}>
+                  <code>.claude/commands/</code> — カスタムコマンド
+                </div>
+              </div>
+              <div className={styles.plc}>
+                <div className={styles.plh}>
+                  <div className={styles.pld} style={{ background: "var(--ge)" }} />
+                  Antigravity / worktrees/gemini/
+                </div>
+                <div className={styles.pli}>
+                  <code>GEMINI.md</code> — グローバルメモリ
+                </div>
+                <div className={styles.pli}>
+                  <code>.agent/rules/</code> — パッシブルール
+                </div>
+                <div className={styles.pli}>
+                  <code>.agent/skills/*/SKILL.md</code>
+                </div>
+                <div className={styles.pli}>
+                  <code>.agent/workflows/</code> — アクティブ手順
+                </div>
+              </div>
+              <div className={styles.plc}>
+                <div className={styles.plh}>
+                  <div className={styles.pld} style={{ background: "var(--co)" }} />
+                  Codex / worktrees/codex/
+                </div>
+                <div className={styles.pli}>
+                  <code>AGENTS.md</code> — オープン標準（主）
+                </div>
+                <div className={styles.pli}>
+                  <code>.agents/skills/*/SKILL.md</code>
+                </div>
+                <div className={styles.pli}>
+                  <code>docs/REQUIREMENTS.md</code>
+                </div>
+                <div className={styles.pli}>
+                  <code>docs/AGENT_TASKS.md</code>
+                </div>
+              </div>
+              <div className={styles.plc}>
+                <div className={styles.plh}>
+                  <div className={styles.pld} style={{ background: "var(--cp)" }} />
+                  Copilot / worktrees/copilot/
+                </div>
+                <div className={styles.pli}>
+                  <code>.github/copilot-instructions.md</code>
+                </div>
+                <div className={styles.pli}>
+                  <code>.github/instructions/*.md</code>
+                </div>
+                <div className={styles.pli}>
+                  <code>.github/prompts/*.prompt.md</code>
+                </div>
+                <div className={styles.pli}>
+                  <code>.github/chatmodes/*.chatmode.md</code>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.cb}>
+              <div className={styles.cbHdr}>
+                <span>scripts/sync-all.sh — 全 WT 一括同期</span>
+                <span className={styles.cbTag}>bash</span>
+              </div>
+              <div className={styles.cbBody}>
+                <span className={styles.syKw}>#!/bin/bash</span>
+                {"\n"}
+                {"set -euo pipefail\n"}
+                {'ROOT="$(git rev-parse --show-toplevel)"\n'}
+                {"WORKTREES=("}
+                <span className={styles.syCl}>claude</span>{" "}
+                <span className={styles.syGe}>gemini</span>{" "}
+                <span className={styles.syCo}>codex</span>{" "}
+                <span className={styles.syCp}>copilot</span>
+                {")\n\n"}
+                {
+                  // biome-ignore lint/suspicious/noTemplateCurlyInString: bash array variable syntax
+                  'for WT in "${WORKTREES[@]}"; do\n'
+                }
+                {'  echo "━━━ Syncing: $WT ━━━━━━━━━━━━━━━━━━"\n'}
+                {'  cd "$ROOT/worktrees/$WT"\n\n'}
+                {'  if [ -n "$(git status --porcelain)" ]; then\n'}
+                {"    git stash push -u -m "}
+                <span className={styles.sySt}>&quot;auto: $WT before sync&quot;</span>
+                {"\n"}
+                {"    STASHED=true\n"}
+                {"  else\n"}
+                {"    STASHED=false\n"}
+                {"  fi\n\n"}
+                {"  if git merge dev --no-edit; then\n"}
+                {'    echo "'}
+                <span className={styles.syOk}> ✓ $WT: synced</span>
+                {'"\n'}
+                {'    if [ "$STASHED" = true ]; then\n'}
+                {"      if git stash apply; then\n"}
+                {"        git stash drop\n"}
+                {"      else\n"}
+                {'        echo "'}
+                <span className={styles.syEr}> ✗ $WT: STASH APPLY FAILED — 手動解決が必要</span>
+                {'"\n'}
+                {"      fi\n"}
+                {"    fi\n"}
+                {"  else\n"}
+                {'    echo "'}
+                <span className={styles.syEr}> ✗ $WT: CONFLICT — 手動解決が必要</span>
+                {'"\n'}
+                {"  fi\n"}
+                {"done\n\n"}
+                {'cd "$ROOT" && git worktree list'}
+              </div>
+            </div>
+          </section>
+
+          {/* ══════════ STEP 04 ══════════ */}
+          <section className={styles.step} id="s04">
+            <div className={styles.stepHdr}>
+              <div className={styles.stepN}>04</div>
+              <div>
+                <div className={styles.stepTitle}>メリット・デメリット — 導入判断の材料</div>
+                <div className={styles.stepDesc}>
+                  4 プラットフォームのドキュメント並列更新における worktree
+                  の優位性と注意すべき落とし穴。
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.mdg}>
+              <div className={styles.mdc}>
+                <div className={`${styles.mdh} ${styles.mdhOk}`}>✅ メリット</div>
+                <div className={styles.mdb}>
+                  <div className={styles.mdi}>
+                    <div className={styles.mdiIcon}>🚀</div>
+                    <div>
+                      <strong>真の並列開発（stash・切替ゼロ）</strong>
+                      <span>
+                        4 ターミナルで同時に別ブランチを操作。AI エージェントを 4
+                        つ同時起動できる。ブランチ切替コストが完全にゼロ。
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles.mdi}>
+                    <div className={styles.mdiIcon}>💾</div>
+                    <div>
+                      <strong>ディスク・メモリを大幅節約</strong>
+                      <span>
+                        .git オブジェクトを共有するため clone×4
+                        に比べてディスク使用量が大幅に少ない（差分のみ追加）。
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles.mdi}>
+                    <div className={styles.mdiIcon}>🔗</div>
+                    <div>
+                      <strong>共通変更が一元管理</strong>
+                      <span>
+                        shared/ の変更を dev で 1 回 commit → sync-all.sh で全 WT
+                        に反映。手動コピー完全不要。
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles.mdi}>
+                    <div className={styles.mdiIcon}>📜</div>
+                    <div>
+                      <strong>Git 履歴の一元化</strong>
+                      <span>
+                        全プラットフォームの変更履歴が 1 リポジトリに集約。git log / bisect / blame
+                        が横断的に使える。
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles.mdi}>
+                    <div className={styles.mdiIcon}>🤖</div>
+                    <div>
+                      <strong>AI エージェントとの最良の相性</strong>
+                      <span>
+                        各 WT に設定ファイルを配置するだけで、AI が同一の git
+                        履歴を参照しながら独立した作業を実行できる。
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles.mdi}>
+                    <div className={styles.mdiIcon}>🔀</div>
+                    <div>
+                      <strong>stash が全 WT 間で共有</strong>
+                      <span>
+                        全 WT が同じ .git を参照するため、WT をまたいで stash を参照・適用できる。
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.mdc}>
+                <div className={`${styles.mdh} ${styles.mdhErr}`}>❌ デメリット・注意点</div>
+                <div className={styles.mdb}>
+                  <div className={styles.mdi}>
+                    <div className={styles.mdiIcon}>🔒</div>
+                    <div>
+                      <strong>同一ブランチの重複チェックアウト不可</strong>
+                      <span>
+                        同じブランチを 2 つの WT で同時チェックアウトできない。--force
+                        は破壊的なので絶対禁止。
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles.mdi}>
+                    <div className={styles.mdiIcon}>⚡</div>
+                    <div>
+                      <strong>hook が全 WT に影響する</strong>
+                      <span>
+                        .git/hooks は全 WT 共有。pre-commit が全 WT
+                        で実行される。個別設定には追加ロジックが必要。
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles.mdi}>
+                    <div className={styles.mdiIcon}>📁</div>
+                    <div>
+                      <strong>IDE が混乱しやすい</strong>
+                      <span>
+                        VS Code がメインルートを認識し、worktrees/
+                        配下を正しく扱えない場合がある。WT ごとに別ウィンドウで開くことを推奨。
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles.mdi}>
+                    <div className={styles.mdiIcon}>🔀</div>
+                    <div>
+                      <strong>merge コンフリクトのリスク</strong>
+                      <span>
+                        4 ブランチが並行して shared/ を変更すると dev merge
+                        時に複数コンフリクトが発生。保護ブランチ設定が必要。
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles.mdi}>
+                    <div className={styles.mdiIcon}>🧹</div>
+                    <div>
+                      <strong>WT 削除手順が特殊</strong>
+                      <span>
+                        rm -rf だけでは git の追跡が残る。git worktree remove または git worktree
+                        prune が必要。
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles.mdi}>
+                    <div className={styles.mdiIcon}>📊</div>
+                    <div>
+                      <strong>gc / fetch が重くなりうる</strong>
+                      <span>
+                        多数の WT 存在時に git gc や git fetch が遅くなる。定期的な git worktree
+                        prune が必要。
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* ══════════ STEP 05 ══════════ */}
+          <section className={styles.step} id="s05">
+            <div className={styles.stepHdr}>
+              <div className={styles.stepN}>05</div>
+              <div>
+                <div className={styles.stepTitle}>導入時の注意点 — 絶対に守る 7 つのルール</div>
+                <div className={styles.stepDesc}>
+                  チームで worktree を運用する際に全員が合意すべき制約と落とし穴の回避策。
+                </div>
+              </div>
+            </div>
+
+            {/* Mermaid: エラーと対処 */}
+            <div className={styles.mmdBox}>
+              <div className={styles.mmdLbl}>▸ よくあるミスと正しい対処フロー</div>
+              <MermaidDiagram
+                chart={`flowchart LR
+subgraph BAD["❌ よくあるミス"]
+direction TB
+E1["同一ブランチを\\n別 WT で checkout"]
+E2["rm -rf で WT\\nディレクトリを削除"]
+E3["shared/ を各 WT から\\n直接変更"]
+E4["AI エージェントを\\nルート直下から起動"]
+end
+subgraph GOOD["✅ 正しい対処"]
+direction TB
+F1["git worktree list で確認\\n各 WT に別ブランチを割当"]
+F2["git worktree remove\\ngit worktree prune"]
+F3["dev で変更 → commit\\nsync-all.sh で全 WT 反映"]
+F4["cd worktrees/claude から\\n各ツールを起動"]
+end
+E1 -->|fatal: already checked out| F1
+E2 -->|.git にメタデータが残存| F2
+E3 -->|merge コンフリクト多発| F3
+E4 -->|全 WT 横断の誤変更リスク| F4
+style E1 fill:#2a1515,stroke:#ff7b72,color:#ffffff
+style E2 fill:#2a1515,stroke:#ff7b72,color:#ffffff
+style E3 fill:#2a1515,stroke:#ff7b72,color:#ffffff
+style E4 fill:#2a1515,stroke:#ff7b72,color:#ffffff
+style F1 fill:#152515,stroke:#56d364,color:#ffffff
+style F2 fill:#152515,stroke:#56d364,color:#ffffff
+style F3 fill:#152515,stroke:#56d364,color:#ffffff
+style F4 fill:#152515,stroke:#56d364,color:#ffffff
+style BAD fill:#1c1010,stroke:#ff7b72,color:#ff7b72
+style GOOD fill:#101c10,stroke:#56d364,color:#56d364`}
+              />
+            </div>
+
+            <div className={styles.rules}>
+              <div className={styles.rule}>
+                <div className={styles.ruleIcon} style={{ color: "var(--err)" }}>
+                  🚫
+                </div>
+                <div>
+                  <strong>ルール 1: 同一ブランチを複数 WT にチェックアウトしない</strong>
+                  <span>
+                    <code>--force</code> フラグは .git の整合性を破壊するため絶対禁止。
+                    <code>git worktree list</code>
+                    で現状確認してから追加する。
+                  </span>
+                </div>
+              </div>
+              <div className={styles.rule}>
+                <div className={styles.ruleIcon} style={{ color: "var(--warn)" }}>
+                  ⚠️
+                </div>
+                <div>
+                  <strong>ルール 2: WT の削除は必ず git worktree remove を使う</strong>
+                  <span>
+                    <code>rm -rf worktrees/claude</code> だけでは .git
+                    内のメタデータが残存する。削除後は
+                    <code>git worktree prune</code> で必ずクリーンアップする。
+                  </span>
+                </div>
+              </div>
+              <div className={styles.rule}>
+                <div className={styles.ruleIcon} style={{ color: "var(--warn)" }}>
+                  ⚠️
+                </div>
+                <div>
+                  <strong>
+                    ルール 3: shared/ (common-header リソース) への変更は dev ブランチ経由のみ
+                  </strong>
+                  <span>
+                    各 WT から直接 shared/ 内の共通リソースを変更すると merge
+                    コンフリクトが多発する。
+                    <code>CODEOWNERS</code>
+                    で特定のレビュアーを指定するだけでなく、保護ブランチや Ruleset の設定で
+                    「PRマージ必須」「特定ユーザーのみ変更可」を強制することが必須。
+                  </span>
+                </div>
+              </div>
+              <div className={styles.rule}>
+                <div className={styles.ruleIcon} style={{ color: "var(--ge)" }}>
+                  🔍
+                </div>
+                <div>
+                  <strong>ルール 4: git stash のメッセージには WT 名を含める</strong>
+                  <span>
+                    stash は全 WT 共通の .git に保存されるため混在する。例:
+                    <code>git stash push -m &quot;claude: WIP nav&quot;</code>
+                  </span>
+                </div>
+              </div>
+              <div className={styles.rule}>
+                <div className={styles.ruleIcon} style={{ color: "var(--co)" }}>
+                  📋
+                </div>
+                <div>
+                  <strong>ルール 5: pre-commit hook は全 WT で動作することを前提に設計する</strong>
+                  <span>
+                    hooks/ は全 WT で共有。特定 WT だけ除外したい場合は
+                    <code>$GIT_DIR</code> 変数で判定するロジックを hook に追加する。
+                  </span>
+                </div>
+              </div>
+              <div className={styles.rule}>
+                <div className={styles.ruleIcon} style={{ color: "var(--cp)" }}>
+                  🤖
+                </div>
+                <div>
+                  <strong>ルール 6: AI エージェントはワークツリーのルートから必ず起動する</strong>
+                  <span>
+                    メインルート（ai-docs/）から起動すると全 WT
+                    横断でファイルを変更するリスクがある。
+                    <code>cd worktrees/claude &amp;&amp; claude</code>
+                    のように WT 内から起動する。
+                  </span>
+                </div>
+              </div>
+              <div className={styles.rule}>
+                <div className={styles.ruleIcon} style={{ color: "var(--ok)" }}>
+                  🔄
+                </div>
+                <div>
+                  <strong>ルール 7: 定期的に git worktree prune を実行する</strong>
+                  <span>
+                    削除済み WT のメタデータが蓄積するため、週次または CI で
+                    <code>git worktree prune &amp;&amp; git fetch --prune</code>
+                    を実行してリポジトリを健全に保つ。
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <h3>よくあるエラーと対処法</h3>
+            <table className={styles.tbl}>
+              <thead>
+                <tr>
+                  <th>エラーメッセージ</th>
+                  <th>原因</th>
+                  <th>対処法</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>fatal: already checked out</td>
+                  <td>同ブランチを別 WT でも checkout しようとした</td>
+                  <td>
+                    <code>git worktree list</code> で確認し、各 WT に別ブランチを使う
+                  </td>
+                </tr>
+                <tr>
+                  <td>fatal: already exists</td>
+                  <td>対象ディレクトリが既に存在する</td>
+                  <td>
+                    <code>rm -rf worktrees/xxx &amp;&amp; git worktree prune</code> 後に再実行
+                  </td>
+                </tr>
+                <tr>
+                  <td>error: worktree locked</td>
+                  <td>別プロセスが使用中でロックされた</td>
+                  <td>
+                    <code>git worktree unlock worktrees/xxx</code> または再起動
+                  </td>
+                </tr>
+                <tr>
+                  <td>CONFLICT in shared/</td>
+                  <td>複数 WT が同じ shared/ ファイルを変更</td>
+                  <td>
+                    CODEOWNERS + 保護ブランチで shared/ への直接変更を禁止し dev 経由のみに制限
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div className={styles.cb}>
+              <div className={styles.cbHdr}>
+                <span>Cleanup Commands</span>
+                <span className={styles.cbTag}>bash</span>
+              </div>
+              <div className={styles.cbBody}>
+                <span className={styles.syCm}># 安全に削除（未コミット変更がない場合）</span>
+                {"\n"}
+                {"git worktree remove worktrees/claude\n\n"}
+                <span className={styles.syCm}># 強制削除（未コミット変更も削除）</span>
+                {"\n"}
+                {"git worktree remove --force worktrees/claude\n\n"}
+                <span className={styles.syCm}># 削除済みディレクトリの参照を git から掃除</span>
+                {"\n"}
+                {"git worktree prune\n"}
+                {"git worktree prune --dry-run   "}
+                <span className={styles.syCm}># 確認してから実行</span>
+                {"\n\n"}
+                <span className={styles.syCm}># 全 WT を一括削除（リセット）</span>
+                {"\n"}
+                {"for WT in claude gemini codex copilot; do\n"}
+                {'  git worktree remove --force "worktrees/$WT" 2>/dev/null || true\n'}
+                {'done && git worktree prune && echo "'}
+                <span className={styles.syOk}>All removed.</span>
+                {'"'}
+              </div>
+            </div>
+          </section>
+
+          {/* ══════════ STEP 06 ══════════ */}
+          <section className={styles.step} id="s06">
+            <div className={styles.stepHdr}>
+              <div className={styles.stepN}>06</div>
+              <div>
+                <div className={styles.stepTitle}>
+                  GitHub Actions との統合 — 4 プラットフォームの並列 CI
+                </div>
+                <div className={styles.stepDesc}>
+                  matrix strategy による効率的な並列ビルド・デプロイパイプライン。
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.mmdBox}>
+              <div className={styles.mmdLbl}>▸ GitHub Actions — matrix 並列パイプライン</div>
+              <MermaidDiagram
+                chart={`flowchart LR
+T(["push to\\nfeat/* or dev"])
+T --> J[detect-platform job]
+J --> M{"matrix strategy\\nfail-fast: false\\n4 並列実行"}
+M --> B1["build: claude\\ngit worktree add"]
+M --> B2["build: gemini\\ngit worktree add"]
+M --> B3["build: codex\\ngit worktree add"]
+M --> B4["build: copilot\\ngit worktree add"]
+B1 --> D1[Deploy\\nclaude site]
+B2 --> D2[Deploy\\ngemini site]
+B3 --> D3[Deploy\\ncodex site]
+B4 --> D4[Deploy\\ncopilot site]
+style T fill:#21262d,stroke:#444c56,color:#ffffff
+style J fill:#21262d,stroke:#e3b341,color:#ffffff
+style M fill:#1f2d14,stroke:#56d364,color:#ffffff
+style B1 fill:#2a1a10,stroke:#ff9f6a,color:#ffffff
+style B2 fill:#101828,stroke:#79b8ff,color:#ffffff
+style B3 fill:#101e12,stroke:#56d364,color:#ffffff
+style B4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff
+style D1 fill:#2a1a10,stroke:#ff9f6a,color:#ffffff
+style D2 fill:#101828,stroke:#79b8ff,color:#ffffff
+style D3 fill:#101e12,stroke:#56d364,color:#ffffff
+style D4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff`}
+              />
+            </div>
+
+            <div className={styles.cb}>
+              <div className={styles.cbHdr}>
+                <span>.github/workflows/parallel-deploy.yml</span>
+                <span className={styles.cbTag}>yaml</span>
+              </div>
+              <div className={styles.cbBody}>
+                <span className={styles.syKw}>name</span>
+                {": Parallel Docs Validation\n"}
+                <span className={styles.syKw}>on</span>
+                {":\n"}
+                {"  push:\n"}
+                {"    branches:\n"}
+                {"      - "}
+                <span className={styles.sySt}>&apos;feat/*-docs&apos;</span>
+                {"\n"}
+                {"      - "}
+                <span className={styles.sySt}>&apos;dev&apos;</span>
+                {"  "}
+                <span className={styles.syCm}># dev へのマージ時も検証</span>
+                {"\n"}
+                {"  pull_request:\n"}
+                {"    branches:\n"}
+                {"      - "}
+                <span className={styles.sySt}>&apos;dev&apos;</span>
+                {"  "}
+                <span className={styles.syCm}># dev への PR 時も検証</span>
+                {"\n\n"}
+                <span className={styles.syKw}>jobs</span>
+                {":\n"}
+                {"  validate-docs:\n"}
+                {"    runs-on: ubuntu-latest\n"}
+                {"    strategy:\n"}
+                {"      matrix:\n"}
+                {"        platform: ["}
+                <span className={styles.syCl}>claude</span>
+                {", "}
+                <span className={styles.syGe}>gemini</span>
+                {", "}
+                <span className={styles.syCo}>codex</span>
+                {", "}
+                <span className={styles.syCp}>copilot</span>
+                {"]\n"}
+                {"      fail-fast: false\n\n"}
+                {"    steps:\n"}
+                {"      - uses: actions/checkout@v4\n"}
+                {"        with:\n"}
+                {"          fetch-depth: 0\n\n"}
+                {"      - uses: oven-sh/setup-bun@v2\n\n"}
+                {"      - name: Setup worktree\n"}
+                {"        id: setup-wt\n"}
+                {"        run: |\n"}
+                {
+                  // biome-ignore lint/suspicious/noTemplateCurlyInString: GitHub Actions expression syntax
+                  '          BRANCH="feat/${{ matrix.platform }}-docs"\n'
+                }
+                {
+                  '          if git show-ref --verify --quiet "refs/remotes/origin/$BRANCH" || git show-ref --verify --quiet "refs/heads/$BRANCH"; then\n'
+                }
+                {
+                  // biome-ignore lint/suspicious/noTemplateCurlyInString: GitHub Actions expression syntax
+                  '            git worktree add /tmp/${{ matrix.platform }} "$BRANCH"\n'
+                }
+                {'            echo "exists=true" >> $GITHUB_OUTPUT\n'}
+                {"          else\n"}
+                {'            echo "exists=false" >> $GITHUB_OUTPUT\n'}
+                {"          fi\n\n"}
+                {"      - name: Validate HTML\n"}
+                {"        if: steps.setup-wt.outputs.exists == &apos;true&apos;\n"}
+                {
+                  // biome-ignore lint/suspicious/noTemplateCurlyInString: GitHub Actions expression syntax
+                  "        working-directory: /tmp/${{ matrix.platform }}\n"
+                }
+                {"        run: |\n"}
+                {
+                  // biome-ignore lint/suspicious/noTemplateCurlyInString: GitHub Actions expression syntax
+                  "          bunx vnu-jar --skip-non-html ${{ matrix.platform }}/agent.html\n"
+                }
+                {
+                  // biome-ignore lint/suspicious/noTemplateCurlyInString: GitHub Actions expression syntax
+                  "          bunx vnu-jar --skip-non-html ${{ matrix.platform }}/skill.html\n\n"
+                }
+                {"      - name: Check Links\n"}
+                {"        if: steps.setup-wt.outputs.exists == &apos;true&apos;\n"}
+                {"        uses: lycheeverse/lychee-action@v2\n"}
+                {"        with:\n"}
+                {
+                  // biome-ignore lint/suspicious/noTemplateCurlyInString: GitHub Actions expression syntax
+                  "          args: /tmp/${{ matrix.platform }}/**/*.html"
+                }
+              </div>
+            </div>
+          </section>
+
+          {/* ══════════ REFERENCES ══════════ */}
+          <section className={styles.step} id="ref">
+            <div className={styles.stepHdr}>
+              <div className={styles.stepN}>参考</div>
+              <div>
+                <div className={styles.stepTitle}>参考リンク集</div>
+                <div className={styles.stepDesc}>
+                  各ステップで使用する公式ドキュメントと関連リソース。
+                </div>
+              </div>
+            </div>
+            <div className={`${styles.ib} ${styles.ibInfo}`}>
+              <span>ℹ️</span>
+              <div>
+                <strong>方針:</strong> 各ベンダー公式ドキュメントを最上位に記載し、 補足情報は「公式
+                GitHub リポジトリ」または「公式ブログ」のみを採用。
+                非公式サイト・コミュニティサイトは除外。
+              </div>
+            </div>
+            <h3>STEP 00: git worktree とは何か</h3>
+            <div className={styles.stepSubsection}>
+              <h4>Git 公式（最優先）</h4>
+              <ul>
+                <li>
+                  <Ext href="https://git-scm.com/docs/git-worktree">
+                    git-worktree — Git 公式リファレンス
+                  </Ext>
+                </li>
+                <li>
+                  <Ext href="https://git-scm.com/docs/gitrepository-layout#Documentation/gitrepository-layout.txt-worktrees">
+                    gitrepository-layout — linked worktrees の内部構造
+                  </Ext>
+                </li>
+                <li>
+                  <Ext href="https://github.com/git/git/blob/master/Documentation/RelNotes/2.5.0.txt">
+                    Git 2.5.0 リリースノート（worktree 導入）
+                  </Ext>
+                </li>
+                <li>
+                  <Ext href="https://git-scm.com/docs/gitignore">
+                    .gitignore — Git 公式リファレンス
+                  </Ext>
+                </li>
+              </ul>
+            </div>
+
+            <h3>STEP 01: ブランチ戦略設計</h3>
+            <div className={styles.stepSubsection}>
+              <h4>Git 公式</h4>
+              <ul>
+                <li>
+                  <Ext href="https://git-scm.com/docs/git-branch">
+                    git-branch — Git 公式リファレンス
+                  </Ext>
+                </li>
+              </ul>
+              <h4>GitHub 公式</h4>
+              <ul>
+                <li>
+                  <Ext href="https://docs.github.com/en/get-started/quickstart/github-flow">
+                    GitHub Flow — GitHub Docs
+                  </Ext>
+                </li>
+                <li>
+                  <Ext href="https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners">
+                    CODEOWNERS について — GitHub Docs
+                  </Ext>
+                </li>
+              </ul>
+            </div>
+
+            <h3>STEP 02: worktree セットアップ</h3>
+            <div className={styles.stepSubsection}>
+              <h4>Git 公式</h4>
+              <ul>
+                <li>
+                  <Ext href="https://git-scm.com/docs/git-worktree#Documentation/git-worktree.txt-addltpathgtltcommit-ishgt">
+                    git worktree add
+                  </Ext>
+                </li>
+                <li>
+                  <Ext href="https://git-scm.com/docs/git-worktree#Documentation/git-worktree.txt-list">
+                    git worktree list
+                  </Ext>
+                </li>
+              </ul>
+            </div>
+
+            <h3>STEP 03: 日常ワークフロー / AI 設定ファイル</h3>
+
+            <div className={styles.stepSubsection}>
+              <h4>■ Anthropic — Claude Code</h4>
+              <table className={styles.tbl}>
+                <thead>
+                  <tr>
+                    <th>ファイル</th>
+                    <th>公式ドキュメント</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <code>CLAUDE.md</code> / auto memory
+                    </td>
+                    <td>
+                      <Ext href="https://code.claude.com/docs/en/memory">
+                        Memory — Claude Code 公式
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Claude Code 概要</td>
+                    <td>
+                      <Ext href="https://docs.anthropic.com/en/docs/claude-code/overview">
+                        Claude Code Overview — Anthropic Docs
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>カスタムコマンド</td>
+                    <td>
+                      <Ext href="https://docs.anthropic.com/en/docs/claude-code/slash-commands">
+                        Slash Commands — Claude Code 公式
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Settings / 設定ファイル</td>
+                    <td>
+                      <Ext href="https://docs.anthropic.com/en/docs/claude-code/settings">
+                        Settings — Claude Code 公式
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>SDK（TypeScript / Python）</td>
+                    <td>
+                      <Ext href="https://docs.anthropic.com/en/docs/claude-code/sdk">
+                        Claude Code SDK — Anthropic Docs
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>GitHub リポジトリ</td>
+                    <td>
+                      <Ext href="https://github.com/anthropics/claude-code">
+                        anthropics/claude-code — GitHub
+                      </Ext>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div className={styles.stepSubsection}>
+              <h4>■ OpenAI — Codex CLI</h4>
+              <table className={styles.tbl}>
+                <thead>
+                  <tr>
+                    <th>ファイル</th>
+                    <th>公式ドキュメント</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Codex CLI 概要</td>
+                    <td>
+                      <Ext href="https://developers.openai.com/codex/cli/">
+                        Codex CLI — developers.openai.com
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code>AGENTS.md</code> 詳細仕様
+                    </td>
+                    <td>
+                      <Ext href="https://developers.openai.com/codex/guides/agents-md/">
+                        Custom instructions with AGENTS.md — OpenAI 公式
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>AGENTS.md オープン形式</td>
+                    <td>
+                      <Ext href="https://github.com/openai/agents.md">
+                        openai/agents.md — GitHub（OpenAI 公式リポジトリ）
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code>SKILL.md</code> — Skills
+                    </td>
+                    <td>
+                      <Ext href="https://developers.openai.com/codex/skills/">
+                        Agent Skills — developers.openai.com
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>CLI コマンドリファレンス</td>
+                    <td>
+                      <Ext href="https://developers.openai.com/codex/cli/reference/">
+                        Command line options — OpenAI 公式
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>CLI 機能一覧</td>
+                    <td>
+                      <Ext href="https://developers.openai.com/codex/cli/features/">
+                        Codex CLI features — OpenAI 公式
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Agents SDK 連携</td>
+                    <td>
+                      <Ext href="https://developers.openai.com/codex/guides/agents-sdk">
+                        Use Codex with the Agents SDK — OpenAI 公式
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Codex モデル一覧</td>
+                    <td>
+                      <Ext href="https://developers.openai.com/codex/models/">
+                        Codex Models — developers.openai.com
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Codex 紹介ブログ</td>
+                    <td>
+                      <Ext href="https://openai.com/index/introducing-codex/">
+                        Introducing Codex — openai.com
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>GitHub リポジトリ</td>
+                    <td>
+                      <Ext href="https://github.com/openai/codex">openai/codex — GitHub</Ext>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div className={`${styles.ib} ${styles.ibInfo}`} style={{ marginTop: "1rem" }}>
+                <span>ℹ️</span>
+                <div>
+                  <strong>補足:</strong> <code>agents.md/AGENTS.md</code> の仕様は OpenAI が主導する
+                  <code>github.com/openai/agents.md</code> が一次ソースです。
+                  複数のコーディングエージェント（Codex, Amp, Jules, Cursor, Factory など）
+                  が協働して策定したオープン形式です。
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.stepSubsection}>
+              <h4>■ Google — Gemini CLI / Gemini Code Assist</h4>
+              <table className={styles.tbl}>
+                <thead>
+                  <tr>
+                    <th>ファイル</th>
+                    <th>公式ドキュメント</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Gemini CLI 概要</td>
+                    <td>
+                      <Ext href="https://docs.cloud.google.com/gemini/docs/codeassist/gemini-cli">
+                        Gemini CLI — Google Cloud Docs
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code>GEMINI.md</code> / <code>AGENT.md</code>
+                    </td>
+                    <td>
+                      <Ext href="https://docs.cloud.google.com/gemini/docs/codeassist/use-agentic-chat-pair-programmer">
+                        Use the Gemini Code Assist agent mode — Google Cloud Docs
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Agent モード概要</td>
+                    <td>
+                      <Ext href="https://cloud.google.com/gemini/docs/codeassist/agent-mode">
+                        Agent mode overview — Google Cloud Docs
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Gemini for Google Cloud（ルート）</td>
+                    <td>
+                      <Ext href="https://cloud.google.com/gemini/docs">
+                        Gemini for Google Cloud Docs
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>リリースノート</td>
+                    <td>
+                      <Ext href="https://docs.cloud.google.com/gemini/docs/codeassist/release-notes">
+                        Gemini Code Assist release notes — Google Cloud
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Gemini CLI 学習コース（公式ブログ）</td>
+                    <td>
+                      <Ext href="https://cloud.google.com/blog/topics/developers-practitioners/mastering-gemini-cli-your-complete-guide-from-installation-to-advanced-use-cases">
+                        Mastering Gemini CLI — Google Cloud Blog
+                      </Ext>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div className={styles.stepSubsection}>
+              <h4>■ Microsoft / GitHub — GitHub Copilot</h4>
+              <table className={styles.tbl}>
+                <thead>
+                  <tr>
+                    <th>ファイル</th>
+                    <th>公式ドキュメント</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <code>copilot-instructions.md</code>
+                    </td>
+                    <td>
+                      <Ext href="https://docs.github.com/copilot/customizing-copilot/adding-custom-instructions-for-github-copilot">
+                        Adding repository custom instructions — GitHub Docs
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>カスタム指示の設定（全体）</td>
+                    <td>
+                      <Ext href="https://docs.github.com/en/copilot/how-tos/configure-custom-instructions">
+                        Configure custom instructions — GitHub Docs
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code>.instructions.md</code>（パス指定）
+                    </td>
+                    <td>
+                      <Ext href="https://docs.github.com/en/copilot/tutorials/customization-library/custom-instructions/your-first-custom-instructions">
+                        Your first custom instructions — GitHub Docs
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code>.prompt.md</code>（プロンプトファイル）
+                    </td>
+                    <td>
+                      <Ext href="https://docs.github.com/en/copilot/tutorials/customization-library/prompt-files/your-first-prompt-file">
+                        Your first prompt file — GitHub Docs
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code>AGENTS.md</code>（Copilot CLI 対応）
+                    </td>
+                    <td>
+                      <Ext href="https://docs.github.com/en/copilot/how-tos/copilot-cli/add-repository-instructions">
+                        Adding custom instructions for GitHub Copilot CLI — GitHub Docs
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>カスタム指示サポート一覧</td>
+                    <td>
+                      <Ext href="https://docs.github.com/en/copilot/reference/custom-instructions-support">
+                        Support for different types of custom instructions — GitHub Docs
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>コードレビューでの活用</td>
+                    <td>
+                      <Ext href="https://docs.github.com/en/copilot/tutorials/use-custom-instructions">
+                        Using custom instructions for Copilot code review — GitHub Docs
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>組織カスタム指示</td>
+                    <td>
+                      <Ext href="https://docs.github.com/en/copilot/how-tos/configure-custom-instructions/add-organization-instructions">
+                        Adding organization custom instructions — GitHub Docs
+                      </Ext>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>STEP 04〜05: git worktree 操作・エラー対処</h3>
+            <div className={styles.stepSubsection}>
+              <h4>Git 公式</h4>
+              <ul>
+                <li>
+                  <Ext href="https://git-scm.com/docs/git-worktree#Documentation/git-worktree.txt-remove">
+                    git worktree remove
+                  </Ext>
+                </li>
+                <li>
+                  <Ext href="https://git-scm.com/docs/git-worktree#Documentation/git-worktree.txt-prune">
+                    git worktree prune
+                  </Ext>
+                </li>
+                <li>
+                  <Ext href="https://git-scm.com/docs/git-worktree#Documentation/git-worktree.txt-lock">
+                    git worktree lock / unlock
+                  </Ext>
+                </li>
+                <li>
+                  <Ext href="https://git-scm.com/docs/git-stash">git stash — Git 公式</Ext>
+                </li>
+                <li>
+                  <Ext href="https://git-scm.com/docs/githooks">githooks — Git hooks 公式</Ext>
+                </li>
+              </ul>
+            </div>
+
+            <h3>STEP 06: GitHub Actions 統合</h3>
+            <div className={styles.stepSubsection}>
+              <h4>GitHub 公式</h4>
+              <ul>
+                <li>
+                  <Ext href="https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/running-variations-of-jobs-in-a-workflow">
+                    matrix strategy — GitHub Actions 公式
+                  </Ext>
+                </li>
+                <li>
+                  <Ext href="https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/running-variations-of-jobs-in-a-workflow#handling-failures">
+                    fail-fast の制御
+                  </Ext>
+                </li>
+                <li>
+                  <Ext href="https://github.com/actions/checkout">
+                    actions/checkout@v4（fetch-depth）— GitHub
+                  </Ext>
+                </li>
+              </ul>
+              <h4>Vercel 公式</h4>
+              <ul>
+                <li>
+                  <Ext href="https://vercel.com/docs/cli/deploy">
+                    Vercel CLI deploy — Vercel 公式
+                  </Ext>
+                </li>
+              </ul>
+            </div>
+
+            <h3>全般: ダイアグラム・フォント・アクセシビリティ</h3>
+            <div className={styles.stepSubsection}>
+              <ul>
+                <li>
+                  <Ext href="https://mermaid.js.org/">Mermaid.js 公式ドキュメント</Ext>
+                </li>
+                <li>
+                  <Ext href="https://mermaid.js.org/syntax/gitgraph.html">
+                    Mermaid — gitGraph 構文
+                  </Ext>
+                </li>
+                <li>
+                  <Ext href="https://mermaid.js.org/syntax/flowchart.html">
+                    Mermaid — flowchart 構文
+                  </Ext>
+                </li>
+                <li>
+                  <Ext href="https://mermaid.js.org/syntax/sequenceDiagram.html">
+                    Mermaid — sequenceDiagram 構文
+                  </Ext>
+                </li>
+                <li>
+                  <Ext href="https://fonts.google.com/specimen/IBM+Plex+Mono">
+                    IBM Plex Mono — Google Fonts
+                  </Ext>
+                </li>
+                <li>
+                  <Ext href="https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html">
+                    WCAG 2.1 コントラスト比ガイドライン — W3C
+                  </Ext>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </div>
+
+        <div className={styles.final}>
+          <div className={styles.finalTitle}>{"// 導入判断サマリー"}</div>
+          <div className={styles.finalBody}>
+            git worktree は
+            <strong>「同一リポジトリを複数の作業ディレクトリで同時並行作業する」</strong>
+            最もクリーンな解決策です。 4 プラットフォームのドキュメント（agent.html / skill.html
+            計8ファイル）を AI ツールと WebSearch で並列更新する今回のシナリオでは、
+            <strong>clone × 4 よりも worktree × 4 が明確に優位</strong>です。 ただし
+            <strong>
+              ① 同一ブランチの重複チェックアウト禁止 ② shared/ (common-header リソース) は dev
+              経由のみ変更 ③ 削除時は git worktree remove 必須
+            </strong>
+            の 3 ルールを守ることが成功の条件です。 各 WT で AI エージェントを起動し、WebSearch
+            で最新情報を調査しながら agent.html と skill.html を更新することで、
+            <strong>4 ツール × 並列 = 最大スループット</strong> の開発体験が実現します。
+          </div>
+        </div>
+      </div>
+
+      <footer className={styles.footer}>
+        <span>git worktree × 4-Platform Docs Parallel Update Guide</span>
+        <span>git 2.5+ required · No additional install needed</span>
+      </footer>
+    </>
+  );
+}
