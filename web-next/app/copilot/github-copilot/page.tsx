@@ -15,6 +15,11 @@ type Source = {
   badge: string;
 };
 
+type SourceGroup = {
+  heading: string;
+  items: Source[];
+};
+
 const TOC_ITEMS = [
   { id: "s01", label: "01 GitHub Copilotとは？" },
   { id: "s02", label: "02 プラン比較・選び方" },
@@ -28,83 +33,98 @@ const TOC_ITEMS = [
   { id: "sources", label: "10 参考ソース一覧" },
 ] as const;
 
-const SOURCES: Source[] = [
+const SOURCE_GROUPS: SourceGroup[] = [
   {
-    icon: "📘",
-    title: "GitHub Copilot 公式ドキュメント",
-    href: "https://docs.github.com/en/copilot",
-    url: "docs.github.com/en/copilot",
-    badge: "GitHub Docs",
+    heading: "// 公式ドキュメント",
+    items: [
+      {
+        icon: "📖",
+        title: "GitHub Copilot ベストプラクティス（公式）",
+        href: "https://docs.github.com/en/copilot/get-started/best-practices",
+        url: "docs.github.com/en/copilot/get-started/best-practices",
+        badge: "GitHub Docs",
+      },
+      {
+        icon: "💳",
+        title: "GitHub Copilot プラン一覧（公式）",
+        href: "https://docs.github.com/en/copilot/get-started/plans",
+        url: "docs.github.com/en/copilot/get-started/plans",
+        badge: "GitHub Docs",
+      },
+      {
+        icon: "💻",
+        title: "GitHub Copilot CLI ベストプラクティス（公式）",
+        href: "https://docs.github.com/en/copilot/how-tos/copilot-cli/cli-best-practices",
+        url: "docs.github.com/en/copilot/how-tos/copilot-cli/cli-best-practices",
+        badge: "GitHub Docs",
+      },
+      {
+        icon: "🚀",
+        title: "GitHub Copilot 公式フィーチャーページ",
+        href: "https://github.com/features/copilot",
+        url: "github.com/features/copilot",
+        badge: "GitHub.com",
+      },
+      {
+        icon: "💰",
+        title: "GitHub Copilot 料金プランページ",
+        href: "https://github.com/features/copilot/plans",
+        url: "github.com/features/copilot/plans",
+        badge: "GitHub.com",
+      },
+      {
+        icon: "🆕",
+        title: "GitHub Copilot 新機能ページ",
+        href: "https://github.com/features/copilot/whats-new",
+        url: "github.com/features/copilot/whats-new",
+        badge: "GitHub.com",
+      },
+    ],
   },
   {
-    icon: "🤖",
-    title: "GitHub Copilot の使い方 — クイックスタート",
-    href: "https://docs.github.com/en/copilot/quickstart",
-    url: "docs.github.com/en/copilot/quickstart",
-    badge: "GitHub Docs",
+    heading: "// GitHub Blog & Changelog",
+    items: [
+      {
+        icon: "📝",
+        title: "GitHub Blog — AI & Copilot 技術ガイド",
+        href: "https://github.blog/ai-and-ml/github-copilot/",
+        url: "github.blog/ai-and-ml/github-copilot/",
+        badge: "Blog",
+      },
+      {
+        icon: "📋",
+        title: "Copilot CLI 強化: エージェント・コンテキスト管理（2026年1月）",
+        href: "https://github.blog/changelog/2026-01-14-github-copilot-cli-enhanced-agents-context-management-and-new-ways-to-install/",
+        url: "github.blog/changelog/2026-01-14-...",
+        badge: "Changelog",
+      },
+      {
+        icon: "⭐",
+        title: "Awesome Copilot — コミュニティ作成の設定集",
+        href: "https://github.com/github/awesome-copilot",
+        url: "github.com/github/awesome-copilot",
+        badge: "GitHub",
+      },
+    ],
   },
   {
-    icon: "✍️",
-    title: "Copilot へのプロンプト エンジニアリング",
-    href: "https://docs.github.com/en/copilot/using-github-copilot/prompt-engineering-for-github-copilot",
-    url: "docs.github.com/en/copilot/using-github-copilot/prompt-engineering-for-github-copilot",
-    badge: "GitHub Docs",
-  },
-  {
-    icon: "🔧",
-    title: "カスタム指示の設定（copilot-instructions.md）",
-    href: "https://docs.github.com/en/copilot/customizing-copilot/adding-repository-custom-instructions-for-github-copilot",
-    url: "docs.github.com/en/copilot/customizing-copilot/adding-repository-custom-instructions",
-    badge: "GitHub Docs",
-  },
-  {
-    icon: "💡",
-    title: "Copilot エージェントモード（GitHub Blog）",
-    href: "https://github.blog/ai-and-ml/github-copilot/github-copilot-agent-mode-activated/",
-    url: "github.blog/ai-and-ml/github-copilot/github-copilot-agent-mode-activated",
-    badge: "GitHub Blog",
-  },
-  {
-    icon: "🌐",
-    title: "GitHub Copilot と Bing 検索連携",
-    href: "https://docs.github.com/en/copilot/using-github-copilot/using-github-copilot-for-pull-requests/using-copilot-to-help-you-work-on-a-pull-request",
-    url: "docs.github.com/en/copilot/using-github-copilot",
-    badge: "GitHub Docs",
-  },
-  {
-    icon: "🔒",
-    title: "GitHub Copilot のセキュリティとデータ保護",
-    href: "https://docs.github.com/en/site-policy/privacy-policies/github-copilot-business-privacy-statement",
-    url: "docs.github.com/en/site-policy/privacy-policies/github-copilot-business-privacy-statement",
-    badge: "GitHub Docs",
-  },
-  {
-    icon: "🧠",
-    title: "Copilot が使用する AIモデルの選択",
-    href: "https://docs.github.com/en/copilot/using-github-copilot/ai-models/changing-the-ai-model-for-copilot-chat",
-    url: "docs.github.com/en/copilot/using-github-copilot/ai-models/changing-the-ai-model-for-copilot-chat",
-    badge: "GitHub Docs",
-  },
-  {
-    icon: "🗺️",
-    title: "GitHub Copilot のロードマップ",
-    href: "https://github.com/orgs/github/projects/4247",
-    url: "github.com/orgs/github/projects/4247",
-    badge: "GitHub",
-  },
-  {
-    icon: "📊",
-    title: "GitHub Copilot のプランと料金",
-    href: "https://docs.github.com/en/copilot/about-github-copilot/subscription-plans-for-github-copilot",
-    url: "docs.github.com/en/copilot/about-github-copilot/subscription-plans-for-github-copilot",
-    badge: "GitHub Docs",
-  },
-  {
-    icon: "🏢",
-    title: "組織・Enterprise向けCopilot課金の詳細（公式）",
-    href: "https://docs.github.com/en/copilot/concepts/billing/organizations-and-enterprises",
-    url: "docs.github.com/en/copilot/concepts/billing/organizations-and-enterprises",
-    badge: "GitHub Docs",
+    heading: "// 料金・比較情報",
+    items: [
+      {
+        icon: "📊",
+        title: "個人向けCopilot課金の詳細（公式）",
+        href: "https://docs.github.com/en/copilot/concepts/billing/billing-for-individuals",
+        url: "docs.github.com/en/copilot/concepts/billing/billing-for-individuals",
+        badge: "GitHub Docs",
+      },
+      {
+        icon: "🏢",
+        title: "組織・Enterprise向けCopilot課金の詳細（公式）",
+        href: "https://docs.github.com/en/copilot/concepts/billing/organizations-and-enterprises",
+        url: "docs.github.com/en/copilot/concepts/billing/organizations-and-enterprises",
+        badge: "GitHub Docs",
+      },
+    ],
   },
 ];
 
@@ -1538,21 +1558,33 @@ export default function GithubCopilotPage() {
             <span className={styles.secNum}>10</span>
             <div>
               <h2 className={styles.secTitle}>参考ソース一覧</h2>
-              <p className={styles.secDesc}>本ガイド作成に使用した公式ドキュメントと参考資料</p>
+              <p className={styles.secDesc}>
+                本ガイドの根拠となる公式ドキュメントおよび最新情報ソース（2026年3月時点）
+              </p>
             </div>
           </div>
-          <div className={styles.sourceList}>
-            {SOURCES.map((s) => (
-              <Ext key={s.href} href={s.href}>
-                <span className={styles.sourceIcon}>{s.icon}</span>
-                <div className={styles.sourceInfo}>
-                  <span className={styles.sourceTitle}>{s.title}</span>
-                  <span className={styles.sourceUrl}>{s.url}</span>
-                </div>
-                <span className={styles.sourceBadge}>{s.badge}</span>
-              </Ext>
-            ))}
-          </div>
+          {SOURCE_GROUPS.map((group, gi) => (
+            <div key={group.heading}>
+              <h3
+                className={styles.checklistHeading}
+                style={gi > 0 ? { margin: "24px 0 14px" } : { marginBottom: "14px" }}
+              >
+                {group.heading}
+              </h3>
+              <div className={styles.sourceList}>
+                {group.items.map((s) => (
+                  <Ext key={s.href} href={s.href}>
+                    <span className={styles.sourceIcon}>{s.icon}</span>
+                    <div className={styles.sourceInfo}>
+                      <span className={styles.sourceTitle}>{s.title}</span>
+                      <span className={styles.sourceUrl}>{s.url}</span>
+                    </div>
+                    <span className={styles.sourceBadge}>{s.badge}</span>
+                  </Ext>
+                ))}
+              </div>
+            </div>
+          ))}
         </section>
       </main>
 
