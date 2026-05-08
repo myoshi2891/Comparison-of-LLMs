@@ -7,6 +7,16 @@ export const metadata: Metadata = {
     "初学者から中級者まで。AIコーディングエージェントを最大限に活かすベストプラクティスをステップバイステップで解説します。",
 };
 
+/**
+ * Renders the static Next.js page for the Japanese "OpenAI Codex 完全ガイド 2026" guide.
+ *
+ * The component returns a fully static JSX tree that presents multiple sections:
+ * header (title, subtitle, stats), and content sections covering Codex overview,
+ * setup, model selection, prompt best practices, AGENTS.md usage, workflows,
+ * advanced techniques, do/don't recommendations, and references.
+ *
+ * @returns The React element tree for the static guide page.
+ */
 export default function Page() {
   return (
     <div className={styles.wrap}>

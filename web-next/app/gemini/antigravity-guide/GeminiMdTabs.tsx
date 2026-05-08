@@ -3,6 +3,15 @@
 import { useState } from "react";
 import styles from "./page.module.css";
 
+/**
+ * Render a two-tab Gemini.md example viewer that toggles between a "best practice" panel and an "anti-pattern" panel.
+ *
+ * The component manages internal tab state, updates ARIA attributes for accessibility, and supports keyboard navigation
+ * with ArrowLeft/ArrowRight to move focus between tabs. Each panel contains styled, read-only Gemini.md sample content;
+ * the anti-pattern panel also shows a warning callout.
+ *
+ * @returns A React element containing the tablist, tab buttons, and the two corresponding tab panels
+ */
 export default function GeminiMdTabs() {
   const [active, setActive] = useState<"g1" | "g2">("g1");
 
