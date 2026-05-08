@@ -2678,11 +2678,112 @@ export default function Page() {
 
         {/* ── s15: BEST-PRACTICES ── */}
         <section id="s15">
-          <div className={styles.slabel}>Section 15</div>
+          <div className={styles.slabel}>Section 15（更新版 — 12則）</div>
           <h2 className={styles.stitle}>
-            <span className={styles.num}>15.</span>横断ベストプラクティス 12則（更新版）
+            <span className={styles.num}>15.</span>横断ベストプラクティス 12則（2026年3月更新版）
           </h2>
-          {/* TODO: faithful content */}
+
+          <div className={styles.bps}>
+            <div className={`${styles.bp} ${styles.bpG}`}>
+              <div className={styles.bpN}>01</div>
+              <h4>copilot-instructions.mdは「2ページ以内」</h4>
+              <p>
+                詳細は.instructions.md・SKILL.mdに分離。長い指示はCopilotが無視する原因になる。Referencesパネルで参照確認必須。
+              </p>
+            </div>
+            <div className={`${styles.bp} ${styles.bpM}`}>
+              <div className={styles.bpN}>02</div>
+              <h4>AGENTS.mdを「唯一の真実のソース」に</h4>
+              <p>
+                Copilot Coding AgentはAGENTS.mdを自動読み込みするため、
+                <code>copilot-instructions.md</code>
+                への明示的インポートは不要。4ツール間でルールを二重管理しない。ツール乗り換え時の書き直しゼロ。
+              </p>
+            </div>
+            <div className={`${styles.bp} ${styles.bpC}`}>
+              <div className={styles.bpN}>03</div>
+              <h4>applyToで「コンテキストの汚染」を防ぐ</h4>
+              <p>
+                Goファイル編集時にはGoルールのみ、テストファイル編集時にはテストルールのみを注入。全ルールを常時注入しない。
+              </p>
+            </div>
+            <div className={`${styles.bp} ${styles.bpV}`}>
+              <div className={styles.bpN}>04</div>
+              <h4>Spec Kitで「バイブコーディング」と決別</h4>
+              <p>
+                constitution.md → specify → plan → tasks の順序を厳守。Spec
+                Kitの一貫性チェックでspec/plan/tasksの食い違いを自動検出。
+              </p>
+            </div>
+            <div className={`${styles.bp} ${styles.bpT}`}>
+              <div className={styles.bpN}>05</div>
+              <h4>.prompt.mdのモデルをタスク特化で選ぶ</h4>
+              <p>
+                設計フェーズにclaude-opus-4-6、実装フェーズにgpt-4.1。プロンプトごとの最適モデル選択はCopilot独自の強み。
+              </p>
+            </div>
+            <div className={`${styles.bp} ${styles.bpR}`}>
+              <div className={styles.bpN}>06</div>
+              <h4>Coding Agentには「完了条件」を明記</h4>
+              <p>
+                GitHubのIssueテキストは「AIプロンプト」として機能する。受け入れ基準・変更ファイル・テスト要件を明示することがベストプラクティス。
+              </p>
+            </div>
+            <div className={`${styles.bp} ${styles.bpG}`}>
+              <div className={styles.bpN}>07</div>
+              <h4>.chatmode.mdと.agent.mdを使い分ける</h4>
+              <p>
+                「アーキテクト目線で会話したい」→ chatmode。「ファイルを実際に操作させたい」→
+                agent。ペルソナか実行委任かで判断。
+              </p>
+            </div>
+            <div className={`${styles.bp} ${styles.bpM}`}>
+              <div className={styles.bpN}>08</div>
+              <h4>SKILL.mdのdescriptionに境界を書く</h4>
+              <p>
+                「Use when...」「Do NOT use when...」の両方を記述。全4ツール共通規格なのでClaude
+                CodeのSKILL.mdをそのまま移植できる。
+              </p>
+            </div>
+            <div className={`${styles.bp} ${styles.bpC}`}>
+              <div className={styles.bpN}>09</div>
+              <h4>Referencesパネルで動作確認を習慣化</h4>
+              <p>
+                Copilotのレスポンス下部のReferencesパネルに使用ファイルが表示される。リストにないファイルは無効か構文エラーがある。
+              </p>
+            </div>
+            <div className={`${styles.bp} ${styles.bpV}`}>
+              <div className={styles.bpN}>10</div>
+              <h4>constitution.mdを「生きた文書」として保守</h4>
+              <p>
+                技術スタック変更・アーキテクチャ決定変更があれば即constitution.mdを更新。コードとconstitutionの乖離がプロジェクト腐敗の根本原因。
+              </p>
+            </div>
+            <div className={`${styles.bp} ${styles.bpG}`}>
+              <div className={styles.bpN}>11</div>
+              <h4>🆕 MCPサーバーは.vscode/mcp.jsonでプロジェクト管理</h4>
+              <p>
+                APIキーは
+                <code>
+                  {"$"}
+                  {"{input:変数名}"}
+                </code>
+                でVS
+                Codeシークレットストレージに保管。mcp.jsonをgitにコミットする場合は平文シークレット不可。GitHub
+                MCP ServerはCopilot
+                CLIにビルトイン（設定不要）なので真っ先に活用する。Business/Enterprise管理者はOrgポリシーでドメイン制限が必要（[18]）。
+              </p>
+            </div>
+            <div className={`${styles.bp} ${styles.bpM}`}>
+              <div className={styles.bpN}>12</div>
+              <h4>🆕 複雑タスクはプランモードを起点にする</h4>
+              <p>
+                5ファイル以上に影響する変更は<code>Shift+Tab</code>
+                でプランモードへ切り替え。Copilotの質問に答えて計画を確定してから実装を開始する。内部テストではSWE-benchで成功率15%向上・タスク完了20%増加の実績。エージェントフックとの組み合わせでCI/CDを自動化（[20],
+                [21]）。
+              </p>
+            </div>
+          </div>
         </section>
 
         {/* ── sources ── */}
