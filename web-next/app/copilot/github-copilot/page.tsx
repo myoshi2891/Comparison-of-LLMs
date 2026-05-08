@@ -128,6 +128,13 @@ const SOURCE_GROUPS: SourceGroup[] = [
   },
 ];
 
+/**
+ * Renders an external link that opens the provided URL in a new tab with safe `rel` attributes.
+ *
+ * @param href - The destination URL for the link.
+ * @param children - Content to render inside the link.
+ * @returns An anchor element pointing to `href` that opens in a new tab and includes `rel="noopener noreferrer"`.
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -136,6 +143,17 @@ function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   );
 }
 
+/**
+ * Render the GitHub Copilot "Complete Best Practices Guide" single-page article (Japanese, March 2026).
+ *
+ * This component produces a static, fully-structured Next.js page that includes a hero header with stats,
+ * a top navigation and table of contents, nine main sections (s01–s09) covering overview, plans, setup,
+ * prompting techniques, 2026 features, best practices, security, model selection, and a checklist,
+ * followed by a grouped reference sources section and a footer.
+ *
+ * @returns A React element representing the complete guide page, including TOC links, content sections,
+ * sources rendered from `SOURCE_GROUPS`, and layout styles from the local CSS module.
+ */
 export default function GithubCopilotPage() {
   return (
     <div className={styles.wrapper}>

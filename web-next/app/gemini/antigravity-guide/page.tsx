@@ -9,6 +9,13 @@ export const metadata: Metadata = {
     "GEMINI.md から SKILL.md・Rules・Workflows・Artifacts まで、Google Antigravity エコシステムの全体を根拠ソース付きで徹底解説。初学者でもステップバイステップで理解できるベストプラクティス完全ガイド。",
 };
 
+/**
+ * Render the Antigravity best-practices guide page containing a hero, table of contents, and ten static content sections.
+ *
+ * The page presents comprehensive guidance on GEMINI.md, SKILL.md, Rules, Workflows, Artifacts, supported models/pricing, cross-cutting best practices, and reference sources, and composes imported UI pieces like GeminiMdTabs and BestPracticesChecklist.
+ *
+ * @returns A React element containing the complete Antigravity guide page layout.
+ */
 export default function Page() {
   return (
     <>

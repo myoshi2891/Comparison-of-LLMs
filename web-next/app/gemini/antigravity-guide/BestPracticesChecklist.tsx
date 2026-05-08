@@ -22,6 +22,13 @@ const ITEMS = [
   <>AGENTS.md にクロスツール共有ルールを記述し他ツールでも動作確認したか（v1.20.3〜）</>,
 ];
 
+/**
+ * Renders an interactive checklist of best-practice items with toggleable entries.
+ *
+ * The component maintains which items are checked and updates each item's visual and accessibility state when toggled.
+ *
+ * @returns The checklist React element containing toggleable items
+ */
 export default function BestPracticesChecklist() {
   const [checked, setChecked] = useState<boolean[]>(Array(ITEMS.length).fill(false));
 
