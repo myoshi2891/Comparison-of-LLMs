@@ -521,6 +521,17 @@
   padding: 20px;
 }
 
+.modelCardRecommended {
+  border-color: rgba(0, 212, 255, 0.4);
+  background: rgba(0, 212, 255, 0.04);
+}
+
+.modelDesc {
+  font-size: 12px;
+  color: var(--cx-text2);
+  line-height: 1.6;
+}
+
 .modelName {
   font-family: var(--font-mono, "JetBrains Mono", monospace);
   font-size: 14px;

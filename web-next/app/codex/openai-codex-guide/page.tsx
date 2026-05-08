@@ -349,15 +349,117 @@ export default function Page() {
           </div>
         </section>
 
-        {/* SECTION 03: MODELS — TODO: faithful migration */}
+        {/* SECTION 03: MODELS */}
         <section id="models" className={styles.sec}>
           <div className={styles.secHeader}>
             <div className={styles.stepNum}>2</div>
             <div>
               <h2 className={styles.secTitle}>モデル選択</h2>
+              <p className={styles.secDesc}>タスクに応じて最適なモデルを使い分ける</p>
             </div>
           </div>
-          <p style={{ color: "#94a3b8" }}>（実装予定）</p>
+
+          <p style={{ color: "#94a3b8", fontSize: "14px", marginBottom: "20px" }}>
+            2026年3月現在、代表的な推奨モデルは以下です。適切なモデル選択がコスト効率と品質に直結します。注:
+            表示は主要な推奨モデルの例であり、他の利用可能なモデルも存在します。
+          </p>
+
+          <div className={styles.modelGrid}>
+            <div className={`${styles.modelCard} ${styles.modelCardRecommended}`}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  marginBottom: "6px",
+                }}
+              >
+                <div className={styles.modelName}>gpt-5.4</div>
+                <div className={`${styles.modelBadge} ${styles.modelBadgeNew}`}>★ 推奨</div>
+              </div>
+              <div className={styles.modelDesc}>
+                コーディング・推論・エージェントワークフローを統合したフラッグシップモデル。GPT-5.3-Codexの業界最高のコード生成能力を内包。ほとんどのタスクはこちらから始めよう。
+              </div>
+            </div>
+            <div className={styles.modelCard}>
+              <div className={styles.modelName}>gpt-5.4-mini</div>
+              <div className={styles.modelDesc}>
+                軽量・高速版。CRUD操作、コード探索、大ファイルレビューなど軽めのタスク向け。gpt-5.4の30%のリソース消費なので長時間作業に最適。
+              </div>
+              <div className={`${styles.modelBadge} ${styles.modelBadgeNew}`}>2x速い・低コスト</div>
+            </div>
+            <div className={styles.modelCard}>
+              <div className={styles.modelName}>gpt-5.3-codex-spark</div>
+              <div className={styles.modelDesc}>
+                リアルタイムコーディングに最適化した研究プレビューモデル。ほぼ即時のコードイテレーションが可能。ChatGPT
+                Pro ユーザー向け。
+              </div>
+              <div className={`${styles.modelBadge} ${styles.modelBadgePro}`}>Pro限定</div>
+            </div>
+            <div className={styles.modelCard}>
+              <div className={styles.modelName}>gpt-5.3-codex</div>
+              <div className={styles.modelDesc}>
+                コーディング特化モデルの前世代フラッグシップ。Responses API
+                でも利用可能。GPT-5.4に後継されたが現在も有効。
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.card} style={{ marginTop: "16px" }}>
+            <div
+              style={{
+                fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
+                fontSize: "13px",
+                color: "#00d4ff",
+                marginBottom: "12px",
+              }}
+            >
+              モデルの切り替え方法
+            </div>
+            <div className={styles.codeWrap}>
+              <div className={styles.codeHeader}>
+                <div className={styles.codeDots}>
+                  <div className={`${styles.codeDot} ${styles.codeDotR}`} />
+                  <div className={`${styles.codeDot} ${styles.codeDotY}`} />
+                  <div className={`${styles.codeDot} ${styles.codeDotG}`} />
+                </div>
+                <div className={styles.codeLang}>bash / config</div>
+              </div>
+              <pre className={styles.codeBody}>
+                <span className={styles.cm}># CLI起動時にモデル指定</span>
+                {"\n"}
+                <span className={styles.fn}>codex</span> <span className={styles.op}>-m</span>{" "}
+                gpt-5.4{"\n\n"}
+                <span className={styles.cm}># 実行中に /model コマンドで切り替え</span>
+                {"\n"}
+                <span className={styles.op}>/model</span> gpt-5.4-mini{"\n\n"}
+                <span className={styles.cm}># config.toml で永続設定 (~/.codex/config.toml)</span>
+                {"\n"}
+                <span className={styles.fn}>model</span> ={" "}
+                <span className={styles.str}>&quot;gpt-5.4&quot;</span>
+                {"\n"}
+                <span className={styles.cm}># オプション: レビュー専用モデル</span>
+                {"\n"}
+                <span className={styles.fn}>review_model</span> ={" "}
+                <span className={styles.str}>&quot;gpt-5.4-mini&quot;</span>
+              </pre>
+            </div>
+          </div>
+
+          <div className={`${styles.callout} ${styles.calloutTip}`}>
+            <div className={styles.calloutIcon}>💚</div>
+            <div>
+              <strong>使い分けの鉄則：</strong>複雑な設計・アーキテクチャ判断・最終レビューには
+              <code style={{ fontFamily: "var(--font-mono,'JetBrains Mono',monospace)" }}>
+                gpt-5.4
+              </code>
+              、コードベース探索・大量ファイルのレビュー・サブエージェントには
+              <code style={{ fontFamily: "var(--font-mono,'JetBrains Mono',monospace)" }}>
+                gpt-5.4-mini
+              </code>
+              を使うことでリソースを節約できます。
+            </div>
+          </div>
         </section>
 
         {/* SECTION 04: PROMPT — TODO: faithful migration */}
