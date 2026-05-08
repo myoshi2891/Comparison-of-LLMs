@@ -8,7 +8,7 @@ export default function GeminiMdTabs() {
 
   return (
     <div className={styles.tabsWrap}>
-      <div className={styles.tabList} role="tablist">
+      <div className={styles.tabList} role="tablist" aria-label="Gemini.md コードサンプル">
         <button
           type="button"
           id="tab-g1"

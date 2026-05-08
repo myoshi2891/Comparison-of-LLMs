@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import GithubCopilotPage from "./page";
+import GithubCopilotPage, { metadata } from "./page";
 
 describe("/copilot/github-copilot", () => {
   it("h1 にページタイトルが表示される", () => {
@@ -29,8 +29,9 @@ describe("/copilot/github-copilot", () => {
     const { container } = render(<GithubCopilotPage />);
     const internalLinks = Array.from(container.querySelectorAll("a[href]")).filter((a) => {
       const href = a.getAttribute("href") ?? "";
-      return href.startsWith("/") && !href.startsWith("//");
+      return (href.startsWith("/") || href.startsWith("#")) && !href.startsWith("//");
     });
+    expect(internalLinks.length).toBeGreaterThan(0);
     for (const link of internalLinks) {
       expect(link.getAttribute("href")).not.toMatch(/\.html/);
     }
@@ -104,5 +105,12 @@ describe("/copilot/github-copilot", () => {
     expect(container.querySelector("#sources")).toBeTruthy();
     const sourceLinks = container.querySelectorAll("#sources a[target='_blank']");
     expect(sourceLinks.length).toBeGreaterThanOrEqual(10);
+  });
+
+  it("metadata.title と metadata.description が定義されている", () => {
+    expect(metadata.title).toBeTruthy();
+    expect(typeof metadata.title).toBe("string");
+    expect(metadata.description).toBeTruthy();
+    expect(typeof metadata.description).toBe("string");
   });
 });

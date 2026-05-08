@@ -790,7 +790,7 @@ export default function Page() {
           </div>
         </section>
 
-        {/* SECTION 06: WORKFLOW — TODO: faithful migration */}
+        {/* SECTION 06: WORKFLOW */}
         <section id="workflow" className={styles.sec}>
           <div className={styles.secHeader}>
             <div className={styles.stepNum}>5</div>
@@ -1224,7 +1224,6 @@ export default function Page() {
           </div>
         </section>
 
-        {/* SECTION 08: DODONT — TODO: faithful migration */}
         {/* SECTION 08: DODONT */}
         <section id="dodont" className={styles.sec}>
           <div className={styles.secHeader}>

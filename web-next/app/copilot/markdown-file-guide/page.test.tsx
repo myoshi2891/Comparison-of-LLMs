@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import Page from "./page";
+import Page, { metadata } from "./page";
 
 describe("/copilot/markdown-file-guide", () => {
   it("h1 に GitHub Copilot が含まれる", () => {
@@ -35,5 +35,12 @@ describe("/copilot/markdown-file-guide", () => {
     const { container } = render(<Page />);
     const codeBlocks = container.querySelectorAll("pre, code");
     expect(codeBlocks.length).toBeGreaterThan(0);
+  });
+
+  it("metadata.title と metadata.description が定義されている", () => {
+    expect(metadata.title).toBeTruthy();
+    expect(typeof metadata.title).toBe("string");
+    expect(metadata.description).toBeTruthy();
+    expect(typeof metadata.description).toBe("string");
   });
 });

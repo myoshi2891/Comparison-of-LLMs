@@ -277,7 +277,7 @@ export default function GithubCopilotPage() {
               <div className={styles.timelineYear}>2026年 — 現在</div>
               <div className={styles.timelineDesc}>
                 コードレビューエージェント、MCPサポート、Extensionsエコシステム、Copilot
-                CLI強化版（GPT-4.1対応）
+                CLI強化版（GPT-5.3-Codex対応）
               </div>
             </div>
           </div>
@@ -1256,7 +1256,7 @@ export default function GithubCopilotPage() {
             <div className={styles.alertContent}>
               <strong>プレミアムリクエストと通常リクエストの違い：</strong>
               <br />
-              高度なモデル（GPT-4.1, Claude
+              高度なモデル（GPT-5.3-Codex, Claude
               Opus等）を使用するChat/エージェントモードは「プレミアムリクエスト」を消費します。
               インラインコード補完は通常消費しません。モデルによって1リクエストあたりの消費量が異なります。
             </div>
@@ -1458,8 +1458,9 @@ export default function GithubCopilotPage() {
             <span className={styles.alertIcon}>💡</span>
             <div className={styles.alertContent}>
               <strong>モデル選択の基本戦略：</strong>
-              日常のコーディングはGPT-4.1、複雑なアーキテクチャ設計はClaude Sonnet、
-              難解なバグや高度な推論が必要な場合のみOpus/o3を使用することで、プレミアムリクエストを効率的に使えます。
+              日常のコーディングはGPT-5.3-Codex、複雑なアーキテクチャ設計はClaude Sonnet 4.6、
+              難解なバグや高度な推論が必要な場合のみClaude Opus
+              4.6を使用することで、プレミアムリクエストを効率的に使えます。
             </div>
           </div>
         </section>
