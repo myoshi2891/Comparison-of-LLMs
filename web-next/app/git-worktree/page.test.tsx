@@ -1,7 +1,12 @@
 import { render } from "@testing-library/react";
 import type { Metadata } from "next";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import Page, { metadata } from "./page";
+
+// MermaidDiagram は next/dynamic の ssr:false コンポーネントのため、テスト環境でモック
+vi.mock("next/dynamic", () => ({
+  default: () => () => null,
+}));
 
 describe("/git-worktree page", () => {
   it("h1 にタイトルテキストが含まれる", () => {

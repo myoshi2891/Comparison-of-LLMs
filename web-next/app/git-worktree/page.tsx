@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import styles from "./page.module.css";
+
+const MermaidDiagram = dynamic(() => import("@/components/docs/MermaidDiagram"), { ssr: false });
 
 export const metadata: Metadata = {
   title: "git worktree × 4プラットフォーム ドキュメント並列開発ガイド",
@@ -663,11 +666,121 @@ export default function GitWorktreePage() {
             <div>
               <div className={styles.stepTitle}>リポジトリ初期設定とブランチ戦略</div>
               <div className={styles.stepDesc}>
-                メインリポジトリのクローンと、4プラットフォーム用ブランチの設計方針。
+                メインリポジトリの作成から 4 プラットフォーム用ブランチの設計まで。
               </div>
             </div>
           </div>
-          {/* faithful content — s01 移植時に実装 */}
+
+          <h3>ブランチ戦略（Git グラフ）</h3>
+          <div className={styles.mmdBox}>
+            <div className={styles.mmdLbl}>
+              ▸ dev を源流として 4 プラットフォームのドキュメントブランチへ派生 — 共通リソース変更は
+              merge で全 WT に同期
+            </div>
+            <MermaidDiagram
+              chart={`%%{init: {'logLevel': 'error', 'gitGraph': {'rotateCommitLabel': false, 'mainBranchName': 'dev'}}}%%
+gitGraph LR:
+commit id: "chore: init"
+commit id: "feat: shared/"
+branch feat/claude-docs
+checkout feat/claude-docs
+commit id: "agent.html v1"
+commit id: "skill.html v1"
+checkout dev
+branch feat/gemini-docs
+checkout feat/gemini-docs
+commit id: "agent.html v1"
+commit id: "skill.html v1"
+checkout dev
+branch feat/codex-docs
+checkout feat/codex-docs
+commit id: "agent.html v1"
+commit id: "skill.html v1"
+checkout dev
+branch feat/copilot-docs
+checkout feat/copilot-docs
+commit id: "agent.html v1"
+checkout dev
+commit id: "fix(shared): header"
+checkout feat/claude-docs
+merge dev id: "sync header"
+checkout feat/gemini-docs
+merge dev id: "sync header "`}
+            />
+          </div>
+
+          <div className={styles.cb}>
+            <div className={styles.cbHdr}>
+              <span>Terminal — リポジトリ初期化</span>
+              <span className={styles.cbTag}>bash</span>
+            </div>
+            <div className={styles.cbBody}>
+              <span className={styles.syCm}>
+                # ── リポジトリ作成 ────────────────────────────────────────────────
+              </span>
+              {"\n"}
+              {"mkdir ai-docs && cd ai-docs\n"}
+              {"git init\n"}
+              {"git commit --allow-empty -m "}
+              <span className={styles.sySt}>"chore: initial commit"</span>
+              {"\n\n"}
+              <span className={styles.syCm}>
+                # ── 共通ディレクトリを dev に作成 ───────────────────────────────
+              </span>
+              {"\n"}
+              {"mkdir -p shared/{components,styles,utils} docs scripts .github/workflows\n"}
+              {"git add . && git commit -m "}
+              <span className={styles.sySt}>"feat: add shared structure"</span>
+              {"\n\n"}
+              <span className={styles.syCm}>
+                # ── 4 プラットフォーム用ブランチを作成 ──────────────────────────
+              </span>
+              {"\n"}
+              {"git branch "}
+              <span className={styles.syCl}>feat/claude-docs</span>
+              {"\n"}
+              {"git branch "}
+              <span className={styles.syGe}>feat/gemini-docs</span>
+              {"\n"}
+              {"git branch "}
+              <span className={styles.syCo}>feat/codex-docs</span>
+              {"\n"}
+              {"git branch "}
+              <span className={styles.syCp}>feat/copilot-docs</span>
+              {"\n\n"}
+              {"git branch -a   "}
+              <span className={styles.syCm}># 確認</span>
+            </div>
+          </div>
+
+          <div className={styles.cb}>
+            <div className={styles.cbHdr}>
+              <span>.gitignore — 必須設定</span>
+              <span className={styles.cbTag}>config</span>
+            </div>
+            <div className={styles.cbBody}>
+              <span className={styles.syCm}>
+                # git worktree のチェックアウト先を追跡対象から除外（必須）
+              </span>
+              {"\n"}
+              <span className={styles.sySt}>{"worktrees/"}</span>
+              {"\n"}
+              <span className={styles.sySt}>{"node_modules/"}</span>
+              {"\n"}
+              <span className={styles.sySt}>{"*.log"}</span>
+              {"\n"}
+              <span className={styles.sySt}>{".DS_Store"}</span>
+            </div>
+          </div>
+
+          <div className={`${styles.ib} ${styles.ibWarn}`}>
+            <span>⚠️</span>
+            <div>
+              <strong>必須：</strong> <code>worktrees/</code> を<code>.gitignore</code>{" "}
+              に追加しないと、git がワークツリー内の
+              <code>.git</code> ファイルを「入れ子リポジトリ」として誤認識しエラーになります。
+            </div>
+          </div>
         </section>
 
         {/* ══════════ STEP 02 ══════════ */}
