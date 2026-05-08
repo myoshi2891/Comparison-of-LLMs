@@ -82,7 +82,112 @@ export default function Page() {
           <h2 className={styles.stitle}>
             <span className={styles.num}>01.</span>GitHub Copilotの全体アーキテクチャと他ツール比較
           </h2>
-          {/* TODO: faithful content */}
+
+          <p>
+            GitHub Copilotは2025年に<strong>Copilot Coding Agent</strong>
+            （GitHub.com上でIssueを割り当てるとPRを自動作成）と<strong>Agent Mode</strong>（VS
+            Code内でマルチファイル編集を自律実行）を正式リリースし、単なるコード補完から
+            <strong>フルエージェント開発プラットフォーム</strong>
+            へ進化しました。2026年3月現在はさらに：
+            <strong>Copilot CLI GA</strong>（Feb 2026）・<strong>MCPサーバー正式サポート</strong>・
+            <strong>プランモード</strong>（Shift+Tab、CLI/JetBrains GA）・
+            <strong>エージェントフック</strong>（JetBrains Preview）・
+            <strong>エージェントメモリ</strong>が追加され、エコシステムは急速に拡張中です。
+          </p>
+
+          <table>
+            <tr>
+              <th>ファイル / 機能</th>
+              <th>Claude Code</th>
+              <th>Google Antigravity</th>
+              <th>OpenAI Codex</th>
+              <th>GitHub Copilot</th>
+            </tr>
+            <tr>
+              <td>永続メモリ（必須）</td>
+              <td>CLAUDE.md</td>
+              <td>GEMINI.md</td>
+              <td>AGENTS.md</td>
+              <td>
+                <strong>copilot-instructions.md</strong>
+              </td>
+            </tr>
+            <tr>
+              <td>パス特化指示</td>
+              <td>サブdir CLAUDE.md</td>
+              <td>fileMatch Rules</td>
+              <td>サブdir AGENTS.md</td>
+              <td>
+                <strong>.instructions.md (applyTo)</strong>
+              </td>
+            </tr>
+            <tr>
+              <td>タスクプロンプト</td>
+              <td>Custom Commands</td>
+              <td>Workflows</td>
+              <td>.prompt.md</td>
+              <td>
+                <strong>.prompt.md</strong>
+              </td>
+            </tr>
+            <tr>
+              <td>AIペルソナ定義</td>
+              <td>なし</td>
+              <td>なし</td>
+              <td>なし</td>
+              <td>
+                <strong>.chatmode.md</strong>（Copilot独自）
+              </td>
+            </tr>
+            <tr>
+              <td>カスタムエージェント</td>
+              <td>サブエージェント</td>
+              <td>Agent Manager</td>
+              <td>Agents SDK</td>
+              <td>
+                <strong>.agent.md</strong>（ハンドオフ対応）
+              </td>
+            </tr>
+            <tr>
+              <td>ナレッジ拡張</td>
+              <td>SKILL.md</td>
+              <td>SKILL.md</td>
+              <td>SKILL.md</td>
+              <td>
+                <strong>SKILL.md（.github/skills/）</strong>
+              </td>
+            </tr>
+            <tr>
+              <td>オープン標準</td>
+              <td>AGENTS.md対応</td>
+              <td>AGENTS.md対応</td>
+              <td>AGENTS.md（主導）</td>
+              <td>
+                <strong>AGENTS.md + CLAUDE.md + GEMINI.md対応</strong>
+              </td>
+            </tr>
+            <tr>
+              <td>SDD公式FW</td>
+              <td>なし（慣習）</td>
+              <td>なし（慣習）</td>
+              <td>なし（慣習）</td>
+              <td>
+                <strong>GitHub Spec Kit（公式）</strong>
+              </td>
+            </tr>
+          </table>
+
+          <div className={`${styles.ib} ${styles.im}`}>
+            <span className={styles.ii}>🏆</span>
+            <div>
+              <strong>Copilotの最大の強み：マルチ標準対応</strong>
+              <br />
+              GitHub
+              CopilotはAGENTS.md（OpenAI）・CLAUDE.md（Anthropic）・GEMINI.md（Google）の3標準をすべて読み込めます。さらにCopilot独自の
+              <code>.chatmode.md</code>（ペルソナ）と<code>.agent.md</code>
+              （エージェントハンドオフ）を持ち、最も豊富なカスタマイズレイヤーを持つプラットフォームです（[3]）。
+            </div>
+          </div>
         </section>
 
         {/* ── s02: DIRECTORY ── */}
