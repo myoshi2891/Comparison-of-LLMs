@@ -996,15 +996,232 @@ export default function Page() {
           </div>
         </section>
 
-        {/* SECTION 07: ADVANCED — TODO: faithful migration */}
+        {/* SECTION 07: ADVANCED */}
         <section id="advanced" className={styles.sec}>
           <div className={styles.secHeader}>
             <div className={styles.stepNum}>6</div>
             <div>
               <h2 className={styles.secTitle}>上級テクニック</h2>
+              <p className={styles.secDesc}>MCP・Skills・Automations・画像入力</p>
             </div>
           </div>
-          <p style={{ color: "#94a3b8" }}>（実装予定）</p>
+
+          <div className={styles.cardGrid}>
+            <div className={styles.card}>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}
+              >
+                <span style={{ fontSize: "24px" }}>🔌</span>
+                <div>
+                  <div
+                    style={{
+                      fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
+                      fontSize: "14px",
+                      color: "#00d4ff",
+                    }}
+                  >
+                    MCP連携
+                  </div>
+                  <div style={{ fontSize: "12px", color: "#64748b" }}>Model Context Protocol</div>
+                </div>
+              </div>
+              <p style={{ fontSize: "13px", color: "#94a3b8", marginBottom: "12px" }}>
+                外部ツール（GitHub, Slack, Jira
+                など）をCodexに接続。コードと外部サービスをシームレスに連携できます。
+              </p>
+              <div className={styles.codeWrap}>
+                <pre className={styles.codeBody} style={{ fontSize: "12px" }}>
+                  <span className={styles.cm}># config.toml でMCPサーバーを設定</span>
+                  {"\n"}
+                  <span className={styles.pn}>[</span>
+                  <span className={styles.kw}>mcp_servers.github</span>
+                  <span className={styles.pn}>]</span>
+                  {"\n"}
+                  <span className={styles.fn}>command</span> ={" "}
+                  <span className={styles.str}>&quot;npx&quot;</span>
+                  {"\n"}
+                  <span className={styles.fn}>args</span> = <span className={styles.pn}>[</span>
+                  <span className={styles.str}>&quot;-y&quot;</span>,{" "}
+                  <span className={styles.str}>
+                    &quot;@modelcontextprotocol/server-github&quot;
+                  </span>
+                  <span className={styles.pn}>]</span>
+                </pre>
+              </div>
+            </div>
+
+            <div className={styles.card}>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}
+              >
+                <span style={{ fontSize: "24px" }}>⚡</span>
+                <div>
+                  <div
+                    style={{
+                      fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
+                      fontSize: "14px",
+                      color: "#7c3aed",
+                    }}
+                  >
+                    Skills（スキル）
+                  </div>
+                  <div style={{ fontSize: "12px", color: "#64748b" }}>
+                    繰り返しワークフローを定義
+                  </div>
+                </div>
+              </div>
+              <p style={{ fontSize: "13px", color: "#94a3b8", marginBottom: "12px" }}>
+                繰り返し実行するワークフローをスキルとして定義。チームで共有することでオンボーディングも効率化。
+              </p>
+              <div className={styles.codeWrap}>
+                <pre className={styles.codeBody} style={{ fontSize: "12px" }}>
+                  <span className={styles.cm}># ~/.agents/skills/add-tests/SKILL.md</span>
+                  {"\n"}
+                  {
+                    "---\nname: add-tests\ndescription: 指定ファイルのユニットテストを追加する\n---\n"
+                  }
+                  <span className={styles.kw}>## 手順</span>
+                  {"\n"}
+                  {
+                    "1. 既存テストのパターンを確認\n2. 境界値・エラーケースを網羅\n3. npm test で確認"
+                  }
+                </pre>
+              </div>
+            </div>
+
+            <div className={styles.card}>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}
+              >
+                <span style={{ fontSize: "24px" }}>🤖</span>
+                <div>
+                  <div
+                    style={{
+                      fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
+                      fontSize: "14px",
+                      color: "#10b981",
+                    }}
+                  >
+                    Automations
+                  </div>
+                  <div style={{ fontSize: "12px", color: "#64748b" }}>
+                    定期実行・スケジューリング
+                  </div>
+                </div>
+              </div>
+              <p style={{ fontSize: "13px", color: "#94a3b8", marginBottom: "12px" }}>
+                Codex
+                Appの「Automations」タブで定期実行を設定。CHANGELOG更新・依存関係チェックなどを自動化できます。
+              </p>
+              <div
+                className={`${styles.callout} ${styles.calloutTip}`}
+                style={{ margin: 0, padding: "12px" }}
+              >
+                <div className={styles.calloutIcon}>💡</div>
+                <div style={{ fontSize: "12px" }}>
+                  Skills = 方法を定義、Automations = スケジュールを定義、という分担が最適です。
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.card}>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}
+              >
+                <span style={{ fontSize: "24px" }}>🖼️</span>
+                <div>
+                  <div
+                    style={{
+                      fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
+                      fontSize: "14px",
+                      color: "#f59e0b",
+                    }}
+                  >
+                    画像入力
+                  </div>
+                  <div style={{ fontSize: "12px", color: "#64748b" }}>
+                    スクリーンショット・デザインから実装
+                  </div>
+                </div>
+              </div>
+              <p style={{ fontSize: "13px", color: "#94a3b8", marginBottom: "12px" }}>
+                UI
+                のスクリーンショットやデザインモックを入力として渡すと、それをベースにコードを生成できます。
+              </p>
+              <div className={styles.codeWrap}>
+                <pre className={styles.codeBody} style={{ fontSize: "12px" }}>
+                  <span className={styles.cm}># 画像を添付してプロンプト実行</span>
+                  {"\n"}
+                  <span className={styles.fn}>codex</span>{" "}
+                  <span className={styles.str}>&quot;このデザインを実装して&quot;</span> \{"\n"}
+                  {"  "}
+                  <span className={styles.op}>-i</span> ./mockup.png
+                </pre>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.card} style={{ marginTop: "0" }}>
+            <div
+              style={{
+                fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
+                fontSize: "13px",
+                color: "#00d4ff",
+                marginBottom: "12px",
+              }}
+            >
+              ✦ CI/CD での自動化例（GitHub Actions）
+            </div>
+            <div className={styles.codeWrap}>
+              <div className={styles.codeHeader}>
+                <div className={styles.codeDots}>
+                  <div className={`${styles.codeDot} ${styles.codeDotR}`} />
+                  <div className={`${styles.codeDot} ${styles.codeDotY}`} />
+                  <div className={`${styles.codeDot} ${styles.codeDotG}`} />
+                </div>
+                <div className={styles.codeLang}>yaml — .github/workflows/codex-changelog.yml</div>
+              </div>
+              <pre className={styles.codeBody}>
+                <span className={styles.fn}>jobs</span>
+                <span className={styles.pn}>:</span>
+                {"\n  "}
+                <span className={styles.fn}>update_changelog</span>
+                <span className={styles.pn}>:</span>
+                {"\n    "}
+                <span className={styles.fn}>runs-on</span>
+                <span className={styles.pn}>:</span>{" "}
+                <span className={styles.str}>ubuntu-latest</span>
+                {"\n    "}
+                <span className={styles.fn}>steps</span>
+                <span className={styles.pn}>:</span>
+                {"\n      "}
+                <span className={styles.pn}>-</span> <span className={styles.fn}>uses</span>
+                <span className={styles.pn}>:</span>{" "}
+                <span className={styles.str}>actions/checkout@v4</span>
+                {"\n      "}
+                <span className={styles.pn}>-</span> <span className={styles.fn}>name</span>
+                <span className={styles.pn}>:</span>{" "}
+                <span className={styles.str}>Update CHANGELOG via Codex</span>
+                {"\n        "}
+                <span className={styles.fn}>run</span>
+                <span className={styles.pn}>:</span> <span className={styles.pn}>|</span>
+                {"\n          "}
+                <span className={styles.fn}>npm</span> install <span className={styles.op}>-g</span>{" "}
+                @openai/codex{"\n          "}
+                <span className={styles.kw}>export</span>{" "}
+                <span className={styles.op}>OPENAI_API_KEY</span>=
+                <span className={styles.str}>
+                  &quot;{"$"}
+                  {"{{ secrets.OPENAI_API_KEY }}"}&quot;
+                </span>
+                {"\n          "}
+                <span className={styles.fn}>codex</span> exec{" "}
+                <span className={styles.str}>
+                  &quot;前回タグからのコミットをもとに CHANGELOG を更新して&quot;
+                </span>
+              </pre>
+            </div>
+          </div>
         </section>
 
         {/* SECTION 08: DODONT — TODO: faithful migration */}
