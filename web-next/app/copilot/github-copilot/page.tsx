@@ -474,7 +474,7 @@ export default function GithubCopilotPage() {
                   </div>
                   <div className={styles.codeBody}>
                     <span className={styles.cc}>
-                      # VS Code コマンドパレットから実行（Ctrl/Cmd + P）
+                      # VS Code コマンドパレットから実行（Ctrl/Cmd + Shift + P）
                     </span>
                     {"\n"}
                     {"ext install GitHub.copilot\next install GitHub.copilot-chat\n\n"}
@@ -1263,6 +1263,7 @@ export default function GithubCopilotPage() {
           </div>
 
           <table className={styles.modelTable}>
+            <caption className={styles.srOnly}>モデル比較</caption>
             <thead>
               <tr>
                 <th>モデル</th>

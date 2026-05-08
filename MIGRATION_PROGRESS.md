@@ -152,7 +152,7 @@ web-next/
 ├── app/codex/openai-codex-guide/        # Phase D-7（faithful 移植完了）
 ├── app/copilot/markdown-file-guide/     # Phase D-8（faithful 移植完了）
 ├── app/copilot/github-copilot/          # Phase D-9（faithful 移植完了）
-└── app/git-worktree/                    # Phase E（scaffold 完了、faithful 移植進行中）
+└── app/git-worktree/                    # Phase E（完了）
 ```
 
 **テスト数**: **542 passed / 542 total（全 Green）** — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
@@ -196,16 +196,17 @@ Phase E の確立パターン（MermaidDiagram）:
 - bash 配列変数 `${...}` / GitHub Actions `${{ }}` は `// biome-ignore lint/suspicious/noTemplateCurlyInString:` で抑制
 - lint 既知違反: 5 warnings + 7 errors（既知）
 
-作業手順:
-- **最初に `/nextjs-page-migration` スキルを呼び出す**（Claude Code の場合は Skill ツール経由）
-- セクション行範囲テーブルを参照して今から実装するセクションの範囲のみを Read
-- 1 セクション完了ごとに以下を順に実行 → 全部 OK なら 1 コミット → 次のセクションへ:
-  1. (cd web-next && bun run test app/git-worktree/page.test.tsx)
-  2. (cd web-next && bunx biome check --write app/git-worktree/page.tsx)  # ← R1: 必ずパス指定
-  3. (cd web-next && bunx biome check app/git-worktree/page.tsx app/git-worktree/page.module.css app/git-worktree/page.test.tsx)
-  4. (cd web-next && bun run test)       # 全件が pass することを確認
-  5. git add web-next/app/git-worktree/ && git commit -m "feat(web-next): faithful migration of /git-worktree <section-id> (...)"
-  6. **MIGRATION_PROGRESS.md を更新 → git commit**（HEAD・次の作業・テスト数・ビルドを同期）← **次セクション HTML を Read する前の必須ゲート**
+作業手順（Phase F: redirects / sitemap）:
+- **最初に `docs/NEXTJS_PHASE_A_F_PLAN.md` §Phase F を参照**して対象 URL マッピングを確認
+- Phase F は以下の 2 タスクで構成される:
+  1. `netlify.toml` に `[[redirects]]` を追加（旧 `.html` URL → 新 Next.js パス、301）
+  2. `web-next/public/sitemap.xml`（または `app/sitemap.ts`）を更新して移行済み全ページを列挙
+- 各タスク完了ごとに以下を順に実行 → 全部 OK なら 1 コミット:
+  1. (cd web-next && bun run build)     # 全ルートが ○ (Static) であること
+  2. (cd web-next && bunx biome check --write netlify.toml)  # ← R1: パス指定必須
+  3. (cd web-next && bun run test)       # 全件が pass することを確認
+  4. git add netlify.toml web-next/public/sitemap.xml && git commit -m "feat(web-next): Phase F — add redirects/sitemap for legacy HTML cutover"
+  5. **MIGRATION_PROGRESS.md を更新 → git commit**（HEAD・次の作業・テスト数・ビルドを同期）
 
 絶対禁止:
 - bun run lint:fix / bunx biome check --write （パス引数なし） — リポジトリ全体を書き換えるため（R1 違反）
@@ -214,7 +215,7 @@ Phase E の確立パターン（MermaidDiagram）:
 - 既存ファイル（pricing.json / scraper / lib/cost.ts 等）への副作用的な変更
 
 検証コマンド早見表:
-  (cd web-next && bun run test)          # 全件 pass が期待値（現在 537 件 全 pass）
+  (cd web-next && bun run test)          # 全件 pass が期待値（現在 542 件 全 pass）
   (cd web-next && bun run typecheck)     # OK
   (cd web-next && bun run build)         # 全ルートが ○ (Static)
   (cd web-next && bun run lint)          # 既知 7 件のみ（新規違反ゼロが必須）

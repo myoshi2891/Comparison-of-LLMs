@@ -18,6 +18,12 @@ export default function GeminiMdTabs() {
           tabIndex={active === "g1" ? 0 : -1}
           className={`${styles.tabBtn}${active === "g1" ? ` ${styles.tabBtnActive}` : ""}`}
           onClick={() => setActive("g1")}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowRight") {
+              setActive("g2");
+              document.getElementById("tab-g2")?.focus();
+            }
+          }}
         >
           ✅ ベストプラクティス例
         </button>
@@ -30,6 +36,12 @@ export default function GeminiMdTabs() {
           tabIndex={active === "g2" ? 0 : -1}
           className={`${styles.tabBtn}${active === "g2" ? ` ${styles.tabBtnActive}` : ""}`}
           onClick={() => setActive("g2")}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowLeft") {
+              setActive("g1");
+              document.getElementById("tab-g1")?.focus();
+            }
+          }}
         >
           ❌ アンチパターン例
         </button>
@@ -45,9 +57,9 @@ export default function GeminiMdTabs() {
         <div className={styles.codeWrap}>
           <div className={styles.cbHead}>
             <div className={styles.cbDots}>
-              <div className={styles.cbd} style={{ background: "#ea4335" }} />
-              <div className={styles.cbd} style={{ background: "#fbbc04" }} />
-              <div className={styles.cbd} style={{ background: "#34a853" }} />
+              <div className={`${styles.cbd} ${styles.cbdRed}`} />
+              <div className={`${styles.cbd} ${styles.cbdYellow}`} />
+              <div className={`${styles.cbd} ${styles.cbdGreen}`} />
             </div>
             <span>~/.gemini/GEMINI.md — ベストプラクティステンプレート</span>
           </div>
@@ -100,12 +112,12 @@ export default function GeminiMdTabs() {
         aria-labelledby="tab-g2"
         className={active === "g2" ? styles.tabPanelActive : styles.tabPanel}
       >
-        <div className={styles.codeWrap} style={{ borderColor: "rgba(234, 67, 53, 0.35)" }}>
+        <div className={`${styles.codeWrap} ${styles.codeWrapWarn}`}>
           <div className={styles.cbHead}>
             <div className={styles.cbDots}>
-              <div className={styles.cbd} style={{ background: "#ea4335" }} />
-              <div className={styles.cbd} style={{ background: "#fbbc04" }} />
-              <div className={styles.cbd} style={{ background: "#34a853" }} />
+              <div className={`${styles.cbd} ${styles.cbdRed}`} />
+              <div className={`${styles.cbd} ${styles.cbdYellow}`} />
+              <div className={`${styles.cbd} ${styles.cbdGreen}`} />
             </div>
             <span>❌ やってはいけない例</span>
           </div>
@@ -141,7 +153,7 @@ export default function GeminiMdTabs() {
             <span className={styles.legHl2}>{"本番DBのIP: 192.168.1.100"}</span>
           </pre>
         </div>
-        <div className={`${styles.info} ${styles.iWarn}`} style={{ marginTop: "0.8rem" }}>
+        <div className={`${styles.info} ${styles.iWarn} ${styles.iWarnMt}`}>
           <span className={styles.infoIcon}>⚠️</span>
           <div>
             機密情報は<code>.geminiignore</code>で除外し、変更履歴はGitで管理。大きな資料は

@@ -64,6 +64,14 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .badgeDot {
+    animation: none;
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .heroTitle {
   font-family: var(--font-display), var(--font-sans), sans-serif;
   font-size: clamp(2rem, 5vw, 3.5rem);
@@ -1105,4 +1113,16 @@
   height: 100%;
   border-radius: 100px;
   background: linear-gradient(90deg, var(--accent), #3b82f6);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }

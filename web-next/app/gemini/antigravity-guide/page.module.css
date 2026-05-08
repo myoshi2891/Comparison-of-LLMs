@@ -743,6 +743,26 @@
   border-radius: 50%;
 }
 
+.cbdRed {
+  background: #ea4335;
+}
+
+.cbdYellow {
+  background: #fbbc04;
+}
+
+.cbdGreen {
+  background: #34a853;
+}
+
+.codeWrapWarn {
+  border-color: rgba(234, 67, 53, 0.35);
+}
+
+.iWarnMt {
+  margin-top: 0.8rem;
+}
+
 /* ── Legacy code highlight colors ───────────────────────── */
 .legHd {
   color: var(--g-blue, #4285f4);

@@ -16,9 +16,10 @@ describe("/copilot/markdown-file-guide", () => {
 
   it("外部リンクに target=_blank と rel=noopener noreferrer が付与されている", () => {
     const { container } = render(<Page />);
-    const extLinks = Array.from(container.querySelectorAll('a[target="_blank"]'));
+    const extLinks = Array.from(container.querySelectorAll('a[href^="http"]'));
     expect(extLinks.length).toBeGreaterThan(0);
     for (const a of extLinks) {
+      expect(a.getAttribute("target")).toBe("_blank");
       expect(a.getAttribute("rel")).toBe("noopener noreferrer");
     }
   });

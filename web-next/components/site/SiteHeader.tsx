@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type NavLink, navLinks } from "./nav-links";
 import { SiteHeaderClient } from "./SiteHeaderClient";
@@ -27,9 +28,9 @@ export function SiteHeader({ pathname: pathnameProp }: { pathname?: string } = {
   return (
     <SiteHeaderClient>
       <nav id="common-header" aria-label="Main Navigation" className="ch-nav">
-        <a className="ch-brand" href="/">
+        <Link className="ch-brand" href="/">
           LLM Studies
-        </a>
+        </Link>
         <button
           type="button"
           className="ch-hamburger"
@@ -60,13 +61,13 @@ export function SiteHeader({ pathname: pathnameProp }: { pathname?: string } = {
                       const active = isActivePath(c.href, pathname);
                       return (
                         <li key={c.href}>
-                          <a
+                          <Link
                             href={c.href}
                             className={active ? "ch-active" : undefined}
                             aria-current={active ? "page" : undefined}
                           >
                             {c.name}
-                          </a>
+                          </Link>
                         </li>
                       );
                     })}
@@ -77,13 +78,13 @@ export function SiteHeader({ pathname: pathnameProp }: { pathname?: string } = {
             const active = isActivePath(link.href, pathname);
             return (
               <li key={link.name}>
-                <a
+                <Link
                   href={link.href}
                   className={active ? "ch-active" : undefined}
                   aria-current={active ? "page" : undefined}
                 >
                   {link.name}
-                </a>
+                </Link>
               </li>
             );
           })}
