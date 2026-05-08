@@ -519,6 +519,10 @@
   font-size: 0.65rem;
 }
 
+.tc {
+  color: var(--text);
+}
+
 /* ─── INFO BOX ─── */
 .ib {
   border-radius: 9px;

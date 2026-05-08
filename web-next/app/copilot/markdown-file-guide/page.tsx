@@ -196,7 +196,235 @@ export default function Page() {
           <h2 className={styles.stitle}>
             <span className={styles.num}>02.</span>全体ファイル構成とディレクトリ
           </h2>
-          {/* TODO: faithful content */}
+
+          <div className={styles.flowWrap}>
+            <div className={styles.flowLbl}>▸ GitHub Copilot SDD — コンテキスト注入フロー</div>
+            <div className={styles.flow}>
+              <div className={styles.fst}>
+                <div className={`${styles.fbox} ${styles.fG}`}>
+                  常時注入
+                  <br />
+                  （全リクエスト）
+                </div>
+                <div className={styles.ffile}>
+                  copilot-instructions.md
+                  <br />
+                  AGENTS.md
+                </div>
+              </div>
+              <div className={styles.farr}>→</div>
+              <div className={styles.fst}>
+                <div className={`${styles.fbox} ${styles.fM}`}>
+                  パス特化
+                  <br />
+                  （自動マッチ）
+                </div>
+                <div className={styles.ffile}>
+                  .instructions.md
+                  <br />
+                  applyTo: glob
+                </div>
+              </div>
+              <div className={styles.farr}>→</div>
+              <div className={styles.fst}>
+                <div className={`${styles.fbox} ${styles.fC}`}>
+                  タスク実行
+                  <br />
+                  （手動呼出）
+                </div>
+                <div className={styles.ffile}>
+                  .prompt.md
+                  <br />
+                  /コマンド
+                </div>
+              </div>
+              <div className={styles.farr}>→</div>
+              <div className={styles.fst}>
+                <div className={`${styles.fbox} ${styles.fV}`}>
+                  ペルソナ切替
+                  <br />
+                  （Chat Mode）
+                </div>
+                <div className={styles.ffile}>
+                  .chatmode.md
+                  <br />
+                  AIキャラクター
+                </div>
+              </div>
+              <div className={styles.farr}>→</div>
+              <div className={styles.fst}>
+                <div className={`${styles.fbox} ${styles.fT}`}>
+                  スキル呼出
+                  <br />
+                  （意味的トリガー）
+                </div>
+                <div className={styles.ffile}>
+                  SKILL.md
+                  <br />
+                  Progressive開示
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h3>推奨ディレクトリ構成（完全版）</h3>
+          <div className={styles.tree}>
+            <div className={styles.t0}>
+              <span className={styles.tf}>📁</span> <span>your-project/</span>
+            </div>
+
+            <div className={`${styles.t0} ${styles.t1}`}>
+              <span className={styles.tm}>📄</span> <span className={styles.tm}>AGENTS.md</span>
+              <span className={styles.tdi}>
+                {" "}
+                — オープン標準（Linux Foundation）Copilotが自動読込
+              </span>
+            </div>
+
+            <div className={`${styles.t0} ${styles.t1}`}>
+              <span className={styles.tf}>📁</span> <span>.github/</span>
+              <span className={styles.tdi}> — Copilot カスタマイズルート</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t2}`}>
+              <span className={styles.tg}>📄</span>{" "}
+              <span className={styles.tg}>copilot-instructions.md</span>
+              <span className={styles.tdi}> — リポジトリ永続メモリ（最重要・全IDE共通）</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t2}`}>
+              <span className={styles.tf}>📁</span> <span>instructions/</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t3}`}>
+              <span className={styles.tm}>📄</span>{" "}
+              <span className={styles.tm}>frontend.instructions.md</span>
+              <span className={styles.tdi}>{' — applyTo: "src/**/*.tsx"'}</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t3}`}>
+              <span className={styles.tm}>📄</span>{" "}
+              <span className={styles.tm}>testing.instructions.md</span>
+              <span className={styles.tdi}>{' — applyTo: "**/*.test.ts"'}</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t3}`}>
+              <span className={styles.tm}>📄</span>{" "}
+              <span className={styles.tm}>infra.instructions.md</span>
+              <span className={styles.tdi}>{' — applyTo: "**/*.tf"'}</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t2}`}>
+              <span className={styles.tf}>📁</span> <span>prompts/</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t3}`}>
+              <span className={styles.tc}>📄</span>{" "}
+              <span className={styles.tc}>specify.prompt.md</span>
+              <span className={styles.tdi}> — Spec Kit: 仕様書生成コマンド</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t3}`}>
+              <span className={styles.tc}>📄</span>{" "}
+              <span className={styles.tc}>plan.prompt.md</span>
+              <span className={styles.tdi}> — Spec Kit: 技術計画生成コマンド</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t3}`}>
+              <span className={styles.tc}>📄</span>{" "}
+              <span className={styles.tc}>tasks.prompt.md</span>
+              <span className={styles.tdi}> — Spec Kit: タスク分解コマンド</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t3}`}>
+              <span className={styles.tc}>📄</span>{" "}
+              <span className={styles.tc}>review.prompt.md</span>
+              <span className={styles.tdi}> — カスタム: コードレビュー</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t2}`}>
+              <span className={styles.tf}>📁</span> <span>chatmodes/</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t3}`}>
+              <span className={styles.tv}>📄</span>{" "}
+              <span className={styles.tv}>architect.chatmode.md</span>
+              <span className={styles.tdi}> — ソフトウェアアーキテクトペルソナ</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t3}`}>
+              <span className={styles.tv}>📄</span>{" "}
+              <span className={styles.tv}>security.chatmode.md</span>
+              <span className={styles.tdi}> — セキュリティレビュワーペルソナ</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t2}`}>
+              <span className={styles.tf}>📁</span> <span>agents/</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t3}`}>
+              <span className={styles.tt}>📄</span>{" "}
+              <span className={styles.tt}>planning.agent.md</span>
+              <span className={styles.tdi}> — 設計フェーズ専用エージェント</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t3}`}>
+              <span className={styles.tt}>📄</span>{" "}
+              <span className={styles.tt}>developer.agent.md</span>
+              <span className={styles.tdi}> — 実装フェーズ専用エージェント</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t2}`}>
+              <span className={styles.tf}>📁</span> <span>skills/</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t3}`}>
+              <span className={styles.tf}>📁</span> <span>db-migration/</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t4}`}>
+              <span className={styles.tg}>📄</span> <span className={styles.tg}>SKILL.md</span>
+              <span className={styles.tdi}> — Progressive Disclosure スキル</span>
+            </div>
+
+            <div className={`${styles.t0} ${styles.t1}`}>
+              <span className={styles.tf}>📁</span> <span>.vscode/</span>
+              <span className={styles.tdi}> — 🆕 VS Code ワークスペース設定</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t2}`}>
+              <span className={styles.tt}>📄</span> <span className={styles.tt}>mcp.json</span>
+              <span className={styles.tdi}> — 🆕 MCPサーバー設定（リモート/ローカル）</span>
+            </div>
+
+            <div className={`${styles.t0} ${styles.t1}`}>
+              <span className={styles.tf}>📁</span> <span>.specify/</span>
+              <span className={styles.tdi}> — GitHub Spec Kit（SDD専用）</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t2}`}>
+              <span className={styles.tf}>📁</span> <span>memory/</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t3}`}>
+              <span className={styles.tr}>📄</span>{" "}
+              <span className={styles.tr}>constitution.md</span>
+              <span className={styles.tdi}> — プロジェクト憲法（不変原則）</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t2}`}>
+              <span className={styles.tf}>📁</span> <span>templates/</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t3}`}>
+              <span className={styles.tg}>📄</span>{" "}
+              <span className={styles.tg}>spec-template.md</span>
+              <span className={styles.tdi}> — 仕様書テンプレート</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t3}`}>
+              <span className={styles.tg}>📄</span>{" "}
+              <span className={styles.tg}>plan-template.md</span>
+              <span className={styles.tdi}> — 技術計画テンプレート</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t3}`}>
+              <span className={styles.tg}>📄</span>{" "}
+              <span className={styles.tg}>tasks-template.md</span>
+              <span className={styles.tdi}> — タスクリストテンプレート</span>
+            </div>
+
+            <div className={`${styles.t0} ${styles.t1}`}>
+              <span className={styles.tf}>📁</span> <span>features/</span>
+              <span className={styles.tdi}> — 機能別SDD仕様書群（Spec Kit生成）</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t2}`}>
+              <span className={styles.tf}>📁</span> <span>preorder/</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t3}`}>
+              <span className={styles.tm}>📄</span> <span className={styles.tm}>spec.md</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t3}`}>
+              <span className={styles.tm}>📄</span> <span className={styles.tm}>plan.md</span>
+            </div>
+            <div className={`${styles.t0} ${styles.t3}`}>
+              <span className={styles.tm}>📄</span> <span className={styles.tm}>tasks.md</span>
+            </div>
+          </div>
         </section>
 
         {/* ── s03: COPILOT-INSTRUCTIONS ── */}
