@@ -555,6 +555,255 @@
   border-radius: 4px;
 }
 
+/* ── Flow diagram ─────────────────────────────────────── */
+.flow {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  min-width: max-content;
+  overflow-x: auto;
+}
+
+.fstep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.fbox {
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 0.77rem;
+  font-weight: 500;
+  text-align: center;
+  border: 1px solid;
+  min-width: 105px;
+  line-height: 1.4;
+}
+
+.fbB {
+  background: rgba(66, 133, 244, 0.1);
+  border-color: rgba(66, 133, 244, 0.4);
+  color: var(--g-blue, #4285f4);
+}
+
+.fbG {
+  background: rgba(52, 168, 83, 0.1);
+  border-color: rgba(52, 168, 83, 0.4);
+  color: var(--g-green, #34a853);
+}
+
+.fbY {
+  background: rgba(251, 188, 4, 0.1);
+  border-color: rgba(251, 188, 4, 0.4);
+  color: var(--g-yellow, #fbbc04);
+}
+
+.fbR {
+  background: rgba(234, 67, 53, 0.1);
+  border-color: rgba(234, 67, 53, 0.4);
+  color: var(--g-red, #ea4335);
+}
+
+.fbP {
+  background: rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.4);
+  color: var(--g-purple, #8b5cf6);
+}
+
+.ffile {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.6rem;
+  color: var(--text3, #5a7090);
+  text-align: center;
+}
+
+.farrow {
+  padding: 0 0.3rem;
+  color: var(--text3, #5a7090);
+  font-size: 1.1rem;
+  margin-top: -1.5rem;
+}
+
+/* ── Grid / Mini-card ──────────────────────────────────── */
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.miniCard {
+  background: var(--bg3, #131b2e);
+  border: 1px solid var(--border, #1e2d4a);
+  border-radius: 10px;
+  padding: 1.1rem;
+}
+
+.miniCard p {
+  font-size: 0.82rem;
+  color: var(--text2, #9aafcc);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.mcTag {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.7rem;
+  color: var(--g-blue, #4285f4);
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+}
+
+/* ── File Tree ─────────────────────────────────────────── */
+.ftree {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.8rem;
+  line-height: 1;
+  background: var(--bg3, #131b2e);
+  border: 1px solid var(--border, #1e2d4a);
+  border-radius: 14px;
+  padding: 1.4rem 1.6rem;
+  margin: 16px 0;
+}
+
+.ftr {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  min-height: 28px;
+}
+
+.ftrIndent {
+  display: flex;
+  align-items: stretch;
+}
+
+.ftrGuide {
+  width: 20px;
+  min-width: 20px;
+  position: relative;
+}
+
+.vline::before {
+  content: "";
+  position: absolute;
+  left: 9px;
+  top: -14px;
+  bottom: -14px;
+  width: 1px;
+  background: var(--border2, #2a3d5e);
+}
+
+.last::before {
+  bottom: 50%;
+}
+
+.elbow::after {
+  content: "";
+  position: absolute;
+  left: 9px;
+  top: 50%;
+  width: 10px;
+  height: 1px;
+  background: var(--border2, #2a3d5e);
+}
+
+.elbow.last::before {
+  content: "";
+  position: absolute;
+  left: 9px;
+  top: -14px;
+  bottom: 50%;
+  width: 1px;
+  background: var(--border2, #2a3d5e);
+}
+
+.ftrName {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  flex-wrap: wrap;
+}
+
+.ftrLabel {
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.ftrDir {
+  color: var(--g-blue, #4285f4);
+  font-weight: 600;
+}
+
+.ftrDirSub {
+  color: #5a87c0;
+  font-weight: 600;
+}
+
+.ftrFreq {
+  color: var(--g-green, #34a853);
+  font-weight: 600;
+}
+
+.ftrFrule {
+  color: var(--g-red, #ea4335);
+}
+
+.ftrFwf {
+  color: var(--g-yellow, #fbbc04);
+}
+
+.ftrFctx {
+  color: var(--g-cyan, #00bcd4);
+}
+
+.ftrFopt {
+  color: var(--text3, #5a7090);
+}
+
+.ftrFsdd {
+  color: #7aacf0;
+}
+
+.ftrFsdd2 {
+  color: var(--g-green, #34a853);
+}
+
+.ftrComment {
+  font-size: 0.72rem;
+  color: var(--text3, #5a7090);
+  white-space: nowrap;
+  font-style: italic;
+}
+
+.ftrBadge {
+  font-size: 0.62rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.fbImportant {
+  background: rgba(66, 133, 244, 0.12);
+  color: var(--g-blue, #4285f4);
+  border: 1px solid rgba(66, 133, 244, 0.25);
+}
+
+.fbNew {
+  background: rgba(251, 188, 4, 0.12);
+  color: var(--g-yellow, #fbbc04);
+  border: 1px solid rgba(251, 188, 4, 0.25);
+}
+
+.fbReq {
+  background: rgba(52, 168, 83, 0.12);
+  color: var(--g-green, #34a853);
+  border: 1px solid rgba(52, 168, 83, 0.25);
+}
+
 /* Model table */
 .modelTable {
   width: 100%;

@@ -283,13 +283,398 @@ export default function Page() {
           </div>
         </section>
 
-        {/* SECTION 02: DIRECTORY — TODO: faithful migration */}
+        {/* SECTION 02: DIRECTORY */}
         <section id="directory" className={styles.sec}>
           <div className={styles.secLabel}>Section 02</div>
           <h2 className={styles.secTitle}>
             <span className={styles.num}>02.</span>全体ファイル構成と推奨ディレクトリ
           </h2>
-          <p>（実装予定）</p>
+
+          <p>
+            プロジェクトを始めたら、まずこのディレクトリ構成を作りましょう。5種類のファイル群がAntigravityの中核を成します。
+          </p>
+
+          <div className={styles.flowWrap}>
+            <div className={styles.flowLabel}>▸ SDD × Antigravity 4フェーズフロー</div>
+            <div className={styles.flow}>
+              <div className={styles.fstep}>
+                <div className={`${styles.fbox} ${styles.fbB}`}>
+                  Phase 1
+                  <br />
+                  仕様策定
+                </div>
+                <div className={styles.ffile}>
+                  spec.md
+                  <br />
+                  requirements.md
+                </div>
+              </div>
+              <div className={styles.farrow}>→</div>
+              <div className={styles.fstep}>
+                <div className={`${styles.fbox} ${styles.fbG}`}>
+                  Phase 2
+                  <br />
+                  設計
+                </div>
+                <div className={styles.ffile}>
+                  design.md
+                  <br />
+                  always-on.md
+                </div>
+              </div>
+              <div className={styles.farrow}>→</div>
+              <div className={styles.fstep}>
+                <div className={`${styles.fbox} ${styles.fbY}`}>
+                  Phase 3
+                  <br />
+                  エージェント実行
+                </div>
+                <div className={styles.ffile}>
+                  tasks.md
+                  <br />
+                  workflows/
+                </div>
+              </div>
+              <div className={styles.farrow}>→</div>
+              <div className={styles.fstep}>
+                <div className={`${styles.fbox} ${styles.fbR}`}>
+                  Phase 4
+                  <br />
+                  検証
+                </div>
+                <div className={styles.ffile}>
+                  Artifacts
+                  <br />
+                  Browser Agent
+                </div>
+              </div>
+              <div className={styles.farrow}>→</div>
+              <div className={styles.fstep}>
+                <div className={`${styles.fbox} ${styles.fbP}`}>
+                  フィードバック
+                  <br />
+                  ループ
+                </div>
+                <div className={styles.ffile}>
+                  Knowledge
+                  <br />
+                  更新
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h3>推奨ディレクトリ構成</h3>
+
+          <div className={styles.ftree}>
+            {/* ROOT */}
+            <div className={styles.ftr}>
+              <div className={styles.ftrName}>
+                <span className={`${styles.ftrLabel} ${styles.ftrDir}`}>📁 your-project/</span>
+              </div>
+            </div>
+
+            {/* .agent/ */}
+            <div className={styles.ftr}>
+              <div className={styles.ftrIndent}>
+                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
+              </div>
+              <div className={styles.ftrName}>
+                <span className={`${styles.ftrLabel} ${styles.ftrDir}`}>📁 .agent/</span>
+                <span className={`${styles.ftrBadge} ${styles.fbImportant}`}>
+                  Antigravity中心設定
+                </span>
+              </div>
+            </div>
+
+            {/* rules/ */}
+            <div className={styles.ftr}>
+              <div className={styles.ftrIndent}>
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
+              </div>
+              <div className={styles.ftrName}>
+                <span className={`${styles.ftrLabel} ${styles.ftrDirSub}`}>📁 rules/</span>
+                <span className={styles.ftrComment}>
+                  ← 受動的制約（常時バックグラウンドで動作）
+                </span>
+              </div>
+            </div>
+
+            {/* rules/always-on.md */}
+            <div className={styles.ftr}>
+              <div className={styles.ftrIndent}>
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
+              </div>
+              <div className={styles.ftrName}>
+                <span className={`${styles.ftrLabel} ${styles.ftrFrule}`}>📄 always-on.md</span>
+                <span className={styles.ftrComment}>
+                  ← activation: always — 常時適用（禁止事項等）
+                </span>
+              </div>
+            </div>
+
+            {/* rules/typescript.md */}
+            <div className={styles.ftr}>
+              <div className={styles.ftrIndent}>
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.elbow} ${styles.last}`} />
+              </div>
+              <div className={styles.ftrName}>
+                <span className={`${styles.ftrLabel} ${styles.ftrFrule}`}>📄 typescript.md</span>
+                <span className={styles.ftrComment}>← activation: fileMatch *.ts — 条件適用</span>
+              </div>
+            </div>
+
+            {/* skills/ */}
+            <div className={styles.ftr}>
+              <div className={styles.ftrIndent}>
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
+              </div>
+              <div className={styles.ftrName}>
+                <span className={`${styles.ftrLabel} ${styles.ftrDirSub}`}>📁 skills/</span>
+                <span className={styles.ftrComment}>← 進歩的開示ナレッジ（オンデマンド）</span>
+              </div>
+            </div>
+
+            {/* skills/db-migration/ */}
+            <div className={styles.ftr}>
+              <div className={styles.ftrIndent}>
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
+              </div>
+              <div className={styles.ftrName}>
+                <span className={`${styles.ftrLabel} ${styles.ftrDirSub}`}>📁 db-migration/</span>
+                <span className={styles.ftrComment}>← スキルディレクトリ（name と一致させる）</span>
+              </div>
+            </div>
+
+            {/* SKILL.md */}
+            <div className={styles.ftr}>
+              <div className={styles.ftrIndent}>
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
+              </div>
+              <div className={styles.ftrName}>
+                <span className={`${styles.ftrLabel} ${styles.ftrFreq}`}>📄 SKILL.md</span>
+                <span className={`${styles.ftrBadge} ${styles.fbReq}`}>必須</span>
+                <span className={styles.ftrComment}>← スキルの脳（name / description / 手順）</span>
+              </div>
+            </div>
+
+            {/* scripts/ */}
+            <div className={styles.ftr}>
+              <div className={styles.ftrIndent}>
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
+              </div>
+              <div className={styles.ftrName}>
+                <span className={`${styles.ftrLabel} ${styles.ftrFopt}`}>📁 scripts/</span>
+                <span className={styles.ftrComment}>← 任意: 決定論的スクリプト（Python/Bash）</span>
+              </div>
+            </div>
+
+            {/* references/ */}
+            <div className={styles.ftr}>
+              <div className={styles.ftrIndent}>
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.elbow} ${styles.last}`} />
+              </div>
+              <div className={styles.ftrName}>
+                <span className={`${styles.ftrLabel} ${styles.ftrFopt}`}>📁 references/</span>
+                <span className={styles.ftrComment}>
+                  ← 任意: 参照ドキュメント（オンデマンド読込）
+                </span>
+              </div>
+            </div>
+
+            {/* workflows/ */}
+            <div className={styles.ftr}>
+              <div className={styles.ftrIndent}>
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.elbow} ${styles.last}`} />
+              </div>
+              <div className={styles.ftrName}>
+                <span className={`${styles.ftrLabel} ${styles.ftrDirSub}`}>📁 workflows/</span>
+                <span className={styles.ftrComment}>
+                  ← 能動的手順書（スラッシュコマンドで起動）
+                </span>
+              </div>
+            </div>
+
+            {/* deploy.md */}
+            <div className={styles.ftr}>
+              <div className={styles.ftrIndent}>
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
+              </div>
+              <div className={styles.ftrName}>
+                <span className={`${styles.ftrLabel} ${styles.ftrFwf}`}>📄 deploy.md</span>
+                <span className={styles.ftrComment}>← /deploy コマンドで実行</span>
+              </div>
+            </div>
+
+            {/* review.md */}
+            <div className={styles.ftr}>
+              <div className={styles.ftrIndent}>
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.elbow} ${styles.last}`} />
+              </div>
+              <div className={styles.ftrName}>
+                <span className={`${styles.ftrLabel} ${styles.ftrFwf}`}>📄 review.md</span>
+                <span className={styles.ftrComment}>← /review コマンドで実行</span>
+              </div>
+            </div>
+
+            {/* .context/ */}
+            <div className={styles.ftr}>
+              <div className={styles.ftrIndent}>
+                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
+              </div>
+              <div className={styles.ftrName}>
+                <span
+                  className={`${styles.ftrLabel} ${styles.ftrDir}`}
+                  style={{ color: "var(--g-cyan, #00bcd4)" }}
+                >
+                  📁 .context/
+                </span>
+                <span className={styles.ftrComment}>
+                  ← Knowledge Base（エージェントが自動学習・蓄積）
+                </span>
+              </div>
+            </div>
+
+            {/* architecture.md */}
+            <div className={styles.ftr}>
+              <div className={styles.ftrIndent}>
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
+              </div>
+              <div className={styles.ftrName}>
+                <span className={`${styles.ftrLabel} ${styles.ftrFctx}`}>📄 architecture.md</span>
+                <span className={styles.ftrComment}>← システム構成・技術スタック情報</span>
+              </div>
+            </div>
+
+            {/* gotchas.md */}
+            <div className={styles.ftr}>
+              <div className={styles.ftrIndent}>
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.elbow} ${styles.last}`} />
+              </div>
+              <div className={styles.ftrName}>
+                <span className={`${styles.ftrLabel} ${styles.ftrFctx}`}>📄 gotchas.md</span>
+                <span className={styles.ftrComment}>← 発見した落とし穴を記録（自動更新）</span>
+              </div>
+            </div>
+
+            {/* docs/ */}
+            <div className={styles.ftr}>
+              <div className={styles.ftrIndent}>
+                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
+              </div>
+              <div className={styles.ftrName}>
+                <span className={`${styles.ftrLabel} ${styles.ftrDir}`}>📁 docs/</span>
+                <span className={styles.ftrComment}>← SDD仕様書群</span>
+              </div>
+            </div>
+
+            {/* spec.md */}
+            <div className={styles.ftr}>
+              <div className={styles.ftrIndent}>
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
+              </div>
+              <div className={styles.ftrName}>
+                <span className={`${styles.ftrLabel} ${styles.ftrFsdd}`}>📄 spec.md</span>
+                <span className={styles.ftrComment}>← 何を・なぜ（プロダクト仕様）</span>
+              </div>
+            </div>
+
+            {/* design.md */}
+            <div className={styles.ftr}>
+              <div className={styles.ftrIndent}>
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
+              </div>
+              <div className={styles.ftrName}>
+                <span className={`${styles.ftrLabel} ${styles.ftrFsdd}`}>📄 design.md</span>
+                <span className={styles.ftrComment}>← 技術設計・アーキテクチャ判断</span>
+              </div>
+            </div>
+
+            {/* tasks.md */}
+            <div className={styles.ftr}>
+              <div className={styles.ftrIndent}>
+                <div className={`${styles.ftrGuide} ${styles.vline}`} />
+                <div className={`${styles.ftrGuide} ${styles.elbow} ${styles.last}`} />
+              </div>
+              <div className={styles.ftrName}>
+                <span className={`${styles.ftrLabel} ${styles.ftrFsdd2}`}>📄 tasks.md</span>
+                <span className={styles.ftrComment}>← タスク管理・依存関係・並列情報</span>
+              </div>
+            </div>
+
+            {/* GEMINI.md */}
+            <div className={styles.ftr}>
+              <div className={styles.ftrIndent}>
+                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
+              </div>
+              <div className={styles.ftrName}>
+                <span className={`${styles.ftrLabel} ${styles.ftrFreq}`}>📄 GEMINI.md</span>
+                <span className={`${styles.ftrBadge} ${styles.fbReq}`}>常時ロード</span>
+                <span className={styles.ftrComment}>
+                  ← プロジェクト共通メモリ（全セッションで注入）
+                </span>
+              </div>
+            </div>
+
+            {/* AGENTS.md */}
+            <div className={styles.ftr}>
+              <div className={styles.ftrIndent}>
+                <div className={`${styles.ftrGuide} ${styles.elbow} ${styles.last}`} />
+              </div>
+              <div className={styles.ftrName}>
+                <span className={`${styles.ftrLabel} ${styles.ftrFopt}`}>📄 AGENTS.md</span>
+                <span className={`${styles.ftrBadge} ${styles.fbNew}`}>v1.20.3〜</span>
+                <span className={styles.ftrComment}>
+                  ← クロスツール共有（Claude Code / Cursor等と共通）
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.grid2}>
+            <div className={styles.miniCard}>
+              <div className={styles.mcTag}>🌐 グローバル設定</div>
+              <p>
+                <code>~/.gemini/GEMINI.md</code>
+                <br />
+                全プロジェクト共通のワーキングスタイル・禁止事項を記述。プロジェクト固有情報は書かないこと。
+              </p>
+            </div>
+            <div className={styles.miniCard}>
+              <div className={styles.mcTag}>🆕 v1.20.3 新機能</div>
+              <p>
+                <code>AGENTS.md</code>
+                対応開始。プロジェクトルートに置くだけでClaude
+                Code・Codex・Cursor等と共通ルールを共有可能。
+              </p>
+            </div>
+          </div>
         </section>
 
         {/* SECTION 03: GEMINI.md — TODO: faithful migration */}
