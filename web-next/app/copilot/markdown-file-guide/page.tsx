@@ -1983,11 +1983,329 @@ export default function Page() {
 
         {/* ── s13: MCP-SUPPORT ── */}
         <section id="s13">
-          <div className={styles.slabel}>Section 13</div>
+          <div className={styles.slabel}>Section 13 🆕 NEW 2026</div>
           <h2 className={styles.stitle}>
-            <span className={styles.num}>13.</span>🆕 MCPサポート — .vscode/mcp.json完全ガイド
+            <span className={styles.num}>13.</span>MCPサポート — .vscode/mcp.json 完全ガイド
           </h2>
-          {/* TODO: faithful content */}
+
+          <p>
+            Model Context Protocol（MCP）は
+            <strong>AIモデルと外部ツール・サービスを標準プロトコルで接続するオープン標準</strong>
+            です（Anthropic考案 → Linux Foundation傘下）。2026年にGitHub CopilotがVS
+            Code・JetBrains・Visual Studio・Copilot
+            CLIで正式サポートし、データベース・API・ブラウザ・Figma・Jira・Slackなど100以上のMCPサーバーをCopilot
+            Agent Modeから直接操作できるようになりました。GitHub MCP ServerはCopilot CLIに
+            <strong>ビルトインで組み込み済み</strong>
+            （追加設定不要）です（[18]）。
+          </p>
+
+          <div className={`${styles.ib} ${styles.ic}`}>
+            <span className={styles.ii}>⚠️</span>
+            <div>
+              <strong>Business / Enterprise プランの注意事項：</strong>
+              <br />
+              組織・企業のCopilot Business/Enterpriseメンバーが利用するには、
+              <strong>Organization管理者が「MCP servers in Copilot」ポリシーを有効化</strong>
+              する必要があります（デフォルト無効）。個人プラン（Free・Pro・Pro+）ではそのまま利用可能です（[18]）。
+            </div>
+          </div>
+
+          <div className={styles.fc}>
+            <div className={styles.fcHdr}>
+              <div
+                className={styles.fci}
+                style={{
+                  background: "rgba(31, 184, 205, 0.12)",
+                  border: "1px solid rgba(31, 184, 205, 0.3)",
+                }}
+              >
+                🔌
+              </div>
+              <div>
+                <div className={styles.fcName}>.vscode/mcp.json</div>
+                <div className={styles.fcPath}>
+                  .vscode/mcp.json — VS Code ワークスペース共有MCP設定
+                </div>
+                <div className={styles.fcTags}>
+                  <span className={`${styles.fct} ${styles.fctT}`}>Agent Mode専用</span>
+                  <span className={`${styles.fct} ${styles.fctM}`}>リモート/ローカル対応</span>
+                  <span className={`${styles.fct} ${styles.fctG}`}>git管理でチーム共有可</span>
+                  <span className={`${styles.fct} ${styles.fctV}`}>IntelliSense対応</span>
+                </div>
+              </div>
+            </div>
+            <div className={styles.fcBody}>
+              <h3>公式推奨構成 — GitHub MCP Server（リモート） + Playwright（ローカル）</h3>
+              <div className={styles.cb}>
+                <div className={styles.cbHdr}>
+                  <div className={styles.dots}>
+                    <div className={styles.dot} style={{ background: "#f25c7a" }} />
+                    <div className={styles.dot} style={{ background: "#f0883e" }} />
+                    <div className={styles.dot} style={{ background: "#238636" }} />
+                  </div>
+                  <span>.vscode/mcp.json — リモート + ローカル構成例（公式ドキュメント準拠）</span>
+                </div>
+                <pre>
+                  {"{"}
+                  {"\n"}
+                  {"  "}
+                  <span className={styles.cGh}>{'"servers"'}</span>
+                  {": {"}
+                  {"\n"}
+                  {"    "}
+                  <span className={styles.cCm}>
+                    {"// リモートMCPサーバー（GitHub公式 — 推奨）"}
+                  </span>
+                  {"\n"}
+                  {"    "}
+                  <span className={styles.cGh}>{'"github"'}</span>
+                  {": {"}
+                  {"\n"}
+                  {"      "}
+                  <span className={styles.cHd}>{'"type"'}</span>
+                  {": "}
+                  <span className={styles.cSt}>{'"http"'}</span>
+                  {","}
+                  {"\n"}
+                  {"      "}
+                  <span className={styles.cHd}>{'"url"'}</span>
+                  {": "}
+                  <span className={styles.cSt}>{'"https://api.githubcopilot.com/mcp"'}</span>
+                  {"\n"}
+                  {"      "}
+                  <span className={styles.cCm}>
+                    {"// OAuth認証 — VS CodeがCodeLensで「Auth」ボタンを表示"}
+                  </span>
+                  {"\n"}
+                  {"    },"}
+                  {"\n"}
+                  {"    "}
+                  <span className={styles.cCm}>
+                    {"// ローカルMCPサーバー（ブラウザ自動化 — Playwright）"}
+                  </span>
+                  {"\n"}
+                  {"    "}
+                  <span className={styles.cGh}>{'"playwright"'}</span>
+                  {": {"}
+                  {"\n"}
+                  {"      "}
+                  <span className={styles.cHd}>{'"command"'}</span>
+                  {": "}
+                  <span className={styles.cSt}>{'"npx"'}</span>
+                  {","}
+                  {"\n"}
+                  {"      "}
+                  <span className={styles.cHd}>{'"args"'}</span>
+                  {": ["}
+                  <span className={styles.cSt}>{'"-y"'}</span>
+                  {", "}
+                  <span className={styles.cSt}>{'"@microsoft/mcp-server-playwright"'}</span>
+                  {"]"}
+                  {"\n"}
+                  {"    },"}
+                  {"\n"}
+                  {"    "}
+                  <span className={styles.cCm}>
+                    {"// ローカルMCPサーバー（Jira連携）— API Key必要"}
+                  </span>
+                  {"\n"}
+                  {"    "}
+                  <span className={styles.cGh}>{'"jira"'}</span>
+                  {": {"}
+                  {"\n"}
+                  {"      "}
+                  <span className={styles.cHd}>{'"command"'}</span>
+                  {": "}
+                  <span className={styles.cSt}>{'"npx"'}</span>
+                  {","}
+                  {"\n"}
+                  {"      "}
+                  <span className={styles.cHd}>{'"args"'}</span>
+                  {": ["}
+                  <span className={styles.cSt}>{'"-y"'}</span>
+                  {", "}
+                  <span className={styles.cSt}>{'"@atlassian/mcp-server-jira"'}</span>
+                  {"],"}
+                  {"\n"}
+                  {"      "}
+                  <span className={styles.cHd}>{'"env"'}</span>
+                  {": {"}
+                  {"\n"}
+                  {"        "}
+                  <span className={styles.cHd}>{'"JIRA_API_TOKEN"'}</span>
+                  {": "}
+                  <span className={styles.cSt}>
+                    {'"$'}
+                    {'{input:jiraToken}"'}
+                  </span>
+                  {","}
+                  {"\n"}
+                  {"        "}
+                  <span className={styles.cCm}>
+                    {"// $"}
+                    {"{input:*} = VS CodeがSecrets保管庫から安全取得"}
+                  </span>
+                  {"\n"}
+                  {"        "}
+                  <span className={styles.cHd}>{'"JIRA_BASE_URL"'}</span>
+                  {": "}
+                  <span className={styles.cSt}>{'"https://yourcompany.atlassian.net"'}</span>
+                  {"\n"}
+                  {"      }"}
+                  {"\n"}
+                  {"    }"}
+                  {"\n"}
+                  {"  }"}
+                  {"\n"}
+                  {"}"}
+                </pre>
+              </div>
+
+              <div className={`${styles.ib} ${styles.ig}`}>
+                <span className={styles.ii}>💡</span>
+                <div>
+                  <strong>Claude Desktopの設定を流用する</strong>
+                  <br />
+                  既にClaude Desktopで<code>claude_desktop_config.json</code>
+                  にMCPサーバーを設定している場合、<code>settings.json</code>に
+                  <code>{'"chat.mcp.discovery.enabled": true'}</code>
+                  を追記するだけで、VS CopilotがClaude
+                  Desktopの設定を自動検出して流用できます（[19]）。設定を二重管理する必要がありません。
+                </div>
+              </div>
+
+              <h3>MCPサーバーを有効化する手順（VS Code）</h3>
+              <div className={styles.g4}>
+                <div className={styles.mc}>
+                  <div className={styles.mcTag} style={{ color: "var(--ms)" }}>
+                    Step 1
+                  </div>
+                  <p>
+                    VS Code拡張機能パネル（Ctrl+Shift+X）でMCP
+                    Marketplaceを開き、サーバーを検索・インストール。またはmcp.jsonに手動記述。
+                  </p>
+                </div>
+                <div className={styles.mc}>
+                  <div className={styles.mcTag} style={{ color: "var(--ms)" }}>
+                    Step 2
+                  </div>
+                  <p>
+                    mcp.jsonファイル上部に表示される<strong>「Start」</strong>
+                    CodeLensボタンをクリックしてサーバーを起動。
+                  </p>
+                </div>
+                <div className={styles.mc}>
+                  <div className={styles.mcTag} style={{ color: "var(--ms)" }}>
+                    Step 3
+                  </div>
+                  <p>
+                    Copilot Chatを開き、<strong>Agent</strong>
+                    モードを選択（Chatモード右上のドロップダウン）。
+                  </p>
+                </div>
+                <div className={styles.mc}>
+                  <div className={styles.mcTag} style={{ color: "var(--ms)" }}>
+                    Step 4
+                  </div>
+                  <p>
+                    ツールアイコンをクリックして「MCP Server:
+                    GitHub」などの利用可能ツール一覧を確認して完了。
+                  </p>
+                </div>
+              </div>
+
+              <h3>Copilot CLI — MCPサーバー管理コマンド</h3>
+              <div className={styles.cb}>
+                <div className={styles.cbHdr}>
+                  <div className={styles.dots}>
+                    <div className={styles.dot} style={{ background: "#f25c7a" }} />
+                    <div className={styles.dot} style={{ background: "#f0883e" }} />
+                    <div className={styles.dot} style={{ background: "#238636" }} />
+                  </div>
+                  <span>Copilot CLI — /mcp サブコマンド一覧</span>
+                </div>
+                <pre>
+                  <span className={styles.cCm}>{"# インタラクティブに追加（最も簡単）"}</span>
+                  {"\n"}
+                  {"/mcp add"}
+                  {"\n\n"}
+                  <span className={styles.cCm}>{"# 設定確認（全サーバーの状態とツール一覧）"}</span>
+                  {"\n"}
+                  {"/mcp show"}
+                  {"\n"}
+                  {"/mcp show github        "}
+                  <span className={styles.cCm}>{"# 特定サーバーの詳細"}</span>
+                  {"\n\n"}
+                  <span className={styles.cCm}>{"# 管理コマンド"}</span>
+                  {"\n"}
+                  {"/mcp edit   github      "}
+                  <span className={styles.cCm}>{"# 設定変更"}</span>
+                  {"\n"}
+                  {"/mcp disable playwright "}
+                  <span className={styles.cCm}>{"# 一時無効化（設定は保持）"}</span>
+                  {"\n"}
+                  {"/mcp enable  playwright "}
+                  <span className={styles.cCm}>{"# 再有効化"}</span>
+                  {"\n"}
+                  {"/mcp delete  jira       "}
+                  <span className={styles.cCm}>{"# 削除"}</span>
+                  {"\n\n"}
+                  <span className={styles.cCm}>
+                    {"# GitHub MCP Serverはビルトイン（追加不要）"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.cCm}>
+                    {"# Issue作成・PR管理・コードサーチが追加設定なしで利用可能"}
+                  </span>
+                </pre>
+              </div>
+
+              <h3>MCPサーバーとSDD（仕様駆動開発）の組み合わせパターン</h3>
+              <div className={styles.g3}>
+                <div className={styles.mc}>
+                  <div className={styles.mcTag} style={{ color: "var(--teal)" }}>
+                    パターン1: Jira→spec.md自動生成
+                  </div>
+                  <p>
+                    「Jira Epic
+                    PROJ-123の詳細からspec.mdを生成して」と指示するだけで、JiraのMCPサーバーからチケット内容を取得しspec.mdを自動生成。コピペ作業が不要になる。
+                  </p>
+                </div>
+                <div className={styles.mc}>
+                  <div className={styles.mcTag} style={{ color: "var(--teal)" }}>
+                    パターン2: DB→スキーマ自動参照
+                  </div>
+                  <p>
+                    PostgreSQLやMySQLのMCPサーバーを接続し、「現在のDBスキーマに基づいてマイグレーションを提案して」と指示。データベースの現状を直接把握した上でコードを生成。
+                  </p>
+                </div>
+                <div className={styles.mc}>
+                  <div className={styles.mcTag} style={{ color: "var(--teal)" }}>
+                    パターン3: Playwright→E2Eテスト
+                  </div>
+                  <p>
+                    Playwright
+                    MCPサーバーでブラウザを操作し、「このURLのUIをスクリーンショット撮影してバグを報告して」→自動でスクリーンショット取得・Issueに添付するエンドツーエンドフロー。
+                  </p>
+                </div>
+              </div>
+
+              <div className={`${styles.ib} ${styles.im}`}>
+                <span className={styles.ii}>🔒</span>
+                <div>
+                  <strong>MCPセキュリティのベストプラクティス</strong>
+                  <br />
+                  {"APIキーは"}
+                  <code>
+                    {"$"}
+                    {"{input:変数名}"}
+                  </code>
+                  {"を使いVS"}
+                  Codeのシークレットストレージに安全保管（JSONに平文記載しない）。mcp.jsonはgitにコミットしても安全なように、シークレット部分を環境変数参照にします。サードパーティMCPサーバーはプライバシーポリシーを必ず確認してください。Business/Enterprise管理者はOrg設定からドメイン制限が可能です（[19]）。
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* ── s14: PLAN-MODE ── */}
