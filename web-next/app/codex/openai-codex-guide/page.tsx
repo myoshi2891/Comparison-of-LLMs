@@ -796,9 +796,204 @@ export default function Page() {
             <div className={styles.stepNum}>5</div>
             <div>
               <h2 className={styles.secTitle}>実践ワークフロー</h2>
+              <p className={styles.secDesc}>1日の開発ルーティンに Codex を組み込む</p>
             </div>
           </div>
-          <p style={{ color: "#94a3b8" }}>（実装予定）</p>
+
+          <div className={styles.card}>
+            <div
+              style={{
+                fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
+                fontSize: "13px",
+                color: "#00d4ff",
+                marginBottom: "16px",
+              }}
+            >
+              ✦ プロが実践するモーニングルーティン
+            </div>
+            <p style={{ fontSize: "14px", color: "#94a3b8", marginBottom: "16px" }}>
+              WorkOS のエンジニアチームが実践する方法：朝のコーヒーを飲む前に、3〜5個のタスクを
+              Codex に並列実行させる。コーヒーを飲み終わる頃にはレビュー待ちのPRが積まれている。
+            </p>
+            <div className={styles.codeWrap}>
+              <div className={styles.codeHeader}>
+                <div className={styles.codeDots}>
+                  <div className={`${styles.codeDot} ${styles.codeDotR}`} />
+                  <div className={`${styles.codeDot} ${styles.codeDotY}`} />
+                  <div className={`${styles.codeDot} ${styles.codeDotG}`} />
+                </div>
+                <div className={styles.codeLang}>bash — 朝のバッチタスク例</div>
+              </div>
+              <pre className={styles.codeBody}>
+                <span className={styles.cm}># タスク1: TypeScript エラー修正</span>
+                {"\n"}
+                <span className={styles.fn}>codex</span>{" "}
+                <span className={styles.str}>
+                  &quot;@src/onboarding/validator.ts の TypeScript
+                  エラーをすべて修正して。型安全性を保つこと&quot;
+                </span>{" "}
+                &amp;{"\n\n"}
+                <span className={styles.cm}># タスク2: スキーマ更新対応</span>
+                {"\n"}
+                <span className={styles.fn}>codex</span>{" "}
+                <span className={styles.str}>
+                  &quot;@api/webhooks.ts を新しいイベントスキーマに対応させて。@docs/schema-v2.md
+                  を参照&quot;
+                </span>{" "}
+                &amp;{"\n\n"}
+                <span className={styles.cm}># タスク3: テストカバレッジ向上</span>
+                {"\n"}
+                <span className={styles.fn}>codex</span>{" "}
+                <span className={styles.str}>
+                  &quot;@src/components/AdminDashboard.tsx のエラーバウンダリを改善して&quot;
+                </span>{" "}
+                &amp;{"\n\n"}
+                <span className={styles.cm}>
+                  # ↑ 全てのバックグラウンドプロセスの完了を待機する
+                </span>
+                {"\n"}wait
+              </pre>
+            </div>
+          </div>
+
+          <div className={styles.card}>
+            <div
+              style={{
+                fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
+                fontSize: "13px",
+                color: "#00d4ff",
+                marginBottom: "12px",
+              }}
+            >
+              ✦ Approval モード（安全設定）の理解
+            </div>
+            <div className={styles.tableWrap}>
+              <table>
+                <tbody>
+                  <tr>
+                    <th>モード</th>
+                    <th>コマンド</th>
+                    <th>動作</th>
+                    <th>推奨場面</th>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span className={`${styles.tag} ${styles.tagPlan}`}>untrusted</span>
+                    </td>
+                    <td>
+                      <code style={{ fontFamily: "var(--font-mono,'JetBrains Mono',monospace)" }}>
+                        --ask-for-approval untrusted
+                      </code>
+                      <br />
+                      <code style={{ fontFamily: "var(--font-mono,'JetBrains Mono',monospace)" }}>
+                        --sandbox read-only
+                      </code>{" "}
+                      (推奨)
+                    </td>
+                    <td style={{ color: "#94a3b8" }}>
+                      すべての操作を毎回確認（既知の安全な読み取り操作を除く）。適切な sandbox
+                      と組み合わせて使用。
+                    </td>
+                    <td>初めてのリポジトリ・重要な変更</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span className={`${styles.tag} ${styles.tagTip}`}>on-request</span>
+                    </td>
+                    <td>
+                      <code style={{ fontFamily: "var(--font-mono,'JetBrains Mono',monospace)" }}>
+                        --ask-for-approval on-request
+                      </code>
+                      <br />
+                      <code style={{ fontFamily: "var(--font-mono,'JetBrains Mono',monospace)" }}>
+                        --sandbox workspace-write
+                      </code>{" "}
+                      (推奨)
+                      <br />
+                      <span style={{ fontSize: "11px", color: "#64748b" }}>
+                        ※ --full-auto の実態
+                      </span>
+                    </td>
+                    <td style={{ color: "#94a3b8" }}>
+                      ワークスペース内書き込みは許可、外部操作・ネットワークは確認。
+                    </td>
+                    <td>日常的な開発作業</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span className={`${styles.tag} ${styles.tagNew}`}>never</span>
+                    </td>
+                    <td>
+                      <code style={{ fontFamily: "var(--font-mono,'JetBrains Mono',monospace)" }}>
+                        --ask-for-approval never
+                      </code>
+                      <br />
+                      <span style={{ fontSize: "11px", color: "#64748b" }}>
+                        ※ 任意の sandbox と併用可能
+                      </span>
+                    </td>
+                    <td style={{ color: "#94a3b8" }}>
+                      承認プロンプトをスキップ。完全なバイパスには別途{" "}
+                      <code style={{ fontSize: "11px" }}>--sandbox danger-full-access</code>{" "}
+                      が必要。
+                    </td>
+                    <td>CI/CD・信頼済みワークフロー</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className={styles.card}>
+            <div
+              style={{
+                fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
+                fontSize: "13px",
+                color: "#00d4ff",
+                marginBottom: "12px",
+              }}
+            >
+              ✦ コードレビューを Codex に任せる
+            </div>
+            <p style={{ fontSize: "14px", color: "#94a3b8", marginBottom: "16px" }}>
+              コードレビューは対話モード（スラッシュコマンド）で行う方法と、ワンショットの CLI
+              コマンド（自動化向け）で行う方法があります。
+            </p>
+            <div className={styles.codeWrap}>
+              <div className={styles.codeHeader}>
+                <div className={styles.codeDots}>
+                  <div className={`${styles.codeDot} ${styles.codeDotR}`} />
+                  <div className={`${styles.codeDot} ${styles.codeDotY}`} />
+                  <div className={`${styles.codeDot} ${styles.codeDotG}`} />
+                </div>
+                <div className={styles.codeLang}>対話モード（codex 起動後に実行）</div>
+              </div>
+              <pre className={styles.codeBody}>
+                <span className={styles.cm}># インタラクティブセッション内で実行</span>
+                {"\n"}
+                <span className={styles.op}>/review</span>
+              </pre>
+            </div>
+            <div className={styles.codeWrap} style={{ marginTop: "16px" }}>
+              <div className={styles.codeHeader}>
+                <div className={styles.codeDots}>
+                  <div className={`${styles.codeDot} ${styles.codeDotR}`} />
+                  <div className={`${styles.codeDot} ${styles.codeDotY}`} />
+                  <div className={`${styles.codeDot} ${styles.codeDotG}`} />
+                </div>
+                <div className={styles.codeLang}>bash — 自動化（ワンショット実行）</div>
+              </div>
+              <pre className={styles.codeBody}>
+                <span className={styles.cm}># CIやスクリプトで一括実行</span>
+                {"\n"}
+                <span className={styles.fn}>codex</span> exec{" "}
+                <span className={styles.str}>
+                  &quot;git diff HEAD~1
+                  をレビューして、潜在的なバグとセキュリティ問題を報告して&quot;
+                </span>
+              </pre>
+            </div>
+          </div>
         </section>
 
         {/* SECTION 07: ADVANCED — TODO: faithful migration */}
