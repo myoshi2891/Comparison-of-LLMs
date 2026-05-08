@@ -230,6 +230,68 @@
   color: var(--text2);
 }
 
+/* ─── Section Sub-heading ─── */
+.secSubHead {
+  margin-bottom: 20px;
+}
+
+.secSubTitle {
+  font-family: var(--font-mono), monospace;
+  font-size: 1rem;
+  color: var(--text2);
+}
+
+/* ─── Timeline ─── */
+.timeline {
+  position: relative;
+  padding-left: 32px;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(180deg, var(--accent), transparent);
+}
+
+.timelineItem {
+  position: relative;
+  padding-bottom: 28px;
+}
+
+.timelineItem::before {
+  content: "";
+  position: absolute;
+  left: -28px;
+  top: 6px;
+  width: 10px;
+  height: 10px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--accent);
+}
+
+.timelineItemLast {
+  padding-bottom: 0;
+}
+
+.timelineYear {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  margin-bottom: 4px;
+}
+
+.timelineDesc {
+  font-size: 0.875rem;
+  color: var(--text2);
+  line-height: 1.6;
+}
+
 /* ─── Cards ─── */
 .cardGrid {
   display: grid;

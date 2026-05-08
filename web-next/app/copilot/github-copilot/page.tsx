@@ -190,7 +190,77 @@ export default function GithubCopilotPage() {
               </p>
             </div>
           </div>
-          {/* s01 content — faithful migration pending */}
+          <div className={styles.cardGrid} style={{ marginBottom: "32px" }}>
+            <div className={styles.card}>
+              <span className={styles.cardIcon}>🤖</span>
+              <div className={styles.cardTitle}>AIペアプログラマー</div>
+              <div className={styles.cardDesc}>
+                GitHub
+                Copilotは、コードを書く際にリアルタイムで提案を行うAIアシスタントです。行全体や関数全体の補完、コードの説明、バグ修正まで幅広くサポートします。
+              </div>
+            </div>
+            <div className={styles.card}>
+              <span className={styles.cardIcon}>⚡</span>
+              <div className={styles.cardTitle}>55%の生産性向上</div>
+              <div className={styles.cardDesc}>
+                GitHub社の調査では、Copilot利用者はコード作成速度が最大55%向上し、開発者満足度が75%向上したと報告されています。
+              </div>
+            </div>
+            <div className={styles.card}>
+              <span className={styles.cardIcon}>🌐</span>
+              <div className={styles.cardTitle}>あらゆる環境で利用可能</div>
+              <div className={styles.cardDesc}>
+                VS Code、JetBrains、Xcode、Neovim、Visual Studio、Eclipse、Azure Data
+                Studio、さらにターミナル（CLI）まで対応しています。
+              </div>
+            </div>
+            <div className={styles.card}>
+              <span className={styles.cardIcon}>🔗</span>
+              <div className={styles.cardTitle}>GitHub完全統合（2026年）</div>
+              <div className={styles.cardDesc}>
+                2026年時点では、コードレビューエージェント、MCPサポート、Copilot
+                Spaces、エージェントモードなど強力な機能が追加されています。
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.secSubHead} style={{ marginBottom: "20px", marginTop: "40px" }}>
+            <h3 className={styles.secSubTitle}>{"// 進化の歴史"}</h3>
+          </div>
+
+          <div className={styles.timeline}>
+            <div className={styles.timelineItem}>
+              <div className={styles.timelineYear}>2022年6月</div>
+              <div className={styles.timelineDesc}>
+                GitHub Copilot正式リリース。インラインコード補完に特化した革命的なツールとして登場
+              </div>
+            </div>
+            <div className={styles.timelineItem}>
+              <div className={styles.timelineYear}>2023年</div>
+              <div className={styles.timelineDesc}>
+                Copilot Chat追加。コードの質問・説明がチャット形式でできるようになった
+              </div>
+            </div>
+            <div className={styles.timelineItem}>
+              <div className={styles.timelineYear}>2024年</div>
+              <div className={styles.timelineDesc}>
+                Copilot Workspace（Issue→PR自動化）、Enterpriseティア登場
+              </div>
+            </div>
+            <div className={styles.timelineItem}>
+              <div className={styles.timelineYear}>2025年</div>
+              <div className={styles.timelineDesc}>
+                マルチモデルサポート（GPT、Claude、Gemini選択可）、エージェントモード追加
+              </div>
+            </div>
+            <div className={`${styles.timelineItem} ${styles.timelineItemLast}`}>
+              <div className={styles.timelineYear}>2026年 — 現在</div>
+              <div className={styles.timelineDesc}>
+                コードレビューエージェント、MCPサポート、Extensionsエコシステム、Copilot
+                CLI強化版（GPT-4.1対応）
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* ─── s02: plans ─── */}
