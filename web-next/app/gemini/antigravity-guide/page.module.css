@@ -303,6 +303,23 @@
   color: #3fb950;
 }
 
+/* Flow comparison */
+.flowWrap {
+  margin: 24px 0;
+  padding: 20px;
+  background: #0c1120;
+  border: 1px solid #1e2d4a;
+  border-radius: 12px;
+}
+
+.flowLabel {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #5a7090;
+  margin-bottom: 20px;
+  letter-spacing: 0.03em;
+}
+
 /* Alert boxes */
 .alertInfo {
   background: rgba(66, 133, 244, 0.1);
@@ -520,6 +537,13 @@
 .sec strong {
   color: #e2eaf8;
   font-weight: 600;
+}
+
+.sec h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #e2eaf8;
+  margin: 24px 0 12px;
 }
 
 .sec code {

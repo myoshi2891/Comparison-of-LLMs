@@ -74,13 +74,213 @@ export default function Page() {
           </ol>
         </nav>
 
-        {/* SECTION 01: OVERVIEW — TODO: faithful migration */}
+        {/* SECTION 01: OVERVIEW */}
         <section id="overview" className={styles.sec}>
           <div className={styles.secLabel}>Section 01</div>
           <h2 className={styles.secTitle}>
             <span className={styles.num}>01.</span>Google Antigravity とは — 従来IDEとの比較
           </h2>
-          <p>（実装予定）</p>
+
+          <p>
+            Google Antigravityは<strong>2025年11月18日にGemini 3と同時発表</strong>
+            されたエージェント・ファースト型IDEです。 VS Codeのフォークをベースに、Claude
+            CodeのようなCLIツールではなく
+            <strong>フルIDEとして「エージェントが主役」のパラダイム</strong>を実装しています。
+            人間の役割は「コードを書く人」から「アーキテクトとして指揮する人」へと変わります。
+          </p>
+
+          <div className={styles.flowWrap}>
+            <div className={styles.flowLabel}>▸ 従来IDE vs Antigravity — パラダイムの違い</div>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr auto 1fr",
+                gap: "1.5rem",
+                alignItems: "center",
+              }}
+            >
+              <div>
+                <div
+                  style={{
+                    fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
+                    fontSize: "0.68rem",
+                    color: "var(--text3, #5a7090)",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.12em",
+                    marginBottom: "1rem",
+                  }}
+                >
+                  ❌ 従来のIDE
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+                  <div
+                    style={{
+                      background: "rgba(90, 112, 144, 0.12)",
+                      border: "1px solid rgba(90, 112, 144, 0.25)",
+                      borderRadius: "8px",
+                      padding: "0.6rem 1rem",
+                      fontSize: "0.78rem",
+                      color: "var(--text2, #9aafcc)",
+                    }}
+                  >
+                    👤 人間 — コードを書く主役
+                  </div>
+                  <div style={{ textAlign: "center", color: "var(--text3, #5a7090)" }}>↓</div>
+                  <div
+                    style={{
+                      background: "rgba(90, 112, 144, 0.08)",
+                      border: "1px solid rgba(90, 112, 144, 0.2)",
+                      borderRadius: "8px",
+                      padding: "0.6rem 1rem",
+                      fontSize: "0.78rem",
+                      color: "var(--text3, #5a7090)",
+                    }}
+                  >
+                    🤖 AI補完 — 提案するだけ
+                  </div>
+                  <div style={{ textAlign: "center", color: "var(--text3, #5a7090)" }}>↓</div>
+                  <div
+                    style={{
+                      background: "rgba(90, 112, 144, 0.08)",
+                      border: "1px solid rgba(90, 112, 144, 0.2)",
+                      borderRadius: "8px",
+                      padding: "0.6rem 1rem",
+                      fontSize: "0.78rem",
+                      color: "var(--text3, #5a7090)",
+                    }}
+                  >
+                    ✅ コード完成（人間が判断・実行）
+                  </div>
+                </div>
+              </div>
+              <div
+                style={{
+                  fontFamily: "var(--font-display, 'Syne', sans-serif)",
+                  fontSize: "1.4rem",
+                  fontWeight: 700,
+                  color: "var(--text3, #5a7090)",
+                  textAlign: "center",
+                }}
+              >
+                VS
+              </div>
+              <div>
+                <div
+                  style={{
+                    fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
+                    fontSize: "0.68rem",
+                    color: "var(--g-green, #34a853)",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.12em",
+                    marginBottom: "1rem",
+                  }}
+                >
+                  ✅ Google Antigravity
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+                  <div
+                    style={{
+                      background: "rgba(139, 92, 246, 0.1)",
+                      border: "1px solid rgba(139, 92, 246, 0.3)",
+                      borderRadius: "8px",
+                      padding: "0.6rem 1rem",
+                      fontSize: "0.78rem",
+                      color: "var(--g-purple, #8b5cf6)",
+                    }}
+                  >
+                    🤖 AIエージェント — 自律的に計画・実行・検証
+                  </div>
+                  <div style={{ textAlign: "center", color: "var(--text3, #5a7090)" }}>↓</div>
+                  <div
+                    style={{
+                      background: "rgba(251, 188, 4, 0.08)",
+                      border: "1px solid rgba(251, 188, 4, 0.25)",
+                      borderRadius: "8px",
+                      padding: "0.6rem 1rem",
+                      fontSize: "0.78rem",
+                      color: "var(--g-yellow, #fbbc04)",
+                    }}
+                  >
+                    👤 人間（アーキテクト）— 方針を決め・レビューする
+                  </div>
+                  <div style={{ textAlign: "center", color: "var(--text3, #5a7090)" }}>↓</div>
+                  <div
+                    style={{
+                      background: "rgba(52, 168, 83, 0.08)",
+                      border: "1px solid rgba(52, 168, 83, 0.25)",
+                      borderRadius: "8px",
+                      padding: "0.6rem 1rem",
+                      fontSize: "0.78rem",
+                      color: "var(--g-green, #34a853)",
+                    }}
+                  >
+                    📊 Artifact生成 — 証拠付きで結果を可視化
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h3>Antigravity vs Claude Code — 比較表</h3>
+          <table className={styles.compareTable}>
+            <tbody>
+              <tr>
+                <th>特性</th>
+                <th>Google Antigravity</th>
+                <th>Claude Code</th>
+              </tr>
+              <tr>
+                <td>種別</td>
+                <td>Agent-First IDE（VSCode fork）</td>
+                <td>CLI / ターミナルエージェント</td>
+              </tr>
+              <tr>
+                <td>主要AI</td>
+                <td>Gemini 3.1 Pro / 3 Flash + Claude Sonnet 4.6 / Opus 4.6 / GPT-OSS 120B</td>
+                <td>Claude Opus / Sonnet / Haiku</td>
+              </tr>
+              <tr>
+                <td>永続記憶</td>
+                <td>GEMINI.md + Knowledge Base + Rules</td>
+                <td>CLAUDE.md + MEMORY.md</td>
+              </tr>
+              <tr>
+                <td>ナレッジ拡張</td>
+                <td>SKILL.md（進歩的開示）</td>
+                <td>SKILL.md（同一規格）</td>
+              </tr>
+              <tr>
+                <td>手順自動化</td>
+                <td>Workflows (.md)</td>
+                <td>Custom Commands (.md)</td>
+              </tr>
+              <tr>
+                <td>ブラウザ自動化</td>
+                <td>Browser Subagent（ネイティブ）</td>
+                <td>なし（MCP経由）</td>
+              </tr>
+              <tr>
+                <td>エビデンス生成</td>
+                <td>Artifacts（自動）</td>
+                <td>なし（手動）</td>
+              </tr>
+              <tr>
+                <td>価格</td>
+                <td>無料（Public Preview中） / Google AI Pro $19.99/月</td>
+                <td>Anthropicプランに依存</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div className={styles.alertInfo}>
+            <span>ℹ️</span>
+            <div>
+              <strong>SKILL.mdは共通規格</strong>です。AntigravityとClaude
+              Codeは同一のSKILL.md形式を採用しており、ファイルを両プラットフォーム間でほぼそのまま移植できます。
+              また<strong>v1.20.3（2026-03-05）以降はAGENTS.mdにも対応</strong>
+              し、他のエージェントツールとのルール共有が可能になりました。
+            </div>
+          </div>
         </section>
 
         {/* SECTION 02: DIRECTORY — TODO: faithful migration */}
