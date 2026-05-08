@@ -272,7 +272,139 @@ export default function GithubCopilotPage() {
               <p className={styles.secDesc}>あなたに最適なプランを選ぶための比較ガイド</p>
             </div>
           </div>
-          {/* s02 content — faithful migration pending */}
+          <div className={styles.plansGrid}>
+            <div className={styles.planCard}>
+              <div className={styles.planName}>Free</div>
+              <div className={styles.planPrice}>
+                <span className={styles.planCurrency}>$</span>0
+                <span className={styles.planPeriod}>/月</span>
+              </div>
+              <div className={styles.planTarget}>まず試してみたい方・学習目的</div>
+              <ul className={styles.planFeatures}>
+                <li>月2,000回のインライン補完</li>
+                <li>月50回のプレミアムリクエスト</li>
+                <li>基本的なChats機能</li>
+              </ul>
+              <span
+                className={`${styles.tag} ${styles.tagFree}`}
+                style={{ marginTop: "12px", display: "inline-block" }}
+              >
+                FREE
+              </span>
+            </div>
+            <div className={`${styles.planCard} ${styles.planCardFeatured}`}>
+              <div className={styles.planName}>Pro</div>
+              <div className={styles.planPrice}>
+                <span className={styles.planCurrency}>$</span>10
+                <span className={styles.planPeriod}>/月</span>
+              </div>
+              <div className={styles.planTarget}>個人開発者・フリーランス向け</div>
+              <ul className={styles.planFeatures}>
+                <li>無制限のインライン補完</li>
+                <li>月300回のプレミアムリクエスト</li>
+                <li>Coding Agent（コーディングエージェント）</li>
+                <li>Code Review（コードレビュー）</li>
+                <li>30日間無料トライアルあり</li>
+              </ul>
+              <span
+                className={`${styles.tag} ${styles.tagPro}`}
+                style={{ marginTop: "12px", display: "inline-block" }}
+              >
+                RECOMMENDED
+              </span>
+            </div>
+            <div className={styles.planCard}>
+              <div className={styles.planName}>Pro+</div>
+              <div className={styles.planPrice}>
+                <span className={styles.planCurrency}>$</span>39
+                <span className={styles.planPeriod}>/月</span>
+              </div>
+              <div className={styles.planTarget}>ヘビーユーザー・上級者向け</div>
+              <ul className={styles.planFeatures}>
+                <li>月1,500回のプレミアムリクエスト</li>
+                <li>全モデルへのアクセス</li>
+                <li>Claude Opus 4.6・o3・GPT-5.4対応</li>
+                <li>Copilot CLI（GA版）</li>
+                <li>最大限の柔軟性</li>
+              </ul>
+              <span
+                className={`${styles.tag} ${styles.tagBeta}`}
+                style={{ marginTop: "12px", display: "inline-block" }}
+              >
+                POWER
+              </span>
+            </div>
+            <div className={styles.planCard}>
+              <div className={styles.planName}>Business</div>
+              <div className={styles.planPrice}>
+                <span className={styles.planCurrency}>$</span>19
+                <span className={styles.planPeriod}>/ユーザー/月</span>
+              </div>
+              <div className={styles.planTarget}>チーム・中小組織向け</div>
+              <ul className={styles.planFeatures}>
+                <li>組織全体の一元管理</li>
+                <li>ポリシー制御・監査ログ</li>
+                <li>IP補償（著作権保護）</li>
+                <li>SAML SSO対応</li>
+              </ul>
+              <span
+                className={`${styles.tag} ${styles.tagPro}`}
+                style={{ marginTop: "12px", display: "inline-block" }}
+              >
+                TEAM
+              </span>
+            </div>
+            <div className={styles.planCard}>
+              <div className={styles.planName}>Enterprise</div>
+              <div className={styles.planPrice}>
+                <span className={styles.planCurrency}>$</span>39
+                <span className={styles.planPeriod}>/ユーザー/月</span>
+              </div>
+              <div className={styles.planTarget}>大企業・コンプライアンス重視</div>
+              <ul className={styles.planFeatures}>
+                <li>ナレッジベース機能</li>
+                <li>カスタムモデル訓練</li>
+                <li>GitHub.com Chat統合</li>
+                <li>Copilot CLI（GA版）</li>
+                <li>GitHub Spark統合</li>
+                <li>月1,000プレミアムリクエスト</li>
+              </ul>
+              <span
+                className={`${styles.tag} ${styles.tagNew}`}
+                style={{ marginTop: "12px", display: "inline-block" }}
+              >
+                ENTERPRISE
+              </span>
+            </div>
+          </div>
+
+          <div className={styles.alertInfo} style={{ marginTop: "16px", fontSize: "0.875rem" }}>
+            <span className={styles.alertIcon}>📅</span>
+            <div className={styles.alertContent}>
+              <strong>最終更新:</strong> 2026年3月
+              <br />
+              <strong>参考:</strong>{" "}
+              <Ext href="https://github.com/features/copilot/plans">
+                GitHub Copilot Plans &amp; Pricing
+              </Ext>
+              ,{" "}
+              <Ext href="https://docs.github.com/en/copilot/get-started/plans">
+                Plans for GitHub Copilot - GitHub Docs
+              </Ext>
+            </div>
+          </div>
+
+          <div className={styles.alertWarn} style={{ marginTop: "24px" }}>
+            <span className={styles.alertIcon}>⚠️</span>
+            <div className={styles.alertContent}>
+              <strong>重要：</strong> EnterpriseプランはGitHub Enterprise
+              Cloud（$21/ユーザー/月）が前提条件です。合計コストは
+              <strong>$60/ユーザー/月</strong>になります。
+              <br />
+              学生・教師・オープンソースメンテナはProプランが<strong>無料</strong>
+              で利用できます。GitHub Student Developer Packを確認してください。
+            </div>
+          </div>
         </section>
 
         {/* ─── s03: setup ─── */}
