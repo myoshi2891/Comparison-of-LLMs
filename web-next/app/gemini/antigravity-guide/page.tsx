@@ -1540,19 +1540,181 @@ export default function Page() {
           <BestPracticesChecklist />
         </section>
 
-        {/* SECTION 10: SOURCES — TODO: faithful migration */}
+        {/* SECTION 10: SOURCES */}
         <section id="sources" className={styles.sec}>
           <div className={styles.secLabel}>Section 10</div>
           <h2 className={styles.secTitle}>
             <span className={styles.num}>10.</span>参考ソース一覧（公式・一次情報優先）
           </h2>
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>sources.placeholder</span>
-              <span className={styles.codeLang}>PLACEHOLDER</span>
+
+          <div className={styles.sourcesList}>
+            <div className={styles.srcItem}>
+              <span className={styles.srcNum}>[1]</span>
+              <div>
+                <a
+                  href="https://developers.googleblog.com/build-with-google-antigravity-our-new-agentic-development-platform/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.srcLink}
+                >
+                  Build with Google Antigravity — Google Developers Blog (Nov 2025)
+                </a>
+                <span className={styles.srcDesc}>
+                  Antigravity公式発表。エージェントファーストパラダイム・Artifacts・Knowledge
+                  Baseの設計思想
+                </span>
+              </div>
             </div>
-            <div className={styles.codeBody}>
-              <span className={styles.cc}>{"/* 実装予定 */"}</span>
+            <div className={styles.srcItem}>
+              <span className={styles.srcNum}>[2]</span>
+              <div>
+                <a
+                  href="https://medium.com/google-cloud/benefits-and-challenges-of-spec-driven-development-and-how-antigravity-is-changing-the-game-3343a6942330"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.srcLink}
+                >
+                  How Google Antigravity is changing spec-driven development — Google Cloud Medium
+                  (Jan 2026)
+                </a>
+                <span className={styles.srcDesc}>
+                  Artifacts（Task List / Implementation Plan / Walkthrough）のSDD活用、Knowledge
+                  Baseによる自動学習
+                </span>
+              </div>
+            </div>
+            <div className={styles.srcItem}>
+              <span className={styles.srcNum}>[3]</span>
+              <div>
+                <a
+                  href="https://codelabs.developers.google.com/getting-started-google-antigravity"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.srcLink}
+                >
+                  Getting Started with Google Antigravity — Google Codelabs
+                </a>
+                <span className={styles.srcDesc}>
+                  公式チュートリアル。Skills・Rules・Workflows・Artifactsの設定方法。GEMINI.md・.agent/ディレクトリ構造
+                </span>
+              </div>
+            </div>
+            <div className={styles.srcItem}>
+              <span className={styles.srcNum}>[4]</span>
+              <div>
+                <a
+                  href="https://codelabs.developers.google.com/getting-started-with-antigravity-skills"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.srcLink}
+                >
+                  Authoring Google Antigravity Skills — Google Codelabs
+                </a>
+                <span className={styles.srcDesc}>
+                  SKILL.mdの完全仕様。スキルディレクトリ構造（SKILL.md / scripts / references /
+                  assets）・5パターン詳解
+                </span>
+              </div>
+            </div>
+            <div className={styles.srcItem}>
+              <span className={styles.srcNum}>[5]</span>
+              <div>
+                <a
+                  href="https://medium.com/google-cloud/tutorial-getting-started-with-antigravity-skills-864041811e0d"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.srcLink}
+                >
+                  How to Build Custom Skills in Google Antigravity — Google Cloud Medium (Jan 2026)
+                </a>
+                <span className={styles.srcDesc}>
+                  Progressive Disclosure設計思想。scripts/サブディレクトリのTool Use
+                  Pattern詳細。グローバル/ワークスペーススコープ
+                </span>
+              </div>
+            </div>
+            <div className={styles.srcItem}>
+              <span className={styles.srcNum}>[6]</span>
+              <div>
+                <a
+                  href="https://iamulya.one/posts/advanced-tips-for-mastering-google-antigravity/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.srcLink}
+                >
+                  Advanced Tips for Mastering Google Antigravity — Amulya Bhatia (Jan 2026)
+                </a>
+                <span className={styles.srcDesc}>
+                  Rules vs Workflows の使い分け。fileMatch
+                  activation。マルチエージェント並列処理。Workflowsチェーン化
+                </span>
+              </div>
+            </div>
+            <div className={styles.srcItem}>
+              <span className={styles.srcNum}>[7]</span>
+              <div>
+                <a
+                  href="https://github.com/sickn33/antigravity-awesome-skills"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.srcLink}
+                >
+                  antigravity-awesome-skills — GitHub (800+ Skills Collection)
+                </a>
+                <span className={styles.srcDesc}>
+                  SKILL.mdのユニバーサル規格（Claude Code / Antigravity /
+                  Cursor共通）。コミュニティスキルライブラリ
+                </span>
+              </div>
+            </div>
+            <div className={styles.srcItem}>
+              <span className={styles.srcNum}>[8]</span>
+              <div>
+                <a
+                  href="https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-pro/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.srcLink}
+                >
+                  Gemini 3.1 Pro: A smarter model — Google Blog (Feb 2026)
+                </a>
+                <span className={styles.srcDesc}>
+                  Gemini 3.1 ProリリースアナウンスとAntigravityへの展開。ARC-AGI-2スコア77.1%
+                </span>
+              </div>
+            </div>
+            <div className={styles.srcItem}>
+              <span className={styles.srcNum}>[9]</span>
+              <div>
+                <a
+                  href="https://ai.google.dev/gemini-api/docs/deprecations"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.srcLink}
+                >
+                  Gemini deprecations — Gemini API Docs
+                </a>
+                <span className={styles.srcDesc}>
+                  Gemini 3 Pro Preview廃止スケジュール（2026-03-09）。Gemini 3.1 Pro
+                  Previewへの移行案内
+                </span>
+              </div>
+            </div>
+            <div className={styles.srcItem}>
+              <span className={styles.srcNum}>[10]</span>
+              <div>
+                <a
+                  href="https://aitoolanalysis.com/google-antigravity-review/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.srcLink}
+                >
+                  Google Antigravity Review 2026 (v1.20.3 Updated) — AI Tool Analysis (Mar 2026)
+                </a>
+                <span className={styles.srcDesc}>
+                  v1.20.3の変更点詳細。AGENTS.mdサポート追加・Auto-continueのデフォルト有効化。サポートモデル一覧
+                </span>
+              </div>
             </div>
           </div>
         </section>
