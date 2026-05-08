@@ -1519,7 +1519,73 @@ export default function Page() {
           <h2 className={styles.stitle}>
             <span className={styles.num}>09.</span>AGENTS.md — オープン標準統合レイヤー
           </h2>
-          {/* TODO: faithful content */}
+
+          <p>
+            GitHub CopilotはLinux Foundation傘下のAAIF（Agentic AI Foundation）が管理する
+            <strong>AGENTS.mdオープン標準をネイティブサポート</strong>
+            しています。プロジェクトルートの<code>AGENTS.md</code>を
+            <code>copilot-instructions.md</code>
+            と並行して自動読み込みします（[3], [16]）。
+            <code>CLAUDE.md</code>・<code>GEMINI.md</code>も
+            <strong>Copilot Coding Agentがネイティブかつ自動で読み込む</strong>
+            ことが公式確認されています（[16]）。追加設定不要でマルチツール環境に対応します。
+          </p>
+
+          <div className={styles.skBanner}>
+            <div className={styles.skIcon}>🌐</div>
+            <div>
+              <div className={styles.skTtl}>マルチ標準戦略：1プロジェクトで全ツール対応</div>
+              <div className={styles.skDesc}>
+                <strong>推奨構成：</strong>
+                <code>AGENTS.md</code>
+                を「唯一の真実のソース」として全ツール共通の基盤ルールを記述し、
+                <code>copilot-instructions.md</code>
+                にはCopilot固有の設定（PR形式・IDE設定等）のみを追記します。これにより、Claude
+                Code・Codex・Antigravity・Copilotの4ツールを切り替えても書き直し不要の理想的なリポジトリ構造が実現します（[3]）。
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.cb}>
+            <div className={styles.cbHdr}>
+              <span>AGENTS.md + copilot-instructions.md の役割分担</span>
+            </div>
+            <pre>
+              <span className={styles.cCm}>{"# AGENTS.md（全ツール共通）"}</span>
+              {"\n"}
+              <span className={styles.cHd}>{"## Build & Test"}</span>
+              {"        "}
+              <span className={styles.cCm}>{"← 全ツール共通のコマンド"}</span>
+              {"\n"}
+              <span className={styles.cHd}>{"## Code Standards"}</span>
+              {"      "}
+              <span className={styles.cCm}>{"← 全ツール共通のコーディング規約"}</span>
+              {"\n"}
+              <span className={styles.cHd}>{"## Architecture"}</span>
+              {"        "}
+              <span className={styles.cCm}>{"← 全ツール共通のアーキテクチャ制約"}</span>
+              {"\n"}
+              <span className={styles.cHd}>{"## Forbidden"}</span>
+              {"           "}
+              <span className={styles.cCm}>{"← 全ツール共通の禁止事項"}</span>
+              {"\n\n"}
+              <span className={styles.cCm}>
+                {"# .github/copilot-instructions.md（Copilot専用）"}
+              </span>
+              {"\n"}
+              <span className={styles.cCm}>
+                {"# AGENTS.md は Coding Agent が自動読込（明示的インポート構文は不要）"}
+              </span>
+              {"\n"}
+              <span className={styles.cHd}>{"## PR Instructions"}</span>
+              {"     "}
+              <span className={styles.cCm}>{"← Copilot Coding Agent専用のPR形式"}</span>
+              {"\n"}
+              <span className={styles.cHd}>{"## VS Code Settings"}</span>
+              {"    "}
+              <span className={styles.cCm}>{"← IDE固有の補足情報"}</span>
+            </pre>
+          </div>
         </section>
 
         {/* ── s10: SPECKIT ── */}
