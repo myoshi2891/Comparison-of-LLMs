@@ -1302,13 +1302,152 @@ export default function Page() {
           </div>
         </section>
 
-        {/* SECTION 08: MODELS — TODO: faithful migration */}
+        {/* SECTION 08: MODELS */}
         <section id="models" className={styles.sec}>
           <div className={styles.secLabel}>Section 08</div>
           <h2 className={styles.secTitle}>
             <span className={styles.num}>08.</span>対応モデルと料金（2026年3月現在）
           </h2>
-          <p>（実装予定）</p>
+
+          <table className={styles.modelTable}>
+            <tbody>
+              <tr>
+                <th>モデルID</th>
+                <th>推奨用途</th>
+                <th>ステータス</th>
+              </tr>
+              <tr>
+                <td>gemini-3-flash-preview</td>
+                <td>コードレビュー・テスト・実装・日常タスク</td>
+                <td>
+                  <span className={`${styles.badge} ${styles.badgeG}`}>✅ デフォルト推奨</span>
+                </td>
+              </tr>
+              <tr>
+                <td>gemini-3.1-pro-preview</td>
+                <td>アーキテクチャ設計・セキュリティ監査（ARC-AGI-2: 77.1%）</td>
+                <td>
+                  <span className={`${styles.badge} ${styles.badgeB}`}>⭐ 新世代最高精度</span>
+                </td>
+              </tr>
+              <tr>
+                <td>gemini-2.5-flash</td>
+                <td>安定運用・コスパ重視</td>
+                <td>
+                  <span className={`${styles.badge} ${styles.badgeG}`}>✅ 安定版</span>
+                </td>
+              </tr>
+              <tr>
+                <td>gemini-2.0-flash</td>
+                <td>（廃止予定）</td>
+                <td>
+                  <span className={`${styles.badge} ${styles.badgeR}`}>⚠️ 2026-06-01 廃止予定</span>
+                </td>
+              </tr>
+              <tr>
+                <td>claude-sonnet-4-6</td>
+                <td>Anthropicモデル（Antigravity対応）</td>
+                <td>
+                  <span className={`${styles.badge} ${styles.badgeY}`}>Anthropic対応</span>
+                </td>
+              </tr>
+              <tr>
+                <td>claude-opus-4-6</td>
+                <td>Anthropic最高精度（Antigravity対応）</td>
+                <td>
+                  <span className={`${styles.badge} ${styles.badgeY}`}>Anthropic対応</span>
+                </td>
+              </tr>
+              <tr>
+                <td>gpt-oss-120b</td>
+                <td>OpenAI対応</td>
+                <td>
+                  <span className={`${styles.badge} ${styles.badgeB}`}>OpenAI対応</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div className={styles.grid3}>
+            <div
+              className={styles.miniCard}
+              style={{ border: "1px solid var(--border)", textAlign: "center" }}
+            >
+              <div className={styles.mcTag} style={{ textAlign: "center" }}>
+                Free
+              </div>
+              <div
+                style={{
+                  fontSize: "1.8rem",
+                  fontWeight: 700,
+                  color: "#edf3ff",
+                  margin: "0.3rem 0",
+                }}
+              >
+                $0
+              </div>
+              <p>
+                Public Preview中
+                <br />
+                利用可能（待機あり）
+              </p>
+            </div>
+            <div
+              className={styles.miniCard}
+              style={{ border: "1px solid rgba(66, 133, 244, 0.35)", textAlign: "center" }}
+            >
+              <div
+                className={styles.mcTag}
+                style={{ textAlign: "center", color: "var(--g-blue, #4285f4)" }}
+              >
+                Google AI Pro
+              </div>
+              <div
+                style={{
+                  fontSize: "1.8rem",
+                  fontWeight: 700,
+                  color: "#edf3ff",
+                  margin: "0.3rem 0",
+                }}
+              >
+                $19.99<span style={{ fontSize: "1rem" }}>/月</span>
+              </div>
+              <p>
+                優先アクセス枠
+                <br />
+                レートリミット緩和
+              </p>
+            </div>
+            <div
+              className={styles.miniCard}
+              style={{ border: "1px solid rgba(251, 188, 4, 0.3)", textAlign: "center" }}
+            >
+              <div
+                className={styles.mcTag}
+                style={{ textAlign: "center", color: "var(--g-yellow, #fbbc04)" }}
+              >
+                Google AI Ultra
+              </div>
+              <div
+                style={{
+                  fontSize: "1.8rem",
+                  fontWeight: 700,
+                  color: "#edf3ff",
+                  margin: "0.3rem 0",
+                }}
+              >
+                $250<span style={{ fontSize: "1rem" }}>/月</span>
+              </div>
+              <p>
+                最優先アクセス
+                <br />
+                Gemini 3.1 Pro利用可
+              </p>
+            </div>
+          </div>
+          <p style={{ fontSize: "0.78rem", color: "var(--text3, #5a7090)", marginTop: "0.5rem" }}>
+            ※ 2026年3月現在、Pro加入者でも最大7日間のレートリミットロックが報告されています
+          </p>
         </section>
 
         {/* SECTION 09: BEST-PRACTICES — TODO: faithful migration */}
