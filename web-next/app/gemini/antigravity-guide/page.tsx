@@ -1011,13 +1011,132 @@ export default function Page() {
           </div>
         </section>
 
-        {/* SECTION 05: RULES — TODO: faithful migration */}
+        {/* SECTION 05: RULES */}
         <section id="rules" className={styles.sec}>
           <div className={styles.secLabel}>Section 05</div>
           <h2 className={styles.secTitle}>
             <span className={styles.num}>05.</span>Rules (.agent/rules/) — 受動的制約
           </h2>
-          <p>（実装予定）</p>
+
+          <p>
+            Antigravityの
+            <strong>Rulesは「常にバックグラウンドで動作するシステムプロンプト」</strong>
+            です。 ファイル単位でルールを分割・個別に有効化できる点が特徴です。
+          </p>
+
+          <h3>Rules vs SKILL.md — 使い分け早見表</h3>
+          <table className={styles.compareTable}>
+            <tbody>
+              <tr>
+                <th>観点</th>
+                <th>Rules (.agent/rules/)</th>
+                <th>SKILL.md (.agent/skills/)</th>
+              </tr>
+              <tr>
+                <td>起動タイミング</td>
+                <td>常時（または設定条件で）</td>
+                <td>意図が合致したときのみ</td>
+              </tr>
+              <tr>
+                <td>コンテキスト消費</td>
+                <td>高（毎回注入）</td>
+                <td>低（オンデマンド）</td>
+              </tr>
+              <tr>
+                <td>用途</td>
+                <td>コーディング規約・禁止事項</td>
+                <td>専門ワークフロー・知識</td>
+              </tr>
+              <tr>
+                <td>推奨内容</td>
+                <td>「〜してはいけない」ルール</td>
+                <td>「〜する方法」の手順</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div className={styles.codeWrap}>
+            <div className={styles.cbHead}>
+              <div className={styles.cbDots}>
+                <div className={styles.cbd} style={{ background: "#ea4335" }} />
+                <div className={styles.cbd} style={{ background: "#fbbc04" }} />
+                <div className={styles.cbd} style={{ background: "#34a853" }} />
+              </div>
+              <span>.agent/rules/always-on.md — 常時適用ルール</span>
+            </div>
+            <pre className={styles.codeBody}>
+              <span className={styles.legHd}>{"---"}</span>
+              {"\n"}
+              <span className={styles.legHl}>{"activation"}</span>
+              {": "}
+              <span className={styles.legStr}>{"always"}</span>
+              {"\n"}
+              <span className={styles.legHd}>{"---"}</span>
+              {"\n\n"}
+              <span className={styles.legHd}>{"# Project Core Rules"}</span>
+              {"\n\n"}
+              <span className={styles.legHd}>{"## Architecture"}</span>
+              {
+                "\n- このプロジェクトはマイクロサービス構成（Go + gRPC）\n- サービス間通信はgRPCのみ（REST禁止）\n\n"
+              }
+              <span className={styles.legHd}>{"## Security Constraints"}</span>
+              {
+                "\n- 認証なしのエンドポイントを新規作成しない\n- パスワードは必ずbcrypt (cost=12)でハッシュ化\n- JWTの有効期限は1時間以内\n\n"
+              }
+              <span className={styles.legHd}>{"## Forbidden Actions"}</span>
+              {"\n"}
+              <span className={styles.legHl2}>
+                {"- ORM使用禁止（raw SQLのみ） ← なぜ: パフォーマンス測定で20x遅延を確認した"}
+              </span>
+              {"\n"}
+              <span className={styles.legHl2}>{"- グローバル変数の新規追加禁止"}</span>
+              {"\n"}
+              <span className={styles.legHl2}>{"- panic()の使用禁止（エラーを返せ）"}</span>
+            </pre>
+          </div>
+
+          <div className={styles.codeWrap}>
+            <div className={styles.cbHead}>
+              <div className={styles.cbDots}>
+                <div className={styles.cbd} style={{ background: "#ea4335" }} />
+                <div className={styles.cbd} style={{ background: "#fbbc04" }} />
+                <div className={styles.cbd} style={{ background: "#34a853" }} />
+              </div>
+              <span>.agent/rules/typescript.md — 言語別ルール（fileMatch使用）</span>
+            </div>
+            <pre className={styles.codeBody}>
+              <span className={styles.legHd}>{"---"}</span>
+              {"\n"}
+              <span className={styles.legHl}>{"activation"}</span>
+              {": "}
+              <span className={styles.legStr}>{"fileMatch"}</span>
+              {"\n"}
+              <span className={styles.legHl}>{"pattern"}</span>
+              {": "}
+              <span className={styles.legStr}>{'"**/*.ts"'}</span>
+              {"  "}
+              <span className={styles.legCmt}>{"# ← TypeScriptファイル編集時のみ適用される"}</span>
+              {"\n"}
+              <span className={styles.legHd}>{"---"}</span>
+              {"\n\n"}
+              <span className={styles.legHd}>{"# TypeScript Coding Standards"}</span>
+              {
+                "\n\n- strict: true を必ず有効にする\n- enum / namespace は使用禁止（erasableSyntaxOnly）\n- エラーは throw ではなく Result"
+              }
+              {"<T,E>"}
+              {" 型で返す\n- never型を活用して網羅性チェックを徹底する"}
+            </pre>
+          </div>
+
+          <div className={`${styles.info} ${styles.iTip}`}>
+            <span className={styles.infoIcon}>💡</span>
+            <div>
+              <code>activation: fileMatch</code>で
+              <strong>特定ファイルを編集するときだけルールを適用</strong>
+              できます。
+              Goファイル編集時のみGoルールを、TypeScriptファイル時のみTSルールを注入することでコンテキストを節約できます。
+            </div>
+          </div>
         </section>
 
         {/* SECTION 06: WORKFLOWS — TODO: faithful migration */}
