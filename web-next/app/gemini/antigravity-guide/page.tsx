@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import BestPracticesChecklist from "./BestPracticesChecklist";
 import GeminiMdTabs from "./GeminiMdTabs";
 import styles from "./page.module.css";
 
@@ -1450,13 +1451,93 @@ export default function Page() {
           </p>
         </section>
 
-        {/* SECTION 09: BEST-PRACTICES — TODO: faithful migration */}
+        {/* SECTION 09: BEST-PRACTICES */}
         <section id="best-practices" className={styles.sec}>
           <div className={styles.secLabel}>Section 09</div>
           <h2 className={styles.secTitle}>
             <span className={styles.num}>09.</span>横断ベストプラクティス 10則
           </h2>
-          <p>（実装予定）</p>
+
+          <div className={styles.bestGrid}>
+            <div className={`${styles.bestCard} ${styles.bestB}`}>
+              <div className={styles.bestN}>01</div>
+              <h4>descriptionがSKILL.mdの命</h4>
+              <p>
+                意味的トリガーとして機能するdescriptionを徹底的に具体化。「何を・いつ・なぜ」を英語・日本語問わず記述すると精度が向上する。
+              </p>
+            </div>
+            <div className={`${styles.bestCard} ${styles.bestG}`}>
+              <div className={styles.bestN}>02</div>
+              <h4>Rules ≠ SKILL.md: 用途を厳守</h4>
+              <p>
+                「常に守るルール」はRules、「特定タスクの知識」はSKILL.md。混在するとコンテキスト汚染が発生する。
+              </p>
+            </div>
+            <div className={`${styles.bestCard} ${styles.bestY}`}>
+              <div className={styles.bestN}>03</div>
+              <h4>Artifactレビューを省略しない</h4>
+              <p>
+                Task ListとImplementation
+                Planは必ずレビュー。ここで設計ミスを検出することがバグコスト最小化の鍵。
+              </p>
+            </div>
+            <div className={`${styles.bestCard} ${styles.bestR}`}>
+              <div className={styles.bestN}>04</div>
+              <h4>fileMatchで言語別ルールを分離</h4>
+              <p>
+                activation:
+                fileMatchを使い、Go/TS/Pythonなど言語別にルールを切り替え。全言語に共通ルールを書かない。
+              </p>
+            </div>
+            <div className={`${styles.bestCard} ${styles.bestP}`}>
+              <div className={styles.bestN}>05</div>
+              <h4>スキルは10〜15個以内に絞る</h4>
+              <p>
+                アクティブなスキルが増えすぎるとAIが混乱し精度が低下する。使わないスキルは/skills
+                disableコマンドで無効化。
+              </p>
+            </div>
+            <div className={`${styles.bestCard} ${styles.bestC}`}>
+              <div className={styles.bestN}>06</div>
+              <h4>.context/でナレッジを蓄積する</h4>
+              <p>
+                Known GotchasをKnowledge
+                Baseに記録。エージェントが同じ過ちを繰り返さず、ドキュメントの自動進化を促す。
+              </p>
+            </div>
+            <div className={`${styles.bestCard} ${styles.bestB}`}>
+              <div className={styles.bestN}>07</div>
+              <h4>Workflowsで繰り返し作業を撲滅</h4>
+              <p>
+                毎回同じ手順を口頭で指示するものはWorkflowに書く。/deploy、/review、/release-notesを整備する。
+              </p>
+            </div>
+            <div className={`${styles.bestCard} ${styles.bestG}`}>
+              <div className={styles.bestN}>08</div>
+              <h4>GEMINI.mdは「薄く・分割して」</h4>
+              <p>
+                @./docs/guide.mdのように@importでファイルを分割参照。1ファイルに全部詰め込まないことがコンテキスト節約の鍵。
+              </p>
+            </div>
+            <div className={`${styles.bestCard} ${styles.bestY}`}>
+              <div className={styles.bestN}>09</div>
+              <h4>Rulesには「Why」を書く</h4>
+              <p>
+                「ORM使用禁止」だけでなく「なぜ禁止か（パフォーマンス測定で20x遅延を確認）」を書くとエージェントの判断精度が上がる。
+              </p>
+            </div>
+            <div className={`${styles.bestCard} ${styles.bestR}`}>
+              <div className={styles.bestN}>10</div>
+              <h4>tasks.mdに並列情報を明示する</h4>
+              <p>
+                「Agent A担当」「Agent B担当（並列可）」を記述することでAgent
+                Managerが最適にタスクを分配できる。
+              </p>
+            </div>
+          </div>
+
+          <h3>公開・運用前チェックリスト</h3>
+          <BestPracticesChecklist />
         </section>
 
         {/* SECTION 10: SOURCES — TODO: faithful migration */}

@@ -1258,6 +1258,146 @@
   background: #0c1120;
 }
 
+/* ── Best Practices Grid ─────────────────────────────────── */
+.bestGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.bestCard {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.bestCard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+
+.bestB::before {
+  background: var(--g-blue, #4285f4);
+}
+
+.bestG::before {
+  background: var(--g-green, #34a853);
+}
+
+.bestY::before {
+  background: var(--g-yellow, #fbbc04);
+}
+
+.bestR::before {
+  background: var(--g-red, #ea4335);
+}
+
+.bestP::before {
+  background: var(--g-purple, #8b5cf6);
+}
+
+.bestC::before {
+  background: var(--g-cyan, #00bcd4);
+}
+
+.bestN {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 1.9rem;
+  opacity: 0.06;
+  position: absolute;
+  top: 2px;
+  right: 8px;
+  color: #fff;
+  font-weight: 700;
+}
+
+.bestCard h4 {
+  font-family: var(--font-display, "Syne", sans-serif);
+  font-size: 0.87rem;
+  font-weight: 700;
+  color: #ddeeff;
+  margin-bottom: 0.4rem;
+}
+
+.bestCard p {
+  font-size: 0.77rem;
+  color: var(--text2, #9aafcc);
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* ── Checklist ───────────────────────────────────────────── */
+.checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 1.5rem 0;
+}
+
+.checkItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+}
+
+.checkItem:hover {
+  border-color: var(--border2);
+}
+
+.checkBox {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  border: 2px solid var(--border2);
+  border-radius: 5px;
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.checkBoxChecked {
+  background: var(--g-green, #34a853);
+  border-color: var(--g-green, #34a853);
+}
+
+.checkBoxChecked::after {
+  content: "✓";
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.checkText {
+  font-size: 0.85rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.checkTextChecked {
+  color: var(--text3, #5a7090);
+  text-decoration: line-through;
+}
+
 /* ── Artifacts ─────────────────────────────────────────── */
 .artRow {
   display: grid;
