@@ -1139,13 +1139,94 @@ export default function Page() {
           </div>
         </section>
 
-        {/* SECTION 06: WORKFLOWS — TODO: faithful migration */}
+        {/* SECTION 06: WORKFLOWS */}
         <section id="workflows" className={styles.sec}>
           <div className={styles.secLabel}>Section 06</div>
           <h2 className={styles.secTitle}>
-            <span className={styles.num}>06.</span>Workflows — 能動的手順書
+            <span className={styles.num}>06.</span>Workflows (.agent/workflows/) — 能動的手順書
           </h2>
-          <p>（実装予定）</p>
+
+          <p>
+            <strong>WorkflowsはRulesの「受動的制約」とは対照的な「能動的手順書」</strong>です。
+            <code>/workflow-name</code>
+            のようにスラッシュコマンドでトリガーし、エージェントが定義された手順を順番に実行します。
+          </p>
+
+          <div className={styles.codeWrap}>
+            <div className={styles.cbHead}>
+              <div className={styles.cbDots}>
+                <div className={styles.cbd} style={{ background: "#ea4335" }} />
+                <div className={styles.cbd} style={{ background: "#fbbc04" }} />
+                <div className={styles.cbd} style={{ background: "#34a853" }} />
+              </div>
+              <span>.agent/workflows/deploy.md — /deployコマンド</span>
+            </div>
+            <pre className={styles.codeBody}>
+              <span className={styles.legHd}>{"# Deploy Workflow"}</span>
+              {"\n"}
+              <span className={styles.legCmt}>
+                {
+                  "# トリガー: チャットで `/deploy staging` と入力するとエージェントがこの手順を実行"
+                }
+              </span>
+              {"\n\n"}
+              <span className={styles.legHd}>{"## 引数"}</span>
+              {"\n- "}
+              <span className={styles.legStr}>{"`$ENV`"}</span>
+              {": ターゲット環境 (staging | production)\n\n"}
+              <span className={styles.legHd}>{"## 手順"}</span>
+              {"\n1. "}
+              <span className={styles.legStr}>{"`git status`"}</span>
+              {" でコミット漏れがないことを確認する\n2. テストを全件実行: "}
+              <span className={styles.legStr}>{"`go test ./... -race`"}</span>
+              {
+                "\n3. テストが失敗した場合は即座に停止してユーザーに報告する\n4. Dockerイメージをビルド: "
+              }
+              <span className={styles.legStr}>
+                {"`docker build -t app:$(git rev-parse --short HEAD) .`"}
+              </span>
+              {"\n5. $ENV環境にデプロイ:\n   - staging: "}
+              <span className={styles.legStr}>{"`kubectl apply -f k8s/staging.yaml`"}</span>
+              {"\n   - production: "}
+              <span className={styles.legHl2}>{"ユーザーに確認を求めてから実行すること"}</span>
+              {"\n6. ヘルスチェック: "}
+              <span className={styles.legStr}>{"`curl https://$ENV.myapp.com/health`"}</span>
+              {"\n7. Artifacts（デプロイサマリー）を生成してユーザーに提示する"}
+            </pre>
+          </div>
+
+          <div className={styles.codeWrap}>
+            <div className={styles.cbHead}>
+              <div className={styles.cbDots}>
+                <div className={styles.cbd} style={{ background: "#ea4335" }} />
+                <div className={styles.cbd} style={{ background: "#fbbc04" }} />
+                <div className={styles.cbd} style={{ background: "#34a853" }} />
+              </div>
+              <span>.agent/workflows/review.md — /reviewコマンド</span>
+            </div>
+            <pre className={styles.codeBody}>
+              <span className={styles.legHd}>{"# Code Review Workflow"}</span>
+              {"\n\n"}
+              <span className={styles.legHd}>{"## 手順"}</span>
+              {"\n1. "}
+              <span className={styles.legStr}>{"`git diff main`"}</span>
+              {
+                " で変更差分を取得する\n2. 以下の観点でコードレビューを実施:\n   - セキュリティ: SQLインジェクション・XSS・認証漏れ\n   - パフォーマンス: N+1クエリ・不要なアロケーション\n   - 設計: SRPの遵守・依存方向・インターフェース設計\n   - テスト: エッジケースのカバレッジ\n3. 問題があれば重大度(P0/P1/P2)付きでリストアップ\n4. "
+              }
+              <span className={styles.legStr}>{"`docs/tasks.md`"}</span>
+              {" に未対応課題として追記する\n5. Implementation Artifactとしてレビュー結果を出力"}
+            </pre>
+          </div>
+
+          <div className={`${styles.info} ${styles.iTip}`}>
+            <span className={styles.infoIcon}>💡</span>
+            <div>
+              ワークフロー内から別のワークフローを呼び出すことができます（
+              <strong>チェーン化</strong>
+              ）。 例: "Ship Feature"ワークフローの中で<code>/review</code>を呼び出し、通過したら
+              <code>/deploy staging</code>を実行する構成が可能です。
+            </div>
+          </div>
         </section>
 
         {/* SECTION 07: ARTIFACTS — TODO: faithful migration */}
