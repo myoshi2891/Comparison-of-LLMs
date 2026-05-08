@@ -29,10 +29,30 @@ except Exception:
     print('')
 " 2>/dev/null || echo "")
 
-# フォールバック: transcript_path が空の場合、プロジェクトディレクトリの最新 JSONL を使用
+# フォールバック: transcript_path が空/不在の場合、assistant usage を含む最新 JSONL を検索
+# サブエージェント/fork が生成するメタデータ専用 JSONL (assistant メッセージなし) を除外する
 CLAUDE_PROJECT_DIR="$HOME/.claude/projects/$(echo "$REPO" | sed 's|/|-|g')"
 if [ -z "$TRANSCRIPT_PATH" ] || [ ! -f "$TRANSCRIPT_PATH" ]; then
-    TRANSCRIPT_PATH=$(ls -t "$CLAUDE_PROJECT_DIR"/*.jsonl 2>/dev/null | head -1 || echo "")
+    TRANSCRIPT_PATH=$(python3 - "$CLAUDE_PROJECT_DIR" <<'PYEOF' 2>/dev/null || echo ""
+import json, os, glob, sys
+proj = sys.argv[1]
+files = sorted(glob.glob(f'{proj}/*.jsonl'), key=os.path.getmtime, reverse=True)
+for f in files:
+    try:
+        with open(f) as fh:
+            for line in fh:
+                try:
+                    obj = json.loads(line)
+                    msg = obj.get('message', {})
+                    if msg.get('role') == 'assistant' and msg.get('usage'):
+                        print(f)
+                        sys.exit(0)
+                except Exception:
+                    pass
+    except Exception:
+        pass
+PYEOF
+)
 fi
 
 # ── 2. 実際の API トークン数を JSONL usage フィールドから取得 ─────────
