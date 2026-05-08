@@ -627,7 +627,120 @@ export default function GithubCopilotPage() {
               <p className={styles.secDesc}>Copilotから最高の提案を引き出すテクニック</p>
             </div>
           </div>
-          {/* s04 content — faithful migration pending */}
+          <div className={styles.alertInfo} style={{ marginBottom: "28px" }}>
+            <span className={styles.alertIcon}>💡</span>
+            <div className={styles.alertContent}>
+              <strong>プロンプトエンジニアリングの3原則：</strong>
+              ①タスクを細分化する　②要件を具体的に書く　③入出力の例を示す
+            </div>
+          </div>
+
+          <h3
+            className={styles.secSubTitle}
+            style={{ marginBottom: "16px", letterSpacing: "0.05em", fontSize: "0.9rem" }}
+          >
+            {"// BAD vs GOOD — プロンプト比較"}
+          </h3>
+
+          <div className={styles.promptGrid}>
+            <div className={`${styles.promptBox} ${styles.promptBoxBad}`}>
+              <div className={`${styles.promptBoxLabel} ${styles.promptBoxBadLabel}`}>
+                ❌ BAD — 漠然とした指示
+              </div>
+              <div className={styles.promptText}>ユーザー認証を作って</div>
+            </div>
+            <div className={`${styles.promptBox} ${styles.promptBoxGood}`}>
+              <div className={`${styles.promptBoxLabel} ${styles.promptBoxGoodLabel}`}>
+                ✅ GOOD — 具体的な指示
+              </div>
+              <div className={styles.promptText}>
+                Next.js 14 + TypeScriptで、メールとパスワードによるJWT認証を実装して。 -
+                bcryptでパスワードハッシュ化 - accessToken (15分) / refreshToken (7日)
+                の2トークン方式 - エラーはカスタムエラークラスで返す - Zodでバリデーション
+                型定義とユニットテストも含めて
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.promptGrid} style={{ marginTop: "16px" }}>
+            <div className={`${styles.promptBox} ${styles.promptBoxBad}`}>
+              <div className={`${styles.promptBoxLabel} ${styles.promptBoxBadLabel}`}>
+                ❌ BAD — コンテキスト不足
+              </div>
+              <div className={styles.promptText}>このコードのバグを直して</div>
+            </div>
+            <div className={`${styles.promptBox} ${styles.promptBoxGood}`}>
+              <div className={`${styles.promptBoxLabel} ${styles.promptBoxGoodLabel}`}>
+                ✅ GOOD — コンテキスト付き
+              </div>
+              <div className={styles.promptText}>
+                @workspace の src/api/users.ts、135行目でTypeErrorが発生しています。 「Cannot read
+                properties of undefined (reading {"'id'"}）」というエラーです。
+                ユーザーが存在しない場合の null チェックが漏れていると思います。
+                修正案と、同様のパターンが他にないか確認してください
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.divider} style={{ margin: "32px 0" }} />
+
+          <h3
+            className={styles.secSubTitle}
+            style={{ marginBottom: "16px", letterSpacing: "0.05em", fontSize: "0.9rem" }}
+          >
+            {"// スラッシュコマンド チートシート"}
+          </h3>
+
+          <div className={styles.cardGrid}>
+            <div className={styles.card}>
+              <div className={styles.cardTitle}>
+                <code>/explain</code>
+              </div>
+              <div className={styles.cardDesc}>
+                選択したコードの動作を詳細に説明します。チームへの共有や自分の理解確認に最適。
+              </div>
+            </div>
+            <div className={styles.card}>
+              <div className={styles.cardTitle}>
+                <code>/fix</code>
+              </div>
+              <div className={styles.cardDesc}>
+                バグや問題を検出して修正案を提示。エラーメッセージと一緒に使うと精度が上がります。
+              </div>
+            </div>
+            <div className={styles.card}>
+              <div className={styles.cardTitle}>
+                <code>/tests</code>
+              </div>
+              <div className={styles.cardDesc}>
+                Jest・Vitest等でユニットテストを自動生成。エッジケースも考慮したテストコードが得られます。
+              </div>
+            </div>
+            <div className={styles.card}>
+              <div className={styles.cardTitle}>
+                <code>/doc</code>
+              </div>
+              <div className={styles.cardDesc}>
+                JSDoc・Docstring等のドキュメントコメントを生成。API仕様書の自動化に役立ちます。
+              </div>
+            </div>
+            <div className={styles.card}>
+              <div className={styles.cardTitle}>
+                <code>@workspace</code>
+              </div>
+              <div className={styles.cardDesc}>
+                プロジェクト全体のファイルを参照して回答。「このプロジェクトで〇〇を実装するには？」という質問に対応。
+              </div>
+            </div>
+            <div className={styles.card}>
+              <div className={styles.cardTitle}>
+                <code>@terminal</code>
+              </div>
+              <div className={styles.cardDesc}>
+                ターミナルの出力内容やエラーを参照して助言。シェルコマンドの問題解決に便利です。
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* ─── s05: features ─── */}
