@@ -568,6 +568,102 @@
 .cg {
   color: #3fb950;
 }
+.cn {
+  color: #f78c6c;
+}
+
+/* ─── Steps List ─── */
+.stepsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.step {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.step:hover {
+  border-color: rgba(0, 212, 255, 0.4);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
+}
+
+.stepNum {
+  font-family: var(--font-mono), monospace;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid var(--border2);
+  min-width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.stepTitle {
+  font-family: var(--font-mono), monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text1);
+  margin-bottom: 8px;
+}
+
+.stepBody {
+  font-size: 0.875rem;
+  color: var(--text2);
+  line-height: 1.7;
+}
+
+.stepBody a {
+  color: var(--accent);
+}
+
+.stepSub {
+  list-style: none;
+  margin-top: 12px;
+  padding: 0;
+}
+
+.stepSub li {
+  font-size: 0.82rem;
+  color: var(--text2);
+  padding: 3px 0;
+  display: flex;
+  gap: 8px;
+}
+
+.stepSub li::before {
+  content: "▸";
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.stepSub code {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.8rem;
+  color: var(--accent);
+  background: rgba(0, 212, 255, 0.08);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
 
 /* ─── Alert ─── */
 .alertInfo {

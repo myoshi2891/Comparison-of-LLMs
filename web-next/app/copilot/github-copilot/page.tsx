@@ -416,7 +416,206 @@ export default function GithubCopilotPage() {
               <p className={styles.secDesc}>インストールから最初のコード補完まで</p>
             </div>
           </div>
-          {/* s03 content — faithful migration pending */}
+          <div className={styles.stepsList}>
+            <div className={styles.step}>
+              <div className={styles.stepNum}>01</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTitle}>GitHubアカウントの準備</div>
+                <div className={styles.stepBody}>
+                  <Ext href="https://github.com">github.com</Ext>
+                  にアクセスしてアカウントを作成（既存アカウントでも可）。
+                  プランを選択します。初めての方は<strong>Copilot Free</strong>
+                  からスタートがおすすめです。
+                </div>
+                <ul className={styles.stepSub}>
+                  <li>github.com → Settings → Copilot → 有効化</li>
+                  <li>学生の方はGitHub Student Developer Pack（無料Pro）を申請</li>
+                  <li>Proプランの30日間無料トライアルも活用可能</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNum}>02</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTitle}>VS Code拡張機能のインストール</div>
+                <div className={styles.stepBody}>
+                  VS Codeを開き、拡張機能マーケットプレイスから「GitHub
+                  Copilot」を検索してインストールします。
+                </div>
+                <div className={styles.codeWrap}>
+                  <div className={styles.codeBar}>
+                    <span className={styles.codeLang}>TERMINAL</span>
+                    <div className={styles.codeDots}>
+                      <span />
+                      <span />
+                      <span />
+                    </div>
+                  </div>
+                  <div className={styles.codeBody}>
+                    <span className={styles.cc}>
+                      # VS Code コマンドパレットから実行（Ctrl/Cmd + P）
+                    </span>
+                    {"\n"}
+                    {"ext install GitHub.copilot\next install GitHub.copilot-chat\n\n"}
+                    <span className={styles.cc}># または コマンドラインから</span>
+                    {"\n"}
+                    {
+                      "code --install-extension GitHub.copilot\ncode --install-extension GitHub.copilot-chat"
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNum}>03</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTitle}>GitHubアカウントでサインイン</div>
+                <div className={styles.stepBody}>
+                  VS Code左下のアカウントアイコン、またはコマンドパレットから「GitHub Copilot: Sign
+                  in to GitHub」を実行。ブラウザでOAuth認証を完了します。
+                </div>
+                <ul className={styles.stepSub}>
+                  <li>Ctrl/Cmd + Shift + P → "GitHub Copilot: Sign in"</li>
+                  <li>ブラウザが開くのでGitHubアカウントで承認</li>
+                  <li>認証後、エディタに戻ると右下にCopilotアイコンが表示</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNum}>04</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTitle}>動作確認 — はじめてのコード補完</div>
+                <div className={styles.stepBody}>
+                  Pythonファイルを作成し、コメントを書いてTabキーを押すと補完が表示されます。
+                </div>
+                <div className={styles.codeWrap}>
+                  <div className={styles.codeBar}>
+                    <span className={styles.codeLang}>PYTHON — hello_copilot.py</span>
+                    <div className={styles.codeDots}>
+                      <span />
+                      <span />
+                      <span />
+                    </div>
+                  </div>
+                  <div className={styles.codeBody}>
+                    <span className={styles.cc}># フィボナッチ数列を返す関数を作成する</span>
+                    {"\n"}
+                    <span className={styles.ce}>def</span>{" "}
+                    <span className={styles.cv}>fibonacci</span>
+                    {"(n: "}
+                    <span className={styles.cv}>int</span>
+                    {") -> "}
+                    <span className={styles.cv}>list</span>
+                    {"["}
+                    <span className={styles.cv}>int</span>
+                    {"]:\n    "}
+                    <span className={styles.cc}>
+                      # ↑ ここでTabを押すとCopilotが補完してくれます！
+                    </span>
+                    {"\n    result = ["}
+                    <span className={styles.cn}>0</span>
+                    {", "}
+                    <span className={styles.cn}>1</span>
+                    {"]\n    "}
+                    <span className={styles.ce}>while</span> <span className={styles.cv}>len</span>
+                    {"(result) < n:\n        result.append(result["}
+                    <span className={styles.cs}>-</span>
+                    <span className={styles.cn}>1</span>
+                    {"] + result["}
+                    <span className={styles.cs}>-</span>
+                    <span className={styles.cn}>2</span>
+                    {"])\n    "}
+                    <span className={styles.ce}>return</span>
+                    {" result[:n]"}
+                  </div>
+                </div>
+                <div className={styles.alertSuccess} style={{ marginTop: "12px" }}>
+                  <span className={styles.alertIcon}>✅</span>
+                  <div className={styles.alertContent}>
+                    補完を<strong>受け入れる</strong>：Tab キー
+                    <strong>却下する</strong>：Esc キー
+                    <strong>次の候補</strong>：Alt+] / Option+]
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNum}>05</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTitle}>Copilot Chatを使ってみる</div>
+                <div className={styles.stepBody}>
+                  サイドバーのCopilotアイコンをクリック、またはCtrl/Cmd+Shift+Iでチャット画面を開きます。
+                </div>
+                <ul className={styles.stepSub}>
+                  <li>
+                    <code>/explain</code> — 選択したコードを日本語で説明してもらう
+                  </li>
+                  <li>
+                    <code>/fix</code> — バグを自動修正してもらう
+                  </li>
+                  <li>
+                    <code>/tests</code> — 単体テストを自動生成
+                  </li>
+                  <li>
+                    <code>/doc</code> — ドキュメントコメントを自動生成
+                  </li>
+                  <li>
+                    <code>@workspace</code> — プロジェクト全体を参照して質問
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNum}>06</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTitle}>カスタム指示ファイルの設定（推奨）</div>
+                <div className={styles.stepBody}>
+                  プロジェクトルートに
+                  <code>.github/copilot-instructions.md</code>
+                  を作成すると、Copilotにプロジェクト固有の指示を与えられます。
+                </div>
+                <div className={styles.codeWrap}>
+                  <div className={styles.codeBar}>
+                    <span className={styles.codeLang}>.github/copilot-instructions.md</span>
+                    <div className={styles.codeDots}>
+                      <span />
+                      <span />
+                      <span />
+                    </div>
+                  </div>
+                  <div className={styles.codeBody}>
+                    <span className={styles.cm}>## ビルドコマンド</span>
+                    {"\n"}
+                    <span className={styles.cs}>-</span>
+                    {" `npm run build` - プロジェクトをビルド\n"}
+                    <span className={styles.cs}>-</span>
+                    {" `npm run test` - テストを実行\n"}
+                    <span className={styles.cs}>-</span>
+                    {" `npm run lint:fix` - Lint自動修正\n\n"}
+                    <span className={styles.cm}>## コードスタイル</span>
+                    {"\n"}
+                    <span className={styles.cs}>-</span>
+                    {" TypeScript strict modeを使用\n"}
+                    <span className={styles.cs}>-</span>
+                    {" 関数コンポーネントをクラスより優先\n"}
+                    <span className={styles.cs}>-</span>
+                    {" 公開APIには必ずJSDocコメントを付与\n\n"}
+                    <span className={styles.cm}>## ワークフロー</span>
+                    {"\n"}
+                    <span className={styles.cs}>-</span>
+                    {" コミットはConventional Commits形式\n"}
+                    <span className={styles.cs}>-</span>
+                    {" ブランチはmainから作成"}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* ─── s04: prompting ─── */}
