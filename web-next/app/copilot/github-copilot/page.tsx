@@ -1165,7 +1165,61 @@ export default function GithubCopilotPage() {
               <p className={styles.secDesc}>安全にCopilotを使用するための重要な注意点</p>
             </div>
           </div>
-          {/* s07 content — faithful migration pending */}
+          <div className={styles.cardGrid}>
+            <div className={styles.card}>
+              <span className={styles.cardIcon}>🔐</span>
+              <div className={styles.cardTitle}>脆弱なコードパターンを認識する</div>
+              <div className={styles.cardDesc}>
+                Copilotはハードコードされた認証情報、SQLインジェクション、パストラバーサルなど一般的な脆弱性をフィルタリングしますが、
+                <strong>すべての脆弱性を防げるわけではありません</strong>。
+                セキュリティ関連のコードは必ず手動レビューしてください。
+              </div>
+            </div>
+            <div className={styles.card}>
+              <span className={styles.cardIcon}>📜</span>
+              <div className={styles.cardTitle}>著作権・ライセンス確認</div>
+              <div className={styles.cardDesc}>
+                Copilotはパブリックリポジトリのコードで学習しています。生成されたコードが既存のOSSコードに類似する可能性があります。
+                Business/EnterpriseプランのIP補償を活用しつつ、重要なコードは確認しましょう。
+              </div>
+            </div>
+            <div className={styles.card}>
+              <span className={styles.cardIcon}>🏢</span>
+              <div className={styles.cardTitle}>機密情報をChatに貼らない</div>
+              <div className={styles.cardDesc}>
+                APIキー・パスワード・個人情報などの機密データをCopilot
+                Chatに直接貼り付けることは避けてください。
+                Enterpriseプランではデータ保護協定（DPA）により適切に管理されますが、基本的な慎重さが重要です。
+              </div>
+            </div>
+            <div className={styles.card}>
+              <span className={styles.cardIcon}>🧪</span>
+              <div className={styles.cardTitle}>必ずテストを実行する</div>
+              <div className={styles.cardDesc}>
+                Copilotが生成したコードは、既存のテスト・コードスキャン・セキュリティテストなど
+                <strong>通常の品質管理プロセスをすべて通過させてください</strong>。
+                AI生成だからといって例外にしないこと。
+              </div>
+            </div>
+            <div className={styles.card}>
+              <span className={styles.cardIcon}>⚙️</span>
+              <div className={styles.cardTitle}>除外ファイルを設定する</div>
+              <div className={styles.cardDesc}>
+                機密性の高いファイル（<code>.env</code>
+                ・設定ファイル・秘密鍵）はCopilotが参照しないよう
+                <code>.copilotignore</code>
+                またはOrganization設定で除外できます（Business/Enterpriseプラン）。
+              </div>
+            </div>
+            <div className={styles.card}>
+              <span className={styles.cardIcon}>🔄</span>
+              <div className={styles.cardTitle}>古いAPIパターンに注意</div>
+              <div className={styles.cardDesc}>
+                Copilotの学習データには古いAPIやライブラリバージョンが含まれています。
+                生成されたコードが使用している外部ライブラリの最新バージョンと互換性があるか必ず確認しましょう。
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* ─── s08: models ─── */}
