@@ -918,7 +918,242 @@ export default function GithubCopilotPage() {
               <p className={styles.secDesc}>Copilotを最大限に活用するための実践的なヒント</p>
             </div>
           </div>
-          {/* s06 content — faithful migration pending */}
+          <details className={styles.accordionItem} open>
+            <summary className={styles.accordionSummary}>
+              <span className={styles.accordionIcon}>📂</span>
+              <span>
+                <strong>01.</strong> 関連ファイルを開き、不要なファイルを閉じる
+              </span>
+              <span className={styles.accordionArrow}>▼</span>
+            </summary>
+            <div className={styles.accordionBody}>
+              Copilotは現在エディタで開いているファイルをコンテキストとして利用します。
+              <strong>実装対象のファイルと関連する型定義・テストファイルだけを開く</strong>
+              ことで、より正確な補完が得られます。
+              逆に無関係なファイルが大量に開いているとコンテキストが汚染されます。
+              <div className={styles.alertInfo} style={{ marginTop: "12px" }}>
+                <span className={styles.alertIcon}>💡</span>
+                <div className={styles.alertContent}>
+                  VS Codeの「エクスプローラー → タブ管理」で不要なファイルを整理しましょう
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <details className={styles.accordionItem}>
+            <summary className={styles.accordionSummary}>
+              <span className={styles.accordionIcon}>📝</span>
+              <span>
+                <strong>02.</strong> 具体的なコメントでコンテキストを提供する
+              </span>
+              <span className={styles.accordionArrow}>▼</span>
+            </summary>
+            <div className={styles.accordionBody}>
+              コードを書く前に、意図を説明するコメントを先に書くと、Copilotの補完精度が劇的に向上します。
+              「何をするか」だけでなく「なぜそうするか」「どんな制約があるか」も書くとさらに効果的です。
+              <div className={styles.codeWrap}>
+                <div className={styles.codeBar}>
+                  <span className={styles.codeLang}>EXAMPLE</span>
+                  <div className={styles.codeDots}>
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                </div>
+                <div className={styles.codeBody}>
+                  <span className={styles.cc}>
+                    {
+                      "/**\n * レート制限付きAPIクライアント\n * - 1分間に最大100リクエスト\n * - 指数バックオフで自動リトライ（最大3回）\n * - タイムアウトは10秒\n * - エラー時はカスタムAPIErrorをthrow\n */"
+                    }
+                  </span>
+                  {"\n"}
+                  <span className={styles.ce}>class</span>{" "}
+                  <span className={styles.cv}>RateLimitedApiClient</span>
+                  {" {"}
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <details className={styles.accordionItem}>
+            <summary className={styles.accordionSummary}>
+              <span className={styles.accordionIcon}>🧩</span>
+              <span>
+                <strong>03.</strong> タスクを小さな単位に分解する
+              </span>
+              <span className={styles.accordionArrow}>▼</span>
+            </summary>
+            <div className={styles.accordionBody}>
+              「ECサイト全体を作って」ではなく「商品一覧APIを作って」→「カート機能を追加して」→「決済フローを実装して」と
+              <strong>小さなステップに分解</strong>
+              することでCopilotの精度が大幅に向上します。
+              複雑なタスクほどプランモードを活用して計画を立てましょう。
+            </div>
+          </details>
+
+          <details className={styles.accordionItem}>
+            <summary className={styles.accordionSummary}>
+              <span className={styles.accordionIcon}>✅</span>
+              <span>
+                <strong>04.</strong> 提案コードを必ず理解してから採用する
+              </span>
+              <span className={styles.accordionArrow}>▼</span>
+            </summary>
+            <div className={styles.accordionBody}>
+              Copilotは強力なツールですが<strong>間違いを犯すことがあります</strong>。
+              提案されたコードを「なぜこのロジックになっているか」を自分で理解してから採用することが必須です。
+              特に、セキュリティに関わる部分（認証・暗号化・SQL）は細心の注意を払いましょう。
+              <div className={styles.alertWarn} style={{ marginTop: "12px" }}>
+                <span className={styles.alertIcon}>⚠️</span>
+                <div className={styles.alertContent}>
+                  Copilotは「コパイロット（副操縦士）」です。「オートパイロット（自動操縦）」ではありません。最終判断は常にあなたが行います。
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <details className={styles.accordionItem}>
+            <summary className={styles.accordionSummary}>
+              <span className={styles.accordionIcon}>🎯</span>
+              <span>
+                <strong>05.</strong> ペルソナを設定してChat品質を上げる
+              </span>
+              <span className={styles.accordionArrow}>▼</span>
+            </summary>
+            <div className={styles.accordionBody}>
+              Chatに「あなたはコード品質と可読性を重視するシニアTypeScriptエンジニアです」などのペルソナを設定すると、
+              より専門的な視点からのレビューや提案が得られます。
+              <div className={styles.codeWrap}>
+                <div className={styles.codeBar}>
+                  <span className={styles.codeLang}>CHAT PROMPT</span>
+                  <div className={styles.codeDots}>
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                </div>
+                <div className={styles.codeBody}>
+                  <span className={styles.cs}>
+                    {
+                      "あなたはGolangのパフォーマンス最適化を専門とする\nシニアバックエンドエンジニアです。\n以下のコードのボトルネックを分析して改善案を提示してください..."
+                    }
+                  </span>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <details className={styles.accordionItem}>
+            <summary className={styles.accordionSummary}>
+              <span className={styles.accordionIcon}>🔄</span>
+              <span>
+                <strong>06.</strong> TDD（テスト駆動開発）と組み合わせる
+              </span>
+              <span className={styles.accordionArrow}>▼</span>
+            </summary>
+            <div className={styles.accordionBody}>
+              テストを先に書き、Copilotにテストを通す実装を生成させるTDDワークフローは非常に効果的です。
+              テストがあることでCopilotが生成したコードの品質を自動検証できます。
+              <code>/tests</code>コマンドでテストを先生成し、その後実装を書くアプローチも有効です。
+            </div>
+          </details>
+
+          <details className={styles.accordionItem}>
+            <summary className={styles.accordionSummary}>
+              <span className={styles.accordionIcon}>📚</span>
+              <span>
+                <strong>07.</strong> copilot-instructions.mdを活用する
+              </span>
+              <span className={styles.accordionArrow}>▼</span>
+            </summary>
+            <div className={styles.accordionBody}>
+              プロジェクト固有のルール（コーディング規約・ライブラリ選定・命名規則）を
+              <code>.github/copilot-instructions.md</code>に記述することで、
+              チーム全員が一貫した品質のコードをCopilotから得られます。 指示は
+              <strong>簡潔・具体的</strong>に書くことが重要です。長すぎると効果が薄れます。
+            </div>
+          </details>
+
+          <details className={styles.accordionItem}>
+            <summary className={styles.accordionSummary}>
+              <span className={styles.accordionIcon}>🌐</span>
+              <span>
+                <strong>08.</strong> コンテキストウィンドウを意識する
+              </span>
+              <span className={styles.accordionArrow}>▼</span>
+            </summary>
+            <div className={styles.accordionBody}>
+              Copilot CLIではトークン上限の95%に近づくと自動圧縮（Auto-compaction）が発動します。
+              長いセッションでは重要な文脈が失われることがあります。 複雑なタスクでは
+              <strong>定期的に新しいチャットセッションを始める</strong>か、 重要なコンテキストを
+              <code>copilot-instructions.md</code>に記録しておきましょう。
+            </div>
+          </details>
+
+          <details className={styles.accordionItem}>
+            <summary className={styles.accordionSummary}>
+              <span className={styles.accordionIcon}>🚀</span>
+              <span>
+                <strong>09.</strong> WRAPフレームワークで効果的なIssueを書く
+              </span>
+              <span className={styles.accordionArrow}>▼</span>
+            </summary>
+            <div className={styles.accordionBody}>
+              GitHub Copilotエージェントが最も効果を発揮するのは、明確に記述されたIssueです。
+              GitHub公式が推奨する<strong>WRAPフレームワーク</strong>を活用しましょう：
+              <div
+                className={styles.cardGrid}
+                style={{ marginTop: "14px", gridTemplateColumns: "repeat(2, 1fr)" }}
+              >
+                <div className={styles.card} style={{ padding: "16px" }}>
+                  <div className={styles.cardTitle} style={{ color: "var(--accent)" }}>
+                    W — What (何を)
+                  </div>
+                  <div className={styles.cardDesc}>達成したいことを具体的に書く</div>
+                </div>
+                <div className={styles.card} style={{ padding: "16px" }}>
+                  <div className={styles.cardTitle} style={{ color: "var(--accent)" }}>
+                    R — Reason (なぜ)
+                  </div>
+                  <div className={styles.cardDesc}>背景・理由・ユーザーへの影響を書く</div>
+                </div>
+                <div className={styles.card} style={{ padding: "16px" }}>
+                  <div className={styles.cardTitle} style={{ color: "var(--accent)" }}>
+                    A — Acceptance (完了条件)
+                  </div>
+                  <div className={styles.cardDesc}>どうなれば完了か明確にする</div>
+                </div>
+                <div className={styles.card} style={{ padding: "16px" }}>
+                  <div className={styles.cardTitle} style={{ color: "var(--accent)" }}>
+                    P — Prior Context (前提)
+                  </div>
+                  <div className={styles.cardDesc}>関連コード・制約・参考情報を添付</div>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <details className={styles.accordionItem}>
+            <summary className={styles.accordionSummary}>
+              <span className={styles.accordionIcon}>📊</span>
+              <span>
+                <strong>10.</strong> プレミアムリクエストの使用量を監視する
+              </span>
+              <span className={styles.accordionArrow}>▼</span>
+            </summary>
+            <div className={styles.accordionBody}>
+              Chat・エージェントモード・コードレビューはプレミアムリクエストを消費します。
+              上限を超えると<strong>$0.04/リクエスト</strong>の追加費用が発生します。
+              月ごとのリセットタイミング（1日UTC深夜）を把握し、 Settings → Copilot → Usage
+              で使用量を定期確認しましょう。
+              <div className={styles.alertInfo} style={{ marginTop: "12px" }}>
+                <span className={styles.alertIcon}>💡</span>
+                <div className={styles.alertContent}>
+                  通常のコード補完（インライン補完）はプレミアムリクエストを消費しません（Freeプランを除く）
+                </div>
+              </div>
+            </div>
+          </details>
         </section>
 
         {/* ─── s07: security ─── */}
