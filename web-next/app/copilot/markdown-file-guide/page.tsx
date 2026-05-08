@@ -1902,9 +1902,83 @@ export default function Page() {
         <section id="s12">
           <div className={styles.slabel}>Section 12</div>
           <h2 className={styles.stitle}>
-            <span className={styles.num}>12.</span>コンテキスト合成の仕組み
+            <span className={styles.num}>12.</span>コンテキスト合成の仕組み — 全ファイルの優先順位
           </h2>
-          {/* TODO: faithful content */}
+
+          <p>
+            Copilotが1回のリクエストで複数のファイルを合成してコンテキストウィンドウに注入する仕組みを理解することが、最適な設計の前提です（[10]）。
+          </p>
+
+          <div className={styles.cb}>
+            <div className={styles.cbHdr}>
+              <span>
+                Copilotのコンテキスト合成順序（最終的なシステムプロンプトへの注入）— 2026年3月版
+              </span>
+            </div>
+            <pre>
+              <span className={styles.cCm}>
+                {"╔══════════════════════════════════════════════════════════════╗"}
+              </span>
+              {"\n"}
+              <span className={styles.cCm}>
+                {"║  Copilot システムプロンプト（最終合成物）                      ║"}
+              </span>
+              {"\n"}
+              <span className={styles.cCm}>
+                {"╠══════════════════════════════════════════════════════════════╣"}
+              </span>
+              {"\n"}
+              <span className={styles.cHd}>{"║  [1] copilot-instructions.md"}</span>
+              {"          ← 全リクエストに常時注入"}
+              {"\n"}
+              <span className={styles.cHd}>{"║  [2] AGENTS.md"}</span>
+              {"                        ← オープン標準（常時）"}
+              {"\n"}
+              <span className={styles.cHd}>{"║  [3] .instructions.md（applyToマッチ）"}</span>
+              {"  ← パス一致時のみ追加"}
+              {"\n"}
+              <span className={styles.cHd}>{"║  [4] .agent.md or .chatmode.md"}</span>
+              {"        ← アクティブな場合"}
+              {"\n"}
+              <span className={styles.cHd}>{"║  [5] SKILL.md（意味的マッチ）"}</span>
+              {"           ← オンデマンド"}
+              {"\n"}
+              <span className={styles.cHd}>{"║  [6] .prompt.md（手動実行）"}</span>
+              {"            ← /コマンドで呼出時"}
+              {"\n"}
+              <span className={styles.cHd}>{"║  [7] MCPサーバーのツール定義"}</span>
+              {"           ← 🆕 Agent Mode時に自動注入"}
+              {"\n"}
+              <span className={styles.cHd}>{"║  [8] プランモード計画（承認済み）"}</span>
+              {"       ← 🆕 Plan Mode使用時に追加"}
+              {"\n"}
+              <span className={styles.cHd}>{"║  [9] ユーザーのチャットテキスト"}</span>
+              {"\n"}
+              <span className={styles.cCm}>
+                {"╠══════════════════════════════════════════════════════════════╣"}
+              </span>
+              {"\n"}
+              <span className={styles.cCm}>
+                {"║  → 全部マージして圧縮 → モデルのコンテキストウィンドウへ        ║"}
+              </span>
+              {"\n"}
+              <span className={styles.cCm}>
+                {"╚══════════════════════════════════════════════════════════════╝"}
+              </span>
+              {"\n\n"}
+              <span className={styles.cCm}>
+                {"# 重要: 下に書かれたものほど「後に読まれ」前のものを上書きする"}
+              </span>
+              {"\n"}
+              <span className={styles.cCm}>
+                {"# Copilot Chat の References パネルでどのファイルが使われたか確認可能"}
+              </span>
+              {"\n"}
+              <span className={styles.cCm}>
+                {"# 🆕 /context コマンド（CLI）でトークン使用量を可視化できる（[20]）"}
+              </span>
+            </pre>
+          </div>
         </section>
 
         {/* ── s13: MCP-SUPPORT ── */}
