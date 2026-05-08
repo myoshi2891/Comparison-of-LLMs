@@ -615,9 +615,211 @@ export default function Page() {
           <div className={styles.slabel}>Section 04</div>
           <h2 className={styles.stitle}>
             <span className={styles.num}>04.</span>
-            <code>.instructions.md</code> — パス特化型ルール
+            <code>.instructions.md</code> — パス特化型ルール（最重要追加機能）
           </h2>
-          {/* TODO: faithful content */}
+
+          <p>
+            2025年7月にリリースされた<strong>パス特化型カスタム指示</strong>。YAMLフロントマターの
+            <code>applyTo</code>プロパティでglobパターンを指定し、
+            <strong>対象ファイルを編集するときのみ自動注入</strong>
+            されます。テスト・スタイル・インフラ・DBなど領域ごとにルールを分離でき、コンテキスト汚染を防げます（[5]）。
+          </p>
+
+          <div className={styles.fc}>
+            <div className={styles.fcHdr}>
+              <div
+                className={styles.fci}
+                style={{
+                  background: "rgba(0, 120, 212, 0.12)",
+                  border: "1px solid rgba(0, 120, 212, 0.3)",
+                }}
+              >
+                📐
+              </div>
+              <div>
+                <div className={styles.fcName}>.instructions.md</div>
+                <div className={styles.fcPath}>
+                  .github/instructions/*.instructions.md — パスマッチで自動注入
+                </div>
+                <div className={styles.fcTags}>
+                  <span className={`${styles.fct} ${styles.fctM}`}>applyTo: glob</span>
+                  <span className={`${styles.fct} ${styles.fctG}`}>July 2025 GA</span>
+                  <span className={`${styles.fct} ${styles.fctC}`}>excludeAgent対応</span>
+                </div>
+              </div>
+            </div>
+            <div className={styles.fcBody}>
+              <h3>フロントマター仕様</h3>
+              <div className={styles.cb}>
+                <div className={styles.cbHdr}>
+                  <span>フロントマター全プロパティ</span>
+                </div>
+                <pre>
+                  <span className={styles.cKy}>{"---"}</span>
+                  {"\n"}
+                  <span className={styles.cGh}>{"applyTo"}</span>
+                  {": "}
+                  <span className={styles.cSt}>{'"glob-pattern"'}</span>
+                  {"          "}
+                  <span className={styles.cCm}>{"# 必須: どのファイルに適用するか"}</span>
+                  {"\n                                     "}
+                  <span className={styles.cCm}>{"# 複数パターンはカンマ区切り"}</span>
+                  {"\n"}
+                  <span className={styles.cGh}>{"description"}</span>
+                  {": "}
+                  <span className={styles.cSt}>{'"Brief description"'}</span>
+                  {"  "}
+                  <span className={styles.cCm}>{"# 任意: 何のルールかの説明"}</span>
+                  {"\n"}
+                  <span className={styles.cGh}>{"excludeAgent"}</span>
+                  {": "}
+                  <span className={styles.cSt}>{'"code-review"'}</span>
+                  {"       "}
+                  <span className={styles.cCm}>{'# 任意: "code-review" or "coding-agent"'}</span>
+                  {"\n                                     "}
+                  <span className={styles.cCm}>{"# 指定したエージェントには非適用"}</span>
+                  {"\n"}
+                  <span className={styles.cKy}>{"---"}</span>
+                </pre>
+              </div>
+
+              <h3>4つの実践テンプレート（領域別分割パターン）</h3>
+              <div className={styles.g2}>
+                <div>
+                  <div className={styles.cb}>
+                    <div className={styles.cbHdr}>
+                      <div className={styles.dots}>
+                        <div className={styles.dot} style={{ background: "#f25c7a" }} />
+                        <div className={styles.dot} style={{ background: "#f0883e" }} />
+                        <div className={styles.dot} style={{ background: "#238636" }} />
+                      </div>
+                      <span>frontend.instructions.md</span>
+                    </div>
+                    <pre>
+                      <span className={styles.cKy}>{"---"}</span>
+                      {"\n"}
+                      <span className={styles.cGh}>{"applyTo"}</span>
+                      {": "}
+                      <span className={styles.cSt}>{'"src/**/*.tsx, src/**/*.ts"'}</span>
+                      {"\n"}
+                      <span className={styles.cGh}>{"description"}</span>
+                      {": "}
+                      <span className={styles.cSt}>{'"React/TypeScript規約"'}</span>
+                      {"\n"}
+                      <span className={styles.cKy}>{"---"}</span>
+                      {"\n\n"}
+                      <span className={styles.cHd}>{"## Frontend Standards"}</span>
+                      {
+                        "\n- コンポーネント: 関数型のみ（クラス禁止）\n- スタイル: Tailwind CSS優先。\n  CSS Modulesは動的スタイルのみ\n- インライン `style={}` 禁止\n- `any` 型の使用禁止\n- props型定義に `interface` を使用"
+                      }
+                    </pre>
+                  </div>
+                </div>
+                <div>
+                  <div className={styles.cb}>
+                    <div className={styles.cbHdr}>
+                      <div className={styles.dots}>
+                        <div className={styles.dot} style={{ background: "#f25c7a" }} />
+                        <div className={styles.dot} style={{ background: "#f0883e" }} />
+                        <div className={styles.dot} style={{ background: "#238636" }} />
+                      </div>
+                      <span>testing.instructions.md</span>
+                    </div>
+                    <pre>
+                      <span className={styles.cKy}>{"---"}</span>
+                      {"\n"}
+                      <span className={styles.cGh}>{"applyTo"}</span>
+                      {": "}
+                      <span className={styles.cSt}>{'"**/*.test.ts,**/*.spec.ts"'}</span>
+                      {"\n"}
+                      <span className={styles.cGh}>{"description"}</span>
+                      {": "}
+                      <span className={styles.cSt}>{'"テスト規約"'}</span>
+                      {"\n"}
+                      <span className={styles.cKy}>{"---"}</span>
+                      {"\n\n"}
+                      <span className={styles.cHd}>{"## Testing Standards"}</span>
+                      {
+                        "\n- RTL使用（enzyme系API禁止）\n- `data-testid` でセレクタを定義\n- 外部依存はすべてモック\n- ユーザー視点の振る舞いをテスト\n- 実装詳細をテストしない"
+                      }
+                    </pre>
+                  </div>
+                </div>
+                <div>
+                  <div className={styles.cb}>
+                    <div className={styles.cbHdr}>
+                      <div className={styles.dots}>
+                        <div className={styles.dot} style={{ background: "#f25c7a" }} />
+                        <div className={styles.dot} style={{ background: "#f0883e" }} />
+                        <div className={styles.dot} style={{ background: "#238636" }} />
+                      </div>
+                      <span>infra.instructions.md</span>
+                    </div>
+                    <pre>
+                      <span className={styles.cKy}>{"---"}</span>
+                      {"\n"}
+                      <span className={styles.cGh}>{"applyTo"}</span>
+                      {": "}
+                      <span className={styles.cSt}>{'"infra/**/*.tf"'}</span>
+                      {"\n"}
+                      <span className={styles.cGh}>{"description"}</span>
+                      {": "}
+                      <span className={styles.cSt}>{'"Terraform規約"'}</span>
+                      {"\n"}
+                      <span className={styles.cKy}>{"---"}</span>
+                      {"\n\n"}
+                      <span className={styles.cHd}>{"## Terraform Standards"}</span>
+                      {
+                        "\n- リソース命名: `{env}-{service}-{type}`\n- 全リソースに `Environment` タグ必須\n- `terraform fmt` 実行後にコミット\n- シークレットは AWS SSM / Vault参照\n- ハードコードIP禁止"
+                      }
+                    </pre>
+                  </div>
+                </div>
+                <div>
+                  <div className={styles.cb}>
+                    <div className={styles.cbHdr}>
+                      <div className={styles.dots}>
+                        <div className={styles.dot} style={{ background: "#f25c7a" }} />
+                        <div className={styles.dot} style={{ background: "#f0883e" }} />
+                        <div className={styles.dot} style={{ background: "#238636" }} />
+                      </div>
+                      <span>migrations.instructions.md</span>
+                    </div>
+                    <pre>
+                      <span className={styles.cKy}>{"---"}</span>
+                      {"\n"}
+                      <span className={styles.cGh}>{"applyTo"}</span>
+                      {": "}
+                      <span className={styles.cSt}>{'"migrations/**/*.sql"'}</span>
+                      {"\n"}
+                      <span className={styles.cGh}>{"excludeAgent"}</span>
+                      {": "}
+                      <span className={styles.cSt}>{'"coding-agent"'}</span>
+                      {"\n"}
+                      <span className={styles.cKy}>{"---"}</span>
+                      {"\n\n"}
+                      <span className={styles.cHd}>{"## Migration Standards"}</span>
+                      {
+                        "\n- ファイル名: YYYYMMDD_description.sql\n- `.up.sql` と `.down.sql` を必ず両方作成\n- `DROP TABLE` は人間確認なしに禁止\n- NULL制約後付けは移行計画を先に書く"
+                      }
+                    </pre>
+                  </div>
+                </div>
+              </div>
+
+              <div className={`${styles.ib} ${styles.ig}`}>
+                <span className={styles.ii}>💡</span>
+                <div>
+                  <strong>excludeAgent の活用法</strong>
+                  <br />
+                  <code>excludeAgent: "coding-agent"</code>を設定すると、Copilot Coding
+                  AgentにはそのルールファイルがPRとして届かず、Copilot
+                  Chatでの手作業支援にのみ適用できます。逆に<code>excludeAgent: "code-review"</code>
+                  で自動コードレビューには除外することもできます（[5]）。
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* ── s05: PROMPT-MD ── */}
