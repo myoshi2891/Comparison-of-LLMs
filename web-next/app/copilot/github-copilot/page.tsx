@@ -752,7 +752,161 @@ export default function GithubCopilotPage() {
               <p className={styles.secDesc}>最新アップデートで追加された強力な機能群</p>
             </div>
           </div>
-          {/* s05 content — faithful migration pending */}
+          <div className={styles.stepsList}>
+            <div className={styles.step}>
+              <div className={styles.stepNum}>🤖</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTitle}>
+                  エージェントモード <span className={`${styles.tag} ${styles.tagNew}`}>NEW</span>
+                </div>
+                <div className={styles.stepBody}>
+                  自律的に複数ファイルを横断して編集・テスト実行・バグ修正まで行う高度な自動化機能。
+                  「ユーザー認証モジュールを実装して」と指示するだけで、ファイル作成からテストまで一括実行します。
+                </div>
+                <ul className={styles.stepSub}>
+                  <li>複数ファイルの同時編集が可能</li>
+                  <li>テスト実行結果を見てコードを自動修正</li>
+                  <li>プレミアムリクエストを複数消費する点に注意</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNum}>📋</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTitle}>
+                  プランモード（Plan Mode）{" "}
+                  <span className={`${styles.tag} ${styles.tagNew}`}>2026</span>
+                </div>
+                <div className={styles.stepBody}>
+                  コードを書く前に実装計画を作成し、承認後に実装を進める機能。Chat UI で Plan
+                  エージェントを選択するか、/plan コマンドで起動。
+                  複雑な機能実装前に計画をレビューできるため、手戻りを大幅に削減できます。
+                </div>
+                <div className={styles.codeWrap}>
+                  <div className={styles.codeBar}>
+                    <span className={styles.codeLang}>COPILOT CHAT — Plan Mode</span>
+                    <div className={styles.codeDots}>
+                      <span />
+                      <span />
+                      <span />
+                    </div>
+                  </div>
+                  <div className={styles.codeBody}>
+                    <span className={styles.cc}>
+                      # Chat UI で Plan エージェントを選択、または /plan と入力
+                    </span>
+                    {"\n"}
+                    <span className={styles.cs}>
+                      OAuth2認証（Google・GitHubプロバイダー）を実装して
+                    </span>
+                    {"\n\n"}
+                    <span className={styles.cc}>
+                      # Copilotが以下のような計画を作成してくれます：
+                    </span>
+                    {"\n"}
+                    <span className={styles.ce}>## 実装計画: OAuth2認証</span>
+                    {"\n"}
+                    <span className={styles.cs}>-</span>
+                    {" [ ] NextAuth.jsのインストールと設定\n"}
+                    <span className={styles.cs}>-</span>
+                    {" [ ] Google OAuth設定ファイル作成\n"}
+                    <span className={styles.cs}>-</span>
+                    {" [ ] GitHubプロバイダー設定\n"}
+                    <span className={styles.cs}>-</span>
+                    {" [ ] コールバックルート実装\n"}
+                    <span className={styles.cs}>-</span>
+                    {" [ ] セッション管理の設定\n"}
+                    <span className={styles.cc}>
+                      # → 承認後に実装開始（Chat UI でプランを編集・承認可能）
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNum}>🔍</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTitle}>
+                  コードレビューエージェント{" "}
+                  <span className={`${styles.tag} ${styles.tagNew}`}>2026</span>
+                </div>
+                <div className={styles.stepBody}>
+                  Pull
+                  Requestに対して自動でコードレビューを行うエージェント。セキュリティ問題・バグ・コードスタイルの問題を自動検出して指摘します。
+                </div>
+                <ul className={styles.stepSub}>
+                  <li>GitHub PR上で直接レビューコメントを生成</li>
+                  <li>GitHub Advanced Securityとの連携でセキュリティスキャン</li>
+                  <li>コーディング規約違反の自動検出</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNum}>🔌</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTitle}>
+                  MCPサポート（Model Context Protocol）{" "}
+                  <span className={`${styles.tag} ${styles.tagNew}`}>2026</span>
+                </div>
+                <div className={styles.stepBody}>
+                  外部ツール（Asana、Jira、Figma等）とCopilotを直接連携できる新しいプロトコル。
+                  Copilot CLIのGitHub MCP serverでは、Copilot Spacesのツールも含まれています。
+                </div>
+                <div className={styles.codeWrap}>
+                  <div className={styles.codeBar}>
+                    <span className={styles.codeLang}>.vscode/mcp.json — MCP設定例</span>
+                    <div className={styles.codeDots}>
+                      <span />
+                      <span />
+                      <span />
+                    </div>
+                  </div>
+                  <div className={styles.codeBody}>
+                    {"{\n  "}
+                    <span className={styles.cs}>"servers"</span>
+                    {": {\n    "}
+                    <span className={styles.cs}>"github"</span>
+                    {": {\n      "}
+                    <span className={styles.cs}>"type"</span>
+                    {": "}
+                    <span className={styles.cs}>"http"</span>
+                    {",\n      "}
+                    <span className={styles.cs}>"url"</span>
+                    {": "}
+                    <span className={styles.cs}>"https://api.githubcopilot.com/mcp/"</span>
+                    {",\n      "}
+                    <span className={styles.cs}>"headers"</span>
+                    {": {\n        "}
+                    <span className={styles.cs}>"X-MCP-Toolsets"</span>
+                    {": "}
+                    <span className={styles.cs}>"default,copilot_spaces"</span>
+                    {"\n      }\n    }\n  }\n}"}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNum}>💾</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTitle}>
+                  Copilot Spaces（コンテキスト管理）{" "}
+                  <span className={`${styles.tag} ${styles.tagNew}`}>2026</span>
+                </div>
+                <div className={styles.stepBody}>
+                  プロジェクト固有のコンテキストを記憶・参照する機能。コードベースの知識を蓄積し、より的確な提案を生成します。
+                </div>
+                <ul className={styles.stepSub}>
+                  <li>リポジトリを横断した知識ベースの構築</li>
+                  <li>クロスエージェントメモリ：CLI・IDE・コードレビュー間で学習を共有</li>
+                  <li>Enterpriseプランではカスタムファインチューニングモデルも利用可能</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* ─── s06: tips ─── */}
