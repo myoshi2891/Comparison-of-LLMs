@@ -462,15 +462,168 @@ export default function Page() {
           </div>
         </section>
 
-        {/* SECTION 04: PROMPT — TODO: faithful migration */}
+        {/* SECTION 04: PROMPT */}
         <section id="prompt" className={styles.sec}>
           <div className={styles.secHeader}>
             <div className={styles.stepNum}>3</div>
             <div>
               <h2 className={styles.secTitle}>プロンプト設計のベストプラクティス</h2>
+              <p className={styles.secDesc}>「何をしたいか」を正確に伝える4つの要素</p>
             </div>
           </div>
-          <p style={{ color: "#94a3b8" }}>（実装予定）</p>
+
+          <div className={`${styles.callout} ${styles.calloutInfo}`}>
+            <div className={styles.calloutIcon}>ℹ️</div>
+            <div>
+              Codex は完璧なプロンプトがなくても動作しますが、
+              <strong>明確なプロンプト = より信頼性の高い結果</strong>
+              につながります。特に大規模コードベースでは効果絶大です。
+            </div>
+          </div>
+
+          <div className={styles.card} style={{ marginTop: "16px" }}>
+            <div
+              style={{
+                fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
+                fontSize: "13px",
+                color: "#00d4ff",
+                marginBottom: "16px",
+              }}
+            >
+              ✦ 良いプロンプトの4要素（公式ガイドより）
+            </div>
+            <div className={styles.cardGrid}>
+              <div className={styles.guideCard}>
+                <div className={styles.guideIcon}>🎯</div>
+                <div className={styles.guideTitle} style={{ color: "#00d4ff" }}>
+                  1. コンテキスト (Context)
+                </div>
+                <div className={styles.guideBody}>
+                  関連するファイル・フォルダ・ドキュメント・エラー情報を伝える。
+                  <code className={styles.guideCode}>@filename</code>
+                  でファイルをメンション可能。
+                </div>
+              </div>
+              <div className={styles.guideCard}>
+                <div className={styles.guideIcon}>📋</div>
+                <div className={styles.guideTitle} style={{ color: "#7c3aed" }}>
+                  2. タスク (Task)
+                </div>
+                <div className={styles.guideBody}>
+                  何を実装・修正・説明してほしいかを具体的に書く。「なんとなく直して」より「〇〇という理由でXXを修正して」が効果的。
+                </div>
+              </div>
+              <div className={styles.guideCard}>
+                <div className={styles.guideIcon}>✅</div>
+                <div className={styles.guideTitle} style={{ color: "#10b981" }}>
+                  3. 完了条件 (Done criteria)
+                </div>
+                <div className={styles.guideBody}>
+                  「何をもって成功とするか」を定義する。テストが通るか、特定の出力が得られるかなど。
+                </div>
+              </div>
+              <div className={styles.guideCard}>
+                <div className={styles.guideIcon}>🚧</div>
+                <div className={styles.guideTitle} style={{ color: "#f59e0b" }}>
+                  4. 制約 (Constraints)
+                </div>
+                <div className={styles.guideBody}>
+                  やってほしくないこと・守るべきルールを明示。「既存のAPIを変更しない」「依存関係を増やさない」など。
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.card}>
+            <div
+              style={{
+                fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
+                fontSize: "13px",
+                color: "#00d4ff",
+                marginBottom: "12px",
+              }}
+            >
+              ✦ 悪い例 vs 良い例
+            </div>
+            <div className={styles.tableWrap}>
+              <table>
+                <tbody>
+                  <tr>
+                    <th>❌ 悪い例</th>
+                    <th>✅ 良い例</th>
+                  </tr>
+                  <tr>
+                    <td style={{ color: "#ef4444" }}>「バグを直して」</td>
+                    <td>
+                      「
+                      <code style={{ fontFamily: "var(--font-mono,'JetBrains Mono',monospace)" }}>
+                        @src/auth.ts
+                      </code>
+                      の JWT
+                      検証で、トークン期限切れ時に500エラーが返る問題を修正して。401を返すようにすること。既存のミドルウェア構造は変えないで。」
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ color: "#ef4444" }}>「テスト書いて」</td>
+                    <td>
+                      「
+                      <code style={{ fontFamily: "var(--font-mono,'JetBrains Mono',monospace)" }}>
+                        @src/utils/parser.ts
+                      </code>
+                      のすべての公開関数にJestのユニットテストを追加して。境界値とエラーケースをカバーすること。既存のテストパターン
+                      (
+                      <code style={{ fontFamily: "var(--font-mono,'JetBrains Mono',monospace)" }}>
+                        @tests/
+                      </code>
+                      ) に合わせて。」
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ color: "#ef4444" }}>「レスポンシブにして」</td>
+                    <td>
+                      「
+                      <code style={{ fontFamily: "var(--font-mono,'JetBrains Mono',monospace)" }}>
+                        @components/Dashboard.tsx
+                      </code>
+                      をモバイル対応に。ブレークポイントは 768px。Tailwind
+                      のみ使用。既存のデザインシステムのクラス名を変えないこと。」
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className={styles.codeWrap}>
+            <div className={styles.codeHeader}>
+              <div className={styles.codeDots}>
+                <div className={`${styles.codeDot} ${styles.codeDotR}`} />
+                <div className={`${styles.codeDot} ${styles.codeDotY}`} />
+                <div className={`${styles.codeDot} ${styles.codeDotG}`} />
+              </div>
+              <div className={styles.codeLang}>実践例：プロンプトテンプレート</div>
+            </div>
+            <pre className={styles.codeBody}>
+              <span className={styles.cm}># コンテキスト</span>
+              {"\n"}
+              <span className={styles.str}>@src/api/users.ts</span> と{" "}
+              <span className={styles.str}>@src/types/user.ts</span> を参照してください。{"\n"}
+              {"Node.js + Express + TypeScript プロジェクトです。\n\n"}
+              <span className={styles.cm}># タスク</span>
+              {"\n"}
+              {
+                "ユーザー作成エンドポイント (POST /api/users) に\nメールアドレスの重複チェックを追加してください。\n\n"
+              }
+              <span className={styles.cm}># 完了条件</span>
+              {"\n"}
+              {"- 重複時は 409 Conflict を返す\n- "}
+              <span className={styles.fn}>npm test</span>
+              {" が通ること\n\n"}
+              <span className={styles.cm}># 制約</span>
+              {"\n"}
+              {"- データベーススキーマは変更しない\n- 新しい依存パッケージを追加しない"}
+            </pre>
+          </div>
         </section>
 
         {/* SECTION 05: AGENTS-MD — TODO: faithful migration */}

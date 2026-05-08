@@ -623,6 +623,38 @@
   line-height: 1.6;
 }
 
+/* ── Guide cards (prompt design) ────────────────────────── */
+.guideCard {
+  padding: 16px;
+  background: var(--cx-bg3);
+  border-radius: 10px;
+  border: 1px solid rgba(0, 212, 255, 0.1);
+}
+
+.guideIcon {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.guideTitle {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.guideBody {
+  font-size: 13px;
+  color: var(--cx-text2);
+}
+
+.guideCode {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
 /* ── Do/Don't grid ───────────────────────────────────────── */
 .doGrid {
   display: grid;
