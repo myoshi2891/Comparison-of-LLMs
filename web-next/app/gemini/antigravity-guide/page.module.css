@@ -555,6 +555,152 @@
   border-radius: 4px;
 }
 
+/* ── Tabs ──────────────────────────────────────────────── */
+.tabsWrap {
+  margin: 1.5rem 0;
+}
+
+.tabList {
+  display: flex;
+  gap: 4px;
+  background: var(--bg3, #131b2e);
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 18px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabList::-webkit-scrollbar {
+  display: none;
+}
+
+.tabBtn {
+  flex: 1;
+  min-width: fit-content;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text3, #5a7090);
+  font-family: var(--font-sans, "Noto Sans JP", sans-serif);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.tabBtnActive {
+  background: var(--bg, #060911);
+  color: var(--g-blue, #4285f4);
+  border: 1px solid var(--border2, #2a3d5e);
+}
+
+.tabPanel {
+  display: none;
+}
+
+.tabPanelActive {
+  display: block;
+}
+
+/* ── Info boxes ─────────────────────────────────────────── */
+.info {
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  display: flex;
+  gap: 0.8rem;
+  font-size: 0.875rem;
+  color: var(--text2, #9aafcc);
+}
+
+.infoIcon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.iNote {
+  background: rgba(66, 133, 244, 0.07);
+  border: 1px solid rgba(66, 133, 244, 0.25);
+}
+
+.iWarn {
+  background: rgba(251, 188, 4, 0.07);
+  border: 1px solid rgba(251, 188, 4, 0.25);
+}
+
+.iCrit {
+  background: rgba(234, 67, 53, 0.07);
+  border: 1px solid rgba(234, 67, 53, 0.25);
+}
+
+.iTip {
+  background: rgba(52, 168, 83, 0.07);
+  border: 1px solid rgba(52, 168, 83, 0.25);
+}
+
+/* ── Code block (dot-header style) ─────────────────────── */
+.cbHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 1rem;
+  background: var(--bg3, #131b2e);
+  border-bottom: 1px solid var(--border, #1e2d4a);
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.66rem;
+  color: var(--text3, #5a7090);
+}
+
+.cbDots {
+  display: flex;
+  gap: 4px;
+}
+
+.cbd {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+/* ── Legacy code highlight colors ───────────────────────── */
+.legHd {
+  color: var(--g-blue, #4285f4);
+  font-weight: 600;
+}
+
+.legStr {
+  color: var(--g-green, #34a853);
+}
+
+.legHl {
+  color: var(--g-yellow, #fbbc04);
+}
+
+.legHl2 {
+  color: var(--g-red, #ea4335);
+}
+
+.legCmt {
+  color: #4a6080;
+  font-style: italic;
+}
+
+.legKw {
+  color: var(--g-purple, #8b5cf6);
+}
+
+.legOk {
+  color: var(--g-green, #34a853);
+}
+
+.legNg {
+  color: var(--g-red, #ea4335);
+}
+
 /* ── Flow diagram ─────────────────────────────────────── */
 .flow {
   display: flex;

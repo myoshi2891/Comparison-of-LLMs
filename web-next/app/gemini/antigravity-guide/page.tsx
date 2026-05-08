@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import GeminiMdTabs from "./GeminiMdTabs";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -677,13 +678,31 @@ export default function Page() {
           </div>
         </section>
 
-        {/* SECTION 03: GEMINI.md — TODO: faithful migration */}
+        {/* SECTION 03: GEMINI.md */}
         <section id="gemini-md" className={styles.sec}>
           <div className={styles.secLabel}>Section 03</div>
           <h2 className={styles.secTitle}>
             <span className={styles.num}>03.</span>GEMINI.md — グローバル永続メモリ
           </h2>
-          <p>（実装予定）</p>
+
+          <p>
+            Claude Codeの<code>CLAUDE.md</code>に相当する
+            <strong>グローバル永続メモリファイル</strong>。<code>~/.gemini/GEMINI.md</code>
+            に配置し、全プロジェクト・全エージェントセッションに横断的に注入されます。
+            プロジェクト固有のルールは後述の<code>.agent/rules/</code>に分離します。
+          </p>
+
+          <GeminiMdTabs />
+
+          <div className={`${styles.info} ${styles.iWarn}`}>
+            <span className={styles.infoIcon}>⚠️</span>
+            <div>
+              <strong>アンチパターン:</strong>
+              GEMINI.mdにプロジェクト固有のDB設定やAPIエンドポイントを書かない。
+              グローバルファイルはプロジェクト固有情報を持つべきではありません。プロジェクト情報は
+              <code>.agent/rules/</code>または<code>.context/</code>へ。
+            </div>
+          </div>
         </section>
 
         {/* SECTION 04: SKILLS — TODO: faithful migration */}
