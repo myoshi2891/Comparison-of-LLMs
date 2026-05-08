@@ -2310,12 +2310,370 @@ export default function Page() {
 
         {/* ── s14: PLAN-MODE ── */}
         <section id="s14">
-          <div className={styles.slabel}>Section 14</div>
+          <div className={styles.slabel}>Section 14 🆕 NEW 2026</div>
           <h2 className={styles.stitle}>
-            <span className={styles.num}>14.</span>🆕 プランモード &amp;
-            エージェントフック（2026年新機能）
+            <span className={styles.num}>14.</span>プランモード &amp; エージェントフック —
+            2026年の新機能
           </h2>
-          {/* TODO: faithful content */}
+
+          <p>
+            2026年初頭に追加されたプランモードと、JetBrainsで先行してPublic
+            Previewとなったエージェントフックは、
+            <strong>AIエージェントを「計画してから実行」へシフトさせる革新的な機能</strong>
+            です。複雑なタスクを実装前に対話的に計画・承認できるため、手戻りを大幅に削減します（[20],
+            [21]）。さらに2026年3月のVS Code 1.112では<strong>MCPサーバーのサンドボックス化</strong>
+            （macOS/Linux）とエージェント自律性の拡張が追加されています（[22]）。
+          </p>
+
+          <div className={styles.fc}>
+            <div className={styles.fcHdr}>
+              <div
+                className={styles.fci}
+                style={{
+                  background: "rgba(240, 136, 62, 0.12)",
+                  border: "1px solid rgba(240, 136, 62, 0.3)",
+                }}
+              >
+                🗺️
+              </div>
+              <div>
+                <div className={styles.fcName}>プランモード（Plan Mode）</div>
+                <div className={styles.fcPath}>
+                  Shift + Tab でトグル切替 — CLI / JetBrains GA / VS Code近日GA
+                </div>
+                <div className={styles.fcTags}>
+                  <span className={`${styles.fct} ${styles.fctC}`}>CLI: GA（Jan 2026）</span>
+                  <span className={`${styles.fct} ${styles.fctM}`}>JetBrains: GA（Mar 2026）</span>
+                  <span className={`${styles.fct} ${styles.fctV}`}>VS Code: GA予定</span>
+                </div>
+              </div>
+            </div>
+            <div className={styles.fcBody}>
+              <h3>プランモードとは — 「計画してから実装」</h3>
+              <p>
+                通常のAgent Modeでは指示を受けた瞬間に実装を開始しますが、プランモードでは
+                <strong>まず実装計画を作成し、開発者が承認してから実装を開始</strong>
+                します。Copilot CLIでは<code>Shift+Tab</code>でモード切替できます（[20]）。
+              </p>
+
+              <div className={styles.flowWrap}>
+                <div className={styles.flowLbl}>
+                  ▸ プランモード — 会話型計画フロー（Copilot CLI）
+                </div>
+                <div className={styles.flow}>
+                  <div className={styles.fst}>
+                    <div className={`${styles.fbox} ${styles.fC}`}>
+                      Shift+Tab
+                      <br />
+                      プランモード起動
+                    </div>
+                    <div className={styles.ffile}>
+                      モードインジケータが
+                      <br />
+                      切り替わる
+                    </div>
+                  </div>
+                  <div className={styles.farr}>→</div>
+                  <div className={styles.fst}>
+                    <div className={`${styles.fbox} ${styles.fM}`}>
+                      Copilotが
+                      <br />
+                      要件を質問
+                    </div>
+                    <div className={styles.ffile}>
+                      ask_user ツールで
+                      <br />
+                      スコープ・制約を確認
+                    </div>
+                  </div>
+                  <div className={styles.farr}>→</div>
+                  <div className={styles.fst}>
+                    <div className={`${styles.fbox} ${styles.fG}`}>
+                      実装計画を
+                      <br />
+                      パネルに表示
+                    </div>
+                    <div className={styles.ffile}>
+                      ファイル変更一覧
+                      <br />
+                      実装ステップ
+                    </div>
+                  </div>
+                  <div className={styles.farr}>→</div>
+                  <div className={styles.fst}>
+                    <div className={`${styles.fbox} ${styles.fV}`}>
+                      人間が計画を
+                      <br />
+                      レビュー・修正
+                    </div>
+                    <div className={styles.ffile}>
+                      Ctrl+Y で編集
+                      <br />
+                      コメントで調整
+                    </div>
+                  </div>
+                  <div className={styles.farr}>→</div>
+                  <div className={styles.fst}>
+                    <div className={`${styles.fbox} ${styles.fT}`}>
+                      承認後に
+                      <br />
+                      実装開始
+                    </div>
+                    <div className={styles.ffile}>
+                      Agent Modeで
+                      <br />
+                      自律実行
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <h3>Spec KitとプランモードのSDD統合ワークフロー（2026年推奨）</h3>
+              <div className={styles.cb}>
+                <div className={styles.cbHdr}>
+                  <div className={styles.dots}>
+                    <div className={styles.dot} style={{ background: "#f25c7a" }} />
+                    <div className={styles.dot} style={{ background: "#f0883e" }} />
+                    <div className={styles.dot} style={{ background: "#238636" }} />
+                  </div>
+                  <span>Copilot CLI — プランモード × SDD 実践パターン</span>
+                </div>
+                <pre>
+                  <span className={styles.cCm}>{"# ── ステップ 1: プランモードに切り替え ──"}</span>
+                  {"\n"}
+                  <span className={styles.cCm}>{"# Shift + Tab でプランモードをオン"}</span>
+                  {"\n"}
+                  <span className={styles.cHd}>{"プランモード"}</span>
+                  {": 有効\n\n"}
+                  <span className={styles.cCm}>{"# ── ステップ 2: 高レベルな要求を入力 ──"}</span>
+                  {"\n"}
+                  <span className={styles.cSt}>
+                    {
+                      "features/preorder/spec.mdとplan.mdに従ってプリオーダーAPIを実装して。\nconstitution.mdのアーキテクチャ原則（gRPCのみ・ORM禁止）に従うこと。"
+                    }
+                  </span>
+                  {"\n\n"}
+                  <span className={styles.cCm}>
+                    {"# ── ステップ 3: Copilotが質問してくる（ask_userツール） ──"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.cGh}>{"Copilot:"}</span>
+                  {
+                    " 実装の優先順位を確認させてください：\n  1. 在庫ロック（Redis SETNX）を先に実装しますか？\n  2. それとも gRPCエンドポイントから始めますか？\n  3. spec.mdのAC（同時100接続）に対応したレート制限は含めますか？\n\n"
+                  }
+                  <span className={styles.cCm}>
+                    {"# ── ステップ 4: 実装計画がパネルに表示される ──"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.cHd}>{"実装計画:"}</span>
+                  {
+                    "\n  Phase 1: internal/inventory/lock.go — Redisロックロジック\n  Phase 2: proto/preorder/v1/preorder.proto — gRPC定義\n  Phase 3: internal/preorder/service.go — ビジネスロジック\n  Phase 4: internal/preorder/service_test.go — table-drivenテスト\n  変更ファイル: 7 | 新規ファイル: 3 | 削除: 0\n\n"
+                  }
+                  <span className={styles.cCm}>
+                    {"# ── ステップ 5: レビュー後に承認 → 実装開始 ──"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.cSt}>
+                    {"承認。Phase 1から始めて。テストを先に書くこと（TDD）。"}
+                  </span>
+                </pre>
+              </div>
+
+              <div className={`${styles.ib} ${styles.ig}`}>
+                <span className={styles.ii}>📊</span>
+                <div>
+                  <strong>
+                    プランモードのパフォーマンスデータ（Visual Studio向け内部テスト）：
+                  </strong>
+                  <br />
+                  Microsoftの内部ベンチマーク（SWE-bench）では、プランニング機能を使用した場合、GPT-5とClaude
+                  Sonnet 4が<strong>成功率約15%向上</strong>、<strong>タスク完了数約20%増加</strong>
+                  という結果が報告されています（[22]）。複雑なマルチファイルタスクほど効果が顕著です。
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.fc} style={{ marginTop: "2rem" }}>
+            <div className={styles.fcHdr}>
+              <div
+                className={styles.fci}
+                style={{
+                  background: "rgba(155, 109, 255, 0.12)",
+                  border: "1px solid rgba(155, 109, 255, 0.3)",
+                }}
+              >
+                🪝
+              </div>
+              <div>
+                <div className={styles.fcName}>エージェントフック（Agent Hooks）</div>
+                <div className={styles.fcPath}>
+                  .github/agent-hooks/ — JetBrains Public Preview（Mar 2026）
+                </div>
+                <div className={styles.fcTags}>
+                  <span className={`${styles.fct} ${styles.fctV}`}>JetBrains: Preview</span>
+                  <span className={`${styles.fct} ${styles.fctC}`}>VS Code: 近日対応予定</span>
+                  <span className={`${styles.fct} ${styles.fctM}`}>
+                    Lint / セキュリティ / CI自動化
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className={styles.fcBody}>
+              <p>
+                エージェントフックは
+                <strong>エージェントセッションの主要タイミングでカスタムコマンドを自動実行</strong>
+                する機能です。実装前のLint、コミット前のセキュリティスキャン、PR作成前のテスト実行など、チームのポリシーをエージェントワークフローに自動組み込みできます（[21]）。
+              </p>
+
+              <div className={styles.g3}>
+                <div className={styles.mc}>
+                  <div className={styles.mcTag} style={{ color: "var(--violet)" }}>
+                    pre_tool_call フック
+                  </div>
+                  <p>
+                    ツール呼び出し前に実行。ファイル変更前のバリデーション、特定ファイルへの書き込み禁止チェック、コーディング規約の事前確認に使用。
+                  </p>
+                </div>
+                <div className={styles.mc}>
+                  <div className={styles.mcTag} style={{ color: "var(--violet)" }}>
+                    post_tool_call フック
+                  </div>
+                  <p>
+                    ツール呼び出し後に実行。変更ファイルに対する自動Lint・フォーマット適用、テスト実行トリガー、変更ログ自動更新に使用。
+                  </p>
+                </div>
+                <div className={styles.mc}>
+                  <div className={styles.mcTag} style={{ color: "var(--violet)" }}>
+                    session_end フック
+                  </div>
+                  <p>
+                    エージェントセッション終了時に実行。セキュリティスキャン（SAST）の実行、テストカバレッジ確認、PR作成前の最終検証チェックリストに使用。
+                  </p>
+                </div>
+              </div>
+
+              <div className={styles.cb}>
+                <div className={styles.cbHdr}>
+                  <div className={styles.dots}>
+                    <div className={styles.dot} style={{ background: "#f25c7a" }} />
+                    <div className={styles.dot} style={{ background: "#f0883e" }} />
+                    <div className={styles.dot} style={{ background: "#238636" }} />
+                  </div>
+                  <span>エージェントフック設定例（JetBrains / VS Code Preview）</span>
+                </div>
+                <pre>
+                  <span className={styles.cCm}>{"# .github/agent-hooks/post-edit.yaml"}</span>
+                  {"\n"}
+                  <span className={styles.cGh}>{"name"}</span>
+                  {": "}
+                  <span className={styles.cSt}>{'"Post-Edit Quality Gate"'}</span>
+                  {"\n"}
+                  <span className={styles.cGh}>{"trigger"}</span>
+                  {": "}
+                  <span className={styles.cSt}>{"post_tool_call"}</span>
+                  {"\n"}
+                  <span className={styles.cGh}>{"conditions"}</span>
+                  {":\n  - "}
+                  <span className={styles.cHd}>{"tool"}</span>
+                  {": "}
+                  <span className={styles.cSt}>{"edit/editFiles"}</span>
+                  {"\n    "}
+                  <span className={styles.cHd}>{"file_pattern"}</span>
+                  {": "}
+                  <span className={styles.cSt}>{'"**/*.go"'}</span>
+                  {"\n\n"}
+                  <span className={styles.cGh}>{"steps"}</span>
+                  {":\n  - "}
+                  <span className={styles.cHd}>{"name"}</span>
+                  {": "}
+                  <span className={styles.cSt}>{'"Lint"'}</span>
+                  {"\n    "}
+                  <span className={styles.cHd}>{"run"}</span>
+                  {": "}
+                  <span className={styles.cSt}>
+                    {'"golangci-lint run $'}
+                    {'{changed_files}"'}
+                  </span>
+                  {"\n  - "}
+                  <span className={styles.cHd}>{"name"}</span>
+                  {": "}
+                  <span className={styles.cSt}>{'"Test"'}</span>
+                  {"\n    "}
+                  <span className={styles.cHd}>{"run"}</span>
+                  {": "}
+                  <span className={styles.cSt}>{'"go test ./... -run TestUnit"'}</span>
+                  {"\n    "}
+                  <span className={styles.cHd}>{"on_failure"}</span>
+                  {": "}
+                  <span className={styles.cSt}>{'"pause_agent"'}</span>
+                  {"  "}
+                  <span className={styles.cCm}>{"# 失敗時はエージェントを一時停止"}</span>
+                  {"\n\n"}
+                  <span className={styles.cCm}>
+                    {"# → テストが失敗するとエージェントが停止してエラーを報告"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.cCm}>{"# → 人間が確認後に「続けて」と指示できる"}</span>
+                </pre>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.fc} style={{ marginTop: "2rem" }}>
+            <div className={styles.fcHdr}>
+              <div
+                className={styles.fci}
+                style={{
+                  background: "rgba(35, 134, 54, 0.12)",
+                  border: "1px solid rgba(35, 134, 54, 0.3)",
+                }}
+              >
+                🧠
+              </div>
+              <div>
+                <div className={styles.fcName}>エージェントメモリ（Agentic Memory）</div>
+                <div className={styles.fcPath}>
+                  自動学習 — Copilot Coding Agent / Code Review が利用（2026年）
+                </div>
+                <div className={styles.fcTags}>
+                  <span className={`${styles.fct} ${styles.fctG}`}>Coding Agent対応</span>
+                  <span className={`${styles.fct} ${styles.fctM}`}>Code Review対応</span>
+                  <span className={`${styles.fct} ${styles.fctV}`}>リポジトリ固有の知識蓄積</span>
+                </div>
+              </div>
+            </div>
+            <div className={styles.fcBody}>
+              <p>
+                GitHub Copilotが<strong>リポジトリに関する有用な情報を自動推論・記憶</strong>
+                し、Copilot Coding AgentとCopilot Code
+                Reviewがその知識を利用して品質を向上させる新機能です。Copilot
+                Spacesと連携することで、よりプロジェクト固有の知識に基づいた提案が得られます（[23]）。
+              </p>
+
+              <div className={styles.g2}>
+                <div className={`${styles.ib} ${styles.ig}`}>
+                  <span className={styles.ii}>🧠</span>
+                  <div>
+                    <strong>エージェントメモリが記憶する情報例：</strong>
+                    <br />• コードベースのパターン（よく使われる関数・ユーティリティ）
+                    <br />• アーキテクチャ上の決定と理由
+                    <br />• バグの傾向（この部分は過去にXのバグが多い）
+                    <br />• テストパターン（このサービスのテスト手法の特徴）
+                  </div>
+                </div>
+                <div className={`${styles.ib} ${styles.im}`}>
+                  <span className={styles.ii}>🏗️</span>
+                  <div>
+                    <strong>Copilot Spacesとの連携：</strong>
+                    <br />
+                    コード・仕様書・ドキュメント・spec.mdなどを「Space」にまとめることで、Copilotの回答がプロジェクト固有のコンテキストに基づくものになります。Coding
+                    AgentとCode Reviewの両方で活用されます（[23]）。
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* ── s15: BEST-PRACTICES ── */}
