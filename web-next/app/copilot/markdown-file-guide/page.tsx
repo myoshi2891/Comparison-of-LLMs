@@ -2793,7 +2793,6 @@ export default function Page() {
             <div className={styles.srcTtl}>
               📚 参考ソース一覧（公式・二次情報を含む）— 2026年3月更新版（追加: [18]〜[23]）
             </div>
-            {/* TODO: faithful content */}
             <div className={styles.src}>
               <span className={styles.sn}>[1]</span>
               <div>
@@ -2801,6 +2800,307 @@ export default function Page() {
                   Diving Into Spec-Driven Development With GitHub Spec Kit — Microsoft for
                   Developers (Sep 2025)
                 </Ext>
+                <span className={styles.sd}>
+                  Spec
+                  Kit公式解説。constitution.md・.specify/・.github/prompts/のSDD構造。specify→plan→tasks→implementフロー
+                </span>
+              </div>
+            </div>
+            <div className={styles.src}>
+              <span className={styles.sn}>[2]</span>
+              <div>
+                <Ext href="https://docs.github.com/copilot/how-tos/agents/copilot-coding-agent/best-practices-for-using-copilot-to-work-on-tasks">
+                  Best practices for using GitHub Copilot to work on tasks — GitHub Docs (公式)
+                </Ext>
+                <span className={styles.sd}>
+                  copilot-instructions.mdのCoding
+                  Agent専用ベストプラクティス。Issue記述のAIプロンプト化・テストコマンドの必要性
+                </span>
+              </div>
+            </div>
+            <div className={styles.src}>
+              <span className={styles.sn}>[3]</span>
+              <div>
+                <Ext href="https://smartscope.blog/en/generative-ai/github-copilot/github-copilot-custom-instructions-guide/">
+                  GitHub Copilot Custom Instructions Complete Guide [Feb 2026] — SmartScope
+                </Ext>
+                <span className={styles.sd}>
+                  全カスタマイズファイルの最新全体像。AGENTS.md統合・.instructions.md(Jul
+                  2025)・.agent.md・SKILL.md(Dec 2025)の経緯
+                </span>
+              </div>
+            </div>
+            <div className={styles.src}>
+              <span className={styles.sn}>[4]</span>
+              <div>
+                <Ext href="https://docs.github.com/copilot/customizing-copilot/adding-custom-instructions-for-github-copilot">
+                  Adding repository custom instructions for GitHub Copilot — GitHub Docs (公式)
+                </Ext>
+                <span className={styles.sd}>
+                  copilot-instructions.md・.instructions.mdの公式仕様。applyToのglob構文・excludeAgent・短文自己完結の原則
+                </span>
+              </div>
+            </div>
+            <div className={styles.src}>
+              <span className={styles.sn}>[5]</span>
+              <div>
+                <Ext href="https://copilotthatjawn.com/tips/copilot-instructions-prompt-files.md">
+                  Master GitHub Copilot Customization with Instructions and Prompt Files — Copilot
+                  That Jawn (Jul 2025)
+                </Ext>
+                <span className={styles.sd}>
+                  .instructions.mdのフロントマター全プロパティ。applyTo
+                  glob構文の詳細。テスト・スタイル・DB分割パターン
+                </span>
+              </div>
+            </div>
+            <div className={styles.src}>
+              <span className={styles.sn}>[6]</span>
+              <div>
+                <Ext href="https://medium.com/@vamshi.rapolu/spec-driven-development-with-github-spec-kit-copilot-in-vs-code-new-existing-projects-2531d10bd61d">
+                  Spec-Driven Development with GitHub Spec Kit + Copilot in VS Code — Medium (Nov
+                  2025)
+                </Ext>
+                <span className={styles.sd}>
+                  Spec
+                  Kitの実践ガイド。.specify/フォルダ構造・specify.prompt.md/plan.prompt.md/tasks.prompt.mdの動作
+                </span>
+              </div>
+            </div>
+            <div className={styles.src}>
+              <span className={styles.sn}>[7]</span>
+              <div>
+                <Ext href="https://medium.com/@frank.laule/mastering-github-copilot-customization-with-copilot-instructions-83e8cc1ca10a">
+                  Mastering GitHub Copilot customization with Copilot-instructions — Medium (Aug
+                  2025)
+                </Ext>
+                <span className={styles.sd}>
+                  .chatmode.mdの設計思想と実装例。API Architectモードのfrontmatter仕様
+                </span>
+              </div>
+            </div>
+            <div className={styles.src}>
+              <span className={styles.sn}>[8]</span>
+              <div>
+                <Ext href="https://onlyutkarsh.com/posts/2026/github-copilot-customization/">
+                  Mastering GitHub Copilot Customisation: Instructions, Prompts, Agents, and Skills
+                  — Utkarsh Shigihalli (Jan 2026)
+                </Ext>
+                <span className={styles.sd}>
+                  .agent.mdハンドオフ・.chatmode.md vs
+                  .agent.mdの使い分け・.prompt.mdのモデル指定・スキルのシステムプロンプト配置
+                </span>
+              </div>
+            </div>
+            <div className={styles.src}>
+              <span className={styles.sn}>[9]</span>
+              <div>
+                <Ext href="https://www.nathannellans.com/post/all-about-github-copilot-custom-instructions">
+                  All About GitHub Copilot Custom Instructions — Nathan Nellans (Nov 2025)
+                </Ext>
+                <span className={styles.sd}>
+                  SKILL.mdの4スコープ（system/user/repository/admin）。AGENTS.md/CLAUDE.md/GEMINI.md対応の全詳細。.claude/skills/パス
+                </span>
+              </div>
+            </div>
+            <div className={styles.src}>
+              <span className={styles.sn}>[10]</span>
+              <div>
+                <Ext href="https://blog.nashtechglobal.com/github-copilot-instructions-prompts/">
+                  GitHub Copilot: Instructions, Prompts &amp; Practical Workflow — NashTech Blog
+                  (Dec 2025)
+                </Ext>
+                <span className={styles.sd}>
+                  コンテキスト合成順序の詳細。copilot-instructions.md→.instructions.md→.prompt.md→チャットテキストのマージメカニズム
+                </span>
+              </div>
+            </div>
+            <div className={styles.src}>
+              <span className={styles.sn}>[11]</span>
+              <div>
+                <Ext href="https://github.com/github/awesome-copilot">
+                  github/awesome-copilot — GitHub（コミュニティリポジトリ）
+                </Ext>
+                <span className={styles.sd}>
+                  prompts/・instructions/・agents/・skills/の4カテゴリー。Specification-Driven
+                  Workflow v1を含む実践テンプレート集
+                </span>
+              </div>
+            </div>
+            <div className={styles.src}>
+              <span className={styles.sn}>[12]</span>
+              <div>
+                <Ext href="https://visualstudiomagazine.com/articles/2025/05/12/vs-code-1-10-showcases-detailed-markdown-copilot-prompting.aspx">
+                  VS Code 1.10 Showcases New Markdown Copilot Prompting — Visual Studio Magazine
+                  (May 2025)
+                </Ext>
+                <span className={styles.sd}>
+                  VS Code 1.10での.instructions.md正式サポート経緯。applyTo
+                  frontmatterの公式化。Ask/Edit/Agentモードの比較
+                </span>
+              </div>
+            </div>
+            <div className={styles.src}>
+              <span className={styles.sn}>[13]</span>
+              <div>
+                <Ext href="https://github.com/SebastienDegodez/copilot-instructions">
+                  SebastienDegodez/copilot-instructions — GitHub（DDD/.NETベストプラクティス集）
+                </Ext>
+                <span className={styles.sd}>
+                  meta-instructions.instructions.md・Collections（YAML）・APM（Agent Package
+                  Manager）によるスキル管理パターン
+                </span>
+              </div>
+            </div>
+            <div className={styles.src}>
+              <span className={styles.sn}>[14]</span>
+              <div>
+                <Ext href="https://docs.github.com/en/copilot/get-started/best-practices">
+                  Best practices for using GitHub Copilot — GitHub Docs（公式）
+                </Ext>
+                <span className={styles.sd}>
+                  Copilot全体のベストプラクティス。タスク粒度・プロンプトエンジニアリング・セキュリティ検証・自動テスト統合
+                </span>
+              </div>
+            </div>
+            <div className={styles.src}>
+              <span className={styles.sn}>[15]</span>
+              <div>
+                <Ext href="https://github.blog/changelog/2025-12-18-github-copilot-now-supports-agent-skills/">
+                  GitHub Copilot now supports Agent Skills — GitHub Changelog (Dec 2025)
+                </Ext>
+                <span className={styles.sd}>
+                  Agent Skills 正式サポート。.github/skills/・~/.copilot/skills/
+                  パス。.claude/skills/ 自動ピックアップ。Copilot CLI・Coding Agent・VS Code Agent
+                  Mode での動作
+                </span>
+              </div>
+            </div>
+            <div className={styles.src}>
+              <span className={styles.sn}>[16]</span>
+              <div>
+                <Ext href="https://github.blog/changelog/2025-08-28-copilot-coding-agent-now-supports-agents-md-custom-instructions/">
+                  Copilot coding agent now supports AGENTS.md custom instructions — GitHub Changelog
+                  (Aug 2025)
+                </Ext>
+                <span className={styles.sd}>
+                  AGENTS.md・CLAUDE.md・GEMINI.md の Copilot Coding Agent
+                  ネイティブ自動読み込みを公式確認。追加設定不要
+                </span>
+              </div>
+            </div>
+            <div className={styles.src}>
+              <span className={styles.sn}>[17]</span>
+              <div>
+                <Ext href="https://github.blog/changelog/2026-02-25-github-copilot-cli-is-now-generally-available/">
+                  GitHub Copilot CLI is now generally available — GitHub Changelog (Feb 2026)
+                </Ext>
+                <span className={styles.sd}>
+                  Copilot CLI GA。Autopilot モード・バックグラウンド委任（&
+                  プレフィックス）・モデル選択・クロスセッションメモリ・カスタムエージェント/スキル対応
+                </span>
+              </div>
+            </div>
+
+            <div
+              className={styles.src}
+              style={{
+                borderTop: "1px solid rgba(0, 120, 212, 0.3)",
+                marginTop: "0.8rem",
+                paddingTop: "0.8rem",
+              }}
+            >
+              <span className={styles.sn} style={{ color: "var(--ms)" }}>
+                [追加]
+              </span>
+              <div
+                style={{
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: "0.64rem",
+                  color: "var(--ms)",
+                  marginBottom: "0.3rem",
+                }}
+              >
+                ── 2026年3月追加ソース（MCP・プランモード・エージェント新機能）──
+              </div>
+            </div>
+
+            <div className={styles.src}>
+              <span className={styles.sn}>[18]</span>
+              <div>
+                <Ext href="https://docs.github.com/en/copilot/how-tos/provide-context/use-mcp/set-up-the-github-mcp-server">
+                  Setting up the GitHub MCP Server — GitHub Docs（公式）
+                </Ext>
+                <span className={styles.sd}>
+                  GitHub MCP ServerのVS Code・JetBrains・Visual
+                  Studioへのセットアップ手順。リモート/ローカル構成の違い。Business/EnterpriseのOrg管理者ポリシー設定。MCP
+                  Registry利用方法
+                </span>
+              </div>
+            </div>
+            <div className={styles.src}>
+              <span className={styles.sn}>[19]</span>
+              <div>
+                <Ext href="https://docs.github.com/copilot/customizing-copilot/using-model-context-protocol/extending-copilot-chat-with-mcp">
+                  Extending GitHub Copilot Chat with MCP servers — GitHub Docs（公式）
+                </Ext>
+                <span className={styles.sd}>
+                  .vscode/mcp.jsonの完全仕様。リモート/ローカルMCPサーバー設定例。Claude
+                  Desktopの設定流用方法。ToolSetsの定義とAgent Modeでの利用方法
+                </span>
+              </div>
+            </div>
+            <div className={styles.src}>
+              <span className={styles.sn}>[20]</span>
+              <div>
+                <Ext href="https://github.blog/changelog/2026-01-21-github-copilot-cli-plan-before-you-build-steer-as-you-go/">
+                  GitHub Copilot CLI: Plan before you build, steer as you go — GitHub Changelog (Jan
+                  2026)
+                </Ext>
+                <span className={styles.sd}>
+                  プランモード（Shift+Tab）の公式解説。ask_userツールによる会話型計画立案。/resumeコマンド・/cdエイリアス。自動コンテキスト圧縮（Auto-compaction）。/contextコマンドのトークン使用量可視化
+                </span>
+              </div>
+            </div>
+            <div className={styles.src}>
+              <span className={styles.sn}>[21]</span>
+              <div>
+                <Ext href="https://github.blog/changelog/2026-03-11-major-agentic-capabilities-improvements-in-github-copilot-for-jetbrains-ides/">
+                  Major agentic capabilities improvements in GitHub Copilot for JetBrains IDEs —
+                  GitHub Changelog (Mar 2026)
+                </Ext>
+                <span className={styles.sd}>
+                  JetBrains向けエージェント機能強化。カスタムエージェント・サブエージェント・プランエージェントのGA。エージェントフック（Public
+                  Preview）。MCP auto-approveサポート。AGENTS.md/CLAUDE.mdサポート拡張
+                </span>
+              </div>
+            </div>
+            <div className={styles.src}>
+              <span className={styles.sn}>[22]</span>
+              <div>
+                <Ext href="https://visualstudiomagazine.com/articles/2025/10/23/hands-on-with-new-visual-studio-copilot-planning-feature-preview.aspx">
+                  Hands On with New Visual Studio Copilot &apos;Planning&apos; Feature (Preview) —
+                  Visual Studio Magazine (Oct 2025)
+                </Ext>
+                <span className={styles.sd}>
+                  Visual
+                  StudioのCopilotプランニング機能詳細。SWE-benchベンチマーク結果（GPT-5・Claude
+                  Sonnet 4で成功率15%向上・タスク完了20%増加）。階層型クローズドループ計画の研究背景
+                </span>
+              </div>
+            </div>
+            <div className={styles.src}>
+              <span className={styles.sn}>[23]</span>
+              <div>
+                <Ext href="https://docs.github.com/en/copilot/get-started/features">
+                  GitHub Copilot features — GitHub Docs（公式）2026年3月版
+                </Ext>
+                <span className={styles.sd}>
+                  全機能一覧。エージェントメモリ（Agentic Memory）の詳細。Copilot
+                  Spaces（コンテキスト管理）。GitHub
+                  Spark（フルスタックAIアプリ構築）。サードパーティエージェント連携。VS Code
+                  1.112でのMCPサンドボックス化
+                </span>
               </div>
             </div>
           </div>
