@@ -1774,11 +1774,131 @@ style GOOD fill:#101c10,stroke:#56d364,color:#56d364`}
                 GitHub Actions との統合 — 4 プラットフォームの並列 CI
               </div>
               <div className={styles.stepDesc}>
-                matrix strategy を使って4プラットフォームのCIを並列実行する設定。
+                matrix strategy による効率的な並列ビルド・デプロイパイプライン。
               </div>
             </div>
           </div>
-          {/* faithful content — s06 移植時に実装 */}
+
+          <div className={styles.mmdBox}>
+            <div className={styles.mmdLbl}>▸ GitHub Actions — matrix 並列パイプライン</div>
+            <MermaidDiagram
+              chart={`flowchart LR
+T(["push to\\nfeat/* or dev"])
+T --> J[detect-platform job]
+J --> M{"matrix strategy\\nfail-fast: false\\n4 並列実行"}
+M --> B1["build: claude\\ngit worktree add"]
+M --> B2["build: gemini\\ngit worktree add"]
+M --> B3["build: codex\\ngit worktree add"]
+M --> B4["build: copilot\\ngit worktree add"]
+B1 --> D1[Deploy\\nclaude site]
+B2 --> D2[Deploy\\ngemini site]
+B3 --> D3[Deploy\\ncodex site]
+B4 --> D4[Deploy\\ncopilot site]
+style T fill:#21262d,stroke:#444c56,color:#ffffff
+style J fill:#21262d,stroke:#e3b341,color:#ffffff
+style M fill:#1f2d14,stroke:#56d364,color:#ffffff
+style B1 fill:#2a1a10,stroke:#ff9f6a,color:#ffffff
+style B2 fill:#101828,stroke:#79b8ff,color:#ffffff
+style B3 fill:#101e12,stroke:#56d364,color:#ffffff
+style B4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff
+style D1 fill:#2a1a10,stroke:#ff9f6a,color:#ffffff
+style D2 fill:#101828,stroke:#79b8ff,color:#ffffff
+style D3 fill:#101e12,stroke:#56d364,color:#ffffff
+style D4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff`}
+            />
+          </div>
+
+          <div className={styles.cb}>
+            <div className={styles.cbHdr}>
+              <span>.github/workflows/parallel-deploy.yml</span>
+              <span className={styles.cbTag}>yaml</span>
+            </div>
+            <div className={styles.cbBody}>
+              <span className={styles.syKw}>name</span>
+              {": Parallel Docs Validation\n"}
+              <span className={styles.syKw}>on</span>
+              {":\n"}
+              {"  push:\n"}
+              {"    branches:\n"}
+              {"      - "}
+              <span className={styles.sySt}>&apos;feat/*-docs&apos;</span>
+              {"\n"}
+              {"      - "}
+              <span className={styles.sySt}>&apos;dev&apos;</span>
+              {"  "}
+              <span className={styles.syCm}># dev へのマージ時も検証</span>
+              {"\n"}
+              {"  pull_request:\n"}
+              {"    branches:\n"}
+              {"      - "}
+              <span className={styles.sySt}>&apos;dev&apos;</span>
+              {"  "}
+              <span className={styles.syCm}># dev への PR 時も検証</span>
+              {"\n\n"}
+              <span className={styles.syKw}>jobs</span>
+              {":\n"}
+              {"  validate-docs:\n"}
+              {"    runs-on: ubuntu-latest\n"}
+              {"    strategy:\n"}
+              {"      matrix:\n"}
+              {"        platform: ["}
+              <span className={styles.syCl}>claude</span>
+              {", "}
+              <span className={styles.syGe}>gemini</span>
+              {", "}
+              <span className={styles.syCo}>codex</span>
+              {", "}
+              <span className={styles.syCp}>copilot</span>
+              {"]\n"}
+              {"      fail-fast: false\n\n"}
+              {"    steps:\n"}
+              {"      - uses: actions/checkout@v4\n"}
+              {"        with:\n"}
+              {"          fetch-depth: 0\n\n"}
+              {"      - uses: oven-sh/setup-bun@v2\n\n"}
+              {"      - name: Setup worktree\n"}
+              {"        id: setup-wt\n"}
+              {"        run: |\n"}
+              {
+                // biome-ignore lint/suspicious/noTemplateCurlyInString: GitHub Actions expression syntax
+                '          BRANCH="feat/${{ matrix.platform }}-docs"\n'
+              }
+              {
+                '          if git show-ref --verify --quiet "refs/remotes/origin/$BRANCH" || git show-ref --verify --quiet "refs/heads/$BRANCH"; then\n'
+              }
+              {
+                // biome-ignore lint/suspicious/noTemplateCurlyInString: GitHub Actions expression syntax
+                '            git worktree add /tmp/${{ matrix.platform }} "$BRANCH"\n'
+              }
+              {'            echo "exists=true" >> $GITHUB_OUTPUT\n'}
+              {"          else\n"}
+              {'            echo "exists=false" >> $GITHUB_OUTPUT\n'}
+              {"          fi\n\n"}
+              {"      - name: Validate HTML\n"}
+              {"        if: steps.setup-wt.outputs.exists == &apos;true&apos;\n"}
+              {
+                // biome-ignore lint/suspicious/noTemplateCurlyInString: GitHub Actions expression syntax
+                "        working-directory: /tmp/${{ matrix.platform }}\n"
+              }
+              {"        run: |\n"}
+              {
+                // biome-ignore lint/suspicious/noTemplateCurlyInString: GitHub Actions expression syntax
+                "          bunx vnu-jar --skip-non-html ${{ matrix.platform }}/agent.html\n"
+              }
+              {
+                // biome-ignore lint/suspicious/noTemplateCurlyInString: GitHub Actions expression syntax
+                "          bunx vnu-jar --skip-non-html ${{ matrix.platform }}/skill.html\n\n"
+              }
+              {"      - name: Check Links\n"}
+              {"        if: steps.setup-wt.outputs.exists == &apos;true&apos;\n"}
+              {"        uses: lycheeverse/lychee-action@v2\n"}
+              {"        with:\n"}
+              {
+                // biome-ignore lint/suspicious/noTemplateCurlyInString: GitHub Actions expression syntax
+                "          args: /tmp/${{ matrix.platform }}/**/*.html"
+              }
+            </div>
+          </div>
         </section>
 
         {/* ══════════ REFERENCES ══════════ */}
