@@ -1592,9 +1592,186 @@ export default function Page() {
         <section id="s10">
           <div className={styles.slabel}>Section 10</div>
           <h2 className={styles.stitle}>
-            <span className={styles.num}>10.</span>GitHub Spec Kit — SDD公式フレームワーク
+            <span className={styles.num}>10.</span>GitHub Spec Kit — 公式SDD統合フレームワーク
           </h2>
-          {/* TODO: faithful content */}
+
+          <p>
+            GitHub Spec KitはMicrosoftが公式で提供する
+            <strong>SDD（仕様駆動開発）統合フレームワーク</strong>です。
+            <code>specify init</code>
+            コマンドで必要なマークダウンファイル群・テンプレート・スクリプトを一括生成し、Copilotのプロンプトファイルと連動してspecify→plan→tasks→implementのフローを体系化します（[1],
+            [6]）。
+          </p>
+
+          <div className={styles.fc}>
+            <div className={styles.fcHdr}>
+              <div
+                className={styles.fci}
+                style={{
+                  background: "rgba(240, 136, 62, 0.12)",
+                  border: "1px solid rgba(240, 136, 62, 0.3)",
+                }}
+              >
+                📐
+              </div>
+              <div>
+                <div className={styles.fcName}>GitHub Spec Kit</div>
+                <div className={styles.fcPath}>
+                  pip install speckit &amp;&amp; specify init — Microsoft公式SDD FW
+                </div>
+                <div className={styles.fcTags}>
+                  <span className={`${styles.fct} ${styles.fctC}`}>Microsoft公式</span>
+                  <span className={`${styles.fct} ${styles.fctG}`}>
+                    Cross-platform（Bash/PowerShell）
+                  </span>
+                  <span className={`${styles.fct} ${styles.fctM}`}>Copilot統合</span>
+                </div>
+              </div>
+            </div>
+            <div className={styles.fcBody}>
+              <h3>constitution.md — プロジェクト憲法（最重要）</h3>
+              <p>
+                Spec Kitが生成する<code>.specify/memory/constitution.md</code>は
+                <strong>プロジェクトの不変原則を定義する「憲法」</strong>
+                です。Copilotが全仕様生成・計画策定・実装の際に必ず参照する最上位ドキュメントです。
+              </p>
+
+              <div className={styles.cb}>
+                <div className={styles.cbHdr}>
+                  <div className={styles.dots}>
+                    <div className={styles.dot} style={{ background: "#f25c7a" }} />
+                    <div className={styles.dot} style={{ background: "#f0883e" }} />
+                    <div className={styles.dot} style={{ background: "#238636" }} />
+                  </div>
+                  <span>.specify/memory/constitution.md — プロジェクト憲法</span>
+                </div>
+                <pre>
+                  <span className={styles.cHd}>{"# Project Constitution"}</span>
+                  {"\n"}
+                  <span className={styles.cCm}>
+                    {"# この文書はCopilotが全判断の基準とする。変更は慎重に。"}
+                  </span>
+                  {"\n\n"}
+                  <span className={styles.cHd}>{"## Product Vision"}</span>
+                  {"\n"}
+                  {"中小EC向けの在庫管理SaaS。"}
+                  {"\n"}
+                  {"ペルソナ: IT非専門の店舗オーナー"}
+                  {"\n"}
+                  {"KPI: 在庫ミス率90%削減・セットアップ10分以内"}
+                  {"\n\n"}
+                  <span className={styles.cHd}>{"## Technology Stack（変更禁止）"}</span>
+                  {"\n"}
+                  {"- Backend: Go 1.23 + gRPC"}
+                  {"\n"}
+                  {"- Frontend: Next.js 15 (App Router)"}
+                  {"\n"}
+                  {"- DB: PostgreSQL 16（ORM禁止・raw SQLのみ）"}
+                  {"\n"}
+                  {"- Cache: Redis 8（Valkey互換）"}
+                  {"\n"}
+                  {"- Test: Go testing + Vitest"}
+                  {"\n\n"}
+                  <span className={styles.cHd}>{"## Architecture Principles"}</span>
+                  {"\n"}
+                  {"1. **Simple over Clever**: 読みやすさ > 賢さ"}
+                  {"\n"}
+                  {"2. **Test-First**: テストを先に書く"}
+                  {"\n"}
+                  {"3. **No Magic Dependencies**: 新規依存は事前承認必須"}
+                  {"\n"}
+                  {"4. **Fail Loud**: サイレントな失敗は絶対禁止"}
+                  {"\n\n"}
+                  <span className={styles.cHd}>{"## Non-Negotiable Constraints"}</span>
+                  {"\n"}
+                  {"- サービス間通信: gRPCのみ（REST禁止）"}
+                  {"\n"}
+                  {"- 本番DBへのDELETE/DROPは人間確認"}
+                  {"\n"}
+                  {"- シークレットのハードコード絶対禁止"}
+                  {"\n\n"}
+                  <span className={styles.cHd}>{"## Definition of Done"}</span>
+                  {"\n"}
+                  {"- ユニットテスト: カバレッジ80%以上"}
+                  {"\n"}
+                  {"- インテグレーションテスト: ハッピーパス必須"}
+                  {"\n"}
+                  {"- ドキュメント: spec.md・plan.md・tasks.md更新済み"}
+                </pre>
+              </div>
+
+              <h3>Spec Kit SDD ワークフロー</h3>
+              <div className={styles.flowWrap}>
+                <div className={styles.flowLbl}>▸ GitHub Spec Kit — 5フェーズSDDワークフロー</div>
+                <div className={styles.flow}>
+                  <div className={styles.fst}>
+                    <div className={`${styles.fbox} ${styles.fR}`}>
+                      INIT
+                      <br />
+                      セットアップ
+                    </div>
+                    <div className={styles.ffile}>
+                      constitution.md
+                      <br />
+                      テンプレート生成
+                    </div>
+                  </div>
+                  <div className={styles.farr}>→</div>
+                  <div className={styles.fst}>
+                    <div className={`${styles.fbox} ${styles.fG}`}>
+                      /speckit
+                      <br />
+                      .specify
+                    </div>
+                    <div className={styles.ffile}>
+                      spec.md
+                      <br />
+                      （仕様書）
+                    </div>
+                  </div>
+                  <div className={styles.farr}>→</div>
+                  <div className={styles.fst}>
+                    <div className={`${styles.fbox} ${styles.fM}`}>
+                      /speckit
+                      <br />
+                      .plan
+                    </div>
+                    <div className={styles.ffile}>
+                      plan.md
+                      <br />
+                      （技術設計）
+                    </div>
+                  </div>
+                  <div className={styles.farr}>→</div>
+                  <div className={styles.fst}>
+                    <div className={`${styles.fbox} ${styles.fC}`}>
+                      /speckit
+                      <br />
+                      .tasks
+                    </div>
+                    <div className={styles.ffile}>
+                      tasks.md
+                      <br />
+                      （タスク分解）
+                    </div>
+                  </div>
+                  <div className={styles.farr}>→</div>
+                  <div className={styles.fst}>
+                    <div className={`${styles.fbox} ${styles.fV}`}>
+                      実装
+                      <br />
+                      （Copilot）
+                    </div>
+                    <div className={styles.ffile}>
+                      コード生成
+                      <br />
+                      PR作成
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* ── s11: SDD-DOCS ── */}
