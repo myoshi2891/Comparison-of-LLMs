@@ -435,7 +435,179 @@ export default function Page() {
             <code>.copilot/instructions.md</code> ＆ <code>copilot-instructions.md</code> —
             リポジトリ永続メモリ
           </h2>
-          {/* TODO: faithful content */}
+
+          <p>
+            <code>.github/copilot-instructions.md</code>はCopilotが
+            <strong>全リクエストに自動添付するリポジトリレベルの永続メモリ</strong>です。VS
+            Code・Visual Studio・JetBrains IDEs・Neovim・GitHub.com・GitHub Mobile・GitHub CLIの
+            <strong>全プラットフォームで共通動作</strong>します（[2]）。2025年1月にPublic
+            Preview、同年中に正式GA。
+          </p>
+
+          <div className={styles.fc}>
+            <div className={styles.fcHdr}>
+              <div
+                className={styles.fci}
+                style={{
+                  background: "rgba(35, 134, 54, 0.12)",
+                  border: "1px solid rgba(35, 134, 54, 0.3)",
+                }}
+              >
+                📋
+              </div>
+              <div>
+                <div className={styles.fcName}>copilot-instructions.md</div>
+                <div className={styles.fcPath}>
+                  .github/copilot-instructions.md — git管理・チーム共有
+                </div>
+                <div className={styles.fcTags}>
+                  <span className={`${styles.fct} ${styles.fctG}`}>全IDE共通</span>
+                  <span className={`${styles.fct} ${styles.fctM}`}>全リクエスト自動注入</span>
+                  <span className={`${styles.fct} ${styles.fctC}`}>
+                    コードレビュー対応（2025年）
+                  </span>
+                  <span className={`${styles.fct} ${styles.fctV}`}>Coding Agent対応</span>
+                </div>
+              </div>
+            </div>
+            <div className={styles.fcBody}>
+              <h3>コンテキストに含まれる優先度順（後者が上書き）</h3>
+              <div className={styles.pstack}>
+                <div className={`${styles.prow} ${styles.pr1}`}>
+                  <div className={styles.prowRank}>① 基底</div>
+                  <div>
+                    <div className={styles.prowFile}>
+                      {"~/.config/github-copilot/*.instructions.md"}
+                    </div>
+                    <div className={styles.prowDesc}>
+                      IDE設定のユーザーレベル指示（存在する場合）
+                    </div>
+                  </div>
+                </div>
+                <div className={styles.parrow}>↓ リポジトリへ</div>
+                <div className={`${styles.prow} ${styles.pr2}`}>
+                  <div className={styles.prowRank}>②</div>
+                  <div>
+                    <div className={styles.prowFile}>.github/copilot-instructions.md</div>
+                    <div className={styles.prowDesc}>
+                      チーム共有のリポジトリルール（全IDE）— <strong>最重要ファイル</strong>
+                    </div>
+                  </div>
+                </div>
+                <div className={styles.parrow}>↓ 追加</div>
+                <div className={`${styles.prow} ${styles.pr3}`}>
+                  <div className={styles.prowRank}>③</div>
+                  <div>
+                    <div className={styles.prowFile}>
+                      {".github/instructions/*.instructions.md"}
+                    </div>
+                    <div className={styles.prowDesc}>
+                      applyToパターンに一致した場合のみ追加注入（後述）
+                    </div>
+                  </div>
+                </div>
+                <div className={styles.parrow}>↓ 追加</div>
+                <div className={`${styles.prow} ${styles.pr4}`}>
+                  <div className={styles.prowRank}>④</div>
+                  <div>
+                    <div className={styles.prowFile}>
+                      アクティブな .prompt.md / ユーザーのチャットテキスト
+                    </div>
+                    <div className={styles.prowDesc}>
+                      手動添付のプロンプトファイル + ユーザー入力
+                    </div>
+                  </div>
+                </div>
+                <div className={styles.parrow}>↓ 全部マージして</div>
+                <div className={`${styles.prow} ${styles.pr5}`}>
+                  <div className={styles.prowRank}>⑤ 最終</div>
+                  <div>
+                    <div className={styles.prowFile}>モデルのコンテキストウィンドウに圧縮注入</div>
+                    <div className={styles.prowDesc}>
+                      Copilotが上記すべてを統合しレスポンス生成（[10]）
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <h3>ベストプラクティス完全テンプレート</h3>
+              <div className={styles.cb}>
+                <div className={styles.cbHdr}>
+                  <div className={styles.dots}>
+                    <div className={styles.dot} style={{ background: "#f25c7a" }} />
+                    <div className={styles.dot} style={{ background: "#f0883e" }} />
+                    <div className={styles.dot} style={{ background: "#238636" }} />
+                  </div>
+                  <span>.github/copilot-instructions.md</span>
+                </div>
+                <pre>
+                  <span className={styles.cHd}>{"# Copilot Instructions"}</span>
+                  {"\n"}
+                  <span className={styles.cCm}>
+                    {"# このファイルはCopilotへの全リクエストに自動添付される。"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.cCm}>
+                    {'# "2ページ以内・簡潔に"が鉄則（公式推奨）。'}
+                  </span>
+                  {"\n\n"}
+                  <span className={styles.cHd}>{"## Project Overview"}</span>
+                  {
+                    "\nECサイトのバックエンドAPI（Go + gRPC マイクロサービス）。\nプリオーダー・決済・在庫管理の3サービスで構成。\n\n"
+                  }
+                  <span className={styles.cHd}>{"## Repository Structure"}</span>
+                  {
+                    "\n- `cmd/`        — サービスエントリーポイント\n- `internal/`   — ビジネスロジック（外部公開不可）\n- `migrations/` — DBマイグレーション（直接編集禁止）\n- `docs/`       — 仕様書群（features/{name}/spec|plan|tasks.md）\n\n"
+                  }
+                  <span className={styles.cHd}>{"## Build & Test"}</span>
+                  {"\n"}
+                  <span className={styles.cCm}>{"# Coding Agentが実行するコマンドを明示する"}</span>
+                  {
+                    "\n- Build:    `go build ./...`\n- Test all: `go test ./... -race -timeout 120s`\n- Lint:     `golangci-lint run`\n- Dev:      `docker compose up -d`\n\n"
+                  }
+                  <span className={styles.cHd}>{"## Code Standards"}</span>
+                  {
+                    '\n- Go 1.23。CGO_ENABLED=0\n- エラー: `fmt.Errorf("context: %w", err)` 形式\n- テスト: table-driven tests 必須\n- ORM使用禁止（pgx v5 raw SQLのみ）\n- サービス間通信: gRPCのみ（REST禁止）\n\n'
+                  }
+                  <span className={styles.cHd}>{"## PR Instructions"}</span>
+                  {"\n"}
+                  <span className={styles.cCm}>{"# Coding AgentがPRを作成する際の形式"}</span>
+                  {
+                    "\nタイトル: `[feat/fix/refactor] 短い説明（英語）`\n必須セクション: Summary / Testing Done / Breaking Changes\n\n"
+                  }
+                  <span className={styles.cHd}>{"## Forbidden"}</span>
+                  {
+                    "\n- `migrations/` への直接書き込み（SKILL.md db-migration を使用）\n- `.env` の作成・変更\n- APIキーのハードコード\n- `panic()` の使用（エラーを返す）"
+                  }
+                </pre>
+              </div>
+
+              <div className={`${styles.ib} ${styles.ic}`}>
+                <span className={styles.ii}>⚠️</span>
+                <div>
+                  <strong>「2ページ以内」の鉄則</strong>
+                  <br />
+                  公式ドキュメントは「短く自己完結した記述（short, self-contained
+                  statements）にすること」を強調しています。外部ファイルへの参照リクエストや長大な指示は機能しません。詳細なルールは
+                  <code>.instructions.md</code>・SKILL.mdへ分離してください（[4]）。
+                </div>
+              </div>
+
+              <div className={`${styles.ib} ${styles.im}`}>
+                <span className={styles.ii}>💡</span>
+                <div>
+                  <strong>Copilotに自動生成させる</strong>
+                  <br />
+                  初回PR作成時にCopilotがinstructionsファイル生成リンクをコメントします。また
+                  <code>
+                    @workspace Generate custom instructions for this repository based on the current
+                    codebase
+                  </code>
+                  とCopilot Chatで依頼すれば即座に草案が生成されます（[3]）。
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* ── s04: INSTRUCTIONS-MD ── */}
