@@ -1246,11 +1246,166 @@ style E4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff`}
             <div>
               <div className={styles.stepTitle}>日常の並列開発ワークフロー</div>
               <div className={styles.stepDesc}>
-                4つのworktreeを使ったドキュメント更新の実践的な手順。
+                各ワークツリーでの作業・共通変更の反映・PR までの全フロー。
               </div>
             </div>
           </div>
-          {/* faithful content — s03 移植時に実装 */}
+
+          {/* Mermaid: シーケンス図 */}
+          <div className={styles.mmdBox}>
+            <div className={styles.mmdLbl}>▸ 並列作業 → 共通変更同期 → PR — シーケンス図</div>
+            <MermaidDiagram
+              chart={`sequenceDiagram
+participant M as dev（メイン WT）
+participant C as claude/ エージェント + WebSearch
+participant G as gemini/ エージェント + WebSearch
+participant X as codex/ エージェント + WebSearch
+participant P as copilot/ エージェント + WebSearch
+Note over C,P: 4ターミナルで同時並列作業（WebSearch で最新情報取得）
+C->>C: docs: agent.html 更新
+G->>G: docs: skill.html 更新
+X->>X: docs: agent.html 更新
+P->>P: docs: skill.html 更新
+M->>M: fix(shared): header CSS
+Note over M,P: scripts/sync-all.sh 実行
+M-->>C: git merge dev
+M-->>G: git merge dev
+M-->>X: git merge dev
+M-->>P: git merge dev
+C->>C: git push → PR 作成
+G->>G: git push → PR 作成
+X->>X: git push → PR 作成
+P->>P: git push → PR 作成`}
+            />
+          </div>
+
+          <h3>各プラットフォームへの AI 設定ファイル配置</h3>
+          <div className={styles.plg}>
+            <div className={styles.plc}>
+              <div className={styles.plh}>
+                <div className={styles.pld} style={{ background: "var(--cl)" }} />
+                Claude / worktrees/claude/
+              </div>
+              <div className={styles.pli}>
+                <code>CLAUDE.md</code> — プロジェクト永続メモリ
+              </div>
+              <div className={styles.pli}>
+                <code>AGENTS.md</code> — オープン標準（兼用）
+              </div>
+              <div className={styles.pli}>
+                <code>.claude/skills/*/SKILL.md</code>
+              </div>
+              <div className={styles.pli}>
+                <code>.claude/commands/</code> — カスタムコマンド
+              </div>
+            </div>
+            <div className={styles.plc}>
+              <div className={styles.plh}>
+                <div className={styles.pld} style={{ background: "var(--ge)" }} />
+                Antigravity / worktrees/gemini/
+              </div>
+              <div className={styles.pli}>
+                <code>GEMINI.md</code> — グローバルメモリ
+              </div>
+              <div className={styles.pli}>
+                <code>.agent/rules/</code> — パッシブルール
+              </div>
+              <div className={styles.pli}>
+                <code>.agent/skills/*/SKILL.md</code>
+              </div>
+              <div className={styles.pli}>
+                <code>.agent/workflows/</code> — アクティブ手順
+              </div>
+            </div>
+            <div className={styles.plc}>
+              <div className={styles.plh}>
+                <div className={styles.pld} style={{ background: "var(--co)" }} />
+                Codex / worktrees/codex/
+              </div>
+              <div className={styles.pli}>
+                <code>AGENTS.md</code> — オープン標準（主）
+              </div>
+              <div className={styles.pli}>
+                <code>.agents/skills/*/SKILL.md</code>
+              </div>
+              <div className={styles.pli}>
+                <code>docs/REQUIREMENTS.md</code>
+              </div>
+              <div className={styles.pli}>
+                <code>docs/AGENT_TASKS.md</code>
+              </div>
+            </div>
+            <div className={styles.plc}>
+              <div className={styles.plh}>
+                <div className={styles.pld} style={{ background: "var(--cp)" }} />
+                Copilot / worktrees/copilot/
+              </div>
+              <div className={styles.pli}>
+                <code>.github/copilot-instructions.md</code>
+              </div>
+              <div className={styles.pli}>
+                <code>.github/instructions/*.md</code>
+              </div>
+              <div className={styles.pli}>
+                <code>.github/prompts/*.prompt.md</code>
+              </div>
+              <div className={styles.pli}>
+                <code>.github/chatmodes/*.chatmode.md</code>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.cb}>
+            <div className={styles.cbHdr}>
+              <span>scripts/sync-all.sh — 全 WT 一括同期</span>
+              <span className={styles.cbTag}>bash</span>
+            </div>
+            <div className={styles.cbBody}>
+              <span className={styles.syKw}>#!/bin/bash</span>
+              {"\n"}
+              {"set -euo pipefail\n"}
+              {'ROOT="$(git rev-parse --show-toplevel)"\n'}
+              {"WORKTREES=("}
+              <span className={styles.syCl}>claude</span>{" "}
+              <span className={styles.syGe}>gemini</span> <span className={styles.syCo}>codex</span>{" "}
+              <span className={styles.syCp}>copilot</span>
+              {")\n\n"}
+              {
+                // biome-ignore lint/suspicious/noTemplateCurlyInString: bash array variable syntax
+                'for WT in "${WORKTREES[@]}"; do\n'
+              }
+              {'  echo "━━━ Syncing: $WT ━━━━━━━━━━━━━━━━━━"\n'}
+              {'  cd "$ROOT/worktrees/$WT"\n\n'}
+              {'  if [ -n "$(git status --porcelain)" ]; then\n'}
+              {"    git stash push -u -m "}
+              <span className={styles.sySt}>&quot;auto: $WT before sync&quot;</span>
+              {"\n"}
+              {"    STASHED=true\n"}
+              {"  else\n"}
+              {"    STASHED=false\n"}
+              {"  fi\n\n"}
+              {"  if git merge dev --no-edit; then\n"}
+              {'    echo "'}
+              <span className={styles.syOk}> ✓ $WT: synced</span>
+              {'"\n'}
+              {'    if [ "$STASHED" = true ]; then\n'}
+              {"      if git stash apply; then\n"}
+              {"        git stash drop\n"}
+              {"      else\n"}
+              {'        echo "'}
+              <span className={styles.syEr}> ✗ $WT: STASH APPLY FAILED — 手動解決が必要</span>
+              {'"\n'}
+              {"      fi\n"}
+              {"    fi\n"}
+              {"  else\n"}
+              {'    echo "'}
+              <span className={styles.syEr}> ✗ $WT: CONFLICT — 手動解決が必要</span>
+              {'"\n'}
+              {"  fi\n"}
+              {"done\n\n"}
+              {'cd "$ROOT" && git worktree list'}
+            </div>
+          </div>
         </section>
 
         {/* ══════════ STEP 04 ══════════ */}
