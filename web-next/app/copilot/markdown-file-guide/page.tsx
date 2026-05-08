@@ -1091,9 +1091,147 @@ export default function Page() {
           <div className={styles.slabel}>Section 06</div>
           <h2 className={styles.stitle}>
             <span className={styles.num}>06.</span>
-            <code>.chatmode.md</code> — カスタムAIペルソナ
+            <code>.chatmode.md</code> — カスタムAIペルソナ（Copilot独自）
           </h2>
-          {/* TODO: faithful content */}
+
+          <p>
+            <code>.github/chatmodes/*.chatmode.md</code>はGitHub Copilot
+            <strong>独自の機能</strong>
+            です。Copilotに「ソフトウェアアーキテクト」「セキュリティ専門家」「教師」などの
+            <strong>特定のペルソナを付与</strong>
+            し、その役割に特化した応答スタイルで会話できます。利用ツール・レスポンス形式・制限事項をフロントマターで細かく制御できます（[7]）。
+          </p>
+
+          <div className={styles.fc}>
+            <div className={styles.fcHdr}>
+              <div
+                className={styles.fci}
+                style={{
+                  background: "rgba(155, 109, 255, 0.12)",
+                  border: "1px solid rgba(155, 109, 255, 0.3)",
+                }}
+              >
+                🎭
+              </div>
+              <div>
+                <div className={styles.fcName}>.chatmode.md</div>
+                <div className={styles.fcPath}>
+                  .github/chatmodes/*.chatmode.md — Chat Modeとして選択
+                </div>
+                <div className={styles.fcTags}>
+                  <span className={`${styles.fct} ${styles.fctV}`}>Copilot独自機能</span>
+                  <span className={`${styles.fct} ${styles.fctM}`}>ツール制御</span>
+                  <span className={`${styles.fct} ${styles.fctG}`}>レスポンス形式制御</span>
+                </div>
+              </div>
+            </div>
+            <div className={styles.fcBody}>
+              <div className={styles.g2}>
+                <div className={styles.cb}>
+                  <div className={styles.cbHdr}>
+                    <div className={styles.dots}>
+                      <div className={styles.dot} style={{ background: "#f25c7a" }} />
+                      <div className={styles.dot} style={{ background: "#f0883e" }} />
+                      <div className={styles.dot} style={{ background: "#238636" }} />
+                    </div>
+                    <span>.github/chatmodes/architect.chatmode.md</span>
+                  </div>
+                  <pre>
+                    <span className={styles.cKy}>{"---"}</span>
+                    {"\n"}
+                    <span className={styles.cGh}>{"description"}</span>
+                    {": "}
+                    <span className={styles.cSt}>
+                      {'"ソフトウェアアーキテクトとして\n  設計・計画・ドキュメントに特化"'}
+                    </span>
+                    {"\n"}
+                    <span className={styles.cGh}>{"tools"}</span>
+                    {": ["}
+                    <span className={styles.cSt}>{'"search/codebase"'}</span>
+                    {", "}
+                    <span className={styles.cSt}>{'"read/problems"'}</span>
+                    {"]"}
+                    {"\n"}
+                    <span className={styles.cCm}>{"# edit系ツールを除外→コード書かない"}</span>
+                    {"\n"}
+                    <span className={styles.cKy}>{"---"}</span>
+                    {"\n\n"}
+                    <span className={styles.cHd}>{"# Software Architect Mode"}</span>
+                    {"\n\n"}
+                    {"あなたはシニアソフトウェアアーキテクト。"}
+                    {"\n"}
+                    {"設計・計画・ドキュメントに集中し、"}
+                    {"\n"}
+                    {"コードは書かない。Markdownのみで回答。"}
+                    {"\n\n"}
+                    <span className={styles.cHd}>{"## Response Style"}</span>
+                    {"\n"}
+                    {"- トレードオフを明示する"}
+                    {"\n"}
+                    {"- 代替案を2〜3案提示する"}
+                    {"\n"}
+                    {"- 決定の根拠を「なぜ」で説明する"}
+                    {"\n"}
+                    {"- 過剰なエンジニアリングを警告する"}
+                  </pre>
+                </div>
+                <div className={styles.cb}>
+                  <div className={styles.cbHdr}>
+                    <div className={styles.dots}>
+                      <div className={styles.dot} style={{ background: "#f25c7a" }} />
+                      <div className={styles.dot} style={{ background: "#f0883e" }} />
+                      <div className={styles.dot} style={{ background: "#238636" }} />
+                    </div>
+                    <span>.github/chatmodes/security.chatmode.md</span>
+                  </div>
+                  <pre>
+                    <span className={styles.cKy}>{"---"}</span>
+                    {"\n"}
+                    <span className={styles.cGh}>{"description"}</span>
+                    {": "}
+                    <span className={styles.cSt}>
+                      {'"セキュリティエンジニアとして\n  脆弱性・OWASP Top 10を中心にレビュー"'}
+                    </span>
+                    {"\n"}
+                    <span className={styles.cGh}>{"tools"}</span>
+                    {": ["}
+                    <span className={styles.cSt}>{'"search/codebase"'}</span>
+                    {"]"}
+                    {"\n"}
+                    <span className={styles.cKy}>{"---"}</span>
+                    {"\n\n"}
+                    <span className={styles.cHd}>{"# Security Review Mode"}</span>
+                    {"\n\n"}
+                    {"OWASP Top 10を基準にコードをレビュー。"}
+                    {"\n"}
+                    {"問題を重大度(Critical/High/Medium/Low)"}
+                    {"\n"}
+                    {"で分類し、修正手順を提示する。"}
+                    {"\n\n"}
+                    <span className={styles.cHd}>{"## Rules"}</span>
+                    {"\n"}
+                    {"- 未確認の脆弱性を断定しない"}
+                    {"\n"}
+                    {"- CWE番号を付与する"}
+                    {"\n"}
+                    {"- 修正コード例を提示する"}
+                  </pre>
+                </div>
+              </div>
+
+              <div className={`${styles.ib} ${styles.iv}`}>
+                <span className={styles.ii}>🎭</span>
+                <div>
+                  <strong>.chatmode.md vs .agent.md の使い分け</strong>
+                  <br />
+                  <code>.chatmode.md</code>は<strong>会話スタイルの変更</strong>
+                  （「アーキテクト目線で話す」）。<code>.agent.md</code>は
+                  <strong>実際にファイルを操作・変更するタスク実行</strong>
+                  （「設計フェーズを担当し完了後に開発エージェントにハンドオフ」）。ペルソナ付与か実行委任かで選びます（[8]）。
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* ── s07: AGENT-MD ── */}
