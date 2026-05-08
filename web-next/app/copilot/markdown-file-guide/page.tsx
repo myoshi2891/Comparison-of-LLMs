@@ -1241,7 +1241,150 @@ export default function Page() {
             <span className={styles.num}>07.</span>
             <code>.agent.md</code> — カスタムエージェント&amp;ハンドオフ
           </h2>
-          {/* TODO: faithful content */}
+
+          <p>
+            <code>.github/agents/*.agent.md</code>はCopilot Coding Agent と VS Code Agent
+            Modeが使用する<strong>カスタムエージェント定義</strong>
+            です。複数エージェント間のハンドオフを設定でき、「計画エージェント →
+            開発エージェント」のようなSDD特化パイプラインを構築できます（[8]）。
+          </p>
+
+          <div className={styles.fc}>
+            <div className={styles.fcHdr}>
+              <div
+                className={styles.fci}
+                style={{
+                  background: "rgba(31, 184, 205, 0.12)",
+                  border: "1px solid rgba(31, 184, 205, 0.3)",
+                }}
+              >
+                🤖
+              </div>
+              <div>
+                <div className={styles.fcName}>.agent.md</div>
+                <div className={styles.fcPath}>
+                  .github/agents/*.agent.md — Coding Agent / Agent Mode
+                </div>
+                <div className={styles.fcTags}>
+                  <span className={`${styles.fct} ${styles.fctT}`}>ハンドオフ対応</span>
+                  <span className={`${styles.fct} ${styles.fctM}`}>MCP Server連携</span>
+                  <span className={`${styles.fct} ${styles.fctV}`}>モデル指定可</span>
+                </div>
+              </div>
+            </div>
+            <div className={styles.fcBody}>
+              <div className={styles.g2}>
+                <div className={styles.cb}>
+                  <div className={styles.cbHdr}>
+                    <div className={styles.dots}>
+                      <div className={styles.dot} style={{ background: "#f25c7a" }} />
+                      <div className={styles.dot} style={{ background: "#f0883e" }} />
+                      <div className={styles.dot} style={{ background: "#238636" }} />
+                    </div>
+                    <span>.github/agents/planning.agent.md</span>
+                  </div>
+                  <pre>
+                    <span className={styles.cKy}>{"---"}</span>
+                    {"\n"}
+                    <span className={styles.cGh}>{"name"}</span>
+                    {": "}
+                    <span className={styles.cSt}>{'"Planning Agent"'}</span>
+                    {"\n"}
+                    <span className={styles.cGh}>{"description"}</span>
+                    {": "}
+                    <span className={styles.cSt}>
+                      {
+                        '"設計・計画専任エージェント。\n  spec.mdとplan.mdを生成してDev Agentへハンドオフ"'
+                      }
+                    </span>
+                    {"\n"}
+                    <span className={styles.cGh}>{"model"}</span>
+                    {": "}
+                    <span className={styles.cSt}>{'"claude-opus-4-6"'}</span>
+                    {"\n"}
+                    <span className={styles.cGh}>{"tools"}</span>
+                    {": ["}
+                    <span className={styles.cSt}>{'"search/codebase"'}</span>
+                    {", "}
+                    <span className={styles.cSt}>{'"edit/editFiles"'}</span>
+                    {",\n         "}
+                    <span className={styles.cSt}>{'"read/problems"'}</span>
+                    {"]"}
+                    {"\n"}
+                    <span className={styles.cKy}>{"---"}</span>
+                    {"\n\n"}
+                    <span className={styles.cHd}>{"# Planning Agent"}</span>
+                    {"\n\n"}
+                    {"あなたはシニアアーキテクト。機能の設計に特化。"}
+                    {"\n"}
+                    {"constitution.md を必ず先に読む。"}
+                    {"\n\n"}
+                    <span className={styles.cHd}>{"## Completion Criteria"}</span>
+                    {"\n"}
+                    {"- features/{name}/spec.md 作成済み"}
+                    {"\n"}
+                    {"- features/{name}/plan.md 作成済み"}
+                    {"\n"}
+                    {"- 既存テストが全件パス"}
+                    {"\n"}
+                    {"→ 完了後は Developer Agent にハンドオフ"}
+                  </pre>
+                </div>
+                <div className={styles.cb}>
+                  <div className={styles.cbHdr}>
+                    <div className={styles.dots}>
+                      <div className={styles.dot} style={{ background: "#f25c7a" }} />
+                      <div className={styles.dot} style={{ background: "#f0883e" }} />
+                      <div className={styles.dot} style={{ background: "#238636" }} />
+                    </div>
+                    <span>.github/agents/developer.agent.md</span>
+                  </div>
+                  <pre>
+                    <span className={styles.cKy}>{"---"}</span>
+                    {"\n"}
+                    <span className={styles.cGh}>{"name"}</span>
+                    {": "}
+                    <span className={styles.cSt}>{'"Developer Agent"'}</span>
+                    {"\n"}
+                    <span className={styles.cGh}>{"description"}</span>
+                    {": "}
+                    <span className={styles.cSt}>
+                      {'"実装専任エージェント。\n  plan.mdとtasks.mdに従ってコードを書く"'}
+                    </span>
+                    {"\n"}
+                    <span className={styles.cGh}>{"model"}</span>
+                    {": "}
+                    <span className={styles.cSt}>{'"claude-sonnet-4-6"'}</span>
+                    {"\n"}
+                    <span className={styles.cGh}>{"tools"}</span>
+                    {": ["}
+                    <span className={styles.cSt}>{'"edit/editFiles"'}</span>
+                    {", "}
+                    <span className={styles.cSt}>{'"search/codebase"'}</span>
+                    {",\n         "}
+                    <span className={styles.cSt}>{'"terminal/runInTerminal"'}</span>
+                    {"]"}
+                    {"\n"}
+                    <span className={styles.cKy}>{"---"}</span>
+                    {"\n\n"}
+                    <span className={styles.cHd}>{"# Developer Agent"}</span>
+                    {"\n\n"}
+                    {"plan.md に従って実装する。"}
+                    {"\n"}
+                    {"仕様の逸脱は Planning Agent に差し戻す。"}
+                    {"\n\n"}
+                    <span className={styles.cHd}>{"## Rules"}</span>
+                    {"\n"}
+                    {"- tasks.md の各タスクを1つずつ実行"}
+                    {"\n"}
+                    {"- テストが失敗したら実装を止めて報告"}
+                    {"\n"}
+                    {"- 追加の依存パッケージ追加は人間確認"}
+                  </pre>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* ── s08: SKILL-MD ── */}
