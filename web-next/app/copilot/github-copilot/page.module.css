@@ -1,5 +1,15 @@
 /* ─── Layout ─── */
 .wrapper {
+  --bg-primary: #0a0e17;
+  --bg-card: #0d1424;
+  --border2: #1a2540;
+  --accent: #00d4ff;
+  --accent-cyan: #00d4ff;
+  --text-primary: #e2eaf6;
+  --text1: #e2eaf6;
+  --text2: #8892a4;
+  --text3: #4a5568;
+
   min-height: 100vh;
   background: var(--bg-primary);
   color: var(--text-primary);

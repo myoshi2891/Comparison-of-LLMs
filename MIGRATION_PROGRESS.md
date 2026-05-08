@@ -145,7 +145,7 @@ web-next/
 ├── app/copilot/agent/       # Phase C-4（faithful 移植完了）
 ├── app/claude/skill-guide/  # Phase D-1（faithful 移植完了）
 ├── app/claude/skill-guide-intermediate/ # Phase D-2（faithful 移植完了）
-├── app/claude/claude-cowork-guide/      # Phase D-3（faithful 移植完了）
+├── app/claude/cowork-guide/             # Phase D-3（faithful 移植完了）
 ├── app/gemini/skill-guide/              # Phase D-4（faithful 移植完了）
 ├── app/gemini/skill-guide-intermediate/ # Phase D-5（faithful 移植完了）
 ├── app/gemini/antigravity-guide/        # Phase D-6（faithful 移植完了）
