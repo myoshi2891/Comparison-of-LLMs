@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
-
-const MermaidDiagram = dynamic(() => import("@/components/docs/MermaidDiagram"), { ssr: false });
 
 export const metadata: Metadata = {
   title: "git worktree × 4プラットフォーム ドキュメント並列開発ガイド",

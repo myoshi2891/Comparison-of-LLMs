@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import { describe, expect, it, vi } from "vitest";
 import Page, { metadata } from "./page";
 
-// MermaidDiagram は next/dynamic の ssr:false コンポーネントのため、テスト環境でモック
-vi.mock("next/dynamic", () => ({
-  default: () => () => null,
+// MermaidDiagram は useEffect 内で mermaid を動的 import するためモック
+vi.mock("@/components/docs/MermaidDiagram", () => ({
+  default: () => null,
 }));
 
 describe("/git-worktree page", () => {
