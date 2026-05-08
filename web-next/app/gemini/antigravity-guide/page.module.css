@@ -1226,3 +1226,45 @@
 .modelTable tr:nth-child(even) td {
   background: #0c1120;
 }
+
+/* ── Artifacts ─────────────────────────────────────────── */
+.artRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0.8rem;
+  margin: 1.5rem 0;
+}
+
+.artCard {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.artIcon {
+  font-size: 1.3rem;
+}
+
+.artName {
+  font-family: var(--font-display, "Syne", sans-serif);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ddeeff;
+}
+
+.artDesc {
+  font-size: 0.75rem;
+  color: var(--text2, #9aafcc);
+  line-height: 1.5;
+}
+
+.artAuto {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.6rem;
+  color: var(--g-green, #34a853);
+  margin-top: 0.2rem;
+}

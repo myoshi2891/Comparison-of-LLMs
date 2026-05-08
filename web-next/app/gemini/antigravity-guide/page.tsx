@@ -1229,13 +1229,77 @@ export default function Page() {
           </div>
         </section>
 
-        {/* SECTION 07: ARTIFACTS — TODO: faithful migration */}
+        {/* SECTION 07: ARTIFACTS */}
         <section id="artifacts" className={styles.sec}>
           <div className={styles.secLabel}>Section 07</div>
           <h2 className={styles.secTitle}>
             <span className={styles.num}>07.</span>Artifacts — エージェント自動生成の証拠
           </h2>
-          <p>（実装予定）</p>
+
+          <p>
+            AntigravityのArtifactsは、
+            <strong>エージェントが自律的に作業を進める際の「信頼の証拠」</strong>
+            として機能します。
+            「エージェントが何をしたか・なぜそう判断したか」をMarkdownや画像・動画で可視化することで「Trust
+            Gap」を埋めます。
+          </p>
+
+          <div className={styles.artRow}>
+            <div className={styles.artCard}>
+              <span className={styles.artIcon}>📋</span>
+              <div className={styles.artName}>Task List</div>
+              <div className={styles.artDesc}>
+                エージェントがコードを書く前に生成する構造化計画。Research → Implementation →
+                Verification のフェーズを明示。
+              </div>
+              <div className={styles.artAuto}>✦ 自動生成</div>
+            </div>
+            <div className={styles.artCard}>
+              <span className={styles.artIcon}>🏛</span>
+              <div className={styles.artName}>Implementation Plan</div>
+              <div className={styles.artDesc}>
+                コードベースへの変更を事前に詳述する技術設計書。どのファイルをなぜ変更するかを人間がレビュー可能な形式で提示。
+              </div>
+              <div className={styles.artAuto}>✦ 自動生成</div>
+            </div>
+            <div className={styles.artCard}>
+              <span className={styles.artIcon}>📊</span>
+              <div className={styles.artName}>Walkthrough</div>
+              <div className={styles.artDesc}>
+                完了した変更のサマリー。変更ファイル一覧・主要な設計判断の理由・テスト結果を含む。
+              </div>
+              <div className={styles.artAuto}>✦ 自動生成</div>
+            </div>
+            <div className={styles.artCard}>
+              <span className={styles.artIcon}>📸</span>
+              <div className={styles.artName}>Screenshots</div>
+              <div className={styles.artDesc}>
+                Browser Subagentが撮影したUIの視覚的エビデンス。フロントエンド変更の検証に使用。
+              </div>
+              <div className={styles.artAuto}>✦ Browser Agent自動撮影</div>
+            </div>
+            <div className={styles.artCard}>
+              <span className={styles.artIcon}>🎬</span>
+              <div className={styles.artName}>Browser Recordings</div>
+              <div className={styles.artDesc}>
+                UI操作のビデオ録画。E2Eフローの証明として機能。人間がレビュー後にフィードバックをインラインコメントで残せる。
+              </div>
+              <div className={styles.artAuto}>✦ Browser Agent自動録画</div>
+            </div>
+          </div>
+
+          <div className={`${styles.info} ${styles.iCrit}`}>
+            <span className={styles.infoIcon}>⚠️</span>
+            <div>
+              <strong>SDD最重要原則: Artifactを読め</strong>
+              <br />
+              多くのユーザーがTask ListやImplementation
+              Planを「なんとなく承認」してコーディング速度を上げようとします。 しかしSDDではここが
+              <strong>最重要レビューポイント</strong>です。
+              「コードは後で直せる。設計の誤りは高くつく」——
+              Artifactを厳密に検査することがバグを未然に防ぐ最善策です。
+            </div>
+          </div>
         </section>
 
         {/* SECTION 08: MODELS — TODO: faithful migration */}
