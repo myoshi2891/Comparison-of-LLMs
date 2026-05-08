@@ -626,15 +626,168 @@ export default function Page() {
           </div>
         </section>
 
-        {/* SECTION 05: AGENTS-MD — TODO: faithful migration */}
+        {/* SECTION 05: AGENTS-MD */}
         <section id="agents-md" className={styles.sec}>
           <div className={styles.secHeader}>
             <div className={styles.stepNum}>4</div>
             <div>
               <h2 className={styles.secTitle}>AGENTS.md の活用</h2>
+              <p className={styles.secDesc}>
+                Codexにプロジェクトのルールを「記憶」させる最強の方法
+              </p>
             </div>
           </div>
-          <p style={{ color: "#94a3b8" }}>（実装予定）</p>
+
+          <div className={styles.card}>
+            <p style={{ fontSize: "14px", color: "#94a3b8", marginBottom: "20px" }}>
+              <strong style={{ color: "#e2e8f0" }}>AGENTS.md</strong> は README.md
+              のようなテキストファイルです。リポジトリのルートや特定ディレクトリに配置することで、Codex
+              がタスク開始前に自動的に読み込みます。「毎回プロンプトに書くルール」を一度定義すれば、以後すべてのタスクに適用されます。
+            </p>
+
+            <div
+              style={{
+                background: "#131c35",
+                borderRadius: "10px",
+                padding: "16px",
+                marginBottom: "16px",
+                border: "1px solid rgba(0,212,255,0.15)",
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
+                  fontSize: "12px",
+                  color: "#64748b",
+                  marginBottom: "8px",
+                }}
+              >
+                読み込み優先順位（高 → 低）
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                  <span
+                    style={{
+                      fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
+                      fontSize: "12px",
+                      color: "#00d4ff",
+                      minWidth: "200px",
+                    }}
+                  >
+                    ~/.codex/AGENTS.override.md
+                    <br />
+                    または ~/.codex/AGENTS.md
+                  </span>
+                  <span style={{ fontSize: "12px", color: "#94a3b8" }}>
+                    グローバル設定（override 優先）
+                  </span>
+                </div>
+                <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                  <span
+                    style={{
+                      fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
+                      fontSize: "12px",
+                      color: "#10b981",
+                      minWidth: "200px",
+                    }}
+                  >
+                    /repo-root/AGENTS.md
+                  </span>
+                  <span style={{ fontSize: "12px", color: "#94a3b8" }}>プロジェクト共通設定</span>
+                </div>
+                <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                  <span
+                    style={{
+                      fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
+                      fontSize: "12px",
+                      color: "#f59e0b",
+                      minWidth: "200px",
+                    }}
+                  >
+                    /subdir/AGENTS.override.md
+                  </span>
+                  <span style={{ fontSize: "12px", color: "#94a3b8" }}>
+                    サブディレクトリ固有ルール
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.codeWrap}>
+            <div className={styles.codeHeader}>
+              <div className={styles.codeDots}>
+                <div className={`${styles.codeDot} ${styles.codeDotR}`} />
+                <div className={`${styles.codeDot} ${styles.codeDotY}`} />
+                <div className={`${styles.codeDot} ${styles.codeDotG}`} />
+              </div>
+              <div className={styles.codeLang}>AGENTS.md テンプレート（コピーして使おう）</div>
+            </div>
+            <pre className={styles.codeBody}>
+              <span className={styles.cm}># AGENTS.md</span>
+              {"\n\n"}
+              <span className={styles.cm}>## プロジェクト概要</span>
+              {"\n"}
+              {"- Node.js + Express + TypeScript の REST API\n"}
+              {"- データベース: PostgreSQL (Prisma ORM)\n"}
+              {"- テストフレームワーク: Jest\n\n"}
+              <span className={styles.cm}>## コーディング規約</span>
+              {"\n"}
+              {"- コメントは日本語で記述すること\n"}
+              {"- 関数の引数が3つ以上の場合はオブジェクト型を使う\n"}
+              <span className={styles.hl}>- any 型は使用禁止。unknown を使うこと</span>
+              {"\n"}
+              {"- エラーハンドリングは必ず Result 型でラップする\n\n"}
+              <span className={styles.cm}>## テスト・ビルドコマンド</span>
+              {"\n"}
+              {"- テスト実行: "}
+              <span className={styles.str}>{"`npm test`"}</span>
+              {"\n"}
+              {"- Lint チェック: "}
+              <span className={styles.str}>{"`npm run lint`"}</span>
+              {"\n"}
+              {"- ビルド: "}
+              <span className={styles.str}>{"`npm run build`"}</span>
+              {"\n"}
+              {"- ⚠️ PRを開く前に必ず lint を実行すること\n\n"}
+              <span className={styles.cm}>## 禁止事項</span>
+              {"\n"}
+              {"- package.json への新規依存追加は確認を取ること\n"}
+              {"- データベースのスキーマ変更は migration ファイルを作成すること\n"}
+              {"- console.log のコミットは禁止（logger を使うこと）"}
+            </pre>
+          </div>
+
+          <div className={styles.codeWrap}>
+            <div className={styles.codeHeader}>
+              <div className={styles.codeDots}>
+                <div className={`${styles.codeDot} ${styles.codeDotR}`} />
+                <div className={`${styles.codeDot} ${styles.codeDotY}`} />
+                <div className={`${styles.codeDot} ${styles.codeDotG}`} />
+              </div>
+              <div className={styles.codeLang}>サブディレクトリへのオーバーライド例</div>
+            </div>
+            <pre className={styles.codeBody}>
+              <span className={styles.cm}># services/payments/AGENTS.override.md</span>
+              {"\n"}
+              <span className={styles.cm}>## Payments サービス固有ルール</span>
+              {"\n"}
+              {"- テストコマンド: "}
+              <span className={styles.str}>{"`make test-payments`"}</span>
+              {" (npm test ではなく)\n"}
+              {"- API キーのローテーション時は必ずセキュリティチャンネルに通知\n"}
+              {"- PCI-DSS 準拠のため、カード情報はログに出力しないこと"}
+            </pre>
+          </div>
+
+          <div className={`${styles.callout} ${styles.calloutTip}`}>
+            <div className={styles.calloutIcon}>💚</div>
+            <div>
+              <strong>プロのヒント：</strong>AGENTS.md
+              にテストコマンドを明記することが最も重要です。Codex
+              は「何をもって完了か」を知るためにテストを実行します。テスト方法が分からないとコードを書いて終わりになってしまいます。
+            </div>
+          </div>
         </section>
 
         {/* SECTION 06: WORKFLOW — TODO: faithful migration */}
