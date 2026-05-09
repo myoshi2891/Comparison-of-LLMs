@@ -9,7 +9,7 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- 最新 HEAD: a2cb93a（fix(web-next): use direct MermaidDiagram import instead of dynamic() in git-worktree page）
+- 最新 HEAD: fee7f1e（feat: pricing.json を最新（2026-05-09）に更新。Claude Opus 4.7, GPT-5.5, DeepSeek V4 Pro, Grok 4.3 等の追加とレガシーモデルの整理、.gitignore の更新。）
 - 未コミット作業: なし（working tree クリーン）
 - 次の作業: **Phase F — netlify.toml [[redirects]] 一括設定 + sitemap 更新**（Phase E 完了）
 - テスト数: `bun run test` **542 passed / 542 total（全 Green ✅）**  — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
