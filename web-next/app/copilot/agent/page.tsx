@@ -156,14 +156,9 @@ const SOURCES: Source[] = [
 ];
 
 /**
- * Render the GitHub Copilot ".agent.md" best-practices guide page.
+ * Renders the single-page UI for the GitHub Copilot .agent.md best-practices guide.
  *
- * Renders a full single-page layout that includes a hero, table of contents, numbered
- * guide sections (s01–s19) covering architecture, instruction file formats, agent
- * frontmatter, handoffs, subagents, MCP integration, templates, best practices,
- * troubleshooting, and a sources section.
- *
- * @returns The React element for the Copilot Agent guidance page
+ * @returns The React element that renders the complete Copilot Agent guidance page
  */
 export default function CopilotAgentPage() {
   return (
