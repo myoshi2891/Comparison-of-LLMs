@@ -4,6 +4,14 @@ export const dynamic = "force-static";
 
 const _DEFAULT_SITE_URL = "https://comparison-of-llms.netlify.app";
 
+/**
+ * Resolve the base origin used for sitemap URLs.
+ *
+ * @returns The origin (scheme, host, and optional port) to use as the site URL. Returns the origin parsed from `NEXT_PUBLIC_SITE_URL` when valid; otherwise returns the default fallback `_DEFAULT_SITE_URL`.
+ *
+ * @remarks
+ * Logs a warning to the console if `NEXT_PUBLIC_SITE_URL` is missing or invalid and the `NETLIFY` environment variable is not set.
+ */
 function resolveSiteUrl(): string {
   const envVal = process.env.NEXT_PUBLIC_SITE_URL;
   if (envVal) {
