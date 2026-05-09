@@ -9,7 +9,7 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- 最新 HEAD: 5510c4e（feat(web-next): Phase F — add 301 redirects, sitemap.xml, robots.txt）
+- 最新 HEAD: 3b45319（chore(web-next): fix all pre-existing lint and formatting issues）
 - 未コミット作業: なし（working tree クリーン）
 - 次の作業: **Phase A–F 全完了 → main へのマージ PR 作成**
 - テスト数: `bun run test` **542 passed / 542 total（全 Green ✅）**  — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
