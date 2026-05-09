@@ -16,15 +16,15 @@ description: |
 ## 対象ファイル
 
 1. **Python スキーマ (信頼源)**: `scraper/src/scraper/models.py`
-2. **TypeScript スキーマ**: `web/src/types/pricing.ts`
+2. **TypeScript スキーマ**: `web-next/types/pricing.ts`
 
 ## 手順
 
 1. `scraper/src/scraper/models.py` を読み込む。
-2. `web/src/types/pricing.ts` を読み込む。
+2. `web-next/types/pricing.ts` を読み込む。
 3. 以下の「同期チェックリスト」に従って差分を検出する。
 4. 差分があれば TypeScript 側を修正する。
-5. コマンド `cd web && bun run build` でビルドが通ることを確認する。
+5. コマンド `cd web-next && bun run build` でビルドが通ることを確認する。
 
 ## 同期チェックリスト
 
