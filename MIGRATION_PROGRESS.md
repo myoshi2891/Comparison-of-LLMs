@@ -9,9 +9,9 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- 最新 HEAD: 72d15df（refactor(web-next): resolveSiteUrlを共通ユーティリティに抽出）
+- 最新 HEAD: 43fdcf1（docs: MIGRATION_PROGRESS.md の HEAD 情報更新）
 - 未コミット作業: なし（working tree クリーン）
-- 次の作業: **Phase A–F 全完了 → main へのマージ PR 作成**
+- 次の作業: **Phase A–F 全完了 → レビュー対応 / マージ準備**
 - テスト数: `bun run test` **542 passed / 542 total（全 Green ✅）**  — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
 - ビルド: `bun run build` ✅（5510c4e 時点）・`bun run typecheck` ✅・`uv run pytest` 5/5 passed
 - **lint 既知違反**: なし（全解消 ✅）
@@ -180,13 +180,13 @@ Next.js 移行プロジェクトの作業を再開してください。
 
 - リポジトリ: LLM-Studies（Phase A–F の Next.js 移行作業中）
 - 現在のブランチ: feat/nextjs-migration
-- 最新 HEAD: 2cfc4cb（docs: update MIGRATION_PROGRESS.md HEAD to 3b45319）
+- 最新 HEAD: 43fdcf1（docs: MIGRATION_PROGRESS.md の HEAD 情報更新）
 - 移行計画: docs/archive/NEXTJS_PHASE_A_F_PLAN.md（Phase A–F）— 全 Phase 完了（アーカイブ）
 - 進捗トラッカー: MIGRATION_PROGRESS.md（**作業開始前に必読**: §「AI 作業ルール」R1〜R4）
 - プロジェクト固有スキル: .claude/skills/nextjs-page-migration/SKILL.md
 - リポジトリ規約: CLAUDE.md（AGENTS.md / GEMINI.md からも参照される。AI 共通の編集ルール）
 
-次の作業: **Phase A–F 全完了 → feat/nextjs-migration を main へマージする PR を作成**
+次の作業: **Phase A–F 全完了 → レビュー対応 / マージ準備**
 
 Phase E の確立パターン（MermaidDiagram）:
 - `MermaidDiagram.tsx` 自体が `"use client"` + `useEffect` のため `dynamic()` でラップ不要
