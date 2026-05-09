@@ -196,17 +196,17 @@ Phase E の確立パターン（MermaidDiagram）:
 - bash 配列変数 `${...}` / GitHub Actions `${{ }}` は `// biome-ignore lint/suspicious/noTemplateCurlyInString:` で抑制
 - lint 既知違反: なし（全解消 ✅）
 
-作業手順（Phase F: redirects / sitemap）:
+Phase F — 実施ログ（参考）:
 - ※ Phase F 完了済み。URL マッピングは `docs/archive/NEXTJS_PHASE_A_F_PLAN.md` §Phase F を参照
-- Phase F は以下の 2 タスクで構成される:
-  1. `netlify.toml` に `[[redirects]]` を追加（旧 `.html` URL → 新 Next.js パス、301）
-  2. `web-next/public/sitemap.xml`（または `app/sitemap.ts`）を更新して移行済み全ページを列挙
-- 各タスク完了ごとに以下を順に実行 → 全部 OK なら 1 コミット:
-  1. (cd web-next && bun run build)     # 全ルートが ○ (Static) であること
-  2. (cd web-next && bunx biome check --write netlify.toml)  # ← R1: パス指定必須
-  3. (cd web-next && bun run test)       # 全件が pass することを確認
-  4. git add netlify.toml web-next/public/sitemap.xml && git commit -m "feat(web-next): Phase F — add redirects/sitemap for legacy HTML cutover"
-  5. **MIGRATION_PROGRESS.md を更新 → git commit**（HEAD・次の作業・テスト数・ビルドを同期）
+- 完了した 2 タスク:
+  1. `netlify.toml` に `[[redirects]]` を追加（旧 `.html` URL → 新 Next.js パス、301） [✅ Done: 2026-05-09 11:39:07, `5510c4e`]
+  2. `web-next/public/sitemap.xml` の静的配置に代わり、`web-next/app/sitemap.ts` (および `robots.ts`) を実装して移行済み全ページを動的に列挙 [✅ Done: 2026-05-09 11:39:07, `5510c4e`]
+- 実行済みのチェックリスト:
+  1. (cd web-next && bun run build) # 全ルート Static 検証 [✅ Done: 2026-05-09 11:39:07]
+  2. (cd web-next && bunx biome check --write netlify.toml) [✅ Done: 2026-05-09 11:39:07]
+  3. (cd web-next && bun run test) # 全件 pass 検証 [✅ Done: 2026-05-09 11:39:07]
+  4. git add とコミット [✅ Done: 2026-05-09 11:39:07, `5510c4e`]
+  5. MIGRATION_PROGRESS.md の更新とコミット [✅ Done: 2026-05-09 11:40:21, `e2603c1`]
 
 絶対禁止:
 - bun run lint:fix / bunx biome check --write （パス引数なし） — リポジトリ全体を書き換えるため（R1 違反）
