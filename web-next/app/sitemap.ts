@@ -1,28 +1,10 @@
 import type { MetadataRoute } from "next";
 
+import { resolveSiteUrl } from "@/lib/site-url";
+
 export const dynamic = "force-static";
 
-const _DEFAULT_SITE_URL = "https://comparison-of-llms.netlify.app";
-
-function resolveSiteUrl(): string {
-  const envVal = process.env.NEXT_PUBLIC_SITE_URL;
-  if (envVal) {
-    try {
-      return new URL(envVal).origin;
-    } catch {
-      // fall through to default
-    }
-  }
-  if (!process.env.NETLIFY) {
-    console.warn(
-      "[sitemap.ts] NEXT_PUBLIC_SITE_URL is not set or invalid. " +
-        "Set NEXT_PUBLIC_SITE_URL for non-Netlify deployments."
-    );
-  }
-  return _DEFAULT_SITE_URL;
-}
-
-const SITE_URL = resolveSiteUrl();
+const SITE_URL = resolveSiteUrl("sitemap.ts");
 
 const ROUTES = [
   "/",
