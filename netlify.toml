@@ -11,3 +11,98 @@
   # - NODE_VERSION: Next.js 16 は Node 20+ を要求 (Bun は Node ランタイムを代替しない)
   BUN_VERSION  = "1.3.9"
   NODE_VERSION = "20"
+
+# Phase F: 旧 legacy/ HTML URL → Next.js App Router パスへの 301 リダイレクト
+# Phase B (skill.html × 4)
+[[redirects]]
+  from   = "/claude/skill.html"
+  to     = "/claude/skill"
+  status = 301
+
+[[redirects]]
+  from   = "/gemini/skill.html"
+  to     = "/gemini/skill"
+  status = 301
+
+[[redirects]]
+  from   = "/codex/skill.html"
+  to     = "/codex/skill"
+  status = 301
+
+[[redirects]]
+  from   = "/copilot/skill.html"
+  to     = "/copilot/skill"
+  status = 301
+
+# Phase C (agent.html × 4)
+[[redirects]]
+  from   = "/claude/agent.html"
+  to     = "/claude/agent"
+  status = 301
+
+[[redirects]]
+  from   = "/gemini/agent.html"
+  to     = "/gemini/agent"
+  status = 301
+
+[[redirects]]
+  from   = "/codex/agent.html"
+  to     = "/codex/agent"
+  status = 301
+
+[[redirects]]
+  from   = "/copilot/agent.html"
+  to     = "/copilot/agent"
+  status = 301
+
+# Phase D (long-form guides × 9)
+[[redirects]]
+  from   = "/claude/skill-guide-for-claude.html"
+  to     = "/claude/skill-guide"
+  status = 301
+
+[[redirects]]
+  from   = "/claude/skill-guide-of-claude-for-intermediate.html"
+  to     = "/claude/skill-guide-intermediate"
+  status = 301
+
+[[redirects]]
+  from   = "/claude/claude-cowork-guide.html"
+  to     = "/claude/cowork-guide"
+  status = 301
+
+[[redirects]]
+  from   = "/gemini/skill-guide-for-gemini.html"
+  to     = "/gemini/skill-guide"
+  status = 301
+
+[[redirects]]
+  from   = "/gemini/skill-guide-of-gemini-for-intermediate.html"
+  to     = "/gemini/skill-guide-intermediate"
+  status = 301
+
+[[redirects]]
+  from   = "/gemini/antigravity-guide.html"
+  to     = "/gemini/antigravity-guide"
+  status = 301
+
+[[redirects]]
+  from   = "/codex/openai-codex-guide.html"
+  to     = "/codex/openai-codex-guide"
+  status = 301
+
+[[redirects]]
+  from   = "/copilot/markdown-file-guide.html"
+  to     = "/copilot/markdown-file-guide"
+  status = 301
+
+[[redirects]]
+  from   = "/copilot/github-copilot.html"
+  to     = "/copilot/github-copilot"
+  status = 301
+
+# Phase E (git_worktree.html)
+[[redirects]]
+  from   = "/git_worktree.html"
+  to     = "/git-worktree"
+  status = 301

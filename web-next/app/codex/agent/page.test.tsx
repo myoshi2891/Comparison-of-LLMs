@@ -80,7 +80,7 @@ describe("/codex/agent - page structure", () => {
     // CSS Modules のクラス名はハッシュ化されるため nav.toc は使えない。
     // ページ内の全 nav のうち、hash リンク (#) を持つものを TOC nav として絞り込む。
     const tocNav = Array.from(container.querySelectorAll("nav")).find((nav) =>
-      nav.querySelector('a[href^="#"]'),
+      nav.querySelector('a[href^="#"]')
     );
     expect(tocNav, "TOC nav element must exist").not.toBeUndefined();
     const tocAnchors = tocNav?.querySelectorAll('a[href^="#"]') ?? [];

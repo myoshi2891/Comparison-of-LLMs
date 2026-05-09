@@ -683,6 +683,7 @@
   background: var(--surface2);
 }
 
+/* biome-ignore lint/style/noDescendingSpecificity: general td code style intentionally defined here; .matrixNote code above has higher specificity and wins in overlap */
 .root td code {
   background: var(--surface3);
   border: 1px solid var(--border2);

@@ -6,35 +6,36 @@
 
 | 領域 | フレームワーク | 状態 | コマンド |
 | ------ | --------------- | ------ | ---------- |
-| フロントエンド (web/) | vitest + @testing-library/react | 基本スモークテストあり | `cd web && bun test` |
-| スクレイパー (scraper/) | pytest | 基本スモークテストあり | `cd scraper && uv run pytest` |
+| フロントエンド (web-next/) | Vitest + @testing-library/react | 542 passed（全 Green） | `cd web-next && bun run test` |
+| スクレイパー (scraper/) | pytest | 5/5 passed | `cd scraper && uv run pytest` |
 
 ## テスト実行
 
 ### フロントエンド
 
 ```bash
-cd web
-bun test           # vitest 実行 (watch モード)
-bun test --run     # 単発実行 (CI 用)
+cd web-next
+bun run test           # vitest 実行 (watch モード)
+bun run test --run     # 単発実行 (CI 用)
 ```
 
 **設定ファイル:**
 
-- テストランナー: `vitest` (package.json の `"test": "vitest"`)
-- DOM 環境: `jsdom` (vitest.config 経由 or vite.config.ts のtest設定)
-- セットアップ: `src/setupTests.ts` (`@testing-library/jest-dom` のマッチャー拡張)
-- tsconfig: テストファイルは `tsconfig.app.json` の `exclude` に指定 (`**/*.test.ts`, `**/*.test.tsx`)
+- テストランナー: `vitest` (`web-next/vitest.config.ts`)
+- DOM 環境: `jsdom`
+- セットアップ: `web-next/` 内の各 `page.test.tsx` が担当
+- tsconfig: `web-next/tsconfig.json` の `strict: true` + `erasableSyntaxOnly: true`
 
-**既存テスト:**
+**既存テスト構成:**
 
 ```text
-web/src/App.test.tsx
-  - App コンポーネントの基本レンダリングテスト
-  - "AI Cost Simulator" テキストの存在確認
-  - "USD + JPY" テキストの存在確認
-web/tests/smoke/smoke.test.tsx
-  - ヘッダー注入スクリプトなど、ビルド成果物の基本的な動作確認
+web-next/tests/
+  cost.test.ts              - lib/cost.ts 純粋関数テスト
+  pricing.test.ts           - Zod スキーマバリデーション
+  i18n.test.ts              - i18n ヘルパーテスト
+  ...
+web-next/app/{claude,gemini,codex,copilot}/*/page.test.tsx
+  - 各ガイドページの contract テスト（タイトル・セクション数・外部リンク rel・metadata）
 ```
 
 ### スクレイパー
@@ -53,25 +54,24 @@ uv run pytest -k "test_"   # パターンマッチ
 
 ## CI での実行
 
-GitHub Actions (`.github/workflows/test.yaml`) で自動実行:
+GitHub Actions で自動実行:
 
 ```text
 push / pull_request
-  ├── web/** 変更時   → bun test || true  (失敗を許容)
-  └── scraper/** 変更時 → uv run pytest    (strict)
+  ├── web-next/** 変更時  → cd web-next && bun run test
+  ├── web-next/** 変更時  → cd web-next && bun run typecheck
+  └── scraper/** 変更時   → cd scraper && uv run pytest
 ```
-
-**注意:** web-test は `|| true` で失敗を許容している。将来テストが安定したら外すべき。
 
 ## テスト追加ガイドライン
 
-### フロントエンド (`web/`)
+### フロントエンド (`web-next/`)
 
 #### ファイル命名規則
 
 ```text
-src/<name>.test.tsx    # コンポーネントテスト
-src/lib/<name>.test.ts # ユーティリティテスト
+web-next/tests/<name>.test.ts       # ユーティリティテスト
+web-next/app/<provider>/<slug>/page.test.tsx  # ガイドページ contract テスト
 ```
 
 #### 推奨テストパターン
@@ -79,8 +79,8 @@ src/lib/<name>.test.ts # ユーティリティテスト
 **1. コスト計算ロジック (`lib/cost.ts`)** — 最優先
 
 ```typescript
-// src/lib/cost.test.ts
-import { calcApiCost, calcSubCost, colorIndex, fmtUSD, fmtJPY } from './cost'
+// web-next/tests/cost.test.ts
+import { calcApiCost, calcSubCost, colorIndex, fmtUSD, fmtJPY } from '@/lib/cost'
 
 describe('calcApiCost', () => {
   it('1時間のコストを正しく計算する', () => {

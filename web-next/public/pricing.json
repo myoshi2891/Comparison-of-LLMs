@@ -1,17 +1,28 @@
 {
-  "generated_at": "2026-04-13",
-  "jpy_rate": 159.75,
-  "jpy_rate_date": "2026-04-13",
+  "generated_at": "2026-05-09",
+  "jpy_rate": 156.65,
+  "jpy_rate_date": "2026-05-09",
   "api_models": [
     {
       "provider": "Anthropic",
-      "name": "Claude Opus 4.6",
+      "name": "Claude Opus 4.7",
       "tag": "最新",
       "cls": "tag-flag",
       "price_in": 5.0,
       "price_out": 25.0,
-      "sub_ja": "エージェントチーム / 1M ctx",
-      "sub_en": "Agent teams / 1M ctx",
+      "sub_ja": "SWE-bench 87.6% / コーディング特化 / Apr 2026",
+      "sub_en": "SWE-bench 87.6% / Coding-focused / Apr 2026",
+      "scrape_status": "fallback"
+    },
+    {
+      "provider": "Anthropic",
+      "name": "Claude Opus 4.6",
+      "tag": "Stable",
+      "cls": "tag-flag",
+      "price_in": 5.0,
+      "price_out": 25.0,
+      "sub_ja": "旧フラッグシップ / エージェントチーム / 1M ctx",
+      "sub_en": "Prev flagship / Agent teams / 1M ctx",
       "scrape_status": "fallback"
     },
     {
@@ -21,7 +32,7 @@
       "cls": "tag-flag",
       "price_in": 3.0,
       "price_out": 15.0,
-      "sub_ja": "バランス最適 / 200K",
+      "sub_ja": "バランス最適 / 200K ctx",
       "sub_en": "Optimal balance / 200K ctx",
       "scrape_status": "fallback"
     },
@@ -38,6 +49,17 @@
     },
     {
       "provider": "Anthropic",
+      "name": "Claude Haiku 3.5",
+      "tag": "Budget",
+      "cls": "tag-mini",
+      "price_in": 0.8,
+      "price_out": 4.0,
+      "sub_ja": "コスト効率モデル / 前世代",
+      "sub_en": "Cost-efficient / prev-gen",
+      "scrape_status": "fallback"
+    },
+    {
+      "provider": "Anthropic",
       "name": "Claude Opus 4.1 (Legacy)",
       "tag": "Legacy",
       "cls": "tag-leg",
@@ -48,14 +70,14 @@
       "scrape_status": "fallback"
     },
     {
-      "provider": "Anthropic",
-      "name": "Claude Haiku 3",
-      "tag": "Budget",
-      "cls": "tag-mini",
-      "price_in": 0.25,
-      "price_out": 1.25,
-      "sub_ja": "Claude最安値モデル",
-      "sub_en": "Claude lowest-cost model",
+      "provider": "OpenAI",
+      "name": "GPT-5.5",
+      "tag": "最新 Flagship",
+      "cls": "tag-flag",
+      "price_in": 5.0,
+      "price_out": 30.0,
+      "sub_ja": "現行フラッグシップ / 1M ctx / May 2026",
+      "sub_en": "Current flagship / 1M ctx / May 2026",
       "scrape_status": "fallback"
     },
     {
@@ -105,12 +127,12 @@
     {
       "provider": "OpenAI",
       "name": "GPT-5.4",
-      "tag": "Flagship",
+      "tag": "Prev Flagship",
       "cls": "tag-flag",
       "price_in": 2.5,
       "price_out": 15.0,
-      "sub_ja": "統合コーディング+推論 / 1M ctx / Mar 2026",
-      "sub_en": "Unified coding+reasoning / 1M ctx / Mar 2026",
+      "sub_ja": "旧フラッグシップ / 1M ctx / Mar 2026",
+      "sub_en": "Prev flagship / 1M ctx / Mar 2026",
       "scrape_status": "fallback"
     },
     {
@@ -127,7 +149,7 @@
     {
       "provider": "OpenAI",
       "name": "GPT-4o-latest",
-      "tag": "Latest",
+      "tag": "Legacy",
       "cls": "tag-bal",
       "price_in": 5.0,
       "price_out": 15.0,
@@ -203,6 +225,17 @@
     },
     {
       "provider": "OpenAI",
+      "name": "GPT-5.4 Nano",
+      "tag": "Budget",
+      "cls": "tag-mini",
+      "price_in": 0.2,
+      "price_out": 1.25,
+      "sub_ja": "GPT-5.4系最安値 / 超高速",
+      "sub_en": "Cheapest GPT-5.4 tier / ultra-fast",
+      "scrape_status": "fallback"
+    },
+    {
+      "provider": "OpenAI",
       "name": "GPT-5 Nano",
       "tag": "Budget",
       "cls": "tag-mini",
@@ -219,8 +252,8 @@
       "cls": "tag-flag",
       "price_in": 2.0,
       "price_out": 12.0,
-      "sub_ja": "最新世代フラッグシップ / 1M ctx / Feb 2026",
-      "sub_en": "Latest gen flagship / 1M ctx / Feb 2026",
+      "sub_ja": "現行世代フラッグシップ / 1M ctx / Mar 2026",
+      "sub_en": "Current gen flagship / 1M ctx / Mar 2026",
       "scrape_status": "fallback"
     },
     {
@@ -335,13 +368,24 @@
     },
     {
       "provider": "DeepSeek",
-      "name": "DeepSeek V4",
+      "name": "DeepSeek V4 Flash",
       "tag": "General",
       "cls": "tag-oss",
-      "price_in": 0.3,
-      "price_out": 0.5,
-      "sub_ja": "新フラッグシップ / Mar 2026 / OSS MIT",
-      "sub_en": "New flagship / Mar 2026 / OSS MIT",
+      "price_in": 0.14,
+      "price_out": 0.28,
+      "sub_ja": "新フラッグシップ / 1M ctx / Apr 2026 / MIT",
+      "sub_en": "New flagship Flash / 1M ctx / Apr 2026 / MIT",
+      "scrape_status": "fallback"
+    },
+    {
+      "provider": "DeepSeek",
+      "name": "DeepSeek V4 Pro",
+      "tag": "Reasoning",
+      "cls": "tag-oss",
+      "price_in": 1.74,
+      "price_out": 3.48,
+      "sub_ja": "高度推論 / 1M ctx / 1.6T MoE / MIT",
+      "sub_en": "Advanced reasoning / 1M ctx / 1.6T MoE / MIT",
       "scrape_status": "fallback"
     },
     {
@@ -368,24 +412,35 @@
     },
     {
       "provider": "xAI",
-      "name": "Grok 4",
-      "tag": "Flagship",
+      "name": "Grok 4.3",
+      "tag": "最新 Flagship",
       "cls": "tag-flag",
-      "price_in": 3.0,
-      "price_out": 15.0,
-      "sub_ja": "Jul 2025 / 256K ctx",
-      "sub_en": "Jul 2025 / 256K ctx",
+      "price_in": 1.25,
+      "price_out": 2.5,
+      "sub_ja": "現行フラッグシップ / 1M ctx / May 2026",
+      "sub_en": "Current flagship / 1M ctx / May 2026",
+      "scrape_status": "fallback"
+    },
+    {
+      "provider": "xAI",
+      "name": "Grok 4.20",
+      "tag": "Long-ctx 2M",
+      "cls": "tag-bal",
+      "price_in": 2.0,
+      "price_out": 6.0,
+      "sub_ja": "長コンテキスト特化 / 2M ctx / マルチエージェント",
+      "sub_en": "Long-context option / 2M ctx / Multi-agent",
       "scrape_status": "fallback"
     },
     {
       "provider": "xAI",
       "name": "Grok 4.1 Fast",
-      "tag": "Fast",
+      "tag": "Legacy ⚠退役",
       "cls": "tag-mini",
       "price_in": 0.2,
       "price_out": 0.5,
-      "sub_ja": "2Mコンテキスト / 業界最安クラス",
-      "sub_en": "2M context / among cheapest in class",
+      "sub_ja": "⚠2026-05-15退役 / 2Mコンテキスト / 業界最安クラス",
+      "sub_en": "⚠Retiring 2026-05-15 / 2M context / among cheapest",
       "scrape_status": "fallback"
     }
   ],

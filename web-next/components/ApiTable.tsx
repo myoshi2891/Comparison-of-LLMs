@@ -52,9 +52,9 @@ const COL_KEYS: readonly ColKey[] = [
 ] as const;
 
 /**
- * Render an API pricing comparison table with sortable period columns, per-model cost cells, and provider grouping.
+ * Renders an API pricing comparison table with sortable period columns, provider grouping, and cheapest-row highlighting.
  *
- * The table computes per-model costs for configured periods, allows column-based ascending/descending sorting, inserts provider group headers when the provider changes, and marks the model(s) with the lowest 30-day cost with a cheapest badge and row styling.
+ * The table displays per-model computed costs for configured periods, allows ascending/descending sorting by column, inserts a provider header row when the provider changes, and marks model(s) with the lowest 30-day cost with a cheapest badge and row styling.
  *
  * @returns A JSX element containing the rendered pricing comparison table
  */
@@ -95,9 +95,7 @@ export function ApiTable({ lang, models, inputTokens, outputTokens, jpyRate }: P
             {COL_KEYS.map((key, i) => (
               <th
                 key={key}
-                aria-sort={
-                  sortCol === i ? (sortDir > 0 ? "ascending" : "descending") : "none"
-                }
+                aria-sort={sortCol === i ? (sortDir > 0 ? "ascending" : "descending") : "none"}
               >
                 <button
                   type="button"

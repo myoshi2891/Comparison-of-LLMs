@@ -142,7 +142,10 @@ export function HomePage({ data }: Props) {
         <span>
           {t("footerSummary", lang)
             .replace("{date}", data.generated_at.slice(0, 10))
-            .replace("{jpy}", Number.isFinite(jpy_rate) && jpy_rate > 0 ? jpy_rate.toFixed(0) : "—")}
+            .replace(
+              "{jpy}",
+              Number.isFinite(jpy_rate) && jpy_rate > 0 ? jpy_rate.toFixed(0) : "—"
+            )}
         </span>
         <span>{t("footerFormula", lang)}</span>
       </footer>

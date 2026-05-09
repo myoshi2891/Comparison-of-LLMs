@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## プロジェクト概要
 
-AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Python スクレイパーが各社料金ページから価格を自動取得し `pricing.json` を生成、**Next.js 16 App Router（SSG / `output: 'export'`）** がそれを読み込んで Netlify CDN へ配信する。Phase 1–14 でコスト計算機ページが Next.js 化済み。残る 18 枚のガイドページ（旧 `legacy/` 配下）は Phase A–F で順次移行中（[`docs/NEXTJS_PHASE_A_F_PLAN.md`](docs/NEXTJS_PHASE_A_F_PLAN.md)）。
+AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Python スクレイパーが各社料金ページから価格を自動取得し `pricing.json` を生成、**Next.js 16 App Router（SSG / `output: 'export'`）** がそれを読み込んで Netlify CDN へ配信する。Phase 1–14 でコスト計算機ページが Next.js 化済み。18 枚のガイドページ（旧 `legacy/` 配下）は Phase A–F で **全移行完了**（計画書は [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md) に保存）。
 
 ## アーキテクチャ
 
@@ -47,11 +47,12 @@ update.sh  ← オーケストレーター (scrape → copy)
 │   ├── web/                     旧 Vite フロントエンド (Phase 14 でカットオーバー)
 │   ├── index.html               旧ホーム (単一ファイル)
 │   ├── shared/common-header.*   共通ヘッダー (Phase A で SiteHeader に置換済み)
-│   ├── claude/ gemini/ codex/ copilot/   18 HTML ガイド (Phase B–E で page.tsx 化へ移行中)
-│   └── git_worktree.html        Mermaid v10 + 手書き SVG (Phase E は移行中)
+│   ├── claude/ gemini/ codex/ copilot/   18 HTML ガイド (Phase B–E で全 page.tsx 化完了)
+│   └── git_worktree.html        Mermaid v10 + 手書き SVG (Phase E 完了)
 └── docs/
-    ├── NEXTJS_MIGRATION_PLAN.md      アーキテクト初期プロンプト (Phase 1–14 完了で凍結)
-    └── NEXTJS_PHASE_A_F_PLAN.md      Phase A–F 計画
+    ├── README.md                プロジェクト概要・アーキテクチャ
+    ├── TESTING.md               テスト戦略・実行方法
+    └── archive/                 完了済み計画書 (NEXTJS_MIGRATION_PLAN.md 等)
 ```
 
 ## データフロー
@@ -116,7 +117,7 @@ cd scraper && uv run pytest   # バックエンド (pytest, テスト結果は C
 
 ## 重要な設計判断
 
-- **Next.js 16 App Router + SSG**: `output: 'export'` で pure 静的エクスポート → Netlify CDN 配信。`@netlify/plugin-nextjs` 不要。Phase 1–14 で Phase 1 のホームページが移行済、Phase A–F で残 18 ページを移行（[`docs/NEXTJS_PHASE_A_F_PLAN.md`](docs/NEXTJS_PHASE_A_F_PLAN.md)、[`docs/NEXTJS_MIGRATION_PLAN.md`](docs/NEXTJS_MIGRATION_PLAN.md)）
+- **Next.js 16 App Router + SSG**: `output: 'export'` で pure 静的エクスポート → Netlify CDN 配信。`@netlify/plugin-nextjs` 不要。Phase 1–14 でコスト計算機ホームが移行済、Phase A–F で残 18 ガイドページも全移行完了（計画書は `docs/archive/` に保存）
 - **3層フォールバック**: スクレイパーは「スクレイプ成功 → 既存 JSON の値 → ハードコードフォールバック」の順で価格を決定。`scrape_status` フィールド (`success` | `fallback` | `manual`) で出自を追跡
 - **型の同期**: `scraper/src/scraper/models.py` (Pydantic) が SSoT、`web-next/types/pricing.ts` (TypeScript) が手動ミラー、`web-next/lib/pricing.ts` の `_AssertParity` でコンパイル時検証。**片方を変更したら必ずもう片方も更新すること**
 - **JA/EN バイリンガル**: `web-next/lib/i18n.tsx` で全テキストを管理（`T` オブジェクト + `t()` / `tRich()` の React 要素ファクトリ）。各スクレイパーも `sub_ja` / `sub_en` や `note_ja` / `note_en` のペアで日英テキストを持つ。ガイドページ（Phase B–E）は当面 JA 固定
@@ -224,11 +225,11 @@ Phase A–F 遂行中、新規ガイドページ (`claude/`, `gemini/`, `codex/`
 - 契約テスト（タイトル・セクション数・外部リンク rel・metadata）を `page.test.tsx` に配置
 - プロジェクト固有スキル `/nextjs-page-migration` で 1 ページ移行手順を自動化可能
 
-### 静的 HTML ドキュメント（legacy/ 配下、移行対象）
+### 静的 HTML ドキュメント（legacy/ 配下、移行完了）
 
-`legacy/` 配下の **18 HTML** は `.gitignore` により remote から隔離済で、Phase A–F で `web-next/app/*` の page.tsx へ順次置換中。
-ファイル別の行数・注意点・移行 Phase 割当は **[`docs/NEXTJS_PHASE_A_F_PLAN.md`](docs/NEXTJS_PHASE_A_F_PLAN.md) §3.1** を参照。
-進捗は **[`MIGRATION_PROGRESS.md`](MIGRATION_PROGRESS.md)** を参照（頻繁に更新されるため CLAUDE.md にインラインしない — プロンプトキャッシュ安定性のため）。
+`legacy/` 配下の **18 HTML** は `.gitignore` により remote から隔離済。Phase A–F で `web-next/app/*` の page.tsx への置換が**全完了**。
+移行計画詳細は **[`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md)** を参照（アーカイブ）。
+最終進捗は **[`MIGRATION_PROGRESS.md`](MIGRATION_PROGRESS.md)** を参照。
 
 #### AI モデルバージョンの扱い
 
