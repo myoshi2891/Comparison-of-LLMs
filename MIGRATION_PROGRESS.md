@@ -9,7 +9,7 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- 最新 HEAD: 2ceedd3（feat(web-next): robots.ts と sitemap.ts の SITE_URL 解決ロジックを堅牢化）
+- 最新 HEAD: 72d15df（refactor(web-next): resolveSiteUrlを共通ユーティリティに抽出）
 - 未コミット作業: なし（working tree クリーン）
 - 次の作業: **Phase A–F 全完了 → main へのマージ PR 作成**
 - テスト数: `bun run test` **542 passed / 542 total（全 Green ✅）**  — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
