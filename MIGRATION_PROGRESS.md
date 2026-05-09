@@ -2,14 +2,14 @@
 
 > 本ファイルは `feat/nextjs-migration` ブランチでの移行作業の状況を記録する。
 > 移行計画:
-> - Phase 1–14（ホームページ）: [`docs/NEXTJS_MIGRATION_PLAN.md`](docs/NEXTJS_MIGRATION_PLAN.md)（凍結扱い）
-> - Phase A–F（18 ガイドページ + 共通インフラ）: [`docs/NEXTJS_PHASE_A_F_PLAN.md`](docs/NEXTJS_PHASE_A_F_PLAN.md)
+> - Phase 1–14（ホームページ）: [`docs/archive/NEXTJS_MIGRATION_PLAN.md`](docs/archive/NEXTJS_MIGRATION_PLAN.md)（完了・アーカイブ）
+> - Phase A–F（18 ガイドページ + 共通インフラ）: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md)（完了・アーカイブ）
 > - プロジェクト固有スキル: [`.claude/skills/nextjs-page-migration/SKILL.md`](.claude/skills/nextjs-page-migration/SKILL.md)
 
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- 最新 HEAD: 3b45319（chore(web-next): fix all pre-existing lint and formatting issues）
+- 最新 HEAD: 2cfc4cb（docs: update MIGRATION_PROGRESS.md HEAD to 3b45319）
 - 未コミット作業: なし（working tree クリーン）
 - 次の作業: **Phase A–F 全完了 → main へのマージ PR 作成**
 - テスト数: `bun run test` **542 passed / 542 total（全 Green ✅）**  — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
@@ -26,11 +26,11 @@
   - `bun run lint:fix`（= `biome check . --write`）
   - `bunx biome check --write`（パス引数なし、カレント全体）
   - `bunx biome format --write`（同上）
-- **理由**: CLAUDE.md「リポジトリ全体の自動フォーマット禁止」ルール違反。このリポジトリには既存の printWidth / organizeImports 違反 6 件が残存しており（別 Issue 対応中）、全体 `--write` はそれらを含む無関係ファイルを意図せず書き換えてしまう
+- **理由**: CLAUDE.md「リポジトリ全体の自動フォーマット禁止」ルール違反。全体 `--write` は作業範囲外の無関係ファイルを意図せず書き換えてしまう（既存違反は `3b45319` で全解消済み、現在 0 件）
 - **正しい手順**:
-  1. `bun run lint` でまず全違反を一覧し、自分の作業範囲起点のものと pre-existing 6 件を切り分ける
+  1. `bun run lint` でまず全違反を一覧し、自分の作業範囲起点のものを特定する
   2. 自分の作業範囲のみを明示的にパス指定して fix: 例 `bunx biome check --write app/<provider>/<slug>/page.tsx app/<provider>/<slug>/page.module.css app/<provider>/<slug>/page.test.tsx`
-  3. 再度 `bun run lint` を実行し、新規違反がゼロで pre-existing 6 件のみが残っていることを確認
+  3. 再度 `bun run lint` を実行し、新規違反がゼロであることを確認
 
 ### R2. faithful 移植の必須化（Phase C-2 で判明）
 
@@ -157,7 +157,7 @@ web-next/
 
 **テスト数**: **542 passed / 542 total（全 Green）** — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
 
-## 確定した設計判断（`docs/NEXTJS_MIGRATION_PLAN.md` ステップ 0）
+## 確定した設計判断（`docs/archive/NEXTJS_MIGRATION_PLAN.md` ステップ 0）
 
 1. **ディレクトリ**: `web-next/` を `legacy/` と並行運用（Phase 14 で旧 `web/` を `legacy/` に退避済み）
 2. **Markdown 運用フロー**: L1 Primitives / L2 Feature Blocks / L3 Pages の 3 層
@@ -180,8 +180,8 @@ Next.js 移行プロジェクトの作業を再開してください。
 
 - リポジトリ: LLM-Studies（Phase A–F の Next.js 移行作業中）
 - 現在のブランチ: feat/nextjs-migration
-- 最新 HEAD: 5510c4e（feat(web-next): Phase F — add 301 redirects, sitemap.xml, robots.txt）
-- 移行計画: docs/NEXTJS_PHASE_A_F_PLAN.md（Phase A–F）— 全 Phase 完了
+- 最新 HEAD: 2cfc4cb（docs: update MIGRATION_PROGRESS.md HEAD to 3b45319）
+- 移行計画: docs/archive/NEXTJS_PHASE_A_F_PLAN.md（Phase A–F）— 全 Phase 完了（アーカイブ）
 - 進捗トラッカー: MIGRATION_PROGRESS.md（**作業開始前に必読**: §「AI 作業ルール」R1〜R4）
 - プロジェクト固有スキル: .claude/skills/nextjs-page-migration/SKILL.md
 - リポジトリ規約: CLAUDE.md（AGENTS.md / GEMINI.md からも参照される。AI 共通の編集ルール）
@@ -197,7 +197,7 @@ Phase E の確立パターン（MermaidDiagram）:
 - lint 既知違反: なし（全解消 ✅）
 
 作業手順（Phase F: redirects / sitemap）:
-- **最初に `docs/NEXTJS_PHASE_A_F_PLAN.md` §Phase F を参照**して対象 URL マッピングを確認
+- ※ Phase F 完了済み。URL マッピングは `docs/archive/NEXTJS_PHASE_A_F_PLAN.md` §Phase F を参照
 - Phase F は以下の 2 タスクで構成される:
   1. `netlify.toml` に `[[redirects]]` を追加（旧 `.html` URL → 新 Next.js パス、301）
   2. `web-next/public/sitemap.xml`（または `app/sitemap.ts`）を更新して移行済み全ページを列挙
@@ -223,7 +223,7 @@ Phase E の確立パターン（MermaidDiagram）:
 
 既知の持越し（別 Issue で対応、本作業では触らない）:
 - lib/i18n.test.ts:18 の key count ハードコード
-- 一部既存ファイルの Biome printWidth 違反 6 件（R1 により全体 lint:fix 禁止）
+- Biome 既存違反: なし（3b45319 で全解消 ✅、R1 により全体 lint:fix は引き続き禁止）
 ```
 
 ### LLM 別の補足
@@ -231,9 +231,9 @@ Phase E の確立パターン（MermaidDiagram）:
 - **Claude Code**: `/nextjs-page-migration` skill が使える（MDX・`.md` SSoT 方式は不採用。全ページ HTML → JSX 直接移植）
 - **Gemini CLI**: GEMINI.md が `@CLAUDE.md` を import する形にしてあるため、CLAUDE.md ルールが自動継承される
 - **Codex / Cursor**: AGENTS.md（CLAUDE.md と同等内容）を読み込ませる
-- **任意の Agent**: 上記プロンプトと CLAUDE.md・MIGRATION_PROGRESS.md・docs/NEXTJS_PHASE_A_F_PLAN.md §Phase F の 3 つを冒頭で読み込ませれば自走可能
+- **任意の Agent**: 上記プロンプトと CLAUDE.md・MIGRATION_PROGRESS.md の 2 つを冒頭で読み込ませれば自走可能（Phase A–F 計画書は docs/archive/ に移動済み）
 
 ## Phase C 完了記録（参照用アーカイブ）
 
 Phase C-1〜C-4 はすべて faithful 移植完了。確立したパターンは SKILL.md §「Phase C 確立パターン」に転記済み。
-詳細な設計事実は `docs/NEXTJS_PHASE_C_DETAILED_DESIGN.md` を参照。
+詳細な設計事実は `docs/archive/NEXTJS_PHASE_C_DETAILED_DESIGN.md` を参照（アーカイブ）。
