@@ -32,6 +32,17 @@ const ROUTES = [
   "/git-worktree",
 ] as const;
 
+/**
+ * Generate sitemap entries from the predefined route list.
+ *
+ * Each sitemap item uses `SITE_URL` combined with the route path, sets `lastModified` to the current date (same value for all entries), and applies different `changeFrequency` and `priority` for the root route versus other routes.
+ *
+ * @returns An array of sitemap items where each item has:
+ * - `url`: `SITE_URL` concatenated with the route path
+ * - `lastModified`: the current date (same for all items)
+ * - `changeFrequency`: `"weekly"` for `/`, `"monthly"` for all other routes
+ * - `priority`: `1.0` for `/`, `0.8` for all other routes
+ */
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
   return ROUTES.map((route) => ({
