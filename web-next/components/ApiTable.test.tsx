@@ -460,7 +460,9 @@ describe("ApiTable - sort title a11y", () => {
     );
     const headers = container.querySelectorAll("thead th");
     // 期間ヘッダ内 button に title がある
-    expect(headers[1]?.querySelector("button")?.getAttribute("title")).toContain("クリックでソート");
+    expect(headers[1]?.querySelector("button")?.getAttribute("title")).toContain(
+      "クリックでソート"
+    );
   });
 
   it("period headers have sort title attribute (English)", () => {

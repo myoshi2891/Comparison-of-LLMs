@@ -26,8 +26,7 @@ interface Props {
  * @returns The React element for the math section containing four informational cards.
  */
 export function MathSection({ lang, jpyRate }: Props) {
-  const rateRounded =
-    Number.isFinite(jpyRate) && jpyRate > 0 ? jpyRate.toFixed(2) : "—";
+  const rateRounded = Number.isFinite(jpyRate) && jpyRate > 0 ? jpyRate.toFixed(2) : "—";
   const ja = lang === "ja";
 
   return (

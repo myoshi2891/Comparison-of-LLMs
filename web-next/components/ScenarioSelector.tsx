@@ -106,7 +106,9 @@ export function ScenarioSelector({
   };
 
   const updateCustomOutput = (val: number) => {
-    const clamped = Number.isNaN(val) ? OUTPUT_MIN : Math.min(OUTPUT_MAX, Math.max(OUTPUT_MIN, val));
+    const clamped = Number.isNaN(val)
+      ? OUTPUT_MIN
+      : Math.min(OUTPUT_MAX, Math.max(OUTPUT_MIN, val));
     setCustomOutput(clamped);
     if (scenario === "custom") onScenarioChange("custom", customInput, clamped);
   };

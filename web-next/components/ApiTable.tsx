@@ -95,9 +95,7 @@ export function ApiTable({ lang, models, inputTokens, outputTokens, jpyRate }: P
             {COL_KEYS.map((key, i) => (
               <th
                 key={key}
-                aria-sort={
-                  sortCol === i ? (sortDir > 0 ? "ascending" : "descending") : "none"
-                }
+                aria-sort={sortCol === i ? (sortDir > 0 ? "ascending" : "descending") : "none"}
               >
                 <button
                   type="button"

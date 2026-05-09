@@ -15,8 +15,8 @@
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { beforeAll, describe, expect, it, vi } from "vitest";
 import type { Metadata, Viewport } from "next";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { T, t } from "@/lib/i18n";
 
 const repoRoot = join(__dirname, "..");

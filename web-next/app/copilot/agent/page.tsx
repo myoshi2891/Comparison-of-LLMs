@@ -1230,6 +1230,7 @@ export default function CopilotAgentPage() {
               {":\n      "}
               <span className={styles.cv}>SENTRY_ACCESS_TOKEN</span>
               {": "}
+              {/* biome-ignore lint/suspicious/noTemplateCurlyInString: GitHub Actions secret syntax */}
               <span className={styles.cv}>{"'${{ secrets.COPILOT_MCP_SENTRY_TOKEN }}'"}</span>
               {"\n"}
               {"      "}
@@ -2192,6 +2193,7 @@ export default function CopilotAgentPage() {
               {"\n      "}
               <span className={styles.cv}>SENTRY_ACCESS_TOKEN</span>
               {": "}
+              {/* biome-ignore lint/suspicious/noTemplateCurlyInString: GitHub Actions secret syntax */}
               <span className={styles.cv}>{"'${{ secrets.COPILOT_MCP_SENTRY_TOKEN }}'"}</span>
               {"\n      "}
               <span className={styles.cc}>
@@ -2199,10 +2201,12 @@ export default function CopilotAgentPage() {
               </span>
               {"\n      "}
               <span className={styles.cc}>
+                {/* biome-ignore lint/suspicious/noTemplateCurlyInString: GitHub Actions template syntax */}
                 {"# GitHub Actions構文: ${{ secrets.* }} / ${{ vars.* }}"}
               </span>
               {"\n      "}
               <span className={styles.cc}>
+                {/* biome-ignore lint/suspicious/noTemplateCurlyInString: shell variable syntax */}
                 {"# Claude Code構文: ${VAR} / ${VAR:-default} も使用可"}
               </span>
               {"\n"}

@@ -14,7 +14,7 @@
 - 次の作業: **Phase A–F 全完了 → main へのマージ PR 作成**
 - テスト数: `bun run test` **542 passed / 542 total（全 Green ✅）**  — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
 - ビルド: `bun run build` ✅（5510c4e 時点）・`bun run typecheck` ✅・`uv run pytest` 5/5 passed
-- **lint 既知違反**: 5 warnings + 7 errors（既知）
+- **lint 既知違反**: なし（全解消 ✅）
 
 ## AI 作業ルール（Phase A–F 共通、**必読**）
 
@@ -194,7 +194,7 @@ Phase E の確立パターン（MermaidDiagram）:
 - テストモック: `vi.mock("@/components/docs/MermaidDiagram", () => ({ default: () => null }))`
 - Mermaid chart 文字列は左端揃え必須（JSX テンプレートリテラル内のインデントに注意）
 - bash 配列変数 `${...}` / GitHub Actions `${{ }}` は `// biome-ignore lint/suspicious/noTemplateCurlyInString:` で抑制
-- lint 既知違反: 5 warnings + 7 errors（既知）
+- lint 既知違反: なし（全解消 ✅）
 
 作業手順（Phase F: redirects / sitemap）:
 - **最初に `docs/NEXTJS_PHASE_A_F_PLAN.md` §Phase F を参照**して対象 URL マッピングを確認
@@ -218,7 +218,7 @@ Phase E の確立パターン（MermaidDiagram）:
   (cd web-next && bun run test)          # 全件 pass が期待値（現在 542 件 全 pass）
   (cd web-next && bun run typecheck)     # OK
   (cd web-next && bun run build)         # 全ルートが ○ (Static)
-  (cd web-next && bun run lint)          # 既知 7 件のみ（新規違反ゼロが必須）
+  (cd web-next && bun run lint)          # 違反 0 件（Green ✅）
   (cd scraper && uv run pytest)          # 5/5 passed
 
 既知の持越し（別 Issue で対応、本作業では触らない）:
