@@ -3,7 +3,7 @@
 GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、GEMINI.md はその委譲 pointer として機能する。
 
-## 必読（順序固定、作業開始前に 2 点読むこと）
+## 必読（順序固定、作業開始前に 2 点を読むこと）
 
 1. [`CLAUDE.md`](CLAUDE.md) — リポジトリ全体の AI 編集ルール・アーキテクチャ・禁止事項
 2. [`MIGRATION_PROGRESS.md`](MIGRATION_PROGRESS.md) — 最新の移行完了状況・AI 作業ルール R1〜R4
