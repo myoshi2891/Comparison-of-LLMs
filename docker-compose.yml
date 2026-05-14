@@ -1,0 +1,46 @@
+services:
+
+  # ── scraper ──────────────────────────────────────────────────────────────────
+  # 用途: update.sh を実行して pricing.json を更新するワンショットコンテナ
+  # 起動: make scrape  /  make scrape-no-scrape
+  scraper:
+    build:
+      context: .
+      dockerfile: docker/scraper/Dockerfile
+    volumes:
+      # プロジェクトルートをバインドマウント
+      # update.sh が web-next/data/、web-next/public/、root の 3 箇所に書き込む
+      - .:/app
+      # Docker が初回マウント時にイメージ内の .venv をボリュームへ自動コピーする
+      # これにより macOS 用バイナリ（ホスト .venv）が Linux コンテナに流入しない
+      - scraper-venv:/app/scraper/.venv
+    environment:
+      - PLAYWRIGHT_NO_SANDBOX=1
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+
+  # ── web ──────────────────────────────────────────────────────────────────────
+  # 用途: Next.js 開発サーバー（ホットリロード）
+  # 起動: make dev  →  http://localhost:3000
+  web:
+    build:
+      context: .
+      dockerfile: docker/web/Dockerfile
+      target: dev
+    ports:
+      - "3000:3000"
+    volumes:
+      # web-next/ 全体をバインドマウント（ソース変更をホットリロードに反映）
+      - ./web-next:/app
+      # named volume が /app/node_modules に被さり、macOS バイナリの流入を防ぐ
+      # Docker はより長いパスのマウントを優先するためバインドマウントと共存可能
+      - web-node-modules:/app/node_modules
+    environment:
+      - NEXT_TELEMETRY_DISABLED=1
+      - NODE_ENV=development
+
+volumes:
+  # Linux 用 Python .venv（Playwright ブラウザバイナリはイメージ層に保存）
+  scraper-venv:
+  # Linux 用 node_modules（macOS 版バイナリの混入防止）
+  web-node-modules:
