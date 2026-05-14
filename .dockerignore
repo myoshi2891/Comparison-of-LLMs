@@ -1,0 +1,59 @@
+# ── バージョン管理 ────────────────────────────────────────────────────────────
+.git/
+.gitignore
+.githooks/
+
+# ── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+**/.DS_Store
+
+# ── Python ビルド成果物 ────────────────────────────────────────────────────────
+scraper/.venv/
+scraper/__pycache__/
+scraper/**/__pycache__/
+scraper/**/*.pyc
+scraper/**/*.pyo
+scraper/.pytest_cache/
+
+# ── Node.js / Bun ビルド成果物 ────────────────────────────────────────────────
+web-next/node_modules/
+web-next/.next/
+web-next/out/
+web-next/*.tsbuildinfo
+web-next/coverage/
+
+# ── legacy（大容量・コンテナ不要）────────────────────────────────────────────
+legacy/
+
+# ── Playwright MCP ────────────────────────────────────────────────────────────
+.playwright-mcp/
+
+# ── エディタ / IDE ─────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+
+# ── Claude / AI エージェント設定 ──────────────────────────────────────────────
+.claude/
+.gemini/
+.agent/
+.skills/
+CLAUDE.local.md
+AGENTS.md
+GEMINI.md
+web-next/AGENTS.md
+web-next/CLAUDE.md
+
+# ── アーカイブ / ドキュメント（ランタイム不要）────────────────────────────────
+archive/
+docs/
+md-for-update/
+
+# ── Git ワークツリー ───────────────────────────────────────────────────────────
+worktrees/
+
+# ── その他 ────────────────────────────────────────────────────────────────────
+*.log
+*.tmp
+*.bak
+sync-all.sh
+prettier.config.cjs
