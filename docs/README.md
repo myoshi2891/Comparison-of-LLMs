@@ -133,7 +133,30 @@ flowchart LR
 
 ---
 
-## クイックスタート
+## Docker クイックスタート（推奨）
+
+Docker Compose + Makefile を使うとローカル環境構築なしで動作します。
+
+```bash
+# 1. イメージをビルド（初回 or Dockerfile 変更時）
+make build-images
+
+# 2. pricing.json を最新化
+make scrape         # フルスクレイプ（Playwright 使用）
+make scrape-no-scrape  # 為替レートのみ（Playwright スキップ）
+
+# 3. 開発サーバー起動
+make dev            # → http://localhost:3000
+
+# その他の操作
+make build          # 静的エクスポート → web-next/out/
+make test           # 全テスト（vitest + pytest）
+make typecheck      # TypeScript 型チェック
+make lint           # Biome リント
+make help           # 全コマンド一覧
+```
+
+## ネイティブクイックスタート
 
 ```bash
 # スクレイパーセットアップ
