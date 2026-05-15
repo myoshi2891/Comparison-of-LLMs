@@ -478,7 +478,7 @@ CC-->>U: ガイドラインに準拠したREADME`}
               <span className={styles.fieldOptional}>任意</span>{" "}
               <span style={{ color: "var(--red)", fontSize: "11px" }}>（非推奨）</span>
             </div>
-            <div className={styles.fieldConstraint}>配列形式 | semver対応</div>
+            <div className={styles.fieldConstraint}>旧仕様: 配列形式 | semver対応</div>
             <div className={styles.fieldDesc}>
               <strong>2026年5月時点で公式ドキュメントから削除済み。</strong>
               既存スキルで使用している場合は、コメントとして SKILL.md 本文に依存関係を記載する形式へ移行することを推奨する。
@@ -1651,7 +1651,7 @@ style E fill:#1a3a5c,stroke:#63b3ed,color:#ffffff`}
                 <code>/effort low | medium | high | auto</code> で Opus 4.6
                 の思考深度をリアルタイム調整。 デフォルトは <code>medium</code>。スキルの
                 frontmatter に <code>effort: high</code> を付与すると、そのスキル起動時のみ deep
-                thinking が有効になる（v2.1.75）。
+                thinking が有効になる（2026年5月時点）。
               </li>
             </ul>
           </div>

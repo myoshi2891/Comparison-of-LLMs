@@ -24,7 +24,8 @@ _PRICE_MAX = 2000.0
 def get_page_text(url: str, wait_selector: str | None = None, timeout_ms: int = 30_000) -> str:
     """URL をヘッドレスブラウザで開き、ページテキスト全体を返す。"""
     with sync_playwright() as p:
-        _launch_args = ["--no-sandbox"] if os.getenv("PLAYWRIGHT_NO_SANDBOX") else []
+        _no_sandbox_val = (os.getenv("PLAYWRIGHT_NO_SANDBOX") or "").strip().lower()
+        _launch_args = ["--no-sandbox"] if _no_sandbox_val in {"1", "true", "yes", "on"} else []
         browser = p.chromium.launch(headless=True, args=_launch_args)
         try:
             page: Page = browser.new_page()
