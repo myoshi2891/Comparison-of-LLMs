@@ -36,8 +36,8 @@ class TestSmoke(unittest.TestCase):
             mock_get.return_value = mock_resp
 
             rate, date = fetch_jpy_rate()
-            self.assertEqual(rate, 150.0)
-            self.assertEqual(date, "2024-01-01")
+            assert rate == 150.0
+            assert date == "2024-01-01"
 
     def test_main(self):
         """
@@ -56,7 +56,7 @@ class TestSmoke(unittest.TestCase):
 
             # Test with no arguments (full scrape path)
             ret = main([])
-            self.assertEqual(ret, 0)
+            assert ret == 0
             mock_scrape.assert_called_once()
             mock_write.assert_called_once()
 
@@ -75,17 +75,17 @@ class TestSmoke(unittest.TestCase):
                 with patch(target) as mock_get:
                     mock_get.return_value = "<html>Mock</html>"
                     res = func()
-                    self.assertIsInstance(res, list)
+                    assert isinstance(res, list)
 
         # AWS uses httpx
-        with self.subTest(provider="scraper.providers.aws"):
+        with self.subTest(provider=scrape_aws.__name__):
             with patch("scraper.providers.aws.httpx.get") as mock_get:
                 mock_resp = MagicMock()
                 mock_resp.json.return_value = {}
                 mock_resp.raise_for_status.return_value = None
                 mock_get.return_value = mock_resp
                 res = scrape_aws()
-                self.assertIsInstance(res, list)
+                assert isinstance(res, list)
 
     def test_tools(self):
         """Smoke test for all tool scrapers (mocked)."""
@@ -104,7 +104,7 @@ class TestSmoke(unittest.TestCase):
                 with patch(target) as mock_get:
                     mock_get.return_value = "<html>Mock</html>"
                     res = func()
-                    self.assertIsInstance(res, list)
+                    assert isinstance(res, list)
 
 if __name__ == "__main__":
     unittest.main()
