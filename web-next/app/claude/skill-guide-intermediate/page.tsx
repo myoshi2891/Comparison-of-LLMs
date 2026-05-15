@@ -8,6 +8,13 @@ export const metadata: Metadata = {
     "プログレッシブ・ディスクロージャー、トークン経済、動的コンテキスト注入、context:fork、エンタープライズプロビジョニングまで網羅した実践リファレンスです。",
 };
 
+/**
+ * Render the SKILL.md intermediate guide page with navigation, table of contents, nine content sections, and footer.
+ *
+ * The component produces a fully static, client-rendered layout that presents the guide's sections (architecture, YAML, instruction design, args, fork, trigger, debug, enterprise, self-improvement), embedded diagrams, example code blocks, and references.
+ *
+ * @returns A JSX element containing the complete static guide layout (progress bar, page TOC, content sections with Mermaid diagrams and code samples, and footer)
+ */
 export default function Page() {
   return (
     <div className={styles.pageWrap}>
@@ -53,7 +60,7 @@ export default function Page() {
       <div className={styles.wrapper}>
         {/* ── Hero ── */}
         <div className={styles.hero}>
-          <div className={styles.heroBadge}>Claude Code（最新版）— 2026年3月時点</div>
+          <div className={styles.heroBadge}>Claude Code（最新版）— 2026年5月時点</div>
           <h1>
             SKILL.md
             <br />
@@ -474,11 +481,14 @@ CC-->>U: ガイドラインに準拠したREADME`}
           </div>
           <div className={styles.fieldCard}>
             <div className={styles.fieldName}>
-              <code>dependencies</code> <span className={styles.fieldOptional}>任意</span>
+              <code>dependencies</code>{" "}
+              <span className={styles.fieldOptional}>任意</span>{" "}
+              <span style={{ color: "var(--red)", fontSize: "11px" }}>（非推奨）</span>
             </div>
-            <div className={styles.fieldConstraint}>配列形式 | semver対応</div>
+            <div className={styles.fieldConstraint}>旧仕様: 配列形式 | semver対応</div>
             <div className={styles.fieldDesc}>
-              スキルの実行に必要なソフトウェアパッケージを明示する。エンタープライズ展開時の依存関係管理に活用できる。
+              <strong>2026年5月時点で公式ドキュメントから削除済み。</strong>
+              既存スキルで使用している場合は、コメントとして SKILL.md 本文に依存関係を記載する形式へ移行することを推奨する。
             </div>
           </div>
           <div className={styles.mermaidWrap}>
@@ -892,6 +902,13 @@ style P3 fill:#2d1f4a,stroke:#b794f4,color:#ffffff`}
             <div className={styles.secNum}>SECTION 05</div>
             <h2>{"context:fork vs カスタムSubagents — 境界線を引く"}</h2>
             <div className={styles.secLine} />
+          </div>
+          <div className={`${styles.callout} ${styles.calloutInfo}`}>
+            <span className={styles.calloutIcon}>🔧</span>
+            <strong>2026年5月現在も有効：</strong>
+            <code>context: fork</code> および <code>agent</code>{" "}
+            フィールドの挙動に関する不具合が v2.1.x で修正済み（GitHub Issue #17283）。
+            現在は仕様通りに動作することが確認されている。非推奨ではなく、引き続き推奨パターン。
           </div>
           <p>
             「コンテキストを分離してタスクを実行する」という目的は共通だが、
@@ -1641,7 +1658,7 @@ style E fill:#1a3a5c,stroke:#63b3ed,color:#ffffff`}
                 <code>/effort low | medium | high | auto</code> で Opus 4.6
                 の思考深度をリアルタイム調整。 デフォルトは <code>medium</code>。スキルの
                 frontmatter に <code>effort: high</code> を付与すると、そのスキル起動時のみ deep
-                thinking が有効になる（v2.1.75）。
+                thinking が有効になる（2026年5月時点）。
               </li>
             </ul>
           </div>
@@ -1821,7 +1838,7 @@ style LOOP fill:#2d2010,stroke:#ffa657,color:#ffffff`}
         <div className={styles.footer}>
           <p>Claude Code SKILL.md 中級者完全攻略ガイド</p>
           <p style={{ marginTop: "6px", fontSize: "12px" }}>
-            Claude Code（最新版）｜ 2026年3月時点
+            Claude Code（最新版）｜ 2026年5月時点
           </p>
           <p style={{ marginTop: "12px", fontSize: "11px", color: "var(--text3)" }}>
             参考:{" "}
@@ -1841,6 +1858,33 @@ style LOOP fill:#2d2010,stroke:#ffa657,color:#ffffff`}
               style={{ color: "var(--blue)", textDecoration: "none" }}
             >
               Agent Skills Overview
+            </a>
+            {" ｜ "}
+            <a
+              href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "var(--blue)", textDecoration: "none" }}
+            >
+              Best Practices
+            </a>
+            {" ｜ "}
+            <a
+              href="https://github.com/anthropics/skills"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "var(--blue)", textDecoration: "none" }}
+            >
+              github.com/anthropics/skills
+            </a>
+            {" ｜ "}
+            <a
+              href="https://code.claude.com/docs/en/changelog"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "var(--blue)", textDecoration: "none" }}
+            >
+              Changelog
             </a>
           </p>
         </div>

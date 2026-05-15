@@ -99,7 +99,19 @@ const SOURCES: Source[] = [
     num: "[15]",
     href: "https://github.com/anthropics/claude-code/releases",
     title: "Claude Code Releases — GitHub (2026)",
-    desc: "v2.1.x系リリースノート: Agent Teams、.claude/rules/、.claude/agents/、autoMemoryDirectory対応",
+    desc: "v2.x系リリースノート: /loop・/effort・ultrareview・Agent Teams安定化・Windows PowerShell対応",
+  },
+  {
+    num: "[16]",
+    href: "https://www.anthropic.com/news/claude-opus-4-7",
+    title: "Claude Opus 4.7 リリースブログ — Anthropic (2026年4月)",
+    desc: "xhigh effort・タスクバジェット・Self-verify・高解像度ビジョン（3.75MP）・破壊的変更点",
+  },
+  {
+    num: "[17]",
+    href: "https://code.claude.com/docs/en/changelog",
+    title: "Claude Code 公式チェンジログ — code.claude.com",
+    desc: "ultrareview・/resume強化・MCP自動リトライ・Bedrock サービスティア設定など最新変更一覧",
   },
 ];
 
@@ -114,6 +126,14 @@ function CodeDots() {
   );
 }
 
+/**
+ * Page component that presents a complete guide to using markdown files for Spec-Driven Development with Claude Code.
+ *
+ * Renders a documentation layout including a header, table of contents, and twelve sections covering CLAUDE.md, spec.md, requirements.md,
+ * design.md, tasks.md, MEMORY.md, steering/rules, SKILL.md, 2026 updates, best practices, and reference sources.
+ *
+ * @returns A React element representing the Claude Skill documentation page.
+ */
 export default function ClaudeSkillPage() {
   return (
     <div className={styles.root}>
@@ -128,10 +148,10 @@ export default function ClaudeSkillPage() {
           各ファイルの役割・構造・ベストプラクティスをステップバイステップで解説。根拠ソース付き。
         </p>
         <div className={styles.badgeRow}>
-          <span className={`${styles.badge} ${styles.badgeBlue}`}>Claude Code v2.1.76</span>
+          <span className={`${styles.badge} ${styles.badgeBlue}`}>Claude Code 最新版</span>
           <span className={`${styles.badge} ${styles.badgePurple}`}>Spec-Driven Development</span>
-          <span className={`${styles.badge} ${styles.badgeGreen}`}>March 2026 最新版</span>
-          <span className={`${styles.badge} ${styles.badgeOrange}`}>Opus 4.6 対応</span>
+          <span className={`${styles.badge} ${styles.badgeGreen}`}>May 2026 最新版</span>
+          <span className={`${styles.badge} ${styles.badgeOrange}`}>Opus 4.7 対応</span>
         </div>
       </header>
 
@@ -168,7 +188,7 @@ export default function ClaudeSkillPage() {
               <a href="#skill-md">SKILL.md — 再利用ナレッジ（2026年大幅強化）</a>
             </li>
             <li>
-              <a href="#new-2026">2026年3月 新機能まとめ</a>
+              <a href="#new-2026">2026年3〜5月 新機能まとめ</a>
             </li>
             <li>
               <a href="#best-practices">横断ベストプラクティス10則</a>
@@ -1345,12 +1365,12 @@ export default function ClaudeSkillPage() {
         <section id="new-2026" className={styles.section}>
           <div className={styles.sectionLabel}>Section 10</div>
           <h2 className={styles.sectionTitle}>
-            <span className={styles.num}>10.</span>2026年3月 新機能まとめ
+            <span className={styles.num}>10.</span>2026年3〜5月 新機能まとめ
           </h2>
 
           <p>
             Claude Code は
-            2026年に入り急速に進化しています。SDD実践に影響する主要な新機能を整理します。
+            2026年3〜5月にかけて急速に進化しています。SDD実践に影響する主要な新機能を整理します。
           </p>
 
           <div className={styles.principles}>
@@ -1358,8 +1378,7 @@ export default function ClaudeSkillPage() {
               <div className={styles.principleNum}>NEW</div>
               <h4>🤝 Agent Teams（マルチエージェント）</h4>
               <p>
-                複数のClaudeインスタンスが並列で協調作業。<code>claude --team</code>
-                で起動。tasks.mdのタスクを各エージェントに割り当て可能。
+                複数のClaudeインスタンスが並列で協調作業（3月に安定化）。Lead + Teammate構成でtasks.mdのタスクを分担可能。
               </p>
             </div>
             <div className={`${styles.principle} ${styles.pBlue}`}>
@@ -1416,12 +1435,26 @@ export default function ClaudeSkillPage() {
                 Fetchが標準ツールとして追加。
               </p>
             </div>
+            <div className={`${styles.principle} ${styles.pBlue}`}>
+              <div className={styles.principleNum}>NEW</div>
+              <h4>🧠 Claude Opus 4.7（4月16日）</h4>
+              <p>
+                SWE-bench Pro 64.3%（+10.9%）・xhigh effortレベル追加・Self-verify・高解像度ビジョン（最大3.75MP）。価格はOpus 4.6と同一。
+              </p>
+            </div>
+            <div className={`${styles.principle} ${styles.pGreen}`}>
+              <div className={styles.principleNum}>NEW</div>
+              <h4>🔍 ultrareview（4月28日）</h4>
+              <p>
+                CI環境から<code>claude ultrareview</code>でコードレビューを自動実行。<code>--json</code>オプションで機械可読出力にも対応。
+              </p>
+            </div>
           </div>
 
           <div className={`${styles.infoBox} ${styles.infoNote}`} style={{ marginTop: "1.5rem" }}>
             <span className={styles.infoIcon}>📅</span>
             <div>
-              上記は <strong>2026年3月21日</strong> 時点の情報です。Claude
+              上記は <strong>2026年5月9日</strong> 時点の情報です。Claude
               Codeは活発に開発が進んでいるため、最新情報は{" "}
               <a
                 href="https://docs.anthropic.com/en/docs/claude-code"
@@ -1494,7 +1527,7 @@ export default function ClaudeSkillPage() {
               <h4>サブエージェントでコンテキスト分離</h4>
               <p>
                 各タスクを独立したコンテキストで処理。メインセッションのノイズを防ぐ。真の並列実行が必要な場合は{" "}
-                <strong>Agent Teams</strong>（experimental, 2026年2月〜）も選択肢。
+                <strong>Agent Teams</strong>（2026年3月安定化）も選択肢。
               </p>
             </div>
             <div className={`${styles.principle} ${styles.pGreen}`}>
