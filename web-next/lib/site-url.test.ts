@@ -1,8 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { resolveSiteUrl } from "./site-url";
+import { DEFAULT_SITE_URL, resolveSiteUrl } from "./site-url";
 
 describe("resolveSiteUrl", () => {
-  const DEFAULT_SITE_URL = "https://comparison-of-llms.netlify.app";
   let originalEnv: NodeJS.ProcessEnv;
 
   beforeEach(() => {
