@@ -23,7 +23,7 @@ jobs:
             scraper:
               - 'scraper/**'
             web:
-              - 'web/**'
+              - 'web-next/**'
 
   # -------------------------
   # WEB TEST（変更時のみ）
@@ -47,16 +47,16 @@ jobs:
         with:
           path: |
             ~/.bun/install/cache
-            web/node_modules
-          key: bun-${{ runner.os }}-${{ hashFiles('web/bun.lockb') }}
+            web-next/node_modules
+          key: bun-${{ runner.os }}-${{ hashFiles('web-next/bun.lock') }}
 
       - name: Install deps
-        working-directory: web
+        working-directory: web-next
         run: bun install --frozen-lockfile
 
       - name: Test web
-        working-directory: web
-        run: bun test || true
+        working-directory: web-next
+        run: bun run test
 
   # -------------------------
   # SCRAPER TEST（変更時のみ）
@@ -69,19 +69,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
         with:
-          python-version: '3.12'
-
-      - name: Install uv
-        run: pip install uv
-
-      - name: Cache uv
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/uv
-          key: uv-${{ runner.os }}-${{ hashFiles('scraper/uv.lock') }}
+          enable-cache: true
+          cache-dependency-glob: 'scraper/uv.lock'
 
       - name: Install deps
         working-directory: scraper
