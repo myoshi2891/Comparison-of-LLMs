@@ -526,6 +526,16 @@ const SECTION_TITLES: TupleStr<typeof SECTION_IDS> = [
   "まとめ：全 Markdown + 設定ファイルの役割（Agent Teams 追記版）",
 ] as const;
 
+/**
+ * Renders the Claude Code guide page covering sub-agents and Agent Teams best practices (v2.1.142, May 2026).
+ *
+ * The page is a static Next.js React component that displays a full, versioned guide including:
+ * - TOC and 17 content sections (CLAUDE.md, sub-agent definitions, MEMORY.md, routing, models, new commands, Agent Teams, hooks, task JSON patterns, and sources)
+ * - Embedded template blocks and example snippets (CLAUDE.md, .claude/agents templates, MEMORY.md, .claude/README.md, task JSON)
+ * - Reference source list and actionable tips/anti-patterns for designing agent-related Markdown files
+ *
+ * @returns The page's JSX element for rendering the guide.
+ */
 export default function ClaudeAgentPage() {
   return (
     <div className={styles.root}>
