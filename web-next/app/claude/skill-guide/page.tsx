@@ -29,7 +29,7 @@ export default function Page() {
           <div className={styles.sidebarLogo}>
             <div className={styles.logoTag}>SKILL.md</div>
             <h2>完全解説ガイド</h2>
-            <p>Claude Code v2.1.76 対応</p>
+            <p>Claude Code 最新版</p>
           </div>
           <p className={styles.navSectionLabel}>はじめに</p>
           <a href="#what" className={styles.navItem}>
@@ -98,7 +98,7 @@ export default function Page() {
             </p>
             <div className={styles.heroMeta}>
               <span className={`${styles.heroChip} ${styles.chipGreen}`}>
-                ✓ Claude Code v2.1.76 対応
+                ✓ Claude Code 最新版
               </span>
               <span className={`${styles.heroChip} ${styles.chipBlue}`}>✓ 初学者向け</span>
               <span className={`${styles.heroChip} ${styles.chipPurple}`}>
@@ -1156,9 +1156,10 @@ style FM fill:#1c2a1c,stroke:#3fb950,color:#e6edf3`}
               <span className={styles.calloutIcon}>💡</span>
               <p>
                 Agent Teams (<code>--team</code>) 利用時は <code>/effort</code> コマンドで思考深度を{" "}
-                <code>low</code>・<code>medium</code>・<code>high</code>{" "}
-                から選択できます。スキル内に <code>effort: high</code> を frontmatter
-                で指定することも可能です（Opus 4.6 使用時のみ有効）。<code>/loop</code>{" "}
+                <code>low</code>・<code>medium</code>・<code>high</code>・<code>xhigh</code>{" "}
+                から選択できます（Opus 4.7 で <code>xhigh</code> が追加）。スキル内に{" "}
+                <code>effort: high</code> を frontmatter
+                で指定することも可能です（Opus 4.7 以降推奨）。<code>/loop</code>{" "}
                 コマンドを使えばスキルを定期的に繰り返し実行させることもできます。
               </p>
             </div>
@@ -1747,7 +1748,7 @@ style B fill:#2a1c1c,stroke:#f85149,color:#e6edf3`}
                 fontFamily: "'JetBrains Mono', monospace",
               }}
             >
-              最終更新: 2026年3月 · Claude Code v2.1.76 対応 · SKILL.md 完全解説ガイド
+              最終更新: 2026年5月 · Claude Code 最新版 · SKILL.md 完全解説ガイド
             </p>
           </section>
         </main>

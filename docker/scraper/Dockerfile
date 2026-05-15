@@ -19,15 +19,20 @@ WORKDIR /app
 # ── 依存レイヤー（pyproject.toml / uv.lock 変更時のみ再実行）───────────────────
 COPY scraper/pyproject.toml scraper/uv.lock scraper/.python-version ./scraper/
 
-# 本番依存のみインストール（dev グループ除外）
-RUN uv sync --project ./scraper --frozen --no-dev
+# 本番依存のみインストール（dev グループ除外・プロジェクト自体はビルドしない）
+# --no-install-project: ソースが未コピーの状態でプロジェクトをビルドしないための分離
+RUN uv sync --project ./scraper --frozen --no-dev --no-install-project
 
 # Playwright Chromium + 必要な Linux システムライブラリを一括インストール
 # このレイヤーは約 300–500 MB。uv sync の後に置くことでキャッシュ効率を最大化
-RUN uv run --project ./scraper playwright install --with-deps chromium
+# uv run はプロジェクトビルドを要求するため、venv の playwright バイナリを直接実行
+RUN ./scraper/.venv/bin/playwright install --with-deps chromium
 
 # ── ソースコピー（ランタイムではバインドマウントで上書き可）──────────────────────
 COPY scraper/ ./scraper/
+
+# プロジェクト自体のインストール（ソースコピー後に実行）
+RUN uv sync --project ./scraper --frozen --no-dev
 COPY update.sh pricing.json ./
 
 ENV PYTHONDONTWRITEBYTECODE=1 \

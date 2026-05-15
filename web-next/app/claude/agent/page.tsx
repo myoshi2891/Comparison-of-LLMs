@@ -4,7 +4,7 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   title: "Claude Code サブエージェント Markdown ベストプラクティス | LLM コスト計算機",
   description:
-    "Claude Code v2.1.76 のサブエージェント / Agent Teams 開発で必要な CLAUDE.md・エージェント定義・MEMORY.md・README.md の役割と書き方を体系化したガイド。",
+    "Claude Code v2.1.142 のサブエージェント / Agent Teams 開発で必要な CLAUDE.md・エージェント定義・MEMORY.md・README.md の役割と書き方を体系化したガイド。",
 };
 
 type Source = { num: string; href: string; title: string; desc: string };
@@ -446,8 +446,8 @@ const SOURCES: Source[] = [
   {
     num: "19",
     href: "https://code.claude.com/docs/en/changelog",
-    title: "🔵 Anthropic CHANGELOG: v2.1.76 March 2026",
-    desc: "v2.1.76 公式 changelog: /effort・PostCompact hook・MCP elicitation・1M context・HTTP hooks・ultrathink 再導入・Opus 4/4.1 廃止など3月アップデート全体",
+    title: "🔵 Anthropic CHANGELOG: v2.1.76〜v2.1.142 (2026年3〜5月)",
+    desc: "公式 changelog: /effort・PostCompact hook・MCP elicitation・1M context・HTTP hooks・ultrathink・/goal・/ultrareview・xhigh effort・agent view・continueOnBlock・Plugin skills など3〜5月アップデート全体",
   },
   {
     num: "20",
@@ -473,6 +473,12 @@ const SOURCES: Source[] = [
     href: "https://docs.anthropic.com/en/docs/claude-code/agent-teams#settings-and-hooks",
     title: "🟢 Anthropic 公式: Agent Teams — Settings & Hooks リファレンス",
     desc: "settings.json の CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS 設定・TeammateIdle/TaskCompleted フックの exit code 仕様・クリーンアップ手順の詳細",
+  },
+  {
+    num: "24",
+    href: "https://claudelog.com/claude-code-changelog/",
+    title: "🔵 ClaudeLog: Claude Code Changelog (v2.1.76〜v2.1.142)",
+    desc: "v2.1.108 /recap・v2.1.111 /ultrareview / xhigh effort・v2.1.128 1M context 完全対応・v2.1.139 /goal / agent view / continueOnBlock・v2.1.141 /loop Esc キャンセル・v2.1.142 Plugin skills など2026年4〜5月の全アップデート",
   },
 ];
 
@@ -508,7 +514,7 @@ const SECTION_TITLES: TupleStr<typeof SECTION_IDS> = [
   "サブエージェント ルーティング設計の意思決定ツリー",
   "コスト最適なモデル選択戦略",
   "絶対に避けるべき Anti-Patterns",
-  "2026年3月 新機能・コマンド (v2.1.63〜v2.1.76)",
+  "2026年3〜5月 新機能・コマンド (v2.1.63〜v2.1.142)",
   ".claude/README.md — エージェント構成ドキュメント",
   "まとめ：各 Markdown の役割と設計原則",
   "Agent Teams とは — サブエージェントとの根本的な違い",
@@ -527,7 +533,7 @@ export default function ClaudeAgentPage() {
         {/* HERO */}
         <div className={styles.hero}>
           <div className={styles.heroBadge}>
-            🤖 Claude Code 完全ガイド — 2026年3月 v2.1.76 最新対応版
+            🤖 Claude Code 完全ガイド — 2026年5月 v2.1.142 最新対応版
           </div>
           <h1 className={styles.heroTitle}>
             サブエージェント + Agent Teams 開発における
@@ -537,9 +543,10 @@ export default function ClaudeAgentPage() {
           <p className={styles.heroDesc}>
             CLAUDE.md・エージェント定義 .md・MEMORY.md・README.md ──
             それぞれの役割と書き方を体系的に解説します。
-            <strong>2026年3月の v2.1.76 大型アップデート</strong>
-            （Voice mode・/loop・/effort・ultrathink・1M コンテキスト・HTTP hooks・MCP
-            elicitation・Agent Teams 安定化）に完全対応した最新版です。
+            <strong>v2.1.142 最新アップデート（2026年5月）</strong>
+            （Voice mode・/loop・/effort・/goal・/ultrareview・xhigh effort・ultrathink・1M
+            コンテキスト・HTTP hooks・MCP elicitation・Agent Teams
+            安定化）に完全対応した最新版です。
           </p>
         </div>
 
@@ -1208,7 +1215,7 @@ export default function ClaudeAgentPage() {
         <section id="s08" className={styles.section}>
           <div className={styles.sectionTitle}>
             <span className={styles.num}>8</span>
-            2026年3月 新機能・コマンド (v2.1.63〜v2.1.76)
+            2026年3〜5月 新機能・コマンド (v2.1.63〜v2.1.142)
           </div>
           <div
             className={styles.atBanner}
@@ -1225,15 +1232,17 @@ export default function ClaudeAgentPage() {
                 color: "#60a5fa",
               }}
             >
-              🚀 v2.1.76 · 2026年3月 大型アップデート
+              🚀 v2.1.142 · 2026年5月 最新アップデート
             </div>
             <h3 style={{ color: "#fff" }}>
-              Voice mode・/loop・/effort・1M コンテキスト・HTTP hooks が一斉リリース
+              Voice mode・/loop・/effort・/goal・/ultrareview・1M コンテキスト・HTTP hooks
+              など多数リリース
             </h3>
             <p>
-              2026年3月は Claude Code
-              にとって最大規模のアップデート月でした。音声入力・定期タスク・努力レベル制御・100万トークンコンテキスト・新しい
-              hooks システムが統合されました。
+              2026年3〜5月は Claude Code
+              にとって大規模な連続アップデート期間でした。音声入力・定期タスク・努力レベル制御・100万トークンコンテキスト・新しい
+              hooks
+              システム・完了条件付き自律タスク（/goal）・クラウドコードレビュー（/ultrareview）が統合されました。
             </p>
           </div>
           <div className={styles.usecaseGrid}>
@@ -1246,30 +1255,31 @@ export default function ClaudeAgentPage() {
               },
               {
                 icon: "🔁",
-                title: "/loop — 定期繰り返しタスク",
-                desc: "cron ジョブのように定期実行するタスクをスケジュール。定期ビルドチェック・テスト実行・モニタリングの自動化に。",
-                prompt: '/loop 30m "pnpm test を実行して結果をレポートして"',
+                title: "/loop — 定期繰り返しタスク — v2.1.105",
+                desc: "cron ジョブのように定期実行するタスクをスケジュール。定期ビルドチェック・テスト実行・モニタリングの自動化に。/proactive エイリアスも追加 (v2.1.105)。Esc で pending wakeup をキャンセル可能 (v2.1.141)。",
+                prompt:
+                  '/loop 30m "pnpm test を実行して結果をレポートして"\n/proactive 1h "依存関係の脆弱性チェック"',
               },
               {
                 icon: "⚡",
-                title: "/effort — Effort Level 制御 — v2.1.75",
-                desc: "Opus 4.6 の思考深度をリアルタイムで変更。デフォルトは medium。",
+                title: "/effort — Effort Level 制御 — v2.1.111",
+                desc: "Opus 4.7 の思考深度をリアルタイムで変更。デフォルトは medium。v2.1.111 で xhigh tier と対話式スライダーが追加。$CLAUDE_EFFORT 環境変数でフック/Bash からも参照可能。",
                 prompt:
-                  "/effort low     ← 高速・低コスト\n/effort medium  ← デフォルト\n/effort high    ← 深い分析\n/effort auto    ← リセット",
+                  "/effort low     ← 高速・低コスト\n/effort medium  ← デフォルト\n/effort high    ← 深い分析\n/effort xhigh   ← 最深（v2.1.111+）\n/effort auto    ← リセット",
               },
               {
                 icon: "🧠",
-                title: "1M トークン コンテキスト — v2.1.75",
-                desc: "Opus 4.6 が Max・Team・Enterprise プランで最大 100万トークンのコンテキストウィンドウをサポート。",
+                title: "1M トークン コンテキスト — v2.1.128",
+                desc: "v2.1.128 で Opus モデルへの完全 1M コンテキスト対応が完了。autocompact の動作も改善し、1M コンテキストモデルでの「Prompt is too long」誤ブロックが修正されました。",
                 prompt:
-                  "最大出力: Opus 4.6 → 64k tokens (デフォルト)\n上限: Opus 4.6 / Sonnet 4.6 → 128k tokens",
+                  "最大出力: Opus 4.7 → 64k tokens (デフォルト)\n上限: Opus / Sonnet → 128k tokens\nコンテキスト上限: 1,000,000 tokens",
               },
               {
                 icon: "🌐",
                 title: "HTTP Hooks — v2.1.63",
-                desc: "hooks でシェルコマンドの代わりに URL へ JSON を POST できるようになりました。CI/CD・Slack 通知・外部 Webhook との連携がローカルスクリプト不要で実現。",
+                desc: 'hooks でシェルコマンドの代わりに URL へ JSON を POST できます。CI/CD・Slack 通知・外部 Webhook との連携がローカルスクリプト不要で実現。v2.1.118 で type: "mcp_tool" フックが追加。v2.1.139 の continueOnBlock で拒否理由を Claude にフィードバック可能。',
                 prompt:
-                  '"type": "http",\n"url": "https://hooks.example.com/claude",\n"method": "POST"',
+                  '"type": "http",\n"url": "https://hooks.example.com/claude",\n"method": "POST"\n// type: "mcp_tool" も指定可能 (v2.1.118+)',
               },
               {
                 icon: "🗜️",
@@ -1277,6 +1287,19 @@ export default function ClaudeAgentPage() {
                 desc: "PostCompact: 会話圧縮後に発火する新フック。MCP Elicitation: MCP サーバーが構造化入力を要求できる機能。",
                 prompt:
                   '"PostCompact": [{ "hooks": [{ "type": "command",\n  "command": "bash -c \'validate_context.sh\'" }]}]',
+              },
+              {
+                icon: "🎯",
+                title: "/goal — 完了条件付き自律タスク — v2.1.139",
+                desc: "完了条件を自然言語で指定し、Claude が複数ターンをまたいで自律実行。インタラクティブ・-p・Remote Control の各モードで動作。経過時間・ターン数・トークン使用量をオーバーレイ表示。",
+                prompt: '/goal "全テストが PASS するまでバグを修正して"',
+              },
+              {
+                icon: "🔍",
+                title: "/ultrareview — クラウドコードレビュー — v2.1.111",
+                desc: "現在ブランチの差分をクラウドのマルチエージェントでレビュー。PR 番号指定も可能。ローカル Agent とは独立したコンテキストで包括的チェックを実行。",
+                prompt:
+                  "/ultrareview           ← 現在ブランチ\n/ultrareview 123       ← GitHub PR#123",
               },
             ].map((uc) => (
               <div key={uc.title} className={styles.uc}>
@@ -1288,7 +1311,7 @@ export default function ClaudeAgentPage() {
             ))}
           </div>
           <div className={styles.card} style={{ marginTop: 16 }}>
-            <div className={styles.cardTitle}>🆕 その他の新コマンド・設定（2026年3月）</div>
+            <div className={styles.cardTitle}>🆕 その他の新コマンド・設定（2026年3〜5月）</div>
             <div className={styles.tableWrap}>
               <table>
                 <thead>
@@ -1336,6 +1359,26 @@ export default function ClaudeAgentPage() {
                       cmd: "effort frontmatter",
                       ver: "v2.1.76",
                       desc: "スキルおよびスラッシュコマンドに effort レベルを frontmatter で指定可能",
+                    },
+                    {
+                      cmd: "/proactive",
+                      ver: "v2.1.105",
+                      desc: "/loop のエイリアス。より意図が伝わる名称で同じ定期実行機能を呼び出せる",
+                    },
+                    {
+                      cmd: "/recap",
+                      ver: "v2.1.108",
+                      desc: "セッションに戻ったとき、経緯を要約して再共有するコマンド。長いセッションの文脈回復に",
+                    },
+                    {
+                      cmd: "/less-permission-prompts",
+                      ver: "v2.1.111",
+                      desc: "過去トランスクリプトをスキャンし、読み取り専用 Bash/MCP ツールの allowlist を自動提案",
+                    },
+                    {
+                      cmd: "claude agents",
+                      ver: "v2.1.139",
+                      desc: "Agent view (Research Preview) でバックグラウンドエージェントの一覧・状態管理",
                     },
                   ].map((r) => (
                     <tr key={r.cmd}>
