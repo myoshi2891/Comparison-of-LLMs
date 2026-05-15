@@ -22,7 +22,17 @@ _PRICE_MAX = 2000.0
 
 
 def get_page_text(url: str, wait_selector: str | None = None, timeout_ms: int = 30_000) -> str:
-    """URL をヘッドレスブラウザで開き、ページテキスト全体を返す。"""
+    """
+    Retrieve the full HTML content of a URL by loading it in a headless Chromium browser.
+    
+    Parameters:
+        url (str): The target page URL to load.
+        wait_selector (str | None): Optional Playwright selector to wait for before returning. If omitted, the function waits 3000 ms after navigation to allow client-side rendering.
+        timeout_ms (int): Timeout in milliseconds applied to navigation and selector waiting operations.
+    
+    Returns:
+        str: The page's full HTML content.
+    """
     with sync_playwright() as p:
         _no_sandbox_val = (os.getenv("PLAYWRIGHT_NO_SANDBOX") or "").strip().lower()
         _launch_args = ["--no-sandbox"] if _no_sandbox_val in {"1", "true", "yes", "on"} else []

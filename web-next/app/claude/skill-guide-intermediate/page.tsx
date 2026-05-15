@@ -8,6 +8,13 @@ export const metadata: Metadata = {
     "プログレッシブ・ディスクロージャー、トークン経済、動的コンテキスト注入、context:fork、エンタープライズプロビジョニングまで網羅した実践リファレンスです。",
 };
 
+/**
+ * Render the SKILL.md intermediate guide page with navigation, table of contents, nine content sections, and footer.
+ *
+ * The component produces a fully static, client-rendered layout that presents the guide's sections (architecture, YAML, instruction design, args, fork, trigger, debug, enterprise, self-improvement), embedded diagrams, example code blocks, and references.
+ *
+ * @returns A JSX element containing the complete static guide layout (progress bar, page TOC, content sections with Mermaid diagrams and code samples, and footer)
+ */
 export default function Page() {
   return (
     <div className={styles.pageWrap}>
