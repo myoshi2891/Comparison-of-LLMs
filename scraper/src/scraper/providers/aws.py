@@ -114,9 +114,8 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
                         if any(kw in usage_type_lower for kw in ["batch", "flex", "priority", "custom-model", "latency-optimized", "cache", "storage", "throughput", "training"]):
                             continue
 
-                        # USD per unit -> USD per 1M tokens
-                        # AWS Bedrock is typically per 1,000 tokens
-                        # 表記揺れ: "1k", "1,000", "per 1000" 等
+                        # 単位変換: AWS Bedrock は通常 per 1,000 tokens 表記
+                        # desc_lower の "1k" / "1,000" / "per 1000" で判定
                         if "1k" in desc_lower or "1,000" in desc_lower or "per 1000" in desc_lower:
                             multiplier = 1000
                             logger.debug(
@@ -131,13 +130,15 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
                         # Also prefer rows that don't have extra qualifiers in usage type
                         is_use1 = "use1" in usage_type_lower
                         
-                        if "input" in usage_type_lower or "input" in desc_lower:
+                        # usage_type_lower は line 110 で "-input-tokens" / "-output-tokens"
+                        # に絞り込み済のため、ここでの input/output 判定はそれだけで充分
+                        if "input" in usage_type_lower:
                             if in_price is None:
                                 in_price = price_1m
                             elif is_use1 and not found_use1_in and usage_type_lower.count("-") <= 3:
                                 in_price = price_1m
                                 found_use1_in = True
-                        elif "output" in usage_type_lower or "output" in desc_lower:
+                        elif "output" in usage_type_lower:
                             if out_price is None:
                                 out_price = price_1m
                             elif is_use1 and not found_use1_out and usage_type_lower.count("-") <= 3:
