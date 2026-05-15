@@ -22,11 +22,11 @@ function isParentActive(link: NavLink, pathname: string): boolean {
 }
 
 /**
- * Render the site's header and primary navigation.
+ * Render the site header with primary navigation and active-route highlighting.
  *
- * Determines the active path by using `pathnameProp` if provided, otherwise `usePathname()` from the router, and falls back to `"/"` when neither is available. Renders the brand link, a hamburger toggle, navigation entries from `navLinks` (with dropdowns for items that have `children`), applies active classes and `aria-current="page"` for matching routes, and includes an external GitHub link.
+ * Chooses the current pathname from `pathnameProp` (if provided), otherwise from the router, and falls back to `"/"`. Renders site branding, a hamburger toggle, navigation links (dropdowns for items with children) with active-state classes and `aria-current="page"` for matching routes, and an external GitHub link.
  *
- * @param pathnameProp - Optional pathname to override the router-derived path; when omitted, the component uses the router pathname or `"/"` as a fallback.
+ * @param pathnameProp - Optional pathname to override the router-derived path; when omitted the component uses the router pathname or `"/"` as a fallback.
  * @returns The header element containing site branding, the navigation menu (including dropdowns and active-state handling), and an external GitHub link.
  */
 export function SiteHeader({ pathname: pathnameProp }: { pathname?: string } = {}) {
@@ -97,8 +97,14 @@ export function SiteHeader({ pathname: pathnameProp }: { pathname?: string } = {
             );
           })}
           <li>
-            <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
-              {"GitHub \u2197"}
+            <a
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="GitHub\uff08\u65b0\u3057\u3044\u30bf\u30d6\u3067\u958b\u304f\uff09"
+            >
+              GitHub
+              <span aria-hidden="true">{"\u2197"}</span>
             </a>
           </li>
         </ul>

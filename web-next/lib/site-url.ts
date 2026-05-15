@@ -1,4 +1,4 @@
-const DEFAULT_SITE_URL = "https://comparison-of-llms.netlify.app";
+export const DEFAULT_SITE_URL = "https://comparison-of-llms.netlify.app";
 
 /**
  * Resolve the site URL from environment variables or use a default fallback.

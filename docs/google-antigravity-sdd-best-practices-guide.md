@@ -1,9 +1,11 @@
 # Google Antigravity — AI仕様駆動開発 ベストプラクティス完全ガイド
 
 > **対象読者**: 初学者〜中級者  
-> **バージョン**: Google Antigravity v1.20.3 / Gemini CLI v0.34.0  
+> **対象バージョン**: Google Antigravity latest / Gemini CLI latest（**2026年4月時点**のスナップショット）  
 > **最終更新**: 2026年4月9日  
 > **前回資料からの差分**: 本ドキュメントは 2026-03-22 作成の HTML ガイドをベースに、AP2・A2UI・AG-UI プロトコル追加（2026-03-18）、ADK Python 2.0 Alpha 公開、ADK TypeScript GA 等の最新アップデートを反映した改訂版です。
+>
+> **コードサンプルのモデル ID について**: 本文中の `gemini-3-flash-preview` / `gemini-3.1-pro-preview` 等の文字列は、**再現性確保のため 2026年4月時点の実モデル ID をそのまま記載**しています。新しいモデルがリリースされた際は Gemini API 公式ドキュメントの最新モデル一覧を参照してください。リリース履歴は本ドキュメント §2-4 を参照。
 
 ---
 
@@ -133,7 +135,7 @@ graph = GraphAgent(
 
 > **参考**: [ADK Graph Workflow 公式ドキュメント](https://google.github.io/adk-docs/agents/workflow-agents/graph/)
 
-### 2-4. Gemini CLI v0.34.0（2026-03-18）の変更点まとめ
+### 2-4. Gemini CLI 主要バージョンの変更履歴（〜2026年3月時点）
 
 | バージョン | 主な変更 |
 |----------|---------|
