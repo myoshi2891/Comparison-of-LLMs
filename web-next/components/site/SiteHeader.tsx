@@ -97,8 +97,14 @@ export function SiteHeader({ pathname: pathnameProp }: { pathname?: string } = {
             );
           })}
           <li>
-            <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
-              {"GitHub \u2197"}
+            <a
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="GitHub\uff08\u65b0\u3057\u3044\u30bf\u30d6\u3067\u958b\u304f\uff09"
+            >
+              GitHub
+              <span aria-hidden="true">{"\u2197"}</span>
             </a>
           </li>
         </ul>
