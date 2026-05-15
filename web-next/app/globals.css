@@ -986,9 +986,7 @@ footer {
 
 /* ── REDUCED MOTION ── */
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto !important;
-  }
+  /* `*` セレクタの !important が html にも適用されるため、html 単独宣言は不要 */
   *,
   *::before,
   *::after {
@@ -1116,8 +1114,15 @@ body.has-common-header {
 }
 
 .ch-links a:hover,
-.ch-links a.ch-active {
+.ch-links a.ch-active,
+.ch-links a:focus-visible {
   color: var(--ch-text-hover);
+}
+
+.ch-links a:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 .ch-dropdown {
