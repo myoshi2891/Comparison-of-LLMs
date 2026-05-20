@@ -33,7 +33,8 @@ update.sh  ← オーケストレーター (scrape → copy)
 │   │   ├── pricing.ts           Zod スキーマ + コンパイル時パリティアサート
 │   │   ├── i18n.tsx             T オブジェクト + t() + tRich() (React 要素ファクトリ)
 │   │   ├── fonts.ts             next/font/google (Noto Sans JP / JetBrains Mono / Syne)
-│   │   └── metadata.ts          静的 Metadata / Viewport
+│   │   ├── metadata.ts          静的 Metadata / Viewport
+│   │   └── site-url.ts          サイト URL 解決ユーティリティ (resolveSiteUrl / NEXT_PUBLIC_SITE_URL)
 │   ├── types/pricing.ts         Pydantic 同期型定義
 │   ├── data/pricing.json        ビルド時 static import 用 (update.sh がコピー)
 │   ├── public/pricing.json      /pricing.json URL 配信用 (update.sh がコピー)
