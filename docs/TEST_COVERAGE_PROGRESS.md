@@ -1,0 +1,508 @@
+# テストカバレッジ進捗トラッカー
+
+> このファイルは `docs/coverage-dashboard.html` のデータソース（信頼源）です。
+> テストを追加・削除したときは必ずこのファイルを先に更新し、
+> その後 `/update-coverage-dashboard` スキルで HTML を同期してください。
+
+## メタデータ
+
+| 項目 | 値 |
+|---|---|
+| 最終スキャン日 | 2026-05-20 |
+| フロントエンドテストランナー | Vitest 4.1 (jsdom 29 + @testing-library/react 16) |
+| バックエンドテストランナー | pytest 9.0 (unittest 互換) |
+| web-next テストファイル数 | 41 |
+| web-next テストケース数 | ≈ 491 |
+| scraper テストファイル数 | 2 |
+| scraper テストケース数 | 5 |
+| 総合カバレッジスコア (weighted) | 31.4% |
+
+スコア計算方法: 8 カテゴリー × 8 ドメイン = 64 セルのうち N/A を除く **43 セル** を
+`✅ 1.0 / ⚠️ 0.5 / ❌ 0` で重み付き集計（lcov/ライン計測値なし）。
+
+---
+
+## カバレッジマトリクス
+
+ステータス凡例: `done` = ✅ 実装済 / `partial` = ⚠️ 部分的 / `missing` = ❌ 未実装 / `na` = — N/A
+
+| カテゴリー | app/ | components/ | site/ | lib/ | types/ | providers/ | tools/ | core |
+|---|---|---|---|---|---|---|---|---|
+| Unit | done | done | done | done | partial | partial | partial | partial |
+| Integration | missing | done | missing | na | na | missing | missing | missing |
+| E2E | missing | missing | missing | na | na | missing | missing | missing |
+| Visual | missing | missing | missing | na | na | na | na | na |
+| Accessibility | partial | partial | partial | na | na | na | na | na |
+| Performance | missing | missing | missing | na | na | missing | missing | missing |
+| API / Contract | na | na | na | done | done | missing | missing | partial |
+| Security | partial | partial | na | partial | na | missing | missing | missing |
+
+---
+
+## セル詳細
+
+各セルの実測データ。`files` フィールドは実在テストファイル名（+ ケース数）。
+
+---
+
+### Unit / app
+
+```
+status: done
+count: 113
+files:
+  - app/claude/agent/page.test.tsx (8)
+  - app/claude/skill/page.test.tsx (8)
+  - app/claude/skill-guide/page.test.tsx (7)
+  - app/claude/skill-guide-intermediate/page.test.tsx (7)
+  - app/claude/cowork-guide/page.test.tsx (7)
+  - app/codex/agent/page.test.tsx (8)
+  - app/codex/skill/page.test.tsx (8)
+  - app/codex/openai-codex-guide/page.test.tsx (6)
+  - app/copilot/agent/page.test.tsx (8)
+  - app/copilot/skill/page.test.tsx (8)
+  - app/copilot/github-copilot/page.test.tsx (16)
+  - app/copilot/markdown-file-guide/page.test.tsx (6)
+  - app/gemini/agent/page.test.tsx (8)
+  - app/gemini/skill/page.test.tsx (8)
+  - app/gemini/skill-guide/page.test.tsx (7)
+  - app/gemini/skill-guide-intermediate/page.test.tsx (6)
+  - app/gemini/antigravity-guide/page.test.tsx (6)
+  - app/git-worktree/page.test.tsx (5)
+note: 全 18 page.tsx ルートが契約テスト付き（タイトル・セクション数・rel 属性）
+```
+
+### Unit / components
+
+```
+status: done
+count: 144
+files:
+  - components/ApiTable.test.tsx (25)
+  - components/SubTable.test.tsx (21)
+  - components/ScenarioSelector.test.tsx (23)
+  - components/HomePage.test.tsx (16)
+  - components/Hero.test.tsx (12)
+  - components/MathSection.test.tsx (11)
+  - components/DualCell.test.tsx (10)
+  - components/RefLinks.test.tsx (18)
+  - components/LanguageToggle.test.tsx (8)
+note: 電卓 UI 9/9 コンポーネント網羅
+```
+
+### Unit / site
+
+```
+status: done
+count: 25
+files:
+  - components/site/SiteHeader.test.tsx (12)
+  - components/site/SiteHeaderClient.test.tsx (7)
+  - components/site/DisclaimerBanner.test.tsx (6)
+note: 共通ヘッダー/バナー 3/3 網羅
+```
+
+### Unit / lib
+
+```
+status: done
+count: 93
+files:
+  - lib/cost.test.ts (49)
+  - lib/pricing.test.ts (23)
+  - lib/i18n.test.ts (7)
+  - lib/i18n.rich.test.tsx (10)
+  - lib/site-url.test.ts (4)
+note: 6 lib モジュール中 5 件カバー（metadata.ts / fonts.ts のみ未）
+```
+
+### Unit / types
+
+```
+status: partial
+count: 0
+files:
+  - lib/pricing.ts → _AssertParity (compile-time only)
+note: ランタイム negative test なし。型レベルアサートのみ
+```
+
+### Unit / providers
+
+```
+status: partial
+count: 1
+files:
+  - scraper/tests/smoke/test_smoke.py::test_providers
+note: 6 プロバイダーを mock で 1 アサート — DOM 構造変更は検出不可
+```
+
+### Unit / tools
+
+```
+status: partial
+count: 1
+files:
+  - scraper/tests/smoke/test_smoke.py::test_tools
+note: 8 ツールを mock で 1 アサート — 価格抽出ロジック未検証
+```
+
+### Unit / core
+
+```
+status: partial
+count: 3
+files:
+  - scraper/tests/test_imports.py (全モジュール import)
+  - scraper/tests/smoke/test_smoke.py::test_main
+  - scraper/tests/smoke/test_smoke.py::test_fetch_jpy_rate
+note: main.py / exchange.py はカバー。browser.py 未テスト
+```
+
+---
+
+### Integration / app
+
+```
+status: missing
+count: 0
+files: []
+note: ルート間遷移・SSG ビルド成果物の結合テストなし
+```
+
+### Integration / components
+
+```
+status: done
+count: 19
+files:
+  - components/HomePage.integration.test.tsx (19)
+note: ScenarioSelector × ApiTable × SubTable のデータフロー検証
+```
+
+### Integration / site
+
+```
+status: missing
+count: 0
+files: []
+note: SiteHeader × layout の結合なし（個別ユニットのみ）
+```
+
+### Integration / providers
+
+```
+status: missing
+count: 0
+files: []
+note: live HTTP → models.py の結合検証なし
+```
+
+### Integration / tools
+
+```
+status: missing
+count: 0
+files: []
+note: 同上
+```
+
+### Integration / core
+
+```
+status: missing
+count: 0
+files: []
+note: main → _scrape_all → _write_output の end-to-end なし
+```
+
+---
+
+### E2E / app
+
+```
+status: missing
+count: 0
+files: []
+note: Playwright / Cypress 等の E2E スイート未導入
+```
+
+### E2E / components
+
+```
+status: missing
+count: 0
+files: []
+note: ""
+```
+
+### E2E / site
+
+```
+status: missing
+count: 0
+files: []
+note: ""
+```
+
+### E2E / providers
+
+```
+status: missing
+count: 0
+files: []
+note: ライブスクレイプ smoke は CI 対象外
+```
+
+### E2E / tools
+
+```
+status: missing
+count: 0
+files: []
+note: ""
+```
+
+### E2E / core
+
+```
+status: missing
+count: 0
+files: []
+note: update.sh の end-to-end 検証なし
+```
+
+---
+
+### Visual / app
+
+```
+status: missing
+count: 0
+files: []
+note: スナップショット・visual diff 未導入
+```
+
+### Visual / components
+
+```
+status: missing
+count: 0
+files: []
+note: ""
+```
+
+### Visual / site
+
+```
+status: missing
+count: 0
+files: []
+note: ""
+```
+
+---
+
+### Accessibility / app
+
+```
+status: partial
+count: null
+files:
+  - 全 page.test.tsx で getByRole / getByText
+note: semantic クエリのみ。axe-core / jest-axe による違反検出なし
+```
+
+### Accessibility / components
+
+```
+status: partial
+count: null
+files:
+  - components/LanguageToggle.test.tsx aria-pressed
+  - components/ApiTable.test.tsx getByRole('columnheader')
+  - components/SubTable.test.tsx getByRole
+note: aria 属性の存在確認のみ
+```
+
+### Accessibility / site
+
+```
+status: partial
+count: null
+files:
+  - components/site/SiteHeader.test.tsx getByRole('navigation')
+note: ランドマーク存在確認のみ
+```
+
+---
+
+### Performance / app
+
+```
+status: missing
+count: 0
+files: []
+note: Lighthouse CI / web-vitals 計測なし
+```
+
+### Performance / components
+
+```
+status: missing
+count: 0
+files: []
+note: ""
+```
+
+### Performance / site
+
+```
+status: missing
+count: 0
+files: []
+note: ""
+```
+
+### Performance / providers
+
+```
+status: missing
+count: 0
+files: []
+note: スクレイプ所要時間の閾値テストなし
+```
+
+### Performance / tools
+
+```
+status: missing
+count: 0
+files: []
+note: ""
+```
+
+### Performance / core
+
+```
+status: missing
+count: 0
+files: []
+note: ""
+```
+
+---
+
+### API-Contract / lib
+
+```
+status: done
+count: 23
+files:
+  - lib/pricing.test.ts (23) — PricingDataSchema (Zod)
+note: runtime スキーマ検証 + pricing.json パース
+```
+
+### API-Contract / types
+
+```
+status: done
+count: 0
+files:
+  - lib/pricing.ts → _AssertParity (compile-time)
+note: Pydantic models.py との compile-time パリティアサート
+```
+
+### API-Contract / providers
+
+```
+status: missing
+count: 0
+files: []
+note: HTML フィクスチャ → ApiModel の契約テストなし
+```
+
+### API-Contract / tools
+
+```
+status: missing
+count: 0
+files: []
+note: HTML フィクスチャ → SubTool の契約テストなし
+```
+
+### API-Contract / core
+
+```
+status: partial
+count: 0
+files:
+  - scraper/src/scraper/models.py (Pydantic 自動バリデーション)
+note: Pydantic がランタイム強制。negative test は未整備
+```
+
+---
+
+### Security / app
+
+```
+status: partial
+count: null
+files:
+  - 全 page.tsx で raw HTML 挿入 API 不使用ポリシー
+note: tRich パターンによる XSS 回避が暗黙の契約
+```
+
+### Security / components
+
+```
+status: partial
+count: 10
+files:
+  - lib/i18n.rich.test.tsx (10) — XSS-resistance
+note: raw HTML 文字列を React 要素へ変換することを静的に検査
+```
+
+### Security / lib
+
+```
+status: partial
+count: 10
+files:
+  - lib/i18n.rich.test.tsx (10)
+note: 上記と同じファイルで lib/i18n.tsx もカバー
+```
+
+### Security / providers
+
+```
+status: missing
+count: 0
+files: []
+note: bun audit / pip-audit の依存脆弱性ゲートなし
+```
+
+### Security / tools
+
+```
+status: missing
+count: 0
+files: []
+note: 同上
+```
+
+### Security / core
+
+```
+status: missing
+count: 0
+files: []
+note: 同上 + httpx タイムアウト/SSRF 検証なし
+```
+
+---
+
+## 更新履歴
+
+| 日付 | 変更内容 | スコア |
+|---|---|---|
+| 2026-05-20 | 初回作成（静的スキャン） | 31.4% |

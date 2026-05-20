@@ -1,0 +1,1174 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Coverage Diagnostic · LLM-Studies</title>
+<meta name="description" content="LLM-Studies テストカバレッジ可視化ダッシュボード — Vitest + pytest 実測スキャン" />
+<meta name="theme-color" content="#0b0d10" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#f5f1ea" media="(prefers-color-scheme: light)" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #f5f1ea;
+    --bg-alt: #ece6db;
+    --paper: #fbf8f1;
+    --ink: #14110d;
+    --ink-soft: #4a443a;
+    --rule: #d8cfbf;
+    --rule-strong: #1c1813;
+    --done: #2f6b3a;
+    --done-fill: #d9ecc8;
+    --done-ink: #1d3f24;
+    --partial: #b67d18;
+    --partial-fill: #f4e3b3;
+    --partial-ink: #6b4a05;
+    --missing: #a83c33;
+    --missing-fill: #eed3cd;
+    --missing-ink: #5d1c16;
+    --na: #b6ad9c;
+    --na-fill: #e8e2d3;
+    --accent: #1f3a52;
+    --hot: #b14c44;
+    --serif: "Fraunces", "Iowan Old Style", "Source Serif Pro", "Georgia", serif;
+    --sans: "Geist", -apple-system, system-ui, "Segoe UI", sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    --shadow: 0 1px 0 var(--rule), 0 24px 60px -32px rgba(20,17,13,.18);
+  }
+  :root[data-theme="dark"] {
+    --bg: #0b0d10;
+    --bg-alt: #14181d;
+    --paper: #11151a;
+    --ink: #f3efe6;
+    --ink-soft: #a9a193;
+    --rule: #262c34;
+    --rule-strong: #f3efe6;
+    --done: #c8ff3d;
+    --done-fill: #1f2e10;
+    --done-ink: #d8ff66;
+    --partial: #f4c25c;
+    --partial-fill: #2b2210;
+    --partial-ink: #fbd87f;
+    --missing: #ff7867;
+    --missing-fill: #2c1614;
+    --missing-ink: #ff998c;
+    --na: #4a5160;
+    --na-fill: #181c22;
+    --accent: #9ec9ff;
+    --hot: #ff8a7a;
+    --shadow: 0 1px 0 var(--rule), 0 28px 80px -40px rgba(0,0,0,.6);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0b0d10;
+      --bg-alt: #14181d;
+      --paper: #11151a;
+      --ink: #f3efe6;
+      --ink-soft: #a9a193;
+      --rule: #262c34;
+      --rule-strong: #f3efe6;
+      --done: #c8ff3d;
+      --done-fill: #1f2e10;
+      --done-ink: #d8ff66;
+      --partial: #f4c25c;
+      --partial-fill: #2b2210;
+      --partial-ink: #fbd87f;
+      --missing: #ff7867;
+      --missing-fill: #2c1614;
+      --missing-ink: #ff998c;
+      --na: #4a5160;
+      --na-fill: #181c22;
+      --accent: #9ec9ff;
+      --hot: #ff8a7a;
+      --shadow: 0 1px 0 var(--rule), 0 28px 80px -40px rgba(0,0,0,.6);
+    }
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--sans);
+    font-weight: 400;
+    color: var(--ink);
+    background: var(--bg);
+    background-image:
+      radial-gradient(1200px 600px at 85% -10%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, color-mix(in srgb, var(--hot) 6%, transparent), transparent 60%);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  ::selection { background: var(--rule-strong); color: var(--bg); }
+
+  a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  a:hover { text-decoration-thickness: 2px; }
+
+  .shell {
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: clamp(24px, 4vw, 56px) clamp(20px, 4vw, 64px);
+  }
+
+  /* Masthead */
+  .masthead {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: end;
+    border-bottom: 1px solid var(--rule-strong);
+    padding-bottom: 28px;
+  }
+  .mast-meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 28px;
+    margin-bottom: 14px;
+  }
+  .mast-meta b { color: var(--ink); font-weight: 500; }
+  .mast-meta .pulse { display: inline-flex; align-items: center; gap: 8px; }
+  .mast-meta .pulse::before {
+    content: ""; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--done);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50%     { opacity: 0.55; transform: scale(1.25); }
+  }
+  h1.title {
+    font-family: var(--serif);
+    font-weight: 350;
+    font-variation-settings: "opsz" 144, "SOFT" 30;
+    font-size: clamp(48px, 8vw, 124px);
+    line-height: 0.92;
+    letter-spacing: -0.025em;
+    margin: 0;
+    color: var(--ink);
+  }
+  h1.title em {
+    font-style: italic;
+    font-weight: 300;
+    font-variation-settings: "opsz" 144, "SOFT" 80;
+    color: var(--hot);
+  }
+  .controls { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .iconbtn {
+    appearance: none;
+    background: var(--paper);
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 10px 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform .15s ease, background .15s ease, border-color .15s ease;
+  }
+  .iconbtn:hover { transform: translateY(-1px); border-color: var(--rule-strong); }
+  .iconbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* Hero */
+  .hero {
+    margin-top: 36px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: clamp(20px, 3vw, 56px);
+    align-items: stretch;
+  }
+  .scorecard {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 32px 36px 28px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .scorecard::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg, transparent 0 14px, color-mix(in srgb, var(--ink) 3%, transparent) 14px 15px);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  .score-label {
+    position: relative;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+  .score-number {
+    position: relative;
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 144, "SOFT" 0;
+    font-weight: 300;
+    font-size: clamp(80px, 14vw, 220px);
+    line-height: 0.85;
+    letter-spacing: -0.04em;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+  .score-number sup {
+    font-family: var(--mono);
+    font-size: 0.16em;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    color: var(--ink-soft);
+    transform: translateY(-2.2em);
+  }
+  .score-bar {
+    position: relative;
+    height: 14px;
+    margin-top: 18px;
+    background: var(--bg-alt);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .score-bar-fill {
+    position: absolute; inset: 0 auto 0 0;
+    background: linear-gradient(90deg,
+      var(--missing) 0%, var(--missing) calc(var(--missing-w) * 1%),
+      var(--partial) calc(var(--missing-w) * 1%), var(--partial) calc((var(--missing-w) + var(--partial-w)) * 1%),
+      var(--done) calc((var(--missing-w) + var(--partial-w)) * 1%), var(--done) 100%);
+    width: 100%;
+  }
+  .score-bar-legend {
+    position: relative;
+    display: flex; justify-content: space-between;
+    margin-top: 10px;
+    font-family: var(--mono);
+    font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .score-note {
+    position: relative;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px dashed var(--rule);
+    color: var(--ink-soft);
+    font-size: 14px;
+    max-width: 56ch;
+  }
+  .score-note strong { color: var(--ink); font-weight: 500; }
+
+  .stack { display: grid; grid-template-rows: repeat(4, 1fr); gap: 12px; }
+  .stat {
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    border-radius: 6px;
+    padding: 18px 22px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 18px;
+    transition: border-color .2s ease;
+  }
+  .stat:hover { border-color: var(--rule-strong); }
+  .stat-index { font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; color: var(--ink-soft); }
+  .stat-label { font-family: var(--serif); font-variation-settings: "opsz" 14; font-weight: 400; font-size: 18px; letter-spacing: -0.01em; }
+  .stat-val { font-family: var(--mono); font-weight: 500; font-size: 22px; color: var(--ink); text-align: right; letter-spacing: -0.01em; }
+  .stat-val small { display: block; font-size: 10px; font-weight: 400; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft); margin-top: 2px; }
+
+  /* Section heading */
+  .sec-head {
+    margin-top: clamp(48px, 6vw, 88px);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 18px;
+    align-items: baseline;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .sec-num {
+    font-family: var(--mono);
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--hot);
+    border: 1px solid var(--hot);
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .sec-title {
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 36;
+    font-weight: 400; font-style: italic;
+    font-size: clamp(28px, 4vw, 46px);
+    line-height: 1.05; letter-spacing: -0.015em;
+    margin: 0;
+  }
+  .sec-aside { font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft); }
+
+  /* Filters */
+  .filterbar {
+    margin: 22px 0 18px;
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 14px 28px;
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .filter-group { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .filter-group > .filter-tag { color: var(--ink); margin-right: 4px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: var(--paper);
+    color: var(--ink-soft);
+    cursor: pointer;
+    user-select: none;
+    transition: background .15s, color .15s, border-color .15s, transform .1s;
+    font: inherit;
+    text-transform: inherit;
+  }
+  .chip:hover { color: var(--ink); border-color: var(--rule-strong); transform: translateY(-1px); }
+  .chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .chip[data-status="done"]::before    { content:""; width:8px; height:8px; border-radius:50%; background: var(--done); }
+  .chip[data-status="partial"]::before { content:""; width:8px; height:8px; border-radius:50%; background: var(--partial); }
+  .chip[data-status="missing"]::before { content:""; width:8px; height:8px; border-radius:50%; background: var(--missing); }
+
+  /* Matrix */
+  .matrix-wrap {
+    position: relative;
+    overflow-x: auto;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    background: var(--paper);
+    box-shadow: var(--shadow);
+  }
+  table.matrix {
+    width: 100%;
+    min-width: 1100px;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+  table.matrix thead th {
+    position: sticky; top: 0; z-index: 2;
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule-strong);
+    text-align: left;
+    padding: 18px 14px 14px;
+    font-weight: 500;
+    color: var(--ink);
+    vertical-align: bottom;
+  }
+  table.matrix thead th .col-label {
+    display: block;
+    font-family: var(--serif); font-variation-settings: "opsz" 14;
+    font-style: italic; font-weight: 400; font-size: 16px;
+    letter-spacing: -0.005em; margin-bottom: 3px;
+    color: var(--ink);
+  }
+  table.matrix thead th .col-path {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-soft); font-weight: 400;
+  }
+  table.matrix thead th.row-axis { min-width: 220px; }
+  table.matrix tbody th {
+    text-align: left;
+    padding: 16px 16px 16px 18px;
+    border-bottom: 1px solid var(--rule);
+    background: color-mix(in srgb, var(--paper) 92%, var(--bg-alt));
+    font-weight: 500; vertical-align: top;
+    position: sticky; left: 0; z-index: 1;
+    min-width: 220px;
+  }
+  table.matrix tbody th .row-label {
+    display: block;
+    font-family: var(--serif); font-variation-settings: "opsz" 14;
+    font-style: italic; font-weight: 400; font-size: 17px;
+    letter-spacing: -0.005em; margin-bottom: 4px;
+    color: var(--ink);
+  }
+  table.matrix tbody th .row-desc {
+    font-family: var(--sans); font-size: 11px; font-weight: 400;
+    color: var(--ink-soft);
+    text-transform: none; letter-spacing: 0; line-height: 1.4;
+    display: block; max-width: 30ch;
+  }
+  table.matrix tbody td {
+    border-bottom: 1px solid var(--rule);
+    border-left: 1px solid var(--rule);
+    padding: 0; vertical-align: top;
+    min-width: 130px; width: 11.5%;
+    position: relative;
+  }
+  table.matrix tbody tr:last-child td,
+  table.matrix tbody tr:last-child th { border-bottom: none; }
+
+  .cell {
+    display: block;
+    padding: 14px 14px 16px;
+    height: 100%;
+    min-height: 78px;
+    cursor: default;
+    position: relative;
+    transition: box-shadow .12s ease;
+  }
+  .cell[data-status="done"]    { background: var(--done-fill);    color: var(--done-ink); }
+  .cell[data-status="partial"] { background: var(--partial-fill); color: var(--partial-ink); }
+  .cell[data-status="missing"] { background: var(--missing-fill); color: var(--missing-ink); }
+  .cell[data-status="na"]      { background: var(--na-fill);      color: var(--ink-soft); }
+
+  .cell .glyph {
+    font-family: var(--mono);
+    font-size: 13px; font-weight: 700;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .cell .glyph::before {
+    content: "";
+    width: 9px; height: 9px; border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 22%, transparent);
+  }
+  .cell[data-status="done"]    .glyph::before { background: var(--done); }
+  .cell[data-status="partial"] .glyph::before { background: var(--partial); }
+  .cell[data-status="missing"] .glyph::before { background: var(--missing); }
+  .cell[data-status="na"]      .glyph::before { background: var(--na); }
+  .cell .count {
+    display: block; margin-top: 8px;
+    font-family: var(--mono); font-weight: 500; font-size: 11px;
+    letter-spacing: 0.05em;
+  }
+  .cell .files {
+    display: block; margin-top: 4px;
+    font-family: var(--mono); font-size: 10px;
+    line-height: 1.4; opacity: 0.8;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .cell:hover, .cell:focus-visible { z-index: 5; box-shadow: inset 0 0 0 2px var(--rule-strong); outline: none; }
+
+  /* Tooltip */
+  .pop {
+    position: fixed; z-index: 100;
+    max-width: 360px;
+    background: var(--ink); color: var(--bg);
+    border-radius: 6px;
+    padding: 14px 16px;
+    box-shadow: 0 20px 60px -10px rgba(0,0,0,.5);
+    font-family: var(--sans); font-size: 12px; line-height: 1.5;
+    pointer-events: none;
+    opacity: 0; transform: translateY(4px);
+    transition: opacity .12s ease, transform .12s ease;
+  }
+  .pop[data-show="1"] { opacity: 1; transform: translateY(0); }
+  .pop .pop-title {
+    margin: 0 0 6px;
+    font-family: var(--serif); font-style: italic; font-weight: 500;
+    font-size: 15px; letter-spacing: -0.005em;
+    color: var(--bg);
+  }
+  .pop .pop-meta {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: color-mix(in srgb, var(--bg) 70%, transparent);
+    margin-bottom: 8px;
+  }
+  .pop ul { margin: 8px 0 0; padding-left: 18px; }
+  .pop li { font-family: var(--mono); font-size: 11px; line-height: 1.55; }
+  .pop .note { margin-top: 8px; color: color-mix(in srgb, var(--bg) 80%, transparent); }
+
+  /* Next actions */
+  .actions {
+    margin-top: 36px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .action-col {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 24px 26px 26px;
+    box-shadow: var(--shadow);
+    display: flex; flex-direction: column;
+  }
+  .action-col header {
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+    border-bottom: 2px solid currentColor;
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 12px;
+  }
+  .action-col[data-prio="high"]   { --tone: var(--missing); }
+  .action-col[data-prio="medium"] { --tone: var(--partial); }
+  .action-col[data-prio="low"]    { --tone: var(--done); }
+  .action-col header { color: var(--tone); }
+  .action-col h3 {
+    margin: 0;
+    font-family: var(--serif); font-variation-settings: "opsz" 30;
+    font-style: italic; font-weight: 400; font-size: 24px;
+    letter-spacing: -0.01em; color: var(--ink);
+  }
+  .prio-tag {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--tone);
+  }
+  .action { padding: 14px 0; border-bottom: 1px dashed var(--rule); }
+  .action:last-child { border-bottom: none; padding-bottom: 0; }
+  .action h4 {
+    margin: 0 0 6px;
+    font-family: var(--sans); font-weight: 500;
+    font-size: 15px; letter-spacing: -0.005em;
+    color: var(--ink);
+  }
+  .action .targets {
+    font-family: var(--mono); font-size: 10.5px;
+    color: var(--ink-soft); line-height: 1.5;
+    margin: 0 0 8px; word-break: break-word;
+  }
+  .action dl {
+    margin: 0;
+    display: grid; grid-template-columns: auto 1fr;
+    gap: 4px 14px;
+    font-family: var(--mono); font-size: 11px;
+  }
+  .action dt {
+    color: var(--ink-soft);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    font-size: 9.5px; align-self: center;
+  }
+  .action dd { margin: 0; color: var(--ink); }
+  .action dd code { font-family: var(--mono); font-size: 11px; background: var(--bg-alt); padding: 1px 5px; border-radius: 3px; }
+  .cost {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; border-radius: 999px;
+    background: color-mix(in srgb, var(--tone) 14%, transparent);
+    color: var(--tone);
+    font-weight: 500;
+  }
+
+  /* Colophon */
+  .colophon {
+    margin-top: clamp(56px, 8vw, 96px);
+    padding-top: 28px;
+    border-top: 1px solid var(--rule-strong);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: end;
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .colophon .signature {
+    font-family: var(--serif); font-style: italic; font-weight: 300;
+    font-variation-settings: "opsz" 60;
+    font-size: clamp(20px, 3vw, 32px);
+    letter-spacing: -0.01em; text-transform: none;
+    color: var(--ink);
+  }
+  .stacklist { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+  .stacklist span { color: var(--ink); }
+
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .hero { grid-template-columns: 1fr; }
+    .stack { grid-template-rows: none; grid-template-columns: repeat(2, 1fr); }
+    .actions { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    .masthead { grid-template-columns: 1fr; align-items: start; }
+    .stack { grid-template-columns: 1fr; }
+    .sec-head { grid-template-columns: auto 1fr; }
+    .sec-aside { display: none; }
+    .colophon { grid-template-columns: 1fr; }
+  }
+
+  /* Print */
+  @media print {
+    :root, :root[data-theme="dark"] {
+      --bg: #fff; --bg-alt: #f4f1ea; --paper: #fff;
+      --ink: #000; --ink-soft: #555; --rule: #bbb; --rule-strong: #000;
+      --done: #2f6b3a; --done-fill: #eaf5e0; --done-ink: #1d3f24;
+      --partial: #b67d18; --partial-fill: #faf0d8; --partial-ink: #6b4a05;
+      --missing: #a83c33; --missing-fill: #f7e2dd; --missing-ink: #5d1c16;
+      --na: #888; --na-fill: #f1f0eb; --accent: #1f3a52; --hot: #8a2e26;
+      --shadow: none;
+    }
+    body { background: #fff !important; }
+    body::before, body::after, .scorecard::before { background: none !important; }
+    .controls, .filterbar { display: none !important; }
+    .matrix-wrap { overflow: visible !important; box-shadow: none; }
+    table.matrix { min-width: 0; font-size: 9px; }
+    .cell { min-height: 0; padding: 8px; }
+    .action-col, .stat, .matrix-wrap, .scorecard { box-shadow: none !important; break-inside: avoid; }
+    .hero { grid-template-columns: 1.4fr 1fr; }
+    a { color: #000; }
+    .pop { display: none !important; }
+    .actions { grid-template-columns: repeat(3, 1fr); }
+    @page { margin: 14mm; size: A3 landscape; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <header class="masthead">
+    <div>
+      <div class="mast-meta">
+        <span>Vol. 001 · Issue 05</span>
+        <span><b>LLM-Studies</b> / Coverage Diagnostic</span>
+        <span>Scan&nbsp;Date · <b>2026-05-20</b></span>
+        <span class="pulse">Static&nbsp;file&nbsp;scan</span>
+      </div>
+      <h1 class="title">Coverage<br/><em>Diagnostic.</em></h1>
+    </div>
+    <div class="controls">
+      <button class="iconbtn" id="themeBtn" type="button" aria-label="テーマ切替">◐ Theme</button>
+      <button class="iconbtn" id="printBtn" type="button" aria-label="PDF印刷">⎙ Print</button>
+    </div>
+  </header>
+
+  <section class="hero" aria-label="サマリー">
+    <div class="scorecard" role="figure" aria-label="全体カバレッジスコア">
+      <div class="score-label">Overall Coverage Index · weighted</div>
+      <div class="score-number"><span id="scoreVal">31</span><sup>.4 %</sup></div>
+      <div class="score-bar" style="--missing-w: 53.5; --partial-w: 15.1;" aria-hidden="true">
+        <div class="score-bar-fill"></div>
+      </div>
+      <div class="score-bar-legend"><span>0%</span><span>50%</span><span>100%</span></div>
+      <p class="score-note">
+        <strong>方法:</strong> 8 カテゴリー × 8 ドメイン = 64 セルのうち、対象外 (N/A) を除く
+        <strong>43 セル</strong>を <strong>✅ 1.0 / ⚠️ 0.5 / ❌ 0</strong> で重み付き集計。
+        実測ベースのファイルスキャン結果のみ採用（推測値なし）。
+        coverage/lcov は未セットアップのためライン/分岐率は集計対象外。
+      </p>
+    </div>
+
+    <div class="stack" role="list" aria-label="サマリー指標">
+      <div class="stat" role="listitem">
+        <span class="stat-index">01</span>
+        <span class="stat-label">Test files · <i>web-next</i></span>
+        <span class="stat-val">41<small>vitest specs</small></span>
+      </div>
+      <div class="stat" role="listitem">
+        <span class="stat-index">02</span>
+        <span class="stat-label">Test cases · <i>web-next</i></span>
+        <span class="stat-val">≈ 491<small>it/test count</small></span>
+      </div>
+      <div class="stat" role="listitem">
+        <span class="stat-index">03</span>
+        <span class="stat-label">Scraper tests · <i>pytest</i></span>
+        <span class="stat-val">2 / 5<small>files / cases</small></span>
+      </div>
+      <div class="stat" role="listitem">
+        <span class="stat-index">04</span>
+        <span class="stat-label">Runners</span>
+        <span class="stat-val">Vitest&nbsp;4.1<small>+ pytest 9.0</small></span>
+      </div>
+    </div>
+  </section>
+
+  <header class="sec-head">
+    <span class="sec-num">§01</span>
+    <h2 class="sec-title">Test matrix &mdash; by <em>category &times; domain</em></h2>
+    <span class="sec-aside">8 × 8 · 64 cells</span>
+  </header>
+
+  <div class="filterbar" role="group" aria-label="マトリクスフィルタ">
+    <div class="filter-group" role="radiogroup" aria-label="ステータスフィルタ">
+      <span class="filter-tag">Status</span>
+      <button class="chip" role="radio" aria-pressed="true"  data-filter="status" data-value="all">all</button>
+      <button class="chip" role="radio" aria-pressed="false" data-filter="status" data-value="done" data-status="done">implemented</button>
+      <button class="chip" role="radio" aria-pressed="false" data-filter="status" data-value="partial" data-status="partial">partial</button>
+      <button class="chip" role="radio" aria-pressed="false" data-filter="status" data-value="missing" data-status="missing">missing</button>
+    </div>
+    <div class="filter-group" role="radiogroup" aria-label="軸切替">
+      <span class="filter-tag">Axis</span>
+      <button class="chip" role="radio" aria-pressed="true"  data-filter="axis" data-value="category">by category (rows)</button>
+      <button class="chip" role="radio" aria-pressed="false" data-filter="axis" data-value="domain">by domain (cols)</button>
+    </div>
+  </div>
+
+  <div class="matrix-wrap">
+    <table class="matrix" id="matrix" aria-label="テストカバレッジマトリクス">
+      <thead>
+        <tr>
+          <th class="row-axis" scope="col">
+            <span class="col-label">Category &times; Domain</span>
+            <span class="col-path">rows = category · cols = domain</span>
+          </th>
+          <th data-col="app" scope="col">
+            <span class="col-label">Routes</span>
+            <span class="col-path">web-next/app/</span>
+          </th>
+          <th data-col="components" scope="col">
+            <span class="col-label">Calculator UI</span>
+            <span class="col-path">web-next/components/</span>
+          </th>
+          <th data-col="site" scope="col">
+            <span class="col-label">Site chrome</span>
+            <span class="col-path">components/site/</span>
+          </th>
+          <th data-col="lib" scope="col">
+            <span class="col-label">Library</span>
+            <span class="col-path">web-next/lib/</span>
+          </th>
+          <th data-col="types" scope="col">
+            <span class="col-label">Types</span>
+            <span class="col-path">web-next/types/</span>
+          </th>
+          <th data-col="providers" scope="col">
+            <span class="col-label">Providers</span>
+            <span class="col-path">scraper/providers/</span>
+          </th>
+          <th data-col="tools" scope="col">
+            <span class="col-label">Tools</span>
+            <span class="col-path">scraper/tools/</span>
+          </th>
+          <th data-col="core" scope="col">
+            <span class="col-label">Scraper core</span>
+            <span class="col-path">main / exchange / browser</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody id="matrixBody"></tbody>
+    </table>
+  </div>
+
+  <header class="sec-head">
+    <span class="sec-num">§02</span>
+    <h2 class="sec-title">Prescription &mdash; <em>prioritized backlog</em></h2>
+    <span class="sec-aside">3 tiers · 9 items</span>
+  </header>
+
+  <section class="actions" aria-label="ネクストアクション">
+    <article class="action-col" data-prio="high">
+      <header>
+        <h3>High priority</h3>
+        <span class="prio-tag">🔴 immediate</span>
+      </header>
+
+      <div class="action">
+        <h4>スクレイパーに HTML フィクスチャ回帰テストを敷く</h4>
+        <p class="targets">scraper/providers/{anthropic,openai,google,aws,deepseek,xai}.py<br/>scraper/tools/{cursor,github_copilot,…}.py</p>
+        <dl>
+          <dt>Tool</dt><dd>pytest + ローカル HTML フィクスチャ (<code>tests/fixtures/*.html</code>)</dd>
+          <dt>Why</dt><dd>現状は mock 1 アサーションのみ。価格抽出ロジックの破損が CI で検出されない</dd>
+          <dt>Cost</dt><dd><span class="cost">中</span> 14 ファイル × フィクスチャ作成</dd>
+          <dt>Impact</dt><dd>各社ページ DOM 変更時の早期検知（3 層フォールバックの正しさを保証）</dd>
+        </dl>
+      </div>
+
+      <div class="action">
+        <h4>主要フロー E2E（料金計算ユーザーシナリオ）</h4>
+        <p class="targets">web-next/app/page.tsx → ScenarioSelector → ApiTable/SubTable</p>
+        <dl>
+          <dt>Tool</dt><dd>Playwright (chromium 既にインストール済)</dd>
+          <dt>Why</dt><dd>HomePage.integration はあるが「ブラウザでの計算結果」までは未検証</dd>
+          <dt>Cost</dt><dd><span class="cost">小</span> 1 シナリオ + CI ジョブ追加</dd>
+          <dt>Impact</dt><dd>JA/EN 切替・通貨表示・列ソートのリグレッション防止</dd>
+        </dl>
+      </div>
+
+      <div class="action">
+        <h4>依存脆弱性スキャンを CI に組み込む</h4>
+        <p class="targets">web-next/ (bun audit) · scraper/ (uv pip-audit)</p>
+        <dl>
+          <dt>Tool</dt><dd>GitHub Actions <code>dependency-review-action</code> + bun audit</dd>
+          <dt>Why</dt><dd>現 CI には security ゲート無し。Next.js 16 / mermaid v10 系の追跡必須</dd>
+          <dt>Cost</dt><dd><span class="cost">小</span> workflow 数行</dd>
+          <dt>Impact</dt><dd>サプライチェーン脆弱性の自動検出</dd>
+        </dl>
+      </div>
+    </article>
+
+    <article class="action-col" data-prio="medium">
+      <header>
+        <h3>Medium priority</h3>
+        <span class="prio-tag">🟡 next sprint</span>
+      </header>
+
+      <div class="action">
+        <h4>jest-axe で a11y を実測テスト化</h4>
+        <p class="targets">SiteHeader / DisclaimerBanner / HomePage / 18 page.tsx</p>
+        <dl>
+          <dt>Tool</dt><dd><code>vitest-axe</code> (or jest-axe) + testing-library</dd>
+          <dt>Why</dt><dd>現状は <code>getByRole</code> 経由の間接検証のみ。WCAG 違反は検出できない</dd>
+          <dt>Cost</dt><dd><span class="cost">小</span> setup.ts に 1 ヘルパー追加</dd>
+          <dt>Impact</dt><dd>コントラスト・aria 属性・ランドマーク欠落の自動検出</dd>
+        </dl>
+      </div>
+
+      <div class="action">
+        <h4>カバレッジ計測の導入（@vitest/coverage-v8）</h4>
+        <p class="targets">web-next/ 全モジュール</p>
+        <dl>
+          <dt>Tool</dt><dd><code>@vitest/coverage-v8</code> → lcov / json-summary 出力</dd>
+          <dt>Why</dt><dd>ライン/分岐カバレッジ未計測。次回からは実数値で本ダッシュボードを生成可能</dd>
+          <dt>Cost</dt><dd><span class="cost">小</span> vitest.config.ts に <code>coverage</code> ブロック</dd>
+          <dt>Impact</dt><dd>ホットスポット特定 + threshold によるリグレッション防止</dd>
+        </dl>
+      </div>
+
+      <div class="action">
+        <h4>metadata.ts / fonts.ts に最小ユニットテスト</h4>
+        <p class="targets">web-next/lib/metadata.ts · web-next/lib/fonts.ts</p>
+        <dl>
+          <dt>Tool</dt><dd>vitest</dd>
+          <dt>Why</dt><dd>Server Component から間接利用される設定値が完全未検証</dd>
+          <dt>Cost</dt><dd><span class="cost">小</span> 2 ファイル × 数ケース</dd>
+          <dt>Impact</dt><dd>OGP・viewport・font 設定の意図しない変更を検出</dd>
+        </dl>
+      </div>
+    </article>
+
+    <article class="action-col" data-prio="low">
+      <header>
+        <h3>Low priority</h3>
+        <span class="prio-tag">🟢 mid-term</span>
+      </header>
+
+      <div class="action">
+        <h4>ビジュアル回帰（Playwright snapshots）</h4>
+        <p class="targets">/, /claude/skill, /git-worktree (Mermaid)</p>
+        <dl>
+          <dt>Tool</dt><dd>Playwright <code>expect(page).toHaveScreenshot</code></dd>
+          <dt>Why</dt><dd>静的エクスポート出力の見た目変化を検出</dd>
+          <dt>Cost</dt><dd><span class="cost">中</span> ベースライン管理が必要</dd>
+          <dt>Impact</dt><dd>Tailwind v4 / next/font の変更時に重宝</dd>
+        </dl>
+      </div>
+
+      <div class="action">
+        <h4>Lighthouse CI / バンドルサイズ監視</h4>
+        <p class="targets">web-next/out/ (静的 build artifact)</p>
+        <dl>
+          <dt>Tool</dt><dd><code>@lhci/cli</code> + <code>bundlesize2</code></dd>
+          <dt>Why</dt><dd>SSG だがクライアント JS 肥大は静かに進行しがち</dd>
+          <dt>Cost</dt><dd><span class="cost">中</span> CI ジョブ + 閾値設定</dd>
+          <dt>Impact</dt><dd>パフォーマンス劣化の予防（特に Mermaid 動的ロード周り）</dd>
+        </dl>
+      </div>
+
+      <div class="action">
+        <h4>Pydantic モデルの negative test</h4>
+        <p class="targets">scraper/src/scraper/models.py</p>
+        <dl>
+          <dt>Tool</dt><dd>pytest + <code>pydantic.ValidationError</code> アサート</dd>
+          <dt>Why</dt><dd>不正な scrape_status / 負の価格を確実に reject することを検証したい</dd>
+          <dt>Cost</dt><dd><span class="cost">小</span> 1 テストファイル</dd>
+          <dt>Impact</dt><dd>3 層フォールバック判定の信頼性向上</dd>
+        </dl>
+      </div>
+    </article>
+  </section>
+
+  <footer class="colophon">
+    <div>
+      <div class="signature">A standing diagnosis &mdash; not a verdict.</div>
+      <div style="margin-top:8px;">Generated · static file scan · no lcov consumed · no values fabricated</div>
+    </div>
+    <div class="stacklist">
+      <span>Vitest 4.1</span>·
+      <span>jsdom 29</span>·
+      <span>@testing-library/react 16</span>·
+      <span>pytest 9.0</span>·
+      <span>Pydantic v2</span>·
+      <span>Zod 4</span>·
+      <span>GitHub Actions · paths-filter</span>
+    </div>
+  </footer>
+
+</div>
+
+<div class="pop" id="pop" role="tooltip" aria-hidden="true"></div>
+
+<script>
+/* DOM helper — safe construction via createElement + textContent */
+function el(tag, opts, children) {
+  var e = document.createElement(tag);
+  if (opts) {
+    if (opts.class) e.className = opts.class;
+    if (opts.text != null) e.textContent = String(opts.text);
+    if (opts.attrs) for (var k in opts.attrs) e.setAttribute(k, opts.attrs[k]);
+    if (opts.data)  for (var d in opts.data)  e.dataset[d] = String(opts.data[d]);
+  }
+  if (children) {
+    for (var i = 0; i < children.length; i++) {
+      var c = children[i];
+      if (c == null || c === false) continue;
+      e.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+    }
+  }
+  return e;
+}
+function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+
+/* Data */
+var ROWS = [
+  { key: "unit",        label: "Unit",                desc: "個別関数・コンポーネントの単体テスト" },
+  { key: "integration", label: "Integration",         desc: "モジュール間の連携・データフロー" },
+  { key: "e2e",         label: "E2E",                 desc: "ユーザーシナリオを再現したエンドツーエンド" },
+  { key: "visual",      label: "Visual / Snapshot",   desc: "UI の見た目の回帰テスト" },
+  { key: "a11y",        label: "Accessibility",       desc: "WCAG・aria・キーボード操作" },
+  { key: "perf",        label: "Performance",         desc: "レンダリング・バンドル・実行時間" },
+  { key: "contract",    label: "API / Contract",      desc: "型・スキーマ・I/O 契約" },
+  { key: "security",    label: "Security",            desc: "XSS / CSRF / 依存脆弱性" }
+];
+var COLS = ["app","components","site","lib","types","providers","tools","core"];
+
+var CELLS = {
+  unit: {
+    app:        { s:"done",    count:113, files:["app/claude/**/page.test.tsx (5 files)","app/codex/**/page.test.tsx (3)","app/copilot/**/page.test.tsx (4)","app/gemini/**/page.test.tsx (5)","app/git-worktree/page.test.tsx"], note:"全 18 page.tsx ルートが契約テスト付き（タイトル・セクション数・rel 属性）" },
+    components: { s:"done",    count:144, files:["ApiTable.test.tsx (25)","SubTable.test.tsx (21)","ScenarioSelector.test.tsx (23)","HomePage.test.tsx (16)","Hero.test.tsx (12)","MathSection.test.tsx (11)","DualCell.test.tsx (10)","RefLinks.test.tsx (18)","LanguageToggle.test.tsx (8)"], note:"電卓 UI 9/9 コンポーネント網羅" },
+    site:       { s:"done",    count:25,  files:["site/SiteHeader.test.tsx (12)","site/SiteHeaderClient.test.tsx (7)","site/DisclaimerBanner.test.tsx (6)"], note:"共通ヘッダー/バナー 3/3 網羅" },
+    lib:        { s:"done",    count:93,  files:["cost.test.ts (49)","pricing.test.ts (23)","i18n.test.ts (7)","i18n.rich.test.tsx (10)","site-url.test.ts (4)"], note:"6 lib モジュール中 5 件カバー（metadata.ts / fonts.ts のみ未）" },
+    types:      { s:"partial", count:0,   files:["lib/pricing.ts → _AssertParity (compile-time)"], note:"ランタイム negative test なし。型レベルアサートのみ" },
+    providers:  { s:"partial", count:1,   files:["scraper/tests/smoke/test_smoke.py::test_providers"], note:"6 プロバイダーを mock で 1 アサート — DOM 構造変更は検出不可" },
+    tools:      { s:"partial", count:1,   files:["scraper/tests/smoke/test_smoke.py::test_tools"], note:"8 ツールを mock で 1 アサート — 価格抽出ロジック未検証" },
+    core:       { s:"partial", count:3,   files:["test_imports.py (全モジュール import)","test_smoke.py::test_main","test_smoke.py::test_fetch_jpy_rate"], note:"main.py / exchange.py はカバー。browser.py 未テスト" }
+  },
+  integration: {
+    app:        { s:"missing", count:0, files:[], note:"ルート間遷移・SSG ビルド成果物の結合テストなし" },
+    components: { s:"done",    count:19, files:["HomePage.integration.test.tsx (19)"], note:"ScenarioSelector × ApiTable × SubTable のデータフロー検証" },
+    site:       { s:"missing", count:0, files:[], note:"SiteHeader × layout の結合なし（個別ユニットのみ）" },
+    lib:        { s:"na" },
+    types:      { s:"na" },
+    providers:  { s:"missing", count:0, files:[], note:"live HTTP → models.py の結合検証なし" },
+    tools:      { s:"missing", count:0, files:[], note:"同上" },
+    core:       { s:"missing", count:0, files:[], note:"main → _scrape_all → _write_output の end-to-end なし" }
+  },
+  e2e: {
+    app:        { s:"missing", count:0, files:[], note:"Playwright / Cypress 等の E2E スイート未導入" },
+    components: { s:"missing", count:0, files:[], note:"" },
+    site:       { s:"missing", count:0, files:[], note:"" },
+    lib:        { s:"na" },
+    types:      { s:"na" },
+    providers:  { s:"missing", count:0, files:[], note:"ライブスクレイプ smoke は CI 対象外" },
+    tools:      { s:"missing", count:0, files:[], note:"" },
+    core:       { s:"missing", count:0, files:[], note:"update.sh の end-to-end 検証なし" }
+  },
+  visual: {
+    app:        { s:"missing", count:0, files:[], note:"スナップショット・visual diff 未導入" },
+    components: { s:"missing", count:0, files:[], note:"" },
+    site:       { s:"missing", count:0, files:[], note:"" },
+    lib: { s:"na" }, types: { s:"na" }, providers: { s:"na" }, tools: { s:"na" }, core: { s:"na" }
+  },
+  a11y: {
+    app:        { s:"partial", count:null, files:["全 page.test.tsx で getByRole / getByText"], note:"semantic クエリのみ。axe-core / jest-axe による違反検出なし" },
+    components: { s:"partial", count:null, files:["LanguageToggle.test.tsx aria-pressed","ApiTable / SubTable getByRole('columnheader')"], note:"aria 属性の存在確認のみ" },
+    site:       { s:"partial", count:null, files:["SiteHeader.test.tsx getByRole('navigation')"], note:"ランドマーク存在確認のみ" },
+    lib: { s:"na" }, types: { s:"na" }, providers: { s:"na" }, tools: { s:"na" }, core: { s:"na" }
+  },
+  perf: {
+    app:        { s:"missing", count:0, files:[], note:"Lighthouse CI / web-vitals 計測なし" },
+    components: { s:"missing", count:0, files:[], note:"" },
+    site:       { s:"missing", count:0, files:[], note:"" },
+    lib:        { s:"na" }, types: { s:"na" },
+    providers:  { s:"missing", count:0, files:[], note:"スクレイプ所要時間の閾値テストなし" },
+    tools:      { s:"missing", count:0, files:[], note:"" },
+    core:       { s:"missing", count:0, files:[], note:"" }
+  },
+  contract: {
+    app:        { s:"na" }, components: { s:"na" }, site: { s:"na" },
+    lib:        { s:"done",    count:23, files:["lib/pricing.test.ts — PricingDataSchema (Zod 23 cases)"], note:"runtime スキーマ検証 + pricing.json パース" },
+    types:      { s:"done",    count:0,  files:["lib/pricing.ts → _AssertParity"], note:"Pydantic models.py との compile-time パリティアサート" },
+    providers:  { s:"missing", count:0, files:[], note:"HTML フィクスチャ → ApiModel の契約テストなし" },
+    tools:      { s:"missing", count:0, files:[], note:"HTML フィクスチャ → SubTool の契約テストなし" },
+    core:       { s:"partial", count:0, files:["scraper/src/scraper/models.py (Pydantic 自動バリデーション)"], note:"Pydantic がランタイム強制。negative test は未整備" }
+  },
+  security: {
+    app:        { s:"partial", count:null, files:["全 page.tsx で raw HTML 挿入 API 不使用ポリシー"], note:"tRich パターンによる XSS 回避が暗黙の契約" },
+    components: { s:"partial", count:10, files:["i18n.rich.test.tsx (10) — XSS-resistance"], note:"raw HTML 文字列を React 要素へ変換することを静的に検査" },
+    site:       { s:"na" },
+    lib:        { s:"partial", count:10, files:["i18n.rich.test.tsx (10)"], note:"上記と同じファイルで lib/i18n.tsx もカバー" },
+    types:      { s:"na" },
+    providers:  { s:"missing", count:0, files:[], note:"bun audit / pip-audit の依存脆弱性ゲートなし" },
+    tools:      { s:"missing", count:0, files:[], note:"同上" },
+    core:       { s:"missing", count:0, files:[], note:"同上 + httpx タイムアウト/SSRF 検証なし" }
+  }
+};
+
+var COL_LABEL = {
+  app:"Routes (web-next/app/)",
+  components:"Calculator UI (components/)",
+  site:"Site chrome (components/site/)",
+  lib:"Library (web-next/lib/)",
+  types:"Types (web-next/types/)",
+  providers:"Scraper providers/",
+  tools:"Scraper tools/",
+  core:"Scraper core"
+};
+var STATUS_TXT = { done:"Implemented", partial:"Partial", missing:"Missing", na:"Not applicable" };
+var STATUS_GLYPH = { done:"✓", partial:"~", missing:"×", na:"—" };
+
+/* Build matrix */
+var body = document.getElementById("matrixBody");
+for (var ri = 0; ri < ROWS.length; ri++) {
+  var row = ROWS[ri];
+  var tr = el("tr", { data: { row: row.key } });
+  var rowTh = el("th", { attrs: { scope: "row" } }, [
+    el("span", { class: "row-label", text: row.label }),
+    el("span", { class: "row-desc",  text: row.desc })
+  ]);
+  tr.appendChild(rowTh);
+
+  for (var ci = 0; ci < COLS.length; ci++) {
+    var col = COLS[ci];
+    var cell = (CELLS[row.key] && CELLS[row.key][col]) || { s: "na" };
+    var td = el("td", { data: { col: col, status: cell.s } });
+
+    var fileCount = (cell.files && cell.files.length) ? (cell.files.length + " file" + (cell.files.length > 1 ? "s" : "")) : "";
+    var countTxt = (cell.count == null) ? "" : (cell.count + " " + (cell.count === 1 ? "case" : "cases"));
+
+    var glyph = el("span", { class: "glyph" }, [
+      STATUS_GLYPH[cell.s] + " ",
+      el("span", { text: STATUS_TXT[cell.s] })
+    ]);
+    var countEl = el("span", { class: "count", text: countTxt });
+    var filesEl = el("span", { class: "files", text: fileCount });
+
+    var inner = el("div", {
+      class: "cell",
+      attrs: { tabindex: "0" },
+      data: { status: cell.s }
+    }, [glyph, countEl, filesEl]);
+
+    inner.dataset.tooltipRow = row.label;
+    inner.dataset.tooltipCol = COL_LABEL[col];
+    inner.dataset.tooltipStatus = STATUS_TXT[cell.s];
+    inner.dataset.tooltipFiles = JSON.stringify(cell.files || []);
+    inner.dataset.tooltipNote = cell.note || "";
+    inner.dataset.tooltipCount = countTxt;
+    inner.setAttribute(
+      "aria-label",
+      row.label + " × " + COL_LABEL[col] + " — " + STATUS_TXT[cell.s]
+      + (countTxt ? " · " + countTxt : "")
+      + (cell.note ? " · " + cell.note : "")
+    );
+    td.appendChild(inner);
+    tr.appendChild(td);
+  }
+  body.appendChild(tr);
+}
+
+/* Tooltip — built via createElement, no markup injection */
+var pop = document.getElementById("pop");
+function showPop(elTarget) {
+  var row = elTarget.dataset.tooltipRow;
+  var col = elTarget.dataset.tooltipCol;
+  var status = elTarget.dataset.tooltipStatus;
+  var count = elTarget.dataset.tooltipCount;
+  var note = elTarget.dataset.tooltipNote;
+  var files = [];
+  try { files = JSON.parse(elTarget.dataset.tooltipFiles); } catch (_) { files = []; }
+
+  clear(pop);
+  pop.appendChild(el("div", { class: "pop-meta", text: row + " × " + col }));
+  pop.appendChild(el("div", {
+    class: "pop-title",
+    text: status + (count ? " · " + count : "")
+  }));
+  if (files.length) {
+    var ul = el("ul");
+    for (var i = 0; i < files.length; i++) {
+      ul.appendChild(el("li", { text: files[i] }));
+    }
+    pop.appendChild(ul);
+  }
+  if (note) pop.appendChild(el("div", { class: "note", text: note }));
+
+  var r = elTarget.getBoundingClientRect();
+  pop.dataset.show = "1";
+  requestAnimationFrame(function () {
+    var pw = pop.offsetWidth, ph = pop.offsetHeight;
+    var x = r.left + r.width / 2 - pw / 2;
+    var y = r.bottom + 10;
+    var margin = 12;
+    if (x < margin) x = margin;
+    if (x + pw > window.innerWidth - margin) x = window.innerWidth - pw - margin;
+    if (y + ph > window.innerHeight - margin) y = r.top - ph - 10;
+    pop.style.left = x + "px";
+    pop.style.top  = y + "px";
+  });
+}
+function hidePop() { pop.dataset.show = "0"; }
+
+document.addEventListener("mouseover", function (e) {
+  var c = e.target.closest && e.target.closest(".cell");
+  if (c) showPop(c);
+});
+document.addEventListener("mouseout", function (e) {
+  if (e.target.closest && e.target.closest(".cell")) hidePop();
+});
+document.addEventListener("focusin", function (e) {
+  var c = e.target.closest && e.target.closest(".cell");
+  if (c) showPop(c);
+});
+document.addEventListener("focusout", function (e) {
+  if (e.target.closest && e.target.closest(".cell")) hidePop();
+});
+document.addEventListener("scroll", hidePop, { passive: true });
+
+/* Filter chips */
+var filterState = { status: "all", axis: "category" };
+
+function applyFilter() {
+  var rows = document.querySelectorAll("#matrixBody tr");
+  for (var i = 0; i < rows.length; i++) {
+    var tds = rows[i].querySelectorAll("td");
+    for (var j = 0; j < tds.length; j++) {
+      var s = tds[j].dataset.status;
+      var match = filterState.status === "all" || s === filterState.status;
+      tds[j].style.opacity = match ? "" : "0.18";
+      tds[j].style.filter  = match ? "" : "grayscale(0.7)";
+    }
+    var rowTh = rows[i].querySelector("th");
+    if (rowTh) rowTh.style.opacity = filterState.axis === "domain" ? "0.55" : "";
+  }
+  var colHeads = document.querySelectorAll("#matrix thead th[data-col]");
+  for (var k = 0; k < colHeads.length; k++) {
+    colHeads[k].style.opacity = filterState.axis === "category" ? "0.65" : "";
+  }
+}
+
+var chips = document.querySelectorAll(".chip[data-filter]");
+for (var ci2 = 0; ci2 < chips.length; ci2++) {
+  chips[ci2].addEventListener("click", function (ev) {
+    var btn = ev.currentTarget;
+    var group = btn.dataset.filter;
+    var siblings = document.querySelectorAll('.chip[data-filter="' + group + '"]');
+    for (var s = 0; s < siblings.length; s++) siblings[s].setAttribute("aria-pressed", "false");
+    btn.setAttribute("aria-pressed", "true");
+    filterState[group] = btn.dataset.value;
+    applyFilter();
+  });
+}
+applyFilter();
+
+/* Theme toggle */
+document.getElementById("themeBtn").addEventListener("click", function () {
+  var cur = document.documentElement.getAttribute("data-theme");
+  var sysDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  var next = !cur ? (sysDark ? "light" : "dark") : (cur === "dark" ? "light" : "dark");
+  document.documentElement.setAttribute("data-theme", next);
+});
+document.getElementById("printBtn").addEventListener("click", function () {
+  window.print();
+});
+</script>
+</body>
+</html>
