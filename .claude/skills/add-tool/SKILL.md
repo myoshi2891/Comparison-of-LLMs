@@ -1,10 +1,12 @@
 ---
 name: add-tool
 description: >
-  pricing.json に新しいコーディングツール（サブスクリプション型）のスクレイパーを追加する。
-  「ツール追加」「新しいコーディングツールを追加」「○○ の料金を追加して」
-  「IDE の料金を取得したい」「サブスクツールを増やして」と言われたときに使用する。
-  tools/ ディレクトリに新しいモジュールを作成し、main.py に登録する手順を提供する。
+  Add a new coding tool (subscription-based) scraper to pricing.json.
+  TRIGGER when the user says any of the following (Japanese or English):
+  - "ツール追加" / "新しいコーディングツールを追加" / "○○ の料金を追加して"
+  - "IDE の料金を取得したい" / "サブスクツールを増やして"
+  - "add tool" / "add coding tool" / "new subscription tool for <name>"
+  Creates a new module in tools/ and registers it in main.py.
 allowed-tools:
   - Read
   - Write

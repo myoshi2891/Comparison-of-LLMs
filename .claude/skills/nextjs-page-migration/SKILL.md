@@ -1,13 +1,14 @@
 ---
 name: nextjs-page-migration
 description: >
-  legacy/ 配下の静的 HTML ガイドページ（claude/, gemini/, codex/, copilot/, git_worktree.html）
-  を web-next/ App Router の page.tsx へ TDD で移植する。
-  「Phase A を進めて」「claude/skill を Next.js に移行」「legacy HTML を web-next へ」
-  「共通ヘッダーを web-next に移植」と言われたときに使用する。
-  共通ヘッダー（SiteHeader）／ディスクレイマー／ナビデータ（nav-links.ts）／CSS Modules 分離／
-  shiki ビルド時ハイライト／Mermaid クライアント遅延ロード／netlify.toml 301 リダイレクトを
-  プロジェクト固有パターンとして適用する。
+  Migrate static HTML guide pages from legacy/ to web-next/ App Router page.tsx using TDD.
+  Covers pages under claude/, gemini/, codex/, copilot/, and git_worktree.html.
+  TRIGGER when the user says any of the following (Japanese or English):
+  - "Phase A を進めて" / "claude/skill を Next.js に移行" / "legacy HTML を web-next へ"
+  - "共通ヘッダーを web-next に移植" / "ガイドページを移行"
+  - "migrate to Next.js" / "migrate guide page" / "nextjs page migration"
+  Applies project-specific patterns: SiteHeader, DisclaimerBanner, nav-links.ts,
+  CSS Modules, shiki build-time highlighting, Mermaid lazy loading, netlify.toml redirects.
 invocation: explicit
 allowed-tools:
   - Read

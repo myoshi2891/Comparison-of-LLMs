@@ -1,10 +1,13 @@
 ---
 name: sync-types
 description: |
-  Python(Pydantic)とTypeScriptの型定義を同期・検証するスキル。
-  「型を同期して」「models.py を変更した」「pricing.ts を更新して」「スキーマが一致しているか確認して」
-  などの指示が出たら必ずこのスキルを使用すること。
-  Python側を信頼源（Single Source of Truth）とし、TypeScript側をそれに合わせる。
+  Sync and verify type definitions between scraper/src/scraper/models.py (Pydantic)
+  and web-next/types/pricing.ts (TypeScript).
+  TRIGGER when the user says any of the following (Japanese or English):
+  - "型を同期して" / "models.py を変更した" / "pricing.ts を更新して"
+  - "スキーマが一致しているか確認して"
+  - "sync types" / "type sync" / "check type parity"
+  Pydantic models.py is the Single Source of Truth; TypeScript side must match.
 ---
 
 # Python ↔ TypeScript 型同期スキル

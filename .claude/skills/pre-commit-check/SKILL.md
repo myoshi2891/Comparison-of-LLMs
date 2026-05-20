@@ -1,10 +1,12 @@
 ---
 name: pre-commit-check
 description: >
-  コミット前に全テスト・ビルドを実行してコード品質を確認する。
-  「コミット前チェック」「テスト実行」「ビルドとテスト」「CI 確認」
-  「全部テストして」「コミットしていいか確認」と言われたときに使用する。
-  フロントエンド（bun test + build）とバックエンド（pytest）の両方を検証する。
+  Run all tests and builds before committing to verify code quality.
+  TRIGGER when the user says any of the following (Japanese or English):
+  - "コミット前チェック" / "テスト実行" / "ビルドとテスト" / "CI 確認"
+  - "全部テストして" / "コミットしていいか確認"
+  - "pre-commit check" / "run tests" / "check before commit" / "verify build"
+  Validates both frontend (bun run test + bun run build) and backend (pytest).
 invocation: explicit
 allowed-tools:
   - Bash
