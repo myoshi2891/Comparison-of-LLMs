@@ -8,6 +8,10 @@ description: |
   - "スキーマが一致しているか確認して"
   - "sync types" / "type sync" / "check type parity"
   Pydantic models.py is the Single Source of Truth; TypeScript side must match.
+allowed-tools:
+  - Read
+  - Edit
+  - Grep
 ---
 
 # Python ↔ TypeScript 型同期スキル
@@ -27,7 +31,7 @@ description: |
 2. `web-next/types/pricing.ts` を読み込む。
 3. 以下の「同期チェックリスト」に従って差分を検出する。
 4. 差分があれば TypeScript 側を修正する。
-5. コマンド `cd web-next && bun run build` でビルドが通ることを確認する。
+5. ユーザーにコマンド `cd web-next && bun run build` の手動実行を依頼し、ビルドが通ることを確認する。
 
 ## 同期チェックリスト
 
