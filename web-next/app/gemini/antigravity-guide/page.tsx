@@ -4,9 +4,9 @@ import GeminiMdTabs from "./GeminiMdTabs";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "Google Antigravity — AI仕様駆動開発 ベストプラクティス完全ガイド",
+  title: "Google Antigravity 2.0 × Gemini 3.5 Flash — AI仕様駆動開発 ベストプラクティス完全ガイド",
   description:
-    "GEMINI.md から SKILL.md・Rules・Workflows・Artifacts まで、Google Antigravity エコシステムの全体を根拠ソース付きで徹底解説。初学者でもステップバイステップで理解できるベストプラクティス完全ガイド。",
+    "GEMINI.md から SKILL.md・Rules・Workflows・Artifacts まで、Google Antigravity エコシステムの全体を根拠ソース付きで徹底解説。初学者でもステップバイステップで理解できるベストプラクティス完全ガイド。Antigravity 2.0 (2026-05-19, Google I/O 2026) — Antigravity CLI / SDK / Managed Agents / plugins / Gemini 3.5 Flash 対応。",
 };
 
 /**
@@ -22,7 +22,7 @@ export default function Page() {
       {/* HERO */}
       <header className={styles.hero}>
         <div className={styles.heroGlow} />
-        <div className={styles.heroTag}>Google Antigravity × Gemini 3.1 Pro</div>
+        <div className={styles.heroTag}>Google Antigravity 2.0 × Gemini 3.5 Flash</div>
         <h1 className={styles.heroH1}>
           AI仕様駆動開発における
           <br />
@@ -36,11 +36,11 @@ export default function Page() {
           Antigravityエコシステムの全体を根拠ソース付きで徹底解説
         </p>
         <div className={styles.heroChips}>
-          <span className={`${styles.chip} ${styles.cb}`}>Google Antigravity</span>
-          <span className={`${styles.chip} ${styles.cg}`}>Gemini 3.1 Pro</span>
+          <span className={`${styles.chip} ${styles.cb}`}>Google Antigravity 2.0</span>
+          <span className={`${styles.chip} ${styles.cg}`}>Gemini 3.5 Flash</span>
           <span className={`${styles.chip} ${styles.cy}`}>Agent-First IDE</span>
           <span className={`${styles.chip} ${styles.cr}`}>Spec-Driven Dev</span>
-          <span className={`${styles.chip} ${styles.cp}`}>v1.20.3 対応</span>
+          <span className={`${styles.chip} ${styles.cp}`}>I/O 2026 (2026-05-19)</span>
         </div>
       </header>
 
@@ -96,6 +96,13 @@ export default function Page() {
             CodeのようなCLIツールではなく
             <strong>フルIDEとして「エージェントが主役」のパラダイム</strong>を実装しています。
             人間の役割は「コードを書く人」から「アーキテクトとして指揮する人」へと変わります。
+            さらに
+            <strong>
+              2026-05-19 の Google I/O 2026 で Antigravity 2.0 が発表され、Gemini 3.5 Flash / 3.5
+              Pro / Omni Flash 対応・Go 製 Antigravity CLI・Antigravity SDK・Managed Agents・
+              plugins エコシステム・AI Studio / Android Studio / Firebase 統合が追加
+            </strong>
+            されました。
           </p>
 
           <div className={styles.flowWrap}>
@@ -245,7 +252,11 @@ export default function Page() {
               </tr>
               <tr>
                 <td>主要AI</td>
-                <td>Gemini 3.1 Pro / 3 Flash + Claude Sonnet 4.6 / Opus 4.6 / GPT-OSS 120B</td>
+                <td>
+                  Gemini 3.5 Flash / 3.5 Pro / Omni Flash（Antigravity 2.0）
+                  <br />+ Gemini 3.1 Pro / 3 Flash（履歴）
+                  <br />+ Claude Sonnet 4.6 / Opus 4.6 / GPT-OSS 120B
+                </td>
                 <td>Claude Opus / Sonnet / Haiku</td>
               </tr>
               <tr>
@@ -286,8 +297,56 @@ export default function Page() {
             <div>
               <strong>SKILL.mdは共通規格</strong>です。AntigravityとClaude
               Codeは同一のSKILL.md形式を採用しており、ファイルを両プラットフォーム間でほぼそのまま移植できます。
-              また<strong>v1.20.3（2026-03-05）以降はAGENTS.mdにも対応</strong>
-              し、他のエージェントツールとのルール共有が可能になりました。
+              また
+              <strong>
+                v1.20.3（2026-03-05）で AGENTS.md に対応し、Antigravity 2.0（2026-05-19, Google I/O
+                2026）で Go 製 Antigravity CLI / SDK / Managed Agents / plugins が追加
+              </strong>
+              されました。Claude Code（CLAUDE.md）など他ツールとのルール共有が可能で、Antigravity
+              CLI 経由でも同じ AGENTS.md / GEMINI.md / SKILL.md を再利用できます。
+            </div>
+          </div>
+
+          {/* SECTION 01b: Antigravity 2.0 主要機能ハイライト */}
+          <h3>Antigravity 2.0 主要機能（I/O 2026, 2026-05-19）</h3>
+          <div className={styles.grid3}>
+            <div className={styles.miniCard}>
+              <div className={styles.mcTag}>🆕 Antigravity CLI</div>
+              <p>
+                Go 製の公式 CLI。Gemini CLI の後継として AI Pro / Ultra / 無料 Code Assist
+                向けに提供。AGENTS.md / GEMINI.md / SKILL.md を IDE と共有可能で、Agent Skills /
+                Hooks / Subagents / Extensions（→ plugins）の機能を継承。
+              </p>
+            </div>
+            <div className={styles.miniCard}>
+              <div className={styles.mcTag}>🛠 Antigravity SDK</div>
+              <p>
+                プログラマブルにエージェントを呼び出す公式 SDK。CI/CD パイプラインや外部システムから
+                Antigravity エージェントを起動し、Managed Agents や独自スキルを Spec-Driven
+                Development のフローに組み込める。
+              </p>
+            </div>
+            <div className={styles.miniCard}>
+              <div className={styles.mcTag}>📦 Managed Agents</div>
+              <p>
+                Gemini API 経由で<strong>isolated Linux 環境を 1 API call で起動</strong>
+                できるフルマネージドなコード実行サンドボックス。エージェントが安全に shell / file
+                操作を実行し、結果を Artifact として返却する。
+              </p>
+            </div>
+            <div className={styles.miniCard}>
+              <div className={styles.mcTag}>🔌 Antigravity plugins</div>
+              <p>
+                Extensions の進化形。SKILL/Rules/Workflow に加え、サードパーティ製プラグインで IDE
+                機能を拡張可能。エコシステム化により team で共有しやすい配布形式を提供。
+              </p>
+            </div>
+            <div className={styles.miniCard}>
+              <div className={styles.mcTag}>🌐 Google エコシステム統合</div>
+              <p>
+                Google AI Studio / Android Studio / Firebase との連携が拡大。Antigravity から直接
+                Firebase デプロイや AI Studio プロンプト評価フローへ橋渡しできるようになった。
+              </p>
             </div>
           </div>
         </section>
@@ -676,11 +735,13 @@ export default function Page() {
               </p>
             </div>
             <div className={styles.miniCard}>
-              <div className={styles.mcTag}>🆕 v1.20.3 新機能</div>
+              <div className={styles.mcTag}>🆕 v1.20.3 〜 2.0 アップデート</div>
               <p>
-                <code>AGENTS.md</code>
+                v1.20.3 で<code>AGENTS.md</code>
                 対応開始。プロジェクトルートに置くだけでClaude
-                Code・Codex・Cursor等と共通ルールを共有可能。
+                Code・Codex・Cursor等と共通ルールを共有可能。Antigravity 2.0（I/O 2026）以降は
+                <strong>Antigravity CLI / SDK / Managed Agents / plugins</strong>
+                経由でも AGENTS.md を共有できる。
               </p>
             </div>
           </div>
@@ -1314,7 +1375,7 @@ export default function Page() {
         <section id="models" className={styles.sec}>
           <div className={styles.secLabel}>Section 08</div>
           <h2 className={styles.secTitle}>
-            <span className={styles.num}>08.</span>対応モデルと料金（2026年3月現在）
+            <span className={styles.num}>08.</span>対応モデルと料金（2026年5月現在）
           </h2>
 
           <table className={styles.modelTable}>
@@ -1323,6 +1384,27 @@ export default function Page() {
                 <th>モデルID</th>
                 <th>推奨用途</th>
                 <th>ステータス</th>
+              </tr>
+              <tr>
+                <td>gemini-3.5-flash</td>
+                <td>Antigravity 2.0 標準モデル — 日常タスク / Managed Agents の実行</td>
+                <td>
+                  <span className={`${styles.badge} ${styles.badgeB}`}>⭐ I/O 2026 主軸</span>
+                </td>
+              </tr>
+              <tr>
+                <td>gemini-3.5-pro</td>
+                <td>高難度推論 / アーキテクチャ設計 / セキュリティ監査</td>
+                <td>
+                  <span className={`${styles.badge} ${styles.badgeB}`}>🚀 I/O 2026 上位モデル</span>
+                </td>
+              </tr>
+              <tr>
+                <td>gemini-omni-flash</td>
+                <td>マルチモーダル特化 — 画像 / 音声 / 動画を含むタスク</td>
+                <td>
+                  <span className={`${styles.badge} ${styles.badgeY}`}>🎬 マルチモーダル特化</span>
+                </td>
               </tr>
               <tr>
                 <td>gemini-3-flash-preview</td>
@@ -1449,12 +1531,14 @@ export default function Page() {
               <p>
                 最優先アクセス
                 <br />
-                Gemini 3.1 Pro利用可
+                Gemini 3.5 Flash / 3.5 Pro / 3.1 Pro 利用可
               </p>
             </div>
           </div>
           <p style={{ fontSize: "0.78rem", color: "var(--text3, #5a7090)", marginTop: "0.5rem" }}>
-            ※ 2026年3月現在、Pro加入者でも最大7日間のレートリミットロックが報告されています
+            ※ 2026年5月現在、Pro加入者でも最大7日間のレートリミットロックが報告されています。Gemini
+            CLI は 2026-06-18 に AI Pro/Ultra/無料 Code Assist 向け停止 → Antigravity CLI
+            へ移行が公式パス
           </p>
         </section>
 
@@ -1720,6 +1804,62 @@ export default function Page() {
                 </a>
                 <span className={styles.srcDesc}>
                   v1.20.3の変更点詳細。AGENTS.mdサポート追加・Auto-continueのデフォルト有効化。サポートモデル一覧
+                </span>
+              </div>
+            </div>
+            <div className={styles.srcItem}>
+              <span className={styles.srcNum}>[11]</span>
+              <div>
+                <a
+                  href="https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-developer-highlights/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.srcLink}
+                >
+                  I/O 2026 developer highlights: Antigravity, Gemini API, AI Studio — Google Blog
+                  (2026-05-19)
+                </a>
+                <span className={styles.srcDesc}>
+                  Antigravity 2.0 発表。Managed Agents（Gemini API 経由で isolated Linux 環境を 1
+                  API call で起動）・Gemini 3.5 Flash・Antigravity CLI/SDK・Google AI
+                  Studio/Android/Firebase 統合の公式まとめ
+                </span>
+              </div>
+            </div>
+            <div className={styles.srcItem}>
+              <span className={styles.srcNum}>[12]</span>
+              <div>
+                <a
+                  href="https://developers.googleblog.com/all-the-news-from-the-google-io-2026-developer-keynote/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.srcLink}
+                >
+                  All the news from the Google I/O 2026 Developer keynote — Google Developers Blog
+                  (2026-05-19)
+                </a>
+                <span className={styles.srcDesc}>
+                  Gemini 3.5 Flash / Gemini 3.5 Pro / Gemini Omni Flash
+                  の正式アナウンス。Antigravity 2.0 への適用範囲も記載
+                </span>
+              </div>
+            </div>
+            <div className={styles.srcItem}>
+              <span className={styles.srcNum}>[13]</span>
+              <div>
+                <a
+                  href="https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.srcLink}
+                >
+                  An important update: Transitioning Gemini CLI to Antigravity CLI — Google
+                  Developers Blog (2026-05-19)
+                </a>
+                <span className={styles.srcDesc}>
+                  Gemini CLI 廃止スケジュール（2026-06-18, AI Pro/Ultra/無料 Code Assist 向け）と
+                  Antigravity CLI 移行ガイド。Agent Skills/Hooks/Subagents/Extensions（→ Antigravity
+                  plugins）の継承を明示
                 </span>
               </div>
             </div>
