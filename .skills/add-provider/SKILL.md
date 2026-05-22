@@ -1,9 +1,11 @@
 ---
 name: add-provider
 description: |
-  新しいAIモデルのプロバイダー（スクレイパー）を追加するスキル。
-  「新しいプロバイダーを追加して」「〇〇のスクレイパーを作って」という指示が出たら使用すること。
-  プロジェクトの命名規則、クラス設計、登録手順を自動化する。
+  Add a new AI model provider (scraper) to pricing.json.
+  TRIGGER when the user says any of the following (Japanese or English):
+  - "新しいプロバイダーを追加して" / "〇〇のスクレイパーを作って"
+  - "add provider" / "add new provider" / "new scraper for <name>"
+  Automates naming conventions, module structure, and registration in main.py.
 ---
 
 # 新規プロバイダー追加スキル

@@ -42,7 +42,8 @@ LLM-Studies/
 │   ├── lib/
 │   │   ├── cost.ts              純粋関数 (calcApiCost / calcSubCost / fmtUSD / fmtJPY)
 │   │   ├── pricing.ts           Zod スキーマ + コンパイル時パリティアサート
-│   │   └── i18n.tsx             T オブジェクト + t() + tRich()
+│   │   ├── i18n.tsx             T オブジェクト + t() + tRich()
+│   │   └── site-url.ts          サイト URL 解決ユーティリティ (resolveSiteUrl)
 │   ├── types/pricing.ts         Pydantic 同期型定義 (手動ミラー)
 │   └── data/pricing.json        ビルド時 static import 用
 ├── netlify.toml        Netlify デプロイ設定 (base=web-next, publish=out)

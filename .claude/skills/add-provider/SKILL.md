@@ -1,10 +1,12 @@
 ---
 name: add-provider
 description: >
-  pricing.json に新しい API プロバイダー（LLM ベンダー）のスクレイパーを追加する。
-  「プロバイダー追加」「新しい LLM を追加」「○○ のスクレイパーを作って」
-  「○○ の料金を取得したい」「API プロバイダーを増やして」と言われたときに使用する。
-  providers/ ディレクトリに新しいモジュールを作成し、main.py に登録する手順を提供する。
+  Add a new API provider (LLM vendor) scraper to pricing.json.
+  TRIGGER when the user says any of the following (Japanese or English):
+  - "プロバイダー追加" / "新しい LLM を追加" / "○○ のスクレイパーを作って"
+  - "○○ の料金を取得したい" / "API プロバイダーを増やして"
+  - "add provider" / "add new LLM" / "new scraper for <provider>"
+  Creates a new module in providers/ and registers it in main.py.
 allowed-tools:
   - Read
   - Write

@@ -1,8 +1,11 @@
 ---
 name: full-update
 description: |
-  データの再取得、為替レートの更新、フロントエンドのビルドまでを全て実行するスキル。
-  「データをフル更新して」「全体をビルドして」「最新の価格を取得して」という指示が出たら使用すること。
+  Run a full data refresh: scrape pricing data, update exchange rates, and build the frontend.
+  TRIGGER when the user says any of the following (Japanese or English):
+  - "データをフル更新して" / "全体をビルドして" / "最新の価格を取得して"
+  - "full update" / "rebuild all" / "refresh pricing data"
+  Executes update.sh (full scrape + build) or update.sh --no-scrape (exchange rate only).
 ---
 
 # 全体フル更新・ビルドスキル
