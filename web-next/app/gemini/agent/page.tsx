@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title:
     "Gemini マルチエージェント開発 (ADK / A2A / AgentEngine) ベストプラクティス | LLM コスト計算機",
   description:
-    "最新の Google Gemini CLI (as of 2026-03)・最新の ADK (as of 2026-03)・最新のエージェント連携プロトコル (A2A/AP2/A2UI等) 時代のサブエージェント / マルチエージェント開発で必要な GEMINI.md・AGENTS.md・agent.py・agent.json・.geminiignore・settings.json の役割と書き方を体系化したガイド。",
+    "最新の Google Gemini CLI (as of 2026-05)・最新の ADK (as of 2026-05)・最新のエージェント連携プロトコル (A2A/AP2/A2UI等) 時代のサブエージェント / マルチエージェント開発で必要な GEMINI.md・AGENTS.md・agent.py・agent.json・.geminiignore・settings.json の役割と書き方を体系化したガイド。",
 };
 
 type Source = { icon: string; title: string; href: string; display: string; desc: string };
@@ -217,7 +217,7 @@ const SOURCES_NEW: Source[] = [
   },
   {
     icon: "🟥",
-    title: "Gemini モデル一覧 — Gemini API 公式（2026年3月現在）",
+    title: "Gemini モデル一覧 — Gemini API 公式（2026年5月現在）",
     href: "https://ai.google.dev/gemini-api/docs/models",
     display: "ai.google.dev/gemini-api/docs/models",
     desc: "gemini-3.1-pro-preview / gemini-3-flash-preview / gemini-2.5-flash 等の現行モデルID・コンテキスト長・価格の公式一覧",
@@ -241,14 +241,21 @@ const SOURCES_NEW: Source[] = [
     title: "Google Developers Blog: AP2 / A2UI / AG-UI 新プロトコル発表（2026年3月18日）",
     href: "https://developers.googleblog.com/en/new-agent-protocols-ap2-a2ui-ag-ui/",
     display: "developers.googleblog.com/en/new-agent-protocols-ap2-a2ui-ag-ui/",
-    desc: "AP2（決済・認証フロープロトコル）・A2UI / AG-UI（エージェント→UI ストリーミング生成）の設計思想・ADK AgentUITransport との統合方法",
+    desc: "AP2（決済・認証）・A2UI / AG-UI（UI ストリーミング生成）の設計思想。※A2UI v0.8非推奨・v0.9推奨とスキーマ変更、AgentUITransport との統合方法",
   },
   {
     icon: "🟩",
-    title: "ADK Python 2.0 Alpha — グラフベースワークフロー（公式ドキュメント）",
+    title: "ADK Python 2.0 GA — グラフベースワークフロー（公式ドキュメント）",
     href: "https://google.github.io/adk-docs/agents/workflow-agents/graph/",
     display: "google.github.io/adk-docs/agents/workflow-agents/graph/",
-    desc: "ADK 2.0 Alpha の GraphAgent API。DAG 形式でエージェントフローを定義・条件分岐ノード・並列ブランチ・ループをコードで宣言的に記述",
+    desc: "ADK 2.0 GA の GraphAgent API。DAG 形式でエージェントフローを定義・条件分岐ノード・並列ブランチ・ループをコードで宣言的に記述",
+  },
+  {
+    icon: "📢",
+    title: "ADK Python 2.0.0 GA リリースノート (2026年5月19日)",
+    href: "https://github.com/google/adk-python/releases/tag/v2.0.0",
+    display: "github.com/google/adk-python/releases/tag/v2.0.0",
+    desc: "ADK 2.0 正式リリース。グラフベースの実行エンジンへの移行、BaseNode によるエージェント設計、イベント・セッションスキーマの変更を含む破壊的変更の解説",
   },
 ];
 
@@ -261,8 +268,8 @@ export default function GeminiAgentPage() {
         {/* HERO */}
         <div className={styles.hero}>
           <div className={styles.heroEyebrow}>
-            🤖 Google Gemini 完全ガイド — 2026 年 3 月最新版 / Gemini CLI v0.34.0 / ADK 2.0 Alpha /
-            A2A + AP2 + A2UI 対応
+            🤖 Google Gemini 完全ガイド — 2026 年 5 月最新版 / Gemini CLI v0.34.0 / ADK 2.0 GA / A2A
+            + AP2 + A2UI 対応
           </div>
           <h1>
             Gemini マルチエージェント開発における
@@ -281,7 +288,7 @@ export default function GeminiAgentPage() {
           <div className={styles.heroChips}>
             <span className={styles.heroChip}>Gemini CLI v0.34.0</span>
             <span className={styles.heroChip}>Gemini Code Assist</span>
-            <span className={styles.heroChip}>ADK 2.0 Alpha (Python / TS / Go / Java)</span>
+            <span className={styles.heroChip}>ADK 2.0 GA (Python / TS / Go / Java)</span>
             <span className={styles.heroChip}>A2A / AP2 / A2UI / AG-UI</span>
             <span className={styles.heroChip}>AgentEngine (Vertex AI)</span>
             <span className={styles.heroChip}>Plan Mode</span>
@@ -1106,11 +1113,11 @@ export default function GeminiAgentPage() {
               ルーティングの判断基準になるため、特に重要です。
             </p>
             <p style={{ marginTop: 10 }}>
-              <strong>2026年3月現在のADK最新状況：</strong> <strong>ADK TypeScript 1.0</strong> が
+              <strong>2026年5月現在のADK最新状況：</strong> <strong>ADK TypeScript 1.0</strong> が
               GA になり、TS/JS プロジェクトでも <code>@google/adk</code>{" "}
-              パッケージで同等の機能が利用可能です。また <strong>ADK Python 2.0 Alpha</strong>
-              （グラフベースのワークフロー定義）が公開中で、より複雑なエージェント DAG
-              の記述が可能になりました。
+              パッケージで同等の機能が利用可能です。また <strong>ADK Python 2.0 GA</strong>
+              （グラフベースのワークフロー定義）が正式リリースされ、本番環境でもより複雑なエージェント
+              DAG の記述が推奨されるようになりました。
             </p>
           </div>
 
@@ -1452,7 +1459,7 @@ export default function GeminiAgentPage() {
             <span className={styles.alertIcon}>✅</span>
             <div className={styles.alertContent}>
               <strong>
-                /memory・/plan・/rewind — コンテキスト＆セッション管理コマンド（2026年3月現在）
+                /memory・/plan・/rewind — コンテキスト＆セッション管理コマンド（2026年5月現在）
               </strong>
               Gemini CLI の <code>/memory show</code>{" "}
               で現在ロードされている全コンテキストを確認できます。
@@ -1678,7 +1685,10 @@ export default function GeminiAgentPage() {
                 </li>
                 <li>ルートエージェントが直接コードを書く（委譲しない）</li>
                 <li>10件以上のサブエージェントを ParallelAgent で同時起動</li>
-                <li>ADK 2.0 Alpha のグラフAPIを本番に使う（まだ安定版ではない）</li>
+                <li>
+                  ADK 2.0.0 で非推奨となった context.session.events.append
+                  などのイベント直接書き込みを使い続ける
+                </li>
                 <li>Plan Mode を無効化したまま本番コードベースを変更させる</li>
               </ul>
             </div>
@@ -1801,11 +1811,10 @@ export default function GeminiAgentPage() {
 
           <div className={styles.maBanner}>
             <div className={styles.maEyebrow}>
-              🌐 ADK Python 1.x GA (2025年5月 Google I/O) · ADK Python 2.0
-              Alpha（グラフワークフロー）公開中 · ADK TypeScript GA · A2A Protocol (Linux Foundation
-              移管済み) · AP2 / A2UI 新プロトコル追加（2026年3月）
+              🌐 ADK 2.0.0 GA (2026年5月リリース) · ADK TypeScript GA · A2A Protocol (Linux
+              Foundation 移管済み) · AP2 / A2UI 新プロトコル追加
             </div>
-            <h3>Google が推奨する 4層アーキテクチャ（2026年3月更新）</h3>
+            <h3>Google が推奨する 4層アーキテクチャ（2026年5月更新）</h3>
             <p>
               Google のマルチエージェント設計は
               <strong>ADK（エージェント内部ロジック）</strong>・
@@ -1815,12 +1824,12 @@ export default function GeminiAgentPage() {
               の4層で構成されます。 A2A は Atlassian・SAP・Salesforce・ServiceNow など
               <strong>50 以上のパートナー</strong>が対応するオープンスタンダードです。 ADK の{" "}
               <code>RemoteA2aAgent</code>
-              を使えば、リモートエージェントへの接続がローカルのツール呼び出しと同じ感覚で実装できます。2026年3月18日のブログでは新たに
+              を使えば、リモートエージェントへの接続がローカルのツール呼び出しと同じ感覚で実装できます。2026年5月更新で
               <strong>
                 AP2（決済認証プロトコル）・A2UI（エージェント→UI
                 コンポーネント生成）・AG-UI（ストリーミングUI）
               </strong>
-              も公開されました。
+              が標準化されました。
             </p>
           </div>
 
@@ -1833,7 +1842,7 @@ export default function GeminiAgentPage() {
                 <div className={styles.layerDesc}>
                   agent.py の <code>instruction</code> / <code>tools</code> /{" "}
                   <code>sub_agents</code> / <code>output_key</code> を定義。
-                  SequentialAgent・ParallelAgent・LoopAgent でワークフローを制御。
+                  SequentialAgent・ParallelAgent・LoopAgent・GraphWorkflow でワークフローを制御。
                 </div>
                 <span className={styles.layerFile}>agents/*/agent.py</span>
                 <span className={styles.layerFile}>agents/*/GEMINI.md</span>
@@ -1892,7 +1901,7 @@ export default function GeminiAgentPage() {
                   AP2/A2UI
                 </div>
                 <div className={styles.layerTitle} style={{ color: "#fb923c" }}>
-                  💳 決済認証 &amp; UI 生成プロトコル（2026年3月18日 新公開）
+                  💳 決済認証 &amp; UI 生成プロトコル
                 </div>
               </div>
               <div className={styles.layerBody}>
@@ -1900,8 +1909,8 @@ export default function GeminiAgentPage() {
                   <strong>AP2</strong>:
                   エージェントが決済・認証フローを標準化されたプロトコルで実行。
                   <strong>A2UI</strong>（AG-UI）: エージェントがフロントエンド UI
-                  コンポーネントをストリーミング生成・更新。 ADK の <code>AgentUITransport</code> で
-                  React 等フロントエンドと統合可能。
+                  コンポーネントをストリーミング生成・更新（v0.8非推奨・v0.9以降推奨）。 ADK の{" "}
+                  <code>AgentUITransport</code> で React 等フロントエンドと統合可能。
                 </div>
                 <span
                   className={styles.layerFile}
@@ -1941,7 +1950,7 @@ export default function GeminiAgentPage() {
                 <li>
                   <code>sub_agents</code> パラメータで<strong>静的に定義</strong>
                 </li>
-                <li>SequentialAgent / ParallelAgent / LoopAgent で制御</li>
+                <li>SequentialAgent / ParallelAgent / LoopAgent / GraphWorkflow で制御</li>
                 <li>
                   <code>output_key</code> で結果を共有 state に書き込む
                 </li>
@@ -2791,7 +2800,7 @@ export default function GeminiAgentPage() {
               {"=[\n    "}
               <span className={styles.cs}>{'"google-cloud-aiplatform[adk,a2a]>=1.88"'}</span>
               {",\n    "}
-              <span className={styles.cs}>{'"google-adk>=1.0.0"'}</span>
+              <span className={styles.cs}>{'"google-adk>=2.0.0"'}</span>
               {",\n  ],\n)\n\n"}
               <span className={styles.cc}>
                 {"# デプロイ後にエンドポイントを確認 → GEMINI.md に記載する"}
