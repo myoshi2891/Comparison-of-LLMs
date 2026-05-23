@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "Google Antigravity × Gemini 3.1 Pro — マークダウンファイル完全ガイド",
+  title: "Google Antigravity v2.0.1 × Gemini 3.5 Flash — マークダウンファイル完全ガイド",
   description:
-    "GEMINI.md / Rules / SKILL.md / Workflows / Knowledge Base / Artifacts / SDD仕様書群 — Google Antigravity の AI 仕様駆動開発を支えるマークダウンファイル群の役割・構造・ベストプラクティスを公式根拠付きで解説。",
+    "GEMINI.md / Rules / SKILL.md / Workflows / Knowledge Base / Artifacts / SDD仕様書群 — Google Antigravity の AI 仕様駆動開発を支えるマークダウンファイル群の役割・構造・ベストプラクティスを公式根拠付きで解説。Antigravity v2.0.1 (2026-05-23, 最新の安定化リリース) / Gemini 3.5 Flash 対応。",
 };
 
 // 外部ソース (sources セクション) の定義。Phase F で redirect 一覧を作る際にも参照する。
@@ -132,6 +132,33 @@ const SOURCES: Source[] = [
     title: "Google Antigravity — Wikipedia（2026年3月更新）",
     desc: "Claude Sonnet 4.6・Claude Opus 4.6・GPT-OSS-120Bのサポート追加。SWE-bench Verified 76.2%スコア。Windsurf fork説など発表経緯の最新情報",
   },
+  {
+    num: "[21]",
+    href: "https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-developer-highlights/",
+    title:
+      "I/O 2026 developer highlights: Antigravity, Gemini API, AI Studio — Google Blog (2026-05-19)",
+    desc: "Antigravity 2.0 発表。Managed Agents（Gemini API 経由で isolated Linux 環境を 1 API call で起動）・Gemini 3.5 Flash・Antigravity CLI/SDK・Google AI Studio/Android/Firebase 統合の公式まとめ。",
+  },
+  {
+    num: "[22]",
+    href: "https://developers.googleblog.com/all-the-news-from-the-google-io-2026-developer-keynote/",
+    title:
+      "All the news from the Google I/O 2026 Developer keynote — Google Developers Blog (2026-05-19)",
+    desc: "Gemini 3.5 Flash / Gemini 3.5 Pro / Gemini Omni Flash の正式アナウンス。Antigravity 2.0 への適用範囲も記載。",
+  },
+  {
+    num: "[23]",
+    href: "https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/",
+    title:
+      "An important update: Transitioning Gemini CLI to Antigravity CLI — Google Developers Blog (2026-05-19)",
+    desc: "Gemini CLI 廃止スケジュール（2026-06-18, AI Pro/Ultra/無料 Code Assist 向け）と Antigravity CLI 移行ガイド。Agent Skills/Hooks/Subagents/Extensions（→ Antigravity plugins）の継承を明示。",
+  },
+  {
+    num: "[24]",
+    href: "https://antigravity.google/changelog/v2.0.1",
+    title: "Google Antigravity v2.0.1 Release Notes (2026-05-23)",
+    desc: "Managed Agentsのセキュリティ強化、fileMatch活性化の最適化、AGENTS.mdの公式標準対応を反映した安定版リリース。",
+  },
 ];
 
 // コードブロック 3 ドット (macOS ウィンドウ風の Google red・yellow・green)。
@@ -150,7 +177,7 @@ export default function GeminiSkillPage() {
     <div className={styles.root}>
       <header className={styles.header}>
         <div className={styles.googleGlow} />
-        <div className={styles.headerTag}>Google Antigravity × Gemini 3.1 Pro</div>
+        <div className={styles.headerTag}>Google Antigravity v2.0.1 × Gemini 3.5 Flash</div>
         <h1 className={styles.headerTitle}>
           AI仕様駆動開発における
           <br />
@@ -163,11 +190,11 @@ export default function GeminiSkillPage() {
           Antigravityの全マークダウンファイルの役割・構造・ベストプラクティスを根拠ソース付きで徹底解説
         </p>
         <div className={styles.platformBadges}>
-          <span className={`${styles.pb} ${styles.pbBlue}`}>Google Antigravity</span>
-          <span className={`${styles.pb} ${styles.pbGreen}`}>Gemini 3.1 Pro</span>
+          <span className={`${styles.pb} ${styles.pbBlue}`}>Google Antigravity v2.0.1</span>
+          <span className={`${styles.pb} ${styles.pbGreen}`}>Gemini 3.5 Flash</span>
           <span className={`${styles.pb} ${styles.pbYellow}`}>Agent-First IDE</span>
           <span className={`${styles.pb} ${styles.pbRed}`}>Spec-Driven Dev</span>
-          <span className={`${styles.pb} ${styles.pbPurple}`}>Nov 2025 GA</span>
+          <span className={`${styles.pb} ${styles.pbPurple}`}>v2.0.1 (2026-05-23)</span>
         </div>
       </header>
 
@@ -228,6 +255,12 @@ export default function GeminiSkillPage() {
               フルIDEとして「エージェントが主役」のパラダイム
             </strong>
             を実装しています。
+            <strong className={styles.strongBright}>
+              2026-05-23 に安定版の Antigravity v2.0.1 がリリースされ、Gemini 3.5 Flash 対応・Go 製
+              Antigravity CLI・Antigravity SDK・Managed Agents（isolated Linux
+              環境のセキュリティ保護強化）・fileMatch活性化の最適化・AGENTS.md
+              の公式標準対応が追加されました。
+            </strong>
           </p>
 
           <table className={styles.table}>
@@ -245,10 +278,14 @@ export default function GeminiSkillPage() {
               <tr>
                 <td>主要AI</td>
                 <td>
-                  Gemini 3.1 Pro (High/Low) / Gemini 3 Flash
+                  Gemini 3.5 Flash（Antigravity v2.0.1 主軸）
+                  <br />+ Gemini 3.1 Pro (High/Low, 履歴) / Gemini 3 Flash
                   <br />+ Claude Sonnet 4.6 / Claude Opus 4.6 / GPT-OSS 120B
                   <br />
-                  <small className={styles.smallDim}>※Gemini 3 Pro廃止済（2026-03-09）</small>
+                  <small className={styles.smallDim}>
+                    ※Gemini 3 Pro 廃止済（2026-03-09）。Gemini CLI は 2026-06-18 に AI
+                    Pro/Ultra/無料 Code Assist 向け停止 → Antigravity CLI へ移行
+                  </small>
                 </td>
                 <td>Claude Opus / Sonnet / Haiku</td>
               </tr>
@@ -313,9 +350,12 @@ export default function GeminiSkillPage() {
                 antigravity-awesome-skills
               </a>
               参照）。また、
-              <strong>v1.20.3（2026-03-05）以降はAGENTS.mdにも対応</strong>
-              し、Claude
-              Code（CLAUDE.md）など他のエージェントツールとのルール共有が可能になりました。
+              <strong>
+                v2.0.1（2026-05-23）で Managed Agents
+                のセキュリティ強化、fileMatch活性化の最適化、AGENTS.md の公式標準対応が適用されました。
+              </strong>
+              Claude Code（CLAUDE.md）など他のエージェントツールとのルール共有が可能で、
+              Antigravity CLI 経由でも同じ AGENTS.md/GEMINI.md/SKILL.md を再利用できます。
             </div>
           </div>
         </section>
@@ -508,7 +548,8 @@ export default function GeminiSkillPage() {
             <div className={`${styles.hi} ${styles.hi1} ${styles.hiTopGap}`}>
               <span className={styles.hG}>📄</span> <span className={styles.hG}>AGENTS.md</span>
               <span className={styles.hD}>
-                — クロスツール共有ルール（v1.20.3～対応、プロジェクトルートに配置）
+                — クロスツール共有ルール（v2.0.1にて公式標準対応が強化、CLI/SDK
+                経由でも標準利用可能、プロジェクトルートに配置）
               </span>
             </div>
           </div>
@@ -554,7 +595,10 @@ export default function GeminiSkillPage() {
                   <tr>
                     <td>AGENTS.md（プロジェクトルート）</td>
                     <td>クロスツール</td>
-                    <td>Claude Code等と共有できるルール（v1.20.3～対応）</td>
+                    <td>
+                      Claude Code等と共有できるルール（v2.0.1にて公式標準対応が強化、CLI/SDK
+                      でも標準参照）
+                    </td>
                   </tr>
                   <tr>
                     <td>.agent/rules/always-on.md</td>
@@ -625,7 +669,10 @@ export default function GeminiSkillPage() {
               Rulesは「常にバックグラウンドで動作するシステムプロンプト」
             </strong>
             です。Claude CodeのCLAUDE.mdとは異なり、
-            <strong>ファイル単位でルールを分割・個別に有効化</strong>できる点が特徴です。
+            <strong>
+              ファイル単位でルールを分割・個別に有効化（v2.0.1でのfileMatch活性化処理の最適化により、コンテキストロード負荷がさらに低減）
+            </strong>
+            できる点が特徴です。
           </p>
 
           <div className={styles.fileCard}>

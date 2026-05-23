@@ -44,7 +44,49 @@ describe("/gemini/antigravity-guide", () => {
   });
 
   it("metadata の title と description が定義されている", () => {
-    expect(metadata.title).toBe("Google Antigravity — AI仕様駆動開発 ベストプラクティス完全ガイド");
+    const title =
+      typeof metadata.title === "string"
+        ? metadata.title
+        : (metadata.title as { default?: string } | undefined)?.default;
+    expect(title).toContain("Google Antigravity");
+    expect(title).toContain("AI仕様駆動開発");
+    expect(title).toContain("ベストプラクティス完全ガイド");
     expect(metadata.description).toBeDefined();
+  });
+
+  it("metadata が Google I/O 2026 アナウンス（Antigravity 2.0 / Gemini 3.5 Flash）を反映している", () => {
+    const title =
+      typeof metadata.title === "string"
+        ? metadata.title
+        : (metadata.title as { default?: string } | undefined)?.default;
+    expect(title).toMatch(/Antigravity 2\.0/);
+    expect(title).toMatch(/Gemini 3\.5 Flash/);
+    expect(metadata.description as string).toMatch(/Antigravity 2\.0/);
+    expect(metadata.description as string).toMatch(/2026-05-19/);
+  });
+
+  it("本文に Antigravity 2.0 / Gemini 3.5 Flash / I/O 2026 / Antigravity CLI が含まれる", () => {
+    const { container } = render(<Page />);
+    const text = container.textContent ?? "";
+    expect(text).toMatch(/Gemini 3\.5 Flash/);
+    expect(text).toMatch(/Antigravity 2\.0/);
+    expect(text).toMatch(/2026-05-19/);
+    expect(text).toMatch(/Antigravity CLI/);
+    expect(text).toMatch(/Managed Agents/);
+  });
+
+  it("SOURCES に I/O 2026 関連の新規 3 URL が含まれる", () => {
+    const { container } = render(<Page />);
+    const sources = container.querySelector("#sources");
+    expect(sources).not.toBeNull();
+    const html = sources?.innerHTML ?? "";
+    const requiredUrlFragments = [
+      "blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-developer-highlights",
+      "developers.googleblog.com/all-the-news-from-the-google-io-2026-developer-keynote",
+      "developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli",
+    ];
+    for (const fragment of requiredUrlFragments) {
+      expect(html).toContain(fragment);
+    }
   });
 });

@@ -58,6 +58,16 @@ describe("/gemini/skill - metadata", () => {
     expect(typeof metadata.description).toBe("string");
     expect((metadata.description as string).length).toBeGreaterThan(0);
   });
+
+  it("reflects Google I/O 2026 announcements (Antigravity v2.0.1 / Gemini 3.5 Flash)", () => {
+    const title =
+      typeof metadata.title === "string"
+        ? metadata.title
+        : (metadata.title as { default?: string } | undefined)?.default;
+    expect(title).toMatch(/Antigravity (v)?2\.0/);
+    expect(title).toMatch(/Gemini 3\.5 Flash/);
+    expect(metadata.description as string).toMatch(/Antigravity (v)?2\.0/);
+  });
 });
 
 describe("/gemini/skill - page structure", () => {
@@ -102,14 +112,41 @@ describe("/gemini/skill - external link safety", () => {
     }
   });
 
-  it("sources section contains at least 15 external links", () => {
+  it("sources section contains at least 24 external links (≥15 baseline + 3 I/O 2026 entries + v2.0.1)", () => {
     const { container } = render(<Page />);
     const sources = container.querySelector("#sources");
     expect(sources).not.toBeNull();
     const externals =
       sources?.querySelectorAll('a[href^="http"]') ??
       ([] as unknown as NodeListOf<HTMLAnchorElement>);
-    expect(externals.length).toBeGreaterThanOrEqual(15);
+    expect(externals.length).toBeGreaterThanOrEqual(24);
+  });
+});
+
+describe("/gemini/skill - Google I/O 2026 content", () => {
+  it("renders Antigravity 2.0 / Gemini 3.5 Flash / I/O 2026 references in the body", () => {
+    const { container } = render(<Page />);
+    const text = container.textContent ?? "";
+    expect(text).toMatch(/Gemini 3\.5 Flash/);
+    expect(text).toMatch(/Antigravity (v)?2\.0/);
+    expect(text).toMatch(/2026-05-(19|23)/);
+    expect(text).toMatch(/Antigravity CLI/);
+  });
+
+  it("includes the three new I/O 2026 SOURCES entries and v2.0.1 by URL", () => {
+    const { container } = render(<Page />);
+    const sources = container.querySelector("#sources");
+    expect(sources).not.toBeNull();
+    const html = sources?.innerHTML ?? "";
+    const requiredUrlFragments = [
+      "blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-developer-highlights",
+      "developers.googleblog.com/all-the-news-from-the-google-io-2026-developer-keynote",
+      "developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli",
+      "antigravity.google/changelog/v2.0.1",
+    ];
+    for (const fragment of requiredUrlFragments) {
+      expect(html).toContain(fragment);
+    }
   });
 });
 

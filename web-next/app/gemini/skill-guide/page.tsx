@@ -115,10 +115,144 @@ style E fill:#fecaca,stroke:#dc2626,color:#7f1d1d
 style F fill:#fecaca,stroke:#dc2626,color:#7f1d1d`;
 
 export const metadata: Metadata = {
-  title: "SKILL.md 完全ガイド — Gemini CLI & Antigravity",
+  title: "SKILL.md 完全ガイド — Gemini CLI v0.43.0 (最終版) & Antigravity v2.0.1",
   description:
-    "AIエージェントに「専門知識の教科書」を渡す仕組み — SKILL.md の構造・書き方・インストール手順を Gemini CLI & Antigravity 対応版で完全解説。",
+    "AIエージェントに「専門知識の教科書」を渡す仕組み — SKILL.md の構造・書き方・インストール手順を Gemini CLI v0.43.0 (最終版) & Antigravity v2.0.1 対応版で完全解説。Google I/O 2026 発表内容対応。",
 };
+
+type Source = { num: string; href: string; title: string; desc: string };
+
+const SOURCES: Source[] = [
+  {
+    num: "[1]",
+    href: "https://developers.googleblog.com/build-with-google-antigravity-our-new-agentic-development-platform/",
+    title: "Build with Google Antigravity — Google Developers Blog (Nov 2025)",
+    desc: "Antigravityの公式発表。エージェントファーストパラダイム・Artifacts・Knowledge Baseの設計思想",
+  },
+  {
+    num: "[2]",
+    href: "https://blog.google/innovation-and-ai/technology/developers-tools/gemini-3-developers/",
+    title: "Gemini 3 for developers: New reasoning, agentic capabilities — Google Blog",
+    desc: "Gemini 3 のエージェント能力とシステム統合理論の解説",
+  },
+  {
+    num: "[3]",
+    href: "https://antigravity.google/",
+    title: "Google Antigravity 公式サイト — antigravity.google",
+    desc: "Antigravity IDE の公式ポータル、ドキュメント、およびインストーラー",
+  },
+  {
+    num: "[4]",
+    href: "https://geminicli.com/docs/",
+    title: "Gemini CLI 公式ドキュメント — geminicli.com",
+    desc: "Gemini CLI（旧）のコア仕様、設定方法、およびコマンドリファレンス",
+  },
+  {
+    num: "[5]",
+    href: "https://github.com/google-gemini/gemini-cli/",
+    title: "Gemini CLI GitHub Repository — github.com",
+    desc: "Gemini CLI のオープンソースリポジトリと開発履歴",
+  },
+  {
+    num: "[6]",
+    href: "https://geminicli.com/docs/changelogs/",
+    title: "Gemini CLI リリースノート — geminicli.com",
+    desc: "Gemini CLI の各バージョンの更新履歴（v0.25.0〜v0.43.0）",
+  },
+  {
+    num: "[7]",
+    href: "https://codelabs.developers.google.com/getting-started-google-antigravity",
+    title: "Getting Started with Google Antigravity — Google Codelabs",
+    desc: "公式チュートリアル。Skills・Rules・Workflows・Artifactsの設定方法。GEMINI.md・.agent/ディレクトリ構造",
+  },
+  {
+    num: "[8]",
+    href: "https://codelabs.developers.google.com/getting-started-with-antigravity-skills",
+    title: "Authoring Google Antigravity Skills — Google Codelabs",
+    desc: "SKILL.mdの完全仕様。スキルディレクトリ構造（SKILL.md / scripts / references / assets）・5パターン詳解",
+  },
+  {
+    num: "[9]",
+    href: "https://medium.com/google-cloud/tutorial-getting-started-with-antigravity-skills-864041811e0d",
+    title: "How to Build Custom Skills in Google Antigravity — Google Cloud Medium (Jan 2026)",
+    desc: "Progressive Disclosure設計思想。scripts/サブディレクトリのTool Use Pattern詳細。グローバル/ワークスペーススコープ",
+  },
+  {
+    num: "[10]",
+    href: "https://medium.com/google-cloud/skills-made-easy-with-google-antigravity-and-gemini-cli-5435139b0af8",
+    title: "Skills Made Easy with Google Antigravity and Gemini CLI — Google Cloud Medium",
+    desc: "Gemini CLI と Antigravity におけるスキル共有方法の簡略解説",
+  },
+  {
+    num: "[11]",
+    href: "https://www.mintlify.com/blog/skill-md",
+    title: "skill.md: An open standard for agent skills — Mintlify",
+    desc: "エージェントスキルのオープンスタンダード共通仕様の設計思想",
+  },
+  {
+    num: "[12]",
+    href: "https://github.com/sickn33/antigravity-awesome-skills",
+    title: "antigravity-awesome-skills — GitHub (sickn33)",
+    desc: "SKILL.mdのユニバーサル規格（Claude Code / Antigravity / Cursor共通）。コミュニティスキルライブラリ",
+  },
+  {
+    num: "[13]",
+    href: "https://github.com/google-gemini/gemini-skills",
+    title: "Gemini CLI Official Skills Repository — GitHub",
+    desc: "Google公式が提供する汎用スキル定義集",
+  },
+  {
+    num: "[14]",
+    href: "https://github.com/google-gemini/gemini-cli/releases/tag/v0.34.0",
+    title: "Gemini CLI v0.34.0 Release Notes — GitHub",
+    desc: "Plan Modeのデフォルト有効化、サンドボックス化、およびセキュリティ強化仕様",
+  },
+  {
+    num: "[15]",
+    href: "https://geminicli.com/docs/plan-mode",
+    title: "Plan Mode Specification — geminicli.com",
+    desc: "/plan コマンドによる安全なコード変更計画立案プロトコル",
+  },
+  {
+    num: "[16]",
+    href: "https://geminicli.com/docs/rewind",
+    title: "/rewind Command Usage — geminicli.com",
+    desc: "セッションの巻き戻しと対話履歴トラバースのドキュメント",
+  },
+  {
+    num: "[17]",
+    href: "https://github.com/google-gemini/gemini-cli/tree/main/packages/sdk",
+    title: "Gemini CLI SDK Source Code — GitHub",
+    desc: "プログラムでカスタムエージェントスキルを制御・開発するための公式SDK",
+  },
+  {
+    num: "[18]",
+    href: "https://dev.to/googleai/unlocking-gemini-cli-with-skills-hooks-plan-mode-2bgf",
+    title: "Unlocking Gemini CLI with Skills, Hooks and Plan Mode — DEV Community",
+    desc: "CLIエージェントの拡張フックとカスタムコマンドのプロトコル解説",
+  },
+  {
+    num: "[19]",
+    href: "https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-developer-highlights/",
+    title:
+      "I/O 2026 developer highlights: Antigravity, Gemini API, AI Studio — Google Blog (2026-05-19)",
+    desc: "Antigravity 2.0 発表。Managed Agents、Gemini 3.5 Flash、Antigravity CLI/SDK などのリリースまとめ",
+  },
+  {
+    num: "[20]",
+    href: "https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/",
+    title:
+      "An important update: Transitioning Gemini CLI to Antigravity CLI — Google Developers Blog (2026-05-19)",
+    desc: "Gemini CLI から Go 製 Antigravity CLI への移行および統合スケジュール、既存スキルの継承ガイド",
+  },
+  {
+    num: "[21]",
+    href: "https://developers.googleblog.com/all-the-news-from-the-google-io-2026-developer-keynote/",
+    title:
+      "All the news from the Google I/O 2026 Developer keynote — Google Developers Blog (2026-05-19)",
+    desc: "Gemini 3.5 Flash / Gemini 3.5 Pro / Gemini Omni Flash の仕様と Antigravity 2.0 統合",
+  },
+];
 
 /**
  * Render the SKILL.md comprehensive guide page tailored for Gemini CLI and Antigravity.
@@ -139,9 +273,9 @@ export default function Page() {
           <span className={`${styles.tag} ${styles.tagGreen}`}>Google Gemini / Antigravity</span>
           <span className={`${styles.tag} ${styles.tagSky}`}>初学者向け完全ガイド</span>
           <span className={`${styles.tag} ${styles.tagViolet}`}>2026年版</span>
-          <span className={`${styles.tag} ${styles.tagTeal}`}>Gemini CLI v0.34.0</span>
-          <span className={`${styles.tag} ${styles.tagIndigo}`}>Antigravity v1.20.3</span>
-          <span className={`${styles.tag} ${styles.tagOrange}`}>最終更新 2026-03-21</span>
+          <span className={`${styles.tag} ${styles.tagTeal}`}>Gemini CLI v0.43.0 (最終版)</span>
+          <span className={`${styles.tag} ${styles.tagIndigo}`}>Antigravity v2.0.1</span>
+          <span className={`${styles.tag} ${styles.tagOrange}`}>最終更新 2026-05-23</span>
         </div>
         <h1 className={styles.heroTitle}>
           SKILL.md
@@ -178,6 +312,9 @@ export default function Page() {
           </a>
           <a href="#whatsnew" className={`${styles.navBtn} ${styles.navBtnNew}`}>
             🆕 最新情報
+          </a>
+          <a href="#sources" className={styles.navBtn}>
+            📚 参考ソース
           </a>
         </nav>
       </header>
@@ -250,8 +387,8 @@ export default function Page() {
                   最新バージョン
                 </td>
                 <td>
-                  <span className={`${styles.badge} ${styles.badgeSky}`}>v0.34.0</span>
-                  <div className={styles.textSlateLight}>2026-03-17</div>
+                  <span className={`${styles.badge} ${styles.badgeSky}`}>v0.43.0 (最終)</span>
+                  <div className={styles.textSlateLight}>2026-05-19</div>
                   <div className={styles.versionLinks}>
                     <a
                       href="https://github.com/google-gemini/gemini-cli/releases"
@@ -271,8 +408,8 @@ export default function Page() {
                   </div>
                 </td>
                 <td>
-                  <span className={`${styles.badge} ${styles.badgeViolet}`}>v1.20.3</span>
-                  <div className={styles.textSlateLight}>2026-03-05</div>
+                  <span className={`${styles.badge} ${styles.badgeViolet}`}>v2.0.1</span>
+                  <div className={styles.textSlateLight}>2026-05-23</div>
                   <div className={styles.versionLinks}>
                     <a
                       href="https://antigravity.google/changelog"
@@ -327,12 +464,12 @@ export default function Page() {
                   デフォルトモデル
                 </td>
                 <td className={styles.mono} style={{ color: "#0369a1", fontSize: "0.75rem" }}>
-                  Auto (Gemini 3)
+                  Auto (Gemini 3.5)
                   <br />
-                  <span style={{ color: "#94a3b8" }}>(v0.29.0〜 タスクに応じて自動選択)</span>
+                  <span style={{ color: "#94a3b8" }}>(タスクに応じて自動選択)</span>
                 </td>
                 <td className={styles.mono} style={{ color: "#6d28d9", fontSize: "0.75rem" }}>
-                  gemini-3-flash-preview
+                  gemini-3.5-flash
                 </td>
               </tr>
               <tr className={styles.trEven}>
@@ -340,10 +477,10 @@ export default function Page() {
                   最高精度モデル
                 </td>
                 <td className={styles.mono} style={{ color: "#0369a1", fontSize: "0.75rem" }}>
-                  gemini-3.1-pro-preview
+                  gemini-3.5-pro
                   <br />
                   <span style={{ color: "#94a3b8" }}>
-                    (v0.31.0〜,{" "}
+                    (
                     <a
                       href="https://ai.google.dev/gemini-api/docs/models"
                       target="_blank"
@@ -356,7 +493,7 @@ export default function Page() {
                   </span>
                 </td>
                 <td className={styles.mono} style={{ color: "#6d28d9", fontSize: "0.75rem" }}>
-                  gemini-3.1-pro-preview
+                  gemini-3.5-pro
                 </td>
               </tr>
               <tr className={styles.tr}>
@@ -368,7 +505,6 @@ export default function Page() {
                   <span className={styles.mono} style={{ fontWeight: 400, fontSize: "0.75rem" }}>
                     /plan
                   </span>{" "}
-                  (v0.29.0〜)
                 </td>
                 <td style={{ fontWeight: 700, color: "#059669" }}>✅ あり</td>
               </tr>
@@ -376,14 +512,14 @@ export default function Page() {
                 <td className={styles.tdLeft} style={{ fontWeight: 600, color: "#334155" }}>
                   skill-creator メタスキル
                 </td>
-                <td style={{ fontWeight: 700, color: "#059669" }}>✅ 標準搭載 (v0.26.0〜)</td>
+                <td style={{ fontWeight: 700, color: "#059669" }}>✅ 標準搭載</td>
                 <td style={{ fontWeight: 700, color: "#059669" }}>✅ あり</td>
               </tr>
               <tr className={styles.tr}>
                 <td className={styles.tdLeft} style={{ fontWeight: 600, color: "#334155" }}>
                   /rewind コマンド
                 </td>
-                <td style={{ fontWeight: 700, color: "#059669" }}>✅ (v0.27.0〜)</td>
+                <td style={{ fontWeight: 700, color: "#059669" }}>✅</td>
                 <td style={{ color: "#94a3b8" }}>—</td>
               </tr>
               <tr className={styles.trEven}>
@@ -397,7 +533,7 @@ export default function Page() {
                     (context.fileName に追加 / デフォルトは GEMINI.md)
                   </span>
                 </td>
-                <td style={{ fontWeight: 700, color: "#059669" }}>✅ (v1.20.3〜)</td>
+                <td style={{ fontWeight: 700, color: "#059669" }}>✅ (v1.20.3〜v2.0.1)</td>
               </tr>
             </tbody>
           </table>
@@ -593,11 +729,7 @@ export default function Page() {
             <span className={styles.cv}>git-commit-formatter</span>
             {"\n\n"}
             <span className={styles.cc}>
-              {"# ✅ 必須: エージェントへのトリガー条件（最重要！）"}
-            </span>
-            {"\n"}
-            <span className={styles.cc}>
-              {"#    「いつ」「どんな言葉が出たら」このスキルを使うかを明記する"}
+              {"# ✅ 必須: 役割と機能の詳細な解説（エージェントに機能のコンテキストを伝える）"}
             </span>
             {"\n"}
             <span className={styles.cm}>description</span>
@@ -610,14 +742,49 @@ export default function Page() {
             </span>
             {"\n"}
             {"  "}
-            <span className={styles.cv}>
-              {"「コミット」「commit」「コミットメッセージ」などが出たら必ず使用。"}
+            <span className={styles.cv}>コード変更の記録やバージョン管理時に呼び出すこと。</span>
+            {"\n\n"}
+            <span className={styles.cc}>
+              {"# ✅ 最新仕様推奨: エージェント起動トリガー（意味的に合致するキーワードを列挙）"}
             </span>
             {"\n"}
-            {"  "}
-            <span className={styles.cv}>コード変更の記録・バージョン管理作業で呼び出すこと。</span>
+            <span className={styles.cm}>triggers</span>
+            {":\n"}
+            {"  - "}
+            <span className={styles.cv}>"コミット"</span>
+            {"\n"}
+            {"  - "}
+            <span className={styles.cv}>"commit"</span>
+            {"\n"}
+            {"  - "}
+            <span className={styles.cv}>"コミットメッセージ"</span>
             {"\n\n"}
-            <span className={styles.cc}>{"# 任意: 依存関係（一部ツールでサポート）"}</span>
+            <span className={styles.cc}>
+              {
+                "# ✅ 最新仕様推奨: エージェントの使用可能ツール制限（セキュリティ・サンドボックス制御）"
+              }
+            </span>
+            {"\n"}
+            <span className={styles.cm}>allowed-tools</span>
+            {":\n"}
+            {"  - "}
+            <span className={styles.cv}>Read</span>
+            {"\n"}
+            {"  - "}
+            <span className={styles.cv}>Edit</span>
+            {"\n"}
+            {"  - "}
+            <span className={styles.cv}>Grep</span>
+            {"\n\n"}
+            <span className={styles.cc}>
+              {"# 任意: 起動モードの設定 (explicit: 手動のみ、auto: 自動実行)"}
+            </span>
+            {"\n"}
+            <span className={styles.cm}>invocation</span>
+            {": "}
+            <span className={styles.cv}>explicit</span>
+            {"\n\n"}
+            <span className={styles.cc}>{"# 任意: 依存関係（実行環境の互換性チェック）"}</span>
             {"\n"}
             <span className={styles.cm}>compatibility</span>
             {":\n"}
@@ -626,12 +793,6 @@ export default function Page() {
             {"\n"}
             {"  - "}
             <span className={styles.cv}>{"node >= 18"}</span>
-            {"\n\n"}
-            <span className={styles.cc}>
-              {"# 任意: 手動呼び出し専用にする（危険な操作に有効）"}
-            </span>
-            {"\n"}
-            <span className={styles.cc}>{"# disable-model-invocation: true"}</span>
             {"\n"}
             <span className={styles.cs}>---</span>
           </div>
@@ -639,30 +800,35 @@ export default function Page() {
 
         {/* description warning */}
         <div className={styles.descWarnBox}>
-          <div className={styles.descWarnTitle}>⚠️ description はエージェントの「発動スイッチ」</div>
+          <div className={styles.descWarnTitle}>
+            ⚠️ triggers と description はエージェントの「発動スイッチ」
+          </div>
           <div className={styles.descExGrid}>
             <div className={styles.descExBad}>
               <div className={styles.descExTitle} style={{ color: "#b91c1c" }}>
-                ❌ 悪い例（曖昧）
+                ❌ 悪い例（トリガーや用途が曖昧）
               </div>
               <code className={styles.descExCode} style={{ color: "#7f1d1d" }}>
-                description: コードをレビューするスキル。
+                {"description: コードをレビューするスキル。\n"}
+                {"triggers: []"}
               </code>
               <div className={styles.descExNote} style={{ color: "#dc2626" }}>
-                → AIがいつ使うか判断できない
+                → AIがいつ使ってよいか判断できず発動しません
               </div>
             </div>
             <div className={styles.descExGood}>
               <div className={styles.descExTitle} style={{ color: "#14532d" }}>
-                ✅ 良い例（具体的）
+                ✅ 良い例（明示的なトリガー定義）
               </div>
               <code className={styles.descExCode} style={{ color: "#14532d" }}>
-                {"description: |\n"}
-                {"コードレビューを実行する。\n"}
-                {'"review","レビュー","PR確認"が出たら必ず使う。'}
+                {"description: フロントエンドコードをレビューする。\n"}
+                {"triggers:\n"}
+                {'  - "review"\n'}
+                {'  - "レビュー"\n'}
+                {'  - "PR確認"'}
               </code>
               <div className={styles.descExNote} style={{ color: "#059669" }}>
-                → トリガーが明確で確実に呼ばれる
+                → トリガー条件が明確で、合致した際に確実に発動します
               </div>
             </div>
           </div>
@@ -810,7 +976,7 @@ export default function Page() {
           Gemini CLI コマンド一覧
           <span style={{ fontSize: "0.875rem", fontWeight: 400, color: "#64748b" }}>
             {" "}
-            （v0.34.0 対応）
+            （v0.43.0 対応）
           </span>
         </h3>
         <div className={styles.codeWrap}>
@@ -1067,7 +1233,7 @@ export default function Page() {
                 <td className={styles.tdLeft} style={{ fontWeight: 700, color: "#0369a1" }}>
                   Gemini CLI
                   <br />
-                  <span className={styles.textSlateLight}>v0.34.0</span>
+                  <span className={styles.textSlateLight}>v0.43.0</span>
                 </td>
                 <td className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}>
                   ~/.gemini/skills/
@@ -1148,7 +1314,7 @@ export default function Page() {
                 Gemini CLI
               </span>
               <span className={styles.badge} style={{ background: "#e0f2fe", color: "#0369a1" }}>
-                v0.34.0 (2026-03-17)
+                v0.43.0 (2026-03-17)
               </span>
             </div>
             <ul
@@ -1691,17 +1857,35 @@ export default function Page() {
         </div>
       </section>
 
-      {/* s11: footer */}
+      {/* s11: sources */}
+      <section id="sources" className={styles.sec}>
+        <h2 className={styles.secTitle}>📚 参考ソース一覧（{SOURCES.length} 件）</h2>
+        <div className={styles.sources}>
+          {SOURCES.map((s) => (
+            <div key={s.num} className={styles.src}>
+              <span className={styles.snum}>{s.num}</span>
+              <div>
+                <a href={s.href} target="_blank" rel="noopener noreferrer">
+                  {s.title}
+                </a>
+                <span className={styles.sdesc}>{s.desc}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* s12: footer */}
       <footer className={styles.footer}>
         <div className={styles.footerTitle}>
-          SKILL.md 完全ガイド — Gemini CLI v0.34.0 &amp; Antigravity v1.20.3 対応版
+          SKILL.md 完全ガイド — Gemini CLI v0.43.0 (最終) &amp; Antigravity v2.0.1 対応版
         </div>
         <div className={styles.footerSub}>
           Based on official documentation from Google Gemini, Antigravity, and Agent Skills Open
           Standard
         </div>
         <div className={styles.footerMeta} data-last-updated="footer">
-          最終更新: 2026年3月21日
+          最終更新: 2026年5月23日
         </div>
       </footer>
     </div>

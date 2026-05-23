@@ -23,9 +23,9 @@ describe("/gemini/skill-guide 契約テスト", () => {
     expect(container.querySelector("h1")?.textContent).toContain("完全解剖ガイド");
   });
 
-  it("h2 が 9 本（セクション数と一致）", () => {
+  it("h2 が 10 本（セクション数と一致）", () => {
     const { container } = render(<Page />);
-    expect(container.querySelectorAll("h2").length).toBe(9);
+    expect(container.querySelectorAll("h2").length).toBe(10);
   });
 
   it("外部リンクに target=_blank と rel=noopener noreferrer が付与されている", () => {
@@ -35,6 +35,14 @@ describe("/gemini/skill-guide 契約テスト", () => {
       expect(a.getAttribute("target")).toBe("_blank");
       expect(a.getAttribute("rel")).toBe("noopener noreferrer");
     }
+  });
+
+  it("sources セクションが存在し、21 件以上の外部リンクが含まれる", () => {
+    const { container } = render(<Page />);
+    const sources = container.querySelector("#sources");
+    expect(sources).not.toBeNull();
+    const externals = sources?.querySelectorAll('a[href^="http"]') ?? [];
+    expect(externals.length).toBeGreaterThanOrEqual(21);
   });
 
   it("内部リンク（/ 始まり）に .html 拡張子がない", () => {
