@@ -1,7 +1,7 @@
 # 月次更新プロンプト集
 
 > **用途**: 毎月最低 1 回、各画面の情報を最新状態に保つためのプロンプトテンプレート集。  
-> **更新日**: 2026-05-09  
+> **更新日**: 2026-05-23  
 > **次回予定**: 2026-06-01 以降
 
 ---
@@ -36,10 +36,10 @@
 | 9 | `/gemini/skill-guide-intermediate` | SKILL.md 完全ガイド — Gemini CLI & Antigravity | 2026-05-23 |
 | 10 | `/gemini/agent` | Gemini マルチエージェント開発（ADK / A2A） | 2026-05-23 |
 | 11 | `/gemini/antigravity-guide` | Google Antigravity — AI仕様駆動開発 ベストプラクティス完全ガイド | 2026-05-22 |
-| 12 | `/codex/skill` | OpenAI Codex — AI仕様駆動開発 マークダウンファイル完全ガイド | 2026-04-18 |
-| 13 | `/codex/agent` | OpenAI Codex エージェント開発ガイド | 2026-04-30 |
-| 14 | `/codex/openai-codex-guide` | OpenAI Codex 完全ガイド 2026 | 2026-05-08 |
-| 15 | `/copilot/skill` | GitHub Copilot SKILL.md 完全ベストプラクティスガイド | 2026-04-18 |
+| 12 | `/codex/skill` | OpenAI Codex — AI仕様駆動開発 マークダウンファイル完全ガイド | 2026-05-23 |
+| 13 | `/codex/agent` | OpenAI Codex エージェント開発ガイド | 2026-05-23 |
+| 14 | `/codex/openai-codex-guide` | OpenAI Codex 完全ガイド 2026 | 2026-05-23 |
+| 15 | `/copilot/skill` | GitHub Copilot SKILL.md 完全ベストプラクティスガイド | 2026-05-23 |
 | 16 | `/copilot/agent` | GitHub Copilot コーディングエージェント開発ガイド | 2026-05-09 |
 | 17 | `/copilot/github-copilot` | GitHub Copilot 完全ガイド 2026 | 2026-05-08 |
 | 18 | `/copilot/markdown-file-guide` | GitHub Copilot — AI仕様駆動開発 マークダウンファイル完全ガイド | 2026-05-08 |

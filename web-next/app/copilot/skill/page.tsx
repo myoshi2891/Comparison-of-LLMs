@@ -4,7 +4,7 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   title: "GitHub Copilot — SKILL.md 完全ベストプラクティスガイド",
   description:
-    "GitHub Copilot Coding Agent / VS Code Agent Mode / Copilot CLI 対応の SKILL.md ガイド。フロントマター完全仕様・Progressive Disclosure 3段階ローディング・ステップバイステップ作成・実践テンプレート集・トラブルシューティングを 2026年3月時点の公式ドキュメント根拠付きで徹底解説。",
+    "GitHub Copilot Coding Agent / VS Code Agent Mode / Copilot CLI 対応の SKILL.md ガイド。フロントマター完全仕様・Progressive Disclosure 3段階ローディング・ステップバイステップ作成・実践テンプレート集・トラブルシューティングを 2026-05-23 最新版 (v0.105.0) の公式ドキュメント根拠付きで徹底解説。",
 };
 
 type Source = { num: string; href: string; title: string; desc: string };
@@ -19,9 +19,9 @@ const SOURCES_SKILL: Source[] = [
   },
   {
     num: "[B]",
-    href: "https://code.visualstudio.com/docs/copilot/customization/agent-skills",
-    title: "Use Agent Skills in VS Code — VS Code 公式ドキュメント（2026年3月最新）【公式】",
-    desc: "3段階 Progressive Disclosure の完全解説。全フロントマターフィールド（user-invokable・disable-model-invocation・argument-hint）。ディレクトリ構造。chat.agentSkillsLocations 設定",
+    href: "https://code.visualstudio.com/docs/copilot/customization/agent-skills/",
+    title: "Use Agent Skills in VS Code — VS Code 公式ドキュメント（2026年5月最新）【公式】",
+    desc: "3段階 Progressive Disclosure の完全解説。全フロントマターフィールド（user-invokable・disable-model-invocation・argument-hint・allowed-tools）。ディレクトリ構造。chat.agentSkillsLocations 設定",
   },
   {
     num: "[C]",
@@ -31,7 +31,7 @@ const SOURCES_SKILL: Source[] = [
   },
   {
     num: "[D]",
-    href: "https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/create-skills",
+    href: "https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/create-skills/",
     title: "Creating agent skills for GitHub Copilot — GitHub Docs【公式】",
     desc: "SKILL.md 作成の公式ガイド。フロントマター必須・任意フィールドの完全仕様。scripts/・references/ 等のリソースファイル参照方法。プロジェクト/個人スキルの配置場所",
   },
@@ -44,14 +44,14 @@ const SOURCES_SKILL: Source[] = [
   },
   {
     num: "[F]",
-    href: "https://agentskills.io/specification",
+    href: "https://agentskills.io/specification/",
     title: "Agent Skills 公式仕様 — agentskills.io（Anthropic 考案・オープン標準）",
     desc: "オープン標準仕様書。SKILL.md 500行/5,000トークン制限。3サブディレクトリ（scripts/references/assets/）。name フィールド正規表現。skills-ref 公式バリデーター CLI",
   },
   {
     num: "[G]",
     href: "https://atalupadhyay.wordpress.com/2026/03/16/agent-skills-in-claude-github-copilot/",
-    title: "Agent Skills in Claude & GitHub Copilot — Atal Upadhyay (Mar 2026)",
+    title: "Agent Skills in Claude & GitHub Copilot — Atal Upadhyay (May 2026)",
     desc: "本文構成ベストプラクティス（Goal/When to use/Instructions/Constraints）。スキルをルーティングドキュメントとして使う設計パターン。Level 2・3 のリアルタイム観察例",
   },
   {
@@ -68,15 +68,15 @@ const SOURCES_SKILL: Source[] = [
   },
   {
     num: "[J]",
-    href: "https://docs.github.com/en/copilot/concepts/agents/about-agent-skills",
+    href: "https://docs.github.com/en/copilot/concepts/agents/about-agent-skills/",
     title: "About agent skills — GitHub Docs【公式】",
     desc: "Agent Skills の概念・対応プラン（Pro/Pro+/Business/Enterprise）。プロジェクト/個人スキルの違い。将来予定（Organization・Enterprise レベルスキル）",
   },
   {
     num: "[K]",
     href: "https://smartscope.blog/en/generative-ai/github-copilot/github-copilot-skills-guide/",
-    title: "GitHub Copilot Agent Skills Guide [Latest Feb 2026] — SmartScope",
-    desc: "2026年2月時点の対応状況まとめ。完全フロントマター仕様（argument-hint 含む）。カスタムインストラクションとの使い分け比較。Coding Agent の自動スキル参照動作実証",
+    title: "GitHub Copilot Agent Skills Guide [Latest May 2026] — SmartScope",
+    desc: "2026年5月時点の対応状況まとめ。完全フロントマター仕様（argument-hint 含む）。カスタムインストラクションとの使い分け比較。Coding Agent の自動スキル参照動作実証",
   },
   {
     num: "[L]",
@@ -90,16 +90,16 @@ const SOURCES_SKILL: Source[] = [
 const SOURCES_EXISTING: Source[] = [
   {
     num: "[1]",
-    href: "https://developer.microsoft.com/blog/spec-driven-development-spec-kit",
+    href: "https://developer.microsoft.com/blog/spec-driven-development-spec-kit/",
     title:
       "Diving Into Spec-Driven Development With GitHub Spec Kit — Microsoft for Developers (Sep 2025)",
     desc: "Spec Kit 公式解説。constitution.md・.specify/・.github/prompts/ の SDD 構造。specify→plan→tasks→implement フロー",
   },
   {
     num: "[4]",
-    href: "https://docs.github.com/copilot/customizing-copilot/adding-custom-instructions-for-github-copilot",
+    href: "https://docs.github.com/en/copilot/customizing-copilot/adding-custom-instructions-for-github-copilot/",
     title: "Adding repository custom instructions for GitHub Copilot — GitHub Docs (公式)",
-    desc: "copilot-instructions.md・.instructions.md の公式仕様。applyTo の glob 構文・excludeAgent・短文自己完結の原則。SKILL.md との使い分けの判断基準",
+    desc: "copilot-instructions.md・.instructions.md の公式仕様。applyTo の glob 構文・excludeAgent・短文自己完結の原則。SKILL.md ととの使い分けの判断基準",
   },
   {
     num: "[9]",
@@ -165,7 +165,7 @@ export default function CopilotSkillPage() {
       <main className={styles.main}>
         {/* TOC */}
         <nav className={styles.toc} aria-label="目次">
-          <div className={styles.tocTtl}>目次 — SKILL.md 完全ガイド 2026年3月版</div>
+          <div className={styles.tocTtl}>目次 — SKILL.md 完全ガイド 2026年5月版</div>
           <ol>
             <li>
               <a href="#skill-concept">SKILL.mdとは — 概念・位置づけ・他ファイルとの違い</a>
@@ -301,7 +301,7 @@ export default function CopilotSkillPage() {
             </table>
           </div>
 
-          <h3>どのツールで使えるか（2026年3月時点）</h3>
+          <h3>どのツールで使えるか（2026年5月時点）</h3>
           <div className={styles.skcat}>
             <div className={styles.skcatItem}>
               <div className={styles.skcatIcon}>🤖</div>
@@ -494,7 +494,9 @@ export default function CopilotSkillPage() {
                 <div className={styles.fcName}>
                   SKILL.md フロントマター — 全フィールド完全リファレンス
                 </div>
-                <div className={styles.fcPath}>agentskills.io/specification 準拠（2026年3月）</div>
+                <div className={styles.fcPath}>
+                  agentskills.io/specification 準拠（2026年5月更新）
+                </div>
                 <div className={styles.fcTags}>
                   <span className={`${styles.fct} ${styles.pillR}`}>name: 必須</span>
                   <span className={`${styles.fct} ${styles.pillR}`}>description: 必須</span>
@@ -537,7 +539,17 @@ export default function CopilotSkillPage() {
                   {"\n  "}
                   <span className={styles.cCm}>
                     {
-                      '# 必須 | 最大1024文字\n  # Level 1の自動発動トリガー。"Use for X, Y, Z" を必ず含める\n  # ユーザーが実際に入力する単語（日本語も可）を列挙'
+                      '# 必須 | 最大1024文字\n  # Level 1の自動発動トリガー。"Use for X, Y, Z" を必ず含める\n  # ※ triggers / steps などの独自キーはフロントマターでは使用できません（トリガーは description、手順は本文に書きます）'
+                    }
+                  </span>
+                  {"\n\n"}
+                  <span className={styles.cGh}>allowed-tools</span>
+                  {": "}
+                  <span className={styles.cSt}>[shell]</span>
+                  {"\n  "}
+                  <span className={styles.cCm}>
+                    {
+                      "# 任意 | スキルに許可するツール（例: shell）を指定。省略時は実行前に確認ダイアログが表示されます"
                     }
                   </span>
                   {"\n\n"}
@@ -636,7 +648,18 @@ export default function CopilotSkillPage() {
                       <span className={`${styles.pill} ${styles.pillR}`}>必須</span>
                     </td>
                     <td>最大1024文字</td>
-                    <td>自動発動トリガー。Use for: キーワード列挙が必須</td>
+                    <td>
+                      自動発動トリガー。Use for: キーワード列挙が必須。※ triggers
+                      などの独自キーは無視されます
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>allowed-tools</td>
+                    <td>
+                      <span className={`${styles.pill} ${styles.pillG}`}>任意</span>
+                    </td>
+                    <td>リスト (例: [shell])</td>
+                    <td>実行を許可するツール。省略時は毎回権限確認プロンプトを表示</td>
                   </tr>
                   <tr>
                     <td>argument-hint</td>
@@ -1620,7 +1643,7 @@ export default function CopilotSkillPage() {
           <div className={styles.slabel}>Section 12 — 参考ソース</div>
           <div className={styles.sources}>
             <div className={styles.srcTtl}>
-              📚 参考ソース一覧 — SKILL.md 完全ガイド 2026年3月版（[A]〜[L] が SKILL.md
+              📚 参考ソース一覧 — SKILL.md 完全ガイド 2026年5月版（[A]〜[L] が SKILL.md
               専用新規追加）
             </div>
 
