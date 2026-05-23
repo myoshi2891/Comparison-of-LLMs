@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "OpenAI Codex — AI仕様駆動開発 マークダウンファイル完全ガイド",
+  title: "OpenAI Codex v0.105.0 × GPT-5.4 — AI仕様駆動開発 マークダウンファイル完全ガイド",
   description:
-    "AGENTS.md / SKILL.md / .prompt.md / REQUIREMENTS.md / AGENT_TASKS.md — OpenAI Codex の AI 仕様駆動開発を支える全マークダウンファイルの役割・構造・ベストプラクティスを公式根拠付きで解説。",
+    "AGENTS.md / SKILL.md / .prompt.md / REQUIREMENTS.md / AGENT_TASKS.md — OpenAI Codex (v0.105.0, 2026-05-23 最新版) の AI 仕様駆動開発を支える全マークダウンファイルの役割・構造・ベストプラクティスを公式根拠付きで解説。GPT-5.4 対応。",
 };
 
 // 外部ソース (sources セクション) の定義。Phase F で redirect 一覧を作る際にも参照する。
@@ -156,6 +156,12 @@ const SOURCES_SKILL_ADDITIONAL: Source[] = [
     title: "Porting Skills (and Superpowers) to OpenAI Codex — blog.fsck.com (Oct 2025)",
     desc: "SKILL.md のオープン規格（Claude Code/Antigravity/Codex 共通）・スキルを「フランチャイズのバインダー」と比喩した設計思想・3プラットフォーム間の移植方法・Few-shot examples の効果",
   },
+  {
+    num: "[24]",
+    href: "https://developers.openai.com/codex/blog/may-2026-updates/",
+    title: "Codex May 2026 Updates: Goal Mode, Appshots, and Mobile Integration — OpenAI Developer Blog (May 2026)",
+    desc: "Goal Mode（自律的な長期目標の実行とチェックポイント管理）・Appshots（UIプレビューのスナップショット共有機能）・モバイル統合の仕様とベストプラクティス",
+  },
 ];
 
 export default function CodexSkillPage() {
@@ -163,7 +169,7 @@ export default function CodexSkillPage() {
     <div className={styles.root}>
       <header className={styles.header}>
         <div className={styles.hdrBg} />
-        <div className={styles.hdrEyebrow}>OpenAI Codex × codex-1 (o3-based)</div>
+        <div className={styles.hdrEyebrow}>OpenAI Codex v0.105.0 × GPT-5.4 (o3-based)</div>
         <h1>
           AI仕様駆動開発における
           <br />
@@ -177,11 +183,11 @@ export default function CodexSkillPage() {
           Codexの全マークダウンファイルの役割・構造・ベストプラクティスを根拠ソース付きで徹底解説
         </p>
         <div className={styles.badgeRow}>
-          <span className={`${styles.badge} ${styles.bOai}`}>OpenAI Codex</span>
-          <span className={`${styles.badge} ${styles.bBlue}`}>codex-1 (o3)</span>
+          <span className={`${styles.badge} ${styles.bOai}`}>OpenAI Codex v0.105.0</span>
+          <span className={`${styles.badge} ${styles.bBlue}`}>GPT-5.4 (o3-based)</span>
           <span className={`${styles.badge} ${styles.bPurple}`}>AGENTS.md オープン標準</span>
           <span className={`${styles.badge} ${styles.bAmber}`}>SKILL.md 共通規格</span>
-          <span className={`${styles.badge} ${styles.bRose}`}>Agents SDK Multi-Agent</span>
+          <span className={`${styles.badge} ${styles.bRose}`}>v0.105.0 (2026-05-23)</span>
         </div>
       </header>
 
@@ -679,6 +685,30 @@ export default function CodexSkillPage() {
                   {"- Summary: 変更内容の1段落サマリー\n"}
                   {"- Testing Done: 実行したテストと結果\n"}
                   {"- Breaking Changes: 破壊的変更があれば記載\n\n"}
+                  <span className={styles.cHd}>## System Instructions</span>
+                  {"\n"}
+                  <span className={styles.cCm}>
+                    # system_promptの役割。エージェントとしての性格や言語前提を指定。
+                  </span>
+                  {"\n"}
+                  {"- 常に日本語で報告や返答を行ってください。\n"}
+                  {"- 変更が必要な場合は実装前に理由と設計プランを提示してください。\n\n"}
+                  <span className={styles.cHd}>## Tool Permissions</span>
+                  {"\n"}
+                  <span className={styles.cCm}>
+                    # 使用可能な tools と、その実行結果取得における token flood 防止の制約。
+                  </span>
+                  {"\n"}
+                  {"- `run_command` ではテストおよびビルドコマンドのみ実行可能。\n"}
+                  {"- コマンド実行結果が長大な場合は byte cap (最大 4000 バイト) で出力を切り詰めて処理すること。\n\n"}
+                  <span className={styles.cHd}>## Agent Handoffs</span>
+                  {"\n"}
+                  <span className={styles.cCm}>
+                    # handoffsポリシー。他の専門エージェントへタスクを委譲・引き渡す際の基準。
+                  </span>
+                  {"\n"}
+                  {"- DBマイグレーションを伴うタスクは `db-migration` エージェントへハンドオフ。\n"}
+                  {"- 実装完了後は `ReviewerAgent` へ自動的にハンドオフして検証を受けること。\n\n"}
                   <span className={styles.cHd}>## Forbidden Actions</span>
                   {"\n"}
                   <span className={styles.cRose}># Codexに絶対にさせてはいけないこと</span>
