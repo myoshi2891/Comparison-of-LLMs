@@ -43,10 +43,10 @@ describe("/gemini/skill-guide-intermediate", () => {
 
   it("metadata の title と description が定義されている", () => {
     expect(metadata.title).toBe(
-      "SKILL.md 完全解剖ガイド | Gemini CLI v0.34.0 & Antigravity v1.20.3 中級者以上向け"
+      "SKILL.md 完全解剖ガイド | Gemini CLI v0.43.0 (最終版) & Antigravity v2.0.1 中級者以上向け"
     );
     expect(metadata.description).toBe(
-      "Google Gemini CLI・Antigravity IDE における SKILL.md の設計思想、アーキテクチャ、実装パターン、運用まで。エージェント駆動開発を次のレベルに引き上げるすべての知識を網羅する。"
+      "Google Gemini CLI (v0.43.0 最終版)・Antigravity IDE (v2.0.1) における SKILL.md の設計思想、アーキテクチャ、実装パターン、運用まで。エージェント駆動開発を次のレベルに引き上げるすべての知識を網羅する。"
     );
   });
 });

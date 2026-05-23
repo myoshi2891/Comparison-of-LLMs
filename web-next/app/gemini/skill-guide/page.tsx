@@ -115,9 +115,9 @@ style E fill:#fecaca,stroke:#dc2626,color:#7f1d1d
 style F fill:#fecaca,stroke:#dc2626,color:#7f1d1d`;
 
 export const metadata: Metadata = {
-  title: "SKILL.md 完全ガイド — Gemini CLI v0.35.0 (最終版) & Antigravity v2.0.1",
+  title: "SKILL.md 完全ガイド — Gemini CLI v0.43.0 (最終版) & Antigravity v2.0.1",
   description:
-    "AIエージェントに「専門知識の教科書」を渡す仕組み — SKILL.md の構造・書き方・インストール手順を Gemini CLI v0.35.0 (最終版) & Antigravity v2.0.1 対応版で完全解説。Google I/O 2026 発表内容対応。",
+    "AIエージェントに「専門知識の教科書」を渡す仕組み — SKILL.md の構造・書き方・インストール手順を Gemini CLI v0.43.0 (最終版) & Antigravity v2.0.1 対応版で完全解説。Google I/O 2026 発表内容対応。",
 };
 
 type Source = { num: string; href: string; title: string; desc: string };
@@ -157,7 +157,7 @@ const SOURCES: Source[] = [
     num: "[6]",
     href: "https://geminicli.com/docs/changelogs/",
     title: "Gemini CLI リリースノート — geminicli.com",
-    desc: "Gemini CLI の各バージョンの更新履歴（v0.25.0〜v0.35.0）",
+    desc: "Gemini CLI の各バージョンの更新履歴（v0.25.0〜v0.43.0）",
   },
   {
     num: "[7]",
@@ -273,7 +273,7 @@ export default function Page() {
           <span className={`${styles.tag} ${styles.tagGreen}`}>Google Gemini / Antigravity</span>
           <span className={`${styles.tag} ${styles.tagSky}`}>初学者向け完全ガイド</span>
           <span className={`${styles.tag} ${styles.tagViolet}`}>2026年版</span>
-          <span className={`${styles.tag} ${styles.tagTeal}`}>Gemini CLI v0.35.0 (最終版)</span>
+          <span className={`${styles.tag} ${styles.tagTeal}`}>Gemini CLI v0.43.0 (最終版)</span>
           <span className={`${styles.tag} ${styles.tagIndigo}`}>Antigravity v2.0.1</span>
           <span className={`${styles.tag} ${styles.tagOrange}`}>最終更新 2026-05-23</span>
         </div>
@@ -387,7 +387,7 @@ export default function Page() {
                   最新バージョン
                 </td>
                 <td>
-                  <span className={`${styles.badge} ${styles.badgeSky}`}>v0.35.0 (最終)</span>
+                  <span className={`${styles.badge} ${styles.badgeSky}`}>v0.43.0 (最終)</span>
                   <div className={styles.textSlateLight}>2026-05-19</div>
                   <div className={styles.versionLinks}>
                     <a
@@ -1878,7 +1878,7 @@ export default function Page() {
       {/* s12: footer */}
       <footer className={styles.footer}>
         <div className={styles.footerTitle}>
-          SKILL.md 完全ガイド — Gemini CLI v0.35.0 (最終) &amp; Antigravity v2.0.1 対応版
+          SKILL.md 完全ガイド — Gemini CLI v0.43.0 (最終) &amp; Antigravity v2.0.1 対応版
         </div>
         <div className={styles.footerSub}>
           Based on official documentation from Google Gemini, Antigravity, and Agent Skills Open

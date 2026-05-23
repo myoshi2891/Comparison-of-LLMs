@@ -4,9 +4,10 @@ import PatternsApp from "./PatternsApp";
 import styles from "./page.module.css";
 
 export const metadata = {
-  title: "SKILL.md 完全解剖ガイド | Gemini CLI v0.34.0 & Antigravity v1.20.3 中級者以上向け",
+  title:
+    "SKILL.md 完全解剖ガイド | Gemini CLI v0.43.0 (最終版) & Antigravity v2.0.1 中級者以上向け",
   description:
-    "Google Gemini CLI・Antigravity IDE における SKILL.md の設計思想、アーキテクチャ、実装パターン、運用まで。エージェント駆動開発を次のレベルに引き上げるすべての知識を網羅する。",
+    "Google Gemini CLI (v0.43.0 最終版)・Antigravity IDE (v2.0.1) における SKILL.md の設計思想、アーキテクチャ、実装パターン、運用まで。エージェント駆動開発を次のレベルに引き上げるすべての知識を網羅する。",
 };
 
 const MERMAID_STRUCTURE = `graph TD
@@ -201,7 +202,7 @@ export default function SkillGuideIntermediatePage() {
       <div className={styles.hero}>
         <div className={styles.container}>
           <div className={styles.heroBadge}>
-            SKILL.md DEEP DIVE — 中級者以上向け ｜ CLI v0.34.0 / Antigravity v1.20.3 対応
+            SKILL.md DEEP DIVE — 中級者以上向け ｜ CLI v0.43.0 (最終版) / Antigravity v2.0.1 対応
           </div>
           <h1 className={styles.heroH1}>
             <span className={styles.accentCyan}>Agent Skills</span>
@@ -218,11 +219,11 @@ export default function SkillGuideIntermediatePage() {
           <div className={styles.heroMeta}>
             <div className={styles.heroChip}>
               <div className={styles.dot} style={{ background: "var(--cyan)" }} />
-              Gemini CLI v0.34.0
+              Gemini CLI v0.43.0 (最終版)
             </div>
             <div className={styles.heroChip}>
               <div className={styles.dot} style={{ background: "var(--orange)" }} />
-              Antigravity v1.20.3
+              Antigravity v2.0.1
             </div>
             <div className={styles.heroChip}>
               <div className={styles.dot} style={{ background: "var(--blue)" }} />
@@ -235,16 +236,16 @@ export default function SkillGuideIntermediatePage() {
           </div>
           <div className={styles.versionBadges}>
             <span className={`${styles.vbadge} ${styles.vbC}`}>
-              Gemini CLI v0.34.0 (2026-03-18)
+              Gemini CLI v0.43.0 (最終版) (2026-05-19)
             </span>
             <span className={`${styles.vbadge} ${styles.vbO}`}>
-              Antigravity v1.20.3 (2026-03-05)
+              Antigravity v2.0.1 (2026-05-23)
             </span>
-            <span className={`${styles.vbadge} ${styles.vbB}`}>Gemini 3.1 Pro Preview</span>
+            <span className={`${styles.vbadge} ${styles.vbB}`}>Gemini 3.5 Flash / Pro</span>
             <span className={`${styles.vbadge} ${styles.vbP}`}>
               Plan Mode / /rewind / skill-creator
             </span>
-            <span className={`${styles.vbadge} ${styles.vbO}`}>最終更新 2026-03-21</span>
+            <span className={`${styles.vbadge} ${styles.vbO}`}>最終更新 2026-05-23</span>
           </div>
         </div>
       </div>
@@ -339,10 +340,10 @@ export default function SkillGuideIntermediatePage() {
                     <strong style={{ color: "var(--text)" }}>バージョン</strong>
                   </td>
                   <td>
-                    <code className={styles.inlineCode}>v0.34.0</code> (2026-03-18)
+                    <code className={styles.inlineCode}>v0.43.0 (最終版)</code> (2026-05-19)
                   </td>
                   <td>
-                    <code className={styles.inlineCode}>v1.20.3</code> (2026-03-05)
+                    <code className={styles.inlineCode}>v2.0.1</code> (2026-05-23)
                   </td>
                 </tr>
                 <tr>
@@ -379,10 +380,10 @@ export default function SkillGuideIntermediatePage() {
                     <strong style={{ color: "var(--text)" }}>デフォルトモデル</strong>
                   </td>
                   <td>
-                    <code className={styles.inlineCode}>gemini-3-flash-preview</code> (v0.29.0〜)
+                    <code className={styles.inlineCode}>gemini-3.5-flash</code> (v0.43.0〜)
                   </td>
                   <td>
-                    <code className={styles.inlineCode}>gemini-3-flash-preview</code>
+                    <code className={styles.inlineCode}>gemini-3.5-flash</code>
                   </td>
                 </tr>
                 <tr>
@@ -390,10 +391,10 @@ export default function SkillGuideIntermediatePage() {
                     <strong style={{ color: "var(--text)" }}>最高精度モデル</strong>
                   </td>
                   <td>
-                    <code className={styles.inlineCode}>gemini-3.1-pro-preview</code> (v0.31.0〜)
+                    <code className={styles.inlineCode}>gemini-3.5-pro</code> (v0.43.0〜)
                   </td>
                   <td>
-                    <code className={styles.inlineCode}>gemini-3.1-pro-preview</code>
+                    <code className={styles.inlineCode}>gemini-3.5-pro</code>
                   </td>
                 </tr>
                 <tr className={styles.rowNew}>
@@ -405,7 +406,7 @@ export default function SkillGuideIntermediatePage() {
                     <code className={styles.inlineCode}>/plan</code> コマンド (v0.29.0〜)
                     <br />
                     <small style={{ color: "var(--text-muted)" }}>
-                      v0.33.0〜リサーチサブエージェント内蔵
+                      v2.0.1〜リサーチサブエージェント内蔵
                     </small>
                   </td>
                   <td>✅ あり</td>
@@ -432,7 +433,7 @@ export default function SkillGuideIntermediatePage() {
                     <span className={styles.newBadge}>NEW</span>
                   </td>
                   <td>✅ あり</td>
-                  <td>✅ (v1.20.3〜)</td>
+                  <td>✅ (v2.0.1〜)</td>
                 </tr>
                 <tr>
                   <td>
@@ -470,7 +471,7 @@ export default function SkillGuideIntermediatePage() {
             <strong>ポータビリティの保証:</strong> SKILL.md はプレーンなMarkdown + YAML
             フォーマット。Gemini CLI、Antigravity、Claude Code、GitHub
             Copilot、Cursor等で共通利用できるオープンスタンダード。
-            <span className={styles.inlineEm}>v1.20.3〜はAGENTS.mdによるクロスツール共有</span>
+            <span className={styles.inlineEm}>v2.0.1〜はAGENTS.mdによるクロスツール共有</span>
             も正式サポートされた。
           </div>
         </div>
@@ -857,13 +858,13 @@ description: |
               <div className={styles.stepNum}>01</div>
               <div className={styles.stepBody}>
                 <div className={styles.stepTitle}>
-                  Gemini CLI — コマンドでインストール
+                  Antigravity / Gemini CLI — コマンドでインストール
                   <span className={styles.newBadge} style={{ fontSize: "11px" }}>
-                    v0.34.0
+                    v2.0.1
                   </span>
                 </div>
                 <p className={styles.stepDesc}>
-                  最もスタンダードな方法。v0.26.0〜の新コマンドも含む完全リファレンス。
+                  CLIツールを用いたスキル管理。Go製の新しい Antigravity CLI コマンドを標準採用。
                 </p>
                 <div className={styles.codeWrap} style={{ marginTop: "16px" }}>
                   <div className={styles.codeHeader}>
@@ -872,30 +873,44 @@ description: |
                       <div className={`${styles.macDot} ${styles.dotYellow}`} />
                       <div className={`${styles.macDot} ${styles.dotGreen}`} />
                     </div>
-                    <span className={styles.codeLang}>shell — Gemini CLI Commands (v0.34.0)</span>
+                    <span className={styles.codeLang}>
+                      shell — Antigravity / Gemini CLI (v2.0.1)
+                    </span>
                   </div>
                   <div className={styles.codeBody}>
+                    <span className={styles.cComment}>
+                      # 新: Antigravity CLI (Go製) のインストール (Homebrew 推奨)
+                    </span>
+                    {"\n"}
+                    <span className={styles.cCmd}>brew install google-antigravity</span>
+                    {"\n\n"}
+                    <span className={styles.cComment}>
+                      # 旧: Gemini CLI (Python製) のインストール (pipx 推奨)
+                    </span>
+                    {"\n"}
+                    <span className={styles.cCmd}>pipx install google-gemini-cli</span>
+                    {"\n\n"}
                     <span className={styles.cComment}>
                       # スキルを Git リポジトリからインストール
                     </span>
                     {"\n"}
-                    <span className={styles.cCmd}>gemini skills install</span>{" "}
+                    <span className={styles.cCmd}>antigravity skills install</span>{" "}
                     <span className={styles.cVal}>https://github.com/example/my-skills.git</span>
                     {"\n\n"}
                     <span className={styles.cComment}># サブパスを指定してインストール</span>
                     {"\n"}
-                    <span className={styles.cCmd}>gemini skills install</span>{" "}
+                    <span className={styles.cCmd}>antigravity skills install</span>{" "}
                     <span className={styles.cVal}>https://github.com/example/skills.git</span>{" "}
                     <span className={styles.cKey}>--path</span>
                     {" skills/firebase\n\n"}
                     <span className={styles.cComment}># ローカルディレクトリからインストール</span>
                     {"\n"}
-                    <span className={styles.cCmd}>gemini skills install</span>{" "}
+                    <span className={styles.cCmd}>antigravity skills install</span>{" "}
                     <span className={styles.cVal}>./my-local-skill/</span>
                     {"\n\n"}
                     <span className={styles.cComment}># インストール済みスキルを一覧表示</span>
                     {"\n"}
-                    <span className={styles.cCmd}>gemini skills list</span>
+                    <span className={styles.cCmd}>antigravity skills list</span>
                     {"\n\n"}
                     <span className={styles.cComment}># セッション中にスキルを一時無効化</span>
                     {"\n"}
@@ -904,14 +919,14 @@ description: |
                     {"\n\n"}
                     <span className={styles.cComment}># スキルを最新版に更新</span>
                     {"\n"}
-                    <span className={styles.cCmd}>gemini skills update</span>
+                    <span className={styles.cCmd}>antigravity skills update</span>
                     {"\n\n"}
                     <span className={styles.cNew}>
                       {"──────────────────────────────────────────────────────────────"}
                     </span>
                     {"\n"}
                     <span className={styles.cNew}>
-                      {"# 🆕 v0.26.0〜 skill-creator（スキル対話的自動生成）"}
+                      {"# 🆕 skill-creator（スキル対話的自動生成）"}
                     </span>
                     {"\n"}
                     <span className={styles.cComment}>
@@ -919,28 +934,26 @@ description: |
                     </span>
                     {"\n\n"}
                     <span className={styles.cNew}>
-                      {"# 🆕 v0.27.0〜 /rewind（セッション履歴を遡る・ロールバック）"}
+                      {"# 🆕 /rewind（セッション履歴を遡る・ロールバック）"}
                     </span>
                     {"\n"}
                     <span className={styles.cCmd}>/rewind</span>
                     {"\n\n"}
                     <span className={styles.cNew}>
-                      {"# 🆕 v0.29.0〜 /plan（Plan Mode: read-only で安全に変更計画立案）"}
+                      {"# 🆕 v2.0.0〜 /plan（Plan Mode: read-only で安全に変更計画立案）"}
                     </span>
                     {"\n"}
                     <span className={styles.cCmd}>/plan</span>
                     {"\n"}
                     <span className={styles.cComment}>
-                      {"# v0.33.0〜: リサーチサブエージェント・アノテーション機能を内蔵"}
+                      {"# v2.0.1〜: リサーチサブエージェント・アノテーション機能を内蔵"}
                     </span>
                     {"\n\n"}
                     <span className={styles.cNew}>
-                      {"# 🆕 v0.30.0〜 Gemini CLI SDK（プログラムによるスキル生成）"}
+                      {"# 🆕 v2.0.0〜 Antigravity CLI SDK（プログラムによるスキル生成）"}
                     </span>
                     {"\n"}
-                    <span className={styles.cComment}>
-                      {"# npm install @google/gemini-cli-sdk"}
-                    </span>
+                    <span className={styles.cCmd}>npm install @google/antigravity-sdk</span>
                   </div>
                 </div>
               </div>
@@ -1348,7 +1361,7 @@ description: |
                 style={{ marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}
               >
                 <span style={{ color: "var(--cyan)" }}>Gemini CLI</span>
-                <code style={{ fontSize: "12px" }}>v0.26.0 → v0.34.0</code>
+                <code style={{ fontSize: "12px" }}>v0.26.0 → v0.43.0</code>
               </h3>
               <div className={styles.timeline}>
                 <div className={styles.tlItem}>
@@ -1399,6 +1412,13 @@ description: |
                   <div className={styles.tlVersion}>v0.34.0</div>
                   <div className={styles.tlText}>
                     安定性向上・スキルロード高速化・パフォーマンス改善（2026-03-18リリース）
+                  </div>
+                </div>
+                <div className={styles.tlItem}>
+                  <div className={styles.tlVersion}>v0.43.0</div>
+                  <div className={styles.tlText}>
+                    Gemini CLI 最終リリース。パフォーマンスのさらなる最適化と Antigravity CLI
+                    への移行準備完了（2026-05-19リリース）
                   </div>
                 </div>
               </div>
