@@ -976,7 +976,7 @@ export default function Page() {
           Gemini CLI コマンド一覧
           <span style={{ fontSize: "0.875rem", fontWeight: 400, color: "#64748b" }}>
             {" "}
-            （v0.34.0 対応）
+            （v0.43.0 対応）
           </span>
         </h3>
         <div className={styles.codeWrap}>
@@ -1233,7 +1233,7 @@ export default function Page() {
                 <td className={styles.tdLeft} style={{ fontWeight: 700, color: "#0369a1" }}>
                   Gemini CLI
                   <br />
-                  <span className={styles.textSlateLight}>v0.34.0</span>
+                  <span className={styles.textSlateLight}>v0.43.0</span>
                 </td>
                 <td className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}>
                   ~/.gemini/skills/
@@ -1314,7 +1314,7 @@ export default function Page() {
                 Gemini CLI
               </span>
               <span className={styles.badge} style={{ background: "#e0f2fe", color: "#0369a1" }}>
-                v0.34.0 (2026-03-17)
+                v0.43.0 (2026-03-17)
               </span>
             </div>
             <ul

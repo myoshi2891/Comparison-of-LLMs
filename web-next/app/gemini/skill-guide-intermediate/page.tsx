@@ -406,7 +406,7 @@ export default function SkillGuideIntermediatePage() {
                     <code className={styles.inlineCode}>/plan</code> コマンド (v0.29.0〜)
                     <br />
                     <small style={{ color: "var(--text-muted)" }}>
-                      v2.0.1〜リサーチサブエージェント内蔵
+                      （Antigravity v2.0.1〜）リサーチサブエージェント内蔵
                     </small>
                   </td>
                   <td>✅ あり</td>

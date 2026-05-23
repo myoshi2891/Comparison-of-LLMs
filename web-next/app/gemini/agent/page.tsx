@@ -217,10 +217,10 @@ const SOURCES_NEW: Source[] = [
   },
   {
     icon: "🟥",
-    title: "Gemini モデル一覧 — Gemini API 公式（2026年5月現在）",
+    title: "Gemini モデル一覧 — Gemini API 公式",
     href: "https://ai.google.dev/gemini-api/docs/models",
     display: "ai.google.dev/gemini-api/docs/models",
-    desc: "gemini-3.1-pro-preview / gemini-3-flash-preview / gemini-2.5-flash 等の現行モデルID・コンテキスト長・価格の公式一覧",
+    desc: "最新モデル一覧（2026年）— モデルID・コンテキスト長・価格はリンク先参照",
   },
   {
     icon: "⛔",
@@ -268,7 +268,7 @@ export default function GeminiAgentPage() {
         {/* HERO */}
         <div className={styles.hero}>
           <div className={styles.heroEyebrow}>
-            🤖 Google Gemini 完全ガイド — 2026 年 5 月最新版 / Gemini CLI v0.34.0 / ADK 2.0 GA / A2A
+            🤖 Google Gemini 完全ガイド — 最新（2026年）/ Gemini CLI 最新版 / ADK 2.0 GA / A2A
             + AP2 + A2UI 対応
           </div>
           <h1>
@@ -286,7 +286,7 @@ export default function GeminiAgentPage() {
             まで ── Gemini エコシステムの全ファイルを体系的に解説します。
           </p>
           <div className={styles.heroChips}>
-            <span className={styles.heroChip}>Gemini CLI v0.34.0</span>
+            <span className={styles.heroChip}>Gemini CLI 最新版</span>
             <span className={styles.heroChip}>Gemini Code Assist</span>
             <span className={styles.heroChip}>ADK 2.0 GA (Python / TS / Go / Java)</span>
             <span className={styles.heroChip}>A2A / AP2 / A2UI / AG-UI</span>
