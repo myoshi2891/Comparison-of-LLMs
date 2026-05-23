@@ -58,7 +58,7 @@
 ```
 WebSearch で以下を確認してからプロンプトを実行する:
 - Anthropic / OpenAI / Google / AWS / DeepSeek / xAI の最新 API 価格変更
-- 新しく登場した主要 LLM モデル（gpt-5, gemini-3.x, claude-opus-5 等）
+- 新しく登場した主要 LLM モデル（年を併記）
 - USD/JPY レート（自動取得だが大幅変動時は手動確認）
 ```
 
