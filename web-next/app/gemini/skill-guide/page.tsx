@@ -1249,7 +1249,7 @@ export default function Page() {
                 <td className={styles.tdLeft} style={{ fontWeight: 700, color: "#6d28d9" }}>
                   Antigravity
                   <br />
-                  <span className={styles.textSlateLight}>v1.20.3</span>
+                  <span className={styles.textSlateLight}>v2.0.1</span>
                 </td>
                 <td className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}>
                   ~/.gemini/antigravity/skills/
