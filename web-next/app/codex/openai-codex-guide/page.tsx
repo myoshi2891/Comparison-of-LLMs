@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
-import styles from "./page.module.css";
+import type { Metadata } from 'next';
+import styles from './page.module.css';
 
 export const metadata: Metadata = {
-  title: "OpenAI Codex 完全ガイド 2026",
+  title: 'OpenAI Codex 完全ガイド 2026',
   description:
-    "初学者から中級者まで。AIコーディングエージェントを最大限に活かすベストプラクティスをステップバイステップで解説します。",
+    '2026-05-23 最新版 (v0.105.0)。初学者から中級者まで、GPT-5.4 を搭載した AI コーディングエージェントを最大限に活かすベストプラクティスをステップバイステップで解説します。',
 };
 
 /**
@@ -22,7 +22,7 @@ export default function Page() {
     <div className={styles.wrap}>
       {/* PAGE HEADER */}
       <header className={styles.pageHeader}>
-        <div className={styles.badge}>2026年3月 最新情報対応</div>
+        <div className={styles.badge}>2026年5月 最新情報対応</div>
         <h1 className={styles.h1}>
           <span className={styles.h1Line1}>OpenAI Codex</span>
           <span className={styles.h1Line2}>完全ガイド</span>
@@ -62,19 +62,19 @@ export default function Page() {
           </div>
 
           <div className={styles.card}>
-            <p style={{ color: "#94a3b8", fontSize: "15px", marginBottom: "20px" }}>
+            <p style={{ color: '#94a3b8', fontSize: '15px', marginBottom: '20px' }}>
               OpenAI Codex は、
-              <strong style={{ color: "#e2e8f0" }}>
+              <strong style={{ color: '#e2e8f0' }}>
                 ソフトウェア開発に特化したAIコーディングエージェント
               </strong>
-              です。2025年5月にクラウドエージェントとして登場し、2026年3月現在ではGPT-5.4を搭載した本番利用可能な開発インフラへと進化しています。単なるコード補完ではなく、
-              <em style={{ color: "#00d4ff" }}>リポジトリ全体を理解・操作できるエージェント</em>
+              です。2025年5月にクラウドエージェントとして登場し、2026年5月現在ではGPT-5.4を搭載した本番利用可能な開発インフラへと進化しています。単なるコード補完ではなく、
+              <em style={{ color: '#00d4ff' }}>リポジトリ全体を理解・操作できるエージェント</em>
               です。
             </p>
 
             <div className={styles.cardGrid}>
               <div className={styles.innerCard}>
-                <div className={styles.innerCardTitle} style={{ color: "#00d4ff" }}>
+                <div className={styles.innerCardTitle} style={{ color: '#00d4ff' }}>
                   ✦ できること
                 </div>
                 <ul className={styles.checklist}>
@@ -105,71 +105,72 @@ export default function Page() {
                 </ul>
               </div>
               <div className={styles.innerCard}>
-                <div className={styles.innerCardTitle} style={{ color: "#7c3aed" }}>
+                <div className={styles.innerCardTitle} style={{ color: '#7c3aed' }}>
                   ✦ 利用方法 (3経路)
                 </div>
                 <div style={{ margin: 0 }}>
                   <div
                     style={{
-                      display: "flex",
-                      gap: "10px",
-                      alignItems: "center",
-                      marginBottom: "10px",
+                      display: 'flex',
+                      gap: '10px',
+                      alignItems: 'center',
+                      marginBottom: '10px',
                     }}
                   >
-                    <span style={{ fontSize: "20px" }}>🌐</span>
+                    <span style={{ fontSize: '20px' }}>🌐</span>
                     <div>
                       <div
                         style={{
                           fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
-                          fontSize: "13px",
-                          color: "#e2e8f0",
+                          fontSize: '13px',
+                          color: '#e2e8f0',
                         }}
                       >
                         Codex App (Web/Cloud)
                       </div>
-                      <div style={{ fontSize: "12px", color: "#94a3b8" }}>
-                        ブラウザから並列タスク実行
+                      <div style={{ fontSize: '12px', color: '#94a3b8' }}>
+                        ブラウザから並列タスク実行。Goal Mode による長期目標の自律実行や Appshots
+                        によるプレビュー表示に対応。
                       </div>
                     </div>
                   </div>
                   <div
                     style={{
-                      display: "flex",
-                      gap: "10px",
-                      alignItems: "center",
-                      marginBottom: "10px",
+                      display: 'flex',
+                      gap: '10px',
+                      alignItems: 'center',
+                      marginBottom: '10px',
                     }}
                   >
-                    <span style={{ fontSize: "20px" }}>💻</span>
+                    <span style={{ fontSize: '20px' }}>💻</span>
                     <div>
                       <div
                         style={{
                           fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
-                          fontSize: "13px",
-                          color: "#e2e8f0",
+                          fontSize: '13px',
+                          color: '#e2e8f0',
                         }}
                       >
                         Codex CLI (Terminal)
                       </div>
-                      <div style={{ fontSize: "12px", color: "#94a3b8" }}>
+                      <div style={{ fontSize: '12px', color: '#94a3b8' }}>
                         ローカル環境でエージェント実行
                       </div>
                     </div>
                   </div>
-                  <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-                    <span style={{ fontSize: "20px" }}>🔧</span>
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                    <span style={{ fontSize: '20px' }}>🔧</span>
                     <div>
                       <div
                         style={{
                           fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
-                          fontSize: "13px",
-                          color: "#e2e8f0",
+                          fontSize: '13px',
+                          color: '#e2e8f0',
                         }}
                       >
                         IDE Extension
                       </div>
-                      <div style={{ fontSize: "12px", color: "#94a3b8" }}>VS Code等に統合</div>
+                      <div style={{ fontSize: '12px', color: '#94a3b8' }}>VS Code等に統合</div>
                     </div>
                   </div>
                 </div>
@@ -180,7 +181,7 @@ export default function Page() {
               <div className={styles.calloutIcon}>💡</div>
               <div>
                 <strong>プラン確認：</strong>
-                <ul style={{ marginTop: "8px", marginLeft: "20px", fontSize: "13px" }}>
+                <ul style={{ marginTop: '8px', marginLeft: '20px', fontSize: '13px' }}>
                   <li>
                     <strong>Plus:</strong> 週間リミットあり（例: 10〜25コードレビュー）
                   </li>
@@ -194,7 +195,7 @@ export default function Page() {
                     <strong>Enterprise:</strong> クレジットベースの利用（無制限利用の保証なし）
                   </li>
                 </ul>
-                <div style={{ marginTop: "8px", fontSize: "13px" }}>
+                <div style={{ marginTop: '8px', fontSize: '13px' }}>
                   ※ 上限超過時のAPI利用は、OpenAI APIレートやクレジット課金に従います。
                 </div>
               </div>
@@ -223,7 +224,7 @@ export default function Page() {
                 <div className={styles.flowDesc}>
                   Codex CLI は npm 経由でインストールします。まず Node.js が入っているか確認。
                 </div>
-                <div className={styles.codeWrap} style={{ marginTop: "12px" }}>
+                <div className={styles.codeWrap} style={{ marginTop: '12px' }}>
                   <div className={styles.codeHeader}>
                     <div className={styles.codeDots}>
                       <div className={`${styles.codeDot} ${styles.codeDotR}`} />
@@ -234,7 +235,7 @@ export default function Page() {
                   </div>
                   <pre className={styles.codeBody}>
                     <span className={styles.cm}># バージョン確認 (v18以上推奨)</span>
-                    {"\n"}node --version{"\n"}npm --version
+                    {'\n'}node --version{'\n'}npm --version
                   </pre>
                 </div>
               </div>
@@ -250,7 +251,7 @@ export default function Page() {
                 <div className={styles.flowDesc}>
                   npm でグローバルインストールします。macOS/Linux で動作。Windows は WSL 推奨。
                 </div>
-                <div className={styles.codeWrap} style={{ marginTop: "12px" }}>
+                <div className={styles.codeWrap} style={{ marginTop: '12px' }}>
                   <div className={styles.codeHeader}>
                     <div className={styles.codeDots}>
                       <div className={`${styles.codeDot} ${styles.codeDotR}`} />
@@ -261,11 +262,11 @@ export default function Page() {
                   </div>
                   <pre className={styles.codeBody}>
                     <span className={styles.cm}># グローバルインストール</span>
-                    {"\n"}
-                    <span className={styles.fn}>npm</span> install{" "}
-                    <span className={styles.op}>-g</span> @openai/codex{"\n\n"}
+                    {'\n'}
+                    <span className={styles.fn}>npm</span> install{' '}
+                    <span className={styles.op}>-g</span> @openai/codex{'\n\n'}
                     <span className={styles.cm}># または npx で直接実行 (インストール不要)</span>
-                    {"\n"}
+                    {'\n'}
                     <span className={styles.fn}>npx</span> @openai/codex
                   </pre>
                 </div>
@@ -282,7 +283,7 @@ export default function Page() {
                 <div className={styles.flowDesc}>
                   初回起動時に ChatGPT アカウントまたは API キーで認証します。
                 </div>
-                <div className={styles.codeWrap} style={{ marginTop: "12px" }}>
+                <div className={styles.codeWrap} style={{ marginTop: '12px' }}>
                   <div className={styles.codeHeader}>
                     <div className={styles.codeDots}>
                       <div className={`${styles.codeDot} ${styles.codeDotR}`} />
@@ -295,15 +296,15 @@ export default function Page() {
                     <span className={styles.cm}>
                       # ターミナルを開いて実行 → ブラウザでサインインを促される
                     </span>
-                    {"\n"}
+                    {'\n'}
                     <span className={styles.fn}>codex</span>
-                    {"\n\n"}
+                    {'\n\n'}
                     <span className={styles.cm}># API キーで使う場合</span>
-                    {"\n"}
-                    <span className={styles.kw}>export</span>{" "}
+                    {'\n'}
+                    <span className={styles.kw}>export</span>{' '}
                     <span className={styles.op}>OPENAI_API_KEY</span>=
                     <span className={styles.str}>&quot;sk-...&quot;</span>
-                    {"\n"}
+                    {'\n'}
                     <span className={styles.fn}>codex</span>
                   </pre>
                 </div>
@@ -319,7 +320,7 @@ export default function Page() {
                 <div className={styles.flowDesc}>
                   定期的にリリースがあるので最新版を保つことが重要です。
                 </div>
-                <div className={styles.codeWrap} style={{ marginTop: "12px" }}>
+                <div className={styles.codeWrap} style={{ marginTop: '12px' }}>
                   <div className={styles.codeHeader}>
                     <div className={styles.codeDots}>
                       <div className={`${styles.codeDot} ${styles.codeDotR}`} />
@@ -330,8 +331,8 @@ export default function Page() {
                   </div>
                   <pre className={styles.codeBody}>
                     <span className={styles.cm}># 最新版に更新</span>
-                    {"\n"}
-                    <span className={styles.fn}>npm</span> update{" "}
+                    {'\n'}
+                    <span className={styles.fn}>npm</span> update{' '}
                     <span className={styles.op}>-g</span> @openai/codex
                   </pre>
                 </div>
@@ -347,9 +348,9 @@ export default function Page() {
               <code
                 style={{
                   fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
-                  background: "rgba(255,255,255,0.1)",
-                  padding: "2px 6px",
-                  borderRadius: "4px",
+                  background: 'rgba(255,255,255,0.1)',
+                  padding: '2px 6px',
+                  borderRadius: '4px',
                 }}
               >
                 WSL (Windows Subsystem for Linux)
@@ -369,8 +370,8 @@ export default function Page() {
             </div>
           </div>
 
-          <p style={{ color: "#94a3b8", fontSize: "14px", marginBottom: "20px" }}>
-            2026年3月現在、代表的な推奨モデルは以下です。適切なモデル選択がコスト効率と品質に直結します。注:
+          <p style={{ color: '#94a3b8', fontSize: '14px', marginBottom: '20px' }}>
+            2026年5月現在、代表的な推奨モデルは以下です。適切なモデル選択がコスト効率と品質に直結します。注:
             表示は主要な推奨モデルの例であり、他の利用可能なモデルも存在します。
           </p>
 
@@ -378,10 +379,10 @@ export default function Page() {
             <div className={`${styles.modelCard} ${styles.modelCardRecommended}`}>
               <div
                 style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                  marginBottom: "6px",
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                  marginBottom: '6px',
                 }}
               >
                 <div className={styles.modelName}>gpt-5.4</div>
@@ -415,13 +416,13 @@ export default function Page() {
             </div>
           </div>
 
-          <div className={styles.card} style={{ marginTop: "16px" }}>
+          <div className={styles.card} style={{ marginTop: '16px' }}>
             <div
               style={{
                 fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
-                fontSize: "13px",
-                color: "#00d4ff",
-                marginBottom: "12px",
+                fontSize: '13px',
+                color: '#00d4ff',
+                marginBottom: '12px',
               }}
             >
               モデルの切り替え方法
@@ -437,20 +438,20 @@ export default function Page() {
               </div>
               <pre className={styles.codeBody}>
                 <span className={styles.cm}># CLI起動時にモデル指定</span>
-                {"\n"}
-                <span className={styles.fn}>codex</span> <span className={styles.op}>-m</span>{" "}
-                gpt-5.4{"\n\n"}
+                {'\n'}
+                <span className={styles.fn}>codex</span> <span className={styles.op}>-m</span>{' '}
+                gpt-5.4{'\n\n'}
                 <span className={styles.cm}># 実行中に /model コマンドで切り替え</span>
-                {"\n"}
-                <span className={styles.op}>/model</span> gpt-5.4-mini{"\n\n"}
+                {'\n'}
+                <span className={styles.op}>/model</span> gpt-5.4-mini{'\n\n'}
                 <span className={styles.cm}># config.toml で永続設定 (~/.codex/config.toml)</span>
-                {"\n"}
-                <span className={styles.fn}>model</span> ={" "}
+                {'\n'}
+                <span className={styles.fn}>model</span> ={' '}
                 <span className={styles.str}>&quot;gpt-5.4&quot;</span>
-                {"\n"}
+                {'\n'}
                 <span className={styles.cm}># オプション: レビュー専用モデル</span>
-                {"\n"}
-                <span className={styles.fn}>review_model</span> ={" "}
+                {'\n'}
+                <span className={styles.fn}>review_model</span> ={' '}
                 <span className={styles.str}>&quot;gpt-5.4-mini&quot;</span>
               </pre>
             </div>
@@ -491,13 +492,13 @@ export default function Page() {
             </div>
           </div>
 
-          <div className={styles.card} style={{ marginTop: "16px" }}>
+          <div className={styles.card} style={{ marginTop: '16px' }}>
             <div
               style={{
                 fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
-                fontSize: "13px",
-                color: "#00d4ff",
-                marginBottom: "16px",
+                fontSize: '13px',
+                color: '#00d4ff',
+                marginBottom: '16px',
               }}
             >
               ✦ 良いプロンプトの4要素（公式ガイドより）
@@ -505,7 +506,7 @@ export default function Page() {
             <div className={styles.cardGrid}>
               <div className={styles.guideCard}>
                 <div className={styles.guideIcon}>🎯</div>
-                <div className={styles.guideTitle} style={{ color: "#00d4ff" }}>
+                <div className={styles.guideTitle} style={{ color: '#00d4ff' }}>
                   1. コンテキスト (Context)
                 </div>
                 <div className={styles.guideBody}>
@@ -516,7 +517,7 @@ export default function Page() {
               </div>
               <div className={styles.guideCard}>
                 <div className={styles.guideIcon}>📋</div>
-                <div className={styles.guideTitle} style={{ color: "#7c3aed" }}>
+                <div className={styles.guideTitle} style={{ color: '#7c3aed' }}>
                   2. タスク (Task)
                 </div>
                 <div className={styles.guideBody}>
@@ -525,7 +526,7 @@ export default function Page() {
               </div>
               <div className={styles.guideCard}>
                 <div className={styles.guideIcon}>✅</div>
-                <div className={styles.guideTitle} style={{ color: "#10b981" }}>
+                <div className={styles.guideTitle} style={{ color: '#10b981' }}>
                   3. 完了条件 (Done criteria)
                 </div>
                 <div className={styles.guideBody}>
@@ -534,7 +535,7 @@ export default function Page() {
               </div>
               <div className={styles.guideCard}>
                 <div className={styles.guideIcon}>🚧</div>
-                <div className={styles.guideTitle} style={{ color: "#f59e0b" }}>
+                <div className={styles.guideTitle} style={{ color: '#f59e0b' }}>
                   4. 制約 (Constraints)
                 </div>
                 <div className={styles.guideBody}>
@@ -548,9 +549,9 @@ export default function Page() {
             <div
               style={{
                 fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
-                fontSize: "13px",
-                color: "#00d4ff",
-                marginBottom: "12px",
+                fontSize: '13px',
+                color: '#00d4ff',
+                marginBottom: '12px',
               }}
             >
               ✦ 悪い例 vs 良い例
@@ -563,7 +564,7 @@ export default function Page() {
                     <th>✅ 良い例</th>
                   </tr>
                   <tr>
-                    <td style={{ color: "#ef4444" }}>「バグを直して」</td>
+                    <td style={{ color: '#ef4444' }}>「バグを直して」</td>
                     <td>
                       「
                       <code style={{ fontFamily: "var(--font-mono,'JetBrains Mono',monospace)" }}>
@@ -574,7 +575,7 @@ export default function Page() {
                     </td>
                   </tr>
                   <tr>
-                    <td style={{ color: "#ef4444" }}>「テスト書いて」</td>
+                    <td style={{ color: '#ef4444' }}>「テスト書いて」</td>
                     <td>
                       「
                       <code style={{ fontFamily: "var(--font-mono,'JetBrains Mono',monospace)" }}>
@@ -589,7 +590,7 @@ export default function Page() {
                     </td>
                   </tr>
                   <tr>
-                    <td style={{ color: "#ef4444" }}>「レスポンシブにして」</td>
+                    <td style={{ color: '#ef4444' }}>「レスポンシブにして」</td>
                     <td>
                       「
                       <code style={{ fontFamily: "var(--font-mono,'JetBrains Mono',monospace)" }}>
@@ -615,23 +616,23 @@ export default function Page() {
             </div>
             <pre className={styles.codeBody}>
               <span className={styles.cm}># コンテキスト</span>
-              {"\n"}
-              <span className={styles.str}>@src/api/users.ts</span> と{" "}
-              <span className={styles.str}>@src/types/user.ts</span> を参照してください。{"\n"}
-              {"Node.js + Express + TypeScript プロジェクトです。\n\n"}
+              {'\n'}
+              <span className={styles.str}>@src/api/users.ts</span> と{' '}
+              <span className={styles.str}>@src/types/user.ts</span> を参照してください。{'\n'}
+              {'Node.js + Express + TypeScript プロジェクトです。\n\n'}
               <span className={styles.cm}># タスク</span>
-              {"\n"}
+              {'\n'}
               {
-                "ユーザー作成エンドポイント (POST /api/users) に\nメールアドレスの重複チェックを追加してください。\n\n"
+                'ユーザー作成エンドポイント (POST /api/users) に\nメールアドレスの重複チェックを追加してください。\n\n'
               }
               <span className={styles.cm}># 完了条件</span>
-              {"\n"}
-              {"- 重複時は 409 Conflict を返す\n- "}
+              {'\n'}
+              {'- 重複時は 409 Conflict を返す\n- '}
               <span className={styles.fn}>npm test</span>
-              {" が通ること\n\n"}
+              {' が通ること\n\n'}
               <span className={styles.cm}># 制約</span>
-              {"\n"}
-              {"- データベーススキーマは変更しない\n- 新しい依存パッケージを追加しない"}
+              {'\n'}
+              {'- データベーススキーマは変更しない\n- 新しい依存パッケージを追加しない'}
             </pre>
           </div>
         </section>
@@ -649,74 +650,74 @@ export default function Page() {
           </div>
 
           <div className={styles.card}>
-            <p style={{ fontSize: "14px", color: "#94a3b8", marginBottom: "20px" }}>
-              <strong style={{ color: "#e2e8f0" }}>AGENTS.md</strong> は README.md
+            <p style={{ fontSize: '14px', color: '#94a3b8', marginBottom: '20px' }}>
+              <strong style={{ color: '#e2e8f0' }}>AGENTS.md</strong> は README.md
               のようなテキストファイルです。リポジトリのルートや特定ディレクトリに配置することで、Codex
               がタスク開始前に自動的に読み込みます。「毎回プロンプトに書くルール」を一度定義すれば、以後すべてのタスクに適用されます。
             </p>
 
             <div
               style={{
-                background: "#131c35",
-                borderRadius: "10px",
-                padding: "16px",
-                marginBottom: "16px",
-                border: "1px solid rgba(0,212,255,0.15)",
+                background: '#131c35',
+                borderRadius: '10px',
+                padding: '16px',
+                marginBottom: '16px',
+                border: '1px solid rgba(0,212,255,0.15)',
               }}
             >
               <div
                 style={{
                   fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
-                  fontSize: "12px",
-                  color: "#64748b",
-                  marginBottom: "8px",
+                  fontSize: '12px',
+                  color: '#64748b',
+                  marginBottom: '8px',
                 }}
               >
                 読み込み優先順位（高 → 低）
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                   <span
                     style={{
                       fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
-                      fontSize: "12px",
-                      color: "#00d4ff",
-                      minWidth: "200px",
+                      fontSize: '12px',
+                      color: '#00d4ff',
+                      minWidth: '200px',
                     }}
                   >
                     ~/.codex/AGENTS.override.md
                     <br />
                     または ~/.codex/AGENTS.md
                   </span>
-                  <span style={{ fontSize: "12px", color: "#94a3b8" }}>
+                  <span style={{ fontSize: '12px', color: '#94a3b8' }}>
                     グローバル設定（override 優先）
                   </span>
                 </div>
-                <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                   <span
                     style={{
                       fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
-                      fontSize: "12px",
-                      color: "#10b981",
-                      minWidth: "200px",
+                      fontSize: '12px',
+                      color: '#10b981',
+                      minWidth: '200px',
                     }}
                   >
                     /repo-root/AGENTS.md
                   </span>
-                  <span style={{ fontSize: "12px", color: "#94a3b8" }}>プロジェクト共通設定</span>
+                  <span style={{ fontSize: '12px', color: '#94a3b8' }}>プロジェクト共通設定</span>
                 </div>
-                <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                   <span
                     style={{
                       fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
-                      fontSize: "12px",
-                      color: "#f59e0b",
-                      minWidth: "200px",
+                      fontSize: '12px',
+                      color: '#f59e0b',
+                      minWidth: '200px',
                     }}
                   >
                     /subdir/AGENTS.override.md
                   </span>
-                  <span style={{ fontSize: "12px", color: "#94a3b8" }}>
+                  <span style={{ fontSize: '12px', color: '#94a3b8' }}>
                     サブディレクトリ固有ルール
                   </span>
                 </div>
@@ -735,36 +736,36 @@ export default function Page() {
             </div>
             <pre className={styles.codeBody}>
               <span className={styles.cm}># AGENTS.md</span>
-              {"\n\n"}
+              {'\n\n'}
               <span className={styles.cm}>## プロジェクト概要</span>
-              {"\n"}
-              {"- Node.js + Express + TypeScript の REST API\n"}
-              {"- データベース: PostgreSQL (Prisma ORM)\n"}
-              {"- テストフレームワーク: Jest\n\n"}
+              {'\n'}
+              {'- Node.js + Express + TypeScript の REST API\n'}
+              {'- データベース: PostgreSQL (Prisma ORM)\n'}
+              {'- テストフレームワーク: Jest\n\n'}
               <span className={styles.cm}>## コーディング規約</span>
-              {"\n"}
-              {"- コメントは日本語で記述すること\n"}
-              {"- 関数の引数が3つ以上の場合はオブジェクト型を使う\n"}
+              {'\n'}
+              {'- コメントは日本語で記述すること\n'}
+              {'- 関数の引数が3つ以上の場合はオブジェクト型を使う\n'}
               <span className={styles.hl}>- any 型は使用禁止。unknown を使うこと</span>
-              {"\n"}
-              {"- エラーハンドリングは必ず Result 型でラップする\n\n"}
+              {'\n'}
+              {'- エラーハンドリングは必ず Result 型でラップする\n\n'}
               <span className={styles.cm}>## テスト・ビルドコマンド</span>
-              {"\n"}
-              {"- テスト実行: "}
-              <span className={styles.str}>{"`npm test`"}</span>
-              {"\n"}
-              {"- Lint チェック: "}
-              <span className={styles.str}>{"`npm run lint`"}</span>
-              {"\n"}
-              {"- ビルド: "}
-              <span className={styles.str}>{"`npm run build`"}</span>
-              {"\n"}
-              {"- ⚠️ PRを開く前に必ず lint を実行すること\n\n"}
+              {'\n'}
+              {'- テスト実行: '}
+              <span className={styles.str}>{'`npm test`'}</span>
+              {'\n'}
+              {'- Lint チェック: '}
+              <span className={styles.str}>{'`npm run lint`'}</span>
+              {'\n'}
+              {'- ビルド: '}
+              <span className={styles.str}>{'`npm run build`'}</span>
+              {'\n'}
+              {'- ⚠️ PRを開く前に必ず lint を実行すること\n\n'}
               <span className={styles.cm}>## 禁止事項</span>
-              {"\n"}
-              {"- package.json への新規依存追加は確認を取ること\n"}
-              {"- データベースのスキーマ変更は migration ファイルを作成すること\n"}
-              {"- console.log のコミットは禁止（logger を使うこと）"}
+              {'\n'}
+              {'- package.json への新規依存追加は確認を取ること\n'}
+              {'- データベースのスキーマ変更は migration ファイルを作成すること\n'}
+              {'- console.log のコミットは禁止（logger を使うこと）'}
             </pre>
           </div>
 
@@ -779,14 +780,14 @@ export default function Page() {
             </div>
             <pre className={styles.codeBody}>
               <span className={styles.cm}># services/payments/AGENTS.override.md</span>
-              {"\n"}
+              {'\n'}
               <span className={styles.cm}>## Payments サービス固有ルール</span>
-              {"\n"}
-              {"- テストコマンド: "}
-              <span className={styles.str}>{"`make test-payments`"}</span>
-              {" (npm test ではなく)\n"}
-              {"- API キーのローテーション時は必ずセキュリティチャンネルに通知\n"}
-              {"- PCI-DSS 準拠のため、カード情報はログに出力しないこと"}
+              {'\n'}
+              {'- テストコマンド: '}
+              <span className={styles.str}>{'`make test-payments`'}</span>
+              {' (npm test ではなく)\n'}
+              {'- API キーのローテーション時は必ずセキュリティチャンネルに通知\n'}
+              {'- PCI-DSS 準拠のため、カード情報はログに出力しないこと'}
             </pre>
           </div>
 
@@ -814,14 +815,14 @@ export default function Page() {
             <div
               style={{
                 fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
-                fontSize: "13px",
-                color: "#00d4ff",
-                marginBottom: "16px",
+                fontSize: '13px',
+                color: '#00d4ff',
+                marginBottom: '16px',
               }}
             >
               ✦ プロが実践するモーニングルーティン
             </div>
-            <p style={{ fontSize: "14px", color: "#94a3b8", marginBottom: "16px" }}>
+            <p style={{ fontSize: '14px', color: '#94a3b8', marginBottom: '16px' }}>
               WorkOS のエンジニアチームが実践する方法：朝のコーヒーを飲む前に、3〜5個のタスクを
               Codex に並列実行させる。コーヒーを飲み終わる頃にはレビュー待ちのPRが積まれている。
             </p>
@@ -835,33 +836,35 @@ export default function Page() {
                 <div className={styles.codeLang}>bash — 朝のバッチタスク例</div>
               </div>
               <pre className={styles.codeBody}>
-                <span className={styles.cm}># タスク1: TypeScript エラー修正</span>
-                {"\n"}
-                <span className={styles.fn}>codex</span>{" "}
+                <span className={styles.cm}>
+                  # タスク1: Goal Mode による自律的な TypeScript エラー修正
+                </span>
+                {'\n'}
+                <span className={styles.fn}>codex</span> <span className={styles.op}>--goal</span>{' '}
                 <span className={styles.str}>
                   &quot;@src/onboarding/validator.ts の TypeScript
                   エラーをすべて修正して。型安全性を保つこと&quot;
-                </span>{" "}
-                &amp;{"\n\n"}
+                </span>{' '}
+                &amp;{'\n\n'}
                 <span className={styles.cm}># タスク2: スキーマ更新対応</span>
-                {"\n"}
-                <span className={styles.fn}>codex</span>{" "}
+                {'\n'}
+                <span className={styles.fn}>codex</span>{' '}
                 <span className={styles.str}>
                   &quot;@api/webhooks.ts を新しいイベントスキーマに対応させて。@docs/schema-v2.md
                   を参照&quot;
-                </span>{" "}
-                &amp;{"\n\n"}
+                </span>{' '}
+                &amp;{'\n\n'}
                 <span className={styles.cm}># タスク3: テストカバレッジ向上</span>
-                {"\n"}
-                <span className={styles.fn}>codex</span>{" "}
+                {'\n'}
+                <span className={styles.fn}>codex</span>{' '}
                 <span className={styles.str}>
                   &quot;@src/components/AdminDashboard.tsx のエラーバウンダリを改善して&quot;
-                </span>{" "}
-                &amp;{"\n\n"}
+                </span>{' '}
+                &amp;{'\n\n'}
                 <span className={styles.cm}>
                   # ↑ 全てのバックグラウンドプロセスの完了を待機する
                 </span>
-                {"\n"}wait
+                {'\n'}wait
               </pre>
             </div>
           </div>
@@ -870,9 +873,9 @@ export default function Page() {
             <div
               style={{
                 fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
-                fontSize: "13px",
-                color: "#00d4ff",
-                marginBottom: "12px",
+                fontSize: '13px',
+                color: '#00d4ff',
+                marginBottom: '12px',
               }}
             >
               ✦ Approval モード（安全設定）の理解
@@ -897,10 +900,10 @@ export default function Page() {
                       <br />
                       <code style={{ fontFamily: "var(--font-mono,'JetBrains Mono',monospace)" }}>
                         --sandbox read-only
-                      </code>{" "}
+                      </code>{' '}
                       (推奨)
                     </td>
-                    <td style={{ color: "#94a3b8" }}>
+                    <td style={{ color: '#94a3b8' }}>
                       すべての操作を毎回確認（既知の安全な読み取り操作を除く）。適切な sandbox
                       と組み合わせて使用。
                     </td>
@@ -917,14 +920,14 @@ export default function Page() {
                       <br />
                       <code style={{ fontFamily: "var(--font-mono,'JetBrains Mono',monospace)" }}>
                         --sandbox workspace-write
-                      </code>{" "}
+                      </code>{' '}
                       (推奨)
                       <br />
-                      <span style={{ fontSize: "11px", color: "#64748b" }}>
+                      <span style={{ fontSize: '11px', color: '#64748b' }}>
                         ※ --full-auto の実態
                       </span>
                     </td>
-                    <td style={{ color: "#94a3b8" }}>
+                    <td style={{ color: '#94a3b8' }}>
                       ワークスペース内書き込みは許可、外部操作・ネットワークは確認。
                     </td>
                     <td>日常的な開発作業</td>
@@ -938,13 +941,13 @@ export default function Page() {
                         --ask-for-approval never
                       </code>
                       <br />
-                      <span style={{ fontSize: "11px", color: "#64748b" }}>
+                      <span style={{ fontSize: '11px', color: '#64748b' }}>
                         ※ 任意の sandbox と併用可能
                       </span>
                     </td>
-                    <td style={{ color: "#94a3b8" }}>
-                      承認プロンプトをスキップ。完全なバイパスには別途{" "}
-                      <code style={{ fontSize: "11px" }}>--sandbox danger-full-access</code>{" "}
+                    <td style={{ color: '#94a3b8' }}>
+                      承認プロンプトをスキップ。完全なバイパスには別途{' '}
+                      <code style={{ fontSize: '11px' }}>--sandbox danger-full-access</code>{' '}
                       が必要。
                     </td>
                     <td>CI/CD・信頼済みワークフロー</td>
@@ -958,14 +961,14 @@ export default function Page() {
             <div
               style={{
                 fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
-                fontSize: "13px",
-                color: "#00d4ff",
-                marginBottom: "12px",
+                fontSize: '13px',
+                color: '#00d4ff',
+                marginBottom: '12px',
               }}
             >
               ✦ コードレビューを Codex に任せる
             </div>
-            <p style={{ fontSize: "14px", color: "#94a3b8", marginBottom: "16px" }}>
+            <p style={{ fontSize: '14px', color: '#94a3b8', marginBottom: '16px' }}>
               コードレビューは対話モード（スラッシュコマンド）で行う方法と、ワンショットの CLI
               コマンド（自動化向け）で行う方法があります。
             </p>
@@ -980,11 +983,11 @@ export default function Page() {
               </div>
               <pre className={styles.codeBody}>
                 <span className={styles.cm}># インタラクティブセッション内で実行</span>
-                {"\n"}
+                {'\n'}
                 <span className={styles.op}>/review</span>
               </pre>
             </div>
-            <div className={styles.codeWrap} style={{ marginTop: "16px" }}>
+            <div className={styles.codeWrap} style={{ marginTop: '16px' }}>
               <div className={styles.codeHeader}>
                 <div className={styles.codeDots}>
                   <div className={`${styles.codeDot} ${styles.codeDotR}`} />
@@ -995,8 +998,8 @@ export default function Page() {
               </div>
               <pre className={styles.codeBody}>
                 <span className={styles.cm}># CIやスクリプトで一括実行</span>
-                {"\n"}
-                <span className={styles.fn}>codex</span> exec{" "}
+                {'\n'}
+                <span className={styles.fn}>codex</span> exec{' '}
                 <span className={styles.str}>
                   &quot;git diff HEAD~1
                   をレビューして、潜在的なバグとセキュリティ問題を報告して&quot;
@@ -1019,39 +1022,39 @@ export default function Page() {
           <div className={styles.cardGrid}>
             <div className={styles.card}>
               <div
-                style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}
+                style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}
               >
-                <span style={{ fontSize: "24px" }}>🔌</span>
+                <span style={{ fontSize: '24px' }}>🔌</span>
                 <div>
                   <div
                     style={{
                       fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
-                      fontSize: "14px",
-                      color: "#00d4ff",
+                      fontSize: '14px',
+                      color: '#00d4ff',
                     }}
                   >
                     MCP連携
                   </div>
-                  <div style={{ fontSize: "12px", color: "#64748b" }}>Model Context Protocol</div>
+                  <div style={{ fontSize: '12px', color: '#64748b' }}>Model Context Protocol</div>
                 </div>
               </div>
-              <p style={{ fontSize: "13px", color: "#94a3b8", marginBottom: "12px" }}>
+              <p style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '12px' }}>
                 外部ツール（GitHub, Slack, Jira
                 など）をCodexに接続。コードと外部サービスをシームレスに連携できます。
               </p>
               <div className={styles.codeWrap}>
-                <pre className={styles.codeBody} style={{ fontSize: "12px" }}>
+                <pre className={styles.codeBody} style={{ fontSize: '12px' }}>
                   <span className={styles.cm}># config.toml でMCPサーバーを設定</span>
-                  {"\n"}
+                  {'\n'}
                   <span className={styles.pn}>[</span>
                   <span className={styles.kw}>mcp_servers.github</span>
                   <span className={styles.pn}>]</span>
-                  {"\n"}
-                  <span className={styles.fn}>command</span> ={" "}
+                  {'\n'}
+                  <span className={styles.fn}>command</span> ={' '}
                   <span className={styles.str}>&quot;npx&quot;</span>
-                  {"\n"}
+                  {'\n'}
                   <span className={styles.fn}>args</span> = <span className={styles.pn}>[</span>
-                  <span className={styles.str}>&quot;-y&quot;</span>,{" "}
+                  <span className={styles.str}>&quot;-y&quot;</span>,{' '}
                   <span className={styles.str}>
                     &quot;@modelcontextprotocol/server-github&quot;
                   </span>
@@ -1062,38 +1065,38 @@ export default function Page() {
 
             <div className={styles.card}>
               <div
-                style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}
+                style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}
               >
-                <span style={{ fontSize: "24px" }}>⚡</span>
+                <span style={{ fontSize: '24px' }}>⚡</span>
                 <div>
                   <div
                     style={{
                       fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
-                      fontSize: "14px",
-                      color: "#7c3aed",
+                      fontSize: '14px',
+                      color: '#7c3aed',
                     }}
                   >
                     Skills（スキル）
                   </div>
-                  <div style={{ fontSize: "12px", color: "#64748b" }}>
+                  <div style={{ fontSize: '12px', color: '#64748b' }}>
                     繰り返しワークフローを定義
                   </div>
                 </div>
               </div>
-              <p style={{ fontSize: "13px", color: "#94a3b8", marginBottom: "12px" }}>
+              <p style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '12px' }}>
                 繰り返し実行するワークフローをスキルとして定義。チームで共有することでオンボーディングも効率化。
               </p>
               <div className={styles.codeWrap}>
-                <pre className={styles.codeBody} style={{ fontSize: "12px" }}>
+                <pre className={styles.codeBody} style={{ fontSize: '12px' }}>
                   <span className={styles.cm}># ~/.agents/skills/add-tests/SKILL.md</span>
-                  {"\n"}
+                  {'\n'}
                   {
-                    "---\nname: add-tests\ndescription: 指定ファイルのユニットテストを追加する\n---\n"
+                    '---\nname: add-tests\ndescription: 指定ファイルのユニットテストを追加する\n---\n'
                   }
                   <span className={styles.kw}>## 手順</span>
-                  {"\n"}
+                  {'\n'}
                   {
-                    "1. 既存テストのパターンを確認\n2. 境界値・エラーケースを網羅\n3. npm test で確認"
+                    '1. 既存テストのパターンを確認\n2. 境界値・エラーケースを網羅\n3. npm test で確認'
                   }
                 </pre>
               </div>
@@ -1101,83 +1104,88 @@ export default function Page() {
 
             <div className={styles.card}>
               <div
-                style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}
+                style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}
               >
-                <span style={{ fontSize: "24px" }}>🤖</span>
+                <span style={{ fontSize: '24px' }}>🤖</span>
                 <div>
                   <div
                     style={{
                       fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
-                      fontSize: "14px",
-                      color: "#10b981",
+                      fontSize: '14px',
+                      color: '#10b981',
                     }}
                   >
-                    Automations
+                    Goal Mode & Automations
                   </div>
-                  <div style={{ fontSize: "12px", color: "#64748b" }}>
-                    定期実行・スケジューリング
+                  <div style={{ fontSize: '12px', color: '#64748b' }}>
+                    自律タスク実行・スケジューリング
                   </div>
                 </div>
               </div>
-              <p style={{ fontSize: "13px", color: "#94a3b8", marginBottom: "12px" }}>
-                Codex
-                Appの「Automations」タブで定期実行を設定。CHANGELOG更新・依存関係チェックなどを自動化できます。
+              <p style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '12px' }}>
+                2026年5月リリースの Goal Mode では、CLI や Web
+                から長期目標を指定して自律的にチェックポイント管理しながらタスクを実行できます。また、Automations
+                タブで定期実行も可能です。
               </p>
               <div
                 className={`${styles.callout} ${styles.calloutTip}`}
-                style={{ margin: 0, padding: "12px" }}
+                style={{ margin: 0, padding: '12px' }}
               >
                 <div className={styles.calloutIcon}>💡</div>
-                <div style={{ fontSize: "12px" }}>
-                  Skills = 方法を定義、Automations = スケジュールを定義、という分担が最適です。
+                <div style={{ fontSize: '12px' }}>
+                  CLI では{' '}
+                  <code style={{ fontFamily: "var(--font-mono,'JetBrains Mono',monospace)" }}>
+                    codex --goal &quot;目標&quot;
+                  </code>{' '}
+                  で Goal Mode を起動できます。
                 </div>
               </div>
             </div>
 
             <div className={styles.card}>
               <div
-                style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}
+                style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}
               >
-                <span style={{ fontSize: "24px" }}>🖼️</span>
+                <span style={{ fontSize: '24px' }}>🖼️</span>
                 <div>
                   <div
                     style={{
                       fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
-                      fontSize: "14px",
-                      color: "#f59e0b",
+                      fontSize: '14px',
+                      color: '#f59e0b',
                     }}
                   >
-                    画像入力
+                    画像入力 & Appshots
                   </div>
-                  <div style={{ fontSize: "12px", color: "#64748b" }}>
-                    スクリーンショット・デザインから実装
+                  <div style={{ fontSize: '12px', color: '#64748b' }}>
+                    モック画像入力とUIプレビュー共有
                   </div>
                 </div>
               </div>
-              <p style={{ fontSize: "13px", color: "#94a3b8", marginBottom: "12px" }}>
-                UI
-                のスクリーンショットやデザインモックを入力として渡すと、それをベースにコードを生成できます。
+              <p style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '12px' }}>
+                UI のモック画像からコードを生成するだけでなく、最新の Appshots
+                機能により、生成されたフロントエンドのUIプレビューを瞬時にスナップショット共有できます。
               </p>
               <div className={styles.codeWrap}>
-                <pre className={styles.codeBody} style={{ fontSize: "12px" }}>
+                <pre className={styles.codeBody} style={{ fontSize: '12px' }}>
                   <span className={styles.cm}># 画像を添付してプロンプト実行</span>
-                  {"\n"}
-                  <span className={styles.fn}>codex</span>{" "}
-                  <span className={styles.str}>&quot;このデザインを実装して&quot;</span> \{"\n"}
-                  {"  "}
+                  {'\n'}
+                  <span className={styles.fn}>codex</span>{' '}
+                  <span className={styles.str}>&quot;このデザインを実装して&quot;</span> \{'\n'}
+                  {'  '}
                   <span className={styles.op}>-i</span> ./mockup.png
                 </pre>
               </div>
             </div>
           </div>
 
-          <div className={styles.card} style={{ marginTop: "0" }}>
+          <div className={styles.card} style={{ marginTop: '0' }}>
             <div
               style={{
                 fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
-                fontSize: "13px",
-                color: "#00d4ff",
-                marginBottom: "12px",
+                fontSize: '13px',
+                color: '#00d4ff',
+                marginBottom: '12px',
               }}
             >
               ✦ CI/CD での自動化例（GitHub Actions）
@@ -1194,38 +1202,38 @@ export default function Page() {
               <pre className={styles.codeBody}>
                 <span className={styles.fn}>jobs</span>
                 <span className={styles.pn}>:</span>
-                {"\n  "}
+                {'\n  '}
                 <span className={styles.fn}>update_changelog</span>
                 <span className={styles.pn}>:</span>
-                {"\n    "}
+                {'\n    '}
                 <span className={styles.fn}>runs-on</span>
-                <span className={styles.pn}>:</span>{" "}
+                <span className={styles.pn}>:</span>{' '}
                 <span className={styles.str}>ubuntu-latest</span>
-                {"\n    "}
+                {'\n    '}
                 <span className={styles.fn}>steps</span>
                 <span className={styles.pn}>:</span>
-                {"\n      "}
+                {'\n      '}
                 <span className={styles.pn}>-</span> <span className={styles.fn}>uses</span>
-                <span className={styles.pn}>:</span>{" "}
+                <span className={styles.pn}>:</span>{' '}
                 <span className={styles.str}>actions/checkout@v4</span>
-                {"\n      "}
+                {'\n      '}
                 <span className={styles.pn}>-</span> <span className={styles.fn}>name</span>
-                <span className={styles.pn}>:</span>{" "}
+                <span className={styles.pn}>:</span>{' '}
                 <span className={styles.str}>Update CHANGELOG via Codex</span>
-                {"\n        "}
+                {'\n        '}
                 <span className={styles.fn}>run</span>
                 <span className={styles.pn}>:</span> <span className={styles.pn}>|</span>
-                {"\n          "}
-                <span className={styles.fn}>npm</span> install <span className={styles.op}>-g</span>{" "}
-                @openai/codex{"\n          "}
-                <span className={styles.kw}>export</span>{" "}
+                {'\n          '}
+                <span className={styles.fn}>npm</span> install <span className={styles.op}>-g</span>{' '}
+                @openai/codex{'\n          '}
+                <span className={styles.kw}>export</span>{' '}
                 <span className={styles.op}>OPENAI_API_KEY</span>=
                 <span className={styles.str}>
-                  &quot;{"$"}
-                  {"{{ secrets.OPENAI_API_KEY }}"}&quot;
+                  &quot;{'$'}
+                  {'{{ secrets.OPENAI_API_KEY }}'}&quot;
                 </span>
-                {"\n          "}
-                <span className={styles.fn}>codex</span> exec{" "}
+                {'\n          '}
+                <span className={styles.fn}>codex</span> exec{' '}
                 <span className={styles.str}>
                   &quot;前回タグからのコミットをもとに CHANGELOG を更新して&quot;
                 </span>
@@ -1245,13 +1253,13 @@ export default function Page() {
           </div>
 
           <div className={styles.cardGrid}>
-            <div className={styles.card} style={{ borderColor: "rgba(16,185,129,0.2)" }}>
+            <div className={styles.card} style={{ borderColor: 'rgba(16,185,129,0.2)' }}>
               <div
                 style={{
                   fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
-                  fontSize: "13px",
-                  color: "#10b981",
-                  marginBottom: "16px",
+                  fontSize: '13px',
+                  color: '#10b981',
+                  marginBottom: '16px',
                 }}
               >
                 ✅ DO — やるべきこと
@@ -1288,13 +1296,13 @@ export default function Page() {
               </ul>
             </div>
 
-            <div className={styles.card} style={{ borderColor: "rgba(239,68,68,0.2)" }}>
+            <div className={styles.card} style={{ borderColor: 'rgba(239,68,68,0.2)' }}>
               <div
                 style={{
                   fontFamily: "var(--font-mono,'JetBrains Mono',monospace)",
-                  fontSize: "13px",
-                  color: "#ef4444",
-                  marginBottom: "16px",
+                  fontSize: '13px',
+                  color: '#ef4444',
+                  marginBottom: '16px',
                 }}
               >
                 ❌ DON&apos;T — やってはいけないこと
@@ -1334,7 +1342,7 @@ export default function Page() {
           <div className={styles.secHeader}>
             <div
               className={styles.stepNum}
-              style={{ background: "linear-gradient(135deg, #64748b, #94a3b8)" }}
+              style={{ background: 'linear-gradient(135deg, #64748b, #94a3b8)' }}
             >
               📚
             </div>
@@ -1346,7 +1354,7 @@ export default function Page() {
 
           <div className={styles.srcList}>
             <a
-              href="https://developers.openai.com/codex"
+              href="https://developers.openai.com/codex/"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.srcItemLink}
@@ -1354,12 +1362,12 @@ export default function Page() {
               <div className={styles.srcItemIcon}>🌐</div>
               <div className={styles.srcItemInfo}>
                 <div className={styles.srcItemTitle}>OpenAI Codex 公式ドキュメント</div>
-                <div className={styles.srcItemUrl}>https://developers.openai.com/codex</div>
+                <div className={styles.srcItemUrl}>https://developers.openai.com/codex/</div>
               </div>
               <div className={styles.srcItemArrow}>↗</div>
             </a>
             <a
-              href="https://developers.openai.com/codex/learn/best-practices"
+              href="https://developers.openai.com/codex/guides/best-practices/"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.srcItemLink}
@@ -1368,13 +1376,13 @@ export default function Page() {
               <div className={styles.srcItemInfo}>
                 <div className={styles.srcItemTitle}>Codex ベストプラクティス（公式）</div>
                 <div className={styles.srcItemUrl}>
-                  https://developers.openai.com/codex/learn/best-practices
+                  https://developers.openai.com/codex/guides/best-practices/
                 </div>
               </div>
               <div className={styles.srcItemArrow}>↗</div>
             </a>
             <a
-              href="https://developers.openai.com/codex/cli"
+              href="https://developers.openai.com/codex/cli/"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.srcItemLink}
@@ -1382,12 +1390,12 @@ export default function Page() {
               <div className={styles.srcItemIcon}>💻</div>
               <div className={styles.srcItemInfo}>
                 <div className={styles.srcItemTitle}>Codex CLI 公式ガイド</div>
-                <div className={styles.srcItemUrl}>https://developers.openai.com/codex/cli</div>
+                <div className={styles.srcItemUrl}>https://developers.openai.com/codex/cli/</div>
               </div>
               <div className={styles.srcItemArrow}>↗</div>
             </a>
             <a
-              href="https://developers.openai.com/codex/guides/agents-md"
+              href="https://developers.openai.com/codex/guides/agents-md/"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.srcItemLink}
@@ -1396,13 +1404,13 @@ export default function Page() {
               <div className={styles.srcItemInfo}>
                 <div className={styles.srcItemTitle}>AGENTS.md 活用ガイド（公式）</div>
                 <div className={styles.srcItemUrl}>
-                  https://developers.openai.com/codex/guides/agents-md
+                  https://developers.openai.com/codex/guides/agents-md/
                 </div>
               </div>
               <div className={styles.srcItemArrow}>↗</div>
             </a>
             <a
-              href="https://developers.openai.com/codex/models"
+              href="https://developers.openai.com/codex/models/"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.srcItemLink}
@@ -1410,21 +1418,21 @@ export default function Page() {
               <div className={styles.srcItemIcon}>🧠</div>
               <div className={styles.srcItemInfo}>
                 <div className={styles.srcItemTitle}>Codex モデル一覧（公式）</div>
-                <div className={styles.srcItemUrl}>https://developers.openai.com/codex/models</div>
+                <div className={styles.srcItemUrl}>https://developers.openai.com/codex/models/</div>
               </div>
               <div className={styles.srcItemArrow}>↗</div>
             </a>
             <a
-              href="https://developers.openai.com/codex/changelog"
+              href="https://developers.openai.com/codex/changelog/"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.srcItemLink}
             >
               <div className={styles.srcItemIcon}>📅</div>
               <div className={styles.srcItemInfo}>
-                <div className={styles.srcItemTitle}>Codex 変更履歴（2026年3月更新）</div>
+                <div className={styles.srcItemTitle}>Codex 変更履歴（2026年5月更新）</div>
                 <div className={styles.srcItemUrl}>
-                  https://developers.openai.com/codex/changelog
+                  https://developers.openai.com/codex/changelog/
                 </div>
               </div>
               <div className={styles.srcItemArrow}>↗</div>
@@ -1483,6 +1491,36 @@ export default function Page() {
                 <div className={styles.srcItemTitle}>OpenAI モデルリリースノート</div>
                 <div className={styles.srcItemUrl}>
                   https://help.openai.com/en/articles/9624314-model-release-notes
+                </div>
+              </div>
+              <div className={styles.srcItemArrow}>↗</div>
+            </a>
+            <a
+              href="https://developers.openai.com/codex/blog/may-2026-updates/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.srcItemLink}
+            >
+              <div className={styles.srcItemIcon}>🔥</div>
+              <div className={styles.srcItemInfo}>
+                <div className={styles.srcItemTitle}>Codex May 2026 Updates (OpenAI)</div>
+                <div className={styles.srcItemUrl}>
+                  https://developers.openai.com/codex/blog/may-2026-updates/
+                </div>
+              </div>
+              <div className={styles.srcItemArrow}>↗</div>
+            </a>
+            <a
+              href="https://developers.openai.com/codex/guides/goal-mode/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.srcItemLink}
+            >
+              <div className={styles.srcItemIcon}>🎯</div>
+              <div className={styles.srcItemInfo}>
+                <div className={styles.srcItemTitle}>Goal Mode 開発ガイド（公式）</div>
+                <div className={styles.srcItemUrl}>
+                  https://developers.openai.com/codex/guides/goal-mode/
                 </div>
               </div>
               <div className={styles.srcItemArrow}>↗</div>
