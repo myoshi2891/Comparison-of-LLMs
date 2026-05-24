@@ -166,6 +166,12 @@ const SOURCES_SKILL_ADDITIONAL: Source[] = [
   },
 ];
 
+/**
+ * Render the Codex Skill documentation page that explains AGENTS.md, SKILL.md, .prompt.md,
+ * SDD files, configuration, multi-agent patterns, best practices, and reference sources.
+ *
+ * @returns A React element containing the complete page layout and content for the Codex Skill guide.
+ */
 export default function CodexSkillPage() {
   return (
     <div className={styles.root}>

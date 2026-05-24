@@ -168,6 +168,13 @@ const SOURCES_NEW: Source[] = [
   },
 ];
 
+/**
+ * Render an external anchor that opens the given URL in a new browser tab with `noopener noreferrer` for link safety.
+ *
+ * @param href - The destination URL for the link.
+ * @param children - The link contents (text or elements) to render inside the anchor.
+ * @returns The anchor element configured to open `href` in a new tab with `rel="noopener noreferrer"`.
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -203,6 +210,15 @@ const TOC_ITEMS = [
   { id: "sources", label: "📚 参考ソース" },
 ] as const;
 
+/**
+ * Render the Codex Agent development guide page that documents AGENTS.md, AGENTS.override.md,
+ * SKILL.md, .codex/config.toml, PM-driven Agents SDK patterns, and related best practices.
+ *
+ * This Next.js page component composes the full instructional article including navigation,
+ * hero, table of contents, detailed sections (s01–s11) and a references list.
+ *
+ * @returns The React element for the Codex Agent development guide page.
+ */
 export default function CodexAgentPage() {
   return (
     <div className={styles.root}>
