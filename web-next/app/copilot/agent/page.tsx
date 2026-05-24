@@ -5,7 +5,7 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   title: "GitHub Copilot コーディングエージェント開発ガイド | LLM コスト計算機",
   description:
-    "GitHub Copilot .agent.md の完全ベストプラクティスガイド。フロントマター全仕様・ステップバイステップ作成・Handoffs（エージェント連鎖）・Subagents（サブエージェント）・MCP統合・マルチエージェント設計パターン・トラブルシューティングを 2026年版の公式ドキュメント準拠で解説。",
+    "GitHub Copilot .agent.md の完全ベストプラクティスガイド。フロントマター全仕様・ステップバイステップ作成・Handoffs（エージェント連鎖）・Subagents（サブエージェント）・MCP統合・マルチエージェント設計パターン・トラブルシューティングを 2026年5月最新版の公式ドキュメント準拠で解説。",
 };
 
 type Source = {
@@ -51,15 +51,15 @@ const SOURCES: Source[] = [
   {
     icon: "🐙",
     title: "GitHub Docs: About custom agents（概念・スコープ）",
-    href: "https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-custom-agents",
-    url: "docs.github.com/en/copilot/concepts/agents/coding-agent/about-custom-agents",
+    href: "https://docs.github.com/en/copilot/concepts/agents/cloud-agent/about-custom-agents",
+    url: "docs.github.com/en/copilot/concepts/agents/cloud-agent/about-custom-agents",
     desc: "カスタムエージェントの概念・リポジトリ/ユーザー/組織レベル配置・対応IDE（VS Code・JetBrains・Eclipse・Xcode）",
   },
   {
     icon: "🛠️",
     title: "GitHub Docs: Creating custom agents（作成手順・IDE別）",
-    href: "https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/create-custom-agents",
-    url: "docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/create-custom-agents",
+    href: "https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/create-custom-agents",
+    url: "docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/create-custom-agents",
     desc: "VS Code・JetBrains・Eclipse・Xcodeでの作成手順。Customize Agentボタン・handoffs設定・プロンプト最大30,000文字",
   },
   {
@@ -67,7 +67,7 @@ const SOURCES: Source[] = [
     title: "GitHub Docs: Custom agents configuration（フロントマター完全仕様）",
     href: "https://docs.github.com/en/copilot/reference/custom-agents-configuration",
     url: "docs.github.com/en/copilot/reference/custom-agents-configuration",
-    desc: `全YAMLフィールド仕様。mcp-serversのtype（local/http/sse）。シークレット構文（\${{secrets.*}} / \${VAR:-default}）。handoffs非対応（GitHub.com）の明記`,
+    desc: `全YAMLフィールド仕様。mcp-serversのtype（local/http/sse）。シークレット構文（\${{secrets.*}} / \${VAR:-default}）。`,
   },
   {
     icon: "💻",
@@ -86,8 +86,8 @@ const SOURCES: Source[] = [
   {
     icon: "🔌",
     title: "GitHub Docs: Extend coding agent with MCP（mcp-servers設定）",
-    href: "https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/extend-coding-agent-with-mcp",
-    url: "docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/extend-coding-agent-with-mcp",
+    href: "https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/extend-coding-agent-with-mcp",
+    url: "docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/extend-coding-agent-with-mcp",
     desc: "MCPサーバー設定JSON/YAML仕様。ビルトインサーバー（github/azure/cloudflare）。シークレット管理（copilot環境）。OAuth認証未対応の明記",
   },
   {
@@ -102,7 +102,7 @@ const SOURCES: Source[] = [
     title: "awesome-copilot: agents.instructions.md（handoffs仕様・テンプレート集）",
     href: "https://github.com/github/awesome-copilot/blob/main/instructions/agents.instructions.md",
     url: "github.com/github/awesome-copilot/blob/main/instructions/agents.instructions.md",
-    desc: "handoffs全フィールド（label/agent/prompt/send）詳細。コンテキスト保持の仕組み。手動vs自動送信の使い分け。Planning→Implementation→Review連鎖例",
+    desc: "handoffs全フィールド（label/agent/prompt/send）詳細。コンテキスト引き継ぎ。手動vs自動送信の使い分け。Planning→Implementation→Review連鎖例",
   },
   {
     icon: "📖",
@@ -153,6 +153,21 @@ const SOURCES: Source[] = [
     url: "learn.microsoft.com/en-us/visualstudio/ide/copilot-specialized-agents",
     desc: "Visual Studio 2026 v18.4+でのカスタムエージェント設定。@debugger/@profiler/@testなどビルトインエージェント。MCP連携でext knowledge source接続",
   },
+  {
+    icon: "📢",
+    title:
+      "GitHub Changelog: Gemini 3.5 Flash is generally available for GitHub Copilot (May 2026)",
+    href: "https://github.blog/changelog/2026-05-19-gemini-3.5-flash-is-generally-available-for-github-copilot/",
+    url: "github.blog/changelog/2026-05-19-gemini-3.5-flash-is-generally-available-for-github-copilot/",
+    desc: "Gemini 3.5 FlashがGitHub Copilotで一般提供開始。より高速かつ高精度なレスポンスが利用可能に",
+  },
+  {
+    icon: "🤖",
+    title: "GitHub Changelog: Auto model selection routes based on task in VS Code (May 2026)",
+    href: "https://github.blog/changelog/2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code/",
+    url: "github.blog/changelog/2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code/",
+    desc: "タスクの難易度やツール使用の有無に基づき、最適なモデルを自動的に選択・ルーティングする機能がVS Code向けにGA",
+  },
 ];
 
 /**
@@ -166,7 +181,7 @@ export default function CopilotAgentPage() {
       <div className={styles.wrap}>
         {/* Hero */}
         <div className={styles.hero}>
-          <div className={styles.heroBadge}>🐙 GitHub Copilot 完全ガイド 2026年版</div>
+          <div className={styles.heroBadge}>🐙 GitHub Copilot 完全ガイド 2026年5月版</div>
           <h1>
             GitHub Copilot <em>.agent.md</em> 完全
             <br />
@@ -176,7 +191,7 @@ export default function CopilotAgentPage() {
             フロントマター全仕様 / ステップバイステップ作成 / Handoffs（エージェント連鎖） /
             Subagents（サブエージェント） / MCP統合 / マルチエージェント設計パターン /
             トラブルシューティング ——
-            2026年版の公式ドキュメント準拠で初学者から上級者まで対応した決定版ガイド。
+            2026年5月版の公式ドキュメント準拠で初学者から上級者まで対応した決定版ガイド。
           </p>
           <div className={styles.heroChips}>
             <span className={styles.heroChip}>フロントマター完全仕様</span>
@@ -1048,6 +1063,12 @@ export default function CopilotAgentPage() {
                 {"# GitHub.com（Coding Agent）でのIssue割り当て時に参照される"}
               </span>
               {"\n\n"}
+              <span className={styles.cm}>argument-hint</span>
+              {": "}
+              <span className={styles.cv}>{"'ヒントテキスト'"}</span>
+              {"        "}
+              <span className={styles.cc}>{"# 任意: 入力欄プレースホルダーヒント"}</span>
+              {"\n\n"}
               <span className={styles.cm}>target</span>
               {": "}
               <span className={styles.cv}>{"'github-copilot'"}</span>
@@ -1243,6 +1264,18 @@ export default function CopilotAgentPage() {
                 {'# シークレットはリポジトリの "copilot" 環境から取得'}
               </span>
               {"\n"}
+              <span className={styles.cm}>hooks</span>
+              {":\n  - "}
+              <span className={styles.cv}>type</span>
+              {": "}
+              <span className={styles.cv}>{"'post-tool'"}</span>
+              {"\n    "}
+              <span className={styles.cv}>command</span>
+              {": "}
+              <span className={styles.cv}>{"'npm run test'"}</span>
+              {"  "}
+              <span className={styles.cc}>{"# フックコマンド"}</span>
+              {"\n"}
               <span className={styles.cs}>---</span>
               {"\n\n"}
               <span className={styles.cc}>{"# ↓ ここからMarkdown本文（最大30,000文字）"}</span>
@@ -1309,6 +1342,20 @@ export default function CopilotAgentPage() {
                   <td>{"表示名。省略時はファイル名（test-agent.agent.md → test-agent）"}</td>
                 </tr>
                 <tr>
+                  <td>argument-hint</td>
+                  <td>
+                    <span className={`${styles.badge} ${styles.bBlue}`}>任意</span>
+                  </td>
+                  <td>
+                    <span className={`${styles.tag} ${styles.tagB}`}>IDE専用</span>
+                  </td>
+                  <td>
+                    {
+                      "チャット入力欄に表示されるプレースホルダー型のヒントテキスト。エージェントとの対話方法をガイドする"
+                    }
+                  </td>
+                </tr>
+                <tr>
                   <td>model</td>
                   <td>
                     <span className={`${styles.badge} ${styles.bBlue}`}>任意</span>
@@ -1350,7 +1397,9 @@ export default function CopilotAgentPage() {
                   <td>
                     <span className={`${styles.tag} ${styles.tagB}`}>IDE専用</span>
                   </td>
-                  <td>{"label・agent・prompt・send の4プロパティ。GitHub.comでは無視される"}</td>
+                  <td>
+                    {"label・agent・prompt・send・model の5プロパティ。GitHub.comでは無視される"}
+                  </td>
                 </tr>
                 <tr>
                   <td>user-invocable</td>
@@ -1370,7 +1419,39 @@ export default function CopilotAgentPage() {
                   <td>
                     <span className={`${styles.tag} ${styles.tagG}`}>全環境</span>
                   </td>
-                  <td>{"true で自動選択を完全無効化。agents[]で明示すれば上書き可"}</td>
+                  <td>
+                    {
+                      "true で自動選択を完全無効化。`infer: false` と同等（両方設定された場合はこちらが優先）。agents[]で明示すれば上書き可"
+                    }
+                  </td>
+                </tr>
+                <tr>
+                  <td>metadata</td>
+                  <td>
+                    <span className={`${styles.badge} ${styles.bBlue}`}>任意</span>
+                  </td>
+                  <td>
+                    <span className={`${styles.tag} ${styles.tagG}`}>GitHub.com専用</span>
+                  </td>
+                  <td>
+                    {
+                      "エージェントのメタデータ注釈（キー・値の文字列ペア）。VS Codeや他IDEでは無視されます"
+                    }
+                  </td>
+                </tr>
+                <tr>
+                  <td>infer</td>
+                  <td>
+                    <span className={`${styles.badge} ${styles.bRed}`}>非推奨</span>
+                  </td>
+                  <td>
+                    <span className={`${styles.tag} ${styles.tagG}`}>全環境</span>
+                  </td>
+                  <td>
+                    {
+                      "廃止（Retired）。代わりに `disable-model-invocation` と `user-invocable` を使用します"
+                    }
+                  </td>
                 </tr>
                 <tr>
                   <td>mcp-servers</td>
@@ -1383,6 +1464,20 @@ export default function CopilotAgentPage() {
                   <td>
                     {
                       "エージェント固有のMCPサーバー設定（YAML形式）。target: github-copilot 時のみ有効。シークレットは copilot 環境から取得"
+                    }
+                  </td>
+                </tr>
+                <tr>
+                  <td>hooks</td>
+                  <td>
+                    <span className={`${styles.badge} ${styles.bBlue}`}>任意</span>
+                  </td>
+                  <td>
+                    <span className={`${styles.tag} ${styles.tagB}`}>IDE専用(Preview)</span>
+                  </td>
+                  <td>
+                    {
+                      "エージェントがアクティブな時のみ実行されるフックコマンド設定。ライフサイクルイベントに合わせた処理を定義"
                     }
                   </td>
                 </tr>
@@ -1717,14 +1812,22 @@ export default function CopilotAgentPage() {
                       <span className={styles.cm}>send</span>
                       {": "}
                       <span className={styles.cv}>{"false"}</span>
+                      {"\n    "}
+                      <span className={styles.cm}>model</span>
+                      {": "}
+                      <span className={styles.cv}>{"'GPT-5 (copilot)'"}</span>
+                      {"         "}
+                      <span className={styles.cc}>{"# 遷移後のモデル（任意）"}</span>
                     </div>
                   </div>
                   <div className={`${styles.alert} ${styles.aw}`} style={{ marginTop: "10px" }}>
                     <span className={styles.alertIcon}>⚠️</span>
                     <div className={styles.alertBody}>
-                      <strong>{"handoffs は GitHub.com では無視されます。"}</strong>
+                      <strong>
+                        {"handoffs および argument-hint は GitHub.com では無視されます。"}
+                      </strong>
                       {
-                        " VS Code・JetBrains・Eclipse・Xcodeのみ有効です。GitHub.com（Copilot Coding Agent）のIssue処理フローでは使用できません。"
+                        " VS Code・JetBrains・Eclipse・Xcodeのみ有効で、GitHub.com（Copilot cloud agent）では compatibility を保つため無視されます。"
                       }
                     </div>
                   </div>
@@ -1911,6 +2014,10 @@ export default function CopilotAgentPage() {
               <span className={styles.cm}>send</span>
               {": "}
               <span className={styles.cv}>{"false"}</span>
+              {"\n    "}
+              <span className={styles.cm}>model</span>
+              {": "}
+              <span className={styles.cv}>{"'Claude Sonnet 4.5 (copilot)'"}</span>
               {"\n"}
               <span className={styles.cs}>---</span>
               {"\n\n"}
@@ -3419,7 +3526,7 @@ export default function CopilotAgentPage() {
         <section id="sources" className={styles.sec}>
           <div className={styles.secHead}>
             <span className={styles.secNum}>📚</span>
-            <h2>参考ソース（公式・一次情報優先）— 2026年版</h2>
+            <h2>参考ソース（公式・一次情報優先）— 2026年5月最新版</h2>
           </div>
           <div className={styles.srcGrid}>
             {SOURCES.map((src) => (
