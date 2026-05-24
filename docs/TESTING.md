@@ -6,7 +6,7 @@
 
 | 領域 | フレームワーク | 状態 | コマンド |
 | ------ | --------------- | ------ | ---------- |
-| フロントエンド (web-next/) | Vitest + @testing-library/react | 542 passed（全 Green） | `cd web-next && bun run test` |
+| フロントエンド (web-next/) | Vitest + @testing-library/react | 553 passed（全 Green） | `cd web-next && bun run test` |
 | スクレイパー (scraper/) | pytest | 5/5 passed | `cd scraper && uv run pytest` |
 
 ## テスト実行

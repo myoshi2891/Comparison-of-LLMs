@@ -156,17 +156,18 @@ const SOURCES: Source[] = [
   {
     icon: "📢",
     title:
-      "GitHub Changelog: Gemini 3.5 Flash is generally available for GitHub Copilot (May 2026)",
+      "GitHub Changelog: Gemini latest model (2026) is generally available for GitHub Copilot (May 2026)",
     href: "https://github.blog/changelog/2026-05-19-gemini-3.5-flash-is-generally-available-for-github-copilot/",
     url: "github.blog/changelog/2026-05-19-gemini-3.5-flash-is-generally-available-for-github-copilot/",
-    desc: "Gemini 3.5 FlashがGitHub Copilotで一般提供開始。より高速かつ高精度なレスポンスが利用可能に",
+    desc: "Geminiの最新モデル（2026）がGitHub Copilotで一般提供開始。より高速かつ高精度なレスポンスが利用可能に",
   },
   {
     icon: "🤖",
-    title: "GitHub Changelog: Auto model selection routes based on task in VS Code (May 2026)",
+    title:
+      "GitHub Changelog: Auto model (latest 2026) selection routes based on task in VS Code (May 2026)",
     href: "https://github.blog/changelog/2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code/",
     url: "github.blog/changelog/2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code/",
-    desc: "タスクの難易度やツール使用の有無に基づき、最適なモデルを自動的に選択・ルーティングする機能がVS Code向けにGA",
+    desc: "タスクの難易度やツール使用の有無に基づき、最適な最新モデル（2026）を自動的に選択・ルーティングする機能がVS Code向けにGA",
   },
 ];
 

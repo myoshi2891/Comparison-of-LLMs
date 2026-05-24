@@ -486,7 +486,17 @@ CC-->>U: ガイドラインに準拠したREADME`}
             </div>
             <div className={styles.fieldConstraint}>旧仕様: 配列形式 | semver対応</div>
             <div className={styles.fieldDesc}>
-              <strong>2026年5月時点で公式ドキュメントから削除済み。</strong>
+              <strong>
+                2026年5月時点で公式ドキュメントから削除されたとの報告がある（
+                <a
+                  href="https://support.anthropic.com/en/articles/12512198-creating-custom-skills"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  公式サポート記事
+                </a>
+                を参照）。
+              </strong>
               既存スキルで使用している場合は、コメントとして SKILL.md
               本文に依存関係を記載する形式へ移行することを推奨する。
             </div>
@@ -906,9 +916,48 @@ style P3 fill:#2d1f4a,stroke:#b794f4,color:#ffffff`}
           <div className={`${styles.callout} ${styles.calloutInfo}`}>
             <span className={styles.calloutIcon}>🔧</span>
             <strong>2026年5月現在も有効：</strong>
-            <code>context: fork</code> および <code>agent</code> フィールドの挙動に関する不具合が
-            v2.1.x で修正済み（GitHub Issue #17283）。
-            現在は仕様通りに動作することが確認されている。非推奨ではなく、引き続き推奨パターン。
+            <code>context: fork</code> および <code>agent</code>{" "}
+            フィールドの挙動に関する不具合について、 v2.1.x 等で修正されたとの報告がある（
+            <a
+              href="https://github.com/anthropics/claude-code/issues/17283"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              GitHub Issue #17283
+            </a>
+            、
+            <a
+              href="https://github.com/anthropics/claude-code/issues/16803"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              #16803
+            </a>
+            、
+            <a
+              href="https://github.com/anthropics/claude-code/issues/20604"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              #20604
+            </a>
+            、および{" "}
+            <a
+              href="https://github.com/anthropics/claude-code/blob/v2.1.1/CHANGELOG.md"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              v2.1.1 CHANGELOG
+            </a>
+            や
+            <a
+              href="https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              最新のCHANGELOG
+            </a>
+            を参照）。 現在は仕様通りに動作すると報告されており、引き続き推奨パターンとされる。
           </div>
           <p>
             「コンテキストを分離してタスクを実行する」という目的は共通だが、

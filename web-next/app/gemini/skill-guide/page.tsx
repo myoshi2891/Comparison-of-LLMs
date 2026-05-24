@@ -1289,7 +1289,7 @@ export default function Page() {
         }}
       >
         <h2 className={styles.secTitle} style={{ color: "#c2410c", borderBottomColor: "#fed7aa" }}>
-          🆕 最新アップデート（2026年3月21日時点）
+          🆕 最新アップデート（2026年5月23日時点）
         </h2>
 
         {/* 2-col: Gemini CLI + Antigravity */}
@@ -1570,7 +1570,7 @@ export default function Page() {
 
         {/* Model table */}
         <h3 className={styles.secH3} style={{ color: "#9a3412", marginTop: "1.5rem" }}>
-          🤖 現在サポートされるモデル（2026年3月）
+          🤖 現在サポートされるモデル（2026年5月23日時点）
         </h3>
         <div className={`${styles.tableWrap} ${styles.modelTable}`}>
           <table

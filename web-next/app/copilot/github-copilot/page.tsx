@@ -1342,8 +1342,7 @@ export default function GithubCopilotPage() {
             <div className={styles.alertContent}>
               <strong>プレミアムリクエストと通常リクエストの違い：</strong>
               <br />
-              高度なモデル（GPT-5.3-Codex, Claude
-              Opus等）を使用するChat/エージェントモードは「プレミアムリクエスト」を消費します。
+              高度なモデル（GPTの最新モデル（2026）やClaudeの最新モデル（2026）等）を使用するChat/エージェントモードは「プレミアムリクエスト」を消費します。
               インラインコード補完は通常消費しません。モデルによって1リクエストあたりの消費量が異なります。
             </div>
           </div>
@@ -1362,7 +1361,7 @@ export default function GithubCopilotPage() {
             <tbody>
               <tr>
                 <td>
-                  <span className={styles.modelName}>GPT-5.3-Codex</span>
+                  <span className={styles.modelName}>GPT — newest 2026</span>
                   <br />
                   <span className={`${styles.tag} ${styles.tagNew}`}>LTS標準</span>
                 </td>
@@ -1380,7 +1379,7 @@ export default function GithubCopilotPage() {
               </tr>
               <tr>
                 <td>
-                  <span className={styles.modelName}>GPT-4o mini</span>
+                  <span className={styles.modelName}>GPT — newest 2026</span>
                   <br />
                   <span className={`${styles.tag} ${styles.tagFree}`}>軽量</span>
                 </td>
@@ -1398,7 +1397,7 @@ export default function GithubCopilotPage() {
               </tr>
               <tr>
                 <td>
-                  <span className={styles.modelName}>Claude Haiku 4.5</span>
+                  <span className={styles.modelName}>Claude — newest 2026</span>
                   <br />
                   <span className={`${styles.tag} ${styles.tagFree}`}>軽量</span>
                 </td>
@@ -1416,7 +1415,7 @@ export default function GithubCopilotPage() {
               </tr>
               <tr>
                 <td>
-                  <span className={styles.modelName}>Claude Sonnet 4.6</span>
+                  <span className={styles.modelName}>Claude — newest 2026</span>
                   <br />
                   <span className={`${styles.tag} ${styles.tagPro}`}>中〜上級</span>
                 </td>
@@ -1434,7 +1433,7 @@ export default function GithubCopilotPage() {
               </tr>
               <tr>
                 <td>
-                  <span className={styles.modelName}>Claude Opus 4.6</span>
+                  <span className={styles.modelName}>Claude — newest 2026</span>
                   <br />
                   <span className={`${styles.tag} ${styles.tagBeta}`}>最上級</span>
                 </td>
@@ -1452,7 +1451,7 @@ export default function GithubCopilotPage() {
               </tr>
               <tr>
                 <td>
-                  <span className={styles.modelName}>Gemini 3.5 Flash</span>
+                  <span className={styles.modelName}>Gemini — newest 2026</span>
                   <br />
                   <span className={`${styles.tag} ${styles.tagNew}`}>GA</span>
                 </td>
@@ -1470,7 +1469,7 @@ export default function GithubCopilotPage() {
               </tr>
               <tr>
                 <td>
-                  <span className={styles.modelName}>Gemini 3 Pro</span>
+                  <span className={styles.modelName}>Gemini — newest 2026</span>
                   <br />
                   <span className={`${styles.tag} ${styles.tagBeta}`}>GA</span>
                 </td>
@@ -1488,7 +1487,7 @@ export default function GithubCopilotPage() {
               </tr>
               <tr>
                 <td>
-                  <span className={styles.modelName}>Grok Code Fast 1</span>
+                  <span className={styles.modelName}>Grok — newest 2026</span>
                   <br />
                   <span className={`${styles.tag} ${styles.tagNew}`}>高速</span>
                 </td>
@@ -1506,7 +1505,7 @@ export default function GithubCopilotPage() {
               </tr>
               <tr>
                 <td>
-                  <span className={styles.modelName}>Raptor mini</span>
+                  <span className={styles.modelName}>Raptor — newest 2026</span>
                   <br />
                   <span className={`${styles.tag} ${styles.tagBeta}`}>Preview</span>
                 </td>
@@ -1536,11 +1535,11 @@ export default function GithubCopilotPage() {
               </Ext>
               ,{" "}
               <Ext href="https://github.blog/changelog/2026-03-18-gpt-5-3-codex-long-term-support-in-github-copilot/">
-                GPT-5.3-Codex LTS - GitHub Changelog
+                GPT latest model (2026) LTS - GitHub Changelog
               </Ext>
               ,{" "}
               <Ext href="https://github.blog/changelog/2026-05-19-gemini-3.5-flash-is-generally-available-for-github-copilot/">
-                Gemini 3.5 Flash in GitHub Copilot
+                Gemini latest model (2026) in GitHub Copilot
               </Ext>
             </div>
           </div>
@@ -1549,9 +1548,8 @@ export default function GithubCopilotPage() {
             <span className={styles.alertIcon}>💡</span>
             <div className={styles.alertContent}>
               <strong>モデル選択の基本戦略：</strong>
-              日常のコーディングはGPT-5.3-CodexやGemini 3.5 Flash、複雑なアーキテクチャ設計はClaude
-              Sonnet 4.6、 難解なバグや高度な推論が必要な場合のみClaude Opus
-              4.6（Pro+のみ）を使用することで、AIクレジットを効率的に使えます。また、VS
+              日常のコーディングはGPTの最新モデル（2026）やGeminiの最新モデル（2026）、複雑なアーキテクチャ設計はClaudeの最新モデル（2026）、
+              難解なバグや高度な推論が必要な場合のみClaudeの最上位モデル（2026、Pro+のみ）を使用することで、AIクレジットを効率的に使えます。また、VS
               Codeの自動モデル選択（Auto Model
               Selection）機能を利用すると、自動的にタスクに応じた最適ルーティングが行われます。
             </div>
