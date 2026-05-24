@@ -222,7 +222,9 @@ export default function CodexAgentPage() {
       <div className={styles.wrap}>
         {/* HERO */}
         <div className={styles.hero}>
-          <div className={styles["hero-badge"]}>⚙ OpenAI Codex 完全ガイド — v0.105.0 (2026年5月最新版)</div>
+          <div className={styles["hero-badge"]}>
+            ⚙ OpenAI Codex 完全ガイド — v0.105.0 (2026年5月最新版)
+          </div>
           <h1>
             OpenAI <em>Codex</em> サブエージェント開発における
             <br />

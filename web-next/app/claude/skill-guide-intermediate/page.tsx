@@ -481,14 +481,14 @@ CC-->>U: ガイドラインに準拠したREADME`}
           </div>
           <div className={styles.fieldCard}>
             <div className={styles.fieldName}>
-              <code>dependencies</code>{" "}
-              <span className={styles.fieldOptional}>任意</span>{" "}
+              <code>dependencies</code> <span className={styles.fieldOptional}>任意</span>{" "}
               <span style={{ color: "var(--red)", fontSize: "11px" }}>（非推奨）</span>
             </div>
             <div className={styles.fieldConstraint}>旧仕様: 配列形式 | semver対応</div>
             <div className={styles.fieldDesc}>
               <strong>2026年5月時点で公式ドキュメントから削除済み。</strong>
-              既存スキルで使用している場合は、コメントとして SKILL.md 本文に依存関係を記載する形式へ移行することを推奨する。
+              既存スキルで使用している場合は、コメントとして SKILL.md
+              本文に依存関係を記載する形式へ移行することを推奨する。
             </div>
           </div>
           <div className={styles.mermaidWrap}>
@@ -906,8 +906,8 @@ style P3 fill:#2d1f4a,stroke:#b794f4,color:#ffffff`}
           <div className={`${styles.callout} ${styles.calloutInfo}`}>
             <span className={styles.calloutIcon}>🔧</span>
             <strong>2026年5月現在も有効：</strong>
-            <code>context: fork</code> および <code>agent</code>{" "}
-            フィールドの挙動に関する不具合が v2.1.x で修正済み（GitHub Issue #17283）。
+            <code>context: fork</code> および <code>agent</code> フィールドの挙動に関する不具合が
+            v2.1.x で修正済み（GitHub Issue #17283）。
             現在は仕様通りに動作することが確認されている。非推奨ではなく、引き続き推奨パターン。
           </div>
           <p>

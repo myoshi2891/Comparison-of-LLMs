@@ -1378,7 +1378,8 @@ export default function ClaudeSkillPage() {
               <div className={styles.principleNum}>NEW</div>
               <h4>🤝 Agent Teams（マルチエージェント）</h4>
               <p>
-                複数のClaudeインスタンスが並列で協調作業（3月に安定化）。Lead + Teammate構成でtasks.mdのタスクを分担可能。
+                複数のClaudeインスタンスが並列で協調作業（3月に安定化）。Lead +
+                Teammate構成でtasks.mdのタスクを分担可能。
               </p>
             </div>
             <div className={`${styles.principle} ${styles.pBlue}`}>
@@ -1439,14 +1440,17 @@ export default function ClaudeSkillPage() {
               <div className={styles.principleNum}>NEW</div>
               <h4>🧠 Claude Opus 4.7（4月16日）</h4>
               <p>
-                SWE-bench Pro 64.3%（+10.9%）・xhigh effortレベル追加・Self-verify・高解像度ビジョン（最大3.75MP）。価格はOpus 4.6と同一。
+                SWE-bench Pro 64.3%（+10.9%）・xhigh
+                effortレベル追加・Self-verify・高解像度ビジョン（最大3.75MP）。価格はOpus
+                4.6と同一。
               </p>
             </div>
             <div className={`${styles.principle} ${styles.pGreen}`}>
               <div className={styles.principleNum}>NEW</div>
               <h4>🔍 ultrareview（4月28日）</h4>
               <p>
-                CI環境から<code>claude ultrareview</code>でコードレビューを自動実行。<code>--json</code>オプションで機械可読出力にも対応。
+                CI環境から<code>claude ultrareview</code>でコードレビューを自動実行。
+                <code>--json</code>オプションで機械可読出力にも対応。
               </p>
             </div>
           </div>

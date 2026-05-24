@@ -9,7 +9,7 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- 最新 HEAD: 43fdcf1（docs: MIGRATION_PROGRESS.md の HEAD 情報更新）
+- 最新 HEAD: 7c1645a（docs(copilot): update best practices guide to May 2026 specifications）
 - 未コミット作業: なし（working tree クリーン）
 - 次の作業: **Phase A–F 全完了 → レビュー対応 / マージ準備**
 - テスト数: `bun run test` **553 passed / 553 total（全 Green ✅）**  — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
@@ -180,7 +180,7 @@ Next.js 移行プロジェクトの作業を再開してください。
 
 - リポジトリ: LLM-Studies（Phase A–F の Next.js 移行作業中）
 - 現在のブランチ: feat/nextjs-migration
-- 最新 HEAD: 43fdcf1（docs: MIGRATION_PROGRESS.md の HEAD 情報更新）
+- 最新 HEAD: 7c1645a（docs(copilot): update best practices guide to May 2026 specifications）
 - 移行計画: docs/archive/NEXTJS_PHASE_A_F_PLAN.md（Phase A–F）— 全 Phase 完了（アーカイブ）
 - 進捗トラッカー: MIGRATION_PROGRESS.md（**作業開始前に必読**: §「AI 作業ルール」R1〜R4）
 - プロジェクト固有スキル: .claude/skills/nextjs-page-migration/SKILL.md

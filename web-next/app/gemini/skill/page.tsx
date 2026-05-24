@@ -352,10 +352,11 @@ export default function GeminiSkillPage() {
               参照）。また、
               <strong>
                 v2.0.1（2026-05-23）で Managed Agents
-                のセキュリティ強化、fileMatch活性化の最適化、AGENTS.md の公式標準対応が適用されました。
+                のセキュリティ強化、fileMatch活性化の最適化、AGENTS.md
+                の公式標準対応が適用されました。
               </strong>
-              Claude Code（CLAUDE.md）など他のエージェントツールとのルール共有が可能で、
-              Antigravity CLI 経由でも同じ AGENTS.md/GEMINI.md/SKILL.md を再利用できます。
+              Claude Code（CLAUDE.md）など他のエージェントツールとのルール共有が可能で、 Antigravity
+              CLI 経由でも同じ AGENTS.md/GEMINI.md/SKILL.md を再利用できます。
             </div>
           </div>
         </section>

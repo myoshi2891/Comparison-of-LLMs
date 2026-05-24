@@ -268,8 +268,8 @@ export default function GeminiAgentPage() {
         {/* HERO */}
         <div className={styles.hero}>
           <div className={styles.heroEyebrow}>
-            🤖 Google Gemini 完全ガイド — 最新（2026年）/ Gemini CLI 最新版 / ADK 2.0 GA / A2A
-            + AP2 + A2UI 対応
+            🤖 Google Gemini 完全ガイド — 最新（2026年）/ Gemini CLI 最新版 / ADK 2.0 GA / A2A + AP2
+            + A2UI 対応
           </div>
           <h1>
             Gemini マルチエージェント開発における
