@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "OpenAI Codex v0.105.0 × GPT-5.4 — AI仕様駆動開発 マークダウンファイル完全ガイド",
+  title:
+    "OpenAI Codex 最新 (2026) — AI仕様駆動開発 マークダウンファイル完全ガイド (v0.105.0, GPT-5.4)",
   description:
-    "AGENTS.md / SKILL.md / .prompt.md / REQUIREMENTS.md / AGENT_TASKS.md — OpenAI Codex (v0.105.0, 2026-05-23 最新版) の AI 仕様駆動開発を支える全マークダウンファイルの役割・構造・ベストプラクティスを公式根拠付きで解説。GPT-5.4 対応。",
+    "AGENTS.md / SKILL.md / .prompt.md / REQUIREMENTS.md / AGENT_TASKS.md — OpenAI Codex 最新 (2026年最新版) の AI 仕様駆動開発を支える全マークダウンファイルの役割・構造・ベストプラクティスを公式根拠付きで解説 (v0.105.0, GPT-5.4 対応)。",
 };
 
 // 外部ソース (sources セクション) の定義。Phase F で redirect 一覧を作る際にも参照する。
@@ -159,7 +160,8 @@ const SOURCES_SKILL_ADDITIONAL: Source[] = [
   {
     num: "[24]",
     href: "https://developers.openai.com/codex/blog/may-2026-updates/",
-    title: "Codex May 2026 Updates: Goal Mode, Appshots, and Mobile Integration — OpenAI Developer Blog (May 2026)",
+    title:
+      "Codex May 2026 Updates: Goal Mode, Appshots, and Mobile Integration — OpenAI Developer Blog (May 2026)",
     desc: "Goal Mode（自律的な長期目標の実行とチェックポイント管理）・Appshots（UIプレビューのスナップショット共有機能）・モバイル統合の仕様とベストプラクティス",
   },
 ];
@@ -169,7 +171,9 @@ export default function CodexSkillPage() {
     <div className={styles.root}>
       <header className={styles.header}>
         <div className={styles.hdrBg} />
-        <div className={styles.hdrEyebrow}>OpenAI Codex v0.105.0 × GPT-5.4 (o3-based)</div>
+        <div className={styles.hdrEyebrow}>
+          OpenAI Codex 最新 (2026) (v0.105.0, GPT-5.4 o3-based)
+        </div>
         <h1>
           AI仕様駆動開発における
           <br />
@@ -183,11 +187,13 @@ export default function CodexSkillPage() {
           Codexの全マークダウンファイルの役割・構造・ベストプラクティスを根拠ソース付きで徹底解説
         </p>
         <div className={styles.badgeRow}>
-          <span className={`${styles.badge} ${styles.bOai}`}>OpenAI Codex v0.105.0</span>
-          <span className={`${styles.badge} ${styles.bBlue}`}>GPT-5.4 (o3-based)</span>
+          <span className={`${styles.badge} ${styles.bOai}`}>
+            OpenAI Codex 最新 (2026) (v0.105.0)
+          </span>
+          <span className={`${styles.badge} ${styles.bBlue}`}>最新モデル (GPT-5.4 o3-based)</span>
           <span className={`${styles.badge} ${styles.bPurple}`}>AGENTS.md オープン標準</span>
           <span className={`${styles.badge} ${styles.bAmber}`}>SKILL.md 共通規格</span>
-          <span className={`${styles.badge} ${styles.bRose}`}>v0.105.0 (2026-05-23)</span>
+          <span className={`${styles.badge} ${styles.bRose}`}>最新版 (2026-05-23, v0.105.0)</span>
         </div>
       </header>
 
@@ -700,7 +706,9 @@ export default function CodexSkillPage() {
                   </span>
                   {"\n"}
                   {"- `run_command` ではテストおよびビルドコマンドのみ実行可能。\n"}
-                  {"- コマンド実行結果が長大な場合は byte cap (最大 4000 バイト) で出力を切り詰めて処理すること。\n\n"}
+                  {
+                    "- コマンド実行結果が長大な場合は byte cap (最大 4000 バイト) で出力を切り詰めて処理すること。\n\n"
+                  }
                   <span className={styles.cHd}>## Agent Handoffs</span>
                   {"\n"}
                   <span className={styles.cCm}>
@@ -2008,7 +2016,7 @@ export default function CodexSkillPage() {
               が統合されており、マルチエージェントフローの可視化・デバッグ・評価・ファインチューニングをワンストップで行えます。一方、
               <code>spawn_agents_on_csv</code>
               によるCSVからのエージェントファンアウトとETA付き進捗追跡は
-              <strong>Codex CLI（rust-v0.105.0+）固有の機能</strong>です（
+              <strong>Codex CLI（最新版, rust-v0.105.0+）固有の機能</strong>です（
               <a
                 href="https://github.com/openai/codex/releases"
                 target="_blank"

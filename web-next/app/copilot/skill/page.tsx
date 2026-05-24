@@ -4,7 +4,7 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   title: "GitHub Copilot — SKILL.md 完全ベストプラクティスガイド",
   description:
-    "GitHub Copilot Coding Agent / VS Code Agent Mode / Copilot CLI 対応の SKILL.md ガイド。フロントマター完全仕様・Progressive Disclosure 3段階ローディング・ステップバイステップ作成・実践テンプレート集・トラブルシューティングを 2026-05-23 最新版 (v0.105.0) の公式ドキュメント根拠付きで徹底解説。",
+    "GitHub Copilot Coding Agent / VS Code Agent Mode / Copilot CLI 対応の SKILL.md ガイド。フロントマター完全仕様・Progressive Disclosure 3段階ローディング・ステップバイステップ作成・実践テンプレート集・トラブルシューティングを 2026年最新版 (v0.105.0) の公式ドキュメント根拠付きで徹底解説。",
 };
 
 type Source = { num: string; href: string; title: string; desc: string };
@@ -99,7 +99,7 @@ const SOURCES_EXISTING: Source[] = [
     num: "[4]",
     href: "https://docs.github.com/en/copilot/customizing-copilot/adding-custom-instructions-for-github-copilot/",
     title: "Adding repository custom instructions for GitHub Copilot — GitHub Docs (公式)",
-    desc: "copilot-instructions.md・.instructions.md の公式仕様。applyTo の glob 構文・excludeAgent・短文自己完結の原則。SKILL.md ととの使い分けの判断基準",
+    desc: "copilot-instructions.md・.instructions.md の公式仕様。applyTo の glob 構文・excludeAgent・短文自己完結の原則。SKILL.md との使い分けの判断基準",
   },
   {
     num: "[9]",
@@ -137,7 +137,7 @@ export default function CopilotSkillPage() {
     <div className={styles.root}>
       <header className={styles.header}>
         <div className={styles.hdrMesh} />
-        <div className={styles.eyebrow}>Microsoft × GitHub × VS Code — 2026年3月最新版</div>
+        <div className={styles.eyebrow}>Microsoft × GitHub × VS Code — 2026年5月版</div>
         <h1>
           <span className={styles.msText}>GitHub Copilot</span>
           <br />
@@ -151,14 +151,14 @@ export default function CopilotSkillPage() {
           フロントマター完全仕様 / 3段階ローディング / ステップバイステップ作成 / 実践テンプレート集
           / トラブルシューティング——
           <br />
-          2026年3月時点の公式ドキュメントと最新情報を元に、初学者から上級者まで対応した決定版ガイド
+          2026年5月時点の公式ドキュメントと最新情報を元に、初学者から上級者まで対応した決定版ガイド
         </p>
         <div className={styles.badgeStrip}>
           <span className={`${styles.badge} ${styles.bm}`}>GitHub Copilot</span>
           <span className={`${styles.badge} ${styles.bg}`}>agentskills.io オープン標準</span>
           <span className={`${styles.badge} ${styles.bc}`}>Progressive Disclosure</span>
           <span className={`${styles.badge} ${styles.bv}`}>4ツール共通フォーマット</span>
-          <span className={`${styles.badge} ${styles.bt}`}>Mar 2026 最新</span>
+          <span className={`${styles.badge} ${styles.bt}`}>May 2026 最新</span>
         </div>
       </header>
 

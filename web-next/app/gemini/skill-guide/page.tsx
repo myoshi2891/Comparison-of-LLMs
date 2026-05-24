@@ -533,7 +533,7 @@ export default function Page() {
                     (context.fileName に追加 / デフォルトは GEMINI.md)
                   </span>
                 </td>
-                <td style={{ fontWeight: 700, color: "#059669" }}>✅ (v1.20.3〜v2.0.1)</td>
+                <td style={{ fontWeight: 700, color: "#059669" }}>✅ (v2.0.1)</td>
               </tr>
             </tbody>
           </table>
@@ -1478,7 +1478,7 @@ export default function Page() {
                 Antigravity
               </span>
               <span className={styles.badge} style={{ background: "#ede9fe", color: "#6d28d9" }}>
-                v1.20.3 (2026-03-05)
+                v2.0.1 (2026-05-23)
               </span>
             </div>
             <ul
@@ -1502,7 +1502,7 @@ export default function Page() {
                     flexShrink: 0,
                   }}
                 >
-                  v1.20.3
+                  v2.0.1
                 </span>
                 <span>
                   <strong>AGENTS.md サポート</strong> 追加（Claude Code
@@ -1518,7 +1518,7 @@ export default function Page() {
                     flexShrink: 0,
                   }}
                 >
-                  v1.20.3
+                  v2.0.1
                 </span>
                 <span>
                   トークン計算バグ修正・<strong>Auto-continue のデフォルト有効化</strong>
