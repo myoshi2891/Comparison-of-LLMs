@@ -11,9 +11,9 @@ export const metadata: Metadata = {
 /**
  * Render the SKILL.md intermediate guide page with navigation, table of contents, nine content sections, and footer.
  *
- * The component produces a fully static, client-rendered layout that presents the guide's sections (architecture, YAML, instruction design, args, fork, trigger, debug, enterprise, self-improvement), embedded diagrams, example code blocks, and references.
+ * Produces a fully composed, static JSX layout for the intermediate SKILL.md guide including hero, TOC, sections (01–09) with Mermaid diagrams, code examples, tables, callouts, and footer.
  *
- * @returns A JSX element containing the complete static guide layout (progress bar, page TOC, content sections with Mermaid diagrams and code samples, and footer)
+ * @returns The complete static guide layout as a JSX element
  */
 export default function Page() {
   return (

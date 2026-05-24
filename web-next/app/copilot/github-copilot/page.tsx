@@ -150,11 +150,11 @@ const SOURCE_GROUPS: SourceGroup[] = [
 ];
 
 /**
- * Renders an external link that opens the provided URL in a new tab with safe `rel` attributes.
+ * Render an anchor that opens the given URL in a new browser tab with safe `rel` attributes.
  *
- * @param href - The destination URL for the link.
- * @param children - Content to render inside the link.
- * @returns An anchor element pointing to `href` that opens in a new tab and includes `rel="noopener noreferrer"`.
+ * @param href - Destination URL for the link
+ * @param children - Content rendered inside the anchor
+ * @returns The anchor element configured with `target="_blank"` and `rel="noopener noreferrer"`
  */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (

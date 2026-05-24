@@ -255,14 +255,14 @@ const SOURCES: Source[] = [
 ];
 
 /**
- * Render the SKILL.md comprehensive guide page tailored for Gemini CLI and Antigravity.
+ * Render the complete SKILL.md guide page for Gemini CLI and Antigravity.
  *
- * The page composes a full multi-section guide including hero, overview, rationale,
- * SKILL.md anatomy, writing how-to, step-by-step creation, installation instructions,
- * examples, best-practice checklist, supported-models changelog, and footer. It embeds
- * mermaid diagrams and interactive subcomponents (StepsApp, ExamplesApp, ChecklistApp).
+ * The page presents a full multi-section documentation layout (hero, overview, rationale,
+ * SKILL.md anatomy, writing how-to, step-by-step guide, installation, examples, checklist,
+ * latest updates, sources, and footer) and embeds mermaid diagrams and interactive subcomponents
+ * such as StepsApp, ExamplesApp, and ChecklistApp.
  *
- * @returns A React element representing the complete SKILL.md guide layout with sections, diagrams, tables, and embedded interactive components.
+ * @returns A React element representing the full multi-section SKILL.md guide layout with diagrams, tables, and embedded interactive components.
  */
 export default function Page() {
   return (

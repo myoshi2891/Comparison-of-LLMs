@@ -132,6 +132,17 @@ function Ext({
   );
 }
 
+/**
+ * Renders the complete "GitHub Copilot — SKILL.md 完全ベストプラクティスガイド" page (May 2026 edition).
+ *
+ * The page includes header metadata, a table of contents, detailed sections covering concept,
+ * the 3-level Progressive Disclosure model, frontmatter specification, placement paths,
+ * a step-by-step creation guide, templates, comparisons with custom instructions,
+ * advanced patterns (resources and MCP), troubleshooting, best practices, community resources,
+ * and reference sources.
+ *
+ * @returns The React element for the full SKILL.md best-practices guide page.
+ */
 export default function CopilotSkillPage() {
   return (
     <div className={styles.root}>

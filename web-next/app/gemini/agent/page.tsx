@@ -259,7 +259,16 @@ const SOURCES_NEW: Source[] = [
   },
 ];
 
-// ── PAGE ─────────────────────────────────────────────────────────────
+/**
+ * Render the Gemini multi-agent best-practices documentation page.
+ *
+ * Renders a static Next.js React page that documents Gemini multi-agent development
+ * patterns, file/layout conventions (GEMINI.md, AGENTS.md, agent.py, agent.json,
+ * .geminiignore, settings.json), ADK/A2A/MCP/AP2/A2UI integration, example snippets,
+ * decision flows, and reference sources.
+ *
+ * @returns The React element for the Gemini multi-agent guide page.
+ */
 
 export default function GeminiAgentPage() {
   return (
