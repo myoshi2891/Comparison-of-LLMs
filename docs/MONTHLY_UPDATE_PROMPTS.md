@@ -1,7 +1,7 @@
 # 月次更新プロンプト集
 
 > **用途**: 毎月最低 1 回、各画面の情報を最新状態に保つためのプロンプトテンプレート集。  
-> **更新日**: 2026-05-09  
+> **最終更新**: 2026-05-24  
 > **次回予定**: 2026-06-01 以降
 
 ---
@@ -23,27 +23,27 @@
 
 ## 画面一覧
 
-| # | URL | ページタイトル（概要） |
-|---|-----|----------------------|
-| 1 | `/` | AIモデル 時間別コスト 計算機（ホーム） |
-| 2 | `/claude/skill` | Claude Code AI仕様駆動開発 — マークダウンファイル完全ガイド |
-| 3 | `/claude/skill-guide` | SKILL.md 完全解説ガイド — Claude Code |
-| 4 | `/claude/skill-guide-intermediate` | SKILL.md 中級者完全攻略ガイド — Claude Code |
-| 5 | `/claude/agent` | Claude Code サブエージェント Markdown ベストプラクティス |
-| 6 | `/claude/cowork-guide` | Claude Cowork 完全入門ガイド |
-| 7 | `/gemini/skill` | Google Antigravity × Gemini — マークダウンファイル完全ガイド |
-| 8 | `/gemini/skill-guide` | SKILL.md 完全解剖ガイド（Gemini CLI 中級者以上向け） |
-| 9 | `/gemini/skill-guide-intermediate` | SKILL.md 完全ガイド — Gemini CLI & Antigravity |
-| 10 | `/gemini/agent` | Gemini マルチエージェント開発（ADK / A2A） |
-| 11 | `/gemini/antigravity-guide` | Google Antigravity — AI仕様駆動開発 ベストプラクティス完全ガイド |
-| 12 | `/codex/skill` | OpenAI Codex — AI仕様駆動開発 マークダウンファイル完全ガイド |
-| 13 | `/codex/agent` | OpenAI Codex エージェント開発ガイド |
-| 14 | `/codex/openai-codex-guide` | OpenAI Codex 完全ガイド 2026 |
-| 15 | `/copilot/skill` | GitHub Copilot SKILL.md 完全ベストプラクティスガイド |
-| 16 | `/copilot/agent` | GitHub Copilot コーディングエージェント開発ガイド |
-| 17 | `/copilot/github-copilot` | GitHub Copilot 完全ガイド 2026 |
-| 18 | `/copilot/markdown-file-guide` | GitHub Copilot — AI仕様駆動開発 マークダウンファイル完全ガイド |
-| 19 | `/git-worktree` | git worktree × 4プラットフォーム ドキュメント並列開発ガイド |
+| # | URL | ページタイトル（概要） | 更新日 |
+|---|-----|----------------------|--------|
+| 1 | `/` | AIモデル 時間別コスト 計算機（ホーム） | 2026-05-09 |
+| 2 | `/claude/skill` | Claude Code AI仕様駆動開発 — マークダウンファイル完全ガイド | 2026-05-15 |
+| 3 | `/claude/skill-guide` | SKILL.md 完全解説ガイド — Claude Code | 2026-05-15 |
+| 4 | `/claude/skill-guide-intermediate` | SKILL.md 中級者完全攻略ガイド — Claude Code | 2026-05-15 |
+| 5 | `/claude/agent` | Claude Code サブエージェント Markdown ベストプラクティス | 2026-05-15 |
+| 6 | `/claude/cowork-guide` | Claude Cowork 完全入門ガイド | 2026-05-08 |
+| 7 | `/gemini/skill` | Google Antigravity × Gemini — マークダウンファイル完全ガイド | 2026-05-23 |
+| 8 | `/gemini/skill-guide` | SKILL.md 完全解剖ガイド（Gemini CLI 中級者以上向け） | 2026-05-24 |
+| 9 | `/gemini/skill-guide-intermediate` | SKILL.md 完全ガイド — Gemini CLI & Antigravity | 2026-05-23 |
+| 10 | `/gemini/agent` | Gemini マルチエージェント開発（ADK / A2A） | 2026-05-23 |
+| 11 | `/gemini/antigravity-guide` | Google Antigravity — AI仕様駆動開発 ベストプラクティス完全ガイド | 2026-05-22 |
+| 12 | `/codex/skill` | OpenAI Codex — AI仕様駆動開発 マークダウンファイル完全ガイド | 2026-05-24 |
+| 13 | `/codex/agent` | OpenAI Codex エージェント開発ガイド | 2026-05-23 |
+| 14 | `/codex/openai-codex-guide` | OpenAI Codex 完全ガイド 2026 | 2026-05-23 |
+| 15 | `/copilot/skill` | GitHub Copilot SKILL.md 完全ベストプラクティスガイド | 2026-05-24 |
+| 16 | `/copilot/agent` | GitHub Copilot コーディングエージェント開発ガイド | 2026-05-24 |
+| 17 | `/copilot/github-copilot` | GitHub Copilot 完全ガイド 2026 | 2026-05-24 |
+| 18 | `/copilot/markdown-file-guide` | GitHub Copilot — AI仕様駆動開発 マークダウンファイル完全ガイド | 2026-05-08 |
+| 19 | `/git-worktree` | git worktree × 4プラットフォーム ドキュメント並列開発ガイド | 2026-05-08 |
 
 ---
 
@@ -909,4 +909,4 @@ Mermaid ダイアグラム定義は変更禁止（インデント汚染でエラ
 
 ---
 
-*最終更新: 2026-05-09 — 初版作成*
+*最終更新: 2026-05-24 — 初版作成*

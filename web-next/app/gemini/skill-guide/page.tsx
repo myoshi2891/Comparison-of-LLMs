@@ -255,14 +255,14 @@ const SOURCES: Source[] = [
 ];
 
 /**
- * Render the SKILL.md comprehensive guide page tailored for Gemini CLI and Antigravity.
+ * Render the complete SKILL.md guide page for Gemini CLI and Antigravity.
  *
- * The page composes a full multi-section guide including hero, overview, rationale,
- * SKILL.md anatomy, writing how-to, step-by-step creation, installation instructions,
- * examples, best-practice checklist, supported-models changelog, and footer. It embeds
- * mermaid diagrams and interactive subcomponents (StepsApp, ExamplesApp, ChecklistApp).
+ * The page presents a full multi-section documentation layout (hero, overview, rationale,
+ * SKILL.md anatomy, writing how-to, step-by-step guide, installation, examples, checklist,
+ * latest updates, sources, and footer) and embeds mermaid diagrams and interactive subcomponents
+ * such as StepsApp, ExamplesApp, and ChecklistApp.
  *
- * @returns A React element representing the complete SKILL.md guide layout with sections, diagrams, tables, and embedded interactive components.
+ * @returns A React element representing the full multi-section SKILL.md guide layout with diagrams, tables, and embedded interactive components.
  */
 export default function Page() {
   return (
@@ -533,7 +533,7 @@ export default function Page() {
                     (context.fileName に追加 / デフォルトは GEMINI.md)
                   </span>
                 </td>
-                <td style={{ fontWeight: 700, color: "#059669" }}>✅ (v1.20.3〜v2.0.1)</td>
+                <td style={{ fontWeight: 700, color: "#059669" }}>✅ (v2.0.1)</td>
               </tr>
             </tbody>
           </table>
@@ -1249,7 +1249,7 @@ export default function Page() {
                 <td className={styles.tdLeft} style={{ fontWeight: 700, color: "#6d28d9" }}>
                   Antigravity
                   <br />
-                  <span className={styles.textSlateLight}>v1.20.3</span>
+                  <span className={styles.textSlateLight}>v2.0.1</span>
                 </td>
                 <td className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}>
                   ~/.gemini/antigravity/skills/
@@ -1289,7 +1289,7 @@ export default function Page() {
         }}
       >
         <h2 className={styles.secTitle} style={{ color: "#c2410c", borderBottomColor: "#fed7aa" }}>
-          🆕 最新アップデート（2026年3月21日時点）
+          🆕 最新アップデート（2026年5月23日時点）
         </h2>
 
         {/* 2-col: Gemini CLI + Antigravity */}
@@ -1478,7 +1478,7 @@ export default function Page() {
                 Antigravity
               </span>
               <span className={styles.badge} style={{ background: "#ede9fe", color: "#6d28d9" }}>
-                v1.20.3 (2026-03-05)
+                v2.0.1 (2026-05-23)
               </span>
             </div>
             <ul
@@ -1502,7 +1502,7 @@ export default function Page() {
                     flexShrink: 0,
                   }}
                 >
-                  v1.20.3
+                  v2.0.1
                 </span>
                 <span>
                   <strong>AGENTS.md サポート</strong> 追加（Claude Code
@@ -1518,7 +1518,7 @@ export default function Page() {
                     flexShrink: 0,
                   }}
                 >
-                  v1.20.3
+                  v2.0.1
                 </span>
                 <span>
                   トークン計算バグ修正・<strong>Auto-continue のデフォルト有効化</strong>
@@ -1570,7 +1570,7 @@ export default function Page() {
 
         {/* Model table */}
         <h3 className={styles.secH3} style={{ color: "#9a3412", marginTop: "1.5rem" }}>
-          🤖 現在サポートされるモデル（2026年3月）
+          🤖 現在サポートされるモデル（2026年5月23日時点）
         </h3>
         <div className={`${styles.tableWrap} ${styles.modelTable}`}>
           <table

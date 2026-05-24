@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "OpenAI Codex エージェント開発ガイド | LLM コスト計算機",
+  title: "OpenAI Codex v0.105.0 エージェント開発ガイド | LLM コスト計算機",
   description:
-    "OpenAI Codex CLI (Rust製) および Agents SDK を使ったサブエージェント / マルチエージェント開発で必要な AGENTS.md・AGENTS.override.md・SKILL.md・config.toml の役割と書き方を体系化したガイド。初学者向け 7 ステップ入門から PM 駆動 SDD パターンまで網羅。",
+    "OpenAI Codex CLI (v0.105.0, 2026-05-23 最新版) および Agents SDK を使ったサブエージェント / マルチエージェント開発で必要な AGENTS.md・AGENTS.override.md・SKILL.md・config.toml の役割と書き方を体系化したガイド。初学者向け 7 ステップ入門から PM 駆動 SDD パターンまで網羅。GPT-5.4 対応。",
 };
 
 type Source = {
@@ -152,8 +152,29 @@ const SOURCES_NEW: Source[] = [
     url: "developers.openai.com/codex/security/",
     desc: "sandbox_mode（read-only / workspace-write / network-sandbox）・network_access 設定・サブエージェントのセキュリティモデルの公式仕様",
   },
+  {
+    icon: "🐙",
+    title: "OpenAI 公式: openai-agents-python (GitHub)",
+    href: "https://github.com/openai/openai-agents-python",
+    url: "github.com/openai/openai-agents-python",
+    desc: "OpenAI Agents SDK の公式リポジトリ。インストール・使用例・APIリファレンスが公開されている",
+  },
+  {
+    icon: "🔥",
+    title: "OpenAI 公式: Codex May 2026 Updates",
+    href: "https://developers.openai.com/codex/blog/may-2026-updates/",
+    url: "developers.openai.com/codex/blog/may-2026-updates/",
+    desc: "Goal Mode (自律的タスク自動化)・Appshots プレビューなどの2026年5月の最新リリース公式ブログ",
+  },
 ];
 
+/**
+ * Render an external anchor that opens the given URL in a new browser tab with `noopener noreferrer` for link safety.
+ *
+ * @param href - The destination URL for the link.
+ * @param children - The link contents (text or elements) to render inside the anchor.
+ * @returns The anchor element configured to open `href` in a new tab with `rel="noopener noreferrer"`.
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -189,6 +210,15 @@ const TOC_ITEMS = [
   { id: "sources", label: "📚 参考ソース" },
 ] as const;
 
+/**
+ * Render the Codex Agent development guide page that documents AGENTS.md, AGENTS.override.md,
+ * SKILL.md, .codex/config.toml, PM-driven Agents SDK patterns, and related best practices.
+ *
+ * This Next.js page component composes the full instructional article including navigation,
+ * hero, table of contents, detailed sections (s01–s11) and a references list.
+ *
+ * @returns The React element for the Codex Agent development guide page.
+ */
 export default function CodexAgentPage() {
   return (
     <div className={styles.root}>
@@ -197,9 +227,9 @@ export default function CodexAgentPage() {
         <div className={styles["nav-logo"]}>⚙</div>
         <span className={styles["nav-title"]}>OpenAI Codex Agent Dev Guide</span>
         <span className={styles["nav-sep"]}>—</span>
-        <span className={styles["nav-sub"]}>codex-1 / Codex CLI / Agents SDK · 2026</span>
+        <span className={styles["nav-sub"]}>codex-1 / Codex CLI v0.105.0 / Agents SDK · 2026</span>
         <div className={styles["nav-right"]}>
-          <span className={styles["nav-chip"]}>Codex CLI</span>
+          <span className={styles["nav-chip"]}>Codex CLI v0.105.0</span>
           <span className={styles["nav-chip"]}>Multi-Agent</span>
           <span className={styles["nav-chip"]}>Skills</span>
         </div>
@@ -208,7 +238,9 @@ export default function CodexAgentPage() {
       <div className={styles.wrap}>
         {/* HERO */}
         <div className={styles.hero}>
-          <div className={styles["hero-badge"]}>⚙ OpenAI Codex 完全ガイド — 2026年3月最新版</div>
+          <div className={styles["hero-badge"]}>
+            ⚙ OpenAI Codex 完全ガイド — v0.105.0 (2026年5月最新版)
+          </div>
           <h1>
             OpenAI <em>Codex</em> サブエージェント開発における
             <br />
@@ -223,8 +255,8 @@ export default function CodexAgentPage() {
           </p>
           <div className={styles["hero-meta"]}>
             <span className={styles["hero-tag"]}>初学者向け 7ステップ入門</span>
-            <span className={styles["hero-tag"]}>Codex CLI (Rust製)</span>
-            <span className={styles["hero-tag"]}>GPT-5.3-Codex (SWE-Bench Pro: 56.8%)</span>
+            <span className={styles["hero-tag"]}>Codex CLI (v0.105.0)</span>
+            <span className={styles["hero-tag"]}>GPT-5.4 (o3-based)</span>
             <span className={styles["hero-tag"]}>Multi-Agent (Experimental)</span>
             <span className={styles["hero-tag"]}>Skills / SKILL.md</span>
             <span className={styles["hero-tag"]}>Agents SDK + MCP</span>

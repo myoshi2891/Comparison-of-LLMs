@@ -97,9 +97,7 @@ export default function Page() {
               に「専門的なスキル」を追加するための設定ファイル。ゼロから概念・構造・活用方法を理解するための初学者向け完全ガイドです。
             </p>
             <div className={styles.heroMeta}>
-              <span className={`${styles.heroChip} ${styles.chipGreen}`}>
-                ✓ Claude Code 最新版
-              </span>
+              <span className={`${styles.heroChip} ${styles.chipGreen}`}>✓ Claude Code 最新版</span>
               <span className={`${styles.heroChip} ${styles.chipBlue}`}>✓ 初学者向け</span>
               <span className={`${styles.heroChip} ${styles.chipPurple}`}>
                 ✓ ステップバイステップ
@@ -1158,8 +1156,8 @@ style FM fill:#1c2a1c,stroke:#3fb950,color:#e6edf3`}
                 Agent Teams (<code>--team</code>) 利用時は <code>/effort</code> コマンドで思考深度を{" "}
                 <code>low</code>・<code>medium</code>・<code>high</code>・<code>xhigh</code>{" "}
                 から選択できます（Opus 4.7 で <code>xhigh</code> が追加）。スキル内に{" "}
-                <code>effort: high</code> を frontmatter
-                で指定することも可能です（Opus 4.7 以降推奨）。<code>/loop</code>{" "}
+                <code>effort: high</code> を frontmatter で指定することも可能です（Opus 4.7
+                以降推奨）。<code>/loop</code>{" "}
                 コマンドを使えばスキルを定期的に繰り返し実行させることもできます。
               </p>
             </div>

@@ -172,6 +172,13 @@ function CodeDots() {
   );
 }
 
+/**
+ * Renders the GeminiSkillPage documentation describing Google Antigravity v2.0.1 — its Rules, SKILL.md conventions, Workflows, Knowledge Base, Artifacts, SDD guidance, and recommended project directory structure.
+ *
+ * The component outputs a static, structured documentation page with sections, code examples, best practices, and a sources list used for in-repo guidance.
+ *
+ * @returns The React element containing the full GeminiSkillPage documentation layout.
+ */
 export default function GeminiSkillPage() {
   return (
     <div className={styles.root}>
@@ -352,10 +359,11 @@ export default function GeminiSkillPage() {
               参照）。また、
               <strong>
                 v2.0.1（2026-05-23）で Managed Agents
-                のセキュリティ強化、fileMatch活性化の最適化、AGENTS.md の公式標準対応が適用されました。
+                のセキュリティ強化、fileMatch活性化の最適化、AGENTS.md
+                の公式標準対応が適用されました。
               </strong>
-              Claude Code（CLAUDE.md）など他のエージェントツールとのルール共有が可能で、
-              Antigravity CLI 経由でも同じ AGENTS.md/GEMINI.md/SKILL.md を再利用できます。
+              Claude Code（CLAUDE.md）など他のエージェントツールとのルール共有が可能で、 Antigravity
+              CLI 経由でも同じ AGENTS.md/GEMINI.md/SKILL.md を再利用できます。
             </div>
           </div>
         </section>

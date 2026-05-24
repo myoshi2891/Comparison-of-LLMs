@@ -259,7 +259,16 @@ const SOURCES_NEW: Source[] = [
   },
 ];
 
-// ── PAGE ─────────────────────────────────────────────────────────────
+/**
+ * Render the Gemini multi-agent best-practices documentation page.
+ *
+ * Renders a static Next.js React page that documents Gemini multi-agent development
+ * patterns, file/layout conventions (GEMINI.md, AGENTS.md, agent.py, agent.json,
+ * .geminiignore, settings.json), ADK/A2A/MCP/AP2/A2UI integration, example snippets,
+ * decision flows, and reference sources.
+ *
+ * @returns The React element for the Gemini multi-agent guide page.
+ */
 
 export default function GeminiAgentPage() {
   return (
@@ -268,8 +277,8 @@ export default function GeminiAgentPage() {
         {/* HERO */}
         <div className={styles.hero}>
           <div className={styles.heroEyebrow}>
-            🤖 Google Gemini 完全ガイド — 最新（2026年）/ Gemini CLI 最新版 / ADK 2.0 GA / A2A
-            + AP2 + A2UI 対応
+            🤖 Google Gemini 完全ガイド — 最新（2026年）/ Gemini CLI 最新版 / ADK 2.0 GA / A2A + AP2
+            + A2UI 対応
           </div>
           <h1>
             Gemini マルチエージェント開発における

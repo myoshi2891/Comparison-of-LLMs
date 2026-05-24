@@ -9,10 +9,10 @@
 ## 現在地
 
 - **ブランチ**: `feat/nextjs-migration`
-- 最新 HEAD: 43fdcf1（docs: MIGRATION_PROGRESS.md の HEAD 情報更新）
+- 最新 HEAD: 7c1645a（docs(copilot): update best practices guide to May 2026 specifications）
 - 未コミット作業: なし（working tree クリーン）
 - 次の作業: **Phase A–F 全完了 → レビュー対応 / マージ準備**
-- テスト数: `bun run test` **542 passed / 542 total（全 Green ✅）**  — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
+- テスト数: `bun run test` **553 passed / 553 total（全 Green ✅）**  — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
 - ビルド: `bun run build` ✅（5510c4e 時点）・`bun run typecheck` ✅・`uv run pytest` 5/5 passed
 - **lint 既知違反**: なし（全解消 ✅）
 
@@ -155,7 +155,7 @@ web-next/
 └── app/git-worktree/                    # Phase E（完了）
 ```
 
-**テスト数**: **542 passed / 542 total（全 Green）** — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
+**テスト数**: **553 passed / 553 total（全 Green）** — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
 
 ## 確定した設計判断（`docs/archive/NEXTJS_MIGRATION_PLAN.md` ステップ 0）
 
@@ -180,7 +180,7 @@ Next.js 移行プロジェクトの作業を再開してください。
 
 - リポジトリ: LLM-Studies（Phase A–F の Next.js 移行作業中）
 - 現在のブランチ: feat/nextjs-migration
-- 最新 HEAD: 43fdcf1（docs: MIGRATION_PROGRESS.md の HEAD 情報更新）
+- 最新 HEAD: 7c1645a（docs(copilot): update best practices guide to May 2026 specifications）
 - 移行計画: docs/archive/NEXTJS_PHASE_A_F_PLAN.md（Phase A–F）— 全 Phase 完了（アーカイブ）
 - 進捗トラッカー: MIGRATION_PROGRESS.md（**作業開始前に必読**: §「AI 作業ルール」R1〜R4）
 - プロジェクト固有スキル: .claude/skills/nextjs-page-migration/SKILL.md
@@ -215,7 +215,7 @@ Phase F — 実施ログ（参考）:
 - 既存ファイル（pricing.json / scraper / lib/cost.ts 等）への副作用的な変更
 
 検証コマンド早見表:
-  (cd web-next && bun run test)          # 全件 pass が期待値（現在 542 件 全 pass）
+  (cd web-next && bun run test)          # 全件 pass が期待値（現在 553 件 全 pass）
   (cd web-next && bun run typecheck)     # OK
   (cd web-next && bun run build)         # 全ルートが ○ (Static)
   (cd web-next && bun run lint)          # 違反 0 件（Green ✅）

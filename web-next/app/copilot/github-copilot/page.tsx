@@ -4,7 +4,7 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   title: "GitHub Copilot 完全ガイド 2026 | ベストプラクティス",
   description:
-    "2026年3月最新版 — 初学者からエキスパートまで対応したステップバイステップのAIコーディングアシスタント活用法",
+    "2026年5月最新版 — 初学者からエキスパートまで対応したステップバイステップのAIコーディングアシスタント活用法",
 };
 
 type Source = {
@@ -47,8 +47,8 @@ const SOURCE_GROUPS: SourceGroup[] = [
       {
         icon: "💳",
         title: "GitHub Copilot プラン一覧（公式）",
-        href: "https://docs.github.com/en/copilot/get-started/plans",
-        url: "docs.github.com/en/copilot/get-started/plans",
+        href: "https://docs.github.com/en/copilot/get-started/plans-for-github-copilot",
+        url: "docs.github.com/en/copilot/get-started/plans-for-github-copilot",
         badge: "GitHub Docs",
       },
       {
@@ -92,6 +92,34 @@ const SOURCE_GROUPS: SourceGroup[] = [
         badge: "Blog",
       },
       {
+        icon: "📢",
+        title: "GitHub Copilot 従量課金制（AI Credits）への移行発表（2026年4月）",
+        href: "https://github.blog/news-insights/company-news/github-copilot-is-moving-to-usage-based-billing/",
+        url: "github.blog/.../github-copilot-is-moving-to-usage-based-billing/",
+        badge: "Blog",
+      },
+      {
+        icon: "⚡",
+        title: "GitHub Copilot App 技術プレビューリリース（2026年5月）",
+        href: "https://github.blog/2026-05-14-introducing-the-github-copilot-app-in-technical-preview/",
+        url: "github.blog/.../introducing-the-github-copilot-app-in-technical-preview/",
+        badge: "Blog",
+      },
+      {
+        icon: "🤖",
+        title: "Gemini 3.5 Flash 一般提供開始（2026年5月）",
+        href: "https://github.blog/changelog/2026-05-19-gemini-3.5-flash-is-generally-available-for-github-copilot/",
+        url: "github.blog/changelog/2026-05-19-...",
+        badge: "Changelog",
+      },
+      {
+        icon: "🎯",
+        title: "VS Codeでのタスクに基づくAIモデル自動ルーティング（2026年5月）",
+        href: "https://github.blog/changelog/2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code/",
+        url: "github.blog/changelog/2026-05-20-...",
+        badge: "Changelog",
+      },
+      {
         icon: "📋",
         title: "Copilot CLI 強化: エージェント・コンテキスト管理（2026年1月）",
         href: "https://github.blog/changelog/2026-01-14-github-copilot-cli-enhanced-agents-context-management-and-new-ways-to-install/",
@@ -112,16 +140,9 @@ const SOURCE_GROUPS: SourceGroup[] = [
     items: [
       {
         icon: "📊",
-        title: "個人向けCopilot課金の詳細（公式）",
-        href: "https://docs.github.com/en/copilot/concepts/billing/billing-for-individuals",
-        url: "docs.github.com/en/copilot/concepts/billing/billing-for-individuals",
-        badge: "GitHub Docs",
-      },
-      {
-        icon: "🏢",
-        title: "組織・Enterprise向けCopilot課金の詳細（公式）",
-        href: "https://docs.github.com/en/copilot/concepts/billing/organizations-and-enterprises",
-        url: "docs.github.com/en/copilot/concepts/billing/organizations-and-enterprises",
+        title: "Copilot 課金と支払いの詳細（公式）",
+        href: "https://docs.github.com/en/copilot/managing-copilot/managing-copilot-billing/about-billing-for-github-copilot",
+        url: "docs.github.com/en/copilot/managing-copilot/managing-copilot-billing/about-billing-for-github-copilot",
         badge: "GitHub Docs",
       },
     ],
@@ -129,11 +150,11 @@ const SOURCE_GROUPS: SourceGroup[] = [
 ];
 
 /**
- * Renders an external link that opens the provided URL in a new tab with safe `rel` attributes.
+ * Render an anchor that opens the given URL in a new browser tab with safe `rel` attributes.
  *
- * @param href - The destination URL for the link.
- * @param children - Content to render inside the link.
- * @returns An anchor element pointing to `href` that opens in a new tab and includes `rel="noopener noreferrer"`.
+ * @param href - Destination URL for the link
+ * @param children - Content rendered inside the anchor
+ * @returns The anchor element configured with `target="_blank"` and `rel="noopener noreferrer"`
  */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
@@ -144,7 +165,7 @@ function Ext({ href, children }: { href: string; children: React.ReactNode }) {
 }
 
 /**
- * Render the GitHub Copilot "Complete Best Practices Guide" single-page article (Japanese, March 2026).
+ * Render the GitHub Copilot "Complete Best Practices Guide" single-page article (Japanese, May 2026).
  *
  * This component produces a static, fully-structured Next.js page that includes a hero header with stats,
  * a top navigation and table of contents, nine main sections (s01–s09) covering overview, plans, setup,
@@ -161,7 +182,7 @@ export default function GithubCopilotPage() {
       <header className={styles.hero}>
         <div className={styles.heroBadge}>
           <span className={styles.badgeDot} />
-          Updated: March 2026
+          Updated: May 2026
         </div>
         <h1 className={styles.heroTitle}>
           <span className={styles.dim}>{"// "}</span>
@@ -170,7 +191,7 @@ export default function GithubCopilotPage() {
           完全ベストプラクティスガイド
         </h1>
         <p className={styles.heroSub}>
-          2026年3月最新版 — 初学者からエキスパートまで対応した
+          2026年5月最新版 — 初学者からエキスパートまで対応した
           <br />
           ステップバイステップのAIコーディングアシスタント活用法
         </p>
@@ -320,7 +341,7 @@ export default function GithubCopilotPage() {
               <div className={styles.planTarget}>まず試してみたい方・学習目的</div>
               <ul className={styles.planFeatures}>
                 <li>月2,000回のインライン補完</li>
-                <li>月50回のプレミアムリクエスト</li>
+                <li>月50回分のAIクレジット</li>
                 <li>基本的なChats機能</li>
               </ul>
               <span
@@ -339,7 +360,7 @@ export default function GithubCopilotPage() {
               <div className={styles.planTarget}>個人開発者・フリーランス向け</div>
               <ul className={styles.planFeatures}>
                 <li>無制限のインライン補完</li>
-                <li>月300回のプレミアムリクエスト</li>
+                <li>月300回分相当のAIクレジット</li>
                 <li>Coding Agent（コーディングエージェント）</li>
                 <li>Code Review（コードレビュー）</li>
                 <li>30日間無料トライアルあり</li>
@@ -359,7 +380,7 @@ export default function GithubCopilotPage() {
               </div>
               <div className={styles.planTarget}>ヘビーユーザー・上級者向け</div>
               <ul className={styles.planFeatures}>
-                <li>月1,500回のプレミアムリクエスト</li>
+                <li>月1,500回分相当のAIクレジット</li>
                 <li>全モデルへのアクセス</li>
                 <li>Claude Opus 4.6・o3・GPT-5.4対応</li>
                 <li>Copilot CLI（GA版）</li>
@@ -405,7 +426,7 @@ export default function GithubCopilotPage() {
                 <li>GitHub.com Chat統合</li>
                 <li>Copilot CLI（GA版）</li>
                 <li>GitHub Spark統合</li>
-                <li>月1,000プレミアムリクエスト</li>
+                <li>月1,000回分相当のAIクレジット</li>
               </ul>
               <span
                 className={`${styles.tag} ${styles.tagNew}`}
@@ -419,15 +440,19 @@ export default function GithubCopilotPage() {
           <div className={styles.alertInfo} style={{ marginTop: "16px", fontSize: "0.875rem" }}>
             <span className={styles.alertIcon}>📅</span>
             <div className={styles.alertContent}>
-              <strong>最終更新:</strong> 2026年3月
+              <strong>最終更新:</strong> 2026年5月
               <br />
               <strong>参考:</strong>{" "}
               <Ext href="https://github.com/features/copilot/plans">
                 GitHub Copilot Plans &amp; Pricing
               </Ext>
               ,{" "}
-              <Ext href="https://docs.github.com/en/copilot/get-started/plans">
+              <Ext href="https://docs.github.com/en/copilot/get-started/plans-for-github-copilot">
                 Plans for GitHub Copilot - GitHub Docs
+              </Ext>
+              ,{" "}
+              <Ext href="https://github.blog/news-insights/company-news/github-copilot-is-moving-to-usage-based-billing/">
+                GitHub Copilot usage-based billing transition
               </Ext>
             </div>
           </div>
@@ -435,7 +460,12 @@ export default function GithubCopilotPage() {
           <div className={styles.alertWarn} style={{ marginTop: "24px" }}>
             <span className={styles.alertIcon}>⚠️</span>
             <div className={styles.alertContent}>
-              <strong>重要：</strong> EnterpriseプランはGitHub Enterprise
+              <strong>重要：</strong>{" "}
+              2026年6月1日より、従来の定額「プレミアムリクエスト」カウント制限から、実際のトークン消費量に基づく『GitHub
+              AI
+              Credits』従量課金制へと完全に移行します（各プラン基本料金に変更はなく、プラン料と同額のクレジットが含まれます）。なお、基本的なインラインコード補完は引き続き無制限でクレジットを消費しません。
+              <br />
+              EnterpriseプランはGitHub Enterprise
               Cloud（$21/ユーザー/月）が前提条件です。合計コストは
               <strong>$60/ユーザー/月</strong>になります。
               <br />
@@ -944,6 +974,44 @@ export default function GithubCopilotPage() {
                 </ul>
               </div>
             </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNum}>📱</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTitle}>
+                  GitHub Copilot App{" "}
+                  <span className={`${styles.tag} ${styles.tagNew}`}>2026/05</span>
+                </div>
+                <div className={styles.stepBody}>
+                  エージェント開発に特化したGitHubネイティブのデスクトップアプリ（技術プレビュー）。
+                  独立したセッションでブランチやファイルの編集、タスク進行状況を管理でき、PRレビューやCIエラーの自動修正まで統合環境で行えます。
+                </div>
+                <ul className={styles.stepSub}>
+                  <li>GitHub Issues / PR から直接セッションを開始可能</li>
+                  <li>自動テストやブラウザプレビューによるコード検証</li>
+                  <li>Interactive / Plan / Autopilotの各モードを搭載</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNum}>🎯</div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepTitle}>
+                  タスクに基づく自動モデル選択（Auto Model Selection）{" "}
+                  <span className={`${styles.tag} ${styles.tagNew}`}>2026/05</span>
+                </div>
+                <div className={styles.stepBody}>
+                  VS
+                  Codeにおいて、実行するタスクの難易度やツール使用の有無に基づき、最適なAIモデルへ自動的にルーティングする機能。
+                </div>
+                <ul className={styles.stepSub}>
+                  <li>手動でモデルを切り替える手間を削減</li>
+                  <li>タスクの複雑さに応じて最適な処理モデルを選択</li>
+                  <li>無駄なプレミアムリクエスト（クレジット）消費を抑制</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -1274,8 +1342,7 @@ export default function GithubCopilotPage() {
             <div className={styles.alertContent}>
               <strong>プレミアムリクエストと通常リクエストの違い：</strong>
               <br />
-              高度なモデル（GPT-5.3-Codex, Claude
-              Opus等）を使用するChat/エージェントモードは「プレミアムリクエスト」を消費します。
+              高度なモデル（GPTの最新モデル（2026）やClaudeの最新モデル（2026）等）を使用するChat/エージェントモードは「プレミアムリクエスト」を消費します。
               インラインコード補完は通常消費しません。モデルによって1リクエストあたりの消費量が異なります。
             </div>
           </div>
@@ -1294,7 +1361,7 @@ export default function GithubCopilotPage() {
             <tbody>
               <tr>
                 <td>
-                  <span className={styles.modelName}>GPT-5.3-Codex</span>
+                  <span className={styles.modelName}>GPT — newest 2026</span>
                   <br />
                   <span className={`${styles.tag} ${styles.tagNew}`}>LTS標準</span>
                 </td>
@@ -1312,7 +1379,7 @@ export default function GithubCopilotPage() {
               </tr>
               <tr>
                 <td>
-                  <span className={styles.modelName}>GPT-4o mini</span>
+                  <span className={styles.modelName}>GPT — newest 2026</span>
                   <br />
                   <span className={`${styles.tag} ${styles.tagFree}`}>軽量</span>
                 </td>
@@ -1330,7 +1397,7 @@ export default function GithubCopilotPage() {
               </tr>
               <tr>
                 <td>
-                  <span className={styles.modelName}>Claude Haiku 4.5</span>
+                  <span className={styles.modelName}>Claude — newest 2026</span>
                   <br />
                   <span className={`${styles.tag} ${styles.tagFree}`}>軽量</span>
                 </td>
@@ -1348,7 +1415,7 @@ export default function GithubCopilotPage() {
               </tr>
               <tr>
                 <td>
-                  <span className={styles.modelName}>Claude Sonnet 4.6</span>
+                  <span className={styles.modelName}>Claude — newest 2026</span>
                   <br />
                   <span className={`${styles.tag} ${styles.tagPro}`}>中〜上級</span>
                 </td>
@@ -1366,7 +1433,7 @@ export default function GithubCopilotPage() {
               </tr>
               <tr>
                 <td>
-                  <span className={styles.modelName}>Claude Opus 4.6</span>
+                  <span className={styles.modelName}>Claude — newest 2026</span>
                   <br />
                   <span className={`${styles.tag} ${styles.tagBeta}`}>最上級</span>
                 </td>
@@ -1384,43 +1451,43 @@ export default function GithubCopilotPage() {
               </tr>
               <tr>
                 <td>
-                  <span className={styles.modelName}>Gemini 2.5 Pro</span>
+                  <span className={styles.modelName}>Gemini — newest 2026</span>
                   <br />
                   <span className={`${styles.tag} ${styles.tagNew}`}>GA</span>
                 </td>
-                <td>最新Gemini。強力な推論・コーディング能力。Google製</td>
-                <td>複雑なタスク・数学・科学的処理</td>
+                <td>2026年5月GA。超高速かつ高精度なレスポンス。Google製</td>
+                <td>迅速なコード補完・チャット回答</td>
+                <td>
+                  <span className={`${styles.tag} ${styles.tagFree}`}>Free〜</span>
+                </td>
+                <td>
+                  <div className={styles.progressBarWrap}>
+                    <div className={styles.progressBarInner} style={{ width: "95%" }} />
+                  </div>
+                  最速クラス
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span className={styles.modelName}>Gemini — newest 2026</span>
+                  <br />
+                  <span className={`${styles.tag} ${styles.tagBeta}`}>GA</span>
+                </td>
+                <td>強力な推論・マルチモーダル対応。Google製</td>
+                <td>複雑なリファクタリング・論理推論</td>
                 <td>
                   <span className={`${styles.tag} ${styles.tagPro}`}>Pro〜</span>
                 </td>
                 <td>
                   <div className={styles.progressBarWrap}>
-                    <div className={styles.progressBarInner} style={{ width: "60%" }} />
+                    <div className={styles.progressBarInner} style={{ width: "70%" }} />
                   </div>
                   普通
                 </td>
               </tr>
               <tr>
                 <td>
-                  <span className={styles.modelName}>Gemini 3 Pro</span>
-                  <br />
-                  <span className={`${styles.tag} ${styles.tagBeta}`}>Preview</span>
-                </td>
-                <td>次世代Gemini（プレビュー版）。Google製</td>
-                <td>最先端の推論・コーディング</td>
-                <td>
-                  <span className={`${styles.tag} ${styles.tagBeta}`}>Pro+〜</span>
-                </td>
-                <td>
-                  <div className={styles.progressBarWrap}>
-                    <div className={styles.progressBarInner} style={{ width: "55%" }} />
-                  </div>
-                  普通〜遅
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <span className={styles.modelName}>Grok Code Fast 1</span>
+                  <span className={styles.modelName}>Grok — newest 2026</span>
                   <br />
                   <span className={`${styles.tag} ${styles.tagNew}`}>高速</span>
                 </td>
@@ -1438,7 +1505,7 @@ export default function GithubCopilotPage() {
               </tr>
               <tr>
                 <td>
-                  <span className={styles.modelName}>Raptor mini</span>
+                  <span className={styles.modelName}>Raptor — newest 2026</span>
                   <br />
                   <span className={`${styles.tag} ${styles.tagBeta}`}>Preview</span>
                 </td>
@@ -1460,15 +1527,19 @@ export default function GithubCopilotPage() {
           <div className={styles.alertInfo} style={{ marginTop: "16px", fontSize: "0.875rem" }}>
             <span className={styles.alertIcon}>📅</span>
             <div className={styles.alertContent}>
-              <strong>最終更新:</strong> 2026年3月
+              <strong>最終更新:</strong> 2026年5月
               <br />
               <strong>参考:</strong>{" "}
-              <Ext href="https://docs.github.com/en/copilot/reference/ai-models/supported-models">
+              <Ext href="https://docs.github.com/en/copilot/using-github-copilot/finding-information-about-github-copilot/supported-models">
                 Supported AI models - GitHub Docs
               </Ext>
               ,{" "}
               <Ext href="https://github.blog/changelog/2026-03-18-gpt-5-3-codex-long-term-support-in-github-copilot/">
-                GPT-5.3-Codex LTS - GitHub Changelog
+                GPT latest model (2026) LTS - GitHub Changelog
+              </Ext>
+              ,{" "}
+              <Ext href="https://github.blog/changelog/2026-05-19-gemini-3.5-flash-is-generally-available-for-github-copilot/">
+                Gemini latest model (2026) in GitHub Copilot
               </Ext>
             </div>
           </div>
@@ -1477,9 +1548,10 @@ export default function GithubCopilotPage() {
             <span className={styles.alertIcon}>💡</span>
             <div className={styles.alertContent}>
               <strong>モデル選択の基本戦略：</strong>
-              日常のコーディングはGPT-5.3-Codex、複雑なアーキテクチャ設計はClaude Sonnet 4.6、
-              難解なバグや高度な推論が必要な場合のみClaude Opus
-              4.6を使用することで、プレミアムリクエストを効率的に使えます。
+              日常のコーディングはGPTの最新モデル（2026）やGeminiの最新モデル（2026）、複雑なアーキテクチャ設計はClaudeの最新モデル（2026）、
+              難解なバグや高度な推論が必要な場合のみClaudeの最上位モデル（2026、Pro+のみ）を使用することで、AIクレジットを効率的に使えます。また、VS
+              Codeの自動モデル選択（Auto Model
+              Selection）機能を利用すると、自動的にタスクに応じた最適ルーティングが行われます。
             </div>
           </div>
         </section>
@@ -1579,7 +1651,7 @@ export default function GithubCopilotPage() {
             <div>
               <h2 className={styles.secTitle}>参考ソース一覧</h2>
               <p className={styles.secDesc}>
-                本ガイドの根拠となる公式ドキュメントおよび最新情報ソース（2026年3月時点）
+                本ガイドの根拠となる公式ドキュメントおよび最新情報ソース（2026年5月時点）
               </p>
             </div>
           </div>
@@ -1612,7 +1684,7 @@ export default function GithubCopilotPage() {
         <p>{"// GitHub Copilot 完全ベストプラクティスガイド"}</p>
         <p style={{ marginTop: "8px", color: "var(--text-muted)" }}>
           {"Last updated: "}
-          <span style={{ color: "var(--accent-cyan)" }}>March 2026</span>
+          <span style={{ color: "var(--accent-cyan)" }}>May 2026</span>
           {"  |  "}
           {"Sources: "}
           <Ext href="https://docs.github.com/en/copilot">GitHub Docs</Ext>
@@ -1620,7 +1692,7 @@ export default function GithubCopilotPage() {
           <Ext href="https://github.blog/ai-and-ml/github-copilot/">GitHub Blog</Ext>
         </p>
         <p style={{ marginTop: "12px", fontSize: "0.7rem", color: "var(--text-muted)" }}>
-          ※ 本ガイドの情報は2026年3月時点のものです。最新情報は公式ドキュメントをご確認ください。
+          ※ 本ガイドの情報は2026年5月時点のものです。最新情報は公式ドキュメントをご確認ください。
         </p>
       </footer>
     </div>

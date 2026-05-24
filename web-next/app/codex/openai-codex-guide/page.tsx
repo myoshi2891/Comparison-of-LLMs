@@ -4,7 +4,7 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   title: "OpenAI Codex 完全ガイド 2026",
   description:
-    "初学者から中級者まで。AIコーディングエージェントを最大限に活かすベストプラクティスをステップバイステップで解説します。",
+    "2026-05-23 最新版 (v0.105.0)。初学者から中級者まで、GPT-5.4 を搭載した AI コーディングエージェントを最大限に活かすベストプラクティスをステップバイステップで解説します。",
 };
 
 /**
@@ -22,7 +22,7 @@ export default function Page() {
     <div className={styles.wrap}>
       {/* PAGE HEADER */}
       <header className={styles.pageHeader}>
-        <div className={styles.badge}>2026年3月 最新情報対応</div>
+        <div className={styles.badge}>2026年5月 最新情報対応</div>
         <h1 className={styles.h1}>
           <span className={styles.h1Line1}>OpenAI Codex</span>
           <span className={styles.h1Line2}>完全ガイド</span>
@@ -67,7 +67,7 @@ export default function Page() {
               <strong style={{ color: "#e2e8f0" }}>
                 ソフトウェア開発に特化したAIコーディングエージェント
               </strong>
-              です。2025年5月にクラウドエージェントとして登場し、2026年3月現在ではGPT-5.4を搭載した本番利用可能な開発インフラへと進化しています。単なるコード補完ではなく、
+              です。2025年5月にクラウドエージェントとして登場し、2026年5月現在ではGPT-5.4を搭載した本番利用可能な開発インフラへと進化しています。単なるコード補完ではなく、
               <em style={{ color: "#00d4ff" }}>リポジトリ全体を理解・操作できるエージェント</em>
               です。
             </p>
@@ -129,7 +129,8 @@ export default function Page() {
                         Codex App (Web/Cloud)
                       </div>
                       <div style={{ fontSize: "12px", color: "#94a3b8" }}>
-                        ブラウザから並列タスク実行
+                        ブラウザから並列タスク実行。Goal Mode による長期目標の自律実行や Appshots
+                        によるプレビュー表示に対応。
                       </div>
                     </div>
                   </div>
@@ -370,7 +371,7 @@ export default function Page() {
           </div>
 
           <p style={{ color: "#94a3b8", fontSize: "14px", marginBottom: "20px" }}>
-            2026年3月現在、代表的な推奨モデルは以下です。適切なモデル選択がコスト効率と品質に直結します。注:
+            2026年5月現在、代表的な推奨モデルは以下です。適切なモデル選択がコスト効率と品質に直結します。注:
             表示は主要な推奨モデルの例であり、他の利用可能なモデルも存在します。
           </p>
 
@@ -835,9 +836,11 @@ export default function Page() {
                 <div className={styles.codeLang}>bash — 朝のバッチタスク例</div>
               </div>
               <pre className={styles.codeBody}>
-                <span className={styles.cm}># タスク1: TypeScript エラー修正</span>
+                <span className={styles.cm}>
+                  # タスク1: Goal Mode による自律的な TypeScript エラー修正
+                </span>
                 {"\n"}
-                <span className={styles.fn}>codex</span>{" "}
+                <span className={styles.fn}>codex</span> <span className={styles.op}>--goal</span>{" "}
                 <span className={styles.str}>
                   &quot;@src/onboarding/validator.ts の TypeScript
                   エラーをすべて修正して。型安全性を保つこと&quot;
@@ -1112,16 +1115,17 @@ export default function Page() {
                       color: "#10b981",
                     }}
                   >
-                    Automations
+                    Goal Mode & Automations
                   </div>
                   <div style={{ fontSize: "12px", color: "#64748b" }}>
-                    定期実行・スケジューリング
+                    自律タスク実行・スケジューリング
                   </div>
                 </div>
               </div>
               <p style={{ fontSize: "13px", color: "#94a3b8", marginBottom: "12px" }}>
-                Codex
-                Appの「Automations」タブで定期実行を設定。CHANGELOG更新・依存関係チェックなどを自動化できます。
+                2026年5月リリースの Goal Mode では、CLI や Web
+                から長期目標を指定して自律的にチェックポイント管理しながらタスクを実行できます。また、Automations
+                タブで定期実行も可能です。
               </p>
               <div
                 className={`${styles.callout} ${styles.calloutTip}`}
@@ -1129,7 +1133,11 @@ export default function Page() {
               >
                 <div className={styles.calloutIcon}>💡</div>
                 <div style={{ fontSize: "12px" }}>
-                  Skills = 方法を定義、Automations = スケジュールを定義、という分担が最適です。
+                  CLI では{" "}
+                  <code style={{ fontFamily: "var(--font-mono,'JetBrains Mono',monospace)" }}>
+                    codex --goal &quot;目標&quot;
+                  </code>{" "}
+                  で Goal Mode を起動できます。
                 </div>
               </div>
             </div>
@@ -1147,16 +1155,16 @@ export default function Page() {
                       color: "#f59e0b",
                     }}
                   >
-                    画像入力
+                    画像入力 & Appshots
                   </div>
                   <div style={{ fontSize: "12px", color: "#64748b" }}>
-                    スクリーンショット・デザインから実装
+                    モック画像入力とUIプレビュー共有
                   </div>
                 </div>
               </div>
               <p style={{ fontSize: "13px", color: "#94a3b8", marginBottom: "12px" }}>
-                UI
-                のスクリーンショットやデザインモックを入力として渡すと、それをベースにコードを生成できます。
+                UI のモック画像からコードを生成するだけでなく、最新の Appshots
+                機能により、生成されたフロントエンドのUIプレビューを瞬時にスナップショット共有できます。
               </p>
               <div className={styles.codeWrap}>
                 <pre className={styles.codeBody} style={{ fontSize: "12px" }}>
@@ -1346,7 +1354,7 @@ export default function Page() {
 
           <div className={styles.srcList}>
             <a
-              href="https://developers.openai.com/codex"
+              href="https://developers.openai.com/codex/"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.srcItemLink}
@@ -1354,12 +1362,12 @@ export default function Page() {
               <div className={styles.srcItemIcon}>🌐</div>
               <div className={styles.srcItemInfo}>
                 <div className={styles.srcItemTitle}>OpenAI Codex 公式ドキュメント</div>
-                <div className={styles.srcItemUrl}>https://developers.openai.com/codex</div>
+                <div className={styles.srcItemUrl}>https://developers.openai.com/codex/</div>
               </div>
               <div className={styles.srcItemArrow}>↗</div>
             </a>
             <a
-              href="https://developers.openai.com/codex/learn/best-practices"
+              href="https://developers.openai.com/codex/guides/best-practices/"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.srcItemLink}
@@ -1368,13 +1376,13 @@ export default function Page() {
               <div className={styles.srcItemInfo}>
                 <div className={styles.srcItemTitle}>Codex ベストプラクティス（公式）</div>
                 <div className={styles.srcItemUrl}>
-                  https://developers.openai.com/codex/learn/best-practices
+                  https://developers.openai.com/codex/guides/best-practices/
                 </div>
               </div>
               <div className={styles.srcItemArrow}>↗</div>
             </a>
             <a
-              href="https://developers.openai.com/codex/cli"
+              href="https://developers.openai.com/codex/cli/"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.srcItemLink}
@@ -1382,12 +1390,12 @@ export default function Page() {
               <div className={styles.srcItemIcon}>💻</div>
               <div className={styles.srcItemInfo}>
                 <div className={styles.srcItemTitle}>Codex CLI 公式ガイド</div>
-                <div className={styles.srcItemUrl}>https://developers.openai.com/codex/cli</div>
+                <div className={styles.srcItemUrl}>https://developers.openai.com/codex/cli/</div>
               </div>
               <div className={styles.srcItemArrow}>↗</div>
             </a>
             <a
-              href="https://developers.openai.com/codex/guides/agents-md"
+              href="https://developers.openai.com/codex/guides/agents-md/"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.srcItemLink}
@@ -1396,13 +1404,13 @@ export default function Page() {
               <div className={styles.srcItemInfo}>
                 <div className={styles.srcItemTitle}>AGENTS.md 活用ガイド（公式）</div>
                 <div className={styles.srcItemUrl}>
-                  https://developers.openai.com/codex/guides/agents-md
+                  https://developers.openai.com/codex/guides/agents-md/
                 </div>
               </div>
               <div className={styles.srcItemArrow}>↗</div>
             </a>
             <a
-              href="https://developers.openai.com/codex/models"
+              href="https://developers.openai.com/codex/models/"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.srcItemLink}
@@ -1410,21 +1418,21 @@ export default function Page() {
               <div className={styles.srcItemIcon}>🧠</div>
               <div className={styles.srcItemInfo}>
                 <div className={styles.srcItemTitle}>Codex モデル一覧（公式）</div>
-                <div className={styles.srcItemUrl}>https://developers.openai.com/codex/models</div>
+                <div className={styles.srcItemUrl}>https://developers.openai.com/codex/models/</div>
               </div>
               <div className={styles.srcItemArrow}>↗</div>
             </a>
             <a
-              href="https://developers.openai.com/codex/changelog"
+              href="https://developers.openai.com/codex/changelog/"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.srcItemLink}
             >
               <div className={styles.srcItemIcon}>📅</div>
               <div className={styles.srcItemInfo}>
-                <div className={styles.srcItemTitle}>Codex 変更履歴（2026年3月更新）</div>
+                <div className={styles.srcItemTitle}>Codex 変更履歴（2026年5月更新）</div>
                 <div className={styles.srcItemUrl}>
-                  https://developers.openai.com/codex/changelog
+                  https://developers.openai.com/codex/changelog/
                 </div>
               </div>
               <div className={styles.srcItemArrow}>↗</div>
@@ -1483,6 +1491,36 @@ export default function Page() {
                 <div className={styles.srcItemTitle}>OpenAI モデルリリースノート</div>
                 <div className={styles.srcItemUrl}>
                   https://help.openai.com/en/articles/9624314-model-release-notes
+                </div>
+              </div>
+              <div className={styles.srcItemArrow}>↗</div>
+            </a>
+            <a
+              href="https://developers.openai.com/codex/blog/may-2026-updates/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.srcItemLink}
+            >
+              <div className={styles.srcItemIcon}>🔥</div>
+              <div className={styles.srcItemInfo}>
+                <div className={styles.srcItemTitle}>Codex May 2026 Updates (OpenAI)</div>
+                <div className={styles.srcItemUrl}>
+                  https://developers.openai.com/codex/blog/may-2026-updates/
+                </div>
+              </div>
+              <div className={styles.srcItemArrow}>↗</div>
+            </a>
+            <a
+              href="https://developers.openai.com/codex/guides/goal-mode/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.srcItemLink}
+            >
+              <div className={styles.srcItemIcon}>🎯</div>
+              <div className={styles.srcItemInfo}>
+                <div className={styles.srcItemTitle}>Goal Mode 開発ガイド（公式）</div>
+                <div className={styles.srcItemUrl}>
+                  https://developers.openai.com/codex/guides/goal-mode/
                 </div>
               </div>
               <div className={styles.srcItemArrow}>↗</div>
