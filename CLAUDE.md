@@ -245,6 +245,7 @@ Build:     cd web-next && bun run build
 5. `cd scraper && uv run pytest` が成功
 6. import が有効
 7. 設定ファイルが意図せず変更されていない
+8. コミット対象の差分（`git diff --cached`）および新規ファイルに、個人情報（PII）やローカル環境固有の絶対パス（例: `file:///Users/` やローカルユーザー名など）が含まれていないことを確認
 
 いずれか失敗 → **停止してユーザーに確認**。
 
