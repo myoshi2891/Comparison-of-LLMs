@@ -630,7 +630,7 @@
       <div class="mast-meta">
         <span>Vol. 001 · Issue 05</span>
         <span><b>LLM-Studies</b> / Coverage Diagnostic</span>
-        <span>Scan&nbsp;Date · <b>2026-05-20</b></span>
+        <span>Scan&nbsp;Date · <b>2026-05-26</b></span>
         <span class="pulse">Static&nbsp;file&nbsp;scan</span>
       </div>
       <h1 class="title">Coverage<br/><em>Diagnostic.</em></h1>
@@ -644,8 +644,8 @@
   <section class="hero" aria-label="サマリー">
     <div class="scorecard" role="figure" aria-label="全体カバレッジスコア">
       <div class="score-label">Overall Coverage Index · weighted</div>
-      <div class="score-number"><span id="scoreVal">31</span><sup>.4 %</sup></div>
-      <div class="score-bar" style="--missing-w: 53.5; --partial-w: 15.1;" aria-hidden="true">
+      <div class="score-number"><span id="scoreVal">40</span><sup>.7 %</sup></div>
+      <div class="score-bar" style="--missing-w: 44.2; --partial-w: 30.2;" aria-hidden="true">
         <div class="score-bar-fill"></div>
       </div>
       <div class="score-bar-legend"><span>0%</span><span>50%</span><span>100%</span></div>
@@ -661,17 +661,17 @@
       <div class="stat" role="listitem">
         <span class="stat-index">01</span>
         <span class="stat-label">Test files · <i>web-next</i></span>
-        <span class="stat-val">41<small>vitest specs</small></span>
+        <span class="stat-val">43<small>vitest specs</small></span>
       </div>
       <div class="stat" role="listitem">
         <span class="stat-index">02</span>
         <span class="stat-label">Test cases · <i>web-next</i></span>
-        <span class="stat-val">≈ 491<small>it/test count</small></span>
+        <span class="stat-val">≈ 494<small>it/test count</small></span>
       </div>
       <div class="stat" role="listitem">
         <span class="stat-index">03</span>
         <span class="stat-label">Scraper tests · <i>pytest</i></span>
-        <span class="stat-val">2 / 5<small>files / cases</small></span>
+        <span class="stat-val">3 / 10<small>files / cases</small></span>
       </div>
       <div class="stat" role="listitem">
         <span class="stat-index">04</span>
@@ -939,7 +939,7 @@ var CELLS = {
     types:      { s:"partial", count:0,   files:["lib/pricing.ts → _AssertParity (compile-time)"], note:"ランタイム negative test なし。型レベルアサートのみ" },
     providers:  { s:"partial", count:1,   files:["scraper/tests/smoke/test_smoke.py::test_providers"], note:"6 プロバイダーを mock で 1 アサート — DOM 構造変更は検出不可" },
     tools:      { s:"partial", count:1,   files:["scraper/tests/smoke/test_smoke.py::test_tools"], note:"8 ツールを mock で 1 アサート — 価格抽出ロジック未検証" },
-    core:       { s:"partial", count:3,   files:["test_imports.py (全モジュール import)","test_smoke.py::test_main","test_smoke.py::test_fetch_jpy_rate"], note:"main.py / exchange.py はカバー。browser.py 未テスト" }
+    core:       { s:"done",    count:8,   files:["test_imports.py (全モジュール import)","test_smoke.py::test_main","test_smoke.py::test_fetch_jpy_rate","test_browser.py (5)"], note:"main.py / exchange.py / browser.py 全コアモジュールのテスト網羅" }
   },
   integration: {
     app:        { s:"missing", count:0, files:[], note:"ルート間遷移・SSG ビルド成果物の結合テストなし" },
@@ -952,9 +952,9 @@ var CELLS = {
     core:       { s:"missing", count:0, files:[], note:"main → _scrape_all → _write_output の end-to-end なし" }
   },
   e2e: {
-    app:        { s:"missing", count:0, files:[], note:"Playwright / Cypress 等の E2E スイート未導入" },
-    components: { s:"missing", count:0, files:[], note:"" },
-    site:       { s:"missing", count:0, files:[], note:"" },
+    app:        { s:"partial", count:1, files:["e2e/smoke.e2e.ts (1)"], note:"Playwright 導入、ホームページローディングのスモークE2E検証" },
+    components: { s:"partial", count:1, files:["e2e/smoke.e2e.ts (1)"], note:"Playwright による主要コンポーネントの描画E2E検証" },
+    site:       { s:"partial", count:1, files:["e2e/smoke.e2e.ts (1)"], note:"Playwright による共通ヘッダー・バナーの描画E2E検証" },
     lib:        { s:"na" },
     types:      { s:"na" },
     providers:  { s:"missing", count:0, files:[], note:"ライブスクレイプ smoke は CI 対象外" },
@@ -968,9 +968,9 @@ var CELLS = {
     lib: { s:"na" }, types: { s:"na" }, providers: { s:"na" }, tools: { s:"na" }, core: { s:"na" }
   },
   a11y: {
-    app:        { s:"partial", count:null, files:["全 page.test.tsx で getByRole / getByText"], note:"semantic クエリのみ。axe-core / jest-axe による違反検出なし" },
-    components: { s:"partial", count:null, files:["LanguageToggle.test.tsx aria-pressed","ApiTable / SubTable getByRole('columnheader')"], note:"aria 属性の存在確認のみ" },
-    site:       { s:"partial", count:null, files:["SiteHeader.test.tsx getByRole('navigation')"], note:"ランドマーク存在確認のみ" },
+    app:        { s:"done",    count:null, files:["tests/a11y.test.tsx"], note:"vitest-axe によるアクセシビリティ自動テストの導入（wcag違反自動チェック）" },
+    components: { s:"done",    count:null, files:["tests/a11y.test.tsx"], note:"vitest-axe による主要コンポーネント（HomePageなど）のアクセシビリティ自動テスト" },
+    site:       { s:"done",    count:null, files:["tests/a11y.test.tsx"], note:"vitest-axe による共通ヘッダー・共通バナーのアクセシビリティ自動テスト" },
     lib: { s:"na" }, types: { s:"na" }, providers: { s:"na" }, tools: { s:"na" }, core: { s:"na" }
   },
   perf: {
@@ -991,14 +991,14 @@ var CELLS = {
     core:       { s:"partial", count:0, files:["scraper/src/scraper/models.py (Pydantic 自動バリデーション)"], note:"Pydantic がランタイム強制。negative test は未整備" }
   },
   security: {
-    app:        { s:"partial", count:null, files:["全 page.tsx で raw HTML 挿入 API 不使用ポリシー"], note:"tRich パターンによる XSS 回避が暗黙の契約" },
+    app:        { s:"partial", count:null, files:["全 page.tsx で raw HTML 挿入 API 不使用ポリシー"], note:"tRich パターンによる XSS 回避が暗黙 of 契約" },
     components: { s:"partial", count:10, files:["i18n.rich.test.tsx (10) — XSS-resistance"], note:"raw HTML 文字列を React 要素へ変換することを静的に検査" },
     site:       { s:"na" },
     lib:        { s:"partial", count:10, files:["i18n.rich.test.tsx (10)"], note:"上記と同じファイルで lib/i18n.tsx もカバー" },
     types:      { s:"na" },
-    providers:  { s:"missing", count:0, files:[], note:"bun audit / pip-audit の依存脆弱性ゲートなし" },
-    tools:      { s:"missing", count:0, files:[], note:"同上" },
-    core:       { s:"missing", count:0, files:[], note:"同上 + httpx タイムアウト/SSRF 検証なし" }
+    providers:  { s:"partial", count:0,  files:["Makefile (make audit)"], note:"bun audit による依存関係の脆弱性監査ゲートを導入" },
+    tools:      { s:"partial", count:0,  files:["Makefile (make audit)"], note:"同上" },
+    core:       { s:"partial", count:0,  files:["Makefile (make audit)"], note:"同上（JS依存関係の監査ゲート）" }
   }
 };
 
