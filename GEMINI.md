@@ -20,6 +20,7 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 - **ファイル全体の書き直し禁止**（明示指示がない限り）
 - **依存関係のアップグレード禁止**
 - **設定ファイル（next.config.ts / tsconfig.json / biome.json 等）の勝手な変更禁止**
+- **PII等（個人情報やローカル固有の絶対パス）のコミット禁止**：コミット前に `git diff --cached` や新規追加ファイルに `file:///Users/` やローカルユーザー名などの情報が含まれていないことを確認
 
 ## 検証コマンド
 
