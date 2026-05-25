@@ -5,7 +5,7 @@
 >
 > 関連:
 > - 全体計画: [`NEXTJS_PHASE_A_F_PLAN.md`](NEXTJS_PHASE_A_F_PLAN.md) §Phase C
-> - 進捗トラッカー: [`../MIGRATION_PROGRESS.md`](../MIGRATION_PROGRESS.md)
+> - 進捗トラッカー: [`MIGRATION_PROGRESS.md`](MIGRATION_PROGRESS.md)
 > - プロジェクト固有スキル: [`../.claude/skills/nextjs-page-migration/SKILL.md`](../.claude/skills/nextjs-page-migration/SKILL.md)
 
 ---
@@ -23,7 +23,7 @@
 
 ### 1.2 セッション開始時に必読のファイル（順序固定）
 
-1. **[`../MIGRATION_PROGRESS.md`](../MIGRATION_PROGRESS.md)** — 「AI 作業ルール」R1（Biome scope）/ R2（faithful 必須）と現在地を確認
+1. **[`MIGRATION_PROGRESS.md`](MIGRATION_PROGRESS.md)** — 「AI 作業ルール」R1（Biome scope）/ R2（faithful 必須）と現在地を確認
 2. **本ファイル** — Phase C 全体設計（Phase C は完了済み。Phase D 以降は `NEXTJS_PHASE_A_F_PLAN.md` §Phase D を参照）
 3. **[`../.claude/skills/nextjs-page-migration/SKILL.md`](../.claude/skills/nextjs-page-migration/SKILL.md)** — 9 ステップ手順（Step 3 Red / Step 4 Green は本書 §4・§5 で具体化）
 4. **C-2 正本テンプレート**（faithful 移植の参考実装）:

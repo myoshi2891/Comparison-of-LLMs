@@ -3,7 +3,7 @@
 > Phase 1–14 でコスト計算機ホームページのみ Next.js 化が完了した。本ドキュメントは残る **18 枚の静的 HTML ガイドページ + 共通インフラ** を `web-next/` App Router 配下へ TDD で移植するための計画を定義する。
 >
 > - 前提ドキュメント: [`docs/NEXTJS_MIGRATION_PLAN.md`](NEXTJS_MIGRATION_PLAN.md)（アーキテクト初期プロンプト — Phase 1–14 完了時点で凍結扱い）
-> - 進捗トラッカー: [`../MIGRATION_PROGRESS.md`](../MIGRATION_PROGRESS.md)
+> - 進捗トラッカー: [`MIGRATION_PROGRESS.md`](MIGRATION_PROGRESS.md)
 > - Phase A Red 先行プラン: `~/.claude/plans/legacy-pr-gitignore-phase-a-sharded-glade.md`
 > - プロジェクト固有スキル: [`.claude/skills/nextjs-page-migration/SKILL.md`](../.claude/skills/nextjs-page-migration/SKILL.md)
 

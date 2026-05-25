@@ -23,7 +23,7 @@ update.sh  ← オーケストレーター (scrape → copy)
 │   │   ├── layout.tsx           ルートレイアウト (SiteHeader/DisclaimerBanner マウント済み)
 │   │   ├── page.tsx             コスト計算機ホーム (Server Component + Zod 検証 → HomePage へ委譲)
 │   │   ├── globals.css          Tailwind v4 + legacy design tokens (227 行)
-│   │   └── {claude,gemini,codex,copilot}/{skill,agent}/   Phase B–C 移行済みルート（詳細は MIGRATION_PROGRESS.md）
+│   │   └── {claude,gemini,codex,copilot}/{skill,agent}/   Phase B–C 移行済みルート（詳細は [`docs/archive/MIGRATION_PROGRESS.md`](docs/archive/MIGRATION_PROGRESS.md)）
 │   ├── components/
 │   │   ├── HomePage.tsx         Client Component (Phase 10)
 │   │   ├── ApiTable.tsx / SubTable.tsx / Hero.tsx / ...   (Phase 8-10 成果物)
@@ -273,7 +273,7 @@ Phase A–F 遂行中、新規ガイドページ (`claude/`, `gemini/`, `codex/`
 
 `legacy/` 配下の **18 HTML** は `.gitignore` により remote から隔離済。Phase A–F で `web-next/app/*` の page.tsx への置換が**全完了**。
 移行計画詳細は **[`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md)** を参照（アーカイブ）。
-最終進捗は **[`MIGRATION_PROGRESS.md`](MIGRATION_PROGRESS.md)** を参照。
+現在の進捗は **[`docs/PROGRESS.md`](docs/PROGRESS.md)** を、過去の移行進捗詳細は **[`docs/archive/MIGRATION_PROGRESS.md`](docs/archive/MIGRATION_PROGRESS.md)** を参照。
 
 #### AI モデルバージョンの扱い
 
