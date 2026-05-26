@@ -66,6 +66,9 @@ test-web: ## フロントエンドテストのみ（vitest）
 test-scraper: ## バックエンドテストのみ（pytest）
 	$(COMPOSE) run --rm scraper uv run pytest
 
+audit: ## 依存関係の脆弱性監査 (bun audit)
+	$(COMPOSE) run --rm --no-deps web bun audit
+
 typecheck: ## TypeScript 型チェック（tsc --noEmit）
 	$(COMPOSE) run --rm --no-deps web bun run typecheck
 

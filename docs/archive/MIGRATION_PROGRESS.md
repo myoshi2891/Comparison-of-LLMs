@@ -1,6 +1,6 @@
 # Next.js 移行 進捗トラッカー
 
-> 本ファイルは `feat/nextjs-migration` ブランチでの移行作業の状況を記録する。
+> 本ファイルは Next.js への移行プロジェクト（`feat/nextjs-migration`）の進捗および移行完了後の運用ステータスを記録する。
 > 移行計画:
 > - Phase 1–14（ホームページ）: [`docs/archive/NEXTJS_MIGRATION_PLAN.md`](docs/archive/NEXTJS_MIGRATION_PLAN.md)（完了・アーカイブ）
 > - Phase A–F（18 ガイドページ + 共通インフラ）: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md)（完了・アーカイブ）
@@ -8,12 +8,12 @@
 
 ## 現在地
 
-- **ブランチ**: `feat/nextjs-migration`
-- 最新 HEAD: 7c1645a（docs(copilot): update best practices guide to May 2026 specifications）
+- **ブランチ**: `dev`（本番 `main` ブランチへの移行マージ完了 🚀）
+- 最新 HEAD: 758cc06（Merge pull request #87 from myoshi2891/dev）
 - 未コミット作業: なし（working tree クリーン）
-- 次の作業: **Phase A–F 全完了 → レビュー対応 / マージ準備**
-- テスト数: `bun run test` **553 passed / 553 total（全 Green ✅）**  — マージ前必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
-- ビルド: `bun run build` ✅（5510c4e 時点）・`bun run typecheck` ✅・`uv run pytest` 5/5 passed
+- 次の作業（ネクストアクション）: **移行完了後の運用・保守および改善フェーズ（詳細は下部「移行完了後の継続的課題とネクストアクション」参照）**
+- テスト数: `bun run test` **553 passed / 553 total（全 Green ✅）**  — 保守時の必須条件: `bun run build` / `bun run typecheck` / `bun run test`（全件 pass）/ `bun run lint`（新規違反ゼロ）/ `cd scraper && uv run pytest`（5/5）すべて成功していること
+- ビルド: `bun run build` ✅・`bun run typecheck` ✅・`uv run pytest` 5/5 passed
 - **lint 既知違反**: なし（全解消 ✅）
 
 ## AI 作業ルール（Phase A–F 共通、**必読**）
@@ -171,48 +171,26 @@ web-next/
 10. **フォント**: **`next/font/google` で self-host**（Phase 6）。Google CDN への @import を廃止し、`--font-sans` / `--font-mono` / `--font-display` を `<html>` に注入する方式に統一
 11. **Metadata**: **`generateMetadata` ではなく静的 `export const metadata`**（Phase 7）。理由: SSG 前提でリクエスト時情報が存在しない＋単一ページ設計で JA/EN が URL で分岐しない
 
-## 次回セッションでの再開プロンプト（Phase F 用）
+## 次回セッションでの再開プロンプト（保守・改善フェーズ用）
 
 次のプロンプトをコピーして任意の Coding Agent（Claude Code / Codex / Cursor / Gemini CLI / Cline 等）に渡せば、コンテキストが復元される:
 
 ```
-Next.js 移行プロジェクトの作業を再開してください。
+Next.js 移行が完了したリポジトリ LLM-Studies の保守・改善作業を再開してください。
 
-- リポジトリ: LLM-Studies（Phase A–F の Next.js 移行作業中）
-- 現在のブランチ: feat/nextjs-migration
-- 最新 HEAD: 7c1645a（docs(copilot): update best practices guide to May 2026 specifications）
-- 移行計画: docs/archive/NEXTJS_PHASE_A_F_PLAN.md（Phase A–F）— 全 Phase 完了（アーカイブ）
+- リポジトリ: LLM-Studies（Next.js 移行プロジェクトは dev/main へ完全マージ済み 🚀）
+- 現在のブランチ: dev
+- 最新 HEAD: 758cc06（Merge pull request #87 from myoshi2891/dev）
+- 移行計画（アーカイブ）: docs/archive/NEXTJS_PHASE_A_F_PLAN.md
 - 進捗トラッカー: MIGRATION_PROGRESS.md（**作業開始前に必読**: §「AI 作業ルール」R1〜R4）
 - プロジェクト固有スキル: .claude/skills/nextjs-page-migration/SKILL.md
 - リポジトリ規約: CLAUDE.md（AGENTS.md / GEMINI.md からも参照される。AI 共通の編集ルール）
 
-次の作業: **Phase A–F 全完了 → レビュー対応 / マージ準備**
-
-Phase E の確立パターン（MermaidDiagram）:
-- `MermaidDiagram.tsx` 自体が `"use client"` + `useEffect` のため `dynamic()` でラップ不要
-- 直接 import: `import MermaidDiagram from "@/components/docs/MermaidDiagram"`
-- テストモック: `vi.mock("@/components/docs/MermaidDiagram", () => ({ default: () => null }))`
-- Mermaid chart 文字列は左端揃え必須（JSX テンプレートリテラル内のインデントに注意）
-- bash 配列変数 `${...}` / GitHub Actions `${{ }}` は `// biome-ignore lint/suspicious/noTemplateCurlyInString:` で抑制
-- lint 既知違反: なし（全解消 ✅）
-
-Phase F — 実施ログ（参考）:
-- ※ Phase F 完了済み。URL マッピングは `docs/archive/NEXTJS_PHASE_A_F_PLAN.md` §Phase F を参照
-- 完了した 2 タスク:
-  1. `netlify.toml` に `[[redirects]]` を追加（旧 `.html` URL → 新 Next.js パス、301） [✅ Done: 2026-05-09 11:39:07, `5510c4e`]
-  2. `web-next/public/sitemap.xml` の静的配置に代わり、`web-next/app/sitemap.ts` (および `robots.ts`) を実装して移行済み全ページを動的に列挙 [✅ Done: 2026-05-09 11:39:07, `5510c4e`]
-- 実行済みのチェックリスト:
-  1. (cd web-next && bun run build) # 全ルート Static 検証 [✅ Done: 2026-05-09 11:39:07]
-  2. (cd web-next && bunx biome check --write netlify.toml) [✅ Done: 2026-05-09 11:39:07]
-  3. (cd web-next && bun run test) # 全件 pass 検証 [✅ Done: 2026-05-09 11:39:07]
-  4. git add とコミット [✅ Done: 2026-05-09 11:39:07, `5510c4e`]
-  5. MIGRATION_PROGRESS.md の更新とコミット [✅ Done: 2026-05-09 11:40:21, `e2603c1`]
-
-絶対禁止:
-- bun run lint:fix / bunx biome check --write （パス引数なし） — リポジトリ全体を書き換えるため（R1 違反）
-- legacy HTML の内容を要約・省略 — Phase C-2 で R2 として明文化（要約版は差し戻し対象）
-- legacy/ 配下の編集（CLAUDE.md「Phase A–F 中は legacy/ 凍結」）
-- 既存ファイル（pricing.json / scraper / lib/cost.ts 等）への副作用的な変更
+次の作業（ネクストアクション）:
+1. データ保守と更新（docs/MONTHLY_UPDATE_PROMPTS.md に基づく月次LLMモデル価格改定の反映）
+2. テストカバレッジの強化（docs/TEST_COVERAGE_PROGRESS.md で missing となっている Integration, E2E, Security などの追加）
+3. パフォーマンスとアクセシビリティの継続的な改善・監視
+4. 依存脆弱性の監査（bun audit などの定期実行）
 
 検証コマンド早見表:
   (cd web-next && bun run test)          # 全件 pass が期待値（現在 553 件 全 pass）
@@ -223,7 +201,7 @@ Phase F — 実施ログ（参考）:
 
 既知の持越し（別 Issue で対応、本作業では触らない）:
 - lib/i18n.test.ts:18 の key count ハードコード
-- Biome 既存違反: なし（3b45319 で全解消 ✅、R1 により全体 lint:fix は引き続き禁止）
+- Biome 既存違反: なし（R1 により全体 lint:fix は引き続き禁止、ファイルパス個別指定のみ許可）
 ```
 
 ### LLM 別の補足
@@ -237,3 +215,24 @@ Phase F — 実施ログ（参考）:
 
 Phase C-1〜C-4 はすべて faithful 移植完了。確立したパターンは SKILL.md §「Phase C 確立パターン」に転記済み。
 詳細な設計事実は `docs/archive/NEXTJS_PHASE_C_DETAILED_DESIGN.md` を参照（アーカイブ）。
+
+## 移行完了後の継続的課題とネクストアクション
+
+Next.js への移行（Phase 1–14, Phase A–F）が完了したため、今後は以下の継続的課題と改善に注力する。
+
+### 1. 月次データアップデート（最優先・定常運用）
+- **内容**: 毎月、各プロバイダー（Anthropic, Google, OpenAI など）の最新価格を反映させる。
+- **実行手順**: [`docs/MONTHLY_UPDATE_PROMPTS.md`](docs/MONTHLY_UPDATE_PROMPTS.md) に規定されたプロンプトと手順に従って、スクレイパー実行・差分マージ・ビルドを行う。
+- **検証**: 為替レート更新および `pricing.json` の型定義と `lib/pricing.ts` の `_AssertParity` の一致を確認する。
+
+### 2. テストカバレッジの拡充
+[`docs/TEST_COVERAGE_PROGRESS.md`](docs/TEST_COVERAGE_PROGRESS.md) で `missing` または `partial` となっている領域のテストを順次追加する。
+- **E2E テストの導入**: Playwright 等を用いた、実際の電卓コンポーネント操作 of ブラウザE2Eテスト。
+- **アクセシビリティ（a11y）テスト**: `axe-core` または `jest-axe` の導入による、全ガイドページのアクセシビリティ自動チェック。
+- **セキュリティ**: CI パイプラインでの `bun audit` / `npm audit` / `pip-audit` の実行による依存関係の脆弱性検知ゲートの整備。
+
+### 3. 表示パフォーマンスおよび Core Web Vitals の監視
+- Netlify 上での SSG (Static Site Generation) 出力物の Lighthouse 計測を行い、LCP (Largest Contentful Paint) や INP (Interaction to Next Paint) が 90点以上を維持しているか監視する。
+
+### 4. 外部リンクおよびマークダウンの保守
+- 各ガイド（Claude, Gemini, Codex, Copilot 用）の記述内容やリンク切れを監視し、[`docs/links.md`](docs/links.md) をもとにリンクチェックを定期実行する。
