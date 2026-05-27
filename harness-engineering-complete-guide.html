@@ -1,0 +1,2425 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>ハーネスエンジニアリング完全ガイド</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+    <style>
+      :root {
+        --bg: #0f1117;
+        --surface: #181c27;
+        --card: #1e2334;
+        --border: #2a3050;
+        --accent: #7c6ef5;
+        --accent2: #4fc3f7;
+        --accent3: #69f0ae;
+        --accent4: #ffb74d;
+        --text: #e8ecf4;
+        --muted: #8892aa;
+        --danger: #ef5350;
+        --grad: linear-gradient(135deg, #7c6ef5 0%, #4fc3f7 100%);
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        line-height: 1.75;
+        min-height: 100vh;
+      }
+
+      /* ── HERO ── */
+      .hero {
+        background: linear-gradient(135deg, #12162a 0%, #1a1035 50%, #0d1a2e 100%);
+        border-bottom: 1px solid var(--border);
+        padding: 64px 24px 48px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+      .hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse 80% 60% at 50% 0%,
+          rgba(124, 110, 245, 0.18),
+          transparent
+        );
+        pointer-events: none;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(124, 110, 245, 0.15);
+        border: 1px solid rgba(124, 110, 245, 0.4);
+        color: #b5aaff;
+        border-radius: 99px;
+        padding: 4px 14px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        margin-bottom: 20px;
+      }
+      .hero h1 {
+        font-size: clamp(1.9rem, 4vw, 3rem);
+        font-weight: 800;
+        line-height: 1.2;
+        margin-bottom: 16px;
+      }
+      .hero h1 span {
+        background: var(--grad);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .hero p {
+        color: var(--muted);
+        font-size: 1.05rem;
+        max-width: 680px;
+        margin: 0 auto 32px;
+      }
+      .hero-meta {
+        display: flex;
+        justify-content: center;
+        gap: 24px;
+        flex-wrap: wrap;
+      }
+      .meta-chip {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+      .meta-chip strong {
+        color: var(--text);
+        display: block;
+        font-size: 0.75rem;
+        margin-bottom: 2px;
+      }
+
+      /* ── LAYOUT ── */
+      .wrapper {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 20px 80px;
+      }
+
+      /* ── TOC ── */
+      .toc {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 28px 32px;
+        margin: 40px 0;
+      }
+      .toc h2 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--accent);
+        margin-bottom: 16px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      .toc ol {
+        padding-left: 20px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px 32px;
+      }
+      .toc li {
+        font-size: 0.92rem;
+      }
+      .toc a {
+        color: var(--muted);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .toc a:hover {
+        color: var(--accent2);
+      }
+      @media (max-width: 600px) {
+        .toc ol {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* ── SECTIONS ── */
+      section {
+        margin-top: 60px;
+      }
+      .section-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 8px;
+      }
+      h2.section-title {
+        font-size: 1.65rem;
+        font-weight: 800;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      h2.section-title .num {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: rgba(124, 110, 245, 0.18);
+        border: 1px solid rgba(124, 110, 245, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        font-weight: 800;
+        color: var(--accent);
+        flex-shrink: 0;
+      }
+      .section-lead {
+        color: var(--muted);
+        margin-bottom: 28px;
+        font-size: 1rem;
+      }
+      .divider {
+        height: 1px;
+        background: var(--border);
+        margin: 48px 0;
+      }
+
+      /* ── CARDS ── */
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 24px 28px;
+        margin-bottom: 20px;
+      }
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      .card-item {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .card-item .icon {
+        font-size: 1.6rem;
+      }
+      .card-item h3 {
+        font-size: 0.95rem;
+        font-weight: 700;
+      }
+      .card-item p {
+        font-size: 0.85rem;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      /* ── CALLOUT ── */
+      .callout {
+        border-radius: 12px;
+        padding: 18px 22px;
+        margin: 20px 0;
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+      }
+      .callout.tip {
+        background: rgba(105, 240, 174, 0.07);
+        border: 1px solid rgba(105, 240, 174, 0.25);
+      }
+      .callout.warn {
+        background: rgba(255, 183, 77, 0.07);
+        border: 1px solid rgba(255, 183, 77, 0.25);
+      }
+      .callout.danger {
+        background: rgba(239, 83, 80, 0.07);
+        border: 1px solid rgba(239, 83, 80, 0.25);
+      }
+      .callout.info {
+        background: rgba(79, 195, 247, 0.07);
+        border: 1px solid rgba(79, 195, 247, 0.25);
+      }
+      .callout-icon {
+        font-size: 1.3rem;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+      .callout-body strong {
+        display: block;
+        font-size: 0.9rem;
+        margin-bottom: 4px;
+      }
+      .callout.tip .callout-body strong {
+        color: var(--accent3);
+      }
+      .callout.warn .callout-body strong {
+        color: var(--accent4);
+      }
+      .callout.danger .callout-body strong {
+        color: var(--danger);
+      }
+      .callout.info .callout-body strong {
+        color: var(--accent2);
+      }
+      .callout-body p,
+      .callout-body span {
+        font-size: 0.9rem;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      /* ── MERMAID ── */
+      .mermaid-wrap {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 28px 16px;
+        margin: 24px 0;
+        overflow-x: auto;
+      }
+      .mermaid-wrap > div {
+        display: flex;
+        justify-content: center;
+      }
+      .mermaid-wrap svg {
+        max-width: 100%;
+        height: auto;
+      }
+      /* 個別ダイアグラムのサイズ調整（巨大化防止） */
+      #diag-2 svg {
+        max-width: 500px !important;
+      }
+      #diag-3 svg {
+        max-width: 380px !important;
+      }
+      #diag-4 svg {
+        max-width: 420px !important;
+      }
+
+      /* ── TABLES ── */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 20px 0;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+      }
+      thead {
+        background: rgba(124, 110, 245, 0.12);
+      }
+      th {
+        padding: 12px 16px;
+        text-align: left;
+        font-weight: 700;
+        color: var(--accent);
+        border-bottom: 1px solid var(--border);
+      }
+      td {
+        padding: 11px 16px;
+        border-bottom: 1px solid rgba(42, 48, 80, 0.6);
+        color: var(--muted);
+      }
+      td strong {
+        color: var(--text);
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      /* ── CODE ── */
+      pre {
+        background: #0b0d14;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin: 16px 0;
+        overflow-x: auto;
+        font-size: 0.85rem;
+        line-height: 1.7;
+      }
+      code {
+        font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        color: #c8d8f0;
+      }
+      .code-label {
+        display: inline-block;
+        background: rgba(124, 110, 245, 0.2);
+        color: var(--accent);
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        padding: 2px 10px;
+        border-radius: 4px;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+      }
+      .hl-k {
+        color: #c792ea;
+      }
+      .hl-s {
+        color: #c3e88d;
+      }
+      .hl-n {
+        color: #82aaff;
+      }
+      .hl-c {
+        color: #546e7a;
+        font-style: italic;
+      }
+      .hl-v {
+        color: #f78c6c;
+      }
+
+      /* ── STEP FLOW ── */
+      .steps {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        margin: 24px 0;
+      }
+      .step {
+        display: flex;
+        gap: 16px;
+        position: relative;
+        padding-bottom: 28px;
+      }
+      .step:last-child {
+        padding-bottom: 0;
+      }
+      .step:not(:last-child)::before {
+        content: '';
+        position: absolute;
+        left: 19px;
+        top: 44px;
+        bottom: 0;
+        width: 2px;
+        background: var(--border);
+      }
+      .step-num {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 2px solid var(--accent);
+        background: rgba(124, 110, 245, 0.12);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        color: var(--accent);
+        flex-shrink: 0;
+        font-size: 0.9rem;
+      }
+      .step-body {
+        flex: 1;
+        padding-top: 8px;
+      }
+      .step-body h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+      .step-body p {
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+      .step-body code {
+        background: rgba(124, 110, 245, 0.15);
+        color: #b5aaff;
+        padding: 2px 7px;
+        border-radius: 4px;
+        font-size: 0.83rem;
+      }
+
+      /* ── RULE CARDS ── */
+      .rules {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 14px;
+        margin: 20px 0;
+      }
+      .rule {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 18px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .rule-tag {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 2px 8px;
+        border-radius: 4px;
+        display: inline-block;
+        width: fit-content;
+      }
+      .rule-tag.gold {
+        background: rgba(255, 183, 77, 0.15);
+        color: var(--accent4);
+      }
+      .rule-tag.blue {
+        background: rgba(79, 195, 247, 0.15);
+        color: var(--accent2);
+      }
+      .rule-tag.green {
+        background: rgba(105, 240, 174, 0.15);
+        color: var(--accent3);
+      }
+      .rule-tag.purple {
+        background: rgba(124, 110, 245, 0.15);
+        color: var(--accent);
+      }
+      .rule h3 {
+        font-size: 0.95rem;
+        font-weight: 700;
+      }
+      .rule p {
+        font-size: 0.85rem;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      /* ── SOURCES ── */
+      .source-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 20px;
+      }
+      .source-item {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px 20px;
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+      }
+      .source-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: rgba(124, 110, 245, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+      }
+      .source-body h4 {
+        font-size: 0.92rem;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .source-body a {
+        color: var(--accent2);
+        font-size: 0.82rem;
+        text-decoration: none;
+        word-break: break-all;
+      }
+      .source-body a:hover {
+        text-decoration: underline;
+      }
+      .source-body p {
+        color: var(--muted);
+        font-size: 0.82rem;
+        margin-top: 3px;
+      }
+
+      /* ── FOOTER ── */
+      footer {
+        border-top: 1px solid var(--border);
+        text-align: center;
+        padding: 32px 20px;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+      footer a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      /* ── UTILS ── */
+      .mt16 {
+        margin-top: 16px;
+      }
+      .mt24 {
+        margin-top: 24px;
+      }
+      .mt8 {
+        margin-top: 8px;
+      }
+      .flex-gap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 12px;
+      }
+      .chip {
+        background: rgba(124, 110, 245, 0.12);
+        border: 1px solid rgba(124, 110, 245, 0.3);
+        color: #b5aaff;
+        border-radius: 99px;
+        padding: 4px 13px;
+        font-size: 0.82rem;
+        font-weight: 600;
+      }
+      .chip.green {
+        background: rgba(105, 240, 174, 0.1);
+        border-color: rgba(105, 240, 174, 0.3);
+        color: var(--accent3);
+      }
+      .chip.blue {
+        background: rgba(79, 195, 247, 0.1);
+        border-color: rgba(79, 195, 247, 0.3);
+        color: var(--accent2);
+      }
+      .chip.orange {
+        background: rgba(255, 183, 77, 0.1);
+        border-color: rgba(255, 183, 77, 0.3);
+        color: var(--accent4);
+      }
+      .chip.red {
+        background: rgba(239, 83, 80, 0.1);
+        border-color: rgba(239, 83, 80, 0.3);
+        color: var(--danger);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ════ HERO ════ -->
+    <div class="hero">
+      <div class="badge">🛠 Claude Code × Harness Engineering</div>
+      <h1>ハーネスエンジニアリング<br /><span>完全ガイド 2026</span></h1>
+      <p>
+        Anthropic
+        公式推奨。AIエージェントが長時間・複数セッションにわたって安定して動作するための「環境設計」を、初学者向けにステップバイステップで解説します。
+      </p>
+      <div class="hero-meta">
+        <div class="meta-chip"><strong>対象</strong>初学者〜中級者</div>
+        <div class="meta-chip"><strong>ツール</strong>Claude Code / Agent SDK</div>
+        <div class="meta-chip"><strong>更新</strong>2026年5月</div>
+        <div class="meta-chip"><strong>情報源</strong>Anthropic Engineering Blog</div>
+      </div>
+    </div>
+
+    <div class="wrapper">
+      <!-- ════ TOC ════ -->
+      <div class="toc">
+        <h2>📋 目次</h2>
+        <ol>
+          <li><a href="#s1">ハーネスエンジニアリングとは？</a></li>
+          <li><a href="#s2">なぜハーネスが必要なのか</a></li>
+          <li><a href="#s3">コアアーキテクチャ：2段階構造</a></li>
+          <li><a href="#s4">CLAUDE.md の設計</a></li>
+          <li><a href="#s5">状態管理とセッション間の引き継ぎ</a></li>
+          <li><a href="#s6">セッションプロトコル（8ステップ）</a></li>
+          <li><a href="#s7">フィードバックループの構築</a></li>
+          <li><a href="#s8">コンテキストウィンドウの管理</a></li>
+          <li><a href="#s9">よくある失敗パターンと対策</a></li>
+          <li><a href="#s10">Minimum Viable Harness</a></li>
+          <li><a href="#s11">参考ソース一覧</a></li>
+        </ol>
+      </div>
+
+      <!-- ════ S1 ════ -->
+      <section id="s1">
+        <div class="section-label">Section 01</div>
+        <h2 class="section-title"><span class="num">1</span>ハーネスエンジニアリングとは？</h2>
+        <p class="section-lead">
+          AIエージェントに「手・目・記憶・制御」を与えるための環境設計の技術です。
+        </p>
+
+        <div class="callout info">
+          <span class="callout-icon">💡</span>
+          <div class="callout-body">
+            <strong>アナロジーで理解する</strong>
+            <p>
+              馬に「馬具（ハーネス）」を装着することで人間が馬の力を制御・活用できるように、エンジニアはAIに「ハーネス」を与えることで、AIの能力を安全・効率的に引き出します。<br />「ハーネスがClaudeを賢くするのではない。Claudeはすでに賢い。ハーネスはClaudeに手・目・作業空間を与えるのだ。」
+            </p>
+          </div>
+        </div>
+
+        <div class="card-grid mt24">
+          <div class="card-item">
+            <span class="icon">👁</span>
+            <h3>Eyes（目）</h3>
+            <p>
+              ファイル読み込み・ブラウザ操作・スクリーンショット取得。エージェントが「見る」手段を提供する。
+            </p>
+          </div>
+          <div class="card-item">
+            <span class="icon">🤲</span>
+            <h3>Hands（手）</h3>
+            <p>
+              コード実行・コマンド実行・ファイル書き込み。エージェントが「操作する」手段を提供する。
+            </p>
+          </div>
+          <div class="card-item">
+            <span class="icon">🧠</span>
+            <h3>Memory（記憶）</h3>
+            <p>セッション間の状態引き継ぎ。progress.txt / Git がエージェントの「記憶」を担う。</p>
+          </div>
+          <div class="card-item">
+            <span class="icon">🛡</span>
+            <h3>Guard（制御）</h3>
+            <p>
+              サンドボックス・コマンド許可リスト・Lint
+              によるガードレール。安全な実行環境を保証する。
+            </p>
+          </div>
+        </div>
+
+        <div class="callout tip">
+          <span class="callout-icon">🔑</span>
+          <div class="callout-body">
+            <strong>最重要原則</strong>
+            <p>
+              ハーネスの質がモデルの質より成果に影響します。同一モデルでもハーネスを変えるとSWE-benchスコアが22点変わる一方、モデルを変えても1点しか変わらないという分析があります。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- ════ S2 ════ -->
+      <section id="s2">
+        <div class="section-label">Section 02</div>
+        <h2 class="section-title"><span class="num">2</span>なぜハーネスが必要なのか</h2>
+        <p class="section-lead">
+          AIエージェントはセッションをまたぐと前の記憶をすべて失います。これが「長時間タスク」の核心的な課題です。
+        </p>
+
+        <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 12px; color: var(--muted)">
+          ❌ ハーネスなし：記憶喪失エンジニア問題
+        </h3>
+        <div class="mermaid-wrap">
+          <div id="diag-0"></div>
+        </div>
+
+        <h3 style="font-size: 1rem; font-weight: 700; margin: 28px 0 12px; color: var(--muted)">
+          ✅ ハーネスあり：構造化された引き継ぎ
+        </h3>
+        <div class="mermaid-wrap">
+          <div id="diag-1"></div>
+        </div>
+
+        <div class="callout warn">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-body">
+            <strong>2大失敗パターン（Anthropic の実験より）</strong>
+            <p>
+              <strong>①一括実装しようとする</strong
+              >：コンテキストが枯渇するまで全機能を一度に実装しようとして、半完成状態で終了する。<br />
+              <strong>②早期勝利宣言</strong
+              >：後半のセッションで進捗を確認し、まだ終わっていないのに「完成しました」と宣言してしまう。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- ════ S3 ════ -->
+      <section id="s3">
+        <div class="section-label">Section 03</div>
+        <h2 class="section-title">
+          <span class="num">3</span>コアアーキテクチャ：2段階エージェント構造
+        </h2>
+        <p class="section-lead">
+          Anthropic が公式に推奨する構造は「Initializer Agent ＋ Coding Agent」の2層構造です。
+        </p>
+
+        <!-- architecture visual -->
+        <div style="margin: 24px 0">
+          <!-- Phase label row -->
+          <div
+            style="display: grid; grid-template-columns: 1fr 40px 1fr; gap: 0; align-items: stretch"
+          >
+            <!-- Phase 1 box -->
+            <div
+              style="
+                background: rgba(124, 110, 245, 0.08);
+                border: 1px solid rgba(124, 110, 245, 0.35);
+                border-radius: 16px;
+                padding: 24px 20px;
+              "
+            >
+              <div style="text-align: center; margin-bottom: 18px">
+                <span
+                  style="
+                    background: rgba(124, 110, 245, 0.2);
+                    color: #b5aaff;
+                    font-size: 0.75rem;
+                    font-weight: 700;
+                    letter-spacing: 0.1em;
+                    padding: 4px 12px;
+                    border-radius: 99px;
+                  "
+                  >PHASE 1 ── 初回のみ</span
+                >
+                <div style="font-size: 1rem; font-weight: 800; margin-top: 8px">
+                  🚀 Initializer Agent
+                </div>
+                <div style="font-size: 0.8rem; color: var(--muted); margin-top: 2px">
+                  プロジェクト開始時に一度だけ実行
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 10px">
+                <div
+                  style="
+                    background: var(--card);
+                    border: 1px solid var(--border);
+                    border-radius: 10px;
+                    padding: 12px 14px;
+                    font-size: 0.85rem;
+                  "
+                >
+                  <div style="font-weight: 700; margin-bottom: 2px">📋 feature_list.json</div>
+                  <div style="color: var(--muted); font-size: 0.8rem">
+                    全機能を「失敗」状態でリスト化
+                  </div>
+                </div>
+                <div
+                  style="
+                    background: var(--card);
+                    border: 1px solid var(--border);
+                    border-radius: 10px;
+                    padding: 12px 14px;
+                    font-size: 0.85rem;
+                  "
+                >
+                  <div style="font-weight: 700; margin-bottom: 2px">⚙️ init.sh</div>
+                  <div style="color: var(--muted); font-size: 0.8rem">
+                    環境を一発で起動するスクリプト
+                  </div>
+                </div>
+                <div
+                  style="
+                    background: var(--card);
+                    border: 1px solid var(--border);
+                    border-radius: 10px;
+                    padding: 12px 14px;
+                    font-size: 0.85rem;
+                  "
+                >
+                  <div style="font-weight: 700; margin-bottom: 2px">📝 claude-progress.txt</div>
+                  <div style="color: var(--muted); font-size: 0.8rem">
+                    進捗を記録するログファイル
+                  </div>
+                </div>
+                <div
+                  style="
+                    background: var(--card);
+                    border: 1px solid var(--border);
+                    border-radius: 10px;
+                    padding: 12px 14px;
+                    font-size: 0.85rem;
+                  "
+                >
+                  <div style="font-weight: 700; margin-bottom: 2px">🗂 初回 git commit</div>
+                  <div style="color: var(--muted); font-size: 0.8rem">初期状態を履歴に保存</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Arrow -->
+            <div style="display: flex; align-items: center; justify-content: center">
+              <div style="text-align: center">
+                <div style="font-size: 1.4rem; color: var(--accent2)">→</div>
+                <div
+                  style="
+                    font-size: 0.65rem;
+                    color: var(--muted);
+                    white-space: nowrap;
+                    margin-top: 2px;
+                  "
+                >
+                  引き継ぎ
+                </div>
+              </div>
+            </div>
+
+            <!-- Phase 2 box -->
+            <div
+              style="
+                background: rgba(79, 195, 247, 0.07);
+                border: 1px solid rgba(79, 195, 247, 0.3);
+                border-radius: 16px;
+                padding: 24px 20px;
+              "
+            >
+              <div style="text-align: center; margin-bottom: 18px">
+                <span
+                  style="
+                    background: rgba(79, 195, 247, 0.15);
+                    color: var(--accent2);
+                    font-size: 0.75rem;
+                    font-weight: 700;
+                    letter-spacing: 0.1em;
+                    padding: 4px 12px;
+                    border-radius: 99px;
+                  "
+                  >PHASE 2 ── 繰り返し実行</span
+                >
+                <div style="font-size: 1rem; font-weight: 800; margin-top: 8px">
+                  ⚙️ Coding Agent
+                </div>
+                <div style="font-size: 0.8rem; color: var(--muted); margin-top: 2px">
+                  全機能が完了するまで何度でも実行
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <div style="display: flex; gap: 10px; align-items: center">
+                  <div
+                    style="
+                      width: 24px;
+                      height: 24px;
+                      border-radius: 50%;
+                      background: rgba(79, 195, 247, 0.15);
+                      border: 1px solid rgba(79, 195, 247, 0.4);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-size: 0.7rem;
+                      font-weight: 800;
+                      color: var(--accent2);
+                      flex-shrink: 0;
+                    "
+                  >
+                    1
+                  </div>
+                  <div style="font-size: 0.82rem">
+                    <strong>Orient</strong>
+                    <span style="color: var(--muted)">— progress.txt / git log を読む</span>
+                  </div>
+                </div>
+                <div
+                  style="margin-left: 12px; width: 1px; height: 8px; background: var(--border)"
+                ></div>
+                <div style="display: flex; gap: 10px; align-items: center">
+                  <div
+                    style="
+                      width: 24px;
+                      height: 24px;
+                      border-radius: 50%;
+                      background: rgba(79, 195, 247, 0.15);
+                      border: 1px solid rgba(79, 195, 247, 0.4);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-size: 0.7rem;
+                      font-weight: 800;
+                      color: var(--accent2);
+                      flex-shrink: 0;
+                    "
+                  >
+                    2
+                  </div>
+                  <div style="font-size: 0.82rem">
+                    <strong>Setup</strong> <span style="color: var(--muted)">— init.sh を実行</span>
+                  </div>
+                </div>
+                <div
+                  style="margin-left: 12px; width: 1px; height: 8px; background: var(--border)"
+                ></div>
+                <div style="display: flex; gap: 10px; align-items: center">
+                  <div
+                    style="
+                      width: 24px;
+                      height: 24px;
+                      border-radius: 50%;
+                      background: rgba(79, 195, 247, 0.15);
+                      border: 1px solid rgba(79, 195, 247, 0.4);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-size: 0.7rem;
+                      font-weight: 800;
+                      color: var(--accent2);
+                      flex-shrink: 0;
+                    "
+                  >
+                    3
+                  </div>
+                  <div style="font-size: 0.82rem">
+                    <strong>Verify</strong>
+                    <span style="color: var(--muted)">— 既存機能の動作確認</span>
+                  </div>
+                </div>
+                <div
+                  style="margin-left: 12px; width: 1px; height: 8px; background: var(--border)"
+                ></div>
+                <div style="display: flex; gap: 10px; align-items: center">
+                  <div
+                    style="
+                      width: 24px;
+                      height: 24px;
+                      border-radius: 50%;
+                      background: rgba(79, 195, 247, 0.15);
+                      border: 1px solid rgba(79, 195, 247, 0.4);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-size: 0.7rem;
+                      font-weight: 800;
+                      color: var(--accent2);
+                      flex-shrink: 0;
+                    "
+                  >
+                    4
+                  </div>
+                  <div style="font-size: 0.82rem">
+                    <strong>Select</strong>
+                    <span style="color: var(--muted)">— 未完了タスクを1つ選ぶ</span>
+                  </div>
+                </div>
+                <div
+                  style="margin-left: 12px; width: 1px; height: 8px; background: var(--border)"
+                ></div>
+                <div style="display: flex; gap: 10px; align-items: center">
+                  <div
+                    style="
+                      width: 24px;
+                      height: 24px;
+                      border-radius: 50%;
+                      background: rgba(79, 195, 247, 0.15);
+                      border: 1px solid rgba(79, 195, 247, 0.4);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-size: 0.7rem;
+                      font-weight: 800;
+                      color: var(--accent2);
+                      flex-shrink: 0;
+                    "
+                  >
+                    5
+                  </div>
+                  <div style="font-size: 0.82rem">
+                    <strong>Implement</strong>
+                    <span style="color: var(--muted)">— 1機能だけ実装</span>
+                  </div>
+                </div>
+                <div
+                  style="margin-left: 12px; width: 1px; height: 8px; background: var(--border)"
+                ></div>
+                <div style="display: flex; gap: 10px; align-items: center">
+                  <div
+                    style="
+                      width: 24px;
+                      height: 24px;
+                      border-radius: 50%;
+                      background: rgba(79, 195, 247, 0.15);
+                      border: 1px solid rgba(79, 195, 247, 0.4);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-size: 0.7rem;
+                      font-weight: 800;
+                      color: var(--accent2);
+                      flex-shrink: 0;
+                    "
+                  >
+                    6
+                  </div>
+                  <div style="font-size: 0.82rem">
+                    <strong>E2E Test</strong>
+                    <span style="color: var(--muted)">— UIを実際に操作して確認</span>
+                  </div>
+                </div>
+                <div
+                  style="margin-left: 12px; width: 1px; height: 8px; background: var(--border)"
+                ></div>
+                <div style="display: flex; gap: 10px; align-items: center">
+                  <div
+                    style="
+                      width: 24px;
+                      height: 24px;
+                      border-radius: 50%;
+                      background: rgba(79, 195, 247, 0.15);
+                      border: 1px solid rgba(79, 195, 247, 0.4);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-size: 0.7rem;
+                      font-weight: 800;
+                      color: var(--accent2);
+                      flex-shrink: 0;
+                    "
+                  >
+                    7
+                  </div>
+                  <div style="font-size: 0.82rem">
+                    <strong>Update</strong>
+                    <span style="color: var(--muted)">— passing: true に更新</span>
+                  </div>
+                </div>
+                <div
+                  style="margin-left: 12px; width: 1px; height: 8px; background: var(--border)"
+                ></div>
+                <div style="display: flex; gap: 10px; align-items: center">
+                  <div
+                    style="
+                      width: 24px;
+                      height: 24px;
+                      border-radius: 50%;
+                      background: rgba(79, 195, 247, 0.15);
+                      border: 1px solid rgba(79, 195, 247, 0.4);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-size: 0.7rem;
+                      font-weight: 800;
+                      color: var(--accent2);
+                      flex-shrink: 0;
+                    "
+                  >
+                    8
+                  </div>
+                  <div style="font-size: 0.82rem">
+                    <strong>Commit</strong>
+                    <span style="color: var(--muted)">— git commit + progress 更新</span>
+                  </div>
+                </div>
+              </div>
+              <!-- loop badge -->
+              <div
+                style="
+                  margin-top: 16px;
+                  text-align: center;
+                  background: rgba(105, 240, 174, 0.08);
+                  border: 1px solid rgba(105, 240, 174, 0.25);
+                  border-radius: 8px;
+                  padding: 8px;
+                  font-size: 0.8rem;
+                  color: var(--accent3);
+                "
+              >
+                🔁 全機能が完了するまで繰り返す
+              </div>
+            </div>
+          </div>
+
+          <!-- bottom: dev → result -->
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-top: 16px;
+              padding: 0 8px;
+            "
+          >
+            <div
+              style="
+                background: rgba(124, 110, 245, 0.1);
+                border: 1px solid rgba(124, 110, 245, 0.3);
+                border-radius: 10px;
+                padding: 10px 18px;
+                font-size: 0.85rem;
+                font-weight: 700;
+              "
+            >
+              👤 開発者がタスクを投入
+            </div>
+            <div style="color: var(--muted); font-size: 0.8rem">
+              ─────────────────────────────────────▶
+            </div>
+            <div
+              style="
+                background: rgba(105, 240, 174, 0.1);
+                border: 1px solid rgba(105, 240, 174, 0.3);
+                border-radius: 10px;
+                padding: 10px 18px;
+                font-size: 0.85rem;
+                font-weight: 700;
+                color: var(--accent3);
+              "
+            >
+              ✅ 全機能が完成
+            </div>
+          </div>
+        </div>
+
+        <div class="card-grid">
+          <div class="card-item">
+            <span class="icon">🚀</span>
+            <h3>Initializer Agent</h3>
+            <p>
+              プロジェクト初回のみ起動。後続の全エージェントが必要とする「環境」をゼロから構築する。異なるシステムプロンプトを使用する点が重要。
+            </p>
+          </div>
+          <div class="card-item">
+            <span class="icon">⚙️</span>
+            <h3>Coding Agent</h3>
+            <p>
+              2回目以降のセッションで繰り返し起動。1セッション1機能のみ実装し、クリーンな状態で終了する。インクリメンタルな進捗が品質の鍵。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- ════ S4 ════ -->
+      <section id="s4">
+        <div class="section-label">Section 04</div>
+        <h2 class="section-title"><span class="num">4</span>CLAUDE.md の設計</h2>
+        <p class="section-lead">
+          CLAUDE.md
+          はエージェントが毎回自動で読み込む「地図」です。短く・ポインタとして機能させることが重要です。
+        </p>
+
+        <div class="mermaid-wrap">
+          <div id="diag-2"></div>
+        </div>
+
+        <div class="callout warn">
+          <span class="callout-icon">📊</span>
+          <div class="callout-body">
+            <strong>なぜ短いほど良いのか（IFScale の研究より）</strong>
+            <p>
+              150〜200 の指示があると「一番最初の指示ばかりが優先される（primacy
+              bias）」バイアスが発生し、後半の指示が無視されるようになります。Anthropic
+              の公式ドキュメントでは「200行以内」を上限としていますが、実際の推奨は50行以内です。
+            </p>
+          </div>
+        </div>
+
+        <div class="table-wrap mt24">
+          <table>
+            <thead>
+              <tr>
+                <th>行数</th>
+                <th>評価</th>
+                <th>理由</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>〜50行</td>
+                <td><span class="chip green">✅ 理想</span></td>
+                <td>コンプライアンス率が最も高い</td>
+              </tr>
+              <tr>
+                <td>〜100行</td>
+                <td><span class="chip blue">⚠️ 許容</span></td>
+                <td>注意して設計すれば機能する</td>
+              </tr>
+              <tr>
+                <td>〜200行</td>
+                <td><span class="chip orange">⚠️ 上限</span></td>
+                <td>Anthropic 公式の最大推奨値</td>
+              </tr>
+              <tr>
+                <td>200行超</td>
+                <td><span class="chip red">❌ 非推奨</span></td>
+                <td>遵守率が著しく低下する</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 style="font-size: 1rem; font-weight: 700; margin: 28px 0 12px">
+          CLAUDE.md テンプレート
+        </h3>
+        <div class="code-label">CLAUDE.md</div>
+        <pre><code><span class="hl-c"># CLAUDE.md — プロジェクトの地図（50行以内を維持すること）</span>
+
+<span class="hl-k">## Routing（主要コマンド）</span>
+<span class="hl-s">- テスト実行:</span>    <span class="hl-n">npm test</span>
+<span class="hl-s">- 開発サーバー起動:</span> <span class="hl-n">bash init.sh</span>
+<span class="hl-s">- リント:</span>       <span class="hl-n">npm run lint</span>
+<span class="hl-s">- アーキテクチャ検証:</span> <span class="hl-n">npm run arch-check</span>
+
+<span class="hl-k">## Key Files（重要ファイル）</span>
+<span class="hl-s">- 機能一覧:</span>   <span class="hl-n">feature_list.json</span>
+<span class="hl-s">- 進捗ログ:</span>   <span class="hl-n">claude-progress.txt</span>
+<span class="hl-s">- ADR:</span>        <span class="hl-n">docs/adr/</span>
+
+<span class="hl-k">## Prohibitions（禁止事項）</span>
+<span class="hl-s">- feature_list.json のアイテムを削除・並び替えしない</span>
+<span class="hl-s">- lint 設定ファイルを変更しない</span>
+<span class="hl-s">- テストなしで機能を passing にマークしない</span>
+
+<span class="hl-k">## Deeper Docs（詳細はここ）</span>
+<span class="hl-s">- コーディング規約:</span> <span class="hl-n">docs/coding-conventions.md</span>
+<span class="hl-s">- テスト戦略:</span>    <span class="hl-n">docs/testing-strategy.md</span></code></pre>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- ════ S5 ════ -->
+      <section id="s5">
+        <div class="section-label">Section 05</div>
+        <h2 class="section-title"><span class="num">5</span>状態管理とセッション間の引き継ぎ</h2>
+        <p class="section-lead">
+          AIのコンテキストは一時的です。永続化はすべてファイルへ書き出す必要があります。
+        </p>
+
+        <div class="mermaid-wrap">
+          <div id="diag-3"></div>
+        </div>
+
+        <h3 style="font-size: 1rem; font-weight: 700; margin: 28px 0 12px">
+          feature_list.json の構造
+        </h3>
+
+        <div class="callout info">
+          <span class="callout-icon">📌</span>
+          <div class="callout-body">
+            <strong>なぜ Markdown ではなく JSON を使うのか？</strong>
+            <p>
+              Anthropic の実験では、Markdown
+              ファイルはモデルが不適切に編集・上書きしやすいのに対し、JSON
+              は構造が固定されているため「意図せず書き換える」事故が大幅に減ることが確認されています。
+            </p>
+          </div>
+        </div>
+
+        <div class="code-label">feature_list.json</div>
+        <pre><code>{
+  <span class="hl-k">"features"</span>: [
+    {
+      <span class="hl-k">"category"</span>: <span class="hl-s">"functional"</span>,
+      <span class="hl-k">"description"</span>: <span class="hl-s">"ユーザーが新規チャットを開始できる"</span>,
+      <span class="hl-k">"steps"</span>: [
+        <span class="hl-s">"メイン画面に遷移する"</span>,
+        <span class="hl-s">"「新しいチャット」ボタンをクリック"</span>,
+        <span class="hl-s">"新しい会話が作成されることを確認"</span>,
+        <span class="hl-s">"チャットエリアにウェルカム状態が表示されることを確認"</span>
+      ],
+      <span class="hl-k">"passes"</span>: <span class="hl-v">false</span>  <span class="hl-c">← 初期値は必ず false。true に変更のみ許可</span>
+    }
+  ]
+}</code></pre>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ファイル</th>
+                <th>形式</th>
+                <th>役割</th>
+                <th>更新タイミング</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>feature_list.json</strong></td>
+                <td>JSON</td>
+                <td>機能の完了状態管理</td>
+                <td>機能完了時のみ passes を true に</td>
+              </tr>
+              <tr>
+                <td><strong>claude-progress.txt</strong></td>
+                <td>自由テキスト</td>
+                <td>セッション間の引き継ぎ</td>
+                <td>各セッション終了時</td>
+              </tr>
+              <tr>
+                <td><strong>init.sh</strong></td>
+                <td>シェルスクリプト</td>
+                <td>環境の再現性保証</td>
+                <td>初回のみ（必要時に更新）</td>
+              </tr>
+              <tr>
+                <td><strong>Git commits</strong></td>
+                <td>バージョン管理</td>
+                <td>変更履歴とロールバック</td>
+                <td>各機能実装完了時</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- ════ S6 ════ -->
+      <section id="s6">
+        <div class="section-label">Section 06</div>
+        <h2 class="section-title"><span class="num">6</span>セッションプロトコル（8ステップ）</h2>
+        <p class="section-lead">
+          各セッションは以下の8ステップを必ず守ることが、品質と安定性の鍵です。
+        </p>
+
+        <div class="mermaid-wrap">
+          <div id="diag-4"></div>
+        </div>
+
+        <div class="steps mt24">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <h3>Orient（状況把握）</h3>
+              <p>
+                セッション開始直後に <code>claude-progress.txt</code> と
+                <code>git log --oneline -20</code>
+                を読む。前のセッションで何が行われたかを把握する。
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <h3>Setup（環境起動）</h3>
+              <p>
+                <code>bash init.sh</code>
+                を実行して開発サーバーを起動。毎回同じ手順で再現できるようにする。
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <h3>Verify Baseline（ベースライン検証）</h3>
+              <p>
+                新機能の実装前に、既存機能が壊れていないかを確認。Puppeteer MCP などで基本的な E2E
+                テストを実行する。壊れていれば先に修正。
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <h3>タスク選択（1つのみ）</h3>
+              <p>
+                <code>feature_list.json</code> を読み、<code>passes: false</code>
+                の中から最優先の1機能だけを選ぶ。複数選ばないことが重要。
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-body">
+              <h3>実装</h3>
+              <p>
+                選んだ1機能のみを実装する。途中でスコープを広げない。関連する別のバグを発見した場合は
+                <code>progress.txt</code> に記録して後回しにする。
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">6</div>
+            <div class="step-body">
+              <h3>テスト（E2E 必須）</h3>
+              <p>
+                ユニットテストだけでなく、Puppeteer / Playwright で実際の UI
+                を操作して確認。人間が使うように操作することで、バックエンドだけのテストでは発見できないバグを検出する。
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">7</div>
+            <div class="step-body">
+              <h3>状態更新</h3>
+              <p>
+                <code>feature_list.json</code> の対象機能を <code>passing: true</code> に変更。<code
+                  >claude-progress.txt</code
+                >
+                に今回の成果・発見・次への指示を記録する。
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">8</div>
+            <div class="step-body">
+              <h3>クリーンな終了</h3>
+              <p>
+                詳細なコミットメッセージで <code>git commit</code>。アプリが「main
+                ブランチにマージできる状態」で終了する。半完成・バグありで終わらない。
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- ════ S7 ════ -->
+      <section id="s7">
+        <div class="section-label">Section 07</div>
+        <h2 class="section-title"><span class="num">7</span>フィードバックループの構築</h2>
+        <p class="section-lead">
+          「高速なフィードバック」がエージェントの品質を決定します。フィードバックが速いほど、1コンテキストウィンドウ内で多くの反復ができます。
+        </p>
+
+        <div class="mermaid-wrap">
+          <div id="diag-5"></div>
+        </div>
+
+        <div class="table-wrap mt24">
+          <table>
+            <thead>
+              <tr>
+                <th>フィードバック種別</th>
+                <th>ツール例</th>
+                <th>役割</th>
+                <th>速度</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Lint / 型チェック</strong></td>
+                <td>ESLint, TypeScript, Ruff, Biome</td>
+                <td>構文・型エラーを即検出</td>
+                <td>⚡ 即時（秒以内）</td>
+              </tr>
+              <tr>
+                <td><strong>ユニットテスト</strong></td>
+                <td>Jest, pytest, Vitest</td>
+                <td>関数単位の正確性検証</td>
+                <td>🟢 秒〜分単位</td>
+              </tr>
+              <tr>
+                <td><strong>E2E テスト</strong></td>
+                <td>Puppeteer MCP, Playwright</td>
+                <td>UIを人間のように操作して検証</td>
+                <td>🟡 分単位</td>
+              </tr>
+              <tr>
+                <td><strong>アーキテクチャ検証</strong></td>
+                <td>archgate, dependency-cruiser</td>
+                <td>設計ルール違反の検出</td>
+                <td>🟢 秒単位</td>
+              </tr>
+              <tr>
+                <td><strong>pre-commit フック</strong></td>
+                <td>Husky, lefthook</td>
+                <td>コミット前の最終チェック</td>
+                <td>🟢 秒単位</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 style="font-size: 1rem; font-weight: 700; margin: 28px 0 12px">
+          Hooks を使った自動フィードバック
+        </h3>
+        <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 12px">
+          Claude Code の
+          <code>PostToolUse</code>
+          フックを使うと、ファイル保存のたびに自動でLintを実行させることができます。
+        </p>
+
+        <div class="code-label">settings.json（Claude Code Hooks 設定）</div>
+        <pre><code>{
+  <span class="hl-k">"hooks"</span>: {
+    <span class="hl-k">"PostToolUse"</span>: [
+      {
+        <span class="hl-k">"matcher"</span>: <span class="hl-s">"Write|Edit"</span>,
+        <span class="hl-k">"hooks"</span>: [
+          {
+            <span class="hl-k">"type"</span>: <span class="hl-s">"command"</span>,
+            <span class="hl-k">"command"</span>: <span class="hl-s">"npm run lint --fix"</span>
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+
+        <div class="callout danger">
+          <span class="callout-icon">🚨</span>
+          <div class="callout-body">
+            <strong>ルール改ざんアンチパターンに注意</strong>
+            <p>
+              エージェントはLintエラーが出たとき、コードを修正する代わりにLint設定を無効化しようとすることがあります。Lint設定ファイルは必ず
+              read-only に保護し、CLAUDE.md で「lint設定を変更禁止」と明示してください。
+            </p>
+          </div>
+        </div>
+
+        <h3 style="font-size: 1rem; font-weight: 700; margin: 28px 0 12px">
+          E2E でエージェントに「目」を与える
+        </h3>
+        <div class="mermaid-wrap">
+          <div id="diag-6"></div>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- ════ S8 ════ -->
+      <section id="s8">
+        <div class="section-label">Section 08</div>
+        <h2 class="section-title"><span class="num">8</span>コンテキストウィンドウの管理</h2>
+        <p class="section-lead">コンテキストは有限の資源です。消費が多いほど品質が下がります。</p>
+
+        <div class="mermaid-wrap">
+          <div id="diag-7"></div>
+        </div>
+
+        <div class="table-wrap mt24">
+          <table>
+            <thead>
+              <tr>
+                <th>戦略</th>
+                <th>操作</th>
+                <th>並列度</th>
+                <th>理由</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>ファイル検索・解析</strong></td>
+                <td>読み込み専用</td>
+                <td>高並列 OK</td>
+                <td>競合が発生しないため</td>
+              </tr>
+              <tr>
+                <td><strong>ビルド・テスト実行</strong></td>
+                <td>書き込みあり</td>
+                <td>低並列推奨</td>
+                <td>競合・バックプレッシャー回避</td>
+              </tr>
+              <tr>
+                <td><strong>結果のサマリー</strong></td>
+                <td>サブエージェント</td>
+                <td>—</td>
+                <td>raw 出力をメインに入れない</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 style="font-size: 1rem; font-weight: 700; margin: 28px 0 12px">
+          Compaction vs. Context Reset
+        </h3>
+        <div class="mermaid-wrap">
+          <div id="diag-8"></div>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- ════ S9 ════ -->
+      <section id="s9">
+        <div class="section-label">Section 09</div>
+        <h2 class="section-title"><span class="num">9</span>よくある失敗パターンと対策</h2>
+        <p class="section-lead">
+          Anthropic の実験で確認された主要な失敗パターンと、ハーネスによる対策をまとめます。
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>失敗パターン</th>
+                <th>症状</th>
+                <th>Initializer の対策</th>
+                <th>Coding Agent の対策</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>早期勝利宣言</strong></td>
+                <td>途中なのに「完成」と言う</td>
+                <td>feature_list.json で全機能を failing で定義</td>
+                <td>セッション開始時に必ず feature_list.json を読む。1機能ずつ選ぶ</td>
+              </tr>
+              <tr>
+                <td><strong>半完成状態で終了</strong></td>
+                <td>バグが残ったまま次セッションへ</td>
+                <td>初期 git リポジトリと progress.txt を準備</td>
+                <td>
+                  開始時に progress.txt と git log を読む。終了時に必ず commit と progress 更新
+                </td>
+              </tr>
+              <tr>
+                <td><strong>テストなし完了マーク</strong></td>
+                <td>動作未確認のまま passing にする</td>
+                <td>feature_list.json に検証ステップを明記</td>
+                <td>E2E テストで実際の UI を確認後のみ passing に変更</td>
+              </tr>
+              <tr>
+                <td><strong>環境構築に時間を浪費</strong></td>
+                <td>毎回 npm install の方法を調べる</td>
+                <td>init.sh を作成して手順を自動化</td>
+                <td>セッション開始時に必ず init.sh を読む</td>
+              </tr>
+              <tr>
+                <td><strong>一括実装しようとする</strong></td>
+                <td>全機能を一度に実装しコンテキスト枯渇</td>
+                <td>機能を細かく分割してリスト化</td>
+                <td>「1セッション1機能」をプロンプトに明記</td>
+              </tr>
+              <tr>
+                <td><strong>ルール改ざん</strong></td>
+                <td>Lint エラーを修正する代わりに設定を無効化</td>
+                <td>—</td>
+                <td>Lint 設定ファイルを read-only に保護。CLAUDE.md で明示的に禁止</td>
+              </tr>
+              <tr>
+                <td><strong>スタブ実装</strong></td>
+                <td>TODO・空のモックで機能完了とする</td>
+                <td>—</td>
+                <td>「プレースホルダーは実装とみなさない」と明示。E2E で実際の動作を確認</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- ════ S10 ════ -->
+      <section id="s10">
+        <div class="section-label">Section 10</div>
+        <h2 class="section-title"><span class="num">10</span>Minimum Viable Harness（最小構成）</h2>
+        <p class="section-lead">
+          ゼロから始める場合の段階的な導入ロードマップです。一度にすべてを導入しなくて構いません。
+        </p>
+
+        <!-- MVH roadmap: HTML cards instead of gantt -->
+        <div style="display: flex; flex-direction: column; gap: 0; margin: 24px 0">
+          <!-- connector line wrapper -->
+          <div style="display: grid; grid-template-columns: 48px 1fr; gap: 0">
+            <!-- spine -->
+            <div style="display: flex; flex-direction: column; align-items: center">
+              <div
+                style="
+                  width: 2px;
+                  flex: 1;
+                  background: linear-gradient(to bottom, #7c6ef5, #4fc3f7, #69f0ae, #ffb74d);
+                "
+              ></div>
+            </div>
+
+            <!-- cards -->
+            <div style="display: flex; flex-direction: column; gap: 0; padding-bottom: 8px">
+              <!-- Week 1 -->
+              <div style="display: flex; align-items: flex-start; gap: 0; margin-bottom: 28px">
+                <div
+                  style="
+                    position: relative;
+                    left: -34px;
+                    top: 16px;
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    background: #7c6ef5;
+                    border: 3px solid var(--bg);
+                    flex-shrink: 0;
+                  "
+                ></div>
+                <div
+                  style="
+                    background: rgba(124, 110, 245, 0.08);
+                    border: 1px solid rgba(124, 110, 245, 0.35);
+                    border-radius: 14px;
+                    padding: 20px 22px;
+                    flex: 1;
+                    margin-left: -6px;
+                  "
+                >
+                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px">
+                    <span
+                      style="
+                        background: rgba(124, 110, 245, 0.2);
+                        color: #b5aaff;
+                        font-size: 0.72rem;
+                        font-weight: 800;
+                        letter-spacing: 0.1em;
+                        padding: 3px 10px;
+                        border-radius: 99px;
+                      "
+                      >WEEK 1</span
+                    >
+                    <span style="font-weight: 800; font-size: 1rem">基盤をつくる</span>
+                  </div>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px">
+                    <div
+                      style="
+                        background: var(--card);
+                        border: 1px solid var(--border);
+                        border-radius: 9px;
+                        padding: 10px 12px;
+                        font-size: 0.82rem;
+                      "
+                    >
+                      <div style="font-weight: 700">📄 CLAUDE.md 作成</div>
+                      <div style="color: var(--muted); font-size: 0.77rem; margin-top: 2px">
+                        50行以内のエージェント地図
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        background: var(--card);
+                        border: 1px solid var(--border);
+                        border-radius: 9px;
+                        padding: 10px 12px;
+                        font-size: 0.82rem;
+                      "
+                    >
+                      <div style="font-weight: 700">📋 feature_list.json</div>
+                      <div style="color: var(--muted); font-size: 0.77rem; margin-top: 2px">
+                        全機能を failing でリスト化
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        background: var(--card);
+                        border: 1px solid var(--border);
+                        border-radius: 9px;
+                        padding: 10px 12px;
+                        font-size: 0.82rem;
+                      "
+                    >
+                      <div style="font-weight: 700">⚙️ init.sh 作成</div>
+                      <div style="color: var(--muted); font-size: 0.77rem; margin-top: 2px">
+                        環境を一発起動するスクリプト
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        background: var(--card);
+                        border: 1px solid var(--border);
+                        border-radius: 9px;
+                        padding: 10px 12px;
+                        font-size: 0.82rem;
+                      "
+                    >
+                      <div style="font-weight: 700">🗂 Git 運用開始</div>
+                      <div style="color: var(--muted); font-size: 0.77rem; margin-top: 2px">
+                        進捗の引き継ぎ手段として活用
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Week 2-4 -->
+              <div style="display: flex; align-items: flex-start; gap: 0; margin-bottom: 28px">
+                <div
+                  style="
+                    position: relative;
+                    left: -34px;
+                    top: 16px;
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    background: #4fc3f7;
+                    border: 3px solid var(--bg);
+                    flex-shrink: 0;
+                  "
+                ></div>
+                <div
+                  style="
+                    background: rgba(79, 195, 247, 0.07);
+                    border: 1px solid rgba(79, 195, 247, 0.3);
+                    border-radius: 14px;
+                    padding: 20px 22px;
+                    flex: 1;
+                    margin-left: -6px;
+                  "
+                >
+                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px">
+                    <span
+                      style="
+                        background: rgba(79, 195, 247, 0.15);
+                        color: var(--accent2);
+                        font-size: 0.72rem;
+                        font-weight: 800;
+                        letter-spacing: 0.1em;
+                        padding: 3px 10px;
+                        border-radius: 99px;
+                      "
+                      >WEEK 2〜4</span
+                    >
+                    <span style="font-weight: 800; font-size: 1rem">品質を高める</span>
+                  </div>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px">
+                    <div
+                      style="
+                        background: var(--card);
+                        border: 1px solid var(--border);
+                        border-radius: 9px;
+                        padding: 10px 12px;
+                        font-size: 0.82rem;
+                      "
+                    >
+                      <div style="font-weight: 700">🔍 Lint 設定</div>
+                      <div style="color: var(--muted); font-size: 0.77rem; margin-top: 2px">
+                        +Hooks で自動実行
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        background: var(--card);
+                        border: 1px solid var(--border);
+                        border-radius: 9px;
+                        padding: 10px 12px;
+                        font-size: 0.82rem;
+                      "
+                    >
+                      <div style="font-weight: 700">🧪 ユニットテスト</div>
+                      <div style="color: var(--muted); font-size: 0.77rem; margin-top: 2px">
+                        関数単位の正確性検証
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        background: var(--card);
+                        border: 1px solid var(--border);
+                        border-radius: 9px;
+                        padding: 10px 12px;
+                        font-size: 0.82rem;
+                      "
+                    >
+                      <div style="font-weight: 700">🌐 E2E テスト</div>
+                      <div style="color: var(--muted); font-size: 0.77rem; margin-top: 2px">
+                        Puppeteer / Playwright
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Month 2-3 -->
+              <div style="display: flex; align-items: flex-start; gap: 0; margin-bottom: 28px">
+                <div
+                  style="
+                    position: relative;
+                    left: -34px;
+                    top: 16px;
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    background: #69f0ae;
+                    border: 3px solid var(--bg);
+                    flex-shrink: 0;
+                  "
+                ></div>
+                <div
+                  style="
+                    background: rgba(105, 240, 174, 0.07);
+                    border: 1px solid rgba(105, 240, 174, 0.25);
+                    border-radius: 14px;
+                    padding: 20px 22px;
+                    flex: 1;
+                    margin-left: -6px;
+                  "
+                >
+                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px">
+                    <span
+                      style="
+                        background: rgba(105, 240, 174, 0.15);
+                        color: var(--accent3);
+                        font-size: 0.72rem;
+                        font-weight: 800;
+                        letter-spacing: 0.1em;
+                        padding: 3px 10px;
+                        border-radius: 99px;
+                      "
+                      >MONTH 2〜3</span
+                    >
+                    <span style="font-weight: 800; font-size: 1rem">高度化する</span>
+                  </div>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px">
+                    <div
+                      style="
+                        background: var(--card);
+                        border: 1px solid var(--border);
+                        border-radius: 9px;
+                        padding: 10px 12px;
+                        font-size: 0.82rem;
+                      "
+                    >
+                      <div style="font-weight: 700">🤖 サブエージェント</div>
+                      <div style="color: var(--muted); font-size: 0.77rem; margin-top: 2px">
+                        検索・解析を並列委任
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        background: var(--card);
+                        border: 1px solid var(--border);
+                        border-radius: 9px;
+                        padding: 10px 12px;
+                        font-size: 0.82rem;
+                      "
+                    >
+                      <div style="font-weight: 700">🧐 Evaluator 分離</div>
+                      <div style="color: var(--muted); font-size: 0.77rem; margin-top: 2px">
+                        評価専用エージェント
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        background: var(--card);
+                        border: 1px solid var(--border);
+                        border-radius: 9px;
+                        padding: 10px 12px;
+                        font-size: 0.82rem;
+                      "
+                    >
+                      <div style="font-weight: 700">📁 ADR 導入</div>
+                      <div style="color: var(--muted); font-size: 0.77rem; margin-top: 2px">
+                        設計決定の記録
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Month 3+ -->
+              <div style="display: flex; align-items: flex-start; gap: 0">
+                <div
+                  style="
+                    position: relative;
+                    left: -34px;
+                    top: 16px;
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    background: #ffb74d;
+                    border: 3px solid var(--bg);
+                    flex-shrink: 0;
+                  "
+                ></div>
+                <div
+                  style="
+                    background: rgba(255, 183, 77, 0.07);
+                    border: 1px solid rgba(255, 183, 77, 0.25);
+                    border-radius: 14px;
+                    padding: 20px 22px;
+                    flex: 1;
+                    margin-left: -6px;
+                  "
+                >
+                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px">
+                    <span
+                      style="
+                        background: rgba(255, 183, 77, 0.15);
+                        color: var(--accent4);
+                        font-size: 0.72rem;
+                        font-weight: 800;
+                        letter-spacing: 0.1em;
+                        padding: 3px 10px;
+                        border-radius: 99px;
+                      "
+                      >MONTH 3+</span
+                    >
+                    <span style="font-weight: 800; font-size: 1rem">最適化・削ぎ落とす</span>
+                  </div>
+                  <div
+                    style="
+                      background: var(--card);
+                      border: 1px solid var(--border);
+                      border-radius: 9px;
+                      padding: 12px 14px;
+                      font-size: 0.85rem;
+                    "
+                  >
+                    <div style="font-weight: 700">🧹 ハーネス複雑度の削減</div>
+                    <div style="color: var(--muted); font-size: 0.8rem; margin-top: 4px">
+                      モデルが不要になったハーネスの仕組みは積極的に取り除く。「Simplify
+                      relentlessly」の原則に従い、ハーネスはモデルの成長に合わせてシンプルにしていく。
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3 style="font-size: 1rem; font-weight: 700; margin: 28px 0 12px">
+          Week 1：最低限のディレクトリ構成
+        </h3>
+        <div class="code-label">プロジェクト構成</div>
+        <pre><code>project/
+├── <span class="hl-k">CLAUDE.md</span>              <span class="hl-c">← エージェントへの地図（50行以内）</span>
+├── <span class="hl-k">feature_list.json</span>      <span class="hl-c">← やることリスト（JSON形式）</span>
+├── <span class="hl-k">claude-progress.txt</span>    <span class="hl-c">← 進捗ログ</span>
+├── <span class="hl-k">init.sh</span>                <span class="hl-c">← 環境起動スクリプト</span>
+├── <span class="hl-k">docs/</span>
+│   ├── adr/               <span class="hl-c">← Architecture Decision Records</span>
+│   ├── coding-conventions.md
+│   └── testing-strategy.md
+└── <span class="hl-k">.git/</span>                  <span class="hl-c">← Git リポジトリ</span></code></pre>
+
+        <h3 style="font-size: 1rem; font-weight: 700; margin: 28px 0 12px">
+          Month 2〜3：Evaluator Agent の分離
+        </h3>
+        <div class="mermaid-wrap">
+          <div id="diag-9"></div>
+        </div>
+
+        <h3 style="font-size: 1rem; font-weight: 700; margin: 28px 0 16px">黄金律まとめ</h3>
+        <div class="rules">
+          <div class="rule">
+            <span class="rule-tag gold">Principle</span>
+            <h3>Humans steer, agents execute</h3>
+            <p>
+              人間が方向を決め、エージェントがコードを書く。設計・意図・フィードバックループは人間の責任。
+            </p>
+          </div>
+          <div class="rule">
+            <span class="rule-tag blue">Principle</span>
+            <h3>Expect eventual consistency</h3>
+            <p>
+              完璧な1回より、反復改善を期待する。ほとんどの問題は、より良いプロンプトで繰り返すことで解決できる。
+            </p>
+          </div>
+          <div class="rule">
+            <span class="rule-tag green">Principle</span>
+            <h3>Simplify relentlessly</h3>
+            <p>
+              モデルが不要になったハーネスの複雑さは削除する。ハーネスはモデルの成長に合わせてシンプルにしていく。
+            </p>
+          </div>
+          <div class="rule">
+            <span class="rule-tag purple">Principle</span>
+            <h3>State in files, not context</h3>
+            <p>永続化はすべてファイルへ。コンテキスト内の情報はセッション終了とともに消える。</p>
+          </div>
+          <div class="rule">
+            <span class="rule-tag gold">Principle</span>
+            <h3>One task per session</h3>
+            <p>
+              1セッション1機能の原則を守る。スコープを広げるとコンテキスト枯渇・品質低下の原因になる。
+            </p>
+          </div>
+          <div class="rule">
+            <span class="rule-tag blue">Principle</span>
+            <h3>Harness &gt; Model</h3>
+            <p>
+              ハーネスの質がモデルの質より成果に影響する。同じモデルでも、ハーネスを変えると22点以上スコアが変わる。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- ════ S11 ════ -->
+      <section id="s11">
+        <div class="section-label">Section 11</div>
+        <h2 class="section-title"><span class="num">11</span>参考ソース一覧</h2>
+        <p class="section-lead">
+          このガイドの根拠となる一次情報源です。すべて確認済みのリンクです。
+        </p>
+
+        <div class="source-list">
+          <div class="source-item">
+            <div class="source-icon">🏛</div>
+            <div class="source-body">
+              <h4>Effective harnesses for long-running agents（公式）</h4>
+              <a
+                href="https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents"
+                target="_blank"
+                >https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents</a
+              >
+              <p>
+                Anthropic Engineering Blog。Initializer Agent / Coding Agent
+                の2層構造、feature_list.json
+                の設計、インクリメンタル進捗の原則。このガイドの主要一次情報源。
+              </p>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-icon">📘</div>
+            <div class="source-body">
+              <h4>Claude Code: Best practices for agentic coding（公式）</h4>
+              <a
+                href="https://www.anthropic.com/engineering/claude-code-best-practices"
+                target="_blank"
+                >https://www.anthropic.com/engineering/claude-code-best-practices</a
+              >
+              <p>
+                Anthropic Engineering Blog。CLAUDE.md
+                設計、環境チューニング、ワークフロー最適化のベストプラクティス。
+              </p>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-icon">📄</div>
+            <div class="source-body">
+              <h4>Claude 4 Prompting Guide - Multi-context window workflows（公式）</h4>
+              <a
+                href="https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/claude-4-best-practices"
+                target="_blank"
+                >https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/claude-4-best-practices</a
+              >
+              <p>
+                公式ドキュメント。マルチコンテキストウィンドウワークフロー、Initializer Agent
+                のプロンプト設計について。
+              </p>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-icon">💻</div>
+            <div class="source-body">
+              <h4>Claude Quickstarts - autonomous-coding（公式サンプル）</h4>
+              <a
+                href="https://github.com/anthropics/claude-quickstarts/tree/main/autonomous-coding"
+                target="_blank"
+                >https://github.com/anthropics/claude-quickstarts/tree/main/autonomous-coding</a
+              >
+              <p>
+                Anthropic GitHub。Initializer / Coding Agent
+                のコード実装サンプル。実際の動作を確認できる。
+              </p>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-icon">📝</div>
+            <div class="source-body">
+              <h4>Harness Engineering Best Practices from Anthropic and OpenAI（Gist）</h4>
+              <a
+                href="https://gist.github.com/celesteanders/21edad2367c8ede2ff092bd87e56a26f"
+                target="_blank"
+                >https://gist.github.com/celesteanders/21edad2367c8ede2ff092bd87e56a26f</a
+              >
+              <p>
+                Anthropic・OpenAI
+                両社のベストプラクティスを統合したコミュニティまとめ。アーキテクチャ・状態管理・フィードバックループの詳細。
+              </p>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-icon">🌐</div>
+            <div class="source-body">
+              <h4>Harness Engineering Best Practices for Claude Code / Codex Users（2026年版）</h4>
+              <a
+                href="https://nyosegawa.com/en/posts/harness-engineering-best-practices-2026/"
+                target="_blank"
+                >https://nyosegawa.com/en/posts/harness-engineering-best-practices-2026/</a
+              >
+              <p>
+                2026年3月公開。リポジトリ衛生・決定論的ツール・E2E
+                テスト戦略・プラットフォーム固有の戦略を網羅した詳細ガイド。
+              </p>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-icon">🎓</div>
+            <div class="source-body">
+              <h4>Learn Harness Engineering by Building a Mini Claude Code（DEV Community）</h4>
+              <a
+                href="https://dev.to/truongpx396/learn-harness-engineering-by-building-a-mini-claude-code-45a9"
+                target="_blank"
+                >https://dev.to/truongpx396/learn-harness-engineering-by-building-a-mini-claude-code-45a9</a
+              >
+              <p>
+                2026年4月公開。Mini Claude Code
+                を自作しながらハーネスエンジニアリングの原則を実践的に学べるチュートリアル。
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <!-- /wrapper -->
+
+    <footer>
+      <p>
+        ハーネスエンジニアリング完全ガイド 2026 ── Claude Sonnet 4.6 / Anthropic Engineering Blog
+        ベース
+      </p>
+      <p style="margin-top: 8px">
+        情報は 2026年5月時点のものです。最新情報は
+        <a href="https://www.anthropic.com/engineering" target="_blank"
+          >Anthropic Engineering Blog</a
+        >
+        をご確認ください。
+      </p>
+    </footer>
+
+    <script>
+      // ── Mermaid JS テンプレートリテラル方式 ──────────────────────────
+      // IDE フォーマッターが <div class="mermaid"> の内容を破壊するのを防ぐため、
+      // ダイアグラムソースをすべて JS テンプレートリテラルで管理する。
+      const DIAGRAMS = {
+        'diag-0': `sequenceDiagram
+  participant Dev as 開発者
+  participant A1 as エージェント Session1
+  participant A2 as エージェント Session2
+  Dev->>A1: 「Webアプリを作って」
+  A1->>A1: 実装開始（コンテキスト消費中）
+  Note over A1: ❌ コンテキスト枯渇で途中終了
+  A1-->>Dev: 未完成・ドキュメントなし
+  Dev->>A2: 再起動
+  A2->>A2: 「何が終わってる？」を把握しようとする
+  Note over A2: ❌ 何が終わったか不明 重複実装・バグ放置
+  A2-->>Dev: 品質低下・時間浪費`,
+
+        'diag-1': `sequenceDiagram
+  participant Dev as 開発者
+  participant H as ハーネス（環境）
+  participant A1 as エージェント Session1
+  participant A2 as エージェント Session2
+  Dev->>H: 初期セットアップ（Initializer）
+  H->>H: feature_list.json / progress.txt / init.sh 作成
+  H->>A1: 「機能Aを実装して」
+  A1->>H: 実装 → git commit + progress 更新
+  Note over H: ✅ 状態がファイルに永続化
+  H->>A2: 新セッション開始
+  A2->>H: progress.txt / git log を読む
+  Note over A2: ✅ 即座に状況把握
+  A2->>H: 機能Bを実装・テスト・commit`,
+
+        'diag-2': `flowchart LR
+  BAD["❌ 悪い例\n─────────────\n200行超の詳細仕様\nインストール手順全文\nアーキテクチャ全解説\n全コーディング規約\n過去の経緯・背景情報"]
+  GOOD["✅ 良い例\n─────────────\n50行以内の目次\nコマンド早見表のみ\n詳細は docs/ へのポインタ\nProhibitions（禁止事項）\nRouting（どこを見るか）"]
+  BAD -.->|改善| GOOD`,
+
+        'diag-3': `flowchart TB
+  subgraph FILES["永続化ファイル群（リポジトリ内）"]
+    FL["feature_list.json\nやることリスト（JSON形式）\npassing: false→true で更新のみ\n削除・並び替え禁止"]
+    PR["claude-progress.txt\n進捗ログ（フリーテキスト）\n何が終わったか / 発見したバグ\n次のセッションへの指示"]
+    IS["init.sh\n環境起動スクリプト\n開発サーバー起動\n依存パッケージインストール"]
+    GH["Git History\nコミットログ = 変更記録\n詳細なコミットメッセージ\nロールバック手段"]
+    CM["CLAUDE.md\nエージェントへの地図\n（前章参照）"]
+  end`,
+
+        'diag-4': `flowchart TD
+  START(["セッション開始"]) --> S1
+  S1["① Orient（状況把握）\nprogress.txt を読む\ngit log --oneline -20 を確認"] --> S2
+  S2["② Setup（環境起動）\nbash init.sh を実行"] --> S3
+  S3["③ Verify Baseline（ベースライン検証）\n既存機能が動いているか確認\nPuppeteer / Playwright で E2E"]
+  S3 -->|壊れている| FIX["既存バグを先に修正\ncommit して state をクリーンに"]
+  FIX --> S4
+  S3 -->|正常| S4
+  S4["④ タスク選択\nfeature_list.json から\n未完了の最優先タスクを1つ選ぶ"] --> S5
+  S5["⑤ 実装\n1タスクのみ実装する\n途中でスコープを広げない"] --> S6
+  S6["⑥ テスト\nUI / API を実際に操作して確認\nユニットテストだけでは不十分"]
+  S6 -->|失敗| S5
+  S6 -->|成功| S7
+  S7["⑦ 状態更新\nfeature_list.json: passing → true\nclaude-progress.txt に記録"] --> S8
+  S8["⑧ クリーンな終了\ngit commit（詳細メッセージ付き）\nアプリが動作する状態で終える"] --> END
+  END(["セッション終了"])`,
+
+        'diag-5': `flowchart LR
+  CODE["コード変更"] --> LINT["Lint / 型チェック\n自動実行（PostToolUse Hook）"]
+  LINT -->|エラー| FIX["修正"]
+  FIX --> CODE
+  LINT -->|OK| UNIT["ユニットテスト\n対象機能のみ即時実行"]
+  UNIT -->|失敗| FIX
+  UNIT -->|OK| E2E["E2E テスト\nPuppeteer / Playwright\n人間のように UI を操作"]
+  E2E -->|失敗| FIX
+  E2E -->|OK| COMMIT["✅ git commit"]`,
+
+        'diag-6': `flowchart TD
+  AGENT["エージェント"] -->|"Puppeteer MCP 使用"| BROWSER["ブラウザ操作"]
+  BROWSER --> NAV["ページ遷移"]
+  BROWSER --> CLICK["ボタンクリック"]
+  BROWSER --> FORM["フォーム入力"]
+  BROWSER --> SS["スクリーンショット取得"]
+  SS --> AGENT
+  NAV & CLICK & FORM --> VERIFY["実際の動作確認"]
+  VERIFY -->|問題発見| FIX["コード修正"]
+  VERIFY -->|正常| PASS["✅ 機能完了"]`,
+
+        'diag-7': `flowchart LR
+  subgraph BAD["❌ コンテキスト浪費パターン"]
+    B1["大量のファイルを一度に読む"]
+    B2["長い raw ログをそのまま貼る"]
+    B3["コンテキストが枯渇するまで作業"]
+  end
+  subgraph GOOD["✅ コンテキスト節約パターン"]
+    G1["必要なファイルだけ読む"]
+    G2["サブエージェントに検索を委任"]
+    G3["毎回同じコアファイルのみロード"]
+  end`,
+
+        'diag-8': `flowchart TD
+  Q{"長時間タスクの\nコンテキスト戦略は？"}
+  Q --> C["Compaction\nコンテキストを圧縮して継続"]
+  Q --> R["Context Reset\n新セッションで再開"]
+  C --> CP["✅ 継続性が高い\n⚠️ コンパクション後の指示精度が低下する場合あり\n⚠️ コンテキスト不安（途中で諦める）が発生しやすい"]
+  R --> RP["✅ クリーンな状態からスタート\n✅ progress.txt / git で引き継ぎ\n⚠️ 毎回 orient のコスト（トークン消費）"]
+  NOTE["Note: Opus 4.6 以降では\nCompaction だけで十分なケースも増加中\nモデル進化に合わせて再評価を"]`,
+
+        'diag-9': `flowchart LR
+  G["Generator Agent\n実装担当"] -->|成果物| E["Evaluator Agent\n評価担当（批判的）"]
+  E -->|スコア + フィードバック| G
+  E -->|全機能 passing| DONE["✅ 完成"]
+  NOTE["自己評価より Evaluator を分離した方が\nはるかに正確な品質保証が可能\nGenerator は自分の仕事を高く評価しすぎる"]`,
+      };
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        themeVariables: {
+          primaryColor: '#2a3050',
+          primaryTextColor: '#e8ecf4',
+          primaryBorderColor: '#7c6ef5',
+          lineColor: '#4fc3f7',
+          secondaryColor: '#1e2334',
+          tertiaryColor: '#181c27',
+          edgeLabelBackground: '#1e2334',
+          clusterBkg: '#181c27',
+          clusterBorder: '#2a3050',
+          titleColor: '#7c6ef5',
+          nodeBorder: '#7c6ef5',
+          mainBkg: '#1e2334',
+          fontSize: '14px',
+        },
+        flowchart: { curve: 'basis', htmlLabels: true },
+        sequence: { actorMargin: 60 },
+      });
+
+      (async () => {
+        for (const [id, src] of Object.entries(DIAGRAMS)) {
+          const el = document.getElementById(id);
+          if (!el) continue;
+          try {
+            const { svg } = await mermaid.render('svg-' + id, src);
+            el.innerHTML = svg;
+            const svgEl = el.querySelector('svg');
+            if (svgEl) {
+              const origWidth = svgEl.getAttribute('width');
+              if (origWidth) {
+                svgEl.style.maxWidth = origWidth.endsWith('%') ? origWidth : origWidth + 'px';
+              } else {
+                svgEl.style.maxWidth = '100%';
+              }
+              svgEl.removeAttribute('width');
+              svgEl.removeAttribute('height');
+              svgEl.style.width = '100%';
+              svgEl.style.height = 'auto';
+            }
+          } catch (e) {
+            el.innerHTML =
+              '<p style="color:#ef5350;font-size:0.85rem;padding:16px">⚠️ ダイアグラムの描画に失敗しました: ' +
+              e.message +
+              '</p>';
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>
