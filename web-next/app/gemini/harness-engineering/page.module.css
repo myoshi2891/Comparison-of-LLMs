@@ -190,6 +190,110 @@
   color: var(--g-red);
   border: 1px solid rgba(234, 67, 53, 0.3);
 }
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.card {
+  background: var(--ink2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.4rem;
+  position: relative;
+  overflow: hidden;
+  transition:
+    border-color 0.25s,
+    transform 0.25s;
+}
+.card:hover {
+  border-color: var(--g-blue);
+  transform: translateY(-2px);
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+.cardB::before {
+  background: var(--g-blue);
+}
+.cardG::before {
+  background: var(--g-grn);
+}
+.cardY::before {
+  background: var(--g-yel);
+}
+.cardR::before {
+  background: var(--g-red);
+}
+.cardP::before {
+  background: var(--g-purp);
+}
+.cardC::before {
+  background: var(--g-cyan);
+}
+.cardNum {
+  font-family: var(--font-display);
+  font-size: 4rem;
+  letter-spacing: 0.05em;
+  opacity: 0.05;
+  position: absolute;
+  top: -4px;
+  right: 10px;
+  line-height: 1;
+  color: #fff;
+}
+.cardTitle {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--bright);
+  margin-bottom: 0.5rem;
+}
+.cardDesc {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.6;
+}
+.tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-top: 0.6rem;
+}
+.tagB {
+  background: rgba(66, 133, 244, 0.15);
+  color: var(--g-blue);
+  border: 1px solid rgba(66, 133, 244, 0.3);
+}
+.tagG {
+  background: rgba(52, 168, 83, 0.15);
+  color: var(--g-grn);
+  border: 1px solid rgba(52, 168, 83, 0.3);
+}
+.tagY {
+  background: rgba(251, 188, 4, 0.15);
+  color: var(--g-yel);
+  border: 1px solid rgba(251, 188, 4, 0.3);
+}
+.tagR {
+  background: rgba(234, 67, 53, 0.15);
+  color: var(--g-red);
+  border: 1px solid rgba(234, 67, 53, 0.3);
+}
+.tagP {
+  background: rgba(139, 92, 246, 0.15);
+  color: var(--g-purp);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
 .footer {
   background: var(--ink2);
   border-top: 1px solid var(--border);

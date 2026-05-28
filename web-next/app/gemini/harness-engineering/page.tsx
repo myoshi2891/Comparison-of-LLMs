@@ -289,7 +289,119 @@ INT --> UNIT`}
       </section>
 
       <section id="s3" className={styles.sec}>
-        <h2 className={styles.secTitle}><span className={styles.n}>03.</span>テストハーネスを構成する5つの要素</h2>
+        <div className={styles.secNo}>Section 03</div>
+        <h2 className={styles.secTitle}>
+          <span className={styles.n}>03.</span>テストハーネスを構成する5つの要素
+        </h2>
+
+        <div className={styles.mermaidWrap}>
+          <div className={styles.mermaidLabel}>5要素の関係図</div>
+          <MermaidDiagram
+            chart={`flowchart TD
+RUNNER["テストランナー Test Runner\n全体の司令塔"]
+FIXTURE["フィクスチャ Fixture\n環境の準備と後片付け"]
+DOUBLE["テストダブル Test Double\n外部依存の替え玉"]
+ASSERT["アサーション Assertion\n期待値との比較"]
+REPORTER["レポーター Reporter\n結果の可視化"]
+RUNNER --> FIXTURE
+FIXTURE --> DOUBLE
+DOUBLE --> ASSERT
+ASSERT --> REPORTER`}
+          />
+        </div>
+
+        <div className={styles.cardGrid}>
+          <div className={`${styles.card} ${styles.cardB}`}>
+            <div className={styles.cardNum}>01</div>
+            <h4 className={styles.cardTitle}>テストランナー</h4>
+            <p className={styles.cardDesc}>
+              テストを順番に実行する司令塔。「どのテストを・どの順番で・何回実行するか」を管理します。
+            </p>
+            <span className={`${styles.tag} ${styles.tagB}`}>Google Test / pytest / Vitest</span>
+          </div>
+          <div className={`${styles.card} ${styles.cardG}`}>
+            <div className={styles.cardNum}>02</div>
+            <h4 className={styles.cardTitle}>フィクスチャ</h4>
+            <p className={styles.cardDesc}>
+              テスト実行前後の「部屋の掃除」担当。setUp でDB用意、tearDown でDB破棄を自動実行します。
+            </p>
+            <span className={`${styles.tag} ${styles.tagG}`}>setUp / tearDown</span>
+          </div>
+          <div className={`${styles.card} ${styles.cardY}`}>
+            <div className={styles.cardNum}>03</div>
+            <h4 className={styles.cardTitle}>テストダブル</h4>
+            <p className={styles.cardDesc}>
+              本物の依存コンポーネントの「替え玉」。Mock・Stub・Fake・Spy の4種類があります（次章で詳述）。
+            </p>
+            <span className={`${styles.tag} ${styles.tagY}`}>Mock / Stub / Fake / Spy</span>
+          </div>
+          <div className={`${styles.card} ${styles.cardR}`}>
+            <div className={styles.cardNum}>04</div>
+            <h4 className={styles.cardTitle}>アサーション</h4>
+            <p className={styles.cardDesc}>
+              「期待どおりだよね？」と確認する係。失敗時に分かりやすいエラーメッセージを出すことが重要です。
+            </p>
+            <span className={`${styles.tag} ${styles.tagR}`}>Google Truth / pytest assert</span>
+          </div>
+          <div className={`${styles.card} ${styles.cardP}`}>
+            <div className={styles.cardNum}>05</div>
+            <h4 className={styles.cardTitle}>レポーター</h4>
+            <p className={styles.cardDesc}>
+              テスト結果をグラフ・ダッシュボードで可視化。Google内部ではSpongeを、OSSではAllureが相当します。
+            </p>
+            <span className={`${styles.tag} ${styles.tagP}`}>Allure / pytest-html</span>
+          </div>
+        </div>
+
+        <h3>テストランナーの言語別比較</h3>
+        <div className={styles.tblWrap}>
+          <table>
+            <thead>
+              <tr>
+                <th>言語</th>
+                <th>Google推奨フレームワーク</th>
+                <th>主な特徴</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>C++</td>
+                <td>
+                  <code>Google Test (gtest)</code>
+                </td>
+                <td>GoogleがOSS公開。パラメータ化テスト・モック（GMock）対応</td>
+              </tr>
+              <tr>
+                <td>Python</td>
+                <td>
+                  <code>pytest</code>
+                </td>
+                <td>フィクスチャが強力。プラグイン豊富。xdist で並列実行可</td>
+              </tr>
+              <tr>
+                <td>Go</td>
+                <td>
+                  <code>testing パッケージ</code>
+                </td>
+                <td>標準ライブラリに内蔵。Table-Driven Tests が慣例</td>
+              </tr>
+              <tr>
+                <td>Java</td>
+                <td>
+                  <code>JUnit5 + Google Truth</code>
+                </td>
+                <td>Truth でアサーションが自然言語に近い記述になる</td>
+              </tr>
+              <tr>
+                <td>TypeScript</td>
+                <td>
+                  <code>Vitest / Jest</code>
+                </td>
+                <td>高速・ESM対応。Vitest は Vite と統合</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
 
       <section id="s4" className={styles.sec}>
