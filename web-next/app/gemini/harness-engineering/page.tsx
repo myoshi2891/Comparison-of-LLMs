@@ -160,7 +160,132 @@ G --> H`}
       </section>
 
       <section id="s2" className={styles.sec}>
-        <h2 className={styles.secTitle}><span className={styles.n}>02.</span>Googleのテスト哲学 — テストピラミッド</h2>
+        <div className={styles.secNo}>Section 02</div>
+        <h2 className={styles.secTitle}>
+          <span className={styles.n}>02.</span>Googleのテスト哲学 — テストピラミッド
+        </h2>
+
+        <p>
+          <strong>テストピラミッド</strong>（Testing Pyramid）は「テストの種類ごとの理想的な量の比率」を表す考え方です。下（細かい粒度）ほど多く・上（粗い粒度）ほど少なくという形になります。
+        </p>
+
+        <div className={`${styles.callout} ${styles.cNote}`}>
+          <span className={styles.ci}>🏗️</span>
+          <div>
+            <strong>日常の例え話 — 建物の検査</strong>
+            <br />
+            ボルト1本の締め付けトルク検査（ユニットテスト）は大量に行います。完成した建物全体の耐震検査（E2Eテスト）は費用が高く少数しか行いません。ピラミッドの形はその比率を表しています。
+          </div>
+        </div>
+
+        <div className={styles.mermaidWrap}>
+          <div className={styles.mermaidLabel}>テストピラミッド — 種類別の理想比率</div>
+          <MermaidDiagram
+            chart={`flowchart TD
+E2E["E2Eテスト\n全システム結合 / 数十〜数百件\n実行時間: 分〜時間単位"]
+INT["統合テスト Integration Test\n複数コンポーネント協調 / 数千〜数万件\n実行時間: 秒〜分単位"]
+UNIT["ユニットテスト Unit Test\n関数・クラス単体 / 数千〜数万件\n実行時間: ミリ秒単位"]
+E2E --> INT
+INT --> UNIT`}
+          />
+        </div>
+
+        <h3>Google の Small / Medium / Large 分類</h3>
+
+        <div className={styles.tblWrap}>
+          <table>
+            <thead>
+              <tr>
+                <th>サイズ</th>
+                <th>日本語名</th>
+                <th>実行制限</th>
+                <th>ネットワーク</th>
+                <th>DB</th>
+                <th>外部サービス</th>
+                <th>目標比率</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <code>Small</code>
+                </td>
+                <td>小テスト</td>
+                <td>60秒以内</td>
+                <td>
+                  <span className={`${styles.badge} ${styles.bRed}`}>禁止</span>
+                </td>
+                <td>
+                  <span className={`${styles.badge} ${styles.bRed}`}>禁止</span>
+                </td>
+                <td>
+                  <span className={`${styles.badge} ${styles.bRed}`}>禁止</span>
+                </td>
+                <td>
+                  <strong>80%以上</strong>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>Medium</code>
+                </td>
+                <td>中テスト</td>
+                <td>300秒以内</td>
+                <td>
+                  <span className={`${styles.badge} ${styles.bYel}`}>ローカルのみ</span>
+                </td>
+                <td>
+                  <span className={`${styles.badge} ${styles.bYel}`}>localhostのみ</span>
+                </td>
+                <td>
+                  <span className={`${styles.badge} ${styles.bRed}`}>禁止</span>
+                </td>
+                <td>15%程度</td>
+              </tr>
+              <tr>
+                <td>
+                  <code>Large</code>
+                </td>
+                <td>大テスト</td>
+                <td>900秒以内</td>
+                <td>
+                  <span className={`${styles.badge} ${styles.bGrn}`}>制限なし</span>
+                </td>
+                <td>
+                  <span className={`${styles.badge} ${styles.bGrn}`}>制限なし</span>
+                </td>
+                <td>
+                  <span className={`${styles.badge} ${styles.bGrn}`}>制限なし</span>
+                </td>
+                <td>5%程度</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div className={`${styles.callout} ${styles.cWarn}`}>
+          <span className={styles.ci}>⚠️</span>
+          <div>
+            <strong>逆ピラミッド（Ice-cream Cone）アンチパターン</strong>
+            <br />
+            E2Eテストが多すぎると「CI実行時間が時間単位になる」「失敗原因がコードかインフラか分からない」という問題が発生します。GoogleはE2Eテストを増やす前に「
+            <strong>このテストをユニットテストで代替できないか</strong>」を必ず問い直すことを推奨しています。
+          </div>
+        </div>
+
+        <div className={styles.vocab}>
+          <div className={styles.vocabHead}>📖 用語集</div>
+          <dl>
+            <dt>テストピラミッド</dt>
+            <dd>ユニット→統合→E2Eの順に「多→少」にテストを配置するベストプラクティス</dd>
+            <dt>E2Eテスト</dt>
+            <dd>ユーザーの操作を模倣してシステム全体を通して動かすテスト</dd>
+            <dt>Small/Medium/Large</dt>
+            <dd>Googleが使うテストサイズ分類。依存する外部リソースの多さで決まる</dd>
+            <dt>逆ピラミッド</dt>
+            <dd>E2Eテストが多すぎる失敗パターン。CI崩壊の主原因</dd>
+          </dl>
+        </div>
       </section>
 
       <section id="s3" className={styles.sec}>
