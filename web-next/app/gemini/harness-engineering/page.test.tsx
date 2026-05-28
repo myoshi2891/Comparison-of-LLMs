@@ -115,6 +115,18 @@ describe("/gemini/harness-engineering - page structure", () => {
     expect(s5?.textContent).toMatch(/freezegun/);
   });
 
+  it("renders s6 content correctly (comparison grid, pytest and gtest code samples, vocabulary)", () => {
+    const { container } = render(<Page />);
+    const s6 = container.querySelector("#s6");
+    expect(s6).not.toBeNull();
+    expect(s6?.textContent).toMatch(/依存性注入/);
+    expect(s6?.querySelector(".cmp-ok, [class*=\"cmp-ok\"]")).toBeDefined();
+    expect(s6?.textContent).toMatch(/conftest.py/);
+    expect(s6?.textContent).toMatch(/test_user_service.py/);
+    expect(s6?.textContent).toMatch(/user_service_test.cc/);
+    expect(s6?.textContent).toMatch(/GMock/);
+  });
+
   it("renders 11 TOC links pointing to section anchors", () => {
     const { container } = render(<Page />);
     const tocAnchors = container.querySelectorAll('nav a[href^="#"]');
