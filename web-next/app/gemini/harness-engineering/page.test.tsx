@@ -187,11 +187,13 @@ describe("/gemini/harness-engineering - page structure", () => {
     expect(s11?.textContent).toMatch(/The Practical Test Pyramid — Martin Fowler/);
     expect(s11?.textContent).toMatch(/Google ADK Evaluation Guide/);
     expect(s11?.textContent).toMatch(/SRE Book/);
-    
+
     const footer = container.querySelector("footer");
     expect(footer).not.toBeNull();
     expect(footer?.textContent).toMatch(/HARNESS ENGINEERING/);
-    expect(footer?.textContent).toMatch(/Google Testing Blog \/ Software Engineering at Google 準拠/);
+    expect(footer?.textContent).toMatch(
+      /Google Testing Blog \/ Software Engineering at Google 準拠/
+    );
   });
 
   it("renders 11 TOC links pointing to section anchors", () => {

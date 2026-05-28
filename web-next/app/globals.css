@@ -38,6 +38,23 @@
   --prp: #a78bfa;
   --teal: #2dd4bf;
   --orng: #fb923c;
+
+  /* ── Gemini / Google Harness Engineering ページ用エイリアス ──
+   * page.module.css が参照する変数名（元の google-harness-engineering.html に由来）。
+   * globals.css の既存変数へのエイリアスとして定義し、後方互換を保つ。 */
+  --ink: #0b0e14;
+  --ink2: #12161f;
+  --ink3: #1a2030;
+  --border: #232d40;
+  --dim: #b6caea;
+  --muted: #89abde;
+  --bright: #f0f6ff;
+  --g-blue: #4285f4;
+  --g-grn: #34a853;
+  --g-yel: #fbbc04;
+  --g-red: #ea4335;
+  --g-cyan: #00bcd4;
+  --g-purp: #8b5cf6;
 }
 
 /*

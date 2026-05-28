@@ -330,6 +330,17 @@
   overflow-x: auto;
   white-space: pre;
 }
+/* macOS 風ドットの色バリアント */
+.red {
+  background: #ea4335;
+}
+.yel {
+  background: #fbbc04;
+}
+.grn {
+  background: #34a853;
+}
+
 .ck {
   color: #ff7b72;
 }
@@ -408,4 +419,176 @@
   border-top: 1px solid var(--border);
   padding: 3rem 2rem;
   text-align: center;
+}
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  min-height: 96vh;
+  display: flex;
+  align-items: center;
+  padding: 6rem 2rem 8rem;
+  background: linear-gradient(155deg, #060c18 0%, #0b0e14 55%, #060b10 100%);
+  border-bottom: 1px solid var(--border);
+}
+.heroBg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 50% at 15% -10%, rgba(66, 133, 244, 0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 85% 10%, rgba(52, 168, 83, 0.12) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 35% at 50% 110%, rgba(251, 188, 4, 0.08) 0%, transparent 55%);
+}
+.heroGrid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image:
+    linear-gradient(var(--g-blue) 1px, transparent 1px),
+    linear-gradient(90deg, var(--g-blue) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.heroWrap {
+  max-width: 1140px;
+  margin: 0 auto;
+  position: relative;
+  width: 100%;
+}
+.heroKicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--g-blue);
+  padding: 0.3rem 1rem;
+  border-radius: 2rem;
+  border: 1px solid rgba(66, 133, 244, 0.35);
+  background: rgba(66, 133, 244, 0.07);
+  margin-bottom: 1.6rem;
+}
+.heroKicker::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--g-blue);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.7);
+  }
+}
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 9vw, 8rem);
+  letter-spacing: 0.04em;
+  line-height: 0.95;
+  color: var(--bright);
+  margin-bottom: 1.6rem;
+}
+.accentBlue {
+  color: var(--g-blue);
+}
+.accentGrn {
+  color: var(--g-grn);
+}
+.accentYel {
+  color: var(--g-yel);
+}
+.accentRed {
+  color: var(--g-red);
+}
+.heroDesc {
+  font-size: 1.05rem;
+  color: var(--muted);
+  max-width: 600px;
+  line-height: 1.75;
+  margin-bottom: 2.5rem;
+}
+.heroChips {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+.chip {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  padding: 0.28rem 0.8rem;
+  border-radius: 2rem;
+  border: 1px solid;
+  letter-spacing: 0.05em;
+}
+.chipB {
+  border-color: rgba(66, 133, 244, 0.4);
+  color: var(--g-blue);
+  background: rgba(66, 133, 244, 0.08);
+}
+.chipG {
+  border-color: rgba(52, 168, 83, 0.4);
+  color: var(--g-grn);
+  background: rgba(52, 168, 83, 0.08);
+}
+.chipY {
+  border-color: rgba(251, 188, 4, 0.4);
+  color: var(--g-yel);
+  background: rgba(251, 188, 4, 0.08);
+}
+.chipR {
+  border-color: rgba(234, 67, 53, 0.4);
+  color: var(--g-red);
+  background: rgba(234, 67, 53, 0.08);
+}
+.chipP {
+  border-color: rgba(139, 92, 246, 0.4);
+  color: var(--g-purp);
+  background: rgba(139, 92, 246, 0.08);
+}
+
+.prog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--g-blue), var(--g-grn), var(--g-yel), var(--g-red));
+  z-index: 9999;
+  box-shadow: 0 0 10px var(--g-blue);
+  width: 100%;
+  transform-origin: 0 50%;
+  animation: scrollProgress auto linear;
+  animation-timeline: scroll();
+}
+
+@keyframes scrollProgress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.wrap code {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  background: var(--ink3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  color: var(--g-cyan);
+}
+.wrap strong {
+  color: var(--bright);
+  font-weight: 500;
 }

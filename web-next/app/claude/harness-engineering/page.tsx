@@ -1043,9 +1043,8 @@ export default function Page() {
             <div className={styles.stepBody}>
               <h3>Orient（状況把握）</h3>
               <p>
-                セッション開始直後に <code>progress.txt</code> と{" "}
-                <code>git log --oneline -20</code>{" "}
-                を読む。前のセッションで何が行われたかを把握する。
+                セッション開始直後に <code>progress.txt</code> と <code>git log --oneline -20</code>{" "}
+                を読み、前のセッションで何が行われたかを把握する。
               </p>
             </div>
           </div>
