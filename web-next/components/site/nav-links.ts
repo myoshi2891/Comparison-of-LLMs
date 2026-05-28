@@ -51,6 +51,7 @@ export const navLinks: readonly NavLink[] = [
       { name: "Skill Guide", href: "/gemini/skill-guide" },
       { name: "Skill Guide (中級)", href: "/gemini/skill-guide-intermediate" },
       { name: "Antigravity", href: "/gemini/antigravity-guide" },
+      { name: "Harness Engineering", href: "/gemini/harness-engineering" },
     ],
   },
   {
