@@ -1665,9 +1665,165 @@ THRESHOLD --> REPORT`}
       </section>
 
       <section id="s10" className={styles.sec}>
+        <div className={styles.secNo}>Section 10</div>
         <h2 className={styles.secTitle}>
           <span className={styles.n}>10.</span>ベストプラクティス10則
         </h2>
+
+        <div className={styles.cardGrid}>
+          <div className={`${styles.card} ${styles.cardB}`}>
+            <div className={styles.cardNum}>01</div>
+            <h4 className={styles.cardTitle}>テストはDAMP、コードはDRY</h4>
+            <p className={styles.cardDesc}>
+              テストの「読みやすさ」はコードの「再利用性」より優先。冗長に見える変数名・コメントを許容する。
+            </p>
+          </div>
+          <div className={`${styles.card} ${styles.cardG}`}>
+            <div className={styles.cardNum}>02</div>
+            <h4 className={styles.cardTitle}>1テスト1アサーション</h4>
+            <p className={styles.cardDesc}>
+              失敗時の原因特定を簡単にする。テスト関数名に「何をテストしているか」を明記する。
+            </p>
+          </div>
+          <div className={`${styles.card} ${styles.cardY}`}>
+            <div className={styles.cardNum}>03</div>
+            <h4 className={styles.cardTitle}>テストコードも本番品質</h4>
+            <p className={styles.cardDesc}>
+              テストが腐ると本番コードも腐る。コードレビューでテストコードも必ず確認する。
+            </p>
+          </div>
+          <div className={`${styles.card} ${styles.cardR}`}>
+            <div className={styles.cardNum}>04</div>
+            <h4 className={styles.cardTitle}>フィクスチャは最小限に</h4>
+            <p className={styles.cardDesc}>
+              大きいSetUpは「何が必要か」を分かりにくくする。必要なセットアップをテスト関数内に書く。
+            </p>
+          </div>
+          <div className={`${styles.card} ${styles.cardP}`}>
+            <div className={styles.cardNum}>05</div>
+            <h4 className={styles.cardTitle}>公開インターフェースのみテスト</h4>
+            <p className={styles.cardDesc}>
+              実装の詳細をテストすると変更のたびに壊れる。private メソッドを直接テストしない。
+            </p>
+          </div>
+          <div className={`${styles.card} ${styles.cardC}`}>
+            <div className={styles.cardNum}>06</div>
+            <h4 className={styles.cardTitle}>テストサイズラベルを付ける</h4>
+            <p className={styles.cardDesc}>
+              CI の実行順序・並列化を最適化できる。<code>@pytest.mark.small</code>{" "}
+              などのマーカーを使う。
+            </p>
+          </div>
+          <div className={`${styles.card} ${styles.cardB}`}>
+            <div className={styles.cardNum}>07</div>
+            <h4 className={styles.cardTitle}>フレイキーテストはその日に直す</h4>
+            <p className={styles.cardDesc}>
+              放置すると「赤を無視する文化」が生まれる。検出したら1時間以内にQuarantineする。
+            </p>
+          </div>
+          <div className={`${styles.card} ${styles.cardG}`}>
+            <div className={styles.cardNum}>08</div>
+            <h4 className={styles.cardTitle}>テストカバレッジは70%以上</h4>
+            <p className={styles.cardDesc}>
+              重要なパスが必ずカバーされることを保証する。カバレッジレポートをCIで必須チェック。
+            </p>
+          </div>
+          <div className={`${styles.card} ${styles.cardY}`}>
+            <div className={styles.cardNum}>09</div>
+            <h4 className={styles.cardTitle}>テストを削除する勇気を持つ</h4>
+            <p className={styles.cardDesc}>
+              意味のないテストは誤った安心感を生む。保守コストが価値を上回ったら削除する。
+            </p>
+          </div>
+          <div className={`${styles.card} ${styles.cardR}`}>
+            <div className={styles.cardNum}>10</div>
+            <h4 className={styles.cardTitle}>テスト名は仕様書として書く</h4>
+            <p className={styles.cardDesc}>
+              テスト名を読むだけで動作仕様が分かるように書く。
+              <code>test_register_user_sends_welcome_email</code>
+            </p>
+          </div>
+        </div>
+
+        <h3>DAMPとDRYの使い分け</h3>
+        <div className={styles.cmp}>
+          <div className={styles.cmpNg}>
+            <div className={styles.cmpLabel}>❌ DRYを守りすぎたテスト（読みにくい）</div>
+            <div className={styles.codeWrap} style={{ margin: 0 }}>
+              <pre className={styles.codeBody}>
+                <span className={styles.ck}>def</span> <span className={styles.cv}>_make_user</span>
+                (name=<span className={styles.cs}>"default"</span>):{"\n"}
+                {"  "}
+                <span className={styles.ck}>return</span> User(name=name){"\n\n"}
+                <span className={styles.ck}>def</span> <span className={styles.cv}>test_a</span>():
+                {"\n"}
+                {"  "}
+                user = _make_user(){" "}
+                <span className={styles.cc}>{"# このヘルパーが何をするか読む必要がある"}</span>
+              </pre>
+            </div>
+          </div>
+          <div className={styles.cmpOk}>
+            <div className={styles.cmpLabel}>✅ DAMPなテスト（少し冗長だが読みやすい）</div>
+            <div className={styles.codeWrap} style={{ margin: 0 }}>
+              <pre className={styles.codeBody}>
+                <span className={styles.ck}>def</span>{" "}
+                <span className={styles.cv}>test_register_user_with_valid_email</span>():{"\n"}
+                {"  "}
+                <span className={styles.cc}>{"# テスト内だけで完結する"}</span>
+                {"\n"}
+                {"  "}
+                user = User(name=<span className={styles.cs}>"Alice"</span>, email=
+                <span className={styles.cs}>"alice@example.com"</span>){"\n"}
+                {"  "}
+                service = UserService(repo=FakeUserRepository())
+              </pre>
+            </div>
+          </div>
+        </div>
+
+        <h3>カバレッジ目標</h3>
+        <div className={styles.tblWrap}>
+          <table>
+            <thead>
+              <tr>
+                <th>テスト種別</th>
+                <th>推奨カバレッジ</th>
+                <th>理由</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ビジネスロジック層</td>
+                <td>
+                  <span className={`${styles.badge} ${styles.bGrn}`}>90%以上</span>
+                </td>
+                <td>バグが高コストな場所のため</td>
+              </tr>
+              <tr>
+                <td>インフラ層（DBアダプター等）</td>
+                <td>
+                  <span className={`${styles.badge} ${styles.bBlue}`}>70%以上</span>
+                </td>
+                <td>変更頻度が低いため</td>
+              </tr>
+              <tr>
+                <td>UI層</td>
+                <td>
+                  <span className={`${styles.badge} ${styles.bYel}`}>60%以上</span>
+                </td>
+                <td>仕様変更が多くテストが壊れやすいため</td>
+              </tr>
+              <tr>
+                <td>設定ファイル</td>
+                <td>
+                  <span className={`${styles.badge} ${styles.bRed}`}>対象外</span>
+                </td>
+                <td>テストの費用対効果が低いため</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
 
       <section id="s11" className={styles.sec}>
