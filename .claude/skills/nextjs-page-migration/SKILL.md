@@ -135,10 +135,8 @@ build-time ハイライトとして `shiki` を採用する。
 - Mermaid 記述は **左端揃え必須**（HTML インデントが混じると構文エラー）— legacy/ から貼り直す際はインデント除去を機械的に行う
 - `<marker>` 色は対応 `<line>` の `stroke` 色と一致させる（SVG 部分）
 - **ダークモードでの視認性（コントラスト）確保**:
-  - Mermaid が出力する SVG は、デフォルトで黒文字や黒線をインラインスタイルで適用するため、ダーク背景では見えなくなる。
-  - これを解決するため、`web-next/app/globals.css` の末尾にグローバルな補正 CSS ルールが適用されている。
-  - テキスト要素には `color` だけでなく、SVG の文字描画のための **`fill`** を必ず `!important` で明るい色 (`var(--txt)`) に設定する。
-  - 矢印や線、アクターやノートの要素も、`web-next/app/globals.css` の `.mermaid` に対するスタイル（`stroke`, `fill`）でコントラストを強制確保している。新規の図解で読みにくい部分が発生した場合は、`web-next/app/globals.css` の補正ルールにクラス名を追加して対応すること。
+  - `web-next/app/globals.css` にはすでに Mermaid 用の補正 CSS ルール (`.mermaid` に対する `fill: var(--txt) !important` や `stroke` など) が適用済みであり、これによってデフォルトの黒文字や黒線がダーク背景でも見えるように確保されている。
+  - 新規の図解で読みにくい部分が発生した場合のみ、`web-next/app/globals.css` の補正ルールにクラス名を追加して対応すること。
 
 ### Step 7: [Refactor] 共通化判断
 

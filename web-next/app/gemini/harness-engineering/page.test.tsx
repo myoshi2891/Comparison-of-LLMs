@@ -48,11 +48,11 @@ describe("/gemini/harness-engineering - metadata", () => {
 });
 
 describe("/gemini/harness-engineering - page structure", () => {
-  it("renders an <h1> containing 'ハーネスエンジニアリング'", () => {
+  it("renders an <h1> containing 'HARNESS'", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
     expect(h1).not.toBeNull();
-    expect(h1?.textContent).toMatch(/ハーネスエンジニアリング/);
+    expect(h1?.textContent).toMatch(/HARNESS/);
   });
 
   it("renders all 11 expected section ids", () => {
@@ -120,7 +120,7 @@ describe("/gemini/harness-engineering - page structure", () => {
     const s6 = container.querySelector("#s6");
     expect(s6).not.toBeNull();
     expect(s6?.textContent).toMatch(/依存性注入/);
-    expect(s6?.querySelector('.cmp-ok, [class*="cmp-ok"]')).toBeDefined();
+    expect(s6?.querySelector('[class*="cmpOk"]')).not.toBeNull();
     expect(s6?.textContent).toMatch(/conftest.py/);
     expect(s6?.textContent).toMatch(/test_user_service.py/);
     expect(s6?.textContent).toMatch(/user_service_test.cc/);

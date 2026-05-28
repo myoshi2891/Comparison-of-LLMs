@@ -834,7 +834,7 @@ def evaluate_response(question: str, actual_response: str) -> float:
     質問: {question}
     回答: {actual_response}
 
-    採点理由と共に、JSON形式で {"score": X.X} のみ返してください。
+    採点理由と共に、JSON形式で {{ "score": X.X }} のみ返してください。
     """
 
     message = client.messages.create(
