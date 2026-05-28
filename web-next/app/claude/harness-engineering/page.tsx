@@ -673,11 +673,513 @@ export default function Page() {
 
       <div className={styles.divider} />
 
-      {/* ════ Stub Sections for s4 to s11 ════ */}
-      <section id="s4" className={styles.sec} />
-      <section id="s5" className={styles.sec} />
-      <section id="s6" className={styles.sec} />
-      <section id="s7" className={styles.sec} />
+      {/* ════ S4 ════ */}
+      <section id="s4" className={styles.sec}>
+        <div className={styles.sectionLabel}>Section 04</div>
+        <h2 className={styles.sectionTitle}>
+          <span className={styles.sectionTitleNum}>4</span>CLAUDE.md の設計
+        </h2>
+        <p className={styles.sectionLead}>
+          CLAUDE.md
+          はエージェントが毎回自動で読み込む「地図」です。短く・ポインタとして機能させることが重要です。
+        </p>
+
+        <div className={styles.mermaidWrap}>
+          <div id="diag-2" />
+        </div>
+
+        <div className={`${styles.callout} ${styles.warn}`}>
+          <span className={styles.calloutIcon}>📊</span>
+          <div className={styles.calloutBody}>
+            <strong>なぜ短いほど良いのか（IFScale の研究より）</strong>
+            <p>
+              150〜200 の指示があると「一番最初の指示ばかりが優先される（primacy
+              bias）」バイアスが発生し、後半の指示が無視されるようになります。Anthropic
+              の公式ドキュメントでは「200行以内」を上限としていますが、実際の推奨は50行以内です。
+            </p>
+          </div>
+        </div>
+
+        <div className={`${styles.tableWrap} ${styles.mt24}`}>
+          <table>
+            <thead>
+              <tr>
+                <th>行数</th>
+                <th>評価</th>
+                <th>理由</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>〜50行</td>
+                <td>
+                  <span className={`${styles.chip} ${styles.green}`}>✅ 理想</span>
+                </td>
+                <td>コンプライアンス率が最も高い</td>
+              </tr>
+              <tr>
+                <td>〜100行</td>
+                <td>
+                  <span className={`${styles.chip} ${styles.blue}`}>⚠️ 許容</span>
+                </td>
+                <td>注意して設計すれば機能する</td>
+              </tr>
+              <tr>
+                <td>〜200行</td>
+                <td>
+                  <span className={`${styles.chip} ${styles.orange}`}>⚠️ 上限</span>
+                </td>
+                <td>Anthropic 公式の最大推奨値</td>
+              </tr>
+              <tr>
+                <td>200行超</td>
+                <td>
+                  <span className={`${styles.chip} ${styles.red}`}>❌ 非推奨</span>
+                </td>
+                <td>遵守率が著しく低下する</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 style={{ fontSize: "1rem", fontWeight: 700, margin: "28px 0 12px" }}>
+          CLAUDE.md テンプレート
+        </h3>
+        <div className={styles.codeWrap}>
+          <div className={styles.codeBar}>
+            <span className={styles.codeLang}>CLAUDE.md</span>
+          </div>
+          <pre className={styles.codeBody}>
+            <code>
+              <span className={styles.cc}>
+                # CLAUDE.md — プロジェクトの地図（50行以内を維持すること）
+              </span>
+              {"\n\n"}
+              <span className={styles.ck}>## Routing（主要コマンド）</span>
+              {"\n"}
+              <span className={styles.cs}>- テスト実行:</span> {"    "}
+              <span className={styles.cv}>npm test</span>
+              {"\n"}
+              <span className={styles.cs}>- 開発サーバー起動:</span>{" "}
+              <span className={styles.cv}>bash init.sh</span>
+              {"\n"}
+              <span className={styles.cs}>- リント:</span> {"       "}
+              <span className={styles.cv}>npm run lint</span>
+              {"\n"}
+              <span className={styles.cs}>- アーキテクチャ検証:</span>{" "}
+              <span className={styles.cv}>npm run arch-check</span>
+              {"\n\n"}
+              <span className={styles.ck}>## Key Files（重要ファイル）</span>
+              {"\n"}
+              <span className={styles.cs}>- 機能一覧:</span> {"   "}
+              <span className={styles.cv}>feature_list.json</span>
+              {"\n"}
+              <span className={styles.cs}>- 進捗ログ:</span> {"   "}
+              <span className={styles.cv}>claude-progress.txt</span>
+              {"\n"}
+              <span className={styles.cs}>- ADR:</span> {"        "}
+              <span className={styles.cv}>docs/adr/</span>
+              {"\n\n"}
+              <span className={styles.ck}>## Prohibitions（禁止事項）</span>
+              {"\n"}
+              <span className={styles.cs}>
+                - feature_list.json のアイテムを削除・並び替えしない
+              </span>
+              {"\n"}
+              <span className={styles.cs}>- lint 設定ファイルを変更しない</span>
+              {"\n"}
+              <span className={styles.cs}>- テストなしで機能を passing にマークしない</span>
+              {"\n\n"}
+              <span className={styles.ck}>## Deeper Docs（詳細はここ）</span>
+              {"\n"}
+              <span className={styles.cs}>- コーディング規約:</span>{" "}
+              <span className={styles.cv}>docs/coding-conventions.md</span>
+              {"\n"}
+              <span className={styles.cs}>- テスト戦略:</span> {"    "}
+              <span className={styles.cv}>docs/testing-strategy.md</span>
+            </code>
+          </pre>
+        </div>
+      </section>
+
+      <div className={styles.divider} />
+
+      {/* ════ S5 ════ */}
+      <section id="s5" className={styles.sec}>
+        <div className={styles.sectionLabel}>Section 05</div>
+        <h2 className={styles.sectionTitle}>
+          <span className={styles.sectionTitleNum}>5</span>状態管理とセッション間の引き継ぎ
+        </h2>
+        <p className={styles.sectionLead}>
+          AIのコンテキストは一時的です。永続化はすべてファイルへ書き出す必要があります。
+        </p>
+
+        <div className={styles.mermaidWrap}>
+          <div id="diag-3" />
+        </div>
+
+        <h3 style={{ fontSize: "1rem", fontWeight: 700, margin: "28px 0 12px" }}>
+          feature_list.json の構造
+        </h3>
+
+        <div className={`${styles.callout} ${styles.info}`}>
+          <span className={styles.calloutIcon}>📌</span>
+          <div className={styles.calloutBody}>
+            <strong>なぜ Markdown ではなく JSON を使うのか？</strong>
+            <p>
+              Anthropic の実験では、Markdown
+              ファイルはモデルが不適切に編集・上書きしやすいのに対し、JSON
+              は構造が固定されているため「意図せず書き換える」事故が大幅に減ることが確認されています。
+            </p>
+          </div>
+        </div>
+
+        <div className={styles.codeWrap}>
+          <div className={styles.codeBar}>
+            <span className={styles.codeLang}>feature_list.json</span>
+          </div>
+          <pre className={styles.codeBody}>
+            <code>
+              {"{"}
+              {"\n"}
+              {"  "}
+              <span className={styles.ck}>&quot;features&quot;</span>: [{"\n"}
+              {"    "}
+              {"{"}
+              {"\n"}
+              {"      "}
+              <span className={styles.ck}>&quot;category&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;functional&quot;</span>,{"\n"}
+              {"      "}
+              <span className={styles.ck}>&quot;description&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;ユーザーが新規チャットを開始できる&quot;</span>,
+              {"\n"}
+              {"      "}
+              <span className={styles.ck}>&quot;steps&quot;</span>: [{"\n"}
+              {"        "}
+              <span className={styles.cs}>&quot;メイン画面に遷移する&quot;</span>,{"\n"}
+              {"        "}
+              <span className={styles.cs}>&quot;「新しいチャット」ボタンをクリック&quot;</span>,
+              {"\n"}
+              {"        "}
+              <span className={styles.cs}>&quot;新しい会話が作成されることを確認&quot;</span>,{"\n"}
+              {"        "}
+              <span className={styles.cs}>
+                &quot;チャットエリアにウェルカム状態が表示されることを確認&quot;
+              </span>
+              {"\n"}
+              {"      "}],{"\n"}
+              {"      "}
+              <span className={styles.ck}>&quot;passes&quot;</span>:{" "}
+              <span className={styles.cv}>false</span>{" "}
+              <span className={styles.cc}>← 初期値は必ず false。true に変更のみ許可</span>
+              {"\n"}
+              {"    "}
+              {"}"}
+              {"\n"}
+              {"  "}]{"\n"}
+              {"}"}
+            </code>
+          </pre>
+        </div>
+
+        <div className={styles.tableWrap}>
+          <table>
+            <thead>
+              <tr>
+                <th>ファイル</th>
+                <th>形式</th>
+                <th>役割</th>
+                <th>更新タイミング</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <strong>feature_list.json</strong>
+                </td>
+                <td>JSON</td>
+                <td>機能の完了状態管理</td>
+                <td>機能完了時のみ passes を true に</td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>claude-progress.txt</strong>
+                </td>
+                <td>自由テキスト</td>
+                <td>セッション間の引き継ぎ</td>
+                <td>各セッション終了時</td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>init.sh</strong>
+                </td>
+                <td>シェルスクリプト</td>
+                <td>環境の再現性保証</td>
+                <td>初回のみ（必要時に更新）</td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Git commits</strong>
+                </td>
+                <td>バージョン管理</td>
+                <td>変更履歴とロールバック</td>
+                <td>各機能実装完了時</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div className={styles.divider} />
+
+      {/* ════ S6 ════ */}
+      <section id="s6" className={styles.sec}>
+        <div className={styles.sectionLabel}>Section 06</div>
+        <h2 className={styles.sectionTitle}>
+          <span className={styles.sectionTitleNum}>6</span>セッションプロトコル（8ステップ）
+        </h2>
+        <p className={styles.sectionLead}>
+          各セッションは以下の8ステップを必ず守ることが、品質と安定性の鍵です。
+        </p>
+
+        <div className={styles.mermaidWrap}>
+          <div id="diag-4" />
+        </div>
+
+        <div className={`${styles.steps} ${styles.mt24}`}>
+          <div className={styles.step}>
+            <div className={styles.stepNum}>1</div>
+            <div className={styles.stepBody}>
+              <h3>Orient（状況把握）</h3>
+              <p>
+                セッション開始直後に <code>claude-progress.txt</code> と{" "}
+                <code>git log --oneline -20</code>{" "}
+                を読む。前のセッションで何が行われたかを把握する。
+              </p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNum}>2</div>
+            <div className={styles.stepBody}>
+              <h3>Setup（環境起動）</h3>
+              <p>
+                <code>bash init.sh</code>{" "}
+                を実行して開発サーバーを起動。毎回同じ手順で再現できるようにする。
+              </p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNum}>3</div>
+            <div className={styles.stepBody}>
+              <h3>Verify Baseline（ベースライン検証）</h3>
+              <p>
+                新機能の実装前に、既存機能が壊れていないかを確認。Puppeteer MCP などで基本的な E2E
+                テストを実行する。壊れていれば先に修正。
+              </p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNum}>4</div>
+            <div className={styles.stepBody}>
+              <h3>タスク選択（1つのみ）</h3>
+              <p>
+                <code>feature_list.json</code> を読み、<code>passes: false</code>{" "}
+                の中から最優先の1機能だけを選ぶ。複数選ばないことが重要。
+              </p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNum}>5</div>
+            <div className={styles.stepBody}>
+              <h3>実装</h3>
+              <p>
+                選んだ1機能のみを実装する。途中でスコープを広げない。関連する別のバグを発見した場合は{" "}
+                <code>progress.txt</code> に記録して後回しにする。
+              </p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNum}>6</div>
+            <div className={styles.stepBody}>
+              <h3>テスト（E2E 必須）</h3>
+              <p>
+                ユニットテストだけでなく、Puppeteer / Playwright で実際の UI
+                を操作して確認。人間が使うように操作することで、バックエンドだけのテストでは発見できないバグを検出する。
+              </p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNum}>7</div>
+            <div className={styles.stepBody}>
+              <h3>状態更新</h3>
+              <p>
+                <code>feature_list.json</code> の対象機能を <code>passing: true</code> に変更。
+                <code>claude-progress.txt</code> に今回の成果・発見・次への指示を記録する。
+              </p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNum}>8</div>
+            <div className={styles.stepBody}>
+              <h3>クリーンな終了</h3>
+              <p>
+                詳細なコミットメッセージで <code>git commit</code>。アプリが「main
+                ブランチにマージできる状態」で終了する。半完成・バグありで終わらない。
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className={styles.divider} />
+
+      {/* ════ S7 ════ */}
+      <section id="s7" className={styles.sec}>
+        <div className={styles.sectionLabel}>Section 07</div>
+        <h2 className={styles.sectionTitle}>
+          <span className={styles.sectionTitleNum}>7</span>フィードバックループの構築
+        </h2>
+        <p className={styles.sectionLead}>
+          「高速なフィードバック」がエージェントの品質を決定します。フィードバックが速いほど、1コンテキストウィンドウ内で多くの反復ができます。
+        </p>
+
+        <div className={styles.mermaidWrap}>
+          <div id="diag-5" />
+        </div>
+
+        <div className={`${styles.tableWrap} ${styles.mt24}`}>
+          <table>
+            <thead>
+              <tr>
+                <th>フィードバック種別</th>
+                <th>ツール例</th>
+                <th>役割</th>
+                <th>速度</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <strong>Lint / 型チェック</strong>
+                </td>
+                <td>ESLint, TypeScript, Ruff, Biome</td>
+                <td>構文・型エラーを即検出</td>
+                <td>⚡ 即時（秒以内）</td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>ユニットテスト</strong>
+                </td>
+                <td>Jest, pytest, Vitest</td>
+                <td>関数単位の正確性検証</td>
+                <td>🟢 秒〜分単位</td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>E2E テスト</strong>
+                </td>
+                <td>Puppeteer MCP, Playwright</td>
+                <td>UIを人間のように操作して検証</td>
+                <td>🟡 分単位</td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>アーキテクチャ検証</strong>
+                </td>
+                <td>archgate, dependency-cruiser</td>
+                <td>設計ルール違反の検出</td>
+                <td>🟢 秒単位</td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>pre-commit フック</strong>
+                </td>
+                <td>Husky, lefthook</td>
+                <td>コミット前の最終チェック</td>
+                <td>🟢 秒単位</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 style={{ fontSize: "1rem", fontWeight: 700, margin: "28px 0 12px" }}>
+          Hooks を使った自動フィードバック
+        </h3>
+        <p style={{ color: "var(--muted)", fontSize: "0.9rem", marginBottom: "12px" }}>
+          Claude Code の <code>PostToolUse</code>{" "}
+          フックを使うと、ファイル保存のたびに自動でLintを実行させることができます。
+        </p>
+
+        <div className={styles.codeWrap}>
+          <div className={styles.codeBar}>
+            <span className={styles.codeLang}>settings.json（Claude Code Hooks 設定）</span>
+          </div>
+          <pre className={styles.codeBody}>
+            <code>
+              {"{"}
+              {"\n"}
+              {"  "}
+              <span className={styles.ck}>&quot;hooks&quot;</span>: {"{"}
+              {"\n"}
+              {"    "}
+              <span className={styles.ck}>&quot;PostToolUse&quot;</span>: [{"\n"}
+              {"      "}
+              {"{"}
+              {"\n"}
+              {"        "}
+              <span className={styles.ck}>&quot;matcher&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;Write|Edit&quot;</span>,{"\n"}
+              {"        "}
+              <span className={styles.ck}>&quot;hooks&quot;</span>: [{"\n"}
+              {"          "}
+              {"{"}
+              {"\n"}
+              {"            "}
+              <span className={styles.ck}>&quot;type&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;command&quot;</span>,{"\n"}
+              {"            "}
+              <span className={styles.ck}>&quot;command&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;npm run lint --fix&quot;</span>
+              {"\n"}
+              {"          "}
+              {"}"}
+              {"\n"}
+              {"        "}]{"\n"}
+              {"      "}
+              {"}"}
+              {"\n"}
+              {"    "}]{"\n"}
+              {"  "}
+              {"}"}
+              {"\n"}
+              {"}"}
+            </code>
+          </pre>
+        </div>
+
+        <div className={`${styles.callout} ${styles.danger}`}>
+          <span className={styles.calloutIcon}>🚨</span>
+          <div className={styles.calloutBody}>
+            <strong>ルール改ざんアンチパターンに注意</strong>
+            <p>
+              エージェントはLintエラーが出たとき、コードを修正する代わりにLint設定を無効化しようとすることがあります。Lint設定ファイルは必ず
+              read-only に保護し、CLAUDE.md で「lint設定を変更禁止」と明示してください。
+            </p>
+          </div>
+        </div>
+
+        <h3 style={{ fontSize: "1rem", fontWeight: 700, margin: "28px 0 12px" }}>
+          E2E でエージェントに「目」を与える
+        </h3>
+        <div className={styles.mermaidWrap}>
+          <div id="diag-6" />
+        </div>
+      </section>
+
+      <div className={styles.divider} />
+
+      {/* ════ Stub Sections for s8 to s10 ════ */}
       <section id="s8" className={styles.sec} />
       <section id="s9" className={styles.sec} />
       <section id="s10" className={styles.sec} />
