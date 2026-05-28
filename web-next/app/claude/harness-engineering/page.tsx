@@ -253,25 +253,12 @@ export default function Page() {
           AIエージェントはセッションをまたぐと前の記憶をすべて失います。これが「長時間タスク」の核心的な課題です。
         </p>
 
-        <h3
-          style={{ fontSize: "1rem", fontWeight: 700, marginBottom: "12px", color: "var(--muted)" }}
-        >
-          ❌ ハーネスなし：記憶喪失エンジニア問題
-        </h3>
+        <h3 className={styles.mutedHeadingShort}>❌ ハーネスなし：記憶喪失エンジニア問題</h3>
         <div className={styles.mermaidWrap}>
           <MermaidDiagram chart={DIAGRAM_0} />
         </div>
 
-        <h3
-          style={{
-            fontSize: "1rem",
-            fontWeight: 700,
-            margin: "28px 0 12px",
-            color: "var(--muted)",
-          }}
-        >
-          ✅ ハーネスあり：構造化された引き継ぎ
-        </h3>
+        <h3 className={styles.mutedHeading}>✅ ハーネスあり：構造化された引き継ぎ</h3>
         <div className={styles.mermaidWrap}>
           <MermaidDiagram chart={DIAGRAM_1} />
         </div>
@@ -849,9 +836,7 @@ export default function Page() {
           </table>
         </div>
 
-        <h3 style={{ fontSize: "1rem", fontWeight: 700, margin: "28px 0 12px" }}>
-          CLAUDE.md テンプレート
-        </h3>
+        <h3 className={styles.heading}>CLAUDE.md テンプレート</h3>
         <div className={styles.codeWrap}>
           <div className={styles.codeBar}>
             <span className={styles.codeLang}>CLAUDE.md</span>
@@ -925,9 +910,7 @@ export default function Page() {
           <MermaidDiagram chart={DIAGRAM_3} />
         </div>
 
-        <h3 style={{ fontSize: "1rem", fontWeight: 700, margin: "28px 0 12px" }}>
-          feature_list.json の構造
-        </h3>
+        <h3 className={styles.heading}>feature_list.json の構造</h3>
 
         <div className={`${styles.callout} ${styles.info}`}>
           <span className={styles.calloutIcon}>📌</span>
@@ -1121,7 +1104,7 @@ export default function Page() {
             <div className={styles.stepBody}>
               <h3>状態更新</h3>
               <p>
-                <code>feature_list.json</code> の対象機能を <code>passing: true</code> に変更。
+                <code>feature_list.json</code> の対象機能を <code>passes: true</code> に変更。
                 <code>claude-progress.txt</code> に今回の成果・発見・次への指示を記録する。
               </p>
             </div>
@@ -1210,9 +1193,7 @@ export default function Page() {
           </table>
         </div>
 
-        <h3 style={{ fontSize: "1rem", fontWeight: 700, margin: "28px 0 12px" }}>
-          Hooks を使った自動フィードバック
-        </h3>
+        <h3 className={styles.heading}>Hooks を使った自動フィードバック</h3>
         <p style={{ color: "var(--muted)", fontSize: "0.9rem", marginBottom: "12px" }}>
           Claude Code の <code>PostToolUse</code>{" "}
           フックを使うと、ファイル保存のたびに自動でLintを実行させることができます。
@@ -1276,9 +1257,7 @@ export default function Page() {
           </div>
         </div>
 
-        <h3 style={{ fontSize: "1rem", fontWeight: 700, margin: "28px 0 12px" }}>
-          E2E でエージェントに「目」を与える
-        </h3>
+        <h3 className={styles.heading}>E2E でエージェントに「目」を与える</h3>
         <div className={styles.mermaidWrap}>
           <MermaidDiagram chart={DIAGRAM_6} />
         </div>
@@ -1339,9 +1318,7 @@ export default function Page() {
           </table>
         </div>
 
-        <h3 style={{ fontSize: "1rem", fontWeight: 700, margin: "28px 0 12px" }}>
-          Compaction vs. Context Reset
-        </h3>
+        <h3 className={styles.heading}>Compaction vs. Context Reset</h3>
         <div className={styles.mermaidWrap}>
           <MermaidDiagram chart={DIAGRAM_8} />
         </div>
@@ -1833,9 +1810,7 @@ export default function Page() {
           </div>
         </div>
 
-        <h3 style={{ fontSize: "1rem", fontWeight: 700, margin: "28px 0 12px" }}>
-          Week 1：最低限のディレクトリ構成
-        </h3>
+        <h3 className={styles.heading}>Week 1：最低限のディレクトリ構成</h3>
         <div className={styles.codeWrap}>
           <div className={styles.codeBar}>
             <span className={styles.codeLang}>プロジェクト構成</span>
@@ -1865,14 +1840,12 @@ export default function Page() {
           </pre>
         </div>
 
-        <h3 style={{ fontSize: "1rem", fontWeight: 700, margin: "28px 0 12px" }}>
-          Month 2〜3：Evaluator Agent の分離
-        </h3>
+        <h3 className={styles.heading}>Month 2〜3：Evaluator Agent の分離</h3>
         <div className={styles.mermaidWrap}>
           <MermaidDiagram chart={DIAGRAM_9} />
         </div>
 
-        <h3 style={{ fontSize: "1rem", fontWeight: 700, margin: "28px 0 16px" }}>黄金律まとめ</h3>
+        <h3 className={styles.headingSpacing}>黄金律まとめ</h3>
         <div className={styles.rules}>
           <div className={`${styles.rule} ${styles.gold}`}>
             <span className={`${styles.ruleTag} ${styles.gold}`}>Principle</span>

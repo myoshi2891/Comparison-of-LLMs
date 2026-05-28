@@ -574,3 +574,32 @@
 .footer a:hover {
   text-decoration: underline;
 }
+
+/* ── ADDED FOR INLINE H3 MIGRATION ── */
+.heading {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 28px 0 12px;
+  color: #e8ecf4;
+}
+
+.headingSpacing {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 28px 0 16px;
+  color: #e8ecf4;
+}
+
+.mutedHeading {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 28px 0 12px;
+  color: #8892aa;
+}
+
+.mutedHeadingShort {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #8892aa;
+}

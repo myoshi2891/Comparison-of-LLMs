@@ -80,15 +80,12 @@ describe("/claude/harness-engineering - external link safety", () => {
       const href = a.getAttribute("href") ?? "";
       return /^https?:\/\//.test(href);
     });
-    // 初期状態ではリンクがないため、このテストは0個でも一旦許容するか、
-    // 実装が進んだらリンクがあることを検証します。
-    if (externals.length > 0) {
-      for (const a of externals) {
-        expect(a.getAttribute("target")).toBe("_blank");
-        const rel = a.getAttribute("rel") ?? "";
-        expect(rel).toMatch(/noopener/);
-        expect(rel).toMatch(/noreferrer/);
-      }
+    expect(externals.length).toBeGreaterThan(0);
+    for (const a of externals) {
+      expect(a.getAttribute("target")).toBe("_blank");
+      const rel = a.getAttribute("rel") ?? "";
+      expect(rel).toMatch(/noopener/);
+      expect(rel).toMatch(/noreferrer/);
     }
   });
 

@@ -130,7 +130,7 @@ build-time ハイライトとして `shiki` を採用する。
 
 ### Step 6: Mermaid ダイアグラム（Phase E）
 
-- `components/docs/MermaidDiagram.tsx` が `next/dynamic` で `ssr: false` のクライアント遅延ロードを提供する
+- `components/docs/MermaidDiagram.tsx` 自体が `useEffect` と `import("mermaid")` を用いたランタイム動的インポートを行うため、ページコンポーネント側からは直接インポートして通常通り使用する
 - Mermaid のテーマは、サイト全体のダーク背景に合わせて **`theme: "dark"`** に設定すること
 - Mermaid 記述は **左端揃え必須**（HTML インデントが混じると構文エラー）— legacy/ から貼り直す際はインデント除去を機械的に行う
 - `<marker>` 色は対応 `<line>` の `stroke` 色と一致させる（SVG 部分）
