@@ -3,7 +3,9 @@ import { join } from "node:path";
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it } from "vitest";
-import HarnessEngineeringPage, { metadata as rawMetadata } from "@/app/claude/harness-engineering/page";
+import HarnessEngineeringPage, {
+  metadata as rawMetadata,
+} from "@/app/claude/harness-engineering/page";
 
 const Page = HarnessEngineeringPage as unknown as () => ReactElement;
 type MetadataLike = { title?: unknown; description?: unknown };
