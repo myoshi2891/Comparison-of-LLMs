@@ -14,14 +14,10 @@
   overflow: hidden;
 }
 .hero::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(
-    ellipse 80% 60% at 50% 0%,
-    rgba(124, 110, 245, 0.18),
-    transparent
-  );
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(124, 110, 245, 0.18), transparent);
   pointer-events: none;
 }
 .heroBadge {
@@ -362,7 +358,7 @@
 }
 .codeBody {
   padding: 20px 24px;
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
   font-size: 0.85rem;
   line-height: 1.7;
   color: #c8d8f0;
@@ -371,15 +367,37 @@
 }
 
 /* Code Highlighting classes from skill guide */
-.ck { color: #ff7b72; } /* Keyword */
-.cs { color: #a5d6ff; } /* String / Divider */
-.cv { color: #79c0ff; } /* Value */
-.cc { color: #8b949e; font-style: italic; } /* Comment */
-.ch { color: #f0883e; font-weight: bold; } /* Header */
-.cm { color: #7ee787; font-weight: bold; } /* Section */
-.cw { color: #d29922; } /* Warning */
-.ce { color: #bc8cff; } /* Special */
-.cg { color: #3fb950; font-weight: bold; } /* Success */
+.ck {
+  color: #ff7b72;
+} /* Keyword */
+.cs {
+  color: #a5d6ff;
+} /* String / Divider */
+.cv {
+  color: #79c0ff;
+} /* Value */
+.cc {
+  color: #8b949e;
+  font-style: italic;
+} /* Comment */
+.ch {
+  color: #f0883e;
+  font-weight: bold;
+} /* Header */
+.cm {
+  color: #7ee787;
+  font-weight: bold;
+} /* Section */
+.cw {
+  color: #d29922;
+} /* Warning */
+.ce {
+  color: #bc8cff;
+} /* Special */
+.cg {
+  color: #3fb950;
+  font-weight: bold;
+} /* Success */
 
 /* ── STEP FLOW ── */
 .steps {
@@ -398,7 +416,7 @@
   padding-bottom: 0;
 }
 .step:not(:last-child)::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 19px;
   top: 44px;
@@ -556,4 +574,3 @@
 .footer a:hover {
   text-decoration: underline;
 }
-
