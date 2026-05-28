@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import styles from "./page.module.css";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
 
 export const metadata: Metadata = {
   title: "Google ハーネスエンジニアリング 完全ガイド",
@@ -47,7 +48,115 @@ export default function GeminiHarnessEngineeringPage() {
       </nav>
 
       <section id="s1" className={styles.sec}>
-        <h2 className={styles.secTitle}><span className={styles.n}>01.</span>ハーネスエンジニアリングとは何か</h2>
+        <div className={styles.secNo}>Section 01</div>
+        <h2 className={styles.secTitle}>
+          <span className={styles.n}>01.</span>ハーネスエンジニアリングとは何か
+        </h2>
+
+        <p>
+          <strong>テストハーネス</strong>（Test Harness）とは、テスト対象のコードを「安全かつ再現可能な環境」で動かすための<strong>足場（スキャフォールディング）</strong>のことです。
+        </p>
+
+        <div className={`${styles.callout} ${styles.cNote}`}>
+          <span className={styles.ci}>🚗</span>
+          <div>
+            <strong>日常の例え話 — クラッシュテスト</strong>
+            <br />
+            車の安全試験を想像してください。ダミー人形・センサー・高速カメラ・制御された壁面——これらすべてが「ハーネス（試験用足場）」です。
+            ハーネスがなければ「何が何に当たってどんな力がかかったか」を数値で再現できません。ソフトウェアのテストも同じです。
+          </div>
+        </div>
+
+        <h3>なぜ Google がハーネスエンジニアリングを重視するのか</h3>
+        <p>
+          Googleは1日に<strong>数億行のコード変更</strong>と<strong>数十億件のテスト</strong>を実行します。この規模で「テストが適当」だと以下の問題が発生します。
+        </p>
+
+        <div className={styles.tblWrap}>
+          <table>
+            <thead>
+              <tr>
+                <th>問題</th>
+                <th>具体例</th>
+                <th>ハーネスがない場合のコスト</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <code>再現不能なバグ</code>
+                </td>
+                <td>本番にのみ発生する環境依存バグ</td>
+                <td>調査に数日〜数週間</td>
+              </tr>
+              <tr>
+                <td>
+                  <code>フレイキーテスト</code>
+                </td>
+                <td>同じコードで50%の確率で失敗</td>
+                <td>CI信頼性が崩壊</td>
+              </tr>
+              <tr>
+                <td>
+                  <code>遅すぎるCI</code>
+                </td>
+                <td>E2Eテストが1回30分</td>
+                <td>開発速度が1/10以下</td>
+              </tr>
+              <tr>
+                <td>
+                  <code>テスト間依存</code>
+                </td>
+                <td>テストAを実行するとテストBが壊れる</td>
+                <td>夜間ビルドが常に赤</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>ハーネスエンジニアリングの全体像</h3>
+
+        <div className={styles.mermaidWrap}>
+          <div className={styles.mermaidLabel}>テストハーネスの全体アーキテクチャ</div>
+          <MermaidDiagram
+            chart={`flowchart LR
+subgraph SUT["テスト対象 SUT"]
+  A[プロダクション<br />コード]
+end
+subgraph HARNESS["テストハーネス層"]
+  B[テストダブル<br />Mock / Stub / Fake]
+  C[フィクスチャ<br />setUp / tearDown]
+  D[テストランナー<br />Google Test / pytest]
+  E[アサーション<br />ライブラリ]
+end
+subgraph OUTPUT["検証・報告"]
+  F[テスト結果<br />PASS / FAIL]
+  G[カバレッジ<br />レポート]
+  H[CIダッシュボード]
+end
+A --> B
+B --> C
+C --> D
+D --> E
+E --> F
+F --> G
+G --> H`}
+          />
+        </div>
+
+        <div className={styles.vocab}>
+          <div className={styles.vocabHead}>📖 用語集</div>
+          <dl>
+            <dt>テストハーネス</dt>
+            <dd>テストを安全・再現可能に実行するための足場全体の総称</dd>
+            <dt>SUT</dt>
+            <dd>System Under Test。「テストされるシステム」の略</dd>
+            <dt>フレイキーテスト</dt>
+            <dd>同じコードで実行のたびに結果が変わる不安定なテスト</dd>
+            <dt>フィクスチャ</dt>
+            <dd>各テスト実行前後に状態を整えるセットアップ/クリーンアップ処理</dd>
+          </dl>
+        </div>
       </section>
 
       <section id="s2" className={styles.sec}>

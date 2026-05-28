@@ -7,6 +7,14 @@
 .sec {
   margin-bottom: 7rem;
 }
+.secNo {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.3rem;
+}
 .secTitle {
   font-size: clamp(2rem, 4vw, 3.2rem);
   border-bottom: 2px solid var(--border);
@@ -16,6 +24,127 @@
 .n {
   color: var(--g-blue);
   margin-right: 0.4rem;
+}
+.callout {
+  border-radius: 10px;
+  padding: 1.1rem 1.4rem;
+  margin: 1.2rem 0;
+  display: flex;
+  gap: 0.9rem;
+  font-size: 0.87rem;
+}
+.ci {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+.cNote {
+  background: rgba(66, 133, 244, 0.07);
+  border: 1px solid rgba(66, 133, 244, 0.25);
+}
+.cWarn {
+  background: rgba(251, 188, 4, 0.07);
+  border: 1px solid rgba(251, 188, 4, 0.25);
+}
+.cCrit {
+  background: rgba(234, 67, 53, 0.07);
+  border: 1px solid rgba(234, 67, 53, 0.25);
+}
+.cTip {
+  background: rgba(52, 168, 83, 0.07);
+  border: 1px solid rgba(52, 168, 83, 0.25);
+}
+.tblWrap {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+.tblWrap table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.83rem;
+}
+.tblWrap thead th {
+  background: var(--ink3);
+  color: var(--bright);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  padding: 0.85rem 1.1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.tblWrap tbody td {
+  padding: 0.8rem 1.1rem;
+  border-bottom: 1px solid rgba(35, 45, 64, 0.7);
+  color: var(--txt);
+  vertical-align: top;
+}
+.tblWrap tbody tr:last-child td {
+  border-bottom: none;
+}
+.tblWrap tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+.mermaidWrap {
+  background: var(--ink2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 2rem 1.5rem;
+  margin: 1.8rem 0;
+  overflow-x: auto;
+}
+.mermaidLabel {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.mermaidLabel::before,
+.mermaidLabel::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.vocab {
+  background: var(--ink2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.2rem 1.5rem;
+  margin-top: 2rem;
+}
+.vocabHead {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--g-yel);
+  margin-bottom: 0.9rem;
+}
+.vocab dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.3rem 1rem;
+  font-size: 0.82rem;
+  margin: 0;
+  padding: 0;
+}
+.vocab dt {
+  color: var(--g-blue);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+.vocab dd {
+  color: var(--muted);
+  margin-left: 0;
 }
 .toc {
   background: var(--ink2);
