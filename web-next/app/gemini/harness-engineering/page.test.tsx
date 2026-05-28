@@ -138,6 +138,17 @@ describe("/gemini/harness-engineering - page structure", () => {
     expect(s7?.textContent).toMatch(/隔離/);
   });
 
+  it("renders s8 content correctly (YAML pipelines, optimization table)", () => {
+    const { container } = render(<Page />);
+    const s8 = container.querySelector("#s8");
+    expect(s8).not.toBeNull();
+    expect(s8?.textContent).toMatch(/Google Cloud Build/);
+    expect(s8?.textContent).toMatch(/cloudbuild.yaml/);
+    expect(s8?.textContent).toMatch(/Harness Test Pipeline/);
+    expect(s8?.querySelector("table")).not.toBeNull();
+    expect(s8?.textContent).toMatch(/変更影響テスト/);
+  });
+
   it("renders 11 TOC links pointing to section anchors", () => {
     const { container } = render(<Page />);
     const tocAnchors = container.querySelectorAll('nav a[href^="#"]');
