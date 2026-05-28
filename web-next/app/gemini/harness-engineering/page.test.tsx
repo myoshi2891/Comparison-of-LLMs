@@ -104,6 +104,17 @@ describe("/gemini/harness-engineering - page structure", () => {
     expect(s4?.textContent).toMatch(/FakeUserRepository/);
   });
 
+  it("renders s5 content correctly (3 principles table, anti-pattern diagram, vocabulary)", () => {
+    const { container } = render(<Page />);
+    const s5 = container.querySelector("#s5");
+    expect(s5).not.toBeNull();
+    expect(s5?.textContent).toMatch(/宇宙服/);
+    expect(s5?.querySelector("table")).not.toBeNull();
+    expect(s5?.textContent).toMatch(/孤立性/);
+    expect(s5?.textContent).toMatch(/冪等性/);
+    expect(s5?.textContent).toMatch(/freezegun/);
+  });
+
   it("renders 11 TOC links pointing to section anchors", () => {
     const { container } = render(<Page />);
     const tocAnchors = container.querySelectorAll('nav a[href^="#"]');
