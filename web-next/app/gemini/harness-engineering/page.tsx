@@ -8,6 +8,13 @@ export const metadata: Metadata = {
     "Googleが実践するテストハーネス設計の技術とベストプラクティスを解説する完全ガイドです。",
 };
 
+/**
+ * Renders an external link that opens in a new browser tab.
+ *
+ * @param href - The destination URL for the link.
+ * @param children - The content displayed inside the link.
+ * @returns An anchor element configured to open `href` in a new tab with `rel="noopener noreferrer"`.
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -30,6 +37,15 @@ const TOC_ITEMS = [
   { id: "s11", label: "11. 参考ソース一覧" },
 ] as const;
 
+/**
+ * Renders the full Japanese "Google ハーネスエンジニアリング 完全ガイド" documentation page.
+ *
+ * The component outputs the complete page structure: hero header with chips, a table of contents, eleven
+ * numbered content sections (s1–s11) containing explanatory text, tables, Mermaid diagrams, and code
+ * examples, and a footer with source references.
+ *
+ * @returns The React element tree for the harness engineering documentation page.
+ */
 export default function GeminiHarnessEngineeringPage() {
   return (
     <>
