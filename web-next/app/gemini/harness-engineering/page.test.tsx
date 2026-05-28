@@ -63,6 +63,15 @@ describe("/gemini/harness-engineering - page structure", () => {
     }
   });
 
+  it("renders s1 content correctly (crash test, table, vocabulary)", () => {
+    const { container } = render(<Page />);
+    const s1 = container.querySelector("#s1");
+    expect(s1).not.toBeNull();
+    expect(s1?.textContent).toMatch(/クラッシュテスト/);
+    expect(s1?.textContent).toMatch(/SUT/);
+    expect(s1?.querySelector("table")).not.toBeNull();
+  });
+
   it("renders 11 TOC links pointing to section anchors", () => {
     const { container } = render(<Page />);
     const tocAnchors = container.querySelectorAll('nav a[href^="#"]');
