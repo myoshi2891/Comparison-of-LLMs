@@ -1,0 +1,39 @@
+/* page.module.css */
+.wrap {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 4rem 2rem 8rem;
+}
+.sec {
+  margin-bottom: 7rem;
+}
+.secTitle {
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 0.8rem;
+  margin-bottom: 2rem;
+}
+.n {
+  color: var(--g-blue);
+  margin-right: 0.4rem;
+}
+.toc {
+  background: var(--ink2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--g-blue);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 4rem;
+}
+.tocTitle {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  color: var(--g-blue);
+  margin-bottom: 1rem;
+}
+.footer {
+  background: var(--ink2);
+  border-top: 1px solid var(--border);
+  padding: 3rem 2rem;
+  text-align: center;
+}
