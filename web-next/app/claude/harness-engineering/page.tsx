@@ -1179,16 +1179,753 @@ export default function Page() {
 
       <div className={styles.divider} />
 
-      {/* ════ Stub Sections for s8 to s10 ════ */}
-      <section id="s8" className={styles.sec} />
-      <section id="s9" className={styles.sec} />
-      <section id="s10" className={styles.sec} />
-      <section id="s11" className={styles.sec}>
-        {/* s11 validation requires at least 3 external links for testing */}
-        <Ext href="https://example.com/1">Source 1</Ext>
-        <Ext href="https://example.com/2">Source 2</Ext>
-        <Ext href="https://example.com/3">Source 3</Ext>
+      {/* ════ S8 ════ */}
+      <section id="s8" className={styles.sec}>
+        <div className={styles.sectionLabel}>Section 08</div>
+        <h2 className={styles.sectionTitle}>
+          <span className={styles.sectionTitleNum}>8</span>コンテキストウィンドウの管理
+        </h2>
+        <p className={styles.sectionLead}>
+          コンテキストは有限の資源です。消費が多いほど品質が下がります。
+        </p>
+
+        <div className={styles.tableWrap}>
+          <table>
+            <thead>
+              <tr>
+                <th>戦略</th>
+                <th>操作</th>
+                <th>並列度</th>
+                <th>理由</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <strong>ファイル検索・解析</strong>
+                </td>
+                <td>読み込み専用</td>
+                <td>高並列 OK</td>
+                <td>競合が発生しないため</td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>ビルド・テスト実行</strong>
+                </td>
+                <td>書き込みあり</td>
+                <td>低並列推奨</td>
+                <td>競合・バックプレッシャー回避</td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>結果のサマリー</strong>
+                </td>
+                <td>サブエージェント</td>
+                <td>—</td>
+                <td>raw 出力をメインに入れない</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 style={{ fontSize: "1rem", fontWeight: 700, margin: "28px 0 12px" }}>
+          Compaction vs. Context Reset
+        </h3>
+        <div className={styles.mermaidWrap}>
+          <div id="diag-8" />
+        </div>
       </section>
+
+      <div className={styles.divider} />
+
+      {/* ════ S9 ════ */}
+      <section id="s9" className={styles.sec}>
+        <div className={styles.sectionLabel}>Section 09</div>
+        <h2 className={styles.sectionTitle}>
+          <span className={styles.sectionTitleNum}>9</span>よくある失敗パターンと対策
+        </h2>
+        <p className={styles.sectionLead}>
+          Anthropic の実験で確認された主要な失敗パターンと、ハーネスによる対策をまとめます。
+        </p>
+
+        <div className={styles.tableWrap}>
+          <table>
+            <thead>
+              <tr>
+                <th>失敗パターン</th>
+                <th>症状</th>
+                <th>Initializer の対策</th>
+                <th>Coding Agent の対策</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <strong>早期勝利宣言</strong>
+                </td>
+                <td>途中なのに「完成」と言う</td>
+                <td>feature_list.json で全機能を failing で定義</td>
+                <td>セッション開始時に必ず feature_list.json を読む。1機能ずつ選ぶ</td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>半完成状態で終了</strong>
+                </td>
+                <td>バグが残ったまま次セッションへ</td>
+                <td>初期 git リポジトリと progress.txt を準備</td>
+                <td>
+                  開始時に progress.txt と git log を読む。終了時に必ず commit と progress 更新
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>テストなし完了マーク</strong>
+                </td>
+                <td>動作未確認のまま passing にする</td>
+                <td>feature_list.json に検証ステップを明記</td>
+                <td>E2E テストで実際の UI を確認後のみ passing に変更</td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>環境構築に時間を浪費</strong>
+                </td>
+                <td>毎回 npm install の方法を調べる</td>
+                <td>init.sh を作成して手順を自動化</td>
+                <td>セッション開始時に必ず init.sh を読む</td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>一括実装しようとする</strong>
+                </td>
+                <td>全機能を一度に実装しコンテキスト枯渇</td>
+                <td>機能を細かく分割してリスト化</td>
+                <td>「1セッション1機能」をプロンプトに明記</td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>ルール改ざん</strong>
+                </td>
+                <td>Lint エラーを修正する代わりに設定を無効化</td>
+                <td>—</td>
+                <td>Lint 設定ファイルを read-only に保護。CLAUDE.md で明示的に禁止</td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>スタブ実装</strong>
+                </td>
+                <td>TODO・空のモックで機能完了とする</td>
+                <td>—</td>
+                <td>「プレースホルダーは実装とみなさない」と明示。E2E で実際の動作を確認</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div className={styles.divider} />
+
+      {/* ════ S10 ════ */}
+      <section id="s10" className={styles.sec}>
+        <div className={styles.sectionLabel}>Section 10</div>
+        <h2 className={styles.sectionTitle}>
+          <span className={styles.sectionTitleNum}>10</span>Minimum Viable Harness（最小構成）
+        </h2>
+        <p className={styles.sectionLead}>
+          ゼロから始める場合の段階的な導入ロードマップです。一度にすべてを導入しなくて構いません。
+        </p>
+
+        {/* MVH roadmap */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 0, margin: "24px 0" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "48px 1fr", gap: 0 }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <div
+                style={{
+                  width: "2px",
+                  flex: 1,
+                  background: "linear-gradient(to bottom, #7c6ef5, #4fc3f7, #69f0ae, #ffb74d)",
+                }}
+              />
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 0, paddingBottom: "8px" }}>
+              {/* Week 1 */}
+              <div
+                style={{ display: "flex", alignItems: "flex-start", gap: 0, marginBottom: "28px" }}
+              >
+                <div
+                  style={{
+                    position: "relative",
+                    left: "-34px",
+                    top: "16px",
+                    width: "20px",
+                    height: "20px",
+                    borderRadius: "50%",
+                    background: "#7c6ef5",
+                    border: "3px solid var(--bg)",
+                    flexShrink: 0,
+                  }}
+                />
+                <div
+                  style={{
+                    background: "rgba(124, 110, 245, 0.08)",
+                    border: "1px solid rgba(124, 110, 245, 0.35)",
+                    borderRadius: "16px",
+                    padding: "20px 22px",
+                    flex: 1,
+                    marginLeft: "-6px",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      marginBottom: "14px",
+                    }}
+                  >
+                    <span
+                      style={{
+                        background: "rgba(124, 110, 245, 0.2)",
+                        color: "#b5aaff",
+                        fontSize: "0.72rem",
+                        fontWeight: 800,
+                        letterSpacing: "0.1em",
+                        padding: "3px 10px",
+                        borderRadius: "99px",
+                      }}
+                    >
+                      WEEK 1
+                    </span>
+                    <span style={{ fontWeight: 800, fontSize: "1rem" }}>基盤をつくる</span>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                    <div
+                      style={{
+                        background: "var(--card)",
+                        border: "1px solid var(--border)",
+                        borderRadius: "9px",
+                        padding: "10px 12px",
+                        fontSize: "0.82rem",
+                      }}
+                    >
+                      <div style={{ fontWeight: 700 }}>📄 CLAUDE.md 作成</div>
+                      <div style={{ color: "var(--muted)", fontSize: "0.77rem", marginTop: "2px" }}>
+                        50行以内のエージェント地図
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        background: "var(--card)",
+                        border: "1px solid var(--border)",
+                        borderRadius: "9px",
+                        padding: "10px 12px",
+                        fontSize: "0.82rem",
+                      }}
+                    >
+                      <div style={{ fontWeight: 700 }}>📋 feature_list.json</div>
+                      <div style={{ color: "var(--muted)", fontSize: "0.77rem", marginTop: "2px" }}>
+                        全機能を failing でリスト化
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        background: "var(--card)",
+                        border: "1px solid var(--border)",
+                        borderRadius: "9px",
+                        padding: "10px 12px",
+                        fontSize: "0.82rem",
+                      }}
+                    >
+                      <div style={{ fontWeight: 700 }}>⚙️ init.sh 作成</div>
+                      <div style={{ color: "var(--muted)", fontSize: "0.77rem", marginTop: "2px" }}>
+                        環境を一発起動するスクリプト
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        background: "var(--card)",
+                        border: "1px solid var(--border)",
+                        borderRadius: "9px",
+                        padding: "10px 12px",
+                        fontSize: "0.82rem",
+                      }}
+                    >
+                      <div style={{ fontWeight: 700 }}>🗂 Git 運用開始</div>
+                      <div style={{ color: "var(--muted)", fontSize: "0.77rem", marginTop: "2px" }}>
+                        進捗の引き継ぎ手段として活用
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Week 2-4 */}
+              <div
+                style={{ display: "flex", alignItems: "flex-start", gap: 0, marginBottom: "28px" }}
+              >
+                <div
+                  style={{
+                    position: "relative",
+                    left: "-34px",
+                    top: "16px",
+                    width: "20px",
+                    height: "20px",
+                    borderRadius: "50%",
+                    background: "#4fc3f7",
+                    border: "3px solid var(--bg)",
+                    flexShrink: 0,
+                  }}
+                />
+                <div
+                  style={{
+                    background: "rgba(79, 195, 247, 0.07)",
+                    border: "1px solid rgba(79, 195, 247, 0.3)",
+                    borderRadius: "16px",
+                    padding: "20px 22px",
+                    flex: 1,
+                    marginLeft: "-6px",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      marginBottom: "14px",
+                    }}
+                  >
+                    <span
+                      style={{
+                        background: "rgba(79, 195, 247, 0.15)",
+                        color: "var(--accent2)",
+                        fontSize: "0.72rem",
+                        fontWeight: 800,
+                        letterSpacing: "0.1em",
+                        padding: "3px 10px",
+                        borderRadius: "99px",
+                      }}
+                    >
+                      WEEK 2〜4
+                    </span>
+                    <span style={{ fontWeight: 800, fontSize: "1rem" }}>品質を高める</span>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px" }}>
+                    <div
+                      style={{
+                        background: "var(--card)",
+                        border: "1px solid var(--border)",
+                        borderRadius: "9px",
+                        padding: "10px 12px",
+                        fontSize: "0.82rem",
+                      }}
+                    >
+                      <div style={{ fontWeight: 700 }}>🔍 Lint 設定</div>
+                      <div style={{ color: "var(--muted)", fontSize: "0.77rem", marginTop: "2px" }}>
+                        +Hooks で自動実行
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        background: "var(--card)",
+                        border: "1px solid var(--border)",
+                        borderRadius: "9px",
+                        padding: "10px 12px",
+                        fontSize: "0.82rem",
+                      }}
+                    >
+                      <div style={{ fontWeight: 700 }}>🧪 ユニットテスト</div>
+                      <div style={{ color: "var(--muted)", fontSize: "0.77rem", marginTop: "2px" }}>
+                        関数単位の正確性検証
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        background: "var(--card)",
+                        border: "1px solid var(--border)",
+                        borderRadius: "9px",
+                        padding: "10px 12px",
+                        fontSize: "0.82rem",
+                      }}
+                    >
+                      <div style={{ fontWeight: 700 }}>🌐 E2E テスト</div>
+                      <div style={{ color: "var(--muted)", fontSize: "0.77rem", marginTop: "2px" }}>
+                        Puppeteer / Playwright
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Month 2-3 */}
+              <div
+                style={{ display: "flex", alignItems: "flex-start", gap: 0, marginBottom: "28px" }}
+              >
+                <div
+                  style={{
+                    position: "relative",
+                    left: "-34px",
+                    top: "16px",
+                    width: "20px",
+                    height: "20px",
+                    borderRadius: "50%",
+                    background: "#69f0ae",
+                    border: "3px solid var(--bg)",
+                    flexShrink: 0,
+                  }}
+                />
+                <div
+                  style={{
+                    background: "rgba(105, 240, 174, 0.07)",
+                    border: "1px solid rgba(105, 240, 174, 0.25)",
+                    borderRadius: "14px",
+                    padding: "20px 22px",
+                    flex: 1,
+                    marginLeft: "-6px",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      marginBottom: "14px",
+                    }}
+                  >
+                    <span
+                      style={{
+                        background: "rgba(105, 240, 174, 0.15)",
+                        color: "var(--accent3)",
+                        fontSize: "0.72rem",
+                        fontWeight: 800,
+                        letterSpacing: "0.1em",
+                        padding: "3px 10px",
+                        borderRadius: "99px",
+                      }}
+                    >
+                      MONTH 2〜3
+                    </span>
+                    <span style={{ fontWeight: 800, fontSize: "1rem" }}>高度化する</span>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px" }}>
+                    <div
+                      style={{
+                        background: "var(--card)",
+                        border: "1px solid var(--border)",
+                        borderRadius: "9px",
+                        padding: "10px 12px",
+                        fontSize: "0.82rem",
+                      }}
+                    >
+                      <div style={{ fontWeight: 700 }}>🤖 サブエージェント</div>
+                      <div style={{ color: "var(--muted)", fontSize: "0.77rem", marginTop: "2px" }}>
+                        検索・解析を並列委任
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        background: "var(--card)",
+                        border: "1px solid var(--border)",
+                        borderRadius: "9px",
+                        padding: "10px 12px",
+                        fontSize: "0.82rem",
+                      }}
+                    >
+                      <div style={{ fontWeight: 700 }}>🧐 Evaluator 分離</div>
+                      <div style={{ color: "var(--muted)", fontSize: "0.77rem", marginTop: "2px" }}>
+                        評価専用エージェント
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        background: "var(--card)",
+                        border: "1px solid var(--border)",
+                        borderRadius: "9px",
+                        padding: "10px 12px",
+                        fontSize: "0.82rem",
+                      }}
+                    >
+                      <div style={{ fontWeight: 700 }}>📁 ADR 導入</div>
+                      <div style={{ color: "var(--muted)", fontSize: "0.77rem", marginTop: "2px" }}>
+                        設計決定の記録
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Month 3+ */}
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 0 }}>
+                <div
+                  style={{
+                    position: "relative",
+                    left: "-34px",
+                    top: "16px",
+                    width: "20px",
+                    height: "20px",
+                    borderRadius: "50%",
+                    background: "#ffb74d",
+                    border: "3px solid var(--bg)",
+                    flexShrink: 0,
+                  }}
+                />
+                <div
+                  style={{
+                    background: "rgba(255, 183, 77, 0.07)",
+                    border: "1px solid rgba(255, 183, 77, 0.25)",
+                    borderRadius: "14px",
+                    padding: "20px 22px",
+                    flex: 1,
+                    marginLeft: "-6px",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      marginBottom: "14px",
+                    }}
+                  >
+                    <span
+                      style={{
+                        background: "rgba(255, 183, 77, 0.15)",
+                        color: "var(--accent4)",
+                        fontSize: "0.72rem",
+                        fontWeight: 800,
+                        letterSpacing: "0.1em",
+                        padding: "3px 10px",
+                        borderRadius: "99px",
+                      }}
+                    >
+                      MONTH 3+
+                    </span>
+                    <span style={{ fontWeight: 800, fontSize: "1rem" }}>最適化・削ぎ落とす</span>
+                  </div>
+                  <div
+                    style={{
+                      background: "var(--card)",
+                      border: "1px solid var(--border)",
+                      borderRadius: "9px",
+                      padding: "12px 14px",
+                      fontSize: "0.85rem",
+                    }}
+                  >
+                    <div style={{ fontWeight: 700 }}>🧹 ハーネス複雑度の削減</div>
+                    <div style={{ color: "var(--muted)", fontSize: "0.8rem", marginTop: "4px" }}>
+                      モデルが不要になったハーネスの仕組みは積極的に取り除く。「Simplify
+                      relentlessly」の原則に従い、ハーネスはモデルの成長に合わせてシンプルにしていく。
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3 style={{ fontSize: "1rem", fontWeight: 700, margin: "28px 0 12px" }}>
+          Week 1：最低限のディレクトリ構成
+        </h3>
+        <div className={styles.codeWrap}>
+          <div className={styles.codeBar}>
+            <span className={styles.codeLang}>プロジェクト構成</span>
+          </div>
+          <pre className={styles.codeBody}>
+            <code>
+              project/{"\n"}
+              ├── <span className={styles.ck}>CLAUDE.md</span>{" "}
+              <span className={styles.cc}>&larr; エージェントへの地図（50行以内）</span>
+              {"\n"}
+              ├── <span className={styles.ck}>feature_list.json</span>{" "}
+              <span className={styles.cc}>&larr; やることリスト（JSON形式）</span>
+              {"\n"}
+              ├── <span className={styles.ck}>claude-progress.txt</span>{" "}
+              <span className={styles.cc}>&larr; 進捗ログ</span>
+              {"\n"}
+              ├── <span className={styles.ck}>init.sh</span>{" "}
+              <span className={styles.cc}>&larr; 環境起動スクリプト</span>
+              {"\n"}
+              ├── <span className={styles.ck}>docs/</span>
+              {"\n"}│ ├── adr/{" "}
+              <span className={styles.cc}>&larr; Architecture Decision Records</span>
+              {"\n"}│ ├── coding-conventions.md{"\n"}│ └── testing-strategy.md{"\n"}
+              └── <span className={styles.ck}>.git/</span>{" "}
+              <span className={styles.cc}>&larr; Git リポジトリ</span>
+            </code>
+          </pre>
+        </div>
+
+        <h3 style={{ fontSize: "1rem", fontWeight: 700, margin: "28px 0 12px" }}>
+          Month 2〜3：Evaluator Agent の分離
+        </h3>
+        <div className={styles.mermaidWrap}>
+          <div id="diag-9" />
+        </div>
+
+        <h3 style={{ fontSize: "1rem", fontWeight: 700, margin: "28px 0 16px" }}>黄金律まとめ</h3>
+        <div className={styles.rules}>
+          <div className={`${styles.rule} ${styles.gold}`}>
+            <span className={`${styles.ruleTag} ${styles.gold}`}>Principle</span>
+            <h3>Humans steer, agents execute</h3>
+            <p>
+              人間が方向を決め、エージェントがコードを書く。設計・意図・フィードバックループは人間の責任。
+            </p>
+          </div>
+          <div className={`${styles.rule} ${styles.blue}`}>
+            <span className={`${styles.ruleTag} ${styles.blue}`}>Principle</span>
+            <h3>Expect eventual consistency</h3>
+            <p>
+              完璧な1回より、反復改善を期待する。ほとんどの問題は、より良いプロンプトで繰り返すことで解決できる。
+            </p>
+          </div>
+          <div className={`${styles.rule} ${styles.green}`}>
+            <span className={`${styles.ruleTag} ${styles.green}`}>Principle</span>
+            <h3>Simplify relentlessly</h3>
+            <p>
+              モデルが不要になったハーネスの複雑さは削除する。ハーネスはモデルの成長に合わせてシンプルにしていく。
+            </p>
+          </div>
+          <div className={`${styles.rule} ${styles.purple}`}>
+            <span className={`${styles.ruleTag} ${styles.purple}`}>Principle</span>
+            <h3>State in files, not context</h3>
+            <p>永続化はすべてファイルへ。コンテキスト内の情報はセッション終了とともに消える。</p>
+          </div>
+          <div className={`${styles.rule} ${styles.gold}`}>
+            <span className={`${styles.ruleTag} ${styles.gold}`}>Principle</span>
+            <h3>One task per session</h3>
+            <p>
+              1セッション1機能の原則を守る。スコープを広げるとコンテキスト枯渇・品質低下の原因になる。
+            </p>
+          </div>
+          <div className={`${styles.rule} ${styles.blue}`}>
+            <span className={`${styles.ruleTag} ${styles.blue}`}>Principle</span>
+            <h3>Harness &gt; Model</h3>
+            <p>
+              ハーネスの質がモデルの質より成果に影響する。同じモデルでも、ハーネスを変えると22点以上スコアが変わる。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div className={styles.divider} />
+
+      {/* ════ S11 ════ */}
+      <section id="s11" className={styles.sec}>
+        <div className={styles.sectionLabel}>Section 11</div>
+        <h2 className={styles.sectionTitle}>
+          <span className={styles.sectionTitleNum}>11</span>参考ソース一覧
+        </h2>
+        <p className={styles.sectionLead}>
+          このガイドの根拠となる一次情報源です。すべて確認済みのリンクです。
+        </p>
+
+        <div className={styles.sourceList}>
+          <div className={styles.sourceItem}>
+            <div className={styles.sourceIcon}>🏛</div>
+            <div className={styles.sourceBody}>
+              <h4>Effective harnesses for long-running agents（公式）</h4>
+              <Ext href="https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents">
+                https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents
+              </Ext>
+              <p>
+                Anthropic Engineering Blog。Initializer Agent / Coding Agent
+                の2層構造、feature_list.json
+                の設計、インクリメンタル進捗の原則。このガイドの主要一次情報源。
+              </p>
+            </div>
+          </div>
+          <div className={styles.sourceItem}>
+            <div className={styles.sourceIcon}>📘</div>
+            <div className={styles.sourceBody}>
+              <h4>Claude Code: Best practices for agentic coding（公式）</h4>
+              <Ext href="https://www.anthropic.com/engineering/claude-code-best-practices">
+                https://www.anthropic.com/engineering/claude-code-best-practices
+              </Ext>
+              <p>
+                Anthropic Engineering Blog。CLAUDE.md
+                設計、環境チューニング、ワークフロー最適化のベストプラクティス。
+              </p>
+            </div>
+          </div>
+          <div className={styles.sourceItem}>
+            <div className={styles.sourceIcon}>📄</div>
+            <div className={styles.sourceBody}>
+              <h4>Claude 4 Prompting Guide - Multi-context window workflows（公式）</h4>
+              <Ext href="https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/claude-4-best-practices">
+                https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/claude-4-best-practices
+              </Ext>
+              <p>
+                公式ドキュメント。マルチコンテキストウィンドウワークフロー、Initializer Agent
+                のプロンプト設計について。
+              </p>
+            </div>
+          </div>
+          <div className={styles.sourceItem}>
+            <div className={styles.sourceIcon}>💻</div>
+            <div className={styles.sourceBody}>
+              <h4>Claude Quickstarts - autonomous-coding（公式サンプル）</h4>
+              <Ext href="https://github.com/anthropics/claude-quickstarts/tree/main/autonomous-coding">
+                https://github.com/anthropics/claude-quickstarts/tree/main/autonomous-coding
+              </Ext>
+              <p>
+                Anthropic GitHub。Initializer / Coding Agent
+                のコード実装サンプル。実際の動作を確認できる。
+              </p>
+            </div>
+          </div>
+          <div className={styles.sourceItem}>
+            <div className={styles.sourceIcon}>📝</div>
+            <div className={styles.sourceBody}>
+              <h4>Harness Engineering Best Practices from Anthropic and OpenAI（Gist）</h4>
+              <Ext href="https://gist.github.com/celesteanders/21edad2367c8ede2ff092bd87e56a26f">
+                https://gist.github.com/celesteanders/21edad2367c8ede2ff092bd87e56a26f
+              </Ext>
+              <p>
+                Anthropic・OpenAI
+                両社のベストプラクティスを統合したコミュニティまとめ。アーキテクチャ・状態管理・フィードバックループの詳細。
+              </p>
+            </div>
+          </div>
+          <div className={styles.sourceItem}>
+            <div className={styles.sourceIcon}>🌐</div>
+            <div className={styles.sourceBody}>
+              <h4>Harness Engineering Best Practices for Claude Code / Codex Users（2026年版）</h4>
+              <Ext href="https://nyosegawa.com/en/posts/harness-engineering-best-practices-2026/">
+                https://nyosegawa.com/en/posts/harness-engineering-best-practices-2026/
+              </Ext>
+              <p>
+                2026年3月公開。リポジトリ衛生・決定論的ツール・E2E
+                テスト戦略・プラットフォーム固有の戦略を網羅した詳細ガイド。
+              </p>
+            </div>
+          </div>
+          <div className={styles.sourceItem}>
+            <div className={styles.sourceIcon}>🎓</div>
+            <div className={styles.sourceBody}>
+              <h4>Learn Harness Engineering by Building a Mini Claude Code（DEV Community）</h4>
+              <Ext href="https://dev.to/truongpx396/learn-harness-engineering-by-building-a-mini-claude-code-45a9">
+                https://dev.to/truongpx396/learn-harness-engineering-by-building-a-mini-claude-code-45a9
+              </Ext>
+              <p>
+                2026年4月公開。Mini Claude Code
+                を自作しながらハーネスエンジニアリングの原則を実践的に学べるチュートリアル。
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* フッター */}
+      <footer className={styles.footer}>
+        <p>
+          ハーネスエンジニアリング完全ガイド 2026 ── Claude Sonnet 4.6 / Anthropic Engineering Blog
+          ベース
+        </p>
+        <p style={{ marginTop: "8px" }}>
+          情報は 2026年5月時点のものです。最新情報は{" "}
+          <Ext href="https://www.anthropic.com/engineering">Anthropic Engineering Blog</Ext>{" "}
+          をご確認ください。
+        </p>
+      </footer>
     </div>
   );
 }

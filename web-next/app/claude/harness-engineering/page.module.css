@@ -440,3 +440,120 @@
   border-radius: 4px;
   font-size: 0.83rem;
 }
+
+/* ── RULE CARDS ── */
+.rules {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin: 20px 0;
+}
+.rule {
+  background: #1e2334;
+  border: 1px solid #2a3050;
+  border-radius: 12px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ruleTag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  width: fit-content;
+}
+.ruleTag.gold {
+  background: rgba(255, 183, 77, 0.15);
+  color: #ffb74d;
+}
+.ruleTag.blue {
+  background: rgba(79, 195, 247, 0.15);
+  color: #4fc3f7;
+}
+.ruleTag.green {
+  background: rgba(105, 240, 174, 0.15);
+  color: #69f0ae;
+}
+.ruleTag.purple {
+  background: rgba(124, 110, 245, 0.15);
+  color: #7c6ef5;
+}
+.rule h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+.rule p {
+  font-size: 0.85rem;
+  color: #8892aa;
+  line-height: 1.6;
+}
+
+/* ── SOURCES ── */
+.sourceList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+.sourceItem {
+  background: #1e2334;
+  border: 1px solid #2a3050;
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.sourceIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(124, 110, 245, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.sourceBody h4 {
+  font-size: 0.92rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.sourceBody a {
+  color: #4fc3f7;
+  font-size: 0.82rem;
+  text-decoration: none;
+  word-break: break-all;
+}
+.sourceBody a:hover {
+  text-decoration: underline;
+}
+.sourceBody p {
+  color: #8892aa;
+  font-size: 0.82rem;
+  margin-top: 3px;
+}
+
+/* ── FOOTER ── */
+.footer {
+  border-top: 1px solid #2a3050;
+  text-align: center;
+  padding: 32px 20px;
+  color: #8892aa;
+  font-size: 0.85rem;
+  margin-top: 48px;
+}
+.footer a {
+  color: #7c6ef5;
+  text-decoration: none;
+}
+.footer a:hover {
+  text-decoration: underline;
+}
+
