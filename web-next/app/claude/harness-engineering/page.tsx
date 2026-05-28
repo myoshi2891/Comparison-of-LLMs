@@ -127,6 +127,13 @@ const TOC_ITEMS = [
   { id: "s11", label: "11. 参考ソース一覧" },
 ] as const;
 
+/**
+ * Render an external link that opens in a new browser tab.
+ *
+ * @param href - Destination URL for the link.
+ * @param children - Content rendered inside the anchor.
+ * @returns An anchor element pointing to `href` that opens in a new tab and includes `rel="noopener noreferrer"`.
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -135,6 +142,16 @@ function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   );
 }
 
+/**
+ * Renders the "ハーネスエンジニアリング 完全ガイド 2026" page.
+ *
+ * The page includes a hero, a table of contents, sections 01–11 covering concepts,
+ * architecture, CLAUDE.md and feature_list.json examples, session protocols,
+ * feedback loops, context-window strategies, failure patterns, a minimum viable
+ * harness roadmap, reference sources, multiple embedded Mermaid diagrams, and a footer.
+ *
+ * @returns A React element that renders the complete guide page with TOC, sectioned content, diagrams, code samples, and external links.
+ */
 export default function Page() {
   return (
     <div className={styles.wrapper}>
