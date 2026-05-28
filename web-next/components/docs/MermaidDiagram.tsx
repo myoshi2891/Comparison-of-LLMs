@@ -21,7 +21,7 @@ export default function MermaidDiagram({ chart }: Props) {
         if (!active || !ref.current) return;
         m.default.initialize({
           startOnLoad: false,
-          theme: "default",
+          theme: "dark",
           flowchart: { useMaxWidth: true, htmlLabels: true },
           sequence: { useMaxWidth: true },
           mindmap: { useMaxWidth: true },

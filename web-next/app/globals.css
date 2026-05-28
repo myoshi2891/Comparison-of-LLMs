@@ -1314,3 +1314,47 @@ body.has-common-header {
     border-bottom: 1px solid rgba(255, 255, 255, 0.03);
   }
 }
+
+/* ── MERMAID DARK MODE CORRECTION ── */
+.mermaid .edgeLabel,
+.mermaid .edgeLabel span,
+.mermaid .edgeLabel p,
+.mermaid .label,
+.mermaid .label span,
+.mermaid .label text,
+.mermaid .messageText,
+.mermaid .loopText,
+.mermaid text,
+.mermaid text.actor {
+  color: var(--txt) !important;
+  fill: var(--txt) !important;
+}
+.mermaid .edgePath .path,
+.mermaid .messageLine0,
+.mermaid .messageLine1,
+.mermaid line,
+.mermaid path {
+  stroke: var(--txt3) !important;
+}
+.mermaid .marker,
+.mermaid marker path,
+.mermaid #arrowhead path,
+.mermaid [id^="arrowhead"] path {
+  fill: var(--txt3) !important;
+  stroke: var(--txt3) !important;
+}
+.mermaid rect.actor,
+.mermaid .actor {
+  fill: var(--srf) !important;
+  stroke: var(--brd2) !important;
+}
+.mermaid rect.note {
+  fill: var(--srf2) !important;
+  stroke: var(--brd2) !important;
+}
+.mermaid .noteText,
+.mermaid .noteText span {
+  color: var(--ylw2) !important;
+  fill: var(--ylw2) !important;
+}
+
