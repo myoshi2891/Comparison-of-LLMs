@@ -72,6 +72,16 @@ describe("/gemini/harness-engineering - page structure", () => {
     expect(s1?.querySelector("table")).not.toBeNull();
   });
 
+  it("renders s2 content correctly (pyramid, sizes table, warnings, vocabulary)", () => {
+    const { container } = render(<Page />);
+    const s2 = container.querySelector("#s2");
+    expect(s2).not.toBeNull();
+    expect(s2?.textContent).toMatch(/テストピラミッド/);
+    expect(s2?.textContent).toMatch(/逆ピラミッド/);
+    expect(s2?.querySelector("table")).not.toBeNull();
+    expect(s2?.textContent).toMatch(/localhostのみ/);
+  });
+
   it("renders 11 TOC links pointing to section anchors", () => {
     const { container } = render(<Page />);
     const tocAnchors = container.querySelectorAll('nav a[href^="#"]');
