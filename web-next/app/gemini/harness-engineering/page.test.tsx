@@ -182,7 +182,7 @@ describe("/gemini/harness-engineering - page structure", () => {
     expect(s11).not.toBeNull();
     expect(s11?.textContent).toMatch(/参考ソース一覧/);
     expect(s11?.textContent).toMatch(/Googleが公式に公開しているソース/);
-    expect(s11?.querySelectorAll('[class*="src-card"]').length).toBe(12);
+    expect(s11?.querySelectorAll('[class*="srcCard"]').length).toBe(12);
     expect(s11?.textContent).toMatch(/Software Engineering at Google — O'Reilly/);
     expect(s11?.textContent).toMatch(/The Practical Test Pyramid — Martin Fowler/);
     expect(s11?.textContent).toMatch(/Google ADK Evaluation Guide/);

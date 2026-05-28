@@ -1827,18 +1827,125 @@ THRESHOLD --> REPORT`}
       </section>
 
       <section id="s11" className={styles.sec}>
+        <div className={styles.secNo}>Section 11</div>
         <h2 className={styles.secTitle}>
           <span className={styles.n}>11.</span>参考ソース一覧
         </h2>
-        <div>
-          <Ext href="https://abseil.io/resources/swe-book">Software Engineering at Google</Ext>
-          <Ext href="https://testing.googleblog.com">Google Testing Blog</Ext>
-          <Ext href="https://github.com/google/googletest">Google Test</Ext>
+        <p>
+          以下はすべてGoogleが公式に公開しているソース、またはGoogleエンジニアが著した一次情報です。
+        </p>
+
+        <div className={styles.srcGrid}>
+          <div className={styles.srcCard}>
+            <div className={styles.srcNum}>[1] 書籍（無料公開）</div>
+            <Ext href="https://abseil.io/resources/swe-book">
+              Software Engineering at Google — O'Reilly (2020)
+            </Ext>
+            <div className={styles.srcDesc}>
+              ハーネスエンジニアリングの根拠となる最重要文献。Chapter 11–14 がテスト全般を網羅
+            </div>
+          </div>
+          <div className={styles.srcCard}>
+            <div className={styles.srcNum}>[2] 公式ブログ</div>
+            <Ext href="https://testing.googleblog.com">Google Testing Blog</Ext>
+            <div className={styles.srcDesc}>
+              Googleエンジニアによるテスト技術の公式ブログ。フレイキー・ハーミティック・ピラミッド等を詳述
+            </div>
+          </div>
+          <div className={styles.srcCard}>
+            <div className={styles.srcNum}>[3] OSS / ドキュメント</div>
+            <Ext href="https://github.com/google/googletest">Google Test (googletest) — GitHub</Ext>
+            <div className={styles.srcDesc}>
+              C++テストフレームワークの公式GitHub。GMock・パラメータ化テストの仕様を確認できる
+            </div>
+          </div>
+          <div className={styles.srcCard}>
+            <div className={styles.srcNum}>[4] 記事</div>
+            <Ext href="https://martinfowler.com/articles/practical-test-pyramid.html">
+              The Practical Test Pyramid — Martin Fowler
+            </Ext>
+            <div className={styles.srcDesc}>
+              Googleのアプローチを引用しながらテストピラミッドを実践的に解説
+            </div>
+          </div>
+          <div className={styles.srcCard}>
+            <div className={styles.srcNum}>[5] ブログ記事</div>
+            <Ext href="https://testing.googleblog.com/2015/04/just-say-no-to-more-end-to-end-tests.html">
+              Just Say No to More End-to-End Tests
+            </Ext>
+            <div className={styles.srcDesc}>
+              逆ピラミッドのアンチパターンを解説した Google Testing Blog の重要記事
+            </div>
+          </div>
+          <div className={styles.srcCard}>
+            <div className={styles.srcNum}>[6] 書籍章</div>
+            <Ext href="https://abseil.io/resources/swe-book/html/ch13.html">
+              Test Doubles — SWE Book Chapter 13
+            </Ext>
+            <div className={styles.srcDesc}>
+              スタブ・モック・フェイク・スパイの4種類を実例付きで解説する公式章
+            </div>
+          </div>
+          <div className={styles.srcCard}>
+            <div className={styles.srcNum}>[7] ブログ記事</div>
+            <Ext href="https://testing.googleblog.com/2012/10/hermetic-servers.html">
+              Hermetic Servers — Google Testing Blog
+            </Ext>
+            <div className={styles.srcDesc}>
+              ハーミティックテストの概念をGoogleが初めて公式に解説した記事
+            </div>
+          </div>
+          <div className={styles.srcCard}>
+            <div className={styles.srcNum}>[8] ブログ記事</div>
+            <Ext href="https://testing.googleblog.com/2016/05/flaky-tests-at-google-and-how-we.html">
+              Flaky Tests at Google and How We Mitigate Them
+            </Ext>
+            <div className={styles.srcDesc}>
+              Googleがフレイキーテストの検出・隔離・解消に使うシステムを公開した記事
+            </div>
+          </div>
+          <div className={styles.srcCard}>
+            <div className={styles.srcNum}>[9] 公式ドキュメント</div>
+            <Ext href="https://google.github.io/adk-docs/evaluate/">
+              Google ADK Evaluation Guide
+            </Ext>
+            <div className={styles.srcDesc}>
+              AIエージェント評価ハーネス（ADK Eval）の公式ドキュメント
+            </div>
+          </div>
+          <div className={styles.srcCard}>
+            <div className={styles.srcNum}>[10] 書籍（無料公開）</div>
+            <Ext href="https://sre.google/sre-book/testing-reliability/">
+              SRE Book — Chapter 17 Testing for Reliability
+            </Ext>
+            <div className={styles.srcDesc}>GoogleのSREが信頼性のためのテスト戦略を解説した章</div>
+          </div>
+          <div className={styles.srcCard}>
+            <div className={styles.srcNum}>[11] 公式ドキュメント</div>
+            <Ext href="https://cloud.google.com/build/docs">Google Cloud Build ドキュメント</Ext>
+            <div className={styles.srcDesc}>
+              cloudbuild.yaml の設定方法・サービスコンテナ・シークレット管理の公式ガイド
+            </div>
+          </div>
+          <div className={styles.srcCard}>
+            <div className={styles.srcNum}>[12] ブログ記事</div>
+            <Ext href="https://testing.googleblog.com/2019/12/testing-on-toilet-tests-too-dry-make.html">
+              Tests Too DRY? Make Them DAMP — Google Testing Blog
+            </Ext>
+            <div className={styles.srcDesc}>
+              DAMPとDRYの使い分けを「Testing on the Toilet」シリーズで解説
+            </div>
+          </div>
         </div>
       </section>
 
       <footer className={styles.footer}>
+        <div className={styles.footerLogo}>HARNESS ENGINEERING</div>
         <p>Google Testing Blog / Software Engineering at Google 準拠 — 2026年版</p>
+        <p style={{ marginTop: "0.4rem", fontSize: "0.72rem" }}>
+          本ドキュメントは abseil.io/resources/swe-book および testing.googleblog.com
+          の公開情報を基に作成
+        </p>
       </footer>
     </main>
   );
