@@ -1100,9 +1100,106 @@ S4 --> S5`}
       </section>
 
       <section id="s7" className={styles.sec}>
+        <div className={styles.secNo}>Section 07</div>
         <h2 className={styles.secTitle}>
           <span className={styles.n}>07.</span>フレイキーテスト対策
         </h2>
+
+        <div className={`${styles.callout} ${styles.cWarn}`}>
+          <span className={styles.ci}>🌦️</span>
+          <div>
+            <strong>日常の例え話 — 当てれない天気予報</strong>
+            <br />
+            天気予報が「明日は降ったり止んだり」と言うようなものです。予測不能なため「信頼できない情報源」として扱われてしまいます。
+            フレイキーなテストも「信頼できないCI」として無視されるようになり、本物のバグを見逃す原因になります。
+          </div>
+        </div>
+
+        <h3>フレイキーの4大原因と解決策</h3>
+        <div className={styles.tblWrap}>
+          <table>
+            <thead>
+              <tr>
+                <th>原因</th>
+                <th>具体例</th>
+                <th>解決策</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <code>時刻依存</code>
+                </td>
+                <td>
+                  <code>datetime.now()</code> を使った条件分岐
+                </td>
+                <td>
+                  時刻をDIで注入・<code>freezegun</code> でモック
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>並行性</code>
+                </td>
+                <td>スレッド間のレースコンディション</td>
+                <td>
+                  <code>asyncio.Lock</code> / Mutex で排他制御
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>テスト順序依存</code>
+                </td>
+                <td>テストAがDBを汚したままテストBが実行</td>
+                <td>tearDown でDB完全クリア</td>
+              </tr>
+              <tr>
+                <td>
+                  <code>乱数依存</code>
+                </td>
+                <td>
+                  <code>random.random()</code> を使った条件分岐
+                </td>
+                <td>
+                  シードを固定 <code>random.seed(42)</code>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Googleのフレイキーテスト検出・解消フロー</h3>
+        <div className={styles.mermaidWrap}>
+          <div className={styles.mermaidLabel}>フレイキーテスト対処フロー</div>
+          <MermaidDiagram
+            chart={`flowchart TD
+DETECT["フレイキーテスト検出<br />CIで3回以上 PASS/FAIL が混在"]
+QUARANTINE["隔離 Quarantine<br />専用ラベルを付けてメインCIから除外"]
+ANALYZE["原因分析<br />時刻 / 並行性 / 順序 / 乱数"]
+FIX["修正<br />原因に応じた対策を実施"]
+VERIFY["再検証<br />10回連続 PASS を確認"]
+RESTORE["メインCIに復帰<br />ラベルを外す"]
+DEADLINE["修正デッドライン超過<br />テストを削除してチケット発行"]
+DETECT --> QUARANTINE
+QUARANTINE --> ANALYZE
+ANALYZE --> FIX
+FIX --> VERIFY
+VERIFY --> RESTORE
+QUARANTINE --> DEADLINE`}
+          />
+        </div>
+
+        <div className={styles.vocab}>
+          <div className={styles.vocabHead}>📖 用語集</div>
+          <dl>
+            <dt>フレイキーテスト</dt>
+            <dd>同じコードで実行のたびに合否が変わる不安定なテスト</dd>
+            <dt>レースコンディション</dt>
+            <dd>複数のスレッドが同じリソースに競合アクセスすることで発生する不定動作</dd>
+            <dt>隔離（Quarantine）</dt>
+            <dd>問題のあるテストをメインCIから一時的に切り離す手法</dd>
+          </dl>
+        </div>
       </section>
 
       <section id="s8" className={styles.sec}>
