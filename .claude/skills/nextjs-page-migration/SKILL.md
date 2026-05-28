@@ -130,11 +130,13 @@ build-time ハイライトとして `shiki` を採用する。
 
 ### Step 6: Mermaid ダイアグラム（Phase E）
 
-- `components/docs/MermaidDiagram.tsx`（導入予定：Phase E）が `next/dynamic` で `ssr: false` の
-  クライアント遅延ロードを提供する
-- Mermaid 記述は **左端揃え必須**（HTML インデントが混じると構文エラー）— legacy/ から
-  貼り直す際はインデント除去を機械的に行う
+- `components/docs/MermaidDiagram.tsx` 自体が `useEffect` と `import("mermaid")` を用いたランタイム動的インポートを行うため、ページコンポーネント側からは直接インポートして通常通り使用する
+- Mermaid のテーマは、サイト全体のダーク背景に合わせて **`theme: "dark"`** に設定すること
+- Mermaid 記述は **左端揃え必須**（HTML インデントが混じると構文エラー）— legacy/ から貼り直す際はインデント除去を機械的に行う
 - `<marker>` 色は対応 `<line>` の `stroke` 色と一致させる（SVG 部分）
+- **ダークモードでの視認性（コントラスト）確保**:
+  - `web-next/app/globals.css` にはすでに Mermaid 用の補正 CSS ルール (`.mermaid` に対する `fill: var(--txt) !important` や `stroke` など) が適用済みであり、これによってデフォルトの黒文字や黒線がダーク背景でも見えるように確保されている。
+  - 新規の図解で読みにくい部分が発生した場合のみ、`web-next/app/globals.css` の補正ルールにクラス名を追加して対応すること。
 
 ### Step 7: [Refactor] 共通化判断
 

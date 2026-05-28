@@ -106,3 +106,14 @@
   from   = "/git_worktree.html"
   to     = "/git-worktree"
   status = 301
+
+# Phase F: Harness Engineering Legacy Guides
+[[redirects]]
+  from   = "/google-harness-engineering.html"
+  to     = "/claude/harness-engineering"
+  status = 301
+
+[[redirects]]
+  from   = "/harness-engineering-complete-guide.html"
+  to     = "/claude/harness-engineering"
+  status = 301

@@ -1,0 +1,1 @@
+../../.claude/rules/no-absolute-paths.md

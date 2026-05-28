@@ -1,0 +1,1 @@
+../../.claude/rules/migration-progress-sync.md

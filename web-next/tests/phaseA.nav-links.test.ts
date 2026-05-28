@@ -71,10 +71,10 @@ describe("Phase A - nav-links top-level entries", () => {
 describe("Phase A - Claude dropdown shape", () => {
   const claude = navLinks.find((link) => link.name === "Claude");
 
-  it("has 5 child entries (skill / agent / skill-guide / skill-guide-intermediate / cowork-guide)", () => {
+  it("has 6 child entries (skill / agent / skill-guide / skill-guide-intermediate / cowork-guide / harness-engineering)", () => {
     expect(claude && "children" in claude).toBe(true);
     const children = claude && "children" in claude ? claude.children : [];
-    expect(children.length).toBe(5);
+    expect(children.length).toBe(6);
   });
 
   it("uses clean URL paths for all Claude children (no .html extension)", () => {
@@ -85,6 +85,7 @@ describe("Phase A - Claude dropdown shape", () => {
       "/claude/skill-guide",
       "/claude/skill-guide-intermediate",
       "/claude/cowork-guide",
+      "/claude/harness-engineering",
     ];
     expect(children.map((c) => c.href)).toEqual(expectedHrefs);
   });
