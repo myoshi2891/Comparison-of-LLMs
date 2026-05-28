@@ -1203,9 +1203,297 @@ QUARANTINE --> DEADLINE`}
       </section>
 
       <section id="s8" className={styles.sec}>
+        <div className={styles.secNo}>Section 08</div>
         <h2 className={styles.secTitle}>
           <span className={styles.n}>08.</span>CIパイプラインへの組み込み
         </h2>
+
+        <h3>Google Cloud Build の設定例</h3>
+        <div className={styles.codeWrap}>
+          <div className={styles.codeBar}>
+            <div className={styles.dots}>
+              <div className={`${styles.dot} ${styles.red}`} />
+              <div className={`${styles.dot} ${styles.yel}`} />
+              <div className={`${styles.dot} ${styles.grn}`} />
+            </div>
+            <span>cloudbuild.yaml — テストハーネスをCIに統合</span>
+          </div>
+          <pre className={styles.codeBody}>
+            <span className={styles.cc}>{"# cloudbuild.yaml"}</span>
+            {"\n"}
+            <span className={styles.cc}>
+              {"# なぜ Cloud Build を使うか: 隔離されたコンテナ環境を提供し、"}
+            </span>
+            {"\n"}
+            <span className={styles.cc}>{"# ハーミティックなテスト実行を保証するため"}</span>
+            {"\n\n"}
+            {"steps:"}
+            {"\n"}
+            {"  "}
+            <span className={styles.cc}>{"# Step 1: 依存パッケージのインストール"}</span>
+            {"\n"}
+            {"  - "}
+            <span className={styles.ck}>name</span>
+            {": "}
+            <span className={styles.cs}>{"'python:3.12-slim'"}</span>
+            {"\n"}
+            {"    "}
+            <span className={styles.ck}>entrypoint</span>
+            {": pip"}
+            {"\n"}
+            {"    "}
+            <span className={styles.ck}>args</span>
+            {": ["}
+            <span className={styles.cs}>{"'install'"}</span>
+            {", "}
+            <span className={styles.cs}>{"'-r'"}</span>
+            {", "}
+            <span className={styles.cs}>{"'requirements.txt'"}</span>
+            {"]"}
+            {"\n\n"}
+            {"  "}
+            <span className={styles.cc}>
+              {"# Step 2: ユニットテスト（Small テスト）を先に実行"}
+            </span>
+            {"\n"}
+            {"  "}
+            <span className={styles.cc}>
+              {"# なぜ先に実行するか: 失敗時の早期検出でCDを節約するため"}
+            </span>
+            {"\n"}
+            {"  - "}
+            <span className={styles.ck}>name</span>
+            {": "}
+            <span className={styles.cs}>{"'python:3.12-slim'"}</span>
+            {"\n"}
+            {"    "}
+            <span className={styles.ck}>entrypoint</span>
+            {": pytest"}
+            {"\n"}
+            {"    "}
+            <span className={styles.ck}>args</span>
+            {": ["}
+            <span className={styles.cs}>{"'-m'"}</span>
+            {", "}
+            <span className={styles.cs}>{"'small'"}</span>
+            {", "}
+            <span className={styles.cs}>{"'--tb=short'"}</span>
+            {", "}
+            <span className={styles.cs}>{"'-q'"}</span>
+            {"]"}
+            {"\n\n"}
+            {"  "}
+            <span className={styles.cc}>{"# Step 3: 統合テスト（Medium テスト）"}</span>
+            {"\n"}
+            {"  - "}
+            <span className={styles.ck}>name</span>
+            {": "}
+            <span className={styles.cs}>{"'python:3.12-slim'"}</span>
+            {"\n"}
+            {"    "}
+            <span className={styles.ck}>entrypoint</span>
+            {": pytest"}
+            {"\n"}
+            {"    "}
+            <span className={styles.ck}>args</span>
+            {": ["}
+            <span className={styles.cs}>{"'-m'"}</span>
+            {", "}
+            <span className={styles.cs}>{"'medium'"}</span>
+            {", "}
+            <span className={styles.cs}>{"'--tb=short'"}</span>
+            {"]"}
+            {"\n\n"}
+            {"services:"}
+            {"\n"}
+            {"  "}
+            <span className={styles.cc}>
+              {"# テスト専用の一時DBコンテナ（毎回新規作成でハーミティックを保つ）"}
+            </span>
+            {"\n"}
+            {"  - "}
+            <span className={styles.ck}>name</span>
+            {": "}
+            <span className={styles.cs}>{"'postgres:16'"}</span>
+            {"\n"}
+            {"    "}
+            <span className={styles.ck}>env</span>
+            {":"}
+            {"\n"}
+            {"      - "}
+            <span className={styles.cs}>{"'POSTGRES_DB=testdb'"}</span>
+            {"\n"}
+            {"      - "}
+            <span className={styles.cs}>{"'POSTGRES_PASSWORD=testpass'"}</span>
+          </pre>
+        </div>
+
+        <h3>GitHub Actions での例</h3>
+        <div className={styles.codeWrap}>
+          <div className={styles.codeBar}>
+            <div className={styles.dots}>
+              <div className={`${styles.dot} ${styles.red}`} />
+              <div className={`${styles.dot} ${styles.yel}`} />
+              <div className={`${styles.dot} ${styles.grn}`} />
+            </div>
+            <span>.github/workflows/test.yaml</span>
+          </div>
+          <pre className={styles.codeBody}>
+            <span className={styles.ck}>name</span>
+            {": "}
+            <span className={styles.cs}>Harness Test Pipeline</span>
+            {"\n\n"}
+            <span className={styles.ck}>on</span>
+            {": [push, pull_request]"}
+            {"\n\n"}
+            <span className={styles.ck}>jobs</span>
+            {":"}
+            {"\n"}
+            {"  "}
+            <span className={styles.ck}>small-tests</span>
+            {":"}
+            {"\n"}
+            {"    "}
+            <span className={styles.ck}>runs-on</span>
+            {": ubuntu-latest"}
+            {"\n"}
+            {"    "}
+            <span className={styles.ck}>steps</span>
+            {":"}
+            {"\n"}
+            {"      - "}
+            <span className={styles.ck}>uses</span>
+            {": actions/checkout@v4"}
+            {"\n"}
+            {"      - "}
+            <span className={styles.ck}>uses</span>
+            {": actions/setup-python@v5"}
+            {"\n"}
+            {"        "}
+            <span className={styles.ck}>with</span>
+            {": { python-version: "}
+            <span className={styles.cs}>{"'3.12'"}</span>
+            {" }"}
+            {"\n"}
+            {"      - "}
+            <span className={styles.ck}>run</span>
+            {": pip install -r requirements.txt"}
+            {"\n"}
+            {"      - "}
+            <span className={styles.ck}>run</span>
+            {": pytest -m small --cov=src --cov-report=xml"}
+            {"\n\n"}
+            {"  "}
+            <span className={styles.ck}>medium-tests</span>
+            {":"}
+            {"\n"}
+            {"    "}
+            <span className={styles.ck}>runs-on</span>
+            {": ubuntu-latest"}
+            {"\n"}
+            {"    "}
+            <span className={styles.ck}>needs</span>
+            {": small-tests  "}
+            <span className={styles.cc}>{"# Small が通過してから Medium を実行"}</span>
+            {"\n"}
+            {"    "}
+            <span className={styles.ck}>services</span>
+            {":"}
+            {"\n"}
+            {"      "}
+            <span className={styles.ck}>postgres</span>
+            {":"}
+            {"\n"}
+            {"        "}
+            <span className={styles.ck}>image</span>
+            {": postgres:16"}
+            {"\n"}
+            {"        "}
+            <span className={styles.ck}>env</span>
+            {": { POSTGRES_DB: testdb, POSTGRES_PASSWORD: testpass }"}
+            {"\n"}
+            {"    "}
+            <span className={styles.ck}>steps</span>
+            {":"}
+            {"\n"}
+            {"      - "}
+            <span className={styles.ck}>uses</span>
+            {": actions/checkout@v4"}
+            {"\n"}
+            {"      - "}
+            <span className={styles.ck}>uses</span>
+            {": actions/setup-python@v5"}
+            {"\n"}
+            {"        "}
+            <span className={styles.ck}>with</span>
+            {": { python-version: "}
+            <span className={styles.cs}>{"'3.12'"}</span>
+            {" }"}
+            {"\n"}
+            {"      - "}
+            <span className={styles.ck}>run</span>
+            {": pip install -r requirements.txt"}
+            {"\n"}
+            {"      - "}
+            <span className={styles.ck}>run</span>
+            {": pytest -m medium"}
+            {"\n"}
+            {"        "}
+            <span className={styles.ck}>env</span>
+            {": { DB_HOST: localhost }"}
+          </pre>
+        </div>
+
+        <h3>テスト実行時間の最適化戦略</h3>
+        <div className={styles.tblWrap}>
+          <table>
+            <thead>
+              <tr>
+                <th>戦略</th>
+                <th>効果</th>
+                <th>実装方法</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <code>並列実行</code>
+                </td>
+                <td>実行時間を1/N に短縮</td>
+                <td>
+                  <code>pytest-xdist -n auto</code>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>シャーディング</code>
+                </td>
+                <td>大規模テストを複数マシンに分散</td>
+                <td>
+                  <code>--shard-index 0 --num-shards 4</code>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>キャッシング</code>
+                </td>
+                <td>依存インストール時間を省略</td>
+                <td>
+                  GitHub Actions <code>actions/cache</code>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>変更影響テスト</code>
+                </td>
+                <td>変更に関連するテストのみ実行</td>
+                <td>
+                  <code>pytest-testmon</code>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
 
       <section id="s9" className={styles.sec}>
