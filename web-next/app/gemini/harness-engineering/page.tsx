@@ -1497,9 +1497,171 @@ QUARANTINE --> DEADLINE`}
       </section>
 
       <section id="s9" className={styles.sec}>
+        <div className={styles.secNo}>Section 09</div>
         <h2 className={styles.secTitle}>
           <span className={styles.n}>09.</span>AIエージェント評価ハーネス
         </h2>
+
+        <p>
+          通常のソフトウェアは「入力A →
+          出力B」が決定論的に決まります。しかしAIエージェントは確率的です。このため専用のハーネスが必要です。
+        </p>
+
+        <h3>通常テスト vs AI評価ハーネスの違い</h3>
+        <div className={styles.tblWrap}>
+          <table>
+            <thead>
+              <tr>
+                <th>特性</th>
+                <th>通常のソフトウェア</th>
+                <th>AIエージェント</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>出力</td>
+                <td>決定論的（毎回同じ）</td>
+                <td>確率的（毎回異なる可能性）</td>
+              </tr>
+              <tr>
+                <td>テスト手法</td>
+                <td>
+                  <code>assert output == expected</code>
+                </td>
+                <td>スコアリング・LLM-as-Judge</td>
+              </tr>
+              <tr>
+                <td>失敗基準</td>
+                <td>1件でも FAIL = 問題</td>
+                <td>スコアが閾値を下回った = 問題</td>
+              </tr>
+              <tr>
+                <td>評価データ</td>
+                <td>単体テストケース</td>
+                <td>評価セット（eval set）</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>ADK Eval — AIエージェント評価ハーネスの全体フロー</h3>
+        <div className={styles.mermaidWrap}>
+          <div className={styles.mermaidLabel}>ADK Eval フロー</div>
+          <MermaidDiagram
+            chart={`flowchart TD
+EVALSET["評価セット eval_set.json<br />質問・期待ツール呼び出し・期待応答"]
+AGENT["AIエージェント<br />ADK LlmAgent / Gemini / Claude"]
+RESPONSE["エージェント応答<br />実際のツール呼び出し<br />実際のテキスト応答"]
+TOOL_CHECK["ツール呼び出し検証<br />expected vs actual<br />完全一致チェック"]
+LLM_JUDGE["LLM-as-Judge<br />応答品質スコアリング<br />0.0 to 1.0"]
+THRESHOLD["閾値チェック<br />スコア >= 0.8 PASS / FAIL"]
+REPORT["評価レポート<br />Allure / HTML スコア推移"]
+EVALSET --> AGENT
+AGENT --> RESPONSE
+RESPONSE --> TOOL_CHECK
+RESPONSE --> LLM_JUDGE
+TOOL_CHECK --> THRESHOLD
+LLM_JUDGE --> THRESHOLD
+THRESHOLD --> REPORT`}
+          />
+        </div>
+
+        <h3>LLM-as-Judge の実装例</h3>
+        <div className={styles.codeWrap}>
+          <div className={styles.codeBar}>
+            <div className={styles.dots}>
+              <div className={`${styles.dot} ${styles.red}`} />
+              <div className={`${styles.dot} ${styles.yel}`} />
+              <div className={`${styles.dot} ${styles.grn}`} />
+            </div>
+            <span>llm_judge.py — AIがAIを採点するパターン</span>
+          </div>
+          <pre className={styles.codeBody}>
+            <span className={styles.ck}>import</span> anthropic, json{"\n\n"}
+            <span className={styles.ck}>def</span>{" "}
+            <span className={styles.cv}>evaluate_response</span>(question:{" "}
+            <span className={styles.ce}>str</span>, actual_response:{" "}
+            <span className={styles.ce}>str</span>) -&gt; <span className={styles.ce}>float</span>:
+            {"\n"}
+            {"    "}
+            <span className={styles.cs}>
+              {'"""0.0〜1.0のスコアで回答品質を評価する。1.0が最高品質。'}
+            </span>
+            {"\n"}
+            {"    "}
+            <span className={styles.cs}>{"なぜ LLM-as-Judge を使うか:"}</span>
+            {"\n"}
+            {"    "}
+            <span className={styles.cs}>
+              {"AIの出力が「意味的に正しいが文字列が異なる」場合、"}
+            </span>
+            {"\n"}
+            {"    "}
+            <span className={styles.cs}>
+              {'通常の assert では検証できないため、別のLLMに採点させる"""'}
+            </span>
+            {"\n"}
+            {"    "}
+            client = anthropic.Anthropic(){"\n\n"}
+            {"    "}
+            judge_prompt = <span className={styles.cs}>f"""</span>
+            {"\n"}
+            {"    "}
+            <span className={styles.cs}>
+              {"以下の質問に対する回答を0.0〜1.0で採点してください。"}
+            </span>
+            {"\n"}
+            {"    "}
+            <span className={styles.cs}>{"1.0=完全に正確で有用、0.0=全く誤り・有害"}</span>
+            {"\n\n"}
+            {"    "}
+            <span className={styles.cs}>{"質問: {question}"}</span>
+            {"\n"}
+            {"    "}
+            <span className={styles.cs}>{"回答: {actual_response}"}</span>
+            {"\n\n"}
+            {"    "}
+            <span className={styles.cs}>{'JSON形式で {"score": X.X} のみ返してください。'}</span>
+            {"\n"}
+            {"    "}
+            <span className={styles.cs}>"""</span>
+            {"\n\n"}
+            {"    "}
+            message = client.messages.create({"\n"}
+            {"        "}
+            model=<span className={styles.cs}>"claude-sonnet-4-6"</span>,{"\n"}
+            {"        "}
+            max_tokens=<span className={styles.ce}>100</span>,{"\n"}
+            {"        "}
+            messages=[{"{"}
+            <span className={styles.cs}>"role"</span>
+            {": "}
+            <span className={styles.cs}>"user"</span>
+            {", "}
+            <span className={styles.cs}>"content"</span>
+            {": judge_prompt}"}]{"\n"}
+            {"    "}){"\n"}
+            {"    "}
+            result = json.loads(message.content[<span className={styles.ce}>0</span>].text){"\n"}
+            {"    "}
+            <span className={styles.ck}>return</span> result[
+            <span className={styles.cs}>"score"</span>]
+          </pre>
+        </div>
+
+        <div className={styles.vocab}>
+          <div className={styles.vocabHead}>📖 用語集</div>
+          <dl>
+            <dt>ADK Eval</dt>
+            <dd>Google ADKに付属するAIエージェント専用評価フレームワーク</dd>
+            <dt>評価セット</dt>
+            <dd>AIエージェントのテストに使うQ&Aペアのデータセット</dd>
+            <dt>LLM-as-Judge</dt>
+            <dd>AIの出力品質を別のLLMが採点するパターン</dd>
+            <dt>確率的</dt>
+            <dd>同じ入力でも実行のたびに異なる出力が返る性質</dd>
+          </dl>
+        </div>
       </section>
 
       <section id="s10" className={styles.sec}>
