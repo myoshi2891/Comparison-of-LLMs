@@ -626,14 +626,31 @@
         color: var(--text3);
         margin-bottom: 16px;
       }
-      .mermaid {
+      .mermaid,
+      div[id^="diag-"] {
         display: flex;
         justify-content: center;
       }
-      .mermaid svg {
+      .mermaid svg,
+      div[id^="diag-"] svg {
+        display: block;
+        margin: 0 auto;
+        width: 100%;
         max-width: 100%;
         height: auto;
       }
+
+      /* 個別サイズ調整 */
+      #diag-0 svg { max-width: 500px; } /* ハーネスサイクル */
+      #diag-1 svg { max-width: 680px; } /* LLM テスト課題マップ (mindmap) */
+      #diag-2 svg { max-width: 780px; } /* Evalsコンポーネント構成 */
+      #diag-3 svg { max-width: 440px; } /* セットアップ実行改善 */
+      #diag-4 svg { max-width: 660px; } /* 判断木 */
+      #diag-5 svg { max-width: 580px; } /* LLM-as-Judge シーケンス */
+      #diag-6 svg { max-width: 780px; } /* 統合フロー */
+      #diag-7 svg { max-width: 680px; } /* コスト管理戦略 */
+      #diag-8 svg { max-width: 440px; } /* Eval チェーン */
+      #diag-9 svg { max-width: 660px; } /* スコア低下原因特定 */
 
       /* ─── STEP FLOW ─── */
       .step-flow {
@@ -1036,6 +1053,74 @@
       /* ─── MERMAID THEME OVERRIDES ─── */
       .mermaid .label {
         color: #e0e8f4 !important;
+      }
+      /* mindmap (LLM テスト課題マップ) コントラスト改善 */
+      /* ノード背景図形 (rect, path, circle 等) の色調整 */
+      .mermaid g.mindmap-node rect,
+      .mermaid g.mindmap-node path,
+      .mermaid g.mindmap-node circle {
+        fill: #111520 !important;
+        stroke: #10a37f !important;
+        stroke-width: 1.5px !important;
+      }
+      .mermaid g.mindmap-node.depth-0 rect,
+      .mermaid g.mindmap-node.depth-0 path,
+      .mermaid g.mindmap-node.depth-0 circle {
+        fill: #10a37f !important;
+        stroke: #1cd4a4 !important;
+        stroke-width: 2.5px !important;
+      }
+      .mermaid g.mindmap-node.depth-1 rect,
+      .mermaid g.mindmap-node.depth-1 path,
+      .mermaid g.mindmap-node.depth-1 circle {
+        fill: #1c2438 !important;
+        stroke: #3b82f6 !important;
+        stroke-width: 2px !important;
+      }
+      .mermaid g.mindmap-node.depth-2 rect,
+      .mermaid g.mindmap-node.depth-2 path,
+      .mermaid g.mindmap-node.depth-2 circle {
+        fill: #0b0e18 !important;
+        stroke: #5a6e8c !important;
+        stroke-width: 1.5px !important;
+      }
+      /* mindmap の文字色 (SVG text要素と htmlLabels 向けのdiv/span両対応) */
+      .mermaid g.mindmap-node text,
+      .mermaid g.mindmap-node .nodeLabel,
+      .mermaid g.mindmap-node div,
+      .mermaid g.mindmap-node span {
+        fill: #ffffff !important;
+        color: #ffffff !important;
+      }
+      .mermaid g.mindmap-node.depth-0 text,
+      .mermaid g.mindmap-node.depth-0 .nodeLabel,
+      .mermaid g.mindmap-node.depth-0 div,
+      .mermaid g.mindmap-node.depth-0 span {
+        fill: #ffffff !important;
+        color: #ffffff !important;
+        font-weight: 800 !important;
+      }
+      .mermaid g.mindmap-node.depth-1 text,
+      .mermaid g.mindmap-node.depth-1 .nodeLabel,
+      .mermaid g.mindmap-node.depth-1 div,
+      .mermaid g.mindmap-node.depth-1 span {
+        fill: #ffffff !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
+      }
+      .mermaid g.mindmap-node.depth-2 text,
+      .mermaid g.mindmap-node.depth-2 .nodeLabel,
+      .mermaid g.mindmap-node.depth-2 div,
+      .mermaid g.mindmap-node.depth-2 span {
+        fill: #cbd5e1 !important;
+        color: #cbd5e1 !important;
+        font-weight: 500 !important;
+      }
+      /* mindmap の接続線 (edge) */
+      .mermaid path.mindmap-edge,
+      .mermaid path.edge {
+        stroke: #5a6e8c !important;
+        stroke-width: 2.5px !important;
       }
     </style>
   </head>
@@ -2848,13 +2933,13 @@ Q4 --> A4`
             const { svg } = await mermaid.render('svg-' + id, src);
             const el = document.getElementById(id);
             if (el) {
+              el.classList.add('mermaid');
               el.innerHTML = svg;
               const svgEl = el.querySelector('svg');
               if (svgEl) {
                 svgEl.removeAttribute('width');
                 svgEl.removeAttribute('height');
-                svgEl.style.width = 'auto';
-                svgEl.style.maxWidth = '100%';
+                svgEl.style.width = '100%';
                 svgEl.style.height = 'auto';
               }
             }
