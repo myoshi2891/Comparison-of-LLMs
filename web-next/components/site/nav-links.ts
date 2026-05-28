@@ -40,6 +40,7 @@ export const navLinks: readonly NavLink[] = [
       { name: "Skill Guide", href: "/claude/skill-guide" },
       { name: "Skill Guide (中級)", href: "/claude/skill-guide-intermediate" },
       { name: "Cowork Guide", href: "/claude/cowork-guide" },
+      { name: "Harness Engineering", href: "/claude/harness-engineering" },
     ],
   },
   {
