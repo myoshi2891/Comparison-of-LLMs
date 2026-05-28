@@ -37,8 +37,8 @@ const DIAGRAM_2 = `flowchart LR
 
 const DIAGRAM_3 = `flowchart TB
   subgraph FILES["永続化ファイル群（リポジトリ内）"]
-    FL["feature_list.json\\nやることリスト（JSON形式）\\npassing: false→true で更新のみ\\n削除・並び替え禁止"]
-    PR["claude-progress.txt\\n進捗ログ（フリーテキスト）\\n何が終わったか / 発見したバグ\\n次のセッションへの指示"]
+    FL["feature_list.json\\nやることリスト（JSON形式）\\npasses: false→true で更新のみ\\n削除・並び替え禁止"]
+    PR["progress.txt\\n進捗ログ（フリーテキスト）\\n何が終わったか / 発見したバグ\\n次のセッションへの指示"]
     IS["init.sh\\n環境起動スクリプト\\n開発サーバー起動\\n依存パッケージインストール"]
     GH["Git History\\nコミットログ = 変更記録\\n詳細なコミットメッセージ\\nロールバック手段"]
     CM["CLAUDE.md\\nエージェントへの地図\\n（前章参照）"]
@@ -57,7 +57,7 @@ const DIAGRAM_4 = `flowchart TD
   S6["⑥ テスト\\nUI / API を実際に操作して確認\\nユニットテストだけでは不十分"]
   S6 -->|失敗| S5
   S6 -->|成功| S7
-  S7["⑦ 状態更新\\nfeature_list.json: passing → true\\nclaude-progress.txt に記録"] --> S8
+  S7["⑦ 状態更新\\nfeature_list.json: passes → true\\nprogress.txt に記録"] --> S8
   S8["⑧ クリーンな終了\\ngit commit（詳細メッセージ付き）\\nアプリが動作する状態で終える"] --> END
   END(["セッション終了"])`;
 
@@ -105,7 +105,7 @@ const DIAGRAM_8 = `flowchart TD
 const DIAGRAM_9 = `flowchart LR
   G["Generator Agent\\n実装担当"] -->|成果物| E["Evaluator Agent\\n評価担当（批判的）"]
   E -->|スコア + フィードバック| G
-  E -->|全機能 passing| DONE["✅ 完成"]
+  E -->|全機能 passes| DONE["✅ 完成"]
   NOTE["自己評価より Evaluator を分離した方が\\nはるかに正確な品質保証が可能\\nGenerator は自分の仕事を高く評価しすぎる"]`;
 
 export const metadata: Metadata = {
@@ -369,7 +369,7 @@ export default function Page() {
                     fontSize: "0.85rem",
                   }}
                 >
-                  <div style={{ fontWeight: 700, marginBottom: "2px" }}>📝 claude-progress.txt</div>
+                  <div style={{ fontWeight: 700, marginBottom: "2px" }}>📝 progress.txt</div>
                   <div style={{ color: "var(--muted)", fontSize: "0.8rem" }}>
                     進捗を記録するログファイル
                   </div>
@@ -652,7 +652,7 @@ export default function Page() {
                   </div>
                   <div style={{ fontSize: "0.82rem" }}>
                     <strong>Update</strong>
-                    <span style={{ color: "var(--muted)" }}>— passing: true に更新</span>
+                    <span style={{ color: "var(--muted)" }}>— passes: true に更新</span>
                   </div>
                 </div>
                 <div
@@ -867,7 +867,7 @@ export default function Page() {
               <span className={styles.cv}>feature_list.json</span>
               {"\n"}
               <span className={styles.cs}>- 進捗ログ:</span> {"   "}
-              <span className={styles.cv}>claude-progress.txt</span>
+              <span className={styles.cv}>progress.txt</span>
               {"\n"}
               <span className={styles.cs}>- ADR:</span> {"        "}
               <span className={styles.cv}>docs/adr/</span>
@@ -880,7 +880,7 @@ export default function Page() {
               {"\n"}
               <span className={styles.cs}>- lint 設定ファイルを変更しない</span>
               {"\n"}
-              <span className={styles.cs}>- テストなしで機能を passing にマークしない</span>
+              <span className={styles.cs}>- テストなしで機能を passes にマークしない</span>
               {"\n\n"}
               <span className={styles.ck}>## Deeper Docs（詳細はここ）</span>
               {"\n"}
@@ -994,7 +994,7 @@ export default function Page() {
               </tr>
               <tr>
                 <td>
-                  <strong>claude-progress.txt</strong>
+                  <strong>progress.txt</strong>
                 </td>
                 <td>自由テキスト</td>
                 <td>セッション間の引き継ぎ</td>
@@ -1043,7 +1043,7 @@ export default function Page() {
             <div className={styles.stepBody}>
               <h3>Orient（状況把握）</h3>
               <p>
-                セッション開始直後に <code>claude-progress.txt</code> と{" "}
+                セッション開始直後に <code>progress.txt</code> と{" "}
                 <code>git log --oneline -20</code>{" "}
                 を読む。前のセッションで何が行われたかを把握する。
               </p>
@@ -1105,7 +1105,7 @@ export default function Page() {
               <h3>状態更新</h3>
               <p>
                 <code>feature_list.json</code> の対象機能を <code>passes: true</code> に変更。
-                <code>claude-progress.txt</code> に今回の成果・発見・次への指示を記録する。
+                <code>progress.txt</code> に今回の成果・発見・次への指示を記録する。
               </p>
             </div>
           </div>
@@ -1369,9 +1369,9 @@ export default function Page() {
                 <td>
                   <strong>テストなし完了マーク</strong>
                 </td>
-                <td>動作未確認のまま passing にする</td>
+                <td>動作未確認のまま passes: true にする</td>
                 <td>feature_list.json に検証ステップを明記</td>
-                <td>E2E テストで実際の UI を確認後のみ passing に変更</td>
+                <td>E2E テストで実際の UI を確認後のみ passes: true に変更</td>
               </tr>
               <tr>
                 <td>
@@ -1824,7 +1824,7 @@ export default function Page() {
               ├── <span className={styles.ck}>feature_list.json</span>{" "}
               <span className={styles.cc}>&larr; やることリスト（JSON形式）</span>
               {"\n"}
-              ├── <span className={styles.ck}>claude-progress.txt</span>{" "}
+              ├── <span className={styles.ck}>progress.txt</span>{" "}
               <span className={styles.cc}>&larr; 進捗ログ</span>
               {"\n"}
               ├── <span className={styles.ck}>init.sh</span>{" "}
