@@ -405,7 +405,256 @@ ASSERT --> REPORTER`}
       </section>
 
       <section id="s4" className={styles.sec}>
-        <h2 className={styles.secTitle}><span className={styles.n}>04.</span>テストダブル — 替え玉の4種類</h2>
+        <div className={styles.secNo}>Section 04</div>
+        <h2 className={styles.secTitle}>
+          <span className={styles.n}>04.</span>テストダブル — 替え玉の4種類
+        </h2>
+
+        <div className={`${styles.callout} ${styles.cNote}`}>
+          <span className={styles.ci}>🎬</span>
+          <div>
+            <strong>日常の例え話 — スタントマン</strong>
+            <br />
+            映画のスタントマンは主役俳優の代わりに危険なシーンをこなします。「似た外見・特定のシーンだけ動く」という点がテストダブルと共通しています。
+            本物（外部DB・外部API）の代わりにテスト専用の替え玉を使うことで、テストを速く・安全・再現可能にします。
+          </div>
+        </div>
+
+        <h3>4種類の比較表</h3>
+        <div className={styles.tblWrap}>
+          <table>
+            <thead>
+              <tr>
+                <th>種類</th>
+                <th>日本語名</th>
+                <th>動作</th>
+                <th>いつ使うか</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <code>Stub</code>
+                </td>
+                <td>スタブ</td>
+                <td>固定値を返すだけ</td>
+                <td>「値が返ってくればいい」場合</td>
+              </tr>
+              <tr>
+                <td>
+                  <code>Mock</code>
+                </td>
+                <td>モック</td>
+                <td>呼び出しを記録・検証する</td>
+                <td>「このメソッドが呼ばれたか確認したい」場合</td>
+              </tr>
+              <tr>
+                <td>
+                  <code>Fake</code>
+                </td>
+                <td>フェイク</td>
+                <td>本物に近いが軽量な実装</td>
+                <td>DBの代わりにメモリ上で動く実装</td>
+              </tr>
+              <tr>
+                <td>
+                  <code>Spy</code>
+                </td>
+                <td>スパイ</td>
+                <td>本物を使いつつ呼び出しを記録</td>
+                <td>既存コードを変更せず動作を監視したい場合</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Stub（スタブ）の実装例</h3>
+        <div className={styles.codeWrap}>
+          <div className={styles.codeBar}>
+            <div className={styles.dots}>
+              <div className={styles.dot} style={{ background: "#ea4335" }} />
+              <div className={styles.dot} style={{ background: "#fbbc04" }} />
+              <div className={styles.dot} style={{ background: "#34a853" }} />
+            </div>
+            <span>stub_example.py — 固定値を返すだけの替え玉</span>
+          </div>
+          <pre className={styles.codeBody}>
+            <span className={styles.cc}># なぜスタブを使うか:</span>
+            {"\n"}
+            <span className={styles.cc}># 本物の天気APIを呼ぶと「ネットワーク障害」「APIキー切れ」でテストが落ちるため</span>
+            {"\n"}
+            <span className={styles.cc}># 替え玉を使ってテスト対象コードの判断ロジックのみをテストする</span>
+            {"\n\n"}
+            <span className={styles.ck}>class</span> <span className={styles.cv}>StubWeatherApi</span>:
+            {"\n"}
+            {"    "}
+            <span className={styles.cs}>&quot;&quot;&quot;本物のWeatherApiの替え玉。常に晴れを返す。&quot;&quot;&quot;</span>
+            {"\n"}
+            {"    "}
+            <span className={styles.ck}>def</span> <span className={styles.cv}>get_weather</span>(self, city: <span className={styles.ce}>str</span>) -&gt; <span className={styles.ce}>str</span>:
+            {"\n"}
+            {"        "}
+            <span className={styles.ck}>return</span> <span className={styles.cs}>&quot;sunny&quot;</span>{"  "}
+            <span className={styles.cc}># 固定値を返すだけ。ネットワーク接続なし</span>
+            {"\n\n"}
+            <span className={styles.ck}>def</span> <span className={styles.cv}>test_suggest_activity_when_sunny</span>():
+            {"\n"}
+            {"    "}
+            stub_api = <span className={styles.cv}>StubWeatherApi</span>()
+            {"\n"}
+            {"    "}
+            service = <span className={styles.cv}>ActivitySuggester</span>(weather_api=stub_api){"  "}
+            <span className={styles.cc}># DI で注入</span>
+            {"\n"}
+            {"    "}
+            suggestion = service.suggest(city=<span className={styles.cs}>&quot;Tokyo&quot;</span>)
+            {"\n"}
+            {"    "}
+            <span className={styles.ck}>assert</span> suggestion == <span className={styles.cs}>&quot;Let&apos;s go outside!&quot;</span>
+          </pre>
+        </div>
+
+        <h3>Mock（モック）の実装例</h3>
+        <div className={styles.codeWrap}>
+          <div className={styles.codeBar}>
+            <div className={styles.dots}>
+              <div className={styles.dot} style={{ background: "#ea4335" }} />
+              <div className={styles.dot} style={{ background: "#fbbc04" }} />
+              <div className={styles.dot} style={{ background: "#34a853" }} />
+            </div>
+            <span>mock_example.py — 呼び出しを記録して検証する替え玉</span>
+          </div>
+          <pre className={styles.codeBody}>
+            <span className={styles.ck}>from</span> unittest.mock <span className={styles.ck}>import</span> <span className={styles.cv}>MagicMock</span>
+            {"\n\n"}
+            <span className={styles.ck}>def</span> <span className={styles.cv}>test_email_sent_on_registration</span>():
+            {"\n"}
+            {"    "}
+            <span className={styles.cc}># なぜモックを使うか: 本物のメールが送信されると受信ボックスが汚れるため</span>
+            {"\n"}
+            {"    "}
+            mock_mailer = <span className={styles.cv}>MagicMock</span>()
+            {"\n"}
+            {"    "}
+            service = <span className={styles.cv}>UserService</span>(mailer=mock_mailer)
+            {"\n\n"}
+            {"    "}
+            service.register(email=<span className={styles.cs}>&quot;user@example.com&quot;</span>)
+            {"\n\n"}
+            {"    "}
+            <span className={styles.cc}># 「send_email が1回・正しい引数で呼ばれたか」を検証する</span>
+            {"\n"}
+            {"    "}
+            mock_mailer.send_email.assert_called_once_with(
+            {"\n"}
+            {"        "}
+            to=<span className={styles.cs}>&quot;user@example.com&quot;</span>,
+            {"\n"}
+            {"        "}
+            subject=<span className={styles.cs}>&quot;Welcome!&quot;</span>
+            {"\n"}
+            {"    "})
+          </pre>
+        </div>
+
+        <h3>Fake（フェイク）の実装例</h3>
+        <div className={styles.codeWrap}>
+          <div className={styles.codeBar}>
+            <div className={styles.dots}>
+              <div className={styles.dot} style={{ background: "#ea4335" }} />
+              <div className={styles.dot} style={{ background: "#fbbc04" }} />
+              <div className={styles.dot} style={{ background: "#34a853" }} />
+            </div>
+            <span>fake_example.py — 実際に動くが軽量なインメモリDB</span>
+          </div>
+          <pre className={styles.codeBody}>
+            <span className={styles.ck}>class</span> <span className={styles.cv}>FakeUserRepository</span>:
+            {"\n"}
+            {"    "}
+            <span className={styles.cs}>&quot;&quot;&quot;本物のPostgreSQLの代わりに辞書で動くインメモリDB&quot;&quot;&quot;</span>
+            {"\n\n"}
+            {"    "}
+            <span className={styles.ck}>def</span> <span className={styles.cv}>__init__</span>(self):
+            {"\n"}
+            {"        "}
+            <span className={styles.cc}># メモリ上の辞書でデータを管理。DBなし・ネットワークなし</span>
+            {"\n"}
+            {"        "}
+            self._store: <span className={styles.ce}>dict</span>[<span className={styles.ce}>str</span>, <span className={styles.cv}>User</span>] = {"{}"}
+            {"\n\n"}
+            {"    "}
+            <span className={styles.ck}>def</span> <span className={styles.cv}>save</span>(self, user: <span className={styles.cv}>User</span>) -&gt; <span className={styles.ce}>None</span>:
+            {"\n"}
+            {"        "}
+            self._store[user.id] = user{"  "}
+            <span className={styles.cc}># 辞書に保存するだけ</span>
+            {"\n\n"}
+            {"    "}
+            <span className={styles.ck}>def</span> <span className={styles.cv}>find_by_id</span>(self, user_id: <span className={styles.ce}>str</span>) -&gt; <span className={styles.cv}>User</span> | <span className={styles.ck}>None</span>:
+            {"\n"}
+            {"        "}
+            <span className={styles.ck}>return</span> self._store.get(user_id)
+            {"\n\n"}
+            <span className={styles.ck}>def</span> <span className={styles.cv}>test_update_user_email</span>():
+            {"\n"}
+            {"    "}
+            fake_repo = <span className={styles.cv}>FakeUserRepository</span>()
+            {"\n"}
+            {"    "}
+            service = <span className={styles.cv}>UserService</span>(repo=fake_repo)
+            {"\n"}
+            {"    "}
+            user = service.create_user(name=<span className={styles.cs}>&quot;Alice&quot;</span>)
+            {"\n"}
+            {"    "}
+            service.update_email(user.id, new_email=<span className={styles.cs}>&quot;new@example.com&quot;</span>)
+            {"\n"}
+            {"    "}
+            saved = fake_repo.find_by_id(user.id)
+            {"\n"}
+            {"    "}
+            <span className={styles.ck}>assert</span> saved.email == <span className={styles.cs}>&quot;new@example.com&quot;</span>
+          </pre>
+        </div>
+
+        <h3>どのテストダブルを選ぶか — 選択フロー</h3>
+        <div className={styles.mermaidWrap}>
+          <div className={styles.mermaidLabel}>テストダブル選択フロー</div>
+          <MermaidDiagram
+            chart={`flowchart TD
+START["外部依存が存在する"]
+Q1{"呼ばれたこと自体を<br />検証したいか"}
+Q2{"実際に動くロジックが<br />必要か"}
+Q3{"本物のコードを<br />変更できるか"}
+MOCK["Mock を使う<br />呼び出しを記録・検証"]
+FAKE["Fake を使う<br />軽量な本物実装"]
+SPY["Spy を使う<br />本物のまま監視"]
+STUB["Stub を使う<br />固定値を返す"]
+START --> Q1
+Q1 -->|Yes| MOCK
+Q1 -->|No| Q2
+Q2 -->|Yes| FAKE
+Q2 -->|No| Q3
+Q3 -->|No| SPY
+Q3 -->|Yes| STUB`}
+          />
+        </div>
+
+        <div className={styles.vocab}>
+          <div className={styles.vocabHead}>📖 用語集</div>
+          <dl>
+            <dt>テストダブル</dt>
+            <dd>テスト用に本物の依存コンポーネントの代わりに使う替え玉の総称</dd>
+            <dt>スタブ</dt>
+            <dd>固定値を返すだけのシンプルな替え玉</dd>
+            <dt>モック</dt>
+            <dd>呼び出しを記録して後から検証できる替え玉</dd>
+            <dt>フェイク</dt>
+            <dd>実際に動作するが軽量な代替実装（インメモリDBなど）</dd>
+            <dt>DI</dt>
+            <dd>Dependency Injection。依存するオブジェクトを外から注入する設計パターン</dd>
+          </dl>
+        </div>
       </section>
 
       <section id="s5" className={styles.sec}>
