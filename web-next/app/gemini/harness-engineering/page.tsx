@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import styles from "./page.module.css";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import styles from "./page.module.css";
 
 export const metadata: Metadata = {
   title: "Google ハーネスエンジニアリング 完全ガイド",
-  description: "Googleが実践するテストハーネス設計の技術とベストプラクティスを解説する完全ガイドです。",
+  description:
+    "Googleが実践するテストハーネス設計の技術とベストプラクティスを解説する完全ガイドです。",
 };
 
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
@@ -54,7 +55,9 @@ export default function GeminiHarnessEngineeringPage() {
         </h2>
 
         <p>
-          <strong>テストハーネス</strong>（Test Harness）とは、テスト対象のコードを「安全かつ再現可能な環境」で動かすための<strong>足場（スキャフォールディング）</strong>のことです。
+          <strong>テストハーネス</strong>（Test
+          Harness）とは、テスト対象のコードを「安全かつ再現可能な環境」で動かすための
+          <strong>足場（スキャフォールディング）</strong>のことです。
         </p>
 
         <div className={`${styles.callout} ${styles.cNote}`}>
@@ -69,7 +72,8 @@ export default function GeminiHarnessEngineeringPage() {
 
         <h3>なぜ Google がハーネスエンジニアリングを重視するのか</h3>
         <p>
-          Googleは1日に<strong>数億行のコード変更</strong>と<strong>数十億件のテスト</strong>を実行します。この規模で「テストが適当」だと以下の問題が発生します。
+          Googleは1日に<strong>数億行のコード変更</strong>と<strong>数十億件のテスト</strong>
+          を実行します。この規模で「テストが適当」だと以下の問題が発生します。
         </p>
 
         <div className={styles.tblWrap}>
@@ -166,7 +170,8 @@ G --> H`}
         </h2>
 
         <p>
-          <strong>テストピラミッド</strong>（Testing Pyramid）は「テストの種類ごとの理想的な量の比率」を表す考え方です。下（細かい粒度）ほど多く・上（粗い粒度）ほど少なくという形になります。
+          <strong>テストピラミッド</strong>（Testing
+          Pyramid）は「テストの種類ごとの理想的な量の比率」を表す考え方です。下（細かい粒度）ほど多く・上（粗い粒度）ほど少なくという形になります。
         </p>
 
         <div className={`${styles.callout} ${styles.cNote}`}>
@@ -269,7 +274,8 @@ INT --> UNIT`}
             <strong>逆ピラミッド（Ice-cream Cone）アンチパターン</strong>
             <br />
             E2Eテストが多すぎると「CI実行時間が時間単位になる」「失敗原因がコードかインフラか分からない」という問題が発生します。GoogleはE2Eテストを増やす前に「
-            <strong>このテストをユニットテストで代替できないか</strong>」を必ず問い直すことを推奨しています。
+            <strong>このテストをユニットテストで代替できないか</strong>
+            」を必ず問い直すことを推奨しています。
           </div>
         </div>
 
@@ -323,7 +329,8 @@ ASSERT --> REPORTER`}
             <div className={styles.cardNum}>02</div>
             <h4 className={styles.cardTitle}>フィクスチャ</h4>
             <p className={styles.cardDesc}>
-              テスト実行前後の「部屋の掃除」担当。setUp でDB用意、tearDown でDB破棄を自動実行します。
+              テスト実行前後の「部屋の掃除」担当。setUp でDB用意、tearDown
+              でDB破棄を自動実行します。
             </p>
             <span className={`${styles.tag} ${styles.tagG}`}>setUp / tearDown</span>
           </div>
@@ -331,7 +338,8 @@ ASSERT --> REPORTER`}
             <div className={styles.cardNum}>03</div>
             <h4 className={styles.cardTitle}>テストダブル</h4>
             <p className={styles.cardDesc}>
-              本物の依存コンポーネントの「替え玉」。Mock・Stub・Fake・Spy の4種類があります（次章で詳述）。
+              本物の依存コンポーネントの「替え玉」。Mock・Stub・Fake・Spy
+              の4種類があります（次章で詳述）。
             </p>
             <span className={`${styles.tag} ${styles.tagY}`}>Mock / Stub / Fake / Spy</span>
           </div>
@@ -481,36 +489,48 @@ ASSERT --> REPORTER`}
           <pre className={styles.codeBody}>
             <span className={styles.cc}># なぜスタブを使うか:</span>
             {"\n"}
-            <span className={styles.cc}># 本物の天気APIを呼ぶと「ネットワーク障害」「APIキー切れ」でテストが落ちるため</span>
+            <span className={styles.cc}>
+              # 本物の天気APIを呼ぶと「ネットワーク障害」「APIキー切れ」でテストが落ちるため
+            </span>
             {"\n"}
-            <span className={styles.cc}># 替え玉を使ってテスト対象コードの判断ロジックのみをテストする</span>
+            <span className={styles.cc}>
+              # 替え玉を使ってテスト対象コードの判断ロジックのみをテストする
+            </span>
             {"\n\n"}
-            <span className={styles.ck}>class</span> <span className={styles.cv}>StubWeatherApi</span>:
+            <span className={styles.ck}>class</span>{" "}
+            <span className={styles.cv}>StubWeatherApi</span>:{"\n"}
+            {"    "}
+            <span className={styles.cs}>
+              &quot;&quot;&quot;本物のWeatherApiの替え玉。常に晴れを返す。&quot;&quot;&quot;
+            </span>
             {"\n"}
             {"    "}
-            <span className={styles.cs}>&quot;&quot;&quot;本物のWeatherApiの替え玉。常に晴れを返す。&quot;&quot;&quot;</span>
-            {"\n"}
-            {"    "}
-            <span className={styles.ck}>def</span> <span className={styles.cv}>get_weather</span>(self, city: <span className={styles.ce}>str</span>) -&gt; <span className={styles.ce}>str</span>:
-            {"\n"}
+            <span className={styles.ck}>def</span> <span className={styles.cv}>get_weather</span>
+            (self, city: <span className={styles.ce}>str</span>) -&gt;{" "}
+            <span className={styles.ce}>str</span>:{"\n"}
             {"        "}
-            <span className={styles.ck}>return</span> <span className={styles.cs}>&quot;sunny&quot;</span>{"  "}
+            <span className={styles.ck}>return</span>{" "}
+            <span className={styles.cs}>&quot;sunny&quot;</span>
+            {"  "}
             <span className={styles.cc}># 固定値を返すだけ。ネットワーク接続なし</span>
             {"\n\n"}
-            <span className={styles.ck}>def</span> <span className={styles.cv}>test_suggest_activity_when_sunny</span>():
+            <span className={styles.ck}>def</span>{" "}
+            <span className={styles.cv}>test_suggest_activity_when_sunny</span>():
             {"\n"}
             {"    "}
             stub_api = <span className={styles.cv}>StubWeatherApi</span>()
             {"\n"}
             {"    "}
-            service = <span className={styles.cv}>ActivitySuggester</span>(weather_api=stub_api){"  "}
+            service = <span className={styles.cv}>ActivitySuggester</span>(weather_api=stub_api)
+            {"  "}
             <span className={styles.cc}># DI で注入</span>
             {"\n"}
             {"    "}
             suggestion = service.suggest(city=<span className={styles.cs}>&quot;Tokyo&quot;</span>)
             {"\n"}
             {"    "}
-            <span className={styles.ck}>assert</span> suggestion == <span className={styles.cs}>&quot;Let&apos;s go outside!&quot;</span>
+            <span className={styles.ck}>assert</span> suggestion =={" "}
+            <span className={styles.cs}>&quot;Let&apos;s go outside!&quot;</span>
           </pre>
         </div>
 
@@ -525,12 +545,16 @@ ASSERT --> REPORTER`}
             <span>mock_example.py — 呼び出しを記録して検証する替え玉</span>
           </div>
           <pre className={styles.codeBody}>
-            <span className={styles.ck}>from</span> unittest.mock <span className={styles.ck}>import</span> <span className={styles.cv}>MagicMock</span>
+            <span className={styles.ck}>from</span> unittest.mock{" "}
+            <span className={styles.ck}>import</span> <span className={styles.cv}>MagicMock</span>
             {"\n\n"}
-            <span className={styles.ck}>def</span> <span className={styles.cv}>test_email_sent_on_registration</span>():
+            <span className={styles.ck}>def</span>{" "}
+            <span className={styles.cv}>test_email_sent_on_registration</span>():
             {"\n"}
             {"    "}
-            <span className={styles.cc}># なぜモックを使うか: 本物のメールが送信されると受信ボックスが汚れるため</span>
+            <span className={styles.cc}>
+              # なぜモックを使うか: 本物のメールが送信されると受信ボックスが汚れるため
+            </span>
             {"\n"}
             {"    "}
             mock_mailer = <span className={styles.cv}>MagicMock</span>()
@@ -542,14 +566,15 @@ ASSERT --> REPORTER`}
             service.register(email=<span className={styles.cs}>&quot;user@example.com&quot;</span>)
             {"\n\n"}
             {"    "}
-            <span className={styles.cc}># 「send_email が1回・正しい引数で呼ばれたか」を検証する</span>
+            <span className={styles.cc}>
+              # 「send_email が1回・正しい引数で呼ばれたか」を検証する
+            </span>
             {"\n"}
             {"    "}
             mock_mailer.send_email.assert_called_once_with(
             {"\n"}
             {"        "}
-            to=<span className={styles.cs}>&quot;user@example.com&quot;</span>,
-            {"\n"}
+            to=<span className={styles.cs}>&quot;user@example.com&quot;</span>,{"\n"}
             {"        "}
             subject=<span className={styles.cs}>&quot;Welcome!&quot;</span>
             {"\n"}
@@ -568,34 +593,44 @@ ASSERT --> REPORTER`}
             <span>fake_example.py — 実際に動くが軽量なインメモリDB</span>
           </div>
           <pre className={styles.codeBody}>
-            <span className={styles.ck}>class</span> <span className={styles.cv}>FakeUserRepository</span>:
-            {"\n"}
+            <span className={styles.ck}>class</span>{" "}
+            <span className={styles.cv}>FakeUserRepository</span>:{"\n"}
             {"    "}
-            <span className={styles.cs}>&quot;&quot;&quot;本物のPostgreSQLの代わりに辞書で動くインメモリDB&quot;&quot;&quot;</span>
+            <span className={styles.cs}>
+              &quot;&quot;&quot;本物のPostgreSQLの代わりに辞書で動くインメモリDB&quot;&quot;&quot;
+            </span>
             {"\n\n"}
             {"    "}
-            <span className={styles.ck}>def</span> <span className={styles.cv}>__init__</span>(self):
+            <span className={styles.ck}>def</span> <span className={styles.cv}>__init__</span>
+            (self):
             {"\n"}
             {"        "}
-            <span className={styles.cc}># メモリ上の辞書でデータを管理。DBなし・ネットワークなし</span>
+            <span className={styles.cc}>
+              # メモリ上の辞書でデータを管理。DBなし・ネットワークなし
+            </span>
             {"\n"}
             {"        "}
-            self._store: <span className={styles.ce}>dict</span>[<span className={styles.ce}>str</span>, <span className={styles.cv}>User</span>] = {"{}"}
+            self._store: <span className={styles.ce}>dict</span>[
+            <span className={styles.ce}>str</span>, <span className={styles.cv}>User</span>] ={" "}
+            {"{}"}
             {"\n\n"}
             {"    "}
-            <span className={styles.ck}>def</span> <span className={styles.cv}>save</span>(self, user: <span className={styles.cv}>User</span>) -&gt; <span className={styles.ce}>None</span>:
-            {"\n"}
+            <span className={styles.ck}>def</span> <span className={styles.cv}>save</span>(self,
+            user: <span className={styles.cv}>User</span>) -&gt;{" "}
+            <span className={styles.ce}>None</span>:{"\n"}
             {"        "}
             self._store[user.id] = user{"  "}
             <span className={styles.cc}># 辞書に保存するだけ</span>
             {"\n\n"}
             {"    "}
-            <span className={styles.ck}>def</span> <span className={styles.cv}>find_by_id</span>(self, user_id: <span className={styles.ce}>str</span>) -&gt; <span className={styles.cv}>User</span> | <span className={styles.ck}>None</span>:
-            {"\n"}
+            <span className={styles.ck}>def</span> <span className={styles.cv}>find_by_id</span>
+            (self, user_id: <span className={styles.ce}>str</span>) -&gt;{" "}
+            <span className={styles.cv}>User</span> | <span className={styles.ck}>None</span>:{"\n"}
             {"        "}
             <span className={styles.ck}>return</span> self._store.get(user_id)
             {"\n\n"}
-            <span className={styles.ck}>def</span> <span className={styles.cv}>test_update_user_email</span>():
+            <span className={styles.ck}>def</span>{" "}
+            <span className={styles.cv}>test_update_user_email</span>():
             {"\n"}
             {"    "}
             fake_repo = <span className={styles.cv}>FakeUserRepository</span>()
@@ -607,13 +642,14 @@ ASSERT --> REPORTER`}
             user = service.create_user(name=<span className={styles.cs}>&quot;Alice&quot;</span>)
             {"\n"}
             {"    "}
-            service.update_email(user.id, new_email=<span className={styles.cs}>&quot;new@example.com&quot;</span>)
-            {"\n"}
+            service.update_email(user.id, new_email=
+            <span className={styles.cs}>&quot;new@example.com&quot;</span>){"\n"}
             {"    "}
             saved = fake_repo.find_by_id(user.id)
             {"\n"}
             {"    "}
-            <span className={styles.ck}>assert</span> saved.email == <span className={styles.cs}>&quot;new@example.com&quot;</span>
+            <span className={styles.ck}>assert</span> saved.email =={" "}
+            <span className={styles.cs}>&quot;new@example.com&quot;</span>
           </pre>
         </div>
 
@@ -747,27 +783,350 @@ AP4 --> FIX4`}
       </section>
 
       <section id="s6" className={styles.sec}>
-        <h2 className={styles.secTitle}><span className={styles.n}>06.</span>ステップバイステップ実装ガイド</h2>
+        <div className={styles.secNo}>Section 06</div>
+        <h2 className={styles.secTitle}>
+          <span className={styles.n}>06.</span>ステップバイステップ実装ガイド
+        </h2>
+
+        <div className={styles.mermaidWrap}>
+          <div className={styles.mermaidLabel}>実装ステップ全体フロー</div>
+          <MermaidDiagram
+            chart={`flowchart TD
+S1["Step 1<br />プロダクションコードの設計<br />DIパターンで依存を注入可能にする"]
+S2["Step 2<br />テストダブルの実装<br />Fake / Stub / Mock を作る"]
+S3["Step 3<br />フィクスチャの設定<br />setUp / tearDown を定義する"]
+S4["Step 4<br />テストケースの実装<br />AAAパターンで書く"]
+S5["Step 5<br />CIパイプラインへの統合<br />GitHub Actions / Cloud Build"]
+S1 --> S2
+S2 --> S3
+S3 --> S4
+S4 --> S5`}
+          />
+        </div>
+
+        <h3>Step 1 — DI（依存性注入）設計</h3>
+        <p>
+          <strong>DI（Dependency Injection）</strong>
+          とは「必要な道具を外から渡してもらう」設計です。テスト時に本物の依存を替え玉に差し替えるために必須です。
+        </p>
+
+        <div className={styles.cmp}>
+          <div className={styles.cmpNg}>
+            <div className={styles.cmpLabel}>❌ DIなし（テスト不可能）</div>
+            <div className={styles.codeWrap} style={{ margin: 0 }}>
+              <pre className={styles.codeBody}>
+                <span className={styles.ck}>class</span>{" "}
+                <span className={styles.cv}>UserService</span>:{"\n"}
+                {"  "}
+                <span className={styles.ck}>def</span> <span className={styles.cv}>__init__</span>
+                (self):
+                {"\n"}
+                {"    "}
+                <span className={styles.cc}># ハードコード。替え玉を差し込めない</span>
+                {"\n"}
+                {"    "}
+                self._db = <span className={styles.cv}>PostgreSQLDatabase</span>({"\n"}
+                {"      "}
+                host=<span className={styles.cs}>&quot;prod.db.example.com&quot;</span>
+                {"\n"}
+                {"    "})
+              </pre>
+            </div>
+          </div>
+          <div className={styles.cmpOk}>
+            <div className={styles.cmpLabel}>✅ DIあり（テスト可能）</div>
+            <div className={styles.codeWrap} style={{ margin: 0 }}>
+              <pre className={styles.codeBody}>
+                <span className={styles.ck}>class</span>{" "}
+                <span className={styles.cv}>UserService</span>:{"\n"}
+                {"  "}
+                <span className={styles.ck}>def</span> <span className={styles.cv}>__init__</span>
+                (self, repo: <span className={styles.cv}>UserRepository</span>):
+                {"\n"}
+                {"    "}
+                <span className={styles.cc}># 外から渡してもらう</span>
+                {"\n"}
+                {"    "}
+                <span className={styles.cc}># 本番=PostgreSQL / テスト=Fake</span>
+                {"\n"}
+                {"    "}
+                self._repo = repo
+              </pre>
+            </div>
+          </div>
+        </div>
+
+        <h3>Step 2 — フィクスチャの設定（pytest）</h3>
+        <div className={styles.codeWrap}>
+          <div className={styles.codeBar}>
+            <div className={styles.dots}>
+              <div className={styles.dot} style={{ background: "#ea4335" }} />
+              <div className={styles.dot} style={{ background: "#fbbc04" }} />
+              <div className={styles.dot} style={{ background: "#34a853" }} />
+            </div>
+            <span>conftest.py — pytest フィクスチャ定義</span>
+          </div>
+          <pre className={styles.codeBody}>
+            <span className={styles.ck}>import</span> pytest
+            {"\n\n"}
+            <span className={styles.cv}>@pytest.fixture</span>
+            {"\n"}
+            <span className={styles.ck}>def</span> <span className={styles.cv}>fake_repo</span>():
+            {"\n"}
+            {"    "}
+            <span className={styles.cs}>
+              &quot;&quot;&quot;各テスト関数に渡されるクリーンなフェイクリポジトリ。
+            </span>
+            {"\n"}
+            {"    "}
+            <span className={styles.cs}>
+              なぜfixture を使うか: 毎回 FakeUserRepository() を書く手間を省き、
+            </span>
+            {"\n"}
+            {"    "}
+            <span className={styles.cs}>
+              さらに各テストが必ず独立したインスタンスを使うことを保証するため。&quot;&quot;&quot;
+            </span>
+            {"\n"}
+            {"    "}
+            <span className={styles.ck}>return</span>{" "}
+            <span className={styles.cv}>FakeUserRepository</span>()
+            {"\n\n"}
+            <span className={styles.cv}>@pytest.fixture</span>
+            {"\n"}
+            <span className={styles.ck}>def</span> <span className={styles.cv}>user_service</span>
+            (fake_repo):
+            {"\n"}
+            {"    "}
+            <span className={styles.cs}>
+              &quot;&quot;&quot;依存関係を注入済みのサービスインスタンスを返す。&quot;&quot;&quot;
+            </span>
+            {"\n"}
+            {"    "}
+            <span className={styles.ck}>return</span> <span className={styles.cv}>UserService</span>
+            (repo=fake_repo)
+          </pre>
+        </div>
+
+        <h3>Step 3 — AAAパターンでテストを書く</h3>
+        <p>
+          <strong>AAAパターン</strong>
+          （Arrange-Act-Assert）とは「準備→実行→検証」の3段構成でテストを書くGoogleの標準スタイルです。
+        </p>
+
+        <div className={styles.codeWrap}>
+          <div className={styles.codeBar}>
+            <div className={styles.dots}>
+              <div className={styles.dot} style={{ background: "#ea4335" }} />
+              <div className={styles.dot} style={{ background: "#fbbc04" }} />
+              <div className={styles.dot} style={{ background: "#34a853" }} />
+            </div>
+            <span>test_user_service.py — AAAパターンによるテスト</span>
+          </div>
+          <pre className={styles.codeBody}>
+            <span className={styles.ck}>def</span>{" "}
+            <span className={styles.cv}>test_register_user_saves_to_repository</span>(user_service,
+            fake_repo):
+            {"\n"}
+            {"    "}
+            <span className={styles.cc}>
+              # ── Arrange（準備）: テストに必要なデータを用意する ──
+            </span>
+            {"\n"}
+            {"    "}
+            user_data = {"{"}
+            <span className={styles.cs}>&quot;name&quot;</span>:{" "}
+            <span className={styles.cs}>&quot;Alice&quot;</span>,{" "}
+            <span className={styles.cs}>&quot;email&quot;</span>:{" "}
+            <span className={styles.cs}>&quot;alice@example.com&quot;</span>
+            {"}"}
+            {"\n\n"}
+            {"    "}
+            <span className={styles.cc}># ── Act（実行）: テスト対象のコードを1つだけ呼ぶ ──</span>
+            {"\n"}
+            {"    "}
+            <span className={styles.cc}>
+              # なぜ1つだけか: 複数呼ぶと「どれが失敗原因か」分からなくなるため
+            </span>
+            {"\n"}
+            {"    "}
+            created_user = user_service.register(**user_data)
+            {"\n\n"}
+            {"    "}
+            <span className={styles.cc}>
+              # ── Assert（検証）: 期待どおりの結果になっているか確認する ──
+            </span>
+            {"\n"}
+            {"    "}
+            saved = fake_repo.find_by_id(created_user.id)
+            {"\n"}
+            {"    "}
+            <span className={styles.ck}>assert</span> saved{" "}
+            <span className={styles.ck}>is not</span> <span className={styles.ck}>None</span>,
+            {"       "}
+            <span className={styles.cs}>&quot;ユーザーがリポジトリに保存されていること&quot;</span>
+            {"\n"}
+            {"    "}
+            <span className={styles.ck}>assert</span> saved.name =={" "}
+            <span className={styles.cs}>&quot;Alice&quot;</span>,{"   "}
+            <span className={styles.cs}>&quot;名前が正しく保存されていること&quot;</span>
+            {"\n"}
+            {"    "}
+            <span className={styles.ck}>assert</span> saved.email =={" "}
+            <span className={styles.cs}>&quot;alice@example.com&quot;</span>,{" "}
+            <span className={styles.cs}>&quot;メールが正しく保存されていること&quot;</span>
+          </pre>
+        </div>
+
+        <h3>Step 4 — Google Test (C++) でハーネスを組む例</h3>
+        <div className={styles.codeWrap}>
+          <div className={styles.codeBar}>
+            <div className={styles.dots}>
+              <div className={styles.dot} style={{ background: "#ea4335" }} />
+              <div className={styles.dot} style={{ background: "#fbbc04" }} />
+              <div className={styles.dot} style={{ background: "#34a853" }} />
+            </div>
+            <span>user_service_test.cc — Google Test + GMock</span>
+          </div>
+          <pre className={styles.codeBody}>
+            <span className={styles.cv}>#include</span>{" "}
+            <span className={styles.cs}>&lt;gtest/gtest.h&gt;</span>
+            {"\n"}
+            <span className={styles.cv}>#include</span>{" "}
+            <span className={styles.cs}>&lt;gmock/gmock.h&gt;</span>
+            {"\n\n"}
+            <span className={styles.cc}>
+              {"// モッククラス: MOCK_METHOD で呼び出し記録・検証機能を自動付与"}
+            </span>
+            {"\n"}
+            <span className={styles.ck}>class</span>{" "}
+            <span className={styles.cv}>MockEmailService</span> :{" "}
+            <span className={styles.ck}>public</span>{" "}
+            <span className={styles.cv}>EmailServiceInterface</span> {"{"}
+            {"\n"}
+            <span className={styles.ck}>public</span>:{"\n"}
+            {"    "}
+            MOCK_METHOD(<span className={styles.ce}>void</span>, Send,
+            {"\n"}
+            {"        "}(<span className={styles.ck}>const</span> std::string&amp; to,{" "}
+            <span className={styles.ck}>const</span> std::string&amp; subject),
+            {"\n"}
+            {"        "}(<span className={styles.ck}>override</span>));
+            {"\n"}
+            {"}"};{"\n\n"}
+            <span className={styles.cc}>
+              {"// テストフィクスチャクラス: SetUp/TearDown を定義"}
+            </span>
+            {"\n"}
+            <span className={styles.ck}>class</span>{" "}
+            <span className={styles.cv}>UserServiceTest</span> :{" "}
+            <span className={styles.ck}>public</span> testing::Test {"{"}
+            {"\n"}
+            <span className={styles.ck}>protected</span>:{"\n"}
+            {"    "}
+            <span className={styles.ce}>void</span> SetUp(){" "}
+            <span className={styles.ck}>override</span> {"{"}
+            {"\n"}
+            {"        "}
+            mock_email_ = std::make_unique&lt;<span className={styles.cv}>MockEmailService</span>
+            &gt;();
+            {"\n"}
+            {"        "}
+            service_ = std::make_unique&lt;<span className={styles.cv}>UserService</span>
+            &gt;(mock_email_.get());
+            {"\n"}
+            {"    "}
+            {"}"}
+            {"\n"}
+            {"    "}
+            std::unique_ptr&lt;<span className={styles.cv}>MockEmailService</span>&gt; mock_email_;
+            {"\n"}
+            {"    "}
+            std::unique_ptr&lt;<span className={styles.cv}>UserService</span>&gt; service_;
+            {"\n"}
+            {"}"};{"\n\n"}
+            <span className={styles.cc}>
+              {"// テストケース: 登録時にウェルカムメールが送信されるか"}
+            </span>
+            {"\n"}
+            TEST_F(<span className={styles.cv}>UserServiceTest</span>, RegisterSendsWelcomeEmail){" "}
+            {"{"}
+            {"\n"}
+            {"    "}
+            <span className={styles.cc}>
+              {"// Arrange: メールが1回・正しい引数で呼ばれることを期待として設定"}
+            </span>
+            {"\n"}
+            {"    "}
+            EXPECT_CALL(*mock_email_, Send(
+            {"\n"}
+            {"        "}
+            testing::Eq(<span className={styles.cs}>&quot;alice@example.com&quot;</span>),
+            {"\n"}
+            {"        "}
+            testing::HasSubstr(<span className={styles.cs}>&quot;Welcome&quot;</span>){"\n"}
+            {"    "})).Times(<span className={styles.ce}>1</span>);
+            {"\n"}
+            {"    "}
+            <span className={styles.cc}>{"// Act: ユーザー登録を実行"}</span>
+            {"\n"}
+            {"    "}
+            service_-&gt;Register(<span className={styles.cs}>&quot;alice@example.com&quot;</span>);
+            {"\n"}
+            {"    "}
+            <span className={styles.cc}>
+              {"// Assert: EXPECT_CALL の期待が満たされなければ自動でFAIL"}
+            </span>
+            {"\n"}
+            {"}"}
+          </pre>
+        </div>
+
+        <div className={styles.vocab}>
+          <div className={styles.vocabHead}>📖 用語集</div>
+          <dl>
+            <dt>DI</dt>
+            <dd>
+              Dependency Injection。コンストラクタ等で依存オブジェクトを外から注入する設計パターン
+            </dd>
+            <dt>AAAパターン</dt>
+            <dd>
+              Arrange-Act-Assert。テストを「準備・実行・検証」の3段に分けるGoogleの標準スタイル
+            </dd>
+            <dt>GMock</dt>
+            <dd>Google TestにC++向けモック生成機能を提供するライブラリ</dd>
+          </dl>
+        </div>
       </section>
 
       <section id="s7" className={styles.sec}>
-        <h2 className={styles.secTitle}><span className={styles.n}>07.</span>フレイキーテスト対策</h2>
+        <h2 className={styles.secTitle}>
+          <span className={styles.n}>07.</span>フレイキーテスト対策
+        </h2>
       </section>
 
       <section id="s8" className={styles.sec}>
-        <h2 className={styles.secTitle}><span className={styles.n}>08.</span>CIパイプラインへの組み込み</h2>
+        <h2 className={styles.secTitle}>
+          <span className={styles.n}>08.</span>CIパイプラインへの組み込み
+        </h2>
       </section>
 
       <section id="s9" className={styles.sec}>
-        <h2 className={styles.secTitle}><span className={styles.n}>09.</span>AIエージェント評価ハーネス</h2>
+        <h2 className={styles.secTitle}>
+          <span className={styles.n}>09.</span>AIエージェント評価ハーネス
+        </h2>
       </section>
 
       <section id="s10" className={styles.sec}>
-        <h2 className={styles.secTitle}><span className={styles.n}>10.</span>ベストプラクティス10則</h2>
+        <h2 className={styles.secTitle}>
+          <span className={styles.n}>10.</span>ベストプラクティス10則
+        </h2>
       </section>
 
       <section id="s11" className={styles.sec}>
-        <h2 className={styles.secTitle}><span className={styles.n}>11.</span>参考ソース一覧</h2>
+        <h2 className={styles.secTitle}>
+          <span className={styles.n}>11.</span>参考ソース一覧
+        </h2>
         <div>
           <Ext href="https://abseil.io/resources/swe-book">Software Engineering at Google</Ext>
           <Ext href="https://testing.googleblog.com">Google Testing Blog</Ext>

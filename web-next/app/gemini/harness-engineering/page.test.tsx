@@ -120,7 +120,7 @@ describe("/gemini/harness-engineering - page structure", () => {
     const s6 = container.querySelector("#s6");
     expect(s6).not.toBeNull();
     expect(s6?.textContent).toMatch(/依存性注入/);
-    expect(s6?.querySelector(".cmp-ok, [class*=\"cmp-ok\"]")).toBeDefined();
+    expect(s6?.querySelector('.cmp-ok, [class*="cmp-ok"]')).toBeDefined();
     expect(s6?.textContent).toMatch(/conftest.py/);
     expect(s6?.textContent).toMatch(/test_user_service.py/);
     expect(s6?.textContent).toMatch(/user_service_test.cc/);
