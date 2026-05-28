@@ -1,5 +1,112 @@
 import type { Metadata } from "next";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
+
+const DIAGRAM_0 = `sequenceDiagram
+  participant Dev as 開発者
+  participant A1 as エージェント Session1
+  participant A2 as エージェント Session2
+  Dev->>A1: 「Webアプリを作って」
+  A1->>A1: 実装開始（コンテキスト消費中）
+  Note over A1: ❌ コンテキスト枯渇で途中終了
+  A1-->>Dev: 未完成・ドキュメントなし
+  Dev->>A2: 再起動
+  A2->>A2: 「何が終わってる？」を把握しようとする
+  Note over A2: ❌ 何が終わったか不明 重複実装・バグ放置
+  A2-->>Dev: 品質低下・時間浪費`;
+
+const DIAGRAM_1 = `sequenceDiagram
+  participant Dev as 開発者
+  participant H as ハーネス（環境）
+  participant A1 as エージェント Session1
+  participant A2 as エージェント Session2
+  Dev->>H: 初期セットアップ（Initializer）
+  H->>H: feature_list.json / progress.txt / init.sh 作成
+  H->>A1: 「機能Aを実装して」
+  A1->>H: 実装 → git commit + progress 更新
+  Note over H: ✅ 状態がファイルに永続化
+  H->>A2: 新セッション開始
+  A2->>H: progress.txt / git log を読む
+  Note over A2: ✅ 即座に状況把握
+  A2->>H: 機能Bを実装・テスト・commit`;
+
+const DIAGRAM_2 = `flowchart LR
+  BAD["❌ 悪い例\\n─────────────\\n200行超の詳細仕様\\nインストール手順全文\\nアーキテクチャ全解説\\n全コーディング規約\\n過去の経緯・背景情報"]
+  GOOD["✅ 良い例\\n─────────────\\n50行以内の目次\\nコマンド早見表のみ\\n詳細は docs/ へのポインタ\\nProhibitions（禁止事項）\\nRouting（どこを見るか）"]
+  BAD -.->|改善| GOOD`;
+
+const DIAGRAM_3 = `flowchart TB
+  subgraph FILES["永続化ファイル群（リポジトリ内）"]
+    FL["feature_list.json\\nやることリスト（JSON形式）\\npassing: false→true で更新のみ\\n削除・並び替え禁止"]
+    PR["claude-progress.txt\\n進捗ログ（フリーテキスト）\\n何が終わったか / 発見したバグ\\n次のセッションへの指示"]
+    IS["init.sh\\n環境起動スクリプト\\n開発サーバー起動\\n依存パッケージインストール"]
+    GH["Git History\\nコミットログ = 変更記録\\n詳細なコミットメッセージ\\nロールバック手段"]
+    CM["CLAUDE.md\\nエージェントへの地図\\n（前章参照）"]
+  end`;
+
+const DIAGRAM_4 = `flowchart TD
+  START(["セッション開始"]) --> S1
+  S1["① Orient（状況把握）\\nprogress.txt を読む\\ngit log --oneline -20 を確認"] --> S2
+  S2["② Setup（環境起動）\\nbash init.sh を実行"] --> S3
+  S3["③ Verify Baseline（ベースライン検証）\\n既存機能が動いているか確認\\nPuppeteer / Playwright で E2E"]
+  S3 -->|壊れている| FIX["既存バグを先に修正\\ncommit して state をクリーンに"]
+  FIX --> S4
+  S3 -->|正常| S4
+  S4["④ タスク選択\\nfeature_list.json から\\n未完了の最優先タスクを1つ選ぶ"] --> S5
+  S5["⑤ 実装\\n1タスクのみ実装する\\n途中でスコープを広げない"] --> S6
+  S6["⑥ テスト\\nUI / API を実際に操作して確認\\nユニットテストだけでは不十分"]
+  S6 -->|失敗| S5
+  S6 -->|成功| S7
+  S7["⑦ 状態更新\\nfeature_list.json: passing → true\\nclaude-progress.txt に記録"] --> S8
+  S8["⑧ クリーンな終了\\ngit commit（詳細メッセージ付き）\\nアプリが動作する状態で終える"] --> END
+  END(["セッション終了"])`;
+
+const DIAGRAM_5 = `flowchart LR
+  CODE["コード変更"] --> LINT["Lint / 型チェック\\n自動実行（PostToolUse Hook）"]
+  LINT -->|エラー| FIX["修正"]
+  FIX --> CODE
+  LINT -->|OK| UNIT["ユニットテスト\\n対象機能のみ即時実行"]
+  UNIT -->|失敗| FIX
+  UNIT -->|OK| E2E["E2E テスト\\nPuppeteer / Playwright\\n人間のように UI を操作"]
+  E2E -->|失敗| FIX
+  E2E -->|OK| COMMIT["✅ git commit"]`;
+
+const DIAGRAM_6 = `flowchart TD
+  AGENT["エージェント"] -->|"Puppeteer MCP 使用"| BROWSER["ブラウザ操作"]
+  BROWSER --> NAV["ページ遷移"]
+  BROWSER --> CLICK["ボタンクリック"]
+  BROWSER --> FORM["フォーム入力"]
+  BROWSER --> SS["スクリーンショット取得"]
+  SS --> AGENT
+  NAV & CLICK & FORM --> VERIFY["実際の動作確認"]
+  VERIFY -->|問題発見| FIX["コード修正"]
+  VERIFY -->|正常| PASS["✅ 機能完了"]`;
+
+const DIAGRAM_7 = `flowchart LR
+  subgraph BAD["❌ コンテキスト浪費パターン"]
+    B1["大量のファイルを一度に読む"]
+    B2["長い raw ログをそのまま貼る"]
+    B3["コンテキストが枯渇するまで作業"]
+  end
+  subgraph GOOD["✅ コンテキスト節約パターン"]
+    G1["必要なファイルだけ読む"]
+    G2["サブエージェントに検索を委任"]
+    G3["毎回同じコアファイルのみロード"]
+  end`;
+
+const DIAGRAM_8 = `flowchart TD
+  Q{"長時間タスクの\\nコンテキスト戦略は？"}
+  Q --> C["Compaction\\nコンテキストを圧縮して継続"]
+  Q --> R["Context Reset\\n新セッションで再開"]
+  C --> CP["✅ 継続性が高い\\n⚠️ コンパクション後の指示精度が低下する場合あり\\n⚠️ コンテキスト不安（途中で諦める）が発生しやすい"]
+  R --> RP["✅ クリーンな状態からスタート\\n✅ progress.txt / git で引き継ぎ\\n⚠️ 毎回 orient のコスト（トークン消費）"]
+  NOTE["Note: Opus 4.6 以降では\\nCompaction だけで十分なケースも増加中\\nモデル進化に合わせて再評価を"]`;
+
+const DIAGRAM_9 = `flowchart LR
+  G["Generator Agent\\n実装担当"] -->|成果物| E["Evaluator Agent\\n評価担当（批判的）"]
+  E -->|スコア + フィードバック| G
+  E -->|全機能 passing| DONE["✅ 完成"]
+  NOTE["自己評価より Evaluator を分離した方が\\nはるかに正確な品質保証が可能\\nGenerator は自分の仕事を高く評価しすぎる"]`;
 
 export const metadata: Metadata = {
   title: "ハーネスエンジニアリング完全ガイド 2026",
@@ -152,7 +259,7 @@ export default function Page() {
           ❌ ハーネスなし：記憶喪失エンジニア問題
         </h3>
         <div className={styles.mermaidWrap}>
-          <div id="diag-0" />
+          <MermaidDiagram chart={DIAGRAM_0} />
         </div>
 
         <h3
@@ -166,7 +273,7 @@ export default function Page() {
           ✅ ハーネスあり：構造化された引き継ぎ
         </h3>
         <div className={styles.mermaidWrap}>
-          <div id="diag-1" />
+          <MermaidDiagram chart={DIAGRAM_1} />
         </div>
 
         <div className={`${styles.callout} ${styles.warn}`}>
@@ -685,7 +792,7 @@ export default function Page() {
         </p>
 
         <div className={styles.mermaidWrap}>
-          <div id="diag-2" />
+          <MermaidDiagram chart={DIAGRAM_2} />
         </div>
 
         <div className={`${styles.callout} ${styles.warn}`}>
@@ -815,7 +922,7 @@ export default function Page() {
         </p>
 
         <div className={styles.mermaidWrap}>
-          <div id="diag-3" />
+          <MermaidDiagram chart={DIAGRAM_3} />
         </div>
 
         <h3 style={{ fontSize: "1rem", fontWeight: 700, margin: "28px 0 12px" }}>
@@ -944,7 +1051,7 @@ export default function Page() {
         </p>
 
         <div className={styles.mermaidWrap}>
-          <div id="diag-4" />
+          <MermaidDiagram chart={DIAGRAM_4} />
         </div>
 
         <div className={`${styles.steps} ${styles.mt24}`}>
@@ -1045,7 +1152,7 @@ export default function Page() {
         </p>
 
         <div className={styles.mermaidWrap}>
-          <div id="diag-5" />
+          <MermaidDiagram chart={DIAGRAM_5} />
         </div>
 
         <div className={`${styles.tableWrap} ${styles.mt24}`}>
@@ -1173,7 +1280,7 @@ export default function Page() {
           E2E でエージェントに「目」を与える
         </h3>
         <div className={styles.mermaidWrap}>
-          <div id="diag-6" />
+          <MermaidDiagram chart={DIAGRAM_6} />
         </div>
       </section>
 
@@ -1188,6 +1295,10 @@ export default function Page() {
         <p className={styles.sectionLead}>
           コンテキストは有限の資源です。消費が多いほど品質が下がります。
         </p>
+
+        <div className={styles.mermaidWrap}>
+          <MermaidDiagram chart={DIAGRAM_7} />
+        </div>
 
         <div className={styles.tableWrap}>
           <table>
@@ -1232,7 +1343,7 @@ export default function Page() {
           Compaction vs. Context Reset
         </h3>
         <div className={styles.mermaidWrap}>
-          <div id="diag-8" />
+          <MermaidDiagram chart={DIAGRAM_8} />
         </div>
       </section>
 
@@ -1758,7 +1869,7 @@ export default function Page() {
           Month 2〜3：Evaluator Agent の分離
         </h3>
         <div className={styles.mermaidWrap}>
-          <div id="diag-9" />
+          <MermaidDiagram chart={DIAGRAM_9} />
         </div>
 
         <h3 style={{ fontSize: "1rem", fontWeight: 700, margin: "28px 0 16px" }}>黄金律まとめ</h3>
