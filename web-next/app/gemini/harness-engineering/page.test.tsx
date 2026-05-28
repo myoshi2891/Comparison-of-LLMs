@@ -176,6 +176,24 @@ describe("/gemini/harness-engineering - page structure", () => {
     expect(s10?.textContent).toMatch(/ビジネスロジック層/);
   });
 
+  it("renders s11 content correctly (12 source cards, footer)", () => {
+    const { container } = render(<Page />);
+    const s11 = container.querySelector("#s11");
+    expect(s11).not.toBeNull();
+    expect(s11?.textContent).toMatch(/参考ソース一覧/);
+    expect(s11?.textContent).toMatch(/Googleが公式に公開しているソース/);
+    expect(s11?.querySelectorAll('[class*="src-card"]').length).toBe(12);
+    expect(s11?.textContent).toMatch(/Software Engineering at Google — O'Reilly/);
+    expect(s11?.textContent).toMatch(/The Practical Test Pyramid — Martin Fowler/);
+    expect(s11?.textContent).toMatch(/Google ADK Evaluation Guide/);
+    expect(s11?.textContent).toMatch(/SRE Book/);
+    
+    const footer = container.querySelector("footer");
+    expect(footer).not.toBeNull();
+    expect(footer?.textContent).toMatch(/HARNESS ENGINEERING/);
+    expect(footer?.textContent).toMatch(/Google Testing Blog \/ Software Engineering at Google 準拠/);
+  });
+
   it("renders 11 TOC links pointing to section anchors", () => {
     const { container } = render(<Page />);
     const tocAnchors = container.querySelectorAll('nav a[href^="#"]');
