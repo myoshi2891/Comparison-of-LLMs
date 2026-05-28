@@ -1171,10 +1171,7 @@
 
           <div class="mermaid-wrap">
             <div class="mermaid-label">▸ ハーネスエンジニアリング サイクル</div>
-            <div class="mermaid">
-              flowchart LR A["評価目標の定義\nWhat to measure"] B["Eval セット設計\nHow to measure"]
-              C["ハーネス実装\nInfrastructure"] D["分析・改善\nIterate"] A --> B --> C --> D --> A
-            </div>
+            <div id="diag-0"></div>
           </div>
 
           <div class="card-grid-3">
@@ -1217,13 +1214,7 @@
 
           <div class="mermaid-wrap">
             <div class="mermaid-label">▸ LLM テスト課題マップ</div>
-            <div class="mermaid">
-              mindmap root((LLM の\nテスト課題)) 非決定性 同じ入力でも毎回異なる出力
-              温度パラメータの影響 モデルアップデートによる挙動変化 評価の難しさ 正解が一意ではない
-              文脈依存の正しさ 人間の感性が必要なケース スケール問題 手動評価のコスト爆発
-              大量テストケース管理 複数モデル間の比較 回帰リスク プロンプト変更の副作用 Fine-tuning
-              前後の比較 本番環境での品質劣化
-            </div>
+            <div id="diag-1"></div>
           </div>
 
           <h3 class="sub-h">ハーネスなし開発のリスク一覧</h3>
@@ -1302,13 +1293,7 @@
 
           <div class="mermaid-wrap">
             <div class="mermaid-label">▸ OpenAI Evals コンポーネント構成</div>
-            <div class="mermaid">
-              flowchart LR subgraph IN["入力層"] DS["Dataset\nJSONL 形式"] PT["Prompt\nTemplate"]
-              end subgraph HN["ハーネス層"] direction TB RN["Runner\n実行エンジン"]
-              SA["Sampler\nモデル呼び出し"] EV["Evaluator\n採点器"] end subgraph OUT["出力層"]
-              RP["results.jsonl\n生の結果"] DB["Platform\nDashboard"] AL["Alert\nSlack / GitHub"]
-              end DS --> RN PT --> RN RN --> SA --> EV EV --> RP --> DB RP --> AL
-            </div>
+            <div id="diag-2"></div>
           </div>
 
           <h3 class="sub-h">Evaluator クラス一覧（組み込み）</h3>
@@ -1390,13 +1375,7 @@
 
           <div class="mermaid-wrap">
             <div class="mermaid-label">▸ セットアップ → 実行 → 改善サイクル</div>
-            <div class="mermaid">
-              flowchart TD S0["Step 0\n環境構築"] S1["Step 1\nデータセット作成\nsamples.jsonl"]
-              S2["Step 2\nYAML 定義\neval_name.yaml"] S3["Step 3\nEval 実行\noaieval model eval"]
-              S4{"合格ライン\n超えたか？"} S5["ダッシュボード\nアップロード"]
-              S6["改善\nプロンプト調整\nデータ追加"] S0 --> S1 --> S2 --> S3 --> S4 S4 -->|"Yes"| S5
-              S4 -->|"No"| S6 S6 --> S3
-            </div>
+            <div id="diag-3"></div>
           </div>
 
           <div class="divider"></div>
@@ -1660,16 +1639,7 @@
 
           <div class="mermaid-wrap">
             <div class="mermaid-label">▸ Eval パターン選択の判断木</div>
-            <div class="mermaid">
-              flowchart TD Q1{"出力は\n一意に決まるか？"} A1["String Match\nMatch / Includes /
-              FuzzyMatch\n最速・最安"] Q2{"判断基準を\n明文化できるか？"} A2["Model Graded\nClosedQA
-              / Criteria\nGPT-4o が採点"] Q3{"コスト・時間を\nかけられるか？"} A3["Human
-              Eval\nゴールデンセット構築"] A4["LLM-as-Judge\nGPT-4o で代替"] A5["Custom
-              Python\n任意ロジック実装"] Q4{"複雑なロジックが\n必要か？"} Q1
-              -->|"Yes\n数値・コード・固定値"| A1 Q1 -->|"No\n自由記述・翻訳"| Q2 Q2 -->|"Yes"| Q4
-              Q2 -->|"No"| Q3 Q3 -->|"Yes"| A3 Q3 -->|"No"| A4 Q4 -->|"Yes\nコード実行・API検証"| A5
-              Q4 -->|"No"| A2
-            </div>
+            <div id="diag-4"></div>
           </div>
 
           <h3 class="sub-h">パターン比較表</h3>
@@ -1754,12 +1724,7 @@
 
           <div class="mermaid-wrap">
             <div class="mermaid-label">▸ LLM-as-Judge シーケンス</div>
-            <div class="mermaid">
-              sequenceDiagram participant H as ハーネス participant UT as 被評価モデル(gpt-4o-mini)
-              participant JD as 採点モデル(gpt-4o) H->>UT: テスト入力を送信 UT-->>H: 回答を返す
-              H->>JD: この回答は正しいか？+ 採点基準 JD-->>H: スコア (Y / N / Unclear) H->>H:
-              results.jsonl に記録
-            </div>
+            <div id="diag-5"></div>
           </div>
 
           <h3 class="sub-h">パターン 2 — LLM-as-Judge 採点プロンプトテンプレート</h3>
@@ -2073,15 +2038,7 @@
 
           <div class="mermaid-wrap">
             <div class="mermaid-label">▸ Codex エージェント × Eval ハーネス 統合フロー</div>
-            <div class="mermaid">
-              sequenceDiagram participant Dev as 開発者 participant Codex as Codex Agent participant
-              Harness as Eval ハーネス participant CI as GitHub Actions participant Review as
-              レビュアー Dev->>Codex: タスクを指示 Codex->>Codex: AGENTS.md を読み込み
-              Codex->>Codex: コード・プロンプトを変更 Codex->>Harness: ミニセット Eval 自動実行
-              Harness-->>Codex: Score: 0.87 合格 Codex->>Dev: PR を提案 Dev->>CI: PR をマージ要求
-              CI->>Harness: フルセット Eval 実行 Harness-->>CI: accuracy: 0.88 合格 CI-->>Review:
-              テスト結果レポート Review->>Dev: LGTM / マージ
-            </div>
+            <div id="diag-6"></div>
           </div>
         </div>
 
@@ -2102,12 +2059,7 @@
 
           <div class="mermaid-wrap">
             <div class="mermaid-label">▸ 実行タイミング別コスト管理戦略</div>
-            <div class="mermaid">
-              flowchart LR PR["PR 作成時\nミニセット 30件\ngpt-4o-mini\n~$0.01"] MG["main
-              マージ前\nフルセット 500件\ngpt-4o\n~$0.50"] NT["毎夜 cron\nゴールデン
-              100件\ngpt-4o\n~$0.10"] RL["リリース前\n包括セット 全件\ngpt-4o + human\n~$5-50"] PR
-              --> MG --> NT --> RL
-            </div>
+            <div id="diag-7"></div>
           </div>
 
           <div class="table-wrap">
@@ -2245,14 +2197,7 @@
 
           <div class="mermaid-wrap">
             <div class="mermaid-label">▸ Eval チェーン フロー（ゲート条件付き）</div>
-            <div class="mermaid">
-              flowchart TD IN["エージェントへのタスク入力"] E1["Step 1
-              Eval\n意図理解の正確さ\naccuracy >= 0.90"] E2["Step 2 Eval\n計画の妥当性\nmodel_graded
-              >= 0.85"] E3["Step 3 Eval\n最終出力の品質\nhuman_graded >= 0.80"] G1{"Step 1 合格？"}
-              G2{"Step 2 合格？"} FAIL["早期失敗\nコスト節約"] PASS["全ステップ合格"] IN --> E1 -->
-              G1 G1 -->|"Yes"| E2 --> G2 G1 -->|"No"| FAIL G2 -->|"Yes"| E3 G2 -->|"No"| FAIL E3 -->
-              PASS
-            </div>
+            <div id="diag-8"></div>
           </div>
 
           <h3 class="sub-h">本番ログからの Eval サンプル自動生成</h3>
@@ -2436,15 +2381,7 @@
 
           <div class="mermaid-wrap">
             <div class="mermaid-label">▸ Eval スコア低下 — 原因特定フローチャート</div>
-            <div class="mermaid">
-              flowchart TD START["Eval スコアが期待より低い"] Q1{"データセット品質\nの問題？"}
-              Q2{"プロンプトの問題？"} Q3{"採点基準の問題？"} Q4{"モデルの問題？"}
-              A1["サンプルを手動確認\n曖昧な正解を修正\nエッジケースを追加"] A2["Few-shot
-              を追加\nシステムプロンプトを修正\nタスクを分解する"] A3["採点プロンプトを見直し\n別の
-              Evaluator を試す\n人手評価でサンプル確認"] A4["上位モデルを試す\nFine-tuning
-              を検討\nRAG を活用する"] START --> Q1 Q1 -->|"Yes"| A1 Q1 -->|"No"| Q2 Q2 -->|"Yes"|
-              A2 Q2 -->|"No"| Q3 Q3 -->|"Yes"| A3 Q3 -->|"No"| Q4 Q4 --> A4
-            </div>
+            <div id="diag-9"></div>
           </div>
 
           <h3 class="sub-h">ハーネスエンジニアリング成熟度モデル</h3>
@@ -2750,8 +2687,179 @@
           mindmap: { useMaxWidth: true, padding: 12 },
         });
 
-        /* すべての .mermaid 要素をレンダリング */
-        mermaid.run({ querySelector: '.mermaid' });
+        /* JS テンプレートリテラルから動的レンダリング */
+        const DIAGRAMS = {
+  'diag-0': `flowchart LR
+A["評価目標の定義\\nWhat to measure"]
+B["Eval セット設計\\nHow to measure"]
+C["ハーネス実装\\nInfrastructure"]
+D["分析・改善\\nIterate"]
+A --> B
+B --> C
+C --> D
+D --> A`,
+  'diag-1': `mindmap
+  root((LLM の\\nテスト課題))
+    非決定性
+      同じ入力でも毎回異なる出力
+      温度パラメータの影響
+      モデルアップデートによる挙動変化
+    評価の難しさ
+      正解が一意ではない
+      文脈依存の正しさ
+      人間の感性が必要なケース
+    スケール問題
+      手動評価のコスト爆発
+      大量テストケース管理
+      複数モデル間の比較
+    回帰リスク
+      プロンプト変更の副作用
+      Fine-tuning前後の比較
+      本番環境での品質劣化`,
+  'diag-2': `flowchart LR
+subgraph IN["入力層"]
+  DS["Dataset\\nJSONL 形式"]
+  PT["Prompt\\nTemplate"]
+end
+subgraph HN["ハーネス層"]
+  direction TB
+  RN["Runner\\n実行エンジン"]
+  SA["Sampler\\nモデル呼び出し"]
+  EV["Evaluator\\n採点器"]
+end
+subgraph OUT["出力層"]
+  RP["results.jsonl\\n生の結果"]
+  DB["Platform\\nDashboard"]
+  AL["Alert\\nSlack / GitHub"]
+end
+DS --> RN
+PT --> RN
+RN --> SA
+SA --> EV
+EV --> RP
+RP --> DB
+RP --> AL`,
+  'diag-3': `flowchart TD
+S0["Step 0\\n環境構築"]
+S1["Step 1\\nデータセット作成\\nsamples.jsonl"]
+S2["Step 2\\nYAML 定義\\neval_name.yaml"]
+S3["Step 3\\nEval 実行\\noaieval model eval"]
+S4{"合格ライン\\n超えたか？"}
+S5["ダッシュボード\\nアップロード"]
+S6["改善\\nプロンプト調整\\nデータ追加"]
+S0 --> S1
+S1 --> S2
+S2 --> S3
+S3 --> S4
+S4 -->|"Yes"| S5
+S4 -->|"No"| S6
+S6 --> S3`,
+  'diag-4': `flowchart TD
+Q1{"出力は\\n一意に決まるか？"}
+A1["String Match\\nMatch / Includes /\\nFuzzyMatch\\n最速・最安"]
+Q2{"判断基準を\\n明文化できるか？"}
+A2["Model Graded\\nClosedQA\\n/ Criteria\\nGPT-4o が採点"]
+Q3{"コスト・時間を\\nかけられるか？"}
+A3["Human\\nEval\\nゴールデンセット構築"]
+A4["LLM-as-Judge\\nGPT-4o で代替"]
+A5["Custom\\nPython\\n任意ロジック実装"]
+Q4{"複雑なロジックが\\n必要か？"}
+Q1 -->|"Yes\\n数値・コード・固定値"| A1
+Q1 -->|"No\\n自由記述・翻訳"| Q2
+Q2 -->|"Yes"| Q4
+Q2 -->|"No"| Q3
+Q3 -->|"Yes"| A3
+Q3 -->|"No"| A4
+Q4 -->|"Yes\\nコード実行・API検証"| A5
+Q4 -->|"No"| A2`,
+  'diag-5': `sequenceDiagram
+participant H as ハーネス
+participant UT as 被評価モデル(gpt-4o-mini)
+participant JD as 採点モデル(gpt-4o)
+H->>UT: テスト入力を送信
+UT-->>H: 回答を返す
+H->>JD: この回答は正しいか？+ 採点基準
+JD-->>H: スコア (Y / N / Unclear)
+H->>H: results.jsonl に記録`,
+  'diag-6': `sequenceDiagram
+participant Dev as 開発者
+participant Codex as Codex Agent
+participant Harness as Eval ハーネス
+participant CI as GitHub Actions
+participant Review as レビュアー
+Dev->>Codex: タスクを指示
+Codex->>Codex: AGENTS.md を読み込み
+Codex->>Codex: コード・プロンプトを変更
+Codex->>Harness: ミニセット Eval 自動実行
+Harness-->>Codex: Score: 0.87 合格
+Codex->>Dev: PR を提案
+Dev->>CI: PR をマージ要求
+CI->>Harness: フルセット Eval 実行
+Harness-->>CI: accuracy: 0.88 合格
+CI-->>Review: テスト結果レポート
+Review->>Dev: LGTM / マージ`,
+  'diag-7': `flowchart LR
+PR["PR 作成時\\nミニセット 30件\\ngpt-4o-mini\\n~$0.01"]
+MG["main\\nマージ前\\nフルセット 500件\\ngpt-4o\\n~$0.50"]
+NT["毎夜 cron\\nゴールデン\\n100件\\ngpt-4o\\n~$0.10"]
+RL["リリース前\\n包括セット 全件\\ngpt-4o + human\\n~$5-50"]
+PR --> MG
+MG --> NT
+NT --> RL`,
+  'diag-8': `flowchart TD
+IN["エージェントへのタスク入力"]
+E1["Step 1\\nEval\\n意図理解の正確さ\\naccuracy >= 0.90"]
+E2["Step 2 Eval\\n計画の妥当性\\nmodel_graded\\n>= 0.85"]
+E3["Step 3 Eval\\n最終出力の品質\\nhuman_graded >= 0.80"]
+G1{"Step 1 合格？"}
+G2{"Step 2 合格？"}
+FAIL["早期失敗\\nコスト節約"]
+PASS["全ステップ合格"]
+IN --> E1
+E1 --> G1
+G1 -->|"Yes"| E2
+E2 --> G2
+G1 -->|"No"| FAIL
+G2 -->|"Yes"| E3
+G2 -->|"No"| FAIL
+E3 --> PASS`,
+  'diag-9': `flowchart TD
+START["Eval スコアが期待より低い"]
+Q1{"データセット品質\\nの問題？"}
+Q2{"プロンプトの問題？"}
+Q3{"採点基準の問題？"}
+Q4{"モデルの問題？"}
+A1["サンプルを手動確認\\n曖昧な正解を修正\\nエッジケースを追加"]
+A2["Few-shot\\nを追加\\nシステムプロンプトを修正\\nタスクを分解する"]
+A3["採点プロンプトを見直し\\n別の\\nEvaluator を試す\\n人手評価でサンプル確認"]
+A4["上位モデルを試す\\nFine-tuning\\nを検討\\nRAG を活用する"]
+START --> Q1
+Q1 -->|"Yes"| A1
+Q1 -->|"No"| Q2
+Q2 -->|"Yes"| A2
+Q2 -->|"No"| Q3
+Q3 -->|"Yes"| A3
+Q3 -->|"No"| Q4
+Q4 --> A4`
+};
+
+        (async () => {
+          for (const [id, src] of Object.entries(DIAGRAMS)) {
+            const { svg } = await mermaid.render('svg-' + id, src);
+            const el = document.getElementById(id);
+            if (el) {
+              el.innerHTML = svg;
+              const svgEl = el.querySelector('svg');
+              if (svgEl) {
+                svgEl.removeAttribute('width');
+                svgEl.removeAttribute('height');
+                svgEl.style.width = 'auto';
+                svgEl.style.maxWidth = '100%';
+                svgEl.style.height = 'auto';
+              }
+            }
+          }
+        })();
       });
 
       /* ─── Intersection Observer (scroll animation) ─── */
