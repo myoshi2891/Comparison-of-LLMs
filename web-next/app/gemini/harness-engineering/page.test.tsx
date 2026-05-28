@@ -82,6 +82,17 @@ describe("/gemini/harness-engineering - page structure", () => {
     expect(s2?.textContent).toMatch(/localhostのみ/);
   });
 
+  it("renders s3 content correctly (5 components cards, comparison table)", () => {
+    const { container } = render(<Page />);
+    const s3 = container.querySelector("#s3");
+    expect(s3).not.toBeNull();
+    expect(s3?.textContent).toMatch(/テストランナー/);
+    expect(s3?.textContent).toMatch(/フィクスチャ/);
+    expect(s3?.textContent).toMatch(/アサーション/);
+    expect(s3?.querySelector("table")).not.toBeNull();
+    expect(s3?.textContent).toMatch(/JUnit5 \+ Google Truth/);
+  });
+
   it("renders 11 TOC links pointing to section anchors", () => {
     const { container } = render(<Page />);
     const tocAnchors = container.querySelectorAll('nav a[href^="#"]');
