@@ -658,7 +658,92 @@ Q3 -->|Yes| STUB`}
       </section>
 
       <section id="s5" className={styles.sec}>
-        <h2 className={styles.secTitle}><span className={styles.n}>05.</span>ハーミティックテスト — 孤立した清潔なテスト</h2>
+        <div className={styles.secNo}>Section 05</div>
+        <h2 className={styles.secTitle}>
+          <span className={styles.n}>05.</span>ハーミティックテスト — 孤立した清潔なテスト
+        </h2>
+
+        <div className={`${styles.callout} ${styles.cNote}`}>
+          <span className={styles.ci}>🚀</span>
+          <div>
+            <strong>日常の例え話 — 宇宙服</strong>
+            <br />
+            宇宙服は外の真空・放射線・温度変化から宇宙飛行士を完全に「密閉」して守ります。ハーミティックテストも外部のDB状態・ネットワーク状況・時刻・他のテストから完全に隔離されたテストです。
+          </div>
+        </div>
+
+        <h3>ハーミティックの3原則</h3>
+        <div className={styles.tblWrap}>
+          <table>
+            <thead>
+              <tr>
+                <th>原則</th>
+                <th>意味</th>
+                <th>実装方法</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <code>孤立性</code>
+                </td>
+                <td>他のテストの実行順・実行有無に結果が依存しない</td>
+                <td>各テストで独立したフィクスチャを使う</td>
+              </tr>
+              <tr>
+                <td>
+                  <code>冪等性</code>
+                </td>
+                <td>何回実行しても同じ結果になる</td>
+                <td>時刻・乱数・外部APIを排除する</td>
+              </tr>
+              <tr>
+                <td>
+                  <code>自己完結性</code>
+                </td>
+                <td>テストデータを自分で作り・自分で片付ける</td>
+                <td>DB初期化をsetUpで行う</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>ハーミティックを破るアンチパターンと解決策</h3>
+        <div className={styles.mermaidWrap}>
+          <div className={styles.mermaidLabel}>アンチパターン → 解決策のフロー</div>
+          <MermaidDiagram
+            chart={`flowchart TD
+ANTI["ハーミティック違反<br />アンチパターン"]
+AP1["共有DBを使う<br />テストA→B間でデータが残る"]
+AP2["現在時刻に依存<br />datetime.now が変わると失敗"]
+AP3["外部APIを呼ぶ<br />ネットワーク障害で失敗"]
+AP4["グローバル変数を変更<br />他のテストに副作用"]
+FIX1["フェイクDBを使う<br />各テストで独立したメモリDB"]
+FIX2["時刻をモックする<br />freezegun / faketime"]
+FIX3["テストダブルを使う<br />スタブ / モック"]
+FIX4["テスト後にリストアする<br />tearDown でリセット"]
+ANTI --> AP1
+ANTI --> AP2
+ANTI --> AP3
+ANTI --> AP4
+AP1 --> FIX1
+AP2 --> FIX2
+AP3 --> FIX3
+AP4 --> FIX4`}
+          />
+        </div>
+
+        <div className={styles.vocab}>
+          <div className={styles.vocabHead}>📖 用語集</div>
+          <dl>
+            <dt>ハーミティック</dt>
+            <dd>外部に依存せず完全に密閉・独立したテストの性質（hermetic = 密閉された）</dd>
+            <dt>冪等性</dt>
+            <dd>同じ操作を何回繰り返しても同じ結果になる性質</dd>
+            <dt>freezegun</dt>
+            <dd>PythonでdatetimeをモックするOSSライブラリ</dd>
+          </dl>
+        </div>
       </section>
 
       <section id="s6" className={styles.sec}>
