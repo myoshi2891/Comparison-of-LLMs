@@ -161,6 +161,21 @@ describe("/gemini/harness-engineering - page structure", () => {
     expect(s9?.textContent).toMatch(/ADK Eval/);
   });
 
+  it("renders s10 content correctly (10 best practices cards, DAMP/DRY comparison, coverage target table)", () => {
+    const { container } = render(<Page />);
+    const s10 = container.querySelector("#s10");
+    expect(s10).not.toBeNull();
+    expect(s10?.textContent).toMatch(/ベストプラクティス10則/);
+    expect(s10?.textContent).toMatch(/テストはDAMP/);
+    expect(s10?.textContent).toMatch(/1テスト1アサーション/);
+    expect(s10?.querySelector('[class*="cmp"]')).not.toBeNull();
+    expect(s10?.textContent).toMatch(/_make_user/);
+    expect(s10?.textContent).toMatch(/FakeUserRepository/);
+    expect(s10?.querySelector("table")).not.toBeNull();
+    expect(s10?.textContent).toMatch(/推奨カバレッジ/);
+    expect(s10?.textContent).toMatch(/ビジネスロジック層/);
+  });
+
   it("renders 11 TOC links pointing to section anchors", () => {
     const { container } = render(<Page />);
     const tocAnchors = container.querySelectorAll('nav a[href^="#"]');
