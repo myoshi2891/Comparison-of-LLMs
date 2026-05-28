@@ -149,6 +149,18 @@ describe("/gemini/harness-engineering - page structure", () => {
     expect(s8?.textContent).toMatch(/変更影響テスト/);
   });
 
+  it("renders s9 content correctly (comparison table, Mermaid diag-7, LLM-as-Judge code, vocabulary)", () => {
+    const { container } = render(<Page />);
+    const s9 = container.querySelector("#s9");
+    expect(s9).not.toBeNull();
+    expect(s9?.textContent).toMatch(/AIエージェント評価ハーネス/);
+    expect(s9?.textContent).toMatch(/決定論的/);
+    expect(s9?.querySelector("table")).not.toBeNull();
+    expect(s9?.textContent).toMatch(/LLM-as-Judge/);
+    expect(s9?.textContent).toMatch(/evaluate_response/);
+    expect(s9?.textContent).toMatch(/ADK Eval/);
+  });
+
   it("renders 11 TOC links pointing to section anchors", () => {
     const { container } = render(<Page />);
     const tocAnchors = container.querySelectorAll('nav a[href^="#"]');
