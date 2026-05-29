@@ -192,10 +192,17 @@ mainContent = mainContent.replace(/style="([^"]*)"/g, (match, styleString) => {
 // Replace old colspan with colSpan
 mainContent = mainContent.replace(/colspan="(\d+)"/g, 'colSpan={$1}');
 
-// Restore <pre> blocks using dangerouslySetInnerHTML
+// Restore <pre> blocks as safe JSX children (no dangerouslySetInnerHTML)
 mainContent = mainContent.replace(/___PRE_BLOCK_(\d+)___/g, (match, index) => {
     const { attrs, content } = preBlocks[index];
-    return `<pre${attrs} dangerouslySetInnerHTML={{ __html: ${JSON.stringify(content)} }} />`;
+    // Escape content for safe JSX embedding as a string literal
+    const safeContent = content
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\{/g, '&#123;')
+        .replace(/\}/g, '&#125;');
+    return `<pre${attrs}>${safeContent}</pre>`;
 });
 
 // Generate Component Name (PascalCase)

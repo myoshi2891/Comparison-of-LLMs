@@ -222,12 +222,17 @@ $('*').each((_, el) => {
 // Done with JSX brace escaping elsewhere.
 
 
-// Convert internal anchors to Link using Cheerio instead of brittle regex
+// Convert anchors: internal → Link, external → target="_blank"
 $('a').each((i, el) => {
     const href = $(el).attr('href');
-    if (href && (href.startsWith('#') || href.startsWith('/'))) {
+    if (!href) return;
+    if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('//')) {
+        // External link: add safety attributes
+        $(el).attr('target', '_blank');
+        $(el).attr('rel', 'noopener noreferrer');
+    } else if (href.startsWith('#') || href.startsWith('/')) {
         hasLink = true;
-        
+
         // Change tag name from 'a' to 'Link' safely within Cheerio.
         // Some verions of cheerio use el.tagName, others el.name. We cover both.
         if (el.name) el.name = 'Link';
@@ -265,20 +270,22 @@ const componentName = `${routeName
     .filter(Boolean)
     .map((part) => part[0].toUpperCase() + part.slice(1))
     .join('')}Page`;
-const cssName = `${routeName}.css`;
 const pageClass = routeName;
 
-const finalTSX = `${hasLink ? "import Link from 'next/link';\n" : ''}${hasMermaid ? "import Mermaid from '../../components/Mermaid';\n" : ''}import Header from '../../components/Header';
-import '../${cssName}';
+// Compute relative import path from generated file to components directory
+const projectRoot = path.resolve(process.cwd());
+const projectComponentsDir = path.join(projectRoot, 'web-next', 'components');
+const importPrefix = path
+    .relative(path.dirname(tsxPath), projectComponentsDir)
+    .replace(/\\/g, '/');
+
+const finalTSX = `${hasLink ? "import Link from 'next/link';\n" : ''}${hasMermaid ? `import Mermaid from '${importPrefix}/Mermaid';\n` : ''}import styles from './page.module.css';
 
 export default function ${componentName}() {
     return (
-        <>
-            <Header />
-            <main className="${pageClass} container mx-auto px-4 py-8 max-w-5xl">
-                ${outHtml}
-            </main>
-        </>
+        <main className="${pageClass} container mx-auto px-4 py-8 max-w-5xl">
+            ${outHtml}
+        </main>
     );
 }
 `;

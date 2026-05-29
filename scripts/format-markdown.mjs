@@ -33,8 +33,8 @@ export default async function formatMarkdown(filePath) {
     for (let i = 0; i < lines.length; i++) {
         let line = lines[i];
         const trimmed = line.trim();
-        // Strip blockquote prefixes (e.g., "> ", ">> ") for fence detection
-        const lineWithoutBlockquote = line.replace(/^\s*(?:>\s?)+/, '').trim();
+        // Strip only the first blockquote token for fence detection (preserves nested > patterns)
+        const lineWithoutBlockquote = line.replace(/^\s*>\s?/, '').trim();
 
         // 1. Preserve YAML front matter verbatim
         if (i === 0 && trimmed === '---') {
@@ -88,7 +88,17 @@ export default async function formatMarkdown(filePath) {
         }
 
         // 4. Split concatenated links (outside code blocks/front matter)
-        line = line.replace(/\)\[/g, ')\n[');
+        //    Skip replacements that fall inside inline code spans (delimited by backticks)
+        line = line.replace(/\)\[/g, (match, offset, str) => {
+            // Find all inline-code ranges on this line
+            let inCode = false;
+            let i = 0;
+            while (i < offset) {
+                if (str[i] === '`') inCode = !inCode;
+                i++;
+            }
+            return inCode ? match : ')\n[';
+        });
 
         if (trimmed === '---') {
             // Preservation logic for horizontal rules (thematic breaks)
@@ -99,8 +109,12 @@ export default async function formatMarkdown(filePath) {
         }
 
         // 5. Ensure blank line before headings (MD022)
+        //    Skip if we are inside a list item or a blockquote context
         if (/^#{1,6}\s+/.test(line)) {
-            if (processedLines.length > 0 && processedLines[processedLines.length - 1].trim() !== '') {
+            const prevNonEmpty = processedLines.slice().reverse().find(l => l.trim() !== '');
+            const isInList = prevNonEmpty !== undefined && /^\s*(?:[-+*]|\d+\.)\s+/.test(prevNonEmpty);
+            const isInBlockquote = /^\s*>/.test(line);
+            if (!isInList && !isInBlockquote && processedLines.length > 0 && processedLines[processedLines.length - 1].trim() !== '') {
                 processedLines.push('');
             }
         }
