@@ -211,6 +211,7 @@ web-next/
 
 | 旧 URL | 新 URL | 移行 Phase |
 |---|---|---|
+| `/openai-harness-engineering-guide.html` | `/codex/harness-engineering` | Post-Phase |
 | `/claude/skill.html` | `/claude/skill` | B-1 |
 | `/gemini/skill.html` | `/gemini/skill` | B-2 |
 | `/codex/skill.html` | `/codex/skill` | B-3 |
