@@ -153,6 +153,56 @@ CSS にもフォールバックを追加する：
 }
 ```
 
+### React/Next.js (CSS Modules) 移植時の表示と中央寄せ（2026年5月追記）
+
+React (Next.js App Router) 移行に際して共通の `MermaidDiagram` コンポーネントを使用する場合、CSS Modules との競合やテスト環境（Vitest）での描画エラーに注意する必要があります。
+
+#### 1. CSS Modules 環境下での中央寄せとサイズ制限
+
+共通の `MermaidDiagram` は出力時にグローバルクラス `"mermaid"` を付与します。しかし、CSS Modules（`*.module.css`）で指定した `.mermaid` はクラス名がハッシュ化されるため、スタイルが当たらなくなり左寄せになってしまいます。
+
+**【対策】**
+1. **TSX 側**: `MermaidDiagram` をラッパー div で囲み、ハッシュ化されるクラス名 (`styles.mermaid`) と、個別幅制限用のグローバル ID (`id="diag-X"`) を付与します。
+
+```tsx
+<div id="diag-0" className={styles.mermaid}>
+  <MermaidDiagram chart={DIAGRAM_0} />
+</div>
+```
+
+2. **CSS 側**: ハッシュ化クラスから下位のグローバルな `svg` をターゲットするため、`:global` セレクタを使用します。
+
+```css
+.mermaid {
+  display: flex;
+  justify-content: center;
+}
+.mermaid :global(svg) {
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+}
+```
+
+   個別 ID セレクタ（`#diag-0 svg` 等）は CSS Modules でも変換されないため、グローバル ID セレクタ経由で最大幅（`max-width`）を制御できます。
+
+#### 2. テスト環境（Vitest）での MermaidDiagram のモック化
+
+`MermaidDiagram` はクライアントサイドで動的に `mermaid` ライブラリを読み込んで動作するため、テスト環境での DOM レンダリング時にエラーを起こす原因となります。
+テストファイル（`page.test.tsx`）では、必ず `vi.mock` を使ってダミー要素にモック化してください。
+
+```typescript
+vi.mock("@/components/docs/MermaidDiagram", () => ({
+  default: function DummyMermaidDiagram({ chart }: { chart: string }) {
+    return <pre data-testid="mermaid">{chart}</pre>;
+  },
+}));
+```
+
+---
+
 ### Mermaid を諦めて HTML/CSS に置き換えるべきケース
 
 以下は CSS では対処不能なため、**純粋な HTML/CSS ウィジェットに置き換える**：

@@ -1,6 +1,12 @@
 import { render } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import Page from "./page";
+
+vi.mock("@/components/docs/MermaidDiagram", () => ({
+  default: function DummyMermaidDiagram({ chart }: { chart: string }) {
+    return <pre data-testid="mermaid">{chart}</pre>;
+  },
+}));
 
 describe("OpenAI Harness Engineering Guide", () => {
   it("renders the correct title (<h1>)", () => {

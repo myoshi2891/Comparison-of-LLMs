@@ -1,4 +1,166 @@
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
+
+const DIAGRAM_0 = `flowchart LR
+A["評価目標の定義\\nWhat to measure"]
+B["Eval セット設計\\nHow to measure"]
+C["ハーネス実装\\nInfrastructure"]
+D["分析・改善\\nIterate"]
+A --> B
+B --> C
+C --> D
+D --> A`;
+
+const DIAGRAM_1 = `mindmap
+  root((LLM の\\nテスト課題))
+    非決定性
+      同じ入力でも毎回異なる出力
+      温度パラメータの影響
+      モデルアップデートによる挙動変化
+    評価の難しさ
+      正解が一意ではない
+      文脈依存の正しさ
+      人間の感性が必要なケース
+    スケール問題
+      手動評価のコスト爆発
+      大量テストケース管理
+      複数モデル間の比較
+    回帰リスク
+      プロンプト変更の副作用
+      Fine-tuning前後の比較
+      本番環境での品質劣化`;
+
+const DIAGRAM_2 = `flowchart LR
+subgraph IN["入力層"]
+  DS["Dataset\\nJSONL 形式"]
+  PT["Prompt\\nTemplate"]
+end
+subgraph HN["ハーネス層"]
+  direction TB
+  RN["Runner\\n実行エンジン"]
+  SA["Sampler\\nモデル呼び出し"]
+  EV["Evaluator\\n採点器"]
+end
+subgraph OUT["出力層"]
+  RP["results.jsonl\\n生の結果"]
+  DB["Platform\\nDashboard"]
+  AL["Alert\\nSlack / GitHub"]
+end
+DS --> RN
+PT --> RN
+RN --> SA
+SA --> EV
+EV --> RP
+RP --> DB
+RP --> AL`;
+
+const DIAGRAM_3 = `flowchart TD
+S0["Step 0\\n環境構築"]
+S1["Step 1\\nデータセット作成\\nsamples.jsonl"]
+S2["Step 2\\nYAML 定義\\neval_name.yaml"]
+S3["Step 3\\nEval 実行\\noaieval model eval"]
+S4{"合格ライン\\n超えたか？"}
+S5["ダッシュボード\\nアップロード"]
+S6["改善\\nプロンプト調整\\nデータ追加"]
+S0 --> S1
+S1 --> S2
+S2 --> S3
+S3 --> S4
+S4 -->|"Yes"| S5
+S4 -->|"No"| S6
+S6 --> S3`;
+
+const DIAGRAM_4 = `flowchart TD
+Q1{"出力は\\n一意に決まるか？"}
+A1["String Match\\nMatch / Includes /\\nFuzzyMatch\\n最速・最安"]
+Q2{"判断基準を\\n明文化できるか？"}
+A2["Model Graded\\nClosedQA\\n/ Criteria\\nGPT-4o が採点"]
+Q3{"コスト・時間を\\nかけられるか？"}
+A3["Human\\nEval\\nゴールデンセット構築"]
+A4["LLM-as-Judge\\nGPT-4o で代替"]
+A5["Custom\\nPython\\n任意ロジック実装"]
+Q4{"複雑なロジックが\\n必要か？"}
+Q1 -->|"Yes\\n数値・コード・固定値"| A1
+Q1 -->|"No\\n自由記述・翻訳"| Q2
+Q2 -->|"Yes"| Q4
+Q2 -->|"No"| Q3
+Q3 -->|"Yes"| A3
+Q3 -->|"No"| A4
+Q4 -->|"Yes\\nコード実行・API検証"| A5
+Q4 -->|"No"| A2`;
+
+const DIAGRAM_5 = `sequenceDiagram
+participant H as ハーネス
+participant UT as 被評価モデル(gpt-4o-mini)
+participant JD as 採点モデル(gpt-4o)
+H->>UT: テスト入力を送信
+UT-->>H: 回答を返す
+H->>JD: この回答は正しいか？+ 採点基準
+JD-->>H: スコア (Y / N / Unclear)
+H->>H: results.jsonl に記録`;
+
+const DIAGRAM_6 = `sequenceDiagram
+participant Dev as 開発者
+participant Codex as Codex Agent
+participant Harness as Eval ハーネス
+participant CI as GitHub Actions
+participant Review as レビュアー
+Dev->>Codex: タスクを指示
+Codex->>Codex: AGENTS.md を読み込み
+Codex->>Codex: コード・プロンプトを変更
+Codex->>Harness: ミニセット Eval 自動実行
+Harness-->>Codex: Score: 0.87 合格
+Codex->>Dev: PR を提案
+Dev->>CI: PR をマージ要求
+CI->>Harness: フルセット Eval 実行
+Harness-->>CI: accuracy: 0.88 合格
+CI-->>Review: テスト結果レポート
+Review->>Dev: LGTM / マージ`;
+
+const DIAGRAM_7 = `flowchart LR
+PR["PR 作成時\\nミニセット 30件\\ngpt-4o-mini\\n~$0.01"]
+MG["main\\nマージ前\\nフルセット 500件\\ngpt-4o\\n~$0.50"]
+NT["毎夜 cron\\nゴールデン\\n100件\\ngpt-4o\\n~$0.10"]
+RL["リリース前\\n包括セット 全件\\ngpt-4o + human\\n~$5-50"]
+PR --> MG
+MG --> NT
+NT --> RL`;
+
+const DIAGRAM_8 = `flowchart TD
+IN["エージェントへのタスク入力"]
+E1["Step 1\\nEval\\n意図理解の正確さ\\naccuracy >= 0.90"]
+E2["Step 2 Eval\\n計画の妥当性\\nmodel_graded\\n>= 0.85"]
+E3["Step 3 Eval\\n最終出力の品質\\nhuman_graded >= 0.80"]
+G1{"Step 1 合格？"}
+G2{"Step 2 合格？"}
+FAIL["早期失敗\\nコスト節約"]
+PASS["全ステップ合格"]
+IN --> E1
+E1 --> G1
+G1 -->|"Yes"| E2
+E2 --> G2
+G1 -->|"No"| FAIL
+G2 -->|"Yes"| E3
+G2 -->|"No"| FAIL
+E3 --> PASS`;
+
+const DIAGRAM_9 = `flowchart TD
+START["Eval スコアが期待より低い"]
+Q1{"データセット品質\\nの問題？"}
+Q2{"プロンプトの問題？"}
+Q3{"採点基準の問題？"}
+Q4{"モデルの問題？"}
+Q1 -->|"Yes"| A1
+Q1 -->|"No"| Q2
+Q2 -->|"Yes"| A2
+Q2 -->|"No"| Q3
+Q3 -->|"Yes"| A3
+Q3 -->|"No"| Q4
+Q4 --> A4
+A1["サンプルを手動確認\\n曖昧な正解を修正\\nエッジケースを追加"]
+A2["Few-shot\\nを追加\\nシステムプロンプトを修正\\nタスクを分解する"]
+A3["採点プロンプトを見直し\\n別の\\nEvaluator を試す\\n人手評価でサンプル確認"]
+A4["上位モデルを試す\\nFine-tuning\\nを検討\\nRAG を活用する"]`;
 
 export default function HarnessEngineeringGuide() {
   return (
@@ -158,7 +320,9 @@ export default function HarnessEngineeringGuide() {
 
           <div className={styles.mermaidWrap}>
             <div className={styles.mermaidLabel}>▸ ハーネスエンジニアリング サイクル</div>
-            <div id="diag-0"></div>
+            <div id="diag-0" className={styles.mermaid}>
+              <MermaidDiagram chart={DIAGRAM_0} />
+            </div>
           </div>
 
           <div className={styles.cardGrid3}>
@@ -201,7 +365,9 @@ export default function HarnessEngineeringGuide() {
 
           <div className={styles.mermaidWrap}>
             <div className={styles.mermaidLabel}>▸ LLM テスト課題マップ</div>
-            <div id="diag-1"></div>
+            <div id="diag-1" className={styles.mermaid}>
+              <MermaidDiagram chart={DIAGRAM_1} />
+            </div>
           </div>
 
           <h3 className={`${styles.h3} ${styles.subH}`}>ハーネスなし開発のリスク一覧</h3>
@@ -307,7 +473,9 @@ export default function HarnessEngineeringGuide() {
 
           <div className={styles.mermaidWrap}>
             <div className={styles.mermaidLabel}>▸ OpenAI Evals コンポーネント構成</div>
-            <div id="diag-2"></div>
+            <div id="diag-2" className={styles.mermaid}>
+              <MermaidDiagram chart={DIAGRAM_2} />
+            </div>
           </div>
 
           <h3 className={`${styles.h3} ${styles.subH}`}>Evaluator クラス一覧（組み込み）</h3>
@@ -403,7 +571,9 @@ export default function HarnessEngineeringGuide() {
 
           <div className={styles.mermaidWrap}>
             <div className={styles.mermaidLabel}>▸ セットアップ → 実行 → 改善サイクル</div>
-            <div id="diag-3"></div>
+            <div id="diag-3" className={styles.mermaid}>
+              <MermaidDiagram chart={DIAGRAM_3} />
+            </div>
           </div>
 
           <div className={styles.divider}></div>
@@ -431,30 +601,41 @@ export default function HarnessEngineeringGuide() {
                   </div>
                   <pre className={styles.pre}>
                     <span className={`${styles.span} ${styles.cm}`}># 1. リポジトリをクローン</span>
-                    <span className={`${styles.span} ${styles.fn}`}>git</span> clone
+                    {"\n"}
+                    <span className={`${styles.span} ${styles.fn}`}>git</span> clone{" "}
                     https://github.com/openai/evals.git
+                    {"\n"}
                     <span className={`${styles.span} ${styles.fn}`}>cd</span> evals
+                    {"\n"}
                     <span className={`${styles.span} ${styles.cm}`}>
                       # 2. 仮想環境を作成（推奨）
                     </span>
+                    {"\n"}
                     <span className={`${styles.span} ${styles.fn}`}>python</span> -m venv .venv
+                    {"\n"}
                     <span className={`${styles.span} ${styles.fn}`}>source</span> .venv/bin/activate{" "}
                     <span className={`${styles.span} ${styles.cm}`}>
                       # Windows: .venv\Scripts\activate
                     </span>
+                    {"\n"}
                     <span className={`${styles.span} ${styles.cm}`}>
                       # 3. 依存パッケージをインストール
                     </span>
+                    {"\n"}
                     <span className={`${styles.span} ${styles.fn}`}>pip</span> install -e{" "}
                     <span className={`${styles.span} ${styles.str}`}>".[dev]"</span>
+                    {"\n"}
                     <span className={`${styles.span} ${styles.cm}`}># 4. API キーを設定</span>
+                    {"\n"}
                     <span className={`${styles.span} ${styles.kw}`}>export</span>{" "}
                     <span className={`${styles.span} ${styles.op}`}>OPENAI_API_KEY</span>=
                     <span className={`${styles.span} ${styles.str}`}>"sk-..."</span>
+                    {"\n"}
                     <span className={`${styles.span} ${styles.cm}`}>
                       # 5. 動作確認（サンプル Eval を実行）
                     </span>
-                    <span className={`${styles.span} ${styles.fn}`}>oaieval</span> gpt-4o test-match
+                    {"\n"}
+                    <span className={`${styles.span} ${styles.fn}`}>oaieval</span> gpt-4o test-match{" "}
                     --max_samples <span className={`${styles.span} ${styles.num}`}>10</span>
                   </pre>
                 </div>
@@ -500,11 +681,13 @@ export default function HarnessEngineeringGuide() {
                       &#123;"input": [&#123;"role": "user", "content":
                       "日本の首都はどこですか？"&#125;], "ideal": "東京"&#125;
                     </span>
+                    {"\n"}
                     <span className={`${styles.span} ${styles.str}`}>
                       &#123;"input": [&#123;"role": "user", "content":
                       "富士山の標高を教えてください"&#125;], "ideal": ["3776メートル", "3,776m",
                       "3776m"]&#125;
                     </span>
+                    {"\n"}
                     <span className={`${styles.span} ${styles.str}`}>
                       &#123;"input": [&#123;"role": "system", "content":
                       "あなたはSQLの専門家です"&#125;, &#123;"role": "user", "content":
@@ -575,22 +758,35 @@ export default function HarnessEngineeringGuide() {
                     <span className={`${styles.span} ${styles.cm}`}>
                       # Eval グループ定義（最上位）
                     </span>
+                    {"\n"}
                     <span className={`${styles.span} ${styles.op}`}>my_qa</span>
                     <span className={`${styles.span} ${styles.kw}`}>:</span>
+                    {"\n"}
+                    {"  "}
                     <span className={`${styles.span} ${styles.fn}`}>id</span>
                     <span className={`${styles.span} ${styles.kw}`}>:</span> my_qa.v1
+                    {"\n"}
+                    {"  "}
                     <span className={`${styles.span} ${styles.fn}`}>metrics</span>
                     <span className={`${styles.span} ${styles.kw}`}>:</span> [accuracy]
+                    {"\n\n"}
                     <span className={`${styles.span} ${styles.cm}`}># Eval バージョン定義</span>
+                    {"\n"}
                     <span className={`${styles.span} ${styles.op}`}>my_qa.v1</span>
                     <span className={`${styles.span} ${styles.kw}`}>:</span>
+                    {"\n"}
+                    {"  "}
                     <span className={`${styles.span} ${styles.fn}`}>class</span>
                     <span className={`${styles.span} ${styles.kw}`}>:</span>{" "}
                     <span className={`${styles.span} ${styles.str}`}>
                       evals.elsuite.basic.match:Match
                     </span>
+                    {"\n"}
+                    {"  "}
                     <span className={`${styles.span} ${styles.fn}`}>args</span>
                     <span className={`${styles.span} ${styles.kw}`}>:</span>
+                    {"\n"}
+                    {"    "}
                     <span className={`${styles.span} ${styles.fn}`}>samples_jsonl</span>
                     <span className={`${styles.span} ${styles.kw}`}>:</span> my_qa/samples.jsonl
                   </pre>
@@ -620,28 +816,38 @@ export default function HarnessEngineeringGuide() {
                   </div>
                   <pre className={styles.pre}>
                     <span className={`${styles.span} ${styles.cm}`}># 基本実行</span>
+                    {"\n"}
                     <span className={`${styles.span} ${styles.fn}`}>oaieval</span> gpt-4o my_qa
+                    {"\n\n"}
                     <span className={`${styles.span} ${styles.cm}`}>
                       # コスト節約: サンプル数を制限してテスト
                     </span>
-                    <span className={`${styles.span} ${styles.fn}`}>oaieval</span> gpt-4o my_qa
+                    {"\n"}
+                    <span className={`${styles.span} ${styles.fn}`}>oaieval</span> gpt-4o my_qa{" "}
                     --max_samples <span className={`${styles.span} ${styles.num}`}>20</span>
+                    {"\n\n"}
                     <span className={`${styles.span} ${styles.cm}`}>
                       # モデル比較: 結果ファイルを分けて保存
                     </span>
-                    <span className={`${styles.span} ${styles.fn}`}>oaieval</span> gpt-4o-mini my_qa
+                    {"\n"}
+                    <span className={`${styles.span} ${styles.fn}`}>oaieval</span> gpt-4o-mini my_qa{" "}
                     --record_path results/mini.jsonl
-                    <span className={`${styles.span} ${styles.fn}`}>oaieval</span> gpt-4o my_qa
+                    {"\n"}
+                    <span className={`${styles.span} ${styles.fn}`}>oaieval</span> gpt-4o my_qa{" "}
                     --record_path results/4o.jsonl
+                    {"\n\n"}
                     <span className={`${styles.span} ${styles.cm}`}>
                       # 並列実行でスピードアップ（コスト注意）
                     </span>
-                    <span className={`${styles.span} ${styles.fn}`}>oaieval</span> gpt-4o my_qa
+                    {"\n"}
+                    <span className={`${styles.span} ${styles.fn}`}>oaieval</span> gpt-4o my_qa{" "}
                     --num_threads <span className={`${styles.span} ${styles.num}`}>10</span>
+                    {"\n\n"}
                     <span className={`${styles.span} ${styles.cm}`}>
                       # 結果を OpenAI Platform にアップロード
                     </span>
-                    <span className={`${styles.span} ${styles.fn}`}>oaieval</span> gpt-4o my_qa
+                    {"\n"}
+                    <span className={`${styles.span} ${styles.fn}`}>oaieval</span> gpt-4o my_qa{" "}
                     --upload
                   </pre>
                 </div>
@@ -673,6 +879,7 @@ export default function HarnessEngineeringGuide() {
                       &#123;"run_id": "abc123", "event_id": 0, "type": "match", "data":
                       &#123;"correct": true, "expected": "東京", "sampled": "東京"&#125;&#125;
                     </span>
+                    {"\n"}
                     <span className={`${styles.span} ${styles.str}`}>
                       &#123;"run_id": "abc123", "event_id": 1, "type": "match", "data":
                       &#123;"correct": false, "expected": "3776メートル", "sampled":
@@ -691,39 +898,59 @@ export default function HarnessEngineeringGuide() {
                   </div>
                   <pre className={styles.pre}>
                     <span className={`${styles.span} ${styles.kw}`}>import</span> json, sys
+                    {"\n"}
                     <span className={`${styles.span} ${styles.kw}`}>def</span>{" "}
                     <span className={`${styles.span} ${styles.fn}`}>check_threshold</span>
                     (results_path: <span className={`${styles.span} ${styles.fn}`}>str</span>,
                     threshold: <span className={`${styles.span} ${styles.fn}`}>float</span> ={" "}
-                    <span className={`${styles.span} ${styles.num}`}>0.85</span>): correct = total ={" "}
+                    <span className={`${styles.span} ${styles.num}`}>0.85</span>):
+                    {"\n"}
+                    {"    "}correct = total ={" "}
                     <span className={`${styles.span} ${styles.num}`}>0</span>
+                    {"\n"}
+                    {"    "}
                     <span className={`${styles.span} ${styles.kw}`}>with</span>{" "}
                     <span className={`${styles.span} ${styles.fn}`}>open</span>
                     (results_path) <span className={`${styles.span} ${styles.kw}`}>as</span> f:
+                    {"\n"}
+                    {"        "}
                     <span className={`${styles.span} ${styles.kw}`}>for</span> line{" "}
-                    <span className={`${styles.span} ${styles.kw}`}>in</span> f: ev = json.
+                    <span className={`${styles.span} ${styles.kw}`}>in</span> f:
+                    {"\n"}
+                    {"            "}ev = json.
                     <span className={`${styles.span} ${styles.fn}`}>loads</span>(line)
+                    {"\n"}
+                    {"            "}
                     <span className={`${styles.span} ${styles.kw}`}>if</span> ev.get(
                     <span className={`${styles.span} ${styles.str}`}>"type"</span>) =={" "}
-                    <span className={`${styles.span} ${styles.str}`}>"match"</span>: total +={" "}
+                    <span className={`${styles.span} ${styles.str}`}>"match"</span>:{"\n"}
+                    {"                "}total +={" "}
                     <span className={`${styles.span} ${styles.num}`}>1</span>
+                    {"\n"}
+                    {"                "}
                     <span className={`${styles.span} ${styles.kw}`}>if</span> ev[
                     <span className={`${styles.span} ${styles.str}`}>"data"</span>][
-                    <span className={`${styles.span} ${styles.str}`}>"correct"</span>]: correct +={" "}
+                    <span className={`${styles.span} ${styles.str}`}>"correct"</span>]:
+                    {"\n"}
+                    {"                    "}correct +={" "}
                     <span className={`${styles.span} ${styles.num}`}>1</span>
-                    accuracy = correct / total{" "}
+                    {"\n"}
+                    {"    "}accuracy = correct / total{" "}
                     <span className={`${styles.span} ${styles.kw}`}>if</span> total{" "}
                     <span className={`${styles.span} ${styles.kw}`}>else</span>{" "}
                     <span className={`${styles.span} ${styles.num}`}>0</span>
+                    {"\n"}
+                    {"    "}
                     <span className={`${styles.span} ${styles.fn}`}>print</span>(
                     <span className={`${styles.span} ${styles.str}`}>
                       f"Accuracy: &#123;accuracy:.2%&#125; (&#123;correct&#125;/&#123;total&#125;)"
                     </span>
-                    ) sys.<span className={`${styles.span} ${styles.fn}`}>exit</span>(
+                    ){"\n"}
+                    {"    "}sys.<span className={`${styles.span} ${styles.fn}`}>exit</span>(
                     <span className={`${styles.span} ${styles.num}`}>0</span>{" "}
                     <span className={`${styles.span} ${styles.kw}`}>if</span> accuracy &gt;=
                     threshold <span className={`${styles.span} ${styles.kw}`}>else</span>{" "}
-                    <span className={`${styles.span} ${styles.num}`}>1</span>)
+                    <span className={`${styles.span} ${styles.num}`}>1</span>){"\n\n"}
                     <span className={`${styles.span} ${styles.fn}`}>check_threshold</span>(
                     <span className={`${styles.span} ${styles.str}`}>"results/4o.jsonl"</span>,
                     threshold=
@@ -755,7 +982,9 @@ export default function HarnessEngineeringGuide() {
 
           <div className={styles.mermaidWrap}>
             <div className={styles.mermaidLabel}>▸ Eval パターン選択の判断木</div>
-            <div id="diag-4"></div>
+            <div id="diag-4" className={styles.mermaid}>
+              <MermaidDiagram chart={DIAGRAM_4} />
+            </div>
           </div>
 
           <h3 className={`${styles.h3} ${styles.subH}`}>パターン比較表</h3>
@@ -874,7 +1103,9 @@ export default function HarnessEngineeringGuide() {
 
           <div className={styles.mermaidWrap}>
             <div className={styles.mermaidLabel}>▸ LLM-as-Judge シーケンス</div>
-            <div id="diag-5"></div>
+            <div id="diag-5" className={styles.mermaid}>
+              <MermaidDiagram chart={DIAGRAM_5} />
+            </div>
           </div>
 
           <h3 className={`${styles.h3} ${styles.subH}`}>
@@ -895,14 +1126,37 @@ export default function HarnessEngineeringGuide() {
             <pre className={styles.pre}>
               <span className={`${styles.span} ${styles.op}`}>GRADER_PROMPT</span> ={" "}
               <span className={`${styles.span} ${styles.str}`}>
-                """ あなたは厳格かつ公平な評価者です。以下の基準で回答を評価してください。 ##
-                評価対象 **質問**: &#123;question&#125; **回答**: &#123;answer&#125; ## 評価基準
-                &#123;criteria&#125; ## 採点ルール - `Y` : 基準を完全に満たしている - `N` :
-                基準を満たしていない - `Unclear` : 判断が難しい場合（乱用禁止） ## 重要な指示 1.
-                自分の知識ではなく「提示された情報のみ」で評価すること 2.
-                部分的に正しくても基準を完全に満たさなければ N 3. 採点理由を 1 文で説明すること ##
-                出力（JSON のみ） &#123;&#123;"grade": "Y/N/Unclear", "reason":
-                "採点理由"&#125;&#125; """
+                """
+                {"\n"}
+                あなたは厳格かつ公平な評価者です。以下の基準で回答を評価してください。
+                {"\n\n"}
+                ## 評価対象
+                {"\n"}
+                **質問**: &#123;question&#125;
+                {"\n"}
+                **回答**: &#123;answer&#125;
+                {"\n\n"}
+                ## 評価基準
+                {"\n"}
+                &#123;criteria&#125;
+                {"\n\n"}
+                ## 採点ルール
+                {"\n"}- `Y` : 基準を完全に満たしている
+                {"\n"}- `N` : 基準を満たしていない
+                {"\n"}- `Unclear` : 判断が難しい場合（乱用禁止）
+                {"\n\n"}
+                ## 重要な指示
+                {"\n"}
+                1. 自分の知識ではなく「提示された情報のみ」で評価すること
+                {"\n"}
+                2. 部分的に正しくても基準を完全に満たさなければ N{"\n"}
+                3. 採点理由を 1 文で説明すること
+                {"\n\n"}
+                ## 出力（JSON のみ）
+                {"\n"}
+                &#123;&#123;"grade": "Y/N/Unclear", "reason": "採点理由"&#125;&#125;
+                {"\n"}
+                """
               </span>
             </pre>
           </div>
@@ -1020,30 +1274,44 @@ export default function HarnessEngineeringGuide() {
             </div>
             <pre className={styles.pre}>
               <span className={`${styles.span} ${styles.hl}`}>my-ai-project/</span>
-              ├── <span className={`${styles.span} ${styles.op}`}>evals/</span>{" "}
-              <span className={`${styles.span} ${styles.cm}`}>← Eval ルートディレクトリ</span>│ ├──
-              registry/ │ │ ├── data/ │ │ │ ├──{" "}
-              <span className={`${styles.span} ${styles.fn}`}>qa_basic/</span>{" "}
-              <span className={`${styles.span} ${styles.cm}`}>← カテゴリ別に分割</span>│ │ │ │ ├──
-              train.jsonl{" "}
-              <span className={`${styles.span} ${styles.cm}`}>← 開発用（少量・変更可）</span>│ │ │ │
-              └── test.jsonl{" "}
-              <span className={`${styles.span} ${styles.cm}`}>← 本番評価用（固定・変更禁止）</span>│
-              │ │ ├── <span className={`${styles.span} ${styles.fn}`}>code_gen/</span>│ │ │ │ └──
-              samples.jsonl │ │ │ └──{" "}
-              <span className={`${styles.span} ${styles.rose}`}>safety/</span>{" "}
-              <span className={`${styles.span} ${styles.cm}`}>← セーフティ Eval は必ず独立</span>│ │
-              │ └── samples.jsonl │ │ └── evals/ │ │ ├── qa_basic.yaml │ │ ├── code_gen.yaml │ │ └──
-              safety.yaml │ └── elsuite/custom/ │ └── my_custom_eval.py{" "}
+              {"\n"}
+              ├── <span className={`${styles.span} ${styles.op}`}>evals/</span> {"  "}
+              <span className={`${styles.span} ${styles.cm}`}>← Eval ルートディレクトリ</span>
+              {"\n"}│ ├── registry/
+              {"\n"}│ │ ├── data/
+              {"\n"}│ │ │ ├── <span className={`${styles.span} ${styles.fn}`}>qa_basic/</span>{" "}
+              {"  "}
+              <span className={`${styles.span} ${styles.cm}`}>← カテゴリ別に分割</span>
+              {"\n"}│ │ │ │ ├── train.jsonl {"  "}
+              <span className={`${styles.span} ${styles.cm}`}>← 開発用（少量・変更可）</span>
+              {"\n"}│ │ │ │ └── test.jsonl {"  "}
+              <span className={`${styles.span} ${styles.cm}`}>← 本番評価用（固定・変更禁止）</span>
+              {"\n"}│ │ │ ├── <span className={`${styles.span} ${styles.fn}`}>code_gen/</span>
+              {"\n"}│ │ │ │ └── samples.jsonl
+              {"\n"}│ │ │ └── <span className={`${styles.span} ${styles.rose}`}>safety/</span>{" "}
+              {"  "}
+              <span className={`${styles.span} ${styles.cm}`}>← セーフティ Eval は必ず独立</span>
+              {"\n"}│ │ │ └── samples.jsonl
+              {"\n"}│ │ └── evals/
+              {"\n"}│ │ ├── qa_basic.yaml
+              {"\n"}│ │ ├── code_gen.yaml
+              {"\n"}│ │ └── safety.yaml
+              {"\n"}│ └── elsuite/custom/
+              {"\n"}│ └── my_custom_eval.py {"  "}
               <span className={`${styles.span} ${styles.cm}`}>← カスタム Evaluator</span>
-              ├── scripts/ │ ├── run_evals.sh{" "}
-              <span className={`${styles.span} ${styles.cm}`}>← 実行スクリプト</span>│ └──
-              compare_models.py{" "}
+              {"\n"}
+              ├── scripts/
+              {"\n"}│ ├── run_evals.sh {"  "}
+              <span className={`${styles.span} ${styles.cm}`}>← 実行スクリプト</span>
+              {"\n"}│ └── compare_models.py {"  "}
               <span className={`${styles.span} ${styles.cm}`}>← モデル比較スクリプト</span>
+              {"\n"}
               ├── results/{" "}
               <span className={`${styles.span} ${styles.rose}`}>← .gitignore 推奨</span>
+              {"\n"}
               ├── <span className={`${styles.span} ${styles.op}`}>AGENTS.md</span>{" "}
               <span className={`${styles.span} ${styles.cm}`}>← Codex 向け永続設定</span>
+              {"\n"}
               └── <span className={`${styles.span} ${styles.op}`}>TEST.md</span>{" "}
               <span className={`${styles.span} ${styles.cm}`}>← 受け入れ基準チェックリスト</span>
             </pre>
@@ -1157,16 +1425,21 @@ export default function HarnessEngineeringGuide() {
             </div>
             <pre className={styles.pre}>
               <span className={`${styles.span} ${styles.hl}`}>## Build & Test Commands</span>
+              {"\n"}
               <span className={`${styles.span} ${styles.op}`}>### AI Eval（ハーネス）</span>
+              {"\n"}
               <span className={`${styles.span} ${styles.cm}`}>
                 # ★ ファイルを変更したら必ず以下を実行すること
               </span>
-              - ミニセット（開発中）: `oaieval gpt-4o-mini qa_basic --max_samples 20` -
-              フルセット（PR前必須）:`oaieval gpt-4o qa_basic` - モデル比較: `python
-              scripts/compare_models.py --models gpt-4o,gpt-4o-mini` - 合格基準: accuracy &gt;= 0.85
-              <span className={`${styles.span} ${styles.op}`}>### 注意事項</span>- Eval 実行には
-              OPENAI_API_KEY 環境変数が必要 - フルセットはコストが発生するため main ブランチ PR
-              時のみ実行 - results/ ディレクトリは .gitignore 済み
+              {"\n"}- ミニセット（開発中）: `oaieval gpt-4o-mini qa_basic --max_samples 20`
+              {"\n"}- フルセット（PR前必須）: `oaieval gpt-4o qa_basic`
+              {"\n"}- モデル比較: `python scripts/compare_models.py --models gpt-4o,gpt-4o-mini`
+              {"\n"}- 合格基準: accuracy &gt;= 0.85
+              {"\n\n"}
+              <span className={`${styles.span} ${styles.op}`}>### 注意事項</span>
+              {"\n"}- Eval 実行には OPENAI_API_KEY 環境変数が必要
+              {"\n"}- フルセットはコストが発生するため main ブランチ PR 時のみ実行
+              {"\n"}- results/ ディレクトリは .gitignore 済み
             </pre>
           </div>
 
@@ -1185,13 +1458,16 @@ export default function HarnessEngineeringGuide() {
               <span className={`${styles.span} ${styles.hl}`}>
                 # TEST.md — AI 品質基準チェックリスト
               </span>
-              <span className={`${styles.span} ${styles.op}`}>## Eval 基準</span>- [ ] [Eval]
-              `qa_basic` eval の accuracy &gt;= 0.85 - [ ] [Eval] `code_gen` eval の pass_rate &gt;=
-              0.80 - [ ] [Eval] `safety` eval の violation_rate == 0.0（ゼロトレランス） - [ ]
-              [Eval] 新機能追加時は対応する eval サンプルを最低 10件追加
-              <span className={`${styles.span} ${styles.op}`}>## 回帰テスト</span>- [ ] [CI]
-              前バージョン比で accuracy が 2% 以上低下していない - [ ] [CI] レスポンスタイム p99
-              &lt; 3000ms
+              {"\n\n"}
+              <span className={`${styles.span} ${styles.op}`}>## Eval 基準</span>
+              {"\n"}- [ ] [Eval] `qa_basic` eval の accuracy &gt;= 0.85
+              {"\n"}- [ ] [Eval] `code_gen` eval の pass_rate &gt;= 0.80
+              {"\n"}- [ ] [Eval] `safety` eval の violation_rate == 0.0（ゼロトレランス）
+              {"\n"}- [ ] [Eval] 新機能追加時は対応する eval サンプルを最低 10件追加
+              {"\n\n"}
+              <span className={`${styles.span} ${styles.op}`}>## 回帰テスト</span>
+              {"\n"}- [ ] [CI] 前バージョン比で accuracy が 2% 以上低下していない
+              {"\n"}- [ ] [CI] レスポンスタイム p99 &lt; 3000ms
             </pre>
           </div>
 
@@ -1203,7 +1479,9 @@ export default function HarnessEngineeringGuide() {
             <div className={styles.mermaidLabel}>
               ▸ Codex エージェント × Eval ハーネス 統合フロー
             </div>
-            <div id="diag-6"></div>
+            <div id="diag-6" className={styles.mermaid}>
+              <MermaidDiagram chart={DIAGRAM_6} />
+            </div>
           </div>
         </section>
 
@@ -1224,7 +1502,9 @@ export default function HarnessEngineeringGuide() {
 
           <div className={styles.mermaidWrap}>
             <div className={styles.mermaidLabel}>▸ 実行タイミング別コスト管理戦略</div>
-            <div id="diag-7"></div>
+            <div id="diag-7" className={styles.mermaid}>
+              <MermaidDiagram chart={DIAGRAM_7} />
+            </div>
           </div>
 
           <div className={styles.tableWrap}>
@@ -1285,76 +1565,149 @@ export default function HarnessEngineeringGuide() {
             <pre className={styles.pre}>
               <span className={`${styles.span} ${styles.op}`}>name:</span>{" "}
               <span className={`${styles.span} ${styles.str}`}>AI Eval Pipeline</span>
+              {"\n\n"}
               <span className={`${styles.span} ${styles.op}`}>on:</span>
+              {"\n"}
+              {"  "}
               <span className={`${styles.span} ${styles.fn}`}>pull_request:</span>
+              {"\n"}
+              {"    "}
               <span className={`${styles.span} ${styles.fn}`}>branches:</span> [main]
-              <span className={`${styles.span} ${styles.fn}`}>paths:</span>-{" "}
-              <span className={`${styles.span} ${styles.str}`}>'prompts/**'</span>{" "}
-              <span className={`${styles.span} ${styles.cm}`}># プロンプト変更時</span>-{" "}
-              <span className={`${styles.span} ${styles.str}`}>'evals/**'</span>{" "}
-              <span className={`${styles.span} ${styles.cm}`}># Eval 定義変更時</span>-{" "}
-              <span className={`${styles.span} ${styles.str}`}>'src/ai/**'</span>{" "}
+              {"\n"}
+              {"    "}
+              <span className={`${styles.span} ${styles.fn}`}>paths:</span>
+              {"\n"}
+              {"      "}- <span className={`${styles.span} ${styles.str}`}>'prompts/**'</span>{" "}
+              <span className={`${styles.span} ${styles.cm}`}># プロンプト変更時</span>
+              {"\n"}
+              {"      "}- <span className={`${styles.span} ${styles.str}`}>'evals/**'</span>{" "}
+              <span className={`${styles.span} ${styles.cm}`}># Eval 定義変更時</span>
+              {"\n"}
+              {"      "}- <span className={`${styles.span} ${styles.str}`}>'src/ai/**'</span>{" "}
               <span className={`${styles.span} ${styles.cm}`}># AI ロジック変更時</span>
+              {"\n\n"}
               <span className={`${styles.span} ${styles.op}`}>jobs:</span>
+              {"\n"}
+              {"  "}
               <span className={`${styles.span} ${styles.fn}`}>mini_eval:</span>
+              {"\n"}
+              {"    "}
               <span className={`${styles.span} ${styles.fn}`}>name:</span>{" "}
               <span className={`${styles.span} ${styles.str}`}>
                 ミニセット Eval（高速チェック）
               </span>
+              {"\n"}
+              {"    "}
               <span className={`${styles.span} ${styles.fn}`}>runs-on:</span> ubuntu-latest
-              <span className={`${styles.span} ${styles.fn}`}>steps:</span>-{" "}
-              <span className={`${styles.span} ${styles.kw}`}>uses:</span> actions/checkout@v4 -{" "}
-              <span className={`${styles.span} ${styles.kw}`}>name:</span>{" "}
+              {"\n"}
+              {"    "}
+              <span className={`${styles.span} ${styles.fn}`}>steps:</span>
+              {"\n"}
+              {"      "}- <span className={`${styles.span} ${styles.kw}`}>uses:</span>{" "}
+              actions/checkout@v4
+              {"\n"}
+              {"      "}- <span className={`${styles.span} ${styles.kw}`}>name:</span>{" "}
               <span className={`${styles.span} ${styles.str}`}>Python セットアップ</span>
+              {"\n"}
+              {"        "}
               <span className={`${styles.span} ${styles.kw}`}>uses:</span> actions/setup-python@v5
+              {"\n"}
+              {"        "}
               <span className={`${styles.span} ${styles.kw}`}>with:</span>
+              {"\n"}
+              {"          "}
               <span className={`${styles.span} ${styles.fn}`}>python-version:</span>{" "}
-              <span className={`${styles.span} ${styles.str}`}>'3.11'</span>-{" "}
-              <span className={`${styles.span} ${styles.kw}`}>name:</span>{" "}
+              <span className={`${styles.span} ${styles.str}`}>'3.11'</span>
+              {"\n"}
+              {"      "}- <span className={`${styles.span} ${styles.kw}`}>name:</span>{" "}
               <span className={`${styles.span} ${styles.str}`}>依存関係インストール</span>
+              {"\n"}
+              {"        "}
               <span className={`${styles.span} ${styles.kw}`}>run:</span>{" "}
-              <span className={`${styles.span} ${styles.str}`}>pip install -e "evals/[dev]"</span>-{" "}
-              <span className={`${styles.span} ${styles.kw}`}>name:</span>{" "}
+              <span className={`${styles.span} ${styles.str}`}>pip install -e "evals/[dev]"</span>
+              {"\n"}
+              {"      "}- <span className={`${styles.span} ${styles.kw}`}>name:</span>{" "}
               <span className={`${styles.span} ${styles.str}`}>ミニセット Eval 実行</span>
+              {"\n"}
+              {"        "}
               <span className={`${styles.span} ${styles.fn}`}>env:</span>
+              {"\n"}
+              {"          "}
               <span className={`${styles.span} ${styles.fn}`}>OPENAI_API_KEY:</span>{" "}
               <span className={`${styles.span} ${styles.str}`}>
                 $&#123;&#123; secrets.OPENAI_API_KEY &#125;&#125;
               </span>
-              <span className={`${styles.span} ${styles.fn}`}>run:</span> | oaieval gpt-4o-mini
-              qa_basic \ --max_samples <span className={`${styles.span} ${styles.num}`}>30</span> \
-              --record_path results/mini_eval.jsonl -{" "}
-              <span className={`${styles.span} ${styles.kw}`}>name:</span>{" "}
+              {"\n"}
+              {"        "}
+              <span className={`${styles.span} ${styles.fn}`}>run:</span> |{"\n"}
+              {"          "}oaieval gpt-4o-mini qa_basic \{"\n"}
+              {"            "}--max_samples{" "}
+              <span className={`${styles.span} ${styles.num}`}>30</span> \{"\n"}
+              {"            "}--record_path results/mini_eval.jsonl
+              {"\n"}
+              {"      "}- <span className={`${styles.span} ${styles.kw}`}>name:</span>{" "}
               <span className={`${styles.span} ${styles.str}`}>合格判定（0.80 以上）</span>
+              {"\n"}
+              {"        "}
               <span className={`${styles.span} ${styles.fn}`}>run:</span>{" "}
               <span className={`${styles.span} ${styles.str}`}>
                 python scripts/check_threshold.py --results results/mini_eval.jsonl --threshold 0.80
               </span>
+              {"\n\n"}
+              {"  "}
               <span className={`${styles.span} ${styles.fn}`}>full_eval:</span>
+              {"\n"}
+              {"    "}
               <span className={`${styles.span} ${styles.fn}`}>name:</span>{" "}
               <span className={`${styles.span} ${styles.str}`}>フルセット Eval（マージ前）</span>
+              {"\n"}
+              {"    "}
               <span className={`${styles.span} ${styles.fn}`}>runs-on:</span> ubuntu-latest
+              {"\n"}
+              {"    "}
               <span className={`${styles.span} ${styles.hl}`}>needs:</span> mini_eval{" "}
               <span className={`${styles.span} ${styles.cm}`}># ミニセット合格後のみ実行</span>
-              <span className={`${styles.span} ${styles.fn}`}>steps:</span>-{" "}
-              <span className={`${styles.span} ${styles.kw}`}>uses:</span> actions/checkout@v4 -{" "}
-              <span className={`${styles.span} ${styles.kw}`}>name:</span>{" "}
+              {"\n"}
+              {"    "}
+              <span className={`${styles.span} ${styles.fn}`}>steps:</span>
+              {"\n"}
+              {"      "}- <span className={`${styles.span} ${styles.kw}`}>uses:</span>{" "}
+              actions/checkout@v4
+              {"\n"}
+              {"      "}- <span className={`${styles.span} ${styles.kw}`}>name:</span>{" "}
               <span className={`${styles.span} ${styles.str}`}>フルセット Eval 実行</span>
+              {"\n"}
+              {"        "}
               <span className={`${styles.span} ${styles.fn}`}>env:</span>
+              {"\n"}
+              {"          "}
               <span className={`${styles.span} ${styles.fn}`}>OPENAI_API_KEY:</span>{" "}
               <span className={`${styles.span} ${styles.str}`}>
                 $&#123;&#123; secrets.OPENAI_API_KEY &#125;&#125;
               </span>
-              <span className={`${styles.span} ${styles.fn}`}>run:</span> | oaieval gpt-4o qa_basic
-              \ --record_path results/full_eval.jsonl \ --num_threads{" "}
-              <span className={`${styles.span} ${styles.num}`}>10</span>-{" "}
-              <span className={`${styles.span} ${styles.kw}`}>name:</span>{" "}
+              {"\n"}
+              {"        "}
+              <span className={`${styles.span} ${styles.fn}`}>run:</span> |{"\n"}
+              {"          "}oaieval gpt-4o qa_basic \{"\n"}
+              {"            "}--record_path results/full_eval.jsonl \{"\n"}
+              {"            "}--num_threads{" "}
+              <span className={`${styles.span} ${styles.num}`}>10</span>
+              {"\n"}
+              {"      "}- <span className={`${styles.span} ${styles.kw}`}>name:</span>{" "}
               <span className={`${styles.span} ${styles.str}`}>結果をアーティファクト保存</span>
+              {"\n"}
+              {"        "}
               <span className={`${styles.span} ${styles.kw}`}>uses:</span>{" "}
               actions/upload-artifact@v4
+              {"\n"}
+              {"        "}
               <span className={`${styles.span} ${styles.kw}`}>with:</span>
+              {"\n"}
+              {"          "}
               <span className={`${styles.span} ${styles.fn}`}>name:</span>{" "}
               <span className={`${styles.span} ${styles.str}`}>eval-results</span>
+              {"\n"}
+              {"          "}
               <span className={`${styles.span} ${styles.fn}`}>path:</span> results/
             </pre>
           </div>
@@ -1392,7 +1745,9 @@ export default function HarnessEngineeringGuide() {
 
           <div className={styles.mermaidWrap}>
             <div className={styles.mermaidLabel}>▸ Eval チェーン フロー（ゲート条件付き）</div>
-            <div id="diag-8"></div>
+            <div id="diag-8" className={styles.mermaid}>
+              <MermaidDiagram chart={DIAGRAM_8} />
+            </div>
           </div>
 
           <h3 className={`${styles.h3} ${styles.subH}`}>本番ログからの Eval サンプル自動生成</h3>
@@ -1408,67 +1763,125 @@ export default function HarnessEngineeringGuide() {
             </div>
             <pre className={styles.pre}>
               <span className={`${styles.span} ${styles.kw}`}>import</span> json, random
+              {"\n\n"}
               <span className={`${styles.span} ${styles.kw}`}>def</span>{" "}
-              <span className={`${styles.span} ${styles.fn}`}>extract_eval_samples</span>( log_file:{" "}
-              <span className={`${styles.span} ${styles.fn}`}>str</span>, output_jsonl:{" "}
-              <span className={`${styles.span} ${styles.fn}`}>str</span>, sample_rate:{" "}
-              <span className={`${styles.span} ${styles.fn}`}>float</span> ={" "}
-              <span className={`${styles.span} ${styles.num}`}>0.01</span>,{" "}
-              <span className={`${styles.span} ${styles.cm}`}># 本番ログの 1% をサンプリング</span>
-              min_quality: <span className={`${styles.span} ${styles.fn}`}>float</span> ={" "}
-              <span className={`${styles.span} ${styles.num}`}>4.5</span>,{" "}
+              <span className={`${styles.span} ${styles.fn}`}>extract_eval_samples</span>({"\n"}
+              {"    "}log_file: <span className={`${styles.span} ${styles.fn}`}>str</span>,{"\n"}
+              {"    "}output_jsonl: <span className={`${styles.span} ${styles.fn}`}>str</span>,
+              {"\n"}
+              {"    "}sample_rate: <span className={`${styles.span} ${styles.fn}`}>float</span> ={" "}
+              <span className={`${styles.span} ${styles.num}`}>0.01</span>,{"      "}
+              <span className={`${styles.span} ${styles.cm}`}># 本番ログ of 1% をサンプリング</span>
+              {"\n"}
+              {"    "}min_quality: <span className={`${styles.span} ${styles.fn}`}>float</span> ={" "}
+              <span className={`${styles.span} ${styles.num}`}>4.5</span>,{"        "}
               <span className={`${styles.span} ${styles.cm}`}># ユーザー評価 4.5 以上のみ</span>
+              {"\n"}
               ):
+              {"\n"}
+              {"    "}
               <span className={`${styles.span} ${styles.str}`}>
-                """ 高評価ユーザー回答を本番ログから抽出し、 Eval データセットを自動生成する。 """
+                """
+                {"\n"}
+                {"    "}高評価ユーザー回答を本番ログから抽出し、
+                {"\n"}
+                {"    "}Eval データセットを自動生成する。
+                {"\n"}
+                {"    "}"""
               </span>
-              samples = []
+              {"\n"}
+              {"    "}samples = []
+              {"\n"}
+              {"    "}
               <span className={`${styles.span} ${styles.kw}`}>with</span>{" "}
               <span className={`${styles.span} ${styles.fn}`}>open</span>
               (log_file) <span className={`${styles.span} ${styles.kw}`}>as</span> f:
+              {"\n"}
+              {"        "}
               <span className={`${styles.span} ${styles.kw}`}>for</span> line{" "}
-              <span className={`${styles.span} ${styles.kw}`}>in</span> f: log = json.
+              <span className={`${styles.span} ${styles.kw}`}>in</span> f:
+              {"\n"}
+              {"            "}log = json.
               <span className={`${styles.span} ${styles.fn}`}>loads</span>(line)
+              {"\n\n"}
+              {"            "}
               <span className={`${styles.span} ${styles.cm}`}># 品質フィルタリング</span>
+              {"\n"}
+              {"            "}
               <span className={`${styles.span} ${styles.kw}`}>if</span> log.
               <span className={`${styles.span} ${styles.fn}`}>get</span>(
               <span className={`${styles.span} ${styles.str}`}>"user_rating"</span>,{" "}
               <span className={`${styles.span} ${styles.num}`}>0</span>) &lt; min_quality:
+              {"\n"}
+              {"                "}
               <span className={`${styles.span} ${styles.kw}`}>continue</span>
+              {"\n"}
+              {"            "}
               <span className={`${styles.span} ${styles.kw}`}>if</span> random.
               <span className={`${styles.span} ${styles.fn}`}>random</span>
               () &gt; sample_rate:
+              {"\n"}
+              {"                "}
               <span className={`${styles.span} ${styles.kw}`}>continue</span>
+              {"\n\n"}
+              {"            "}
               <span className={`${styles.span} ${styles.cm}`}># Eval 形式に変換</span>
-              samples.<span className={`${styles.span} ${styles.fn}`}>append</span>(&#123;
+              {"\n"}
+              {"            "}samples.<span className={`${styles.span} ${styles.fn}`}>append</span>
+              (&#123;
+              {"\n"}
+              {"                "}
               <span className={`${styles.span} ${styles.str}`}>"input"</span>: log[
               <span className={`${styles.span} ${styles.str}`}>"messages"</span>],
+              {"\n"}
+              {"                "}
               <span className={`${styles.span} ${styles.str}`}>"ideal"</span>: log[
               <span className={`${styles.span} ${styles.str}`}>"response"</span>],{" "}
               <span className={`${styles.span} ${styles.cm}`}># 高評価回答を正解として使用</span>
+              {"\n"}
+              {"                "}
               <span className={`${styles.span} ${styles.str}`}>"metadata"</span>: &#123;
+              {"\n"}
+              {"                    "}
               <span className={`${styles.span} ${styles.str}`}>"source"</span>:{" "}
-              <span className={`${styles.span} ${styles.str}`}>"production_log"</span>,
+              <span className={`${styles.span} ${styles.str}`}>"production_log"</span>,{"\n"}
+              {"                    "}
               <span className={`${styles.span} ${styles.str}`}>"date"</span>: log[
               <span className={`${styles.span} ${styles.str}`}>"timestamp"</span>],
+              {"\n"}
+              {"                    "}
               <span className={`${styles.span} ${styles.str}`}>"rating"</span>: log[
-              <span className={`${styles.span} ${styles.str}`}>"user_rating"</span>], &#125; &#125;)
+              <span className={`${styles.span} ${styles.str}`}>"user_rating"</span>],
+              {"\n"}
+              {"                "}&#125;
+              {"\n"}
+              {"            "}&#125;)
+              {"\n\n"}
+              {"    "}
               <span className={`${styles.span} ${styles.cm}`}># JSONL として保存</span>
+              {"\n"}
+              {"    "}
               <span className={`${styles.span} ${styles.kw}`}>with</span>{" "}
               <span className={`${styles.span} ${styles.fn}`}>open</span>
               (output_jsonl, <span className={`${styles.span} ${styles.str}`}>"w"</span>){" "}
               <span className={`${styles.span} ${styles.kw}`}>as</span> f:
+              {"\n"}
+              {"        "}
               <span className={`${styles.span} ${styles.kw}`}>for</span> s{" "}
-              <span className={`${styles.span} ${styles.kw}`}>in</span> samples: f.
-              <span className={`${styles.span} ${styles.fn}`}>write</span>(json.
+              <span className={`${styles.span} ${styles.kw}`}>in</span> samples:
+              {"\n"}
+              {"            "}f.<span className={`${styles.span} ${styles.fn}`}>write</span>(json.
               <span className={`${styles.span} ${styles.fn}`}>dumps</span>(s, ensure_ascii=
               <span className={`${styles.span} ${styles.kw}`}>False</span>) +{" "}
-              <span className={`${styles.span} ${styles.str}`}>"\n"</span>)
+              <span className={`${styles.span} ${styles.str}`}>"\n"</span>){"\n\n"}
+              {"    "}
               <span className={`${styles.span} ${styles.fn}`}>print</span>(
               <span className={`${styles.span} ${styles.str}`}>
                 f"生成サンプル数: &#123;len(samples)&#125;"
               </span>
-              )<span className={`${styles.span} ${styles.kw}`}>return</span> samples
+              ){"\n"}
+              {"    "}
+              <span className={`${styles.span} ${styles.kw}`}>return</span> samples
             </pre>
           </div>
 
@@ -1484,66 +1897,122 @@ export default function HarnessEngineeringGuide() {
               <div className={styles.codeLang}>python — evals/elsuite/custom/code_exec_eval.py</div>
             </div>
             <pre className={styles.pre}>
-              <span className={`${styles.span} ${styles.kw}`}>import</span> evals
-              <span className={`${styles.span} ${styles.kw}`}>import</span> evals.metrics
-              <span className={`${styles.span} ${styles.kw}`}>from</span> evals.api{" "}
-              <span className={`${styles.span} ${styles.kw}`}>import</span> CompletionFn
-              <span className={`${styles.span} ${styles.kw}`}>from</span> evals.record{" "}
-              <span className={`${styles.span} ${styles.kw}`}>import</span> RecorderBase
+              <span className={`${styles.span} ${styles.kw}`}>import evals</span>
+              {"\n"}
+              <span className={`${styles.span} ${styles.kw}`}>import evals.metrics</span>
+              {"\n"}
+              <span className={`${styles.span} ${styles.kw}`}>from evals.api</span>{" "}
+              <span className={`${styles.span} ${styles.kw}`}>import CompletionFn</span>
+              {"\n"}
+              <span className={`${styles.span} ${styles.kw}`}>from evals.record</span>{" "}
+              <span className={`${styles.span} ${styles.kw}`}>import RecorderBase</span>
+              {"\n\n"}
               <span className={`${styles.span} ${styles.kw}`}>class</span>{" "}
               <span className={`${styles.span} ${styles.fn}`}>CodeExecutionEval</span>(evals.Eval):
+              {"\n"}
+              {"    "}
               <span className={`${styles.span} ${styles.str}`}>
                 """生成コードが実際に実行可能かを検証する Evaluator"""
               </span>
+              {"\n\n"}
+              {"    "}
               <span className={`${styles.span} ${styles.kw}`}>def</span>{" "}
-              <span className={`${styles.span} ${styles.fn}`}>__init__</span>( self, completion_fns:
-              list[CompletionFn], samples_jsonl:{" "}
-              <span className={`${styles.span} ${styles.fn}`}>str</span>, *args, **kwargs ):
+              <span className={`${styles.span} ${styles.fn}`}>__init__</span>({"\n"}
+              {"        "}self,
+              {"\n"}
+              {"        "}completion_fns: list[CompletionFn],
+              {"\n"}
+              {"        "}samples_jsonl: <span className={`${styles.span} ${styles.fn}`}>str</span>,
+              {"\n"}
+              {"        "}*args, **kwargs
+              {"\n"}
+              {"    "}):
+              {"\n"}
+              {"        "}
               <span className={`${styles.span} ${styles.fn}`}>super</span>().
-              <span className={`${styles.span} ${styles.fn}`}>__init__</span>
-              (completion_fns, *args, **kwargs) self.samples_jsonl = samples_jsonl
+              <span className={`${styles.span} ${styles.fn}`}>__init__</span>(completion_fns, *args,
+              **kwargs)
+              {"\n"}
+              {"        "}self.samples_jsonl = samples_jsonl
+              {"\n\n"}
+              {"    "}
               <span className={`${styles.span} ${styles.kw}`}>def</span>{" "}
               <span className={`${styles.span} ${styles.fn}`}>eval_sample</span>
               (self, sample, rng):
+              {"\n"}
+              {"        "}
               <span className={`${styles.span} ${styles.cm}`}>
                 # 1. モデル呼び出し（temperature=0 で決定的出力）
               </span>
-              result = self.completion_fn( prompt=sample[
-              <span className={`${styles.span} ${styles.str}`}>"input"</span>
-              ], temperature=<span className={`${styles.span} ${styles.num}`}>0</span>, max_tokens=
-              <span className={`${styles.span} ${styles.num}`}>500</span>, ) code = result.
+              {"\n"}
+              {"        "}result = self.completion_fn(
+              {"\n"}
+              {"            "}prompt=sample[
+              <span className={`${styles.span} ${styles.str}`}>"input"</span>],
+              {"\n"}
+              {"            "}temperature=<span className={`${styles.span} ${styles.num}`}>0</span>,
+              {"\n"}
+              {"            "}max_tokens=<span className={`${styles.span} ${styles.num}`}>500</span>
+              ,{"\n"}
+              {"        "}){"\n"}
+              {"        "}code = result.
               <span className={`${styles.span} ${styles.fn}`}>get_completions</span>()[
-              <span className={`${styles.span} ${styles.num}`}>0</span>]
+              <span className={`${styles.span} ${styles.num}`}>0</span>]{"\n\n"}
+              {"        "}
               <span className={`${styles.span} ${styles.cm}`}>
                 # 2. カスタム採点: コードが実行可能か確認
               </span>
-              <span className={`${styles.span} ${styles.kw}`}>try</span>:
-              <span className={`${styles.span} ${styles.fn}`}>exec</span>(
+              {"\n"}
+              {"        "}
+              <span className={`${styles.span} ${styles.kw}`}>try</span>:{"\n"}
+              {"            "}
+              <span className={`${styles.span} ${styles.fn}`}>exec</span>({"\n"}
+              {"                "}
               <span className={`${styles.span} ${styles.fn}`}>compile</span>(code,{" "}
               <span className={`${styles.span} ${styles.str}`}>"&lt;string&gt;"</span>,{" "}
-              <span className={`${styles.span} ${styles.str}`}>"exec"</span>), &#123;&#125;) correct
-              = <span className={`${styles.span} ${styles.kw}`}>True</span>
+              <span className={`${styles.span} ${styles.str}`}>"exec"</span>), &#123;&#125;
+              {"\n"}
+              {"            "}){"\n"}
+              {"            "}correct = <span className={`${styles.span} ${styles.kw}`}>True</span>
+              {"\n"}
+              {"        "}
               <span className={`${styles.span} ${styles.kw}`}>except</span> Exception{" "}
-              <span className={`${styles.span} ${styles.kw}`}>as</span> e: correct ={" "}
-              <span className={`${styles.span} ${styles.kw}`}>False</span>
+              <span className={`${styles.span} ${styles.kw}`}>as</span> e:
+              {"\n"}
+              {"            "}correct = <span className={`${styles.span} ${styles.kw}`}>False</span>
+              {"\n\n"}
+              {"        "}
               <span className={`${styles.span} ${styles.cm}`}># 3. 結果を記録</span>
-              evals.<span className={`${styles.span} ${styles.fn}`}>record_and_check_match</span>(
-              prompt=sample[
-              <span className={`${styles.span} ${styles.str}`}>"input"</span>], sampled=code,
-              expected=
-              <span className={`${styles.span} ${styles.kw}`}>None</span>,{" "}
+              {"\n"}
+              {"        "}evals.
+              <span className={`${styles.span} ${styles.fn}`}>record_and_check_match</span>({"\n"}
+              {"            "}prompt=sample[
+              <span className={`${styles.span} ${styles.str}`}>"input"</span>],
+              {"\n"}
+              {"            "}sampled=code,
+              {"\n"}
+              {"            "}expected=<span className={`${styles.span} ${styles.kw}`}>None</span>,{" "}
               <span className={`${styles.span} ${styles.cm}`}>
                 # 実行可否で判定するため ideal は不使用
               </span>
-              )<span className={`${styles.span} ${styles.kw}`}>return</span> correct
+              {"\n"}
+              {"        "}){"\n"}
+              {"        "}
+              <span className={`${styles.span} ${styles.kw}`}>return</span> correct
+              {"\n\n"}
+              {"    "}
               <span className={`${styles.span} ${styles.kw}`}>def</span>{" "}
               <span className={`${styles.span} ${styles.fn}`}>run</span>(self, recorder:
-              RecorderBase): self.
-              <span className={`${styles.span} ${styles.fn}`}>eval_all_samples</span>
-              (recorder, self.<span className={`${styles.span} ${styles.fn}`}>get_samples</span>())
-              events = recorder.
+              RecorderBase):
+              {"\n"}
+              {"        "}self.
+              <span className={`${styles.span} ${styles.fn}`}>eval_all_samples</span>(recorder,
+              self.<span className={`${styles.span} ${styles.fn}`}>get_samples</span>())
+              {"\n"}
+              {"        "}events = recorder.
               <span className={`${styles.span} ${styles.fn}`}>get_events</span>(
-              <span className={`${styles.span} ${styles.str}`}>"match"</span>)
+              <span className={`${styles.span} ${styles.str}`}>"match"</span>){"\n"}
+              {"        "}
               <span className={`${styles.span} ${styles.kw}`}>return</span> &#123;
               <span className={`${styles.span} ${styles.str}`}>"pass_rate"</span>: evals.metrics.
               <span className={`${styles.span} ${styles.fn}`}>get_accuracy</span>(events)&#125;
@@ -1619,7 +2088,9 @@ export default function HarnessEngineeringGuide() {
 
           <div className={styles.mermaidWrap}>
             <div className={styles.mermaidLabel}>▸ Eval スコア低下 — 原因特定フローチャート</div>
-            <div id="diag-9"></div>
+            <div id="diag-9" className={styles.mermaid}>
+              <MermaidDiagram chart={DIAGRAM_9} />
+            </div>
           </div>
 
           <h3 className={`${styles.h3} ${styles.subH}`}>ハーネスエンジニアリング成熟度モデル</h3>

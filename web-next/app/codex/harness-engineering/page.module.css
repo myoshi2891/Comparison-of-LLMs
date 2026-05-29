@@ -585,8 +585,8 @@ tbody tr:hover td {
   display: flex;
   justify-content: center;
 }
-.mermaid svg,
-.diag svg {
+.mermaid :global(svg),
+.diag :global(svg) {
   display: block;
   margin: 0 auto;
   width: 100%;
