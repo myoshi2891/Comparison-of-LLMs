@@ -37,7 +37,9 @@
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.4",
-    "vitest-axe": "^0.1.0"
+    "vitest-axe": "^0.1.0",
+    "cheerio": "^1.0.0-rc.12",
+    "marked": "^12.0.0"
   },
   "ignoreScripts": [
     "sharp",

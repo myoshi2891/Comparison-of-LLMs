@@ -204,7 +204,8 @@ if (!componentName) {
     componentName = 'DefaultPage';
 }
 
-const cssExists = fs.existsSync(path.join('app', `${pageName}.css`));
+const baseAppDir = fs.existsSync('web-next/app') ? 'web-next/app' : 'app';
+const cssExists = fs.existsSync(path.join(baseAppDir, `${pageName}.css`));
 const cssImport = cssExists ? `import '../${pageName}.css';\n` : '';
 
 const out = `${cssImport}
@@ -217,7 +218,7 @@ export default function ${componentName}() {
 }
 `;
 
-const outputDir = path.join('app', pageName);
+const outputDir = path.join(baseAppDir, pageName);
 if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
 }
@@ -225,3 +226,4 @@ if (!fs.existsSync(outputDir)) {
 const outputPath = path.join(outputDir, 'page.tsx');
 fs.writeFileSync(outputPath, out);
 console.log(`Successfully converted ${inputPath} -> ${outputPath}`);
+

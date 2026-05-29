@@ -19,6 +19,7 @@ const tsxPath = path.resolve(process.cwd(), args[1]);
 let hasLink = false;
 let hasMermaid = false;
 const mermaidBlocks = new Map();
+const codeBlocks = new Map();
 
 let md;
 try {
