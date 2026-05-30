@@ -1095,11 +1095,7 @@
         self._scenarios = scenarios
         self._call_history: list[str] = []  <span class="cmt"># 呼び出し記録（検証用）</span>
 
-<<<<<<< HEAD
     <span class="kw">async def</span> <span class="fn">generate_content_async</span>(self, llm_request, **kwargs) -&gt; LlmResponse:
-=======
-    <span class="kw">async def</span> <span class="fn">generate_content_async</span>(self, llm_request, **kwargs) -> LlmResponse:
->>>>>>> 9c8edc4 (docs: rename gemini-agent-harness-guide.md and add engineering guide html)
         query = llm_request.contents[-1].parts[0].text
         self._call_history.append(query)
 
@@ -1110,11 +1106,7 @@
         <span class="kw">return</span> LlmResponse(text=<span class="str">"デフォルト応答です。"</span>)
 
     <span class="kw">@property</span>
-<<<<<<< HEAD
     <span class="kw">def</span> <span class="fn">call_count</span>(self) -&gt; int:
-=======
-    <span class="kw">def</span> <span class="fn">call_count</span>(self) -> int:
->>>>>>> 9c8edc4 (docs: rename gemini-agent-harness-guide.md and add engineering guide html)
         <span class="str">"""何回呼ばれたかを返す（アサーション用）"""</span>
         <span class="kw">return</span> len(self._call_history)</pre>
         </div>
@@ -1135,11 +1127,7 @@
     <span class="str">"""デプロイツールの替え玉。本番環境には触れず成功/失敗を制御できる。"""</span>
     call_log = []  <span class="cmt"># 呼び出し記録</span>
 
-<<<<<<< HEAD
     <span class="kw">def</span> <span class="fn">fake_deploy</span>(environment: str) -&gt; dict:
-=======
-    <span class="kw">def</span> <span class="fn">fake_deploy</span>(environment: str) -> dict:
->>>>>>> 9c8edc4 (docs: rename gemini-agent-harness-guide.md and add engineering guide html)
         call_log.append({<span class="str">"environment"</span>: environment})
         <span class="kw">if</span> should_succeed:
             <span class="kw">return</span> {<span class="str">"status"</span>: <span class="str">"success"</span>, <span class="str">"url"</span>: <span class="str">f"https://{environment}.example.com"</span>}
@@ -1282,11 +1270,7 @@ adk eval \
     print(<span class="str">f"ツール呼び出し精度: {results.scores['tool_call_quality']:.2f}"</span>)
 
     <span class="cmt"># CI での合否判定</span>
-<<<<<<< HEAD
     <span class="kw">assert</span> results.scores[<span class="str">"tool_call_quality"</span>] &gt;= <span class="num">0.8</span>, \
-=======
-    <span class="kw">assert</span> results.scores[<span class="str">"tool_call_quality"</span>] >= <span class="num">0.8</span>, \
->>>>>>> 9c8edc4 (docs: rename gemini-agent-harness-guide.md and add engineering guide html)
         <span class="str">f"ツール呼び出し精度が基準値を下回りました: {results.scores['tool_call_quality']:.2f}"</span>
 
 <span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
@@ -1337,11 +1321,7 @@ adk eval \
     actual_response: str,
     reference_answer: str,
     model: str = <span class="str">"claude-sonnet-4-6"</span>  <span class="cmt"># 被評価モデルとは別のモデルを使う</span>
-<<<<<<< HEAD
 ) -&gt; dict:
-=======
-) -> dict:
->>>>>>> 9c8edc4 (docs: rename gemini-agent-harness-guide.md and add engineering guide html)
     client = anthropic.Anthropic()
 
     judge_prompt = <span class="str">f"""あなたはAIエージェントの応答品質を評価する専門家です。
@@ -1512,11 +1492,7 @@ adk eval \
     query: str,
     n_trials: int = <span class="num">5</span>,  <span class="cmt"># 5回評価して平均を使う</span>
     threshold: float = <span class="num">0.75</span>
-<<<<<<< HEAD
 ) -&gt; dict:
-=======
-) -> dict:
->>>>>>> 9c8edc4 (docs: rename gemini-agent-harness-guide.md and add engineering guide html)
     <span class="str">"""
     同じクエリをn_trials回評価し、平均・標準偏差でスコアを安定化する。
     LLMの確率的な出力によるフレイキーを緩和するGoogle推奨の手法。
@@ -1527,22 +1503,13 @@ adk eval \
         scores.append(result.score)
 
     avg_score = mean(scores)
-<<<<<<< HEAD
     score_std = stdev(scores) <span class="kw">if</span> len(scores) &gt; <span class="num">1</span> <span class="kw">else</span> <span class="num">0.0</span>
-=======
-    score_std = stdev(scores) <span class="kw">if</span> len(scores) > <span class="num">1</span> <span class="kw">else</span> <span class="num">0.0</span>
->>>>>>> 9c8edc4 (docs: rename gemini-agent-harness-guide.md and add engineering guide html)
 
     <span class="kw">return</span> {
         <span class="str">"average_score"</span>: avg_score,
         <span class="str">"std_deviation"</span>: score_std,
-<<<<<<< HEAD
         <span class="str">"is_stable"</span>: score_std &lt; <span class="num">0.1</span>,  <span class="cmt"># 標準偏差0.1未満を「安定」と判定</span>
         <span class="str">"passes_threshold"</span>: avg_score &gt;= threshold,
-=======
-        <span class="str">"is_stable"</span>: score_std < <span class="num">0.1</span>,  <span class="cmt"># 標準偏差0.1未満を「安定」と判定</span>
-        <span class="str">"passes_threshold"</span>: avg_score >= threshold,
->>>>>>> 9c8edc4 (docs: rename gemini-agent-harness-guide.md and add engineering guide html)
         <span class="str">"all_scores"</span>: scores
     }</pre>
         </div>
@@ -1679,11 +1646,7 @@ adk eval \
           <div class="bp bp-y">
             <div class="bpn">03</div>
             <h4>完全一致より閾値スコアを使う</h4>
-<<<<<<< HEAD
             <p>LLMの確率的な出力に対応。<code>score &gt;= 0.8</code> のような基準を設定。</p>
-=======
-            <p>LLMの確率的な出力に対応。<code>score >= 0.8</code> のような基準を設定。</p>
->>>>>>> 9c8edc4 (docs: rename gemini-agent-harness-guide.md and add engineering guide html)
           </div>
           <div class="bp bp-r">
             <div class="bpn">04</div>
@@ -1903,11 +1866,7 @@ adk eval \
           <div class="src">
             <span class="snum">[1]</span>
             <div>
-<<<<<<< HEAD
               <a href="https://google.github.io/adk-docs/evaluate/" target="_blank" rel="noopener noreferrer"
-=======
-              <a href="https://google.github.io/adk-docs/evaluate/" target="_blank" rel="noopener"
->>>>>>> 9c8edc4 (docs: rename gemini-agent-harness-guide.md and add engineering guide html)
                 >ADK Evaluation Guide — Google ADK 公式ドキュメント</a
               ><span class="sdesc"
                 >ADK Eval の全仕様。評価セット・Scorers・Python
@@ -1918,11 +1877,7 @@ adk eval \
           <div class="src">
             <span class="snum">[2]</span>
             <div>
-<<<<<<< HEAD
               <a href="https://abseil.io/resources/swe-book" target="_blank" rel="noopener noreferrer"
-=======
-              <a href="https://abseil.io/resources/swe-book" target="_blank" rel="noopener"
->>>>>>> 9c8edc4 (docs: rename gemini-agent-harness-guide.md and add engineering guide html)
                 >Software Engineering at Google (O'Reilly, 2020) — Chapter 11〜14 テスト関連</a
               ><span class="sdesc"
                 >Small/Medium/Large分類・フレイキーテスト対策・テストダブルの設計思想の原典</span
@@ -1932,11 +1887,7 @@ adk eval \
           <div class="src">
             <span class="snum">[3]</span>
             <div>
-<<<<<<< HEAD
               <a href="https://testing.googleblog.com" target="_blank" rel="noopener noreferrer"
-=======
-              <a href="https://testing.googleblog.com" target="_blank" rel="noopener"
->>>>>>> 9c8edc4 (docs: rename gemini-agent-harness-guide.md and add engineering guide html)
                 >Google Testing Blog — 公式テスト技術ブログ</a
               ><span class="sdesc">Googleエンジニアによるテスト技術の最新情報</span>
             </div>
@@ -1947,11 +1898,7 @@ adk eval \
               <a
                 href="https://testing.googleblog.com/2015/04/just-say-no-to-more-end-to-end-tests.html"
                 target="_blank"
-<<<<<<< HEAD
                 rel="noopener noreferrer"
-=======
-                rel="noopener"
->>>>>>> 9c8edc4 (docs: rename gemini-agent-harness-guide.md and add engineering guide html)
                 >Just Say No to More End-to-End Tests — Google Testing Blog</a
               ><span class="sdesc">テストピラミッドの重要性・E2Eテスト過多の問題を解説</span>
             </div>
@@ -1962,11 +1909,7 @@ adk eval \
               <a
                 href="https://testing.googleblog.com/2016/05/flaky-tests-at-google-and-how-we.html"
                 target="_blank"
-<<<<<<< HEAD
                 rel="noopener noreferrer"
-=======
-                rel="noopener"
->>>>>>> 9c8edc4 (docs: rename gemini-agent-harness-guide.md and add engineering guide html)
                 >Flaky Tests at Google and How We Mitigate Them</a
               ><span class="sdesc">Googleのフレイキーテスト検出・隔離・解決のプロセスの詳細</span>
             </div>
@@ -1977,11 +1920,7 @@ adk eval \
               <a
                 href="https://google.github.io/adk-docs/agents/multi-agents/"
                 target="_blank"
-<<<<<<< HEAD
                 rel="noopener noreferrer"
-=======
-                rel="noopener"
->>>>>>> 9c8edc4 (docs: rename gemini-agent-harness-guide.md and add engineering guide html)
                 >ADK Multi-agent Systems — Google ADK 公式ドキュメント</a
               ><span class="sdesc"
                 >SequentialAgent / ParallelAgent / LoopAgent の仕様と output_key 設計</span
@@ -1991,11 +1930,7 @@ adk eval \
           <div class="src">
             <span class="snum">[7]</span>
             <div>
-<<<<<<< HEAD
               <a href="https://github.com/google/adk-python" target="_blank" rel="noopener noreferrer"
-=======
-              <a href="https://github.com/google/adk-python" target="_blank" rel="noopener"
->>>>>>> 9c8edc4 (docs: rename gemini-agent-harness-guide.md and add engineering guide html)
                 >Google ADK GitHub リポジトリ</a
               ><span class="sdesc">ADK Python のソースコード・評価フレームワーク実装</span>
             </div>
@@ -2006,11 +1941,7 @@ adk eval \
               <a
                 href="https://developers.googleblog.com/developers-guide-to-multi-agent-patterns-in-adk/"
                 target="_blank"
-<<<<<<< HEAD
                 rel="noopener noreferrer"
-=======
-                rel="noopener"
->>>>>>> 9c8edc4 (docs: rename gemini-agent-harness-guide.md and add engineering guide html)
                 >Developers Guide to Multi-Agent Patterns in ADK — Google Developers Blog</a
               ><span class="sdesc"
                 >AutoFlowルーティング・output_key管理・description設計のベストプラクティス</span
@@ -2023,11 +1954,7 @@ adk eval \
               <a
                 href="https://codelabs.developers.google.com/codelabs/production-ready-ai-with-gc/3-developing-agents/build-a-multi-agent-system-with-adk"
                 target="_blank"
-<<<<<<< HEAD
                 rel="noopener noreferrer"
-=======
-                rel="noopener"
->>>>>>> 9c8edc4 (docs: rename gemini-agent-harness-guide.md and add engineering guide html)
                 >Build a Multi-Agent System with ADK — Google Codelabs</a
               ><span class="sdesc">SequentialAgent / LoopAgent のハンズオン実装と評価</span>
             </div>
@@ -2038,11 +1965,7 @@ adk eval \
               <a
                 href="https://testing.googleblog.com/2012/10/hermetic-servers.html"
                 target="_blank"
-<<<<<<< HEAD
                 rel="noopener noreferrer"
-=======
-                rel="noopener"
->>>>>>> 9c8edc4 (docs: rename gemini-agent-harness-guide.md and add engineering guide html)
                 >Hermetic Servers — Google Testing Blog</a
               ><span class="sdesc">ハーミティックテストの設計思想と実装パターン</span>
             </div>
@@ -2053,11 +1976,7 @@ adk eval \
               <a
                 href="https://sre.google/sre-book/testing-reliability/"
                 target="_blank"
-<<<<<<< HEAD
                 rel="noopener noreferrer"
-=======
-                rel="noopener"
->>>>>>> 9c8edc4 (docs: rename gemini-agent-harness-guide.md and add engineering guide html)
                 >Site Reliability Engineering (SRE Book) — Chapter 17 Testing</a
               ><span class="sdesc">Google SRE が実践するテスト信頼性向上手法（無料公開）</span>
             </div>
@@ -2068,11 +1987,7 @@ adk eval \
               <a
                 href="https://testing.googleblog.com/2019/12/testing-on-toilet-tests-too-dry-make.html"
                 target="_blank"
-<<<<<<< HEAD
                 rel="noopener noreferrer"
-=======
-                rel="noopener"
->>>>>>> 9c8edc4 (docs: rename gemini-agent-harness-guide.md and add engineering guide html)
                 >DAMP vs DRY in Tests — Google Testing Blog</a
               ><span class="sdesc">テストコードは可読性を優先するDAMP原則の解説</span>
             </div>
@@ -2080,11 +1995,7 @@ adk eval \
           <div class="src">
             <span class="snum">[13]</span>
             <div>
-<<<<<<< HEAD
               <a href="https://cloud.google.com/build/docs" target="_blank" rel="noopener noreferrer"
-=======
-              <a href="https://cloud.google.com/build/docs" target="_blank" rel="noopener"
->>>>>>> 9c8edc4 (docs: rename gemini-agent-harness-guide.md and add engineering guide html)
                 >Google Cloud Build ドキュメント</a
               ><span class="sdesc">隔離されたCI環境でのエージェント評価パイプライン構築</span>
             </div>
@@ -2095,11 +2006,7 @@ adk eval \
               <a
                 href="https://ai.google.dev/gemini-api/docs/deprecations"
                 target="_blank"
-<<<<<<< HEAD
                 rel="noopener noreferrer"
-=======
-                rel="noopener"
->>>>>>> 9c8edc4 (docs: rename gemini-agent-harness-guide.md and add engineering guide html)
                 >Gemini API Deprecation Schedule</a
               ><span class="sdesc">モデルバージョンのピン留め判断に必要な廃止スケジュール</span>
             </div>
@@ -2110,11 +2017,7 @@ adk eval \
               <a
                 href="https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-pro/"
                 target="_blank"
-<<<<<<< HEAD
                 rel="noopener noreferrer"
-=======
-                rel="noopener"
->>>>>>> 9c8edc4 (docs: rename gemini-agent-harness-guide.md and add engineering guide html)
                 >Gemini 3.1 Pro リリースアナウンス — Google Blog</a
               ><span class="sdesc">Gemini 3.1 Pro Preview の性能・評価用途での活用方法</span>
             </div>
