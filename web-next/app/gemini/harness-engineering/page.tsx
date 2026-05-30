@@ -8,6 +8,125 @@ export const metadata: Metadata = {
     "Googleが実践するテストハーネス設計の技術とベストプラクティスを解説する完全ガイドです。",
 };
 
+const DIAGRAM_0 = `flowchart LR
+subgraph SUT["テスト対象 SUT"]
+  A[プロダクション<br />コード]
+end
+subgraph HARNESS["テストハーネス層"]
+  B[テストダブル<br />Mock / Stub / Fake]
+  C[フィクスチャ<br />setUp / tearDown]
+  D[テストランナー<br />Google Test / pytest]
+  E[アサーション<br />ライブラリ]
+end
+subgraph OUTPUT["検証・報告"]
+  F[テスト結果<br />PASS / FAIL]
+  G[カバレッジ<br />レポート]
+  H[CIダッシュボード]
+end
+A --> B
+B --> C
+C --> D
+D --> E
+E --> F
+F --> G
+G --> H`;
+
+const DIAGRAM_1 = `flowchart TD
+E2E["E2Eテスト\\\\n全システム結合 / 数十〜数百件\\\\n実行時間: 分〜時間単位"]
+INT["統合テスト Integration Test\\\\n複数コンポーネント協調 / 数千〜数万件\\\\n実行時間: 秒〜分単位"]
+UNIT["ユニットテスト Unit Test\\\\n関数・クラス単体 / 数千〜数万件\\\\n実行時間: ミリ秒単位"]
+E2E --> INT
+INT --> UNIT`;
+
+const DIAGRAM_2 = `flowchart TD
+RUNNER["テストランナー Test Runner\\\\n全体の司令塔"]
+FIXTURE["フィクスチャ Fixture\\\\n環境の準備と後片付け"]
+DOUBLE["テストダブル Test Double\\\\n外部依存の替え玉"]
+ASSERT["アサーション Assertion\\\\n期待値との比較"]
+REPORTER["レポーター Reporter\\\\n結果の可視化"]
+RUNNER --> FIXTURE
+FIXTURE --> DOUBLE
+DOUBLE --> ASSERT
+ASSERT --> REPORTER`;
+
+const DIAGRAM_3 = `flowchart TD
+START["外部依存が存在する"]
+Q1{"呼ばれたこと自体を<br />検証したいか"}
+Q2{"実際に動くロジックが<br />必要か"}
+Q3{"本物のコードを<br />変更できるか"}
+MOCK["Mock を使う<br />呼び出しを記録・検証"]
+FAKE["Fake を使う<br />軽量な本物実装"]
+SPY["Spy を使う<br />本物のまま監視"]
+STUB["Stub を使う<br />固定値を返す"]
+START --> Q1
+Q1 -->|Yes| MOCK
+Q1 -->|No| Q2
+Q2 -->|Yes| FAKE
+Q2 -->|No| Q3
+Q3 -->|No| SPY
+Q3 -->|Yes| STUB`;
+
+const DIAGRAM_4 = `flowchart TD
+ANTI["ハーミティック違反<br />アンチパターン"]
+AP1["共有DBを使う<br />テストA→B間でデータが残る"]
+AP2["現在時刻に依存<br />datetime.now が変わると失敗"]
+AP3["外部APIを呼ぶ<br />ネットワーク障害で失敗"]
+AP4["グローバル変数を変更<br />他のテストに副作用"]
+FIX1["フェイクDBを使う<br />各テストで独立したメモリDB"]
+FIX2["時刻をモックする<br />freezegun / faketime"]
+FIX3["テストダブルを使う<br />スタブ / モック"]
+FIX4["テスト後にリストアする<br />tearDown でリセット"]
+ANTI --> AP1
+ANTI --> AP2
+ANTI --> AP3
+ANTI --> AP4
+AP1 --> FIX1
+AP2 --> FIX2
+AP3 --> FIX3
+AP4 --> FIX4`;
+
+const DIAGRAM_5 = `flowchart TD
+S1["Step 1<br />プロダクションコード of 設計<br />DIパターンで依存を注入可能にする"]
+S2["Step 2<br />テストダブル of 実装<br />Fake / Stub / Mock を作る"]
+S3["Step 3<br />フィクスチャ of 設定<br />setUp / tearDown を定義する"]
+S4["Step 4<br />テストケース of 実装<br />AAAパターンで書く"]
+S5["Step 5<br />CIパイプラインへの統合<br />GitHub Actions / Cloud Build"]
+S1 --> S2
+S2 --> S3
+S3 --> S4
+S4 --> S5`;
+
+const DIAGRAM_6 = `flowchart TD
+DETECT["フレイキーテスト検出<br />CIで3回以上 PASS/FAIL が混在"]
+QUARANTINE["隔離 Quarantine<br />専用ラベルを付けてメインCIから除外"]
+ANALYZE["原因分析<br />時刻 / 並行性 / 順序 / 乱数"]
+FIX["修正<br />原因に応じた対策を実施"]
+VERIFY["再検証<br />10回連続 PASS を確認"]
+RESTORE["メインCIに復帰<br />ラベルを外す"]
+DEADLINE["修正デッドライン超過<br />テストを削除してチケット発行"]
+DETECT --> QUARANTINE
+QUARANTINE --> ANALYZE
+ANALYZE --> FIX
+FIX --> VERIFY
+VERIFY --> RESTORE
+QUARANTINE --> DEADLINE`;
+
+const DIAGRAM_7 = `flowchart TD
+EVALSET["評価セット eval_set.json<br />質問・期待ツール呼び出し・期待応答"]
+AGENT["AIエージェント<br />ADK LlmAgent / Gemini / Claude"]
+RESPONSE["エージェント応答<br />実際のツール呼び出し<br />実際のテキスト応答"]
+TOOL_CHECK["ツール呼び出し検証<br />expected vs actual<br />完全一致チェック"]
+LLM_JUDGE["LLM-as-Judge<br />応答品質スコアリング<br />0.0 to 1.0"]
+THRESHOLD["閾値チェック<br />スコア >= 0.8 PASS / FAIL"]
+REPORT["評価レポート<br />Allure / HTML スコア推移"]
+EVALSET --> AGENT
+AGENT --> RESPONSE
+RESPONSE --> TOOL_CHECK
+RESPONSE --> LLM_JUDGE
+TOOL_CHECK --> THRESHOLD
+LLM_JUDGE --> THRESHOLD
+THRESHOLD --> REPORT`;
+
 /**
  * Renders an external link that opens in a new browser tab.
  *
@@ -163,30 +282,7 @@ export default function GeminiHarnessEngineeringPage() {
 
           <div className={styles.mermaidWrap}>
             <div className={styles.mermaidLabel}>テストハーネスの全体アーキテクチャ</div>
-            <MermaidDiagram
-              chart={`flowchart LR
-subgraph SUT["テスト対象 SUT"]
-  A[プロダクション<br />コード]
-end
-subgraph HARNESS["テストハーネス層"]
-  B[テストダブル<br />Mock / Stub / Fake]
-  C[フィクスチャ<br />setUp / tearDown]
-  D[テストランナー<br />Google Test / pytest]
-  E[アサーション<br />ライブラリ]
-end
-subgraph OUTPUT["検証・報告"]
-  F[テスト結果<br />PASS / FAIL]
-  G[カバレッジ<br />レポート]
-  H[CIダッシュボード]
-end
-A --> B
-B --> C
-C --> D
-D --> E
-E --> F
-F --> G
-G --> H`}
-            />
+            <MermaidDiagram chart={DIAGRAM_0} />
           </div>
 
           <div className={styles.vocab}>
@@ -227,14 +323,7 @@ G --> H`}
           <div className={styles.mermaidWrap}>
             <div className={styles.mermaidLabel}>テストピラミッド — 種類別の理想比率</div>
             <div style={{ maxWidth: "280px", margin: "0 auto" }}>
-              <MermaidDiagram
-                chart={`flowchart TD
-E2E["E2Eテスト\n全システム結合 / 数十〜数百件\n実行時間: 分〜時間単位"]
-INT["統合テスト Integration Test\n複数コンポーネント協調 / 数千〜数万件\n実行時間: 秒〜分単位"]
-UNIT["ユニットテスト Unit Test\n関数・クラス単体 / 数千〜数万件\n実行時間: ミリ秒単位"]
-E2E --> INT
-INT --> UNIT`}
-              />
+              <MermaidDiagram chart={DIAGRAM_1} />
             </div>
           </div>
 
@@ -346,18 +435,7 @@ INT --> UNIT`}
           <div className={styles.mermaidWrap}>
             <div className={styles.mermaidLabel}>5要素の関係図</div>
             <div style={{ maxWidth: "240px", margin: "0 auto" }}>
-              <MermaidDiagram
-                chart={`flowchart TD
-RUNNER["テストランナー Test Runner\n全体の司令塔"]
-FIXTURE["フィクスチャ Fixture\n環境の準備と後片付け"]
-DOUBLE["テストダブル Test Double\n外部依存の替え玉"]
-ASSERT["アサーション Assertion\n期待値との比較"]
-REPORTER["レポーター Reporter\n結果の可視化"]
-RUNNER --> FIXTURE
-FIXTURE --> DOUBLE
-DOUBLE --> ASSERT
-ASSERT --> REPORTER`}
-              />
+              <MermaidDiagram chart={DIAGRAM_2} />
             </div>
           </div>
 
@@ -703,24 +781,7 @@ ASSERT --> REPORTER`}
           <div className={styles.mermaidWrap}>
             <div className={styles.mermaidLabel}>テストダブル選択フロー</div>
             <div style={{ maxWidth: "520px", margin: "0 auto" }}>
-              <MermaidDiagram
-                chart={`flowchart TD
-START["外部依存が存在する"]
-Q1{"呼ばれたこと自体を<br />検証したいか"}
-Q2{"実際に動くロジックが<br />必要か"}
-Q3{"本物のコードを<br />変更できるか"}
-MOCK["Mock を使う<br />呼び出しを記録・検証"]
-FAKE["Fake を使う<br />軽量な本物実装"]
-SPY["Spy を使う<br />本物のまま監視"]
-STUB["Stub を使う<br />固定値を返す"]
-START --> Q1
-Q1 -->|Yes| MOCK
-Q1 -->|No| Q2
-Q2 -->|Yes| FAKE
-Q2 -->|No| Q3
-Q3 -->|No| SPY
-Q3 -->|Yes| STUB`}
-              />
+              <MermaidDiagram chart={DIAGRAM_3} />
             </div>
           </div>
 
@@ -795,26 +856,7 @@ Q3 -->|Yes| STUB`}
           <h3>ハーミティックを破るアンチパターンと解決策</h3>
           <div className={styles.mermaidWrap}>
             <div className={styles.mermaidLabel}>アンチパターン → 解決策のフロー</div>
-            <MermaidDiagram
-              chart={`flowchart TD
-ANTI["ハーミティック違反<br />アンチパターン"]
-AP1["共有DBを使う<br />テストA→B間でデータが残る"]
-AP2["現在時刻に依存<br />datetime.now が変わると失敗"]
-AP3["外部APIを呼ぶ<br />ネットワーク障害で失敗"]
-AP4["グローバル変数を変更<br />他のテストに副作用"]
-FIX1["フェイクDBを使う<br />各テストで独立したメモリDB"]
-FIX2["時刻をモックする<br />freezegun / faketime"]
-FIX3["テストダブルを使う<br />スタブ / モック"]
-FIX4["テスト後にリストアする<br />tearDown でリセット"]
-ANTI --> AP1
-ANTI --> AP2
-ANTI --> AP3
-ANTI --> AP4
-AP1 --> FIX1
-AP2 --> FIX2
-AP3 --> FIX3
-AP4 --> FIX4`}
-            />
+            <MermaidDiagram chart={DIAGRAM_4} />
           </div>
 
           <div className={styles.vocab}>
@@ -839,18 +881,7 @@ AP4 --> FIX4`}
           <div className={styles.mermaidWrap}>
             <div className={styles.mermaidLabel}>実装ステップ全体フロー</div>
             <div style={{ maxWidth: "300px", margin: "0 auto" }}>
-              <MermaidDiagram
-                chart={`flowchart TD
-S1["Step 1<br />プロダクションコード of 設計<br />DIパターンで依存を注入可能にする"]
-S2["Step 2<br />テストダブル of 実装<br />Fake / Stub / Mock を作る"]
-S3["Step 3<br />フィクスチャ of 設定<br />setUp / tearDown を定義する"]
-S4["Step 4<br />テストケース of 実装<br />AAAパターンで書く"]
-S5["Step 5<br />CIパイプラインへの統合<br />GitHub Actions / Cloud Build"]
-S1 --> S2
-S2 --> S3
-S3 --> S4
-S4 --> S5`}
-              />
+              <MermaidDiagram chart={DIAGRAM_5} />
             </div>
           </div>
 
@@ -1229,22 +1260,7 @@ S4 --> S5`}
           <div className={styles.mermaidWrap}>
             <div className={styles.mermaidLabel}>フレイキーテスト対処フロー</div>
             <div style={{ maxWidth: "450px", margin: "0 auto" }}>
-              <MermaidDiagram
-                chart={`flowchart TD
-DETECT["フレイキーテスト検出<br />CIで3回以上 PASS/FAIL が混在"]
-QUARANTINE["隔離 Quarantine<br />専用ラベルを付けてメインCIから除外"]
-ANALYZE["原因分析<br />時刻 / 並行性 / 順序 / 乱数"]
-FIX["修正<br />原因に応じた対策を実施"]
-VERIFY["再検証<br />10回連続 PASS を確認"]
-RESTORE["メインCIに復帰<br />ラベルを外す"]
-DEADLINE["修正デッドライン超過<br />テストを削除してチケット発行"]
-DETECT --> QUARANTINE
-QUARANTINE --> ANALYZE
-ANALYZE --> FIX
-FIX --> VERIFY
-VERIFY --> RESTORE
-QUARANTINE --> DEADLINE`}
-              />
+              <MermaidDiagram chart={DIAGRAM_6} />
             </div>
           </div>
 
@@ -1607,23 +1623,7 @@ QUARANTINE --> DEADLINE`}
           <div className={styles.mermaidWrap}>
             <div className={styles.mermaidLabel}>ADK Eval フロー</div>
             <div style={{ maxWidth: "420px", margin: "0 auto" }}>
-              <MermaidDiagram
-                chart={`flowchart TD
-EVALSET["評価セット eval_set.json<br />質問・期待ツール呼び出し・期待応答"]
-AGENT["AIエージェント<br />ADK LlmAgent / Gemini / Claude"]
-RESPONSE["エージェント応答<br />実際のツール呼び出し<br />実際のテキスト応答"]
-TOOL_CHECK["ツール呼び出し検証<br />expected vs actual<br />完全一致チェック"]
-LLM_JUDGE["LLM-as-Judge<br />応答品質スコアリング<br />0.0 to 1.0"]
-THRESHOLD["閾値チェック<br />スコア >= 0.8 PASS / FAIL"]
-REPORT["評価レポート<br />Allure / HTML スコア推移"]
-EVALSET --> AGENT
-AGENT --> RESPONSE
-RESPONSE --> TOOL_CHECK
-RESPONSE --> LLM_JUDGE
-TOOL_CHECK --> THRESHOLD
-LLM_JUDGE --> THRESHOLD
-THRESHOLD --> REPORT`}
-              />
+              <MermaidDiagram chart={DIAGRAM_7} />
             </div>
           </div>
 

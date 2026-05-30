@@ -60,6 +60,7 @@ export const navLinks: readonly NavLink[] = [
       { name: "Skill", href: "/codex/skill" },
       { name: "Agent", href: "/codex/agent" },
       { name: "Codex Guide", href: "/codex/openai-codex-guide" },
+      { name: "Harness Engineering", href: "/codex/harness-engineering" },
     ],
   },
   {

@@ -10,6 +10,7 @@ jobs:
   # -------------------------
   changes:
     runs-on: ubuntu-latest
+    # リポジトリのファイル読み取り(contents: read)およびPRメタデータの参照/検証(pull-requests: read)に必要な最小限の権限を付与
     permissions:
       contents: read
       pull-requests: read
