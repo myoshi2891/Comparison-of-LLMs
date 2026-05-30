@@ -1,11 +1,8 @@
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import * as cheerio from "cheerio";
 import { marked } from "marked";
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const __filename = fileURLToPath(import.meta.url);
 
 const args = process.argv.slice(2);
 if (args.length < 2) {
