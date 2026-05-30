@@ -37,20 +37,23 @@ export default function Checklist() {
 
   return (
     <div className={styles.checklist} id="cl">
-      {CHECK_ITEMS.map((item, index) => (
-        <div
-          key={item}
-          className={`${styles.checkItem} ${checkedStates[index] ? styles.checked : ""}`}
-          role="checkbox"
-          aria-checked={checkedStates[index]}
-          tabIndex={0}
-          onClick={() => toggle(index)}
-          onKeyDown={(e) => handleKeyDown(e, index)}
-        >
-          <div className={styles.checkBox} />
-          <div className={styles.checkText}>{item}</div>
-        </div>
-      ))}
+      {CHECK_ITEMS.map((item, index) => {
+        return (
+          // biome-ignore lint/a11y/useSemanticElements: custom checkbox styling
+          <div
+            key={item}
+            className={`${styles.checkItem} ${checkedStates[index] ? styles.checked : ""}`}
+            role="checkbox"
+            aria-checked={checkedStates[index]}
+            tabIndex={0}
+            onClick={() => toggle(index)}
+            onKeyDown={(e) => handleKeyDown(e, index)}
+          >
+            <div className={styles.checkBox} />
+            <div className={styles.checkText}>{item}</div>
+          </div>
+        );
+      })}
     </div>
   );
 }

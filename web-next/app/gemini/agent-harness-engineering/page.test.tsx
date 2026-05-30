@@ -214,7 +214,7 @@ describe("/gemini/agent-harness-engineering - language classes on code blocks", 
     const { container } = render(<Page />);
     const codeBlocks = Array.from(container.querySelectorAll("pre"));
     // TOC などのダミーの MermaidDiagram (pre data-testid="mermaid") は除外
-    const actualBlocks = codeBlocks.filter(pre => pre.getAttribute("data-testid") !== "mermaid");
+    const actualBlocks = codeBlocks.filter((pre) => pre.getAttribute("data-testid") !== "mermaid");
     expect(actualBlocks.length).toBeGreaterThan(0);
     for (const pre of actualBlocks) {
       const className = pre.className || "";
