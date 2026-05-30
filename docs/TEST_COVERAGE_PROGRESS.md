@@ -8,11 +8,11 @@
 
 | 項目 | 値 |
 |---|---|
-| 最終スキャン日 | 2026-05-26 |
+| 最終スキャン日 | 2026-05-30 |
 | フロントエンドテストランナー | Vitest 4.1 (jsdom 29 + @testing-library/react 16) |
 | バックエンドテストランナー | pytest 9.0 (unittest 互換) |
-| web-next テストファイル数 | 43 |
-| web-next テストケース数 | ≈ 494 |
+| web-next テストファイル数 | 47 |
+| web-next テストケース数 | 609 |
 | scraper テストファイル数 | 3 |
 | scraper テストケース数 | 10 |
 | 総合カバレッジスコア (weighted) | 40.7% |
@@ -222,30 +222,33 @@ note: main → _scrape_all → _write_output の end-to-end なし
 
 ```
 status: partial
-count: 1
+count: 5
 files:
   - web-next/e2e/smoke.e2e.ts (1)
-note: Playwright 導入、ホームページローディングのスモークE2E検証
+  - web-next/e2e/calculator.e2e.ts (4)
+note: Playwright による画面ロードおよびインタラクティブ動作（言語・通貨切り替え、プリセット変更）のE2E検証
 ```
 
 ### E2E / components
 
 ```
 status: partial
-count: 1
+count: 5
 files:
   - web-next/e2e/smoke.e2e.ts (1)
-note: Playwright による主要コンポーネントの描画E2E検証
+  - web-next/e2e/calculator.e2e.ts (4)
+note: Playwright による電卓UIプリセットの適用および通貨切り替え時の描画更新のE2E検証
 ```
 
 ### E2E / site
 
 ```
 status: partial
-count: 1
+count: 5
 files:
   - web-next/e2e/smoke.e2e.ts (1)
-note: Playwright による共通ヘッダー・バナーの描画E2E検証
+  - web-next/e2e/calculator.e2e.ts (4)
+note: Playwright による共通ヘッダー・バナーおよび言語切り替え時のヘッダー表示のE2E検証
 ```
 
 ### E2E / providers
@@ -313,7 +316,7 @@ status: done
 count: null
 files:
   - web-next/tests/a11y.test.tsx
-note: vitest-axe によるアクセシビリティ自動テストの導入（wcag違反自動チェック）
+note: vitest-axe による主要ガイドページ（Antigravity, Harness, Agent Harnessなど）のアクセシビリティ自動テスト（wcag違反自動チェック）
 ```
 
 ### Accessibility / components
@@ -481,7 +484,8 @@ status: partial
 count: 0
 files:
   - Makefile (make audit)
-note: bun audit による依存関係の脆弱性監査ゲートを導入
+  - .github/workflows/test.yaml (bun audit)
+note: GitHub Actions CI に bun audit による自動脆弱性監査ゲートを組み込み
 ```
 
 ### Security / tools
@@ -491,6 +495,7 @@ status: partial
 count: 0
 files:
   - Makefile (make audit)
+  - .github/workflows/test.yaml (bun audit)
 note: 同上
 ```
 
@@ -501,6 +506,7 @@ status: partial
 count: 0
 files:
   - Makefile (make audit)
+  - .github/workflows/test.yaml (bun audit)
 note: 同上（JS依存関係の監査ゲート）
 ```
 
@@ -510,5 +516,6 @@ note: 同上（JS依存関係の監査ゲート）
 
 | 日付 | 変更内容 | スコア |
 |---|---|---|
+| 2026-05-30 | a11yガイドページ自動テスト追加、Playwright電卓インタラクションテスト、およびCI脆弱性自動監査ゲートの導入 | 40.7% |
 | 2026-05-26 | アクセシビリティ自動テスト、Playwright E2E骨格、依存関係脆弱性監査ゲート、およびスクレイパーbrowserテストを追加 | 40.7% |
 | 2026-05-20 | 初回作成（静的スキャン） | 31.4% |

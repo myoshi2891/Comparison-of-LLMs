@@ -630,7 +630,7 @@
       <div class="mast-meta">
         <span>Vol. 001 · Issue 05</span>
         <span><b>LLM-Studies</b> / Coverage Diagnostic</span>
-        <span>Scan&nbsp;Date · <b>2026-05-26</b></span>
+        <span>Scan&nbsp;Date · <b>2026-05-30</b></span>
         <span class="pulse">Static&nbsp;file&nbsp;scan</span>
       </div>
       <h1 class="title">Coverage<br/><em>Diagnostic.</em></h1>
@@ -640,7 +640,7 @@
       <button class="iconbtn" id="printBtn" type="button" aria-label="PDF印刷">⎙ Print</button>
     </div>
   </header>
-
+ 
   <section class="hero" aria-label="サマリー">
     <div class="scorecard" role="figure" aria-label="全体カバレッジスコア">
       <div class="score-label">Overall Coverage Index · weighted</div>
@@ -652,21 +652,21 @@
       <p class="score-note">
         <strong>方法:</strong> 8 カテゴリー × 8 ドメイン = 64 セルのうち、対象外 (N/A) を除く
         <strong>43 セル</strong>を <strong>✅ 1.0 / ⚠️ 0.5 / ❌ 0</strong> で重み付き集計。
-        実測ベースのファイルスキャン結果のみ採用（推測値なし）。
+        実測ベースのであるファイルスキャン結果のみ採用（推測値なし）。
         coverage/lcov は未セットアップのためライン/分岐率は集計対象外。
       </p>
     </div>
-
+ 
     <div class="stack" role="list" aria-label="サマリー指標">
       <div class="stat" role="listitem">
         <span class="stat-index">01</span>
         <span class="stat-label">Test files · <i>web-next</i></span>
-        <span class="stat-val">43<small>vitest specs</small></span>
+        <span class="stat-val">47<small>vitest specs</small></span>
       </div>
       <div class="stat" role="listitem">
         <span class="stat-index">02</span>
         <span class="stat-label">Test cases · <i>web-next</i></span>
-        <span class="stat-val">≈ 494<small>it/test count</small></span>
+        <span class="stat-val">609<small>it/test count</small></span>
       </div>
       <div class="stat" role="listitem">
         <span class="stat-index">03</span>
@@ -952,9 +952,9 @@ var CELLS = {
     core:       { s:"missing", count:0, files:[], note:"main → _scrape_all → _write_output の end-to-end なし" }
   },
   e2e: {
-    app:        { s:"partial", count:1, files:["e2e/smoke.e2e.ts (1)"], note:"Playwright 導入、ホームページローディングのスモークE2E検証" },
-    components: { s:"partial", count:1, files:["e2e/smoke.e2e.ts (1)"], note:"Playwright による主要コンポーネントの描画E2E検証" },
-    site:       { s:"partial", count:1, files:["e2e/smoke.e2e.ts (1)"], note:"Playwright による共通ヘッダー・バナーの描画E2E検証" },
+    app:        { s:"partial", count:5, files:["e2e/smoke.e2e.ts (1)","e2e/calculator.e2e.ts (4)"], note:"Playwright による画面ロードおよびインタラクティブ動作（言語・通貨切り替え、プリセット変更）のE2E検証" },
+    components: { s:"partial", count:5, files:["e2e/smoke.e2e.ts (1)","e2e/calculator.e2e.ts (4)"], note:"Playwright による電卓UIプリセットの適用および通貨切り替え時の描画更新のE2E検証" },
+    site:       { s:"partial", count:5, files:["e2e/smoke.e2e.ts (1)","e2e/calculator.e2e.ts (4)"], note:"Playwright による共通ヘッダー・バナーおよび言語切り替え時のヘッダー表示のE2E検証" },
     lib:        { s:"na" },
     types:      { s:"na" },
     providers:  { s:"missing", count:0, files:[], note:"ライブスクレイプ smoke は CI 対象外" },
@@ -968,7 +968,7 @@ var CELLS = {
     lib: { s:"na" }, types: { s:"na" }, providers: { s:"na" }, tools: { s:"na" }, core: { s:"na" }
   },
   a11y: {
-    app:        { s:"done",    count:null, files:["tests/a11y.test.tsx"], note:"vitest-axe によるアクセシビリティ自動テストの導入（wcag違反自動チェック）" },
+    app:        { s:"done",    count:null, files:["tests/a11y.test.tsx"], note:"vitest-axe による主要ガイドページ（Antigravity, Harness, Agent Harnessなど）のアクセシビリティ自動テスト（wcag違反自動チェック）" },
     components: { s:"done",    count:null, files:["tests/a11y.test.tsx"], note:"vitest-axe による主要コンポーネント（HomePageなど）のアクセシビリティ自動テスト" },
     site:       { s:"done",    count:null, files:["tests/a11y.test.tsx"], note:"vitest-axe による共通ヘッダー・共通バナーのアクセシビリティ自動テスト" },
     lib: { s:"na" }, types: { s:"na" }, providers: { s:"na" }, tools: { s:"na" }, core: { s:"na" }
@@ -996,9 +996,9 @@ var CELLS = {
     site:       { s:"na" },
     lib:        { s:"partial", count:10, files:["i18n.rich.test.tsx (10)"], note:"上記と同じファイルで lib/i18n.tsx もカバー" },
     types:      { s:"na" },
-    providers:  { s:"partial", count:0,  files:["Makefile (make audit)"], note:"bun audit による依存関係の脆弱性監査ゲートを導入" },
-    tools:      { s:"partial", count:0,  files:["Makefile (make audit)"], note:"同上" },
-    core:       { s:"partial", count:0,  files:["Makefile (make audit)"], note:"同上（JS依存関係の監査ゲート）" }
+    providers:  { s:"partial", count:0,  files:["Makefile (make audit)","workflows/test.yaml (bun audit)"], note:"GitHub Actions CI に bun audit による自動脆弱性監査ゲートを組み込み" },
+    tools:      { s:"partial", count:0,  files:["Makefile (make audit)","workflows/test.yaml (bun audit)"], note:"同上" },
+    core:       { s:"partial", count:0,  files:["Makefile (make audit)","workflows/test.yaml (bun audit)"], note:"同上（JS依存関係の監査ゲート）" }
   }
 };
 

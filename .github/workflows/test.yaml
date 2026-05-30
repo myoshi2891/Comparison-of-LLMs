@@ -58,6 +58,10 @@ jobs:
         working-directory: web-next
         run: bun install --frozen-lockfile
 
+      - name: Dependency vulnerability audit
+        working-directory: web-next
+        run: bun audit
+
       - name: Test web
         working-directory: web-next
         run: bun run test
