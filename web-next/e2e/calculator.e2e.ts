@@ -44,7 +44,11 @@ test.describe("Calculator Interactive E2E Test", () => {
 
   test("should change currency and display appropriate format", async ({ page }) => {
     // 通貨切り替えボタン（JPY/USD または 円/ドル）をクリック
-    const currencyBtn = page.locator('button:has-text("USD"), button:has-text("JPY"), button:has-text("円"), button:has-text("ドル")').first();
+    const currencyBtn = page
+      .locator(
+        'button:has-text("USD"), button:has-text("JPY"), button:has-text("円"), button:has-text("ドル")'
+      )
+      .first();
     if (await currencyBtn.isVisible()) {
       const initialText = await currencyBtn.textContent();
       await currencyBtn.click();

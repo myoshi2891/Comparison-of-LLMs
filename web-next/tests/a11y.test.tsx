@@ -3,12 +3,12 @@ import type { ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { axe } from "vitest-axe";
 import * as matchers from "vitest-axe/matchers";
+import AgentHarnessEngineeringPage from "@/app/gemini/agent-harness-engineering/page";
+import AntigravityGuidePage from "@/app/gemini/antigravity-guide/page";
+import HarnessEngineeringPage from "@/app/gemini/harness-engineering/page";
 import { HomePage } from "@/components/HomePage";
 import { DisclaimerBanner } from "@/components/site/DisclaimerBanner";
 import { SiteHeader as RawSiteHeader } from "@/components/site/SiteHeader";
-import AntigravityGuidePage from "@/app/gemini/antigravity-guide/page";
-import HarnessEngineeringPage from "@/app/gemini/harness-engineering/page";
-import AgentHarnessEngineeringPage from "@/app/gemini/agent-harness-engineering/page";
 import type { PricingData } from "@/types/pricing";
 
 vi.mock("@/components/docs/MermaidDiagram", () => ({
