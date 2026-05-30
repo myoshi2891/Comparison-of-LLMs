@@ -98,7 +98,7 @@
   border-radius: 100px;
   padding: 6px 16px;
   margin-bottom: 28px;
-  animation: fadeIn 0.8s ease both;
+  animation: fade-in 0.8s ease both;
 }
 .eyebrow::before {
   content: "";
@@ -116,7 +116,7 @@
   line-height: 1.05;
   letter-spacing: -0.03em;
   margin-bottom: 20px;
-  animation: fadeIn 0.8s 0.1s ease both;
+  animation: fade-in 0.8s 0.1s ease both;
 }
 .wrapper h1 .t1 {
   display: block;
@@ -136,7 +136,7 @@
   max-width: 580px;
   margin-bottom: 48px;
   font-weight: 300;
-  animation: fadeIn 0.8s 0.2s ease both;
+  animation: fade-in 0.8s 0.2s ease both;
 }
 
 .heroStats {
@@ -144,7 +144,7 @@
   gap: 40px;
   flex-wrap: wrap;
   justify-content: center;
-  animation: fadeIn 0.8s 0.3s ease both;
+  animation: fade-in 0.8s 0.3s ease both;
 }
 .stat {
   text-align: center;
@@ -178,13 +178,13 @@
   font-family: var(--mono);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  animation: fadeIn 1s 0.7s ease both;
+  animation: fade-in 1s 0.7s ease both;
 }
 .scrollLine {
   width: 1px;
   height: 36px;
   background: linear-gradient(to bottom, var(--oai), transparent);
-  animation: scrollPulse 2s infinite;
+  animation: scroll-pulse 2s infinite;
 }
 
 /* ─── NAV ─── */
@@ -970,7 +970,7 @@ h3.subH::before {
 }
 
 /* ─── ANIMATIONS ─── */
-@keyframes fadeIn {
+@keyframes fade-in {
   from {
     opacity: 0;
     transform: translateY(-16px);
@@ -989,7 +989,7 @@ h3.subH::before {
     opacity: 0.25;
   }
 }
-@keyframes scrollPulse {
+@keyframes scroll-pulse {
   0% {
     transform: scaleY(0);
     transform-origin: top;
