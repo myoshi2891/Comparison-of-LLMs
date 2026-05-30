@@ -184,6 +184,13 @@ interface ExtProps {
   children: React.ReactNode;
 }
 
+/**
+ * Render an external link that opens in a new browser tab and includes safe `rel` attributes.
+ *
+ * @param href - The destination URL for the link
+ * @param children - Content to display inside the link
+ * @returns An anchor element that navigates to `href`, opens in a new tab, and uses `rel="noopener noreferrer"`
+ */
 function Ext({ href, children }: ExtProps) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -192,6 +199,14 @@ function Ext({ href, children }: ExtProps) {
   );
 }
 
+/**
+ * Renders the "Google ADK × Gemini — AIエージェント ハーネスエンジニアリング 完全ガイド" page.
+ *
+ * The component constructs the full static documentation page: hero, table of contents,
+ * Sections 01–11 (including diagrams, code examples, tables, and a checklist), and footer.
+ *
+ * @returns The React element tree for the guide page.
+ */
 export default function AgentHarnessEngineeringPage() {
   return (
     <>

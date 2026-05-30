@@ -15,6 +15,14 @@ const CHECK_ITEMS = [
   "E2E テストは手動レビューで承認されているか",
 ];
 
+/**
+ * Renders an interactive checklist of predefined items with keyboard and mouse toggles.
+ *
+ * Each item displays a custom-styled checkbox and text, reflects its checked state via
+ * `aria-checked`, and can be toggled by clicking or pressing Enter/Space while focused.
+ *
+ * @returns A React element containing the checklist UI.
+ */
 export default function Checklist() {
   const [checkedStates, setCheckedStates] = useState<boolean[]>(
     new Array(CHECK_ITEMS.length).fill(false)
