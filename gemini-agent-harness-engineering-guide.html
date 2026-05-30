@@ -1,0 +1,2271 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Google Gemini AIエージェント ハーネスエンジニアリング 完全ガイド</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #060d1a;
+        --surface: #0d1b30;
+        --surface2: #162035;
+        --border: #1e2f4a;
+        --g-blue: #4285f4;
+        --g-green: #34a853;
+        --g-yellow: #fbbc04;
+        --g-red: #ea4335;
+        --g-cyan: #00bcd4;
+        --g-purple: #7c4dff;
+        --text: #e8eef8;
+        --text-dim: #8aa0be;
+        --text-bright: #f0f6ff;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'Noto Sans JP', sans-serif;
+        font-weight: 300;
+        line-height: 1.8;
+      }
+
+      /* ── PROGRESS BAR ── */
+      #prog {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        width: 0%;
+        background: linear-gradient(90deg, var(--g-blue), var(--g-green), var(--g-yellow));
+        z-index: 9999;
+        transition: width 0.1s;
+      }
+
+      /* ── STICKY NAV ── */
+      nav.top-nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(6, 13, 26, 0.9);
+        backdrop-filter: blur(14px);
+        border-bottom: 1px solid var(--border);
+        padding: 0 24px;
+      }
+      .nav-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        height: 52px;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      .nav-inner::-webkit-scrollbar {
+        display: none;
+      }
+      .nav-logo {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 14px;
+        white-space: nowrap;
+        margin-right: 16px;
+        background: linear-gradient(90deg, var(--g-blue), var(--g-green));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      nav.top-nav a {
+        color: var(--text-dim);
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+        padding: 5px 10px;
+        border-radius: 6px;
+        transition: all 0.2s;
+      }
+      nav.top-nav a:hover {
+        color: var(--g-blue);
+        background: rgba(66, 133, 244, 0.1);
+      }
+
+      /* ── HERO ── */
+      .hero {
+        position: relative;
+        overflow: hidden;
+        padding: 80px 24px 100px;
+        text-align: center;
+        background: linear-gradient(160deg, #071526 0%, #060d1a 60%);
+        border-bottom: 1px solid var(--border);
+      }
+      .hero-glow {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(ellipse 60% 40% at 20% 0%, rgba(66, 133, 244, 0.15) 0%, transparent 55%),
+          radial-gradient(ellipse 50% 35% at 80% 0%, rgba(52, 168, 83, 0.1) 0%, transparent 55%),
+          radial-gradient(ellipse 40% 30% at 50% 110%, rgba(124, 77, 255, 0.08) 0%, transparent 55%);
+      }
+      .hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.68rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--g-blue);
+        padding: 0.3rem 0.9rem;
+        border: 1px solid rgba(66, 133, 244, 0.35);
+        border-radius: 2rem;
+        background: rgba(66, 133, 244, 0.07);
+        margin-bottom: 1.4rem;
+      }
+      .hero-eyebrow::before {
+        content: '';
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--g-blue);
+        animation: blink 2s infinite;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.4;
+          transform: scale(0.75);
+        }
+      }
+      .hero h1 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: clamp(1.8rem, 4.5vw, 3.2rem);
+        font-weight: 700;
+        line-height: 1.15;
+        color: var(--text-bright);
+        margin-bottom: 1.2rem;
+        letter-spacing: -0.02em;
+      }
+      .rainbow {
+        background: linear-gradient(90deg, #4285f4, #34a853, #fbbc04, #ea4335, #7c4dff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .hero-sub {
+        font-size: 0.96rem;
+        color: var(--text-dim);
+        max-width: 640px;
+        margin: 0 auto 2rem;
+      }
+      .hero-chips {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .chip {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.64rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 2rem;
+        border: 1px solid;
+      }
+      .cb {
+        border-color: rgba(66, 133, 244, 0.4);
+        color: var(--g-blue);
+        background: rgba(66, 133, 244, 0.08);
+      }
+      .cg {
+        border-color: rgba(52, 168, 83, 0.4);
+        color: var(--g-green);
+        background: rgba(52, 168, 83, 0.08);
+      }
+      .cy {
+        border-color: rgba(251, 188, 4, 0.4);
+        color: var(--g-yellow);
+        background: rgba(251, 188, 4, 0.08);
+      }
+      .cr {
+        border-color: rgba(234, 67, 53, 0.4);
+        color: var(--g-red);
+        background: rgba(234, 67, 53, 0.08);
+      }
+      .cp {
+        border-color: rgba(124, 77, 255, 0.4);
+        color: var(--g-purple);
+        background: rgba(124, 77, 255, 0.08);
+      }
+
+      /* ── LAYOUT ── */
+      .wrap {
+        max-width: 1060px;
+        margin: 0 auto;
+        padding: 56px 24px 100px;
+      }
+
+      /* ── TOC ── */
+      .toc {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--g-blue);
+        border-radius: 12px;
+        padding: 1.5rem 2rem;
+        margin-bottom: 3.5rem;
+      }
+      .toc-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.66rem;
+        letter-spacing: 0.2em;
+        color: var(--g-blue);
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+      }
+      .toc ol {
+        list-style: none;
+        counter-reset: toc;
+      }
+      .toc li {
+        counter-increment: toc;
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+        padding: 0.2rem 0;
+        font-size: 0.87rem;
+      }
+      .toc li::before {
+        content: counter(toc, decimal-leading-zero);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.66rem;
+        color: var(--text-dim);
+        min-width: 2rem;
+      }
+      .toc a {
+        color: var(--text);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .toc a:hover {
+        color: var(--g-blue);
+      }
+
+      /* ── SECTIONS ── */
+      section.sec {
+        margin-bottom: 5rem;
+      }
+      .sec-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.66rem;
+        letter-spacing: 0.2em;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        margin-bottom: 0.4rem;
+      }
+      h2.sec-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.65rem;
+        font-weight: 700;
+        color: var(--text-bright);
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.8rem;
+        border-bottom: 1px solid var(--border);
+      }
+      h2.sec-title .num {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.85rem;
+        color: var(--g-blue);
+        margin-right: 0.5rem;
+      }
+      h3 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.08rem;
+        font-weight: 600;
+        color: var(--text-bright);
+        margin: 2.2rem 0 0.8rem;
+      }
+      p {
+        margin-bottom: 0.9rem;
+        font-size: 0.93rem;
+      }
+      p:last-child {
+        margin-bottom: 0;
+      }
+      strong {
+        color: var(--text-bright);
+        font-weight: 500;
+      }
+
+      /* ── MERMAID ── */
+      .mermaid-wrap {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 2rem 1.5rem;
+        margin: 1.5rem 0;
+        overflow-x: auto;
+        text-align: center;
+      }
+      .mermaid-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.64rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        margin-bottom: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .mermaid-label::before,
+      .mermaid-label::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+      .mermaid-wrap svg {
+        display: inline-block;
+        width: auto !important;
+        max-width: 100% !important;
+        height: auto !important;
+      }
+      #diag-2 svg {
+        max-width: 500px !important;
+      }
+      #diag-5 svg {
+        max-width: 530px !important;
+      }
+      #diag-8 svg {
+        max-width: 680px !important;
+      }
+      #diag-9 svg {
+        max-width: 540px !important;
+      }
+      #diag-10 svg {
+        max-width: 400px !important;
+      }
+
+      /* ── CODE BLOCKS ── */
+      .code-wrap {
+        background: #040810;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 1rem 0;
+      }
+      .code-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.45rem 1rem;
+        background: var(--surface2);
+        border-bottom: 1px solid var(--border);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.64rem;
+        color: var(--text-dim);
+      }
+      .code-dots {
+        display: flex;
+        gap: 4px;
+      }
+      .cd {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+      }
+      pre {
+        padding: 1.2rem 1.5rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.76rem;
+        line-height: 1.8;
+        color: #d0dff8;
+        overflow-x: auto;
+        white-space: pre;
+      }
+      .kw {
+        color: var(--g-purple);
+      }
+      .str {
+        color: var(--g-green);
+      }
+      .cmt {
+        color: #4a6080;
+        font-style: italic;
+      }
+      .fn {
+        color: #7dd3fc;
+      }
+      .num {
+        color: var(--g-yellow);
+      }
+      .key {
+        color: #93c5fd;
+      }
+
+      /* ── TABLES ── */
+      .tbl-wrap {
+        overflow-x: auto;
+        margin: 1.5rem 0;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.84rem;
+      }
+      th {
+        background: var(--surface2);
+        color: var(--text-bright);
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600;
+        padding: 0.7rem 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.78rem;
+      }
+      td {
+        padding: 0.7rem 1rem;
+        border-bottom: 1px solid rgba(30, 47, 74, 0.6);
+        color: var(--text);
+        vertical-align: top;
+        font-size: 0.82rem;
+      }
+      td:first-child {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.74rem;
+        color: var(--g-green);
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+      code {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.78rem;
+        background: rgba(66, 133, 244, 0.1);
+        border: 1px solid rgba(66, 133, 244, 0.2);
+        border-radius: 4px;
+        padding: 1px 6px;
+        color: var(--g-cyan);
+      }
+
+      /* ── INFO BOXES ── */
+      .info {
+        border-radius: 10px;
+        padding: 1rem 1.2rem;
+        margin: 1rem 0;
+        display: flex;
+        gap: 0.8rem;
+        font-size: 0.875rem;
+        align-items: flex-start;
+      }
+      .info .ii {
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        margin-top: 0.1rem;
+      }
+      .i-note {
+        background: rgba(66, 133, 244, 0.07);
+        border: 1px solid rgba(66, 133, 244, 0.25);
+      }
+      .i-warn {
+        background: rgba(251, 188, 4, 0.07);
+        border: 1px solid rgba(251, 188, 4, 0.25);
+      }
+      .i-tip {
+        background: rgba(52, 168, 83, 0.07);
+        border: 1px solid rgba(52, 168, 83, 0.25);
+      }
+      .i-crit {
+        background: rgba(234, 67, 53, 0.07);
+        border: 1px solid rgba(234, 67, 53, 0.25);
+      }
+
+      /* ── GRID CARDS ── */
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .mini-card {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.1rem;
+      }
+      .mc-tag {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.68rem;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+      }
+      .mini-card p {
+        font-size: 0.82rem;
+        color: var(--text-dim);
+        margin: 0;
+        line-height: 1.6;
+      }
+
+      /* ── BP CARDS ── */
+      .bp-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .bp {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.2rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .bp::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+      }
+      .bp-b::before {
+        background: var(--g-blue);
+      }
+      .bp-g::before {
+        background: var(--g-green);
+      }
+      .bp-y::before {
+        background: var(--g-yellow);
+      }
+      .bp-r::before {
+        background: var(--g-red);
+      }
+      .bp-p::before {
+        background: var(--g-purple);
+      }
+      .bp-c::before {
+        background: var(--g-cyan);
+      }
+      .bpn {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 2rem;
+        opacity: 0.06;
+        position: absolute;
+        top: 2px;
+        right: 8px;
+        color: #fff;
+        font-weight: 700;
+        line-height: 1;
+      }
+      .bp h4 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--text-bright);
+        margin-bottom: 0.4rem;
+      }
+      .bp p {
+        font-size: 0.78rem;
+        color: var(--text-dim);
+        margin: 0;
+        line-height: 1.55;
+      }
+
+      /* ── CHECKLIST ── */
+      .checklist {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 1.5rem 0;
+      }
+      .check-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .check-item:hover {
+        border-color: rgba(66, 133, 244, 0.4);
+      }
+      .check-box {
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+        border: 2px solid var(--border);
+        border-radius: 5px;
+        margin-top: 1px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+      }
+      .check-item.checked .check-box {
+        background: var(--g-green);
+        border-color: var(--g-green);
+      }
+      .check-item.checked .check-box::after {
+        content: '✓';
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .check-item.checked .check-text {
+        color: var(--text-dim);
+        text-decoration: line-through;
+      }
+      .check-text {
+        font-size: 0.85rem;
+        color: var(--text);
+        line-height: 1.5;
+      }
+
+      /* ── SOURCES ── */
+      .sources {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 1.5rem 2rem;
+        margin-top: 3rem;
+      }
+      .src {
+        display: flex;
+        align-items: baseline;
+        gap: 0.8rem;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(30, 47, 74, 0.5);
+        font-size: 0.8rem;
+      }
+      .src:last-child {
+        border-bottom: none;
+      }
+      .snum {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.65rem;
+        color: var(--text-dim);
+        min-width: 2rem;
+      }
+      .src a {
+        color: var(--g-blue);
+        text-decoration: none;
+        word-break: break-all;
+      }
+      .src a:hover {
+        text-decoration: underline;
+      }
+      .sdesc {
+        color: var(--text-dim);
+        font-size: 0.73rem;
+        display: block;
+        margin-top: 0.1rem;
+      }
+
+      /* ── STEP FLOW ── */
+      .step-flow {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        position: relative;
+      }
+      .step-flow::before {
+        content: '';
+        position: absolute;
+        left: 22px;
+        top: 44px;
+        bottom: 44px;
+        width: 1px;
+        background: linear-gradient(to bottom, var(--g-blue), transparent);
+      }
+      .step-item {
+        display: flex;
+        gap: 20px;
+        padding: 24px 0;
+        position: relative;
+      }
+      .step-num {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        background: var(--surface2);
+        border: 2px solid var(--g-blue);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 600;
+        font-size: 0.82rem;
+        color: var(--g-blue);
+        position: relative;
+        z-index: 1;
+      }
+      .step-body {
+        flex: 1;
+      }
+      .step-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--text-bright);
+      }
+
+      /* ── SCORE BADGES ── */
+      .score-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.68rem;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 4px;
+      }
+      .sb-g {
+        background: rgba(52, 168, 83, 0.15);
+        color: var(--g-green);
+        border: 1px solid rgba(52, 168, 83, 0.3);
+      }
+      .sb-y {
+        background: rgba(251, 188, 4, 0.15);
+        color: var(--g-yellow);
+        border: 1px solid rgba(251, 188, 4, 0.3);
+      }
+      .sb-r {
+        background: rgba(234, 67, 53, 0.15);
+        color: var(--g-red);
+        border: 1px solid rgba(234, 67, 53, 0.3);
+      }
+
+      /* ── FADE IN ── */
+      .fade-in {
+        opacity: 0;
+        transform: translateY(18px);
+        transition:
+          opacity 0.5s ease,
+          transform 0.5s ease;
+      }
+      .fade-in.vis {
+        opacity: 1;
+        transform: none;
+      }
+
+      /* ── FOOTER ── */
+      footer {
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+        padding: 40px 24px;
+        text-align: center;
+      }
+      .footer-logo {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(90deg, var(--g-blue), var(--g-green));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      footer p {
+        font-size: 0.78rem;
+        color: var(--text-dim);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="prog"></div>
+
+    <!-- NAV -->
+    <nav class="top-nav">
+      <div class="nav-inner">
+        <div class="nav-logo">Gemini Harness Guide</div>
+        <a href="#s1">概要</a>
+        <a href="#s2">アーキテクチャ</a>
+        <a href="#s3">評価セット</a>
+        <a href="#s4">テストダブル</a>
+        <a href="#s5">ADK Eval</a>
+        <a href="#s6">LLM-as-Judge</a>
+        <a href="#s7">マルチエージェント</a>
+        <a href="#s8">フレイキー対策</a>
+        <a href="#s9">CI統合</a>
+        <a href="#s10">ベストプラクティス</a>
+        <a href="#s11">ソース</a>
+      </div>
+    </nav>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="hero-glow"></div>
+      <div class="hero-eyebrow">Google ADK × Gemini 3.1 Pro — 2026年5月最新版</div>
+      <h1>
+        Google Gemini<br /><span class="rainbow">AIエージェント ハーネスエンジニアリング</span
+        ><br />完全ガイド
+      </h1>
+      <p class="hero-sub">
+        初学者でもステップバイステップで理解できる — 評価セット設計からテストダブル・ADK
+        Eval・LLM-as-Judge・CIパイプライン統合まで、Google推奨のベストプラクティスを根拠ソース付きで徹底解説
+      </p>
+      <div class="hero-chips">
+        <span class="chip cb">Gemini CLI v0.34.0</span>
+        <span class="chip cg">Google ADK v1.x</span>
+        <span class="chip cy">ADK Eval</span>
+        <span class="chip cr">LLM-as-Judge</span>
+        <span class="chip cp">GitHub Actions</span>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <!-- TOC -->
+      <nav class="toc fade-in">
+        <div class="toc-label">目次</div>
+        <ol>
+          <li><a href="#s1">AIエージェントのテストとは — 通常ソフトウェアとの決定的な違い</a></li>
+          <li><a href="#s2">ハーネスアーキテクチャ全体像</a></li>
+          <li><a href="#s3">評価セット（Eval Set）の設計</a></li>
+          <li><a href="#s4">テストダブル — フェイクLLM・フェイクツールの実装</a></li>
+          <li><a href="#s5">ADK Eval — Google公式評価フレームワーク</a></li>
+          <li><a href="#s6">LLM-as-Judge パターン</a></li>
+          <li><a href="#s7">マルチエージェント評価ハーネス</a></li>
+          <li><a href="#s8">フレイキー（不安定）評価への対処</a></li>
+          <li><a href="#s9">CIパイプラインへの統合</a></li>
+          <li><a href="#s10">ベストプラクティス 10則 &amp; チェックリスト</a></li>
+          <li><a href="#s11">参考ソース一覧</a></li>
+        </ol>
+      </nav>
+
+      <!-- ── SECTION 1 ── -->
+      <section id="s1" class="sec fade-in">
+        <div class="sec-label">Section 01</div>
+        <h2 class="sec-title"><span class="num">01.</span>AIエージェントのテストとは何か</h2>
+
+        <p>
+          通常のソフトウェアは「同じ入力 →
+          必ず同じ出力」という<strong>決定論的</strong>な性質を持ちます。一方、LLMベースのAIエージェントは<strong>確率的</strong>であり、同じ質問でも毎回微妙に異なる回答を生成します。このため、従来の
+          <code>assert output == expected</code> アプローチが使えません。
+        </p>
+
+        <h3>通常ソフトウェア vs AIエージェントの違い</h3>
+        <div class="tbl-wrap">
+          <table>
+            <tr>
+              <th>比較軸</th>
+              <th>通常のソフトウェア</th>
+              <th>AIエージェント</th>
+            </tr>
+            <tr>
+              <td>出力の性質</td>
+              <td>決定論的（毎回同じ）</td>
+              <td>確率的（毎回変わりうる）</td>
+            </tr>
+            <tr>
+              <td>テスト手法</td>
+              <td><code>assert output == expected</code></td>
+              <td>スコアリング・LLM-as-Judge</td>
+            </tr>
+            <tr>
+              <td>失敗基準</td>
+              <td>1件でも FAIL</td>
+              <td>スコアが閾値を下回る</td>
+            </tr>
+            <tr>
+              <td>テストデータ</td>
+              <td>単体テストケース</td>
+              <td>評価セット（Eval Set）</td>
+            </tr>
+            <tr>
+              <td>検証対象</td>
+              <td>戻り値・副作用</td>
+              <td>ツール呼び出し・応答品質・安全性</td>
+            </tr>
+            <tr>
+              <td>実行コスト</td>
+              <td>ミリ秒〜秒単位・無料</td>
+              <td>秒〜分単位・APIコスト発生</td>
+            </tr>
+          </table>
+        </div>
+
+        <h3>AIエージェントのテスト3観点</h3>
+        <div class="mermaid-wrap">
+          <div class="mermaid-label">テスト観点の全体像</div>
+          <div id="diag-1" class="mermaid"></div>
+        </div>
+
+        <div class="info i-note">
+          <span class="ii">💡</span>
+          <div>
+            <strong>例え話：</strong
+            >自動車のクラッシュテストでは、ダミー人形・センサー・高速カメラ・制御された環境がすべて揃って初めて「安全性スコア」が出ます。AIエージェントも同様に、テスト環境・評価データ・採点ロジックがセットになった<strong>テストハーネス</strong>がなければ品質を数値化できません。
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION 2 ── -->
+      <section id="s2" class="sec fade-in">
+        <div class="sec-label">Section 02</div>
+        <h2 class="sec-title"><span class="num">02.</span>ハーネスアーキテクチャ全体像</h2>
+
+        <div class="mermaid-wrap">
+          <div class="mermaid-label">Google推奨エージェント評価ハーネスの構成</div>
+          <div id="diag-2" class="mermaid"></div>
+        </div>
+
+        <h3>3種類のテストレベル</h3>
+        <p>
+          Googleはエージェントテストを
+          <strong>Small / Medium / Large</strong> で分類しています（Software Engineering at Google
+          の分類をAIに適用）。
+        </p>
+        <div class="tbl-wrap">
+          <table>
+            <tr>
+              <th>レベル</th>
+              <th>名称</th>
+              <th>LLM</th>
+              <th>外部API</th>
+              <th>目的</th>
+              <th>実行時間</th>
+            </tr>
+            <tr>
+              <td>Small</td>
+              <td>ユニット評価</td>
+              <td>フェイクLLM</td>
+              <td>モック</td>
+              <td>ツール呼び出しロジックのテスト</td>
+              <td>〜5秒</td>
+            </tr>
+            <tr>
+              <td>Medium</td>
+              <td>統合評価</td>
+              <td>本物LLM（安価なモデル）</td>
+              <td>スタブ</td>
+              <td>1〜3ターンの会話品質評価</td>
+              <td>〜60秒</td>
+            </tr>
+            <tr>
+              <td>Large</td>
+              <td>E2E評価</td>
+              <td>本物LLM（最高精度モデル）</td>
+              <td>本物API</td>
+              <td>複数ステップの自律タスク評価</td>
+              <td>〜300秒</td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="card-grid">
+          <div class="mini-card">
+            <div class="mc-tag" style="color: var(--g-green)">🔬 Small テストを最大化</div>
+            <p>
+              フェイクLLMを使い APIコスト
+              0円・高速で設計ミスを早期発見。全テストの70%以上をSmallに。
+            </p>
+          </div>
+          <div class="mini-card">
+            <div class="mc-tag" style="color: var(--g-blue)">🔗 Medium テストでバランス</div>
+            <p>
+              安価な <code>gemini-3-flash-preview</code> を使い実際の会話品質を確認。コスト90%削減。
+            </p>
+          </div>
+          <div class="mini-card">
+            <div class="mc-tag" style="color: var(--g-yellow)">🚀 Large テストは最小限に</div>
+            <p>最高精度モデルのE2E評価は時間・コストが高い。リリース前の最終確認に限定。</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION 3 ── -->
+      <section id="s3" class="sec fade-in">
+        <div class="sec-label">Section 03</div>
+        <h2 class="sec-title"><span class="num">03.</span>評価セット（Eval Set）の設計</h2>
+
+        <p>
+          <strong>評価セット</strong
+          >とは「こう聞いたら・こうツールを呼んで・こう答えるはず」という期待を定義したテストデータの集合です。コードと分離してJSON/YAMLで管理することで、<strong>評価観点の変更をコード変更なしに実施</strong>できます。
+        </p>
+
+        <h3>ADK Eval の評価セット形式（JSON）</h3>
+        <div class="code-wrap">
+          <div class="code-bar">
+            <div class="code-dots">
+              <div class="cd" style="background: #ea4335"></div>
+              <div class="cd" style="background: #fbbc04"></div>
+              <div class="cd" style="background: #34a853"></div>
+            </div>
+            <span>evals/eval_set.json</span>
+          </div>
+          <pre><span class="key">[</span>
+  <span class="key">{</span>
+    <span class="str">"name"</span>: <span class="str">"deploy_staging_query"</span>,
+    <span class="str">"query"</span>: <span class="str">"ステージング環境にデプロイする手順を実行してください"</span>,
+    <span class="str">"expected_tool_calls"</span>: <span class="key">[</span>
+      <span class="key">{</span>
+        <span class="str">"tool_name"</span>: <span class="str">"check_test_coverage"</span>,
+        <span class="str">"args"</span>: <span class="key">{</span> <span class="str">"threshold"</span>: <span class="num">80</span> <span class="key">}</span>
+      <span class="key">}</span>,
+      <span class="key">{</span>
+        <span class="str">"tool_name"</span>: <span class="str">"run_deploy"</span>,
+        <span class="str">"args"</span>: <span class="key">{</span> <span class="str">"environment"</span>: <span class="str">"staging"</span> <span class="key">}</span>
+      <span class="key">}</span>
+    <span class="key">]</span>,
+    <span class="str">"reference"</span>: <span class="str">"テスト通過後、ステージングへのデプロイが完了しました。"</span>
+  <span class="key">}</span>,
+  <span class="key">{</span>
+    <span class="str">"name"</span>: <span class="str">"security_check_query"</span>,
+    <span class="str">"query"</span>: <span class="str">"このコードにSQLインジェクションのリスクはありますか？"</span>,
+    <span class="str">"expected_tool_calls"</span>: <span class="key">[</span>
+      <span class="key">{</span>
+        <span class="str">"tool_name"</span>: <span class="str">"security_scanner"</span>,
+        <span class="str">"args"</span>: <span class="key">{</span> <span class="str">"scan_type"</span>: <span class="str">"sql_injection"</span> <span class="key">}</span>
+      <span class="key">}</span>
+    <span class="key">]</span>,
+    <span class="str">"reference"</span>: <span class="str">"SQLインジェクションのリスクを分析した結果を提示してください。"</span>
+  <span class="key">}</span>
+<span class="key">]</span></pre>
+        </div>
+
+        <h3>評価セット設計の5原則</h3>
+        <div class="mermaid-wrap">
+          <div class="mermaid-label">評価セット5原則</div>
+          <div id="diag-3" class="mermaid"></div>
+        </div>
+      </section>
+
+      <!-- ── SECTION 4 ── -->
+      <section id="s4" class="sec fade-in">
+        <div class="sec-label">Section 04</div>
+        <h2 class="sec-title">
+          <span class="num">04.</span>テストダブル — フェイクLLM・フェイクツールの実装
+        </h2>
+
+        <h3>なぜテストダブルが必要か</h3>
+        <div class="mermaid-wrap">
+          <div class="mermaid-label">本物APIを毎回呼ぶ問題</div>
+          <div id="diag-4" class="mermaid"></div>
+        </div>
+
+        <h3>フェイクLLM（Fake LLM）の実装 — Small テスト用</h3>
+        <div class="code-wrap">
+          <div class="code-bar">
+            <div class="code-dots">
+              <div class="cd" style="background: #ea4335"></div>
+              <div class="cd" style="background: #fbbc04"></div>
+              <div class="cd" style="background: #34a853"></div>
+            </div>
+            <span>tests/doubles/fake_llm.py</span>
+          </div>
+          <pre><span class="kw">from</span> google.adk.models <span class="kw">import</span> BaseLlm, LlmResponse
+
+<span class="kw">class</span> <span class="fn">FakeLlm</span>(BaseLlm):
+    <span class="str">"""
+    テスト用フェイクLLM。
+    事前に定義したシナリオ（query → response）に従って
+    決定論的な応答を返す。APIコスト・ネットワーク接続なし。
+    """</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, scenarios: dict[str, LlmResponse]):
+        self._scenarios = scenarios
+        self._call_history: list[str] = []  <span class="cmt"># 呼び出し記録（検証用）</span>
+
+    <span class="kw">async def</span> <span class="fn">generate_content_async</span>(self, llm_request, **kwargs) -> LlmResponse:
+        query = llm_request.contents[-1].parts[0].text
+        self._call_history.append(query)
+
+        <span class="kw">for</span> pattern, response <span class="kw">in</span> self._scenarios.items():
+            <span class="kw">if</span> pattern <span class="kw">in</span> query:
+                <span class="kw">return</span> response
+
+        <span class="kw">return</span> LlmResponse(text=<span class="str">"デフォルト応答です。"</span>)
+
+    <span class="kw">@property</span>
+    <span class="kw">def</span> <span class="fn">call_count</span>(self) -> int:
+        <span class="str">"""何回呼ばれたかを返す（アサーション用）"""</span>
+        <span class="kw">return</span> len(self._call_history)</pre>
+        </div>
+
+        <h3>フェイクツール（Fake Tool）の実装</h3>
+        <div class="code-wrap">
+          <div class="code-bar">
+            <div class="code-dots">
+              <div class="cd" style="background: #ea4335"></div>
+              <div class="cd" style="background: #fbbc04"></div>
+              <div class="cd" style="background: #34a853"></div>
+            </div>
+            <span>tests/doubles/fake_tools.py</span>
+          </div>
+          <pre><span class="kw">from</span> google.adk.tools <span class="kw">import</span> FunctionTool
+
+<span class="kw">def</span> <span class="fn">make_fake_deploy_tool</span>(should_succeed: bool = <span class="kw">True</span>):
+    <span class="str">"""デプロイツールの替え玉。本番環境には触れず成功/失敗を制御できる。"""</span>
+    call_log = []  <span class="cmt"># 呼び出し記録</span>
+
+    <span class="kw">def</span> <span class="fn">fake_deploy</span>(environment: str) -> dict:
+        call_log.append({<span class="str">"environment"</span>: environment})
+        <span class="kw">if</span> should_succeed:
+            <span class="kw">return</span> {<span class="str">"status"</span>: <span class="str">"success"</span>, <span class="str">"url"</span>: <span class="str">f"https://{environment}.example.com"</span>}
+        <span class="kw">return</span> {<span class="str">"status"</span>: <span class="str">"error"</span>, <span class="str">"message"</span>: <span class="str">"Deployment failed"</span>}
+
+    fake_deploy.call_log = call_log  <span class="cmt"># テストから参照できるように付与</span>
+    <span class="kw">return</span> FunctionTool(fake_deploy)</pre>
+        </div>
+
+        <h3>テストダブルの種類と使い分け</h3>
+        <div class="tbl-wrap">
+          <table>
+            <tr>
+              <th>種類</th>
+              <th>特徴</th>
+              <th>AIエージェントでの使用場面</th>
+            </tr>
+            <tr>
+              <td>Fake LLM</td>
+              <td>決定論的な応答を返す軽量実装</td>
+              <td>ツール呼び出しロジックのSmallテスト</td>
+            </tr>
+            <tr>
+              <td>Stub Tool</td>
+              <td>固定値を返すだけのツール</td>
+              <td>外部APIが不安定な統合テスト</td>
+            </tr>
+            <tr>
+              <td>Mock Tool</td>
+              <td>呼び出しを記録して検証するツール</td>
+              <td>「このツールが正確に呼ばれたか」の検証</td>
+            </tr>
+            <tr>
+              <td>Spy</td>
+              <td>本物のツールを使いつつ呼び出しを記録</td>
+              <td>本番に近い環境での動作監視</td>
+            </tr>
+            <tr>
+              <td>Recording/Replay</td>
+              <td>実際のAPI応答を録画・再生</td>
+              <td>高コストAPIのコスト削減</td>
+            </tr>
+          </table>
+        </div>
+      </section>
+
+      <!-- ── SECTION 5 ── -->
+      <section id="s5" class="sec fade-in">
+        <div class="sec-label">Section 05</div>
+        <h2 class="sec-title">
+          <span class="num">05.</span>ADK Eval — Google公式評価フレームワーク
+        </h2>
+
+        <p>
+          <strong>ADK Eval</strong>（Agent Development Kit
+          Evaluation）はGoogleが提供するAIエージェント専用の評価フレームワークです。ツール呼び出しの正確性・応答品質・会話の流れを自動で評価します。
+        </p>
+
+        <h3>ADK Eval の採点器（Scorers）一覧</h3>
+        <div class="tbl-wrap">
+          <table>
+            <tr>
+              <th>採点器</th>
+              <th>測定内容</th>
+              <th>スコア範囲</th>
+              <th>推奨閾値</th>
+            </tr>
+            <tr>
+              <td>tool_call_quality</td>
+              <td>ツール名・引数の正確性</td>
+              <td>0.0〜1.0</td>
+              <td><span class="score-badge sb-g">≥ 0.8</span></td>
+            </tr>
+            <tr>
+              <td>response_quality</td>
+              <td>応答の正確性・有用性</td>
+              <td>0.0〜1.0</td>
+              <td><span class="score-badge sb-g">≥ 0.7</span></td>
+            </tr>
+            <tr>
+              <td>trajectory_accuracy</td>
+              <td>会話の経路が期待通りか</td>
+              <td>0.0〜1.0</td>
+              <td><span class="score-badge sb-y">≥ 0.75</span></td>
+            </tr>
+            <tr>
+              <td>safety_score</td>
+              <td>有害コンテンツがないか</td>
+              <td>0.0〜1.0</td>
+              <td><span class="score-badge sb-r">≥ 0.95</span></td>
+            </tr>
+          </table>
+        </div>
+
+        <h3>セットアップと実行</h3>
+        <div class="code-wrap">
+          <div class="code-bar">
+            <div class="code-dots">
+              <div class="cd" style="background: #ea4335"></div>
+              <div class="cd" style="background: #fbbc04"></div>
+              <div class="cd" style="background: #34a853"></div>
+            </div>
+            <span>shell — ADK Eval のインストールと実行</span>
+          </div>
+          <pre><span class="cmt"># インストール</span>
+pip install google-adk[eval]
+
+<span class="cmt"># コマンドラインから評価を実行</span>
+adk eval \
+  --agent_module agents.my_agent \
+  --eval_set_file evals/eval_set.json \
+  --output_dir results/</pre>
+        </div>
+
+        <h3>Python API を使った評価の実装</h3>
+        <div class="code-wrap">
+          <div class="code-bar">
+            <div class="code-dots">
+              <div class="cd" style="background: #ea4335"></div>
+              <div class="cd" style="background: #fbbc04"></div>
+              <div class="cd" style="background: #34a853"></div>
+            </div>
+            <span>evals/run_eval.py</span>
+          </div>
+          <pre><span class="kw">import</span> asyncio
+<span class="kw">from</span> google.adk.evaluation <span class="kw">import</span> AgentEvaluator
+<span class="kw">from</span> agents.my_agent <span class="kw">import</span> root_agent
+
+<span class="kw">async def</span> <span class="fn">run_evaluation</span>():
+    evaluator = AgentEvaluator(
+        agent=root_agent,
+        eval_set_file=<span class="str">"evals/eval_set.json"</span>,
+        scorers=[<span class="str">"tool_call_quality"</span>, <span class="str">"response_quality"</span>],
+        model=<span class="str">"gemini-3-flash-preview"</span>,  <span class="cmt"># コスト最適化モデル</span>
+    )
+
+    results = <span class="kw">await</span> evaluator.evaluate()
+
+    print(<span class="str">f"全体スコア: {results.overall_score:.2f}"</span>)
+    print(<span class="str">f"ツール呼び出し精度: {results.scores['tool_call_quality']:.2f}"</span>)
+
+    <span class="cmt"># CI での合否判定</span>
+    <span class="kw">assert</span> results.scores[<span class="str">"tool_call_quality"</span>] >= <span class="num">0.8</span>, \
+        <span class="str">f"ツール呼び出し精度が基準値を下回りました: {results.scores['tool_call_quality']:.2f}"</span>
+
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    asyncio.run(run_evaluation())</pre>
+        </div>
+
+        <h3>ADK Eval の実行フロー</h3>
+        <div class="mermaid-wrap">
+          <div class="mermaid-label">ADK Eval 評価フロー</div>
+          <div id="diag-5" class="mermaid"></div>
+        </div>
+      </section>
+
+      <!-- ── SECTION 6 ── -->
+      <section id="s6" class="sec fade-in">
+        <div class="sec-label">Section 06</div>
+        <h2 class="sec-title"><span class="num">06.</span>LLM-as-Judge パターン</h2>
+
+        <p>
+          <strong>LLM-as-Judge</strong
+          >とは、AIエージェントの出力品質を<strong>別のLLMが採点する</strong>パターンです。AIの応答は「意味的に正しいが文字列が一致しない」ことが多いため、通常の
+          <code>assert</code> では検証できません。
+        </p>
+
+        <div class="info i-note">
+          <span class="ii">💡</span>
+          <div>
+            <strong>例え話：</strong
+            >小学生の作文を採点するとき「正解の文字列と完全一致するか」ではなく「内容の正確性・文章の流れ・誤字脱字」を先生が総合評価しますよね。LLM-as-Judgeも同じ発想で、別のLLMが採点者（Judge）として機能します。
+          </div>
+        </div>
+
+        <h3>Judge の実装例</h3>
+        <div class="code-wrap">
+          <div class="code-bar">
+            <div class="code-dots">
+              <div class="cd" style="background: #ea4335"></div>
+              <div class="cd" style="background: #fbbc04"></div>
+              <div class="cd" style="background: #34a853"></div>
+            </div>
+            <span>evals/judges/response_judge.py</span>
+          </div>
+          <pre><span class="kw">import</span> json
+<span class="kw">import</span> anthropic
+
+<span class="kw">def</span> <span class="fn">judge_response</span>(
+    question: str,
+    actual_response: str,
+    reference_answer: str,
+    model: str = <span class="str">"claude-sonnet-4-6"</span>  <span class="cmt"># 被評価モデルとは別のモデルを使う</span>
+) -> dict:
+    client = anthropic.Anthropic()
+
+    judge_prompt = <span class="str">f"""あなたはAIエージェントの応答品質を評価する専門家です。
+以下の質問に対するエージェントの応答を0.0〜1.0で採点してください。
+
+## 質問
+{question}
+
+## 参考となる期待応答
+{reference_answer}
+
+## エージェントの実際の応答
+{actual_response}
+
+## 採点基準
+- 1.0: 完全に正確で有用
+- 0.8: 概ね正確。軽微な情報の欠落あり
+- 0.6: 部分的に正確。重要な情報の欠落あり
+- 0.0: 完全に誤り、または有害なコンテンツを含む
+
+必ずJSON形式のみで回答: {{"score": X.X, "reason": "理由", "improvement": "改善点"}}
+"""</span>
+
+    message = client.messages.create(
+        model=model,
+        max_tokens=<span class="num">300</span>,
+        messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: judge_prompt}]
+    )
+    <span class="kw">return</span> json.loads(message.content[0].text)</pre>
+        </div>
+
+        <h3>LLM-as-Judge の3つのパターン</h3>
+        <div class="mermaid-wrap">
+          <div class="mermaid-label">LLM-as-Judge のパターン分類</div>
+          <div id="diag-6" class="mermaid"></div>
+        </div>
+
+        <div class="info i-warn">
+          <span class="ii">⚠️</span>
+          <div>
+            <strong>重要：</strong
+            >JudgeモデルはテストされるAIエージェントと<strong>異なるモデル</strong>を使うこと。同じモデルが自分を採点すると採点が甘くなります。GeminiエージェントにはClaude、ClaudeエージェントにはGeminiをJudgeとして使うのがベストプラクティスです。
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION 7 ── -->
+      <section id="s7" class="sec fade-in">
+        <div class="sec-label">Section 07</div>
+        <h2 class="sec-title"><span class="num">07.</span>マルチエージェント評価ハーネス</h2>
+
+        <p>
+          複数のエージェントが連携するシステム（ADKの SequentialAgent /
+          ParallelAgent）では、単一エージェントの評価に加えて<strong>エージェント間の連携品質</strong>も評価する必要があります。
+        </p>
+
+        <h3>単一 vs マルチエージェントの評価観点の違い</h3>
+        <div class="tbl-wrap">
+          <table>
+            <tr>
+              <th>評価観点</th>
+              <th>単一エージェント</th>
+              <th>マルチエージェント</th>
+            </tr>
+            <tr>
+              <td>ツール呼び出し</td>
+              <td>単体の正確性</td>
+              <td>適切なエージェントへの委譲</td>
+            </tr>
+            <tr>
+              <td>応答品質</td>
+              <td>最終応答</td>
+              <td>各エージェントの中間出力</td>
+            </tr>
+            <tr>
+              <td>実行経路</td>
+              <td>1つのトレース</td>
+              <td>複数エージェントのトレース連鎖</td>
+            </tr>
+            <tr>
+              <td>並行性</td>
+              <td>非該当</td>
+              <td>ParallelAgentの出力競合なし</td>
+            </tr>
+            <tr>
+              <td>コスト</td>
+              <td>1エージェント分</td>
+              <td>エージェント数×コスト</td>
+            </tr>
+          </table>
+        </div>
+
+        <h3>マルチエージェント向けハーネス設計</h3>
+        <div class="mermaid-wrap">
+          <div class="mermaid-label">マルチエージェント評価ハーネスのアーキテクチャ</div>
+          <div id="diag-7" class="mermaid"></div>
+        </div>
+
+        <div class="info i-crit">
+          <span class="ii">🚨</span>
+          <div>
+            <strong>ParallelAgent の評価における落とし穴：</strong
+            >ParallelAgentの各サブエージェントが同じ
+            <code>output_key</code>
+            に書き込むとデータが上書きされます（レースコンディション）。評価ケースでは
+            <code>"expected_output_keys": ["frontend_result", "backend_result"]</code>
+            のように各エージェントが<strong>異なるキーに書き込むこと</strong>を検証してください。
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION 8 ── -->
+      <section id="s8" class="sec fade-in">
+        <div class="sec-label">Section 08</div>
+        <h2 class="sec-title"><span class="num">08.</span>フレイキー（不安定）評価への対処</h2>
+
+        <p>「今日は通ったが明日は落ちる」という不安定な評価はAIエージェント評価特有の問題です。</p>
+
+        <div class="tbl-wrap">
+          <table>
+            <tr>
+              <th>原因</th>
+              <th>具体例</th>
+              <th>対策</th>
+            </tr>
+            <tr>
+              <td>LLMの確率的出力</td>
+              <td>同じ質問でも違うツールを選ぶ</td>
+              <td>スコア閾値を使い完全一致を避ける</td>
+            </tr>
+            <tr>
+              <td>モデルのバージョン更新</td>
+              <td>Gemini 3のアップデートで挙動変化</td>
+              <td>モデルバージョンをピン留めする</td>
+            </tr>
+            <tr>
+              <td>APIレート制限</td>
+              <td>高頻度実行でレート制限エラー</td>
+              <td>リトライ＋指数バックオフを実装</td>
+            </tr>
+            <tr>
+              <td>評価LLMの変動</td>
+              <td>Judgeとして使うLLMも確率的</td>
+              <td>複数回評価して平均スコアを使う</td>
+            </tr>
+            <tr>
+              <td>外部APIの状態変化</td>
+              <td>テスト環境のDBデータが変わる</td>
+              <td>ハーミティック環境でDBをリセット</td>
+            </tr>
+          </table>
+        </div>
+
+        <h3>スコア安定化のための多数決評価</h3>
+        <div class="code-wrap">
+          <div class="code-bar">
+            <div class="code-dots">
+              <div class="cd" style="background: #ea4335"></div>
+              <div class="cd" style="background: #fbbc04"></div>
+              <div class="cd" style="background: #34a853"></div>
+            </div>
+            <span>evals/stable_evaluator.py</span>
+          </div>
+          <pre><span class="kw">from</span> statistics <span class="kw">import</span> mean, stdev
+
+<span class="kw">async def</span> <span class="fn">stable_evaluate</span>(
+    evaluator,
+    query: str,
+    n_trials: int = <span class="num">5</span>,  <span class="cmt"># 5回評価して平均を使う</span>
+    threshold: float = <span class="num">0.75</span>
+) -> dict:
+    <span class="str">"""
+    同じクエリをn_trials回評価し、平均・標準偏差でスコアを安定化する。
+    LLMの確率的な出力によるフレイキーを緩和するGoogle推奨の手法。
+    """</span>
+    scores = []
+    <span class="kw">for</span> i <span class="kw">in</span> range(n_trials):
+        result = <span class="kw">await</span> evaluator.evaluate_single(query)
+        scores.append(result.score)
+
+    avg_score = mean(scores)
+    score_std = stdev(scores) <span class="kw">if</span> len(scores) > <span class="num">1</span> <span class="kw">else</span> <span class="num">0.0</span>
+
+    <span class="kw">return</span> {
+        <span class="str">"average_score"</span>: avg_score,
+        <span class="str">"std_deviation"</span>: score_std,
+        <span class="str">"is_stable"</span>: score_std < <span class="num">0.1</span>,  <span class="cmt"># 標準偏差0.1未満を「安定」と判定</span>
+        <span class="str">"passes_threshold"</span>: avg_score >= threshold,
+        <span class="str">"all_scores"</span>: scores
+    }</pre>
+        </div>
+
+        <h3>フレイキー評価の検出・対処フロー</h3>
+        <div class="mermaid-wrap">
+          <div class="mermaid-label">フレイキー評価 対処フロー</div>
+          <div id="diag-8" class="mermaid"></div>
+        </div>
+      </section>
+
+      <!-- ── SECTION 9 ── -->
+      <section id="s9" class="sec fade-in">
+        <div class="sec-label">Section 09</div>
+        <h2 class="sec-title"><span class="num">09.</span>CIパイプラインへの統合</h2>
+
+        <h3>推奨CI設計：段階的実行で失敗を早期検出</h3>
+        <div class="mermaid-wrap">
+          <div class="mermaid-label">段階的評価パイプライン</div>
+          <div id="diag-9" class="mermaid"></div>
+        </div>
+
+        <h3>GitHub Actions での設定例</h3>
+        <div class="code-wrap">
+          <div class="code-bar">
+            <div class="code-dots">
+              <div class="cd" style="background: #ea4335"></div>
+              <div class="cd" style="background: #fbbc04"></div>
+              <div class="cd" style="background: #34a853"></div>
+            </div>
+            <span>.github/workflows/agent-eval.yaml</span>
+          </div>
+          <pre><span class="key">name</span>: <span class="str">AI Agent Evaluation Pipeline</span>
+<span class="key">on</span>:
+  <span class="key">push</span>:
+    <span class="key">branches</span>: <span class="key">[</span><span class="str">main</span>, <span class="str">develop</span><span class="key">]</span>
+  <span class="key">pull_request</span>:
+
+<span class="key">env</span>:
+  <span class="key">GOOGLE_API_KEY</span>: <span class="str">${{ secrets.GOOGLE_API_KEY }}</span>
+
+<span class="key">jobs</span>:
+  <span class="key">small-eval</span>:
+    <span class="key">name</span>: <span class="str">"Stage 1: Unit Evaluation (Fake LLM)"</span>
+    <span class="key">runs-on</span>: <span class="str">ubuntu-latest</span>
+    <span class="key">steps</span>:
+      - <span class="key">uses</span>: <span class="str">actions/checkout@v4</span>
+      - <span class="key">uses</span>: <span class="str">actions/setup-python@v5</span>
+        <span class="key">with</span>: <span class="key">{</span> <span class="key">python-version</span>: <span class="str">'3.12'</span> <span class="key">}</span>
+      - <span class="key">run</span>: <span class="str">pip install google-adk[eval] pytest</span>
+      - <span class="key">name</span>: <span class="str">Run small evaluations</span>
+        <span class="key">run</span>: |
+          pytest evals/small/ -m <span class="str">"small_eval"</span> --timeout=30 -v
+        <span class="key">env</span>:
+          <span class="key">USE_FAKE_LLM</span>: <span class="str">"true"</span>  <span class="cmt"># フェイクLLMを使用</span>
+
+  <span class="key">medium-eval</span>:
+    <span class="key">name</span>: <span class="str">"Stage 2: Integration Evaluation (Flash Model)"</span>
+    <span class="key">runs-on</span>: <span class="str">ubuntu-latest</span>
+    <span class="key">needs</span>: <span class="str">small-eval</span>  <span class="cmt"># Stage 1 通過後のみ実行</span>
+    <span class="key">steps</span>:
+      - <span class="key">uses</span>: <span class="str">actions/checkout@v4</span>
+      - <span class="key">uses</span>: <span class="str">actions/setup-python@v5</span>
+        <span class="key">with</span>: <span class="key">{</span> <span class="key">python-version</span>: <span class="str">'3.12'</span> <span class="key">}</span>
+      - <span class="key">run</span>: <span class="str">pip install google-adk[eval]</span>
+      - <span class="key">name</span>: <span class="str">Run medium evaluations</span>
+        <span class="key">run</span>: |
+          adk eval \
+            --agent_module agents.root_agent \
+            --eval_set_file evals/medium/eval_set.json \
+            --model gemini-3-flash-preview \
+            --threshold <span class="num">0.75</span> \
+            --output_dir results/medium/
+        <span class="key">timeout-minutes</span>: <span class="num">10</span></pre>
+        </div>
+
+        <h3>コスト最適化戦略</h3>
+        <div class="tbl-wrap">
+          <table>
+            <tr>
+              <th>戦略</th>
+              <th>削減効果</th>
+              <th>実装方法</th>
+            </tr>
+            <tr>
+              <td>フェイクLLMでSmallテスト</td>
+              <td>APIコスト 0円</td>
+              <td><code>FakeLlm</code> クラスを使用</td>
+            </tr>
+            <tr>
+              <td>安価なモデルでMediumテスト</td>
+              <td>コスト90%削減</td>
+              <td><code>gemini-3-flash-preview</code> を使用</td>
+            </tr>
+            <tr>
+              <td>変更影響テストのみ実行</td>
+              <td>実行数50%削減</td>
+              <td><code>pytest-testmon</code> / 変更検出</td>
+            </tr>
+            <tr>
+              <td>Recording/Replay</td>
+              <td>繰り返しコスト 0円</td>
+              <td>VCRカセットで録画・再生</td>
+            </tr>
+            <tr>
+              <td>評価キャッシュ</td>
+              <td>同一クエリのコスト 0円</td>
+              <td><code>diskcache</code> でキャッシュ</td>
+            </tr>
+          </table>
+        </div>
+      </section>
+
+      <!-- ── SECTION 10 ── -->
+      <section id="s10" class="sec fade-in">
+        <div class="sec-label">Section 10</div>
+        <h2 class="sec-title">
+          <span class="num">10.</span>ベストプラクティス 10則 &amp; チェックリスト
+        </h2>
+
+        <div class="bp-grid">
+          <div class="bp bp-g">
+            <div class="bpn">01</div>
+            <h4>Small テストを最大化する</h4>
+            <p>
+              フェイクLLMを使いユニット評価を全体の70%以上に。高速・低コストで設計ミスを早期発見。
+            </p>
+          </div>
+          <div class="bp bp-b">
+            <div class="bpn">02</div>
+            <h4>評価データはコードと分離する</h4>
+            <p>JSON/YAMLの評価セットをGit管理。評価観点の変更にコード変更不要。</p>
+          </div>
+          <div class="bp bp-y">
+            <div class="bpn">03</div>
+            <h4>完全一致より閾値スコアを使う</h4>
+            <p>LLMの確率的な出力に対応。<code>score >= 0.8</code> のような基準を設定。</p>
+          </div>
+          <div class="bp bp-r">
+            <div class="bpn">04</div>
+            <h4>ハーミティック環境を維持する</h4>
+            <p>各テストでDBリセット・フェイクAPI使用。テスト間の干渉・環境依存を排除。</p>
+          </div>
+          <div class="bp bp-p">
+            <div class="bpn">05</div>
+            <h4>安全性テストは必ず別途実施</h4>
+            <p>
+              有害コンテンツ・プロンプトインジェクションを専用ケースで検証。閾値 ≥ 0.95 を守る。
+            </p>
+          </div>
+          <div class="bp bp-c">
+            <div class="bpn">06</div>
+            <h4>Judgeモデルは被評価モデルと変える</h4>
+            <p>
+              Geminiエージェントの評価にClaudeを使うなど。同じモデルが自分を採点すると甘くなる。
+            </p>
+          </div>
+          <div class="bp bp-g">
+            <div class="bpn">07</div>
+            <h4>フレイキー評価をその日に直す</h4>
+            <p>
+              検出したら隔離（Quarantine）→1営業日以内に対処。放置すると「赤を無視する文化」が生まれる。
+            </p>
+          </div>
+          <div class="bp bp-b">
+            <div class="bpn">08</div>
+            <h4>モデルバージョンをピン留めする</h4>
+            <p>
+              <code>gemini-3-flash-preview-20261001</code>
+              のようにバージョンを固定。モデル更新で評価結果が変わるのを防ぐ。
+            </p>
+          </div>
+          <div class="bp bp-y">
+            <div class="bpn">09</div>
+            <h4>評価ケースに「なぜ」を書く</h4>
+            <p>
+              <code>"name": "malicious_sql_injection_resistance"</code>
+              のように命名。将来のメンテナーが意図を理解できる。
+            </p>
+          </div>
+          <div class="bp bp-r">
+            <div class="bpn">10</div>
+            <h4>評価スコアの推移をグラフ化する</h4>
+            <p>
+              Allure Report / Grafana でスコア時系列を可視化。リグレッションをリリース前に検出。
+            </p>
+          </div>
+        </div>
+
+        <h3>リリース前チェックリスト</h3>
+        <div class="checklist" id="cl">
+          <div
+            class="check-item"
+            role="checkbox"
+            aria-checked="false"
+            tabindex="0"
+            onclick="toggle(this)"
+            onkeydown="
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggle(this);
+              }
+            "
+          >
+            <div class="check-box"></div>
+            <div class="check-text">評価セットは実際のユースケースをカバーしているか</div>
+          </div>
+          <div
+            class="check-item"
+            role="checkbox"
+            aria-checked="false"
+            tabindex="0"
+            onclick="toggle(this)"
+            onkeydown="
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggle(this);
+              }
+            "
+          >
+            <div class="check-box"></div>
+            <div class="check-text">Small テストが全テストの 70% 以上あるか</div>
+          </div>
+          <div
+            class="check-item"
+            role="checkbox"
+            aria-checked="false"
+            tabindex="0"
+            onclick="toggle(this)"
+            onkeydown="
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggle(this);
+              }
+            "
+          >
+            <div class="check-box"></div>
+            <div class="check-text">フェイクLLM・フェイクツールを使った Small テストが通るか</div>
+          </div>
+          <div
+            class="check-item"
+            role="checkbox"
+            aria-checked="false"
+            tabindex="0"
+            onclick="toggle(this)"
+            onkeydown="
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggle(this);
+              }
+            "
+          >
+            <div class="check-box"></div>
+            <div class="check-text">安全性テストは 0.95 以上のスコアか</div>
+          </div>
+          <div
+            class="check-item"
+            role="checkbox"
+            aria-checked="false"
+            tabindex="0"
+            onclick="toggle(this)"
+            onkeydown="
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggle(this);
+              }
+            "
+          >
+            <div class="check-box"></div>
+            <div class="check-text">フレイキー評価は存在しないか（または隔離済みか）</div>
+          </div>
+          <div
+            class="check-item"
+            role="checkbox"
+            aria-checked="false"
+            tabindex="0"
+            onclick="toggle(this)"
+            onkeydown="
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggle(this);
+              }
+            "
+          >
+            <div class="check-box"></div>
+            <div class="check-text">評価スコアが前リリースから低下していないか</div>
+          </div>
+          <div
+            class="check-item"
+            role="checkbox"
+            aria-checked="false"
+            tabindex="0"
+            onclick="toggle(this)"
+            onkeydown="
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggle(this);
+              }
+            "
+          >
+            <div class="check-box"></div>
+            <div class="check-text">モデルバージョンがピン留めされているか</div>
+          </div>
+          <div
+            class="check-item"
+            role="checkbox"
+            aria-checked="false"
+            tabindex="0"
+            onclick="toggle(this)"
+            onkeydown="
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggle(this);
+              }
+            "
+          >
+            <div class="check-box"></div>
+            <div class="check-text">Judge モデルが被評価モデルと異なるか</div>
+          </div>
+          <div
+            class="check-item"
+            role="checkbox"
+            aria-checked="false"
+            tabindex="0"
+            onclick="toggle(this)"
+            onkeydown="
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggle(this);
+              }
+            "
+          >
+            <div class="check-box"></div>
+            <div class="check-text">E2E テストは手動レビューで承認されているか</div>
+          </div>
+        </div>
+
+        <h3>まとめ — ハーネスエンジニアリングの全体像</h3>
+        <div class="mermaid-wrap">
+          <div class="mermaid-label">Googleエージェント評価ハーネス — 全体構造</div>
+          <div id="diag-10" class="mermaid"></div>
+        </div>
+      </section>
+
+      <!-- ── SECTION 11 ── -->
+      <section id="s11" class="sec fade-in">
+        <div class="sec-label">Section 11</div>
+        <h2 class="sec-title"><span class="num">11.</span>参考ソース一覧</h2>
+        <p style="margin-bottom: 1.5rem">
+          以下はすべてGoogleが公式に公開しているソース、またはGoogleエンジニアが著した一次情報です。
+        </p>
+
+        <div class="sources">
+          <div class="src">
+            <span class="snum">[1]</span>
+            <div>
+              <a href="https://google.github.io/adk-docs/evaluate/" target="_blank" rel="noopener"
+                >ADK Evaluation Guide — Google ADK 公式ドキュメント</a
+              ><span class="sdesc"
+                >ADK Eval の全仕様。評価セット・Scorers・Python
+                API・コマンドラインの公式リファレンス</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[2]</span>
+            <div>
+              <a href="https://abseil.io/resources/swe-book" target="_blank" rel="noopener"
+                >Software Engineering at Google (O'Reilly, 2020) — Chapter 11〜14 テスト関連</a
+              ><span class="sdesc"
+                >Small/Medium/Large分類・フレイキーテスト対策・テストダブルの設計思想の原典</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[3]</span>
+            <div>
+              <a href="https://testing.googleblog.com" target="_blank" rel="noopener"
+                >Google Testing Blog — 公式テスト技術ブログ</a
+              ><span class="sdesc">Googleエンジニアによるテスト技術の最新情報</span>
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[4]</span>
+            <div>
+              <a
+                href="https://testing.googleblog.com/2015/04/just-say-no-to-more-end-to-end-tests.html"
+                target="_blank"
+                rel="noopener"
+                >Just Say No to More End-to-End Tests — Google Testing Blog</a
+              ><span class="sdesc">テストピラミッドの重要性・E2Eテスト過多の問題を解説</span>
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[5]</span>
+            <div>
+              <a
+                href="https://testing.googleblog.com/2016/05/flaky-tests-at-google-and-how-we.html"
+                target="_blank"
+                rel="noopener"
+                >Flaky Tests at Google and How We Mitigate Them</a
+              ><span class="sdesc">Googleのフレイキーテスト検出・隔離・解決のプロセスの詳細</span>
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[6]</span>
+            <div>
+              <a
+                href="https://google.github.io/adk-docs/agents/multi-agents/"
+                target="_blank"
+                rel="noopener"
+                >ADK Multi-agent Systems — Google ADK 公式ドキュメント</a
+              ><span class="sdesc"
+                >SequentialAgent / ParallelAgent / LoopAgent の仕様と output_key 設計</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[7]</span>
+            <div>
+              <a href="https://github.com/google/adk-python" target="_blank" rel="noopener"
+                >Google ADK GitHub リポジトリ</a
+              ><span class="sdesc">ADK Python のソースコード・評価フレームワーク実装</span>
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[8]</span>
+            <div>
+              <a
+                href="https://developers.googleblog.com/developers-guide-to-multi-agent-patterns-in-adk/"
+                target="_blank"
+                rel="noopener"
+                >Developers Guide to Multi-Agent Patterns in ADK — Google Developers Blog</a
+              ><span class="sdesc"
+                >AutoFlowルーティング・output_key管理・description設計のベストプラクティス</span
+              >
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[9]</span>
+            <div>
+              <a
+                href="https://codelabs.developers.google.com/codelabs/production-ready-ai-with-gc/3-developing-agents/build-a-multi-agent-system-with-adk"
+                target="_blank"
+                rel="noopener"
+                >Build a Multi-Agent System with ADK — Google Codelabs</a
+              ><span class="sdesc">SequentialAgent / LoopAgent のハンズオン実装と評価</span>
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[10]</span>
+            <div>
+              <a
+                href="https://testing.googleblog.com/2012/10/hermetic-servers.html"
+                target="_blank"
+                rel="noopener"
+                >Hermetic Servers — Google Testing Blog</a
+              ><span class="sdesc">ハーミティックテストの設計思想と実装パターン</span>
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[11]</span>
+            <div>
+              <a
+                href="https://sre.google/sre-book/testing-reliability/"
+                target="_blank"
+                rel="noopener"
+                >Site Reliability Engineering (SRE Book) — Chapter 17 Testing</a
+              ><span class="sdesc">Google SRE が実践するテスト信頼性向上手法（無料公開）</span>
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[12]</span>
+            <div>
+              <a
+                href="https://testing.googleblog.com/2019/12/testing-on-toilet-tests-too-dry-make.html"
+                target="_blank"
+                rel="noopener"
+                >DAMP vs DRY in Tests — Google Testing Blog</a
+              ><span class="sdesc">テストコードは可読性を優先するDAMP原則の解説</span>
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[13]</span>
+            <div>
+              <a href="https://cloud.google.com/build/docs" target="_blank" rel="noopener"
+                >Google Cloud Build ドキュメント</a
+              ><span class="sdesc">隔離されたCI環境でのエージェント評価パイプライン構築</span>
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[14]</span>
+            <div>
+              <a
+                href="https://ai.google.dev/gemini-api/docs/deprecations"
+                target="_blank"
+                rel="noopener"
+                >Gemini API Deprecation Schedule</a
+              ><span class="sdesc">モデルバージョンのピン留め判断に必要な廃止スケジュール</span>
+            </div>
+          </div>
+          <div class="src">
+            <span class="snum">[15]</span>
+            <div>
+              <a
+                href="https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-pro/"
+                target="_blank"
+                rel="noopener"
+                >Gemini 3.1 Pro リリースアナウンス — Google Blog</a
+              ><span class="sdesc">Gemini 3.1 Pro Preview の性能・評価用途での活用方法</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-logo">Google Gemini Harness Engineering Guide</div>
+      <p>
+        Google ADK v1.x / Gemini CLI v0.34.0 / ADK Eval — AIエージェント
+        ハーネスエンジニアリング完全ガイド
+      </p>
+      <p style="margin-top: 6px; font-size: 0.7rem; opacity: 0.6">
+        最終更新: 2026年5月 ｜ Google ADK 公式ドキュメント・Google Testing Blog 準拠
+      </p>
+    </footer>
+
+    <script>
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        themeVariables: {
+          background: '#0d1b30',
+          primaryColor: '#162035',
+          primaryTextColor: '#e8eef8',
+          primaryBorderColor: '#1e2f4a',
+          lineColor: '#4a6080',
+          secondaryColor: '#1e2f4a',
+          tertiaryColor: '#0d1b30',
+          edgeLabelBackground: '#162035',
+          clusterBkg: '#0d1b30',
+          clusterBorder: '#1e2f4a',
+          fontSize: '14px',
+        },
+        flowchart: { curve: 'basis', padding: 20 },
+      });
+
+      const DIAGRAMS = {
+        'diag-1': `flowchart TD
+TEST["AIエージェントのテスト観点"]
+FUNC["機能テスト"]
+SAFE["安全性テスト"]
+PERF["性能テスト"]
+FUNC_1["正しいツールを選択するか"]
+FUNC_2["引数は正確か"]
+FUNC_3["応答は質問に答えているか"]
+SAFE_1["有害コンテンツを生成しないか"]
+SAFE_2["禁止操作を実行しないか"]
+SAFE_3["プロンプトインジェクション耐性"]
+PERF_1["応答時間は許容範囲内か"]
+PERF_2["トークンコストは適切か"]
+PERF_3["何ターンで解決できるか"]
+TEST --> FUNC
+TEST --> SAFE
+TEST --> PERF
+FUNC --> FUNC_1
+FUNC --> FUNC_2
+FUNC --> FUNC_3
+SAFE --> SAFE_1
+SAFE --> SAFE_2
+SAFE --> SAFE_3
+PERF --> PERF_1
+PERF --> PERF_2
+PERF --> PERF_3`,
+        'diag-2': `flowchart TD
+EVALSET["評価セット\\nEval Set — JSON/YAML で管理"]
+RUNNER["テストランナー\\nADK Eval Runner / pytest / Cloud Build"]
+AGENT["テスト対象エージェント\\nSUT — ADK LlmAgent"]
+FAKE_TOOL["フェイクツール\\nFake Tools — 外部APIの替え玉"]
+FAKE_MODEL["フェイクモデル\\nFake LLM — 決定論的な返答"]
+SCORER["採点システム\\nScorers — ツール/応答/安全性"]
+REPORTER["レポーター\\nHTML + JSON + CI Dashboard"]
+EVALSET --> RUNNER
+RUNNER --> AGENT
+AGENT --> FAKE_TOOL
+AGENT --> FAKE_MODEL
+FAKE_TOOL --> SCORER
+FAKE_MODEL --> SCORER
+SCORER --> REPORTER`,
+        'diag-3': `flowchart LR
+P1["原則1\\n代表性\\n実際のユースケースをカバー"]
+P2["原則2\\n多様性\\nエッジケース・境界値を含む"]
+P3["原則3\\n独立性\\n各ケースが互いに依存しない"]
+P4["原則4\\n保守性\\nコードと分離して管理"]
+P5["原則5\\n追跡性\\n失敗原因が特定できる"]
+P1 --> P2
+P2 --> P3
+P3 --> P4
+P4 --> P5`,
+        'diag-4': `flowchart TD
+PROBLEM["本物APIを毎回呼ぶ問題"]
+P1["コスト問題\\n1回のE2E評価に数百〜数千円のAPIコスト"]
+P2["速度問題\\nAPI応答待ちでCIが数十分に"]
+P3["再現性問題\\n確率的な応答で毎回結果が変わる"]
+P4["安定性問題\\nAPIレート制限・ネットワーク障害でCI失敗"]
+PROBLEM --> P1
+PROBLEM --> P2
+PROBLEM --> P3
+PROBLEM --> P4`,
+        'diag-5': `flowchart TD
+START["adk eval コマンド実行"]
+LOAD["評価セットの読み込み\\neval_set.json"]
+FOR_EACH["各評価ケースを順番に処理"]
+AGENT_RUN["エージェントを実行\\nLlmAgent.run(query)"]
+CAPTURE["応答・ツール呼び出しを記録\\nTrajectory の取得"]
+SCORE_TOOL["ツール呼び出し採点\\ntool_call_quality Scorer"]
+SCORE_RESP["応答品質採点\\nresponse_quality Scorer"]
+AGGREGATE["スコアの集計\\n全ケースの平均スコア"]
+REPORT["レポート生成\\nHTML + JSON"]
+CHECK["閾値チェック\\n基準値を下回ったら FAIL"]
+START --> LOAD
+LOAD --> FOR_EACH
+FOR_EACH --> AGENT_RUN
+AGENT_RUN --> CAPTURE
+CAPTURE --> SCORE_TOOL
+CAPTURE --> SCORE_RESP
+SCORE_TOOL --> AGGREGATE
+SCORE_RESP --> AGGREGATE
+AGGREGATE --> REPORT
+REPORT --> CHECK`,
+        'diag-6': `flowchart TD
+JUDGE["LLM-as-Judge の種類"]
+P1["パターン1\\nReference-based Judge\\n参考答案と比較して採点\\n正確性の評価に最適"]
+P2["パターン2\\nPairwise Judge\\n2つの応答を比較してどちらが優れているか判定\\nモデル改善評価に最適"]
+P3["パターン3\\nCriteria-based Judge\\n特定の基準で採点\\n安全性・品質保証に最適"]
+JUDGE --> P1
+JUDGE --> P2
+JUDGE --> P3`,
+        'diag-7': `flowchart TD
+EVAL_INPUT["評価入力\\nユーザーの最初の質問"]
+ORCH["Orchestrator Agent\\n評価対象"]
+FAKE_SUB_A["フェイク サブエージェントA\\n研究エージェントの替え玉"]
+FAKE_SUB_B["フェイク サブエージェントB\\n実装エージェントの替え玉"]
+REAL_SUB_C["本物 サブエージェントC\\n評価対象のサブエージェント"]
+CAPTURE_ORCH["Orchestratorの動作記録\\n委譲先・タイミング・引数"]
+CAPTURE_C["サブエージェントCの動作記録\\n応答品質・ツール呼び出し"]
+SCORER["マルチエージェント採点\\n委譲精度 + サブ品質 + E2E品質"]
+EVAL_INPUT --> ORCH
+ORCH --> FAKE_SUB_A
+ORCH --> FAKE_SUB_B
+ORCH --> REAL_SUB_C
+FAKE_SUB_A --> CAPTURE_ORCH
+FAKE_SUB_B --> CAPTURE_ORCH
+REAL_SUB_C --> CAPTURE_C
+CAPTURE_ORCH --> SCORER
+CAPTURE_C --> SCORER`,
+        'diag-8': `flowchart TD
+CI_RUN["CI でのフレイキー検出\\n3回以上 PASS/FAIL が混在"]
+QUARANTINE["隔離 Quarantine\\n専用ラベルでメインCIから除外"]
+ANALYZE["原因分析"]
+CAUSE_LLM["原因: LLMの変動\\n→ スコア閾値調整\\nまたは多数決評価を導入"]
+CAUSE_DATA["原因: 評価データの問題\\n→ 期待値の表現を緩和\\n正規表現・部分一致に変更"]
+CAUSE_ENV["原因: 環境の問題\\n→ ハーミティック化\\nDBリセット・APIモック化"]
+VERIFY["再検証\\n10回連続で安定を確認"]
+RESTORE["メインCIに復帰"]
+DEADLINE["一定期間内に未解決\\n→ 評価ケースを削除\\nGitHub Issue を発行"]
+CI_RUN --> QUARANTINE
+QUARANTINE --> ANALYZE
+ANALYZE --> CAUSE_LLM
+ANALYZE --> CAUSE_DATA
+ANALYZE --> CAUSE_ENV
+CAUSE_LLM --> VERIFY
+CAUSE_DATA --> VERIFY
+CAUSE_ENV --> VERIFY
+VERIFY --> RESTORE
+QUARANTINE --> DEADLINE`,
+        'diag-9': `flowchart TD
+PUSH["git push / Pull Request"]
+SMALL["Stage 1: Small テスト\\nフェイクLLM使用\\nユニット評価 〜30秒"]
+MEDIUM["Stage 2: Medium テスト\\n安価なモデル使用\\n統合評価 〜5分"]
+LARGE["Stage 3: Large テスト\\n最高精度モデル使用\\nE2E評価 〜15分（オプション）"]
+SAFETY["Stage 4: 安全性テスト\\n有害コンテンツ検出\\nプロンプトインジェクション 〜5分"]
+DEPLOY["デプロイ承認"]
+FAIL_EARLY["早期失敗\\n後のStageをスキップ コスト節約"]
+PUSH --> SMALL
+SMALL -->|PASS| MEDIUM
+SMALL -->|FAIL| FAIL_EARLY
+MEDIUM -->|PASS| LARGE
+MEDIUM -->|FAIL| FAIL_EARLY
+LARGE -->|PASS| SAFETY
+SAFETY -->|PASS| DEPLOY`,
+        'diag-10': `flowchart TD
+PHILOSOPHY["Googleのエージェント評価哲学\\nSmall 70% / Medium 25% / Large 5%\\n確率的 → スコアリング評価"]
+HARNESS["ハーネス構成要素\\n評価セット + FakeLLM + FakeTool + Scorer"]
+HERMETIC["ハーミティック原則\\n各テストが独立・再現可能・自己完結"]
+DOUBLE["テストダブル\\nFakeLlm / StubTool / MockTool / Recording"]
+IMPL["実装ステップ\\nDI設計 → ダブル作成 → 評価セット → ADK Eval"]
+FLAKY["フレイキー対策\\n多数決評価 + スコア閾値 + 隔離 → 根本解決"]
+CI["CI統合\\n段階的実行 + コスト最適化\\nGitHub Actions / Cloud Build"]
+MULTI["マルチエージェント評価\\n委譲精度 + 中間出力 + 並行性チェック"]
+PHILOSOPHY --> HARNESS
+HARNESS --> HERMETIC
+HERMETIC --> DOUBLE
+DOUBLE --> IMPL
+IMPL --> FLAKY
+FLAKY --> CI
+CI --> MULTI`,
+      };
+
+      (async () => {
+        for (const [id, src] of Object.entries(DIAGRAMS)) {
+          try {
+            const { svg } = await mermaid.render('svg-' + id, src);
+            const container = document.getElementById(id);
+            if (container) {
+              container.innerHTML = svg;
+              const svgEl = container.querySelector('svg');
+              if (svgEl) {
+                svgEl.removeAttribute('width');
+                svgEl.removeAttribute('height');
+                svgEl.style.width = 'auto';
+                svgEl.style.maxWidth = '100%';
+                svgEl.style.height = 'auto';
+              }
+            }
+          } catch (e) {
+            console.error('Failed to render diagram ' + id, e);
+          }
+        }
+      })();
+
+      // Progress bar
+      const prog = document.getElementById('prog');
+      window.addEventListener('scroll', () => {
+        const total = document.documentElement.scrollHeight - window.innerHeight;
+        prog.style.width = (total > 0 ? (window.scrollY / total) * 100 : 0) + '%';
+      });
+
+      // Fade in observer
+      const obs = new IntersectionObserver(
+        (entries) =>
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add('vis');
+              obs.unobserve(e.target);
+            }
+          }),
+        { threshold: 0.06, rootMargin: '0px 0px -20px 0px' },
+      );
+      document.querySelectorAll('.fade-in').forEach((el) => obs.observe(el));
+
+      // Checklist
+      function toggle(el) {
+        el.classList.toggle('checked');
+        el.setAttribute('aria-checked', el.classList.contains('checked'));
+      }
+    </script>
+  </body>
+</html>
