@@ -152,7 +152,7 @@ describe("/gemini/agent-harness-engineering - page structure", () => {
     const s11 = container.querySelector("#s11");
     expect(s11).not.toBeNull();
     expect(s11?.textContent).toMatch(/参考ソース一覧/);
-    expect(s11?.textContent).toMatch(/google.github.io\/adk-docs/);
+    expect(s11?.querySelector("a")?.getAttribute("href")).toMatch(/google.github.io\/adk-docs/);
 
     const footer = container.querySelector("footer");
     expect(footer).not.toBeNull();
