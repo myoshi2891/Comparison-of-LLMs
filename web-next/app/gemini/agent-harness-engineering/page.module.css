@@ -382,6 +382,10 @@
   white-space: pre;
 }
 
+.codeLine:empty::before {
+  content: " ";
+}
+
 /* Code Highlights */
 .ck {
   color: var(--g-purple);

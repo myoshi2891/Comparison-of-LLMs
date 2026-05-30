@@ -454,140 +454,114 @@ export default function AgentHarnessEngineeringPage() {
                 <span className={styles.key}>[</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>{"{"}</span>
+                {"  "}<span className={styles.key}>{"{"}</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.str}>"name"</span>:{" "}
+                {"    "}<span className={styles.str}>"name"</span>:{" "}
                 <span className={styles.str}>"deploy_staging_query"</span>,
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.str}>"query"</span>:{" "}
+                {"    "}<span className={styles.str}>"query"</span>:{" "}
                 <span className={styles.str}>
                   "ステージング環境にデプロイする手順を実行してください"
                 </span>
                 ,
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.str}>"expected_tool_calls"</span>:{" "}
+                {"    "}<span className={styles.str}>"expected_tool_calls"</span>:{" "}
                 <span className={styles.key}>[</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>{"{"}</span>
+                {"      "}<span className={styles.key}>{"{"}</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.str}>"tool_name"</span>:{" "}
+                {"        "}<span className={styles.str}>"tool_name"</span>:{" "}
                 <span className={styles.str}>"check_test_coverage"</span>,
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.str}>"args"</span>:{" "}
+                {"        "}<span className={styles.str}>"args"</span>:{" "}
                 <span className={styles.key}>{"{"}</span>{" "}
                 <span className={styles.str}>"threshold"</span>:{" "}
                 <span className={styles.num}>80</span> <span className={styles.key}>{"}"}</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>{"}"}</span>,
+                {"      "}<span className={styles.key}>{"}"}</span>,
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>{"{"}</span>
+                {"      "}<span className={styles.key}>{"{"}</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.str}>"tool_name"</span>:{" "}
+                {"        "}<span className={styles.str}>"tool_name"</span>:{" "}
                 <span className={styles.str}>"run_deploy"</span>,
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.str}>"args"</span>:{" "}
+                {"        "}<span className={styles.str}>"args"</span>:{" "}
                 <span className={styles.key}>{"{"}</span>{" "}
                 <span className={styles.str}>"environment"</span>:{" "}
                 <span className={styles.str}>"staging"</span>{" "}
                 <span className={styles.key}>{"}"}</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>{"}"}</span>
+                {"      "}<span className={styles.key}>{"}"}</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>]</span>,
+                {"    "}<span className={styles.key}>]</span>,
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.str}>"reference"</span>:{" "}
+                {"    "}<span className={styles.str}>"reference"</span>:{" "}
                 <span className={styles.str}>
                   "テスト通過後、ステージングへのデプロイが完了しました。"
                 </span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>{"}"}</span>,
+                {"  "}<span className={styles.key}>{"}"}</span>,
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>{"{"}</span>
+                {"  "}<span className={styles.key}>{"{"}</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.str}>"name"</span>:{" "}
+                {"    "}<span className={styles.str}>"name"</span>:{" "}
                 <span className={styles.str}>"security_check_query"</span>,
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.str}>"query"</span>:{" "}
+                {"    "}<span className={styles.str}>"query"</span>:{" "}
                 <span className={styles.str}>
                   "このコードにSQLインジェクションのリスクはありますか？"
                 </span>
                 ,
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.str}>"expected_tool_calls"</span>:{" "}
+                {"    "}<span className={styles.str}>"expected_tool_calls"</span>:{" "}
                 <span className={styles.key}>[</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>{"{"}</span>
+                {"      "}<span className={styles.key}>{"{"}</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.str}>"tool_name"</span>:{" "}
+                {"        "}<span className={styles.str}>"tool_name"</span>:{" "}
                 <span className={styles.str}>"security_scanner"</span>,
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.str}>"args"</span>:{" "}
+                {"        "}<span className={styles.str}>"args"</span>:{" "}
                 <span className={styles.key}>{"{"}</span>{" "}
                 <span className={styles.str}>"scan_type"</span>:{" "}
                 <span className={styles.str}>"sql_injection"</span>{" "}
                 <span className={styles.key}>{"}"}</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>{"}"}</span>
+                {"      "}<span className={styles.key}>{"}"}</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>]</span>,
+                {"    "}<span className={styles.key}>]</span>,
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.str}>"reference"</span>:{" "}
+                {"    "}<span className={styles.str}>"reference"</span>:{" "}
                 <span className={styles.str}>
                   "SQLインジェクションのリスクを分析した結果を提示してください。"
                 </span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>{"}"}</span>
+                {"  "}<span className={styles.key}>{"}"}</span>
               </div>
               <div className={styles.codeLine}>
                 <span className={styles.key}>]</span>
@@ -634,92 +608,80 @@ export default function AgentHarnessEngineeringPage() {
                 <span className={styles.kw}>from</span> google.adk.models{" "}
                 <span className={styles.kw}>import</span> BaseLlm, LlmResponse
               </div>
-              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine} />
               <div className={styles.codeLine}>
                 <span className={styles.kw}>class</span> <span className={styles.fn}>FakeLlm</span>
                 (BaseLlm):
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.str}>"""</span>
+                {"    "}<span className={styles.str}>"""</span>
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.str}> テスト用フェイクLLM。</span>
+                {"    "}<span className={styles.str}>テスト用フェイクLLM。</span>
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.str}>
-                  {" "}
-                  事前に定義したシナリオ（query → response）に従って
-                </span>
+                {"    "}<span className={styles.str}>事前に定義したシナリオ（query → response）に従って</span>
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.str}>
-                  {" "}
-                  決定論的な応答を返す。APIコスト・ネットワーク接続なし。
-                </span>
+                {"    "}<span className={styles.str}>決定論的な応答を返す。APIコスト・ネットワーク接続なし。</span>
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.str}> """</span>
+                {"    "}<span className={styles.str}>"""</span>
               </div>
-              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine} />
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.kw}>def</span> <span className={styles.fn}>__init__</span>
+                {"    "}<span className={styles.kw}>def</span> <span className={styles.fn}>__init__</span>
                 (self, scenarios: dict[str, LlmResponse]):
               </div>
-              <div className={styles.codeLine}> self._scenarios = scenarios</div>
               <div className={styles.codeLine}>
-                {" "}
-                self._call_history: list[str] = []{" "}
+                {"        "}self._scenarios = scenarios
+              </div>
+              <div className={styles.codeLine}>
+                {"        "}self._call_history: list[str] = []{" "}
                 <span className={styles.cmt}># 呼び出し記録（検証用）</span>
               </div>
-              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine} />
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.kw}>async def</span>{" "}
+                {"    "}<span className={styles.kw}>async def</span>{" "}
                 <span className={styles.fn}>generate_content_async</span>(self, llm_request,
                 **kwargs) -&gt; LlmResponse:
               </div>
-              <div className={styles.codeLine}> query = llm_request.contents[-1].parts[0].text</div>
-              <div className={styles.codeLine}> self._call_history.append(query)</div>
-              <div className={styles.codeLine}></div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.kw}>for</span> pattern, response{" "}
+                {"        "}query = llm_request.contents[-1].parts[0].text
+              </div>
+              <div className={styles.codeLine}>
+                {"        "}self._call_history.append(query)
+              </div>
+              <div className={styles.codeLine} />
+              <div className={styles.codeLine}>
+                {"        "}<span className={styles.kw}>for</span> pattern, response{" "}
                 <span className={styles.kw}>in</span> self._scenarios.items():
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.kw}>if</span> pattern <span className={styles.kw}>in</span>{" "}
+                {"            "}<span className={styles.kw}>if</span> pattern <span className={styles.kw}>in</span>{" "}
                 query:
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.kw}>return</span> response
+                {"                "}<span className={styles.kw}>return</span> response
               </div>
-              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine} />
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.kw}>return</span> LlmResponse(text=
+                {"        "}<span className={styles.kw}>return</span> LlmResponse(text=
                 <span className={styles.str}>"デフォルト応答です。"</span>)
               </div>
-              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine} />
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.kw}>@property</span>
+                {"    "}<span className={styles.kw}>@property</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.kw}>def</span> <span className={styles.fn}>call_count</span>
+                {"    "}<span className={styles.kw}>def</span> <span className={styles.fn}>call_count</span>
                 (self) -&gt; int:
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.str}>"""何回呼ばれたかを返す（アサーション用）"""</span>
+                {"        "}<span className={styles.str}>"""何回呼ばれたかを返す（アサーション用）"""</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.kw}>return</span> len(self._call_history)
+                {"        "}<span className={styles.kw}>return</span> len(self._call_history)
               </div>
             </pre>
           </div>
@@ -739,60 +701,50 @@ export default function AgentHarnessEngineeringPage() {
                 <span className={styles.kw}>from</span> google.adk.tools{" "}
                 <span className={styles.kw}>import</span> FunctionTool
               </div>
-              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine} />
               <div className={styles.codeLine}>
                 <span className={styles.kw}>def</span>{" "}
                 <span className={styles.fn}>make_fake_deploy_tool</span>(should_succeed: bool ={" "}
                 <span className={styles.kw}>True</span>):
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.str}>
+                {"    "}<span className={styles.str}>
                   """デプロイツールの替え玉。本番環境には触れず成功/失敗を制御できる。"""
                 </span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                call_log = [] <span className={styles.cmt}># 呼び出し記録</span>
+                {"    "}call_log = [] <span className={styles.cmt}># 呼び出し記録</span>
               </div>
-              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine} />
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.kw}>def</span>{" "}
+                {"    "}<span className={styles.kw}>def</span>{" "}
                 <span className={styles.fn}>fake_deploy</span>(environment: str) -&gt; dict:
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                call_log.append(<span className={styles.key}>{'{"environment": environment}'}</span>
-                )
+                {"        "}call_log.append(<span className={styles.key}>{'{"environment": environment}'}</span>)
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.kw}>if</span> should_succeed:
+                {"        "}<span className={styles.kw}>if</span> should_succeed:
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.kw}>return</span>{" "}
+                {"            "}<span className={styles.kw}>return</span>{" "}
                 <span className={styles.key}>
                   {'{"status": "success", "url": f"https://{environment}.example.com"}'}
                 </span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.kw}>return</span>{" "}
+                {"        "}<span className={styles.kw}>return</span>{" "}
                 <span className={styles.key}>
                   {'{"status": "error", "message": "Deployment failed"}'}
                 </span>
               </div>
-              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine} />
               <div className={styles.codeLine}>
-                {" "}
-                fake_deploy.call_log = call_log{" "}
+                {"    "}fake_deploy.call_log = call_log{" "}
                 <span className={styles.cmt}># テストから参照できるように付与</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.kw}>return</span> FunctionTool(fake_deploy)
+                {"    "}<span className={styles.kw}>return</span> FunctionTool(fake_deploy)
               </div>
             </pre>
           </div>
@@ -912,14 +864,20 @@ export default function AgentHarnessEngineeringPage() {
                 <span className={styles.cmt}># インストール</span>
               </div>
               <div className={styles.codeLine}>pip install google-adk[eval]</div>
-              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine} />
               <div className={styles.codeLine}>
                 <span className={styles.cmt}># コマンドラインから評価を実行</span>
               </div>
               <div className={styles.codeLine}>adk eval \</div>
-              <div className={styles.codeLine}> --agent_module agents.my_agent \</div>
-              <div className={styles.codeLine}> --eval_set_file evals/eval_set.json \</div>
-              <div className={styles.codeLine}> --output_dir results/</div>
+              <div className={styles.codeLine}>
+                {"  "}--agent_module agents.my_agent \
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}--eval_set_file evals/eval_set.json \
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}--output_dir results/
+              </div>
             </pre>
           </div>
 
@@ -945,75 +903,74 @@ export default function AgentHarnessEngineeringPage() {
                 <span className={styles.kw}>from</span> agents.my_agent{" "}
                 <span className={styles.kw}>import</span> root_agent
               </div>
-              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine} />
               <div className={styles.codeLine}>
                 <span className={styles.kw}>async def</span>{" "}
                 <span className={styles.fn}>run_evaluation</span>():
               </div>
-              <div className={styles.codeLine}> evaluator = AgentEvaluator(</div>
-              <div className={styles.codeLine}> agent=root_agent,</div>
               <div className={styles.codeLine}>
-                {" "}
-                eval_set_file=<span className={styles.str}>"evals/eval_set.json"</span>,
+                {"    "}evaluator = AgentEvaluator(
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                scorers=[<span className={styles.str}>"tool_call_quality"</span>,{" "}
+                {"        "}agent=root_agent,
+              </div>
+              <div className={styles.codeLine}>
+                {"        "}eval_set_file=<span className={styles.str}>"evals/eval_set.json"</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"        "}scorers=[<span className={styles.str}>"tool_call_quality"</span>,{" "}
                 <span className={styles.str}>"response_quality"</span>],
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                model=<span className={styles.str}>"gemini-3-flash-preview"</span>,{" "}
+                {"        "}model=<span className={styles.str}>"gemini-3-flash-preview"</span>,{" "}
                 <span className={styles.cmt}># コスト最適化モデル</span>
               </div>
-              <div className={styles.codeLine}> )</div>
-              <div className={styles.codeLine}></div>
               <div className={styles.codeLine}>
-                {" "}
-                results = <span className={styles.kw}>await</span> evaluator.evaluate()
+                {"    "})
               </div>
-              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine} />
               <div className={styles.codeLine}>
-                {" "}
-                print(f
+                {"    "}results = <span className={styles.kw}>await</span> evaluator.evaluate()
+              </div>
+              <div className={styles.codeLine} />
+              <div className={styles.codeLine}>
+                {"    "}print(f
                 <span className={styles.str}>
                   "全体スコア: {"{"}results.overall_score:.2f{"}"}"
                 </span>
                 )
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                print(f
+                {"    "}print(f
                 <span className={styles.str}>
                   "ツール呼び出し精度: {"{"}results.scores['tool_call_quality']:.2f{"}"}"
                 </span>
                 )
               </div>
-              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine} />
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.cmt}># CI での合否判定</span>
+                {"    "}<span className={styles.cmt}># CI での合否判定</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.kw}>assert</span> results.scores[
+                {"    "}<span className={styles.kw}>assert</span> results.scores[
                 <span className={styles.str}>"tool_call_quality"</span>] &gt;={" "}
                 <span className={styles.num}>0.8</span>, \
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                f
+                {"        "}f
                 <span className={styles.str}>
                   "ツール呼び出し精度が基準値を下回りました: {"{"}
                   results.scores['tool_call_quality']:.2f{"}"}"
                 </span>
               </div>
-              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine} />
               <div className={styles.codeLine}>
                 <span className={styles.kw}>if</span> __name__ =={" "}
                 <span className={styles.str}>"__main__"</span>:
               </div>
-              <div className={styles.codeLine}> asyncio.run(run_evaluation())</div>
+              <div className={styles.codeLine}>
+                {"    "}asyncio.run(run_evaluation())
+              </div>
             </pre>
           </div>
 
@@ -1064,105 +1021,102 @@ export default function AgentHarnessEngineeringPage() {
               <div className={styles.codeLine}>
                 <span className={styles.kw}>import</span> anthropic
               </div>
-              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine} />
               <div className={styles.codeLine}>
                 <span className={styles.kw}>def</span>{" "}
                 <span className={styles.fn}>judge_response</span>(
               </div>
-              <div className={styles.codeLine}> question: str,</div>
-              <div className={styles.codeLine}> actual_response: str,</div>
-              <div className={styles.codeLine}> reference_answer: str,</div>
               <div className={styles.codeLine}>
-                {" "}
-                model: str = <span className={styles.str}>"claude-sonnet-4-6"</span>{" "}
+                {"    "}question: str,
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}actual_response: str,
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}reference_answer: str,
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}model: str = <span className={styles.str}>"claude-sonnet-4-6"</span>{" "}
                 <span className={styles.cmt}># 被評価モデルとは別のモデルを使う</span>
               </div>
-              <div className={styles.codeLine}>) -&gt; dict:</div>
-              <div className={styles.codeLine}> client = anthropic.Anthropic()</div>
-              <div className={styles.codeLine}></div>
               <div className={styles.codeLine}>
-                {" "}
-                judge_prompt = f
-                <span className={styles.str}>
-                  """あなたはAIエージェントの応答品質を評価する専門家です。
-                </span>
+                ) -&gt; dict:
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.str}>
-                  以下の質問に対するエージェントの応答を0.0〜1.0で採点してください。
-                </span>
+                {"    "}client = anthropic.Anthropic()
               </div>
-              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine} />
               <div className={styles.codeLine}>
-                <span className={styles.str}>## 質問</span>
+                {"    "}judge_prompt = f<span className={styles.str}>"""あなたはAIエージェントの応答品質を評価する専門家です。</span>
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.str}>
-                  {"{"}question{"}"}
-                </span>
+                <span className={styles.str}>    以下の質問に対するエージェントの応答を0.0〜1.0で採点してください。</span>
               </div>
-              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine} />
               <div className={styles.codeLine}>
-                <span className={styles.str}>## 参考となる期待応答</span>
+                <span className={styles.str}>    ## 質問</span>
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.str}>
-                  {"{"}reference_answer{"}"}
-                </span>
+                <span className={styles.str}>    {"{"}question{"}"}</span>
               </div>
-              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine} />
               <div className={styles.codeLine}>
-                <span className={styles.str}>## エージェントの実際の応答</span>
+                <span className={styles.str}>    ## 参考となる期待応答</span>
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.str}>
-                  {"{"}actual_response{"}"}
-                </span>
+                <span className={styles.str}>    {"{"}reference_answer{"}"}</span>
               </div>
-              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine} />
               <div className={styles.codeLine}>
-                <span className={styles.str}>## 採点基準</span>
+                <span className={styles.str}>    ## エージェントの実際の応答</span>
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.str}>- 1.0: 完全に正確で有用</span>
+                <span className={styles.str}>    {"{"}actual_response{"}"}</span>
+              </div>
+              <div className={styles.codeLine} />
+              <div className={styles.codeLine}>
+                <span className={styles.str}>    ## 採点基準</span>
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.str}>- 0.8: 概ね正確。軽微な情報の欠落あり</span>
+                <span className={styles.str}>    - 1.0: 完全に正確で有用</span>
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.str}>- 0.6: 部分的に正確。重要な情報の欠落あり</span>
+                <span className={styles.str}>    - 0.8: 概ね正確。軽微な情報の欠落あり</span>
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.str}>- 0.0: 完全に誤り、または有害なコンテンツを含む</span>
-              </div>
-              <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}>
-                <span className={styles.str}>
-                  必ずJSON形式のみで回答: {"{"}"score": X.X, "reason": "理由", "improvement":
-                  "改善点"{"}"}
-                </span>
+                <span className={styles.str}>    - 0.6: 部分的に正確。重要な情報の欠落あり</span>
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.str}>"""</span>
+                <span className={styles.str}>    - 0.0: 完全に誤り、または有害なコンテンツを含む</span>
               </div>
-              <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}> message = client.messages.create(</div>
-              <div className={styles.codeLine}> model=model,</div>
+              <div className={styles.codeLine} />
               <div className={styles.codeLine}>
-                {" "}
-                max_tokens=<span className={styles.num}>300</span>,
+                <span className={styles.str}>    必ずJSON形式のみで回答: {"{"}"score": X.X, "reason": "理由", "improvement": "改善点"{"}"}</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                messages=[{"{"}
+                <span className={styles.str}>    """</span>
+              </div>
+              <div className={styles.codeLine} />
+              <div className={styles.codeLine}>
+                {"    "}message = client.messages.create(
+              </div>
+              <div className={styles.codeLine}>
+                {"        "}model=model,
+              </div>
+              <div className={styles.codeLine}>
+                {"        "}max_tokens=<span className={styles.num}>300</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"        "}messages=[{"{"}
                 <span className={styles.str}>"role"</span>:{" "}
                 <span className={styles.str}>"user"</span>,{" "}
                 <span className={styles.str}>"content"</span>: judge_prompt{"}"}]
               </div>
-              <div className={styles.codeLine}> )</div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.kw}>return</span> json.loads(message.content[0].text)
+                {"    "})
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}<span className={styles.kw}>return</span> json.loads(message.content[0].text)
               </div>
             </pre>
           </div>
@@ -1328,86 +1282,80 @@ export default function AgentHarnessEngineeringPage() {
                 <span className={styles.kw}>async def</span>{" "}
                 <span className={styles.fn}>stable_evaluate</span>(
               </div>
-              <div className={styles.codeLine}> evaluator,</div>
-              <div className={styles.codeLine}> query: str,</div>
               <div className={styles.codeLine}>
-                {" "}
-                n_trials: int = <span className={styles.num}>5</span>,{" "}
+                {"    "}evaluator,
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}query: str,
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}n_trials: int = <span className={styles.num}>5</span>,{" "}
                 <span className={styles.cmt}># 5回評価して平均を使う</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                threshold: float = <span className={styles.num}>0.75</span>
-              </div>
-              <div className={styles.codeLine}>) -&gt; dict:</div>
-              <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.str}>"""</span>
+                {"    "}threshold: float = <span className={styles.num}>0.75</span>
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.str}>
-                  {" "}
-                  同じクエリをn_trials回評価し、平均・標準偏差でスコアを安定化する。
-                </span>
+                ) -&gt; dict:
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.str}>
-                  {" "}
-                  LLMの確率的な出力によるフレイキーを緩和するGoogle推奨の手法。
-                </span>
+                {"    "}<span className={styles.str}>"""</span>
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.str}> """</span>
+                {"    "}<span className={styles.str}>同じクエリをn_trials回評価し、平均・標準偏差でスコアを安定化する。</span>
               </div>
-              <div className={styles.codeLine}> scores = []</div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.kw}>for</span> i <span className={styles.kw}>in</span>{" "}
+                {"    "}<span className={styles.str}>LLMの確率的な出力によるフレイキーを緩和するGoogle推奨の手法。</span>
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}<span className={styles.str}>"""</span>
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}scores = []
+              </div>
+              <div className={styles.codeLine} />
+              <div className={styles.codeLine}>
+                {"    "}<span className={styles.kw}>for</span> i <span className={styles.kw}>in</span>{" "}
                 range(n_trials):
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                result = <span className={styles.kw}>await</span> evaluator.evaluate_single(query)
+                {"        "}result = <span className={styles.kw}>await</span> evaluator.evaluate_single(query)
               </div>
-              <div className={styles.codeLine}> scores.append(result.score)</div>
-              <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}> avg_score = mean(scores)</div>
               <div className={styles.codeLine}>
-                {" "}
-                score_std = stdev(scores) <span className={styles.kw}>if</span> len(scores) &gt;{" "}
+                {"        "}scores.append(result.score)
+              </div>
+              <div className={styles.codeLine} />
+              <div className={styles.codeLine}>
+                {"    "}avg_score = mean(scores)
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}score_std = stdev(scores) <span className={styles.kw}>if</span> len(scores) &gt;{" "}
                 <span className={styles.num}>1</span> <span className={styles.kw}>else</span>{" "}
                 <span className={styles.num}>0.0</span>
               </div>
-              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine} />
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.kw}>return</span> <span className={styles.key}>{"{"}</span>
+                {"    "}<span className={styles.kw}>return</span> <span className={styles.key}>{"{"}</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.str}>"average_score"</span>: avg_score,
+                {"        "}<span className={styles.str}>"average_score"</span>: avg_score,
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.str}>"std_deviation"</span>: score_std,
+                {"        "}<span className={styles.str}>"std_deviation"</span>: score_std,
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.str}>"is_stable"</span>: score_std &lt;{" "}
+                {"        "}<span className={styles.str}>"is_stable"</span>: score_std &lt;{" "}
                 <span className={styles.num}>0.1</span>,{" "}
                 <span className={styles.cmt}># 標準偏差0.1未満を「安定」と判定</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.str}>"passes_threshold"</span>: avg_score &gt;= threshold,
+                {"        "}<span className={styles.str}>"passes_threshold"</span>: avg_score &gt;= threshold,
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.str}>"all_scores"</span>: scores
+                {"        "}<span className={styles.str}>"all_scores"</span>: scores
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>{"}"}</span>
+                {"    "}<span className={styles.key}>{"}"}</span>
               </div>
             </pre>
           </div>
@@ -1455,164 +1403,143 @@ export default function AgentHarnessEngineeringPage() {
                 <span className={styles.key}>on</span>:
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>push</span>:
+                {"  "}<span className={styles.key}>push</span>:
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>branches</span>: <span className={styles.key}>[</span>
+                {"    "}<span className={styles.key}>branches</span>: <span className={styles.key}>[</span>
                 <span className={styles.str}>main</span>,{" "}
                 <span className={styles.str}>develop</span>
                 <span className={styles.key}>]</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>pull_request</span>:
+                {"  "}<span className={styles.key}>pull_request</span>:
               </div>
-              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine} />
               <div className={styles.codeLine}>
                 <span className={styles.key}>env</span>:
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>GOOGLE_API_KEY</span>:{" "}
+                {"  "}<span className={styles.key}>GOOGLE_API_KEY</span>:{" "}
                 <span className={styles.str}>
                   {"$"}
                   {"{ secrets.GOOGLE_API_KEY }}"}
                 </span>
               </div>
-              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine} />
               <div className={styles.codeLine}>
                 <span className={styles.key}>jobs</span>:
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>small-eval</span>:
+                {"  "}<span className={styles.key}>small-eval</span>:
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>name</span>:{" "}
+                {"    "}<span className={styles.key}>name</span>:{" "}
                 <span className={styles.str}>"Stage 1: Unit Evaluation (Fake LLM)"</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>runs-on</span>:{" "}
+                {"    "}<span className={styles.key}>runs-on</span>:{" "}
                 <span className={styles.str}>ubuntu-latest</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>steps</span>:
+                {"    "}<span className={styles.key}>steps</span>:
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                - <span className={styles.key}>uses</span>:{" "}
+                {"      "}- <span className={styles.key}>uses</span>:{" "}
                 <span className={styles.str}>actions/checkout@v4</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                - <span className={styles.key}>uses</span>:{" "}
+                {"      "}- <span className={styles.key}>uses</span>:{" "}
                 <span className={styles.str}>actions/setup-python@v5</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>with</span>:{" "}
+                {"        "}<span className={styles.key}>with</span>:{" "}
                 <span className={styles.key}>{"{ python-version: '3.12' }"}</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                - <span className={styles.key}>run</span>:{" "}
+                {"      "}- <span className={styles.key}>run</span>:{" "}
                 <span className={styles.str}>pip install google-adk[eval] pytest</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                - <span className={styles.key}>name</span>:{" "}
+                {"      "}- <span className={styles.key}>name</span>:{" "}
                 <span className={styles.str}>Run small evaluations</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>run</span>: |
+                {"        "}<span className={styles.key}>run</span>: |
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                pytest evals/small/ -m <span className={styles.str}>"small_eval"</span> --timeout=30
-                -v
+                {"          "}pytest evals/small/ -m <span className={styles.str}>"small_eval"</span> --timeout=30 -v
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>env</span>:
+                {"        "}<span className={styles.key}>env</span>:
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>USE_FAKE_LLM</span>:{" "}
+                {"          "}<span className={styles.key}>USE_FAKE_LLM</span>:{" "}
                 <span className={styles.str}>"true"</span>{" "}
                 <span className={styles.cmt}># フェイクLLMを使用</span>
               </div>
-              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine} />
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>medium-eval</span>:
+                {"  "}<span className={styles.key}>medium-eval</span>:
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>name</span>:{" "}
+                {"    "}<span className={styles.key}>name</span>:{" "}
                 <span className={styles.str}>"Stage 2: Integration Evaluation (Flash Model)"</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>runs-on</span>:{" "}
+                {"    "}<span className={styles.key}>runs-on</span>:{" "}
                 <span className={styles.str}>ubuntu-latest</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>needs</span>:{" "}
+                {"    "}<span className={styles.key}>needs</span>:{" "}
                 <span className={styles.str}>small-eval</span>{" "}
                 <span className={styles.cmt}># Stage 1 通過後のみ実行</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>steps</span>:
+                {"    "}<span className={styles.key}>steps</span>:
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                - <span className={styles.key}>uses</span>:{" "}
+                {"      "}- <span className={styles.key}>uses</span>:{" "}
                 <span className={styles.str}>actions/checkout@v4</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                - <span className={styles.key}>uses</span>:{" "}
+                {"      "}- <span className={styles.key}>uses</span>:{" "}
                 <span className={styles.str}>actions/setup-python@v5</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>with</span>:{" "}
+                {"        "}<span className={styles.key}>with</span>:{" "}
                 <span className={styles.key}>{"{ python-version: '3.12' }"}</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                - <span className={styles.key}>run</span>:{" "}
+                {"      "}- <span className={styles.key}>run</span>:{" "}
                 <span className={styles.str}>pip install google-adk[eval]</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                - <span className={styles.key}>name</span>:{" "}
+                {"      "}- <span className={styles.key}>name</span>:{" "}
                 <span className={styles.str}>Run medium evaluations</span>
               </div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>run</span>: |
+                {"        "}<span className={styles.key}>run</span>: |
               </div>
-              <div className={styles.codeLine}> adk eval \</div>
-              <div className={styles.codeLine}> --agent_module agents.root_agent \</div>
-              <div className={styles.codeLine}> --eval_set_file evals/medium/eval_set.json \</div>
-              <div className={styles.codeLine}> --model gemini-3-flash-preview \</div>
               <div className={styles.codeLine}>
-                {" "}
-                --threshold <span className={styles.num}>0.75</span> \
+                {"          "}adk eval \
               </div>
-              <div className={styles.codeLine}> --output_dir results/medium/</div>
               <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.key}>timeout-minutes</span>:{" "}
+                {"            "}--agent_module agents.root_agent \
+              </div>
+              <div className={styles.codeLine}>
+                {"            "}--eval_set_file evals/medium/eval_set.json \
+              </div>
+              <div className={styles.codeLine}>
+                {"            "}--model gemini-3-flash-preview \
+              </div>
+              <div className={styles.codeLine}>
+                {"            "}--threshold <span className={styles.num}>0.75</span> \
+              </div>
+              <div className={styles.codeLine}>
+                {"            "}--output_dir results/medium/
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}<span className={styles.key}>timeout-minutes</span>:{" "}
                 <span className={styles.num}>10</span>
               </div>
             </pre>
