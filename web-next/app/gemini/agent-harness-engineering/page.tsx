@@ -179,7 +179,12 @@ IMPL --> FLAKY
 FLAKY --> CI
 CI --> MULTI`;
 
-function Ext({ href, children }: { href: string; children: React.ReactNode }) {
+interface ExtProps {
+  href: string;
+  children: React.ReactNode;
+}
+
+function Ext({ href, children }: ExtProps) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
       {children}
