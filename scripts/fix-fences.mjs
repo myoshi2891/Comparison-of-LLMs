@@ -2,11 +2,11 @@ import { readFile, writeFile } from 'fs/promises';
 import { resolve } from 'path';
 
 /**
- * コードフェンスの言語指定漏れを `text` に補完する。
- * - 開きフェンス (``` または ~~~) で言語指定が空のとき `text` を付与する。
- * - 末尾改行を1つに正規化する。
+ * Normalize Markdown code fences by filling empty opening-fence info with `text` and ensuring the file ends with exactly one newline.
  *
- * @param {string} filePath - 対象 Markdown ファイル（上書き保存）。
+ * Modifies the file in place: for opening code fences (``` or ~~~) whose info string is empty, the literal `text` is appended immediately after the fence delimiter; trailing empty lines are removed and a single newline is appended.
+ *
+ * @param {string} filePath - Path to the Markdown file to update; the file is overwritten with the normalized contents.
  */
 export default async function fixFences(filePath) {
   const absolutePath = resolve(filePath);
