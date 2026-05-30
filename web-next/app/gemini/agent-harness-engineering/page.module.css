@@ -111,7 +111,7 @@
 }
 
 .heroEyebrow::before {
-  content: '';
+  content: "";
   width: 7px;
   height: 7px;
   border-radius: 50%;
@@ -120,7 +120,8 @@
 }
 
 @keyframes blink {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
@@ -323,7 +324,7 @@
 
 .mermaidLabel::before,
 .mermaidLabel::after {
-  content: '';
+  content: "";
   flex: 1;
   height: 1px;
   background: var(--border-color);
@@ -331,9 +332,8 @@
 
 .mermaidWrap svg {
   display: inline-block;
-  width: auto !important;
-  max-width: 100% !important;
-  height: auto !important;
+  max-width: 100%;
+  height: auto;
 }
 
 /* ── CODE BLOCKS ── */
@@ -513,7 +513,7 @@
 }
 
 .bp::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -615,21 +615,21 @@
 }
 
 .checked .checkBox::after {
-  content: '✓';
+  content: "✓";
   color: #fff;
   font-size: 12px;
   font-weight: 700;
-}
-
-.checked .checkText {
-  color: var(--text-dim);
-  text-decoration: line-through;
 }
 
 .checkText {
   font-size: 0.85rem;
   color: var(--text);
   line-height: 1.5;
+}
+
+.checked .checkText {
+  color: var(--text-dim);
+  text-decoration: line-through;
 }
 
 /* ── SOURCES ── */
@@ -687,7 +687,7 @@
 }
 
 .stepFlow::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 22px;
   top: 44px;
