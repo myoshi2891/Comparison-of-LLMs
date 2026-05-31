@@ -14,7 +14,7 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（既知の違反なし、0 件維持）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **609 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **612 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **5 件すべて合格** (全 Green ✅)
 
 ## テストカバレッジの進捗状況

@@ -630,7 +630,7 @@
       <div class="mast-meta">
         <span>Vol. 001 · Issue 05</span>
         <span><b>LLM-Studies</b> / Coverage Diagnostic</span>
-        <span>Scan&nbsp;Date · <b>2026-05-26</b></span>
+        <span>Scan&nbsp;Date · <b>2026-05-31</b></span>
         <span class="pulse">Static&nbsp;file&nbsp;scan</span>
       </div>
       <h1 class="title">Coverage<br/><em>Diagnostic.</em></h1>
@@ -640,38 +640,38 @@
       <button class="iconbtn" id="printBtn" type="button" aria-label="PDF印刷">⎙ Print</button>
     </div>
   </header>
-
+ 
   <section class="hero" aria-label="サマリー">
     <div class="scorecard" role="figure" aria-label="全体カバレッジスコア">
       <div class="score-label">Overall Coverage Index · weighted</div>
-      <div class="score-number"><span id="scoreVal">40</span><sup>.7 %</sup></div>
-      <div class="score-bar" style="--missing-w: 44.2; --partial-w: 30.2;" aria-hidden="true">
+      <div class="score-number"><span id="scoreVal">44</span><sup>.2 %</sup></div>
+      <div class="score-bar" style="--missing-w: 44.2; --partial-w: 23.3;" aria-hidden="true">
         <div class="score-bar-fill"></div>
       </div>
       <div class="score-bar-legend"><span>0%</span><span>50%</span><span>100%</span></div>
       <p class="score-note">
         <strong>方法:</strong> 8 カテゴリー × 8 ドメイン = 64 セルのうち、対象外 (N/A) を除く
         <strong>43 セル</strong>を <strong>✅ 1.0 / ⚠️ 0.5 / ❌ 0</strong> で重み付き集計。
-        実測ベースのファイルスキャン結果のみ採用（推測値なし）。
+        実測ベースのであるファイルスキャン結果のみ採用（推測値なし）。
         coverage/lcov は未セットアップのためライン/分岐率は集計対象外。
       </p>
     </div>
-
+ 
     <div class="stack" role="list" aria-label="サマリー指標">
       <div class="stat" role="listitem">
         <span class="stat-index">01</span>
         <span class="stat-label">Test files · <i>web-next</i></span>
-        <span class="stat-val">43<small>vitest specs</small></span>
+        <span class="stat-val">48<small>vitest specs</small></span>
       </div>
       <div class="stat" role="listitem">
         <span class="stat-index">02</span>
         <span class="stat-label">Test cases · <i>web-next</i></span>
-        <span class="stat-val">≈ 494<small>it/test count</small></span>
+        <span class="stat-val">635<small>it/test count</small></span>
       </div>
       <div class="stat" role="listitem">
         <span class="stat-index">03</span>
         <span class="stat-label">Scraper tests · <i>pytest</i></span>
-        <span class="stat-val">3 / 10<small>files / cases</small></span>
+        <span class="stat-val">5 / 38<small>files / cases</small></span>
       </div>
       <div class="stat" role="listitem">
         <span class="stat-index">04</span>
@@ -936,9 +936,9 @@ var CELLS = {
     components: { s:"done",    count:144, files:["ApiTable.test.tsx (25)","SubTable.test.tsx (21)","ScenarioSelector.test.tsx (23)","HomePage.test.tsx (16)","Hero.test.tsx (12)","MathSection.test.tsx (11)","DualCell.test.tsx (10)","RefLinks.test.tsx (18)","LanguageToggle.test.tsx (8)"], note:"電卓 UI 9/9 コンポーネント網羅" },
     site:       { s:"done",    count:25,  files:["site/SiteHeader.test.tsx (12)","site/SiteHeaderClient.test.tsx (7)","site/DisclaimerBanner.test.tsx (6)"], note:"共通ヘッダー/バナー 3/3 網羅" },
     lib:        { s:"done",    count:93,  files:["cost.test.ts (49)","pricing.test.ts (23)","i18n.test.ts (7)","i18n.rich.test.tsx (10)","site-url.test.ts (4)"], note:"6 lib モジュール中 5 件カバー（metadata.ts / fonts.ts のみ未）" },
-    types:      { s:"partial", count:0,   files:["lib/pricing.ts → _AssertParity (compile-time)"], note:"ランタイム negative test なし。型レベルアサートのみ" },
-    providers:  { s:"partial", count:1,   files:["scraper/tests/smoke/test_smoke.py::test_providers"], note:"6 プロバイダーを mock で 1 アサート — DOM 構造変更は検出不可" },
-    tools:      { s:"partial", count:1,   files:["scraper/tests/smoke/test_smoke.py::test_tools"], note:"8 ツールを mock で 1 アサート — 価格抽出ロジック未検証" },
+    types:      { s:"done",    count:23,  files:["types/pricing.test.ts (23)","lib/pricing.ts → _AssertParity (compile-time)"], note:"型↔Zodスキーマのランタイム parity + negative test（型強制拒否・必須欠落・positive制約・日付フォーマット境界）" },
+    providers:  { s:"done",    count:13,  files:["scraper/tests/test_providers.py (12)","scraper/tests/smoke/test_smoke.py::test_providers (1)"], note:"6 プロバイダーの価格抽出を success（fixture→期待値一致）/ fallback（非マッチ→全モデル fallback 値）両パスで検証" },
+    tools:      { s:"done",    count:17,  files:["scraper/tests/test_tools.py (16)","scraper/tests/smoke/test_smoke.py::test_tools (1)"], note:"8 ツールの価格抽出を success（fixture→monthly一致）/ fallback（非マッチ→全プラン fallback 値）両パスで検証" },
     core:       { s:"done",    count:8,   files:["test_imports.py (全モジュール import)","test_smoke.py::test_main","test_smoke.py::test_fetch_jpy_rate","test_browser.py (5)"], note:"main.py / exchange.py / browser.py 全コアモジュールのテスト網羅" }
   },
   integration: {
@@ -952,9 +952,9 @@ var CELLS = {
     core:       { s:"missing", count:0, files:[], note:"main → _scrape_all → _write_output の end-to-end なし" }
   },
   e2e: {
-    app:        { s:"partial", count:1, files:["e2e/smoke.e2e.ts (1)"], note:"Playwright 導入、ホームページローディングのスモークE2E検証" },
-    components: { s:"partial", count:1, files:["e2e/smoke.e2e.ts (1)"], note:"Playwright による主要コンポーネントの描画E2E検証" },
-    site:       { s:"partial", count:1, files:["e2e/smoke.e2e.ts (1)"], note:"Playwright による共通ヘッダー・バナーの描画E2E検証" },
+    app:        { s:"partial", count:5, files:["e2e/smoke.e2e.ts (1)","e2e/calculator.e2e.ts (4)"], note:"Playwright による画面ロードおよびインタラクティブ動作（言語・通貨切り替え、プリセット変更）のE2E検証" },
+    components: { s:"partial", count:5, files:["e2e/smoke.e2e.ts (1)","e2e/calculator.e2e.ts (4)"], note:"Playwright による電卓UIプリセットの適用および通貨切り替え時の描画更新のE2E検証" },
+    site:       { s:"partial", count:5, files:["e2e/smoke.e2e.ts (1)","e2e/calculator.e2e.ts (4)"], note:"Playwright による共通ヘッダー・バナーおよび言語切り替え時のヘッダー表示のE2E検証" },
     lib:        { s:"na" },
     types:      { s:"na" },
     providers:  { s:"missing", count:0, files:[], note:"ライブスクレイプ smoke は CI 対象外" },
@@ -968,7 +968,7 @@ var CELLS = {
     lib: { s:"na" }, types: { s:"na" }, providers: { s:"na" }, tools: { s:"na" }, core: { s:"na" }
   },
   a11y: {
-    app:        { s:"done",    count:null, files:["tests/a11y.test.tsx"], note:"vitest-axe によるアクセシビリティ自動テストの導入（wcag違反自動チェック）" },
+    app:        { s:"done",    count:null, files:["tests/a11y.test.tsx"], note:"vitest-axe による主要ガイドページ（Antigravity, Harness, Agent Harnessなど）のアクセシビリティ自動テスト（wcag違反自動チェック）" },
     components: { s:"done",    count:null, files:["tests/a11y.test.tsx"], note:"vitest-axe による主要コンポーネント（HomePageなど）のアクセシビリティ自動テスト" },
     site:       { s:"done",    count:null, files:["tests/a11y.test.tsx"], note:"vitest-axe による共通ヘッダー・共通バナーのアクセシビリティ自動テスト" },
     lib: { s:"na" }, types: { s:"na" }, providers: { s:"na" }, tools: { s:"na" }, core: { s:"na" }
@@ -996,9 +996,9 @@ var CELLS = {
     site:       { s:"na" },
     lib:        { s:"partial", count:10, files:["i18n.rich.test.tsx (10)"], note:"上記と同じファイルで lib/i18n.tsx もカバー" },
     types:      { s:"na" },
-    providers:  { s:"partial", count:0,  files:["Makefile (make audit)"], note:"bun audit による依存関係の脆弱性監査ゲートを導入" },
-    tools:      { s:"partial", count:0,  files:["Makefile (make audit)"], note:"同上" },
-    core:       { s:"partial", count:0,  files:["Makefile (make audit)"], note:"同上（JS依存関係の監査ゲート）" }
+    providers:  { s:"partial", count:0,  files:["Makefile (make audit)","workflows/test.yaml (bun audit)"], note:"GitHub Actions CI に bun audit による自動脆弱性監査ゲートを組み込み" },
+    tools:      { s:"partial", count:0,  files:["Makefile (make audit)","workflows/test.yaml (bun audit)"], note:"同上" },
+    core:       { s:"partial", count:0,  files:["Makefile (make audit)","workflows/test.yaml (bun audit)"], note:"同上（JS依存関係の監査ゲート）" }
   }
 };
 

@@ -1,12 +1,21 @@
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { axe } from "vitest-axe";
 import * as matchers from "vitest-axe/matchers";
+import AgentHarnessEngineeringPage from "@/app/gemini/agent-harness-engineering/page";
+import AntigravityGuidePage from "@/app/gemini/antigravity-guide/page";
+import HarnessEngineeringPage from "@/app/gemini/harness-engineering/page";
 import { HomePage } from "@/components/HomePage";
 import { DisclaimerBanner } from "@/components/site/DisclaimerBanner";
 import { SiteHeader as RawSiteHeader } from "@/components/site/SiteHeader";
 import type { PricingData } from "@/types/pricing";
+
+vi.mock("@/components/docs/MermaidDiagram", () => ({
+  default: function DummyMermaidDiagram({ chart }: { chart: string }) {
+    return <pre data-testid="mermaid">{chart}</pre>;
+  },
+}));
 
 // Custom type definitions for vitest-axe matchers
 interface CustomMatchers<R = unknown> {
@@ -69,6 +78,36 @@ describe("Accessibility Automated Audit (axe-core)", () => {
 
   it("HomePage has no accessibility violations", async () => {
     const { container } = render(<HomePage data={testPricing} />);
+    const results = await axe(container, {
+      rules: {
+        "heading-order": { enabled: false },
+      },
+    });
+    expect(results).toHaveNoViolations();
+  });
+
+  it("AntigravityGuidePage has no accessibility violations", async () => {
+    const { container } = render(<AntigravityGuidePage />);
+    const results = await axe(container, {
+      rules: {
+        "heading-order": { enabled: false },
+      },
+    });
+    expect(results).toHaveNoViolations();
+  });
+
+  it("HarnessEngineeringPage has no accessibility violations", async () => {
+    const { container } = render(<HarnessEngineeringPage />);
+    const results = await axe(container, {
+      rules: {
+        "heading-order": { enabled: false },
+      },
+    });
+    expect(results).toHaveNoViolations();
+  });
+
+  it("AgentHarnessEngineeringPage has no accessibility violations", async () => {
+    const { container } = render(<AgentHarnessEngineeringPage />);
     const results = await axe(container, {
       rules: {
         "heading-order": { enabled: false },
