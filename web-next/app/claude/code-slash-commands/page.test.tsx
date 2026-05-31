@@ -7,7 +7,7 @@ beforeAll(() => {
     observe = vi.fn();
     unobserve = vi.fn();
     disconnect = vi.fn();
-  } as any;
+  } as unknown as typeof IntersectionObserver;
 });
 
 describe("/claude/code-slash-commands", () => {

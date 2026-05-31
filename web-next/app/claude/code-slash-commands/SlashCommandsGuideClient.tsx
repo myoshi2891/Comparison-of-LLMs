@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import CodeCopyButton from "@/components/docs/CodeCopyButton";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
 
 // ── MERMAID DIAGRAMS ──
@@ -256,8 +256,12 @@ export default function SlashCommandsGuideClient() {
 
           <p className={styles.lead}>
             スラッシュコマンドは Claude Code セッションを
-            <strong style={{ color: "var(--color-text-primary)" }}>制御するためのショートカット</strong>
-            です。通常のプロンプトが「Claude に何をするか」を伝えるのに対し、スラッシュコマンドは「Claude がどう振る舞うか」や「セッション自体への操作」を実行します。
+            <strong style={{ color: "var(--color-text-primary)" }}>
+              制御するためのショートカット
+            </strong>
+            です。通常のプロンプトが「Claude
+            に何をするか」を伝えるのに対し、スラッシュコマンドは「Claude
+            がどう振る舞うか」や「セッション自体への操作」を実行します。
           </p>
 
           <div className={styles.typeCards}>
@@ -267,7 +271,9 @@ export default function SlashCommandsGuideClient() {
               <div className={styles.typeCardDesc}>
                 Claude に対してタスクを指示する。コードを書く、リファクタリングする、調査するなど。
               </div>
-              <div className={styles.typeCardExample}>&quot;この関数をリファクタリングして&quot;</div>
+              <div className={styles.typeCardExample}>
+                &quot;この関数をリファクタリングして&quot;
+              </div>
             </div>
             <div className={`${styles.typeCard} ${styles.skill}`}>
               <div className={styles.typeCardLabel}>スラッシュコマンド</div>
@@ -326,7 +332,8 @@ export default function SlashCommandsGuideClient() {
               <code>
                 <span className={styles.tCmt}># 方法 1: ネイティブバイナリ（推奨）</span>
                 {"\n"}
-                <span className={styles.tCmd}>curl</span> -fsSL https://claude.ai/install.sh | <span className={styles.tCmd}>bash</span>
+                <span className={styles.tCmd}>curl</span> -fsSL https://claude.ai/install.sh |{" "}
+                <span className={styles.tCmd}>bash</span>
                 {"\n\n"}
                 <span className={styles.tCmt}># 方法 2: Homebrew（macOS のみ）</span>
                 {"\n"}
@@ -357,11 +364,14 @@ export default function SlashCommandsGuideClient() {
             </div>
             <pre>
               <code>
-                <span className={styles.tCmd}>claude</span> auth login    <span className={styles.tCmt}># サインインまたはアカウント切り替え</span>
+                <span className={styles.tCmd}>claude</span> auth login{" "}
+                <span className={styles.tCmt}># サインインまたはアカウント切り替え</span>
                 {"\n"}
-                <span className={styles.tCmd}>claude</span> auth status   <span className={styles.tCmt}># 認証状態を確認</span>
+                <span className={styles.tCmd}>claude</span> auth status{" "}
+                <span className={styles.tCmt}># 認証状態を確認</span>
                 {"\n"}
-                <span className={styles.tCmd}>claude</span> auth logout   <span className={styles.tCmt}># サインアウト</span>
+                <span className={styles.tCmd}>claude</span> auth logout{" "}
+                <span className={styles.tCmt}># サインアウト</span>
               </code>
             </pre>
           </div>
@@ -376,65 +386,127 @@ export default function SlashCommandsGuideClient() {
               </tr>
             </thead>
             <tbody>
-              <tr className={matchSearch("claude インタラクティブセッション開始") ? "" : styles.hidden}>
-                <td><code>claude</code></td>
+              <tr
+                className={
+                  matchSearch("claude インタラクティブセッション開始") ? "" : styles.hidden
+                }
+              >
+                <td>
+                  <code>claude</code>
+                </td>
                 <td>インタラクティブセッション開始</td>
-                <td><code>claude</code></td>
+                <td>
+                  <code>claude</code>
+                </td>
               </tr>
               <tr className={matchSearch("-p プリントモード 1回実行して終了") ? "" : styles.hidden}>
-                <td><code>-p &quot;...&quot;</code></td>
+                <td>
+                  <code>-p &quot;...&quot;</code>
+                </td>
                 <td>1回実行して終了（プリントモード）</td>
-                <td><code>claude -p &quot;TODO を列挙して&quot;</code></td>
+                <td>
+                  <code>claude -p &quot;TODO を列挙して&quot;</code>
+                </td>
               </tr>
               <tr className={matchSearch("-c 直近のセッションを継続") ? "" : styles.hidden}>
-                <td><code>-c</code></td>
+                <td>
+                  <code>-c</code>
+                </td>
                 <td>直近のセッションを継続</td>
-                <td><code>claude -c</code></td>
+                <td>
+                  <code>claude -c</code>
+                </td>
               </tr>
               <tr className={matchSearch("-r 指定セッションを再開") ? "" : styles.hidden}>
-                <td><code>-r &quot;名前&quot;</code></td>
+                <td>
+                  <code>-r &quot;名前&quot;</code>
+                </td>
                 <td>指定セッションを再開</td>
-                <td><code>claude -r &quot;auth-refactor&quot;</code></td>
+                <td>
+                  <code>claude -r &quot;auth-refactor&quot;</code>
+                </td>
               </tr>
               <tr className={matchSearch("-n セッションに名前をつけて開始") ? "" : styles.hidden}>
-                <td><code>-n &quot;名前&quot;</code></td>
+                <td>
+                  <code>-n &quot;名前&quot;</code>
+                </td>
                 <td>セッションに名前をつけて開始</td>
-                <td><code>claude -n &quot;feature-x&quot;</code></td>
+                <td>
+                  <code>claude -n &quot;feature-x&quot;</code>
+                </td>
               </tr>
               <tr className={matchSearch("--model モデルを指定して起動") ? "" : styles.hidden}>
-                <td><code>--model</code></td>
+                <td>
+                  <code>--model</code>
+                </td>
                 <td>モデルを指定して起動</td>
-                <td><code>claude --model opus</code></td>
+                <td>
+                  <code>claude --model opus</code>
+                </td>
               </tr>
-              <tr className={matchSearch("--max-turns 自律ターン数の上限を設定") ? "" : styles.hidden}>
-                <td><code>--max-turns N</code></td>
+              <tr
+                className={matchSearch("--max-turns 自律ターン数の上限を設定") ? "" : styles.hidden}
+              >
+                <td>
+                  <code>--max-turns N</code>
+                </td>
                 <td>自律ターン数の上限を設定</td>
-                <td><code>claude -p &quot;fix lint&quot; --max-turns 10</code></td>
+                <td>
+                  <code>claude -p &quot;fix lint&quot; --max-turns 10</code>
+                </td>
               </tr>
               <tr className={matchSearch("--init CLAUDE.md を作成して起動") ? "" : styles.hidden}>
-                <td><code>--init</code></td>
+                <td>
+                  <code>--init</code>
+                </td>
                 <td>CLAUDE.md を作成して起動</td>
-                <td><code>claude --init</code></td>
+                <td>
+                  <code>claude --init</code>
+                </td>
               </tr>
-              <tr className={matchSearch("--from-pr PR に紐づけてセッションを開始") ? "" : styles.hidden}>
-                <td><code>--from-pr N</code></td>
+              <tr
+                className={
+                  matchSearch("--from-pr PR に紐づけてセッションを開始") ? "" : styles.hidden
+                }
+              >
+                <td>
+                  <code>--from-pr N</code>
+                </td>
                 <td>PR に紐づけてセッションを開始</td>
-                <td><code>claude --from-pr 456</code></td>
+                <td>
+                  <code>claude --from-pr 456</code>
+                </td>
               </tr>
               <tr className={matchSearch("-w 独立した git worktree で起動") ? "" : styles.hidden}>
-                <td><code>-w</code></td>
+                <td>
+                  <code>-w</code>
+                </td>
                 <td>独立した git worktree で起動</td>
-                <td><code>claude -w</code></td>
+                <td>
+                  <code>claude -w</code>
+                </td>
               </tr>
               <tr className={matchSearch("--debug デバッグログを有効化") ? "" : styles.hidden}>
-                <td><code>--debug</code></td>
+                <td>
+                  <code>--debug</code>
+                </td>
                 <td>デバッグログを有効化</td>
-                <td><code>claude --debug</code></td>
+                <td>
+                  <code>claude --debug</code>
+                </td>
               </tr>
-              <tr className={matchSearch("--bare フック・LSP・プラグインをスキップ") ? "" : styles.hidden}>
-                <td><code>--bare</code></td>
+              <tr
+                className={
+                  matchSearch("--bare フック・LSP・プラグインをスキップ") ? "" : styles.hidden
+                }
+              >
+                <td>
+                  <code>--bare</code>
+                </td>
                 <td>フック・LSP・プラグインをスキップ</td>
-                <td><code>claude -p &quot;...&quot; --bare</code></td>
+                <td>
+                  <code>claude -p &quot;...&quot; --bare</code>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -442,7 +514,9 @@ export default function SlashCommandsGuideClient() {
           <h3>セッション開始フロー</h3>
           <div className={styles.mermaidWrap}>
             <MermaidDiagram chart={DIAG_0} />
-            <div className={styles.mermaidCaption}>図: セッション開始から作業開始までの推奨フロー</div>
+            <div className={styles.mermaidCaption}>
+              図: セッション開始から作業開始までの推奨フロー
+            </div>
           </div>
         </section>
 
@@ -483,23 +557,33 @@ export default function SlashCommandsGuideClient() {
                 </td>
                 <td>CLI 本体</td>
                 <td>固定ロジック・高速・引数なしで即実行</td>
-                <td><code>/clear</code> <code>/compact</code> <code>/model</code></td>
+                <td>
+                  <code>/clear</code> <code>/compact</code> <code>/model</code>
+                </td>
               </tr>
-              <tr className={matchSearch("スキル CLI に同梱 プロンプトベース") ? "" : styles.hidden}>
+              <tr
+                className={matchSearch("スキル CLI に同梱 プロンプトベース") ? "" : styles.hidden}
+              >
                 <td>
                   <span className={`${styles.pill} ${styles.pillSkill}`}>スキル</span>
                 </td>
                 <td>CLI に同梱</td>
                 <td>プロンプトベース・Claude が実行計画を立案</td>
-                <td><code>/batch</code> <code>/code-review</code></td>
+                <td>
+                  <code>/batch</code> <code>/code-review</code>
+                </td>
               </tr>
               <tr className={matchSearch("カスタム commands ユーザー定義") ? "" : styles.hidden}>
                 <td>
                   <span className={`${styles.pill} ${styles.pillNew}`}>カスタム</span>
                 </td>
-                <td><code>.claude/commands/</code></td>
+                <td>
+                  <code>.claude/commands/</code>
+                </td>
                 <td>ユーザー定義の Markdown テンプレート</td>
-                <td><code>/my-review</code></td>
+                <td>
+                  <code>/my-review</code>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -509,7 +593,9 @@ export default function SlashCommandsGuideClient() {
             <div className={styles.calloutBody}>
               <div className={styles.calloutTitle}>2026 年の重要変更点</div>
               <p>
-                カスタムコマンド (<code>.claude/commands/</code>) とスキル (<code>.claude/skills/</code>) が統合されました。既存のコマンドファイルはそのまま動作しますが、新規作成にはスキル形式を推奨します。同名の場合はスキルが優先されます。
+                カスタムコマンド (<code>.claude/commands/</code>) とスキル (
+                <code>.claude/skills/</code>)
+                が統合されました。既存のコマンドファイルはそのまま動作しますが、新規作成にはスキル形式を推奨します。同名の場合はスキルが優先されます。
               </p>
             </div>
           </div>
@@ -528,7 +614,8 @@ export default function SlashCommandsGuideClient() {
           </div>
 
           <p className={styles.lead}>
-            最も頻繁に使用するカテゴリです。コンテキスト管理は Claude Code の出力品質を左右する最大の要因です。
+            最も頻繁に使用するカテゴリです。コンテキスト管理は Claude Code
+            の出力品質を左右する最大の要因です。
           </p>
 
           <table className={styles.dataTable}>
@@ -540,53 +627,107 @@ export default function SlashCommandsGuideClient() {
               </tr>
             </thead>
             <tbody>
-              <tr className={matchSearch("/clear 会話履歴を全消去してコンテキストを解放") ? "" : styles.hidden}>
-                <td><code>/clear</code></td>
+              <tr
+                className={
+                  matchSearch("/clear 会話履歴を全消去してコンテキストを解放") ? "" : styles.hidden
+                }
+              >
+                <td>
+                  <code>/clear</code>
+                </td>
                 <td>会話履歴を全消去してコンテキストを解放</td>
                 <td>新しいタスクに切り替えるとき</td>
               </tr>
-              <tr className={matchSearch("/compact 会話を要約 圧縮してトークンを節約") ? "" : styles.hidden}>
-                <td><code>/compact [指示]</code></td>
+              <tr
+                className={
+                  matchSearch("/compact 会話を要約 圧縮してトークンを節約") ? "" : styles.hidden
+                }
+              >
+                <td>
+                  <code>/compact [指示]</code>
+                </td>
                 <td>会話を要約・圧縮してトークンを節約</td>
                 <td>長いセッションで続けたいとき</td>
               </tr>
-              <tr className={matchSearch("/context コンテキストウィンドウの使用状況を表示") ? "" : styles.hidden}>
-                <td><code>/context</code></td>
+              <tr
+                className={
+                  matchSearch("/context コンテキストウィンドウの使用状況を表示")
+                    ? ""
+                    : styles.hidden
+                }
+              >
+                <td>
+                  <code>/context</code>
+                </td>
                 <td>コンテキストウィンドウの使用状況を表示</td>
                 <td>上限に近づいていないか確認するとき</td>
               </tr>
-              <tr className={matchSearch("/rewind 以前のチェックポイントに巻き戻す") ? "" : styles.hidden}>
-                <td><code>/rewind</code></td>
+              <tr
+                className={
+                  matchSearch("/rewind 以前のチェックポイントに巻き戻す") ? "" : styles.hidden
+                }
+              >
+                <td>
+                  <code>/rewind</code>
+                </td>
                 <td>以前のチェックポイントに巻き戻す</td>
                 <td>Claude が間違った方向に進んだとき</td>
               </tr>
               <tr className={matchSearch("/resume 以前のセッションを再開") ? "" : styles.hidden}>
-                <td><code>/resume [名前]</code></td>
+                <td>
+                  <code>/resume [名前]</code>
+                </td>
                 <td>以前のセッションを再開</td>
                 <td>昨日の作業を引き継ぐとき</td>
               </tr>
-              <tr className={matchSearch("/rename 現在のセッションに名前をつける") ? "" : styles.hidden}>
-                <td><code>/rename [名前]</code></td>
+              <tr
+                className={
+                  matchSearch("/rename 現在のセッションに名前をつける") ? "" : styles.hidden
+                }
+              >
+                <td>
+                  <code>/rename [名前]</code>
+                </td>
                 <td>現在のセッションに名前をつける</td>
                 <td>複数セッションを管理するとき</td>
               </tr>
               <tr className={matchSearch("/branch 会話を分岐させて並行探索") ? "" : styles.hidden}>
-                <td><code>/branch [名前]</code></td>
+                <td>
+                  <code>/branch [名前]</code>
+                </td>
                 <td>会話を分岐させて並行探索</td>
                 <td>リスクのある変更を試したいとき</td>
               </tr>
-              <tr className={matchSearch("/export 会話を Markdown 等でエクスポート") ? "" : styles.hidden}>
-                <td><code>/export [ファイル名]</code></td>
+              <tr
+                className={
+                  matchSearch("/export 会話を Markdown 等でエクスポート") ? "" : styles.hidden
+                }
+              >
+                <td>
+                  <code>/export [ファイル名]</code>
+                </td>
                 <td>会話を Markdown 等でエクスポート</td>
                 <td>ログを保存したいとき</td>
               </tr>
-              <tr className={matchSearch("/diff インタラクティブな差分ビューワーを開く") ? "" : styles.hidden}>
-                <td><code>/diff</code></td>
+              <tr
+                className={
+                  matchSearch("/diff インタラクティブな差分ビューワーを開く") ? "" : styles.hidden
+                }
+              >
+                <td>
+                  <code>/diff</code>
+                </td>
                 <td>インタラクティブな差分ビューワーを開く</td>
                 <td>変更内容を視覚的に確認するとき</td>
               </tr>
-              <tr className={matchSearch("/copy 最新または N 番目の回答をコピー") ? "" : styles.hidden}>
-                <td><code>/copy [N]</code></td>
+              <tr
+                className={
+                  matchSearch("/copy 最新または N 番目の回答をコピー") ? "" : styles.hidden
+                }
+              >
+                <td>
+                  <code>/copy [N]</code>
+                </td>
                 <td>最新または N 番目の回答をコピー</td>
                 <td>コードをクリップボードに取得</td>
               </tr>
@@ -598,8 +739,14 @@ export default function SlashCommandsGuideClient() {
                 <td>完了条件を設定して自動継続</td>
                 <td>複数ターンにまたがる長い作業</td>
               </tr>
-              <tr className={matchSearch("/status 現在のセッション 環境状態を表示") ? "" : styles.hidden}>
-                <td><code>/status</code></td>
+              <tr
+                className={
+                  matchSearch("/status 現在のセッション 環境状態を表示") ? "" : styles.hidden
+                }
+              >
+                <td>
+                  <code>/status</code>
+                </td>
                 <td>現在のセッション・環境状態を表示</td>
                 <td>最初に実行して状態を把握</td>
               </tr>
@@ -623,13 +770,19 @@ export default function SlashCommandsGuideClient() {
                 {"\n"}
                 <span className={styles.tCmd}>/compact</span>
                 {"\n\n"}
-                <span className={styles.tCmt}># フォーカスを指定して圧縮（重要情報を優先的に保持）</span>
+                <span className={styles.tCmt}>
+                  # フォーカスを指定して圧縮（重要情報を優先的に保持）
+                </span>
                 {"\n"}
-                <span className={styles.tCmd}>/compact</span> <span className={styles.tStr}>認証モジュールと現在のテスト失敗を中心に保持して</span>
+                <span className={styles.tCmd}>/compact</span>{" "}
+                <span className={styles.tStr}>
+                  認証モジュールと現在のテスト失敗を中心に保持して
+                </span>
                 {"\n\n"}
                 <span className={styles.tCmt}># API の設計決定だけ残す</span>
                 {"\n"}
-                <span className={styles.tCmd}>/compact</span> <span className={styles.tStr}>API の設計決定のみ保持</span>
+                <span className={styles.tCmd}>/compact</span>{" "}
+                <span className={styles.tStr}>API の設計決定のみ保持</span>
               </code>
             </pre>
           </div>
@@ -655,13 +808,17 @@ export default function SlashCommandsGuideClient() {
               <code>
                 <span className={styles.tCmt}># 全ユニットテストが通過するまで修正を続ける</span>
                 {"\n"}
-                <span className={styles.tCmd}>/goal</span> <span className={styles.tStr}>全ユニットテストが PASS になるまで</span>
+                <span className={styles.tCmd}>/goal</span>{" "}
+                <span className={styles.tStr}>全ユニットテストが PASS になるまで</span>
                 {"\n\n"}
                 <span className={styles.tCmt}># カバレッジ 80% 以上を達成するまで</span>
                 {"\n"}
-                <span className={styles.tCmd}>/goal</span> <span className={styles.tStr}>テストカバレッジが 80% 以上になるまで</span>
+                <span className={styles.tCmd}>/goal</span>{" "}
+                <span className={styles.tStr}>テストカバレッジが 80% 以上になるまで</span>
                 {"\n\n"}
-                <span className={styles.tCmt}># 経過時間・ターン数・トークン数のオーバーレイが表示される</span>
+                <span className={styles.tCmt}>
+                  # 経過時間・ターン数・トークン数のオーバーレイが表示される
+                </span>
               </code>
             </pre>
           </div>
@@ -676,24 +833,58 @@ export default function SlashCommandsGuideClient() {
               </tr>
             </thead>
             <tbody>
-              <tr className={matchSearch("新しいタスクを始める /clear 前の作業が干渉しない") ? "" : styles.hidden}>
+              <tr
+                className={
+                  matchSearch("新しいタスクを始める /clear 前の作業が干渉しない")
+                    ? ""
+                    : styles.hidden
+                }
+              >
                 <td>新しいタスクを始める</td>
-                <td><code>/clear</code></td>
+                <td>
+                  <code>/clear</code>
+                </td>
                 <td>前の作業が干渉しないようにする</td>
               </tr>
-              <tr className={matchSearch("長いセッションを続ける /compact 重要な文脈を残しながらトークンを節約") ? "" : styles.hidden}>
+              <tr
+                className={
+                  matchSearch(
+                    "長いセッションを続ける /compact 重要な文脈を残しながらトークンを節約"
+                  )
+                    ? ""
+                    : styles.hidden
+                }
+              >
                 <td>長いセッションを続ける</td>
-                <td><code>/compact</code></td>
+                <td>
+                  <code>/compact</code>
+                </td>
                 <td>重要な文脈を残しながらトークンを節約</td>
               </tr>
-              <tr className={matchSearch("コンテキスト使用量を確認 /context 上限に達する前に行動") ? "" : styles.hidden}>
+              <tr
+                className={
+                  matchSearch("コンテキスト使用量を確認 /context 上限に達する前に行動")
+                    ? ""
+                    : styles.hidden
+                }
+              >
                 <td>コンテキスト使用量を確認</td>
-                <td><code>/context</code></td>
+                <td>
+                  <code>/context</code>
+                </td>
                 <td>上限に達する前に行動できる</td>
               </tr>
-              <tr className={matchSearch("作業が迷走したとき /rewind 正しい状態に素早く戻せる") ? "" : styles.hidden}>
+              <tr
+                className={
+                  matchSearch("作業が迷走したとき /rewind 正しい状態に素早く戻せる")
+                    ? ""
+                    : styles.hidden
+                }
+              >
                 <td>作業が迷走したとき</td>
-                <td><code>/rewind</code></td>
+                <td>
+                  <code>/rewind</code>
+                </td>
                 <td>正しい状態に素早く戻れる</td>
               </tr>
             </tbody>
@@ -725,13 +916,19 @@ export default function SlashCommandsGuideClient() {
             </div>
             <pre>
               <code>
-                <span className={styles.tCmd}>/model</span> opus    <span className={styles.tCmt}># Claude Opus 4.8 — 高精度・複雑タスク向け</span>
+                <span className={styles.tCmd}>/model</span> opus{" "}
+                <span className={styles.tCmt}># Claude Opus 4.8 — 高精度・複雑タスク向け</span>
                 {"\n"}
-                <span className={styles.tCmd}>/model</span> sonnet  <span className={styles.tCmt}># Claude Sonnet 4.6 — バランス型・日常タスク向け</span>
+                <span className={styles.tCmd}>/model</span> sonnet{" "}
+                <span className={styles.tCmt}>
+                  # Claude Sonnet 4.6 — バランス型・日常タスク向け
+                </span>
                 {"\n"}
-                <span className={styles.tCmd}>/model</span> haiku   <span className={styles.tCmt}># Claude Haiku 4.5 — 高速・軽量タスク向け</span>
+                <span className={styles.tCmd}>/model</span> haiku{" "}
+                <span className={styles.tCmt}># Claude Haiku 4.5 — 高速・軽量タスク向け</span>
                 {"\n"}
-                <span className={styles.tCmd}>/model</span>         <span className={styles.tCmt}># モデルピッカー UI を開く</span>
+                <span className={styles.tCmd}>/model</span>{" "}
+                <span className={styles.tCmt}># モデルピッカー UI を開く</span>
               </code>
             </pre>
           </div>
@@ -741,7 +938,8 @@ export default function SlashCommandsGuideClient() {
             <div className={styles.calloutBody}>
               <div className={styles.calloutTitle}>v2.1.153 以降の変更</div>
               <p>
-                モデルピッカーで選択したモデルは以降の新規セッションのデフォルトとして保存されます。現在のセッションのみに適用したい場合は <code>s</code> キーを押してください。
+                モデルピッカーで選択したモデルは以降の新規セッションのデフォルトとして保存されます。現在のセッションのみに適用したい場合は{" "}
+                <code>s</code> キーを押してください。
               </p>
             </div>
           </div>
@@ -756,28 +954,56 @@ export default function SlashCommandsGuideClient() {
               </tr>
             </thead>
             <tbody>
-              <tr className={matchSearch("low 軽量な推論 コード補完 単純な検索") ? "" : styles.hidden}>
-                <td><code>low</code></td>
+              <tr
+                className={matchSearch("low 軽量な推論 コード補完 単純な検索") ? "" : styles.hidden}
+              >
+                <td>
+                  <code>low</code>
+                </td>
                 <td>軽量な推論</td>
                 <td>コード補完、単純な検索</td>
               </tr>
-              <tr className={matchSearch("medium 標準推論 一般的なコーディングタスク") ? "" : styles.hidden}>
-                <td><code>medium</code></td>
+              <tr
+                className={
+                  matchSearch("medium 標準推論 一般的なコーディングタスク") ? "" : styles.hidden
+                }
+              >
+                <td>
+                  <code>medium</code>
+                </td>
                 <td>標準推論</td>
                 <td>一般的なコーディングタスク</td>
               </tr>
-              <tr className={matchSearch("high 深い推論 複雑なリファクタリング 設計") ? "" : styles.hidden}>
-                <td><code>high</code></td>
+              <tr
+                className={
+                  matchSearch("high 深い推論 複雑なリファクタリング 設計") ? "" : styles.hidden
+                }
+              >
+                <td>
+                  <code>high</code>
+                </td>
                 <td>深い推論</td>
                 <td>複雑なリファクタリング、設計</td>
               </tr>
-              <tr className={matchSearch("xhigh 最高レベル 難解なバグ修正 アーキテクチャ設計") ? "" : styles.hidden}>
-                <td><code>xhigh</code></td>
+              <tr
+                className={
+                  matchSearch("xhigh 最高レベル 難解なバグ修正 アーキテクチャ設計")
+                    ? ""
+                    : styles.hidden
+                }
+              >
+                <td>
+                  <code>xhigh</code>
+                </td>
                 <td>最高レベル（Opus 4.8 推奨）</td>
                 <td>難解なバグ修正、アーキテクチャ設計</td>
               </tr>
-              <tr className={matchSearch("auto モデルデフォルトに戻す リセット") ? "" : styles.hidden}>
-                <td><code>auto</code></td>
+              <tr
+                className={matchSearch("auto モデルデフォルトに戻す リセット") ? "" : styles.hidden}
+              >
+                <td>
+                  <code>auto</code>
+                </td>
                 <td>モデルデフォルトに戻す</td>
                 <td>リセットしたいとき</td>
               </tr>
@@ -796,15 +1022,20 @@ export default function SlashCommandsGuideClient() {
             </div>
             <pre>
               <code>
-                <span className={styles.tCmd}>/effort</span> high    <span className={styles.tCmt}># 高精度推論に設定</span>
+                <span className={styles.tCmd}>/effort</span> high{" "}
+                <span className={styles.tCmt}># 高精度推論に設定</span>
                 {"\n"}
-                <span className={styles.tCmd}>/effort</span> xhigh   <span className={styles.tCmt}># 最高精度（Opus 4.8 推奨）</span>
+                <span className={styles.tCmd}>/effort</span> xhigh{" "}
+                <span className={styles.tCmt}># 最高精度（Opus 4.8 推奨）</span>
                 {"\n"}
-                <span className={styles.tCmd}>/effort</span>         <span className={styles.tCmt}># インタラクティブスライダーを開く</span>
+                <span className={styles.tCmd}>/effort</span>{" "}
+                <span className={styles.tCmt}># インタラクティブスライダーを開く</span>
                 {"\n"}
-                <span className={styles.tCmd}>/fast</span> on        <span className={styles.tCmt}># 素早い・簡潔な回答に切り替え</span>
+                <span className={styles.tCmd}>/fast</span> on{" "}
+                <span className={styles.tCmt}># 素早い・簡潔な回答に切り替え</span>
                 {"\n"}
-                <span className={styles.tCmd}>/fast</span> off       <span className={styles.tCmt}># 通常モードに戻す</span>
+                <span className={styles.tCmd}>/fast</span> off{" "}
+                <span className={styles.tCmt}># 通常モードに戻す</span>
               </code>
             </pre>
           </div>
@@ -833,7 +1064,9 @@ export default function SlashCommandsGuideClient() {
             <div className={styles.calloutBody}>
               <div className={styles.calloutTitle}>/init は最初に実行すべき最重要コマンド</div>
               <p>
-                新しいプロジェクトで Claude Code を使い始める際は必ず <code>/init</code> を実行して <code>CLAUDE.md</code> を作成してください。プロジェクトの文脈を Claude に伝える最も効果的な方法です。
+                新しいプロジェクトで Claude Code を使い始める際は必ず <code>/init</code> を実行して{" "}
+                <code>CLAUDE.md</code> を作成してください。プロジェクトの文脈を Claude
+                に伝える最も効果的な方法です。
               </p>
             </div>
           </div>
@@ -847,62 +1080,134 @@ export default function SlashCommandsGuideClient() {
               </tr>
             </thead>
             <tbody>
-              <tr className={matchSearch("/init CLAUDE.md を作成 初期設定 全プロジェクトで最初に実行") ? "" : styles.hidden}>
-                <td><code>/init</code></td>
+              <tr
+                className={
+                  matchSearch("/init CLAUDE.md を作成 初期設定 全プロジェクトで最初に実行")
+                    ? ""
+                    : styles.hidden
+                }
+              >
+                <td>
+                  <code>/init</code>
+                </td>
                 <td>CLAUDE.md を作成・初期設定</td>
                 <td>全プロジェクトで最初に実行</td>
               </tr>
-              <tr className={matchSearch("/config Settings 設定画面を開く Vimモード") ? "" : styles.hidden}>
-                <td><code>/config</code></td>
+              <tr
+                className={
+                  matchSearch("/config Settings 設定画面を開く Vimモード") ? "" : styles.hidden
+                }
+              >
+                <td>
+                  <code>/config</code>
+                </td>
                 <td>Claude Code の設定画面を開く</td>
                 <td>Vim モード・ワークフロー設定</td>
               </tr>
               <tr className={matchSearch("/memory メモリファイルを開く 編集") ? "" : styles.hidden}>
-                <td><code>/memory</code></td>
+                <td>
+                  <code>/memory</code>
+                </td>
                 <td>メモリファイルを開く・編集</td>
                 <td>CLAUDE.md のワークフロー管理</td>
               </tr>
-              <tr className={matchSearch("/permissions 権限設定をインタラクティブに管理 コマンドブロック") ? "" : styles.hidden}>
-                <td><code>/permissions</code></td>
+              <tr
+                className={
+                  matchSearch("/permissions 権限設定をインタラクティブに管理 コマンドブロック")
+                    ? ""
+                    : styles.hidden
+                }
+              >
+                <td>
+                  <code>/permissions</code>
+                </td>
                 <td>権限設定をインタラクティブに管理</td>
                 <td>コマンドがブロックされたときに確認</td>
               </tr>
-              <tr className={matchSearch("/hooks フックスクリプトを管理 PreToolUse") ? "" : styles.hidden}>
-                <td><code>/hooks</code></td>
+              <tr
+                className={
+                  matchSearch("/hooks フックスクリプトを管理 PreToolUse") ? "" : styles.hidden
+                }
+              >
+                <td>
+                  <code>/hooks</code>
+                </td>
                 <td>フックスクリプトを管理</td>
                 <td>PreToolUse・SessionStart イベント</td>
               </tr>
               <tr className={matchSearch("/doctor 診断を実行 問題を自動修正") ? "" : styles.hidden}>
-                <td><code>/doctor</code></td>
+                <td>
+                  <code>/doctor</code>
+                </td>
                 <td>診断を実行・問題を自動修正</td>
-                <td>インストール後や更新後に実行。<code>f</code> で自動修正</td>
+                <td>
+                  インストール後や更新後に実行。<code>f</code> で自動修正
+                </td>
               </tr>
-              <tr className={matchSearch("/terminal-setup ターミナル統合を設定 VS Code 文字化け") ? "" : styles.hidden}>
-                <td><code>/terminal-setup</code></td>
+              <tr
+                className={
+                  matchSearch("/terminal-setup ターミナル統合を設定 VS Code 文字化け")
+                    ? ""
+                    : styles.hidden
+                }
+              >
+                <td>
+                  <code>/terminal-setup</code>
+                </td>
                 <td>ターミナル統合を設定</td>
                 <td>VS Code / Cursor での文字化けを防ぐ</td>
               </tr>
-              <tr className={matchSearch("/sandbox サンドボックス制御を開く 実行権限") ? "" : styles.hidden}>
-                <td><code>/sandbox</code></td>
+              <tr
+                className={
+                  matchSearch("/sandbox サンドボックス制御を開く 実行権限") ? "" : styles.hidden
+                }
+              >
+                <td>
+                  <code>/sandbox</code>
+                </td>
                 <td>サンドボックス制御を開く</td>
                 <td>実行権限の確認</td>
               </tr>
-              <tr className={matchSearch("/add-dir 作業スコープにディレクトリを追加 モノレポ") ? "" : styles.hidden}>
-                <td><code>/add-dir &lt;パス&gt;</code></td>
+              <tr
+                className={
+                  matchSearch("/add-dir 作業スコープにディレクトリを追加 モノレポ")
+                    ? ""
+                    : styles.hidden
+                }
+              >
+                <td>
+                  <code>/add-dir &lt;パス&gt;</code>
+                </td>
                 <td>作業スコープにディレクトリを追加</td>
                 <td>モノレポや隣接プロジェクト向け</td>
               </tr>
-              <tr className={matchSearch("/keybindings ショートカットをカスタマイズ keybindings.json") ? "" : styles.hidden}>
-                <td><code>/keybindings</code></td>
+              <tr
+                className={
+                  matchSearch("/keybindings ショートカットをカスタマイズ keybindings.json")
+                    ? ""
+                    : styles.hidden
+                }
+              >
+                <td>
+                  <code>/keybindings</code>
+                </td>
                 <td>キーボードショートカットをカスタマイズ</td>
                 <td>~/.claude/keybindings.json を編集</td>
               </tr>
               <tr className={matchSearch("/theme テーマを変更 作成 themes") ? "" : styles.hidden}>
-                <td><code>/theme</code></td>
+                <td>
+                  <code>/theme</code>
+                </td>
                 <td>テーマを変更・作成</td>
                 <td>~/.claude/themes/ に JSON を配置</td>
               </tr>
-              <tr className={matchSearch("/team-onboarding チーム向けガイド自動生成 オンボーディング") ? "" : styles.hidden}>
+              <tr
+                className={
+                  matchSearch("/team-onboarding チーム向けガイド自動生成 オンボーディング")
+                    ? ""
+                    : styles.hidden
+                }
+              >
                 <td>
                   <code>/team-onboarding</code>
                   <span className={`${styles.pill} ${styles.pillNew}`}>v2.1.101+</span>
@@ -910,8 +1215,14 @@ export default function SlashCommandsGuideClient() {
                 <td>チームメンバー向けガイドを自動生成</td>
                 <td>オンボーディングコストを削減</td>
               </tr>
-              <tr className={matchSearch("/status セッション 環境状態を表示 最初に確認") ? "" : styles.hidden}>
-                <td><code>/status</code></td>
+              <tr
+                className={
+                  matchSearch("/status セッション 環境状態を表示 最初に確認") ? "" : styles.hidden
+                }
+              >
+                <td>
+                  <code>/status</code>
+                </td>
                 <td>現在のセッション・環境状態を表示</td>
                 <td>最初に確認する習慣をつける</td>
               </tr>
@@ -934,27 +1245,20 @@ export default function SlashCommandsGuideClient() {
                 <span className={styles.tKey}># プロジェクト名</span>
                 {"\n\n"}
                 <span className={styles.tKey}>## コンテキスト</span>
-                {"\n"}
-                - 使用言語・フレームワーク（例: TypeScript + Next.js）{"\n"}
-                - アーキテクチャの概要{"\n"}
-                - 担当チームと責任範囲
+                {"\n"}- 使用言語・フレームワーク（例: TypeScript + Next.js）{"\n"}-
+                アーキテクチャの概要{"\n"}- 担当チームと責任範囲
                 {"\n\n"}
                 <span className={styles.tKey}>## 開発規約</span>
-                {"\n"}
-                - コーディングスタイル（Prettier, ESLint の設定）{"\n"}
-                - テストの書き方（Vitest, テストカバレッジ要件）{"\n"}
-                - コミットメッセージの形式（Conventional Commits）
+                {"\n"}- コーディングスタイル（Prettier, ESLint の設定）{"\n"}-
+                テストの書き方（Vitest, テストカバレッジ要件）{"\n"}-
+                コミットメッセージの形式（Conventional Commits）
                 {"\n\n"}
                 <span className={styles.tKey}>## 禁止事項</span>
-                {"\n"}
-                - 本番コードに console.log を残さない{"\n"}
-                - 使用禁止のライブラリ一覧
+                {"\n"}- 本番コードに console.log を残さない{"\n"}- 使用禁止のライブラリ一覧
                 {"\n\n"}
                 <span className={styles.tKey}>## よく使うコマンド</span>
-                {"\n"}
-                - ビルド: `npm run build`{"\n"}
-                - テスト: `npm test`{"\n"}
-                - デプロイ: `npm run deploy`
+                {"\n"}- ビルド: `npm run build`{"\n"}- テスト: `npm test`{"\n"}- デプロイ: `npm run
+                deploy`
               </code>
             </pre>
           </div>
@@ -968,16 +1272,26 @@ export default function SlashCommandsGuideClient() {
               </tr>
             </thead>
             <tbody>
-              <tr className={matchSearch("Shift+Tab モード切替 自動承認 プランモード") ? "" : styles.hidden}>
-                <td><code>Shift+Tab</code></td>
+              <tr
+                className={
+                  matchSearch("Shift+Tab モード切替 自動承認 プランモード") ? "" : styles.hidden
+                }
+              >
+                <td>
+                  <code>Shift+Tab</code>
+                </td>
                 <td>モード切替（通常 → 自動承認 → プランモード）を順番に切り替え</td>
               </tr>
               <tr className={matchSearch("Esc 2回 巻き戻す rewind") ? "" : styles.hidden}>
-                <td><code>Esc × 2</code></td>
+                <td>
+                  <code>Esc × 2</code>
+                </td>
                 <td>直前の状態に巻き戻す（/rewind と同じ）</td>
               </tr>
               <tr className={matchSearch("Ctrl+A セッション一覧を表示") ? "" : styles.hidden}>
-                <td><code>Ctrl+A</code></td>
+                <td>
+                  <code>Ctrl+A</code>
+                </td>
                 <td>全プロジェクトのセッション一覧を表示</td>
               </tr>
             </tbody>
@@ -1006,20 +1320,32 @@ export default function SlashCommandsGuideClient() {
             </thead>
             <tbody>
               <tr className={matchSearch("/plan 実装計画を立案 プランモード") ? "" : styles.hidden}>
-                <td><code>/plan [説明]</code></td>
+                <td>
+                  <code>/plan [説明]</code>
+                </td>
                 <td>
                   <span className={`${styles.pill} ${styles.pillBuiltin}`}>組込</span>
                 </td>
                 <td>プランモードに入る。コードを書く前に実装計画を立案</td>
               </tr>
-              <tr className={matchSearch("/diff インタラクティブ差分ビューワー") ? "" : styles.hidden}>
-                <td><code>/diff</code></td>
+              <tr
+                className={matchSearch("/diff インタラクティブ差分ビューワー") ? "" : styles.hidden}
+              >
+                <td>
+                  <code>/diff</code>
+                </td>
                 <td>
                   <span className={`${styles.pill} ${styles.pillBuiltin}`}>組込</span>
                 </td>
                 <td>インタラクティブ差分ビューワー。左右矢印でターン別差分を切替</td>
               </tr>
-              <tr className={matchSearch("/code-review バグ セキュリティ問題検出 /simplify") ? "" : styles.hidden}>
+              <tr
+                className={
+                  matchSearch("/code-review バグ セキュリティ問題検出 /simplify")
+                    ? ""
+                    : styles.hidden
+                }
+              >
                 <td>
                   <code>/code-review [effort]</code>
                   <span className={`${styles.pill} ${styles.pillNew}`}>改名</span>
@@ -1029,22 +1355,40 @@ export default function SlashCommandsGuideClient() {
                 </td>
                 <td>バグ・セキュリティ問題の検出（v2.1.147 で /simplify から改名）</td>
               </tr>
-              <tr className={matchSearch("/security-review セキュリティ脆弱性 SQLインジェクション XSS") ? "" : styles.hidden}>
-                <td><code>/security-review</code></td>
+              <tr
+                className={
+                  matchSearch("/security-review セキュリティ脆弱性 SQLインジェクション XSS")
+                    ? ""
+                    : styles.hidden
+                }
+              >
+                <td>
+                  <code>/security-review</code>
+                </td>
                 <td>
                   <span className={`${styles.pill} ${styles.pillSkill}`}>スキル</span>
                 </td>
                 <td>セキュリティ脆弱性の分析（SQL インジェクション・XSS・認証問題など）</td>
               </tr>
-              <tr className={matchSearch("/ultrareview 超詳細なコードレビュー PR") ? "" : styles.hidden}>
-                <td><code>/ultrareview</code></td>
+              <tr
+                className={
+                  matchSearch("/ultrareview 超詳細なコードレビュー PR") ? "" : styles.hidden
+                }
+              >
+                <td>
+                  <code>/ultrareview</code>
+                </td>
                 <td>
                   <span className={`${styles.pill} ${styles.pillSkill}`}>スキル</span>
                 </td>
                 <td>超詳細なコードレビュー。重要な PR に使用</td>
               </tr>
-              <tr className={matchSearch("/autofix-pr 自動修正エージェント起動") ? "" : styles.hidden}>
-                <td><code>/autofix-pr [説明]</code></td>
+              <tr
+                className={matchSearch("/autofix-pr 自動修正エージェント起動") ? "" : styles.hidden}
+              >
+                <td>
+                  <code>/autofix-pr [説明]</code>
+                </td>
                 <td>
                   <span className={`${styles.pill} ${styles.pillSkill}`}>スキル</span>
                 </td>
@@ -1075,7 +1419,8 @@ export default function SlashCommandsGuideClient() {
               <div className={styles.stepContent}>
                 <div className={styles.stepTitle}>/code-review — バグを検出</div>
                 <div className={styles.stepDesc}>
-                  正確性のバグをエフォートレベルを指定して検出。<code>--comment</code> オプションで GitHub PR にインラインコメントを投稿できます。
+                  正確性のバグをエフォートレベルを指定して検出。<code>--comment</code> オプションで
+                  GitHub PR にインラインコメントを投稿できます。
                 </div>
               </div>
             </div>
@@ -1121,36 +1466,62 @@ export default function SlashCommandsGuideClient() {
               </tr>
             </thead>
             <tbody>
-              <tr className={matchSearch("/batch 並列エージェントに分散実行 gh CLI") ? "" : styles.hidden}>
-                <td><code>/batch &lt;指示&gt;</code></td>
+              <tr
+                className={
+                  matchSearch("/batch 並列エージェントに分散実行 gh CLI") ? "" : styles.hidden
+                }
+              >
+                <td>
+                  <code>/batch &lt;指示&gt;</code>
+                </td>
                 <td>
                   <span className={`${styles.pill} ${styles.pillSkill}`}>スキル</span>
                 </td>
                 <td>大規模変更を並列エージェントに分散実行（gh CLI 必須）</td>
               </tr>
-              <tr className={matchSearch("/agents サブエージェントを管理 一覧") ? "" : styles.hidden}>
-                <td><code>/agents</code></td>
+              <tr
+                className={matchSearch("/agents サブエージェントを管理 一覧") ? "" : styles.hidden}
+              >
+                <td>
+                  <code>/agents</code>
+                </td>
                 <td>
                   <span className={`${styles.pill} ${styles.pillBuiltin}`}>組込</span>
                 </td>
                 <td>サブエージェントを管理・一覧表示</td>
               </tr>
-              <tr className={matchSearch("/tasks バックグラウンドエージェント") ? "" : styles.hidden}>
-                <td><code>/tasks</code></td>
+              <tr
+                className={matchSearch("/tasks バックグラウンドエージェント") ? "" : styles.hidden}
+              >
+                <td>
+                  <code>/tasks</code>
+                </td>
                 <td>
                   <span className={`${styles.pill} ${styles.pillBuiltin}`}>組込</span>
                 </td>
                 <td>バックグラウンドエージェントを一覧表示</td>
               </tr>
-              <tr className={matchSearch("/bashes バックグラウンド bash タスク") ? "" : styles.hidden}>
-                <td><code>/bashes</code></td>
+              <tr
+                className={matchSearch("/bashes バックグラウンド bash タスク") ? "" : styles.hidden}
+              >
+                <td>
+                  <code>/bashes</code>
+                </td>
                 <td>
                   <span className={`${styles.pill} ${styles.pillBuiltin}`}>組込</span>
                 </td>
                 <td>バックグラウンドの bash タスクを一覧</td>
               </tr>
-              <tr className={matchSearch("/loop 定期的にプロンプトを繰り返し実行 自ペース") ? "" : styles.hidden}>
-                <td><code>/loop [間隔] [プロンプト]</code></td>
+              <tr
+                className={
+                  matchSearch("/loop 定期的にプロンプトを繰り返し実行 自ペース")
+                    ? ""
+                    : styles.hidden
+                }
+              >
+                <td>
+                  <code>/loop [間隔] [プロンプト]</code>
+                </td>
                 <td>
                   <span className={`${styles.pill} ${styles.pillSkill}`}>スキル</span>
                 </td>
@@ -1166,8 +1537,14 @@ export default function SlashCommandsGuideClient() {
                 </td>
                 <td>インストール済みスキルを一覧表示・検索</td>
               </tr>
-              <tr className={matchSearch("/plugins プラグインを管理 MCPサーバー") ? "" : styles.hidden}>
-                <td><code>/plugins</code></td>
+              <tr
+                className={
+                  matchSearch("/plugins プラグインを管理 MCPサーバー") ? "" : styles.hidden
+                }
+              >
+                <td>
+                  <code>/plugins</code>
+                </td>
                 <td>
                   <span className={`${styles.pill} ${styles.pillBuiltin}`}>組込</span>
                 </td>
@@ -1195,14 +1572,22 @@ export default function SlashCommandsGuideClient() {
             </div>
             <pre>
               <code>
-                <span className={styles.tCmt}># 全 API エンドポイントのエラーハンドリングを統一</span>
+                <span className={styles.tCmt}>
+                  # 全 API エンドポイントのエラーハンドリングを統一
+                </span>
                 {"\n"}
-                <span className={styles.tCmd}>/batch</span> <span className={styles.tStr}>全 API エンドポイントのエラーハンドリングを統一して</span>{"\n"}
+                <span className={styles.tCmd}>/batch</span>{" "}
+                <span className={styles.tStr}>
+                  全 API エンドポイントのエラーハンドリングを統一して
+                </span>
+                {"\n"}
                 <span className={styles.tStr}>型安全な Result 型を返すようにリファクタリング</span>
                 {"\n\n"}
                 <span className={styles.tCmt}># テストカバレッジを向上させる</span>
                 {"\n"}
-                <span className={styles.tCmd}>/batch</span> <span className={styles.tStr}>テストカバレッジが 50% 以下のモジュールに</span>{"\n"}
+                <span className={styles.tCmd}>/batch</span>{" "}
+                <span className={styles.tStr}>テストカバレッジが 50% 以下のモジュールに</span>
+                {"\n"}
                 <span className={styles.tStr}>ユニットテストを追加</span>
               </code>
             </pre>
@@ -1223,13 +1608,17 @@ export default function SlashCommandsGuideClient() {
               <code>
                 <span className={styles.tCmt}># 5 分ごとにプロンプトを実行</span>
                 {"\n"}
-                <span className={styles.tCmd}>/loop</span> 5m <span className={styles.tStr}>テスト結果を確認して失敗しているテストを修正</span>
+                <span className={styles.tCmd}>/loop</span> 5m{" "}
+                <span className={styles.tStr}>テスト結果を確認して失敗しているテストを修正</span>
                 {"\n\n"}
                 <span className={styles.tCmt}># 間隔を省略すると Claude が自分でペースを決定</span>
                 {"\n"}
-                <span className={styles.tCmd}>/loop</span> <span className={styles.tStr}>ログを監視してエラーが出たら通知</span>
+                <span className={styles.tCmd}>/loop</span>{" "}
+                <span className={styles.tStr}>ログを監視してエラーが出たら通知</span>
                 {"\n\n"}
-                <span className={styles.tCmt}># プロンプトを省略すると自律的なメンテナンスモードに</span>
+                <span className={styles.tCmt}>
+                  # プロンプトを省略すると自律的なメンテナンスモードに
+                </span>
                 {"\n"}
                 <span className={styles.tCmd}>/loop</span>
               </code>
@@ -1250,7 +1639,8 @@ export default function SlashCommandsGuideClient() {
           </div>
 
           <p className={styles.lead}>
-            MCP（Model Context Protocol）サーバーを通じて、外部サービス（GitHub, Asana, Gmail など）と連携できます。
+            MCP（Model Context Protocol）サーバーを通じて、外部サービス（GitHub, Asana, Gmail
+            など）と連携できます。
           </p>
 
           <table className={styles.dataTable}>
@@ -1261,16 +1651,32 @@ export default function SlashCommandsGuideClient() {
               </tr>
             </thead>
             <tbody>
-              <tr className={matchSearch("/mcp MCP サーバーの状態を表示 管理") ? "" : styles.hidden}>
-                <td><code>/mcp</code></td>
+              <tr
+                className={matchSearch("/mcp MCP サーバーの状態を表示 管理") ? "" : styles.hidden}
+              >
+                <td>
+                  <code>/mcp</code>
+                </td>
                 <td>MCP サーバーの状態を表示・管理</td>
               </tr>
-              <tr className={matchSearch("/mcp enable 指定した MCP サーバーを有効化") ? "" : styles.hidden}>
-                <td><code>/mcp enable [名前]</code></td>
+              <tr
+                className={
+                  matchSearch("/mcp enable 指定した MCP サーバーを有効化") ? "" : styles.hidden
+                }
+              >
+                <td>
+                  <code>/mcp enable [名前]</code>
+                </td>
                 <td>指定した MCP サーバーを有効化</td>
               </tr>
-              <tr className={matchSearch("/mcp disable 指定した MCP サーバーを無効化") ? "" : styles.hidden}>
-                <td><code>/mcp disable [名前]</code></td>
+              <tr
+                className={
+                  matchSearch("/mcp disable 指定した MCP サーバーを無効化") ? "" : styles.hidden
+                }
+              >
+                <td>
+                  <code>/mcp disable [名前]</code>
+                </td>
                 <td>指定した MCP サーバーを無効化</td>
               </tr>
             </tbody>
@@ -1282,9 +1688,7 @@ export default function SlashCommandsGuideClient() {
                 <i className="ti ti-terminal" />
                 使用例
               </span>
-              <CodeCopyButton
-                text={`/mcp\n/mcp enable github\n/mcp disable github`}
-              />
+              <CodeCopyButton text={`/mcp\n/mcp enable github\n/mcp disable github`} />
             </div>
             <pre>
               <code>
@@ -1308,7 +1712,9 @@ export default function SlashCommandsGuideClient() {
             <div className={styles.calloutBody}>
               <div className={styles.calloutTitle}>MCP コマンドの拡張</div>
               <p>
-                インストール済みのプラグインや接続済みの MCP サーバーは追加のスラッシュコマンドを提供することがあります。<code>/skills</code> や <code>/mcp</code> で現在有効なコマンドを確認してください。
+                インストール済みのプラグインや接続済みの MCP
+                サーバーは追加のスラッシュコマンドを提供することがあります。<code>/skills</code> や{" "}
+                <code>/mcp</code> で現在有効なコマンドを確認してください。
               </p>
             </div>
           </div>
@@ -1337,9 +1743,7 @@ export default function SlashCommandsGuideClient() {
                 <i className="ti ti-terminal" />
                 bash
               </span>
-              <CodeCopyButton
-                text={`mkdir -p .claude/commands\nmkdir -p ~/.claude/commands`}
-              />
+              <CodeCopyButton text={`mkdir -p .claude/commands\nmkdir -p ~/.claude/commands`} />
             </div>
             <pre>
               <code>
@@ -1356,7 +1760,8 @@ export default function SlashCommandsGuideClient() {
 
           <h3>ステップ 2: Markdown ファイルを作成</h3>
           <p>
-            ファイル名がそのままコマンド名になります（例: <code>optimize.md</code> → <code>/optimize</code>）。
+            ファイル名がそのままコマンド名になります（例: <code>optimize.md</code> →{" "}
+            <code>/optimize</code>）。
           </p>
           <div className={styles.codeBlock}>
             <div className={styles.codeBlockHeader}>
@@ -1397,18 +1802,18 @@ export default function SlashCommandsGuideClient() {
               <code>
                 <span className={styles.tKey}>---</span>
                 {"\n"}
-                <span className={styles.tKey}>description</span>: セキュリティ脆弱性スキャンを実行{"\n"}
-                <span className={styles.tKey}>allowed-tools</span>: Read, Grep, Glob, Bash, WebFetch{"\n"}
+                <span className={styles.tKey}>description</span>: セキュリティ脆弱性スキャンを実行
+                {"\n"}
+                <span className={styles.tKey}>allowed-tools</span>: Read, Grep, Glob, Bash, WebFetch
+                {"\n"}
                 <span className={styles.tKey}>model</span>: claude-opus-4-7{"\n"}
-                <span className={styles.tKey}>argument-hint</span>: <span className={styles.tStr}>&quot;[ブランチ名またはファイルパス]&quot;</span>
+                <span className={styles.tKey}>argument-hint</span>:{" "}
+                <span className={styles.tStr}>&quot;[ブランチ名またはファイルパス]&quot;</span>
                 {"\n"}
                 <span className={styles.tKey}>---</span>
                 {"\n\n"}
-                以下の観点でセキュリティ監査を実施してください：{"\n"}
-                - SQL インジェクションのリスク{"\n"}
-                - XSS 脆弱性{"\n"}
-                - 認証・認可の問題{"\n"}
-                - クレデンシャルの露出
+                以下の観点でセキュリティ監査を実施してください：{"\n"}- SQL インジェクションのリスク
+                {"\n"}- XSS 脆弱性{"\n"}- 認証・認可の問題{"\n"}- クレデンシャルの露出
                 {"\n\n"}
                 対象: <span className={styles.tKey}>$ARGUMENTS</span>
               </code>
@@ -1425,30 +1830,56 @@ export default function SlashCommandsGuideClient() {
               </tr>
             </thead>
             <tbody>
-              <tr className={matchSearch("description コマンドの説明 メニューに表示") ? "" : styles.hidden}>
-                <td><code>description</code></td>
+              <tr
+                className={
+                  matchSearch("description コマンドの説明 メニューに表示") ? "" : styles.hidden
+                }
+              >
+                <td>
+                  <code>description</code>
+                </td>
                 <td>コマンドの説明（/ メニューに表示）</td>
-                <td><code>&quot;セキュリティレビューを実行&quot;</code></td>
+                <td>
+                  <code>&quot;セキュリティレビューを実行&quot;</code>
+                </td>
               </tr>
-              <tr className={matchSearch("allowed-tools 使用を許可するツール") ? "" : styles.hidden}>
-                <td><code>allowed-tools</code></td>
+              <tr
+                className={matchSearch("allowed-tools 使用を許可するツール") ? "" : styles.hidden}
+              >
+                <td>
+                  <code>allowed-tools</code>
+                </td>
                 <td>使用を許可するツール</td>
-                <td><code>Read, Grep, Glob, Bash</code></td>
+                <td>
+                  <code>Read, Grep, Glob, Bash</code>
+                </td>
               </tr>
               <tr className={matchSearch("model 使用するモデルを固定") ? "" : styles.hidden}>
-                <td><code>model</code></td>
+                <td>
+                  <code>model</code>
+                </td>
                 <td>使用するモデルを固定</td>
-                <td><code>claude-opus-4-7</code></td>
+                <td>
+                  <code>claude-opus-4-7</code>
+                </td>
               </tr>
               <tr className={matchSearch("argument-hint 引数のヒント表示") ? "" : styles.hidden}>
-                <td><code>argument-hint</code></td>
+                <td>
+                  <code>argument-hint</code>
+                </td>
                 <td>引数のヒント表示</td>
-                <td><code>&quot;[ファイルパス]&quot;</code></td>
+                <td>
+                  <code>&quot;[ファイルパス]&quot;</code>
+                </td>
               </tr>
               <tr className={matchSearch("context コンテキストの扱い fork") ? "" : styles.hidden}>
-                <td><code>context</code></td>
+                <td>
+                  <code>context</code>
+                </td>
                 <td>コンテキストの扱い</td>
-                <td><code>fork</code></td>
+                <td>
+                  <code>fork</code>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -1468,11 +1899,11 @@ export default function SlashCommandsGuideClient() {
               <code>
                 <span className={styles.tCmt}># 従来（引き続き動作）</span>
                 {"\n"}
-                .claude/commands/review.md      →  <span className={styles.tCmd}>/review</span>
+                .claude/commands/review.md → <span className={styles.tCmd}>/review</span>
                 {"\n\n"}
                 <span className={styles.tCmt}># 推奨（スキル形式）</span>
                 {"\n"}
-                .claude/skills/review/SKILL.md  →  <span className={styles.tCmd}>/review</span>
+                .claude/skills/review/SKILL.md → <span className={styles.tCmd}>/review</span>
                 {"\n\n"}
                 <span className={styles.tCmt}># 同名の場合はスキルが優先</span>
               </code>
@@ -1489,15 +1920,29 @@ export default function SlashCommandsGuideClient() {
               </tr>
             </thead>
             <tbody>
-              <tr className={matchSearch("$ARGUMENTS コマンド名の後ろに入力した全テキスト") ? "" : styles.hidden}>
-                <td><code>$ARGUMENTS</code></td>
+              <tr
+                className={
+                  matchSearch("$ARGUMENTS コマンド名の後ろに入力した全テキスト")
+                    ? ""
+                    : styles.hidden
+                }
+              >
+                <td>
+                  <code>$ARGUMENTS</code>
+                </td>
                 <td>コマンド名の後ろに入力した全テキスト</td>
-                <td><code>/fix-issue 123 high</code> → <code>&quot;123 high&quot;</code></td>
+                <td>
+                  <code>/fix-issue 123 high</code> → <code>&quot;123 high&quot;</code>
+                </td>
               </tr>
               <tr className={matchSearch("$1 $2 スペース区切りの引数") ? "" : styles.hidden}>
-                <td><code>$1</code>, <code>$2</code></td>
+                <td>
+                  <code>$1</code>, <code>$2</code>
+                </td>
                 <td>スペース区切りの引数</td>
-                <td><code>/fix-issue 123 high</code> → <code>$1=123, $2=high</code></td>
+                <td>
+                  <code>/fix-issue 123 high</code> → <code>$1=123, $2=high</code>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -1515,7 +1960,14 @@ export default function SlashCommandsGuideClient() {
             </div>
           </div>
 
-          <div className={styles.bestPractice} style={{ display: matchSearch("BP-01 セッション開始時のルーティン status context compact") ? "" : "none" }}>
+          <div
+            className={styles.bestPractice}
+            style={{
+              display: matchSearch("BP-01 セッション開始時のルーティン status context compact")
+                ? ""
+                : "none",
+            }}
+          >
             <div className={styles.bpHeader}>
               <span className={styles.bpNum}>BP-01</span>
               <span className={styles.bpTitle}>セッション開始時のルーティン</span>
@@ -1525,53 +1977,90 @@ export default function SlashCommandsGuideClient() {
             </div>
           </div>
 
-          <div className={styles.bestPractice} style={{ display: matchSearch("BP-02 CLAUDE.md を育てる memory") ? "" : "none" }}>
+          <div
+            className={styles.bestPractice}
+            style={{ display: matchSearch("BP-02 CLAUDE.md を育てる memory") ? "" : "none" }}
+          >
             <div className={styles.bpHeader}>
               <span className={styles.bpNum}>BP-02</span>
               <span className={styles.bpTitle}>CLAUDE.md を育てる</span>
             </div>
             <p style={{ margin: 0, fontSize: "13.5px", color: "var(--color-text-secondary)" }}>
-              プロジェクトのルール・禁止事項・よく使うコマンドを CLAUDE.md に蓄積します。Claude はセッション開始時に必ずこのファイルを読み込むため、毎回同じ説明をする必要がなくなります。<code>/memory</code> コマンドで随時更新できます。
+              プロジェクトのルール・禁止事項・よく使うコマンドを CLAUDE.md に蓄積します。Claude
+              はセッション開始時に必ずこのファイルを読み込むため、毎回同じ説明をする必要がなくなります。
+              <code>/memory</code> コマンドで随時更新できます。
             </p>
           </div>
 
-          <div className={styles.bestPractice} style={{ display: matchSearch("BP-03 100 ファイル以上の変更は /batch を使う") ? "" : "none" }}>
+          <div
+            className={styles.bestPractice}
+            style={{
+              display: matchSearch("BP-03 100 ファイル以上の変更は /batch を使う") ? "" : "none",
+            }}
+          >
             <div className={styles.bpHeader}>
               <span className={styles.bpNum}>BP-03</span>
               <span className={styles.bpTitle}>100 ファイル以上の変更は /batch を使う</span>
             </div>
             <p style={{ margin: 0, fontSize: "13.5px", color: "var(--color-text-secondary)" }}>
-              並列エージェントが独立した git worktree で作業するためコンフリクトが少なく、各ユニットに PR が作られるのでレビューも容易になります。大規模リファクタリングには必須です。
+              並列エージェントが独立した git worktree
+              で作業するためコンフリクトが少なく、各ユニットに PR
+              が作られるのでレビューも容易になります。大規模リファクタリングには必須です。
             </p>
           </div>
 
-          <div className={styles.bestPractice} style={{ display: matchSearch("BP-04 セキュリティコードには必ず /security-review") ? "" : "none" }}>
+          <div
+            className={styles.bestPractice}
+            style={{
+              display: matchSearch("BP-04 セキュリティコードには必ず /security-review")
+                ? ""
+                : "none",
+            }}
+          >
             <div className={styles.bpHeader}>
               <span className={styles.bpNum}>BP-04</span>
               <span className={styles.bpTitle}>セキュリティコードには必ず /security-review</span>
             </div>
             <p style={{ margin: 0, fontSize: "13.5px", color: "var(--color-text-secondary)" }}>
-              認証・認可・外部入力処理などセキュリティに関わる変更を行った後は、PR をマージする前に必ず <code>/security-review</code> を実行します。インジェクション・XSS・クレデンシャル露出を自動でチェックします。
+              認証・認可・外部入力処理などセキュリティに関わる変更を行った後は、PR
+              をマージする前に必ず <code>/security-review</code>{" "}
+              を実行します。インジェクション・XSS・クレデンシャル露出を自動でチェックします。
             </p>
           </div>
 
-          <div className={styles.bestPractice} style={{ display: matchSearch("BP-05 チームのワークフローはカスタムコマンドにする") ? "" : "none" }}>
+          <div
+            className={styles.bestPractice}
+            style={{
+              display: matchSearch("BP-05 チームのワークフローはカスタムコマンドにする")
+                ? ""
+                : "none",
+            }}
+          >
             <div className={styles.bpHeader}>
               <span className={styles.bpNum}>BP-05</span>
               <span className={styles.bpTitle}>チームのワークフローはカスタムコマンドにする</span>
             </div>
             <p style={{ margin: 0, fontSize: "13.5px", color: "var(--color-text-secondary)" }}>
-              繰り返し実行するセキュリティレビュー・デプロイチェック・コードスタイル確認などは <code>.claude/commands/</code> にカスタムコマンドとして保存し、Git で共有します。チーム全体のレビュー品質が均一になります。
+              繰り返し実行するセキュリティレビュー・デプロイチェック・コードスタイル確認などは{" "}
+              <code>.claude/commands/</code> にカスタムコマンドとして保存し、Git
+              で共有します。チーム全体のレビュー品質が均一になります。
             </p>
           </div>
 
-          <div className={styles.bestPractice} style={{ display: matchSearch("BP-06 名前付きセッションで文脈を管理する resume") ? "" : "none" }}>
+          <div
+            className={styles.bestPractice}
+            style={{
+              display: matchSearch("BP-06 名前付きセッションで文脈を管理する resume") ? "" : "none",
+            }}
+          >
             <div className={styles.bpHeader}>
               <span className={styles.bpNum}>BP-06</span>
               <span className={styles.bpTitle}>名前付きセッションで文脈を管理する</span>
             </div>
             <p style={{ margin: 0, fontSize: "13.5px", color: "var(--color-text-secondary)" }}>
-              複数の機能を並行開発する際は <code>claude -n &quot;feature-xxx&quot;</code> で名前付きセッションを使います。<code>/resume &quot;feature-xxx&quot;</code> で過去の作業文脈をそのまま引き継げます。
+              複数の機能を並行開発する際は <code>claude -n &quot;feature-xxx&quot;</code>{" "}
+              で名前付きセッションを使います。<code>/resume &quot;feature-xxx&quot;</code>{" "}
+              で過去の作業文脈をそのまま引き継げます。
             </p>
           </div>
         </section>
@@ -1595,7 +2084,14 @@ export default function SlashCommandsGuideClient() {
           </div>
 
           <h3>ワークフロー B: バグ修正</h3>
-          <div className={styles.codeBlock} style={{ display: matchSearch("ワークフロー B: バグ修正 --from-pr /security-review") ? "" : "none" }}>
+          <div
+            className={styles.codeBlock}
+            style={{
+              display: matchSearch("ワークフロー B: バグ修正 --from-pr /security-review")
+                ? ""
+                : "none",
+            }}
+          >
             <div className={styles.codeBlockHeader}>
               <span className={styles.codeBlockLang}>
                 <i className="ti ti-terminal" />
@@ -1613,7 +2109,10 @@ export default function SlashCommandsGuideClient() {
                 {"\n\n"}
                 <span className={styles.tCmt}># バグを分析・修正・テスト（通常のプロンプト）</span>
                 {"\n"}
-                <span className={styles.tStr}>&quot;TypeError: Cannot read property 'id' of undefined の原因を調査して修正して&quot;</span>
+                <span className={styles.tStr}>
+                  &quot;TypeError: Cannot read property 'id' of undefined
+                  の原因を調査して修正して&quot;
+                </span>
                 {"\n\n"}
                 <span className={styles.tCmt}># 修正後にセキュリティも確認</span>
                 {"\n"}
@@ -1631,7 +2130,16 @@ export default function SlashCommandsGuideClient() {
           </div>
 
           <h3>ワークフロー D: CI/CD での自動実行</h3>
-          <div className={styles.codeBlock} style={{ display: matchSearch("ワークフロー D: CI/CD での自動実行 /code-review /security-scan --bare --output-format json") ? "" : "none" }}>
+          <div
+            className={styles.codeBlock}
+            style={{
+              display: matchSearch(
+                "ワークフロー D: CI/CD での自動実行 /code-review /security-scan --bare --output-format json"
+              )
+                ? ""
+                : "none",
+            }}
+          >
             <div className={styles.codeBlockHeader}>
               <span className={styles.codeBlockLang}>
                 <i className="ti ti-terminal" />
@@ -1645,15 +2153,20 @@ export default function SlashCommandsGuideClient() {
               <code>
                 <span className={styles.tCmt}># ノンインタラクティブでコードレビューを実行</span>
                 {"\n"}
-                <span className={styles.tCmd}>claude</span> <span className={styles.tFlag}>-p</span> <span className={styles.tStr}>&quot;/code-review&quot;</span> --max-turns 5 --output-format json
+                <span className={styles.tCmd}>claude</span> <span className={styles.tFlag}>-p</span>{" "}
+                <span className={styles.tStr}>&quot;/code-review&quot;</span> --max-turns 5
+                --output-format json
                 {"\n\n"}
                 <span className={styles.tCmt}># 特定のファイルを対象にセキュリティスキャン</span>
                 {"\n"}
-                <span className={styles.tCmd}>claude</span> <span className={styles.tFlag}>-p</span> <span className={styles.tStr}>&quot;/security-scan src/auth/&quot;</span> --bare
+                <span className={styles.tCmd}>claude</span> <span className={styles.tFlag}>-p</span>{" "}
+                <span className={styles.tStr}>&quot;/security-scan src/auth/&quot;</span> --bare
                 {"\n\n"}
                 <span className={styles.tCmt}># 結果を JSON で出力して CI ツールで処理</span>
                 {"\n"}
-                <span className={styles.tCmd}>claude</span> <span className={styles.tFlag}>-p</span> <span className={styles.tStr}>&quot;テストを実行してカバレッジを報告&quot;</span> \{"\n"}
+                <span className={styles.tCmd}>claude</span> <span className={styles.tFlag}>-p</span>{" "}
+                <span className={styles.tStr}>&quot;テストを実行してカバレッジを報告&quot;</span> \
+                {"\n"}
                 {"  "}--output-format json --max-turns 10
               </code>
             </pre>
@@ -1673,11 +2186,19 @@ export default function SlashCommandsGuideClient() {
           </div>
 
           <p className={styles.lead}>
-            本ガイドは以下のソースをもとに作成しています。Claude Code は頻繁に更新されるため、最新情報は公式ドキュメントを参照してください。
+            本ガイドは以下のソースをもとに作成しています。Claude Code
+            は頻繁に更新されるため、最新情報は公式ドキュメントを参照してください。
           </p>
 
           <div className={styles.sourceList}>
-            <div className={styles.sourceRow} style={{ display: matchSearch("Anthropic 公式 Claude Code リリースノート release-notes") ? "" : "none" }}>
+            <div
+              className={styles.sourceRow}
+              style={{
+                display: matchSearch("Anthropic 公式 Claude Code リリースノート release-notes")
+                  ? ""
+                  : "none",
+              }}
+            >
               <i className="ti ti-shield-check" />
               <div className={styles.sourceInfo}>
                 <div className={styles.sourceName}>Anthropic 公式 — Claude Code リリースノート</div>
@@ -1690,10 +2211,19 @@ export default function SlashCommandsGuideClient() {
               <span className={styles.sourceDate}>2026-05-31</span>
             </div>
 
-            <div className={styles.sourceRow} style={{ display: matchSearch("Claude Agent SDK Slash Commands 公式ドキュメント agent-sdk") ? "" : "none" }}>
+            <div
+              className={styles.sourceRow}
+              style={{
+                display: matchSearch("Claude Agent SDK Slash Commands 公式ドキュメント agent-sdk")
+                  ? ""
+                  : "none",
+              }}
+            >
               <i className="ti ti-shield-check" />
               <div className={styles.sourceInfo}>
-                <div className={styles.sourceName}>Claude Agent SDK — Slash Commands 公式ドキュメント</div>
+                <div className={styles.sourceName}>
+                  Claude Agent SDK — Slash Commands 公式ドキュメント
+                </div>
                 <div className={styles.sourceHref}>
                   <Ext href="https://code.claude.com/docs/en/agent-sdk/slash-commands">
                     https://code.claude.com/docs/en/agent-sdk/slash-commands
@@ -1703,10 +2233,19 @@ export default function SlashCommandsGuideClient() {
               <span className={styles.sourceDate}>2026-05-31</span>
             </div>
 
-            <div className={styles.sourceRow} style={{ display: matchSearch("Blake Crosley Claude Code Cheat Sheet cheetsheet") ? "" : "none" }}>
+            <div
+              className={styles.sourceRow}
+              style={{
+                display: matchSearch("Blake Crosley Claude Code Cheat Sheet cheetsheet")
+                  ? ""
+                  : "none",
+              }}
+            >
               <i className="ti ti-file-text" />
               <div className={styles.sourceInfo}>
-                <div className={styles.sourceName}>Blake Crosley — Claude Code Cheat Sheet (v2.1.150)</div>
+                <div className={styles.sourceName}>
+                  Blake Crosley — Claude Code Cheat Sheet (v2.1.150)
+                </div>
                 <div className={styles.sourceHref}>
                   <Ext href="https://blakecrosley.com/guides/claude-code-cheatsheet">
                     https://blakecrosley.com/guides/claude-code-cheatsheet
@@ -1716,10 +2255,17 @@ export default function SlashCommandsGuideClient() {
               <span className={styles.sourceDate}>2026-05-24</span>
             </div>
 
-            <div className={styles.sourceRow} style={{ display: matchSearch("ScriptByAI Claude Code Commands Cheat Sheet") ? "" : "none" }}>
+            <div
+              className={styles.sourceRow}
+              style={{
+                display: matchSearch("ScriptByAI Claude Code Commands Cheat Sheet") ? "" : "none",
+              }}
+            >
               <i className="ti ti-file-text" />
               <div className={styles.sourceInfo}>
-                <div className={styles.sourceName}>ScriptByAI — Claude Code Commands Cheat Sheet 2026</div>
+                <div className={styles.sourceName}>
+                  ScriptByAI — Claude Code Commands Cheat Sheet 2026
+                </div>
                 <div className={styles.sourceHref}>
                   <Ext href="https://www.scriptbyai.com/claude-code-commands-cheat-sheet/">
                     https://www.scriptbyai.com/claude-code-commands-cheat-sheet/
@@ -1729,7 +2275,14 @@ export default function SlashCommandsGuideClient() {
               <span className={styles.sourceDate}>2026-05-30</span>
             </div>
 
-            <div className={styles.sourceRow} style={{ display: matchSearch("Emrah Kondur Medium Complete Guide to Slash Commands ekondur") ? "" : "none" }}>
+            <div
+              className={styles.sourceRow}
+              style={{
+                display: matchSearch("Emrah Kondur Medium Complete Guide to Slash Commands ekondur")
+                  ? ""
+                  : "none",
+              }}
+            >
               <i className="ti ti-file-text" />
               <div className={styles.sourceInfo}>
                 <div className={styles.sourceName}>
@@ -1744,7 +2297,14 @@ export default function SlashCommandsGuideClient() {
               <span className={styles.sourceDate}>2026-05-07</span>
             </div>
 
-            <div className={styles.sourceRow} style={{ display: matchSearch("AiOps School Master Tutorial Every Claude Code Slash Command") ? "" : "none" }}>
+            <div
+              className={styles.sourceRow}
+              style={{
+                display: matchSearch("AiOps School Master Tutorial Every Claude Code Slash Command")
+                  ? ""
+                  : "none",
+              }}
+            >
               <i className="ti ti-file-text" />
               <div className={styles.sourceInfo}>
                 <div className={styles.sourceName}>
@@ -1759,7 +2319,14 @@ export default function SlashCommandsGuideClient() {
               <span className={styles.sourceDate}>2026-04-25</span>
             </div>
 
-            <div className={styles.sourceRow} style={{ display: matchSearch("Hidekazu Konishi Claude Code Features and Settings Reference") ? "" : "none" }}>
+            <div
+              className={styles.sourceRow}
+              style={{
+                display: matchSearch("Hidekazu Konishi Claude Code Features and Settings Reference")
+                  ? ""
+                  : "none",
+              }}
+            >
               <i className="ti ti-file-text" />
               <div className={styles.sourceInfo}>
                 <div className={styles.sourceName}>
@@ -1774,7 +2341,16 @@ export default function SlashCommandsGuideClient() {
               <span className={styles.sourceDate}>2026-05-16</span>
             </div>
 
-            <div className={styles.sourceRow} style={{ display: matchSearch("Tim Dietrich Complete Developer Guide to Claude Code Commands") ? "" : "none" }}>
+            <div
+              className={styles.sourceRow}
+              style={{
+                display: matchSearch(
+                  "Tim Dietrich Complete Developer Guide to Claude Code Commands"
+                )
+                  ? ""
+                  : "none",
+              }}
+            >
               <i className="ti ti-file-text" />
               <div className={styles.sourceInfo}>
                 <div className={styles.sourceName}>
@@ -1789,7 +2365,14 @@ export default function SlashCommandsGuideClient() {
               <span className={styles.sourceDate}>2026-03-02</span>
             </div>
 
-            <div className={styles.sourceRow} style={{ display: matchSearch("luongnv89/claude-howto Slash Commands README GitHub") ? "" : "none" }}>
+            <div
+              className={styles.sourceRow}
+              style={{
+                display: matchSearch("luongnv89/claude-howto Slash Commands README GitHub")
+                  ? ""
+                  : "none",
+              }}
+            >
               <i className="ti ti-brand-github" />
               <div className={styles.sourceInfo}>
                 <div className={styles.sourceName}>
@@ -1805,12 +2388,16 @@ export default function SlashCommandsGuideClient() {
             </div>
           </div>
 
-          <div className={`${styles.callout} ${styles.calloutWarning}`} style={{ marginTop: "20px" }}>
+          <div
+            className={`${styles.callout} ${styles.calloutWarning}`}
+            style={{ marginTop: "20px" }}
+          >
             <i className={`ti ti-alert-triangle ${styles.calloutIcon}`} />
             <div className={styles.calloutBody}>
               <div className={styles.calloutTitle}>バージョン差異について</div>
               <p>
-                Claude Code は頻繁にアップデートされます。セッション内で <code>/help</code> を実行し、現在のバージョンで使用可能なコマンドの一覧を確認することを推奨します。
+                Claude Code は頻繁にアップデートされます。セッション内で <code>/help</code>{" "}
+                を実行し、現在のバージョンで使用可能なコマンドの一覧を確認することを推奨します。
               </p>
             </div>
           </div>
