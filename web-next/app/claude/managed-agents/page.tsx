@@ -341,9 +341,7 @@ export default function Page() {
                     <td>
                       <strong>クラウドインフラ活用</strong>
                     </td>
-                    <td>
-                      事前構成済みパッケージ・ネットワーク付きセキュアサンドボックス
-                    </td>
+                    <td>事前構成済みパッケージ・ネットワーク付きセキュアサンドボックス</td>
                   </tr>
                   <tr>
                     <td>
@@ -361,9 +359,7 @@ export default function Page() {
                     <td>
                       <strong>ステートフルセッション</strong>
                     </td>
-                    <td>
-                      複数インタラクションにまたがる永続ファイルシステムと会話履歴
-                    </td>
+                    <td>複数インタラクションにまたがる永続ファイルシステムと会話履歴</td>
                   </tr>
                 </tbody>
               </table>
@@ -377,9 +373,7 @@ export default function Page() {
               <h2>Messages API との違い</h2>
             </div>
 
-            <p>
-              Anthropic には 2 つのビルド方式があります。目的に応じて使い分けましょう。
-            </p>
+            <p>Anthropic には 2 つのビルド方式があります。目的に応じて使い分けましょう。</p>
 
             <div className={styles.mermaidWrap}>
               <div id="diag-0">
@@ -402,9 +396,7 @@ export default function Page() {
                       <strong>概要</strong>
                     </td>
                     <td>モデルへの直接プロンプトアクセス</td>
-                    <td>
-                      事前構成済みエージェントハーネス（マネージドインフラ上で動作）
-                    </td>
+                    <td>事前構成済みエージェントハーネス（マネージドインフラ上で動作）</td>
                   </tr>
                   <tr>
                     <td>
@@ -447,7 +439,8 @@ export default function Page() {
             </div>
 
             <p>
-              Managed Agents は 4 つの概念で構成されています。これを理解することがすべての出発点です。
+              Managed Agents は 4
+              つの概念で構成されています。これを理解することがすべての出発点です。
             </p>
 
             <div className={styles.mermaidWrap}>
@@ -482,9 +475,7 @@ export default function Page() {
                     <td>
                       <strong>Environment</strong>
                     </td>
-                    <td>
-                      エージェントが動くコンテナ設定。クラウドまたはセルフホストから選ぶ
-                    </td>
+                    <td>エージェントが動くコンテナ設定。クラウドまたはセルフホストから選ぶ</td>
                     <td>
                       <code>cloud</code> / <code>self-hosted</code>
                     </td>
@@ -494,8 +485,8 @@ export default function Page() {
                       <strong>Session</strong>
                     </td>
                     <td>
-                      環境内で特定タスクを実行する実行中エージェントインスタンス。1
-                      タスク = 1 セッション
+                      環境内で特定タスクを実行する実行中エージェントインスタンス。1 タスク = 1
+                      セッション
                     </td>
                     <td>fibonacci.txt を生成するタスク</td>
                   </tr>
@@ -566,9 +557,7 @@ export default function Page() {
                         <tr>
                           <td>Anthropic Console アカウント</td>
                           <td>
-                            <Ext href="https://platform.claude.com">
-                              platform.claude.com
-                            </Ext>{" "}
+                            <Ext href="https://platform.claude.com">platform.claude.com</Ext>{" "}
                             でサインアップ
                           </td>
                         </tr>
@@ -591,12 +580,10 @@ export default function Page() {
                   <div className={styles.stepLine} />
                 </div>
                 <div className={styles.stepContent}>
-                  <div className={styles.stepTitle}>
-                    CLI と SDK をインストールする
-                  </div>
+                  <div className={styles.stepTitle}>CLI と SDK をインストールする</div>
                   <p>
-                    Anthropic は <code>ant</code> という CLI
-                    ツールを提供しています。SDK と合わせてインストールします。
+                    Anthropic は <code>ant</code> という CLI ツールを提供しています。SDK
+                    と合わせてインストールします。
                   </p>
 
                   <div className={styles.codeBlock}>
@@ -620,7 +607,8 @@ export default function Page() {
                           <span className={styles.cm}># Linux / WSL (curl)</span>
                         </div>
                         <div className={styles.codeLine}>
-                          <span className={styles.kw}>curl</span> -fsSL https://cli.anthropic.com/install.sh | sh
+                          <span className={styles.kw}>curl</span> -fsSL
+                          https://cli.anthropic.com/install.sh | sh
                         </div>
                         <div className={styles.codeLine} />
                         <div className={styles.codeLine}>
@@ -713,20 +701,24 @@ export default function Page() {
                     </div>
                     <pre>
                       <code>
-                        <div className={styles.codeLine}>
-                          ant beta:agents create \
-                        </div>
+                        <div className={styles.codeLine}>ant beta:agents create \</div>
                         <div className={styles.codeLine}>
                           {"  "}--name <span className={styles.st}>"Coding Assistant"</span> \
                         </div>
                         <div className={styles.codeLine}>
-                          {"  "}--model <span className={styles.st}>'{`{id: claude-opus-4-7}`}'</span> \
+                          {"  "}--model{" "}
+                          <span className={styles.st}>'{`{id: claude-opus-4-7}`}'</span> \
                         </div>
                         <div className={styles.codeLine}>
-                          {"  "}--system <span className={styles.st}>"You are a helpful coding assistant. Write clean, well-documented code."</span> \
+                          {"  "}--system{" "}
+                          <span className={styles.st}>
+                            "You are a helpful coding assistant. Write clean, well-documented code."
+                          </span>{" "}
+                          \
                         </div>
                         <div className={styles.codeLine}>
-                          {"  "}--tool <span className={styles.st}>'{`{type: agent_toolset_20260401}`}'</span>
+                          {"  "}--tool{" "}
+                          <span className={styles.st}>'{`{type: agent_toolset_20260401}`}'</span>
                         </div>
                       </code>
                     </pre>
@@ -757,26 +749,36 @@ export default function Page() {
                           {"    "}name=<span className={styles.st}>"Coding Assistant"</span>,
                         </div>
                         <div className={styles.codeLine}>
-                          {"    "}model={"{"}<span className={styles.st}>"id"</span>: <span className={styles.st}>"claude-opus-4-7"</span>{"}"},
+                          {"    "}model={"{"}
+                          <span className={styles.st}>"id"</span>:{" "}
+                          <span className={styles.st}>"claude-opus-4-7"</span>
+                          {"}"},
                         </div>
                         <div className={styles.codeLine}>
-                          {"    "}system=<span className={styles.st}>"You are a helpful coding assistant. Write clean, well-documented code."</span>,
+                          {"    "}system=
+                          <span className={styles.st}>
+                            "You are a helpful coding assistant. Write clean, well-documented code."
+                          </span>
+                          ,
                         </div>
                         <div className={styles.codeLine}>
-                          {"    "}tools=[{"{"}<span className={styles.st}>"type"</span>: <span className={styles.st}>"agent_toolset_20260401"</span>{"}"}],
+                          {"    "}tools=[{"{"}
+                          <span className={styles.st}>"type"</span>:{" "}
+                          <span className={styles.st}>"agent_toolset_20260401"</span>
+                          {"}"}],
                         </div>
                         <div className={styles.codeLine}>
-                          {"    "}betas=[<span className={styles.st}>"managed-agents-2026-04-01"</span>],
+                          {"    "}betas=[
+                          <span className={styles.st}>"managed-agents-2026-04-01"</span>],
                         </div>
-                        <div className={styles.codeLine}>
-                          )
-                        </div>
+                        <div className={styles.codeLine}>)</div>
                         <div className={styles.codeLine} />
                         <div className={styles.codeLine}>
                           <span className={styles.cm}># このIDを環境変数やDBに保存する</span>
                         </div>
                         <div className={styles.codeLine}>
-                          <span className={styles.fn}>print</span>(<span className={styles.st}>f"Agent ID: {`{agent.id}`}"</span>)
+                          <span className={styles.fn}>print</span>(
+                          <span className={styles.st}>f"Agent ID: {`{agent.id}`}"</span>)
                         </div>
                       </code>
                     </pre>
@@ -801,9 +803,7 @@ export default function Page() {
                   <div className={styles.stepLine} />
                 </div>
                 <div className={styles.stepContent}>
-                  <div className={styles.stepTitle}>
-                    環境（Environment）を作成する
-                  </div>
+                  <div className={styles.stepTitle}>環境（Environment）を作成する</div>
                   <p>
                     環境はエージェントが動くコンテナの設定です。クラウドとセルフホストから選びます。
                   </p>
@@ -834,22 +834,29 @@ export default function Page() {
                           {"    "}config={"{"}
                         </div>
                         <div className={styles.codeLine}>
-                          {"        "}<span className={styles.st}>"type"</span>: <span className={styles.st}>"cloud"</span>,
+                          {"        "}
+                          <span className={styles.st}>"type"</span>:{" "}
+                          <span className={styles.st}>"cloud"</span>,
                         </div>
                         <div className={styles.codeLine}>
-                          {"        "}<span className={styles.st}>"network"</span>: {"{"}<span className={styles.st}>"internet_access"</span>: <span className={styles.kw}>True</span>{"}"}
+                          {"        "}
+                          <span className={styles.st}>"network"</span>: {"{"}
+                          <span className={styles.st}>"internet_access"</span>:{" "}
+                          <span className={styles.kw}>True</span>
+                          {"}"}
                         </div>
                         <div className={styles.codeLine}>
-                          {"    "}{"}"},
+                          {"    "}
+                          {"}"},
                         </div>
                         <div className={styles.codeLine}>
-                          {"    "}betas=[<span className={styles.st}>"managed-agents-2026-04-01"</span>],
+                          {"    "}betas=[
+                          <span className={styles.st}>"managed-agents-2026-04-01"</span>],
                         </div>
+                        <div className={styles.codeLine}>)</div>
                         <div className={styles.codeLine}>
-                          )
-                        </div>
-                        <div className={styles.codeLine}>
-                          <span className={styles.fn}>print</span>(<span className={styles.st}>f"Environment ID: {`{env.id}`}"</span>)
+                          <span className={styles.fn}>print</span>(
+                          <span className={styles.st}>f"Environment ID: {`{env.id}`}"</span>)
                         </div>
                       </code>
                     </pre>
@@ -864,12 +871,9 @@ export default function Page() {
                   <div className={styles.stepLine} />
                 </div>
                 <div className={styles.stepContent}>
-                  <div className={styles.stepTitle}>
-                    セッションを開始してタスクを送信する
-                  </div>
+                  <div className={styles.stepTitle}>セッションを開始してタスクを送信する</div>
                   <p>
-                    作成したエージェント ID と環境 ID
-                    を使ってセッションを起動し、タスクを送ります。
+                    作成したエージェント ID と環境 ID を使ってセッションを起動し、タスクを送ります。
                   </p>
 
                   <div className={styles.codeBlock}>
@@ -886,41 +890,49 @@ export default function Page() {
                           AGENT_ID = <span className={styles.st}>"agent_xxxxxxxxxxxxxxxx"</span>
                         </div>
                         <div className={styles.codeLine}>
-                          ENV_ID   = <span className={styles.st}>"env_xxxxxxxxxxxxxxxx"</span>
+                          ENV_ID = <span className={styles.st}>"env_xxxxxxxxxxxxxxxx"</span>
                         </div>
                         <div className={styles.codeLine} />
                         <div className={styles.codeLine}>
-                          <span className={styles.kw}>with</span> client.beta.sessions.<span className={styles.fn}>stream</span>(
+                          <span className={styles.kw}>with</span> client.beta.sessions.
+                          <span className={styles.fn}>stream</span>(
                         </div>
-                        <div className={styles.codeLine}>
-                          {"    "}agent_id=AGENT_ID,
-                        </div>
-                        <div className={styles.codeLine}>
-                          {"    "}environment_id=ENV_ID,
-                        </div>
+                        <div className={styles.codeLine}>{"    "}agent_id=AGENT_ID,</div>
+                        <div className={styles.codeLine}>{"    "}environment_id=ENV_ID,</div>
                         <div className={styles.codeLine}>
                           {"    "}user_event={"{"}
                         </div>
                         <div className={styles.codeLine}>
-                          {"        "}<span className={styles.st}>"type"</span>: <span className={styles.st}>"user"</span>,
+                          {"        "}
+                          <span className={styles.st}>"type"</span>:{" "}
+                          <span className={styles.st}>"user"</span>,
                         </div>
                         <div className={styles.codeLine}>
-                          {"        "}<span className={styles.st}>"content"</span>: <span className={styles.st}>"フィボナッチ数列の最初の20個を fibonacci.txt に書き出してください"</span>
+                          {"        "}
+                          <span className={styles.st}>"content"</span>:{" "}
+                          <span className={styles.st}>
+                            "フィボナッチ数列の最初の20個を fibonacci.txt に書き出してください"
+                          </span>
                         </div>
                         <div className={styles.codeLine}>
-                          {"    "}{"}"},
+                          {"    "}
+                          {"}"},
                         </div>
                         <div className={styles.codeLine}>
-                          {"    "}betas=[<span className={styles.st}>"managed-agents-2026-04-01"</span>],
+                          {"    "}betas=[
+                          <span className={styles.st}>"managed-agents-2026-04-01"</span>],
                         </div>
                         <div className={styles.codeLine}>
                           ) <span className={styles.kw}>as</span> stream:
                         </div>
                         <div className={styles.codeLine}>
-                          {"    "}<span className={styles.kw}>for</span> event <span className={styles.kw}>in</span> stream:
+                          {"    "}
+                          <span className={styles.kw}>for</span> event{" "}
+                          <span className={styles.kw}>in</span> stream:
                         </div>
                         <div className={styles.codeLine}>
-                          {"        "}<span className={styles.fn}>print</span>(event)
+                          {"        "}
+                          <span className={styles.fn}>print</span>(event)
                         </div>
                       </code>
                     </pre>
@@ -934,9 +946,7 @@ export default function Page() {
                   <div className={styles.stepDot}>5</div>
                 </div>
                 <div className={styles.stepContent}>
-                  <div className={styles.stepTitle}>
-                    イベントストリームを処理する
-                  </div>
+                  <div className={styles.stepTitle}>イベントストリームを処理する</div>
                   <p>
                     セッションはリアルタイムでイベントを返します。イベントタイプに応じて処理を分岐させます。
                   </p>
@@ -1118,7 +1128,10 @@ export default function Page() {
                     {"    "}name=<span className={styles.st}>"Safe Agent"</span>,
                   </div>
                   <div className={styles.codeLine}>
-                    {"    "}model={"{"}<span className={styles.st}>"id"</span>: <span className={styles.st}>"claude-opus-4-7"</span>{"}"},
+                    {"    "}model={"{"}
+                    <span className={styles.st}>"id"</span>:{" "}
+                    <span className={styles.st}>"claude-opus-4-7"</span>
+                    {"}"},
                   </div>
                   <div className={styles.codeLine}>
                     {"    "}system=<span className={styles.st}>"..."</span>,
@@ -1127,32 +1140,40 @@ export default function Page() {
                     {"    "}tools=[{"{"}
                   </div>
                   <div className={styles.codeLine}>
-                    {"        "}<span className={styles.st}>"type"</span>: <span className={styles.st}>"agent_toolset_20260401"</span>,
+                    {"        "}
+                    <span className={styles.st}>"type"</span>:{" "}
+                    <span className={styles.st}>"agent_toolset_20260401"</span>,
                   </div>
                   <div className={styles.codeLine}>
-                    {"        "}<span className={styles.st}>"default_config"</span>: {"{"}
+                    {"        "}
+                    <span className={styles.st}>"default_config"</span>: {"{"}
                   </div>
                   <div className={styles.codeLine}>
-                    {"            "}<span className={styles.st}>"permission_policy"</span>: {"{"}
+                    {"            "}
+                    <span className={styles.st}>"permission_policy"</span>: {"{"}
                   </div>
                   <div className={styles.codeLine}>
-                    {"                "}<span className={styles.st}>"type"</span>: <span className={styles.st}>"always_allow"</span>  <span className={styles.cm}># or "always_deny", "ask_human"</span>
+                    {"                "}
+                    <span className={styles.st}>"type"</span>:{" "}
+                    <span className={styles.st}>"always_allow"</span>{" "}
+                    <span className={styles.cm}># or "always_deny", "ask_human"</span>
                   </div>
                   <div className={styles.codeLine}>
-                    {"            "}{"}"}
+                    {"            "}
+                    {"}"}
                   </div>
                   <div className={styles.codeLine}>
-                    {"        "}{"}"}
+                    {"        "}
+                    {"}"}
                   </div>
                   <div className={styles.codeLine}>
-                    {"    "}{"}"}],
+                    {"    "}
+                    {"}"}],
                   </div>
                   <div className={styles.codeLine}>
                     {"    "}betas=[<span className={styles.st}>"managed-agents-2026-04-01"</span>],
                   </div>
-                  <div className={styles.codeLine}>
-                    )
-                  </div>
+                  <div className={styles.codeLine}>)</div>
                 </code>
               </pre>
             </div>
@@ -1189,33 +1210,37 @@ export default function Page() {
                   <div className={styles.codeLine}>
                     session = client.beta.sessions.<span className={styles.fn}>create</span>(
                   </div>
-                  <div className={styles.codeLine}>
-                    {"    "}agent_id=AGENT_ID,
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"    "}environment_id=ENV_ID,
-                  </div>
+                  <div className={styles.codeLine}>{"    "}agent_id=AGENT_ID,</div>
+                  <div className={styles.codeLine}>{"    "}environment_id=ENV_ID,</div>
                   <div className={styles.codeLine}>
                     {"    "}user_event={"{"}
                   </div>
                   <div className={styles.codeLine}>
-                    {"        "}<span className={styles.st}>"type"</span>: <span className={styles.st}>"user"</span>,
+                    {"        "}
+                    <span className={styles.st}>"type"</span>:{" "}
+                    <span className={styles.st}>"user"</span>,
                   </div>
                   <div className={styles.codeLine}>
-                    {"        "}<span className={styles.st}>"content"</span>: <span className={styles.st}>"レポートを作成してください"</span>
+                    {"        "}
+                    <span className={styles.st}>"content"</span>:{" "}
+                    <span className={styles.st}>"レポートを作成してください"</span>
                   </div>
                   <div className={styles.codeLine}>
-                    {"    "}{"}"},
+                    {"    "}
+                    {"}"},
                   </div>
                   <div className={styles.codeLine}>
-                    {"    "}webhook={"{"}<span className={styles.st}>"url"</span>: <span className={styles.st}>"https://your-app.example.com/webhook/session"</span>{"}"},
+                    {"    "}webhook={"{"}
+                    <span className={styles.st}>"url"</span>:{" "}
+                    <span className={styles.st}>
+                      "https://your-app.example.com/webhook/session"
+                    </span>
+                    {"}"},
                   </div>
                   <div className={styles.codeLine}>
                     {"    "}betas=[<span className={styles.st}>"managed-agents-2026-04-01"</span>],
                   </div>
-                  <div className={styles.codeLine}>
-                    )
-                  </div>
+                  <div className={styles.codeLine}>)</div>
                 </code>
               </pre>
             </div>
@@ -1278,41 +1303,59 @@ export default function Page() {
                     {"    "}name=<span className={styles.st}>"Engineering Lead"</span>,
                   </div>
                   <div className={styles.codeLine}>
-                    {"    "}model={"{"}<span className={styles.st}>"id"</span>: <span className={styles.st}>"claude-opus-4-7"</span>{"}"},
+                    {"    "}model={"{"}
+                    <span className={styles.st}>"id"</span>:{" "}
+                    <span className={styles.st}>"claude-opus-4-7"</span>
+                    {"}"},
                   </div>
                   <div className={styles.codeLine}>
-                    {"    "}system=<span className={styles.st}>"You coordinate engineering work. Delegate to specialist agents."</span>,
+                    {"    "}system=
+                    <span className={styles.st}>
+                      "You coordinate engineering work. Delegate to specialist agents."
+                    </span>
+                    ,
                   </div>
                   <div className={styles.codeLine}>
-                    {"    "}tools=[{"{"}<span className={styles.st}>"type"</span>: <span className={styles.st}>"agent_toolset_20260401"</span>{"}"}],
+                    {"    "}tools=[{"{"}
+                    <span className={styles.st}>"type"</span>:{" "}
+                    <span className={styles.st}>"agent_toolset_20260401"</span>
+                    {"}"}],
                   </div>
                   <div className={styles.codeLine}>
                     {"    "}multiagent={"{"}
                   </div>
                   <div className={styles.codeLine}>
-                    {"        "}<span className={styles.st}>"type"</span>: <span className={styles.st}>"coordinator"</span>,
+                    {"        "}
+                    <span className={styles.st}>"type"</span>:{" "}
+                    <span className={styles.st}>"coordinator"</span>,
                   </div>
                   <div className={styles.codeLine}>
-                    {"        "}<span className={styles.st}>"agents"</span>: [
+                    {"        "}
+                    <span className={styles.st}>"agents"</span>: [
                   </div>
                   <div className={styles.codeLine}>
-                    {"            "}{"{"}<span className={styles.st}>"type"</span>: <span className={styles.st}>"agent"</span>, <span className={styles.st}>"id"</span>: REVIEWER_AGENT_ID{"}"},
+                    {"            "}
+                    {"{"}
+                    <span className={styles.st}>"type"</span>:{" "}
+                    <span className={styles.st}>"agent"</span>,{" "}
+                    <span className={styles.st}>"id"</span>: REVIEWER_AGENT_ID{"}"},
                   </div>
                   <div className={styles.codeLine}>
-                    {"            "}{"{"}<span className={styles.st}>"type"</span>: <span className={styles.st}>"agent"</span>, <span className={styles.st}>"id"</span>: TEST_WRITER_AGENT_ID{"}"},
+                    {"            "}
+                    {"{"}
+                    <span className={styles.st}>"type"</span>:{" "}
+                    <span className={styles.st}>"agent"</span>,{" "}
+                    <span className={styles.st}>"id"</span>: TEST_WRITER_AGENT_ID{"}"},
                   </div>
+                  <div className={styles.codeLine}>{"        "}]</div>
                   <div className={styles.codeLine}>
-                    {"        "}]
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"    "}{"}"},
+                    {"    "}
+                    {"}"},
                   </div>
                   <div className={styles.codeLine}>
                     {"    "}betas=[<span className={styles.st}>"managed-agents-2026-04-01"</span>],
                   </div>
-                  <div className={styles.codeLine}>
-                    )
-                  </div>
+                  <div className={styles.codeLine}>)</div>
                 </code>
               </pre>
             </div>
@@ -1403,13 +1446,13 @@ export default function Page() {
                     <span className={styles.cm}>description: &gt;</span>
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.cm}>  財務データを分析するスキル。</span>
+                    <span className={styles.cm}> 財務データを分析するスキル。</span>
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.cm}>  売上・コスト・利益率の計算と可視化を行う。</span>
+                    <span className={styles.cm}> 売上・コスト・利益率の計算と可視化を行う。</span>
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.cm}>  財務レポートの作成時に使用する。</span>
+                    <span className={styles.cm}> 財務レポートの作成時に使用する。</span>
                   </div>
                   <div className={styles.codeLine}>
                     <span className={styles.cm}>---</span>
@@ -1441,7 +1484,8 @@ export default function Page() {
                   </div>
                   <div className={styles.codeLine} />
                   <div className={styles.codeLine}>
-                    - <span className={styles.st}>"Q3 の売上データを分析して"</span> → データ読み込み → 指標計算 → レポート出力
+                    - <span className={styles.st}>"Q3 の売上データを分析して"</span> →
+                    データ読み込み → 指標計算 → レポート出力
                   </div>
                 </code>
               </pre>
@@ -1453,8 +1497,8 @@ export default function Page() {
                 <strong>claude-api スキルの活用</strong>
                 <br />
                 Claude Code には <code>claude-api</code>
-                スキルがバンドルされています。Claude API・Managed Agents
-                の最新リファレンスや言語別 SDK ドキュメントを自動で参照してくれます。
+                スキルがバンドルされています。Claude API・Managed Agents の最新リファレンスや言語別
+                SDK ドキュメントを自動で参照してくれます。
               </div>
             </div>
           </section>
@@ -1483,33 +1527,23 @@ export default function Page() {
                       <strong>ベータヘッダーを忘れる</strong>
                     </td>
                     <td>
-                      <code>managed-agents-2026-04-01</code> を付け忘れて API
-                      エラー
+                      <code>managed-agents-2026-04-01</code> を付け忘れて API エラー
                     </td>
-                    <td>
-                      SDK
-                      使用時は自動付与される。curl 使用時はヘッダーを明示的に追加する
-                    </td>
+                    <td>SDK 使用時は自動付与される。curl 使用時はヘッダーを明示的に追加する</td>
                   </tr>
                   <tr>
                     <td>
                       <strong>Agent ID を保存しない</strong>
                     </td>
-                    <td>
-                      毎回エージェントを作成してコストと時間を無駄にする
-                    </td>
-                    <td>
-                      ID を環境変数や DB に保存する。エージェントは一度作れば使い回せる
-                    </td>
+                    <td>毎回エージェントを作成してコストと時間を無駄にする</td>
+                    <td>ID を環境変数や DB に保存する。エージェントは一度作れば使い回せる</td>
                   </tr>
                   <tr>
                     <td>
                       <strong>全ツールを常に有効にする</strong>
                     </td>
                     <td>不要なツールがセキュリティリスクになる</td>
-                    <td>
-                      最小権限の原則を適用し、タスクに必要なツールのみを有効化する
-                    </td>
+                    <td>最小権限の原則を適用し、タスクに必要なツールのみを有効化する</td>
                   </tr>
                   <tr>
                     <td>
@@ -1602,8 +1636,8 @@ export default function Page() {
               <div className={styles.checkGroupTitle}>本番運用前</div>
               <div className={styles.checkItem}>
                 <div className={styles.checkBox} />
-                権限ポリシー（<code>always_allow</code> /{" "}
-                <code>ask_human</code> /<code>always_deny</code>
+                権限ポリシー（<code>always_allow</code> / <code>ask_human</code> /
+                <code>always_deny</code>
                 ）を適切に設定した
               </div>
               <div className={styles.checkItem}>
@@ -1638,9 +1672,7 @@ export default function Page() {
                   <i className="ti ti-file-description" />
                   <div className={styles.refCardBody}>
                     <div className={styles.refCardTitle}>Managed Agents 概要</div>
-                    <div className={styles.refCardUrl}>
-                      platform.claude.com/.../overview
-                    </div>
+                    <div className={styles.refCardUrl}>platform.claude.com/.../overview</div>
                   </div>
                 </div>
               </Ext>
@@ -1649,9 +1681,7 @@ export default function Page() {
                   <i className="ti ti-rocket" />
                   <div className={styles.refCardBody}>
                     <div className={styles.refCardTitle}>クイックスタート</div>
-                    <div className={styles.refCardUrl}>
-                      platform.claude.com/.../quickstart
-                    </div>
+                    <div className={styles.refCardUrl}>platform.claude.com/.../quickstart</div>
                   </div>
                 </div>
               </Ext>
@@ -1660,9 +1690,7 @@ export default function Page() {
                   <i className="ti ti-settings" />
                   <div className={styles.refCardBody}>
                     <div className={styles.refCardTitle}>エージェント設定</div>
-                    <div className={styles.refCardUrl}>
-                      platform.claude.com/.../agent-setup
-                    </div>
+                    <div className={styles.refCardUrl}>platform.claude.com/.../agent-setup</div>
                   </div>
                 </div>
               </Ext>
@@ -1671,9 +1699,7 @@ export default function Page() {
                   <i className="ti ti-tool" />
                   <div className={styles.refCardBody}>
                     <div className={styles.refCardTitle}>ツール一覧</div>
-                    <div className={styles.refCardUrl}>
-                      platform.claude.com/.../tools
-                    </div>
+                    <div className={styles.refCardUrl}>platform.claude.com/.../tools</div>
                   </div>
                 </div>
               </Ext>
@@ -1682,9 +1708,7 @@ export default function Page() {
                   <i className="ti ti-server" />
                   <div className={styles.refCardBody}>
                     <div className={styles.refCardTitle}>環境設定</div>
-                    <div className={styles.refCardUrl}>
-                      platform.claude.com/.../environments
-                    </div>
+                    <div className={styles.refCardUrl}>platform.claude.com/.../environments</div>
                   </div>
                 </div>
               </Ext>
@@ -1693,9 +1717,7 @@ export default function Page() {
                   <i className="ti ti-player-play" />
                   <div className={styles.refCardBody}>
                     <div className={styles.refCardTitle}>セッション管理</div>
-                    <div className={styles.refCardUrl}>
-                      platform.claude.com/.../sessions
-                    </div>
+                    <div className={styles.refCardUrl}>platform.claude.com/.../sessions</div>
                   </div>
                 </div>
               </Ext>
@@ -1715,9 +1737,7 @@ export default function Page() {
                   <i className="ti ti-webhook" />
                   <div className={styles.refCardBody}>
                     <div className={styles.refCardTitle}>Webhooks</div>
-                    <div className={styles.refCardUrl}>
-                      platform.claude.com/.../webhooks
-                    </div>
+                    <div className={styles.refCardUrl}>platform.claude.com/.../webhooks</div>
                   </div>
                 </div>
               </Ext>
@@ -1726,9 +1746,7 @@ export default function Page() {
                   <i className="ti ti-users" />
                   <div className={styles.refCardBody}>
                     <div className={styles.refCardTitle}>マルチエージェント</div>
-                    <div className={styles.refCardUrl}>
-                      platform.claude.com/.../multi-agent
-                    </div>
+                    <div className={styles.refCardUrl}>platform.claude.com/.../multi-agent</div>
                   </div>
                 </div>
               </Ext>
@@ -1758,9 +1776,7 @@ export default function Page() {
                 <div className={styles.refCard}>
                   <i className="ti ti-brand-github" />
                   <div className={styles.refCardBody}>
-                    <div className={styles.refCardTitle}>
-                      Anthropic Engineering Blog
-                    </div>
+                    <div className={styles.refCardTitle}>Anthropic Engineering Blog</div>
                     <div className={styles.refCardUrl}>
                       anthropic.com/engineering/managed-agents
                     </div>
@@ -1777,10 +1793,8 @@ export default function Page() {
               <div className={styles.calloutBody}>
                 <strong>インタラクティブなチュートリアル</strong>
                 <br />
-                Claude Code で{" "}
-                <code>/claude-api managed-agents-onboard</code>{" "}
-                を実行すると、対話形式で Managed Agents
-                のセットアップをガイドしてもらえます。
+                Claude Code で <code>/claude-api managed-agents-onboard</code>{" "}
+                を実行すると、対話形式で Managed Agents のセットアップをガイドしてもらえます。
               </div>
             </div>
           </section>
