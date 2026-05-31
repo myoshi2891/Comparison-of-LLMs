@@ -4,6 +4,10 @@ test.describe("Calculator Interactive E2E Test", () => {
   test.beforeEach(async ({ page }) => {
     // ホームページへ遷移
     await page.goto("/");
+    // 言語切り替えのブレを防ぐため、初期状態を確実に「日本語」に設定
+    const jaBtn = page.locator(".lang-btn.ja");
+    await expect(jaBtn).toBeVisible();
+    await jaBtn.click();
   });
 
   test("should load calculator UI elements", async ({ page }) => {
@@ -16,44 +20,46 @@ test.describe("Calculator Interactive E2E Test", () => {
   });
 
   test("should update values when preset scenario is clicked", async ({ page }) => {
-    // 最初の入力トークンの値を取得
-    const inputToken = page.locator('input[type="number"]').first();
-    const initialVal = await inputToken.inputValue();
+    // 初期状態でアサンプションバーが Standard であることを検証
+    const scenarioVal = page.locator(".assumption-bar .val").first();
+    await expect(scenarioVal).toHaveText("⚙️ Standard — 標準");
 
-    // Heavy プリセットをクリックしてみる
+    // Heavy プリセットボタンの存在をハードアサーションで確認してクリック
     const heavyBtn = page.locator('button:has-text("Heavy"), button:has-text("ヘビー")').first();
-    if (await heavyBtn.isVisible()) {
-      await heavyBtn.click();
+    await expect(heavyBtn).toBeVisible();
+    await heavyBtn.click();
 
-      // トークン入力値が更新されたかアサート
-      const newVal = await inputToken.inputValue();
-      expect(newVal).not.toBe(initialVal);
-    }
+    // プリセットが Heavy に更新されたことを期待される具体的な文字列で明示的にアサート
+    await expect(scenarioVal).toHaveText("🔥 Heavy — 重量");
   });
 
   test("should toggle language and show translations", async ({ page }) => {
-    // 言語切り替えボタン (EN/JA) をクリック
-    const langBtn = page.locator('button:has-text("EN"), button:has-text("日本語")').first();
-    const initialText = await langBtn.textContent();
+    // 英語 (EN) ボタンを取得してクリック
+    const enBtn = page.locator(".lang-btn.en");
+    await expect(enBtn).toBeVisible();
 
-    await langBtn.click();
+    // アサンプションバーの見出しが日本語であることを事前に確認
+    const scenarioLabel = page.locator(".assumption-bar .lbl").first();
+    await expect(scenarioLabel).toHaveText("現在のシナリオ:");
 
-    // テキストが切り替わったことを検証
-    await expect(langBtn).not.toHaveText(initialText ?? "");
+    await enBtn.click();
+
+    // 言語が英語に切り替わったことを、期待される英語のラベルで明示的にアサート
+    await expect(enBtn).toHaveClass(/active/);
+    await expect(scenarioLabel).toHaveText("Scenario:");
   });
 
-  test("should change currency and display appropriate format", async ({ page }) => {
+  // 通貨切り替え機能は現行コードに存在しない（USD/JPY同時表示の仕様）ため、このテストは無効としてスキップ
+  test.skip("should change currency and display appropriate format", async ({ page }) => {
     // 通貨切り替えボタン（JPY/USD または 円/ドル）をクリック
     const currencyBtn = page
       .locator(
         'button:has-text("USD"), button:has-text("JPY"), button:has-text("円"), button:has-text("ドル")'
       )
       .first();
-    if (await currencyBtn.isVisible()) {
-      const initialText = await currencyBtn.textContent();
-      await currencyBtn.click();
-      // ボタン表示かテーブルの通貨マークが切り替わることを期待
-      await expect(currencyBtn).not.toHaveText(initialText ?? "");
-    }
+    await expect(currencyBtn).toBeVisible();
+    const initialText = await currencyBtn.textContent();
+    await currencyBtn.click();
+    await expect(currencyBtn).not.toHaveText(initialText ?? "");
   });
 });
