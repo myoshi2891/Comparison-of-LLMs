@@ -1,6 +1,6 @@
 # 概要
 
-最終更新日: 2026-05-30
+最終更新日: 2026-05-31
 
 **関連ソースファイル**: `CLAUDE.md` / `AGENTS.md` / `GEMINI.md` / `web-next/` / `scraper/`
 

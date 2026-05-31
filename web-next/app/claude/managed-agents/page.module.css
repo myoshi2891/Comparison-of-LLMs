@@ -21,8 +21,8 @@
   --color-border-secondary: #1e1e28;
   --color-border-tertiary: #141418;
 
-  --font-sans: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
-  --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+  --font-sans: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
 
   --border-radius-md: 8px;
   --border-radius-lg: 12px;
@@ -489,7 +489,7 @@
 }
 
 .codeLine:empty::before {
-  content: " ";
+  content: ' ';
 }
 
 /* Syntax colors */
@@ -606,6 +606,62 @@
   max-width: 100% !important;
   /* biome-ignore lint/complexity/noImportantStyles: required */
   height: auto !important;
+}
+
+/* Mermaid 図のサイズ微調整 (表示サイズを縮小して見やすくする) */
+.mermaidWrap :global(#diag-0) {
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.mermaidWrap :global(#diag-1) {
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.mermaidWrap :global(#diag-2) {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.mermaidWrap :global(#diag-3) {
+  max-width: 880px;
+  margin: 0 auto;
+}
+
+.mermaidWrap :global(#diag-4) {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.mermaidWrap :global(#diag-5) {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.mermaidWrap :global(#diag-6) {
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.mermaidWrap :global(#diag-7) {
+  max-width: 850px;
+  margin: 0 auto;
+}
+
+.mermaidWrap :global(#diag-8) {
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.mermaidWrap :global(#diag-9) {
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+.mermaidWrap :global(#diag-10) {
+  max-width: 450px;
+  margin: 0 auto;
 }
 
 /* Tag chips for tools */
