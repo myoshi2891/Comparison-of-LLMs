@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import CodeCopyButton from "@/components/docs/CodeCopyButton";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
 
@@ -589,10 +590,10 @@ export default function Page() {
                   <div className={styles.codeBlock}>
                     <div className={styles.codeHeader}>
                       <span className={styles.codeLang}>bash — CLI インストール</span>
-                      <button type="button" className={styles.codeCopy}>
-                        <i className="ti ti-copy" />
-                        コピー
-                      </button>
+                      <CodeCopyButton
+                        className={styles.codeCopy}
+                        text={`# macOS (Homebrew)\nbrew install anthropic/tap/ant\n\n# Linux / WSL (curl)\ncurl -fsSL https://cli.anthropic.com/install.sh | sh\n\n# インストール確認\nant --version`}
+                      />
                     </div>
                     <pre>
                       <code>
@@ -624,10 +625,10 @@ export default function Page() {
                   <div className={styles.codeBlock}>
                     <div className={styles.codeHeader}>
                       <span className={styles.codeLang}>bash — SDK インストール</span>
-                      <button type="button" className={styles.codeCopy}>
-                        <i className="ti ti-copy" />
-                        コピー
-                      </button>
+                      <CodeCopyButton
+                        className={styles.codeCopy}
+                        text={`# Python\npip install anthropic\n\n# TypeScript / Node.js\nnpm install @anthropic-ai/sdk`}
+                      />
                     </div>
                     <pre>
                       <code>
@@ -651,10 +652,10 @@ export default function Page() {
                   <div className={styles.codeBlock}>
                     <div className={styles.codeHeader}>
                       <span className={styles.codeLang}>bash — API キー設定</span>
-                      <button type="button" className={styles.codeCopy}>
-                        <i className="ti ti-copy" />
-                        コピー
-                      </button>
+                      <CodeCopyButton
+                        className={styles.codeCopy}
+                        text={`export ANTHROPIC_API_KEY="your-api-key-here"`}
+                      />
                     </div>
                     <pre>
                       <code>
@@ -694,10 +695,10 @@ export default function Page() {
                   <div className={styles.codeBlock}>
                     <div className={styles.codeHeader}>
                       <span className={styles.codeLang}>CLI</span>
-                      <button type="button" className={styles.codeCopy}>
-                        <i className="ti ti-copy" />
-                        コピー
-                      </button>
+                      <CodeCopyButton
+                        className={styles.codeCopy}
+                        text={`ant beta:agents create \\\n  --name "Coding Assistant" \\\n  --model '{id: claude-opus-4-7}' \\\n  --system "You are a helpful coding assistant. Write clean, well-documented code." \\\n  --tool '{type: agent_toolset_20260401}'`}
+                      />
                     </div>
                     <pre>
                       <code>
@@ -727,10 +728,10 @@ export default function Page() {
                   <div className={styles.codeBlock}>
                     <div className={styles.codeHeader}>
                       <span className={styles.codeLang}>Python</span>
-                      <button type="button" className={styles.codeCopy}>
-                        <i className="ti ti-copy" />
-                        コピー
-                      </button>
+                      <CodeCopyButton
+                        className={styles.codeCopy}
+                        text={`import anthropic\n\nclient = anthropic.Anthropic()\n\nagent = client.beta.agents.create(\n    name="Coding Assistant",\n    model={"id": "claude-opus-4-7"},\n    system="You are a helpful coding assistant. Write clean, well-documented code.",\n    tools=[{"type": "agent_toolset_20260401"}],\n    betas=["managed-agents-2026-04-01"],\n)\n\n# このIDを環境変数やDBに保存する\nprint(f"Agent ID: {agent.id}")`}
+                      />
                     </div>
                     <pre>
                       <code>
@@ -817,10 +818,10 @@ export default function Page() {
                   <div className={styles.codeBlock}>
                     <div className={styles.codeHeader}>
                       <span className={styles.codeLang}>Python</span>
-                      <button type="button" className={styles.codeCopy}>
-                        <i className="ti ti-copy" />
-                        コピー
-                      </button>
+                      <CodeCopyButton
+                        className={styles.codeCopy}
+                        text={`env = client.beta.environments.create(\n    name="quickstart-env",\n    config={\n        "type": "cloud",\n        "network": {"internet_access": True}\n    },\n    betas=["managed-agents-2026-04-01"],\n)\nprint(f"Environment ID: {env.id}")`}
+                      />
                     </div>
                     <pre>
                       <code>
@@ -879,10 +880,10 @@ export default function Page() {
                   <div className={styles.codeBlock}>
                     <div className={styles.codeHeader}>
                       <span className={styles.codeLang}>Python — ストリーミング</span>
-                      <button type="button" className={styles.codeCopy}>
-                        <i className="ti ti-copy" />
-                        コピー
-                      </button>
+                      <CodeCopyButton
+                        className={styles.codeCopy}
+                        text={`AGENT_ID = "agent_xxxxxxxxxxxxxxxx"\nENV_ID = "env_xxxxxxxxxxxxxxxx"\n\nwith client.beta.sessions.stream(\n    agent_id=AGENT_ID,\n    environment_id=ENV_ID,\n    user_event={\n        "type": "user",\n        "content": "フィボナッチ数列の最初の20個を fibonacci.txt に書き出してください"\n    },\n    betas=["managed-agents-2026-04-01"],\n) as stream:\n    for event in stream:\n        print(event)`}
+                      />
                     </div>
                     <pre>
                       <code>
@@ -1114,10 +1115,10 @@ export default function Page() {
             <div className={styles.codeBlock}>
               <div className={styles.codeHeader}>
                 <span className={styles.codeLang}>Python — 権限ポリシー設定</span>
-                <button type="button" className={styles.codeCopy}>
-                  <i className="ti ti-copy" />
-                  コピー
-                </button>
+                <CodeCopyButton
+                  className={styles.codeCopy}
+                  text={`agent = client.beta.agents.create(\n    name="Safe Agent",\n    model={"id": "claude-opus-4-7"},\n    system="...",\n    tools=[{\n        "type": "agent_toolset_20260401",\n        "default_config": {\n            "permission_policy": {\n                "type": "always_allow" # or "always_deny", "ask_human"\n            }\n        }\n    }],\n    betas=["managed-agents-2026-04-01"],\n)`}
+                />
               </div>
               <pre>
                 <code>
@@ -1200,10 +1201,10 @@ export default function Page() {
             <div className={styles.codeBlock}>
               <div className={styles.codeHeader}>
                 <span className={styles.codeLang}>Python — Webhook 付きセッション</span>
-                <button type="button" className={styles.codeCopy}>
-                  <i className="ti ti-copy" />
-                  コピー
-                </button>
+                <CodeCopyButton
+                  className={styles.codeCopy}
+                  text={`session = client.beta.sessions.create(\n    agent_id=AGENT_ID,\n    environment_id=ENV_ID,\n    user_event={\n        "type": "user",\n        "content": "レポートを作成してください"\n    },\n    webhook={"url": "https://your-app.example.com/webhook/session"},\n    betas=["managed-agents-2026-04-01"],\n)`}
+                />
               </div>
               <pre>
                 <code>
@@ -1289,10 +1290,10 @@ export default function Page() {
             <div className={styles.codeBlock}>
               <div className={styles.codeHeader}>
                 <span className={styles.codeLang}>Python — コーディネーター作成</span>
-                <button type="button" className={styles.codeCopy}>
-                  <i className="ti ti-copy" />
-                  コピー
-                </button>
+                <CodeCopyButton
+                  className={styles.codeCopy}
+                  text={`coordinator = client.beta.agents.create(\n    name="Engineering Lead",\n    model={"id": "claude-opus-4-7"},\n    system="You coordinate engineering work. Delegate to specialist agents.",\n    tools=[{"type": "agent_toolset_20260401"}],\n    multiagent={\n        "type": "coordinator",\n        "agents": [\n            {"type": "agent", "id": REVIEWER_AGENT_ID},\n            {"type": "agent", "id": TEST_WRITER_AGENT_ID}\n        ]\n    },\n    betas=["managed-agents-2026-04-01"],\n)`}
+                />
               </div>
               <pre>
                 <code>
@@ -1429,10 +1430,10 @@ export default function Page() {
             <div className={styles.codeBlock}>
               <div className={styles.codeHeader}>
                 <span className={styles.codeLang}>Markdown — スキル定義ファイル</span>
-                <button type="button" className={styles.codeCopy}>
-                  <i className="ti ti-copy" />
-                  コピー
-                </button>
+                <CodeCopyButton
+                  className={styles.codeCopy}
+                  text={`---\nname: financial-analyzer\ndescription: >\n  財務データを分析するスキル。\n  売上・コスト・利益率の計算と可視化を行う。\n  財務レポートの作成時に使用する。\n---\n\n# Financial Analyzer\n\n## Instructions\n\n1. まずデータのフォーマットを確認する\n2. 欠損値を処理する\n3. 主要指標（売上・利益率・前年比）を計算する\n4. 結果をレポートとして整形する\n\n## Examples\n\n- "Q3 の売上データを分析して" → データ読み込み → 指標計算 → レポート出力`}
+                />
               </div>
               <pre>
                 <code>
