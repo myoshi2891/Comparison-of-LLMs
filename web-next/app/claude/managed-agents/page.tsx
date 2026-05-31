@@ -149,6 +149,13 @@ interface ExtProps {
   children: React.ReactNode;
 }
 
+/**
+ * Render an external anchor that opens the provided URL in a new browser tab.
+ *
+ * @param href - The URL the link points to; opened in a new tab
+ * @param children - Content placed inside the anchor element
+ * @returns An anchor element with `target="_blank"` and `rel="noopener noreferrer"`
+ */
 function Ext({ href, children }: ExtProps) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -157,6 +164,18 @@ function Ext({ href, children }: ExtProps) {
   );
 }
 
+/**
+ * Renders the "Claude Managed Agents 完全ガイド" Next.js documentation page in Japanese,
+ * including a sidebar table of contents, multiple sections with explanatory text, code
+ * samples, Mermaid diagrams, and external reference links.
+ *
+ * The page is static and purely declarative; it composes layout, navigation, content
+ * sections (overview, comparison, core concepts, architecture, setup steps, tools,
+ * permissions, webhooks, multi-agent patterns, Agent Skills, mistakes, checklist, and
+ * references), and utility components like CodeCopyButton, MermaidDiagram, and Ext.
+ *
+ * @returns The JSX element for the Managed Agents documentation page.
+ */
 export default function Page() {
   return (
     <div className={styles.layout}>
