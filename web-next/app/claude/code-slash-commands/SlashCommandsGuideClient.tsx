@@ -513,11 +513,7 @@ export default function SlashCommandsGuideClient() {
 
           <h3>セッション開始フロー</h3>
           <div className={styles.mermaidWrap}>
-            <MermaidDiagram
-              id="diag-0"
-              chart={DIAG_0}
-              style={{ maxWidth: "920px", margin: "0 auto" }}
-            />
+            <MermaidDiagram id="diag-0" chart={DIAG_0} className={styles.diag0} />
             <div className={styles.mermaidCaption}>
               図: セッション開始から作業開始までの推奨フロー
             </div>
@@ -541,11 +537,7 @@ export default function SlashCommandsGuideClient() {
           </p>
 
           <div className={styles.mermaidWrap}>
-            <MermaidDiagram
-              id="diag-1"
-              chart={DIAG_1}
-              style={{ maxWidth: "920px", margin: "0 auto" }}
-            />
+            <MermaidDiagram id="diag-1" chart={DIAG_1} className={styles.diag1} />
             <div className={styles.mermaidCaption}>図: スラッシュコマンドの 3 分類</div>
           </div>
 
@@ -797,11 +789,7 @@ export default function SlashCommandsGuideClient() {
 
           <h3>/clear と /compact の使い分け</h3>
           <div className={styles.mermaidWrap}>
-            <MermaidDiagram
-              id="diag-2"
-              chart={DIAG_2}
-              style={{ maxWidth: "800px", margin: "0 auto" }}
-            />
+            <MermaidDiagram id="diag-2" chart={DIAG_2} className={styles.diag2} />
             <div className={styles.mermaidCaption}>図: /clear と /compact の使い分け判断フロー</div>
           </div>
 
@@ -1054,11 +1042,7 @@ export default function SlashCommandsGuideClient() {
 
           <h3>タスク別モデル選択フロー</h3>
           <div className={styles.mermaidWrap}>
-            <MermaidDiagram
-              id="diag-3"
-              chart={DIAG_3}
-              style={{ maxWidth: "880px", margin: "0 auto" }}
-            />
+            <MermaidDiagram id="diag-3" chart={DIAG_3} className={styles.diag3} />
             <div className={styles.mermaidCaption}>図: タスクの複雑さに応じたモデル選択フロー</div>
           </div>
         </section>
@@ -1415,11 +1399,7 @@ export default function SlashCommandsGuideClient() {
 
           <h3>/plan モードのフロー</h3>
           <div className={styles.mermaidWrap}>
-            <MermaidDiagram
-              id="diag-4"
-              chart={DIAG_4}
-              style={{ maxWidth: "500px", margin: "0 auto" }}
-            />
+            <MermaidDiagram id="diag-4" chart={DIAG_4} className={styles.diag4} />
             <div className={styles.mermaidCaption}>図: /plan を使った開発フロー</div>
           </div>
 
@@ -1575,11 +1555,7 @@ export default function SlashCommandsGuideClient() {
 
           <h3>/batch の仕組み</h3>
           <div className={styles.mermaidWrap}>
-            <MermaidDiagram
-              id="diag-5"
-              chart={DIAG_5}
-              style={{ maxWidth: "480px", margin: "0 auto" }}
-            />
+            <MermaidDiagram id="diag-5" chart={DIAG_5} className={styles.diag5} />
             <div className={styles.mermaidCaption}>図: /batch による並列エージェント実行フロー</div>
           </div>
 
@@ -1997,11 +1973,7 @@ export default function SlashCommandsGuideClient() {
               <span className={styles.bpTitle}>セッション開始時のルーティン</span>
             </div>
             <div className={styles.mermaidWrap} style={{ margin: 0 }}>
-              <MermaidDiagram
-                id="diag-6"
-                chart={DIAG_6}
-                style={{ maxWidth: "520px", margin: "0 auto" }}
-              />
+              <MermaidDiagram id="diag-6" chart={DIAG_6} className={styles.diag6} />
             </div>
           </div>
 
@@ -2107,11 +2079,7 @@ export default function SlashCommandsGuideClient() {
 
           <h3>ワークフロー A: 新機能開発</h3>
           <div className={styles.mermaidWrap}>
-            <MermaidDiagram
-              id="diag-7"
-              chart={DIAG_7}
-              style={{ maxWidth: "850px", margin: "0 auto" }}
-            />
+            <MermaidDiagram id="diag-7" chart={DIAG_7} className={styles.diag7} />
             <div className={styles.mermaidCaption}>図: ワークフロー A — 新機能開発</div>
           </div>
 
@@ -2155,11 +2123,7 @@ export default function SlashCommandsGuideClient() {
 
           <h3>ワークフロー C: 大規模リファクタリング</h3>
           <div className={styles.mermaidWrap}>
-            <MermaidDiagram
-              id="diag-8"
-              chart={DIAG_8}
-              style={{ maxWidth: "820px", margin: "0 auto" }}
-            />
+            <MermaidDiagram id="diag-8" chart={DIAG_8} className={styles.diag8} />
             <div className={styles.mermaidCaption}>
               図: ワークフロー C — /batch を使った大規模リファクタリング
             </div>

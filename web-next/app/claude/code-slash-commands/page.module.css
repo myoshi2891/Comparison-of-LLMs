@@ -27,8 +27,8 @@
   --c-coral-500: #f97316;
   --c-coral-200: #fed7aa;
   --c-pink-500: #ec4899;
-  --font-sans: "DM Sans", "Segoe UI", sans-serif;
-  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+  --font-sans: 'DM Sans', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
   --border-radius-md: 8px;
   --border-radius-lg: 12px;
   --border-radius-xl: 16px;
@@ -206,7 +206,7 @@
 }
 
 .section h3::before {
-  content: "";
+  content: '';
   display: inline-block;
   width: 3px;
   height: 14px;
@@ -754,7 +754,53 @@
 
 /* Custom settings specifically for this guide's Mermaid Diagrams to avoid oversized renders */
 .mermaidWrap :global(svg) {
-  max-height: 320px;
+  display: block;
+  margin: 0 auto;
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* 各マーメイド図のサイズ微調整用クラス (個別調整が可能です) */
+.diag0,
+.diag1,
+.diag2,
+.diag3,
+.diag4,
+.diag5,
+.diag6,
+.diag7,
+.diag8 {
+  margin: 0 auto;
+  display: block;
+  width: 100%;
+}
+
+.diag0 {
+  max-width: 820px;
+}
+.diag1 {
+  max-width: 920px;
+}
+.diag2 {
+  max-width: 800px;
+}
+.diag3 {
+  max-width: 680px;
+}
+.diag4 {
+  max-width: 500px;
+}
+.diag5 {
+  max-width: 480px;
+}
+.diag6 {
+  max-width: 520px;
+}
+.diag7 {
+  max-width: 850px;
+}
+.diag8 {
+  max-width: 820px;
 }
 
 @media (max-width: 860px) {
