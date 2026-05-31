@@ -24,14 +24,30 @@ from scraper.providers import anthropic, aws, deepseek, google, openai, xai
 
 @pytest.fixture(autouse=True)
 def _silence_logging():
-    """抽出失敗時の warning ログでテスト出力を汚さない。"""
+    """
+    Temporarily suppresses logging output to prevent warning messages from polluting test output.
+    
+    Disables logging before the test runs and restores the previous logging state after the test completes.
+    """
     logging.disable(logging.CRITICAL)
     yield
     logging.disable(logging.NOTSET)
 
 
 def _find(models: list[ApiModel], name: str) -> ApiModel:
-    """name 一致モデルを返す。なければ AssertionError。"""
+    """
+    Return the ApiModel from `models` whose `name` equals `name`.
+    
+    Parameters:
+        models (list[ApiModel]): Collection of models to search.
+        name (str): Model name to match.
+    
+    Returns:
+        ApiModel: The model with a matching `name`.
+    
+    Raises:
+        AssertionError: If no model with `name` is found in `models`.
+    """
     for m in models:
         if m.name == name:
             return m
@@ -39,7 +55,17 @@ def _find(models: list[ApiModel], name: str) -> ApiModel:
 
 
 def _assert_all_fallback(models: list[ApiModel], fallbacks: dict, provider_field: str | None):
-    """全モデルが fallback 値・status・件数・(任意で) provider に一致することを確認。"""
+    """
+    Verify that every model in `models` matches its corresponding fallback entry for prices, status, count, and optionally provider.
+    
+    Parameters:
+        models (list[ApiModel]): List of ApiModel instances to check.
+        fallbacks (dict): Mapping from model name (str) to a tuple (price_in, price_out) representing expected fallback values.
+        provider_field (str | None): If provided, each model's `provider` field must equal this value; if None, provider is not checked.
+    
+    Raises:
+        AssertionError: If the number of models differs from `fallbacks`, any model name is missing, any `price_in`/`price_out` differs from the fallback, any model's `scrape_status` is not "fallback", or (when `provider_field` is provided) any model's `provider` does not match.
+    """
     assert len(models) == len(fallbacks)
     names = {m.name for m in models}
     assert names == set(fallbacks.keys())
@@ -237,6 +263,15 @@ class TestAws:
     }
 
     def _mock_resp(self, payload: dict) -> MagicMock:
+        """
+        Create a MagicMock that mimics an HTTP response whose json() call returns the given payload.
+        
+        Parameters:
+            payload (dict): The JSON-like payload to be returned by the mock response's json() method.
+        
+        Returns:
+            MagicMock: A mock response object whose json() returns `payload` and whose raise_for_status() is a no-op.
+        """
         resp = MagicMock()
         resp.json.return_value = payload
         resp.raise_for_status.return_value = None

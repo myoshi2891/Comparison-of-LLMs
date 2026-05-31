@@ -35,12 +35,30 @@ _NAME, _MONTHLY, _ANNUAL = 1, 2, 3
 
 @pytest.fixture(autouse=True)
 def _silence_logging():
+    """
+    Temporarily suppress logging output for the duration of a test.
+    
+    Disables logging at and below CRITICAL, and restores the logging level to NOTSET when the fixture finishes. Intended for use as an autouse pytest fixture to silence test log output.
+    """
     logging.disable(logging.CRITICAL)
     yield
     logging.disable(logging.NOTSET)
 
 
 def _find(tools: list[SubTool], name: str) -> SubTool:
+    """
+    Locate and return the SubTool with the given name from a list of tools.
+    
+    Parameters:
+        tools (list[SubTool]): Iterable of SubTool objects to search.
+        name (str): Exact plan name to find.
+    
+    Returns:
+        SubTool: The first SubTool whose `name` attribute equals `name`.
+    
+    Raises:
+        AssertionError: If no SubTool with the given name is found; the message lists available tool names.
+    """
     for t in tools:
         if t.name == name:
             return t
@@ -48,7 +66,16 @@ def _find(tools: list[SubTool], name: str) -> SubTool:
 
 
 def _assert_all_fallback(tools: list[SubTool], fallbacks: list[tuple]):
-    """全プランが _FALLBACKS の monthly/annual・status・件数・名前に一致することを確認。"""
+    """
+    Assert that every plan in `tools` matches its fallback definition for name, monthly price, annual price, and scrape status.
+    
+    Parameters:
+        tools (list[SubTool]): SubTool objects produced by the scraper.
+        fallbacks (list[tuple]): Fallback definitions (rows) where each row includes the plan name and the expected monthly and annual values.
+    
+    Raises:
+        AssertionError: If the number of tools differs from fallbacks, any plan name is missing, or any plan's monthly, annual, or scrape_status does not match the fallback.
+    """
     assert len(tools) == len(fallbacks)
     by_name = {row[_NAME]: row for row in fallbacks}
     assert {t.name for t in tools} == set(by_name.keys())
@@ -60,6 +87,16 @@ def _assert_all_fallback(tools: list[SubTool], fallbacks: list[tuple]):
 
 
 def _run(module, html: str) -> list[SubTool]:
+    """
+    Run a scraper module's scrape() with its get_page_text function mocked to return the provided HTML.
+    
+    Parameters:
+        module: The scraper module whose get_page_text will be patched and whose scrape() will be invoked.
+        html (str): The HTML string that get_page_text should return during the scrape.
+    
+    Returns:
+        list[SubTool]: The list of SubTool objects returned by module.scrape().
+    """
     target = f"{module.__name__}.get_page_text"
     with patch(target, return_value=html):
         return module.scrape()
@@ -88,6 +125,11 @@ class TestCursor:
         assert pro.scrape_status == "success"
 
     def test_fallback_on_empty_html(self):
+        """
+        Verify that an empty page causes every plan to use the module's fallback values.
+        
+        Asserts that each returned SubTool's name, monthly, annual, and scrape_status match the entries in cursor._FALLBACKS via _assert_all_fallback.
+        """
         _assert_all_fallback(_run(cursor, _EMPTY), cursor._FALLBACKS)
 
 
@@ -112,6 +154,11 @@ class TestGithubCopilot:
         assert biz.group == "GitHub Copilot"
 
     def test_fallback_on_empty_html(self):
+        """
+        Verify that when the fetched page is empty, every GitHub Copilot plan falls back to the module's predefined fallback values.
+        
+        Asserts that each plan's monthly, annual, name, and scrape_status match the entries in github_copilot._FALLBACKS.
+        """
         _assert_all_fallback(_run(github_copilot, _EMPTY), github_copilot._FALLBACKS)
 
 
@@ -123,6 +170,11 @@ class TestJetbrains:
         assert pack.scrape_status == "success"
 
     def test_fallback_on_empty_html(self):
+        """
+        Verify that all JetBrains plans fall back to their default definitions when the fetched page is empty.
+        
+        Asserts that running the JetBrains scraper with empty HTML produces a list of plans whose `monthly`, `annual`, `name`, and `scrape_status` match the entries in `jetbrains._FALLBACKS` (with `scrape_status` equal to "fallback").
+        """
         _assert_all_fallback(_run(jetbrains, _EMPTY), jetbrains._FALLBACKS)
 
 
@@ -139,12 +191,22 @@ class TestOpenaiCodex:
 
 class TestGoogleOne:
     def test_success_extracts_ai_pro_price(self):
+        """
+        Verify the Google One scraper extracts the AI Pro monthly price.
+        
+        Asserts that the "AI Pro" plan's `monthly` equals 24.99 and its `scrape_status` is "success".
+        """
         tools = _run(google_one, "<p>AI Pro $24.99 / month</p>")
         pro = _find(tools, "AI Pro")
         assert pro.monthly == 24.99
         assert pro.scrape_status == "success"
 
     def test_fallback_on_empty_html(self):
+        """
+        Verify that all Google One plans use the module fallbacks when the page HTML is empty.
+        
+        Asserts that each returned plan's name, monthly, annual, and scrape_status match the entries defined in google_one._FALLBACKS (scrape_status should be "fallback").
+        """
         _assert_all_fallback(_run(google_one, _EMPTY), google_one._FALLBACKS)
 
 
@@ -157,4 +219,7 @@ class TestAntigravity:
         assert pro.group == "Antigravity"
 
     def test_fallback_on_empty_html(self):
+        """
+        Verify that when the scraper receives empty HTML, every Antigravity plan reports fallback pricing and a 'fallback' scrape status.
+        """
         _assert_all_fallback(_run(antigravity, _EMPTY), antigravity._FALLBACKS)
