@@ -20,8 +20,8 @@
         --color-background-danger: #1a0a0a;
 
         --color-text-primary: #e8e8ee;
-        --color-text-secondary: #9898b0;
-        --color-text-tertiary: #58586a;
+        --color-text-secondary: #c5c5e4;
+        --color-text-tertiary: #bfbfe8;
         --color-text-info: #60a5fa;
         --color-text-success: #4ade80;
         --color-text-warning: #facc15;
@@ -1149,7 +1149,7 @@
                 <div class="code-block">
                   <div class="code-header">
                     <span class="code-lang">bash — CLI インストール</span>
-                    <button class="code-copy" onclick="copyCode(this)">
+                    <button type="button" class="code-copy" onclick="copyCode(this)">
                       <i class="ti ti-copy"></i>コピー
                     </button>
                   </div>
@@ -1166,7 +1166,7 @@
                 <div class="code-block">
                   <div class="code-header">
                     <span class="code-lang">bash — SDK インストール</span>
-                    <button class="code-copy" onclick="copyCode(this)">
+                    <button type="button" class="code-copy" onclick="copyCode(this)">
                       <i class="ti ti-copy"></i>コピー
                     </button>
                   </div>
@@ -1180,7 +1180,7 @@
                 <div class="code-block">
                   <div class="code-header">
                     <span class="code-lang">bash — API キー設定</span>
-                    <button class="code-copy" onclick="copyCode(this)">
+                    <button type="button" class="code-copy" onclick="copyCode(this)">
                       <i class="ti ti-copy"></i>コピー
                     </button>
                   </div>
@@ -1214,7 +1214,7 @@
                 <div class="code-block">
                   <div class="code-header">
                     <span class="code-lang">CLI</span>
-                    <button class="code-copy" onclick="copyCode(this)">
+                    <button type="button" class="code-copy" onclick="copyCode(this)">
                       <i class="ti ti-copy"></i>コピー
                     </button>
                   </div>
@@ -1228,7 +1228,7 @@
                 <div class="code-block">
                   <div class="code-header">
                     <span class="code-lang">Python</span>
-                    <button class="code-copy" onclick="copyCode(this)">
+                    <button type="button" class="code-copy" onclick="copyCode(this)">
                       <i class="ti ti-copy"></i>コピー
                     </button>
                   </div>
@@ -1278,7 +1278,7 @@ agent = client.beta.agents.<span class="fn">create</span>(
                 <div class="code-block">
                   <div class="code-header">
                     <span class="code-lang">Python</span>
-                    <button class="code-copy" onclick="copyCode(this)">
+                    <button type="button" class="code-copy" onclick="copyCode(this)">
                       <i class="ti ti-copy"></i>コピー
                     </button>
                   </div>
@@ -1310,7 +1310,7 @@ agent = client.beta.agents.<span class="fn">create</span>(
                 <div class="code-block">
                   <div class="code-header">
                     <span class="code-lang">Python — ストリーミング</span>
-                    <button class="code-copy" onclick="copyCode(this)">
+                    <button type="button" class="code-copy" onclick="copyCode(this)">
                       <i class="ti ti-copy"></i>コピー
                     </button>
                   </div>
@@ -1459,7 +1459,7 @@ ENV_ID   = <span class="st">"env_xxxxxxxxxxxxxxxx"</span>
           <div class="code-block">
             <div class="code-header">
               <span class="code-lang">Python — 権限ポリシー設定</span>
-              <button class="code-copy" onclick="copyCode(this)">
+              <button type="button" class="code-copy" onclick="copyCode(this)">
                 <i class="ti ti-copy"></i>コピー
               </button>
             </div>
@@ -1499,7 +1499,7 @@ ENV_ID   = <span class="st">"env_xxxxxxxxxxxxxxxx"</span>
           <div class="code-block">
             <div class="code-header">
               <span class="code-lang">Python — Webhook 付きセッション</span>
-              <button class="code-copy" onclick="copyCode(this)">
+              <button type="button" class="code-copy" onclick="copyCode(this)">
                 <i class="ti ti-copy"></i>コピー
               </button>
             </div>
@@ -1554,7 +1554,7 @@ ENV_ID   = <span class="st">"env_xxxxxxxxxxxxxxxx"</span>
           <div class="code-block">
             <div class="code-header">
               <span class="code-lang">Python — コーディネーター作成</span>
-              <button class="code-copy" onclick="copyCode(this)">
+              <button type="button" class="code-copy" onclick="copyCode(this)">
                 <i class="ti ti-copy"></i>コピー
               </button>
             </div>
@@ -1632,7 +1632,7 @@ ENV_ID   = <span class="st">"env_xxxxxxxxxxxxxxxx"</span>
           <div class="code-block">
             <div class="code-header">
               <span class="code-lang">Markdown — スキル定義ファイル</span>
-              <button class="code-copy" onclick="copyCode(this)">
+              <button type="button" class="code-copy" onclick="copyCode(this)">
                 <i class="ti ti-copy"></i>コピー
               </button>
             </div>
@@ -2087,7 +2087,7 @@ Agent --> S3[Anthropic\\nプレビルドスキル]
 style Agent fill:#1e1b4b,stroke:#8b5cf6,color:#e2e8f0
 style S1 fill:#300e14,stroke:#f43f5e,color:#e2e8f0
 style S2 fill:#0a2926,stroke:#14b8a6,color:#e2e8f0
-style S3 fill:#0c1929,stroke:#3b82f6,color:#e2e8f0`
+style S3 fill:#0c1929,stroke:#3b82f6,color:#e2e8f0`,
       };
 
       // Mermaid init
@@ -2126,7 +2126,8 @@ style S3 fill:#0c1929,stroke:#3b82f6,color:#e2e8f0`
             }
           } catch (err) {
             console.error('Failed to render mermaid diagram ' + id + ':', err);
-            container.innerHTML = '<span style="color: var(--color-text-danger)">Diagram render error</span>';
+            container.innerHTML =
+              '<span style="color: var(--color-text-danger)">Diagram render error</span>';
           }
         }
       })();
