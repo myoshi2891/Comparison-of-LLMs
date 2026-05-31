@@ -1,8 +1,46 @@
 .layout {
-  max-width: 1200px;
-  margin: 0 auto;
+  --color-background-primary: #0c0d11;
+  --color-background-secondary: #12141b;
+  --color-background-tertiary: #1a1d27;
+  --color-text-primary: #e0e2ea;
+  --color-text-secondary: #bec5dc;
+  --color-text-tertiary: #9cabcf;
+  --color-border-primary: #252834;
+  --color-border-secondary: #1c1f2c;
+  --color-border-tertiary: #141620;
+  --color-background-info: #0d1e36;
+  --color-text-info: #60a5fa;
+  --color-background-success: #0c2018;
+  --color-text-success: #34d399;
+  --color-background-warning: #1e1908;
+  --color-text-warning: #fbbf24;
+  --color-background-danger: #1e0e0e;
+  --color-text-danger: #f87171;
+  --c-teal-100: #ccfbf1;
+  --c-teal-200: #99f6e4;
+  --c-teal-500: #14b8a6;
+  --c-teal-800: #0f4440;
+  --c-purple-100: #ede9fe;
+  --c-purple-200: #ddd6fe;
+  --c-purple-500: #8b5cf6;
+  --c-purple-800: #4c1d95;
+  --c-coral-500: #f97316;
+  --c-coral-200: #fed7aa;
+  --c-pink-500: #ec4899;
+  --font-sans: "DM Sans", "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+
+  max-width: 100%;
+  margin: 0;
   display: grid;
   grid-template-columns: 228px 1fr;
+  min-height: 100vh;
+  background: var(--color-background-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
 }
 
 .sidebar {
@@ -716,7 +754,7 @@
 
 /* Custom settings specifically for this guide's Mermaid Diagrams to avoid oversized renders */
 .mermaidWrap :global(svg) {
-  max-height: 320px !important;
+  max-height: 320px;
 }
 
 @media (max-width: 860px) {

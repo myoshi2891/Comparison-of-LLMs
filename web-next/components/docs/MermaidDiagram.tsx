@@ -1,7 +1,12 @@
 "use client";
 import { useEffect, useRef } from "react";
 
-type Props = { chart: string };
+type Props = {
+  chart: string;
+  id?: string;
+  style?: React.CSSProperties;
+  className?: string;
+};
 
 /**
  * Render a Mermaid diagram from the provided Mermaid chart source and update it when `chart` changes.
@@ -11,7 +16,7 @@ type Props = { chart: string };
  * @param chart - Mermaid diagram source text to render
  * @returns The React element containing the rendered Mermaid diagram
  */
-export default function MermaidDiagram({ chart }: Props) {
+export default function MermaidDiagram({ chart, id, style, className }: Props) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -45,5 +50,12 @@ export default function MermaidDiagram({ chart }: Props) {
     };
   }, [chart]);
 
-  return <div className="mermaid" ref={ref} style={{ width: "100%", minHeight: "4rem" }} />;
+  return (
+    <div
+      id={id}
+      className={`mermaid ${className || ""}`}
+      ref={ref}
+      style={{ width: "100%", minHeight: "4rem", ...style }}
+    />
+  );
 }
