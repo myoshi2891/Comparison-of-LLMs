@@ -1,7 +1,7 @@
 # プロジェクト進捗・ステータス (PROGRESS.md)
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
-> - 最終更新日: **Updated 2026-05-30**
+> - 最終更新日: **Updated 2026-05-31**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -14,7 +14,7 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（既知の違反なし、0 件維持）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **612 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **642 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **5 件すべて合格** (全 Green ✅)
 
 ## テストカバレッジの進捗状況
@@ -135,7 +135,7 @@ Next.js 移行完了後のリポジトリ `LLM-Studies` にて、テストカバ
 Next.js 移行完了後のリポジトリ `LLM-Studies` の保守・改善作業を再開してください。
 
 - リポジトリ: LLM-Studies (Next.js 移行プロジェクトは dev/main へ完全マージ済み)
-- 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (609/609 passed) / pytest (5/5 passed) で全 Green
+- 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (642/642 passed) / pytest (5/5 passed) で全 Green
 - リポジトリ規約: CLAUDE.md (編集上の絶対ルール)
 
 作業方針：

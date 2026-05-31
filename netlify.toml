@@ -117,3 +117,8 @@
   from   = "/harness-engineering-complete-guide.html"
   to     = "/claude/harness-engineering"
   status = 301
+
+[[redirects]]
+  from   = "/claude-managed-agents-guide.html"
+  to     = "/claude/managed-agents"
+  status = 301
