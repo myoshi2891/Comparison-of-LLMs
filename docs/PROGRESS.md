@@ -14,10 +14,11 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（既知の違反なし、0 件維持）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **655 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **660 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **5 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **GitHub Copilot Code Review 完全活用ガイド**: Next.js App Router への移行完了 🚀（5件の契約テストを追加し、合計660テスト合格）。
 - **CodeRabbit 完全活用ガイド**: Next.js App Router への移行完了 🚀（5件の契約テストを追加し、合計655テスト合格）。
 - **Claude Code スラッシュコマンド完全ガイド**: Next.js App Router への移行完了 🚀（5件の契約テストを追加し、合計650テスト合格）。
 - **CodeCopyButton コンポーネント**: `web-next/components/docs/` に追加。`managed-agents` ページ等で利用開始。
