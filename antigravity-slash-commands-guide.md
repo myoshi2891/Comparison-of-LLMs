@@ -1,8 +1,8 @@
 # Google Antigravity CLI スラッシュコマンド 完全ガイド
 
-> **対象**: Google Antigravity v1.20.3 / Gemini CLI v0.34.0  
+> **対象**: Google Antigravity / Gemini CLI (latest stable 2026-06-01)  
 > **対象読者**: Antigravity を使い始めたばかりの初学者  
-> **最終更新**: 2026年5月31日
+> **最終更新**: 2026年6月1日
 
 ---
 
@@ -48,11 +48,11 @@ mindmap
     "組み込み"
       "/plan"
         "read-only 計画モード"
-        "v0.29.0から"
-        "v0.33.0 でリサーチ強化"
+        "Latest (2026) 対応"
+        "リサーチ強化済み"
       "/rewind"
         "セッション巻き戻し"
-        "v0.27.0から"
+        "Latest (2026) 対応"
       "/skills"
         "disable スキル無効化"
         "list スキル一覧"
@@ -75,7 +75,7 @@ mindmap
 
 ### 3.1 `/plan` — 安全な計画立案モード
 
-**バージョン**: Gemini CLI v0.29.0〜 / Antigravity 対応済み  
+**バージョン**: Latest (2026) / Antigravity 対応済み  
 **目的**: コードを一切変更せずに、変更計画だけを安全に立案する「read-only モード」
 
 #### どんなときに使うか
@@ -109,14 +109,14 @@ UserService の認証ロジックを JWT から OAuth2 に移行したい
 
 **Step 5**: 承認したら通常モードで実装を依頼する
 
-#### v0.33.0 の強化点
+#### 最新の強化点 (Latest 2026)
 
-v0.33.0 以降、`/plan` にリサーチサブエージェントとアノテーション機能が追加されました。
+Latest (2026) 以降、`/plan` にリサーチサブエージェントとアノテーション機能が追加されました。
 
 ```mermaid
 flowchart LR
     A["/plan 入力"] --> B["read-only 分析"]
-    B --> C{"v0.33.0 以降"}
+    B --> C{"Latest (2026)"}
     C --> D["リサーチサブエージェント\n外部ドキュメントも調査"]
     C --> E["アノテーション機能\n根拠を引用付きで表示"]
     D --> F["詳細な Implementation Plan"]
@@ -132,7 +132,7 @@ flowchart LR
 
 ### 3.2 `/rewind` — セッション巻き戻し
 
-**バージョン**: Gemini CLI v0.27.0〜  
+**バージョン**: Latest (2026)  
 **目的**: セッション履歴を遡り、誤った操作をロールバックする
 
 #### どんなときに使うか
@@ -577,11 +577,11 @@ flowchart LR
 | 3 | **Advanced Tips for Mastering Google Antigravity** — Amulya Bhatia | https://iamulya.one/posts/advanced-tips-for-mastering-google-antigravity/ |
 | 4 | **Agent Skills \| Gemini CLI 公式ドキュメント** | https://geminicli.com/docs/cli/skills/ |
 | 5 | **Plan Mode 公式ドキュメント** — Gemini CLI | https://geminicli.com/docs/plan-mode |
-| 6 | **Gemini CLI /rewind コマンド** (v0.27.0〜) | https://geminicli.com/docs/rewind |
+| 6 | **Gemini CLI /rewind コマンド** (Latest 2026) | https://geminicli.com/docs/rewind |
 | 7 | **Gemini CLI 全リリース履歴** — GitHub | https://github.com/google-gemini/gemini-cli/releases |
 | 8 | **Build with Google Antigravity** — Google Developers Blog | https://developers.googleblog.com/build-with-google-antigravity-our-new-agentic-development-platform/ |
 | 9 | **How Google Antigravity is changing spec-driven development** — Google Cloud Medium | https://medium.com/google-cloud/benefits-and-challenges-of-spec-driven-development-and-how-antigravity-is-changing-the-game-3343a6942330 |
-| 10 | **Google Antigravity Review 2026 (v1.20.3 Updated)** — AI Tool Analysis | https://aitoolanalysis.com/google-antigravity-review/ |
+| 10 | **Google Antigravity Review 2026 (Latest 2026 Updated)** — AI Tool Analysis | https://aitoolanalysis.com/google-antigravity-review/ |
 | 11 | **Gemini CLI Changelog** | https://geminicli.com/docs/changelogs/ |
 | 12 | **Skills + Hooks + Plan Mode 解説** — DEV Community | https://dev.to/googleai/unlocking-gemini-cli-with-skills-hooks-plan-mode-2bgf |
 | 13 | **Gemini 3.1 Pro リリースアナウンス** — Google Blog | https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-pro/ |
@@ -593,8 +593,8 @@ flowchart LR
 
 | コマンド | 用途 | バージョン |
 |---------|------|-----------|
-| `/plan` | read-only で変更計画を安全に立案 | v0.29.0〜 |
-| `/rewind` | セッションを特定ポイントに巻き戻す | v0.27.0〜 |
+| `/plan` | read-only で変更計画を安全に立案 | Latest (2026) |
+| `/rewind` | セッションを特定ポイントに巻き戻す | Latest (2026) |
 | `/skills list` | インストール済みスキル一覧を表示 | 全バージョン |
 | `/skills disable <番号>` | 指定スキルをセッション中に無効化 | 全バージョン |
 | `/memory show` | 現在のコンテキスト全体を表示 | 全バージョン |
@@ -604,4 +604,4 @@ flowchart LR
 
 ---
 
-*本ドキュメントは Google Antigravity v1.20.3 / Gemini CLI v0.34.0 時点の情報を基に作成しています。最新情報は [geminicli.com/docs](https://geminicli.com/docs) および [antigravity.google](https://antigravity.google) を参照してください。*
+*本ドキュメントは Google Antigravity / Gemini CLI (Latest 2026) 時点の情報を基に作成しています。最新情報は [geminicli.com/docs](https://geminicli.com/docs) および [antigravity.google](https://antigravity.google) を参照してください。*
