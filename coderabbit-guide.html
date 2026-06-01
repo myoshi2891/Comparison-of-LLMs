@@ -1,0 +1,2970 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CodeRabbit 完全活用ガイド — 中上級者向け</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&family=IBM+Plex+Sans+JP:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+    <style>
+      :root {
+        --bg-deep: #030712;
+        --bg-card: #0d1117;
+        --bg-panel: #111827;
+        --neon-green: #39ff14;
+        --neon-cyan: #00f5ff;
+        --neon-pink: #ff2d78;
+        --neon-amber: #ffb800;
+        --neon-purple: #b347ea;
+        --text-primary: #e2e8f0;
+        --text-muted: #64748b;
+        --text-dim: #374151;
+        --border: #1e293b;
+        --border-bright: #2d3748;
+        --font-mono: 'Space Mono', monospace;
+        --font-sans: 'IBM Plex Sans JP', 'Syne', sans-serif;
+        --font-head: 'Syne', 'Space Mono', sans-serif;
+        --radius: 8px;
+        --radius-lg: 14px;
+        --glow-green: 0 0 20px rgba(57, 255, 20, 0.35);
+        --glow-cyan: 0 0 20px rgba(0, 245, 255, 0.35);
+        --glow-pink: 0 0 20px rgba(255, 45, 120, 0.35);
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg-deep);
+        color: var(--text-primary);
+        font-family: var(--font-sans);
+        font-size: 1rem;
+        line-height: 1.7;
+        overflow-x: hidden;
+      }
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 245, 255, 0.012) 2px,
+          rgba(0, 245, 255, 0.012) 4px
+        );
+        pointer-events: none;
+        z-index: 0;
+      }
+      body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+        background-size: 40px 40px;
+        pointer-events: none;
+        z-index: 0;
+      }
+      /* ───── NAV ───── */
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(3, 7, 18, 0.92);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border-bright);
+        padding: 0.6rem 1.2rem;
+        overflow-x: auto;
+        white-space: nowrap;
+        scrollbar-width: none;
+      }
+      nav::-webkit-scrollbar {
+        display: none;
+      }
+      .nav-inner {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        min-width: max-content;
+      }
+      .nav-logo {
+        font-family: var(--font-head);
+        font-size: 1rem;
+        font-weight: 800;
+        color: var(--neon-cyan);
+        margin-right: 0.8rem;
+        text-decoration: none;
+        flex-shrink: 0;
+      }
+      nav a.nav-link {
+        display: inline-block;
+        padding: 0.3rem 0.75rem;
+        border-radius: 20px;
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        font-family: var(--font-mono);
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      nav a.nav-link:hover {
+        color: var(--neon-cyan);
+        border-color: var(--neon-cyan);
+        box-shadow: var(--glow-cyan);
+      }
+      /* ───── MAIN ───── */
+      main {
+        position: relative;
+        z-index: 1;
+        max-width: 940px;
+        margin: 0 auto;
+        padding: 2rem 1.2rem 4rem;
+      }
+      /* ───── HERO ───── */
+      .hero {
+        text-align: center;
+        padding: 4rem 1rem 3rem;
+        background: radial-gradient(
+          ellipse 80% 50% at 50% 0%,
+          rgba(0, 245, 255, 0.07),
+          transparent
+        );
+        border: 1px solid var(--border-bright);
+        border-radius: var(--radius-lg);
+        margin-bottom: 3rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 50% 50%, rgba(57, 255, 20, 0.04), transparent 70%);
+        animation: pulse 4s ease-in-out infinite;
+      }
+      .hero-tag {
+        display: inline-block;
+        padding: 0.3rem 1rem;
+        border: 1px solid var(--neon-cyan);
+        border-radius: 20px;
+        color: var(--neon-cyan);
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        margin-bottom: 1.2rem;
+        animation: fadeInDown 0.6s ease both;
+      }
+      .hero h1 {
+        font-family: var(--font-head);
+        font-size: clamp(1.8rem, 5vw, 3rem);
+        font-weight: 800;
+        color: #fff;
+        line-height: 1.15;
+        margin-bottom: 1rem;
+        animation: fadeInDown 0.7s 0.1s ease both;
+      }
+      .hero h1 span {
+        color: var(--neon-cyan);
+      }
+      .hero-meta {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        margin-top: 1.5rem;
+        animation: fadeInUp 0.7s 0.3s ease both;
+      }
+      .hero-badge {
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-family: var(--font-mono);
+        border: 1px solid;
+      }
+      .badge-green {
+        color: var(--neon-green);
+        border-color: var(--neon-green);
+      }
+      .badge-cyan {
+        color: var(--neon-cyan);
+        border-color: var(--neon-cyan);
+      }
+      .badge-pink {
+        color: var(--neon-pink);
+        border-color: var(--neon-pink);
+      }
+      .badge-amber {
+        color: var(--neon-amber);
+        border-color: var(--neon-amber);
+      }
+      /* ───── TOC ───── */
+      .toc-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 3rem;
+      }
+      .toc-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1rem;
+        text-decoration: none;
+        transition: all 0.25s;
+      }
+      .toc-card:hover {
+        border-color: var(--neon-cyan);
+        transform: translateY(-3px);
+        box-shadow: var(--glow-cyan);
+      }
+      .toc-card .toc-num {
+        color: var(--neon-cyan);
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+      }
+      .toc-card .toc-title {
+        color: var(--text-primary);
+        font-weight: 600;
+        margin-top: 0.25rem;
+        font-size: 1rem;
+      }
+      /* ───── SECTION / CHAPTER ───── */
+      .chapter {
+        margin-bottom: 4rem;
+      }
+      .chapter-header {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin-bottom: 1.5rem;
+      }
+      .chapter-num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.2rem;
+        height: 2.2rem;
+        border-radius: 50%;
+        border: 2px solid var(--neon-cyan);
+        color: var(--neon-cyan);
+        font-family: var(--font-mono);
+        font-size: 0.85rem;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+      .chapter-title {
+        font-family: var(--font-head);
+        font-size: 1.7rem;
+        font-weight: 800;
+        color: #fff;
+      }
+      .chapter-title span {
+        color: var(--neon-cyan);
+      }
+      .section {
+        margin-bottom: 2.5rem;
+      }
+      .section-title {
+        font-family: var(--font-head);
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.75rem;
+        padding-left: 0.75rem;
+        border-left: 3px solid var(--neon-cyan);
+      }
+      .subsection-title {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--neon-amber);
+        margin: 1rem 0 0.5rem;
+      }
+      p {
+        margin-bottom: 0.9rem;
+      }
+      /* ───── ARCH LAYERS ───── */
+      .arch-layers {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin: 1.5rem 0;
+      }
+      .arch-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        background: var(--bg-card);
+        border-radius: var(--radius);
+        padding: 0.8rem 1.2rem;
+        border-left: 4px solid;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+      .arch-row:hover {
+        transform: translateX(6px);
+        box-shadow: 4px 0 16px rgba(0, 245, 255, 0.15);
+      }
+      .arch-row.green {
+        border-left-color: var(--neon-green);
+      }
+      .arch-row.cyan {
+        border-left-color: var(--neon-cyan);
+      }
+      .arch-row.pink {
+        border-left-color: var(--neon-pink);
+      }
+      .arch-row.amber {
+        border-left-color: var(--neon-amber);
+      }
+      .arch-row.purple {
+        border-left-color: var(--neon-purple);
+      }
+      .arch-label {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        width: 160px;
+        flex-shrink: 0;
+      }
+      .arch-desc {
+        font-size: 0.95rem;
+      }
+      /* ───── PYRAMID ───── */
+      .pyramid {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.4rem;
+        margin: 1.5rem 0;
+      }
+      .pyramid-level {
+        border-radius: 6px;
+        padding: 0.6rem 1rem;
+        text-align: center;
+        font-size: 0.9rem;
+        font-family: var(--font-mono);
+        transition: transform 0.2s;
+        cursor: default;
+      }
+      .pyramid-level:hover {
+        transform: scale(1.04);
+      }
+      /* ───── CODE BLOCK ───── */
+      .code-block {
+        background: #050d1a;
+        border: 1px solid var(--border-bright);
+        border-radius: var(--radius);
+        padding: 2.2rem 1.4rem 1.2rem;
+        font-family: var(--font-mono);
+        font-size: 0.88rem;
+        line-height: 1.6;
+        overflow-x: auto;
+        margin: 1rem 0;
+        position: relative;
+        white-space: pre-wrap;
+      }
+      .code-block .file-tag {
+        position: absolute;
+        top: 0.5rem;
+        right: 1rem;
+        background: var(--bg-panel);
+        border: 1px solid var(--border-bright);
+        border-radius: 4px;
+        padding: 0.1rem 0.6rem;
+        font-size: 0.72rem;
+        color: var(--neon-cyan);
+        font-family: var(--font-mono);
+      }
+      .code-green {
+        color: #39ff14;
+      }
+      .code-cyan {
+        color: #00f5ff;
+      }
+      .code-amber {
+        color: #ffb800;
+      }
+      .code-pink {
+        color: #ff2d78;
+      }
+      .code-purple {
+        color: #b347ea;
+      }
+      .code-gray {
+        color: #64748b;
+      }
+      .code-keyword {
+        color: #ff2d78;
+        font-weight: 700;
+      }
+      .code-string {
+        color: #39ff14;
+      }
+      .code-comment {
+        color: #475569;
+        font-style: italic;
+      }
+      /* ───── STEP LIST ───── */
+      .step-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+      .step-list li {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+      .step-num {
+        width: 2rem;
+        height: 2rem;
+        flex-shrink: 0;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #000;
+      }
+      .step-content {
+        padding-top: 0.15rem;
+      }
+      /* ───── CALLOUT ───── */
+      .callout {
+        border-radius: var(--radius);
+        padding: 1rem 1.2rem;
+        margin: 1.2rem 0;
+        border-left: 4px solid;
+        display: flex;
+        gap: 0.75rem;
+        align-items: flex-start;
+      }
+      .callout.info {
+        background: rgba(0, 245, 255, 0.06);
+        border-left-color: var(--neon-cyan);
+      }
+      .callout.warning {
+        background: rgba(255, 184, 0, 0.07);
+        border-left-color: var(--neon-amber);
+      }
+      .callout.danger {
+        background: rgba(255, 45, 120, 0.07);
+        border-left-color: var(--neon-pink);
+      }
+      .callout-icon {
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        margin-top: 0.05rem;
+      }
+      .callout-body {
+        font-size: 0.95rem;
+      }
+      /* ───── METRIC GRID ───── */
+      .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .metric-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.1rem;
+        text-align: center;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+      .metric-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0, 245, 255, 0.12);
+      }
+      .metric-val {
+        font-family: var(--font-head);
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--neon-cyan);
+      }
+      .metric-label {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        margin-top: 0.25rem;
+      }
+      /* ───── PROGRESS ───── */
+      .progress-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+        margin: 1rem 0;
+      }
+      .progress-item {
+      }
+      .progress-label {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.3rem;
+        font-size: 0.88rem;
+      }
+      .progress-bar-bg {
+        background: var(--bg-panel);
+        border-radius: 20px;
+        height: 8px;
+        overflow: hidden;
+      }
+      .progress-bar {
+        height: 8px;
+        border-radius: 20px;
+        width: 0;
+        animation: growBar 1.2s ease forwards;
+      }
+      /* ───── TABLE ───── */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 1.2rem 0;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+      }
+      thead {
+        background: var(--bg-panel);
+      }
+      th {
+        padding: 0.75rem 1rem;
+        text-align: left;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        color: var(--neon-cyan);
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      td {
+        padding: 0.7rem 1rem;
+        border-top: 1px solid var(--border);
+        color: var(--text-primary);
+      }
+      tr:hover td {
+        background: rgba(255, 255, 255, 0.03);
+      }
+      /* ───── COMPARE (good/bad) ───── */
+      .compare-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1.2rem 0;
+      }
+      .compare-card {
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+      .compare-head {
+        padding: 0.5rem 1rem;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        font-weight: 700;
+      }
+      .compare-card.good .compare-head {
+        background: rgba(57, 255, 20, 0.15);
+        color: var(--neon-green);
+      }
+      .compare-card.bad .compare-head {
+        background: rgba(255, 45, 120, 0.15);
+        color: var(--neon-pink);
+      }
+      .compare-body {
+        background: #050d1a;
+        padding: 1rem;
+        font-family: var(--font-mono);
+        font-size: 0.84rem;
+        line-height: 1.6;
+        border: 1px solid var(--border);
+        border-top: none;
+        white-space: pre-wrap;
+      }
+      /* ───── ALERT ───── */
+      .alert {
+        border-left: 4px solid;
+        border-radius: 0 var(--radius) var(--radius) 0;
+        padding: 0.8rem 1rem;
+        margin: 0.8rem 0;
+        font-size: 0.92rem;
+      }
+      .alert.green {
+        border-color: var(--neon-green);
+        background: rgba(57, 255, 20, 0.07);
+        color: var(--neon-green);
+      }
+      .alert.amber {
+        border-color: var(--neon-amber);
+        background: rgba(255, 184, 0, 0.07);
+        color: var(--neon-amber);
+      }
+      .alert.red {
+        border-color: var(--neon-pink);
+        background: rgba(255, 45, 120, 0.07);
+        color: var(--neon-pink);
+      }
+      .alert.cyan {
+        border-color: var(--neon-cyan);
+        background: rgba(0, 245, 255, 0.07);
+        color: var(--neon-cyan);
+      }
+      /* ───── REF GRID ───── */
+      .ref-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin: 1.5rem 0;
+      }
+      .ref-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 0.9rem 1rem;
+        transition:
+          transform 0.2s,
+          border-color 0.2s;
+        overflow: hidden;
+      }
+      .ref-card:hover {
+        transform: translateX(4px);
+        border-color: var(--neon-cyan);
+      }
+      .ref-cat {
+        font-size: 0.72rem;
+        font-family: var(--font-mono);
+        color: var(--neon-cyan);
+        margin-bottom: 0.3rem;
+      }
+      .ref-card a {
+        color: var(--text-muted);
+        font-size: 0.82rem;
+        text-decoration: none;
+        word-break: break-all;
+        display: block;
+      }
+      .ref-card a:hover {
+        color: var(--text-primary);
+      }
+      /* ───── TREND CARD ───── */
+      .trend-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.1rem 1.2rem;
+        margin: 0.75rem 0;
+        position: relative;
+        transition: box-shadow 0.2s;
+      }
+      .trend-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: var(--radius);
+        box-shadow: 0 0 0 rgba(0, 245, 255, 0);
+        transition: box-shadow 0.3s;
+      }
+      .trend-card:hover::before {
+        box-shadow: 0 0 24px rgba(0, 245, 255, 0.2);
+      }
+      .trend-tag {
+        font-size: 0.75rem;
+        font-family: var(--font-mono);
+        color: var(--neon-purple);
+        margin-bottom: 0.4rem;
+      }
+      .trend-title {
+        font-weight: 600;
+        margin-bottom: 0.4rem;
+        color: #fff;
+      }
+      .trend-body {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+      }
+      /* ───── EXAM GRID ───── */
+      .exam-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .exam-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.1rem;
+        transition: transform 0.2s;
+      }
+      .exam-card:hover {
+        transform: translateY(-3px);
+      }
+      .exam-title {
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+        color: #fff;
+      }
+      .exam-stars {
+        color: var(--neon-amber);
+        font-size: 1rem;
+        margin-bottom: 0.4rem;
+      }
+      .exam-desc {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+      }
+      /* ───── DIVIDER ───── */
+      .divider {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 2.5rem 0;
+      }
+      /* ───── MERMAID ───── */
+      .mermaid-wrap {
+        background: #080e1a;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        overflow-x: auto;
+        text-align: center;
+      }
+      /* ───── KLEVEL ───── */
+      .klevel {
+        display: inline-block;
+        font-size: 0.72rem;
+        font-family: var(--font-mono);
+        padding: 0.15rem 0.5rem;
+        border-radius: 4px;
+        margin-left: 0.5rem;
+        vertical-align: middle;
+      }
+      .kl1 {
+        background: rgba(57, 255, 20, 0.15);
+        color: var(--neon-green);
+      }
+      .kl2 {
+        background: rgba(0, 245, 255, 0.15);
+        color: var(--neon-cyan);
+      }
+      .kl3 {
+        background: rgba(255, 184, 0, 0.15);
+        color: var(--neon-amber);
+      }
+      /* ───── ANIMATIONS ───── */
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-18px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(18px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes growBar {
+        from {
+          width: 0;
+        }
+        to {
+          width: var(--target-width);
+        }
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.5;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+      /* ───── RESPONSIVE ───── */
+      @media (max-width: 900px) {
+        .compare-grid {
+          grid-template-columns: 1fr;
+        }
+        .ref-grid {
+          grid-template-columns: 1fr;
+        }
+        .toc-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .arch-label {
+          width: 120px;
+        }
+      }
+      @media (max-width: 560px) {
+        .toc-grid {
+          grid-template-columns: 1fr;
+        }
+        .metric-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        nav a.nav-link {
+          font-size: 0.75rem;
+          padding: 0.25rem 0.55rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- NAV -->
+    <nav>
+      <div class="nav-inner">
+        <a href="#top" class="nav-logo">🐰 CR Guide</a>
+        <a href="#ch1" class="nav-link">1. Architecture</a>
+        <a href="#ch2" class="nav-link">2. Configuration</a>
+        <a href="#ch3" class="nav-link">3. Knowledge Base</a>
+        <a href="#ch4" class="nav-link">4. Commands</a>
+        <a href="#ch5" class="nav-link">5. Finishing Touches</a>
+        <a href="#ch6" class="nav-link">6. MCP</a>
+        <a href="#ch7" class="nav-link">7. Tools / CI</a>
+        <a href="#ch8" class="nav-link">8. Advanced</a>
+        <a href="#refs" class="nav-link">References</a>
+      </div>
+    </nav>
+
+    <main id="top">
+      <!-- ══════════════ HERO ══════════════ -->
+      <section class="hero">
+        <div class="hero-tag">🚀 CodeRabbit 完全活用ガイド — 2025</div>
+        <h1>Ship Better Code,<br /><span>AI がレビューする時代</span>の<br />実践マスターガイド</h1>
+        <p
+          style="color: var(--text-muted); max-width: 540px; margin: 0.8rem auto 0; font-size: 1rem"
+        >
+          中上級者向け。アーキテクチャの深部から高度なカスタマイズ・MCP連携・AI
+          エージェント活用まで完全網羅。
+        </p>
+        <div class="hero-meta">
+          <span class="hero-badge badge-green">中〜上級者対象</span>
+          <span class="hero-badge badge-cyan">Chapter 8 構成</span>
+          <span class="hero-badge badge-pink">最新: 2025-06</span>
+          <span class="hero-badge badge-amber">公式 docs 一次情報源</span>
+        </div>
+      </section>
+
+      <!-- ══════════════ KEY METRICS ══════════════ -->
+      <div class="metric-grid">
+        <div class="metric-card">
+          <div class="metric-val">40<span style="font-size: 1.2rem">+</span></div>
+          <div class="metric-label">静的解析ツール対応</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val">5</div>
+          <div class="metric-label">対応 Git プラットフォーム</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val">20</div>
+          <div class="metric-label">MCP サーバー接続数（Enterprise）</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val">18<span style="font-size: 1.2rem">+</span></div>
+          <div class="metric-label">Docstring 対応言語</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val">6</div>
+          <div class="metric-label">Finishing Touches 種類</div>
+        </div>
+      </div>
+
+      <!-- ══════════════ TOC ══════════════ -->
+      <div class="toc-grid">
+        <a href="#ch1" class="toc-card"
+          ><div class="toc-num">Chapter 01</div>
+          <div class="toc-title">アーキテクチャ詳解</div></a
+        >
+        <a href="#ch2" class="toc-card"
+          ><div class="toc-num">Chapter 02</div>
+          <div class="toc-title">設定の完全制御</div></a
+        >
+        <a href="#ch3" class="toc-card"
+          ><div class="toc-num">Chapter 03</div>
+          <div class="toc-title">Knowledge Base & Learnings</div></a
+        >
+        <a href="#ch4" class="toc-card"
+          ><div class="toc-num">Chapter 04</div>
+          <div class="toc-title">コマンド & チャット</div></a
+        >
+        <a href="#ch5" class="toc-card"
+          ><div class="toc-num">Chapter 05</div>
+          <div class="toc-title">Finishing Touches</div></a
+        >
+        <a href="#ch6" class="toc-card"
+          ><div class="toc-num">Chapter 06</div>
+          <div class="toc-title">MCP 統合</div></a
+        >
+        <a href="#ch7" class="toc-card"
+          ><div class="toc-num">Chapter 07</div>
+          <div class="toc-title">ツール & CI/CD 連携</div></a
+        >
+        <a href="#ch8" class="toc-card"
+          ><div class="toc-num">Chapter 08</div>
+          <div class="toc-title">上級テクニック</div></a
+        >
+      </div>
+
+      <hr class="divider" />
+
+      <!-- ══════════════ CH1: ARCHITECTURE ══════════════ -->
+      <section class="chapter" id="ch1">
+        <div class="chapter-header">
+          <div class="chapter-num">1</div>
+          <h2 class="chapter-title">
+            <span>アーキテクチャ</span>詳解 <span class="klevel kl1">K-Level: 理解</span>
+          </h2>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">1.1 CodeRabbit の本質とは？</h3>
+          <p>
+            <strong>定義：</strong>CodeRabbit は単なる "LLM に diff を渡すツール" ではなく、複数の
+            AI エージェントを並列オーケストレーションする <em>本番グレードの AI インフラ</em> です。
+          </p>
+          <p>
+            <strong>理由：</strong
+            >コードは差分だけでは意味が確定しない。認証ミドルウェアの変更が正しいかどうかは、リポジトリ全体・過去の
+            PR・リンクしたイシューを統合しないと判定できないからです。
+          </p>
+
+          <div class="arch-layers">
+            <div class="arch-row green">
+              <div class="arch-label">Cloud Sandbox</div>
+              <div class="arch-desc">
+                リポジトリをフルクローンした隔離実行環境。全静的解析・SAST はここで動作
+              </div>
+            </div>
+            <div class="arch-row cyan">
+              <div class="arch-label">Multi-Model Analysis</div>
+              <div class="arch-desc">
+                40+ 静的解析ツール + 複数 LLM を並列実行。言語・フレームワーク別に最適なモデルを選択
+              </div>
+            </div>
+            <div class="arch-row pink">
+              <div class="arch-label">Agentic Exploration</div>
+              <div class="arch-desc">
+                コードベース全体を自律的に調査。依存関係・型定義・テストを参照しながらコンテキスト構築
+              </div>
+            </div>
+            <div class="arch-row amber">
+              <div class="arch-label">Specialized Agents</div>
+              <div class="arch-desc">
+                Review / Verification / Chat / Pre-Merge Checks / Finishing Touches の 5
+                エージェントが協調動作
+              </div>
+            </div>
+            <div class="arch-row purple">
+              <div class="arch-label">Living Memory</div>
+              <div class="arch-desc">
+                Learnings DB + Knowledge Base。フィードバックを記憶し、次回以降の精度を継続的に向上
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">1.2 PR レビューの処理フロー</h3>
+
+          <div class="mermaid-wrap">
+            <div class="mermaid">
+flowchart TD
+A([PR Open / Push]) --> B[Webhook 受信]
+B --> C{自動レビュー設定?}
+C -- No --> D([待機: 手動コマンド待ち])
+C -- Yes --> E["Cloud Sandbox 起動\nリポジトリフルクローン"]
+E --> F[Knowledge Base 読込]
+F --> G[Learnings DB 照合]
+G --> H{並列解析}
+H --> I[40+ 静的解析ツール]
+H --> J[LLM コード理解エージェント]
+H --> K[イシュートラッカー連携]
+I --> L[結果集約]
+J --> L
+K --> L
+L --> M["Verification エージェント\n誤検知フィルタリング"]
+M --> N[Walkthrough コメント生成]
+N --> O[インライン Review コメント]
+O --> P([PR コメント投稿])
+P --> Q{Finishing Touches}
+Q --> R[Autofix / Unit Test / Docstring 等]
+
+style A fill:#0d1117,stroke:#00f5ff,color:#e2e8f0
+style P fill:#0d1117,stroke:#39ff14,color:#e2e8f0
+style H fill:#111827,stroke:#b347ea,color:#e2e8f0
+style M fill:#111827,stroke:#ffb800,color:#e2e8f0
+            </div>
+          </div>
+
+          <div class="callout info">
+            <span class="callout-icon">💡</span>
+            <div class="callout-body">
+              <strong>Verification Agent の重要性：</strong>LLM
+              単体の出力をそのまま投稿するとハルシネーションが混入します。Verification Agent
+              が他の解析結果とクロスチェックすることで、誤検知を大幅に削減しています。
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">1.3 対応プラットフォーム</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>プラットフォーム</th>
+                  <th>タイプ</th>
+                  <th>主な認証方式</th>
+                  <th>Finishing Touches</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>GitHub.com</td>
+                  <td>SaaS</td>
+                  <td>GitHub App</td>
+                  <td>フルサポート</td>
+                </tr>
+                <tr>
+                  <td>GitHub Enterprise Server</td>
+                  <td>Self-hosted</td>
+                  <td>OAuth App + Webhook</td>
+                  <td>フルサポート</td>
+                </tr>
+                <tr>
+                  <td>GitLab.com</td>
+                  <td>SaaS</td>
+                  <td>Personal/Group Access Token</td>
+                  <td>Autofix, Docstring, Merge Conflict</td>
+                </tr>
+                <tr>
+                  <td>Azure DevOps</td>
+                  <td>SaaS</td>
+                  <td>Personal Access Token</td>
+                  <td>Docstring のみ</td>
+                </tr>
+                <tr>
+                  <td>Bitbucket Cloud</td>
+                  <td>SaaS</td>
+                  <td>App Password</td>
+                  <td>Docstring のみ</td>
+                </tr>
+                <tr>
+                  <td>Bitbucket Data Center</td>
+                  <td>Self-hosted</td>
+                  <td>HTTP Access Token</td>
+                  <td>Docstring のみ</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Chapter 1 refs -->
+        <div class="section">
+          <h3 class="section-title">📚 Chapter 1 参考 URL</h3>
+          <div class="ref-grid">
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】アーキテクチャ</div>
+              <a href="https://docs.coderabbit.ai/overview/architecture.md" target="_blank"
+                >https://docs.coderabbit.ai/overview/architecture.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】PR レビュー概要</div>
+              <a href="https://docs.coderabbit.ai/overview/pull-request-review.md" target="_blank"
+                >https://docs.coderabbit.ai/overview/pull-request-review.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】プラットフォーム一覧</div>
+              <a href="https://docs.coderabbit.ai/platforms/overview.md" target="_blank"
+                >https://docs.coderabbit.ai/platforms/overview.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】GitHub 連携</div>
+              <a href="https://docs.coderabbit.ai/platforms/github-com.md" target="_blank"
+                >https://docs.coderabbit.ai/platforms/github-com.md</a
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <!-- ══════════════ CH2: CONFIGURATION ══════════════ -->
+      <section class="chapter" id="ch2">
+        <div class="chapter-header">
+          <div class="chapter-num">2</div>
+          <h2 class="chapter-title">
+            <span>設定の</span>完全制御 <span class="klevel kl2">K-Level: 適用</span>
+          </h2>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">2.1 設定の優先度ヒエラルキー</h3>
+          <p>
+            <strong>定義：</strong>CodeRabbit の設定は 6
+            層の優先度ピラミッドで管理されます。上位レイヤーが下位を上書きします（設定継承を有効化しない限り）。
+          </p>
+
+          <div class="pyramid">
+            <div
+              class="pyramid-level"
+              style="
+                width: 220px;
+                background: rgba(255, 45, 120, 0.2);
+                border: 1px solid var(--neon-pink);
+                color: var(--neon-pink);
+              "
+            >
+              Priority 0 — Global Overrides
+            </div>
+            <div
+              class="pyramid-level"
+              style="
+                width: 280px;
+                background: rgba(0, 245, 255, 0.15);
+                border: 1px solid var(--neon-cyan);
+                color: var(--neon-cyan);
+              "
+            >
+              Priority 1 — .coderabbit.yaml (リポジトリ)
+            </div>
+            <div
+              class="pyramid-level"
+              style="
+                width: 340px;
+                background: rgba(57, 255, 20, 0.1);
+                border: 1px solid var(--neon-green);
+                color: var(--neon-green);
+              "
+            >
+              Priority 2 — Central Repository
+            </div>
+            <div
+              class="pyramid-level"
+              style="
+                width: 400px;
+                background: rgba(179, 71, 234, 0.1);
+                border: 1px solid var(--neon-purple);
+                color: var(--neon-purple);
+              "
+            >
+              Priority 3 — Repository Settings (UI)
+            </div>
+            <div
+              class="pyramid-level"
+              style="
+                width: 460px;
+                background: rgba(255, 184, 0, 0.08);
+                border: 1px solid var(--neon-amber);
+                color: var(--neon-amber);
+              "
+            >
+              Priority 4 — Organization Settings (UI)
+            </div>
+            <div
+              class="pyramid-level"
+              style="
+                width: 520px;
+                background: rgba(100, 116, 139, 0.1);
+                border: 1px solid #64748b;
+                color: #64748b;
+              "
+            >
+              Priority 5 — Default Settings
+            </div>
+          </div>
+
+          <div class="callout warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-body">
+              <strong>重要：</strong
+              >設定はデフォルトで「マージ」されません。上位レイヤーが全体を置き換えます。<code
+                >configuration_inheritance: true</code
+              >
+              を明示的に有効化した場合のみ、親レイヤーの設定がマージされます。
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">2.2 .coderabbit.yaml — 推奨構成の完全形</h3>
+          <p>
+            <strong>理由：</strong>YAML
+            ファイルをリポジトリに含めることで、設定変更をコードレビューのワークフローに乗せられます（GitOps）。
+          </p>
+
+          <div class="compare-grid">
+            <div class="compare-card good">
+              <div class="compare-head">✅ 本番推奨構成（上級）</div>
+              <pre class="compare-body"><span class="code-comment"># yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json</span>
+<span class="code-keyword">language</span>: <span class="code-string">"ja-JP"</span>
+
+<span class="code-keyword">reviews</span>:
+  <span class="code-keyword">profile</span>: <span class="code-string">"assertive"</span>
+  <span class="code-keyword">request_changes_workflow</span>: <span class="code-green">true</span>
+  <span class="code-keyword">high_level_summary</span>: <span class="code-green">true</span>
+  <span class="code-keyword">auto_review</span>:
+    <span class="code-keyword">enabled</span>: <span class="code-green">true</span>
+    <span class="code-keyword">drafts</span>: <span class="code-pink">false</span>
+  <span class="code-keyword">base_branches</span>:
+    - <span class="code-string">"main"</span>
+    - <span class="code-string">"develop"</span>
+  <span class="code-keyword">path_instructions</span>:
+    - <span class="code-keyword">path</span>: <span class="code-string">"src/api/**"</span>
+      <span class="code-keyword">instructions</span>: <span class="code-string">|
+        認証・認可・入力バリデーションに集中。 ORM をバイパスする直接 DB クエリに警告。</span>
+    - <span class="code-keyword">path</span>: <span class="code-string">"tests/**"</span>
+      <span class="code-keyword">instructions</span>: <span class="code-string">|
+        エッジケース・エラーパスのカバレッジを確認。 テスト名が意図を明確に表しているか評価。</span>
+  <span class="code-keyword">path_filters</span>:
+    - <span class="code-string">"!**/generated/**"</span>
+    - <span class="code-string">"!**/*.pb.go"</span>
+
+<span class="code-keyword">knowledge_base</span>:
+  <span class="code-keyword">learnings</span>:
+    <span class="code-keyword">scope</span>: <span class="code-string">"local"</span>
+  <span class="code-keyword">issues</span>:
+    <span class="code-keyword">scope</span>: <span class="code-string">"auto"</span></pre>
+            </div>
+            <div class="compare-card bad">
+              <div class="compare-head">❌ アンチパターン（最小設定のみ）</div>
+              <pre class="compare-body"><span class="code-comment"># 設定なし＝デフォルト頼り
+# 問題:
+# - 生成コード・lock ファイルもレビュー対象になる
+# - ドラフト PR にも自動レビューが走りクレジットを消費
+# - path_instructions なしで全ファイルに汎用レビュー
+# - learnings がクロスリポジトリ汚染を起こす可能性</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">2.3 Path Instructions — 精密レビューの設計</h3>
+          <p>
+            <strong>定義：</strong>glob
+            パターンでファイルパスを指定し、そのパスのファイルに対してのみ適用されるレビュー指示を設定する機能です。
+          </p>
+
+          <h4 class="subsection-title">よく使うパターン別 Path Instructions 例</h4>
+          <pre class="code-block"><span class="file-tag">.coderabbit.yaml</span>
+<span class="code-keyword">reviews</span>:
+  <span class="code-keyword">path_instructions</span>:
+    <span class="code-comment"># API エンドポイント: セキュリティ重視</span>
+    - <span class="code-keyword">path</span>: <span class="code-string">"src/controllers/**"</span>
+      <span class="code-keyword">instructions</span>: <span class="code-string">|
+        - 認証・認可の欠落を必ず指摘。
+        - SQL インジェクション・XSS の可能性を確認。
+        - レート制限の実装を確認。</span>
+
+    <span class="code-comment"># インフラコード: 破壊的変更に敏感</span>
+    - <span class="code-keyword">path</span>: <span class="code-string">"**/*.tf"</span>
+      <span class="code-keyword">instructions</span>: <span class="code-string">|
+        - terraform destroy に相当する変更は必ず警告。
+        - 最小権限の原則に違反する IAM 設定を指摘。</span>
+
+    <span class="code-comment"># マイグレーション: 不可逆操作の検出</span>
+    - <span class="code-keyword">path</span>: <span class="code-string">"db/migrations/**"</span>
+      <span class="code-keyword">instructions</span>: <span class="code-string">|
+        - DROP TABLE / TRUNCATE を検出したら危険として警告。
+        - ダウンタイムを伴うロックが発生するか評価。</span>
+
+    <span class="code-comment"># フロントエンド: アクセシビリティ</span>
+    - <span class="code-keyword">path</span>: <span class="code-string">"src/components/**"</span>
+      <span class="code-keyword">instructions</span>: <span class="code-string">|
+        - WCAG 2.1 準拠（aria-label, alt テキスト等）を確認。
+        - console.log の残存を指摘。</span></pre>
+
+          <div class="callout info">
+            <span class="callout-icon">💡</span>
+            <div class="callout-body">
+              glob パターンは
+              <a
+                href="https://github.com/isaacs/minimatch"
+                target="_blank"
+                style="color: var(--neon-cyan)"
+                >minimatch</a
+              >
+              形式。<code>**</code> は任意のディレクトリ深度にマッチします。パスフィルター（除外）は
+              <code>!</code> プレフィックスで指定。
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">2.4 Central Configuration — 組織全体の一元管理</h3>
+          <p>
+            <strong>理由：</strong>50 リポジトリに個別 YAML
+            を配置するのは運用上のオーバーヘッドになります。Central Configuration を使うと
+            <code>coderabbit</code> という専用リポジトリ 1 か所だけ管理すれば済みます。
+          </p>
+
+          <ul class="step-list">
+            <li>
+              <span class="step-num">1</span>
+              <div class="step-content">
+                組織内に <code>coderabbit</code> という名前のリポジトリを作成する
+              </div>
+            </li>
+            <li>
+              <span class="step-num">2</span>
+              <div class="step-content">
+                そのリポジトリのルートに <code>.coderabbit.yaml</code> を配置する
+              </div>
+            </li>
+            <li>
+              <span class="step-num">3</span>
+              <div class="step-content">
+                個別
+                <code>.coderabbit.yaml</code> を持たないリポジトリには自動的にこの設定が適用される
+              </div>
+            </li>
+            <li>
+              <span class="step-num">4</span>
+              <div class="step-content">
+                個別リポジトリに
+                <code>.coderabbit.yaml</code> を置くと、中央設定より優先される（Priority 1 &gt; 2）
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Ch2 refs -->
+        <div class="section">
+          <h3 class="section-title">📚 Chapter 2 参考 URL</h3>
+          <div class="ref-grid">
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】設定概要</div>
+              <a href="https://docs.coderabbit.ai/guides/configuration-overview.md" target="_blank"
+                >https://docs.coderabbit.ai/guides/configuration-overview.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】YAML 設定</div>
+              <a
+                href="https://docs.coderabbit.ai/getting-started/yaml-configuration.md"
+                target="_blank"
+                >https://docs.coderabbit.ai/getting-started/yaml-configuration.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】Path Instructions</div>
+              <a
+                href="https://docs.coderabbit.ai/configuration/path-instructions.md"
+                target="_blank"
+                >https://docs.coderabbit.ai/configuration/path-instructions.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】Central Configuration</div>
+              <a
+                href="https://docs.coderabbit.ai/configuration/central-configuration.md"
+                target="_blank"
+                >https://docs.coderabbit.ai/configuration/central-configuration.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】設定継承</div>
+              <a
+                href="https://docs.coderabbit.ai/configuration/configuration-inheritance.md"
+                target="_blank"
+                >https://docs.coderabbit.ai/configuration/configuration-inheritance.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】Configuration Reference</div>
+              <a href="https://docs.coderabbit.ai/reference/configuration.md" target="_blank"
+                >https://docs.coderabbit.ai/reference/configuration.md</a
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <!-- ══════════════ CH3: KNOWLEDGE BASE ══════════════ -->
+      <section class="chapter" id="ch3">
+        <div class="chapter-header">
+          <div class="chapter-num">3</div>
+          <h2 class="chapter-title">
+            <span>Knowledge Base</span> &amp; Learnings
+            <span class="klevel kl2">K-Level: 適用</span>
+          </h2>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">3.1 Knowledge Base の全体像</h3>
+          <p>
+            CodeRabbit のレビュー精度は
+            <strong>Knowledge Base</strong> の充実度に比例します。Knowledge Base は 5
+            つのソースで構成されます。
+          </p>
+
+          <div class="arch-layers">
+            <div class="arch-row cyan">
+              <div class="arch-label">Learnings</div>
+              <div class="arch-desc">
+                チャットから自然言語で追加される動的なレビュー優先事項。フィードバックループにより自動進化
+              </div>
+            </div>
+            <div class="arch-row green">
+              <div class="arch-label">Code Guidelines</div>
+              <div class="arch-desc">
+                .cursorrules / CLAUDE.md / AGENTS.md を自動検出。AI
+                コーディングエージェントと共有可能
+              </div>
+            </div>
+            <div class="arch-row amber">
+              <div class="arch-label">Multi-Repo Analysis</div>
+              <div class="arch-desc">
+                関連リポジトリをリンクして API 破壊的変更・依存不整合をクロスリポジトリで検出
+              </div>
+            </div>
+            <div class="arch-row pink">
+              <div class="arch-label">MCP Servers</div>
+              <div class="arch-desc">
+                Notion / Jira / SonarQube 等の外部ツールからレビューコンテキストを動的取得
+              </div>
+            </div>
+            <div class="arch-row purple">
+              <div class="arch-label">Web Search</div>
+              <div class="arch-desc">
+                セキュリティ脆弱性・最新 API 情報をリアルタイムに検索してレビューに反映
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">3.2 Learnings — AI を育てる</h3>
+          <p>
+            <strong>定義：</strong>PR コメントを通じて自然言語でレビュー優先事項を CodeRabbit
+            に記憶させる仕組みです。組織の Git
+            プラットフォームに紐づいた内部データベースに保存されます。
+          </p>
+
+          <h4 class="subsection-title">Learning を追加する 3 パターン</h4>
+
+          <ul class="step-list">
+            <li>
+              <span class="step-num">1</span>
+              <div class="step-content">
+                <strong>コメント返信で追加（最も推奨）</strong><br />
+                CodeRabbit のインラインコメントに直接返信する。文脈が最も豊富に保存される。
+                <pre class="code-block" style="margin-top: 0.5rem"><span class="code-green">@coderabbitai</span> <span class="code-string">認証ミドルウェアではネストした try-catch より アーリーリターン + 固有エラーコードを使います。モニタリングツールがエラーコードで追跡できるため。</span></pre>
+              </div>
+            </li>
+            <li>
+              <span class="step-num">2</span>
+              <div class="step-content">
+                <strong>ファイルインポートで一括追加</strong><br />
+                既存ドキュメント（コーディング規約等）を一気にインポート。
+                <pre class="code-block" style="margin-top: 0.5rem"><span class="code-green">@coderabbitai</span> <span class="code-string">add a learning using docs/coding-standards.md</span></pre>
+              </div>
+            </li>
+            <li>
+              <span class="step-num">3</span>
+              <div class="step-content">
+                <strong>CSV インポートで組織移行時に転送</strong><br />
+                旧アカウントからエクスポートした CSV を新 PR にアップして移行。
+                <pre class="code-block" style="margin-top: 0.5rem"><span class="code-green">@coderabbitai</span> <span class="code-string">import file my_learnings.csv as Learnings data for future use</span></pre>
+              </div>
+            </li>
+          </ul>
+
+          <h4 class="subsection-title">効果的な Learning の書き方</h4>
+          <div class="compare-grid">
+            <div class="compare-card good">
+              <div class="compare-head">✅ 効果的（理由を含む）</div>
+              <pre class="compare-body"><span class="code-green">@coderabbitai</span> ユーザー ID をエラーメッセージに含めないでください。
+<span class="code-cyan">理由:</span> エラーログは外部モニタリングサービスに送信されるため。ユーザーコンテキストは トレーシングシステムで別途追跡しています。</pre>
+            </div>
+            <div class="compare-card bad">
+              <div class="compare-head">❌ 非効果的（理由なし）</div>
+              <pre class="compare-body"><span class="code-green">@coderabbitai</span> エラーメッセージにユーザー IDを入れるな。
+
+<span class="code-comment">// 理由がないと類似状況で正しく適用されない</span></pre>
+            </div>
+          </div>
+
+          <h4 class="subsection-title">Learnings スコープ設定</h4>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>スコープ</th>
+                  <th>挙動</th>
+                  <th>推奨ユースケース</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>auto</code>（デフォルト）</td>
+                  <td>public: リポジトリのみ / private: 組織全体</td>
+                  <td>混在環境のデフォルト</td>
+                </tr>
+                <tr>
+                  <td><code>local</code></td>
+                  <td>そのリポジトリのみ</td>
+                  <td>Python / React 等 異なる技術スタックが混在</td>
+                </tr>
+                <tr>
+                  <td><code>global</code></td>
+                  <td>組織全リポジトリに適用</td>
+                  <td>セキュリティ要件・命名規則が全社統一</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">3.3 Code Guidelines — 既存ドキュメントを即座に活用</h3>
+          <p>
+            CodeRabbit
+            は以下のファイルをリポジトリ内で<strong>自動検出</strong>し、レビュー基準として適用します。設定不要です。
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ファイル名</th>
+                  <th>説明</th>
+                  <th>AI コーディングエージェントとの共有</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>CLAUDE.md</code></td>
+                  <td>Anthropic Claude 向けエージェント指示</td>
+                  <td>Claude Code / Cursor で共有可</td>
+                </tr>
+                <tr>
+                  <td><code>.cursorrules</code></td>
+                  <td>Cursor IDE のルール定義</td>
+                  <td>Cursor で共有可</td>
+                </tr>
+                <tr>
+                  <td><code>AGENTS.md</code></td>
+                  <td>汎用エージェント指示ファイル</td>
+                  <td>多くのエージェントで共有可</td>
+                </tr>
+                <tr>
+                  <td><code>.github/copilot-instructions.md</code></td>
+                  <td>GitHub Copilot 向け指示</td>
+                  <td>Copilot で共有可</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="alert green">
+            💡 <strong>CLAUDE.md が既に存在するなら</strong>、CodeRabbit
+            は追加設定なしにその内容をレビュー基準として使用します。プロジェクトの規約を一元管理できます。
+          </div>
+        </div>
+
+        <!-- Ch3 refs -->
+        <div class="section">
+          <h3 class="section-title">📚 Chapter 3 参考 URL</h3>
+          <div class="ref-grid">
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】Knowledge Base 概要</div>
+              <a href="https://docs.coderabbit.ai/knowledge-base/index.md" target="_blank"
+                >https://docs.coderabbit.ai/knowledge-base/index.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】Learnings</div>
+              <a href="https://docs.coderabbit.ai/knowledge-base/learnings.md" target="_blank"
+                >https://docs.coderabbit.ai/knowledge-base/learnings.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】Code Guidelines</div>
+              <a href="https://docs.coderabbit.ai/knowledge-base/code-guidelines.md" target="_blank"
+                >https://docs.coderabbit.ai/knowledge-base/code-guidelines.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】Multi-Repo Analysis</div>
+              <a
+                href="https://docs.coderabbit.ai/knowledge-base/multi-repo-analysis.md"
+                target="_blank"
+                >https://docs.coderabbit.ai/knowledge-base/multi-repo-analysis.md</a
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <!-- ══════════════ CH4: COMMANDS ══════════════ -->
+      <section class="chapter" id="ch4">
+        <div class="chapter-header">
+          <div class="chapter-num">4</div>
+          <h2 class="chapter-title">
+            <span>コマンド</span> &amp; チャット活用 <span class="klevel kl1">K-Level: 記憶</span>
+          </h2>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">4.1 コアコマンド完全リファレンス</h3>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>コマンド</th>
+                  <th>効果</th>
+                  <th>用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>@coderabbitai review</code></td>
+                  <td>前回以降の差分を増分レビュー</td>
+                  <td>新しいコミット後に素早く確認</td>
+                </tr>
+                <tr>
+                  <td><code>@coderabbitai full review</code></td>
+                  <td>PR 全体をゼロからレビュー</td>
+                  <td>大規模リファクタリング後</td>
+                </tr>
+                <tr>
+                  <td><code>@coderabbitai pause</code></td>
+                  <td>自動レビューを一時停止</td>
+                  <td>WIP コミット中のノイズ削減</td>
+                </tr>
+                <tr>
+                  <td><code>@coderabbitai resume</code></td>
+                  <td>自動レビューを再開</td>
+                  <td>pause 解除</td>
+                </tr>
+                <tr>
+                  <td><code>@coderabbitai resolve</code></td>
+                  <td>全コメントを解決済みにする</td>
+                  <td>一括クリーンアップ</td>
+                </tr>
+                <tr>
+                  <td><code>@coderabbitai summary</code></td>
+                  <td>PR 説明の要約を更新</td>
+                  <td>変更内容が大きく変わった後</td>
+                </tr>
+                <tr>
+                  <td><code>@coderabbitai generate sequence diagram</code></td>
+                  <td>シーケンス図を生成して投稿</td>
+                  <td>設計レビュー前の可視化</td>
+                </tr>
+                <tr>
+                  <td><code>@coderabbitai configuration</code></td>
+                  <td>現在の設定を表示</td>
+                  <td>設定確認・デバッグ</td>
+                </tr>
+                <tr>
+                  <td><code>@coderabbitai help</code></td>
+                  <td>クイックリファレンスを表示</td>
+                  <td>コマンド一覧を確認</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout info">
+            <span class="callout-icon">💡</span>
+            <div class="callout-body">
+              <code>@coderabbitai review</code> と <code>full review</code> の違いに注意。<code
+                >review</code
+              >
+              は増分（前回以降の変更のみ）、<code>full review</code> は PR
+              全体を再評価します。大幅なリベース後は <code>full review</code> を使用してください。
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">4.2 インタラクティブチャットの活用パターン</h3>
+          <p>コマンド以外にも、CodeRabbit とのチャットによって様々な高度な活用が可能です。</p>
+
+          <div class="exam-grid">
+            <div class="exam-card">
+              <div class="exam-title">🔍 コードの深堀り質問</div>
+              <div class="exam-stars">★★★★☆</div>
+              <div class="exam-desc">
+                「この関数の時間計算量を教えて」「このパターンのメモリリークリスクは？」など、特定コードへの質問
+              </div>
+            </div>
+            <div class="exam-card">
+              <div class="exam-title">📝 Learning の即座追加</div>
+              <div class="exam-stars">★★★★★</div>
+              <div class="exam-desc">
+                コメント返信で理由付きの優先事項を伝えると、次回から自動適用される
+              </div>
+            </div>
+            <div class="exam-card">
+              <div class="exam-title">🔧 改善案の依頼</div>
+              <div class="exam-stars">★★★★☆</div>
+              <div class="exam-desc">
+                「このコードをより関数型スタイルに書き直して」「エラーハンドリングを強化するには？」
+              </div>
+            </div>
+            <div class="exam-card">
+              <div class="exam-title">📊 設計レビュー</div>
+              <div class="exam-stars">★★★☆☆</div>
+              <div class="exam-desc">
+                シーケンス図生成を活用して、PR の変更が設計意図と一致しているか確認
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">4.3 PR Description で自動レビューを制御</h3>
+
+          <pre class="code-block"><span class="file-tag">PR Description</span>
+<span class="code-comment">## Summary</span>
+<span class="code-comment">このPRはユーザー認証フローのリファクタリングです。</span>
+
+<span class="code-comment">## レビュー対象外（意図的な変更）</span>
+<span class="code-green">@coderabbitai ignore</span> <span class="code-amber"># ← PR全体の自動レビューを無効化</span>
+
+<span class="code-comment">## または特定コミットのみ除外したい場合</span>
+<span class="code-comment"># コミットメッセージに [skip ci] を含める</span></pre>
+        </div>
+
+        <!-- Ch4 refs -->
+        <div class="section">
+          <h3 class="section-title">📚 Chapter 4 参考 URL</h3>
+          <div class="ref-grid">
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】コマンド管理</div>
+              <a href="https://docs.coderabbit.ai/guides/commands.md" target="_blank"
+                >https://docs.coderabbit.ai/guides/commands.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】レビューコマンドリファレンス</div>
+              <a href="https://docs.coderabbit.ai/reference/review-commands.md" target="_blank"
+                >https://docs.coderabbit.ai/reference/review-commands.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】インタラクティブチャット</div>
+              <a href="https://docs.coderabbit.ai/guide/chat.md" target="_blank"
+                >https://docs.coderabbit.ai/guide/chat.md</a
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <!-- ══════════════ CH5: FINISHING TOUCHES ══════════════ -->
+      <section class="chapter" id="ch5">
+        <div class="chapter-header">
+          <div class="chapter-num">5</div>
+          <h2 class="chapter-title">
+            <span>Finishing Touches</span> — AI が仕上げる
+            <span class="klevel kl3">K-Level: 応用</span>
+          </h2>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">5.1 Finishing Touches 全機能マップ</h3>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>機能</th>
+                  <th>コマンド</th>
+                  <th>出力</th>
+                  <th>プラン</th>
+                  <th>対応 PF</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>🔧 <strong>Autofix</strong></td>
+                  <td><code>@coderabbitai autofix</code></td>
+                  <td>コミット or スタック PR</td>
+                  <td>Pro+</td>
+                  <td>GitHub / GitLab</td>
+                </tr>
+                <tr>
+                  <td>📝 <strong>Docstring 生成</strong></td>
+                  <td><code>@coderabbitai generate docstrings</code></td>
+                  <td>別 PR として作成</td>
+                  <td>Pro+</td>
+                  <td>全プラットフォーム</td>
+                </tr>
+                <tr>
+                  <td>🔀 <strong>マージコンフリクト解消</strong></td>
+                  <td><code>@coderabbitai fix merge conflict</code></td>
+                  <td>マージコミット</td>
+                  <td>Pro+</td>
+                  <td>GitHub / GitLab</td>
+                </tr>
+                <tr>
+                  <td>🧪 <strong>ユニットテスト生成</strong></td>
+                  <td><code>@coderabbitai generate unit tests</code></td>
+                  <td>PR or コミット</td>
+                  <td>Pro+</td>
+                  <td>GitHub のみ</td>
+                </tr>
+                <tr>
+                  <td>✨ <strong>コード簡略化</strong></td>
+                  <td><code>@coderabbitai simplify</code></td>
+                  <td>PR or コミット</td>
+                  <td>Pro+</td>
+                  <td>GitHub のみ</td>
+                </tr>
+                <tr>
+                  <td>📜 <strong>Custom Recipe</strong></td>
+                  <td><code>@coderabbitai run &lt;recipe&gt;</code></td>
+                  <td>コミット or スタック PR</td>
+                  <td>Pro+</td>
+                  <td>GitHub のみ</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">5.2 Custom Recipes — チームの繰り返しタスクを自動化</h3>
+          <p>
+            <strong>定義：</strong
+            >チームが頻繁に行う定型作業をレシピとして定義し、ワンコマンドで実行させる機能。
+          </p>
+          <p>
+            <strong>具体例：</strong>CHANGELOG 更新・import
+            整理・型チェック強化・国際化対応確認など。
+          </p>
+
+          <pre class="code-block"><span class="file-tag">.coderabbit.yaml</span>
+<span class="code-keyword">finishing_touches</span>:
+  <span class="code-keyword">custom_recipes</span>:
+    - <span class="code-keyword">name</span>: <span class="code-string">"add-changelog-entry"</span>
+      <span class="code-keyword">description</span>: <span class="code-string">"CHANGELOG.md にこの PR のエントリを追加"</span>
+      <span class="code-keyword">instructions</span>: <span class="code-string">|
+        PR の内容を分析し、CHANGELOG.md の [Unreleased] セクションに適切なエントリを追加してください。
+        形式: `- [Fix/Feature/Chore] 変更内容の簡潔な説明 (#PR番号)`</span>
+
+    - <span class="code-keyword">name</span>: <span class="code-string">"enforce-strict-types"</span>
+      <span class="code-keyword">description</span>: <span class="code-string">"any 型を排除して厳密型に変換"</span>
+      <span class="code-keyword">instructions</span>: <span class="code-string">|
+        変更されたTypeScriptファイル内の any 型を 適切な型に置き換えてください。
+        unknown を中間型として使う場合はコメントで説明を追加。</span></pre>
+
+          <h4 class="subsection-title">使い方</h4>
+          <pre class="code-block"><span class="code-comment"># PR コメントでレシピを実行</span>
+<span class="code-green">@coderabbitai</span> <span class="code-string">run add-changelog-entry</span>
+<span class="code-green">@coderabbitai</span> <span class="code-string">run enforce-strict-types</span></pre>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">5.3 Finishing Touches のトリガーフロー</h3>
+
+          <div class="mermaid-wrap">
+            <div id="mermaid-finishing-touches"></div>
+          </div>
+        </div>
+
+        <!-- Ch5 refs -->
+        <div class="section">
+          <h3 class="section-title">📚 Chapter 5 参考 URL</h3>
+          <div class="ref-grid">
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】Finishing Touches 概要</div>
+              <a href="https://docs.coderabbit.ai/finishing-touches/index.md" target="_blank"
+                >https://docs.coderabbit.ai/finishing-touches/index.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】Autofix</div>
+              <a href="https://docs.coderabbit.ai/finishing-touches/autofix.md" target="_blank"
+                >https://docs.coderabbit.ai/finishing-touches/autofix.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】Docstring 生成</div>
+              <a href="https://docs.coderabbit.ai/finishing-touches/docstrings.md" target="_blank"
+                >https://docs.coderabbit.ai/finishing-touches/docstrings.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】Unit Test 生成</div>
+              <a
+                href="https://docs.coderabbit.ai/finishing-touches/unit-test-generation.md"
+                target="_blank"
+                >https://docs.coderabbit.ai/finishing-touches/unit-test-generation.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】Custom Recipes</div>
+              <a
+                href="https://docs.coderabbit.ai/finishing-touches/custom-finishing-touches.md"
+                target="_blank"
+                >https://docs.coderabbit.ai/finishing-touches/custom-finishing-touches.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】マージコンフリクト解消</div>
+              <a
+                href="https://docs.coderabbit.ai/finishing-touches/resolve-merge-conflict.md"
+                target="_blank"
+                >https://docs.coderabbit.ai/finishing-touches/resolve-merge-conflict.md</a
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <!-- ══════════════ CH6: MCP ══════════════ -->
+      <section class="chapter" id="ch6">
+        <div class="chapter-header">
+          <div class="chapter-num">6</div>
+          <h2 class="chapter-title">
+            <span>MCP</span> 統合 — コンテキストを無限に拡張
+            <span class="klevel kl3">K-Level: 応用</span>
+          </h2>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">6.1 MCP とは何か、なぜ重要か</h3>
+          <p>
+            <strong>定義：</strong>Model Context Protocol (MCP) は Anthropic
+            が提唱した標準インターフェース。CodeRabbit は MCP クライアントとして動作し、あらゆる MCP
+            サーバーに接続して外部データをレビューコンテキストに組み込みます。
+          </p>
+          <p>
+            <strong>理由：</strong
+            >コードレビューの精度は「コンテキストの豊富さ」に依存します。設計書・テスト結果・イシュー要件・パフォーマンスデータを参照することで、コードの「正しさ」をより深く評価できます。
+          </p>
+
+          <div class="metric-grid">
+            <div class="metric-card">
+              <div class="metric-val">5</div>
+              <div class="metric-label">MCP 接続数 (Pro)</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-val">15</div>
+              <div class="metric-label">MCP 接続数 (Pro+)</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-val">20</div>
+              <div class="metric-label">MCP 接続数 (Enterprise)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">6.2 MCP 設定手順</h3>
+
+          <ul class="step-list">
+            <li>
+              <span class="step-num">1</span>
+              <div class="step-content">
+                <a
+                  href="https://app.coderabbit.ai/integrations"
+                  target="_blank"
+                  style="color: var(--neon-cyan)"
+                  >app.coderabbit.ai/integrations</a
+                >
+                → MCP タブへ移動
+              </div>
+            </li>
+            <li>
+              <span class="step-num">2</span>
+              <div class="step-content">
+                <strong>New MCP Server</strong> をクリック。サーバー URL と名前を入力
+              </div>
+            </li>
+            <li>
+              <span class="step-num">3</span>
+              <div class="step-content">認証フロー（OAuth / API キー等）を完了</div>
+            </li>
+            <li>
+              <span class="step-num">4</span>
+              <div class="step-content">個別ツールの有効/無効を切り替え</div>
+            </li>
+            <li>
+              <span class="step-num">5</span>
+              <div class="step-content">
+                <strong>User guidance</strong> フィールドに CodeRabbit
+                への使い方説明を記述（次節参照）
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">6.3 User Guidance — AI に使い方を教える</h3>
+          <p>
+            <strong>定義：</strong>MCP サーバーを利用する際に AI
+            エージェントが最初に読むフリーテキスト指示。
+          </p>
+
+          <div class="compare-grid">
+            <div class="compare-card good">
+              <div class="compare-head">✅ Notion MCP 向け優れた User Guidance</div>
+              <pre class="compare-body"><span class="code-cyan">このNotionワークスペースはエンジニアリング文書を含みます。</span>
+コードレビューでは "Engineering" スペースを参照してください:
+- "Architecture Decisions": 設計の根拠
+- "API Contracts": インターフェース仕様
+- "Service Runbooks": 運用コンテキスト
+HR / Finance スペースの内容は取得しないでください。</pre>
+            </div>
+            <div class="compare-card bad">
+              <div class="compare-head">❌ 不十分な User Guidance</div>
+              <pre class="compare-body"><span class="code-pink">Notion のドキュメントを使ってください。</span>
+
+<span class="code-comment">// 問題:
+// - どのスペースを見るか不明
+// - レビューとの関連性不明
+// - 不要なページも取得される</span></pre>
+            </div>
+          </div>
+
+          <h4 class="subsection-title">URL テンプレートプレースホルダー</h4>
+          <p>MCP の User Guidance 内で PR 固有の値を動的に展開できます。</p>
+
+          <pre class="code-block"><span class="code-comment"># Jenkins Organization Folder の例</span>
+<span class="code-green">Jenkins ビルド URL パターン:</span> <span class="code-string">https://jenkins.company.com/job/{workspace}/job/{repo}/job/PR-{pr}/</span>
+
+<span class="code-comment"># SonarQube プロジェクトキー規約</span>
+<span class="code-green">SonarQube プロジェクトキー形式:</span> <span class="code-amber">{org}_{repo}</span>
+<span class="code-green">ダッシュボード URL:</span> <span class="code-string">https://sonar.company.com/dashboard?id={org}_{repo}</span></pre>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>プレースホルダー</th>
+                  <th>展開される値</th>
+                  <th>例</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>{repo}</code> / <code>{repository}</code></td>
+                  <td>リポジトリ名</td>
+                  <td><code>my-backend</code></td>
+                </tr>
+                <tr>
+                  <td><code>{pr}</code> / <code>{pr number}</code></td>
+                  <td>PR 番号</td>
+                  <td><code>42</code></td>
+                </tr>
+                <tr>
+                  <td><code>{workspace}</code> / <code>{org}</code></td>
+                  <td>組織名</td>
+                  <td><code>acme-corp</code></td>
+                </tr>
+                <tr>
+                  <td><code>{project}</code></td>
+                  <td>Azure DevOps プロジェクト名</td>
+                  <td><code>MyProject</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Ch6 refs -->
+        <div class="section">
+          <h3 class="section-title">📚 Chapter 6 参考 URL</h3>
+          <div class="ref-grid">
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】MCP サーバー統合</div>
+              <a href="https://docs.coderabbit.ai/integrations/mcp-servers.md" target="_blank"
+                >https://docs.coderabbit.ai/integrations/mcp-servers.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】Knowledge Base - MCP コンテキスト</div>
+              <a href="https://docs.coderabbit.ai/knowledge-base/mcp-context.md" target="_blank"
+                >https://docs.coderabbit.ai/knowledge-base/mcp-context.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】Slack Agent 接続</div>
+              <a href="https://docs.coderabbit.ai/slack-agent/connections.md" target="_blank"
+                >https://docs.coderabbit.ai/slack-agent/connections.md</a
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <!-- ══════════════ CH7: TOOLS / CI ══════════════ -->
+      <section class="chapter" id="ch7">
+        <div class="chapter-header">
+          <div class="chapter-num">7</div>
+          <h2 class="chapter-title">
+            <span>ツール</span> &amp; CI/CD 連携 <span class="klevel kl2">K-Level: 適用</span>
+          </h2>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">7.1 40+ 静的解析ツールの自動統合</h3>
+          <p>
+            CodeRabbit
+            は各言語の代表的な静的解析ツールを自動実行し、結果をインラインコメントに統合します。設定ファイルが存在すればそれを優先使用します。
+          </p>
+
+          <div class="progress-list">
+            <div class="progress-item">
+              <div class="progress-label">
+                <span>JavaScript / TypeScript</span
+                ><span style="color: var(--neon-cyan)">ESLint + Biome + Oxlint</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div
+                  class="progress-bar"
+                  style="
+                    --target-width: 95%;
+                    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+                  "
+                ></div>
+              </div>
+            </div>
+            <div class="progress-item">
+              <div class="progress-label">
+                <span>Python</span
+                ><span style="color: var(--neon-green)">Ruff + Flake8 + Pylint</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div
+                  class="progress-bar"
+                  style="
+                    --target-width: 90%;
+                    background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan));
+                  "
+                ></div>
+              </div>
+            </div>
+            <div class="progress-item">
+              <div class="progress-label">
+                <span>Go</span><span style="color: var(--neon-amber)">golangci-lint</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div
+                  class="progress-bar"
+                  style="
+                    --target-width: 88%;
+                    background: linear-gradient(90deg, var(--neon-amber), var(--neon-green));
+                  "
+                ></div>
+              </div>
+            </div>
+            <div class="progress-item">
+              <div class="progress-label">
+                <span>Rust</span><span style="color: var(--neon-pink)">Clippy</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div
+                  class="progress-bar"
+                  style="
+                    --target-width: 85%;
+                    background: linear-gradient(90deg, var(--neon-pink), var(--neon-amber));
+                  "
+                ></div>
+              </div>
+            </div>
+            <div class="progress-item">
+              <div class="progress-label">
+                <span>セキュリティ全般</span
+                ><span style="color: var(--neon-purple)"
+                  >Semgrep + OpenGrep + Betterleaks + Trivy</span
+                >
+              </div>
+              <div class="progress-bar-bg">
+                <div
+                  class="progress-bar"
+                  style="
+                    --target-width: 92%;
+                    background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink));
+                  "
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>カテゴリ</th>
+                  <th>対応ツール（抜粋）</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>JavaScript/TS</td>
+                  <td>ESLint, Biome, Oxlint, ember-template-lint</td>
+                </tr>
+                <tr>
+                  <td>Python</td>
+                  <td>Ruff, Flake8, Pylint, Bandit</td>
+                </tr>
+                <tr>
+                  <td>Java/Kotlin</td>
+                  <td>PMD, Detekt</td>
+                </tr>
+                <tr>
+                  <td>Ruby</td>
+                  <td>RuboCop</td>
+                </tr>
+                <tr>
+                  <td>PHP</td>
+                  <td>PHPCS, PHPMD, PHPStan</td>
+                </tr>
+                <tr>
+                  <td>Go</td>
+                  <td>golangci-lint</td>
+                </tr>
+                <tr>
+                  <td>Rust</td>
+                  <td>Clippy</td>
+                </tr>
+                <tr>
+                  <td>Swift</td>
+                  <td>SwiftLint</td>
+                </tr>
+                <tr>
+                  <td>CSS</td>
+                  <td>Stylelint</td>
+                </tr>
+                <tr>
+                  <td>Infra/Config</td>
+                  <td>Checkov, TFLint, Hadolint, actionlint, YAMLlint</td>
+                </tr>
+                <tr>
+                  <td>セキュリティ</td>
+                  <td>Semgrep, OpenGrep, Trivy, TruffleHog, OSV-Scanner, Betterleaks</td>
+                </tr>
+                <tr>
+                  <td>SQL</td>
+                  <td>SQLFluff</td>
+                </tr>
+                <tr>
+                  <td>Shell</td>
+                  <td>ShellCheck</td>
+                </tr>
+                <tr>
+                  <td>Markdown</td>
+                  <td>markdownlint, LanguageTool</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">7.2 CI/CD パイプライン解析</h3>
+          <p>
+            <strong>定義：</strong>CodeRabbit は CI/CD
+            の失敗ログを読み取り、失敗した箇所のコードラインに直接修正提案を投稿します。
+          </p>
+
+          <div class="mermaid-wrap">
+            <div id="mermaid-pipeline"></div>
+          </div>
+
+          <h4 class="subsection-title">CircleCI 連携設定例</h4>
+          <pre class="code-block"><span class="file-tag">.coderabbit.yaml</span>
+<span class="code-keyword">integrations</span>:
+  <span class="code-keyword">circleci</span>:
+    <span class="code-keyword">enabled</span>: <span class="code-green">true</span>
+
+<span class="code-comment"># CircleCI MCP サーバーを別途追加することで
+# より詳細なパイプライン情報を取得可能</span></pre>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">7.3 IDE・CLI 連携</h3>
+          <p>PR を開く前の段階でもコードレビューが可能です。</p>
+
+          <div class="exam-grid">
+            <div class="exam-card">
+              <div class="exam-title">🖥️ VS Code / Cursor / Windsurf</div>
+              <div class="exam-stars">★★★★★</div>
+              <div class="exam-desc">
+                IDE 拡張をインストールするだけでコミット前にリアルタイムレビューを取得
+              </div>
+            </div>
+            <div class="exam-card">
+              <div class="exam-title">💻 CLI ツール</div>
+              <div class="exam-stars">★★★★☆</div>
+              <div class="exam-desc">
+                Claude Code / Cursor / Codex / Gemini に CodeRabbit
+                プラグインを組み込んで自律レビュー
+              </div>
+            </div>
+          </div>
+
+          <pre class="code-block"><span class="code-comment"># Claude Code での CodeRabbit CLI スキル追加</span>
+<span class="code-green">claude</span> <span class="code-string">install coderabbit-skill</span>
+
+<span class="code-comment"># 手動 CLI レビュー実行</span>
+<span class="code-green">coderabbit</span> <span class="code-string">review --diff HEAD~1</span></pre>
+        </div>
+
+        <!-- Ch7 refs -->
+        <div class="section">
+          <h3 class="section-title">📚 Chapter 7 参考 URL</h3>
+          <div class="ref-grid">
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】ツール一覧</div>
+              <a href="https://docs.coderabbit.ai/tools/index.md" target="_blank"
+                >https://docs.coderabbit.ai/tools/index.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】CI/CD パイプライン解析</div>
+              <a
+                href="https://docs.coderabbit.ai/pr-reviews/cicd-pipeline-analysis.md"
+                target="_blank"
+                >https://docs.coderabbit.ai/pr-reviews/cicd-pipeline-analysis.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】CircleCI 連携</div>
+              <a href="https://docs.coderabbit.ai/integrations/circleci.md" target="_blank"
+                >https://docs.coderabbit.ai/integrations/circleci.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】IDE 拡張</div>
+              <a href="https://docs.coderabbit.ai/ide/index.md" target="_blank"
+                >https://docs.coderabbit.ai/ide/index.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】CLI ツール</div>
+              <a href="https://docs.coderabbit.ai/cli/index.md" target="_blank"
+                >https://docs.coderabbit.ai/cli/index.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】Claude Code 連携</div>
+              <a href="https://docs.coderabbit.ai/cli/claude-code-integration.md" target="_blank"
+                >https://docs.coderabbit.ai/cli/claude-code-integration.md</a
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <!-- ══════════════ CH8: ADVANCED ══════════════ -->
+      <section class="chapter" id="ch8">
+        <div class="chapter-header">
+          <div class="chapter-num">8</div>
+          <h2 class="chapter-title">
+            <span>上級テクニック</span> — 真のエキスパートへ
+            <span class="klevel kl3">K-Level: 創造</span>
+          </h2>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">8.1 ast-grep による構文精密レビュー</h3>
+          <p>
+            <strong>定義：</strong
+            >AST（抽象構文木）ベースのパターンマッチングで、テキスト検索では発見できない構造的なコードパターンを検出します。
+          </p>
+
+          <pre class="code-block"><span class="file-tag">.coderabbit.yaml</span>
+<span class="code-keyword">reviews</span>:
+  <span class="code-keyword">path_instructions</span>:
+    - <span class="code-keyword">path</span>: <span class="code-string">"src/**/*.ts"</span>
+      <span class="code-keyword">instructions</span>: <span class="code-string">|
+        Use ast-grep to detect any usage of `document.write()`. This is banned in our codebase due to XSS risks.</span>
+
+<span class="code-comment"># ast-grep ルールファイル (.ast-grep/rules/no-console.yaml)</span>
+<span class="code-keyword">id</span>: <span class="code-string">no-console-log</span>
+<span class="code-keyword">language</span>: <span class="code-string">TypeScript</span>
+<span class="code-keyword">rule</span>:
+  <span class="code-keyword">pattern</span>: <span class="code-string">console.log($$$)</span>
+<span class="code-keyword">message</span>: <span class="code-string">本番コードに console.log を残さないでください</span>
+<span class="code-keyword">severity</span>: <span class="code-string">warning</span></pre>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">8.2 Pre-Merge Checks — マージ前の品質ゲート</h3>
+          <p>
+            <strong>定義：</strong>PR
+            マージ前に自動実行されるカスタム検証ロジック。自然言語で条件を定義できます。
+          </p>
+
+          <pre class="code-block"><span class="file-tag">.coderabbit.yaml</span>
+<span class="code-keyword">reviews</span>:
+  <span class="code-keyword">custom_checks</span>:
+    - <span class="code-keyword">name</span>: <span class="code-string">"migration-has-rollback"</span>
+      <span class="code-keyword">description</span>: <span class="code-string">"DBマイグレーションには必ずロールバックが必要"</span>
+      <span class="code-keyword">instructions</span>: <span class="code-string">|
+        db/migrations/ 配下のファイルが変更されている場合: up() / down() の両メソッドが存在することを確認。 down() が存在しない場合は FAIL。</span>
+
+    - <span class="code-keyword">name</span>: <span class="code-string">"no-secrets-in-code"</span>
+      <span class="code-keyword">description</span>: <span class="code-string">"ハードコードされた認証情報の検出"</span>
+      <span class="code-keyword">instructions</span>: <span class="code-string">|
+        API キー・パスワード・トークンのハードコーディングを検出。 環境変数 (process.env.*) 経由でない認証情報は FAIL。</span></pre>
+
+          <div class="callout warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-body">
+              Pre-Merge Checks は GitHub Status Check として統合されます。PR
+              のマージブロック条件として設定できます（Branch Protection Rules との組み合わせ推奨）。
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">8.3 Global Overrides — コンプライアンス強制</h3>
+          <p>
+            <strong>定義：</strong>組織管理者のみが設定でき、全リポジトリの個別 YAML
+            を含めたあらゆる設定より優先される最強レイヤー。
+          </p>
+
+          <div class="callout danger">
+            <span class="callout-icon">🚨</span>
+            <div class="callout-body">
+              Global Overrides
+              は全リポジトリに強制適用されます。誤った設定は組織全体のレビューワークフローに影響するため、必ずステージング環境でテストしてから適用してください。
+            </div>
+          </div>
+
+          <pre class="code-block"><span class="file-tag">Organization Settings → Global Overrides</span>
+<span class="code-comment"># yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json</span>
+<span class="code-keyword">reviews</span>:
+  <span class="code-keyword">profile</span>: <span class="code-string">"assertive"</span>
+  <span class="code-keyword">path_instructions</span>:
+    - <span class="code-keyword">path</span>: <span class="code-string">"**/*.sql"</span>
+      <span class="code-keyword">instructions</span>: <span class="code-string">|
+        DROP TABLE / TRUNCATE を含む文を発見した場合、 必ず DANGER レベルで警告。承認なしのマージを禁止。</span>
+
+<span class="code-comment"># スカラー: 上書き / オブジェクト: 再帰的マージ</span>
+<span class="code-comment"># 配列: キーで照合後マージ (path_instructions は path がキー)</span></pre>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">8.4 Learnings の健全性維持サイクル</h3>
+
+          <div class="mermaid-wrap">
+            <div id="mermaid-learnings"></div>
+          </div>
+
+          <h4 class="subsection-title">運用ベストプラクティス</h4>
+          <ul class="step-list">
+            <li>
+              <span class="step-num">Q</span>
+              <div class="step-content">
+                <strong>四半期レビュー：</strong>古い・矛盾する Learning
+                を特定して削除。技術スタックが変わった後は特に重要
+              </div>
+            </li>
+            <li>
+              <span class="step-num">🔍</span>
+              <div class="step-content">
+                <strong>類似検索を活用：</strong>「error
+                handling」「authentication」等のキーワードで意味的に類似した Learning を一括確認
+              </div>
+            </li>
+            <li>
+              <span class="step-num">⚡</span>
+              <div class="step-content">
+                <strong>Learning が無視される場合：</strong>「Before responding, review all
+                Learnings to ensure none are ignored.」という補強ルールを追加
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">8.5 Slack Agent — AI エージェントをワークスペースに</h3>
+          <p>CodeRabbit Agent for Slack は Slack 上で直接 AI コーディング支援を実現します。</p>
+
+          <div class="trend-card">
+            <div class="trend-tag">🔮 最新機能</div>
+            <div class="trend-title">スコープ管理による権限制御</div>
+            <div class="trend-body">
+              Slack
+              チャンネルごとに「スコープ」を設定し、アクセス可能なリポジトリ・外部ツール・消費上限を個別管理。本番リポジトリへのアクセスを制限しつつ、開発リポジトリでは広い権限を付与するような細粒度制御が可能。
+            </div>
+          </div>
+
+          <div class="trend-card">
+            <div class="trend-tag">🔮 最新機能</div>
+            <div class="trend-title">Automations — 定期実行タスク</div>
+            <div class="trend-body">
+              Slack Agent のオートメーション機能により、「毎週月曜に未解決 PR の要約を投稿」「CI
+              失敗時に自動分析を実行」といったスケジュールトリガーを設定可能。
+            </div>
+          </div>
+        </div>
+
+        <!-- Ch8 refs -->
+        <div class="section">
+          <h3 class="section-title">📚 Chapter 8 参考 URL</h3>
+          <div class="ref-grid">
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】ast-grep 指示</div>
+              <a
+                href="https://docs.coderabbit.ai/configuration/ast-grep-instructions.md"
+                target="_blank"
+                >https://docs.coderabbit.ai/configuration/ast-grep-instructions.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】Custom Checks</div>
+              <a href="https://docs.coderabbit.ai/pr-reviews/custom-checks.md" target="_blank"
+                >https://docs.coderabbit.ai/pr-reviews/custom-checks.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】Pre-Merge Checks</div>
+              <a href="https://docs.coderabbit.ai/pr-reviews/pre-merge-checks.md" target="_blank"
+                >https://docs.coderabbit.ai/pr-reviews/pre-merge-checks.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】Slack Agent</div>
+              <a href="https://docs.coderabbit.ai/slack-agent/index.md" target="_blank"
+                >https://docs.coderabbit.ai/slack-agent/index.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】Scopes</div>
+              <a href="https://docs.coderabbit.ai/slack-agent/scopes.md" target="_blank"
+                >https://docs.coderabbit.ai/slack-agent/scopes.md</a
+              >
+            </div>
+            <div class="ref-card">
+              <div class="ref-cat">【公式 Docs】Automations</div>
+              <a href="https://docs.coderabbit.ai/slack-agent/automations.md" target="_blank"
+                >https://docs.coderabbit.ai/slack-agent/automations.md</a
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <!-- ══════════════ REFERENCES ══════════════ -->
+      <section class="chapter" id="refs">
+        <div class="chapter-header">
+          <div
+            class="chapter-num"
+            style="border-color: var(--neon-amber); color: var(--neon-amber)"
+          >
+            📚
+          </div>
+          <h2 class="chapter-title">全参考 <span>URL 一覧</span></h2>
+        </div>
+
+        <h3 class="section-title">🏠 公式ドキュメント（一次情報源）</h3>
+        <div class="ref-grid">
+          <div class="ref-card">
+            <div class="ref-cat">【公式 Docs】ホーム</div>
+            <a href="https://docs.coderabbit.ai/" target="_blank">https://docs.coderabbit.ai/</a>
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">【公式 Docs】完全インデックス</div>
+            <a href="https://docs.coderabbit.ai/llms.txt" target="_blank"
+              >https://docs.coderabbit.ai/llms.txt</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">【公式 App】Web アプリ</div>
+            <a href="https://app.coderabbit.ai/" target="_blank">https://app.coderabbit.ai/</a>
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">【公式】料金プラン</div>
+            <a href="https://coderabbit.ai/pricing" target="_blank"
+              >https://coderabbit.ai/pricing</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">【公式 Schema】設定スキーマ</div>
+            <a href="https://coderabbit.ai/integrations/schema.v2.json" target="_blank"
+              >https://coderabbit.ai/integrations/schema.v2.json</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">【公式 App】Learnings ダッシュボード</div>
+            <a href="https://app.coderabbit.ai/learnings" target="_blank"
+              >https://app.coderabbit.ai/learnings</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">【公式 App】MCP 統合設定</div>
+            <a href="https://app.coderabbit.ai/integrations" target="_blank"
+              >https://app.coderabbit.ai/integrations</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">【公式 Docs】Quickstart</div>
+            <a href="https://docs.coderabbit.ai/getting-started/quickstart.md" target="_blank"
+              >https://docs.coderabbit.ai/getting-started/quickstart.md</a
+            >
+          </div>
+        </div>
+
+        <h3 class="section-title" style="margin-top: 1.5rem">🔧 設定・カスタマイズ関連</h3>
+        <div class="ref-grid">
+          <div class="ref-card">
+            <div class="ref-cat">【公式 Docs】Configuration Reference</div>
+            <a href="https://docs.coderabbit.ai/reference/configuration.md" target="_blank"
+              >https://docs.coderabbit.ai/reference/configuration.md</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">【公式 Docs】YAML Validator</div>
+            <a href="https://docs.coderabbit.ai/configuration/yaml-validator.md" target="_blank"
+              >https://docs.coderabbit.ai/configuration/yaml-validator.md</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">【公式 Docs】自動レビュー制御</div>
+            <a href="https://docs.coderabbit.ai/configuration/auto-review.md" target="_blank"
+              >https://docs.coderabbit.ai/configuration/auto-review.md</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">【公式 Docs】組織設定</div>
+            <a href="https://docs.coderabbit.ai/guides/organization-settings.md" target="_blank"
+              >https://docs.coderabbit.ai/guides/organization-settings.md</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">【公式 Docs】設定例 (Django)</div>
+            <a
+              href="https://docs.coderabbit.ai/configuration/example/python/django.md"
+              target="_blank"
+              >https://docs.coderabbit.ai/configuration/example/python/django.md</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">【公式 Docs】設定例 (Expo)</div>
+            <a
+              href="https://docs.coderabbit.ai/configuration/example/typescript/expo.md"
+              target="_blank"
+              >https://docs.coderabbit.ai/configuration/example/typescript/expo.md</a
+            >
+          </div>
+        </div>
+
+        <h3 class="section-title" style="margin-top: 1.5rem">🤖 エージェント・AI 関連</h3>
+        <div class="ref-grid">
+          <div class="ref-card">
+            <div class="ref-cat">【公式 Docs】CodeRabbit Plan 概要</div>
+            <a href="https://docs.coderabbit.ai/plan/index.md" target="_blank"
+              >https://docs.coderabbit.ai/plan/index.md</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">【公式 Docs】Agent Handoff</div>
+            <a href="https://docs.coderabbit.ai/plan/agent-handoff.md" target="_blank"
+              >https://docs.coderabbit.ai/plan/agent-handoff.md</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">【公式 Docs】Slop Detection</div>
+            <a href="https://docs.coderabbit.ai/pr-reviews/slop-detection.md" target="_blank"
+              >https://docs.coderabbit.ai/pr-reviews/slop-detection.md</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">【公式 Docs】Coding Plan 作成</div>
+            <a href="https://docs.coderabbit.ai/plan/create-plan.md" target="_blank"
+              >https://docs.coderabbit.ai/plan/create-plan.md</a
+            >
+          </div>
+        </div>
+
+        <h3 class="section-title" style="margin-top: 1.5rem">📊 管理・エンタープライズ</h3>
+        <div class="ref-grid">
+          <div class="ref-card">
+            <div class="ref-cat">【公式 Docs】管理概要</div>
+            <a href="https://docs.coderabbit.ai/management/index.md" target="_blank"
+              >https://docs.coderabbit.ai/management/index.md</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">【公式 Docs】Enterprise SSO</div>
+            <a href="https://docs.coderabbit.ai/management/sso/index.md" target="_blank"
+              >https://docs.coderabbit.ai/management/sso/index.md</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">【公式 Docs】監査ログ</div>
+            <a href="https://docs.coderabbit.ai/management/audit-logs.md" target="_blank"
+              >https://docs.coderabbit.ai/management/audit-logs.md</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">【公式 Docs】カスタムロール</div>
+            <a href="https://docs.coderabbit.ai/management/custom-roles.md" target="_blank"
+              >https://docs.coderabbit.ai/management/custom-roles.md</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">【公式 Docs】レポート</div>
+            <a href="https://docs.coderabbit.ai/management/reports/index.md" target="_blank"
+              >https://docs.coderabbit.ai/management/reports/index.md</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">【公式 Docs】Glossary</div>
+            <a href="https://docs.coderabbit.ai/reference/glossary.md" target="_blank"
+              >https://docs.coderabbit.ai/reference/glossary.md</a
+            >
+          </div>
+        </div>
+
+        <h3 class="section-title" style="margin-top: 1.5rem">🌐 外部参考資料</h3>
+        <div class="ref-grid">
+          <div class="ref-card">
+            <div class="ref-cat">【公式 Blog】CodeRabbit ブログ</div>
+            <a href="https://coderabbit.ai/blog" target="_blank">https://coderabbit.ai/blog</a>
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">【コミュニティ】Discord</div>
+            <a href="https://discord.gg/coderabbit" target="_blank"
+              >https://discord.gg/coderabbit</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">【外部ライブラリ】minimatch (glob パターン)</div>
+            <a href="https://github.com/isaacs/minimatch" target="_blank"
+              >https://github.com/isaacs/minimatch</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">【外部 Docs】MCP プロトコル仕様</div>
+            <a href="https://modelcontextprotocol.io/" target="_blank"
+              >https://modelcontextprotocol.io/</a
+            >
+          </div>
+        </div>
+
+        <div
+          style="
+            text-align: center;
+            margin-top: 3rem;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+          "
+        >
+          <p>
+            Generated: 2025-06 | Source:
+            <a href="https://docs.coderabbit.ai/" style="color: var(--neon-cyan)"
+              >docs.coderabbit.ai</a
+            >
+            (一次情報源)
+          </p>
+          <p style="margin-top: 0.3rem">CodeRabbit 公式ドキュメントに基づく中上級者向けガイド</p>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      // Mermaid init
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        themeVariables: {
+          primaryColor: '#0d1117',
+          primaryTextColor: '#e2e8f0',
+          primaryBorderColor: '#00f5ff',
+          lineColor: '#64748b',
+          secondaryColor: '#111827',
+          tertiaryColor: '#1e293b',
+          background: '#030712',
+          mainBkg: '#0d1117',
+          nodeBorder: '#00f5ff',
+          clusterBkg: '#111827',
+          titleColor: '#00f5ff',
+          edgeLabelBackground: '#111827',
+          attributeBackgroundColorEven: '#0d1117',
+          attributeBackgroundColorOdd: '#111827',
+          fontSize: '14px',
+        },
+        flowchart: { htmlLabels: true, curve: 'basis' },
+        sequence: { actorMargin: 50, messageMargin: 40 },
+      });
+
+      const DIAGRAMS = {
+        'mermaid-pr-flow': `flowchart TD
+A([PR Open / Push]) --> B[Webhook 受信]
+B --> C{自動レビュー設定?}
+C -- No --> D([待機: 手動コマンド待ち])
+C -- Yes --> E["Cloud Sandbox 起動\\nリポジトリフルクローン"]
+E --> F[Knowledge Base 読込]
+F --> G[Learnings DB 照合]
+G --> H{並列解析}
+H --> I[40+ 静的解析ツール]
+H --> J[LLM コード理解エージェント]
+H --> K[イシュートラッカー連携]
+I --> L[結果集約]
+J --> L
+K --> L
+L --> M["Verification エージェント\\n誤検知フィルタリング"]
+M --> N[Walkthrough コメント生成]
+N --> O[インライン Review コメント]
+O --> P([PR コメント投稿])
+P --> Q{Finishing Touches}
+Q --> R[Autofix / Unit Test / Docstring 等]
+
+style A fill:#0d1117,stroke:#00f5ff,color:#e2e8f0
+style P fill:#0d1117,stroke:#39ff14,color:#e2e8f0
+style H fill:#111827,stroke:#b347ea,color:#e2e8f0
+style M fill:#111827,stroke:#ffb800,color:#e2e8f0`,
+
+        'mermaid-finishing-touches': `flowchart LR
+A([PR レビュー完了]) --> B["Walkthrough コメント\\n✨ Finishing Touches セクション"]
+B --> C{トリガー方法}
+C --> D["チェックボックスをクリック\\nGitHub PR のみ"]
+C --> E["コマンドをコメント\\n全プラットフォーム"]
+D --> F[Sandbox 実行環境]
+E --> F
+F --> G{アクション種別}
+G --> H["Autofix\\n未解決指摘を修正"]
+G --> I["Unit Test\\nテストファイル生成"]
+G --> J["Docstring\\n18+ 言語対応"]
+G --> K["Custom Recipe\\n定義済みタスク実行"]
+H --> L([コミット or\\nスタック PR として出力])
+I --> L
+J --> M([別 PR として出力])
+K --> L
+
+style A fill:#0d1117,stroke:#00f5ff,color:#e2e8f0
+style L fill:#0d1117,stroke:#39ff14,color:#e2e8f0
+style M fill:#0d1117,stroke:#b347ea,color:#e2e8f0`,
+
+        'mermaid-pipeline': `sequenceDiagram
+participant Dev as 開発者
+participant PR as GitHub PR
+participant CI as CI/CD (CircleCI 等)
+participant CR as CodeRabbit
+
+Dev->>PR: プッシュ & PR 作成
+PR->>CI: Webhook トリガー
+CI-->>PR: ✗ ビルド失敗 (GitHub Checks)
+PR->>CR: Checks 失敗通知
+CR->>CI: ビルドログ取得
+CR->>CR: 失敗原因とコードを照合
+CR->>PR: 失敗行にインライン修正提案
+Dev->>PR: 提案を確認・適用
+PR->>CI: 再実行
+CI-->>PR: ✓ 成功`,
+
+        'mermaid-learnings': `flowchart TD
+A([PR レビュー]) --> B[CodeRabbit がコメント]
+B --> C{チームが反応}
+C --> D[同意: コメントを解決]
+C --> E[異議: 理由付きで反論]
+E --> F[Learning DB に追加]
+F --> G[次回レビューに反映]
+H([四半期定期メンテ]) --> I[Learnings ダッシュボード確認]
+I --> J{使用状況確認}
+J --> K[Never Used: 削除候補]
+J --> L[矛盾する Learning: 解消]
+J --> M[古い規約: 更新]
+K --> N([クリーンな Knowledge Base])
+L --> N
+M --> N
+N --> A
+
+style A fill:#0d1117,stroke:#00f5ff,color:#e2e8f0
+style N fill:#0d1117,stroke:#39ff14,color:#e2e8f0
+style H fill:#111827,stroke:#ffb800,color:#e2e8f0`
+      };
+
+      (async () => {
+        for (const [id, src] of Object.entries(DIAGRAMS)) {
+          const el = document.getElementById(id);
+          if (!el) continue;
+          try {
+            const { svg } = await mermaid.render('svg-' + id, src);
+            el.innerHTML = svg;
+            const svgEl = el.querySelector('svg');
+            if (svgEl) {
+              svgEl.removeAttribute('width');
+              svgEl.removeAttribute('height');
+              svgEl.style.width = 'auto';
+              svgEl.style.maxWidth = '100%';
+              svgEl.style.height = 'auto';
+            }
+          } catch (err) {
+            console.error('Mermaid render error for ' + id + ':', err);
+          }
+        }
+      })();
+
+      // Progress bar animation on scroll
+      const progressBars = document.querySelectorAll('.progress-bar');
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.style.animationPlayState = 'running';
+            }
+          });
+        },
+        { threshold: 0.3 },
+      );
+
+      progressBars.forEach((bar) => {
+        bar.style.animationPlayState = 'paused';
+        observer.observe(bar);
+      });
+    </script>
+  </body>
+</html>
