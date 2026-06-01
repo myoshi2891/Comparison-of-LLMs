@@ -15,9 +15,9 @@
   --text-muted: #484f58;
   --border: #21262d;
   --border-bright: #30363d;
-  --font-mono: var(--font-mono), 'Space Mono', 'Fira Code', monospace;
-  --font-display: var(--font-display), 'Syne', sans-serif;
-  --font-body: var(--font-sans), 'IBM Plex Sans JP', 'Noto Sans JP', sans-serif;
+  --font-mono: var(--font-mono), "Space Mono", "Fira Code", monospace;
+  --font-display: var(--font-display), "Syne", sans-serif;
+  --font-body: var(--font-sans), "IBM Plex Sans JP", "Noto Sans JP", sans-serif;
   --radius: 8px;
   --radius-lg: 12px;
   --shadow-neon: 0 0 20px rgba(0, 255, 136, 0.15);
@@ -34,7 +34,7 @@
 }
 
 .layout::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background: repeating-linear-gradient(
@@ -49,7 +49,7 @@
 }
 
 .layout::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background-image:
@@ -225,7 +225,7 @@
   gap: 0.75rem;
 }
 .sectionTitle::before {
-  content: '';
+  content: "";
   display: block;
   width: 4px;
   height: 1.4em;
@@ -797,7 +797,7 @@
   position: relative;
 }
 .refCard::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   top: 0;
@@ -850,7 +850,7 @@
   cursor: default;
 }
 .trendCard::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background: radial-gradient(circle at 80% 20%, rgba(0, 212, 255, 0.06), transparent 60%);
@@ -1042,7 +1042,7 @@
   font-size: 0.9375rem;
 }
 .ulStyled li::before {
-  content: '▸';
+  content: "▸";
   position: absolute;
   left: 0;
   color: var(--neon-green);

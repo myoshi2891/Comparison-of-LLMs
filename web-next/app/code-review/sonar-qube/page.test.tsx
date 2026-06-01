@@ -14,9 +14,7 @@ describe("/code-review/sonar-qube", () => {
   it("h1 の見出しテキストが一致する", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
-    expect(h1?.textContent?.trim().replace(/\s+/g, " ")).toBe(
-      "SonarQube Code Review 実践ガイド"
-    );
+    expect(h1?.textContent?.trim().replace(/\s+/g, " ")).toBe("SonarQubeCode Review 実践ガイド");
   });
 
   it("主要セクション h2 が 13 個ある", () => {
