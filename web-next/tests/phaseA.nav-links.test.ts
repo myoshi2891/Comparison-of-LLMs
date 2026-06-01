@@ -41,8 +41,8 @@ describe("Phase A - nav-links export shape", () => {
 });
 
 describe("Phase A - nav-links top-level entries", () => {
-  it("has exactly 6 top-level entries", () => {
-    expect(navLinks.length).toBe(6);
+  it("has exactly 7 top-level entries", () => {
+    expect(navLinks.length).toBe(7);
   });
 
   it("starts with Home as a flat link", () => {
@@ -58,8 +58,8 @@ describe("Phase A - nav-links top-level entries", () => {
     expect("href" in last && last.href === "/git-worktree").toBe(true);
   });
 
-  it("has Claude/Gemini/Codex/Copilot as dropdowns with children", () => {
-    const providers = ["Claude", "Gemini", "Codex", "Copilot"] as const;
+  it("has Claude/Gemini/Codex/Copilot/Code Review as dropdowns with children", () => {
+    const providers = ["Claude", "Gemini", "Codex", "Copilot", "Code Review"] as const;
     for (const name of providers) {
       const entry = navLinks.find((link) => link.name === name);
       expect(entry, `${name} must exist`).toBeDefined();
