@@ -79,6 +79,7 @@ export const navLinks: readonly NavLink[] = [
     name: "Code Review",
     children: [
       { name: "CodeRabbit Guide", href: "/code-review/coderabbit-guide" },
+      { name: "Copilot Code Review", href: "/code-review/copilot-code-review" },
     ],
   },
   { name: "Git Worktree", href: "/git-worktree" },
