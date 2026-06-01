@@ -139,16 +139,36 @@ export default function Page() {
       {/* NAV */}
       <nav className={styles.innerNav}>
         <div className={styles.navInner}>
-          <a href="#top" className={styles.navLogo}>🐰 CR Guide</a>
-          <a href="#ch1" className={styles.navLink}>1. Architecture</a>
-          <a href="#ch2" className={styles.navLink}>2. Configuration</a>
-          <a href="#ch3" className={styles.navLink}>3. Knowledge Base</a>
-          <a href="#ch4" className={styles.navLink}>4. Commands</a>
-          <a href="#ch5" className={styles.navLink}>5. Finishing Touches</a>
-          <a href="#ch6" className={styles.navLink}>6. MCP</a>
-          <a href="#ch7" className={styles.navLink}>7. Tools / CI</a>
-          <a href="#ch8" className={styles.navLink}>8. Advanced</a>
-          <a href="#refs" className={styles.navLink}>References</a>
+          <a href="#top" className={styles.navLogo}>
+            🐰 CR Guide
+          </a>
+          <a href="#ch1" className={styles.navLink}>
+            1. Architecture
+          </a>
+          <a href="#ch2" className={styles.navLink}>
+            2. Configuration
+          </a>
+          <a href="#ch3" className={styles.navLink}>
+            3. Knowledge Base
+          </a>
+          <a href="#ch4" className={styles.navLink}>
+            4. Commands
+          </a>
+          <a href="#ch5" className={styles.navLink}>
+            5. Finishing Touches
+          </a>
+          <a href="#ch6" className={styles.navLink}>
+            6. MCP
+          </a>
+          <a href="#ch7" className={styles.navLink}>
+            7. Tools / CI
+          </a>
+          <a href="#ch8" className={styles.navLink}>
+            8. Advanced
+          </a>
+          <a href="#refs" className={styles.navLink}>
+            References
+          </a>
         </div>
       </nav>
 
@@ -157,13 +177,19 @@ export default function Page() {
         <section className={styles.hero}>
           <div className={styles.heroTag}>🚀 CodeRabbit 完全活用ガイド — 2025</div>
           <h1>
-            Ship Better Code,{" "}
-            <br />
+            Ship Better Code, <br />
             <span>AI がレビューする時代</span>の
             <br />
             実践マスターガイド
           </h1>
-          <p style={{ color: "var(--text-muted)", maxWidth: "540px", margin: "0.8rem auto 0", fontSize: "1rem" }}>
+          <p
+            style={{
+              color: "var(--text-muted)",
+              maxWidth: "540px",
+              margin: "0.8rem auto 0",
+              fontSize: "1rem",
+            }}
+          >
             中上級者向け。アーキテクチャの深部から高度なカスタマイズ・MCP連携・AI
             エージェント活用まで完全網羅。
           </p>
@@ -178,7 +204,9 @@ export default function Page() {
         {/* ══════════════ KEY METRICS ══════════════ */}
         <div className={styles.metricGrid}>
           <div className={styles.metricCard}>
-            <div className={styles.metricVal}>40<span style={{ fontSize: "1.2rem" }}>+</span></div>
+            <div className={styles.metricVal}>
+              40<span style={{ fontSize: "1.2rem" }}>+</span>
+            </div>
             <div className={styles.metricLabel}>静的解析ツール対応</div>
           </div>
           <div className={styles.metricCard}>
@@ -190,7 +218,9 @@ export default function Page() {
             <div className={styles.metricLabel}>MCP サーバー接続数（Enterprise）</div>
           </div>
           <div className={styles.metricCard}>
-            <div className={styles.metricVal}>18<span style={{ fontSize: "1.2rem" }}>+</span></div>
+            <div className={styles.metricVal}>
+              18<span style={{ fontSize: "1.2rem" }}>+</span>
+            </div>
             <div className={styles.metricLabel}>Docstring 対応言語</div>
           </div>
           <div className={styles.metricCard}>
@@ -242,18 +272,21 @@ export default function Page() {
           <div className={styles.chapterHeader}>
             <div className={styles.chapterNum}>1</div>
             <h2 className={styles.chapterTitle}>
-              <span>アーキテクチャ</span>詳解 <span className={`${styles.klevel} ${styles.kl1}`}>K-Level: 理解</span>
+              <span>アーキテクチャ</span>詳解{" "}
+              <span className={`${styles.klevel} ${styles.kl1}`}>K-Level: 理解</span>
             </h2>
           </div>
 
           <div className={styles.section}>
             <h3 className={styles.sectionTitle}>1.1 CodeRabbit の本質とは？</h3>
             <p className={styles.paragraph}>
-              <strong>定義：</strong>CodeRabbit は単なる &quot;LLM に diff を渡すツール&quot; ではなく、複数の
-              AI エージェントを並列オーケストレーションする <em>本番グレードの AI インフラ</em> です。
+              <strong>定義：</strong>CodeRabbit は単なる &quot;LLM に diff を渡すツール&quot;
+              ではなく、複数の AI エージェントを並列オーケストレーションする{" "}
+              <em>本番グレードの AI インフラ</em> です。
             </p>
             <p className={styles.paragraph}>
-              <strong>理由：</strong>コードは差分だけでは意味が確定しない。認証ミドルウェアの変更が正しいかどうかは、リポジトリ全体・過去の
+              <strong>理由：</strong>
+              コードは差分だけでは意味が確定しない。認証ミドルウェアの変更が正しいかどうかは、リポジトリ全体・過去の
               PR・リンクしたイシューを統合しないと判定できないからです。
             </p>
 
@@ -267,7 +300,8 @@ export default function Page() {
               <div className={`${styles.archRow} ${styles.cyan}`}>
                 <div className={styles.archLabel}>Multi-Model Analysis</div>
                 <div className={styles.archDesc}>
-                  40+ 静的解析ツール + 複数 LLM を並列実行。言語・フレームワーク別に最適なモデルを選択
+                  40+ 静的解析ツール + 複数 LLM
+                  を並列実行。言語・フレームワーク別に最適なモデルを選択
                 </div>
               </div>
               <div className={`${styles.archRow} ${styles.pink}`}>
@@ -286,7 +320,8 @@ export default function Page() {
               <div className={`${styles.archRow} ${styles.purple}`}>
                 <div className={styles.archLabel}>Living Memory</div>
                 <div className={styles.archDesc}>
-                  Learnings DB + Knowledge Base。フィードバックを記憶し、次回以降の精度を継続的に向上
+                  Learnings DB + Knowledge
+                  Base。フィードバックを記憶し、次回以降の精度を継続的に向上
                 </div>
               </div>
             </div>
@@ -404,7 +439,8 @@ export default function Page() {
           <div className={styles.chapterHeader}>
             <div className={styles.chapterNum}>2</div>
             <h2 className={styles.chapterTitle}>
-              <span>設定の</span>完全制御 <span className={`${styles.klevel} ${styles.kl2}`}>K-Level: 適用</span>
+              <span>設定の</span>完全制御{" "}
+              <span className={`${styles.klevel} ${styles.kl2}`}>K-Level: 適用</span>
             </h2>
           </div>
 
@@ -487,7 +523,8 @@ export default function Page() {
             <div className={`${styles.callout} ${styles.warning}`}>
               <span className={styles.calloutIcon}>⚠️</span>
               <div className={styles.calloutBody}>
-                <strong>重要：</strong>設定はデフォルトで「マージ」されません。上位レイヤーが全体を置き換えます。
+                <strong>重要：</strong>
+                設定はデフォルトで「マージ」されません。上位レイヤーが全体を置き換えます。
                 <code>configuration_inheritance: true</code>
                 を明示的に有効化した場合のみ、親レイヤーの設定がマージされます。
               </div>
@@ -505,46 +542,155 @@ export default function Page() {
               <div className={`${styles.compareCard} ${styles.good}`}>
                 <div className={styles.compareHead}>✅ 本番推奨構成（上級）</div>
                 <div className={styles.compareBody}>
-                  <div className={styles.codeLine}><span className={styles.codeComment}># yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json</span></div>
-                  <div className={styles.codeLine}><span className={styles.codeKeyword}>language</span>: <span className={styles.codeString}>&quot;ja-JP&quot;</span></div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.codeComment}>
+                      # yaml-language-server:
+                      $schema=https://coderabbit.ai/integrations/schema.v2.json
+                    </span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.codeKeyword}>language</span>:{" "}
+                    <span className={styles.codeString}>&quot;ja-JP&quot;</span>
+                  </div>
                   <div className={styles.codeLine} />
-                  <div className={styles.codeLine}><span className={styles.codeKeyword}>reviews</span>:</div>
-                  <div className={styles.codeLine}>{"  "}<span className={styles.codeKeyword}>profile</span>: <span className={styles.codeString}>&quot;assertive&quot;</span></div>
-                  <div className={styles.codeLine}>{"  "}<span className={styles.codeKeyword}>request_changes_workflow</span>: <span className={styles.codeGreen}>true</span></div>
-                  <div className={styles.codeLine}>{"  "}<span className={styles.codeKeyword}>high_level_summary</span>: <span className={styles.codeGreen}>true</span></div>
-                  <div className={styles.codeLine}>{"  "}<span className={styles.codeKeyword}>auto_review</span>:</div>
-                  <div className={styles.codeLine}>{"    "}<span className={styles.codeKeyword}>enabled</span>: <span className={styles.codeGreen}>true</span></div>
-                  <div className={styles.codeLine}>{"    "}<span className={styles.codeKeyword}>drafts</span>: <span className={styles.codePink}>false</span></div>
-                  <div className={styles.codeLine}>{"  "}<span className={styles.codeKeyword}>base_branches</span>:</div>
-                  <div className={styles.codeLine}>{"    "}- <span className={styles.codeString}>&quot;main&quot;</span></div>
-                  <div className={styles.codeLine}>{"    "}- <span className={styles.codeString}>&quot;develop&quot;</span></div>
-                  <div className={styles.codeLine}>{"  "}<span className={styles.codeKeyword}>path_instructions</span>:</div>
-                  <div className={styles.codeLine}>{"    "}- <span className={styles.codeKeyword}>path</span>: <span className={styles.codeString}>&quot;src/api/**&quot;</span></div>
-                  <div className={styles.codeLine}>{"      "}<span className={styles.codeKeyword}>instructions</span>: <span className={styles.codeString}>|</span></div>
-                  <div className={styles.codeLine}>{"        認証・認可・入力バリデーションに集中。 ORM をバイパスする直接 DB クエリに警告。"}</div>
-                  <div className={styles.codeLine}>{"    "}- <span className={styles.codeKeyword}>path</span>: <span className={styles.codeString}>&quot;tests/**&quot;</span></div>
-                  <div className={styles.codeLine}>{"      "}<span className={styles.codeKeyword}>instructions</span>: <span className={styles.codeString}>|</span></div>
-                  <div className={styles.codeLine}>{"        エッジケース・エラーパスのカバレッジを確認。 テスト名が意図を明確に表しているか評価。"}</div>
-                  <div className={styles.codeLine}>{"  "}<span className={styles.codeKeyword}>path_filters</span>:</div>
-                  <div className={styles.codeLine}>{"    "}- <span className={styles.codeString}>&quot;!**/generated/**&quot;</span></div>
-                  <div className={styles.codeLine}>{"    "}- <span className={styles.codeString}>&quot;!**/*.pb.go&quot;</span></div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.codeKeyword}>reviews</span>:
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"  "}
+                    <span className={styles.codeKeyword}>profile</span>:{" "}
+                    <span className={styles.codeString}>&quot;assertive&quot;</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"  "}
+                    <span className={styles.codeKeyword}>request_changes_workflow</span>:{" "}
+                    <span className={styles.codeGreen}>true</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"  "}
+                    <span className={styles.codeKeyword}>high_level_summary</span>:{" "}
+                    <span className={styles.codeGreen}>true</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"  "}
+                    <span className={styles.codeKeyword}>auto_review</span>:
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"    "}
+                    <span className={styles.codeKeyword}>enabled</span>:{" "}
+                    <span className={styles.codeGreen}>true</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"    "}
+                    <span className={styles.codeKeyword}>drafts</span>:{" "}
+                    <span className={styles.codePink}>false</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"  "}
+                    <span className={styles.codeKeyword}>base_branches</span>:
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"    "}- <span className={styles.codeString}>&quot;main&quot;</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"    "}- <span className={styles.codeString}>&quot;develop&quot;</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"  "}
+                    <span className={styles.codeKeyword}>path_instructions</span>:
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"    "}- <span className={styles.codeKeyword}>path</span>:{" "}
+                    <span className={styles.codeString}>&quot;src/api/**&quot;</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"      "}
+                    <span className={styles.codeKeyword}>instructions</span>:{" "}
+                    <span className={styles.codeString}>|</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {
+                      "        認証・認可・入力バリデーションに集中。 ORM をバイパスする直接 DB クエリに警告。"
+                    }
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"    "}- <span className={styles.codeKeyword}>path</span>:{" "}
+                    <span className={styles.codeString}>&quot;tests/**&quot;</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"      "}
+                    <span className={styles.codeKeyword}>instructions</span>:{" "}
+                    <span className={styles.codeString}>|</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {
+                      "        エッジケース・エラーパスのカバレッジを確認。 テスト名が意図を明確に表しているか評価。"
+                    }
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"  "}
+                    <span className={styles.codeKeyword}>path_filters</span>:
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"    "}-{" "}
+                    <span className={styles.codeString}>&quot;!**/generated/**&quot;</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"    "}- <span className={styles.codeString}>&quot;!**/*.pb.go&quot;</span>
+                  </div>
                   <div className={styles.codeLine} />
-                  <div className={styles.codeLine}><span className={styles.codeKeyword}>knowledge_base</span>:</div>
-                  <div className={styles.codeLine}>{"  "}<span className={styles.codeKeyword}>learnings</span>:</div>
-                  <div className={styles.codeLine}>{"    "}<span className={styles.codeKeyword}>scope</span>: <span className={styles.codeString}>&quot;local&quot;</span></div>
-                  <div className={styles.codeLine}>{"  "}<span className={styles.codeKeyword}>issues</span>:</div>
-                  <div className={styles.codeLine}>{"    "}<span className={styles.codeKeyword}>scope</span>: <span className={styles.codeString}>&quot;auto&quot;</span></div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.codeKeyword}>knowledge_base</span>:
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"  "}
+                    <span className={styles.codeKeyword}>learnings</span>:
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"    "}
+                    <span className={styles.codeKeyword}>scope</span>:{" "}
+                    <span className={styles.codeString}>&quot;local&quot;</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"  "}
+                    <span className={styles.codeKeyword}>issues</span>:
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"    "}
+                    <span className={styles.codeKeyword}>scope</span>:{" "}
+                    <span className={styles.codeString}>&quot;auto&quot;</span>
+                  </div>
                 </div>
               </div>
               <div className={`${styles.compareCard} ${styles.bad}`}>
                 <div className={styles.compareHead}>❌ アンチパターン（最小設定のみ）</div>
                 <div className={styles.compareBody}>
-                  <div className={styles.codeLine}><span className={styles.codeComment}># 設定なし＝デフォルト頼り</span></div>
-                  <div className={styles.codeLine}><span className={styles.codeComment}># 問題:</span></div>
-                  <div className={styles.codeLine}><span className={styles.codeComment}># - 生成コード・lock ファイルもレビュー対象になる</span></div>
-                  <div className={styles.codeLine}><span className={styles.codeComment}># - ドラフト PR にも自動レビューが走りクレジットを消費</span></div>
-                  <div className={styles.codeLine}><span className={styles.codeComment}># - path_instructions なしで全ファイルに汎用レビュー</span></div>
-                  <div className={styles.codeLine}><span className={styles.codeComment}># - learnings がクロスリポジトリ汚染を起こす可能性</span></div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.codeComment}># 設定なし＝デフォルト頼り</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.codeComment}># 問題:</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.codeComment}>
+                      # - 生成コード・lock ファイルもレビュー対象になる
+                    </span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.codeComment}>
+                      # - ドラフト PR にも自動レビューが走りクレジットを消費
+                    </span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.codeComment}>
+                      # - path_instructions なしで全ファイルに汎用レビュー
+                    </span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.codeComment}>
+                      # - learnings がクロスリポジトリ汚染を起こす可能性
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -568,31 +714,88 @@ export default function Page() {
                 />
               </div>
               <div className={styles.codeBody}>
-                <div className={styles.codeLine}><span className={styles.codeKeyword}>reviews</span>:</div>
-                <div className={styles.codeLine}>{"  "}<span className={styles.codeKeyword}>path_instructions</span>:</div>
-                <div className={styles.codeLine}>{"    "}<span className={styles.codeComment}># API エンドポイント: セキュリティ重視</span></div>
-                <div className={styles.codeLine}>{"    "}- <span className={styles.codeKeyword}>path</span>: <span className={styles.codeString}>&quot;src/controllers/**&quot;</span></div>
-                <div className={styles.codeLine}>{"      "}<span className={styles.codeKeyword}>instructions</span>: <span className={styles.codeString}>|</span></div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeKeyword}>reviews</span>:
+                </div>
+                <div className={styles.codeLine}>
+                  {"  "}
+                  <span className={styles.codeKeyword}>path_instructions</span>:
+                </div>
+                <div className={styles.codeLine}>
+                  {"    "}
+                  <span className={styles.codeComment}># API エンドポイント: セキュリティ重視</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"    "}- <span className={styles.codeKeyword}>path</span>:{" "}
+                  <span className={styles.codeString}>&quot;src/controllers/**&quot;</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"      "}
+                  <span className={styles.codeKeyword}>instructions</span>:{" "}
+                  <span className={styles.codeString}>|</span>
+                </div>
                 <div className={styles.codeLine}>{"        - 認証・認可の欠落を必ず指摘。"}</div>
-                <div className={styles.codeLine}>{"        - SQL インジェクション・XSS の可能性を確認。"}</div>
+                <div className={styles.codeLine}>
+                  {"        - SQL インジェクション・XSS の可能性を確認。"}
+                </div>
                 <div className={styles.codeLine}>{"        - レート制限の実装を確認。"}</div>
                 <div className={styles.codeLine} />
-                <div className={styles.codeLine}>{"    "}<span className={styles.codeComment}># インフラコード: 破壊的変更に敏感</span></div>
-                <div className={styles.codeLine}>{"    "}- <span className={styles.codeKeyword}>path</span>: <span className={styles.codeString}>&quot;**/*.tf&quot;</span></div>
-                <div className={styles.codeLine}>{"      "}<span className={styles.codeKeyword}>instructions</span>: <span className={styles.codeString}>|</span></div>
-                <div className={styles.codeLine}>{"        - terraform destroy に相当する変更は必ず警告。"}</div>
-                <div className={styles.codeLine}>{"        - 最小権限の原則に違反する IAM 設定を指摘。"}</div>
+                <div className={styles.codeLine}>
+                  {"    "}
+                  <span className={styles.codeComment}># インフラコード: 破壊的変更に敏感</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"    "}- <span className={styles.codeKeyword}>path</span>:{" "}
+                  <span className={styles.codeString}>&quot;**/*.tf&quot;</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"      "}
+                  <span className={styles.codeKeyword}>instructions</span>:{" "}
+                  <span className={styles.codeString}>|</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"        - terraform destroy に相当する変更は必ず警告。"}
+                </div>
+                <div className={styles.codeLine}>
+                  {"        - 最小権限の原則に違反する IAM 設定を指摘。"}
+                </div>
                 <div className={styles.codeLine} />
-                <div className={styles.codeLine}>{"    "}<span className={styles.codeComment}># マイグレーション: 不可逆操作の検出</span></div>
-                <div className={styles.codeLine}>{"    "}- <span className={styles.codeKeyword}>path</span>: <span className={styles.codeString}>&quot;db/migrations/**&quot;</span></div>
-                <div className={styles.codeLine}>{"      "}<span className={styles.codeKeyword}>instructions</span>: <span className={styles.codeString}>|</span></div>
-                <div className={styles.codeLine}>{"        - DROP TABLE / TRUNCATE を検出したら危険として警告。"}</div>
-                <div className={styles.codeLine}>{"        - ダウンタイムを伴うロックが発生するか評価。"}</div>
+                <div className={styles.codeLine}>
+                  {"    "}
+                  <span className={styles.codeComment}># マイグレーション: 不可逆操作の検出</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"    "}- <span className={styles.codeKeyword}>path</span>:{" "}
+                  <span className={styles.codeString}>&quot;db/migrations/**&quot;</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"      "}
+                  <span className={styles.codeKeyword}>instructions</span>:{" "}
+                  <span className={styles.codeString}>|</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"        - DROP TABLE / TRUNCATE を検出したら危険として警告。"}
+                </div>
+                <div className={styles.codeLine}>
+                  {"        - ダウンタイムを伴うロックが発生するか評価。"}
+                </div>
                 <div className={styles.codeLine} />
-                <div className={styles.codeLine}>{"    "}<span className={styles.codeComment}># フロントエンド: アクセシビリティ</span></div>
-                <div className={styles.codeLine}>{"    "}- <span className={styles.codeKeyword}>path</span>: <span className={styles.codeString}>&quot;src/components/**&quot;</span></div>
-                <div className={styles.codeLine}>{"      "}<span className={styles.codeKeyword}>instructions</span>: <span className={styles.codeString}>|</span></div>
-                <div className={styles.codeLine}>{"        - WCAG 2.1 準拠（aria-label, alt テキスト等）を確認。"}</div>
+                <div className={styles.codeLine}>
+                  {"    "}
+                  <span className={styles.codeComment}># フロントエンド: アクセシビリティ</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"    "}- <span className={styles.codeKeyword}>path</span>:{" "}
+                  <span className={styles.codeString}>&quot;src/components/**&quot;</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"      "}
+                  <span className={styles.codeKeyword}>instructions</span>:{" "}
+                  <span className={styles.codeString}>|</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"        - WCAG 2.1 準拠（aria-label, alt テキスト等）を確認。"}
+                </div>
                 <div className={styles.codeLine}>{"        - console.log の残存を指摘。"}</div>
               </div>
             </div>
@@ -602,7 +805,8 @@ export default function Page() {
               <div className={styles.calloutBody}>
                 glob パターンは
                 <Ext href="https://github.com/isaacs/minimatch">minimatch</Ext>
-                形式。<code>**</code> は任意のディレクトリ深度にマッチします。パスフィルター（除外）は
+                形式。<code>**</code>{" "}
+                は任意のディレクトリ深度にマッチします。パスフィルター（除外）は
                 <code>!</code> プレフィックスで指定。
               </div>
             </div>
@@ -640,7 +844,8 @@ export default function Page() {
                 <span className={styles.stepNum}>4</span>
                 <div className={styles.stepContent}>
                   個別リポジトリに
-                  <code>.coderabbit.yaml</code> を置くと、中央設定より優先される（Priority 1 &gt; 2）
+                  <code>.coderabbit.yaml</code> を置くと、中央設定より優先される（Priority 1 &gt;
+                  2）
                 </div>
               </li>
             </ul>
@@ -773,7 +978,10 @@ export default function Page() {
                     <div className={styles.codeBody}>
                       <div className={styles.codeLine}>
                         <span className={styles.codeGreen}>@coderabbitai</span>{" "}
-                        <span className={styles.codeString}>認証ミドルウェアではネストした try-catch より アーリーリターン + 固有エラーコードを使います。モニタリングツールがエラーコードで追跡できるため。</span>
+                        <span className={styles.codeString}>
+                          認証ミドルウェアではネストした try-catch より アーリーリターン +
+                          固有エラーコードを使います。モニタリングツールがエラーコードで追跡できるため。
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -796,7 +1004,9 @@ export default function Page() {
                     <div className={styles.codeBody}>
                       <div className={styles.codeLine}>
                         <span className={styles.codeGreen}>@coderabbitai</span>{" "}
-                        <span className={styles.codeString}>add a learning using docs/coding-standards.md</span>
+                        <span className={styles.codeString}>
+                          add a learning using docs/coding-standards.md
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -819,7 +1029,9 @@ export default function Page() {
                     <div className={styles.codeBody}>
                       <div className={styles.codeLine}>
                         <span className={styles.codeGreen}>@coderabbitai</span>{" "}
-                        <span className={styles.codeString}>import file my_learnings.csv as Learnings data for future use</span>
+                        <span className={styles.codeString}>
+                          import file my_learnings.csv as Learnings data for future use
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -833,10 +1045,13 @@ export default function Page() {
                 <div className={styles.compareHead}>✅ 効果的（理由を含む）</div>
                 <div className={styles.compareBody}>
                   <div className={styles.codeLine}>
-                    <span className={styles.codeGreen}>@coderabbitai</span> ユーザー ID をエラーメッセージに含めないでください。
+                    <span className={styles.codeGreen}>@coderabbitai</span> ユーザー ID
+                    をエラーメッセージに含めないでください。
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.codeCyan}>理由:</span> エラーログは外部モニタリングサービスに送信されるため。ユーザーコンテキストは トレーシングシステムで別途追跡しています。
+                    <span className={styles.codeCyan}>理由:</span>{" "}
+                    エラーログは外部モニタリングサービスに送信されるため。ユーザーコンテキストは
+                    トレーシングシステムで別途追跡しています。
                   </div>
                 </div>
               </div>
@@ -844,11 +1059,14 @@ export default function Page() {
                 <div className={styles.compareHead}>❌ 非効果的（理由なし）</div>
                 <div className={styles.compareBody}>
                   <div className={styles.codeLine}>
-                    <span className={styles.codeGreen}>@coderabbitai</span> エラーメッセージにユーザー IDを入れるな。
+                    <span className={styles.codeGreen}>@coderabbitai</span>{" "}
+                    エラーメッセージにユーザー IDを入れるな。
                   </div>
                   <div className={styles.codeLine} />
                   <div className={styles.codeLine}>
-                    <span className={styles.codeComment}>// 理由がないと類似状況で正しく適用されない</span>
+                    <span className={styles.codeComment}>
+                      // 理由がないと類似状況で正しく適用されない
+                    </span>
                   </div>
                 </div>
               </div>
@@ -866,17 +1084,23 @@ export default function Page() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td className={styles.td}><code>auto</code>（デフォルト）</td>
+                    <td className={styles.td}>
+                      <code>auto</code>（デフォルト）
+                    </td>
                     <td className={styles.td}>public: リポジトリのみ / private: 組織全体</td>
                     <td className={styles.td}>混在環境のデフォルト</td>
                   </tr>
                   <tr>
-                    <td className={styles.td}><code>local</code></td>
+                    <td className={styles.td}>
+                      <code>local</code>
+                    </td>
                     <td className={styles.td}>そのリポジトリのみ</td>
                     <td className={styles.td}>Python / React 等 異なる技術スタックが混在</td>
                   </tr>
                   <tr>
-                    <td className={styles.td}><code>global</code></td>
+                    <td className={styles.td}>
+                      <code>global</code>
+                    </td>
                     <td className={styles.td}>組織全リポジトリに適用</td>
                     <td className={styles.td}>セキュリティ要件・命名規則が全社統一</td>
                   </tr>
@@ -886,10 +1110,12 @@ export default function Page() {
           </div>
 
           <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>3.3 Code Guidelines — 既存ドキュメントを即座に活用</h3>
+            <h3 className={styles.sectionTitle}>
+              3.3 Code Guidelines — 既存ドキュメントを即座に活用
+            </h3>
             <p className={styles.paragraph}>
-              CodeRabbit
-              は以下のファイルをリポジトリ内で<strong>自動検出</strong>し、レビュー基準として適用します。設定不要です。
+              CodeRabbit は以下のファイルをリポジトリ内で<strong>自動検出</strong>
+              し、レビュー基準として適用します。設定不要です。
             </p>
 
             <div className={styles.tableWrap}>
@@ -903,22 +1129,30 @@ export default function Page() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td className={styles.td}><code>CLAUDE.md</code></td>
+                    <td className={styles.td}>
+                      <code>CLAUDE.md</code>
+                    </td>
                     <td className={styles.td}>Anthropic Claude 向けエージェント指示</td>
                     <td className={styles.td}>Claude Code / Cursor で共有可</td>
                   </tr>
                   <tr>
-                    <td className={styles.td}><code>.cursorrules</code></td>
+                    <td className={styles.td}>
+                      <code>.cursorrules</code>
+                    </td>
                     <td className={styles.td}>Cursor IDE のルール定義</td>
                     <td className={styles.td}>Cursor で共有可</td>
                   </tr>
                   <tr>
-                    <td className={styles.td}><code>AGENTS.md</code></td>
+                    <td className={styles.td}>
+                      <code>AGENTS.md</code>
+                    </td>
                     <td className={styles.td}>汎用エージェント指示ファイル</td>
                     <td className={styles.td}>多くのエージェントで共有可</td>
                   </tr>
                   <tr>
-                    <td className={styles.td}><code>.github/copilot-instructions.md</code></td>
+                    <td className={styles.td}>
+                      <code>.github/copilot-instructions.md</code>
+                    </td>
                     <td className={styles.td}>GitHub Copilot 向け指示</td>
                     <td className={styles.td}>Copilot で共有可</td>
                   </tr>
@@ -971,7 +1205,8 @@ export default function Page() {
           <div className={styles.chapterHeader}>
             <div className={styles.chapterNum}>4</div>
             <h2 className={styles.chapterTitle}>
-              <span>コマンド</span> &amp; チャット活用 <span className={`${styles.klevel} ${styles.kl1}`}>K-Level: 記憶</span>
+              <span>コマンド</span> &amp; チャット活用{" "}
+              <span className={`${styles.klevel} ${styles.kl1}`}>K-Level: 記憶</span>
             </h2>
           </div>
 
@@ -989,47 +1224,65 @@ export default function Page() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td className={styles.td}><code>@coderabbitai review</code></td>
+                    <td className={styles.td}>
+                      <code>@coderabbitai review</code>
+                    </td>
                     <td className={styles.td}>前回以降の差分を増分レビュー</td>
                     <td className={styles.td}>新しいコミット後に素早く確認</td>
                   </tr>
                   <tr>
-                    <td className={styles.td}><code>@coderabbitai full review</code></td>
+                    <td className={styles.td}>
+                      <code>@coderabbitai full review</code>
+                    </td>
                     <td className={styles.td}>PR 全体をゼロからレビュー</td>
                     <td className={styles.td}>大規模リファクタリング後</td>
                   </tr>
                   <tr>
-                    <td className={styles.td}><code>@coderabbitai pause</code></td>
+                    <td className={styles.td}>
+                      <code>@coderabbitai pause</code>
+                    </td>
                     <td className={styles.td}>自動レビューを一時停止</td>
                     <td className={styles.td}>WIP コミット中のノイズ削減</td>
                   </tr>
                   <tr>
-                    <td className={styles.td}><code>@coderabbitai resume</code></td>
+                    <td className={styles.td}>
+                      <code>@coderabbitai resume</code>
+                    </td>
                     <td className={styles.td}>自動レビューを再開</td>
                     <td className={styles.td}>pause 解除</td>
                   </tr>
                   <tr>
-                    <td className={styles.td}><code>@coderabbitai resolve</code></td>
+                    <td className={styles.td}>
+                      <code>@coderabbitai resolve</code>
+                    </td>
                     <td className={styles.td}>全コメントを解決済みにする</td>
                     <td className={styles.td}>一括クリーンアップ</td>
                   </tr>
                   <tr>
-                    <td className={styles.td}><code>@coderabbitai summary</code></td>
+                    <td className={styles.td}>
+                      <code>@coderabbitai summary</code>
+                    </td>
                     <td className={styles.td}>PR 説明の要約を更新</td>
                     <td className={styles.td}>変更内容が大きく変わった後</td>
                   </tr>
                   <tr>
-                    <td className={styles.td}><code>@coderabbitai generate sequence diagram</code></td>
+                    <td className={styles.td}>
+                      <code>@coderabbitai generate sequence diagram</code>
+                    </td>
                     <td className={styles.td}>シーケンス図を生成して投稿</td>
                     <td className={styles.td}>設計レビュー前の可視化</td>
                   </tr>
                   <tr>
-                    <td className={styles.td}><code>@coderabbitai configuration</code></td>
+                    <td className={styles.td}>
+                      <code>@coderabbitai configuration</code>
+                    </td>
                     <td className={styles.td}>現在の設定を表示</td>
                     <td className={styles.td}>設定確認・デバッグ</td>
                   </tr>
                   <tr>
-                    <td className={styles.td}><code>@coderabbitai help</code></td>
+                    <td className={styles.td}>
+                      <code>@coderabbitai help</code>
+                    </td>
                     <td className={styles.td}>クイックリファレンスを表示</td>
                     <td className={styles.td}>コマンド一覧を確認</td>
                   </tr>
@@ -1049,7 +1302,9 @@ export default function Page() {
 
           <div className={styles.section}>
             <h3 className={styles.sectionTitle}>4.2 インタラクティブチャットの活用パターン</h3>
-            <p className={styles.paragraph}>コマンド以外にも、CodeRabbit とのチャットによって様々な高度な活用が可能です。</p>
+            <p className={styles.paragraph}>
+              コマンド以外にも、CodeRabbit とのチャットによって様々な高度な活用が可能です。
+            </p>
 
             <div className={styles.examGrid}>
               <div className={styles.examCard}>
@@ -1095,14 +1350,33 @@ export default function Page() {
                 />
               </div>
               <div className={styles.codeBody}>
-                <div className={styles.codeLine}><span className={styles.codeComment}>## Summary</span></div>
-                <div className={styles.codeLine}><span className={styles.codeComment}>このPRはユーザー認証フローのリファクタリングです。</span></div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeComment}>## Summary</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeComment}>
+                    このPRはユーザー認証フローのリファクタリングです。
+                  </span>
+                </div>
                 <div className={styles.codeLine} />
-                <div className={styles.codeLine}><span className={styles.codeComment}>## レビュー対象外（意図的な変更）</span></div>
-                <div className={styles.codeLine}><span className={styles.codeGreen}>@coderabbitai ignore</span> <span className={styles.codeAmber}># ← PR全体の自動レビューを無効化</span></div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeComment}>## レビュー対象外（意図的な変更）</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeGreen}>@coderabbitai ignore</span>{" "}
+                  <span className={styles.codeAmber}># ← PR全体の自動レビューを無効化</span>
+                </div>
                 <div className={styles.codeLine} />
-                <div className={styles.codeLine}><span className={styles.codeComment}>## または特定コミットのみ除外したい場合</span></div>
-                <div className={styles.codeLine}><span className={styles.codeComment}># コミットメッセージに [skip ci] を含める</span></div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeComment}>
+                    ## または特定コミットのみ除外したい場合
+                  </span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeComment}>
+                    # コミットメッセージに [skip ci] を含める
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -1161,43 +1435,67 @@ export default function Page() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td className={styles.td}>🔧 <strong>Autofix</strong></td>
-                    <td className={styles.td}><code>@coderabbitai autofix</code></td>
+                    <td className={styles.td}>
+                      🔧 <strong>Autofix</strong>
+                    </td>
+                    <td className={styles.td}>
+                      <code>@coderabbitai autofix</code>
+                    </td>
                     <td className={styles.td}>コミット or スタック PR</td>
                     <td className={styles.td}>Pro+</td>
                     <td className={styles.td}>GitHub / GitLab</td>
                   </tr>
                   <tr>
-                    <td className={styles.td}>📝 <strong>Docstring 生成</strong></td>
-                    <td className={styles.td}><code>@coderabbitai generate docstrings</code></td>
+                    <td className={styles.td}>
+                      📝 <strong>Docstring 生成</strong>
+                    </td>
+                    <td className={styles.td}>
+                      <code>@coderabbitai generate docstrings</code>
+                    </td>
                     <td className={styles.td}>別 PR として作成</td>
                     <td className={styles.td}>Pro+</td>
                     <td className={styles.td}>全プラットフォーム</td>
                   </tr>
                   <tr>
-                    <td className={styles.td}>🔀 <strong>マージコンフリクト解消</strong></td>
-                    <td className={styles.td}><code>@coderabbitai fix merge conflict</code></td>
+                    <td className={styles.td}>
+                      🔀 <strong>マージコンフリクト解消</strong>
+                    </td>
+                    <td className={styles.td}>
+                      <code>@coderabbitai fix merge conflict</code>
+                    </td>
                     <td className={styles.td}>マージコミット</td>
                     <td className={styles.td}>Pro+</td>
                     <td className={styles.td}>GitHub / GitLab</td>
                   </tr>
                   <tr>
-                    <td className={styles.td}>🧪 <strong>ユニットテスト生成</strong></td>
-                    <td className={styles.td}><code>@coderabbitai generate unit tests</code></td>
+                    <td className={styles.td}>
+                      🧪 <strong>ユニットテスト生成</strong>
+                    </td>
+                    <td className={styles.td}>
+                      <code>@coderabbitai generate unit tests</code>
+                    </td>
                     <td className={styles.td}>PR or コミット</td>
                     <td className={styles.td}>Pro+</td>
                     <td className={styles.td}>GitHub のみ</td>
                   </tr>
                   <tr>
-                    <td className={styles.td}>✨ <strong>コード簡略化</strong></td>
-                    <td className={styles.td}><code>@coderabbitai simplify</code></td>
+                    <td className={styles.td}>
+                      ✨ <strong>コード簡略化</strong>
+                    </td>
+                    <td className={styles.td}>
+                      <code>@coderabbitai simplify</code>
+                    </td>
                     <td className={styles.td}>PR or コミット</td>
                     <td className={styles.td}>Pro+</td>
                     <td className={styles.td}>GitHub のみ</td>
                   </tr>
                   <tr>
-                    <td className={styles.td}>📜 <strong>Custom Recipe</strong></td>
-                    <td className={styles.td}><code>@coderabbitai run &lt;recipe&gt;</code></td>
+                    <td className={styles.td}>
+                      📜 <strong>Custom Recipe</strong>
+                    </td>
+                    <td className={styles.td}>
+                      <code>@coderabbitai run &lt;recipe&gt;</code>
+                    </td>
                     <td className={styles.td}>コミット or スタック PR</td>
                     <td className={styles.td}>Pro+</td>
                     <td className={styles.td}>GitHub のみ</td>
@@ -1208,9 +1506,12 @@ export default function Page() {
           </div>
 
           <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>5.2 Custom Recipes — チームの繰り返しタスクを自動化</h3>
+            <h3 className={styles.sectionTitle}>
+              5.2 Custom Recipes — チームの繰り返しタスクを自動化
+            </h3>
             <p className={styles.paragraph}>
-              <strong>定義：</strong>チームが頻繁に行う定型作業をレシピとして定義し、ワンコマンドで実行させる機能。
+              <strong>定義：</strong>
+              チームが頻繁に行う定型作業をレシピとして定義し、ワンコマンドで実行させる機能。
             </p>
             <p className={styles.paragraph}>
               <strong>具体例：</strong>CHANGELOG 更新・import
@@ -1227,19 +1528,62 @@ export default function Page() {
                 />
               </div>
               <div className={styles.codeBody}>
-                <div className={styles.codeLine}><span className={styles.codeKeyword}>finishing_touches</span>:</div>
-                <div className={styles.codeLine}>{"  "}<span className={styles.codeKeyword}>custom_recipes</span>:</div>
-                <div className={styles.codeLine}>{"    "}- <span className={styles.codeKeyword}>name</span>: <span className={styles.codeString}>&quot;add-changelog-entry&quot;</span></div>
-                <div className={styles.codeLine}>{"      "}<span className={styles.codeKeyword}>description</span>: <span className={styles.codeString}>&quot;CHANGELOG.md にこの PR のエントリを追加&quot;</span></div>
-                <div className={styles.codeLine}>{"      "}<span className={styles.codeKeyword}>instructions</span>: <span className={styles.codeString}>|</span></div>
-                <div className={styles.codeLine}>{"        PR の内容を分析し、CHANGELOG.md の [Unreleased] セクションに適切なエントリを追加してください。"}</div>
-                <div className={styles.codeLine}>{"        形式: `- [Fix/Feature/Chore] 変更内容 of 簡潔な説明 (#PR番号)`"}</div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeKeyword}>finishing_touches</span>:
+                </div>
+                <div className={styles.codeLine}>
+                  {"  "}
+                  <span className={styles.codeKeyword}>custom_recipes</span>:
+                </div>
+                <div className={styles.codeLine}>
+                  {"    "}- <span className={styles.codeKeyword}>name</span>:{" "}
+                  <span className={styles.codeString}>&quot;add-changelog-entry&quot;</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"      "}
+                  <span className={styles.codeKeyword}>description</span>:{" "}
+                  <span className={styles.codeString}>
+                    &quot;CHANGELOG.md にこの PR のエントリを追加&quot;
+                  </span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"      "}
+                  <span className={styles.codeKeyword}>instructions</span>:{" "}
+                  <span className={styles.codeString}>|</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {
+                    "        PR の内容を分析し、CHANGELOG.md の [Unreleased] セクションに適切なエントリを追加してください。"
+                  }
+                </div>
+                <div className={styles.codeLine}>
+                  {"        形式: `- [Fix/Feature/Chore] 変更内容 of 簡潔な説明 (#PR番号)`"}
+                </div>
                 <div className={styles.codeLine} />
-                <div className={styles.codeLine}>{"    "}- <span className={styles.codeKeyword}>name</span>: <span className={styles.codeString}>&quot;enforce-strict-types&quot;</span></div>
-                <div className={styles.codeLine}>{"      "}<span className={styles.codeKeyword}>description</span>: <span className={styles.codeString}>&quot;any 型を排除して厳密型に変換&quot;</span></div>
-                <div className={styles.codeLine}>{"      "}<span className={styles.codeKeyword}>instructions</span>: <span className={styles.codeString}>|</span></div>
-                <div className={styles.codeLine}>{"        変更されたTypeScriptファイル内の any 型を 適切な型に置き換えてください。"}</div>
-                <div className={styles.codeLine}>{"        unknown を中間型として使う場合はコメントで説明を追加。"}</div>
+                <div className={styles.codeLine}>
+                  {"    "}- <span className={styles.codeKeyword}>name</span>:{" "}
+                  <span className={styles.codeString}>&quot;enforce-strict-types&quot;</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"      "}
+                  <span className={styles.codeKeyword}>description</span>:{" "}
+                  <span className={styles.codeString}>
+                    &quot;any 型を排除して厳密型に変換&quot;
+                  </span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"      "}
+                  <span className={styles.codeKeyword}>instructions</span>:{" "}
+                  <span className={styles.codeString}>|</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {
+                    "        変更されたTypeScriptファイル内の any 型を 適切な型に置き換えてください。"
+                  }
+                </div>
+                <div className={styles.codeLine}>
+                  {"        unknown を中間型として使う場合はコメントで説明を追加。"}
+                </div>
               </div>
             </div>
 
@@ -1253,9 +1597,17 @@ export default function Page() {
                 />
               </div>
               <div className={styles.codeBody}>
-                <div className={styles.codeLine}><span className={styles.codeComment}># PR コメントでレシピを実行</span></div>
-                <div className={styles.codeLine}><span className={styles.codeGreen}>@coderabbitai</span> <span className={styles.codeString}>run add-changelog-entry</span></div>
-                <div className={styles.codeLine}><span className={styles.codeGreen}>@coderabbitai</span> <span className={styles.codeString}>run enforce-strict-types</span></div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeComment}># PR コメントでレシピを実行</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeGreen}>@coderabbitai</span>{" "}
+                  <span className={styles.codeString}>run add-changelog-entry</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeGreen}>@coderabbitai</span>{" "}
+                  <span className={styles.codeString}>run enforce-strict-types</span>
+                </div>
               </div>
             </div>
           </div>
@@ -1321,7 +1673,8 @@ export default function Page() {
           <div className={styles.chapterHeader}>
             <div className={styles.chapterNum}>6</div>
             <h2 className={styles.chapterTitle}>
-              <span>MCP</span> 統合 — コンテキストを無限に拡張 <span className={`${styles.klevel} ${styles.kl3}`}>K-Level: 応用</span>
+              <span>MCP</span> 統合 — コンテキストを無限に拡張{" "}
+              <span className={`${styles.klevel} ${styles.kl3}`}>K-Level: 応用</span>
             </h2>
           </div>
 
@@ -1329,11 +1682,12 @@ export default function Page() {
             <h3 className={styles.sectionTitle}>6.1 MCP とは何か、なぜ重要か</h3>
             <p className={styles.paragraph}>
               <strong>定義：</strong>Model Context Protocol (MCP) は Anthropic
-              が提唱した標準インターフェース。CodeRabbit は MCP クライアントとして動作し、あらゆる MCP
-              サーバーに接続して外部データをレビューコンテキストに組み込みます。
+              が提唱した標準インターフェース。CodeRabbit は MCP クライアントとして動作し、あらゆる
+              MCP サーバーに接続して外部データをレビューコンテキストに組み込みます。
             </p>
             <p className={styles.paragraph}>
-              <strong>理由：</strong>コードレビューの精度は「コンテキストの豊富さ」に依存します。設計書・テスト結果・イシュー要件・パフォーマンスデータを参照することで、コードの「正しさ」をより深く評価できます。
+              <strong>理由：</strong>
+              コードレビューの精度は「コンテキストの豊富さ」に依存します。設計書・テスト結果・イシュー要件・パフォーマンスデータを参照することで、コードの「正しさ」をより深く評価できます。
             </p>
 
             <div className={styles.metricGrid}>
@@ -1359,7 +1713,9 @@ export default function Page() {
               <li>
                 <span className={styles.stepNum}>1</span>
                 <div className={styles.stepContent}>
-                  <Ext href="https://app.coderabbit.ai/integrations">app.coderabbit.ai/integrations</Ext>{" "}
+                  <Ext href="https://app.coderabbit.ai/integrations">
+                    app.coderabbit.ai/integrations
+                  </Ext>{" "}
                   → MCP タブへ移動
                 </div>
               </li>
@@ -1398,29 +1754,55 @@ export default function Page() {
               <div className={`${styles.compareCard} ${styles.good}`}>
                 <div className={styles.compareHead}>✅ Notion MCP 向け優れた User Guidance</div>
                 <div className={styles.compareBody}>
-                  <div className={styles.codeLine}><span className={styles.codeCyan}>このNotionワークスペースはエンジニアリング文書を含みます。</span></div>
-                  <div className={styles.codeLine}>コードレビューでは &quot;Engineering&quot; スペースを参照してください:</div>
-                  <div className={styles.codeLine}>- &quot;Architecture Decisions&quot;: 設計の根拠</div>
-                  <div className={styles.codeLine}>- &quot;API Contracts&quot;: インターフェース仕様</div>
-                  <div className={styles.codeLine}>- &quot;Service Runbooks&quot;: 運用コンテキスト</div>
-                  <div className={styles.codeLine}>HR / Finance スペースの内容は取得しないでください。</div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.codeCyan}>
+                      このNotionワークスペースはエンジニアリング文書を含みます。
+                    </span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    コードレビューでは &quot;Engineering&quot; スペースを参照してください:
+                  </div>
+                  <div className={styles.codeLine}>
+                    - &quot;Architecture Decisions&quot;: 設計の根拠
+                  </div>
+                  <div className={styles.codeLine}>
+                    - &quot;API Contracts&quot;: インターフェース仕様
+                  </div>
+                  <div className={styles.codeLine}>
+                    - &quot;Service Runbooks&quot;: 運用コンテキスト
+                  </div>
+                  <div className={styles.codeLine}>
+                    HR / Finance スペースの内容は取得しないでください。
+                  </div>
                 </div>
               </div>
               <div className={`${styles.compareCard} ${styles.bad}`}>
                 <div className={styles.compareHead}>❌ 不十分な User Guidance</div>
                 <div className={styles.compareBody}>
-                  <div className={styles.codeLine}><span className={styles.codePink}>Notion のドキュメントを使ってください。</span></div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.codePink}>Notion のドキュメントを使ってください。</span>
+                  </div>
                   <div className={styles.codeLine} />
-                  <div className={styles.codeLine}><span className={styles.codeComment}>// 問題:</span></div>
-                  <div className={styles.codeLine}><span className={styles.codeComment}>// - どのスペースを見るか不明</span></div>
-                  <div className={styles.codeLine}><span className={styles.codeComment}>// - レビューとの関連性不明</span></div>
-                  <div className={styles.codeLine}><span className={styles.codeComment}>// - 不要なページも取得される</span></div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.codeComment}>// 問題:</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.codeComment}>// - どのスペースを見るか不明</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.codeComment}>// - レビューとの関連性不明</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.codeComment}>// - 不要なページも取得される</span>
+                  </div>
                 </div>
               </div>
             </div>
 
             <h4 className={styles.subsectionTitle}>URL テンプレートプレースホルダー</h4>
-            <p className={styles.paragraph}>MCP の User Guidance 内で PR 固有の値を動的に展開できます。</p>
+            <p className={styles.paragraph}>
+              MCP の User Guidance 内で PR 固有の値を動的に展開できます。
+            </p>
 
             <div className={styles.codeWrap}>
               <div className={styles.codeBar}>
@@ -1431,12 +1813,29 @@ export default function Page() {
                 />
               </div>
               <div className={styles.codeBody}>
-                <div className={styles.codeLine}><span className={styles.codeComment}># Jenkins Organization Folder の例</span></div>
-                <div className={styles.codeLine}><span className={styles.codeGreen}>Jenkins ビルド URL パターン:</span> <span className={styles.codeString}>https://jenkins.company.com/job/&#123;workspace&#125;/job/&#123;repo&#125;/job/PR-&#123;pr&#125;/</span></div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeComment}># Jenkins Organization Folder の例</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeGreen}>Jenkins ビルド URL パターン:</span>{" "}
+                  <span className={styles.codeString}>
+                    https://jenkins.company.com/job/&#123;workspace&#125;/job/&#123;repo&#125;/job/PR-&#123;pr&#125;/
+                  </span>
+                </div>
                 <div className={styles.codeLine} />
-                <div className={styles.codeLine}><span className={styles.codeComment}># SonarQube プロジェクトキー規約</span></div>
-                <div className={styles.codeLine}><span className={styles.codeGreen}>SonarQube プロジェクトキー形式:</span> <span className={styles.codeAmber}>&#123;org&#125;_&#123;repo&#125;</span></div>
-                <div className={styles.codeLine}><span className={styles.codeGreen}>ダッシュボード URL:</span> <span className={styles.codeString}>https://sonar.company.com/dashboard?id=&#123;org&#125;_&#123;repo&#125;</span></div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeComment}># SonarQube プロジェクトキー規約</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeGreen}>SonarQube プロジェクトキー形式:</span>{" "}
+                  <span className={styles.codeAmber}>&#123;org&#125;_&#123;repo&#125;</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeGreen}>ダッシュボード URL:</span>{" "}
+                  <span className={styles.codeString}>
+                    https://sonar.company.com/dashboard?id=&#123;org&#125;_&#123;repo&#125;
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -1451,24 +1850,40 @@ export default function Page() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td className={styles.td}><code>&#123;repo&#125;</code> / <code>&#123;repository&#125;</code></td>
+                    <td className={styles.td}>
+                      <code>&#123;repo&#125;</code> / <code>&#123;repository&#125;</code>
+                    </td>
                     <td className={styles.td}>リポジトリ名</td>
-                    <td className={styles.td}><code>my-backend</code></td>
+                    <td className={styles.td}>
+                      <code>my-backend</code>
+                    </td>
                   </tr>
                   <tr>
-                    <td className={styles.td}><code>&#123;pr&#125;</code> / <code>&#123;pr number&#125;</code></td>
+                    <td className={styles.td}>
+                      <code>&#123;pr&#125;</code> / <code>&#123;pr number&#125;</code>
+                    </td>
                     <td className={styles.td}>PR 番号</td>
-                    <td className={styles.td}><code>42</code></td>
+                    <td className={styles.td}>
+                      <code>42</code>
+                    </td>
                   </tr>
                   <tr>
-                    <td className={styles.td}><code>&#123;workspace&#125;</code> / <code>&#123;org&#125;</code></td>
+                    <td className={styles.td}>
+                      <code>&#123;workspace&#125;</code> / <code>&#123;org&#125;</code>
+                    </td>
                     <td className={styles.td}>組織名</td>
-                    <td className={styles.td}><code>acme-corp</code></td>
+                    <td className={styles.td}>
+                      <code>acme-corp</code>
+                    </td>
                   </tr>
                   <tr>
-                    <td className={styles.td}><code>&#123;project&#125;</code></td>
+                    <td className={styles.td}>
+                      <code>&#123;project&#125;</code>
+                    </td>
                     <td className={styles.td}>Azure DevOps プロジェクト名</td>
-                    <td className={styles.td}><code>MyProject</code></td>
+                    <td className={styles.td}>
+                      <code>MyProject</code>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -1508,7 +1923,8 @@ export default function Page() {
           <div className={styles.chapterHeader}>
             <div className={styles.chapterNum}>7</div>
             <h2 className={styles.chapterTitle}>
-              <span>ツール</span> &amp; CI/CD 連携 <span className={`${styles.klevel} ${styles.kl2}`}>K-Level: 適用</span>
+              <span>ツール</span> &amp; CI/CD 連携{" "}
+              <span className={`${styles.klevel} ${styles.kl2}`}>K-Level: 適用</span>
             </h2>
           </div>
 
@@ -1591,7 +2007,9 @@ export default function Page() {
               <div className={styles.progressItem}>
                 <div className={styles.progressLabel}>
                   <span>セキュリティ全般</span>
-                  <span style={{ color: "var(--neon-purple)" }}>Semgrep + OpenGrep + Betterleaks + Trivy</span>
+                  <span style={{ color: "var(--neon-purple)" }}>
+                    Semgrep + OpenGrep + Betterleaks + Trivy
+                  </span>
                 </div>
                 <div className={styles.progressBarBg}>
                   <div
@@ -1658,7 +2076,9 @@ export default function Page() {
                   </tr>
                   <tr>
                     <td className={styles.td}>セキュリティ</td>
-                    <td className={styles.td}>Semgrep, OpenGrep, Trivy, TruffleHog, OSV-Scanner, Betterleaks</td>
+                    <td className={styles.td}>
+                      Semgrep, OpenGrep, Trivy, TruffleHog, OSV-Scanner, Betterleaks
+                    </td>
                   </tr>
                   <tr>
                     <td className={styles.td}>SQL</td>
@@ -1701,9 +2121,18 @@ export default function Page() {
                 />
               </div>
               <div className={styles.codeBody}>
-                <div className={styles.codeLine}><span className={styles.codeKeyword}>integrations</span>:</div>
-                <div className={styles.codeLine}>{"  "}<span className={styles.codeKeyword}>circleci</span>:</div>
-                <div className={styles.codeLine}>{"    "}<span className={styles.codeKeyword}>enabled</span>: <span className={styles.codeGreen}>true</span></div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeKeyword}>integrations</span>:
+                </div>
+                <div className={styles.codeLine}>
+                  {"  "}
+                  <span className={styles.codeKeyword}>circleci</span>:
+                </div>
+                <div className={styles.codeLine}>
+                  {"    "}
+                  <span className={styles.codeKeyword}>enabled</span>:{" "}
+                  <span className={styles.codeGreen}>true</span>
+                </div>
               </div>
             </div>
           </div>
@@ -1739,11 +2168,23 @@ export default function Page() {
                 />
               </div>
               <div className={styles.codeBody}>
-                <div className={styles.codeLine}><span className={styles.codeComment}># Claude Code での CodeRabbit CLI スキル追加</span></div>
-                <div className={styles.codeLine}><span className={styles.codeGreen}>claude</span> <span className={styles.codeString}>install coderabbit-skill</span></div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeComment}>
+                    # Claude Code での CodeRabbit CLI スキル追加
+                  </span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeGreen}>claude</span>{" "}
+                  <span className={styles.codeString}>install coderabbit-skill</span>
+                </div>
                 <div className={styles.codeLine} />
-                <div className={styles.codeLine}><span className={styles.codeComment}># 手動 CLI レビュー実行</span></div>
-                <div className={styles.codeLine}><span className={styles.codeGreen}>coderabbit</span> <span className={styles.codeString}>review --diff HEAD~1</span></div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeComment}># 手動 CLI レビュー実行</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeGreen}>coderabbit</span>{" "}
+                  <span className={styles.codeString}>review --diff HEAD~1</span>
+                </div>
               </div>
             </div>
           </div>
@@ -1799,14 +2240,16 @@ export default function Page() {
           <div className={styles.chapterHeader}>
             <div className={styles.chapterNum}>8</div>
             <h2 className={styles.chapterTitle}>
-              <span>上級テクニック</span> — 真のエキスパートへ <span className={`${styles.klevel} ${styles.kl3}`}>K-Level: 創造</span>
+              <span>上級テクニック</span> — 真のエキスパートへ{" "}
+              <span className={`${styles.klevel} ${styles.kl3}`}>K-Level: 創造</span>
             </h2>
           </div>
 
           <div className={styles.section}>
             <h3 className={styles.sectionTitle}>8.1 ast-grep による構文精密レビュー</h3>
             <p className={styles.paragraph}>
-              <strong>定義：</strong>AST（抽象構文木）ベースのパターンマッチングで、テキスト検索では発見できない構造的なコードパターンを検出します。
+              <strong>定義：</strong>
+              AST（抽象構文木）ベースのパターンマッチングで、テキスト検索では発見できない構造的なコードパターンを検出します。
             </p>
 
             <div className={styles.codeWrap}>
@@ -1818,19 +2261,59 @@ export default function Page() {
                 />
               </div>
               <div className={styles.codeBody}>
-                <div className={styles.codeLine}><span className={styles.codeKeyword}>reviews</span>:</div>
-                <div className={styles.codeLine}>{"  "}<span className={styles.codeKeyword}>path_instructions</span>:</div>
-                <div className={styles.codeLine}>{"    "}- <span className={styles.codeKeyword}>path</span>: <span className={styles.codeString}>&quot;src/**/*.ts&quot;</span></div>
-                <div className={styles.codeLine}>{"      "}<span className={styles.codeKeyword}>instructions</span>: <span className={styles.codeString}>|</span></div>
-                <div className={styles.codeLine}>{"        Use ast-grep to detect any usage of `document.write()`. This is banned in our codebase due to XSS risks."}</div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeKeyword}>reviews</span>:
+                </div>
+                <div className={styles.codeLine}>
+                  {"  "}
+                  <span className={styles.codeKeyword}>path_instructions</span>:
+                </div>
+                <div className={styles.codeLine}>
+                  {"    "}- <span className={styles.codeKeyword}>path</span>:{" "}
+                  <span className={styles.codeString}>&quot;src/**/*.ts&quot;</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"      "}
+                  <span className={styles.codeKeyword}>instructions</span>:{" "}
+                  <span className={styles.codeString}>|</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {
+                    "        Use ast-grep to detect any usage of `document.write()`. This is banned in our codebase due to XSS risks."
+                  }
+                </div>
                 <div className={styles.codeLine} />
-                <div className={styles.codeLine}><span className={styles.codeComment}># ast-grep ルールファイル (.ast-grep/rules/no-console.yaml)</span></div>
-                <div className={styles.codeLine}><span className={styles.codeKeyword}>id</span>: <span className={styles.codeString}>no-console-log</span></div>
-                <div className={styles.codeLine}><span className={styles.codeKeyword}>language</span>: <span className={styles.codeString}>TypeScript</span></div>
-                <div className={styles.codeLine}><span className={styles.codeKeyword}>rule</span>:</div>
-                <div className={styles.codeLine}>{"  "}<span className={styles.codeKeyword}>pattern</span>: <span className={styles.codeString}>console.log($$$)</span></div>
-                <div className={styles.codeLine}><span className={styles.codeKeyword}>message</span>: <span className={styles.codeString}>本番コードに console.log を残さないでください</span></div>
-                <div className={styles.codeLine}><span className={styles.codeKeyword}>severity</span>: <span className={styles.codeString}>warning</span></div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeComment}>
+                    # ast-grep ルールファイル (.ast-grep/rules/no-console.yaml)
+                  </span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeKeyword}>id</span>:{" "}
+                  <span className={styles.codeString}>no-console-log</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeKeyword}>language</span>:{" "}
+                  <span className={styles.codeString}>TypeScript</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeKeyword}>rule</span>:
+                </div>
+                <div className={styles.codeLine}>
+                  {"  "}
+                  <span className={styles.codeKeyword}>pattern</span>:{" "}
+                  <span className={styles.codeString}>console.log($$$)</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeKeyword}>message</span>:{" "}
+                  <span className={styles.codeString}>
+                    本番コードに console.log を残さないでください
+                  </span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeKeyword}>severity</span>:{" "}
+                  <span className={styles.codeString}>warning</span>
+                </div>
               </div>
             </div>
           </div>
@@ -1852,17 +2335,56 @@ export default function Page() {
                 />
               </div>
               <div className={styles.codeBody}>
-                <div className={styles.codeLine}><span className={styles.codeKeyword}>reviews</span>:</div>
-                <div className={styles.codeLine}>{"  "}<span className={styles.codeKeyword}>custom_checks</span>:</div>
-                <div className={styles.codeLine}>{"    "}- <span className={styles.codeKeyword}>name</span>: <span className={styles.codeString}>&quot;migration-has-rollback&quot;</span></div>
-                <div className={styles.codeLine}>{"      "}<span className={styles.codeKeyword}>description</span>: <span className={styles.codeString}>&quot;DBマイグレーションには必ずロールバックが必要&quot;</span></div>
-                <div className={styles.codeLine}>{"      "}<span className={styles.codeKeyword}>instructions</span>: <span className={styles.codeString}>|</span></div>
-                <div className={styles.codeLine}>{"        db/migrations/ 配下のファイルが変更されている場合: up() / down() の両メソッドが存在することを確認。 down() が存在しない場合は FAIL。"}</div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeKeyword}>reviews</span>:
+                </div>
+                <div className={styles.codeLine}>
+                  {"  "}
+                  <span className={styles.codeKeyword}>custom_checks</span>:
+                </div>
+                <div className={styles.codeLine}>
+                  {"    "}- <span className={styles.codeKeyword}>name</span>:{" "}
+                  <span className={styles.codeString}>&quot;migration-has-rollback&quot;</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"      "}
+                  <span className={styles.codeKeyword}>description</span>:{" "}
+                  <span className={styles.codeString}>
+                    &quot;DBマイグレーションには必ずロールバックが必要&quot;
+                  </span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"      "}
+                  <span className={styles.codeKeyword}>instructions</span>:{" "}
+                  <span className={styles.codeString}>|</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {
+                    "        db/migrations/ 配下のファイルが変更されている場合: up() / down() の両メソッドが存在することを確認。 down() が存在しない場合は FAIL。"
+                  }
+                </div>
                 <div className={styles.codeLine} />
-                <div className={styles.codeLine}>{"    "}- <span className={styles.codeKeyword}>name</span>: <span className={styles.codeString}>&quot;no-secrets-in-code&quot;</span></div>
-                <div className={styles.codeLine}>{"      "}<span className={styles.codeKeyword}>description</span>: <span className={styles.codeString}>&quot;ハードコードされた認証情報の検出&quot;</span></div>
-                <div className={styles.codeLine}>{"      "}<span className={styles.codeKeyword}>instructions</span>: <span className={styles.codeString}>|</span></div>
-                <div className={styles.codeLine}>{"        API キー・パスワード・トークンのハードコーディングを検出。 環境変数 (process.env.*) 経由でない認証情報は FAIL。"}</div>
+                <div className={styles.codeLine}>
+                  {"    "}- <span className={styles.codeKeyword}>name</span>:{" "}
+                  <span className={styles.codeString}>&quot;no-secrets-in-code&quot;</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"      "}
+                  <span className={styles.codeKeyword}>description</span>:{" "}
+                  <span className={styles.codeString}>
+                    &quot;ハードコードされた認証情報の検出&quot;
+                  </span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"      "}
+                  <span className={styles.codeKeyword}>instructions</span>:{" "}
+                  <span className={styles.codeString}>|</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {
+                    "        API キー・パスワード・トークンのハードコーディングを検出。 環境変数 (process.env.*) 経由でない認証情報は FAIL。"
+                  }
+                </div>
               </div>
             </div>
 
@@ -1870,7 +2392,8 @@ export default function Page() {
               <span className={styles.calloutIcon}>⚠️</span>
               <div className={styles.calloutBody}>
                 <strong>Pre-Merge Checks は GitHub Status Check として統合されます。</strong>PR
-                のマージブロック条件として設定できます（Branch Protection Rules との組み合わせ推奨）。
+                のマージブロック条件として設定できます（Branch Protection Rules
+                との組み合わせ推奨）。
               </div>
             </div>
           </div>
@@ -1885,7 +2408,8 @@ export default function Page() {
             <div className={`${styles.callout} ${styles.danger}`}>
               <span className={styles.calloutIcon}>🚨</span>
               <div className={styles.calloutBody}>
-                <strong>Global Overrides は全リポジトリに強制適用されます。</strong>誤った設定は組織全体のレビューワークフローに影響するため、必ずステージング環境でテストしてから適用してください。
+                <strong>Global Overrides は全リポジトリに強制適用されます。</strong>
+                誤った設定は組織全体のレビューワークフローに影響するため、必ずステージング環境でテストしてから適用してください。
               </div>
             </div>
 
@@ -1898,17 +2422,54 @@ export default function Page() {
                 />
               </div>
               <div className={styles.codeBody}>
-                <div className={styles.codeLine}><span className={styles.codeComment}># Organization Settings → Global Overrides</span></div>
-                <div className={styles.codeLine}><span className={styles.codeComment}># yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json</span></div>
-                <div className={styles.codeLine}><span className={styles.codeKeyword}>reviews</span>:</div>
-                <div className={styles.codeLine}>{"  "}<span className={styles.codeKeyword}>profile</span>: <span className={styles.codeString}>&quot;assertive&quot;</span></div>
-                <div className={styles.codeLine}>{"  "}<span className={styles.codeKeyword}>path_instructions</span>:</div>
-                <div className={styles.codeLine}>{"    "}- <span className={styles.codeKeyword}>path</span>: <span className={styles.codeString}>&quot;**/*.sql&quot;</span></div>
-                <div className={styles.codeLine}>{"      "}<span className={styles.codeKeyword}>instructions</span>: <span className={styles.codeString}>|</span></div>
-                <div className={styles.codeLine}>{"        DROP TABLE / TRUNCATE を含む文を発見した場合、 必ず DANGER レベルで警告。承認なしのマージを禁止。"}</div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeComment}>
+                    # Organization Settings → Global Overrides
+                  </span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeComment}>
+                    # yaml-language-server:
+                    $schema=https://coderabbit.ai/integrations/schema.v2.json
+                  </span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeKeyword}>reviews</span>:
+                </div>
+                <div className={styles.codeLine}>
+                  {"  "}
+                  <span className={styles.codeKeyword}>profile</span>:{" "}
+                  <span className={styles.codeString}>&quot;assertive&quot;</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"  "}
+                  <span className={styles.codeKeyword}>path_instructions</span>:
+                </div>
+                <div className={styles.codeLine}>
+                  {"    "}- <span className={styles.codeKeyword}>path</span>:{" "}
+                  <span className={styles.codeString}>&quot;**/*.sql&quot;</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"      "}
+                  <span className={styles.codeKeyword}>instructions</span>:{" "}
+                  <span className={styles.codeString}>|</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {
+                    "        DROP TABLE / TRUNCATE を含む文を発見した場合、 必ず DANGER レベルで警告。承認なしのマージを禁止。"
+                  }
+                </div>
                 <div className={styles.codeLine} />
-                <div className={styles.codeLine}><span className={styles.codeComment}># スカラー: 上書き / オブジェクト: 再帰的マージ</span></div>
-                <div className={styles.codeLine}><span className={styles.codeComment}># 配列: キーで照合後マージ (path_instructions は path がキー)</span></div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeComment}>
+                    # スカラー: 上書き / オブジェクト: 再帰的マージ
+                  </span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.codeComment}>
+                    # 配列: キーで照合後マージ (path_instructions は path がキー)
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -1949,8 +2510,12 @@ export default function Page() {
           </div>
 
           <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>8.5 Slack Agent — AI エージェントをワークスペースに</h3>
-            <p className={styles.paragraph}>CodeRabbit Agent for Slack は Slack 上で直接 AI コーディング支援を実現します。</p>
+            <h3 className={styles.sectionTitle}>
+              8.5 Slack Agent — AI エージェントをワークスペースに
+            </h3>
+            <p className={styles.paragraph}>
+              CodeRabbit Agent for Slack は Slack 上で直接 AI コーディング支援を実現します。
+            </p>
 
             <div className={styles.trendCard}>
               <div className={styles.trendTag}>🔮 最新機能</div>
@@ -2026,7 +2591,9 @@ export default function Page() {
             >
               📚
             </div>
-            <h2 className={styles.chapterTitle}>全参考 <span>URL 一覧</span></h2>
+            <h2 className={styles.chapterTitle}>
+              全参考 <span>URL 一覧</span>
+            </h2>
           </div>
 
           <h3 className={styles.sectionTitle}>🏠 公式ドキュメント（一次情報源）</h3>
@@ -2037,7 +2604,9 @@ export default function Page() {
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【公式 Docs】完全インデックス</div>
-              <Ext href="https://docs.coderabbit.ai/llms.txt">https://docs.coderabbit.ai/llms.txt</Ext>
+              <Ext href="https://docs.coderabbit.ai/llms.txt">
+                https://docs.coderabbit.ai/llms.txt
+              </Ext>
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【公式 App】Web アプリ</div>
@@ -2049,99 +2618,147 @@ export default function Page() {
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【公式 Schema】設定スキーマ</div>
-              <Ext href="https://coderabbit.ai/integrations/schema.v2.json">https://coderabbit.ai/integrations/schema.v2.json</Ext>
+              <Ext href="https://coderabbit.ai/integrations/schema.v2.json">
+                https://coderabbit.ai/integrations/schema.v2.json
+              </Ext>
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【公式 App】Learnings ダッシュボード</div>
-              <Ext href="https://app.coderabbit.ai/learnings">https://app.coderabbit.ai/learnings</Ext>
+              <Ext href="https://app.coderabbit.ai/learnings">
+                https://app.coderabbit.ai/learnings
+              </Ext>
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【公式 App】MCP 統合設定</div>
-              <Ext href="https://app.coderabbit.ai/integrations">https://app.coderabbit.ai/integrations</Ext>
+              <Ext href="https://app.coderabbit.ai/integrations">
+                https://app.coderabbit.ai/integrations
+              </Ext>
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【公式 Docs】Quickstart</div>
-              <Ext href="https://docs.coderabbit.ai/getting-started/quickstart.md">https://docs.coderabbit.ai/getting-started/quickstart.md</Ext>
+              <Ext href="https://docs.coderabbit.ai/getting-started/quickstart.md">
+                https://docs.coderabbit.ai/getting-started/quickstart.md
+              </Ext>
             </div>
           </div>
 
-          <h3 className={styles.sectionTitle} style={{ marginTop: "1.5rem" }}>🔧 設定・カスタマイズ関連</h3>
+          <h3 className={styles.sectionTitle} style={{ marginTop: "1.5rem" }}>
+            🔧 設定・カスタマイズ関連
+          </h3>
           <div className={styles.refGrid}>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【公式 Docs】Configuration Reference</div>
-              <Ext href="https://docs.coderabbit.ai/reference/configuration.md">https://docs.coderabbit.ai/reference/configuration.md</Ext>
+              <Ext href="https://docs.coderabbit.ai/reference/configuration.md">
+                https://docs.coderabbit.ai/reference/configuration.md
+              </Ext>
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【公式 Docs】YAML Validator</div>
-              <Ext href="https://docs.coderabbit.ai/configuration/yaml-validator.md">https://docs.coderabbit.ai/configuration/yaml-validator.md</Ext>
+              <Ext href="https://docs.coderabbit.ai/configuration/yaml-validator.md">
+                https://docs.coderabbit.ai/configuration/yaml-validator.md
+              </Ext>
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【公式 Docs】自動レビュー制御</div>
-              <Ext href="https://docs.coderabbit.ai/configuration/auto-review.md">https://docs.coderabbit.ai/configuration/auto-review.md</Ext>
+              <Ext href="https://docs.coderabbit.ai/configuration/auto-review.md">
+                https://docs.coderabbit.ai/configuration/auto-review.md
+              </Ext>
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【公式 Docs】組織設定</div>
-              <Ext href="https://docs.coderabbit.ai/guides/organization-settings.md">https://docs.coderabbit.ai/guides/organization-settings.md</Ext>
+              <Ext href="https://docs.coderabbit.ai/guides/organization-settings.md">
+                https://docs.coderabbit.ai/guides/organization-settings.md
+              </Ext>
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【公式 Docs】設定例 (Django)</div>
-              <Ext href="https://docs.coderabbit.ai/configuration/example/python/django.md">https://docs.coderabbit.ai/configuration/example/python/django.md</Ext>
+              <Ext href="https://docs.coderabbit.ai/configuration/example/python/django.md">
+                https://docs.coderabbit.ai/configuration/example/python/django.md
+              </Ext>
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【公式 Docs】設定例 (Expo)</div>
-              <Ext href="https://docs.coderabbit.ai/configuration/example/typescript/expo.md">https://docs.coderabbit.ai/configuration/example/typescript/expo.md</Ext>
+              <Ext href="https://docs.coderabbit.ai/configuration/example/typescript/expo.md">
+                https://docs.coderabbit.ai/configuration/example/typescript/expo.md
+              </Ext>
             </div>
           </div>
 
-          <h3 className={styles.sectionTitle} style={{ marginTop: "1.5rem" }}>🤖 エージェント・AI 関連</h3>
+          <h3 className={styles.sectionTitle} style={{ marginTop: "1.5rem" }}>
+            🤖 エージェント・AI 関連
+          </h3>
           <div className={styles.refGrid}>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【公式 Docs】CodeRabbit Plan 概要</div>
-              <Ext href="https://docs.coderabbit.ai/plan/index.md">https://docs.coderabbit.ai/plan/index.md</Ext>
+              <Ext href="https://docs.coderabbit.ai/plan/index.md">
+                https://docs.coderabbit.ai/plan/index.md
+              </Ext>
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【公式 Docs】Agent Handoff</div>
-              <Ext href="https://docs.coderabbit.ai/plan/agent-handoff.md">https://docs.coderabbit.ai/plan/agent-handoff.md</Ext>
+              <Ext href="https://docs.coderabbit.ai/plan/agent-handoff.md">
+                https://docs.coderabbit.ai/plan/agent-handoff.md
+              </Ext>
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【公式 Docs】Slop Detection</div>
-              <Ext href="https://docs.coderabbit.ai/pr-reviews/slop-detection.md">https://docs.coderabbit.ai/pr-reviews/slop-detection.md</Ext>
+              <Ext href="https://docs.coderabbit.ai/pr-reviews/slop-detection.md">
+                https://docs.coderabbit.ai/pr-reviews/slop-detection.md
+              </Ext>
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【公式 Docs】Coding Plan 作成</div>
-              <Ext href="https://docs.coderabbit.ai/plan/create-plan.md">https://docs.coderabbit.ai/plan/create-plan.md</Ext>
+              <Ext href="https://docs.coderabbit.ai/plan/create-plan.md">
+                https://docs.coderabbit.ai/plan/create-plan.md
+              </Ext>
             </div>
           </div>
 
-          <h3 className={styles.sectionTitle} style={{ marginTop: "1.5rem" }}>📊 管理・エンタープライズ</h3>
+          <h3 className={styles.sectionTitle} style={{ marginTop: "1.5rem" }}>
+            📊 管理・エンタープライズ
+          </h3>
           <div className={styles.refGrid}>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【公式 Docs】管理概要</div>
-              <Ext href="https://docs.coderabbit.ai/management/index.md">https://docs.coderabbit.ai/management/index.md</Ext>
+              <Ext href="https://docs.coderabbit.ai/management/index.md">
+                https://docs.coderabbit.ai/management/index.md
+              </Ext>
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【公式 Docs】Enterprise SSO</div>
-              <Ext href="https://docs.coderabbit.ai/management/sso/index.md">https://docs.coderabbit.ai/management/sso/index.md</Ext>
+              <Ext href="https://docs.coderabbit.ai/management/sso/index.md">
+                https://docs.coderabbit.ai/management/sso/index.md
+              </Ext>
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【公式 Docs】監査ログ</div>
-              <Ext href="https://docs.coderabbit.ai/management/audit-logs.md">https://docs.coderabbit.ai/management/audit-logs.md</Ext>
+              <Ext href="https://docs.coderabbit.ai/management/audit-logs.md">
+                https://docs.coderabbit.ai/management/audit-logs.md
+              </Ext>
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【公式 Docs】カスタムロール</div>
-              <Ext href="https://docs.coderabbit.ai/management/custom-roles.md">https://docs.coderabbit.ai/management/custom-roles.md</Ext>
+              <Ext href="https://docs.coderabbit.ai/management/custom-roles.md">
+                https://docs.coderabbit.ai/management/custom-roles.md
+              </Ext>
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【公式 Docs】レポート</div>
-              <Ext href="https://docs.coderabbit.ai/management/reports/index.md">https://docs.coderabbit.ai/management/reports/index.md</Ext>
+              <Ext href="https://docs.coderabbit.ai/management/reports/index.md">
+                https://docs.coderabbit.ai/management/reports/index.md
+              </Ext>
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【公式 Docs】Glossary</div>
-              <Ext href="https://docs.coderabbit.ai/reference/glossary.md">https://docs.coderabbit.ai/reference/glossary.md</Ext>
+              <Ext href="https://docs.coderabbit.ai/reference/glossary.md">
+                https://docs.coderabbit.ai/reference/glossary.md
+              </Ext>
             </div>
           </div>
 
-          <h3 className={styles.sectionTitle} style={{ marginTop: "1.5rem" }}>🌐 外部参考資料</h3>
+          <h3 className={styles.sectionTitle} style={{ marginTop: "1.5rem" }}>
+            🌐 外部参考資料
+          </h3>
           <div className={styles.refGrid}>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【公式 Blog】CodeRabbit ブログ</div>
@@ -2153,7 +2770,9 @@ export default function Page() {
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【外部ライブラリ】minimatch (glob パターン)</div>
-              <Ext href="https://github.com/isaacs/minimatch">https://github.com/isaacs/minimatch</Ext>
+              <Ext href="https://github.com/isaacs/minimatch">
+                https://github.com/isaacs/minimatch
+              </Ext>
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>【外部 Docs】MCP プロトコル仕様</div>
@@ -2174,7 +2793,9 @@ export default function Page() {
               Generated: 2025-06 | Source:{" "}
               <Ext href="https://docs.coderabbit.ai/">docs.coderabbit.ai</Ext> (一次情報源)
             </p>
-            <p style={{ marginTop: "0.3rem" }}>CodeRabbit 公式ドキュメントに基づく中上級者向けガイド</p>
+            <p style={{ marginTop: "0.3rem" }}>
+              CodeRabbit 公式ドキュメントに基づく中上級者向けガイド
+            </p>
           </div>
         </section>
       </main>

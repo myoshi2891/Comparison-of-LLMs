@@ -14,9 +14,9 @@
   --text-primary: #e6edf3;
   --text-secondary: #8b949e;
   --text-muted: #484f58;
-  --font-mono: 'Space Mono', monospace;
-  --font-head: 'Syne', sans-serif;
-  --font-body: 'IBM Plex Sans JP', sans-serif;
+  --font-mono: "Space Mono", monospace;
+  --font-head: "Syne", sans-serif;
+  --font-body: "IBM Plex Sans JP", sans-serif;
   --radius: 8px;
   --radius-lg: 14px;
   --transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
@@ -30,7 +30,7 @@
 
 /* scanline + grid overlay */
 .pageContainer::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background: repeating-linear-gradient(
@@ -45,7 +45,7 @@
 }
 
 .pageContainer::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background-image:
@@ -137,7 +137,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.7;
     transform: scale(1);
   }
@@ -818,7 +819,7 @@
 }
 
 .trendCard::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -40px;
   right: -40px;
@@ -881,7 +882,7 @@
 }
 
 .refCard::after {
-  content: '→';
+  content: "→";
   position: absolute;
   right: 1rem;
   top: 50%;
