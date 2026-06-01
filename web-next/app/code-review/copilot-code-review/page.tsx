@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import styles from "./page.module.css";
 import CodeCopyButton from "@/components/docs/CodeCopyButton";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import styles from "./page.module.css";
 
 export const metadata: Metadata = {
   title: "GitHub Copilot Code Review — 完全活用ガイド",
@@ -98,9 +98,7 @@ export default function Page() {
       {/* NAVBAR */}
       <nav className={styles.nav}>
         <div className={styles.navInner}>
-          <a href="#" className={styles.navBrand}>
-            Copilot CR Guide
-          </a>
+          <span className={styles.navBrand}>Copilot CR Guide</span>
           <a href="#ch1">01 概要</a>
           <a href="#ch2">02 可用性</a>
           <a href="#ch3">03 セットアップ</a>
@@ -203,8 +201,8 @@ export default function Page() {
           <p className={styles.paragraph}>
             <strong>GitHub Copilot Code Review</strong> は、Pull
             Request（PR）内のコード変更を自動的に解析し、マルチアングルで問題を検出して修正案を提示する
-            AI エージェントです。すべての主要プログラミング言語に対応し、「Comment」レビューとして PR
-            に投稿します。
+            AI エージェントです。すべての主要プログラミング言語に対応し、「Comment」レビューとして
+            PR に投稿します。
           </p>
 
           <h3 className={styles.sectionTitle}>1.2 なぜ重要か</h3>
@@ -276,8 +274,8 @@ export default function Page() {
 
           <div className={`${styles.callout} ${styles.info}`}>
             <strong>📌 重要な設計上の制約</strong>
-            Copilot Code Review は
-            <em>必ず</em>「Comment」レビューを投稿します。「Approve」や「Request
+            Copilot Code Review は<em>必ず</em>
+            「Comment」レビューを投稿します。「Approve」や「Request
             Changes」は行いません。そのため、必須承認者数のカウントには含まれず、マージをブロックしません。
           </div>
         </section>
@@ -555,8 +553,8 @@ export default function Page() {
               <div className={styles.stepContent}>
                 <strong>Org ポリシー有効化</strong>
                 <br />
-                Organization → Settings → Copilot → Policies → <em>Copilot code review</em> を Enabled
-                に設定。
+                Organization → Settings → Copilot → Policies → <em>Copilot code review</em> を
+                Enabled に設定。
               </div>
             </li>
             <li>
@@ -564,9 +562,8 @@ export default function Page() {
               <div className={styles.stepContent}>
                 <strong>Runners の設定（Agentic 機能用）</strong>
                 <br />
-                Full Project Context Gathering は GitHub Actions runners
-                を使用。デフォルトは GitHub-hosted runners。大規模リポジトリでは Larger runners
-                への移行を検討。
+                Full Project Context Gathering は GitHub Actions runners を使用。デフォルトは
+                GitHub-hosted runners。大規模リポジトリでは Larger runners への移行を検討。
               </div>
             </li>
             <li>
@@ -584,7 +581,7 @@ export default function Page() {
                 <strong>Custom Instructions の準備</strong>
                 <br />
                 <code>.github/copilot-instructions.md</code>（リポジトリ全体）または{" "}
-                <code>.github/instructions/**/*.instructions.md</code>（パス別）を作成。
+                <code>.github/instructions/{"**/*.instructions.md"}</code>（パス別）を作成。
               </div>
             </li>
           </ul>
@@ -645,16 +642,21 @@ export default function Page() {
 
           <div className={styles.compareGrid}>
             <div className={`${styles.compareCard} ${styles.good}`}>
-              <div className={styles.compareTitle}>✅ 良い例：コミット前にローカルレビューを使う</div>
+              <div className={styles.compareTitle}>
+                ✅ 良い例：コミット前にローカルレビューを使う
+              </div>
               <p
                 className={styles.paragraph}
                 style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}
               >
-                Source Control ビュー → CHANGES 上の 🔍 ボタン → 問題をローカルで修正してからコミット
+                Source Control ビュー → CHANGES 上の 🔍 ボタン →
+                問題をローカルで修正してからコミット
               </p>
             </div>
             <div className={`${styles.compareCard} ${styles.bad}`}>
-              <div className={styles.compareTitle}>❌ 悪い例：全変更を一括コミットしてからレビュー依頼</div>
+              <div className={styles.compareTitle}>
+                ❌ 悪い例：全変更を一括コミットしてからレビュー依頼
+              </div>
               <p
                 className={styles.paragraph}
                 style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}
@@ -707,7 +709,9 @@ export default function Page() {
           <ul className={styles.stepList}>
             <li>
               <span className={styles.stepNum}>1</span>
-              <div className={styles.stepContent}>左側パネルの <strong>Commit</strong> ツールウィンドウを開く</div>
+              <div className={styles.stepContent}>
+                左側パネルの <strong>Commit</strong> ツールウィンドウを開く
+              </div>
             </li>
             <li>
               <span className={styles.stepNum}>2</span>
@@ -736,22 +740,28 @@ export default function Page() {
             </li>
             <li>
               <span className={styles.stepNum}>2</span>
-              <div className={styles.stepContent}>Editor → GitHub Copilot → Open Chat でチャットウィンドウを開く</div>
+              <div className={styles.stepContent}>
+                Editor → GitHub Copilot → Open Chat でチャットウィンドウを開く
+              </div>
             </li>
             <li>
               <span className={styles.stepNum}>3</span>
-              <div className={styles.stepContent}>右下の Code Review ボタン（吹き出しアイコン）をクリック</div>
+              <div className={styles.stepContent}>
+                右下の Code Review ボタン（吹き出しアイコン）をクリック
+              </div>
             </li>
             <li>
               <span className={`${styles.stepNum} ${styles.cyan}`}>4</span>
               <div className={styles.stepContent}>
-                <strong>Review Staged Changes</strong> または <strong>Review Unstaged Changes</strong>{" "}
-                を選択
+                <strong>Review Staged Changes</strong> または{" "}
+                <strong>Review Unstaged Changes</strong> を選択
               </div>
             </li>
             <li>
               <span className={`${styles.stepNum} ${styles.cyan}`}>5</span>
-              <div className={styles.stepContent}>レビュー対象ファイルをチェックボックスで選択 → Continue</div>
+              <div className={styles.stepContent}>
+                レビュー対象ファイルをチェックボックスで選択 → Continue
+              </div>
             </li>
             <li>
               <span className={`${styles.stepNum} ${styles.purple}`}>6</span>
@@ -789,7 +799,8 @@ export default function Page() {
           <div className={`${styles.callout} ${styles.warning}`}>
             <strong>⚠️ 制限: 最初の 4,000 文字のみ読み取り</strong>
             Custom Instructions ファイルの最初の 4,000 文字を超えた部分は Code Review
-            に反映されません（Copilot Chat / Cloud Agent にはこの制限なし）。重要な指示を冒頭に配置してください。
+            に反映されません（Copilot Chat / Cloud Agent
+            にはこの制限なし）。重要な指示を冒頭に配置してください。
           </div>
 
           <h3 className={styles.sectionTitle}>5.2 ファイル構成</h3>
@@ -804,7 +815,8 @@ export default function Page() {
             <div className={`${styles.archLayer} ${styles.cyan}`}>
               <span className={styles.archLabel}>パス別指示</span>
               <span className={styles.archDesc}>
-                <code>.github/instructions/**/*.instructions.md</code> — 特定パスのファイルにのみ適用
+                <code>.github/instructions/{"**/*.instructions.md"}</code> —
+                特定パスのファイルにのみ適用
               </span>
             </div>
             <div className={`${styles.archLayer} ${styles.purple}`}>
@@ -911,7 +923,8 @@ export default function Page() {
                 <span className={styles.cs}>---</span>
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.ck}>applyTo</span>: <span className={styles.cs}>&quot;src/api/**&quot;</span>
+                <span className={styles.ck}>applyTo</span>:{" "}
+                <span className={styles.cs}>&quot;src/api/**&quot;</span>
               </div>
               <div className={styles.codeLine}>
                 <span className={styles.cs}>---</span>
@@ -938,13 +951,16 @@ export default function Page() {
                 <span className={styles.cs}>---</span>
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.ck}>applyTo</span>: <span className={styles.cs}>&quot;db/migrations/**&quot;</span>
+                <span className={styles.ck}>applyTo</span>:{" "}
+                <span className={styles.cs}>&quot;db/migrations/**&quot;</span>
               </div>
               <div className={styles.codeLine}>
                 <span className={styles.cs}>---</span>
               </div>
               <div className={styles.codeLine}>For database migrations:</div>
-              <div className={styles.codeLine}>- Verify DOWN migration exists and is reversible</div>
+              <div className={styles.codeLine}>
+                - Verify DOWN migration exists and is reversible
+              </div>
               <div className={styles.codeLine}>- Check for missing index on foreign keys</div>
               <div className={styles.codeLine}>- Flag column renames without data migration</div>
             </div>
@@ -952,7 +968,8 @@ export default function Page() {
 
           <h3 className={styles.sectionTitle}>5.5 Copilot Memory（Public Preview）</h3>
           <p className={styles.paragraph}>
-            Copilot Pro / Pro+ ユーザーは <strong>Copilot Memory</strong> を有効化することで、Copilot
+            Copilot Pro / Pro+ ユーザーは <strong>Copilot Memory</strong>{" "}
+            を有効化することで、Copilot
             がリポジトリについて学習した知識を蓄積し、レビュー精度を継続的に向上させることができます。
           </p>
 
@@ -1002,7 +1019,9 @@ export default function Page() {
             </div>
           </div>
 
-          <h3 className={styles.sectionTitle}>6.2 Cloud Agent 連携（Fix PR 自動生成）— Public Preview</h3>
+          <h3 className={styles.sectionTitle}>
+            6.2 Cloud Agent 連携（Fix PR 自動生成）— Public Preview
+          </h3>
 
           <ul className={styles.stepList}>
             <li>
@@ -1015,12 +1034,15 @@ export default function Page() {
             <li>
               <span className={styles.stepNum}>2</span>
               <div className={styles.stepContent}>
-                <strong>Implement suggestion</strong> をクリックすると PR 上にドラフトコメントが作成される
+                <strong>Implement suggestion</strong> をクリックすると PR
+                上にドラフトコメントが作成される
               </div>
             </li>
             <li>
               <span className={`${styles.stepNum} ${styles.cyan}`}>3</span>
-              <div className={styles.stepContent}>ドラフトコメントで Copilot に追加の指示を書いてサブミット</div>
+              <div className={styles.stepContent}>
+                ドラフトコメントで Copilot に追加の指示を書いてサブミット
+              </div>
             </li>
             <li>
               <span className={`${styles.stepNum} ${styles.cyan}`}>4</span>
@@ -1030,7 +1052,9 @@ export default function Page() {
             </li>
             <li>
               <span className={`${styles.stepNum} ${styles.purple}`}>5</span>
-              <div className={styles.stepContent}>生成された Fix PR を人間がレビューしてマージ判断</div>
+              <div className={styles.stepContent}>
+                生成された Fix PR を人間がレビューしてマージ判断
+              </div>
             </li>
           </ul>
 
@@ -1065,7 +1089,9 @@ export default function Page() {
                   <td className={styles.td}>
                     <span className={`${styles.badge} ${styles.badgeAmber}`}>分単位課金</span>
                   </td>
-                  <td className={styles.td}>大規模リポジトリ、高速なコンテキスト収集が必要な場合</td>
+                  <td className={styles.td}>
+                    大規模リポジトリ、高速なコンテキスト収集が必要な場合
+                  </td>
                 </tr>
                 <tr>
                   <td className={styles.td}>Self-hosted runners</td>
@@ -1079,9 +1105,9 @@ export default function Page() {
           </div>
 
           <div className={`${styles.alert} ${styles.alertAmber}`}>
-            組織で GitHub-hosted runners が <strong>無効化</strong>{" "}
-            されている場合、Agentic 機能（Full Project Context Gathering 含む）は利用できません。Self-hosted
-            runners を設定することで回避可能です。
+            組織で GitHub-hosted runners が <strong>無効化</strong> されている場合、Agentic
+            機能（Full Project Context Gathering 含む）は利用できません。Self-hosted runners
+            を設定することで回避可能です。
           </div>
         </section>
 
@@ -1096,10 +1122,16 @@ export default function Page() {
 
           <h3 className={styles.sectionTitle}>7.1 自動レビューの階層構造</h3>
           <div className={styles.pyramid}>
-            <div className={`${styles.pyrTier} ${styles.pyrT4}`}>Enterprise Org: 全リポジトリ適用</div>
+            <div className={`${styles.pyrTier} ${styles.pyrT4}`}>
+              Enterprise Org: 全リポジトリ適用
+            </div>
             <div className={`${styles.pyrTier} ${styles.pyrT3}`}>Org Owner: 指定リポジトリ適用</div>
-            <div className={`${styles.pyrTier} ${styles.pyrT2}`}>Repository Owner: リポジトリ内 PR に適用</div>
-            <div className={`${styles.pyrTier} ${styles.pyrT1}`}>個人 (Pro/Pro+): 自分の PR に適用</div>
+            <div className={`${styles.pyrTier} ${styles.pyrT2}`}>
+              Repository Owner: リポジトリ内 PR に適用
+            </div>
+            <div className={`${styles.pyrTier} ${styles.pyrT1}`}>
+              個人 (Pro/Pro+): 自分の PR に適用
+            </div>
           </div>
 
           <h3 className={styles.sectionTitle}>7.2 トリガー設定と挙動</h3>
@@ -1116,7 +1148,9 @@ export default function Page() {
               <tbody>
                 <tr>
                   <td className={styles.td}>Basic（デフォルト）</td>
-                  <td className={styles.td}>PR を "Open" で作成時 / Draft → Open 切替時（初回のみ）</td>
+                  <td className={styles.td}>
+                    PR を "Open" で作成時 / Draft → Open 切替時（初回のみ）
+                  </td>
                   <td className={styles.td}>標準的な開発フロー</td>
                 </tr>
                 <tr>
@@ -1140,7 +1174,9 @@ export default function Page() {
             </div>
           </div>
 
-          <h3 className={styles.sectionTitle}>7.4 Bot・GitHub Actions が PR を作成する場合の課金帰属</h3>
+          <h3 className={styles.sectionTitle}>
+            7.4 Bot・GitHub Actions が PR を作成する場合の課金帰属
+          </h3>
 
           <div className={styles.archLayers}>
             <div className={styles.archLayer}>
@@ -1149,7 +1185,9 @@ export default function Page() {
             </div>
             <div className={`${styles.archLayer} ${styles.amber}`}>
               <span className={styles.archLabel}>特定不可能</span>
-              <span className={styles.archDesc}>指定された Billing Owner のクォータに加算される</span>
+              <span className={styles.archDesc}>
+                指定された Billing Owner のクォータに加算される
+              </span>
             </div>
           </div>
 
@@ -1160,7 +1198,8 @@ export default function Page() {
                 className={styles.paragraph}
                 style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}
               >
-                大きい PR には必ず Human Review も必須にする（Org の branch protection rules で設定）。Copilot
+                大きい PR には必ず Human Review も必須にする（Org の branch protection rules
+                で設定）。Copilot
                 のコメントは参考として扱い、最終判断は人間が行う運用フローを確立する。
               </p>
             </div>
@@ -1170,8 +1209,9 @@ export default function Page() {
                 className={styles.paragraph}
                 style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}
               >
-                Copilot の「Comment」レビューは Required Reviewers に含まれないが、レビュープロセス全体を
-                Copilot に委任するのは危険。Copilot は全問題を検出できる保証なし。
+                Copilot の「Comment」レビューは Required Reviewers
+                に含まれないが、レビュープロセス全体を Copilot に委任するのは危険。Copilot
+                は全問題を検出できる保証なし。
               </p>
             </div>
           </div>
@@ -1319,7 +1359,9 @@ export default function Page() {
                   <td className={styles.td}>
                     <span className={`${styles.badge} ${styles.badgeRed}`}>無効</span>
                   </td>
-                  <td className={styles.td}>ライセンスなしユーザーへの提供。Ent 設定後は Org で変更不可</td>
+                  <td className={styles.td}>
+                    ライセンスなしユーザーへの提供。Ent 設定後は Org で変更不可
+                  </td>
                 </tr>
                 <tr>
                   <td className={styles.td}>Automatic code review</td>
@@ -1353,19 +1395,27 @@ export default function Page() {
           <ul className={styles.stepList}>
             <li>
               <span className={styles.stepNum}>1</span>
-              <div className={styles.stepContent}>Enterprise Settings → Audit Log で Copilot Code Review 関連イベントを確認</div>
+              <div className={styles.stepContent}>
+                Enterprise Settings → Audit Log で Copilot Code Review 関連イベントを確認
+              </div>
             </li>
             <li>
               <span className={`${styles.stepNum} ${styles.cyan}`}>2</span>
-              <div className={styles.stepContent}>Premium Request の使用状況は Settings → Billing → Copilot usage で確認</div>
+              <div className={styles.stepContent}>
+                Premium Request の使用状況は Settings → Billing → Copilot usage で確認
+              </div>
             </li>
             <li>
               <span className={`${styles.stepNum} ${styles.cyan}`}>3</span>
-              <div className={styles.stepContent}>Agentic 機能の使用状況は Agentic Audit Log Events を参照</div>
+              <div className={styles.stepContent}>
+                Agentic 機能の使用状況は Agentic Audit Log Events を参照
+              </div>
             </li>
             <li>
               <span className={`${styles.stepNum} ${styles.purple}`}>4</span>
-              <div className={styles.stepContent}>Org レベルの Activity Report をダウンロードして定期的に分析</div>
+              <div className={styles.stepContent}>
+                Org レベルの Activity Report をダウンロードして定期的に分析
+              </div>
             </li>
           </ul>
 
@@ -1406,7 +1456,8 @@ export default function Page() {
 
           <h3 className={styles.sectionTitle}>10.2 PR サイズとレビュー品質</h3>
           <p className={styles.paragraph}>
-            Copilot のコンテキストウィンドウには制限があります。PR が大きすぎると指摘が表面的になります。
+            Copilot のコンテキストウィンドウには制限があります。PR
+            が大きすぎると指摘が表面的になります。
           </p>
 
           <div className={styles.tableWrap}>
@@ -1472,7 +1523,9 @@ export default function Page() {
                 「可読性を高めて」ではなく「ネストが 3 層以上は関数分割を提案」。
                 <br />
                 <br />
-                <strong style={{ color: "var(--neon-green)" }}>3. パス別 Instructions で責務を分離</strong>
+                <strong style={{ color: "var(--neon-green)" }}>
+                  3. パス別 Instructions で責務を分離
+                </strong>
                 <br />
                 API / DB / Frontend ごとに異なる観点を設定。
               </p>
@@ -1483,12 +1536,16 @@ export default function Page() {
                 className={styles.paragraph}
                 style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginTop: "0.4rem" }}
               >
-                <strong style={{ color: "var(--neon-red)" }}>×「全てのベストプラクティスを適用して」</strong>
+                <strong style={{ color: "var(--neon-red)" }}>
+                  ×「全てのベストプラクティスを適用して」
+                </strong>
                 <br />
                 包括的すぎる指示は Copilot の焦点が分散する。
                 <br />
                 <br />
-                <strong style={{ color: "var(--neon-red)" }}>× 4000 文字を超える設定ファイル</strong>
+                <strong style={{ color: "var(--neon-red)" }}>
+                  × 4000 文字を超える設定ファイル
+                </strong>
                 <br />
                 後半の指示は完全に無視される。
                 <br />
@@ -1527,14 +1584,13 @@ export default function Page() {
               </div>
               <div className={styles.codeLine}>
                 {"    "}
-                <span className={styles.ck}>types</span>: [
-                <span className={styles.cs}>opened</span>,{" "}
-                <span className={styles.cs}>ready_for_review</span>]
+                <span className={styles.ck}>types</span>: [<span className={styles.cs}>opened</span>
+                , <span className={styles.cs}>ready_for_review</span>]
               </div>
               <div className={styles.codeLine}>
                 {"    "}
-                <span className={styles.ck}>branches</span>: [<span className={styles.cs}>main</span>,{" "}
-                <span className={styles.cs}>develop</span>]
+                <span className={styles.ck}>branches</span>: [
+                <span className={styles.cs}>main</span>, <span className={styles.cs}>develop</span>]
               </div>
               <div className={styles.codeLine} />
               <div className={styles.codeLine}>
@@ -1568,7 +1624,8 @@ export default function Page() {
               </div>
               <div className={styles.codeLine}>
                 {"    "}
-                <span className={styles.ck}>needs</span>: <span className={styles.cs}>pre-checks</span>
+                <span className={styles.ck}>needs</span>:{" "}
+                <span className={styles.cs}>pre-checks</span>
               </div>
               <div className={styles.codeLine}>
                 {"    "}
@@ -1589,7 +1646,8 @@ export default function Page() {
                 <span className={styles.cs}>|</span>
               </div>
               <div className={styles.codeLine}>
-                {"          gh pr edit \${{ github.event.pull_request.number }} \\"}
+                {/* biome-ignore lint/suspicious/noTemplateCurlyInString: GH expression */}
+                {"          gh pr edit ${{ github.event.pull_request.number }} \\"}
               </div>
               <div className={styles.codeLine}>{"            --add-reviewer @copilot"}</div>
               <div className={styles.codeLine}>
@@ -1597,6 +1655,7 @@ export default function Page() {
               </div>
               <div className={styles.codeLine}>
                 {"          "}(<span className={styles.ck}>GH_TOKEN</span>):{" "}
+                {/* biome-ignore lint/suspicious/noTemplateCurlyInString: GH token */}
                 <span className={styles.cs}>{"${{ secrets.GITHUB_TOKEN }}"}</span>
               </div>
             </div>
@@ -1606,7 +1665,8 @@ export default function Page() {
           <div className={`${styles.alert} ${styles.alertGreen}`}>
             <strong>👍 有効なフィードバック活用法</strong>
             Copilot のコメントに👍/👎を積極的に付けることで、チームの Copilot
-            レビュー品質が向上します。特に👎の場合は理由を選択することで、GitHub のモデル改善に貢献できます。
+            レビュー品質が向上します。特に👎の場合は理由を選択することで、GitHub
+            のモデル改善に貢献できます。
           </div>
           <div className={`${styles.alert} ${styles.alertRed}`}>
             <strong>⚠️ Copilot レビューの限界を理解する</strong>
@@ -1623,7 +1683,8 @@ export default function Page() {
               <div className={styles.stepContent}>
                 <strong>Phase 1: パイロット（Week 1-2）</strong>
                 <br />
-                少数チームで手動レビュー依頼から開始。Custom Instructions を最小限で作成。フィードバックを収集。
+                少数チームで手動レビュー依頼から開始。Custom Instructions
+                を最小限で作成。フィードバックを収集。
               </div>
             </li>
             <li>
@@ -1631,7 +1692,8 @@ export default function Page() {
               <div className={styles.stepContent}>
                 <strong>Phase 2: カスタマイズ（Week 3-4）</strong>
                 <br />
-                チームの技術スタック・コーディング規約を反映した Custom Instructions を整備。パス別設定を追加。
+                チームの技術スタック・コーディング規約を反映した Custom Instructions
+                を整備。パス別設定を追加。
               </div>
             </li>
             <li>
@@ -1647,7 +1709,8 @@ export default function Page() {
               <div className={styles.stepContent}>
                 <strong>Phase 4: 全社展開（Month 3+）</strong>
                 <br />
-                Enterprise レベルでのポリシー管理。Audit Log によるコスト分析。Cloud Agent 連携（Preview）の評価。
+                Enterprise レベルでのポリシー管理。Audit Log によるコスト分析。Cloud Agent
+                連携（Preview）の評価。
               </div>
             </li>
           </ul>
@@ -1774,7 +1837,9 @@ export default function Page() {
               <span className={styles.refCard}>
                 <span className={styles.refCat}>Billing / クォータ管理</span>
                 <span className={styles.refTitle}>Premium request management</span>
-                <span className={styles.refUrl}>docs.github.com/.../premium-request-management</span>
+                <span className={styles.refUrl}>
+                  docs.github.com/.../premium-request-management
+                </span>
               </span>
             </Ext>
             <Ext href="https://docs.github.com/en/code-security/code-quality/concepts/about-code-quality">
@@ -1811,8 +1876,8 @@ export default function Page() {
               color: "var(--text-muted)",
             }}
           >
-            最終更新: June 2026 &nbsp;|&nbsp; 一次情報源: GitHub Docs (docs.github.com) &nbsp;|&nbsp;
-            本ガイドは公式ドキュメントに基づいて作成
+            最終更新: June 2026 &nbsp;|&nbsp; 一次情報源: GitHub Docs (docs.github.com)
+            &nbsp;|&nbsp; 本ガイドは公式ドキュメントに基づいて作成
           </div>
         </section>
       </div>
