@@ -45,7 +45,7 @@ services:
   # 前提: 事前に make sonar がカバレッジを生成しレポートパスを補正済みであること
   sonar-scanner:
     profiles: ["tools"]
-    image: sonarsource/sonar-scanner-cli:latest
+    image: sonarsource/sonar-scanner-cli:11
     volumes:
       # リポジトリルートをマウント（sonar-project.properties を読み込む）
       - .:/usr/src

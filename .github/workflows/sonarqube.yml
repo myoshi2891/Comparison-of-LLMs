@@ -9,6 +9,11 @@ on:
     branches: [main, dev]
   pull_request:
 
+# 同一 ref への新しい push/PR が古い実行をキャンセル（重複実行・クレジット消費を防止）
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   analyze:
     name: SonarQube Cloud Analysis
@@ -21,6 +26,8 @@ jobs:
         with:
           # 新コード判定・blame 精度のため全履歴を取得（Sonar 推奨）
           fetch-depth: 0
+          # 認証トークンをワークツリー（.git/config）に残さない（後続ステップへの漏洩防止）
+          persist-credentials: false
 
       # ── フロントエンド カバレッジ（web-next）──────────────────────────────
       - uses: actions/setup-node@v4
@@ -61,6 +68,9 @@ jobs:
 
       # ── SonarQube Cloud 解析 + Quality Gate ───────────────────────────────
       - name: SonarQube Scan
+        # フォーク PR は SONAR_TOKEN シークレットを受け取れず失敗するためスキップ
+        # （同一リポジトリ PR か、非 PR イベント時のみ実行）
+        if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
         uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
