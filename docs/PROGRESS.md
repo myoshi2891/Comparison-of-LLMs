@@ -1,7 +1,7 @@
 # プロジェクト進捗・ステータス (PROGRESS.md)
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
-> - 最終更新日: **Updated 2026-05-31**
+> - 最終更新日: **Updated 2026-06-01**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -14,10 +14,11 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（既知の違反なし、0 件維持）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **650 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **655 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **5 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **CodeRabbit 完全活用ガイド**: Next.js App Router への移行完了 🚀（5件の契約テストを追加し、合計655テスト合格）。
 - **Claude Code スラッシュコマンド完全ガイド**: Next.js App Router への移行完了 🚀（5件の契約テストを追加し、合計650テスト合格）。
 - **CodeCopyButton コンポーネント**: `web-next/components/docs/` に追加。`managed-agents` ページ等で利用開始。
 
@@ -25,9 +26,9 @@
 
 総合的なテストカバレッジの詳細は [`docs/TEST_COVERAGE_PROGRESS.md`](TEST_COVERAGE_PROGRESS.md) および [`docs/coverage-dashboard.html`](coverage-dashboard.html) を参照のこと。
 
-### テスト分野別のカバレッジ概要 (2026-05-30 時点)
+### テスト分野別のカバレッジ概要 (2026-06-01 時点)
 - **Unit**:
-  - `app/` (全 20 ガイドページルート): ✅ 100% 契約テスト（タイトル、セクション数、rel、metadata）
+  - `app/` (全 21 ガイドページルート): ✅ 100% 契約テスト（タイトル、セクション数、rel、metadata）
   - `components/` (電卓 UI 9/9 コンポーネント): ✅ 100%
   - `site/` (共通ヘッダー/バナー): ✅ 100%
   - `lib/` (ユーティリティ): ほぼ網羅 (metadata, fonts を除く)
