@@ -12,9 +12,9 @@
   --text-dim: #9bb8e6;
   --border: #1e293b;
   --border-bright: #2d3748;
-  --font-mono: var(--font-mono), "Space Mono", monospace;
-  --font-sans: var(--font-sans), "IBM Plex Sans JP", sans-serif;
-  --font-head: "Syne", var(--font-mono), sans-serif;
+  --font-mono: "JetBrains Mono", "Space Mono", monospace;
+  --font-sans: "Noto Sans JP", "IBM Plex Sans JP", sans-serif;
+  --font-head: var(--font-display), var(--font-mono), sans-serif;
   --radius: 8px;
   --radius-lg: 14px;
   --glow-green: 0 0 20px rgba(57, 255, 20, 0.35);

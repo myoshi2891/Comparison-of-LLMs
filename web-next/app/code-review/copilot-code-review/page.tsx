@@ -127,7 +127,7 @@ export default function Page() {
         </p>
         <div className={styles.heroMeta}>
           <span className={styles.metaChip}>
-            更新: <span>2025年6月</span>
+            更新: <span>2026年6月</span>
           </span>
           <span className={styles.metaChip}>
             一次情報源: <span>docs.github.com</span>
@@ -992,7 +992,7 @@ export default function Page() {
               <div className={styles.trendLabel}>Availability</div>
               <div className={styles.trendTitle}>Pro / Pro+ 限定</div>
               <div className={styles.trendDesc}>
-                2025年6月時点で Public Preview。Business / Enterprise プランでは提供されていない
+                2026年6月時点で Public Preview。Business / Enterprise プランでは提供されていない
               </div>
             </div>
           </div>
