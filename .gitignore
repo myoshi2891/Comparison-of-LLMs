@@ -39,6 +39,12 @@ dist-ssr/
 .eslintcache
 .stylelintcache
 
+# Coverage / SonarQube（CI・make sonar が再生成する成果物）
+web-next/coverage/
+scraper/coverage.xml
+.coverage
+.scannerwork/
+
 # Security / Environment
 .env
 .env.local

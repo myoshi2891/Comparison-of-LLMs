@@ -4,6 +4,7 @@
         scrape scrape-no-scrape \
         build \
         test test-web test-scraper \
+        coverage sonar \
         typecheck lint lint-fix format \
         down logs logs-web \
         shell-web shell-scraper \
@@ -68,6 +69,23 @@ test-scraper: ## バックエンドテストのみ（pytest）
 
 audit: ## 依存関係の脆弱性監査 (bun audit)
 	$(COMPOSE) run --rm --no-deps web bun audit
+
+# ── SonarQube ──────────────────────────────────────────────────────────────────
+coverage: ## 両言語のカバレッジを生成（web-next/coverage/lcov.info + scraper/coverage.xml）
+	@# 注: devDependencies 追加直後は named volume が古い可能性あり → make build-web で更新
+	$(COMPOSE) run --rm --no-deps web bun run test:coverage
+	$(COMPOSE) run --rm scraper bash -c "cd scraper && uv run pytest --cov --cov-report=xml"
+
+sonar: ## SonarQube Cloud 解析を実行（要: export SONAR_TOKEN=xxxx）
+	@if [ -z "$$SONAR_TOKEN" ]; then \
+	    echo "ERROR: 環境変数 SONAR_TOKEN が未設定です（export SONAR_TOKEN=xxxx）"; \
+	    exit 1; \
+	fi
+	$(MAKE) coverage
+	@# レポート内パスをリポジトリルート相対へ補正（モノレポのパス解決ズレ→カバレッジ0%を防止）
+	perl -i -pe 's{^SF:}{SF:web-next/}' web-next/coverage/lcov.info
+	perl -i -pe 's{<source>src/scraper</source>}{<source>scraper/src/scraper</source>}' scraper/coverage.xml
+	$(COMPOSE) --profile tools run --rm sonar-scanner
 
 typecheck: ## TypeScript 型チェック（tsc --noEmit）
 	$(COMPOSE) run --rm --no-deps web bun run typecheck
