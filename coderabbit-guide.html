@@ -21,8 +21,8 @@
         --neon-amber: #ffb800;
         --neon-purple: #b347ea;
         --text-primary: #e2e8f0;
-        --text-muted: #64748b;
-        --text-dim: #374151;
+        --text-muted: #aac2e5;
+        --text-dim: #9bb8e6;
         --border: #1e293b;
         --border-bright: #2d3748;
         --font-mono: 'Space Mono', monospace;
@@ -749,6 +749,11 @@
         overflow-x: auto;
         text-align: center;
       }
+      #mermaid-pr-flow,
+      #mermaid-learnings {
+        max-width: 650px;
+        margin: 0 auto;
+      }
       /* ───── KLEVEL ───── */
       .klevel {
         display: inline-block;
@@ -996,33 +1001,7 @@
           <h3 class="section-title">1.2 PR レビューの処理フロー</h3>
 
           <div class="mermaid-wrap">
-            <div class="mermaid">
-flowchart TD
-A([PR Open / Push]) --> B[Webhook 受信]
-B --> C{自動レビュー設定?}
-C -- No --> D([待機: 手動コマンド待ち])
-C -- Yes --> E["Cloud Sandbox 起動\nリポジトリフルクローン"]
-E --> F[Knowledge Base 読込]
-F --> G[Learnings DB 照合]
-G --> H{並列解析}
-H --> I[40+ 静的解析ツール]
-H --> J[LLM コード理解エージェント]
-H --> K[イシュートラッカー連携]
-I --> L[結果集約]
-J --> L
-K --> L
-L --> M["Verification エージェント\n誤検知フィルタリング"]
-M --> N[Walkthrough コメント生成]
-N --> O[インライン Review コメント]
-O --> P([PR コメント投稿])
-P --> Q{Finishing Touches}
-Q --> R[Autofix / Unit Test / Docstring 等]
-
-style A fill:#0d1117,stroke:#00f5ff,color:#e2e8f0
-style P fill:#0d1117,stroke:#39ff14,color:#e2e8f0
-style H fill:#111827,stroke:#b347ea,color:#e2e8f0
-style M fill:#111827,stroke:#ffb800,color:#e2e8f0
-            </div>
+            <div id="mermaid-pr-flow"></div>
           </div>
 
           <div class="callout info">
@@ -1230,7 +1209,9 @@ style M fill:#111827,stroke:#ffb800,color:#e2e8f0
           <div class="compare-grid">
             <div class="compare-card good">
               <div class="compare-head">✅ 本番推奨構成（上級）</div>
-              <pre class="compare-body"><span class="code-comment"># yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json</span>
+              <pre
+                class="compare-body"
+              ><span class="code-comment"># yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json</span>
 <span class="code-keyword">language</span>: <span class="code-string">"ja-JP"</span>
 
 <span class="code-keyword">reviews</span>:
@@ -1485,7 +1466,10 @@ style M fill:#111827,stroke:#ffb800,color:#e2e8f0
               <div class="step-content">
                 <strong>コメント返信で追加（最も推奨）</strong><br />
                 CodeRabbit のインラインコメントに直接返信する。文脈が最も豊富に保存される。
-                <pre class="code-block" style="margin-top: 0.5rem"><span class="code-green">@coderabbitai</span> <span class="code-string">認証ミドルウェアではネストした try-catch より アーリーリターン + 固有エラーコードを使います。モニタリングツールがエラーコードで追跡できるため。</span></pre>
+                <pre
+                  class="code-block"
+                  style="margin-top: 0.5rem"
+                ><span class="code-green">@coderabbitai</span> <span class="code-string">認証ミドルウェアではネストした try-catch より アーリーリターン + 固有エラーコードを使います。モニタリングツールがエラーコードで追跡できるため。</span></pre>
               </div>
             </li>
             <li>
@@ -1493,7 +1477,10 @@ style M fill:#111827,stroke:#ffb800,color:#e2e8f0
               <div class="step-content">
                 <strong>ファイルインポートで一括追加</strong><br />
                 既存ドキュメント（コーディング規約等）を一気にインポート。
-                <pre class="code-block" style="margin-top: 0.5rem"><span class="code-green">@coderabbitai</span> <span class="code-string">add a learning using docs/coding-standards.md</span></pre>
+                <pre
+                  class="code-block"
+                  style="margin-top: 0.5rem"
+                ><span class="code-green">@coderabbitai</span> <span class="code-string">add a learning using docs/coding-standards.md</span></pre>
               </div>
             </li>
             <li>
@@ -1501,7 +1488,10 @@ style M fill:#111827,stroke:#ffb800,color:#e2e8f0
               <div class="step-content">
                 <strong>CSV インポートで組織移行時に転送</strong><br />
                 旧アカウントからエクスポートした CSV を新 PR にアップして移行。
-                <pre class="code-block" style="margin-top: 0.5rem"><span class="code-green">@coderabbitai</span> <span class="code-string">import file my_learnings.csv as Learnings data for future use</span></pre>
+                <pre
+                  class="code-block"
+                  style="margin-top: 0.5rem"
+                ><span class="code-green">@coderabbitai</span> <span class="code-string">import file my_learnings.csv as Learnings data for future use</span></pre>
               </div>
             </li>
           </ul>
@@ -1510,12 +1500,16 @@ style M fill:#111827,stroke:#ffb800,color:#e2e8f0
           <div class="compare-grid">
             <div class="compare-card good">
               <div class="compare-head">✅ 効果的（理由を含む）</div>
-              <pre class="compare-body"><span class="code-green">@coderabbitai</span> ユーザー ID をエラーメッセージに含めないでください。
+              <pre
+                class="compare-body"
+              ><span class="code-green">@coderabbitai</span> ユーザー ID をエラーメッセージに含めないでください。
 <span class="code-cyan">理由:</span> エラーログは外部モニタリングサービスに送信されるため。ユーザーコンテキストは トレーシングシステムで別途追跡しています。</pre>
             </div>
             <div class="compare-card bad">
               <div class="compare-head">❌ 非効果的（理由なし）</div>
-              <pre class="compare-body"><span class="code-green">@coderabbitai</span> エラーメッセージにユーザー IDを入れるな。
+              <pre
+                class="compare-body"
+              ><span class="code-green">@coderabbitai</span> エラーメッセージにユーザー IDを入れるな。
 
 <span class="code-comment">// 理由がないと類似状況で正しく適用されない</span></pre>
             </div>
@@ -2048,7 +2042,9 @@ style M fill:#111827,stroke:#ffb800,color:#e2e8f0
           <div class="compare-grid">
             <div class="compare-card good">
               <div class="compare-head">✅ Notion MCP 向け優れた User Guidance</div>
-              <pre class="compare-body"><span class="code-cyan">このNotionワークスペースはエンジニアリング文書を含みます。</span>
+              <pre
+                class="compare-body"
+              ><span class="code-cyan">このNotionワークスペースはエンジニアリング文書を含みます。</span>
 コードレビューでは "Engineering" スペースを参照してください:
 - "Architecture Decisions": 設計の根拠
 - "API Contracts": インターフェース仕様
@@ -2057,7 +2053,9 @@ HR / Finance スペースの内容は取得しないでください。</pre>
             </div>
             <div class="compare-card bad">
               <div class="compare-head">❌ 不十分な User Guidance</div>
-              <pre class="compare-body"><span class="code-pink">Notion のドキュメントを使ってください。</span>
+              <pre
+                class="compare-body"
+              ><span class="code-pink">Notion のドキュメントを使ってください。</span>
 
 <span class="code-comment">// 問題:
 // - どのスペースを見るか不明
@@ -2069,7 +2067,9 @@ HR / Finance スペースの内容は取得しないでください。</pre>
           <h4 class="subsection-title">URL テンプレートプレースホルダー</h4>
           <p>MCP の User Guidance 内で PR 固有の値を動的に展開できます。</p>
 
-          <pre class="code-block"><span class="code-comment"># Jenkins Organization Folder の例</span>
+          <pre
+            class="code-block"
+          ><span class="code-comment"># Jenkins Organization Folder の例</span>
 <span class="code-green">Jenkins ビルド URL パターン:</span> <span class="code-string">https://jenkins.company.com/job/{workspace}/job/{repo}/job/PR-{pr}/</span>
 
 <span class="code-comment"># SonarQube プロジェクトキー規約</span>
@@ -2346,7 +2346,9 @@ HR / Finance スペースの内容は取得しないでください。</pre>
             </div>
           </div>
 
-          <pre class="code-block"><span class="code-comment"># Claude Code での CodeRabbit CLI スキル追加</span>
+          <pre
+            class="code-block"
+          ><span class="code-comment"># Claude Code での CodeRabbit CLI スキル追加</span>
 <span class="code-green">claude</span> <span class="code-string">install coderabbit-skill</span>
 
 <span class="code-comment"># 手動 CLI レビュー実行</span>
@@ -2478,7 +2480,9 @@ HR / Finance スペースの内容は取得しないでください。</pre>
             </div>
           </div>
 
-          <pre class="code-block"><span class="file-tag">Organization Settings → Global Overrides</span>
+          <pre
+            class="code-block"
+          ><span class="file-tag">Organization Settings → Global Overrides</span>
 <span class="code-comment"># yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json</span>
 <span class="code-keyword">reviews</span>:
   <span class="code-keyword">profile</span>: <span class="code-string">"assertive"</span>
@@ -2924,7 +2928,7 @@ N --> A
 
 style A fill:#0d1117,stroke:#00f5ff,color:#e2e8f0
 style N fill:#0d1117,stroke:#39ff14,color:#e2e8f0
-style H fill:#111827,stroke:#ffb800,color:#e2e8f0`
+style H fill:#111827,stroke:#ffb800,color:#e2e8f0`,
       };
 
       (async () => {
