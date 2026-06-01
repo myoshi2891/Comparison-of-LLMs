@@ -1065,7 +1065,7 @@ export default function Page() {
                   <div className={styles.codeLine} />
                   <div className={styles.codeLine}>
                     <span className={styles.codeComment}>
-                      // 理由がないと類似状況で正しく適用されない
+                      {"// 理由がないと類似状況で正しく適用されない"}
                     </span>
                   </div>
                 </div>
@@ -1784,16 +1784,16 @@ export default function Page() {
                   </div>
                   <div className={styles.codeLine} />
                   <div className={styles.codeLine}>
-                    <span className={styles.codeComment}>// 問題:</span>
+                    <span className={styles.codeComment}>{"// 問題:"}</span>
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.codeComment}>// - どのスペースを見るか不明</span>
+                    <span className={styles.codeComment}>{"// - どのスペースを見るか不明"}</span>
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.codeComment}>// - レビューとの関連性不明</span>
+                    <span className={styles.codeComment}>{"// - レビューとの関連性不明"}</span>
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.codeComment}>// - 不要なページも取得される</span>
+                    <span className={styles.codeComment}>{"// - 不要なページも取得される"}</span>
                   </div>
                 </div>
               </div>
@@ -2270,7 +2270,7 @@ export default function Page() {
                 </div>
                 <div className={styles.codeLine}>
                   {"    "}- <span className={styles.codeKeyword}>path</span>:{" "}
-                  <span className={styles.codeString}>&quot;src/**/*.ts&quot;</span>
+                  <span className={styles.codeString}>&quot;src{`/**/`}*.ts&quot;</span>
                 </div>
                 <div className={styles.codeLine}>
                   {"      "}

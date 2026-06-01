@@ -100,10 +100,10 @@
   font-family: var(--font-head);
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--neon-green) !important;
+  color: var(--neon-green);
   margin-right: 0.75rem;
-  border: none !important;
-  background: transparent !important;
+  border: none;
+  background: transparent;
 }
 
 /* ─── LAYOUT ─── */

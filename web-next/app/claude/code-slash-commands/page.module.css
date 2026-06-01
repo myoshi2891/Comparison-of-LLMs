@@ -677,7 +677,7 @@
 }
 
 .hidden {
-  display: none !important;
+  display: none;
 }
 
 .pageHeader {
@@ -756,8 +756,8 @@
 .mermaidWrap :global(svg) {
   display: block;
   margin: 0 auto;
-  width: 100% !important;
-  height: auto !important;
+  width: 100%;
+  height: auto;
 }
 
 /* 各マーメイド図のサイズ微調整用クラス (個別調整が可能です) */
