@@ -1,0 +1,2412 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GitHub Copilot Code Review — 完全活用ガイド</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=IBM+Plex+Sans+JP:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.15.0/mermaid.min.js"></script>
+    <style>
+      :root {
+        --bg-deep: #030712;
+        --bg-surface: #0d1117;
+        --bg-card: #161b22;
+        --bg-hover: #1f2937;
+        --border: #21262d;
+        --border-glow: #30363d;
+        --neon-green: #39ff14;
+        --neon-cyan: #00e5ff;
+        --neon-purple: #bf5af2;
+        --neon-amber: #fbbf24;
+        --neon-red: #ff4136;
+        --neon-blue: #3b82f6;
+        --text-primary: #e6edf3;
+        --text-secondary: #8b949e;
+        --text-muted: #484f58;
+        --font-mono: 'Space Mono', monospace;
+        --font-head: 'Syne', sans-serif;
+        --font-body: 'IBM Plex Sans JP', sans-serif;
+        --radius: 8px;
+        --radius-lg: 14px;
+        --transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--bg-deep);
+        color: var(--text-primary);
+        font-family: var(--font-body);
+        font-size: 1rem;
+        line-height: 1.75;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* scanline + grid overlay */
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 229, 255, 0.018) 2px,
+          rgba(0, 229, 255, 0.018) 4px
+        );
+        pointer-events: none;
+        z-index: 1000;
+      }
+      body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(57, 255, 20, 0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(57, 255, 20, 0.04) 1px, transparent 1px);
+        background-size: 40px 40px;
+        pointer-events: none;
+        z-index: 999;
+      }
+
+      /* ─── NAVBAR ─── */
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 900;
+        background: rgba(3, 7, 18, 0.88);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--border);
+        padding: 0 1.5rem;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+      .nav-inner {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0.6rem 0;
+      }
+      nav a {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        padding: 0.35rem 0.75rem;
+        border-radius: var(--radius);
+        border: 1px solid transparent;
+        transition: var(--transition);
+        flex-shrink: 0;
+      }
+      nav a:hover {
+        color: var(--neon-cyan);
+        border-color: var(--neon-cyan);
+        background: rgba(0, 229, 255, 0.06);
+      }
+      .nav-brand {
+        font-family: var(--font-head);
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--neon-green) !important;
+        margin-right: 0.75rem;
+        border: none !important;
+        background: transparent !important;
+      }
+
+      /* ─── LAYOUT ─── */
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem 5rem;
+      }
+
+      /* ─── HERO ─── */
+      .hero {
+        text-align: center;
+        padding: 4rem 1rem 3rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .hero-glow {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse 70% 50% at 50% 40%,
+          rgba(57, 255, 20, 0.07) 0%,
+          transparent 70%
+        );
+        animation: pulse 4s ease-in-out infinite;
+        pointer-events: none;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.7;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.05);
+        }
+      }
+      .hero-badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--neon-green);
+        border: 1px solid var(--neon-green);
+        padding: 0.25rem 0.85rem;
+        border-radius: 99px;
+        margin-bottom: 1.2rem;
+        animation: fadeInDown 0.6s ease both;
+      }
+      .hero h1 {
+        font-family: var(--font-head);
+        font-size: clamp(1.9rem, 5vw, 3.2rem);
+        font-weight: 800;
+        line-height: 1.15;
+        background: linear-gradient(135deg, var(--neon-green) 0%, var(--neon-cyan) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: fadeInDown 0.7s 0.1s ease both;
+      }
+      .hero-sub {
+        font-size: 1.05rem;
+        color: var(--text-secondary);
+        max-width: 580px;
+        margin: 1rem auto 2rem;
+        animation: fadeInDown 0.7s 0.2s ease both;
+      }
+      .hero-meta {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        animation: fadeInUp 0.7s 0.3s ease both;
+      }
+      .meta-chip {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        padding: 0.3rem 0.9rem;
+        border-radius: 99px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-glow);
+        color: var(--text-secondary);
+      }
+      .meta-chip span {
+        color: var(--neon-cyan);
+      }
+
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-18px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(18px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ─── SECTION ─── */
+      section {
+        margin-bottom: 4rem;
+      }
+      .chapter-header {
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+        margin-bottom: 1.8rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .chapter-num {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 0.2rem 0.65rem;
+        border-radius: var(--radius);
+        background: var(--neon-green);
+        color: #000;
+        flex-shrink: 0;
+      }
+      .chapter-num.cyan {
+        background: var(--neon-cyan);
+      }
+      .chapter-num.purple {
+        background: var(--neon-purple);
+        color: #fff;
+      }
+      .chapter-num.amber {
+        background: var(--neon-amber);
+        color: #000;
+      }
+      .chapter-num.red {
+        background: var(--neon-red);
+        color: #fff;
+      }
+      .chapter-num.blue {
+        background: var(--neon-blue);
+        color: #fff;
+      }
+
+      h2 {
+        font-family: var(--font-head);
+        font-size: clamp(1.2rem, 3vw, 1.65rem);
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+      h3 {
+        font-family: var(--font-head);
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--neon-cyan);
+        margin: 1.8rem 0 0.8rem;
+      }
+      h4 {
+        font-family: var(--font-head);
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--neon-green);
+        margin: 1.2rem 0 0.5rem;
+      }
+      p {
+        margin-bottom: 0.9rem;
+        color: var(--text-primary);
+      }
+
+      /* ─── TOC GRID ─── */
+      .toc-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0.85rem;
+        margin: 1.5rem 0;
+      }
+      .toc-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 0.9rem 1rem;
+        text-decoration: none;
+        color: var(--text-secondary);
+        font-size: 0.88rem;
+        transition: var(--transition);
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+      .toc-card:hover {
+        border-color: var(--neon-cyan);
+        color: var(--neon-cyan);
+        background: rgba(0, 229, 255, 0.04);
+        transform: translateY(-2px);
+      }
+      .toc-icon {
+        font-size: 1rem;
+        flex-shrink: 0;
+      }
+
+      /* ─── ARCH LAYERS ─── */
+      .arch-layers {
+        display: flex;
+        flex-direction: column;
+        gap: 0.55rem;
+        margin: 1.5rem 0;
+      }
+      .arch-layer {
+        background: var(--bg-card);
+        border-left: 4px solid var(--neon-green);
+        border-radius: 0 var(--radius) var(--radius) 0;
+        padding: 0.75rem 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: var(--transition);
+      }
+      .arch-layer:hover {
+        background: var(--bg-hover);
+        transform: translateX(4px);
+      }
+      .arch-layer.cyan {
+        border-color: var(--neon-cyan);
+      }
+      .arch-layer.purple {
+        border-color: var(--neon-purple);
+      }
+      .arch-layer.amber {
+        border-color: var(--neon-amber);
+      }
+      .arch-layer.red {
+        border-color: var(--neon-red);
+      }
+      .arch-layer.blue {
+        border-color: var(--neon-blue);
+      }
+      .arch-label {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        min-width: 130px;
+        color: var(--text-secondary);
+      }
+      .arch-desc {
+        font-size: 0.9rem;
+      }
+
+      /* ─── CODE BLOCK ─── */
+      .code-block {
+        background: #0a0e16;
+        border: 1px solid var(--border-glow);
+        border-radius: var(--radius);
+        padding: 1.1rem 1.25rem;
+        overflow-x: auto;
+        margin: 1rem 0;
+        position: relative;
+      }
+      .code-block pre {
+        font-family: var(--font-mono);
+        font-size: 0.83rem;
+        line-height: 1.65;
+        color: var(--text-primary);
+        white-space: pre;
+      }
+      .code-lang {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.75rem;
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        color: var(--text-muted);
+      }
+      .code-green {
+        color: var(--neon-green);
+      }
+      .code-cyan {
+        color: var(--neon-cyan);
+      }
+      .code-purple {
+        color: var(--neon-purple);
+      }
+      .code-amber {
+        color: var(--neon-amber);
+      }
+      .code-comment {
+        color: #6e7681;
+      }
+      .code-keyword {
+        color: #ff79c6;
+      }
+      .code-str {
+        color: #f1fa8c;
+      }
+
+      /* ─── STEP LIST ─── */
+      .step-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+        margin: 1rem 0;
+      }
+      .step-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.9rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 0.9rem 1rem;
+        transition: var(--transition);
+      }
+      .step-list li:hover {
+        border-color: var(--border-glow);
+        background: var(--bg-hover);
+      }
+      .step-num {
+        width: 1.8rem;
+        height: 1.8rem;
+        flex-shrink: 0;
+        border-radius: 50%;
+        background: var(--neon-green);
+        color: #000;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .step-num.cyan {
+        background: var(--neon-cyan);
+      }
+      .step-num.purple {
+        background: var(--neon-purple);
+        color: #fff;
+      }
+
+      /* ─── CALLOUT ─── */
+      .callout {
+        border-radius: var(--radius);
+        padding: 1rem 1.2rem;
+        margin: 1rem 0;
+        border-left: 4px solid;
+        font-size: 0.93rem;
+      }
+      .callout.info {
+        background: rgba(0, 229, 255, 0.06);
+        border-color: var(--neon-cyan);
+        color: #a8d8ea;
+      }
+      .callout.warning {
+        background: rgba(251, 191, 36, 0.06);
+        border-color: var(--neon-amber);
+        color: #fde68a;
+      }
+      .callout.danger {
+        background: rgba(255, 65, 54, 0.06);
+        border-color: var(--neon-red);
+        color: #fca5a5;
+      }
+      .callout strong {
+        font-weight: 700;
+        display: block;
+        margin-bottom: 0.3rem;
+      }
+
+      /* ─── METRIC GRID ─── */
+      .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .metric-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 1.2rem 1rem;
+        text-align: center;
+        transition: var(--transition);
+        cursor: default;
+      }
+      .metric-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        border-color: var(--neon-green);
+      }
+      .metric-val {
+        font-family: var(--font-head);
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--neon-green);
+        display: block;
+      }
+      .metric-val.cyan {
+        color: var(--neon-cyan);
+      }
+      .metric-val.purple {
+        color: var(--neon-purple);
+      }
+      .metric-val.amber {
+        color: var(--neon-amber);
+      }
+      .metric-label {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin-top: 0.25rem;
+      }
+
+      /* ─── PROGRESS ─── */
+      .progress-item {
+        margin: 0.7rem 0;
+      }
+      .progress-header {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.82rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.3rem;
+      }
+      .progress-bar {
+        background: var(--border);
+        border-radius: 99px;
+        height: 7px;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        border-radius: 99px;
+        background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan));
+        width: 0;
+        animation: growBar 1.2s 0.3s ease forwards;
+      }
+      @keyframes growBar {
+        to {
+          width: var(--w);
+        }
+      }
+
+      /* ─── TABLE ─── */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 1.2rem 0;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+      }
+      th {
+        background: var(--bg-hover);
+        color: var(--neon-cyan);
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        padding: 0.7rem 1rem;
+        text-align: left;
+        white-space: nowrap;
+        border-bottom: 1px solid var(--border);
+      }
+      td {
+        padding: 0.7rem 1rem;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-primary);
+        vertical-align: top;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover td {
+        background: rgba(255, 255, 255, 0.025);
+      }
+      .badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        padding: 0.15rem 0.5rem;
+        border-radius: 4px;
+        margin: 0.1rem;
+      }
+      .badge-green {
+        background: rgba(57, 255, 20, 0.15);
+        color: var(--neon-green);
+        border: 1px solid rgba(57, 255, 20, 0.3);
+      }
+      .badge-cyan {
+        background: rgba(0, 229, 255, 0.12);
+        color: var(--neon-cyan);
+        border: 1px solid rgba(0, 229, 255, 0.25);
+      }
+      .badge-amber {
+        background: rgba(251, 191, 36, 0.12);
+        color: var(--neon-amber);
+        border: 1px solid rgba(251, 191, 36, 0.25);
+      }
+      .badge-red {
+        background: rgba(255, 65, 54, 0.12);
+        color: var(--neon-red);
+        border: 1px solid rgba(255, 65, 54, 0.25);
+      }
+      .badge-purple {
+        background: rgba(191, 90, 242, 0.12);
+        color: var(--neon-purple);
+        border: 1px solid rgba(191, 90, 242, 0.3);
+      }
+
+      /* ─── EXAM / COMPARE GRID ─── */
+      .compare-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1.2rem 0;
+      }
+      @media (max-width: 600px) {
+        .compare-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .compare-card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1rem 1.1rem;
+        background: var(--bg-card);
+      }
+      .compare-card.good {
+        border-color: rgba(57, 255, 20, 0.3);
+      }
+      .compare-card.bad {
+        border-color: rgba(255, 65, 54, 0.3);
+      }
+      .compare-title {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        margin-bottom: 0.5rem;
+      }
+      .good .compare-title {
+        color: var(--neon-green);
+      }
+      .bad .compare-title {
+        color: var(--neon-red);
+      }
+
+      /* ─── ALERT ─── */
+      .alert {
+        padding: 0.85rem 1.1rem;
+        border-radius: var(--radius);
+        border-left: 4px solid;
+        font-size: 0.9rem;
+        margin: 0.8rem 0;
+      }
+      .alert-green {
+        background: rgba(57, 255, 20, 0.05);
+        border-color: var(--neon-green);
+        color: #86efac;
+      }
+      .alert-amber {
+        background: rgba(251, 191, 36, 0.05);
+        border-color: var(--neon-amber);
+        color: #fde68a;
+      }
+      .alert-red {
+        background: rgba(255, 65, 54, 0.05);
+        border-color: var(--neon-red);
+        color: #fca5a5;
+      }
+      .alert-cyan {
+        background: rgba(0, 229, 255, 0.05);
+        border-color: var(--neon-cyan);
+        color: #a5f3fc;
+      }
+
+      /* ─── TREND CARD ─── */
+      .trend-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1rem;
+        margin: 1.2rem 0;
+      }
+      .trend-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 1.2rem;
+        position: relative;
+        overflow: hidden;
+        transition: var(--transition);
+      }
+      .trend-card::before {
+        content: '';
+        position: absolute;
+        top: -40px;
+        right: -40px;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(0, 229, 255, 0.12) 0%, transparent 70%);
+        pointer-events: none;
+        transition: var(--transition);
+      }
+      .trend-card:hover {
+        border-color: var(--neon-cyan);
+        transform: translateY(-3px);
+      }
+      .trend-card:hover::before {
+        opacity: 1.5;
+      }
+      .trend-label {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--neon-cyan);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 0.4rem;
+      }
+      .trend-title {
+        font-family: var(--font-head);
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 0.4rem;
+      }
+      .trend-desc {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+      }
+
+      /* ─── REF GRID ─── */
+      .ref-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 0.85rem;
+        margin: 1.2rem 0;
+      }
+      .ref-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 0.85rem 1rem;
+        text-decoration: none;
+        transition: var(--transition);
+        display: block;
+        overflow: hidden;
+        position: relative;
+      }
+      .ref-card::after {
+        content: '→';
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%) translateX(8px);
+        opacity: 0;
+        color: var(--neon-cyan);
+        transition: var(--transition);
+      }
+      .ref-card:hover {
+        border-color: var(--neon-cyan);
+        background: rgba(0, 229, 255, 0.04);
+      }
+      .ref-card:hover::after {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+      }
+      .ref-cat {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        color: var(--neon-amber);
+        margin-bottom: 0.2rem;
+        display: block;
+      }
+      .ref-title {
+        font-size: 0.85rem;
+        color: var(--text-primary);
+        display: block;
+      }
+      .ref-url {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        word-break: break-all;
+        display: block;
+        margin-top: 0.15rem;
+      }
+
+      /* ─── PYRAMID ─── */
+      .pyramid {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.35rem;
+        margin: 1.5rem auto;
+      }
+      .pyr-tier {
+        border-radius: var(--radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #000;
+        padding: 0.55rem 1rem;
+        transition: var(--transition);
+        cursor: default;
+        text-align: center;
+      }
+      .pyr-tier:hover {
+        transform: scaleX(1.03);
+      }
+      .pyr-t1 {
+        width: 75%;
+        background: var(--neon-green);
+      }
+      .pyr-t2 {
+        width: 58%;
+        background: var(--neon-cyan);
+      }
+      .pyr-t3 {
+        width: 42%;
+        background: var(--neon-purple);
+        color: #fff;
+      }
+      .pyr-t4 {
+        width: 28%;
+        background: var(--neon-amber);
+      }
+
+      /* ─── MERMAID ─── */
+      .mermaid-wrap {
+        background: #0a0e16;
+        border: 1px solid var(--border-glow);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        margin: 1.3rem 0;
+        overflow-x: auto;
+      }
+      .mermaid {
+        display: flex;
+        justify-content: center;
+      }
+      .mermaid svg {
+        display: block;
+        margin: 0 auto;
+        width: auto !important;
+        max-width: 100% !important;
+        height: auto !important;
+      }
+
+      /* ─── 各フロー図の最大横幅を手動で調整する設定 (max-width) ─── */
+      #mermaid-0 svg {
+        max-width: 800px !important;
+      } /* 1.3 アーキテクチャ概観 (flowchart LR) */
+      #mermaid-1 svg {
+        max-width: 450px !important;
+      } /* 3.1 Organization 有効化フロー (flowchart TD) */
+      #mermaid-2 svg {
+        max-width: 1250px !important;
+      } /* 6.1 Context Gathering (flowchart LR) */
+      #mermaid-3 svg {
+        max-width: 850px !important;
+      } /* 7.3 自動レビュー設定フロー (flowchart TD) */
+      #mermaid-4 svg {
+        max-width: 850px !important;
+      } /* 8.3 クォータ超過時の対応フロー (flowchart LR) */
+      #mermaid-5 svg {
+        max-width: 650px !important;
+      } /* 10.1 Human Review との役割分担 (flowchart TD) */
+
+      /* ─── SEPARATOR ─── */
+      hr.divider {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 2.5rem 0;
+      }
+
+      /* ─── RESPONSIVE ─── */
+      @media (max-width: 900px) {
+        .metric-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .trend-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 600px) {
+        .container {
+          padding: 1.5rem 1rem 4rem;
+        }
+        .metric-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        nav a {
+          font-size: 0.72rem;
+          padding: 0.3rem 0.55rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- NAVBAR -->
+    <nav>
+      <div class="nav-inner">
+        <a href="#" class="nav-brand">Copilot CR Guide</a>
+        <a href="#ch1">01 概要</a>
+        <a href="#ch2">02 可用性</a>
+        <a href="#ch3">03 セットアップ</a>
+        <a href="#ch4">04 基本操作</a>
+        <a href="#ch5">05 Custom Instructions</a>
+        <a href="#ch6">06 Agentic機能</a>
+        <a href="#ch7">07 自動レビュー</a>
+        <a href="#ch8">08 クォータ/課金</a>
+        <a href="#ch9">09 Enterprise</a>
+        <a href="#ch10">10 ベストプラクティス</a>
+        <a href="#refs">参考文献</a>
+      </div>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-glow"></div>
+      <div class="hero-badge">K-Level: Intermediate → Advanced</div>
+      <h1>GitHub Copilot<br />Code Review 完全活用ガイド</h1>
+      <p class="hero-sub">
+        AI駆動のコードレビューをチーム開発に深く組み込む——概念・設定・運用まで中〜上級者向けにステップバイステップで解説
+      </p>
+      <div class="hero-meta">
+        <span class="meta-chip">更新: <span>2026年6月</span></span>
+        <span class="meta-chip">一次情報源: <span>docs.github.com</span></span>
+        <span class="meta-chip">対象: <span>Pro / Business / Enterprise</span></span>
+        <span class="meta-chip">K-Level: <span>300–400</span></span>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- TOC -->
+      <section id="toc">
+        <h3
+          style="
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-family: var(--font-mono);
+            margin-bottom: 0.9rem;
+          "
+        >
+          — 目次 —
+        </h3>
+        <div class="toc-grid">
+          <a href="#ch1" class="toc-card"
+            ><span class="toc-icon">🔍</span>01 概要・アーキテクチャ</a
+          >
+          <a href="#ch2" class="toc-card"><span class="toc-icon">🗺</span>02 可用性・プラン比較</a>
+          <a href="#ch3" class="toc-card"><span class="toc-icon">⚙️</span>03 初期セットアップ</a>
+          <a href="#ch4" class="toc-card"><span class="toc-icon">▶️</span>04 基本操作（全環境）</a>
+          <a href="#ch5" class="toc-card"><span class="toc-icon">📝</span>05 Custom Instructions</a>
+          <a href="#ch6" class="toc-card"><span class="toc-icon">🤖</span>06 Agentic 機能</a>
+          <a href="#ch7" class="toc-card"><span class="toc-icon">⚡</span>07 自動レビュー設定</a>
+          <a href="#ch8" class="toc-card"><span class="toc-icon">💰</span>08 クォータ・課金管理</a>
+          <a href="#ch9" class="toc-card"><span class="toc-icon">🏢</span>09 Enterprise 管理</a>
+          <a href="#ch10" class="toc-card"><span class="toc-icon">🏆</span>10 ベストプラクティス</a>
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <!-- CH1 -->
+      <section id="ch1">
+        <div class="chapter-header">
+          <span class="chapter-num">CH-01</span>
+          <h2>概要・アーキテクチャ</h2>
+        </div>
+
+        <h3>1.1 定義</h3>
+        <p>
+          <strong>GitHub Copilot Code Review</strong> は、Pull
+          Request（PR）内のコード変更を自動的に解析し、マルチアングルで問題を検出して修正案を提示する
+          AI エージェントです。すべての主要プログラミング言語に対応し、「Comment」レビューとして PR
+          に投稿します。
+        </p>
+
+        <h3>1.2 なぜ重要か</h3>
+        <p>
+          コードレビューはソフトウェア品質の要ですが、人間のレビュアーはボトルネックになりがちです。Copilot
+          Code Review
+          は最初の品質フィルタとして機能し、レビュアーが本質的な設計判断に集中できる環境を作ります。
+        </p>
+
+        <div class="metric-grid">
+          <div class="metric-card">
+            <span class="metric-val">&lt;30s</span>
+            <div class="metric-label">標準レビュー完了時間</div>
+          </div>
+          <div class="metric-card">
+            <span class="metric-val cyan">All</span>
+            <div class="metric-label">対応言語（言語問わず）</div>
+          </div>
+          <div class="metric-card">
+            <span class="metric-val purple">7+</span>
+            <div class="metric-label">対応開発環境</div>
+          </div>
+          <div class="metric-card">
+            <span class="metric-val amber">4KB</span>
+            <div class="metric-label">Custom Instructions 最大読み取り</div>
+          </div>
+        </div>
+
+        <h3>1.3 アーキテクチャ概観</h3>
+
+        <div class="mermaid-wrap">
+          <div id="mermaid-0" class="mermaid"></div>
+        </div>
+
+        <div class="arch-layers">
+          <div class="arch-layer">
+            <span class="arch-label">Input Layer</span>
+            <span class="arch-desc"
+              >PR diff、ファイル差分、コメント、ベースブランチの Custom Instructions</span
+            >
+          </div>
+          <div class="arch-layer cyan">
+            <span class="arch-label">Context Layer</span>
+            <span class="arch-desc"
+              >Full Project Context Gathering — リポジトリ全体を解析してコード変更の意図を把握</span
+            >
+          </div>
+          <div class="arch-layer purple">
+            <span class="arch-label">Reasoning Layer</span>
+            <span class="arch-desc"
+              >専用チューニングされたモデル群 — モデル切替不可（品質・一貫性保証のため）</span
+            >
+          </div>
+          <div class="arch-layer amber">
+            <span class="arch-label">Output Layer</span>
+            <span class="arch-desc"
+              >「Comment」レビュー（Approve/Request Changes ではない）、Suggested Changes</span
+            >
+          </div>
+          <div class="arch-layer blue">
+            <span class="arch-label">Agentic Layer</span>
+            <span class="arch-desc"
+              >★ Preview: Cloud Agent 連携による Fix PR 自動生成、Actions runners 使用</span
+            >
+          </div>
+        </div>
+
+        <div class="callout info">
+          <strong>📌 重要な設計上の制約</strong>
+          Copilot Code Review は
+          <em>必ず</em>「Comment」レビューを投稿します。「Approve」や「Request
+          Changes」は行いません。そのため、必須承認者数のカウントには含まれず、マージをブロックしません。
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <!-- CH2 -->
+      <section id="ch2">
+        <div class="chapter-header">
+          <span class="chapter-num cyan">CH-02</span>
+          <h2>可用性・プラン比較</h2>
+        </div>
+
+        <h3>2.1 対応プラットフォーム</h3>
+
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>環境</th>
+              <th>対応状況</th>
+              <th>備考</th>
+            </tr>
+            <tr>
+              <td>GitHub.com (Web)</td>
+              <td><span class="badge badge-green">✓ GA</span></td>
+              <td>PR の Reviewers メニューから選択</td>
+            </tr>
+            <tr>
+              <td>GitHub Mobile</td>
+              <td><span class="badge badge-green">✓ GA</span></td>
+              <td>Reviews セクション → Request Reviews</td>
+            </tr>
+            <tr>
+              <td>VS Code</td>
+              <td><span class="badge badge-green">✓ GA</span></td>
+              <td>未コミット変更のローカルレビューも可能</td>
+            </tr>
+            <tr>
+              <td>Visual Studio</td>
+              <td><span class="badge badge-green">✓ GA</span></td>
+              <td>v17.14 以降必須。Git Changes ウィンドウから起動</td>
+            </tr>
+            <tr>
+              <td>JetBrains IDEs</td>
+              <td><span class="badge badge-green">✓ GA</span></td>
+              <td>Commit ウィンドウ上部の Copilot ボタン</td>
+            </tr>
+            <tr>
+              <td>Xcode</td>
+              <td><span class="badge badge-green">✓ GA</span></td>
+              <td>CopilotForXcode v0.41.0+、Staged/Unstaged 選択可</td>
+            </tr>
+            <tr>
+              <td>GitHub CLI</td>
+              <td><span class="badge badge-green">✓ GA</span></td>
+              <td><code>gh pr create --reviewer @copilot</code></td>
+            </tr>
+          </table>
+        </div>
+
+        <h3>2.2 プラン別機能比較</h3>
+
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>機能</th>
+              <th>Copilot Free</th>
+              <th>Copilot Pro</th>
+              <th>Copilot Pro+</th>
+              <th>Copilot Business</th>
+              <th>Copilot Enterprise</th>
+            </tr>
+            <tr>
+              <td>Code Review（基本）</td>
+              <td><span class="badge badge-red">✗</span></td>
+              <td><span class="badge badge-green">✓</span></td>
+              <td><span class="badge badge-green">✓</span></td>
+              <td><span class="badge badge-green">✓</span></td>
+              <td><span class="badge badge-green">✓</span></td>
+            </tr>
+            <tr>
+              <td>Full Project Context</td>
+              <td><span class="badge badge-red">✗</span></td>
+              <td><span class="badge badge-green">✓</span></td>
+              <td><span class="badge badge-green">✓</span></td>
+              <td><span class="badge badge-green">✓</span></td>
+              <td><span class="badge badge-green">✓</span></td>
+            </tr>
+            <tr>
+              <td>Cloud Agent 連携（Fix PR）</td>
+              <td><span class="badge badge-red">✗</span></td>
+              <td><span class="badge badge-amber">Preview</span></td>
+              <td><span class="badge badge-amber">Preview</span></td>
+              <td><span class="badge badge-amber">Preview</span></td>
+              <td><span class="badge badge-amber">Preview</span></td>
+            </tr>
+            <tr>
+              <td>自動レビュー（個人設定）</td>
+              <td><span class="badge badge-red">✗</span></td>
+              <td><span class="badge badge-green">✓</span></td>
+              <td><span class="badge badge-green">✓</span></td>
+              <td><span class="badge badge-red">✗</span></td>
+              <td><span class="badge badge-red">✗</span></td>
+            </tr>
+            <tr>
+              <td>Org/Repo 自動レビュー設定</td>
+              <td><span class="badge badge-red">✗</span></td>
+              <td><span class="badge badge-red">✗</span></td>
+              <td><span class="badge badge-red">✗</span></td>
+              <td><span class="badge badge-green">✓</span></td>
+              <td><span class="badge badge-green">✓</span></td>
+            </tr>
+            <tr>
+              <td>ライセンスなしユーザー向け提供</td>
+              <td><span class="badge badge-red">✗</span></td>
+              <td><span class="badge badge-red">✗</span></td>
+              <td><span class="badge badge-red">✗</span></td>
+              <td><span class="badge badge-green">要有効化</span></td>
+              <td><span class="badge badge-green">要有効化</span></td>
+            </tr>
+            <tr>
+              <td>Copilot Memory</td>
+              <td><span class="badge badge-red">✗</span></td>
+              <td><span class="badge badge-amber">Preview</span></td>
+              <td><span class="badge badge-amber">Preview</span></td>
+              <td><span class="badge badge-red">✗</span></td>
+              <td><span class="badge badge-red">✗</span></td>
+            </tr>
+          </table>
+        </div>
+
+        <h3>2.3 レビュー対象外ファイル</h3>
+        <div class="arch-layers">
+          <div class="arch-layer red">
+            <span class="arch-label">除外: 依存管理</span>
+            <span class="arch-desc"
+              >package.json、Gemfile.lock、yarn.lock、package-lock.json など</span
+            >
+          </div>
+          <div class="arch-layer red">
+            <span class="arch-label">除外: ログファイル</span>
+            <span class="arch-desc">*.log、*.log.* 形式のファイル</span>
+          </div>
+          <div class="arch-layer red">
+            <span class="arch-label">除外: SVG ファイル</span>
+            <span class="arch-desc">*.svg — バイナリ的なベクターデータはスキップ</span>
+          </div>
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <!-- CH3 -->
+      <section id="ch3">
+        <div class="chapter-header">
+          <span class="chapter-num purple">CH-03</span>
+          <h2>初期セットアップ</h2>
+        </div>
+
+        <h3>3.1 Organization レベルの有効化フロー</h3>
+
+        <div class="mermaid-wrap">
+          <div id="mermaid-1" class="mermaid"></div>
+        </div>
+
+        <h3>3.2 ステップバイステップ手順</h3>
+        <ul class="step-list">
+          <li>
+            <span class="step-num">1</span>
+            <div>
+              <strong>プラン確認</strong><br />Copilot Pro / Pro+ / Business / Enterprise
+              のいずれかを保有していることを確認。Free プランでは Code Review は利用不可。
+            </div>
+          </li>
+          <li>
+            <span class="step-num">2</span>
+            <div>
+              <strong>Org ポリシー有効化</strong><br />Organization → Settings → Copilot → Policies
+              → <em>Copilot code review</em> を Enabled に設定。
+            </div>
+          </li>
+          <li>
+            <span class="step-num cyan">3</span>
+            <div>
+              <strong>Runners の設定（Agentic 機能用）</strong><br />Full Project Context Gathering
+              は GitHub Actions runners を使用。デフォルトは GitHub-hosted
+              runners。大規模リポジトリでは Larger runners への移行を検討。
+            </div>
+          </li>
+          <li>
+            <span class="step-num cyan">4</span>
+            <div>
+              <strong>コンテンツ除外の設定</strong><br /><code
+                >.github/copilot-instructions.md</code
+              >
+              にスキャン対象外パスを記述、または Org 設定の Content exclusion を使用。
+            </div>
+          </li>
+          <li>
+            <span class="step-num purple">5</span>
+            <div>
+              <strong>Custom Instructions の準備</strong><br /><code
+                >.github/copilot-instructions.md</code
+              >（リポジトリ全体）または
+              <code>.github/instructions/**/*.instructions.md</code>（パス別）を作成。
+            </div>
+          </li>
+        </ul>
+
+        <div class="callout warning">
+          <strong>⚠️ 注意: 自動レビューのトリガー条件</strong>
+          自動レビューが有効な場合、GitHub Actions が無効化されている環境や Actions
+          ワークフローが失敗した場合でも <em>基本レビュー</em> は生成されますが、Full Project
+          Context Gathering などの Agentic 機能は動作しません。
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <!-- CH4 -->
+      <section id="ch4">
+        <div class="chapter-header">
+          <span class="chapter-num amber">CH-04</span>
+          <h2>基本操作（全環境別）</h2>
+        </div>
+
+        <h3>4.1 GitHub.com（Web）— 最も標準的な使い方</h3>
+        <ul class="step-list">
+          <li>
+            <span class="step-num">1</span>
+            <div>PR を作成または既存 PR に移動する</div>
+          </li>
+          <li>
+            <span class="step-num">2</span>
+            <div>
+              右側の <strong>Reviewers</strong> メニューを開き <strong>Copilot</strong> を選択
+            </div>
+          </li>
+          <li>
+            <span class="step-num">3</span>
+            <div>通常 30 秒以内にコメントが投稿される</div>
+          </li>
+          <li>
+            <span class="step-num">4</span>
+            <div>
+              コメントを確認し、必要に応じて Suggested Changes を
+              <em>Apply suggestion</em> ボタンで適用
+            </div>
+          </li>
+          <li>
+            <span class="step-num cyan">5</span>
+            <div>フィードバック（👍/👎）で提案品質を評価 — 製品改善に活用される</div>
+          </li>
+        </ul>
+
+        <h3>4.2 VS Code — ローカルレビューの活用</h3>
+        <p>
+          VS Code では PR
+          のほかに、<em>未コミット変更のローカルレビュー</em>が可能です。早期フィードバックを得ることでコミット前の品質向上が図れます。
+        </p>
+
+        <div class="compare-grid">
+          <div class="compare-card good">
+            <div class="compare-title">✅ 良い例：コミット前にローカルレビューを使う</div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary)">
+              Source Control ビュー → CHANGES 上の 🔍 ボタン → 問題をローカルで修正してからコミット
+            </p>
+          </div>
+          <div class="compare-card bad">
+            <div class="compare-title">❌ 悪い例：全変更を一括コミットしてからレビュー依頼</div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary)">
+              差分が大きいと Copilot のコンテキストが分散し、指摘が表面的になりやすい
+            </p>
+          </div>
+        </div>
+
+        <h3>4.3 GitHub CLI — CI パイプラインへの組み込み</h3>
+
+        <div class="code-block">
+          <span class="code-lang">shell</span>
+          <pre><span class="code-comment"># PR 作成と同時に Copilot をレビュアーに追加</span>
+<span class="code-green">gh</span> pr create --reviewer @copilot
+
+<span class="code-comment"># 既存 PR にレビュー依頼</span>
+<span class="code-green">gh</span> pr edit <span class="code-amber">PR-NUMBER</span> --add-reviewer @copilot
+
+<span class="code-comment"># 対話的選択（スペースキーで選択）</span>
+<span class="code-green">gh</span> pr create
+<span class="code-comment"># → Reviewers プロンプトで "Copilot (AI)" を選択</span></pre>
+        </div>
+
+        <h3>4.4 JetBrains IDEs</h3>
+        <ul class="step-list">
+          <li>
+            <span class="step-num">1</span>
+            <div>左側パネルの <strong>Commit</strong> ツールウィンドウを開く</div>
+          </li>
+          <li>
+            <span class="step-num">2</span>
+            <div>
+              コミットメッセージ入力欄の上にある
+              <strong>Copilot: Review Code Changes</strong>（虫眼鏡+スパークルアイコン）をクリック
+            </div>
+          </li>
+          <li>
+            <span class="step-num">3</span>
+            <div>コメントを確認、上下矢印で複数コメントを移動</div>
+          </li>
+          <li>
+            <span class="step-num cyan">4</span>
+            <div><strong>Discard</strong> ボタンで不要な提案を却下</div>
+          </li>
+        </ul>
+
+        <h3>4.5 Xcode</h3>
+        <ul class="step-list">
+          <li>
+            <span class="step-num">1</span>
+            <div>CopilotForXcode v0.41.0+ をインストール</div>
+          </li>
+          <li>
+            <span class="step-num">2</span>
+            <div>Editor → GitHub Copilot → Open Chat でチャットウィンドウを開く</div>
+          </li>
+          <li>
+            <span class="step-num">3</span>
+            <div>右下の Code Review ボタン（吹き出しアイコン）をクリック</div>
+          </li>
+          <li>
+            <span class="step-num cyan">4</span>
+            <div>
+              <strong>Review Staged Changes</strong> または
+              <strong>Review Unstaged Changes</strong> を選択
+            </div>
+          </li>
+          <li>
+            <span class="step-num cyan">5</span>
+            <div>レビュー対象ファイルをチェックボックスで選択 → Continue</div>
+          </li>
+          <li>
+            <span class="step-num purple">6</span>
+            <div>Accept / Dismiss でインライン提案を処理</div>
+          </li>
+        </ul>
+
+        <h3>4.6 再レビューの依頼</h3>
+        <div class="callout info">
+          <strong>📌 重要: Copilot は自動で再レビューしない</strong>
+          PR に変更をプッシュしても（「Review new pushes」を有効化していない限り）Copilot
+          は自動で再レビューしません。Reviewers メニューの Copilot
+          横の更新ボタンをクリックして手動で再依頼します。なお、再レビュー時には以前に Resolve
+          済みや 👎 をつけたコメントが再び投稿されることがあります。
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <!-- CH5 -->
+      <section id="ch5">
+        <div class="chapter-header">
+          <span class="chapter-num red">CH-05</span>
+          <h2>Custom Instructions による高度カスタマイズ</h2>
+        </div>
+
+        <h3>5.1 定義と仕組み</h3>
+        <p>
+          <strong>Custom Instructions</strong>
+          は、自然言語で記述したレビュー指示をリポジトリに格納することで、Copilot
+          のレビュー観点・スタイル・優先事項を制御する機能です。Copilot は PR
+          のベースブランチにある設定ファイルを参照します。
+        </p>
+
+        <div class="callout warning">
+          <strong>⚠️ 制限: 最初の 4,000 文字のみ読み取り</strong>
+          Custom Instructions ファイルの最初の 4,000 文字を超えた部分は Code Review
+          に反映されません（Copilot Chat / Cloud Agent
+          にはこの制限なし）。重要な指示を冒頭に配置してください。
+        </div>
+
+        <h3>5.2 ファイル構成</h3>
+
+        <div class="arch-layers">
+          <div class="arch-layer">
+            <span class="arch-label">リポジトリ全体</span>
+            <span class="arch-desc"
+              ><code>.github/copilot-instructions.md</code> — 全ファイルに適用</span
+            >
+          </div>
+          <div class="arch-layer cyan">
+            <span class="arch-label">パス別指示</span>
+            <span class="arch-desc"
+              ><code>.github/instructions/**/*.instructions.md</code> —
+              特定パスのファイルにのみ適用</span
+            >
+          </div>
+          <div class="arch-layer purple">
+            <span class="arch-label">Organization 指示</span>
+            <span class="arch-desc"
+              >Org Settings → Copilot で設定（Enterprise / Business のみ）</span
+            >
+          </div>
+        </div>
+
+        <h3>5.3 実践例：プロダクションレベルの Instructions</h3>
+
+        <div class="compare-grid">
+          <div class="compare-card good">
+            <div class="compare-title">✅ 良い例: 具体的・測定可能な指示</div>
+            <div class="code-block" style="margin-top: 0.6rem">
+              <pre><span class="code-comment"># .github/copilot-instructions.md</span>
+<span class="code-comment">
+## Code Review Guidelines</span>
+
+<span class="code-comment"># 言語・スタイル</span>
+<span class="code-str">Review in Japanese. Focus on security
+and performance. Flag O(n²) loops
+in data-processing code.</span>
+
+<span class="code-comment"># セキュリティ</span>
+<span class="code-str">Apply checks in /docs/security.md.
+Flag any SQL string concatenation.</span>
+
+<span class="code-comment"># 禁止パターン</span>
+<span class="code-str">Reject nested ternary operators.
+Reject console.log in production.</span></pre>
+            </div>
+          </div>
+          <div class="compare-card bad">
+            <div class="compare-title">❌ 悪い例: 曖昧・過剰な指示</div>
+            <div class="code-block" style="margin-top: 0.6rem">
+              <pre><span class="code-comment"># 悪い例</span>
+<span class="code-str">コードをちゃんとレビューしてください。
+いい感じに書かれているか確認して。
+バグがあれば教えてください。
+パフォーマンスも見てください。
+読みやすさも大事です。
+セキュリティも注意してください。
+</span><span class="code-comment"># → 4000 文字以内に具体的指示を入れていない</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <h3>5.4 パス別 Instructions の応用</h3>
+        <div class="code-block">
+          <span class="code-lang">markdown</span>
+          <pre><span class="code-comment"># .github/instructions/api/*.instructions.md</span>
+<span class="code-str">
+---
+applyTo: "src/api/**"
+---
+When reviewing API endpoints:
+- Check for missing authentication middleware
+- Validate all inputs use zod schemas
+- Ensure error responses follow RFC 7807
+- Flag any endpoint exposing stack traces
+</span></pre>
+        </div>
+
+        <div class="code-block">
+          <span class="code-lang">markdown</span>
+          <pre><span class="code-comment"># .github/instructions/migrations/*.instructions.md</span>
+<span class="code-str">
+---
+applyTo: "db/migrations/**"
+---
+For database migrations:
+- Verify DOWN migration exists and is reversible
+- Check for missing index on foreign keys
+- Flag column renames without data migration
+</span></pre>
+        </div>
+
+        <h3>5.5 Copilot Memory（Public Preview）</h3>
+        <p>
+          Copilot Pro / Pro+ ユーザーは <strong>Copilot Memory</strong> を有効化することで、Copilot
+          がリポジトリについて学習した知識を蓄積し、レビュー精度を継続的に向上させることができます。
+        </p>
+
+        <div class="trend-grid">
+          <div class="trend-card">
+            <div class="trend-label">Copilot Memory</div>
+            <div class="trend-title">学習型コンテキスト蓄積</div>
+            <div class="trend-desc">
+              リポジトリ固有のコーディングパターン、頻出バグ傾向、チームの命名規則を学習・記憶
+            </div>
+          </div>
+          <div class="trend-card">
+            <div class="trend-label">Integration</div>
+            <div class="trend-title">PR レビューへの自動適用</div>
+            <div class="trend-desc">
+              蓄積した知識は PR レビュー時に自動的に参照され、より文脈に即した指摘が可能になる
+            </div>
+          </div>
+          <div class="trend-card">
+            <div class="trend-label">Availability</div>
+            <div class="trend-title">Pro / Pro+ 限定</div>
+            <div class="trend-desc">
+              2026年6月時点で Public Preview。Business / Enterprise プランでは提供されていない
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <!-- CH6 -->
+      <section id="ch6">
+        <div class="chapter-header">
+          <span class="chapter-num blue">CH-06</span>
+          <h2>Agentic 機能の活用</h2>
+        </div>
+
+        <h3>6.1 Full Project Context Gathering（GA）</h3>
+        <p>
+          従来のコードレビューが PR の diff のみを見るのに対し、Full Project Context Gathering
+          はリポジトリ全体を解析して変更の意図・影響範囲・既存コードとの整合性を把握します。これにより「このメソッドは別モジュールで既に実装されている」「この変更が下流のクラスに影響する」といったコンテキスト依存の指摘が可能です。
+        </p>
+
+        <div class="mermaid-wrap">
+          <div id="mermaid-2" class="mermaid"></div>
+        </div>
+
+        <h3>6.2 Cloud Agent 連携（Fix PR 自動生成）— Public Preview</h3>
+
+        <ul class="step-list">
+          <li>
+            <span class="step-num">1</span>
+            <div>
+              Code Review のコメントに
+              <strong>Implement suggestion</strong> ボタンが表示されていることを確認（Cloud Agent
+              が有効な場合のみ）
+            </div>
+          </li>
+          <li>
+            <span class="step-num">2</span>
+            <div>
+              <strong>Implement suggestion</strong> をクリックすると PR
+              上にドラフトコメントが作成される
+            </div>
+          </li>
+          <li>
+            <span class="step-num cyan">3</span>
+            <div>ドラフトコメントで Copilot に追加の指示を書いてサブミット</div>
+          </li>
+          <li>
+            <span class="step-num cyan">4</span>
+            <div>Copilot Cloud Agent が提案された修正を適用した<em>新しい PR</em>を自動生成</div>
+          </li>
+          <li>
+            <span class="step-num purple">5</span>
+            <div>生成された Fix PR を人間がレビューしてマージ判断</div>
+          </li>
+        </ul>
+
+        <div class="callout warning">
+          <strong>⚠️ Preview 機能の注意事項</strong>
+          Cloud Agent 連携は Public Preview であり、仕様が変更される可能性があります。GitHub
+          Pre-release License Terms
+          が適用されます。エンタープライズ環境での本番運用前に十分なテストを推奨します。
+        </div>
+
+        <h3>6.3 GitHub Actions runners の設定</h3>
+
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Runner 種別</th>
+              <th>コスト</th>
+              <th>推奨ユースケース</th>
+            </tr>
+            <tr>
+              <td>GitHub-hosted (Standard)</td>
+              <td><span class="badge badge-green">無料枠内</span></td>
+              <td>通常規模のリポジトリ、Agentic 機能のデフォルト</td>
+            </tr>
+            <tr>
+              <td>GitHub-hosted (Larger)</td>
+              <td><span class="badge badge-amber">分単位課金</span></td>
+              <td>大規模リポジトリ、高速なコンテキスト収集が必要な場合</td>
+            </tr>
+            <tr>
+              <td>Self-hosted runners</td>
+              <td><span class="badge badge-cyan">要設定</span></td>
+              <td>GitHub-hosted runners が組織で無効化されている場合</td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="alert alert-amber">
+          組織で GitHub-hosted runners が <strong>無効化</strong> されている場合、Agentic 機能（Full
+          Project Context Gathering 含む）は利用できません。Self-hosted runners
+          を設定することで回避可能です。
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <!-- CH7 -->
+      <section id="ch7">
+        <div class="chapter-header">
+          <span class="chapter-num">CH-07</span>
+          <h2>自動レビュー（Automatic Reviews）の設定</h2>
+        </div>
+
+        <h3>7.1 自動レビューの階層構造</h3>
+        <div class="pyramid">
+          <div class="pyr-tier pyr-t4">Enterprise Org: 全リポジトリ適用</div>
+          <div class="pyr-tier pyr-t3">Org Owner: 指定リポジトリ適用</div>
+          <div class="pyr-tier pyr-t2">Repository Owner: リポジトリ内 PR に適用</div>
+          <div class="pyr-tier pyr-t1">個人 (Pro/Pro+): 自分の PR に適用</div>
+        </div>
+
+        <h3>7.2 トリガー設定と挙動</h3>
+
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>設定オプション</th>
+              <th>トリガータイミング</th>
+              <th>推奨シナリオ</th>
+            </tr>
+            <tr>
+              <td>Basic（デフォルト）</td>
+              <td>PR を "Open" で作成時 / Draft → Open 切替時（初回のみ）</td>
+              <td>標準的な開発フロー</td>
+            </tr>
+            <tr>
+              <td>Review new pushes</td>
+              <td>PR へのコミットプッシュ毎</td>
+              <td>継続的に品質チェックしたい場合（クォータ消費注意）</td>
+            </tr>
+            <tr>
+              <td>Review draft PRs</td>
+              <td>Draft PR の作成時から</td>
+              <td>WIP 段階から早期フィードバックを得たい場合</td>
+            </tr>
+          </table>
+        </div>
+
+        <h3>7.3 自動レビューの設定フロー</h3>
+        <div class="mermaid-wrap">
+          <div id="mermaid-3" class="mermaid"></div>
+        </div>
+
+        <h3>7.4 Bot・GitHub Actions が PR を作成する場合の課金帰属</h3>
+
+        <div class="arch-layers">
+          <div class="arch-layer">
+            <span class="arch-label">ワークフロー起動者が特定可能</span>
+            <span class="arch-desc">そのユーザーのクォータに加算される</span>
+          </div>
+          <div class="arch-layer amber">
+            <span class="arch-label">特定不可能</span>
+            <span class="arch-desc">指定された Billing Owner のクォータに加算される</span>
+          </div>
+        </div>
+
+        <div class="compare-grid">
+          <div class="compare-card good">
+            <div class="compare-title">✅ 良い例: 自動レビューの適切な設定</div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary)">
+              大きい PR には必ず Human Review も必須にする（Org の branch protection rules
+              で設定）。Copilot
+              のコメントは参考として扱い、最終判断は人間が行う運用フローを確立する。
+            </div>
+          </div>
+          <div class="compare-card bad">
+            <div class="compare-title">❌ 悪い例: Copilot のみでレビュー完結</div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary)">
+              Copilot の「Comment」レビューは Required Reviewers
+              に含まれないが、レビュープロセス全体を Copilot に委任するのは危険。Copilot
+              は全問題を検出できる保証なし。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <!-- CH8 -->
+      <section id="ch8">
+        <div class="chapter-header">
+          <span class="chapter-num cyan">CH-08</span>
+          <h2>クォータ・課金管理</h2>
+        </div>
+
+        <h3>8.1 クォータ消費の仕組み</h3>
+        <p>
+          Copilot Code Review は <strong>Premium Request</strong> を消費します。PR レビュー 1 回 =
+          Premium Request 1 消費。IDE でのローカルレビューも同様です。
+        </p>
+
+        <div class="metric-grid">
+          <div class="metric-card">
+            <span class="metric-val">1</span>
+            <div class="metric-label">PR レビュー1回あたりの消費</div>
+          </div>
+          <div class="metric-card">
+            <span class="metric-val cyan">1</span>
+            <div class="metric-label">IDE ローカルレビュー1回あたり</div>
+          </div>
+          <div class="metric-card">
+            <span class="metric-val purple">0</span>
+            <div class="metric-label">Copilot Free プランの月次クォータ</div>
+          </div>
+          <div class="metric-card">
+            <span class="metric-val amber">Paid</span>
+            <div class="metric-label">クォータ超過時（有償オーバーエイジ）</div>
+          </div>
+        </div>
+
+        <h3>8.2 クォータ帰属ルール</h3>
+        <div class="arch-layers">
+          <div class="arch-layer">
+            <span class="arch-label">自動レビュー（設定済み）</span>
+            <span class="arch-desc">PR 作成者のクォータに帰属</span>
+          </div>
+          <div class="arch-layer cyan">
+            <span class="arch-label">手動レビュー依頼</span>
+            <span class="arch-desc">依頼を実行したユーザーのクォータに帰属</span>
+          </div>
+          <div class="arch-layer amber">
+            <span class="arch-label">ライセンスなしユーザー</span>
+            <span class="arch-desc"
+              >個人クォータなし。生成コストは Org/Enterprise の Paid Overage Usage に計上</span
+            >
+          </div>
+        </div>
+
+        <h3>8.3 クォータ超過時の対応フロー</h3>
+        <div class="mermaid-wrap">
+          <div id="mermaid-4" class="mermaid"></div>
+        </div>
+
+        <h3>8.4 クォータ節約のベストプラクティス</h3>
+        <div class="progress-item">
+          <div class="progress-header">
+            <span>PR を小さく分割（200行以下を目標）</span><span>効果 高</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="--w: 90%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-header">
+            <span>「Review new pushes」は必要な場合のみ有効化</span><span>効果 高</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="--w: 85%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-header">
+            <span>Lint / 型チェックを CI で先行実行してから PR 作成</span><span>効果 中</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="--w: 65%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-header">
+            <span>Bot 生成 PR の Billing Owner を適切に設定</span><span>効果 中</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="--w: 55%"></div></div>
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <!-- CH9 -->
+      <section id="ch9">
+        <div class="chapter-header">
+          <span class="chapter-num purple">CH-09</span>
+          <h2>Enterprise 管理・ガバナンス</h2>
+        </div>
+
+        <h3>9.1 Enterprise 管理者向けポリシー設定</h3>
+
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>ポリシー</th>
+              <th>設定箇所</th>
+              <th>デフォルト</th>
+              <th>説明</th>
+            </tr>
+            <tr>
+              <td>Copilot code review</td>
+              <td>Org / Enterprise Policy</td>
+              <td><span class="badge badge-red">無効</span></td>
+              <td>Code Review 機能の有効化</td>
+            </tr>
+            <tr>
+              <td>Premium request paid usage</td>
+              <td>Enterprise Admin</td>
+              <td><span class="badge badge-red">無効</span></td>
+              <td>ライセンスなしユーザー向け提供の前提条件</td>
+            </tr>
+            <tr>
+              <td>Allow members without license</td>
+              <td>Enterprise → Org</td>
+              <td><span class="badge badge-red">無効</span></td>
+              <td>ライセンスなしユーザーへの提供。Ent 設定後は Org で変更不可</td>
+            </tr>
+            <tr>
+              <td>Automatic code review</td>
+              <td>Org / Repo Settings</td>
+              <td><span class="badge badge-red">無効</span></td>
+              <td>自動レビューの対象リポジトリ設定</td>
+            </tr>
+            <tr>
+              <td>Content exclusion</td>
+              <td>Org Settings / .github</td>
+              <td>—</td>
+              <td>スキャン対象外ファイル・ディレクトリの指定</td>
+            </tr>
+          </table>
+        </div>
+
+        <h3>9.2 ライセンスなしユーザー向け提供の注意点</h3>
+        <div class="callout danger">
+          <strong>🔴 Enterprise Admin 必読</strong>
+          「Allow members without a Copilot license」を Enterprise
+          レベルで設定した場合、そのポリシーは Organization レベルで<em
+            >表示はされますが変更できません（Most Restrictive）</em
+          >。また、当該ユーザーが生成するレビューコストはすべて組織への Paid Overage
+          として計上されます。予算管理に注意してください。
+        </div>
+
+        <h3>9.3 Audit Log・モニタリング</h3>
+        <ul class="step-list">
+          <li>
+            <span class="step-num">1</span>
+            <div>Enterprise Settings → Audit Log で Copilot Code Review 関連イベントを確認</div>
+          </li>
+          <li>
+            <span class="step-num cyan">2</span>
+            <div>Premium Request の使用状況は Settings → Billing → Copilot usage で確認</div>
+          </li>
+          <li>
+            <span class="step-num cyan">3</span>
+            <div>Agentic 機能の使用状況は Agentic Audit Log Events を参照</div>
+          </li>
+          <li>
+            <span class="step-num purple">4</span>
+            <div>Org レベルの Activity Report をダウンロードして定期的に分析</div>
+          </li>
+        </ul>
+
+        <h3>9.4 GitHub Code Quality との連携</h3>
+        <div class="trend-grid">
+          <div class="trend-card">
+            <div class="trend-label">Copilot Code Review</div>
+            <div class="trend-title">PR 単位のフィードバック</div>
+            <div class="trend-desc">
+              PR の変更差分を対象。即時フィードバックで開発サイクルを加速
+            </div>
+          </div>
+          <div class="trend-card">
+            <div class="trend-label">GitHub Code Quality</div>
+            <div class="trend-title">リポジトリ全体の品質分析</div>
+            <div class="trend-desc">信頼性・保守性の継続的評価。戦略的な技術的負債管理に活用</div>
+          </div>
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <!-- CH10 -->
+      <section id="ch10">
+        <div class="chapter-header">
+          <span class="chapter-num amber">CH-10</span>
+          <h2>ベストプラクティス・運用設計</h2>
+        </div>
+
+        <h3>10.1 Human Review との役割分担</h3>
+        <div class="mermaid-wrap">
+          <div id="mermaid-5" class="mermaid"></div>
+        </div>
+
+        <h3>10.2 PR サイズとレビュー品質</h3>
+        <p>
+          Copilot のコンテキストウィンドウには制限があります。PR
+          が大きすぎると指摘が表面的になります。
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>PR サイズ（変更行数）</th>
+              <th>Copilot レビュー品質</th>
+              <th>推奨アクション</th>
+            </tr>
+            <tr>
+              <td>〜 200 行</td>
+              <td><span class="badge badge-green">★★★ 最高</span></td>
+              <td>そのままレビュー依頼</td>
+            </tr>
+            <tr>
+              <td>200〜500 行</td>
+              <td><span class="badge badge-cyan">★★☆ 良好</span></td>
+              <td>可能なら分割を検討</td>
+            </tr>
+            <tr>
+              <td>500〜1000 行</td>
+              <td><span class="badge badge-amber">★☆☆ 低下</span></td>
+              <td>機能単位で PR を分割</td>
+            </tr>
+            <tr>
+              <td>1000 行以上</td>
+              <td><span class="badge badge-red">☆☆☆ 要注意</span></td>
+              <td>必ず分割。Human Review を主体に</td>
+            </tr>
+          </table>
+        </div>
+
+        <h3>10.3 Custom Instructions 設計のベストプラクティス</h3>
+
+        <div class="compare-grid">
+          <div class="compare-card good">
+            <div class="compare-title">✅ 効果的な Instructions の構造</div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.4rem">
+              <strong style="color: var(--neon-green)"
+                >1. 優先度高い指示を冒頭 4000 文字以内に</strong
+              ><br />
+              セキュリティ、重大バグ検出ルールを先頭に配置。<br /><br />
+              <strong style="color: var(--neon-green)">2. 具体的なパターンを指定</strong><br />
+              「可読性を高めて」ではなく「ネストが 3 層以上は関数分割を提案」。<br /><br />
+              <strong style="color: var(--neon-green)">3. パス別 Instructions で責務を分離</strong
+              ><br />
+              API / DB / Frontend ごとに異なる観点を設定。
+            </div>
+          </div>
+          <div class="compare-card bad">
+            <div class="compare-title">❌ 避けるべき Anti-patterns</div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.4rem">
+              <strong style="color: var(--neon-red)">×「全てのベストプラクティスを適用して」</strong
+              ><br />
+              包括的すぎる指示は Copilot の焦点が分散する。<br /><br />
+              <strong style="color: var(--neon-red)">× 4000 文字を超える設定ファイル</strong><br />
+              後半の指示は完全に無視される。<br /><br />
+              <strong style="color: var(--neon-red)"
+                >× feature ブランチで Instructions を編集</strong
+              ><br />
+              Copilot はベースブランチの Instructions を参照するため、feature
+              ブランチの変更は反映されない。
+            </div>
+          </div>
+        </div>
+
+        <h3>10.4 CI/CD パイプラインへの統合</h3>
+        <div class="code-block">
+          <span class="code-lang">yaml</span>
+          <pre><span class="code-comment"># .github/workflows/auto-review.yml</span>
+<span class="code-keyword">name:</span> <span class="code-str">Auto Copilot Review</span>
+<span class="code-keyword">on:</span>
+  <span class="code-keyword">pull_request:</span>
+    <span class="code-keyword">types:</span> [<span class="code-str">opened</span>, <span class="code-str">ready_for_review</span>]
+    <span class="code-keyword">branches:</span> [<span class="code-str">main</span>, <span class="code-str">develop</span>]
+
+<span class="code-keyword">jobs:</span>
+  <span class="code-keyword">pre-checks:</span>
+    <span class="code-keyword">runs-on:</span> <span class="code-str">ubuntu-latest</span>
+    <span class="code-keyword">steps:</span>
+      <span class="code-comment"># Copilot レビュー前に Lint & Tests を通す</span>
+      - <span class="code-keyword">uses:</span> <span class="code-str">actions/checkout@v4</span>
+      - <span class="code-keyword">run:</span> <span class="code-str">npm ci &amp;&amp; npm run lint &amp;&amp; npm test</span>
+
+  <span class="code-comment"># Copilot への依頼は Org の自動レビュー設定で行う</span>
+  <span class="code-comment"># Bot PR の場合は gh CLI で明示的に依頼</span>
+  <span class="code-keyword">request-copilot-review:</span>
+    <span class="code-keyword">needs:</span> <span class="code-str">pre-checks</span>
+    <span class="code-keyword">if:</span> <span class="code-str">github.event.pull_request.draft == false</span>
+    <span class="code-keyword">runs-on:</span> <span class="code-str">ubuntu-latest</span>
+    <span class="code-keyword">steps:</span>
+      - <span class="code-keyword">run:</span> <span class="code-str">|
+          gh pr edit ${{ github.event.pull_request.number }} \
+            --add-reviewer @copilot</span>
+        <span class="code-keyword">env:</span>
+          <span class="code-keyword">GH_TOKEN:</span> <span class="code-str">${{ secrets.GITHUB_TOKEN }}</span></pre>
+        </div>
+
+        <h3>10.5 レビュー結果の評価とフィードバック</h3>
+        <div class="alert alert-green">
+          <strong>👍 有効なフィードバック活用法</strong>
+          Copilot のコメントに👍/👎を積極的に付けることで、チームの Copilot
+          レビュー品質が向上します。特に👎の場合は理由を選択することで、GitHub
+          のモデル改善に貢献できます。
+        </div>
+        <div class="alert alert-red">
+          <strong>⚠️ Copilot レビューの限界を理解する</strong>
+          Copilot
+          はすべての問題を検出できる保証はありません。特に「ビジネスロジックの正確性」「非機能要件への適合」「セキュリティ脅威モデルに基づいた判断」は
+          Human Review で補完必須です。
+        </div>
+
+        <h3>10.6 組織展開のロードマップ</h3>
+
+        <div class="step-list">
+          <li>
+            <span class="step-num">1</span>
+            <div>
+              <strong>Phase 1: パイロット（Week 1-2）</strong
+              ><br />少数チームで手動レビュー依頼から開始。Custom Instructions
+              を最小限で作成。フィードバックを収集。
+            </div>
+          </li>
+          <li>
+            <span class="step-num cyan">2</span>
+            <div>
+              <strong>Phase 2: カスタマイズ（Week 3-4）</strong
+              ><br />チームの技術スタック・コーディング規約を反映した Custom Instructions
+              を整備。パス別設定を追加。
+            </div>
+          </li>
+          <li>
+            <span class="step-num cyan">3</span>
+            <div>
+              <strong>Phase 3: 自動化（Month 2）</strong
+              ><br />主要リポジトリで自動レビューを有効化。ライセンスなしユーザー向け提供ポリシーの検討。
+            </div>
+          </li>
+          <li>
+            <span class="step-num purple">4</span>
+            <div>
+              <strong>Phase 4: 全社展開（Month 3+）</strong><br />Enterprise
+              レベルでのポリシー管理。Audit Log によるコスト分析。Cloud Agent
+              連携（Preview）の評価。
+            </div>
+          </li>
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <!-- REFERENCES -->
+      <section id="refs">
+        <div class="chapter-header">
+          <span class="chapter-num" style="background: var(--text-muted); color: #000">REF</span>
+          <h2>参考文献・公式ドキュメント</h2>
+        </div>
+
+        <div class="ref-grid">
+          <a
+            href="https://docs.github.com/en/copilot/concepts/agents/code-review"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="ref-card"
+          >
+            <span class="ref-cat">一次情報源 / Concepts</span>
+            <span class="ref-title">About GitHub Copilot code review</span>
+            <span class="ref-url">docs.github.com/en/copilot/concepts/agents/code-review</span>
+          </a>
+          <a
+            href="https://docs.github.com/en/copilot/how-tos/use-copilot-agents/request-a-code-review/use-code-review"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="ref-card"
+          >
+            <span class="ref-cat">How-to / 操作手順</span>
+            <span class="ref-title">Using GitHub Copilot code review</span>
+            <span class="ref-url">docs.github.com/.../use-code-review</span>
+          </a>
+          <a
+            href="https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-automatic-review"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="ref-card"
+          >
+            <span class="ref-cat">How-to / 自動レビュー設定</span>
+            <span class="ref-title">Configure automatic code review</span>
+            <span class="ref-url">docs.github.com/.../configure-automatic-review</span>
+          </a>
+          <a
+            href="https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-runners"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="ref-card"
+          >
+            <span class="ref-cat">How-to / インフラ設定</span>
+            <span class="ref-title">Configuring runners for Copilot code review</span>
+            <span class="ref-url">docs.github.com/.../configure-runners</span>
+          </a>
+          <a
+            href="https://docs.github.com/en/copilot/reference/review-excluded-files"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="ref-card"
+          >
+            <span class="ref-cat">Reference / 除外ファイル</span>
+            <span class="ref-title">Files excluded from Copilot code review</span>
+            <span class="ref-url">docs.github.com/en/copilot/reference/review-excluded-files</span>
+          </a>
+          <a
+            href="https://docs.github.com/en/copilot/responsible-use/code-review"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="ref-card"
+          >
+            <span class="ref-cat">Responsible Use / ガイドライン</span>
+            <span class="ref-title">Responsible use of GitHub Copilot code review</span>
+            <span class="ref-url">docs.github.com/en/copilot/responsible-use/code-review</span>
+          </a>
+          <a
+            href="https://docs.github.com/en/copilot/concepts/prompting/response-customization"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="ref-card"
+          >
+            <span class="ref-cat">Concepts / カスタマイズ</span>
+            <span class="ref-title">About customizing GitHub Copilot responses</span>
+            <span class="ref-url">docs.github.com/.../response-customization</span>
+          </a>
+          <a
+            href="https://docs.github.com/en/copilot/concepts/agents/copilot-memory"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="ref-card"
+          >
+            <span class="ref-cat">Concepts / Agentic</span>
+            <span class="ref-title">About agentic memory for GitHub Copilot</span>
+            <span class="ref-url">docs.github.com/.../copilot-memory</span>
+          </a>
+          <a
+            href="https://docs.github.com/en/copilot/how-tos/administer-copilot/manage-for-organization/manage-policies"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="ref-card"
+          >
+            <span class="ref-cat">Admin / Organization</span>
+            <span class="ref-title">Managing policies for Copilot in your organization</span>
+            <span class="ref-url">docs.github.com/.../manage-policies</span>
+          </a>
+          <a
+            href="https://docs.github.com/en/copilot/how-tos/administer-copilot/manage-for-enterprise/manage-agents/enable-copilot-code-review"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="ref-card"
+          >
+            <span class="ref-cat">Admin / Enterprise</span>
+            <span class="ref-title">Enable Copilot code review (Enterprise)</span>
+            <span class="ref-url">docs.github.com/.../enable-copilot-code-review</span>
+          </a>
+          <a
+            href="https://docs.github.com/en/copilot/tutorials/customize-code-review"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="ref-card"
+          >
+            <span class="ref-cat">Tutorial / カスタマイズ</span>
+            <span class="ref-title">Customize code review</span>
+            <span class="ref-url">docs.github.com/en/copilot/tutorials/customize-code-review</span>
+          </a>
+          <a
+            href="https://docs.github.com/en/copilot/tutorials/optimize-code-reviews"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="ref-card"
+          >
+            <span class="ref-cat">Tutorial / 最適化</span>
+            <span class="ref-title">Optimize code reviews</span>
+            <span class="ref-url">docs.github.com/en/copilot/tutorials/optimize-code-reviews</span>
+          </a>
+          <a
+            href="https://docs.github.com/en/copilot/concepts/billing/premium-request-management"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="ref-card"
+          >
+            <span class="ref-cat">Billing / クォータ管理</span>
+            <span class="ref-title">Premium request management</span>
+            <span class="ref-url">docs.github.com/.../premium-request-management</span>
+          </a>
+          <a
+            href="https://docs.github.com/en/code-security/code-quality/concepts/about-code-quality"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="ref-card"
+          >
+            <span class="ref-cat">関連機能 / Code Quality</span>
+            <span class="ref-title">About GitHub Code Quality</span>
+            <span class="ref-url">docs.github.com/.../about-code-quality</span>
+          </a>
+          <a
+            href="https://docs.github.com/en/site-policy/github-terms/github-pre-release-license-terms"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="ref-card"
+          >
+            <span class="ref-cat">Legal / Preview Terms</span>
+            <span class="ref-title">GitHub Pre-release License Terms</span>
+            <span class="ref-url">docs.github.com/.../github-pre-release-license-terms</span>
+          </a>
+          <a href="https://github.com/features/copilot/plans" target="_blank" rel="noopener noreferrer" class="ref-card">
+            <span class="ref-cat">プラン比較</span>
+            <span class="ref-title">GitHub Copilot Plans &amp; Pricing</span>
+            <span class="ref-url">github.com/features/copilot/plans</span>
+          </a>
+        </div>
+
+        <div
+          style="
+            text-align: center;
+            margin-top: 3rem;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+          "
+        >
+          最終更新: June 2026 &nbsp;|&nbsp; 一次情報源: GitHub Docs (docs.github.com) &nbsp;|&nbsp;
+          本ガイドは公式ドキュメントに基づいて作成
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const DIAGRAMS = {
+        'mermaid-0': `flowchart LR
+PR[Pull Request / Local Changes]
+subgraph Copilot["GitHub Copilot Code Review Engine"]
+direction TB
+CTX["Full Project Context Gathering"]
+MODEL["Purpose-Built Model Mix"]
+CI["Custom Instructions Parser"]
+CTX --> MODEL
+CI --> MODEL
+end
+PR --> Copilot
+Copilot --> COM["Review Comments + Suggested Fixes"]
+COM --> DEV[Developer]
+COM --> AGT["Copilot Cloud Agent - Public Preview"]
+AGT --> FIXPR["Fix PR Auto-generated"]
+DEV -->|Thumbs up/down| FB[Feedback Loop]`,
+
+        'mermaid-1': `flowchart TD
+A["Org Admin として GitHub.com にログイン"] --> B["Organization Settings へ移動"]
+B --> C["Copilot - Policies タブ"]
+C --> D{"コードレビューを有効化"}
+D -->|有効化| E["Copilot code review トグル ON"]
+E --> F{"ライセンスなしメンバーにも提供?"}
+F -->|Yes| G["Premium request paid usage を先に有効化"]
+G --> H["Allow members without a Copilot license ポリシー有効化"]
+H --> I["対象リポジトリを明示指定"]
+F -->|No| J["設定完了"]
+I --> J`,
+
+        'mermaid-2': `flowchart LR
+subgraph GA["Full Project Context Gathering - GA"]
+DIFF["PR diff"] --> ANALYZER["Repository Analyzer via GitHub Actions"]
+REPO["Entire Repository Codebase"] --> ANALYZER
+ANALYZER --> CONTEXT["Rich Context Object"]
+end
+subgraph PREVIEW["Cloud Agent Integration - Preview"]
+REVIEW_COM["Review Comment + Suggestion"] --> IMPL["Implement Suggestion ボタン"]
+IMPL --> DRAFT["Draft Comment on PR"]
+DRAFT --> AGENT["Copilot Cloud Agent"]
+AGENT --> FIXPR["New Fix PR against your branch"]
+end
+CONTEXT --> REVIEW_COM`,
+
+        'mermaid-3': `flowchart TD
+A["自動レビュー設定を開始"] --> B{"対象スコープ"}
+B -->|個人 Pro/Pro+| C["GitHub Settings - Copilot - Code review - Enable for your PRs"]
+B -->|リポジトリ| D["Repo Settings - Copilot - Automatic code review"]
+B -->|組織| E["Org Settings - Copilot Policies - Automatic code review"]
+C --> F["トリガー条件選択: Basic / New pushes / Draft PRs"]
+D --> F
+E --> G["対象リポジトリを選択: 全て / 特定リポジトリ"]
+G --> F
+F --> H["保存 - 有効化完了"]`,
+
+        'mermaid-4': `flowchart LR
+A["月次クォータ超過"] --> B{"対応選択"}
+B -->|短期| C["クォータリセットを待つ"]
+B -->|継続利用| D["プランのアップグレード"]
+B -->|追加購入| E["Additional Premium Requests を有効化"]
+D --> F["レビュー継続"]
+E --> F
+C --> G["リセット後に再開"]`,
+
+        'mermaid-5': `flowchart TD
+PR["Pull Request 作成"] --> COPILOT["Copilot Code Review (自動 or 手動トリガー)"]
+COPILOT --> FIX1["明確な修正提案 - Apply"]
+COPILOT --> SKIP["判断困難 - スキップ"]
+FIX1 --> HUMAN["Human Review"]
+SKIP --> HUMAN
+HUMAN --> ARCH["アーキテクチャ判断 / ビジネスロジック検証 / パフォーマンス要件確認"]
+ARCH --> APPROVE["Approve / Request Changes"]
+APPROVE --> MERGE["Merge"]`,
+      };
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        themeVariables: {
+          primaryColor: '#161b22',
+          primaryTextColor: '#e6edf3',
+          primaryBorderColor: '#30363d',
+          lineColor: '#39ff14',
+          secondaryColor: '#0d1117',
+          tertiaryColor: '#1f2937',
+          edgeLabelBackground: '#030712',
+          nodeTextColor: '#e6edf3',
+          clusterBkg: '#0d1117',
+          clusterBorder: '#21262d',
+          titleColor: '#00e5ff',
+          attributeBackgroundColorOdd: '#161b22',
+          attributeBackgroundColorEven: '#0d1117',
+        },
+        flowchart: { curve: 'basis', useMaxWidth: true },
+      });
+
+      (async () => {
+        for (const [id, src] of Object.entries(DIAGRAMS)) {
+          try {
+            const el = document.getElementById(id);
+            if (!el) continue;
+            const { svg } = await mermaid.render('svg-' + id, src);
+            el.innerHTML = svg;
+            const svgEl = el.querySelector('svg');
+            if (svgEl) {
+              svgEl.removeAttribute('width');
+              svgEl.removeAttribute('height');
+              svgEl.style.width = 'auto';
+              svgEl.style.maxWidth = '100%';
+              svgEl.style.height = 'auto';
+            }
+          } catch (err) {
+            console.error('Mermaid render error for ' + id + ':', err);
+            el.textContent = '⚠️ ダイアグラムを描画できませんでした';
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>

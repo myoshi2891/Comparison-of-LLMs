@@ -21,8 +21,8 @@
   --color-border-secondary: #1e1e28;
   --color-border-tertiary: #141418;
 
-  --font-sans: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --font-sans: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
 
   --border-radius-md: 8px;
   --border-radius-lg: 12px;
@@ -489,7 +489,7 @@
 }
 
 .codeLine:empty::before {
-  content: ' ';
+  content: " ";
 }
 
 /* Syntax colors */
