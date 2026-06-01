@@ -1,0 +1,3283 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SonarQube Code Review 実践ガイド | 中〜上級者向け</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=IBM+Plex+Sans+JP:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --bg-deep: #030712;
+        --bg-surface: #090e1b;
+        --bg-card: #0d1117;
+        --bg-card-hover: #161b22;
+        --neon-green: #00ff88;
+        --neon-cyan: #00d4ff;
+        --neon-purple: #bd93f9;
+        --neon-amber: #ffb86c;
+        --neon-red: #ff5555;
+        --neon-blue: #6e9fff;
+        --neon-pink: #ff79c6;
+        --text-primary: #e6edf3;
+        --text-secondary: #8b949e;
+        --text-muted: #484f58;
+        --border: #21262d;
+        --border-bright: #30363d;
+        --font-mono: 'Space Mono', 'Fira Code', monospace;
+        --font-display: 'Syne', sans-serif;
+        --font-body: 'IBM Plex Sans JP', 'Noto Sans JP', sans-serif;
+        --radius: 8px;
+        --radius-lg: 12px;
+        --shadow-neon: 0 0 20px rgba(0, 255, 136, 0.15);
+        --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+        --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg-deep);
+        color: var(--text-primary);
+        font-family: var(--font-body);
+        font-size: 1rem;
+        line-height: 1.75;
+        overflow-x: hidden;
+        position: relative;
+      }
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 3px,
+          rgba(0, 255, 136, 0.01) 3px,
+          rgba(0, 255, 136, 0.01) 4px
+        );
+        pointer-events: none;
+        z-index: 9998;
+      }
+      body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(0, 212, 255, 0.02) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 212, 255, 0.02) 1px, transparent 1px);
+        background-size: 60px 60px;
+        pointer-events: none;
+        z-index: 9997;
+      }
+
+      /* Animations */
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-28px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(28px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          box-shadow:
+            0 0 30px rgba(0, 255, 136, 0.25),
+            0 0 60px rgba(0, 255, 136, 0.08);
+        }
+        50% {
+          box-shadow:
+            0 0 60px rgba(0, 255, 136, 0.5),
+            0 0 100px rgba(0, 255, 136, 0.15);
+        }
+      }
+      @keyframes growBar {
+        from {
+          width: 0;
+        }
+        to {
+          width: var(--bar-width, 100%);
+        }
+      }
+      @keyframes glowPulse {
+        0%,
+        100% {
+          opacity: 0.5;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      /* Sticky Nav */
+      .sticky-nav {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: rgba(3, 7, 18, 0.93);
+        backdrop-filter: blur(18px);
+        border-bottom: 1px solid var(--border);
+        padding: 0 1.5rem;
+        overflow-x: auto;
+        white-space: nowrap;
+        scrollbar-width: thin;
+        scrollbar-color: var(--neon-green) transparent;
+      }
+      .sticky-nav::-webkit-scrollbar {
+        height: 3px;
+      }
+      .sticky-nav::-webkit-scrollbar-thumb {
+        background: var(--neon-green);
+        border-radius: 2px;
+      }
+      .nav-inner {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2rem;
+        min-width: max-content;
+        height: 52px;
+      }
+      .nav-logo {
+        font-family: var(--font-display);
+        font-weight: 800;
+        color: var(--neon-green);
+        font-size: 1rem;
+        margin-right: 1rem;
+        text-decoration: none;
+        letter-spacing: 0.05em;
+        flex-shrink: 0;
+        text-shadow: 0 0 12px rgba(0, 255, 136, 0.4);
+      }
+      .nav-link {
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 0.8rem;
+        font-family: var(--font-mono);
+        padding: 0.3rem 0.65rem;
+        border-radius: var(--radius);
+        transition: var(--transition);
+        white-space: nowrap;
+      }
+      .nav-link:hover,
+      .nav-link.active {
+        color: var(--neon-green);
+        background: rgba(0, 255, 136, 0.08);
+      }
+
+      /* Layout */
+      .container {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
+      .chapter-section {
+        padding: 5rem 0 3rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .chapter-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 2.5rem;
+        flex-wrap: wrap;
+      }
+      .chapter-num {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--bg-deep);
+        background: var(--neon-green);
+        padding: 0.25rem 0.6rem;
+        border-radius: 4px;
+        flex-shrink: 0;
+        margin-top: 0.5rem;
+        letter-spacing: 0.04em;
+      }
+      .k-level {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        color: var(--neon-cyan);
+        background: rgba(0, 212, 255, 0.1);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        flex-shrink: 0;
+        margin-top: 0.5rem;
+      }
+      .chapter-title {
+        font-family: var(--font-display);
+        font-size: clamp(1.5rem, 4vw, 2.25rem);
+        font-weight: 800;
+        color: var(--text-primary);
+        line-height: 1.2;
+      }
+      .section-title {
+        font-family: var(--font-display);
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--neon-cyan);
+        margin: 3rem 0 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .section-title::before {
+        content: '';
+        display: block;
+        width: 4px;
+        height: 1.4em;
+        background: var(--neon-cyan);
+        border-radius: 2px;
+        flex-shrink: 0;
+      }
+      .subsection-title {
+        font-family: var(--font-display);
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--neon-green);
+        margin: 2rem 0 0.875rem;
+      }
+      p {
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+      }
+
+      /* Hero */
+      .hero {
+        padding: 6rem 0 5rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+      .hero-bg-glow {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 700px;
+        height: 350px;
+        background: radial-gradient(ellipse, rgba(0, 255, 136, 0.07) 0%, transparent 70%);
+        pointer-events: none;
+        animation: pulse 4s ease-in-out infinite;
+      }
+      .hero-badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--neon-green);
+        background: rgba(0, 255, 136, 0.1);
+        border: 1px solid rgba(0, 255, 136, 0.3);
+        padding: 0.375rem 1rem;
+        border-radius: 50px;
+        margin-bottom: 1.5rem;
+        animation: fadeInDown 0.6s ease both;
+      }
+      .hero-title {
+        font-family: var(--font-display);
+        font-size: clamp(2rem, 6vw, 3.5rem);
+        font-weight: 800;
+        line-height: 1.15;
+        margin-bottom: 1rem;
+        background: linear-gradient(
+          135deg,
+          var(--neon-green) 0%,
+          var(--neon-cyan) 50%,
+          var(--neon-purple) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: fadeInDown 0.6s 0.1s ease both;
+      }
+      .hero-subtitle {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        max-width: 600px;
+        margin: 0 auto 2.5rem;
+        animation: fadeInDown 0.6s 0.2s ease both;
+      }
+      .hero-meta {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.875rem;
+        animation: fadeInUp 0.6s 0.3s ease both;
+      }
+      .hero-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+      }
+      .hero-meta-item .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--neon-green);
+        animation: glowPulse 2s ease infinite;
+      }
+
+      /* TOC Grid */
+      .toc-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 0.875rem;
+        margin: 2rem 0;
+      }
+      .toc-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.125rem;
+        text-decoration: none;
+        color: var(--text-primary);
+        transition: var(--transition);
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+      .toc-card:hover {
+        border-color: var(--neon-green);
+        background: var(--bg-card-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 32px rgba(0, 255, 136, 0.1);
+      }
+      .toc-num {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: var(--neon-green);
+        background: rgba(0, 255, 136, 0.1);
+        border: 1px solid rgba(0, 255, 136, 0.3);
+        padding: 0.2rem 0.45rem;
+        border-radius: 4px;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+      .toc-text {
+        font-size: 0.9rem;
+        font-weight: 500;
+        line-height: 1.4;
+      }
+
+      /* Arch Layers */
+      .arch-layers {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin: 1.5rem 0;
+      }
+      .arch-layer {
+        background: var(--bg-card);
+        border-left: 4px solid var(--layer-color, var(--neon-green));
+        border-radius: 0 var(--radius) var(--radius) 0;
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: var(--transition);
+        cursor: default;
+      }
+      .arch-layer:hover {
+        background: var(--bg-card-hover);
+        transform: translateX(5px);
+      }
+      .arch-layer-label {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--layer-color, var(--neon-green));
+        min-width: 150px;
+        flex-shrink: 0;
+      }
+      .arch-layer-desc {
+        font-size: 0.9375rem;
+        color: var(--text-secondary);
+      }
+
+      /* Pyramid */
+      .pyramid {
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: center;
+        gap: 3px;
+        margin: 2rem auto;
+        max-width: 500px;
+      }
+      .pyramid-layer {
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-mono);
+        font-size: 0.8125rem;
+        font-weight: 700;
+        color: var(--bg-deep);
+        border-radius: 4px;
+        width: var(--pyr-width, 100%);
+        background: var(--pyr-color, var(--neon-green));
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+        cursor: default;
+        text-align: center;
+        padding: 0 1rem;
+      }
+      .pyramid-layer:hover {
+        transform: scaleY(1.1);
+        box-shadow: 0 0 24px rgba(0, 255, 136, 0.4);
+      }
+
+      /* Code Blocks */
+      .code-block-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #161b22;
+        border: 1px solid var(--border);
+        border-bottom: none;
+        border-radius: var(--radius) var(--radius) 0 0;
+        padding: 0.6rem 1.25rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+      }
+      .code-block-header + .code-block {
+        border-radius: 0 0 var(--radius) var(--radius);
+        margin-top: 0;
+      }
+      .code-dots {
+        display: flex;
+        gap: 6px;
+      }
+      .code-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+      }
+      .code-dot-red {
+        background: #ff5f57;
+      }
+      .code-dot-amber {
+        background: #ffbd2e;
+      }
+      .code-dot-green {
+        background: #28ca42;
+      }
+      .code-lang {
+        color: var(--neon-cyan);
+        font-weight: 700;
+      }
+      .code-block {
+        background: #0d1117;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.25rem 1.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.875rem;
+        line-height: 1.7;
+        overflow-x: auto;
+        margin: 1.25rem 0;
+        white-space: pre;
+      }
+      .code-green {
+        color: var(--neon-green);
+      }
+      .code-cyan {
+        color: var(--neon-cyan);
+      }
+      .code-purple {
+        color: var(--neon-purple);
+      }
+      .code-amber {
+        color: var(--neon-amber);
+      }
+      .code-red {
+        color: var(--neon-red);
+      }
+      .code-blue {
+        color: var(--neon-blue);
+      }
+      .code-keyword {
+        color: #ff79c6;
+      }
+      .code-comment {
+        color: #6272a4;
+        font-style: italic;
+      }
+      .code-string {
+        color: #f1fa8c;
+      }
+      .code-num {
+        color: var(--neon-cyan);
+      }
+
+      /* Step List */
+      .step-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .step-item {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+      .step-num {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(0, 255, 136, 0.1);
+        border: 2px solid var(--neon-green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-mono);
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: var(--neon-green);
+        flex-shrink: 0;
+      }
+      .step-content {
+        flex: 1;
+        padding-top: 0.4rem;
+      }
+      .step-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+      }
+      .step-desc {
+        font-size: 0.9375rem;
+        color: var(--text-secondary);
+        margin: 0;
+      }
+
+      /* Callout */
+      .callout {
+        border-radius: var(--radius);
+        padding: 1.25rem 1.5rem;
+        margin: 1.5rem 0;
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+      .callout-info {
+        background: rgba(0, 212, 255, 0.07);
+        border: 1px solid rgba(0, 212, 255, 0.25);
+      }
+      .callout-warning {
+        background: rgba(255, 184, 108, 0.07);
+        border: 1px solid rgba(255, 184, 108, 0.25);
+      }
+      .callout-danger {
+        background: rgba(255, 85, 85, 0.07);
+        border: 1px solid rgba(255, 85, 85, 0.25);
+      }
+      .callout-icon {
+        font-size: 1.2rem;
+        flex-shrink: 0;
+        margin-top: 0.1rem;
+      }
+      .callout-body {
+        flex: 1;
+      }
+      .callout-title {
+        font-weight: 700;
+        font-size: 0.9375rem;
+        margin-bottom: 0.375rem;
+      }
+      .callout-info .callout-title {
+        color: var(--neon-cyan);
+      }
+      .callout-warning .callout-title {
+        color: var(--neon-amber);
+      }
+      .callout-danger .callout-title {
+        color: var(--neon-red);
+      }
+      .callout p {
+        margin: 0;
+        font-size: 0.9375rem;
+        color: var(--text-secondary);
+      }
+
+      /* Metric Grid */
+      .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .metric-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.25rem;
+        text-align: center;
+        transition: var(--transition);
+        cursor: default;
+      }
+      .metric-card:hover {
+        border-color: var(--neon-green);
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(0, 255, 136, 0.15);
+      }
+      .metric-value {
+        font-family: var(--font-display);
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--neon-green);
+        display: block;
+        margin-bottom: 0.25rem;
+      }
+      .metric-label {
+        font-size: 0.8125rem;
+        color: var(--text-secondary);
+        line-height: 1.4;
+      }
+
+      /* Progress */
+      .progress-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .progress-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.375rem;
+      }
+      .progress-header {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.875rem;
+      }
+      .progress-label {
+        color: var(--text-primary);
+        font-weight: 500;
+      }
+      .progress-value {
+        color: var(--neon-green);
+        font-family: var(--font-mono);
+      }
+      .progress-track {
+        height: 8px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .progress-bar {
+        height: 100%;
+        border-radius: 4px;
+        background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan));
+        animation: growBar 1.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+        animation-delay: var(--delay, 0s);
+        width: var(--bar-width, 0%);
+      }
+
+      /* Table Wrap */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 1.5rem 0;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        scrollbar-width: thin;
+        scrollbar-color: var(--neon-green) transparent;
+      }
+      .table-wrap::-webkit-scrollbar {
+        height: 5px;
+      }
+      .table-wrap::-webkit-scrollbar-thumb {
+        background: var(--neon-green);
+        border-radius: 2px;
+      }
+      .table-wrap table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .table-wrap th {
+        background: rgba(0, 255, 136, 0.06);
+        color: var(--neon-green);
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-align: left;
+        padding: 0.875rem 1.25rem;
+        border-bottom: 1px solid var(--border);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+      .table-wrap td {
+        padding: 0.875rem 1.25rem;
+        border-bottom: 1px solid rgba(33, 38, 45, 0.5);
+        font-size: 0.9375rem;
+        color: var(--text-primary);
+      }
+      .table-wrap tr:last-child td {
+        border-bottom: none;
+      }
+      .table-wrap tbody tr {
+        transition: background 0.15s ease;
+      }
+      .table-wrap tbody tr:hover td {
+        background: rgba(0, 255, 136, 0.04);
+      }
+
+      /* Exam Grid */
+      .exam-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .exam-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        transition: var(--transition);
+        cursor: default;
+      }
+      .exam-card:hover {
+        border-color: var(--neon-purple);
+        box-shadow: 0 8px 32px rgba(189, 147, 249, 0.1);
+        transform: translateY(-2px);
+      }
+      .exam-card-title {
+        font-family: var(--font-display);
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+      }
+      .exam-stars {
+        color: var(--neon-amber);
+        font-size: 0.875rem;
+        margin-bottom: 0.75rem;
+      }
+      .exam-desc {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+      }
+
+      /* Ref Grid */
+      .ref-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+        margin: 2rem 0;
+      }
+      .ref-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.25rem 1.25rem 1.25rem 1.5rem;
+        text-decoration: none;
+        color: var(--text-primary);
+        transition: var(--transition);
+        display: block;
+        overflow: hidden;
+        position: relative;
+      }
+      .ref-card::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: var(--ref-color, var(--neon-cyan));
+      }
+      .ref-card:hover {
+        transform: translateX(4px);
+        background: var(--bg-card-hover);
+        border-color: var(--ref-color, var(--neon-cyan));
+      }
+      .ref-category {
+        font-family: var(--font-mono);
+        font-size: 0.67rem;
+        font-weight: 700;
+        color: var(--ref-color, var(--neon-cyan));
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 0.35rem;
+      }
+      .ref-title {
+        font-size: 0.9375rem;
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+        color: var(--text-primary);
+      }
+      .ref-url {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+        word-break: break-all;
+      }
+
+      /* Trend Cards */
+      .trend-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .trend-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        position: relative;
+        transition: var(--transition);
+        overflow: hidden;
+        cursor: default;
+      }
+      .trend-card::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 80% 20%, rgba(0, 212, 255, 0.06), transparent 60%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+      }
+      .trend-card:hover::after {
+        opacity: 1;
+      }
+      .trend-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+        border-color: var(--trend-color, var(--neon-cyan));
+      }
+      .trend-icon {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+        display: block;
+      }
+      .trend-card-title {
+        font-family: var(--font-display);
+        font-size: 1.0625rem;
+        font-weight: 700;
+        color: var(--trend-color, var(--neon-cyan));
+        margin-bottom: 0.5rem;
+      }
+      .trend-card-desc {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+      }
+
+      /* Alert */
+      .alert {
+        padding: 1rem 1.25rem;
+        border-radius: var(--radius);
+        border-left: 4px solid;
+        margin: 1.25rem 0;
+        font-size: 0.9375rem;
+      }
+      .alert-green {
+        border-color: var(--neon-green);
+        background: rgba(0, 255, 136, 0.06);
+        color: #a3ffcf;
+      }
+      .alert-amber {
+        border-color: var(--neon-amber);
+        background: rgba(255, 184, 108, 0.06);
+        color: #ffd6a5;
+      }
+      .alert-red {
+        border-color: var(--neon-red);
+        background: rgba(255, 85, 85, 0.06);
+        color: #ffadad;
+      }
+      .alert-cyan {
+        border-color: var(--neon-cyan);
+        background: rgba(0, 212, 255, 0.06);
+        color: #a8dadc;
+      }
+
+      /* Compare */
+      .compare-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .compare-card {
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+      .compare-header {
+        padding: 0.625rem 1rem;
+        font-family: var(--font-mono);
+        font-size: 0.8125rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .compare-good .compare-header {
+        background: rgba(0, 255, 136, 0.12);
+        color: var(--neon-green);
+        border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+      }
+      .compare-bad .compare-header {
+        background: rgba(255, 85, 85, 0.12);
+        color: var(--neon-red);
+        border-bottom: 1px solid rgba(255, 85, 85, 0.2);
+      }
+      .compare-good {
+        border: 1px solid rgba(0, 255, 136, 0.2);
+      }
+      .compare-bad {
+        border: 1px solid rgba(255, 85, 85, 0.2);
+      }
+      .compare-good .code-block,
+      .compare-bad .code-block {
+        border: none;
+        border-radius: 0;
+        margin: 0;
+      }
+
+      /* Mermaid */
+      .mermaid-wrap {
+        margin: 1.5rem 0;
+        padding: 1.5rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        overflow-x: auto;
+      }
+      .mermaid {
+        display: flex;
+        justify-content: center;
+      }
+
+      /* Tags */
+      .tag {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        padding: 0.18rem 0.5rem;
+        border-radius: 4px;
+        background: rgba(0, 255, 136, 0.1);
+        color: var(--neon-green);
+        border: 1px solid rgba(0, 255, 136, 0.2);
+        margin: 0.1rem;
+      }
+      .tag-cyan {
+        background: rgba(0, 212, 255, 0.1);
+        color: var(--neon-cyan);
+        border-color: rgba(0, 212, 255, 0.2);
+      }
+      .tag-purple {
+        background: rgba(189, 147, 249, 0.1);
+        color: var(--neon-purple);
+        border-color: rgba(189, 147, 249, 0.2);
+      }
+      .tag-amber {
+        background: rgba(255, 184, 108, 0.1);
+        color: var(--neon-amber);
+        border-color: rgba(255, 184, 108, 0.2);
+      }
+      .tag-red {
+        background: rgba(255, 85, 85, 0.1);
+        color: var(--neon-red);
+        border-color: rgba(255, 85, 85, 0.2);
+      }
+
+      /* Utilities */
+      .divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--border), transparent);
+        margin: 2.5rem 0;
+      }
+      .text-mono {
+        font-family: var(--font-mono);
+      }
+      .text-green {
+        color: var(--neon-green);
+      }
+      .text-cyan {
+        color: var(--neon-cyan);
+      }
+      .text-purple {
+        color: var(--neon-purple);
+      }
+      .text-amber {
+        color: var(--neon-amber);
+      }
+      .text-red {
+        color: var(--neon-red);
+      }
+      .text-muted {
+        color: var(--text-secondary);
+      }
+      ul.ul-styled {
+        list-style: none;
+        padding: 0;
+        margin: 1rem 0;
+      }
+      ul.ul-styled li {
+        padding: 0.35rem 0 0.35rem 1.5rem;
+        position: relative;
+        color: var(--text-primary);
+        font-size: 0.9375rem;
+      }
+      ul.ul-styled li::before {
+        content: '▸';
+        position: absolute;
+        left: 0;
+        color: var(--neon-green);
+      }
+
+      footer {
+        padding: 3rem 0;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        border-top: 1px solid var(--border);
+      }
+
+      /* Responsive */
+      @media (max-width: 900px) {
+        .compare-grid {
+          grid-template-columns: 1fr;
+        }
+        .toc-grid {
+          grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+        }
+        .metric-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .ref-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 600px) {
+        .container {
+          padding: 0 1rem;
+        }
+        .chapter-section {
+          padding: 3rem 0 2rem;
+        }
+        .hero {
+          padding: 3.5rem 0 2.5rem;
+        }
+        .metric-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .exam-grid,
+        .trend-grid {
+          grid-template-columns: 1fr;
+        }
+        .arch-layer-label {
+          min-width: 100px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ==================== NAVIGATION ==================== -->
+    <nav class="sticky-nav">
+      <div class="nav-inner">
+        <a class="nav-logo" href="#top">⬡ SQ GUIDE</a>
+        <a class="nav-link" href="#toc">目次</a>
+        <a class="nav-link" href="#ch1">Ch.1 概要</a>
+        <a class="nav-link" href="#ch2">Ch.2 コアコンセプト</a>
+        <a class="nav-link" href="#ch3">Ch.3 スキャナー設定</a>
+        <a class="nav-link" href="#ch4">Ch.4 CI/CD 統合</a>
+        <a class="nav-link" href="#ch5">Ch.5 PR 解析</a>
+        <a class="nav-link" href="#ch6">Ch.6 Quality Gates</a>
+        <a class="nav-link" href="#ch7">Ch.7 プロファイル&amp;ルール</a>
+        <a class="nav-link" href="#ch8">Ch.8 セキュリティ</a>
+        <a class="nav-link" href="#ch9">Ch.9 AI 統合</a>
+        <a class="nav-link" href="#ch10">Ch.10 Web API</a>
+        <a class="nav-link" href="#ch11">Ch.11 ベストプラクティス</a>
+        <a class="nav-link" href="#refs">参考文献</a>
+      </div>
+    </nav>
+
+    <main id="top">
+      <!-- ==================== HERO ==================== -->
+      <section class="hero">
+        <div class="hero-bg-glow"></div>
+        <div class="container">
+          <div class="hero-badge">SonarQube Server 2026.2 / Cloud 対応 | 2026年6月 更新</div>
+          <h1 class="hero-title">SonarQube<br />Code Review 実践ガイド</h1>
+          <p class="hero-subtitle">
+            中級者〜上級者のための、Static Analysis を核とした品質エンジニアリング完全解説。Clean as
+            You Code から AI エージェント統合まで。
+          </p>
+          <div class="hero-meta">
+            <div class="hero-meta-item"><span class="dot"></span> 11 Chapters</div>
+            <div class="hero-meta-item"><span class="dot"></span> K-Level K1〜K6</div>
+            <div class="hero-meta-item">
+              <span class="dot"></span> 一次情報源: docs.sonarsource.com
+            </div>
+            <div class="hero-meta-item"><span class="dot"></span> 対象: 中〜上級エンジニア</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TOC ==================== -->
+      <section id="toc" class="chapter-section">
+        <div class="container">
+          <div class="chapter-header">
+            <span class="chapter-num">TOC</span>
+            <h2 class="chapter-title">目次</h2>
+          </div>
+          <div class="toc-grid">
+            <a class="toc-card" href="#ch1"
+              ><span class="toc-num">01</span
+              ><span class="toc-text">SonarQube の全体像とアーキテクチャ</span></a
+            >
+            <a class="toc-card" href="#ch2"
+              ><span class="toc-num">02</span
+              ><span class="toc-text">コアコンセプト：CaYC / MQR / Gate</span></a
+            >
+            <a class="toc-card" href="#ch3"
+              ><span class="toc-num">03</span
+              ><span class="toc-text">プロジェクト設定とスキャナー構成</span></a
+            >
+            <a class="toc-card" href="#ch4"
+              ><span class="toc-num">04</span
+              ><span class="toc-text">CI/CD パイプラインへの統合</span></a
+            >
+            <a class="toc-card" href="#ch5"
+              ><span class="toc-num">05</span
+              ><span class="toc-text">Pull Request 解析とデコレーション</span></a
+            >
+            <a class="toc-card" href="#ch6"
+              ><span class="toc-num">06</span
+              ><span class="toc-text">Quality Gates の高度な設計</span></a
+            >
+            <a class="toc-card" href="#ch7"
+              ><span class="toc-num">07</span
+              ><span class="toc-text">Quality Profiles とカスタムルール</span></a
+            >
+            <a class="toc-card" href="#ch8"
+              ><span class="toc-num">08</span
+              ><span class="toc-text">セキュリティ解析の徹底活用</span></a
+            >
+            <a class="toc-card" href="#ch9"
+              ><span class="toc-num">09</span
+              ><span class="toc-text">AI エージェント統合（2026最新）</span></a
+            >
+            <a class="toc-card" href="#ch10"
+              ><span class="toc-num">10</span><span class="toc-text">Web API による自動化</span></a
+            >
+            <a class="toc-card" href="#ch11"
+              ><span class="toc-num">11</span
+              ><span class="toc-text">運用ベストプラクティス</span></a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== CHAPTER 1 ==================== -->
+      <section id="ch1" class="chapter-section">
+        <div class="container">
+          <div class="chapter-header">
+            <span class="chapter-num">CH 01</span>
+            <span class="k-level">K-Level: K1–K2</span>
+            <h2 class="chapter-title">SonarQube の全体像とアーキテクチャ</h2>
+          </div>
+
+          <h3 class="section-title">1.1 定義：SonarQube とは何か</h3>
+          <p>
+            <strong>SonarQube</strong> は、静的解析（Static
+            Analysis）によってソースコードの品質・セキュリティ・保守性を自動的に評価する
+            <em>継続的インスペクション（Continuous Inspection）</em>
+            プラットフォームである。コードを実行せず、ソースコードを直接解析することで、バグ・脆弱性・コードスメルを早期に検出する。
+          </p>
+
+          <div class="metric-grid">
+            <div class="metric-card">
+              <span class="metric-value">75%</span
+              ><span class="metric-label">Fortune 100 企業の採用率</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-value">750B+</span
+              ><span class="metric-label">毎日解析されるコード行数</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-value">30+</span
+              ><span class="metric-label">対応プログラミング言語数</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-value">6,000+</span
+              ><span class="metric-label">組み込みルール数</span>
+            </div>
+          </div>
+
+          <h3 class="section-title">1.2 理由：なぜ SonarQube が必要か</h3>
+          <p>
+            従来のコードレビューは人間のレビュアーに依存し、一貫性・速度・網羅性に限界がある。SonarQube
+            は以下の課題を解決する：
+          </p>
+          <div class="arch-layers">
+            <div class="arch-layer" style="--layer-color: var(--neon-red)">
+              <span class="arch-layer-label">人的レビューの限界</span
+              ><span class="arch-layer-desc"
+                >見落とし・疲労・属人化 → SonarQube で自動化・標準化</span
+              >
+            </div>
+            <div class="arch-layer" style="--layer-color: var(--neon-amber)">
+              <span class="arch-layer-label">技術的負債の蓄積</span
+              ><span class="arch-layer-desc">Clean as You Code で新規コードの品質を常に維持</span>
+            </div>
+            <div class="arch-layer" style="--layer-color: var(--neon-cyan)">
+              <span class="arch-layer-label">セキュリティリスク</span
+              ><span class="arch-layer-desc"
+                >OWASP/CWE対応の Taint Analysis で脆弱性を早期検出</span
+              >
+            </div>
+            <div class="arch-layer" style="--layer-color: var(--neon-green)">
+              <span class="arch-layer-label">CI/CDとの断絶</span
+              ><span class="arch-layer-desc">Quality Gate でパイプラインを自動ブロック・制御</span>
+            </div>
+          </div>
+
+          <h3 class="section-title">1.3 アーキテクチャ概要</h3>
+          <div class="mermaid-wrap">
+<div class="mermaid">
+flowchart TD
+DEV["Developer (IDE / ローカル)"] -->|コードプッシュ| SCM["SCM (GitHub / GitLab / Bitbucket)"]
+SCM -->|Webhook / Trigger| CI["CI Pipeline (GitHub Actions / Jenkins / GitLab CI)"]
+CI -->|SonarScanner 実行| SCAN["SonarScanner (ソース静的解析)"]
+SCAN -->|解析レポート送信| SQ["SonarQube Server / SonarQube Cloud"]
+SQ -->|Quality Gate 判定| QG{"Quality Gate (Passed / Failed)"}
+QG -->|通過| MERGE["PR Merge 許可 / Deployment 続行"]
+QG -->|失敗| BLOCK["Pipeline 停止 / PR Merge ブロック"]
+SQ -->|PR Decoration| SCM
+SQ -->|Issue 通知| DEV
+IDE["SonarQube for IDE (VS Code / IntelliJ 等)"] -->|リアルタイム解析| DEV
+</div>
+          </div>
+
+          <h3 class="section-title">1.4 エディション比較</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>機能</th>
+                  <th>Community Build</th>
+                  <th>Developer Ed.</th>
+                  <th>Enterprise Ed.</th>
+                  <th>Data Center Ed.</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>メインブランチ解析</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                </tr>
+                <tr>
+                  <td>マルチブランチ解析</td>
+                  <td>❌</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                </tr>
+                <tr>
+                  <td>PR 解析 &amp; デコレーション</td>
+                  <td>❌</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                </tr>
+                <tr>
+                  <td>Portfolio / Application</td>
+                  <td>❌</td>
+                  <td>❌</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                </tr>
+                <tr>
+                  <td>Security Reports (OWASP等)</td>
+                  <td>❌</td>
+                  <td>❌</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                </tr>
+                <tr>
+                  <td>高可用性クラスタ (HA)</td>
+                  <td>❌</td>
+                  <td>❌</td>
+                  <td>❌</td>
+                  <td>✅</td>
+                </tr>
+                <tr>
+                  <td>Remediation Agent (Beta)</td>
+                  <td>❌</td>
+                  <td>❌</td>
+                  <td>✅ Cloud</td>
+                  <td>✅ Cloud</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="alert alert-cyan">
+            💡 <strong>Cloud vs Server：</strong> SonarQube Cloud は
+            SaaS型でインフラ管理不要。Server
+            は自社インフラへのオンプレミス／コンテナ展開型。機能セットはほぼ同等だが、Cloud
+            の最新機能（AI機能等）が先行する場合がある。
+          </div>
+
+          <h3 class="section-title">1.5 参考 URL（Chapter 1）</h3>
+          <div class="ref-grid">
+            <a
+              class="ref-card"
+              href="https://docs.sonarsource.com/"
+              target="_blank"
+              style="--ref-color: var(--neon-green)"
+              ><div class="ref-category">🏠 公式ポータル</div>
+              <div class="ref-title">SonarQube 公式ドキュメント入口</div>
+              <div class="ref-url">https://docs.sonarsource.com/</div></a
+            >
+            <a
+              class="ref-card"
+              href="https://docs.sonarsource.com/sonarqube-server/analyzing-source-code/analysis-overview"
+              target="_blank"
+              style="--ref-color: var(--neon-cyan)"
+              ><div class="ref-category">📚 Server Docs</div>
+              <div class="ref-title">SonarQube Server 解析概要</div>
+              <div class="ref-url">
+                docs.sonarsource.com/sonarqube-server/analyzing-source-code/analysis-overview
+              </div></a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== CHAPTER 2 ==================== -->
+      <section id="ch2" class="chapter-section">
+        <div class="container">
+          <div class="chapter-header">
+            <span class="chapter-num">CH 02</span>
+            <span class="k-level">K-Level: K2–K3</span>
+            <h2 class="chapter-title">コアコンセプト：CaYC / MQR / Quality Gate</h2>
+          </div>
+
+          <h3 class="section-title">2.1 Clean as You Code（CaYC）</h3>
+          <p>
+            <strong>定義：</strong> 既存のレガシーコード全体を一度に修正しようとせず、<em
+              >新規コード（New Code）に常に高い品質基準を課す</em
+            >戦略。開発者は自分が追加・変更したコードのみに責任を持つ。
+          </p>
+          <p>
+            <strong>理由：</strong>
+            技術的負債を段階的に解消しつつ、今日書くコードを常にクリーンに保つことで、時間をかけてコードベース全体の品質が向上する。
+          </p>
+
+          <div class="mermaid-wrap">
+<div class="mermaid">
+flowchart LR
+subgraph DEF["New Code の定義オプション"]
+A["直近 N 日間のコード変更"]
+B["特定ブランチとの差分"]
+C["前回バージョン以降の変更"]
+end
+subgraph GATE["Sonar way Quality Gate の条件"]
+D["新規 Issue: 0件"]
+E["新規脆弱性: 0件"]
+F["Hotspot 全件レビュー済み: 100%"]
+G["カバレッジ 80%以上"]
+H["重複率 3%以下"]
+end
+A & B & C --> D & E & F & G & H
+</div>
+          </div>
+
+          <h3 class="section-title">2.2 インスタンスモード：Standard vs MQR</h3>
+          <p>
+            <strong>定義：</strong> SonarQube Server 2026 では2つのモードが存在する。Standard
+            Experience はバグ・脆弱性・Code Smell という従来分類。MQR（Multi-Quality
+            Rule）モードはルールを
+            <em>セキュリティ・信頼性・保守性</em>
+            という品質特性の軸で評価し、1つのルールが複数の品質特性に影響するケースを正確に表現できる。
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>観点</th>
+                  <th>Standard Experience</th>
+                  <th>MQR Mode（推奨）</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>ルール分類</td>
+                  <td>Bug / Vulnerability / Code Smell</td>
+                  <td>Security / Reliability / Maintainability</td>
+                </tr>
+                <tr>
+                  <td>Severity 段階</td>
+                  <td>Blocker, Critical, Major, Minor, Info</td>
+                  <td>Blocker, High, Medium, Low, Info</td>
+                </tr>
+                <tr>
+                  <td>1ルールの影響</td>
+                  <td>単一カテゴリに1 severity</td>
+                  <td>複数品質特性に別々の severity を付与</td>
+                </tr>
+                <tr>
+                  <td>移行</td>
+                  <td>Administration → General Settings → Mode</td>
+                  <td>同左（admin 権限必要）</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="alert alert-amber">
+            ⚠️ MQR モードへの切り替え後、1つの Issue が複数品質特性に紐付くため Issue
+            数が増加することがある。カスタム Quality Gate の条件も更新が必要。
+          </div>
+
+          <h3 class="section-title">2.3 主要メトリクス定義</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>メトリクス</th>
+                  <th>定義</th>
+                  <th>良好値の目安</th>
+                  <th>モード</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Coverage</td>
+                  <td>テストが実行するコード行の割合</td>
+                  <td>新規コード ≥ 80%</td>
+                  <td>両モード</td>
+                </tr>
+                <tr>
+                  <td>Duplications</td>
+                  <td>重複コードブロックの割合</td>
+                  <td>新規コード ≤ 3%</td>
+                  <td>両モード</td>
+                </tr>
+                <tr>
+                  <td>Reliability Rating</td>
+                  <td>バグの深刻度に基づく A〜E 評価</td>
+                  <td>A（バグなし）</td>
+                  <td>Standard</td>
+                </tr>
+                <tr>
+                  <td>Security Rating</td>
+                  <td>脆弱性の深刻度に基づく A〜E 評価</td>
+                  <td>A（脆弱性なし）</td>
+                  <td>Standard</td>
+                </tr>
+                <tr>
+                  <td>Maintainability Rating</td>
+                  <td>Code Smell 修正工数率に基づく A〜E</td>
+                  <td>A（≤ 5%）</td>
+                  <td>Standard</td>
+                </tr>
+                <tr>
+                  <td>Software Quality Severity</td>
+                  <td>各品質特性への影響深刻度</td>
+                  <td>Blocker/High: 0件</td>
+                  <td>MQR</td>
+                </tr>
+                <tr>
+                  <td>SQALE Index</td>
+                  <td>技術的負債の推定修正工数</td>
+                  <td>プロジェクト規模による</td>
+                  <td>両モード</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 class="section-title">2.4 Issue 深刻度のピラミッド</h3>
+          <div class="pyramid">
+            <div class="pyramid-layer" style="--pyr-width: 100%; --pyr-color: var(--neon-green)">
+              Info — 参考情報（要対応なし）
+            </div>
+            <div class="pyramid-layer" style="--pyr-width: 82%; --pyr-color: var(--neon-cyan)">
+              Minor — 小規模なスタイル問題
+            </div>
+            <div class="pyramid-layer" style="--pyr-width: 64%; --pyr-color: var(--neon-amber)">
+              Major — 保守性・品質に影響
+            </div>
+            <div class="pyramid-layer" style="--pyr-width:46%;--pyr-color:#e07000)">
+              Critical — バグ・セキュリティリスク
+            </div>
+            <div class="pyramid-layer" style="--pyr-width: 28%; --pyr-color: var(--neon-red)">
+              Blocker — 即時修正必須
+            </div>
+          </div>
+
+          <h3 class="section-title">2.5 参考 URL（Chapter 2）</h3>
+          <div class="ref-grid">
+            <a
+              class="ref-card"
+              href="https://docs.sonarsource.com/sonarqube-server/user-guide/about-new-code"
+              target="_blank"
+              style="--ref-color: var(--neon-green)"
+              ><div class="ref-category">📖 Clean as You Code</div>
+              <div class="ref-title">New Code の定義と CaYC アプローチ</div>
+              <div class="ref-url">
+                docs.sonarsource.com/sonarqube-server/user-guide/about-new-code
+              </div></a
+            >
+            <a
+              class="ref-card"
+              href="https://docs.sonarsource.com/sonarqube-server/user-guide/code-metrics/changing-modes"
+              target="_blank"
+              style="--ref-color: var(--neon-cyan)"
+              ><div class="ref-category">⚙️ MQR Mode</div>
+              <div class="ref-title">インスタンスモードの変更方法</div>
+              <div class="ref-url">
+                docs.sonarsource.com/sonarqube-server/user-guide/code-metrics/changing-modes
+              </div></a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== CHAPTER 3 ==================== -->
+      <section id="ch3" class="chapter-section">
+        <div class="container">
+          <div class="chapter-header">
+            <span class="chapter-num">CH 03</span>
+            <span class="k-level">K-Level: K3</span>
+            <h2 class="chapter-title">プロジェクト設定とスキャナー構成</h2>
+          </div>
+
+          <h3 class="section-title">3.1 スキャナー選択フロー</h3>
+          <div class="mermaid-wrap">
+<div class="mermaid">
+flowchart TD
+START([プロジェクト種別は?]) --> Q1{Maven プロジェクト?}
+Q1 -->|Yes| MAVEN["sonar-maven-plugin (mvn sonar:sonar)"]
+Q1 -->|No| Q2{Gradle プロジェクト?}
+Q2 -->|Yes| GRADLE["sonar-gradle-plugin (./gradlew sonar)"]
+Q2 -->|No| Q3{NET プロジェクト?}
+Q3 -->|Yes| MSBUILD["SonarScanner for .NET (dotnet-sonarscanner)"]
+Q3 -->|No| Q4{Node / Python / Go 等?}
+Q4 -->|Yes| CLI["SonarScanner CLI (汎用スキャナー)"]
+Q4 -->|No| Q5{外部ツール結果のみインポート?}
+Q5 -->|Yes| GENERIC["Generic Issue Format (JSONレポートをインポート)"]
+Q5 -->|No| CLI
+</div>
+          </div>
+
+          <h3 class="section-title">3.2 sonar-project.properties の詳細設定</h3>
+          <p>
+            <strong>定義：</strong>
+            プロジェクトルートに配置する設定ファイル。スキャナーの動作をコードとして管理できる（Infrastructure
+            as Code 的アプローチ）。
+          </p>
+
+          <div class="code-block-header">
+            <div class="code-dots">
+              <div class="code-dot code-dot-red"></div>
+              <div class="code-dot code-dot-amber"></div>
+              <div class="code-dot code-dot-green"></div>
+            </div>
+            <span class="code-lang">PROPERTIES — sonar-project.properties</span>
+          </div>
+          <pre
+            class="code-block"
+          ><code><span class="code-comment"># ===== プロジェクト識別子 =====</span>
+<span class="code-green">sonar.projectKey</span>=<span class="code-string">com.example:my-service</span>
+<span class="code-green">sonar.projectName</span>=<span class="code-string">My Service</span>
+<span class="code-green">sonar.projectVersion</span>=<span class="code-string">1.0.0</span>
+
+<span class="code-comment"># ===== ソース設定 =====</span>
+<span class="code-green">sonar.sources</span>=<span class="code-string">src/main</span>
+<span class="code-green">sonar.tests</span>=<span class="code-string">src/test</span>
+<span class="code-green">sonar.sourceEncoding</span>=<span class="code-string">UTF-8</span>
+
+<span class="code-comment"># ===== Java 固有設定 =====</span>
+<span class="code-green">sonar.java.binaries</span>=<span class="code-string">target/classes</span>
+<span class="code-green">sonar.java.libraries</span>=<span class="code-string">target/dependency/*.jar</span>
+<span class="code-green">sonar.java.test.binaries</span>=<span class="code-string">target/test-classes</span>
+
+<span class="code-comment"># ===== カバレッジ レポート =====</span>
+<span class="code-green">sonar.coverage.jacoco.xmlReportPaths</span>=<span class="code-string">target/site/jacoco/jacoco.xml</span>
+
+<span class="code-comment"># ===== 解析除外（自動生成・サードパーティ） =====</span>
+<span class="code-green">sonar.exclusions</span>=<span class="code-string">**/generated/**,**/vendor/**,**/*.min.js,**/node_modules/**</span>
+<span class="code-green">sonar.coverage.exclusions</span>=<span class="code-string">**/config/**,**/dto/**,**/entity/**</span>
+<span class="code-green">sonar.test.exclusions</span>=<span class="code-string">**/testdata/**</span>
+
+<span class="code-comment"># ===== New Code 定義（プロジェクトレベル） =====</span>
+<span class="code-comment"># previous_version | NUMBER_OF_DAYS | reference_branch</span>
+<span class="code-green">sonar.newCode.referenceBranch</span>=<span class="code-string">main</span></code></pre>
+
+          <h3 class="section-title">3.3 トークン管理：良い例 vs 悪い例</h3>
+          <div class="compare-grid">
+            <div class="compare-card compare-good">
+              <div class="compare-header">✅ 推奨：環境変数経由</div>
+              <pre
+                class="code-block"
+              ><code><span class="code-comment"># CI シークレットとして設定</span>
+<span class="code-comment"># SONAR_TOKEN=sqp_xxxxx</span>
+
+<span class="code-green">sonar-scanner</span> \
+  <span class="code-cyan">-Dsonar.token</span>=<span class="code-string">"${SONAR_TOKEN}"</span> \
+  <span class="code-cyan">-Dsonar.host.url</span>=<span class="code-string">"${SONAR_HOST_URL}"</span></code></pre>
+            </div>
+            <div class="compare-card compare-bad">
+              <div class="compare-header">❌ NG：ファイルにハードコード</div>
+              <pre
+                class="code-block"
+              ><code><span class="code-comment"># sonar-project.properties に直書き</span>
+<span class="code-comment"># → Git 履歴にトークンが残る！</span>
+
+<span class="code-red">sonar.login</span>=<span class="code-red">sqp_ab12cd34ef56</span>
+<span class="code-red">sonar.host.url</span>=<span class="code-red">https://sonar.example.com</span></code></pre>
+            </div>
+          </div>
+
+          <h3 class="section-title">3.4 トークン種別と最小権限の原則</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>トークン種別</th>
+                  <th>スコープ</th>
+                  <th>推奨用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="tag">User Token</span></td>
+                  <td>ユーザー権限相当</td>
+                  <td>ローカル開発・デバッグ</td>
+                </tr>
+                <tr>
+                  <td><span class="tag tag-cyan">Project Analysis Token</span></td>
+                  <td>単一プロジェクトの解析のみ</td>
+                  <td>✅ CI/CD パイプライン（最小権限）</td>
+                </tr>
+                <tr>
+                  <td><span class="tag tag-amber">Global Analysis Token</span></td>
+                  <td>全プロジェクトの解析</td>
+                  <td>中央集権 CI（使用は最小限に）</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="alert alert-amber">
+            ⚠️ CI/CD では必ず
+            <strong>Project Analysis Token</strong>
+            を使用すること。万が一の漏洩時の影響範囲を最小化できる。
+          </div>
+
+          <h3 class="section-title">3.5 参考 URL（Chapter 3）</h3>
+          <div class="ref-grid">
+            <a
+              class="ref-card"
+              href="https://docs.sonarsource.com/sonarqube-server/extension-guide/adding-coding-rules"
+              target="_blank"
+              style="--ref-color: var(--neon-green)"
+              ><div class="ref-category">⚙️ Configuration</div>
+              <div class="ref-title">SonarScanner 設定リファレンス</div>
+              <div class="ref-url">
+                docs.sonarsource.com/sonarqube-server/extension-guide/adding-coding-rules
+              </div></a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== CHAPTER 4 ==================== -->
+      <section id="ch4" class="chapter-section">
+        <div class="container">
+          <div class="chapter-header">
+            <span class="chapter-num">CH 04</span>
+            <span class="k-level">K-Level: K3–K4</span>
+            <h2 class="chapter-title">CI/CD パイプラインへの統合</h2>
+          </div>
+
+          <h3 class="section-title">4.1 統合パターン概要</h3>
+          <div class="mermaid-wrap">
+<div class="mermaid">
+flowchart LR
+DEV["Developer (コードプッシュ)"] -->|Trigger| CI["CI Pipeline"]
+CI --> BUILD["Build and Test (ユニットテスト + カバレッジ)"]
+BUILD --> SCAN["SonarScanner (解析実行)"]
+SCAN --> SQ["SonarQube (解析処理)"]
+SQ --> QG{"Quality Gate"}
+QG -->|PASSED| DEPLOY["Deploy / Merge 許可"]
+QG -->|FAILED| FAIL["パイプライン失敗 (修正を促す)"]
+SQ -.->|Webhook| NOTIFY["Slack / Teams 通知"]
+</div>
+          </div>
+
+          <h3 class="section-title">4.2 GitHub Actions</h3>
+          <div class="callout callout-info">
+            <div class="callout-icon">ℹ️</div>
+            <div class="callout-body">
+              <p class="callout-title">重要：fetch-depth: 0 は必須</p>
+              <p>
+                浅いクローン（デフォルト fetch-depth: 1）では Git 履歴が不足し、New Code
+                の検出精度が大幅に低下する。必ず fetch-depth: 0 を指定すること。
+              </p>
+            </div>
+          </div>
+
+          <div class="code-block-header">
+            <div class="code-dots">
+              <div class="code-dot code-dot-red"></div>
+              <div class="code-dot code-dot-amber"></div>
+              <div class="code-dot code-dot-green"></div>
+            </div>
+            <span class="code-lang">YAML — .github/workflows/sonarqube.yml</span>
+          </div>
+          <pre
+            class="code-block"
+          ><code><span class="code-green">name</span>: <span class="code-string">SonarQube Analysis</span>
+
+<span class="code-green">on</span>:
+  <span class="code-cyan">push</span>:
+    <span class="code-amber">branches</span>: [main, develop]
+  <span class="code-cyan">pull_request</span>:
+    <span class="code-amber">types</span>: [opened, synchronize, reopened]
+
+<span class="code-green">jobs</span>:
+  <span class="code-cyan">sonarqube</span>:
+    <span class="code-amber">name</span>: SonarQube Scan
+    <span class="code-amber">runs-on</span>: ubuntu-latest
+
+    <span class="code-green">steps</span>:
+      - <span class="code-cyan">name</span>: Checkout repository
+        <span class="code-amber">uses</span>: actions/checkout@v4
+        <span class="code-amber">with</span>:
+          <span class="code-green">fetch-depth</span>: <span class="code-num">0</span>  <span class="code-comment"># ← 完全 Git 履歴（必須！）</span>
+
+      - <span class="code-cyan">name</span>: Set up JDK 21
+        <span class="code-amber">uses</span>: actions/setup-java@v4
+        <span class="code-amber">with</span>:
+          <span class="code-green">java-version</span>: <span class="code-string">'21'</span>
+          <span class="code-green">distribution</span>: <span class="code-string">'temurin'</span>
+          <span class="code-green">cache</span>: <span class="code-string">'maven'</span>
+
+      - <span class="code-cyan">name</span>: Cache SonarQube packages
+        <span class="code-amber">uses</span>: actions/cache@v4
+        <span class="code-amber">with</span>:
+          <span class="code-green">path</span>: ~/.sonar/cache
+          <span class="code-green">key</span>: ${{ runner.os }}-sonar
+          <span class="code-green">restore-keys</span>: ${{ runner.os }}-sonar
+
+      - <span class="code-cyan">name</span>: Build and run tests with coverage
+        <span class="code-amber">run</span>: mvn -B verify -Pcoverage
+
+      - <span class="code-cyan">name</span>: SonarQube Scan
+        <span class="code-amber">uses</span>: SonarSource/sonarqube-scan-action@v5
+        <span class="code-amber">env</span>:
+          <span class="code-green">SONAR_TOKEN</span>: ${{ secrets.SONAR_TOKEN }}
+          <span class="code-green">SONAR_HOST_URL</span>: ${{ secrets.SONAR_HOST_URL }}
+
+      - <span class="code-cyan">name</span>: Quality Gate check
+        <span class="code-amber">id</span>: sonarqube-quality-gate-check
+        <span class="code-amber">uses</span>: SonarSource/sonarqube-quality-gate-action@v1
+        <span class="code-amber">timeout-minutes</span>: <span class="code-num">5</span>
+        <span class="code-amber">env</span>:
+          <span class="code-green">SONAR_TOKEN</span>: ${{ secrets.SONAR_TOKEN }}
+          <span class="code-green">SONAR_HOST_URL</span>: ${{ secrets.SONAR_HOST_URL }}
+
+      - <span class="code-cyan">name</span>: Fail if Quality Gate failed
+        <span class="code-amber">if</span>: steps.sonarqube-quality-gate-check.outputs.quality-gate-status == 'FAILED'
+        <span class="code-amber">run</span>: exit <span class="code-num">1</span></code></pre>
+
+          <h3 class="section-title">4.3 Jenkins Declarative Pipeline</h3>
+          <div class="code-block-header">
+            <div class="code-dots">
+              <div class="code-dot code-dot-red"></div>
+              <div class="code-dot code-dot-amber"></div>
+              <div class="code-dot code-dot-green"></div>
+            </div>
+            <span class="code-lang">GROOVY — Jenkinsfile</span>
+          </div>
+          <pre class="code-block"><code><span class="code-keyword">pipeline</span> {
+    <span class="code-keyword">agent</span> any
+    <span class="code-cyan">environment</span> {
+        <span class="code-green">SONAR_ENV</span> = <span class="code-string">'SonarQube'</span>  <span class="code-comment">// Jenkins 管理画面での名前</span>
+    }
+    <span class="code-cyan">stages</span> {
+        <span class="code-keyword">stage</span>(<span class="code-string">'Build &amp; Test'</span>) {
+            <span class="code-cyan">steps</span> {
+                sh <span class="code-string">'mvn -B clean verify -Pcoverage'</span>
+            }
+        }
+        <span class="code-keyword">stage</span>(<span class="code-string">'SonarQube Analysis'</span>) {
+            <span class="code-cyan">steps</span> {
+                <span class="code-keyword">withSonarQubeEnv</span>(env.SONAR_ENV) {
+                    sh <span class="code-string">'mvn sonar:sonar'</span>
+                }
+            }
+        }
+        <span class="code-keyword">stage</span>(<span class="code-string">'Quality Gate'</span>) {
+            <span class="code-cyan">steps</span> {
+                <span class="code-comment">// Webhook 使用でノンブロッキング待機（推奨）</span>
+                timeout(time: <span class="code-num">5</span>, unit: <span class="code-string">'MINUTES'</span>) {
+                    <span class="code-keyword">waitForQualityGate</span> abortPipeline: <span class="code-cyan">true</span>
+                }
+            }
+        }
+    }
+    <span class="code-cyan">post</span> {
+        <span class="code-keyword">failure</span> {
+            slackSend(color: <span class="code-string">'danger'</span>,
+              message: <span class="code-string">"❌ Quality Gate Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}"</span>)
+        }
+    }
+}</code></pre>
+
+          <div class="callout callout-warning">
+            <div class="callout-icon">⚙️</div>
+            <div class="callout-body">
+              <p class="callout-title">Jenkins Webhook の設定が必須</p>
+              <p>
+                SonarQube 管理画面 → Administration → Configuration → Webhooks で
+                <code>http://&lt;jenkins-host&gt;/sonarqube-webhook/</code> を登録すること。Webhook
+                がないと waitForQualityGate がタイムアウトする。
+              </p>
+            </div>
+          </div>
+
+          <h3 class="section-title">4.4 GitLab CI/CD</h3>
+          <div class="code-block-header">
+            <div class="code-dots">
+              <div class="code-dot code-dot-red"></div>
+              <div class="code-dot code-dot-amber"></div>
+              <div class="code-dot code-dot-green"></div>
+            </div>
+            <span class="code-lang">YAML — .gitlab-ci.yml</span>
+          </div>
+          <pre class="code-block"><code><span class="code-green">variables</span>:
+  <span class="code-cyan">SONAR_USER_HOME</span>: <span class="code-string">"${CI_PROJECT_DIR}/.sonar"</span>
+  <span class="code-cyan">GIT_DEPTH</span>: <span class="code-string">"0"</span>  <span class="code-comment"># 完全 Git 履歴（必須）</span>
+
+<span class="code-green">sonarqube-check</span>:
+  <span class="code-amber">stage</span>: test
+  <span class="code-amber">image</span>:
+    <span class="code-green">name</span>: sonarsource/sonar-scanner-cli:latest
+    <span class="code-green">entrypoint</span>: [<span class="code-string">""</span>]
+  <span class="code-amber">cache</span>:
+    <span class="code-green">key</span>: <span class="code-string">"${CI_JOB_NAME}"</span>
+    <span class="code-green">paths</span>:
+      - .sonar/cache
+  <span class="code-amber">script</span>:
+    - sonar-scanner
+      -Dsonar.qualitygate.wait=<span class="code-cyan">true</span>
+  <span class="code-amber">rules</span>:
+    - <span class="code-cyan">if</span>: $CI_PIPELINE_SOURCE == <span class="code-string">'merge_request_event'</span>
+    - <span class="code-cyan">if</span>: $CI_COMMIT_BRANCH == <span class="code-string">'main'</span></code></pre>
+
+          <h3 class="section-title">4.5 Quality Gate 待機方式の比較</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>方式</th>
+                  <th>利点</th>
+                  <th>欠点</th>
+                  <th>推奨シーン</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>sonar.qualitygate.wait=true</code></td>
+                  <td>設定シンプル、どのCIでも動作</td>
+                  <td>スキャナーがポーリング（時間・CPU消費）</td>
+                  <td>小規模・シンプルな構成</td>
+                </tr>
+                <tr>
+                  <td>Quality Gate Action（GitHub）</td>
+                  <td>非同期・効率的</td>
+                  <td>GitHub Actions 依存</td>
+                  <td>GitHub Actions</td>
+                </tr>
+                <tr>
+                  <td><code>waitForQualityGate</code>（Jenkins）</td>
+                  <td>Webhook 活用で軽量、再起動耐性あり</td>
+                  <td>Webhook 設定が必要</td>
+                  <td>Jenkins</td>
+                </tr>
+                <tr>
+                  <td>外部 API ポーリング（自作）</td>
+                  <td>CI ツール非依存</td>
+                  <td>実装コスト高</td>
+                  <td>独自 CI 基盤</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== CHAPTER 5 ==================== -->
+      <section id="ch5" class="chapter-section">
+        <div class="container">
+          <div class="chapter-header">
+            <span class="chapter-num">CH 05</span>
+            <span class="k-level">K-Level: K3</span>
+            <h2 class="chapter-title">Pull Request 解析とデコレーション</h2>
+          </div>
+
+          <p>
+            <strong>定義：</strong> PR
+            解析は、プルリクエストが開かれた時点、およびプッシュがあるたびに自動実行される。PR
+            ブランチとターゲットブランチを比較し、<em>差分コードに導入された Issue のみ</em>
+            を報告する。Developer Edition 以上で利用可能。
+          </p>
+
+          <h3 class="section-title">5.1 PR 解析シーケンス</h3>
+          <div class="mermaid-wrap">
+<div class="mermaid">
+sequenceDiagram
+participant Dev as Developer
+participant SCM as GitHub or GitLab
+participant CI as CI Pipeline
+participant SS as SonarScanner
+participant SQ as SonarQube
+Dev->>SCM: PR 作成 / コミットプッシュ
+SCM->>CI: Webhook でパイプライン起動
+CI->>CI: Build and テスト実行
+CI->>SS: SonarScanner 起動 (PR パラメータ付き)
+SS->>SQ: 解析レポート送信
+SQ->>SQ: PRブランチ vs targetブランチ差分解析
+Note over SQ: 差分コード of Issue のみ報告
+SQ->>SCM: Quality Gate 結果をデコレーション
+Note over SCM: PR ページにインラインコメント表示
+SQ-->>CI: QG ステータスを返答
+CI->>Dev: パイプライン結果通知
+</div>
+          </div>
+
+          <h3 class="section-title">5.2 PR パラメータの手動設定</h3>
+          <p>
+            多くの CI 環境ではパラメータを自動検出するが、カスタム CI
+            環境では手動設定が必要な場合がある。
+          </p>
+          <div class="code-block-header">
+            <div class="code-dots">
+              <div class="code-dot code-dot-red"></div>
+              <div class="code-dot code-dot-amber"></div>
+              <div class="code-dot code-dot-green"></div>
+            </div>
+            <span class="code-lang">BASH — 手動 PR パラメータ</span>
+          </div>
+          <pre class="code-block"><code>sonar-scanner \
+  <span class="code-cyan">-Dsonar.pullrequest.key</span>=<span class="code-string">${PR_NUMBER}</span> \         <span class="code-comment"># PR の一意識別子</span>
+  <span class="code-cyan">-Dsonar.pullrequest.branch</span>=<span class="code-string">${SOURCE_BRANCH}</span> \  <span class="code-comment"># feature ブランチ名</span>
+  <span class="code-cyan">-Dsonar.pullrequest.base</span>=<span class="code-string">${TARGET_BRANCH}</span> \   <span class="code-comment"># マージ先（main 等）</span>
+  <span class="code-cyan">-Dsonar.pullrequest.provider</span>=<span class="code-string">GitHub</span> \
+  <span class="code-cyan">-Dsonar.pullrequest.github.repository</span>=<span class="code-string">org/repo</span></code></pre>
+
+          <p>
+            <strong>自動検出対応環境：</strong> <span class="tag">GitHub Actions</span>
+            <span class="tag tag-cyan">GitLab CI</span>
+            <span class="tag tag-cyan">Jenkins（Multibranch）</span>
+            <span class="tag tag-purple">CircleCI</span>
+            <span class="tag tag-purple">Azure Pipelines</span>
+            <span class="tag tag-amber">Bitbucket Pipelines</span>
+          </p>
+
+          <h3 class="section-title">5.3 PR 解析の重要な挙動と制約</h3>
+          <div class="step-list">
+            <div class="step-item">
+              <div class="step-num">1</div>
+              <div class="step-content">
+                <div class="step-title">差分コードのみを対象</div>
+                <p class="step-desc">
+                  PR ブランチで追加・編集されたコードの Issue のみ報告。既存コードの Issue
+                  は報告されない（Issue バックデーティングが適用外）。
+                </p>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-num">2</div>
+              <div class="step-content">
+                <div class="step-title">マージ後の新規 Issue の可能性</div>
+                <p class="step-desc">
+                  マージ後の最初のメインブランチ解析で、PR 解析が未検出の旧コード上の Issue
+                  が出現することがある。
+                </p>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-num">3</div>
+              <div class="step-content">
+                <div class="step-title">30日間の自動パージ</div>
+                <p class="step-desc">
+                  PR 解析結果はデフォルト30日間保持。Administration → Housekeeping で変更可能。
+                </p>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-num">4</div>
+              <div class="step-content">
+                <div class="step-title">Issue 属性の同期</div>
+                <p class="step-desc">
+                  Issue のステータス・アサイン・コメントはターゲットブランチの対応 Issue
+                  と同期される。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-green">
+            ✅ PR 解析では
+            <strong>差分コードに絞ることで解析時間を短縮</strong
+            >するために差分インクリメンタル解析機構が採用されている。
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== CHAPTER 6 ==================== -->
+      <section id="ch6" class="chapter-section">
+        <div class="container">
+          <div class="chapter-header">
+            <span class="chapter-num">CH 06</span>
+            <span class="k-level">K-Level: K4</span>
+            <h2 class="chapter-title">Quality Gates の高度な設計</h2>
+          </div>
+
+          <p>
+            <strong>定義：</strong> Quality Gate
+            はコードを一連の条件（Condition）で評価し「プロジェクトはリリース可能か？」という問いに答える。各条件はメトリクスと閾値の組み合わせで構成される。
+          </p>
+
+          <h3 class="section-title">6.1 Quality Gate 評価フロー</h3>
+          <div class="mermaid-wrap">
+<div class="mermaid">
+flowchart TD
+ANALYSIS["解析完了"] --> EVAL["Quality Gate 全条件を評価"]
+EVAL --> C1{"新規 Issue = 0件?"}
+EVAL --> C2{"Security Hotspot 全件レビュー済み?"}
+EVAL --> C3{"カバレッジ >= 閾値%?"}
+EVAL --> C4{"重複率 <= 閾値%?"}
+C1 -->|OK| P1["OK"]
+C1 -->|NG| F1["ERROR"]
+C2 -->|OK| P2["OK"]
+C2 -->|NG| F2["ERROR"]
+C3 -->|OK| P3["OK"]
+C3 -->|NG| F3["ERROR"]
+C4 -->|OK| P4["OK"]
+C4 -->|NG| F4["ERROR"]
+P1 & P2 & P3 & P4 --> PASS["PASSED (デプロイ可能 / PR マージ許可)"]
+F1 --> FAIL["FAILED (パイプライン停止 / マージブロック)"]
+F2 --> FAIL
+F3 --> FAIL
+F4 --> FAIL
+</div>
+          </div>
+
+          <h3 class="section-title">6.2 Sonar way Quality Gate の条件（デフォルト）</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>条件</th>
+                  <th>メトリクス</th>
+                  <th>演算子</th>
+                  <th>閾値</th>
+                  <th>変更可否</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>新規 Issue ゼロ</td>
+                  <td>Issues</td>
+                  <td>is greater than</td>
+                  <td>0</td>
+                  <td>🔒 固定</td>
+                </tr>
+                <tr>
+                  <td>Hotspot 全件レビュー</td>
+                  <td>Security Hotspots Reviewed</td>
+                  <td>is less than</td>
+                  <td>100%</td>
+                  <td>🔒 固定</td>
+                </tr>
+                <tr>
+                  <td>信頼性評価</td>
+                  <td>Reliability Rating</td>
+                  <td>is worse than</td>
+                  <td>A</td>
+                  <td>🔒 固定</td>
+                </tr>
+                <tr>
+                  <td>セキュリティ評価</td>
+                  <td>Security Rating</td>
+                  <td>is worse than</td>
+                  <td>A</td>
+                  <td>🔒 固定</td>
+                </tr>
+                <tr>
+                  <td>テストカバレッジ</td>
+                  <td>Coverage</td>
+                  <td>is less than</td>
+                  <td>80%</td>
+                  <td>✏️ 変更可</td>
+                </tr>
+                <tr>
+                  <td>重複率</td>
+                  <td>Duplicated Lines (%)</td>
+                  <td>is greater than</td>
+                  <td>3%</td>
+                  <td>✏️ 変更可</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 class="section-title">6.3 プロジェクト特性別 Quality Gate 設計</h3>
+          <div class="exam-grid">
+            <div class="exam-card">
+              <div class="exam-card-title">🏭 本番サービス（厳格型）</div>
+              <div class="exam-stars">★★★★★</div>
+              <div class="exam-desc">
+                Coverage ≥ 85%、重複 ≤ 2%、Blocker Issue 0件絶対。セキュリティ評価 A
+                必須。リリース頻度が高く、ダウンタイムのコストが大きいサービス向け。
+              </div>
+            </div>
+            <div class="exam-card">
+              <div class="exam-card-title">🚀 スタートアップ MVP（段階的型）</div>
+              <div class="exam-stars">★★★☆☆</div>
+              <div class="exam-desc">
+                Coverage ≥ 60% から開始し、フェーズごとに締め付け。Blocker のみブロック、Major
+                以下は警告のみ。スピードと品質のバランスを取る。
+              </div>
+            </div>
+            <div class="exam-card">
+              <div class="exam-card-title">🔬 実験的プロジェクト（緩和型）</div>
+              <div class="exam-stars">★★☆☆☆</div>
+              <div class="exam-desc">
+                Hotspot レビューのみ必須。Coverage
+                要件なし。PoC・研究目的のプロジェクトで、品質よりも開発速度を優先するケース。
+              </div>
+            </div>
+          </div>
+
+          <h3 class="section-title">6.4 段階的締め付け戦略（レガシー移行期）</h3>
+          <div class="progress-list">
+            <div class="progress-item">
+              <div class="progress-header">
+                <span class="progress-label">Phase 1（導入期）: Coverage ≥ 50%</span
+                ><span class="progress-value">50%</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-bar" style="--bar-width: 50%; --delay: 0s"></div>
+              </div>
+            </div>
+            <div class="progress-item">
+              <div class="progress-header">
+                <span class="progress-label">Phase 2（安定期）: Coverage ≥ 70%</span
+                ><span class="progress-value">70%</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-bar" style="--bar-width: 70%; --delay: 0.2s"></div>
+              </div>
+            </div>
+            <div class="progress-item">
+              <div class="progress-header">
+                <span class="progress-label">Phase 3（成熟期）: Coverage ≥ 80%</span
+                ><span class="progress-value">80%</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-bar" style="--bar-width: 80%; --delay: 0.4s"></div>
+              </div>
+            </div>
+            <div class="progress-item">
+              <div class="progress-header">
+                <span class="progress-label">Phase 4（最終目標）: Coverage ≥ 85%</span
+                ><span class="progress-value">85%</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-bar" style="--bar-width: 85%; --delay: 0.6s"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== CHAPTER 7 ==================== -->
+      <section id="ch7" class="chapter-section">
+        <div class="container">
+          <div class="chapter-header">
+            <span class="chapter-num">CH 07</span>
+            <span class="k-level">K-Level: K4–K6</span>
+            <h2 class="chapter-title">Quality Profiles とカスタムルール</h2>
+          </div>
+
+          <p>
+            <strong>定義：</strong> Quality Profile
+            は解析時に適用するルールセットを定義する設定。プロジェクト単位・言語単位で割り当て可能。Sonar
+            way は SonarSource が提供する読み取り専用の推奨プロファイル。
+          </p>
+
+          <h3 class="section-title">7.1 継承戦略：Sonar way を直接変更しない</h3>
+          <div class="mermaid-wrap">
+<div class="mermaid">
+flowchart TD
+SW["Sonar way (SonarSource 提供・読み取り専用)"]
+SW -->|extends| BASE["Org Base Profile (組織共通ルール追加)"]
+BASE -->|extends| BE["Backend Profile (Java / Go / Python 固有)"]
+BASE -->|extends| FE["Frontend Profile (TypeScript / JavaScript / CSS)"]
+BASE -->|extends| SEC["Security Profile (セキュリティ強化ルール追加)"]
+BE -->|プロジェクト割り当て| P1["Service A"]
+BE -->|プロジェクト割り当て| P2["Service B"]
+FE -->|プロジェクト割り当て| P3["Web App"]
+SEC -->|プロジェクト割り当て| P4["Payment Service"]
+</div>
+          </div>
+
+          <div class="alert alert-green">
+            ✅ 継承により、Sonar way
+            が更新された際の新ルールを子プロファイルが自動的に受け継ぐ。Sonar way
+            を直接コピーしてカスタマイズすると、この自動更新の恩恵を失う。
+          </div>
+
+          <h3 class="section-title">7.2 カスタムルールの追加（3 つの方法）</h3>
+
+          <div class="subsection-title">方法 1：XPath ルール（UIから即座に作成）</div>
+          <p>
+            Quality Profiles → ルール詳細画面 →
+            テンプレートから作成。テンプレートが存在する言語のみ利用可能。実装コストが低いが機能は限定的。
+          </p>
+
+          <div class="subsection-title">方法 2：Java Plugin API（フル機能・推奨）</div>
+          <div class="code-block-header">
+            <div class="code-dots">
+              <div class="code-dot code-dot-red"></div>
+              <div class="code-dot code-dot-amber"></div>
+              <div class="code-dot code-dot-green"></div>
+            </div>
+            <span class="code-lang">JAVA — カスタムルール実装例</span>
+          </div>
+          <pre
+            class="code-block"
+          ><code><span class="code-keyword">@Rule</span>(key = <span class="code-string">"NoSystemOutPrintlnRule"</span>)
+<span class="code-keyword">public class</span> <span class="code-cyan">NoSystemOutPrintlnRule</span>
+    <span class="code-keyword">extends</span> IssuableSubscriptionVisitor {
+
+  <span class="code-comment">// 監視するAST ノード種別を宣言</span>
+  <span class="code-keyword">@Override</span>
+  <span class="code-keyword">public</span> List&lt;Tree.Kind&gt; <span class="code-green">nodesToVisit</span>() {
+    <span class="code-keyword">return</span> Collections.singletonList(Tree.Kind.EXPRESSION_STATEMENT);
+  }
+
+  <span class="code-keyword">@Override</span>
+  <span class="code-keyword">public void</span> <span class="code-green">visitNode</span>(Tree tree) {
+    ExpressionStatementTree expr = (ExpressionStatementTree) tree;
+    String text = expr.firstToken().text();
+    <span class="code-keyword">if</span> (text.contains(<span class="code-string">"System.out.println"</span>)) {
+      <span class="code-green">reportIssue</span>(tree,
+        <span class="code-string">"System.out.println を使用しないでください。"</span> +
+        <span class="code-string">"ロガーを使用してください。"</span>);
+    }
+  }
+}</code></pre>
+
+          <div class="subsection-title">
+            方法 3：Generic Issue Format（外部ツール結果のインポート）
+          </div>
+          <p>ESLint・Semgrep・Checkstyle 等の結果を JSON 形式で SonarQube に取り込む。</p>
+          <div class="compare-grid">
+            <div class="compare-card compare-good">
+              <div class="compare-header">✅ レポート JSON 形式</div>
+              <pre class="code-block"><code>{
+  <span class="code-green">"issues"</span>: [{
+    <span class="code-cyan">"engineId"</span>: <span class="code-string">"eslint"</span>,
+    <span class="code-cyan">"ruleId"</span>: <span class="code-string">"no-console"</span>,
+    <span class="code-cyan">"severity"</span>: <span class="code-string">"MINOR"</span>,
+    <span class="code-cyan">"type"</span>: <span class="code-string">"CODE_SMELL"</span>,
+    <span class="code-cyan">"primaryLocation"</span>: {
+      <span class="code-green">"message"</span>: <span class="code-string">"console.log を避けて"</span>,
+      <span class="code-green">"filePath"</span>: <span class="code-string">"src/helper.js"</span>,
+      <span class="code-green">"textRange"</span>: {
+        <span class="code-amber">"startLine"</span>: <span class="code-num">42</span>,
+        <span class="code-amber">"endLine"</span>: <span class="code-num">42</span>
+      }
+    }
+  }]
+}</code></pre>
+            </div>
+            <div class="compare-card compare-bad">
+              <div class="compare-header">❌ スキャナーコマンド例（NG）</div>
+              <pre
+                class="code-block"
+              ><code><span class="code-comment"># NG: レポートパスを指定しない</span>
+<span class="code-red">sonar-scanner</span>
+
+<span class="code-comment"># OK: 明示的にレポートパスを指定</span>
+<span class="code-green">sonar-scanner</span> \
+  <span class="code-cyan">-Dsonar.externalIssues</span>\
+<span class="code-cyan">  ReportPaths</span>=<span class="code-string">eslint-report.json</span>
+
+<span class="code-comment"># また engineId は必須（ないと無視）</span>
+<span class="code-comment"># type フィールドも必須</span></code></pre>
+            </div>
+          </div>
+
+          <h3 class="section-title">7.3 MQR モードでのカスタムルール作成時の設定項目</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>フィールド</th>
+                  <th>選択肢</th>
+                  <th>説明</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Type</td>
+                  <td>Issue / Security Hotspot</td>
+                  <td>Issue または Hotspot のどちらか</td>
+                </tr>
+                <tr>
+                  <td>Category</td>
+                  <td>Consistency / Intentionality / Adaptability / Responsibility</td>
+                  <td>Clean Code 属性のカテゴリ</td>
+                </tr>
+                <tr>
+                  <td>Software Quality</td>
+                  <td>Security / Reliability / Maintainability</td>
+                  <td>複数選択可能（MQR の特長）</td>
+                </tr>
+                <tr>
+                  <td>Severity</td>
+                  <td>Blocker / High / Medium / Low / Info</td>
+                  <td>品質特性ごとに設定</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== CHAPTER 8 ==================== -->
+      <section id="ch8" class="chapter-section">
+        <div class="container">
+          <div class="chapter-header">
+            <span class="chapter-num">CH 08</span>
+            <span class="k-level">K-Level: K3–K4</span>
+            <h2 class="chapter-title">セキュリティ解析の徹底活用</h2>
+          </div>
+
+          <h3 class="section-title">8.1 Security Hotspot レビューワークフロー</h3>
+          <p>
+            <strong>定義：</strong> Security Hotspot
+            は脆弱性ではなく「セキュリティに敏感なコード」。深刻度は付与されず、必ず人間によるレビューが必要。レビュー後に
+            Safe または Vulnerability に分類される。
+          </p>
+
+          <div class="mermaid-wrap">
+<div class="mermaid">
+flowchart TD
+DETECT["SonarQube が Security Hotspot を検出"] --> ASSIGN["担当者にアサイン (自動割り当て)"]
+ASSIGN --> REVIEW["コードレビュー実施 (脅威シナリオを確認)"]
+REVIEW --> SAFE{"実際に脅威あり?"}
+SAFE -->|脅威なし| MARK_SAFE["Safe としてマーク (根拠を記録)"]
+SAFE -->|脅威あり| FIX["コードを修正 (脆弱性として扱う)"]
+SAFE -->|判断不能| ESCALATE["セキュリティ専門家へエスカレーション"]
+MARK_SAFE --> CLOSED["Hotspot クローズ (QG の条件に算入)"]
+FIX --> REANALYSIS["再解析 -> Vulnerability として追跡"]
+ESCALATE --> REVIEW
+</div>
+          </div>
+
+          <h3 class="section-title">8.2 セキュリティルールの2種類</h3>
+          <div class="arch-layers">
+            <div class="arch-layer" style="--layer-color: var(--neon-red)">
+              <span class="arch-layer-label">Security-Injection</span
+              ><span class="arch-layer-desc"
+                >インジェクション脆弱性を検出。Taint Analysis で汚染データの流れを追跡（SQL/XSS/SSRF
+                等）</span
+              >
+            </div>
+            <div class="arch-layer" style="--layer-color: var(--neon-amber)">
+              <span class="arch-layer-label">Security-Configuration</span
+              ><span class="arch-layer-desc"
+                >誤った設定を検出（無効な暗号化アルゴリズム・TLS
+                バージョン・権限チェック漏れ等）</span
+              >
+            </div>
+          </div>
+
+          <h3 class="section-title">8.3 Taint Analysis のカスタム設定（Enterprise）</h3>
+          <p>
+            自社フレームワーク固有のソース・サニタイザー・シンクを登録し、解析精度を向上させる。
+          </p>
+          <div class="code-block-header">
+            <div class="code-dots">
+              <div class="code-dot code-dot-red"></div>
+              <div class="code-dot code-dot-amber"></div>
+              <div class="code-dot code-dot-green"></div>
+            </div>
+            <span class="code-lang">XML — セキュリティエンジン カスタム設定</span>
+          </div>
+          <pre
+            class="code-block"
+          ><code><span class="code-comment">&lt;!-- security-custom-config.xml --&gt;</span>
+<span class="code-keyword">&lt;customConfiguration&gt;</span>
+  <span class="code-cyan">&lt;sources&gt;</span>
+    <span class="code-green">&lt;method&gt;</span>
+      <span class="code-amber">&lt;name&gt;</span>getCustomInput<span class="code-amber">&lt;/name&gt;</span>
+      <span class="code-amber">&lt;className&gt;</span>com.example.CustomRequestWrapper<span class="code-amber">&lt;/className&gt;</span>
+    <span class="code-green">&lt;/method&gt;</span>
+  <span class="code-cyan">&lt;/sources&gt;</span>
+  <span class="code-cyan">&lt;sanitizers&gt;</span>
+    <span class="code-green">&lt;method&gt;</span>
+      <span class="code-amber">&lt;name&gt;</span>sanitizeInput<span class="code-amber">&lt;/name&gt;</span>
+      <span class="code-amber">&lt;className&gt;</span>com.example.InputSanitizer<span class="code-amber">&lt;/className&gt;</span>
+    <span class="code-green">&lt;/method&gt;</span>
+  <span class="code-cyan">&lt;/sanitizers&gt;</span>
+  <span class="code-cyan">&lt;sinks&gt;</span>
+    <span class="code-green">&lt;method&gt;</span>
+      <span class="code-amber">&lt;name&gt;</span>executeQuery<span class="code-amber">&lt;/name&gt;</span>
+      <span class="code-amber">&lt;className&gt;</span>com.example.CustomDbWrapper<span class="code-amber">&lt;/className&gt;</span>
+      <span class="code-amber">&lt;args&gt;</span>0<span class="code-amber">&lt;/args&gt;</span>   <span class="code-comment">&lt;!-- 第1引数が汚染チェック対象 --&gt;</span>
+    <span class="code-green">&lt;/method&gt;</span>
+  <span class="code-cyan">&lt;/sinks&gt;</span>
+<span class="code-keyword">&lt;/customConfiguration&gt;</span></code></pre>
+
+          <h3 class="section-title">8.4 対応セキュリティ標準一覧</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>標準</th>
+                  <th>対応内容</th>
+                  <th>エディション</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>OWASP Top 10 2021</td>
+                  <td>A01〜A10 全カテゴリのルールマッピング</td>
+                  <td>全エディション</td>
+                </tr>
+                <tr>
+                  <td>OWASP ASVS</td>
+                  <td>Level 1〜3 の要件に対応</td>
+                  <td>全エディション</td>
+                </tr>
+                <tr>
+                  <td>CWE Top 25</td>
+                  <td>個別 CWE 番号でフィルタリング可能</td>
+                  <td>全エディション</td>
+                </tr>
+                <tr>
+                  <td>SANS Top 25</td>
+                  <td>全 25 カテゴリに対応</td>
+                  <td>全エディション</td>
+                </tr>
+                <tr>
+                  <td>PCI DSS</td>
+                  <td>関連ルールをタグで識別</td>
+                  <td>Enterprise 以上</td>
+                </tr>
+                <tr>
+                  <td>MISRA C++ 2023</td>
+                  <td>組み込みシステム向けルール</td>
+                  <td>Enterprise 以上</td>
+                </tr>
+                <tr>
+                  <td>CERT C/C++/Java</td>
+                  <td>CERT 標準への対応</td>
+                  <td>Developer 以上</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== CHAPTER 9 ==================== -->
+      <section id="ch9" class="chapter-section">
+        <div class="container">
+          <div class="chapter-header">
+            <span class="chapter-num">CH 09</span>
+            <span class="k-level">K-Level: K3–K4</span>
+            <h2 class="chapter-title">AI エージェント統合（2026 最新機能）</h2>
+          </div>
+
+          <h3 class="section-title">9.1 AI 統合の全体像：Guide → Generate → Verify ループ</h3>
+          <div class="mermaid-wrap">
+<div class="mermaid">
+flowchart LR
+subgraph GUIDE["Guide フェーズ"]
+    CA["Context Augmentation (プロジェクト固有知識を LLM に注入)"]
+end
+subgraph GEN["Generate フェーズ"]
+    AI["AI Agent (Claude / Cursor / Copilot 等)"]
+end
+subgraph VERIFY["Verify フェーズ"]
+    AA["Agentic Analysis (CI 同等精度の解析を実行)"]
+end
+MCP["SonarQube MCP Server"] -.->|ツール提供| CA & AA
+CA -->|ガイドライン注入| AI
+AI -->|コード生成・修正| AA
+AA -->|Issue フィードバック| AI
+AA -->|品質基準 PASSED| DONE["PR マージ / デプロイ"]
+AA -->|品質基準 FAILED| AI
+</div>
+          </div>
+
+          <h3 class="section-title">9.2 SonarQube MCP Server のセットアップ</h3>
+          <p>
+            <strong>定義：</strong> MCP（Model Context Protocol）サーバーは AI エージェントと
+            SonarQube を接続するブリッジ。Claude Code・Cursor・VS Code +
+            Copilot・Windsurf・Kiro・Zed 等と接続できる。
+          </p>
+
+          <div class="code-block-header">
+            <div class="code-dots">
+              <div class="code-dot code-dot-red"></div>
+              <div class="code-dot code-dot-amber"></div>
+              <div class="code-dot code-dot-green"></div>
+            </div>
+            <span class="code-lang">JSON — MCP Server 設定（Claude Code / Cursor）</span>
+          </div>
+          <pre class="code-block"><code>{
+  <span class="code-green">"mcpServers"</span>: {
+    <span class="code-cyan">"sonarqube"</span>: {
+      <span class="code-amber">"command"</span>: <span class="code-string">"docker"</span>,
+      <span class="code-amber">"args"</span>: [
+        <span class="code-string">"run"</span>, <span class="code-string">"--init"</span>, <span class="code-string">"--pull=always"</span>,
+        <span class="code-string">"-i"</span>, <span class="code-string">"--rm"</span>,
+        <span class="code-string">"-e"</span>, <span class="code-string">"SONARQUBE_TOKEN"</span>,
+        <span class="code-string">"-e"</span>, <span class="code-string">"SONARQUBE_ORG"</span>,
+        <span class="code-string">"mcp/sonarqube"</span>
+      ],
+      <span class="code-amber">"env"</span>: {
+        <span class="code-green">"SONARQUBE_TOKEN"</span>: <span class="code-string">"&lt;YOUR_PROJECT_ANALYSIS_TOKEN&gt;"</span>,
+        <span class="code-green">"SONARQUBE_ORG"</span>: <span class="code-string">"&lt;YOUR_ORG_KEY&gt;"</span>
+      }
+    }
+  }
+}</code></pre>
+
+          <h3 class="section-title">9.3 利用可能なツールセット</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ツールセット</th>
+                  <th>提供する能力</th>
+                  <th>要件</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>issues</code></td>
+                  <td>Issue の取得・フィルタリング・コメント追加</td>
+                  <td>標準（無料）</td>
+                </tr>
+                <tr>
+                  <td><code>quality-gates</code></td>
+                  <td>QG ステータス確認</td>
+                  <td>標準（無料）</td>
+                </tr>
+                <tr>
+                  <td><code>security-hotspots</code></td>
+                  <td>Hotspot のレビュー支援</td>
+                  <td>標準（無料）</td>
+                </tr>
+                <tr>
+                  <td><code>coverage</code></td>
+                  <td>テストカバレッジ情報の取得</td>
+                  <td>標準（無料）</td>
+                </tr>
+                <tr>
+                  <td><code>analysis</code></td>
+                  <td>コードスニペットの即時解析（Agentic Analysis）</td>
+                  <td>Cloud アドオン</td>
+                </tr>
+                <tr>
+                  <td><code>cag</code></td>
+                  <td>Context Augmentation（コールフロー・ガイドライン・SCA）</td>
+                  <td>Cloud アドオン</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 class="section-title">9.4 Context Augmentation の 4 カテゴリ</h3>
+          <div class="trend-grid">
+            <div class="trend-card" style="--trend-color: var(--neon-cyan)">
+              <div class="trend-card-inner">
+                <span class="trend-icon">📖</span>
+                <div class="trend-card-title">ガイドライン (Guidelines)</div>
+                <div class="trend-card-desc">
+                  エージェントのプロンプト内容に基づき、関連する Sonar ルールを LLM
+                  コンテキストに挿入。DB アクセス操作なら SQL インジェクション関連ルールを自動注入。
+                </div>
+              </div>
+            </div>
+            <div class="trend-card" style="--trend-color: var(--neon-green)">
+              <div class="trend-card-inner">
+                <span class="trend-icon">🔭</span>
+                <div class="trend-card-title">コードナビゲーション</div>
+                <div class="trend-card-desc">
+                  テキスト検索ではなく、コールスタック・クラス階層・参照情報に基づきコードベースを意味的に探索。エージェントが正確な箇所を修正できる。
+                </div>
+              </div>
+            </div>
+            <div class="trend-card" style="--trend-color: var(--neon-amber)">
+              <div class="trend-card-inner">
+                <span class="trend-icon">📦</span>
+                <div class="trend-card-title">依存関係ガイダンス</div>
+                <div class="trend-card-desc">
+                  新規ライブラリ追加前に、既知の脆弱性・サプライチェーンマルウェア・ライセンス準拠を事前確認（SCA
+                  機能）。
+                </div>
+              </div>
+            </div>
+            <div class="trend-card" style="--trend-color: var(--neon-purple)">
+              <div class="trend-card-inner">
+                <span class="trend-icon">🧬</span>
+                <div class="trend-card-title">コーディング標準</div>
+                <div class="trend-card-desc">
+                  プロジェクト固有の過去 Issue
+                  傾向を分析し、エージェントが行おうとしている操作に関連する標準ルールを推奨。
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h3 class="section-title">9.5 Remediation Agent（Beta）</h3>
+          <div class="callout callout-info">
+            <div class="callout-icon">🤖</div>
+            <div class="callout-body">
+              <p class="callout-title">Remediation Agent とは</p>
+              <p>
+                SonarQube Cloud の Team（年間）/ Enterprise プランで利用可能。PR の Issue
+                を自動修正する AI エージェント。「Assign to
+                Agent」ボタンをクリックするとエージェントが独立して Issue を解析・修正 PR
+                を作成し、開発者がレビューして承認する。Reliability・Maintainability Issue
+                に対応（Beta フェーズ）。
+              </p>
+            </div>
+          </div>
+          <div class="alert alert-amber">
+            ⚠️ Security Issue への自動修正は必ず人間の最終確認が必須。Remediation Agent
+            の提案は参考情報として扱い、盲目的に適用しないこと。
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== CHAPTER 10 ==================== -->
+      <section id="ch10" class="chapter-section">
+        <div class="container">
+          <div class="chapter-header">
+            <span class="chapter-num">CH 10</span>
+            <span class="k-level">K-Level: K3–K4</span>
+            <h2 class="chapter-title">Web API による自動化</h2>
+          </div>
+
+          <h3 class="section-title">10.1 主要 API エンドポイント</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>エンドポイント</th>
+                  <th>用途</th>
+                  <th>メソッド</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>/api/qualitygates/project_status</code></td>
+                  <td>プロジェクトの QG ステータス取得</td>
+                  <td>GET</td>
+                </tr>
+                <tr>
+                  <td><code>/api/issues/search</code></td>
+                  <td>Issue の検索・フィルタリング</td>
+                  <td>GET</td>
+                </tr>
+                <tr>
+                  <td><code>/api/measures/component</code></td>
+                  <td>メトリクス値の取得</td>
+                  <td>GET</td>
+                </tr>
+                <tr>
+                  <td><code>/api/projects/search</code></td>
+                  <td>プロジェクト一覧取得</td>
+                  <td>GET</td>
+                </tr>
+                <tr>
+                  <td><code>/api/qualityprofiles/search</code></td>
+                  <td>Quality Profile 一覧取得</td>
+                  <td>GET</td>
+                </tr>
+                <tr>
+                  <td><code>/api/webhooks/create</code></td>
+                  <td>Webhook の登録</td>
+                  <td>POST</td>
+                </tr>
+                <tr>
+                  <td><code>/api/user_tokens/generate</code></td>
+                  <td>API トークン発行</td>
+                  <td>POST</td>
+                </tr>
+                <tr>
+                  <td><code>/api/hotspots/search</code></td>
+                  <td>Security Hotspot 一覧取得</td>
+                  <td>GET</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 class="section-title">10.2 Quality Gate ステータスの取得（cURL）</h3>
+          <div class="code-block-header">
+            <div class="code-dots">
+              <div class="code-dot code-dot-red"></div>
+              <div class="code-dot code-dot-amber"></div>
+              <div class="code-dot code-dot-green"></div>
+            </div>
+            <span class="code-lang">BASH — QG ステータス確認</span>
+          </div>
+          <pre
+            class="code-block"
+          ><code><span class="code-comment"># QG ステータスを JSON で取得して jq で整形</span>
+<span class="code-green">curl</span> -u <span class="code-string">"${SONAR_TOKEN}:"</span> \
+  <span class="code-string">"${SONAR_HOST_URL}/api/qualitygates/project_status"</span> \
+  <span class="code-cyan">?projectKey</span>=<span class="code-string">com.example:my-service</span> \
+  <span class="code-cyan">&amp;branch</span>=<span class="code-string">main</span> \
+  | jq <span class="code-string">'{
+      status: .projectStatus.status,
+      failedConditions: [
+        .projectStatus.conditions[] |
+        select(.status != "OK") |
+        {
+          metric: .metricKey,
+          actual: .actualValue,
+          threshold: .errorThreshold
+        }
+      ]
+    }'</span></code></pre>
+
+          <h3 class="section-title">10.3 Issue サマリーの自動生成（Python）</h3>
+          <div class="code-block-header">
+            <div class="code-dots">
+              <div class="code-dot code-dot-red"></div>
+              <div class="code-dot code-dot-amber"></div>
+              <div class="code-dot code-dot-green"></div>
+            </div>
+            <span class="code-lang">PYTHON — New Code Issue サマリー取得</span>
+          </div>
+          <pre class="code-block"><code><span class="code-keyword">import</span> requests
+<span class="code-keyword">import</span> os
+
+SONAR_TOKEN = os.environ[<span class="code-string">"SONAR_TOKEN"</span>]
+SONAR_HOST  = os.environ[<span class="code-string">"SONAR_HOST_URL"</span>]
+PROJECT_KEY = <span class="code-string">"com.example:my-service"</span>
+
+<span class="code-keyword">def</span> <span class="code-green">get_new_code_issues</span>(branch: str = <span class="code-string">"main"</span>) -&gt; dict:
+    <span class="code-string">"""新規コードの Issue サマリーを取得"""</span>
+    params = {
+        <span class="code-string">"componentKeys"</span>: PROJECT_KEY,
+        <span class="code-string">"resolved"</span>: <span class="code-string">"false"</span>,
+        <span class="code-string">"sinceLeakPeriod"</span>: <span class="code-string">"true"</span>,  <span class="code-comment"># New Code のみ</span>
+        <span class="code-string">"branch"</span>: branch,
+        <span class="code-string">"facets"</span>: <span class="code-string">"types,severities"</span>,
+        <span class="code-string">"ps"</span>: <span class="code-num">1</span>  <span class="code-comment"># カウントのみ必要</span>
+    }
+    resp = requests.get(
+        f<span class="code-string">"{SONAR_HOST}/api/issues/search"</span>,
+        params=params,
+        auth=(SONAR_TOKEN, <span class="code-string">""</span>)
+    )
+    resp.raise_for_status()
+    <span class="code-keyword">return</span> resp.json()
+
+issues = get_new_code_issues()
+<span class="code-green">print</span>(f<span class="code-string">"New Code Issues: {issues['total']}"</span>)
+<span class="code-keyword">for</span> facet <span class="code-keyword">in</span> issues.get(<span class="code-string">"facets"</span>, []):
+    <span class="code-keyword">if</span> facet[<span class="code-string">"property"</span>] == <span class="code-string">"types"</span>:
+        <span class="code-keyword">for</span> v <span class="code-keyword">in</span> facet[<span class="code-string">"values"</span>]:
+            <span class="code-green">print</span>(f<span class="code-string">"  {v['val']}: {v['count']}"</span>)</code></pre>
+        </div>
+      </section>
+
+      <!-- ==================== CHAPTER 11 ==================== -->
+      <section id="ch11" class="chapter-section">
+        <div class="container">
+          <div class="chapter-header">
+            <span class="chapter-num">CH 11</span>
+            <span class="k-level">K-Level: K2–K4</span>
+            <h2 class="chapter-title">運用ベストプラクティス</h2>
+          </div>
+
+          <h3 class="section-title">11.1 段階的導入ロードマップ</h3>
+          <div class="mermaid-wrap">
+<div class="mermaid">
+flowchart LR
+S1["Stage 1: メインブランチ解析の確立 (2-4週間)"] --> S2["Stage 2: CI/CD パイプライン統合 (2-4週間)"]
+S2 --> S3["Stage 3: PR デコレーション有効化 (1-2週間)"]
+S3 --> S4["Stage 4: Quality Gate の段階的締め付け"]
+S4 --> S5["Stage 5: AI エージェント統合 (オプション)"]
+</div>
+          </div>
+
+          <h3 class="section-title">11.2 Issue 優先度付けの指針</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>優先度</th>
+                  <th>対象 Issue</th>
+                  <th>対応方針</th>
+                  <th>目安</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>🔴 最高</td>
+                  <td>Blocker Bug / Blocker Vulnerability</td>
+                  <td>即座に修正・リリースブロック</td>
+                  <td>当日中</td>
+                </tr>
+                <tr>
+                  <td>🟠 高</td>
+                  <td>Critical Bug / Vulnerability</td>
+                  <td>次スプリントで必ず修正</td>
+                  <td>1週間以内</td>
+                </tr>
+                <tr>
+                  <td>🟡 中</td>
+                  <td>Major Code Smell / Minor Vulnerability</td>
+                  <td>バックログに積み、計画的に対応</td>
+                  <td>1ヶ月以内</td>
+                </tr>
+                <tr>
+                  <td>🟢 低</td>
+                  <td>Info / Minor Code Smell</td>
+                  <td>余裕があれば対応</td>
+                  <td>随時</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 class="section-title">11.3 False Positive への対応ポリシー</h3>
+          <div class="compare-grid">
+            <div class="compare-card compare-good">
+              <div class="compare-header">✅ 正しい NOSONAR の使い方</div>
+              <pre
+                class="code-block"
+              ><code><span class="code-comment">// 設計上の例外：この箇所は意図的に</span>
+<span class="code-comment">// System.out を使用する必要がある</span>
+<span class="code-comment">// 理由：シャットダウンフック内でロガーが</span>
+<span class="code-comment">// 利用不可のため（PR #123 で議論済み）</span>
+System.out.println(<span class="code-string">"Shutdown"</span>); <span class="code-comment">// NOSONAR</span></code></pre>
+            </div>
+            <div class="compare-card compare-bad">
+              <div class="compare-header">❌ 乱用パターン</div>
+              <pre
+                class="code-block"
+              ><code><span class="code-comment">// 理由なし・説明なし・大量 NOSONAR</span>
+<span class="code-red">// 全行に NOSONAR を付けてメトリクスを誤魔化す</span>
+
+<span class="code-red">String sql = "SELECT * FROM users WHERE id=" + id; // NOSONAR
+someMethod(password); // NOSONAR
+eval(userInput); // NOSONAR</span></code></pre>
+            </div>
+          </div>
+
+          <h3 class="section-title">11.4 パフォーマンスチューニング</h3>
+          <div class="subsection-title">除外設定で解析対象を最小化</div>
+          <div class="code-block-header">
+            <div class="code-dots">
+              <div class="code-dot code-dot-red"></div>
+              <div class="code-dot code-dot-amber"></div>
+              <div class="code-dot code-dot-green"></div>
+            </div>
+            <span class="code-lang">PROPERTIES — 解析パフォーマンス最適化</span>
+          </div>
+          <pre
+            class="code-block"
+          ><code><span class="code-comment"># 自動生成・サードパーティを除外</span>
+<span class="code-green">sonar.exclusions</span>=<span class="code-string">**/node_modules/**,**/vendor/**,**/dist/**,**/generated/**</span>
+
+<span class="code-comment"># JVM ヒープサイズ拡張（大規模プロジェクト）</span>
+<span class="code-green">sonar.java.jvmArgs</span>=<span class="code-string">-Xmx4g -Xms512m</span>
+
+<span class="code-comment"># スキャナーキャッシュディレクトリ指定</span>
+<span class="code-green">sonar.scanner.cacheDirectory</span>=<span class="code-string">/opt/sonar-cache</span></code></pre>
+
+          <h3 class="section-title">11.5 モノレポ対応</h3>
+          <div class="code-block-header">
+            <div class="code-dots">
+              <div class="code-dot code-dot-red"></div>
+              <div class="code-dot code-dot-amber"></div>
+              <div class="code-dot code-dot-green"></div>
+            </div>
+            <span class="code-lang">YAML — GitHub Actions モノレポ並列解析</span>
+          </div>
+          <pre class="code-block"><code><span class="code-green">jobs</span>:
+  <span class="code-cyan">sonar-service-a</span>:
+    <span class="code-amber">uses</span>: ./.github/workflows/sonar-scan.yml
+    <span class="code-amber">with</span>:
+      <span class="code-green">project-key</span>: <span class="code-string">com.example:service-a</span>
+      <span class="code-green">sources-path</span>: <span class="code-string">services/service-a/src</span>
+    <span class="code-amber">secrets</span>: inherit
+
+  <span class="code-cyan">sonar-service-b</span>:
+    <span class="code-amber">uses</span>: ./.github/workflows/sonar-scan.yml
+    <span class="code-amber">with</span>:
+      <span class="code-green">project-key</span>: <span class="code-string">com.example:service-b</span>
+      <span class="code-green">sources-path</span>: <span class="code-string">services/service-b/src</span>
+    <span class="code-amber">secrets</span>: inherit</code></pre>
+
+          <h3 class="section-title">11.6 チーム文化への定着ポイント</h3>
+          <div class="step-list">
+            <div class="step-item">
+              <div class="step-num">1</div>
+              <div class="step-content">
+                <div class="step-title">「最初の分析は穏やかに」</div>
+                <p class="step-desc">
+                  導入直後は Issue 数が膨大になりがち。最初の QG
+                  は緩く設定し、チームの恐怖感を取り除く。
+                </p>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-num">2</div>
+              <div class="step-content">
+                <div class="step-title">プルリクエスト文化と組み合わせる</div>
+                <p class="step-desc">
+                  PR デコレーションにより、レビュアーが SonarQube 結果を PR
+                  画面で確認できるようにする。ツールを押し付けるのではなくワークフローに溶け込ませる。
+                </p>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-num">3</div>
+              <div class="step-content">
+                <div class="step-title">ダッシュボードを可視化する</div>
+                <p class="step-desc">
+                  SonarQube のダッシュボードを CI/CD の状況ページや Slack
+                  に定期通知。品質メトリクスをチームの共通言語にする。
+                </p>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-num">4</div>
+              <div class="step-content">
+                <div class="step-title">定期的なルールレビュー</div>
+                <p class="step-desc">
+                  Quality Gate
+                  の条件は四半期ごとにレビュー。ビジネス要件・チームの成熟度に応じて段階的に引き上げる。
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== REFERENCES ==================== -->
+      <section id="refs" class="chapter-section">
+        <div class="container">
+          <div class="chapter-header">
+            <span class="chapter-num">REFS</span>
+            <h2 class="chapter-title">参考文献・一次情報源</h2>
+          </div>
+
+          <div class="ref-grid">
+            <a
+              class="ref-card"
+              href="https://docs.sonarsource.com/"
+              target="_blank"
+              style="--ref-color: var(--neon-green)"
+              ><div class="ref-category">🏠 一次情報源</div>
+              <div class="ref-title">SonarQube 公式ドキュメント入口</div>
+              <div class="ref-url">https://docs.sonarsource.com/</div></a
+            >
+
+            <a
+              class="ref-card"
+              href="https://docs.sonarsource.com/sonarqube-server/analyzing-source-code/analysis-overview"
+              target="_blank"
+              style="--ref-color: var(--neon-green)"
+              ><div class="ref-category">📖 Server Docs</div>
+              <div class="ref-title">SonarQube Server 解析概要</div>
+              <div class="ref-url">
+                docs.sonarsource.com/sonarqube-server/analyzing-source-code/analysis-overview
+              </div></a
+            >
+
+            <a
+              class="ref-card"
+              href="https://docs.sonarsource.com/sonarqube-server/user-guide/about-new-code"
+              target="_blank"
+              style="--ref-color: var(--neon-cyan)"
+              ><div class="ref-category">🌱 Clean as You Code</div>
+              <div class="ref-title">New Code の定義と CaYC アプローチ</div>
+              <div class="ref-url">
+                docs.sonarsource.com/sonarqube-server/user-guide/about-new-code
+              </div></a
+            >
+
+            <a
+              class="ref-card"
+              href="https://docs.sonarsource.com/sonarqube-server/quality-standards-administration/managing-quality-gates/introduction-to-quality-gates"
+              target="_blank"
+              style="--ref-color: var(--neon-cyan)"
+              ><div class="ref-category">⚖️ Quality Gates</div>
+              <div class="ref-title">Quality Gate 概要と設計</div>
+              <div class="ref-url">docs.sonarsource.com/.../introduction-to-quality-gates</div></a
+            >
+
+            <a
+              class="ref-card"
+              href="https://docs.sonarsource.com/sonarqube-server/analyzing-source-code/pull-request-analysis/introduction"
+              target="_blank"
+              style="--ref-color: var(--neon-purple)"
+              ><div class="ref-category">🔀 PR Analysis</div>
+              <div class="ref-title">PR 解析の仕組みと設定</div>
+              <div class="ref-url">
+                docs.sonarsource.com/.../pull-request-analysis/introduction
+              </div></a
+            >
+
+            <a
+              class="ref-card"
+              href="https://docs.sonarsource.com/sonarqube-server/quality-standards-administration/managing-rules/security-related-rules"
+              target="_blank"
+              style="--ref-color: var(--neon-red)"
+              ><div class="ref-category">🔒 Security</div>
+              <div class="ref-title">セキュリティルール：Injection と Configuration</div>
+              <div class="ref-url">docs.sonarsource.com/.../security-related-rules</div></a
+            >
+
+            <a
+              class="ref-card"
+              href="https://docs.sonarsource.com/sonarqube-server/user-guide/code-metrics/changing-modes"
+              target="_blank"
+              style="--ref-color: var(--neon-amber)"
+              ><div class="ref-category">⚙️ MQR Mode</div>
+              <div class="ref-title">Standard Experience ↔ MQR Mode の切り替え</div>
+              <div class="ref-url">docs.sonarsource.com/.../code-metrics/changing-modes</div></a
+            >
+
+            <a
+              class="ref-card"
+              href="https://docs.sonarsource.com/sonarqube-mcp-server"
+              target="_blank"
+              style="--ref-color: var(--neon-green)"
+              ><div class="ref-category">🤖 AI / MCP</div>
+              <div class="ref-title">SonarQube MCP Server ドキュメント</div>
+              <div class="ref-url">docs.sonarsource.com/sonarqube-mcp-server</div></a
+            >
+
+            <a
+              class="ref-card"
+              href="https://docs.sonarsource.com/sonarqube-cloud/analyzing-source-code/agentic-analysis"
+              target="_blank"
+              style="--ref-color: var(--neon-purple)"
+              ><div class="ref-category">⚡ Agentic Analysis</div>
+              <div class="ref-title">AI エージェント向け Agentic Analysis</div>
+              <div class="ref-url">
+                docs.sonarsource.com/sonarqube-cloud/analyzing-source-code/agentic-analysis
+              </div></a
+            >
+
+            <a
+              class="ref-card"
+              href="https://docs.sonarsource.com/sonarqube-cloud/administering-sonarcloud/ai-features/sonarqube-remediation-agent"
+              target="_blank"
+              style="--ref-color: var(--neon-cyan)"
+              ><div class="ref-category">🔧 Remediation Agent</div>
+              <div class="ref-title">Remediation Agent（Beta）設定と利用方法</div>
+              <div class="ref-url">docs.sonarsource.com/.../sonarqube-remediation-agent</div></a
+            >
+
+            <a
+              class="ref-card"
+              href="https://docs.sonarsource.com/sonarqube-server/devops-platform-integration/gitlab-integration/adding-analysis-to-gitlab-ci-cd"
+              target="_blank"
+              style="--ref-color: var(--neon-amber)"
+              ><div class="ref-category">🦊 GitLab CI</div>
+              <div class="ref-title">GitLab CI/CD パイプラインへの統合</div>
+              <div class="ref-url">docs.sonarsource.com/.../adding-analysis-to-gitlab-ci-cd</div></a
+            >
+
+            <a
+              class="ref-card"
+              href="https://github.com/SonarSource/sonarqube-mcp-server"
+              target="_blank"
+              style="--ref-color: var(--neon-green)"
+              ><div class="ref-category">💻 GitHub</div>
+              <div class="ref-title">SonarQube MCP Server オープンソースリポジトリ</div>
+              <div class="ref-url">github.com/SonarSource/sonarqube-mcp-server</div></a
+            >
+
+            <a
+              class="ref-card"
+              href="https://www.sonarsource.com/blog/introducing-sonar-context-augmentation"
+              target="_blank"
+              style="--ref-color: var(--neon-blue)"
+              ><div class="ref-category">📰 Blog</div>
+              <div class="ref-title">Sonar Context Augmentation 解説ブログ</div>
+              <div class="ref-url">
+                sonarsource.com/blog/introducing-sonar-context-augmentation
+              </div></a
+            >
+
+            <a
+              class="ref-card"
+              href="https://docs.sonarsource.com/sonarqube-server/extension-guide/adding-coding-rules"
+              target="_blank"
+              style="--ref-color: var(--neon-purple)"
+              ><div class="ref-category">🛠️ Custom Rules</div>
+              <div class="ref-title">カスタムコーディングルールの追加方法</div>
+              <div class="ref-url">docs.sonarsource.com/.../adding-coding-rules</div></a
+            >
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container">
+        <p style="margin-bottom: 0.5rem">
+          <span style="color: var(--neon-green)">⬡ SonarQube Code Review 実践ガイド</span> —
+          中〜上級エンジニア向け
+        </p>
+        <p>
+          対応バージョン: SonarQube Server 2026.2 / SonarQube Cloud (2026.1 LTA 準拠) &nbsp;|&nbsp;
+          最終更新: 2026年6月
+        </p>
+        <p style="margin-top: 0.5rem">
+          一次情報源:
+          <a href="https://docs.sonarsource.com/" style="color: var(--neon-cyan)" target="_blank"
+            >docs.sonarsource.com</a
+          >
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      // Mermaid 初期化
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'dark',
+        themeVariables: {
+          primaryColor: '#00ff88',
+          primaryTextColor: '#e6edf3',
+          primaryBorderColor: '#00ff88',
+          lineColor: '#00d4ff',
+          secondaryColor: '#0d1117',
+          tertiaryColor: '#161b22',
+          background: '#030712',
+          nodeTextColor: '#e6edf3',
+          clusterBkg: '#161b22',
+          titleColor: '#00ff88',
+          edgeLabelBackground: '#0d1117',
+          signalColor: '#00d4ff',
+          actorBkg: '#161b22',
+          actorBorder: '#00ff88',
+          actorTextColor: '#e6edf3',
+          actorLineColor: '#00d4ff',
+          labelBoxBkgColor: '#0d1117',
+          labelBoxBorderColor: '#30363d',
+          labelTextColor: '#e6edf3',
+          loopTextColor: '#e6edf3',
+          noteBorderColor: '#ffb86c',
+          noteBkgColor: '#161b22',
+          noteTextColor: '#e6edf3',
+          fontFamily: 'IBM Plex Sans JP, sans-serif',
+          fontSize: '14px',
+        },
+      });
+
+      // Progress bar の scroll-triggered animation
+      const barObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.style.animationPlayState = 'running';
+              barObserver.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.1 },
+      );
+
+      document.querySelectorAll('.progress-bar').forEach((bar) => {
+        bar.style.animationPlayState = 'paused';
+        barObserver.observe(bar);
+      });
+
+      // Active nav link highlighting
+      const sections = document.querySelectorAll('[id^="ch"], #toc, #refs');
+      const navLinks = document.querySelectorAll('.nav-link[href^="#"]');
+
+      const secObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const id = entry.target.id;
+              navLinks.forEach((link) => {
+                link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+              });
+            }
+          });
+        },
+        { threshold: 0.3 },
+      );
+
+      sections.forEach((s) => secObserver.observe(s));
+    </script>
+  </body>
+</html>
