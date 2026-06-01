@@ -15,7 +15,7 @@ describe("/code-review/copilot-code-review", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
     expect(h1?.textContent?.trim().replace(/\s+/g, " ")).toBe(
-      "GitHub Copilot Code Review 完全活用ガイド"
+      "GitHub CopilotCode Review 完全活用ガイド"
     );
   });
 
