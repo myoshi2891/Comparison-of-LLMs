@@ -1,12 +1,11 @@
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
 
-
 export const metadata = {
   title: "Gemini CLI / Antigravity スラッシュコマンド完全ガイド v0.44.1",
-  description: "Gemini CLI / Antigravity CLI の全コマンドをステップバイステップで解説。初学者がゼロから実践できるベストプラクティス付き。"
+  description:
+    "Gemini CLI / Antigravity CLI の全コマンドをステップバイステップで解説。初学者がゼロから実践できるベストプラクティス付き。",
 };
-
 
 export default function AntigravitySlashCommandsGuidePage() {
   return (
@@ -966,7 +965,11 @@ export default function AntigravitySlashCommandsGuidePage() {
             <span className="alert-icon">ℹ️</span>
             <div>
               <strong>参照ソース</strong>:
-              <a href="https://geminicli.com/docs/cli/gemini-md/" target="_blank" rel="noopener noreferrer">
+              <a
+                href="https://geminicli.com/docs/cli/gemini-md/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 Project Context (GEMINI.md) 公式ドキュメント
               </a>
               ·
@@ -1094,7 +1097,10 @@ export default function AntigravitySlashCommandsGuidePage() {
                 <span className="progress-val">42,300 / 1,000,000</span>
               </div>
               <div className="progress-bar">
-                <div className="progress-fill pf-g" style={{ "--ProgW": "4.2%" }}></div>
+                <div
+                  className="progress-fill pf-g"
+                  style={{ "--ProgW": "4.2%" } as React.CSSProperties}
+                ></div>
               </div>
             </div>
             <div className="progress-item">
@@ -1103,7 +1109,10 @@ export default function AntigravitySlashCommandsGuidePage() {
                 <span className="progress-val">8,100 / 1,000,000</span>
               </div>
               <div className="progress-bar">
-                <div className="progress-fill pf-c" style={{ "--ProgW": "0.8%" }}></div>
+                <div
+                  className="progress-fill pf-c"
+                  style={{ "--ProgW": "0.8%" } as React.CSSProperties}
+                ></div>
               </div>
             </div>
             <div className="progress-item">
@@ -1112,7 +1121,10 @@ export default function AntigravitySlashCommandsGuidePage() {
                 <span className="progress-val">67%</span>
               </div>
               <div className="progress-bar">
-                <div className="progress-fill pf-y" style={{ "--ProgW": "67%" }}></div>
+                <div
+                  className="progress-fill pf-y"
+                  style={{ "--ProgW": "67%" } as React.CSSProperties}
+                ></div>
               </div>
             </div>
           </div>
@@ -1355,7 +1367,11 @@ export default function AntigravitySlashCommandsGuidePage() {
             <span className="alert-icon">ℹ️</span>
             <div>
               <strong>参照ソース</strong>:
-              <a href="https://geminicli.com/docs/cli/plan-mode/" target="_blank" rel="noopener noreferrer">
+              <a
+                href="https://geminicli.com/docs/cli/plan-mode/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 Plan Mode 公式ドキュメント
               </a>
               ·
