@@ -1,3 +1,6 @@
+.pageWrapper {
+  display: block;
+}
 :global(.antigravity-guide-wrapper *),
 :global(.antigravity-guide-wrapper *::before),
 :global(.antigravity-guide-wrapper *::after) {
