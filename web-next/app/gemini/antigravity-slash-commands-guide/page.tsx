@@ -248,23 +248,33 @@ export default function AntigravitySlashCommandsGuidePage() {
             <div className="compare-card compare-ok">
               <div className="compare-label">✅ 正しい使い分け</div>
               <pre>
-                &lt;span class="code-comment"&gt;# CLI 設定を確認したい → /&lt;/span&gt; &lt;span
-                class="code-green"&gt;/memory show&lt;/span&gt; &lt;span class="code-comment"&gt;#
-                ファイルを読ませたい → @&lt;/span&gt; &lt;span class="code-green"&gt;@src/app.ts
-                この関数を最適化して&lt;/span&gt; &lt;span class="code-comment"&gt;# git
-                の状態を確認したい → !&lt;/span&gt; &lt;span class="code-green"&gt;!git log
-                --oneline -5&lt;/span&gt;
+                <span className="code-comment"># CLI 設定を確認したい → /</span>
+                {"\n"}
+                <span className="code-green">/memory show</span>
+                {"\n\n"}
+                <span className="code-comment"># ファイルを読ませたい → @</span>
+                {"\n"}
+                <span className="code-green">@src/app.ts この関数を最適化して</span>
+                {"\n\n"}
+                <span className="code-comment"># git の状態を確認したい → !</span>
+                {"\n"}
+                <span className="code-green">!git log --oneline -5</span>
               </pre>
             </div>
             <div className="compare-card compare-ng">
               <div className="compare-label">❌ よくある混同</div>
               <pre>
-                &lt;span class="code-comment"&gt;# ファイルを読ませたいのに / を使う&lt;/span&gt;
-                &lt;span class="code-red"&gt;/src/app.ts を説明して&lt;/span&gt; &lt;span
-                class="code-comment"&gt;# → コマンドとして解釈されエラーになる&lt;/span&gt; &lt;span
-                class="code-comment"&gt;# CLI 設定を変えたいのに @ を使う&lt;/span&gt; &lt;span
-                class="code-red"&gt;@memory refresh&lt;/span&gt; &lt;span class="code-comment"&gt;#
-                → memory ファイルを探してしまう&lt;/span&gt;
+                <span className="code-comment"># ファイルを読ませたいのに / を使う</span>
+                {"\n"}
+                <span className="code-red">/src/app.ts を説明して</span>
+                {"\n"}
+                <span className="code-comment"># → コマンドとして解釈されエラーになる</span>
+                {"\n\n"}
+                <span className="code-comment"># CLI 設定を変えたいのに @ を使う</span>
+                {"\n"}
+                <span className="code-red">@memory refresh</span>
+                {"\n"}
+                <span className="code-comment"># → memory ファイルを探してしまう</span>
               </pre>
             </div>
           </div>
@@ -475,8 +485,8 @@ export default function AntigravitySlashCommandsGuidePage() {
                       <span className="code-title">terminal</span>
                     </div>
                     <pre className="code-body">
-                      &lt;span class="code-green"&gt;/chat save&lt;/span&gt; &lt;span
-                      class="code-arg"&gt;before-refactor&lt;/span&gt;
+                      <span className="code-green">/chat save</span>{" "}
+                      <span className="code-arg">before-refactor</span>
                     </pre>
                   </div>
                 </div>
@@ -497,8 +507,8 @@ export default function AntigravitySlashCommandsGuidePage() {
                       <span className="code-title">terminal</span>
                     </div>
                     <pre className="code-body">
-                      &lt;span class="code-green"&gt;/chat resume&lt;/span&gt; &lt;span
-                      class="code-arg"&gt;before-refactor&lt;/span&gt;
+                      <span className="code-green">/chat resume</span>{" "}
+                      <span className="code-arg">before-refactor</span>
                     </pre>
                   </div>
                 </div>
@@ -519,10 +529,13 @@ export default function AntigravitySlashCommandsGuidePage() {
                       <span className="code-title">terminal</span>
                     </div>
                     <pre className="code-body">
-                      &lt;span class="code-green"&gt;/chat list&lt;/span&gt; &lt;span
-                      class="code-comment"&gt;# 出力例:&lt;/span&gt; &lt;span class="code-white"&gt;
-                      before-refactor 2026-05-30 14:22&lt;/span&gt; &lt;span class="code-white"&gt;
-                      feature-auth 2026-05-29 09:11&lt;/span&gt;
+                      <span className="code-green">/chat list</span>
+                      {"\n"}
+                      <span className="code-comment"># 出力例:</span>
+                      {"\n"}
+                      <span className="code-white"> before-refactor 2026-05-30 14:22</span>
+                      {"\n"}
+                      <span className="code-white"> feature-auth 2026-05-29 09:11</span>
                     </pre>
                   </div>
                 </div>
@@ -543,8 +556,8 @@ export default function AntigravitySlashCommandsGuidePage() {
                       <span className="code-title">terminal</span>
                     </div>
                     <pre className="code-body">
-                      &lt;span class="code-green"&gt;/chat share&lt;/span&gt; &lt;span
-                      class="code-arg"&gt;review-2026-05-31.md&lt;/span&gt;
+                      <span className="code-green">/chat share</span>{" "}
+                      <span className="code-arg">review-2026-05-31.md</span>
                     </pre>
                   </div>
                 </div>
@@ -570,7 +583,9 @@ export default function AntigravitySlashCommandsGuidePage() {
               <span className="code-title">terminal</span>
               <span className="code-lang">ショートカット: Ctrl+L</span>
             </div>
-            <pre className="code-body">&lt;span class="code-green"&gt;/clear&lt;/span&gt;</pre>
+            <pre className="code-body">
+              <span className="code-green">/clear</span>
+            </pre>
           </div>
 
           <div className="section-divider"></div>
@@ -626,11 +641,14 @@ export default function AntigravitySlashCommandsGuidePage() {
               <span className="code-title">terminal</span>
             </div>
             <pre className="code-body">
-              &lt;span class="code-comment"&gt;# 直前のチェックポイントに戻す&lt;/span&gt; &lt;span
-              class="code-green"&gt;/restore&lt;/span&gt; &lt;span class="code-comment"&gt;#
-              特定のツール呼び出し時点まで戻す&lt;/span&gt; &lt;span
-              class="code-green"&gt;/restore&lt;/span&gt; &lt;span
-              class="code-arg"&gt;&lt;tool_call_id&gt;&lt;/span&gt;
+              <span className="code-comment"># 直前のチェックポイントに戻す</span>
+              {"\n"}
+              <span className="code-green">/restore</span>
+              {"\n\n"}
+              <span className="code-comment"># 特定のツール呼び出し時点まで戻す</span>
+              {"\n"}
+              <span className="code-green">/restore</span>{" "}
+              <span className="code-arg">{"<tool_call_id>"}</span>
             </pre>
           </div>
 
@@ -780,7 +798,7 @@ export default function AntigravitySlashCommandsGuidePage() {
                     </div>
                   </div>
                   <pre className="code-body">
-                    &lt;span class="code-green"&gt;/memory show&lt;/span&gt;
+                    <span className="code-green">/memory show</span>
                   </pre>
                 </div>
               </div>
@@ -798,7 +816,7 @@ export default function AntigravitySlashCommandsGuidePage() {
                     </div>
                   </div>
                   <pre className="code-body">
-                    &lt;span class="code-green"&gt;/memory refresh&lt;/span&gt;
+                    <span className="code-green">/memory refresh</span>
                   </pre>
                 </div>
               </div>
@@ -816,9 +834,10 @@ export default function AntigravitySlashCommandsGuidePage() {
                     </div>
                   </div>
                   <pre className="code-body">
-                    &lt;span class="code-green"&gt;/memory add&lt;/span&gt; &lt;span
-                    class="code-string"&gt;"Cloud
-                    SQLの接続は/cloudsql/&#123;conn-name&#125;を使う"&lt;/span&gt;
+                    <span className="code-green">/memory add</span>{" "}
+                    <span className="code-string">
+                      &quot;Cloud SQLの接続は/cloudsql/&#123;conn-name&#125;を使う&quot;
+                    </span>
                   </pre>
                 </div>
               </div>
@@ -836,7 +855,7 @@ export default function AntigravitySlashCommandsGuidePage() {
                     </div>
                   </div>
                   <pre className="code-body">
-                    &lt;span class="code-green"&gt;/memory list&lt;/span&gt;
+                    <span className="code-green">/memory list</span>
                   </pre>
                 </div>
               </div>
@@ -1075,7 +1094,9 @@ export default function AntigravitySlashCommandsGuidePage() {
                 <div className="cd" style={{ background: "#28c840" }}></div>
               </div>
             </div>
-            <pre className="code-body">&lt;span class="code-green"&gt;/settings&lt;/span&gt;</pre>
+            <pre className="code-body">
+              <span className="code-green">/settings</span>
+            </pre>
           </div>
 
           <h3>
@@ -1099,7 +1120,7 @@ export default function AntigravitySlashCommandsGuidePage() {
               <div className="progress-bar">
                 <div
                   className="progress-fill pf-g"
-                  style={{ "--ProgW": "4.2%" } as React.CSSProperties}
+                  style={{ "--prog-w": "4.2%" } as React.CSSProperties}
                 ></div>
               </div>
             </div>
@@ -1111,7 +1132,7 @@ export default function AntigravitySlashCommandsGuidePage() {
               <div className="progress-bar">
                 <div
                   className="progress-fill pf-c"
-                  style={{ "--ProgW": "0.8%" } as React.CSSProperties}
+                  style={{ "--prog-w": "0.8%" } as React.CSSProperties}
                 ></div>
               </div>
             </div>
@@ -1123,7 +1144,7 @@ export default function AntigravitySlashCommandsGuidePage() {
               <div className="progress-bar">
                 <div
                   className="progress-fill pf-y"
-                  style={{ "--ProgW": "67%" } as React.CSSProperties}
+                  style={{ "--prog-w": "67%" } as React.CSSProperties}
                 ></div>
               </div>
             </div>
@@ -1282,12 +1303,15 @@ export default function AntigravitySlashCommandsGuidePage() {
               <span className="code-title">起動方法</span>
             </div>
             <pre className="code-body">
-              &lt;span class="code-comment"&gt;# 起動時に Plan Mode で開始する&lt;/span&gt; &lt;span
-              class="code-cmd"&gt;gemini&lt;/span&gt; &lt;span
-              class="code-keyword"&gt;--plan&lt;/span&gt; &lt;span class="code-comment"&gt;# または
-              /settings から手動で切り替え&lt;/span&gt; &lt;span
-              class="code-green"&gt;/settings&lt;/span&gt; &lt;span class="code-comment"&gt;# → Plan
-              Mode の ON/OFF を切り替え&lt;/span&gt;
+              <span className="code-comment"># 起動時に Plan Mode で開始する</span>
+              {"\n"}
+              <span className="code-cmd">gemini</span> <span className="code-keyword">--plan</span>
+              {"\n\n"}
+              <span className="code-comment"># または /settings から手動で切り替え</span>
+              {"\n"}
+              <span className="code-green">/settings</span>
+              {"\n"}
+              <span className="code-comment"># → Plan Mode の ON/OFF を切り替え</span>
             </pre>
           </div>
 
@@ -1434,15 +1458,19 @@ export default function AntigravitySlashCommandsGuidePage() {
               <span className="code-lang">TOML</span>
             </div>
             <pre className="code-body">
-              &lt;span class="code-comment" &gt;# /review コマンドとして登録される（ファイル名 =
-              コマンド名）&lt;/span &gt; &lt;span class="code-keyword"&gt;description&lt;/span&gt; =
-              &lt;span
-              class="code-string"&gt;"コードレビューを実施してレポートを生成する"&lt;/span&gt;
-              &lt;span class="code-keyword"&gt;prompt&lt;/span&gt; = &lt;span class="code-string"
-              &gt;""" 以下の観点でコードレビューを実施してください: 1. セキュリティ:
-              SQLインジェクション・XSS・認証漏れ 2. パフォーマンス: N+1クエリ・不要なループ 3. 設計:
-              単一責任原則・依存方向 問題があれば重大度 (P0=致命的/P1=重要/P2=軽微)
-              付きでリストアップしてください。 """&lt;/span &gt;
+              <span className="code-comment">
+                # /review コマンドとして登録される（ファイル名 = コマンド名）
+              </span>
+              {"\n\n"}
+              <span className="code-keyword">description</span>
+              {" = "}
+              <span className="code-string">
+                &quot;コードレビューを実施してレポートを生成する&quot;
+              </span>
+              {"\n\n"}
+              <span className="code-keyword">prompt</span>
+              {" = "}
+              <span className="code-string">{`"""\n以下の観点でコードレビューを実施してください:\n1. セキュリティ: SQLインジェクション・XSS・認証漏れ\n2. パフォーマンス: N+1クエリ・不要なループ\n3. 設計: 単一責任原則・依存方向\n問題があれば重大度 (P0=致命的/P1=重要/P2=軽微) 付きでリストアップしてください。\n"""`}</span>
             </pre>
           </div>
 
@@ -1463,10 +1491,17 @@ export default function AntigravitySlashCommandsGuidePage() {
               <span className="code-lang">TOML</span>
             </div>
             <pre className="code-body">
-              &lt;span class="code-keyword"&gt;description&lt;/span&gt; = &lt;span
-              class="code-string"&gt;"指定された問題のコード修正案を生成する"&lt;/span&gt; &lt;span
-              class="code-keyword"&gt;prompt&lt;/span&gt; = &lt;span class="code-string"
-              &gt;"以下の問題に対するコード修正案を提供してください: &lt;args&gt;"&lt;/span &gt;
+              <span className="code-keyword">description</span>
+              {" = "}
+              <span className="code-string">
+                &quot;指定された問題のコード修正案を生成する&quot;
+              </span>
+              {"\n\n"}
+              <span className="code-keyword">prompt</span>
+              {" = "}
+              <span className="code-string">
+                &quot;以下の問題に対するコード修正案を提供してください: {"<args>"}&quot;
+              </span>
             </pre>
           </div>
 
@@ -1485,12 +1520,15 @@ export default function AntigravitySlashCommandsGuidePage() {
               <span className="code-lang">TOML</span>
             </div>
             <pre className="code-body">
-              &lt;span class="code-keyword"&gt;description&lt;/span&gt; = &lt;span
-              class="code-string"&gt;"ステージ済みの変更からGitコミットメッセージを生成する"&lt;/span&gt;
-              &lt;span class="code-keyword"&gt;prompt&lt;/span&gt; = &lt;span class="code-string"
-              &gt;""" 以下のgit diffに基づいてConventional
-              Commits形式のコミットメッセージを生成してください: ```diff !&#123;git diff
-              --staged&#125; ``` """&lt;/span &gt;
+              <span className="code-keyword">description</span>
+              {" = "}
+              <span className="code-string">
+                &quot;ステージ済みの変更からGitコミットメッセージを生成する&quot;
+              </span>
+              {"\n\n"}
+              <span className="code-keyword">prompt</span>
+              {" = "}
+              <span className="code-string">{`"""\n以下のgit diffに基づいてConventional Commits形式の\nコミットメッセージを生成してください:\n\`\`\`diff\n!{git diff --staged}\n\`\`\`\n"""`}</span>
             </pre>
           </div>
 
@@ -1511,13 +1549,15 @@ export default function AntigravitySlashCommandsGuidePage() {
               <span className="code-lang">TOML</span>
             </div>
             <pre className="code-body">
-              &lt;span class="code-keyword"&gt;description&lt;/span&gt; = &lt;span
-              class="code-string"
-              &gt;"ベストプラクティスガイドを参照してコードを厳格にレビューする"&lt;/span &gt;
-              &lt;span class="code-keyword"&gt;prompt&lt;/span&gt; = &lt;span class="code-string"
-              &gt;""" 以下のコードをレビューしてください: &lt;args&gt;
-              以下のベストプラクティスに従ってレビューすること: @&#123;docs/best-practices.md&#125;
-              """&lt;/span &gt;
+              <span className="code-keyword">description</span>
+              {" = "}
+              <span className="code-string">
+                &quot;ベストプラクティスガイドを参照してコードを厳格にレビューする&quot;
+              </span>
+              {"\n\n"}
+              <span className="code-keyword">prompt</span>
+              {" = "}
+              <span className="code-string">{`"""\n以下のコードをレビューしてください: <args>\n以下のベストプラクティスに従ってレビューすること:\n@{docs/best-practices.md}\n"""`}</span>
             </pre>
           </div>
 
@@ -1548,8 +1588,8 @@ export default function AntigravitySlashCommandsGuidePage() {
                     </div>
                   </div>
                   <pre className="code-body">
-                    &lt;span class="code-cmd"&gt;mkdir&lt;/span&gt; &lt;span
-                    class="code-keyword"&gt;-p&lt;/span&gt; .gemini/commands
+                    <span className="code-cmd">mkdir</span> <span className="code-keyword">-p</span>
+                    {" .gemini/commands"}
                   </pre>
                 </div>
               </div>
@@ -1567,7 +1607,8 @@ export default function AntigravitySlashCommandsGuidePage() {
                     </div>
                   </div>
                   <pre className="code-body">
-                    &lt;span class="code-cmd"&gt;touch&lt;/span&gt; .gemini/commands/deploy.toml
+                    <span className="code-cmd">touch</span>
+                    {" .gemini/commands/deploy.toml"}
                   </pre>
                 </div>
               </div>
@@ -1586,14 +1627,13 @@ export default function AntigravitySlashCommandsGuidePage() {
                     <span className="code-title">.gemini/commands/deploy.toml</span>
                   </div>
                   <pre className="code-body">
-                    &lt;span class="code-keyword"&gt;description&lt;/span&gt; = &lt;span
-                    class="code-string"&gt;"ステージング環境にデプロイする"&lt;/span&gt; &lt;span
-                    class="code-keyword"&gt;prompt&lt;/span&gt; = &lt;span class="code-string"
-                    &gt;""" 以下の手順でデプロイを実行してください: 現在のgitの状態: !&#123;git
-                    status&#125; 1. 未コミットのファイルがある場合は停止してユーザーに報告する 2.
-                    テストを全件実行してPASSを確認する 3. ビルドを実行する 4.
-                    ステージング環境にデプロイする 5. ヘルスチェックで動作確認する 6.
-                    デプロイサマリーを出力する """&lt;/span &gt;
+                    <span className="code-keyword">description</span>
+                    {" = "}
+                    <span className="code-string">&quot;ステージング環境にデプロイする&quot;</span>
+                    {"\n\n"}
+                    <span className="code-keyword">prompt</span>
+                    {" = "}
+                    <span className="code-string">{`"""\n以下の手順でデプロイを実行してください:\n現在のgitの状態: !{git status}\n1. 未コミットのファイルがある場合は停止してユーザーに報告する\n2. テストを全件実行してPASSを確認する\n3. ビルドを実行する\n4. ステージング環境にデプロイする\n5. ヘルスチェックで動作確認する\n6. デプロイサマリーを出力する\n"""`}</span>
                   </pre>
                 </div>
               </div>
@@ -1611,7 +1651,7 @@ export default function AntigravitySlashCommandsGuidePage() {
                     </div>
                   </div>
                   <pre className="code-body">
-                    &lt;span class="code-green"&gt;/deploy&lt;/span&gt;
+                    <span className="code-green">/deploy</span>
                   </pre>
                 </div>
               </div>
@@ -1629,10 +1669,13 @@ export default function AntigravitySlashCommandsGuidePage() {
                     </div>
                   </div>
                   <pre className="code-body">
-                    &lt;span class="code-cmd"&gt;git add&lt;/span&gt; .gemini/commands/ &lt;span
-                    class="code-cmd"&gt;git commit&lt;/span&gt; &lt;span
-                    class="code-keyword"&gt;-m&lt;/span&gt; &lt;span class="code-string"&gt;"feat:
-                    チーム共用デプロイコマンドを追加"&lt;/span&gt;
+                    <span className="code-cmd">git add</span>
+                    {" .gemini/commands/\n"}
+                    <span className="code-cmd">git commit</span>{" "}
+                    <span className="code-keyword">-m</span>{" "}
+                    <span className="code-string">
+                      &quot;feat: チーム共用デプロイコマンドを追加&quot;
+                    </span>
                   </pre>
                 </div>
               </div>
@@ -1692,15 +1735,20 @@ export default function AntigravitySlashCommandsGuidePage() {
               <span className="code-title">使用例</span>
             </div>
             <pre className="code-body">
-              &lt;span class="code-comment"&gt;# 単一ファイルを読ませる&lt;/span&gt; &lt;span
-              class="code-cmd"&gt;@src/UserService.ts&lt;/span&gt; このファイルの問題点を指摘して
-              &lt;span class="code-comment"&gt;# ディレクトリ全体を読ませる&lt;/span&gt; &lt;span
-              class="code-cmd"&gt;@src/components/&lt;/span&gt;
-              このディレクトリのコンポーネント設計を評価して &lt;span class="code-comment"&gt;#
-              複数ファイルを同時に読ませる&lt;/span&gt; &lt;span
-              class="code-cmd"&gt;@src/models/User.ts&lt;/span&gt; &lt;span
-              class="code-cmd"&gt;@src/services/UserService.ts&lt;/span&gt;
-              両ファイルの整合性を確認して
+              <span className="code-comment"># 単一ファイルを読ませる</span>
+              {"\n"}
+              <span className="code-cmd">@src/UserService.ts</span>
+              {" このファイルの問題点を指摘して\n\n"}
+              <span className="code-comment"># ディレクトリ全体を読ませる</span>
+              {"\n"}
+              <span className="code-cmd">@src/components/</span>
+              {"\nこのディレクトリのコンポーネント設計を評価して\n\n"}
+              <span className="code-comment"># 複数ファイルを同時に読ませる</span>
+              {"\n"}
+              <span className="code-cmd">@src/models/User.ts</span>
+              {"\n"}
+              <span className="code-cmd">@src/services/UserService.ts</span>
+              {" 両ファイルの整合性を確認して"}
             </pre>
           </div>
 
@@ -1727,12 +1775,17 @@ export default function AntigravitySlashCommandsGuidePage() {
               <span className="code-title">使用例</span>
             </div>
             <pre className="code-body">
-              &lt;span class="code-comment"&gt;# 単発実行&lt;/span&gt; &lt;span
-              class="code-cmd"&gt;!git&lt;/span&gt; log --oneline -10 &lt;span
-              class="code-cmd"&gt;!ls&lt;/span&gt; -la src/ &lt;span class="code-comment"&gt;# !
-              だけ入力するとシェルモードに切り替わる&lt;/span&gt; &lt;span
-              class="code-cmd"&gt;!&lt;/span&gt; &lt;span class="code-comment"&gt;# →
-              シェルモードに入る。exit で CLI に戻る&lt;/span&gt;
+              <span className="code-comment"># 単発実行</span>
+              {"\n"}
+              <span className="code-cmd">!git</span>
+              {" log --oneline -10\n"}
+              <span className="code-cmd">!ls</span>
+              {" -la src/\n\n"}
+              <span className="code-comment"># ! だけ入力するとシェルモードに切り替わる</span>
+              {"\n"}
+              <span className="code-cmd">!</span>
+              {"\n"}
+              <span className="code-comment"># → シェルモードに入る。exit で CLI に戻る</span>
             </pre>
           </div>
 
@@ -1751,20 +1804,29 @@ export default function AntigravitySlashCommandsGuidePage() {
             <div className="compare-card compare-ok">
               <div className="compare-label">✅ 安全な使い方</div>
               <pre>
-                &lt;span class="code-comment"&gt;# 読み取り専用の確認コマンド&lt;/span&gt; &lt;span
-                class="code-green"&gt;!git status&lt;/span&gt; &lt;span class="code-green"&gt;!ls
-                -la&lt;/span&gt; &lt;span class="code-green"&gt;!cat package.json&lt;/span&gt;
-                &lt;span class="code-comment"&gt;# 実行前に内容を確認してから&lt;/span&gt; &lt;span
-                class="code-green"&gt;!npm test&lt;/span&gt;
+                <span className="code-comment"># 読み取り専用の確認コマンド</span>
+                {"\n"}
+                <span className="code-green">!git status</span>
+                {"\n"}
+                <span className="code-green">!ls -la</span>
+                {"\n"}
+                <span className="code-green">!cat package.json</span>
+                {"\n\n"}
+                <span className="code-comment"># 実行前に内容を確認してから</span>
+                {"\n"}
+                <span className="code-green">!npm test</span>
               </pre>
             </div>
             <div className="compare-card compare-ng">
               <div className="compare-label">❌ 危険な使い方</div>
               <pre>
-                &lt;span class="code-comment"&gt;# 確認なしに破壊的コマンドを実行&lt;/span&gt;
-                &lt;span class="code-red"&gt;!rm -rf node_modules&lt;/span&gt; &lt;span
-                class="code-comment"&gt;# 本番に影響するコマンドを不注意に実行&lt;/span&gt; &lt;span
-                class="code-red"&gt;!kubectl delete pod --all&lt;/span&gt;
+                <span className="code-comment"># 確認なしに破壊的コマンドを実行</span>
+                {"\n"}
+                <span className="code-red">!rm -rf node_modules</span>
+                {"\n\n"}
+                <span className="code-comment"># 本番に影響するコマンドを不注意に実行</span>
+                {"\n"}
+                <span className="code-red">!kubectl delete pod --all</span>
               </pre>
             </div>
           </div>

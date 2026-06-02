@@ -1,6 +1,31 @@
 .pageWrapper {
   display: block;
 }
+
+/* antigravity-slash-commands-guide ページ固有のデザイントークン
+ * 元 HTML の :root 変数をスコープ化。globals.css の共通変数と衝突しないよう
+ * .antigravity-guide-wrapper 配下に限定して定義する。 */
+:global(.antigravity-guide-wrapper) {
+  --bg-deep: #030712;
+  --bg-surface: #0d1117;
+  --bg-surface2: #161b22;
+  --bg-surface3: #1c2333;
+  --border: #21293a;
+  --border2: #2d3748;
+  --neon-green: #00ff88;
+  --neon-cyan: #00d4ff;
+  --neon-purple: #7c4dff;
+  --neon-yellow: #f0b429;
+  --neon-red: #ff4757;
+  --neon-orange: #ff6b35;
+  --text: #e2e8f0;
+  --text-dim: #8b949e;
+  --text-muted: #4a5568;
+  --radius: 8px;
+  --radius-lg: 16px;
+  --nav-h: 56px;
+}
+
 :global(.antigravity-guide-wrapper *),
 :global(.antigravity-guide-wrapper *::before),
 :global(.antigravity-guide-wrapper *::after) {
@@ -146,7 +171,7 @@
   animation: fadeInDown 0.6s ease both;
 }
 :global(.antigravity-guide-wrapper .hero-tag::before) {
-  content: "";
+  content: '';
   width: 7px;
   height: 7px;
   border-radius: 50%;
@@ -451,7 +476,7 @@
   position: relative;
 }
 :global(.antigravity-guide-wrapper .step-list::before) {
-  content: "";
+  content: '';
   position: absolute;
   left: 20px;
   top: 40px;
@@ -659,7 +684,7 @@
   overflow: hidden;
 }
 :global(.antigravity-guide-wrapper .metric-card::before) {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
@@ -824,7 +849,7 @@
   position: relative;
 }
 :global(.antigravity-guide-wrapper .ref-card::after) {
-  content: "";
+  content: '';
   position: absolute;
   bottom: 0;
   left: 0;
@@ -880,7 +905,7 @@
   overflow: hidden;
 }
 :global(.antigravity-guide-wrapper .trend-card::before) {
-  content: "";
+  content: '';
   position: absolute;
   top: -40px;
   right: -40px;
@@ -1002,8 +1027,13 @@
   margin-bottom: 16px;
 }
 :global(.antigravity-guide-wrapper .mermaid) {
-  display: block;
+  display: flex;
+  justify-content: center;
   width: 100%;
+}
+:global(.antigravity-guide-wrapper .mermaid svg) {
+  max-width: 100%;
+  height: auto;
 }
 
 /* FOOTER */
@@ -1011,7 +1041,13 @@
   background: var(--bg-surface);
   border-top: 1px solid var(--border);
   padding: 40px 24px;
+  margin: auto;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 :global(.antigravity-guide-wrapper .footer-brand) {
   font-family: var(--font-display);
