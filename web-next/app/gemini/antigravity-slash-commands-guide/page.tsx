@@ -9,7 +9,7 @@ export const metadata = {
 
 export default function AntigravitySlashCommandsGuidePage() {
   return (
-    <main className={styles.wrapper}>
+    <main className="antigravity-guide-wrapper">
       {/* NAV */}
       <nav>
         <div className="nav-inner">
