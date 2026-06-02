@@ -39,6 +39,21 @@ services:
       - NEXT_TELEMETRY_DISABLED=1
       - NODE_ENV=development
 
+  # ── sonar-scanner ──────────────────────────────────────────────────────────
+  # 用途: SonarQube Cloud へローカルから解析を送信する scanner CLI
+  # 起動: make sonar（profiles: tools のため通常の make dev/scrape では起動しない）
+  # 前提: 事前に make sonar がカバレッジを生成しレポートパスを補正済みであること
+  sonar-scanner:
+    profiles: ["tools"]
+    image: sonarsource/sonar-scanner-cli:11
+    volumes:
+      # リポジトリルートをマウント（sonar-project.properties を読み込む）
+      - .:/usr/src
+    environment:
+      # SONAR_TOKEN はホストの環境変数から渡す（コミット禁止）
+      - SONAR_TOKEN=${SONAR_TOKEN}
+      - SONAR_HOST_URL=https://sonarcloud.io
+
 volumes:
   # Linux 用 Python .venv（Playwright ブラウザバイナリはイメージ層に保存）
   scraper-venv:

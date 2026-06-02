@@ -1,0 +1,81 @@
+name: sonarqube
+
+# SonarQube Cloud（public 無料プラン）による品質解析。
+# 既存 test.yaml（変更検出ゲート）とは独立。Sonar は両言語の全体像が必要なため両方を常に計測する。
+# 前提: リポジトリ Secrets に SONAR_TOKEN を登録し、Cloud 側で Automatic Analysis を OFF にすること。
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+
+# 同一 ref への新しい push/PR が古い実行をキャンセル（重複実行・クレジット消費を防止）
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: SonarQube Cloud Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # 新コード判定・blame 精度のため全履歴を取得（Sonar 推奨）
+          fetch-depth: 0
+          # 認証トークンをワークツリー（.git/config）に残さない（後続ステップへの漏洩防止）
+          persist-credentials: false
+
+      # ── フロントエンド カバレッジ（web-next）──────────────────────────────
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: oven-sh/setup-bun@v1
+
+      - name: Install web deps
+        working-directory: web-next
+        run: bun install --frozen-lockfile
+
+      - name: Web coverage
+        working-directory: web-next
+        run: bun run test:coverage
+
+      # ── バックエンド カバレッジ（scraper）────────────────────────────────
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: 'scraper/uv.lock'
+
+      - name: Install scraper deps
+        working-directory: scraper
+        run: uv sync --frozen
+
+      - name: Scraper coverage
+        working-directory: scraper
+        run: uv run pytest --cov --cov-report=xml
+
+      # ── レポート内パスをリポジトリルート相対へ補正 ────────────────────────
+      # これを行わないと scanner（base dir=ルート）がファイルを解決できずカバレッジ 0% になる
+      - name: Normalize coverage report paths
+        run: |
+          perl -i -pe 's{^SF:}{SF:web-next/}' web-next/coverage/lcov.info
+          perl -i -pe 's{<source>src/scraper</source>}{<source>scraper/src/scraper</source>}' scraper/coverage.xml
+
+      # ── SonarQube Cloud 解析 + Quality Gate ───────────────────────────────
+      - name: SonarQube Scan
+        # フォーク PR は SONAR_TOKEN シークレットを受け取れず失敗するためスキップ
+        # （同一リポジトリ PR か、非 PR イベント時のみ実行）
+        if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
+        with:
+          # Quality Gate 失敗時にジョブを fail（PR の回帰防止）
+          args: >
+            -Dsonar.qualitygate.wait=true

@@ -11,6 +11,7 @@
     "format": "biome format . --write",
     "audit": "bun audit",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit"
@@ -28,6 +29,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.11",
+    "@playwright/test": "^1.49.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
@@ -35,15 +37,15 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "4.1.4",
     "@vitest/ui": "^4.1.4",
-    "@playwright/test": "^1.49.0",
+    "cheerio": "^1.0.0-rc.12",
     "jsdom": "^29.0.2",
+    "marked": "^12.0.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.4",
-    "vitest-axe": "^0.1.0",
-    "cheerio": "^1.0.0-rc.12",
-    "marked": "^12.0.0"
+    "vitest-axe": "^0.1.0"
   },
   "ignoreScripts": [
     "sharp",

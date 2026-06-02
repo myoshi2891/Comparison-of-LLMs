@@ -24,4 +24,15 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "pytest>=9.0.3",
+    "pytest-cov>=6.0.0",
 ]
+
+[tool.coverage.run]
+# 計測対象はパッケージ本体のみ
+source = ["src/scraper"]
+# coverage.xml のファイルパスを相対化 → SonarQube のソースパス解決ズレ（カバレッジ 0%）を防ぐ
+relative_files = true
+
+# 既定の `uv run pytest` の出力は変更しない（決定論性維持）。
+# カバレッジは明示フラグで生成する: uv run pytest --cov --cov-report=xml
+#   → make sonar / .github/workflows/sonarqube.yml が付与する。

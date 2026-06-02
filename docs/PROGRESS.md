@@ -14,10 +14,12 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（既知の違反なし、0 件維持）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **660 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **665 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **5 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **SonarQube Cloud 解析の導入（品質 CI/CD）**: public 無料プランをモノレポ単一プロジェクトで導入。両言語にカバレッジ計測を追加（web-next: `@vitest/coverage-v8`→`lcov.info` / scraper: `pytest-cov`→`coverage.xml`、いずれも dev 依存）。`sonar-project.properties` / `.github/workflows/sonarqube.yml`（`push:main,dev`+PR）/ `make sonar`（Docker scanner CLI）を追加。**モノレポのレポートパス補正**（lcov `SF:`→`web-next/`、coverage.xml `<source>`→`scraper/src/scraper`）でカバレッジ 0% を回避。既定 `uv run pytest` の出力は不変。**初回手動作業**: Cloud import→Automatic Analysis OFF、org/projectKey 反映、GitHub Secrets に `SONAR_TOKEN` 登録。
+- **SonarQube Code Review 実践ガイド**: Next.js App Router への移行完了 🚀（5件の契約テストを追加し、合計665テスト合格）。
 - **GitHub Copilot Code Review 完全活用ガイド**: Next.js App Router への移行完了 🚀（5件の契約テストを追加し、合計660テスト合格）。
 - **CodeRabbit 完全活用ガイド**: Next.js App Router への移行完了 🚀（5件の契約テストを追加し、合計655テスト合格）。
 - **Claude Code スラッシュコマンド完全ガイド**: Next.js App Router への移行完了 🚀（5件の契約テストを追加し、合計650テスト合格）。
@@ -29,7 +31,7 @@
 
 ### テスト分野別のカバレッジ概要 (2026-06-01 時点)
 - **Unit**:
-  - `app/` (全 21 ガイドページルート): ✅ 100% 契約テスト（タイトル、セクション数、rel、metadata）
+  - `app/` (全 22 ガイドページルート): ✅ 100% 契約テスト（タイトル、セクション数、rel、metadata）
   - `components/` (電卓 UI 9/9 コンポーネント): ✅ 100%
   - `site/` (共通ヘッダー/バナー): ✅ 100%
   - `lib/` (ユーティリティ): ほぼ網羅 (metadata, fonts を除く)
