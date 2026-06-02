@@ -71,7 +71,7 @@ jobs:
         # フォーク PR は SONAR_TOKEN シークレットを受け取れず失敗するためスキップ
         # （同一リポジトリ PR か、非 PR イベント時のみ実行）
         if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
-        uses: SonarSource/sonarqube-scan-action@v5
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io
