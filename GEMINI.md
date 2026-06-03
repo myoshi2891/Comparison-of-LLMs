@@ -1,6 +1,6 @@
 # GEMINI.md
 
-Updated 2026-06-02
+Updated 2026-06-03
 
 GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、GEMINI.md はその委譲 pointer として機能する。
@@ -17,7 +17,7 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 
 ## 絶対に守るべきルール（CLAUDE.md と docs/PROGRESS.md のサマリ）
 
-- **R1（Biome scope）**: `bun run lint:fix` / `bunx biome check --write`（パス引数なし）は **禁止**。必ずファイル単位でパス指定
+- **R1（Biome scope）**: `bun run lint:fix` / `bunx biome check --write`（パス引数なし）は **禁止**。必ずファイル単位でパス指 定
 - **legacy/ 配下の編集禁止**（移行完了・凍結済み）
 - **ファイル全体の書き直し禁止**（明示指示がない限り）
 - **依存関係のアップグレード禁止**
@@ -27,7 +27,7 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 ## 検証コマンド
 
 ```bash
-cd web-next && bun run test        # 665 pass（全 Green ✅）
+cd web-next && bun run test        # 670 pass（全 Green ✅）
 cd web-next && bun run typecheck   # OK
 cd web-next && bun run build       # 全ルートが ○ (Static)
 cd web-next && bun run lint        # 0 件（全解消 ✅）
