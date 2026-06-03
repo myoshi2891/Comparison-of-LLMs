@@ -1,13 +1,15 @@
 # Testing
 
+Updated 2026-06-02
+
 > テスト戦略・実行方法・テスト追加ガイドライン。
 
 ## 現状のテスト体制
 
 | 領域 | フレームワーク | 状態 | コマンド |
 | ------ | --------------- | ------ | ---------- |
-| フロントエンド (web-next/) | Vitest + @testing-library/react | 553 passed（全 Green） | `cd web-next && bun run test` |
-| スクレイパー (scraper/) | pytest | 5/5 passed | `cd scraper && uv run pytest` |
+| フロントエンド (web-next/) | Vitest + @testing-library/react | 665 passed（全 Green） | `cd web-next && bun run test` |
+| スクレイパー (scraper/) | pytest | 38/38 passed | `cd scraper && uv run pytest` |
 
 ## テスト実行
 

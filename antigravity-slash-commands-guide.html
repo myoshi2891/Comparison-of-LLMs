@@ -1,0 +1,3447 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gemini CLI / Antigravity スラッシュコマンド完全ガイド v0.44.1</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans+JP:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+      :root {
+        --bg-deep: #030712;
+        --bg-surface: #0d1117;
+        --bg-surface2: #161b22;
+        --bg-surface3: #1c2333;
+        --border: #21293a;
+        --border2: #2d3748;
+        --neon-green: #00ff88;
+        --neon-cyan: #00d4ff;
+        --neon-purple: #7c4dff;
+        --neon-yellow: #f0b429;
+        --neon-red: #ff4757;
+        --neon-orange: #ff6b35;
+        --text: #e2e8f0;
+        --text-dim: #8b949e;
+        --text-muted: #4a5568;
+        --font-display: 'Syne', sans-serif;
+        --font-mono: 'Space Mono', monospace;
+        --font-body: 'IBM Plex Sans JP', sans-serif;
+        --radius: 8px;
+        --radius-lg: 16px;
+        --nav-h: 56px;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: calc(var(--nav-h) + 16px);
+      }
+      body {
+        background: var(--bg-deep);
+        color: var(--text);
+        font-family: var(--font-body);
+        font-size: 1rem;
+        line-height: 1.75;
+        overflow-x: hidden;
+        position: relative;
+      }
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 255, 136, 0.012) 2px,
+          rgba(0, 255, 136, 0.012) 4px
+        );
+        pointer-events: none;
+        z-index: 9000;
+      }
+      body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(0, 212, 255, 0.025) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 212, 255, 0.025) 1px, transparent 1px);
+        background-size: 40px 40px;
+        pointer-events: none;
+        z-index: 8999;
+      }
+      a {
+        color: var(--neon-cyan);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5 {
+        font-family: var(--font-display);
+        line-height: 1.2;
+      }
+      code {
+        font-family: var(--font-mono);
+        font-size: 0.9rem;
+        background: var(--bg-surface3);
+        border: 1px solid var(--border2);
+        border-radius: 4px;
+        padding: 2px 7px;
+        color: var(--neon-green);
+      }
+      strong {
+        color: #fff;
+        font-weight: 600;
+      }
+
+      /* NAV */
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 500;
+        background: rgba(3, 7, 18, 0.92);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--border);
+        height: var(--nav-h);
+      }
+      .nav-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 20px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      .nav-inner::-webkit-scrollbar {
+        display: none;
+      }
+      .nav-brand {
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: 1rem;
+        color: var(--neon-green);
+        white-space: nowrap;
+        margin-right: 12px;
+        letter-spacing: 0.04em;
+        flex-shrink: 0;
+      }
+      .nav-brand span {
+        color: var(--neon-cyan);
+      }
+      nav a.nav-link {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--text-dim);
+        white-space: nowrap;
+        padding: 5px 10px;
+        border-radius: 6px;
+        transition: all 0.2s;
+        flex-shrink: 0;
+      }
+      nav a.nav-link:hover {
+        color: var(--neon-green);
+        background: rgba(0, 255, 136, 0.08);
+        text-decoration: none;
+      }
+      .nav-ver {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        color: var(--neon-yellow);
+        border: 1px solid rgba(240, 180, 41, 0.3);
+        border-radius: 4px;
+        padding: 2px 8px;
+        white-space: nowrap;
+        margin-left: auto;
+        flex-shrink: 0;
+      }
+
+      /* HERO */
+      .hero {
+        position: relative;
+        overflow: hidden;
+        padding: 90px 24px 80px;
+        text-align: center;
+        background: linear-gradient(160deg, #050c1a 0%, var(--bg-deep) 55%, #040a0f 100%);
+        border-bottom: 1px solid var(--border);
+      }
+      .hero-glow {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(ellipse 60% 50% at 50% -20%, rgba(0, 255, 136, 0.1) 0%, transparent 60%),
+          radial-gradient(ellipse 40% 30% at 80% 60%, rgba(0, 212, 255, 0.06) 0%, transparent 55%);
+        animation: pulse 4s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.7;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+      .hero-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--neon-green);
+        padding: 0.3rem 1rem;
+        border: 1px solid rgba(0, 255, 136, 0.35);
+        border-radius: 2rem;
+        background: rgba(0, 255, 136, 0.06);
+        margin-bottom: 1.4rem;
+        animation: fadeInDown 0.6s ease both;
+      }
+      .hero-tag::before {
+        content: '';
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--neon-green);
+        animation: blink 1.5s infinite;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.2;
+        }
+      }
+      .hero h1 {
+        font-size: clamp(2rem, 5vw, 3.4rem);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: #f0f6ff;
+        margin-bottom: 1.2rem;
+        animation: fadeInDown 0.7s 0.1s ease both;
+      }
+      .hero h1 .accent {
+        background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .hero-sub {
+        font-size: 1.05rem;
+        color: var(--text-dim);
+        max-width: 620px;
+        margin: 0 auto 2rem;
+        line-height: 1.75;
+        animation: fadeInUp 0.7s 0.2s ease both;
+      }
+      .hero-badges {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        flex-wrap: wrap;
+        animation: fadeInUp 0.7s 0.3s ease both;
+      }
+      .ver-badge {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        padding: 0.3rem 0.8rem;
+        border-radius: 2rem;
+        border: 1px solid;
+        white-space: nowrap;
+      }
+      .vb-g {
+        border-color: rgba(0, 255, 136, 0.4);
+        color: var(--neon-green);
+        background: rgba(0, 255, 136, 0.07);
+      }
+      .vb-c {
+        border-color: rgba(0, 212, 255, 0.4);
+        color: var(--neon-cyan);
+        background: rgba(0, 212, 255, 0.07);
+      }
+      .vb-y {
+        border-color: rgba(240, 180, 41, 0.4);
+        color: var(--neon-yellow);
+        background: rgba(240, 180, 41, 0.07);
+      }
+      .vb-r {
+        border-color: rgba(255, 71, 87, 0.5);
+        color: var(--neon-red);
+        background: rgba(255, 71, 87, 0.08);
+      }
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* WRAPPER */
+      .wrap {
+        max-width: 1060px;
+        margin: 0 auto;
+        padding: 60px 24px 100px;
+      }
+
+      /* CHAPTER */
+      .chapter {
+        margin-bottom: 80px;
+      }
+      .chapter-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 28px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+      }
+      .chapter-num {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        font-weight: 700;
+        background: var(--neon-green);
+        color: #000;
+        padding: 4px 12px;
+        border-radius: 2rem;
+        flex-shrink: 0;
+      }
+      .chapter-klevel {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        padding: 3px 10px;
+        border-radius: 2rem;
+        border: 1px solid;
+        flex-shrink: 0;
+      }
+      .kl1 {
+        border-color: rgba(0, 255, 136, 0.3);
+        color: var(--neon-green);
+      }
+      .kl2 {
+        border-color: rgba(0, 212, 255, 0.3);
+        color: var(--neon-cyan);
+      }
+      .kl3 {
+        border-color: rgba(240, 180, 41, 0.3);
+        color: var(--neon-yellow);
+      }
+      .chapter-header h2 {
+        font-size: clamp(1.35rem, 3vw, 1.9rem);
+        font-weight: 700;
+        color: #edf3ff;
+      }
+      .chapter-header h2 .cmd {
+        color: var(--neon-green);
+      }
+      p {
+        margin-bottom: 0.9rem;
+        font-size: 1rem;
+        color: var(--text);
+      }
+      p:last-child {
+        margin-bottom: 0;
+      }
+      h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #ddeeff;
+        margin: 2rem 0 0.8rem;
+      }
+      h4 {
+        font-family: var(--font-display);
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-dim);
+        margin: 1.5rem 0 0.6rem;
+      }
+
+      /* ALERT / CALLOUT */
+      .alert {
+        border-radius: var(--radius);
+        padding: 14px 18px;
+        margin: 14px 0;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        font-size: 1rem;
+      }
+      .alert-icon {
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+      .alert-info {
+        background: rgba(0, 212, 255, 0.07);
+        border-left: 3px solid var(--neon-cyan);
+      }
+      .alert-warn {
+        background: rgba(240, 180, 41, 0.07);
+        border-left: 3px solid var(--neon-yellow);
+      }
+      .alert-danger {
+        background: rgba(255, 71, 87, 0.07);
+        border-left: 3px solid var(--neon-red);
+      }
+      .alert-success {
+        background: rgba(0, 255, 136, 0.07);
+        border-left: 3px solid var(--neon-green);
+      }
+      .callout {
+        border-radius: var(--radius);
+        padding: 16px 20px;
+        margin: 16px 0;
+        font-size: 1rem;
+      }
+      .callout-info {
+        background: rgba(0, 212, 255, 0.06);
+        border: 1px solid rgba(0, 212, 255, 0.2);
+      }
+      .callout-warn {
+        background: rgba(240, 180, 41, 0.06);
+        border: 1px solid rgba(240, 180, 41, 0.2);
+      }
+      .callout-danger {
+        background: rgba(255, 71, 87, 0.06);
+        border: 1px solid rgba(255, 71, 87, 0.2);
+      }
+
+      /* CODE BLOCK */
+      .code-block {
+        background: #060810;
+        border: 1px solid var(--border2);
+        border-radius: var(--radius);
+        overflow: hidden;
+        margin: 14px 0;
+      }
+      .code-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 16px;
+        background: var(--bg-surface2);
+        border-bottom: 1px solid var(--border);
+      }
+      .code-dots {
+        display: flex;
+        gap: 5px;
+      }
+      .cd {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .code-title {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        color: var(--text-muted);
+      }
+      .code-lang {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        color: var(--neon-purple);
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+      .code-body {
+        padding: 18px 22px;
+        font-family: var(--font-mono);
+        font-size: 0.85rem;
+        line-height: 1.85;
+        color: #d0dcea;
+        overflow-x: auto;
+        white-space: pre;
+      }
+      .code-keyword {
+        color: var(--neon-purple);
+      }
+      .code-string {
+        color: var(--neon-green);
+      }
+      .code-comment {
+        color: #4a6080;
+        font-style: italic;
+      }
+      .code-cmd {
+        color: var(--neon-cyan);
+      }
+      .code-arg {
+        color: var(--neon-yellow);
+      }
+      .code-red {
+        color: var(--neon-red);
+      }
+      .code-green {
+        color: var(--neon-green);
+      }
+      .code-white {
+        color: #fff;
+        font-weight: 700;
+      }
+
+      /* STEP LIST */
+      .step-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        margin: 16px 0;
+        position: relative;
+      }
+      .step-list::before {
+        content: '';
+        position: absolute;
+        left: 20px;
+        top: 40px;
+        bottom: 20px;
+        width: 1px;
+        background: linear-gradient(to bottom, var(--neon-green), transparent);
+      }
+      .step-item {
+        display: flex;
+        gap: 20px;
+        padding: 18px 0;
+      }
+      .step-num {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        border-radius: 50%;
+        border: 2px solid var(--neon-green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-mono);
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--neon-green);
+        position: relative;
+        z-index: 1;
+        background: var(--bg-deep);
+        flex-shrink: 0;
+      }
+      .step-body {
+        flex: 1;
+        padding-top: 8px;
+      }
+      .step-title {
+        font-family: var(--font-display);
+        font-size: 1rem;
+        font-weight: 700;
+        color: #ddeeff;
+        margin-bottom: 6px;
+      }
+      .step-desc {
+        font-size: 0.95rem;
+        color: var(--text-dim);
+        line-height: 1.7;
+      }
+
+      /* TABLE */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 16px 0;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+      }
+      thead th {
+        background: var(--bg-surface2);
+        color: var(--text);
+        font-family: var(--font-display);
+        font-weight: 600;
+        padding: 10px 16px;
+        text-align: left;
+        border-bottom: 1px solid var(--border2);
+        font-size: 0.85rem;
+      }
+      tbody td {
+        padding: 10px 16px;
+        border-bottom: 1px solid rgba(33, 41, 58, 0.6);
+        color: var(--text-dim);
+        vertical-align: top;
+        line-height: 1.65;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:hover td {
+        background: rgba(0, 255, 136, 0.03);
+        color: var(--text);
+      }
+      td code {
+        font-size: 0.8rem;
+      }
+      td:first-child {
+        color: var(--neon-cyan);
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+      }
+
+      /* TOC GRID */
+      .toc-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
+        margin: 24px 0;
+      }
+      .toc-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px 18px;
+        transition: all 0.25s;
+        text-decoration: none !important;
+        display: block;
+      }
+      .toc-card:hover {
+        border-color: var(--neon-green);
+        background: rgba(0, 255, 136, 0.04);
+        transform: translateY(-2px);
+        text-decoration: none;
+      }
+      .toc-card-num {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        color: var(--neon-green);
+        margin-bottom: 4px;
+      }
+      .toc-card-title {
+        font-family: var(--font-display);
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--text);
+        line-height: 1.4;
+      }
+      .toc-card-sub {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin-top: 4px;
+        line-height: 1.4;
+      }
+
+      /* ARCH LAYERS */
+      .arch-layers {
+        margin: 16px 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .arch-layer {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px 18px;
+        transition: all 0.2s;
+      }
+      .arch-layer:hover {
+        transform: translateX(4px);
+      }
+      .arch-layer.l-green {
+        border-left: 4px solid var(--neon-green);
+      }
+      .arch-layer.l-cyan {
+        border-left: 4px solid var(--neon-cyan);
+      }
+      .arch-layer.l-yellow {
+        border-left: 4px solid var(--neon-yellow);
+      }
+      .arch-layer.l-red {
+        border-left: 4px solid var(--neon-red);
+      }
+      .arch-layer.l-purple {
+        border-left: 4px solid var(--neon-purple);
+      }
+      .arch-label {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 700;
+        min-width: 80px;
+        flex-shrink: 0;
+      }
+      .arch-content {
+        flex: 1;
+      }
+      .arch-content strong {
+        font-size: 0.9rem;
+        color: #ddeeff;
+        display: block;
+        margin-bottom: 2px;
+      }
+      .arch-content span {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+      }
+
+      /* METRIC GRID */
+      .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 14px;
+        margin: 16px 0;
+      }
+      .metric-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 20px;
+        transition: all 0.25s;
+        position: relative;
+        overflow: hidden;
+      }
+      .metric-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+      }
+      .mc-g::before {
+        background: var(--neon-green);
+      }
+      .mc-c::before {
+        background: var(--neon-cyan);
+      }
+      .mc-y::before {
+        background: var(--neon-yellow);
+      }
+      .mc-r::before {
+        background: var(--neon-red);
+      }
+      .mc-p::before {
+        background: var(--neon-purple);
+      }
+      .metric-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 30px rgba(0, 255, 136, 0.1);
+      }
+      .metric-num {
+        font-family: var(--font-mono);
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--neon-green);
+        opacity: 0.12;
+        position: absolute;
+        top: 8px;
+        right: 14px;
+        line-height: 1;
+      }
+      .metric-title {
+        font-family: var(--font-display);
+        font-size: 0.92rem;
+        font-weight: 700;
+        color: #ddeeff;
+        margin-bottom: 6px;
+      }
+      .metric-desc {
+        font-size: 0.82rem;
+        color: var(--text-dim);
+        line-height: 1.6;
+      }
+
+      /* PROGRESS ITEM */
+      .progress-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 16px 0;
+      }
+      .progress-item {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 12px 16px;
+      }
+      .progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .progress-label {
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        color: var(--text);
+      }
+      .progress-val {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--neon-cyan);
+      }
+      .progress-bar {
+        height: 4px;
+        background: var(--bg-surface3);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        border-radius: 2px;
+        animation: growBar 1.2s ease both;
+      }
+      @keyframes growBar {
+        from {
+          width: 0;
+        }
+        to {
+          width: var(--prog-w, 50%);
+        }
+      }
+      .pf-g {
+        background: var(--neon-green);
+      }
+      .pf-c {
+        background: var(--neon-cyan);
+      }
+      .pf-y {
+        background: var(--neon-yellow);
+      }
+      .pf-r {
+        background: var(--neon-red);
+      }
+
+      /* EXAM GRID */
+      .exam-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+        margin: 16px 0;
+      }
+      .exam-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px;
+        text-align: center;
+        transition: all 0.2s;
+      }
+      .exam-card:hover {
+        border-color: var(--neon-cyan);
+        transform: scale(1.02);
+      }
+      .exam-cmd {
+        font-family: var(--font-mono);
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--neon-green);
+        margin-bottom: 6px;
+      }
+      .exam-desc {
+        font-size: 0.8rem;
+        color: var(--text-dim);
+        margin-bottom: 8px;
+        line-height: 1.5;
+      }
+      .exam-stars {
+        color: var(--neon-yellow);
+        font-size: 0.85rem;
+      }
+
+      /* REF GRID */
+      .ref-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 12px;
+        margin: 16px 0;
+      }
+      .ref-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px;
+        transition: all 0.25s;
+        overflow: hidden;
+        position: relative;
+      }
+      .ref-card::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--neon-cyan);
+        transform: translateY(100%);
+        transition: transform 0.2s;
+      }
+      .ref-card:hover {
+        border-color: var(--neon-cyan);
+        transform: translateY(-2px);
+      }
+      .ref-card:hover::after {
+        transform: translateY(0);
+      }
+      .ref-cat {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--neon-cyan);
+        margin-bottom: 6px;
+      }
+      .ref-title {
+        font-family: var(--font-display);
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 6px;
+        line-height: 1.4;
+      }
+      .ref-url {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--neon-green);
+        word-break: break-all;
+        opacity: 0.8;
+      }
+      .ref-url:hover {
+        opacity: 1;
+      }
+
+      /* TREND CARD */
+      .trend-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 20px 24px;
+        margin: 14px 0;
+        position: relative;
+        overflow: hidden;
+      }
+      .trend-card::before {
+        content: '';
+        position: absolute;
+        top: -40px;
+        right: -40px;
+        width: 120px;
+        height: 120px;
+        background: radial-gradient(circle, rgba(0, 255, 136, 0.12) 0%, transparent 70%);
+        pointer-events: none;
+      }
+      .trend-label {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: var(--neon-yellow);
+        margin-bottom: 8px;
+      }
+      .trend-card h4 {
+        font-family: var(--font-display);
+        font-size: 1rem;
+        font-weight: 700;
+        color: #fff;
+        margin: 0 0 8px;
+      }
+      .trend-card p {
+        font-size: 0.9rem;
+        color: var(--text-dim);
+        margin: 0;
+        line-height: 1.65;
+      }
+
+      /* PYRAMID */
+      .pyramid {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        margin: 20px 0;
+      }
+      .pyramid-row {
+        display: flex;
+        justify-content: center;
+        transition: transform 0.2s;
+      }
+      .pyramid-row:hover {
+        transform: scale(1.03);
+      }
+      .pyramid-block {
+        padding: 10px 20px;
+        text-align: center;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        font-family: var(--font-display);
+      }
+
+      /* COMPARE */
+      .compare-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin: 14px 0;
+      }
+      @media (max-width: 640px) {
+        .compare-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .compare-card {
+        border-radius: var(--radius);
+        padding: 16px 18px;
+      }
+      .compare-ok {
+        background: rgba(0, 255, 136, 0.06);
+        border: 1px solid rgba(0, 255, 136, 0.25);
+      }
+      .compare-ng {
+        background: rgba(255, 71, 87, 0.06);
+        border: 1px solid rgba(255, 71, 87, 0.2);
+      }
+      .compare-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 10px;
+      }
+      .compare-ok .compare-label {
+        color: var(--neon-green);
+      }
+      .compare-ng .compare-label {
+        color: var(--neon-red);
+      }
+      .compare-card pre {
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        color: var(--text-dim);
+        white-space: pre-wrap;
+        word-break: break-all;
+        line-height: 1.7;
+      }
+
+      /* MERMAID */
+      .mermaid-wrap {
+        background: var(--bg-surface);
+        border: 1px solid var(--border2);
+        border-radius: var(--radius-lg);
+        padding: 28px 20px;
+        margin: 16px 0;
+        overflow-x: auto;
+        text-align: center;
+      }
+      .mermaid-title {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 16px;
+      }
+      .mermaid {
+        display: block;
+        width: 100%;
+      }
+
+      /* FOOTER */
+      footer {
+        background: var(--bg-surface);
+        border-top: 1px solid var(--border);
+        padding: 40px 24px;
+        text-align: center;
+      }
+      .footer-brand {
+        font-family: var(--font-display);
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: var(--neon-green);
+        margin-bottom: 8px;
+      }
+      footer p {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+      }
+
+      /* RESPONSIVE */
+      @media (max-width: 900px) {
+        .toc-grid,
+        .metric-grid,
+        .exam-grid {
+          grid-template-columns: 1fr;
+        }
+        .compare-grid {
+          grid-template-columns: 1fr;
+        }
+        .ref-grid {
+          grid-template-columns: 1fr;
+        }
+        .nav-ver {
+          display: none;
+        }
+        .wrap {
+          padding: 40px 16px 80px;
+        }
+      }
+      @media (max-width: 600px) {
+        .hero {
+          padding: 60px 16px 60px;
+        }
+        .hero h1 {
+          font-size: 1.8rem;
+        }
+        .step-list::before {
+          left: 16px;
+        }
+        .step-num {
+          width: 32px;
+          height: 32px;
+          min-width: 32px;
+        }
+      }
+
+      /* SECTION DIVIDER */
+      .section-divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--border2), transparent);
+        margin: 32px 0;
+      }
+
+      /* BADGE */
+      .badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 4px;
+        margin: 2px;
+      }
+      .badge-g {
+        background: rgba(0, 255, 136, 0.12);
+        color: var(--neon-green);
+        border: 1px solid rgba(0, 255, 136, 0.25);
+      }
+      .badge-c {
+        background: rgba(0, 212, 255, 0.12);
+        color: var(--neon-cyan);
+        border: 1px solid rgba(0, 212, 255, 0.25);
+      }
+      .badge-y {
+        background: rgba(240, 180, 41, 0.12);
+        color: var(--neon-yellow);
+        border: 1px solid rgba(240, 180, 41, 0.25);
+      }
+      .badge-r {
+        background: rgba(255, 71, 87, 0.12);
+        color: var(--neon-red);
+        border: 1px solid rgba(255, 71, 87, 0.25);
+      }
+      .badge-p {
+        background: rgba(124, 77, 255, 0.12);
+        color: var(--neon-purple);
+        border: 1px solid rgba(124, 77, 255, 0.25);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- NAV -->
+    <nav>
+      <div class="nav-inner">
+        <div class="nav-brand">Gemini<span>/</span>Antigravity</div>
+        <a class="nav-link" href="#ch1">プレフィックス</a>
+        <a class="nav-link" href="#ch2">全体マップ</a>
+        <a class="nav-link" href="#ch3">セッション管理</a>
+        <a class="nav-link" href="#ch4">コンテキスト</a>
+        <a class="nav-link" href="#ch5">ツール確認</a>
+        <a class="nav-link" href="#ch6">UI設定</a>
+        <a class="nav-link" href="#ch7">Plan Mode</a>
+        <a class="nav-link" href="#ch8">カスタム</a>
+        <a class="nav-link" href="#ch9">@と!</a>
+        <a class="nav-link" href="#ch10">選択フロー</a>
+        <a class="nav-link" href="#ch11">ベスト10則</a>
+        <a class="nav-link" href="#ch12">よくあるミス</a>
+        <a class="nav-link" href="#ch13">リファレンス</a>
+        <a class="nav-link" href="#ch14">参考ソース</a>
+        <div class="nav-ver">CLI v0.44.1 / Antigravity 1.0.3</div>
+      </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-glow"></div>
+      <div class="hero-tag">
+        Gemini CLI v0.44.1 &nbsp;|&nbsp; Antigravity CLI 1.0.3 &nbsp;|&nbsp; IDE 2.0.3
+      </div>
+      <h1><span class="accent">スラッシュコマンド</span><br />完全ガイド</h1>
+      <p class="hero-sub">
+        Gemini CLI / Antigravity CLI の全コマンドをステップバイステップで解説。<br />初学者がゼロから実践できるベストプラクティス付き。
+      </p>
+      <div class="hero-badges">
+        <span class="ver-badge vb-g">Gemini CLI v0.44.1</span>
+        <span class="ver-badge vb-c">Antigravity CLI 1.0.3</span>
+        <span class="ver-badge vb-y">IDE Commit 2.0.3</span>
+        <span class="ver-badge vb-r">2026-06-18 移行予告</span>
+      </div>
+    </section>
+
+    <div class="wrap">
+      <!-- IMPORTANT NOTICE -->
+      <div class="alert alert-warn" style="margin-bottom: 32px">
+        <span class="alert-icon">⚠️</span>
+        <div>
+          <strong>移行のお知らせ（2026年6月18日）</strong><br />
+          無料ユーザー・Google One ユーザー向けに
+          <strong>Gemini CLI → Antigravity CLI</strong> へ移行されます。有料ユーザー（Google AI Pro
+          / Ultra）は引き続き Gemini CLI を利用できます。 コマンド体系・設定場所はほぼ共通です。
+          <a
+            href="https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli"
+            target="_blank"
+            >公式ブログ ↗</a
+          >
+        </div>
+      </div>
+
+      <!-- TOC -->
+      <section id="toc" class="chapter">
+        <div class="chapter-header">
+          <span class="chapter-num">目次</span>
+          <h2>全章一覧</h2>
+        </div>
+        <div class="toc-grid">
+          <a class="toc-card" href="#ch1"
+            ><div class="toc-card-num">Ch 1 · K1</div>
+            <div class="toc-card-title">コマンドプレフィックスの3種類</div>
+            <div class="toc-card-sub">/ @ ! の使い分け</div></a
+          >
+          <a class="toc-card" href="#ch2"
+            ><div class="toc-card-num">Ch 2 · K1</div>
+            <div class="toc-card-title">スラッシュコマンド全体マップ</div>
+            <div class="toc-card-sub">全コマンドのカテゴリ構造</div></a
+          >
+          <a class="toc-card" href="#ch3"
+            ><div class="toc-card-num">Ch 3 · K3</div>
+            <div class="toc-card-title">セッション管理コマンド</div>
+            <div class="toc-card-sub">/chat /clear /compress /restore /copy</div></a
+          >
+          <a class="toc-card" href="#ch4"
+            ><div class="toc-card-num">Ch 4 · K3</div>
+            <div class="toc-card-title">コンテキスト・メモリ管理</div>
+            <div class="toc-card-sub">/memory /directory /init</div></a
+          >
+          <a class="toc-card" href="#ch5"
+            ><div class="toc-card-num">Ch 5 · K2</div>
+            <div class="toc-card-title">ツール・設定確認コマンド</div>
+            <div class="toc-card-sub">/mcp /tools /settings /stats</div></a
+          >
+          <a class="toc-card" href="#ch6"
+            ><div class="toc-card-num">Ch 6 · K1</div>
+            <div class="toc-card-title">UIカスタマイズコマンド</div>
+            <div class="toc-card-sub">/theme /editor /vim</div></a
+          >
+          <a class="toc-card" href="#ch7"
+            ><div class="toc-card-num">Ch 7 · K3</div>
+            <div class="toc-card-title">Plan Mode — 安全な計画立案</div>
+            <div class="toc-card-sub">read-only で影響範囲を把握</div></a
+          >
+          <a class="toc-card" href="#ch8"
+            ><div class="toc-card-num">Ch 8 · K3</div>
+            <div class="toc-card-title">カスタムコマンド TOML形式</div>
+            <div class="toc-card-sub">.gemini/commands/ に .toml で定義</div></a
+          >
+          <a class="toc-card" href="#ch9"
+            ><div class="toc-card-num">Ch 9 · K2</div>
+            <div class="toc-card-title">@ コマンドと ! コマンド</div>
+            <div class="toc-card-sub">ファイル注入・シェル実行</div></a
+          >
+          <a class="toc-card" href="#ch10"
+            ><div class="toc-card-num">Ch 10 · K2</div>
+            <div class="toc-card-title">コマンド選択フローチャート</div>
+            <div class="toc-card-sub">状況に応じた判断フロー</div></a
+          >
+          <a class="toc-card" href="#ch11"
+            ><div class="toc-card-num">Ch 11 · K3</div>
+            <div class="toc-card-title">ベストプラクティス 10 則</div>
+            <div class="toc-card-sub">効率的な開発ワークフロー</div></a
+          >
+          <a class="toc-card" href="#ch12"
+            ><div class="toc-card-num">Ch 12 · K2</div>
+            <div class="toc-card-title">よくあるミスと解決策</div>
+            <div class="toc-card-sub">初学者が陥りがちなパターン</div></a
+          >
+          <a class="toc-card" href="#ch13"
+            ><div class="toc-card-num">Ch 13 · K1</div>
+            <div class="toc-card-title">クイックリファレンスカード</div>
+            <div class="toc-card-sub">全コマンドの早見表</div></a
+          >
+          <a class="toc-card" href="#ch14"
+            ><div class="toc-card-num">Ch 14</div>
+            <div class="toc-card-title">参考ソース一覧</div>
+            <div class="toc-card-sub">公式ドキュメント・URL</div></a
+          >
+        </div>
+      </section>
+
+      <!-- ──────────────────────────────────────────────── -->
+      <!-- CH1: PREFIX TYPES -->
+      <!-- ──────────────────────────────────────────────── -->
+      <section id="ch1" class="chapter">
+        <div class="chapter-header">
+          <span class="chapter-num">Ch 01</span>
+          <span class="chapter-klevel kl1">K1 認識</span>
+          <h2>コマンドプレフィックスの<span class="cmd">3種類</span></h2>
+        </div>
+
+        <p>
+          <strong>定義</strong>: Gemini CLI / Antigravity CLI
+          では、入力の<strong>先頭文字</strong>によって処理が3種類に分岐します。プレフィックスを理解することで、あらゆる操作を迷わず使えるようになります。
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>プレフィックス</th>
+                <th>名称</th>
+                <th>役割</th>
+                <th>例</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>/</td>
+                <td>スラッシュ</td>
+                <td>CLI 自体の動作を制御する「メタコマンド」</td>
+                <td><code>/memory show</code></td>
+              </tr>
+              <tr>
+                <td>@</td>
+                <td>アットマーク</td>
+                <td>ファイル・ディレクトリの内容をプロンプトに埋め込む</td>
+                <td><code>@src/main.ts を説明して</code></td>
+              </tr>
+              <tr>
+                <td>!</td>
+                <td>エクスクラメーション</td>
+                <td>シェルコマンドをターミナルで直接実行する</td>
+                <td><code>!git status</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="compare-grid">
+          <div class="compare-card compare-ok">
+            <div class="compare-label">✅ 正しい使い分け</div>
+            <pre><span class="code-comment"># CLI 設定を確認したい → /</span>
+<span class="code-green">/memory show</span>
+
+<span class="code-comment"># ファイルを読ませたい → @</span>
+<span class="code-green">@src/app.ts この関数を最適化して</span>
+
+<span class="code-comment"># git の状態を確認したい → !</span>
+<span class="code-green">!git log --oneline -5</span></pre>
+          </div>
+          <div class="compare-card compare-ng">
+            <div class="compare-label">❌ よくある混同</div>
+            <pre><span class="code-comment"># ファイルを読ませたいのに / を使う</span>
+<span class="code-red">/src/app.ts を説明して</span>
+<span class="code-comment"># → コマンドとして解釈されエラーになる</span>
+
+<span class="code-comment"># CLI 設定を変えたいのに @ を使う</span>
+<span class="code-red">@memory refresh</span>
+<span class="code-comment"># → memory ファイルを探してしまう</span></pre>
+          </div>
+        </div>
+
+        <div class="mermaid-wrap">
+          <div class="mermaid-title">▸ プレフィックス別の処理フロー</div>
+          <div id="diag-1" class="mermaid"></div>
+        </div>
+
+        <div class="alert alert-info">
+          <span class="alert-icon">ℹ️</span>
+          <div>
+            <strong>参照ソース</strong>:
+            <a
+              href="https://google-gemini.github.io/gemini-cli/docs/cli/commands.html"
+              target="_blank"
+              >CLI Commands Reference (公式)</a
+            >
+            — コマンドプレフィックスの公式仕様
+          </div>
+        </div>
+      </section>
+
+      <!-- ──────────────────────────────────────────────── -->
+      <!-- CH2: OVERALL MAP -->
+      <!-- ──────────────────────────────────────────────── -->
+      <section id="ch2" class="chapter">
+        <div class="chapter-header">
+          <span class="chapter-num">Ch 02</span>
+          <span class="chapter-klevel kl1">K1 認識</span>
+          <h2>スラッシュコマンド<span class="cmd">全体マップ</span></h2>
+        </div>
+
+        <p>
+          <strong>定義</strong>:
+          スラッシュコマンドは5つのカテゴリに分類されます。全体像を把握してから個別コマンドを学ぶことで、「どこに何があるか」を迷わず判断できます。
+        </p>
+
+        <div class="mermaid-wrap">
+          <div class="mermaid-title">▸ スラッシュコマンド カテゴリマップ</div>
+          <div id="diag-2" class="mermaid"></div>
+        </div>
+
+        <div class="arch-layers">
+          <div class="arch-layer l-cyan">
+            <div class="arch-label" style="color: var(--neon-cyan)">セッション</div>
+            <div class="arch-content">
+              <strong>/chat, /clear, /compress, /restore, /copy</strong
+              ><span>会話の保存・再開・圧縮・ファイル巻き戻し</span>
+            </div>
+          </div>
+          <div class="arch-layer l-green">
+            <div class="arch-label" style="color: var(--neon-green)">コンテキスト</div>
+            <div class="arch-content">
+              <strong>/memory, /directory, /init</strong
+              ><span>GEMINI.md 管理・ワークスペース設定・自動生成</span>
+            </div>
+          </div>
+          <div class="arch-layer l-purple">
+            <div class="arch-label" style="color: var(--neon-purple)">ツール確認</div>
+            <div class="arch-content">
+              <strong>/mcp, /tools, /settings, /stats, /extensions</strong
+              ><span>MCP サーバー・設定エディタ・統計表示</span>
+            </div>
+          </div>
+          <div class="arch-layer l-yellow">
+            <div class="arch-label" style="color: var(--neon-yellow)">UI設定</div>
+            <div class="arch-content">
+              <strong>/theme, /editor, /vim</strong
+              ><span>テーマ・エディタ・vim モードの切り替え</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-info">
+          <span class="alert-icon">ℹ️</span>
+          <div>
+            <strong>参照ソース</strong>:
+            <a href="https://geminicli.com/docs/reference/commands/" target="_blank"
+              >Command Reference (geminicli.com)</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- ──────────────────────────────────────────────── -->
+      <!-- CH3: SESSION MANAGEMENT -->
+      <!-- ──────────────────────────────────────────────── -->
+      <section id="ch3" class="chapter">
+        <div class="chapter-header">
+          <span class="chapter-num">Ch 03</span>
+          <span class="chapter-klevel kl3">K3 適用</span>
+          <h2>セッション管理コマンド</h2>
+        </div>
+
+        <h3>3.1 <code>/chat</code> — 会話の保存と再開</h3>
+        <p><strong>定義</strong>: 会話状態をタグ付きで保存し、後から再開・共有できる機能です。</p>
+        <p>
+          <strong>理由</strong>:
+          セッションをまたいで長い作業を続けるとき、再度コンテキストを説明し直す手間を省けます。
+        </p>
+
+        <div class="alert alert-warn">
+          <span class="alert-icon">⚠️</span>
+          <div>
+            <strong>v0.44.x の変更点</strong>: 以前の
+            <code>/rewind</code>（ファイル変更の巻き戻し）機能は
+            <code>/restore</code> に統合されました。<code>/chat</code>
+            はセッションの保存・再開専用です。
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>コマンド</th>
+                <th>説明</th>
+                <th>使用例</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>/chat save &lt;タグ&gt;</td>
+                <td>現在の会話をタグ付きで保存</td>
+                <td><code>/chat save feature-auth</code></td>
+              </tr>
+              <tr>
+                <td>/chat resume &lt;タグ&gt;</td>
+                <td>保存した会話を再開</td>
+                <td><code>/chat resume feature-auth</code></td>
+              </tr>
+              <tr>
+                <td>/chat list</td>
+                <td>保存済み会話の一覧表示</td>
+                <td><code>/chat list</code></td>
+              </tr>
+              <tr>
+                <td>/chat delete &lt;タグ&gt;</td>
+                <td>保存済み会話を削除</td>
+                <td><code>/chat delete old-session</code></td>
+              </tr>
+              <tr>
+                <td>/chat share &lt;ファイル名&gt;</td>
+                <td>会話を Markdown/JSON に書き出し</td>
+                <td><code>/chat share report.md</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4>ステップバイステップ: 翌日に作業を再開する</h4>
+        <div class="step-list">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title">作業の区切りで保存する</div>
+              <div class="step-desc">
+                <div class="code-block">
+                  <div class="code-bar">
+                    <div class="code-dots">
+                      <div class="cd" style="background: #ff5f57"></div>
+                      <div class="cd" style="background: #ffbd2e"></div>
+                      <div class="cd" style="background: #28c840"></div>
+                    </div>
+                    <span class="code-title">terminal</span>
+                  </div>
+                  <pre class="code-body"><span class="code-green">/chat save</span>
+<span class="code-arg">before-refactor</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-title">翌日・別ターミナルから再開する</div>
+              <div class="step-desc">
+                <div class="code-block">
+                  <div class="code-bar">
+                    <div class="code-dots">
+                      <div class="cd" style="background: #ff5f57"></div>
+                      <div class="cd" style="background: #ffbd2e"></div>
+                      <div class="cd" style="background: #28c840"></div>
+                    </div>
+                    <span class="code-title">terminal</span>
+                  </div>
+                  <pre class="code-body"><span class="code-green">/chat resume</span>
+<span class="code-arg">before-refactor</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-title">保存済み一覧を確認する</div>
+              <div class="step-desc">
+                <div class="code-block">
+                  <div class="code-bar">
+                    <div class="code-dots">
+                      <div class="cd" style="background: #ff5f57"></div>
+                      <div class="cd" style="background: #ffbd2e"></div>
+                      <div class="cd" style="background: #28c840"></div>
+                    </div>
+                    <span class="code-title">terminal</span>
+                  </div>
+                  <pre class="code-body"><span class="code-green">/chat list</span>
+<span class="code-comment"># 出力例:</span>
+<span class="code-white"> before-refactor 2026-05-30 14:22</span>
+<span class="code-white"> feature-auth 2026-05-29 09:11</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <div class="step-title">会話をチームと共有する</div>
+              <div class="step-desc">
+                <div class="code-block">
+                  <div class="code-bar">
+                    <div class="code-dots">
+                      <div class="cd" style="background: #ff5f57"></div>
+                      <div class="cd" style="background: #ffbd2e"></div>
+                      <div class="cd" style="background: #28c840"></div>
+                    </div>
+                    <span class="code-title">terminal</span>
+                  </div>
+                  <pre class="code-body"><span class="code-green">/chat share</span>
+<span class="code-arg">review-2026-05-31.md</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h3>3.2 <code>/clear</code> — 画面クリア</h3>
+        <p>
+          <strong>定義</strong>: ターミナルの表示をクリアします。セッションデータは保持されます。
+        </p>
+        <div class="code-block">
+          <div class="code-bar">
+            <div class="code-dots">
+              <div class="cd" style="background: #ff5f57"></div>
+              <div class="cd" style="background: #ffbd2e"></div>
+              <div class="cd" style="background: #28c840"></div>
+            </div>
+            <span class="code-title">terminal</span
+            ><span class="code-lang">ショートカット: Ctrl+L</span>
+          </div>
+          <pre class="code-body"><span class="code-green">/clear</span></pre>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h3>3.3 <code>/compress</code> — コンテキスト圧縮</h3>
+        <p>
+          <strong>定義</strong>: チャット履歴全体を高レベルの要約に置き換えてトークンを節約します。
+        </p>
+        <p>
+          <strong>理由</strong>: 長時間の作業でコンテキストが膨らむと応答が遅くなります。<code
+            >/compress</code
+          >
+          で圧縮すると作業の文脈を保ちながら軽量化できます。
+        </p>
+
+        <div class="mermaid-wrap">
+          <div class="mermaid-title">▸ /compress の効果</div>
+          <div id="diag-3" class="mermaid"></div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h3>3.4 <code>/restore</code> — ファイル変更の巻き戻し</h3>
+        <p><strong>定義</strong>: ツール実行前の状態にプロジェクトファイルを復元します。</p>
+        <div class="alert alert-warn">
+          <span class="alert-icon">⚠️</span>
+          <div>
+            <strong>前提条件</strong>:
+            <code>--checkpointing</code> オプション付きで起動するか、<code
+              >.gemini/settings.json</code
+            >
+            でチェックポインティングを有効化している必要があります。
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-bar">
+            <div class="code-dots">
+              <div class="cd" style="background: #ff5f57"></div>
+              <div class="cd" style="background: #ffbd2e"></div>
+              <div class="cd" style="background: #28c840"></div>
+            </div>
+            <span class="code-title">terminal</span>
+          </div>
+          <pre class="code-body"><span class="code-comment"># 直前のチェックポイントに戻す</span>
+<span class="code-green">/restore</span>
+
+<span class="code-comment"># 特定のツール呼び出し時点まで戻す</span>
+<span class="code-green">/restore</span>
+<span class="code-arg">&lt;tool_call_id&gt;</span></pre>
+        </div>
+
+        <div class="mermaid-wrap">
+          <div class="mermaid-title">▸ /restore と /chat resume の使い分け</div>
+          <div id="diag-4" class="mermaid"></div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h3>3.5 <code>/copy</code> — 最後の出力をコピー</h3>
+        <p>AI の最後の出力をクリップボードにコピーします。</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>OS</th>
+                <th>必要なツール</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Linux</td>
+                <td><code>xclip</code> または <code>xsel</code>（要インストール）</td>
+              </tr>
+              <tr>
+                <td>macOS</td>
+                <td><code>pbcopy</code>（プリインストール済み）</td>
+              </tr>
+              <tr>
+                <td>Windows</td>
+                <td><code>clip</code>（プリインストール済み）</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="alert alert-info">
+          <span class="alert-icon">ℹ️</span>
+          <div>
+            <strong>参照ソース</strong>:
+            <a href="https://geminicli.com/docs/cli/tutorials/session-management/" target="_blank"
+              >Session Management Tutorial (公式)</a
+            >
+            ·
+            <a href="https://geminicli.com/docs/cli/checkpointing/" target="_blank"
+              >Checkpointing (公式)</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- ──────────────────────────────────────────────── -->
+      <!-- CH4: CONTEXT MANAGEMENT -->
+      <!-- ──────────────────────────────────────────────── -->
+      <section id="ch4" class="chapter">
+        <div class="chapter-header">
+          <span class="chapter-num">Ch 04</span>
+          <span class="chapter-klevel kl3">K3 適用</span>
+          <h2>コンテキスト・メモリ管理コマンド</h2>
+        </div>
+
+        <h3>4.1 <code>/memory</code> — GEMINI.md 管理</h3>
+        <p>
+          <strong>定義</strong>: GEMINI.md
+          ファイルから読み込まれた階層型メモリを確認・更新・追記する機能です。
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>コマンド</th>
+                <th>説明</th>
+                <th>使用例</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>/memory show</td>
+                <td>現在ロードされているコンテキスト全体を表示</td>
+                <td><code>/memory show</code></td>
+              </tr>
+              <tr>
+                <td>/memory refresh</td>
+                <td>全 GEMINI.md を再スキャンして更新</td>
+                <td><code>/memory refresh</code></td>
+              </tr>
+              <tr>
+                <td>/memory add &lt;テキスト&gt;</td>
+                <td>メモリにテキストを即時追記</td>
+                <td><code>/memory add "本番DBへのDELETE禁止"</code></td>
+              </tr>
+              <tr>
+                <td>/memory list</td>
+                <td>使用中の GEMINI.md ファイルのパス一覧</td>
+                <td><code>/memory list</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4>ステップバイステップ</h4>
+        <div class="step-list">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title">エージェントが何を知っているか確認する</div>
+              <div class="code-block">
+                <div class="code-bar">
+                  <div class="code-dots">
+                    <div class="cd" style="background: #ff5f57"></div>
+                    <div class="cd" style="background: #ffbd2e"></div>
+                    <div class="cd" style="background: #28c840"></div>
+                  </div>
+                </div>
+                <pre class="code-body"><span class="code-green">/memory show</span></pre>
+              </div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-title">GEMINI.md 編集後、即座に反映させる</div>
+              <div class="code-block">
+                <div class="code-bar">
+                  <div class="code-dots">
+                    <div class="cd" style="background: #ff5f57"></div>
+                    <div class="cd" style="background: #ffbd2e"></div>
+                    <div class="cd" style="background: #28c840"></div>
+                  </div>
+                </div>
+                <pre class="code-body"><span class="code-green">/memory refresh</span></pre>
+              </div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-title">作業中に発見した知識を永続化する</div>
+              <div class="code-block">
+                <div class="code-bar">
+                  <div class="code-dots">
+                    <div class="cd" style="background: #ff5f57"></div>
+                    <div class="cd" style="background: #ffbd2e"></div>
+                    <div class="cd" style="background: #28c840"></div>
+                  </div>
+                </div>
+                <pre class="code-body"><span class="code-green">/memory add</span>
+<span class="code-string">"Cloud SQLの接続は/cloudsql/{conn-name}を使う"</span></pre>
+              </div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <div class="step-title">読み込まれているファイルを確認する</div>
+              <div class="code-block">
+                <div class="code-bar">
+                  <div class="code-dots">
+                    <div class="cd" style="background: #ff5f57"></div>
+                    <div class="cd" style="background: #ffbd2e"></div>
+                    <div class="cd" style="background: #28c840"></div>
+                  </div>
+                </div>
+                <pre class="code-body"><span class="code-green">/memory list</span></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h4>GEMINI.md の階層構造と優先度</h4>
+        <div class="arch-layers">
+          <div class="arch-layer l-green">
+            <div class="arch-label" style="color: var(--neon-green)">最高優先</div>
+            <div class="arch-content">
+              <strong>Auto-scan — 作業ファイル近くの GEMINI.md</strong
+              ><span>エージェントがアクセスしたファイルの近傍を自動検出</span>
+            </div>
+          </div>
+          <div class="arch-layer l-cyan">
+            <div class="arch-label" style="color: var(--neon-cyan)">高優先</div>
+            <div class="arch-content">
+              <strong>Sub-directory — src/GEMINI.md 等</strong
+              ><span>サブディレクトリ固有のルールを定義</span>
+            </div>
+          </div>
+          <div class="arch-layer l-yellow">
+            <div class="arch-label" style="color: var(--neon-yellow)">中優先</div>
+            <div class="arch-content">
+              <strong>Project Root — ./GEMINI.md</strong><span>プロジェクト全体のコンテキスト</span>
+            </div>
+          </div>
+          <div class="arch-layer l-red">
+            <div class="arch-label" style="color: var(--neon-red)">低優先</div>
+            <div class="arch-content">
+              <strong>Global — ~/.gemini/GEMINI.md</strong
+              ><span>全プロジェクト共通のデフォルト設定</span>
+            </div>
+          </div>
+        </div>
+        <div class="callout callout-info">
+          <strong>ポイント</strong>: すべての GEMINI.md
+          が<strong>結合</strong>されてモデルに送られます。より深い階層のファイルの内容が優先されます。
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h3>4.2 <code>/directory</code> (<code>/dir</code>) — ワークスペース管理</h3>
+        <p>複数ディレクトリのサポートのために、ワークスペースにディレクトリを追加・確認します。</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>コマンド</th>
+                <th>説明</th>
+                <th>使用例</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>/dir add &lt;パス&gt;</td>
+                <td>ワークスペースにディレクトリを追加</td>
+                <td><code>/dir add ../shared-lib</code></td>
+              </tr>
+              <tr>
+                <td>/dir show</td>
+                <td>追加済みディレクトリを表示</td>
+                <td><code>/dir show</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="alert alert-warn">
+          <span class="alert-icon">⚠️</span>
+          <div>制限的なサンドボックスプロファイル使用時は <code>/dir add</code> が無効です。</div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h3>4.3 <code>/init</code> — GEMINI.md 自動生成</h3>
+        <p>
+          <strong>定義</strong>: 現在のディレクトリを分析して、プロジェクト専用の GEMINI.md
+          を自動生成します。
+        </p>
+        <p>
+          <strong>理由</strong>: 新しいプロジェクトで手動で GEMINI.md
+          を作成するのは手間がかかります。<code>/init</code>
+          を使えば技術スタックを自動検出して最適な初期コンテキストを生成できます。
+        </p>
+
+        <div class="mermaid-wrap">
+          <div class="mermaid-title">▸ /init の処理フロー</div>
+          <div id="diag-5" class="mermaid"></div>
+        </div>
+
+        <div class="callout callout-info">
+          <strong>初回セットアップのベストプラクティス</strong>: 新規プロジェクトでは最初に
+          <code>/init</code> を実行し、生成された GEMINI.md
+          を確認・編集してからコーディングを開始しましょう。
+        </div>
+
+        <div class="alert alert-info">
+          <span class="alert-icon">ℹ️</span>
+          <div>
+            <strong>参照ソース</strong>:
+            <a href="https://geminicli.com/docs/cli/gemini-md/" target="_blank"
+              >Project Context (GEMINI.md) 公式ドキュメント</a
+            >
+            ·
+            <a href="https://geminicli.com/docs/cli/tutorials/memory-management/" target="_blank"
+              >Memory Management Tutorial</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- ──────────────────────────────────────────────── -->
+      <!-- CH5: TOOLS & SETTINGS -->
+      <!-- ──────────────────────────────────────────────── -->
+      <section id="ch5" class="chapter">
+        <div class="chapter-header">
+          <span class="chapter-num">Ch 05</span>
+          <span class="chapter-klevel kl2">K2 理解</span>
+          <h2>ツール・設定確認コマンド</h2>
+        </div>
+
+        <h3>5.1 <code>/mcp</code> — MCP サーバー確認</h3>
+        <p>
+          設定済みの MCP (Model Context Protocol) サーバーの状態と利用可能なツールを確認します。<br /><strong
+            >キーボードショートカット</strong
+          >: <kbd>Ctrl+T</kbd> でツール説明の表示/非表示を切り替え
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>コマンド</th>
+                <th>説明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>/mcp</td>
+                <td>MCP サーバーの一覧・接続状態・ツール表示</td>
+              </tr>
+              <tr>
+                <td>/mcp desc</td>
+                <td>MCP サーバーとツールの詳細説明を表示</td>
+              </tr>
+              <tr>
+                <td>/mcp nodesc</td>
+                <td>ツール名のみ表示（説明を非表示）</td>
+              </tr>
+              <tr>
+                <td>/mcp schema</td>
+                <td>ツールの JSON スキーマを表示</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>5.2 <code>/tools</code> — 使用可能ツール一覧</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>コマンド</th>
+                <th>説明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>/tools</td>
+                <td>ツール名の一覧を表示</td>
+              </tr>
+              <tr>
+                <td>/tools desc</td>
+                <td>各ツールの詳細説明を表示</td>
+              </tr>
+              <tr>
+                <td>/tools nodesc</td>
+                <td>ツール名のみ表示</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>5.3 <code>/settings</code> — 設定エディタ</h3>
+        <p>
+          <code>.gemini/settings.json</code> を直接編集するより安全な GUI
+          設定エディタを開きます。バリデーション付きの UI で設定を変更できます。
+        </p>
+        <div class="code-block">
+          <div class="code-bar">
+            <div class="code-dots">
+              <div class="cd" style="background: #ff5f57"></div>
+              <div class="cd" style="background: #ffbd2e"></div>
+              <div class="cd" style="background: #28c840"></div>
+            </div>
+          </div>
+          <pre class="code-body"><span class="code-green">/settings</span></pre>
+        </div>
+
+        <h3>5.4 <code>/stats</code> — セッション統計</h3>
+        <p>現在のセッションのトークン使用量・キャッシュ節約量・セッション時間を表示します。</p>
+        <div class="alert alert-warn">
+          <span class="alert-icon">⚠️</span>
+          <div>
+            キャッシュトークン情報は <strong>API キー認証時のみ</strong>表示されます。OAuth
+            認証（Google アカウント）では現時点では表示されません。
+          </div>
+        </div>
+
+        <div class="progress-list">
+          <div class="progress-item">
+            <div class="progress-header">
+              <span class="progress-label">Input Tokens 使用量</span
+              ><span class="progress-val">42,300 / 1,000,000</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill pf-g" style="--prog-w: 4.2%"></div>
+            </div>
+          </div>
+          <div class="progress-item">
+            <div class="progress-header">
+              <span class="progress-label">Output Tokens 使用量</span
+              ><span class="progress-val">8,100 / 1,000,000</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill pf-c" style="--prog-w: 0.8%"></div>
+            </div>
+          </div>
+          <div class="progress-item">
+            <div class="progress-header">
+              <span class="progress-label">キャッシュ節約率</span
+              ><span class="progress-val">67%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill pf-y" style="--prog-w: 67%"></div>
+            </div>
+          </div>
+        </div>
+        <p style="font-size: 0.82rem; color: var(--text-muted)">
+          ※ /stats の表示イメージ（実際の値はセッションによって異なります）
+        </p>
+
+        <div class="alert alert-info">
+          <span class="alert-icon">ℹ️</span>
+          <div>
+            <strong>参照ソース</strong>:
+            <a href="https://geminicli.com/docs/reference/commands/" target="_blank"
+              >Full Command Reference</a
+            >
+            ·
+            <a href="https://geminicli.com/docs/reference/keyboard-shortcuts/" target="_blank"
+              >Keyboard Shortcuts</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- ──────────────────────────────────────────────── -->
+      <!-- CH6: UI CUSTOMIZATION -->
+      <!-- ──────────────────────────────────────────────── -->
+      <section id="ch6" class="chapter">
+        <div class="chapter-header">
+          <span class="chapter-num">Ch 06</span>
+          <span class="chapter-klevel kl1">K1 認識</span>
+          <h2>UIカスタマイズコマンド</h2>
+        </div>
+
+        <div class="exam-grid">
+          <div class="exam-card">
+            <div class="exam-cmd">/theme</div>
+            <div class="exam-desc">
+              視覚テーマを変更するダイアログを開く。色覚多様性対応テーマ含む（v0.40.0〜）
+            </div>
+            <div class="exam-stars">★★★☆☆</div>
+          </div>
+          <div class="exam-card">
+            <div class="exam-cmd">/editor</div>
+            <div class="exam-desc">
+              対応エディタを選択するダイアログを開く。マルチライン入力に活用
+            </div>
+            <div class="exam-stars">★★☆☆☆</div>
+          </div>
+          <div class="exam-card">
+            <div class="exam-cmd">/vim</div>
+            <div class="exam-desc">
+              入力エリアで vim スタイルのナビゲーションを有効化/無効化。設定は永続保存
+            </div>
+            <div class="exam-stars">★★★★☆</div>
+          </div>
+        </div>
+
+        <h3>vim モードの操作表</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>モード</th>
+                <th>フッター表示</th>
+                <th>主な操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>NORMAL</td>
+                <td><code>[NORMAL]</code></td>
+                <td>
+                  <code>h/j/k/l</code> 移動、<code>w/b</code> 単語移動、<code>dd</code>
+                  行削除、<code>i</code> で INSERT へ
+                </td>
+              </tr>
+              <tr>
+                <td>INSERT</td>
+                <td><code>[INSERT]</code></td>
+                <td>通常のテキスト入力。<code>Esc</code> で NORMAL へ</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout callout-info">
+          vim モードの設定は
+          <code>~/.gemini/settings.json</code> に保存され、セッション間で保持されます。
+        </div>
+
+        <div class="alert alert-info">
+          <span class="alert-icon">ℹ️</span>
+          <div>
+            <strong>参照ソース</strong>:
+            <a href="https://geminicli.com/docs/reference/keyboard-shortcuts/" target="_blank"
+              >Keyboard Shortcuts Reference (公式)</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- ──────────────────────────────────────────────── -->
+      <!-- CH7: PLAN MODE -->
+      <!-- ──────────────────────────────────────────────── -->
+      <section id="ch7" class="chapter">
+        <div class="chapter-header">
+          <span class="chapter-num">Ch 07</span>
+          <span class="chapter-klevel kl3">K3 適用</span>
+          <h2>Plan Mode — <span class="cmd">安全な計画立案</span></h2>
+        </div>
+
+        <p>
+          <strong>定義</strong>: Plan Mode は
+          <strong>コードを一切変更せず</strong> に、変更計画だけを安全に立案できる read-only
+          モードです。
+        </p>
+        <p>
+          <strong>理由</strong>:
+          大きな変更や影響範囲が不明な修正でも、まず計画を立てて人間がレビューすることでミスを防げます。「5分の計画が数時間のバグ修正を防ぐ」の原則です。
+        </p>
+
+        <div class="alert alert-warn">
+          <span class="alert-icon">⚠️</span>
+          <div>
+            <strong>起動方法（v0.44.x）</strong>: Plan Mode
+            は独立したスラッシュコマンドではなく、<code>/settings</code>
+            から切り替えるか、起動時フラグで有効化します。
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-bar">
+            <div class="code-dots">
+              <div class="cd" style="background: #ff5f57"></div>
+              <div class="cd" style="background: #ffbd2e"></div>
+              <div class="cd" style="background: #28c840"></div>
+            </div>
+            <span class="code-title">起動方法</span>
+          </div>
+          <pre class="code-body"><span class="code-comment"># 起動時に Plan Mode で開始する</span>
+<span class="code-cmd">gemini</span> <span class="code-keyword">--plan</span>
+
+<span class="code-comment"># または /settings から手動で切り替え</span>
+<span class="code-green">/settings</span>
+<span class="code-comment"># → Plan Mode の ON/OFF を切り替え</span></pre>
+        </div>
+
+        <div class="mermaid-wrap">
+          <div class="mermaid-title">▸ Plan Mode の動作フロー</div>
+          <div id="diag-6" class="mermaid"></div>
+        </div>
+
+        <h4>Plan Mode でできること・できないこと</h4>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>操作</th>
+                <th>Plan Mode</th>
+                <th>通常モード</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ファイルの読み取り・分析</td>
+                <td><span class="badge badge-g">できる</span></td>
+                <td><span class="badge badge-g">できる</span></td>
+              </tr>
+              <tr>
+                <td>コードの計画立案・提案</td>
+                <td><span class="badge badge-g">できる</span></td>
+                <td><span class="badge badge-g">できる</span></td>
+              </tr>
+              <tr>
+                <td>ファイルの書き込み・変更</td>
+                <td><span class="badge badge-r">できない</span></td>
+                <td><span class="badge badge-g">できる</span></td>
+              </tr>
+              <tr>
+                <td>シェルコマンドの実行</td>
+                <td><span class="badge badge-r">できない</span></td>
+                <td><span class="badge badge-g">できる</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="trend-card">
+          <div class="trend-label">v0.33.0 以降の強化</div>
+          <h4>Plan Mode にリサーチサブエージェントが追加</h4>
+          <p>
+            Plan Mode
+            でリサーチサブエージェントとアノテーション機能が統合されました。外部ドキュメントも調査した上で、根拠付きの詳細な
+            Implementation Plan を生成できるようになりました。
+          </p>
+        </div>
+
+        <div class="alert alert-info">
+          <span class="alert-icon">ℹ️</span>
+          <div>
+            <strong>参照ソース</strong>:
+            <a href="https://geminicli.com/docs/cli/plan-mode/" target="_blank"
+              >Plan Mode 公式ドキュメント</a
+            >
+            ·
+            <a
+              href="https://dev.to/googleai/unlocking-gemini-cli-with-skills-hooks-plan-mode-2bgf"
+              target="_blank"
+              >Skills + Hooks + Plan Mode 解説 (DEV Community)</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- ──────────────────────────────────────────────── -->
+      <!-- CH8: CUSTOM COMMANDS (TOML) -->
+      <!-- ──────────────────────────────────────────────── -->
+      <section id="ch8" class="chapter">
+        <div class="chapter-header">
+          <span class="chapter-num">Ch 08</span>
+          <span class="chapter-klevel kl3">K3 適用</span>
+          <h2>カスタムコマンド <span class="cmd">TOML形式</span></h2>
+        </div>
+
+        <div class="alert alert-danger">
+          <span class="alert-icon">🚨</span>
+          <div>
+            <strong>v0.44.1 での重要な仕様変更</strong>: カスタムコマンドは
+            <strong>TOML 形式</strong> (<code>.toml</code>) で定義します。旧バージョンの Markdown
+            形式 (<code>.agent/workflows/*.md</code>) は使用しません。保存場所も
+            <strong><code>.gemini/commands/</code></strong> に変わりました。
+          </div>
+        </div>
+
+        <div class="mermaid-wrap">
+          <div class="mermaid-title">▸ グローバル vs プロジェクトコマンドの優先度</div>
+          <div id="diag-7" class="mermaid"></div>
+        </div>
+
+        <h3>8.1 基本的な TOML ファイルの書き方</h3>
+        <div class="code-block">
+          <div class="code-bar">
+            <div class="code-dots">
+              <div class="cd" style="background: #ff5f57"></div>
+              <div class="cd" style="background: #ffbd2e"></div>
+              <div class="cd" style="background: #28c840"></div>
+            </div>
+            <span class="code-title">.gemini/commands/review.toml</span
+            ><span class="code-lang">TOML</span>
+          </div>
+          <pre class="code-body"><span class="code-comment"
+  ># /review コマンドとして登録される（ファイル名 = コマンド名）</span
+>
+
+<span class="code-keyword">description</span> =
+<span class="code-string">"コードレビューを実施してレポートを生成する"</span>
+
+<span class="code-keyword">prompt</span> =
+<span class="code-string"
+  >""" 以下の観点でコードレビューを実施してください: 1. セキュリティ:
+  SQLインジェクション・XSS・認証漏れ 2. パフォーマンス: N+1クエリ・不要なループ 3. 設計:
+  単一責任原則・依存方向 問題があれば重大度 (P0=致命的/P1=重要/P2=軽微)
+  付きでリストアップしてください。 """</span
+></pre>
+        </div>
+
+        <h3>8.2 引数を受け取るコマンド</h3>
+        <p><code>&lt;args&gt;</code> プレースホルダーを使ってユーザーの入力を受け取れます。</p>
+        <div class="code-block">
+          <div class="code-bar">
+            <div class="code-dots">
+              <div class="cd" style="background: #ff5f57"></div>
+              <div class="cd" style="background: #ffbd2e"></div>
+              <div class="cd" style="background: #28c840"></div>
+            </div>
+            <span class="code-title">.gemini/commands/git/fix.toml → /git:fix "問題の説明"</span
+            ><span class="code-lang">TOML</span>
+          </div>
+          <pre class="code-body"><span class="code-keyword">description</span> =
+<span class="code-string">"指定された問題のコード修正案を生成する"</span>
+
+<span class="code-keyword">prompt</span> =
+<span class="code-string"
+  >"以下の問題に対するコード修正案を提供してください: &lt;args&gt;"</span
+></pre>
+        </div>
+
+        <h3>8.3 シェルコマンドの結果を埋め込む</h3>
+        <p><code>!{シェルコマンド}</code> 構文でシェルの出力をプロンプトに注入できます。</p>
+        <div class="code-block">
+          <div class="code-bar">
+            <div class="code-dots">
+              <div class="cd" style="background: #ff5f57"></div>
+              <div class="cd" style="background: #ffbd2e"></div>
+              <div class="cd" style="background: #28c840"></div>
+            </div>
+            <span class="code-title">.gemini/commands/git/commit.toml → /git:commit</span
+            ><span class="code-lang">TOML</span>
+          </div>
+          <pre class="code-body"><span class="code-keyword">description</span> =
+<span class="code-string">"ステージ済みの変更からGitコミットメッセージを生成する"</span>
+
+<span class="code-keyword">prompt</span> =
+<span class="code-string"
+  >""" 以下のgit diffに基づいてConventional
+  Commits形式のコミットメッセージを生成してください: ```diff !{git diff --staged} ```
+  """</span
+></pre>
+        </div>
+
+        <h3>8.4 ファイル内容を埋め込む</h3>
+        <p><code>@{ファイルパス}</code> 構文でファイルの内容をプロンプトに注入できます。</p>
+        <div class="code-block">
+          <div class="code-bar">
+            <div class="code-dots">
+              <div class="cd" style="background: #ff5f57"></div>
+              <div class="cd" style="background: #ffbd2e"></div>
+              <div class="cd" style="background: #28c840"></div>
+            </div>
+            <span class="code-title"
+              >.gemini/commands/review-strict.toml → /review-strict src/UserService.ts</span
+            ><span class="code-lang">TOML</span>
+          </div>
+          <pre class="code-body"><span class="code-keyword">description</span> =
+<span class="code-string"
+  >"ベストプラクティスガイドを参照してコードを厳格にレビューする"</span
+>
+
+<span class="code-keyword">prompt</span> =
+<span class="code-string"
+  >""" 以下のコードをレビューしてください: &lt;args&gt;
+  以下のベストプラクティスに従ってレビューすること: @{docs/best-practices.md} """</span
+></pre>
+        </div>
+
+        <h3>8.5 名前空間（ディレクトリ構造 → コロン区切り）</h3>
+        <div class="mermaid-wrap">
+          <div class="mermaid-title">▸ ディレクトリ構造とコマンド名のマッピング</div>
+          <div id="diag-8" class="mermaid"></div>
+        </div>
+
+        <h3>8.6 カスタムコマンド作成 ステップバイステップ</h3>
+        <div class="step-list">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title">プロジェクト用のコマンドディレクトリを作成する</div>
+              <div class="code-block">
+                <div class="code-bar">
+                  <div class="code-dots">
+                    <div class="cd" style="background: #ff5f57"></div>
+                    <div class="cd" style="background: #ffbd2e"></div>
+                    <div class="cd" style="background: #28c840"></div>
+                  </div>
+                </div>
+                <pre class="code-body"><span class="code-cmd">mkdir</span>
+<span class="code-keyword">-p</span> .gemini/commands</pre>
+              </div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-title">TOML ファイルを作成する（ファイル名 = コマンド名）</div>
+              <div class="code-block">
+                <div class="code-bar">
+                  <div class="code-dots">
+                    <div class="cd" style="background: #ff5f57"></div>
+                    <div class="cd" style="background: #ffbd2e"></div>
+                    <div class="cd" style="background: #28c840"></div>
+                  </div>
+                </div>
+                <pre
+                  class="code-body"
+                ><span class="code-cmd">touch</span> .gemini/commands/deploy.toml</pre>
+              </div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-title">TOML ファイルを記述する</div>
+              <div class="code-block">
+                <div class="code-bar">
+                  <div class="code-dots">
+                    <div class="cd" style="background: #ff5f57"></div>
+                    <div class="cd" style="background: #ffbd2e"></div>
+                    <div class="cd" style="background: #28c840"></div>
+                  </div>
+                  <span class="code-title">.gemini/commands/deploy.toml</span>
+                </div>
+                <pre class="code-body"><span class="code-keyword">description</span> =
+<span class="code-string">"ステージング環境にデプロイする"</span>
+
+<span class="code-keyword">prompt</span> =
+<span class="code-string"
+  >""" 以下の手順でデプロイを実行してください: 現在のgitの状態: !{git status} 1.
+  未コミットのファイルがある場合は停止してユーザーに報告する 2.
+  テストを全件実行してPASSを確認する 3. ビルドを実行する 4.
+  ステージング環境にデプロイする 5. ヘルスチェックで動作確認する 6.
+  デプロイサマリーを出力する """</span
+></pre>
+              </div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <div class="step-title">チャットでコマンドを実行する</div>
+              <div class="code-block">
+                <div class="code-bar">
+                  <div class="code-dots">
+                    <div class="cd" style="background: #ff5f57"></div>
+                    <div class="cd" style="background: #ffbd2e"></div>
+                    <div class="cd" style="background: #28c840"></div>
+                  </div>
+                </div>
+                <pre class="code-body"><span class="code-green">/deploy</span></pre>
+              </div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">5</div>
+            <div class="step-body">
+              <div class="step-title">チームで共有するために git にコミットする</div>
+              <div class="code-block">
+                <div class="code-bar">
+                  <div class="code-dots">
+                    <div class="cd" style="background: #ff5f57"></div>
+                    <div class="cd" style="background: #ffbd2e"></div>
+                    <div class="cd" style="background: #28c840"></div>
+                  </div>
+                </div>
+                <pre class="code-body"><span class="code-cmd">git add</span> .gemini/commands/
+<span class="code-cmd">git commit</span> <span class="code-keyword">-m</span>
+<span class="code-string">"feat: チーム共用デプロイコマンドを追加"</span></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-info">
+          <span class="alert-icon">ℹ️</span>
+          <div>
+            <strong>参照ソース</strong>:
+            <a href="https://geminicli.com/docs/cli/custom-commands/" target="_blank"
+              >Custom Commands 公式ドキュメント</a
+            >
+            ·
+            <a href="https://geminicli.com/docs/cli/tutorials/automation/" target="_blank"
+              >Automate Tasks Tutorial</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- ──────────────────────────────────────────────── -->
+      <!-- CH9: @ AND ! COMMANDS -->
+      <!-- ──────────────────────────────────────────────── -->
+      <section id="ch9" class="chapter">
+        <div class="chapter-header">
+          <span class="chapter-num">Ch 09</span>
+          <span class="chapter-klevel kl2">K2 理解</span>
+          <h2><span class="cmd">@</span> コマンドと <span class="cmd">!</span> コマンド</h2>
+        </div>
+
+        <h3>9.1 <code>@</code> — ファイル・ディレクトリ内容の注入</h3>
+        <p>
+          <strong>定義</strong>:
+          <code>@</code>
+          に続けてファイルパスを入力すると、そのファイルの内容がプロンプトに埋め込まれます。
+        </p>
+
+        <div class="code-block">
+          <div class="code-bar">
+            <div class="code-dots">
+              <div class="cd" style="background: #ff5f57"></div>
+              <div class="cd" style="background: #ffbd2e"></div>
+              <div class="cd" style="background: #28c840"></div>
+            </div>
+            <span class="code-title">使用例</span>
+          </div>
+          <pre class="code-body"><span class="code-comment"># 単一ファイルを読ませる</span>
+<span class="code-cmd">@src/UserService.ts</span> このファイルの問題点を指摘して
+
+<span class="code-comment"># ディレクトリ全体を読ませる</span>
+<span class="code-cmd">@src/components/</span>
+このディレクトリのコンポーネント設計を評価して
+
+<span class="code-comment"># 複数ファイルを同時に読ませる</span>
+<span class="code-cmd">@src/models/User.ts</span>
+<span class="code-cmd">@src/services/UserService.ts</span> 両ファイルの整合性を確認して</pre>
+        </div>
+
+        <div class="callout callout-info">
+          <strong>自動除外</strong>: <code>.gitignore</code> /
+          <code>.geminiignore</code> で除外されているファイルは自動でスキップされます。
+        </div>
+
+        <h3>9.2 <code>!</code> — シェルコマンドの直接実行</h3>
+        <p>
+          <strong>定義</strong>:
+          <code>!</code>
+          に続けてシェルコマンドを入力すると、そのコマンドがターミナルで直接実行されます。
+        </p>
+
+        <div class="code-block">
+          <div class="code-bar">
+            <div class="code-dots">
+              <div class="cd" style="background: #ff5f57"></div>
+              <div class="cd" style="background: #ffbd2e"></div>
+              <div class="cd" style="background: #28c840"></div>
+            </div>
+            <span class="code-title">使用例</span>
+          </div>
+          <pre
+            class="code-body"
+          ><span class="code-comment"># 単発実行</span> <span class="code-cmd">!git</span> log
+--oneline -10 <span class="code-cmd">!ls</span> -la src/
+
+<span class="code-comment"># ! だけ入力するとシェルモードに切り替わる</span>
+<span class="code-cmd">!</span>
+<span class="code-comment"># → シェルモードに入る。exit で CLI に戻る</span></pre>
+        </div>
+
+        <div class="alert alert-danger">
+          <span class="alert-icon">🚨</span>
+          <div>
+            <strong>セキュリティ注意</strong>:
+            <code>!</code>
+            で実行したコマンドはターミナルで直接実行したのと同等の権限・影響があります。<strong
+              >実行前に内容をよく確認してください。</strong
+            >
+            カスタムコマンドの <code>!{...}</code> は実行前に確認ダイアログが表示されます。
+          </div>
+        </div>
+
+        <div class="compare-grid">
+          <div class="compare-card compare-ok">
+            <div class="compare-label">✅ 安全な使い方</div>
+            <pre><span class="code-comment"># 読み取り専用の確認コマンド</span>
+<span class="code-green">!git status</span>
+<span class="code-green">!ls -la</span>
+<span class="code-green">!cat package.json</span>
+
+<span class="code-comment"># 実行前に内容を確認してから</span>
+<span class="code-green">!npm test</span></pre>
+          </div>
+          <div class="compare-card compare-ng">
+            <div class="compare-label">❌ 危険な使い方</div>
+            <pre><span class="code-comment"># 確認なしに破壊的コマンドを実行</span>
+<span class="code-red">!rm -rf node_modules</span>
+
+<span class="code-comment"># 本番に影響するコマンドを不注意に実行</span>
+<span class="code-red">!kubectl delete pod --all</span></pre>
+          </div>
+        </div>
+
+        <div class="alert alert-info">
+          <span class="alert-icon">ℹ️</span>
+          <div>
+            <strong>参照ソース</strong>:
+            <a
+              href="https://google-gemini.github.io/gemini-cli/docs/cli/commands.html"
+              target="_blank"
+              >CLI Commands Reference (公式)</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- ──────────────────────────────────────────────── -->
+      <!-- CH10: DECISION FLOWCHART -->
+      <!-- ──────────────────────────────────────────────── -->
+      <section id="ch10" class="chapter">
+        <div class="chapter-header">
+          <span class="chapter-num">Ch 10</span>
+          <span class="chapter-klevel kl2">K2 理解</span>
+          <h2>コマンド選択<span class="cmd">フローチャート</span></h2>
+        </div>
+
+        <p>
+          「今どのコマンドを使うべきか」の判断フローです。状況に応じて最適なコマンドを選択できます。
+        </p>
+
+        <div class="mermaid-wrap">
+          <div class="mermaid-title">▸ 状況別コマンド選択フロー</div>
+          <div id="diag-9" class="mermaid"></div>
+        </div>
+      </section>
+
+      <!-- ──────────────────────────────────────────────── -->
+      <!-- CH11: BEST PRACTICES -->
+      <!-- ──────────────────────────────────────────────── -->
+      <section id="ch11" class="chapter">
+        <div class="chapter-header">
+          <span class="chapter-num">Ch 11</span>
+          <span class="chapter-klevel kl3">K3 適用</span>
+          <h2>ベストプラクティス <span class="cmd">10 則</span></h2>
+        </div>
+
+        <div class="metric-grid">
+          <div class="metric-card mc-c">
+            <div class="metric-num">01</div>
+            <div class="metric-title">新プロジェクトは /init から始める</div>
+            <div class="metric-desc">
+              まず <code>/init</code> で GEMINI.md
+              を自動生成。エージェントにプロジェクト文脈を即座に伝えられます。
+            </div>
+          </div>
+          <div class="metric-card mc-g">
+            <div class="metric-num">02</div>
+            <div class="metric-title">実装前は Plan Mode を活用する</div>
+            <div class="metric-desc">
+              大きな変更は必ず Plan Mode で計画立案してからレビュー → 承認 →
+              実装の順で進めましょう。
+            </div>
+          </div>
+          <div class="metric-card mc-y">
+            <div class="metric-num">03</div>
+            <div class="metric-title">/chat save で定期的に保存する</div>
+            <div class="metric-desc">
+              長い作業セッションでは節目ごとに保存。<code>/chat save phase-1-complete</code>
+              のように意味のあるタグを付けましょう。
+            </div>
+          </div>
+          <div class="metric-card mc-p">
+            <div class="metric-num">04</div>
+            <div class="metric-title">/compress でコンテキストを軽量化</div>
+            <div class="metric-desc">
+              レスポンスが遅くなってきたら
+              <code>/compress</code> で圧縮。高レベルの要約が保持されるため文脈は失われません。
+            </div>
+          </div>
+          <div class="metric-card mc-r">
+            <div class="metric-num">05</div>
+            <div class="metric-title">description を必ず書く</div>
+            <div class="metric-desc">
+              カスタムコマンドの TOML には <code>description</code> を必ず記述。<code>/help</code>
+              メニューでの表示とチームの理解に不可欠です。
+            </div>
+          </div>
+          <div class="metric-card mc-g">
+            <div class="metric-num">06</div>
+            <div class="metric-title">シェル埋め込みは内容を明示する</div>
+            <div class="metric-desc">
+              <code>!{...}</code>
+              は実行前に確認ダイアログが表示されます。チーム共有コマンドでは実行されるコマンドを明示しましょう。
+            </div>
+          </div>
+          <div class="metric-card mc-c">
+            <div class="metric-num">07</div>
+            <div class="metric-title">名前空間でコマンドを整理する</div>
+            <div class="metric-desc">
+              <code>git/commit.toml</code> →
+              <code>/git:commit</code>
+              のようにサブディレクトリで整理。コマンドが増えても管理しやすくなります。
+            </div>
+          </div>
+          <div class="metric-card mc-y">
+            <div class="metric-num">08</div>
+            <div class="metric-title">プロジェクトコマンドは git で共有</div>
+            <div class="metric-desc">
+              <code>.gemini/commands/</code>
+              をリポジトリにコミット。チーム全員が同じカスタムコマンドを使えます。
+            </div>
+          </div>
+          <div class="metric-card mc-p">
+            <div class="metric-num">09</div>
+            <div class="metric-title">/memory show で定期確認する</div>
+            <div class="metric-desc">
+              エージェントが期待どおりに動かないときはまず
+              <code>/memory show</code> で確認。意図しない GEMINI.md
+              が読まれていることがよくあります。
+            </div>
+          </div>
+          <div class="metric-card mc-r">
+            <div class="metric-num">10</div>
+            <div class="metric-title">Plan → 実装 → /review → /deploy のサイクル</div>
+            <div class="metric-desc">
+              Plan Mode で計画 → 通常モードで実装 → <code>/review</code> でレビュー →
+              <code>/deploy</code> でデプロイの黄金サイクルを習慣化しましょう。
+            </div>
+          </div>
+        </div>
+
+        <div class="mermaid-wrap">
+          <div class="mermaid-title">▸ Rule 10 — 黄金の開発サイクル</div>
+          <div id="diag-10" class="mermaid"></div>
+        </div>
+
+        <div class="alert alert-info">
+          <span class="alert-icon">ℹ️</span>
+          <div>
+            <strong>参照ソース</strong>:
+            <a href="https://geminicli.com/docs/cli/tutorials/automation/" target="_blank"
+              >Automate Tasks Tutorial</a
+            >
+            ·
+            <a
+              href="https://codelabs.developers.google.com/getting-started-google-antigravity"
+              target="_blank"
+              >Getting Started with Antigravity (Codelabs)</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- ──────────────────────────────────────────────── -->
+      <!-- CH12: COMMON MISTAKES -->
+      <!-- ──────────────────────────────────────────────── -->
+      <section id="ch12" class="chapter">
+        <div class="chapter-header">
+          <span class="chapter-num">Ch 12</span>
+          <span class="chapter-klevel kl2">K2 理解</span>
+          <h2>よくあるミスと<span class="cmd">解決策</span></h2>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>よくあるミス</th>
+                <th>原因</th>
+                <th>解決策</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>カスタムコマンドが認識されない</td>
+                <td>.md 形式で作成した、または場所が違う</td>
+                <td><code>.gemini/commands/</code> に <code>.toml</code> 形式で作成する</td>
+              </tr>
+              <tr>
+                <td>/restore が使えない</td>
+                <td>チェックポインティング未設定</td>
+                <td>
+                  <code>--checkpointing</code> フラグで起動するか
+                  <code>settings.json</code> で有効化する
+                </td>
+              </tr>
+              <tr>
+                <td>/memory show で GEMINI.md が表示されない</td>
+                <td>ファイルの場所が違う</td>
+                <td><code>~/.gemini/GEMINI.md</code> または <code>./GEMINI.md</code> に配置する</td>
+              </tr>
+              <tr>
+                <td>!{...} コマンドが実行されない</td>
+                <td>確認ダイアログでキャンセルした</td>
+                <td>セキュリティ確認は正常な動作。内容を確認して承認する</td>
+              </tr>
+              <tr>
+                <td>/chat resume で会話が見つからない</td>
+                <td>タグ名を間違えた</td>
+                <td><code>/chat list</code> で保存済みタグを確認する</td>
+              </tr>
+              <tr>
+                <td>カスタムコマンドで引数が反映されない</td>
+                <td>&lt;args&gt; プレースホルダーがない</td>
+                <td><code>prompt</code> 内に <code>&lt;args&gt;</code> を記述する</td>
+              </tr>
+              <tr>
+                <td>@ファイルパス でファイルが読まれない</td>
+                <td>.geminiignore で除外されている</td>
+                <td><code>.geminiignore</code> の設定を確認する</td>
+              </tr>
+              <tr>
+                <td>Plan Mode が解除できない</td>
+                <td>設定の戻し方が分からない</td>
+                <td><code>/settings</code> を開いて Plan Mode を OFF にする</td>
+              </tr>
+              <tr>
+                <td>旧形式の /agent/workflows/*.md が動かない</td>
+                <td>v0.44.x で仕様変更</td>
+                <td><code>.gemini/commands/*.toml</code> 形式に移行する</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ──────────────────────────────────────────────── -->
+      <!-- CH13: QUICK REFERENCE -->
+      <!-- ──────────────────────────────────────────────── -->
+      <section id="ch13" class="chapter">
+        <div class="chapter-header">
+          <span class="chapter-num">Ch 13</span>
+          <span class="chapter-klevel kl1">K1 認識</span>
+          <h2>クイックリファレンスカード</h2>
+        </div>
+
+        <h3>組み込みスラッシュコマンド 全一覧</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>コマンド</th>
+                <th>カテゴリ</th>
+                <th>用途</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>/chat save &lt;タグ&gt;</td>
+                <td><span class="badge badge-c">セッション</span></td>
+                <td>会話をタグ付きで保存</td>
+              </tr>
+              <tr>
+                <td>/chat resume &lt;タグ&gt;</td>
+                <td><span class="badge badge-c">セッション</span></td>
+                <td>保存済み会話を再開</td>
+              </tr>
+              <tr>
+                <td>/chat list</td>
+                <td><span class="badge badge-c">セッション</span></td>
+                <td>保存済み会話の一覧</td>
+              </tr>
+              <tr>
+                <td>/chat share &lt;ファイル&gt;</td>
+                <td><span class="badge badge-c">セッション</span></td>
+                <td>会話をファイルに出力</td>
+              </tr>
+              <tr>
+                <td>/clear</td>
+                <td><span class="badge badge-c">セッション</span></td>
+                <td>画面クリア（Ctrl+L）</td>
+              </tr>
+              <tr>
+                <td>/compress</td>
+                <td><span class="badge badge-c">セッション</span></td>
+                <td>コンテキストを圧縮</td>
+              </tr>
+              <tr>
+                <td>/copy</td>
+                <td><span class="badge badge-c">セッション</span></td>
+                <td>最後の出力をコピー</td>
+              </tr>
+              <tr>
+                <td>/restore [id]</td>
+                <td><span class="badge badge-c">セッション</span></td>
+                <td>ファイル変更を巻き戻し</td>
+              </tr>
+              <tr>
+                <td>/memory show</td>
+                <td><span class="badge badge-g">コンテキスト</span></td>
+                <td>コンテキスト全体を表示</td>
+              </tr>
+              <tr>
+                <td>/memory refresh</td>
+                <td><span class="badge badge-g">コンテキスト</span></td>
+                <td>GEMINI.md を再スキャン</td>
+              </tr>
+              <tr>
+                <td>/memory add &lt;テキスト&gt;</td>
+                <td><span class="badge badge-g">コンテキスト</span></td>
+                <td>メモリに即時追記</td>
+              </tr>
+              <tr>
+                <td>/memory list</td>
+                <td><span class="badge badge-g">コンテキスト</span></td>
+                <td>GEMINI.md ファイル一覧</td>
+              </tr>
+              <tr>
+                <td>/dir add &lt;パス&gt;</td>
+                <td><span class="badge badge-g">コンテキスト</span></td>
+                <td>ワークスペースにディレクトリ追加</td>
+              </tr>
+              <tr>
+                <td>/dir show</td>
+                <td><span class="badge badge-g">コンテキスト</span></td>
+                <td>ワークスペース一覧表示</td>
+              </tr>
+              <tr>
+                <td>/init</td>
+                <td><span class="badge badge-g">コンテキスト</span></td>
+                <td>GEMINI.md を自動生成</td>
+              </tr>
+              <tr>
+                <td>/mcp</td>
+                <td><span class="badge badge-p">ツール</span></td>
+                <td>MCP サーバー確認</td>
+              </tr>
+              <tr>
+                <td>/tools</td>
+                <td><span class="badge badge-p">ツール</span></td>
+                <td>使用可能ツール一覧</td>
+              </tr>
+              <tr>
+                <td>/settings</td>
+                <td><span class="badge badge-p">ツール</span></td>
+                <td>設定エディタを開く</td>
+              </tr>
+              <tr>
+                <td>/stats</td>
+                <td><span class="badge badge-p">ツール</span></td>
+                <td>セッション統計表示</td>
+              </tr>
+              <tr>
+                <td>/extensions</td>
+                <td><span class="badge badge-p">ツール</span></td>
+                <td>アクティブな拡張一覧</td>
+              </tr>
+              <tr>
+                <td>/theme</td>
+                <td><span class="badge badge-y">UI</span></td>
+                <td>テーマ変更</td>
+              </tr>
+              <tr>
+                <td>/editor</td>
+                <td><span class="badge badge-y">UI</span></td>
+                <td>エディタ選択</td>
+              </tr>
+              <tr>
+                <td>/vim</td>
+                <td><span class="badge badge-y">UI</span></td>
+                <td>vim モード切り替え</td>
+              </tr>
+              <tr>
+                <td>/auth</td>
+                <td><span class="badge badge-r">その他</span></td>
+                <td>認証方法変更</td>
+              </tr>
+              <tr>
+                <td>/about</td>
+                <td><span class="badge badge-r">その他</span></td>
+                <td>バージョン情報</td>
+              </tr>
+              <tr>
+                <td>/help または /?</td>
+                <td><span class="badge badge-r">その他</span></td>
+                <td>ヘルプ表示</td>
+              </tr>
+              <tr>
+                <td>/bug &lt;内容&gt;</td>
+                <td><span class="badge badge-r">その他</span></td>
+                <td>バグ報告</td>
+              </tr>
+              <tr>
+                <td>/privacy</td>
+                <td><span class="badge badge-r">その他</span></td>
+                <td>プライバシー設定</td>
+              </tr>
+              <tr>
+                <td>/quit または /exit</td>
+                <td><span class="badge badge-r">その他</span></td>
+                <td>終了</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>カスタムコマンド (TOML) 書き方早見表</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>機能</th>
+                <th>構文</th>
+                <th>例</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>基本定義</td>
+                <td><code>description = "..."</code> + <code>prompt = "..."</code></td>
+                <td>すべてのコマンドに必須</td>
+              </tr>
+              <tr>
+                <td>引数受け取り</td>
+                <td><code>prompt</code> 内に <code>&lt;args&gt;</code></td>
+                <td><code>prompt = "修正して: &lt;args&gt;"</code></td>
+              </tr>
+              <tr>
+                <td>シェル出力埋め込み</td>
+                <td><code>prompt</code> 内に <code>!{コマンド}</code></td>
+                <td><code>!{git diff --staged}</code></td>
+              </tr>
+              <tr>
+                <td>ファイル内容埋め込み</td>
+                <td><code>prompt</code> 内に <code>@{パス}</code></td>
+                <td><code>@{docs/guide.md}</code></td>
+              </tr>
+              <tr>
+                <td>名前空間</td>
+                <td><code>サブディレクトリ名/ファイル名.toml</code></td>
+                <td><code>git/commit.toml</code> → <code>/git:commit</code></td>
+              </tr>
+              <tr>
+                <td>グローバルコマンド</td>
+                <td><code>~/.gemini/commands/</code> に配置</td>
+                <td>全プロジェクトで有効</td>
+              </tr>
+              <tr>
+                <td>プロジェクトコマンド</td>
+                <td><code>プロジェクト/.gemini/commands/</code> に配置</td>
+                <td>このプロジェクトのみ有効</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ──────────────────────────────────────────────── -->
+      <!-- CH14: REFERENCES -->
+      <!-- ──────────────────────────────────────────────── -->
+      <section id="ch14" class="chapter">
+        <div class="chapter-header">
+          <span class="chapter-num">Ch 14</span>
+          <h2>参考ソース一覧</h2>
+        </div>
+
+        <div class="ref-grid">
+          <a class="ref-card" href="https://geminicli.com/docs/reference/commands/" target="_blank">
+            <div class="ref-cat">公式ドキュメント</div>
+            <div class="ref-title">Command Reference — 全コマンドリファレンス</div>
+            <div class="ref-url">geminicli.com/docs/reference/commands/</div>
+          </a>
+          <a
+            class="ref-card"
+            href="https://geminicli.com/docs/cli/custom-commands/"
+            target="_blank"
+          >
+            <div class="ref-cat">公式ドキュメント</div>
+            <div class="ref-title">Custom Commands — TOML カスタムコマンド公式仕様</div>
+            <div class="ref-url">geminicli.com/docs/cli/custom-commands/</div>
+          </a>
+          <a class="ref-card" href="https://geminicli.com/docs/cli/plan-mode/" target="_blank">
+            <div class="ref-cat">公式ドキュメント</div>
+            <div class="ref-title">Plan Mode — read-only 計画立案モード</div>
+            <div class="ref-url">geminicli.com/docs/cli/plan-mode/</div>
+          </a>
+          <a
+            class="ref-card"
+            href="https://geminicli.com/docs/cli/tutorials/memory-management/"
+            target="_blank"
+          >
+            <div class="ref-cat">チュートリアル</div>
+            <div class="ref-title">Manage Context and Memory — コンテキスト管理</div>
+            <div class="ref-url">geminicli.com/docs/cli/tutorials/memory-management/</div>
+          </a>
+          <a
+            class="ref-card"
+            href="https://geminicli.com/docs/cli/tutorials/session-management/"
+            target="_blank"
+          >
+            <div class="ref-cat">チュートリアル</div>
+            <div class="ref-title">Manage Sessions and History — セッション管理</div>
+            <div class="ref-url">geminicli.com/docs/cli/tutorials/session-management/</div>
+          </a>
+          <a
+            class="ref-card"
+            href="https://geminicli.com/docs/cli/tutorials/automation/"
+            target="_blank"
+          >
+            <div class="ref-cat">チュートリアル</div>
+            <div class="ref-title">Automate Tasks — タスク自動化チュートリアル</div>
+            <div class="ref-url">geminicli.com/docs/cli/tutorials/automation/</div>
+          </a>
+          <a class="ref-card" href="https://geminicli.com/docs/cli/checkpointing/" target="_blank">
+            <div class="ref-cat">公式ドキュメント</div>
+            <div class="ref-title">Checkpointing — /restore の前提機能</div>
+            <div class="ref-url">geminicli.com/docs/cli/checkpointing/</div>
+          </a>
+          <a class="ref-card" href="https://geminicli.com/docs/cli/gemini-md/" target="_blank">
+            <div class="ref-cat">公式ドキュメント</div>
+            <div class="ref-title">Project Context (GEMINI.md) — 階層型メモリ</div>
+            <div class="ref-url">geminicli.com/docs/cli/gemini-md/</div>
+          </a>
+          <a class="ref-card" href="https://geminicli.com/docs/changelogs/" target="_blank">
+            <div class="ref-cat">リリースノート</div>
+            <div class="ref-title">Gemini CLI Changelog — バージョン履歴</div>
+            <div class="ref-url">geminicli.com/docs/changelogs/</div>
+          </a>
+          <a
+            class="ref-card"
+            href="https://github.com/google-gemini/gemini-cli/releases/tag/v0.44.1"
+            target="_blank"
+          >
+            <div class="ref-cat">GitHub リリース</div>
+            <div class="ref-title">Gemini CLI v0.44.1 リリース — 最新バージョン</div>
+            <div class="ref-url">github.com/google-gemini/gemini-cli/releases/tag/v0.44.1</div>
+          </a>
+          <a
+            class="ref-card"
+            href="https://geminicli.com/docs/reference/keyboard-shortcuts/"
+            target="_blank"
+          >
+            <div class="ref-cat">リファレンス</div>
+            <div class="ref-title">Keyboard Shortcuts — キーボードショートカット一覧</div>
+            <div class="ref-url">geminicli.com/docs/reference/keyboard-shortcuts/</div>
+          </a>
+          <a
+            class="ref-card"
+            href="https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli"
+            target="_blank"
+          >
+            <div class="ref-cat">Google Developers Blog</div>
+            <div class="ref-title">Gemini CLI → Antigravity CLI 移行のお知らせ</div>
+            <div class="ref-url">
+              developers.googleblog.com/…transitioning-gemini-cli-to-antigravity-cli
+            </div>
+          </a>
+          <a
+            class="ref-card"
+            href="https://codelabs.developers.google.com/getting-started-google-antigravity"
+            target="_blank"
+          >
+            <div class="ref-cat">Google Codelabs</div>
+            <div class="ref-title">Getting Started with Google Antigravity</div>
+            <div class="ref-url">
+              codelabs.developers.google.com/getting-started-google-antigravity
+            </div>
+          </a>
+          <a
+            class="ref-card"
+            href="https://dev.to/googleai/unlocking-gemini-cli-with-skills-hooks-plan-mode-2bgf"
+            target="_blank"
+          >
+            <div class="ref-cat">DEV Community</div>
+            <div class="ref-title">Skills + Hooks + Plan Mode の詳細解説</div>
+            <div class="ref-url">
+              dev.to/googleai/unlocking-gemini-cli-with-skills-hooks-plan-mode-2bgf
+            </div>
+          </a>
+        </div>
+      </section>
+    </div>
+    <!-- /wrap -->
+
+    <footer>
+      <div class="footer-brand">Gemini CLI / Antigravity CLI</div>
+      <p>スラッシュコマンド完全ガイド — CLI v0.44.1 / Antigravity CLI 1.0.3 / IDE Commit 2.0.3</p>
+      <p style="margin-top: 6px">
+        最終更新: 2026年5月31日 &nbsp;|&nbsp;
+        <a href="https://geminicli.com/docs" target="_blank">公式ドキュメント ↗</a>
+      </p>
+    </footer>
+
+    <script>
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        themeVariables: {
+          background: '#0d1117',
+          primaryColor: '#1c2333',
+          primaryTextColor: '#e2e8f0',
+          primaryBorderColor: '#2d3748',
+          lineColor: '#4a5568',
+          secondaryColor: '#161b22',
+          tertiaryColor: '#0d1117',
+          edgeLabelBackground: '#161b22',
+          clusterBkg: '#0d1117',
+          clusterBorder: '#2d3748',
+          titleColor: '#e2e8f0',
+          fontSize: '14px',
+        },
+        flowchart: { curve: 'basis', padding: 16, htmlLabels: true },
+      });
+
+      const DIAGRAMS = {
+        'diag-1': `flowchart LR
+INPUT["ユーザーの入力"]
+INPUT --> S["/ スラッシュ<br>CLI自体を制御<br>/memory<br>/chat /settings"]
+INPUT --> A["@ アットマーク<br>ファイル内容を注入<br>@src/file.ts"]
+INPUT --> B["! エクスクラメーション<br>シェル直接実行<br>!git status"]
+INPUT --> P["プレーンテキスト<br>AIへの通常の指示"]
+style S fill:#0d2e1a,stroke:#00ff88,color:#00ff88
+style A fill:#0d1e2a,stroke:#00d4ff,color:#00d4ff
+style B fill:#2a1a0d,stroke:#f0b429,color:#f0b429
+style P fill:#1c1c1c,stroke:#4a5568,color:#8b949e`,
+
+        'diag-2': `flowchart TB
+ROOT["スラッシュコマンド"]
+ROOT --> S["セッション管理<br>chat /<br>clear<br>compress / restore<br>copy"]
+ROOT --> C["コンテキスト管理<br>memory /<br>directory<br>init"]
+ROOT --> T["ツール確認<br>mcp / tools<br>settings / stats<br>extensions"]
+ROOT --> U["UIカスタマイズ<br>theme / editor<br>vim"]
+ROOT --> O["その他<br>auth / about<br>bug<br>/ privacy<br>help / quit"]
+style ROOT fill:#0d1117,stroke:#00ff88,color:#00ff88
+style S fill:#0d1e2a,stroke:#00d4ff,color:#00d4ff
+style C fill:#0d2e1a,stroke:#00ff88,color:#00ff88
+style T fill:#1e1a2a,stroke:#7c4dff,color:#7c4dff
+style U fill:#2a1a0d,stroke:#f0b429,color:#f0b429
+style O fill:#1c1c1c,stroke:#4a5568,color:#8b949e`,
+
+        'diag-3': `flowchart LR
+A["長くなった<br>チャット履歴<br>大量トークン消費"]
+B["/compress 実行"]
+C["高レベルの要約<br>文脈は保持<br>トークン節約"]
+D["レスポンスが<br>軽快に戻る"]
+A --> B
+B --> C
+C --> D
+style A fill:#2a0d0d,stroke:#ff4757,color:#ff4757
+style C fill:#0d2e1a,stroke:#00ff88,color:#00ff88
+style D fill:#0d1e2a,stroke:#00d4ff,color:#00d4ff`,
+
+        'diag-4': `flowchart TD
+A["問題が発生した"]
+B{"何を戻したいか"}
+B --> C["ファイルの変更を<br>元に戻したい"]
+B --> D["会話の流れを<br>特定時点から再開したい"]
+C --> E["/restore<br>チェックポイント時点に復元<br>前提: checkpointing有効"]
+D --> F["/chat<br>resume タグ名<br>保存済み会話から再開<br>前提: chat save済み"]
+A --> B
+style E fill:#0d1e2a,stroke:#00d4ff,color:#00d4ff
+style F fill:#0d2e1a,stroke:#00ff88,color:#00ff88`,
+
+        'diag-5': `flowchart LR
+A["/init 実行"]
+B["現在のディレクトリを分析<br>技術スタック・構成を把握"]
+C["GEMINI.md を自動生成<br>プロジェクト固有のコンテキスト"]
+D["エージェントがプロジェクトを<br>深く理解した状態で作業開始"]
+A --> B
+B --> C
+C --> D
+style A fill:#0d1e2a,stroke:#00d4ff,color:#00d4ff
+style C fill:#0d2e1a,stroke:#00ff88,color:#00ff88
+style D fill:#1e1a2a,stroke:#7c4dff,color:#7c4dff`,
+
+        'diag-6': `flowchart TD
+A["Plan Mode 有効化"]
+B["作業内容を自然言語で伝える<br>例:<br>JWT認証をOAuth2に移行したい"]
+C["エージェントが read-only で<br>コードベースを分析"]
+D["Implementation Plan を生成<br>変更ファイル・変更内容・影響範囲・リスク"]
+E{"人間がレビュー"}
+F["Plan Mode を無効化して<br>通常モードで実装を依頼"]
+G["計画を修正して<br>再立案"]
+A --> B
+B --> C
+C --> D
+D --> E
+E --> |承認| F
+E --> |修正| G
+G --> B
+style A fill:#0d1e2a,stroke:#00d4ff,color:#00d4ff
+style D fill:#0d2e1a,stroke:#00ff88,color:#00ff88
+style F fill:#2a1a0d,stroke:#f0b429,color:#f0b429`,
+
+        'diag-7': `flowchart TB
+U["User Global Commands<br>~/.gemini/commands/<br>全プロジェクトで有効"]
+P["Project Local<br>Commands<br>プロジェクト/.gemini/commands/<br>このプロジェクトのみ<br>gitで共有可能"]
+M["アクティブなコマンド<br>同名の場合はProjectが優先"]
+U --> M
+P --> M
+style U fill:#0d1e2a,stroke:#00d4ff,color:#00d4ff
+style P fill:#0d2e1a,stroke:#00ff88,color:#00ff88
+style M fill:#1e1a2a,stroke:#7c4dff,color:#7c4dff`,
+
+        'diag-8': `flowchart LR
+A[".gemini/commands/test.toml"] --> B["/test コマンド"]
+C[".gemini/commands/git/commit.toml"] --> D["/git:commit コマンド"]
+E[".gemini/commands/refactor/pure.toml"] --> F["/refactor:pure コマンド"]
+style B fill:#0d2e1a,stroke:#00ff88,color:#00ff88
+style D fill:#0d1e2a,stroke:#00d4ff,color:#00d4ff
+style F fill:#1e1a2a,stroke:#7c4dff,color:#7c4dff`,
+
+        'diag-9': `flowchart TD
+START["今何をしたいか"]
+START --> Q1["会話を保存・再開したい"]
+START --> Q2["ファイルの変更を元に戻したい"]
+START --> Q3["コンテキストが膨らんで重い"]
+START --> Q4["エージェントの動作がおかしい"]
+START --> Q5["繰り返す作業を自動化したい"]
+START --> Q6["新しいプロジェクトを始めた"]
+START --> Q7["コードを変えず計画だけ立てたい"]
+Q1 --> R1["/chat save タグ名 で保存<br>/chat resume タグ名 で再開"]
+Q2 --> R2["/restore<br>チェックポイントからファイルを復元"]
+Q3 --> R3["/compress<br>コンテキストを要約に圧縮"]
+Q4 --> R4["/memory show で確認<br>/memory<br>refresh で再スキャン"]
+Q5 --> R5[".gemini/commands/に<br>TOMLファイルを作成して実行"]
+Q6 --> R6["/init<br>GEMINI.mdを自動生成"]
+Q7 --> R7["Plan Mode を有効化<br>/settings<br>から切り替え"]
+style R1 fill:#0d1e2a,stroke:#00d4ff,color:#00d4ff
+style R2 fill:#2a0d0d,stroke:#ff4757,color:#ff4757
+style R3 fill:#2a1a0d,stroke:#f0b429,color:#f0b429
+style R4 fill:#0d2e1a,stroke:#00ff88,color:#00ff88
+style R5 fill:#1e1a2a,stroke:#7c4dff,color:#7c4dff
+style R6 fill:#0d1e2a,stroke:#00d4ff,color:#00d4ff
+style R7 fill:#1a1a2a,stroke:#7c4dff,color:#7c4dff`,
+
+        'diag-10': `flowchart LR
+A["Plan Mode<br>計画立案・承認"]
+B["通常モードで<br>実装"]
+C["/review<br>コードレビュー"]
+D{"レビュー通過"}
+E["/deploy staging<br>ステージング"]
+F["動作確認"]
+G["/deploy production<br>本番デプロイ"]
+A --> B
+B --> C
+C --> D
+D --> |Yes| E
+D --> |No| B
+E --> F
+F --> G
+style A fill:#0d1e2a,stroke:#00d4ff,color:#00d4ff
+style C fill:#0d2e1a,stroke:#00ff88,color:#00ff88
+style E fill:#2a1a0d,stroke:#f0b429,color:#f0b429
+style G fill:#2a0d0d,stroke:#ff4757,color:#ff4757`,
+      };
+
+      (async () => {
+        for (const [id, src] of Object.entries(DIAGRAMS)) {
+          try {
+            const container = document.getElementById(id);
+            if (container) {
+              const { svg } = await mermaid.render('svg-' + id, src, container);
+              container.innerHTML = svg;
+              const svgEl = container.querySelector('svg');
+              if (svgEl) {
+                svgEl.removeAttribute('width');
+                svgEl.removeAttribute('height');
+                svgEl.style.width = '100%';
+                svgEl.style.maxWidth = '100%';
+                svgEl.style.height = 'auto';
+              }
+
+              const wrap = container.closest('.mermaid-wrap');
+              if (wrap) {
+                const controls = document.createElement('div');
+                controls.className = 'mermaid-controls';
+                controls.style.cssText =
+                  'display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 12px; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);';
+
+                controls.innerHTML = `
+                  <span>サイズ:</span>
+                  <input type="range" min="30" max="200" value="100" style="width: 100px; accent-color: var(--neon-cyan); cursor: pointer;" />
+                  <span class="zoom-val">100%</span>
+                  <button style="background: var(--bg-surface2); border: 1px solid var(--border2); color: var(--text); border-radius: 4px; padding: 2px 8px; cursor: pointer; font-family: var(--font-mono); font-size: 0.65rem;">RESET</button>
+                `;
+
+                const range = controls.querySelector('input[type="range"]');
+                const valDisp = controls.querySelector('.zoom-val');
+                const resetBtn = controls.querySelector('button');
+
+                range.addEventListener('input', (e) => {
+                  const val = e.target.value;
+                  valDisp.textContent = val + '%';
+                  if (svgEl) {
+                    svgEl.style.width = val + '%';
+                  }
+                });
+
+                resetBtn.addEventListener('click', () => {
+                  range.value = 100;
+                  valDisp.textContent = '100%';
+                  if (svgEl) {
+                    svgEl.style.width = '100%';
+                  }
+                });
+
+                wrap.appendChild(controls);
+              }
+            }
+          } catch (e) {
+            console.error('Failed to render diagram ' + id, e);
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>
