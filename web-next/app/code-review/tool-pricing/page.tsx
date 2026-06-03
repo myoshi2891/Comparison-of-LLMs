@@ -1,5 +1,15 @@
 import type { Metadata } from "next";
-import { CATEGORY_ORDER, PRICE_CHECKED_AT, TOOLS, type ToolCategory } from "./constants";
+import pricingJson from "@/data/pricing.json";
+import { fmtJPY, fmtUSD } from "@/lib/cost";
+import { parsePricingData } from "@/lib/pricing";
+import {
+  CATEGORY_ORDER,
+  PRICE_CHECKED_AT,
+  TOOLS,
+  type ToolCategory,
+  planAmounts,
+  representativePrice,
+} from "./constants";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -7,6 +17,8 @@ export const metadata: Metadata = {
   description:
     "GitHub Copilot・Codex・Claude・CodeRabbit・SonarQube など Code Review 系 AI ツール 9 種の料金目安・主用途・メリット/デメリットを、価格の出典付きで横断比較。",
 };
+
+const pricing = parsePricingData(pricingJson);
 
 /** 外部リンク共通ヘルパー（target/rel を強制）。data-* 属性等は rest で透過。 */
 function Ext({ href, className, children, ...rest }: React.ComponentProps<"a">) {
@@ -36,6 +48,9 @@ const toolNo = (name: string) =>
   String(TOOLS.findIndex((t) => t.name === name) + 1).padStart(2, "0");
 
 export default function ToolPricingPage() {
+  const jpyRate = pricing.jpy_rate;
+  const generatedAt = pricing.generated_at;
+
   return (
     <div className={styles.page}>
       {/* 装飾レイヤー */}
@@ -53,6 +68,9 @@ export default function ToolPricingPage() {
           <p className={styles.lede}>
             PR レビューから静的解析まで、コードレビューを担う AI ツール 9 種を横断比較。
             価格は変動するため、各ツールに<strong>公式の価格出典リンク</strong>を併記しています。
+          </p>
+          <p className={styles.rateNote}>
+            ※ 円は USD からの概算。更新時レート 1 USD = ¥{jpyRate.toLocaleString("ja-JP")}（{generatedAt} 時点）
           </p>
 
           <dl className={styles.stats}>
@@ -97,7 +115,7 @@ export default function ToolPricingPage() {
                   <th scope="col">ツール</th>
                   <th scope="col">カテゴリ</th>
                   <th scope="col">主用途</th>
-                  <th scope="col">価格目安</th>
+                  <th scope="col">価格目安（from）</th>
                 </tr>
               </thead>
               <tbody>
@@ -115,7 +133,7 @@ export default function ToolPricingPage() {
                     </td>
                     <td className={styles.matrixUse}>{tool.use}</td>
                     <td>
-                      <span className={styles.priceChip}>{tool.price}</span>
+                      <span className={styles.priceChip}>{representativePrice(tool.plans)}</span>
                     </td>
                   </tr>
                 ))}
@@ -170,11 +188,63 @@ export default function ToolPricingPage() {
                       </div>
                     </div>
 
+                    {/* ─── プラン別料金表 ─── */}
+                    <div className={styles.planWrap}>
+                      <table className={styles.planTable}>
+                        <thead>
+                          <tr data-plan-header>
+                            <th scope="col">プラン</th>
+                            <th scope="col">1ヶ月</th>
+                            <th scope="col">3ヶ月</th>
+                            <th scope="col">12ヶ月</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {tool.plans.map((plan) => {
+                            const { m1, discounted } = planAmounts(plan);
+                            return (
+                              <tr key={plan.name} data-plan-row>
+                                <td className={styles.planName}>
+                                  {plan.name}
+                                  {plan.unitNote && (
+                                    <small className={styles.unitNote}>{plan.unitNote}</small>
+                                  )}
+                                </td>
+                                {m1 === null ? (
+                                  <td colSpan={3} className={styles.planNote}>
+                                    {plan.priceNote}
+                                  </td>
+                                ) : (
+                                  <>
+                                    <td className={styles.amtCell}>
+                                      <span className={styles.amtUsd}>{fmtUSD(m1)}</span>
+                                      <span className={styles.amtJpy}>{fmtJPY(m1, jpyRate)}</span>
+                                    </td>
+                                    <td className={styles.amtCell}>
+                                      <span className={styles.amtUsd}>{fmtUSD(m1 * 3)}</span>
+                                      <span className={styles.amtJpy}>{fmtJPY(m1 * 3, jpyRate)}</span>
+                                    </td>
+                                    <td className={styles.amtCell}>
+                                      <span className={styles.amtUsd}>
+                                        {fmtUSD((plan.annualMonthlyUsd ?? m1) * 12)}
+                                      </span>
+                                      {discounted && (
+                                        <span className={styles.discountBadge}>年額割引</span>
+                                      )}
+                                      <span className={styles.amtJpy}>
+                                        {fmtJPY((plan.annualMonthlyUsd ?? m1) * 12, jpyRate)}
+                                      </span>
+                                    </td>
+                                  </>
+                                )}
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+
                     <footer className={styles.cardFoot}>
-                      <div className={styles.priceBlock}>
-                        <span className={styles.priceLabel}>価格目安</span>
-                        <span className={styles.priceChip}>{tool.price}</span>
-                      </div>
                       <Ext href={tool.sourceUrl} className={styles.sourceLink} data-source-link>
                         <span className={styles.sourceLabel}>出典</span>
                         {tool.sourceLabel}
@@ -206,6 +276,10 @@ export default function ToolPricingPage() {
             </p>
             <p className={styles.disclaimerSub}>
               本ページは月次で価格を見直します。出典は各社公式の pricing ページを参照しています。
+            </p>
+            <p className={styles.disclaimerSub}>
+              ※ 円は USD からの概算換算です。更新時レート 1 USD = ¥{jpyRate.toLocaleString("ja-JP")}（
+              {generatedAt} 時点）。為替レートは日々変動するため、実際の金額は異なる場合があります。
             </p>
           </div>
         </section>

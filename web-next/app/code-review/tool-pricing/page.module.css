@@ -553,6 +553,115 @@
   margin-left: auto;
 }
 
+/* ─── PLAN PRICING TABLE ─── */
+.planWrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-deep);
+  -webkit-overflow-scrolling: touch;
+}
+
+.planTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.planTable thead th {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 500;
+  padding: 0.55rem 0.75rem;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.planTable tbody tr {
+  border-bottom: 1px solid var(--border);
+}
+
+.planTable tbody tr:last-child {
+  border-bottom: none;
+}
+
+.planTable td {
+  padding: 0.5rem 0.75rem;
+  vertical-align: middle;
+}
+
+.planName {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.unitNote {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--ink-faint);
+  margin-top: 0.18rem;
+  white-space: normal;
+  line-height: 1.4;
+}
+
+.planNote {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--ink-dim);
+  font-style: italic;
+}
+
+.amtCell {
+  white-space: nowrap;
+}
+
+.amtUsd {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.amtJpy {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  color: var(--ink-faint);
+  margin-top: 0.1rem;
+}
+
+.discountBadge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  font-weight: 600;
+  color: var(--bg-deep);
+  background: var(--cat);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  margin-left: 0.35rem;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* ─── HERO RATE NOTE ─── */
+.rateNote {
+  margin: 0.9rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+  line-height: 1.6;
+}
+
 /* ─── DISCLAIMER ─── */
 .disclaimer {
   padding: 1.5rem 1.6rem;
