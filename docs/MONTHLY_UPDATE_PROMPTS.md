@@ -44,6 +44,17 @@
 | 17 | `/copilot/github-copilot` | GitHub Copilot 完全ガイド 2026 | 2026-05-24 |
 | 18 | `/copilot/markdown-file-guide` | GitHub Copilot — AI仕様駆動開発 マークダウンファイル完全ガイド | 2026-05-08 |
 | 19 | `/git-worktree` | git worktree × 4プラットフォーム ドキュメント並列開発ガイド | 2026-05-08 |
+| 20 | `/code-review/tool-pricing` | Code Review ツール料金比較ページ | 2026-06-03 |
+| 21 | `/code-review/sonar-qube` | SonarQube Code Review 実践ガイド | 2026-06-03 |
+| 22 | `/code-review/copilot-code-review` | GitHub Copilot Code Review 完全活用ガイド | 2026-06-03 |
+| 23 | `/code-review/coderabbit-guide` | CodeRabbit 完全活用ガイド | 2026-06-03 |
+| 24 | `/claude/code-slash-commands` | Claude Code スラッシュコマンド完全ガイド 2026 | 2026-06-03 |
+| 25 | `/claude/harness-engineering` | ハーネスエンジニアリング完全ガイド 2026 | 2026-06-03 |
+| 26 | `/claude/managed-agents` | Claude Managed Agents 完全ガイド | 2026-06-03 |
+| 27 | `/gemini/agent-harness-engineering` | Gemini Agent Harness Engineering 完全ガイド 2026 | 2026-06-03 |
+| 28 | `/gemini/antigravity-slash-commands-guide` | Antigravity スラッシュコマンド完全ガイド | 2026-06-03 |
+| 29 | `/gemini/harness-engineering` | ハーネスエンジニアリング完全ガイド 2026 (Gemini CLI & Antigravity) | 2026-06-03 |
+| 30 | `/codex/harness-engineering` | OpenAI Codex ハーネスエンジニアリング完全ガイド | 2026-06-03 |
 
 ---
 
@@ -90,8 +101,9 @@ web-next/app/page.tsx と web-next/components/HomePage.tsx を読んで現状を
 
 - [ ] `bun run build` が成功する
 - [ ] `bun run typecheck` がエラーなし
-- [ ] `bun run test` がすべてパス
-- [ ] 新モデルが UI テーブルに表示される（ローカル `bun run dev` で目視確認）
+- [ ] `bun run test web-next/components/HomePage` のユニットテスト・統合テストがすべてパスする
+- [ ] `bun run test scraper`（スクレイパー側のテスト）がすべてパスする
+- [ ] ローカルホスト (`http://localhost:3000/`) で新モデルが UI テーブルに正しく表示されていることを目視確認（通貨表記やカラーインデックスの確認）
 
 ---
 
@@ -132,9 +144,10 @@ web-next/app/claude/skill/page.tsx を読んでください。
 
 ### 検証チェックリスト
 
-- [ ] `bun run test` で `claude/skill` の契約テストがパス
-- [ ] `bun run build` が成功
-- [ ] 外部リンクに `rel="noopener noreferrer"` が付いている
+- [ ] `bun run test web-next/app/claude/skill` (claude/skill の契約テスト) がパスする
+- [ ] `bun run build` が成功する
+- [ ] `bun run lint web-next/app/claude/skill/page.tsx` でリントエラーがないことを確認
+- [ ] ローカルホスト (`http://localhost:3000/claude/skill`) を開き、外部リンクに `rel="noopener noreferrer"` が付いていること、および表示崩れがないか目視確認
 
 ---
 
@@ -269,9 +282,10 @@ JSX コンポーネント定義（関数・型）は変更しない。
 
 ### 検証チェックリスト
 
-- [ ] `bun run test` パス（agent ページの契約テスト含む）
-- [ ] `bun run build` 成功
-- [ ] `bun run typecheck` エラーなし
+- [ ] `bun run test web-next/app/claude/agent` (agent ページの契約テスト) がパスする
+- [ ] `bun run build` が成功する
+- [ ] `bun run typecheck` でエラーなし
+- [ ] ローカルホスト (`http://localhost:3000/claude/agent`) で、新機能カードが正常にレンダリングされ、レイアウトが崩れていないか確認
 
 ---
 
@@ -355,8 +369,9 @@ web-next/app/gemini/skill/page.tsx を読んでください。
 
 ### 検証チェックリスト
 
-- [ ] `bun run test` パス
-- [ ] `bun run build` 成功
+- [ ] `bun run test web-next/app/gemini/skill` (gemini/skill の契約テスト) がパスする
+- [ ] `bun run build` が成功する
+- [ ] ローカルホスト (`http://localhost:3000/gemini/skill`) を開き、マークダウンファイルの仕様解説表示や外部リンクが壊れていないか目視確認
 
 ---
 
@@ -480,8 +495,9 @@ JSX 構造（コンポーネント定義）は変更しない。
 
 ### 検証チェックリスト
 
-- [ ] `bun run test` パス（agent ページの契約テスト含む）
-- [ ] `bun run build` 成功
+- [ ] `bun run test web-next/app/gemini/agent` (agent ページの契約テスト) がパスする
+- [ ] `bun run build` が成功する
+- [ ] ローカルホスト (`http://localhost:3000/gemini/agent`) を開き、エージェント定義コードブロックや参考文献リンクが壊れていないか目視確認
 
 ---
 
@@ -692,8 +708,9 @@ web-next/app/copilot/skill/page.tsx を読んでください。
 
 ### 検証チェックリスト
 
-- [ ] `bun run test` パス
-- [ ] `bun run build` 成功
+- [ ] `bun run test web-next/app/copilot/skill` (copilot/skill の契約テスト) がパスする
+- [ ] `bun run build` が成功する
+- [ ] ローカルホスト (`http://localhost:3000/copilot/skill`) を開き、SKILL.md のフロントマターやトリガーの解説が正常にレンダリングされているか目視確認
 
 ---
 
@@ -876,9 +893,372 @@ Mermaid ダイアグラム定義は変更禁止（インデント汚染でエラ
 
 ### 検証チェックリスト
 
-- [ ] `bun run test` パス
-- [ ] `bun run build` 成功
-- [ ] Mermaid ダイアグラムが正常表示されること（ローカルで目視確認）
+- [ ] `bun run test web-next/app/git-worktree` (git-worktree 契約テスト) がパスする
+- [ ] `bun run build` が成功する
+- [ ] ローカルホスト (`http://localhost:3000/git-worktree`) を開き、Mermaid ダイアグラムが正常表示されること、および表示崩れがないか目視確認
+
+---
+
+## 画面 20 — `/code-review/tool-pricing`（料金比較ページ）
+
+**ファイル**: `web-next/app/code-review/tool-pricing/constants.ts` (SSoT) / `web-next/app/code-review/tool-pricing/page.tsx`  
+**URL**: `/code-review/tool-pricing`  
+**更新頻度**: 毎月
+
+### 事前確認
+
+```
+以下を WebSearch で確認する:
+- 対象となる 9 種類のツール（GitHub Copilot, Codex, Claude Code, CodeRabbit, Gemini Code Assist, Google Jules, AWS CodeGuru, SonarQube Community/Developer）の公式 Pricing ページ
+- USD/JPY の最新為替レート（大幅変動がないか確認）
+```
+
+### 更新プロンプト
+
+```
+web-next/app/code-review/tool-pricing/constants.ts を読んでください。価格に関する可変データはこのファイルが SSoT となっています。
+
+以下の作業を行ってください:
+1. WebSearch で各ツールの公式 Pricing にアクセスし、プラン料金や仕様変更がないか確認する。
+2. 変更があった場合、constants.ts の TOOLS 配列内該当エントリの plans (monthlyUsd, annualMonthlyUsd, unitNote 等) を修正し、priceCheckedAt を当月「YYYY-MM」に更新する。
+3. constants.ts の PRICE_CHECKED_AT 定数を当月「YYYY-MM」に更新する。
+4. web-next/app/code-review/tool-pricing/page.tsx で利用されているコンポーネントに影響がないか確認する。
+
+JSX構造や計算用純粋関数（planAmounts / representativePrice）は変更せず、constants.ts のデータ差し替えのみに留めてください。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test web-next/app/code-review/tool-pricing` がすべてパスする
+- [ ] `bun run build` が成功する
+- [ ] ローカル (`http://localhost:3000/code-review/tool-pricing`) で表示を確認し、USDと円の二段表示、割引バッジ、更新レートが正しく出力されていることを目視確認する
+
+---
+
+## 画面 21 — `/code-review/sonar-qube`（SonarQube Code Review 実践ガイド）
+
+**ファイル**: `web-next/app/code-review/sonar-qube/page.tsx`  
+**URL**: `/code-review/sonar-qube`  
+**更新頻度**: 毎月
+
+### 事前確認
+
+```
+以下を WebSearch で確認する:
+- SonarQube Server（旧 SonarQube）の最新バージョン番号（例: 2026.2 以降）
+- SonarSource 公式ドキュメント（docs.sonarsource.com）での Clean as You Code (CaYC)、MQR (Multi-Quality Rule)、Quality Gates の最新仕様
+```
+
+### 更新プロンプト
+
+```
+web-next/app/code-review/sonar-qube/page.tsx を読んでください。
+
+以下の作業を行ってください:
+1. ヒーローセクションのバージョン（例: "SonarQube Server 2026.2"）と更新年月を最新のものに更新する。
+2. SOURCES 配列のリンク切れをチェックし、最新のドキュメント URL に置き換える。
+3. Quality Gate のメトリクス、MQR モードでの評価基準等に変更があれば、該当セクションの解説文を外科的に修正する。
+
+※Mermaidダイアグラム定義は、シンタックスエラーを避けるため原則として変更しないでください。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test web-next/app/code-review/sonar-qube` がパスする
+- [ ] `bun run build` が成功する
+- [ ] プレビュー画面 (`http://localhost:3000/code-review/sonar-qube`) で Mermaid ダイアグラムが正常に描画され、スタイル崩れがないことを確認する
+
+---
+
+## 画面 22 — `/code-review/copilot-code-review`（GitHub Copilot Code Review 完全活用ガイド）
+
+**ファイル**: `web-next/app/code-review/copilot-code-review/page.tsx`  
+**URL**: `/code-review/copilot-code-review`  
+**更新頻度**: 毎月
+
+### 事前確認
+
+```
+以下を WebSearch で確認する:
+- GitHub Copilot Code Review / Copilot Edits の最新機能（GitHub Changelog）
+- PR レビュー自動化、Custom Instructions の適用範囲などの最新仕様
+```
+
+### 更新プロンプト
+
+```
+web-next/app/code-review/copilot-code-review/page.tsx を読んでください。
+
+以下の作業を行ってください:
+1. ヒーロー内のバージョン情報や更新日付を最新版に更新する。
+2. SOURCES のリンク切れを修正し、最新ブログやドキュメント（github.blog）があれば追加する。
+3. Copilot による PR レビュー機能の変更（UIやコマンドなど）があれば、該当箇所の説明文を外科的に修正する。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test web-next/app/code-review/copilot-code-review` がパスする
+- [ ] `bun run build` が成功する
+- [ ] プレビュー画面で外部リンクに `rel="noopener noreferrer"` が正しく付与されていることを確認する
+
+---
+
+## 画面 23 — `/code-review/coderabbit-guide`（CodeRabbit 完全活用ガイド）
+
+**ファイル**: `web-next/app/code-review/coderabbit-guide/page.tsx`  
+**URL**: `/code-review/coderabbit-guide`  
+**更新頻度**: 毎月
+
+### 事前確認
+
+```
+以下を WebSearch で確認する:
+- CodeRabbit（AI PR レビューツール）の最新アップデート内容（公式 changelog）
+- 設定ファイル（.coderabbit.yaml）の新オプションや、MCP 連携などの最新情報
+```
+
+### 更新プロンプト
+
+```
+web-next/app/code-review/coderabbit-guide/page.tsx を読んでください。
+
+以下の作業を行ってください:
+1. ヒーローセクションのバージョン情報・年月を最新版に更新する。
+2. SOURCES のリンク切れを確認・修正し、新しい公式ドキュメントを追加する。
+3. `.coderabbit.yaml` のコードブロック内にある設定項目に変更があれば修正し、新機能の解説があれば外科的に追加する。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test web-next/app/code-review/coderabbit-guide` がパスする
+- [ ] `bun run build` が成功する
+
+---
+
+## 画面 24 — `/claude/code-slash-commands`（Claude Code スラッシュコマンド完全ガイド 2026）
+
+**ファイル**: `web-next/app/claude/code-slash-commands/SlashCommandsGuideClient.tsx` (および `page.tsx`)  
+**URL**: `/claude/code-slash-commands`  
+**更新頻度**: 毎月
+
+### 事前確認
+
+```
+以下を WebSearch で確認する:
+- Claude Code 最新版（例: v2.x.xx）のスラッシュコマンド（/search, /write 等）の変更・追加
+- /effort オプションの指定方法や /loop 等の最新の実行時フラグ
+```
+
+### 更新プロンプト
+
+```
+web-next/app/claude/code-slash-commands/SlashCommandsGuideClient.tsx を読んでください。
+
+以下の作業を行ってください:
+1. `web-next/app/claude/code-slash-commands/page.tsx` 内の metadata タイトルと説明のバージョン年月を更新する。
+2. SlashCommandsGuideClient.tsx 内の `SOURCES` リンク切れを確認・修正する。
+3. 追加・廃止されたスラッシュコマンドやオプションがあれば、コマンド説明テーブルや実践例のコードブロックを外科的に修正する。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test web-next/app/claude/code-slash-commands` がパスする
+- [ ] `bun run build` が成功する
+
+---
+
+## 画面 25 — `/claude/harness-engineering`（ハーネスエンジニアリング完全ガイド 2026）
+
+**ファイル**: `web-next/app/claude/harness-engineering/page.tsx`  
+**URL**: `/claude/harness-engineering`  
+**更新頻度**: 毎月
+
+### 事前確認
+
+```
+以下を WebSearch で確認する:
+- Anthropic Engineering Blog にて紹介されている「Harness Engineering（ハーネス設計）」の最新ベストプラクティス
+- Initializer Agent / Coding Agent 2段階構造に関する公式の更新情報
+```
+
+### 更新プロンプト
+
+```
+web-next/app/claude/harness-engineering/page.tsx を読んでください。
+
+以下の作業を行ってください:
+1. ヒーローセクションのバージョン情報・年月を最新版に更新する。
+2. SOURCES のリンク切れを修正し、最新ドキュメントを追加する。
+3. セッションプロトコル（8ステップ）や feature_list.json / progress.txt の設計指針に変更があれば説明文を外科的に修正する。
+
+※Mermaid ダイアグラム定義は、シンタックスエラーを避けるため原則として変更しないでください。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test web-next/app/claude/harness-engineering` がパスする
+- [ ] `bun run build` が成功する
+
+---
+
+## 画面 26 — `/claude/managed-agents`（Claude Managed Agents 完全ガイド）
+
+**ファイル**: `web-next/app/claude/managed-agents/page.tsx`  
+**URL**: `/claude/managed-agents`  
+**更新頻度**: 毎月
+
+### 事前確認
+
+```
+以下を WebSearch で確認する:
+- Anthropic "Managed Agents" (フルマネージド型エージェント基盤) の最新リリースステータス（ベータからGAなど）
+- CLI (`ant` ツール) や SDK (`@anthropic-ai/sdk`) の最新バージョンとコマンド変更
+```
+
+### 更新プロンプト
+
+```
+web-next/app/claude/managed-agents/page.tsx を読んでください。
+
+以下の作業を行ってください:
+1. ヒーローセクションのバージョン（例: "Beta 2026-04-01" など）と更新年月を最新のものにする。
+2. SOURCES のリンク切れを確認・修正する。
+3. `ant beta:agents` などのインストール/実行コードブロック内の CLI コマンドやオプション指定に変更があれば修正する。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test web-next/app/claude/managed-agents` がパスする
+- [ ] `bun run build` が成功する
+
+---
+
+## 画面 27 — `/gemini/agent-harness-engineering`（Gemini Agent Harness Engineering 完全ガイド 2026）
+
+**ファイル**: `web-next/app/gemini/agent-harness-engineering/page.tsx`  
+**URL**: `/gemini/agent-harness-engineering`  
+**更新頻度**: 毎月
+
+### 事前確認
+
+```
+以下を WebSearch で確認する:
+- Google Antigravity / Gemini CLI における「エージェントハーネス（環境設計）」の最新ベストプラクティス
+- 状態管理用の progress.txt やタスク進捗チェックの仕様変更
+```
+
+### 更新プロンプト
+
+```
+web-next/app/gemini/agent-harness-engineering/page.tsx を読んでください。
+
+以下の作業を行ってください:
+1. ヒーローセクションのバージョン情報・年月を最新版に更新する。
+2. SOURCES 配列のリンク切れをチェック・修正する。
+3. Gemini 環境下での 2段階エージェントモデルや、CLAUDE.md に相当する GEMINI.md の記述指針に更新があれば外科的に修正する。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test web-next/app/gemini/agent-harness-engineering` がパスする
+- [ ] `bun run build` が成功する
+
+---
+
+## 画面 28 — `/gemini/antigravity-slash-commands-guide`（Antigravity スラッシュコマンド完全ガイド）
+
+**ファイル**: `web-next/app/gemini/antigravity-slash-commands-guide/page.tsx`  
+**URL**: `/gemini/antigravity-slash-commands-guide`  
+**更新頻度**: 毎月
+
+### 事前確認
+
+```
+以下を WebSearch で確認する:
+- Gemini CLI から Antigravity CLI への移行に伴う、最新のスラッシュコマンド体系（/memory, /restore, /compress 等）
+- 設定ファイル（.gemini/settings.json）の新設定項目
+```
+
+### 更新プロンプト
+
+```
+web-next/app/gemini/antigravity-slash-commands-guide/page.tsx を読んでください。
+
+以下の作業を行ってください:
+1. metadata.title のバージョン（例: "v0.44.1"）およびヒーロー内のバージョン・更新年月を最新のものにする。
+2. SOURCES のリンク切れを修正する。
+3. コマンド体系（例: `/rewind` が `/restore` へ統合など）の挙動変更に応じて、説明テーブルやステップリストの記述を外科的に修正する。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test web-next/app/gemini/antigravity-slash-commands-guide` がパスする
+- [ ] `bun run build` が成功する
+- [ ] プレビュー画面で移行案内アラートなどが正しく表示されているか確認する
+
+---
+
+## 画面 29 — `/gemini/harness-engineering`（ハーネスエンジニアリング完全ガイド 2026 - Gemini CLI & Antigravity）
+
+**ファイル**: `web-next/app/gemini/harness-engineering/page.tsx`  
+**URL**: `/gemini/harness-engineering`  
+**更新頻度**: 毎月
+
+### 事前確認
+
+```
+以下を WebSearch で確認する:
+- Gemini CLI / Antigravity 環境下でのハーネス設計の最新情報
+- GEMINI.md や `.geminiignore` の仕様変更
+```
+
+### 更新プロンプト
+
+```
+web-next/app/gemini/harness-engineering/page.tsx を読んでください。
+
+以下の作業を行ってください:
+1. ヒーローセクションのバージョン情報・更新年月を最新版にする。
+2. SOURCES のリンク切れをチェック・修正する。
+3. ハーネス構造やサンプルスクリプト（init.sh 等）に Gemini/Antigravity 固有の仕様変更があれば、外科的に修正する。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test web-next/app/gemini/harness-engineering` がパスする
+- [ ] `bun run build` が成功する
+
+---
+
+## 画面 30 — `/codex/harness-engineering`（OpenAI Codex ハーネスエンジニアリング完全ガイド）
+
+**ファイル**: `web-next/app/codex/harness-engineering/page.tsx`  
+**URL**: `/codex/harness-engineering`  
+**更新頻度**: 毎月
+
+### 事前確認
+
+```
+以下を WebSearch で確認する:
+- OpenAI Evals (openai/evals) フレームワークの最新リリース、インストール手順
+- AGENTS.md / TEST.md / config.toml とハーネスの統合に関する OpenAI 公式の最新設計
+```
+
+### 更新プロンプト
+
+```
+web-next/app/codex/harness-engineering/page.tsx を読んでください。
+
+以下の作業を行ってください:
+1. ヒーローセクションのバージョン・更新年月を最新版に更新する。
+2. SOURCES 配列のリンク切れを修正し、最新ドキュメントがあれば追加する。
+3. openai/evals のセットアップ手順や oaieval CLI コマンド仕様に変更があれば、コードブロックを外科的に修正する。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test web-next/app/codex/harness-engineering` がパスする
+- [ ] `bun run build` が成功する
 
 ---
 
