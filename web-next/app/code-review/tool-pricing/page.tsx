@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { CATEGORY_ORDER, PRICE_CHECKED_AT, type ToolCategory, TOOLS } from "./constants";
+import { CATEGORY_ORDER, PRICE_CHECKED_AT, TOOLS, type ToolCategory } from "./constants";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -32,7 +32,8 @@ const CAT_SLUG: Record<ToolCategory, string> = {
 };
 
 /** TOOLS 配列内の通し番号（01 始まり）。マトリクス・カードで共有。 */
-const toolNo = (name: string) => String(TOOLS.findIndex((t) => t.name === name) + 1).padStart(2, "0");
+const toolNo = (name: string) =>
+  String(TOOLS.findIndex((t) => t.name === name) + 1).padStart(2, "0");
 
 export default function ToolPricingPage() {
   return (
@@ -127,11 +128,7 @@ export default function ToolPricingPage() {
         {CATEGORY_ORDER.map((cat, ci) => {
           const tools = TOOLS.filter((t) => t.category === cat);
           return (
-            <section
-              key={cat}
-              id={CAT_SLUG[cat]}
-              className={`${styles.section} ${CAT_CLASS[cat]}`}
-            >
+            <section key={cat} id={CAT_SLUG[cat]} className={`${styles.section} ${CAT_CLASS[cat]}`}>
               <div className={styles.sectionHead}>
                 <h2 className={styles.h2}>
                   <span className={styles.h2No}>{String(ci + 1).padStart(2, "0")}</span>
@@ -178,11 +175,7 @@ export default function ToolPricingPage() {
                         <span className={styles.priceLabel}>価格目安</span>
                         <span className={styles.priceChip}>{tool.price}</span>
                       </div>
-                      <Ext
-                        href={tool.sourceUrl}
-                        className={styles.sourceLink}
-                        data-source-link
-                      >
+                      <Ext href={tool.sourceUrl} className={styles.sourceLink} data-source-link>
                         <span className={styles.sourceLabel}>出典</span>
                         {tool.sourceLabel}
                         <span className={styles.sourceArrow} aria-hidden="true">

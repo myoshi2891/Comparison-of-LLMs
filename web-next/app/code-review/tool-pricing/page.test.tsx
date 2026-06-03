@@ -7,9 +7,7 @@ describe("/code-review/tool-pricing", () => {
   it("h1 の見出しテキストが一致する", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
-    expect(h1?.textContent?.trim().replace(/\s+/g, " ")).toBe(
-      "AI Code Review Tools 料金比較"
-    );
+    expect(h1?.textContent?.trim().replace(/\s+/g, " ")).toBe("AI Code Review Tools 料金比較");
   });
 
   it("主要セクション h2 が 5 個ある", () => {
