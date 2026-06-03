@@ -5,10 +5,10 @@ import { parsePricingData } from "@/lib/pricing";
 import {
   CATEGORY_ORDER,
   PRICE_CHECKED_AT,
-  TOOLS,
-  type ToolCategory,
   planAmounts,
   representativePrice,
+  TOOLS,
+  type ToolCategory,
 } from "./constants";
 import styles from "./page.module.css";
 
@@ -70,7 +70,8 @@ export default function ToolPricingPage() {
             価格は変動するため、各ツールに<strong>公式の価格出典リンク</strong>を併記しています。
           </p>
           <p className={styles.rateNote}>
-            ※ 円は USD からの概算。更新時レート 1 USD = ¥{jpyRate.toLocaleString("ja-JP")}（{generatedAt} 時点）
+            ※ 円は USD からの概算。更新時レート 1 USD = ¥{jpyRate.toLocaleString("ja-JP")}（
+            {generatedAt} 時点）
           </p>
 
           <dl className={styles.stats}>
@@ -222,7 +223,9 @@ export default function ToolPricingPage() {
                                     </td>
                                     <td className={styles.amtCell}>
                                       <span className={styles.amtUsd}>{fmtUSD(m1 * 3)}</span>
-                                      <span className={styles.amtJpy}>{fmtJPY(m1 * 3, jpyRate)}</span>
+                                      <span className={styles.amtJpy}>
+                                        {fmtJPY(m1 * 3, jpyRate)}
+                                      </span>
                                     </td>
                                     <td className={styles.amtCell}>
                                       <span className={styles.amtUsd}>
@@ -278,8 +281,9 @@ export default function ToolPricingPage() {
               本ページは月次で価格を見直します。出典は各社公式の pricing ページを参照しています。
             </p>
             <p className={styles.disclaimerSub}>
-              ※ 円は USD からの概算換算です。更新時レート 1 USD = ¥{jpyRate.toLocaleString("ja-JP")}（
-              {generatedAt} 時点）。為替レートは日々変動するため、実際の金額は異なる場合があります。
+              ※ 円は USD からの概算換算です。更新時レート 1 USD = ¥{jpyRate.toLocaleString("ja-JP")}
+              （{generatedAt}{" "}
+              時点）。為替レートは日々変動するため、実際の金額は異なる場合があります。
             </p>
           </div>
         </section>

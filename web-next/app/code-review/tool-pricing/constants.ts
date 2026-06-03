@@ -124,7 +124,12 @@ export const TOOLS: readonly ToolEntry[] = [
     cons: "深い設計レビューは弱め",
     plans: [
       { name: "Free", monthlyUsd: 0 },
-      { name: "Pro", monthlyUsd: 10, annualMonthlyUsd: 8.33, unitNote: "+ AI Credits（2026-06 従量制）" },
+      {
+        name: "Pro",
+        monthlyUsd: 10,
+        annualMonthlyUsd: 8.33,
+        unitNote: "+ AI Credits（2026-06 従量制）",
+      },
       { name: "Business", monthlyUsd: 19, unitNote: "+ AI Credits（2026-06 従量制）" },
       { name: "Enterprise", monthlyUsd: 39, unitNote: "+ AI Credits（2026-06 従量制）" },
     ],
@@ -143,7 +148,12 @@ export const TOOLS: readonly ToolEntry[] = [
     plans: [
       { name: "ChatGPT Plus", monthlyUsd: 20, unitNote: "+ トークン従量" },
       { name: "ChatGPT Pro", monthlyUsd: 200, unitNote: "+ トークン従量" },
-      { name: "ChatGPT Team", monthlyUsd: 30, annualMonthlyUsd: 25, unitNote: "+ トークン従量・最低2シート" },
+      {
+        name: "ChatGPT Team",
+        monthlyUsd: 30,
+        annualMonthlyUsd: 25,
+        unitNote: "+ トークン従量・最低2シート",
+      },
     ],
     href: "https://openai.com/codex/",
     sourceUrl: "https://openai.com/chatgpt/pricing/",
@@ -160,7 +170,12 @@ export const TOOLS: readonly ToolEntry[] = [
     plans: [
       { name: "Pro", monthlyUsd: 20 },
       { name: "Max 5x", monthlyUsd: 100 },
-      { name: "Team Premium", monthlyUsd: 125, annualMonthlyUsd: 100, unitNote: "最低5シート・Claude Code 同梱" },
+      {
+        name: "Team Premium",
+        monthlyUsd: 125,
+        annualMonthlyUsd: 100,
+        unitNote: "最低5シート・Claude Code 同梱",
+      },
       { name: "Enterprise", monthlyUsd: null, priceNote: "要問合せ" },
     ],
     href: "https://claude.com/product/claude-code",
@@ -195,8 +210,18 @@ export const TOOLS: readonly ToolEntry[] = [
     cons: "PR レビューは弱め",
     plans: [
       { name: "Free（個人）", monthlyUsd: 0 },
-      { name: "Standard", monthlyUsd: 22.8, annualMonthlyUsd: 19, unitNote: "1ユーザー/月（月払い$22.80・年払い$19）" },
-      { name: "Enterprise", monthlyUsd: 54, annualMonthlyUsd: 45, unitNote: "1ユーザー/月（月払い$54・年払い$45）" },
+      {
+        name: "Standard",
+        monthlyUsd: 22.8,
+        annualMonthlyUsd: 19,
+        unitNote: "1ユーザー/月（月払い$22.80・年払い$19）",
+      },
+      {
+        name: "Enterprise",
+        monthlyUsd: 54,
+        annualMonthlyUsd: 45,
+        unitNote: "1ユーザー/月（月払い$54・年払い$45）",
+      },
     ],
     href: "https://codeassist.google/",
     sourceUrl: "https://cloud.google.com/products/gemini/pricing",

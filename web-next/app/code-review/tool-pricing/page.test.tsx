@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { PRICE_CHECKED_AT, TOOLS, type PricingPlan, planAmounts } from "./constants";
+import { PRICE_CHECKED_AT, type PricingPlan, planAmounts, TOOLS } from "./constants";
 import Page from "./page";
 
 describe("/code-review/tool-pricing", () => {
