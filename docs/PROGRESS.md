@@ -12,9 +12,9 @@
 - **動作検証**:
   - `bun run build` ✅（`web-next` の全ルートが Static プリレンダリングされる）
   - `bun run typecheck` ✅
-  - `bun run lint` ✅（既知の違反なし、0 件維持）
+  - `bun run lint` ✅（本作業範囲では新規違反 0 件、既知の既存指摘は本件対象外）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **684 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **685 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
@@ -150,7 +150,7 @@ Next.js 移行完了後のリポジトリ `LLM-Studies` にて、テストカバ
 Next.js 移行完了後のリポジトリ `LLM-Studies` の保守・改善作業を再開してください。
 
 - リポジトリ: LLM-Studies (Next.js 移行プロジェクトは dev/main へ完全マージ済み)
-- 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (677/677 passed) / pytest (38/38 passed) で全 Green
+- 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (685/685 passed) / pytest (38/38 passed) で全 Green
 - リポジトリ規約: CLAUDE.md (編集上の絶対ルール)
 
 作業方針：

@@ -1,9 +1,14 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { PRICE_CHECKED_AT, type PricingPlan, planAmounts, TOOLS } from "./constants";
-import Page from "./page";
+import Page, { metadata } from "./page";
 
 describe("/code-review/tool-pricing", () => {
+  it("metadata の title / description が定義されている", () => {
+    expect(metadata.title).toBe("AI Code Review ツール料金比較 — Tool Pricing");
+    expect(metadata.description).toContain("Code Review 系 AI ツール 9 種");
+  });
+
   it("h1 の見出しテキストが一致する", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
