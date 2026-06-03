@@ -86,9 +86,8 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
     results["Claude Haiku 4.5"] = (pi, po, si if si == so else "fallback")
 
     # 未スクレイプのモデルはフォールバック維持
-    scraped = {"Claude Opus 4.6", "Claude Sonnet 4.6", "Claude Haiku 4.5"}
     for name in _FALLBACKS:
-        if name not in scraped:
+        if name not in results:
             fb_in, fb_out = fallback_map.get(name, (0.0, 0.0))
             results[name] = (fb_in, fb_out, "fallback")
 
@@ -104,13 +103,13 @@ def _build_models(
             name=n,
             tag=_TAG.get(n, ""),
             cls=_CLS.get(n, "tag-bal"),
-            price_in=v[0],
-            price_out=v[1],
+            price_in=fallback_map[n][0],
+            price_out=fallback_map[n][1],
             sub_ja=_SUB_JA.get(n, ""),
             sub_en=_SUB_EN.get(n, ""),
             scrape_status=status,  # type: ignore[arg-type]
         )
-        for n, v in _FALLBACKS.items()
+        for n in _FALLBACKS
     ]
 
 

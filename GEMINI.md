@@ -17,7 +17,7 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 
 ## 絶対に守るべきルール（CLAUDE.md と docs/PROGRESS.md のサマリ）
 
-- **R1（Biome scope）**: `bun run lint:fix` / `bunx biome check --write`（パス引数なし）は **禁止**。必ずファイル単位でパス指 定
+- **R1（Biome scope）**: `bun run lint:fix` / `bunx biome check --write`（パス引数なし）は **禁止**。必ずファイル単位でパス指定
 - **legacy/ 配下の編集禁止**（移行完了・凍結済み）
 - **ファイル全体の書き直し禁止**（明示指示がない限り）
 - **依存関係のアップグレード禁止**
