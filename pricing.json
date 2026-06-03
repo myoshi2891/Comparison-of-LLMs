@@ -8,8 +8,8 @@
       "name": "Claude Opus 4.8",
       "tag": "最新",
       "cls": "tag-flag",
-      "price_in": 5.0,
-      "price_out": 25.0,
+      "price_in": 5,
+      "price_out": 25,
       "sub_ja": "2026年5月 / 1M ctx / Adaptive thinking / 最新フラッグシップ",
       "sub_en": "May 2026 / 1M ctx / Adaptive thinking / latest flagship",
       "scrape_status": "manual"
@@ -19,8 +19,8 @@
       "name": "Claude Opus 4.7",
       "tag": "Stable",
       "cls": "tag-flag",
-      "price_in": 5.0,
-      "price_out": 25.0,
+      "price_in": 5,
+      "price_out": 25,
       "sub_ja": "SWE-bench 87.6% / コーディング特化 / Apr 2026",
       "sub_en": "SWE-bench 87.6% / Coding-focused / Apr 2026",
       "scrape_status": "fallback"
@@ -30,8 +30,8 @@
       "name": "Claude Opus 4.6",
       "tag": "Stable",
       "cls": "tag-flag",
-      "price_in": 5.0,
-      "price_out": 25.0,
+      "price_in": 5,
+      "price_out": 25,
       "sub_ja": "旧フラッグシップ / エージェントチーム / 1M ctx",
       "sub_en": "Prev flagship / Agent teams / 1M ctx",
       "scrape_status": "fallback"
@@ -41,8 +41,8 @@
       "name": "Claude Sonnet 4.6",
       "tag": "最新",
       "cls": "tag-flag",
-      "price_in": 3.0,
-      "price_out": 15.0,
+      "price_in": 3,
+      "price_out": 15,
       "sub_ja": "バランス最適 / 200K ctx",
       "sub_en": "Optimal balance / 200K ctx",
       "scrape_status": "fallback"
@@ -52,8 +52,8 @@
       "name": "Claude Haiku 4.5",
       "tag": "Fast",
       "cls": "tag-mini",
-      "price_in": 1.0,
-      "price_out": 5.0,
+      "price_in": 1,
+      "price_out": 5,
       "sub_ja": "高速・高ボリューム向け / 200K",
       "sub_en": "Fast / high-volume use cases / 200K",
       "scrape_status": "fallback"
@@ -64,7 +64,7 @@
       "tag": "Budget",
       "cls": "tag-mini",
       "price_in": 0.8,
-      "price_out": 4.0,
+      "price_out": 4,
       "sub_ja": "コスト効率モデル / 前世代",
       "sub_en": "Cost-efficient / prev-gen",
       "scrape_status": "fallback"
@@ -74,8 +74,8 @@
       "name": "Claude Opus 4.1 (Legacy)",
       "tag": "Legacy",
       "cls": "tag-leg",
-      "price_in": 15.0,
-      "price_out": 75.0,
+      "price_in": 15,
+      "price_out": 75,
       "sub_ja": "旧フラッグシップ / 非推奨",
       "sub_en": "Legacy flagship / deprecated",
       "scrape_status": "fallback"
@@ -85,8 +85,8 @@
       "name": "GPT-5.5",
       "tag": "最新 Flagship",
       "cls": "tag-flag",
-      "price_in": 5.0,
-      "price_out": 30.0,
+      "price_in": 5,
+      "price_out": 30,
       "sub_ja": "現行フラッグシップ / 1M ctx / May 2026",
       "sub_en": "Current flagship / 1M ctx / May 2026",
       "scrape_status": "fallback"
@@ -96,8 +96,8 @@
       "name": "o3-pro",
       "tag": "Reasoning",
       "cls": "tag-rsn",
-      "price_in": 20.0,
-      "price_out": 80.0,
+      "price_in": 20,
+      "price_out": 80,
       "sub_ja": "最高品質推論 / Jun 2025",
       "sub_en": "Highest quality reasoning / Jun 2025",
       "scrape_status": "fallback"
@@ -107,8 +107,8 @@
       "name": "o1",
       "tag": "Legacy",
       "cls": "tag-leg",
-      "price_in": 15.0,
-      "price_out": 60.0,
+      "price_in": 15,
+      "price_out": 60,
       "sub_ja": "旧推論フラッグシップ",
       "sub_en": "Legacy reasoning flagship",
       "scrape_status": "fallback"
@@ -118,8 +118,8 @@
       "name": "o3",
       "tag": "Reasoning ↓80%OFF",
       "cls": "tag-rsn",
-      "price_in": 2.0,
-      "price_out": 8.0,
+      "price_in": 2,
+      "price_out": 8,
       "sub_ja": "Jun 2025: $10→$2 値下げ",
       "sub_en": "Jun 2025: $10→$2 price cut",
       "scrape_status": "fallback"
@@ -138,32 +138,32 @@
     {
       "provider": "OpenAI",
       "name": "GPT-5.4",
-      "tag": "Prev Flagship",
+      "tag": "Flagship",
       "cls": "tag-flag",
       "price_in": 2.5,
-      "price_out": 15.0,
-      "sub_ja": "旧フラッグシップ / 1M ctx / Mar 2026",
-      "sub_en": "Prev flagship / 1M ctx / Mar 2026",
+      "price_out": 15,
+      "sub_ja": "フラッグシップ / 1M ctx / Apr 2026",
+      "sub_en": "Flagship / 1M ctx / Apr 2026",
       "scrape_status": "fallback"
     },
     {
       "provider": "OpenAI",
       "name": "GPT-5",
-      "tag": "Stable",
-      "cls": "tag-bal",
+      "tag": "Flagship",
+      "cls": "tag-flag",
       "price_in": 1.25,
-      "price_out": 10.0,
+      "price_out": 10,
       "sub_ja": "SWE-bench最高クラス / 400K",
-      "sub_en": "Stable flagship / 400K ctx",
+      "sub_en": "Top SWE-bench / 400K ctx",
       "scrape_status": "fallback"
     },
     {
       "provider": "OpenAI",
       "name": "GPT-4o-latest",
-      "tag": "Legacy",
+      "tag": "Latest",
       "cls": "tag-bal",
-      "price_in": 5.0,
-      "price_out": 15.0,
+      "price_in": 5,
+      "price_out": 15,
       "sub_ja": "ChatGPT最新版追跡モデル",
       "sub_en": "Tracks latest ChatGPT version",
       "scrape_status": "fallback"
@@ -174,7 +174,7 @@
       "tag": "Stable",
       "cls": "tag-bal",
       "price_in": 2.5,
-      "price_out": 10.0,
+      "price_out": 10,
       "sub_ja": "マルチモーダル安定版 / 128K",
       "sub_en": "Multimodal stable / 128K ctx",
       "scrape_status": "fallback"
@@ -184,8 +184,8 @@
       "name": "GPT-4.1",
       "tag": "New",
       "cls": "tag-bal",
-      "price_in": 2.0,
-      "price_out": 8.0,
+      "price_in": 2,
+      "price_out": 8,
       "sub_ja": "1Mコンテキスト / Apr 2025",
       "sub_en": "1M context / Apr 2025",
       "scrape_status": "fallback"
@@ -193,12 +193,12 @@
     {
       "provider": "OpenAI",
       "name": "GPT-5.4-mini",
-      "tag": "Balanced",
-      "cls": "tag-bal",
+      "tag": "Mini",
+      "cls": "tag-mini",
       "price_in": 0.75,
       "price_out": 4.5,
-      "sub_ja": "GPT-5.4の軽量版 / バランス重視",
-      "sub_en": "GPT-5.4 lightweight / balanced",
+      "sub_ja": "高速小型 / Apr 2026",
+      "sub_en": "Fast compact / Apr 2026",
       "scrape_status": "fallback"
     },
     {
@@ -207,7 +207,7 @@
       "tag": "Balanced",
       "cls": "tag-bal",
       "price_in": 0.25,
-      "price_out": 2.0,
+      "price_out": 2,
       "sub_ja": "汎用バランスモデル / 400K",
       "sub_en": "General purpose balanced / 400K",
       "scrape_status": "fallback"
@@ -241,8 +241,8 @@
       "cls": "tag-mini",
       "price_in": 0.2,
       "price_out": 1.25,
-      "sub_ja": "GPT-5.4系最安値 / 超高速",
-      "sub_en": "Cheapest GPT-5.4 tier / ultra-fast",
+      "sub_ja": "超低コスト / Apr 2026",
+      "sub_en": "Ultra-budget / Apr 2026",
       "scrape_status": "fallback"
     },
     {
@@ -261,8 +261,8 @@
       "name": "Gemini 3.1 Pro Preview",
       "tag": "Preview",
       "cls": "tag-flag",
-      "price_in": 2.0,
-      "price_out": 12.0,
+      "price_in": 2,
+      "price_out": 12,
       "sub_ja": "現行世代フラッグシップ / 1M ctx / Mar 2026",
       "sub_en": "Current gen flagship / 1M ctx / Mar 2026",
       "scrape_status": "fallback"
@@ -273,7 +273,7 @@
       "tag": "Fast",
       "cls": "tag-bal",
       "price_in": 1.5,
-      "price_out": 9.0,
+      "price_out": 9,
       "sub_ja": "2026年5月リリース / 1M コンテキスト / 高速推論",
       "sub_en": "May 2026 / 1M context / fast inference",
       "scrape_status": "manual"
@@ -284,7 +284,7 @@
       "tag": "Flagship",
       "cls": "tag-flag",
       "price_in": 1.25,
-      "price_out": 10.0,
+      "price_out": 10,
       "sub_ja": "コーディング最強 / 1M ctx",
       "sub_en": "Top coding model / 1M ctx",
       "scrape_status": "fallback"
@@ -295,7 +295,7 @@
       "tag": "Preview",
       "cls": "tag-bal",
       "price_in": 0.5,
-      "price_out": 3.0,
+      "price_out": 3,
       "sub_ja": "次世代Flash / 1M ctx",
       "sub_en": "Next-gen Flash / 1M ctx",
       "scrape_status": "fallback"
@@ -328,7 +328,7 @@
       "tag": "GCP Enterprise",
       "cls": "tag-vtx",
       "price_in": 1.25,
-      "price_out": 10.0,
+      "price_out": 10,
       "sub_ja": "Google AIと同額 / GCP SLA / ≤200K",
       "sub_en": "Same as Google AI / GCP SLA / ≤200K",
       "scrape_status": "fallback"
@@ -339,7 +339,7 @@
       "tag": "Long Context",
       "cls": "tag-vtx",
       "price_in": 2.5,
-      "price_out": 15.0,
+      "price_out": 15,
       "sub_ja": "200K超コンテキスト / VPC Controls",
       "sub_en": ">200K context / VPC Controls",
       "scrape_status": "fallback"
@@ -448,8 +448,8 @@
       "name": "Grok 4.20",
       "tag": "Long-ctx 2M",
       "cls": "tag-bal",
-      "price_in": 2.0,
-      "price_out": 6.0,
+      "price_in": 2,
+      "price_out": 6,
       "sub_ja": "長コンテキスト特化 / 2M ctx / マルチエージェント",
       "sub_en": "Long-context option / 2M ctx / Multi-agent",
       "scrape_status": "fallback"
@@ -470,8 +470,8 @@
     {
       "group": "GitHub Copilot",
       "name": "Free",
-      "monthly": 0.0,
-      "annual": 0.0,
+      "monthly": 0,
+      "annual": 0,
       "tag": "Free",
       "cls": "tag-mini",
       "note_ja": "2,000補完+50 Premium req/月",
@@ -481,8 +481,8 @@
     {
       "group": "GitHub Copilot",
       "name": "Pro",
-      "monthly": 10.0,
-      "annual": 100.0,
+      "monthly": 10,
+      "annual": 100,
       "tag": "Individual",
       "cls": "tag-bal",
       "note_ja": "300 Premium req/月 | 学生無料",
@@ -492,8 +492,8 @@
     {
       "group": "GitHub Copilot",
       "name": "Pro+",
-      "monthly": 39.0,
-      "annual": 390.0,
+      "monthly": 39,
+      "annual": 390,
       "tag": "Pro+",
       "cls": "tag-flag",
       "note_ja": "1,500 req/月 | 全モデルアクセス",
@@ -503,7 +503,7 @@
     {
       "group": "GitHub Copilot",
       "name": "Business",
-      "monthly": 19.0,
+      "monthly": 19,
       "annual": null,
       "tag": "Team",
       "cls": "tag-bal",
@@ -514,7 +514,7 @@
     {
       "group": "GitHub Copilot",
       "name": "Enterprise",
-      "monthly": 39.0,
+      "monthly": 39,
       "annual": null,
       "tag": "Enterprise",
       "cls": "tag-flag",
@@ -525,8 +525,8 @@
     {
       "group": "Cursor",
       "name": "Hobby (Free)",
-      "monthly": 0.0,
-      "annual": 0.0,
+      "monthly": 0,
+      "annual": 0,
       "tag": "Free",
       "cls": "tag-mini",
       "note_ja": "50 Premium + 500 free req/月",
@@ -536,8 +536,8 @@
     {
       "group": "Cursor",
       "name": "Pro",
-      "monthly": 20.0,
-      "annual": 16.0,
+      "monthly": 20,
+      "annual": 16,
       "tag": "Individual",
       "cls": "tag-bal",
       "note_ja": "$20クレジット/月 ≈ 225 Claude req",
@@ -547,8 +547,8 @@
     {
       "group": "Cursor",
       "name": "Pro+",
-      "monthly": 60.0,
-      "annual": 48.0,
+      "monthly": 60,
+      "annual": 48,
       "tag": "Power",
       "cls": "tag-flag",
       "note_ja": "$60クレジット/月 (Pro×3) | ヘビーユーザー向け",
@@ -558,7 +558,7 @@
     {
       "group": "Cursor",
       "name": "Ultra",
-      "monthly": 200.0,
+      "monthly": 200,
       "annual": null,
       "tag": "Top Tier",
       "cls": "tag-flag",
@@ -569,8 +569,8 @@
     {
       "group": "Cursor",
       "name": "Teams",
-      "monthly": 40.0,
-      "annual": 32.0,
+      "monthly": 40,
+      "annual": 32,
       "tag": "Team",
       "cls": "tag-bal",
       "note_ja": "SSO + 管理ダッシュボード | /user",
@@ -580,7 +580,7 @@
     {
       "group": "Windsurf",
       "name": "Free",
-      "monthly": 0.0,
+      "monthly": 0,
       "annual": null,
       "tag": "Free",
       "cls": "tag-mini",
@@ -591,7 +591,7 @@
     {
       "group": "Windsurf",
       "name": "Pro",
-      "monthly": 15.0,
+      "monthly": 15,
       "annual": null,
       "tag": "Individual",
       "cls": "tag-bal",
@@ -602,7 +602,7 @@
     {
       "group": "Windsurf",
       "name": "Teams",
-      "monthly": 30.0,
+      "monthly": 30,
       "annual": null,
       "tag": "Team",
       "cls": "tag-bal",
@@ -613,8 +613,8 @@
     {
       "group": "Claude Code",
       "name": "Pro",
-      "monthly": 20.0,
-      "annual": 17.0,
+      "monthly": 20,
+      "annual": 17,
       "tag": "Individual",
       "cls": "tag-bal",
       "note_ja": "~45 msg/5h | Claude CLI含む",
@@ -624,7 +624,7 @@
     {
       "group": "Claude Code",
       "name": "Max 5x",
-      "monthly": 100.0,
+      "monthly": 100,
       "annual": null,
       "tag": "Power",
       "cls": "tag-flag",
@@ -635,7 +635,7 @@
     {
       "group": "Claude Code",
       "name": "Max 20x",
-      "monthly": 200.0,
+      "monthly": 200,
       "annual": null,
       "tag": "Max",
       "cls": "tag-flag",
@@ -646,8 +646,8 @@
     {
       "group": "Claude Code",
       "name": "Team Standard",
-      "monthly": 30.0,
-      "annual": 25.0,
+      "monthly": 30,
+      "annual": 25,
       "tag": "Team",
       "cls": "tag-bal",
       "note_ja": "SSO + 集中課金 | /user (5席~)",
@@ -657,8 +657,8 @@
     {
       "group": "Claude Code",
       "name": "Team Premium",
-      "monthly": 125.0,
-      "annual": 100.0,
+      "monthly": 125,
+      "annual": 100,
       "tag": "Team+",
       "cls": "tag-flag",
       "note_ja": "Claude Code含む高機能チームプラン | /user",
@@ -668,8 +668,8 @@
     {
       "group": "JetBrains AI",
       "name": "Free (基本AI機能)",
-      "monthly": 0.0,
-      "annual": 0.0,
+      "monthly": 0,
+      "annual": 0,
       "tag": "Free",
       "cls": "tag-mini",
       "note_ja": "補完・基本チャット / 10 AI actions/day",
@@ -679,8 +679,8 @@
     {
       "group": "JetBrains AI",
       "name": "AI Pro (Individual)",
-      "monthly": 10.0,
-      "annual": 100.0,
+      "monthly": 10,
+      "annual": 100,
       "tag": "Individual",
       "cls": "tag-jb",
       "note_ja": "無制限AI補完+チャット / 全IDE / ローカルモデル可",
@@ -701,7 +701,7 @@
     {
       "group": "JetBrains AI",
       "name": "AI Business (Team)",
-      "monthly": 20.0,
+      "monthly": 20,
       "annual": null,
       "tag": "Team",
       "cls": "tag-jb",
@@ -712,7 +712,7 @@
     {
       "group": "JetBrains AI",
       "name": "AI Enterprise",
-      "monthly": 30.0,
+      "monthly": 30,
       "annual": null,
       "tag": "Enterprise",
       "cls": "tag-jb",
@@ -723,8 +723,8 @@
     {
       "group": "Junie (JetBrains)",
       "name": "AI Pro incl. (Individual)",
-      "monthly": 10.0,
-      "annual": 100.0,
+      "monthly": 10,
+      "annual": 100,
       "tag": "Agent",
       "cls": "tag-jb",
       "note_ja": "AI Pro に含む / IntelliJ対応 / 自律タスク",
@@ -734,7 +734,7 @@
     {
       "group": "Junie (JetBrains)",
       "name": "AI Business incl. (Team)",
-      "monthly": 20.0,
+      "monthly": 20,
       "annual": null,
       "tag": "Team Agent",
       "cls": "tag-jb",
@@ -745,7 +745,7 @@
     {
       "group": "OpenAI Codex",
       "name": "ChatGPT Plus (Codex)",
-      "monthly": 20.0,
+      "monthly": 20,
       "annual": null,
       "tag": "Plus",
       "cls": "tag-bal",
@@ -756,7 +756,7 @@
     {
       "group": "OpenAI Codex",
       "name": "ChatGPT Pro (Codex)",
-      "monthly": 200.0,
+      "monthly": 200,
       "annual": null,
       "tag": "Pro",
       "cls": "tag-flag",
@@ -800,7 +800,7 @@
     {
       "group": "Antigravity",
       "name": "Free",
-      "monthly": 0.0,
+      "monthly": 0,
       "annual": null,
       "tag": "Free (Google)",
       "cls": "tag-mini",
@@ -811,7 +811,7 @@
     {
       "group": "Antigravity",
       "name": "Pro",
-      "monthly": 20.0,
+      "monthly": 20,
       "annual": null,
       "tag": "Indiv. ⚠",
       "cls": "tag-ag",
@@ -822,7 +822,7 @@
     {
       "group": "Antigravity",
       "name": "Team",
-      "monthly": 40.0,
+      "monthly": 40,
       "annual": null,
       "tag": "Team ⚠",
       "cls": "tag-ag",
