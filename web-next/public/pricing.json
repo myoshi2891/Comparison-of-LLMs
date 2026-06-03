@@ -1,12 +1,23 @@
 {
-  "generated_at": "2026-05-09",
-  "jpy_rate": 156.65,
-  "jpy_rate_date": "2026-05-09",
+  "generated_at": "2026-06-03",
+  "jpy_rate": 159.75,
+  "jpy_rate_date": "2026-06-02",
   "api_models": [
     {
       "provider": "Anthropic",
-      "name": "Claude Opus 4.7",
+      "name": "Claude Opus 4.8",
       "tag": "最新",
+      "cls": "tag-flag",
+      "price_in": 5.0,
+      "price_out": 25.0,
+      "sub_ja": "2026年5月 / 1M ctx / Adaptive thinking / 最新フラッグシップ",
+      "sub_en": "May 2026 / 1M ctx / Adaptive thinking / latest flagship",
+      "scrape_status": "manual"
+    },
+    {
+      "provider": "Anthropic",
+      "name": "Claude Opus 4.7",
+      "tag": "Stable",
       "cls": "tag-flag",
       "price_in": 5.0,
       "price_out": 25.0,
@@ -258,6 +269,17 @@
     },
     {
       "provider": "Google AI",
+      "name": "Gemini 3.5 Flash",
+      "tag": "Fast",
+      "cls": "tag-bal",
+      "price_in": 1.5,
+      "price_out": 9.0,
+      "sub_ja": "2026年5月リリース / 1M コンテキスト / 高速推論",
+      "sub_en": "May 2026 / 1M context / fast inference",
+      "scrape_status": "manual"
+    },
+    {
+      "provider": "Google AI",
       "name": "Gemini 2.5 Pro",
       "tag": "Flagship",
       "cls": "tag-flag",
@@ -382,11 +404,11 @@
       "name": "DeepSeek V4 Pro",
       "tag": "Reasoning",
       "cls": "tag-oss",
-      "price_in": 1.74,
-      "price_out": 3.48,
-      "sub_ja": "高度推論 / 1M ctx / 1.6T MoE / MIT",
-      "sub_en": "Advanced reasoning / 1M ctx / 1.6T MoE / MIT",
-      "scrape_status": "fallback"
+      "price_in": 0.435,
+      "price_out": 0.87,
+      "sub_ja": "高度推論 / 1M ctx / 1.6T MoE / MIT / 2026-05-22値下げ",
+      "sub_en": "Advanced reasoning / 1M ctx / 1.6T MoE / MIT / price cut May 2026",
+      "scrape_status": "manual"
     },
     {
       "provider": "DeepSeek",

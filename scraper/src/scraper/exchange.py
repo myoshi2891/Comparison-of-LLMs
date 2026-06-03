@@ -14,13 +14,14 @@ import httpx
 logger = logging.getLogger(__name__)
 
 # Frankfurter API: ECB の公式レートを使用、APIキー不要
-_FRANKFURTER_URL = "https://api.frankfurter.app/latest?from=USD&to=JPY"
+# 2026-06: api.frankfurter.app → api.frankfurter.dev/v1 に移転
+_FRANKFURTER_URL = "https://api.frankfurter.dev/v1/latest?from=USD&to=JPY"
 
 
 def fetch_jpy_rate(fallback: float = 155.0) -> tuple[float, str]:
     """(rate, date) を返す。失敗時は (fallback, 'fallback') を返す。"""
     try:
-        resp = httpx.get(_FRANKFURTER_URL, timeout=15)
+        resp = httpx.get(_FRANKFURTER_URL, timeout=15, follow_redirects=True)
         resp.raise_for_status()
         data = resp.json()
         # {"amount": 1.0, "base": "USD", "date": "2026-02-21", "rates": {"JPY": 155.22}}

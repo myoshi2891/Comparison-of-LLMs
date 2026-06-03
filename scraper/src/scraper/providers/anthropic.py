@@ -15,11 +15,13 @@ _URL = "https://www.anthropic.com/pricing"
 
 # フォールバック価格（ハードコード最終手段）
 _FALLBACKS: dict[str, tuple[float, float]] = {
+    "Claude Opus 4.8":          (5.00,  25.00),
+    "Claude Opus 4.7":          (5.00,  25.00),
     "Claude Opus 4.6":          (5.00,  25.00),
     "Claude Sonnet 4.6":        (3.00,  15.00),
     "Claude Haiku 4.5":         (1.00,   5.00),
+    "Claude Haiku 3.5":         (0.80,   4.00),
     "Claude Opus 4.1 (Legacy)": (15.00, 75.00),
-    "Claude Haiku 3":           (0.25,   1.25),
 }
 
 
@@ -83,10 +85,12 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
     po, so = sanity_check(out_price, "Anthropic/Haiku4.5/out", fb_out)
     results["Claude Haiku 4.5"] = (pi, po, si if si == so else "fallback")
 
-    # Legacy / Budget はフォールバック維持
-    for name in ("Claude Opus 4.1 (Legacy)", "Claude Haiku 3"):
-        fb_in, fb_out = fallback_map[name]
-        results[name] = (fb_in, fb_out, "fallback")
+    # 未スクレイプのモデルはフォールバック維持
+    scraped = {"Claude Opus 4.6", "Claude Sonnet 4.6", "Claude Haiku 4.5"}
+    for name in _FALLBACKS:
+        if name not in scraped:
+            fb_in, fb_out = fallback_map.get(name, (0.0, 0.0))
+            results[name] = (fb_in, fb_out, "fallback")
 
     return _build_models_from_results(results, fallback_map)
 
@@ -98,8 +102,8 @@ def _build_models(
         ApiModel(
             provider="Anthropic",
             name=n,
-            tag="最新 Feb-26" if "4.6" in n or "4.5" in n else ("Legacy" if "Legacy" in n else "Budget"),
-            cls="tag-flag" if "4.6" in n else ("tag-mini" if n == "Claude Haiku 3" else ("tag-leg" if "Legacy" in n else "tag-mini")),
+            tag=_TAG.get(n, ""),
+            cls=_CLS.get(n, "tag-bal"),
             price_in=v[0],
             price_out=v[1],
             sub_ja=_SUB_JA.get(n, ""),
@@ -133,30 +137,38 @@ def _build_models_from_results(
 
 
 _TAG = {
-    "Claude Opus 4.6":          "最新",
+    "Claude Opus 4.8":          "最新",
+    "Claude Opus 4.7":          "Stable",
+    "Claude Opus 4.6":          "Stable",
     "Claude Sonnet 4.6":        "最新",
     "Claude Haiku 4.5":         "Fast",
+    "Claude Haiku 3.5":         "Budget",
     "Claude Opus 4.1 (Legacy)": "Legacy",
-    "Claude Haiku 3":           "Budget",
 }
 _CLS = {
+    "Claude Opus 4.8":          "tag-flag",
+    "Claude Opus 4.7":          "tag-flag",
     "Claude Opus 4.6":          "tag-flag",
     "Claude Sonnet 4.6":        "tag-flag",
     "Claude Haiku 4.5":         "tag-mini",
+    "Claude Haiku 3.5":         "tag-mini",
     "Claude Opus 4.1 (Legacy)": "tag-leg",
-    "Claude Haiku 3":           "tag-mini",
 }
 _SUB_JA = {
-    "Claude Opus 4.6":          "エージェントチーム / 200K",
-    "Claude Sonnet 4.6":        "バランス最適 / 200K",
+    "Claude Opus 4.8":          "2026年5月 / 1M ctx / Adaptive thinking / 最新フラッグシップ",
+    "Claude Opus 4.7":          "SWE-bench 87.6% / コーディング特化 / Apr 2026",
+    "Claude Opus 4.6":          "旧フラッグシップ / エージェントチーム / 1M ctx",
+    "Claude Sonnet 4.6":        "バランス最適 / 200K ctx",
     "Claude Haiku 4.5":         "高速・高ボリューム向け",
+    "Claude Haiku 3.5":         "コスト効率モデル / 前世代",
     "Claude Opus 4.1 (Legacy)": "旧フラッグシップ / 非推奨",
-    "Claude Haiku 3":           "Claude最安値モデル",
 }
 _SUB_EN = {
-    "Claude Opus 4.6":          "Agent teams / 200K ctx",
+    "Claude Opus 4.8":          "May 2026 / 1M ctx / Adaptive thinking / latest flagship",
+    "Claude Opus 4.7":          "SWE-bench 87.6% / Coding-focused / Apr 2026",
+    "Claude Opus 4.6":          "Prev flagship / Agent teams / 1M ctx",
     "Claude Sonnet 4.6":        "Optimal balance / 200K ctx",
     "Claude Haiku 4.5":         "Fast / high-volume use cases",
+    "Claude Haiku 3.5":         "Cost-efficient / prev-gen",
     "Claude Opus 4.1 (Legacy)": "Legacy flagship / deprecated",
-    "Claude Haiku 3":           "Claude lowest-cost model",
 }

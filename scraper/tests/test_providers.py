@@ -189,24 +189,24 @@ class TestDeepSeek:
 
 
 # --------------------------------------------------------------------------- #
-# xAI（"Grok 4" のみ。"Grok 4.1 Fast" を含めないことで key 衝突を回避）
+# xAI（"Grok 4.3" のみ。"Grok 4.1 Fast" を含めないことで key 衝突を回避）
 # --------------------------------------------------------------------------- #
 class TestXai:
     _HTML = (
         "<html><body>"
-        "<p>Grok 4 $9.50</p>"
-        "<p>Grok 4 output $25.00</p>"
+        "<p>Grok 4.3 $9.50</p>"
+        "<p>Grok 4.3 output $25.00</p>"
         "</body></html>"
     )
 
     def test_success_extracts_prices(self):
         with patch("scraper.providers.xai.get_page_text", return_value=self._HTML):
             models = xai.scrape()
-        grok4 = _find(models, "Grok 4")
-        assert grok4.price_in == 9.50
-        assert grok4.price_out == 25.00
-        assert grok4.scrape_status == "success"
-        assert grok4.provider == "xAI"
+        grok43 = _find(models, "Grok 4.3")
+        assert grok43.price_in == 9.50
+        assert grok43.price_out == 25.00
+        assert grok43.scrape_status == "success"
+        assert grok43.provider == "xAI"
 
     def test_fallback_on_empty_html(self):
         with patch("scraper.providers.xai.get_page_text", return_value="<html></html>"):

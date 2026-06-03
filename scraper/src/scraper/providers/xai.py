@@ -14,17 +14,28 @@ logger = logging.getLogger(__name__)
 _URL = "https://x.ai/api"
 
 _FALLBACKS: dict[str, tuple[float, float]] = {
-    "Grok 4":      (3.00, 15.00),
+    "Grok 4.3":      (1.25,  2.50),
+    "Grok 4.20":     (2.00,  6.00),
     "Grok 4.1 Fast": (0.20,  0.50),
 }
-_TAG = {"Grok 4": "Flagship", "Grok 4.1 Fast": "Fast"}
-_CLS = {"Grok 4": "tag-flag", "Grok 4.1 Fast": "tag-mini"}
+_TAG = {
+    "Grok 4.3":      "Flagship",
+    "Grok 4.20":     "Flagship",
+    "Grok 4.1 Fast": "Fast",
+}
+_CLS = {
+    "Grok 4.3":      "tag-flag",
+    "Grok 4.20":     "tag-flag",
+    "Grok 4.1 Fast": "tag-mini",
+}
 _SUB_JA = {
-    "Grok 4":      "Jul 2025 / 256K ctx",
+    "Grok 4.3":      "最新 / 1M ctx / May 2026",
+    "Grok 4.20":     "前フラッグシップ / 1M ctx / Mar 2026",
     "Grok 4.1 Fast": "2Mコンテキスト / 業界最安クラス",
 }
 _SUB_EN = {
-    "Grok 4":      "Jul 2025 / 256K ctx",
+    "Grok 4.3":      "Latest / 1M ctx / May 2026",
+    "Grok 4.20":     "Prev flagship / 1M ctx / Mar 2026",
     "Grok 4.1 Fast": "2M context / among cheapest in class",
 }
 
