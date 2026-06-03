@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { PRICE_CHECKED_AT, TOOLS } from "./constants";
+import { PRICE_CHECKED_AT, TOOLS, type PricingPlan, planAmounts } from "./constants";
 import Page from "./page";
 
 describe("/code-review/tool-pricing", () => {
@@ -52,5 +52,52 @@ describe("/code-review/tool-pricing", () => {
         expect(href).not.toContain(".html");
       }
     }
+  });
+
+  it("各カードに料金表ヘッダー（1ヶ月/3ヶ月/12ヶ月）が存在する", () => {
+    const { container } = render(<Page />);
+    const headers = container.querySelectorAll("[data-plan-header]");
+    expect(headers.length).toBeGreaterThanOrEqual(TOOLS.length);
+  });
+
+  it("プラン行の総数が TOOLS.flatMap(t => t.plans).length と一致する", () => {
+    const { container } = render(<Page />);
+    const rows = container.querySelectorAll("[data-plan-row]");
+    const expected = TOOLS.flatMap((t) => t.plans).length;
+    expect(rows).toHaveLength(expected);
+  });
+
+  it("円記号「¥」がページに描画される", () => {
+    const { container } = render(<Page />);
+    expect(container.textContent).toContain("¥");
+  });
+});
+
+describe("planAmounts", () => {
+  it("monthlyUsd が数値の場合は m1/m3/m12 を返し discounted=false", () => {
+    const plan: PricingPlan = { name: "Pro", monthlyUsd: 10 };
+    const result = planAmounts(plan);
+    expect(result).toEqual({ m1: 10, m3: 30, m12: 120, discounted: false });
+  });
+
+  it("annualMonthlyUsd がある場合は m12 に年額換算を使い discounted=true", () => {
+    const plan: PricingPlan = { name: "Pro", monthlyUsd: 10, annualMonthlyUsd: 8.33 };
+    const result = planAmounts(plan);
+    expect(result.m1).toBe(10);
+    expect(result.m3).toBe(30);
+    expect(result.m12).toBeCloseTo(8.33 * 12);
+    expect(result.discounted).toBe(true);
+  });
+
+  it("monthlyUsd が null の場合は全て null、discounted=false", () => {
+    const plan: PricingPlan = { name: "Enterprise", monthlyUsd: null, priceNote: "要問合せ" };
+    const result = planAmounts(plan);
+    expect(result).toEqual({ m1: null, m3: null, m12: null, discounted: false });
+  });
+
+  it("monthlyUsd が 0（Free プラン）は数値として扱われる", () => {
+    const plan: PricingPlan = { name: "Free", monthlyUsd: 0 };
+    const result = planAmounts(plan);
+    expect(result).toEqual({ m1: 0, m3: 0, m12: 0, discounted: false });
   });
 });
