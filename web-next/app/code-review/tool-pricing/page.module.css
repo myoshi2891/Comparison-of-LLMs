@@ -1,0 +1,609 @@
+/*
+ * Code Review Tool Pricing — エディトリアル "Pricing Dossier" デザイン。
+ * 既存 code-review ガイドの neon-green ターミナル調とは意図的に差別化し、
+ * 暖色アクセント + カテゴリ別カラーコードの落ち着いた資料体裁にする。
+ * フォントはプロジェクト next/font の CSS 変数（--font-display / --font-mono / --font-sans）を参照。
+ */
+
+.page {
+  /* ── 配色トークン（ページ局所） ── */
+  --bg-deep: #0a0a10;
+  --bg-panel: #111119;
+  --bg-card: #15151f;
+  --bg-card-hi: #1b1b27;
+  --border: #272736;
+  --border-hi: #353548;
+  --ink: #f5f1e9;
+  --ink-dim: #aaa6b8;
+  --ink-faint: #6d6a80;
+  --accent: #e8b04b; /* 暖色ゴールド = シグネチャ */
+  --accent-soft: rgba(232, 176, 75, 0.14);
+  --pros: #4ade80;
+  --cons: #f87171;
+
+  /* カテゴリ色（既定。各 cat* クラスで上書き） */
+  --c-review: #5eb1ff;
+  --c-agent: #b388ff;
+  --c-static: #ffb454;
+  --cat: var(--accent);
+
+  --radius: 14px;
+  --radius-sm: 9px;
+  --shadow: 0 18px 50px -28px rgba(0, 0, 0, 0.9);
+  --font-head: var(--font-display, "Syne", sans-serif);
+  --font-mono: var(--font-mono, "JetBrains Mono", monospace);
+  --font-body: var(--font-sans, "Noto Sans JP", sans-serif);
+
+  position: relative;
+  min-height: 100vh;
+  background: var(--bg-deep);
+  color: var(--ink);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  isolation: isolate;
+}
+
+/* ── カテゴリ別アクセント注入 ── */
+.catReview {
+  --cat: var(--c-review);
+}
+.catAgent {
+  --cat: var(--c-agent);
+}
+.catStatic {
+  --cat: var(--c-static);
+}
+
+/* ── 装飾レイヤー ── */
+.grid {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 80%);
+  pointer-events: none;
+}
+
+.glow {
+  position: fixed;
+  top: -22vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80vw;
+  height: 55vh;
+  z-index: -1;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(232, 176, 75, 0.12),
+    transparent 68%
+  );
+  filter: blur(20px);
+  pointer-events: none;
+}
+
+/* ── レイアウト ── */
+.shell {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: clamp(2.5rem, 6vw, 5rem) clamp(1.1rem, 4vw, 2.5rem) 6rem;
+}
+
+/* ─── HERO ─── */
+.hero {
+  padding-bottom: clamp(2rem, 5vw, 3.5rem);
+  border-bottom: 1px solid var(--border);
+}
+
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 1.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.kickerDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: clamp(2.4rem, 7vw, 5rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  background: linear-gradient(180deg, #fff 0%, #d8d2c4 55%, #9c9789 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.lede {
+  max-width: 60ch;
+  margin: 1.5rem 0 0;
+  font-size: 1.04rem;
+  line-height: 1.85;
+  color: var(--ink-dim);
+}
+
+.lede strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(1.2rem, 4vw, 2.6rem);
+  margin: 2.2rem 0 0;
+}
+
+.stat {
+  margin: 0;
+}
+
+.stat dt {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.stat dd {
+  margin: 0.3rem 0 0;
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 2.6rem;
+  line-height: 1;
+  color: var(--accent);
+}
+
+.statSm {
+  font-size: 1.5rem !important;
+  font-family: var(--font-mono) !important;
+  letter-spacing: -0.01em;
+}
+
+.anchors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 2.4rem;
+}
+
+.anchors a {
+  --cat: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-decoration: none;
+  color: var(--ink-dim);
+  padding: 0.42rem 0.85rem;
+  border: 1px solid var(--border-hi);
+  border-radius: 999px;
+  transition: 0.2s ease;
+}
+
+.anchors a:hover {
+  color: var(--bg-deep);
+  background: var(--cat);
+  border-color: var(--cat);
+}
+
+/* ─── SECTION ─── */
+.section {
+  margin-top: clamp(3rem, 7vw, 4.5rem);
+  scroll-margin-top: 1.5rem;
+}
+
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.6rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 0.85rem;
+  margin: 0;
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: clamp(1.5rem, 3.5vw, 2.1rem);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.h2No {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--cat);
+  letter-spacing: 0.05em;
+}
+
+.sectionNote {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+/* ─── MATRIX TABLE ─── */
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-panel);
+  -webkit-overflow-scrolling: touch;
+}
+
+.matrix {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.matrix thead th {
+  position: sticky;
+  top: 0;
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 500;
+  padding: 0.95rem 1.1rem;
+  background: var(--bg-card-hi);
+  border-bottom: 1px solid var(--border-hi);
+  white-space: nowrap;
+}
+
+.matrix tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.18s ease;
+}
+
+.matrix tbody tr:last-child {
+  border-bottom: none;
+}
+
+.matrix tbody tr:hover {
+  background: var(--bg-card-hi);
+}
+
+.matrix td,
+.matrix tbody th {
+  padding: 0.9rem 1.1rem;
+  vertical-align: middle;
+}
+
+.matrixName {
+  position: sticky;
+  left: 0;
+  text-align: left;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border);
+  box-shadow: 3px 0 0 -2px var(--cat);
+  white-space: nowrap;
+}
+
+.matrix tbody tr:hover .matrixName {
+  background: var(--bg-card-hi);
+}
+
+.matrixNo {
+  display: inline-block;
+  margin-right: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--cat);
+}
+
+.matrixUse {
+  color: var(--ink-dim);
+}
+
+/* カテゴリタグ */
+.catTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--cat);
+  white-space: nowrap;
+}
+
+.catDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--cat);
+  box-shadow: 0 0 8px var(--cat);
+}
+
+/* 価格チップ */
+.priceChip {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--ink);
+  padding: 0.22rem 0.6rem;
+  border: 1px solid var(--border-hi);
+  border-radius: 7px;
+  background: var(--bg-card);
+  white-space: nowrap;
+}
+
+/* ─── CARD GRID ─── */
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 1.1rem;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem 1.4rem 1.3rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, var(--bg-card-hi), var(--bg-card));
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition:
+    transform 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--cat);
+  opacity: 0.85;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-hi);
+}
+
+.cardGhostNo {
+  position: absolute;
+  top: -0.5rem;
+  right: 0.6rem;
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 4.2rem;
+  line-height: 1;
+  color: var(--cat);
+  opacity: 0.08;
+  pointer-events: none;
+  user-select: none;
+}
+
+.cardHead {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cardName {
+  margin: 0;
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 1.18rem;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+.cardNameLink {
+  color: inherit;
+  text-decoration: none;
+  background-image: linear-gradient(var(--cat), var(--cat));
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.25s ease;
+}
+
+.cardNameLink:hover {
+  background-size: 100% 1px;
+}
+
+.cardUse {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--ink-faint);
+}
+
+.cardSummary {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.75;
+  color: var(--ink-dim);
+}
+
+/* メリット/デメリット */
+.prosCons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.pcPanel {
+  padding: 0.7rem 0.75rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.pcPanel p {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.pcLabel {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pros {
+  background: rgba(74, 222, 128, 0.06);
+  border-color: rgba(74, 222, 128, 0.22);
+}
+.pros .pcLabel {
+  color: var(--pros);
+}
+
+.cons {
+  background: rgba(248, 113, 113, 0.06);
+  border-color: rgba(248, 113, 113, 0.22);
+}
+.cons .pcLabel {
+  color: var(--cons);
+}
+
+/* カードフッター */
+.cardFoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 0.9rem;
+  margin-top: auto;
+  padding-top: 0.95rem;
+  border-top: 1px solid var(--border);
+}
+
+.priceBlock {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.priceLabel {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.sourceLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--ink-dim);
+  text-decoration: none;
+  padding: 0.22rem 0.5rem;
+  border: 1px dashed var(--border-hi);
+  border-radius: 7px;
+  transition: 0.18s ease;
+}
+
+.sourceLink:hover {
+  color: var(--cat);
+  border-color: var(--cat);
+  border-style: solid;
+}
+
+.sourceLabel {
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cat);
+}
+
+.sourceArrow {
+  font-size: 0.8rem;
+}
+
+.checkedAt {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  color: var(--ink-faint);
+  margin-left: auto;
+}
+
+/* ─── DISCLAIMER ─── */
+.disclaimer {
+  padding: 1.5rem 1.6rem;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--bg-panel);
+}
+
+.disclaimer p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: var(--ink-dim);
+}
+
+.disclaimer strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.disclaimerSub {
+  margin-top: 0.8rem !important;
+  font-size: 0.82rem !important;
+  color: var(--ink-faint) !important;
+}
+
+/* ─── レスポンシブ ─── */
+@media (max-width: 560px) {
+  .sectionHead {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+  .prosCons {
+    grid-template-columns: 1fr;
+  }
+  .checkedAt {
+    margin-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .anchors a,
+  .sourceLink,
+  .cardNameLink {
+    transition: none;
+  }
+}
