@@ -355,16 +355,17 @@
 
 /* ─── CARD GRID ─── */
 .cardGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-  gap: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .card {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  gap: 1.6rem;
+  align-items: start;
   padding: 1.5rem 1.4rem 1.3rem;
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -388,6 +389,14 @@
 .card:hover {
   transform: translateY(-3px);
   border-color: var(--border-hi);
+}
+
+/* ツール情報パネル（左列） */
+.cardInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
 }
 
 .cardGhostNo {
@@ -690,6 +699,12 @@
 }
 
 /* ─── レスポンシブ ─── */
+@media (max-width: 720px) {
+  .card {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 560px) {
   .sectionHead {
     flex-direction: column;

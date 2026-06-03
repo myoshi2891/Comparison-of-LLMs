@@ -163,33 +163,47 @@ export default function ToolPricingPage() {
                       {toolNo(tool.name)}
                     </span>
 
-                    <header className={styles.cardHead}>
-                      <span className={styles.catTag}>
-                        <span className={styles.catDot} aria-hidden="true" />
-                        {tool.category}
-                      </span>
-                      <h3 className={styles.cardName}>
-                        <Ext href={tool.href} className={styles.cardNameLink}>
-                          {tool.name}
+                    {/* 左: ツール情報 */}
+                    <div className={styles.cardInfo}>
+                      <header className={styles.cardHead}>
+                        <span className={styles.catTag}>
+                          <span className={styles.catDot} aria-hidden="true" />
+                          {tool.category}
+                        </span>
+                        <h3 className={styles.cardName}>
+                          <Ext href={tool.href} className={styles.cardNameLink}>
+                            {tool.name}
+                          </Ext>
+                        </h3>
+                        <p className={styles.cardUse}>主用途: {tool.use}</p>
+                      </header>
+
+                      <p className={styles.cardSummary}>{tool.summary}</p>
+
+                      <div className={styles.prosCons}>
+                        <div className={`${styles.pcPanel} ${styles.pros}`}>
+                          <span className={styles.pcLabel}>メリット</span>
+                          <p>{tool.pros}</p>
+                        </div>
+                        <div className={`${styles.pcPanel} ${styles.cons}`}>
+                          <span className={styles.pcLabel}>デメリット</span>
+                          <p>{tool.cons}</p>
+                        </div>
+                      </div>
+
+                      <footer className={styles.cardFoot}>
+                        <Ext href={tool.sourceUrl} className={styles.sourceLink} data-source-link>
+                          <span className={styles.sourceLabel}>出典</span>
+                          {tool.sourceLabel}
+                          <span className={styles.sourceArrow} aria-hidden="true">
+                            ↗
+                          </span>
                         </Ext>
-                      </h3>
-                      <p className={styles.cardUse}>主用途: {tool.use}</p>
-                    </header>
-
-                    <p className={styles.cardSummary}>{tool.summary}</p>
-
-                    <div className={styles.prosCons}>
-                      <div className={`${styles.pcPanel} ${styles.pros}`}>
-                        <span className={styles.pcLabel}>メリット</span>
-                        <p>{tool.pros}</p>
-                      </div>
-                      <div className={`${styles.pcPanel} ${styles.cons}`}>
-                        <span className={styles.pcLabel}>デメリット</span>
-                        <p>{tool.cons}</p>
-                      </div>
+                        <span className={styles.checkedAt}>確認 {tool.priceCheckedAt}</span>
+                      </footer>
                     </div>
 
-                    {/* ─── プラン別料金表 ─── */}
+                    {/* 右: プラン別料金表 */}
                     <div className={styles.planWrap}>
                       <table className={styles.planTable}>
                         <thead>
@@ -246,17 +260,6 @@ export default function ToolPricingPage() {
                         </tbody>
                       </table>
                     </div>
-
-                    <footer className={styles.cardFoot}>
-                      <Ext href={tool.sourceUrl} className={styles.sourceLink} data-source-link>
-                        <span className={styles.sourceLabel}>出典</span>
-                        {tool.sourceLabel}
-                        <span className={styles.sourceArrow} aria-hidden="true">
-                          ↗
-                        </span>
-                      </Ext>
-                      <span className={styles.checkedAt}>確認 {tool.priceCheckedAt}</span>
-                    </footer>
                   </article>
                 ))}
               </div>
@@ -273,9 +276,7 @@ export default function ToolPricingPage() {
           </div>
           <div className={styles.disclaimer}>
             <p>
-              掲載の価格は <strong>{PRICE_CHECKED_AT} 時点</strong>の目安です。プラン体系・通貨・
-              従量課金の単価は頻繁に変わるため、契約前に必ず各ツールの公式ページ（各カードの
-              <strong>「出典」リンク</strong>）で最新の料金を確認してください。
+              掲載の価格は <strong>{PRICE_CHECKED_AT} 時点</strong>の目安です。プラン体系・通貨・従量課金の単価は頻繁に変わるため、契約前に必ず各ツールの公式ページ（各カードの<strong>「出典」リンク</strong>）で最新の料金を確認してください。
             </p>
             <p className={styles.disclaimerSub}>
               本ページは月次で価格を見直します。出典は各社公式の pricing ページを参照しています。
