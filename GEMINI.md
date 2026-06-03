@@ -1,6 +1,6 @@
 # GEMINI.md
 
-Updated 2026-06-03
+Updated 2026-06-04
 
 GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、GEMINI.md はその委譲 pointer として機能する。
