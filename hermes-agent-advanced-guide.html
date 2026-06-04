@@ -1476,14 +1476,19 @@ H -->|deny| DENY["拒否"]
           <div class="compare-card good">
             <div class="compare-label">✅ 本番ゲートウェイ推奨</div>
             <div class="compare-code">
-              approvals: mode: smart timeout: 120 cron_mode: deny destructive_slash_confirm: true
-            </div>
+approvals:
+  mode: smart
+  timeout: 120
+  cron_mode: deny
+  destructive_slash_confirm: true
+</div>
           </div>
           <div class="compare-card bad">
             <div class="compare-label">❌ 絶対にやらない設定</div>
             <div class="compare-code">
-              approvals: mode: off # 本番cronで # cron_mode: approve # も同様に危険
-            </div>
+approvals:
+  mode: off # 本番cronで # cron_mode: approve # も同様に危険
+</div>
           </div>
         </div>
 
@@ -1840,17 +1845,24 @@ GW &lt;--&gt;|"HTTPS"| P
           <div class="compare-card good">
             <div class="compare-label">✅ スキル frontmatter で宣言（v0.5.1+）</div>
             <div class="compare-code">
-              required_environment_variables: - name: GITHUB_TOKEN prompt: GitHub PAT help:
-              github.com/settings/tokens required_credential_files: - path: google_token.json
-              description: OAuth2 token # Docker/Modalに自動フォワード
-            </div>
+required_environment_variables:
+  - name: GITHUB_TOKEN
+    prompt: GitHub PAT
+    help: github.com/settings/tokens
+required_credential_files:
+  - path: google_token.json
+    description: OAuth2 token
+# Docker/Modalに自動フォワード
+</div>
           </div>
           <div class="compare-card bad">
             <div class="compare-label">❌ インフラキーをパススルーに追加</div>
             <div class="compare-code">
-              terminal: env_passthrough: # NG: プロバイダーAPIキーは # 絶対に追加しない -
-              OPENAI_API_KEY - TELEGRAM_BOT_TOKEN
-            </div>
+terminal:
+  env_passthrough: # NG: プロバイダーAPIキーは絶対に追加しない
+    - OPENAI_API_KEY
+    - TELEGRAM_BOT_TOKEN
+</div>
           </div>
         </div>
 
@@ -2249,17 +2261,24 @@ O1 --> G1 & G2
           <div class="compare-card good">
             <div class="compare-label">✅ コンテキストを明示的に渡す</div>
             <div class="compare-code">
-              delegate_task( goal="api/handlers.py の TypeError を修正", context=""" api/handlers.py
-              line 47: NoneType has no attribute 'get'. parse_body()はContent-Type未設定時
-              にNone返却。Python 3.11 使用。 プロジェクト: /home/user/myproject """ )
-            </div>
+delegate_task(
+  goal="api/handlers.py の TypeError を修正",
+  context="""
+  api/handlers.py line 47: NoneType has no attribute 'get'.
+  parse_body()はContent-Type未設定時にNone返却。
+  Python 3.11 使用。
+  プロジェクト: /home/user/myproject
+  """
+)
+</div>
           </div>
           <div class="compare-card bad">
             <div class="compare-label">❌ サブエージェントは過去を知らない</div>
             <div class="compare-code">
-              delegate_task( goal="エラーを修正して" # NG: サブエージェントは #
-              新規会話から開始するため # 「エラー」が何かを知らない )
-            </div>
+delegate_task(
+  goal="エラーを修正して" # NG: サブエージェントは新規会話から開始するため「エラー」が何かを知らない
+)
+</div>
           </div>
         </div>
 
@@ -2334,17 +2353,24 @@ write_state(<span class="cs">"issue_count"</span>, latest)
           <div class="compare-card good">
             <div class="compare-label">✅ コストゼロの監視タスク</div>
             <div class="compare-code">
-              hermes cron create "every 5m" \ --no-agent \ --script memory-watchdog.sh \ --deliver
-              telegram \ --name "memory-watchdog" # stdout 空 = silent tick（通知なし） # stdout
-              あり = Telegram へ配信 # non-zero exit = エラーアラート
-            </div>
+hermes cron create "every 5m" \
+  --no-agent \
+  --script memory-watchdog.sh \
+  --deliver telegram \
+  --name "memory-watchdog"
+  # stdout 空 = silent tick（通知なし）
+  # stdout あり = Telegram へ配信
+  # non-zero exit = エラーアラート
+</div>
           </div>
           <div class="compare-card bad">
             <div class="compare-label">❌ 文脈を前提とした cron プロンプト</div>
             <div class="compare-code">
-              cronjob( prompt="あのサーバー問題を確認して", schedule="every 5m" ) # NG: cron
-              は独立したセッション # 「あのサーバー」を知らない
-            </div>
+cronjob(
+  prompt="あのサーバー問題を確認して", # NG: cron は独立したセッション。「あのサーバー」を知らない
+  schedule="every 5m"
+)
+</div>
           </div>
         </div>
 
