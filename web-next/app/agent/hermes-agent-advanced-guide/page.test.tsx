@@ -24,6 +24,7 @@ const EXPECTED_SECTION_IDS = [
   "ch9",
   "ch10",
   "ch11",
+  "ch12",
 ] as const;
 
 describe("/agent/hermes-agent-advanced-guide - metadata", () => {
@@ -50,8 +51,10 @@ describe("/agent/hermes-agent-advanced-guide - page structure", () => {
     expect(h1?.textContent).toMatch(/Hermes Agent/);
   });
 
-  it("renders all 11 expected chapter section ids", () => {
+  it("renders all 12 expected chapter section ids", () => {
     const { container } = render(<Page />);
+    const sections = container.querySelectorAll('section[id^="ch"]');
+    expect(sections.length).toBe(EXPECTED_SECTION_IDS.length);
     for (const id of EXPECTED_SECTION_IDS) {
       const el = container.querySelector(`#${id}`);
       expect(el, `chapter section id="${id}" must exist`).not.toBeNull();

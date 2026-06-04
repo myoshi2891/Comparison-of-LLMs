@@ -111,6 +111,28 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .hero::before,
+  .heroBadge,
+  .hero h1,
+  .heroSub,
+  .heroMeta,
+  .progressBar,
+  .trendCard::before {
+    animation: none;
+  }
+
+  .tocCard,
+  .metricCard,
+  .examCard,
+  .trendCard,
+  .archLayer,
+  .pyramidRow {
+    transition: none;
+    transform: none;
+  }
+}
+
 /* NAV */
 .nav {
   position: sticky;
@@ -195,6 +217,16 @@
   transform: translate(-50%, -50%);
   animation: pulse 4s ease-in-out infinite;
   pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero::before,
+  .heroBadge,
+  .hero h1,
+  .heroSub,
+  .heroMeta {
+    animation: none;
+  }
 }
 
 .heroBadge {
@@ -876,6 +908,12 @@
   width: var(--w);
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .progressBar {
+    animation: none;
+  }
+}
+
 .progressBar.green {
   background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan));
 }
@@ -961,6 +999,12 @@
   background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan), var(--neon-purple));
   animation: border-spin 3s linear infinite;
   background-size: 200% 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trendCard::before {
+    animation: none;
+  }
 }
 
 .trendCard:hover {
