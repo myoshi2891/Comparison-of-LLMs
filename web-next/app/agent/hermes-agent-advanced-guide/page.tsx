@@ -17,7 +17,7 @@ function Ext({
   children: ReactNode;
 }) {
   return (
-    <a href={href} className={className} target="_blank" rel="noopener noreferrer">
+    <a href={href} className={className} target="_blank" rel="external noopener noreferrer">
       {children}
     </a>
   );

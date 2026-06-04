@@ -85,7 +85,7 @@ AIモデル価格と為替レートを一括更新します。
   ```bash
   cd web-next && bun run test
   # または修正した画面の個別テストを実行
-  cd web-next && bun run test web-next/app/claude/agent
+  cd web-next && bun run test app/claude/agent/page.test.tsx
   ```
 
 - 目視による確認：
