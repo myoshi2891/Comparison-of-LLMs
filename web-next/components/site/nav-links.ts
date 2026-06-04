@@ -85,5 +85,9 @@ export const navLinks: readonly NavLink[] = [
       { name: "SonarQube Guide", href: "/code-review/sonar-qube" },
     ],
   },
+  {
+    name: "Hermes",
+    children: [{ name: "Advanced Guide", href: "/agent/hermes-agent-advanced-guide" }],
+  },
   { name: "Git Worktree", href: "/git-worktree" },
 ];
