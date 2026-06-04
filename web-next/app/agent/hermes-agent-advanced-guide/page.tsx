@@ -1,14 +1,21 @@
-import dynamic from "next/dynamic";
+import type { CSSProperties, ReactNode } from "react";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
-
-const MermaidDiagram = dynamic(() => import("@/components/docs/MermaidDiagram"), { ssr: false });
 
 export const metadata = {
   title: "Hermes Agent — 中級・上級者向け完全ガイド",
   description: "内部アーキテクチャ / 7層セキュリティ / 本番デプロイメントベストプラクティス",
 };
 
-function Ext({ href, className, children }: { href: string; className?: string; children: React.ReactNode }) {
+function Ext({
+  href,
+  className,
+  children,
+}: {
+  href: string;
+  className?: string;
+  children: ReactNode;
+}) {
   return (
     <a href={href} className={className} target="_blank" rel="noopener noreferrer">
       {children}
@@ -25,7 +32,7 @@ export default function Page() {
           <a href="#ch1">01 Architecture</a>
           <a href="#ch2">02 Security</a>
           <a href="#ch3">03 Approval</a>
-          <a href="#ch4">04 Auth &amp; Pairing</a>
+          <a href="#ch4">04 Auth & Pairing</a>
           <a href="#ch5">05 Container</a>
           <a href="#ch6">06 Credentials</a>
           <a href="#ch7">07 MCP</a>
@@ -107,7 +114,7 @@ export default function Page() {
           </a>
           <a className={styles.tocCard} href="#ch4">
             <div className={styles.tocNum}>Ch.04</div>
-            <div className={styles.tocLabel}>ユーザー認可 &amp; DM Pairing</div>
+            <div className={styles.tocLabel}>ユーザー認可 & DM Pairing</div>
           </a>
           <a className={styles.tocCard} href="#ch5">
             <div className={styles.tocNum}>Ch.05</div>
@@ -157,31 +164,24 @@ export default function Page() {
           <h3 className={styles.sectionTitle}>エージェントループ — データフロー</h3>
           <div className={styles.mermaidWrap}>
             <MermaidDiagram
+              id="diag-loop"
               chart={`flowchart TD
-A["User Input
-(CLI / Gateway / ACP)"] --> B["HermesCLI
-.process_input()"]
-B --> C["AIAgent
-.run_conversation()"]
-C --> D["prompt_builder
-.build_system_prompt()"]
-D --> E["runtime_provider
-.resolve()"]
+A["User Input\\n(CLI / Gateway / ACP)"] --> B["HermesCLI\\n.process_input()"]
+B --> C["AIAgent\\n.run_conversation()"]
+C --> D["prompt_builder\\n.build_system_prompt()"]
+D --> E["runtime_provider\\n.resolve()"]
 E --> F{API Mode}
 F -->|chat_completions| G["OpenAI 互換 API"]
 F -->|codex_responses| H["Codex API"]
 F -->|anthropic_messages| I["Anthropic Messages API"]
 G & H & I --> J{Tool Call?}
-J -->|Yes| K["model_tools
-.handle_function_call()"]
-K --> L["tools/approval.py
-危険コマンド検査"]
+J -->|Yes| K["model_tools\\n.handle_function_call()"]
+K --> L["tools/approval.py\\n危険コマンド検査"]
 L -->|承認| M["Tool 実行"]
 L -->|拒否| N["Error Return"]
 M --> J
 J -->|No| O["Final Response"]
-O --> P["SessionDB
-(SQLite + FTS5)"]`}
+O --> P["SessionDB\\n(SQLite + FTS5)"]`}
             />
           </div>
 
@@ -366,7 +366,7 @@ O --> P["SessionDB
             <div className={styles.progressBarWrap}>
               <div
                 className={`${styles.progressBar} ${styles.green}`}
-                style={{ width: "100%", "--w": "100%" } as React.CSSProperties}
+                style={{ width: "100%", "--w": "100%" } as CSSProperties}
               />
             </div>
             <div className={styles.progressPct}>100%</div>
@@ -376,7 +376,7 @@ O --> P["SessionDB
             <div className={styles.progressBarWrap}>
               <div
                 className={`${styles.progressBar} ${styles.green}`}
-                style={{ width: "100%", "--w": "100%" } as React.CSSProperties}
+                style={{ width: "100%", "--w": "100%" } as CSSProperties}
               />
             </div>
             <div className={styles.progressPct}>100%</div>
@@ -386,7 +386,7 @@ O --> P["SessionDB
             <div className={styles.progressBarWrap}>
               <div
                 className={`${styles.progressBar} ${styles.green}`}
-                style={{ width: "95%", "--w": "95%" } as React.CSSProperties}
+                style={{ width: "95%", "--w": "95%" } as CSSProperties}
               />
             </div>
             <div className={styles.progressPct}>95%</div>
@@ -396,7 +396,7 @@ O --> P["SessionDB
             <div className={styles.progressBarWrap}>
               <div
                 className={`${styles.progressBar} ${styles.green}`}
-                style={{ width: "90%", "--w": "90%" } as React.CSSProperties}
+                style={{ width: "90%", "--w": "90%" } as CSSProperties}
               />
             </div>
             <div className={styles.progressPct}>90%</div>
@@ -406,7 +406,7 @@ O --> P["SessionDB
             <div className={styles.progressBarWrap}>
               <div
                 className={`${styles.progressBar} ${styles.amber}`}
-                style={{ width: "75%", "--w": "75%" } as React.CSSProperties}
+                style={{ width: "75%", "--w": "75%" } as CSSProperties}
               />
             </div>
             <div className={styles.progressPct}>75%</div>
@@ -416,7 +416,7 @@ O --> P["SessionDB
             <div className={styles.progressBarWrap}>
               <div
                 className={`${styles.progressBar} ${styles.amber}`}
-                style={{ width: "80%", "--w": "80%" } as React.CSSProperties}
+                style={{ width: "80%", "--w": "80%" } as CSSProperties}
               />
             </div>
             <div className={styles.progressPct}>80%</div>
@@ -562,21 +562,16 @@ O --> P["SessionDB
           <h3 className={styles.sectionTitle}>承認フロー — CLI vs Gateway</h3>
           <div className={styles.mermaidWrap}>
             <MermaidDiagram
+              id="diag-approval"
               chart={`flowchart TD
 A["コマンド実行要求"] --> B{Hardline Blocklist?}
-B -->|Yes| BLOCK["無条件ブロック
-設定に関係なく"]
+B -->|Yes| BLOCK["無条件ブロック\\n設定に関係なく"]
 B -->|No| T["tirith スキャン"]
 T --> C{approvals.mode}
-C -->|manual| D["ユーザー承認プロンプト
-60秒タイムアウト後 DENY"]
-C -->|smart| E["補助 LLM がリスク評価
-低リスク→自動承認
-高リスク→自動拒否
-不明→手動"]
+C -->|manual| D["ユーザー承認プロンプト\\n60秒タイムアウト後 DENY"]
+C -->|smart| E["補助 LLM がリスク評価\\n低リスク→自動承認\\n高リスク→自動拒否\\n不明→手動"]
 C -->|off| G["全コマンド自動承認"]
-D --> H{"once / session
-/ always / deny"}
+D --> H{"once / session\\n/ always / deny"}
 E --> H
 G --> RUN["実行"]
 H -->|allow| RUN
@@ -694,30 +689,24 @@ H -->|deny| DENY["拒否"]`}
         {/* CH4 */}
         <section className={styles.chapter} id="ch4">
           <div className={styles.chapterNum}>Ch.04 — K-Level: Intermediate</div>
-          <h2 className={styles.chapterTitle}>ユーザー認可 &amp; DM Pairing</h2>
+          <h2 className={styles.chapterTitle}>ユーザー認可 & DM Pairing</h2>
 
           <h3 className={styles.sectionTitle}>認可チェックの優先順位</h3>
           <div className={styles.mermaidWrap}>
             <MermaidDiagram
+              id="diag-auth"
               chart={`flowchart TD
-A["受信メッセージ"] --> B{プラットフォーム別
-allow-all?
-DISCORD_ALLOW_ALL_USERS}
+A["受信メッセージ"] --> B{プラットフォーム別\\nallow-all?\\nDISCORD_ALLOW_ALL_USERS}
 B -->|Yes| ALLOW["アクセス許可"]
-B -->|No| C{DM Pairing
-承認済み?}
+B -->|No| C{DM Pairing\\n承認済み?}
 C -->|Yes| ALLOW
-C -->|No| D{プラットフォーム別 allowlist?
-TELEGRAM_ALLOWED_USERS}
+C -->|No| D{プラットフォーム別 allowlist?\\nTELEGRAM_ALLOWED_USERS}
 D -->|Yes| ALLOW
-D -->|No| E{グローバル allowlist?
-GATEWAY_ALLOWED_USERS}
+D -->|No| E{グローバル allowlist?\\nGATEWAY_ALLOWED_USERS}
 E -->|Yes| ALLOW
-E -->|No| F{GATEWAY_ALLOW
-_ALL_USERS?}
+E -->|No| F{GATEWAY_ALLOW\\n_ALL_USERS?}
 F -->|Yes| ALLOW
-F -->|No| DENY["拒否
-(Default)"]`}
+F -->|No| DENY["拒否\\n(Default)"]`}
             />
           </div>
 
@@ -1006,18 +995,16 @@ F -->|No| DENY["拒否
             <MermaidDiagram
               chart={`flowchart LR
 subgraph GH["ゲートウェイホスト（低権限）"]
-  GW["hermes gateway
-Telegram/Discord 受信"]
+  GW["hermes gateway\\nTelegram/Discord 受信"]
 end
 subgraph WH["ワーカーホスト（分離）"]
-  WK["コマンド実行
-terminal / file / code"]
+  WK["コマンド実行\\nterminal / file / code"]
 end
 subgraph LLM["LLM Provider"]
   P["Nous Portal / OpenRouter"]
 end
-GW <--&gt;|"SSH (専用キー)"| WK
-GW <--&gt;|"HTTPS"| P`}
+GW <-->|"SSH (専用キー)"| WK
+GW <-->|"HTTPS"| P`}
             />
           </div>
 
@@ -1519,18 +1506,11 @@ GW <--&gt;|"HTTPS"| P`}
           <div className={styles.mermaidWrap}>
             <MermaidDiagram
               chart={`flowchart LR
-A["hermes profile create &lt;name&gt;"] --> B{オプション}
-B --> C["(なし)
-空プロファイル
-スキルのみシード済み"]
-B --> D["--clone
-config+.env+SOUL.md コピー
-メモリ・セッションは新規"]
-B --> E["--clone-all
-全データ完全コピー
-バックアップ・フォーク用"]
-B --> F["--clone-from src
-指定プロファイルから複製"]`}
+A["hermes profile create <name>"] --> B{オプション}
+B --> C["(なし)\\n空プロファイル\\nスキルのみシード済み"]
+B --> D["--clone\\nconfig+.env+SOUL.md コピー\\nメモリ・セッションは新規"]
+B --> E["--clone-all\\n全データ完全コピー\\nバックアップ・フォーク用"]
+B --> F["--clone-from src\\n指定プロファイルから複製"]`}
             />
           </div>
 
@@ -1662,17 +1642,14 @@ B --> F["--clone-from src
           <div className={styles.mermaidWrap}>
             <MermaidDiagram
               chart={`flowchart TD
-P["親エージェント
-(depth 0)"]
+P["親エージェント\\n(depth 0)"]
 subgraph D1["depth 1 (max_spawn_depth=1 デフォルト)"]
-  L1["子1 role=leaf
-委譲不可"]
+  L1["子1 role=leaf\\n委譲不可"]
   L2["子2 role=leaf"]
   L3["子3 role=leaf"]
 end
 subgraph D2["depth 2 (max_spawn_depth=2 設定時)"]
-  O1["子1 role=orchestrator
-委譲可能"]
+  O1["子1 role=orchestrator\\n委譲可能"]
   G1["孫1"]
   G2["孫2"]
 end
@@ -1708,11 +1685,12 @@ O1 --> G1 & G2`}
               <div className={styles.compareLabel}>❌ サブエージェントは過去を知らない</div>
               <div className={styles.compareCode}>
                 <div className={styles.codeLine}>delegate_task(</div>
+                <div className={styles.codeLine}> goal="エラーを修正して"</div>
                 <div className={styles.codeLine}>
                   {" "}
-                  goal="エラーを修正して" # NG:
-                  サブエージェントは新規会話から開始するため「エラー」が何かを知らない
+                  # NG: サブエージェントは新規会話から開始するため
                 </div>
+                <div className={styles.codeLine}> # 「エラー」が何かを知らない</div>
                 <div className={styles.codeLine}>)</div>
               </div>
             </div>
@@ -1752,20 +1730,9 @@ O1 --> G1 & G2`}
           <div className={styles.mermaidWrap}>
             <MermaidDiagram
               chart={`flowchart LR
-J1["Job 1: News Collector
-毎日 7:00
-HN から上位10件収集
-→ raw.md に保存"]
-J2["Job 2: News Triage
-毎日 7:30
-context_from=Job1
-1-10でスコアリング
-→ ranked.md"]
-J3["Job 3: News Brief
-毎日 8:00
-context_from=Job2
-3ツイート草案作成
-→ Telegram 配信"]
+J1["Job 1: News Collector\\n毎日 7:00\\nHN から上位10件収集\\n→ raw.md に保存"]
+J2["Job 2: News Triage\\n毎日 7:30\\ncontext_from=Job1\\n1-10でスコアリング\\n→ ranked.md"]
+J3["Job 3: News Brief\\n毎日 8:00\\ncontext_from=Job2\\n3ツイート草案作成\\n→ Telegram 配信"]
 J1 -->|"最新出力を注入"| J2
 J2 -->|"最新出力を注入"| J3`}
             />
@@ -1829,11 +1796,9 @@ J2 -->|"最新出力を注入"| J3`}
               <div className={styles.compareLabel}>❌ 文脈を前提とした cron プロンプト</div>
               <div className={styles.compareCode}>
                 <div className={styles.codeLine}>cronjob(</div>
-                <div className={styles.codeLine}>
-                  {" "}
-                  prompt="あのサーバー問題を確認して", # NG: cron
-                  は独立したセッション。「あのサーバー」を知らない
-                </div>
+                <div className={styles.codeLine}> prompt="あのサーバー問題を確認して",</div>
+                <div className={styles.codeLine}> # NG: cron は独立したセッション。</div>
+                <div className={styles.codeLine}> # 「あのサーバー」を知らない</div>
                 <div className={styles.codeLine}> schedule="every 5m"</div>
                 <div className={styles.codeLine}>)</div>
               </div>
@@ -1964,9 +1929,7 @@ J2 -->|"最新出力を注入"| J3`}
             <li className={styles.stepItem}>
               <div className={styles.stepNum}>10</div>
               <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>
-                  定期アップデート &amp; アドバイザリーチェック
-                </div>
+                <div className={styles.stepTitle}>定期アップデート & アドバイザリーチェック</div>
                 <div className={styles.stepDesc}>
                   <code className={styles.inlineCode}>hermes update</code> +{" "}
                   <code className={styles.inlineCode}>hermes doctor</code>{" "}
@@ -2083,7 +2046,7 @@ J2 -->|"最新出力を注入"| J3`}
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>公式ユーザーガイド</div>
-              <div className={styles.refTitle}>Checkpoints &amp; Rollback</div>
+              <div className={styles.refTitle}>Checkpoints & Rollback</div>
               <Ext
                 className={styles.refUrl}
                 href="https://hermes-agent.nousresearch.com/docs/user-guide/checkpoints-and-rollback"
@@ -2157,7 +2120,7 @@ J2 -->|"最新出力を注入"| J3`}
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>Architecture</div>
-              <div className={styles.refTitle}>Context Compression &amp; Caching</div>
+              <div className={styles.refTitle}>Context Compression & Caching</div>
               <Ext
                 className={styles.refUrl}
                 href="https://hermes-agent.nousresearch.com/docs/developer-guide/context-compression-and-caching"
@@ -2257,7 +2220,7 @@ J2 -->|"最新出力を注入"| J3`}
             </div>
           </div>
 
-          <h3 className={styles.sectionTitle}>関連ツール &amp; エコシステム</h3>
+          <h3 className={styles.sectionTitle}>関連ツール & エコシステム</h3>
           <div className={styles.refGrid}>
             <div className={styles.refCard}>
               <div className={styles.refCat}>Security Tool</div>
@@ -2313,7 +2276,7 @@ J2 -->|"最新出力を注入"| J3`}
           <Ext className={styles.link} href="https://hermes-agent.nousresearch.com/">
             hermes-agent.nousresearch.com
           </Ext>{" "}
-          &amp;{" "}
+          {"&"}{" "}
           <Ext className={styles.link} href="https://github.com/NousResearch/hermes-agent">
             github.com/NousResearch/hermes-agent
           </Ext>

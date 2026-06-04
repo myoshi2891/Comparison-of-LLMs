@@ -1047,6 +1047,32 @@
   text-align: center;
 }
 
+.mermaidWrap svg {
+  /* biome-ignore lint/complexity/noImportantStyles: required */
+  width: auto !important;
+  /* biome-ignore lint/complexity/noImportantStyles: required */
+  max-width: 100% !important;
+  /* biome-ignore lint/complexity/noImportantStyles: required */
+  height: auto !important;
+  display: block;
+  margin: 0 auto;
+}
+
+.mermaidWrap :global(#diag-loop) {
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.mermaidWrap :global(#diag-approval) {
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.mermaidWrap :global(#diag-auth) {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
 /* DIVIDER */
 .divider {
   height: 1px;
