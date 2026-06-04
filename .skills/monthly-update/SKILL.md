@@ -9,6 +9,8 @@ Trigger: 月次更新, 価格アップデート, monthly update, 価格改定の
 
 # 月次更新・メンテナンススキル
 
+(最終更新日: 2026-06-04)
+
 ## Goal
 
 プロジェクトに存在する30個の画面（AIモデルコスト計算機、各種AIエージェントガイド、スラッシュコマンド完全ガイド、Code Review ツール料金比較ページなど）の価格データ、API仕様、バージョン番号、一次情報源リンクを毎月最新に保ち、不整合を防ぐ。
@@ -57,7 +59,7 @@ AIモデル価格と為替レートを一括更新します。
 ### 3. Tool Pricing (料金比較) の更新
 
 `/code-review/tool-pricing` の料金情報（`app/code-review/tool-pricing/constants.ts`）を更新します。
-- WebSearch で得た最新 of 価格情報に基づき、USD額を更新します。
+- WebSearch で得た最新の価格情報に基づき、USD額を更新します。
 - 更新したツールの `priceCheckedAt` と、全体の `PRICE_CHECKED_AT` を当月の「YYYY-MM」に書き換えます。
 
 ### 4. 各ガイドページの順次更新
@@ -82,7 +84,7 @@ AIモデル価格と為替レートを一括更新します。
 
   ```bash
   cd web-next && bun run test
-  # または修正した画面 of 個別テストを実行
+  # または修正した画面の個別テストを実行
   cd web-next && bun run test web-next/app/claude/agent
   ```
 
