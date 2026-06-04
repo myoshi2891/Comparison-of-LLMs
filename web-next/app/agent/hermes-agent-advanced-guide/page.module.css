@@ -877,6 +877,11 @@
   word-break: break-all;
 }
 
+.compareCode .codeLine {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
 /* PROGRESS */
 .progressItem {
   display: flex;
