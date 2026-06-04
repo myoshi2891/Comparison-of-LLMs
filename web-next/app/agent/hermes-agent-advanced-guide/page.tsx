@@ -8,9 +8,9 @@ export const metadata = {
   description: "内部アーキテクチャ / 7層セキュリティ / 本番デプロイメントベストプラクティス",
 };
 
-function Ext({ href, children }: { href: string; children: React.ReactNode }) {
+function Ext({ href, className, children }: { href: string; className?: string; children: React.ReactNode }) {
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer">
+    <a href={href} className={className} target="_blank" rel="noopener noreferrer">
       {children}
     </a>
   );
@@ -149,7 +149,8 @@ export default function Page() {
           <h2 className={styles.chapterTitle}>内部アーキテクチャ深掘り</h2>
           <p className={styles.paragraph}>
             Hermesの中核は <code className={styles.inlineCode}>run_agent.py</code> の{" "}
-            <strong className={styles.strongText}>AIAgent</strong> クラスです。CLI・Gateway・ACP・Batch
+            <strong className={styles.strongText}>AIAgent</strong>{" "}
+            クラスです。CLI・Gateway・ACP・Batch
             Runnerなど全エントリポイントが同一クラスを共有し、プラットフォーム差異はエントリポイント側で吸収されます。
           </p>
 
@@ -192,24 +193,24 @@ O --> P["SessionDB
             <div className={`${styles.archLayer} ${styles.l1}`}>
               <div className={styles.archNum}>1</div>
               <div className={styles.archTitle}>
-                <strong className={styles.strongText}>stable 層</strong> — エージェントID / SOUL.md / ツールスキーマ(28ツールセット)
-                / スキルインデックス
+                <strong className={styles.strongText}>stable 層</strong> — エージェントID / SOUL.md
+                / ツールスキーマ(28ツールセット) / スキルインデックス
               </div>
               <span className={`${styles.archBadge} ${styles.noBypass}`}>キャッシュ対象</span>
             </div>
             <div className={`${styles.archLayer} ${styles.l2}`}>
               <div className={styles.archNum}>2</div>
               <div className={styles.archTitle}>
-                <strong className={styles.strongText}>context 層</strong> — AGENTS.md / CLAUDE.md / .cursorrules /
-                プロジェクトコンテキスト
+                <strong className={styles.strongText}>context 層</strong> — AGENTS.md / CLAUDE.md /
+                .cursorrules / プロジェクトコンテキスト
               </div>
               <span className={`${styles.archBadge} ${styles.bypass}`}>プロジェクト固有</span>
             </div>
             <div className={`${styles.archLayer} ${styles.l3}`}>
               <div className={styles.archNum}>3</div>
               <div className={styles.archTitle}>
-                <strong className={styles.strongText}>volatile 層</strong> — MEMORY.md (~800 tokens) / USER.md (~500 tokens) /
-                タイムスタンプ
+                <strong className={styles.strongText}>volatile 層</strong> — MEMORY.md (~800 tokens)
+                / USER.md (~500 tokens) / タイムスタンプ
               </div>
               <span className={`${styles.archBadge} ${styles.auto}`}>セッション毎</span>
             </div>
@@ -225,10 +226,18 @@ O --> P["SessionDB
 
           <h3 className={styles.sectionTitle}>ツールレジストリの依存チェーン</h3>
           <div className={styles.pyramid}>
-            <div className={`${styles.pyramidRow} ${styles.pr1}`}>run_agent.py / cli.py / batch_runner.py</div>
-            <div className={`${styles.pyramidRow} ${styles.pr2}`}>model_tools.py（ツール発見・スキーマ収集）</div>
-            <div className={`${styles.pyramidRow} ${styles.pr3}`}>tools/*.py（import時に自動登録）</div>
-            <div className={`${styles.pyramidRow} ${styles.pr4}`}>tools/registry.py（依存なし）</div>
+            <div className={`${styles.pyramidRow} ${styles.pr1}`}>
+              run_agent.py / cli.py / batch_runner.py
+            </div>
+            <div className={`${styles.pyramidRow} ${styles.pr2}`}>
+              model_tools.py（ツール発見・スキーマ収集）
+            </div>
+            <div className={`${styles.pyramidRow} ${styles.pr3}`}>
+              tools/*.py（import時に自動登録）
+            </div>
+            <div className={`${styles.pyramidRow} ${styles.pr4}`}>
+              tools/registry.py（依存なし）
+            </div>
           </div>
           <p className={styles.paragraph}>
             <code className={styles.inlineCode}>tools/*.py</code> ファイルはトップレベルで{" "}
@@ -286,35 +295,40 @@ O --> P["SessionDB
             <div className={`${styles.archLayer} ${styles.l1}`}>
               <div className={styles.archNum}>1</div>
               <div className={styles.archTitle}>
-                <strong className={styles.strongText}>User Authorization</strong> — allowlist / DM pairing でアクセス制御
+                <strong className={styles.strongText}>User Authorization</strong> — allowlist / DM
+                pairing でアクセス制御
               </div>
               <span className={`${styles.archBadge} ${styles.noBypass}`}>バイパス不可</span>
             </div>
             <div className={`${styles.archLayer} ${styles.l2}`}>
               <div className={styles.archNum}>2</div>
               <div className={styles.archTitle}>
-                <strong className={styles.strongText}>Dangerous Command Approval</strong> — 破壊的操作の人間ループ確認
+                <strong className={styles.strongText}>Dangerous Command Approval</strong> —
+                破壊的操作の人間ループ確認
               </div>
               <span className={`${styles.archBadge} ${styles.bypass}`}>YOLO で一部迂回可</span>
             </div>
             <div className={`${styles.archLayer} ${styles.l3}`}>
               <div className={styles.archNum}>3</div>
               <div className={styles.archTitle}>
-                <strong className={styles.strongText}>Container Isolation</strong> — Docker/Singularity/Modal サンドボックス
+                <strong className={styles.strongText}>Container Isolation</strong> —
+                Docker/Singularity/Modal サンドボックス
               </div>
               <span className={`${styles.archBadge} ${styles.auto}`}>コンテナが境界</span>
             </div>
             <div className={`${styles.archLayer} ${styles.l4}`}>
               <div className={styles.archNum}>4</div>
               <div className={styles.archTitle}>
-                <strong className={styles.strongText}>MCP Credential Filtering</strong> — サブプロセスへの環境変数分離
+                <strong className={styles.strongText}>MCP Credential Filtering</strong> —
+                サブプロセスへの環境変数分離
               </div>
               <span className={`${styles.archBadge} ${styles.noBypass}`}>allowlist のみ通過</span>
             </div>
             <div className={`${styles.archLayer} ${styles.l5}`}>
               <div className={styles.archNum}>5</div>
               <div className={styles.archTitle}>
-                <strong className={styles.strongText}>Context File Scanning</strong> — AGENTS.md 等のプロンプトインジェクション検出
+                <strong className={styles.strongText}>Context File Scanning</strong> — AGENTS.md
+                等のプロンプトインジェクション検出
               </div>
               <span className={`${styles.archBadge} ${styles.noBypass}`}>自動・無効化不可</span>
             </div>
@@ -329,7 +343,8 @@ O --> P["SessionDB
             <div className={`${styles.archLayer} ${styles.l7}`}>
               <div className={styles.archNum}>7</div>
               <div className={styles.archTitle}>
-                <strong className={styles.strongText}>Input Sanitization</strong> — working directory パラメータを allowlist で検証
+                <strong className={styles.strongText}>Input Sanitization</strong> — working
+                directory パラメータを allowlist で検証
               </div>
               <span className={`${styles.archBadge} ${styles.noBypass}`}>自動</span>
             </div>
@@ -349,42 +364,60 @@ O --> P["SessionDB
           <div className={styles.progressItem}>
             <div className={styles.progressLabel}>User Authorization</div>
             <div className={styles.progressBarWrap}>
-              <div className={`${styles.progressBar} ${styles.green}`} style={{ width: "100%", "--w": "100%" } as React.CSSProperties} />
+              <div
+                className={`${styles.progressBar} ${styles.green}`}
+                style={{ width: "100%", "--w": "100%" } as React.CSSProperties}
+              />
             </div>
             <div className={styles.progressPct}>100%</div>
           </div>
           <div className={styles.progressItem}>
             <div className={styles.progressLabel}>Hardline Blocklist</div>
             <div className={styles.progressBarWrap}>
-              <div className={`${styles.progressBar} ${styles.green}`} style={{ width: "100%", "--w": "100%" } as React.CSSProperties} />
+              <div
+                className={`${styles.progressBar} ${styles.green}`}
+                style={{ width: "100%", "--w": "100%" } as React.CSSProperties}
+              />
             </div>
             <div className={styles.progressPct}>100%</div>
           </div>
           <div className={styles.progressItem}>
             <div className={styles.progressLabel}>Context File Scan</div>
             <div className={styles.progressBarWrap}>
-              <div className={`${styles.progressBar} ${styles.green}`} style={{ width: "95%", "--w": "95%" } as React.CSSProperties} />
+              <div
+                className={`${styles.progressBar} ${styles.green}`}
+                style={{ width: "95%", "--w": "95%" } as React.CSSProperties}
+              />
             </div>
             <div className={styles.progressPct}>95%</div>
           </div>
           <div className={styles.progressItem}>
             <div className={styles.progressLabel}>Container Isolation</div>
             <div className={styles.progressBarWrap}>
-              <div className={`${styles.progressBar} ${styles.green}`} style={{ width: "90%", "--w": "90%" } as React.CSSProperties} />
+              <div
+                className={`${styles.progressBar} ${styles.green}`}
+                style={{ width: "90%", "--w": "90%" } as React.CSSProperties}
+              />
             </div>
             <div className={styles.progressPct}>90%</div>
           </div>
           <div className={styles.progressItem}>
             <div className={styles.progressLabel}>Command Approval</div>
             <div className={styles.progressBarWrap}>
-              <div className={`${styles.progressBar} ${styles.amber}`} style={{ width: "75%", "--w": "75%" } as React.CSSProperties} />
+              <div
+                className={`${styles.progressBar} ${styles.amber}`}
+                style={{ width: "75%", "--w": "75%" } as React.CSSProperties}
+              />
             </div>
             <div className={styles.progressPct}>75%</div>
           </div>
           <div className={styles.progressItem}>
             <div className={styles.progressLabel}>MCP Filtering</div>
             <div className={styles.progressBarWrap}>
-              <div className={`${styles.progressBar} ${styles.amber}`} style={{ width: "80%", "--w": "80%" } as React.CSSProperties} />
+              <div
+                className={`${styles.progressBar} ${styles.amber}`}
+                style={{ width: "80%", "--w": "80%" } as React.CSSProperties}
+              />
             </div>
             <div className={styles.progressPct}>80%</div>
           </div>
@@ -394,7 +427,10 @@ O --> P["SessionDB
             <div className={styles.refCard}>
               <div className={styles.refCat}>公式 Security</div>
               <div className={styles.refTitle}>Security Model Overview</div>
-              <Ext className={styles.refUrl} href="https://hermes-agent.nousresearch.com/docs/user-guide/security">
+              <Ext
+                className={styles.refUrl}
+                href="https://hermes-agent.nousresearch.com/docs/user-guide/security"
+              >
                 …/user-guide/security
               </Ext>
             </div>
@@ -419,7 +455,8 @@ O --> P["SessionDB
               <tbody className={styles.tbody}>
                 <tr className={styles.tr}>
                   <td className={styles.td}>
-                    <code className={styles.inlineCode}>manual</code> <strong className={styles.strongText}>【デフォルト】</strong>
+                    <code className={styles.inlineCode}>manual</code>{" "}
+                    <strong className={styles.strongText}>【デフォルト】</strong>
                   </td>
                   <td className={styles.td}>危険コマンドは常にユーザーへ承認プロンプトを表示</td>
                   <td className={styles.td}>個人開発・インタラクティブ利用</td>
@@ -451,7 +488,8 @@ O --> P["SessionDB
             以下のパターンは <code className={styles.inlineCode}>--yolo</code>、
             <code className={styles.inlineCode}>approvals.mode: off</code>、
             <code className={styles.inlineCode}>cron_mode: approve</code>
-            、「常に許可」クリックのいずれの状況でも <strong className={styles.strongText}>絶対にブロック</strong> されます。
+            、「常に許可」クリックのいずれの状況でも{" "}
+            <strong className={styles.strongText}>絶対にブロック</strong> されます。
           </p>
           <div className={styles.tableWrap}>
             <table className={styles.table}>
@@ -552,17 +590,20 @@ H -->|deny| DENY["拒否"]`}
               <div className={styles.compareLabel}>✅ 本番ゲートウェイ推奨</div>
               <div className={styles.compareCode}>
                 <div className={styles.codeLine}>approvals:</div>
-                <div className={styles.codeLine}>  mode: smart</div>
-                <div className={styles.codeLine}>  timeout: 120</div>
-                <div className={styles.codeLine}>  cron_mode: deny</div>
-                <div className={styles.codeLine}>  destructive_slash_confirm: true</div>
+                <div className={styles.codeLine}> mode: smart</div>
+                <div className={styles.codeLine}> timeout: 120</div>
+                <div className={styles.codeLine}> cron_mode: deny</div>
+                <div className={styles.codeLine}> destructive_slash_confirm: true</div>
               </div>
             </div>
             <div className={`${styles.compareCard} ${styles.bad}`}>
               <div className={styles.compareLabel}>❌ 絶対にやらない設定</div>
               <div className={styles.compareCode}>
                 <div className={styles.codeLine}>approvals:</div>
-                <div className={styles.codeLine}>  mode: off # 本番cronで # cron_mode: approve # も同様に危険</div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  mode: off # 本番cronで # cron_mode: approve # も同様に危険
+                </div>
               </div>
             </div>
           </div>
@@ -570,9 +611,11 @@ H -->|deny| DENY["拒否"]`}
           <div className={`${styles.callout} ${styles.danger}`}>
             <div className={styles.calloutIcon}>⛔</div>
             <div>
-              <strong className={styles.strongText}>cron_mode: approve</strong> は headless で動作する cron
+              <strong className={styles.strongText}>cron_mode: approve</strong> は headless
+              で動作する cron
               ジョブが危険コマンドを自動承認します。本番環境では絶対に使用しないでください。デフォルトの{" "}
-              <code className={styles.inlineCode}>cron_mode: deny</code> を維持することを強く推奨します。
+              <code className={styles.inlineCode}>cron_mode: deny</code>{" "}
+              を維持することを強く推奨します。
             </div>
           </div>
 
@@ -602,11 +645,13 @@ H -->|deny| DENY["拒否"]`}
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cc}>mcp_reload_confirm</span>: <span className={styles.ck}>true</span>
+              <span className={styles.cc}>mcp_reload_confirm</span>:{" "}
+              <span className={styles.ck}>true</span>
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cc}>destructive_slash_confirm</span>: <span className={styles.ck}>true</span>
+              <span className={styles.cc}>destructive_slash_confirm</span>:{" "}
+              <span className={styles.ck}>true</span>
             </div>
             <div className={styles.codeLine} />
             <div className={styles.codeLine}>
@@ -677,10 +722,13 @@ F -->|No| DENY["拒否
           </div>
 
           <div className={`${styles.alert} ${styles.alertRed}`}>
-            ⚠ allowlist が何も設定されていない場合、全ユーザーがデフォルトで拒否されます。ゲートウェイ起動時にログへ警告が出力されます。
+            ⚠ allowlist
+            が何も設定されていない場合、全ユーザーがデフォルトで拒否されます。ゲートウェイ起動時にログへ警告が出力されます。
           </div>
 
-          <h3 className={styles.sectionTitle}>DM Pairing — OWASP 準拠 of セキュアなユーザー追加フロー</h3>
+          <h3 className={styles.sectionTitle}>
+            DM Pairing — OWASP 準拠 of セキュアなユーザー追加フロー
+          </h3>
           <ul className={styles.stepList}>
             <li className={styles.stepItem}>
               <div className={styles.stepNum}>1</div>
@@ -699,7 +747,9 @@ F -->|No| DENY["拒否
                 <div className={styles.stepDesc}>
                   <code className={styles.inlineCode}>hermes pairing list</code>{" "}
                   で保留リスト確認後、
-                  <code className={styles.inlineCode}>hermes pairing approve telegram ABC12DEF</code>{" "}
+                  <code className={styles.inlineCode}>
+                    hermes pairing approve telegram ABC12DEF
+                  </code>{" "}
                   で承認
                 </div>
               </div>
@@ -709,14 +759,18 @@ F -->|No| DENY["拒否
               <div className={styles.stepContent}>
                 <div className={styles.stepTitle}>ユーザーが永続承認リストへ追加</div>
                 <div className={styles.stepDesc}>
-                  <code className={styles.inlineCode}>~/.hermes/pairing/{"{platform}"}-approved.json</code>{" "}
+                  <code className={styles.inlineCode}>
+                    ~/.hermes/pairing/{"{platform}"}-approved.json
+                  </code>{" "}
                   （chmod 0600）に保存。以降の全メッセージが処理される。
                 </div>
               </div>
             </li>
           </ul>
 
-          <h3 className={styles.sectionTitle}>Pairing セキュリティ仕様（OWASP + NIST SP 800-63-4 準拠）</h3>
+          <h3 className={styles.sectionTitle}>
+            Pairing セキュリティ仕様（OWASP + NIST SP 800-63-4 準拠）
+          </h3>
           <div className={styles.examGrid}>
             <div className={styles.examCard}>
               <div className={styles.examTitle}>コード形式</div>
@@ -764,10 +818,12 @@ F -->|No| DENY["拒否
               <span className={styles.cs}>111222333444555666</span>
             </div>
             <div className={styles.codeLine}>
-              <span className={styles.cc}>SLACK_ALLOWED_USERS</span>=<span className={styles.cs}>U01ABC123</span>
+              <span className={styles.cc}>SLACK_ALLOWED_USERS</span>=
+              <span className={styles.cs}>U01ABC123</span>
             </div>
             <div className={styles.codeLine}>
-              <span className={styles.cc}>GATEWAY_ALLOWED_USERS</span>=<span className={styles.cs}>123456789</span>
+              <span className={styles.cc}>GATEWAY_ALLOWED_USERS</span>=
+              <span className={styles.cs}>123456789</span>
             </div>
             <div className={styles.codeLine} />
             <div className={styles.codeLine}>
@@ -893,45 +949,54 @@ F -->|No| DENY["拒否
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cs}>"--cap-drop"</span>, <span className={styles.cs}>"ALL"</span>,{" "}
+              <span className={styles.cs}>"--cap-drop"</span>,{" "}
+              <span className={styles.cs}>"ALL"</span>,{" "}
               <span className={styles.cm}># 全 Linux capabilities を drop</span>
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cs}>"--cap-add"</span>, <span className={styles.cs}>"DAC_OVERRIDE"</span>,{" "}
+              <span className={styles.cs}>"--cap-add"</span>,{" "}
+              <span className={styles.cs}>"DAC_OVERRIDE"</span>,{" "}
               <span className={styles.cm}># bind-mount ディレクトリへの書き込み</span>
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cs}>"--cap-add"</span>, <span className={styles.cs}>"CHOWN"</span>,{" "}
+              <span className={styles.cs}>"--cap-add"</span>,{" "}
+              <span className={styles.cs}>"CHOWN"</span>,{" "}
               <span className={styles.cm}># パッケージマネージャー用</span>
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cs}>"--cap-add"</span>, <span className={styles.cs}>"FOWNER"</span>,{" "}
+              <span className={styles.cs}>"--cap-add"</span>,{" "}
+              <span className={styles.cs}>"FOWNER"</span>,{" "}
               <span className={styles.cm}># パッケージマネージャー用</span>
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cs}>"--security-opt"</span>, <span className={styles.cs}>"no-new-privileges"</span>,{" "}
+              <span className={styles.cs}>"--security-opt"</span>,{" "}
+              <span className={styles.cs}>"no-new-privileges"</span>,{" "}
               <span className={styles.cm}># 特権昇格ブロック</span>
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cs}>"--pids-limit"</span>, <span className={styles.cs}>"256"</span>,{" "}
+              <span className={styles.cs}>"--pids-limit"</span>,{" "}
+              <span className={styles.cs}>"256"</span>,{" "}
               <span className={styles.cm}># プロセス数制限</span>
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cs}>"--tmpfs"</span>, <span className={styles.cs}>"/tmp:rw,nosuid,size=512m"</span>,
+              <span className={styles.cs}>"--tmpfs"</span>,{" "}
+              <span className={styles.cs}>"/tmp:rw,nosuid,size=512m"</span>,
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cs}>"--tmpfs"</span>, <span className={styles.cs}>"/var/tmp:rw,noexec,nosuid,size=256m"</span>,
+              <span className={styles.cs}>"--tmpfs"</span>,{" "}
+              <span className={styles.cs}>"/var/tmp:rw,noexec,nosuid,size=256m"</span>,
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cs}>"--tmpfs"</span>, <span className={styles.cs}>"/run:rw,noexec,nosuid,size=64m"</span>,
+              <span className={styles.cs}>"--tmpfs"</span>,{" "}
+              <span className={styles.cs}>"/run:rw,noexec,nosuid,size=64m"</span>,
             </div>
             <div className={styles.codeLine}>]</div>
           </div>
@@ -971,7 +1036,10 @@ GW <--&gt;|"HTTPS"| P`}
             <div className={styles.refCard}>
               <div className={styles.refCat}>公式ユーザーガイド</div>
               <div className={styles.refTitle}>Docker</div>
-              <Ext className={styles.refUrl} href="https://hermes-agent.nousresearch.com/docs/user-guide/docker">
+              <Ext
+                className={styles.refUrl}
+                href="https://hermes-agent.nousresearch.com/docs/user-guide/docker"
+              >
                 …/user-guide/docker
               </Ext>
             </div>
@@ -998,14 +1066,18 @@ GW <--&gt;|"HTTPS"| P`}
                   <td className={styles.td}>
                     <code className={styles.inlineCode}>execute_code</code>
                   </td>
-                  <td className={styles.td}>KEY/TOKEN/SECRET/PASSWORD/AUTH を含む変数名をブロック</td>
+                  <td className={styles.td}>
+                    KEY/TOKEN/SECRET/PASSWORD/AUTH を含む変数名をブロック
+                  </td>
                   <td className={styles.td}>スキル宣言 or config で許可</td>
                 </tr>
                 <tr className={styles.tr}>
                   <td className={styles.td}>
                     <code className={styles.inlineCode}>terminal (local)</code>
                   </td>
-                  <td className={styles.td}>Hermes インフラ変数（プロバイダーキー・GW トークン）をブロック</td>
+                  <td className={styles.td}>
+                    Hermes インフラ変数（プロバイダーキー・GW トークン）をブロック
+                  </td>
                   <td className={styles.td}>env_passthrough リストで許可</td>
                 </tr>
                 <tr className={styles.tr}>
@@ -1035,18 +1107,20 @@ GW <--&gt;|"HTTPS"| P`}
             </table>
           </div>
 
-          <h3 className={styles.sectionTitle}>スキルによる自動パススルー（推奨）vs 手動設定（非推奨）</h3>
+          <h3 className={styles.sectionTitle}>
+            スキルによる自動パススルー（推奨）vs 手動設定（非推奨）
+          </h3>
           <div className={styles.compareGrid}>
             <div className={`${styles.compareCard} ${styles.good}`}>
               <div className={styles.compareLabel}>✅ スキル frontmatter で宣言（v0.5.1+）</div>
               <div className={styles.compareCode}>
                 <div className={styles.codeLine}>required_environment_variables:</div>
-                <div className={styles.codeLine}>  - name: GITHUB_TOKEN</div>
-                <div className={styles.codeLine}>    prompt: GitHub PAT</div>
-                <div className={styles.codeLine}>    help: github.com/settings/tokens</div>
+                <div className={styles.codeLine}> - name: GITHUB_TOKEN</div>
+                <div className={styles.codeLine}> prompt: GitHub PAT</div>
+                <div className={styles.codeLine}> help: github.com/settings/tokens</div>
                 <div className={styles.codeLine}>required_credential_files:</div>
-                <div className={styles.codeLine}>  - path: google_token.json</div>
-                <div className={styles.codeLine}>    description: OAuth2 token</div>
+                <div className={styles.codeLine}> - path: google_token.json</div>
+                <div className={styles.codeLine}> description: OAuth2 token</div>
                 <div className={styles.codeLine}># Docker/Modalに自動フォワード</div>
               </div>
             </div>
@@ -1054,9 +1128,12 @@ GW <--&gt;|"HTTPS"| P`}
               <div className={styles.compareLabel}>❌ インフラキーをパススルーに追加</div>
               <div className={styles.compareCode}>
                 <div className={styles.codeLine}>terminal:</div>
-                <div className={styles.codeLine}>  env_passthrough: # NG: プロバイダーAPIキーは絶対に追加しない</div>
-                <div className={styles.codeLine}>    - OPENAI_API_KEY</div>
-                <div className={styles.codeLine}>    - TELEGRAM_BOT_TOKEN</div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  env_passthrough: # NG: プロバイダーAPIキーは絶対に追加しない
+                </div>
+                <div className={styles.codeLine}> - OPENAI_API_KEY</div>
+                <div className={styles.codeLine}> - TELEGRAM_BOT_TOKEN</div>
               </div>
             </div>
           </div>
@@ -1092,8 +1169,8 @@ GW <--&gt;|"HTTPS"| P`}
 
           <h3 className={styles.sectionTitle}>MCP stdio プロセスの環境変数フィルタリング</h3>
           <div className={`${styles.alert} ${styles.alertCyan}`}>
-            MCPサーバーのサブプロセスはホストから PATH / HOME / USER / LANG / LC_ALL / TERM / SHELL / TMPDIR +
-            XDG_* 変数のみ受け取ります。APIキー・トークン等は全て除去されます。
+            MCPサーバーのサブプロセスはホストから PATH / HOME / USER / LANG / LC_ALL / TERM / SHELL
+            / TMPDIR + XDG_* 変数のみ受け取ります。APIキー・トークン等は全て除去されます。
           </div>
 
           <div className={`${styles.codeBlock} language-yaml`}>
@@ -1111,9 +1188,8 @@ GW <--&gt;|"HTTPS"| P`}
             </div>
             <div className={styles.codeLine}>
               {"    "}
-              <span className={styles.cc}>args</span>: [
-              <span className={styles.cs}>"-y"</span>, <span className={styles.cs}>"@modelcontextprotocol/server-github"</span>
-              ]
+              <span className={styles.cc}>args</span>: [<span className={styles.cs}>"-y"</span>,{" "}
+              <span className={styles.cs}>"@modelcontextprotocol/server-github"</span>]
             </div>
             <div className={styles.codeLine}>
               {"    "}
@@ -1122,7 +1198,8 @@ GW <--&gt;|"HTTPS"| P`}
             <div className={styles.codeLine}>
               {"      "}
               <span className={styles.cg}>GITHUB_PERSONAL_ACCESS_TOKEN</span>:{" "}
-              <span className={styles.cs}>"ghp_..."</span> <span className={styles.cm}># これのみ渡される</span>
+              <span className={styles.cs}>"ghp_..."</span>{" "}
+              <span className={styles.cm}># これのみ渡される</span>
             </div>
             <div className={styles.codeLine} />
             <div className={styles.codeLine}>
@@ -1131,10 +1208,10 @@ GW <--&gt;|"HTTPS"| P`}
             </div>
             <div className={styles.codeLine}>
               {"    "}
-              <span className={styles.cc}>command</span>: [
-              <span className={styles.cs}>"npx"</span>, <span className={styles.cs}>"mcp-server-sqlite"</span>,{" "}
-              <span className={styles.cs}>"--db"</span>, <span className={styles.cs}>"~/db.sqlite"</span>
-              ]{" "}
+              <span className={styles.cc}>command</span>: [<span className={styles.cs}>"npx"</span>,{" "}
+              <span className={styles.cs}>"mcp-server-sqlite"</span>,{" "}
+              <span className={styles.cs}>"--db"</span>,{" "}
+              <span className={styles.cs}>"~/db.sqlite"</span>]{" "}
               <span className={styles.cm}># env なし = 最小権限</span>
             </div>
           </div>
@@ -1218,7 +1295,9 @@ GW <--&gt;|"HTTPS"| P`}
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cm}># RFC 1918: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16</span>
+              <span className={styles.cm}>
+                # RFC 1918: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16
+              </span>
             </div>
             <div className={styles.codeLine}>
               {"  "}
@@ -1226,7 +1305,9 @@ GW <--&gt;|"HTTPS"| P`}
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cm}># リンクローカル: 169.254.0.0/16 (クラウドメタデータ含む)</span>
+              <span className={styles.cm}>
+                # リンクローカル: 169.254.0.0/16 (クラウドメタデータ含む)
+              </span>
             </div>
             <div className={styles.codeLine}>
               {"  "}
@@ -1238,7 +1319,8 @@ GW <--&gt;|"HTTPS"| P`}
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cc}>allow_private_urls</span>: <span className={styles.ck}>false</span>{" "}
+              <span className={styles.cc}>allow_private_urls</span>:{" "}
+              <span className={styles.ck}>false</span>{" "}
               <span className={styles.cm}># デフォルト false を維持</span>
             </div>
           </div>
@@ -1289,22 +1371,29 @@ GW <--&gt;|"HTTPS"| P`}
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cc}>tirith_enabled</span>: <span className={styles.ck}>true</span>{" "}
+              <span className={styles.cc}>tirith_enabled</span>:{" "}
+              <span className={styles.ck}>true</span>{" "}
               <span className={styles.cm}># デフォルト: true</span>
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cc}>tirith_timeout</span>: <span className={styles.cg}>5</span>{" "}
+              <span className={styles.cc}>tirith_timeout</span>:{" "}
+              <span className={styles.cg}>5</span>{" "}
               <span className={styles.cm}># サブプロセスタイムアウト（秒）</span>
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cc}>tirith_fail_open</span>: <span className={styles.ck}>false</span>{" "}
-              <span className={styles.cm}># 高セキュリティ: tirith 不在時もブロック。デフォルト true（tirith 不在時は通過）</span>
+              <span className={styles.cc}>tirith_fail_open</span>:{" "}
+              <span className={styles.ck}>false</span>{" "}
+              <span className={styles.cm}>
+                # 高セキュリティ: tirith 不在時もブロック。デフォルト true（tirith 不在時は通過）
+              </span>
             </div>
           </div>
 
-          <h3 className={styles.sectionTitle}>アドバイザリーチェッカー（サプライチェーン汚染対応）</h3>
+          <h3 className={styles.sectionTitle}>
+            アドバイザリーチェッカー（サプライチェーン汚染対応）
+          </h3>
           <ul className={styles.stepList}>
             <li className={styles.stepItem}>
               <div className={styles.stepNum}>1</div>
@@ -1334,8 +1423,7 @@ GW <--&gt;|"HTTPS"| P`}
                 <div className={styles.stepDesc}>
                   <code className={styles.inlineCode}>hermes doctor --ack &lt;advisory-id&gt;</code>{" "}
                   で確認済みとしてマーク。
-                  <code className={styles.inlineCode}>config.security.acked_advisories</code>{" "}
-                  に保存
+                  <code className={styles.inlineCode}>config.security.acked_advisories</code> に保存
                 </div>
               </div>
             </li>
@@ -1422,8 +1510,9 @@ GW <--&gt;|"HTTPS"| P`}
           <div className={styles.chapterNum}>Ch.09 — K-Level: Intermediate</div>
           <h2 className={styles.chapterTitle}>プロファイルシステムによる多エージェント管理</h2>
           <p className={styles.paragraph}>
-            プロファイルは独立したHermesホームディレクトリです。各プロファイルは config / .env / SOUL.md / memories
-            / sessions / skills / cron / state.db を個別に保持し、並行して稼働できます。
+            プロファイルは独立したHermesホームディレクトリです。各プロファイルは config / .env /
+            SOUL.md / memories / sessions / skills / cron / state.db
+            を個別に保持し、並行して稼働できます。
           </p>
 
           <h3 className={styles.sectionTitle}>プロファイル作成の4種類</h3>
@@ -1504,7 +1593,10 @@ B --> F["--clone-from src
             <div className={styles.refCard}>
               <div className={styles.refCat}>公式ユーザーガイド</div>
               <div className={styles.refTitle}>Profiles: Running Multiple Agents</div>
-              <Ext className={styles.refUrl} href="https://hermes-agent.nousresearch.com/docs/user-guide/profiles">
+              <Ext
+                className={styles.refUrl}
+                href="https://hermes-agent.nousresearch.com/docs/user-guide/profiles"
+              >
                 …/user-guide/profiles
               </Ext>
             </div>
@@ -1596,13 +1688,19 @@ O1 --> G1 & G2`}
               <div className={styles.compareLabel}>✅ コンテキストを明示的に渡す</div>
               <div className={styles.compareCode}>
                 <div className={styles.codeLine}>delegate_task(</div>
-                <div className={styles.codeLine}>  goal="api/handlers.py の TypeError を修正",</div>
-                <div className={styles.codeLine}>  context="""</div>
-                <div className={styles.codeLine}>  api/handlers.py line 47: NoneType has no attribute 'get'.</div>
-                <div className={styles.codeLine}>  parse_body()はContent-Type未設定時にNone返却。</div>
-                <div className={styles.codeLine}>  Python 3.11 使用。</div>
-                <div className={styles.codeLine}>  プロジェクト: /home/user/myproject</div>
-                <div className={styles.codeLine}>  """</div>
+                <div className={styles.codeLine}> goal="api/handlers.py の TypeError を修正",</div>
+                <div className={styles.codeLine}> context="""</div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  api/handlers.py line 47: NoneType has no attribute 'get'.
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  parse_body()はContent-Type未設定時にNone返却。
+                </div>
+                <div className={styles.codeLine}> Python 3.11 使用。</div>
+                <div className={styles.codeLine}> プロジェクト: /home/user/myproject</div>
+                <div className={styles.codeLine}> """</div>
                 <div className={styles.codeLine}>)</div>
               </div>
             </div>
@@ -1610,7 +1708,11 @@ O1 --> G1 & G2`}
               <div className={styles.compareLabel}>❌ サブエージェントは過去を知らない</div>
               <div className={styles.compareCode}>
                 <div className={styles.codeLine}>delegate_task(</div>
-                <div className={styles.codeLine}>  goal="エラーを修正して" # NG: サブエージェントは新規会話から開始するため「エラー」が何かを知らない</div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  goal="エラーを修正して" # NG:
+                  サブエージェントは新規会話から開始するため「エラー」が何かを知らない
+                </div>
                 <div className={styles.codeLine}>)</div>
               </div>
             </div>
@@ -1620,8 +1722,8 @@ O1 --> G1 & G2`}
             <div className={styles.calloutIcon}>⚠</div>
             <div>
               <code className={styles.inlineCode}>max_spawn_depth: 3</code> +{" "}
-              <code className={styles.inlineCode}>max_concurrent_children: 3</code> の場合、最大 3×3×3 ={" "}
-              <strong className={styles.strongText}>27並列リーフエージェント</strong>{" "}
+              <code className={styles.inlineCode}>max_concurrent_children: 3</code> の場合、最大
+              3×3×3 = <strong className={styles.strongText}>27並列リーフエージェント</strong>{" "}
               が動作します。深度を上げる場合はコストを十分に考慮してください。
             </div>
           </div>
@@ -1675,9 +1777,7 @@ J2 -->|"最新出力を注入"| J3`}
             <div className={styles.codeLine}>
               <span className={styles.ck}>import</span> json, sys
             </div>
-            <div className={styles.codeLine}>
-              latest = fetch_latest_issue_count()
-            </div>
+            <div className={styles.codeLine}>latest = fetch_latest_issue_count()</div>
             <div className={styles.codeLine}>
               prev = read_state(<span className={styles.cs}>"issue_count"</span>)
             </div>
@@ -1691,7 +1791,8 @@ J2 -->|"最新出力を注入"| J3`}
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.ck}>print</span>(json.dumps({`{"wakeAgent":`} <span className={styles.ck}>False</span>
+              <span className={styles.ck}>print</span>(json.dumps({`{"wakeAgent":`}{" "}
+              <span className={styles.ck}>False</span>
               {`}`}))
             </div>
             <div className={styles.codeLine}>
@@ -1703,7 +1804,8 @@ J2 -->|"最新出力を注入"| J3`}
               write_state(<span className={styles.cs}>"issue_count"</span>, latest)
             </div>
             <div className={styles.codeLine}>
-              <span className={styles.ck}>print</span>(json.dumps({`{"wakeAgent":`} <span className={styles.ck}>true</span>
+              <span className={styles.ck}>print</span>(json.dumps({`{"wakeAgent":`}{" "}
+              <span className={styles.ck}>true</span>
               {`}`}))
             </div>
           </div>
@@ -1714,21 +1816,25 @@ J2 -->|"最新出力を注入"| J3`}
               <div className={styles.compareLabel}>✅ コストゼロの監視タスク</div>
               <div className={styles.compareCode}>
                 <div className={styles.codeLine}>hermes cron create "every 5m" \</div>
-                <div className={styles.codeLine}>  --no-agent \</div>
-                <div className={styles.codeLine}>  --script memory-watchdog.sh \</div>
-                <div className={styles.codeLine}>  --deliver telegram \</div>
-                <div className={styles.codeLine}>  --name "memory-watchdog"</div>
-                <div className={styles.codeLine}>  # stdout 空 = silent tick（通知なし）</div>
-                <div className={styles.codeLine}>  # stdout あり = Telegram へ配信</div>
-                <div className={styles.codeLine}>  # non-zero exit = エラーアラート</div>
+                <div className={styles.codeLine}> --no-agent \</div>
+                <div className={styles.codeLine}> --script memory-watchdog.sh \</div>
+                <div className={styles.codeLine}> --deliver telegram \</div>
+                <div className={styles.codeLine}> --name "memory-watchdog"</div>
+                <div className={styles.codeLine}> # stdout 空 = silent tick（通知なし）</div>
+                <div className={styles.codeLine}> # stdout あり = Telegram へ配信</div>
+                <div className={styles.codeLine}> # non-zero exit = エラーアラート</div>
               </div>
             </div>
             <div className={`${styles.compareCard} ${styles.bad}`}>
               <div className={styles.compareLabel}>❌ 文脈を前提とした cron プロンプト</div>
               <div className={styles.compareCode}>
                 <div className={styles.codeLine}>cronjob(</div>
-                <div className={styles.codeLine}>  prompt="あのサーバー問題を確認して", # NG: cron は独立したセッション。「あのサーバー」を知らない</div>
-                <div className={styles.codeLine}>  schedule="every 5m"</div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  prompt="あのサーバー問題を確認して", # NG: cron
+                  は独立したセッション。「あのサーバー」を知らない
+                </div>
+                <div className={styles.codeLine}> schedule="every 5m"</div>
                 <div className={styles.codeLine}>)</div>
               </div>
             </div>
@@ -1773,8 +1879,7 @@ J2 -->|"最新出力を注入"| J3`}
                 <div className={styles.stepDesc}>
                   <code className={styles.inlineCode}>GATEWAY_ALLOW_ALL_USERS=true</code>{" "}
                   は本番禁止。
-                  <code className={styles.inlineCode}>TELEGRAM_ALLOWED_USERS=...</code>{" "}
-                  等を設定。
+                  <code className={styles.inlineCode}>TELEGRAM_ALLOWED_USERS=...</code> 等を設定。
                 </div>
               </div>
             </li>
@@ -1793,7 +1898,9 @@ J2 -->|"最新出力を注入"| J3`}
               <div className={styles.stepContent}>
                 <div className={styles.stepTitle}>リソース制限を設定</div>
                 <div className={styles.stepDesc}>
-                  <code className={styles.inlineCode}>container_cpu / container_memory / container_disk</code>{" "}
+                  <code className={styles.inlineCode}>
+                    container_cpu / container_memory / container_disk
+                  </code>{" "}
                   に必要最小限の値を設定。
                 </div>
               </div>
@@ -1812,7 +1919,9 @@ J2 -->|"最新出力を注入"| J3`}
               <div className={styles.stepNum}>5</div>
               <div className={styles.stepContent}>
                 <div className={styles.stepTitle}>DM Pairing を有効化</div>
-                <div className={styles.stepDesc}>ユーザーIDのハードコードの代わりにペアリングコードを使用。</div>
+                <div className={styles.stepDesc}>
+                  ユーザーIDのハードコードの代わりにペアリングコードを使用。
+                </div>
               </div>
             </li>
             <li className={styles.stepItem}>
@@ -1829,14 +1938,18 @@ J2 -->|"最新出力を注入"| J3`}
               <div className={styles.stepNum}>7</div>
               <div className={styles.stepContent}>
                 <div className={styles.stepTitle}>terminal.cwd を明示設定</div>
-                <div className={styles.stepDesc}>機密ディレクトリからの操作を防止。絶対パスで指定する。</div>
+                <div className={styles.stepDesc}>
+                  機密ディレクトリからの操作を防止。絶対パスで指定する。
+                </div>
               </div>
             </li>
             <li className={styles.stepItem}>
               <div className={styles.stepNum}>8</div>
               <div className={styles.stepContent}>
                 <div className={styles.stepTitle}>root 以外のユーザーで実行</div>
-                <div className={styles.stepDesc}>専用の非特権ユーザーでゲートウェイプロセスを実行。</div>
+                <div className={styles.stepDesc}>
+                  専用の非特権ユーザーでゲートウェイプロセスを実行。
+                </div>
               </div>
             </li>
             <li className={styles.stepItem}>
@@ -1851,7 +1964,9 @@ J2 -->|"最新出力を注入"| J3`}
             <li className={styles.stepItem}>
               <div className={styles.stepNum}>10</div>
               <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>定期アップデート &amp; アドバイザリーチェック</div>
+                <div className={styles.stepTitle}>
+                  定期アップデート &amp; アドバイザリーチェック
+                </div>
                 <div className={styles.stepDesc}>
                   <code className={styles.inlineCode}>hermes update</code> +{" "}
                   <code className={styles.inlineCode}>hermes doctor</code>{" "}
@@ -1887,22 +2002,24 @@ J2 -->|"最新出力を注入"| J3`}
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cc}>container_memory</span>: <span className={styles.cg}>2048</span>{" "}
-              <span className={styles.cm}># 2GB</span>
+              <span className={styles.cc}>container_memory</span>:{" "}
+              <span className={styles.cg}>2048</span> <span className={styles.cm}># 2GB</span>
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cc}>container_disk</span>: <span className={styles.cg}>10240</span>{" "}
-              <span className={styles.cm}># 10GB</span>
+              <span className={styles.cc}>container_disk</span>:{" "}
+              <span className={styles.cg}>10240</span> <span className={styles.cm}># 10GB</span>
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cc}>container_persistent</span>: <span className={styles.ck}>false</span>{" "}
+              <span className={styles.cc}>container_persistent</span>:{" "}
+              <span className={styles.ck}>false</span>{" "}
               <span className={styles.cm}># ephemeral</span>
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cc}>cwd</span>: <span className={styles.cs}>"/workspace"</span>
+              <span className={styles.cc}>cwd</span>:{" "}
+              <span className={styles.cs}>"/workspace"</span>
             </div>
             <div className={styles.codeLine} />
             <div className={styles.codeLine}>
@@ -1922,7 +2039,8 @@ J2 -->|"最新出力を注入"| J3`}
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cc}>destructive_slash_confirm</span>: <span className={styles.ck}>true</span>
+              <span className={styles.cc}>destructive_slash_confirm</span>:{" "}
+              <span className={styles.ck}>true</span>
             </div>
             <div className={styles.codeLine} />
             <div className={styles.codeLine}>
@@ -1930,20 +2048,24 @@ J2 -->|"最新出力を注入"| J3`}
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cc}>tirith_enabled</span>: <span className={styles.ck}>true</span>
+              <span className={styles.cc}>tirith_enabled</span>:{" "}
+              <span className={styles.ck}>true</span>
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cc}>tirith_fail_open</span>: <span className={styles.ck}>false</span>{" "}
+              <span className={styles.cc}>tirith_fail_open</span>:{" "}
+              <span className={styles.ck}>false</span>{" "}
               <span className={styles.cm}># 高セキュリティ</span>
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cc}>allow_private_urls</span>: <span className={styles.ck}>false</span>
+              <span className={styles.cc}>allow_private_urls</span>:{" "}
+              <span className={styles.ck}>false</span>
             </div>
             <div className={styles.codeLine}>
               {"  "}
-              <span className={styles.cc}>allow_lazy_installs</span>: <span className={styles.ck}>false</span>
+              <span className={styles.cc}>allow_lazy_installs</span>:{" "}
+              <span className={styles.ck}>false</span>
             </div>
           </div>
 
@@ -1996,7 +2118,10 @@ J2 -->|"最新出力を注入"| J3`}
             <div className={styles.refCard}>
               <div className={styles.refCat}>Security</div>
               <div className={styles.refTitle}>Security Model (完全ガイド)</div>
-              <Ext className={styles.refUrl} href="https://hermes-agent.nousresearch.com/docs/user-guide/security">
+              <Ext
+                className={styles.refUrl}
+                href="https://hermes-agent.nousresearch.com/docs/user-guide/security"
+              >
                 …/user-guide/security
               </Ext>
             </div>
@@ -2073,7 +2198,10 @@ J2 -->|"最新出力を注入"| J3`}
             <div className={styles.refCard}>
               <div className={styles.refCat}>Features</div>
               <div className={styles.refTitle}>Scheduled Tasks (Cron)</div>
-              <Ext className={styles.refUrl} href="https://hermes-agent.nousresearch.com/docs/user-guide/features/cron">
+              <Ext
+                className={styles.refUrl}
+                href="https://hermes-agent.nousresearch.com/docs/user-guide/features/cron"
+              >
                 …/features/cron
               </Ext>
             </div>
@@ -2090,21 +2218,30 @@ J2 -->|"最新出力を注入"| J3`}
             <div className={styles.refCard}>
               <div className={styles.refCat}>User Guide</div>
               <div className={styles.refTitle}>Profiles: Multiple Agents</div>
-              <Ext className={styles.refUrl} href="https://hermes-agent.nousresearch.com/docs/user-guide/profiles">
+              <Ext
+                className={styles.refUrl}
+                href="https://hermes-agent.nousresearch.com/docs/user-guide/profiles"
+              >
                 …/user-guide/profiles
               </Ext>
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>User Guide</div>
               <div className={styles.refTitle}>Docker</div>
-              <Ext className={styles.refUrl} href="https://hermes-agent.nousresearch.com/docs/user-guide/docker">
+              <Ext
+                className={styles.refUrl}
+                href="https://hermes-agent.nousresearch.com/docs/user-guide/docker"
+              >
                 …/user-guide/docker
               </Ext>
             </div>
             <div className={styles.refCard}>
               <div className={styles.refCat}>Reference</div>
               <div className={styles.refTitle}>CLI Commands</div>
-              <Ext className={styles.refUrl} href="https://hermes-agent.nousresearch.com/docs/reference/cli-commands">
+              <Ext
+                className={styles.refUrl}
+                href="https://hermes-agent.nousresearch.com/docs/reference/cli-commands"
+              >
                 …/reference/cli-commands
               </Ext>
             </div>

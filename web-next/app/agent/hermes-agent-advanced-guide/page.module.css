@@ -15,9 +15,9 @@
   --border-active: rgba(0, 255, 136, 0.4);
   --glow-green: 0 0 20px rgba(0, 255, 136, 0.35);
   --glow-cyan: 0 0 20px rgba(0, 229, 255, 0.35);
-  --font-mono: 'Space Mono', monospace;
-  --font-display: 'Syne', sans-serif;
-  --font-body: 'IBM Plex Sans JP', sans-serif;
+  --font-mono: "Space Mono", monospace;
+  --font-display: "Syne", sans-serif;
+  --font-body: "IBM Plex Sans JP", sans-serif;
   --radius: 8px;
   --radius-lg: 14px;
 
@@ -31,7 +31,7 @@
 }
 
 .pageContainer::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background: repeating-linear-gradient(
@@ -46,7 +46,7 @@
 }
 
 .pageContainer::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background-image:
@@ -185,7 +185,7 @@
 }
 
 .hero::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -276,7 +276,7 @@
 }
 
 .chapterNum::before {
-  content: '';
+  content: "";
   display: inline-block;
   width: 24px;
   height: 1px;
@@ -952,7 +952,7 @@
 }
 
 .trendCard::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;

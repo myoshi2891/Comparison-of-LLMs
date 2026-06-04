@@ -4,7 +4,9 @@ import { join } from "node:path";
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it } from "vitest";
-import PageComponent, { metadata as rawMetadata } from "@/app/agent/hermes-agent-advanced-guide/page";
+import PageComponent, {
+  metadata as rawMetadata,
+} from "@/app/agent/hermes-agent-advanced-guide/page";
 
 const Page = PageComponent as unknown as () => ReactElement;
 type MetadataLike = { title?: unknown; description?: unknown };
@@ -21,7 +23,7 @@ const EXPECTED_SECTION_IDS = [
   "ch8",
   "ch9",
   "ch10",
-  "ch11"
+  "ch11",
 ] as const;
 
 describe("/agent/hermes-agent-advanced-guide - metadata", () => {
