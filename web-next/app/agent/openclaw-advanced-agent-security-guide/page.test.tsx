@@ -53,6 +53,7 @@ describe("/agent/openclaw-advanced-agent-security-guide - page structure", () =>
   it("renders all 12 expected section ids", () => {
     const { container } = render(<Page />);
     const sections = container.querySelectorAll('section[id^="s"]');
+    expect(sections.length).toBe(13);
     // We expect 12 sections starting with s1 through s12. Let's make sure we find them.
     for (const id of EXPECTED_SECTION_IDS) {
       const el = container.querySelector(`#${id}`);
