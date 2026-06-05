@@ -217,11 +217,17 @@
             }
           } catch (err) {
             console.error('Error rendering ' + id, err);
+            const target = document.getElementById(id);
+            if (target) {
+              target.textContent = "⚠️ ダイアグラムを描画できませんでした";
+            }
           }
         }
       })();
     </script>
     <style>
+      @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+JP:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
       :root {
         --color-background-primary: #0f1117;
         --color-background-secondary: #141728;
@@ -308,8 +314,6 @@
         line-height: 1.7;
         font-weight: 400;
       }
-
-      @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+JP:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
       .page-wrap {
         max-width: 1080px;
@@ -1131,7 +1135,7 @@
 
         <div class="code-block">
           <div class="code-label">
-            <i class="ti ti-settings"></i> openclaw.json — サブエージェント基本設定
+            <i class="ti ti-settings"></i> openclaw.json — サブエージェント基本設定（※モデル表記は CLAUDE.md の「latest/newest + 年号」ポリシーに準拠）
           </div>
           <pre><code class="language-json">{
   "agents": {
@@ -1142,7 +1146,7 @@
         "maxChildrenPerAgent": 5,
         "runTimeoutSeconds": 900,
         "delegationMode": "prefer",
-        "model": "anthropic/claude-haiku-4-5"
+        "model": "anthropic/claude-haiku-latest-2026"
       }
     }
   }
@@ -1218,14 +1222,15 @@
         <h3 class="sub-title">3.1 モデルの動的切り替え</h3>
         <div class="code-block">
           <div class="code-label">
-            <i class="ti ti-brand-typescript"></i> plugin.ts — before_model_resolve
+            <i class="ti ti-brand-typescript"></i> plugin.ts — before_model_resolve（※モデル表記は CLAUDE.md の「latest/newest + 年号」ポリシーに準拠）
           </div>
           <pre><code class="language-typescript">export const beforeModelResolve: BeforeModelResolveHook = async (ctx) => {
   const message = ctx.session?.lastUserMessage ?? "";
   const isComplexTask = /analyze|research|compare|architect/i.test(message);
 
   if (isComplexTask) {
-    return { provider: "anthropic", model: "claude-opus-4-6" };
+    // CLAUDE.md の「latest/newest + 年号」ポリシーに準拠
+    return { provider: "anthropic", model: "claude-opus-latest-2026" };
   }
   return null; // デフォルトモデルを使用
 };</code></pre>
@@ -1265,7 +1270,7 @@
     toolCallCount: toolCalls.length,
     toolNames: toolCalls.map(t => t.name),
     durationMs: duration,
-  }) + "<br>");
+  }) + "\n");
 };</code></pre>
         </div>
 
@@ -2006,14 +2011,14 @@ chmod 600 ~/.openclaw/agents/*/agent/auth-profiles.json</code></pre>
         <h3 class="sub-title">10.1 パターン1 — チャンネル別モデル分離</h3>
         <div class="code-block">
           <div class="code-label">
-            <i class="ti ti-settings"></i> openclaw.json — WhatsApp / Telegram でモデル分離
+            <i class="ti ti-settings"></i> openclaw.json — WhatsApp / Telegram でモデル分離（※モデル表記は CLAUDE.md の「latest/newest + 年号」ポリシーに準拠）
           </div>
           <pre><code class="language-json">{
   "agents": {
     "list": [
-      { "id": "everyday", "model": "anthropic/claude-sonnet-4-6",
+      { "id": "everyday", "model": "anthropic/claude-sonnet-latest-2026",
         "workspace": "~/.openclaw/workspace-everyday" },
-      { "id": "deepwork", "model": "anthropic/claude-opus-4-6",
+      { "id": "deepwork", "model": "anthropic/claude-opus-latest-2026",
         "workspace": "~/.openclaw/workspace-deepwork",
         "subagents": { "delegationMode": "prefer", "maxConcurrent": 4 } }
     ]
