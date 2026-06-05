@@ -1,6 +1,6 @@
 # 概要
 
-最終更新日: 2026-06-03
+最終更新日: 2026-06-05
 
 **関連ソースファイル**: `CLAUDE.md` / `AGENTS.md` / `GEMINI.md` / `web-next/` / `scraper/`
 
@@ -206,7 +206,7 @@ cd scraper && uv run pytest
 ```bash
 cd web-next && bun run build      # 全ルートが ○ (Static)
 cd web-next && bun run typecheck  # 型エラーゼロ
-cd web-next && bun run test       # 685 件 pass
+cd web-next && bun run test       # 693 件 pass
 cd web-next && bun run lint       # 新規違反ゼロ
 cd scraper && uv run pytest       # 38/38 passed
 ```

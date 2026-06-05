@@ -83,8 +83,8 @@ describe("/agent/hermes-agent-advanced-guide - external link safety", () => {
       expect(a.getAttribute("target")).toBe("_blank");
       const rel = a.getAttribute("rel") ?? "";
       expect(rel).toMatch(/\bexternal\b/);
-      expect(rel).toMatch(/noopener/);
-      expect(rel).toMatch(/noreferrer/);
+      expect(rel).toMatch(/\bnoopener\b/);
+      expect(rel).toMatch(/\bnoreferrer\b/);
     }
   });
 

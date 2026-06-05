@@ -44,7 +44,7 @@ graph TD
 ### 2. pricing.json の更新
 
 AIモデル価格と為替レートを一括更新します。
-- `.agent/skills/full-update/` または `.claude/skills/full-update/` に基づき、スクレイパーを実行して `pricing.json` を更新します。
+- `.agent/skills/full-update/` に基づきスクレイパーを実行して `pricing.json` を更新します。
 
   ```bash
   # スクレイパー実行によるデータ更新
@@ -104,7 +104,7 @@ AIモデル価格と為替レートを一括更新します。
 
 - [ ] `bun run build` が成功していること。
 - [ ] `bun run typecheck` にパスしていること。
-- [ ] `bun run test` の 685 件以上のテストがすべて Green になっていること。
+- [ ] `bun run test` の 693 件以上のテストがすべて Green になっていること。
 - [ ] `bun run lint` に新規エラーがないこと。
 - [ ] `docs/MONTHLY_UPDATE_PROMPTS.md` 内の画面一覧テーブルの「更新日」が最新のもの（当月日付）に更新されていること。
 - [ ] 最終更新日（タイムスタンプ）が適切に更新されていること。
