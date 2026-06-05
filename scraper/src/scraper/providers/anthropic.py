@@ -26,7 +26,17 @@ _FALLBACKS: dict[str, tuple[float, float]] = {
 
 
 def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
-    """Anthropic の価格をスクレイピングして ApiModel リストを返す。"""
+    """
+    Scrape Anthropic's pricing page and produce ApiModel entries for supported Claude models.
+    
+    Attempts to extract in/out prices for specific Claude models from Anthropic's pricing HTML. If `existing` is provided, its Anthropic model prices seed fallbacks; hardcoded fallback prices are used when extraction fails, when fetch fails, or when extracted in/out sanity checks disagree. Models not found on the page are added from the fallback set with scrape status "fallback".
+    
+    Parameters:
+        existing (list[ApiModel] | None): Optional previously known ApiModel list whose Anthropic entries provide preferred fallback prices.
+    
+    Returns:
+        list[ApiModel]: ApiModel objects for each model with `price_in`/`price_out` populated from extracted values or fallbacks and `scrape_status` set to indicate whether the value came from a successful scrape or a fallback.
+    """
     logger.info("Anthropic: スクレイピング開始 %s", _URL)
 
     # 既存値をフォールバックとして使う（既存 JSON があれば）
@@ -97,6 +107,16 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
 def _build_models(
     fallback_map: dict[str, tuple[float, float]], status: str
 ) -> list[ApiModel]:
+    """
+    Construct a list of ApiModel entries for all fallback models using provided prices and scrape status.
+    
+    Parameters:
+        fallback_map (dict[str, tuple[float, float]]): Mapping from model name to a tuple of (price_in, price_out) used for each ApiModel's pricing.
+        status (str): Scrape status value to assign to each ApiModel's `scrape_status` field.
+    
+    Returns:
+        list[ApiModel]: ApiModel objects for every model key in the `_FALLBACKS` order with provider set to "Anthropic", metadata fields (`tag`, `cls`, `sub_ja`, `sub_en`) populated from module maps, prices taken from `fallback_map`, and `scrape_status` set to `status`.
+    """
     return [
         ApiModel(
             provider="Anthropic",

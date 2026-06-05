@@ -19,7 +19,15 @@ _FRANKFURTER_URL = "https://api.frankfurter.dev/v1/latest?from=USD&to=JPY"
 
 
 def fetch_jpy_rate(fallback: float = 155.0) -> tuple[float, str]:
-    """(rate, date) を返す。失敗時は (fallback, 'fallback') を返す。"""
+    """
+    Fetches the latest USD→JPY exchange rate from the Frankfurter API.
+    
+    Parameters:
+        fallback (float): Rate to return if the API request or response parsing fails (default 155.0).
+    
+    Returns:
+        (rate, date_str): `rate` is the fetched JPY rate; `date_str` is the date string from the API. On failure returns `fallback` and the string `"fallback"`.
+    """
     try:
         resp = httpx.get(_FRANKFURTER_URL, timeout=15, follow_redirects=True)
         resp.raise_for_status()
