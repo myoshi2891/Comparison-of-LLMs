@@ -287,7 +287,9 @@ export default function ToolPricingPage() {
           </div>
           <div className={styles.disclaimer}>
             <p>
-              掲載の価格は <strong>{PRICE_CHECKED_AT} 時点</strong>の目安です。プラン体系・通貨・従量課金の単価は頻繁に変わるため、契約前に必ず各ツールの公式ページ（各カードの<strong>「出典」リンク</strong>）で最新の料金を確認してください。
+              掲載の価格は <strong>{PRICE_CHECKED_AT} 時点</strong>
+              の目安です。プラン体系・通貨・従量課金の単価は頻繁に変わるため、契約前に必ず各ツールの公式ページ（各カードの
+              <strong>「出典」リンク</strong>）で最新の料金を確認してください。
             </p>
             <p className={styles.disclaimerSub}>
               本ページは月次で価格を見直します。出典は各社公式の pricing ページを参照しています。
