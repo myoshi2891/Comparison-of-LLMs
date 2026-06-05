@@ -1,7 +1,7 @@
 # プロジェクト進捗・ステータス (PROGRESS.md)
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
-> - 最終更新日: **Updated 2026-06-02**
+> - 最終更新日: **Updated 2026-06-04**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -12,12 +12,16 @@
 - **動作検証**:
   - `bun run build` ✅（`web-next` の全ルートが Static プリレンダリングされる）
   - `bun run typecheck` ✅
-  - `bun run lint` ✅（既知の違反なし、0 件維持）
+  - `bun run lint` ✅（本作業範囲では新規違反 0 件、既知の既存指摘は本件対象外）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **670 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **693 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **Hermes Agent 中級・上級者向け完全ガイド**: Next.js App Router への移行完了 🚀（8件の契約テストを追加し、合計685テスト合格）。アーキテクチャの深掘り、7層の多層防御セキュリティモデル、DMペアリング、Docker サンドボックス、サブエージェント委譲、Cron ジョブチェーニング等、本番運用を見据えた高度な活用法を解説する詳細ガイド。
+- **Hermes Agent 完全ガイド**: Nous Research が開発した自己改善型 AI エージェント「Hermes Agent」のアーキテクチャ、セットアップ、メモリ、スキル、自動化（Cron）等を解説する総合ガイドをルートに配置。
+- **Code Review Tool Pricing（1/3/12ヶ月プラン別料金表）**: 既存の `/code-review/tool-pricing` ページに**プラン別・USD+円の料金表**を追加 🚀。`ToolEntry.price: string` を `plans: readonly PricingPlan[]` に置き換え、`planAmounts`（1/3/12ヶ月計算・純粋関数）と `representativePrice`（マトリクス用最安値ラベル）を `constants.ts` に追加。pricing.json の `jpy_rate` / `generated_at` を `parsePricingData` で取得し、`fmtUSD` / `fmtJPY` で USD+円を二段表示。年額割引あるプランには「年額割引」バッジを表示。Hero と免責セクションに更新時レートと基準日を明記。テスト 7 件追加（plan-header / plan-row / ¥記号 各ページテスト + planAmounts 純粋関数テスト4件、計684テスト合格）。Gemini Code Assist / Google Jules AI Ultra は公式ページで WebSearch 確認済み（Standard $19〜22.80、Enterprise $45〜54、Jules Ultra $200/月）。確定不能プラン（AWS CodeGuru・SonarQube Developer）は `priceNote` で「従量課金」「LOC依存（年額）」と非推測値で明記。
+- **Code Review Tool Pricing（料金比較ページ）**: `/code-review/tool-pricing` を新規追加 🚀。Code Review 系 AI ツール 9 種（GitHub Copilot / Codex / Claude / CodeRabbit / Gemini Code Assist / Jules / AWS CodeGuru / SonarQube ×2）の料金目安・主用途・メリット/デメリットを比較マトリクス＋カテゴリ別カードで横断表示。各価格に**公式 pricing ページの出典リンク**と確認年月を併記し、可変データは `app/code-review/tool-pricing/constants.ts` に SSoT として集約（**月次価格レビュー対象**）。Code Review ナビ先頭に「Tool Pricing」を追加。契約テスト 7 件追加（合計 677 テスト合格）。本ページの lint はクリーン（既存 `sonar-qube` / `antigravity-slash-commands-guide` の既知 lint 指摘は本作業の対象外）。
 - **Antigravity スラッシュコマンド完全ガイド (CSS修正)**: Next.js CSS Modules の `:global()` ラッパーを用いて、約400行のスタイルを安全にスコープ化し適用完了。
 - **Antigravity スラッシュコマンド完全ガイド**: Next.js App Router への移行完了 🚀（5件の契約テストを追加し、合計670テスト合格）。
 - **Antigravity スラッシュコマンド完全ガイド (HTML版)**: Gemini CLI から Antigravity CLI への移行に伴う、スラッシュコマンド、カスタムコマンド（TOML）、Plan Mode 等の解説ガイドをルートに配置。
@@ -97,6 +101,8 @@ cd scraper && uv run pytest
 ### 1. 月次データアップデート（定常運用）
 毎月、各プロバイダー（Anthropic, Google, OpenAI など）の最新価格を反映させる。
 為替レート更新および `pricing.json` の型定義と `lib/pricing.ts` の `_AssertParity` の一致を確認する。
+加えて、**`/code-review/tool-pricing` の料金**（`app/code-review/tool-pricing/constants.ts`）も毎月見直す。
+各エントリの `sourceUrl`（公式 pricing ページ）を辿って `price` / `priceCheckedAt` を更新し、ページ全体の `PRICE_CHECKED_AT` を当月へ更新する。
 
 ### 2. テストカバレッジの拡充
 [`docs/TEST_COVERAGE_PROGRESS.md`](TEST_COVERAGE_PROGRESS.md) で `missing` または `partial` となっている領域のテストを順次追加する。
@@ -146,7 +152,7 @@ Next.js 移行完了後のリポジトリ `LLM-Studies` にて、テストカバ
 Next.js 移行完了後のリポジトリ `LLM-Studies` の保守・改善作業を再開してください。
 
 - リポジトリ: LLM-Studies (Next.js 移行プロジェクトは dev/main へ完全マージ済み)
-- 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (670/670 passed) / pytest (38/38 passed) で全 Green
+- 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (685/685 passed) / pytest (38/38 passed) で全 Green
 - リポジトリ規約: CLAUDE.md (編集上の絶対ルール)
 
 作業方針：

@@ -14,18 +14,34 @@ logger = logging.getLogger(__name__)
 _URL = "https://platform.deepseek.com/api-docs/pricing"
 
 _FALLBACKS: dict[str, tuple[float, float]] = {
-    "DeepSeek-V3.2": (0.28, 0.42),
-    "DeepSeek-R1":   (0.28, 0.42),
+    "DeepSeek V4 Flash": (0.140, 0.280),
+    "DeepSeek V4 Pro":   (0.435, 0.870),
+    "DeepSeek-V3.2":     (0.280, 0.420),
+    "DeepSeek-R1":       (0.550, 2.190),
 }
-_TAG  = {"DeepSeek-V3.2": "General",   "DeepSeek-R1": "Reasoning"}
-_CLS  = {"DeepSeek-V3.2": "tag-oss",   "DeepSeek-R1": "tag-oss"}
+_TAG = {
+    "DeepSeek V4 Flash": "Fast",
+    "DeepSeek V4 Pro":   "Reasoning",
+    "DeepSeek-V3.2":     "General",
+    "DeepSeek-R1":       "Reasoning",
+}
+_CLS = {
+    "DeepSeek V4 Flash": "tag-oss",
+    "DeepSeek V4 Pro":   "tag-oss",
+    "DeepSeek-V3.2":     "tag-oss",
+    "DeepSeek-R1":       "tag-oss",
+}
 _SUB_JA = {
-    "DeepSeek-V3.2": "V3.2統合価格 / 671B MoE / OSS MIT",
-    "DeepSeek-R1":   "V3.2統合価格 / CoT推論 / OSS MIT",
+    "DeepSeek V4 Flash": "新フラッグシップ / 1M ctx / Apr 2026 / MIT",
+    "DeepSeek V4 Pro":   "高度推論 / 1M ctx / 1.6T MoE / MIT / 2026-05-22値下げ",
+    "DeepSeek-V3.2":     "671B MoE / OSS MIT / 128K",
+    "DeepSeek-R1":       "CoT推論 / OSS MIT",
 }
 _SUB_EN = {
-    "DeepSeek-V3.2": "V3.2 unified pricing / 671B MoE / OSS MIT",
-    "DeepSeek-R1":   "V3.2 unified pricing / CoT reasoning / OSS MIT",
+    "DeepSeek V4 Flash": "New flagship Flash / 1M ctx / Apr 2026 / MIT",
+    "DeepSeek V4 Pro":   "Advanced reasoning / 1M ctx / 1.6T MoE / MIT / price cut May 2026",
+    "DeepSeek-V3.2":     "671B MoE / OSS MIT / 128K ctx",
+    "DeepSeek-R1":       "Chain-of-thought reasoning / OSS MIT",
 }
 
 

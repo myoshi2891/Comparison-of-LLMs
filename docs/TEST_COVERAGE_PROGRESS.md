@@ -8,11 +8,11 @@
 
 | 項目 | 値 |
 |---|---|
-| 最終スキャン日 | 2026-05-31 |
+| 最終スキャン日 | 2026-06-03 |
 | フロントエンドテストランナー | Vitest 4.1 (jsdom 29 + @testing-library/react 16) |
 | バックエンドテストランナー | pytest 9.0 (unittest 互換) |
-| web-next テストファイル数 | 49 |
-| web-next テストケース数 | 642 |
+| web-next テストファイル数 | 56 |
+| web-next テストケース数 | 685 |
 | scraper テストファイル数 | 5 |
 | scraper テストケース数 | 38 |
 | 総合カバレッジスコア (weighted) | 44.2% |
@@ -49,28 +49,38 @@
 
 ```
 status: done
-count: 120
+count: 239
 files:
   - app/claude/agent/page.test.tsx (8)
+  - app/claude/code-slash-commands/page.test.tsx (5)
+  - app/claude/cowork-guide/page.test.tsx (7)
+  - app/claude/harness-engineering/page.test.tsx (8)
+  - app/claude/managed-agents/page.test.tsx (7)
   - app/claude/skill/page.test.tsx (8)
   - app/claude/skill-guide/page.test.tsx (7)
   - app/claude/skill-guide-intermediate/page.test.tsx (7)
-  - app/claude/cowork-guide/page.test.tsx (7)
-  - app/claude/managed-agents/page.test.tsx (7)
+  - app/code-review/coderabbit-guide/page.test.tsx (5)
+  - app/code-review/copilot-code-review/page.test.tsx (5)
+  - app/code-review/sonar-qube/page.test.tsx (5)
+  - app/code-review/tool-pricing/page.test.tsx (15)
   - app/codex/agent/page.test.tsx (8)
-  - app/codex/skill/page.test.tsx (8)
+  - app/codex/harness-engineering/page.test.tsx (5)
   - app/codex/openai-codex-guide/page.test.tsx (6)
+  - app/codex/skill/page.test.tsx (8)
   - app/copilot/agent/page.test.tsx (8)
-  - app/copilot/skill/page.test.tsx (8)
   - app/copilot/github-copilot/page.test.tsx (16)
   - app/copilot/markdown-file-guide/page.test.tsx (6)
+  - app/copilot/skill/page.test.tsx (8)
   - app/gemini/agent/page.test.tsx (8)
-  - app/gemini/skill/page.test.tsx (8)
-  - app/gemini/skill-guide/page.test.tsx (7)
+  - app/gemini/agent-harness-engineering/page.test.tsx (21)
+  - app/gemini/antigravity-guide/page.test.tsx (9)
+  - app/gemini/antigravity-slash-commands-guide/page.test.tsx (5)
+  - app/gemini/harness-engineering/page.test.tsx (19)
+  - app/gemini/skill/page.test.tsx (11)
+  - app/gemini/skill-guide/page.test.tsx (8)
   - app/gemini/skill-guide-intermediate/page.test.tsx (6)
-  - app/gemini/antigravity-guide/page.test.tsx (6)
   - app/git-worktree/page.test.tsx (5)
-note: 全 19 page.tsx ルートが契約テスト付き（タイトル・セクション数・rel 属性）
+note: 全 29 page.tsx ルートが契約テスト付き（タイトル・セクション数・rel 属性）
 ```
 
 ### Unit / components
