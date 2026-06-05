@@ -20,7 +20,11 @@ export const metadata: Metadata = {
 
 const pricing = parsePricingData(pricingJson);
 
-/** 外部リンク共通ヘルパー（target/rel を強制）。data-* 属性等は rest で透過。 */
+/**
+ * Render an anchor element that always opens in a new tab with safe `rel` attributes.
+ *
+ * Forces `target="_blank"` and `rel="noopener noreferrer"`, while forwarding all other anchor props (including `data-*` attributes) to the rendered `<a>`.
+ */
 function Ext({ href, className, children, ...rest }: React.ComponentProps<"a">) {
   return (
     <a href={href} className={className} target="_blank" rel="noopener noreferrer" {...rest}>
@@ -47,6 +51,13 @@ const CAT_SLUG: Record<ToolCategory, string> = {
 const toolNo = (name: string) =>
   String(TOOLS.findIndex((t) => t.name === name) + 1).padStart(2, "0");
 
+/**
+ * Render the AI Code Review Tools pricing comparison page.
+ *
+ * Renders a hero with stats and page navigation, a comparison matrix of all tools, category-specific tool cards showing summaries, pros/cons, source links, and plan-by-plan pricing displayed in USD with approximate JPY conversions, plus an about/disclaimer section.
+ *
+ * @returns The React element for the tool pricing page.
+ */
 export default function ToolPricingPage() {
   const jpyRate = pricing.jpy_rate;
   const generatedAt = pricing.generated_at;

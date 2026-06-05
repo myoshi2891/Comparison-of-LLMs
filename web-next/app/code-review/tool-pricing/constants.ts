@@ -64,11 +64,16 @@ export const PRICE_CHECKED_AT = "2026-06";
 export const CATEGORY_ORDER: readonly ToolCategory[] = ["AIレビュー", "AIエージェント", "静的解析"];
 
 /**
- * プランの 1/3/12 ヶ月 USD 額を計算する純粋関数。
- * - m1 = monthlyUsd
- * - m3 = monthlyUsd × 3
- * - m12 = (annualMonthlyUsd ?? monthlyUsd) × 12、discounted = annualMonthlyUsd != null
- * monthlyUsd が null の場合は全て null（priceNote を表示）。
+ * Compute representative USD amounts for 1, 3, and 12 months and whether an annual discount applies.
+ *
+ * If `p.monthlyUsd` is `null`, all amount fields are `null` and `discounted` is `false`.
+ *
+ * @param p - The pricing plan to evaluate
+ * @returns An object with:
+ *  - `m1`: monthly USD amount or `null`
+ *  - `m3`: three-month USD total or `null`
+ *  - `m12`: twelve-month USD total using `annualMonthlyUsd` when provided otherwise `monthlyUsd`, or `null`
+ *  - `discounted`: `true` if `annualMonthlyUsd` is present, `false` otherwise
  */
 export function planAmounts(p: PricingPlan): {
   m1: number | null;
@@ -90,10 +95,10 @@ export function planAmounts(p: PricingPlan): {
 }
 
 /**
- * マトリクス用の代表最安価格テキストを返す純粋関数。
- * - Free($0) プランがあれば「無料〜」（他プランあり）または「無料」
- * - 全 null でなければ最小 monthlyUsd を「$X〜」
- * - 全 null なら先頭プランの priceNote
+ * Produce a representative lowest-price label for a set of pricing plans for display in a comparison matrix.
+ *
+ * @param plans - The pricing plans to evaluate
+ * @returns `'無料'` if only free plans exist, `'無料〜'` if a free plan exists alongside paid plans, `'$<min>〜'` when one or more numeric `monthlyUsd` values exist (using the minimum), or the first plan's `priceNote` (or `"—"`) when all `monthlyUsd` values are `null`.
  */
 export function representativePrice(plans: readonly PricingPlan[]): string {
   const hasFree = plans.some((p) => p.monthlyUsd === 0);
