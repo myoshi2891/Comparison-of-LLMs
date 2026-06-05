@@ -50,11 +50,11 @@ describe("/agent/openclaw-advanced-agent-security-guide - page structure", () =>
     expect(h1?.textContent).toMatch(/OpenClaw Agent/);
   });
 
-  it("renders all 12 expected section ids", () => {
+  it("renders all 13 expected sections (s1-s12 + sources)", () => {
     const { container } = render(<Page />);
     const sections = container.querySelectorAll('section[id^="s"]');
     expect(sections.length).toBe(13);
-    // We expect 12 sections starting with s1 through s12. Let's make sure we find them.
+    // Verify the 12 main content sections (s1-s12) are present
     for (const id of EXPECTED_SECTION_IDS) {
       const el = container.querySelector(`#${id}`);
       expect(el, `section id="${id}" must exist`).not.toBeNull();
