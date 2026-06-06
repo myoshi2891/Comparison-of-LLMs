@@ -87,8 +87,11 @@ jobs:
         # フォーク PR は SONAR_TOKEN シークレットを受け取れず失敗するためスキップ
         if: ${{ env.SONAR_TOKEN != '' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
         run: |
+          # bash -e (set -e) を一時的に無効化して npx の失敗で即終了しないようにする
+          set +e
           npx @sonar/scan -Dsonar.qualitygate.wait=true > sonar.log 2>&1
           SCAN_EXIT_CODE=$?
+          set -e
           echo "scan_exit_code=$SCAN_EXIT_CODE" >> $GITHUB_OUTPUT
 
       - name: Check SonarQube Scan Status
