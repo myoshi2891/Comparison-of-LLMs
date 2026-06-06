@@ -72,7 +72,7 @@ describe("/agent/openclaw-advanced-agent-security-guide - page structure", () =>
 });
 
 describe("/agent/openclaw-advanced-agent-security-guide - external link safety", () => {
-  it("all external http(s) links have target='_blank' and rel containing 'external noopener noreferrer'", () => {
+  it("all external http(s) links have correct target and rel attributes", () => {
     const { container } = render(<Page />);
     const externals = Array.from(container.querySelectorAll("a")).filter((a) => {
       const href = a.getAttribute("href") ?? "";
