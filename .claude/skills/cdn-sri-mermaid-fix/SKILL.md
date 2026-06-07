@@ -37,12 +37,21 @@ const fs = require('fs');
 const crypto = require('crypto');
 
 const content = fs.readFileSync('temp_ts.js');
+const sha384 = crypto.createHash('sha384').update(content).digest('base64');
 const sha512 = crypto.createHash('sha512').update(content).digest('base64');
+
+console.log(`sha384-${sha384}`);
 console.log(`sha512-${sha512}`);
 ```
 
 4. **ハッシュ計算後の一時ファイルの削除**:
    不要な一時ファイルは必ず削除し、Workspace をクリーンに保ちます。
+
+   **削除コマンド例 (Bash / macOS / Linux):**
+   ```bash
+   rm -f temp_ts.js hash_calc.js
+   ```
+   *Note: `-f` フラグを使用することで、ファイルが存在しない場合のエラー出力を防ぎ、安全に削除できます。Windows (PowerShell) 環境では `Remove-Item -ErrorAction SilentlyContinue temp_ts.js, hash_calc.js` などの代替コマンドが利用可能です。*
 
 ---
 
