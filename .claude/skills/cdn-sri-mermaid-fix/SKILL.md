@@ -48,10 +48,12 @@ console.log(`sha512-${sha512}`);
    不要な一時ファイルは必ず削除し、Workspace をクリーンに保ちます。
 
    **削除コマンド例 (Bash / macOS / Linux):**
-   ```bash
-   rm -f temp_ts.js hash_calc.js
-   ```
-   *Note: `-f` フラグを使用することで、ファイルが存在しない場合のエラー出力を防ぎ、安全に削除できます。Windows (PowerShell) 環境では `Remove-Item -ErrorAction SilentlyContinue temp_ts.js, hash_calc.js` などの代替コマンドが利用可能です。*
+
+```bash
+rm -f temp_ts.js hash_calc.js
+```
+
+  *Note: `-f` フラグを使用することで、ファイルが存在しない場合のエラー出力を防ぎ、安全に削除できます。Windows (PowerShell) 環境では `Remove-Item -ErrorAction SilentlyContinue temp_ts.js, hash_calc.js` などの代替コマンドが利用可能です。*
 
 ---
 
