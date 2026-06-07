@@ -1,3 +1,4 @@
+/* biome-ignore-all lint/suspicious/noTemplateCurlyInString: code examples contain bash/yaml variables */
 "use client";
 
 import { useEffect, useRef, useState } from "react";

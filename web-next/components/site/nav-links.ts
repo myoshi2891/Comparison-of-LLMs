@@ -86,8 +86,11 @@ export const navLinks: readonly NavLink[] = [
     ],
   },
   {
-    name: "Hermes",
-    children: [{ name: "Advanced Guide", href: "/agent/hermes-agent-advanced-guide" }],
+    name: "Agent",
+    children: [
+      { name: "Advanced Guide", href: "/agent/hermes-agent-advanced-guide" },
+      { name: "OpenClaw Security Guide", href: "/agent/openclaw-advanced-agent-security-guide" },
+    ],
   },
   { name: "Git Worktree", href: "/git-worktree" },
 ];

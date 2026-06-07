@@ -438,6 +438,18 @@
 }
 
 /* Code Blocks */
+.codeBlock {
+  background: #0d1117;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  margin: 1.25rem 0;
+  white-space: pre;
+}
 .codeBlockHeader {
   display: flex;
   align-items: center;
@@ -476,18 +488,6 @@
 .codeLang {
   color: var(--neon-cyan);
   font-weight: 700;
-}
-.codeBlock {
-  background: #0d1117;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.25rem 1.5rem;
-  font-family: var(--font-mono);
-  font-size: 0.875rem;
-  line-height: 1.7;
-  overflow-x: auto;
-  margin: 1.25rem 0;
-  white-space: pre;
 }
 .codeLine {
   white-space: pre;

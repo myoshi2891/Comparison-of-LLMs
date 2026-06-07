@@ -58,13 +58,32 @@ describe("Phase A - nav-links top-level entries", () => {
     expect("href" in last && last.href === "/git-worktree").toBe(true);
   });
 
-  it("has Claude/Gemini/Codex/Copilot/Code Review/Hermes as dropdowns with children", () => {
-    const providers = ["Claude", "Gemini", "Codex", "Copilot", "Code Review", "Hermes"] as const;
+  it("has Claude/Gemini/Codex/Copilot/Code Review/Agent as dropdowns with children", () => {
+    const providers = ["Claude", "Gemini", "Codex", "Copilot", "Code Review", "Agent"] as const;
     for (const name of providers) {
       const entry = navLinks.find((link) => link.name === name);
       expect(entry, `${name} must exist`).toBeDefined();
       expect(entry && "children" in entry && Array.isArray(entry.children)).toBe(true);
     }
+  });
+});
+
+describe("Phase A - Agent dropdown shape", () => {
+  const agent = navLinks.find((link) => link.name === "Agent");
+
+  it("has 2 child entries (advanced guide / openclaw security guide)", () => {
+    expect(agent && "children" in agent).toBe(true);
+    const children = agent && "children" in agent ? agent.children : [];
+    expect(children.length).toBe(2);
+  });
+
+  it("uses clean URL paths for all Agent children (no .html extension)", () => {
+    const children = agent && "children" in agent ? agent.children : [];
+    const expectedHrefs = [
+      "/agent/hermes-agent-advanced-guide",
+      "/agent/openclaw-advanced-agent-security-guide",
+    ];
+    expect(children.map((c) => c.href)).toEqual(expectedHrefs);
   });
 });
 
