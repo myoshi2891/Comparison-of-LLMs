@@ -111,11 +111,12 @@ const DIAG_MCP = `flowchart TD
 interface ExtProps {
   href: string;
   children: React.ReactNode;
+  className?: string;
 }
 
-function Ext({ href, children }: ExtProps) {
+function Ext({ href, children, className }: ExtProps) {
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer">
+    <a href={href} className={className} target="_blank" rel="noopener noreferrer">
       {children}
     </a>
   );
@@ -268,13 +269,36 @@ export default function Page() {
             >
               <title>システムアーキテクチャ概要</title>
               <rect width="880" height="456" fill="#0f0f28" rx="8" />
-              <text x="440" y="36" textAnchor="middle" fontSize="16" fontWeight="700" fill="#e2e8f0">
+              <text
+                x="440"
+                y="36"
+                textAnchor="middle"
+                fontSize="16"
+                fontWeight="700"
+                fill="#e2e8f0"
+              >
                 Claude Self-hosted Sandboxes — アーキテクチャ概要
               </text>
 
               {/* Left zone: Anthropic Cloud */}
-              <rect x="18" y="52" width="372" height="388" rx="14" fill="#111138" stroke="#4285f4" strokeWidth="2" />
-              <text x="204" y="82" textAnchor="middle" fontSize="13" fontWeight="700" fill="#7dd3fc">
+              <rect
+                x="18"
+                y="52"
+                width="372"
+                height="388"
+                rx="14"
+                fill="#111138"
+                stroke="#4285f4"
+                strokeWidth="2"
+              />
+              <text
+                x="204"
+                y="82"
+                textAnchor="middle"
+                fontSize="13"
+                fontWeight="700"
+                fill="#7dd3fc"
+              >
                 ☁ Anthropic Cloud
               </text>
               <text x="204" y="100" textAnchor="middle" fontSize="10.5" fill="#64748b">
@@ -284,8 +308,24 @@ export default function Page() {
 
               {/* Claude Model */}
               <rect x="36" y="117" width="155" height="52" rx="8" fill="#1a2e5a" />
-              <rect x="36" y="117" width="155" height="52" rx="8" fill="none" stroke="#3b82f6" strokeWidth="1" />
-              <text x="113" y="141" textAnchor="middle" fontSize="11.5" fill="#93c5fd" fontWeight="600">
+              <rect
+                x="36"
+                y="117"
+                width="155"
+                height="52"
+                rx="8"
+                fill="none"
+                stroke="#3b82f6"
+                strokeWidth="1"
+              />
+              <text
+                x="113"
+                y="141"
+                textAnchor="middle"
+                fontSize="11.5"
+                fill="#93c5fd"
+                fontWeight="600"
+              >
                 🤖 Claude Model
               </text>
               <text x="113" y="157" textAnchor="middle" fontSize="9.5" fill="#64748b">
@@ -294,8 +334,24 @@ export default function Page() {
 
               {/* Orchestration */}
               <rect x="205" y="117" width="155" height="52" rx="8" fill="#1a2e5a" />
-              <rect x="205" y="117" width="155" height="52" rx="8" fill="none" stroke="#3b82f6" strokeWidth="1" />
-              <text x="282" y="141" textAnchor="middle" fontSize="11.5" fill="#93c5fd" fontWeight="600">
+              <rect
+                x="205"
+                y="117"
+                width="155"
+                height="52"
+                rx="8"
+                fill="none"
+                stroke="#3b82f6"
+                strokeWidth="1"
+              />
+              <text
+                x="282"
+                y="141"
+                textAnchor="middle"
+                fontSize="11.5"
+                fill="#93c5fd"
+                fontWeight="600"
+              >
                 ⚙ Orchestration
               </text>
               <text x="282" y="157" textAnchor="middle" fontSize="9.5" fill="#64748b">
@@ -303,8 +359,24 @@ export default function Page() {
               </text>
 
               {/* Work Queue */}
-              <rect x="36" y="186" width="324" height="64" rx="8" fill="#1e1650" stroke="#8b5cf6" strokeWidth="1.5" />
-              <text x="198" y="213" textAnchor="middle" fontSize="12.5" fill="#c4b5fd" fontWeight="700">
+              <rect
+                x="36"
+                y="186"
+                width="324"
+                height="64"
+                rx="8"
+                fill="#1e1650"
+                stroke="#8b5cf6"
+                strokeWidth="1.5"
+              />
+              <text
+                x="198"
+                y="213"
+                textAnchor="middle"
+                fontSize="12.5"
+                fill="#c4b5fd"
+                fontWeight="700"
+              >
                 📬 Work Queue
               </text>
               <text x="198" y="232" textAnchor="middle" fontSize="9.5" fill="#64748b">
@@ -312,16 +384,48 @@ export default function Page() {
               </text>
 
               {/* Context / Error */}
-              <rect x="36" y="268" width="155" height="52" rx="8" fill="#172340" stroke="#1d4ed8" strokeWidth="1" />
-              <text x="113" y="292" textAnchor="middle" fontSize="11.5" fill="#7dd3fc" fontWeight="600">
+              <rect
+                x="36"
+                y="268"
+                width="155"
+                height="52"
+                rx="8"
+                fill="#172340"
+                stroke="#1d4ed8"
+                strokeWidth="1"
+              />
+              <text
+                x="113"
+                y="292"
+                textAnchor="middle"
+                fontSize="11.5"
+                fill="#7dd3fc"
+                fontWeight="600"
+              >
                 📝 Context Mgmt
               </text>
               <text x="113" y="308" textAnchor="middle" fontSize="9.5" fill="#64748b">
                 コンテキスト管理
               </text>
 
-              <rect x="205" y="268" width="155" height="52" rx="8" fill="#172340" stroke="#1d4ed8" strokeWidth="1" />
-              <text x="282" y="292" textAnchor="middle" fontSize="11.5" fill="#7dd3fc" fontWeight="600">
+              <rect
+                x="205"
+                y="268"
+                width="155"
+                height="52"
+                rx="8"
+                fill="#172340"
+                stroke="#1d4ed8"
+                strokeWidth="1"
+              />
+              <text
+                x="282"
+                y="292"
+                textAnchor="middle"
+                fontSize="11.5"
+                fill="#7dd3fc"
+                fontWeight="600"
+              >
                 🔄 Error Recovery
               </text>
               <text x="282" y="308" textAnchor="middle" fontSize="9.5" fill="#64748b">
@@ -329,8 +433,24 @@ export default function Page() {
               </text>
 
               {/* Sessions API */}
-              <rect x="36" y="338" width="324" height="52" rx="8" fill="#0e3320" stroke="#22c55e" strokeWidth="1.5" />
-              <text x="198" y="362" textAnchor="middle" fontSize="11.5" fill="#86efac" fontWeight="600">
+              <rect
+                x="36"
+                y="338"
+                width="324"
+                height="52"
+                rx="8"
+                fill="#0e3320"
+                stroke="#22c55e"
+                strokeWidth="1.5"
+              />
+              <text
+                x="198"
+                y="362"
+                textAnchor="middle"
+                fontSize="11.5"
+                fill="#86efac"
+                fontWeight="600"
+              >
                 🔗 Sessions API · Webhooks · SSE
               </text>
               <text x="198" y="380" textAnchor="middle" fontSize="9.5" fill="#64748b">
@@ -338,8 +458,24 @@ export default function Page() {
               </text>
 
               {/* Right zone: Your Infrastructure */}
-              <rect x="490" y="52" width="372" height="388" rx="14" fill="#0f2018" stroke="#22c55e" strokeWidth="2" />
-              <text x="676" y="82" textAnchor="middle" fontSize="13" fontWeight="700" fill="#86efac">
+              <rect
+                x="490"
+                y="52"
+                width="372"
+                height="388"
+                rx="14"
+                fill="#0f2018"
+                stroke="#22c55e"
+                strokeWidth="2"
+              />
+              <text
+                x="676"
+                y="82"
+                textAnchor="middle"
+                fontSize="13"
+                fontWeight="700"
+                fill="#86efac"
+              >
                 🏢 Your Infrastructure
               </text>
               <text x="676" y="100" textAnchor="middle" fontSize="10.5" fill="#64748b">
@@ -348,8 +484,24 @@ export default function Page() {
               <line x1="508" y1="109" x2="844" y2="109" stroke="#14532d" strokeWidth="1" />
 
               {/* Worker */}
-              <rect x="508" y="117" width="336" height="52" rx="8" fill="#14532d" stroke="#22c55e" strokeWidth="1.5" />
-              <text x="676" y="141" textAnchor="middle" fontSize="11.5" fill="#86efac" fontWeight="700">
+              <rect
+                x="508"
+                y="117"
+                width="336"
+                height="52"
+                rx="8"
+                fill="#14532d"
+                stroke="#22c55e"
+                strokeWidth="1.5"
+              />
+              <text
+                x="676"
+                y="141"
+                textAnchor="middle"
+                fontSize="11.5"
+                fill="#86efac"
+                fontWeight="700"
+              >
                 🖥 Environment Worker
               </text>
               <text x="676" y="157" textAnchor="middle" fontSize="9.5" fill="#64748b">
@@ -357,19 +509,49 @@ export default function Page() {
               </text>
 
               {/* Sandbox */}
-              <rect x="508" y="186" width="336" height="84" rx="8" fill="#052e16" stroke="#16a34a" strokeWidth="1" />
-              <text x="676" y="210" textAnchor="middle" fontSize="11.5" fill="#86efac" fontWeight="600">
+              <rect
+                x="508"
+                y="186"
+                width="336"
+                height="84"
+                rx="8"
+                fill="#052e16"
+                stroke="#16a34a"
+                strokeWidth="1"
+              />
+              <text
+                x="676"
+                y="210"
+                textAnchor="middle"
+                fontSize="11.5"
+                fill="#86efac"
+                fontWeight="600"
+              >
                 📦 Sandbox Container
               </text>
               <rect x="522" y="220" width="145" height="40" rx="5" fill="#14532d" />
-              <text x="594" y="238" textAnchor="middle" fontSize="9.5" fill="#bbf7d0" fontWeight="600">
+              <text
+                x="594"
+                y="238"
+                textAnchor="middle"
+                fontSize="9.5"
+                fill="#bbf7d0"
+                fontWeight="600"
+              >
                 /workspace
               </text>
               <text x="594" y="253" textAnchor="middle" fontSize="9" fill="#64748b">
                 スキル・作業ファイル
               </text>
               <rect x="679" y="220" width="151" height="40" rx="5" fill="#14532d" />
-              <text x="754" y="238" textAnchor="middle" fontSize="9.5" fill="#bbf7d0" fontWeight="600">
+              <text
+                x="754"
+                y="238"
+                textAnchor="middle"
+                fontSize="9.5"
+                fill="#bbf7d0"
+                fontWeight="600"
+              >
                 /mnt/session/outputs
               </text>
               <text x="754" y="253" textAnchor="middle" fontSize="9" fill="#64748b">
@@ -377,16 +559,48 @@ export default function Page() {
               </text>
 
               {/* Tool Execution / Internal */}
-              <rect x="508" y="288" width="158" height="52" rx="8" fill="#14532d" stroke="#16a34a" strokeWidth="1" />
-              <text x="587" y="312" textAnchor="middle" fontSize="11.5" fill="#86efac" fontWeight="600">
+              <rect
+                x="508"
+                y="288"
+                width="158"
+                height="52"
+                rx="8"
+                fill="#14532d"
+                stroke="#16a34a"
+                strokeWidth="1"
+              />
+              <text
+                x="587"
+                y="312"
+                textAnchor="middle"
+                fontSize="11.5"
+                fill="#86efac"
+                fontWeight="600"
+              >
                 🔧 Tool Execution
               </text>
               <text x="587" y="328" textAnchor="middle" fontSize="9.5" fill="#64748b">
                 Bash / File / Web
               </text>
 
-              <rect x="678" y="288" width="158" height="52" rx="8" fill="#14532d" stroke="#16a34a" strokeWidth="1" />
-              <text x="757" y="312" textAnchor="middle" fontSize="11.5" fill="#86efac" fontWeight="600">
+              <rect
+                x="678"
+                y="288"
+                width="158"
+                height="52"
+                rx="8"
+                fill="#14532d"
+                stroke="#16a34a"
+                strokeWidth="1"
+              />
+              <text
+                x="757"
+                y="312"
+                textAnchor="middle"
+                fontSize="11.5"
+                fill="#86efac"
+                fontWeight="600"
+              >
                 🌐 Internal Services
               </text>
               <text x="757" y="328" textAnchor="middle" fontSize="9.5" fill="#64748b">
@@ -394,8 +608,24 @@ export default function Page() {
               </text>
 
               {/* Security Controls */}
-              <rect x="508" y="358" width="336" height="38" rx="8" fill="#052e16" stroke="#16a34a" strokeWidth="1" />
-              <text x="676" y="374" textAnchor="middle" fontSize="10.5" fill="#86efac" fontWeight="600">
+              <rect
+                x="508"
+                y="358"
+                width="336"
+                height="38"
+                rx="8"
+                fill="#052e16"
+                stroke="#16a34a"
+                strokeWidth="1"
+              />
+              <text
+                x="676"
+                y="374"
+                textAnchor="middle"
+                fontSize="10.5"
+                fill="#86efac"
+                fontWeight="600"
+              >
                 🔒 VPC · Firewall · Audit Log · Compliance
               </text>
               <text x="676" y="389" textAnchor="middle" fontSize="9" fill="#64748b">
@@ -403,7 +633,15 @@ export default function Page() {
               </text>
 
               {/* Network boundary */}
-              <line x1="433" y1="52" x2="433" y2="430" stroke="#334155" strokeWidth="1.5" strokeDasharray="10 6" />
+              <line
+                x1="433"
+                y1="52"
+                x2="433"
+                y2="430"
+                stroke="#334155"
+                strokeWidth="1.5"
+                strokeDasharray="10 6"
+              />
               <rect x="378" y="432" width="112" height="16" rx="3" fill="#0f0f28" />
               <text x="434" y="443" textAnchor="middle" fontSize="9.5" fill="#64748b">
                 ネットワーク境界
@@ -411,10 +649,26 @@ export default function Page() {
 
               {/* Arrows */}
               <defs>
-                <marker id="mb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                <marker
+                  id="mb"
+                  viewBox="0 0 10 10"
+                  refX="9"
+                  refY="5"
+                  markerWidth="7"
+                  markerHeight="7"
+                  orient="auto"
+                >
                   <polygon points="0,1 9,5 0,9" fill="#8b5cf6" />
                 </marker>
-                <marker id="mg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                <marker
+                  id="mg"
+                  viewBox="0 0 10 10"
+                  refX="9"
+                  refY="5"
+                  markerWidth="7"
+                  markerHeight="7"
+                  orient="auto"
+                >
                   <polygon points="0,1 9,5 0,9" fill="#22c55e" />
                 </marker>
               </defs>
@@ -428,8 +682,24 @@ export default function Page() {
                 strokeDasharray="7 3"
                 markerEnd="url(#mb)"
               />
-              <rect x="403" y="194" width="62" height="16" rx="4" fill="#0f0f28" stroke="#8b5cf6" strokeWidth="1" />
-              <text x="434" y="206" textAnchor="middle" fontSize="9" fill="#c4b5fd" fontWeight="700">
+              <rect
+                x="403"
+                y="194"
+                width="62"
+                height="16"
+                rx="4"
+                fill="#0f0f28"
+                stroke="#8b5cf6"
+                strokeWidth="1"
+              />
+              <text
+                x="434"
+                y="206"
+                textAnchor="middle"
+                fontSize="9"
+                fill="#c4b5fd"
+                fontWeight="700"
+              >
                 ① Poll
               </text>
               <line
@@ -442,8 +712,24 @@ export default function Page() {
                 strokeDasharray="7 3"
                 markerEnd="url(#mg)"
               />
-              <rect x="401" y="238" width="68" height="16" rx="4" fill="#0f0f28" stroke="#22c55e" strokeWidth="1" />
-              <text x="435" y="250" textAnchor="middle" fontSize="9" fill="#86efac" fontWeight="700">
+              <rect
+                x="401"
+                y="238"
+                width="68"
+                height="16"
+                rx="4"
+                fill="#0f0f28"
+                stroke="#22c55e"
+                strokeWidth="1"
+              />
+              <text
+                x="435"
+                y="250"
+                textAnchor="middle"
+                fontSize="9"
+                fill="#86efac"
+                fontWeight="700"
+              >
                 ② Results
               </text>
             </svg>
@@ -543,7 +829,9 @@ export default function Page() {
                   <td className={styles.tl}>社内サービスアクセス</td>
                   <td>限定的</td>
                   <td>
-                    <span className={`${styles.badge} ${styles.bg}`}>✅ プライベートネットワーク経由</span>
+                    <span className={`${styles.badge} ${styles.bg}`}>
+                      ✅ プライベートネットワーク経由
+                    </span>
                   </td>
                 </tr>
                 <tr>
@@ -556,7 +844,9 @@ export default function Page() {
                 <tr>
                   <td className={styles.tl}>ZDR / HIPAA BAA 対象</td>
                   <td>
-                    <span className={`${styles.badge} ${styles.br}`}>❌ 非対象（Managed Agents全体）</span>
+                    <span className={`${styles.badge} ${styles.br}`}>
+                      ❌ 非対象（Managed Agents全体）
+                    </span>
                   </td>
                   <td>
                     <span className={`${styles.badge} ${styles.br}`}>❌ 同左</span>
@@ -575,7 +865,8 @@ export default function Page() {
             <span className={styles.caI}>⚠️</span>
             <p>
               <strong>注意:</strong> Managed Agents はステートフルな設計のため、現時点では{" "}
-              <strong>Zero Data Retention (ZDR)</strong> および <strong>HIPAA BAA</strong> の対象外です。詳細:{" "}
+              <strong>Zero Data Retention (ZDR)</strong> および <strong>HIPAA BAA</strong>{" "}
+              の対象外です。詳細:{" "}
               <Ext href="https://platform.claude.com/docs/en/manage-claude/api-and-data-retention#feature-eligibility">
                 API and data retention
               </Ext>
@@ -645,7 +936,9 @@ export default function Page() {
               <tbody>
                 <tr>
                   <td className={styles.tl}>Clay</td>
-                  <td>GTM エンジニアリングエージェント「Sculptor」でワークフローを自律構築・テスト</td>
+                  <td>
+                    GTM エンジニアリングエージェント「Sculptor」でワークフローを自律構築・テスト
+                  </td>
                   <td>Daytona</td>
                 </tr>
                 <tr>
@@ -714,7 +1007,9 @@ export default function Page() {
                       <code>sk-ant-...</code> 形式
                     </td>
                     <td>
-                      <Ext href="https://platform.claude.com/settings/keys">platform.claude.com/settings/keys</Ext>
+                      <Ext href="https://platform.claude.com/settings/keys">
+                        platform.claude.com/settings/keys
+                      </Ext>
                     </td>
                   </tr>
                   <tr>
@@ -837,14 +1132,21 @@ export default function Page() {
                     agent = client.beta.agents.<span className={styles.fn}>create</span>(
                   </div>
                   <div className={styles.codeLine}>
-                    {"    "}name=<span className={styles.st}>&quot;Self-hosted Demo Agent&quot;</span>,
+                    {"    "}name=
+                    <span className={styles.st}>&quot;Self-hosted Demo Agent&quot;</span>,
                   </div>
                   <div className={styles.codeLine}>
-                    {"    "}model=<span className={styles.st}>&quot;claude-opus-4-latest&quot;</span>,{"      "}
-                    <span className={styles.cc}># 必要に応じて Managed Agents 対応の最新モデルに置き換えてください</span>
+                    {"    "}model=
+                    <span className={styles.st}>&quot;claude-opus-4-latest&quot;</span>,{"      "}
+                    <span className={styles.cc}>
+                      # 必要に応じて Managed Agents 対応の最新モデルに置き換えてください
+                    </span>
                   </div>
                   <div className={styles.codeLine}>
-                    {"    "}system_prompt=<span className={styles.st}>&quot;&quot;&quot;You are a helpful coding assistant.</span>
+                    {"    "}system_prompt=
+                    <span className={styles.st}>
+                      &quot;&quot;&quot;You are a helpful coding assistant.
+                    </span>
                   </div>
                   <div className={styles.codeLine}>
                     <span className={styles.st}>Your working directory is /workspace.</span>
@@ -853,7 +1155,9 @@ export default function Page() {
                     <span className={styles.st}>Skills are available at /workspace/skills/.</span>
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.st}>Output files should be written to /mnt/session/outputs.</span>
+                    <span className={styles.st}>
+                      Output files should be written to /mnt/session/outputs.
+                    </span>
                   </div>
                   <div className={styles.codeLine}>
                     <span className={styles.st}>&quot;&quot;&quot;</span>,
@@ -861,8 +1165,10 @@ export default function Page() {
                   <div className={styles.codeLine}>)</div>
                   <div className={styles.codeLine} />
                   <div className={styles.codeLine}>
-                    <span className={styles.fn}>print</span>(f<span className={styles.st}>&quot;Agent ID: &#123;agent.id&#125;&quot;</span>)
-                    {"  "}<span className={styles.cc}># agent_01XxXx...</span>
+                    <span className={styles.fn}>print</span>(f
+                    <span className={styles.st}>&quot;Agent ID: &#123;agent.id&#125;&quot;</span>)
+                    {"  "}
+                    <span className={styles.cc}># agent_01XxXx...</span>
                   </div>
                 </code>
               </pre>
@@ -897,24 +1203,35 @@ export default function Page() {
               <pre>
                 <code>
                   <div className={styles.codeLine}>
-                    environment = client.beta.environments.<span className={styles.fn}>create</span>(
+                    environment = client.beta.environments.<span className={styles.fn}>create</span>
+                    (
                   </div>
                   <div className={styles.codeLine}>
-                    {"    "}name=<span className={styles.st}>&quot;Production Self-hosted Environment&quot;</span>,
+                    {"    "}name=
+                    <span className={styles.st}>
+                      &quot;Production Self-hosted Environment&quot;
+                    </span>
+                    ,
                   </div>
                   <div className={styles.codeLine}>
                     {"    "}type=<span className={styles.st}>&quot;self_hosted&quot;</span>,
                   </div>
-                  <div className={styles.codeLine}>
-                    )
-                  </div>
+                  <div className={styles.codeLine}>)</div>
                   <div className={styles.codeLine} />
                   <div className={styles.codeLine}>
-                    <span className={styles.fn}>print</span>(f<span className={styles.st}>&quot;Environment ID : &#123;environment.id&#125;&quot;</span>)
+                    <span className={styles.fn}>print</span>(f
+                    <span className={styles.st}>
+                      &quot;Environment ID : &#123;environment.id&#125;&quot;
+                    </span>
+                    )
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.fn}>print</span>(f<span className={styles.st}>&quot;Environment Key: &#123;environment.key&#125;&quot;</span>)
-                    {"  "}<span className={styles.cc}># &lt;-- 必ずシークレットマネージャーへ！</span>
+                    <span className={styles.fn}>print</span>(f
+                    <span className={styles.st}>
+                      &quot;Environment Key: &#123;environment.key&#125;&quot;
+                    </span>
+                    ){"  "}
+                    <span className={styles.cc}># &lt;-- 必ずシークレットマネージャーへ！</span>
                   </div>
                 </code>
               </pre>
@@ -950,9 +1267,11 @@ export default function Page() {
             <div className={`${styles.ca} ${styles.caR}`}>
               <span className={styles.caI}>🔑</span>
               <p>
-                <strong>AWS を使用する場合：</strong> Claude Platform on AWS では環境キーの代わりに AWS IAM（SigV4）で認証します。IAM
-                プリンシパルに <code>AnthropicSelfHostedEnvironmentAccess</code>{" "}
-                マネージドポリシーをアタッチしてください。Console で生成した環境キーは AWS エンドポイントでは動作しません。
+                <strong>AWS を使用する場合：</strong> Claude Platform on AWS では環境キーの代わりに
+                AWS IAM（SigV4）で認証します。IAM プリンシパルに{" "}
+                <code>AnthropicSelfHostedEnvironmentAccess</code>{" "}
+                マネージドポリシーをアタッチしてください。Console で生成した環境キーは AWS
+                エンドポイントでは動作しません。
               </p>
             </div>
           </div>
@@ -965,7 +1284,9 @@ export default function Page() {
               <span className={`${styles.tag} ${styles.tv}`}>核心部分</span>
               <span className={`${styles.tag} ${styles.ta}`}>パターンを選択</span>
             </div>
-            <p>ワーカーはワークキューをポーリングしてツール呼び出しをローカルで実行するプロセスです。</p>
+            <p>
+              ワーカーはワークキューをポーリングしてツール呼び出しをローカルで実行するプロセスです。
+            </p>
 
             <h4>パターン A: Always-on（ant CLI）— 最もシンプル</h4>
             <div className={styles.cb}>
@@ -998,11 +1319,14 @@ export default function Page() {
                   </div>
                   <div className={styles.codeLine} />
                   <div className={styles.codeLine}>
-                    <span className={styles.cc}># 作業ディレクトリを変更する場合（システムプロンプトも合わせて更新すること）</span>
+                    <span className={styles.cc}>
+                      # 作業ディレクトリを変更する場合（システムプロンプトも合わせて更新すること）
+                    </span>
                   </div>
                   <div className={styles.codeLine}>
                     <span className={styles.kw}>ant</span> worker --environment-id{" "}
-                    <span className={styles.st}>&quot;$ANTHROPIC_ENVIRONMENT_ID&quot;</span> --workdir /custom/workspace
+                    <span className={styles.st}>&quot;$ANTHROPIC_ENVIRONMENT_ID&quot;</span>{" "}
+                    --workdir /custom/workspace
                   </div>
                 </code>
               </pre>
@@ -1035,18 +1359,21 @@ export default function Page() {
                     worker = anthropic.beta.<span className={styles.fn}>EnvironmentWorker</span>(
                   </div>
                   <div className={styles.codeLine}>
-                    {"    "}environment_id=os.environ[<span className={styles.st}>&quot;ANTHROPIC_ENVIRONMENT_ID&quot;</span>],
+                    {"    "}environment_id=os.environ[
+                    <span className={styles.st}>&quot;ANTHROPIC_ENVIRONMENT_ID&quot;</span>],
                   </div>
                   <div className={styles.codeLine}>
-                    {"    "}environment_key=os.environ[<span className={styles.st}>&quot;ANTHROPIC_ENVIRONMENT_KEY&quot;</span>],
+                    {"    "}environment_key=os.environ[
+                    <span className={styles.st}>&quot;ANTHROPIC_ENVIRONMENT_KEY&quot;</span>],
                   </div>
-                  <div className={styles.codeLine}>
-                    )
-                  </div>
+                  <div className={styles.codeLine}>)</div>
                   <div className={styles.codeLine} />
                   <div className={styles.codeLine}>
                     worker.<span className={styles.fn}>run</span>()
-                    {"  "}<span className={styles.cc}># ブロッキング実行（Ctrl+C でグレースフルシャットダウン）</span>
+                    {"  "}
+                    <span className={styles.cc}>
+                      # ブロッキング実行（Ctrl+C でグレースフルシャットダウン）
+                    </span>
                   </div>
                 </code>
               </pre>
@@ -1075,7 +1402,8 @@ export default function Page() {
                     <span className={styles.kw}>import</span> anthropic
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.kw}>from</span> flask <span className={styles.kw}>import</span> Flask, request, jsonify
+                    <span className={styles.kw}>from</span> flask{" "}
+                    <span className={styles.kw}>import</span> Flask, request, jsonify
                   </div>
                   <div className={styles.codeLine} />
                   <div className={styles.codeLine}>
@@ -1083,19 +1411,21 @@ export default function Page() {
                   </div>
                   <div className={styles.codeLine} />
                   <div className={styles.codeLine}>
-                    <span className={styles.op}>@</span>app.<span className={styles.fn}>route</span>(
-                    <span className={styles.st}>&quot;/webhook/anthropic&quot;</span>, methods=[
+                    <span className={styles.op}>@</span>app.<span className={styles.fn}>route</span>
+                    (<span className={styles.st}>&quot;/webhook/anthropic&quot;</span>, methods=[
                     <span className={styles.st}>&quot;POST&quot;</span>])
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.kw}>def</span> <span className={styles.fn}>handle_webhook</span>():
+                    <span className={styles.kw}>def</span>{" "}
+                    <span className={styles.fn}>handle_webhook</span>():
                   </div>
                   <div className={styles.codeLine}>
                     {"    "}payload = request.<span className={styles.fn}>get_json</span>()
                   </div>
                   <div className={styles.codeLine}>
                     {"    "}
-                    <span className={styles.kw}>if</span> payload.<span className={styles.fn}>get</span>(
+                    <span className={styles.kw}>if</span> payload.
+                    <span className={styles.fn}>get</span>(
                     <span className={styles.st}>&quot;type&quot;</span>) =={" "}
                     <span className={styles.st}>&quot;session.status_run_started&quot;</span>:
                   </div>
@@ -1104,7 +1434,8 @@ export default function Page() {
                     <span className={styles.cc}># セッション開始時だけワーカーを起動</span>
                   </div>
                   <div className={styles.codeLine}>
-                    {"        "}worker = anthropic.beta.<span className={styles.fn}>EnvironmentWorker</span>(
+                    {"        "}worker = anthropic.beta.
+                    <span className={styles.fn}>EnvironmentWorker</span>(
                   </div>
                   <div className={styles.codeLine}>
                     {"            "}environment_id=os.environ[
@@ -1114,16 +1445,16 @@ export default function Page() {
                     {"            "}environment_key=os.environ[
                     <span className={styles.st}>&quot;ANTHROPIC_ENVIRONMENT_KEY&quot;</span>],
                   </div>
-                  <div className={styles.codeLine}>
-                    {"        "})
-                  </div>
+                  <div className={styles.codeLine}>{"        "})</div>
                   <div className={styles.codeLine}>
                     {"        "}worker.<span className={styles.fn}>run_until_empty</span>()
-                    {"  "}<span className={styles.cc}># キューが空になったら自動終了</span>
+                    {"  "}
+                    <span className={styles.cc}># キューが空になったら自動終了</span>
                   </div>
                   <div className={styles.codeLine}>
                     {"    "}
-                    <span className={styles.kw}>return</span> <span className={styles.fn}>jsonify</span>(&#123;
+                    <span className={styles.kw}>return</span>{" "}
+                    <span className={styles.fn}>jsonify</span>(&#123;
                     <span className={styles.st}>&quot;status&quot;</span>:{" "}
                     <span className={styles.st}>&quot;ok&quot;</span>&#125;)
                   </div>
@@ -1133,7 +1464,8 @@ export default function Page() {
                     <span className={styles.st}>&quot;__main__&quot;</span>:
                   </div>
                   <div className={styles.codeLine}>
-                    {"    "}app.<span className={styles.fn}>run</span>(port=<span className={styles.nm}>8080</span>)
+                    {"    "}app.<span className={styles.fn}>run</span>(port=
+                    <span className={styles.nm}>8080</span>)
                   </div>
                 </code>
               </pre>
@@ -1176,62 +1508,70 @@ export default function Page() {
                   <div className={styles.codeLine}>
                     session = client.beta.sessions.<span className={styles.fn}>create</span>(
                   </div>
+                  <div className={styles.codeLine}>{"    "}agent=agent.id,</div>
+                  <div className={styles.codeLine}>{"    "}environment_id=environment.id,</div>
+                  <div className={styles.codeLine}>{"    "}metadata=&#123;</div>
                   <div className={styles.codeLine}>
-                    {"    "}agent=agent.id,
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"    "}environment_id=environment.id,
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"    "}metadata=&#123;
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"        "}<span className={styles.st}>&quot;input_file&quot;</span>:{" "}
-                    <span className={styles.st}>&quot;s3://my-bucket/sensitive-data.csv&quot;</span>,{"  "}
+                    {"        "}
+                    <span className={styles.st}>&quot;input_file&quot;</span>:{" "}
+                    <span className={styles.st}>&quot;s3://my-bucket/sensitive-data.csv&quot;</span>
+                    ,{"  "}
                     <span className={styles.cc}># ワーカーが読み取る</span>
                   </div>
                   <div className={styles.codeLine}>
-                    {"        "}<span className={styles.st}>&quot;user_id&quot;</span>:{"    "}
+                    {"        "}
+                    <span className={styles.st}>&quot;user_id&quot;</span>:{"    "}
                     <span className={styles.st}>&quot;user_12345&quot;</span>,
                   </div>
                   <div className={styles.codeLine}>
-                    {"        "}<span className={styles.st}>&quot;task&quot;</span>:{"       "}
+                    {"        "}
+                    <span className={styles.st}>&quot;task&quot;</span>:{"       "}
                     <span className={styles.st}>&quot;analyze_q1_report&quot;</span>,
                   </div>
-                  <div className={styles.codeLine}>
-                    {"    "}&#125;,
-                  </div>
+                  <div className={styles.codeLine}>{"    "}&#125;,</div>
                   <div className={styles.codeLine}>)</div>
                   <div className={styles.codeLine} />
                   <div className={styles.codeLine}>
-                    <span className={styles.fn}>print</span>(f<span className={styles.st}>&quot;Session ID: &#123;session.id&#125;&quot;</span>)
+                    <span className={styles.fn}>print</span>(f
+                    <span className={styles.st}>
+                      &quot;Session ID: &#123;session.id&#125;&quot;
+                    </span>
+                    )
                   </div>
                   <div className={styles.codeLine} />
                   <div className={styles.codeLine}>
                     <span className={styles.cc}># SSE でイベントをストリーミング受信</span>
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.kw}>for</span> event <span className={styles.kw}>in</span> client.beta.sessions.
+                    <span className={styles.kw}>for</span> event{" "}
+                    <span className={styles.kw}>in</span> client.beta.sessions.
                     <span className={styles.fn}>stream_events</span>(session.id):
                   </div>
                   <div className={styles.codeLine}>
-                    {"    "}<span className={styles.kw}>if</span> event.type =={" "}
+                    {"    "}
+                    <span className={styles.kw}>if</span> event.type =={" "}
                     <span className={styles.st}>&quot;content_block_delta&quot;</span>:
                   </div>
                   <div className={styles.codeLine}>
-                    {"        "}<span className={styles.fn}>print</span>(event.delta.text, end=
-                    <span className={styles.st}>&quot;&quot;</span>, flush=<span className={styles.kw}>True</span>)
+                    {"        "}
+                    <span className={styles.fn}>print</span>(event.delta.text, end=
+                    <span className={styles.st}>&quot;&quot;</span>, flush=
+                    <span className={styles.kw}>True</span>)
                   </div>
                   <div className={styles.codeLine}>
-                    {"    "}<span className={styles.kw}>else</span> <span className={styles.kw}>if</span> event.type =={" "}
+                    {"    "}
+                    <span className={styles.kw}>else</span> <span className={styles.kw}>if</span>{" "}
+                    event.type =={" "}
                     <span className={styles.st}>&quot;session.status_completed&quot;</span>:
                   </div>
                   <div className={styles.codeLine}>
-                    {"        "}<span className={styles.fn}>print</span>(
+                    {"        "}
+                    <span className={styles.fn}>print</span>(
                     <span className={styles.st}>&quot;\\n\\n🎉 セッション完了&quot;</span>)
                   </div>
                   <div className={styles.codeLine}>
-                    {"        "}<span className={styles.kw}>break</span>
+                    {"        "}
+                    <span className={styles.kw}>break</span>
                   </div>
                 </code>
               </pre>
@@ -1239,14 +1579,17 @@ export default function Page() {
             <div className={`${styles.ca} ${styles.caA}`}>
               <span className={styles.caI}>📌</span>
               <p>
-                <strong>ファイルとリポジトリ：</strong> Cloud 環境と異なり、ファイル・GitHub リポジトリのマウントは Anthropic が管理しません。
-                <code>metadata</code> でパスを渡してワーカー側で処理するか、コンテナイメージに組み込んでください。
+                <strong>ファイルとリポジトリ：</strong> Cloud 環境と異なり、ファイル・GitHub
+                リポジトリのマウントは Anthropic が管理しません。
+                <code>metadata</code>{" "}
+                でパスを渡してワーカー側で処理するか、コンテナイメージに組み込んでください。
               </p>
             </div>
             <div className={`${styles.ca} ${styles.caR}`}>
               <span className={styles.caI}>🚫</span>
               <p>
-                <strong>制限：</strong> Self-hosted サンドボックスでは現在 <strong>Memory（永続メモリ）</strong> はサポートされていません。
+                <strong>制限：</strong> Self-hosted サンドボックスでは現在{" "}
+                <strong>Memory（永続メモリ）</strong> はサポートされていません。
               </p>
             </div>
           </div>
@@ -1282,10 +1625,14 @@ export default function Page() {
                   </div>
                   <div className={styles.codeLine} />
                   <div className={styles.codeLine}>
-                    <span className={styles.cc}># ⚠️ 組織 API キー（ANTHROPIC_API_KEY）で認証すること</span>
+                    <span className={styles.cc}>
+                      # ⚠️ 組織 API キー（ANTHROPIC_API_KEY）で認証すること
+                    </span>
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.cc}># ワーカーホストから呼び出さない（組織スコープ認証情報の漏洩リスク）</span>
+                    <span className={styles.cc}>
+                      # ワーカーホストから呼び出さない（組織スコープ認証情報の漏洩リスク）
+                    </span>
                   </div>
                   <div className={styles.codeLine}>
                     client = anthropic.<span className={styles.fn}>Anthropic</span>()
@@ -1295,16 +1642,23 @@ export default function Page() {
                     stats = client.beta.environments.work.<span className={styles.fn}>stats</span>(
                   </div>
                   <div className={styles.codeLine}>
-                    {"    "}os.environ[<span className={styles.st}>&quot;ANTHROPIC_ENVIRONMENT_ID&quot;</span>]
+                    {"    "}os.environ[
+                    <span className={styles.st}>&quot;ANTHROPIC_ENVIRONMENT_ID&quot;</span>]
                   </div>
+                  <div className={styles.codeLine}>)</div>
                   <div className={styles.codeLine}>
+                    <span className={styles.fn}>print</span>(f
+                    <span className={styles.st}>
+                      &quot;depth=&#123;stats.depth&#125; pending=&#123;stats.pending&#125;&quot;
+                    </span>
                     )
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.fn}>print</span>(f<span className={styles.st}>&quot;depth=&#123;stats.depth&#125; pending=&#123;stats.pending&#125;&quot;</span>)
-                  </div>
-                  <div className={styles.codeLine}>
-                    <span className={styles.fn}>print</span>(f<span className={styles.st}>&quot;workers_polling=&#123;stats.workers_polling&#125;&quot;</span>)
+                    <span className={styles.fn}>print</span>(f
+                    <span className={styles.st}>
+                      &quot;workers_polling=&#123;stats.workers_polling&#125;&quot;
+                    </span>
+                    )
                   </div>
                 </code>
               </pre>
@@ -1494,13 +1848,36 @@ export default function Page() {
             >
               <title>セキュリティ責任分担モデル</title>
               <rect width="840" height="420" fill="#0f0f28" rx="8" />
-              <text x="420" y="34" textAnchor="middle" fontSize="15" fontWeight="700" fill="#e2e8f0">
+              <text
+                x="420"
+                y="34"
+                textAnchor="middle"
+                fontSize="15"
+                fontWeight="700"
+                fill="#e2e8f0"
+              >
                 セキュリティ責任分担モデル
               </text>
 
               {/* Left: Anthropic */}
-              <rect x="16" y="50" width="398" height="356" rx="12" fill="#111138" stroke="#3b82f6" strokeWidth="2" />
-              <text x="215" y="80" textAnchor="middle" fontSize="13" fontWeight="700" fill="#7dd3fc">
+              <rect
+                x="16"
+                y="50"
+                width="398"
+                height="356"
+                rx="12"
+                fill="#111138"
+                stroke="#3b82f6"
+                strokeWidth="2"
+              />
+              <text
+                x="215"
+                y="80"
+                textAnchor="middle"
+                fontSize="13"
+                fontWeight="700"
+                fill="#7dd3fc"
+              >
                 🛡 Anthropic が管理・保証
               </text>
               <line x1="32" y1="90" x2="396" y2="90" stroke="#1e3a5f" strokeWidth="1" />
@@ -1530,8 +1907,23 @@ export default function Page() {
                 Claude Platform インフラの運用・保守
               </text>
 
-              <line x1="32" y1="308" x2="396" y2="308" stroke="#1e3a5f" strokeWidth="1" strokeDasharray="4 3" />
-              <text x="215" y="328" textAnchor="middle" fontSize="10.5" fill="#64748b" fontStyle="italic">
+              <line
+                x1="32"
+                y1="308"
+                x2="396"
+                y2="308"
+                stroke="#1e3a5f"
+                strokeWidth="1"
+                strokeDasharray="4 3"
+              />
+              <text
+                x="215"
+                y="328"
+                textAnchor="middle"
+                fontSize="10.5"
+                fill="#64748b"
+                fontStyle="italic"
+              >
                 ⚠ Anthropic にできないこと
               </text>
               <text x="215" y="347" textAnchor="middle" fontSize="10" fill="#64748b">
@@ -1548,8 +1940,24 @@ export default function Page() {
               </text>
 
               {/* Right: You */}
-              <rect x="426" y="50" width="398" height="356" rx="12" fill="#1a1208" stroke="#d97706" strokeWidth="2" />
-              <text x="625" y="80" textAnchor="middle" fontSize="13" fontWeight="700" fill="#fbbf24">
+              <rect
+                x="426"
+                y="50"
+                width="398"
+                height="356"
+                rx="12"
+                fill="#1a1208"
+                stroke="#d97706"
+                strokeWidth="2"
+              />
+              <text
+                x="625"
+                y="80"
+                textAnchor="middle"
+                fontSize="13"
+                fontWeight="700"
+                fill="#fbbf24"
+              >
                 ⚠ あなたが担当・管理
               </text>
               <line x1="442" y1="90" x2="806" y2="90" stroke="#451a03" strokeWidth="1" />
@@ -1624,21 +2032,29 @@ export default function Page() {
                 <tr>
                   <td className={styles.tl}>漏洩キーの即時無効化</td>
                   <td>
-                    異常検出は可能だが瞬時の無効化は不可。<code>ANTHROPIC_ENVIRONMENT_KEY</code> は DB
-                    パスワードと同等に扱い、漏洩時は<strong>即座にローテーション</strong>
+                    異常検出は可能だが瞬時の無効化は不可。<code>ANTHROPIC_ENVIRONMENT_KEY</code> は
+                    DB パスワードと同等に扱い、漏洩時は<strong>即座にローテーション</strong>
                   </td>
                 </tr>
                 <tr>
                   <td className={styles.tl}>ワーカービルドの検証</td>
-                  <td>コンテナイメージを検査する仕組みがない。サプライチェーン攻撃はコントロールプレーンから検出不可</td>
+                  <td>
+                    コンテナイメージを検査する仕組みがない。サプライチェーン攻撃はコントロールプレーンから検出不可
+                  </td>
                 </tr>
                 <tr>
                   <td className={styles.tl}>コンテナ内ツール間の分離</td>
-                  <td>Anthropic のセキュリティ境界はコンテナの外側で終わる。コンテナ内のツール分離はすべてあなたの責任</td>
+                  <td>
+                    Anthropic
+                    のセキュリティ境界はコンテナの外側で終わる。コンテナ内のツール分離はすべてあなたの責任
+                  </td>
                 </tr>
                 <tr>
                   <td className={styles.tl}>データ保持の強制</td>
-                  <td>セッションコンテンツがワーカーに届いた後は Anthropic のデータライフサイクル管理外</td>
+                  <td>
+                    セッションコンテンツがワーカーに届いた後は Anthropic
+                    のデータライフサイクル管理外
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -1651,7 +2067,8 @@ export default function Page() {
             <span className={styles.secN}>9</span>サンドボックスプロバイダー
           </h2>
           <p>
-            Self-hosted Sandboxes は任意のプラットフォームで構築できますが、公式統合ガイドが提供されているプロバイダーがあります。
+            Self-hosted Sandboxes
+            は任意のプラットフォームで構築できますが、公式統合ガイドが提供されているプロバイダーがあります。
           </p>
           <div className={styles.provs}>
             <div className={styles.prov}>
@@ -1662,12 +2079,16 @@ export default function Page() {
                 <span className={styles.provTag}>スケール</span>
               </div>
               <div className={styles.provD}>
-                microVM + 軽量アイソレート。ゼロトラスト秘密注入、カスタマイズ可能なエグレスプロキシ、Cloudflare
+                microVM +
+                軽量アイソレート。ゼロトラスト秘密注入、カスタマイズ可能なエグレスプロキシ、Cloudflare
                 ネットワーク経由の内部サービス接続。
                 <br />
                 <em>採用: Amplitude（Design Agent）</em>
               </div>
-              <Ext href="https://developers.cloudflare.com/sandbox/claude-managed-agents/" className={styles.provA}>
+              <Ext
+                href="https://developers.cloudflare.com/sandbox/claude-managed-agents/"
+                className={styles.provA}
+              >
                 → 統合ガイド
               </Ext>
             </div>
@@ -1679,11 +2100,15 @@ export default function Page() {
                 <span className={styles.provTag}>SSH</span>
               </div>
               <div className={styles.provD}>
-                長時間稼働・ステートフルなフルコンピュータ環境。SSH や認証済みプレビュー URL でアクセス。状態の一時停止・復元が可能。
+                長時間稼働・ステートフルなフルコンピュータ環境。SSH や認証済みプレビュー URL
+                でアクセス。状態の一時停止・復元が可能。
                 <br />
                 <em>採用: Clay（Sculptor）</em>
               </div>
-              <Ext href="https://www.daytona.io/docs/en/guides/claude/claude-managed-agents" className={styles.provA}>
+              <Ext
+                href="https://www.daytona.io/docs/en/guides/claude/claude-managed-agents"
+                className={styles.provA}
+              >
                 → 統合ガイド
               </Ext>
             </div>
@@ -1695,11 +2120,15 @@ export default function Page() {
                 <span className={styles.provTag}>大規模並列</span>
               </div>
               <div className={styles.provD}>
-                AI ワークロード専用クラウド。サブ秒起動、GPU / CPU オンデマンド、数十万の並列サンドボックスに対応。
+                AI ワークロード専用クラウド。サブ秒起動、GPU / CPU
+                オンデマンド、数十万の並列サンドボックスに対応。
                 <br />
                 <em>採用: Mason、DoorDash</em>
               </div>
-              <Ext href="https://github.com/modal-labs/claude-managed-agents-modal-sandbox" className={styles.provA}>
+              <Ext
+                href="https://github.com/modal-labs/claude-managed-agents-modal-sandbox"
+                className={styles.provA}
+              >
                 → GitHub ガイド
               </Ext>
             </div>
@@ -1731,7 +2160,10 @@ export default function Page() {
           <h2>
             <span className={styles.secN}>10</span>MCP トンネルとの組み合わせ
           </h2>
-          <p>Self-hosted Sandboxes と MCP Tunnels は独立した機能です。それぞれが別の「制御軸」を担います。</p>
+          <p>
+            Self-hosted Sandboxes と MCP Tunnels
+            は独立した機能です。それぞれが別の「制御軸」を担います。
+          </p>
           <div className={styles.tw}>
             <table>
               <thead>
@@ -1752,7 +2184,8 @@ export default function Page() {
                 <tr>
                   <td className={styles.tl}>MCP Tunnels</td>
                   <td>
-                    Anthropic がプライベートネットワーク内の MCP サーバーに<strong>到達する方法</strong>
+                    Anthropic がプライベートネットワーク内の MCP サーバーに
+                    <strong>到達する方法</strong>
                   </td>
                   <td>単独で使用可能</td>
                 </tr>
@@ -1768,7 +2201,9 @@ export default function Page() {
             <p>
               <strong>MCP Tunnels のステータス：</strong>
               現在リサーチプレビュー中です。アクセスには申請が必要:{" "}
-              <Ext href="https://claude.com/form/claude-managed-agents">claude.com/form/claude-managed-agents</Ext>
+              <Ext href="https://claude.com/form/claude-managed-agents">
+                claude.com/form/claude-managed-agents
+              </Ext>
             </p>
           </div>
         </section>
@@ -1783,7 +2218,8 @@ export default function Page() {
           <ul className={styles.clList}>
             <li>
               <div className={styles.clBox} />
-              ANTHROPIC_ENVIRONMENT_KEY を AWS Secrets Manager / GCP Secret Manager / Vault に保管した
+              ANTHROPIC_ENVIRONMENT_KEY を AWS Secrets Manager / GCP Secret Manager / Vault
+              に保管した
             </li>
             <li>
               <div className={styles.clBox} />
@@ -1791,7 +2227,8 @@ export default function Page() {
             </li>
             <li>
               <div className={styles.clBox} />
-              ワーカーホストに ANTHROPIC_API_KEY を設定していない（ツール呼び出しから漏洩するリスク）
+              ワーカーホストに ANTHROPIC_API_KEY
+              を設定していない（ツール呼び出しから漏洩するリスク）
             </li>
             <li>
               <div className={styles.clBox} />
@@ -1890,11 +2327,13 @@ export default function Page() {
                   <span className={styles.kw}>RUN</span> useradd -u 1000 -m -s /bin/bash agentuser
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.kw}>RUN</span> apt-get update <span className={styles.op}>&&</span> apt-get install -y
-                  bash curl unzip tar <span className={styles.op}>\</span>
+                  <span className={styles.kw}>RUN</span> apt-get update{" "}
+                  <span className={styles.op}>&&</span> apt-get install -y bash curl unzip tar{" "}
+                  <span className={styles.op}>\</span>
                 </div>
                 <div className={styles.codeLine}>
-                  {"    "}<span className={styles.op}>&&</span> rm -rf /var/lib/apt/lists/*
+                  {"    "}
+                  <span className={styles.op}>&&</span> rm -rf /var/lib/apt/lists/*
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
@@ -1920,7 +2359,7 @@ export default function Page() {
               <span className={styles.cl}>bash</span>
               <CodeCopyButton
                 className={styles.codeCopy}
-                text={`docker run \\\n  --user 1000:1000 \\\n  --cap-drop ALL \\\n  --read-only \\\n  --tmpfs /tmp \\\n  --network restricted_network \\\n  -v /host/outputs:/mnt/session/outputs \\\n  -e ANTHROPIC_ENVIRONMENT_KEY="\$(get_secret env_key)" \\\n  my-worker-image:latest`}
+                text={`docker run \\\n  --user 1000:1000 \\\n  --cap-drop ALL \\\n  --read-only \\\n  --tmpfs /tmp \\\n  --network restricted_network \\\n  -v /host/outputs:/mnt/session/outputs \\\n  -e ANTHROPIC_ENVIRONMENT_KEY="$(get_secret env_key)" \\\n  my-worker-image:latest`}
               />
             </div>
             <pre>
@@ -1928,30 +2367,17 @@ export default function Page() {
                 <div className={styles.codeLine}>
                   <span className={styles.kw}>docker</span> run \
                 </div>
+                <div className={styles.codeLine}>{"  "}--user 1000:1000 \</div>
+                <div className={styles.codeLine}>{"  "}--cap-drop ALL \</div>
+                <div className={styles.codeLine}>{"  "}--read-only \</div>
+                <div className={styles.codeLine}>{"  "}--tmpfs /tmp \</div>
+                <div className={styles.codeLine}>{"  "}--network restricted_network \</div>
+                <div className={styles.codeLine}>{"  "}-v /host/outputs:/mnt/session/outputs \</div>
                 <div className={styles.codeLine}>
-                  {"  "}--user 1000:1000 \
+                  {"  "}-e ANTHROPIC_ENVIRONMENT_KEY=
+                  <span className={styles.st}>&quot;$(get_secret env_key)&quot;</span> \
                 </div>
-                <div className={styles.codeLine}>
-                  {"  "}--cap-drop ALL \
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}--read-only \
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}--tmpfs /tmp \
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}--network restricted_network \
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}-v /host/outputs:/mnt/session/outputs \
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}-e ANTHROPIC_ENVIRONMENT_KEY=<span className={styles.st}>&quot;$(get_secret env_key)&quot;</span> \
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}my-worker-image:latest
-                </div>
+                <div className={styles.codeLine}>{"  "}my-worker-image:latest</div>
               </code>
             </pre>
           </div>
@@ -2026,75 +2452,112 @@ export default function Page() {
                   <span className={styles.kw}>import</span> os
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.kw}>from</span> datetime <span className={styles.kw}>import</span> datetime, timezone
+                  <span className={styles.kw}>from</span> datetime{" "}
+                  <span className={styles.kw}>import</span> datetime, timezone
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.kw}>import</span> anthropic
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># ⚠️ 組織 API キーで認証・ワーカーホスト外から実行</span>
+                  <span className={styles.cc}>
+                    # ⚠️ 組織 API キーで認証・ワーカーホスト外から実行
+                  </span>
                 </div>
                 <div className={styles.codeLine}>
                   client = anthropic.<span className={styles.fn}>Anthropic</span>()
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.kw}>def</span> <span className={styles.fn}>check_queue_and_scale</span>():
+                  <span className={styles.kw}>def</span>{" "}
+                  <span className={styles.fn}>check_queue_and_scale</span>():
                 </div>
                 <div className={styles.codeLine}>
-                  {"    "}stats = client.beta.environments.work.<span className={styles.fn}>stats</span>(
+                  {"    "}stats = client.beta.environments.work.
+                  <span className={styles.fn}>stats</span>(
                 </div>
                 <div className={styles.codeLine}>
-                  {"        "}os.environ[<span className={styles.st}>&quot;ANTHROPIC_ENVIRONMENT_ID&quot;</span>]
+                  {"        "}os.environ[
+                  <span className={styles.st}>&quot;ANTHROPIC_ENVIRONMENT_ID&quot;</span>]
+                </div>
+                <div className={styles.codeLine}>{"    "})</div>
+                <div className={styles.codeLine}>
+                  {"    "}
+                  <span className={styles.fn}>print</span>(f
+                  <span className={styles.st}>
+                    &quot;depth=&#123;stats.depth&#125; pending=&#123;stats.pending&#125; &quot;
+                  </span>
                 </div>
                 <div className={styles.codeLine}>
-                  {"    "})
-                </div>
-                <div className={styles.codeLine}>
-                  {"    "}<span className={styles.fn}>print</span>(f<span className={styles.st}>&quot;depth=&#123;stats.depth&#125; pending=&#123;stats.pending&#125; &quot;</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"          "}f<span className={styles.st}>&quot;workers=&#123;stats.workers_polling&#125;&quot;</span>)
-                </div>
-                <div className={styles.codeLine} />
-                <div className={styles.codeLine}>
-                  {"    "}<span className={styles.cc}># depth &gt; 10 ならワーカーをスケールアウト</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"    "}<span className={styles.kw}>if</span> stats.depth <span className={styles.op}>&gt;</span> <span className={styles.nm}>10</span>:
-                </div>
-                <div className={styles.codeLine}>
-                  {"        "}<span className={styles.fn}>print</span>(f<span className={styles.st}>&quot;Scaling up: launching &#123;stats.depth // 5&#125; workers&quot;</span>)
-                </div>
-                <div className={styles.codeLine}>
-                  {"        "}<span className={styles.cc}># launch_workers(count=stats.depth // 5)</span>
+                  {"          "}f
+                  <span className={styles.st}>
+                    &quot;workers=&#123;stats.workers_polling&#125;&quot;
+                  </span>
+                  )
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  {"    "}<span className={styles.cc}># workers_polling == 0 は死活アラート</span>
+                  {"    "}
+                  <span className={styles.cc}># depth &gt; 10 ならワーカーをスケールアウト</span>
                 </div>
                 <div className={styles.codeLine}>
-                  {"    "}<span className={styles.kw}>if</span> stats.workers_polling == <span className={styles.nm}>0</span>:
+                  {"    "}
+                  <span className={styles.kw}>if</span> stats.depth{" "}
+                  <span className={styles.op}>&gt;</span> <span className={styles.nm}>10</span>:
                 </div>
                 <div className={styles.codeLine}>
-                  {"        "}<span className={styles.fn}>print</span>(<span className={styles.st}>&quot;ALERT: No workers polling!&quot;</span>)
+                  {"        "}
+                  <span className={styles.fn}>print</span>(f
+                  <span className={styles.st}>
+                    &quot;Scaling up: launching &#123;stats.depth {"//"} 5&#125; workers&quot;
+                  </span>
+                  )
+                </div>
+                <div className={styles.codeLine}>
+                  {"        "}
+                  <span className={styles.cc}># launch_workers(count=stats.depth {"//"} 5)</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"    "}
+                  <span className={styles.cc}># workers_polling == 0 は死活アラート</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"    "}
+                  <span className={styles.kw}>if</span> stats.workers_polling =={" "}
+                  <span className={styles.nm}>0</span>:
+                </div>
+                <div className={styles.codeLine}>
+                  {"        "}
+                  <span className={styles.fn}>print</span>(
+                  <span className={styles.st}>&quot;ALERT: No workers polling!&quot;</span>)
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  {"    "}<span className={styles.cc}># バックログアラート</span>
+                  {"    "}
+                  <span className={styles.cc}># バックログアラート</span>
                 </div>
                 <div className={styles.codeLine}>
-                  {"    "}<span className={styles.kw}>if</span> stats.oldest_queued_at:
+                  {"    "}
+                  <span className={styles.kw}>if</span> stats.oldest_queued_at:
                 </div>
                 <div className={styles.codeLine}>
-                  {"        "}age = (datetime.<span className={styles.fn}>now</span>(timezone.utc) - stats.oldest_queued_at).<span className={styles.fn}>total_seconds</span>() / <span className={styles.nm}>60</span>
+                  {"        "}age = (datetime.<span className={styles.fn}>now</span>(timezone.utc) -
+                  stats.oldest_queued_at).<span className={styles.fn}>total_seconds</span>() /{" "}
+                  <span className={styles.nm}>60</span>
                 </div>
                 <div className={styles.codeLine}>
-                  {"        "}<span className={styles.kw}>if</span> age <span className={styles.op}>&gt;</span> <span className={styles.nm}>10</span>:
+                  {"        "}
+                  <span className={styles.kw}>if</span> age <span className={styles.op}>&gt;</span>{" "}
+                  <span className={styles.nm}>10</span>:
                 </div>
                 <div className={styles.codeLine}>
-                  {"        "}{"    "}<span className={styles.fn}>print</span>(f<span className={styles.st}>&quot;Backlog: oldest item is &#123;age:.1f&#125; min old&quot;</span>)
+                  {"        "}
+                  {"    "}
+                  <span className={styles.fn}>print</span>(f
+                  <span className={styles.st}>
+                    &quot;Backlog: oldest item is &#123;age:.1f&#125; min old&quot;
+                  </span>
+                  )
                 </div>
               </code>
             </pre>
@@ -2128,30 +2591,37 @@ export default function Page() {
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># グレースフルシャットダウン（現在のツール呼び出し完了後に停止）</span>
+                  <span className={styles.cc}>
+                    # グレースフルシャットダウン（現在のツール呼び出し完了後に停止）
+                  </span>
                 </div>
                 <div className={styles.codeLine}>
                   work = client.beta.environments.work.<span className={styles.fn}>stop</span>(
                 </div>
                 <div className={styles.codeLine}>
-                  {"    "}os.environ[<span className={styles.st}>&quot;ANTHROPIC_WORK_ID&quot;</span>],{"   "}
-                  <span className={styles.cc}># 対象ワークアイテム ID（ワーカーホストで自動設定されない）</span>
+                  {"    "}os.environ[
+                  <span className={styles.st}>&quot;ANTHROPIC_WORK_ID&quot;</span>],{"   "}
+                  <span className={styles.cc}>
+                    # 対象ワークアイテム ID（ワーカーホストで自動設定されない）
+                  </span>
                 </div>
                 <div className={styles.codeLine}>
-                  {"    "}environment_id=os.environ[<span className={styles.st}>&quot;ANTHROPIC_ENVIRONMENT_ID&quot;</span>],
+                  {"    "}environment_id=os.environ[
+                  <span className={styles.st}>&quot;ANTHROPIC_ENVIRONMENT_ID&quot;</span>],
                 </div>
+                <div className={styles.codeLine}>)</div>
                 <div className={styles.codeLine}>
-                  )
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.fn}>print</span>(f<span className={styles.st}>&quot;State: &#123;work.state&#125;&quot;</span>)
+                  <span className={styles.fn}>print</span>(f
+                  <span className={styles.st}>&quot;State: &#123;work.state&#125;&quot;</span>)
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
                   <span className={styles.cc}># 即時強制終了: force=True を追加</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># client.beta.environments.work.stop(..., force=True)</span>
+                  <span className={styles.cc}>
+                    # client.beta.environments.work.stop(..., force=True)
+                  </span>
                 </div>
               </code>
             </pre>
@@ -2166,77 +2636,127 @@ export default function Page() {
 
           <h4>公式ドキュメント</h4>
           <div className={styles.srcGrid}>
-            <Ext href="https://platform.claude.com/docs/en/managed-agents/self-hosted-sandboxes" className={styles.srcA}>
+            <Ext
+              href="https://platform.claude.com/docs/en/managed-agents/self-hosted-sandboxes"
+              className={styles.srcA}
+            >
               <span className={styles.srcIcon}>📖</span>
               <div>
                 <div className={styles.srcTit}>Self-hosted Sandboxes 統合ガイド</div>
-                <div className={styles.srcUrl}>platform.claude.com/docs/en/managed-agents/self-hosted-sandboxes</div>
+                <div className={styles.srcUrl}>
+                  platform.claude.com/docs/en/managed-agents/self-hosted-sandboxes
+                </div>
               </div>
             </Ext>
-            <Ext href="https://platform.claude.com/docs/en/managed-agents/self-hosted-sandboxes-security" className={styles.srcA}>
+            <Ext
+              href="https://platform.claude.com/docs/en/managed-agents/self-hosted-sandboxes-security"
+              className={styles.srcA}
+            >
               <span className={styles.srcIcon}>🔒</span>
               <div>
                 <div className={styles.srcTit}>セキュリティモデル（責任分担）</div>
-                <div className={styles.srcUrl}>platform.claude.com/docs/en/managed-agents/self-hosted-sandboxes-security</div>
+                <div className={styles.srcUrl}>
+                  platform.claude.com/docs/en/managed-agents/self-hosted-sandboxes-security
+                </div>
               </div>
             </Ext>
-            <Ext href="https://platform.claude.com/docs/en/managed-agents/overview" className={styles.srcA}>
+            <Ext
+              href="https://platform.claude.com/docs/en/managed-agents/overview"
+              className={styles.srcA}
+            >
               <span className={styles.srcIcon}>📋</span>
               <div>
                 <div className={styles.srcTit}>Managed Agents 概要</div>
-                <div className={styles.srcUrl}>platform.claude.com/docs/en/managed-agents/overview</div>
+                <div className={styles.srcUrl}>
+                  platform.claude.com/docs/en/managed-agents/overview
+                </div>
               </div>
             </Ext>
-            <Ext href="https://platform.claude.com/docs/en/managed-agents/quickstart" className={styles.srcA}>
+            <Ext
+              href="https://platform.claude.com/docs/en/managed-agents/quickstart"
+              className={styles.srcA}
+            >
               <span className={styles.srcIcon}>🚀</span>
               <div>
                 <div className={styles.srcTit}>クイックスタート</div>
-                <div className={styles.srcUrl}>platform.claude.com/docs/en/managed-agents/quickstart</div>
+                <div className={styles.srcUrl}>
+                  platform.claude.com/docs/en/managed-agents/quickstart
+                </div>
               </div>
             </Ext>
-            <Ext href="https://platform.claude.com/docs/en/managed-agents/sessions" className={styles.srcA}>
+            <Ext
+              href="https://platform.claude.com/docs/en/managed-agents/sessions"
+              className={styles.srcA}
+            >
               <span className={styles.srcIcon}>📡</span>
               <div>
                 <div className={styles.srcTit}>セッションの開始</div>
-                <div className={styles.srcUrl}>platform.claude.com/docs/en/managed-agents/sessions</div>
+                <div className={styles.srcUrl}>
+                  platform.claude.com/docs/en/managed-agents/sessions
+                </div>
               </div>
             </Ext>
-            <Ext href="https://platform.claude.com/docs/en/api/beta/environments/work" className={styles.srcA}>
+            <Ext
+              href="https://platform.claude.com/docs/en/api/beta/environments/work"
+              className={styles.srcA}
+            >
               <span className={styles.srcIcon}>⚙️</span>
               <div>
                 <div className={styles.srcTit}>Environments Work API リファレンス</div>
-                <div className={styles.srcUrl}>platform.claude.com/docs/en/api/beta/environments/work</div>
+                <div className={styles.srcUrl}>
+                  platform.claude.com/docs/en/api/beta/environments/work
+                </div>
               </div>
             </Ext>
-            <Ext href="https://platform.claude.com/docs/en/manage-claude/api-and-data-retention" className={styles.srcA}>
+            <Ext
+              href="https://platform.claude.com/docs/en/manage-claude/api-and-data-retention"
+              className={styles.srcA}
+            >
               <span className={styles.srcIcon}>🗄️</span>
               <div>
                 <div className={styles.srcTit}>API データ保持ポリシー</div>
-                <div className={styles.srcUrl}>platform.claude.com/docs/en/manage-claude/api-and-data-retention</div>
+                <div className={styles.srcUrl}>
+                  platform.claude.com/docs/en/manage-claude/api-and-data-retention
+                </div>
               </div>
             </Ext>
-            <Ext href="https://platform.claude.com/docs/en/build-with-claude/claude-platform-on-aws" className={styles.srcA}>
+            <Ext
+              href="https://platform.claude.com/docs/en/build-with-claude/claude-platform-on-aws"
+              className={styles.srcA}
+            >
               <span className={styles.srcIcon}>☁️</span>
               <div>
                 <div className={styles.srcTit}>Claude Platform on AWS</div>
-                <div className={styles.srcUrl}>platform.claude.com/docs/en/build-with-claude/claude-platform-on-aws</div>
+                <div className={styles.srcUrl}>
+                  platform.claude.com/docs/en/build-with-claude/claude-platform-on-aws
+                </div>
               </div>
             </Ext>
-            <Ext href="https://platform.claude.com/docs/en/agents-and-tools/mcp-tunnels/overview" className={styles.srcA}>
+            <Ext
+              href="https://platform.claude.com/docs/en/agents-and-tools/mcp-tunnels/overview"
+              className={styles.srcA}
+            >
               <span className={styles.srcIcon}>🔗</span>
               <div>
                 <div className={styles.srcTit}>MCP Tunnels 概要</div>
-                <div className={styles.srcUrl}>platform.claude.com/docs/en/agents-and-tools/mcp-tunnels/overview</div>
+                <div className={styles.srcUrl}>
+                  platform.claude.com/docs/en/agents-and-tools/mcp-tunnels/overview
+                </div>
               </div>
             </Ext>
           </div>
 
           <h4>公式ブログ</h4>
           <div className={styles.srcGrid}>
-            <Ext href="https://claude.com/blog/claude-managed-agents-updates" className={styles.srcA}>
+            <Ext
+              href="https://claude.com/blog/claude-managed-agents-updates"
+              className={styles.srcA}
+            >
               <span className={styles.srcIcon}>📰</span>
               <div>
-                <div className={styles.srcTit}>Self-hosted Sandboxes &amp; MCP Tunnels 発表（2026年5月19日）</div>
+                <div className={styles.srcTit}>
+                  Self-hosted Sandboxes &amp; MCP Tunnels 発表（2026年5月19日）
+                </div>
                 <div className={styles.srcUrl}>claude.com/blog/claude-managed-agents-updates</div>
               </div>
             </Ext>
@@ -2251,43 +2771,68 @@ export default function Page() {
 
           <h4>プロバイダー統合ガイド</h4>
           <div className={styles.srcGrid}>
-            <Ext href="https://developers.cloudflare.com/sandbox/claude-managed-agents/" className={styles.srcA}>
+            <Ext
+              href="https://developers.cloudflare.com/sandbox/claude-managed-agents/"
+              className={styles.srcA}
+            >
               <span className={styles.srcIcon}>☁️</span>
               <div>
                 <div className={styles.srcTit}>Cloudflare 統合ガイド</div>
-                <div className={styles.srcUrl}>developers.cloudflare.com/sandbox/claude-managed-agents/</div>
+                <div className={styles.srcUrl}>
+                  developers.cloudflare.com/sandbox/claude-managed-agents/
+                </div>
               </div>
             </Ext>
-            <Ext href="https://www.daytona.io/docs/en/guides/claude/claude-managed-agents" className={styles.srcA}>
+            <Ext
+              href="https://www.daytona.io/docs/en/guides/claude/claude-managed-agents"
+              className={styles.srcA}
+            >
               <span className={styles.srcIcon}>🖥️</span>
               <div>
                 <div className={styles.srcTit}>Daytona 統合ガイド</div>
-                <div className={styles.srcUrl}>daytona.io/docs/en/guides/claude/claude-managed-agents</div>
+                <div className={styles.srcUrl}>
+                  daytona.io/docs/en/guides/claude/claude-managed-agents
+                </div>
               </div>
             </Ext>
-            <Ext href="https://github.com/modal-labs/claude-managed-agents-modal-sandbox" className={styles.srcA}>
+            <Ext
+              href="https://github.com/modal-labs/claude-managed-agents-modal-sandbox"
+              className={styles.srcA}
+            >
               <span className={styles.srcIcon}>🤖</span>
               <div>
                 <div className={styles.srcTit}>Modal 統合ガイド（GitHub）</div>
-                <div className={styles.srcUrl}>github.com/modal-labs/claude-managed-agents-modal-sandbox</div>
+                <div className={styles.srcUrl}>
+                  github.com/modal-labs/claude-managed-agents-modal-sandbox
+                </div>
               </div>
             </Ext>
-            <Ext href="https://vercel.com/kb/guide/run-claude-managed-agent-tools-with-vercel-sandbox" className={styles.srcA}>
+            <Ext
+              href="https://vercel.com/kb/guide/run-claude-managed-agent-tools-with-vercel-sandbox"
+              className={styles.srcA}
+            >
               <span className={styles.srcIcon}>⚡</span>
               <div>
                 <div className={styles.srcTit}>Vercel 統合ガイド</div>
-                <div className={styles.srcUrl}>vercel.com/kb/guide/run-claude-managed-agent-tools-with-vercel-sandbox</div>
+                <div className={styles.srcUrl}>
+                  vercel.com/kb/guide/run-claude-managed-agent-tools-with-vercel-sandbox
+                </div>
               </div>
             </Ext>
           </div>
 
           <h4>サンプルコード</h4>
           <div className={styles.srcGrid}>
-            <Ext href="https://github.com/anthropics/claude-cookbooks/tree/main/managed_agents/self_hosted_sandboxes" className={styles.srcA}>
+            <Ext
+              href="https://github.com/anthropics/claude-cookbooks/tree/main/managed_agents/self_hosted_sandboxes"
+              className={styles.srcA}
+            >
               <span className={styles.srcIcon}>🍳</span>
               <div>
                 <div className={styles.srcTit}>Claude Cookbooks（Self-hosted Sandboxes）</div>
-                <div className={styles.srcUrl}>github.com/anthropics/claude-cookbooks/tree/main/managed_agents/self_hosted_sandboxes</div>
+                <div className={styles.srcUrl}>
+                  github.com/anthropics/claude-cookbooks/tree/main/managed_agents/self_hosted_sandboxes
+                </div>
               </div>
             </Ext>
             <Ext href="https://claude.com/form/claude-managed-agents" className={styles.srcA}>
@@ -2302,9 +2847,12 @@ export default function Page() {
 
         <footer>
           <p>
-            📌 本ガイドは公式ドキュメント（取得日: 2026年6月10日）を基に作成しています。Claude Managed Agents は Public Beta のため、API
+            📌 本ガイドは公式ドキュメント（取得日: 2026年6月10日）を基に作成しています。Claude
+            Managed Agents は Public Beta のため、API
             仕様は予告なく変更される可能性があります。最新情報は
-            <Ext href="https://platform.claude.com/docs/en/managed-agents/self-hosted-sandboxes">公式ドキュメント</Ext>
+            <Ext href="https://platform.claude.com/docs/en/managed-agents/self-hosted-sandboxes">
+              公式ドキュメント
+            </Ext>
             をご確認ください。
           </p>
         </footer>
