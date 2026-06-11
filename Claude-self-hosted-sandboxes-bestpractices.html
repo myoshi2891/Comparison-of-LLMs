@@ -26,8 +26,8 @@
         --aa-l: #fcd34d;
         --ar: #f87171;
         --tp: #e2e8f0;
-        --ts: #94a3b8;
-        --tm: #64748b;
+        --ts: #c1d3ec;
+        --tm: #bdd9ff;
         --tc: #c4b5fd;
         --bdr: rgba(139, 92, 246, 0.2);
         --bds: rgba(255, 255, 255, 0.05);
@@ -51,7 +51,7 @@
         background: var(--bg);
         color: var(--tp);
         line-height: 1.7;
-        font-size: 15px;
+        font-size: 1rem;
       }
       .layout {
         display: grid;
@@ -91,18 +91,18 @@
       }
       .sb-txt {
         font-family: var(--fw);
-        font-size: 0.78rem;
+        font-size: 1rem;
         font-weight: 600;
         line-height: 1.3;
         color: var(--tp);
       }
       .sb-sub {
-        font-size: 0.65rem;
+        font-size: 1rem;
         color: var(--aa);
         font-weight: 500;
       }
       .nav-cat {
-        font-size: 0.62rem;
+        font-size: 1rem;
         font-weight: 700;
         letter-spacing: 0.1em;
         text-transform: uppercase;
@@ -117,7 +117,7 @@
         border-radius: 6px;
         color: var(--ts);
         text-decoration: none;
-        font-size: 0.78rem;
+        font-size: 1rem;
         transition: all 0.18s;
         border-left: 2px solid transparent;
       }
@@ -135,11 +135,11 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 16px;
-        height: 16px;
+        width: 24px;
+        height: 24px;
         background: var(--av-d);
         border-radius: 50%;
-        font-size: 0.6rem;
+        font-size: 1rem;
         font-weight: 700;
         color: #fff;
         flex-shrink: 0;
@@ -147,7 +147,8 @@
       /* ── Main ── */
       main {
         padding: 0 2.25rem 5rem;
-        max-width: 900px;
+        width: 100%;
+        max-width: 100%;
       }
       /* ── Hero ── */
       .hero {
@@ -164,7 +165,7 @@
         color: var(--av-l);
         padding: 0.3rem 0.8rem;
         border-radius: 999px;
-        font-size: 0.72rem;
+        font-size: 1rem;
         font-weight: 600;
         margin-bottom: 1.25rem;
       }
@@ -212,7 +213,7 @@
         display: flex;
         align-items: center;
         gap: 0.35rem;
-        font-size: 0.75rem;
+        font-size: 1rem;
         color: var(--tm);
       }
       .h-meta-i strong {
@@ -244,7 +245,7 @@
         border: 1px solid var(--av);
         color: var(--av-l);
         border-radius: 7px;
-        font-size: 0.82rem;
+        font-size: 1rem;
         font-weight: 700;
         flex-shrink: 0;
       }
@@ -256,7 +257,7 @@
         margin: 1.75rem 0 0.75rem;
       }
       h4 {
-        font-size: 0.82rem;
+        font-size: 1rem;
         font-weight: 700;
         color: var(--av-l);
         margin: 1.25rem 0 0.5rem;
@@ -291,7 +292,7 @@
       th {
         padding: 0.65rem 0.9rem;
         text-align: left;
-        font-size: 0.72rem;
+        font-size: 1rem;
         font-weight: 700;
         color: var(--av-l);
         letter-spacing: 0.06em;
@@ -301,7 +302,7 @@
       }
       td {
         padding: 0.62rem 0.9rem;
-        font-size: 0.83rem;
+        font-size: 1rem;
         color: var(--ts);
         border-bottom: 1px solid var(--bds);
         vertical-align: top;
@@ -351,7 +352,7 @@
         background: #28ca41;
       }
       .cl {
-        font-size: 0.67rem;
+        font-size: 1rem;
         color: var(--tm);
         font-family: var(--fc);
         letter-spacing: 0.05em;
@@ -363,7 +364,7 @@
       }
       code {
         font-family: var(--fc);
-        font-size: 0.8rem;
+        font-size: 1rem;
         line-height: 1.75;
         color: #e2e8f0;
       }
@@ -383,7 +384,7 @@
         padding: 0.875rem 1.1rem;
         border-radius: 9px;
         margin: 1rem 0;
-        font-size: 0.85rem;
+        font-size: 1rem;
       }
       .ca-i {
         font-size: 1rem;
@@ -422,12 +423,27 @@
         background: var(--bg-c);
         border: 1px solid var(--bdr);
         border-radius: 11px;
-        padding: 1.25rem;
-        margin: 1.25rem 0;
+        padding: 1.25rem 1.25rem 2.5rem 1.25rem;
+        margin: 1.25rem auto;
+        max-width: 900px;
+        width: 100%;
         overflow-x: auto;
       }
+      .mw.mw-lg {
+        max-width: 100%;
+      }
+      .mw pre.mermaid {
+        padding: 0 !important;
+        margin: 0;
+        background: transparent;
+      }
+      .mw svg {
+        display: block;
+        margin: 0 auto;
+        overflow: visible !important;
+      }
       .mw-t {
-        font-size: 0.67rem;
+        font-size: 1rem;
         font-weight: 700;
         color: var(--tm);
         letter-spacing: 0.1em;
@@ -451,11 +467,13 @@
         border: 1px solid var(--bdr);
         border-radius: 12px;
         padding: 1.5rem;
-        margin: 1.25rem 0;
+        margin: 1.25rem auto;
+        max-width: 900px;
+        width: 100%;
         overflow-x: auto;
       }
       .svgw-t {
-        font-size: 0.67rem;
+        font-size: 1rem;
         font-weight: 700;
         color: var(--tm);
         letter-spacing: 0.1em;
@@ -499,7 +517,7 @@
         justify-content: center;
         font-family: var(--fw);
         font-weight: 700;
-        font-size: 0.95rem;
+        font-size: 1rem;
         color: #fff;
       }
       .step h3 {
@@ -515,7 +533,7 @@
       .tag {
         padding: 0.18rem 0.55rem;
         border-radius: 4px;
-        font-size: 0.67rem;
+        font-size: 1rem;
         font-weight: 700;
         letter-spacing: 0.05em;
         text-transform: uppercase;
@@ -556,11 +574,11 @@
       .pc-t {
         font-family: var(--fw);
         font-weight: 700;
-        font-size: 0.92rem;
+        font-size: 1rem;
         color: var(--tp);
       }
       .pc-s {
-        font-size: 0.72rem;
+        font-size: 1rem;
         color: var(--tm);
         margin-top: 0.15rem;
       }
@@ -573,7 +591,7 @@
         align-items: center;
         padding: 0.3rem 0;
         border-bottom: 1px solid var(--bds);
-        font-size: 0.78rem;
+        font-size: 1rem;
       }
       .pr:last-child {
         border-bottom: none;
@@ -606,7 +624,7 @@
       .prov-n {
         font-family: var(--fw);
         font-weight: 700;
-        font-size: 0.95rem;
+        font-size: 1rem;
         color: var(--tp);
         margin-bottom: 0.4rem;
       }
@@ -619,19 +637,19 @@
       .prov-tag {
         padding: 0.12rem 0.45rem;
         border-radius: 4px;
-        font-size: 0.65rem;
+        font-size: 1rem;
         font-weight: 700;
         background: rgba(245, 158, 11, 0.15);
         color: var(--aa-l);
       }
       .prov-d {
-        font-size: 0.78rem;
+        font-size: 1rem;
         color: var(--tm);
         line-height: 1.5;
         margin-bottom: 0.7rem;
       }
       .prov-a {
-        font-size: 0.72rem;
+        font-size: 1rem;
         color: var(--at);
         font-weight: 500;
       }
@@ -646,7 +664,7 @@
         gap: 0.65rem;
         padding: 0.5rem 0;
         border-bottom: 1px solid var(--bds);
-        font-size: 0.83rem;
+        font-size: 1rem;
         color: var(--ts);
       }
       .cl-list li:last-child {
@@ -663,7 +681,7 @@
       .cl-cat {
         font-family: var(--fw);
         font-weight: 700;
-        font-size: 0.76rem;
+        font-size: 1rem;
         color: var(--aa);
         text-transform: uppercase;
         letter-spacing: 0.05em;
@@ -675,7 +693,7 @@
         align-items: center;
         padding: 0.18rem 0.55rem;
         border-radius: 999px;
-        font-size: 0.68rem;
+        font-size: 1rem;
         font-weight: 600;
       }
       .bg {
@@ -721,13 +739,13 @@
         flex-shrink: 0;
       }
       .src-tit {
-        font-size: 0.8rem;
+        font-size: 1rem;
         font-weight: 600;
         color: var(--tp);
         margin-bottom: 0.15rem;
       }
       .src-url {
-        font-size: 0.67rem;
+        font-size: 1rem;
         color: var(--at);
         font-family: var(--fc);
         word-break: break-all;
@@ -736,7 +754,7 @@
       footer {
         padding: 1.75rem 0;
         border-top: 1px solid var(--bdr);
-        font-size: 0.78rem;
+        font-size: 1rem;
         color: var(--tm);
         margin-top: 2rem;
       }
@@ -1511,7 +1529,7 @@
         <section id="architecture" class="sec">
           <h2><span class="sec-n">4</span>システムアーキテクチャ</h2>
           <h3 id="lifecycle">セッションライフサイクル</h3>
-          <div class="mw">
+          <div class="mw mw-lg">
             <div class="mw-t">セッションデータフロー（Sequence Diagram）</div>
             <pre class="mermaid">
 sequenceDiagram
@@ -2945,10 +2963,16 @@ print(f"State: {work.state}")
           titleColor: '#e2e8f0',
           edgeLabelBackground: '#1e1650',
           nodeTextColor: '#e2e8f0',
-          fontSize: '14px',
+          fontSize: '16px',
         },
         flowchart: { curve: 'basis', padding: 18 },
-        sequence: { actorMargin: 50, messageMargin: 35, mirrorActors: false },
+        sequence: {
+          actorMargin: 50,
+          messageMargin: 35,
+          mirrorActors: true,
+          bottomMarginAdjustment: 60,
+          useMaxWidth: true,
+        },
       });
 
       // ── Active nav highlighting via IntersectionObserver ──
