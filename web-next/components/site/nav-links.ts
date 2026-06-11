@@ -42,6 +42,7 @@ export const navLinks: readonly NavLink[] = [
       { name: "Cowork Guide", href: "/claude/cowork-guide" },
       { name: "Harness Engineering", href: "/claude/harness-engineering" },
       { name: "Managed Agents", href: "/claude/managed-agents" },
+      { name: "Self-hosted Sandboxes", href: "/claude/self-hosted-sandboxes" },
       { name: "Code Slash Commands", href: "/claude/code-slash-commands" },
     ],
   },
