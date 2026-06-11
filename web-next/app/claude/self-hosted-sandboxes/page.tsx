@@ -2845,7 +2845,7 @@ export default function Page() {
           </div>
         </section>
 
-        <footer>
+        <footer className={styles.footer}>
           <p>
             📌 本ガイドは公式ドキュメント（取得日: 2026年6月10日）を基に作成しています。Claude
             Managed Agents は Public Beta のため、API
