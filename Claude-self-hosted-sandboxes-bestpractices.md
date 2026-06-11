@@ -1,7 +1,7 @@
 # 🚀 Claude Self-hosted Sandboxes 完全ガイド
 
 > **ステータス:** Public Beta（2026年5月19日リリース）  
-> **対象モデル:** Claude Opus 4.8 を含む Managed Agents 対応全モデル  
+> **対象モデル:** Claude Opus 4 系最新版（2026年時点）を含む Managed Agents 対応最新モデル  
 > **推奨対象:** Claude API 初学者 〜 中級エンジニア
 
 ---
@@ -263,7 +263,7 @@ client = anthropic.Anthropic()
 # エージェントを作成（モデルはエージェント側で設定、環境ではない）
 agent = client.beta.agents.create(
     name="Self-hosted Demo Agent",
-    model="claude-opus-4-8",           # Managed Agents 対応の全モデルが使用可能
+    model="claude-opus-4-latest",      # 必要に応じて Managed Agents 対応の最新モデルに置き換えてください
     system_prompt="""You are a helpful coding assistant.
 Your working directory is /workspace.
 Agent skills are available at /workspace/skills/.

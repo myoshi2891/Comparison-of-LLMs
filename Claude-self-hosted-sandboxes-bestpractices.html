@@ -826,7 +826,7 @@
           </p>
           <div class="h-meta">
             <span class="h-meta-i"
-              >🤖 <strong>対象モデル</strong>: Claude Opus 4.8 を含む全モデル</span
+              >🤖 <strong>対象モデル</strong>: Claude Opus 4 系最新版（2026年時点）を含む最新モデル</span
             >
             <span class="h-meta-i">📋 <strong>ステータス</strong>: Public Beta</span>
             <span class="h-meta-i">📅 <strong>更新日</strong>: 2026年6月10日</span>
@@ -1717,7 +1717,7 @@ client = anthropic.Anthropic()
 
 agent = client.beta.agents.create(
     name="Self-hosted Demo Agent",
-    model="claude-opus-4-8",          # 対応モデルはすべて利用可
+    model="claude-opus-4-latest",      # 必要に応じて Managed Agents 対応の最新モデルに置き換えてください
     system_prompt="""You are a helpful coding assistant.
 Your working directory is /workspace.
 Skills are available at /workspace/skills/.
