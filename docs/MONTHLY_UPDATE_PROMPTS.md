@@ -2,7 +2,7 @@
 
 > **用途**: 毎月最低 1 回、各画面の情報を最新状態に保つためのプロンプトテンプレート集。  
 > **最終更新**: 2026-06-12  
-> **次回予定**: 2026-06-01 以降
+> **次回予定**: 2026-07-01 以降
 
 ---
 
@@ -370,7 +370,7 @@ web-next/app/google/skill/page.tsx を読んでください。
 
 ### 検証チェックリスト
 
-- [ ] `bun run test web-next/app/google/skill` (gemini/skill の契約テスト) がパスする
+- [ ] `bun run test web-next/app/google/skill` (google/skill の契約テスト) がパスする
 - [ ] `bun run build` が成功する
 - [ ] ローカルホスト (`http://localhost:3000/google/skill`) を開き、マークダウンファイルの仕様解説表示や外部リンクが壊れていないか目視確認
 
