@@ -1,16 +1,16 @@
 // Phase B-2 [Red] contract test. Expected to FAIL until Green phase
-// implements app/gemini/skill/page.tsx.
+// implements app/google/skill/page.tsx.
 
 /**
- * Phase B-2 契約テスト (/gemini/skill)。
+ * Phase B-2 契約テスト (/google/skill)。
  *
  * 固定する契約:
  * - `metadata` が export され、title に「マークダウンファイル」と
  *   「Antigravity」を含む
  * - `<h1>` が 1 つ存在し、`マークダウンファイル` を含む
- * - 11 個の section id が存在する (overview, directory, gemini-md, rules,
+ * - 11 個 of section id が存在する (overview, directory, gemini-md, rules,
  *   skills, workflows, context, artifacts, sdd, best-practices, sources)
- * - 11 個の TOC リンクが `#section-id` 形式で存在する
+ * - 11 個 of TOC リンクが `#section-id` 形式で存在する
  * - 外部リンク (http/https) には全て `target="_blank"` かつ
  *   `rel="noopener noreferrer"` が付与されている
  * - `sources` セクション内に 15 件以上の外部リンクが存在する
@@ -22,7 +22,7 @@ import { join } from "node:path";
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it } from "vitest";
-import GeminiSkillPage, { metadata as rawMetadata } from "@/app/gemini/skill/page";
+import GeminiSkillPage, { metadata as rawMetadata } from "@/app/google/skill/page";
 
 const Page = GeminiSkillPage as unknown as () => ReactElement;
 // Next.js の Metadata 型を避けるための最小ローカル型 (実体は Metadata オブジェクト)。
@@ -43,7 +43,7 @@ const EXPECTED_SECTION_IDS = [
   "sources",
 ] as const;
 
-describe("/gemini/skill - metadata", () => {
+describe("/google/skill - metadata", () => {
   it("exports a metadata object with title containing マークダウンファイル and Antigravity", () => {
     expect(metadata).toBeDefined();
     const title =
@@ -70,7 +70,7 @@ describe("/gemini/skill - metadata", () => {
   });
 });
 
-describe("/gemini/skill - page structure", () => {
+describe("/google/skill - page structure", () => {
   it("renders an <h1> containing 'マークダウンファイル'", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
@@ -96,7 +96,7 @@ describe("/gemini/skill - page structure", () => {
   });
 });
 
-describe("/gemini/skill - external link safety", () => {
+describe("/google/skill - external link safety", () => {
   it("all external http(s) links have target='_blank' and rel='noopener noreferrer'", () => {
     const { container } = render(<Page />);
     const externals = Array.from(container.querySelectorAll("a")).filter((a) => {
@@ -123,7 +123,7 @@ describe("/gemini/skill - external link safety", () => {
   });
 });
 
-describe("/gemini/skill - Google I/O 2026 content", () => {
+describe("/google/skill - Google I/O 2026 content", () => {
   it("renders Antigravity 2.0 / Gemini 3.5 Flash / I/O 2026 references in the body", () => {
     const { container } = render(<Page />);
     const text = container.textContent ?? "";
@@ -150,7 +150,7 @@ describe("/gemini/skill - Google I/O 2026 content", () => {
   });
 });
 
-describe("/gemini/skill - static source safety", () => {
+describe("/google/skill - static source safety", () => {
   it("does not use the React raw-HTML injection prop", () => {
     const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
     // オブフスケート (false positive / prompt hook 誤検知回避)。

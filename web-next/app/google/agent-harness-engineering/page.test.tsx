@@ -5,7 +5,7 @@ import type { ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
 import AgentHarnessEngineeringPage, {
   metadata as rawMetadata,
-} from "@/app/gemini/agent-harness-engineering/page";
+} from "@/app/google/agent-harness-engineering/page";
 
 vi.mock("@/components/docs/MermaidDiagram", () => ({
   default: function DummyMermaidDiagram({ chart }: { chart: string }) {
@@ -31,7 +31,7 @@ const EXPECTED_SECTION_IDS = [
   "s11",
 ] as const;
 
-describe("/gemini/agent-harness-engineering - metadata", () => {
+describe("/google/agent-harness-engineering - metadata", () => {
   it("exports a metadata object with title", () => {
     expect(metadata).toBeDefined();
     const title =
@@ -47,7 +47,7 @@ describe("/gemini/agent-harness-engineering - metadata", () => {
   });
 });
 
-describe("/gemini/agent-harness-engineering - page structure", () => {
+describe("/google/agent-harness-engineering - page structure", () => {
   it("renders an <h1> containing correct title", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
@@ -169,7 +169,7 @@ describe("/gemini/agent-harness-engineering - page structure", () => {
   });
 });
 
-describe("/gemini/agent-harness-engineering - external link safety", () => {
+describe("/google/agent-harness-engineering - external link safety", () => {
   it("all external http(s) links have target='_blank' and rel='noopener noreferrer'", () => {
     const { container } = render(<Page />);
     const externals = Array.from(container.querySelectorAll("a")).filter((a) => {
@@ -196,7 +196,7 @@ describe("/gemini/agent-harness-engineering - external link safety", () => {
   });
 });
 
-describe("/gemini/agent-harness-engineering - clean internal links", () => {
+describe("/google/agent-harness-engineering - clean internal links", () => {
   it("all internal links do not contain .html extension", () => {
     const { container } = render(<Page />);
     const anchors = Array.from(container.querySelectorAll("a"));
@@ -209,7 +209,7 @@ describe("/gemini/agent-harness-engineering - clean internal links", () => {
   });
 });
 
-describe("/gemini/agent-harness-engineering - language classes on code blocks", () => {
+describe("/google/agent-harness-engineering - language classes on code blocks", () => {
   it("all pre or code elements for code samples have language-* classes", () => {
     const { container } = render(<Page />);
     const codeBlocks = Array.from(container.querySelectorAll("pre"));
@@ -223,7 +223,7 @@ describe("/gemini/agent-harness-engineering - language classes on code blocks", 
   });
 });
 
-describe("/gemini/agent-harness-engineering - static source safety", () => {
+describe("/google/agent-harness-engineering - static source safety", () => {
   it("does not use the React raw-HTML injection prop", () => {
     const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
     const needle = ["danger", "ously", "Set", "Inner", "HTML"].join("");

@@ -2,7 +2,7 @@ import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import Page, { metadata } from "./page";
 
-describe("/gemini/antigravity-slash-commands-guide", () => {
+describe("/google/antigravity-slash-commands-guide", () => {
   it("h1 の見出しテキストが一致する", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
