@@ -377,7 +377,10 @@ export default function Page() {
               </thead>
               <tbody>
                 <tr className={styles.tr}>
-                  <td className={`${styles.tdLeft}`} style={{ fontWeight: 600, color: "var(--text)" }}>
+                  <td
+                    className={`${styles.tdLeft}`}
+                    style={{ fontWeight: 600, color: "var(--text)" }}
+                  >
                     形態
                   </td>
                   <td>ターミナルアプリ</td>
@@ -429,7 +432,10 @@ export default function Page() {
                   <td className={styles.mono} style={{ color: "var(--blue)", fontSize: "0.75rem" }}>
                     {"~/.gemini/skills/"}
                   </td>
-                  <td className={styles.mono} style={{ color: "var(--purple)", fontSize: "0.75rem" }}>
+                  <td
+                    className={styles.mono}
+                    style={{ color: "var(--purple)", fontSize: "0.75rem" }}
+                  >
                     {"~/.gemini/antigravity/skills/"}
                   </td>
                 </tr>
@@ -440,7 +446,10 @@ export default function Page() {
                   <td className={styles.mono} style={{ color: "var(--blue)", fontSize: "0.75rem" }}>
                     {".gemini/skills/"}
                   </td>
-                  <td className={styles.mono} style={{ color: "var(--purple)", fontSize: "0.75rem" }}>
+                  <td
+                    className={styles.mono}
+                    style={{ color: "var(--purple)", fontSize: "0.75rem" }}
+                  >
                     {".agent/skills/"}
                   </td>
                 </tr>
@@ -451,7 +460,9 @@ export default function Page() {
                   <td className={styles.mono} style={{ color: "var(--blue)", fontSize: "0.75rem" }}>
                     gemini skills install
                   </td>
-                  <td style={{ color: "var(--text-subtle)", fontSize: "0.75rem" }}>GUI または CLI</td>
+                  <td style={{ color: "var(--text-subtle)", fontSize: "0.75rem" }}>
+                    GUI または CLI
+                  </td>
                 </tr>
                 <tr className={styles.trEven}>
                   <td className={styles.tdLeft} style={{ fontWeight: 600, color: "var(--text)" }}>
@@ -469,7 +480,10 @@ export default function Page() {
                     <br />
                     <span style={{ color: "#94a3b8" }}>(タスクに応じて自動選択)</span>
                   </td>
-                  <td className={styles.mono} style={{ color: "var(--purple)", fontSize: "0.75rem" }}>
+                  <td
+                    className={styles.mono}
+                    style={{ color: "var(--purple)", fontSize: "0.75rem" }}
+                  >
                     gemini-3.5-flash
                   </td>
                 </tr>
@@ -493,7 +507,10 @@ export default function Page() {
                       )
                     </span>
                   </td>
-                  <td className={styles.mono} style={{ color: "var(--purple)", fontSize: "0.75rem" }}>
+                  <td
+                    className={styles.mono}
+                    style={{ color: "var(--purple)", fontSize: "0.75rem" }}
+                  >
                     gemini-3.5-pro
                   </td>
                 </tr>
@@ -656,17 +673,23 @@ export default function Page() {
                 <div className={styles.legendItem}>
                   <span className={styles.legendDot} style={{ background: "#10b981" }} />
                   <span style={{ fontWeight: 700, color: "#22c55e" }}>SKILL.md</span>
-                  <span style={{ color: "var(--text-subtle)" }}>— 必須。YAMLメタデータ＋指示本文</span>
+                  <span style={{ color: "var(--text-subtle)" }}>
+                    — 必須。YAMLメタデータ＋指示本文
+                  </span>
                 </div>
                 <div className={styles.legendItem}>
                   <span className={styles.legendDot} style={{ background: "#38bdf8" }} />
                   <span style={{ fontWeight: 700, color: "#38bdf8" }}>scripts/</span>
-                  <span style={{ color: "var(--text-subtle)" }}>— 自動実行スクリプト（Python/Bash）</span>
+                  <span style={{ color: "var(--text-subtle)" }}>
+                    — 自動実行スクリプト（Python/Bash）
+                  </span>
                 </div>
                 <div className={styles.legendItem}>
                   <span className={styles.legendDot} style={{ background: "#a78bfa" }} />
                   <span style={{ fontWeight: 700, color: "#c084fc" }}>references/</span>
-                  <span style={{ color: "var(--text-subtle)" }}>— 参照ドキュメント（必要時のみ読込）</span>
+                  <span style={{ color: "var(--text-subtle)" }}>
+                    — 参照ドキュメント（必要時のみ読込）
+                  </span>
                 </div>
                 <div className={styles.legendItem}>
                   <span className={styles.legendDot} style={{ background: "#94a3b8" }} />
@@ -1291,7 +1314,8 @@ export default function Page() {
           id="whatsnew"
           className={styles.sec}
           style={{
-            background: "linear-gradient(135deg, rgba(249, 115, 22, 0.05), rgba(245, 158, 11, 0.1))",
+            background:
+              "linear-gradient(135deg, rgba(249, 115, 22, 0.05), rgba(245, 158, 11, 0.1))",
             borderWidth: "2px",
             borderStyle: "solid",
             borderColor: "rgba(249, 115, 22, 0.3)",
@@ -1309,7 +1333,11 @@ export default function Page() {
             {/* Gemini CLI */}
             <div
               className={styles.newCard}
-              style={{ borderColor: "rgba(59, 130, 246, 0.3)", background: "var(--bg-2)", padding: "1.25rem" }}
+              style={{
+                borderColor: "rgba(59, 130, 246, 0.3)",
+                background: "var(--bg-2)",
+                padding: "1.25rem",
+              }}
             >
               <div
                 style={{
@@ -1325,7 +1353,10 @@ export default function Page() {
                 >
                   Gemini CLI
                 </span>
-                <span className={styles.badge} style={{ background: "var(--blue-dim)", color: "#60a5fa" }}>
+                <span
+                  className={styles.badge}
+                  style={{ background: "var(--blue-dim)", color: "#60a5fa" }}
+                >
                   v0.43.0 (2026-03-17)
                 </span>
               </div>
@@ -1476,7 +1507,11 @@ export default function Page() {
             {/* Antigravity */}
             <div
               className={styles.newCard}
-              style={{ borderColor: "rgba(168, 85, 247, 0.3)", background: "var(--bg-2)", padding: "1.25rem" }}
+              style={{
+                borderColor: "rgba(168, 85, 247, 0.3)",
+                background: "var(--bg-2)",
+                padding: "1.25rem",
+              }}
             >
               <div
                 style={{
@@ -1492,7 +1527,10 @@ export default function Page() {
                 >
                   Antigravity
                 </span>
-                <span className={styles.badge} style={{ background: "var(--purple-dim)", color: "#c084fc" }}>
+                <span
+                  className={styles.badge}
+                  style={{ background: "var(--purple-dim)", color: "#c084fc" }}
+                >
                   v2.0.1 (2026-05-23)
                 </span>
               </div>
@@ -1642,7 +1680,11 @@ export default function Page() {
                 <tr>
                   <td
                     className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}
-                    style={{ border: "1px solid rgba(249, 115, 22, 0.2)", padding: "0.5rem 1rem", color: "var(--text-subtle)" }}
+                    style={{
+                      border: "1px solid rgba(249, 115, 22, 0.2)",
+                      padding: "0.5rem 1rem",
+                      color: "var(--text-subtle)",
+                    }}
                   >
                     gemini-3-flash-preview
                   </td>
@@ -1681,7 +1723,11 @@ export default function Page() {
                 <tr style={{ background: "rgba(249, 115, 22, 0.05)" }}>
                   <td
                     className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}
-                    style={{ border: "1px solid rgba(249, 115, 22, 0.2)", padding: "0.5rem 1rem", color: "var(--text-subtle)" }}
+                    style={{
+                      border: "1px solid rgba(249, 115, 22, 0.2)",
+                      padding: "0.5rem 1rem",
+                      color: "var(--text-subtle)",
+                    }}
                   >
                     gemini-3.1-pro-preview
                   </td>
@@ -1720,7 +1766,11 @@ export default function Page() {
                 <tr>
                   <td
                     className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}
-                    style={{ border: "1px solid rgba(249, 115, 22, 0.2)", padding: "0.5rem 1rem", color: "var(--text-subtle)" }}
+                    style={{
+                      border: "1px solid rgba(249, 115, 22, 0.2)",
+                      padding: "0.5rem 1rem",
+                      color: "var(--text-subtle)",
+                    }}
                   >
                     gemini-2.5-flash
                   </td>
@@ -1810,7 +1860,11 @@ export default function Page() {
                 <tr>
                   <td
                     className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}
-                    style={{ border: "1px solid rgba(249, 115, 22, 0.2)", padding: "0.5rem 1rem", color: "var(--text-subtle)" }}
+                    style={{
+                      border: "1px solid rgba(249, 115, 22, 0.2)",
+                      padding: "0.5rem 1rem",
+                      color: "var(--text-subtle)",
+                    }}
                   >
                     claude-sonnet-4-6
                   </td>
@@ -1847,7 +1901,11 @@ export default function Page() {
                 <tr style={{ background: "rgba(249, 115, 22, 0.05)" }}>
                   <td
                     className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}
-                    style={{ border: "1px solid rgba(249, 115, 22, 0.2)", padding: "0.5rem 1rem", color: "var(--text-subtle)" }}
+                    style={{
+                      border: "1px solid rgba(249, 115, 22, 0.2)",
+                      padding: "0.5rem 1rem",
+                      color: "var(--text-subtle)",
+                    }}
                   >
                     claude-opus-4-6
                   </td>

@@ -127,7 +127,9 @@ export default function ChecklistApp() {
             marginBottom: "0.5rem",
           }}
         >
-          <span style={{ fontWeight: 700, color: "var(--text)", fontSize: "0.875rem" }}>完了度</span>
+          <span style={{ fontWeight: 700, color: "var(--text)", fontSize: "0.875rem" }}>
+            完了度
+          </span>
           <span
             style={{
               fontWeight: 700,
@@ -206,7 +208,9 @@ export default function ChecklistApp() {
                   <span
                     className={styles.checkText}
                     style={
-                      isChecked ? { color: "var(--text-muted)", textDecoration: "line-through" } : undefined
+                      isChecked
+                        ? { color: "var(--text-muted)", textDecoration: "line-through" }
+                        : undefined
                     }
                   >
                     {item.text}

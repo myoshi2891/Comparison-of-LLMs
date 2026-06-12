@@ -386,11 +386,18 @@ export default function ExamplesApp() {
         <div className={styles.patternCard}>
           <div style={{ fontSize: "1.5rem", marginBottom: "0.25rem" }}>{current.emoji}</div>
           <div
-            style={{ fontWeight: 700, color: "var(--cyan)", fontSize: "1rem", marginBottom: "0.25rem" }}
+            style={{
+              fontWeight: 700,
+              color: "var(--cyan)",
+              fontSize: "1rem",
+              marginBottom: "0.25rem",
+            }}
           >
             {current.label}
           </div>
-          <p style={{ color: "var(--text-subtle)", fontSize: "0.875rem", margin: 0 }}>{current.desc}</p>
+          <p style={{ color: "var(--text-subtle)", fontSize: "0.875rem", margin: 0 }}>
+            {current.desc}
+          </p>
         </div>
 
         {/* 2-col grid: dir structure + use case */}
