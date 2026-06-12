@@ -694,7 +694,7 @@ spec:
               </tr>
               <tr>
                 <td>🔑 ID管理</td>
-                <td>Workload Identity で Pod 単位 of 最小権限 IAM</td>
+                <td>Workload Identity で Pod 単位の最小権限 IAM</td>
                 <td>1つのPod侵害が他に波及しない</td>
               </tr>
               <tr>
