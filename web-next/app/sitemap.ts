@@ -31,6 +31,9 @@ const ROUTES = [
   "/copilot/github-copilot",
   // Phase E: git_worktree.html
   "/git-worktree",
+  "/google/harness-engineering",
+  "/google/agent-harness-engineering",
+  "/google/antigravity-slash-commands-guide",
 ] as const;
 
 /**
