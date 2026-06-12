@@ -5,7 +5,7 @@ import type { ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
 import HarnessEngineeringPage, {
   metadata as rawMetadata,
-} from "@/app/gemini/harness-engineering/page";
+} from "./page";
 
 vi.mock("@/components/docs/MermaidDiagram", () => ({
   default: function DummyMermaidDiagram({ chart }: { chart: string }) {
