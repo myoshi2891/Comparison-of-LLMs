@@ -1,7 +1,7 @@
 # プロジェクト進捗・ステータス (PROGRESS.md)
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
-> - 最終更新日: **Updated 2026-06-11**
+> - 最終更新日: **Updated 2026-06-12**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -14,10 +14,11 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（本作業範囲では新規違反 0 件、既知の既存指摘は本件対象外）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **710 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **738 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **CIエラー修正およびGoogle関連コンポーネントテスト追加**: Biomeフォーマットエラーを修正し、テストカバレッジが不足していた8つの新規Googleコンポーネントに対する Vitest テストを追加。合計738テスト合格。
 - **Claude Self-hosted Sandboxes 完全ガイド**: Next.js App Router への移行完了 🚀（7件の契約テストを追加し、合計710テスト合格）。Claude Managed Agents のセルフホスト型サンドボックス環境におけるアーキテクチャ、Docker 連携、セキュリティ制御、MCP 統合などのベストプラクティスを解説する詳細ガイド。
 - **Hermes Agent 中級・上級者向け完全ガイド**: Next.js App Router への移行完了 🚀（8件の契約テストを追加し、合計693テスト合格）。アーキテクチャの深掘り、7層の多層防御セキュリティモデル、DMペアリング、Docker サンドボックス、サブエージェント委譲、Cron ジョブチェーニング等、本番運用を見据えた高度な活用法を解説する詳細ガイド。
 - **Hermes Agent 完全ガイド**: Nous Research が開発した自己改善型 AI エージェント「Hermes Agent」のアーキテクチャ、セットアップ、メモリ、スキル、自動化（Cron）等を解説する総合ガイドをルートに配置。
@@ -153,7 +154,7 @@ Next.js 移行完了後のリポジトリ `LLM-Studies` にて、テストカバ
 Next.js 移行完了後のリポジトリ `LLM-Studies` の保守・改善作業を再開してください。
 
 - リポジトリ: LLM-Studies (Next.js 移行プロジェクトは dev/main へ完全マージ済み)
-- 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (710/710 passed) / pytest (38/38 passed) で全 Green
+  - 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (738/738 passed) / pytest (38/38 passed) で全 Green
 - リポジトリ規約: CLAUDE.md (編集上の絶対ルール)
 
 作業方針：
