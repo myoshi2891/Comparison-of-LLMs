@@ -218,11 +218,11 @@ function Code5() {
 }
 
 const VIZ_CONFIGS = [
-  { bg: "#e0f2fe", border: "#7dd3fc", icon: "📁", label: "ディレクトリ作成完了！" },
-  { bg: "#fef3c7", border: "#fcd34d", icon: "📝", label: "YAMLフロントマター完成！" },
-  { bg: "#d1fae5", border: "#6ee7b7", icon: "✍️", label: "指示本文完成！" },
-  { bg: "#ede9fe", border: "#c4b5fd", icon: "🔍", label: "スキル認識確認中..." },
-  { bg: "#ffe4e6", border: "#fda4af", icon: "🚀", label: "スキル進化中！" },
+  { bg: "rgba(59, 130, 246, 0.15)", border: "rgba(59, 130, 246, 0.4)", icon: "📁", label: "ディレクトリ作成完了！" },
+  { bg: "rgba(245, 158, 11, 0.15)", border: "rgba(245, 158, 11, 0.4)", icon: "📝", label: "YAMLフロントマター完成！" },
+  { bg: "rgba(16, 185, 129, 0.15)", border: "rgba(16, 185, 129, 0.4)", icon: "✍️", label: "指示本文完成！" },
+  { bg: "rgba(168, 85, 247, 0.15)", border: "rgba(168, 85, 247, 0.4)", icon: "🔍", label: "スキル認識確認中..." },
+  { bg: "rgba(244, 63, 94, 0.15)", border: "rgba(244, 63, 94, 0.4)", icon: "🚀", label: "スキル進化中！" },
 ] as const;
 
 /**
@@ -236,7 +236,7 @@ function StepViz({ step }: { step: number }) {
   return (
     <div className={styles.stepViz} style={{ background: cfg.bg, borderColor: cfg.border }}>
       <div style={{ fontSize: "1.875rem", marginBottom: "0.5rem" }}>{cfg.icon}</div>
-      <div style={{ fontWeight: 700, color: "#334155", fontSize: "0.875rem" }}>{cfg.label}</div>
+      <div style={{ fontWeight: 700, color: "var(--text)", fontSize: "0.875rem" }}>{cfg.label}</div>
     </div>
   );
 }
@@ -327,7 +327,7 @@ export default function StepsApp() {
           style={{
             marginTop: 0,
             marginBottom: "1rem",
-            color: "#0f766e",
+            color: "var(--cyan)",
             fontSize: "1.25rem",
             fontWeight: 600,
           }}
@@ -358,7 +358,7 @@ export default function StepsApp() {
                   <div>
                     <div
                       className={styles.stepTitle}
-                      style={isActive ? { color: "#065f46" } : undefined}
+                      style={isActive ? { color: "var(--cyan)" } : undefined}
                     >
                       {s.title}
                     </div>
@@ -381,7 +381,7 @@ export default function StepsApp() {
             <h3
               style={{
                 margin: 0,
-                color: "#0f766e",
+                color: "var(--cyan)",
                 fontSize: "1.125rem",
                 fontWeight: 700,
               }}
@@ -475,9 +475,9 @@ export default function StepsApp() {
               padding: "0.625rem 1.25rem",
               borderRadius: "0.75rem",
               fontWeight: 600,
-              color: "#334155",
-              background: "#ffffff",
-              border: "2px solid #e2e8f0",
+              color: "var(--text)",
+              background: "var(--bg-2)",
+              border: "2px solid var(--border)",
               cursor: "pointer",
               fontSize: "0.875rem",
               boxShadow: "0 2px 6px rgba(0,0,0,0.1)",

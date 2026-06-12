@@ -172,10 +172,24 @@
 
 /* ===== Mermaid ===== */
 .mermaidWrap {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   overflow-x: auto;
   margin: 1.5rem 0;
+}
+
+.mermaidWrap :global(svg) {
+  margin: 0 auto;
+}
+
+.mermaidWrap :global(.node) text,
+.mermaidWrap :global(.node) span,
+.mermaidWrap :global(.label) {
+  color: inherit !important;
+  fill: currentColor !important;
 }
 
 /* ===== 3-col card grid (overview) ===== */

@@ -19,10 +19,10 @@ end
 SKILL --> GC
 SKILL --> AG
 SKILL --> CC
-style SKILL fill:#d1fae5,stroke:#059669,color:#065f46
-style GCi fill:#bfdbfe,stroke:#0284c7,color:#0c4a6e
-style AGi fill:#ede9fe,stroke:#7c3aed,color:#3b0764
-style CCi fill:#fef3c7,stroke:#d97706,color:#78350f`;
+style SKILL fill:#064e3b,stroke:#059669,color:#a7f3d0
+style GCi fill:#1e3a8a,stroke:#3b82f6,color:#bfdbfe
+style AGi fill:#4c1d95,stroke:#8b5cf6,color:#ddd6fe
+style CCi fill:#78350f,stroke:#d97706,color:#fde68a`;
 
 const MERMAID_WHY_COMPARE = `graph TD
 subgraph 従来の方法["❌ 従来の方法（非効率）"]
@@ -35,9 +35,9 @@ A2["👤 ユーザー指示"] --> B2["AIエージェント"]
 B2 -->|"関連スキルを\\nオンデマンド検索"| C2["📄 SKILL.md だけ読む\\n（最小トークン消費）"]
 C2 --> D2["⚡ 高精度・高速・低コスト"]
 end
-style D1 fill:#fecaca,stroke:#dc2626,color:#7f1d1d
-style D2 fill:#d1fae5,stroke:#059669,color:#065f46
-style C2 fill:#bfdbfe,stroke:#0284c7,color:#0c4a6e`;
+style D1 fill:#7f1d1d,stroke:#dc2626,color:#fecaca
+style D2 fill:#064e3b,stroke:#059669,color:#a7f3d0
+style C2 fill:#1e3a8a,stroke:#3b82f6,color:#bfdbfe`;
 
 const MERMAID_WHY_LEVELS = `graph LR
 L1["🏷️ レベル1: メタデータ\\nname + description\\n常にコンテキストにある\\n～100 tokens\\nセッション開始時に読込"]
@@ -45,9 +45,9 @@ L2["📄 レベル2: SKILL.md 本文\\nスキルが呼ばれたときのみ\\n5,
 L3["📚 レベル3: 参照ファイル\\n本文から参照された時のみ\\n容量無制限\\nAPIドキュメント等"]
 L1 -->|"スキルが選ばれたとき"| L2
 L2 -->|"本文から参照されたとき"| L3
-style L1 fill:#fef3c7,stroke:#f59e0b,color:#78350f
-style L2 fill:#bfdbfe,stroke:#0284c7,color:#0c4a6e
-style L3 fill:#d1fae5,stroke:#059669,color:#065f46`;
+style L1 fill:#78350f,stroke:#f59e0b,color:#fde68a
+style L2 fill:#1e3a8a,stroke:#3b82f6,color:#bfdbfe
+style L3 fill:#064e3b,stroke:#059669,color:#a7f3d0`;
 
 const MERMAID_HOWTO = `graph LR
 A["---\\nYAML\\nフロントマター\\n---"]
@@ -58,9 +58,9 @@ E["## Step-by-Step Guide\\n具体的な実行手順\\n（最重要）"]
 F["## Examples\\n入力例と出力例\\nFew-shot学習"]
 G["## Rules\\n禁止事項と推奨事項\\n❌と✅"]
 A --> B --> C --> D --> E --> F --> G
-style A fill:#fef3c7,stroke:#f59e0b,color:#78350f
-style E fill:#d1fae5,stroke:#059669,color:#065f46
-style G fill:#ede9fe,stroke:#7c3aed,color:#3b0764`;
+style A fill:#78350f,stroke:#f59e0b,color:#fde68a
+style E fill:#064e3b,stroke:#059669,color:#a7f3d0
+style G fill:#4c1d95,stroke:#8b5cf6,color:#ddd6fe`;
 
 const MERMAID_INSTALL_SCOPE = `graph TB
 Root["📂 スキルの配置場所"]
@@ -377,14 +377,14 @@ export default function Page() {
               </thead>
               <tbody>
                 <tr className={styles.tr}>
-                  <td className={`${styles.tdLeft}`} style={{ fontWeight: 600, color: "#334155" }}>
+                  <td className={`${styles.tdLeft}`} style={{ fontWeight: 600, color: "var(--text)" }}>
                     形態
                   </td>
-                  <td style={{ color: "#475569" }}>ターミナルアプリ</td>
-                  <td style={{ color: "#475569" }}>IDE（エディタ）</td>
+                  <td>ターミナルアプリ</td>
+                  <td>IDE（エディタ）</td>
                 </tr>
                 <tr className={styles.trEven}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "#334155" }}>
+                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "var(--text)" }}>
                     最新バージョン
                   </td>
                   <td>
@@ -423,61 +423,61 @@ export default function Page() {
                   </td>
                 </tr>
                 <tr className={styles.tr}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "#334155" }}>
+                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "var(--text)" }}>
                     グローバルスキルパス
                   </td>
-                  <td className={styles.mono} style={{ color: "#0369a1", fontSize: "0.75rem" }}>
+                  <td className={styles.mono} style={{ color: "var(--blue)", fontSize: "0.75rem" }}>
                     {"~/.gemini/skills/"}
                   </td>
-                  <td className={styles.mono} style={{ color: "#6d28d9", fontSize: "0.75rem" }}>
+                  <td className={styles.mono} style={{ color: "var(--purple)", fontSize: "0.75rem" }}>
                     {"~/.gemini/antigravity/skills/"}
                   </td>
                 </tr>
                 <tr className={styles.trEven}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "#334155" }}>
+                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "var(--text)" }}>
                     ワークスペーススキルパス
                   </td>
-                  <td className={styles.mono} style={{ color: "#0369a1", fontSize: "0.75rem" }}>
+                  <td className={styles.mono} style={{ color: "var(--blue)", fontSize: "0.75rem" }}>
                     {".gemini/skills/"}
                   </td>
-                  <td className={styles.mono} style={{ color: "#6d28d9", fontSize: "0.75rem" }}>
+                  <td className={styles.mono} style={{ color: "var(--purple)", fontSize: "0.75rem" }}>
                     {".agent/skills/"}
                   </td>
                 </tr>
                 <tr className={styles.tr}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "#334155" }}>
+                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "var(--text)" }}>
                     インストールコマンド
                   </td>
-                  <td className={styles.mono} style={{ color: "#0369a1", fontSize: "0.75rem" }}>
+                  <td className={styles.mono} style={{ color: "var(--blue)", fontSize: "0.75rem" }}>
                     gemini skills install
                   </td>
-                  <td style={{ color: "#475569", fontSize: "0.75rem" }}>GUI または CLI</td>
+                  <td style={{ color: "var(--text-subtle)", fontSize: "0.75rem" }}>GUI または CLI</td>
                 </tr>
                 <tr className={styles.trEven}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "#334155" }}>
+                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "var(--text)" }}>
                     SKILL.md サポート
                   </td>
-                  <td style={{ fontWeight: 700, color: "#059669" }}>✅ フル対応</td>
-                  <td style={{ fontWeight: 700, color: "#059669" }}>✅ フル対応</td>
+                  <td style={{ fontWeight: 700, color: "var(--green)" }}>✅ フル対応</td>
+                  <td style={{ fontWeight: 700, color: "var(--green)" }}>✅ フル対応</td>
                 </tr>
                 <tr className={styles.tr}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "#334155" }}>
+                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "var(--text)" }}>
                     デフォルトモデル
                   </td>
-                  <td className={styles.mono} style={{ color: "#0369a1", fontSize: "0.75rem" }}>
+                  <td className={styles.mono} style={{ color: "var(--blue)", fontSize: "0.75rem" }}>
                     Auto (Gemini 3.5)
                     <br />
                     <span style={{ color: "#94a3b8" }}>(タスクに応じて自動選択)</span>
                   </td>
-                  <td className={styles.mono} style={{ color: "#6d28d9", fontSize: "0.75rem" }}>
+                  <td className={styles.mono} style={{ color: "var(--purple)", fontSize: "0.75rem" }}>
                     gemini-3.5-flash
                   </td>
                 </tr>
                 <tr className={styles.trEven}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "#334155" }}>
+                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "var(--text)" }}>
                     最高精度モデル
                   </td>
-                  <td className={styles.mono} style={{ color: "#0369a1", fontSize: "0.75rem" }}>
+                  <td className={styles.mono} style={{ color: "var(--blue)", fontSize: "0.75rem" }}>
                     gemini-3.5-pro
                     <br />
                     <span style={{ color: "#94a3b8" }}>
@@ -493,12 +493,12 @@ export default function Page() {
                       )
                     </span>
                   </td>
-                  <td className={styles.mono} style={{ color: "#6d28d9", fontSize: "0.75rem" }}>
+                  <td className={styles.mono} style={{ color: "var(--purple)", fontSize: "0.75rem" }}>
                     gemini-3.5-pro
                   </td>
                 </tr>
                 <tr className={styles.tr}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "#334155" }}>
+                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "var(--text)" }}>
                     Plan Mode
                   </td>
                   <td style={{ fontWeight: 700, color: "#059669" }}>
@@ -510,21 +510,21 @@ export default function Page() {
                   <td style={{ fontWeight: 700, color: "#059669" }}>✅ あり</td>
                 </tr>
                 <tr className={styles.trEven}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "#334155" }}>
+                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "var(--text)" }}>
                     skill-creator メタスキル
                   </td>
                   <td style={{ fontWeight: 700, color: "#059669" }}>✅ 標準搭載</td>
                   <td style={{ fontWeight: 700, color: "#059669" }}>✅ あり</td>
                 </tr>
                 <tr className={styles.tr}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "#334155" }}>
+                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "var(--text)" }}>
                     /rewind コマンド
                   </td>
                   <td style={{ fontWeight: 700, color: "#059669" }}>✅</td>
                   <td style={{ color: "#94a3b8" }}>—</td>
                 </tr>
                 <tr className={styles.trEven}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "#334155" }}>
+                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "var(--text)" }}>
                     AGENTS.md 対応
                   </td>
                   <td style={{ color: "#475569", fontSize: "0.75rem" }}>
@@ -568,7 +568,7 @@ export default function Page() {
           </h3>
           <p
             style={{
-              color: "#475569",
+              color: "var(--text-subtle)",
               fontSize: "0.875rem",
               lineHeight: 1.75,
               marginBottom: "1rem",
@@ -655,23 +655,23 @@ export default function Page() {
               <div className={styles.legendList}>
                 <div className={styles.legendItem}>
                   <span className={styles.legendDot} style={{ background: "#10b981" }} />
-                  <span style={{ fontWeight: 700, color: "#047857" }}>SKILL.md</span>
-                  <span style={{ color: "#64748b" }}>— 必須。YAMLメタデータ＋指示本文</span>
+                  <span style={{ fontWeight: 700, color: "#22c55e" }}>SKILL.md</span>
+                  <span style={{ color: "var(--text-subtle)" }}>— 必須。YAMLメタデータ＋指示本文</span>
                 </div>
                 <div className={styles.legendItem}>
                   <span className={styles.legendDot} style={{ background: "#38bdf8" }} />
-                  <span style={{ fontWeight: 700, color: "#0369a1" }}>scripts/</span>
-                  <span style={{ color: "#64748b" }}>— 自動実行スクリプト（Python/Bash）</span>
+                  <span style={{ fontWeight: 700, color: "#38bdf8" }}>scripts/</span>
+                  <span style={{ color: "var(--text-subtle)" }}>— 自動実行スクリプト（Python/Bash）</span>
                 </div>
                 <div className={styles.legendItem}>
                   <span className={styles.legendDot} style={{ background: "#a78bfa" }} />
-                  <span style={{ fontWeight: 700, color: "#6d28d9" }}>references/</span>
-                  <span style={{ color: "#64748b" }}>— 参照ドキュメント（必要時のみ読込）</span>
+                  <span style={{ fontWeight: 700, color: "#c084fc" }}>references/</span>
+                  <span style={{ color: "var(--text-subtle)" }}>— 参照ドキュメント（必要時のみ読込）</span>
                 </div>
                 <div className={styles.legendItem}>
                   <span className={styles.legendDot} style={{ background: "#94a3b8" }} />
-                  <span style={{ fontWeight: 700, color: "#334155" }}>assets/</span>
-                  <span style={{ color: "#64748b" }}>— テンプレート・静的ファイル</span>
+                  <span style={{ fontWeight: 700, color: "var(--text)" }}>assets/</span>
+                  <span style={{ color: "var(--text-subtle)" }}>— テンプレート・静的ファイル</span>
                 </div>
               </div>
             </div>
@@ -681,10 +681,10 @@ export default function Page() {
               <h3 className={styles.fileTreeHead}>SKILL.md の構成</h3>
               <div className={styles.anatStack}>
                 <div className={`${styles.anatCard} ${styles.anatCardAmber}`}>
-                  <div className={styles.anatTitle} style={{ color: "#92400e" }}>
+                  <div className={styles.anatTitle} style={{ color: "#fbbf24" }}>
                     🔑 YAMLフロントマター（必須）
                   </div>
-                  <div className={styles.anatBody} style={{ color: "#b45309" }}>
+                  <div className={styles.anatBody} style={{ color: "#fde68a" }}>
                     <code className={styles.codeInlineAmber}>---</code>
                     で囲まれたYAML形式のメタデータ。
                     <br />
@@ -694,10 +694,10 @@ export default function Page() {
                 </div>
                 <div className={styles.anatConnect}>↕</div>
                 <div className={`${styles.anatCard} ${styles.anatCardSky}`}>
-                  <div className={styles.anatTitle} style={{ color: "#075985" }}>
+                  <div className={styles.anatTitle} style={{ color: "#60a5fa" }}>
                     📝 マークダウン本文（必須）
                   </div>
-                  <div className={styles.anatBody} style={{ color: "#0369a1" }}>
+                  <div className={styles.anatBody} style={{ color: "#93c5fd" }}>
                     エージェントへの具体的な指示。以下のセクションで構成：
                     <br />
                     Overview → Before Starting → Step-by-Step → Examples → Rules
@@ -705,10 +705,10 @@ export default function Page() {
                 </div>
                 <div className={styles.anatConnect}>↕</div>
                 <div className={`${styles.anatCard} ${styles.anatCardEmerald}`}>
-                  <div className={styles.anatTitle} style={{ color: "#14532d" }}>
+                  <div className={styles.anatTitle} style={{ color: "#34d399" }}>
                     🔗 参照ファイルリンク（任意）
                   </div>
-                  <div className={styles.anatBody} style={{ color: "#15803d" }}>
+                  <div className={styles.anatBody} style={{ color: "#a7f3d0" }}>
                     本文中で
                     <code className={styles.codeInlineEmerald}>references/api-docs.md</code>
                     のように外部ファイルを参照。必要時だけ読込
@@ -813,29 +813,29 @@ export default function Page() {
             </div>
             <div className={styles.descExGrid}>
               <div className={styles.descExBad}>
-                <div className={styles.descExTitle} style={{ color: "#b91c1c" }}>
+                <div className={styles.descExTitle} style={{ color: "#fca5a5" }}>
                   ❌ 悪い例（トリガーや用途が曖昧）
                 </div>
-                <code className={styles.descExCode} style={{ color: "#7f1d1d" }}>
+                <code className={styles.descExCode} style={{ color: "#fecaca" }}>
                   {"description: コードをレビューするスキル。\n"}
                   {"triggers: []"}
                 </code>
-                <div className={styles.descExNote} style={{ color: "#dc2626" }}>
+                <div className={styles.descExNote} style={{ color: "#fda4af" }}>
                   → AIがいつ使ってよいか判断できず発動しません
                 </div>
               </div>
               <div className={styles.descExGood}>
-                <div className={styles.descExTitle} style={{ color: "#14532d" }}>
+                <div className={styles.descExTitle} style={{ color: "#86efac" }}>
                   ✅ 良い例（明示的なトリガー定義）
                 </div>
-                <code className={styles.descExCode} style={{ color: "#14532d" }}>
+                <code className={styles.descExCode} style={{ color: "#a7f3d0" }}>
                   {"description: フロントエンドコードをレビューする。\n"}
                   {"triggers:\n"}
                   {'  - "review"\n'}
                   {'  - "レビュー"\n'}
                   {'  - "PR確認"'}
                 </code>
-                <div className={styles.descExNote} style={{ color: "#059669" }}>
+                <div className={styles.descExNote} style={{ color: "#a7f3d0" }}>
                   → トリガー条件が明確で、合致した際に確実に発動します
                 </div>
               </div>
@@ -849,7 +849,7 @@ export default function Page() {
 
           <p
             style={{
-              color: "#475569",
+              color: "var(--text-subtle)",
               fontSize: "0.875rem",
               lineHeight: 1.75,
               marginBottom: "1.25rem",
@@ -982,7 +982,7 @@ export default function Page() {
           {/* Gemini CLI commands */}
           <h3 className={styles.secH3}>
             Gemini CLI コマンド一覧
-            <span style={{ fontSize: "0.875rem", fontWeight: 400, color: "#64748b" }}>
+            <span style={{ fontSize: "0.875rem", fontWeight: 400, color: "var(--text-muted)" }}>
               {" "}
               （v0.43.0 対応）
             </span>
@@ -1050,7 +1050,7 @@ export default function Page() {
           </h3>
           <p
             style={{
-              color: "#475569",
+              color: "var(--text-subtle)",
               fontSize: "0.875rem",
               lineHeight: 1.75,
               marginBottom: "0.75rem",
@@ -1058,7 +1058,8 @@ export default function Page() {
           >
             <code
               style={{
-                background: "#f1f5f9",
+                background: "var(--bg-4)",
+                color: "var(--text)",
                 padding: "0.125rem 0.5rem",
                 borderRadius: "0.25rem",
                 fontFamily: "var(--font-mono)",
@@ -1160,7 +1161,7 @@ export default function Page() {
                   style={{ width: "70%", background: "#7dd3fc" }}
                 />
               </div>
-              <span className={styles.skillCountStatus} style={{ color: "#0369a1" }}>
+              <span className={styles.skillCountStatus} style={{ color: "var(--blue)" }}>
                 普通
               </span>
             </div>
@@ -1172,7 +1173,7 @@ export default function Page() {
                   style={{ width: "90%", background: "#34d399" }}
                 />
               </div>
-              <span className={styles.skillCountStatus} style={{ color: "#059669" }}>
+              <span className={styles.skillCountStatus} style={{ color: "var(--green)" }}>
                 最適 ⭐
               </span>
             </div>
@@ -1184,7 +1185,7 @@ export default function Page() {
                   style={{ width: "80%", background: "#facc15" }}
                 />
               </div>
-              <span className={styles.skillCountStatus} style={{ color: "#a16207" }}>
+              <span className={styles.skillCountStatus} style={{ color: "var(--orange)" }}>
                 やや多め
               </span>
             </div>
@@ -1196,7 +1197,7 @@ export default function Page() {
                   style={{ width: "40%", background: "#f87171" }}
                 />
               </div>
-              <span className={styles.skillCountStatus} style={{ color: "#b91c1c" }}>
+              <span className={styles.skillCountStatus} style={{ color: "var(--red)" }}>
                 非推奨
               </span>
             </div>
@@ -1212,25 +1213,25 @@ export default function Page() {
                 <tr>
                   <th
                     className={`${styles.thGradient} ${styles.tdLeft}`}
-                    style={{ color: "#134e4a" }}
+                    style={{ color: "var(--cyan)" }}
                   >
                     ツール
                   </th>
                   <th
                     className={`${styles.thGradient} ${styles.tdLeft}`}
-                    style={{ color: "#134e4a" }}
+                    style={{ color: "var(--cyan)" }}
                   >
                     グローバルパス
                   </th>
                   <th
                     className={`${styles.thGradient} ${styles.tdLeft}`}
-                    style={{ color: "#134e4a" }}
+                    style={{ color: "var(--cyan)" }}
                   >
                     ローカルパス
                   </th>
                   <th
                     className={`${styles.thGradient} ${styles.tdLeft}`}
-                    style={{ color: "#134e4a" }}
+                    style={{ color: "var(--cyan)" }}
                   >
                     インストールコマンド
                   </th>
@@ -1238,7 +1239,7 @@ export default function Page() {
               </thead>
               <tbody>
                 <tr className={styles.tr}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 700, color: "#0369a1" }}>
+                  <td className={styles.tdLeft} style={{ fontWeight: 700, color: "var(--blue)" }}>
                     Gemini CLI
                     <br />
                     <span className={styles.textSlateLight}>v0.43.0</span>
@@ -1254,7 +1255,7 @@ export default function Page() {
                   </td>
                 </tr>
                 <tr className={styles.trEven}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 700, color: "#6d28d9" }}>
+                  <td className={styles.tdLeft} style={{ fontWeight: 700, color: "var(--purple)" }}>
                     Antigravity
                     <br />
                     <span className={styles.textSlateLight}>v2.0.1</span>
@@ -1270,7 +1271,7 @@ export default function Page() {
                   </td>
                 </tr>
                 <tr className={styles.tr}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 700, color: "#059669" }}>
+                  <td className={styles.tdLeft} style={{ fontWeight: 700, color: "var(--green)" }}>
                     両方同時
                   </td>
                   <td className={styles.textSlate} colSpan={2} style={{ textAlign: "center" }}>
@@ -1290,15 +1291,15 @@ export default function Page() {
           id="whatsnew"
           className={styles.sec}
           style={{
-            background: "linear-gradient(135deg,#fff7ed,#fef3c7)",
+            background: "linear-gradient(135deg, rgba(249, 115, 22, 0.05), rgba(245, 158, 11, 0.1))",
             borderWidth: "2px",
             borderStyle: "solid",
-            borderColor: "#fed7aa",
+            borderColor: "rgba(249, 115, 22, 0.3)",
           }}
         >
           <h2
             className={styles.secTitle}
-            style={{ color: "#c2410c", borderBottomColor: "#fed7aa" }}
+            style={{ color: "var(--orange)", borderBottomColor: "rgba(249, 115, 22, 0.3)" }}
           >
             🆕 最新アップデート（2026年5月23日時点）
           </h2>
@@ -1308,7 +1309,7 @@ export default function Page() {
             {/* Gemini CLI */}
             <div
               className={styles.newCard}
-              style={{ borderColor: "#bae6fd", background: "#ffffff", padding: "1.25rem" }}
+              style={{ borderColor: "rgba(59, 130, 246, 0.3)", background: "var(--bg-2)", padding: "1.25rem" }}
             >
               <div
                 style={{
@@ -1324,7 +1325,7 @@ export default function Page() {
                 >
                   Gemini CLI
                 </span>
-                <span className={styles.badge} style={{ background: "#e0f2fe", color: "#0369a1" }}>
+                <span className={styles.badge} style={{ background: "var(--blue-dim)", color: "#60a5fa" }}>
                   v0.43.0 (2026-03-17)
                 </span>
               </div>
@@ -1337,7 +1338,7 @@ export default function Page() {
                   flexDirection: "column",
                   gap: "0.5rem",
                   fontSize: "0.875rem",
-                  color: "#475569",
+                  color: "var(--text-subtle)",
                 }}
               >
                 <li style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
@@ -1386,7 +1387,8 @@ export default function Page() {
                     Gemini 3 をデフォルトモデルに採用（
                     <code
                       style={{
-                        background: "#f1f5f9",
+                        background: "var(--bg-3)",
+                        color: "var(--text)",
                         padding: "0 0.25rem",
                         borderRadius: "0.25rem",
                         fontSize: "0.75rem",
@@ -1412,7 +1414,8 @@ export default function Page() {
                     <strong>Gemini CLI SDK</strong>（
                     <code
                       style={{
-                        background: "#f1f5f9",
+                        background: "var(--bg-3)",
+                        color: "var(--text)",
                         padding: "0 0.25rem",
                         borderRadius: "0.25rem",
                         fontSize: "0.75rem",
@@ -1473,7 +1476,7 @@ export default function Page() {
             {/* Antigravity */}
             <div
               className={styles.newCard}
-              style={{ borderColor: "#ddd6fe", background: "#ffffff", padding: "1.25rem" }}
+              style={{ borderColor: "rgba(168, 85, 247, 0.3)", background: "var(--bg-2)", padding: "1.25rem" }}
             >
               <div
                 style={{
@@ -1489,7 +1492,7 @@ export default function Page() {
                 >
                   Antigravity
                 </span>
-                <span className={styles.badge} style={{ background: "#ede9fe", color: "#6d28d9" }}>
+                <span className={styles.badge} style={{ background: "var(--purple-dim)", color: "#c084fc" }}>
                   v2.0.1 (2026-05-23)
                 </span>
               </div>
@@ -1502,7 +1505,7 @@ export default function Page() {
                   flexDirection: "column",
                   gap: "0.5rem",
                   fontSize: "0.875rem",
-                  color: "#475569",
+                  color: "var(--text-subtle)",
                 }}
               >
                 <li style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
@@ -1560,7 +1563,8 @@ export default function Page() {
                         <code
                           key={m}
                           style={{
-                            background: "#f1f5f9",
+                            background: "var(--bg-3)",
+                            color: "var(--text)",
                             padding: "0 0.25rem",
                             borderRadius: "0.25rem",
                             fontSize: "0.75rem",
@@ -1581,53 +1585,53 @@ export default function Page() {
           </div>
 
           {/* Model table */}
-          <h3 className={styles.secH3} style={{ color: "#9a3412", marginTop: "1.5rem" }}>
+          <h3 className={styles.secH3} style={{ color: "var(--orange)", marginTop: "1.5rem" }}>
             🤖 現在サポートされるモデル（2026年5月23日時点）
           </h3>
           <div className={`${styles.tableWrap} ${styles.modelTable}`}>
             <table
               className={styles.table}
-              style={{ background: "#ffffff", borderRadius: "0.75rem", overflow: "hidden" }}
+              style={{ background: "var(--bg-2)", borderRadius: "0.75rem", overflow: "hidden" }}
             >
               <thead>
-                <tr style={{ background: "#ffedd5" }}>
+                <tr style={{ background: "rgba(249, 115, 22, 0.15)" }}>
                   <th
                     className={styles.tdLeft}
                     style={{
-                      border: "1px solid #fed7aa",
+                      border: "1px solid rgba(249, 115, 22, 0.3)",
                       padding: "0.5rem 1rem",
                       fontWeight: 700,
-                      color: "#7c2d12",
+                      color: "var(--text)",
                     }}
                   >
                     モデルID
                   </th>
                   <th
                     style={{
-                      border: "1px solid #fed7aa",
+                      border: "1px solid rgba(249, 115, 22, 0.3)",
                       padding: "0.5rem 1rem",
                       fontWeight: 700,
-                      color: "#7c2d12",
+                      color: "var(--text)",
                     }}
                   >
                     推奨用途
                   </th>
                   <th
                     style={{
-                      border: "1px solid #fed7aa",
+                      border: "1px solid rgba(249, 115, 22, 0.3)",
                       padding: "0.5rem 1rem",
                       fontWeight: 700,
-                      color: "#7c2d12",
+                      color: "var(--text)",
                     }}
                   >
                     ステータス
                   </th>
                   <th
                     style={{
-                      border: "1px solid #fed7aa",
+                      border: "1px solid rgba(249, 115, 22, 0.3)",
                       padding: "0.5rem 1rem",
                       fontWeight: 700,
-                      color: "#7c2d12",
+                      color: "var(--text)",
                     }}
                   >
                     対応ツール
@@ -1638,23 +1642,24 @@ export default function Page() {
                 <tr>
                   <td
                     className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}
-                    style={{ border: "1px solid #fed7aa", padding: "0.5rem 1rem" }}
+                    style={{ border: "1px solid rgba(249, 115, 22, 0.2)", padding: "0.5rem 1rem", color: "var(--text-subtle)" }}
                   >
                     gemini-3-flash-preview
                   </td>
                   <td
                     className={styles.textSlate}
                     style={{
-                      border: "1px solid #fed7aa",
+                      border: "1px solid rgba(249, 115, 22, 0.2)",
                       padding: "0.5rem 1rem",
                       textAlign: "center",
+                      color: "var(--text-subtle)",
                     }}
                   >
                     コードレビュー・テスト・実装・オーケストレーター
                   </td>
                   <td
                     style={{
-                      border: "1px solid #fed7aa",
+                      border: "1px solid rgba(249, 115, 22, 0.2)",
                       padding: "0.5rem 1rem",
                       textAlign: "center",
                     }}
@@ -1665,7 +1670,7 @@ export default function Page() {
                   </td>
                   <td
                     style={{
-                      border: "1px solid #fed7aa",
+                      border: "1px solid rgba(249, 115, 22, 0.2)",
                       padding: "0.5rem 1rem",
                       textAlign: "center",
                     }}
@@ -1673,26 +1678,27 @@ export default function Page() {
                     <span className={`${styles.badge} ${styles.badgeGreen}`}>両方</span>
                   </td>
                 </tr>
-                <tr style={{ background: "#fff7ed" }}>
+                <tr style={{ background: "rgba(249, 115, 22, 0.05)" }}>
                   <td
                     className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}
-                    style={{ border: "1px solid #fed7aa", padding: "0.5rem 1rem" }}
+                    style={{ border: "1px solid rgba(249, 115, 22, 0.2)", padding: "0.5rem 1rem", color: "var(--text-subtle)" }}
                   >
                     gemini-3.1-pro-preview
                   </td>
                   <td
                     className={styles.textSlate}
                     style={{
-                      border: "1px solid #fed7aa",
+                      border: "1px solid rgba(249, 115, 22, 0.2)",
                       padding: "0.5rem 1rem",
                       textAlign: "center",
+                      color: "var(--text-subtle)",
                     }}
                   >
                     アーキテクチャ設計・セキュリティ監査（ARC-AGI-2: 77.1%）
                   </td>
                   <td
                     style={{
-                      border: "1px solid #fed7aa",
+                      border: "1px solid rgba(249, 115, 22, 0.2)",
                       padding: "0.5rem 1rem",
                       textAlign: "center",
                     }}
@@ -1703,7 +1709,7 @@ export default function Page() {
                   </td>
                   <td
                     style={{
-                      border: "1px solid #fed7aa",
+                      border: "1px solid rgba(249, 115, 22, 0.2)",
                       padding: "0.5rem 1rem",
                       textAlign: "center",
                     }}
@@ -1714,23 +1720,24 @@ export default function Page() {
                 <tr>
                   <td
                     className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}
-                    style={{ border: "1px solid #fed7aa", padding: "0.5rem 1rem" }}
+                    style={{ border: "1px solid rgba(249, 115, 22, 0.2)", padding: "0.5rem 1rem", color: "var(--text-subtle)" }}
                   >
                     gemini-2.5-flash
                   </td>
                   <td
                     className={styles.textSlate}
                     style={{
-                      border: "1px solid #fed7aa",
+                      border: "1px solid rgba(249, 115, 22, 0.2)",
                       padding: "0.5rem 1rem",
                       textAlign: "center",
+                      color: "var(--text-subtle)",
                     }}
                   >
                     安定運用・コスパ重視
                   </td>
                   <td
                     style={{
-                      border: "1px solid #fed7aa",
+                      border: "1px solid rgba(249, 115, 22, 0.2)",
                       padding: "0.5rem 1rem",
                       textAlign: "center",
                     }}
@@ -1739,7 +1746,7 @@ export default function Page() {
                   </td>
                   <td
                     style={{
-                      border: "1px solid #fed7aa",
+                      border: "1px solid rgba(249, 115, 22, 0.2)",
                       padding: "0.5rem 1rem",
                       textAlign: "center",
                     }}
@@ -1752,23 +1759,23 @@ export default function Page() {
                     </span>
                   </td>
                 </tr>
-                <tr style={{ background: "#fff7ed" }}>
+                <tr style={{ background: "rgba(249, 115, 22, 0.05)" }}>
                   <td
                     className={`${styles.tdLeft} ${styles.mono}`}
                     style={{
-                      border: "1px solid #fed7aa",
+                      border: "1px solid rgba(249, 115, 22, 0.2)",
                       padding: "0.5rem 1rem",
-                      color: "#94a3b8",
+                      color: "var(--text-muted)",
                     }}
                   >
                     gemini-2.0-flash
                   </td>
                   <td
                     style={{
-                      border: "1px solid #fed7aa",
+                      border: "1px solid rgba(249, 115, 22, 0.2)",
                       padding: "0.5rem 1rem",
                       textAlign: "center",
-                      color: "#94a3b8",
+                      color: "var(--text-muted)",
                       fontSize: "0.75rem",
                     }}
                   >
@@ -1776,7 +1783,7 @@ export default function Page() {
                   </td>
                   <td
                     style={{
-                      border: "1px solid #fed7aa",
+                      border: "1px solid rgba(249, 115, 22, 0.2)",
                       padding: "0.5rem 1rem",
                       textAlign: "center",
                     }}
@@ -1787,7 +1794,7 @@ export default function Page() {
                   </td>
                   <td
                     style={{
-                      border: "1px solid #fed7aa",
+                      border: "1px solid rgba(249, 115, 22, 0.2)",
                       padding: "0.5rem 1rem",
                       textAlign: "center",
                     }}
@@ -1803,23 +1810,24 @@ export default function Page() {
                 <tr>
                   <td
                     className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}
-                    style={{ border: "1px solid #fed7aa", padding: "0.5rem 1rem" }}
+                    style={{ border: "1px solid rgba(249, 115, 22, 0.2)", padding: "0.5rem 1rem", color: "var(--text-subtle)" }}
                   >
                     claude-sonnet-4-6
                   </td>
                   <td
                     className={styles.textSlate}
                     style={{
-                      border: "1px solid #fed7aa",
+                      border: "1px solid rgba(249, 115, 22, 0.2)",
                       padding: "0.5rem 1rem",
                       textAlign: "center",
+                      color: "var(--text-subtle)",
                     }}
                   >
                     Anthropic モデル（Antigravity 対応）
                   </td>
                   <td
                     style={{
-                      border: "1px solid #fed7aa",
+                      border: "1px solid rgba(249, 115, 22, 0.2)",
                       padding: "0.5rem 1rem",
                       textAlign: "center",
                     }}
@@ -1828,7 +1836,7 @@ export default function Page() {
                   </td>
                   <td
                     style={{
-                      border: "1px solid #fed7aa",
+                      border: "1px solid rgba(249, 115, 22, 0.2)",
                       padding: "0.5rem 1rem",
                       textAlign: "center",
                     }}
@@ -1836,26 +1844,27 @@ export default function Page() {
                     <span className={`${styles.badge} ${styles.badgeViolet}`}>Antigravity</span>
                   </td>
                 </tr>
-                <tr style={{ background: "#fff7ed" }}>
+                <tr style={{ background: "rgba(249, 115, 22, 0.05)" }}>
                   <td
                     className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}
-                    style={{ border: "1px solid #fed7aa", padding: "0.5rem 1rem" }}
+                    style={{ border: "1px solid rgba(249, 115, 22, 0.2)", padding: "0.5rem 1rem", color: "var(--text-subtle)" }}
                   >
                     claude-opus-4-6
                   </td>
                   <td
                     className={styles.textSlate}
                     style={{
-                      border: "1px solid #fed7aa",
+                      border: "1px solid rgba(249, 115, 22, 0.2)",
                       padding: "0.5rem 1rem",
                       textAlign: "center",
+                      color: "var(--text-subtle)",
                     }}
                   >
                     Anthropic 最高精度（Antigravity 対応）
                   </td>
                   <td
                     style={{
-                      border: "1px solid #fed7aa",
+                      border: "1px solid rgba(249, 115, 22, 0.2)",
                       padding: "0.5rem 1rem",
                       textAlign: "center",
                     }}
@@ -1864,7 +1873,7 @@ export default function Page() {
                   </td>
                   <td
                     style={{
-                      border: "1px solid #fed7aa",
+                      border: "1px solid rgba(249, 115, 22, 0.2)",
                       padding: "0.5rem 1rem",
                       textAlign: "center",
                     }}
