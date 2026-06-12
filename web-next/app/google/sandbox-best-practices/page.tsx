@@ -301,7 +301,10 @@ export default function GoogleSandboxBestPracticesPage() {
             </div>
           </div>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c1)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c1)" } as React.CSSProperties}
+          >
             Google の 6 つのサンドボックス技術 — クイックリファレンス
           </div>
           <table className={styles.mdTable}>
@@ -384,14 +387,22 @@ export default function GoogleSandboxBestPracticesPage() {
             </tbody>
           </table>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c1)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c1)" } as React.CSSProperties}
+          >
             サンドボックスが必要な理由（3 層防御モデル）
           </div>
-          <div className={styles.diagramWrap} style={{ "--diag-w": "650px" } as React.CSSProperties}>
+          <div
+            className={styles.diagramWrap}
+            style={{ "--diag-w": "650px" } as React.CSSProperties}
+          >
             <div className={styles.preMermaid}>
               <MermaidDiagram chart={DIAG_1} />
             </div>
-            <p className={styles.diagramLabel}>図1: サンドボックスが防ぐ攻撃と Google の三層防御モデル</p>
+            <p className={styles.diagramLabel}>
+              図1: サンドボックスが防ぐ攻撃と Google の三層防御モデル
+            </p>
           </div>
         </section>
 
@@ -411,7 +422,9 @@ export default function GoogleSandboxBestPracticesPage() {
             <div className={styles.preMermaid}>
               <MermaidDiagram chart={DIAG_2} />
             </div>
-            <p className={styles.diagramLabel}>図2: ユースケース別サンドボックス選択フローチャート</p>
+            <p className={styles.diagramLabel}>
+              図2: ユースケース別サンドボックス選択フローチャート
+            </p>
           </div>
         </section>
 
@@ -423,7 +436,10 @@ export default function GoogleSandboxBestPracticesPage() {
           <h2 className={styles.secTitle}>GKE Agent Sandbox</h2>
 
           <div className={styles.sbHeader} style={{ borderLeftColor: "var(--c1)" }}>
-            <div className={styles.sbIcon} style={{ background: "rgba(66, 133, 244, 0.15)", color: "var(--c1)" }}>
+            <div
+              className={styles.sbIcon}
+              style={{ background: "rgba(66, 133, 244, 0.15)", color: "var(--c1)" }}
+            >
               🤖
             </div>
             <div className={styles.sbHeaderMeta}>
@@ -452,7 +468,10 @@ export default function GoogleSandboxBestPracticesPage() {
             </div>
           </div>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c1)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c1)" } as React.CSSProperties}
+          >
             仕組みの全体像
           </div>
           <div
@@ -465,7 +484,10 @@ export default function GoogleSandboxBestPracticesPage() {
             <p className={styles.diagramLabel}>図3: GKE Agent Sandbox の CRD 連携フロー</p>
           </div>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c1)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c1)" } as React.CSSProperties}
+          >
             4 つの主要 CRD の役割
           </div>
           <table className={styles.mdTable}>
@@ -482,7 +504,9 @@ export default function GoogleSandboxBestPracticesPage() {
                   <strong style={{ color: "var(--c1)" }}>SandboxTemplate</strong>
                 </td>
                 <td>「箱の設計図」</td>
-                <td>Podのリソース・セキュリティポリシー・ネットワークルールを定義する再利用可能な青写真</td>
+                <td>
+                  Podのリソース・セキュリティポリシー・ネットワークルールを定義する再利用可能な青写真
+                </td>
               </tr>
               <tr>
                 <td>
@@ -508,7 +532,10 @@ export default function GoogleSandboxBestPracticesPage() {
             </tbody>
           </table>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c1)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c1)" } as React.CSSProperties}
+          >
             SandboxTemplate の最小設定例
           </div>
           <div className={styles.codeBlock}>
@@ -542,7 +569,10 @@ spec:
             </pre>
           </div>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c1)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c1)" } as React.CSSProperties}
+          >
             セットアップ手順
           </div>
           <div className={styles.steps}>
@@ -556,7 +586,9 @@ spec:
               <div className={styles.stepBody}>
                 <div className={styles.stepTitle}>GKE クラスタを Workload Identity 付きで作成</div>
                 <div className={styles.stepDesc}>
-                  <code style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "#a8c4e0" }}>
+                  <code
+                    style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "#a8c4e0" }}
+                  >
                     --workload-pool=${"{PROJECT_ID}"}.svc.id.goog
                   </code>{" "}
                   オプションを付けて作成します。
@@ -573,7 +605,9 @@ spec:
               <div className={styles.stepBody}>
                 <div className={styles.stepTitle}>gVisor ノードプールを追加</div>
                 <div className={styles.stepDesc}>
-                  <code style={{ fontFamily: "var(--font-mono)", fontSize: "1rem", color: "#a8c4e0" }}>
+                  <code
+                    style={{ fontFamily: "var(--font-mono)", fontSize: "1rem", color: "#a8c4e0" }}
+                  >
                     --sandbox type=gvisor --image-type cos_containerd
                   </code>{" "}
                   でサンドボックス専用ノードを作成します。
@@ -617,15 +651,21 @@ spec:
                 5
               </div>
               <div className={styles.stepBody}>
-                <div className={styles.stepTitle}>AIフレームワーク（ADK/LangChain）から SandboxClaim を発行</div>
+                <div className={styles.stepTitle}>
+                  AIフレームワーク（ADK/LangChain）から SandboxClaim を発行
+                </div>
                 <div className={styles.stepDesc}>
-                  フレームワークが SandboxClaim を発行すると、Warm Pool から即座に隔離環境が割り当てられます。
+                  フレームワークが SandboxClaim を発行すると、Warm Pool
+                  から即座に隔離環境が割り当てられます。
                 </div>
               </div>
             </div>
           </div>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c1)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c1)" } as React.CSSProperties}
+          >
             ベストプラクティス
           </div>
           <table className={styles.mdTable}>
@@ -706,7 +746,10 @@ spec:
           <h2 className={styles.secTitle}>Gemini Code Execution</h2>
 
           <div className={styles.sbHeader} style={{ borderLeftColor: "var(--c2)" }}>
-            <div className={styles.sbIcon} style={{ background: "rgba(52, 168, 83, 0.15)", color: "var(--c2)" }}>
+            <div
+              className={styles.sbIcon}
+              style={{ background: "rgba(52, 168, 83, 0.15)", color: "var(--c2)" }}
+            >
               ✨
             </div>
             <div className={styles.sbHeaderMeta}>
@@ -735,7 +778,10 @@ spec:
             </div>
           </div>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c2)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c2)" } as React.CSSProperties}
+          >
             コード実行の流れ（シーケンス図）
           </div>
           <div
@@ -748,7 +794,10 @@ spec:
             <p className={styles.diagramLabel}>図4: Gemini Code Execution の ReAct ループ</p>
           </div>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c2)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c2)" } as React.CSSProperties}
+          >
             制約事項と対処法
           </div>
           <table className={styles.mdTable}>
@@ -762,7 +811,9 @@ spec:
             <tbody>
               <tr>
                 <td>⏱️ タイムアウト</td>
-                <td>最大 <strong>30 秒</strong> で強制終了</td>
+                <td>
+                  最大 <strong>30 秒</strong> で強制終了
+                </td>
                 <td>処理を複数ターンに分割して実行</td>
               </tr>
               <tr>
@@ -788,7 +839,10 @@ spec:
             </tbody>
           </table>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c2)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c2)" } as React.CSSProperties}
+          >
             Python SDK で有効化する方法
           </div>
           <div className={styles.codeBlock}>
@@ -819,7 +873,10 @@ for part in response.candidates[0].content.parts:
             </pre>
           </div>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c2)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c2)" } as React.CSSProperties}
+          >
             ベストプラクティス
           </div>
           <div
@@ -862,7 +919,10 @@ for part in response.candidates[0].content.parts:
           <h2 className={styles.secTitle}>gVisor / GKE Sandbox</h2>
 
           <div className={styles.sbHeader} style={{ borderLeftColor: "var(--c3)" }}>
-            <div className={styles.sbIcon} style={{ background: "rgba(255, 109, 0, 0.15)", color: "var(--c3)" }}>
+            <div
+              className={styles.sbIcon}
+              style={{ background: "rgba(255, 109, 0, 0.15)", color: "var(--c3)" }}
+            >
               🛡️
             </div>
             <div className={styles.sbHeaderMeta}>
@@ -872,7 +932,8 @@ for part in response.candidates[0].content.parts:
               </div>
               <div className={styles.sbDesc}>
                 Google が開発した OSS のアプリケーションカーネル。コンテナがホスト OS
-                のカーネルに直接触れることなく実行される。<strong>GKE Agent Sandbox の基盤技術</strong>
+                のカーネルに直接触れることなく実行される。
+                <strong>GKE Agent Sandbox の基盤技術</strong>
                 であり、Gemini の実行にも使用されている。
               </div>
             </div>
@@ -891,17 +952,28 @@ for part in response.candidates[0].content.parts:
             </div>
           </div>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c3)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c3)" } as React.CSSProperties}
+          >
             通常コンテナ vs gVisor コンテナ
           </div>
-          <div className={styles.diagramWrap} style={{ "--diag-w": "600px" } as React.CSSProperties}>
+          <div
+            className={styles.diagramWrap}
+            style={{ "--diag-w": "600px" } as React.CSSProperties}
+          >
             <div className={styles.preMermaid}>
               <MermaidDiagram chart={DIAG_6} />
             </div>
-            <p className={styles.diagramLabel}>図6: 通常コンテナと gVisor コンテナのアーキテクチャ比較</p>
+            <p className={styles.diagramLabel}>
+              図6: 通常コンテナと gVisor コンテナのアーキテクチャ比較
+            </p>
           </div>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c3)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c3)" } as React.CSSProperties}
+          >
             通常コンテナとの比較表
           </div>
           <table className={styles.mdTable}>
@@ -922,7 +994,8 @@ for part in response.candidates[0].content.parts:
                 <td>隔離強度</td>
                 <td>中（名前空間・cgroup）</td>
                 <td>
-                  <span style={{ color: "#34a853", fontWeight: 700 }}>高</span>（ユーザー空間カーネル）
+                  <span style={{ color: "#34a853", fontWeight: 700 }}>高</span>
+                  （ユーザー空間カーネル）
                 </td>
               </tr>
               <tr>
@@ -943,13 +1016,18 @@ for part in response.candidates[0].content.parts:
                 <td>KubernetesでのPod設定</td>
                 <td>（デフォルト）</td>
                 <td>
-                  <code style={{ fontFamily: "var(--font-mono)", fontSize: "1rem" }}>runtimeClassName: gvisor</code>
+                  <code style={{ fontFamily: "var(--font-mono)", fontSize: "1rem" }}>
+                    runtimeClassName: gvisor
+                  </code>
                 </td>
               </tr>
             </tbody>
           </table>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c3)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c3)" } as React.CSSProperties}
+          >
             GKE Sandbox 有効化手順
           </div>
           <div className={styles.steps}>
@@ -961,7 +1039,9 @@ for part in response.candidates[0].content.parts:
                 1
               </div>
               <div className={styles.stepBody}>
-                <div className={styles.stepTitle}>cos_containerd イメージタイプのノードプールを作成</div>
+                <div className={styles.stepTitle}>
+                  cos_containerd イメージタイプのノードプールを作成
+                </div>
                 <div className={styles.stepDesc}>
                   gVisor が動作するためには Container-Optimized OS with containerd が必要です。
                 </div>
@@ -975,8 +1055,12 @@ for part in response.candidates[0].content.parts:
                 2
               </div>
               <div className={styles.stepBody}>
-                <div className={styles.stepTitle}>gVisor ノードプールを作成（--sandbox type=gvisor）</div>
-                <div className={styles.stepDesc}>専用ノードプールを作成し、gVisor ランタイムを有効化します。</div>
+                <div className={styles.stepTitle}>
+                  gVisor ノードプールを作成（--sandbox type=gvisor）
+                </div>
+                <div className={styles.stepDesc}>
+                  専用ノードプールを作成し、gVisor ランタイムを有効化します。
+                </div>
               </div>
             </div>
             <div className={styles.step}>
@@ -987,8 +1071,12 @@ for part in response.candidates[0].content.parts:
                 3
               </div>
               <div className={styles.stepBody}>
-                <div className={styles.stepTitle}>Deployment に runtimeClassName: gvisor を追加</div>
-                <div className={styles.stepDesc}>信頼できないワークロードの Pod spec に RuntimeClass を指定します。</div>
+                <div className={styles.stepTitle}>
+                  Deployment に runtimeClassName: gvisor を追加
+                </div>
+                <div className={styles.stepDesc}>
+                  信頼できないワークロードの Pod spec に RuntimeClass を指定します。
+                </div>
               </div>
             </div>
             <div className={styles.step}>
@@ -1023,7 +1111,9 @@ for part in response.candidates[0].content.parts:
             </li>
             <li>
               <span className={styles.linkLabel}>Performance Guide</span>
-              <Ext href="https://gvisor.dev/docs/architecture_guide/performance/">gVisor パフォーマンスガイド</Ext>
+              <Ext href="https://gvisor.dev/docs/architecture_guide/performance/">
+                gVisor パフォーマンスガイド
+              </Ext>
             </li>
           </ul>
         </section>
@@ -1036,7 +1126,10 @@ for part in response.candidates[0].content.parts:
           <h2 className={styles.secTitle}>Sandbox2 / SAPI</h2>
 
           <div className={styles.sbHeader} style={{ borderLeftColor: "var(--c4)" }}>
-            <div className={styles.sbIcon} style={{ background: "rgba(251, 188, 4, 0.15)", color: "var(--c4)" }}>
+            <div
+              className={styles.sbIcon}
+              style={{ background: "rgba(251, 188, 4, 0.15)", color: "var(--c4)" }}
+            >
               🔩
             </div>
             <div className={styles.sbHeaderMeta}>
@@ -1046,7 +1139,8 @@ for part in response.candidates[0].content.parts:
               </div>
               <div className={styles.sbDesc}>
                 C/C++ で書かれたライブラリやプログラムを安全に実行するための Google OSS
-                フレームワーク。古い脆弱なライブラリを「<strong>一度サンドボックス化したらどこでも再利用</strong>
+                フレームワーク。古い脆弱なライブラリを「
+                <strong>一度サンドボックス化したらどこでも再利用</strong>
                 」できる設計。
               </div>
             </div>
@@ -1065,7 +1159,10 @@ for part in response.candidates[0].content.parts:
             </div>
           </div>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c4)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c4)" } as React.CSSProperties}
+          >
             Sandbox2 の 2 プロセスモデル
           </div>
           <div
@@ -1078,7 +1175,10 @@ for part in response.candidates[0].content.parts:
             <p className={styles.diagramLabel}>図7: Sandbox2 の Executor-Sandboxee 分離モデル</p>
           </div>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c4)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c4)" } as React.CSSProperties}
+          >
             Sandbox2 vs SAPI — 使い分けガイド
           </div>
           <table className={styles.mdTable}>
@@ -1106,7 +1206,8 @@ for part in response.candidates[0].content.parts:
                 <td>再利用性</td>
                 <td>低（プロジェクトごとに再実装）</td>
                 <td>
-                  <span style={{ color: "#34a853", fontWeight: 700 }}>高</span>（一度書いたらどこでも）
+                  <span style={{ color: "#34a853", fontWeight: 700 }}>高</span>
+                  （一度書いたらどこでも）
                 </td>
               </tr>
               <tr>
@@ -1124,7 +1225,10 @@ for part in response.candidates[0].content.parts:
             </tbody>
           </table>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c4)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c4)" } as React.CSSProperties}
+          >
             seccomp-bpf の仕組み（初学者向け）
           </div>
           <div className={`${styles.callout} ${styles.calloutInfo}`}>
@@ -1142,11 +1246,15 @@ for part in response.candidates[0].content.parts:
           <ul className={styles.linkList}>
             <li>
               <span className={styles.linkLabel}>公式ドキュメント</span>
-              <Ext href="https://developers.google.com/code-sandboxing">Google Code Sandboxing Overview</Ext>
+              <Ext href="https://developers.google.com/code-sandboxing">
+                Google Code Sandboxing Overview
+              </Ext>
             </li>
             <li>
               <span className={styles.linkLabel}>Sandbox2 解説</span>
-              <Ext href="https://developers.google.com/code-sandboxing/sandbox2/explained">Sandbox2 Explained</Ext>
+              <Ext href="https://developers.google.com/code-sandboxing/sandbox2/explained">
+                Sandbox2 Explained
+              </Ext>
             </li>
             <li>
               <span className={styles.linkLabel}>SAPI Getting Started</span>
@@ -1169,13 +1277,17 @@ for part in response.candidates[0].content.parts:
           <h2 className={styles.secTitle}>V8 Sandbox</h2>
 
           <div className={styles.sbHeader} style={{ borderLeftColor: "var(--c5)" }}>
-            <div className={styles.sbIcon} style={{ background: "rgba(156, 39, 176, 0.15)", color: "var(--c5)" }}>
+            <div
+              className={styles.sbIcon}
+              style={{ background: "rgba(156, 39, 176, 0.15)", color: "var(--c5)" }}
+            >
               🌐
             </div>
             <div className={styles.sbHeaderMeta}>
               <div className={styles.sbName}>V8 Sandbox</div>
               <div className={styles.sbDomain}>
-                領域: ブラウザ JavaScript 実行 &nbsp;|&nbsp; 主要技術: メモリ空間分離（ポインタ圧縮）
+                領域: ブラウザ JavaScript 実行 &nbsp;|&nbsp; 主要技術:
+                メモリ空間分離（ポインタ圧縮）
               </div>
               <div className={styles.sbDesc}>
                 Chrome ブラウザ内部で JavaScript を実行する V8 エンジン専用のメモリ隔離機構。JS
@@ -1198,7 +1310,10 @@ for part in response.candidates[0].content.parts:
             </div>
           </div>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c5)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c5)" } as React.CSSProperties}
+          >
             V8 Sandbox のメモリ隔離モデル
           </div>
           <div
@@ -1211,7 +1326,10 @@ for part in response.candidates[0].content.parts:
             <p className={styles.diagramLabel}>図8: V8 Sandbox のメモリ分離とポインタ圧縮</p>
           </div>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c5)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c5)" } as React.CSSProperties}
+          >
             ポインタ圧縮とは？（初学者向け）
           </div>
           <div className={`${styles.callout} ${styles.calloutInfo}`}>
@@ -1220,13 +1338,19 @@ for part in response.candidates[0].content.parts:
               通常のポインタは「メモリのどこでも指せる 64bit アドレス」ですが、V8 Sandbox では
               <strong>32bit のオフセット</strong>に圧縮します。
               <br />
-              実際のアドレス = <code style={{ fontFamily: "var(--font-mono)" }}>サンドボックス基底アドレス + 32bit オフセット</code>
+              実際のアドレス ={" "}
+              <code style={{ fontFamily: "var(--font-mono)" }}>
+                サンドボックス基底アドレス + 32bit オフセット
+              </code>
               <br />
               攻撃者がポインタを改ざんしても、常に「サンドボックス内のアドレス」しか指せないため、外部メモリへのアクセスが不可能になります。
             </div>
           </div>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c5)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c5)" } as React.CSSProperties}
+          >
             役割別アクションアイテム
           </div>
           <table className={styles.mdTable}>
@@ -1248,13 +1372,18 @@ for part in response.candidates[0].content.parts:
               <tr>
                 <td>⚙️ Node.js 開発者</td>
                 <td>
-                  <code style={{ fontFamily: "var(--font-mono)", fontSize: "1rem" }}>isolated-vm</code>{" "}
+                  <code style={{ fontFamily: "var(--font-mono)", fontSize: "1rem" }}>
+                    isolated-vm
+                  </code>{" "}
                   パッケージ（V8 Isolate ベース）で各テナントに独立した実行環境を付与
                 </td>
               </tr>
               <tr>
                 <td>🔍 セキュリティ研究者</td>
-                <td>V8 Sandbox バイパスは Chrome VRP（脆弱性報奨金）の対象セキュリティ境界として認定済み</td>
+                <td>
+                  V8 Sandbox バイパスは Chrome
+                  VRP（脆弱性報奨金）の対象セキュリティ境界として認定済み
+                </td>
               </tr>
             </tbody>
           </table>
@@ -1298,14 +1427,27 @@ for part in response.candidates[0].content.parts:
             </div>
           </div>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c6)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c6)" } as React.CSSProperties}
+          >
             Privacy Sandbox とは何だったか
           </div>
-          <p style={{ color: "var(--ts)", fontSize: "1rem", marginBottom: "24px", lineHeight: "1.75" }}>
+          <p
+            style={{
+              color: "var(--ts)",
+              fontSize: "1rem",
+              marginBottom: "24px",
+              lineHeight: "1.75",
+            }}
+          >
             2019年にGoogleが発表したプライバシー配慮型Web広告APIの総称。サードパーティCookieを廃止しながらも広告のターゲティング・計測を維持するという目標で開発されていましたが、採用率の低迷・規制当局（英国CMA等）からの懸念・業界からの冷ややかな反応により、6年間の開発の末に廃止されました。
           </p>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c6)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c6)" } as React.CSSProperties}
+          >
             廃止までのタイムライン
           </div>
           <div className={styles.timeline}>
@@ -1340,7 +1482,9 @@ for part in response.candidates[0].content.parts:
               </div>
               <div className={styles.tlBody}>
                 <div className={styles.tlYear}>2024年7月</div>
-                <div className={styles.tlEvent}>完全廃止からユーザー選択型モデルへ方針転換を発表。</div>
+                <div className={styles.tlEvent}>
+                  完全廃止からユーザー選択型モデルへ方針転換を発表。
+                </div>
               </div>
             </div>
             <div className={styles.tlItem}>
@@ -1350,7 +1494,9 @@ for part in response.candidates[0].content.parts:
               </div>
               <div className={styles.tlBody}>
                 <div className={styles.tlYear}>2025年4月</div>
-                <div className={styles.tlEvent}>新規プロンプト展開を中止。既存のCookie設定を維持すると発表。</div>
+                <div className={styles.tlEvent}>
+                  新規プロンプト展開を中止。既存のCookie設定を維持すると発表。
+                </div>
               </div>
             </div>
             <div className={styles.tlItem}>
@@ -1363,13 +1509,19 @@ for part in response.candidates[0].content.parts:
                   2025年10月17日
                 </div>
                 <div className={styles.tlEvent}>
-                  <strong>Topics API / Protected Audience / Attribution Reporting を含む全 API を正式廃止。</strong>
+                  <strong>
+                    Topics API / Protected Audience / Attribution Reporting を含む全 API
+                    を正式廃止。
+                  </strong>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c6)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c6)" } as React.CSSProperties}
+          >
             現在の代替アプローチ
           </div>
           <table className={styles.mdTable}>
@@ -1402,8 +1554,9 @@ for part in response.candidates[0].content.parts:
           <div className={`${styles.callout} ${styles.calloutWarn}`}>
             <div className={styles.calloutIcon}>⚠️</div>
             <div className={styles.calloutBody}>
-              <strong>注意:</strong> サードパーティ Cookie は Chrome に引き続き存在しています。ただし
-              Safari・Firefox は既にブロックしており、GDPR/同意管理（CMP）の維持は引き続き法的義務です。
+              <strong>注意:</strong> サードパーティ Cookie は Chrome
+              に引き続き存在しています。ただし Safari・Firefox
+              は既にブロックしており、GDPR/同意管理（CMP）の維持は引き続き法的義務です。
             </div>
           </div>
         </section>
@@ -1534,10 +1687,11 @@ for part in response.candidates[0].content.parts:
             <div className={styles.calloutIcon}>💡</div>
             <div className={styles.calloutBody}>
               <strong>迷ったら：</strong> まず
-              <strong style={{ color: "var(--c2)" }}>Gemini Code Execution</strong> から試してください。Python
-              に限定されますが、インフラ不要でGemini
+              <strong style={{ color: "var(--c2)" }}>Gemini Code Execution</strong>{" "}
+              から試してください。Python に限定されますが、インフラ不要でGemini
               が自律的にコードを実行します。より複雑な要件（多言語・ステートフル・高スループット）が出てきたら
-              <strong style={{ color: "var(--c1)" }}>GKE Agent Sandbox</strong> に移行するのが Google 推奨のパスです。
+              <strong style={{ color: "var(--c1)" }}>GKE Agent Sandbox</strong> に移行するのが
+              Google 推奨のパスです。
             </div>
           </div>
         </section>
@@ -1558,19 +1712,22 @@ for part in response.candidates[0].content.parts:
             <div className={styles.glossaryItem}>
               <div className={styles.glossaryTerm}>gVisor</div>
               <div className={styles.glossaryDef}>
-                Google が開発した OSS のアプリケーションカーネル。Linux syscall をユーザー空間で再実装し、ホストOSカーネルへの直接接触を防ぐ。
+                Google が開発した OSS のアプリケーションカーネル。Linux syscall
+                をユーザー空間で再実装し、ホストOSカーネルへの直接接触を防ぐ。
               </div>
             </div>
             <div className={styles.glossaryItem}>
               <div className={styles.glossaryTerm}>seccomp-bpf</div>
               <div className={styles.glossaryDef}>
-                Linuxカーネルのセキュリティ機能。BPF プログラムで「どの syscall を許可するか」を細かく制御できる。
+                Linuxカーネルのセキュリティ機能。BPF プログラムで「どの syscall
+                を許可するか」を細かく制御できる。
               </div>
             </div>
             <div className={styles.glossaryItem}>
               <div className={styles.glossaryTerm}>Linux Namespaces</div>
               <div className={styles.glossaryDef}>
-                PID・ネットワーク・ファイルシステム等をプロセスごとに独立した「見え方」で分離する Linux の機能。
+                PID・ネットワーク・ファイルシステム等をプロセスごとに独立した「見え方」で分離する
+                Linux の機能。
               </div>
             </div>
             <div className={styles.glossaryItem}>
@@ -1582,7 +1739,8 @@ for part in response.candidates[0].content.parts:
             <div className={styles.glossaryItem}>
               <div className={styles.glossaryTerm}>SandboxClaim</div>
               <div className={styles.glossaryDef}>
-                AIフレームワークが GKE Agent Sandbox に「実行環境を1つ貸してください」とリクエストするKubernetesリソース。PVCと同様のClaimモデル。
+                AIフレームワークが GKE Agent Sandbox
+                に「実行環境を1つ貸してください」とリクエストするKubernetesリソース。PVCと同様のClaimモデル。
               </div>
             </div>
             <div className={styles.glossaryItem}>
@@ -1600,14 +1758,16 @@ for part in response.candidates[0].content.parts:
             <div className={styles.glossaryItem}>
               <div className={styles.glossaryTerm}>ポインタ圧縮（V8）</div>
               <div className={styles.glossaryDef}>
-                64bitのメモリアドレスを32bitのオフセットに変換する技術。V8 Sandboxがサンドボックス外のメモリを参照できなくするための核心技術。
+                64bitのメモリアドレスを32bitのオフセットに変換する技術。V8
+                Sandboxがサンドボックス外のメモリを参照できなくするための核心技術。
               </div>
             </div>
             <div className={styles.glossaryItem}>
               <div className={styles.glossaryTerm}>RuntimeClass（Kubernetes）</div>
               <div className={styles.glossaryDef}>
                 KubernetesでPodの実行エンジン（runc / gVisor 等）を指定するためのリソース。
-                <code style={{ fontSize: "1rem" }}>runtimeClassName: gvisor</code> でgVisorを指定する。
+                <code style={{ fontSize: "1rem" }}>runtimeClassName: gvisor</code>{" "}
+                でgVisorを指定する。
               </div>
             </div>
           </div>
@@ -1620,7 +1780,10 @@ for part in response.candidates[0].content.parts:
           </div>
           <h2 className={styles.secTitle}>公式リンク集</h2>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c1)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c1)" } as React.CSSProperties}
+          >
             GKE Agent Sandbox
           </div>
           <ul className={styles.linkList}>
@@ -1662,13 +1825,18 @@ for part in response.candidates[0].content.parts:
             </li>
           </ul>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c2)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c2)" } as React.CSSProperties}
+          >
             Gemini Code Execution
           </div>
           <ul className={styles.linkList}>
             <li>
               <span className={styles.linkLabel}>API Ref</span>
-              <Ext href="https://ai.google.dev/gemini-api/docs/code-execution">Code Execution — ai.google.dev</Ext>
+              <Ext href="https://ai.google.dev/gemini-api/docs/code-execution">
+                Code Execution — ai.google.dev
+              </Ext>
             </li>
             <li>
               <span className={styles.linkLabel}>Vertex AI</span>
@@ -1678,7 +1846,10 @@ for part in response.candidates[0].content.parts:
             </li>
           </ul>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c3)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c3)" } as React.CSSProperties}
+          >
             gVisor / GKE Sandbox
           </div>
           <ul className={styles.linkList}>
@@ -1694,11 +1865,15 @@ for part in response.candidates[0].content.parts:
             </li>
             <li>
               <span className={styles.linkLabel}>Performance</span>
-              <Ext href="https://gvisor.dev/docs/architecture_guide/performance/">gVisor パフォーマンスガイド</Ext>
+              <Ext href="https://gvisor.dev/docs/architecture_guide/performance/">
+                gVisor パフォーマンスガイド
+              </Ext>
             </li>
             <li>
               <span className={styles.linkLabel}>Platforms</span>
-              <Ext href="https://gvisor.dev/docs/architecture_guide/platforms/">gVisor Platform ガイド（systrap/KVM/ptrace）</Ext>
+              <Ext href="https://gvisor.dev/docs/architecture_guide/platforms/">
+                gVisor Platform ガイド（systrap/KVM/ptrace）
+              </Ext>
             </li>
             <li>
               <span className={styles.linkLabel}>Production</span>
@@ -1706,7 +1881,10 @@ for part in response.candidates[0].content.parts:
             </li>
           </ul>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c4)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c4)" } as React.CSSProperties}
+          >
             Sandbox2 / SAPI
           </div>
           <ul className={styles.linkList}>
@@ -1716,11 +1894,15 @@ for part in response.candidates[0].content.parts:
             </li>
             <li>
               <span className={styles.linkLabel}>Sandbox2</span>
-              <Ext href="https://developers.google.com/code-sandboxing/sandbox2/explained">Sandbox2 Explained</Ext>
+              <Ext href="https://developers.google.com/code-sandboxing/sandbox2/explained">
+                Sandbox2 Explained
+              </Ext>
             </li>
             <li>
               <span className={styles.linkLabel}>SAPI</span>
-              <Ext href="https://developers.google.com/code-sandboxing/sandboxed-api/getting-started">SAPI Getting Started</Ext>
+              <Ext href="https://developers.google.com/code-sandboxing/sandboxed-api/getting-started">
+                SAPI Getting Started
+              </Ext>
             </li>
             <li>
               <span className={styles.linkLabel}>GitHub</span>
@@ -1728,7 +1910,10 @@ for part in response.candidates[0].content.parts:
             </li>
           </ul>
 
-          <div className={styles.subH2} style={{ "--accent-c": "var(--c5)" } as React.CSSProperties}>
+          <div
+            className={styles.subH2}
+            style={{ "--accent-c": "var(--c5)" } as React.CSSProperties}
+          >
             V8 Sandbox
           </div>
           <ul className={styles.linkList}>

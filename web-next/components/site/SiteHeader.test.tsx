@@ -59,16 +59,16 @@ describe("Phase A - SiteHeader root structure", () => {
 });
 
 describe("Phase A - SiteHeader dropdown rendering", () => {
-  it("renders 6 dropdowns (Claude/Gemini/Codex/Copilot/Code Review/Hermes) as .ch-dropdown <li>", () => {
+  it("renders 7 dropdowns (Claude/Gemini/Google/Codex/Copilot/Code Review/Hermes) as .ch-dropdown <li>", () => {
     const { container } = render(<SiteHeader pathname="/" />);
     const dropdowns = container.querySelectorAll("li.ch-dropdown");
-    expect(dropdowns.length).toBe(6);
+    expect(dropdowns.length).toBe(7);
   });
 
   it("each dropdown has a .ch-dropdown-toggle button with aria-haspopup=true", () => {
     const { container } = render(<SiteHeader pathname="/" />);
     const toggles = container.querySelectorAll("li.ch-dropdown .ch-dropdown-toggle");
-    expect(toggles.length).toBe(6);
+    expect(toggles.length).toBe(7);
     toggles.forEach((btn) => {
       expect(btn.getAttribute("aria-haspopup")).toBe("true");
     });
@@ -77,7 +77,7 @@ describe("Phase A - SiteHeader dropdown rendering", () => {
   it("each dropdown has a .ch-submenu <ul> with at least one child", () => {
     const { container } = render(<SiteHeader pathname="/" />);
     const submenus = container.querySelectorAll("li.ch-dropdown ul.ch-submenu");
-    expect(submenus.length).toBe(6);
+    expect(submenus.length).toBe(7);
     submenus.forEach((ul) => {
       expect(ul.querySelectorAll("li").length).toBeGreaterThan(0);
     });

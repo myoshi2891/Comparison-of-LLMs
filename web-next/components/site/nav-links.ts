@@ -60,6 +60,10 @@ export const navLinks: readonly NavLink[] = [
     ],
   },
   {
+    name: "Google",
+    children: [{ name: "Google Sandbox", href: "/google/sandbox-best-practices" }],
+  },
+  {
     name: "Codex",
     children: [
       { name: "Skill", href: "/codex/skill" },
