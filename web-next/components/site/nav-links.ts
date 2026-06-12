@@ -47,21 +47,18 @@ export const navLinks: readonly NavLink[] = [
     ],
   },
   {
-    name: "Gemini",
-    children: [
-      { name: "Skill", href: "/gemini/skill" },
-      { name: "Agent", href: "/gemini/agent" },
-      { name: "Skill Guide", href: "/gemini/skill-guide" },
-      { name: "Skill Guide (中級)", href: "/gemini/skill-guide-intermediate" },
-      { name: "Antigravity", href: "/gemini/antigravity-guide" },
-      { name: "Antigravity Slash Commands", href: "/gemini/antigravity-slash-commands-guide" },
-      { name: "Harness Engineering", href: "/gemini/harness-engineering" },
-      { name: "Agent Harness Engineering", href: "/gemini/agent-harness-engineering" },
-    ],
-  },
-  {
     name: "Google",
-    children: [{ name: "Google Sandbox", href: "/google/sandbox-best-practices" }],
+    children: [
+      { name: "Google Sandbox", href: "/google/sandbox-best-practices" },
+      { name: "Skill", href: "/google/skill" },
+      { name: "Agent", href: "/google/agent" },
+      { name: "Skill Guide", href: "/google/skill-guide" },
+      { name: "Skill Guide (中級)", href: "/google/skill-guide-intermediate" },
+      { name: "Antigravity", href: "/google/antigravity-guide" },
+      { name: "Antigravity Slash Commands", href: "/google/antigravity-slash-commands-guide" },
+      { name: "Harness Engineering", href: "/google/harness-engineering" },
+      { name: "Agent Harness Engineering", href: "/google/agent-harness-engineering" },
+    ],
   },
   {
     name: "Codex",
