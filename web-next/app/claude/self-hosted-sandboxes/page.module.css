@@ -75,13 +75,13 @@
 }
 
 .sbSub {
-  font-size: 0.85rem;
+  font-size: 1rem;
   color: var(--aa);
   font-weight: 500;
 }
 
 .navCat {
-  font-size: 0.85rem;
+  font-size: 1rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -97,7 +97,7 @@
   border-radius: 6px;
   color: var(--ts);
   text-decoration: none;
-  font-size: 0.95rem;
+  font-size: 1rem;
   transition: all 0.18s;
   border-left: 2px solid transparent;
 }
@@ -116,7 +116,7 @@
   height: 24px;
   background: var(--av-d);
   border-radius: 50%;
-  font-size: 0.85rem;
+  font-size: 1rem;
   font-weight: 700;
   color: #fff;
   flex-shrink: 0;
@@ -146,7 +146,7 @@
   color: var(--av-l);
   padding: 0.3rem 0.8rem;
   border-radius: 999px;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
   margin-bottom: 1.25rem;
 }
@@ -203,7 +203,7 @@
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: var(--tm);
 }
 
@@ -240,7 +240,7 @@
   border: 1px solid var(--av);
   color: var(--av-l);
   border-radius: 7px;
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -296,7 +296,7 @@
 .tw th {
   padding: 0.65rem 0.9rem;
   text-align: left;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--av-l);
   letter-spacing: 0.06em;
@@ -307,7 +307,7 @@
 
 .tw td {
   padding: 0.62rem 0.9rem;
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: var(--ts);
   border-bottom: 1px solid var(--bds);
   vertical-align: top;
@@ -335,7 +335,7 @@
   color: var(--tc);
   padding: 0.1em 0.38em;
   border-radius: 4px;
-  font-size: 0.85em;
+  font-size: 1rem;
 }
 
 /* ── Code ── */
@@ -378,7 +378,7 @@
 }
 
 .cl {
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: var(--tm);
   font-family: var(--fc);
   letter-spacing: 0.05em;
@@ -390,7 +390,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.85rem;
+  font-size: 1rem;
   color: var(--tm);
   background: none;
   border: none;
@@ -413,7 +413,7 @@
 
 .cb code {
   font-family: var(--fc);
-  font-size: 0.9rem;
+  font-size: 1rem;
   line-height: 1.75;
   color: #e2e8f0;
 }
@@ -454,7 +454,7 @@
   padding: 0.875rem 1.1rem;
   border-radius: 9px;
   margin: 1rem 0;
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
 .caI {
@@ -519,7 +519,7 @@
 }
 
 .mwT {
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--tm);
   letter-spacing: 0.1em;
@@ -553,7 +553,7 @@
 }
 
 .svgwT {
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--tm);
   letter-spacing: 0.1em;
@@ -620,7 +620,7 @@
 .tag {
   padding: 0.18rem 0.55rem;
   border-radius: 4px;
-  font-size: 0.8rem;
+  font-size: 1rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -674,7 +674,7 @@
 }
 
 .pcS {
-  font-size: 0.85rem;
+  font-size: 1rem;
   color: var(--tm);
   margin-top: 0.15rem;
 }
@@ -689,7 +689,7 @@
   align-items: center;
   padding: 0.3rem 0;
   border-bottom: 1px solid var(--bds);
-  font-size: 0.85rem;
+  font-size: 1rem;
 }
 
 .pr:last-child {
@@ -746,7 +746,7 @@
 .provTag {
   padding: 0.12rem 0.45rem;
   border-radius: 4px;
-  font-size: 0.75rem;
+  font-size: 1rem;
   font-weight: 700;
   background: rgba(245, 158, 11, 0.15);
   color: var(--aa-l);
@@ -754,7 +754,7 @@
 }
 
 .provD {
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: var(--tm);
   line-height: 1.5;
   margin-bottom: 1rem;
@@ -762,7 +762,7 @@
 }
 
 .provA {
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: var(--at);
   font-weight: 500;
   text-decoration: none;
@@ -785,7 +785,7 @@
   gap: 0.65rem;
   padding: 0.5rem 0;
   border-bottom: 1px solid var(--bds);
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: var(--ts);
 }
 
@@ -808,7 +808,7 @@
   align-items: center;
   padding: 0.18rem 0.55rem;
   border-radius: 999px;
-  font-size: 0.8rem;
+  font-size: 1rem;
   font-weight: 600;
 }
 
@@ -863,14 +863,14 @@
 }
 
 .srcTit {
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--tp);
   margin-bottom: 0.15rem;
 }
 
 .srcUrl {
-  font-size: 0.8rem;
+  font-size: 1rem;
   color: var(--at);
   font-family: var(--fc);
   word-break: break-all;
@@ -880,7 +880,7 @@
 .footer {
   padding: 1.75rem 0;
   border-top: 1px solid var(--bdr);
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: var(--tm);
   margin-top: 2rem;
 }
