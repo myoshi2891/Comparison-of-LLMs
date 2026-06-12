@@ -1,0 +1,2999 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Claude Self-hosted Sandboxes 完全ガイド</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&family=Fira+Code:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+      :root {
+        --bg: #07071a;
+        --bg-s: #0f0f28;
+        --bg-c: #161636;
+        --bg-ch: #1e1e48;
+        --av: #8b5cf6;
+        --av-l: #a78bfa;
+        --av-d: #6d28d9;
+        --at: #06b6d4;
+        --ag: #10b981;
+        --aa: #f59e0b;
+        --aa-l: #fcd34d;
+        --ar: #f87171;
+        --tp: #e2e8f0;
+        --ts: #c1d3ec;
+        --tm: #bdd9ff;
+        --tc: #c4b5fd;
+        --bdr: rgba(139, 92, 246, 0.2);
+        --bds: rgba(255, 255, 255, 0.05);
+        --fw: 'Space Grotesk', sans-serif;
+        --fb: 'Inter', sans-serif;
+        --fc: 'Fira Code', monospace;
+        --sw: 252px;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: var(--fb);
+        background: var(--bg);
+        color: var(--tp);
+        line-height: 1.7;
+        font-size: 1rem;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: var(--sw) 1fr;
+        min-height: 100vh;
+      }
+      /* ── Sidebar ── */
+      .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+        background: var(--bg-s);
+        border-right: 1px solid var(--bdr);
+        padding: 1.5rem 1rem;
+        scrollbar-width: thin;
+        scrollbar-color: var(--bdr) transparent;
+      }
+      .sb-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.25rem;
+        border-bottom: 1px solid var(--bdr);
+      }
+      .sb-icon {
+        width: 34px;
+        height: 34px;
+        background: linear-gradient(135deg, var(--av), var(--av-d));
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+      }
+      .sb-txt {
+        font-family: var(--fw);
+        font-size: 1rem;
+        font-weight: 600;
+        line-height: 1.3;
+        color: var(--tp);
+      }
+      .sb-sub {
+        font-size: 1rem;
+        color: var(--aa);
+        font-weight: 500;
+      }
+      .nav-cat {
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--tm);
+        margin: 1.25rem 0 0.35rem 0.5rem;
+      }
+      .nav-a {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.38rem 0.6rem;
+        border-radius: 6px;
+        color: var(--ts);
+        text-decoration: none;
+        font-size: 1rem;
+        transition: all 0.18s;
+        border-left: 2px solid transparent;
+      }
+      .nav-a:hover {
+        color: var(--tp);
+        background: var(--bds);
+        border-left-color: var(--av);
+      }
+      .nav-a.active {
+        color: var(--av-l);
+        background: rgba(139, 92, 246, 0.1);
+        border-left-color: var(--av);
+      }
+      .nav-step {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        background: var(--av-d);
+        border-radius: 50%;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #fff;
+        flex-shrink: 0;
+      }
+      /* ── Main ── */
+      main {
+        padding: 0 2.25rem 5rem;
+        width: 100%;
+        max-width: 100%;
+      }
+      /* ── Hero ── */
+      .hero {
+        padding: 3.5rem 0 2.5rem;
+        border-bottom: 1px solid var(--bdr);
+        margin-bottom: 3rem;
+      }
+      .h-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(139, 92, 246, 0.1);
+        border: 1px solid rgba(139, 92, 246, 0.35);
+        color: var(--av-l);
+        padding: 0.3rem 0.8rem;
+        border-radius: 999px;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 1.25rem;
+      }
+      .h-dot {
+        width: 6px;
+        height: 6px;
+        background: var(--ag);
+        border-radius: 50%;
+        animation: blink 2s infinite;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+      h1 {
+        font-family: var(--fw);
+        font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+        font-weight: 700;
+        line-height: 1.2;
+        margin-bottom: 0.875rem;
+      }
+      h1 .hl {
+        background: linear-gradient(135deg, var(--av-l), var(--at));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .h-lead {
+        font-size: 1rem;
+        color: var(--ts);
+        max-width: 600px;
+        margin-bottom: 1.5rem;
+      }
+      .h-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.875rem;
+      }
+      .h-meta-i {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 1rem;
+        color: var(--tm);
+      }
+      .h-meta-i strong {
+        color: var(--ts);
+      }
+      /* ── Section ── */
+      .sec {
+        margin-bottom: 3.75rem;
+        scroll-margin-top: 0.75rem;
+      }
+      h2 {
+        font-family: var(--fw);
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1.1rem;
+        padding-bottom: 0.7rem;
+        border-bottom: 1px solid var(--bdr);
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+      }
+      .sec-n {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        background: rgba(139, 92, 246, 0.15);
+        border: 1px solid var(--av);
+        color: var(--av-l);
+        border-radius: 7px;
+        font-size: 1rem;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+      h3 {
+        font-family: var(--fw);
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--tp);
+        margin: 1.75rem 0 0.75rem;
+      }
+      h4 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--av-l);
+        margin: 1.25rem 0 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      p {
+        color: var(--ts);
+        margin-bottom: 0.875rem;
+      }
+      a {
+        color: var(--at);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      /* ── Tables ── */
+      .tw {
+        overflow-x: auto;
+        margin: 1.1rem 0;
+        border-radius: 10px;
+        border: 1px solid var(--bdr);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      thead {
+        background: rgba(139, 92, 246, 0.1);
+      }
+      th {
+        padding: 0.65rem 0.9rem;
+        text-align: left;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--av-l);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--bdr);
+        white-space: nowrap;
+      }
+      td {
+        padding: 0.62rem 0.9rem;
+        font-size: 1rem;
+        color: var(--ts);
+        border-bottom: 1px solid var(--bds);
+        vertical-align: top;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover td {
+        background: rgba(255, 255, 255, 0.015);
+      }
+      td.tl {
+        font-weight: 600;
+        color: var(--tp);
+      }
+      /* ── Code ── */
+      .cb {
+        background: #050510;
+        border: 1px solid var(--bdr);
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 1rem 0;
+      }
+      .ch {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem 0.875rem;
+        background: rgba(255, 255, 255, 0.025);
+        border-bottom: 1px solid var(--bdr);
+      }
+      .dots {
+        display: flex;
+        gap: 5px;
+      }
+      .d {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+      }
+      .dr {
+        background: #ff5f57;
+      }
+      .dy {
+        background: #ffbd2e;
+      }
+      .dg {
+        background: #28ca41;
+      }
+      .cl {
+        font-size: 1rem;
+        color: var(--tm);
+        font-family: var(--fc);
+        letter-spacing: 0.05em;
+      }
+      pre {
+        padding: 1.1rem;
+        overflow-x: auto;
+        margin: 0;
+      }
+      code {
+        font-family: var(--fc);
+        font-size: 1rem;
+        line-height: 1.75;
+        color: #e2e8f0;
+      }
+      p code,
+      li code,
+      td code {
+        background: rgba(139, 92, 246, 0.15);
+        color: var(--tc);
+        padding: 0.1em 0.38em;
+        border-radius: 4px;
+        font-size: 0.82em;
+      }
+      /* ── Callouts ── */
+      .ca {
+        display: flex;
+        gap: 0.875rem;
+        padding: 0.875rem 1.1rem;
+        border-radius: 9px;
+        margin: 1rem 0;
+        font-size: 1rem;
+      }
+      .ca-i {
+        font-size: 1rem;
+        flex-shrink: 0;
+        margin-top: 0.1rem;
+      }
+      .ca-v {
+        background: rgba(139, 92, 246, 0.1);
+        border-left: 3px solid var(--av);
+        color: #c4b5fd;
+      }
+      .ca-a {
+        background: rgba(245, 158, 11, 0.1);
+        border-left: 3px solid var(--aa);
+        color: #fde68a;
+      }
+      .ca-g {
+        background: rgba(16, 185, 129, 0.1);
+        border-left: 3px solid var(--ag);
+        color: #6ee7b7;
+      }
+      .ca-r {
+        background: rgba(248, 113, 113, 0.1);
+        border-left: 3px solid var(--ar);
+        color: #fca5a5;
+      }
+      .ca p {
+        color: inherit;
+        margin: 0;
+      }
+      .ca strong {
+        color: inherit;
+      }
+      /* ── Mermaid ── */
+      .mw {
+        background: var(--bg-c);
+        border: 1px solid var(--bdr);
+        border-radius: 11px;
+        padding: 1.25rem 1.25rem 2.5rem 1.25rem;
+        margin: 1.25rem auto;
+        max-width: 900px;
+        width: 100%;
+        overflow-x: auto;
+      }
+      .mw.mw-lg {
+        max-width: 100%;
+      }
+      .mw pre.mermaid {
+        padding: 0 !important;
+        margin: 0;
+        background: transparent;
+      }
+      .mw svg {
+        display: block;
+        margin: 0 auto;
+        overflow: visible !important;
+      }
+      .mw-t {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--tm);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+      }
+      .mw-t::before {
+        content: '';
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        background: var(--av);
+        border-radius: 3px;
+      }
+      /* ── SVG wrapper ── */
+      .svgw {
+        background: var(--bg-c);
+        border: 1px solid var(--bdr);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1.25rem auto;
+        max-width: 900px;
+        width: 100%;
+        overflow-x: auto;
+      }
+      .svgw-t {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--tm);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+      }
+      .svgw-t::before {
+        content: '';
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        background: var(--at);
+        border-radius: 3px;
+      }
+      /* ── Step cards ── */
+      .step {
+        position: relative;
+        background: var(--bg-c);
+        border: 1px solid var(--bdr);
+        border-radius: 14px;
+        padding: 1.5rem 1.5rem 1.5rem 4.25rem;
+        margin-bottom: 1.25rem;
+        transition: border-color 0.25s;
+      }
+      .step:hover {
+        border-color: var(--av);
+      }
+      .step-n {
+        position: absolute;
+        left: 1.1rem;
+        top: 1.5rem;
+        width: 34px;
+        height: 34px;
+        background: linear-gradient(135deg, var(--av), var(--av-d));
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--fw);
+        font-weight: 700;
+        font-size: 1rem;
+        color: #fff;
+      }
+      .step h3 {
+        margin-top: 0;
+        margin-bottom: 0.35rem;
+      }
+      .step-tags {
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.875rem;
+      }
+      .tag {
+        padding: 0.18rem 0.55rem;
+        border-radius: 4px;
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      .tv {
+        background: rgba(139, 92, 246, 0.2);
+        color: var(--av-l);
+      }
+      .ta {
+        background: rgba(245, 158, 11, 0.2);
+        color: var(--aa-l);
+      }
+      .tg {
+        background: rgba(16, 185, 129, 0.2);
+        color: #34d399;
+      }
+      .tr {
+        background: rgba(248, 113, 113, 0.2);
+        color: #fca5a5;
+      }
+      /* ── Pattern cards ── */
+      .pcards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 0.875rem;
+        margin: 1.1rem 0;
+      }
+      .pcard {
+        background: var(--bg-c);
+        border: 1px solid var(--bdr);
+        border-radius: 11px;
+        overflow: hidden;
+      }
+      .pc-h {
+        padding: 0.875rem 1.1rem;
+        border-bottom: 1px solid var(--bdr);
+      }
+      .pc-t {
+        font-family: var(--fw);
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--tp);
+      }
+      .pc-s {
+        font-size: 1rem;
+        color: var(--tm);
+        margin-top: 0.15rem;
+      }
+      .pc-b {
+        padding: 0.875rem 1.1rem;
+      }
+      .pr {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.3rem 0;
+        border-bottom: 1px solid var(--bds);
+        font-size: 1rem;
+      }
+      .pr:last-child {
+        border-bottom: none;
+      }
+      .pr-k {
+        color: var(--tm);
+      }
+      .pr-v {
+        color: var(--ts);
+        font-weight: 500;
+      }
+      /* ── Provider cards ── */
+      .provs {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+        gap: 0.875rem;
+        margin: 1.1rem 0;
+      }
+      .prov {
+        background: var(--bg-c);
+        border: 1px solid var(--bdr);
+        border-radius: 11px;
+        padding: 1.1rem;
+        transition: all 0.2s;
+      }
+      .prov:hover {
+        border-color: var(--aa);
+        transform: translateY(-2px);
+      }
+      .prov-n {
+        font-family: var(--fw);
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--tp);
+        margin-bottom: 0.4rem;
+      }
+      .prov-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.3rem;
+        margin-bottom: 0.6rem;
+      }
+      .prov-tag {
+        padding: 0.12rem 0.45rem;
+        border-radius: 4px;
+        font-size: 1rem;
+        font-weight: 700;
+        background: rgba(245, 158, 11, 0.15);
+        color: var(--aa-l);
+      }
+      .prov-d {
+        font-size: 1rem;
+        color: var(--tm);
+        line-height: 1.5;
+        margin-bottom: 0.7rem;
+      }
+      .prov-a {
+        font-size: 1rem;
+        color: var(--at);
+        font-weight: 500;
+      }
+      /* ── Checklist ── */
+      .cl-list {
+        list-style: none;
+        margin: 0.875rem 0;
+      }
+      .cl-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.65rem;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--bds);
+        font-size: 1rem;
+        color: var(--ts);
+      }
+      .cl-list li:last-child {
+        border-bottom: none;
+      }
+      .cl-box {
+        width: 17px;
+        height: 17px;
+        border: 1.5px solid var(--av);
+        border-radius: 4px;
+        flex-shrink: 0;
+        margin-top: 0.15rem;
+      }
+      .cl-cat {
+        font-family: var(--fw);
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--aa);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.65rem 0 0.2rem;
+      }
+      /* ── Badges ── */
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.18rem 0.55rem;
+        border-radius: 999px;
+        font-size: 1rem;
+        font-weight: 600;
+      }
+      .bg {
+        background: rgba(16, 185, 129, 0.2);
+        color: #34d399;
+      }
+      .br {
+        background: rgba(248, 113, 113, 0.2);
+        color: #fca5a5;
+      }
+      .ba {
+        background: rgba(245, 158, 11, 0.2);
+        color: #fde68a;
+      }
+      .bv {
+        background: rgba(139, 92, 246, 0.2);
+        color: #c4b5fd;
+      }
+      /* ── Sources ── */
+      .src-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 0.65rem;
+        margin: 1.1rem 0;
+      }
+      .src-a {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.65rem;
+        background: var(--bg-c);
+        border: 1px solid var(--bdr);
+        border-radius: 9px;
+        padding: 0.8rem 0.9rem;
+        text-decoration: none;
+        transition: all 0.18s;
+      }
+      .src-a:hover {
+        border-color: var(--av);
+        background: var(--bg-ch);
+      }
+      .src-icon {
+        font-size: 1.2rem;
+        flex-shrink: 0;
+      }
+      .src-tit {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--tp);
+        margin-bottom: 0.15rem;
+      }
+      .src-url {
+        font-size: 1rem;
+        color: var(--at);
+        font-family: var(--fc);
+        word-break: break-all;
+      }
+      /* ── Footer ── */
+      footer {
+        padding: 1.75rem 0;
+        border-top: 1px solid var(--bdr);
+        font-size: 1rem;
+        color: var(--tm);
+        margin-top: 2rem;
+      }
+      /* ── Responsive ── */
+      @media (max-width: 860px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+        .sidebar {
+          position: static;
+          height: auto;
+          border-right: none;
+          border-bottom: 1px solid var(--bdr);
+        }
+        main {
+          padding: 0 1.25rem 3rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <!-- =============================== SIDEBAR =============================== -->
+      <aside class="sidebar">
+        <div class="sb-brand">
+          <div class="sb-icon">🤖</div>
+          <div>
+            <div class="sb-txt">Self-hosted Sandboxes</div>
+            <div class="sb-sub">完全ガイド · Public Beta</div>
+          </div>
+        </div>
+        <nav id="sidenav">
+          <p class="nav-cat">はじめに</p>
+          <a href="#about" class="nav-a">Self-hosted とは</a>
+          <a href="#comparison" class="nav-a">Cloud との違い</a>
+          <a href="#usecases" class="nav-a">ユースケース</a>
+          <p class="nav-cat">アーキテクチャ</p>
+          <a href="#architecture" class="nav-a">システム概要（SVG）</a>
+          <a href="#lifecycle" class="nav-a">セッションライフサイクル</a>
+          <p class="nav-cat">セットアップ</p>
+          <a href="#step0" class="nav-a"><span class="nav-step">0</span>&nbsp;前提条件</a>
+          <a href="#step1" class="nav-a"><span class="nav-step">1</span>&nbsp;エージェント作成</a>
+          <a href="#step2" class="nav-a"><span class="nav-step">2</span>&nbsp;環境作成</a>
+          <a href="#step3" class="nav-a"><span class="nav-step">3</span>&nbsp;ワーカー起動</a>
+          <a href="#step4" class="nav-a"><span class="nav-step">4</span>&nbsp;セッション開始</a>
+          <a href="#step5" class="nav-a"><span class="nav-step">5</span>&nbsp;モニタリング設定</a>
+          <p class="nav-cat">詳細ガイド</p>
+          <a href="#workers" class="nav-a">ワーカーパターン</a>
+          <a href="#filesystem" class="nav-a">ファイルシステム</a>
+          <a href="#security" class="nav-a">セキュリティモデル</a>
+          <a href="#providers" class="nav-a">プロバイダー</a>
+          <a href="#mcp" class="nav-a">MCP トンネル</a>
+          <p class="nav-cat">運用</p>
+          <a href="#bestpractices" class="nav-a">ベストプラクティス</a>
+          <a href="#monitoring" class="nav-a">モニタリングと運用</a>
+          <p class="nav-cat">リソース</p>
+          <a href="#sources" class="nav-a">参考 URL</a>
+        </nav>
+      </aside>
+
+      <!-- =============================== MAIN =============================== -->
+      <main>
+        <!-- ── Hero ── -->
+        <section class="hero">
+          <div class="h-badge"><span class="h-dot"></span>Public Beta — 2026年5月19日リリース</div>
+          <h1>Claude <span class="hl">Self-hosted Sandboxes</span><br />完全ガイド</h1>
+          <p class="h-lead">
+            AIエージェントのツール実行環境を自社インフラに移動する方法を、初学者から実務者まで使えるようにステップバイステップで解説します。
+          </p>
+          <div class="h-meta">
+            <span class="h-meta-i"
+              >🤖 <strong>対象モデル</strong>: Claude Opus 4 系最新版（2026年時点）を含む最新モデル</span
+            >
+            <span class="h-meta-i">📋 <strong>ステータス</strong>: Public Beta</span>
+            <span class="h-meta-i">📅 <strong>更新日</strong>: 2026年6月10日</span>
+          </div>
+        </section>
+
+        <!-- ── 1. About ── -->
+        <section id="about" class="sec">
+          <h2><span class="sec-n">1</span>Self-hosted Sandboxes とは？</h2>
+          <p>
+            <strong>Self-hosted Sandboxes</strong> は Claude Managed Agents
+            の機能で、AIエージェントの<strong>ツール実行環境をあなた自身のインフラに移動</strong>できる仕組みです。デフォルトでは
+            Anthropic が管理するクラウドサンドボックスでツールが実行されますが、Self-hosted
+            を選択すると、ツールの実際の実行だけがあなたのインフラに移ります。
+          </p>
+
+          <div class="ca ca-v">
+            <span class="ca-i">💡</span>
+            <p>
+              <strong>核心：</strong>
+              オーケストレーション（推論・エラー回復・プロンプトキャッシュ）は常に Anthropic
+              のクラウドで動きます。Self-hosted で変わるのは「ツールが実行される場所」だけです。
+            </p>
+          </div>
+
+          <!-- Architecture SVG -->
+          <div class="svgw">
+            <div class="svgw-t">システムアーキテクチャ概要</div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 880 456"
+              font-family="'Space Grotesk','Segoe UI',Arial,sans-serif"
+              style="width: 100%; max-width: 880px; display: block; margin: 0 auto"
+            >
+              <rect width="880" height="456" fill="#0f0f28" rx="8" />
+              <text
+                x="440"
+                y="36"
+                text-anchor="middle"
+                font-size="16"
+                font-weight="700"
+                fill="#e2e8f0"
+              >
+                Claude Self-hosted Sandboxes — アーキテクチャ概要
+              </text>
+
+              <!-- Left zone: Anthropic Cloud -->
+              <rect
+                x="18"
+                y="52"
+                width="372"
+                height="388"
+                rx="14"
+                fill="#111138"
+                stroke="#4285f4"
+                stroke-width="2"
+              />
+              <text
+                x="204"
+                y="82"
+                text-anchor="middle"
+                font-size="13"
+                font-weight="700"
+                fill="#7dd3fc"
+              >
+                ☁ Anthropic Cloud
+              </text>
+              <text x="204" y="100" text-anchor="middle" font-size="10.5" fill="#64748b">
+                オーケストレーション（指揮制御）
+              </text>
+              <line x1="36" y1="109" x2="372" y2="109" stroke="#1e3a5f" stroke-width="1" />
+
+              <!-- Claude Model -->
+              <rect x="36" y="117" width="155" height="52" rx="8" fill="#1a2e5a" />
+              <rect
+                x="36"
+                y="117"
+                width="155"
+                height="52"
+                rx="8"
+                fill="none"
+                stroke="#3b82f6"
+                stroke-width="1"
+              />
+              <text
+                x="113"
+                y="141"
+                text-anchor="middle"
+                font-size="11.5"
+                fill="#93c5fd"
+                font-weight="600"
+              >
+                🤖 Claude Model
+              </text>
+              <text x="113" y="157" text-anchor="middle" font-size="9.5" fill="#64748b">
+                推論エンジン
+              </text>
+
+              <!-- Orchestration -->
+              <rect x="205" y="117" width="155" height="52" rx="8" fill="#1a2e5a" />
+              <rect
+                x="205"
+                y="117"
+                width="155"
+                height="52"
+                rx="8"
+                fill="none"
+                stroke="#3b82f6"
+                stroke-width="1"
+              />
+              <text
+                x="282"
+                y="141"
+                text-anchor="middle"
+                font-size="11.5"
+                fill="#93c5fd"
+                font-weight="600"
+              >
+                ⚙ Orchestration
+              </text>
+              <text x="282" y="157" text-anchor="middle" font-size="9.5" fill="#64748b">
+                エージェントループ
+              </text>
+
+              <!-- Work Queue -->
+              <rect
+                x="36"
+                y="186"
+                width="324"
+                height="64"
+                rx="8"
+                fill="#1e1650"
+                stroke="#8b5cf6"
+                stroke-width="1.5"
+              />
+              <text
+                x="198"
+                y="213"
+                text-anchor="middle"
+                font-size="12.5"
+                fill="#c4b5fd"
+                font-weight="700"
+              >
+                📬 Work Queue
+              </text>
+              <text x="198" y="232" text-anchor="middle" font-size="9.5" fill="#64748b">
+                depth · pending · workers_polling でキュー状態を管理
+              </text>
+
+              <!-- Context / Error -->
+              <rect
+                x="36"
+                y="268"
+                width="155"
+                height="52"
+                rx="8"
+                fill="#172340"
+                stroke="#1d4ed8"
+                stroke-width="1"
+              />
+              <text
+                x="113"
+                y="292"
+                text-anchor="middle"
+                font-size="11.5"
+                fill="#7dd3fc"
+                font-weight="600"
+              >
+                📝 Context Mgmt
+              </text>
+              <text x="113" y="308" text-anchor="middle" font-size="9.5" fill="#64748b">
+                コンテキスト管理
+              </text>
+
+              <rect
+                x="205"
+                y="268"
+                width="155"
+                height="52"
+                rx="8"
+                fill="#172340"
+                stroke="#1d4ed8"
+                stroke-width="1"
+              />
+              <text
+                x="282"
+                y="292"
+                text-anchor="middle"
+                font-size="11.5"
+                fill="#7dd3fc"
+                font-weight="600"
+              >
+                🔄 Error Recovery
+              </text>
+              <text x="282" y="308" text-anchor="middle" font-size="9.5" fill="#64748b">
+                エラー回復
+              </text>
+
+              <!-- Sessions API -->
+              <rect
+                x="36"
+                y="338"
+                width="324"
+                height="52"
+                rx="8"
+                fill="#0e3320"
+                stroke="#22c55e"
+                stroke-width="1.5"
+              />
+              <text
+                x="198"
+                y="362"
+                text-anchor="middle"
+                font-size="11.5"
+                fill="#86efac"
+                font-weight="600"
+              >
+                🔗 Sessions API · Webhooks · SSE
+              </text>
+              <text x="198" y="380" text-anchor="middle" font-size="9.5" fill="#64748b">
+                ユーザーアプリのアクセスポイント
+              </text>
+
+              <!-- Right zone: Your Infrastructure -->
+              <rect
+                x="490"
+                y="52"
+                width="372"
+                height="388"
+                rx="14"
+                fill="#0f2018"
+                stroke="#22c55e"
+                stroke-width="2"
+              />
+              <text
+                x="676"
+                y="82"
+                text-anchor="middle"
+                font-size="13"
+                font-weight="700"
+                fill="#86efac"
+              >
+                🏢 Your Infrastructure
+              </text>
+              <text x="676" y="100" text-anchor="middle" font-size="10.5" fill="#64748b">
+                ツール実行環境
+              </text>
+              <line x1="508" y1="109" x2="844" y2="109" stroke="#14532d" stroke-width="1" />
+
+              <!-- Worker -->
+              <rect
+                x="508"
+                y="117"
+                width="336"
+                height="52"
+                rx="8"
+                fill="#14532d"
+                stroke="#22c55e"
+                stroke-width="1.5"
+              />
+              <text
+                x="676"
+                y="141"
+                text-anchor="middle"
+                font-size="11.5"
+                fill="#86efac"
+                font-weight="700"
+              >
+                🖥 Environment Worker
+              </text>
+              <text x="676" y="157" text-anchor="middle" font-size="9.5" fill="#64748b">
+                Always-on or Webhook-triggered
+              </text>
+
+              <!-- Sandbox -->
+              <rect
+                x="508"
+                y="186"
+                width="336"
+                height="84"
+                rx="8"
+                fill="#052e16"
+                stroke="#16a34a"
+                stroke-width="1"
+              />
+              <text
+                x="676"
+                y="210"
+                text-anchor="middle"
+                font-size="11.5"
+                fill="#86efac"
+                font-weight="600"
+              >
+                📦 Sandbox Container
+              </text>
+              <rect x="522" y="220" width="145" height="40" rx="5" fill="#14532d" />
+              <text
+                x="594"
+                y="238"
+                text-anchor="middle"
+                font-size="9.5"
+                fill="#bbf7d0"
+                font-weight="600"
+              >
+                /workspace
+              </text>
+              <text x="594" y="253" text-anchor="middle" font-size="9" fill="#64748b">
+                スキル・作業ファイル
+              </text>
+              <rect x="679" y="220" width="151" height="40" rx="5" fill="#14532d" />
+              <text
+                x="754"
+                y="238"
+                text-anchor="middle"
+                font-size="9.5"
+                fill="#bbf7d0"
+                font-weight="600"
+              >
+                /mnt/session/outputs
+              </text>
+              <text x="754" y="253" text-anchor="middle" font-size="9" fill="#64748b">
+                出力ファイル
+              </text>
+
+              <!-- Tool Execution / Internal -->
+              <rect
+                x="508"
+                y="288"
+                width="158"
+                height="52"
+                rx="8"
+                fill="#14532d"
+                stroke="#16a34a"
+                stroke-width="1"
+              />
+              <text
+                x="587"
+                y="312"
+                text-anchor="middle"
+                font-size="11.5"
+                fill="#86efac"
+                font-weight="600"
+              >
+                🔧 Tool Execution
+              </text>
+              <text x="587" y="328" text-anchor="middle" font-size="9.5" fill="#64748b">
+                Bash / File / Web
+              </text>
+
+              <rect
+                x="678"
+                y="288"
+                width="158"
+                height="52"
+                rx="8"
+                fill="#14532d"
+                stroke="#16a34a"
+                stroke-width="1"
+              />
+              <text
+                x="757"
+                y="312"
+                text-anchor="middle"
+                font-size="11.5"
+                fill="#86efac"
+                font-weight="600"
+              >
+                🌐 Internal Services
+              </text>
+              <text x="757" y="328" text-anchor="middle" font-size="9.5" fill="#64748b">
+                社内 API · DB
+              </text>
+
+              <!-- Security Controls -->
+              <rect
+                x="508"
+                y="358"
+                width="336"
+                height="38"
+                rx="8"
+                fill="#052e16"
+                stroke="#16a34a"
+                stroke-width="1"
+              />
+              <text
+                x="676"
+                y="374"
+                text-anchor="middle"
+                font-size="10.5"
+                fill="#86efac"
+                font-weight="600"
+              >
+                🔒 VPC · Firewall · Audit Log · Compliance
+              </text>
+              <text x="676" y="389" text-anchor="middle" font-size="9" fill="#64748b">
+                あなたのセキュリティコントロール
+              </text>
+
+              <!-- Network boundary -->
+              <line
+                x1="433"
+                y1="52"
+                x2="433"
+                y2="430"
+                stroke="#334155"
+                stroke-width="1.5"
+                stroke-dasharray="10 6"
+              />
+              <rect x="378" y="432" width="112" height="16" rx="3" fill="#0f0f28" />
+              <text x="434" y="443" text-anchor="middle" font-size="9.5" fill="#64748b">
+                ネットワーク境界
+              </text>
+
+              <!-- Arrows -->
+              <defs>
+                <marker
+                  id="mb"
+                  viewBox="0 0 10 10"
+                  refX="9"
+                  refY="5"
+                  markerWidth="7"
+                  markerHeight="7"
+                  orient="auto"
+                >
+                  <polygon points="0,1 9,5 0,9" fill="#8b5cf6" />
+                </marker>
+                <marker
+                  id="mg"
+                  viewBox="0 0 10 10"
+                  refX="9"
+                  refY="5"
+                  markerWidth="7"
+                  markerHeight="7"
+                  orient="auto"
+                >
+                  <polygon points="0,1 9,5 0,9" fill="#22c55e" />
+                </marker>
+              </defs>
+              <line
+                x1="488"
+                y1="212"
+                x2="398"
+                y2="212"
+                stroke="#8b5cf6"
+                stroke-width="2.5"
+                stroke-dasharray="7 3"
+                marker-end="url(#mb)"
+              />
+              <rect
+                x="403"
+                y="194"
+                width="62"
+                height="16"
+                rx="4"
+                fill="#0f0f28"
+                stroke="#8b5cf6"
+                stroke-width="1"
+              />
+              <text
+                x="434"
+                y="206"
+                text-anchor="middle"
+                font-size="9"
+                fill="#c4b5fd"
+                font-weight="700"
+              >
+                ① Poll
+              </text>
+              <line
+                x1="398"
+                y1="234"
+                x2="488"
+                y2="234"
+                stroke="#22c55e"
+                stroke-width="2.5"
+                stroke-dasharray="7 3"
+                marker-end="url(#mg)"
+              />
+              <rect
+                x="401"
+                y="238"
+                width="68"
+                height="16"
+                rx="4"
+                fill="#0f0f28"
+                stroke="#22c55e"
+                stroke-width="1"
+              />
+              <text
+                x="435"
+                y="250"
+                text-anchor="middle"
+                font-size="9"
+                fill="#86efac"
+                font-weight="700"
+              >
+                ② Results
+              </text>
+            </svg>
+          </div>
+
+          <h3>Managed Agents の4つのコアコンセプト</h3>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>コンセプト</th>
+                  <th>説明</th>
+                  <th>Self-hosted での変化</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="tl">Agent（エージェント）</td>
+                  <td>モデル・システムプロンプト・ツール・MCP・スキルの定義</td>
+                  <td>変化なし</td>
+                </tr>
+                <tr>
+                  <td class="tl">Environment（環境）</td>
+                  <td>セッションが動作する場所の設定</td>
+                  <td>type を <code>self_hosted</code> に変更</td>
+                </tr>
+                <tr>
+                  <td class="tl">Session（セッション）</td>
+                  <td>タスクを実行するエージェントの稼働インスタンス</td>
+                  <td>変化なし（起動方法は同じ）</td>
+                </tr>
+                <tr>
+                  <td class="tl">Events（イベント）</td>
+                  <td>アプリとエージェント間のメッセージ</td>
+                  <td>変化なし</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ── 2. Comparison ── -->
+        <section id="comparison" class="sec">
+          <h2><span class="sec-n">2</span>Cloud 環境との違い</h2>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>比較項目</th>
+                  <th>☁️ Cloud Environment</th>
+                  <th>🏢 Self-hosted Sandbox</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="tl">ツール実行場所</td>
+                  <td>Anthropic 管理のサンドボックス</td>
+                  <td><strong>あなたのインフラ</strong></td>
+                </tr>
+                <tr>
+                  <td class="tl">ネットワーク制御</td>
+                  <td>Anthropic のエグレスポリシー</td>
+                  <td><strong>あなたのネットワークポリシー</strong></td>
+                </tr>
+                <tr>
+                  <td class="tl">ファイル・GitHub マウント</td>
+                  <td>Anthropic が管理</td>
+                  <td><strong>あなたが管理</strong></td>
+                </tr>
+                <tr>
+                  <td class="tl">コンテナライフサイクル</td>
+                  <td>Anthropic が管理</td>
+                  <td><strong>あなたが管理</strong></td>
+                </tr>
+                <tr>
+                  <td class="tl">カスタムコンテナイメージ</td>
+                  <td><span class="badge br">❌ 不可</span></td>
+                  <td><span class="badge bg">✅ 可能</span></td>
+                </tr>
+                <tr>
+                  <td class="tl">社内サービスアクセス</td>
+                  <td>限定的</td>
+                  <td><span class="badge bg">✅ プライベートネットワーク経由</span></td>
+                </tr>
+                <tr>
+                  <td class="tl">データのネットワーク外出力</td>
+                  <td>Anthropic インフラ上に入る</td>
+                  <td><span class="badge bg">✅ 境界内で完結</span></td>
+                </tr>
+                <tr>
+                  <td class="tl">ZDR / HIPAA BAA 対象</td>
+                  <td><span class="badge br">❌ 非対象（Managed Agents全体）</span></td>
+                  <td><span class="badge br">❌ 同左</span></td>
+                </tr>
+                <tr>
+                  <td class="tl">セットアップ難易度</td>
+                  <td>低い（すぐ使える）</td>
+                  <td>中程度（ワーカー実装が必要）</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="ca ca-a">
+            <span class="ca-i">⚠️</span>
+            <p>
+              <strong>注意:</strong> Managed Agents はステートフルな設計のため、現時点では
+              <strong>Zero Data Retention (ZDR)</strong> および
+              <strong>HIPAA BAA</strong> の対象外です。詳細:
+              <a
+                href="https://platform.claude.com/docs/en/manage-claude/api-and-data-retention#feature-eligibility"
+                >API and data retention</a
+              >
+            </p>
+          </div>
+        </section>
+
+        <!-- ── 3. Use Cases ── -->
+        <section id="usecases" class="sec">
+          <h2><span class="sec-n">3</span>ユースケース</h2>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>ユースケース</th>
+                  <th>詳細</th>
+                  <th>対象業界</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="tl">機密データ処理</td>
+                  <td>患者情報・金融データをネットワーク境界内で AI 分析</td>
+                  <td>医療・金融</td>
+                </tr>
+                <tr>
+                  <td class="tl">社内システム連携</td>
+                  <td>イントラネット API・プライベート DB へのアクセス</td>
+                  <td>製造・エンタープライズ</td>
+                </tr>
+                <tr>
+                  <td class="tl">コンプライアンス対応</td>
+                  <td>組織独自の監査ログ・セキュリティコントロールの適用</td>
+                  <td>政府・金融・ヘルスケア</td>
+                </tr>
+                <tr>
+                  <td class="tl">重計算処理</td>
+                  <td>長時間ビルド・画像生成・データパイプライン（GPU 活用）</td>
+                  <td>AI/ML・メディア</td>
+                </tr>
+                <tr>
+                  <td class="tl">ステートフル開発環境</td>
+                  <td>長時間稼働・状態保持・SSH アクセスが必要なエージェント</td>
+                  <td>エンジニアリング・R&amp;D</td>
+                </tr>
+                <tr>
+                  <td class="tl">カスタムランタイム</td>
+                  <td>特定の OS イメージ・パッケージ・設定が必要な環境</td>
+                  <td>DevOps・システム開発</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>実採用事例（公式ブログ, 2026年5月）</h3>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>企業</th>
+                  <th>使用内容</th>
+                  <th>プロバイダー</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="tl">Clay</td>
+                  <td>
+                    GTM エンジニアリングエージェント「Sculptor」でワークフローを自律構築・テスト
+                  </td>
+                  <td>Daytona</td>
+                </tr>
+                <tr>
+                  <td class="tl">Rogo</td>
+                  <td>機関投資家向け金融 AI プラットフォームで独自データを安全処理</td>
+                  <td>Vercel</td>
+                </tr>
+                <tr>
+                  <td class="tl">Amplitude</td>
+                  <td>ブランド準拠の UI を生成する Design Agent</td>
+                  <td>Cloudflare</td>
+                </tr>
+                <tr>
+                  <td class="tl">Mason</td>
+                  <td>複雑な製品面での社内ツールのセキュアなオーケストレーション</td>
+                  <td>Modal</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ── 4. Architecture / Lifecycle ── -->
+        <section id="architecture" class="sec">
+          <h2><span class="sec-n">4</span>システムアーキテクチャ</h2>
+          <h3 id="lifecycle">セッションライフサイクル</h3>
+          <div class="mw mw-lg">
+            <div class="mw-t">セッションデータフロー（Sequence Diagram）</div>
+            <pre class="mermaid">
+sequenceDiagram
+    participant App as Your App
+    participant API as Anthropic API
+    participant WQ  as Work Queue
+    participant W   as Worker
+    participant SB  as Sandbox
+
+    Note over App,SB: フェーズ1 — セッション作成
+    App->>API: sessions.create(agent_id, env_id, metadata)
+    API->>WQ:  セッションをキューにエンキュー
+    API-->>App: session_id を返す
+
+    Note over W,WQ: フェーズ2 — ワーカーポーリング
+    loop ポーリングループ
+        W->>WQ:  GET /environments/{id}/work
+        WQ-->>W: ワークアイテムを返す
+        W->>WQ:  POST /work/{id}/ack（取得確認）
+    end
+
+    Note over W,SB: フェーズ3 — サンドボックス起動
+    W->>SB: コンテナを起動
+    SB->>SB: /workspace/skills/ にスキルをダウンロード
+
+    Note over API,SB: フェーズ4 — エージェントループ
+    loop ツール実行ループ
+        API->>W: ツール呼び出しリクエスト
+        W->>SB: ローカルでツールを実行
+        W->>WQ: POST /work/{id}/heartbeat（生存確認）
+        SB-->>W: 実行結果
+        W->>API: POST /work/{id}/results（結果投稿）
+    end
+
+    Note over API,App: フェーズ5 — 完了
+    API-->>App: SSE でファイナルイベントをストリーミング
+    Note over SB: /mnt/session/outputs に出力を保存
+    </pre
+            >
+          </div>
+        </section>
+
+        <!-- ── 5. Setup ── -->
+        <section id="setup" class="sec">
+          <h2><span class="sec-n">5</span>Step-by-Step セットアップ</h2>
+          <div class="mw">
+            <div class="mw-t">セットアップ全体フロー</div>
+            <pre class="mermaid">
+flowchart TD
+    S([Start]) --> P0
+    P0["Step 0\n前提条件を確認"]
+    P1["Step 1\nエージェントを作成"]
+    P2["Step 2\nself_hosted 環境を作成\n環境キーを安全に保管"]
+    P3{"Step 3\nワーカーパターンを選択"}
+    P3A["Always-on\nant CLI\n最もシンプル"]
+    P3B["Always-on\nPython / TS SDK\nカスタムロジック"]
+    P3C["Webhook-triggered\nPython / TS SDK\nコスト効率重視"]
+    P4["Step 4\nセッションを開始"]
+    P5["Step 5\nキュー深度・ワーカーを監視"]
+    E([完了])
+
+    P0-->P1-->P2-->P3
+    P3-->|開発用|P3A
+    P3-->|本番カスタム|P3B
+    P3-->|スケール|P3C
+    P3A-->P4
+    P3B-->P4
+    P3C-->P4
+    P4-->P5-->E
+
+    style S fill:#8b5cf6,color:#fff,stroke:none
+    style E fill:#10b981,color:#fff,stroke:none
+    style P3 fill:#1e1650,color:#c4b5fd,stroke:#8b5cf6
+    style P3A fill:#131330,color:#a78bfa,stroke:#6d28d9
+    style P3B fill:#131330,color:#a78bfa,stroke:#6d28d9
+    style P3C fill:#0e2818,color:#86efac,stroke:#16a34a
+    </pre
+            >
+          </div>
+
+          <!-- Step 0 -->
+          <div id="step0" class="step">
+            <div class="step-n">0</div>
+            <h3>前提条件の確認</h3>
+            <div class="step-tags">
+              <span class="tag tv">必須</span><span class="tag ta">最初に確認</span>
+            </div>
+            <div class="tw">
+              <table>
+                <thead>
+                  <tr>
+                    <th>要件</th>
+                    <th>詳細</th>
+                    <th>取得先</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="tl">Claude API キー</td>
+                    <td><code>sk-ant-...</code> 形式</td>
+                    <td>
+                      <a href="https://platform.claude.com/settings/keys"
+                        >platform.claude.com/settings/keys</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="tl">Beta ヘッダー</td>
+                    <td><code>managed-agents-2026-04-01</code>（SDK は自動付与）</td>
+                    <td>SDK 利用時は自動</td>
+                  </tr>
+                  <tr>
+                    <td class="tl">Python SDK</td>
+                    <td><code>pip install anthropic</code></td>
+                    <td>PyPI</td>
+                  </tr>
+                  <tr>
+                    <td class="tl">TypeScript SDK</td>
+                    <td><code>npm install @anthropic-ai/sdk</code></td>
+                    <td>npm</td>
+                  </tr>
+                  <tr>
+                    <td class="tl">ant CLI</td>
+                    <td><code>pip install anthropic</code> に同梱</td>
+                    <td>PyPI</td>
+                  </tr>
+                  <tr>
+                    <td class="tl">/bin/bash（固定パス）</td>
+                    <td>SDK ヘルパーが固定パスで参照</td>
+                    <td>OS 標準（PATH 解決不可）</td>
+                  </tr>
+                  <tr>
+                    <td class="tl">Node.js 22+（TS SDK のみ）</td>
+                    <td><code>unzip</code>, <code>tar</code> も必要</td>
+                    <td>nodejs.org</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="cb">
+              <div class="ch">
+                <div class="dots">
+                  <div class="d dr"></div>
+                  <div class="d dy"></div>
+                  <div class="d dg"></div>
+                </div>
+                <span class="cl">bash</span>
+              </div>
+              <pre><code>pip install anthropic            # Python SDK + ant CLI
+npm install @anthropic-ai/sdk    # TypeScript SDK
+export ANTHROPIC_API_KEY="sk-ant-xxxxxxxxxx"</code></pre>
+            </div>
+            <div class="ca ca-a">
+              <span class="ca-i">⚠️</span>
+              <p>
+                SDK ヘルパーは <code>/bin/bash</code> を<strong>固定パス</strong>で参照します。PATH
+                変数での解決は行われません。
+              </p>
+            </div>
+          </div>
+
+          <!-- Step 1 -->
+          <div id="step1" class="step">
+            <div class="step-n">1</div>
+            <h3>エージェントを作成する</h3>
+            <div class="step-tags">
+              <span class="tag tv">モデル定義</span
+              ><span class="tag tg">一度作成・ID で再利用</span>
+            </div>
+            <p>
+              エージェントは「モデル・システムプロンプト・ツール・スキルの定義」です。モデルはエージェント側で設定します（環境側ではありません）。
+            </p>
+            <div class="cb">
+              <div class="ch">
+                <div class="dots">
+                  <div class="d dr"></div>
+                  <div class="d dy"></div>
+                  <div class="d dg"></div>
+                </div>
+                <span class="cl">python</span>
+              </div>
+              <pre><code>import anthropic
+
+client = anthropic.Anthropic()
+
+agent = client.beta.agents.create(
+    name="Self-hosted Demo Agent",
+    model="claude-opus-4-latest",      # 必要に応じて Managed Agents 対応の最新モデルに置き換えてください
+    system_prompt="""You are a helpful coding assistant.
+Your working directory is /workspace.
+Skills are available at /workspace/skills/.
+Output files should be written to /mnt/session/outputs.
+""",
+)
+
+print(f"Agent ID: {agent.id}")  # agent_01XxXx...</code></pre>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div id="step2" class="step">
+            <div class="step-n">2</div>
+            <h3>Self-hosted 環境を作成する</h3>
+            <div class="step-tags">
+              <span class="tag tv">環境作成</span><span class="tag tr">環境キーを安全に保管！</span>
+            </div>
+            <p>
+              <code>type="self_hosted"</code> を指定して環境を作成します。ここで発行される
+              <strong>環境キー（ANTHROPIC_ENVIRONMENT_KEY）</strong> の取り扱いが最も重要です。
+            </p>
+            <div class="cb">
+              <div class="ch">
+                <div class="dots">
+                  <div class="d dr"></div>
+                  <div class="d dy"></div>
+                  <div class="d dg"></div>
+                </div>
+                <span class="cl">python</span>
+              </div>
+              <pre><code>environment = client.beta.environments.create(
+    name="Production Self-hosted Environment",
+    type="self_hosted",
+)
+
+print(f"Environment ID : {environment.id}")
+print(f"Environment Key: {environment.key}")  # &lt;-- 必ずシークレットマネージャーへ！</code></pre>
+            </div>
+            <div class="tw">
+              <table>
+                <thead>
+                  <tr>
+                    <th>❌ やってはいけない</th>
+                    <th>✅ 推奨</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>.env ファイルに平文で保存</td>
+                    <td>AWS Secrets Manager に保管</td>
+                  </tr>
+                  <tr>
+                    <td>コンテナイメージに焼き込む</td>
+                    <td>GCP Secret Manager に保管</td>
+                  </tr>
+                  <tr>
+                    <td>Git リポジトリにコミット</td>
+                    <td>HashiCorp Vault に保管</td>
+                  </tr>
+                  <tr>
+                    <td>ワーカーホストの環境変数に設定</td>
+                    <td>CI/CD パイプラインでランタイム注入</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="ca ca-r">
+              <span class="ca-i">🔑</span>
+              <p>
+                <strong>AWS を使用する場合：</strong> Claude Platform on AWS では環境キーの代わりに
+                AWS IAM（SigV4）で認証します。IAM プリンシパルに
+                <code>AnthropicSelfHostedEnvironmentAccess</code>
+                マネージドポリシーをアタッチしてください。Console で生成した環境キーは AWS
+                エンドポイントでは動作しません。
+              </p>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div id="step3" class="step">
+            <div class="step-n">3</div>
+            <h3>ワーカーを起動する（3パターン）</h3>
+            <div class="step-tags">
+              <span class="tag tv">核心部分</span><span class="tag ta">パターンを選択</span>
+            </div>
+            <p>
+              ワーカーはワークキューをポーリングしてツール呼び出しをローカルで実行するプロセスです。
+            </p>
+
+            <h4>パターン A: Always-on（ant CLI）— 最もシンプル</h4>
+            <div class="cb">
+              <div class="ch">
+                <div class="dots">
+                  <div class="d dr"></div>
+                  <div class="d dy"></div>
+                  <div class="d dg"></div>
+                </div>
+                <span class="cl">bash</span>
+              </div>
+              <pre><code>export ANTHROPIC_ENVIRONMENT_KEY="env-key-xxxxxxxxxx"
+export ANTHROPIC_ENVIRONMENT_ID="env-xxxxxxxxxxxx"
+
+ant worker --environment-id "$ANTHROPIC_ENVIRONMENT_ID"
+
+# 作業ディレクトリを変更する場合（システムプロンプトも合わせて更新すること）
+ant worker --environment-id "$ANTHROPIC_ENVIRONMENT_ID" --workdir /custom/workspace</code></pre>
+            </div>
+
+            <h4>パターン B: Always-on（Python SDK）— カスタムロジック対応</h4>
+            <div class="cb">
+              <div class="ch">
+                <div class="dots">
+                  <div class="d dr"></div>
+                  <div class="d dy"></div>
+                  <div class="d dg"></div>
+                </div>
+                <span class="cl">python</span>
+              </div>
+              <pre><code>import os
+import anthropic
+
+worker = anthropic.beta.EnvironmentWorker(
+    environment_id=os.environ["ANTHROPIC_ENVIRONMENT_ID"],
+    environment_key=os.environ["ANTHROPIC_ENVIRONMENT_KEY"],
+)
+
+worker.run()  # ブロッキング実行（Ctrl+C でグレースフルシャットダウン）</code></pre>
+            </div>
+
+            <h4>パターン C: Webhook-triggered（Python SDK）— コスト効率重視</h4>
+            <div class="cb">
+              <div class="ch">
+                <div class="dots">
+                  <div class="d dr"></div>
+                  <div class="d dy"></div>
+                  <div class="d dg"></div>
+                </div>
+                <span class="cl">python</span>
+              </div>
+              <pre><code>import os
+import anthropic
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route("/webhook/anthropic", methods=["POST"])
+def handle_webhook():
+    payload = request.get_json()
+    if payload.get("type") == "session.status_run_started":
+        # セッション開始時だけワーカーを起動
+        worker = anthropic.beta.EnvironmentWorker(
+            environment_id=os.environ["ANTHROPIC_ENVIRONMENT_ID"],
+            environment_key=os.environ["ANTHROPIC_ENVIRONMENT_KEY"],
+        )
+        worker.run_until_empty()  # キューが空になったら自動終了
+    return jsonify({"status": "ok"})
+
+if __name__ == "__main__":
+    app.run(port=8080)</code></pre>
+            </div>
+            <div class="ca ca-v">
+              <span class="ca-i">💡</span>
+              <p>
+                TypeScript SDK も同様のパターンで実装できます。TypeScript では追加で
+                <code>unzip</code>、<code>tar</code>、Node.js 22+ が必要です。
+              </p>
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div id="step4" class="step">
+            <div class="step-n">4</div>
+            <h3>セッションを開始する</h3>
+            <div class="step-tags"><span class="tag tg">ワーカー起動後に実行</span></div>
+            <p>
+              <code>environment_id</code> を指定することで Self-hosted が有効になります。<code
+                >metadata</code
+              >
+              でセッション固有の情報をワーカーに渡せます。
+            </p>
+            <div class="cb">
+              <div class="ch">
+                <div class="dots">
+                  <div class="d dr"></div>
+                  <div class="d dy"></div>
+                  <div class="d dg"></div>
+                </div>
+                <span class="cl">python</span>
+              </div>
+              <pre><code>session = client.beta.sessions.create(
+    agent=agent.id,
+    environment_id=environment.id,
+    metadata={
+        "input_file": "s3://my-bucket/sensitive-data.csv",  # ワーカーが読み取る
+        "user_id":    "user_12345",
+        "task":       "analyze_q1_report",
+    },
+)
+
+print(f"Session ID: {session.id}")
+
+# SSE でイベントをストリーミング受信
+for event in client.beta.sessions.stream_events(session.id):
+    if event.type == "content_block_delta":
+        print(event.delta.text, end="", flush=True)
+    elif event.type == "session.status_completed":
+        print("\n\n🎉 セッション完了")
+        break</code></pre>
+            </div>
+            <div class="ca ca-a">
+              <span class="ca-i">📌</span>
+              <p>
+                <strong>ファイルとリポジトリ：</strong> Cloud 環境と異なり、ファイル・GitHub
+                リポジトリのマウントは Anthropic が管理しません。<code>metadata</code>
+                でパスを渡してワーカー側で処理するか、コンテナイメージに組み込んでください。
+              </p>
+            </div>
+            <div class="ca ca-r">
+              <span class="ca-i">🚫</span>
+              <p>
+                <strong>制限：</strong> Self-hosted サンドボックスでは現在
+                <strong>Memory（永続メモリ）</strong> はサポートされていません。
+              </p>
+            </div>
+          </div>
+
+          <!-- Step 5 -->
+          <div id="step5" class="step">
+            <div class="step-n">5</div>
+            <h3>モニタリングを設定する</h3>
+            <div class="step-tags">
+              <span class="tag tg">運用フェーズ</span
+              ><span class="tag tr">組織 API キーで認証</span>
+            </div>
+            <div class="cb">
+              <div class="ch">
+                <div class="dots">
+                  <div class="d dr"></div>
+                  <div class="d dy"></div>
+                  <div class="d dg"></div>
+                </div>
+                <span class="cl">python</span>
+              </div>
+              <pre><code>import os
+import anthropic
+
+# ⚠️ 組織 API キー（ANTHROPIC_API_KEY）で認証すること
+# ワーカーホストから呼び出さない（組織スコープ認証情報の漏洩リスク）
+client = anthropic.Anthropic()
+
+stats = client.beta.environments.work.stats(
+    os.environ["ANTHROPIC_ENVIRONMENT_ID"]
+)
+print(f"depth={stats.depth} pending={stats.pending}")
+print(f"workers_polling={stats.workers_polling}")</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── 6. Worker Patterns ── -->
+        <section id="workers" class="sec">
+          <h2><span class="sec-n">6</span>ワーカーパターンの選び方</h2>
+          <div class="mw">
+            <div class="mw-t">ワーカーパターン選択フロー</div>
+            <pre class="mermaid">
+flowchart TD
+    Start([開始]) --> Q1{用途は？}
+    Q1-->|"開発・テスト\nすぐ試したい"| AO_CLI
+    Q1-->|"本番・一定負荷"| AO_SDK
+    Q1-->|"断続的な負荷\nコスト最適化"| WT_SDK
+
+    AO_CLI["Always-on: ant CLI\n常時ポーリング\nコマンド1行で起動"]
+    AO_SDK["Always-on: Python/TS SDK\n常時ポーリング\nカスタムロジック実装可能"]
+    WT_SDK["Webhook-triggered\nPython/TS SDK\nsession.status_run_started で起動\nアイドル時はゼロコスト"]
+
+    AO_CLI --> R1["ant worker --environment-id ID"]
+    AO_SDK --> R2["worker.run()"]
+    WT_SDK --> R3["worker.run_until_empty()"]
+
+    style AO_CLI fill:#1a1650,color:#c4b5fd,stroke:#8b5cf6
+    style AO_SDK fill:#1a1650,color:#c4b5fd,stroke:#8b5cf6
+    style WT_SDK fill:#0e2818,color:#86efac,stroke:#22c55e
+    </pre
+            >
+          </div>
+
+          <div class="pcards">
+            <div class="pcard">
+              <div class="pc-h">
+                <div class="pc-t">Always-on（ant CLI）</div>
+                <div class="pc-s">最もシンプルなパターン</div>
+              </div>
+              <div class="pc-b">
+                <div class="pr">
+                  <span class="pr-k">実装の複雑さ</span
+                  ><span class="pr-v"><span class="badge bg">最低</span></span>
+                </div>
+                <div class="pr">
+                  <span class="pr-k">カスタムロジック</span
+                  ><span class="pr-v"><span class="badge br">❌</span></span>
+                </div>
+                <div class="pr">
+                  <span class="pr-k">レイテンシ</span><span class="pr-v">最低</span>
+                </div>
+                <div class="pr">
+                  <span class="pr-k">アイドルコスト</span><span class="pr-v">常時発生</span>
+                </div>
+                <div class="pr">
+                  <span class="pr-k">向いているケース</span><span class="pr-v">開発・テスト</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pcard">
+              <div class="pc-h">
+                <div class="pc-t">Always-on（SDK）</div>
+                <div class="pc-s">カスタムロジック対応</div>
+              </div>
+              <div class="pc-b">
+                <div class="pr">
+                  <span class="pr-k">実装の複雑さ</span
+                  ><span class="pr-v"><span class="badge bv">低い</span></span>
+                </div>
+                <div class="pr">
+                  <span class="pr-k">カスタムロジック</span
+                  ><span class="pr-v"><span class="badge bg">✅</span></span>
+                </div>
+                <div class="pr">
+                  <span class="pr-k">レイテンシ</span><span class="pr-v">低い</span>
+                </div>
+                <div class="pr">
+                  <span class="pr-k">アイドルコスト</span><span class="pr-v">常時発生</span>
+                </div>
+                <div class="pr">
+                  <span class="pr-k">向いているケース</span><span class="pr-v">一定負荷の本番</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pcard">
+              <div class="pc-h">
+                <div class="pc-t">Webhook-triggered（SDK）</div>
+                <div class="pc-s">コスト効率重視</div>
+              </div>
+              <div class="pc-b">
+                <div class="pr">
+                  <span class="pr-k">実装の複雑さ</span
+                  ><span class="pr-v"><span class="badge ba">中程度</span></span>
+                </div>
+                <div class="pr">
+                  <span class="pr-k">カスタムロジック</span
+                  ><span class="pr-v"><span class="badge bg">✅</span></span>
+                </div>
+                <div class="pr">
+                  <span class="pr-k">レイテンシ</span><span class="pr-v">やや高い</span>
+                </div>
+                <div class="pr">
+                  <span class="pr-k">アイドルコスト</span
+                  ><span class="pr-v"><span class="badge bg">ほぼゼロ</span></span>
+                </div>
+                <div class="pr">
+                  <span class="pr-k">向いているケース</span
+                  ><span class="pr-v">断続的な本番負荷</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── 7. Filesystem ── -->
+        <section id="filesystem" class="sec">
+          <h2><span class="sec-n">7</span>サンドボックスのファイルシステム</h2>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>パス</th>
+                  <th>説明</th>
+                  <th>注意点</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="tl"><code>/workspace</code></td>
+                  <td>デフォルト作業ディレクトリ。ツール実行の基点</td>
+                  <td><code>--workdir</code> で変更した場合はシステムプロンプトも必ず更新</td>
+                </tr>
+                <tr>
+                  <td class="tl"><code>/workspace/skills/&lt;name&gt;/</code></td>
+                  <td>エージェントスキルの自動ダウンロード先</td>
+                  <td>スキルを使う際はこのパスをプロンプトに記載</td>
+                </tr>
+                <tr>
+                  <td class="tl"><code>/mnt/session/outputs</code></td>
+                  <td>セッションの最終出力ファイル置き場</td>
+                  <td>ホストディレクトリをここにマウントしないと出力が取得できない</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="ca ca-a">
+            <span class="ca-i">⚠️</span>
+            <p>
+              <code>--workdir</code> をデフォルトの
+              <code>/workspace</code>
+              から変更した場合、Claudeがスキルを見つけられるようエージェントのシステムプロンプトも合わせて更新してください。
+            </p>
+          </div>
+        </section>
+
+        <!-- ── 8. Security ── -->
+        <section id="security" class="sec">
+          <h2><span class="sec-n">8</span>セキュリティ責任分担モデル</h2>
+
+          <!-- Security SVG -->
+          <div class="svgw">
+            <div class="svgw-t">Shared Responsibility Model</div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 840 420"
+              font-family="'Space Grotesk','Segoe UI',Arial,sans-serif"
+              style="width: 100%; max-width: 840px; display: block; margin: 0 auto"
+            >
+              <rect width="840" height="420" fill="#0f0f28" rx="8" />
+              <text
+                x="420"
+                y="34"
+                text-anchor="middle"
+                font-size="15"
+                font-weight="700"
+                fill="#e2e8f0"
+              >
+                セキュリティ責任分担モデル
+              </text>
+
+              <!-- Left: Anthropic -->
+              <rect
+                x="16"
+                y="50"
+                width="398"
+                height="356"
+                rx="12"
+                fill="#111138"
+                stroke="#3b82f6"
+                stroke-width="2"
+              />
+              <text
+                x="215"
+                y="80"
+                text-anchor="middle"
+                font-size="13"
+                font-weight="700"
+                fill="#7dd3fc"
+              >
+                🛡 Anthropic が管理・保証
+              </text>
+              <line x1="32" y1="90" x2="396" y2="90" stroke="#1e3a5f" stroke-width="1" />
+
+              <circle cx="44" cy="114" r="5" fill="#3b82f6" />
+              <text x="58" y="118" font-size="11.5" fill="#93c5fd">
+                コントロールプレーンのセキュリティ管理
+              </text>
+              <circle cx="44" cy="148" r="5" fill="#3b82f6" />
+              <text x="58" y="152" font-size="11.5" fill="#93c5fd">
+                セッション・ワークキューの完全性
+              </text>
+              <circle cx="44" cy="182" r="5" fill="#3b82f6" />
+              <text x="58" y="186" font-size="11.5" fill="#93c5fd">マルチテナント分離の保証</text>
+              <circle cx="44" cy="216" r="5" fill="#3b82f6" />
+              <text x="58" y="220" font-size="11.5" fill="#93c5fd">
+                エージェントコンテキストの最小化
+              </text>
+              <circle cx="44" cy="250" r="5" fill="#3b82f6" />
+              <text x="58" y="254" font-size="11.5" fill="#93c5fd">
+                API 認証の管理（ANTHROPIC_API_KEY）
+              </text>
+              <circle cx="44" cy="284" r="5" fill="#3b82f6" />
+              <text x="58" y="288" font-size="11.5" fill="#93c5fd">
+                Claude Platform インフラの運用・保守
+              </text>
+
+              <line
+                x1="32"
+                y1="308"
+                x2="396"
+                y2="308"
+                stroke="#1e3a5f"
+                stroke-width="1"
+                stroke-dasharray="4 3"
+              />
+              <text
+                x="215"
+                y="328"
+                text-anchor="middle"
+                font-size="10.5"
+                fill="#64748b"
+                font-style="italic"
+              >
+                ⚠ Anthropic にできないこと
+              </text>
+              <text x="215" y="347" text-anchor="middle" font-size="10" fill="#64748b">
+                漏洩キーの即時無効化
+              </text>
+              <text x="215" y="364" text-anchor="middle" font-size="10" fill="#64748b">
+                ワーカービルドの検証
+              </text>
+              <text x="215" y="381" text-anchor="middle" font-size="10" fill="#64748b">
+                コンテナ内ツール間の分離
+              </text>
+              <text x="215" y="396" text-anchor="middle" font-size="10" fill="#64748b">
+                あなたの環境のデータ保持の強制
+              </text>
+
+              <!-- Right: You -->
+              <rect
+                x="426"
+                y="50"
+                width="398"
+                height="356"
+                rx="12"
+                fill="#1a1208"
+                stroke="#d97706"
+                stroke-width="2"
+              />
+              <text
+                x="625"
+                y="80"
+                text-anchor="middle"
+                font-size="13"
+                font-weight="700"
+                fill="#fbbf24"
+              >
+                ⚠ あなたが担当・管理
+              </text>
+              <line x1="442" y1="90" x2="806" y2="90" stroke="#451a03" stroke-width="1" />
+
+              <circle cx="454" cy="114" r="5" fill="#d97706" />
+              <text x="468" y="118" font-size="11" fill="#fde68a">
+                コンテナイメージ品質・ランタイム堅牢化
+              </text>
+              <text x="468" y="133" font-size="9.5" fill="#64748b">
+                非 root ユーザー / ケーパビリティ削除 / RO rootfs
+              </text>
+
+              <circle cx="454" cy="156" r="5" fill="#d97706" />
+              <text x="468" y="160" font-size="11" fill="#fde68a">ネットワークエグレス制御</text>
+              <text x="468" y="175" font-size="9.5" fill="#64748b">
+                VPC / FW / 必要エンドポイントのみ許可
+              </text>
+
+              <circle cx="454" cy="198" r="5" fill="#d97706" />
+              <text x="468" y="202" font-size="11" fill="#fde68a">
+                ANTHROPIC_ENVIRONMENT_KEY の保管・ローテーション
+              </text>
+              <text x="468" y="217" font-size="9.5" fill="#64748b">
+                シークレットマネージャーに保管・漏洩時は即ローテーション
+              </text>
+
+              <circle cx="454" cy="240" r="5" fill="#d97706" />
+              <text x="468" y="244" font-size="11" fill="#fde68a">信頼境界ごとの環境分離</text>
+              <text x="468" y="259" font-size="9.5" fill="#64748b">
+                ユーザー / チームごとに別ワークスペース・環境を作成
+              </text>
+
+              <circle cx="454" cy="282" r="5" fill="#d97706" />
+              <text x="468" y="286" font-size="11" fill="#fde68a">ツール実行の最小権限適用</text>
+              <text x="468" y="301" font-size="9.5" fill="#64748b">
+                プロセスユーザー権限・マウントディレクトリを最小化
+              </text>
+
+              <circle cx="454" cy="324" r="5" fill="#d97706" />
+              <text x="468" y="328" font-size="11" fill="#fde68a">
+                ログ保持・セッションコンテンツ管理
+              </text>
+              <text x="468" y="343" font-size="9.5" fill="#64748b">
+                Anthropic は visibility なし・自社ポリシーに従う
+              </text>
+
+              <circle cx="454" cy="366" r="5" fill="#d97706" />
+              <text x="468" y="370" font-size="11" fill="#fde68a">コンプライアンス・監査対応</text>
+              <text x="468" y="385" font-size="9.5" fill="#64748b">
+                ZDR / HIPAA BAA は Managed Agents 対象外
+              </text>
+            </svg>
+          </div>
+
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>Anthropic にできないこと</th>
+                  <th>詳細と推奨対応</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="tl">漏洩キーの即時無効化</td>
+                  <td>
+                    異常検出は可能だが瞬時の無効化は不可。<code>ANTHROPIC_ENVIRONMENT_KEY</code> は
+                    DB パスワードと同等に扱い、漏洩時は<strong>即座にローテーション</strong>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tl">ワーカービルドの検証</td>
+                  <td>
+                    コンテナイメージを検査する仕組みがない。サプライチェーン攻撃はコントロールプレーンから検出不可
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tl">コンテナ内ツール間の分離</td>
+                  <td>
+                    Anthropic
+                    のセキュリティ境界はコンテナの外側で終わる。コンテナ内のツール分離はすべてあなたの責任
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tl">データ保持の強制</td>
+                  <td>
+                    セッションコンテンツがワーカーに届いた後は Anthropic
+                    のデータライフサイクル管理外
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ── 9. Providers ── -->
+        <section id="providers" class="sec">
+          <h2><span class="sec-n">9</span>サンドボックスプロバイダー</h2>
+          <p>
+            Self-hosted Sandboxes
+            は任意のプラットフォームで構築できますが、公式統合ガイドが提供されているプロバイダーがあります。
+          </p>
+          <div class="provs">
+            <div class="prov">
+              <div class="prov-n">☁️ Cloudflare</div>
+              <div class="prov-tags">
+                <span class="prov-tag">microVM</span><span class="prov-tag">エグレス制御</span
+                ><span class="prov-tag">スケール</span>
+              </div>
+              <div class="prov-d">
+                microVM +
+                軽量アイソレート。ゼロトラスト秘密注入、カスタマイズ可能なエグレスプロキシ、Cloudflare
+                ネットワーク経由の内部サービス接続。<br /><em>採用: Amplitude（Design Agent）</em>
+              </div>
+              <a
+                class="prov-a"
+                href="https://developers.cloudflare.com/sandbox/claude-managed-agents/"
+                >→ 統合ガイド</a
+              >
+            </div>
+            <div class="prov">
+              <div class="prov-n">🖥️ Daytona</div>
+              <div class="prov-tags">
+                <span class="prov-tag">ステートフル</span><span class="prov-tag">長時間実行</span
+                ><span class="prov-tag">SSH</span>
+              </div>
+              <div class="prov-d">
+                長時間稼働・ステートフルなフルコンピュータ環境。SSH や認証済みプレビュー URL
+                でアクセス。状態の一時停止・復元が可能。<br /><em>採用: Clay（Sculptor）</em>
+              </div>
+              <a
+                class="prov-a"
+                href="https://www.daytona.io/docs/en/guides/claude/claude-managed-agents"
+                >→ 統合ガイド</a
+              >
+            </div>
+            <div class="prov">
+              <div class="prov-n">🤖 Modal</div>
+              <div class="prov-tags">
+                <span class="prov-tag">GPU 対応</span><span class="prov-tag">サブ秒起動</span
+                ><span class="prov-tag">大規模並列</span>
+              </div>
+              <div class="prov-d">
+                AI ワークロード専用クラウド。サブ秒起動、GPU / CPU
+                オンデマンド、数十万の並列サンドボックスに対応。<br /><em>採用: Mason、DoorDash</em>
+              </div>
+              <a
+                class="prov-a"
+                href="https://github.com/modal-labs/claude-managed-agents-modal-sandbox"
+                >→ GitHub ガイド</a
+              >
+            </div>
+            <div class="prov">
+              <div class="prov-n">⚡ Vercel</div>
+              <div class="prov-tags">
+                <span class="prov-tag">VPC ピアリング</span><span class="prov-tag">ミリ秒起動</span
+                ><span class="prov-tag">資格情報注入</span>
+              </div>
+              <div class="prov-d">
+                VM セキュリティ + VPC
+                ピアリング。ミリ秒起動。認証情報はネットワーク境界で注入されるため、サンドボックス内に入らない。<br /><em
+                  >採用: Rogo</em
+                >
+              </div>
+              <a
+                class="prov-a"
+                href="https://vercel.com/kb/guide/run-claude-managed-agent-tools-with-vercel-sandbox"
+                >→ 統合ガイド</a
+              >
+            </div>
+          </div>
+        </section>
+
+        <!-- ── 10. MCP Tunnels ── -->
+        <section id="mcp" class="sec">
+          <h2><span class="sec-n">10</span>MCP トンネルとの組み合わせ</h2>
+          <p>
+            Self-hosted Sandboxes と MCP Tunnels
+            は独立した機能です。それぞれが別の「制御軸」を担います。
+          </p>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>機能</th>
+                  <th>制御対象</th>
+                  <th>独立性</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="tl">Self-hosted Sandboxes</td>
+                  <td>エージェントのコードが<strong>実行される場所</strong></td>
+                  <td>単独で使用可能</td>
+                </tr>
+                <tr>
+                  <td class="tl">MCP Tunnels</td>
+                  <td>
+                    Anthropic がプライベートネットワーク内の MCP サーバーに<strong
+                      >到達する方法</strong
+                    >
+                  </td>
+                  <td>単独で使用可能</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="mw">
+            <div class="mw-t">MCP トンネル組み合わせ判断フロー</div>
+            <pre class="mermaid">
+flowchart TD
+    Q{何を制御したいか？}
+
+    Q-->|"ツール実行を境界内に置きたい"| A
+    Q-->|"プライベートMCPサーバーに接続"| B
+    Q-->|"両方"| C
+
+    A["Self-hosted Sandbox のみ\n\nCloud Sandbox +\nPublic MCP Server"]
+    B["MCP Tunnels のみ\n\nCloud Sandbox +\nPrivate MCP Server（Tunnel 経由）"]
+    C["両方を組み合わせ\n\nYour Sandbox +\nPrivate MCP Server（Tunnel 経由）\n\n実行もツールも境界内に完全維持"]
+
+    style A fill:#131338,color:#93c5fd,stroke:#3b82f6
+    style B fill:#1a1208,color:#fde68a,stroke:#d97706
+    style C fill:#0a2010,color:#86efac,stroke:#22c55e
+    </pre
+            >
+          </div>
+          <div class="ca ca-v">
+            <span class="ca-i">📌</span>
+            <p>
+              <strong>MCP Tunnels のステータス：</strong>
+              現在リサーチプレビュー中です。アクセスには申請が必要:
+              <a href="https://claude.com/form/claude-managed-agents"
+                >claude.com/form/claude-managed-agents</a
+              >
+            </p>
+          </div>
+        </section>
+
+        <!-- ── 11. Best Practices ── -->
+        <section id="bestpractices" class="sec">
+          <h2><span class="sec-n">11</span>ベストプラクティス チェックリスト</h2>
+
+          <h4>🔐 セキュリティ</h4>
+          <ul class="cl-list">
+            <li>
+              <div class="cl-box"></div>
+              ANTHROPIC_ENVIRONMENT_KEY を AWS Secrets Manager / GCP Secret Manager / Vault
+              に保管した
+            </li>
+            <li>
+              <div class="cl-box"></div>
+              環境変数ファイル (.env) やコンテナイメージに環境キーを埋め込んでいない
+            </li>
+            <li>
+              <div class="cl-box"></div>
+              ワーカーホストに ANTHROPIC_API_KEY
+              を設定していない（ツール呼び出しから漏洩するリスク）
+            </li>
+            <li>
+              <div class="cl-box"></div>
+              コンテナを非 root ユーザー（UID 1000 等）で実行している
+            </li>
+            <li>
+              <div class="cl-box"></div>
+              不要な Linux ケーパビリティを削除している（--cap-drop=ALL）
+            </li>
+            <li>
+              <div class="cl-box"></div>
+              読み取り専用ルートファイルシステムを検討した（--read-only）
+            </li>
+            <li>
+              <div class="cl-box"></div>
+              ネットワークエグレスをツールが必要とするエンドポイントのみに制限した
+            </li>
+            <li>
+              <div class="cl-box"></div>
+              信頼境界ごとに別々の環境（Environment）を作成した
+            </li>
+            <li>
+              <div class="cl-box"></div>
+              鍵漏洩が疑われた場合の即時ローテーション手順を整備した
+            </li>
+          </ul>
+
+          <h4>⚡ パフォーマンス</h4>
+          <ul class="cl-list">
+            <li>
+              <div class="cl-box"></div>
+              work.stats で depth を監視し、バックログに応じてワーカーをスケールする仕組みを用意した
+            </li>
+            <li>
+              <div class="cl-box"></div>
+              workers_polling == 0 になったら死活アラートを発火するようにした
+            </li>
+            <li>
+              <div class="cl-box"></div>
+              断続的な負荷には Webhook-triggered パターンでコストを最適化した
+            </li>
+            <li>
+              <div class="cl-box"></div>
+              oldest_queued_at が古くなりすぎた場合のアラートを設定した
+            </li>
+          </ul>
+
+          <h4>🛠️ 運用</h4>
+          <ul class="cl-list">
+            <li>
+              <div class="cl-box"></div>
+              /mnt/session/outputs にホストディレクトリをマウントして出力を取得できるようにした
+            </li>
+            <li>
+              <div class="cl-box"></div>
+              work.stop によるグレースフルシャットダウン手順を整備した
+            </li>
+            <li>
+              <div class="cl-box"></div>
+              --workdir を変更した場合、エージェントのシステムプロンプトも更新した
+            </li>
+            <li>
+              <div class="cl-box"></div>
+              モニタリング呼び出しはワーカーホストではなく別の運用ツールから行っている
+            </li>
+            <li>
+              <div class="cl-box"></div>
+              Memory は Self-hosted では現在未サポートであることを把握している
+            </li>
+          </ul>
+
+          <h3>Docker セキュリティ設定例</h3>
+          <div class="cb">
+            <div class="ch">
+              <div class="dots">
+                <div class="d dr"></div>
+                <div class="d dy"></div>
+                <div class="d dg"></div>
+              </div>
+              <span class="cl">dockerfile</span>
+            </div>
+            <pre><code>FROM ubuntu:24.04
+
+# 非 root ユーザーを作成
+RUN useradd -u 1000 -m -s /bin/bash agentuser
+RUN apt-get update &amp;&amp; apt-get install -y bash curl unzip tar \
+    &amp;&amp; rm -rf /var/lib/apt/lists/*
+
+WORKDIR /workspace
+RUN chown agentuser:agentuser /workspace
+USER agentuser</code></pre>
+          </div>
+
+          <div class="cb">
+            <div class="ch">
+              <div class="dots">
+                <div class="d dr"></div>
+                <div class="d dy"></div>
+                <div class="d dg"></div>
+              </div>
+              <span class="cl">bash</span>
+            </div>
+            <pre><code>docker run \
+  --user 1000:1000 \
+  --cap-drop ALL \
+  --read-only \
+  --tmpfs /tmp \
+  --network restricted_network \
+  -v /host/outputs:/mnt/session/outputs \
+  -e ANTHROPIC_ENVIRONMENT_KEY="$(get_secret env_key)" \
+  my-worker-image:latest</code></pre>
+          </div>
+        </section>
+
+        <!-- ── 12. Monitoring ── -->
+        <section id="monitoring" class="sec">
+          <h2><span class="sec-n">12</span>モニタリングと運用</h2>
+
+          <h3>キューメトリクスの意味</h3>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>メトリクス</th>
+                  <th>説明</th>
+                  <th>活用方法</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="tl"><code>depth</code></td>
+                  <td>キューで待機中のアイテム数</td>
+                  <td>ワーカースケールアウトのトリガー</td>
+                </tr>
+                <tr>
+                  <td class="tl"><code>pending</code></td>
+                  <td>ワーカーが取得・処理中のアイテム数</td>
+                  <td>現在の処理負荷の把握</td>
+                </tr>
+                <tr>
+                  <td class="tl"><code>oldest_queued_at</code></td>
+                  <td>最古の待機アイテムのタイムスタンプ（空なら null）</td>
+                  <td>バックログアラートの基準</td>
+                </tr>
+                <tr>
+                  <td class="tl"><code>workers_polling</code></td>
+                  <td>過去30秒でポーリングしたワーカー数</td>
+                  <td>死活監視（0になったら要アラート）</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>キュー監視 + オートスケールの例</h3>
+          <div class="cb">
+            <div class="ch">
+              <div class="dots">
+                <div class="d dr"></div>
+                <div class="d dy"></div>
+                <div class="d dg"></div>
+              </div>
+              <span class="cl">python</span>
+            </div>
+            <pre><code>import os
+from datetime import datetime, timezone
+import anthropic
+
+# ⚠️ 組織 API キーで認証・ワーカーホスト外から実行
+client = anthropic.Anthropic()
+
+def check_queue_and_scale():
+    stats = client.beta.environments.work.stats(
+        os.environ["ANTHROPIC_ENVIRONMENT_ID"]
+    )
+    print(f"depth={stats.depth} pending={stats.pending} "
+          f"workers={stats.workers_polling}")
+
+    # depth &gt; 10 ならワーカーをスケールアウト
+    if stats.depth &gt; 10:
+        print(f"Scaling up: launching {stats.depth // 5} workers")
+        # launch_workers(count=stats.depth // 5)
+
+    # workers_polling == 0 は死活アラート
+    if stats.workers_polling == 0:
+        print("ALERT: No workers polling!")
+
+    # バックログアラート
+    if stats.oldest_queued_at:
+        age = (datetime.now(timezone.utc) - stats.oldest_queued_at).total_seconds() / 60
+        if age &gt; 10:
+            print(f"Backlog: oldest item is {age:.1f} min old")</code></pre>
+          </div>
+
+          <h3>グレースフルシャットダウン</h3>
+          <div class="cb">
+            <div class="ch">
+              <div class="dots">
+                <div class="d dr"></div>
+                <div class="d dy"></div>
+                <div class="d dg"></div>
+              </div>
+              <span class="cl">python</span>
+            </div>
+            <pre><code>import os
+import anthropic
+
+client = anthropic.Anthropic()
+
+# グレースフルシャットダウン（現在のツール呼び出し完了後に停止）
+work = client.beta.environments.work.stop(
+    os.environ["ANTHROPIC_WORK_ID"],   # 対象ワークアイテム ID（ワーカーホストで自動設定されない）
+    environment_id=os.environ["ANTHROPIC_ENVIRONMENT_ID"],
+)
+print(f"State: {work.state}")
+
+# 即時強制終了: force=True を追加
+# client.beta.environments.work.stop(..., force=True)</code></pre>
+          </div>
+        </section>
+
+        <!-- ── 13. Sources ── -->
+        <section id="sources" class="sec">
+          <h2><span class="sec-n">13</span>参考リソース（ソース URL）</h2>
+
+          <h4>公式ドキュメント</h4>
+          <div class="src-grid">
+            <a
+              class="src-a"
+              href="https://platform.claude.com/docs/en/managed-agents/self-hosted-sandboxes"
+              target="_blank"
+              ><span class="src-icon">📖</span>
+              <div>
+                <div class="src-tit">Self-hosted Sandboxes 統合ガイド</div>
+                <div class="src-url">
+                  platform.claude.com/docs/en/managed-agents/self-hosted-sandboxes
+                </div>
+              </div></a
+            >
+            <a
+              class="src-a"
+              href="https://platform.claude.com/docs/en/managed-agents/self-hosted-sandboxes-security"
+              target="_blank"
+              ><span class="src-icon">🔒</span>
+              <div>
+                <div class="src-tit">セキュリティモデル（責任分担）</div>
+                <div class="src-url">
+                  platform.claude.com/docs/en/managed-agents/self-hosted-sandboxes-security
+                </div>
+              </div></a
+            >
+            <a
+              class="src-a"
+              href="https://platform.claude.com/docs/en/managed-agents/overview"
+              target="_blank"
+              ><span class="src-icon">📋</span>
+              <div>
+                <div class="src-tit">Managed Agents 概要</div>
+                <div class="src-url">platform.claude.com/docs/en/managed-agents/overview</div>
+              </div></a
+            >
+            <a
+              class="src-a"
+              href="https://platform.claude.com/docs/en/managed-agents/quickstart"
+              target="_blank"
+              ><span class="src-icon">🚀</span>
+              <div>
+                <div class="src-tit">クイックスタート</div>
+                <div class="src-url">platform.claude.com/docs/en/managed-agents/quickstart</div>
+              </div></a
+            >
+            <a
+              class="src-a"
+              href="https://platform.claude.com/docs/en/managed-agents/sessions"
+              target="_blank"
+              ><span class="src-icon">📡</span>
+              <div>
+                <div class="src-tit">セッションの開始</div>
+                <div class="src-url">platform.claude.com/docs/en/managed-agents/sessions</div>
+              </div></a
+            >
+            <a
+              class="src-a"
+              href="https://platform.claude.com/docs/en/api/beta/environments/work"
+              target="_blank"
+              ><span class="src-icon">⚙️</span>
+              <div>
+                <div class="src-tit">Environments Work API リファレンス</div>
+                <div class="src-url">platform.claude.com/docs/en/api/beta/environments/work</div>
+              </div></a
+            >
+            <a
+              class="src-a"
+              href="https://platform.claude.com/docs/en/manage-claude/api-and-data-retention"
+              target="_blank"
+              ><span class="src-icon">🗄️</span>
+              <div>
+                <div class="src-tit">API データ保持ポリシー</div>
+                <div class="src-url">
+                  platform.claude.com/docs/en/manage-claude/api-and-data-retention
+                </div>
+              </div></a
+            >
+            <a
+              class="src-a"
+              href="https://platform.claude.com/docs/en/build-with-claude/claude-platform-on-aws"
+              target="_blank"
+              ><span class="src-icon">☁️</span>
+              <div>
+                <div class="src-tit">Claude Platform on AWS</div>
+                <div class="src-url">
+                  platform.claude.com/docs/en/build-with-claude/claude-platform-on-aws
+                </div>
+              </div></a
+            >
+            <a
+              class="src-a"
+              href="https://platform.claude.com/docs/en/agents-and-tools/mcp-tunnels/overview"
+              target="_blank"
+              ><span class="src-icon">🔗</span>
+              <div>
+                <div class="src-tit">MCP Tunnels 概要</div>
+                <div class="src-url">
+                  platform.claude.com/docs/en/agents-and-tools/mcp-tunnels/overview
+                </div>
+              </div></a
+            >
+          </div>
+
+          <h4>公式ブログ</h4>
+          <div class="src-grid">
+            <a
+              class="src-a"
+              href="https://claude.com/blog/claude-managed-agents-updates"
+              target="_blank"
+              ><span class="src-icon">📰</span>
+              <div>
+                <div class="src-tit">
+                  Self-hosted Sandboxes &amp; MCP Tunnels 発表（2026年5月19日）
+                </div>
+                <div class="src-url">claude.com/blog/claude-managed-agents-updates</div>
+              </div></a
+            >
+            <a class="src-a" href="https://platform.claude.com/" target="_blank"
+              ><span class="src-icon">🖥️</span>
+              <div>
+                <div class="src-tit">Claude Console</div>
+                <div class="src-url">platform.claude.com</div>
+              </div></a
+            >
+          </div>
+
+          <h4>プロバイダー統合ガイド</h4>
+          <div class="src-grid">
+            <a
+              class="src-a"
+              href="https://developers.cloudflare.com/sandbox/claude-managed-agents/"
+              target="_blank"
+              ><span class="src-icon">☁️</span>
+              <div>
+                <div class="src-tit">Cloudflare 統合ガイド</div>
+                <div class="src-url">developers.cloudflare.com/sandbox/claude-managed-agents/</div>
+              </div></a
+            >
+            <a
+              class="src-a"
+              href="https://www.daytona.io/docs/en/guides/claude/claude-managed-agents"
+              target="_blank"
+              ><span class="src-icon">🖥️</span>
+              <div>
+                <div class="src-tit">Daytona 統合ガイド</div>
+                <div class="src-url">daytona.io/docs/en/guides/claude/claude-managed-agents</div>
+              </div></a
+            >
+            <a
+              class="src-a"
+              href="https://github.com/modal-labs/claude-managed-agents-modal-sandbox"
+              target="_blank"
+              ><span class="src-icon">🤖</span>
+              <div>
+                <div class="src-tit">Modal 統合ガイド（GitHub）</div>
+                <div class="src-url">github.com/modal-labs/claude-managed-agents-modal-sandbox</div>
+              </div></a
+            >
+            <a
+              class="src-a"
+              href="https://vercel.com/kb/guide/run-claude-managed-agent-tools-with-vercel-sandbox"
+              target="_blank"
+              ><span class="src-icon">⚡</span>
+              <div>
+                <div class="src-tit">Vercel 統合ガイド</div>
+                <div class="src-url">
+                  vercel.com/kb/guide/run-claude-managed-agent-tools-with-vercel-sandbox
+                </div>
+              </div></a
+            >
+          </div>
+
+          <h4>サンプルコード</h4>
+          <div class="src-grid">
+            <a
+              class="src-a"
+              href="https://github.com/anthropics/claude-cookbooks/tree/main/managed_agents/self_hosted_sandboxes"
+              target="_blank"
+              ><span class="src-icon">🍳</span>
+              <div>
+                <div class="src-tit">Claude Cookbooks（Self-hosted Sandboxes）</div>
+                <div class="src-url">
+                  github.com/anthropics/claude-cookbooks/tree/main/managed_agents/self_hosted_sandboxes
+                </div>
+              </div></a
+            >
+            <a class="src-a" href="https://claude.com/form/claude-managed-agents" target="_blank"
+              ><span class="src-icon">📝</span>
+              <div>
+                <div class="src-tit">MCP Tunnels アクセス申請</div>
+                <div class="src-url">claude.com/form/claude-managed-agents</div>
+              </div></a
+            >
+          </div>
+        </section>
+
+        <footer>
+          <p>
+            📌 本ガイドは公式ドキュメント（取得日: 2026年6月10日）を基に作成しています。Claude
+            Managed Agents は Public Beta のため、API
+            仕様は予告なく変更される可能性があります。最新情報は
+            <a href="https://platform.claude.com/docs/en/managed-agents/self-hosted-sandboxes"
+              >公式ドキュメント</a
+            >をご確認ください。
+          </p>
+        </footer>
+      </main>
+    </div>
+
+    <script>
+      // ── Mermaid init ──
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'dark',
+        themeVariables: {
+          primaryColor: '#1e1650',
+          primaryTextColor: '#e2e8f0',
+          primaryBorderColor: '#8b5cf6',
+          lineColor: '#94a3b8',
+          secondaryColor: '#131330',
+          tertiaryColor: '#0d0d22',
+          background: '#0f0f28',
+          mainBkg: '#1e1650',
+          nodeBorder: '#8b5cf6',
+          clusterBkg: '#0d0d22',
+          clusterBorder: '#2d2d5e',
+          titleColor: '#e2e8f0',
+          edgeLabelBackground: '#1e1650',
+          nodeTextColor: '#e2e8f0',
+          fontSize: '16px',
+        },
+        flowchart: { curve: 'basis', padding: 18 },
+        sequence: {
+          actorMargin: 50,
+          messageMargin: 35,
+          mirrorActors: true,
+          bottomMarginAdjustment: 60,
+          useMaxWidth: true,
+        },
+      });
+
+      // ── Active nav highlighting via IntersectionObserver ──
+      const navLinks = document.querySelectorAll('#sidenav .nav-a[href^="#"]');
+      const sections = document.querySelectorAll('.sec, .step, .hero');
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const id = entry.target.id;
+              navLinks.forEach((a) => {
+                a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+              });
+            }
+          });
+        },
+        { rootMargin: '-20% 0px -70% 0px', threshold: 0 },
+      );
+
+      sections.forEach((s) => s.id && observer.observe(s));
+    </script>
+  </body>
+</html>
