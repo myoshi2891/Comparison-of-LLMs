@@ -630,7 +630,7 @@
       <div class="mast-meta">
         <span>Vol. 001 · Issue 05</span>
         <span><b>LLM-Studies</b> / Coverage Diagnostic</span>
-        <span>Scan&nbsp;Date · <b>2026-05-31</b></span>
+        <span>Scan&nbsp;Date · <b>2026-06-05</b></span>
         <span class="pulse">Static&nbsp;file&nbsp;scan</span>
       </div>
       <h1 class="title">Coverage<br/><em>Diagnostic.</em></h1>
@@ -661,12 +661,12 @@
       <div class="stat" role="listitem">
         <span class="stat-index">01</span>
         <span class="stat-label">Test files · <i>web-next</i></span>
-        <span class="stat-val">49<small>vitest specs</small></span>
+        <span class="stat-val">57<small>vitest specs</small></span>
       </div>
       <div class="stat" role="listitem">
         <span class="stat-index">02</span>
         <span class="stat-label">Test cases · <i>web-next</i></span>
-        <span class="stat-val">642<small>it/test count</small></span>
+        <span class="stat-val">693<small>it/test count</small></span>
       </div>
       <div class="stat" role="listitem">
         <span class="stat-index">03</span>
@@ -932,7 +932,38 @@ var COLS = ["app","components","site","lib","types","providers","tools","core"];
 
 var CELLS = {
   unit: {
-    app:        { s:"done",    count:239, files:["app/claude/**/page.test.tsx (5 files)","app/codex/**/page.test.tsx (3)","app/copilot/**/page.test.tsx (4)","app/google/**/page.test.tsx (9)","app/git-worktree/page.test.tsx","app/claude/managed-agents/page.test.tsx (7)"], note:"全 29 page.tsx ルートが契約テスト付き（タイトル・セクション数・rel 属性）" },
+    app:        { s:"done",    count:239, files:[
+      "app/claude/agent/page.test.tsx (8)",
+      "app/claude/code-slash-commands/page.test.tsx (5)",
+      "app/claude/cowork-guide/page.test.tsx (7)",
+      "app/claude/harness-engineering/page.test.tsx (8)",
+      "app/claude/managed-agents/page.test.tsx (7)",
+      "app/claude/skill/page.test.tsx (8)",
+      "app/claude/skill-guide/page.test.tsx (7)",
+      "app/claude/skill-guide-intermediate/page.test.tsx (7)",
+      "app/code-review/coderabbit-guide/page.test.tsx (5)",
+      "app/code-review/copilot-code-review/page.test.tsx (5)",
+      "app/code-review/sonar-qube/page.test.tsx (5)",
+      "app/code-review/tool-pricing/page.test.tsx (15)",
+      "app/codex/agent/page.test.tsx (8)",
+      "app/codex/harness-engineering/page.test.tsx (5)",
+      "app/codex/openai-codex-guide/page.test.tsx (6)",
+      "app/codex/skill/page.test.tsx (8)",
+      "app/copilot/agent/page.test.tsx (8)",
+      "app/copilot/github-copilot/page.test.tsx (16)",
+      "app/copilot/markdown-file-guide/page.test.tsx (6)",
+      "app/copilot/skill/page.test.tsx (8)",
+      "app/google/agent/page.test.tsx (8)",
+      "app/google/agent-harness-engineering/page.test.tsx (21)",
+      "app/google/antigravity-guide/page.test.tsx (9)",
+      "app/google/antigravity-slash-commands-guide/page.test.tsx (5)",
+      "app/google/harness-engineering/page.test.tsx (19)",
+      "app/google/sandbox-best-practices/page.test.tsx (20)",
+      "app/google/skill/page.test.tsx (11)",
+      "app/google/skill-guide/page.test.tsx (8)",
+      "app/google/skill-guide-intermediate/page.test.tsx (6)",
+      "app/git-worktree/page.test.tsx (5)"
+    ], note:"全 29 page.tsx ルートが契約テスト付き（タイトル・セクション数・rel 属性）" },
     components: { s:"done",    count:144, files:["ApiTable.test.tsx (25)","SubTable.test.tsx (21)","ScenarioSelector.test.tsx (23)","HomePage.test.tsx (16)","Hero.test.tsx (12)","MathSection.test.tsx (11)","DualCell.test.tsx (10)","RefLinks.test.tsx (18)","LanguageToggle.test.tsx (8)"], note:"電卓 UI 9/9 コンポーネント網羅" },
     site:       { s:"done",    count:25,  files:["site/SiteHeader.test.tsx (12)","site/SiteHeaderClient.test.tsx (7)","site/DisclaimerBanner.test.tsx (6)"], note:"共通ヘッダー/バナー 3/3 網羅" },
     lib:        { s:"done",    count:93,  files:["cost.test.ts (49)","pricing.test.ts (23)","i18n.test.ts (7)","i18n.rich.test.tsx (10)","site-url.test.ts (4)"], note:"6 lib モジュール中 5 件カバー（metadata.ts / fonts.ts のみ未）" },
