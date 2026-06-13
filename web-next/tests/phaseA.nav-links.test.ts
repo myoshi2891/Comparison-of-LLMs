@@ -58,8 +58,8 @@ describe("Phase A - nav-links top-level entries", () => {
     expect("href" in last && last.href === "/git-worktree").toBe(true);
   });
 
-  it("has Claude/Gemini/Codex/Copilot/Code Review/Agent as dropdowns with children", () => {
-    const providers = ["Claude", "Gemini", "Codex", "Copilot", "Code Review", "Agent"] as const;
+  it("has Claude/Google/Codex/Copilot/Code Review/Agent as dropdowns with children", () => {
+    const providers = ["Claude", "Google", "Codex", "Copilot", "Code Review", "Agent"] as const;
     for (const name of providers) {
       const entry = navLinks.find((link) => link.name === name);
       expect(entry, `${name} must exist`).toBeDefined();

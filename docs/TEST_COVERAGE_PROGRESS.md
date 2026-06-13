@@ -8,11 +8,11 @@
 
 | 項目 | 値 |
 |---|---|
-| 最終スキャン日 | 2026-06-05 |
+| 最終スキャン日 | 2026-06-13 |
 | フロントエンドテストランナー | Vitest 4.1 (jsdom 29 + @testing-library/react 16) |
 | バックエンドテストランナー | pytest 9.0 (unittest 互換) |
-| web-next テストファイル数 | 57 |
-| web-next テストケース数 | 693 |
+| web-next テストファイル数 | 61 |
+| web-next テストケース数 | 738 |
 | scraper テストファイル数 | 5 |
 | scraper テストケース数 | 38 |
 | 総合カバレッジスコア (weighted) | 44.2% |
@@ -71,14 +71,15 @@ files:
   - app/copilot/github-copilot/page.test.tsx (16)
   - app/copilot/markdown-file-guide/page.test.tsx (6)
   - app/copilot/skill/page.test.tsx (8)
-  - app/gemini/agent/page.test.tsx (8)
-  - app/gemini/agent-harness-engineering/page.test.tsx (21)
-  - app/gemini/antigravity-guide/page.test.tsx (9)
-  - app/gemini/antigravity-slash-commands-guide/page.test.tsx (5)
-  - app/gemini/harness-engineering/page.test.tsx (19)
-  - app/gemini/skill/page.test.tsx (11)
-  - app/gemini/skill-guide/page.test.tsx (8)
-  - app/gemini/skill-guide-intermediate/page.test.tsx (6)
+  - app/google/agent/page.test.tsx (8)
+  - app/google/agent-harness-engineering/page.test.tsx (21)
+  - app/google/antigravity-guide/page.test.tsx (9)
+  - app/google/antigravity-slash-commands-guide/page.test.tsx (5)
+  - app/google/harness-engineering/page.test.tsx (19)
+  - app/google/sandbox-best-practices/page.test.tsx (20)
+  - app/google/skill/page.test.tsx (11)
+  - app/google/skill-guide/page.test.tsx (8)
+  - app/google/skill-guide-intermediate/page.test.tsx (6)
   - app/git-worktree/page.test.tsx (5)
 note: 全 29 page.tsx ルートが契約テスト付き（タイトル・セクション数・rel 属性）
 ```
@@ -530,6 +531,8 @@ note: 同上（JS依存関係の監査ゲート）
 
 | 日付 | 変更内容 | スコア |
 |---|---|---|
+| 2026-06-13 | Google 関連コンポーネントテストの堅牢性向上（try-finally 導入） | 44.2% |
+| 2026-06-12 | Google 関連コンポーネント 8 点の Vitest 追加、Biome フォーマット修正 | 44.2% |
 | 2026-05-31 | Unit/types（型スキーマのランタイム negative test）・Unit/providers・Unit/tools（価格抽出 success/fallback 両パス）を追加し partial→done に昇格 | 44.2% |
 | 2026-05-30 | a11yガイドページ自動テスト追加、Playwright電卓インタラクションテスト、およびCI脆弱性自動監査ゲートの導入 | 40.7% |
 | 2026-05-26 | アクセシビリティ自動テスト、Playwright E2E骨格、依存関係脆弱性監査ゲート、およびスクレイパーbrowserテストを追加 | 40.7% |
