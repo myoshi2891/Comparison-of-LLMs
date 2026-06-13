@@ -1,13 +1,13 @@
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import ExamplesApp from "@/app/google/skill-guide/ExamplesApp";
 import Checklist from "@/app/google/agent-harness-engineering/Checklist";
+import BestPracticesChecklist from "@/app/google/antigravity-guide/BestPracticesChecklist";
 import GeminiMdTabs from "@/app/google/antigravity-guide/GeminiMdTabs";
+import ChecklistAppSkillGuide from "@/app/google/skill-guide/ChecklistApp";
+import ExamplesApp from "@/app/google/skill-guide/ExamplesApp";
+import StepsApp from "@/app/google/skill-guide/StepsApp";
 import ChecklistAppIntermediate from "@/app/google/skill-guide-intermediate/ChecklistApp";
 import PatternsApp from "@/app/google/skill-guide-intermediate/PatternsApp";
-import StepsApp from "@/app/google/skill-guide/StepsApp";
-import BestPracticesChecklist from "@/app/google/antigravity-guide/BestPracticesChecklist";
-import ChecklistAppSkillGuide from "@/app/google/skill-guide/ChecklistApp";
 
 describe("ExamplesApp", () => {
   it("renders correctly and allows tab navigation via click and keydown", () => {
@@ -97,7 +97,7 @@ describe("ChecklistAppIntermediate", () => {
   it("toggles checklist items on click", () => {
     render(<ChecklistAppIntermediate />);
     const buttons = screen.getAllByRole("button");
-    
+
     expect(buttons[0].getAttribute("aria-pressed")).toBe("false");
     fireEvent.click(buttons[0]);
     expect(buttons[0].getAttribute("aria-pressed")).toBe("true");
@@ -134,70 +134,72 @@ describe("PatternsApp", () => {
 describe("StepsApp", () => {
   it("supports step navigation and play/reset controls", () => {
     vi.useFakeTimers();
-    render(<StepsApp />);
+    try {
+      render(<StepsApp />);
 
-    const step1Btn = screen.getByRole("button", { name: /1/ });
-    const step2Btn = screen.getByRole("button", { name: /2/ });
+      const step1Btn = screen.getByRole("button", { name: /1/ });
+      const step2Btn = screen.getByRole("button", { name: /2/ });
 
-    expect(step1Btn.getAttribute("aria-current")).toBe("step");
+      expect(step1Btn.getAttribute("aria-current")).toBe("step");
 
-    // Click step 2
-    act(() => {
-      fireEvent.click(step2Btn);
-    });
-    expect(step2Btn.getAttribute("aria-current")).toBe("step");
+      // Click step 2
+      act(() => {
+        fireEvent.click(step2Btn);
+      });
+      expect(step2Btn.getAttribute("aria-current")).toBe("step");
 
-    // Play/Next/Prev/Reset buttons
-    const playBtn = screen.getByRole("button", { name: /Play/i });
-    const prevBtn = screen.getByRole("button", { name: /Prev/i });
-    const nextBtn = screen.getByRole("button", { name: /Next/i });
-    const resetBtn = screen.getByRole("button", { name: /Reset/i });
+      // Play/Next/Prev/Reset buttons
+      const playBtn = screen.getByRole("button", { name: /Play/i });
+      const prevBtn = screen.getByRole("button", { name: /Prev/i });
+      const nextBtn = screen.getByRole("button", { name: /Next/i });
+      const resetBtn = screen.getByRole("button", { name: /Reset/i });
 
-    // step 2 is active, click prev -> should be step 1
-    act(() => {
-      fireEvent.click(prevBtn);
-    });
-    expect(step1Btn.getAttribute("aria-current")).toBe("step");
+      // step 2 is active, click prev -> should be step 1
+      act(() => {
+        fireEvent.click(prevBtn);
+      });
+      expect(step1Btn.getAttribute("aria-current")).toBe("step");
 
-    // click next -> should be step 2
-    act(() => {
-      fireEvent.click(nextBtn);
-    });
-    expect(step2Btn.getAttribute("aria-current")).toBe("step");
+      // click next -> should be step 2
+      act(() => {
+        fireEvent.click(nextBtn);
+      });
+      expect(step2Btn.getAttribute("aria-current")).toBe("step");
 
-    // click reset -> should be step 1
-    act(() => {
-      fireEvent.click(resetBtn);
-    });
-    expect(step1Btn.getAttribute("aria-current")).toBe("step");
+      // click reset -> should be step 1
+      act(() => {
+        fireEvent.click(resetBtn);
+      });
+      expect(step1Btn.getAttribute("aria-current")).toBe("step");
 
-    // Play autoplay simulation
-    act(() => {
-      fireEvent.click(playBtn);
-    });
-    // wait 2 seconds (simulate autoplay timer)
-    act(() => {
-      vi.advanceTimersByTime(2000);
-    });
-    // should be step 2 now
-    expect(step2Btn.getAttribute("aria-current")).toBe("step");
+      // Play autoplay simulation
+      act(() => {
+        fireEvent.click(playBtn);
+      });
+      // wait 2 seconds (simulate autoplay timer)
+      act(() => {
+        vi.advanceTimersByTime(2000);
+      });
+      // should be step 2 now
+      expect(step2Btn.getAttribute("aria-current")).toBe("step");
 
-    // advance timers multiple times to reach end and stop playing
-    act(() => {
-      vi.advanceTimersByTime(2000); // step 3
-    });
-    act(() => {
-      vi.advanceTimersByTime(2000); // step 4
-    });
-    act(() => {
-      vi.advanceTimersByTime(2000); // step 5
-    });
-    act(() => {
-      vi.advanceTimersByTime(2000); // reset to step 1
-    });
-    expect(step1Btn.getAttribute("aria-current")).toBe("step");
-
-    vi.useRealTimers();
+      // advance timers multiple times to reach end and stop playing
+      act(() => {
+        vi.advanceTimersByTime(2000); // step 3
+      });
+      act(() => {
+        vi.advanceTimersByTime(2000); // step 4
+      });
+      act(() => {
+        vi.advanceTimersByTime(2000); // step 5
+      });
+      act(() => {
+        vi.advanceTimersByTime(2000); // reset to step 1
+      });
+      expect(step1Btn.getAttribute("aria-current")).toBe("step");
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 
@@ -205,7 +207,7 @@ describe("BestPracticesChecklist", () => {
   it("toggles checklist items on click", () => {
     render(<BestPracticesChecklist />);
     const buttons = screen.getAllByRole("button");
-    
+
     expect(buttons[0].getAttribute("aria-pressed")).toBe("false");
     fireEvent.click(buttons[0]);
     expect(buttons[0].getAttribute("aria-pressed")).toBe("true");
@@ -218,7 +220,7 @@ describe("ChecklistAppSkillGuide", () => {
   it("toggles and updates completion rate", () => {
     render(<ChecklistAppSkillGuide />);
     const buttons = screen.getAllByRole("button");
-    
+
     // initially 0%
     expect(screen.getByText("0%")).toBeDefined();
 
