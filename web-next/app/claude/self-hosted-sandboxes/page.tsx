@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import CodeCopyButton from "@/components/docs/CodeCopyButton";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import InteractiveChecklist from "./InteractiveChecklist";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -96,7 +97,7 @@ const DIAG_WORKERS = `flowchart TD
 const DIAG_MCP = `flowchart TD
     Q{何を制御したいか？}
 
-    Q-->|"ツール実行を境界内に置いたい"| A
+    Q-->|"ツール実行を境界内に置きたい"| A
     Q-->|"プライベートMCPサーバーに接続"| B
     Q-->|"両方"| C
 
@@ -1473,7 +1474,7 @@ export default function Page() {
             <div className={`${styles.ca} ${styles.caV}`}>
               <span className={styles.caI}>💡</span>
               <p>
-                TypeScript SDK も同様 of パターンで実装できます。TypeScript では追加で{" "}
+                TypeScript SDK も同様のパターンで実装できます。TypeScript では追加で{" "}
                 <code>unzip</code>、<code>tar</code>、Node.js 22+ が必要です。
               </p>
             </div>
@@ -2215,90 +2216,40 @@ export default function Page() {
           </h2>
 
           <h4>🔐 セキュリティ</h4>
-          <ul className={styles.clList}>
-            <li>
-              <div className={styles.clBox} />
-              ANTHROPIC_ENVIRONMENT_KEY を AWS Secrets Manager / GCP Secret Manager / Vault
-              に保管した
-            </li>
-            <li>
-              <div className={styles.clBox} />
-              環境変数ファイル (.env) やコンテナイメージに環境キーを埋め込んでいない
-            </li>
-            <li>
-              <div className={styles.clBox} />
-              ワーカーホストに ANTHROPIC_API_KEY
-              を設定していない（ツール呼び出しから漏洩するリスク）
-            </li>
-            <li>
-              <div className={styles.clBox} />
-              コンテナを非 root ユーザー（UID 1000 等）で実行している
-            </li>
-            <li>
-              <div className={styles.clBox} />
-              不要な Linux ケーパビリティを削除している（--cap-drop=ALL）
-            </li>
-            <li>
-              <div className={styles.clBox} />
-              読み取り専用ルートファイルシステムを検討した（--read-only）
-            </li>
-            <li>
-              <div className={styles.clBox} />
-              ネットワークエグレスをツールが必要とするエンドポイントのみに制限した
-            </li>
-            <li>
-              <div className={styles.clBox} />
-              信頼境界ごとに別々の環境（Environment）を作成した
-            </li>
-            <li>
-              <div className={styles.clBox} />
-              鍵漏洩が疑われた場合の即時ローテーション手順を整備した
-            </li>
-          </ul>
+          <InteractiveChecklist
+            items={[
+              "ANTHROPIC_ENVIRONMENT_KEY を AWS Secrets Manager / GCP Secret Manager / Vault に保管した",
+              "環境変数ファイル (.env) やコンテナイメージに環境キーを埋め込んでいない",
+              "ワーカーホストに ANTHROPIC_API_KEY を設定していない（ツール呼び出しから漏洩するリスク）",
+              "コンテナを非 root ユーザー（UID 1000 等）で実行している",
+              "不要な Linux ケーパビリティを削除している（--cap-drop=ALL）",
+              "読み取り専用ルートファイルシステムを検討した（--read-only）",
+              "ネットワークエグレスをツールが必要とするエンドポイントのみに制限した",
+              "信頼境界ごとに別々の環境（Environment）を作成した",
+              "鍵漏洩が疑われた場合の即時ローテーション手順を整備した",
+            ]}
+          />
 
           <h4>⚡ パフォーマンス</h4>
-          <ul className={styles.clList}>
-            <li>
-              <div className={styles.clBox} />
-              work.stats で depth を監視し、バックログに応じてワーカーをスケールする仕組みを用意した
-            </li>
-            <li>
-              <div className={styles.clBox} />
-              workers_polling == 0 になったら死活アラートを発火するようにした
-            </li>
-            <li>
-              <div className={styles.clBox} />
-              断続的な負荷には Webhook-triggered パターンでコストを最適化した
-            </li>
-            <li>
-              <div className={styles.clBox} />
-              oldest_queued_at が古くなりすぎた場合のアラートを設定した
-            </li>
-          </ul>
+          <InteractiveChecklist
+            items={[
+              "work.stats で depth を監視し、バックログに応じてワーカーをスケールする仕組みを用意した",
+              "workers_polling == 0 になったら死活アラートを発火するようにした",
+              "断続的な負荷には Webhook-triggered パターンでコストを最適化した",
+              "oldest_queued_at が古くなりすぎた場合のアラートを設定した",
+            ]}
+          />
 
           <h4>🛠️ 運用</h4>
-          <ul className={styles.clList}>
-            <li>
-              <div className={styles.clBox} />
-              /mnt/session/outputs にホストディレクトリをマウントして出力を取得できるようにした
-            </li>
-            <li>
-              <div className={styles.clBox} />
-              work.stop によるグレースフルシャットダウン手順を整備した
-            </li>
-            <li>
-              <div className={styles.clBox} />
-              --workdir を変更した場合、エージェントのシステムプロンプトも更新した
-            </li>
-            <li>
-              <div className={styles.clBox} />
-              モニタリング呼び出しはワーカーホストではなく別の運用ツールから行っている
-            </li>
-            <li>
-              <div className={styles.clBox} />
-              Memory は Self-hosted では現在未サポートであることを把握している
-            </li>
-          </ul>
+          <InteractiveChecklist
+            items={[
+              "/mnt/session/outputs にホストディレクトリをマウントして出力を取得できるようにした",
+              "work.stop によるグレースフルシャットダウン手順を整備した",
+              "--workdir を変更した場合、エージェントのシステムプロンプトも更新した",
+              "モニタリング呼び出しはワーカーホストではなく別の運用ツールから行っている",
+              "Memory は Self-hosted では現在未サポートであることを把握している",
+            ]}
+          />
 
           <h3>Docker セキュリティ設定例</h3>
           <div className={styles.cb}>

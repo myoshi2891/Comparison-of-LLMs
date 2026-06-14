@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { fireEvent, render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import Page, { metadata } from "./page";
 
@@ -45,5 +45,38 @@ describe("/claude/self-hosted-sandboxes 契約テスト", () => {
     for (const a of internal) {
       expect(a.getAttribute("href")).not.toMatch(/\.html$/);
     }
+  });
+
+  it("チェックボックスが機能し、クリックで aria-checked が切り替わる", () => {
+    const { container } = render(<Page />);
+    const checkboxes = container.querySelectorAll('[role="checkbox"]');
+    expect(checkboxes.length).toBeGreaterThan(0);
+
+    const firstCheckbox = checkboxes[0];
+    expect(firstCheckbox.getAttribute("aria-checked")).toBe("false");
+
+    // クリック
+    fireEvent.click(firstCheckbox);
+    expect(firstCheckbox.getAttribute("aria-checked")).toBe("true");
+
+    // 再度クリック
+    fireEvent.click(firstCheckbox);
+    expect(firstCheckbox.getAttribute("aria-checked")).toBe("false");
+  });
+
+  it("チェックボックスがキー入力（Enter/Space）で切り替わる", () => {
+    const { container } = render(<Page />);
+    const checkboxes = container.querySelectorAll('[role="checkbox"]');
+    const firstCheckbox = checkboxes[0];
+
+    expect(firstCheckbox.getAttribute("aria-checked")).toBe("false");
+
+    // Spaceキー
+    fireEvent.keyDown(firstCheckbox, { key: " ", code: "Space" });
+    expect(firstCheckbox.getAttribute("aria-checked")).toBe("true");
+
+    // Enterキー
+    fireEvent.keyDown(firstCheckbox, { key: "Enter", code: "Enter" });
+    expect(firstCheckbox.getAttribute("aria-checked")).toBe("false");
   });
 });

@@ -780,17 +780,34 @@
 }
 
 .clList li {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.65rem;
-  padding: 0.5rem 0;
+  padding: 0;
   border-bottom: 1px solid var(--bds);
   font-size: 1rem;
-  color: var(--ts);
 }
 
 .clList li:last-child {
   border-bottom: none;
+}
+
+.clButton {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.5rem 0;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--ts);
+  cursor: pointer;
+}
+
+.clButton:focus-visible {
+  outline: 2px solid var(--av);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 .clBox {
@@ -800,6 +817,26 @@
   border-radius: 4px;
   flex-shrink: 0;
   margin-top: 0.15rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.clBoxChecked {
+  background: var(--av);
+}
+
+.clBoxChecked::after {
+  content: "✓";
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.clText {
+  flex: 1;
 }
 
 /* ── Badges ── */
