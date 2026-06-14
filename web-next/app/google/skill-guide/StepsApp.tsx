@@ -169,9 +169,9 @@ function Code4() {
 }
 
 /**
- * Renders a styled shell code block demonstrating adding deterministic scripts and reference files.
+ * Displays shell commands for creating scripts and references directories with example validation and guideline files.
  *
- * @returns The example shell commands that create `scripts/` and `references/` directories and write example files (`scripts/validate.py`, `references/guidelines.md`) using heredocs.
+ * @returns A styled code block component with shell commands.
  */
 function Code5() {
   return (
@@ -315,11 +315,11 @@ const STEPS_DATA: StepData[] = [
 ];
 
 /**
- * Render an interactive multi-step skill guide with navigation and playback controls.
+ * Provides an interactive guide for creating and testing a skill through multiple sequential steps.
  *
- * Displays a left step list and a right detail panel showing the selected step's title, description, tip, visualization card, and code example; provides Play, Prev, Next, and Reset controls and an autoplay mode that advances through the steps.
+ * Renders a navigable step interface with autoplay capability. Users can manually navigate between steps, play through all steps automatically, or reset to the beginning.
  *
- * @returns The JSX element for the steps guide UI
+ * @returns The JSX element for the guide interface.
  */
 export default function StepsApp() {
   const [activeStep, setActiveStep] = useState(1);
