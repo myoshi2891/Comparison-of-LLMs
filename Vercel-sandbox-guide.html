@@ -1,0 +1,2303 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vercel Sandbox 完全入門ガイド 2026</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+      :root {
+        --bg: #000000;
+        --bg-card: #0a0a0a;
+        --bg-elevated: #111111;
+        --bg-code: #0d1117;
+        --border: #1e1e1e;
+        --border-hi: #2e2e2e;
+        --text-primary: #ededed;
+        --text-sec: #888888;
+        --text-muted: #555555;
+        --blue: #0070f3;
+        --blue-dim: rgba(0, 112, 243, 0.12);
+        --blue-glow: rgba(0, 112, 243, 0.35);
+        --teal: #50e3c2;
+        --teal-dim: rgba(80, 227, 194, 0.1);
+        --green: #3ecf8e;
+        --green-dim: rgba(62, 207, 142, 0.1);
+        --amber: #f59e0b;
+        --amber-dim: rgba(245, 158, 11, 0.1);
+        --red: #ef4444;
+        --red-dim: rgba(239, 68, 68, 0.1);
+        --purple: #a78bfa;
+        --purple-dim: rgba(167, 139, 250, 0.1);
+        --sidebar-w: 260px;
+        --radius: 8px;
+        --radius-lg: 12px;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+        font-size: 16px;
+      }
+      body {
+        font-family: 'Inter', system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--text-primary);
+        line-height: 1.7;
+        display: flex;
+      }
+      a {
+        color: var(--blue);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      code,
+      pre {
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      /* ── Sidebar ─────────────────────────────────────────── */
+      #sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: var(--sidebar-w);
+        background: var(--bg-card);
+        border-right: 1px solid var(--border);
+        overflow-y: auto;
+        padding: 0;
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
+      }
+      .sidebar-logo {
+        padding: 24px 20px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+      }
+      .sidebar-logo svg {
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0;
+      }
+      .sidebar-logo-text {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-primary);
+        line-height: 1.3;
+      }
+      .sidebar-logo-sub {
+        font-size: 11px;
+        color: var(--text-sec);
+      }
+      .sidebar-nav {
+        padding: 12px 0;
+        flex: 1;
+      }
+      .nav-group-label {
+        padding: 14px 20px 6px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        text-transform: uppercase;
+      }
+      .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 7px 20px;
+        font-size: 12.5px;
+        font-weight: 500;
+        color: var(--text-sec);
+        transition: all 0.15s;
+        cursor: pointer;
+        border-left: 2px solid transparent;
+        text-decoration: none;
+      }
+      .nav-link:hover {
+        color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.04);
+        text-decoration: none;
+      }
+      .nav-link.active {
+        color: var(--blue);
+        background: var(--blue-dim);
+        border-left-color: var(--blue);
+      }
+      .nav-num {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border-hi);
+        font-size: 9px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        flex-shrink: 0;
+        transition: all 0.15s;
+      }
+      .nav-link.active .nav-num {
+        background: var(--blue);
+        border-color: var(--blue);
+        color: #fff;
+        box-shadow: 0 0 8px var(--blue-glow);
+      }
+
+      /* ── Main content ───────────────────────────────────── */
+      #main {
+        margin-left: var(--sidebar-w);
+        flex: 1;
+        max-width: calc(100vw - var(--sidebar-w));
+        min-height: 100vh;
+      }
+
+      /* ── Hero ────────────────────────────────────────────── */
+      .hero {
+        padding: 80px 64px 64px;
+        background: linear-gradient(135deg, #000 0%, #060615 50%, #000 100%);
+        border-bottom: 1px solid var(--border);
+        position: relative;
+        overflow: hidden;
+      }
+      .hero::before {
+        content: '';
+        position: absolute;
+        top: -200px;
+        right: -100px;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(ellipse, rgba(0, 112, 243, 0.12) 0%, transparent 65%);
+        pointer-events: none;
+      }
+      .hero::after {
+        content: '';
+        position: absolute;
+        bottom: -150px;
+        left: 10%;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(ellipse, rgba(80, 227, 194, 0.07) 0%, transparent 65%);
+        pointer-events: none;
+      }
+      .hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--blue-dim);
+        border: 1px solid rgba(0, 112, 243, 0.25);
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--blue);
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin-bottom: 24px;
+      }
+      .hero h1 {
+        font-size: 52px;
+        font-weight: 800;
+        line-height: 1.1;
+        letter-spacing: -0.03em;
+        background: linear-gradient(135deg, #fff 30%, var(--teal) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 20px;
+        max-width: 700px;
+      }
+      .hero-desc {
+        font-size: 18px;
+        color: var(--text-sec);
+        max-width: 580px;
+        line-height: 1.65;
+        margin-bottom: 32px;
+      }
+      .hero-badges {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .badge-blue {
+        background: var(--blue-dim);
+        border: 1px solid rgba(0, 112, 243, 0.3);
+        color: var(--blue);
+      }
+      .badge-teal {
+        background: var(--teal-dim);
+        border: 1px solid rgba(80, 227, 194, 0.3);
+        color: var(--teal);
+      }
+      .badge-green {
+        background: var(--green-dim);
+        border: 1px solid rgba(62, 207, 142, 0.3);
+        color: var(--green);
+      }
+      .badge-amber {
+        background: var(--amber-dim);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        color: var(--amber);
+      }
+      .badge-purple {
+        background: var(--purple-dim);
+        border: 1px solid rgba(167, 139, 250, 0.3);
+        color: var(--purple);
+      }
+
+      /* ── Sections ────────────────────────────────────────── */
+      .section {
+        padding: 64px;
+        border-bottom: 1px solid var(--border);
+      }
+      .section:last-child {
+        border-bottom: none;
+      }
+      .section-eyebrow {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--blue);
+        margin-bottom: 10px;
+      }
+      .section h2 {
+        font-size: 32px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin-bottom: 12px;
+      }
+      .section h3 {
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        margin: 40px 0 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .section h3::before {
+        content: '';
+        width: 3px;
+        height: 20px;
+        background: linear-gradient(to bottom, var(--blue), var(--teal));
+        border-radius: 2px;
+        flex-shrink: 0;
+      }
+      .section h4 {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 24px 0 10px;
+        color: var(--text-primary);
+      }
+      .section-intro {
+        font-size: 15.5px;
+        color: var(--text-sec);
+        max-width: 680px;
+        line-height: 1.75;
+        margin-bottom: 36px;
+      }
+
+      /* ── Cards ────────────────────────────────────────────── */
+      .card-grid {
+        display: grid;
+        gap: 16px;
+      }
+      .card-grid-2 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .card-grid-3 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        transition: border-color 0.2s;
+      }
+      .card:hover {
+        border-color: var(--border-hi);
+      }
+      .card-icon {
+        font-size: 28px;
+        margin-bottom: 12px;
+      }
+      .card-title {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+      .card-desc {
+        font-size: 13px;
+        color: var(--text-sec);
+        line-height: 1.6;
+      }
+      .card-tag {
+        display: inline-block;
+        margin-top: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 4px;
+      }
+
+      /* ── Tables ──────────────────────────────────────────── */
+      .tbl-wrap {
+        overflow-x: auto;
+        margin: 20px 0;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+      }
+      thead th {
+        background: var(--bg-elevated);
+        padding: 10px 16px;
+        text-align: left;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--text-sec);
+        border-bottom: 1px solid var(--border-hi);
+        white-space: nowrap;
+      }
+      tbody td {
+        padding: 11px 16px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-primary);
+        vertical-align: top;
+        line-height: 1.55;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:hover td {
+        background: rgba(255, 255, 255, 0.025);
+      }
+      .td-icon {
+        font-size: 16px;
+        text-align: center;
+        width: 36px;
+      }
+      td code {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border-hi);
+        padding: 1px 6px;
+        border-radius: 4px;
+        font-size: 12px;
+        color: var(--teal);
+      }
+
+      /* ── Code blocks ─────────────────────────────────────── */
+      .code-wrap {
+        position: relative;
+        margin: 20px 0;
+      }
+      .code-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #161b22;
+        padding: 8px 16px;
+        border-radius: var(--radius) var(--radius) 0 0;
+        border: 1px solid #30363d;
+        border-bottom: none;
+      }
+      .code-lang {
+        font-size: 11px;
+        font-weight: 600;
+        color: #8b949e;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .copy-btn {
+        font-size: 11px;
+        font-weight: 600;
+        color: #8b949e;
+        background: none;
+        border: 1px solid #30363d;
+        padding: 3px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.15s;
+        font-family: inherit;
+      }
+      .copy-btn:hover {
+        color: #e6edf3;
+        border-color: #58a6ff;
+      }
+      .copy-btn.copied {
+        color: var(--green);
+        border-color: var(--green);
+      }
+      .code-wrap pre {
+        margin: 0;
+        border-radius: 0 0 var(--radius) var(--radius);
+        border: 1px solid #30363d;
+        border-top: none;
+        overflow-x: auto;
+        font-size: 13px;
+        line-height: 1.65;
+      }
+      .code-wrap pre code {
+        border: none;
+        background: transparent;
+        padding: 0;
+        border-radius: 0;
+      }
+
+      /* ── Mermaid diagrams ─────────────────────────────────── */
+      .mermaid-wrap {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 32px 24px;
+        margin: 24px 0;
+        overflow-x: auto;
+      }
+      .mermaid-wrap .mermaid {
+        min-height: 60px;
+      }
+      .mermaid-caption {
+        text-align: center;
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 12px;
+      }
+
+      /* ── Step indicators ─────────────────────────────────── */
+      .steps {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .step {
+        display: flex;
+        gap: 20px;
+        position: relative;
+      }
+      .step:not(:last-child)::before {
+        content: '';
+        position: absolute;
+        left: 19px;
+        top: 44px;
+        width: 2px;
+        height: calc(100% - 24px);
+        background: linear-gradient(to bottom, var(--blue), transparent);
+      }
+      .step-num {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--blue-dim);
+        border: 2px solid var(--blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--blue);
+        flex-shrink: 0;
+        box-shadow: 0 0 16px var(--blue-glow);
+        margin-top: 2px;
+      }
+      .step-body {
+        flex: 1;
+        padding-bottom: 36px;
+      }
+      .step-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        line-height: 1.4;
+      }
+      .step-desc {
+        font-size: 14px;
+        color: var(--text-sec);
+        line-height: 1.65;
+        margin-bottom: 16px;
+      }
+
+      /* ── Alert / callout boxes ─────────────────────────────── */
+      .callout {
+        border-radius: var(--radius);
+        padding: 16px 20px;
+        margin: 20px 0;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        font-size: 13.5px;
+        line-height: 1.65;
+      }
+      .callout-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+      .callout-blue {
+        background: var(--blue-dim);
+        border: 1px solid rgba(0, 112, 243, 0.25);
+      }
+      .callout-amber {
+        background: var(--amber-dim);
+        border: 1px solid rgba(245, 158, 11, 0.25);
+      }
+      .callout-green {
+        background: var(--green-dim);
+        border: 1px solid rgba(62, 207, 142, 0.25);
+      }
+      .callout-purple {
+        background: var(--purple-dim);
+        border: 1px solid rgba(167, 139, 250, 0.25);
+      }
+      .callout strong {
+        font-weight: 600;
+      }
+
+      /* ── Comparison grid ─────────────────────────────────── */
+      .vs-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin: 20px 0;
+      }
+      .vs-card {
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        border: 1px solid;
+      }
+      .vs-card-bad {
+        background: var(--red-dim);
+        border-color: rgba(239, 68, 68, 0.25);
+      }
+      .vs-card-good {
+        background: var(--green-dim);
+        border-color: rgba(62, 207, 142, 0.25);
+      }
+      .vs-label {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+        display: block;
+      }
+      .vs-label-bad {
+        color: var(--red);
+      }
+      .vs-label-good {
+        color: var(--green);
+      }
+
+      /* ── Resource links ─────────────────────────────────── */
+      .resource-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-top: 20px;
+      }
+      .resource-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        text-decoration: none;
+        transition: all 0.15s;
+      }
+      .resource-card:hover {
+        border-color: var(--blue);
+        background: var(--blue-dim);
+        text-decoration: none;
+      }
+      .resource-icon {
+        font-size: 22px;
+        flex-shrink: 0;
+      }
+      .resource-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+      .resource-url {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 2px;
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      /* ── Footer ─────────────────────────────────────────── */
+      .footer {
+        padding: 40px 64px;
+        border-top: 1px solid var(--border);
+        background: var(--bg-card);
+        font-size: 12px;
+        color: var(--text-muted);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      /* ── Responsive ─────────────────────────────────────── */
+      @media (max-width: 900px) {
+        #sidebar {
+          display: none;
+        }
+        #main {
+          margin-left: 0;
+          max-width: 100vw;
+        }
+        .hero {
+          padding: 40px 24px;
+        }
+        .hero h1 {
+          font-size: 34px;
+        }
+        .section {
+          padding: 40px 24px;
+        }
+        .card-grid-2,
+        .card-grid-3,
+        .vs-grid,
+        .resource-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ══════════════════════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════════════════════════ -->
+    <nav id="sidebar">
+      <div class="sidebar-logo">
+        <svg viewBox="0 0 76 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M37.5274 0L75.0548 65H0L37.5274 0Z" fill="white" />
+        </svg>
+        <div>
+          <div class="sidebar-logo-text">Vercel Sandbox</div>
+          <div class="sidebar-logo-sub">完全入門ガイド 2026</div>
+        </div>
+      </div>
+
+      <div class="sidebar-nav">
+        <div class="nav-group-label">はじめに</div>
+        <a class="nav-link active" href="#intro"><span class="nav-num">1</span>Sandboxとは？</a>
+        <a class="nav-link" href="#architecture"><span class="nav-num">2</span>アーキテクチャ</a>
+        <a class="nav-link" href="#usecases"><span class="nav-num">3</span>ユースケース</a>
+
+        <div class="nav-group-label">セットアップ</div>
+        <a class="nav-link" href="#setup"><span class="nav-num">4</span>セットアップ手順</a>
+        <a class="nav-link" href="#concepts"><span class="nav-num">5</span>コアコンセプト</a>
+        <a class="nav-link" href="#persistent-vs"><span class="nav-num">6</span>永続的 vs 一時的</a>
+
+        <div class="nav-group-label">実践ガイド</div>
+        <a class="nav-link" href="#first-sandbox"><span class="nav-num">7</span>最初のSandbox</a>
+        <a class="nav-link" href="#sdk"><span class="nav-num">8</span>JS SDK ガイド</a>
+        <a class="nav-link" href="#cli"><span class="nav-num">9</span>CLI リファレンス</a>
+
+        <div class="nav-group-label">高度な機能</div>
+        <a class="nav-link" href="#persistent-detail"
+          ><span class="nav-num">10</span>永続Sandboxの詳細</a
+        >
+        <a class="nav-link" href="#snapshots"><span class="nav-num">11</span>スナップショット</a>
+        <a class="nav-link" href="#network"><span class="nav-num">12</span>ネットワークポリシー</a>
+        <a class="nav-link" href="#tags"><span class="nav-num">13</span>タグ管理</a>
+
+        <div class="nav-group-label">まとめ</div>
+        <a class="nav-link" href="#best-practices"
+          ><span class="nav-num">14</span>ベストプラクティス</a
+        >
+        <a class="nav-link" href="#resources"><span class="nav-num">15</span>参考ソース</a>
+      </div>
+    </nav>
+
+    <!-- ══════════════════════════════════════════════════════
+     MAIN CONTENT
+══════════════════════════════════════════════════════════ -->
+    <main id="main">
+      <!-- ── HERO ─────────────────────────────────────────── -->
+      <section class="hero">
+        <div class="hero-eyebrow"><span>⚡</span> Vercel Sandbox GA · 2026年6月</div>
+        <h1>Vercel Sandbox<br />完全入門ガイド</h1>
+        <p class="hero-desc">
+          信頼できないコードを<strong>ミリ秒単位</strong>で安全に実行できる Linux マイクロVM。<br />
+          初学者でもわかるステップバイステップ解説＋ベストプラクティス付き。
+        </p>
+        <div class="hero-badges">
+          <span class="badge badge-blue">📦 @vercel/sandbox v2</span>
+          <span class="badge badge-teal">🔒 Firecracker MicroVM</span>
+          <span class="badge badge-green">🚀 サブ秒起動</span>
+          <span class="badge badge-amber">📸 自動スナップショット</span>
+          <span class="badge badge-purple">🌐 OSS</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════
+  § 1  WHAT IS VERCEL SANDBOX
+══════════════════════════════════════════════════════════ -->
+      <section class="section" id="intro">
+        <div class="section-eyebrow">Section 01</div>
+        <h2>Vercel Sandbox とは？</h2>
+        <p class="section-intro">
+          <strong>Vercel Sandbox</strong> は、AI
+          エージェントが生成したコード・ユーザーが入力したスクリプト・サードパーティ製コードなど、<em>信頼できないコード</em>を<strong
+            >完全に隔離された Linux マイクロVM</strong
+          >内で安全に実行するためのサービスです。2026年1月30日に GA（一般公開）となり、CLI と SDK
+          はオープンソース化されました。
+        </p>
+
+        <div class="callout callout-blue">
+          <span class="callout-icon">💡</span>
+          <div>
+            <strong>一言で言うと:</strong> 「コードを安全に動かせる使い捨ての Linux
+            マシン」を<strong>数ミリ秒</strong>で用意できるサービスです。従来のコンテナよりも強力な
+            VM レベルの隔離を実現しています。
+          </div>
+        </div>
+
+        <h3>Vercel Sandbox が解決する課題</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>従来インフラの問題</th>
+                <th>Vercel Sandbox の解決策</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>環境準備に数分かかる</td>
+                <td>⚡ <strong>ミリ秒単位で起動</strong>（サブ秒）</td>
+              </tr>
+              <tr>
+                <td>実行環境が共有され攻撃リスクが高い</td>
+                <td>🔒 <strong>Firecracker MicroVM による完全分離</strong>（独自カーネル）</td>
+              </tr>
+              <tr>
+                <td>アイドル時間にもコストがかかる</td>
+                <td>💰 <strong>Active CPU 時間のみ課金</strong></td>
+              </tr>
+              <tr>
+                <td>複雑な環境の状態引き継ぎが困難</td>
+                <td>📸 <strong>自動スナップショットで状態を保存・復元</strong></td>
+              </tr>
+              <tr>
+                <td>本番環境への意図しない影響リスク</td>
+                <td>🌐 <strong>完全に隔離された VM のため本番への影響ゼロ</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>システム仕様</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>項目</th>
+                <th>詳細</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ベース OS</td>
+                <td><code>Amazon Linux 2023</code></td>
+              </tr>
+              <tr>
+                <td>利用可能ランタイム</td>
+                <td>
+                  <code>node26</code>, <code>node24</code>（デフォルト）, <code>node22</code>,
+                  <code>python3.13</code>
+                </td>
+              </tr>
+              <tr>
+                <td>デフォルト作業ディレクトリ</td>
+                <td><code>/vercel/sandbox</code></td>
+              </tr>
+              <tr>
+                <td>実行ユーザー</td>
+                <td><code>vercel-sandbox</code>（<code>sudo</code> アクセス可）</td>
+              </tr>
+              <tr>
+                <td>仮想化技術</td>
+                <td>Firecracker MicroVM（各 VM が独自カーネルを保有）</td>
+              </tr>
+              <tr>
+                <td>起動速度</td>
+                <td><strong>ミリ秒単位</strong>（サブ秒）</td>
+              </tr>
+              <tr>
+                <td>最大 vCPU</td>
+                <td>8 vCPU（各 vCPU に 2048 MB RAM）</td>
+              </tr>
+              <tr>
+                <td>最大公開ポート数</td>
+                <td>15 ポート</td>
+              </tr>
+              <tr>
+                <td>プリインストールツール</td>
+                <td>
+                  <code>git</code>, <code>curl</code>, <code>unzip</code>, <code>tar</code>,
+                  <code>openssl</code> 等
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════
+  § 2  ARCHITECTURE
+══════════════════════════════════════════════════════════ -->
+      <section class="section" id="architecture">
+        <div class="section-eyebrow">Section 02</div>
+        <h2>全体アーキテクチャを理解する</h2>
+        <p class="section-intro">
+          Vercel の内部コンピュートプラットフォーム「<strong>Hive</strong>」は、毎日
+          270万件以上のデプロイを処理する基盤の上に Sandbox を構築しています。SDK・CLI から
+          Firecracker MicroVM まで、呼び出しがどのように流れるかを把握しましょう。
+        </p>
+
+        <div class="mermaid-wrap">
+          <div class="mermaid">
+            graph TB subgraph CLIENT["👤 呼び出し元レイヤー"] A1["JS SDK\n@vercel/sandbox"]
+            A2["Python SDK\nvercel パッケージ"] A3["CLI\nsandbox / sbx"] A4["AI エージェント\n(v0,
+            Roo Code 等)"] end subgraph API["🔵 Vercel Sandbox API / 認証レイヤー"] B1["OIDC Token
+            認証（推奨）"] B2["ルーティング・管理"] B3["スナップショット管理"] end subgraph HIVE["🟢
+            Hive コンピュートプラットフォーム（Firecracker）"] C1["MicroVM クラスター\nRegion A"]
+            C2["MicroVM クラスター\nRegion B"] C3["MicroVM クラスター\nRegion C"] end subgraph
+            SBX["🟣 個別 Sandbox インスタンス（完全分離）"] D1["Sandbox A\nAmazon Linux
+            2023\nnode24"] D2["Sandbox B\npython3.13\n独自 FS・NW・PID NS"] D3["Sandbox
+            C\nPersistent モード\nSnapshot 保存済み"] end CLIENT --> API API --> HIVE HIVE --> SBX
+            style CLIENT fill:#1e1b4b,stroke:#6366f1,color:#c7d2fe style API
+            fill:#0c1a2e,stroke:#0ea5e9,color:#7dd3fc style HIVE
+            fill:#0a1f0a,stroke:#22c55e,color:#86efac style SBX
+            fill:#1a0a2e,stroke:#a855f7,color:#d8b4fe
+          </div>
+          <p class="mermaid-caption">
+            Vercel Sandbox の多層アーキテクチャ — 呼び出し元から Firecracker MicroVM まで
+          </p>
+        </div>
+
+        <div class="callout callout-amber">
+          <span class="callout-icon">⚠️</span>
+          <div>
+            <strong>コンテナとの違い:</strong> Docker などのコンテナはホスト OS
+            のカーネルを共有しますが、Vercel Sandbox は各 VM が<strong>独自のカーネルを持つ</strong>
+            Firecracker MicroVM のため、より強力な隔離が実現されています。
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════
+  § 3  USE CASES
+══════════════════════════════════════════════════════════ -->
+      <section class="section" id="usecases">
+        <div class="section-eyebrow">Section 03</div>
+        <h2>主なユースケース</h2>
+        <p class="section-intro">Vercel Sandbox は多様なシナリオに対応できます。</p>
+
+        <div class="card-grid card-grid-2">
+          <div class="card">
+            <div class="card-icon">🤖</div>
+            <div class="card-title">AI エージェントのコード実行</div>
+            <div class="card-desc">
+              LLM が生成したコードを安全に実行。v0・Roo Code・Blackbox AI
+              などが採用。本番環境への影響はゼロ。
+            </div>
+            <span class="card-tag badge-green">Persistent 推奨</span>
+          </div>
+          <div class="card">
+            <div class="card-icon">🧪</div>
+            <div class="card-title">コードプレイグラウンド / IDE</div>
+            <div class="card-desc">
+              ユーザーがリアルタイムにコードを書いて実行。各ユーザーが完全に独立した環境を持てる。
+            </div>
+            <span class="card-tag badge-blue">Persistent 推奨</span>
+          </div>
+          <div class="card">
+            <div class="card-icon">🔍</div>
+            <div class="card-title">CI/CD・テスト分離実行</div>
+            <div class="card-desc">
+              ユーザー投稿コードを本番と切り離してビルド・テスト。使い捨て環境のため後始末不要。
+            </div>
+            <span class="card-tag badge-amber">Non-persistent 推奨</span>
+          </div>
+          <div class="card">
+            <div class="card-icon">🚀</div>
+            <div class="card-title">開発サーバー / ライブプレビュー</div>
+            <div class="card-desc">
+              Sandbox 内で Dev Server を起動して公開 URL
+              を発行。エージェントが生成したアプリを即プレビュー。
+            </div>
+            <span class="card-tag badge-purple">--publish-port</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════
+  § 4  SETUP
+══════════════════════════════════════════════════════════ -->
+      <section class="section" id="setup">
+        <div class="section-eyebrow">Section 04</div>
+        <h2>セットアップ手順（Step-by-Step）</h2>
+        <p class="section-intro">5 つのステップで Vercel Sandbox を使い始められます。</p>
+
+        <div class="mermaid-wrap">
+          <div class="mermaid">
+            flowchart LR S1["① Vercel CLI\nインストール"] --> S2["② プロジェクト\n作成・リンク"] S2
+            --> S3["③ Sandbox CLI / SDK\nインストール"] S3 --> S4["④ 認証設定\nOIDC or Token"] S4
+            --> S5["✅ 最初の\nSandbox 作成"] style S1 fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd
+            style S2 fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd style S3
+            fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd style S4
+            fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd style S5
+            fill:#14532d,stroke:#22c55e,color:#86efac
+          </div>
+        </div>
+
+        <div class="steps">
+          <!-- Step 1 -->
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title">Vercel CLI のインストール</div>
+              <div class="step-desc">Vercel CLI をグローバルインストールします。</div>
+              <div class="code-wrap">
+                <div class="code-header">
+                  <span class="code-lang">bash</span
+                  ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-bash">npm install -g vercel</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-title">プロジェクトの作成・リンク（認証の準備）</div>
+              <div class="step-desc">
+                <code>vercel link</code> で プロジェクトとリンクすることで OIDC
+                トークン認証が使えるようになります。
+              </div>
+              <div class="code-wrap">
+                <div class="code-header">
+                  <span class="code-lang">bash</span
+                  ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-bash">mkdir my-sandbox-project && cd my-sandbox-project
+
+# Vercel にリンク（OIDC トークン認証を有効化）
+vercel link
+
+# 環境変数を取得（VERCEL_OIDC_TOKEN が .env.local に保存される）
+vercel env pull</code></pre>
+              </div>
+              <div class="callout callout-amber" style="margin-top: 12px">
+                <span class="callout-icon">⚠️</span>
+                <div>
+                  <strong>重要:</strong> OIDC トークンは
+                  <strong>12時間で失効</strong>します。長時間の開発では
+                  <code>vercel env pull</code> を再実行してください。
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-title">Sandbox CLI / JS SDK のインストール</div>
+              <div class="code-wrap">
+                <div class="code-header">
+                  <span class="code-lang">bash</span
+                  ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-bash"># CLI をグローバルインストール
+npm install -g sandbox
+
+# または npx で直接使用（インストール不要）
+npx sandbox --help
+
+# JS SDK をプロジェクトに追加
+npm install @vercel/sandbox
+
+# Python SDK の場合
+pip install vercel</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <div class="step-title">認証方法を選択する</div>
+              <div class="tbl-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>認証方法</th>
+                      <th>使用環境</th>
+                      <th>セキュリティ</th>
+                      <th>設定コマンド</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>OIDC Token（推奨）</strong></td>
+                      <td>Vercel 上・ローカル開発</td>
+                      <td>◎ 自動ローテーション</td>
+                      <td><code>vercel link && vercel env pull</code></td>
+                    </tr>
+                    <tr>
+                      <td>Access Token</td>
+                      <td>外部 CI/CD・非 Vercel 環境</td>
+                      <td>○ 長期間有効</td>
+                      <td>Dashboard で手動生成</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 5 -->
+          <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-body">
+              <div class="step-title">最初の Sandbox を作成する</div>
+              <div class="step-desc">
+                CLI で 1 コマンドか、JS SDK で数行のコードで起動できます。
+              </div>
+              <div class="code-wrap">
+                <div class="code-header">
+                  <span class="code-lang">bash</span
+                  ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-bash"># CLI で最速スタート（作成してシェルに接続）
+npx sandbox create --connect</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════
+  § 5  CORE CONCEPTS
+══════════════════════════════════════════════════════════ -->
+      <section class="section" id="concepts">
+        <div class="section-eyebrow">Section 05</div>
+        <h2>コアコンセプト：Sandbox と Session</h2>
+        <p class="section-intro">
+          Vercel Sandbox
+          を使いこなすために、<strong>Sandbox</strong>・<strong>Session</strong>・<strong
+            >Snapshot</strong
+          >
+          の 3 つの概念を理解しましょう。
+        </p>
+
+        <div class="mermaid-wrap">
+          <div class="mermaid">
+            graph TB SBX["🏗️ Sandbox（永続的な存在）\nname で識別 / プロジェクト内でユニーク"] SBX
+            --> S1["Session 1\n最初の起動 → 実行 → 停止"] SBX --> S2["Session 2\n再開（Snapshot
+            から復元）→ 実行 → 停止"] SBX --> S3["Session 3\nさらに再開 → 実行 → 停止"] S1
+            -->|"停止時に自動 Snapshot"| SS1[("📸 Snapshot 1\nファイルシステムの状態")] SS1
+            -->|"次回再開時に復元"| S2 S2 -->|"停止時に自動 Snapshot"| SS2[("📸 Snapshot
+            2\n最新の状態")] SS2 -->|"次回再開時に復元"| S3 style SBX
+            fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd style S1
+            fill:#14532d,stroke:#22c55e,color:#86efac style S2
+            fill:#14532d,stroke:#22c55e,color:#86efac style S3
+            fill:#14532d,stroke:#22c55e,color:#86efac style SS1
+            fill:#2d1b4e,stroke:#a855f7,color:#d8b4fe style SS2
+            fill:#2d1b4e,stroke:#a855f7,color:#d8b4fe
+          </div>
+          <p class="mermaid-caption">
+            Sandbox（長期的な存在）の中で Session（単一の VM 起動）が繰り返される
+          </p>
+        </div>
+
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>概念</th>
+                <th>説明</th>
+                <th>ライフタイム</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Sandbox</strong></td>
+                <td><code>name</code> で識別される長期的な存在。設定・Snapshot を保持</td>
+                <td>プロジェクトが存在する限り</td>
+              </tr>
+              <tr>
+                <td><strong>Session</strong></td>
+                <td>Sandbox 内で起動する単一の VM インスタンス</td>
+                <td>コマンド実行中〜停止まで</td>
+              </tr>
+              <tr>
+                <td><strong>Snapshot</strong></td>
+                <td>Session 停止時に自動保存されるファイルシステムの状態</td>
+                <td>設定した有効期限まで</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════
+  § 6  PERSISTENT VS NON-PERSISTENT
+══════════════════════════════════════════════════════════ -->
+      <section class="section" id="persistent-vs">
+        <div class="section-eyebrow">Section 06</div>
+        <h2>永続的 vs 一時的サンドボックス</h2>
+        <p class="section-intro">
+          Vercel Sandbox にはデフォルトの
+          <strong>Persistent（永続）</strong> モードと、一時タスク向けの
+          <strong>Non-persistent（一時）</strong> モードがあります。
+        </p>
+
+        <div class="mermaid-wrap">
+          <div class="mermaid">
+            flowchart LR subgraph PERSIST["♾️ Persistent（デフォルト）"] P1["作成"] --> P2["Session
+            起動"] P2 --> P3["コード実行"] P3 --> P4["停止"] P4 -->|"📸 自動 Snapshot"|
+            P5["状態を保存"] P5 -->|"次回 Snapshot から再開"| P2 end subgraph EPHEMERAL["⚡
+            Non-persistent"] E1["作成"] --> E2["Session 起動"] E2 --> E3["コード実行"] E3 -->
+            E4["停止"] E4 -->|"🗑️ 状態を破棄"| E5["終了（再開不可）"] end style PERSIST
+            fill:#0a1f0a,stroke:#22c55e,color:#86efac style EPHEMERAL
+            fill:#1f0a0a,stroke:#ef4444,color:#fca5a5
+          </div>
+        </div>
+
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>観点</th>
+                <th>Persistent（デフォルト）</th>
+                <th>Non-persistent</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>停止時の挙動</td>
+                <td>✅ 自動スナップショット保存</td>
+                <td>❌ 状態は破棄</td>
+              </tr>
+              <tr>
+                <td>再開方法</td>
+                <td><code>Sandbox.get({ name })</code> で自動再開</td>
+                <td>不可（新規作成のみ）</td>
+              </tr>
+              <tr>
+                <td>スナップショット管理</td>
+                <td>自動（手動管理不要）</td>
+                <td>なし</td>
+              </tr>
+              <tr>
+                <td>ストレージ課金</td>
+                <td>Snapshot Storage が発生</td>
+                <td>発生しない</td>
+              </tr>
+              <tr>
+                <td>主な用途</td>
+                <td>開発環境・エージェントワークスペース・長期ジョブ</td>
+                <td>CI/CD・ビルド専用・使い捨てタスク</td>
+              </tr>
+              <tr>
+                <td>作成時の指定</td>
+                <td>デフォルト（省略可）</td>
+                <td><code>persistent: false</code> または <code>--non-persistent</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════
+  § 7  FIRST SANDBOX
+══════════════════════════════════════════════════════════ -->
+      <section class="section" id="first-sandbox">
+        <div class="section-eyebrow">Section 07</div>
+        <h2>はじめての Sandbox を作る</h2>
+
+        <h3>CLI で最速スタート（1コマンド）</h3>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">bash</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><code class="language-bash"># Sandbox を作成してインタラクティブシェルに接続
+npx sandbox create --connect
+
+# 名前を指定して作成
+sandbox create --name my-first-sandbox --connect</code></pre>
+        </div>
+
+        <h3>JS SDK で最小コード</h3>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">typescript</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><code class="language-typescript">import { Sandbox } from "@vercel/sandbox";
+
+async function main() {
+  // 1. サンドボックスを作成（persistent がデフォルト）
+  const sandbox = await Sandbox.create({
+    name: "my-first-sandbox",    // 省略するとランダム名が生成される
+    runtime: "node24",           // デフォルトは node24
+    timeout: 5 * 60 * 1000,     // タイムアウト: 5分（ミリ秒単位）
+  });
+
+  // 2. コマンドを実行
+  const result = await sandbox.runCommand("node", [
+    "-e",
+    'console.log("Hello from Vercel Sandbox!")',
+  ]);
+  console.log("Exit code:", result.exitCode);       // 0
+  console.log("Output:", await result.stdout());    // Hello from...
+
+  // 3. 停止（persistent なので自動スナップショット保存）
+  await sandbox.stop();
+}
+
+main();</code></pre>
+        </div>
+
+        <h3>作成〜実行フロー</h3>
+        <div class="mermaid-wrap">
+          <div class="mermaid">
+            flowchart TD A(["開始"]) --> B["Sandbox.create()\nまたは sandbox create"] B --> C{"同じ
+            name の\nSandbox が存在する？"} C -->|"はい（Persistent）"| D["既存 Sandbox
+            を再開\nSnapshot から復元"] C -->|"いいえ"| E["新規 MicroVM を起動\n（ミリ秒で完了）"] D
+            --> F["コマンド実行\nrunCommand / exec"] E --> F F --> G{"処理を継続する？"} G
+            -->|"はい"| F G -->|"いいえ"| H["sandbox.stop()"] H --> I{"Persistent?"} I -->|"Yes"|
+            J["📸 自動スナップショット\nファイルシステムを保存"] I -->|"No"| K["🗑️
+            状態を破棄\nストレージ課金なし"] J --> L(["終了"]) K --> L style A
+            fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd style L
+            fill:#14532d,stroke:#22c55e,color:#86efac style J
+            fill:#2d1b4e,stroke:#a855f7,color:#d8b4fe style K
+            fill:#3b1515,stroke:#ef4444,color:#fca5a5
+          </div>
+          <p class="mermaid-caption">Sandbox 作成から停止まで全体フロー</p>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════
+  § 8  JS SDK
+══════════════════════════════════════════════════════════ -->
+      <section class="section" id="sdk">
+        <div class="section-eyebrow">Section 08</div>
+        <h2>JS SDK 実践ガイド</h2>
+
+        <h3>主要メソッド一覧</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>メソッド</th>
+                <th>用途</th>
+                <th>戻り値</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>Sandbox.create()</code></td>
+                <td>新規 Sandbox を作成</td>
+                <td><code>Promise&lt;Sandbox&gt;</code></td>
+              </tr>
+              <tr>
+                <td><code>Sandbox.get()</code></td>
+                <td>既存 Sandbox を名前で取得</td>
+                <td><code>Promise&lt;Sandbox&gt;</code></td>
+              </tr>
+              <tr>
+                <td><code>Sandbox.getOrCreate()</code></td>
+                <td>あれば再開・なければ作成（<strong>推奨</strong>）</td>
+                <td><code>Promise&lt;Sandbox&gt;</code></td>
+              </tr>
+              <tr>
+                <td><code>Sandbox.fork()</code></td>
+                <td>既存 Sandbox をフォーク</td>
+                <td><code>Promise&lt;Sandbox&gt;</code></td>
+              </tr>
+              <tr>
+                <td><code>Sandbox.list()</code></td>
+                <td>Sandbox 一覧を取得（async-iterable）</td>
+                <td><code>Promise&lt;Paginated&gt;</code></td>
+              </tr>
+              <tr>
+                <td><code>sandbox.runCommand()</code></td>
+                <td>コマンドを実行</td>
+                <td><code>Promise&lt;CommandFinished&gt;</code></td>
+              </tr>
+              <tr>
+                <td><code>sandbox.writeFiles()</code></td>
+                <td>ファイルを書き込む</td>
+                <td><code>Promise&lt;void&gt;</code></td>
+              </tr>
+              <tr>
+                <td><code>sandbox.readFileToBuffer()</code></td>
+                <td>ファイルを読み込む</td>
+                <td><code>Promise&lt;Buffer|null&gt;</code></td>
+              </tr>
+              <tr>
+                <td><code>sandbox.domain()</code></td>
+                <td>公開 URL を取得</td>
+                <td><code>string</code></td>
+              </tr>
+              <tr>
+                <td><code>sandbox.stop()</code></td>
+                <td>Sandbox を停止</td>
+                <td><code>Promise&lt;...&gt;</code></td>
+              </tr>
+              <tr>
+                <td><code>sandbox.update()</code></td>
+                <td>設定を動的に更新</td>
+                <td><code>Promise&lt;void&gt;</code></td>
+              </tr>
+              <tr>
+                <td><code>sandbox.delete()</code></td>
+                <td>完全削除（Snapshot も消去）</td>
+                <td><code>Promise&lt;void&gt;</code></td>
+              </tr>
+              <tr>
+                <td><code>sandbox.extendTimeout()</code></td>
+                <td>タイムアウト延長</td>
+                <td><code>Promise&lt;void&gt;</code></td>
+              </tr>
+              <tr>
+                <td><code>sandbox.snapshot()</code></td>
+                <td>手動スナップショット</td>
+                <td><code>Promise&lt;Snapshot&gt;</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>パターン A：一時タスク向け（Non-persistent）</h3>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">typescript</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><code class="language-typescript">const sandbox = await Sandbox.create({
+  persistent: false,            // 停止後に状態を破棄（Snapshot 課金なし）
+  timeout: 15 * 60 * 1000,     // 15分
+});
+
+try {
+  await sandbox.runCommand("npm", ["test"]);
+} finally {
+  await sandbox.stop();         // 状態は破棄される
+}</code></pre>
+        </div>
+
+        <h3>パターン B：長期利用向け getOrCreate（最推奨）</h3>
+        <div class="mermaid-wrap">
+          <div class="mermaid">
+            flowchart TD GC["Sandbox.getOrCreate({ name: 'my-sandbox' })"] GC --> E1{"同じ name
+            の\nSandbox が存在？"} E1 -->|"存在する"| E2{"Snapshot の\n有効期限は？"} E2 -->|"有効"|
+            E3["✅ 既存 Sandbox を再開\nonResume() を実行"] E2 -->|"期限切れ"| E4["🔄 Sandbox
+            を再作成\nonCreate() を実行"] E1 -->|"存在しない"| E5["🆕 新規 Sandbox
+            を作成\nonCreate() を実行"] E3 --> DONE(["Sandbox インスタンス返却"]) E4 --> DONE E5 -->
+            DONE style GC fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd style DONE
+            fill:#14532d,stroke:#22c55e,color:#86efac style E3
+            fill:#0a1f0a,stroke:#22c55e,color:#86efac style E4
+            fill:#2d1a00,stroke:#f59e0b,color:#fde68a style E5
+            fill:#2d1b4e,stroke:#a855f7,color:#d8b4fe
+          </div>
+          <p class="mermaid-caption">getOrCreate の 3 つの動作分岐</p>
+        </div>
+
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">typescript</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><code class="language-typescript">const sandbox = await Sandbox.getOrCreate({
+  name: "dev-environment",
+  runtime: "node24",
+
+  // 🔴 初回作成時のみ実行（重い初期化）
+  onCreate: async (sbx) => {
+    await sbx.runCommand("git", ["clone", "https://github.com/your/repo", "."]);
+    await sbx.runCommand("npm", ["install"]);
+    console.log("初回セットアップ完了！（次回から skip）");
+  },
+
+  // 🔵 再開のたびに実行（バックグラウンドサービスの再起動等）
+  onResume: async (sbx) => {
+    await sbx.runCommand({
+      cmd: "npm",
+      args: ["run", "dev"],
+      detached: true,           // バックグラウンドで実行
+    });
+    console.log("Dev サーバー起動！");
+  },
+});</code></pre>
+        </div>
+
+        <h3>ファイル操作</h3>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">typescript</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><code class="language-typescript">// ファイルの書き込み
+await sandbox.writeFiles([
+  {
+    path: "/vercel/sandbox/src/index.ts",
+    content: Buffer.from(`export const hello = () => "world";`),
+  },
+  {
+    path: "/vercel/sandbox/scripts/run.sh",
+    content: Buffer.from("#!/bin/bash\nnpm start"),
+    mode: 0o755,                // 実行権限を付与（chmod +x 相当）
+  },
+]);
+
+// ファイルの読み込み
+const buf = await sandbox.readFileToBuffer({ path: "dist/output.js" });
+if (buf) console.log(buf.toString());
+
+// ローカルにダウンロード
+await sandbox.downloadFile(
+  { path: "/vercel/sandbox/coverage/lcov.info" },
+  { path: "./reports/lcov.info", mkdirRecursive: true }
+);</code></pre>
+        </div>
+
+        <h3>ポート公開（Dev サーバーのプレビュー URL）</h3>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">typescript</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><code class="language-typescript">const sandbox = await Sandbox.create({
+  name: "web-preview",
+  ports: [3000, 8080],           // 公開するポート番号
+});
+
+// Dev サーバーをバックグラウンドで起動
+await sandbox.runCommand({
+  cmd: "npm",
+  args: ["run", "dev"],
+  detached: true,
+});
+
+// 公開 URL を取得
+const previewUrl = sandbox.domain(3000);
+console.log("プレビュー URL:", previewUrl);
+// => https://xxxxxxxx-3000.sandbox.vercel.app</code></pre>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════
+  § 9  CLI
+══════════════════════════════════════════════════════════ -->
+      <section class="section" id="cli">
+        <div class="section-eyebrow">Section 09</div>
+        <h2>CLI 完全リファレンス</h2>
+
+        <h3>コマンド全体マップ</h3>
+        <div class="mermaid-wrap">
+          <div class="mermaid">
+            mindmap root((sandbox CLI)) サンドボックス管理 list / ls create fork remove config
+            実行系 run（停止中も自動再開） exec（起動中のみ） connect / ssh / shell ファイル操作
+            copy / cp セッション管理 sessions スナップショット snapshot（手動作成）
+            snapshots（一覧・管理） 認証 login logout
+          </div>
+          <p class="mermaid-caption">sandbox CLI の全コマンド体系</p>
+        </div>
+
+        <h3>よく使うコマンド実例</h3>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">bash</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><code class="language-bash"># ─── 作成 ──────────────────────────────────────────────
+# 基本（Node.js 24）
+sandbox create --name my-sandbox
+
+# Python ランタイムで 1 時間タイムアウト
+sandbox create --runtime python3.13 --timeout 1h --name py-box
+
+# 作成と同時にシェルに接続
+sandbox create --name dev-box --connect
+
+# ポートを公開（Dev サーバー向け）
+sandbox create --name web-app --publish-port 3000
+
+# 非永続（一時）サンドボックス
+sandbox create --name ci-task --non-persistent
+
+# Snapshot 7日保持 + 最新1件のみ
+sandbox create --name long-lived \
+  --snapshot-expiration 7d \
+  --keep-last-snapshots 1
+
+# ─── コマンド実行 ───────────────────────────────────────
+# 停止中でも自動再開してからコマンド実行
+sandbox run --name my-sandbox -- npm test
+
+# 起動中の Sandbox にコマンドを送信
+sandbox exec my-sandbox -- node script.js
+
+# sudo でシステムパッケージをインストール
+sandbox exec --sudo my-sandbox -- dnf install -y curl
+
+# インタラクティブシェルに接続
+sandbox connect my-sandbox
+
+# ─── ファイル操作 ──────────────────────────────────────
+# ローカル → Sandbox
+sandbox copy ./local.txt my-sandbox:/vercel/sandbox/remote.txt
+
+# Sandbox → ローカル
+sandbox copy my-sandbox:/vercel/sandbox/output.log ./logs/
+
+# ─── 設定変更 ──────────────────────────────────────────
+sandbox config list my-sandbox           # 現在の設定を確認
+sandbox config vcpus my-sandbox 4        # 4 vCPU に変更
+sandbox config timeout my-sandbox 30m   # タイムアウト 30 分
+sandbox config tags my-sandbox --tag env=staging --tag team=backend
+
+# ─── 停止・削除 ────────────────────────────────────────
+sandbox stop my-sandbox                  # 停止（Snapshot 保存）
+sandbox remove my-sandbox               # 完全削除（Snapshot も消去）</code></pre>
+        </div>
+
+        <h3>run vs exec の違い</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>コマンド</th>
+                <th>対象 Sandbox の状態</th>
+                <th>動作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>sandbox run</code></td>
+                <td>停止中・起動中どちらでも OK</td>
+                <td>停止中なら <strong>自動的に再開</strong>してから実行</td>
+              </tr>
+              <tr>
+                <td><code>sandbox exec</code></td>
+                <td><strong>起動中のみ</strong></td>
+                <td>停止中の場合はエラー</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════
+  § 10  PERSISTENT SANDBOXES DETAIL
+══════════════════════════════════════════════════════════ -->
+      <section class="section" id="persistent-detail">
+        <div class="section-eyebrow">Section 10</div>
+        <h2>永続的サンドボックスの詳細</h2>
+
+        <h3>ライフサイクル全体フロー（シーケンス）</h3>
+        <div class="mermaid-wrap">
+          <div class="mermaid">
+            sequenceDiagram participant Dev as 開発者 / AI エージェント participant API as Vercel
+            Sandbox API participant VM as MicroVM（Session） participant SS as Snapshot
+            ストレージ（S3） Dev->>API: Sandbox.create({ name: "my-sandbox" }) API->>VM: 新規
+            MicroVM を起動 VM-->>Dev: Sandbox インスタンス返却 Dev->>VM: runCommand("npm install")
+            VM-->>Dev: 実行結果（exit 0） Dev->>VM: sandbox.stop() VM->>SS: 📸
+            ファイルシステムを自動スナップショット VM-->>Dev: 停止完了（Session 1 終了） Note over
+            Dev,SS: 数時間後・翌日でも問題なし Dev->>API: Sandbox.get({ name: "my-sandbox" })
+            API-->>Dev: Sandbox ハンドル返却 Dev->>API: sandbox.runCommand("npm test") API->>SS:
+            最新 Snapshot を取得 SS-->>API: Snapshot データ API->>VM: 新規 MicroVM を Snapshot
+            から起動 VM-->>Dev: 実行結果（npm install 済の状態から！） Note right of VM: Session 2
+            開始
+          </div>
+          <p class="mermaid-caption">停止 → スナップショット → 再開 の完全なシーケンス</p>
+        </div>
+
+        <h3>ライフサイクルフック（onCreate と onResume）</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>フック</th>
+                <th>実行タイミング</th>
+                <th>用途</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>onCreate</code></td>
+                <td>Sandbox が<strong>初回作成されたとき</strong>のみ</td>
+                <td>重い初期化（git clone、npm install 等）</td>
+              </tr>
+              <tr>
+                <td><code>onResume</code></td>
+                <td><strong>毎回の再開時</strong>（自動再開も含む）</td>
+                <td>バックグラウンドサービスの再起動、キャッシュの再読み込み</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">typescript</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><code class="language-typescript">const sandbox = await Sandbox.getOrCreate({
+  name: "agent-workspace",
+
+  // ✅ 初回のみ（重い処理）
+  onCreate: async (sbx) => {
+    await sbx.runCommand("git", ["clone", repoUrl, "."]);
+    await sbx.runCommand("npm", ["install"]);
+    await sbx.runCommand("pip", ["install", "-r", "requirements.txt"]);
+  },
+
+  // ✅ 毎回の再開時（軽量な再起動）
+  onResume: async (sbx) => {
+    await sbx.runCommand({ cmd: "redis-server", detached: true });
+    await sbx.runCommand({ cmd: "npm", args: ["run", "dev"], detached: true });
+  },
+});</code></pre>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════
+  § 11  SNAPSHOTS
+══════════════════════════════════════════════════════════ -->
+      <section class="section" id="snapshots">
+        <div class="section-eyebrow">Section 11</div>
+        <h2>スナップショット管理</h2>
+
+        <h3>スナップショット保持ポリシーのフロー</h3>
+        <div class="mermaid-wrap">
+          <div class="mermaid">
+            flowchart TD A["Sandbox が停止"] A --> B["📸 自動スナップショット作成"] B -->
+            C{"keepLastSnapshots\n設定あり？"} C -->|"設定なし"| D["すべての Snapshot
+            を保持\n（有効期限まで）"] C -->|"設定あり（例: count: 1）"| E{"保持上限 N
+            件を\n超過した？"} E -->|"いいえ"| D E -->|"はい"| F{"deleteEvicted?"} F
+            -->|"true（デフォルト）"| G["🗑️ 古い Snapshot を即時削除"] F -->|"false"| H["⏳
+            有効期限まで保持"] style B fill:#2d1b4e,stroke:#a855f7,color:#d8b4fe style G
+            fill:#3b1515,stroke:#ef4444,color:#fca5a5
+          </div>
+        </div>
+
+        <h3>推奨設定（コスト最小化）</h3>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">typescript</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><code class="language-typescript">// ✅ 最新 1 件のみ保持してストレージコストを最小化
+const sandbox = await Sandbox.create({
+  name: "my-sandbox",
+  snapshotExpiration: 7 * 24 * 60 * 60 * 1000,   // 7日
+  keepLastSnapshots: {
+    count: 1,               // 最新 1 件のみ
+    deleteEvicted: true,    // 古いものは即座に削除
+  },
+});</code></pre>
+        </div>
+
+        <h3>スナップショット操作コマンド</h3>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">bash</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><code class="language-bash"># 手動でスナップショットを作成
+sandbox snapshot my-sandbox
+
+# スナップショット一覧を表示
+sandbox snapshots list my-sandbox
+
+# 特定スナップショットに巻き戻し
+sandbox config current-snapshot my-sandbox snap_abc123
+
+# 特定スナップショットから新規 Sandbox を作成
+sandbox create --name forked-sandbox --snapshot snap_abc123
+
+# 既存 Sandbox をフォーク（スナップショットを継承）
+sandbox fork my-sandbox --name my-fork</code></pre>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════
+  § 12  NETWORK POLICY
+══════════════════════════════════════════════════════════ -->
+      <section class="section" id="network">
+        <div class="section-eyebrow">Section 12</div>
+        <h2>ネットワークポリシー</h2>
+
+        <h3>3 種類のポリシー</h3>
+        <div class="mermaid-wrap">
+          <div class="mermaid">
+            flowchart LR subgraph ALLOW["🌐 allow-all（デフォルト）"] AS["Sandbox"]
+            -->|"すべて許可"| AN["インターネット全体"] end subgraph DENY["🚫 deny-all"]
+            DS["Sandbox"] -->|"すべて遮断"| DN["❌ インターネット"] end subgraph CUSTOM["⚙️
+            custom（カスタム）"] CS["Sandbox"] -->|"許可"| CN1["✅ ai-gateway.vercel.sh"] CS
+            -->|"遮断"| CN2["❌ その他"] end style ALLOW fill:#0a1f0a,stroke:#22c55e,color:#86efac
+            style DENY fill:#1f0a0a,stroke:#ef4444,color:#fca5a5 style CUSTOM
+            fill:#0c1a2e,stroke:#3b82f6,color:#93c5fd
+          </div>
+        </div>
+
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ポリシー</th>
+                <th>説明</th>
+                <th>用途</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>allow-all</code></td>
+                <td>すべての通信を許可（<strong>デフォルト</strong>）</td>
+                <td>開発・テスト</td>
+              </tr>
+              <tr>
+                <td><code>deny-all</code></td>
+                <td>すべての通信を遮断</td>
+                <td>最高セキュリティが必要な実行</td>
+              </tr>
+              <tr>
+                <td>カスタム</td>
+                <td>ドメイン / CIDR を個別指定</td>
+                <td>特定 API のみ許可</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">bash</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><code class="language-bash"># すべて遮断（最もセキュア）
+sandbox create --name secure-box --network-policy deny-all
+
+# Vercel AI ゲートウェイのみ許可
+sandbox create --name ai-box --allowed-domain ai-gateway.vercel.sh
+
+# ワイルドカードでサブドメインを許可
+sandbox create --name api-box \
+  --allowed-domain "*.vercel.app" \
+  --allowed-domain api.example.com
+
+# 実行後に設定変更（動的に変更可能）
+sandbox config network-policy my-sandbox --mode deny-all</code></pre>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════
+  § 13  TAGS
+══════════════════════════════════════════════════════════ -->
+      <section class="section" id="tags">
+        <div class="section-eyebrow">Section 13</div>
+        <h2>タグによる管理</h2>
+        <p class="section-intro">
+          タグ（Tags）は Sandbox を
+          <strong>環境・チーム・用途</strong> などで分類するためのキーバリューペアです（最大 5
+          個）。
+        </p>
+
+        <div class="mermaid-wrap">
+          <div class="mermaid">
+            graph LR subgraph PROD["env=production"] P1["prod-agent-1"] P2["prod-agent-2"] end
+            subgraph STG["env=staging"] S1["staging-agent-1"] end subgraph CI["env=ci"]
+            C1["ci-build-1"] C2["ci-build-2"] end MGMT["Dashboard / CLI\nsandbox list --tag
+            env=production"] --> PROD MGMT --> STG MGMT --> CI style PROD
+            fill:#14532d,stroke:#22c55e,color:#86efac style STG
+            fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd style CI
+            fill:#2d1b4e,stroke:#a855f7,color:#d8b4fe
+          </div>
+          <p class="mermaid-caption">タグを使ったフリート管理の例</p>
+        </div>
+
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">bash</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><code class="language-bash"># 作成時にタグを付与
+sandbox create --name prod-sandbox \
+  --tag env=production \
+  --tag team=backend \
+  --tag version=2.0
+
+# タグでフィルタして一覧表示
+sandbox list --tag env=staging
+
+# タグを更新（既存タグはすべて置き換え）
+sandbox config tags my-sandbox \
+  --tag env=production \
+  --tag team=platform
+
+# タグをすべてクリア
+sandbox config tags my-sandbox</code></pre>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════
+  § 14  BEST PRACTICES
+══════════════════════════════════════════════════════════ -->
+      <section class="section" id="best-practices">
+        <div class="section-eyebrow">Section 14</div>
+        <h2>ベストプラクティス集</h2>
+
+        <h3>全体像</h3>
+        <div class="mermaid-wrap">
+          <div class="mermaid">
+            mindmap root((ベストプラクティス)) コスト最適化 keepLastSnapshots: 1 に設定 CI/CD には
+            non-persistent を使う 適切なタイムアウト設定 処理後は必ず stop セキュリティ untrusted
+            code には deny-all OIDC Token を優先使用 処理後にネットワーク遮断 不要な Sandbox
+            を定期削除 パフォーマンス getOrCreate でスナップショットを活用 onCreate
+            で重い初期化を一度だけ onResume で軽量な再起動 detached でバックグラウンド実行
+            管理・運用 name を必ず明示的に指定 タグで環境・チームを分類 v1→v2 移行は name に注意
+          </div>
+        </div>
+
+        <!-- BP 1 -->
+        <h3>✅ BP-1：Snapshot は最新 1 件のみ保持（コスト最小化）</h3>
+        <div class="vs-grid">
+          <div class="vs-card vs-card-bad">
+            <span class="vs-label vs-label-bad">❌ 悪い例</span>
+            <div class="code-wrap" style="margin: 0">
+              <div class="code-header">
+                <span class="code-lang">typescript</span
+                ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              </div>
+              <pre><code class="language-typescript">// Snapshot が無制限に蓄積される
+await Sandbox.create({ name: "my-sandbox" });</code></pre>
+            </div>
+          </div>
+          <div class="vs-card vs-card-good">
+            <span class="vs-label vs-label-good">✅ 良い例</span>
+            <div class="code-wrap" style="margin: 0">
+              <div class="code-header">
+                <span class="code-lang">typescript</span
+                ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              </div>
+              <pre><code class="language-typescript">// 最新 1 件のみ保持してコスト最小化
+await Sandbox.create({
+  name: "my-sandbox",
+  snapshotExpiration: 7 * 24 * 60 * 60 * 1000,
+  keepLastSnapshots: { count: 1, deleteEvicted: true },
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- BP 2 -->
+        <h3>✅ BP-2：CI/CD の使い捨てタスクは Non-persistent</h3>
+        <div class="vs-grid">
+          <div class="vs-card vs-card-bad">
+            <span class="vs-label vs-label-bad">❌ 悪い例</span>
+            <div class="code-wrap" style="margin: 0">
+              <div class="code-header">
+                <span class="code-lang">typescript</span
+                ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              </div>
+              <pre><code class="language-typescript">// CI で永続モード → 不要な Snapshot 課金
+await Sandbox.create({ name: "ci-run-123" });</code></pre>
+            </div>
+          </div>
+          <div class="vs-card vs-card-good">
+            <span class="vs-label vs-label-good">✅ 良い例</span>
+            <div class="code-wrap" style="margin: 0">
+              <div class="code-header">
+                <span class="code-lang">typescript</span
+                ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              </div>
+              <pre><code class="language-typescript">// non-persistent で課金ゼロ
+await Sandbox.create({
+  name: "ci-run-123",
+  persistent: false,
+  timeout: 15 * 60 * 1000,
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- BP 3 -->
+        <h3>✅ BP-3：getOrCreate で冪等性を確保</h3>
+        <div class="vs-grid">
+          <div class="vs-card vs-card-bad">
+            <span class="vs-label vs-label-bad">❌ 悪い例</span>
+            <div class="code-wrap" style="margin: 0">
+              <div class="code-header">
+                <span class="code-lang">typescript</span
+                ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              </div>
+              <pre><code class="language-typescript">// 2 回目は同名 Sandbox が既に存在しエラー
+const sb = await Sandbox.create({ name: "dev" });</code></pre>
+            </div>
+          </div>
+          <div class="vs-card vs-card-good">
+            <span class="vs-label vs-label-good">✅ 良い例</span>
+            <div class="code-wrap" style="margin: 0">
+              <div class="code-header">
+                <span class="code-lang">typescript</span
+                ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              </div>
+              <pre><code class="language-typescript">// 「あれば再開・なければ作成」で常に安全
+const sb = await Sandbox.getOrCreate({ name: "dev" });</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- BP 4 -->
+        <h3>✅ BP-4：name は必ず明示的に指定</h3>
+        <div class="vs-grid">
+          <div class="vs-card vs-card-bad">
+            <span class="vs-label vs-label-bad">❌ 悪い例</span>
+            <div class="code-wrap" style="margin: 0">
+              <div class="code-header">
+                <span class="code-lang">typescript</span
+                ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              </div>
+              <pre><code class="language-typescript">// ランダム名 → 後で管理が困難
+await Sandbox.create();</code></pre>
+            </div>
+          </div>
+          <div class="vs-card vs-card-good">
+            <span class="vs-label vs-label-good">✅ 良い例</span>
+            <div class="code-wrap" style="margin: 0">
+              <div class="code-header">
+                <span class="code-lang">typescript</span
+                ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              </div>
+              <pre><code class="language-typescript">// ユーザー ID 等を含めた意味のある名前
+await Sandbox.create({
+  name: `user-${userId}-workspace`,
+  tags: { userId, env: "development" },
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <h3>✅ BP-5：タイムアウトを用途に合わせて設定</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>用途</th>
+                <th>推奨タイムアウト</th>
+                <th>設定例</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>インタラクティブ開発</td>
+                <td>長め（1時間）</td>
+                <td><code>--timeout 1h</code></td>
+              </tr>
+              <tr>
+                <td>AI エージェントのタスク</td>
+                <td>中程度（30分）</td>
+                <td><code>--timeout 30m</code></td>
+              </tr>
+              <tr>
+                <td>CI/CD ビルド</td>
+                <td>短め（15分）</td>
+                <td><code>--timeout 15m</code></td>
+              </tr>
+              <tr>
+                <td>デフォルト</td>
+                <td>5分</td>
+                <td>省略可</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════
+  § 15  RESOURCES
+══════════════════════════════════════════════════════════ -->
+      <section class="section" id="resources">
+        <div class="section-eyebrow">Section 15</div>
+        <h2>参考ソース / 公式リンク集</h2>
+        <p class="section-intro">
+          本ガイドの根拠となるソース源です。最新情報は必ず公式ドキュメントをご確認ください。
+        </p>
+
+        <h3>公式ドキュメント</h3>
+        <div class="resource-grid">
+          <a class="resource-card" href="https://vercel.com/sandbox" target="_blank">
+            <span class="resource-icon">🏠</span>
+            <div>
+              <div class="resource-title">Vercel Sandbox ランディングページ</div>
+              <div class="resource-url">vercel.com/sandbox</div>
+            </div>
+          </a>
+          <a class="resource-card" href="https://vercel.com/docs/sandbox" target="_blank">
+            <span class="resource-icon">📖</span>
+            <div>
+              <div class="resource-title">Vercel Sandbox ドキュメント（概要）</div>
+              <div class="resource-url">vercel.com/docs/sandbox</div>
+            </div>
+          </a>
+          <a
+            class="resource-card"
+            href="https://vercel.com/docs/sandbox/cli-reference"
+            target="_blank"
+          >
+            <span class="resource-icon">⌨️</span>
+            <div>
+              <div class="resource-title">CLI 完全リファレンス</div>
+              <div class="resource-url">vercel.com/docs/sandbox/cli-reference</div>
+            </div>
+          </a>
+          <a
+            class="resource-card"
+            href="https://vercel.com/docs/sandbox/sdk-reference"
+            target="_blank"
+          >
+            <span class="resource-icon">📦</span>
+            <div>
+              <div class="resource-title">JS SDK リファレンス</div>
+              <div class="resource-url">vercel.com/docs/sandbox/sdk-reference</div>
+            </div>
+          </a>
+          <a
+            class="resource-card"
+            href="https://vercel.com/docs/sandbox/concepts/persistent-sandboxes"
+            target="_blank"
+          >
+            <span class="resource-icon">♾️</span>
+            <div>
+              <div class="resource-title">永続的サンドボックス</div>
+              <div class="resource-url">vercel.com/docs/sandbox/concepts/persistent-sandboxes</div>
+            </div>
+          </a>
+          <a
+            class="resource-card"
+            href="https://vercel.com/docs/sandbox/concepts/snapshots"
+            target="_blank"
+          >
+            <span class="resource-icon">📸</span>
+            <div>
+              <div class="resource-title">スナップショット</div>
+              <div class="resource-url">vercel.com/docs/sandbox/concepts/snapshots</div>
+            </div>
+          </a>
+          <a class="resource-card" href="https://vercel.com/docs/sandbox/pricing" target="_blank">
+            <span class="resource-icon">💰</span>
+            <div>
+              <div class="resource-title">料金・プラン</div>
+              <div class="resource-url">vercel.com/docs/sandbox/pricing</div>
+            </div>
+          </a>
+          <a
+            class="resource-card"
+            href="https://vercel.com/docs/sandbox/quickstart"
+            target="_blank"
+          >
+            <span class="resource-icon">🚀</span>
+            <div>
+              <div class="resource-title">クイックスタート</div>
+              <div class="resource-url">vercel.com/docs/sandbox/quickstart</div>
+            </div>
+          </a>
+        </div>
+
+        <h3>OSS・ブログ</h3>
+        <div class="resource-grid">
+          <a class="resource-card" href="https://github.com/vercel/sandbox" target="_blank">
+            <span class="resource-icon">🐙</span>
+            <div>
+              <div class="resource-title">GitHub リポジトリ（CLI + SDK オープンソース）</div>
+              <div class="resource-url">github.com/vercel/sandbox</div>
+            </div>
+          </a>
+          <a
+            class="resource-card"
+            href="https://vercel.com/blog/vercel-sandbox-is-now-generally-available"
+            target="_blank"
+          >
+            <span class="resource-icon">📰</span>
+            <div>
+              <div class="resource-title">GA 発表ブログ（2026/01/30）</div>
+              <div class="resource-url">
+                vercel.com/blog/vercel-sandbox-is-now-generally-available
+              </div>
+            </div>
+          </a>
+          <a
+            class="resource-card"
+            href="https://www.npmjs.com/package/@vercel/sandbox"
+            target="_blank"
+          >
+            <span class="resource-icon">📦</span>
+            <div>
+              <div class="resource-title">@vercel/sandbox（JS SDK）</div>
+              <div class="resource-url">npmjs.com/package/@vercel/sandbox</div>
+            </div>
+          </a>
+          <a class="resource-card" href="https://www.npmjs.com/package/sandbox" target="_blank">
+            <span class="resource-icon">⌨️</span>
+            <div>
+              <div class="resource-title">sandbox（CLI）</div>
+              <div class="resource-url">npmjs.com/package/sandbox</div>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- ── FOOTER ────────────────────────────────────────── -->
+      <footer class="footer">
+        <div>© 2026 Vercel Sandbox 完全入門ガイド — 公式ドキュメントに基づき作成</div>
+        <div>
+          最終更新: 2026年6月 |
+          <a href="https://vercel.com/docs/sandbox" target="_blank">vercel.com/docs/sandbox</a>
+        </div>
+      </footer>
+    </main>
+    <!-- #main -->
+
+    <!-- ══════════════════════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════════════════════════ -->
+    <script>
+      /* ── Mermaid 初期化 ──────────────────────────────────── */
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'dark',
+        fontFamily: "'Inter', system-ui, sans-serif",
+        themeVariables: {
+          background: '#0a0a0a',
+          primaryColor: '#1e3a5f',
+          primaryTextColor: '#93c5fd',
+          primaryBorderColor: '#3b82f6',
+          lineColor: '#374151',
+          secondaryColor: '#0a1f0a',
+          secondaryTextColor: '#86efac',
+          secondaryBorderColor: '#22c55e',
+          tertiaryColor: '#1a0a2e',
+          tertiaryTextColor: '#d8b4fe',
+          tertiaryBorderColor: '#a855f7',
+          nodeBorder: '#6366f1',
+          clusterBkg: '#111',
+          clusterBorder: '#222',
+          edgeLabelBackground: '#0a0a0a',
+          titleColor: '#ededed',
+          actorBkg: '#1e3a5f',
+          actorBorder: '#3b82f6',
+          actorTextColor: '#93c5fd',
+          actorLineColor: '#374151',
+          activationBkgColor: '#0a1f0a',
+          activationBorderColor: '#22c55e',
+          noteBkgColor: '#2d1b4e',
+          noteTextColor: '#d8b4fe',
+          noteBorderColor: '#a855f7',
+          labelBoxBkgColor: '#0a0a0a',
+          labelBoxBorderColor: '#222',
+          labelTextColor: '#ededed',
+          loopTextColor: '#ededed',
+          signalColor: '#6366f1',
+          signalTextColor: '#ededed',
+        },
+        flowchart: { curve: 'basis', padding: 20 },
+        sequence: { mirrorActors: false, noteMargin: 10 },
+      });
+
+      /* ── Highlight.js 初期化 ──────────────────────────────── */
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('pre code').forEach((el) => {
+          hljs.highlightElement(el);
+        });
+
+        /* ── Sidebar active tracking ──────────────────────── */
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        const obs = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                const id = entry.target.getAttribute('id');
+                navLinks.forEach((link) => {
+                  link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+                });
+              }
+            });
+          },
+          { rootMargin: '-10% 0px -80% 0px', threshold: 0 },
+        );
+
+        sections.forEach((s) => obs.observe(s));
+      });
+
+      /* ── Copy button ──────────────────────────────────────── */
+      function copyCode(btn) {
+        const pre = btn.closest('.code-wrap').querySelector('pre');
+        const text = pre.innerText;
+        navigator.clipboard.writeText(text).then(() => {
+          btn.textContent = 'Copied!';
+          btn.classList.add('copied');
+          setTimeout(() => {
+            btn.textContent = 'Copy';
+            btn.classList.remove('copied');
+          }, 2000);
+        });
+      }
+    </script>
+  </body>
+</html>

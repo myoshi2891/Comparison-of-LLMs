@@ -1,7 +1,7 @@
 # プロジェクト進捗・ステータス (PROGRESS.md)
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
-> - 最終更新日: **Updated 2026-06-14**
+> - 最終更新日: **Updated 2026-06-15**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -18,8 +18,9 @@
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **Vercel Sandbox 実践・上級者ガイド**: Vercel Sandbox のアーキテクチャ、SDK API リファレンス、認証、ネットワークポリシー、セキュリティ等を詳細に解説した上級者向けガイド (`Vercel-sandbox-advanced-guide.md`) を追加。
 - **InteractiveChecklist コンポーネントの導入**: `claude/self-hosted-sandboxes` ページに、クライアントサイドで状態を保持し、Enter/Spaceキーやクリックで切り替え可能な `InteractiveChecklist` を導入。アクセシビリティ（aria-checked/role="checkbox"）にも配慮。
-- **Vercel Sandbox 完全入門ガイド**: Vercel Sandbox (MicroVM) のアーキテクチャ、セットアップ、SDK利用法、ベストプラクティスを網羅した詳細ガイド (`Vercel-sandbox-guide.md`) を追加。
+- **Vercel Sandbox 完全入門ガイド**: Vercel Sandbox (MicroVM) のアーキテクチャ、セットアップ、SDK利用法、ベストプラクティスを網羅した詳細ガイド (`Vercel-sandbox-guide.md`) を追加。HTML版 (`Vercel-sandbox-guide.html`) も作成。
 - **Claude Self-hosted Sandboxes ガイドの強化**: インタラクティブチェックリストの導入と、誤字の修正を実施。合計 740 テスト合格（2件追加）。
 - **Google 関連コンポーネントテストの堅牢性向上**: `StepsApp` のテストにおいて、`fakeTimers` のクリーンアップを確実にするため `try-finally` ブロックを導入。インポート順の整理。合計 738 テスト合格（維持）。
 - **CIエラー修正およびGoogle関連コンポーネントテスト追加**: Biomeフォーマットエラーを修正し、テストカバレッジが不足していた8つの新規Googleコンポーネントに対する Vitest テストを追加。合計738テスト合格。
