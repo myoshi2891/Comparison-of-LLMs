@@ -3,9 +3,7 @@ import { join } from "node:path";
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
-import HarnessEngineeringPage, {
-  metadata as rawMetadata,
-} from "@/app/gemini/harness-engineering/page";
+import HarnessEngineeringPage, { metadata as rawMetadata } from "./page";
 
 vi.mock("@/components/docs/MermaidDiagram", () => ({
   default: function DummyMermaidDiagram({ chart }: { chart: string }) {
@@ -31,7 +29,7 @@ const EXPECTED_SECTION_IDS = [
   "s11",
 ] as const;
 
-describe("/gemini/harness-engineering - metadata", () => {
+describe("/google/harness-engineering - metadata", () => {
   it("exports a metadata object with title", () => {
     expect(metadata).toBeDefined();
     const title =
@@ -47,7 +45,7 @@ describe("/gemini/harness-engineering - metadata", () => {
   });
 });
 
-describe("/gemini/harness-engineering - page structure", () => {
+describe("/google/harness-engineering - page structure", () => {
   it("renders an <h1> containing 'HARNESS'", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
@@ -206,7 +204,7 @@ describe("/gemini/harness-engineering - page structure", () => {
   });
 });
 
-describe("/gemini/harness-engineering - external link safety", () => {
+describe("/google/harness-engineering - external link safety", () => {
   it("all external http(s) links have target='_blank' and rel='noopener noreferrer'", () => {
     const { container } = render(<Page />);
     const externals = Array.from(container.querySelectorAll("a")).filter((a) => {
@@ -233,7 +231,7 @@ describe("/gemini/harness-engineering - external link safety", () => {
   });
 });
 
-describe("/gemini/harness-engineering - static source safety", () => {
+describe("/google/harness-engineering - static source safety", () => {
   it("does not use the React raw-HTML injection prop", () => {
     const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
     const needle = ["danger", "ously", "Set", "Inner", "HTML"].join("");

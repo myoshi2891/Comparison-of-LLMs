@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import Page, { metadata } from "./page";
 import styles from "./page.module.css";
 
-describe("/gemini/antigravity-guide", () => {
+describe("/google/antigravity-guide", () => {
   it("h1 の見出しテキストが一致する", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");

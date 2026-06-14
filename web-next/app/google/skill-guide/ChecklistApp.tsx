@@ -101,9 +101,9 @@ const CHECK_ITEMS: CheckItem[] = [
 const TOTAL = CHECK_ITEMS.length;
 
 /**
- * Checklist UI component that tracks completed items and displays progress.
+ * Interactive checklist component for tracking task completion progress.
  *
- * Renders a list of checklist items with toggleable completion states, a progress bar showing the percentage complete, and a success message when all items are completed.
+ * Displays a list of items users can mark as complete, with real-time progress tracking and a success notification when finished.
  *
  * @returns The React element for the checklist and progress interface.
  */
@@ -127,7 +127,9 @@ export default function ChecklistApp() {
             marginBottom: "0.5rem",
           }}
         >
-          <span style={{ fontWeight: 700, color: "#334155", fontSize: "0.875rem" }}>完了度</span>
+          <span style={{ fontWeight: 700, color: "var(--text)", fontSize: "0.875rem" }}>
+            完了度
+          </span>
           <span
             style={{
               fontWeight: 700,
@@ -154,7 +156,7 @@ export default function ChecklistApp() {
             }}
           />
         </div>
-        <div style={{ fontSize: "0.75rem", color: "#64748b", marginTop: "0.25rem" }}>
+        <div style={{ fontSize: "0.75rem", color: "var(--text-subtle)", marginTop: "0.25rem" }}>
           {done} / {TOTAL} 項目完了
         </div>
         {pct === 100 && (
@@ -179,8 +181,8 @@ export default function ChecklistApp() {
                 cursor: "pointer",
                 width: "100%",
                 textAlign: "left",
-                background: isChecked ? "#f0fdf4" : "#ffffff",
-                borderColor: isChecked ? "#86efac" : "#e2e8f0",
+                background: isChecked ? "rgba(16, 185, 129, 0.15)" : "var(--bg-2)",
+                borderColor: isChecked ? "var(--green)" : "var(--border)",
               }}
               onClick={() => toggle(item.id)}
               aria-pressed={isChecked}
@@ -206,7 +208,9 @@ export default function ChecklistApp() {
                   <span
                     className={styles.checkText}
                     style={
-                      isChecked ? { color: "#065f46", textDecoration: "line-through" } : undefined
+                      isChecked
+                        ? { color: "var(--text-muted)", textDecoration: "line-through" }
+                        : undefined
                     }
                   >
                     {item.text}

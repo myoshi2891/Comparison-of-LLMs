@@ -21,7 +21,7 @@ import { join } from "node:path";
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it } from "vitest";
-import GeminiAgentPage, { metadata as rawMetadata } from "@/app/gemini/agent/page";
+import GeminiAgentPage, { metadata as rawMetadata } from "@/app/google/agent/page";
 
 const Page = GeminiAgentPage as unknown as () => ReactElement;
 // Next.js の Metadata 型を避けるための最小ローカル型 (実体は Metadata オブジェクト)。
@@ -49,7 +49,7 @@ const EXPECTED_SECTION_IDS = [
   "sources",
 ] as const;
 
-describe("/gemini/agent - metadata", () => {
+describe("/google/agent - metadata", () => {
   it("exports a metadata object with title containing Gemini", () => {
     expect(metadata).toBeDefined();
     const title =
@@ -65,7 +65,7 @@ describe("/gemini/agent - metadata", () => {
   });
 });
 
-describe("/gemini/agent - page structure", () => {
+describe("/google/agent - page structure", () => {
   it("renders an <h1> containing 'Gemini'", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
@@ -94,7 +94,7 @@ describe("/gemini/agent - page structure", () => {
   });
 });
 
-describe("/gemini/agent - external link safety", () => {
+describe("/google/agent - external link safety", () => {
   it("all external http(s) links have target='_blank' and rel='noopener noreferrer'", () => {
     const { container } = render(<Page />);
     const externals = Array.from(container.querySelectorAll("a")).filter((a) => {
@@ -120,7 +120,7 @@ describe("/gemini/agent - external link safety", () => {
   });
 });
 
-describe("/gemini/agent - static source safety", () => {
+describe("/google/agent - static source safety", () => {
   it("does not use the React raw-HTML injection prop", () => {
     const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
     // オブフスケート (false positive / prompt hook 誤検知回避)。

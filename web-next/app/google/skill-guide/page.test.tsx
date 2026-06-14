@@ -2,7 +2,7 @@ import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import Page, { metadata } from "./page";
 
-describe("/gemini/skill-guide 契約テスト", () => {
+describe("/google/skill-guide 契約テスト", () => {
   it("metadata.title が非空文字列である", () => {
     expect(typeof metadata.title).toBe("string");
     expect((metadata.title as string).length).toBeGreaterThan(0);

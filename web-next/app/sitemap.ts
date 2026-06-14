@@ -10,26 +10,30 @@ const ROUTES = [
   "/",
   // Phase B: skill.html × 4
   "/claude/skill",
-  "/gemini/skill",
+  "/google/skill",
   "/codex/skill",
   "/copilot/skill",
   // Phase C: agent.html × 4
   "/claude/agent",
-  "/gemini/agent",
+  "/google/agent",
   "/codex/agent",
   "/copilot/agent",
   // Phase D: long-form guides × 9
   "/claude/skill-guide",
   "/claude/skill-guide-intermediate",
   "/claude/cowork-guide",
-  "/gemini/skill-guide",
-  "/gemini/skill-guide-intermediate",
-  "/gemini/antigravity-guide",
+  "/google/skill-guide",
+  "/google/skill-guide-intermediate",
+  "/google/antigravity-guide",
+  "/google/sandbox-best-practices",
   "/codex/openai-codex-guide",
   "/copilot/markdown-file-guide",
   "/copilot/github-copilot",
   // Phase E: git_worktree.html
   "/git-worktree",
+  "/google/harness-engineering",
+  "/google/agent-harness-engineering",
+  "/google/antigravity-slash-commands-guide",
 ] as const;
 
 /**

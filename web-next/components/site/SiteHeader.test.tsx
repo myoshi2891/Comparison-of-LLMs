@@ -59,7 +59,7 @@ describe("Phase A - SiteHeader root structure", () => {
 });
 
 describe("Phase A - SiteHeader dropdown rendering", () => {
-  it("renders 6 dropdowns (Claude/Gemini/Codex/Copilot/Code Review/Hermes) as .ch-dropdown <li>", () => {
+  it("renders 6 dropdowns (Claude/Google/Codex/Copilot/Code Review/Hermes) as .ch-dropdown <li>", () => {
     const { container } = render(<SiteHeader pathname="/" />);
     const dropdowns = container.querySelectorAll("li.ch-dropdown");
     expect(dropdowns.length).toBe(6);

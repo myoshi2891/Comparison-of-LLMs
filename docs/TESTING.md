@@ -1,6 +1,6 @@
 # Testing
 
-Updated 2026-06-03
+Updated 2026-06-13
 
 > テスト戦略・実行方法・テスト追加ガイドライン。
 
@@ -8,7 +8,7 @@ Updated 2026-06-03
 
 | 領域 | フレームワーク | 状態 | コマンド |
 | ------ | --------------- | ------ | ---------- |
-| フロントエンド (web-next/) | Vitest + @testing-library/react | 670 passed（全 Green, Antigravity ガイド契約テスト 5 件含む） | `cd web-next && bun run test` |
+| フロントエンド (web-next/) | Vitest + @testing-library/react | 738 passed（全 Green、google新規コンポーネントテスト含む） | `cd web-next && bun run test` |
 | スクレイパー (scraper/) | pytest | 38/38 passed | `cd scraper && uv run pytest` |
 
 ## テスト実行
