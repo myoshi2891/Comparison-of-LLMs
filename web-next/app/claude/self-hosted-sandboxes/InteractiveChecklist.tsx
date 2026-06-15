@@ -4,7 +4,7 @@ import { useState } from "react";
 import styles from "./page.module.css";
 
 interface InteractiveChecklistProps {
-  items: string[];
+  readonly items: string[];
 }
 
 /**
@@ -34,7 +34,8 @@ export default function InteractiveChecklist({ items }: InteractiveChecklistProp
   return (
     <ul className={styles.clList}>
       {items.map((item, index) => (
-        <li key={item}>
+        // biome-ignore lint/suspicious/noArrayIndexKey: array index as key
+        <li key={index}>
           {/* biome-ignore lint/a11y/useSemanticElements: custom checkbox styling */}
           <button
             type="button"

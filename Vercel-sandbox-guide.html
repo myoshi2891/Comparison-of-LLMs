@@ -1014,7 +1014,7 @@
               <div class="code-wrap">
                 <div class="code-header">
                   <span class="code-lang">bash</span
-                  ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                  ><button type="button" class="copy-btn" onclick="copyCode(this)">Copy</button>
                 </div>
                 <pre><code class="language-bash">npm install -g vercel</code></pre>
               </div>
@@ -1033,7 +1033,7 @@
               <div class="code-wrap">
                 <div class="code-header">
                   <span class="code-lang">bash</span
-                  ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                  ><button type="button" class="copy-btn" onclick="copyCode(this)">Copy</button>
                 </div>
                 <pre><code class="language-bash">mkdir my-sandbox-project && cd my-sandbox-project
 
@@ -1062,7 +1062,7 @@ vercel env pull</code></pre>
               <div class="code-wrap">
                 <div class="code-header">
                   <span class="code-lang">bash</span
-                  ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                  ><button type="button" class="copy-btn" onclick="copyCode(this)">Copy</button>
                 </div>
                 <pre><code class="language-bash"># CLI をグローバルインストール
 npm install -g sandbox
@@ -1124,7 +1124,7 @@ pip install vercel</code></pre>
               <div class="code-wrap">
                 <div class="code-header">
                   <span class="code-lang">bash</span
-                  ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                  ><button type="button" class="copy-btn" onclick="copyCode(this)">Copy</button>
                 </div>
                 <pre><code class="language-bash"># CLI で最速スタート（作成してシェルに接続）
 npx sandbox create --connect</code></pre>
@@ -1257,7 +1257,7 @@ npx sandbox create --connect</code></pre>
         <div class="code-wrap">
           <div class="code-header">
             <span class="code-lang">bash</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            ><button type="button" class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
           <pre><code class="language-bash"># Sandbox を作成してインタラクティブシェルに接続
 npx sandbox create --connect
@@ -1270,7 +1270,7 @@ sandbox create --name my-first-sandbox --connect</code></pre>
         <div class="code-wrap">
           <div class="code-header">
             <span class="code-lang">typescript</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            ><button type="button" class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
           <pre><code class="language-typescript">import { Sandbox } from "@vercel/sandbox";
 
@@ -1400,7 +1400,7 @@ main();</code></pre>
         <div class="code-wrap">
           <div class="code-header">
             <span class="code-lang">typescript</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            ><button type="button" class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
           <pre><code class="language-typescript">const sandbox = await Sandbox.create({
   persistent: false,            // 停止後に状態を破棄（Snapshot 課金なし）
@@ -1423,7 +1423,7 @@ try {
         <div class="code-wrap">
           <div class="code-header">
             <span class="code-lang">typescript</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            ><button type="button" class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
           <pre><code class="language-typescript">const sandbox = await Sandbox.getOrCreate({
   name: "dev-environment",
@@ -1452,7 +1452,7 @@ try {
         <div class="code-wrap">
           <div class="code-header">
             <span class="code-lang">typescript</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            ><button type="button" class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
           <pre><code class="language-typescript">// ファイルの書き込み
 await sandbox.writeFiles([
@@ -1482,7 +1482,7 @@ await sandbox.downloadFile(
         <div class="code-wrap">
           <div class="code-header">
             <span class="code-lang">typescript</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            ><button type="button" class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
           <pre><code class="language-typescript">const sandbox = await Sandbox.create({
   name: "web-preview",
@@ -1520,7 +1520,7 @@ console.log("プレビュー URL:", previewUrl);
         <div class="code-wrap">
           <div class="code-header">
             <span class="code-lang">bash</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            ><button type="button" class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
           <pre><code class="language-bash"># ─── 作成 ──────────────────────────────────────────────
 # 基本（Node.js 24）
@@ -1641,7 +1641,7 @@ sandbox remove my-sandbox               # 完全削除（Snapshot も消去）</
         <div class="code-wrap">
           <div class="code-header">
             <span class="code-lang">typescript</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            ><button type="button" class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
           <pre><code class="language-typescript">const sandbox = await Sandbox.getOrCreate({
   name: "agent-workspace",
@@ -1678,7 +1678,7 @@ sandbox remove my-sandbox               # 完全削除（Snapshot も消去）</
         <div class="code-wrap">
           <div class="code-header">
             <span class="code-lang">typescript</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            ><button type="button" class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
           <pre><code class="language-typescript">// ✅ 最新 1 件のみ保持してストレージコストを最小化
 const sandbox = await Sandbox.create({
@@ -1695,7 +1695,7 @@ const sandbox = await Sandbox.create({
         <div class="code-wrap">
           <div class="code-header">
             <span class="code-lang">bash</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            ><button type="button" class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
           <pre><code class="language-bash"># 手動でスナップショットを作成
 sandbox snapshot my-sandbox
@@ -1758,7 +1758,7 @@ sandbox fork my-sandbox --name my-fork</code></pre>
         <div class="code-wrap">
           <div class="code-header">
             <span class="code-lang">bash</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            ><button type="button" class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
           <pre><code class="language-bash"># すべて遮断（最もセキュア）
 sandbox create --name secure-box --network-policy deny-all
@@ -1796,7 +1796,7 @@ sandbox config network-policy my-sandbox --mode deny-all</code></pre>
         <div class="code-wrap">
           <div class="code-header">
             <span class="code-lang">bash</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            ><button type="button" class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
           <pre><code class="language-bash"># 作成時にタグを付与
 sandbox create --name prod-sandbox \
@@ -1837,7 +1837,7 @@ sandbox config tags my-sandbox</code></pre>
             <div class="code-wrap" style="margin: 0">
               <div class="code-header">
                 <span class="code-lang">typescript</span
-                ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                ><button type="button" class="copy-btn" onclick="copyCode(this)">Copy</button>
               </div>
               <pre><code class="language-typescript">// Snapshot が無制限に蓄積される
 await Sandbox.create({ name: "my-sandbox" });</code></pre>
@@ -1848,7 +1848,7 @@ await Sandbox.create({ name: "my-sandbox" });</code></pre>
             <div class="code-wrap" style="margin: 0">
               <div class="code-header">
                 <span class="code-lang">typescript</span
-                ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                ><button type="button" class="copy-btn" onclick="copyCode(this)">Copy</button>
               </div>
               <pre><code class="language-typescript">// 最新 1 件のみ保持してコスト最小化
 await Sandbox.create({
@@ -1868,7 +1868,7 @@ await Sandbox.create({
             <div class="code-wrap" style="margin: 0">
               <div class="code-header">
                 <span class="code-lang">typescript</span
-                ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                ><button type="button" class="copy-btn" onclick="copyCode(this)">Copy</button>
               </div>
               <pre><code class="language-typescript">// CI で永続モード → 不要な Snapshot 課金
 await Sandbox.create({ name: "ci-run-123" });</code></pre>
@@ -1879,7 +1879,7 @@ await Sandbox.create({ name: "ci-run-123" });</code></pre>
             <div class="code-wrap" style="margin: 0">
               <div class="code-header">
                 <span class="code-lang">typescript</span
-                ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                ><button type="button" class="copy-btn" onclick="copyCode(this)">Copy</button>
               </div>
               <pre><code class="language-typescript">// non-persistent で課金ゼロ
 await Sandbox.create({
@@ -1899,7 +1899,7 @@ await Sandbox.create({
             <div class="code-wrap" style="margin: 0">
               <div class="code-header">
                 <span class="code-lang">typescript</span
-                ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                ><button type="button" class="copy-btn" onclick="copyCode(this)">Copy</button>
               </div>
               <pre><code class="language-typescript">// 2 回目は同名 Sandbox が既に存在しエラー
 const sb = await Sandbox.create({ name: "dev" });</code></pre>
@@ -1910,7 +1910,7 @@ const sb = await Sandbox.create({ name: "dev" });</code></pre>
             <div class="code-wrap" style="margin: 0">
               <div class="code-header">
                 <span class="code-lang">typescript</span
-                ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                ><button type="button" class="copy-btn" onclick="copyCode(this)">Copy</button>
               </div>
               <pre><code class="language-typescript">// 「あれば再開・なければ作成」で常に安全
 const sb = await Sandbox.getOrCreate({ name: "dev" });</code></pre>
@@ -1926,7 +1926,7 @@ const sb = await Sandbox.getOrCreate({ name: "dev" });</code></pre>
             <div class="code-wrap" style="margin: 0">
               <div class="code-header">
                 <span class="code-lang">typescript</span
-                ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                ><button type="button" class="copy-btn" onclick="copyCode(this)">Copy</button>
               </div>
               <pre><code class="language-typescript">// ランダム名 → 後で管理が困難
 await Sandbox.create();</code></pre>
@@ -1937,7 +1937,7 @@ await Sandbox.create();</code></pre>
             <div class="code-wrap" style="margin: 0">
               <div class="code-header">
                 <span class="code-lang">typescript</span
-                ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                ><button type="button" class="copy-btn" onclick="copyCode(this)">Copy</button>
               </div>
               <pre><code class="language-typescript">// ユーザー ID 等を含めた意味のある名前
 await Sandbox.create({
@@ -1996,76 +1996,66 @@ await Sandbox.create({
 
         <h3>公式ドキュメント</h3>
         <div class="resource-grid">
-          <a class="resource-card" href="https://vercel.com/sandbox" target="_blank">
+          <a class="resource-card" href="https://vercel.com/sandbox" target="_blank" rel="noopener noreferrer">
             <span class="resource-icon">🏠</span>
             <div>
               <div class="resource-title">Vercel Sandbox ランディングページ</div>
               <div class="resource-url">vercel.com/sandbox</div>
             </div>
           </a>
-          <a class="resource-card" href="https://vercel.com/docs/sandbox" target="_blank">
+          <a class="resource-card" href="https://vercel.com/docs/sandbox" target="_blank" rel="noopener noreferrer">
             <span class="resource-icon">📖</span>
             <div>
               <div class="resource-title">Vercel Sandbox ドキュメント（概要）</div>
               <div class="resource-url">vercel.com/docs/sandbox</div>
             </div>
           </a>
-          <a
-            class="resource-card"
+          <a class="resource-card"
             href="https://vercel.com/docs/sandbox/cli-reference"
-            target="_blank"
-          >
+            target="_blank" rel="noopener noreferrer">
             <span class="resource-icon">⌨️</span>
             <div>
               <div class="resource-title">CLI 完全リファレンス</div>
               <div class="resource-url">vercel.com/docs/sandbox/cli-reference</div>
             </div>
           </a>
-          <a
-            class="resource-card"
+          <a class="resource-card"
             href="https://vercel.com/docs/sandbox/sdk-reference"
-            target="_blank"
-          >
+            target="_blank" rel="noopener noreferrer">
             <span class="resource-icon">📦</span>
             <div>
               <div class="resource-title">JS SDK リファレンス</div>
               <div class="resource-url">vercel.com/docs/sandbox/sdk-reference</div>
             </div>
           </a>
-          <a
-            class="resource-card"
+          <a class="resource-card"
             href="https://vercel.com/docs/sandbox/concepts/persistent-sandboxes"
-            target="_blank"
-          >
+            target="_blank" rel="noopener noreferrer">
             <span class="resource-icon">♾️</span>
             <div>
               <div class="resource-title">永続的サンドボックス</div>
               <div class="resource-url">vercel.com/docs/sandbox/concepts/persistent-sandboxes</div>
             </div>
           </a>
-          <a
-            class="resource-card"
+          <a class="resource-card"
             href="https://vercel.com/docs/sandbox/concepts/snapshots"
-            target="_blank"
-          >
+            target="_blank" rel="noopener noreferrer">
             <span class="resource-icon">📸</span>
             <div>
               <div class="resource-title">スナップショット</div>
               <div class="resource-url">vercel.com/docs/sandbox/concepts/snapshots</div>
             </div>
           </a>
-          <a class="resource-card" href="https://vercel.com/docs/sandbox/pricing" target="_blank">
+          <a class="resource-card" href="https://vercel.com/docs/sandbox/pricing" target="_blank" rel="noopener noreferrer">
             <span class="resource-icon">💰</span>
             <div>
               <div class="resource-title">料金・プラン</div>
               <div class="resource-url">vercel.com/docs/sandbox/pricing</div>
             </div>
           </a>
-          <a
-            class="resource-card"
+          <a class="resource-card"
             href="https://vercel.com/docs/sandbox/quickstart"
-            target="_blank"
-          >
+            target="_blank" rel="noopener noreferrer">
             <span class="resource-icon">🚀</span>
             <div>
               <div class="resource-title">クイックスタート</div>
@@ -2076,18 +2066,16 @@ await Sandbox.create({
 
         <h3>OSS・ブログ</h3>
         <div class="resource-grid">
-          <a class="resource-card" href="https://github.com/vercel/sandbox" target="_blank">
+          <a class="resource-card" href="https://github.com/vercel/sandbox" target="_blank" rel="noopener noreferrer">
             <span class="resource-icon">🐙</span>
             <div>
               <div class="resource-title">GitHub リポジトリ（CLI + SDK オープンソース）</div>
               <div class="resource-url">github.com/vercel/sandbox</div>
             </div>
           </a>
-          <a
-            class="resource-card"
+          <a class="resource-card"
             href="https://vercel.com/blog/vercel-sandbox-is-now-generally-available"
-            target="_blank"
-          >
+            target="_blank" rel="noopener noreferrer">
             <span class="resource-icon">📰</span>
             <div>
               <div class="resource-title">GA 発表ブログ（2026/01/30）</div>
@@ -2096,18 +2084,16 @@ await Sandbox.create({
               </div>
             </div>
           </a>
-          <a
-            class="resource-card"
+          <a class="resource-card"
             href="https://www.npmjs.com/package/@vercel/sandbox"
-            target="_blank"
-          >
+            target="_blank" rel="noopener noreferrer">
             <span class="resource-icon">📦</span>
             <div>
               <div class="resource-title">@vercel/sandbox（JS SDK）</div>
               <div class="resource-url">npmjs.com/package/@vercel/sandbox</div>
             </div>
           </a>
-          <a class="resource-card" href="https://www.npmjs.com/package/sandbox" target="_blank">
+          <a class="resource-card" href="https://www.npmjs.com/package/sandbox" target="_blank" rel="noopener noreferrer">
             <span class="resource-icon">⌨️</span>
             <div>
               <div class="resource-title">sandbox（CLI）</div>
@@ -2122,7 +2108,7 @@ await Sandbox.create({
         <div>© 2026 Vercel Sandbox 完全入門ガイド — 公式ドキュメントに基づき作成</div>
         <div>
           最終更新: 2026年6月 |
-          <a href="https://vercel.com/docs/sandbox" target="_blank">vercel.com/docs/sandbox</a>
+          <a href="https://vercel.com/docs/sandbox" target="_blank" rel="noopener noreferrer">vercel.com/docs/sandbox</a>
         </div>
       </footer>
     </main>
@@ -2530,17 +2516,24 @@ style CI fill:#2d1b4e,stroke:#a855f7,color:#d8b4fe`,
       });
 
       /* ── Copy button ──────────────────────────────────────── */
-      function copyCode(btn) {
+      async function copyCode(btn) {
         const pre = btn.closest('.code-wrap').querySelector('pre');
         const text = pre.innerText;
-        navigator.clipboard.writeText(text).then(() => {
+        try {
+          await navigator.clipboard.writeText(text);
           btn.textContent = 'Copied!';
           btn.classList.add('copied');
           setTimeout(() => {
             btn.textContent = 'Copy';
             btn.classList.remove('copied');
           }, 2000);
-        });
+        } catch (err) {
+          console.error('Failed to copy text: ', err);
+          btn.textContent = 'Failed!';
+          setTimeout(() => {
+            btn.textContent = 'Copy';
+          }, 2000);
+        }
       }
     </script>
   </body>
