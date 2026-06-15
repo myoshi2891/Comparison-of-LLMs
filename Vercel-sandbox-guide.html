@@ -24,8 +24,8 @@
         --border: #1e1e1e;
         --border-hi: #2e2e2e;
         --text-primary: #ededed;
-        --text-sec: #888888;
-        --text-muted: #555555;
+        --text-sec: #c0c0c0;
+        --text-muted: #c3c3c3;
         --blue: #0070f3;
         --blue-dim: rgba(0, 112, 243, 0.12);
         --blue-glow: rgba(0, 112, 243, 0.35);
@@ -492,9 +492,19 @@
         padding: 32px 24px;
         margin: 24px 0;
         overflow-x: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
       .mermaid-wrap .mermaid {
         min-height: 60px;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+      }
+      .mermaid-wrap .mermaid svg {
+        margin: 0 auto;
+        display: block;
       }
       .mermaid-caption {
         text-align: center;
@@ -703,6 +713,26 @@
           grid-template-columns: 1fr;
         }
       }
+
+      /* ── Mermaid Layout fixes ─────────────────────────────── */
+      .mermaid-wrap .mermaid {
+        overflow: visible;
+      }
+      .mermaid-wrap .mermaid svg {
+        overflow: visible;
+      }
+
+      /* マインドマップ: foreignObject内のHTMLテキストはドキュメントheadのCSSで制御する */
+      /* （SVG内部の<style>はforeignObject内のHTMLにはカスケードしないため） */
+      #diag-cli foreignObject div,
+      #diag-cli foreignObject span,
+      #diag-cli foreignObject p,
+      #diag-best-practices foreignObject div,
+      #diag-best-practices foreignObject span,
+      #diag-best-practices foreignObject p {
+        color: #e2e8f0 !important;
+        -webkit-text-fill-color: #e2e8f0 !important;
+      }
     </style>
   </head>
   <body>
@@ -900,21 +930,7 @@
         </p>
 
         <div class="mermaid-wrap">
-          <div class="mermaid">
-            graph TB subgraph CLIENT["👤 呼び出し元レイヤー"] A1["JS SDK\n@vercel/sandbox"]
-            A2["Python SDK\nvercel パッケージ"] A3["CLI\nsandbox / sbx"] A4["AI エージェント\n(v0,
-            Roo Code 等)"] end subgraph API["🔵 Vercel Sandbox API / 認証レイヤー"] B1["OIDC Token
-            認証（推奨）"] B2["ルーティング・管理"] B3["スナップショット管理"] end subgraph HIVE["🟢
-            Hive コンピュートプラットフォーム（Firecracker）"] C1["MicroVM クラスター\nRegion A"]
-            C2["MicroVM クラスター\nRegion B"] C3["MicroVM クラスター\nRegion C"] end subgraph
-            SBX["🟣 個別 Sandbox インスタンス（完全分離）"] D1["Sandbox A\nAmazon Linux
-            2023\nnode24"] D2["Sandbox B\npython3.13\n独自 FS・NW・PID NS"] D3["Sandbox
-            C\nPersistent モード\nSnapshot 保存済み"] end CLIENT --> API API --> HIVE HIVE --> SBX
-            style CLIENT fill:#1e1b4b,stroke:#6366f1,color:#c7d2fe style API
-            fill:#0c1a2e,stroke:#0ea5e9,color:#7dd3fc style HIVE
-            fill:#0a1f0a,stroke:#22c55e,color:#86efac style SBX
-            fill:#1a0a2e,stroke:#a855f7,color:#d8b4fe
-          </div>
+          <div class="mermaid" id="diag-architecture"></div>
           <p class="mermaid-caption">
             Vercel Sandbox の多層アーキテクチャ — 呼び出し元から Firecracker MicroVM まで
           </p>
@@ -985,15 +1001,7 @@
         <p class="section-intro">5 つのステップで Vercel Sandbox を使い始められます。</p>
 
         <div class="mermaid-wrap">
-          <div class="mermaid">
-            flowchart LR S1["① Vercel CLI\nインストール"] --> S2["② プロジェクト\n作成・リンク"] S2
-            --> S3["③ Sandbox CLI / SDK\nインストール"] S3 --> S4["④ 認証設定\nOIDC or Token"] S4
-            --> S5["✅ 最初の\nSandbox 作成"] style S1 fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd
-            style S2 fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd style S3
-            fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd style S4
-            fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd style S5
-            fill:#14532d,stroke:#22c55e,color:#86efac
-          </div>
+          <div class="mermaid" id="diag-setup"></div>
         </div>
 
         <div class="steps">
@@ -1141,20 +1149,7 @@ npx sandbox create --connect</code></pre>
         </p>
 
         <div class="mermaid-wrap">
-          <div class="mermaid">
-            graph TB SBX["🏗️ Sandbox（永続的な存在）\nname で識別 / プロジェクト内でユニーク"] SBX
-            --> S1["Session 1\n最初の起動 → 実行 → 停止"] SBX --> S2["Session 2\n再開（Snapshot
-            から復元）→ 実行 → 停止"] SBX --> S3["Session 3\nさらに再開 → 実行 → 停止"] S1
-            -->|"停止時に自動 Snapshot"| SS1[("📸 Snapshot 1\nファイルシステムの状態")] SS1
-            -->|"次回再開時に復元"| S2 S2 -->|"停止時に自動 Snapshot"| SS2[("📸 Snapshot
-            2\n最新の状態")] SS2 -->|"次回再開時に復元"| S3 style SBX
-            fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd style S1
-            fill:#14532d,stroke:#22c55e,color:#86efac style S2
-            fill:#14532d,stroke:#22c55e,color:#86efac style S3
-            fill:#14532d,stroke:#22c55e,color:#86efac style SS1
-            fill:#2d1b4e,stroke:#a855f7,color:#d8b4fe style SS2
-            fill:#2d1b4e,stroke:#a855f7,color:#d8b4fe
-          </div>
+          <div class="mermaid" id="diag-concepts"></div>
           <p class="mermaid-caption">
             Sandbox（長期的な存在）の中で Session（単一の VM 起動）が繰り返される
           </p>
@@ -1203,15 +1198,7 @@ npx sandbox create --connect</code></pre>
         </p>
 
         <div class="mermaid-wrap">
-          <div class="mermaid">
-            flowchart LR subgraph PERSIST["♾️ Persistent（デフォルト）"] P1["作成"] --> P2["Session
-            起動"] P2 --> P3["コード実行"] P3 --> P4["停止"] P4 -->|"📸 自動 Snapshot"|
-            P5["状態を保存"] P5 -->|"次回 Snapshot から再開"| P2 end subgraph EPHEMERAL["⚡
-            Non-persistent"] E1["作成"] --> E2["Session 起動"] E2 --> E3["コード実行"] E3 -->
-            E4["停止"] E4 -->|"🗑️ 状態を破棄"| E5["終了（再開不可）"] end style PERSIST
-            fill:#0a1f0a,stroke:#22c55e,color:#86efac style EPHEMERAL
-            fill:#1f0a0a,stroke:#ef4444,color:#fca5a5
-          </div>
+          <div class="mermaid" id="diag-persistent-vs"></div>
         </div>
 
         <div class="tbl-wrap">
@@ -1312,19 +1299,7 @@ main();</code></pre>
 
         <h3>作成〜実行フロー</h3>
         <div class="mermaid-wrap">
-          <div class="mermaid">
-            flowchart TD A(["開始"]) --> B["Sandbox.create()\nまたは sandbox create"] B --> C{"同じ
-            name の\nSandbox が存在する？"} C -->|"はい（Persistent）"| D["既存 Sandbox
-            を再開\nSnapshot から復元"] C -->|"いいえ"| E["新規 MicroVM を起動\n（ミリ秒で完了）"] D
-            --> F["コマンド実行\nrunCommand / exec"] E --> F F --> G{"処理を継続する？"} G
-            -->|"はい"| F G -->|"いいえ"| H["sandbox.stop()"] H --> I{"Persistent?"} I -->|"Yes"|
-            J["📸 自動スナップショット\nファイルシステムを保存"] I -->|"No"| K["🗑️
-            状態を破棄\nストレージ課金なし"] J --> L(["終了"]) K --> L style A
-            fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd style L
-            fill:#14532d,stroke:#22c55e,color:#86efac style J
-            fill:#2d1b4e,stroke:#a855f7,color:#d8b4fe style K
-            fill:#3b1515,stroke:#ef4444,color:#fca5a5
-          </div>
+          <div class="mermaid" id="diag-flow"></div>
           <p class="mermaid-caption">Sandbox 作成から停止まで全体フロー</p>
         </div>
       </section>
@@ -1441,18 +1416,7 @@ try {
 
         <h3>パターン B：長期利用向け getOrCreate（最推奨）</h3>
         <div class="mermaid-wrap">
-          <div class="mermaid">
-            flowchart TD GC["Sandbox.getOrCreate({ name: 'my-sandbox' })"] GC --> E1{"同じ name
-            の\nSandbox が存在？"} E1 -->|"存在する"| E2{"Snapshot の\n有効期限は？"} E2 -->|"有効"|
-            E3["✅ 既存 Sandbox を再開\nonResume() を実行"] E2 -->|"期限切れ"| E4["🔄 Sandbox
-            を再作成\nonCreate() を実行"] E1 -->|"存在しない"| E5["🆕 新規 Sandbox
-            を作成\nonCreate() を実行"] E3 --> DONE(["Sandbox インスタンス返却"]) E4 --> DONE E5 -->
-            DONE style GC fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd style DONE
-            fill:#14532d,stroke:#22c55e,color:#86efac style E3
-            fill:#0a1f0a,stroke:#22c55e,color:#86efac style E4
-            fill:#2d1a00,stroke:#f59e0b,color:#fde68a style E5
-            fill:#2d1b4e,stroke:#a855f7,color:#d8b4fe
-          </div>
+          <div class="mermaid" id="diag-getorcreate"></div>
           <p class="mermaid-caption">getOrCreate の 3 つの動作分岐</p>
         </div>
 
@@ -1548,12 +1512,7 @@ console.log("プレビュー URL:", previewUrl);
 
         <h3>コマンド全体マップ</h3>
         <div class="mermaid-wrap">
-          <div class="mermaid">
-            mindmap root((sandbox CLI)) サンドボックス管理 list / ls create fork remove config
-            実行系 run（停止中も自動再開） exec（起動中のみ） connect / ssh / shell ファイル操作
-            copy / cp セッション管理 sessions スナップショット snapshot（手動作成）
-            snapshots（一覧・管理） 認証 login logout
-          </div>
+          <div class="mermaid" id="diag-cli"></div>
           <p class="mermaid-caption">sandbox CLI の全コマンド体系</p>
         </div>
 
@@ -1650,19 +1609,7 @@ sandbox remove my-sandbox               # 完全削除（Snapshot も消去）</
 
         <h3>ライフサイクル全体フロー（シーケンス）</h3>
         <div class="mermaid-wrap">
-          <div class="mermaid">
-            sequenceDiagram participant Dev as 開発者 / AI エージェント participant API as Vercel
-            Sandbox API participant VM as MicroVM（Session） participant SS as Snapshot
-            ストレージ（S3） Dev->>API: Sandbox.create({ name: "my-sandbox" }) API->>VM: 新規
-            MicroVM を起動 VM-->>Dev: Sandbox インスタンス返却 Dev->>VM: runCommand("npm install")
-            VM-->>Dev: 実行結果（exit 0） Dev->>VM: sandbox.stop() VM->>SS: 📸
-            ファイルシステムを自動スナップショット VM-->>Dev: 停止完了（Session 1 終了） Note over
-            Dev,SS: 数時間後・翌日でも問題なし Dev->>API: Sandbox.get({ name: "my-sandbox" })
-            API-->>Dev: Sandbox ハンドル返却 Dev->>API: sandbox.runCommand("npm test") API->>SS:
-            最新 Snapshot を取得 SS-->>API: Snapshot データ API->>VM: 新規 MicroVM を Snapshot
-            から起動 VM-->>Dev: 実行結果（npm install 済の状態から！） Note right of VM: Session 2
-            開始
-          </div>
+          <div class="mermaid" id="diag-lifecycle"></div>
           <p class="mermaid-caption">停止 → スナップショット → 再開 の完全なシーケンス</p>
         </div>
 
@@ -1724,15 +1671,7 @@ sandbox remove my-sandbox               # 完全削除（Snapshot も消去）</
 
         <h3>スナップショット保持ポリシーのフロー</h3>
         <div class="mermaid-wrap">
-          <div class="mermaid">
-            flowchart TD A["Sandbox が停止"] A --> B["📸 自動スナップショット作成"] B -->
-            C{"keepLastSnapshots\n設定あり？"} C -->|"設定なし"| D["すべての Snapshot
-            を保持\n（有効期限まで）"] C -->|"設定あり（例: count: 1）"| E{"保持上限 N
-            件を\n超過した？"} E -->|"いいえ"| D E -->|"はい"| F{"deleteEvicted?"} F
-            -->|"true（デフォルト）"| G["🗑️ 古い Snapshot を即時削除"] F -->|"false"| H["⏳
-            有効期限まで保持"] style B fill:#2d1b4e,stroke:#a855f7,color:#d8b4fe style G
-            fill:#3b1515,stroke:#ef4444,color:#fca5a5
-          </div>
+          <div class="mermaid" id="diag-snapshots"></div>
         </div>
 
         <h3>推奨設定（コスト最小化）</h3>
@@ -1784,15 +1723,7 @@ sandbox fork my-sandbox --name my-fork</code></pre>
 
         <h3>3 種類のポリシー</h3>
         <div class="mermaid-wrap">
-          <div class="mermaid">
-            flowchart LR subgraph ALLOW["🌐 allow-all（デフォルト）"] AS["Sandbox"]
-            -->|"すべて許可"| AN["インターネット全体"] end subgraph DENY["🚫 deny-all"]
-            DS["Sandbox"] -->|"すべて遮断"| DN["❌ インターネット"] end subgraph CUSTOM["⚙️
-            custom（カスタム）"] CS["Sandbox"] -->|"許可"| CN1["✅ ai-gateway.vercel.sh"] CS
-            -->|"遮断"| CN2["❌ その他"] end style ALLOW fill:#0a1f0a,stroke:#22c55e,color:#86efac
-            style DENY fill:#1f0a0a,stroke:#ef4444,color:#fca5a5 style CUSTOM
-            fill:#0c1a2e,stroke:#3b82f6,color:#93c5fd
-          </div>
+          <div class="mermaid" id="diag-network"></div>
         </div>
 
         <div class="tbl-wrap">
@@ -1858,15 +1789,7 @@ sandbox config network-policy my-sandbox --mode deny-all</code></pre>
         </p>
 
         <div class="mermaid-wrap">
-          <div class="mermaid">
-            graph LR subgraph PROD["env=production"] P1["prod-agent-1"] P2["prod-agent-2"] end
-            subgraph STG["env=staging"] S1["staging-agent-1"] end subgraph CI["env=ci"]
-            C1["ci-build-1"] C2["ci-build-2"] end MGMT["Dashboard / CLI\nsandbox list --tag
-            env=production"] --> PROD MGMT --> STG MGMT --> CI style PROD
-            fill:#14532d,stroke:#22c55e,color:#86efac style STG
-            fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd style CI
-            fill:#2d1b4e,stroke:#a855f7,color:#d8b4fe
-          </div>
+          <div class="mermaid" id="diag-tags"></div>
           <p class="mermaid-caption">タグを使ったフリート管理の例</p>
         </div>
 
@@ -1903,14 +1826,7 @@ sandbox config tags my-sandbox</code></pre>
 
         <h3>全体像</h3>
         <div class="mermaid-wrap">
-          <div class="mermaid">
-            mindmap root((ベストプラクティス)) コスト最適化 keepLastSnapshots: 1 に設定 CI/CD には
-            non-persistent を使う 適切なタイムアウト設定 処理後は必ず stop セキュリティ untrusted
-            code には deny-all OIDC Token を優先使用 処理後にネットワーク遮断 不要な Sandbox
-            を定期削除 パフォーマンス getOrCreate でスナップショットを活用 onCreate
-            で重い初期化を一度だけ onResume で軽量な再起動 detached でバックグラウンド実行
-            管理・運用 name を必ず明示的に指定 タグで環境・チームを分類 v1→v2 移行は name に注意
-          </div>
+          <div class="mermaid" id="diag-best-practices"></div>
         </div>
 
         <!-- BP 1 -->
@@ -2216,9 +2132,235 @@ await Sandbox.create({
      SCRIPTS
 ══════════════════════════════════════════════════════════ -->
     <script>
-      /* ── Mermaid 初期化 ──────────────────────────────────── */
+      /* ── Mermaid diagrams (JS Template Literal Migration) ── */
+      const DIAGRAMS = {
+        'diag-architecture': `graph TB
+subgraph CLIENT[" 呼び出し元レイヤー "]
+A1[" JS SDK <br/> @vercel/sandbox "]
+A2[" Python SDK <br/> vercel パッケージ "]
+A3[" CLI <br/> sandbox - sbx "]
+A4[" AI エージェント <br/> v0, Roo Code 等 "]
+end
+subgraph API[" Vercel Sandbox API "]
+B1[" OIDC Token 認証 - 推奨 "]
+B2[" ルーティング・管理 "]
+B3[" スナップショット管理 "]
+end
+subgraph HIVE[" Hive コンピュートプラットフォーム "]
+C1[" MicroVM クラスター <br/> Region A "]
+C2[" MicroVM クラスター <br/> Region B "]
+C3[" MicroVM クラスター <br/> Region C "]
+end
+subgraph SBX[" 個別 Sandbox インスタンス "]
+D1[" Sandbox A <br/> Amazon Linux 2023 "]
+D2[" Sandbox B <br/> python3.13 "]
+D3[" Sandbox C <br/> Persistent モード "]
+end
+CLIENT --> API
+API --> HIVE
+HIVE --> SBX
+style CLIENT fill:#1e1b4b,stroke:#6366f1,color:#c7d2fe
+style API fill:#0c1a2e,stroke:#0ea5e9,color:#7dd3fc
+style HIVE fill:#0a1f0a,stroke:#22c55e,color:#86efac
+style SBX fill:#1a0a2e,stroke:#a855f7,color:#d8b4fe`,
+
+        'diag-setup': `flowchart LR
+S1[" 1 Vercel CLI<br/>インストール "] --> S2[" 2 プロジェクト<br/>作成・リンク "]
+S2 --> S3[" 3 Sandbox CLI - SDK<br/>インストール "]
+S3 --> S4[" 4 認証設定<br/>OIDC or Token "]
+S4 --> S5[" 最初の Sandbox 作成 "]
+style S1 fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd
+style S2 fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd
+style S3 fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd
+style S4 fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd
+style S5 fill:#14532d,stroke:#22c55e,color:#86efac`,
+
+        'diag-concepts': `graph TB
+SBX["Sandbox - 永続的な存在<br/>name で識別 - プロジェクト内でユニーク"]
+SBX --> S1["Session 1<br/>最初の起動 - 実行 - 停止"]
+SBX --> S2["Session 2<br/>再開 - Snapshot から復元 - 実行 - 停止"]
+SBX --> S3["Session 3<br/>さらに再開 - 実行 - 停止"]
+S1 -->|"停止時に自動 Snapshot"| SS1[("Snapshot 1<br/>ファイルシステムの状態")]
+SS1 -->|"次回再開時に復元"| S2
+S2 -->|"停止時に自動 Snapshot"| SS2[("Snapshot 2<br/>最新の状態")]
+SS2 -->|"次回再開時に復元"| S3
+style SBX fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd
+style S1 fill:#14532d,stroke:#22c55e,color:#86efac
+style S2 fill:#14532d,stroke:#22c55e,color:#86efac
+style S3 fill:#14532d,stroke:#22c55e,color:#86efac
+style SS1 fill:#2d1b4e,stroke:#a855f7,color:#d8b4fe
+style SS2 fill:#2d1b4e,stroke:#a855f7,color:#d8b4fe`,
+
+        'diag-persistent-vs': `flowchart LR
+subgraph PERSIST["Persistent - デフォルト"]
+P1["作成"] --> P2["Session 起動"]
+P2 --> P3["コード実行"]
+P3 --> P4["停止"]
+P4 -->|"自動 Snapshot"| P5["状態を保存"]
+P5 -->|"次回 Snapshot から再開"| P2
+end
+subgraph EPHEMERAL["Non-persistent"]
+E1["作成"] --> E2["Session 起動"]
+E2 --> E3["コード実行"]
+E3 --> E4["停止"]
+E4 -->|"状態を破棄"| E5["終了 - 再開不可"]
+end
+style PERSIST fill:#0a1f0a,stroke:#22c55e,color:#86efac
+style EPHEMERAL fill:#1f0a0a,stroke:#ef4444,color:#fca5a5`,
+
+        'diag-flow': `flowchart TD
+A(["開始"]) --> B["Sandbox.create()<br/>または sandbox create"]
+B --> C{"暗黙的な状態変化を防ぐため<br/>Sandbox が存在する？"}
+C -->|"はい - Persistent"| D["既存 Sandbox を再開<br/>Snapshot から復元"]
+C -->|"いいえ"| E["新規 MicroVM を起動<br/>ミリ秒で完了"]
+D --> F["コマンド実行<br/>runCommand - exec"]
+E --> F
+F --> G{"処理を継続する？"}
+G -->|"はい"| F
+G -->|"いいえ"| H["sandbox.stop()"]
+H --> I{"Persistent?"}
+I -->|"Yes"| J["自動スナップショット<br/>ファイルシステムを保存"]
+I -->|"No"| K["状態を破棄<br/>ストレージ課金なし"]
+J --> L(["終了"])
+K --> L
+style A fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd
+style L fill:#14532d,stroke:#22c55e,color:#86efac
+style J fill:#2d1b4e,stroke:#a855f7,color:#d8b4fe
+style K fill:#3b1515,stroke:#ef4444,color:#fca5a5`,
+
+        'diag-getorcreate': `flowchart TD
+GC["Sandbox.getOrCreate - name: 'my-sandbox'"]
+GC --> E1{"同じ name の<br/>Sandbox が存在？"}
+E1 -->|"存在する"| E2{"Snapshot の<br/>有効期限は？"}
+E2 -->|"有効"| E3["既存 Sandbox を再開<br/>onResume() を実行"]
+E2 -->|"期限切れ"| E4["Sandbox を再作成<br/>onCreate() を実行"]
+E1 -->|"存在しない"| E5["新規 Sandbox を作成<br/>onCreate() を実行"]
+E3 --> DONE(["Sandbox インスタンス返却"])
+E4 --> DONE
+E5 --> DONE
+style GC fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd
+style DONE fill:#14532d,stroke:#22c55e,color:#86efac
+style E3 fill:#0a1f0a,stroke:#22c55e,color:#86efac
+style E4 fill:#2d1a00,stroke:#f59e0b,color:#fde68a
+style E5 fill:#2d1b4e,stroke:#a855f7,color:#d8b4fe`,
+
+        'diag-cli': `mindmap
+  root((sandbox CLI))
+    サンドボックス管理
+      list - ls
+      create
+      fork
+      remove
+      config
+    実行系
+      run - 停止中も自動再開
+      exec - 起動中のみ
+      connect - ssh - shell
+    ファイル操作
+      copy - cp
+    セッション管理
+      sessions
+    スナップショット
+      snapshot - 手動作成
+      snapshots - 一覧・管理
+    認証
+      login
+      logout`,
+
+        'diag-lifecycle': `sequenceDiagram
+  participant Dev as 開発者 - AI エージェント
+  participant API as Vercel Sandbox API
+  participant VM as MicroVM - Session
+  participant SS as Snapshot ストレージ
+  Dev->>API: Sandbox.create - name: "my-sandbox"
+  API->>VM: 新規 MicroVM を起動
+  VM-->>Dev: Sandbox インスタンス返却
+  Dev->>VM: runCommand("npm install")
+  VM-->>Dev: 実行結果 exit 0
+  Dev->>VM: sandbox.stop()
+  VM->>SS: ファイルシステムを自動スナップショット
+  VM-->>Dev: 停止完了 - Session 1 終了
+  Note over Dev,SS: 数時間後 - 翌日でも問題なし
+  Dev->>API: Sandbox.get - name: "my-sandbox"
+  API-->>Dev: Sandbox ハンドル返却
+  Dev->>API: sandbox.runCommand("npm test")
+  API->>SS: 最新 Snapshot を取得
+  SS-->>API: Snapshot データ
+  API->>VM: 新規 MicroVM を Snapshot から起動
+  VM-->>Dev: 実行結果 - npm install 済の状態から
+  Note right of VM: Session 2 開始`,
+
+        'diag-snapshots': `flowchart TD
+A["Sandbox が停止"] --> B["自動スナップショット作成"]
+B --> C{"keepLastSnapshots<br/>設定あり？"}
+C -->|"設定なし"| D["すべての Snapshot を保持<br/>有効期限まで"]
+C -->|"設定あり - 例: count: 1"| E{"保持上限 N 件を<br/>超過した？"}
+E -->|"いいえ"| D
+E -->|"はい"| F{"deleteEvicted?"}
+F -->|"true - デフォルト"| G["古い Snapshot を即時削除"]
+F -->|"false"| H["有効期限まで保持"]
+style B fill:#2d1b4e,stroke:#a855f7,color:#d8b4fe
+style G fill:#3b1515,stroke:#ef4444,color:#fca5a5`,
+
+        'diag-network': `flowchart LR
+subgraph ALLOW["allow-all - デフォルト"]
+AS["Sandbox"] -->|"すべて許可"| AN["インターネット全体"]
+end
+subgraph DENY["deny-all"]
+DS["Sandbox"] -->|"すべて遮断"| DN["インターネット"]
+end
+subgraph CUSTOM["custom - カスタム"]
+CS["Sandbox"] -->|"許可"| CN1["ai-gateway.vercel.sh"]
+CS -->|"遮断"| CN2["その他"]
+end
+style ALLOW fill:#0a1f0a,stroke:#22c55e,color:#86efac
+style DENY fill:#1f0a0a,stroke:#ef4444,color:#fca5a5
+style CUSTOM fill:#0c1a2e,stroke:#3b82f6,color:#93c5fd`,
+
+        'diag-tags': `graph LR
+subgraph PROD["env=production"]
+P1["prod-agent-1"]
+P2["prod-agent-2"]
+end
+subgraph STG["env=staging"]
+S1["staging-agent-1"]
+end
+subgraph CI["env=ci"]
+C1["ci-build-1"]
+C2["ci-build-2"]
+end
+MGMT["Dashboard - CLI<br/>sandbox list --tag env=production"] --> PROD
+MGMT --> STG
+MGMT --> CI
+style PROD fill:#14532d,stroke:#22c55e,color:#86efac
+style STG fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd
+style CI fill:#2d1b4e,stroke:#a855f7,color:#d8b4fe`,
+
+        'diag-best-practices': `mindmap
+  root((ベストプラクティス))
+    コスト最適化
+      keepLastSnapshots - 1 に設定
+      CI - CD には non-persistent を使う
+      適切なタイムアウト設定
+      処理後は必ず stop
+    セキュリティ
+      untrusted code には deny-all
+      OIDC Token を優先使用
+      処理後にネットワーク遮断
+      不要な Sandbox を定期削除
+    パフォーマンス
+      getOrCreate でスナップショットを活用
+      onCreate で重い初期化を一度だけ
+      onResume で軽量な再起動
+      detached でバックグラウンド実行
+    管理 - 運用
+      name を必ず明示的に指定
+      タグで環境 - チームを分類
+      v1 から v2 移行は name に注意`,
+      };
+
       mermaid.initialize({
-        startOnLoad: true,
+        startOnLoad: false,
         theme: 'dark',
         fontFamily: "'Inter', system-ui, sans-serif",
         themeVariables: {
@@ -2253,10 +2395,112 @@ await Sandbox.create({
           loopTextColor: '#ededed',
           signalColor: '#6366f1',
           signalTextColor: '#ededed',
+          /* マインドマップ用 cScale — Mermaid v10 mindmap branch colors */
+          cScale0: '#1e3a5f', cScale1: '#111827', cScale2: '#1a1a2e',
+          cScale3: '#1e2a3a', cScale4: '#121825', cScale5: '#111111',
+          cScale6: '#1a1f2e', cScale7: '#0f1923', cScale8: '#1e3a5f',
+          cScale9: '#111827', cScale10: '#1a1a2e', cScale11: '#1e2a3a',
         },
         flowchart: { curve: 'basis', padding: 20 },
-        sequence: { mirrorActors: false, noteMargin: 10 },
+        sequence: { mirrorActors: true, noteMargin: 10, useMaxWidth: false },
       });
+
+      /* ── マインドマップ SVG 後処理: SVG内部に<style>を注入してインライン色を上書き ── */
+      const MINDMAP_IDS = ['diag-cli', 'diag-best-practices'];
+
+      function applyMindmapStyle(svgEl) {
+        /* ノード背景形状（rect/circle/ellipse/polygon/path）のインラインfillをJSで直接上書き */
+        const shapes = svgEl.querySelectorAll(
+          'g.mindmap-node > rect, g.mindmap-node > circle, g.mindmap-node > ellipse,'
+          + ' g.mindmap-node > polygon, g.mindmap-node > path'
+        );
+        shapes.forEach(shape => {
+          shape.style.setProperty('fill', '#1e293b', 'important');
+          shape.style.setProperty('stroke', '#475569', 'important');
+          shape.style.setProperty('stroke-width', '1.5px', 'important');
+        });
+
+        /* ルートノード（最初の circle/ellipse） → 青グロー */
+        const rootShape = svgEl.querySelector('g.mindmap-node > circle, g.mindmap-node > ellipse');
+        if (rootShape) {
+          rootShape.style.setProperty('fill', 'rgba(0,112,243,0.2)', 'important');
+          rootShape.style.setProperty('stroke', '#0070f3', 'important');
+          rootShape.style.setProperty('stroke-width', '2.5px', 'important');
+          rootShape.style.setProperty('filter', 'drop-shadow(0 0 10px rgba(0,112,243,0.5))', 'important');
+        }
+
+        /* SVG text要素（まれにテキストをtextで出力する場合） */
+        svgEl.querySelectorAll('g.mindmap-node text').forEach(t => {
+          t.style.setProperty('fill', '#e2e8f0', 'important');
+        });
+
+        /* foreignObject内のHTML要素 — CSSのcascadeが届かない場合の保険強制適用 */
+        svgEl.querySelectorAll('g.mindmap-node foreignObject').forEach(fo => {
+          /* querySelectorAllでfo配下の全要素に直接style設定 */
+          try {
+            fo.querySelectorAll('*').forEach(child => {
+              child.style.setProperty('color', '#e2e8f0', 'important');
+            });
+          } catch (e) { /* cross-origin警告等は無視 */ }
+        });
+
+        /* エッジ（接続線）色 */
+        svgEl.querySelectorAll('path').forEach(p => {
+          if (p.getAttribute('fill') === 'none'
+              || p.classList.contains('mindmap-edge')
+              || p.classList.contains('edge')) {
+            p.style.setProperty('stroke', '#4b5563', 'important');
+            p.style.setProperty('opacity', '0.9', 'important');
+          }
+        });
+
+        /*
+         * setTimeout 後に再適用: Mermaidが非同期にスタイルを上書きする場合の保険。
+         * ブラウザのレンダリング完了後に1フレーム遅延して再度CSS-in-JSを適用
+         */
+        requestAnimationFrame(() => {
+          svgEl.querySelectorAll('g.mindmap-node foreignObject').forEach(fo => {
+            try {
+              fo.querySelectorAll('*').forEach(child => {
+                child.style.setProperty('color', '#e2e8f0', 'important');
+              });
+            } catch (e) { /* ignore */ }
+          });
+        });
+      }
+
+      /* ── Mermaid Render ─────────────────────────────────── */
+      (async () => {
+        if (document.fonts) {
+          await document.fonts.ready;
+        }
+        for (const [id, src] of Object.entries(DIAGRAMS)) {
+          try {
+            const el = document.getElementById(id);
+            if (!el) continue;
+            const { svg } = await mermaid.render('svg-' + id, src);
+            el.innerHTML = svg;
+
+            const svgEl = el.querySelector('svg');
+            if (svgEl) {
+              const origMaxWidth = svgEl.style.maxWidth;
+              /* 全図共通: 幅だけレスポンシブ化。高さは auto にしてviewBoxで制御。overflow visibleで下部切れを防ぐ */
+              svgEl.removeAttribute('width');
+              svgEl.removeAttribute('height');
+              svgEl.style.width = '100%';
+              svgEl.style.maxWidth = origMaxWidth || '100%';
+              svgEl.style.height = 'auto';
+              svgEl.style.overflow = 'visible';
+
+              if (MINDMAP_IDS.includes(id)) {
+                applyMindmapStyle(svgEl);
+              }
+            }
+          } catch (err) {
+            console.error('Failed to render mermaid diagram: ' + id, err);
+          }
+        }
+      })();
 
       /* ── Highlight.js 初期化 ──────────────────────────────── */
       document.addEventListener('DOMContentLoaded', () => {
