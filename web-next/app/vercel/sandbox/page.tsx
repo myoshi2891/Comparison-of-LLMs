@@ -86,7 +86,7 @@ style EPHEMERAL fill:#1f0a0a,stroke:#ef4444,color:#fca5a5`;
 
 const DIAG_FLOW = `flowchart TD
 A(["開始"]) --> B["Sandbox.create()<br/>または sandbox create"]
-B --> C{"暗黙的な状態変化を防ぐため<br/>Sandbox が存在する？"}
+B --> C{"暗慢的な状態変化を防ぐため<br/>Sandbox が存在する？"}
 C -->|"はい - Persistent"| D["既存 Sandbox を再開<br/>Snapshot から復元"]
 C -->|"いいえ"| E["新規 MicroVM を起動<br/>ミリ秒で完了"]
 D --> F["コマンド実行<br/>runCommand - exec"]
@@ -256,7 +256,13 @@ export default function Page() {
       ══════════════════════════════════════════════════════════ */}
       <aside className={styles.sidebar}>
         <div className={styles.sidebarLogo}>
-          <svg viewBox="0 0 76 65" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Vercel Logo">
+          <svg
+            viewBox="0 0 76 65"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            role="img"
+            aria-label="Vercel Logo"
+          >
             <title>Vercel Logo</title>
             <path d="M37.5274 0L75.0548 65H0L37.5274 0Z" fill="white" />
           </svg>
@@ -359,16 +365,19 @@ export default function Page() {
           <div className={styles.sectionEyebrow}>Section 01</div>
           <h2>Vercel Sandbox とは？</h2>
           <p className={styles.sectionIntro}>
-            <strong>Vercel Sandbox</strong> は、AI エージェントが生成したコード・ユーザーが入力したスクリプト・サードパーティ製コードなど、
-            <em>信頼できないコード</em>を<strong>完全に隔離された Linux マイクロVM</strong>内で安全に実行するためのサービスです。
-            2026年1月30日に GA（一般公開）となり、CLI と SDK はオープンソース化されました。
+            <strong>Vercel Sandbox</strong> は、AI
+            エージェントが生成したコード・ユーザーが入力したスクリプト・サードパーティ製コードなど、
+            <em>信頼できないコード</em>を<strong>完全に隔離された Linux マイクロVM</strong>
+            内で安全に実行するためのサービスです。 2026年1月30日に GA（一般公開）となり、CLI と SDK
+            はオープンソース化されました。
           </p>
 
           <div className={`${styles.callout} ${styles.calloutBlue}`}>
             <span className={styles.calloutIcon}>💡</span>
             <div>
-              <strong>一言で言うと:</strong> 「コードを安全に動かせる使い捨ての Linux
-              マシン」を<strong>数ミリ秒</strong>で用意できるサービスです。従来のコンテナよりも強力な VM レベルの隔離を実現しています。
+              <strong>一言で言うと:</strong> 「コードを安全に動かせる使い捨ての Linux マシン」を
+              <strong>数ミリ秒</strong>で用意できるサービスです。従来のコンテナよりも強力な VM
+              レベルの隔離を実現しています。
             </div>
           </div>
 
@@ -384,23 +393,33 @@ export default function Page() {
               <tbody>
                 <tr>
                   <td>環境準備に数分かかる</td>
-                  <td>⚡ <strong>ミリ秒単位で起動</strong>（サブ秒）</td>
+                  <td>
+                    ⚡ <strong>ミリ秒単位で起動</strong>（サブ秒）
+                  </td>
                 </tr>
                 <tr>
                   <td>実行環境が共有され攻撃リスクが高い</td>
-                  <td>🔒 <strong>Firecracker MicroVM による完全分離</strong>（独自カーネル）</td>
+                  <td>
+                    🔒 <strong>Firecracker MicroVM による完全分離</strong>（独自カーネル）
+                  </td>
                 </tr>
                 <tr>
                   <td>アイドル時間にもコストがかかる</td>
-                  <td>💰 <strong>Active CPU 時間のみ課金</strong></td>
+                  <td>
+                    💰 <strong>Active CPU 時間のみ課金</strong>
+                  </td>
                 </tr>
                 <tr>
                   <td>複雑な環境の状態引き継ぎが困難</td>
-                  <td>📸 <strong>自動スナップショットで状態を保存・復元</strong></td>
+                  <td>
+                    📸 <strong>自動スナップショットで状態を保存・復元</strong>
+                  </td>
                 </tr>
                 <tr>
                   <td>本番環境への意図しない影響リスク</td>
-                  <td>🌐 <strong>完全に隔離された VM のため本番への影響ゼロ</strong></td>
+                  <td>
+                    🌐 <strong>完全に隔離された VM のため本番への影響ゼロ</strong>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -418,17 +437,22 @@ export default function Page() {
               <tbody>
                 <tr>
                   <td>ベース OS</td>
-                  <td><code>Amazon Linux 2023</code></td>
+                  <td>
+                    <code>Amazon Linux 2023</code>
+                  </td>
                 </tr>
                 <tr>
                   <td>利用可能ランタイム</td>
                   <td>
-                    <code>node26</code>, <code>node24</code>（デフォルト）, <code>node22</code>, <code>python3.13</code>
+                    <code>node26</code>, <code>node24</code>（デフォルト）, <code>node22</code>,{" "}
+                    <code>python3.13</code>
                   </td>
                 </tr>
                 <tr>
                   <td>デフォルト作業ディレクトリ</td>
-                  <td><code>/vercel/sandbox</code></td>
+                  <td>
+                    <code>/vercel/sandbox</code>
+                  </td>
                 </tr>
                 <tr>
                   <td>実行ユーザー</td>
@@ -442,7 +466,9 @@ export default function Page() {
                 </tr>
                 <tr>
                   <td>起動速度</td>
-                  <td><strong>ミリ秒単位</strong>（サブ秒）</td>
+                  <td>
+                    <strong>ミリ秒単位</strong>（サブ秒）
+                  </td>
                 </tr>
                 <tr>
                   <td>最大 vCPU</td>
@@ -455,7 +481,8 @@ export default function Page() {
                 <tr>
                   <td>プリインストールツール</td>
                   <td>
-                    <code>git</code>, <code>curl</code>, <code>unzip</code>, <code>tar</code>, <code>openssl</code> 等
+                    <code>git</code>, <code>curl</code>, <code>unzip</code>, <code>tar</code>,{" "}
+                    <code>openssl</code> 等
                   </td>
                 </tr>
               </tbody>
@@ -470,8 +497,9 @@ export default function Page() {
           <div className={styles.sectionEyebrow}>Section 02</div>
           <h2>全体アーキテクチャを理解する</h2>
           <p className={styles.sectionIntro}>
-            Vercel の内部コンピュートプラットフォーム「<strong>Hive</strong>」は、毎日 270万件以上のデプロイを処理する基盤の上に Sandbox を構築しています。
-            SDK・CLI から Firecracker MicroVM まで、呼び出しがどのように流れるかを把握しましょう。
+            Vercel の内部コンピュートプラットフォーム「<strong>Hive</strong>」は、毎日
+            270万件以上のデプロイを処理する基盤の上に Sandbox を構築しています。 SDK・CLI から
+            Firecracker MicroVM まで、呼び出しがどのように流れるかを把握しましょう。
           </p>
 
           <div className={styles.mermaidWrap}>
@@ -485,7 +513,8 @@ export default function Page() {
             <span className={styles.calloutIcon}>⚠️</span>
             <div>
               <strong>コンテナとの違い:</strong> Docker などのコンテナはホスト OS
-              のカーネルを共有しますが、Vercel Sandbox は各 VM が<strong>独自のカーネルを持つ</strong>
+              のカーネルを共有しますが、Vercel Sandbox は各 VM が
+              <strong>独自のカーネルを持つ</strong>
               Firecracker MicroVM のため、より強力な隔離が実現されています。
             </div>
           </div>
@@ -504,7 +533,8 @@ export default function Page() {
               <div className={styles.cardIcon}>🤖</div>
               <div className={styles.cardTitle}>AI エージェントのコード実行</div>
               <div className={styles.cardDesc}>
-                LLM が生成したコードを安全に実行。v0・Roo Code・Blackbox AI などが採用。本番環境への影響はゼロ。
+                LLM が生成したコードを安全に実行。v0・Roo Code・Blackbox AI
+                などが採用。本番環境への影響はゼロ。
               </div>
               <span className={`${styles.cardTag} ${styles.badgeGreen}`}>Persistent 推奨</span>
             </div>
@@ -528,7 +558,8 @@ export default function Page() {
               <div className={styles.cardIcon}>🚀</div>
               <div className={styles.cardTitle}>開発サーバー / ライブプレビュー</div>
               <div className={styles.cardDesc}>
-                Sandbox 内で Dev Server を起動して公開 URL を発行。エージェントが生成したアプリを即プレビュー。
+                Sandbox 内で Dev Server を起動して公開 URL
+                を発行。エージェントが生成したアプリを即プレビュー。
               </div>
               <span className={`${styles.cardTag} ${styles.badgePurple}`}>--publish-port</span>
             </div>
@@ -541,7 +572,9 @@ export default function Page() {
         <section className={styles.section} id="setup">
           <div className={styles.sectionEyebrow}>Section 04</div>
           <h2>セットアップ手順（Step-by-Step）</h2>
-          <p className={styles.sectionIntro}>5 つのステップで Vercel Sandbox を使い始められます。</p>
+          <p className={styles.sectionIntro}>
+            5 つのステップで Vercel Sandbox を使い始められます。
+          </p>
 
           <div className={styles.mermaidWrap}>
             <MermaidDiagram chart={DIAG_SETUP} id="diag-setup" />
@@ -576,7 +609,8 @@ export default function Page() {
               <div className={styles.stepBody}>
                 <div className={styles.stepTitle}>プロジェクトの作成・リンク（認証の準備）</div>
                 <div className={styles.stepDesc}>
-                  <code>vercel link</code> で プロジェクトとリンクすることで OIDC トークン認証が使えるようになります。
+                  <code>vercel link</code> で プロジェクトとリンクすることで OIDC
+                  トークン認証が使えるようになります。
                 </div>
                 <div className={styles.codeWrap}>
                   <div className={styles.codeHeader}>
@@ -589,18 +623,23 @@ export default function Page() {
                   <pre>
                     <code className="language-bash">
                       <div className={styles.codeLine}>
-                        <span className={styles.ck}>mkdir</span> my-sandbox-project &amp;&amp; <span className={styles.ck}>cd</span> my-sandbox-project
+                        <span className={styles.ck}>mkdir</span> my-sandbox-project &amp;&amp;{" "}
+                        <span className={styles.ck}>cd</span> my-sandbox-project
                       </div>
                       <div className={styles.codeLine} />
                       <div className={styles.codeLine}>
-                        <span className={styles.cc}># Vercel にリンク（OIDC トークン認証を有効化）</span>
+                        <span className={styles.cc}>
+                          {"# Vercel にリンク（OIDC トークン認証を有効化）"}
+                        </span>
                       </div>
                       <div className={styles.codeLine}>
                         <span className={styles.ck}>vercel</span> link
                       </div>
                       <div className={styles.codeLine} />
                       <div className={styles.codeLine}>
-                        <span className={styles.cc}># 環境変数を取得（VERCEL_OIDC_TOKEN が .env.local に保存される）</span>
+                        <span className={styles.cc}>
+                          {"# 環境変数を取得（VERCEL_OIDC_TOKEN が .env.local に保存される）"}
+                        </span>
                       </div>
                       <div className={styles.codeLine}>
                         <span className={styles.ck}>vercel</span> env pull
@@ -608,7 +647,10 @@ export default function Page() {
                     </code>
                   </pre>
                 </div>
-                <div className={`${styles.callout} ${styles.calloutAmber}`} style={{ marginTop: "12px" }}>
+                <div
+                  className={`${styles.callout} ${styles.calloutAmber}`}
+                  style={{ marginTop: "12px" }}
+                >
                   <span className={styles.calloutIcon}>⚠️</span>
                   <div>
                     <strong>重要:</strong> OIDC トークンは <strong>12時間で失効</strong>します。
@@ -634,28 +676,30 @@ export default function Page() {
                   <pre>
                     <code className="language-bash">
                       <div className={styles.codeLine}>
-                        <span className={styles.cc}># CLI をグローバルインストール</span>
+                        <span className={styles.cc}>{"# CLI をグローバルインストール"}</span>
                       </div>
                       <div className={styles.codeLine}>
                         <span className={styles.ck}>npm</span> install -g sandbox
                       </div>
                       <div className={styles.codeLine} />
                       <div className={styles.codeLine}>
-                        <span className={styles.cc}># または npx で直接使用（インストール不要）</span>
+                        <span className={styles.cc}>
+                          {"# または npx で直接使用（インストール不要）"}
+                        </span>
                       </div>
                       <div className={styles.codeLine}>
                         <span className={styles.ck}>npx</span> sandbox --help
                       </div>
                       <div className={styles.codeLine} />
                       <div className={styles.codeLine}>
-                        <span className={styles.cc}># JS SDK をプロジェクトに追加</span>
+                        <span className={styles.cc}>{"# JS SDK をプロジェクトに追加"}</span>
                       </div>
                       <div className={styles.codeLine}>
                         <span className={styles.ck}>npm</span> install @vercel/sandbox
                       </div>
                       <div className={styles.codeLine} />
                       <div className={styles.codeLine}>
-                        <span className={styles.cc}># Python SDK の場合</span>
+                        <span className={styles.cc}>{"# Python SDK の場合"}</span>
                       </div>
                       <div className={styles.codeLine}>
                         <span className={styles.ck}>pip</span> install vercel
@@ -683,10 +727,14 @@ export default function Page() {
                     </thead>
                     <tbody>
                       <tr>
-                        <td><strong>OIDC Token（推奨）</strong></td>
+                        <td>
+                          <strong>OIDC Token（推奨）</strong>
+                        </td>
                         <td>Vercel 上・ローカル開発</td>
                         <td>◎ 自動ローテーション</td>
-                        <td><code>vercel link &amp;&amp; vercel env pull</code></td>
+                        <td>
+                          <code>vercel link &amp;&amp; vercel env pull</code>
+                        </td>
                       </tr>
                       <tr>
                         <td>Access Token</td>
@@ -705,16 +753,23 @@ export default function Page() {
               <div className={styles.stepNum}>5</div>
               <div className={styles.stepBody}>
                 <div className={styles.stepTitle}>最初の Sandbox を作成する</div>
-                <div className={styles.stepDesc}>CLI で 1 コマンドか、JS SDK で数行 of コードで起動できます。</div>
+                <div className={styles.stepDesc}>
+                  CLI で 1 コマンドか、JS SDK で数行 of コードで起動できます。
+                </div>
                 <div className={styles.codeWrap}>
                   <div className={styles.codeHeader}>
                     <span className={styles.codeLang}>bash</span>
-                    <CodeCopyButton className={styles.copyBtn} text="npx sandbox create --connect" />
+                    <CodeCopyButton
+                      className={styles.copyBtn}
+                      text="npx sandbox create --connect"
+                    />
                   </div>
                   <pre>
                     <code className="language-bash">
                       <div className={styles.codeLine}>
-                        <span className={styles.cc}># CLI で最速スタート（作成してシェルに接続）</span>
+                        <span className={styles.cc}>
+                          {"# CLI で最速スタート（作成してシェルに接続）"}
+                        </span>
                       </div>
                       <div className={styles.codeLine}>
                         <span className={styles.ck}>npx</span> sandbox create --connect
@@ -732,9 +787,10 @@ export default function Page() {
         ══════════════════════════════════════════════════════════ */}
         <section className={styles.section} id="concepts">
           <div className={styles.sectionEyebrow}>Section 05</div>
-          <h2>コアコンセプト：Sandbox と Session</h2>
+          <h2>コアコンセプト：Sandbox 和 Session</h2>
           <p className={styles.sectionIntro}>
-            Vercel Sandbox を使いこなすために、<strong>Sandbox</strong>・<strong>Session</strong>・<strong>Snapshot</strong> の 3 つの概念を理解しましょう。
+            Vercel Sandbox を使いこなすために、<strong>Sandbox</strong>・<strong>Session</strong>・
+            <strong>Snapshot</strong> の 3 つの概念を理解しましょう。
           </p>
 
           <div className={styles.mermaidWrap}>
@@ -755,17 +811,25 @@ export default function Page() {
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>Sandbox</strong></td>
-                  <td><code>name</code> で識別される長期的な存在。設定・Snapshot を保持</td>
+                  <td>
+                    <strong>Sandbox</strong>
+                  </td>
+                  <td>
+                    <code>name</code> で識別される長期的な存在。設定・Snapshot を保持
+                  </td>
                   <td>プロジェクトが存在する限り</td>
                 </tr>
                 <tr>
-                  <td><strong>Session</strong></td>
+                  <td>
+                    <strong>Session</strong>
+                  </td>
                   <td>Sandbox 内で起動する単一の VM インスタンス</td>
                   <td>コマンド実行中〜停止まで</td>
                 </tr>
                 <tr>
-                  <td><strong>Snapshot</strong></td>
+                  <td>
+                    <strong>Snapshot</strong>
+                  </td>
                   <td>Session 停止時に自動保存されるファイルシステムの状態</td>
                   <td>設定した有効期限まで</td>
                 </tr>
@@ -781,7 +845,8 @@ export default function Page() {
           <div className={styles.sectionEyebrow}>Section 06</div>
           <h2>永続的 vs 一時的サンドボックス</h2>
           <p className={styles.sectionIntro}>
-            Vercel Sandbox にはデフォルトの <strong>Persistent（永続）</strong> モードと、一時タスク向けの <strong>Non-persistent（一時）</strong> モードがあります。
+            Vercel Sandbox にはデフォルトの <strong>Persistent（永続）</strong>{" "}
+            モードと、一時タスク向けの <strong>Non-persistent（一時）</strong> モードがあります。
           </p>
 
           <div className={styles.mermaidWrap}>
@@ -805,7 +870,9 @@ export default function Page() {
                 </tr>
                 <tr>
                   <td>再開方法</td>
-                  <td><code>Sandbox.get(&#123; name &#125;)</code> で自動再開</td>
+                  <td>
+                    <code>Sandbox.get(&#123; name &#125;)</code> で自動再開
+                  </td>
                   <td>不可（新規作成のみ）</td>
                 </tr>
                 <tr>
@@ -826,7 +893,9 @@ export default function Page() {
                 <tr>
                   <td>作成時の指定</td>
                   <td>デフォルト（省略可）</td>
-                  <td><code>persistent: false</code> または <code>--non-persistent</code></td>
+                  <td>
+                    <code>persistent: false</code> または <code>--non-persistent</code>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -852,17 +921,20 @@ export default function Page() {
             <pre>
               <code className="language-bash">
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># Sandbox を作成してインタラクティブシェルに接続</span>
+                  <span className={styles.cc}>
+                    {"# Sandbox を作成してインタラクティブシェルに接続"}
+                  </span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>npx</span> sandbox create --connect
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># 名前を指定して作成</span>
+                  <span className={styles.cc}>{"# 名前を指定して作成"}</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>sandbox</span> create --name my-first-sandbox --connect
+                  <span className={styles.ck}>sandbox</span> create --name my-first-sandbox
+                  --connect
                 </div>
               </code>
             </pre>
@@ -880,66 +952,88 @@ export default function Page() {
             <pre>
               <code className="language-typescript">
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>import</span> &#123; Sandbox &#125; <span className={styles.ck}>from</span> <span className={styles.cs}>&quot;@vercel/sandbox&quot;</span>;
+                  <span className={styles.ck}>import</span> &#123; Sandbox &#125;{" "}
+                  <span className={styles.ck}>from</span>{" "}
+                  <span className={styles.cs}>&quot;@vercel/sandbox&quot;</span>
+                  {";"}
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>async</span> <span className={styles.ck}>function</span> main() &#123;
+                  <span className={styles.ck}>async</span>{" "}
+                  <span className={styles.ck}>function</span> main() &#123;
                 </div>
                 <div className={styles.codeLine}>
-                  {"  "}<span className={styles.cc}>// 1. サンドボックスを作成（persistent がデフォルト）</span>
+                  {"  "}
+                  <span className={styles.cc}>
+                    {"// 1. サンドボックスを作成（persistent がデフォルト）"}
+                  </span>
                 </div>
                 <div className={styles.codeLine}>
-                  {"  "}<span className={styles.ck}>const</span> <span className={styles.cv}>sandbox</span> = <span className={styles.ck}>await</span> Sandbox.create(&#123;
+                  {"  "}
+                  <span className={styles.ck}>const</span>{" "}
+                  <span className={styles.cv}>sandbox</span> ={" "}
+                  <span className={styles.ck}>await</span> Sandbox.create(&#123;
                 </div>
                 <div className={styles.codeLine}>
-                  {"    "}name: <span className={styles.cs}>&quot;my-first-sandbox&quot;</span>,    <span className={styles.cc}>// 省略するとランダム名が生成される</span>
+                  {"    "}name: <span className={styles.cs}>&quot;my-first-sandbox&quot;</span>,{" "}
+                  <span className={styles.cc}>{"// 省略するとランダム名が生成される"}</span>
                 </div>
                 <div className={styles.codeLine}>
-                  {"    "}runtime: <span className={styles.cs}>&quot;node24&quot;</span>,           <span className={styles.cc}>// デフォルト is node24</span>
+                  {"    "}runtime: <span className={styles.cs}>&quot;node24&quot;</span>,{" "}
+                  <span className={styles.cc}>{"// デフォルト is node24"}</span>
                 </div>
                 <div className={styles.codeLine}>
-                  {"    "}timeout: <span className={styles.nm}>5</span> * <span className={styles.nm}>60</span> * <span className={styles.nm}>1000</span>,     <span className={styles.cc}>// タイムアウト: 5分（ミリ秒単位）</span>
+                  {"    "}timeout: <span className={styles.nm}>5</span> *{" "}
+                  <span className={styles.nm}>60</span> * <span className={styles.nm}>1000</span>,{" "}
+                  <span className={styles.cc}>{"// タイムアウト: 5分（ミリ秒単位）"}</span>
+                </div>
+                <div className={styles.codeLine}>{"  "}&#125;);</div>
+                <div className={styles.codeLine} />
+                <div className={styles.codeLine}>
+                  {"  "}
+                  <span className={styles.cc}>{"// 2. コマンドを実行"}</span>
                 </div>
                 <div className={styles.codeLine}>
-                  {"  "}&#125;);
+                  {"  "}
+                  <span className={styles.ck}>const</span> <span className={styles.cv}>result</span>{" "}
+                  = <span className={styles.ck}>await</span> sandbox.runCommand(
+                  <span className={styles.cs}>&quot;node&quot;</span>, [
+                </div>
+                <div className={styles.codeLine}>
+                  {"    "}
+                  <span className={styles.cs}>&quot;-e&quot;</span>,
+                </div>
+                <div className={styles.codeLine}>
+                  {"    "}
+                  <span className={styles.cs}>
+                    &apos;console.log(&quot;Hello from Vercel Sandbox!&quot;)&apos;
+                  </span>
+                  ,
+                </div>
+                <div className={styles.codeLine}>{"  "}]);</div>
+                <div className={styles.codeLine}>
+                  {"  "}console.log(<span className={styles.cs}>&quot;Exit code:&quot;</span>,
+                  result.exitCode); <span className={styles.cc}>{"// 0"}</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {"  "}console.log(<span className={styles.cs}>&quot;Output:&quot;</span>,{" "}
+                  <span className={styles.ck}>await</span> result.stdout());{" "}
+                  <span className={styles.cc}>{"// Hello from..."}</span>
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  {"  "}<span className={styles.cc}>// 2. コマンドを実行</span>
+                  {"  "}
+                  <span className={styles.cc}>
+                    {"// 3. 停止（persistent なので自動スナップショット保存）"}
+                  </span>
                 </div>
                 <div className={styles.codeLine}>
-                  {"  "}<span className={styles.ck}>const</span> <span className={styles.cv}>result</span> = <span className={styles.ck}>await</span> sandbox.runCommand(<span className={styles.cs}>&quot;node&quot;</span>, [
+                  {"  "}
+                  <span className={styles.ck}>await</span> sandbox.stop();
                 </div>
-                <div className={styles.codeLine}>
-                  {"    "}<span className={styles.cs}>&quot;-e&quot;</span>,
-                </div>
-                <div className={styles.codeLine}>
-                  {"    "}<span className={styles.cs}>&apos;console.log(&quot;Hello from Vercel Sandbox!&quot;)&apos;</span>,
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}]);
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}console.log(<span className={styles.cs}>&quot;Exit code:&quot;</span>, result.exitCode);       <span className={styles.cc}>// 0</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}console.log(<span className={styles.cs}>&quot;Output:&quot;</span>, <span className={styles.ck}>await</span> result.stdout());    <span className={styles.cc}>// Hello from...</span>
-                </div>
+                <div className={styles.codeLine}>&#125;</div>
                 <div className={styles.codeLine} />
-                <div className={styles.codeLine}>
-                  {"  "}<span className={styles.cc}>// 3. 停止（persistent なので自動スナップショット保存）</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}<span className={styles.ck}>await</span> sandbox.stop();
-                </div>
-                <div className={styles.codeLine}>
-                  &#125;
-                </div>
-                <div className={styles.codeLine} />
-                <div className={styles.codeLine}>
-                  main();
-                </div>
+                <div className={styles.codeLine}>main();</div>
               </code>
             </pre>
           </div>
@@ -970,74 +1064,132 @@ export default function Page() {
               </thead>
               <tbody>
                 <tr>
-                  <td><code>Sandbox.create()</code></td>
+                  <td>
+                    <code>Sandbox.create()</code>
+                  </td>
                   <td>新規 Sandbox を作成</td>
-                  <td><code>Promise&lt;Sandbox&gt;</code></td>
+                  <td>
+                    <code>Promise&lt;Sandbox&gt;</code>
+                  </td>
                 </tr>
                 <tr>
-                  <td><code>Sandbox.get()</code></td>
+                  <td>
+                    <code>Sandbox.get()</code>
+                  </td>
                   <td>既存 Sandbox を名前で取得</td>
-                  <td><code>Promise&lt;Sandbox&gt;</code></td>
+                  <td>
+                    <code>Promise&lt;Sandbox&gt;</code>
+                  </td>
                 </tr>
                 <tr>
-                  <td><code>Sandbox.getOrCreate()</code></td>
-                  <td>あれば再開・なければ作成（<strong>推奨</strong>）</td>
-                  <td><code>Promise&lt;Sandbox&gt;</code></td>
+                  <td>
+                    <code>Sandbox.getOrCreate()</code>
+                  </td>
+                  <td>
+                    あれば再開・なければ作成（<strong>推奨</strong>）
+                  </td>
+                  <td>
+                    <code>Promise&lt;Sandbox&gt;</code>
+                  </td>
                 </tr>
                 <tr>
-                  <td><code>Sandbox.fork()</code></td>
+                  <td>
+                    <code>Sandbox.fork()</code>
+                  </td>
                   <td>既存 Sandbox をフォーク</td>
-                  <td><code>Promise&lt;Sandbox&gt;</code></td>
+                  <td>
+                    <code>Promise&lt;Sandbox&gt;</code>
+                  </td>
                 </tr>
                 <tr>
-                  <td><code>Sandbox.list()</code></td>
+                  <td>
+                    <code>Sandbox.list()</code>
+                  </td>
                   <td>Sandbox 一覧を取得（async-iterable）</td>
-                  <td><code>Promise&lt;Paginated&gt;</code></td>
+                  <td>
+                    <code>Promise&lt;Paginated&gt;</code>
+                  </td>
                 </tr>
                 <tr>
-                  <td><code>sandbox.runCommand()</code></td>
+                  <td>
+                    <code>sandbox.runCommand()</code>
+                  </td>
                   <td>コマンドを実行</td>
-                  <td><code>Promise&lt;CommandFinished&gt;</code></td>
+                  <td>
+                    <code>Promise&lt;CommandFinished&gt;</code>
+                  </td>
                 </tr>
                 <tr>
-                  <td><code>sandbox.writeFiles()</code></td>
+                  <td>
+                    <code>sandbox.writeFiles()</code>
+                  </td>
                   <td>ファイルを書き込む</td>
-                  <td><code>Promise&lt;void&gt;</code></td>
+                  <td>
+                    <code>Promise&lt;void&gt;</code>
+                  </td>
                 </tr>
                 <tr>
-                  <td><code>sandbox.readFileToBuffer()</code></td>
+                  <td>
+                    <code>sandbox.readFileToBuffer()</code>
+                  </td>
                   <td>ファイルを読み込む</td>
-                  <td><code>Promise&lt;Buffer|null&gt;</code></td>
+                  <td>
+                    <code>Promise&lt;Buffer|null&gt;</code>
+                  </td>
                 </tr>
                 <tr>
-                  <td><code>sandbox.domain()</code></td>
+                  <td>
+                    <code>sandbox.domain()</code>
+                  </td>
                   <td>公開 URL を取得</td>
-                  <td><code>string</code></td>
+                  <td>
+                    <code>string</code>
+                  </td>
                 </tr>
                 <tr>
-                  <td><code>sandbox.stop()</code></td>
+                  <td>
+                    <code>sandbox.stop()</code>
+                  </td>
                   <td>Sandbox を停止</td>
-                  <td><code>Promise&lt;...&gt;</code></td>
+                  <td>
+                    <code>Promise&lt;...&gt;</code>
+                  </td>
                 </tr>
                 <tr>
-                  <td><code>sandbox.update()</code></td>
+                  <td>
+                    <code>sandbox.update()</code>
+                  </td>
                   <td>設定を動的に更新</td>
-                  <td><code>Promise&lt;void&gt;</code></td>
+                  <td>
+                    <code>Promise&lt;void&gt;</code>
+                  </td>
                 </tr>
                 <tr>
-                  <td><code>sandbox.delete()</code></td>
+                  <td>
+                    <code>sandbox.delete()</code>
+                  </td>
                   <td>完全削除（Snapshot も消去）</td>
-                  <td><code>Promise&lt;void&gt;</code></td>
+                  <td>
+                    <code>Promise&lt;void&gt;</code>
+                  </td>
                 </tr>
                 <tr>
-                  <td><code>sandbox.extendTimeout()</code></td>
+                  <td>
+                    <code>sandbox.extendTimeout()</code>
+                  </td>
                   <td>タイムアウト延長</td>
-                  <td><code>Promise&lt;void&gt;</code></td>
+                  <td>
+                    <code>Promise&lt;void&gt;</code>
+                  </td>
                 </tr>
                 <tr>
-                  <td><code>sandbox.snapshot()</code></td>
+                  <td>
+                    <code>sandbox.snapshot()</code>
+                  </td>
                   <td>手動スナップショット</td>
-                  <td><code>Promise&lt;Snapshot&gt;</code></td>
+                  <td>
+                    <code>Promise&lt;Snapshot&gt;</code>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -1055,33 +1207,39 @@ export default function Page() {
             <pre>
               <code className="language-typescript">
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>const</span> <span className={styles.cv}>sandbox</span> = <span className={styles.ck}>await</span> Sandbox.create(&#123;
+                  <span className={styles.ck}>const</span>{" "}
+                  <span className={styles.cv}>sandbox</span> ={" "}
+                  <span className={styles.ck}>await</span> Sandbox.create(&#123;
                 </div>
                 <div className={styles.codeLine}>
-                  {"  "}persistent: <span className={styles.ck}>false</span>,            <span className={styles.cc}>// 停止後に状態を破棄（Snapshot 課金なし）</span>
+                  {"  "}persistent: <span className={styles.ck}>false</span>,{" "}
+                  <span className={styles.cc}>{"// 停止後に状態を破棄（Snapshot 課金なし）"}</span>
                 </div>
                 <div className={styles.codeLine}>
-                  {"  "}timeout: <span className={styles.nm}>15</span> * <span className={styles.nm}>60</span> * <span className={styles.nm}>1000</span>,     <span className={styles.cc}>// 15分</span>
+                  {"  "}timeout: <span className={styles.nm}>15</span> *{" "}
+                  <span className={styles.nm}>60</span> * <span className={styles.nm}>1000</span>,{" "}
+                  <span className={styles.cc}>{"// 15分"}</span>
                 </div>
-                <div className={styles.codeLine}>
-                  &#125;);
-                </div>
+                <div className={styles.codeLine}>&#125;);</div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>try</span> &#123;
                 </div>
                 <div className={styles.codeLine}>
-                  {"  "}<span className={styles.ck}>await</span> sandbox.runCommand(<span className={styles.cs}>&quot;npm&quot;</span>, [<span className={styles.cs}>&quot;test&quot;</span>]);
+                  {"  "}
+                  <span className={styles.ck}>await</span> sandbox.runCommand(
+                  <span className={styles.cs}>&quot;npm&quot;</span>, [
+                  <span className={styles.cs}>&quot;test&quot;</span>]);
                 </div>
                 <div className={styles.codeLine}>
                   &#125; <span className={styles.ck}>finally</span> &#123;
                 </div>
                 <div className={styles.codeLine}>
-                  {"  "}<span className={styles.ck}>await</span> sandbox.stop();         <span className={styles.cc}>// 状態は破棄される</span>
+                  {"  "}
+                  <span className={styles.ck}>await</span> sandbox.stop();{" "}
+                  <span className={styles.cc}>{"// 状態は破棄される"}</span>
                 </div>
-                <div className={styles.codeLine}>
-                  &#125;
-                </div>
+                <div className={styles.codeLine}>&#125;</div>
               </code>
             </pre>
           </div>
@@ -1103,7 +1261,9 @@ export default function Page() {
             <pre>
               <code className="language-typescript">
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>const</span> <span className={styles.cv}>sandbox</span> = <span className={styles.ck}>await</span> Sandbox.getOrCreate(&#123;
+                  <span className={styles.ck}>const</span>{" "}
+                  <span className={styles.cv}>sandbox</span> ={" "}
+                  <span className={styles.ck}>await</span> Sandbox.getOrCreate(&#123;
                 </div>
                 <div className={styles.codeLine}>
                   {"  "}name: <span className={styles.cs}>&quot;dev-environment&quot;</span>,
@@ -1113,54 +1273,68 @@ export default function Page() {
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  {"  "}<span className={styles.cc}>// 🔴 初回作成時のみ実行（重い初期化）</span>
+                  {"  "}
+                  <span className={styles.cc}>{"// 🔴 初回作成時のみ実行（重い初期化）"}</span>
                 </div>
                 <div className={styles.codeLine}>
-                  {"  "}onCreate: <span className={styles.ck}>async</span> (<span className={styles.cv}>sbx</span>) =&gt; &#123;
+                  {"  "}onCreate: <span className={styles.ck}>async</span> (
+                  <span className={styles.cv}>sbx</span>) =&gt; &#123;
                 </div>
                 <div className={styles.codeLine}>
-                  {"    "}<span className={styles.ck}>await</span> sbx.runCommand(<span className={styles.cs}>&quot;git&quot;</span>, [<span className={styles.cs}>&quot;clone&quot;</span>, <span className={styles.cs}>&quot;https://github.com/your/repo&quot;</span>, <span className={styles.cs}>&quot;.&quot;</span>]);
+                  {"    "}
+                  <span className={styles.ck}>await</span> sbx.runCommand(
+                  <span className={styles.cs}>&quot;git&quot;</span>, [
+                  <span className={styles.cs}>&quot;clone&quot;</span>,{" "}
+                  <span className={styles.cs}>&quot;https://github.com/your/repo&quot;</span>,{" "}
+                  <span className={styles.cs}>&quot;.&quot;</span>]);
                 </div>
                 <div className={styles.codeLine}>
-                  {"    "}<span className={styles.ck}>await</span> sbx.runCommand(<span className={styles.cs}>&quot;npm&quot;</span>, [<span className={styles.cs}>&quot;install&quot;</span>]);
+                  {"    "}
+                  <span className={styles.ck}>await</span> sbx.runCommand(
+                  <span className={styles.cs}>&quot;npm&quot;</span>, [
+                  <span className={styles.cs}>&quot;install&quot;</span>]);
                 </div>
                 <div className={styles.codeLine}>
-                  {"    "}console.log(<span className={styles.cs}>&quot;初回セットアップ完了！（次回から skip）&quot;</span>);
+                  {"    "}console.log(
+                  <span className={styles.cs}>
+                    &quot;初回セットアップ完了！（次回から skip）&quot;
+                  </span>
+                  );
                 </div>
-                <div className={styles.codeLine}>
-                  {"  "}&#125;,
-                </div>
+                <div className={styles.codeLine}>{"  "}&#125;,</div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  {"  "}<span className={styles.cc}>// 🔵 再開のたびに実行（バックグラウンドサービスの再起動等）</span>
+                  {"  "}
+                  <span className={styles.cc}>
+                    {"// 🔵 再開のたびに実行（バックグラウンドサービスの再起動等）"}
+                  </span>
                 </div>
                 <div className={styles.codeLine}>
-                  {"  "}onResume: <span className={styles.ck}>async</span> (<span className={styles.cv}>sbx</span>) =&gt; &#123;
+                  {"  "}onResume: <span className={styles.ck}>async</span> (
+                  <span className={styles.cv}>sbx</span>) =&gt; &#123;
                 </div>
                 <div className={styles.codeLine}>
-                  {"    "}<span className={styles.ck}>await</span> sbx.runCommand(&#123;
+                  {"    "}
+                  <span className={styles.ck}>await</span> sbx.runCommand(&#123;
                 </div>
                 <div className={styles.codeLine}>
                   {"      "}cmd: <span className={styles.cs}>&quot;npm&quot;</span>,
                 </div>
                 <div className={styles.codeLine}>
-                  {"      "}args: [<span className={styles.cs}>&quot;run&quot;</span>, <span className={styles.cs}>&quot;dev&quot;</span>],
+                  {"      "}args: [<span className={styles.cs}>&quot;run&quot;</span>,{" "}
+                  <span className={styles.cs}>&quot;dev&quot;</span>],
                 </div>
                 <div className={styles.codeLine}>
-                  {"      "}detached: <span className={styles.ck}>true</span>,           <span className={styles.cc}>// バックグラウンドで実行</span>
+                  {"      "}detached: <span className={styles.ck}>true</span>,{" "}
+                  <span className={styles.cc}>{"// バックグラウンドで実行"}</span>
                 </div>
+                <div className={styles.codeLine}>{"    "}&#125;);</div>
                 <div className={styles.codeLine}>
-                  {"    "}&#125;);
+                  {"    "}console.log(
+                  <span className={styles.cs}>&quot;Dev サーバー起動！&quot;</span>);
                 </div>
-                <div className={styles.codeLine}>
-                  {"    "}console.log(<span className={styles.cs}>&quot;Dev サーバー起動！&quot;</span>);
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}&#125;,
-                </div>
-                <div className={styles.codeLine}>
-                  &#125;);
-                </div>
+                <div className={styles.codeLine}>{"  "}&#125;,</div>
+                <div className={styles.codeLine}>&#125;);</div>
               </code>
             </pre>
           </div>
@@ -1177,67 +1351,69 @@ export default function Page() {
             <pre>
               <code className="language-typescript">
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}>// ファイルの書き込み</span>
+                  <span className={styles.cc}>{"// ファイルの書き込み"}</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>await</span> sandbox.writeFiles([
                 </div>
+                <div className={styles.codeLine}>{"  "}&#123;</div>
                 <div className={styles.codeLine}>
-                  {"  "}&#123;
+                  {"    "}path:{" "}
+                  <span className={styles.cs}>&quot;/vercel/sandbox/src/index.ts&quot;</span>,
                 </div>
                 <div className={styles.codeLine}>
-                  {"    "}path: <span className={styles.cs}>&quot;/vercel/sandbox/src/index.ts&quot;</span>,
+                  {"    "}content: Buffer.from(
+                  <span className={styles.cs}>
+                    `export const hello = () =&gt; &quot;world&quot;;`
+                  </span>
+                  ),
+                </div>
+                <div className={styles.codeLine}>{"  "}&#125;,</div>
+                <div className={styles.codeLine}>{"  "}&#123;</div>
+                <div className={styles.codeLine}>
+                  {"    "}path:{" "}
+                  <span className={styles.cs}>&quot;/vercel/sandbox/scripts/run.sh&quot;</span>,
                 </div>
                 <div className={styles.codeLine}>
-                  {"    "}content: Buffer.from(<span className={styles.cs}>`export const hello = () =&gt; &quot;world&quot;;`</span>),
+                  {"    "}content: Buffer.from(
+                  <span className={styles.cs}>&quot;#!/bin/bash\\nnpm start&quot;</span>),
                 </div>
                 <div className={styles.codeLine}>
-                  {"  "}&#125;,
+                  {"    "}mode: <span className={styles.nm}>0o755</span>,{" "}
+                  <span className={styles.cc}>{"// 実行権限を付与（chmod +x 相当）"}</span>
                 </div>
-                <div className={styles.codeLine}>
-                  {"  "}&#123;
-                </div>
-                <div className={styles.codeLine}>
-                  {"    "}path: <span className={styles.cs}>&quot;/vercel/sandbox/scripts/run.sh&quot;</span>,
-                </div>
-                <div className={styles.codeLine}>
-                  {"    "}content: Buffer.from(<span className={styles.cs}>&quot;#!/bin/bash\\nnpm start&quot;</span>),
-                </div>
-                <div className={styles.codeLine}>
-                  {"    "}mode: <span className={styles.nm}>0o755</span>,                <span className={styles.cc}>// 実行権限を付与（chmod +x 相当）</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}&#125;,
-                </div>
-                <div className={styles.codeLine}>
-                  ]);
-                </div>
+                <div className={styles.codeLine}>{"  "}&#125;,</div>
+                <div className={styles.codeLine}>]);</div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}>// ファイルの読み込み</span>
+                  <span className={styles.cc}>{"// ファイルの読み込み"}</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>const</span> <span className={styles.cv}>buf</span> = <span className={styles.ck}>await</span> sandbox.readFileToBuffer(&#123; path: <span className={styles.cs}>&quot;dist/output.js&quot;</span> &#125;);
+                  <span className={styles.ck}>const</span> <span className={styles.cv}>buf</span> ={" "}
+                  <span className={styles.ck}>await</span> sandbox.readFileToBuffer(&#123; path:{" "}
+                  <span className={styles.cs}>&quot;dist/output.js&quot;</span> &#125;);
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>if</span> (buf) console.log(buf.toString());
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}>// ローカルにダウンロード</span>
+                  <span className={styles.cc}>{"// ローカルにダウンロード"}</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>await</span> sandbox.downloadFile(
                 </div>
                 <div className={styles.codeLine}>
-                  {"  "}&#123; path: <span className={styles.cs}>&quot;/vercel/sandbox/coverage/lcov.info&quot;</span> &#125;,
+                  {"  "}&#123; path:{" "}
+                  <span className={styles.cs}>&quot;/vercel/sandbox/coverage/lcov.info&quot;</span>{" "}
+                  &#125;,
                 </div>
                 <div className={styles.codeLine}>
-                  {"  "}&#123; path: <span className={styles.cs}>&quot;./reports/lcov.info&quot;</span>, mkdirRecursive: <span className={styles.ck}>true</span> &#125;
+                  {"  "}&#123; path:{" "}
+                  <span className={styles.cs}>&quot;./reports/lcov.info&quot;</span>,
+                  mkdirRecursive: <span className={styles.ck}>true</span> &#125;
                 </div>
-                <div className={styles.codeLine}>
-                  );
-                </div>
+                <div className={styles.codeLine}>);</div>
               </code>
             </pre>
           </div>
@@ -1254,20 +1430,22 @@ export default function Page() {
             <pre>
               <code className="language-typescript">
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>const</span> <span className={styles.cv}>sandbox</span> = <span className={styles.ck}>await</span> Sandbox.create(&#123;
+                  <span className={styles.ck}>const</span>{" "}
+                  <span className={styles.cv}>sandbox</span> ={" "}
+                  <span className={styles.ck}>await</span> Sandbox.create(&#123;
                 </div>
                 <div className={styles.codeLine}>
                   {"  "}name: <span className={styles.cs}>&quot;web-preview&quot;</span>,
                 </div>
                 <div className={styles.codeLine}>
-                  {"  "}ports: [<span className={styles.nm}>3000</span>, <span className={styles.nm}>8080</span>],           <span className={styles.cc}>// 公開するポート番号</span>
+                  {"  "}ports: [<span className={styles.nm}>3000</span>,{" "}
+                  <span className={styles.nm}>8080</span>],{" "}
+                  <span className={styles.cc}>{"// 公開するポート番号"}</span>
                 </div>
-                <div className={styles.codeLine}>
-                  &#125;);
-                </div>
+                <div className={styles.codeLine}>&#125;);</div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}>// Dev サーバーをバックグラウンドで起動</span>
+                  <span className={styles.cc}>{"// Dev サーバーをバックグラウンドで起動"}</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>await</span> sandbox.runCommand(&#123;
@@ -1276,26 +1454,30 @@ export default function Page() {
                   {"  "}cmd: <span className={styles.cs}>&quot;npm&quot;</span>,
                 </div>
                 <div className={styles.codeLine}>
-                  {"  "}args: [<span className={styles.cs}>&quot;run&quot;</span>, <span className={styles.cs}>&quot;dev&quot;</span>],
+                  {"  "}args: [<span className={styles.cs}>&quot;run&quot;</span>,{" "}
+                  <span className={styles.cs}>&quot;dev&quot;</span>],
                 </div>
                 <div className={styles.codeLine}>
                   {"  "}detached: <span className={styles.ck}>true</span>,
                 </div>
-                <div className={styles.codeLine}>
-                  &#125;);
-                </div>
+                <div className={styles.codeLine}>&#125;);</div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}>// 公開 URL を取得</span>
+                  <span className={styles.cc}>{"// 公開 URL を取得"}</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>const</span> <span className={styles.cv}>previewUrl</span> = sandbox.domain(<span className={styles.nm}>3000</span>);
+                  <span className={styles.ck}>const</span>{" "}
+                  <span className={styles.cv}>previewUrl</span> = sandbox.domain(
+                  <span className={styles.nm}>3000</span>);
                 </div>
                 <div className={styles.codeLine}>
-                  console.log(<span className={styles.cs}>&quot;プレビュー URL:&quot;</span>, previewUrl);
+                  console.log(<span className={styles.cs}>&quot;プレビュー URL:&quot;</span>,
+                  previewUrl);
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}>// =&gt; https://xxxxxxxx-3000.sandbox.vercel.app</span>
+                  <span className={styles.cc}>
+                    {"// =&gt; https://xxxxxxxx-3000.sandbox.vercel.app"}
+                  </span>
                 </div>
               </code>
             </pre>
@@ -1327,128 +1509,145 @@ export default function Page() {
             <pre>
               <code className="language-bash">
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># ─── 作成 ──────────────────────────────────────────────</span>
+                  <span className={styles.cc}>
+                    {"# ─── 作成 ──────────────────────────────────────────────"}
+                  </span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># 基本（Node.js 24）</span>
+                  <span className={styles.cc}>{"# 基本（Node.js 24）"}</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>sandbox</span> create --name my-sandbox
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># Python ランタイムで 1 時間タイムアウト</span>
+                  <span className={styles.cc}>{"# Python ランタイムで 1 時間タイムアウト"}</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>sandbox</span> create --runtime python3.13 --timeout 1h --name py-box
+                  <span className={styles.ck}>sandbox</span> create --runtime python3.13 --timeout
+                  1h --name py-box
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># 作成と同時にシェルに接続</span>
+                  <span className={styles.cc}>{"# 作成と同時にシェルに接続"}</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>sandbox</span> create --name dev-box --connect
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># ポートを公開（Dev サーバー向け）</span>
+                  <span className={styles.cc}>{"# ポートを公開（Dev サーバー向け）"}</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>sandbox</span> create --name web-app --publish-port 3000
+                  <span className={styles.ck}>sandbox</span> create --name web-app --publish-port
+                  3000
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># 非永続（一時）サンドボックス</span>
+                  <span className={styles.cc}>{"# 非永続（一時）サンドボックス"}</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>sandbox</span> create --name ci-task --non-persistent
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># Snapshot 7日保持 + 最新1件のみ</span>
+                  <span className={styles.cc}>{"# Snapshot 7日保持 + 最新1件のみ"}</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>sandbox</span> create --name long-lived \
                 </div>
-                <div className={styles.codeLine}>
-                  {"  "}--snapshot-expiration 7d \
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}--keep-last-snapshots 1
-                </div>
+                <div className={styles.codeLine}>{"  "}--snapshot-expiration 7d \</div>
+                <div className={styles.codeLine}>{"  "}--keep-last-snapshots 1</div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># ─── コマンド実行 ───────────────────────────────────────</span>
+                  <span className={styles.cc}>
+                    {"# ─── コマンド実行 ───────────────────────────────────────"}
+                  </span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># 停止中でも自動再開してからコマンド実行</span>
+                  <span className={styles.cc}>{"# 停止中でも自動再開してからコマンド実行"}</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>sandbox</span> run --name my-sandbox -- npm test
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># 起動中の Sandbox にコマンドを送信</span>
+                  <span className={styles.cc}>{"# 起動中の Sandbox にコマンドを送信"}</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>sandbox</span> exec my-sandbox -- node script.js
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># sudo でシステムパッケージをインストール</span>
+                  <span className={styles.cc}>{"# sudo でシステムパッケージをインストール"}</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>sandbox</span> exec --sudo my-sandbox -- dnf install -y curl
+                  <span className={styles.ck}>sandbox</span> exec --sudo my-sandbox -- dnf install
+                  -y curl
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># インタラクティブシェルに接続</span>
+                  <span className={styles.cc}>{"# インタラクティブシェルに接続"}</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>sandbox</span> connect my-sandbox
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># ─── ファイル操作 ──────────────────────────────────────</span>
+                  <span className={styles.cc}>
+                    {"# ─── ファイル操作 ──────────────────────────────────────"}
+                  </span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># ローカル → Sandbox</span>
+                  <span className={styles.cc}>{"# ローカル → Sandbox"}</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>sandbox</span> copy ./local.txt my-sandbox:/vercel/sandbox/remote.txt
-                </div>
-                <div className={styles.codeLine} />
-                <div className={styles.codeLine}>
-                  <span className={styles.cc}># Sandbox → ローカル</span>
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.ck}>sandbox</span> copy my-sandbox:/vercel/sandbox/output.log ./logs/
+                  <span className={styles.ck}>sandbox</span> copy ./local.txt
+                  my-sandbox:/vercel/sandbox/remote.txt
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># ─── 設定変更 ──────────────────────────────────────────</span>
+                  <span className={styles.cc}>{"# Sandbox → ローカル"}</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>sandbox</span> config list my-sandbox           <span className={styles.cc}># 現在の設定を確認</span>
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.ck}>sandbox</span> config vcpus my-sandbox 4        <span className={styles.cc}># 4 vCPU に変更</span>
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.ck}>sandbox</span> config timeout my-sandbox 30m   <span className={styles.cc}># タイムアウト 30 分</span>
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.ck}>sandbox</span> config tags my-sandbox --tag env=staging --tag team=backend
+                  <span className={styles.ck}>sandbox</span> copy
+                  my-sandbox:/vercel/sandbox/output.log ./logs/
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># ─── 停止・削除 ────────────────────────────────────────</span>
+                  <span className={styles.cc}>
+                    {"# ─── 設定変更 ──────────────────────────────────────────"}
+                  </span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>sandbox</span> stop my-sandbox                  <span className={styles.cc}># 停止（Snapshot 保存）</span>
+                  <span className={styles.ck}>sandbox</span> config list my-sandbox{" "}
+                  <span className={styles.cc}>{"# 現在の設定を確認"}</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>sandbox</span> remove my-sandbox               <span className={styles.cc}># 完全削除（Snapshot も消去）</span>
+                  <span className={styles.ck}>sandbox</span> config vcpus my-sandbox 4{" "}
+                  <span className={styles.cc}>{"# 4 vCPU に変更"}</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.ck}>sandbox</span> config timeout my-sandbox 30m{" "}
+                  <span className={styles.cc}>{"# タイムアウト 30 分"}</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.ck}>sandbox</span> config tags my-sandbox --tag
+                  env=staging --tag team=backend
+                </div>
+                <div className={styles.codeLine} />
+                <div className={styles.codeLine}>
+                  <span className={styles.cc}>
+                    {"# ─── 停止・削除 ────────────────────────────────────────"}
+                  </span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.ck}>sandbox</span> stop my-sandbox{" "}
+                  <span className={styles.cc}>{"# 停止（Snapshot 保存）"}</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.ck}>sandbox</span> remove my-sandbox{" "}
+                  <span className={styles.cc}>{"# 完全削除（Snapshot も消去）"}</span>
                 </div>
               </code>
             </pre>
@@ -1466,13 +1665,21 @@ export default function Page() {
               </thead>
               <tbody>
                 <tr>
-                  <td><code>sandbox run</code></td>
+                  <td>
+                    <code>sandbox run</code>
+                  </td>
                   <td>停止中・起動中どちらでも OK</td>
-                  <td>停止中なら <strong>自動的に再開</strong>してから実行</td>
+                  <td>
+                    停止中なら <strong>自動的に再開</strong>してから実行
+                  </td>
                 </tr>
                 <tr>
-                  <td><code>sandbox exec</code></td>
-                  <td><strong>起動中のみ</strong></td>
+                  <td>
+                    <code>sandbox exec</code>
+                  </td>
+                  <td>
+                    <strong>起動中のみ</strong>
+                  </td>
                   <td>停止中の場合はエラー</td>
                 </tr>
               </tbody>
@@ -1490,7 +1697,9 @@ export default function Page() {
           <h3>ライフサイクル全体フロー（シーケンス）</h3>
           <div className={styles.mermaidWrap}>
             <MermaidDiagram chart={DIAG_LIFECYCLE} id="diag-lifecycle" />
-            <p className={styles.mermaidCaption}>停止 → スナップショット → 再開 の完全なシーケンス</p>
+            <p className={styles.mermaidCaption}>
+              停止 → スナップショット → 再開 の完全なシーケンス
+            </p>
           </div>
 
           <h3>ライフサイクルフック（onCreate と onResume）</h3>
@@ -1505,13 +1714,21 @@ export default function Page() {
               </thead>
               <tbody>
                 <tr>
-                  <td><code>onCreate</code></td>
-                  <td>Sandbox が<strong>初回作成されたとき</strong>のみ</td>
+                  <td>
+                    <code>onCreate</code>
+                  </td>
+                  <td>
+                    Sandbox が<strong>初回作成されたとき</strong>のみ
+                  </td>
                   <td>重い初期化（git clone、npm install 等）</td>
                 </tr>
                 <tr>
-                  <td><code>onResume</code></td>
-                  <td><strong>毎回の再開時</strong>（自動再開も含む）</td>
+                  <td>
+                    <code>onResume</code>
+                  </td>
+                  <td>
+                    <strong>毎回の再開時</strong>（自動再開も含む）
+                  </td>
                   <td>バックグラウンドサービスの再起動、キャッシュの再読み込み</td>
                 </tr>
               </tbody>
@@ -1529,49 +1746,69 @@ export default function Page() {
             <pre>
               <code className="language-typescript">
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>const</span> <span className={styles.cv}>sandbox</span> = <span className={styles.ck}>await</span> Sandbox.getOrCreate(&#123;
+                  <span className={styles.ck}>const</span>{" "}
+                  <span className={styles.cv}>sandbox</span> ={" "}
+                  <span className={styles.ck}>await</span> Sandbox.getOrCreate(&#123;
                 </div>
                 <div className={styles.codeLine}>
                   {"  "}name: <span className={styles.cs}>&quot;agent-workspace&quot;</span>,
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  {"  "}<span className={styles.cc}>// ✅ 初回のみ（重い処理）</span>
+                  {"  "}
+                  <span className={styles.cc}>{"// ✅ 初回のみ（重い処理）"}</span>
                 </div>
                 <div className={styles.codeLine}>
-                  {"  "}onCreate: <span className={styles.ck}>async</span> (<span className={styles.cv}>sbx</span>) =&gt; &#123;
+                  {"  "}onCreate: <span className={styles.ck}>async</span> (
+                  <span className={styles.cv}>sbx</span>) =&gt; &#123;
                 </div>
                 <div className={styles.codeLine}>
-                  {"    "}<span className={styles.ck}>await</span> sbx.runCommand(<span className={styles.cs}>&quot;git&quot;</span>, [<span className={styles.cs}>&quot;clone&quot;</span>, repoUrl, <span className={styles.cs}>&quot;.&quot;</span>]);
+                  {"    "}
+                  <span className={styles.ck}>await</span> sbx.runCommand(
+                  <span className={styles.cs}>&quot;git&quot;</span>, [
+                  <span className={styles.cs}>&quot;clone&quot;</span>, repoUrl,{" "}
+                  <span className={styles.cs}>&quot;.&quot;</span>]);
                 </div>
                 <div className={styles.codeLine}>
-                  {"    "}<span className={styles.ck}>await</span> sbx.runCommand(<span className={styles.cs}>&quot;npm&quot;</span>, [<span className={styles.cs}>&quot;install&quot;</span>]);
+                  {"    "}
+                  <span className={styles.ck}>await</span> sbx.runCommand(
+                  <span className={styles.cs}>&quot;npm&quot;</span>, [
+                  <span className={styles.cs}>&quot;install&quot;</span>]);
                 </div>
                 <div className={styles.codeLine}>
-                  {"    "}<span className={styles.ck}>await</span> sbx.runCommand(<span className={styles.cs}>&quot;pip&quot;</span>, [<span className={styles.cs}>&quot;install&quot;</span>, <span className={styles.cs}>&quot;-r&quot;</span>, <span className={styles.cs}>&quot;requirements.txt&quot;</span>]);
+                  {"    "}
+                  <span className={styles.ck}>await</span> sbx.runCommand(
+                  <span className={styles.cs}>&quot;pip&quot;</span>, [
+                  <span className={styles.cs}>&quot;install&quot;</span>,{" "}
+                  <span className={styles.cs}>&quot;-r&quot;</span>,{" "}
+                  <span className={styles.cs}>&quot;requirements.txt&quot;</span>]);
                 </div>
-                <div className={styles.codeLine}>
-                  {"  "}&#125;,
-                </div>
+                <div className={styles.codeLine}>{"  "}&#125;,</div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  {"  "}<span className={styles.cc}>// ✅ 毎回の再開時（軽量な再起動）</span>
+                  {"  "}
+                  <span className={styles.cc}>{"// ✅ 毎回の再開時（軽量な再起動）"}</span>
                 </div>
                 <div className={styles.codeLine}>
-                  {"  "}onResume: <span className={styles.ck}>async</span> (<span className={styles.cv}>sbx</span>) =&gt; &#123;
+                  {"  "}onResume: <span className={styles.ck}>async</span> (
+                  <span className={styles.cv}>sbx</span>) =&gt; &#123;
                 </div>
                 <div className={styles.codeLine}>
-                  {"    "}<span className={styles.ck}>await</span> sbx.runCommand(&#123; cmd: <span className={styles.cs}>&quot;redis-server&quot;</span>, detached: <span className={styles.ck}>true</span> &#125;);
+                  {"    "}
+                  <span className={styles.ck}>await</span> sbx.runCommand(&#123; cmd:{" "}
+                  <span className={styles.cs}>&quot;redis-server&quot;</span>, detached:{" "}
+                  <span className={styles.ck}>true</span> &#125;);
                 </div>
                 <div className={styles.codeLine}>
-                  {"    "}<span className={styles.ck}>await</span> sbx.runCommand(&#123; cmd: <span className={styles.cs}>&quot;npm&quot;</span>, args: [<span className={styles.cs}>&quot;run&quot;</span>, <span className={styles.cs}>&quot;dev&quot;</span>], detached: <span className={styles.ck}>true</span> &#125;);
+                  {"    "}
+                  <span className={styles.ck}>await</span> sbx.runCommand(&#123; cmd:{" "}
+                  <span className={styles.cs}>&quot;npm&quot;</span>, args: [
+                  <span className={styles.cs}>&quot;run&quot;</span>,{" "}
+                  <span className={styles.cs}>&quot;dev&quot;</span>], detached:{" "}
+                  <span className={styles.ck}>true</span> &#125;);
                 </div>
-                <div className={styles.codeLine}>
-                  {"  "}&#125;,
-                </div>
-                <div className={styles.codeLine}>
-                  &#125;);
-                </div>
+                <div className={styles.codeLine}>{"  "}&#125;,</div>
+                <div className={styles.codeLine}>&#125;);</div>
               </code>
             </pre>
           </div>
@@ -1601,32 +1838,35 @@ export default function Page() {
             <pre>
               <code className="language-typescript">
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}>// ✅ 最新 1 件のみ保持してストレージコストを最小化</span>
+                  <span className={styles.cc}>
+                    {"// ✅ 最新 1 件のみ保持してストレージコストを最小化"}
+                  </span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>const</span> <span className={styles.cv}>sandbox</span> = <span className={styles.ck}>await</span> Sandbox.create(&#123;
+                  <span className={styles.ck}>const</span>{" "}
+                  <span className={styles.cv}>sandbox</span> ={" "}
+                  <span className={styles.ck}>await</span> Sandbox.create(&#123;
                 </div>
                 <div className={styles.codeLine}>
                   {"  "}name: <span className={styles.cs}>&quot;my-sandbox&quot;</span>,
                 </div>
                 <div className={styles.codeLine}>
-                  {"  "}snapshotExpiration: <span className={styles.nm}>7</span> * <span className={styles.nm}>24</span> * <span className={styles.nm}>60</span> * <span className={styles.nm}>60</span> * <span className={styles.nm}>1000</span>,   <span className={styles.cc}>// 7日</span>
+                  {"  "}snapshotExpiration: <span className={styles.nm}>7</span> *{" "}
+                  <span className={styles.nm}>24</span> * <span className={styles.nm}>60</span> *{" "}
+                  <span className={styles.nm}>60</span> * <span className={styles.nm}>1000</span>,{" "}
+                  <span className={styles.cc}>{"// 7日"}</span>
+                </div>
+                <div className={styles.codeLine}>{"  "}keepLastSnapshots: &#123;</div>
+                <div className={styles.codeLine}>
+                  {"    "}count: <span className={styles.nm}>1</span>,{" "}
+                  <span className={styles.cc}>{"// 最新 1 件のみ"}</span>
                 </div>
                 <div className={styles.codeLine}>
-                  {"  "}keepLastSnapshots: &#123;
+                  {"    "}deleteEvicted: <span className={styles.ck}>true</span>,{" "}
+                  <span className={styles.cc}>{"// 古いものは即座に削除"}</span>
                 </div>
-                <div className={styles.codeLine}>
-                  {"    "}count: <span className={styles.nm}>1</span>,               <span className={styles.cc}>// 最新 1 件のみ</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"    "}deleteEvicted: <span className={styles.ck}>true</span>,    <span className={styles.cc}>// 古いものは即座に削除</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}&#125;,
-                </div>
-                <div className={styles.codeLine}>
-                  &#125;);
-                </div>
+                <div className={styles.codeLine}>{"  "}&#125;,</div>
+                <div className={styles.codeLine}>&#125;);</div>
               </code>
             </pre>
           </div>
@@ -1643,35 +1883,41 @@ export default function Page() {
             <pre>
               <code className="language-bash">
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># 手動でスナップショットを作成</span>
+                  <span className={styles.cc}>{"# 手動でスナップショットを作成"}</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>sandbox</span> snapshot my-sandbox
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># スナップショット一覧を表示</span>
+                  <span className={styles.cc}>{"# スナップショット一覧を表示"}</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>sandbox</span> snapshots list my-sandbox
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># 特定スナップショットに巻き戻し</span>
+                  <span className={styles.cc}>{"# 特定スナップショットに巻き戻し"}</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>sandbox</span> config current-snapshot my-sandbox snap_abc123
-                </div>
-                <div className={styles.codeLine} />
-                <div className={styles.codeLine}>
-                  <span className={styles.cc}># 特定スナップショットから新規 Sandbox を作成</span>
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.ck}>sandbox</span> create --name forked-sandbox --snapshot snap_abc123
+                  <span className={styles.ck}>sandbox</span> config current-snapshot my-sandbox
+                  snap_abc123
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># 既存 Sandbox をフォーク（スナップショットを継承）</span>
+                  <span className={styles.cc}>
+                    {"# 特定スナップショットから新規 Sandbox を作成"}
+                  </span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.ck}>sandbox</span> create --name forked-sandbox --snapshot
+                  snap_abc123
+                </div>
+                <div className={styles.codeLine} />
+                <div className={styles.codeLine}>
+                  <span className={styles.cc}>
+                    {"# 既存 Sandbox をフォーク（スナップショットを継承）"}
+                  </span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>sandbox</span> fork my-sandbox --name my-fork
@@ -1704,12 +1950,18 @@ export default function Page() {
               </thead>
               <tbody>
                 <tr>
-                  <td><code>allow-all</code></td>
-                  <td>すべての通信を許可（<strong>デフォルト</strong>）</td>
+                  <td>
+                    <code>allow-all</code>
+                  </td>
+                  <td>
+                    すべての通信を許可（<strong>デフォルト</strong>）
+                  </td>
                   <td>開発・テスト</td>
                 </tr>
                 <tr>
-                  <td><code>deny-all</code></td>
+                  <td>
+                    <code>deny-all</code>
+                  </td>
                   <td>すべての通信を遮断</td>
                   <td>最高セキュリティが必要な実行</td>
                 </tr>
@@ -1733,37 +1985,39 @@ export default function Page() {
             <pre>
               <code className="language-bash">
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># すべて遮断（最もセキュア）</span>
+                  <span className={styles.cc}>{"# すべて遮断（最もセキュア）"}</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>sandbox</span> create --name secure-box --network-policy deny-all
-                </div>
-                <div className={styles.codeLine} />
-                <div className={styles.codeLine}>
-                  <span className={styles.cc}># Vercel AI ゲートウェイのみ許可</span>
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.ck}>sandbox</span> create --name ai-box --allowed-domain ai-gateway.vercel.sh
+                  <span className={styles.ck}>sandbox</span> create --name secure-box
+                  --network-policy deny-all
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># ワイルドカードでサブドメインを許可</span>
+                  <span className={styles.cc}>{"# Vercel AI ゲートウェイのみ許可"}</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.ck}>sandbox</span> create --name ai-box --allowed-domain
+                  ai-gateway.vercel.sh
+                </div>
+                <div className={styles.codeLine} />
+                <div className={styles.codeLine}>
+                  <span className={styles.cc}>{"# ワイルドカードでサブドメインを許可"}</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>sandbox</span> create --name api-box \
                 </div>
                 <div className={styles.codeLine}>
-                  {"  "}--allowed-domain <span className={styles.cs}>&quot;*.vercel.app&quot;</span> \
+                  {"  "}--allowed-domain <span className={styles.cs}>&quot;*.vercel.app&quot;</span>{" "}
+                  \
                 </div>
-                <div className={styles.codeLine}>
-                  {"  "}--allowed-domain api.example.com
-                </div>
+                <div className={styles.codeLine}>{"  "}--allowed-domain api.example.com</div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># 実行後に設定変更（動的に変更可能）</span>
+                  <span className={styles.cc}>{"# 実行後に設定変更（動的に変更可能）"}</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>sandbox</span> config network-policy my-sandbox --mode deny-all
+                  <span className={styles.ck}>sandbox</span> config network-policy my-sandbox --mode
+                  deny-all
                 </div>
               </code>
             </pre>
@@ -1777,7 +2031,8 @@ export default function Page() {
           <div className={styles.sectionEyebrow}>Section 13</div>
           <h2>タグによる管理</h2>
           <p className={styles.sectionIntro}>
-            タグ（Tags）は Sandbox を <strong>環境・チーム・用途</strong> などで分類するためのキーバリューペアです（最大 5 個）。
+            タグ（Tags）は Sandbox を <strong>環境・チーム・用途</strong>{" "}
+            などで分類するためのキーバリューペアです（最大 5 個）。
           </p>
 
           <div className={styles.mermaidWrap}>
@@ -1796,43 +2051,33 @@ export default function Page() {
             <pre>
               <code className="language-bash">
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># 作成時にタグを付与</span>
+                  <span className={styles.cc}>{"# 作成時にタグを付与"}</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>sandbox</span> create --name prod-sandbox \
                 </div>
-                <div className={styles.codeLine}>
-                  {"  "}--tag env=production \
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}--tag team=backend \
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}--tag version=2.0
-                </div>
+                <div className={styles.codeLine}>{"  "}--tag env=production \</div>
+                <div className={styles.codeLine}>{"  "}--tag team=backend \</div>
+                <div className={styles.codeLine}>{"  "}--tag version=2.0</div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># タグでフィルタして一覧表示</span>
+                  <span className={styles.cc}>{"# タグでフィルタして一覧表示"}</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>sandbox</span> list --tag env=staging
                 </div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># タグを更新（既存タグはすべて置き換え）</span>
+                  <span className={styles.cc}>{"# タグを更新（既存タグはすべて置き換え）"}</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>sandbox</span> config tags my-sandbox \
                 </div>
-                <div className={styles.codeLine}>
-                  {"  "}--tag env=production \
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}--tag team=platform
-                </div>
+                <div className={styles.codeLine}>{"  "}--tag env=production \</div>
+                <div className={styles.codeLine}>{"  "}--tag team=platform</div>
                 <div className={styles.codeLine} />
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}># タグをすべてクリア</span>
+                  <span className={styles.cc}>{"# タグをすべてクリア"}</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>sandbox</span> config tags my-sandbox
@@ -1870,10 +2115,11 @@ export default function Page() {
                 <pre>
                   <code className="language-typescript">
                     <div className={styles.codeLine}>
-                      <span className={styles.cc}>// Snapshot が無制限に蓄積される</span>
+                      <span className={styles.cc}>{"// Snapshot が無制限に蓄積される"}</span>
                     </div>
                     <div className={styles.codeLine}>
-                      <span className={styles.ck}>await</span> Sandbox.create(&#123; name: <span className={styles.cs}>&quot;my-sandbox&quot;</span> &#125;);
+                      <span className={styles.ck}>await</span> Sandbox.create(&#123; name:{" "}
+                      <span className={styles.cs}>&quot;my-sandbox&quot;</span> &#125;);
                     </div>
                   </code>
                 </pre>
@@ -1892,7 +2138,7 @@ export default function Page() {
                 <pre>
                   <code className="language-typescript">
                     <div className={styles.codeLine}>
-                      <span className={styles.cc}>// 最新 1 件のみ保持してコスト最小化</span>
+                      <span className={styles.cc}>{"// 最新 1 件のみ保持してコスト最小化"}</span>
                     </div>
                     <div className={styles.codeLine}>
                       <span className={styles.ck}>await</span> Sandbox.create(&#123;
@@ -1901,14 +2147,16 @@ export default function Page() {
                       {"  "}name: <span className={styles.cs}>&quot;my-sandbox&quot;</span>,
                     </div>
                     <div className={styles.codeLine}>
-                      {"  "}snapshotExpiration: <span className={styles.nm}>7</span> * <span className={styles.nm}>24</span> * <span className={styles.nm}>60</span> * <span className={styles.nm}>60</span> * <span className={styles.nm}>1000</span>,
+                      {"  "}snapshotExpiration: <span className={styles.nm}>7</span> *{" "}
+                      <span className={styles.nm}>24</span> * <span className={styles.nm}>60</span>{" "}
+                      * <span className={styles.nm}>60</span> *{" "}
+                      <span className={styles.nm}>1000</span>,
                     </div>
                     <div className={styles.codeLine}>
-                      {"  "}keepLastSnapshots: &#123; count: <span className={styles.nm}>1</span>, deleteEvicted: <span className={styles.ck}>true</span> &#125;,
+                      {"  "}keepLastSnapshots: &#123; count: <span className={styles.nm}>1</span>,
+                      deleteEvicted: <span className={styles.ck}>true</span> &#125;,
                     </div>
-                    <div className={styles.codeLine}>
-                      &#125;);
-                    </div>
+                    <div className={styles.codeLine}>&#125;);</div>
                   </code>
                 </pre>
               </div>
@@ -1931,10 +2179,13 @@ export default function Page() {
                 <pre>
                   <code className="language-typescript">
                     <div className={styles.codeLine}>
-                      <span className={styles.cc}>// CI で永続モード → 不要な Snapshot 課金</span>
+                      <span className={styles.cc}>
+                        {"// CI で永続モード → 不要な Snapshot 課金"}
+                      </span>
                     </div>
                     <div className={styles.codeLine}>
-                      <span className={styles.ck}>await</span> Sandbox.create(&#123; name: <span className={styles.cs}>&quot;ci-run-123&quot;</span> &#125;);
+                      <span className={styles.ck}>await</span> Sandbox.create(&#123; name:{" "}
+                      <span className={styles.cs}>&quot;ci-run-123&quot;</span> &#125;);
                     </div>
                   </code>
                 </pre>
@@ -1953,7 +2204,7 @@ export default function Page() {
                 <pre>
                   <code className="language-typescript">
                     <div className={styles.codeLine}>
-                      <span className={styles.cc}>// non-persistent で課金ゼロ</span>
+                      <span className={styles.cc}>{"// non-persistent で課金ゼロ"}</span>
                     </div>
                     <div className={styles.codeLine}>
                       <span className={styles.ck}>await</span> Sandbox.create(&#123;
@@ -1965,11 +2216,11 @@ export default function Page() {
                       {"  "}persistent: <span className={styles.ck}>false</span>,
                     </div>
                     <div className={styles.codeLine}>
-                      {"  "}timeout: <span className={styles.nm}>15</span> * <span className={styles.nm}>60</span> * <span className={styles.nm}>1000</span>,
+                      {"  "}timeout: <span className={styles.nm}>15</span> *{" "}
+                      <span className={styles.nm}>60</span> *{" "}
+                      <span className={styles.nm}>1000</span>,
                     </div>
-                    <div className={styles.codeLine}>
-                      &#125;);
-                    </div>
+                    <div className={styles.codeLine}>&#125;);</div>
                   </code>
                 </pre>
               </div>
@@ -1992,10 +2243,14 @@ export default function Page() {
                 <pre>
                   <code className="language-typescript">
                     <div className={styles.codeLine}>
-                      <span className={styles.cc}>// 2 回目は同名 Sandbox が既に存在しエラー</span>
+                      <span className={styles.cc}>
+                        {"// 2 回目は同名 Sandbox が既に存在しエラー"}
+                      </span>
                     </div>
                     <div className={styles.codeLine}>
-                      <span className={styles.ck}>const</span> <span className={styles.cv}>sb</span> = <span className={styles.ck}>await</span> Sandbox.create(&#123; name: <span className={styles.cs}>&quot;dev&quot;</span> &#125;);
+                      <span className={styles.ck}>const</span> <span className={styles.cv}>sb</span>{" "}
+                      = <span className={styles.ck}>await</span> Sandbox.create(&#123; name:{" "}
+                      <span className={styles.cs}>&quot;dev&quot;</span> &#125;);
                     </div>
                   </code>
                 </pre>
@@ -2014,10 +2269,14 @@ export default function Page() {
                 <pre>
                   <code className="language-typescript">
                     <div className={styles.codeLine}>
-                      <span className={styles.cc}>// 「あれば再開・なければ作成」で常に安全</span>
+                      <span className={styles.cc}>
+                        {"// 「あれば再開・なければ作成」で常に安全"}
+                      </span>
                     </div>
                     <div className={styles.codeLine}>
-                      <span className={styles.ck}>const</span> <span className={styles.cv}>sb</span> = <span className={styles.ck}>await</span> Sandbox.getOrCreate(&#123; name: <span className={styles.cs}>&quot;dev&quot;</span> &#125;);
+                      <span className={styles.ck}>const</span> <span className={styles.cv}>sb</span>{" "}
+                      = <span className={styles.ck}>await</span> Sandbox.getOrCreate(&#123; name:{" "}
+                      <span className={styles.cs}>&quot;dev&quot;</span> &#125;);
                     </div>
                   </code>
                 </pre>
@@ -2041,7 +2300,7 @@ export default function Page() {
                 <pre>
                   <code className="language-typescript">
                     <div className={styles.codeLine}>
-                      <span className={styles.cc}>// 用途不明なランダム名が生成される</span>
+                      <span className={styles.cc}>{"// 用途不明なランダム名が生成される"}</span>
                     </div>
                     <div className={styles.codeLine}>
                       <span className={styles.ck}>await</span> Sandbox.create();
@@ -2063,20 +2322,20 @@ export default function Page() {
                 <pre>
                   <code className="language-typescript">
                     <div className={styles.codeLine}>
-                      <span className={styles.cc}>// ユーザー ID 等を含めた意味のある名前</span>
+                      <span className={styles.cc}>{"// ユーザー ID 等を含めた意味のある名前"}</span>
                     </div>
                     <div className={styles.codeLine}>
                       <span className={styles.ck}>await</span> Sandbox.create(&#123;
                     </div>
                     <div className={styles.codeLine}>
-                      {"  "}name: <span className={styles.cs}>`user-$&#123;userId&#125;-workspace`</span>,
+                      {"  "}name:{" "}
+                      <span className={styles.cs}>`user-$&#123;userId&#125;-workspace`</span>,
                     </div>
                     <div className={styles.codeLine}>
-                      {"  "}tags: &#123; userId, env: <span className={styles.cs}>&quot;development&quot;</span> &#125;,
+                      {"  "}tags: &#123; userId, env:{" "}
+                      <span className={styles.cs}>&quot;development&quot;</span> &#125;,
                     </div>
-                    <div className={styles.codeLine}>
-                      &#125;);
-                    </div>
+                    <div className={styles.codeLine}>&#125;);</div>
                   </code>
                 </pre>
               </div>
@@ -2097,17 +2356,23 @@ export default function Page() {
                 <tr>
                   <td>インタラクティブ開発</td>
                   <td>長め（1時間）</td>
-                  <td><code>--timeout 1h</code></td>
+                  <td>
+                    <code>--timeout 1h</code>
+                  </td>
                 </tr>
                 <tr>
                   <td>AI エージェントのタスク</td>
                   <td>中程度（30分）</td>
-                  <td><code>--timeout 30m</code></td>
+                  <td>
+                    <code>--timeout 30m</code>
+                  </td>
                 </tr>
                 <tr>
                   <td>CI/CD ビルド</td>
                   <td>短め（15分）</td>
-                  <td><code>--timeout 15m</code></td>
+                  <td>
+                    <code>--timeout 15m</code>
+                  </td>
                 </tr>
                 <tr>
                   <td>デフォルト</td>
@@ -2145,28 +2410,42 @@ export default function Page() {
                 <div className={styles.resourceUrl}>vercel.com/docs/sandbox</div>
               </div>
             </Ext>
-            <Ext className={styles.resourceCard} href="https://vercel.com/docs/sandbox/cli-reference">
+            <Ext
+              className={styles.resourceCard}
+              href="https://vercel.com/docs/sandbox/cli-reference"
+            >
               <span className={styles.resourceIcon}>⌨️</span>
               <div>
                 <div className={styles.resourceTitle}>CLI 完全リファレンス</div>
                 <div className={styles.resourceUrl}>vercel.com/docs/sandbox/cli-reference</div>
               </div>
             </Ext>
-            <Ext className={styles.resourceCard} href="https://vercel.com/docs/sandbox/sdk-reference">
+            <Ext
+              className={styles.resourceCard}
+              href="https://vercel.com/docs/sandbox/sdk-reference"
+            >
               <span className={styles.resourceIcon}>📦</span>
               <div>
                 <div className={styles.resourceTitle}>JS SDK リファレンス</div>
                 <div className={styles.resourceUrl}>vercel.com/docs/sandbox/sdk-reference</div>
               </div>
             </Ext>
-            <Ext className={styles.resourceCard} href="https://vercel.com/docs/sandbox/concepts/persistent-sandboxes">
+            <Ext
+              className={styles.resourceCard}
+              href="https://vercel.com/docs/sandbox/concepts/persistent-sandboxes"
+            >
               <span className={styles.resourceIcon}>♾️</span>
               <div>
                 <div className={styles.resourceTitle}>永続的サンドボックス</div>
-                <div className={styles.resourceUrl}>vercel.com/docs/sandbox/concepts/persistent-sandboxes</div>
+                <div className={styles.resourceUrl}>
+                  vercel.com/docs/sandbox/concepts/persistent-sandboxes
+                </div>
               </div>
             </Ext>
-            <Ext className={styles.resourceCard} href="https://vercel.com/docs/sandbox/concepts/snapshots">
+            <Ext
+              className={styles.resourceCard}
+              href="https://vercel.com/docs/sandbox/concepts/snapshots"
+            >
               <span className={styles.resourceIcon}>📸</span>
               <div>
                 <div className={styles.resourceTitle}>スナップショット</div>
@@ -2194,11 +2473,16 @@ export default function Page() {
             <Ext className={styles.resourceCard} href="https://github.com/vercel/sandbox">
               <span className={styles.resourceIcon}>🐙</span>
               <div>
-                <div className={styles.resourceTitle}>GitHub リポジトリ（CLI + SDK オープンソース）</div>
+                <div className={styles.resourceTitle}>
+                  GitHub リポジトリ（CLI + SDK オープンソース）
+                </div>
                 <div className={styles.resourceUrl}>github.com/vercel/sandbox</div>
               </div>
             </Ext>
-            <Ext className={styles.resourceCard} href="https://vercel.com/blog/vercel-sandbox-is-now-generally-available">
+            <Ext
+              className={styles.resourceCard}
+              href="https://vercel.com/blog/vercel-sandbox-is-now-generally-available"
+            >
               <span className={styles.resourceIcon}>📰</span>
               <div>
                 <div className={styles.resourceTitle}>GA 発表ブログ（2026/01/30）</div>
@@ -2207,7 +2491,10 @@ export default function Page() {
                 </div>
               </div>
             </Ext>
-            <Ext className={styles.resourceCard} href="https://www.npmjs.com/package/@vercel/sandbox">
+            <Ext
+              className={styles.resourceCard}
+              href="https://www.npmjs.com/package/@vercel/sandbox"
+            >
               <span className={styles.resourceIcon}>📦</span>
               <div>
                 <div className={styles.resourceTitle}>@vercel/sandbox（JS SDK）</div>

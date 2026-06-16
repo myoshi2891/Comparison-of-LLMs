@@ -1,5 +1,5 @@
+import { render } from "@testing-library/react";
 import { expect, test } from "vitest";
-import { render, screen } from "@testing-library/react";
 import Page from "./page";
 
 test("Vercel Sandbox Page Contract Tests", () => {
@@ -8,7 +8,8 @@ test("Vercel Sandbox Page Contract Tests", () => {
   // 1. Title test
   const title = container.querySelector("h1");
   expect(title).not.toBeNull();
-  expect(title?.textContent?.replace(/\s+/g, " ")).toContain("Vercel Sandbox 完全入門ガイド");
+  expect(title?.textContent).toContain("Vercel Sandbox");
+  expect(title?.textContent).toContain("完全入門ガイド");
 
   // 2. Sections test (h2 count should be 15)
   const h2Elements = container.querySelectorAll("h2");
@@ -28,7 +29,12 @@ test("Vercel Sandbox Page Contract Tests", () => {
   // 4. Internal link clean URL tests
   for (const link of links) {
     const href = link.getAttribute("href");
-    if (href && !href.startsWith("http://") && !href.startsWith("https://") && !href.startsWith("#")) {
+    if (
+      href &&
+      !href.startsWith("http://") &&
+      !href.startsWith("https://") &&
+      !href.startsWith("#")
+    ) {
       expect(href.endsWith(".html")).toBe(false);
     }
   }

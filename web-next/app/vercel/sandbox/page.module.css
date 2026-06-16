@@ -114,6 +114,7 @@
 }
 
 .navLinkActive {
+  /* biome-ignore lint/complexity/noImportantStyles: override base link color */
   color: var(--blue) !important;
   background: var(--blue-dim);
   border-left-color: var(--blue);
@@ -160,7 +161,7 @@
 }
 
 .hero::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -200px;
   right: -100px;
@@ -171,7 +172,7 @@
 }
 
 .hero::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -150px;
   left: 10%;
@@ -304,7 +305,7 @@
 }
 
 .section h3::before {
-  content: '';
+  content: "";
   width: 3px;
   height: 20px;
   background: linear-gradient(to bottom, var(--blue), var(--teal));
@@ -509,15 +510,37 @@
 }
 
 /* Syntax Highlighting Colors */
-.ck { color: #ff7b72; font-weight: bold; } /* Keywords */
-.cs { color: #a5d6ff; } /* Strings */
-.cv { color: #79c0ff; } /* Values / Variables */
-.cc { color: #3b4750; font-style: italic; } /* Comments */
-.cm { color: #7ee787; font-weight: bold; } /* Markers / Success */
-.cw { color: #d29922; } /* Warning */
-.ce { color: #bc8cff; } /* Enum / Special */
-.cg { color: #3fb950; } /* Success */
-.ch { color: #f0883e; font-weight: bold; } /* Headings */
+.ck {
+  color: #ff7b72;
+  font-weight: bold;
+} /* Keywords */
+.cs {
+  color: #a5d6ff;
+} /* Strings */
+.cv {
+  color: #79c0ff;
+} /* Values / Variables */
+.cc {
+  color: #3b4750;
+  font-style: italic;
+} /* Comments */
+.cm {
+  color: #7ee787;
+  font-weight: bold;
+} /* Markers / Success */
+.cw {
+  color: #d29922;
+} /* Warning */
+.ce {
+  color: #bc8cff;
+} /* Enum / Special */
+.cg {
+  color: #3fb950;
+} /* Success */
+.ch {
+  color: #f0883e;
+  font-weight: bold;
+} /* Headings */
 
 /* ── Mermaid diagrams ─────────────────────────────────── */
 .mermaidWrap {
@@ -566,7 +589,7 @@
 }
 
 .step:not(:last-child)::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 19px;
   top: 44px;
@@ -741,7 +764,7 @@
   font-size: 11px;
   color: var(--text-muted);
   margin-top: 2px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
 }
 
 /* ── Footer ─────────────────────────────────────────── */
@@ -806,6 +829,8 @@
 #diag-best-practices foreignObject div,
 #diag-best-practices foreignObject span,
 #diag-best-practices foreignObject p {
+  /* biome-ignore lint/complexity/noImportantStyles: override inline SVG text colors */
   color: #e2e8f0 !important;
+  /* biome-ignore lint/complexity/noImportantStyles: override WebKit fill color */
   -webkit-text-fill-color: #e2e8f0 !important;
 }
