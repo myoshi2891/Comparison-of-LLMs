@@ -94,5 +94,11 @@ export const navLinks: readonly NavLink[] = [
       { name: "OpenClaw Security Guide", href: "/agent/openclaw-advanced-agent-security-guide" },
     ],
   },
+  {
+    name: "Vercel",
+    children: [
+      { name: "Vercel Sandbox", href: "/vercel/sandbox" },
+    ],
+  },
   { name: "Git Worktree", href: "/git-worktree" },
 ];
