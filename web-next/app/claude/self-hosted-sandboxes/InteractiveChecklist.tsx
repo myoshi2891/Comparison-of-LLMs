@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./page.module.css";
 
 interface InteractiveChecklistProps {
@@ -15,6 +15,10 @@ export default function InteractiveChecklist({ items }: InteractiveChecklistProp
   const [checkedStates, setCheckedStates] = useState<boolean[]>(
     new Array(items.length).fill(false)
   );
+
+  useEffect(() => {
+    setCheckedStates(new Array(items.length).fill(false));
+  }, [items]);
 
   const toggle = (index: number) => {
     setCheckedStates((prev) => {

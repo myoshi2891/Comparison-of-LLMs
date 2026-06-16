@@ -8,11 +8,11 @@
 
 | 項目 | 値 |
 |---|---|
-| 最終スキャン日 | 2026-06-14 |
+| 最終スキャン日 | 2026-06-16 |
 | フロントエンドテストランナー | Vitest 4.1 (jsdom 29 + @testing-library/react 16) |
 | バックエンドテストランナー | pytest 9.0 (unittest 互換) |
-| web-next テストファイル数 | 61 |
-| web-next テストケース数 | 740 |
+| web-next テストファイル数 | 62 |
+| web-next テストケース数 | 742 |
 | scraper テストファイル数 | 5 |
 | scraper テストケース数 | 38 |
 | 総合カバレッジスコア (weighted) | 44.2% |
@@ -91,7 +91,7 @@ note: 全 33 page.tsx ルートが契約テスト付き（タイトル・セク�
 
 ```
 status: done
-count: 144
+count: 146
 files:
   - components/ApiTable.test.tsx (25)
   - components/SubTable.test.tsx (21)
@@ -102,7 +102,8 @@ files:
   - components/DualCell.test.tsx (10)
   - components/RefLinks.test.tsx (18)
   - components/LanguageToggle.test.tsx (8)
-note: 電卓 UI 9/9 コンポーネント網羅
+  - tests/interactive-checklist.test.tsx (2)
+note: 電卓 UI 9/9 コンポーネント網羅 + InteractiveChecklist トグルおよび再初期化テスト
 ```
 
 ### Unit / site
@@ -534,6 +535,7 @@ note: 同上（JS依存関係の監査ゲート）
 
 | 日付 | 変更内容 | スコア |
 |---|---|---|
+| 2026-06-16 | InteractiveChecklist 状態再初期化バグの修正とテスト作成 (+2) | 44.2% |
 | 2026-06-14 | InteractiveChecklist 導入に伴う claude/self-hosted-sandboxes テスト強化 (+2) | 44.2% |
 | 2026-06-13 | Google 関連コンポーネントテストの堅牢性向上（try-finally 導入） | 44.2% |
 | 2026-06-12 | Google 関連コンポーネント 8 点の Vitest 追加、Biome フォーマット修正 | 44.2% |
