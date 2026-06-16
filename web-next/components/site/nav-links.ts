@@ -95,7 +95,7 @@ export const navLinks: readonly NavLink[] = [
     ],
   },
   {
-    name: "Vercel",
+    name: "Sandbox",
     children: [{ name: "Vercel Sandbox", href: "/vercel/sandbox" }],
   },
   { name: "Git Worktree", href: "/git-worktree" },

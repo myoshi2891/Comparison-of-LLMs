@@ -58,7 +58,7 @@ describe("Phase A - nav-links top-level entries", () => {
     expect("href" in last && last.href === "/git-worktree").toBe(true);
   });
 
-  it("has Claude/Google/Codex/Copilot/Code Review/Agent/Vercel as dropdowns with children", () => {
+  it("has Claude/Google/Codex/Copilot/Code Review/Agent/Sandbox as dropdowns with children", () => {
     const providers = [
       "Claude",
       "Google",
@@ -66,7 +66,7 @@ describe("Phase A - nav-links top-level entries", () => {
       "Copilot",
       "Code Review",
       "Agent",
-      "Vercel",
+      "Sandbox",
     ] as const;
     for (const name of providers) {
       const entry = navLinks.find((link) => link.name === name);
