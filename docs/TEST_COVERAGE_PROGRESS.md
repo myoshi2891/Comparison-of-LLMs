@@ -59,9 +59,9 @@ files:
   - app/claude/harness-engineering/page.test.tsx (8)
   - app/claude/managed-agents/page.test.tsx (7)
   - app/claude/self-hosted-sandboxes/page.test.tsx (9)
-  - app/claude/skill/page.test.tsx (8)
-  - app/claude/skill-guide/page.test.tsx (7)
   - app/claude/skill-guide-intermediate/page.test.tsx (7)
+  - app/claude/skill-guide/page.test.tsx (7)
+  - app/claude/skill/page.test.tsx (8)
   - app/code-review/coderabbit-guide/page.test.tsx (5)
   - app/code-review/copilot-code-review/page.test.tsx (5)
   - app/code-review/sonar-qube/page.test.tsx (5)
@@ -84,7 +84,8 @@ files:
   - app/google/skill-guide-intermediate/page.test.tsx (6)
   - app/google/skill-guide/page.test.tsx (8)
   - app/google/skill/page.test.tsx (11)
-note: 全 33 page.tsx ルートが契約テスト付き（タイトル・セクション数・rel 属性）
+  - app/vercel/sandbox/page.test.tsx (1)
+note: 全 34 page.tsx ルートが契約テスト付き（タイトル・セクション数・rel 属性）
 ```
 
 ### Unit / components
@@ -535,6 +536,7 @@ note: 同上（JS依存関係の監査ゲート）
 
 | 日付 | 変更内容 | スコア |
 |---|---|---|
+| 2026-06-16 | カバレッジダッシュボードの page.tsx 契約テスト数の不整合を修正し、34 件に同期 | 44.2% |
 | 2026-06-16 | InteractiveChecklist 状態再初期化バグの修正とテスト作成 (+2) | 44.2% |
 | 2026-06-14 | InteractiveChecklist 導入に伴う claude/self-hosted-sandboxes テスト強化 (+2) | 44.2% |
 | 2026-06-13 | Google 関連コンポーネントテストの堅牢性向上（try-finally 導入） | 44.2% |
