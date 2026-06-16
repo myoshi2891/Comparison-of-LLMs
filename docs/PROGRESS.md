@@ -10,14 +10,16 @@
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
 - **動作検証**:
-  - `bun run build` ✅（`web-next` の全ルートが Static プリレンダリングされる）
+  - `bun run build` ✅（`web-next` の全ルートが Static プリレンダリングされる。※Antigravity環境では実行禁止）
   - `bun run typecheck` ✅
   - `bun run lint` ✅（本作業範囲では新規違反 0 件、既知の既存指摘は本件対象外）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **742 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **743 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **Vercel Sandbox 完全入門ガイドの Next.js 移行**: `Vercel-sandbox-guide.html` から `web-next/app/vercel/sandbox/page.tsx` への完全移行を完了 🚀。CSS Modules によるレイアウト調整、Mermaid遅延ロード、安全な外部リンク対応、コードコピーボタンを実装。ナビゲーションに「Vercel` -> `Vercel Sandbox`」を新規登録し、テスト期待値の修正や新規の契約テストを含めた 743 件のフロントエンドテストが全合格。
+- **ビルド実行禁止ルールの明文化**: Antigravity環境におけるメモリ制限（OOM）クラッシュやネットワーク遮断エラーを防止するため、`CLAUDE.md` および `GEMINI.md` に Antigravity サンドボックス環境下でのみビルドコマンド実行を禁止するルールを追加整備。
 - **InteractiveChecklist 状態同期バグの修正**: `items` プロップの動的変更時に `checkedStates` が追従せず表示と不整合を起こす問題を `useEffect` による再初期化で解決。テストケースを新規追加。
 - **Vercel Sandbox 実践・上級者ガイド**: Vercel Sandbox のアーキテクチャ、SDK API リファレンス、認証、ネットワークポリシー、セキュリティ等を詳細に解説した上級者向けガイド (`Vercel-sandbox-advanced-guide.md`) を追加。
 - **InteractiveChecklist コンポーネントの導入**: `claude/self-hosted-sandboxes` ページに、クライアントサイドで状態を保持し、Enter/Spaceキーやクリックで切り替え可能な `InteractiveChecklist` を導入。アクセシビリティ（aria-checked/role="checkbox"）にも配慮。
@@ -160,12 +162,12 @@ Next.js 移行完了後のリポジトリ `LLM-Studies` にて、テストカバ
 Next.js 移行完了後のリポジトリ `LLM-Studies` の保守・改善作業を再開してください。
 
 - リポジトリ: LLM-Studies (Next.js 移行プロジェクトは dev/main へ完全マージ済み)
-  - 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (742/742 passed) / pytest (38/38 passed) で全 Green
-- リポジトリ規約: CLAUDE.md (編集上の絶対ルール)
+  - 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (743/743 passed) / pytest (38/38 passed) で全 Green
+- リポジトリ規約: CLAUDE.md (編集上の絶対ルール。※Antigravity環境ではビルドは実行禁止)
 
 作業方針：
 1. ドキュメントや設定ファイルの更新、パフォーマンスとアクセシビリティの継続的な改善・監視。
-2. 検証コマンド:
+2. 検証コマンド（※Antigravity環境ではビルドは実行禁止）:
   (cd web-next && bun run test)
   (cd web-next && bun run typecheck)
   (cd web-next && bun run build)
