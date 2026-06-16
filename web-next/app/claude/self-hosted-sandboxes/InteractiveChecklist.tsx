@@ -45,7 +45,7 @@ export default function InteractiveChecklist({ items }: InteractiveChecklistProp
             type="button"
             className={styles.clButton}
             role="checkbox"
-            aria-checked={checkedStates[index]}
+            aria-checked={checkedStates[index] ?? false}
             onClick={() => toggle(index)}
             onKeyDown={(e) => handleKeyDown(e, index)}
           >

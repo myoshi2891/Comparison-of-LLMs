@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 import { expect, test } from "vitest";
-import Page from "./page";
+import Page, { metadata } from "./page";
 
 test("Vercel Sandbox Page Contract Tests", () => {
   const { container } = render(<Page />);
@@ -46,4 +46,11 @@ test("Vercel Sandbox Page Contract Tests", () => {
     expect(className).not.toBeNull();
     expect(className).toMatch(/language-.+/);
   }
+
+  // 6. Metadata test
+  expect(metadata).toBeDefined();
+  expect(metadata.title).toBe("Vercel Sandbox 完全入門ガイド 2026");
+  expect(metadata.description).toBe(
+    "信頼できないコードをミリ秒単位で安全に実行できる Linux マイクロVM。初学者でもわかるステップバイステップ解説＋ベストプラクティス付き。"
+  );
 });
