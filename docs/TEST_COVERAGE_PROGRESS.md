@@ -8,11 +8,11 @@
 
 | 項目 | 値 |
 |---|---|
-| 最終スキャン日 | 2026-06-13 |
+| 最終スキャン日 | 2026-06-16 |
 | フロントエンドテストランナー | Vitest 4.1 (jsdom 29 + @testing-library/react 16) |
 | バックエンドテストランナー | pytest 9.0 (unittest 互換) |
-| web-next テストファイル数 | 61 |
-| web-next テストケース数 | 738 |
+| web-next テストファイル数 | 62 |
+| web-next テストケース数 | 742 |
 | scraper テストファイル数 | 5 |
 | scraper テストケース数 | 38 |
 | 総合カバレッジスコア (weighted) | 44.2% |
@@ -49,16 +49,19 @@
 
 ```
 status: done
-count: 239
+count: 289
 files:
+  - app/agent/hermes-agent-advanced-guide/page.test.tsx (8)
+  - app/agent/openclaw-advanced-agent-security-guide/page.test.tsx (8)
   - app/claude/agent/page.test.tsx (8)
   - app/claude/code-slash-commands/page.test.tsx (5)
   - app/claude/cowork-guide/page.test.tsx (7)
   - app/claude/harness-engineering/page.test.tsx (8)
   - app/claude/managed-agents/page.test.tsx (7)
-  - app/claude/skill/page.test.tsx (8)
-  - app/claude/skill-guide/page.test.tsx (7)
+  - app/claude/self-hosted-sandboxes/page.test.tsx (9)
   - app/claude/skill-guide-intermediate/page.test.tsx (7)
+  - app/claude/skill-guide/page.test.tsx (7)
+  - app/claude/skill/page.test.tsx (8)
   - app/code-review/coderabbit-guide/page.test.tsx (5)
   - app/code-review/copilot-code-review/page.test.tsx (5)
   - app/code-review/sonar-qube/page.test.tsx (5)
@@ -71,24 +74,25 @@ files:
   - app/copilot/github-copilot/page.test.tsx (16)
   - app/copilot/markdown-file-guide/page.test.tsx (6)
   - app/copilot/skill/page.test.tsx (8)
-  - app/google/agent/page.test.tsx (8)
+  - app/git-worktree/page.test.tsx (5)
   - app/google/agent-harness-engineering/page.test.tsx (21)
+  - app/google/agent/page.test.tsx (8)
   - app/google/antigravity-guide/page.test.tsx (9)
   - app/google/antigravity-slash-commands-guide/page.test.tsx (5)
   - app/google/harness-engineering/page.test.tsx (19)
   - app/google/sandbox-best-practices/page.test.tsx (20)
-  - app/google/skill/page.test.tsx (11)
-  - app/google/skill-guide/page.test.tsx (8)
   - app/google/skill-guide-intermediate/page.test.tsx (6)
-  - app/git-worktree/page.test.tsx (5)
-note: 全 29 page.tsx ルートが契約テスト付き（タイトル・セクション数・rel 属性）
+  - app/google/skill-guide/page.test.tsx (8)
+  - app/google/skill/page.test.tsx (11)
+  - app/vercel/sandbox/page.test.tsx (1)
+note: 全 34 page.tsx ルートが契約テスト付き（タイトル・セクション数・rel 属性）
 ```
 
 ### Unit / components
 
 ```
 status: done
-count: 144
+count: 146
 files:
   - components/ApiTable.test.tsx (25)
   - components/SubTable.test.tsx (21)
@@ -99,7 +103,8 @@ files:
   - components/DualCell.test.tsx (10)
   - components/RefLinks.test.tsx (18)
   - components/LanguageToggle.test.tsx (8)
-note: 電卓 UI 9/9 コンポーネント網羅
+  - tests/interactive-checklist.test.tsx (2)
+note: 電卓 UI 9/9 コンポーネント網羅 + InteractiveChecklist トグルおよび再初期化テスト
 ```
 
 ### Unit / site
@@ -531,6 +536,9 @@ note: 同上（JS依存関係の監査ゲート）
 
 | 日付 | 変更内容 | スコア |
 |---|---|---|
+| 2026-06-16 | カバレッジダッシュボードの page.tsx 契約テスト数の不整合を修正し、34 件に同期 | 44.2% |
+| 2026-06-16 | InteractiveChecklist 状態再初期化バグの修正とテスト作成 (+2) | 44.2% |
+| 2026-06-14 | InteractiveChecklist 導入に伴う claude/self-hosted-sandboxes テスト強化 (+2) | 44.2% |
 | 2026-06-13 | Google 関連コンポーネントテストの堅牢性向上（try-finally 導入） | 44.2% |
 | 2026-06-12 | Google 関連コンポーネント 8 点の Vitest 追加、Biome フォーマット修正 | 44.2% |
 | 2026-05-31 | Unit/types（型スキーマのランタイム negative test）・Unit/providers・Unit/tools（価格抽出 success/fallback 両パス）を追加し partial→done に昇格 | 44.2% |

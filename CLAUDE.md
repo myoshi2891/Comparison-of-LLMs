@@ -25,7 +25,7 @@ update.sh  ← オーケストレーター (scrape → copy)
 │   │   ├── layout.tsx           ルートレイアウト (SiteHeader/DisclaimerBanner マウント済み)
 │   │   ├── page.tsx             コスト計算機ホーム (Server Component + Zod 検証 → HomePage へ委譲)
 │   │   ├── globals.css          Tailwind v4 + legacy design tokens (227 行)
-│   │   └── {claude,google,codex,copilot}/{skill,agent}/ および /google/agent-harness-engineering/、/claude/managed-agents/、/claude/self-hosted-sandboxes/、/claude/code-slash-commands/、/code-review/coderabbit-guide/、/code-review/copilot-code-review/、/code-review/sonar-qube/、/code-review/tool-pricing/、/agent/hermes-agent-advanced-guide/   Phase B–C および追加移行済みルート（詳細は [`docs/archive/MIGRATION_PROGRESS.md`](docs/archive/MIGRATION_PROGRESS.md)）
+│   │   └── {claude,google,codex,copilot}/{skill,agent}/ および /google/agent-harness-engineering/、/claude/managed-agents/、/claude/self-hosted-sandboxes/、/claude/code-slash-commands/、/code-review/coderabbit-guide/、/code-review/copilot-code-review/、/code-review/sonar-qube/、/code-review/tool-pricing/、/agent/hermes-agent-advanced-guide/、/vercel/sandbox/   Phase B–C および追加移行済みルート（詳細は [`docs/archive/MIGRATION_PROGRESS.md`](docs/archive/MIGRATION_PROGRESS.md)）
 │   ├── components/
 │   │   ├── HomePage.tsx         Client Component (Phase 10)
 │   │   ├── ApiTable.tsx / SubTable.tsx / Hero.tsx / ...   (Phase 8-10 成果物)
@@ -259,8 +259,8 @@ Build:     cd web-next && bun run build
 
 以下を全て確認してからコミットすること：
 
-1. `cd web-next && bun run build` が成功
-2. `cd web-next && bun run test` が成功
+1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
+2. `cd web-next && bun run test` が成功（実測 743 件合格を確認）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功（既知の違反件数は CI または進捗ドキュメントを参照、新規違反がないこと）
 5. `cd scraper && uv run pytest` が成功

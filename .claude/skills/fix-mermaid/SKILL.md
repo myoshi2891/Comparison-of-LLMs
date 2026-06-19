@@ -1,26 +1,32 @@
 ---
 name: fix-mermaid
 description: >
-  Use this skill to fix Mermaid diagram syntax errors inside HTML files.
+  Use this skill to fix Mermaid diagram syntax errors, rendering issues,
+  and dark-mode styling problems inside HTML files.
   Trigger when the user mentions: "mermaid error", "Syntax error in text",
   "mermaid not rendering", "diagram is broken", "all diagrams crashed",
+  "文字が読めない", "はみ出している", "図が醜い", "ダークモードで見にくい",
+  "シーケンス図が切れている", "マインドマップの色がおかしい",
   or references a Mermaid version error (e.g. "mermaid version 10.9.5").
-  Fixes HTML formatter-induced indentation pollution and statement concatenation
-  that break Mermaid v10 parsing.
-allowed-tools:
-  - Read
-  - Edit
-  - Grep
-  - Bash
+  Covers: syntax fixes, SVG sizing, dark-mode coloring (mindmap/sequence),
+  foreignObject CSS limitations, and font-loading timing.
 ---
 
-# Mermaid v10 構文修正スキル
+# Mermaid v10 修正・スタイリングスキル
+
+Updated: 2026-06-15
 
 ## 対象
 
-`<div class="mermaid">` ブロック内の構文エラー。
+- `<div class="mermaid">` ブロック / JS テンプレートリテラル方式の構文エラー
+- ダークモードでの配色崩れ（マインドマップ・シーケンス図）
+- SVGサイズ・クリッピング問題
 
-## Mermaid v10 の必須ルール
+---
+
+## Part 1: 構文修正
+
+### Mermaid v10 の必須ルール
 
 1. コンテンツは**カラム0配置**（先頭空白なし）
 2. 各ステートメントは**改行で分離**（1行に複数連結しない）
@@ -28,54 +34,21 @@ allowed-tools:
 4. `mindmap` のみ例外 — 内部インデントは階層構造を表すため保持する
 5. `block-beta` は**使用禁止** — v10.9.5 で全体クラッシュの原因になる。`graph TD` で代替する
 
-## よくある原因
-
-HTMLフォーマッタによる破壊パターン:
+### よくある原因（HTMLフォーマッタによる破壊）
 
 - 14スペース等のHTMLインデントがMermaidコンテンツに混入する
 - 長いノードラベルが行分断される（`A["テキスト` と `続き"]` に分かれる）
 - 複数ステートメントが1行に連結される（`graph TD A["x"] B["y"] A --> B`）
 
-## 修正手順
+### 修正手順
 
-1. `Grep` で `<div class="mermaid">` を全検索してブロック数を把握する
-2. 各ブロックを `Read` で確認し、上記ルール違反を特定する
-3. `Edit` で各ブロックの内容を修正する
+1. `grep_search` で `<div class="mermaid">` を全検索してブロック数を把握する
+2. 各ブロックを `view_file` で確認し、上記ルール違反を特定する
+3. `replace_file_content` / `multi_replace_file_content` で各ブロックの内容を修正する
    - `<div>` タグ自体のインデントは変更しない
    - タグ内のMermaidコンテンツのみを置換対象にする
 
-自動修正が必要な場合は `scripts/fix_mermaid.py` を使用する:
-
-```bash
-python3 .claude/skills/fix-mermaid/scripts/fix_mermaid.py path/to/file.html
-```
-
-## 変換例
-
-**Before（壊れた状態）:**
-
-```html
-<div class="mermaid">
-  graph LR A["ノードA"] B["ノードB"] A --> B
-  style A fill:#fff
-</div>
-```
-
-**After（修正後）:**
-
-```html
-<div class="mermaid">
-graph LR
-A["ノードA"]
-B["ノードB"]
-A --> B
-style A fill:#fff
-</div>
-```
-
-## ダイアグラム別の注意点
-
-詳細は `references/mermaid-v10-guide.md` を参照。要点のみ:
+### ダイアグラム別の注意点
 
 | 種別 | 注意点 |
 | ------ | -------- |
@@ -85,13 +58,247 @@ style A fill:#fff
 | `block-beta` | **使用禁止**（全体クラッシュ） |
 | `htmlLabels: true` 環境 | `<` → `&lt;`、`>` → `&gt;` に変換 |
 
-## 実地検証済み：ブラウザレンダラー固有の問題（2026年3月）
+### ブラウザレンダラーで Syntax Error を起こす文字・構文
 
-静的パーサー `@mermaid-js/parser` ではエラーにならないが、ブラウザの Mermaid v10.9.5 レンダラーで `Syntax error in text` が発生するパターン。
+| 箇所 | 問題のある記述 | 対処 |
+| ------ | --------------- | ------ |
+| `subgraph` ラベル | 丸括弧 `()` を含む | 削除または別表現に置換 |
+| `subgraph` ラベル | 絵文字（`🌐` `🖥️` 等） | 削除 |
+| `participant ... as` | 絵文字（`👤` `⚡` 等） | 削除 |
+| エッジラベル `\|...\|` | 先頭スラッシュ `\|/command\|` | スラッシュを除去 |
+| ノードラベル `["..."]` | 全角波ダッシュ `〜` | `から` 等の日本語に置換 |
+| ノードラベル `["..."]` | スラッシュ `path/to` | `-` またはスペースに置換 |
+| 菱形ノード `{}` | クォートなし日本語 `{新しいファイル}` | `{"新しいファイル"}` とクォートする |
 
-### IDEフォーマッター（Prettier）による破壊が根本原因
+---
 
-`<div class="mermaid">` に Mermaid ソースを直接書くと、VSCode/Prettier が保存のたびにインデントを付加して構文を壊す。**恒久対策は JS テンプレートリテラルへの移管**。
+## Part 2: ダークモード配色・スタイリング（2026年6月追記）
+
+> **重要:** HTMLでMermaidをダークモードで使う場合、マインドマップ・シーケンス図には固有の落とし穴がある。
+> CSS セレクタだけで対処しようとすると失敗する。以下の手順に従うこと。
+
+### 2-1: JSテンプレートリテラル方式（必須の前提）
+
+`<div class="mermaid">` に直接書くと IDEフォーマッタが破壊する。**必ずJSテンプレートリテラル方式を使う**。
+
+```html
+<!-- ✅ JSテンプレートリテラル方式 -->
+<div id="diag-cli"></div>
+<script>
+const DIAGRAMS = {
+  'diag-cli': `mindmap
+  root((sandbox CLI))
+    サンドボックス管理
+      list - ls`,
+};
+mermaid.initialize({ startOnLoad: false, theme: 'dark', ... });
+(async () => {
+  if (document.fonts) await document.fonts.ready; // ← フォントロード完了を待つ（重要！）
+  for (const [id, src] of Object.entries(DIAGRAMS)) {
+    const { svg } = await mermaid.render('svg-' + id, src);
+    document.getElementById(id).innerHTML = svg;
+    // SVGサイズ・スタイル後処理をここで行う
+  }
+})();
+</script>
+```
+
+> **⚠️ フォントロード待ちが必須**: `await document.fonts.ready` を省略すると、
+> Webフォント（Inter等）のロード前にMermaidが文字幅を計算するため、
+> **ノード幅が狭くなり文字がはみ出す**。必ず追加すること。
+
+### 2-2: mermaid.initialize の themeVariables 設定
+
+ダークモードの基本設定に加え、**マインドマップ専用の `cScale0〜11`** を必ず設定する。
+これを省略するとMermaidデフォルトの原色（赤・緑・紫）が使われ、ダークモードで非常に醜くなる。
+
+```js
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'dark',
+  fontFamily: "'Inter', system-ui, sans-serif",
+  themeVariables: {
+    background: '#0a0a0a',
+    primaryColor: '#1e3a5f',
+    primaryTextColor: '#93c5fd',
+    primaryBorderColor: '#3b82f6',
+    lineColor: '#374151',
+    actorBkg: '#1e3a5f',
+    actorBorder: '#3b82f6',
+    actorTextColor: '#93c5fd',
+    actorLineColor: '#374151',
+    noteBkgColor: '#2d1b4e',
+    noteTextColor: '#d8b4fe',
+    /* ★ マインドマップ枝カラー: これを設定しないと原色になる */
+    cScale0: '#1e3a5f', cScale1: '#111827', cScale2: '#1a1a2e',
+    cScale3: '#1e2a3a', cScale4: '#121825', cScale5: '#111111',
+    cScale6: '#1a1f2e', cScale7: '#0f1923', cScale8: '#1e3a5f',
+    cScale9: '#111827', cScale10: '#1a1a2e', cScale11: '#1e2a3a',
+  },
+  flowchart: { curve: 'basis', padding: 20 },
+  /* ★ シーケンス図: mirrorActors:true で上下両方にアクターボックスを表示 */
+  sequence: { mirrorActors: true, noteMargin: 10, useMaxWidth: false },
+});
+```
+
+### 2-3: SVGサイズ後処理（レンダリング後に必ず実行）
+
+```js
+const svgEl = el.querySelector('svg');
+if (svgEl) {
+  svgEl.removeAttribute('width');
+  svgEl.removeAttribute('height');
+  svgEl.style.width    = '100%';
+  svgEl.style.maxWidth = svgEl.style.maxWidth || '100%';
+  svgEl.style.height   = 'auto';
+  svgEl.style.overflow = 'visible'; // ← シーケンス図下部切れ防止
+}
+```
+
+CSSにもフォールバックを追加:
+
+```css
+.mermaid-wrap .mermaid {
+  overflow: visible;
+}
+.mermaid-wrap .mermaid svg {
+  overflow: visible;
+}
+```
+
+### 2-4: マインドマップ ダークモード配色の落とし穴と対処法
+
+**❌ 以下の方法は機能しない（よくある間違い）:**
+
+```css
+/* NG: .depth-0 などのクラスはMermaid v10 mindmapでは生成されない */
+.mermaid svg .mindmap-node.depth-0 rect { fill: blue !important; }
+
+/* NG: SVG内<style>はforeignObject内のHTMLに cascade しない */
+/* SVG内に<style>を注入してもforeignObject内のdiv/spanの色は変わらない */
+```
+
+**✅ 正しい対処法（3段構え）:**
+
+#### ① ドキュメントhead CSSでforeignObject内HTMLをターゲット
+
+```css
+/* SVG内<style>ではforeignObject内HTMLに届かないため、headのCSSで直接指定する */
+#diag-cli foreignObject div,
+#diag-cli foreignObject span,
+#diag-cli foreignObject p,
+#diag-best-practices foreignObject div,
+#diag-best-practices foreignObject span,
+#diag-best-practices foreignObject p {
+  color: #e2e8f0 !important;
+  -webkit-text-fill-color: #e2e8f0 !important;
+}
+```
+
+#### ② JS直接操作でノード背景のインラインstyleを上書き
+
+```js
+function applyMindmapStyle(svgEl) {
+  // ノード背景形状のinline fillをJSで直接上書き
+  const shapes = svgEl.querySelectorAll(
+    'g.mindmap-node > rect, g.mindmap-node > circle, '
+    + 'g.mindmap-node > ellipse, g.mindmap-node > polygon, g.mindmap-node > path'
+  );
+  shapes.forEach(shape => {
+    shape.style.setProperty('fill', '#1e293b', 'important');   // スレートブルー（視認性良好）
+    shape.style.setProperty('stroke', '#475569', 'important');
+    shape.style.setProperty('stroke-width', '1.5px', 'important');
+  });
+
+  // ルートノード（最初の circle/ellipse）を青グローで強調
+  const rootShape = svgEl.querySelector('g.mindmap-node > circle, g.mindmap-node > ellipse');
+  if (rootShape) {
+    rootShape.style.setProperty('fill', 'rgba(0,112,243,0.2)', 'important');
+    rootShape.style.setProperty('stroke', '#0070f3', 'important');
+    rootShape.style.setProperty('stroke-width', '2.5px', 'important');
+    rootShape.style.setProperty('filter', 'drop-shadow(0 0 10px rgba(0,112,243,0.5))', 'important');
+  }
+
+  // SVG text要素
+  svgEl.querySelectorAll('g.mindmap-node text').forEach(t => {
+    t.style.setProperty('fill', '#e2e8f0', 'important');
+  });
+
+  // foreignObject内のHTML要素（headのCSSが届かない場合の保険）
+  svgEl.querySelectorAll('g.mindmap-node foreignObject').forEach(fo => {
+    try {
+      fo.querySelectorAll('*').forEach(child => {
+        child.style.setProperty('color', '#e2e8f0', 'important');
+      });
+    } catch (e) { /* ignore */ }
+  });
+
+  // エッジ色
+  svgEl.querySelectorAll('path').forEach(p => {
+    if (p.getAttribute('fill') === 'none'
+        || p.classList.contains('mindmap-edge')
+        || p.classList.contains('edge')) {
+      p.style.setProperty('stroke', '#4b5563', 'important');
+    }
+  });
+
+  // requestAnimationFrame後に再適用（Mermaidが非同期でスタイル上書きする場合の保険）
+  requestAnimationFrame(() => {
+    svgEl.querySelectorAll('g.mindmap-node foreignObject').forEach(fo => {
+      try {
+        fo.querySelectorAll('*').forEach(child => {
+          child.style.setProperty('color', '#e2e8f0', 'important');
+        });
+      } catch (e) { /* ignore */ }
+    });
+  });
+}
+```
+
+#### ③ レンダー後に呼び出す
+
+```js
+const MINDMAP_IDS = ['diag-cli', 'diag-best-practices'];
+// ...render loop内で...
+if (MINDMAP_IDS.includes(id)) {
+  applyMindmapStyle(svgEl);
+}
+```
+
+### 2-5: シーケンス図 下部切れ問題
+
+**症状:** 最後のメッセージや Note、アクターボックス（下段）が切れて見えない。
+
+**原因と対処:**
+
+| 原因 | 対処 |
+|---|---|
+| `mirrorActors: false` でアクターが上段のみ | `mirrorActors: true` に変更 |
+| SVGのheight属性を削除した後にviewBoxが存在しない | `overflow: visible` をSVGに設定 |
+| `useMaxWidth` のデフォルト制限 | `useMaxWidth: false` を設定 |
+
+```js
+// sequence設定
+sequence: { mirrorActors: true, noteMargin: 10, useMaxWidth: false }
+
+// SVG後処理でoverflow: visibleを必ず設定
+svgEl.style.overflow = 'visible';
+```
+
+### 2-6: ノードラベルのはみ出し（文字切れ）対策
+
+ノード内テキストがはみ出す場合、以下を確認:
+
+1. **フォントロード待ち**: `await document.fonts.ready` が実装されているか（最重要）
+2. **ラベルにパディング用スペースを追加**: `A["text"]` → `A[" text "]`（前後に半角スペース）
+3. **サブグラフタイトルを短縮**: 長いタイトルはノード幅計算に影響する
+
+---
+
+## Part 3: JSテンプレートリテラル方式（恒久対策）
+
+`<div class="mermaid">` に直接書くと、VSCode/Prettier が保存のたびにインデントを付加して構文を壊す。
+**恒久対策は JS テンプレートリテラルへの移管**。
 
 ```html
 <!-- ❌ Prettierが保存時にインデントを付加して破壊する -->
@@ -109,9 +316,18 @@ A --> B`,
 };
 mermaid.initialize({ startOnLoad: false });
 (async () => {
+  if (document.fonts) await document.fonts.ready; // ← 必須
   for (const [id, src] of Object.entries(DIAGRAMS)) {
     const { svg } = await mermaid.render('svg-' + id, src);
     document.getElementById(id).innerHTML = svg;
+    const svgEl = document.getElementById(id).querySelector('svg');
+    if (svgEl) {
+      svgEl.removeAttribute('width');
+      svgEl.removeAttribute('height');
+      svgEl.style.width = '100%';
+      svgEl.style.height = 'auto';
+      svgEl.style.overflow = 'visible';
+    }
   }
 })();
 </script>
@@ -119,58 +335,17 @@ mermaid.initialize({ startOnLoad: false });
 
 この方式では `-->` を `--&gt;` にエスケープする必要もなくなる。
 
-### ブラウザレンダラーで Syntax Error を起こす文字・構文
+---
 
-| 箇所 | 問題のある記述 | 対処 |
-| ------ | --------------- | ------ |
-| `subgraph` ラベル | 丸括弧 `()` を含む | 削除または別表現に置換 |
-| `subgraph` ラベル | 絵文字（`🌐` `🖥️` 等） | 削除 |
-| `participant ... as` | 絵文字（`👤` `⚡` 等） | 削除 |
-| エッジラベル `\|...\|` | 先頭スラッシュ `\|/command\|` | スラッシュを除去 |
-| ノードラベル `["..."]` | 全角波ダッシュ `〜` | `から` 等の日本語に置換 |
-| ノードラベル `["..."]` | スラッシュ `path/to` | `-` またはスペースに置換 |
-| 菱形ノード `{}` | クォートなし日本語 `{新しいファイル}` | `{"新しいファイル"}` とクォートする |
+## Part 4: React/Next.js (CSS Modules) 移植時の注意点
 
-### SVG サイズ制御
-
-Mermaid v10 は SVG 要素に絶対ピクセル値の `width`/`height` 属性を付与する。`mermaid.render()` 後に必ず除去する。
-
-```js
-svgEl.removeAttribute('width');
-svgEl.removeAttribute('height');
-svgEl.style.width    = 'auto';     // 'auto' 必須。'100%' は NG（拡大されて縦長になる）
-svgEl.style.maxWidth = '100%';
-svgEl.style.height   = 'auto';
-```
-
-CSS にもフォールバックを追加する：
-
-```css
-.mermaid-wrap svg {
-  width: auto !important;
-  max-width: 100% !important;
-  height: auto !important;
-}
-```
-
-### React/Next.js (CSS Modules) 移植時の表示と中央寄せ（2026年5月追記）
-
-React (Next.js App Router) 移行に際して共通の `MermaidDiagram` コンポーネントを使用する場合、CSS Modules との競合やテスト環境（Vitest）での描画エラーに注意する必要があります。
-
-#### 1. CSS Modules 環境下での中央寄せとサイズ制限
-
-共通の `MermaidDiagram` は出力時にグローバルクラス `"mermaid"` を付与します。しかし、CSS Modules（`*.module.css`）で指定した `.mermaid` はクラス名がハッシュ化されるため、スタイルが当たらなくなり左寄せになってしまいます。
-
-**【対策】**
-1. **TSX 側**: `MermaidDiagram` をラッパー div で囲み、ハッシュ化されるクラス名 (`styles.mermaid`) と、個別幅制限用のグローバル ID (`id="diag-X"`) を付与します。
+### CSS Modules 環境下での中央寄せとサイズ制限
 
 ```tsx
 <div id="diag-0" className={styles.mermaid}>
   <MermaidDiagram chart={DIAGRAM_0} />
 </div>
 ```
-
-2. **CSS 側**: ハッシュ化クラスから下位のグローバルな `svg` をターゲットするため、`:global` セレクタを使用します。
 
 ```css
 .mermaid {
@@ -186,12 +361,7 @@ React (Next.js App Router) 移行に際して共通の `MermaidDiagram` コン�
 }
 ```
 
-   個別 ID セレクタ（`#diag-0 svg` 等）は CSS Modules でも変換されないため、グローバル ID セレクタ経由で最大幅（`max-width`）を制御できます。
-
-#### 2. テスト環境（Vitest）での MermaidDiagram のモック化
-
-`MermaidDiagram` はクライアントサイドで動的に `mermaid` ライブラリを読み込んで動作するため、テスト環境での DOM レンダリング時にエラーを起こす原因となります。
-テストファイル（`page.test.tsx`）では、必ず `vi.mock` を使ってダミー要素にモック化してください。
+### テスト環境（Vitest）でのモック化
 
 ```typescript
 vi.mock("@/components/docs/MermaidDiagram", () => ({
@@ -203,7 +373,7 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
 
 ---
 
-### Mermaid を諦めて HTML/CSS に置き換えるべきケース
+## Part 5: Mermaidを諦めてHTML/CSSに置き換えるべきケース
 
 以下は CSS では対処不能なため、**純粋な HTML/CSS ウィジェットに置き換える**：
 
@@ -211,3 +381,17 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
 - 接続されていない複数のサブグラフ（ノード数が非対称なためアスペクト比が崩れる）
 
 判断基準：「ノード増減に関わらず、他の図と同じ高さに収まる保証がない場合」
+
+---
+
+## クイックリファレンス：問題別対処フロー
+
+| 症状 | まず確認すること | 対処 |
+|---|---|---|
+| 構文エラー (`Syntax error in text`) | インデント汚染・行連結 | Part 1参照 |
+| 文字がノード外にはみ出す | `document.fonts.ready` の有無 | `await document.fonts.ready` を追加 |
+| マインドマップが原色（赤・緑・紫） | `cScale0-11` の設定 | Part 2-2参照 |
+| マインドマップのテキストが読めない | `foreignObject` CSS非カスケード問題 | Part 2-4の手順に従う |
+| シーケンス図の下部が切れる | `mirrorActors`, `overflow` の設定 | Part 2-5参照 |
+| CSS `!important` が効かない | inline `style` 属性の優先度 | JS `.style.setProperty(..., 'important')` を使う |
+| SVGが縦長に拡大される | `width: 100%` の誤用 | `width: auto; max-width: 100%` に変更 |
