@@ -8,8 +8,7 @@ interface InteractiveChecklistProps {
 }
 
 /**
- * An interactive, stateful checklist component for self-hosted sandboxes guide.
- * It displays items as a list of button checkboxes with custom styles and accessibility attributes.
+ * Renders a checklist where items can be toggled by clicking or using Enter and Space keys.
  */
 export default function InteractiveChecklist({ items }: InteractiveChecklistProps) {
   const [checkedStates, setCheckedStates] = useState<boolean[]>(
