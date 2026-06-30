@@ -59,6 +59,9 @@ export const metadata: Metadata = {
     "コードを一行も書かずに自然言語の指示だけでファイル管理・タスク自動化を実現する Anthropic のデスクトップツール「Cowork」を初学者向けにゼロから解説します。",
 };
 
+/**
+ * Renders the complete Claude Cowork beginner guide page.
+ */
 export default function Page() {
   return (
     <div className={styles.pageWrap}>

@@ -127,12 +127,11 @@ function CodeDots() {
 }
 
 /**
- * Page component that presents a complete guide to using markdown files for Spec-Driven Development with Claude Code.
+ * Renders the Claude Code × Spec-Driven Development guide page.
  *
- * Renders a documentation layout including a header, table of contents, and twelve sections covering CLAUDE.md, spec.md, requirements.md,
- * design.md, tasks.md, MEMORY.md, steering/rules, SKILL.md, 2026 updates, best practices, and reference sources.
+ * Displays a documentation layout with a header, table of contents, and twelve sections covering CLAUDE.md, spec.md, requirements.md, design.md, tasks.md, MEMORY.md, steering files, SKILL.md, 2026 updates, best practices, and reference sources.
  *
- * @returns A React element representing the Claude Skill documentation page.
+ * @returns The Claude Skill documentation page.
  */
 export default function ClaudeSkillPage() {
   return (

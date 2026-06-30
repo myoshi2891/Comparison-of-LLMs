@@ -107,6 +107,11 @@ function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   );
 }
 
+/**
+ * Renders the slash commands guide page with sidebar section tracking and search filtering.
+ *
+ * @returns The rendered guide page.
+ */
 export default function SlashCommandsGuideClient() {
   const [activeSection, setActiveSection] = useState("overview");
   const [searchQuery, setSearchQuery] = useState("");

@@ -52,9 +52,9 @@ const toolNo = (name: string) =>
   String(TOOLS.findIndex((t) => t.name === name) + 1).padStart(2, "0");
 
 /**
- * Render the AI Code Review Tools pricing comparison page.
+ * Renders the AI Code Review Tools pricing comparison page.
  *
- * Renders a hero with stats and page navigation, a comparison matrix of all tools, category-specific tool cards showing summaries, pros/cons, source links, and plan-by-plan pricing displayed in USD with approximate JPY conversions, plus an about/disclaimer section.
+ * Includes a hero with navigation and summary stats, a comparison matrix for all tools, category-specific detail sections with pricing tables, and an about section with pricing notes and source guidance.
  *
  * @returns The React element for the tool pricing page.
  */
