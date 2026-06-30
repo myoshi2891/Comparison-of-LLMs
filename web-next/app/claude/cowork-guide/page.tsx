@@ -201,9 +201,13 @@ export default function Page() {
           <div className={`${styles.callout} ${styles.calloutInfo}`}>
             <span className={styles.calloutIcon}>ℹ️</span>
             <p>
-              <strong>現在の提供状況:</strong> Cowork は Anthropic の Beta
-              製品として提供されています。 アクセスには waitlist への登録が必要な場合があります。
-              最新の提供状況は <Ext href="https://claude.ai">claude.ai</Ext> で確認してください。
+              <strong>現在の提供状況:</strong> Cowork は 2026 年 4 月 9 日に
+              <strong>一般提供（GA）</strong>となり、Beta バッジは外れました。Pro（$20/月）以上の
+              すべての有料プランに無償で含まれ、macOS / Windows で利用できます。GA
+              では定期実行タスク、 Team/Enterprise
+              向けプラグインマーケットプレイス、ロールベースアクセス制御、利用状況分析、
+              OpenTelemetry 連携が追加されました。最新の提供状況は{" "}
+              <Ext href="https://claude.ai">claude.ai</Ext> で確認してください。
             </p>
           </div>
         </section>
@@ -228,7 +232,7 @@ export default function Page() {
             <div className={`${styles.productCard} ${styles.productCardHighlight}`}>
               <div className={styles.productEmoji}>🖥️</div>
               <div className={styles.productName}>Cowork</div>
-              <div className={styles.productTarget}>Desktop App (Beta)</div>
+              <div className={styles.productTarget}>Desktop App (GA)</div>
               <div className={styles.productDesc}>ファイル管理・タスク自動化（非開発者）</div>
             </div>
             <div className={styles.productCard}>
@@ -1260,15 +1264,15 @@ allowed-tools:
           <div className={`${styles.callout} ${styles.calloutWarn}`}>
             <span className={styles.calloutIcon}>⚠️</span>
             <p>
-              <strong>最新情報の確認を推奨:</strong> Cowork は Beta
-              製品であり、仕様が急速に変わる場合があります。
+              <strong>最新情報の確認を推奨:</strong> Cowork は GA 後も
+              機能追加が活発で、仕様が変わる場合があります。
               本ガイドの内容と実際の動作が異なる場合は、
               <Ext href="https://support.claude.com">support.claude.com</Ext>
               の公式情報を優先してください。
             </p>
           </div>
           <p className={styles.footerNote}>
-            Claude Cowork 完全入門ガイド · 2026年3月版 · 初学者向けベストプラクティス
+            Claude Cowork 完全入門ガイド · 2026年6月版（GA 対応） · 初学者向けベストプラクティス
           </p>
         </section>
       </div>
