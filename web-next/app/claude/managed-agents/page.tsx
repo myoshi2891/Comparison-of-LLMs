@@ -716,7 +716,7 @@ export default function Page() {
                       <span className={styles.codeLang}>CLI</span>
                       <CodeCopyButton
                         className={styles.codeCopy}
-                        text={`ant beta:agents create \\\n  --name "Coding Assistant" \\\n  --model '{id: claude-opus-4-7}' \\\n  --system "You are a helpful coding assistant. Write clean, well-documented code." \\\n  --tool '{type: agent_toolset_20260401}'`}
+                        text={`ant beta:agents create \\\n  --name "Coding Assistant" \\\n  --model '{id: claude-opus-4-8}' \\\n  --system "You are a helpful coding assistant. Write clean, well-documented code." \\\n  --tool '{type: agent_toolset_20260401}'`}
                       />
                     </div>
                     <pre>
@@ -727,7 +727,7 @@ export default function Page() {
                         </div>
                         <div className={styles.codeLine}>
                           {"  "}--model{" "}
-                          <span className={styles.st}>'{`{id: claude-opus-4-7}`}'</span> \
+                          <span className={styles.st}>'{`{id: claude-opus-4-8}`}'</span> \
                         </div>
                         <div className={styles.codeLine}>
                           {"  "}--system{" "}
@@ -749,7 +749,7 @@ export default function Page() {
                       <span className={styles.codeLang}>Python</span>
                       <CodeCopyButton
                         className={styles.codeCopy}
-                        text={`import anthropic\n\nclient = anthropic.Anthropic()\n\nagent = client.beta.agents.create(\n    name="Coding Assistant",\n    model={"id": "claude-opus-4-7"},\n    system="You are a helpful coding assistant. Write clean, well-documented code.",\n    tools=[{"type": "agent_toolset_20260401"}],\n    betas=["managed-agents-2026-04-01"],\n)\n\n# このIDを環境変数やDBに保存する\nprint(f"Agent ID: {agent.id}")`}
+                        text={`import anthropic\n\nclient = anthropic.Anthropic()\n\nagent = client.beta.agents.create(\n    name="Coding Assistant",\n    model={"id": "claude-opus-4-8"},\n    system="You are a helpful coding assistant. Write clean, well-documented code.",\n    tools=[{"type": "agent_toolset_20260401"}],\n    betas=["managed-agents-2026-04-01"],\n)\n\n# このIDを環境変数やDBに保存する\nprint(f"Agent ID: {agent.id}")`}
                       />
                     </div>
                     <pre>
@@ -771,7 +771,7 @@ export default function Page() {
                         <div className={styles.codeLine}>
                           {"    "}model={"{"}
                           <span className={styles.st}>"id"</span>:{" "}
-                          <span className={styles.st}>"claude-opus-4-7"</span>
+                          <span className={styles.st}>"claude-opus-4-8"</span>
                           {"}"},
                         </div>
                         <div className={styles.codeLine}>
@@ -1136,7 +1136,7 @@ export default function Page() {
                 <span className={styles.codeLang}>Python — 権限ポリシー設定</span>
                 <CodeCopyButton
                   className={styles.codeCopy}
-                  text={`agent = client.beta.agents.create(\n    name="Safe Agent",\n    model={"id": "claude-opus-4-7"},\n    system="...",\n    tools=[{\n        "type": "agent_toolset_20260401",\n        "default_config": {\n            "permission_policy": {\n                "type": "always_allow" # or "always_deny", "ask_human"\n            }\n        }\n    }],\n    betas=["managed-agents-2026-04-01"],\n)`}
+                  text={`agent = client.beta.agents.create(\n    name="Safe Agent",\n    model={"id": "claude-opus-4-8"},\n    system="...",\n    tools=[{\n        "type": "agent_toolset_20260401",\n        "default_config": {\n            "permission_policy": {\n                "type": "always_allow" # or "always_deny", "ask_human"\n            }\n        }\n    }],\n    betas=["managed-agents-2026-04-01"],\n)`}
                 />
               </div>
               <pre>
@@ -1150,7 +1150,7 @@ export default function Page() {
                   <div className={styles.codeLine}>
                     {"    "}model={"{"}
                     <span className={styles.st}>"id"</span>:{" "}
-                    <span className={styles.st}>"claude-opus-4-7"</span>
+                    <span className={styles.st}>"claude-opus-4-8"</span>
                     {"}"},
                   </div>
                   <div className={styles.codeLine}>
@@ -1311,7 +1311,7 @@ export default function Page() {
                 <span className={styles.codeLang}>Python — コーディネーター作成</span>
                 <CodeCopyButton
                   className={styles.codeCopy}
-                  text={`coordinator = client.beta.agents.create(\n    name="Engineering Lead",\n    model={"id": "claude-opus-4-7"},\n    system="You coordinate engineering work. Delegate to specialist agents.",\n    tools=[{"type": "agent_toolset_20260401"}],\n    multiagent={\n        "type": "coordinator",\n        "agents": [\n            {"type": "agent", "id": REVIEWER_AGENT_ID},\n            {"type": "agent", "id": TEST_WRITER_AGENT_ID}\n        ]\n    },\n    betas=["managed-agents-2026-04-01"],\n)`}
+                  text={`coordinator = client.beta.agents.create(\n    name="Engineering Lead",\n    model={"id": "claude-opus-4-8"},\n    system="You coordinate engineering work. Delegate to specialist agents.",\n    tools=[{"type": "agent_toolset_20260401"}],\n    multiagent={\n        "type": "coordinator",\n        "agents": [\n            {"type": "agent", "id": REVIEWER_AGENT_ID},\n            {"type": "agent", "id": TEST_WRITER_AGENT_ID}\n        ]\n    },\n    betas=["managed-agents-2026-04-01"],\n)`}
                 />
               </div>
               <pre>
@@ -1325,7 +1325,7 @@ export default function Page() {
                   <div className={styles.codeLine}>
                     {"    "}model={"{"}
                     <span className={styles.st}>"id"</span>:{" "}
-                    <span className={styles.st}>"claude-opus-4-7"</span>
+                    <span className={styles.st}>"claude-opus-4-8"</span>
                     {"}"},
                   </div>
                   <div className={styles.codeLine}>
