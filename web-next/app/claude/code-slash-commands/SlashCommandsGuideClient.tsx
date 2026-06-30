@@ -236,8 +236,8 @@ export default function SlashCommandsGuideClient() {
               </h1>
             </div>
             <div className={styles.headerBadges}>
-              <span className={`${styles.badge} ${styles.badgeVersion}`}>v2.1.150</span>
-              <span className={`${styles.badge} ${styles.badgeDate}`}>2026-05-31</span>
+              <span className={`${styles.badge} ${styles.badgeVersion}`}>v2.1.196</span>
+              <span className={`${styles.badge} ${styles.badgeDate}`}>2026-06-30</span>
             </div>
           </div>
         </header>
@@ -1795,7 +1795,7 @@ export default function SlashCommandsGuideClient() {
                 .claude/commands/security-scan.md（フロントマター付き）
               </span>
               <CodeCopyButton
-                text={`---\ndescription: セキュリティ脆弱性スキャンを実行\nallowed-tools: Read, Grep, Glob, Bash, WebFetch\nmodel: claude-opus-4-7\nargument-hint: "[ブランチ名またはファイルパス]"\n---\n\n以下の観点でセキュリティ監査を実施してください：\n- SQL インジェクションのリスク\n- XSS 脆弱性\n- 認証・認可の問題\n- クレデンシャルの露出\n\n対象: $ARGUMENTS`}
+                text={`---\ndescription: セキュリティ脆弱性スキャンを実行\nallowed-tools: Read, Grep, Glob, Bash, WebFetch\nmodel: claude-opus-4-8\nargument-hint: "[ブランチ名またはファイルパス]"\n---\n\n以下の観点でセキュリティ監査を実施してください：\n- SQL インジェクションのリスク\n- XSS 脆弱性\n- 認証・認可の問題\n- クレデンシャルの露出\n\n対象: $ARGUMENTS`}
               />
             </div>
             <pre>
@@ -1806,7 +1806,7 @@ export default function SlashCommandsGuideClient() {
                 {"\n"}
                 <span className={styles.tKey}>allowed-tools</span>: Read, Grep, Glob, Bash, WebFetch
                 {"\n"}
-                <span className={styles.tKey}>model</span>: claude-opus-4-7{"\n"}
+                <span className={styles.tKey}>model</span>: claude-opus-4-8{"\n"}
                 <span className={styles.tKey}>argument-hint</span>:{" "}
                 <span className={styles.tStr}>&quot;[ブランチ名またはファイルパス]&quot;</span>
                 {"\n"}
@@ -1860,7 +1860,7 @@ export default function SlashCommandsGuideClient() {
                 </td>
                 <td>使用するモデルを固定</td>
                 <td>
-                  <code>claude-opus-4-7</code>
+                  <code>claude-opus-4-8</code>
                 </td>
               </tr>
               <tr className={matchSearch("argument-hint 引数のヒント表示") ? "" : styles.hidden}>
