@@ -153,6 +153,9 @@ function Ext({ href, children }: ExtProps) {
   );
 }
 
+/**
+ * Renders the SonarQube guide page and keeps the navigation state in sync with scroll position.
+ */
 export default function Page() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeSection, setActiveSection] = useState<string>("toc");

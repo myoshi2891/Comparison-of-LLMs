@@ -9,12 +9,9 @@ export const metadata: Metadata = {
 };
 
 /**
- * Render the SKILL.md complete guide page layout with navigation and content.
+ * Renders the SKILL.md complete guide page.
  *
- * Renders a documentation-style page containing a sidebar with numbered navigation,
- * a main area with a hero and content sections (including a client-only Mermaid diagram).
- *
- * @returns A React element representing the SKILL.md guide page.
+ * @returns A React element for the SKILL.md guide page.
  */
 export default function Page() {
   return (

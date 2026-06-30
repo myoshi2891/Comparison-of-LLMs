@@ -92,6 +92,11 @@ HUMAN --> ARCH["アーキテクチャ判断 / ビジネスロジック検証 / �
 ARCH --> APPROVE["Approve / Request Changes"]
 APPROVE --> MERGE["Merge"]`;
 
+/**
+ * Renders the GitHub Copilot Code Review guide page.
+ *
+ * @returns The page content for the Copilot Code Review guide.
+ */
 export default function Page() {
   return (
     <div className={styles.pageContainer}>

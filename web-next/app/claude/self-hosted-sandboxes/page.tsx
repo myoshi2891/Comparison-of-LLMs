@@ -123,6 +123,9 @@ function Ext({ href, children, className }: ExtProps) {
   );
 }
 
+/**
+ * Renders the Self-hosted Sandboxes guide page.
+ */
 export default function Page() {
   return (
     <div className={styles.layout}>
