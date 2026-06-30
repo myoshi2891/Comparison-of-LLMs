@@ -1231,6 +1231,14 @@ export default function Page() {
             Copilot Code Review は <strong>Premium Request</strong> を消費します。PR レビュー 1 回 =
             Premium Request 1 消費。IDE でのローカルレビューも同様です。
           </p>
+          <p className={styles.paragraph}>
+            <strong>2026-06-01 の課金変更：</strong>{" "}
+            GitHub は 2026 年 6 月 1 日より Copilot を使用量ベース（AI Credits）課金へ移行しました。
+            これに伴い Copilot Code Review も AI Credits を消費するようになり、さらに
+            <strong>プライベートリポジトリ</strong>で実行されるレビューは既存プランの
+            <strong>GitHub Actions 分</strong>も消費します。Pro / Pro+ / Max
+            プランで自動レビュー（Automatically request Copilot code review）を有効化できます。
+          </p>
 
           <div className={styles.metricGrid}>
             <div className={styles.metricCard}>
