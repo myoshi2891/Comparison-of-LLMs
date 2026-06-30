@@ -123,6 +123,9 @@ function Ext({ href, children, className }: ExtProps) {
   );
 }
 
+/**
+ * Renders the Self-hosted Sandboxes guide page.
+ */
 export default function Page() {
   return (
     <div className={styles.layout}>
@@ -231,7 +234,7 @@ export default function Page() {
               📋 <strong>ステータス</strong>: Public Beta
             </span>
             <span className={styles.hMetaI}>
-              📅 <strong>更新日</strong>: 2026年6月10日
+              📅 <strong>更新日</strong>: 2026年6月30日
             </span>
           </div>
         </section>
@@ -1273,6 +1276,18 @@ export default function Page() {
                 <code>AnthropicSelfHostedEnvironmentAccess</code>{" "}
                 マネージドポリシーをアタッチしてください。Console で生成した環境キーは AWS
                 エンドポイントでは動作しません。
+              </p>
+            </div>
+            <div className={`${styles.ca} ${styles.caR}`}>
+              <span className={styles.caI}>🆕</span>
+              <p>
+                <strong>
+                  2026年6月の新設定 — <code>sandbox.credentials</code>：
+                </strong>{" "}
+                Claude Code v2.1
+                系（2026年6月）で、サンドボックス内で実行されるコマンドが認証情報ファイルやシークレットの
+                環境変数を読み取れないようブロックする <code>sandbox.credentials</code>{" "}
+                設定が追加されました。セルフホスト環境でもワーカープロセスのシークレット露出を抑える多層防御として有効です。
               </p>
             </div>
           </div>

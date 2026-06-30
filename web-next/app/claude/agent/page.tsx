@@ -4,7 +4,7 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   title: "Claude Code サブエージェント Markdown ベストプラクティス | LLM コスト計算機",
   description:
-    "Claude Code v2.1.142 のサブエージェント / Agent Teams 開発で必要な CLAUDE.md・エージェント定義・MEMORY.md・README.md の役割と書き方を体系化したガイド。",
+    "Claude Code v2.1.196 のサブエージェント / Agent Teams 開発で必要な CLAUDE.md・エージェント定義・MEMORY.md・README.md の役割と書き方を体系化したガイド。",
 };
 
 type Source = { num: string; href: string; title: string; desc: string };
@@ -527,7 +527,7 @@ const SECTION_TITLES: TupleStr<typeof SECTION_IDS> = [
 ] as const;
 
 /**
- * Renders the Claude Code guide page covering sub-agents and Agent Teams best practices (v2.1.142, May 2026).
+ * Renders the Claude Code guide page covering sub-agents and Agent Teams best practices (v2.1.196, June 2026).
  *
  * The page is a static Next.js React component that displays a full, versioned guide including:
  * - TOC and 17 content sections (CLAUDE.md, sub-agent definitions, MEMORY.md, routing, models, new commands, Agent Teams, hooks, task JSON patterns, and sources)
@@ -543,7 +543,7 @@ export default function ClaudeAgentPage() {
         {/* HERO */}
         <div className={styles.hero}>
           <div className={styles.heroBadge}>
-            🤖 Claude Code 完全ガイド — 2026年5月 v2.1.142 最新対応版
+            🤖 Claude Code 完全ガイド — 2026年6月 v2.1.196 最新対応版
           </div>
           <h1 className={styles.heroTitle}>
             サブエージェント + Agent Teams 開発における
@@ -553,10 +553,11 @@ export default function ClaudeAgentPage() {
           <p className={styles.heroDesc}>
             CLAUDE.md・エージェント定義 .md・MEMORY.md・README.md ──
             それぞれの役割と書き方を体系的に解説します。
-            <strong>v2.1.142 最新アップデート（2026年5月）</strong>
+            <strong>v2.1.196 最新アップデート（2026年6月）</strong>
             （Voice mode・/loop・/effort・/goal・/ultrareview・xhigh effort・ultrathink・1M
-            コンテキスト・HTTP hooks・MCP elicitation・Agent Teams
-            安定化）に完全対応した最新版です。
+            コンテキスト・HTTP hooks・MCP elicitation・Agent Teams 安定化、さらに Opus 4.8 の
+            dynamic workflows・sandbox.credentials
+            によるシークレット保護）に完全対応した最新版です。
           </p>
         </div>
 
@@ -1242,7 +1243,7 @@ export default function ClaudeAgentPage() {
                 color: "#60a5fa",
               }}
             >
-              🚀 v2.1.142 · 2026年5月 最新アップデート
+              🚀 v2.1.196 · 2026年6月 最新アップデート
             </div>
             <h3 style={{ color: "#fff" }}>
               Voice mode・/loop・/effort・/goal・/ultrareview・1M コンテキスト・HTTP hooks
@@ -1273,7 +1274,7 @@ export default function ClaudeAgentPage() {
               {
                 icon: "⚡",
                 title: "/effort — Effort Level 制御 — v2.1.111",
-                desc: "Opus 4.7 の思考深度をリアルタイムで変更。デフォルトは medium。v2.1.111 で xhigh tier と対話式スライダーが追加。$CLAUDE_EFFORT 環境変数でフック/Bash からも参照可能。",
+                desc: "Opus 4.8 の思考深度をリアルタイムで変更。デフォルトは medium。v2.1.111 で xhigh tier と対話式スライダーが追加。$CLAUDE_EFFORT 環境変数でフック/Bash からも参照可能。",
                 prompt:
                   "/effort low     ← 高速・低コスト\n/effort medium  ← デフォルト\n/effort high    ← 深い分析\n/effort xhigh   ← 最深（v2.1.111+）\n/effort auto    ← リセット",
               },
@@ -1282,7 +1283,7 @@ export default function ClaudeAgentPage() {
                 title: "1M トークン コンテキスト — v2.1.128",
                 desc: "v2.1.128 で Opus モデルへの完全 1M コンテキスト対応が完了。autocompact の動作も改善し、1M コンテキストモデルでの「Prompt is too long」誤ブロックが修正されました。",
                 prompt:
-                  "最大出力: Opus 4.7 → 64k tokens (デフォルト)\n上限: Opus / Sonnet → 128k tokens\nコンテキスト上限: 1,000,000 tokens",
+                  "最大出力: Opus 4.8 → 64k tokens (デフォルト)\n上限: Opus / Sonnet → 128k tokens\nコンテキスト上限: 1,000,000 tokens",
               },
               {
                 icon: "🌐",

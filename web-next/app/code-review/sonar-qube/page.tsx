@@ -153,6 +153,9 @@ function Ext({ href, children }: ExtProps) {
   );
 }
 
+/**
+ * Renders the SonarQube guide page and keeps the navigation state in sync with scroll position.
+ */
 export default function Page() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeSection, setActiveSection] = useState<string>("toc");
@@ -300,7 +303,7 @@ export default function Page() {
           <div className={styles.heroBgGlow} />
           <div className={styles.container}>
             <div className={styles.heroBadge}>
-              SonarQube Server 2026.2 / Cloud 対応 | 2026年6月 更新
+              SonarQube Server 2026.3 / Cloud 対応 | 2026年6月 更新
             </div>
             <h1 className={styles.heroTitle}>
               SonarQube
@@ -2563,6 +2566,13 @@ sonar-scanner \\
               SonarQube を接続するブリッジ。Claude Code・Cursor・VS Code +
               Copilot・Windsurf・Kiro・Zed 等と接続できる。
             </p>
+            <p className={styles.paragraph}>
+              <strong>2026.3 の新機能：</strong> SonarQube Server 2026.3 以降は MCP サーバーを{" "}
+              <strong>本体に組み込み（embedded MCP server）</strong>でホストできるようになった。
+              従来の Docker コンテナを個別に起動する方式に加え、単一の MCP サーバー URL
+              を指定するだけで AI
+              コーディングアシスタントを接続でき、インフラ管理のオーバーヘッドが削減される。
+            </p>
 
             <div className={styles.codeBlockHeader}>
               <div className={styles.codeDots}>
@@ -3621,7 +3631,7 @@ sonar.scanner.cacheDirectory=/opt/sonar-cache`}
             中〜上級エンジニア向け
           </p>
           <p>
-            対応バージョン: SonarQube Server 2026.2 / SonarQube Cloud (2026.1 LTA 準拠)
+            対応バージョン: SonarQube Server 2026.3 / SonarQube Cloud (2026.1 LTA 準拠)
             &nbsp;|&nbsp; 最終更新: 2026年6月
           </p>
           <p style={{ marginTop: "0.5rem" }}>

@@ -9,12 +9,9 @@ export const metadata: Metadata = {
 };
 
 /**
- * Render the SKILL.md complete guide page layout with navigation and content.
+ * Renders the SKILL.md complete guide page.
  *
- * Renders a documentation-style page containing a sidebar with numbered navigation,
- * a main area with a hero and content sections (including a client-only Mermaid diagram).
- *
- * @returns A React element representing the SKILL.md guide page.
+ * @returns A React element for the SKILL.md guide page.
  */
 export default function Page() {
   return (
@@ -1158,7 +1155,9 @@ style FM fill:#1c2a1c,stroke:#3fb950,color:#e6edf3`}
                 から選択できます（Opus 4.7 で <code>xhigh</code> が追加）。スキル内に{" "}
                 <code>effort: high</code> を frontmatter で指定することも可能です（Opus 4.7
                 以降推奨）。<code>/loop</code>{" "}
-                コマンドを使えばスキルを定期的に繰り返し実行させることもできます。
+                コマンドを使えばスキルを定期的に繰り返し実行させることもできます。Opus 4.8
+                （2026-05-28）では claude.ai 上でもエフォート量を制御できるようになり、Claude Code
+                には大規模問題に対応する「dynamic workflows」が追加されています。
               </p>
             </div>
           </section>
@@ -1746,7 +1745,7 @@ style B fill:#2a1c1c,stroke:#f85149,color:#e6edf3`}
                 fontFamily: "'JetBrains Mono', monospace",
               }}
             >
-              最終更新: 2026年5月 · Claude Code 最新版 · SKILL.md 完全解説ガイド
+              最終更新: 2026年6月 · Claude Code 最新版 · SKILL.md 完全解説ガイド
             </p>
           </section>
         </main>
