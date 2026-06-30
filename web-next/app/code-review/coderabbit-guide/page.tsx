@@ -104,6 +104,11 @@ function Ext({ href, children }: ExtProps) {
   );
 }
 
+/**
+ * Renders the CodeRabbit guide page.
+ *
+ * Displays the full chaptered documentation layout, reference links, embedded diagrams, copyable code samples, and viewport-triggered progress bar animations.
+ */
 export default function Page() {
   const containerRef = useRef<HTMLDivElement>(null);
 
