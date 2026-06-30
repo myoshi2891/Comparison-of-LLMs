@@ -175,7 +175,7 @@ export default function Page() {
             <strong>ツール</strong>Claude Code / Agent SDK
           </div>
           <div className={styles.metaChip}>
-            <strong>更新</strong>2026年5月
+            <strong>更新</strong>2026年6月
           </div>
           <div className={styles.metaChip}>
             <strong>情報源</strong>Anthropic Engineering Blog
@@ -2021,7 +2021,7 @@ export default function Page() {
           ベース
         </p>
         <p style={{ marginTop: "8px" }}>
-          情報は 2026年5月時点のものです。最新情報は{" "}
+          情報は 2026年6月時点のものです。最新情報は{" "}
           <Ext href="https://www.anthropic.com/engineering">Anthropic Engineering Blog</Ext>{" "}
           をご確認ください。
         </p>
