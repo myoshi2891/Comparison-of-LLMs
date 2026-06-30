@@ -103,9 +103,9 @@ const SOURCES: Source[] = [
   },
   {
     num: "[16]",
-    href: "https://www.anthropic.com/news/claude-opus-4-7",
-    title: "Claude Opus 4.7 リリースブログ — Anthropic (2026年4月)",
-    desc: "xhigh effort・タスクバジェット・Self-verify・高解像度ビジョン（3.75MP）・破壊的変更点",
+    href: "https://www.anthropic.com/news/claude-opus-4-8",
+    title: "Claude Opus 4.8 リリースブログ — Anthropic (2026年5月28日)",
+    desc: "Claude Code「dynamic workflows」・エフォート制御・fast モード 2.5倍速・コード欠陥の見逃しが約1/4に低減",
   },
   {
     num: "[17]",
@@ -1458,7 +1458,7 @@ export default function ClaudeSkillPage() {
           <div className={`${styles.infoBox} ${styles.infoNote}`} style={{ marginTop: "1.5rem" }}>
             <span className={styles.infoIcon}>📅</span>
             <div>
-              上記は <strong>2026年5月9日</strong> 時点の情報です。Claude
+              上記は <strong>2026年6月30日</strong> 時点の情報です。Claude
               Codeは活発に開発が進んでいるため、最新情報は{" "}
               <a
                 href="https://docs.anthropic.com/en/docs/claude-code"
