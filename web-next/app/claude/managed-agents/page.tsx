@@ -306,7 +306,7 @@ export default function Page() {
             <div className={styles.metaRow}>
               <div className={styles.metaChip}>
                 <i className="ti ti-calendar" />
-                2026-05-30
+                2026-06-30
               </div>
               <div className={styles.metaChip}>
                 <i className="ti ti-tag" />

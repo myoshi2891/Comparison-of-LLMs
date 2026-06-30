@@ -150,8 +150,8 @@ export default function ClaudeSkillPage() {
         <div className={styles.badgeRow}>
           <span className={`${styles.badge} ${styles.badgeBlue}`}>Claude Code 最新版</span>
           <span className={`${styles.badge} ${styles.badgePurple}`}>Spec-Driven Development</span>
-          <span className={`${styles.badge} ${styles.badgeGreen}`}>May 2026 最新版</span>
-          <span className={`${styles.badge} ${styles.badgeOrange}`}>Opus 4.7 対応</span>
+          <span className={`${styles.badge} ${styles.badgeGreen}`}>Jun 2026 最新版</span>
+          <span className={`${styles.badge} ${styles.badgeOrange}`}>Opus 4.8 対応</span>
         </div>
       </header>
 

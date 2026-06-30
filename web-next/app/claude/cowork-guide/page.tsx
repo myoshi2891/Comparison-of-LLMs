@@ -201,7 +201,7 @@ export default function Page() {
           <div className={`${styles.callout} ${styles.calloutInfo}`}>
             <span className={styles.calloutIcon}>ℹ️</span>
             <p>
-              <strong>現在の提供状況:</strong> Cowork は 2026 年 4 月 9 日に
+              <strong>現在の提供状況:</strong> Cowork は 2026 年 4 月 9 日に{" "}
               <strong>一般提供（GA）</strong>となり、Beta バッジは外れました。Pro（$20/月）以上の
               すべての有料プランに無償で含まれ、macOS / Windows で利用できます。GA
               では定期実行タスク、 Team/Enterprise
@@ -343,7 +343,8 @@ export default function Page() {
                   <div className={`${styles.callout} ${styles.calloutInfo} ${styles.calloutMt}`}>
                     <span className={styles.calloutIcon}>ℹ️</span>
                     <p>
-                      Beta 期間中はウェイトリストへの登録が必要な場合があります。
+                      Cowork は 2026 年 4 月 9 日より一般提供（GA）されており、Pro
+                      以上の有料プランに無償で含まれます。
                       <Ext href="https://support.claude.com">support.claude.com</Ext>{" "}
                       で最新状況を確認してください。
                     </p>

@@ -60,7 +60,7 @@ const toolNo = (name: string) =>
  */
 export default function ToolPricingPage() {
   const jpyRate = pricing.jpy_rate;
-  const generatedAt = pricing.generated_at;
+  const generatedAt = pricing.jpy_rate_date;
 
   return (
     <div className={styles.page}>

@@ -527,7 +527,7 @@ const SECTION_TITLES: TupleStr<typeof SECTION_IDS> = [
 ] as const;
 
 /**
- * Renders the Claude Code guide page covering sub-agents and Agent Teams best practices (v2.1.142, May 2026).
+ * Renders the Claude Code guide page covering sub-agents and Agent Teams best practices (v2.1.196, June 2026).
  *
  * The page is a static Next.js React component that displays a full, versioned guide including:
  * - TOC and 17 content sections (CLAUDE.md, sub-agent definitions, MEMORY.md, routing, models, new commands, Agent Teams, hooks, task JSON patterns, and sources)
@@ -1243,7 +1243,7 @@ export default function ClaudeAgentPage() {
                 color: "#60a5fa",
               }}
             >
-              🚀 v2.1.142 · 2026年5月 最新アップデート
+              🚀 v2.1.196 · 2026年6月 最新アップデート
             </div>
             <h3 style={{ color: "#fff" }}>
               Voice mode・/loop・/effort・/goal・/ultrareview・1M コンテキスト・HTTP hooks

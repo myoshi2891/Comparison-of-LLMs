@@ -2564,7 +2564,7 @@ sonar-scanner \\
               Copilot・Windsurf・Kiro・Zed 等と接続できる。
             </p>
             <p className={styles.paragraph}>
-              <strong>2026.3 の新機能：</strong> SonarQube Server 2026.3 以降は MCP サーバーを
+              <strong>2026.3 の新機能：</strong> SonarQube Server 2026.3 以降は MCP サーバーを{" "}
               <strong>本体に組み込み（embedded MCP server）</strong>でホストできるようになった。
               従来の Docker コンテナを個別に起動する方式に加え、単一の MCP サーバー URL
               を指定するだけで AI

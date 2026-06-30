@@ -915,7 +915,7 @@ style P3 fill:#2d1f4a,stroke:#b794f4,color:#ffffff`}
           </div>
           <div className={`${styles.callout} ${styles.calloutInfo}`}>
             <span className={styles.calloutIcon}>🔧</span>
-            <strong>2026年5月現在も有効：</strong>
+            <strong>2026年6月現在も有効：</strong>
             <code>context: fork</code> および <code>agent</code>{" "}
             フィールドの挙動に関する不具合について、 v2.1.x 等で修正されたとの報告がある（
             <a
@@ -1707,7 +1707,7 @@ style E fill:#1a3a5c,stroke:#63b3ed,color:#ffffff`}
                 <code>/effort low | medium | high | auto</code> で Opus 4.6
                 の思考深度をリアルタイム調整。 デフォルトは <code>medium</code>。スキルの
                 frontmatter に <code>effort: high</code> を付与すると、そのスキル起動時のみ deep
-                thinking が有効になる（2026年5月時点）。
+                thinking が有効になる（2026年6月時点）。
               </li>
             </ul>
           </div>
