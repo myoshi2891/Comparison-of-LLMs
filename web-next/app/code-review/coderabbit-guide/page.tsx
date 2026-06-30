@@ -175,7 +175,7 @@ export default function Page() {
       <main className={styles.main} id="top">
         {/* ══════════════ HERO ══════════════ */}
         <section className={styles.hero}>
-          <div className={styles.heroTag}>🚀 CodeRabbit 完全活用ガイド — 2025</div>
+          <div className={styles.heroTag}>🚀 CodeRabbit 完全活用ガイド — 2026</div>
           <h1>
             Ship Better Code, <br />
             <span>AI がレビューする時代</span>の
@@ -196,7 +196,7 @@ export default function Page() {
           <div className={styles.heroMeta}>
             <span className={`${styles.heroBadge} ${styles.badgeGreen}`}>中〜上級者対象</span>
             <span className={`${styles.heroBadge} ${styles.badgeCyan}`}>Chapter 8 構成</span>
-            <span className={`${styles.heroBadge} ${styles.badgePink}`}>最新: 2025-06</span>
+            <span className={`${styles.heroBadge} ${styles.badgePink}`}>最新: 2026-06</span>
             <span className={`${styles.heroBadge} ${styles.badgeAmber}`}>公式 docs 一次情報源</span>
           </div>
         </section>
@@ -2790,7 +2790,7 @@ export default function Page() {
             }}
           >
             <p>
-              Generated: 2025-06 | Source:{" "}
+              Generated: 2026-06 | Source:{" "}
               <Ext href="https://docs.coderabbit.ai/">docs.coderabbit.ai</Ext> (一次情報源)
             </p>
             <p style={{ marginTop: "0.3rem" }}>
