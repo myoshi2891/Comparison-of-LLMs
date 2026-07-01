@@ -248,6 +248,11 @@ function Ext({ href, children, className }: ExtProps) {
   );
 }
 
+/**
+ * Renders the Vercel Sandbox guide page.
+ *
+ * @returns The documentation layout for the Vercel Sandbox introductory guide.
+ */
 export default function Page() {
   return (
     <div className={styles.layout}>

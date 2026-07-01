@@ -173,11 +173,9 @@ function CodeDots() {
 }
 
 /**
- * Renders the GeminiSkillPage documentation describing Google Antigravity v2.0.1 — its Rules, SKILL.md conventions, Workflows, Knowledge Base, Artifacts, SDD guidance, and recommended project directory structure.
+ * Renders the GeminiSkillPage documentation site.
  *
- * The component outputs a static, structured documentation page with sections, code examples, best practices, and a sources list used for in-repo guidance.
- *
- * @returns The React element containing the full GeminiSkillPage documentation layout.
+ * @returns The React element for the full documentation layout.
  */
 export default function GeminiSkillPage() {
   return (

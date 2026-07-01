@@ -147,10 +147,9 @@ style A fill:#1a1a10,stroke:#f97316,color:#fdba74
 style C fill:#1a1020,stroke:#a855f7,color:#c4b5fd`;
 
 /**
- * Renders the intermediate-plus "SKILL.md" full-page guide describing architecture, syntax,
- * patterns, installation, scope, lifecycle, MCP integration, best practices, and changelog.
+ * Renders the full intermediate-plus SKILL.md guide page.
  *
- * @returns The React element for the complete guide page layout.
+ * @returns The React element for the complete guide layout.
  */
 export default function SkillGuideIntermediatePage() {
   return (

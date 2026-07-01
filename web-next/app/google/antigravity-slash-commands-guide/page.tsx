@@ -7,6 +7,9 @@ export const metadata = {
     "Gemini CLI / Antigravity CLI の全コマンドをステップバイステップで解説。初学者がゼロから実践できるベストプラクティス付き。",
 };
 
+/**
+ * Renders the Antigravity slash commands guide page.
+ */
 export default function AntigravitySlashCommandsGuidePage() {
   return (
     <main className={`antigravity-guide-wrapper ${styles.pageWrapper}`}>

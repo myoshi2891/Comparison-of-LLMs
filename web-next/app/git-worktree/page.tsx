@@ -16,6 +16,11 @@ function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   );
 }
 
+/**
+ * Renders the git worktree parallel documentation guide page.
+ *
+ * @returns The page content for the worktree-based multi-platform documentation workflow guide.
+ */
 export default function GitWorktreePage() {
   return (
     <>
