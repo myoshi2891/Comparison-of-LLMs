@@ -2394,7 +2394,8 @@ export default function HarnessEngineeringGuide() {
             OpenAI ハーネスエンジニアリング 完全ガイド 2026
           </div>
           <div>
-            最終更新: 2026年6月（Codex CLI v0.142.4 / GPT-5.5・GPT-5-Codex）｜ 情報は記載時点のものです。最新情報は
+            最終更新: 2026年6月（Codex CLI v0.142.4 / GPT-5.5・GPT-5-Codex）｜
+            情報は記載時点のものです。最新情報は
             <a
               className={styles.a}
               href="https://platform.openai.com/docs"

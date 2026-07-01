@@ -227,7 +227,9 @@ export default function CodexAgentPage() {
         <div className={styles["nav-logo"]}>⚙</div>
         <span className={styles["nav-title"]}>OpenAI Codex Agent Dev Guide</span>
         <span className={styles["nav-sep"]}>—</span>
-        <span className={styles["nav-sub"]}>GPT-5-Codex / Codex CLI v0.142.4 / Agents SDK · 2026</span>
+        <span className={styles["nav-sub"]}>
+          GPT-5-Codex / Codex CLI v0.142.4 / Agents SDK · 2026
+        </span>
         <div className={styles["nav-right"]}>
           <span className={styles["nav-chip"]}>Codex CLI v0.142.4</span>
           <span className={styles["nav-chip"]}>Multi-Agent</span>
