@@ -4,7 +4,7 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   title: "GitHub Copilot 完全ガイド 2026 | ベストプラクティス",
   description:
-    "2026年5月最新版 — 初学者からエキスパートまで対応したステップバイステップのAIコーディングアシスタント活用法",
+    "2026年6月最新版 — 初学者からエキスパートまで対応したステップバイステップのAIコーディングアシスタント活用法。Cloud agent GA・従量課金（AI Credits）・Copilot code review の AGENTS.md 対応を反映。",
 };
 
 type Source = {
@@ -182,7 +182,7 @@ export default function GithubCopilotPage() {
       <header className={styles.hero}>
         <div className={styles.heroBadge}>
           <span className={styles.badgeDot} />
-          Updated: May 2026
+          Updated: June 2026
         </div>
         <h1 className={styles.heroTitle}>
           <span className={styles.dim}>{"// "}</span>
@@ -191,7 +191,7 @@ export default function GithubCopilotPage() {
           完全ベストプラクティスガイド
         </h1>
         <p className={styles.heroSub}>
-          2026年5月最新版 — 初学者からエキスパートまで対応した
+          2026年6月最新版 — 初学者からエキスパートまで対応した
           <br />
           ステップバイステップのAIコーディングアシスタント活用法
         </p>
@@ -440,7 +440,7 @@ export default function GithubCopilotPage() {
           <div className={styles.alertInfo} style={{ marginTop: "16px", fontSize: "0.875rem" }}>
             <span className={styles.alertIcon}>📅</span>
             <div className={styles.alertContent}>
-              <strong>最終更新:</strong> 2026年5月
+              <strong>最終更新:</strong> 2026年6月
               <br />
               <strong>参考:</strong>{" "}
               <Ext href="https://github.com/features/copilot/plans">
@@ -1527,7 +1527,7 @@ export default function GithubCopilotPage() {
           <div className={styles.alertInfo} style={{ marginTop: "16px", fontSize: "0.875rem" }}>
             <span className={styles.alertIcon}>📅</span>
             <div className={styles.alertContent}>
-              <strong>最終更新:</strong> 2026年5月
+              <strong>最終更新:</strong> 2026年6月
               <br />
               <strong>参考:</strong>{" "}
               <Ext href="https://docs.github.com/en/copilot/using-github-copilot/finding-information-about-github-copilot/supported-models">
@@ -1651,7 +1651,7 @@ export default function GithubCopilotPage() {
             <div>
               <h2 className={styles.secTitle}>参考ソース一覧</h2>
               <p className={styles.secDesc}>
-                本ガイドの根拠となる公式ドキュメントおよび最新情報ソース（2026年5月時点）
+                本ガイドの根拠となる公式ドキュメントおよび最新情報ソース（2026年6月時点）
               </p>
             </div>
           </div>
