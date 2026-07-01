@@ -16,6 +16,11 @@ function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   );
 }
 
+/**
+ * Renders the git worktree parallel documentation guide page.
+ *
+ * @returns The page content for the worktree-based multi-platform documentation workflow guide.
+ */
 export default function GitWorktreePage() {
   return (
     <>
@@ -2452,6 +2457,7 @@ style D4 fill:#1c1028,stroke:#e2a8ff,color:#ffffff`}
       <footer className={styles.footer}>
         <span>git worktree × 4-Platform Docs Parallel Update Guide</span>
         <span>git 2.5+ required · No additional install needed</span>
+        <span>最終レビュー: 2026年6月</span>
       </footer>
     </>
   );

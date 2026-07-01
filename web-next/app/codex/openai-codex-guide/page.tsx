@@ -4,16 +4,11 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   title: "OpenAI Codex 完全ガイド 2026",
   description:
-    "2026-05-23 最新版 (v0.105.0)。初学者から中級者まで、GPT-5.4 を搭載した AI コーディングエージェントを最大限に活かすベストプラクティスをステップバイステップで解説します。",
+    "2026-06-29 最新版 (v0.142.4)。初学者から中級者まで、GPT-5.5 / GPT-5-Codex を搭載した AI コーディングエージェントを最大限に活かすベストプラクティスをステップバイステップで解説します（Codex Remote GA 対応）。",
 };
 
 /**
- * Renders the static Next.js page for the Japanese "OpenAI Codex 完全ガイド 2026" guide.
- *
- * The component returns a fully static JSX tree that presents multiple sections:
- * header (title, subtitle, stats), and content sections covering Codex overview,
- * setup, model selection, prompt best practices, AGENTS.md usage, workflows,
- * advanced techniques, do/don't recommendations, and references.
+ * Renders the Japanese "OpenAI Codex 完全ガイド 2026" page.
  *
  * @returns The React element tree for the static guide page.
  */
@@ -22,7 +17,7 @@ export default function Page() {
     <div className={styles.wrap}>
       {/* PAGE HEADER */}
       <header className={styles.pageHeader}>
-        <div className={styles.badge}>2026年5月 最新情報対応</div>
+        <div className={styles.badge}>2026年6月 最新情報対応</div>
         <h1 className={styles.h1}>
           <span className={styles.h1Line1}>OpenAI Codex</span>
           <span className={styles.h1Line2}>完全ガイド</span>
@@ -36,7 +31,7 @@ export default function Page() {
             <div className={styles.statLabel}>対応言語</div>
           </div>
           <div className={styles.stat}>
-            <div className={styles.statVal}>GPT-5.4</div>
+            <div className={styles.statVal}>GPT-5.5</div>
             <div className={styles.statLabel}>最新モデル</div>
           </div>
           <div className={styles.stat}>
@@ -67,7 +62,8 @@ export default function Page() {
               <strong style={{ color: "#e2e8f0" }}>
                 ソフトウェア開発に特化したAIコーディングエージェント
               </strong>
-              です。2025年5月にクラウドエージェントとして登場し、2026年5月現在ではGPT-5.4を搭載した本番利用可能な開発インフラへと進化しています。単なるコード補完ではなく、
+              です。2025年5月にクラウドエージェントとして登場し、2026年6月現在ではGPT-5.5 /
+              GPT-5-Codexを搭載した本番利用可能な開発インフラへと進化しています。単なるコード補完ではなく、
               <em style={{ color: "#00d4ff" }}>リポジトリ全体を理解・操作できるエージェント</em>
               です。
             </p>
@@ -371,7 +367,7 @@ export default function Page() {
           </div>
 
           <p style={{ color: "#94a3b8", fontSize: "14px", marginBottom: "20px" }}>
-            2026年5月現在、代表的な推奨モデルは以下です。適切なモデル選択がコスト効率と品質に直結します。注:
+            2026年6月現在、代表的な推奨モデルは以下です。適切なモデル選択がコスト効率と品質に直結します。注:
             表示は主要な推奨モデルの例であり、他の利用可能なモデルも存在します。
           </p>
 
@@ -385,22 +381,22 @@ export default function Page() {
                   marginBottom: "6px",
                 }}
               >
-                <div className={styles.modelName}>gpt-5.4</div>
+                <div className={styles.modelName}>gpt-5.5</div>
                 <div className={`${styles.modelBadge} ${styles.modelBadgeNew}`}>★ 推奨</div>
               </div>
               <div className={styles.modelDesc}>
-                コーディング・推論・エージェントワークフローを統合したフラッグシップモデル。GPT-5.3-Codexの業界最高のコード生成能力を内包。ほとんどのタスクはこちらから始めよう。
+                コーディング・推論・エージェントワークフローを統合したフラッグシップモデル。GPT-5-Codexの業界最高のコード生成能力を内包。ほとんどのタスクはこちらから始めよう。
               </div>
             </div>
             <div className={styles.modelCard}>
-              <div className={styles.modelName}>gpt-5.4-mini</div>
+              <div className={styles.modelName}>gpt-5.5-mini</div>
               <div className={styles.modelDesc}>
-                軽量・高速版。CRUD操作、コード探索、大ファイルレビューなど軽めのタスク向け。gpt-5.4の30%のリソース消費なので長時間作業に最適。
+                軽量・高速版。CRUD操作、コード探索、大ファイルレビューなど軽めのタスク向け。gpt-5.5の30%のリソース消費なので長時間作業に最適。
               </div>
               <div className={`${styles.modelBadge} ${styles.modelBadgeNew}`}>2x速い・低コスト</div>
             </div>
             <div className={styles.modelCard}>
-              <div className={styles.modelName}>gpt-5.3-codex-spark</div>
+              <div className={styles.modelName}>gpt-5-codex-spark</div>
               <div className={styles.modelDesc}>
                 リアルタイムコーディングに最適化した研究プレビューモデル。ほぼ即時のコードイテレーションが可能。ChatGPT
                 Pro ユーザー向け。
@@ -408,10 +404,10 @@ export default function Page() {
               <div className={`${styles.modelBadge} ${styles.modelBadgePro}`}>Pro限定</div>
             </div>
             <div className={styles.modelCard}>
-              <div className={styles.modelName}>gpt-5.3-codex</div>
+              <div className={styles.modelName}>gpt-5-codex</div>
               <div className={styles.modelDesc}>
-                コーディング特化モデルの前世代フラッグシップ。Responses API
-                でも利用可能。GPT-5.4に後継されたが現在も有効。
+                コーディング特化モデル。Responses API
+                でも利用可能。GPT-5.5に後継されたが現在も有効。
               </div>
             </div>
           </div>
@@ -440,19 +436,19 @@ export default function Page() {
                 <span className={styles.cm}># CLI起動時にモデル指定</span>
                 {"\n"}
                 <span className={styles.fn}>codex</span> <span className={styles.op}>-m</span>{" "}
-                gpt-5.4{"\n\n"}
+                gpt-5.5{"\n\n"}
                 <span className={styles.cm}># 実行中に /model コマンドで切り替え</span>
                 {"\n"}
-                <span className={styles.op}>/model</span> gpt-5.4-mini{"\n\n"}
+                <span className={styles.op}>/model</span> gpt-5.5-mini{"\n\n"}
                 <span className={styles.cm}># config.toml で永続設定 (~/.codex/config.toml)</span>
                 {"\n"}
                 <span className={styles.fn}>model</span> ={" "}
-                <span className={styles.str}>&quot;gpt-5.4&quot;</span>
+                <span className={styles.str}>&quot;gpt-5.5&quot;</span>
                 {"\n"}
                 <span className={styles.cm}># オプション: レビュー専用モデル</span>
                 {"\n"}
                 <span className={styles.fn}>review_model</span> ={" "}
-                <span className={styles.str}>&quot;gpt-5.4-mini&quot;</span>
+                <span className={styles.str}>&quot;gpt-5.5-mini&quot;</span>
               </pre>
             </div>
           </div>
@@ -462,11 +458,11 @@ export default function Page() {
             <div>
               <strong>使い分けの鉄則：</strong>複雑な設計・アーキテクチャ判断・最終レビューには
               <code style={{ fontFamily: "var(--font-mono,'JetBrains Mono',monospace)" }}>
-                gpt-5.4
+                gpt-5.5
               </code>
               、コードベース探索・大量ファイルのレビュー・サブエージェントには
               <code style={{ fontFamily: "var(--font-mono,'JetBrains Mono',monospace)" }}>
-                gpt-5.4-mini
+                gpt-5.5-mini
               </code>
               を使うことでリソースを節約できます。
             </div>

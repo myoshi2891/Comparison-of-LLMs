@@ -60,7 +60,8 @@ const toolNo = (name: string) =>
  */
 export default function ToolPricingPage() {
   const jpyRate = pricing.jpy_rate;
-  const generatedAt = pricing.jpy_rate_date;
+  // jpy_rate_date は API 失敗時にセンチネル "fallback" になりうるため表示用に正規化する
+  const rateDateLabel = pricing.jpy_rate_date === "fallback" ? "–" : pricing.jpy_rate_date;
 
   return (
     <div className={styles.page}>
@@ -82,7 +83,7 @@ export default function ToolPricingPage() {
           </p>
           <p className={styles.rateNote}>
             ※ 円は USD からの概算。更新時レート 1 USD = ¥{jpyRate.toLocaleString("ja-JP")}（
-            {generatedAt} 時点）
+            {rateDateLabel} 時点）
           </p>
 
           <dl className={styles.stats}>
@@ -296,7 +297,7 @@ export default function ToolPricingPage() {
             </p>
             <p className={styles.disclaimerSub}>
               ※ 円は USD からの概算換算です。更新時レート 1 USD = ¥{jpyRate.toLocaleString("ja-JP")}
-              （{generatedAt}{" "}
+              （{rateDateLabel}{" "}
               時点）。為替レートは日々変動するため、実際の金額は異なる場合があります。
             </p>
           </div>

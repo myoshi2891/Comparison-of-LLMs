@@ -23,6 +23,11 @@ function Ext({
   );
 }
 
+/**
+ * Renders the Hermes Agent advanced guide page.
+ *
+ * @returns The complete guide layout, including navigation, chapter sections, diagrams, references, and footer content.
+ */
 export default function Page() {
   return (
     <div className={styles.pageContainer}>
@@ -46,7 +51,7 @@ export default function Page() {
       </nav>
 
       <section className={styles.hero}>
-        <div className={styles.heroBadge}>Nous Research — v0.15.2 — 2026.06.03</div>
+        <div className={styles.heroBadge}>Nous Research — v0.15.2 — 2026.06.30</div>
         <h1>
           Hermes Agent
           <br />
@@ -63,7 +68,7 @@ export default function Page() {
             バージョン <span>v0.15.2</span>
           </div>
           <div className={styles.metaPill}>
-            更新 <span>2026年6月3日</span>
+            更新 <span>2026年6月30日</span>
           </div>
           <div className={styles.metaPill}>
             ライセンス <span>MIT</span>
@@ -2282,7 +2287,7 @@ J2 -->|"最新出力を注入"| J3`}
           </Ext>
         </p>
         <p className={styles.paragraph} style={{ marginTop: "0.4rem" }}>
-          Hermes Agent v0.15.2 — MIT License — Nous Research — 2026.06.03
+          Hermes Agent v0.15.2 — MIT License — Nous Research — 2026.06.30
         </p>
       </footer>
     </div>

@@ -1444,6 +1444,14 @@ export default function ClaudeSkillPage() {
                 4.6と同一。
               </p>
             </div>
+            <div className={`${styles.principle} ${styles.pPurple}`}>
+              <div className={styles.principleNum}>NEW</div>
+              <h4>🧠 Claude Opus 4.8（5月28日）</h4>
+              <p>
+                Claude Code「dynamic
+                workflows」・エフォート制御・fastモード2.5倍速・コード欠陥の見逃しが約1/4に低減（[16]）。
+              </p>
+            </div>
             <div className={`${styles.principle} ${styles.pGreen}`}>
               <div className={styles.principleNum}>NEW</div>
               <h4>🔍 ultrareview（4月28日）</h4>

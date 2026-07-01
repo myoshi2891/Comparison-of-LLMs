@@ -4,7 +4,7 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   title: "GitHub Copilot — SKILL.md 完全ベストプラクティスガイド",
   description:
-    "GitHub Copilot Coding Agent / VS Code Agent Mode / Copilot CLI 対応の SKILL.md ガイド。フロントマター完全仕様・Progressive Disclosure 3段階ローディング・ステップバイステップ作成・実践テンプレート集・トラブルシューティングを 2026年最新版 (v0.105.0) の公式ドキュメント根拠付きで徹底解説。",
+    "GitHub Copilot Coding Agent / VS Code Agent Mode / Copilot CLI 対応の SKILL.md ガイド。フロントマター完全仕様・Progressive Disclosure 3段階ローディング・ステップバイステップ作成・実践テンプレート集・トラブルシューティングを 2026年6月最新版の公式ドキュメント根拠付きで徹底解説。Copilot code review は AGENTS.md 対応（2026-06-18）、Cloud agent は GA。",
 };
 
 type Source = { num: string; href: string; title: string; desc: string };
@@ -133,12 +133,11 @@ function Ext({
 }
 
 /**
- * Renders the complete "GitHub Copilot — SKILL.md 完全ベストプラクティスガイド" page (May 2026 edition).
+ * Renders the complete "GitHub Copilot — SKILL.md 完全ベストプラクティスガイド" page (June 2026 edition).
  *
- * The page includes header metadata, a table of contents, detailed sections covering concept,
- * the 3-level Progressive Disclosure model, frontmatter specification, placement paths,
- * a step-by-step creation guide, templates, comparisons with custom instructions,
- * advanced patterns (resources and MCP), troubleshooting, best practices, community resources,
+ * The page covers the SKILL.md concept, Progressive Disclosure, frontmatter specification,
+ * placement paths, step-by-step creation, reusable templates, custom instructions comparison,
+ * advanced resource and MCP patterns, troubleshooting, best practices, community resources,
  * and reference sources.
  *
  * @returns The React element for the full SKILL.md best-practices guide page.
@@ -148,7 +147,7 @@ export default function CopilotSkillPage() {
     <div className={styles.root}>
       <header className={styles.header}>
         <div className={styles.hdrMesh} />
-        <div className={styles.eyebrow}>Microsoft × GitHub × VS Code — 2026年5月版</div>
+        <div className={styles.eyebrow}>Microsoft × GitHub × VS Code — 2026年6月版</div>
         <h1>
           <span className={styles.msText}>GitHub Copilot</span>
           <br />
@@ -162,21 +161,21 @@ export default function CopilotSkillPage() {
           フロントマター完全仕様 / 3段階ローディング / ステップバイステップ作成 / 実践テンプレート集
           / トラブルシューティング——
           <br />
-          2026年5月時点の公式ドキュメントと最新情報を元に、初学者から上級者まで対応した決定版ガイド
+          2026年6月時点の公式ドキュメントと最新情報を元に、初学者から上級者まで対応した決定版ガイド
         </p>
         <div className={styles.badgeStrip}>
           <span className={`${styles.badge} ${styles.bm}`}>GitHub Copilot</span>
           <span className={`${styles.badge} ${styles.bg}`}>agentskills.io オープン標準</span>
           <span className={`${styles.badge} ${styles.bc}`}>Progressive Disclosure</span>
           <span className={`${styles.badge} ${styles.bv}`}>4ツール共通フォーマット</span>
-          <span className={`${styles.badge} ${styles.bt}`}>May 2026 最新</span>
+          <span className={`${styles.badge} ${styles.bt}`}>June 2026 最新</span>
         </div>
       </header>
 
       <main className={styles.main}>
         {/* TOC */}
         <nav className={styles.toc} aria-label="目次">
-          <div className={styles.tocTtl}>目次 — SKILL.md 完全ガイド 2026年5月版</div>
+          <div className={styles.tocTtl}>目次 — SKILL.md 完全ガイド 2026年6月版</div>
           <ol>
             <li>
               <a href="#skill-concept">SKILL.mdとは — 概念・位置づけ・他ファイルとの違い</a>
@@ -1654,7 +1653,7 @@ export default function CopilotSkillPage() {
           <div className={styles.slabel}>Section 12 — 参考ソース</div>
           <div className={styles.sources}>
             <div className={styles.srcTtl}>
-              📚 参考ソース一覧 — SKILL.md 完全ガイド 2026年5月版（[A]〜[L] が SKILL.md
+              📚 参考ソース一覧 — SKILL.md 完全ガイド 2026年6月版（[A]〜[L] が SKILL.md
               専用新規追加）
             </div>
 

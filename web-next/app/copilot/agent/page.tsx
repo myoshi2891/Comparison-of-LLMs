@@ -5,7 +5,7 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   title: "GitHub Copilot コーディングエージェント開発ガイド | LLM コスト計算機",
   description:
-    "GitHub Copilot .agent.md の完全ベストプラクティスガイド。フロントマター全仕様・ステップバイステップ作成・Handoffs（エージェント連鎖）・Subagents（サブエージェント）・MCP統合・マルチエージェント設計パターン・トラブルシューティングを 2026年5月最新版の公式ドキュメント準拠で解説。",
+    "GitHub Copilot .agent.md の完全ベストプラクティスガイド。フロントマター全仕様・ステップバイステップ作成・Handoffs（エージェント連鎖）・Subagents（サブエージェント）・MCP統合・マルチエージェント設計パターン・トラブルシューティングを 2026年6月最新版の公式ドキュメント準拠で解説。Cloud agent GA・組織/エンタープライズエージェント（JetBrains）・Copilot code review の AGENTS.md 対応に対応。",
 };
 
 type Source = {
@@ -182,7 +182,7 @@ export default function CopilotAgentPage() {
       <div className={styles.wrap}>
         {/* Hero */}
         <div className={styles.hero}>
-          <div className={styles.heroBadge}>🐙 GitHub Copilot 完全ガイド 2026年5月版</div>
+          <div className={styles.heroBadge}>🐙 GitHub Copilot 完全ガイド 2026年6月版</div>
           <h1>
             GitHub Copilot <em>.agent.md</em> 完全
             <br />
@@ -192,7 +192,7 @@ export default function CopilotAgentPage() {
             フロントマター全仕様 / ステップバイステップ作成 / Handoffs（エージェント連鎖） /
             Subagents（サブエージェント） / MCP統合 / マルチエージェント設計パターン /
             トラブルシューティング ——
-            2026年5月版の公式ドキュメント準拠で初学者から上級者まで対応した決定版ガイド。
+            2026年6月版の公式ドキュメント準拠で初学者から上級者まで対応した決定版ガイド。
           </p>
           <div className={styles.heroChips}>
             <span className={styles.heroChip}>フロントマター完全仕様</span>
@@ -3527,7 +3527,7 @@ export default function CopilotAgentPage() {
         <section id="sources" className={styles.sec}>
           <div className={styles.secHead}>
             <span className={styles.secNum}>📚</span>
-            <h2>参考ソース（公式・一次情報優先）— 2026年5月最新版</h2>
+            <h2>参考ソース（公式・一次情報優先）— 2026年6月最新版</h2>
           </div>
           <div className={styles.srcGrid}>
             {SOURCES.map((src) => (

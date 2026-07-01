@@ -95,7 +95,7 @@ APPROVE --> MERGE["Merge"]`;
 /**
  * Renders the GitHub Copilot Code Review guide page.
  *
- * @returns The page content for the Copilot Code Review guide.
+ * @returns The full guide page content.
  */
 export default function Page() {
   return (
@@ -1239,10 +1239,9 @@ export default function Page() {
           <p className={styles.paragraph}>
             <strong>2026-06-01 の課金変更：</strong> GitHub は 2026 年 6 月 1 日より Copilot
             を使用量ベース（AI Credits）課金へ移行しました。 これに伴い Copilot Code Review も AI
-            Credits を消費するようになり、さらに{" "}
-            <strong>プライベートリポジトリ</strong>で実行されるレビューは既存プランの{" "}
-            <strong>GitHub Actions 分</strong>も消費します。Pro /
-            Pro+ / Max プランで自動レビュー（Automatically request Copilot code
+            Credits を消費するようになり、さらに <strong>プライベートリポジトリ</strong>
+            で実行されるレビューは既存プランの <strong>GitHub Actions 分</strong>も消費します。Pro /
+            Pro+ プランで自動レビュー（個人設定）（Automatically request Copilot code
             review）を有効化できます。
           </p>
 

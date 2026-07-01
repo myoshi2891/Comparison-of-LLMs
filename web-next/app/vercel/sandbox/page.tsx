@@ -248,6 +248,11 @@ function Ext({ href, children, className }: ExtProps) {
   );
 }
 
+/**
+ * Renders the Vercel Sandbox guide page.
+ *
+ * @returns The documentation layout for the Vercel Sandbox introductory guide.
+ */
 export default function Page() {
   return (
     <div className={styles.layout}>
@@ -2515,7 +2520,7 @@ export default function Page() {
         <footer className={styles.footer}>
           <div>© 2026 Vercel Sandbox 完全入門ガイド — 公式ドキュメントに基づき作成</div>
           <div>
-            最終更新: 2026年6月 |{" "}
+            最終更新: 2026年6月30日 |{" "}
             <Ext href="https://vercel.com/docs/sandbox">vercel.com/docs/sandbox</Ext>
           </div>
         </footer>

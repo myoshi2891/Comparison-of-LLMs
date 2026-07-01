@@ -2011,7 +2011,7 @@ export default function GeminiHarnessEngineeringPage() {
           <p>Google Testing Blog / Software Engineering at Google 準拠 — 2026年版</p>
           <p style={{ marginTop: "0.4rem", fontSize: "0.72rem" }}>
             本ドキュメントは abseil.io/resources/swe-book および testing.googleblog.com
-            の公開情報を基に作成
+            の公開情報を基に作成（最終レビュー: 2026年6月）
           </p>
         </footer>
       </main>

@@ -10,11 +10,11 @@ export const metadata: Metadata = {
 };
 
 /**
- * Render the Antigravity best-practices guide page containing a hero, table of contents, and ten static content sections.
+ * Renders the Antigravity best-practices guide page with a hero, table of contents, and ten static sections.
  *
- * The page presents comprehensive guidance on GEMINI.md, SKILL.md, Rules, Workflows, Artifacts, supported models/pricing, cross-cutting best practices, and reference sources, and composes imported UI pieces like GeminiMdTabs and BestPracticesChecklist.
+ * The page covers GEMINI.md, SKILL.md, Rules, Workflows, Artifacts, supported models and pricing, cross-cutting best practices, and reference sources, and includes `GeminiMdTabs` and `BestPracticesChecklist`.
  *
- * @returns A React element containing the complete Antigravity guide page layout.
+ * @returns A React element containing the complete guide page layout.
  */
 export default function Page() {
   return (
@@ -1375,7 +1375,7 @@ export default function Page() {
         <section id="models" className={styles.sec}>
           <div className={styles.secLabel}>Section 08</div>
           <h2 className={styles.secTitle}>
-            <span className={styles.num}>08.</span>対応モデルと料金（2026年5月現在）
+            <span className={styles.num}>08.</span>対応モデルと料金（2026年6月現在）
           </h2>
 
           <table className={styles.modelTable}>
@@ -1536,9 +1536,9 @@ export default function Page() {
             </div>
           </div>
           <p style={{ fontSize: "0.78rem", color: "var(--text3, #5a7090)", marginTop: "0.5rem" }}>
-            ※ 2026年5月現在、Pro加入者でも最大7日間のレートリミットロックが報告されています。Gemini
-            CLI は 2026-06-18 に AI Pro/Ultra/無料 Code Assist 向け停止 → Antigravity CLI
-            へ移行が公式パス
+            ※ 2026年6月現在、Pro加入者でも最大7日間のレートリミットロックが報告されています。Gemini
+            CLI は 2026-06-18 に AI Pro/Ultra/無料 Code Assist 向けサンセット済 → Antigravity CLI
+            へ移行完了（公式パス）
           </p>
         </section>
 

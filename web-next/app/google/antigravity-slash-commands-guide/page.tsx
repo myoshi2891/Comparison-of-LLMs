@@ -7,6 +7,9 @@ export const metadata = {
     "Gemini CLI / Antigravity CLI の全コマンドをステップバイステップで解説。初学者がゼロから実践できるベストプラクティス付き。",
 };
 
+/**
+ * Renders the Antigravity slash commands guide page.
+ */
 export default function AntigravitySlashCommandsGuidePage() {
   return (
     <main className={`antigravity-guide-wrapper ${styles.pageWrapper}`}>
@@ -82,7 +85,7 @@ export default function AntigravitySlashCommandsGuidePage() {
           <span className="ver-badge vb-g">Gemini CLI v0.44.1</span>
           <span className="ver-badge vb-c">Antigravity CLI 1.0.3</span>
           <span className="ver-badge vb-y">IDE Commit 2.0.3</span>
-          <span className="ver-badge vb-r">2026-06-18 移行予告</span>
+          <span className="ver-badge vb-r">2026-06-18 サンセット済</span>
         </div>
       </section>
 
@@ -91,12 +94,14 @@ export default function AntigravitySlashCommandsGuidePage() {
         <div className="alert alert-warn" style={{ marginBottom: "32px" }}>
           <span className="alert-icon">⚠️</span>
           <div>
-            <strong>移行のお知らせ（2026年6月18日）</strong>
+            <strong>移行完了のお知らせ（2026年6月18日 サンセット済）</strong>
             <br />
-            無料ユーザー・Google One ユーザー向けに
-            <strong>Gemini CLI → Antigravity CLI</strong> へ移行されます。有料ユーザー（Google AI
-            Pro / Ultra）は引き続き Gemini CLI を利用できます。
-            コマンド体系・設定場所はほぼ共通です。
+            2026-06-18 をもって、無料の Gemini Code Assist（個人）に加え{" "}
+            <strong>Google AI Pro / Ultra 加入者</strong>向けにも Gemini CLI / Gemini Code Assist
+            IDE 拡張がリクエスト処理を停止し、
+            <strong>Gemini CLI → Antigravity CLI</strong> への移行が公式パスとなりました。
+            コマンド体系・設定場所はほぼ共通です（初期段階では 1:1
+            のフィーチャーパリティは無い点に注意）。
             <a
               href="https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli"
               target="_blank"

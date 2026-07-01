@@ -162,6 +162,11 @@ A2["Few-shot\\nを追加\\nシステムプロンプトを修正\\nタスクを�
 A3["採点プロンプトを見直し\\n別の\\nEvaluator を試す\\n人手評価でサンプル確認"]
 A4["上位モデルを試す\\nFine-tuning\\nを検討\\nRAG を活用する"]`;
 
+/**
+ * Renders the Harness Engineering guide page.
+ *
+ * @returns The guide page content for OpenAI harness engineering.
+ */
 export default function HarnessEngineeringGuide() {
   return (
     <div className={styles.wrapper}>
@@ -2394,7 +2399,8 @@ export default function HarnessEngineeringGuide() {
             OpenAI ハーネスエンジニアリング 完全ガイド 2026
           </div>
           <div>
-            最終更新: 2026年5月 ｜ 情報は記載時点のものです。最新情報は
+            最終更新: 2026年6月（Codex CLI v0.142.4 / GPT-5.5・GPT-5-Codex）｜
+            情報は記載時点のものです。最新情報は
             <a
               className={styles.a}
               href="https://platform.openai.com/docs"

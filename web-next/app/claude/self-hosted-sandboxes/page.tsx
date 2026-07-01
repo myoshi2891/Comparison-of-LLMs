@@ -2813,7 +2813,7 @@ export default function Page() {
 
         <footer className={styles.footer}>
           <p>
-            📌 本ガイドは公式ドキュメント（取得日: 2026年6月10日）を基に作成しています。Claude
+            📌 本ガイドは公式ドキュメント（取得日: 2026年6月30日）を基に作成しています。Claude
             Managed Agents は Public Beta のため、API
             仕様は予告なく変更される可能性があります。最新情報は
             <Ext href="https://platform.claude.com/docs/en/managed-agents/self-hosted-sandboxes">

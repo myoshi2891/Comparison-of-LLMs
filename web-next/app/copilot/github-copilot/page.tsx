@@ -4,7 +4,7 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   title: "GitHub Copilot 完全ガイド 2026 | ベストプラクティス",
   description:
-    "2026年5月最新版 — 初学者からエキスパートまで対応したステップバイステップのAIコーディングアシスタント活用法",
+    "2026年6月最新版 — 初学者からエキスパートまで対応したステップバイステップのAIコーディングアシスタント活用法。Cloud agent GA・従量課金（AI Credits）・Copilot code review の AGENTS.md 対応を反映。",
 };
 
 type Source = {
@@ -165,15 +165,13 @@ function Ext({ href, children }: { href: string; children: React.ReactNode }) {
 }
 
 /**
- * Render the GitHub Copilot "Complete Best Practices Guide" single-page article (Japanese, May 2026).
+ * Renders the GitHub Copilot complete best practices guide page.
  *
- * This component produces a static, fully-structured Next.js page that includes a hero header with stats,
- * a top navigation and table of contents, nine main sections (s01–s09) covering overview, plans, setup,
- * prompting techniques, 2026 features, best practices, security, model selection, and a checklist,
- * followed by a grouped reference sources section and a footer.
+ * This page assembles a static Japanese article with a hero header, navigation and table of contents,
+ * nine content sections covering setup, prompting, features, security, model selection, and a checklist,
+ * plus grouped reference sources and a footer.
  *
- * @returns A React element representing the complete guide page, including TOC links, content sections,
- * sources rendered from `SOURCE_GROUPS`, and layout styles from the local CSS module.
+ * @returns The complete guide page as a React element.
  */
 export default function GithubCopilotPage() {
   return (
@@ -182,7 +180,7 @@ export default function GithubCopilotPage() {
       <header className={styles.hero}>
         <div className={styles.heroBadge}>
           <span className={styles.badgeDot} />
-          Updated: May 2026
+          Updated: June 2026
         </div>
         <h1 className={styles.heroTitle}>
           <span className={styles.dim}>{"// "}</span>
@@ -191,7 +189,7 @@ export default function GithubCopilotPage() {
           完全ベストプラクティスガイド
         </h1>
         <p className={styles.heroSub}>
-          2026年5月最新版 — 初学者からエキスパートまで対応した
+          2026年6月最新版 — 初学者からエキスパートまで対応した
           <br />
           ステップバイステップのAIコーディングアシスタント活用法
         </p>
@@ -440,7 +438,7 @@ export default function GithubCopilotPage() {
           <div className={styles.alertInfo} style={{ marginTop: "16px", fontSize: "0.875rem" }}>
             <span className={styles.alertIcon}>📅</span>
             <div className={styles.alertContent}>
-              <strong>最終更新:</strong> 2026年5月
+              <strong>最終更新:</strong> 2026年6月
               <br />
               <strong>参考:</strong>{" "}
               <Ext href="https://github.com/features/copilot/plans">
@@ -1527,7 +1525,7 @@ export default function GithubCopilotPage() {
           <div className={styles.alertInfo} style={{ marginTop: "16px", fontSize: "0.875rem" }}>
             <span className={styles.alertIcon}>📅</span>
             <div className={styles.alertContent}>
-              <strong>最終更新:</strong> 2026年5月
+              <strong>最終更新:</strong> 2026年6月
               <br />
               <strong>参考:</strong>{" "}
               <Ext href="https://docs.github.com/en/copilot/using-github-copilot/finding-information-about-github-copilot/supported-models">
@@ -1651,7 +1649,7 @@ export default function GithubCopilotPage() {
             <div>
               <h2 className={styles.secTitle}>参考ソース一覧</h2>
               <p className={styles.secDesc}>
-                本ガイドの根拠となる公式ドキュメントおよび最新情報ソース（2026年5月時点）
+                本ガイドの根拠となる公式ドキュメントおよび最新情報ソース（2026年6月時点）
               </p>
             </div>
           </div>
@@ -1684,7 +1682,7 @@ export default function GithubCopilotPage() {
         <p>{"// GitHub Copilot 完全ベストプラクティスガイド"}</p>
         <p style={{ marginTop: "8px", color: "var(--text-muted)" }}>
           {"Last updated: "}
-          <span style={{ color: "var(--accent-cyan)" }}>May 2026</span>
+          <span style={{ color: "var(--accent-cyan)" }}>June 2026</span>
           {"  |  "}
           {"Sources: "}
           <Ext href="https://docs.github.com/en/copilot">GitHub Docs</Ext>
@@ -1692,7 +1690,7 @@ export default function GithubCopilotPage() {
           <Ext href="https://github.blog/ai-and-ml/github-copilot/">GitHub Blog</Ext>
         </p>
         <p style={{ marginTop: "12px", fontSize: "0.7rem", color: "var(--text-muted)" }}>
-          ※ 本ガイドの情報は2026年5月時点のものです。最新情報は公式ドキュメントをご確認ください。
+          ※ 本ガイドの情報は2026年6月時点のものです。最新情報は公式ドキュメントをご確認ください。
         </p>
       </footer>
     </div>

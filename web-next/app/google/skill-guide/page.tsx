@@ -117,7 +117,7 @@ style F fill:#fecaca,stroke:#dc2626,color:#7f1d1d`;
 export const metadata: Metadata = {
   title: "SKILL.md 完全ガイド — Gemini CLI v0.43.0 (最終版) & Antigravity v2.0.1",
   description:
-    "AIエージェントに「専門知識の教科書」を渡す仕組み — SKILL.md の構造・書き方・インストール手順を Gemini CLI v0.43.0 (最終版) & Antigravity v2.0.1 対応版で完全解説。Google I/O 2026 発表内容対応。",
+    "AIエージェントに「専門知識の教科書」を渡す仕組み — SKILL.md の構造・書き方・インストール手順を Gemini CLI v0.43.0 (最終版) & Antigravity v2.0.1 対応版で完全解説。Google I/O 2026 発表内容対応。Gemini CLI は 2026-06-18 に AI Pro/Ultra/無料 Code Assist 向けサンセット済（→ Antigravity CLI へ移行）。",
 };
 
 type Source = { num: string; href: string; title: string; desc: string };
@@ -255,14 +255,10 @@ const SOURCES: Source[] = [
 ];
 
 /**
- * Render the complete SKILL.md guide page for Gemini CLI and Antigravity.
+ * Renders the complete SKILL.md guide page for Gemini CLI and Antigravity.
  *
- * The page presents a full multi-section documentation layout (hero, overview, rationale,
- * SKILL.md anatomy, writing how-to, step-by-step guide, installation, examples, checklist,
- * latest updates, sources, and footer) and embeds mermaid diagrams and interactive subcomponents
- * such as StepsApp, ExamplesApp, and ChecklistApp.
- *
- * @returns A React element representing the full multi-section SKILL.md guide layout with diagrams, tables, and embedded interactive components.
+ * @returns A React element containing the full multi-section guide, including diagrams, tables,
+ * and embedded interactive components.
  */
 export default function Page() {
   return (
@@ -392,7 +388,9 @@ export default function Page() {
                   </td>
                   <td>
                     <span className={`${styles.badge} ${styles.badgeSky}`}>v0.43.0 (最終)</span>
-                    <div className={styles.textSlateLight}>2026-05-19</div>
+                    <div className={styles.textSlateLight}>
+                      2026-05-19 / 2026-06-18 サンセット済
+                    </div>
                     <div className={styles.versionLinks}>
                       <a
                         href="https://github.com/google-gemini/gemini-cli/releases"

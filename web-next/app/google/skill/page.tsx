@@ -4,7 +4,7 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   title: "Google Antigravity v2.0.1 × Gemini 3.5 Flash — マークダウンファイル完全ガイド",
   description:
-    "GEMINI.md / Rules / SKILL.md / Workflows / Knowledge Base / Artifacts / SDD仕様書群 — Google Antigravity の AI 仕様駆動開発を支えるマークダウンファイル群の役割・構造・ベストプラクティスを公式根拠付きで解説。Antigravity v2.0.1 (2026-05-23, 最新の安定化リリース) / Gemini 3.5 Flash 対応。",
+    "GEMINI.md / Rules / SKILL.md / Workflows / Knowledge Base / Artifacts / SDD仕様書群 — Google Antigravity の AI 仕様駆動開発を支えるマークダウンファイル群の役割・構造・ベストプラクティスを公式根拠付きで解説。Antigravity v2.0.1 (2026-05-23, 最新の安定化リリース) / Gemini 3.5 Flash 対応。Gemini CLI は 2026-06-18 に AI Pro/Ultra/無料 Code Assist 向けサンセット済（→ Antigravity CLI へ移行）。",
 };
 
 // 外部ソース (sources セクション) の定義。Phase F で redirect 一覧を作る際にも参照する。
@@ -173,11 +173,9 @@ function CodeDots() {
 }
 
 /**
- * Renders the GeminiSkillPage documentation describing Google Antigravity v2.0.1 — its Rules, SKILL.md conventions, Workflows, Knowledge Base, Artifacts, SDD guidance, and recommended project directory structure.
+ * Renders the GeminiSkillPage documentation site.
  *
- * The component outputs a static, structured documentation page with sections, code examples, best practices, and a sources list used for in-repo guidance.
- *
- * @returns The React element containing the full GeminiSkillPage documentation layout.
+ * @returns The React element for the full documentation layout.
  */
 export default function GeminiSkillPage() {
   return (
@@ -291,7 +289,7 @@ export default function GeminiSkillPage() {
                   <br />
                   <small className={styles.smallDim}>
                     ※Gemini 3 Pro 廃止済（2026-03-09）。Gemini CLI は 2026-06-18 に AI
-                    Pro/Ultra/無料 Code Assist 向け停止 → Antigravity CLI へ移行
+                    Pro/Ultra/無料 Code Assist 向けサンセット済 → Antigravity CLI へ移行完了
                   </small>
                 </td>
                 <td>Claude Opus / Sonnet / Haiku</td>

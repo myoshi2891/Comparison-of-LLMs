@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "OpenAI Codex v0.105.0 エージェント開発ガイド | LLM コスト計算機",
+  title: "OpenAI Codex v0.142.4 エージェント開発ガイド | LLM コスト計算機",
   description:
-    "OpenAI Codex CLI (v0.105.0, 2026-05-23 最新版) および Agents SDK を使ったサブエージェント / マルチエージェント開発で必要な AGENTS.md・AGENTS.override.md・SKILL.md・config.toml の役割と書き方を体系化したガイド。初学者向け 7 ステップ入門から PM 駆動 SDD パターンまで網羅。GPT-5.4 対応。",
+    "OpenAI Codex CLI (v0.142.4, 2026-06-29 最新版) および Agents SDK を使ったサブエージェント / マルチエージェント開発で必要な AGENTS.md・AGENTS.override.md・SKILL.md・config.toml の役割と書き方を体系化したガイド。初学者向け 7 ステップ入門から PM 駆動 SDD パターンまで網羅。GPT-5.5 / GPT-5-Codex 対応、Codex Remote GA。",
 };
 
 type Source = {
@@ -211,13 +211,12 @@ const TOC_ITEMS = [
 ] as const;
 
 /**
- * Render the Codex Agent development guide page that documents AGENTS.md, AGENTS.override.md,
- * SKILL.md, .codex/config.toml, PM-driven Agents SDK patterns, and related best practices.
+ * Renders the Codex Agent development guide page.
  *
- * This Next.js page component composes the full instructional article including navigation,
- * hero, table of contents, detailed sections (s01–s11) and a references list.
+ * The page presents an instructional article covering AGENTS.md, AGENTS.override.md, SKILL.md,
+ * .codex/config.toml, PM-driven Agents SDK workflows, and related best practices.
  *
- * @returns The React element for the Codex Agent development guide page.
+ * @returns The React element for the guide page.
  */
 export default function CodexAgentPage() {
   return (
@@ -227,9 +226,11 @@ export default function CodexAgentPage() {
         <div className={styles["nav-logo"]}>⚙</div>
         <span className={styles["nav-title"]}>OpenAI Codex Agent Dev Guide</span>
         <span className={styles["nav-sep"]}>—</span>
-        <span className={styles["nav-sub"]}>codex-1 / Codex CLI v0.105.0 / Agents SDK · 2026</span>
+        <span className={styles["nav-sub"]}>
+          GPT-5-Codex / Codex CLI v0.142.4 / Agents SDK · 2026
+        </span>
         <div className={styles["nav-right"]}>
-          <span className={styles["nav-chip"]}>Codex CLI v0.105.0</span>
+          <span className={styles["nav-chip"]}>Codex CLI v0.142.4</span>
           <span className={styles["nav-chip"]}>Multi-Agent</span>
           <span className={styles["nav-chip"]}>Skills</span>
         </div>
@@ -239,7 +240,7 @@ export default function CodexAgentPage() {
         {/* HERO */}
         <div className={styles.hero}>
           <div className={styles["hero-badge"]}>
-            ⚙ OpenAI Codex 完全ガイド — v0.105.0 (2026年5月最新版)
+            ⚙ OpenAI Codex 完全ガイド — v0.142.4 (2026年6月最新版)
           </div>
           <h1>
             OpenAI <em>Codex</em> サブエージェント開発における
@@ -255,8 +256,8 @@ export default function CodexAgentPage() {
           </p>
           <div className={styles["hero-meta"]}>
             <span className={styles["hero-tag"]}>初学者向け 7ステップ入門</span>
-            <span className={styles["hero-tag"]}>Codex CLI (v0.105.0)</span>
-            <span className={styles["hero-tag"]}>GPT-5.4 (o3-based)</span>
+            <span className={styles["hero-tag"]}>Codex CLI (v0.142.4)</span>
+            <span className={styles["hero-tag"]}>GPT-5.5 / GPT-5-Codex</span>
             <span className={styles["hero-tag"]}>Multi-Agent (Experimental)</span>
             <span className={styles["hero-tag"]}>Skills / SKILL.md</span>
             <span className={styles["hero-tag"]}>Agents SDK + MCP</span>
@@ -2239,7 +2240,7 @@ export default function CodexAgentPage() {
               ）。
               <br />
               一方、<code>spawn_agents_on_csv</code> による CSV からのエージェントファンアウトと ETA
-              付き進捗追跡は <strong>Codex CLI（rust-v0.105.0+）固有の機能</strong>です（
+              付き進捗追跡は <strong>Codex CLI（v0.142.4+）固有の機能</strong>です（
               <Ext href="https://github.com/openai/codex/releases">Codex CLI リリースノート</Ext>
               ）。
             </div>
