@@ -95,7 +95,7 @@ APPROVE --> MERGE["Merge"]`;
 /**
  * Renders the GitHub Copilot Code Review guide page.
  *
- * @returns The page content for the Copilot Code Review guide.
+ * @returns The full guide page content.
  */
 export default function Page() {
   return (

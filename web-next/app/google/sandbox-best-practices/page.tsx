@@ -193,6 +193,11 @@ const TOC_ITEMS = [
   { id: "resources", label: "公式リンク集" },
 ] as const;
 
+/**
+ * Renders the Google Sandbox best practices guide page.
+ *
+ * @returns The Google Sandbox best practices documentation page.
+ */
 export default function GoogleSandboxBestPracticesPage() {
   return (
     <>

@@ -8,12 +8,7 @@ export const metadata: Metadata = {
 };
 
 /**
- * Renders the static Next.js page for the Japanese "OpenAI Codex 完全ガイド 2026" guide.
- *
- * The component returns a fully static JSX tree that presents multiple sections:
- * header (title, subtitle, stats), and content sections covering Codex overview,
- * setup, model selection, prompt best practices, AGENTS.md usage, workflows,
- * advanced techniques, do/don't recommendations, and references.
+ * Renders the Japanese "OpenAI Codex 完全ガイド 2026" page.
  *
  * @returns The React element tree for the static guide page.
  */

@@ -23,6 +23,11 @@ function Ext({
   );
 }
 
+/**
+ * Renders the Hermes Agent advanced guide page.
+ *
+ * @returns The complete guide layout, including navigation, chapter sections, diagrams, references, and footer content.
+ */
 export default function Page() {
   return (
     <div className={styles.pageContainer}>
