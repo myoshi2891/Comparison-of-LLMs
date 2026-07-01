@@ -4,7 +4,7 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   title: "OpenAI Codex 完全ガイド 2026",
   description:
-    "2026-05-23 最新版 (v0.105.0)。初学者から中級者まで、GPT-5.4 を搭載した AI コーディングエージェントを最大限に活かすベストプラクティスをステップバイステップで解説します。",
+    "2026-06-29 最新版 (v0.142.4)。初学者から中級者まで、GPT-5.5 / GPT-5-Codex を搭載した AI コーディングエージェントを最大限に活かすベストプラクティスをステップバイステップで解説します（Codex Remote GA 対応）。",
 };
 
 /**
@@ -22,7 +22,7 @@ export default function Page() {
     <div className={styles.wrap}>
       {/* PAGE HEADER */}
       <header className={styles.pageHeader}>
-        <div className={styles.badge}>2026年5月 最新情報対応</div>
+        <div className={styles.badge}>2026年6月 最新情報対応</div>
         <h1 className={styles.h1}>
           <span className={styles.h1Line1}>OpenAI Codex</span>
           <span className={styles.h1Line2}>完全ガイド</span>
@@ -36,7 +36,7 @@ export default function Page() {
             <div className={styles.statLabel}>対応言語</div>
           </div>
           <div className={styles.stat}>
-            <div className={styles.statVal}>GPT-5.4</div>
+            <div className={styles.statVal}>GPT-5.5</div>
             <div className={styles.statLabel}>最新モデル</div>
           </div>
           <div className={styles.stat}>
@@ -67,7 +67,7 @@ export default function Page() {
               <strong style={{ color: "#e2e8f0" }}>
                 ソフトウェア開発に特化したAIコーディングエージェント
               </strong>
-              です。2025年5月にクラウドエージェントとして登場し、2026年5月現在ではGPT-5.4を搭載した本番利用可能な開発インフラへと進化しています。単なるコード補完ではなく、
+              です。2025年5月にクラウドエージェントとして登場し、2026年6月現在ではGPT-5.5 / GPT-5-Codexを搭載した本番利用可能な開発インフラへと進化しています。単なるコード補完ではなく、
               <em style={{ color: "#00d4ff" }}>リポジトリ全体を理解・操作できるエージェント</em>
               です。
             </p>
@@ -371,7 +371,7 @@ export default function Page() {
           </div>
 
           <p style={{ color: "#94a3b8", fontSize: "14px", marginBottom: "20px" }}>
-            2026年5月現在、代表的な推奨モデルは以下です。適切なモデル選択がコスト効率と品質に直結します。注:
+            2026年6月現在、代表的な推奨モデルは以下です。適切なモデル選択がコスト効率と品質に直結します。注:
             表示は主要な推奨モデルの例であり、他の利用可能なモデルも存在します。
           </p>
 
