@@ -1941,7 +1941,7 @@ export default function AgentHarnessEngineeringPage() {
           ハーネスエンジニアリング完全ガイド
         </p>
         <p style={{ marginTop: "6px", fontSize: "0.7rem", opacity: 0.6 }}>
-          最終更新: 2026年5月 ｜ Google ADK 公式ドキュメント・Google Testing Blog 準拠
+          最終更新: 2026年6月 ｜ Google ADK 公式ドキュメント・Google Testing Blog 準拠
         </p>
       </footer>
     </>
