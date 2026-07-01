@@ -162,6 +162,11 @@ A2["Few-shot\\nを追加\\nシステムプロンプトを修正\\nタスクを�
 A3["採点プロンプトを見直し\\n別の\\nEvaluator を試す\\n人手評価でサンプル確認"]
 A4["上位モデルを試す\\nFine-tuning\\nを検討\\nRAG を活用する"]`;
 
+/**
+ * Renders the Harness Engineering guide page.
+ *
+ * @returns The guide page content for OpenAI harness engineering.
+ */
 export default function HarnessEngineeringGuide() {
   return (
     <div className={styles.wrapper}>

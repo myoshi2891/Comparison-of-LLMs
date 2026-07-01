@@ -165,15 +165,13 @@ function Ext({ href, children }: { href: string; children: React.ReactNode }) {
 }
 
 /**
- * Render the GitHub Copilot "Complete Best Practices Guide" single-page article (Japanese, May 2026).
+ * Renders the GitHub Copilot complete best practices guide page.
  *
- * This component produces a static, fully-structured Next.js page that includes a hero header with stats,
- * a top navigation and table of contents, nine main sections (s01–s09) covering overview, plans, setup,
- * prompting techniques, 2026 features, best practices, security, model selection, and a checklist,
- * followed by a grouped reference sources section and a footer.
+ * This page assembles a static Japanese article with a hero header, navigation and table of contents,
+ * nine content sections covering setup, prompting, features, security, model selection, and a checklist,
+ * plus grouped reference sources and a footer.
  *
- * @returns A React element representing the complete guide page, including TOC links, content sections,
- * sources rendered from `SOURCE_GROUPS`, and layout styles from the local CSS module.
+ * @returns The complete guide page as a React element.
  */
 export default function GithubCopilotPage() {
   return (

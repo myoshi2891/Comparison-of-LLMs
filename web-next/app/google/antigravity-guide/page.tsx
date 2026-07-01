@@ -10,11 +10,11 @@ export const metadata: Metadata = {
 };
 
 /**
- * Render the Antigravity best-practices guide page containing a hero, table of contents, and ten static content sections.
+ * Renders the Antigravity best-practices guide page with a hero, table of contents, and ten static sections.
  *
- * The page presents comprehensive guidance on GEMINI.md, SKILL.md, Rules, Workflows, Artifacts, supported models/pricing, cross-cutting best practices, and reference sources, and composes imported UI pieces like GeminiMdTabs and BestPracticesChecklist.
+ * The page covers GEMINI.md, SKILL.md, Rules, Workflows, Artifacts, supported models and pricing, cross-cutting best practices, and reference sources, and includes `GeminiMdTabs` and `BestPracticesChecklist`.
  *
- * @returns A React element containing the complete Antigravity guide page layout.
+ * @returns A React element containing the complete guide page layout.
  */
 export default function Page() {
   return (

@@ -159,6 +159,9 @@ const DIAGRAMS = {
     AUDIT --> A3["セキュリティ監査再実行\\nopenclaw security audit --deep"]`,
 };
 
+/**
+ * Renders the OpenClaw security guide page.
+ */
 export default function OpenClawSecurityGuidePage() {
   return (
     <div className={styles.pageWrap}>

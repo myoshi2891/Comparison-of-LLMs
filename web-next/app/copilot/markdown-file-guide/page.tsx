@@ -7,6 +7,12 @@ export const metadata: Metadata = {
     "copilot-instructions.md / .instructions.md / .prompt.md / .chatmode.md / .agent.md / AGENTS.md / SKILL.md / MCP / Plan Mode — Copilotの全カスタマイズファイル・新機能を根拠ソース付きで徹底解説。Copilot code review の AGENTS.md 対応（2026-06-18）・Cloud agent GA を反映。",
 };
 
+/**
+ * Renders an external link.
+ *
+ * @param href - The link URL
+ * @param children - The link content
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -34,6 +40,11 @@ const TOC_ITEMS = [
   { id: "sources", label: "参考ソース一覧（更新版）" },
 ] as const;
 
+/**
+ * Renders the GitHub Copilot markdown customization guide page.
+ *
+ * @returns The rendered documentation page.
+ */
 export default function Page() {
   return (
     <div className={styles.page}>

@@ -211,13 +211,12 @@ const TOC_ITEMS = [
 ] as const;
 
 /**
- * Render the Codex Agent development guide page that documents AGENTS.md, AGENTS.override.md,
- * SKILL.md, .codex/config.toml, PM-driven Agents SDK patterns, and related best practices.
+ * Renders the Codex Agent development guide page.
  *
- * This Next.js page component composes the full instructional article including navigation,
- * hero, table of contents, detailed sections (s01–s11) and a references list.
+ * The page presents an instructional article covering AGENTS.md, AGENTS.override.md, SKILL.md,
+ * .codex/config.toml, PM-driven Agents SDK workflows, and related best practices.
  *
- * @returns The React element for the Codex Agent development guide page.
+ * @returns The React element for the guide page.
  */
 export default function CodexAgentPage() {
   return (

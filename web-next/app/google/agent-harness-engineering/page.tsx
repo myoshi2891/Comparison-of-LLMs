@@ -200,10 +200,7 @@ function Ext({ href, children }: ExtProps) {
 }
 
 /**
- * Renders the "Google ADK × Gemini — AIエージェント ハーネスエンジニアリング 完全ガイド" page.
- *
- * The component constructs the full static documentation page: hero, table of contents,
- * Sections 01–11 (including diagrams, code examples, tables, and a checklist), and footer.
+ * Renders the AI agent harness engineering guide page.
  *
  * @returns The React element tree for the guide page.
  */
