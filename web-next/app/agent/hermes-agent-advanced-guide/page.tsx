@@ -63,7 +63,7 @@ export default function Page() {
             バージョン <span>v0.15.2</span>
           </div>
           <div className={styles.metaPill}>
-            更新 <span>2026年6月3日</span>
+            更新 <span>2026年6月30日</span>
           </div>
           <div className={styles.metaPill}>
             ライセンス <span>MIT</span>
