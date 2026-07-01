@@ -1684,7 +1684,7 @@ export default function GithubCopilotPage() {
         <p>{"// GitHub Copilot 完全ベストプラクティスガイド"}</p>
         <p style={{ marginTop: "8px", color: "var(--text-muted)" }}>
           {"Last updated: "}
-          <span style={{ color: "var(--accent-cyan)" }}>May 2026</span>
+          <span style={{ color: "var(--accent-cyan)" }}>June 2026</span>
           {"  |  "}
           {"Sources: "}
           <Ext href="https://docs.github.com/en/copilot">GitHub Docs</Ext>
@@ -1692,7 +1692,7 @@ export default function GithubCopilotPage() {
           <Ext href="https://github.blog/ai-and-ml/github-copilot/">GitHub Blog</Ext>
         </p>
         <p style={{ marginTop: "12px", fontSize: "0.7rem", color: "var(--text-muted)" }}>
-          ※ 本ガイドの情報は2026年5月時点のものです。最新情報は公式ドキュメントをご確認ください。
+          ※ 本ガイドの情報は2026年6月時点のものです。最新情報は公式ドキュメントをご確認ください。
         </p>
       </footer>
     </div>

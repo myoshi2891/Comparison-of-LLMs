@@ -60,7 +60,7 @@ export default function Page() {
           <span className={`${styles.badge} ${styles.bv}`}>AGENTS.md オープン標準</span>
           <span className={`${styles.badge} ${styles.bt}`}>MCP サポート</span>
           <span className={`${styles.badge} ${styles.bg}`}>Plan Mode GA</span>
-          <span className={`${styles.badge} ${styles.bm}`}>Mar 2026 最新</span>
+          <span className={`${styles.badge} ${styles.bm}`}>Jun 2026 最新</span>
         </div>
       </header>
 
@@ -2788,10 +2788,10 @@ export default function Page() {
 
         {/* ── sources ── */}
         <section id="sources">
-          <div className={styles.slabel}>Section 16（2026年3月更新版）</div>
+          <div className={styles.slabel}>Section 16（2026年6月更新版）</div>
           <div className={styles.sources}>
             <div className={styles.srcTtl}>
-              📚 参考ソース一覧（公式・二次情報を含む）— 2026年3月更新版（追加: [18]〜[23]）
+              📚 参考ソース一覧（公式・二次情報を含む）— 2026年6月更新版（追加: [18]〜[23]）
             </div>
             <div className={styles.src}>
               <span className={styles.sn}>[1]</span>

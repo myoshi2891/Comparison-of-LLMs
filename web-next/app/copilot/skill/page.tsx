@@ -169,14 +169,14 @@ export default function CopilotSkillPage() {
           <span className={`${styles.badge} ${styles.bg}`}>agentskills.io オープン標準</span>
           <span className={`${styles.badge} ${styles.bc}`}>Progressive Disclosure</span>
           <span className={`${styles.badge} ${styles.bv}`}>4ツール共通フォーマット</span>
-          <span className={`${styles.badge} ${styles.bt}`}>May 2026 最新</span>
+          <span className={`${styles.badge} ${styles.bt}`}>June 2026 最新</span>
         </div>
       </header>
 
       <main className={styles.main}>
         {/* TOC */}
         <nav className={styles.toc} aria-label="目次">
-          <div className={styles.tocTtl}>目次 — SKILL.md 完全ガイド 2026年5月版</div>
+          <div className={styles.tocTtl}>目次 — SKILL.md 完全ガイド 2026年6月版</div>
           <ol>
             <li>
               <a href="#skill-concept">SKILL.mdとは — 概念・位置づけ・他ファイルとの違い</a>
@@ -1654,7 +1654,7 @@ export default function CopilotSkillPage() {
           <div className={styles.slabel}>Section 12 — 参考ソース</div>
           <div className={styles.sources}>
             <div className={styles.srcTtl}>
-              📚 参考ソース一覧 — SKILL.md 完全ガイド 2026年5月版（[A]〜[L] が SKILL.md
+              📚 参考ソース一覧 — SKILL.md 完全ガイド 2026年6月版（[A]〜[L] が SKILL.md
               専用新規追加）
             </div>
 

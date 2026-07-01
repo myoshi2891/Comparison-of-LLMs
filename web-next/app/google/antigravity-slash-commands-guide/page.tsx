@@ -93,7 +93,7 @@ export default function AntigravitySlashCommandsGuidePage() {
           <div>
             <strong>移行完了のお知らせ（2026年6月18日 サンセット済）</strong>
             <br />
-            2026-06-18 をもって、無料の Gemini Code Assist（個人）に加え
+            2026-06-18 をもって、無料の Gemini Code Assist（個人）に加え{" "}
             <strong>Google AI Pro / Ultra 加入者</strong>向けにも Gemini CLI / Gemini Code Assist
             IDE 拡張がリクエスト処理を停止し、
             <strong>Gemini CLI → Antigravity CLI</strong> への移行が公式パスとなりました。
