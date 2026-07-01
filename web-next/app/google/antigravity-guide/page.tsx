@@ -1536,9 +1536,9 @@ export default function Page() {
             </div>
           </div>
           <p style={{ fontSize: "0.78rem", color: "var(--text3, #5a7090)", marginTop: "0.5rem" }}>
-            ※ 2026年5月現在、Pro加入者でも最大7日間のレートリミットロックが報告されています。Gemini
-            CLI は 2026-06-18 に AI Pro/Ultra/無料 Code Assist 向け停止 → Antigravity CLI
-            へ移行が公式パス
+            ※ 2026年6月現在、Pro加入者でも最大7日間のレートリミットロックが報告されています。Gemini
+            CLI は 2026-06-18 に AI Pro/Ultra/無料 Code Assist 向けサンセット済 → Antigravity CLI
+            へ移行完了（公式パス）
           </p>
         </section>
 
