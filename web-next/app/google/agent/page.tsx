@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title:
     "Gemini マルチエージェント開発 (ADK / A2A / AgentEngine) ベストプラクティス | LLM コスト計算機",
   description:
-    "最新の Google Gemini CLI (as of 2026-05)・最新の ADK (as of 2026-05)・最新のエージェント連携プロトコル (A2A/AP2/A2UI等) 時代のサブエージェント / マルチエージェント開発で必要な GEMINI.md・AGENTS.md・agent.py・agent.json・.geminiignore・settings.json の役割と書き方を体系化したガイド。",
+    "最新の Google Gemini CLI / Antigravity CLI (as of 2026-06)・最新の ADK (as of 2026-06)・最新のエージェント連携プロトコル (A2A/AP2/A2UI等) 時代のサブエージェント / マルチエージェント開発で必要な GEMINI.md・AGENTS.md・agent.py・agent.json・.geminiignore・settings.json の役割と書き方を体系化したガイド。Gemini CLI は 2026-06-18 に AI Pro/Ultra/無料 Code Assist 向けサンセット済（→ Antigravity CLI へ移行）。",
 };
 
 type Source = { icon: string; title: string; href: string; display: string; desc: string };
