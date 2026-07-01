@@ -1,0 +1,3026 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cursor 完全ガイド ― 初学者のためのステップバイステップ・ベストプラクティス</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+    <style>
+      :root {
+        --bg-base: #07111e;
+        --bg-surface: #0d1b2e;
+        --bg-surface-2: #122540;
+        --bg-surface-3: #16304f;
+        --border: rgba(148, 163, 184, 0.14);
+        --border-strong: rgba(148, 163, 184, 0.28);
+        --text-primary: #e8edf5;
+        --text-secondary: #c3d4eb;
+        --text-tertiary: #a9c3e9;
+        --accent: #5eead4;
+        --accent-strong: #2dd4bf;
+        --accent-amber: #fbbf24;
+        --accent-rose: #fb7185;
+        --accent-violet: #a78bfa;
+        --radius: 10px;
+        --font-display: 'Space Grotesk', sans-serif;
+        --font-body: 'Inter', sans-serif;
+        --font-mono: 'JetBrains Mono', monospace;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--bg-base);
+        background-image:
+          radial-gradient(
+            ellipse 900px 500px at 12% -10%,
+            rgba(94, 234, 212, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 700px 500px at 100% 10%,
+            rgba(167, 139, 250, 0.06),
+            transparent 60%
+          );
+        color: var(--text-primary);
+        font-family: var(--font-body);
+        line-height: 1.75;
+        font-size: 16px;
+        -webkit-font-smoothing: antialiased;
+      }
+      ::selection {
+        background: rgba(94, 234, 212, 0.25);
+        color: #fff;
+      }
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: var(--font-display);
+        color: #f4f7fb;
+        letter-spacing: -0.01em;
+        line-height: 1.3;
+      }
+      code {
+        font-family: var(--font-mono);
+      }
+
+      /* ---------- Layout ---------- */
+      .layout {
+        display: flex;
+        max-width: 100%;
+        margin: 0 auto;
+      }
+      .sidebar {
+        width: 290px;
+        flex-shrink: 0;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+        padding: 32px 20px 40px 28px;
+        border-right: 1px solid var(--border);
+        scrollbar-width: thin;
+        scrollbar-color: var(--bg-surface-3) transparent;
+      }
+      .sidebar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .sidebar::-webkit-scrollbar-thumb {
+        background: var(--bg-surface-3);
+        border-radius: 3px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 6px;
+      }
+      .brand-mark {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-violet));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-mono);
+        font-weight: 600;
+        color: #07111e;
+        font-size: 15px;
+        flex-shrink: 0;
+      }
+      .brand-text {
+        font-family: var(--font-display);
+        font-size: 15px;
+        font-weight: 600;
+        color: #f4f7fb;
+        line-height: 1.2;
+      }
+      .brand-sub {
+        font-size: 11px;
+        color: var(--text-tertiary);
+        font-family: var(--font-mono);
+        margin-top: 2px;
+      }
+      .sidebar-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 18px 0;
+      }
+      .toc-group {
+        margin-bottom: 4px;
+      }
+      .toc-group-label {
+        font-size: 10.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        color: var(--text-tertiary);
+        font-weight: 600;
+        margin: 18px 0 8px;
+        font-family: var(--font-mono);
+      }
+      .toc-link {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 7px 10px;
+        border-radius: 7px;
+        font-size: 13.5px;
+        color: var(--text-secondary);
+        border-left: 2px solid transparent;
+        transition: all 0.15s ease;
+      }
+      .toc-link:hover {
+        background: var(--bg-surface);
+        color: var(--text-primary);
+        text-decoration: none;
+      }
+      .toc-link.active {
+        background: var(--bg-surface-2);
+        color: var(--accent);
+        border-left-color: var(--accent);
+        font-weight: 500;
+      }
+      .toc-num {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--text-tertiary);
+        width: 20px;
+        flex-shrink: 0;
+      }
+      .toc-link.active .toc-num {
+        color: var(--accent);
+      }
+
+      .main {
+        flex: 1;
+        min-width: 0;
+        padding: 0 0 120px;
+      }
+      .container {
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 0 56px;
+      }
+
+      /* ---------- Hero ---------- */
+      .hero {
+        padding: 88px 56px 64px;
+        max-width: 100%;
+        margin: 0 auto;
+        border-bottom: 1px solid var(--border);
+      }
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--accent);
+        background: rgba(94, 234, 212, 0.08);
+        border: 1px solid rgba(94, 234, 212, 0.25);
+        padding: 5px 12px;
+        border-radius: 100px;
+        margin-bottom: 24px;
+      }
+      .hero h1 {
+        font-size: 44px;
+        font-weight: 700;
+        margin: 0 0 20px;
+        max-width: 760px;
+      }
+      .hero .lead {
+        font-size: 17px;
+        color: var(--text-secondary);
+        max-width: 640px;
+        margin: 0 0 32px;
+      }
+      .hero-meta {
+        display: flex;
+        gap: 24px;
+        flex-wrap: wrap;
+        font-size: 13px;
+        color: var(--text-tertiary);
+        font-family: var(--font-mono);
+      }
+      .hero-meta span {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      /* ---------- Sections ---------- */
+      section.chapter {
+        padding: 64px 56px;
+        border-bottom: 1px solid var(--border);
+        max-width: 100%;
+        margin: 0 auto;
+      }
+      section.chapter:last-of-type {
+        border-bottom: none;
+      }
+      .chapter-kicker {
+        font-family: var(--font-mono);
+        font-size: 12.5px;
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+      .chapter-kicker .line {
+        height: 1px;
+        width: 32px;
+        background: var(--accent);
+        opacity: 0.5;
+      }
+      h2.chapter-title {
+        font-size: 30px;
+        margin: 0 0 18px;
+      }
+      h3 {
+        font-size: 21px;
+        margin: 36px 0 14px;
+        color: #eef2f8;
+      }
+      h4 {
+        font-size: 16.5px;
+        margin: 26px 0 10px;
+        color: var(--accent);
+      }
+      p {
+        color: var(--text-secondary);
+        margin: 0 0 16px;
+        font-size: 15.5px;
+      }
+      strong {
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+      ul,
+      ol {
+        color: var(--text-secondary);
+        padding-left: 22px;
+        font-size: 15.5px;
+      }
+      li {
+        margin-bottom: 8px;
+      }
+      li::marker {
+        color: var(--accent);
+      }
+
+      /* ---------- Step list ---------- */
+      .steps {
+        list-style: none;
+        padding: 0;
+        counter-reset: step;
+        margin: 24px 0;
+      }
+      .steps li {
+        counter-increment: step;
+        position: relative;
+        padding: 16px 20px 16px 56px;
+        margin-bottom: 10px;
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+      }
+      .steps li::before {
+        content: counter(step);
+        position: absolute;
+        left: 16px;
+        top: 16px;
+        width: 26px;
+        height: 26px;
+        border-radius: 7px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+        color: #07111e;
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .steps li strong {
+        display: block;
+        color: var(--text-primary);
+        margin-bottom: 4px;
+        font-size: 15px;
+      }
+      .steps li p {
+        margin: 0;
+        font-size: 14.5px;
+      }
+      .steps li .kbd-row {
+        margin-top: 8px;
+      }
+
+      /* ---------- Callouts ---------- */
+      .callout {
+        border-radius: var(--radius);
+        padding: 18px 20px;
+        margin: 22px 0;
+        border: 1px solid var(--border);
+        background: var(--bg-surface);
+        font-size: 14.5px;
+      }
+      .callout-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 8px;
+        color: var(--text-primary);
+      }
+      .callout p {
+        margin: 0;
+        font-size: 14.5px;
+      }
+      .callout.tip {
+        border-left: 3px solid var(--accent);
+      }
+      .callout.tip .callout-title {
+        color: var(--accent);
+      }
+      .callout.warn {
+        border-left: 3px solid var(--accent-amber);
+      }
+      .callout.warn .callout-title {
+        color: var(--accent-amber);
+      }
+      .callout.danger {
+        border-left: 3px solid var(--accent-rose);
+      }
+      .callout.danger .callout-title {
+        color: var(--accent-rose);
+      }
+      .callout.cite {
+        border-left: 3px solid var(--accent-violet);
+        background: var(--bg-surface);
+      }
+      .callout.cite .callout-title {
+        color: var(--accent-violet);
+      }
+      .callout.cite ul {
+        margin: 0;
+        padding-left: 18px;
+      }
+      .callout.cite li {
+        font-size: 13px;
+        margin-bottom: 5px;
+      }
+      .callout.cite a {
+        color: var(--text-secondary);
+        word-break: break-all;
+      }
+      .callout.cite a:hover {
+        color: var(--accent-violet);
+      }
+
+      /* ---------- Kbd ---------- */
+      .kbd-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+      }
+      kbd {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        background: var(--bg-surface-3);
+        border: 1px solid var(--border-strong);
+        border-bottom-width: 2px;
+        padding: 3px 8px;
+        border-radius: 6px;
+        color: var(--text-primary);
+      }
+
+      /* ---------- Tables ---------- */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 22px 0;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+      thead th {
+        background: var(--bg-surface-2);
+        color: var(--text-primary);
+        text-align: left;
+        padding: 11px 14px;
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: 13px;
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+      tbody td {
+        padding: 11px 14px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-secondary);
+        vertical-align: top;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:hover {
+        background: rgba(94, 234, 212, 0.03);
+      }
+      td code,
+      li code,
+      p code {
+        background: var(--bg-surface-3);
+        color: var(--accent);
+        padding: 2px 6px;
+        border-radius: 5px;
+        font-size: 0.85em;
+      }
+
+      /* ---------- Code blocks ---------- */
+      .code-block {
+        margin: 20px 0;
+        border-radius: var(--radius);
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+      .code-block .code-title {
+        background: var(--bg-surface-2);
+        padding: 9px 16px;
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--text-tertiary);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+      }
+      .code-block pre {
+        margin: 0;
+        padding: 18px 20px;
+        overflow-x: auto;
+        background: #0a1420 !important;
+        font-size: 13.5px;
+      }
+      .code-block code.hljs {
+        background: transparent !important;
+      }
+
+      /* ---------- Diagram ---------- */
+      .diagram-card {
+        margin: 26px 0;
+        padding: 24px;
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+      }
+      .diagram-card .diagram-label {
+        font-family: var(--font-mono);
+        font-size: 11.5px;
+        color: var(--text-tertiary);
+        margin-bottom: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .mermaid {
+        display: flex;
+        justify-content: center;
+      }
+
+      /* ---------- Feature grid ---------- */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin: 22px 0;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin: 22px 0;
+      }
+      .feature-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 18px 20px;
+      }
+      .feature-card .fc-title {
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: 14.5px;
+        color: var(--text-primary);
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .feature-card p {
+        font-size: 13.5px;
+        margin: 0;
+      }
+      .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+
+      /* ---------- Badge ---------- */
+      .badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        padding: 2px 8px;
+        border-radius: 100px;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+      }
+      .badge.free {
+        background: rgba(94, 234, 212, 0.12);
+        color: var(--accent);
+      }
+      .badge.pro {
+        background: rgba(251, 191, 36, 0.12);
+        color: var(--accent-amber);
+      }
+      .badge.team {
+        background: rgba(167, 139, 250, 0.14);
+        color: var(--accent-violet);
+      }
+
+      /* ---------- Footer / refs ---------- */
+      .ref-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        counter-reset: ref;
+      }
+      .ref-list li {
+        counter-increment: ref;
+        padding: 10px 0 10px 34px;
+        position: relative;
+        border-bottom: 1px solid var(--border);
+        font-size: 13.5px;
+      }
+      .ref-list li:last-child {
+        border-bottom: none;
+      }
+      .ref-list li::before {
+        content: '[' counter(ref) ']';
+        position: absolute;
+        left: 0;
+        top: 10px;
+        font-family: var(--font-mono);
+        color: var(--accent);
+        font-size: 12px;
+      }
+      .ref-list a {
+        color: var(--text-secondary);
+        word-break: break-all;
+      }
+      .ref-list a:hover {
+        color: var(--accent);
+      }
+      .ref-list .ref-desc {
+        color: var(--text-tertiary);
+        font-size: 12.5px;
+        display: block;
+        margin-top: 2px;
+      }
+
+      footer.page-footer {
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 40px 56px 80px;
+        color: var(--text-tertiary);
+        font-size: 12.5px;
+        font-family: var(--font-mono);
+        text-align: center;
+      }
+
+      @media (max-width: 980px) {
+        .sidebar {
+          display: none;
+        }
+        .hero,
+        section.chapter,
+        footer.page-footer {
+          padding-left: 24px;
+          padding-right: 24px;
+        }
+        .grid-2,
+        .grid-3 {
+          grid-template-columns: 1fr;
+        }
+        .hero h1 {
+          font-size: 32px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <nav class="sidebar" id="sidebar">
+        <div class="brand">
+          <div class="brand-mark">C</div>
+          <div>
+            <div class="brand-text">Cursor 完全ガイド</div>
+            <div class="brand-sub">v2026.07 &middot; 日本語版</div>
+          </div>
+        </div>
+        <div class="sidebar-divider"></div>
+        <div id="toc"></div>
+      </nav>
+
+      <main class="main">
+        <section class="hero">
+          <div class="eyebrow">● COMPLETE GUIDE &middot; CURSOR 2.5+ &middot; 2026年7月更新</div>
+          <h1>Cursor 完全ガイド<br />初学者のためのステップバイステップ・ベストプラクティス</h1>
+          <p class="lead">
+            Cursor は VS Code をベースにした AI ネイティブなコードエディタです。本ガイドでは、
+            Tab補完・Agentモード・Rules・MCP・Memories・Bugbot など Cursor の全主要機能について、
+            公式ドキュメント (cursor.com/docs)
+            を根拠に、初学者でも迷わず実践できるようステップバイステップで解説します。
+            各章末には参照した公式ソースの URL を明記しています。
+          </p>
+          <div class="hero-meta">
+            <span>&#128196; 全17章 + 参考文献</span>
+            <span>&#128279; 一次情報: cursor.com/docs</span>
+            <span>&#127757; 対象: Cursor 初学者〜中級者</span>
+          </div>
+        </section>
+
+        <section class="chapter" id="ch-00">
+          <div class="chapter-kicker"><span class="line"></span>CHAPTER 00 &middot; OVERVIEW</div>
+          <h2 class="chapter-title">Cursor とは何か ― 全体像をつかむ</h2>
+
+          <p>
+            Cursor は、コード補完だけでなく「コードベースを理解し、自律的にタスクをこなす AI
+            エージェント」を エディタの中核に据えた開発ツールです。VS Code
+            の操作感をそのまま引き継ぎながら、 Tab補完・Chat・Inline Edit・Agent(自律実行)・Cloud
+            Agents(クラウド実行)という 5つの入力方式で、AIとコードのやり取りを行います。
+          </p>
+
+          <div class="diagram-card">
+            <div class="diagram-label">FIG 0-1. Cursor の機能アーキテクチャ全体像</div>
+            <pre class="mermaid">
+flowchart TB
+    subgraph EDITOR["Cursor エディタ"]
+        TAB["Tab 補完<br/>次の一手を予測"]
+        INLINE["Inline Edit<br/>Cmd/Ctrl+K"]
+        CHAT["Chat / Agent<br/>Cmd/Ctrl+L"]
+    end
+
+    subgraph CONTEXT["コンテキスト層"]
+        RULES["Rules<br/>.cursor/rules, AGENTS.md"]
+        MEM["Memories<br/>会話から自動学習"]
+        INDEX["Codebase Indexing<br/>セマンティック検索"]
+        ATSIGN["@ Symbols<br/>ファイル/Web/Git参照"]
+    end
+
+    subgraph EXT["外部連携"]
+        MCP["MCP Servers<br/>Slack/DB/Figma等"]
+        SKILLS["Skills / Subagents<br/>動的な専門知識"]
+    end
+
+    subgraph EXEC["実行基盤"]
+        LOCAL["ローカル実行<br/>ターミナル/ファイル編集"]
+        CLOUD["Cloud Agents<br/>並列クラウドVM"]
+        BUGBOT["Bugbot<br/>PR自動レビュー"]
+    end
+
+    CHAT --> CONTEXT
+    INLINE --> CONTEXT
+    CONTEXT --> EXEC
+    EXT --> CHAT
+    CHAT --> CLOUD
+    CLOUD --> BUGBOT
+
+    style EDITOR fill:#0d1b2e,stroke:#5eead4,color:#e8edf5
+    style CONTEXT fill:#0d1b2e,stroke:#a78bfa,color:#e8edf5
+    style EXT fill:#0d1b2e,stroke:#fbbf24,color:#e8edf5
+    style EXEC fill:#0d1b2e,stroke:#fb7185,color:#e8edf5
+    </pre>
+          </div>
+
+          <p>
+            重要なのは、これらが「バラバラの機能」ではなく
+            <strong>共通のコンテキスト層(Rules / Memories / Codebase Indexing / @ Symbols)</strong>
+            を介して連携している点です。Agentに何かを依頼するとき、その裏側では常にこのコンテキスト層が
+            「どのファイルを読むべきか」「どんな規約に従うべきか」を判断しています大規模言語モデルは補完のあいだメモリを保持しないため、Rules
+            がプロンプトレベルで永続的な文脈を提供する仕組みになっています。
+          </p>
+
+          <h3>Cursor の4つの動作モード</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>モード</th>
+                  <th>用途</th>
+                  <th>特徴</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Agent</strong></td>
+                  <td>実装・リファクタ・バグ修正</td>
+                  <td>
+                    コードベースを検索し、複数ファイルを編集し、ターミナルコマンドを実行し、自律的にエラーを修正する
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Ask</strong></td>
+                  <td>コード変更なしの質問・調査</td>
+                  <td>コードベースを検索して質問に答えるのみで、ファイルは編集しない</td>
+                </tr>
+                <tr>
+                  <td><strong>Plan</strong></td>
+                  <td>複雑な実装前の設計レビュー</td>
+                  <td>
+                    Agentがコードベースを調査し、明確化のための質問をし、レビュー可能な計画を生成する
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Debug</strong></td>
+                  <td>再現・原因特定が難しいバグ</td>
+                  <td>再現困難なバグの原因調査に特化</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout tip">
+            <div class="callout-title">💡 モード切替のコツ</div>
+            <p>
+              各モードは独自のコンテキストを使用するため、モードを切り替えると新しいコンテキストウィンドウで会話が始まります。タスクの種類が変わったら、既存チャットを使い回さず新しいチャットを開始するのがベストプラクティスです。
+            </p>
+          </div>
+        </section>
+
+        <section class="chapter" id="ch-01">
+          <div class="chapter-kicker">
+            <span class="line"></span>CHAPTER 01 &middot; GETTING STARTED
+          </div>
+          <h2 class="chapter-title">インストールとクイックスタート</h2>
+
+          <p>
+            Cursor は macOS / Windows / Linux に対応しており、公式サイトからダウンロードするか、
+            Linux では apt / yum リポジトリ経由でインストールできます。ここでは「インストール →
+            初めての変更 → レビュー」までの最短ルートを解説します。
+          </p>
+
+          <ol class="steps">
+            <li>
+              <strong>Cursor をダウンロードしてサインイン</strong>
+              <p>
+                cursor.com からアプリをダウンロードし、起動後にサインインします。既存の VS Code
+                設定・拡張機能・キーバインドはインポート可能です。
+              </p>
+            </li>
+            <li>
+              <strong>(Linux) apt/yum でのインストール</strong>
+              <p>
+                Debian系ではGPGキーを登録してからaptリポジトリを追加します。apt/yumパッケージはAppImageより推奨されており、デスクトップアイコンや自動更新、CLIツールが同梱されます。
+              </p>
+              <div class="code-block">
+                <div class="code-title">bash — Debian/Ubuntu 系</div>
+                <pre><code class="language-bash">curl -fsSL https://downloads.cursor.com/keys/anysphere.asc \
+  | gpg --dearmor | sudo tee /etc/apt/keyrings/cursor.gpg > /dev/null
+
+echo "deb [arch=amd64,arm64 signed-by=/etc/apt/keyrings/cursor.gpg] \
+https://downloads.cursor.com/aptrepo stable main" \
+  | sudo tee /etc/apt/sources.list.d/cursor.list > /dev/null
+
+sudo apt update &amp;&amp; sudo apt install cursor</code></pre>
+              </div>
+            </li>
+            <li>
+              <strong>プロジェクトフォルダを開く</strong>
+              <p>
+                <code>File &gt; Open Folder</code> でプロジェクトを開くと、Cursor
+                はバックグラウンドで自動的にコードベースのインデックス作成を開始します。設定は不要です。
+              </p>
+            </li>
+            <li>
+              <strong>コードベースを理解させる</strong>
+              <p>
+                最初の一手として、Agentに「このリポジトリの構成を説明して」と依頼するのが定石です。Cursorはリポジトリを検索し、関連ファイルを読み、プロジェクトの構造を要約します。これは不慣れなコードベースを素早く把握する最速の方法の一つです。
+              </p>
+              <div class="code-block">
+                <div class="code-title">プロンプト例</div>
+                <pre><code class="language-text">このコードベースの構成を説明してください。
+主要なディレクトリの役割と、エントリーポイントがどこかを教えてください。</code></pre>
+              </div>
+            </li>
+            <li>
+              <strong>小さく安全な変更から始める</strong>
+              <p>
+                コードベースを理解したら、Agentに安全な改善案を3つ提案させ、1つ選んで実装させます。低リスクなタスク(文言修正、小さなUI修正など)から始めるのが推奨されています。
+              </p>
+            </li>
+            <li>
+              <strong>差分をレビューする</strong>
+              <p>
+                Agentの変更はdiffビュー上に適用されます。完了したら、そのプロジェクトが元々使っているチェック(テスト・型チェック・lint・ビルド)を実行させて検証しましょう。
+              </p>
+            </li>
+          </ol>
+
+          <div class="callout cite">
+            <div class="callout-title">📚 この章の参照元</div>
+            <ul>
+              <li>
+                <a
+                  href="https://cursor.com/docs/get-started/quickstart"
+                  target="_blank"
+                  rel="noopener"
+                  >cursor.com/docs/get-started/quickstart</a
+                ><span class="ref-desc">Quickstart — Cursor Docs</span>
+              </li>
+              <li>
+                <a
+                  href="https://cursor.com/help/getting-started/install"
+                  target="_blank"
+                  rel="noopener"
+                  >cursor.com/help/getting-started/install</a
+                ><span class="ref-desc">Download and install Cursor</span>
+              </li>
+              <li>
+                <a
+                  href="https://cursor.com/help/getting-started/first-project"
+                  target="_blank"
+                  rel="noopener"
+                  >cursor.com/help/getting-started/first-project</a
+                ><span class="ref-desc">Your first project</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="chapter" id="ch-02">
+          <div class="chapter-kicker"><span class="line"></span>CHAPTER 02 &middot; TAB</div>
+          <h2 class="chapter-title">Tab補完 ― AIオートコンプリート</h2>
+
+          <p>
+            Tab は Cursor 独自の AI
+            駆動オートコンプリートです。最近の編集履歴・周辺コード・リンターエラーをもとに、
+            次に書くべきコードをグレー表示のゴーストテキストとして提案します。
+          </p>
+
+          <div class="grid-2">
+            <div class="feature-card">
+              <div class="fc-title">
+                <span class="dot" style="background: var(--accent)"></span>複数行の編集提案
+              </div>
+              <p>
+                単一行の補完だけでなく、複数行の書き換え・不足しているimport文の追加・関連コード間の協調的な編集も提案できます。
+              </p>
+            </div>
+            <div class="feature-card">
+              <div class="fc-title">
+                <span class="dot" style="background: var(--accent-violet)"></span
+                >次の編集位置へジャンプ
+              </div>
+              <p>
+                提案をTabで確定した後、もう一度Tabを押すと次に編集すべき場所へカーソルが自動でジャンプします。手動でのスクロールや移動が不要になります。
+              </p>
+            </div>
+            <div class="feature-card">
+              <div class="fc-title">
+                <span class="dot" style="background: var(--accent-amber)"></span
+                >クロスファイル編集予測
+              </div>
+              <p>
+                あるファイルの変更が別のファイルの更新を必要とする場合、Tabはそれを予測します。別ファイルへジャンプ可能なときは、エディタ下部にポータルウィンドウが表示されます。
+              </p>
+            </div>
+            <div class="feature-card">
+              <div class="fc-title">
+                <span class="dot" style="background: var(--accent-rose)"></span>専用モデルで高速動作
+              </div>
+              <p>
+                Tab補完はCursor独自の専用モデル(Fusion系)によって処理されており、通常のチャット用モデル一覧には表示されません。低レイテンシで動作するよう最適化されています。
+              </p>
+            </div>
+          </div>
+
+          <h3>ステップバイステップ: Tab を使いこなす</h3>
+          <ol class="steps">
+            <li>
+              <strong>提案が出たらそのまま様子を見る</strong>
+              <p>
+                タイピング中、カーソルの先にグレーの提案テキストが自動的に表示されます。何も設定は不要です。
+              </p>
+            </li>
+            <li>
+              <strong><kbd>Tab</kbd> で確定 / <kbd>Esc</kbd> で却下</strong>
+              <p>
+                提案が正しければTabキーで確定します。不要な場合はEscで却下し、自分でタイプを続けられます。
+              </p>
+              <div class="kbd-row">
+                <kbd>Tab</kbd
+                ><span style="color: var(--text-tertiary); font-size: 13px">受け入れる</span>
+              </div>
+            </li>
+            <li>
+              <strong>確定後にもう一度 Tab を押す</strong>
+              <p>
+                編集後、次の編集候補位置にカーソルが移動している場合があります。連続してTabを押すことで、複数箇所の編集をテンポよく進められます。
+              </p>
+            </li>
+            <li>
+              <strong>状況に応じてTabを一時停止する</strong>
+              <p>
+                エディタ右下のTabステータスインジケーターをクリックすると、指定時間だけTabを無効化する「Snooze」機能や詳細設定にアクセスできます。
+              </p>
+            </li>
+          </ol>
+
+          <div class="callout tip">
+            <div class="callout-title">💡 ベストプラクティス</div>
+            <p>
+              Tabの提案精度は「最近の編集パターン」に強く依存します。似た変更を複数ファイルに適用する場合、最初の1〜2箇所を丁寧に手で編集すると、以降の箇所でTabの予測精度が大きく向上します。
+            </p>
+          </div>
+
+          <div class="callout cite">
+            <div class="callout-title">📚 この章の参照元</div>
+            <ul>
+              <li>
+                <a href="https://cursor.com/help/ai-features/tab" target="_blank" rel="noopener"
+                  >cursor.com/help/ai-features/tab</a
+                ><span class="ref-desc">Tab completion — Cursor Docs</span>
+              </li>
+              <li>
+                <a href="https://cursor.com/docs/tab/overview" target="_blank" rel="noopener"
+                  >cursor.com/docs/tab/overview</a
+                ><span class="ref-desc">Tab completion overview</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="chapter" id="ch-03">
+          <div class="chapter-kicker"><span class="line"></span>CHAPTER 03 &middot; AGENT</div>
+          <h2 class="chapter-title">Agentモード ― 自律的なコーディング</h2>
+
+          <p>
+            Agent は Cursor
+            の中核機能です。コードベースを検索し、複数ファイルを編集し、ターミナルコマンドを実行し、
+            自律的にエラーを修正します。ゼロからの機能構築、既存コードのリファクタリング、バグ修正、テスト作成、
+            シェルコマンド実行までを自然言語の指示ひとつでこなします。
+          </p>
+
+          <div class="diagram-card">
+            <div class="diagram-label">FIG 3-1. Agentのタスク実行フロー</div>
+            <pre class="mermaid">
+sequenceDiagram
+    participant U as 開発者
+    participant A as Agent
+    participant C as コードベース
+    participant T as ターミナル
+
+    U->>A: 自然言語でタスクを依頼
+    A->>C: 関連ファイルを検索(grep/セマンティック検索)
+    C-->>A: 該当コードを返す
+    A->>A: 変更計画を立てる
+    A->>C: 複数ファイルを編集(diffとして反映)
+    A->>T: テスト/ビルドコマンドを実行
+    T-->>A: 実行結果・エラーを返す
+    alt エラーがある場合
+        A->>C: 自律的に修正を適用
+        A->>T: 再実行
+    end
+    A-->>U: 差分をレビュー用に提示
+    </pre
+            >
+          </div>
+
+          <h3>ステップバイステップ: Agentを使う</h3>
+          <ol class="steps">
+            <li>
+              <strong>具体的な依頼を書く</strong>
+              <p>
+                例:「ホームページにメールアドレスとパスワードのフィールドを持つログインフォームを追加して」のように、何をしたいか具体的に書きます。
+              </p>
+            </li>
+            <li>
+              <strong><kbd>Enter</kbd> で送信し、探索を見守る</strong>
+              <p>
+                Agentはどのファイルを読み、どこを変更し、結果をどう検証すべきかを自分で判断してコードベースの探索を始めます。
+              </p>
+            </li>
+            <li>
+              <strong>diffビューで変更を確認する</strong>
+              <p>
+                変更はリアルタイムでdiffビューに反映されます。不要な変更はその場で却下できます。
+              </p>
+            </li>
+            <li>
+              <strong>途中で止めて方向転換する</strong>
+              <p>
+                Stopボタンを押すとタスクを途中で停止できます。別のアプローチを指示し直したいときに便利です。
+              </p>
+            </li>
+          </ol>
+
+          <h3>4つのモードの使い分け</h3>
+          <p>
+            Agentパネルでは <kbd>Shift</kbd>+<kbd>Tab</kbd>
+            でAgent/Plan/Ask/Debugをローテーション切り替えできます。
+            複雑なタスクを検知すると、Cursorが自動でPlanモードを提案することもあります。
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>状況</th>
+                  <th>推奨モード</th>
+                  <th>理由</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>普段のほとんどのタスク</td>
+                  <td>Agent</td>
+                  <td>最も汎用的で高速に実装まで完了する</td>
+                </tr>
+                <tr>
+                  <td>コードを変更せず理解したいだけ</td>
+                  <td>Ask</td>
+                  <td>ファイルを一切編集せず、質問への回答に専念する</td>
+                </tr>
+                <tr>
+                  <td>複数ファイルにまたがる大きな機能追加</td>
+                  <td>Plan</td>
+                  <td>実装前にレビュー可能な計画を生成し、事前に方向性を確認できる</td>
+                </tr>
+                <tr>
+                  <td>再現しづらい・原因不明のバグ</td>
+                  <td>Debug</td>
+                  <td>バグの原因調査に特化した振る舞いをする</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout tip">
+            <div class="callout-title">💡 Plan Mode活用のベストプラクティス</div>
+            <p>
+              Planは Markdown ファイルとして開かれるため直接編集できます。「Save to workspace」で
+              <code>.cursor/plans/</code>
+              に保存すればチーム向けドキュメントになり、作業の再開や将来のAgentへの引き継ぎにも役立ちます。ただし、単純作業や慣れたタスクでは詳細な計画は不要で、直接Agentに投げてしまって構いません。
+            </p>
+          </div>
+
+          <div class="callout warn">
+            <div class="callout-title">⚠️ 計画通りにならなかったとき</div>
+            <p>
+              Agentの生成物が想定と違う場合、フォローアップの指示で細かく修正しようとするより、変更を
+              revert
+              してPlanをより具体的に練り直し、再実行する方が結果的に速く、クリーンな結果になりやすいとされています。
+            </p>
+          </div>
+
+          <h3>実践パターン: テスト駆動開発(TDD)でAgentを使う</h3>
+          <ol class="steps">
+            <li>
+              <strong>期待する入出力ペアに基づいてテストを書かせる</strong>
+              <p>
+                TDDで進めていることを明示し、まだ存在しない機能に対してモック実装を作らないよう伝えます。
+              </p>
+            </li>
+            <li>
+              <strong>テストを実行させ、失敗を確認させる</strong>
+              <p>この段階では実装コードを書かないよう明示的に指示します。</p>
+            </li>
+            <li>
+              <strong>テストに満足したらコミットする</strong>
+            </li>
+            <li>
+              <strong>テストに合格する実装コードを書かせる</strong>
+              <p>テスト自体は変更しないよう指示し、全テストが通るまで反復させます。</p>
+            </li>
+          </ol>
+
+          <div class="callout cite">
+            <div class="callout-title">📚 この章の参照元</div>
+            <ul>
+              <li>
+                <a href="https://cursor.com/help/ai-features/agent" target="_blank" rel="noopener"
+                  >cursor.com/help/ai-features/agent</a
+                ><span class="ref-desc">Agent mode — Cursor Docs</span>
+              </li>
+              <li>
+                <a href="https://cursor.com/docs/agent/overview" target="_blank" rel="noopener"
+                  >cursor.com/docs/agent/overview</a
+                ><span class="ref-desc">Agent overview</span>
+              </li>
+              <li>
+                <a href="https://cursor.com/docs/agent/plan-mode" target="_blank" rel="noopener"
+                  >cursor.com/docs/agent/plan-mode</a
+                ><span class="ref-desc">Plan Mode</span>
+              </li>
+              <li>
+                <a
+                  href="https://cursor.com/blog/agent-best-practices"
+                  target="_blank"
+                  rel="noopener"
+                  >cursor.com/blog/agent-best-practices</a
+                ><span class="ref-desc">Best practices for coding with agents</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="chapter" id="ch-04">
+          <div class="chapter-kicker">
+            <span class="line"></span>CHAPTER 04 &middot; INLINE EDIT
+          </div>
+          <h2 class="chapter-title">Inline Edit (Cmd/Ctrl+K) ― その場での即時編集</h2>
+
+          <p>
+            Inline Edit は、チャットパネルを開かずにコードをその場で修正できる機能です。
+            コードを選択し、やりたいことを説明するだけで、Cursorがその場で編集を適用します。
+            ターミナル内でも同じ仕組みが使え、コマンド生成にも利用できます。
+          </p>
+
+          <ol class="steps">
+            <li>
+              <strong>編集したいコードを選択する</strong>
+              <p>関数・ブロック・1行など、任意の範囲を選択します。</p>
+            </li>
+            <li>
+              <strong
+                ><kbd>Cmd</kbd>+<kbd>K</kbd>(Mac)/
+                <kbd>Ctrl</kbd>+<kbd>K</kbd>(Win/Linux)を押す</strong
+              >
+              <p>インライン入力欄が開きます。</p>
+              <div class="kbd-row"><kbd>⌘</kbd>+<kbd>K</kbd></div>
+            </li>
+            <li>
+              <strong>指示を入力してEnter</strong>
+              <p>
+                例:「この関数を async 関数に変換して」。選択範囲に対してその場で編集が適用されます。
+              </p>
+            </li>
+            <li>
+              <strong>フォローアップで微調整</strong>
+              <p>
+                結果に満足しなければ、続けて追加の指示を入力しEnterを押すことで、その場で反復修正できます。
+              </p>
+            </li>
+            <li>
+              <strong>より複雑な変更はChatへ</strong>
+              <p>
+                複数ファイルにまたがる変更や大きめの修正が必要になった場合は、コードを選択して
+                <kbd>Cmd</kbd>/<kbd>Ctrl</kbd>+<kbd>L</kbd>
+                でChatパネルへエスカレーションするのが自然な流れです。
+              </p>
+            </li>
+            <li>
+              <strong>ターミナルでもInline Editを使う</strong>
+              <p>
+                ターミナル内で <kbd>Ctrl</kbd>+<kbd>K</kbd>
+                を押すと下部にプロンプトバーが開き、やりたい操作を説明するだけでコマンドを生成してくれます。直近のターミナル履歴も文脈として利用されます。
+              </p>
+            </li>
+          </ol>
+
+          <div class="callout warn">
+            <div class="callout-title">⚠️ User Rules は Inline Edit には適用されない</div>
+            <p>
+              公式FAQで明言されている通り、User Rules(ユーザー全体設定のルール)はInline
+              Edit(Cmd/Ctrl+K)には適用されず、Agent(Chat)でのみ使用されます。Inline
+              Editで一貫したコーディング規約を守らせたい場合は、Project
+              Rulesやプロンプト内での明示が必要です。
+            </p>
+          </div>
+
+          <div class="callout cite">
+            <div class="callout-title">📚 この章の参照元</div>
+            <ul>
+              <li>
+                <a
+                  href="https://cursor.com/docs/inline-edit/overview"
+                  target="_blank"
+                  rel="noopener"
+                  >cursor.com/docs/inline-edit/overview</a
+                ><span class="ref-desc">Inline edit — Cursor Docs</span>
+              </li>
+              <li>
+                <a href="https://cursor.com/docs/rules.md" target="_blank" rel="noopener"
+                  >cursor.com/docs/rules.md</a
+                ><span class="ref-desc">Rules — FAQ (User Rules と Inline Edit の関係)</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="chapter" id="ch-05">
+          <div class="chapter-kicker"><span class="line"></span>CHAPTER 05 &middot; CONTEXT</div>
+          <h2 class="chapter-title">コンテキスト管理 ― @ Symbols とコードベース検索</h2>
+
+          <p>
+            AIエージェントの回答品質は「どれだけ正確なコンテキストを渡せるか」に大きく左右されます。
+            Cursorは
+            <code>@</code>
+            記号によるコンテキスト参照と、自動的なコードベースインデックス作成(セマンティック検索)を組み合わせることで、
+            大規模なコードベースでも正確に目的のコードへたどり着けるよう設計されています。
+          </p>
+
+          <h3>主要な @ Symbols 一覧</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>記号</th>
+                  <th>用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>@Files &amp; Folders</code></td>
+                  <td>特定のファイル・フォルダをコンテキストとして明示的に指定する</td>
+                </tr>
+                <tr>
+                  <td><code>@Code</code></td>
+                  <td>特定の関数やコードシンボルを参照する</td>
+                </tr>
+                <tr>
+                  <td><code>@Docs</code></td>
+                  <td>外部ドキュメント(ライブラリ公式ドキュメント等)を参照する</td>
+                </tr>
+                <tr>
+                  <td><code>@Git</code></td>
+                  <td>コミット・ブランチ・PRなどGit情報を参照する</td>
+                </tr>
+                <tr>
+                  <td><code>@Past Chats</code></td>
+                  <td>過去の会話履歴を参照する</td>
+                </tr>
+                <tr>
+                  <td><code>@Cursor Rules</code></td>
+                  <td>特定のルールをチャットに手動で適用する</td>
+                </tr>
+                <tr>
+                  <td><code>@Web</code></td>
+                  <td>Web検索結果をコンテキストに含める</td>
+                </tr>
+                <tr>
+                  <td><code>@Link</code></td>
+                  <td>URLを指定してページ内容(PDF含む)を取り込む</td>
+                </tr>
+                <tr>
+                  <td><code>@Recent Changes</code></td>
+                  <td>直近の変更差分を参照する</td>
+                </tr>
+                <tr>
+                  <td><code>@Linter Errors</code></td>
+                  <td>現在のリンターエラーを参照する</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>コードベースインデックスの仕組み</h3>
+          <p>
+            Cursorはワークスペースを開いた瞬間から自動的にインデックス作成を開始します。設定は不要です。
+            コードは意味のあるチャンク(関数・クラス・論理ブロック単位)に分割され、各チャンクは専用の埋め込みモデルによってベクトル化され、ベクトルデータベースに格納されます。
+          </p>
+
+          <div class="diagram-card">
+            <div class="diagram-label">FIG 5-1. grep とセマンティック検索の使い分け</div>
+            <pre class="mermaid">
+flowchart LR
+    Q["開発者の質問"] --> D{"完全一致で\n探せるか?"}
+    D -- "はい\n関数名/変数名が分かる" --> G["Instant Grep\n正規表現・単語境界マッチ"]
+    D -- "いいえ\n概念的な質問" --> S["セマンティック検索\nベクトル類似度検索"]
+    G --> R["該当コードを特定"]
+    S --> R
+    R --> A["Agentが編集/回答を生成"]
+
+    style Q fill:#0d1b2e,stroke:#9db0c9,color:#e8edf5
+    style G fill:#0d1b2e,stroke:#5eead4,color:#e8edf5
+    style S fill:#0d1b2e,stroke:#a78bfa,color:#e8edf5
+    style R fill:#0d1b2e,stroke:#fbbf24,color:#e8edf5
+    style A fill:#0d1b2e,stroke:#fb7185,color:#e8edf5
+    </pre
+            >
+          </div>
+
+          <p>
+            Cursorは正確な文字列一致にはCursor独自の高速検索エンジン「Instant
+            Grep」を、意味ベースの検索にはセマンティック検索を、
+            それぞれ状況に応じて自動的に使い分けます。研究によれば、grepとセマンティック検索を組み合わせることで、grep単体と比較して
+            コードベースに関する質問への回答精度が平均12.5%向上し、1,000ファイル超の大規模コードベースほどその効果は大きくなります。
+          </p>
+
+          <h3>ステップバイステップ: 大規模コードベースを効率よく探索する</h3>
+          <ol class="steps">
+            <li>
+              <strong>関数名や変数名が分かっているなら、それを明言する</strong>
+              <p>
+                「processOrder
+                の呼び出し元をすべて見つけて」のように具体的なターゲットを与えると、Agentは正確なgrepパターンを構築できます。
+              </p>
+            </li>
+            <li>
+              <strong>不慣れな領域では「振る舞い」で説明する</strong>
+              <p>
+                「認証はどこで処理していますか?」のように尋ねると、"authentication"
+                という単語がファイル内に一切登場しなくても、意味的に近いコード(例:
+                <code>middleware/session.ts</code>)を発見できます。
+              </p>
+            </li>
+            <li>
+              <strong>変更前に既存パターンを確認させる</strong>
+              <p>
+                新しいコードを追加する前に、Agentへ既存の実装パターンを提示させることで、重複実装や規約違反を防げます。
+              </p>
+            </li>
+            <li>
+              <strong>探索結果が膨大になりそうならSubagentに任せる</strong>
+              <p>
+                多数のファイルを横断検索するとコンテキストを大量に消費します。Subagent(第8章参照)は結果を要約して返すため、メインの会話をすっきり保てます。
+              </p>
+            </li>
+            <li>
+              <strong>不明瞭なコードベースはMermaid図で可視化させる</strong>
+              <p>
+                「認証システムのデータフローを、OAuthプロバイダ・セッション管理・トークンリフレッシュを含めてMermaid図で示して」のように依頼すると、オンボーディングや設計レビューに使えるアーキテクチャ図を生成してくれます。
+              </p>
+            </li>
+          </ol>
+
+          <div class="callout tip">
+            <div class="callout-title">💡 インデックス対象を絞り込む</div>
+            <p>
+              <code>.gitignore</code> や
+              <code>.cursorignore</code>
+              に記載したファイルはインデックス対象から除外されます。生成物や巨大なコンテンツファイルを除外しておくと検索精度が向上します。インデックス済みのファイル一覧は「Cursor
+              Settings &gt; Indexing &amp; Docs &gt; View included files」から確認できます。
+            </p>
+          </div>
+
+          <div class="callout cite">
+            <div class="callout-title">📚 この章の参照元</div>
+            <ul>
+              <li>
+                <a
+                  href="https://docs.cursor.com/en/context/@-symbols/overview"
+                  target="_blank"
+                  rel="noopener"
+                  >docs.cursor.com/en/context/@-symbols/overview</a
+                ><span class="ref-desc">@ Symbols overview</span>
+              </li>
+              <li>
+                <a
+                  href="https://cursor.com/docs/context/codebase-indexing"
+                  target="_blank"
+                  rel="noopener"
+                  >cursor.com/docs/context/codebase-indexing</a
+                ><span class="ref-desc">Semantic &amp; Agentic Search</span>
+              </li>
+              <li>
+                <a
+                  href="https://cursor.com/docs/cookbook/large-codebases"
+                  target="_blank"
+                  rel="noopener"
+                  >cursor.com/docs/cookbook/large-codebases</a
+                ><span class="ref-desc">Understanding Your Codebase — Cursor Learn</span>
+              </li>
+              <li>
+                <a
+                  href="https://cursor.com/blog/secure-codebase-indexing"
+                  target="_blank"
+                  rel="noopener"
+                  >cursor.com/blog/secure-codebase-indexing</a
+                ><span class="ref-desc">Securely indexing large codebases</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="chapter" id="ch-06">
+          <div class="chapter-kicker"><span class="line"></span>CHAPTER 06 &middot; RULES</div>
+          <h2 class="chapter-title">Rules ― 永続的な指示をAgentに与える</h2>
+
+          <p>
+            大規模言語モデルは補完と補完のあいだで記憶を保持しません。Rulesは、プロンプトレベルで
+            「常に読み込まれる永続的な文脈」を提供する仕組みです。ルールの内容はモデルコンテキストの先頭に含まれ、
+            コード生成・編集の解釈・ワークフロー支援に一貫したガイダンスを与えます。
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>種類</th>
+                  <th>保存場所</th>
+                  <th>スコープ</th>
+                  <th>プラン</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Project Rules</strong></td>
+                  <td><code>.cursor/rules/*.mdc</code></td>
+                  <td>バージョン管理され、コードベースにスコープされる</td>
+                  <td><span class="badge free">全プラン</span></td>
+                </tr>
+                <tr>
+                  <td><strong>User Rules</strong></td>
+                  <td>Cursor環境全体(グローバル)</td>
+                  <td>Agent(Chat)のみに適用、全プロジェクト共通</td>
+                  <td><span class="badge free">全プラン</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Team Rules</strong></td>
+                  <td>ダッシュボードで管理</td>
+                  <td>チーム全体、全リポジトリに適用</td>
+                  <td><span class="badge team">Team/Enterprise</span></td>
+                </tr>
+                <tr>
+                  <td><strong>AGENTS.md</strong></td>
+                  <td>プロジェクトルート</td>
+                  <td><code>.cursor/rules</code>のシンプルな代替。素のMarkdownで記述可</td>
+                  <td><span class="badge free">全プラン</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            複数のルールが適用される場合の優先順位は
+            <strong>Team Rules → Project Rules → User Rules</strong> の順です。
+            該当するすべてのルールがマージされ、内容が競合する場合は前者(より上位のもの)が優先されます。
+          </p>
+
+          <h3>ステップバイステップ: Project Ruleを作成する</h3>
+          <ol class="steps">
+            <li>
+              <strong><code>.cursor/rules/</code> ディレクトリにファイルを作成</strong>
+              <p>
+                拡張子は必ず <code>.mdc</code> にします。プレーンな
+                <code>.md</code>
+                ファイルはfrontmatter(description/globs/alwaysApply)を持たないため、ルールシステムに認識されず無視されます。素のMarkdownで済ませたい場合はAGENTS.mdを使いましょう。
+              </p>
+              <div class="code-block">
+                <div class="code-title">bash — ディレクトリ構成の例</div>
+                <pre><code class="language-bash">.cursor/rules/
+  react-patterns.mdc     # 正しく認識される
+  api-guidelines.md      # 拡張子が違うため無視される
+  frontend/
+    components.mdc       # フォルダで整理も可能</code></pre>
+              </div>
+            </li>
+            <li>
+              <strong>frontmatterで適用範囲を定義</strong>
+              <p>
+                「Apply
+                Intelligently(内容に応じて自動適用)」を使う場合はdescriptionを必ず定義します。「Apply
+                to Specific
+                Files(特定ファイルにのみ適用)」を使う場合は、参照するファイルにglobsパターンが一致しているか確認してください。ルールが適用されない場合、大抵はこのどちらかの設定漏れが原因です。
+              </p>
+            </li>
+            <li>
+              <strong>本文にはコマンド・規約・参照先を簡潔に書く</strong>
+              <p>
+                ファイルの内容を丸ごとコピーするのではなく、正規のコード例へのポインタを記載するのがコツです。こうすることでルールが短く保たれ、コードが変わってもルールが陳腐化しにくくなります。
+              </p>
+              <div class="code-block">
+                <div class="code-title">markdown — .cursor/rules/project.mdc の例</div>
+                <pre><code class="language-markdown"># Commands
+- `npm run build`: プロジェクトをビルド
+- `npm run typecheck`: 型チェックを実行
+- `npm run test`: テストを実行(高速化のため単一ファイル指定を推奨)
+
+# Code style
+- ES modules (import/export) を使用し、CommonJS (require) は使わない
+- 可能な限り分割代入でimportする: `import { foo } from 'bar'`
+- 正規のコンポーネント構造は `components/Button.tsx` を参照
+
+# Workflow
+- 一連のコード変更後は必ず型チェックを実行する
+- APIルートは既存パターンに従い `app/api/` に配置する</code></pre>
+              </div>
+            </li>
+            <li>
+              <strong>他ファイルを参照する</strong>
+              <p>
+                ルール内で
+                <code>@filename.ts</code>
+                と書くとそのファイルをコンテキストに含められます。チャット内で特定のルールを手動適用したい場合も
+                <code>@</code> でルール名をメンションします。
+              </p>
+            </li>
+            <li>
+              <strong>Agentにミスから学ばせる</strong>
+              <p>
+                Agentが間違いを犯したら、その都度ルールを更新します。GitHub上のissueやPRで
+                <code>@cursor</code> をタグ付けし、Agent自身にルールを更新させることも可能です。
+              </p>
+            </li>
+          </ol>
+
+          <h3>GitHubからルールをインポートする</h3>
+          <ol class="steps">
+            <li><strong>Cursor Settings → Rules, Commands を開く</strong></li>
+            <li>
+              <strong>Project Rules 横の「+ Add Rule」から「Remote Rule (GitHub)」を選択</strong>
+            </li>
+            <li>
+              <strong>対象GitHubリポジトリのURLを貼り付ける</strong>
+              <p>
+                アクセス権があれば公開・非公開いずれのリポジトリからもルールをインポートできます。
+              </p>
+            </li>
+          </ol>
+
+          <div class="callout warn">
+            <div class="callout-title">⚠️ .cursorrules はレガシー</div>
+            <p>
+              プロジェクトルート直下の
+              <code>.cursorrules</code>
+              ファイルはレガシー形式であり、将来的に廃止予定です。コマンドパレットから「New Cursor
+              Rule」を実行して
+              <code>.cursor/rules/*.mdc</code> 形式に移行することが推奨されています。
+            </p>
+          </div>
+
+          <div class="callout tip">
+            <div class="callout-title">💡 FAQ: Rulesが他のAI機能に影響するか</div>
+            <p>
+              Rulesは Cursor Tab や他のAI機能には影響しません。あくまでAgent(Chat)向けの仕組みです。
+            </p>
+          </div>
+
+          <div class="callout cite">
+            <div class="callout-title">📚 この章の参照元</div>
+            <ul>
+              <li>
+                <a href="https://cursor.com/docs/rules" target="_blank" rel="noopener"
+                  >cursor.com/docs/rules</a
+                ><span class="ref-desc">Rules — Cursor Docs</span>
+              </li>
+              <li>
+                <a href="https://cursor.com/docs/rules.md" target="_blank" rel="noopener"
+                  >cursor.com/docs/rules.md</a
+                ><span class="ref-desc">Rules — 詳細仕様とFAQ</span>
+              </li>
+              <li>
+                <a
+                  href="https://cursor.com/blog/agent-best-practices"
+                  target="_blank"
+                  rel="noopener"
+                  >cursor.com/blog/agent-best-practices</a
+                ><span class="ref-desc">Best practices for coding with agents</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="chapter" id="ch-07">
+          <div class="chapter-kicker">
+            <span class="line"></span>CHAPTER 07 &middot; SKILLS &amp; SUBAGENTS
+          </div>
+          <h2 class="chapter-title">Skills / Subagents / Hooks ― 動的な拡張機構</h2>
+
+          <p>
+            RulesとSkillsは似て非なるものです。<strong>Rulesは常時有効な静的コンテキスト</strong>である一方、
+            <strong>Skillsは関連性があると判断されたときにだけ動的に読み込まれる能力</strong>です。
+            この違いにより、コンテキストウィンドウを圧迫せずに専門知識をAgentへ持たせることができます。
+          </p>
+
+          <div class="diagram-card">
+            <div class="diagram-label">FIG 7-1. Rules / Skills / Subagents の関係</div>
+            <pre class="mermaid">
+flowchart TB
+    R["Rules<br/>常時読み込み・静的"] -->|"会話開始時に自動適用"| CTX["Agentのコンテキスト"]
+    SK["Skills (SKILL.md)<br/>動的・オンデマンド"] -->|"関連性があると判断された時のみ"| CTX
+    CTX --> MA["メインAgent"]
+    MA -->|"タスクを委譲"| SA1["Subagent: explore<br/>コードベース検索"]
+    MA -->|"タスクを委譲"| SA2["Subagent: bash<br/>シェル実行"]
+    MA -->|"タスクを委譲"| SA3["Subagent: browser<br/>ブラウザ自動化"]
+    MA -->|"カスタム委譲"| SA4["カスタムSubagent<br/>.cursor/agents/*.md"]
+    SA4 -.->|"Cursor 2.5+ ネスト可"| SA5["孫Subagent"]
+
+    style R fill:#0d1b2e,stroke:#a78bfa,color:#e8edf5
+    style SK fill:#0d1b2e,stroke:#5eead4,color:#e8edf5
+    style MA fill:#0d1b2e,stroke:#fbbf24,color:#e8edf5
+    </pre>
+          </div>
+
+          <h3>Skills(スキル)</h3>
+          <p>SkillsはSKILL.mdファイルで定義され、以下を含めることができます。</p>
+          <ul>
+            <li>
+              <strong>カスタムコマンド</strong> — Agent入力欄で
+              <code>/</code> から呼び出せる再利用可能なワークフロー
+            </li>
+            <li><strong>フック</strong> — Agentのアクション前後に実行されるスクリプト</li>
+            <li><strong>ドメイン知識</strong> — 特定タスクのためにオンデマンドで参照される指示</li>
+          </ul>
+          <p>
+            スキルとフックを組み合わせることで、セキュリティツール・シークレット管理・オブザーバビリティ基盤との連携も可能になり、
+            「テストが全て通るまで自律的に反復し続けるAgent」のような長時間稼働パターンも構築できます。
+          </p>
+
+          <h3>Subagents(サブエージェント)</h3>
+          <p>
+            Cursorには
+            <code>explore</code
+            >(コードベース検索)・<code>bash</code>(シェル実行)・<code>browser</code>(MCP経由のブラウザ自動化)という
+            3つの組み込みSubagentがあり、コンテキストを大量消費する処理を自動的に肩代わりします。設定は不要です。
+          </p>
+
+          <h4>ステップバイステップ: カスタムSubagentを作る</h4>
+          <ol class="steps">
+            <li>
+              <strong><code>.cursor/agents/</code> にYAML frontmatter付きファイルを作成</strong>
+              <p><code>name</code> と <code>description</code> を必須で定義します。</p>
+              <div class="code-block">
+                <div class="code-title">markdown — .cursor/agents/verifier.md</div>
+                <pre><code class="language-yaml">---
+name: verifier
+description: 完了した作業を検証する。実装が機能しているか確認し、
+  テストを実行し、合否を報告する。「use proactively」を含めると自動委譲されやすくなる。
+model: gpt-5.5
+---
+完了した実装を検証してください。テストを実行し、
+何が合格し、何が未完了かを具体的に報告してください。</code></pre>
+              </div>
+            </li>
+            <li>
+              <strong>descriptionフィールドを練り込む</strong>
+              <p>
+                Agentがどのタイミングでこのサブエージェントに委譲するかは
+                <code>description</code> の内容で決まります。「use proactively」「always use
+                for」のようなフレーズを含めると自動委譲が促進されます。実際にプロンプトを試し、意図通りのSubagentが起動するか検証しましょう。
+              </p>
+            </li>
+            <li>
+              <strong><code>/名前</code> で明示的に呼び出す</strong>
+              <div class="code-block">
+                <div class="code-title">プロンプト例</div>
+                <pre><code class="language-text">/verifier 認証フローが完成しているか確認して
+/debugger このエラーを調査して
+/security-auditor 決済モジュールをレビューして</code></pre>
+              </div>
+            </li>
+            <li>
+              <strong>複数Subagentを並列起動する</strong>
+              <p>
+                「APIの変更をレビューしつつ、ドキュメントを並行して更新して」のように依頼すると、複数のSubagentが並列実行されスループットが向上します。ただし並列実行はトークン消費も比例して増える(5つ並列なら概ね5倍)点に注意が必要です。
+              </p>
+            </li>
+            <li>
+              <strong>汎用的すぎるSubagentを乱立させない</strong>
+              <p>
+                「changelogを生成する」「importを整形する」のような単発の単純作業には、Subagentではなく軽量なSkillの利用が推奨されています。各Subagentは単一の明確な責務に絞り込みましょう。
+              </p>
+            </li>
+            <li>
+              <strong><code>.cursor/agents/</code> をバージョン管理する</strong>
+              <p>
+                リポジトリにコミットすることでチーム全体がカスタムSubagentの恩恵を受けられます。
+              </p>
+            </li>
+          </ol>
+
+          <div class="callout tip">
+            <div class="callout-title">💡 Rules vs Skills の判断基準</div>
+            <p>
+              「毎回のプロンプトに絶対に必要な短い前提」はRulesへ。「特定タスクの時だけ必要な、やや長めの手順書」はSkillsへ、という切り分けがコンテキスト効率の観点で有効です。
+            </p>
+          </div>
+
+          <div class="callout cite">
+            <div class="callout-title">📚 この章の参照元</div>
+            <ul>
+              <li>
+                <a href="https://cursor.com/docs/subagents" target="_blank" rel="noopener"
+                  >cursor.com/docs/subagents</a
+                ><span class="ref-desc">Subagents — Cursor Docs</span>
+              </li>
+              <li>
+                <a href="https://cursor.com/docs/hooks" target="_blank" rel="noopener"
+                  >cursor.com/docs/hooks</a
+                ><span class="ref-desc">Hooks — Cursor Docs</span>
+              </li>
+              <li>
+                <a
+                  href="https://cursor.com/blog/agent-best-practices"
+                  target="_blank"
+                  rel="noopener"
+                  >cursor.com/blog/agent-best-practices</a
+                ><span class="ref-desc">Best practices for coding with agents(Skills章)</span>
+              </li>
+              <li>
+                <a href="https://cursor.com/changelog/2-5" target="_blank" rel="noopener"
+                  >cursor.com/changelog/2-5</a
+                ><span class="ref-desc">Plugins, Sandbox Access Controls, and Async Subagents</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="chapter" id="ch-08">
+          <div class="chapter-kicker"><span class="line"></span>CHAPTER 08 &middot; MEMORIES</div>
+          <h2 class="chapter-title">Memories ― 会話から自動で学習する記憶機能</h2>
+
+          <p>
+            Memoriesは、会話の中からCursorが事実を自動的に記憶し、以降の会話で参照できるようにする機能です。
+            「以前このプロジェクトではこう決めた」といった文脈を毎回タイプし直す必要がなくなります。
+          </p>
+
+          <ol class="steps">
+            <li>
+              <strong>設定を開く</strong>
+              <p>
+                <kbd>Cmd</kbd>/<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>J</kbd> でCursor
+                Settingsを開き、Rulesタブ内のMemoriesセクションを確認します。
+              </p>
+            </li>
+            <li>
+              <strong>自動生成された記憶を確認する</strong>
+              <p>
+                会話中にCursorが「覚えておくべき」と判断した事実は自動的にMemoriesとして蓄積されます。
+              </p>
+            </li>
+            <li>
+              <strong>プロジェクト単位・個人単位で管理する</strong>
+              <p>
+                Memoriesはプロジェクトごとに、かつ個人アカウント単位で保存され、設定画面から管理(閲覧・削除)できます。
+              </p>
+            </li>
+          </ol>
+
+          <div class="callout warn">
+            <div class="callout-title">⚠️ プライバシーに関する注意</div>
+            <p>
+              Memories機能では、内容とそのインデックスの両方がCursorのインフラ側に保存されます。機密性の高いプロジェクトで利用する場合は、この保存範囲を理解した上で有効化するかどうかを検討してください。
+            </p>
+          </div>
+
+          <div class="callout cite">
+            <div class="callout-title">📚 この章の参照元</div>
+            <ul>
+              <li>
+                <a href="https://cursor.com/changelog/1-0" target="_blank" rel="noopener"
+                  >cursor.com/changelog/1-0</a
+                ><span class="ref-desc"
+                  >Bugbot, Background Agent access to everyone, and one-click MCP
+                  install(Memories初出のリリースノート)</span
+                >
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="chapter" id="ch-09">
+          <div class="chapter-kicker"><span class="line"></span>CHAPTER 09 &middot; MCP</div>
+          <h2 class="chapter-title">Model Context Protocol (MCP) ― 外部ツール連携</h2>
+
+          <p>
+            MCPは、CursorのAgentを外部ツール・データソースに接続するオープンな規格です。
+            Slackメッセージの読み取り、Datadogログの調査、Sentryのエラー調査、データベースへのクエリなど、
+            コーディングの枠を超えた作業をAgentに任せられるようになります。
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>MCPプロトコル機能</th>
+                  <th>Cursorでのサポート</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Tools(ツール)</td>
+                  <td>AIモデルが実行できる関数。サポート済み</td>
+                </tr>
+                <tr>
+                  <td>Prompts(プロンプト)</td>
+                  <td>テンプレート化されたメッセージ/ワークフロー。サポート済み</td>
+                </tr>
+                <tr>
+                  <td>Resources(リソース)</td>
+                  <td>読み取り・参照可能な構造化データソース。サポート済み</td>
+                </tr>
+                <tr>
+                  <td>Roots(ルート)</td>
+                  <td>サーバー起点のURI/ファイルシステム境界の問い合わせ。サポート済み</td>
+                </tr>
+                <tr>
+                  <td>Elicitation(聞き出し)</td>
+                  <td>サーバー起点の追加情報要求。サポート済み</td>
+                </tr>
+                <tr>
+                  <td>Apps(拡張)</td>
+                  <td>ツール出力とともに返るインタラクティブUI。サポート済み</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>ステップバイステップ: MCPサーバーを設定する</h3>
+          <ol class="steps">
+            <li>
+              <strong>接続方式を選ぶ(stdio / リモート)</strong>
+              <p>
+                ローカルプロセスとして起動するstdio方式(npx, python,
+                dockerなど)と、既にホストされているリモートサーバーにHTTP/SSEで接続する方式があります。
+              </p>
+            </li>
+            <li>
+              <strong><code>mcp.json</code> に設定を書く</strong>
+              <div class="code-block">
+                <div class="code-title">json — stdioサーバーの例(Node.js)</div>
+                <pre><code class="language-json">{
+  "mcpServers": {
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://localhost/mydb"
+      ]
+    }
+  }
+}</code></pre>
+              </div>
+              <div class="code-block">
+                <div class="code-title">json — リモートサーバーの例(HTTP/SSE)</div>
+                <pre><code class="language-json">{
+  "mcpServers": {
+    "server-name": {
+      "url": "http://localhost:3000/mcp",
+      "headers": { "API_KEY": "value" }
+    }
+  }
+}</code></pre>
+              </div>
+            </li>
+            <li>
+              <strong>OAuth対応サーバーの認証情報を設定する(必要な場合)</strong>
+              <p>
+                プロバイダが固定のClient
+                IDを発行している場合や、リダイレクトURLのホワイトリスト登録が必要な場合(FigmaやLinearなど)、Dynamic
+                Client
+                Registrationに対応していない場合は、<code>mcp.json</code>に静的なOAuthクライアント資格情報を指定できます。
+              </p>
+            </li>
+            <li>
+              <strong>接続を承認する</strong>
+              <p>
+                すべてのMCP接続には明示的な承認が必要です。承認後も、各ツール呼び出しには個別の承認が必要になります(MCPアローリストで特定ツールを事前承認することも可能)。
+              </p>
+            </li>
+            <li>
+              <strong>ワンクリックインストールリンクを活用する</strong>
+              <p>
+                MCP開発者であれば、READMEに「Add to
+                Cursor」ボタンを設置してデプロイリンク経由での簡単インストールを提供できます。
+              </p>
+            </li>
+          </ol>
+
+          <div class="callout danger">
+            <div class="callout-title">🔒 セキュリティ上の注意</div>
+            <p>
+              MCPサーバーは外部サービスにアクセスし、ユーザーに代わってコードを実行できます。導入前に必ず以下を確認してください。
+            </p>
+            <ul style="margin-top: 8px">
+              <li>信頼できる開発者・リポジトリのMCPサーバーのみ導入する</li>
+              <li>サーバーがアクセスするデータ・APIの権限範囲を確認する</li>
+              <li>APIキーは必要最小限の権限に制限する</li>
+              <li>重要な連携については、可能であればソースコードを監査する</li>
+            </ul>
+          </div>
+
+          <div class="callout cite">
+            <div class="callout-title">📚 この章の参照元</div>
+            <ul>
+              <li>
+                <a href="https://cursor.com/docs/mcp" target="_blank" rel="noopener"
+                  >cursor.com/docs/mcp</a
+                ><span class="ref-desc">Model Context Protocol (MCP) — Cursor Docs</span>
+              </li>
+              <li>
+                <a href="https://cursor.com/docs/mcp.md" target="_blank" rel="noopener"
+                  >cursor.com/docs/mcp.md</a
+                ><span class="ref-desc">MCP — 設定詳細・セキュリティガイドライン</span>
+              </li>
+              <li>
+                <a
+                  href="https://cursor.com/docs/context/mcp/install-links"
+                  target="_blank"
+                  rel="noopener"
+                  >cursor.com/docs/context/mcp/install-links</a
+                ><span class="ref-desc">MCP Install Links</span>
+              </li>
+              <li>
+                <a href="https://cursor.com/docs/cli/mcp.md" target="_blank" rel="noopener"
+                  >cursor.com/docs/cli/mcp.md</a
+                ><span class="ref-desc">MCP for CLI</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="chapter" id="ch-10">
+          <div class="chapter-kicker">
+            <span class="line"></span>CHAPTER 10 &middot; MODELS &amp; PRICING
+          </div>
+          <h2 class="chapter-title">モデル選択・Max Mode・料金体系</h2>
+
+          <p>
+            Cursorは Anthropic・OpenAI・Google・xAI
+            などのフロンティアモデルに加え、独自のCursorモデルも提供しています。
+            どのモデルを選ぶか、Max
+            Modeをいつ使うかは、コストと精度のバランスを左右する重要な意思決定です。
+          </p>
+
+          <h3>モデルルーター: Auto と Premium</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ルーター</th>
+                  <th>挙動</th>
+                  <th>課金</th>
+                  <th>向いている用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Auto</strong></td>
+                  <td>知性・コスト効率・信頼性のバランスを考慮しCursorが自動選択</td>
+                  <td>固定トークンレート(Cursor Token Rateの対象外)</td>
+                  <td>日常的なタスク全般</td>
+                </tr>
+                <tr>
+                  <td><strong>Premium</strong></td>
+                  <td>
+                    内部ベンチマーク・評価・ユーザーフィードバックに基づき最も高性能なモデルを選択
+                  </td>
+                  <td>選択されたモデルのAPIレートで課金</td>
+                  <td>最も複雑なタスク</td>
+                </tr>
+                <tr>
+                  <td><strong>Composer 2.5</strong></td>
+                  <td>エージェント型コーディングに特化したCursor独自モデル</td>
+                  <td>Autoと同じプールから利用</td>
+                  <td>コーディングタスク全般</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Max Mode</h3>
+          <p>
+            Max Modeは、そのモデルがサポートする最大のコンテキストウィンドウまで拡張するモードです。
+            より広いコンテキストはコードベースへの深い理解につながり、複雑なタスクでの精度向上が期待できます。
+            ただしトークンベースの課金となるため、通常モードよりも使用量を早く消費します。
+          </p>
+
+          <ol class="steps">
+            <li>
+              <strong>チャット/Agentパネルのモデルセレクタを開く</strong>
+            </li>
+            <li>
+              <strong>Max Modeをトグルでオンにする</strong>
+              <p>
+                これはグローバル設定であり、会話をまたいで有効な状態が維持されます。一部のモデルはMax
+                Mode専用で、選択すると自動的に有効化されます。
+              </p>
+            </li>
+            <li>
+              <strong>効果が大きいケースを見極める</strong>
+              <p>
+                Max
+                Modeはデフォルトの約20万トークンより大きなコンテキストウィンドウを持つモデルで最も効果を発揮します。コストよりも最高の精度を優先したい、難易度の高いタスクに向いています。
+              </p>
+            </li>
+          </ol>
+
+          <div class="callout warn">
+            <div class="callout-title">⚠️ 課金体系の違いに注意</div>
+            <p>
+              現行の個人向けプランでは、Max
+              ModeはモデルのAPIレートで課金されます。Teamsプランでは、Auto以外のリクエストに1Mトークンあたり$0.25の「Cursor
+              Token Rate」が上乗せされます。レガシーなリクエストベースのプランでは、Max
+              Modeに20%のサーチャージが加算されます。
+            </p>
+          </div>
+
+          <h3>個人向けプランの含有APIクレジット(2026年7月時点)</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>プラン</th>
+                  <th>月額</th>
+                  <th>含まれるAPI利用枠</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Pro</td>
+                  <td>$20/月</td>
+                  <td>$20分のAPIエージェント利用 + Auto/Composerの潤沢な利用枠</td>
+                </tr>
+                <tr>
+                  <td>Pro Plus</td>
+                  <td>$60/月</td>
+                  <td>$70分のAPIエージェント利用 + Auto/Composerの潤沢な利用枠</td>
+                </tr>
+                <tr>
+                  <td>Ultra</td>
+                  <td>$200/月</td>
+                  <td>$400分のAPIエージェント利用 + Auto/Composerの潤沢な利用枠</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="font-size: 13px; color: var(--text-tertiary)">
+            ※
+            料金は変更される可能性があるため、最新の金額は必ず公式ページ(下記参照元)で確認してください。
+          </p>
+
+          <div class="callout tip">
+            <div class="callout-title">💡 モデル選びの実践指針</div>
+            <p>
+              迷ったらまずAutoから始め、複雑な設計判断やリファクタリングなど「一発で高精度な回答がほしい」場面でだけPremiumやMax
+              Modeへ切り替えるという運用が、コストと生産性のバランスとして扱いやすい考え方です。
+            </p>
+          </div>
+
+          <div class="callout cite">
+            <div class="callout-title">📚 この章の参照元</div>
+            <ul>
+              <li>
+                <a href="https://cursor.com/docs/models-and-pricing" target="_blank" rel="noopener"
+                  >cursor.com/docs/models-and-pricing</a
+                ><span class="ref-desc">Models &amp; Pricing — Cursor Docs</span>
+              </li>
+              <li>
+                <a
+                  href="https://cursor.com/help/ai-features/max-mode"
+                  target="_blank"
+                  rel="noopener"
+                  >cursor.com/help/ai-features/max-mode</a
+                ><span class="ref-desc">Max Mode</span>
+              </li>
+              <li>
+                <a
+                  href="https://cursor.com/help/account-and-billing/pricing"
+                  target="_blank"
+                  rel="noopener"
+                  >cursor.com/help/account-and-billing/pricing</a
+                ><span class="ref-desc">Pricing and plans</span>
+              </li>
+              <li>
+                <a
+                  href="https://cursor.com/help/models-and-usage/usage-limits"
+                  target="_blank"
+                  rel="noopener"
+                  >cursor.com/help/models-and-usage/usage-limits</a
+                ><span class="ref-desc">Usage and limits</span>
+              </li>
+              <li>
+                <a href="https://cursor.com/pricing" target="_blank" rel="noopener"
+                  >cursor.com/pricing</a
+                ><span class="ref-desc">Cursor Pricing(最新の公式料金ページ)</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="chapter" id="ch-11">
+          <div class="chapter-kicker">
+            <span class="line"></span>CHAPTER 11 &middot; CLOUD AGENTS
+          </div>
+          <h2 class="chapter-title">Background Agents / Cloud Agents ― クラウドでの並列実行</h2>
+
+          <p>
+            Cloud Agentsは、ローカルマシンに縛られずクラウドVM上でAgentを実行する機能です。
+            複数のAgentを並列で走らせても互いに干渉しないよう、Cursorが自動的にGit
+            worktreeを作成・管理します。
+          </p>
+
+          <div class="diagram-card">
+            <div class="diagram-label">FIG 11-1. Cloud Agent の環境構成フロー</div>
+            <pre class="mermaid">
+flowchart LR
+    A["タスクを依頼<br/>(ローカル or cursor.com/agents)"] --> B{"実行環境を選択"}
+    B --> C["Cursor管理の<br/>Cloud Agent(デフォルト)"]
+    B --> D["My Machines /<br/>Self-Hosted Pool"]
+    C --> E["環境セットアップ<br/>Agent主導 / スナップショット / Dockerfile"]
+    E --> F["独立VM上でworktree実行"]
+    F --> G["ビルド・テスト・検証"]
+    G --> H["マージ可能なPRを生成"]
+
+    style A fill:#0d1b2e,stroke:#9db0c9,color:#e8edf5
+    style C fill:#0d1b2e,stroke:#5eead4,color:#e8edf5
+    style F fill:#0d1b2e,stroke:#a78bfa,color:#e8edf5
+    style H fill:#0d1b2e,stroke:#fbbf24,color:#e8edf5
+    </pre>
+          </div>
+
+          <h3>ステップバイステップ: Cloud Agentを起動する</h3>
+          <ol class="steps">
+            <li>
+              <strong>ソースコード管理サービスと連携する</strong>
+              <p>
+                GitHub・GitLab・Azure
+                DevOps・Bitbucketいずれかのアカウントを接続し、必要なリポジトリ権限があることを確認します。有料プランへの加入が必要です。
+              </p>
+            </li>
+            <li>
+              <strong>環境を設定する</strong>
+              <p>
+                3つの方法があります: (1) Agent主導のセットアップに任せる、(2)
+                保存済みスナップショットを使う、(3)
+                <code>.cursor/environment.json</code> でDockerfileを指定する。
+              </p>
+            </li>
+            <li>
+              <strong>チャットの途中からCloud Agentへ委譲する</strong>
+              <p>
+                メッセージの先頭に <code>&amp;</code> を付けて送信すると、その会話をCloud
+                Agentへプッシュして実行を継続させ、離席中も処理を続けさせられます。あとから
+                <code>cursor.com/agents</code> でWebやモバイルから再開できます。
+              </p>
+              <div class="code-block">
+                <div class="code-title">プロンプト例(会話の途中でクラウドに送る)</div>
+                <pre><code class="language-text">&amp; 認証モジュールをリファクタリングして、包括的なテストを追加して</code></pre>
+              </div>
+            </li>
+            <li>
+              <strong>シークレット・環境変数を設定する</strong>
+              <p>
+                クラウドVM上で人間の開発者と同じようにコードをビルド・テストするには、APIキーやDB認証情報などのシークレットが必要です。<code>cursor.com/dashboard/cloud-agents</code>のSecretsタブから管理するのが推奨される方法です。
+              </p>
+            </li>
+            <li>
+              <strong>フックで整合性を保つ</strong>
+              <p>
+                Cloud
+                Agentsはリポジトリ内の<code>.cursor/hooks.json</code>に定義されたコマンドベースのフックを実行します。<code>beforeShellExecution</code>・<code>afterFileEdit</code>・<code>preToolUse</code>・<code>subagentStart</code>などが対応しており、フォーマッタや監査スクリプト、ポリシーチェックをクラウド実行時にも維持できます。
+              </p>
+            </li>
+          </ol>
+
+          <div class="callout tip">
+            <div class="callout-title">💡 実践アイデア: モデルの多数決</div>
+            <p>
+              複数のモデルに同じ問題を並列で試させ、最良の結果を選ぶという運用パターンは、特に難易度の高いタスクにおいて最終的な出力品質を大きく改善することが確認されています。Cloud
+              Agentsの並列実行はこのパターンと相性が良好です。
+            </p>
+          </div>
+
+          <div class="callout cite">
+            <div class="callout-title">📚 この章の参照元</div>
+            <ul>
+              <li>
+                <a href="https://cursor.com/docs/cloud-agent" target="_blank" rel="noopener"
+                  >cursor.com/docs/cloud-agent</a
+                ><span class="ref-desc">Cloud Agents — Cursor Docs</span>
+              </li>
+              <li>
+                <a href="https://cursor.com/docs/cloud-agent/setup" target="_blank" rel="noopener"
+                  >cursor.com/docs/cloud-agent/setup</a
+                ><span class="ref-desc">Cloud Environment Setup</span>
+              </li>
+              <li>
+                <a
+                  href="https://cursor.com/blog/agent-best-practices"
+                  target="_blank"
+                  rel="noopener"
+                  >cursor.com/blog/agent-best-practices</a
+                ><span class="ref-desc">Best practices for coding with agents(並列実行の章)</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="chapter" id="ch-12">
+          <div class="chapter-kicker"><span class="line"></span>CHAPTER 12 &middot; BUGBOT</div>
+          <h2 class="chapter-title">Bugbot ― 自動PRコードレビュー</h2>
+
+          <p>
+            BugbotはCursorの自動PRレビュー製品です。すべてのプルリクエストをバグ・セキュリティ脆弱性・コード品質の観点で分析し、
+            説明と修正案付きのインラインコメントを残します。GitHub/GitLab/Bitbucketと連携して動作します。
+          </p>
+
+          <ol class="steps">
+            <li>
+              <strong>リポジトリでBugbotを有効化する</strong>
+              <p>
+                GitHub / GitLab /
+                Bitbucketいずれかの連携ページからセットアップします。有効化後はPRの作成・更新のたびに自動的にレビューが走ります。
+              </p>
+            </li>
+            <li>
+              <strong>手動でレビューをトリガーする</strong>
+              <p>
+                PR上に <code>cursor review</code> または
+                <code>bugbot run</code>
+                とコメントすると、その場でレビューを実行できます。詳細ログが必要な場合は
+                <code>cursor review verbose=true</code> を使います。
+              </p>
+            </li>
+            <li>
+              <strong>プロジェクト固有のレビュー基準を教える</strong>
+              <p>
+                <code>.cursor/BUGBOT.md</code>
+                を作成し、レビュー時に守ってほしい基準を記述します。Bugbotは常にルートのファイルを含み、変更されたファイルから上位ディレクトリへ遡って関連コンテキストを探します。
+              </p>
+              <div class="code-block">
+                <div class="code-title">markdown — .cursor/BUGBOT.md の例</div>
+                <pre><code class="language-markdown"># Review Standards
+
+## テストカバレッジ
+`server/**`, `api/**` に変更があり、`**/*.test.*`, `tests/**` に変更がない場合、
+テスト不足としてフラグを立てる。
+
+## セキュリティ機微な領域
+`auth/**`, `payments/**`, `security/**` を変更するPRには
+セキュリティレビューを促すコメントを追加する。
+
+## よくあるパターン
+- 非同期コードでの `.Result` や `.Wait()` の使用(awaitを使うべき)にフラグを立てる
+- 紐づくissueのないTODOコメントにフラグを立てる
+- PR説明に正当化理由のない新規依存関係にフラグを立てる</code></pre>
+              </div>
+            </li>
+            <li>
+              <strong>1週間ほど運用してルールをチューニングする</strong>
+              <p>
+                運用開始後しばらくすると、どのコメントが価値があり、どれを無視すべきかの傾向が見えてきます。それに応じてルールを調整していきます。まずは繰り返し発生する1〜2個の問題から着手し、パターンが見えるたびにルールを追加するのが定石です。
+              </p>
+            </li>
+            <li>
+              <strong>Bugbot Autofixを有効にする(任意)</strong>
+              <p>
+                BugbotダッシュボードでAutofixを有効にすると、Bugbotが発見した問題に対して独立したクラウドAgentが自律的に修正案を生成します。Autofixによる変更の35%以上が実際にベースPRへマージされています。
+              </p>
+            </li>
+          </ol>
+
+          <h3>レビュアーとしてCursorを使う(人間が主導するレビュー)</h3>
+          <p>Bugbotとは別に、レビュアー自身がAgentを使って理解を助けることもできます。</p>
+          <div class="code-block">
+            <div class="code-title">プロンプト例 — レビュー時の質問集</div>
+            <pre><code class="language-text">このPRを説明してください。何を達成しようとしていて、
+どんなアプローチを取っていますか?
+
+このPRは決済フローに触れています。変更されたコードが
+決済システムの他の部分とどうつながっているか見せてください。
+
+このPRは返金処理の扱いを変更しています。
+どんなエッジケースを確認すべきですか?</code></pre>
+          </div>
+
+          <div class="callout tip">
+            <div class="callout-title">💡 レビュー知識をルール化する</div>
+            <p>
+              優れたレビュアーが持つ知識は、Bugbot Rules(<code>.cursor/BUGBOT.md</code>)やProject
+              Rulesとして明文化できます。一度エンコードすれば、Cursor(とBugbot)はすべてのレビューでその知識を一貫して適用してくれます。
+            </p>
+          </div>
+
+          <div class="callout cite">
+            <div class="callout-title">📚 この章の参照元</div>
+            <ul>
+              <li>
+                <a href="https://cursor.com/help/ai-features/bugbot" target="_blank" rel="noopener"
+                  >cursor.com/help/ai-features/bugbot</a
+                ><span class="ref-desc">Bugbot — Cursor Docs</span>
+              </li>
+              <li>
+                <a href="https://cursor.com/bugbot" target="_blank" rel="noopener"
+                  >cursor.com/bugbot</a
+                ><span class="ref-desc"
+                  >AI Code Review Built for Production — Bugbot by Cursor</span
+                >
+              </li>
+              <li>
+                <a href="https://cursor.com/for/code-review" target="_blank" rel="noopener"
+                  >cursor.com/for/code-review</a
+                ><span class="ref-desc">Reviewing Code with Cursor</span>
+              </li>
+              <li>
+                <a href="https://cursor.com/blog/bugbot-autofix" target="_blank" rel="noopener"
+                  >cursor.com/blog/bugbot-autofix</a
+                ><span class="ref-desc">Closing the code review loop with Bugbot Autofix</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="chapter" id="ch-13">
+          <div class="chapter-kicker"><span class="line"></span>CHAPTER 13 &middot; SECURITY</div>
+          <h2 class="chapter-title">セキュリティとガードレール</h2>
+
+          <p>
+            AIエージェントはプロンプトインジェクション・ハルシネーションなどにより予期しない挙動を取る可能性があります。
+            Cursorはデフォルトで複数のガードレールを備えており、公式には「これらのデフォルト設定は有効なままにしておくことを推奨する」とされています。
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>アクション種別</th>
+                  <th>承認要否</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>ファイル読み取り・コード検索</td>
+                  <td>承認不要</td>
+                </tr>
+                <tr>
+                  <td>ワークスペースファイルの編集</td>
+                  <td>
+                    原則不要(即座にディスクへ保存されるため、バージョン管理での差し戻しを前提とする)
+                  </td>
+                </tr>
+                <tr>
+                  <td>設定ファイル(コンフィグ)の変更</td>
+                  <td>承認が必要</td>
+                </tr>
+                <tr>
+                  <td>ターミナルコマンドの実行</td>
+                  <td>デフォルトで承認が必要(Run Modesで信頼済みコマンドのみ自動許可も可能)</td>
+                </tr>
+                <tr>
+                  <td>MCP接続</td>
+                  <td>接続時に承認が必要。承認後も各ツール呼び出しごとに個別承認が必要</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <ol class="steps">
+            <li>
+              <strong><code>.cursorignore</code> でアクセス制限する</strong>
+              <p>
+                Agentにアクセスさせたくない特定のファイル(シークレット、機密文書など)は
+                <code>.cursorignore</code> でブロックします。
+              </p>
+            </li>
+            <li>
+              <strong>Run Modesを設定する</strong>
+              <p>
+                単純なアローリストから「Auto-review
+                classifier」まで、ターミナルコマンドの自動承認範囲を段階的に設定できます。ただしこれらは「ベストエフォートのガードレール」であり、ハードなセキュリティ境界ではない点に注意してください。
+              </p>
+            </li>
+            <li>
+              <strong>ワークスペーストラストを有効化する(必要な場合)</strong>
+              <p>
+                デフォルトでは無効ですが、有効にすると新しいワークスペースを開く際に「通常モード」か「制限モード」かを選択するよう促されます。
+              </p>
+            </li>
+            <li>
+              <strong>自動リロード設定を確認する</strong>
+              <p>
+                自動リロードが有効な場合、レビューする前にAgentの変更が実行されてしまう可能性があります。レビューを重視する場合はこの設定を見直しましょう。
+              </p>
+            </li>
+            <li>
+              <strong>常にバージョン管理を使う</strong>
+              <p>
+                Agentはワークスペースファイル(設定ファイルを除く)を承認なしに変更でき、変更は即座にディスクへ保存されます。Gitなどのバージョン管理を必ず併用し、いつでも変更を差し戻せる状態にしておくことが公式に推奨されています。
+              </p>
+            </li>
+          </ol>
+
+          <div class="callout danger">
+            <div class="callout-title">🔒 ネットワークアクセスについて</div>
+            <p>
+              デフォルト設定では、Agentのツールは限定されたネットワーク先にしかリクエストを送れず、任意のネットワークリクエストを自由に行うことはできません。攻撃者はネットワークリクエストを悪用してデータを窃取しようとする可能性があるため、この制限がセキュリティ上重要な役割を果たしています。
+            </p>
+          </div>
+
+          <div class="callout cite">
+            <div class="callout-title">📚 この章の参照元</div>
+            <ul>
+              <li>
+                <a href="https://cursor.com/docs/agent/security" target="_blank" rel="noopener"
+                  >cursor.com/docs/agent/security</a
+                ><span class="ref-desc">Agent Security — Cursor Docs</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="chapter" id="ch-14">
+          <div class="chapter-kicker"><span class="line"></span>CHAPTER 14 &middot; SHORTCUTS</div>
+          <h2 class="chapter-title">キーボードショートカット早見表</h2>
+
+          <p>
+            CursorはVS Codeをベースにしているため、既存のVS Codeショートカットはそのまま使えます。
+            その上でCursor独自のAI機能向けショートカットが追加されています。以下は日常的な開発でとくに重要なものです。
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ショートカット</th>
+                  <th>機能</th>
+                  <th>章</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><kbd>⌘</kbd>/<kbd>Ctrl</kbd> + <kbd>K</kbd></td>
+                  <td>Inline Edit を開く(選択範囲をその場で編集)</td>
+                  <td>Ch.04</td>
+                </tr>
+                <tr>
+                  <td><kbd>⌘</kbd>/<kbd>Ctrl</kbd> + <kbd>L</kbd></td>
+                  <td>Chat / Agent パネルを開く(複雑な変更・複数ファイル編集へ)</td>
+                  <td>Ch.03, 04</td>
+                </tr>
+                <tr>
+                  <td><kbd>Tab</kbd></td>
+                  <td>Tab補完の提案を確定する</td>
+                  <td>Ch.02</td>
+                </tr>
+                <tr>
+                  <td><kbd>Esc</kbd></td>
+                  <td>提案を却下する</td>
+                  <td>Ch.02</td>
+                </tr>
+                <tr>
+                  <td><kbd>Shift</kbd> + <kbd>Tab</kbd></td>
+                  <td>Agent / Plan / Ask / Debug モードをローテーション切替</td>
+                  <td>Ch.03</td>
+                </tr>
+                <tr>
+                  <td><kbd>⌘</kbd>/<kbd>Ctrl</kbd> + <kbd>E</kbd></td>
+                  <td>Background Agent のコントロールパネルを開く</td>
+                  <td>Ch.11</td>
+                </tr>
+                <tr>
+                  <td><kbd>Ctrl</kbd> + <kbd>K</kbd>(ターミナル内)</td>
+                  <td>ターミナル用Inline Editでコマンド生成</td>
+                  <td>Ch.04</td>
+                </tr>
+                <tr>
+                  <td><kbd>⌘</kbd>/<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>J</kbd></td>
+                  <td>Cursor Settingsを開く(Rules / Memories 管理)</td>
+                  <td>Ch.06, 08</td>
+                </tr>
+                <tr>
+                  <td>@ + 入力</td>
+                  <td>@ Symbols メニューを開き、矢印キーで候補をナビゲート</td>
+                  <td>Ch.05</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout tip">
+            <div class="callout-title">💡 ショートカットのカスタマイズ</div>
+            <p>
+              Tab補完の確定キーなど、多くのショートカットはKeyboard Shortcuts設定から「Accept Cursor
+              Tab Suggestions」のようなコマンド名で検索してリマップできます。VS
+              Codeの<code>keybindings.json</code>もそのままインポート可能です。
+            </p>
+          </div>
+
+          <div class="callout cite">
+            <div class="callout-title">📚 この章の参照元</div>
+            <ul>
+              <li>
+                <a
+                  href="https://cursor.com/docs/reference/keyboard-shortcuts"
+                  target="_blank"
+                  rel="noopener"
+                  >cursor.com/docs/reference/keyboard-shortcuts</a
+                ><span class="ref-desc">Keyboard Shortcuts — Cursor Docs</span>
+              </li>
+              <li>
+                <a href="https://cursor.com/docs/tab/overview" target="_blank" rel="noopener"
+                  >cursor.com/docs/tab/overview</a
+                ><span class="ref-desc">Tab completion(ショートカットのリマップ方法)</span>
+              </li>
+              <li>
+                <a
+                  href="https://cursor.com/help/ai-features/terminal"
+                  target="_blank"
+                  rel="noopener"
+                  >docs.cursor.com/en/inline-edit/terminal</a
+                ><span class="ref-desc">Inline Edit — Terminal</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="chapter" id="ch-15">
+          <div class="chapter-kicker"><span class="line"></span>CHAPTER 15 &middot; WORKFLOWS</div>
+          <h2 class="chapter-title">実践ワークフロー ― 機能を組み合わせる</h2>
+
+          <p>
+            ここまで個々の機能を見てきましたが、実際の開発では複数機能を組み合わせて使います。
+            最後に、代表的な3つのワークフローを通じて機能同士の連携をおさらいします。
+          </p>
+
+          <h3>ワークフロー1: 未知のコードベースへのオンボーディング</h3>
+          <div class="diagram-card">
+            <div class="diagram-label">FIG 15-1. 新規参画者のオンボーディングフロー</div>
+            <pre class="mermaid">
+flowchart TD
+    A["Ask モードで概要を質問<br/>「このコードベースの構成を説明して」"] --> B["Agentにアーキテクチャ図を<br/>Mermaidで生成させる"]
+    B --> C["@Docs / @Web で<br/>使用ライブラリの外部ドキュメントを参照"]
+    C --> D["小さく安全な改善タスクを依頼"]
+    D --> E["diffをレビューし、テストを実行"]
+    E --> F["学んだ規約を Project Rule として記録"]
+
+    style A fill:#0d1b2e,stroke:#5eead4,color:#e8edf5
+    style F fill:#0d1b2e,stroke:#a78bfa,color:#e8edf5
+    </pre>
+          </div>
+
+          <h3>ワークフロー2: 大規模リファクタリング(Plan → 並列Cloud Agent)</h3>
+          <ol class="steps">
+            <li>
+              <strong>Planモードで計画を立てる</strong>
+              <p>
+                Agentに調査させ、明確化のための質問に答え、レビュー可能な計画を<code>.cursor/plans/</code>に保存する。
+              </p>
+            </li>
+            <li>
+              <strong>計画をチームでレビューする</strong>
+              <p>Markdownファイルなので、Pull Request同様にコメント・修正が可能。</p>
+            </li>
+            <li>
+              <strong>Cloud Agentへ委譲する</strong>
+              <p>
+                <code>&amp;</code
+                >を使って計画の実行をクラウドへ送り、複数モジュールを並列worktreeで処理させる。
+              </p>
+            </li>
+            <li>
+              <strong>Bugbotで最終チェック</strong>
+              <p>生成されたPRに対してBugbotが自動レビューし、見落としを検出する。</p>
+            </li>
+          </ol>
+
+          <h3>ワークフロー3: 継続的な品質改善ループ</h3>
+          <div class="diagram-card">
+            <div class="diagram-label">
+              FIG 15-2. Rules と Bugbot による品質フィードバックループ
+            </div>
+            <pre class="mermaid">
+flowchart LR
+    D1["Agentのミスを発見"] --> D2["Project Rule /<br/>.cursor/BUGBOT.md に追記"]
+    D2 --> D3["以降の全Agent実行<br/>および全Bugbotレビューに反映"]
+    D3 --> D4["レビューで繰り返しの<br/>指摘パターンを観測"]
+    D4 --> D1
+
+    style D1 fill:#0d1b2e,stroke:#fb7185,color:#e8edf5
+    style D2 fill:#0d1b2e,stroke:#fbbf24,color:#e8edf5
+    style D3 fill:#0d1b2e,stroke:#5eead4,color:#e8edf5
+    style D4 fill:#0d1b2e,stroke:#a78bfa,color:#e8edf5
+    </pre>
+          </div>
+          <p>
+            このループの本質は「Agentが同じ間違いを繰り返さないようにする」ことです。ルールもBugbotの基準も、
+            一度書けば以降のすべてのセッションに永続的に適用されるため、チームの暗黙知を資産として蓄積できます。
+          </p>
+
+          <div class="callout tip">
+            <div class="callout-title">💡 まとめの指針</div>
+            <p>
+              Tab(単発の予測) → Inline Edit(局所的な即時編集) → Agent(自律的な複数ファイル編集) →
+              Plan(大規模タスクの事前設計) → Cloud
+              Agents(並列・非同期実行)という順に「介入の粒度」が変わっていきます。タスクの規模と不確実性に応じて、この中から適切な入口を選ぶことが上達の近道です。
+            </p>
+          </div>
+        </section>
+
+        <section class="chapter" id="ch-16">
+          <div class="chapter-kicker"><span class="line"></span>CHAPTER 16 &middot; REFERENCES</div>
+          <h2 class="chapter-title">参考文献一覧 ― 全参照URL</h2>
+          <p>
+            本ガイド作成にあたり参照した公式ドキュメント・公式ブログのURLを、章を横断してすべて掲載します(2026年7月1日時点でアクセス確認済み)。
+          </p>
+
+          <ol class="ref-list">
+            <li>
+              <a href="https://cursor.com/docs" target="_blank" rel="noopener"
+                >https://cursor.com/docs</a
+              ><span class="ref-desc">Cursor Docs トップページ</span>
+            </li>
+            <li>
+              <a
+                href="https://cursor.com/docs/get-started/quickstart"
+                target="_blank"
+                rel="noopener"
+                >https://cursor.com/docs/get-started/quickstart</a
+              ><span class="ref-desc">Quickstart</span>
+            </li>
+            <li>
+              <a
+                href="https://cursor.com/help/getting-started/install"
+                target="_blank"
+                rel="noopener"
+                >https://cursor.com/help/getting-started/install</a
+              ><span class="ref-desc">Download and install Cursor</span>
+            </li>
+            <li>
+              <a
+                href="https://cursor.com/help/getting-started/first-project"
+                target="_blank"
+                rel="noopener"
+                >https://cursor.com/help/getting-started/first-project</a
+              ><span class="ref-desc">Your first project</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/help/ai-features/tab" target="_blank" rel="noopener"
+                >https://cursor.com/help/ai-features/tab</a
+              ><span class="ref-desc">Tab completion</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/docs/tab/overview" target="_blank" rel="noopener"
+                >https://cursor.com/docs/tab/overview</a
+              ><span class="ref-desc">Tab completion overview</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/help/ai-features/agent" target="_blank" rel="noopener"
+                >https://cursor.com/help/ai-features/agent</a
+              ><span class="ref-desc">Agent mode</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/docs/agent/overview" target="_blank" rel="noopener"
+                >https://cursor.com/docs/agent/overview</a
+              ><span class="ref-desc">Agent overview</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/docs/agent/plan-mode" target="_blank" rel="noopener"
+                >https://cursor.com/docs/agent/plan-mode</a
+              ><span class="ref-desc">Plan Mode</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/blog/agent-best-practices" target="_blank" rel="noopener"
+                >https://cursor.com/blog/agent-best-practices</a
+              ><span class="ref-desc">Best practices for coding with agents</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/docs/inline-edit/overview" target="_blank" rel="noopener"
+                >https://cursor.com/docs/inline-edit/overview</a
+              ><span class="ref-desc">Inline edit</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/docs/rules" target="_blank" rel="noopener"
+                >https://cursor.com/docs/rules</a
+              ><span class="ref-desc">Rules</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/docs/rules.md" target="_blank" rel="noopener"
+                >https://cursor.com/docs/rules.md</a
+              ><span class="ref-desc">Rules — 詳細仕様とFAQ</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/docs/subagents" target="_blank" rel="noopener"
+                >https://cursor.com/docs/subagents</a
+              ><span class="ref-desc">Subagents</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/docs/hooks" target="_blank" rel="noopener"
+                >https://cursor.com/docs/hooks</a
+              ><span class="ref-desc">Hooks</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/changelog/2-5" target="_blank" rel="noopener"
+                >https://cursor.com/changelog/2-5</a
+              ><span class="ref-desc">Plugins, Sandbox Access Controls, and Async Subagents</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/changelog/1-0" target="_blank" rel="noopener"
+                >https://cursor.com/changelog/1-0</a
+              ><span class="ref-desc">Bugbot, Background Agent, Memories 初出リリースノート</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/docs/mcp" target="_blank" rel="noopener"
+                >https://cursor.com/docs/mcp</a
+              ><span class="ref-desc">Model Context Protocol (MCP)</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/docs/mcp.md" target="_blank" rel="noopener"
+                >https://cursor.com/docs/mcp.md</a
+              ><span class="ref-desc">MCP — 設定詳細・セキュリティガイドライン</span>
+            </li>
+            <li>
+              <a
+                href="https://cursor.com/docs/context/mcp/install-links"
+                target="_blank"
+                rel="noopener"
+                >https://cursor.com/docs/context/mcp/install-links</a
+              ><span class="ref-desc">MCP Install Links</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/docs/cli/mcp.md" target="_blank" rel="noopener"
+                >https://cursor.com/docs/cli/mcp.md</a
+              ><span class="ref-desc">MCP for CLI</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/docs/models-and-pricing" target="_blank" rel="noopener"
+                >https://cursor.com/docs/models-and-pricing</a
+              ><span class="ref-desc">Models &amp; Pricing</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/help/ai-features/max-mode" target="_blank" rel="noopener"
+                >https://cursor.com/help/ai-features/max-mode</a
+              ><span class="ref-desc">Max Mode</span>
+            </li>
+            <li>
+              <a
+                href="https://cursor.com/help/account-and-billing/pricing"
+                target="_blank"
+                rel="noopener"
+                >https://cursor.com/help/account-and-billing/pricing</a
+              ><span class="ref-desc">Pricing and plans</span>
+            </li>
+            <li>
+              <a
+                href="https://cursor.com/help/models-and-usage/usage-limits"
+                target="_blank"
+                rel="noopener"
+                >https://cursor.com/help/models-and-usage/usage-limits</a
+              ><span class="ref-desc">Usage and limits</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/pricing" target="_blank" rel="noopener"
+                >https://cursor.com/pricing</a
+              ><span class="ref-desc">Cursor Pricing(最新の公式料金ページ)</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/docs/cloud-agent" target="_blank" rel="noopener"
+                >https://cursor.com/docs/cloud-agent</a
+              ><span class="ref-desc">Cloud Agents</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/docs/cloud-agent/setup" target="_blank" rel="noopener"
+                >https://cursor.com/docs/cloud-agent/setup</a
+              ><span class="ref-desc">Cloud Environment Setup</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/help/ai-features/bugbot" target="_blank" rel="noopener"
+                >https://cursor.com/help/ai-features/bugbot</a
+              ><span class="ref-desc">Bugbot</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/bugbot" target="_blank" rel="noopener"
+                >https://cursor.com/bugbot</a
+              ><span class="ref-desc">AI Code Review Built for Production — Bugbot</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/for/code-review" target="_blank" rel="noopener"
+                >https://cursor.com/for/code-review</a
+              ><span class="ref-desc">Reviewing Code with Cursor</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/blog/bugbot-autofix" target="_blank" rel="noopener"
+                >https://cursor.com/blog/bugbot-autofix</a
+              ><span class="ref-desc">Closing the code review loop with Bugbot Autofix</span>
+            </li>
+            <li>
+              <a href="https://cursor.com/docs/agent/security" target="_blank" rel="noopener"
+                >https://cursor.com/docs/agent/security</a
+              ><span class="ref-desc">Agent Security</span>
+            </li>
+            <li>
+              <a
+                href="https://cursor.com/docs/reference/keyboard-shortcuts"
+                target="_blank"
+                rel="noopener"
+                >https://cursor.com/docs/reference/keyboard-shortcuts</a
+              ><span class="ref-desc">Keyboard Shortcuts</span>
+            </li>
+            <li>
+              <a
+                href="https://cursor.com/docs/context/codebase-indexing"
+                target="_blank"
+                rel="noopener"
+                >https://cursor.com/docs/context/codebase-indexing</a
+              ><span class="ref-desc">Semantic &amp; Agentic Search</span>
+            </li>
+            <li>
+              <a
+                href="https://cursor.com/docs/cookbook/large-codebases"
+                target="_blank"
+                rel="noopener"
+                >https://cursor.com/docs/cookbook/large-codebases</a
+              ><span class="ref-desc">Understanding Your Codebase — Cursor Learn</span>
+            </li>
+            <li>
+              <a
+                href="https://cursor.com/blog/secure-codebase-indexing"
+                target="_blank"
+                rel="noopener"
+                >https://cursor.com/blog/secure-codebase-indexing</a
+              ><span class="ref-desc">Securely indexing large codebases</span>
+            </li>
+            <li>
+              <a
+                href="https://docs.cursor.com/en/context/@-symbols/overview"
+                target="_blank"
+                rel="noopener"
+                >https://docs.cursor.com/en/context/@-symbols/overview</a
+              ><span class="ref-desc">@ Symbols overview</span>
+            </li>
+          </ol>
+
+          <div class="callout warn" style="margin-top: 28px">
+            <div class="callout-title">⚠️ 免責事項</div>
+            <p>
+              Cursorは頻繁に機能更新・料金体系の見直しが行われる製品です。本ガイドは2026年7月1日時点の公式ドキュメントに基づいて作成されていますが、特に料金・Max
+              Modeの課金条件・モデルラインナップについては、実際の利用前に必ず最新の公式ページをご確認ください。
+            </p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <footer class="page-footer">
+      Cursor 完全ガイド &middot; 一次情報源: cursor.com/docs &middot; 作成日: 2026-07-01<br />
+      本ドキュメントは教育目的の非公式ガイドであり、Anysphere Inc. / Cursor
+      による公式資料ではありません。
+    </footer>
+
+    <script>
+      // ---------- Mermaid init ----------
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        themeVariables: {
+          background: '#0d1b2e',
+          primaryColor: '#122540',
+          primaryTextColor: '#e8edf5',
+          primaryBorderColor: '#5eead4',
+          lineColor: '#6b7f9c',
+          secondaryColor: '#16304f',
+          tertiaryColor: '#0d1b2e',
+          fontFamily: 'Inter, sans-serif',
+          fontSize: '14px',
+          actorBkg: '#122540',
+          actorBorder: '#5eead4',
+          actorTextColor: '#e8edf5',
+          signalColor: '#9db0c9',
+          signalTextColor: '#e8edf5',
+          labelBoxBkgColor: '#122540',
+          labelTextColor: '#e8edf5',
+          noteBkgColor: '#16304f',
+          noteTextColor: '#e8edf5',
+        },
+        flowchart: { curve: 'basis', htmlLabels: true },
+        securityLevel: 'loose',
+      });
+
+      document.addEventListener('DOMContentLoaded', function () {
+        // Render mermaid diagrams by injecting via textContent (avoids HTML entity issues)
+        var diagrams = document.querySelectorAll('pre.mermaid');
+        diagrams.forEach(function (el, i) {
+          var code = el.textContent;
+          var id = 'mermaid-diagram-' + i;
+          mermaid
+            .render(id, code)
+            .then(function (result) {
+              var wrapper = document.createElement('div');
+              wrapper.className = 'mermaid';
+              wrapper.innerHTML = result.svg;
+              el.replaceWith(wrapper);
+            })
+            .catch(function (err) {
+              console.error('Mermaid render error:', err);
+            });
+        });
+
+        // Syntax highlighting
+        document.querySelectorAll('pre code').forEach(function (block) {
+          hljs.highlightElement(block);
+        });
+
+        // ---------- Build sidebar TOC dynamically ----------
+        var toc = document.getElementById('toc');
+        var sections = document.querySelectorAll('section.chapter');
+        var group = document.createElement('div');
+        group.className = 'toc-group';
+        var label = document.createElement('div');
+        label.className = 'toc-group-label';
+        label.textContent = '目次';
+        group.appendChild(label);
+
+        var links = [];
+        sections.forEach(function (sec) {
+          var kicker = sec.querySelector('.chapter-kicker');
+          var titleEl = sec.querySelector('h2.chapter-title');
+          if (!titleEl) return;
+          var kickerText = kicker ? kicker.textContent.trim() : '';
+          var numMatch = kickerText.match(/CHAPTER\s+(\d+)/i);
+          var num = numMatch ? numMatch[1] : '';
+          var a = document.createElement('a');
+          a.className = 'toc-link';
+          a.href = '#' + sec.id;
+          var numSpan = document.createElement('span');
+          numSpan.className = 'toc-num';
+          numSpan.textContent = num;
+          var textSpan = document.createElement('span');
+          textSpan.textContent = titleEl.textContent.split('―')[0].split('-')[0].trim();
+          a.appendChild(numSpan);
+          a.appendChild(textSpan);
+          group.appendChild(a);
+          links.push({ id: sec.id, el: a });
+        });
+        toc.appendChild(group);
+
+        // ---------- IntersectionObserver for active state ----------
+        var observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              var link = links.find(function (l) {
+                return l.id === entry.target.id;
+              });
+              if (!link) return;
+              if (entry.isIntersecting) {
+                links.forEach(function (l) {
+                  l.el.classList.remove('active');
+                });
+                link.el.classList.add('active');
+              }
+            });
+          },
+          { rootMargin: '-15% 0px -70% 0px', threshold: 0 },
+        );
+
+        sections.forEach(function (sec) {
+          observer.observe(sec);
+        });
+      });
+    </script>
+  </body>
+</html>
