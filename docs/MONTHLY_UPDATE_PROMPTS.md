@@ -1,7 +1,7 @@
 # 月次更新プロンプト集
 
 > **用途**: 毎月最低 1 回、各画面の情報を最新状態に保つためのプロンプトテンプレート集。  
-> **最終更新**: 2026-06-12  
+> **最終更新**: 2026-06-30  
 > **次回予定**: 2026-07-01 以降
 
 ---
@@ -25,37 +25,41 @@
 
 | # | URL | ページタイトル（概要） | 更新日 |
 |---|-----|----------------------|--------|
-| 1 | `/` | AIモデル 時間別コスト 計算機（ホーム） | 2026-05-09 |
-| 2 | `/claude/skill` | Claude Code AI仕様駆動開発 — マークダウンファイル完全ガイド | 2026-05-15 |
-| 3 | `/claude/skill-guide` | SKILL.md 完全解説ガイド — Claude Code | 2026-05-15 |
-| 4 | `/claude/skill-guide-intermediate` | SKILL.md 中級者完全攻略ガイド — Claude Code | 2026-05-15 |
-| 5 | `/claude/agent` | Claude Code サブエージェント Markdown ベストプラクティス | 2026-05-15 |
-| 6 | `/claude/cowork-guide` | Claude Cowork 完全入門ガイド | 2026-05-08 |
-| 7 | `/google/skill` | Google Antigravity × Gemini — マークダウンファイル完全ガイド | 2026-05-23 |
-| 8 | `/google/skill-guide` | SKILL.md 完全解剖ガイド（Gemini CLI 中級者以上向け） | 2026-05-24 |
-| 9 | `/google/skill-guide-intermediate` | SKILL.md 完全ガイド — Gemini CLI & Antigravity | 2026-05-23 |
-| 10 | `/google/agent` | Gemini マルチエージェント開発（ADK / A2A） | 2026-05-23 |
-| 11 | `/google/antigravity-guide` | Google Antigravity — AI仕様駆動開発 ベストプラクティス完全ガイド | 2026-05-22 |
-| 12 | `/codex/skill` | OpenAI Codex — AI仕様駆動開発 マークダウンファイル完全ガイド | 2026-05-24 |
-| 13 | `/codex/agent` | OpenAI Codex エージェント開発ガイド | 2026-05-23 |
-| 14 | `/codex/openai-codex-guide` | OpenAI Codex 完全ガイド 2026 | 2026-05-23 |
-| 15 | `/copilot/skill` | GitHub Copilot SKILL.md 完全ベストプラクティスガイド | 2026-05-24 |
-| 16 | `/copilot/agent` | GitHub Copilot コーディングエージェント開発ガイド | 2026-05-24 |
-| 17 | `/copilot/github-copilot` | GitHub Copilot 完全ガイド 2026 | 2026-05-24 |
-| 18 | `/copilot/markdown-file-guide` | GitHub Copilot — AI仕様駆動開発 マークダウンファイル完全ガイド | 2026-05-08 |
-| 19 | `/git-worktree` | git worktree × 4プラットフォーム ドキュメント並列開発ガイド | 2026-05-08 |
-| 20 | `/code-review/tool-pricing` | Code Review ツール料金比較ページ | 2026-06-03 |
-| 21 | `/code-review/sonar-qube` | SonarQube Code Review 実践ガイド | 2026-06-03 |
-| 22 | `/code-review/copilot-code-review` | GitHub Copilot Code Review 完全活用ガイド | 2026-06-03 |
-| 23 | `/code-review/coderabbit-guide` | CodeRabbit 完全活用ガイド | 2026-06-03 |
-| 24 | `/claude/code-slash-commands` | Claude Code スラッシュコマンド完全ガイド 2026 | 2026-06-03 |
-| 25 | `/claude/harness-engineering` | ハーネスエンジニアリング完全ガイド 2026 | 2026-06-03 |
-| 26 | `/claude/managed-agents` | Claude Managed Agents 完全ガイド | 2026-06-03 |
-| 27 | `/google/agent-harness-engineering` | Gemini Agent Harness Engineering 完全ガイド 2026 | 2026-06-03 |
-| 28 | `/google/antigravity-slash-commands-guide` | Antigravity スラッシュコマンド完全ガイド | 2026-06-03 |
-| 29 | `/google/harness-engineering` | ハーネスエンジニアリング完全ガイド 2026 (Gemini CLI & Antigravity) | 2026-06-03 |
-| 30 | `/codex/harness-engineering` | OpenAI Codex ハーネスエンジニアリング完全ガイド | 2026-06-03 |
-| 31 | `/google/sandbox-best-practices` | Google AI Sandbox ベストプラクティス完全ガイド 2026 | 2026-06-12 |
+| 1 | `/` | AIモデル 時間別コスト 計算機（ホーム） | 2026-06-29 |
+| 2 | `/claude/skill` | Claude Code AI仕様駆動開発 — マークダウンファイル完全ガイド | 2026-06-30 |
+| 3 | `/claude/skill-guide` | SKILL.md 完全解説ガイド — Claude Code | 2026-06-30 |
+| 4 | `/claude/skill-guide-intermediate` | SKILL.md 中級者完全攻略ガイド — Claude Code | 2026-06-30 |
+| 5 | `/claude/agent` | Claude Code サブエージェント Markdown ベストプラクティス | 2026-06-30 |
+| 6 | `/claude/cowork-guide` | Claude Cowork 完全入門ガイド | 2026-06-30 |
+| 7 | `/google/skill` | Google Antigravity × Gemini — マークダウンファイル完全ガイド | 2026-06-30 |
+| 8 | `/google/skill-guide` | SKILL.md 完全解剖ガイド（Gemini CLI 中級者以上向け） | 2026-06-30 |
+| 9 | `/google/skill-guide-intermediate` | SKILL.md 完全ガイド — Gemini CLI & Antigravity | 2026-06-30 |
+| 10 | `/google/agent` | Gemini マルチエージェント開発（ADK / A2A） | 2026-06-30 |
+| 11 | `/google/antigravity-guide` | Google Antigravity — AI仕様駆動開発 ベストプラクティス完全ガイド | 2026-06-30 |
+| 12 | `/codex/skill` | OpenAI Codex — AI仕様駆動開発 マークダウンファイル完全ガイド | 2026-06-30 |
+| 13 | `/codex/agent` | OpenAI Codex エージェント開発ガイド | 2026-06-30 |
+| 14 | `/codex/openai-codex-guide` | OpenAI Codex 完全ガイド 2026 | 2026-06-30 |
+| 15 | `/copilot/skill` | GitHub Copilot SKILL.md 完全ベストプラクティスガイド | 2026-06-30 |
+| 16 | `/copilot/agent` | GitHub Copilot コーディングエージェント開発ガイド | 2026-06-30 |
+| 17 | `/copilot/github-copilot` | GitHub Copilot 完全ガイド 2026 | 2026-06-30 |
+| 18 | `/copilot/markdown-file-guide` | GitHub Copilot — AI仕様駆動開発 マークダウンファイル完全ガイド | 2026-06-30 |
+| 19 | `/git-worktree` | git worktree × 4プラットフォーム ドキュメント並列開発ガイド | 2026-06-30 |
+| 20 | `/code-review/tool-pricing` | Code Review ツール料金比較ページ | 2026-06-30 |
+| 21 | `/code-review/sonar-qube` | SonarQube Code Review 実践ガイド | 2026-06-30 |
+| 22 | `/code-review/copilot-code-review` | GitHub Copilot Code Review 完全活用ガイド | 2026-06-30 |
+| 23 | `/code-review/coderabbit-guide` | CodeRabbit 完全活用ガイド | 2026-06-30 |
+| 24 | `/claude/code-slash-commands` | Claude Code スラッシュコマンド完全ガイド 2026 | 2026-06-30 |
+| 25 | `/claude/harness-engineering` | ハーネスエンジニアリング完全ガイド 2026 | 2026-06-30 |
+| 26 | `/claude/managed-agents` | Claude Managed Agents 完全ガイド | 2026-06-30 |
+| 27 | `/google/agent-harness-engineering` | Gemini Agent Harness Engineering 完全ガイド 2026 | 2026-06-30 |
+| 28 | `/google/antigravity-slash-commands-guide` | Antigravity スラッシュコマンド完全ガイド | 2026-06-30 |
+| 29 | `/google/harness-engineering` | ハーネスエンジニアリング完全ガイド 2026 (Gemini CLI & Antigravity) | 2026-06-30 |
+| 30 | `/codex/harness-engineering` | OpenAI Codex ハーネスエンジニアリング完全ガイド | 2026-06-30 |
+| 31 | `/google/sandbox-best-practices` | Google AI Sandbox ベストプラクティス完全ガイド 2026 | 2026-06-30 |
+| 32 | `/agent/hermes-agent-advanced-guide` | Hermes Agent 中級・上級者向け完全ガイド | 2026-06-30 |
+| 33 | `/agent/openclaw-advanced-agent-security-guide` | OpenClaw Agent 高度活用 & セキュリティ完全ガイド | 2026-06-30 |
+| 34 | `/claude/self-hosted-sandboxes` | Claude セルフホスト型サンドボックス完全ガイド | 2026-06-30 |
+| 35 | `/vercel/sandbox` | Vercel Sandbox 完全入門ガイド 2026 | 2026-06-30 |
 
 ---
 
@@ -1295,6 +1299,123 @@ web-next/app/google/sandbox-best-practices/page.tsx を読んでください。
 
 ---
 
+## 画面 32 — `/agent/hermes-agent-advanced-guide`（Hermes Agent 中級・上級者向け完全ガイド）
+
+**ファイル**: `web-next/app/agent/hermes-agent-advanced-guide/page.tsx`  
+**URL**: `/agent/hermes-agent-advanced-guide`  
+**更新頻度**: 2〜3 ヶ月ごと（アーキテクチャ・セキュリティ設計の変更時）
+
+### 事前確認
+
+```
+以下を WebSearch で確認する:
+- Hermes Agent の最新リリース・内部アーキテクチャ変更
+- 7 層セキュリティモデル・本番デプロイメントのベストプラクティス更新
+```
+
+### 更新プロンプト
+
+```
+web-next/app/agent/hermes-agent-advanced-guide/page.tsx を読んでください。
+ヘッダの「更新 YYYY年M月D日」表記・SOURCES のリンク切れ・セキュリティ/デプロイ節の仕様変更のみを外科的に更新してください。
+セクション数（契約テストの EXPECTED_SECTION_IDS）は変更しないこと。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test web-next/app/agent/hermes-agent-advanced-guide` がパスする
+- [ ] `bun run build` が成功する
+
+---
+
+## 画面 33 — `/agent/openclaw-advanced-agent-security-guide`（OpenClaw Agent 高度活用 & セキュリティ完全ガイド）
+
+**ファイル**: `web-next/app/agent/openclaw-advanced-agent-security-guide/page.tsx`  
+**URL**: `/agent/openclaw-advanced-agent-security-guide`  
+**更新頻度**: 毎月（stable channel の情報基準日を更新）
+
+### 事前確認
+
+```
+以下を WebSearch で確認する:
+- OpenClaw stable channel の最新バージョン・セキュリティ勧告
+- `openclaw --version` の最新値・設定スキーマ変更
+```
+
+### 更新プロンプト
+
+```
+web-next/app/agent/openclaw-advanced-agent-security-guide/page.tsx を読んでください。
+「情報基準日: YYYY-MM-DD」表記（ヘッダバッジ・カレンダーチップ・フッター）を当月末に更新し、
+SOURCES のリンク切れ・セキュリティ節の仕様変更のみを外科的に修正してください。
+セクション数（契約テストは 13 セクション固定）は変更しないこと。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test web-next/app/agent/openclaw-advanced-agent-security-guide` がパスする
+- [ ] `bun run build` が成功する
+
+---
+
+## 画面 34 — `/claude/self-hosted-sandboxes`（Claude セルフホスト型サンドボックス完全ガイド）
+
+**ファイル**: `web-next/app/claude/self-hosted-sandboxes/page.tsx`  
+**URL**: `/claude/self-hosted-sandboxes`  
+**更新頻度**: 毎月（Anthropic のサンドボックス/エージェント実行環境の変更時）
+
+### 事前確認
+
+```
+以下を WebSearch で確認する:
+- Anthropic のセルフホスト型サンドボックス / エージェント実行環境の最新ガイダンス
+- Claude Code / Agent SDK のサンドボックス関連設定の変更
+```
+
+### 更新プロンプト
+
+```
+web-next/app/claude/self-hosted-sandboxes/page.tsx を読んでください。
+metadata・ヒーローのバージョン/年月・SOURCES のリンク切れ・設定コードブロックのみを外科的に更新してください。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test web-next/app/claude/self-hosted-sandboxes` がパスする
+- [ ] `bun run build` が成功する
+
+---
+
+## 画面 35 — `/vercel/sandbox`（Vercel Sandbox 完全入門ガイド 2026）
+
+**ファイル**: `web-next/app/vercel/sandbox/page.tsx`  
+**URL**: `/vercel/sandbox`  
+**更新頻度**: 毎月（Vercel Sandbox の GA 後機能追加・CLI/SDK 変更時）
+
+### 事前確認
+
+```
+以下を WebSearch で確認する:
+- Vercel Sandbox（Linux マイクロVM）の最新機能・CLI/SDK 仕様変更
+- 料金・リージョン・タグ機能などの変更
+```
+
+### 更新プロンプト
+
+```
+web-next/app/vercel/sandbox/page.tsx を読んでください。
+ヒーローの「GA · YYYY年M月」・フッターの「最終更新: YYYY年M月」・SOURCES のリンク切れ・
+CLI コマンド例のみを外科的に更新してください。
+h2 セクション数（契約テストは 15 見出し固定）は変更しないこと。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test web-next/app/vercel/sandbox` がパスする
+- [ ] `bun run build` が成功する
+
+---
+
 ## 全画面一括更新フロー（月次メンテナンス）
 
 月次更新を効率よく行うための推奨フロー:
@@ -1322,4 +1443,4 @@ web-next/app/google/sandbox-best-practices/page.tsx を読んでください。
 
 ---
 
-*最終更新: 2026-06-12 — 初版作成*
+*最終更新: 2026-06-30 — 全 35 ページ月次更新（2026-06 サイクル）完了。未記載だった画面 32〜35（hermes / openclaw / self-hosted-sandboxes / vercel-sandbox）を追記。*
