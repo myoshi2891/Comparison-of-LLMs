@@ -3,9 +3,9 @@ import styles from "./page.module.css";
 
 export const metadata: Metadata = {
   title:
-    "OpenAI Codex 最新 (2026) — AI仕様駆動開発 マークダウンファイル完全ガイド (v0.105.0, GPT-5.4)",
+    "OpenAI Codex 最新 (2026) — AI仕様駆動開発 マークダウンファイル完全ガイド (v0.142.4, GPT-5.5 / GPT-5-Codex)",
   description:
-    "AGENTS.md / SKILL.md / .prompt.md / REQUIREMENTS.md / AGENT_TASKS.md — OpenAI Codex 最新 (2026年最新版) の AI 仕様駆動開発を支える全マークダウンファイルの役割・構造・ベストプラクティスを公式根拠付きで解説 (v0.105.0, GPT-5.4 対応)。",
+    "AGENTS.md / SKILL.md / .prompt.md / REQUIREMENTS.md / AGENT_TASKS.md — OpenAI Codex 最新 (2026年最新版) の AI 仕様駆動開発を支える全マークダウンファイルの役割・構造・ベストプラクティスを公式根拠付きで解説 (v0.142.4, GPT-5.5 / GPT-5-Codex 対応、Codex Remote GA)。",
 };
 
 // 外部ソース (sources セクション) の定義。Phase F で redirect 一覧を作る際にも参照する。
@@ -178,7 +178,7 @@ export default function CodexSkillPage() {
       <header className={styles.header}>
         <div className={styles.hdrBg} />
         <div className={styles.hdrEyebrow}>
-          OpenAI Codex 最新 (2026) (v0.105.0, GPT-5.4 o3-based)
+          OpenAI Codex 最新 (2026) (v0.142.4, GPT-5.5 / GPT-5-Codex)
         </div>
         <h1>
           AI仕様駆動開発における
@@ -194,12 +194,14 @@ export default function CodexSkillPage() {
         </p>
         <div className={styles.badgeRow}>
           <span className={`${styles.badge} ${styles.bOai}`}>
-            OpenAI Codex 最新 (2026) (v0.105.0)
+            OpenAI Codex 最新 (2026) (v0.142.4)
           </span>
-          <span className={`${styles.badge} ${styles.bBlue}`}>最新モデル (GPT-5.4 o3-based)</span>
+          <span className={`${styles.badge} ${styles.bBlue}`}>
+            最新モデル (GPT-5.5 / GPT-5-Codex)
+          </span>
           <span className={`${styles.badge} ${styles.bPurple}`}>AGENTS.md オープン標準</span>
           <span className={`${styles.badge} ${styles.bAmber}`}>SKILL.md 共通規格</span>
-          <span className={`${styles.badge} ${styles.bRose}`}>最新版 (2026-05-23, v0.105.0)</span>
+          <span className={`${styles.badge} ${styles.bRose}`}>最新版 (2026-06-29, v0.142.4)</span>
         </div>
       </header>
 
