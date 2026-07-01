@@ -386,22 +386,22 @@ export default function Page() {
                   marginBottom: "6px",
                 }}
               >
-                <div className={styles.modelName}>gpt-5.4</div>
+                <div className={styles.modelName}>gpt-5.5</div>
                 <div className={`${styles.modelBadge} ${styles.modelBadgeNew}`}>★ 推奨</div>
               </div>
               <div className={styles.modelDesc}>
-                コーディング・推論・エージェントワークフローを統合したフラッグシップモデル。GPT-5.3-Codexの業界最高のコード生成能力を内包。ほとんどのタスクはこちらから始めよう。
+                コーディング・推論・エージェントワークフローを統合したフラッグシップモデル。GPT-5-Codexの業界最高のコード生成能力を内包。ほとんどのタスクはこちらから始めよう。
               </div>
             </div>
             <div className={styles.modelCard}>
-              <div className={styles.modelName}>gpt-5.4-mini</div>
+              <div className={styles.modelName}>gpt-5.5-mini</div>
               <div className={styles.modelDesc}>
-                軽量・高速版。CRUD操作、コード探索、大ファイルレビューなど軽めのタスク向け。gpt-5.4の30%のリソース消費なので長時間作業に最適。
+                軽量・高速版。CRUD操作、コード探索、大ファイルレビューなど軽めのタスク向け。gpt-5.5の30%のリソース消費なので長時間作業に最適。
               </div>
               <div className={`${styles.modelBadge} ${styles.modelBadgeNew}`}>2x速い・低コスト</div>
             </div>
             <div className={styles.modelCard}>
-              <div className={styles.modelName}>gpt-5.3-codex-spark</div>
+              <div className={styles.modelName}>gpt-5-codex-spark</div>
               <div className={styles.modelDesc}>
                 リアルタイムコーディングに最適化した研究プレビューモデル。ほぼ即時のコードイテレーションが可能。ChatGPT
                 Pro ユーザー向け。
@@ -409,10 +409,10 @@ export default function Page() {
               <div className={`${styles.modelBadge} ${styles.modelBadgePro}`}>Pro限定</div>
             </div>
             <div className={styles.modelCard}>
-              <div className={styles.modelName}>gpt-5.3-codex</div>
+              <div className={styles.modelName}>gpt-5-codex</div>
               <div className={styles.modelDesc}>
-                コーディング特化モデルの前世代フラッグシップ。Responses API
-                でも利用可能。GPT-5.4に後継されたが現在も有効。
+                コーディング特化モデル。Responses API
+                でも利用可能。GPT-5.5に後継されたが現在も有効。
               </div>
             </div>
           </div>
@@ -441,19 +441,19 @@ export default function Page() {
                 <span className={styles.cm}># CLI起動時にモデル指定</span>
                 {"\n"}
                 <span className={styles.fn}>codex</span> <span className={styles.op}>-m</span>{" "}
-                gpt-5.4{"\n\n"}
+                gpt-5.5{"\n\n"}
                 <span className={styles.cm}># 実行中に /model コマンドで切り替え</span>
                 {"\n"}
-                <span className={styles.op}>/model</span> gpt-5.4-mini{"\n\n"}
+                <span className={styles.op}>/model</span> gpt-5.5-mini{"\n\n"}
                 <span className={styles.cm}># config.toml で永続設定 (~/.codex/config.toml)</span>
                 {"\n"}
                 <span className={styles.fn}>model</span> ={" "}
-                <span className={styles.str}>&quot;gpt-5.4&quot;</span>
+                <span className={styles.str}>&quot;gpt-5.5&quot;</span>
                 {"\n"}
                 <span className={styles.cm}># オプション: レビュー専用モデル</span>
                 {"\n"}
                 <span className={styles.fn}>review_model</span> ={" "}
-                <span className={styles.str}>&quot;gpt-5.4-mini&quot;</span>
+                <span className={styles.str}>&quot;gpt-5.5-mini&quot;</span>
               </pre>
             </div>
           </div>
@@ -463,11 +463,11 @@ export default function Page() {
             <div>
               <strong>使い分けの鉄則：</strong>複雑な設計・アーキテクチャ判断・最終レビューには
               <code style={{ fontFamily: "var(--font-mono,'JetBrains Mono',monospace)" }}>
-                gpt-5.4
+                gpt-5.5
               </code>
               、コードベース探索・大量ファイルのレビュー・サブエージェントには
               <code style={{ fontFamily: "var(--font-mono,'JetBrains Mono',monospace)" }}>
-                gpt-5.4-mini
+                gpt-5.5-mini
               </code>
               を使うことでリソースを節約できます。
             </div>

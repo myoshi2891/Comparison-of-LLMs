@@ -2241,7 +2241,7 @@ export default function CodexAgentPage() {
               ）。
               <br />
               一方、<code>spawn_agents_on_csv</code> による CSV からのエージェントファンアウトと ETA
-              付き進捗追跡は <strong>Codex CLI（rust-v0.105.0+）固有の機能</strong>です（
+              付き進捗追跡は <strong>Codex CLI（v0.142.4+）固有の機能</strong>です（
               <Ext href="https://github.com/openai/codex/releases">Codex CLI リリースノート</Ext>
               ）。
             </div>

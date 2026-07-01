@@ -46,7 +46,7 @@ export default function Page() {
       </nav>
 
       <section className={styles.hero}>
-        <div className={styles.heroBadge}>Nous Research — v0.15.2 — 2026.06.03</div>
+        <div className={styles.heroBadge}>Nous Research — v0.15.2 — 2026.06.30</div>
         <h1>
           Hermes Agent
           <br />
@@ -2282,7 +2282,7 @@ J2 -->|"最新出力を注入"| J3`}
           </Ext>
         </p>
         <p className={styles.paragraph} style={{ marginTop: "0.4rem" }}>
-          Hermes Agent v0.15.2 — MIT License — Nous Research — 2026.06.03
+          Hermes Agent v0.15.2 — MIT License — Nous Research — 2026.06.30
         </p>
       </footer>
     </div>

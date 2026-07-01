@@ -88,7 +88,7 @@ export default function Page() {
             （GitHub.com上でIssueを割り当てるとPRを自動作成）と<strong>Agent Mode</strong>（VS
             Code内でマルチファイル編集を自律実行）を正式リリースし、単なるコード補完から
             <strong>フルエージェント開発プラットフォーム</strong>
-            へ進化しました。2026年3月現在はさらに：
+            へ進化しました。2026年6月現在はさらに：
             <strong>Copilot CLI GA</strong>（Feb 2026）・<strong>MCPサーバー正式サポート</strong>・
             <strong>プランモード</strong>（Shift+Tab、CLI/JetBrains GA）・
             <strong>エージェントフック</strong>（JetBrains Preview）・
@@ -1912,7 +1912,7 @@ export default function Page() {
           <div className={styles.cb}>
             <div className={styles.cbHdr}>
               <span>
-                Copilotのコンテキスト合成順序（最終的なシステムプロンプトへの注入）— 2026年3月版
+                Copilotのコンテキスト合成順序（最終的なシステムプロンプトへの注入）— 2026年6月版
               </span>
             </div>
             <pre>

@@ -1375,7 +1375,7 @@ export default function Page() {
         <section id="models" className={styles.sec}>
           <div className={styles.secLabel}>Section 08</div>
           <h2 className={styles.secTitle}>
-            <span className={styles.num}>08.</span>対応モデルと料金（2026年5月現在）
+            <span className={styles.num}>08.</span>対応モデルと料金（2026年6月現在）
           </h2>
 
           <table className={styles.modelTable}>
