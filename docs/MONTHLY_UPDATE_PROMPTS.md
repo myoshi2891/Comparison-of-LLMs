@@ -16,8 +16,66 @@
 **共通制約（全画面共通）**:
 - ファイル全体の書き直し禁止。外科的パッチのみ
 - `bun run build && bun run typecheck && bun run test && bun run lint` が全て通ること
-- `metadata.title` / `metadata.description` のバージョン年号も同時に更新すること
+- **日付・バージョン表記は `metadata` だけでなく本文中の全箇所を更新する**（下記「頻出レビュー指摘」参照）
 - 外部リンクは `rel="noopener noreferrer"` を維持すること
+
+---
+
+## 頻出レビュー指摘 & 事前チェック（全画面共通・必読）
+
+過去サイクルで **更新後に別途修正コミットが必要になった典型的な取りこぼし**。着手前・コミット前の両方で確認する。
+
+### 指摘1: 日付/バージョン表記の更新漏れ（最頻出）
+
+「metadata のみ更新」と考えると **本文中に散在する日付表記を見落とす**。日付は最低でも以下 5 系統に分散している:
+
+| 箇所 | 例 |
+|---|---|
+| `metadata.title` / `metadata.description` | `... 2026` / `2026年X月時点` |
+| ヒーロー/ヘッダのバッジ | `<span className={styles.badge}>May 2026 最新</span>` |
+| TOC / 目次タイトル | `目次 — SKILL.md 完全ガイド 2026年X月版` |
+| SOURCES セクションのラベル | `参考ソース一覧 — 2026年X月更新版` |
+| フッター | `Last updated: June 2026` / `最終更新: 2026年X月` |
+
+**事前 grep（対象 page.tsx で必ず実行し、ヒットを全て更新）**:
+
+```bash
+cd web-next
+grep -nE '(20[0-9]{2}年[0-9]{1,2}月|(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* 20[0-9]{2}|Last updated|最終更新|更新版|時点|as of|情報基準日)' app/<path>/page.tsx
+```
+
+英語月名（`May`→`June`）と和文（`2026年5月`→`2026年6月`）の**両方**を揃えること。
+
+### 指摘2: JSX の半角スペース消失
+
+テキストと `<strong>` / `<Ext>` などインライン要素が改行で隣接すると、レンダリング時に半角スペースが消える。**要素の直前/直後に明示的に `{" "}` を挿入**する。
+
+```tsx
+// NG: 「加え」と<strong>の間の空白が消える
+2026-06-18 をもって、無料の Gemini Code Assist（個人）に加え
+<strong>Google AI Pro / Ultra 加入者</strong>向けにも
+
+// OK
+2026-06-18 をもって、無料の Gemini Code Assist（個人）に加え{" "}
+<strong>Google AI Pro / Ultra 加入者</strong>向けにも
+```
+
+### 指摘3: 契約テストの完全一致アサート
+
+`page.test.tsx` は `toBe`（完全一致）と `toContain` / `toMatch`（部分一致）が混在する。metadata description やセクション文言を変えると `toBe` が壊れる。**編集前に確認し、同一コミットでテストも同期**する:
+
+```bash
+grep -nE 'toBe\(|toContain|toMatch' app/<path>/page.test.tsx
+```
+
+### コミット前の最終スイープ
+
+```bash
+cd web-next
+# 旧月表記が残っていないか（例: 前月が 5 月なら "2026年5月" "May 2026" を検索）
+grep -rnE '(2026年5月|May 2026|Mar 2026)' app/<path>/  # 空になるまで潰す
+bun run test app/<path> >/tmp/t.log 2>&1; echo "exit=$?"   # tail はexit code を隠すため必ず echo で確認
+```
 
 ---
 
@@ -702,13 +760,15 @@ web-next/app/copilot/skill/page.tsx を読んでください。
 
 1. metadata のバージョン・年月を更新する
    （例: "2026年3月時点" → "2026年X月時点"）
+   ※ ヒーローバッジ（"May 2026 最新"）・TOC タイトル（"2026年X月版"）・
+     SOURCES ラベルの日付も忘れず更新する。冒頭の「頻出レビュー指摘」の grep を先に実行すること
 
 2. SKILL.md フロントマターフィールド（description / triggers / steps 等）の
    説明で GitHub Copilot 固有の最新仕様に合わせて修正する
 
 3. SOURCES の "2026年3月" 等の日付表記を最新化し、リンク切れを修正する
 
-変更は metadata・フィールド説明・SOURCES のみ。
+変更は metadata・バッジ/TOC/SOURCES の日付・フィールド説明・SOURCES リンクのみ。
 ```
 
 ### 検証チェックリスト
@@ -1436,6 +1496,7 @@ h2 セクション数（契約テストは 15 見出し固定）は変更しな�
 
 4. [検証] 全画面更新後に一括チェック
    cd web-next && bun run build && bun run test && bun run typecheck && bun run lint
+   ※ 各ページ着手時に「頻出レビュー指摘」の grep（日付表記の全箇所洗い出し）を必ず実行する
 
 5. [コミット] /commit-commands:commit-push-pr スキルを使用
    コミットメッセージ例: "docs(guide): monthly update YYYY-MM"
@@ -1443,4 +1504,4 @@ h2 セクション数（契約テストは 15 見出し固定）は変更しな�
 
 ---
 
-*最終更新: 2026-06-30 — 全 35 ページ月次更新（2026-06 サイクル）完了。未記載だった画面 32〜35（hermes / openclaw / self-hosted-sandboxes / vercel-sandbox）を追記。*
+*最終更新: 2026-07-01 — 「頻出レビュー指摘 & 事前チェック」節を追加（日付表記の全箇所洗い出し grep / JSX 空白 `{" "}` / 契約テスト toBe 同期）。2026-06 サイクルで別途修正コミット（`5846931`）が必要になった取りこぼしを再発防止するための追記。*
