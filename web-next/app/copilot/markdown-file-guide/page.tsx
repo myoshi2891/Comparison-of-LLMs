@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "GitHub Copilot — AI仕様駆動開発 マークダウンファイル完全ガイド 2026年3月版",
+  title: "GitHub Copilot — AI仕様駆動開発 マークダウンファイル完全ガイド 2026年6月版",
   description:
-    "copilot-instructions.md / .instructions.md / .prompt.md / .chatmode.md / .agent.md / SKILL.md / MCP / Plan Mode — Copilotの全カスタマイズファイル・新機能を根拠ソース付きで徹底解説",
+    "copilot-instructions.md / .instructions.md / .prompt.md / .chatmode.md / .agent.md / AGENTS.md / SKILL.md / MCP / Plan Mode — Copilotの全カスタマイズファイル・新機能を根拠ソース付きで徹底解説。Copilot code review の AGENTS.md 対応（2026-06-18）・Cloud agent GA を反映。",
 };
 
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
@@ -39,7 +39,7 @@ export default function Page() {
     <div className={styles.page}>
       <header className={styles.hdr}>
         <div className={styles.hdrMesh} />
-        <div className={styles.eyebrow}>Microsoft × GitHub × VS Code — 2026年3月 最新版</div>
+        <div className={styles.eyebrow}>Microsoft × GitHub × VS Code — 2026年6月 最新版</div>
         <h1>
           <span className={styles.msText}>GitHub Copilot</span>
           <br />
@@ -51,7 +51,7 @@ export default function Page() {
           copilot-instructions.md / .instructions.md / .prompt.md / .chatmode.md / .agent.md /
           SKILL.md / MCP / Plan Mode ——
           <br />
-          2026年3月最新情報を反映。Copilotの全カスタマイズファイル・新機能の役割・構造・ベストプラクティスを根拠ソース付きで徹底解説
+          2026年6月最新情報を反映。Copilotの全カスタマイズファイル・新機能の役割・構造・ベストプラクティスを根拠ソース付きで徹底解説
         </p>
         <div className={styles.badgeStrip}>
           <span className={`${styles.badge} ${styles.bm}`}>GitHub Copilot</span>
@@ -66,7 +66,7 @@ export default function Page() {
 
       <main className={styles.main}>
         <nav className={styles.toc}>
-          <div className={styles.tocTtl}>目次 — 2026年3月版（MCP・Plan Mode 追加）</div>
+          <div className={styles.tocTtl}>目次 — 2026年6月版（MCP・Plan Mode・AGENTS.md 対応）</div>
           <ol>
             {TOC_ITEMS.map((item) => (
               <li key={item.id}>
@@ -2680,7 +2680,7 @@ export default function Page() {
         <section id="s15">
           <div className={styles.slabel}>Section 15（更新版 — 12則）</div>
           <h2 className={styles.stitle}>
-            <span className={styles.num}>15.</span>横断ベストプラクティス 12則（2026年3月更新版）
+            <span className={styles.num}>15.</span>横断ベストプラクティス 12則（2026年6月更新版）
           </h2>
 
           <div className={styles.bps}>
