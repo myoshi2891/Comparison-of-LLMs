@@ -1936,7 +1936,7 @@ for part in response.candidates[0].content.parts:
           </ul>
 
           <div className={styles.footerNote}>
-            本ドキュメントは 2026年6月12日時点の Google 公式情報・発表に基づいています。
+            本ドキュメントは 2026年6月30日時点の Google 公式情報・発表に基づいています。
             <br />
             各技術は急速に進化しています。最新情報は公式ドキュメントをご確認ください。
           </div>
