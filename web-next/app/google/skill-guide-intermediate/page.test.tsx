@@ -46,7 +46,7 @@ describe("/google/skill-guide-intermediate", () => {
       "SKILL.md 完全解剖ガイド | Gemini CLI v0.43.0 (最終版) & Antigravity v2.0.1 中級者以上向け"
     );
     expect(metadata.description).toBe(
-      "Google Gemini CLI (v0.43.0 最終版)・Antigravity IDE (v2.0.1) における SKILL.md の設計思想、アーキテクチャ、実装パターン、運用まで。エージェント駆動開発を次のレベルに引き上げるすべての知識を網羅する。"
+      "Google Gemini CLI (v0.43.0 最終版)・Antigravity IDE (v2.0.1) における SKILL.md の設計思想、アーキテクチャ、実装パターン、運用まで。エージェント駆動開発を次のレベルに引き上げるすべての知識を網羅する。Gemini CLI は 2026-06-18 に AI Pro/Ultra/無料 Code Assist 向けサンセット済（→ Antigravity CLI へ移行）。"
     );
   });
 });

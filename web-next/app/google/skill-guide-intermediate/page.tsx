@@ -7,7 +7,7 @@ export const metadata = {
   title:
     "SKILL.md 完全解剖ガイド | Gemini CLI v0.43.0 (最終版) & Antigravity v2.0.1 中級者以上向け",
   description:
-    "Google Gemini CLI (v0.43.0 最終版)・Antigravity IDE (v2.0.1) における SKILL.md の設計思想、アーキテクチャ、実装パターン、運用まで。エージェント駆動開発を次のレベルに引き上げるすべての知識を網羅する。",
+    "Google Gemini CLI (v0.43.0 最終版)・Antigravity IDE (v2.0.1) における SKILL.md の設計思想、アーキテクチャ、実装パターン、運用まで。エージェント駆動開発を次のレベルに引き上げるすべての知識を網羅する。Gemini CLI は 2026-06-18 に AI Pro/Ultra/無料 Code Assist 向けサンセット済（→ Antigravity CLI へ移行）。",
 };
 
 const MERMAID_STRUCTURE = `graph TD
@@ -236,7 +236,7 @@ export default function SkillGuideIntermediatePage() {
           </div>
           <div className={styles.versionBadges}>
             <span className={`${styles.vbadge} ${styles.vbC}`}>
-              Gemini CLI v0.43.0 (最終版) (2026-05-19)
+              Gemini CLI v0.43.0 (最終版・2026-06-18 サンセット済)
             </span>
             <span className={`${styles.vbadge} ${styles.vbO}`}>
               Antigravity v2.0.1 (2026-05-23)
