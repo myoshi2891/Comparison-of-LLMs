@@ -166,7 +166,7 @@ export default function OpenClawSecurityGuidePage() {
       <header className={styles.siteHeader}>
         <div className={styles.headerBadge}>
           <span className={styles.dot} />
-          openclaw · stable channel · 2026-06-05
+          openclaw · stable channel · 2026-06-30
         </div>
         <h1 className={styles.pageTitle}>
           OpenClaw Agent
@@ -179,7 +179,7 @@ export default function OpenClawSecurityGuidePage() {
             <i className="ti ti-user" aria-hidden="true" /> 中級〜上級者
           </span>
           <span className={styles.metaChip}>
-            <i className="ti ti-calendar" aria-hidden="true" /> 2026-06-05
+            <i className="ti ti-calendar" aria-hidden="true" /> 2026-06-30
           </span>
           <span className={styles.metaChip}>
             <i className="ti ti-shield-check" aria-hidden="true" /> セキュリティ含む
@@ -3702,7 +3702,7 @@ openclaw security audit --json > security-audit-$(date +%Y%m%d).json`}
 
       {/* FOOTER */}
       <footer className={styles.siteFooter}>
-        <span>情報基準日: 2026-06-05 · OpenClaw stable channel</span>
+        <span>情報基準日: 2026-06-30 · OpenClaw stable channel</span>
         <span>
           <a href="https://docs.openclaw.ai" target="_blank" rel="external noopener noreferrer">
             docs.openclaw.ai
