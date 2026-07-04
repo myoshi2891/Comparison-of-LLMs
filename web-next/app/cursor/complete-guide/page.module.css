@@ -496,6 +496,7 @@
 .codeBar {
   background: var(--bg-surface-2);
   padding: 9px 16px;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 12px;
   color: var(--text-tertiary);
   border-bottom: 1px solid var(--border);
@@ -512,12 +513,15 @@
   padding: 18px 20px;
   overflow-x: auto;
   background: #0a1420 !important;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 13.5px;
+  line-height: 1.65;
 }
 
 .codeLine {
   white-space: pre;
   min-height: 1.5em;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
 }
 
 /* Code highlighting colors mapping styles.* */
@@ -705,7 +709,8 @@
   margin: 0 auto;
   padding: 40px 56px 80px;
   color: var(--text-tertiary);
-  font-size: 13px;
+  font-size: 12.5px;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   text-align: center;
   border-top: 1px solid var(--border);
   line-height: 1.8;
