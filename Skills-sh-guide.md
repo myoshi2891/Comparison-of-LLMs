@@ -585,7 +585,7 @@ npx skills add anthropics/skills --skill skill-creator
 
 ---
 
-## 11. まとめ:今日から始める3ステップ
+## 11. まとめ:今日から始める4ステップ
 
 ```mermaid
 flowchart LR
