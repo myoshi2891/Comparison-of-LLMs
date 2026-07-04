@@ -4,11 +4,12 @@ import Page, { metadata } from "./page";
 import styles from "./page.module.css";
 
 beforeAll(() => {
-  global.IntersectionObserver = vi.fn().mockImplementation(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn(),
-  }));
+  global.IntersectionObserver = class {
+    constructor() {}
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  } as any;
 });
 
 test("Cursor Complete Guide Page Contract Tests", () => {

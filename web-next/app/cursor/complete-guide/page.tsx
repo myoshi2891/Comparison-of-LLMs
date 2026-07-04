@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import CodeCopyButton from "@/components/docs/CodeCopyButton";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import TocObserver from "./TocObserver";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -146,6 +147,7 @@ function Ext({ href, children, className }: ExtProps) {
 export default function Page() {
   return (
     <div className={styles.layout}>
+      <TocObserver />
       {/* SIDEBAR */}
       <aside className={styles.sidebar}>
         <div className={styles.brand}>

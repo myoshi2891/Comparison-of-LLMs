@@ -39,6 +39,8 @@
   overflow-y: auto;
   padding: 32px 20px 40px 28px;
   border-right: 1px solid var(--border);
+  background: var(--bg-base);
+  z-index: 10;
   scrollbar-width: thin;
   scrollbar-color: var(--bg-surface-3) transparent;
 }
@@ -526,8 +528,8 @@
   color: #a5d6ff;
 } /* String / Delimiter */
 .cv {
-  color: #79c0ff;
-} /* Value */
+  color: #98c379;
+} /* Value (Atom One Dark Green) */
 .cw {
   color: #d29922;
   font-weight: bold;
@@ -547,9 +549,9 @@
   font-weight: bold;
 } /* Heading */
 .cm {
-  color: #7ee787;
-  font-weight: bold;
-} /* Marker / Section */
+  color: #abb2bf;
+  font-weight: normal;
+} /* JSON Key / Standard text (Atom One Dark Light Gray) */
 
 /* ── Diagram ─────────────────────────────────────── */
 .diagramCard {
@@ -714,8 +716,9 @@
   .layout {
     flex-direction: column;
   }
-  .sidebar {
-    display: none;
+  .sidebar,
+  :global(body.has-common-header) .sidebar {
+    display: none !important;
   }
   .hero,
   .chapter,
