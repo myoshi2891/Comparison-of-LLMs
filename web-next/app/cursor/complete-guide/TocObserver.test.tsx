@@ -60,7 +60,9 @@ test("observes every chapter section and activates the first TOC link initially"
   expect(observedTargets).toHaveLength(2);
   const links = container.querySelectorAll(`.${styles.tocLink}`);
   expect(links[0].classList.contains(styles.tocLinkActive)).toBe(true);
+  expect(links[0].getAttribute("aria-current")).toBe("location");
   expect(links[1].classList.contains(styles.tocLinkActive)).toBe(false);
+  expect(links[1].getAttribute("aria-current")).toBeNull();
 });
 
 test("switches the active link when a section intersects", () => {
@@ -71,7 +73,9 @@ test("switches the active link when a section intersects", () => {
 
   const links = container.querySelectorAll(`.${styles.tocLink}`);
   expect(links[0].classList.contains(styles.tocLinkActive)).toBe(false);
+  expect(links[0].getAttribute("aria-current")).toBeNull();
   expect(links[1].classList.contains(styles.tocLinkActive)).toBe(true);
+  expect(links[1].getAttribute("aria-current")).toBe("location");
 });
 
 test("ignores entries that are not intersecting", () => {
@@ -82,7 +86,9 @@ test("ignores entries that are not intersecting", () => {
 
   const links = container.querySelectorAll(`.${styles.tocLink}`);
   expect(links[0].classList.contains(styles.tocLinkActive)).toBe(true);
+  expect(links[0].getAttribute("aria-current")).toBe("location");
   expect(links[1].classList.contains(styles.tocLinkActive)).toBe(false);
+  expect(links[1].getAttribute("aria-current")).toBeNull();
 });
 
 test("skips entries whose target has no matching TOC link", () => {
@@ -96,6 +102,7 @@ test("skips entries whose target has no matching TOC link", () => {
 
   const links = container.querySelectorAll(`.${styles.tocLink}`);
   expect(links[0].classList.contains(styles.tocLinkActive)).toBe(true);
+  expect(links[0].getAttribute("aria-current")).toBe("location");
 });
 
 test("does nothing when no TOC links exist", () => {

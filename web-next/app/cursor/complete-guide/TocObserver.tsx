@@ -14,6 +14,7 @@ export default function TocObserver() {
     // Set first link as active initially
     if (links.length > 0) {
       links[0].classList.add(styles.tocLinkActive);
+      links[0].setAttribute("aria-current", "location");
     }
 
     const observer = new IntersectionObserver(
@@ -26,8 +27,10 @@ export default function TocObserver() {
           if (entry.isIntersecting) {
             for (const l of links) {
               l.classList.remove(styles.tocLinkActive);
+              l.removeAttribute("aria-current");
             }
             link.classList.add(styles.tocLinkActive);
+            link.setAttribute("aria-current", "location");
           }
         }
       },

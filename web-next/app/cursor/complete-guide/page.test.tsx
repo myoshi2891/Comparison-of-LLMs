@@ -108,9 +108,10 @@ test("Cursor Complete Guide Page Contract Tests", () => {
   expect(parent?.className).not.toContain("layout");
 
   // 9. Active TOC item test (TOC item active styles verification)
-  // 初期レンダリング時に TocObserver のマウント効果により styles.tocLinkActive が最初のリンクに付与されていることを検証
+  // 初期レンダリング時に TocObserver のマウント効果により styles.tocLinkActive と aria-current="location" が最初のリンクに付与されていることを検証
   const activeLink = container.querySelector(`.${styles.tocLinkActive}`);
   expect(activeLink).not.toBeNull();
+  expect(activeLink?.getAttribute("aria-current")).toBe("location");
 
   // 10. Code block structure test (codeWrap > codeBar + codeBody > codeLine)
   const codeWraps = container.querySelectorAll(`.${styles.codeWrap}`);
