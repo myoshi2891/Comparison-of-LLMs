@@ -102,4 +102,21 @@ test("Cursor Complete Guide Page Contract Tests", () => {
   // 現在は styles.tocLinkActive 自体が page.tsx で使われていないため、以下の要素は null になり、テストが Red（失敗）します。
   const activeLink = container.querySelector(`.${styles.tocLinkActive}`);
   expect(activeLink).not.toBeNull();
+
+  // 10. Code block structure test (codeWrap > codeBar + codeBody > codeLine)
+  const codeWraps = container.querySelectorAll(`.${styles.codeWrap}`);
+  expect(codeWraps.length).toBeGreaterThan(0);
+  for (const wrap of codeWraps) {
+    const bar = wrap.querySelector(`.${styles.codeBar}`);
+    const body = wrap.querySelector(`.${styles.codeBody}`);
+    expect(bar).not.toBeNull();
+    expect(body).not.toBeNull();
+    // codeBody must have codeLine children
+    const lines = body?.querySelectorAll(`.${styles.codeLine}`);
+    expect(lines?.length).toBeGreaterThan(0);
+  }
+
+  // 11. Footer center alignment class test (pageFooter must have text-align: center set via CSS module)
+  const footerEl = container.querySelector(`.${styles.pageFooter}`);
+  expect(footerEl).not.toBeNull();
 });
