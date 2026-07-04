@@ -1,7 +1,7 @@
 # プロジェクト進捗・ステータス (PROGRESS.md)
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
-> - 最終更新日: **Updated 2026-07-01**
+> - 最終更新日: **Updated 2026-07-04**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -14,10 +14,11 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（本作業範囲では新規違反 0 件、既知の既存指摘は本件対象外）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **743 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **744 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **Cursor 完全ガイドの Next.js 移行**: `Cursor-complete-guide.html` から `web-next/app/cursor/complete-guide/page.tsx` への完全移行を完了 🚀。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策、コピー機能付きコードブロック、Mermaid遅延ロードを実装。ナビゲーションに新規カテゴリ「IDE -> Cursor Guide」を追加し、関連する契約テストや既存ナビテストの期待値を更新。全744件のテストがパス。
 - **Vercel Sandbox 完全入門ガイドの Next.js 移行**: `Vercel-sandbox-guide.html` から `web-next/app/vercel/sandbox/page.tsx` への完全移行を完了 🚀。CSS Modules によるレイアウト調整、Mermaid遅延ロード、安全な外部リンク対応、コードコピーボタンを実装。ナビゲーションに「Vercel` -> `Vercel Sandbox`」を新規登録し、テスト期待値の修正や新規の契約テストを含めた 743 件のフロントエンドテストが全合格。
 - **ビルド実行禁止ルールの明文化**: Antigravity環境におけるメモリ制限（OOM）クラッシュやネットワーク遮断エラーを防止するため、`CLAUDE.md` および `GEMINI.md` に Antigravity サンドボックス環境下でのみビルドコマンド実行を禁止するルールを追加整備。
 - **InteractiveChecklist 状態同期バグの修正**: `items` プロップの動的変更時に `checkedStates` が追従せず表示と不整合を起こす問題を `useEffect` による再初期化で解決。テストケースを新規追加。
