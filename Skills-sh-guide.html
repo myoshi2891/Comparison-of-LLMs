@@ -1,0 +1,2522 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>skills.sh 完全ガイド ― AIエージェントを賢くする「Agent Skills」入門</title>
+    <meta
+      name="description"
+      content="skills.shの仕組み、CLIの使い方、主要スキルの利用方法を初学者向けにステップバイステップで解説する技術ガイド"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+      integrity="sha384-IjoEWQzGtqsNLrVC4Tu2cYuwoaTVylP3MnYOE5bP6f7/D4r5EYrSrypO4nKnE9tl"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"
+      integrity="sha384-rCRD2fxHuBxS6V2IthxSJJRThpPtLU402heTvcwh+bYT7cpjFa54x8XxOXdWibBt"
+      crossorigin="anonymous"
+      defer
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"
+      integrity="sha384-aHpymG41uCYoyu/FGJo3bioHn326iCRN7lt6Nl/Kf0Uf9U5oswRgYDU+065KNIdv"
+      crossorigin="anonymous"
+      defer
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"
+      integrity="sha384-N2liw06/AlnqsBiAx/l7lzyswVNnc2wzRNvdTIUsBmjmH9mvO/9NGMt75L02X4NQ"
+      crossorigin="anonymous"
+      defer
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/markdown.min.js"
+      integrity="sha384-+CP9/iEB6oTOqrd0pHXQ9NoD6zvo95ea91voIMFCyPs4YyHCJCW5rLlYxpUvC+Z9"
+      crossorigin="anonymous"
+      defer
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/plaintext.min.js"
+      integrity="sha384-OLBgp1GsljhM2TJ+sbHjaiH9txEUvgdDTAzHv2P24donTt6/529l+9Ua0vFImLlb"
+      crossorigin="anonymous"
+      defer
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"
+      integrity="sha512-bWeB2tgEo86L1JAd2kj9xbbvyytYUAJivlMSzFwL4Lto/0eMM+dG/Tk24znPJat0NqLZl0/E9QQqqk8B4fO2NQ=="
+      crossorigin="anonymous"
+      defer
+    ></script>
+
+    <style>
+      :root {
+        --bg: #07111e;
+        --bg-elevated: #0b1524;
+        --surface: #101f33;
+        --surface-hover: #152845;
+        --surface-2: #0c1a2c;
+        --border: rgba(148, 178, 214, 0.14);
+        --border-strong: rgba(148, 178, 214, 0.3);
+        --text-primary: #eaf1fb;
+        --text-secondary: #a6b8d1;
+        --text-muted: #6c7f9c;
+        --accent: #5eead4;
+        --accent-strong: #2dd4bf;
+        --accent-soft: rgba(94, 234, 212, 0.12);
+        --amber: #fbbf24;
+        --amber-soft: rgba(251, 191, 36, 0.1);
+        --violet: #a78bfa;
+        --violet-soft: rgba(167, 139, 250, 0.12);
+        --rose: #fb7185;
+        --code-bg: #0a1622;
+        --font-display: 'Space Grotesk', sans-serif;
+        --font-body: 'Inter', sans-serif;
+        --font-mono: 'JetBrains Mono', monospace;
+        --sidebar-w: 296px;
+        --content-max: 920px;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--bg);
+        background-image:
+          radial-gradient(
+            ellipse 900px 500px at 85% -10%,
+            rgba(94, 234, 212, 0.06),
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 700px 500px at -10% 40%,
+            rgba(167, 139, 250, 0.05),
+            transparent 60%
+          );
+        color: var(--text-primary);
+        font-family: var(--font-body);
+        line-height: 1.7;
+        font-size: 16px;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      ::selection {
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+
+      ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border-strong);
+        border-radius: 6px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--accent);
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+        border-radius: 3px;
+      }
+
+      /* ===== Layout ===== */
+      .layout {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      /* ===== Sidebar ===== */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: var(--sidebar-w);
+        background: var(--bg-elevated);
+        border-right: 1px solid var(--border);
+        overflow-y: auto;
+        padding: 28px 20px 40px;
+        z-index: 100;
+        transition: transform 0.25s ease;
+      }
+      .sidebar::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 8px 22px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 18px;
+      }
+      .brand-mark {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        background: linear-gradient(135deg, var(--accent), var(--violet));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-display);
+        font-weight: 700;
+        color: #04121a;
+        font-size: 15px;
+        flex-shrink: 0;
+      }
+      .brand-text {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.25;
+      }
+      .brand-text strong {
+        font-family: var(--font-display);
+        font-size: 15px;
+        letter-spacing: 0.01em;
+      }
+      .brand-text span {
+        font-size: 11.5px;
+        color: var(--text-muted);
+      }
+
+      .progress-track {
+        height: 3px;
+        background: var(--surface);
+        border-radius: 2px;
+        overflow: hidden;
+        margin: 0 8px 20px;
+      }
+      .progress-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--accent), var(--violet));
+        transition: width 0.15s ease;
+      }
+
+      .nav-group-label {
+        font-size: 10.5px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        padding: 14px 8px 6px;
+        font-weight: 600;
+      }
+
+      .toc {
+        list-style: none;
+      }
+      .toc-item {
+        margin: 1px 0;
+      }
+      .toc-link {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        font-size: 13.5px;
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition:
+          background 0.15s ease,
+          color 0.15s ease;
+        border-left: 2px solid transparent;
+      }
+      .toc-num {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--text-muted);
+        flex-shrink: 0;
+        width: 20px;
+      }
+      .toc-link:hover {
+        background: var(--surface);
+        color: var(--text-primary);
+        text-decoration: none;
+      }
+      .toc-link.active {
+        background: var(--accent-soft);
+        color: var(--accent);
+        border-left-color: var(--accent);
+      }
+      .toc-link.active .toc-num {
+        color: var(--accent);
+      }
+
+      .toc-sub {
+        list-style: none;
+        margin: 2px 0 6px 30px;
+        border-left: 1px solid var(--border);
+      }
+      .toc-sub-link {
+        display: block;
+        padding: 5px 12px;
+        font-size: 12px;
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.15s ease;
+      }
+      .toc-sub-link:hover,
+      .toc-sub-link.active {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      .sidebar-footer {
+        margin-top: 22px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border);
+        font-size: 11.5px;
+        color: var(--text-muted);
+        padding-left: 8px;
+      }
+      .sidebar-footer a {
+        color: var(--text-secondary);
+      }
+
+      .nav-toggle {
+        display: none;
+        position: fixed;
+        top: 16px;
+        left: 16px;
+        z-index: 200;
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: var(--surface);
+        border: 1px solid var(--border-strong);
+        color: var(--text-primary);
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+      .nav-toggle svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      /* ===== Main content ===== */
+      .main {
+        margin-left: var(--sidebar-w);
+        flex: 1;
+        min-width: 0;
+        padding: 0 40px 120px;
+      }
+      .content-inner {
+        max-width: var(--content-max);
+        margin: 0 auto;
+      }
+
+      /* ===== Hero ===== */
+      .hero {
+        padding: 88px 0 56px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 56px;
+      }
+      .hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--font-mono);
+        font-size: 12.5px;
+        color: var(--accent);
+        background: var(--accent-soft);
+        border: 1px solid rgba(94, 234, 212, 0.25);
+        padding: 6px 12px;
+        border-radius: 100px;
+        margin-bottom: 22px;
+      }
+      .hero-eyebrow .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+      .hero h1 {
+        font-family: var(--font-display);
+        font-size: clamp(32px, 5vw, 50px);
+        font-weight: 700;
+        line-height: 1.15;
+        letter-spacing: -0.01em;
+        margin-bottom: 20px;
+        background: linear-gradient(135deg, #ffffff 30%, var(--accent) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .hero-lede {
+        font-size: 17.5px;
+        color: var(--text-secondary);
+        max-width: 680px;
+        margin-bottom: 28px;
+      }
+      .hero-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .hero-chip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12.5px;
+        color: var(--text-secondary);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        padding: 8px 14px;
+        border-radius: 10px;
+      }
+      .hero-chip strong {
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+
+      /* ===== Sections ===== */
+      section.chapter {
+        padding-top: 64px;
+        scroll-margin-top: 28px;
+      }
+      section.chapter:first-of-type {
+        padding-top: 0;
+      }
+
+      .chapter-eyebrow {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        color: var(--accent);
+        letter-spacing: 0.06em;
+        margin-bottom: 10px;
+        display: block;
+      }
+      .chapter h2 {
+        font-family: var(--font-display);
+        font-size: clamp(24px, 3.4vw, 34px);
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        margin-bottom: 18px;
+        color: var(--text-primary);
+      }
+      .chapter h3 {
+        font-family: var(--font-display);
+        font-size: 20px;
+        font-weight: 600;
+        margin: 32px 0 12px;
+        color: var(--text-primary);
+      }
+      .chapter h4 {
+        font-family: var(--font-display);
+        font-size: 16.5px;
+        font-weight: 600;
+        margin: 22px 0 10px;
+        color: var(--accent);
+      }
+
+      .prose p {
+        color: var(--text-secondary);
+        margin-bottom: 16px;
+        font-size: 15.5px;
+      }
+      .prose strong {
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+      .prose ul,
+      .prose ol {
+        color: var(--text-secondary);
+        margin: 0 0 18px 22px;
+        font-size: 15.5px;
+      }
+      .prose li {
+        margin-bottom: 6px;
+      }
+      .prose li::marker {
+        color: var(--accent);
+      }
+      .prose code:not(pre code) {
+        font-family: var(--font-mono);
+        font-size: 0.87em;
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        padding: 1px 6px;
+        border-radius: 5px;
+        color: var(--accent);
+      }
+
+      /* ===== Tables ===== */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 20px 0 28px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+        background: var(--surface-2);
+      }
+      thead th {
+        text-align: left;
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: 12.5px;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        color: var(--accent);
+        background: var(--bg-elevated);
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border-strong);
+        white-space: nowrap;
+      }
+      tbody td {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-secondary);
+        vertical-align: top;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:hover {
+        background: var(--surface-hover);
+      }
+      tbody td:first-child {
+        color: var(--text-primary);
+        font-weight: 500;
+      }
+      tbody code {
+        font-family: var(--font-mono);
+        font-size: 0.85em;
+        color: var(--accent);
+      }
+
+      /* ===== Code blocks ===== */
+      .code-block {
+        position: relative;
+        margin: 18px 0 26px;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        background: var(--code-bg);
+      }
+      .code-block .code-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 9px 16px;
+        background: var(--bg-elevated);
+        border-bottom: 1px solid var(--border);
+        font-family: var(--font-mono);
+        font-size: 11.5px;
+        color: var(--text-muted);
+        letter-spacing: 0.03em;
+      }
+      .code-block pre {
+        margin: 0;
+        padding: 18px 20px;
+        overflow-x: auto;
+      }
+      .code-block code {
+        font-family: var(--font-mono) !important;
+        font-size: 13.3px;
+        line-height: 1.65;
+        background: transparent !important;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots span {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--border-strong);
+      }
+
+      /* ===== Callouts ===== */
+      .callout {
+        display: flex;
+        gap: 14px;
+        padding: 16px 18px;
+        border-radius: 12px;
+        margin: 20px 0 28px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+      }
+      .callout-icon {
+        flex-shrink: 0;
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 700;
+        font-family: var(--font-display);
+      }
+      .callout p {
+        margin: 0;
+        font-size: 14.5px;
+        color: var(--text-secondary);
+      }
+      .callout p strong {
+        color: var(--text-primary);
+      }
+      .callout.tip {
+        border-color: rgba(94, 234, 212, 0.25);
+        background: var(--accent-soft);
+      }
+      .callout.tip .callout-icon {
+        background: rgba(94, 234, 212, 0.18);
+        color: var(--accent);
+      }
+      .callout.warn {
+        border-color: rgba(251, 191, 36, 0.25);
+        background: var(--amber-soft);
+      }
+      .callout.warn .callout-icon {
+        background: rgba(251, 191, 36, 0.2);
+        color: var(--amber);
+      }
+      .callout.note {
+        border-color: rgba(167, 139, 250, 0.25);
+        background: var(--violet-soft);
+      }
+      .callout.note .callout-icon {
+        background: rgba(167, 139, 250, 0.2);
+        color: var(--violet);
+      }
+
+      /* ===== Mermaid diagrams ===== */
+      .diagram-card {
+        margin: 24px 0 30px;
+        padding: 22px;
+        border-radius: 14px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+      }
+      .diagram-title {
+        font-family: var(--font-mono);
+        font-size: 11.5px;
+        color: var(--text-muted);
+        letter-spacing: 0.05em;
+        margin-bottom: 14px;
+        text-transform: uppercase;
+      }
+      .mermaid-diagram {
+        display: flex;
+        justify-content: center;
+        overflow-x: auto;
+      }
+      .mermaid-diagram svg {
+        max-width: 100%;
+        height: auto !important;
+      }
+
+      /* ===== Feature grid / cards ===== */
+      .grid-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 14px;
+        margin: 22px 0 30px;
+      }
+      .mini-card {
+        padding: 16px 18px;
+        border-radius: 12px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+      }
+      .mini-card h4 {
+        margin: 0 0 6px;
+        font-size: 14.5px;
+        color: var(--text-primary);
+        font-family: var(--font-display);
+      }
+      .mini-card p {
+        font-size: 13.3px;
+        color: var(--text-secondary);
+        margin: 0;
+      }
+
+      /* ===== Skill deep-dive cards (chapter 7) ===== */
+      .skill-card {
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: var(--surface-2);
+        padding: 26px 26px 22px;
+        margin: 26px 0;
+        scroll-margin-top: 28px;
+      }
+      .skill-card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 6px;
+      }
+      .skill-card-head h3 {
+        margin: 0;
+        font-size: 20px;
+      }
+      .skill-badge {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        padding: 4px 10px;
+        border-radius: 100px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        border: 1px solid rgba(94, 234, 212, 0.3);
+        white-space: nowrap;
+      }
+      .skill-repo {
+        font-family: var(--font-mono);
+        font-size: 12.5px;
+        color: var(--text-muted);
+        margin-bottom: 14px;
+      }
+
+      /* ===== Footer / reference list ===== */
+      .ref-list {
+        list-style: none;
+        margin: 0 0 10px;
+      }
+      .ref-list li {
+        padding: 11px 0;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .ref-list li:last-child {
+        border-bottom: none;
+      }
+      .ref-list .ref-label {
+        font-size: 14px;
+        color: var(--text-primary);
+        font-weight: 500;
+      }
+      .ref-list .ref-url {
+        font-family: var(--font-mono);
+        font-size: 12.5px;
+        color: var(--accent);
+        word-break: break-all;
+      }
+
+      .page-footer {
+        margin-top: 80px;
+        padding-top: 28px;
+        border-top: 1px solid var(--border);
+        font-size: 13px;
+        color: var(--text-muted);
+      }
+
+      .divider {
+        height: 1px;
+        background: var(--border);
+        margin: 52px 0;
+        border: none;
+      }
+
+      .step-flow {
+        counter-reset: step;
+        margin: 24px 0 8px;
+      }
+      .step-item {
+        position: relative;
+        padding: 0 0 26px 40px;
+        border-left: 2px solid var(--border);
+        margin-left: 15px;
+      }
+      .step-item:last-child {
+        border-left-color: transparent;
+        padding-bottom: 0;
+      }
+      .step-item::before {
+        counter-increment: step;
+        content: counter(step);
+        position: absolute;
+        left: -16px;
+        top: 0;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: var(--bg-elevated);
+        border: 2px solid var(--accent);
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-mono);
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .step-item h4 {
+        margin: 2px 0 8px;
+      }
+      .step-item p {
+        color: var(--text-secondary);
+        font-size: 14.5px;
+        margin-bottom: 10px;
+      }
+
+      /* ===== Responsive ===== */
+      @media (max-width: 980px) {
+        .sidebar {
+          transform: translateX(-100%);
+          box-shadow: 20px 0 40px rgba(0, 0, 0, 0.4);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .main {
+          margin-left: 0;
+          padding: 0 22px 100px;
+        }
+        .nav-toggle {
+          display: flex;
+        }
+        .hero {
+          padding-top: 96px;
+        }
+      }
+      @media (max-width: 560px) {
+        .hero h1 {
+          font-size: 28px;
+        }
+        .grid-cards {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <button class="nav-toggle" id="navToggle" aria-label="メニューを開閉">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <line x1="3" y1="18" x2="21" y2="18" />
+      </svg>
+    </button>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="brand">
+          <div class="brand-mark">S</div>
+          <div class="brand-text">
+            <strong>skills.sh ガイド</strong>
+            <span>Agent Skills 入門</span>
+          </div>
+        </div>
+
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+        <nav>
+          <div class="nav-group-label">はじめに</div>
+          <ul class="toc">
+            <li class="toc-item">
+              <a href="#sec-01" class="toc-link"
+                ><span class="toc-num">01</span>skills.sh とは何か</a
+              >
+            </li>
+            <li class="toc-item">
+              <a href="#sec-02" class="toc-link"
+                ><span class="toc-num">02</span>Agent Skills の基本概念</a
+              >
+            </li>
+            <li class="toc-item">
+              <a href="#sec-03" class="toc-link"
+                ><span class="toc-num">03</span>SKILL.md のフォーマット</a
+              >
+            </li>
+          </ul>
+
+          <div class="nav-group-label">全体像を掴む</div>
+          <ul class="toc">
+            <li class="toc-item">
+              <a href="#sec-04" class="toc-link"
+                ><span class="toc-num">04</span>エコシステム全体像</a
+              >
+            </li>
+            <li class="toc-item">
+              <a href="#sec-05" class="toc-link"><span class="toc-num">05</span>CLI 実践ガイド</a>
+            </li>
+            <li class="toc-item">
+              <a href="#sec-06" class="toc-link"
+                ><span class="toc-num">06</span>カテゴリマップと選び方</a
+              >
+            </li>
+          </ul>
+
+          <div class="nav-group-label">主要スキル</div>
+          <ul class="toc">
+            <li class="toc-item">
+              <a href="#sec-07" class="toc-link"
+                ><span class="toc-num">07</span>主要スキル徹底解説</a
+              >
+            </li>
+          </ul>
+          <ul class="toc-sub">
+            <li><a href="#skill-find-skills" class="toc-sub-link">find-skills</a></li>
+            <li><a href="#skill-skill-creator" class="toc-sub-link">skill-creator</a></li>
+            <li><a href="#skill-frontend-design" class="toc-sub-link">frontend-design</a></li>
+            <li>
+              <a href="#skill-web-design-guidelines" class="toc-sub-link">web-design-guidelines</a>
+            </li>
+            <li><a href="#skill-shadcn" class="toc-sub-link">shadcn</a></li>
+            <li>
+              <a href="#skill-vercel-react" class="toc-sub-link">vercel-react-best-practices</a>
+            </li>
+            <li><a href="#skill-agent-browser" class="toc-sub-link">agent-browser</a></li>
+            <li><a href="#skill-docs" class="toc-sub-link">pptx / docx / xlsx / pdf</a></li>
+            <li><a href="#skill-webapp-testing" class="toc-sub-link">webapp-testing</a></li>
+            <li><a href="#skill-supabase" class="toc-sub-link">supabase-postgres</a></li>
+            <li><a href="#skill-superpowers" class="toc-sub-link">superpowers系</a></li>
+            <li><a href="#skill-foundry" class="toc-sub-link">microsoft-foundry</a></li>
+          </ul>
+
+          <div class="nav-group-label">応用と安全性</div>
+          <ul class="toc">
+            <li class="toc-item">
+              <a href="#sec-08" class="toc-link"
+                ><span class="toc-num">08</span>対応AIエージェント</a
+              >
+            </li>
+            <li class="toc-item">
+              <a href="#sec-09" class="toc-link"
+                ><span class="toc-num">09</span>セキュリティと監査</a
+              >
+            </li>
+            <li class="toc-item">
+              <a href="#sec-10" class="toc-link"
+                ><span class="toc-num">10</span>自作スキルの作り方</a
+              >
+            </li>
+          </ul>
+
+          <div class="nav-group-label">おわりに</div>
+          <ul class="toc">
+            <li class="toc-item">
+              <a href="#sec-11" class="toc-link"><span class="toc-num">11</span>まとめ:3ステップ</a>
+            </li>
+            <li class="toc-item">
+              <a href="#sec-12" class="toc-link"><span class="toc-num">12</span>参考URL一覧</a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="sidebar-footer">
+          2026年7月時点の情報を基に作成。最新情報は<br /><a
+            href="https://www.skills.sh/"
+            target="_blank"
+            rel="noopener"
+            >skills.sh</a
+          >本体でご確認ください。
+        </div>
+      </aside>
+
+      <main class="main">
+        <div class="content-inner">
+          <header class="hero">
+            <span class="hero-eyebrow"><span class="dot"></span>TECHNICAL GUIDE ・ 初学者向け</span>
+            <h1>skills.sh 完全ガイド<br />AIエージェントを賢くする「Agent Skills」入門</h1>
+            <p class="hero-lede">
+              Claude Code や Cursor、Codex CLI
+              などのAIコーディングエージェントに専門知識を追加する仕組み「Agent
+              Skills」と、そのハブである skills.sh
+              の使い方を、実際のCLIコマンド・図解付きでゼロから解説します。
+            </p>
+            <div class="hero-meta">
+              <div class="hero-chip">📚 <strong>全12章</strong>構成</div>
+              <div class="hero-chip">🧭 対象: <strong>Agent Skills初学者</strong></div>
+              <div class="hero-chip">🔗 参照元: <strong>skills.sh / Anthropic公式</strong></div>
+              <div class="hero-chip">🗓️ <strong>2026年7月</strong>時点の情報</div>
+            </div>
+          </header>
+
+          <section class="chapter" id="sec-01">
+            <span class="chapter-eyebrow">CHAPTER 01</span>
+            <h2>skills.sh とは何か</h2>
+            <div class="prose">
+              <p>
+                <strong>skills.sh</strong> は、AIエージェント(Claude Code、Cursor、Codex CLI、GitHub
+                Copilot など)に「専門知識」を追加で持たせるための拡張パッケージ =
+                <strong>Agent Skills</strong>
+                を検索・比較・インストールできる、GitHubリポジトリ横断型のディレクトリ(登録・検索サイト)です。
+              </p>
+              <p>
+                npm(JavaScriptのパッケージ)における
+                <code>npmjs.com</code>
+                のような立ち位置を、AIエージェント向けの「スキル」というパッケージ種別で提供していると考えるとイメージしやすいです。
+              </p>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>機能</th>
+                    <th>内容</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>検索・発見</td>
+                    <td>カテゴリ別・ランキング別にスキルを閲覧し、キーワードで検索できる</td>
+                  </tr>
+                  <tr>
+                    <td>CLI配布</td>
+                    <td>
+                      <code>npx skills</code>
+                      コマンド一発でGitHub上のスキルをローカルにインストールできる
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>セキュリティ監査</td>
+                    <td>主要スキルに対し、複数の第三者機関によるコード監査結果を掲示している</td>
+                  </tr>
+                  <tr>
+                    <td>ドキュメント</td>
+                    <td>Agent Skills仕様の使い方、CLIリファレンス、FAQなどを提供</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="callout note">
+              <div class="callout-icon">i</div>
+              <p>
+                <strong>重要:</strong>
+                skills.sh自体がスキルを作っているわけではありません。GitHub上に公開された各社・各個人のスキルリポジトリ(Anthropic公式、Vercel、Supabase、Microsoft、個人開発者など)を横断的に集約・可視化している「ハブ」です。実体(コード)は各GitHubリポジトリ側にあり、インストール時にCLIがそこから直接ファイルを取得します。
+              </p>
+            </div>
+          </section>
+
+          <section class="chapter" id="sec-02">
+            <span class="chapter-eyebrow">CHAPTER 02</span>
+            <h2>そもそも「Agent Skills」とは何か</h2>
+
+            <h3>一言で言うと</h3>
+            <div class="prose">
+              <p>
+                Agent Skills
+                は、<strong>「指示書・スクリプト・参考資料をまとめたフォルダ」</strong>です。中身は基本的に
+                <code>SKILL.md</code>
+                という1つのMarkdownファイルと、必要に応じて付随するスクリプトや資料ファイルです。
+              </p>
+              <p>
+                Anthropicのエンジニアリングブログでは、スキルを作ることは「新しく入社したベテラン社員に渡すオンボーディング資料を作ること」に例えられています。エージェント自身(モデル)は再学習・ファインチューニングされるわけではなく、汎用的な能力を保ったまま、<strong>特定のタスクに対する「やり方」だけを外部から差し込む</strong>、という考え方です。
+              </p>
+            </div>
+
+            <h3>なぜ生まれたのか</h3>
+            <div class="prose">
+              <ul>
+                <li>会話のたびに同じ手順・同じ社内ルールを説明し直すのは非効率</li>
+                <li>
+                  かといって、すべてのツール定義やルールを常にプロンプトに詰め込むとコンテキストウィンドウ(トークン)を圧迫する
+                </li>
+                <li>
+                  そこでAnthropicは「必要になったときだけ、必要な分だけ読み込む」=
+                  <strong>段階的開示(Progressive Disclosure)</strong>
+                  という設計を採用したスキル形式を考案
+                </li>
+              </ul>
+              <p>
+                この形式は現在、Anthropicだけでなく OpenAI の Codex CLI や Microsoft の GitHub
+                Copilot
+                などでも採用が進んでいる、いわば<strong>オープンな業界標準</strong>になりつつあります。
+              </p>
+            </div>
+
+            <h3>段階的開示(Progressive Disclosure)の仕組み</h3>
+            <div class="prose">
+              <p>
+                Agent
+                Skillsの最大の特徴は、スキルの中身を<strong>3つの層(Tier)</strong>に分けて、必要な層だけを順番に読み込む点です。
+              </p>
+            </div>
+
+            <div class="diagram-card">
+              <div class="diagram-title">図1: 段階的開示(Progressive Disclosure)のフロー</div>
+              <div class="mermaid-diagram">
+                <div class="mermaid" id="diagram-progressive"></div>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>層(Tier)</th>
+                    <th>読み込まれる内容</th>
+                    <th>タイミング</th>
+                    <th>目安コスト</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Tier 1</td>
+                    <td>YAML frontmatterの <code>name</code> と <code>description</code></td>
+                    <td>エージェント起動時に常に</td>
+                    <td>スキル1つあたり約30トークン</td>
+                  </tr>
+                  <tr>
+                    <td>Tier 2</td>
+                    <td><code>SKILL.md</code> の本文(手順・ルール・注意点)</td>
+                    <td>ユーザーの依頼がTier1のdescriptionと一致した時</td>
+                    <td>数百〜数千トークン</td>
+                  </tr>
+                  <tr>
+                    <td>Tier 3</td>
+                    <td>同梱スクリプト・追加のMarkdown資料・テンプレート</td>
+                    <td>Tier2の指示が参照した時のみ</td>
+                    <td>必要な分だけ</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="callout tip">
+              <div class="callout-icon">✓</div>
+              <p>
+                ポイントは、<strong>エージェントがフォルダの中身をあらかじめ全部覚えているわけではなく</strong>、Linuxのファイルシステムを操作するのと同じ感覚で、必要なファイルだけをその場で
+                <code>cat</code> や
+                <code>bash</code>
+                で読みに行く、という設計になっていることです。これにより、数百個のスキルをインストールしていても、使わないスキルはほぼゼロコストで放置できます。
+              </p>
+            </div>
+          </section>
+
+          <section class="chapter" id="sec-03">
+            <span class="chapter-eyebrow">CHAPTER 03</span>
+            <h2>SKILL.md のフォーマットを理解する</h2>
+            <div class="prose">
+              <p>すべてのスキルは、最低限これだけの構造を持ちます。</p>
+            </div>
+
+            <div class="code-block">
+              <div class="code-label">
+                <span>SKILL.md</span>
+                <div class="dots"><span></span><span></span><span></span></div>
+              </div>
+              <pre><code class="language-yaml">---
+name: my-skill-name
+description: このスキルが何をするか、どんな時に使うべきかを明確に書く。
+             エージェントはこの文章だけを見てスキルを使うか判断するため、
+             ここの品質がスキルの「発火率」を左右する最重要項目。
+---
+
+# My Skill Name
+
+## 概要
+このスキルの目的を1〜2段落で説明する。
+
+## 手順
+1. まず〇〇を確認する
+2. 次に△△を実行する
+3. 最後に□□を検証する
+
+## 注意点
+- こういうケースでは✕✕をしてはいけない</code></pre>
+            </div>
+
+            <h3>必須フィールド</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>フィールド</th>
+                    <th>役割</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>name</code></td>
+                    <td>
+                      スキルの一意な識別子(ケバブケース推奨、例: <code>pdf-form-filler</code>)
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><code>description</code></td>
+                    <td>
+                      <strong>最重要。</strong
+                      >エージェントがTier1の段階で読む唯一の情報。「何をするか」だけでなく「いつ使うべきか」までトリガーとなる言葉を具体的に書く必要がある
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>本文(Markdown部分)の書き方のコツ</h3>
+            <div class="prose">
+              <ul>
+                <li>手順は箇条書き・番号付きリストで明確に</li>
+                <li>
+                  SKILL.md自体が長くなりすぎる場合は、別ファイル(例: <code>forms.md</code>,
+                  <code>reference.md</code>)に分割し、本文からリンクで参照する(= Tier
+                  3として遅延読み込みされる)
+                </li>
+                <li>
+                  「コードとして実行させたいスクリプト」と「読み込ませて理解させたいドキュメント」を明確に区別して書く(実行
+                  vs 参照)
+                </li>
+              </ul>
+            </div>
+
+            <h3>フォルダ構成の例</h3>
+            <div class="code-block">
+              <div class="code-label">
+                <span>folder structure</span>
+                <div class="dots"><span></span><span></span><span></span></div>
+              </div>
+              <pre><code class="language-plaintext">my-skill/
+├── SKILL.md          ← 必須。エントリーポイント
+├── reference.md       ← 任意。詳細な参考資料(Tier 3)
+├── scripts/
+│   └── validate.py    ← 任意。エージェントがbashで実行するスクリプト
+└── templates/
+    └── example.docx   ← 任意。生成物のひな形など</code></pre>
+            </div>
+          </section>
+
+          <section class="chapter" id="sec-04">
+            <span class="chapter-eyebrow">CHAPTER 04</span>
+            <h2>skills.sh エコシステムの全体像</h2>
+            <div class="prose">
+              <p>
+                skills.sh
+                を中心に、「どこでスキルが作られ」「どこに集約され」「どこで実行されるか」を図にすると次のようになります。
+              </p>
+            </div>
+
+            <div class="diagram-card">
+              <div class="diagram-title">図2: skills.sh エコシステムマップ</div>
+              <div class="mermaid-diagram"><div class="mermaid" id="diagram-ecosystem"></div></div>
+            </div>
+
+            <div class="callout note">
+              <div class="callout-icon">i</div>
+              <p>
+                重要なのは、<strong
+                  >skills.sh
+                  はあくまで「入口」であり、実体(コード)は各GitHubリポジトリ側にある</strong
+                >という点です。インストール時にCLIがGitHubから直接ファイルを取得します。
+              </p>
+            </div>
+          </section>
+
+          <section class="chapter" id="sec-05">
+            <span class="chapter-eyebrow">CHAPTER 05</span>
+            <h2>CLI のインストールと使い方(ステップバイステップ)</h2>
+
+            <div class="step-flow">
+              <div class="step-item">
+                <h4>前提環境を確認する</h4>
+                <p>
+                  Node.js が入っていれば追加インストール不要です(<code>npx</code> はnpmに同梱)。
+                </p>
+                <div class="code-block">
+                  <div class="code-label">
+                    <span>bash</span>
+                    <div class="dots"><span></span><span></span><span></span></div>
+                  </div>
+                  <pre><code class="language-bash">node -v
+npx --version</code></pre>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <h4>気になるスキルをインストールする</h4>
+                <p>
+                  skills.sh
+                  の各スキル詳細ページには、そのままコピペできるインストールコマンドが表示されています。基本形は次の2パターンです。
+                </p>
+                <div class="code-block">
+                  <div class="code-label">
+                    <span>bash</span>
+                    <div class="dots"><span></span><span></span><span></span></div>
+                  </div>
+                  <pre><code class="language-bash"># パターンA: リポジトリ全体(複数スキルをまとめて配布している場合)をインストール
+npx skills add &lt;owner&gt;/&lt;repo&gt;
+
+# パターンB: リポジトリの中から特定の1スキルだけをインストール(最も一般的)
+npx skills add &lt;owner&gt;/&lt;repo&gt; --skill &lt;skill-name&gt;</code></pre>
+                </div>
+                <p>具体例(<code>frontend-design</code> スキルの場合):</p>
+                <div class="code-block">
+                  <div class="code-label">
+                    <span>bash</span>
+                    <div class="dots"><span></span><span></span><span></span></div>
+                  </div>
+                  <pre><code class="language-bash">npx skills add anthropics/skills --skill frontend-design</code></pre>
+                </div>
+                <p>フルURL形式で指定することもできます(スキル詳細ページに表示される正式な形式):</p>
+                <div class="code-block">
+                  <div class="code-label">
+                    <span>bash</span>
+                    <div class="dots"><span></span><span></span><span></span></div>
+                  </div>
+                  <pre><code class="language-bash">npx skills add https://github.com/anthropics/skills --skill frontend-design</code></pre>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <h4>スキルを探す(名前がわからない場合)</h4>
+                <p>
+                  <code>find-skills</code>
+                  スキルを導入すると、エージェントに自然文で頼むだけでキーワード検索・インストールまで自動化できます。
+                </p>
+                <div class="code-block">
+                  <div class="code-label">
+                    <span>bash</span>
+                    <div class="dots"><span></span><span></span><span></span></div>
+                  </div>
+                  <pre><code class="language-bash">npx skills add https://github.com/vercel-labs/skills --skill find-skills</code></pre>
+                </div>
+                <p>導入後は、Claude Codeなどのチャットで以下のように話しかけるだけで完結します。</p>
+                <div class="code-block">
+                  <div class="code-label">
+                    <span>chat</span>
+                    <div class="dots"><span></span><span></span><span></span></div>
+                  </div>
+                  <pre><code class="language-plaintext">「Reactのパフォーマンスを改善するスキルを探してインストールして」</code></pre>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <h4>エージェントに認識させる</h4>
+                <p>
+                  インストールが完了すると、CLIはエージェントが参照するローカルのスキル格納フォルダ(エージェントの種類によって配置場所は異なります)に
+                  <code>SKILL.md</code>
+                  一式をコピーします。多くの場合、<strong>エージェントを再起動する、または新しい会話を始めるだけ</strong>で自動的にTier1(name/description)がスキャンされ、以降のリクエストに応じて自動発火するようになります。
+                </p>
+                <p>
+                  Claude Code
+                  の場合はプラグイン形式での導入にも対応しており、次のようなコマンドでマーケットプレイス経由の一括インストールも可能です(Anthropic公式スキルの場合)。
+                </p>
+                <div class="code-block">
+                  <div class="code-label">
+                    <span>Claude Code</span>
+                    <div class="dots"><span></span><span></span><span></span></div>
+                  </div>
+                  <pre><code class="language-bash">/plugin install document-skills@anthropic-agent-skills</code></pre>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <h4>匿名テレメトリを無効化したい場合(任意)</h4>
+                <p>
+                  CLIはデフォルトでインストール状況などの匿名利用統計をskills.shへ送信します。送信したくない場合は環境変数で無効化できます。
+                </p>
+                <div class="code-block">
+                  <div class="code-label">
+                    <span>bash</span>
+                    <div class="dots"><span></span><span></span><span></span></div>
+                  </div>
+                  <pre><code class="language-bash">DISABLE_TELEMETRY=1 npx skills add anthropics/skills --skill pdf</code></pre>
+                </div>
+              </div>
+            </div>
+
+            <h3>インストールから実行までの流れ(全体シーケンス)</h3>
+            <div class="diagram-card">
+              <div class="diagram-title">図3: CLIインストール〜スキル発火までのシーケンス</div>
+              <div class="mermaid-diagram">
+                <div class="mermaid" id="diagram-install-sequence"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="chapter" id="sec-06">
+            <span class="chapter-eyebrow">CHAPTER 06</span>
+            <h2>主要スキル カテゴリ別マップ</h2>
+            <div class="prose">
+              <p>
+                skills.sh
+                に登録されているスキルは膨大な数がありますが、初学者がまず押さえておくべき代表的なものを7カテゴリに整理しました。
+              </p>
+            </div>
+
+            <div class="diagram-card">
+              <div class="diagram-title">図4: 主要スキルのカテゴリマップ</div>
+              <div class="mermaid-diagram">
+                <div class="mermaid" id="diagram-category-map"></div>
+              </div>
+            </div>
+
+            <h3>どのスキルを選べばいいか迷ったときの早見表</h3>
+            <div class="diagram-card">
+              <div class="diagram-title">図5: スキル選定フローチャート</div>
+              <div class="mermaid-diagram"><div class="mermaid" id="diagram-decision"></div></div>
+            </div>
+          </section>
+
+          <section class="chapter" id="sec-07">
+            <span class="chapter-eyebrow">CHAPTER 07</span>
+            <h2>主要スキル 徹底解説</h2>
+            <div class="prose">
+              <p>
+                ここからは、実際にskills.shのランキング上位・代表格となっているスキルを1つずつ、<strong>「何をするか」「いつ使うか」「インストール方法」</strong>の3点セットで解説します。
+              </p>
+            </div>
+
+            <div class="skill-card" id="skill-find-skills">
+              <div class="skill-card-head">
+                <h3>7-1. find-skills ― スキルを探すためのスキル</h3>
+                <span class="skill-badge">エージェント運用</span>
+              </div>
+              <div class="skill-repo">
+                提供元: <code>vercel-labs/skills</code> ・ カテゴリ: エージェント運用
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>できること</td>
+                      <td>
+                        ユーザーの自然文の依頼から必要なスキルをキーワード検索し、その場でインストールまで行う、いわば「メタスキル」
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>こんな時に使う</td>
+                      <td>
+                        「〇〇をしたいけど、どのスキルを入れればいいかわからない」という入り口の段階
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="code-block">
+                <div class="code-label">
+                  <span>install</span>
+                  <div class="dots"><span></span><span></span><span></span></div>
+                </div>
+                <pre><code class="language-bash">npx skills add https://github.com/vercel-labs/skills --skill find-skills</code></pre>
+              </div>
+              <div class="callout tip">
+                <div class="callout-icon">✓</div>
+                <p>
+                  導入後は、エージェントに「〇〇のためのスキルを探して」と話しかけるだけで、検索からインストールまでを自動化できます。他のすべてのスキルの入り口として、最初に入れておくと便利な1本です。
+                </p>
+              </div>
+            </div>
+
+            <div class="skill-card" id="skill-skill-creator">
+              <div class="skill-card-head">
+                <h3>7-2. skill-creator ― スキルを作るためのスキル</h3>
+                <span class="skill-badge">エージェント運用</span>
+              </div>
+              <div class="skill-repo">
+                提供元: <code>anthropics/skills</code> ・ カテゴリ: エージェント運用
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>できること</td>
+                      <td>
+                        Anthropicのベストプラクティスに沿った
+                        <code>SKILL.md</code>
+                        の雛形生成、トリガー精度(description)の評価、反復改善までを支援
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>こんな時に使う</td>
+                      <td>
+                        社内ルールや個人のワークフローを、自分専用のスキルとして固定化・再利用したいとき
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="code-block">
+                <div class="code-label">
+                  <span>install</span>
+                  <div class="dots"><span></span><span></span><span></span></div>
+                </div>
+                <pre><code class="language-bash">npx skills add anthropics/skills --skill skill-creator</code></pre>
+              </div>
+              <div class="callout note">
+                <div class="callout-icon">i</div>
+                <p>
+                  詳しい使い方は <a href="#sec-10">第10章「自作スキルの作り方」</a> で解説します。
+                </p>
+              </div>
+            </div>
+
+            <div class="skill-card" id="skill-frontend-design">
+              <div class="skill-card-head">
+                <h3>7-3. frontend-design ― フロントエンドの意匠設計</h3>
+                <span class="skill-badge">デザイン & UI</span>
+              </div>
+              <div class="skill-repo">
+                提供元: <code>anthropics/skills</code> ・ カテゴリ: デザイン & UI
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>できること</td>
+                      <td>
+                        新規UIを作る、または既存UIを作り直す際に、「テンプレート感の出ない」意図的なビジュアル方向性・タイポグラフィ・配色などの判断基準をエージェントに与える
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>こんな時に使う</td>
+                      <td>
+                        「なんとなくAIっぽい/量産型に見えるUI」から脱却し、独自性のあるデザインをコーディングエージェントに作らせたいとき
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="code-block">
+                <div class="code-label">
+                  <span>install</span>
+                  <div class="dots"><span></span><span></span><span></span></div>
+                </div>
+                <pre><code class="language-bash">npx skills add anthropics/skills --skill frontend-design</code></pre>
+              </div>
+            </div>
+
+            <div class="skill-card" id="skill-web-design-guidelines">
+              <div class="skill-card-head">
+                <h3>7-4. web-design-guidelines ― Webデザインの一般原則</h3>
+                <span class="skill-badge">デザイン & UI</span>
+              </div>
+              <div class="skill-repo">
+                提供元: <code>vercel-labs/agent-skills</code> ・ カテゴリ: デザイン & UI
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>できること</td>
+                      <td>
+                        余白・階層構造・可読性・アクセシビリティなど、Webデザインの普遍的な原則をチェックリストとしてエージェントに参照させる
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>こんな時に使う</td>
+                      <td>
+                        frontend-designと組み合わせて、デザインの「独自性」だけでなく「基本品質」も担保したいとき
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="code-block">
+                <div class="code-label">
+                  <span>install</span>
+                  <div class="dots"><span></span><span></span><span></span></div>
+                </div>
+                <pre><code class="language-bash">npx skills add https://github.com/vercel-labs/agent-skills --skill web-design-guidelines</code></pre>
+              </div>
+            </div>
+
+            <div class="skill-card" id="skill-shadcn">
+              <div class="skill-card-head">
+                <h3>7-5. shadcn ― UIコンポーネントライブラリ連携</h3>
+                <span class="skill-badge">デザイン & UI / React</span>
+              </div>
+              <div class="skill-repo">
+                提供元: <code>shadcn/ui</code> ・ カテゴリ: デザイン & UI / React
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>できること</td>
+                      <td>
+                        shadcn/ui のコンポーネント(Button, Dialog,
+                        Formなど)を正しい作法でエージェントに導入・カスタマイズさせる
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>こんな時に使う</td>
+                      <td>Reactプロジェクトでshadcn/uiベースのUIを構築・拡張したいとき</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="code-block">
+                <div class="code-label">
+                  <span>install</span>
+                  <div class="dots"><span></span><span></span><span></span></div>
+                </div>
+                <pre><code class="language-bash">npx skills add shadcn/ui --skill shadcn</code></pre>
+              </div>
+            </div>
+
+            <div class="skill-card" id="skill-vercel-react">
+              <div class="skill-card-head">
+                <h3>7-6. vercel-react-best-practices / vercel-composition-patterns</h3>
+                <span class="skill-badge">React / Next.js</span>
+              </div>
+              <div class="skill-repo">
+                提供元: <code>vercel-labs/agent-skills</code> ・ カテゴリ: React / Next.js
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>できること</td>
+                      <td>
+                        不要な再レンダリングの回避、Server Components/Client
+                        Componentsの適切な使い分け、コンポーネント分割パターンなど、Vercelが推奨するReact設計指針をエージェントに適用させる
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>こんな時に使う</td>
+                      <td>
+                        Next.js/Reactアプリのコードレビューやリファクタリングをエージェントに任せるとき
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="code-block">
+                <div class="code-label">
+                  <span>install</span>
+                  <div class="dots"><span></span><span></span><span></span></div>
+                </div>
+                <pre><code class="language-bash">npx skills add https://github.com/vercel-labs/agent-skills --skill vercel-react-best-practices
+npx skills add https://github.com/vercel-labs/agent-skills --skill vercel-composition-patterns</code></pre>
+              </div>
+            </div>
+
+            <div class="skill-card" id="skill-agent-browser">
+              <div class="skill-card-head">
+                <h3>7-7. agent-browser ― ブラウザ自動操作</h3>
+                <span class="skill-badge">エージェント運用 / テスト</span>
+              </div>
+              <div class="skill-repo">
+                提供元: <code>vercel-labs/agent-browser</code> ・ カテゴリ: エージェント運用 /
+                テスト
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>できること</td>
+                      <td>
+                        エージェントに実ブラウザを操作させ、画面のクリック・入力・スクリーンショット取得・動作確認などを行わせる
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>こんな時に使う</td>
+                      <td>
+                        作ったWebアプリを実際にブラウザで動かして目視確認・デバッグさせたいとき
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="code-block">
+                <div class="code-label">
+                  <span>install</span>
+                  <div class="dots"><span></span><span></span><span></span></div>
+                </div>
+                <pre><code class="language-bash">npx skills add https://github.com/vercel-labs/agent-browser --skill agent-browser</code></pre>
+              </div>
+            </div>
+
+            <div class="skill-card" id="skill-docs">
+              <div class="skill-card-head">
+                <h3>7-8. Anthropic公式ドキュメント生成スキル群(pptx / docx / xlsx / pdf)</h3>
+                <span class="skill-badge">ドキュメント生成</span>
+              </div>
+              <div class="skill-repo">
+                提供元: <code>anthropics/skills</code> ・ カテゴリ: ドキュメント生成
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>できること</td>
+                      <td>
+                        PowerPoint・Word・Excel・PDFファイルの<strong>実際に開けるバイナリファイル</strong>を、テキスト説明ではなく生成物として作成・編集する
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>こんな時に使う</td>
+                      <td>
+                        「報告書をWordで」「決算資料をExcelで」といった、成果物がオフィス文書そのものであるとき
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="code-block">
+                <div class="code-label">
+                  <span>install</span>
+                  <div class="dots"><span></span><span></span><span></span></div>
+                </div>
+                <pre><code class="language-bash">npx skills add anthropics/skills --skill pptx
+npx skills add anthropics/skills --skill docx
+npx skills add anthropics/skills --skill xlsx
+npx skills add anthropics/skills --skill pdf</code></pre>
+              </div>
+              <div class="callout note">
+                <div class="callout-icon">i</div>
+                <p>
+                  補足:
+                  Claude.aiの有料プランでは、これらのドキュメント生成スキルは追加インストールなしで既定で使えるようになっています。
+                </p>
+              </div>
+            </div>
+
+            <div class="skill-card" id="skill-webapp-testing">
+              <div class="skill-card-head">
+                <h3>7-9. webapp-testing ― Webアプリの自動テスト</h3>
+                <span class="skill-badge">テスト</span>
+              </div>
+              <div class="skill-repo">
+                提供元: <code>anthropics/skills</code> ・ カテゴリ: テスト
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>できること</td>
+                      <td>
+                        実装したWebアプリに対して、実ブラウザ相当の環境で動作確認・回帰テストのシナリオを組み立てて実行させる
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>こんな時に使う</td>
+                      <td>
+                        実装が完了した機能について、「ちゃんと動くか」をエージェント自身に検証させたいとき
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="code-block">
+                <div class="code-label">
+                  <span>install</span>
+                  <div class="dots"><span></span><span></span><span></span></div>
+                </div>
+                <pre><code class="language-bash">npx skills add anthropics/skills --skill webapp-testing</code></pre>
+              </div>
+            </div>
+
+            <div class="skill-card" id="skill-supabase">
+              <div class="skill-card-head">
+                <h3>7-10. supabase-postgres-best-practices ― DB設計・SQL品質</h3>
+                <span class="skill-badge">データベース</span>
+              </div>
+              <div class="skill-repo">
+                提供元: <code>supabase/agent-skills</code> ・ カテゴリ: データベース
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>できること</td>
+                      <td>
+                        PostgreSQL(Supabase)のスキーマ設計、インデックス設計、Row Level
+                        Security(RLS)などのベストプラクティスをエージェントに適用させる
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>こんな時に使う</td>
+                      <td>
+                        Supabase/PostgreSQLベースのバックエンド設計・マイグレーションをエージェントにレビューさせたいとき
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="code-block">
+                <div class="code-label">
+                  <span>install</span>
+                  <div class="dots"><span></span><span></span><span></span></div>
+                </div>
+                <pre><code class="language-bash">npx skills add https://github.com/supabase/agent-skills --skill supabase-postgres-best-practices</code></pre>
+              </div>
+            </div>
+
+            <div class="skill-card" id="skill-superpowers">
+              <div class="skill-card-head">
+                <h3>7-11. superpowers系 ― 開発方法論・思考の型</h3>
+                <span class="skill-badge">エージェント運用</span>
+              </div>
+              <div class="skill-repo">
+                提供元: <code>obra/superpowers</code> ・ カテゴリ: エージェント運用
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>できること</td>
+                      <td>
+                        <code>brainstorming</code
+                        >(発散的思考の型)、<code>systematic-debugging</code>(体系的なデバッグ手順)など、特定の技術領域ではなく「進め方・考え方」そのものをスキル化したもの
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>こんな時に使う</td>
+                      <td>
+                        個別ツールの使い方ではなく、エージェントの思考プロセス自体をより体系立てたいとき
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="code-block">
+                <div class="code-label">
+                  <span>install</span>
+                  <div class="dots"><span></span><span></span><span></span></div>
+                </div>
+                <pre><code class="language-bash">npx skills add obra/superpowers --skill brainstorming
+npx skills add obra/superpowers --skill systematic-debugging</code></pre>
+              </div>
+            </div>
+
+            <div class="skill-card" id="skill-foundry">
+              <div class="skill-card-head">
+                <h3>7-12. microsoft-foundry / azure-skills ― クラウド・エンタープライズ</h3>
+                <span class="skill-badge">クラウド / DevOps</span>
+              </div>
+              <div class="skill-repo">
+                提供元: <code>microsoft/azure-skills</code> ・ カテゴリ: クラウド / DevOps
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>できること</td>
+                      <td>
+                        Microsoft
+                        Foundry(Azure上のAnthropicホスティング環境)を利用する際の設定・デプロイ手順をエージェントに適用させる
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>こんな時に使う</td>
+                      <td>Azure環境でClaudeベースのエージェントを構築・運用するとき</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="code-block">
+                <div class="code-label">
+                  <span>install</span>
+                  <div class="dots"><span></span><span></span><span></span></div>
+                </div>
+                <pre><code class="language-bash">npx skills add microsoft/azure-skills --skill microsoft-foundry</code></pre>
+              </div>
+            </div>
+          </section>
+
+          <section class="chapter" id="sec-08">
+            <span class="chapter-eyebrow">CHAPTER 08</span>
+            <h2>対応しているAIエージェント</h2>
+            <div class="prose">
+              <p>
+                Agent Skills
+                はオープンな仕様であるため、Claude系だけでなく複数のエージェント/IDEで利用が広がっています。skills.sh
+                上では、エージェントごとの対応状況ページも用意されています。
+              </p>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>エージェント</th>
+                    <th>タイプ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Claude Code</td>
+                    <td>CLI型コーディングエージェント(Anthropic)</td>
+                  </tr>
+                  <tr>
+                    <td>Cursor</td>
+                    <td>IDE統合型エージェント</td>
+                  </tr>
+                  <tr>
+                    <td>Codex CLI</td>
+                    <td>OpenAIのコーディングエージェント</td>
+                  </tr>
+                  <tr>
+                    <td>GitHub Copilot</td>
+                    <td>IDE統合型エージェント(Microsoft)</td>
+                  </tr>
+                  <tr>
+                    <td>Windsurf</td>
+                    <td>IDE統合型エージェント</td>
+                  </tr>
+                  <tr>
+                    <td>Cline</td>
+                    <td>VS Code拡張型エージェント</td>
+                  </tr>
+                  <tr>
+                    <td>Gemini CLI</td>
+                    <td>Googleのコーディングエージェント</td>
+                  </tr>
+                  <tr>
+                    <td>OpenCode / Roo / Trae / Zed など</td>
+                    <td>その他のオープンソース/独立系エージェント</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="callout warn">
+              <div class="callout-icon">!</div>
+              <p>
+                <strong>注意点:</strong>
+                エージェントの種類によって「スキルフォルダの配置場所」や「発見(discovery)の仕組み」に細かな違いがあります。同じ
+                <code>SKILL.md</code>
+                を複数のエージェントで使い回せることが「オープン標準」としての強みですが、導入時は各エージェントの公式ドキュメントで配置パスを確認するのが確実です。
+              </p>
+            </div>
+          </section>
+
+          <section class="chapter" id="sec-09">
+            <span class="chapter-eyebrow">CHAPTER 09</span>
+            <h2>セキュリティと監査の仕組み</h2>
+            <div class="prose">
+              <p>
+                スキルは「指示書」であると同時に、<strong>スクリプトを実行する権限をエージェントに与えるもの</strong>でもあります。裏を返せば、悪意あるスキルを不用意にインストールすると、想定外のコマンド実行やデータの持ち出し(exfiltration)につながるリスクがあります。
+              </p>
+            </div>
+
+            <h3>skills.sh が提供する監査情報</h3>
+            <div class="prose">
+              <p>
+                skills.sh には
+                <code>/audits</code>
+                ページがあり、登録されている主要スキルについて、複数の第三者セキュリティ機関による静的スキャン結果(安全度のレーティング)を確認できます。監査は継続的に実施されており、既知の危険パターン(不審なネットワーク呼び出し、認証情報へのアクセスなど)を機械的にチェックしています。
+              </p>
+            </div>
+
+            <h3>Anthropic公式が推奨する自衛策</h3>
+            <div class="prose">
+              <ul>
+                <li>
+                  <strong>信頼できる提供元のスキルだけを使う</strong>(自作、またはAnthropic公式)
+                </li>
+                <li>
+                  出所不明のスキルを使う場合は、<code>SKILL.md</code>
+                  本文・同梱スクリプト・画像・参考資料まで<strong>すべて目視で確認</strong>する
+                </li>
+                <li>
+                  想定外のネットワーク呼び出しや、スキルの説明と矛盾する挙動(ファイルアクセスパターンなど)がないか確認する
+                </li>
+                <li>本番環境で使う場合は特に、機密データの取り扱いに注意する</li>
+              </ul>
+            </div>
+
+            <h3>実務でのチェックリスト</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>チェック項目</th>
+                    <th>確認方法</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>提供元は信頼できるか</td>
+                    <td>公式組織(Anthropic/Vercel/Supabaseなど)か、実績のある個人か</td>
+                  </tr>
+                  <tr>
+                    <td>skills.shの監査結果は良好か</td>
+                    <td><code>/audits</code> ページのレーティングを確認</td>
+                  </tr>
+                  <tr>
+                    <td>SKILL.md本文を読んだか</td>
+                    <td>指示内容が説明(description)と矛盾していないか</td>
+                  </tr>
+                  <tr>
+                    <td>同梱スクリプトを読んだか</td>
+                    <td>外部通信・認証情報アクセスの有無を確認</td>
+                  </tr>
+                  <tr>
+                    <td>インストール数・更新頻度は妥当か</td>
+                    <td>極端に新しい/更新が止まっているものは慎重に</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="chapter" id="sec-10">
+            <span class="chapter-eyebrow">CHAPTER 10</span>
+            <h2>自分だけのスキルを作る(skill-creator活用法)</h2>
+            <div class="prose">
+              <p>
+                既存スキルに満足できない、あるいは社内独自のルールをスキル化したい場合は
+                <code>skill-creator</code> を使います。基本的な進め方は次のループです。
+              </p>
+            </div>
+
+            <div class="diagram-card">
+              <div class="diagram-title">図6: スキル自作のワークフロー</div>
+              <div class="mermaid-diagram">
+                <div class="mermaid" id="diagram-skillcreator-loop"></div>
+              </div>
+            </div>
+
+            <h3>導入コマンド</h3>
+            <div class="code-block">
+              <div class="code-label">
+                <span>bash</span>
+                <div class="dots"><span></span><span></span><span></span></div>
+              </div>
+              <pre><code class="language-bash">npx skills add anthropics/skills --skill skill-creator</code></pre>
+            </div>
+
+            <h3>作成時のベストプラクティス(Anthropic公式ブログより要約)</h3>
+            <div class="step-flow">
+              <div class="step-item">
+                <h4>評価から始める</h4>
+                <p>
+                  まず既存のエージェントに代表的なタスクをやらせてみて、どこで詰まるか・情報不足になるかを
+                  observe する
+                </p>
+              </div>
+              <div class="step-item">
+                <h4>description に全力を注ぐ</h4>
+                <p>
+                  Tier1で読まれるのはこの一文だけなので、「何を」「いつ」使うかが明確に伝わる書き方をする
+                </p>
+              </div>
+              <div class="step-item">
+                <h4>肥大化したら分割する</h4>
+                <p>
+                  SKILL.md本文が長くなりすぎたら、参考資料を別ファイルに切り出し、Tier3として遅延読み込みさせる
+                </p>
+              </div>
+              <div class="step-item">
+                <h4>実行させたいのか読ませたいのか区別する</h4>
+                <p>
+                  決定的な処理(ソートやバリデーションなど)はスクリプトとして実行させ、判断が必要な部分だけを自然文の指示にする
+                </p>
+              </div>
+              <div class="step-item">
+                <h4>他のスキルとの共存を前提にする</h4>
+                <p>
+                  1つのタスクに複数のスキルが同時に有効な場合もあるため、自分のスキルだけが動くことを前提に書かない
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <hr class="divider" />
+
+          <section class="chapter" id="sec-11">
+            <span class="chapter-eyebrow">CHAPTER 11</span>
+            <h2>まとめ:今日から始める3ステップ</h2>
+
+            <div class="diagram-card">
+              <div class="diagram-title">図7: 導入から自作までのロードマップ</div>
+              <div class="mermaid-diagram">
+                <div class="mermaid" id="diagram-summary-steps"></div>
+              </div>
+            </div>
+
+            <div class="code-block">
+              <div class="code-label">
+                <span>bash</span>
+                <div class="dots"><span></span><span></span><span></span></div>
+              </div>
+              <pre><code class="language-bash"># ステップ1: 検索用スキルを入れる
+npx skills add https://github.com/vercel-labs/skills --skill find-skills
+
+# ステップ2: 興味のあるスキルを1つ入れてみる(例: フロントエンド設計)
+npx skills add anthropics/skills --skill frontend-design
+
+# ステップ3: エージェントに関連の依頼をして、実際に使われるか確認する</code></pre>
+            </div>
+
+            <div class="callout tip">
+              <div class="callout-icon">✓</div>
+              <p>
+                Agent Skills
+                は「モデルを賢くする」のではなく、<strong>「エージェントに正しい手順書を渡す」</strong>ための仕組みです。まずは自分の日常業務で繰り返している作業を1つ思い浮かべ、それに近いスキルをskills.shで探すところから始めるのが、最も理解が早い入り口です。
+              </p>
+            </div>
+          </section>
+
+          <section class="chapter" id="sec-12">
+            <span class="chapter-eyebrow">CHAPTER 12</span>
+            <h2>参考URL一覧</h2>
+
+            <h3>skills.sh 本体</h3>
+            <ul class="ref-list">
+              <li>
+                <span class="ref-label">skills.sh トップページ</span
+                ><a class="ref-url" href="https://www.skills.sh/" target="_blank" rel="noopener"
+                  >https://www.skills.sh/</a
+                >
+              </li>
+              <li>
+                <span class="ref-label">ドキュメント</span
+                ><a class="ref-url" href="https://www.skills.sh/docs" target="_blank" rel="noopener"
+                  >https://www.skills.sh/docs</a
+                >
+              </li>
+              <li>
+                <span class="ref-label">CLIリファレンス</span
+                ><a
+                  class="ref-url"
+                  href="https://www.skills.sh/docs/cli"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.skills.sh/docs/cli</a
+                >
+              </li>
+              <li>
+                <span class="ref-label">FAQ</span
+                ><a
+                  class="ref-url"
+                  href="https://www.skills.sh/docs/faq"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.skills.sh/docs/faq</a
+                >
+              </li>
+              <li>
+                <span class="ref-label">セキュリティ監査ページ</span
+                ><a
+                  class="ref-url"
+                  href="https://www.skills.sh/audits"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.skills.sh/audits</a
+                >
+              </li>
+            </ul>
+
+            <h3>本ガイドで扱った主要スキルの詳細ページ</h3>
+            <ul class="ref-list">
+              <li>
+                <span class="ref-label">find-skills</span
+                ><a
+                  class="ref-url"
+                  href="https://www.skills.sh/vercel-labs/skills/find-skills"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.skills.sh/vercel-labs/skills/find-skills</a
+                >
+              </li>
+              <li>
+                <span class="ref-label">skill-creator</span
+                ><a
+                  class="ref-url"
+                  href="https://www.skills.sh/anthropics/skills/skill-creator"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.skills.sh/anthropics/skills/skill-creator</a
+                >
+              </li>
+              <li>
+                <span class="ref-label">frontend-design</span
+                ><a
+                  class="ref-url"
+                  href="https://www.skills.sh/anthropics/skills/frontend-design"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.skills.sh/anthropics/skills/frontend-design</a
+                >
+              </li>
+              <li>
+                <span class="ref-label">web-design-guidelines</span
+                ><a
+                  class="ref-url"
+                  href="https://www.skills.sh/vercel-labs/agent-skills/web-design-guidelines"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.skills.sh/vercel-labs/agent-skills/web-design-guidelines</a
+                >
+              </li>
+              <li>
+                <span class="ref-label">shadcn</span
+                ><a
+                  class="ref-url"
+                  href="https://www.skills.sh/shadcn/ui/shadcn"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.skills.sh/shadcn/ui/shadcn</a
+                >
+              </li>
+              <li>
+                <span class="ref-label">agent-browser</span
+                ><a
+                  class="ref-url"
+                  href="https://www.skills.sh/vercel-labs/agent-browser/agent-browser"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.skills.sh/vercel-labs/agent-browser/agent-browser</a
+                >
+              </li>
+              <li>
+                <span class="ref-label">supabase-postgres-best-practices</span
+                ><a
+                  class="ref-url"
+                  href="https://www.skills.sh/supabase/agent-skills/supabase-postgres-best-practices"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.skills.sh/supabase/agent-skills/supabase-postgres-best-practices</a
+                >
+              </li>
+            </ul>
+
+            <h3>元となるGitHubリポジトリ</h3>
+            <ul class="ref-list">
+              <li>
+                <span class="ref-label">anthropics/skills</span
+                ><a
+                  class="ref-url"
+                  href="https://github.com/anthropics/skills"
+                  target="_blank"
+                  rel="noopener"
+                  >https://github.com/anthropics/skills</a
+                >
+              </li>
+              <li>
+                <span class="ref-label">vercel-labs/skills</span
+                ><a
+                  class="ref-url"
+                  href="https://github.com/vercel-labs/skills"
+                  target="_blank"
+                  rel="noopener"
+                  >https://github.com/vercel-labs/skills</a
+                >
+              </li>
+            </ul>
+
+            <h3>Anthropic公式ドキュメント・エンジニアリングブログ</h3>
+            <ul class="ref-list">
+              <li>
+                <span class="ref-label">Agent Skillsの設計思想(エンジニアリングブログ)</span
+                ><a
+                  class="ref-url"
+                  href="https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills</a
+                >
+              </li>
+              <li>
+                <span class="ref-label">Agent Skills 公式ドキュメント(Claude Platform Docs)</span
+                ><a
+                  class="ref-url"
+                  href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview"
+                  target="_blank"
+                  rel="noopener"
+                  >https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview</a
+                >
+              </li>
+            </ul>
+          </section>
+
+          <footer class="page-footer">
+            本ガイドは2026年7月時点でskills.shおよび関連公式ドキュメントを参照して作成しました。エコシステムは急速に拡大しているため、最新のスキル一覧・カテゴリ構成は都度
+            <a href="https://www.skills.sh/" target="_blank" rel="noopener">skills.sh</a>
+            本体でご確認ください。
+          </footer>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const DIAGRAMS = {
+        'diagram-progressive': `flowchart TD
+    A[エージェントが起動する] --> B["Tier 1: 全スキルの<br/>name + description のみ読み込む<br/>(1スキルあたり約30トークン程度)"]
+    B --> C{ユーザーの依頼内容が<br/>いずれかのdescriptionと一致する?}
+    C -- 一致しない --> E[通常の会話・処理を続行<br/>スキルは使わない]
+    C -- 一致する --> D["Tier 2: 該当スキルの<br/>SKILL.md本文を読み込む<br/>(具体的な手順・ルール)"]
+    D --> F{本文が追加ファイルを<br/>参照している?<br/>例: forms.md, validate.py}
+    F -- 参照なし --> H[SKILL.mdの指示に従い<br/>タスクを実行]
+    F -- 参照あり --> G["Tier 3: 参照された<br/>スクリプトや参考資料だけを<br/>bashコマンド等でその都度読み込む"]
+    G --> H
+    H --> I[結果をユーザーに返す]`,
+
+        'diagram-ecosystem': `graph LR
+    subgraph SRC[スキルの提供元 = GitHubリポジトリ]
+        A1[anthropics/skills<br/>公式ドキュメント生成系]
+        A2[vercel-labs/skills<br/>vercel-labs/agent-skills<br/>フロントエンド系]
+        A3[supabase/agent-skills<br/>データベース系]
+        A4[shadcn/ui<br/>UIコンポーネント系]
+        A5[microsoft/azure-skills<br/>クラウド系]
+        A6[obra/superpowers<br/>開発手法・思考法系]
+    end
+
+    subgraph HUB[skills.sh]
+        B1[検索・ランキング<br/>カテゴリ別ディレクトリ]
+        B2[セキュリティ監査<br/>Agent Trust Hub / Socket / Snyk]
+        B3["CLI: npx skills"]
+    end
+
+    subgraph RUN[実行環境 = AIエージェント]
+        C1[Claude Code]
+        C2[Cursor]
+        C3[Codex CLI]
+        C4[GitHub Copilot]
+        C5[Windsurf / Cline ほか]
+    end
+
+    A1 --> B1
+    A2 --> B1
+    A3 --> B1
+    A4 --> B1
+    A5 --> B1
+    A6 --> B1
+    B2 -.スキャン・格付け.-> B1
+    B1 --> B3
+    B3 -->|npx skills add| C1
+    B3 -->|npx skills add| C2
+    B3 -->|npx skills add| C3
+    B3 -->|npx skills add| C4
+    B3 -->|npx skills add| C5`,
+
+        'diagram-install-sequence': `sequenceDiagram
+    participant U as ユーザー
+    participant T as ターミナル(npx skills)
+    participant GH as GitHubリポジトリ
+    participant FS as ローカルのスキル格納フォルダ
+    participant AG as AIエージェント
+
+    U->>T: npx skills add anthropics/skills --skill pdf
+    T->>GH: pdfスキルのファイル一式を取得
+    GH-->>T: SKILL.md + scripts/ + reference.md
+    T->>FS: エージェント用フォルダへ保存
+    T-->>U: インストール完了
+    Note over U,AG: ここで新しい会話を開始 or エージェント再起動
+    U->>AG: 「このPDFのフォーム項目を抽出して」
+    AG->>FS: 全スキルのdescriptionを走査(Tier1)
+    FS-->>AG: pdfスキルのdescriptionが一致
+    AG->>FS: SKILL.md本文を読み込む(Tier2)
+    AG->>FS: 同梱のPythonスクリプトを実行(Tier3)
+    FS-->>AG: スクリプトの実行結果のみ返却
+    AG-->>U: 抽出結果を提示`,
+
+        'diagram-category-map': `graph TD
+    ROOT[skills.sh 主要カテゴリ]
+    ROOT --> CAT1[① エージェント運用<br/>Agent Workflows]
+    ROOT --> CAT2[② デザイン & UI]
+    ROOT --> CAT3[③ React / Next.js]
+    ROOT --> CAT4[④ ドキュメント生成]
+    ROOT --> CAT5[⑤ テスト]
+    ROOT --> CAT6[⑥ データベース]
+    ROOT --> CAT7[⑦ クラウド / DevOps]
+
+    CAT1 --> S1[find-skills]
+    CAT1 --> S2[skill-creator]
+    CAT1 --> S3[agent-browser]
+    CAT1 --> S4[superpowers系<br/>brainstorming等]
+
+    CAT2 --> S5[frontend-design]
+    CAT2 --> S6[web-design-guidelines]
+    CAT2 --> S7[shadcn]
+
+    CAT3 --> S8[vercel-react-best-practices]
+    CAT3 --> S9[vercel-composition-patterns]
+
+    CAT4 --> S10[pptx / docx / xlsx / pdf]
+
+    CAT5 --> S11[webapp-testing]
+
+    CAT6 --> S12[supabase-postgres-best-practices]
+
+    CAT7 --> S13[microsoft-foundry<br/>azure-skills]`,
+
+        'diagram-decision': `flowchart TD
+    Q{何をしたい?}
+    Q -->|Webサイトの見た目・UIを改善したい| R1[frontend-design<br/>web-design-guidelines]
+    Q -->|Word/PDF/Excel/PowerPointを操作したい| R2[docx / pdf / xlsx / pptx]
+    Q -->|Reactアプリのパフォーマンスを最適化したい| R3[vercel-react-best-practices]
+    Q -->|ブラウザを自動操作させたい| R4[agent-browser]
+    Q -->|作ったWebアプリを自動テストしたい| R5[webapp-testing]
+    Q -->|DB設計・SQLの品質を上げたい| R6[supabase-postgres-best-practices]
+    Q -->|自分専用のスキルを作りたい| R7[skill-creator]
+    Q -->|どんなスキルがあるか探したい| R8[find-skills]`,
+
+        'diagram-skillcreator-loop': `flowchart LR
+    A[1. 目的を1〜2行で言語化する] --> B[2. SKILL.mdのドラフトを書く<br/>name + description + 手順]
+    B --> C[3. 実際にありそうな依頼文を<br/>テストケースとして複数用意する]
+    C --> D[4. スキルあり/なしで<br/>エージェントの挙動を比較実行]
+    D --> E[5. 結果を評価する<br/>期待通りに発火したか/手順通り動いたか]
+    E --> F{品質は十分か?}
+    F -- 不十分 --> G[6. descriptionや手順を<br/>フィードバックに基づき修正]
+    G --> C
+    F -- 十分 --> H[7. 公開/チーム共有<br/>あるいは自分用として保存]`,
+
+        'diagram-summary-steps': `flowchart LR
+    A["① find-skillsを導入して<br/>ざっくり探してみる"] --> B["② 気になったスキルを<br/>npx skills add で1つ入れてみる"]
+    B --> C["③ 実際にエージェントに<br/>関連する依頼をして発火を確認"]
+    C --> D["④ 慣れてきたら<br/>skill-creatorで自作に挑戦"]`,
+      };
+
+      // ===== Mermaid 初期化(ダークテーマをサイトのCSS変数に合わせる) =====
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        themeVariables: {
+          darkMode: true,
+          background: '#07111e',
+          mainBkg: '#101f33',
+          primaryColor: '#101f33',
+          primaryTextColor: '#eaf1fb',
+          primaryBorderColor: '#5eead4',
+          secondaryColor: '#0b1524',
+          secondaryBorderColor: 'rgba(148,178,214,.3)',
+          tertiaryColor: '#152845',
+          tertiaryBorderColor: 'rgba(148,178,214,.3)',
+          lineColor: '#5eead4',
+          textColor: '#eaf1fb',
+          nodeTextColor: '#eaf1fb',
+          clusterBkg: '#0b1524',
+          clusterBorder: 'rgba(148,178,214,.35)',
+          edgeLabelBackground: '#0b1524',
+          fontFamily: 'Inter, sans-serif',
+          fontSize: '14px',
+          actorBkg: '#101f33',
+          actorBorder: '#5eead4',
+          actorTextColor: '#eaf1fb',
+          actorLineColor: 'rgba(148,178,214,.4)',
+          signalColor: '#a6b8d1',
+          signalTextColor: '#eaf1fb',
+          labelBoxBkgColor: '#152845',
+          labelBoxBorderColor: '#5eead4',
+          labelTextColor: '#eaf1fb',
+          loopTextColor: '#eaf1fb',
+          noteBkgColor: '#1a3a33',
+          noteTextColor: '#eaf1fb',
+          noteBorderColor: '#2dd4bf',
+        },
+        flowchart: { curve: 'basis', useMaxWidth: true, htmlLabels: true },
+        sequence: { useMaxWidth: true, wrap: true },
+      });
+
+      // DIAGRAMSオブジェクトの中身をtextContentとして各divへ流し込んでからレンダリング
+      Object.keys(DIAGRAMS).forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.textContent = DIAGRAMS[id];
+        }
+      });
+      mermaid.run({ querySelector: '.mermaid' });
+
+      // ===== highlight.js =====
+      hljs.configure({ languages: ['bash', 'yaml', 'markdown', 'plaintext'] });
+      document.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
+
+      // ===== サイドバー: スクロール連動ハイライト(IntersectionObserver) =====
+      const chapterSections = document.querySelectorAll('section.chapter[id]');
+      const skillCards = document.querySelectorAll('.skill-card[id]');
+      const tocLinks = document.querySelectorAll('.toc-link');
+      const tocSubLinks = document.querySelectorAll('.toc-sub-link');
+
+      function clearActive() {
+        tocLinks.forEach((l) => l.classList.remove('active'));
+        tocSubLinks.forEach((l) => l.classList.remove('active'));
+      }
+
+      function setActiveById(id) {
+        clearActive();
+        const link = document.querySelector('.toc-link[href="#' + id + '"]');
+        if (link) {
+          link.classList.add('active');
+          return;
+        }
+        const subLink = document.querySelector('.toc-sub-link[href="#' + id + '"]');
+        if (subLink) {
+          subLink.classList.add('active');
+          const parentSection = subLink.closest('section');
+          if (parentSection) {
+            const parentTocLink = document.querySelector(
+              '.toc-link[href="#' + parentSection.id + '"]',
+            );
+            if (parentTocLink) parentTocLink.classList.add('active');
+          }
+        }
+      }
+
+      const observerTargets = [...chapterSections, ...skillCards];
+      const io = new IntersectionObserver(
+        (entries) => {
+          let bestEntry = null;
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              if (!bestEntry || entry.boundingClientRect.top < bestEntry.boundingClientRect.top) {
+                bestEntry = entry;
+              }
+            }
+          });
+          if (bestEntry) {
+            setActiveById(bestEntry.target.id);
+          }
+        },
+        { rootMargin: '-15% 0px -70% 0px', threshold: [0, 1] },
+      );
+
+      observerTargets.forEach((el) => io.observe(el));
+
+      // ===== スクロール進捗バー =====
+      const progressFill = document.getElementById('progressFill');
+      function updateProgress() {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const pct = docHeight > 0 ? Math.min(100, (scrollTop / docHeight) * 100) : 0;
+        if (progressFill) progressFill.style.width = pct + '%';
+      }
+      window.addEventListener('scroll', updateProgress, { passive: true });
+      updateProgress();
+
+      // ===== モバイル: サイドバー開閉 =====
+      const navToggle = document.getElementById('navToggle');
+      const sidebar = document.getElementById('sidebar');
+      if (navToggle && sidebar) {
+        navToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+        sidebar.querySelectorAll('a').forEach((a) => {
+          a.addEventListener('click', () => sidebar.classList.remove('open'));
+        });
+      }
+      });
+    </script>
+  </body>
+</html>

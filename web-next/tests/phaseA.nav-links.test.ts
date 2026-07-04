@@ -41,8 +41,8 @@ describe("Phase A - nav-links export shape", () => {
 });
 
 describe("Phase A - nav-links top-level entries", () => {
-  it("has exactly 9 top-level entries", () => {
-    expect(navLinks.length).toBe(9);
+  it("has exactly 10 top-level entries", () => {
+    expect(navLinks.length).toBe(10);
   });
 
   it("starts with Home as a flat link", () => {
@@ -58,7 +58,7 @@ describe("Phase A - nav-links top-level entries", () => {
     expect("href" in last && last.href === "/git-worktree").toBe(true);
   });
 
-  it("has Claude/Google/Codex/Copilot/Code Review/Agent/Sandbox as dropdowns with children", () => {
+  it("has Claude/Google/Codex/Copilot/Code Review/Agent/Sandbox/IDE as dropdowns with children", () => {
     const providers = [
       "Claude",
       "Google",
@@ -67,6 +67,7 @@ describe("Phase A - nav-links top-level entries", () => {
       "Code Review",
       "Agent",
       "Sandbox",
+      "IDE",
     ] as const;
     for (const name of providers) {
       const entry = navLinks.find((link) => link.name === name);

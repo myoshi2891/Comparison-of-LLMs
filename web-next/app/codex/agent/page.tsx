@@ -1868,7 +1868,7 @@ export default function CodexAgentPage() {
                 コードベースの探索・検索専用。Haiku相当の軽量モデルで並列実行。Read-only sandbox。
               </div>
               <div className={styles["role-ex"]}>
-                model = &quot;gpt-4.1-mini&quot;
+                model = &quot;gpt-5.5-mini&quot;
                 <br />
                 sandbox = &quot;read-only&quot;
               </div>
@@ -1880,7 +1880,7 @@ export default function CodexAgentPage() {
                 汎用コーディングエージェント。メインのタスク実行ロール。workspace-write sandbox。
               </div>
               <div className={styles["role-ex"]}>
-                model = &quot;gpt-5.3-codex&quot;
+                model = &quot;gpt-5-codex&quot;
                 <br />
                 sandbox = &quot;workspace-write&quot;
               </div>
@@ -1892,7 +1892,7 @@ export default function CodexAgentPage() {
                 コードレビュー専用。Read-only で never approval。高精度モデルで品質確認。
               </div>
               <div className={styles["role-ex"]}>
-                model = &quot;gpt-5.4&quot;
+                model = &quot;gpt-5.5&quot;
                 <br />
                 approval_policy = &quot;never&quot;
               </div>
@@ -1915,7 +1915,7 @@ export default function CodexAgentPage() {
               {"\n\n"}
               <span className={styles.cm}>model</span>
               {" = "}
-              <span className={styles.cs}>"gpt-5.3-codex"</span>
+              <span className={styles.cs}>"gpt-5-codex"</span>
               {"\n"}
               <span className={styles.cc}># プロジェクトデフォルトモデル</span>
               {"\n"}
@@ -2080,7 +2080,7 @@ export default function CodexAgentPage() {
               {"\n\n"}
               <span className={styles.cm}>model</span>
               {" = "}
-              <span className={styles.cs}>"gpt-5.4"</span>
+              <span className={styles.cs}>"gpt-5.5"</span>
               {"\n"}
               <span className={styles.cc}># 高精度モデルをレビューに使用</span>
               {"\n"}
@@ -2178,7 +2178,7 @@ export default function CodexAgentPage() {
               {",\n    "}
               <span className={styles.cm}>model</span>
               {"="}
-              <span className={styles.cs}>"gpt-5.3-codex"</span>
+              <span className={styles.cs}>"gpt-5-codex"</span>
               {",\n    "}
               <span className={styles.cm}>mcp_servers</span>
               {"=[codex_mcp],\n)\nbackend_agent = Agent(\n    "}
@@ -2196,7 +2196,7 @@ export default function CodexAgentPage() {
               {",\n    "}
               <span className={styles.cm}>model</span>
               {"="}
-              <span className={styles.cs}>"gpt-5.3-codex"</span>
+              <span className={styles.cs}>"gpt-5-codex"</span>
               {",\n    "}
               <span className={styles.cm}>mcp_servers</span>
               {"=[codex_mcp],\n)\n\n"}
@@ -2218,7 +2218,7 @@ export default function CodexAgentPage() {
               {",\n    "}
               <span className={styles.cm}>model</span>
               {"="}
-              <span className={styles.cs}>"gpt-5.4"</span>
+              <span className={styles.cs}>"gpt-5.5"</span>
               {",\n    "}
               <span className={styles.cm}>mcp_servers</span>
               {"=[codex_mcp],\n    "}
@@ -2378,7 +2378,7 @@ export default function CodexAgentPage() {
               <tbody>
                 <tr>
                   <td>
-                    <code>gpt-4.1-mini</code>
+                    <code>gpt-5.5-mini</code>
                   </td>
                   <td>高速・低コスト</td>
                   <td>explorer（コード探索・検索）</td>
@@ -2389,7 +2389,7 @@ export default function CodexAgentPage() {
                 </tr>
                 <tr>
                   <td>
-                    <code>gpt-4.1</code>
+                    <code>gpt-5.5</code>
                   </td>
                   <td>バランス重視</td>
                   <td>実装・テスト生成・PR作成</td>
@@ -2399,7 +2399,7 @@ export default function CodexAgentPage() {
                 </tr>
                 <tr>
                   <td>
-                    <code>gpt-5.3-codex</code>
+                    <code>gpt-5-codex</code>
                   </td>
                   <td>コーディング特化</td>
                   <td>複雑な実装・リファクタリング</td>
@@ -2411,7 +2411,7 @@ export default function CodexAgentPage() {
                 </tr>
                 <tr>
                   <td>
-                    <code>gpt-5.4</code>
+                    <code>gpt-5.5</code>
                   </td>
                   <td>高精度推論</td>
                   <td>reviewer・アーキテクチャ設計</td>
@@ -2422,7 +2422,7 @@ export default function CodexAgentPage() {
                 </tr>
                 <tr>
                   <td>
-                    <code>gpt-5.3-codex-spark</code>
+                    <code>gpt-5-codex-spark</code>
                     <span className={`${styles.badge} ${styles["b-orange"]}`}>
                       research preview
                     </span>
@@ -2447,8 +2447,8 @@ export default function CodexAgentPage() {
               <strong>プロファイル機能でコスト最適化</strong>
               <code>config.toml</code> の <code>[profiles]</code> で複数の設定プロファイルを定義し、
               <code>codex --profile deep-review</code> のように切り替えられます。通常開発は{" "}
-              <code>gpt-4.1</code>、セキュリティレビューは{" "}
-              <code>gpt-5.4 + reasoning_effort=high</code>{" "}
+              <code>gpt-5.5</code>、セキュリティレビューは{" "}
+              <code>gpt-5.5 + reasoning_effort=high</code>{" "}
               のように使い分けることでコストを大幅に削減できます。
             </div>
           </div>
