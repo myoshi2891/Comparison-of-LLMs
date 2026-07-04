@@ -1,15 +1,25 @@
 import { render } from "@testing-library/react";
-import { beforeAll, expect, test, vi } from "vitest";
+import { beforeAll, expect, test } from "vitest";
 import Page, { metadata } from "./page";
 import styles from "./page.module.css";
 
 beforeAll(() => {
-  global.IntersectionObserver = class {
-    constructor() {}
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-  } as any;
+  // Minimal stub so `new IntersectionObserver(...)` doesn't throw in jsdom
+  class IntersectionObserverStub {
+    // biome-ignore lint/suspicious/noEmptyBlockStatements: test stub
+    observe() {
+      /* noop */
+    }
+    // biome-ignore lint/suspicious/noEmptyBlockStatements: test stub
+    unobserve() {
+      /* noop */
+    }
+    // biome-ignore lint/suspicious/noEmptyBlockStatements: test stub
+    disconnect() {
+      /* noop */
+    }
+  }
+  global.IntersectionObserver = IntersectionObserverStub as unknown as typeof IntersectionObserver;
 });
 
 test("Cursor Complete Guide Page Contract Tests", () => {
