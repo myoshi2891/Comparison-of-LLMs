@@ -210,15 +210,69 @@ function Ext({ href, children }: { href: string; children: React.ReactNode }) {
 </div>
 ```
 
-### TOC nav
+> [!IMPORTANT]
+> コードブロックを構成する `.codeBar`, `.codeBody`, `.codeLine` などのCSSモジュールクラスには、必ず等幅フォント設定（`font-family: var(--font-mono), "JetBrains Mono", monospace`）を適用すること。また、`.codeBody` には適切な `line-height`（例: `1.65`）を指定して視認性を確保する。
+
+### フッター構造
+
+フッターはメインコンテンツ (`<main>`) の末尾に配置し、中央寄せと等幅フォントを適用する。
+
+```css
+.pageFooter {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 40px 56px 80px;
+  color: var(--text-tertiary);
+  font-size: 12.5px;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  line-height: 1.8;
+  background: #050b12;
+}
+```
+
+### TOC nav とスクロール自動追従 (Intersection Observer)
+
+スクロールに応じて目次（TOC）のアクティブ項目をハイライトするIntersection Observerを導入する場合、`page.tsx` を `'use client'` 化してはいけない（Next.js App Routerの仕様により `metadata` がエクスポートできなくなるため）。
+
+**推奨設計パターン**:
+1. 同一ディレクトリ内に `TocObserver.tsx` という軽量クライアントコンポーネントを新規作成する。
+2. `TocObserver` 内で `useEffect` と `IntersectionObserver` を用いて、各 `.chapter` の交差判定を行い、TOCリンクに対して直接 `classList.add(styles.tocLinkActive)` / `classList.remove(styles.tocLinkActive)` を操作する。
+3. サーバーコンポーネントである `page.tsx` から `TocObserver` をインポートし、レイアウト内に配置する。これにより、`metadata` 静的エクスポートの維持とスクロール追従機能の両立が可能になる。
 
 ```tsx
-<nav className={styles.toc}>
-  <div className={styles.tocTitle}>目次</div>
-  {TOC_ITEMS.map((item) => (
-    <a key={item.id} href={`#${item.id}`}>{item.label}</a>
-  ))}
-</nav>
+// TocObserver.tsx
+"use client";
+import { useEffect } from "react";
+import styles from "./page.module.css";
+
+export default function TocObserver() {
+  useEffect(() => {
+    const sections = document.querySelectorAll("section.chapter");
+    const links = Array.from(document.querySelectorAll(`.${styles.tocLink}`));
+    if (links.length > 0) links[0].classList.add(styles.tocLinkActive);
+
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          for (const l of links) {
+            if (l.getAttribute("href") === `#${id}`) {
+              l.classList.add(styles.tocLinkActive);
+            } else {
+              l.classList.remove(styles.tocLinkActive);
+            }
+          }
+        }
+      }
+    }, { rootMargin: "-15% 0px -70% 0px", threshold: 0 });
+
+    for (const sec of sections) observer.observe(sec);
+    return () => observer.disconnect();
+  }, []);
+  return null;
+}
 ```
 
 ### CSS Module 複合クラス
@@ -310,3 +364,5 @@ cd web-next && bun run build && bun run lint && bun run test
 - **SVG に `role="img"` + `aria-label` + `<title>` を省略しない** — Biome `noSvgWithoutTitle` 違反
 - **Playwright MCP ツールを使わない** — 視覚確認はユーザーが手動で実施
 - **新規ガイドページを `legacy/` 配下に作成しない** — `web-next/app/` 側のみに作成する
+- **コードブロックやフッターの monospace フォント指定を省略しない** — `.codeBody`, `.codeLine`, `.codeBar`, `.pageFooter` には必ず等幅フォント（`font-family: var(--font-mono), ...`）を明示的に指定すること。
+- **RSC の `page.tsx` を直接クライアントコンポーネント化（'use client'）しない** — Intersection Observer 等が必要な場合は、軽量な `<TocObserver />` などに分割し、`page.tsx` 自体は Server Component のままで `metadata` 静的エクスポートができる状態を維持する。
