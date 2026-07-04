@@ -156,7 +156,7 @@ export default function Page() {
           </div>
         </div>
         <div className={styles.sidebarDivider} />
-        
+
         <nav className={styles.tocGroup}>
           <div className={styles.tocGroupLabel}>目次</div>
           <a className={styles.tocLink} href="#ch-00">
@@ -216,8 +216,14 @@ export default function Page() {
       {/* MAIN CONTENT */}
       <main className={styles.main}>
         <section className={styles.hero}>
-          <div className={styles.eyebrow}>● COMPLETE GUIDE &middot; CURSOR 2.5+ &middot; 2026年7月更新</div>
-          <h1>Cursor 完全ガイド<br />初学者のためのステップバイステップ・ベストプラクティス</h1>
+          <div className={styles.eyebrow}>
+            ● COMPLETE GUIDE &middot; CURSOR 2.5+ &middot; 2026年7月更新
+          </div>
+          <h1>
+            Cursor 完全ガイド
+            <br />
+            初学者のためのステップバイステップ・ベストプラクティス
+          </h1>
           <p className={styles.lead}>
             Cursor は VS Code をベースにした AI ネイティブなコードエディタです。本ガイドでは、
             Tab補完・Agentモード・Rules・MCP・Memories・Bugbot など Cursor の全主要機能について、
@@ -234,7 +240,9 @@ export default function Page() {
 
         {/* CHAPTER 00 */}
         <section className={styles.chapter} id="ch-00">
-          <div className={styles.chapterKicker}><span className={styles.chapterKickerLine}></span>CHAPTER 00 &middot; OVERVIEW</div>
+          <div className={styles.chapterKicker}>
+            <span className={styles.chapterKickerLine}></span>CHAPTER 00 &middot; OVERVIEW
+          </div>
           <h2 className={styles.chapterTitle}>Cursor とは何か ― 全体像をつかむ</h2>
           <p className={styles.text}>
             Cursor は、コード補完だけでなく「コードベースを理解し、自律的にタスクをこなす AI
@@ -252,7 +260,9 @@ export default function Page() {
 
           <p className={styles.text}>
             重要なのは、これらが「バラバラの機能」ではなく{" "}
-            <strong className={styles.strongText}>共通のコンテキスト層(Rules / Memories / Codebase Indexing / @ Symbols)</strong>{" "}
+            <strong className={styles.strongText}>
+              共通のコンテキスト層(Rules / Memories / Codebase Indexing / @ Symbols)
+            </strong>{" "}
             を介して連携している点です。Agentに何かを依頼するとき、その裏側では常にこのコンテキスト層が
             「どのファイルを読むべきか」「どんな規約に従うべきか」を判断しています。大規模言語モデルは補完のあいだメモリを保持しないため、Rules
             がプロンプトレベルで永続的な文脈を提供する仕組みになっています。
@@ -270,26 +280,34 @@ export default function Page() {
               </thead>
               <tbody className={styles.tbody}>
                 <tr>
-                  <td><strong className={styles.strongText}>Agent</strong></td>
+                  <td>
+                    <strong className={styles.strongText}>Agent</strong>
+                  </td>
                   <td>実装・リファクタ・バグ修正</td>
                   <td>
                     コードベースを検索し、複数ファイルを編集し、ターミナルコマンドを実行し、自律的にエラーを修正する
                   </td>
                 </tr>
                 <tr>
-                  <td><strong className={styles.strongText}>Ask</strong></td>
+                  <td>
+                    <strong className={styles.strongText}>Ask</strong>
+                  </td>
                   <td>コード変更なしの質問・調査</td>
                   <td>コードベースを検索して質問に答えるのみで、ファイルは編集しない</td>
                 </tr>
                 <tr>
-                  <td><strong className={styles.strongText}>Plan</strong></td>
+                  <td>
+                    <strong className={styles.strongText}>Plan</strong>
+                  </td>
                   <td>複雑な実装前の設計レビュー</td>
                   <td>
                     Agentがコードベースを調査し、明確化のための質問をし、レビュー可能な計画を生成する
                   </td>
                 </tr>
                 <tr>
-                  <td><strong className={styles.strongText}>Debug</strong></td>
+                  <td>
+                    <strong className={styles.strongText}>Debug</strong>
+                  </td>
                   <td>再現・原因特定が難しいバグ</td>
                   <td>再現困難なバグの原因調査に特化</td>
                 </tr>
@@ -307,7 +325,9 @@ export default function Page() {
 
         {/* CHAPTER 01 */}
         <section className={styles.chapter} id="ch-01">
-          <div className={styles.chapterKicker}><span className={styles.chapterKickerLine}></span>CHAPTER 01 &middot; GETTING STARTED</div>
+          <div className={styles.chapterKicker}>
+            <span className={styles.chapterKickerLine}></span>CHAPTER 01 &middot; GETTING STARTED
+          </div>
           <h2 className={styles.chapterTitle}>インストールとクイックスタート</h2>
           <p className={styles.text}>
             Cursor は macOS / Windows / Linux に対応しており、公式サイトからダウンロードするか、
@@ -337,21 +357,46 @@ export default function Page() {
                   />
                 </div>
                 <div className={styles.codeBody}>
-                  <div className={styles.codeLine}><span className={styles.ck}>curl</span> -fsSL https://downloads.cursor.com/keys/anysphere.asc \</div>
-                  <div className={styles.codeLine}>  | gpg --dearmor | <span className={styles.ck}>sudo tee</span> /etc/apt/keyrings/cursor.gpg &gt; /dev/null</div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.ck}>curl</span> -fsSL
+                    https://downloads.cursor.com/keys/anysphere.asc \
+                  </div>
+                  <div className={styles.codeLine}>
+                    {" "}
+                    | gpg --dearmor | <span className={styles.ck}>sudo tee</span>{" "}
+                    /etc/apt/keyrings/cursor.gpg &gt; /dev/null
+                  </div>
                   <div className={styles.codeLine} />
-                  <div className={styles.codeLine}><span className={styles.ck}>echo</span> <span className={styles.cs}>"deb [arch=amd64,arm64 signed-by=/etc/apt/keyrings/cursor.gpg] \</span></div>
-                  <div className={styles.codeLine}><span className={styles.cs}>https://downloads.cursor.com/aptrepo stable main"</span> \</div>
-                  <div className={styles.codeLine}>  | <span className={styles.ck}>sudo tee</span> /etc/apt/sources.list.d/cursor.list &gt; /dev/null</div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.ck}>echo</span>{" "}
+                    <span className={styles.cs}>
+                      "deb [arch=amd64,arm64 signed-by=/etc/apt/keyrings/cursor.gpg] \
+                    </span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.cs}>
+                      https://downloads.cursor.com/aptrepo stable main"
+                    </span>{" "}
+                    \
+                  </div>
+                  <div className={styles.codeLine}>
+                    {" "}
+                    | <span className={styles.ck}>sudo tee</span>{" "}
+                    /etc/apt/sources.list.d/cursor.list &gt; /dev/null
+                  </div>
                   <div className={styles.codeLine} />
-                  <div className={styles.codeLine}><span className={styles.ck}>sudo apt</span> update &amp;&amp; <span className={styles.ck}>sudo apt</span> install cursor</div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.ck}>sudo apt</span> update &amp;&amp;{" "}
+                    <span className={styles.ck}>sudo apt</span> install cursor
+                  </div>
                 </div>
               </div>
             </li>
             <li className={styles.stepItem}>
               <strong className={styles.stepTitle}>プロジェクトフォルダを開く</strong>
               <p className={styles.stepText}>
-                <code className={styles.inlineCode}>File &gt; Open Folder</code> でプロジェクトを開くと、Cursor
+                <code className={styles.inlineCode}>File &gt; Open Folder</code>{" "}
+                でプロジェクトを開くと、Cursor
                 はバックグラウンドで自動的にコードベースのインデックス作成を開始します。設定は不要です。
               </p>
             </li>
@@ -370,7 +415,9 @@ export default function Page() {
                 </div>
                 <div className={styles.codeBody}>
                   <div className={styles.codeLine}>このコードベースの構成を説明してください。</div>
-                  <div className={styles.codeLine}>主要なディレクトリの役割と、エントリーポイントがどこかを教えてください。</div>
+                  <div className={styles.codeLine}>
+                    主要なディレクトリの役割と、エントリーポイントがどこかを教えてください。
+                  </div>
                 </div>
               </div>
             </li>
@@ -415,7 +462,9 @@ export default function Page() {
 
         {/* CHAPTER 02 */}
         <section className={styles.chapter} id="ch-02">
-          <div className={styles.chapterKicker}><span className={styles.chapterKickerLine}></span>CHAPTER 02 &middot; TAB</div>
+          <div className={styles.chapterKicker}>
+            <span className={styles.chapterKickerLine}></span>CHAPTER 02 &middot; TAB
+          </div>
           <h2 className={styles.chapterTitle}>Tab補完 ― AIオートコンプリート</h2>
           <p className={styles.text}>
             Tab は Cursor 独自の AI
@@ -426,7 +475,8 @@ export default function Page() {
           <div className={styles.grid2}>
             <div className={styles.featureCard}>
               <div className={styles.fcTitle}>
-                <span className={styles.dot} style={{ background: "var(--accent)" }}></span>複数行の編集提案
+                <span className={styles.dot} style={{ background: "var(--accent)" }}></span>
+                複数行の編集提案
               </div>
               <p>
                 単一行の補完だけでなく、複数行の書き換え・不足しているimport文の追加・関連コード間の協調的な編集も提案できます。
@@ -434,7 +484,8 @@ export default function Page() {
             </div>
             <div className={styles.featureCard}>
               <div className={styles.fcTitle}>
-                <span className={styles.dot} style={{ background: "var(--accent-violet)" }}></span>次の編集位置へジャンプ
+                <span className={styles.dot} style={{ background: "var(--accent-violet)" }}></span>
+                次の編集位置へジャンプ
               </div>
               <p>
                 提案をTabで確定した後、もう一度Tabを押すと次に編集すべき場所へカーソルが自動でジャンプします。手動でのスクロールや移動が不要になります。
@@ -442,7 +493,8 @@ export default function Page() {
             </div>
             <div className={styles.featureCard}>
               <div className={styles.fcTitle}>
-                <span className={styles.dot} style={{ background: "var(--accent-amber)" }}></span>クロスファイル編集予測
+                <span className={styles.dot} style={{ background: "var(--accent-amber)" }}></span>
+                クロスファイル編集予測
               </div>
               <p>
                 あるファイルの変更が別のファイルの更新を必要とする場合、Tabはそれを予測します。別ファイルへジャンプ可能なときは、エディタ下部にポータルウィンドウが表示されます。
@@ -450,7 +502,8 @@ export default function Page() {
             </div>
             <div className={styles.featureCard}>
               <div className={styles.fcTitle}>
-                <span className={styles.dot} style={{ background: "var(--accent-rose)" }}></span>専用モデルで高速動作
+                <span className={styles.dot} style={{ background: "var(--accent-rose)" }}></span>
+                専用モデルで高速動作
               </div>
               <p>
                 Tab補完はCursor独自の専用モデル(Fusion系)によって処理されており、通常のチャット用モデル一覧には表示されません。低レイテンシで動作するよう最適化されています。
@@ -467,7 +520,10 @@ export default function Page() {
               </p>
             </li>
             <li className={styles.stepItem}>
-              <strong className={styles.stepTitle}><kbd className={styles.kbd}>Tab</kbd> で確定 / <kbd className={styles.kbd}>Esc</kbd> で却下</strong>
+              <strong className={styles.stepTitle}>
+                <kbd className={styles.kbd}>Tab</kbd> で確定 / <kbd className={styles.kbd}>Esc</kbd>{" "}
+                で却下
+              </strong>
               <p className={styles.stepText}>
                 提案が正しければTabキーで確定します。不要な場合はEscで却下し、自分でタイプを続けられます。
               </p>
@@ -507,9 +563,7 @@ export default function Page() {
                 <span className={styles.refDesc}>Tab completion — Cursor Docs</span>
               </li>
               <li className={styles.citeListItem}>
-                <Ext href="https://cursor.com/docs/tab/overview">
-                  cursor.com/docs/tab/overview
-                </Ext>
+                <Ext href="https://cursor.com/docs/tab/overview">cursor.com/docs/tab/overview</Ext>
                 <span className={styles.refDesc}>Tab completion overview</span>
               </li>
             </ul>
@@ -518,7 +572,9 @@ export default function Page() {
 
         {/* CHAPTER 03 */}
         <section className={styles.chapter} id="ch-03">
-          <div className={styles.chapterKicker}><span className={styles.chapterKickerLine}></span>CHAPTER 03 &middot; AGENT</div>
+          <div className={styles.chapterKicker}>
+            <span className={styles.chapterKickerLine}></span>CHAPTER 03 &middot; AGENT
+          </div>
           <h2 className={styles.chapterTitle}>Agentモード ― 自律的なコーディング</h2>
           <p className={styles.text}>
             Agent は Cursor
@@ -543,7 +599,9 @@ export default function Page() {
               </p>
             </li>
             <li className={styles.stepItem}>
-              <strong className={styles.stepTitle}><kbd className={styles.kbd}>Enter</kbd> で送信し、探索を見守る</strong>
+              <strong className={styles.stepTitle}>
+                <kbd className={styles.kbd}>Enter</kbd> で送信し、探索を見守る
+              </strong>
               <p className={styles.stepText}>
                 Agentはどのファイルを読み、どこを変更し、結果をどう検証すべきかを自分で判断してコードベースの探索を始めます。
               </p>
@@ -564,7 +622,8 @@ export default function Page() {
 
           <h3 className={styles.sectionTitle}>4つのモードの使い分け</h3>
           <p className={styles.text}>
-            Agentパネルでは <kbd className={styles.kbd}>Shift</kbd>+<kbd className={styles.kbd}>Tab</kbd>{" "}
+            Agentパネルでは <kbd className={styles.kbd}>Shift</kbd>+
+            <kbd className={styles.kbd}>Tab</kbd>{" "}
             でAgent/Plan/Ask/Debugをローテーション切り替えできます。
             複雑なタスクを検知すると、Cursorが自動でPlanモードを提案することもあります。
           </p>
@@ -624,21 +683,27 @@ export default function Page() {
           <h3 className={styles.sectionTitle}>実践パターン: テスト駆動開発(TDD)でAgentを使う</h3>
           <ol className={styles.steps}>
             <li className={styles.stepItem}>
-              <strong className={styles.stepTitle}>期待する入出力ペアに基づいてテストを書かせる</strong>
+              <strong className={styles.stepTitle}>
+                期待する入出力ペアに基づいてテストを書かせる
+              </strong>
               <p className={styles.stepText}>
                 TDDで進めていることを明示し、まだ存在しない機能に対してモック実装を作らないよう伝えます。
               </p>
             </li>
             <li className={styles.stepItem}>
               <strong className={styles.stepTitle}>テストを実行させ、失敗を確認させる</strong>
-              <p className={styles.stepText}>この段階では実装コードを書かないよう明示的に指示します。</p>
+              <p className={styles.stepText}>
+                この段階では実装コードを書かないよう明示的に指示します。
+              </p>
             </li>
             <li className={styles.stepItem}>
               <strong className={styles.stepTitle}>テストに満足したらコミットする</strong>
             </li>
             <li className={styles.stepItem}>
               <strong className={styles.stepTitle}>テストに合格する実装コードを書かせる</strong>
-              <p className={styles.stepText}>テスト自体は変更しないよう指示し、全テストが通るまで反復させます。</p>
+              <p className={styles.stepText}>
+                テスト自体は変更しないよう指示し、全テストが通るまで反復させます。
+              </p>
             </li>
           </ol>
 
@@ -675,7 +740,9 @@ export default function Page() {
 
         {/* CHAPTER 04 */}
         <section className={styles.chapter} id="ch-04">
-          <div className={styles.chapterKicker}><span className={styles.chapterKickerLine}></span>CHAPTER 04 &middot; INLINE EDIT</div>
+          <div className={styles.chapterKicker}>
+            <span className={styles.chapterKickerLine}></span>CHAPTER 04 &middot; INLINE EDIT
+          </div>
           <h2 className={styles.chapterTitle}>Inline Edit (Cmd/Ctrl+K) ― その場での即時編集</h2>
           <p className={styles.text}>
             Inline Edit は、チャットパネルを開かずにコードをその場で修正できる機能です。
@@ -689,9 +756,15 @@ export default function Page() {
               <p className={styles.stepText}>関数・ブロック・1行など、任意の範囲を選択します。</p>
             </li>
             <li className={styles.stepItem}>
-              <strong className={styles.stepTitle}><kbd className={styles.kbd}>Cmd</kbd>+<kbd className={styles.kbd}>K</kbd>(Mac)/ <kbd className={styles.kbd}>Ctrl</kbd>+<kbd className={styles.kbd}>K</kbd>(Win/Linux)を押す</strong>
+              <strong className={styles.stepTitle}>
+                <kbd className={styles.kbd}>Cmd</kbd>+<kbd className={styles.kbd}>K</kbd>(Mac)/{" "}
+                <kbd className={styles.kbd}>Ctrl</kbd>+<kbd className={styles.kbd}>K</kbd>
+                (Win/Linux)を押す
+              </strong>
               <p className={styles.stepText}>インライン入力欄が開きます。</p>
-              <div className={styles.kbdRow}><kbd className={styles.kbd}>⌘</kbd>+<kbd className={styles.kbd}>K</kbd></div>
+              <div className={styles.kbdRow}>
+                <kbd className={styles.kbd}>⌘</kbd>+<kbd className={styles.kbd}>K</kbd>
+              </div>
             </li>
             <li className={styles.stepItem}>
               <strong className={styles.stepTitle}>指示を入力してEnter</strong>
@@ -709,14 +782,16 @@ export default function Page() {
               <strong className={styles.stepTitle}>より複雑な変更はChatへ</strong>
               <p className={styles.stepText}>
                 複数ファイルにまたがる変更や大きめの修正が必要になった場合は、コードを選択して{" "}
-                <kbd className={styles.kbd}>Cmd</kbd>/<kbd className={styles.kbd}>Ctrl</kbd>+<kbd className={styles.kbd}>L</kbd>{" "}
+                <kbd className={styles.kbd}>Cmd</kbd>/<kbd className={styles.kbd}>Ctrl</kbd>+
+                <kbd className={styles.kbd}>L</kbd>{" "}
                 でChatパネルへエスカレーションするのが自然な流れです。
               </p>
             </li>
             <li className={styles.stepItem}>
               <strong className={styles.stepTitle}>ターミナルでもInline Editを使う</strong>
               <p className={styles.stepText}>
-                ターミナル内で <kbd className={styles.kbd}>Ctrl</kbd>+<kbd className={styles.kbd}>K</kbd>{" "}
+                ターミナル内で <kbd className={styles.kbd}>Ctrl</kbd>+
+                <kbd className={styles.kbd}>K</kbd>{" "}
                 を押すと下部にプロンプトバーが開き、やりたい操作を説明するだけでコマンドを生成してくれます。直近のターミナル履歴も文脈として利用されます。
               </p>
             </li>
@@ -742,10 +817,10 @@ export default function Page() {
                 <span className={styles.refDesc}>Inline edit — Cursor Docs</span>
               </li>
               <li className={styles.citeListItem}>
-                <Ext href="https://cursor.com/docs/rules.md">
-                  cursor.com/docs/rules.md
-                </Ext>
-                <span className={styles.refDesc}>Rules — FAQ (User Rules と Inline Edit の関係)</span>
+                <Ext href="https://cursor.com/docs/rules.md">cursor.com/docs/rules.md</Ext>
+                <span className={styles.refDesc}>
+                  Rules — FAQ (User Rules と Inline Edit の関係)
+                </span>
               </li>
             </ul>
           </div>
@@ -753,12 +828,13 @@ export default function Page() {
 
         {/* CHAPTER 05 */}
         <section className={styles.chapter} id="ch-05">
-          <div className={styles.chapterKicker}><span className={styles.chapterKickerLine}></span>CHAPTER 05 &middot; CONTEXT</div>
+          <div className={styles.chapterKicker}>
+            <span className={styles.chapterKickerLine}></span>CHAPTER 05 &middot; CONTEXT
+          </div>
           <h2 className={styles.chapterTitle}>コンテキスト管理 ― @ Symbols とコードベース検索</h2>
           <p className={styles.text}>
             AIエージェントの回答品質は「どれだけ正確なコンテキストを渡せるか」に大きく左右されます。
-            Cursorは{" "}
-            <code className={styles.inlineCode}>@</code>{" "}
+            Cursorは <code className={styles.inlineCode}>@</code>{" "}
             記号によるコンテキスト参照と、自動的なコードベースインデックス作成(セマンティック検索)を組み合わせることで、
             大規模なコードベースでも正確に目的のコードへたどり着けるよう設計されています。
           </p>
@@ -774,43 +850,63 @@ export default function Page() {
               </thead>
               <tbody className={styles.tbody}>
                 <tr>
-                  <td><code>@Files &amp; Folders</code></td>
+                  <td>
+                    <code>@Files &amp; Folders</code>
+                  </td>
                   <td>特定のファイル・フォルダをコンテキストとして明示的に指定する</td>
                 </tr>
                 <tr>
-                  <td><code>@Code</code></td>
+                  <td>
+                    <code>@Code</code>
+                  </td>
                   <td>特定の関数やコードシンボルを参照する</td>
                 </tr>
                 <tr>
-                  <td><code>@Docs</code></td>
+                  <td>
+                    <code>@Docs</code>
+                  </td>
                   <td>外部ドキュメント(ライブラリ公式ドキュメント等)を参照する</td>
                 </tr>
                 <tr>
-                  <td><code>@Git</code></td>
+                  <td>
+                    <code>@Git</code>
+                  </td>
                   <td>コミット・ブランチ・PRなどGit情報を参照する</td>
                 </tr>
                 <tr>
-                  <td><code>@Past Chats</code></td>
+                  <td>
+                    <code>@Past Chats</code>
+                  </td>
                   <td>過去の会話履歴を参照する</td>
                 </tr>
                 <tr>
-                  <td><code>@Cursor Rules</code></td>
+                  <td>
+                    <code>@Cursor Rules</code>
+                  </td>
                   <td>特定のルールをチャットに手動で適用する</td>
                 </tr>
                 <tr>
-                  <td><code>@Web</code></td>
+                  <td>
+                    <code>@Web</code>
+                  </td>
                   <td>Web検索結果をコンテキストに含める</td>
                 </tr>
                 <tr>
-                  <td><code>@Link</code></td>
+                  <td>
+                    <code>@Link</code>
+                  </td>
                   <td>URLを指定してページ内容(PDF含む)を取り込む</td>
                 </tr>
                 <tr>
-                  <td><code>@Recent Changes</code></td>
+                  <td>
+                    <code>@Recent Changes</code>
+                  </td>
                   <td>直近の変更差分を参照する</td>
                 </tr>
                 <tr>
-                  <td><code>@Linter Errors</code></td>
+                  <td>
+                    <code>@Linter Errors</code>
+                  </td>
                   <td>現在のリンターエラーを参照する</td>
                 </tr>
               </tbody>
@@ -831,16 +927,20 @@ export default function Page() {
           </div>
 
           <p className={styles.text}>
-            Cursorは正確な文字列一致にはCursor独自の高速検索エンジン「Instant
-            Grep」を、意味ベース of 検索にはセマンティック検索を、
+            Cursorは正確な文字列一致にはCursor独自の高速検索エンジン「Instant Grep」を、意味ベース
+            of 検索にはセマンティック検索を、
             それぞれ状況に応じて自動的に使い分けます。研究によれば、grepとセマンティック検索を組み合わせることで、grep単体と比較して
             コードベースに関する質問への回答精度が平均12.5%向上し、1,000ファイル超の大規模コードベースほどその効果は大きくなります。
           </p>
 
-          <h3 className={styles.sectionTitle}>ステップバイステップ: 大規模コードベースを効率よく探索する</h3>
+          <h3 className={styles.sectionTitle}>
+            ステップバイステップ: 大規模コードベースを効率よく探索する
+          </h3>
           <ol className={styles.steps}>
             <li className={styles.stepItem}>
-              <strong className={styles.stepTitle}>関数名や変数名が分かっているなら、それを明言する</strong>
+              <strong className={styles.stepTitle}>
+                関数名や変数名が分かっているなら、それを明言する
+              </strong>
               <p className={styles.stepText}>
                 「processOrder
                 の呼び出し元をすべて見つけて」のように具体的なターゲットを与えると、Agentは正確なgrepパターンを構築できます。
@@ -861,13 +961,17 @@ export default function Page() {
               </p>
             </li>
             <li className={styles.stepItem}>
-              <strong className={styles.stepTitle}>探索結果が膨大になりそうならSubagentに任せる</strong>
+              <strong className={styles.stepTitle}>
+                探索結果が膨大になりそうならSubagentに任せる
+              </strong>
               <p className={styles.stepText}>
                 多数のファイルを横断検索するとコンテキストを大量に消費します。Subagent(第8章参照)は結果を要約して返すため、メインの会話をすっきり保てます。
               </p>
             </li>
             <li className={styles.stepItem}>
-              <strong className={styles.stepTitle}>不明瞭なコードベースはMermaid図で可視化させる</strong>
+              <strong className={styles.stepTitle}>
+                不明瞭なコードベースはMermaid図で可視化させる
+              </strong>
               <p className={styles.stepText}>
                 「認証システムのデータフローを、OAuthプロバイダ・セッション管理・トークンリフレッシュを含めてMermaid図で示して」のように依頼すると、オンボーディングや設計レビューに使えるアーキテクチャ図を生成してくれます。
               </p>
@@ -917,7 +1021,9 @@ export default function Page() {
 
         {/* CHAPTER 06 */}
         <section className={styles.chapter} id="ch-06">
-          <div className={styles.chapterKicker}><span className={styles.chapterKickerLine}></span>CHAPTER 06 &middot; RULES</div>
+          <div className={styles.chapterKicker}>
+            <span className={styles.chapterKickerLine}></span>CHAPTER 06 &middot; RULES
+          </div>
           <h2 className={styles.chapterTitle}>Rules ― 永続的な指示をAgentに与える</h2>
           <p className={styles.text}>
             大規模言語モデルは補完と補完のあいだで記憶を保持しません。Rulesは、プロンプトレベルで
@@ -937,28 +1043,48 @@ export default function Page() {
               </thead>
               <tbody className={styles.tbody}>
                 <tr>
-                  <td><strong className={styles.strongText}>Project Rules</strong></td>
-                  <td><code>.cursor/rules/*.mdc</code></td>
+                  <td>
+                    <strong className={styles.strongText}>Project Rules</strong>
+                  </td>
+                  <td>
+                    <code>.cursor/rules/*.mdc</code>
+                  </td>
                   <td>バージョン管理され、コードベースにスコープされる</td>
-                  <td><span className={`${styles.badge} styles.badgeFree`}>全プラン</span></td>
+                  <td>
+                    <span className={`${styles.badge} styles.badgeFree`}>全プラン</span>
+                  </td>
                 </tr>
                 <tr>
-                  <td><strong className={styles.strongText}>User Rules</strong></td>
+                  <td>
+                    <strong className={styles.strongText}>User Rules</strong>
+                  </td>
                   <td>Cursor環境全体(グローバル)</td>
                   <td>Agent(Chat)のみに適用、全プロジェクト共通</td>
-                  <td><span className={`${styles.badge} styles.badgeFree`}>全プラン</span></td>
+                  <td>
+                    <span className={`${styles.badge} styles.badgeFree`}>全プラン</span>
+                  </td>
                 </tr>
                 <tr>
-                  <td><strong className={styles.strongText}>Team Rules</strong></td>
+                  <td>
+                    <strong className={styles.strongText}>Team Rules</strong>
+                  </td>
                   <td>ダッシュボードで管理</td>
                   <td>チーム全体、全リポジトリに適用</td>
-                  <td><span className={`${styles.badge} styles.badgeTeam`}>Team/Enterprise</span></td>
+                  <td>
+                    <span className={`${styles.badge} styles.badgeTeam`}>Team/Enterprise</span>
+                  </td>
                 </tr>
                 <tr>
-                  <td><strong className={styles.strongText}>AGENTS.md</strong></td>
+                  <td>
+                    <strong className={styles.strongText}>AGENTS.md</strong>
+                  </td>
                   <td>プロジェクトルート</td>
-                  <td><code>.cursor/rules</code>のシンプルな代替。素のMarkdownで記述可</td>
-                  <td><span className={`${styles.badge} styles.badgeFree`}>全プラン</span></td>
+                  <td>
+                    <code>.cursor/rules</code>のシンプルな代替。素のMarkdownで記述可
+                  </td>
+                  <td>
+                    <span className={`${styles.badge} styles.badgeFree`}>全プラン</span>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -966,14 +1092,17 @@ export default function Page() {
 
           <p className={styles.text}>
             複数のルールが適用される場合の優先順位は{" "}
-            <strong className={styles.strongText}>Team Rules → Project Rules → User Rules</strong> の順です。
+            <strong className={styles.strongText}>Team Rules → Project Rules → User Rules</strong>{" "}
+            の順です。
             該当するすべてのルールがマージされ、内容が競合する場合は前者(より上位のもの)が優先されます。
           </p>
 
           <h3 className={styles.sectionTitle}>ステップバイステップ: Project Ruleを作成する</h3>
           <ol className={styles.steps}>
             <li className={styles.stepItem}>
-              <strong className={styles.stepTitle}><code>.cursor/rules/</code> ディレクトリにファイルを作成</strong>
+              <strong className={styles.stepTitle}>
+                <code>.cursor/rules/</code> ディレクトリにファイルを作成
+              </strong>
               <p className={styles.stepText}>
                 拡張子は必ず <code>.mdc</code> にします。プレーンな{" "}
                 <code className={styles.inlineCode}>.md</code>{" "}
@@ -989,10 +1118,20 @@ export default function Page() {
                 </div>
                 <div className={styles.codeBody}>
                   <div className={styles.codeLine}>.cursor/rules/</div>
-                  <div className={styles.codeLine}>  react-patterns.mdc     <span className={styles.cc}># 正しく認識される</span></div>
-                  <div className={styles.codeLine}>  api-guidelines.md      <span className={styles.cc}># 拡張子が違うため無視される</span></div>
-                  <div className={styles.codeLine}>  frontend/</div>
-                  <div className={styles.codeLine}>    components.mdc       <span className={styles.cc}># フォルダで整理も可能</span></div>
+                  <div className={styles.codeLine}>
+                    {" "}
+                    react-patterns.mdc <span className={styles.cc}># 正しく認識される</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {" "}
+                    api-guidelines.md{" "}
+                    <span className={styles.cc}># 拡張子が違うため無視される</span>
+                  </div>
+                  <div className={styles.codeLine}> frontend/</div>
+                  <div className={styles.codeLine}>
+                    {" "}
+                    components.mdc <span className={styles.cc}># フォルダで整理も可能</span>
+                  </div>
                 </div>
               </div>
             </li>
@@ -1006,7 +1145,9 @@ export default function Page() {
               </p>
             </li>
             <li className={styles.stepItem}>
-              <strong className={styles.stepTitle}>本文にはコマンド・規約・参照先を簡潔に書く</strong>
+              <strong className={styles.stepTitle}>
+                本文にはコマンド・規約・参照先を簡潔に書く
+              </strong>
               <p className={styles.stepText}>
                 ファイルの内容を丸ごとコピーするのではなく、正規のコード例へのポインタを記載するのがコツです。こうすることでルールが短く保たれ、コードが変わってもルールが陳腐化しにくくなります。
               </p>
@@ -1019,27 +1160,52 @@ export default function Page() {
                   />
                 </div>
                 <div className={styles.codeBody}>
-                  <div className={styles.codeLine}><span className={styles.ch}># Commands</span></div>
-                  <div className={styles.codeLine}>- <span className={styles.ce}>`npm run build`</span>: プロジェクトをビルド</div>
-                  <div className={styles.codeLine}>- <span className={styles.ce}>`npm run typecheck`</span>: 型チェックを実行</div>
-                  <div className={styles.codeLine}>- <span className={styles.ce}>`npm run test`</span>: テストを実行(高速化のため単一ファイル指定を推奨)</div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.ch}># Commands</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    - <span className={styles.ce}>`npm run build`</span>: プロジェクトをビルド
+                  </div>
+                  <div className={styles.codeLine}>
+                    - <span className={styles.ce}>`npm run typecheck`</span>: 型チェックを実行
+                  </div>
+                  <div className={styles.codeLine}>
+                    - <span className={styles.ce}>`npm run test`</span>:
+                    テストを実行(高速化のため単一ファイル指定を推奨)
+                  </div>
                   <div className={styles.codeLine} />
-                  <div className={styles.codeLine}><span className={styles.ch}># Code style</span></div>
-                  <div className={styles.codeLine}>- ES modules (import/export) を使用し、CommonJS (require) は使わない</div>
-                  <div className={styles.codeLine}>- 可能な限り分割代入でimportする: <span className={styles.cs}>`import {'{ foo }'} from 'bar'`</span></div>
-                  <div className={styles.codeLine}>- 正規のコンポーネント構造は <span className={styles.cs}>`components/Button.tsx`</span> を参照</div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.ch}># Code style</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    - ES modules (import/export) を使用し、CommonJS (require) は使わない
+                  </div>
+                  <div className={styles.codeLine}>
+                    - 可能な限り分割代入でimportする:{" "}
+                    <span className={styles.cs}>`import {"{ foo }"} from 'bar'`</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    - 正規のコンポーネント構造は{" "}
+                    <span className={styles.cs}>`components/Button.tsx`</span> を参照
+                  </div>
                   <div className={styles.codeLine} />
-                  <div className={styles.codeLine}><span className={styles.ch}># Workflow</span></div>
-                  <div className={styles.codeLine}>- 一連のコード変更後は必ず型チェックを実行する</div>
-                  <div className={styles.codeLine}>- APIルートは既存パターンに従い <span className={styles.cs}>`app/api/`</span> に配置する</div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.ch}># Workflow</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    - 一連のコード変更後は必ず型チェックを実行する
+                  </div>
+                  <div className={styles.codeLine}>
+                    - APIルートは既存パターンに従い <span className={styles.cs}>`app/api/`</span>{" "}
+                    に配置する
+                  </div>
                 </div>
               </div>
             </li>
             <li className={styles.stepItem}>
               <strong className={styles.stepTitle}>他ファイルを参照する</strong>
               <p className={styles.stepText}>
-                ルール内で{" "}
-                <code className={styles.inlineCode}>@filename.ts</code>{" "}
+                ルール内で <code className={styles.inlineCode}>@filename.ts</code>{" "}
                 と書くとそのファイルをコンテキストに含められます。チャット内で特定のルールを手動適用したい場合も{" "}
                 <code className={styles.inlineCode}>@</code> でルール名をメンションします。
               </p>
@@ -1048,7 +1214,8 @@ export default function Page() {
               <strong className={styles.stepTitle}>Agentにミスから学ばせる</strong>
               <p className={styles.stepText}>
                 Agentが間違いを犯したら、その都度ルールを更新します。GitHub上のissueやPRで{" "}
-                <code className={styles.inlineCode}>@cursor</code> をタグ付けし、Agent自身にルールを更新させることも可能です。
+                <code className={styles.inlineCode}>@cursor</code>{" "}
+                をタグ付けし、Agent自身にルールを更新させることも可能です。
               </p>
             </li>
           </ol>
@@ -1059,7 +1226,9 @@ export default function Page() {
               <strong className={styles.stepTitle}>Cursor Settings → Rules, Commands を開く</strong>
             </li>
             <li className={styles.stepItem}>
-              <strong className={styles.stepTitle}>Project Rules 横の「+ Add Rule」から「Remote Rule (GitHub)」を選択</strong>
+              <strong className={styles.stepTitle}>
+                Project Rules 横の「+ Add Rule」から「Remote Rule (GitHub)」を選択
+              </strong>
             </li>
             <li className={styles.stepItem}>
               <strong className={styles.stepTitle}>対象GitHubリポジトリのURLを貼り付ける</strong>
@@ -1072,11 +1241,10 @@ export default function Page() {
           <div className={`${styles.callout} ${styles.warn}`}>
             <div className={styles.calloutTitle}>⚠️ .cursorrules はレガシー</div>
             <p className={styles.calloutText}>
-              プロジェクトルート直下の{" "}
-              <code className={styles.inlineCode}>.cursorrules</code>{" "}
+              プロジェクトルート直下の <code className={styles.inlineCode}>.cursorrules</code>{" "}
               ファイルはレガシー形式であり、将来的に廃止予定です。コマンドパレットから「New Cursor
-              Rule」を実行して{" "}
-              <code className={styles.inlineCode}>.cursor/rules/*.mdc</code> 形式に移行することが推奨されています。
+              Rule」を実行して <code className={styles.inlineCode}>.cursor/rules/*.mdc</code>{" "}
+              形式に移行することが推奨されています。
             </p>
           </div>
 
@@ -1091,15 +1259,11 @@ export default function Page() {
             <div className={styles.calloutTitle}>📚 この章の参照元</div>
             <ul className={styles.citeList}>
               <li className={styles.citeListItem}>
-                <Ext href="https://cursor.com/docs/rules">
-                  cursor.com/docs/rules
-                </Ext>
+                <Ext href="https://cursor.com/docs/rules">cursor.com/docs/rules</Ext>
                 <span className={styles.refDesc}>Rules — Cursor Docs</span>
               </li>
               <li className={styles.citeListItem}>
-                <Ext href="https://cursor.com/docs/rules.md">
-                  cursor.com/docs/rules.md
-                </Ext>
+                <Ext href="https://cursor.com/docs/rules.md">cursor.com/docs/rules.md</Ext>
                 <span className={styles.refDesc}>Rules — 詳細仕様とFAQ</span>
               </li>
               <li className={styles.citeListItem}>
@@ -1114,11 +1278,19 @@ export default function Page() {
 
         {/* CHAPTER 07 */}
         <section className={styles.chapter} id="ch-07">
-          <div className={styles.chapterKicker}><span className={styles.chapterKickerLine}></span>CHAPTER 07 &middot; SKILLS &amp; SUBAGENTS</div>
+          <div className={styles.chapterKicker}>
+            <span className={styles.chapterKickerLine}></span>CHAPTER 07 &middot; SKILLS &amp;
+            SUBAGENTS
+          </div>
           <h2 className={styles.chapterTitle}>Skills / Subagents / Hooks ― 動的な拡張機構</h2>
           <p className={styles.text}>
-            RulesとSkillsは似て非なるものです。<strong className={styles.strongText}>Rulesは常時有効な静的コンテキスト</strong>である一方、
-            <strong className={styles.strongText}>Skillsは関連性があると判断されたときにだけ動的に読み込まれる能力</strong>です。
+            RulesとSkillsは似て非なるものです。
+            <strong className={styles.strongText}>Rulesは常時有効な静的コンテキスト</strong>
+            である一方、
+            <strong className={styles.strongText}>
+              Skillsは関連性があると判断されたときにだけ動的に読み込まれる能力
+            </strong>
+            です。
             この違いにより、コンテキストウィンドウを圧迫せずに専門知識をAgentへ持たせることができます。
           </p>
 
@@ -1130,14 +1302,22 @@ export default function Page() {
           </div>
 
           <h3 className={styles.sectionTitle}>Skills(スキル)</h3>
-          <p className={styles.text}>SkillsはSKILL.mdファイルで定義され、以下を含めることができます。</p>
+          <p className={styles.text}>
+            SkillsはSKILL.mdファイルで定義され、以下を含めることができます。
+          </p>
           <ul className={styles.list}>
             <li className={styles.listItem}>
               <strong className={styles.strongText}>カスタムコマンド</strong> — Agent入力欄で{" "}
               <code className={styles.inlineCode}>/</code> から呼び出せる再利用可能なワークフロー
             </li>
-            <li className={styles.listItem}><strong className={styles.strongText}>フック</strong> — Agentのアクション前後に実行されるスクリプト</li>
-            <li className={styles.listItem}><strong className={styles.strongText}>ドメイン知識</strong> — 特定タスクのためにオンデマンドで参照される指示</li>
+            <li className={styles.listItem}>
+              <strong className={styles.strongText}>フック</strong> —
+              Agentのアクション前後に実行されるスクリプト
+            </li>
+            <li className={styles.listItem}>
+              <strong className={styles.strongText}>ドメイン知識</strong> —
+              特定タスクのためにオンデマンドで参照される指示
+            </li>
           </ul>
           <p className={styles.text}>
             スキルとフックを組み合わせることで、セキュリティツール・シークレット管理・オブザーバビリティ基盤との連携も可能になり、
@@ -1146,17 +1326,21 @@ export default function Page() {
 
           <h3 className={styles.sectionTitle}>Subagents(サブエージェント)</h3>
           <p className={styles.text}>
-            Cursorには{" "}
-            <code className={styles.inlineCode}>explore</code>{" "}
-            (コードベース検索)・<code className={styles.inlineCode}>bash</code>(シェル実行)・<code className={styles.inlineCode}>browser</code>(MCP経由のブラウザ自動化)という
+            Cursorには <code className={styles.inlineCode}>explore</code> (コードベース検索)・
+            <code className={styles.inlineCode}>bash</code>(シェル実行)・
+            <code className={styles.inlineCode}>browser</code>(MCP経由のブラウザ自動化)という
             3つの組み込みSubagentがあり、コンテキストを大量消費する処理を自動的に肩代わりします。設定は不要です。
           </p>
 
           <h4 className={styles.subSectionTitle}>ステップバイステップ: カスタムSubagentを作る</h4>
           <ol className={styles.steps}>
             <li className={styles.stepItem}>
-              <strong className={styles.stepTitle}><code>.cursor/agents/</code> にYAML frontmatter付きファイルを作成</strong>
-              <p className={styles.stepText}><code>name</code> と <code>description</code> を必須で定義します。</p>
+              <strong className={styles.stepTitle}>
+                <code>.cursor/agents/</code> にYAML frontmatter付きファイルを作成
+              </strong>
+              <p className={styles.stepText}>
+                <code>name</code> と <code>description</code> を必須で定義します。
+              </p>
               <div className={styles.codeWrap}>
                 <div className={styles.codeBar}>
                   <span>markdown — .cursor/agents/verifier.md</span>
@@ -1166,14 +1350,33 @@ export default function Page() {
                   />
                 </div>
                 <div className={styles.codeBody}>
-                  <div className={styles.codeLine}><span className={styles.cs}>---</span></div>
-                  <div className={styles.codeLine}><span className={styles.cm}>name</span>: verifier</div>
-                  <div className={styles.codeLine}><span className={styles.cm}>description</span>: 完了した作業を検証する。実装が機能しているか確認し、</div>
-                  <div className={styles.codeLine}>  テストを実行し、合否を報告する。「use proactively」を含めると自動委譲されやすくなる。</div>
-                  <div className={styles.codeLine}><span className={styles.cm}>model</span>: gpt-5.5</div>
-                  <div className={styles.codeLine}><span className={styles.cs}>---</span></div>
-                  <div className={styles.codeLine}>完了した実装を検証してください。テストを実行し、</div>
-                  <div className={styles.codeLine}>何が合格し、何が未完了かを具体的に報告してください。</div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.cs}>---</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.cm}>name</span>: verifier
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.cm}>description</span>:
+                    完了した作業を検証する。実装が機能しているか確認し、
+                  </div>
+                  <div className={styles.codeLine}>
+                    {" "}
+                    テストを実行し、合否を報告する。「use
+                    proactively」を含めると自動委譲されやすくなる。
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.cm}>model</span>: gpt-5.5
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.cs}>---</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    完了した実装を検証してください。テストを実行し、
+                  </div>
+                  <div className={styles.codeLine}>
+                    何が合格し、何が未完了かを具体的に報告してください。
+                  </div>
                 </div>
               </div>
             </li>
@@ -1181,12 +1384,15 @@ export default function Page() {
               <strong className={styles.stepTitle}>descriptionフィールドを練り込む</strong>
               <p className={styles.stepText}>
                 Agentがどのタイミングでこのサブエージェントに委譲するかは{" "}
-                <code className={styles.inlineCode}>description</code> の内容で決まります。「use proactively」「always use
+                <code className={styles.inlineCode}>description</code> の内容で決まります。「use
+                proactively」「always use
                 for」のようなフレーズを含めると自動委譲が促進されます。実際にプロンプトを試し、意図通りのSubagentが起動するか検証しましょう。
               </p>
             </li>
             <li className={styles.stepItem}>
-              <strong className={styles.stepTitle}><code>/名前</code> で明示的に呼び出す</strong>
+              <strong className={styles.stepTitle}>
+                <code>/名前</code> で明示的に呼び出す
+              </strong>
               <div className={styles.codeWrap}>
                 <div className={styles.codeBar}>
                   <span>プロンプト例</span>
@@ -1196,9 +1402,13 @@ export default function Page() {
                   />
                 </div>
                 <div className={styles.codeBody}>
-                  <div className={styles.codeLine}>/verifier 認証フローが完成しているか確認して</div>
+                  <div className={styles.codeLine}>
+                    /verifier 認証フローが完成しているか確認して
+                  </div>
                   <div className={styles.codeLine}>/debugger このエラーを調査して</div>
-                  <div className={styles.codeLine}>/security-auditor 決済モジュールをレビューして</div>
+                  <div className={styles.codeLine}>
+                    /security-auditor 決済モジュールをレビューして
+                  </div>
                 </div>
               </div>
             </li>
@@ -1215,7 +1425,9 @@ export default function Page() {
               </p>
             </li>
             <li className={styles.stepItem}>
-              <strong className={styles.stepTitle}><code>.cursor/agents/</code> をバージョン管理する</strong>
+              <strong className={styles.stepTitle}>
+                <code>.cursor/agents/</code> をバージョン管理する
+              </strong>
               <p className={styles.stepText}>
                 リポジトリにコミットすることでチーム全体がカスタムSubagentの恩恵を受けられます。
               </p>
@@ -1233,28 +1445,26 @@ export default function Page() {
             <div className={styles.calloutTitle}>📚 この章の参照元</div>
             <ul className={styles.citeList}>
               <li className={styles.citeListItem}>
-                <Ext href="https://cursor.com/docs/subagents">
-                  cursor.com/docs/subagents
-                </Ext>
+                <Ext href="https://cursor.com/docs/subagents">cursor.com/docs/subagents</Ext>
                 <span className={styles.refDesc}>Subagents — Cursor Docs</span>
               </li>
               <li className={styles.citeListItem}>
-                <Ext href="https://cursor.com/docs/hooks">
-                  cursor.com/docs/hooks
-                </Ext>
+                <Ext href="https://cursor.com/docs/hooks">cursor.com/docs/hooks</Ext>
                 <span className={styles.refDesc}>Hooks — Cursor Docs</span>
               </li>
               <li className={styles.citeListItem}>
                 <Ext href="https://cursor.com/blog/agent-best-practices">
                   cursor.com/blog/agent-best-practices
                 </Ext>
-                <span className={styles.refDesc}>Best practices for coding with agents(Skills章)</span>
+                <span className={styles.refDesc}>
+                  Best practices for coding with agents(Skills章)
+                </span>
               </li>
               <li className={styles.citeListItem}>
-                <Ext href="https://cursor.com/changelog/2-5">
-                  cursor.com/changelog/2-5
-                </Ext>
-                <span className={styles.refDesc}>Plugins, Sandbox Access Controls, and Async Subagents</span>
+                <Ext href="https://cursor.com/changelog/2-5">cursor.com/changelog/2-5</Ext>
+                <span className={styles.refDesc}>
+                  Plugins, Sandbox Access Controls, and Async Subagents
+                </span>
               </li>
             </ul>
           </div>
@@ -1262,7 +1472,9 @@ export default function Page() {
 
         {/* CHAPTER 08 */}
         <section className={styles.chapter} id="ch-08">
-          <div className={styles.chapterKicker}><span className={styles.chapterKickerLine}></span>CHAPTER 08 &middot; MEMORIES</div>
+          <div className={styles.chapterKicker}>
+            <span className={styles.chapterKickerLine}></span>CHAPTER 08 &middot; MEMORIES
+          </div>
           <h2 className={styles.chapterTitle}>Memories ― 会話から自動で学習する記憶機能</h2>
           <p className={styles.text}>
             Memoriesは、会話の中からCursorが事実を自動的に記憶し、以降の会話で参照できるようにする機能です。
@@ -1273,7 +1485,8 @@ export default function Page() {
             <li className={styles.stepItem}>
               <strong className={styles.stepTitle}>設定を開く</strong>
               <p className={styles.stepText}>
-                <kbd className={styles.kbd}>Cmd</kbd>/<kbd className={styles.kbd}>Ctrl</kbd>+<kbd className={styles.kbd}>Shift</kbd>+<kbd className={styles.kbd}>J</kbd> でCursor
+                <kbd className={styles.kbd}>Cmd</kbd>/<kbd className={styles.kbd}>Ctrl</kbd>+
+                <kbd className={styles.kbd}>Shift</kbd>+<kbd className={styles.kbd}>J</kbd> でCursor
                 Settingsを開き、Rulesタブ内のMemoriesセクションを確認します。
               </p>
             </li>
@@ -1302,9 +1515,7 @@ export default function Page() {
             <div className={styles.calloutTitle}>📚 この章の参照元</div>
             <ul className={styles.citeList}>
               <li className={styles.citeListItem}>
-                <Ext href="https://cursor.com/changelog/1-0">
-                  cursor.com/changelog/1-0
-                </Ext>
+                <Ext href="https://cursor.com/changelog/1-0">cursor.com/changelog/1-0</Ext>
                 <span className={styles.refDesc}>
                   Bugbot, Background Agent access to everyone, and one-click MCP
                   install(Memories初出のリリースノート)
@@ -1316,7 +1527,9 @@ export default function Page() {
 
         {/* CHAPTER 09 */}
         <section className={styles.chapter} id="ch-09">
-          <div className={styles.chapterKicker}><span className={styles.chapterKickerLine}></span>CHAPTER 09 &middot; MCP</div>
+          <div className={styles.chapterKicker}>
+            <span className={styles.chapterKickerLine}></span>CHAPTER 09 &middot; MCP
+          </div>
           <h2 className={styles.chapterTitle}>Model Context Protocol (MCP) ― 外部ツール連携</h2>
           <p className={styles.text}>
             MCPは、CursorのAgentを外部ツール・データソースに接続するオープンな規格です。
@@ -1371,7 +1584,9 @@ export default function Page() {
               </p>
             </li>
             <li className={styles.stepItem}>
-              <strong className={styles.stepTitle}><code>mcp.json</code> に設定を書く</strong>
+              <strong className={styles.stepTitle}>
+                <code>mcp.json</code> に設定を書く
+              </strong>
               <div className={styles.codeWrap}>
                 <div className={styles.codeBar}>
                   <span>json — stdioサーバーの例(Node.js)</span>
@@ -1381,18 +1596,55 @@ export default function Page() {
                   />
                 </div>
                 <div className={styles.codeBody}>
-                  <div className={styles.codeLine}><span className={styles.cs}>{"{"}</span></div>
-                  <div className={styles.codeLine}>  <span className={styles.cm}>"mcpServers"</span>: <span className={styles.cs}>{"{"}</span></div>
-                  <div className={styles.codeLine}>    <span className={styles.cm}>"postgres"</span>: <span className={styles.cs}>{"{"}</span></div>
-                  <div className={styles.codeLine}>      <span className={styles.cm}>"command"</span>: <span className={styles.cv}>"npx"</span>,</div>
-                  <div className={styles.codeLine}>      <span className={styles.cm}>"args"</span>: <span className={styles.cs}>[</span></div>
-                  <div className={styles.codeLine}>        <span className={styles.cv}>"-y"</span>,</div>
-                  <div className={styles.codeLine}>        <span className={styles.cv}>"@modelcontextprotocol/server-postgres"</span>,</div>
-                  <div className={styles.codeLine}>        <span className={styles.cv}>"postgresql://localhost/mydb"</span></div>
-                  <div className={styles.codeLine}>      <span className={styles.cs}>]</span></div>
-                  <div className={styles.codeLine}>    <span className={styles.cs}>{"}"}</span></div>
-                  <div className={styles.codeLine}>  <span className={styles.cs}>{"}"}</span></div>
-                  <div className={styles.codeLine}><span className={styles.cs}>{"}"}</span></div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.cs}>{"{"}</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {" "}
+                    <span className={styles.cm}>"mcpServers"</span>:{" "}
+                    <span className={styles.cs}>{"{"}</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {" "}
+                    <span className={styles.cm}>"postgres"</span>:{" "}
+                    <span className={styles.cs}>{"{"}</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {" "}
+                    <span className={styles.cm}>"command"</span>:{" "}
+                    <span className={styles.cv}>"npx"</span>,
+                  </div>
+                  <div className={styles.codeLine}>
+                    {" "}
+                    <span className={styles.cm}>"args"</span>: <span className={styles.cs}>[</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {" "}
+                    <span className={styles.cv}>"-y"</span>,
+                  </div>
+                  <div className={styles.codeLine}>
+                    {" "}
+                    <span className={styles.cv}>"@modelcontextprotocol/server-postgres"</span>,
+                  </div>
+                  <div className={styles.codeLine}>
+                    {" "}
+                    <span className={styles.cv}>"postgresql://localhost/mydb"</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {" "}
+                    <span className={styles.cs}>]</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {" "}
+                    <span className={styles.cs}>{"}"}</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {" "}
+                    <span className={styles.cs}>{"}"}</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.cs}>{"}"}</span>
+                  </div>
                 </div>
               </div>
 
@@ -1405,24 +1657,56 @@ export default function Page() {
                   />
                 </div>
                 <div className={styles.codeBody}>
-                  <div className={styles.codeLine}><span className={styles.cs}>{"{"}</span></div>
-                  <div className={styles.codeLine}>  <span className={styles.cm}>"mcpServers"</span>: <span className={styles.cs}>{"{"}</span></div>
-                  <div className={styles.codeLine}>    <span className={styles.cm}>"server-name"</span>: <span className={styles.cs}>{"{"}</span></div>
-                  <div className={styles.codeLine}>      <span className={styles.cm}>"url"</span>: <span className={styles.cv}>"http://localhost:3000/mcp"</span>,</div>
-                  <div className={styles.codeLine}>      <span className={styles.cm}>"headers"</span>: <span className={styles.cs}>{"{ "}</span><span className={styles.cm}>"API_KEY"</span>: <span className={styles.cv}>"value"</span><span className={styles.cs}>{" }"}</span></div>
-                  <div className={styles.codeLine}>    <span className={styles.cs}>{"}"}</span></div>
-                  <div className={styles.codeLine}>  <span className={styles.cs}>{"}"}</span></div>
-                  <div className={styles.codeLine}><span className={styles.cs}>{"}"}</span></div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.cs}>{"{"}</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {" "}
+                    <span className={styles.cm}>"mcpServers"</span>:{" "}
+                    <span className={styles.cs}>{"{"}</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {" "}
+                    <span className={styles.cm}>"server-name"</span>:{" "}
+                    <span className={styles.cs}>{"{"}</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {" "}
+                    <span className={styles.cm}>"url"</span>:{" "}
+                    <span className={styles.cv}>"http://localhost:3000/mcp"</span>,
+                  </div>
+                  <div className={styles.codeLine}>
+                    {" "}
+                    <span className={styles.cm}>"headers"</span>:{" "}
+                    <span className={styles.cs}>{"{ "}</span>
+                    <span className={styles.cm}>"API_KEY"</span>:{" "}
+                    <span className={styles.cv}>"value"</span>
+                    <span className={styles.cs}>{" }"}</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {" "}
+                    <span className={styles.cs}>{"}"}</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {" "}
+                    <span className={styles.cs}>{"}"}</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.cs}>{"}"}</span>
+                  </div>
                 </div>
               </div>
             </li>
             <li className={styles.stepItem}>
-              <strong className={styles.stepTitle}>OAuth対応サーバーの認証情報を設定する(必要な場合)</strong>
+              <strong className={styles.stepTitle}>
+                OAuth対応サーバーの認証情報を設定する(必要な場合)
+              </strong>
               <p className={styles.stepText}>
                 プロバイダが固定のClient
                 IDを発行している場合や、リダイレクトURLのホワイトリスト登録が必要な場合(FigmaやLinearなど)、Dynamic
-                Client
-                Registrationに対応していない場合は、<code className={styles.inlineCode}>mcp.json</code>に静的なOAuthクライアント資格情報を指定できます。
+                Client Registrationに対応していない場合は、
+                <code className={styles.inlineCode}>mcp.json</code>
+                に静的なOAuthクライアント資格情報を指定できます。
               </p>
             </li>
             <li className={styles.stepItem}>
@@ -1446,10 +1730,16 @@ export default function Page() {
               MCPサーバーは外部サービスにアクセスし、ユーザーに代わってコードを実行できます。導入前に必ず以下を確認してください。
             </p>
             <ul className={styles.list} style={{ marginTop: "8px" }}>
-              <li className={styles.listItem}>信頼できる開発者・リポジトリのMCPサーバーのみ導入する</li>
-              <li className={styles.listItem}>サーバーがアクセスするデータ・APIの権限範囲を確認する</li>
+              <li className={styles.listItem}>
+                信頼できる開発者・リポジトリのMCPサーバーのみ導入する
+              </li>
+              <li className={styles.listItem}>
+                サーバーがアクセスするデータ・APIの権限範囲を確認する
+              </li>
               <li className={styles.listItem}>APIキーは必要最小限の権限に制限する</li>
-              <li className={styles.listItem}>重要な連携については、可能であればソースコードを監査する</li>
+              <li className={styles.listItem}>
+                重要な連携については、可能であればソースコードを監査する
+              </li>
             </ul>
           </div>
 
@@ -1457,15 +1747,11 @@ export default function Page() {
             <div className={styles.calloutTitle}>📚 この章の参照元</div>
             <ul className={styles.citeList}>
               <li className={styles.citeListItem}>
-                <Ext href="https://cursor.com/docs/mcp">
-                  cursor.com/docs/mcp
-                </Ext>
+                <Ext href="https://cursor.com/docs/mcp">cursor.com/docs/mcp</Ext>
                 <span className={styles.refDesc}>Model Context Protocol (MCP) — Cursor Docs</span>
               </li>
               <li className={styles.citeListItem}>
-                <Ext href="https://cursor.com/docs/mcp.md">
-                  cursor.com/docs/mcp.md
-                </Ext>
+                <Ext href="https://cursor.com/docs/mcp.md">cursor.com/docs/mcp.md</Ext>
                 <span className={styles.refDesc}>MCP — 設定詳細・セキュリティガイドライン</span>
               </li>
               <li className={styles.citeListItem}>
@@ -1475,9 +1761,7 @@ export default function Page() {
                 <span className={styles.refDesc}>MCP Install Links</span>
               </li>
               <li className={styles.citeListItem}>
-                <Ext href="https://cursor.com/docs/cli/mcp.md">
-                  cursor.com/docs/cli/mcp.md
-                </Ext>
+                <Ext href="https://cursor.com/docs/cli/mcp.md">cursor.com/docs/cli/mcp.md</Ext>
                 <span className={styles.refDesc}>MCP for CLI</span>
               </li>
             </ul>
@@ -1486,7 +1770,10 @@ export default function Page() {
 
         {/* CHAPTER 10 */}
         <section className={styles.chapter} id="ch-10">
-          <div className={styles.chapterKicker}><span className={styles.chapterKickerLine}></span>CHAPTER 10 &middot; MODELS &amp; PRICING</div>
+          <div className={styles.chapterKicker}>
+            <span className={styles.chapterKickerLine}></span>CHAPTER 10 &middot; MODELS &amp;
+            PRICING
+          </div>
           <h2 className={styles.chapterTitle}>モデル選択・Max Mode・料金体系</h2>
           <p className={styles.text}>
             Cursorは Anthropic・OpenAI・Google・xAI
@@ -1508,13 +1795,17 @@ export default function Page() {
               </thead>
               <tbody className={styles.tbody}>
                 <tr>
-                  <td><strong className={styles.strongText}>Auto</strong></td>
+                  <td>
+                    <strong className={styles.strongText}>Auto</strong>
+                  </td>
                   <td>知性・コスト効率・信頼性のバランスを考慮しCursorが自動選択</td>
                   <td>固定トークンレート(Cursor Token Rateの対象外)</td>
                   <td>日常的なタスク全般</td>
                 </tr>
                 <tr>
-                  <td><strong className={styles.strongText}>Premium</strong></td>
+                  <td>
+                    <strong className={styles.strongText}>Premium</strong>
+                  </td>
                   <td>
                     内部ベンチマーク・評価・ユーザーフィードバックに基づき最も高性能なモデルを選択
                   </td>
@@ -1522,7 +1813,9 @@ export default function Page() {
                   <td>最も複雑なタスク</td>
                 </tr>
                 <tr>
-                  <td><strong className={styles.strongText}>Composer 2.5</strong></td>
+                  <td>
+                    <strong className={styles.strongText}>Composer 2.5</strong>
+                  </td>
                   <td>エージェント型コーディングに特化したCursor独自モデル</td>
                   <td>Autoと同じプールから利用</td>
                   <td>コーディングタスク全般</td>
@@ -1540,7 +1833,9 @@ export default function Page() {
 
           <ol className={styles.steps}>
             <li className={styles.stepItem}>
-              <strong className={styles.stepTitle}>チャット/Agentパネルのモデルセレクタを開く</strong>
+              <strong className={styles.stepTitle}>
+                チャット/Agentパネルのモデルセレクタを開く
+              </strong>
             </li>
             <li className={styles.stepItem}>
               <strong className={styles.stepTitle}>Max Modeをトグルでオンにする</strong>
@@ -1638,9 +1933,7 @@ export default function Page() {
                 <span className={styles.refDesc}>Usage and limits</span>
               </li>
               <li className={styles.citeListItem}>
-                <Ext href="https://cursor.com/pricing">
-                  cursor.com/pricing
-                </Ext>
+                <Ext href="https://cursor.com/pricing">cursor.com/pricing</Ext>
                 <span className={styles.refDesc}>Cursor Pricing(最新の公式料金ページ)</span>
               </li>
             </ul>
@@ -1649,8 +1942,12 @@ export default function Page() {
 
         {/* CHAPTER 11 */}
         <section className={styles.chapter} id="ch-11">
-          <div className={styles.chapterKicker}><span className={styles.chapterKickerLine}></span>CHAPTER 11 &middot; CLOUD AGENTS</div>
-          <h2 className={styles.chapterTitle}>Background Agents / Cloud Agents ― クラウドでの並列実行</h2>
+          <div className={styles.chapterKicker}>
+            <span className={styles.chapterKickerLine}></span>CHAPTER 11 &middot; CLOUD AGENTS
+          </div>
+          <h2 className={styles.chapterTitle}>
+            Background Agents / Cloud Agents ― クラウドでの並列実行
+          </h2>
           <p className={styles.text}>
             Cloud Agentsは、ローカルマシンに縛られずクラウドVM上でAgentを実行する機能です。
             複数のAgentを並列で走らせても互いに干渉しないよう、Cursorが自動的にGit
@@ -1678,7 +1975,8 @@ export default function Page() {
               <p className={styles.stepText}>
                 3つの方法があります: (1) Agent主導のセットアップに任せる、(2)
                 保存済みスナップショットを使う、(3)
-                <code className={styles.inlineCode}>.cursor/environment.json</code> でDockerfileを指定する。
+                <code className={styles.inlineCode}>.cursor/environment.json</code>{" "}
+                でDockerfileを指定する。
               </p>
             </li>
             <li className={styles.stepItem}>
@@ -1686,7 +1984,8 @@ export default function Page() {
               <p className={styles.stepText}>
                 メッセージの先頭に <code>&amp;</code> を付けて送信すると、その会話をCloud
                 Agentへプッシュして実行を継続させ、離席中も処理を続けさせられます。あとから{" "}
-                <code className={styles.inlineCode}>cursor.com/agents</code> でWebやモバイルから再開できます。
+                <code className={styles.inlineCode}>cursor.com/agents</code>{" "}
+                でWebやモバイルから再開できます。
               </p>
               <div className={styles.codeWrap}>
                 <div className={styles.codeBar}>
@@ -1697,21 +1996,31 @@ export default function Page() {
                   />
                 </div>
                 <div className={styles.codeBody}>
-                  <div className={styles.codeLine}>&amp; 認証モジュールをリファクタリングして、包括的なテストを追加して</div>
+                  <div className={styles.codeLine}>
+                    &amp; 認証モジュールをリファクタリングして、包括的なテストを追加して
+                  </div>
                 </div>
               </div>
             </li>
             <li className={styles.stepItem}>
               <strong className={styles.stepTitle}>シークレット・環境変数を設定する</strong>
               <p className={styles.stepText}>
-                クラウドVM上で人間の開発者と同じようにコードをビルド・テストするには、APIキーやDB認証情報などのシークレットが必要です。<code className={styles.inlineCode}>cursor.com/dashboard/cloud-agents</code>のSecretsタブから管理するのが推奨される方法です。
+                クラウドVM上で人間の開発者と同じようにコードをビルド・テストするには、APIキーやDB認証情報などのシークレットが必要です。
+                <code className={styles.inlineCode}>cursor.com/dashboard/cloud-agents</code>
+                のSecretsタブから管理するのが推奨される方法です。
               </p>
             </li>
             <li className={styles.stepItem}>
               <strong className={styles.stepTitle}>フックで整合性を保つ</strong>
               <p className={styles.stepText}>
-                Cloud
-                Agentsはリポジトリ内の<code className={styles.inlineCode}>.cursor/hooks.json</code>に定義されたコマンドベースのフックを実行します。<code className={styles.inlineCode}>beforeShellExecution</code>・<code className={styles.inlineCode}>afterFileEdit</code>・<code className={styles.inlineCode}>preToolUse</code>・<code className={styles.inlineCode}>subagentStart</code>などが対応しており、フォーマッタや監査スクリプト、ポリシーチェックをクラウド実行時にも維持できます。
+                Cloud Agentsはリポジトリ内の
+                <code className={styles.inlineCode}>.cursor/hooks.json</code>
+                に定義されたコマンドベースのフックを実行します。
+                <code className={styles.inlineCode}>beforeShellExecution</code>・
+                <code className={styles.inlineCode}>afterFileEdit</code>・
+                <code className={styles.inlineCode}>preToolUse</code>・
+                <code className={styles.inlineCode}>subagentStart</code>
+                などが対応しており、フォーマッタや監査スクリプト、ポリシーチェックをクラウド実行時にも維持できます。
               </p>
             </li>
           </ol>
@@ -1728,9 +2037,7 @@ export default function Page() {
             <div className={styles.calloutTitle}>📚 この章の参照元</div>
             <ul className={styles.citeList}>
               <li className={styles.citeListItem}>
-                <Ext href="https://cursor.com/docs/cloud-agent">
-                  cursor.com/docs/cloud-agent
-                </Ext>
+                <Ext href="https://cursor.com/docs/cloud-agent">cursor.com/docs/cloud-agent</Ext>
                 <span className={styles.refDesc}>Cloud Agents — Cursor Docs</span>
               </li>
               <li className={styles.citeListItem}>
@@ -1743,7 +2050,9 @@ export default function Page() {
                 <Ext href="https://cursor.com/blog/agent-best-practices">
                   cursor.com/blog/agent-best-practices
                 </Ext>
-                <span className={styles.refDesc}>Best practices for coding with agents(並列実行の章)</span>
+                <span className={styles.refDesc}>
+                  Best practices for coding with agents(並列実行の章)
+                </span>
               </li>
             </ul>
           </div>
@@ -1751,7 +2060,9 @@ export default function Page() {
 
         {/* CHAPTER 12 */}
         <section className={styles.chapter} id="ch-12">
-          <div className={styles.chapterKicker}><span className={styles.chapterKickerLine}></span>CHAPTER 12 &middot; BUGBOT</div>
+          <div className={styles.chapterKicker}>
+            <span className={styles.chapterKickerLine}></span>CHAPTER 12 &middot; BUGBOT
+          </div>
           <h2 className={styles.chapterTitle}>Bugbot ― 自動PRコードレビュー</h2>
           <p className={styles.text}>
             BugbotはCursorの自動PRレビュー製品です。すべてのプルリクエストをバグ・セキュリティ脆弱性・コード品質の観点で分析し、
@@ -1769,8 +2080,7 @@ export default function Page() {
             <li className={styles.stepItem}>
               <strong className={styles.stepTitle}>手動でレビューをトリガーする</strong>
               <p className={styles.stepText}>
-                PR上に <code>cursor review</code> または{" "}
-                <code>bugbot run</code>{" "}
+                PR上に <code>cursor review</code> または <code>bugbot run</code>{" "}
                 とコメントすると、その場でレビューを実行できます。詳細ログが必要な場合は{" "}
                 <code>cursor review verbose=true</code> を使います。
               </p>
@@ -1790,25 +2100,54 @@ export default function Page() {
                   />
                 </div>
                 <div className={styles.codeBody}>
-                  <div className={styles.codeLine}><span className={styles.ch}># Review Standards</span></div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.ch}># Review Standards</span>
+                  </div>
                   <div className={styles.codeLine} />
-                  <div className={styles.codeLine}><span className={styles.ch}>## テストカバレッジ</span></div>
-                  <div className={styles.codeLine}><span className={styles.ce}>`server/**`</span>, <span className={styles.ce}>`api/**`</span> に変更があり、<span className={styles.ce}>`**/*.test.*`</span>, <span className={styles.ce}>`tests/**`</span> に変更がない場合、</div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.ch}>## テストカバレッジ</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.ce}>`server/**`</span>,{" "}
+                    <span className={styles.ce}>`api/**`</span> に変更があり、
+                    <span className={styles.ce}>`**/*.test.*`</span>,{" "}
+                    <span className={styles.ce}>`tests/**`</span> に変更がない場合、
+                  </div>
                   <div className={styles.codeLine}>テスト不足としてフラグを立てる。</div>
                   <div className={styles.codeLine} />
-                  <div className={styles.codeLine}><span className={styles.ch}>## セキュリティ機微な領域</span></div>
-                  <div className={styles.codeLine}><span className={styles.ce}>`auth/**`</span>, <span className={styles.ce}>`payments/**`</span>, <span className={styles.ce}>`security/**`</span> を変更するPRには</div>
-                  <div className={styles.codeLine}>セキュリティレビューを促すコメントを追加する。</div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.ch}>## セキュリティ機微な領域</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.ce}>`auth/**`</span>,{" "}
+                    <span className={styles.ce}>`payments/**`</span>,{" "}
+                    <span className={styles.ce}>`security/**`</span> を変更するPRには
+                  </div>
+                  <div className={styles.codeLine}>
+                    セキュリティレビューを促すコメントを追加する。
+                  </div>
                   <div className={styles.codeLine} />
-                  <div className={styles.codeLine}><span className={styles.ch}>## よくあるパターン</span></div>
-                  <div className={styles.codeLine}>- 非同期コードでの <span className={styles.ce}>`.Result`</span> や <span className={styles.ce}>`.Wait()`</span> の使用(awaitを使うべき)にフラグを立てる</div>
-                  <div className={styles.codeLine}>- 紐づくissueのないTODOコメントにフラグを立てる</div>
-                  <div className={styles.codeLine}>- PR説明に正当化理由のない新規依存関係にフラグを立てる</div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.ch}>## よくあるパターン</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    - 非同期コードでの <span className={styles.ce}>`.Result`</span> や{" "}
+                    <span className={styles.ce}>`.Wait()`</span>{" "}
+                    の使用(awaitを使うべき)にフラグを立てる
+                  </div>
+                  <div className={styles.codeLine}>
+                    - 紐づくissueのないTODOコメントにフラグを立てる
+                  </div>
+                  <div className={styles.codeLine}>
+                    - PR説明に正当化理由のない新規依存関係にフラグを立てる
+                  </div>
                 </div>
               </div>
             </li>
             <li className={styles.stepItem}>
-              <strong className={styles.stepTitle}>1週間ほど運用してルールをチューニングする</strong>
+              <strong className={styles.stepTitle}>
+                1週間ほど運用してルールをチューニングする
+              </strong>
               <p className={styles.stepText}>
                 運用開始後しばらくすると、どのコメントが価値があり、どれを無視すべきかの傾向が見えてきます。それに応じてルールを調整していきます。まずは繰り返し発生する1〜2個の問題から着手し、パターンが見えるたびにルールを追加するのが定石です。
               </p>
@@ -1821,8 +2160,12 @@ export default function Page() {
             </li>
           </ol>
 
-          <h3 className={styles.sectionTitle}>レビュアーとしてCursorを使う(人間が主導するレビュー)</h3>
-          <p className={styles.text}>Bugbotとは別に、レビュアー自身がAgentを使って理解を助けることもできます。</p>
+          <h3 className={styles.sectionTitle}>
+            レビュアーとしてCursorを使う(人間が主導するレビュー)
+          </h3>
+          <p className={styles.text}>
+            Bugbotとは別に、レビュアー自身がAgentを使って理解を助けることもできます。
+          </p>
           <div className={styles.codeWrap}>
             <div className={styles.codeBar}>
               <span>プロンプト例 — レビュー時の質問集</span>
@@ -1832,11 +2175,17 @@ export default function Page() {
               />
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}>このPRを説明してください。何を達成しようとしていて、</div>
+              <div className={styles.codeLine}>
+                このPRを説明してください。何を達成しようとしていて、
+              </div>
               <div className={styles.codeLine}>どんなアプローチを取っていますか?</div>
               <div className={styles.codeLine} />
-              <div className={styles.codeLine}>このPRは決済フローに触れています。変更されたコードが</div>
-              <div className={styles.codeLine}>決済システムの他の部分とどうつながっているか見せてください。</div>
+              <div className={styles.codeLine}>
+                このPRは決済フローに触れています。変更されたコードが
+              </div>
+              <div className={styles.codeLine}>
+                決済システムの他の部分とどうつながっているか見せてください。
+              </div>
               <div className={styles.codeLine} />
               <div className={styles.codeLine}>このPRは返金処理の扱いを変更しています。</div>
               <div className={styles.codeLine}>どんなエッジケースを確認すべきですか?</div>
@@ -1846,7 +2195,8 @@ export default function Page() {
           <div className={`${styles.callout} ${styles.tip}`}>
             <div className={styles.calloutTitle}>💡 レビュー知識をルール化する</div>
             <p className={styles.calloutText}>
-              優れたレビュアーが持つ知識は、Bugbot Rules(<code className={styles.inlineCode}>.cursor/BUGBOT.md</code>)やProject
+              優れたレビュアーが持つ知識は、Bugbot Rules(
+              <code className={styles.inlineCode}>.cursor/BUGBOT.md</code>)やProject
               Rulesとして明文化できます。一度エンコードすれば、Cursor(とBugbot)はすべてのレビューでその知識を一貫して適用してくれます。
             </p>
           </div>
@@ -1861,22 +2211,22 @@ export default function Page() {
                 <span className={styles.refDesc}>Bugbot — Cursor Docs</span>
               </li>
               <li className={styles.citeListItem}>
-                <Ext href="https://cursor.com/bugbot">
-                  cursor.com/bugbot
-                </Ext>
-                <span className={styles.refDesc}>AI Code Review Built for Production — Bugbot by Cursor</span>
+                <Ext href="https://cursor.com/bugbot">cursor.com/bugbot</Ext>
+                <span className={styles.refDesc}>
+                  AI Code Review Built for Production — Bugbot by Cursor
+                </span>
               </li>
               <li className={styles.citeListItem}>
-                <Ext href="https://cursor.com/for/code-review">
-                  cursor.com/for/code-review
-                </Ext>
+                <Ext href="https://cursor.com/for/code-review">cursor.com/for/code-review</Ext>
                 <span className={styles.refDesc}>Reviewing Code with Cursor</span>
               </li>
               <li className={styles.citeListItem}>
                 <Ext href="https://cursor.com/blog/bugbot-autofix">
                   cursor.com/blog/bugbot-autofix
                 </Ext>
-                <span className={styles.refDesc}>Closing the code review loop with Bugbot Autofix</span>
+                <span className={styles.refDesc}>
+                  Closing the code review loop with Bugbot Autofix
+                </span>
               </li>
             </ul>
           </div>
@@ -1884,7 +2234,9 @@ export default function Page() {
 
         {/* CHAPTER 13 */}
         <section className={styles.chapter} id="ch-13">
-          <div className={styles.chapterKicker}><span className={styles.chapterKickerLine}></span>CHAPTER 13 &middot; SECURITY</div>
+          <div className={styles.chapterKicker}>
+            <span className={styles.chapterKickerLine}></span>CHAPTER 13 &middot; SECURITY
+          </div>
           <h2 className={styles.chapterTitle}>セキュリティとガードレール</h2>
           <p className={styles.text}>
             AIエージェントはプロンプトインジェクション・ハルシネーションなどにより予期しない挙動を取る可能性があります。
@@ -1928,7 +2280,9 @@ export default function Page() {
 
           <ol className={styles.steps}>
             <li className={styles.stepItem}>
-              <strong className={styles.stepTitle}><code>.cursorignore</code> でアクセス制限する</strong>
+              <strong className={styles.stepTitle}>
+                <code>.cursorignore</code> でアクセス制限する
+              </strong>
               <p className={styles.stepText}>
                 Agentにアクセスさせたくない特定のファイル(シークレット、機密文書など)は{" "}
                 <code>.cursorignore</code> でブロックします。
@@ -1942,7 +2296,9 @@ export default function Page() {
               </p>
             </li>
             <li className={styles.stepItem}>
-              <strong className={styles.stepTitle}>ワークスペーストラストを有効化する(必要な場合)</strong>
+              <strong className={styles.stepTitle}>
+                ワークスペーストラストを有効化する(必要な場合)
+              </strong>
               <p className={styles.stepText}>
                 デフォルトでは無効ですが、有効にすると新しいワークスペースを開く際に「通常モード」か「制限モード」かを選択するよう促されます。
               </p>
@@ -1983,7 +2339,9 @@ export default function Page() {
 
         {/* CHAPTER 14 */}
         <section className={styles.chapter} id="ch-14">
-          <div className={styles.chapterKicker}><span className={styles.chapterKickerLine}></span>CHAPTER 14 &middot; SHORTCUTS</div>
+          <div className={styles.chapterKicker}>
+            <span className={styles.chapterKickerLine}></span>CHAPTER 14 &middot; SHORTCUTS
+          </div>
           <h2 className={styles.chapterTitle}>キーボードショートカット早見表</h2>
           <p className={styles.text}>
             CursorはVS Codeをベースにしているため、既存のVS Codeショートカットはそのまま使えます。
@@ -2001,42 +2359,63 @@ export default function Page() {
               </thead>
               <tbody className={styles.tbody}>
                 <tr>
-                  <td><kbd className={styles.kbd}>⌘</kbd>/<kbd className={styles.kbd}>Ctrl</kbd> + <kbd className={styles.kbd}>K</kbd></td>
+                  <td>
+                    <kbd className={styles.kbd}>⌘</kbd>/<kbd className={styles.kbd}>Ctrl</kbd> +{" "}
+                    <kbd className={styles.kbd}>K</kbd>
+                  </td>
                   <td>Inline Edit を開く(選択範囲をその場で編集)</td>
                   <td>Ch.04</td>
                 </tr>
                 <tr>
-                  <td><kbd className={styles.kbd}>⌘</kbd>/<kbd className={styles.kbd}>Ctrl</kbd> + <kbd className={styles.kbd}>L</kbd></td>
+                  <td>
+                    <kbd className={styles.kbd}>⌘</kbd>/<kbd className={styles.kbd}>Ctrl</kbd> +{" "}
+                    <kbd className={styles.kbd}>L</kbd>
+                  </td>
                   <td>Chat / Agent パネルを開く(複雑な変更・複数ファイル編集へ)</td>
                   <td>Ch.03, 04</td>
                 </tr>
                 <tr>
-                  <td><kbd className={styles.kbd}>Tab</kbd></td>
+                  <td>
+                    <kbd className={styles.kbd}>Tab</kbd>
+                  </td>
                   <td>Tab補完の提案を確定する</td>
                   <td>Ch.02</td>
                 </tr>
                 <tr>
-                  <td><kbd className={styles.kbd}>Esc</kbd></td>
+                  <td>
+                    <kbd className={styles.kbd}>Esc</kbd>
+                  </td>
                   <td>提案を却下する</td>
                   <td>Ch.02</td>
                 </tr>
                 <tr>
-                  <td><kbd className={styles.kbd}>Shift</kbd> + <kbd className={styles.kbd}>Tab</kbd></td>
+                  <td>
+                    <kbd className={styles.kbd}>Shift</kbd> + <kbd className={styles.kbd}>Tab</kbd>
+                  </td>
                   <td>Agent / Plan / Ask / Debug モードをローテーション切替</td>
                   <td>Ch.03</td>
                 </tr>
                 <tr>
-                  <td><kbd className={styles.kbd}>⌘</kbd>/<kbd className={styles.kbd}>Ctrl</kbd> + <kbd className={styles.kbd}>E</kbd></td>
+                  <td>
+                    <kbd className={styles.kbd}>⌘</kbd>/<kbd className={styles.kbd}>Ctrl</kbd> +{" "}
+                    <kbd className={styles.kbd}>E</kbd>
+                  </td>
                   <td>Background Agent のコントロールパネルを開く</td>
                   <td>Ch.11</td>
                 </tr>
                 <tr>
-                  <td><kbd className={styles.kbd}>Ctrl</kbd> + <kbd className={styles.kbd}>K</kbd>(ターミナル内)</td>
+                  <td>
+                    <kbd className={styles.kbd}>Ctrl</kbd> + <kbd className={styles.kbd}>K</kbd>
+                    (ターミナル内)
+                  </td>
                   <td>ターミナル用Inline Editでコマンド生成</td>
                   <td>Ch.04</td>
                 </tr>
                 <tr>
-                  <td><kbd className={styles.kbd}>⌘</kbd>/<kbd className={styles.kbd}>Ctrl</kbd> + <kbd className={styles.kbd}>Shift</kbd> + <kbd className={styles.kbd}>J</kbd></td>
+                  <td>
+                    <kbd className={styles.kbd}>⌘</kbd>/<kbd className={styles.kbd}>Ctrl</kbd> +{" "}
+                    <kbd className={styles.kbd}>Shift</kbd> + <kbd className={styles.kbd}>J</kbd>
+                  </td>
                   <td>Cursor Settingsを開く(Rules / Memories 管理)</td>
                   <td>Ch.06, 08</td>
                 </tr>
@@ -2053,8 +2432,8 @@ export default function Page() {
             <div className={styles.calloutTitle}>💡 ショートカットのカスタマイズ</div>
             <p className={styles.calloutText}>
               Tab補完の確定キーなど、多くのショートカットはKeyboard Shortcuts設定から「Accept Cursor
-              Tab Suggestions」のようなコマンド名で検索してリマップできます。VS
-              Codeの<code>keybindings.json</code>もそのままインポート可能です。
+              Tab Suggestions」のようなコマンド名で検索してリマップできます。VS Codeの
+              <code>keybindings.json</code>もそのままインポート可能です。
             </p>
           </div>
 
@@ -2068,9 +2447,7 @@ export default function Page() {
                 <span className={styles.refDesc}>Keyboard Shortcuts — Cursor Docs</span>
               </li>
               <li className={styles.citeListItem}>
-                <Ext href="https://cursor.com/docs/tab/overview">
-                  cursor.com/docs/tab/overview
-                </Ext>
+                <Ext href="https://cursor.com/docs/tab/overview">cursor.com/docs/tab/overview</Ext>
                 <span className={styles.refDesc}>Tab completion(ショートカットのリマップ方法)</span>
               </li>
               <li className={styles.citeListItem}>
@@ -2085,14 +2462,18 @@ export default function Page() {
 
         {/* CHAPTER 15 */}
         <section className={styles.chapter} id="ch-15">
-          <div className={styles.chapterKicker}><span className={styles.chapterKickerLine}></span>CHAPTER 15 &middot; WORKFLOWS</div>
+          <div className={styles.chapterKicker}>
+            <span className={styles.chapterKickerLine}></span>CHAPTER 15 &middot; WORKFLOWS
+          </div>
           <h2 className={styles.chapterTitle}>実践ワークフロー ― 機能を組み合わせる</h2>
           <p className={styles.text}>
             ここまで個々の機能を見てきましたが、実際の開発では複数機能を組み合わせて使います。
             最後に、代表的な3つのワークフローを通じて機能同士の連携をおさらいします。
           </p>
 
-          <h3 className={styles.sectionTitle}>ワークフロー1: 未知のコードベースへのオンボーディング</h3>
+          <h3 className={styles.sectionTitle}>
+            ワークフロー1: 未知のコードベースへのオンボーディング
+          </h3>
           <div className={styles.diagramCard}>
             <div className={styles.diagramLabel}>FIG 15-1. 新規参画者のオンボーディングフロー</div>
             <div className={styles.mermaid}>
@@ -2100,17 +2481,22 @@ export default function Page() {
             </div>
           </div>
 
-          <h3 className={styles.sectionTitle}>ワークフロー2: 大規模リファクタリング(Plan → 並列Cloud Agent)</h3>
+          <h3 className={styles.sectionTitle}>
+            ワークフロー2: 大規模リファクタリング(Plan → 並列Cloud Agent)
+          </h3>
           <ol className={styles.steps}>
             <li className={styles.stepItem}>
               <strong className={styles.stepTitle}>Planモードで計画を立てる</strong>
               <p className={styles.stepText}>
-                Agentに調査させ、明確化のための質問に答え、レビュー可能な計画を <code className={styles.inlineCode}>.cursor/plans/</code> に保存する。
+                Agentに調査させ、明確化のための質問に答え、レビュー可能な計画を{" "}
+                <code className={styles.inlineCode}>.cursor/plans/</code> に保存する。
               </p>
             </li>
             <li className={styles.stepItem}>
               <strong className={styles.stepTitle}>計画をチームでレビューする</strong>
-              <p className={styles.stepText}>Markdownファイルなので、Pull Request同様にコメント・修正が可能。</p>
+              <p className={styles.stepText}>
+                Markdownファイルなので、Pull Request同様にコメント・修正が可能。
+              </p>
             </li>
             <li className={styles.stepItem}>
               <strong className={styles.stepTitle}>Cloud Agentへ委譲する</strong>
@@ -2121,7 +2507,9 @@ export default function Page() {
             </li>
             <li className={styles.stepItem}>
               <strong className={styles.stepTitle}>Bugbotで最終チェック</strong>
-              <p className={styles.stepText}>生成されたPRに対してBugbotが自動レビューし、見落としを検出する。</p>
+              <p className={styles.stepText}>
+                生成されたPRに対してBugbotが自動レビューし、見落としを検出する。
+              </p>
             </li>
           </ol>
 
@@ -2151,7 +2539,9 @@ export default function Page() {
 
         {/* CHAPTER 16 */}
         <section className={styles.chapter} id="ch-16">
-          <div className={styles.chapterKicker}><span className={styles.chapterKickerLine}></span>CHAPTER 16 &middot; REFERENCES</div>
+          <div className={styles.chapterKicker}>
+            <span className={styles.chapterKickerLine}></span>CHAPTER 16 &middot; REFERENCES
+          </div>
           <h2 className={styles.chapterTitle}>参考文献一覧 ― 全参照URL</h2>
           <p className={styles.text}>
             本ガイド作成にあたり参照した公式ドキュメント・公式ブログのURLを、章を横断してすべて掲載します(2026年7月1日時点でアクセス確認済み)。
@@ -2159,9 +2549,7 @@ export default function Page() {
 
           <ol className={styles.refList}>
             <li className={styles.refListItem}>
-              <Ext href="https://cursor.com/docs">
-                https://cursor.com/docs
-              </Ext>
+              <Ext href="https://cursor.com/docs">https://cursor.com/docs</Ext>
               <span className={styles.refDesc}>Cursor Docs トップページ</span>
             </li>
             <li className={styles.refListItem}>
@@ -2225,51 +2613,39 @@ export default function Page() {
               <span className={styles.refDesc}>Inline edit</span>
             </li>
             <li className={styles.refListItem}>
-              <Ext href="https://cursor.com/docs/rules">
-                https://cursor.com/docs/rules
-              </Ext>
+              <Ext href="https://cursor.com/docs/rules">https://cursor.com/docs/rules</Ext>
               <span className={styles.refDesc}>Rules</span>
             </li>
             <li className={styles.refListItem}>
-              <Ext href="https://cursor.com/docs/rules.md">
-                https://cursor.com/docs/rules.md
-              </Ext>
+              <Ext href="https://cursor.com/docs/rules.md">https://cursor.com/docs/rules.md</Ext>
               <span className={styles.refDesc}>Rules — 詳細仕様とFAQ</span>
             </li>
             <li className={styles.refListItem}>
-              <Ext href="https://cursor.com/docs/subagents">
-                https://cursor.com/docs/subagents
-              </Ext>
+              <Ext href="https://cursor.com/docs/subagents">https://cursor.com/docs/subagents</Ext>
               <span className={styles.refDesc}>Subagents</span>
             </li>
             <li className={styles.refListItem}>
-              <Ext href="https://cursor.com/docs/hooks">
-                https://cursor.com/docs/hooks
-              </Ext>
+              <Ext href="https://cursor.com/docs/hooks">https://cursor.com/docs/hooks</Ext>
               <span className={styles.refDesc}>Hooks</span>
             </li>
             <li className={styles.refListItem}>
-              <Ext href="https://cursor.com/changelog/2-5">
-                https://cursor.com/changelog/2-5
-              </Ext>
-              <span className={styles.refDesc}>Plugins, Sandbox Access Controls, and Async Subagents</span>
+              <Ext href="https://cursor.com/changelog/2-5">https://cursor.com/changelog/2-5</Ext>
+              <span className={styles.refDesc}>
+                Plugins, Sandbox Access Controls, and Async Subagents
+              </span>
             </li>
             <li className={styles.refListItem}>
-              <Ext href="https://cursor.com/changelog/1-0">
-                https://cursor.com/changelog/1-0
-              </Ext>
-              <span className={styles.refDesc}>Bugbot, Background Agent, Memories 初出リリースノート</span>
+              <Ext href="https://cursor.com/changelog/1-0">https://cursor.com/changelog/1-0</Ext>
+              <span className={styles.refDesc}>
+                Bugbot, Background Agent, Memories 初出リリースノート
+              </span>
             </li>
             <li className={styles.refListItem}>
-              <Ext href="https://cursor.com/docs/mcp">
-                https://cursor.com/docs/mcp
-              </Ext>
+              <Ext href="https://cursor.com/docs/mcp">https://cursor.com/docs/mcp</Ext>
               <span className={styles.refDesc}>Model Context Protocol (MCP)</span>
             </li>
             <li className={styles.refListItem}>
-              <Ext href="https://cursor.com/docs/mcp.md">
-                https://cursor.com/docs/mcp.md
-              </Ext>
+              <Ext href="https://cursor.com/docs/mcp.md">https://cursor.com/docs/mcp.md</Ext>
               <span className={styles.refDesc}>MCP — 設定詳細・セキュリティガイドライン</span>
             </li>
             <li className={styles.refListItem}>
@@ -2309,9 +2685,7 @@ export default function Page() {
               <span className={styles.refDesc}>Usage and limits</span>
             </li>
             <li className={styles.refListItem}>
-              <Ext href="https://cursor.com/pricing">
-                https://cursor.com/pricing
-              </Ext>
+              <Ext href="https://cursor.com/pricing">https://cursor.com/pricing</Ext>
               <span className={styles.refDesc}>Cursor Pricing(最新の公式料金ページ)</span>
             </li>
             <li className={styles.refListItem}>
@@ -2333,9 +2707,7 @@ export default function Page() {
               <span className={styles.refDesc}>Bugbot</span>
             </li>
             <li className={styles.refListItem}>
-              <Ext href="https://cursor.com/bugbot">
-                https://cursor.com/bugbot
-              </Ext>
+              <Ext href="https://cursor.com/bugbot">https://cursor.com/bugbot</Ext>
               <span className={styles.refDesc}>AI Code Review Built for Production — Bugbot</span>
             </li>
             <li className={styles.refListItem}>
@@ -2348,7 +2720,9 @@ export default function Page() {
               <Ext href="https://cursor.com/blog/bugbot-autofix">
                 https://cursor.com/blog/bugbot-autofix
               </Ext>
-              <span className={styles.refDesc}>Closing the code review loop with Bugbot Autofix</span>
+              <span className={styles.refDesc}>
+                Closing the code review loop with Bugbot Autofix
+              </span>
             </li>
             <li className={styles.refListItem}>
               <Ext href="https://cursor.com/docs/agent/security">
@@ -2399,7 +2773,8 @@ export default function Page() {
       </main>
 
       <footer className={styles.pageFooter}>
-        Cursor 完全ガイド &middot; 一次情報源: cursor.com/docs &middot; 作成日: 2026-07-01<br />
+        Cursor 完全ガイド &middot; 一次情報源: cursor.com/docs &middot; 作成日: 2026-07-01
+        <br />
         本ドキュメントは教育目的の非公式ガイドであり、Anysphere Inc. / Cursor
         による公式資料ではありません。
       </footer>

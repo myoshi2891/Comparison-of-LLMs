@@ -48,7 +48,9 @@ test("Cursor Complete Guide Page Contract Tests", () => {
 
   // 6. Metadata test
   expect(metadata).toBeDefined();
-  expect(metadata.title).toBe("Cursor 完全ガイド ― 初学者のためのステップバイステップ・ベストプラクティス");
+  expect(metadata.title).toBe(
+    "Cursor 完全ガイド ― 初学者のためのステップバイステップ・ベストプラクティス"
+  );
   expect(metadata.description).toBe(
     "初学者のためのCursor完全ガイド。AIオートコンプリート(Tab補完)、自律Agentモード、コンテキスト管理(@ Symbols)、カスタムルール/サブエージェント設定、MCP連携等の使い方とベストプラクティスを解説。"
   );

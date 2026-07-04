@@ -23,16 +23,8 @@
   margin: 0 auto;
   background: var(--bg-base);
   background-image:
-    radial-gradient(
-      ellipse 900px 500px at 12% -10%,
-      rgba(94, 234, 212, 0.08),
-      transparent 60%
-    ),
-    radial-gradient(
-      ellipse 700px 500px at 100% 10%,
-      rgba(167, 139, 250, 0.06),
-      transparent 60%
-    );
+    radial-gradient(ellipse 900px 500px at 12% -10%, rgba(94, 234, 212, 0.08), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 100% 10%, rgba(167, 139, 250, 0.06), transparent 60%);
   color: var(--text-primary);
   line-height: 1.75;
   font-size: 16px;
@@ -522,15 +514,37 @@
 }
 
 /* Code highlighting colors mapping styles.* */
-.ck { color: #ff7b72; } /* Keyword */
-.cs { color: #a5d6ff; } /* String / Delimiter */
-.cv { color: #79c0ff; } /* Value */
-.cw { color: #d29922; font-weight: bold; } /* Warning / Important */
-.ce { color: #bc8cff; } /* Special / Enum */
-.cc { color: #8b949e; font-style: italic; } /* Comment */
-.cg { color: #3fb950; } /* Success / Positive */
-.ch { color: #f0883e; font-weight: bold; } /* Heading */
-.cm { color: #7ee787; font-weight: bold; } /* Marker / Section */
+.ck {
+  color: #ff7b72;
+} /* Keyword */
+.cs {
+  color: #a5d6ff;
+} /* String / Delimiter */
+.cv {
+  color: #79c0ff;
+} /* Value */
+.cw {
+  color: #d29922;
+  font-weight: bold;
+} /* Warning / Important */
+.ce {
+  color: #bc8cff;
+} /* Special / Enum */
+.cc {
+  color: #8b949e;
+  font-style: italic;
+} /* Comment */
+.cg {
+  color: #3fb950;
+} /* Success / Positive */
+.ch {
+  color: #f0883e;
+  font-weight: bold;
+} /* Heading */
+.cm {
+  color: #7ee787;
+  font-weight: bold;
+} /* Marker / Section */
 
 /* ── Diagram ─────────────────────────────────────── */
 .diagramCard {
@@ -653,7 +667,7 @@
 }
 
 .refListItem::before {
-  content: '[' counter(ref) ']';
+  content: "[" counter(ref) "]";
   position: absolute;
   left: 0;
   top: 10px;
