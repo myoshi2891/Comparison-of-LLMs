@@ -1,6 +1,15 @@
 import { render } from "@testing-library/react";
-import { expect, test } from "vitest";
+import { beforeAll, expect, test, vi } from "vitest";
 import Page, { metadata } from "./page";
+import styles from "./page.module.css";
+
+beforeAll(() => {
+  global.IntersectionObserver = vi.fn().mockImplementation(() => ({
+    observe: vi.fn(),
+    unobserve: vi.fn(),
+    disconnect: vi.fn(),
+  }));
+});
 
 test("Cursor Complete Guide Page Contract Tests", () => {
   const { container } = render(<Page />);
@@ -86,4 +95,10 @@ test("Cursor Complete Guide Page Contract Tests", () => {
   expect(footer).not.toBeNull();
   const parent = footer?.parentElement;
   expect(parent?.className).not.toContain("layout");
+
+  // 9. Active TOC item test (TOC item active styles verification)
+  // 初期レンダリング時に styles.tocLinkActive がいずれかのリンク（マウント後に設定されるはず）に付与されているかアサート
+  // 現在は styles.tocLinkActive 自体が page.tsx で使われていないため、以下の要素は null になり、テストが Red（失敗）します。
+  const activeLink = container.querySelector(`.${styles.tocLinkActive}`);
+  expect(activeLink).not.toBeNull();
 });
