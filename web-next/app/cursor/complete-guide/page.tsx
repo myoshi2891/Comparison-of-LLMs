@@ -145,7 +145,8 @@ function Ext({ href, children, className }: ExtProps) {
 
 export default function Page() {
   return (
-    <div className={styles.layout}>
+    <>
+      <div className={styles.layout}>
       {/* SIDEBAR */}
       <aside className={styles.sidebar}>
         <div className={styles.brand}>
@@ -160,10 +161,10 @@ export default function Page() {
         <nav className={styles.tocGroup}>
           <div className={styles.tocGroupLabel}>目次</div>
           <a className={styles.tocLink} href="#ch-00">
-            <span className={styles.tocNum}>00</span>全体像
+            <span className={styles.tocNum}>00</span>Cursor とは何か
           </a>
           <a className={styles.tocLink} href="#ch-01">
-            <span className={styles.tocNum}>01</span>クイックスタート
+            <span className={styles.tocNum}>01</span>インストールとクイックスタート
           </a>
           <a className={styles.tocLink} href="#ch-02">
             <span className={styles.tocNum}>02</span>Tab補完
@@ -172,7 +173,7 @@ export default function Page() {
             <span className={styles.tocNum}>03</span>Agentモード
           </a>
           <a className={styles.tocLink} href="#ch-04">
-            <span className={styles.tocNum}>04</span>Inline Edit
+            <span className={styles.tocNum}>04</span>Inline Edit (Cmd/Ctrl+K)
           </a>
           <a className={styles.tocLink} href="#ch-05">
             <span className={styles.tocNum}>05</span>コンテキスト管理
@@ -181,28 +182,28 @@ export default function Page() {
             <span className={styles.tocNum}>06</span>Rules
           </a>
           <a className={styles.tocLink} href="#ch-07">
-            <span className={styles.tocNum}>07</span>Skills/Subagents
+            <span className={styles.tocNum}>07</span>Skills / Subagents / Hooks
           </a>
           <a className={styles.tocLink} href="#ch-08">
             <span className={styles.tocNum}>08</span>Memories
           </a>
           <a className={styles.tocLink} href="#ch-09">
-            <span className={styles.tocNum}>09</span>MCP連携
+            <span className={styles.tocNum}>09</span>Model Context Protocol (MCP)
           </a>
           <a className={styles.tocLink} href="#ch-10">
-            <span className={styles.tocNum}>10</span>モデルと料金
+            <span className={styles.tocNum}>10</span>モデル選択・Max Mode・料金体系
           </a>
           <a className={styles.tocLink} href="#ch-11">
-            <span className={styles.tocNum}>11</span>Cloud Agents
+            <span className={styles.tocNum}>11</span>Background Agents / Cloud Agents
           </a>
           <a className={styles.tocLink} href="#ch-12">
             <span className={styles.tocNum}>12</span>Bugbot
           </a>
           <a className={styles.tocLink} href="#ch-13">
-            <span className={styles.tocNum}>13</span>セキュリティ
+            <span className={styles.tocNum}>13</span>セキュリティとガードレール
           </a>
           <a className={styles.tocLink} href="#ch-14">
-            <span className={styles.tocNum}>14</span>ショートカット
+            <span className={styles.tocNum}>14</span>キーボードショートカット早見表
           </a>
           <a className={styles.tocLink} href="#ch-15">
             <span className={styles.tocNum}>15</span>実践ワークフロー
@@ -2771,13 +2772,14 @@ export default function Page() {
           </div>
         </section>
       </main>
-
-      <footer className={styles.pageFooter}>
-        Cursor 完全ガイド &middot; 一次情報源: cursor.com/docs &middot; 作成日: 2026-07-01
-        <br />
-        本ドキュメントは教育目的の非公式ガイドであり、Anysphere Inc. / Cursor
-        による公式資料ではありません。
-      </footer>
     </div>
+
+    <footer className={styles.pageFooter}>
+      Cursor 完全ガイド &middot; 一次情報源: cursor.com/docs &middot; 作成日: 2026-07-01
+      <br />
+      本ドキュメントは教育目的の非公式ガイドであり、Anysphere Inc. / Cursor
+      による公式資料ではありません。
+    </footer>
+  </>
   );
 }

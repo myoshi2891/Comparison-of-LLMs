@@ -54,4 +54,36 @@ test("Cursor Complete Guide Page Contract Tests", () => {
   expect(metadata.description).toBe(
     "初学者のためのCursor完全ガイド。AIオートコンプリート(Tab補完)、自律Agentモード、コンテキスト管理(@ Symbols)、カスタムルール/サブエージェント設定、MCP連携等の使い方とベストプラクティスを解説。"
   );
+
+  // 7. TOC Text Content Tests (should match legacy HTML exactly)
+  const tocLinks = container.querySelectorAll("aside nav a");
+  const expectedTocTexts = [
+    "00Cursor とは何か",
+    "01インストールとクイックスタート",
+    "02Tab補完",
+    "03Agentモード",
+    "04Inline Edit (Cmd/Ctrl+K)",
+    "05コンテキスト管理",
+    "06Rules",
+    "07Skills / Subagents / Hooks",
+    "08Memories",
+    "09Model Context Protocol (MCP)",
+    "10モデル選択・Max Mode・料金体系",
+    "11Background Agents / Cloud Agents",
+    "12Bugbot",
+    "13セキュリティとガードレール",
+    "14キーボードショートカット早見表",
+    "15実践ワークフロー",
+    "16参考文献",
+  ];
+  expect(tocLinks.length).toBe(expectedTocTexts.length);
+  tocLinks.forEach((link, idx) => {
+    expect(link.textContent?.trim()).toBe(expectedTocTexts[idx]);
+  });
+
+  // 8. Footer Layout nesting test (footer must not be inside layout container)
+  const footer = container.querySelector("footer");
+  expect(footer).not.toBeNull();
+  const parent = footer?.parentElement;
+  expect(parent?.className).not.toContain("layout");
 });

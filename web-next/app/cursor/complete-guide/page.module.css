@@ -43,6 +43,11 @@
   scrollbar-color: var(--bg-surface-3) transparent;
 }
 
+:global(body.has-common-header) .sidebar {
+  top: calc(var(--ch-height) + var(--ch-disclaimer-height, 0px) + 10px);
+  height: calc(100vh - var(--ch-height) - var(--ch-disclaimer-height, 0px) - 20px);
+}
+
 .sidebar::-webkit-scrollbar {
   width: 6px;
 }
