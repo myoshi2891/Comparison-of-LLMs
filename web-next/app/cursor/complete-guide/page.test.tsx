@@ -108,8 +108,7 @@ test("Cursor Complete Guide Page Contract Tests", () => {
   expect(parent?.className).not.toContain("layout");
 
   // 9. Active TOC item test (TOC item active styles verification)
-  // 初期レンダリング時に styles.tocLinkActive がいずれかのリンク（マウント後に設定されるはず）に付与されているかアサート
-  // 現在は styles.tocLinkActive 自体が page.tsx で使われていないため、以下の要素は null になり、テストが Red（失敗）します。
+  // 初期レンダリング時に TocObserver のマウント効果により styles.tocLinkActive が最初のリンクに付与されていることを検証
   const activeLink = container.querySelector(`.${styles.tocLinkActive}`);
   expect(activeLink).not.toBeNull();
 

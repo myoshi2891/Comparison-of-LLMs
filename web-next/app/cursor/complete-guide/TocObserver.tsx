@@ -8,7 +8,7 @@ import styles from "./page.module.css";
  */
 export default function TocObserver() {
   useEffect(() => {
-    const sections = document.querySelectorAll("section.chapter");
+    const sections = document.querySelectorAll(`section.${styles.chapter}`);
     const links = Array.from(document.querySelectorAll(`.${styles.tocLink}`));
 
     // Set first link as active initially
