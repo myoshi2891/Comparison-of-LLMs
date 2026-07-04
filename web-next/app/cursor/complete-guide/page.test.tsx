@@ -10,9 +10,9 @@ test("Cursor Complete Guide Page Contract Tests", () => {
   expect(title).not.toBeNull();
   expect(title?.textContent).toContain("Cursor 完全ガイド");
 
-  // 2. Sections test (h2 count should be 16 based on chapter-titles)
+  // 2. Sections test (h2 count should be 17 based on chapter-titles)
   const h2Elements = container.querySelectorAll("h2");
-  expect(h2Elements.length).toBe(16);
+  expect(h2Elements.length).toBe(17);
 
   // 3. External link safety tests
   const links = container.querySelectorAll("a");
