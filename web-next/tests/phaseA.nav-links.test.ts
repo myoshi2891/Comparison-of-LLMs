@@ -81,14 +81,12 @@ describe("Phase A - Agent dropdown shape", () => {
   const agent = navLinks.find((link) => link.name === "Agent");
 
   it("has 4 child entries (advanced guide / openclaw security guide / loop engineering / skills-sh)", () => {
-    const agent = navLinks.find((link) => link.name === "Agent");
     expect(agent && "children" in agent).toBe(true);
     const children = agent && "children" in agent ? agent.children : [];
     expect(children.length).toBe(4);
   });
 
   it("uses clean URL paths for all Agent children (no .html extension)", () => {
-    const agent = navLinks.find((link) => link.name === "Agent");
     expect(agent && "children" in agent).toBe(true);
     const children = agent && "children" in agent ? agent.children : [];
     const expectedHrefs = [
