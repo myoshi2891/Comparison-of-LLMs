@@ -58,7 +58,7 @@ describe("/claude/skills-sh - page structure", () => {
     expect(h2s[5].textContent).toContain("主要スキル カテゴリ別マップ");
     expect(h2s[6].textContent).toContain("主要スキル 徹底解説");
     expect(h2s[7].textContent).toContain("対応しているAIエージェント");
-    expect(h2s[8].textContent).toContain("セキュリティと監査 of 仕組み" || "セキュリティと監査の仕組み"); // HTML contains "セキュリティと監査の仕組み"
+    expect(h2s[8].textContent).toContain("セキュリティと監査の仕組み"); // HTML contains "セキュリティと監査の仕組み"
     expect(h2s[9].textContent).toContain("自分だけのスキルを作る");
     expect(h2s[10].textContent).toContain("まとめ");
     expect(h2s[11].textContent).toContain("参考URL一覧");
