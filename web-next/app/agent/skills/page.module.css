@@ -15,8 +15,12 @@
   --accent-amber: #e8a33d;
   --accent-coral: #ef8b6b;
   --accent-pink: #d980c0;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
-  --font-mono: var(--font-mono), "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic",
+    "Meiryo", sans-serif;
+  --font-mono:
+    var(--font-mono), "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo,
+    monospace;
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
@@ -103,7 +107,9 @@
   font-weight: 400;
   padding: 8px 12px;
   border-radius: var(--radius-md);
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
   text-decoration: none;
 }
 
@@ -296,7 +302,7 @@
 }
 
 .chapter th {
-  text-align: left;
+  text-align: left !important;
   background: var(--bg-tertiary);
   color: var(--text-secondary);
   font-weight: 500;
@@ -488,15 +494,37 @@
 }
 
 /* Syntax Highlight Colors (shiki fallback colors mapping) */
-.ck { color: #ff7b72; font-weight: 500; } /* keyword */
-.cs { color: #a5d6ff; }                   /* string / punctuation */
-.cv { color: #79c0ff; }                   /* value */
-.cc { color: #8b949e; font-style: italic; } /* comment */
-.ch { color: #f0883e; font-weight: bold; }  /* heading */
-.cm { color: #7ee787; font-weight: bold; }  /* marker */
-.cw { color: #d29922; }                   /* warning */
-.ce { color: #bc8cff; }                   /* special / enum */
-.cg { color: #3fb950; }                   /* success */
+.ck {
+  color: #ff7b72;
+  font-weight: 500;
+} /* keyword */
+.cs {
+  color: #a5d6ff;
+} /* string / punctuation */
+.cv {
+  color: #79c0ff;
+} /* value */
+.cc {
+  color: #8b949e;
+  font-style: italic;
+} /* comment */
+.ch {
+  color: #f0883e;
+  font-weight: bold;
+} /* heading */
+.cm {
+  color: #7ee787;
+  font-weight: bold;
+} /* marker */
+.cw {
+  color: #d29922;
+} /* warning */
+.ce {
+  color: #bc8cff;
+} /* special / enum */
+.cg {
+  color: #3fb950;
+} /* success */
 
 /* ===== Responsive ===== */
 @media (max-width: 900px) {
