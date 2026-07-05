@@ -14,10 +14,11 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（本作業範囲では新規違反 0 件、既知の既存指摘は本件対象外）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **787 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **794 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **skills.sh 完全ガイドの Next.js 移行**: `Skills-sh-guide.html` から `web-next/app/claude/skills-sh/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化とメインコンテンツの画面幅100%化、外部リンクのセキュリティ対策、Mermaid遅延ロード、TOCスクロールハイライト追従（Intersection Observer）、進捗バーおよびモバイル開閉ロジックの TocObserver 移行を実装。ナビゲーションの「Claude -> skills.sh Guide」に新規登録。 Vitest 契約テスト 7 件追加（合計 794 テスト合格）。
 - **Claude Fable 5 実践活用ガイドの Next.js 移行**: `Claude-fable-5-best-practices.html` から `web-next/app/claude/fable-5-best-practices/page.tsx` への完全移行を完了 🚀。カテゴリ毎に TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策、Mermaid遅延ロード、TOCスクロールハイライト追従（Intersection Observer）を実装。ナビゲーションの「Claude -> Fable 5 Best Practices」に新規登録。 Vitest 契約テスト 9 件追加（合計 787 テスト合格）。
 - **Cursor 実践ガイド（中〜上級者向け）の Next.js 移行**: `Cursor-complete-guide-intermediate.html` から `web-next/app/cursor/complete-guide-intermediate/page.tsx` への完全移行を完了 🚀。カテゴリ毎に TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策、Mermaid遅延ロード、TOCスクロールハイライト追従（Intersection Observer）を実装。ナビゲーションの「IDE -> Cursor Guide (中級)」に新規登録。 Vitest 契約テスト 2 件追加（合計 778 テスト合格）。
 - **Loop Engineering 完全ガイドの Next.js 移行**: `Loop-engineering-guide.html` から `web-next/app/agent/loop-engineering/page.tsx` への完全移行を完了 🚀。カテゴリ毎に TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策、モノスペースコードブロック、警告バナー、Mermaid遅延ロード、TOCスクロールハイライト追従（Intersection Observer）を実装。ナビゲーションの「Agent -> Loop Engineering Guide」に新規登録。 Vitest 契約テスト 19 件追加（合計 778 テスト合格）。
