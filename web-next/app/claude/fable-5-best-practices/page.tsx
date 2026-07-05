@@ -689,7 +689,7 @@ export default function Fable5BestPracticesPage() {
                   <tr>
                     <td>
                       Boris Cherny<br />
-                      <span className={styles.brandSub} style={{ fontSize: '11px', color: 'var(--text-faint)' }}>
+                      <span className={styles.authorSub}>
                         Claude Code創設者 / Anthropic
                       </span>
                     </td>
@@ -700,7 +700,7 @@ export default function Fable5BestPracticesPage() {
                   <tr>
                     <td>
                       Peter Steinberger<br />
-                      <span className={styles.brandSub} style={{ fontSize: '11px', color: 'var(--text-faint)' }}>
+                      <span className={styles.authorSub}>
                         OpenClaw創設者
                       </span>
                     </td>
@@ -717,7 +717,7 @@ export default function Fable5BestPracticesPage() {
                   <tr>
                     <td>
                       Addy Osmani<br />
-                      <span className={styles.brandSub} style={{ fontSize: '11px', color: 'var(--text-faint)' }}>
+                      <span className={styles.authorSub}>
                         Google
                       </span>
                     </td>
@@ -728,7 +728,7 @@ export default function Fable5BestPracticesPage() {
                   <tr>
                     <td>
                       Lance Martin<br />
-                      <span className={styles.brandSub} style={{ fontSize: '11px', color: 'var(--text-faint)' }}>
+                      <span className={styles.authorSub}>
                         Anthropic
                       </span>
                     </td>
@@ -823,7 +823,7 @@ export default function Fable5BestPracticesPage() {
                   自分は無意識に分かっている(センス・美意識・業界の慣習など)が、言語化していない暗黙の基準。例:コードの「きれいさ」の基準を説明せずに期待している
                 </div>
               </div>
-              <div className={`${styles.qCell} ${styles.qPartial}`} style={{ background: 'linear-gradient(135deg, rgba(239, 140, 115, 0.14), var(--bg-card))' }}>
+              <div className={`${styles.qCell} ${styles.qPartial} ${styles.qPartialStrong}`}>
                 <div className={styles.qTitle}><span>QUADRANT 4</span>Unknown Unknowns(未知の未知)</div>
                 <div className={styles.qDesc}>
                   自分がそもそも結果に影響すると想定していなかった要因。例:想定していなかったレガシーな依存関係の存在
@@ -1044,7 +1044,7 @@ export default function Fable5BestPracticesPage() {
               Fable 5は複数のベンチマークで高い成績を収めている。例えば Center for AI Safety と Scale AI Labs が公表した Remote Labor Index(実在するフリーランス案件240件を人間の専門家基準で採点するベンチマーク)では、Fable 5は16.1%の案件で人間の専門家と同等かそれを上回る成果を出し、Opus 4.8(8.3%)やGPT-5.5(6.3%)を上回った。ただし裏を返せば、<b>このベンチマークでもプロ品質に届いた案件は6件に1件程度</b>であり、過信は禁物である。
             </p>
 
-            <div className={styles.specGrid} style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+            <div className={styles.specGrid}>
               <div className={styles.specItem}>
                 <div className={styles.specLabel}>Fable 5</div>
                 <div className={styles.specValue}>16.1%</div>
@@ -1058,7 +1058,7 @@ export default function Fable5BestPracticesPage() {
                 <div className={styles.specValue}>6.3%</div>
               </div>
             </div>
-            <p style={{ fontSize: '12.5px', color: 'var(--text-faint)', marginTop: '-8px' }}>
+            <p className={styles.specCaption}>
               Remote Labor Index: 人間の専門家と同等以上と判定された案件の割合
             </p>
 
