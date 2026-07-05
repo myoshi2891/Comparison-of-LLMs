@@ -548,9 +548,8 @@
       .figure-canvas svg {
         display: block;
         margin: 0 auto;
-        width: auto;
+        width: 100%;
         max-width: 100%;
-        max-height: 420px;
         height: auto !important;
         overflow: visible;
       }
@@ -6612,12 +6611,12 @@ agent --sandbox enabled        # または disabled
           document.querySelectorAll('.figure-canvas .mermaid svg').forEach((svgEl) => {
             svgEl.removeAttribute('width');
             svgEl.removeAttribute('height');
-            svgEl.style.display  = 'block';
-            svgEl.style.margin   = '0 auto';
-            svgEl.style.width    = 'auto';
+            svgEl.style.display = 'block';
+            svgEl.style.margin = '0 auto';
+            svgEl.style.width = 'auto';
             svgEl.style.maxWidth = '100%';
             svgEl.style.maxHeight = '420px';
-            svgEl.style.height   = 'auto';
+            svgEl.style.height = 'auto';
             svgEl.style.overflow = 'visible';
           });
         })
