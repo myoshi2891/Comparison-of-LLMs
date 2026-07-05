@@ -45,10 +45,10 @@ describe("/claude/fable-5-best-practices - page structure (Step 1)", () => {
     expect(h1?.textContent?.replace(/\s+/g, "")).toContain("ClaudeFable5実践活用ガイド");
   });
 
-  it("renders <h2> headings for ch1 to ch7", () => {
+  it("renders <h2> headings for ch1 to ch10", () => {
     const { container } = render(<Page />);
     const h2s = Array.from(container.querySelectorAll("h2"));
-    expect(h2s).toHaveLength(7);
+    expect(h2s).toHaveLength(10);
     expect(h2s[0].textContent).toContain("Claude Fable 5 とは何か");
     expect(h2s[1].textContent).toContain("タイムライン");
     expect(h2s[2].textContent).toContain("安全分類器");
@@ -56,5 +56,8 @@ describe("/claude/fable-5-best-practices - page structure (Step 1)", () => {
     expect(h2s[4].textContent).toContain("Effort");
     expect(h2s[5].textContent).toContain("Claude Code");
     expect(h2s[6].textContent).toContain("Loop Engineering");
+    expect(h2s[7].textContent).toContain("Unknowns");
+    expect(h2s[8].textContent).toContain("検証ループとメモリ");
+    expect(h2s[9].textContent).toContain("モデル選定フロー");
   });
 });
