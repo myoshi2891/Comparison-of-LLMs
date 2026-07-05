@@ -47,6 +47,13 @@ export default function TocObserver() {
       }
     }
 
+    // 初期アクティブ状態: 最初の TOC リンクをデフォルトでアクティブにする
+    const firstLink = tocLinks[0];
+    if (firstLink) {
+      firstLink.classList.add(styles.tocLinkActive);
+      firstLink.setAttribute("aria-current", "location");
+    }
+
     const io = new IntersectionObserver(
       (entries) => {
         let bestEntry: IntersectionObserverEntry | null = null;
@@ -83,12 +90,27 @@ export default function TocObserver() {
     const navToggle = document.getElementById("navToggle");
     const sidebar = document.getElementById("sidebar");
 
+    // 初期状態の aria-expanded を設定
+    if (navToggle) {
+      navToggle.setAttribute("aria-expanded", "false");
+    }
+
     const handleToggleClick = () => {
-      if (sidebar) sidebar.classList.toggle(styles.sidebarOpen);
+      if (sidebar) {
+        const isOpen = sidebar.classList.toggle(styles.sidebarOpen);
+        if (navToggle) {
+          navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        }
+      }
     };
 
     const handleLinkClick = () => {
-      if (sidebar) sidebar.classList.remove(styles.sidebarOpen);
+      if (sidebar) {
+        sidebar.classList.remove(styles.sidebarOpen);
+        if (navToggle) {
+          navToggle.setAttribute("aria-expanded", "false");
+        }
+      }
     };
 
     if (navToggle) {

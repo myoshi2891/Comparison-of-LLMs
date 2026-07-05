@@ -1,6 +1,11 @@
-import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import dynamic from "next/dynamic";
 import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
+
+const MermaidDiagram = dynamic(() => import("@/components/docs/MermaidDiagram"), {
+  ssr: false,
+});
+
 
 export const metadata = {
   title: "skills.sh 完全ガイド ― AIエージェントを賢くする「Agent Skills」入門",
@@ -1495,10 +1500,10 @@ export default function SkillsShGuidePage() {
                   <pre>
                     <code className="language-bash">
                       <div className={styles.codeLine}>
-                        npx skills add cobra/superpowers --skill brainstorming
+                        npx skills add obra/superpowers --skill brainstorming
                       </div>
                       <div className={styles.codeLine}>
-                        npx skills add cobra/superpowers --skill systematic-debugging
+                        npx skills add obra/superpowers --skill systematic-debugging
                       </div>
                     </code>
                   </pre>

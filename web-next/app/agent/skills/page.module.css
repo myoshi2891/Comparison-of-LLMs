@@ -113,6 +113,10 @@
   text-decoration: none;
 }
 
+/* TocObserver の querySelectorAll で識別するためのマーカークラス */
+/* 実際のスタイルは .sidebarNav a に付与されている */
+.tocLink {}
+
 .sidebarNav a:hover {
   background: var(--bg-hover);
   color: var(--text-primary);
