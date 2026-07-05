@@ -29,8 +29,8 @@
         --border: rgba(148, 167, 199, 0.14);
         --border-strong: rgba(148, 167, 199, 0.28);
         --text: #e7edf6;
-        --text-dim: #a9b6c9;
-        --text-faint: #6f7f96;
+        --text-dim: #bac6d9;
+        --text-faint: #9fb4d1;
         --accent: #7c9eff;
         --accent-dim: rgba(124, 158, 255, 0.14);
         --accent-strong: #a9c0ff;
@@ -44,7 +44,7 @@
         --radius-md: 10px;
         --radius-lg: 16px;
         --sidebar-w: 300px;
-        --maxw: 880px;
+        --maxw: none;
       }
 
       *,
@@ -276,7 +276,6 @@
 
       .hero {
         padding: 88px 56px 56px;
-        max-width: 980px;
         border-bottom: 1px solid var(--border);
       }
       .eyebrow {
@@ -355,7 +354,6 @@
       /* ---------------- Chapter blocks ---------------- */
       .chapter {
         padding: 64px 56px 8px;
-        max-width: var(--maxw);
         border-bottom: 1px solid var(--border);
         scroll-margin-top: 24px;
       }
@@ -536,10 +534,22 @@
         padding: 18px 10px;
         overflow-x: auto;
         border: 1px solid var(--border);
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+      }
+      .figure-canvas > pre.mermaid {
+        width: 100%;
+        display: flex;
+        justify-content: center;
       }
       .figure-canvas svg {
+        display: block;
+        margin: 0 auto;
+        width: auto;
         max-width: 100%;
         height: auto !important;
+        overflow: visible;
       }
       .figure-legend {
         margin: 16px 0 20px;
@@ -703,7 +713,6 @@
       /* ---------------- Footer ---------------- */
       .site-footer {
         padding: 48px 56px 80px;
-        max-width: var(--maxw);
         color: var(--text-faint);
         font-size: 0.82rem;
       }
