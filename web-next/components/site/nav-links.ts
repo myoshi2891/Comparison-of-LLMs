@@ -44,6 +44,7 @@ export const navLinks: readonly NavLink[] = [
       { name: "Managed Agents", href: "/claude/managed-agents" },
       { name: "Self-hosted Sandboxes", href: "/claude/self-hosted-sandboxes" },
       { name: "Code Slash Commands", href: "/claude/code-slash-commands" },
+      { name: "Fable 5 Best Practices", href: "/claude/fable-5-best-practices" },
     ],
   },
   {
