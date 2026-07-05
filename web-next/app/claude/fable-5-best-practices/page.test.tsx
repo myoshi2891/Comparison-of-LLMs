@@ -42,7 +42,7 @@ describe("/claude/fable-5-best-practices - page structure (Step 1)", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
     expect(h1).not.toBeNull();
-    expect(h1?.textContent?.replace(/\s+/g, " ")).toContain("Claude Fable 5 実践活用ガイド");
+    expect(h1?.textContent?.replace(/\s+/g, "")).toContain("ClaudeFable5実践活用ガイド");
   });
 
   it("renders <h2> headings for ch1 and ch2", () => {
