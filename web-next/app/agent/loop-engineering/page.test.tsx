@@ -39,6 +39,26 @@ describe("/agent/loop-engineering - page structure", () => {
     expect(h1).not.toBeNull();
     expect(h1?.textContent).toMatch(/Loop Engineering/);
   });
+
+  it("renders s1 and s2 sections", () => {
+    const { container } = render(<Page />);
+    expect(container.querySelector("#s1")).not.toBeNull();
+    expect(container.querySelector("#s2")).not.toBeNull();
+  });
+
+  it("renders diagrams diag-1 and diag-2", () => {
+    const { container } = render(<Page />);
+    expect(container.querySelector("#diag-1")).not.toBeNull();
+    expect(container.querySelector("#diag-2")).not.toBeNull();
+  });
+
+  it("renders the terminology hierarchy table", () => {
+    const { container } = render(<Page />);
+    const table = container.querySelector("table");
+    expect(table).not.toBeNull();
+    expect(table?.textContent).toContain("Prompt Engineering");
+    expect(table?.textContent).toContain("Loop Engineering");
+  });
 });
 
 describe("/agent/loop-engineering - static source safety", () => {
