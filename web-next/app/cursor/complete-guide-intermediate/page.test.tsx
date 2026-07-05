@@ -112,9 +112,9 @@ test("Cursor Intermediate Guide Page Contract Tests", () => {
     expect(link.textContent?.trim().replace(/\s+/g, " ")).toBe(expectedTocTexts[idx]);
   });
 
-  // 8. Mermaid diagrams assertions for Category 2 (Ch 4-6)
+  // 8. Mermaid diagrams assertions for Category 2 & 3 (Ch 4-9)
   const mermaidBlocks = container.querySelectorAll("[data-testid='mermaid']");
-  // Total diagrams implemented so far: d01, d03, d04, d05, d06 (5 diagrams)
+  // Total diagrams implemented so far: d01, d03, d04, d05, d06, d07, d08, d09 (8 diagrams)
   const charts = Array.from(mermaidBlocks).map((block) => block.textContent);
   expect(
     charts.some(
@@ -138,6 +138,30 @@ test("Cursor Intermediate Guide Page Contract Tests", () => {
         c?.includes("d06-debug-mode-flow") ||
         c?.includes("d06_debug_mode_flow") ||
         c?.includes("ログ計装")
+    )
+  ).toBe(true);
+  expect(
+    charts.some(
+      (c) =>
+        c?.includes("d07-context-sources") ||
+        c?.includes("d07_context_sources") ||
+        c?.includes("SemanticIndex")
+    )
+  ).toBe(true);
+  expect(
+    charts.some(
+      (c) =>
+        c?.includes("d08-rules-priority") ||
+        c?.includes("d08_rules_priority") ||
+        c?.includes("Priority")
+    )
+  ).toBe(true);
+  expect(
+    charts.some(
+      (c) =>
+        c?.includes("d09-mcp-architecture") ||
+        c?.includes("d09_mcp_architecture") ||
+        c?.includes("LocalServer")
     )
   ).toBe(true);
 });
