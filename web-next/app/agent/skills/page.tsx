@@ -47,6 +47,10 @@ const DIAGRAM_4 = `flowchart TD
 export default function Page() {
   return (
     <div className={styles.pageContainer}>
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css"
+      />
       <TocObserver />
       <div className={styles.layout}>
         <button

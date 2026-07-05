@@ -117,6 +117,12 @@ This skill provides rules and best practices to ensure all Markdown documents (`
 
 ---
 
+### 5. テーブルの左寄せ規約
+
+**ルール**: マークダウンの表（テーブル）の文言は、必ず左寄せ（`text-align: left`）で文章を表示してください。ヘッダー下部のセパレータ行は `:---` または `---` で定義し、右寄せ（`---:`）や中央寄せ（`:---:`）は使用しないでください。
+
+---
+
 <!-- markdownlint-enable MD031 MD022 MD032 -->
 
 ## ワークフロー（検証と修正の手順）

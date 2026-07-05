@@ -218,10 +218,15 @@
   color: var(--text-primary);
 }
 
-.chapter ul,
+.chapter ul {
+  margin: 0 0 16px;
+  padding-left: 22px;
+  list-style-type: disc;
+}
 .chapter ol {
   margin: 0 0 16px;
   padding-left: 22px;
+  list-style-type: decimal;
 }
 .chapter li {
   margin: 6px 0;
@@ -307,6 +312,7 @@
   color: var(--text-primary);
   vertical-align: top;
   line-height: 1.7;
+  text-align: left;
 }
 
 .chapter tr:last-child td {
