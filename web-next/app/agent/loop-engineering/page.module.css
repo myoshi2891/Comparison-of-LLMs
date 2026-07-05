@@ -302,6 +302,37 @@
   margin-bottom: 6px;
 }
 
+/* Code block styles */
+.codeWrap {
+  background: var(--code-bg);
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin: 18px 0;
+  overflow-x: auto;
+}
+
+.codeBody {
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-size: 13.4px;
+  line-height: 1.65;
+  color: var(--code-ink);
+}
+
+.codeLine {
+  white-space: pre;
+}
+
+/* Syntax highlight colors */
+.ck {
+  color: #ff7b72; /* Keyword */
+  font-weight: 600;
+}
+
+.cc {
+  color: #8b949e; /* Comment */
+  font-style: italic;
+}
+
 .tableScroll {
   overflow-x: auto;
   margin: 20px 0;

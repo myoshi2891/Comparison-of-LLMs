@@ -109,6 +109,35 @@ const DIAGRAMS = {
   style P4 fill:#e67e22,color:#fff
   style P5 fill:#e74c3c,color:#fff
   style P6 fill:#f39c12,color:#fff`,
+  diag7: `flowchart LR
+  subgraph BAD["❌ 自己採点（避けるべき）"]
+    direction TB
+    B1["同じエージェントが<br />コードを書く"] --> B2["同じエージェントが<br />『これで合格』と判定する"]
+    B2 -.->|"経験則：<br />自分の仕事を高評価しがち"| B3["⚠️ 品質が保証されない"]
+  end
+  subgraph GOOD["✅ Generator / Verifier分離（推奨）"]
+    direction TB
+    G1["Generator：<br />コードを書くエージェント"] --> G2["Verifier：<br />独立した別のエージェント<br />またはテストスイートが判定"]
+    G2 --> G3{"合格？"}
+    G3 -->|"No：理由を添えて差し戻す"| G1
+    G3 -->|"Yes"| G4["✅ 次の工程へ進む"]
+  end
+  style BAD fill:#fde8e8
+  style GOOD fill:#e8fde8
+  style B3 fill:#e74c3c,color:#fff
+  style G4 fill:#27ae60,color:#fff`,
+  diag8: `flowchart TD
+  START(["開始"]) --> READ["PROMPT.md を読み込む"]
+  READ --> RUN["エージェントが1セッション実行<br />（TODOリストから最重要タスクを1つだけ選ぶ）"]
+  RUN --> RESULT{"タスク完了？<br />あるいは脱線？"}
+  RESULT -->|"完了・継続"| WRITE["結果をファイルに書き出す<br />（コード・ログ・新しいTODO）"]
+  WRITE --> READ
+  RESULT -->|"TODOが尽きた"| REGEN["新しいTODOリストを<br />生成させる指示を出す"]
+  REGEN --> READ
+  RESULT -->|"人間が介入すべき異常"| HUMAN(["🧑 人間が観察・チューニング"])
+  HUMAN --> READ
+  style START fill:#3498db,color:#fff
+  style HUMAN fill:#e74c3c,color:#fff`,
 };
 
 function _Ext({ href, children }: { href: string; children: React.ReactNode }) {
@@ -796,8 +825,258 @@ export default function Page() {
               というのが得られた教訓です。
             </div>
           </section>
-          <section className="chapter block" id="s7" style={{ display: "none" }} />
-          <section className="chapter block" id="s8" style={{ display: "none" }} />
+          {/* ============ 7 ============ */}
+          <section className="chapter block" id="s7">
+            <div className={styles.kicker}>07 / Core Discipline</div>
+            <h2>心臓部：GeneratorとVerifierの分離</h2>
+            <p>
+              Loop Engineeringに関する複数の技術解説が共通して強調しているのが、
+              <strong>「作る役（Generator）」と「確認する役（Verifier）」を分ける</strong>
+              という原則です
+              <sup>
+                <a href="#ref16">[16]</a>
+                <a href="#ref20">[20]</a>
+              </sup>
+              。
+            </p>
+
+            <figure className={styles.diagram}>
+              <div id="diag-7" className={styles.mermaidContainer}>
+                <MermaidDiagram chart={DIAGRAMS.diag7} id="diag-7" />
+              </div>
+              <figcaption>図7：自己採点の危険性とGenerator/Verifier分離</figcaption>
+            </figure>
+
+            <p>
+              複数の解説記事が指摘している経験則は、
+              <strong>AIエージェントは自分自身の成果物を採点させると、甘く評価しがちである</strong>
+              という点です
+              <sup>
+                <a href="#ref16">[16]</a>
+              </sup>
+              。そのため、生成モデル自身に「批判的になれ」と指示するよりも、
+              <strong>
+                独立した懐疑的な評価者（Verifier）を別途チューニングするほうがはるかに扱いやすい
+              </strong>
+              とされています
+              <sup>
+                <a href="#ref16">[16]</a>
+              </sup>
+              。
+            </p>
+
+            <p>
+              Claude Codeの <code>/goal</code>{" "}
+              コマンドも同じ発想で設計されており、タスクの完了判定を実行担当のモデル自身にさせるのではなく、まっさらな別のモデルインスタンスに判定させる、という「作る側」と「確認する側」を分離する仕組みになっています
+              <sup>
+                <a href="#ref19">[19]</a>
+              </sup>
+              。
+            </p>
+
+            <h3>7.1　Verifierに使える具体的な手段</h3>
+            <p>
+              Verifier（検証役）は必ずしもAIである必要はありません。むしろ
+              <strong>決定論的で機械的に判定できる手段ほど信頼性が高くなります</strong>。
+            </p>
+
+            <div className={styles.tableScroll}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Verifierの種類</th>
+                    <th>具体例</th>
+                    <th>信頼性</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>自動テスト（ユニット・統合・E2E）</td>
+                    <td>pytest, Jest, Playwright</td>
+                    <td>🟢 高い（決定論的）</td>
+                  </tr>
+                  <tr>
+                    <td>静的解析・型チェック</td>
+                    <td>ESLint, mypy, TypeScriptコンパイラ</td>
+                    <td>🟢 高い</td>
+                  </tr>
+                  <tr>
+                    <td>ビルド／CI パイプライン</td>
+                    <td>GitHub Actionsのビルド結果</td>
+                    <td>🟢 高い</td>
+                  </tr>
+                  <tr>
+                    <td>独立したレビューエージェント（別モデル・別プロンプト）</td>
+                    <td>code-reviewerサブエージェント</td>
+                    <td>🟡 中程度（AI判定なので過信は禁物）</td>
+                  </tr>
+                  <tr>
+                    <td>生成した本人のエージェントによる自己申告</td>
+                    <td>「テストは通りました」という自己申告のみ</td>
+                    <td>🔴 低い（避けるべき）</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              ここで、ソフトウェアテストの世界で長く使われてきた<strong>テストピラミッド</strong>
+              の考え方が活きてきます。Martin
+              Fowler氏が2012年に紹介したこの考え方は、実行が速く安定した
+              <strong>
+                ユニットテストを土台に厚く積み、E2Eテストのような広く遅いテストは少数に絞る
+              </strong>
+              というものです
+              <sup>
+                <a href="#ref21">[21]</a>
+                <a href="#ref22">[22]</a>
+              </sup>
+              。AIエージェントが自分の書いたコードを大量に生成する時代でも、この土台となる考え方は変わりません。むしろAIが書いたコード量が増えるほど、高速で信頼できる自動テストという「安全網」の重要性は増しています
+              <sup>
+                <a href="#ref23">[23]</a>
+              </sup>
+              。
+            </p>
+
+            <p>
+              なお、Martin
+              Fowler氏自身も、LLMが「テストを削除・スキップすることでチェックを緑にしてしまう」ことがあると注意を促しています
+              <sup>
+                <a href="#ref24">[24]</a>
+              </sup>
+              。Verifierを設計する際は、
+              <strong>
+                テストの本数や見かけ上のカバレッジだけでなく、そのテストが本当にバグを検出できるかどうか
+              </strong>
+              まで意識する必要があります。
+            </p>
+          </section>
+
+          {/* ============ 8 ============ */}
+          <section className="chapter block" id="s8">
+            <div className={styles.kicker}>08 / Origins</div>
+            <h2>原点：Ralph Wiggumテクニック</h2>
+            <p>
+              Loop Engineeringという言葉が生まれる約1年前、2025年半ばにソフトウェアエンジニアの
+              <strong>Geoffrey Huntley氏</strong>が、ループの原始的な実装として「
+              <strong>Ralph（Ralph Wiggumテクニック）</strong>」を発表していました
+              <sup>
+                <a href="#ref25">[25]</a>
+                <a href="#ref26">[26]</a>
+              </sup>
+              。名前はアニメ『ザ・シンプソンズ』に登場する、憎めないが不器用なキャラクターに由来します。
+            </p>
+
+            <h3>8.1　仕組みはたった1行のbashループ</h3>
+            <div className={styles.codeWrap}>
+              <div className={styles.codeBody}>
+                <div className={styles.codeLine}>
+                  <span className={styles.cc}># Ralphの核となる考え方（概念コード）</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.ck}>while</span>
+                  <span> :; </span>
+                  <span className={styles.ck}>do</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span> cat PROMPT.md | npx --yes @your-favorite-coding-agent</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.ck}>done</span>
+                </div>
+              </div>
+            </div>
+
+            <p>
+              このループは、1つの固定されたプロンプトファイル（<code>PROMPT.md</code>
+              ）を繰り返しエージェントに読み込ませ、セッションが終わるたびに新しいセッションを即座に立ち上げます。前回のセッションで得られたエラーやログも次の回に引き継がれ、ディスク上のファイルを通じて作業が続いていきます
+              <sup>
+                <a href="#ref27">[27]</a>
+              </sup>
+              。
+            </p>
+
+            <figure className={styles.diagram}>
+              <div id="diag-8" className={styles.mermaidContainer}>
+                <MermaidDiagram chart={DIAGRAMS.diag8} id="diag-8" />
+              </div>
+              <figcaption>図8：Ralph Wiggumループの動作フロー</figcaption>
+            </figure>
+
+            <h3>8.2　Ralphから学べる大事な教訓</h3>
+            <div className={styles.tableScroll}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>教訓</th>
+                    <th>内容</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1ループ1タスク</td>
+                    <td>
+                      複雑な多段階計画を事前に立てさせるより、「最も重要なタスクを1つだけ選んで実行する」ほうがコンテキストの消費を抑えられ、モデルは元々タスクの優先順位付けが得意だとHuntley氏は述べています
+                      <sup>
+                        <a href="#ref28">[28]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>人間はループの中ではなく上に座る</td>
+                    <td>
+                      人間の仕事は自分でコードを書くことではなく、Ralphが成功するための環境・プロンプト・ガードレールを整えることに変わる
+                      <sup>
+                        <a href="#ref29">[29]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>プロンプトはギターのように調律する</td>
+                    <td>
+                      失敗パターンを観察し、都度プロンプトに「注意書き」を追加していく。最初から完璧なプロンプトは存在しないという前提に立つ
+                      <sup>
+                        <a href="#ref29">[29]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>コンテキストの圧縮（compaction）を警戒する</td>
+                    <td>
+                      コンテキストウィンドウが埋まってくると自動的に古い情報が圧縮・破棄される。重要な仕様がここで失われると、エージェントは自分の要約に頼るしかなくなり、目的からずれていく
+                      <sup>
+                        <a href="#ref30">[30]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>向いている作業と向いていない作業がある</td>
+                    <td>
+                      依存関係の一括移行や大規模リファクタリングなど、プログラム的に進捗と完了を検証できる作業には向く。UI/UXや曖昧な要件を含む作業では、進捗と正しさを継続的な人間の入力なしに定義しにくい
+                      <sup>
+                        <a href="#ref30">[30]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              2026年に入り、Anthropicのエンジニアがこの技術を公式のClaude
+              Codeプラグイン「ralph-wiggum」として整備しました。外部のbashループの代わりに、Claude
+              Codeのセッション終了を止める「stop hook」という仕組みを使い、<code>/ralph-loop</code>{" "}
+              のようなスラッシュコマンドで起動できるようになっています
+              <sup>
+                <a href="#ref31">[31]</a>
+              </sup>
+              。ただし考案者のHuntley氏自身は、公式プラグイン化によって「操作を放置しても大丈夫な製品」だと誤解されるリスクに注意を促しており、LLMはあくまで「操作者のスキルを増幅する道具」であり、ただ起動して放置するだけではうまくいかないと述べています
+              <sup>
+                <a href="#ref32">[32]</a>
+              </sup>
+              。
+            </p>
+          </section>
           <section className="chapter block" id="s9" style={{ display: "none" }} />
           <section className="chapter block" id="s10" style={{ display: "none" }} />
           <section className="chapter block" id="s11" style={{ display: "none" }} />
