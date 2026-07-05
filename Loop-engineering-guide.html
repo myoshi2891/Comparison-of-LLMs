@@ -2584,8 +2584,261 @@ model: sonnet
     </footer>
 
     <script>
+      const DIAGRAMS = {
+        'diag-1': `graph LR
+  subgraph OLD["❌ これまで（人間がループそのもの）"]
+    O1["人がプロンプトを書く"] --> O2["エージェントが出力"]
+    O2 --> O3["人が結果を確認"]
+    O3 --> O4["人が次のプロンプトを書く"]
+    O4 --> O1
+  end
+  subgraph NEW["✅ Loop Engineering（システムがループそのもの）"]
+    N1["システムがタスクを発見"] --> N2["エージェントが実行"]
+    N2 --> N3["別のエージェントが検証"]
+    N3 --> N4["結果を記録・記憶"]
+    N4 --> N5["次の周回をスケジュール"]
+    N5 --> N1
+  end
+  style OLD fill:#fde8e8
+  style NEW fill:#e8fde8`,
+        'diag-2': `flowchart TD
+  A["① Prompt Engineering<br />（2023〜2024年頃）<br />『何を言うか』を工夫する<br />良いプロンプト vs 悪いプロンプト"]
+  B["② Context Engineering<br />（2024〜2025年頃）<br />『何を見せるか』を工夫する<br />コンテキストウィンドウに何を詰めるか"]
+  C["③ Harness Engineering<br />（2025年頃）<br />『どんな道具を持たせるか』を工夫する<br />ツール・権限・実行環境の設計"]
+  D["④ Loop Engineering<br />（2026年〜）<br />『いつ・何回・どう繰り返すか』を工夫する<br />人間を実行ループから外す"]
+  A -->|"進化"| B
+  B -->|"進化"| C
+  C -->|"進化"| D
+  style A fill:#95a5a6,color:#fff
+  style B fill:#3498db,color:#fff
+  style C fill:#e67e22,color:#fff
+  style D fill:#e74c3c,color:#fff`,
+        'diag-3': `flowchart LR
+  GOAL(["🎯 ゴール／仕様を定義する<br />（人間の仕事）"]) --> LOOP
+  subgraph LOOP["🔁 ループ（自動で回り続ける）"]
+    direction TB
+    DO["実行する"] --> CHECK["結果を確認する"]
+    CHECK --> DECIDE{"合格？"}
+    DECIDE -->|"No：やり直す"| DO
+    DECIDE -->|"Yes：完了"| STOP(["✅ 停止する"])
+  end
+  style GOAL fill:#3498db,color:#fff
+  style STOP fill:#27ae60,color:#fff
+  style DECIDE fill:#f39c12,color:#fff`,
+        'diag-4': `graph TD
+  subgraph EXT["🌍 外部フィードバックループ（数時間〜数週間）"]
+    direction TB
+    EXT1["友人に見せる・アルファテスター・<br />A/Bテスト・本番投入"]
+  end
+  subgraph DEV["🧑‍💻 開発者フィードバックループ（数分〜数時間）"]
+    direction TB
+    DEV1["人間がプロダクトを確認し<br />エージェントに方向修正を指示する"]
+  end
+  subgraph AGENT["🤖 エージェンティック・コーディングループ（数分単位）"]
+    direction TB
+    AGENT1["仕様書 + 評価基準（evals）を渡す"] --> AGENT2["エージェントがコードを書く"]
+    AGENT2 --> AGENT3["エージェント自身がテストする"]
+    AGENT3 --> AGENT4{"仕様を満たし<br />バグがないか？"}
+    AGENT4 -->|"No"| AGENT2
+    AGENT4 -->|"Yes"| AGENT5["いったん完了として報告"]
+  end
+  AGENT5 --> DEV1
+  DEV1 -->|"仕様を更新して<br />再度エージェントへ"| AGENT1
+  DEV1 --> EXT1
+  EXT1 -->|"データがプロダクトビジョンを<br />更新する"| DEV1
+  style EXT fill:#fef9e7
+  style DEV fill:#ebf5fb
+  style AGENT fill:#eafaf1`,
+        'diag-5': `flowchart TD
+  D["① Discovery（発見）<br />価値のあるタスクを自律的に見つける<br />例：CIの失敗ログ、未解決のissueを読む"]
+  H["② Handoff（引き渡し）<br />タスクごとに独立した作業環境（sandbox）を用意し<br />複数のエージェントを並行させる"]
+  V["③ Verification（検証）<br />成果物が基準を満たしているか判定する<br />最も重要かつ最も軽視されがちな工程"]
+  P["④ Persistence（永続化）<br />『何をしたか・次に何をすべきか』を<br />会話の外部（ファイルやDB）に記録する"]
+  S["⑤ Scheduling（スケジューリング）<br />次の周回を自動で起動する仕組み<br />これがあって初めて『一回きりの実行』が『ループ』になる"]
+  D --> H
+  H --> V
+  V --> P
+  P --> S
+  S -->|"次の周回へ"| D
+  style D fill:#3498db,color:#fff
+  style H fill:#8e44ad,color:#fff
+  style V fill:#e74c3c,color:#fff
+  style P fill:#27ae60,color:#fff
+  style S fill:#f39c12,color:#fff`,
+        'diag-6': `graph TD
+  subgraph PARTS["🧩 ループを構成する6つの部品"]
+    P1["⏰ Automations<br />（自動起動の仕組み）"]
+    P2["🌳 Worktrees<br />（並行作業用の作業ディレクトリ）"]
+    P3["📖 Skills<br />（プロジェクト固有の知識）"]
+    P4["🔌 Plugins / Connectors<br />（既存ツールとの接続）"]
+    P5["🤖 Sub-agents<br />（役割分担された複数のエージェント）"]
+    P6["🧠 Memory（外部記憶）<br />（会話の外にある共有状態）"]
+  end
+  P1 -.->|"実現する"| DISC["Discovery"]
+  P2 -.->|"実現する"| HAND["Handoff"]
+  P5 -.->|"実現する"| VER["Verification"]
+  P6 -.->|"実現する"| PERS["Persistence"]
+  P1 -.->|"実現する"| SCHED["Scheduling"]
+  style P1 fill:#3498db,color:#fff
+  style P2 fill:#8e44ad,color:#fff
+  style P3 fill:#27ae60,color:#fff
+  style P4 fill:#e67e22,color:#fff
+  style P5 fill:#e74c3c,color:#fff
+  style P6 fill:#f39c12,color:#fff`,
+        'diag-7': `flowchart LR
+  subgraph BAD["❌ 自己採点（避けるべき）"]
+    direction TB
+    B1["同じエージェントが<br />コードを書く"] --> B2["同じエージェントが<br />『これで合格』と判定する"]
+    B2 -.->|"経験則：<br />自分の仕事を高評価しがち"| B3["⚠️ 品質が保証されない"]
+  end
+  subgraph GOOD["✅ Generator / Verifier分離（推奨）"]
+    direction TB
+    G1["Generator：<br />コードを書くエージェント"] --> G2["Verifier：<br />独立した別のエージェント<br />またはテストスイートが判定"]
+    G2 --> G3{"合格？"}
+    G3 -->|"No：理由を添えて差し戻す"| G1
+    G3 -->|"Yes"| G4["✅ 次の工程へ進む"]
+  end
+  style BAD fill:#fde8e8
+  style GOOD fill:#e8fde8
+  style B3 fill:#e74c3c,color:#fff
+  style G4 fill:#27ae60,color:#fff`,
+        'diag-8': `flowchart TD
+  START(["開始"]) --> READ["PROMPT.md を読み込む"]
+  READ --> RUN["エージェントが1セッション実行<br />（TODOリストから最重要タスクを1つだけ選ぶ）"]
+  RUN --> RESULT{"タスク完了？<br />あるいは脱線？"}
+  RESULT -->|"完了・継続"| WRITE["結果をファイルに書き出す<br />（コード・ログ・新しいTODO）"]
+  WRITE --> READ
+  RESULT -->|"TODOが尽きた"| REGEN["新しいTODOリストを<br />生成させる指示を出す"]
+  REGEN --> READ
+  RESULT -->|"人間が介入すべき異常"| HUMAN(["🧑 人間が観察・チューニング"])
+  HUMAN --> READ
+  style START fill:#3498db,color:#fff
+  style HUMAN fill:#e74c3c,color:#fff`,
+        'diag-9': `flowchart TD
+  S1["Step 1<br />検証可能なタスクを選ぶ"] --> S2["Step 2<br />『完了』の基準を決める"]
+  S2 --> S3["Step 3<br />Verifierを設計する"]
+  S3 --> S4["Step 4<br />状態(Memory)を外部化する"]
+  S4 --> S5["Step 5<br />並列化のためのSandbox/Worktreeを用意する"]
+  S5 --> S6["Step 6<br />スケジューリングで自動化する"]
+  S6 --> S7["Step 7<br />観察・チューニング・コスト管理をする"]
+  S7 -->|"改善を反映"| S1
+  style S1 fill:#3498db,color:#fff
+  style S2 fill:#8e44ad,color:#fff
+  style S3 fill:#e74c3c,color:#fff
+  style S4 fill:#27ae60,color:#fff
+  style S5 fill:#e67e22,color:#fff
+  style S6 fill:#f39c12,color:#fff
+  style S7 fill:#1abc9c,color:#fff`,
+        'diag-10': `graph TD
+  STOP["🛑 停止条件を3種類用意する"]
+  STOP --> C1["① 成功条件<br />仕様を満たし、テストが全て通った"]
+  STOP --> C2["② 上限条件<br />最大イテレーション回数・最大予算に達した"]
+  STOP --> C3["③ 異常検知条件<br />同じ失敗を繰り返している（無進捗）"]
+  style C1 fill:#27ae60,color:#fff
+  style C2 fill:#f39c12,color:#fff
+  style C3 fill:#e74c3c,color:#fff`,
+        'diag-11': `graph TD
+  TRIAGE["トリアージ結果<br />（複数の要修正項目）"] --> W1["Worktree A<br />（issue #101用）"]
+  TRIAGE --> W2["Worktree B<br />（issue #102用）"]
+  TRIAGE --> W3["Worktree C<br />（issue #103用）"]
+  W1 --> AGENT1["Generatorエージェント"] --> VER1["Verifierエージェント"]
+  W2 --> AGENT2["Generatorエージェント"] --> VER2["Verifierエージェント"]
+  W3 --> AGENT3["Generatorエージェント"] --> VER3["Verifierエージェント"]
+  VER1 --> MERGE["mainブランチへ<br />プルリクエスト"]
+  VER2 --> MERGE
+  VER3 --> MERGE
+  style TRIAGE fill:#2c3e50,color:#fff
+  style MERGE fill:#27ae60,color:#fff`,
+        'diag-12': `sequenceDiagram
+  participant CRON as ⏰ スケジューラ
+  participant DISC as 🔍 発見エージェント
+  participant STATE as 🧠 状態ファイル
+  participant WT as 🌳 Worktree
+  participant GEN as ✍️ Generatorエージェント
+  participant VER as 🕵️ Verifierエージェント
+  participant HUMAN as 🧑 人間の受信箱
+  CRON->>DISC: 毎朝トリガー
+  DISC->>DISC: 昨日のCI失敗ログ・未解決issue・<br />最近のコミットを読む
+  DISC->>STATE: 対応候補をMarkdown/Linearに書き出す
+  loop 対応候補ごとに
+    STATE->>WT: 独立したworktreeを作成
+    WT->>GEN: 修正案の作成を依頼
+    GEN->>VER: 生成した差分を提出
+    VER->>VER: プロジェクトのルール・テストと照合
+    alt 合格
+      VER->>HUMAN: プルリクエストを自動オープン
+    else 不合格
+      VER->>GEN: 理由を添えて差し戻す
+    else 判断がつかない
+      VER->>HUMAN: 受信箱に転送し、人間の判断を待つ
+    end
+  end
+  STATE->>STATE: 状態ファイルを更新（翌日に引き継ぐ）`,
+        'diag-13': `flowchart TD
+  RISK["⚠️ Loop Engineeringの主なリスク"]
+  RISK --> R1["💸 コストの暴走<br />検証が甘いループはトークン代を<br />静かに、しかし際限なく消費し続ける"]
+  RISK --> R2["🧠 認知的な明け渡し<br />『Cognitive Surrender』<br />ループが自動で回るほど、考えるのをやめて<br />結果を鵜呑みにしやすくなる"]
+  RISK --> R3["🌀 コンテキストの劣化<br />『Context Rot』<br />圧縮（compaction）で重要な仕様が失われ<br />目的から少しずつずれていく"]
+  RISK --> R4["🪞 自己採点バイアス<br />生成モデル自身に判定させると<br />甘い評価になりがち"]
+  RISK --> R5["📊 サンプリングバイアス<br />ツールベンダーの成功事例は<br />すでにそのツールを使いこなす人からのデータ"]
+  style RISK fill:#2c3e50,color:#fff
+  style R1 fill:#e74c3c,color:#fff
+  style R2 fill:#e74c3c,color:#fff
+  style R3 fill:#e74c3c,color:#fff
+  style R4 fill:#e74c3c,color:#fff
+  style R5 fill:#e74c3c,color:#fff`,
+        'diag-14': `graph TD
+  LV0["Level 0：手動プロンプト<br />すべてのやり取りを人間が毎回入力する"]
+  LV1["Level 1：単発の自動化<br />1つのタスクをcronで一度だけ自動実行する"]
+  LV2["Level 2：検証つきループ<br />Generator/Verifierを分離し、<br />停止条件を明確に設定する"]
+  LV3["Level 3：状態の永続化<br />会話の外に状態を保存し、<br />複数回の実行をまたいで文脈を維持する"]
+  LV4["Level 4：並列化された複数ループ<br />Worktreeで複数タスクを並行処理し、<br />コストと進捗を継続的に監視する"]
+  LV5["Level 5：ループのエコシステム化<br />複数のループが互いに連携し、<br />人間はアーキテクトとして設計・監督に専念する"]
+  LV0 --> LV1
+  LV1 --> LV2
+  LV2 --> LV3
+  LV3 --> LV4
+  LV4 --> LV5
+  style LV0 fill:#e74c3c,color:#fff
+  style LV1 fill:#e67e22,color:#fff
+  style LV2 fill:#f39c12,color:#fff
+  style LV3 fill:#27ae60,color:#fff
+  style LV4 fill:#3498db,color:#fff
+  style LV5 fill:#8e44ad,color:#fff`,
+        'diag-15': `flowchart TD
+  CHECK["🔍 ループの健全性チェック"]
+  Q1{"停止条件（成功・上限・無進捗）<br />を3種類とも設定しているか？"}
+  Q2{"作る役と確認する役は<br />別のプロンプト／モデルに<br />分かれているか？"}
+  Q3{"状態は会話の外（ファイル等）に<br />保存されているか？"}
+  Q4{"コストを日次・週次で<br />監視できているか？"}
+  Q5{"人間へのエスカレーション経路が<br />明確に定義されているか？"}
+  FIX1["🔧 max-iterationsと予算上限、<br />無進捗検知を追加する"]
+  FIX2["🔧 レビュー専任のサブエージェントを<br />切り出す"]
+  FIX3["🔧 TODO.md等の外部ファイルに<br />進捗を書き出す仕組みを追加する"]
+  FIX4["🔧 コストダッシュボードを設定し、<br />アラートを仕込む"]
+  FIX5["🔧 『人間が判断すべき境界線』を<br />ドキュメント化する"]
+  HEALTHY["✅ 健全なループ運用"]
+  CHECK --> Q1
+  Q1 -->|"No"| FIX1
+  Q1 -->|"Yes"| Q2
+  Q2 -->|"No"| FIX2
+  Q2 -->|"Yes"| Q3
+  Q3 -->|"No"| FIX3
+  Q3 -->|"Yes"| Q4
+  Q4 -->|"No"| FIX4
+  Q4 -->|"Yes"| Q5
+  Q5 -->|"No"| FIX5
+  Q5 -->|"Yes"| HEALTHY
+  style HEALTHY fill:#27ae60,color:#fff
+  style FIX1 fill:#3498db,color:#fff
+  style FIX2 fill:#3498db,color:#fff
+  style FIX3 fill:#3498db,color:#fff
+  style FIX4 fill:#3498db,color:#fff
+  style FIX5 fill:#3498db,color:#fff`
+      };
+
       mermaid.initialize({
-        startOnLoad: true,
+        startOnLoad: false,
         theme: 'base',
         themeVariables: {
           fontFamily: 'IBM Plex Sans JP, IBM Plex Sans, sans-serif',
@@ -2599,6 +2852,29 @@ model: sonnet
         flowchart: { curve: 'basis', htmlLabels: true },
         securityLevel: 'loose',
       });
+
+      (async () => {
+        if (document.fonts) await document.fonts.ready;
+        for (const [id, src] of Object.entries(DIAGRAMS)) {
+          const container = document.getElementById(id);
+          if (!container) continue;
+          try {
+            const { svg } = await mermaid.render('svg-' + id, src);
+            container.innerHTML = svg;
+            const svgEl = container.querySelector('svg');
+            if (svgEl) {
+              svgEl.removeAttribute('width');
+              svgEl.removeAttribute('height');
+              svgEl.style.width = '100%';
+              svgEl.style.height = 'auto';
+              svgEl.style.overflow = 'visible';
+            }
+          } catch (e) {
+            console.error('Error rendering mermaid diagram ' + id, e);
+            container.innerHTML = `<pre class="error">Rendering Error: ${e.message}</pre>`;
+          }
+        }
+      })();
 
       // Mobile TOC toggle
       const tocToggle = document.getElementById('tocToggle');
