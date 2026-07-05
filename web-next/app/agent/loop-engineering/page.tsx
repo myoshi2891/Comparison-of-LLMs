@@ -138,6 +138,66 @@ const DIAGRAMS = {
   HUMAN --> READ
   style START fill:#3498db,color:#fff
   style HUMAN fill:#e74c3c,color:#fff`,
+  diag9: `flowchart TD
+  S1["Step 1<br />検証可能なタスクを選ぶ"] --> S2["Step 2<br />『完了』の基準を決める"]
+  S2 --> S3["Step 3<br />Verifierを設計する"]
+  S3 --> S4["Step 4<br />状態(Memory)を外部化する"]
+  S4 --> S5["Step 5<br />並列化のためのSandbox/Worktreeを用意する"]
+  S5 --> S6["Step 6<br />スケジューリングで自動化する"]
+  S6 --> S7["Step 7<br />観察・チューニング・コスト管理をする"]
+  S7 -->|"改善を反映"| S1
+  style S1 fill:#3498db,color:#fff
+  style S2 fill:#8e44ad,color:#fff
+  style S3 fill:#e74c3c,color:#fff
+  style S4 fill:#27ae60,color:#fff
+  style S5 fill:#e67e22,color:#fff
+  style S6 fill:#f39c12,color:#fff
+  style S7 fill:#1abc9c,color:#fff`,
+  diag10: `graph TD
+  STOP["🛑 停止条件を3種類用意する"]
+  STOP --> C1["① 成功条件<br />仕様を満たし、テストが全て通った"]
+  STOP --> C2["② 上限条件<br />最大イテレーション回数・最大予算に達した"]
+  STOP --> C3["③ 異常検知条件<br />同じ失敗を繰り返している（無進捗）"]
+  style C1 fill:#27ae60,color:#fff
+  style C2 fill:#f39c12,color:#fff
+  style C3 fill:#e74c3c,color:#fff`,
+  diag11: `graph TD
+  TRIAGE["トリアージ結果<br />（複数の要修正項目）"] --> W1["Worktree A<br />（issue #101用）"]
+  TRIAGE --> W2["Worktree B<br />（issue #102用）"]
+  TRIAGE --> W3["Worktree C<br />（issue #103用）"]
+  W1 --> AGENT1["Generatorエージェント"] --> VER1["Verifierエージェント"]
+  W2 --> AGENT2["Generatorエージェント"] --> VER2["Verifierエージェント"]
+  W3 --> AGENT3["Generatorエージェント"] --> VER3["Verifierエージェント"]
+  VER1 --> MERGE["mainブランチへ<br />プルリクエスト"]
+  VER2 --> MERGE
+  VER3 --> MERGE
+  style TRIAGE fill:#2c3e50,color:#fff
+  style MERGE fill:#27ae60,color:#fff`,
+  diag12: `sequenceDiagram
+  participant CRON as ⏰ スケジューラ
+  participant DISC as 🔍 発見エージェント
+  participant STATE as 🧠 状態ファイル
+  participant WT as 🌳 Worktree
+  participant GEN as ✍️ Generatorエージェント
+  participant VER as 🕵️ Verifierエージェント
+  participant HUMAN as 🧑 人間の受信箱
+  CRON->>DISC: 毎朝トリガー
+  DISC->>DISC: 昨日のCI失敗ログ・未解決issue・<br />最近のコミットを読む
+  DISC->>STATE: 対応候補をMarkdown/Linearに書き出す
+  loop 対応候補ごとに
+    STATE->>WT: 独立したworktreeを作成
+    WT->>GEN: 修正案の作成を依頼
+    GEN->>VER: 生成した差分を提出
+    VER->>VER: プロジェクトのルール・テストと照合
+    alt 合格
+      VER->>HUMAN: プルリクエストを自動オープン
+    else 不合格
+      VER->>GEN: 理由を添えて差し戻す
+    else 判断がつかない
+      VER->>HUMAN: 受信箱に転送し、人間の判断を待つ
+    end
+  end
+  STATE->>STATE: 状態ファイルを更新（翌日に引き継ぐ）`,
 };
 
 function _Ext({ href, children }: { href: string; children: React.ReactNode }) {
@@ -1077,8 +1137,312 @@ export default function Page() {
               。
             </p>
           </section>
-          <section className="chapter block" id="s9" style={{ display: "none" }} />
-          <section className="chapter block" id="s10" style={{ display: "none" }} />
+          {/* ============ 9 ============ */}
+          <section className="chapter block" id="s9">
+            <div className={styles.kicker}>09 / Practice</div>
+            <h2>ステップバイステップ実践ガイド</h2>
+            <p>
+              ここからは、実際に自分の手でループを組み立てるための手順を、初心者でも迷わないよう順番に解説します。
+            </p>
+
+            <figure className={styles.diagram}>
+              <div id="diag-9" className={styles.mermaidContainer}>
+                <MermaidDiagram chart={DIAGRAMS.diag9} id="diag-9" />
+              </div>
+              <figcaption>図9：ループ構築の7ステップ</figcaption>
+            </figure>
+
+            <h3>Step 1：検証可能なタスクを選ぶ</h3>
+            <p>
+              すべてのタスクがループ向きなわけではありません。まずは「機械的に正解・不正解を判定できるタスク」から始めるのが鉄則です。
+            </p>
+            <div className={styles.tableScroll}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>✅ ループ向きなタスク</th>
+                    <th>❌ ループ向きでないタスク</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>依存パッケージのバージョン移行</td>
+                    <td>まったく新しいUI/UXのデザイン</td>
+                  </tr>
+                  <tr>
+                    <td>型エラー・Lintエラーの一括修正</td>
+                    <td>ブランド戦略や事業方針の決定</td>
+                  </tr>
+                  <tr>
+                    <td>CIの失敗しているテストの修正</td>
+                    <td>「良い雰囲気」など主観的な評価が必要な作業</td>
+                  </tr>
+                  <tr>
+                    <td>既存パターンに沿ったテストコードの追加</td>
+                    <td>一度きりの調査・意思決定</td>
+                  </tr>
+                  <tr>
+                    <td>ドキュメントとコードの同期</td>
+                    <td>顧客に直接影響する重大な意思決定</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              判断に迷ったら、「この作業が終わったかどうかを、人間が目視確認せずプログラムだけで判定できるか？」と自問してください。できないなら、まず人間の判断基準を明文化するところから始める必要があります。
+            </p>
+
+            <h3>Step 2：「完了」の基準（Stop Condition）を決める</h3>
+            <p>
+              ループ最大のリスクは「終わり時を決めずに走らせてしまうこと」です。始める前に、必ず次の3種類の停止条件を用意します。
+            </p>
+
+            <figure className={styles.diagram}>
+              <div id="diag-10" className={styles.mermaidContainer}>
+                <MermaidDiagram chart={DIAGRAMS.diag10} id="diag-10" />
+              </div>
+              <figcaption>図10：3種類の停止条件</figcaption>
+            </figure>
+
+            <div className={styles.tableScroll}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>条件の種類</th>
+                    <th>設定例</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>成功条件</td>
+                    <td>
+                      「指定したテストスイートがすべてグリーンになる」「仕様書のチェックリストが全項目満たされる」
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>上限条件（回数）</td>
+                    <td>
+                      最大イテレーション回数を指定するオプション（例：
+                      <code>--max-iterations 20</code>）
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>上限条件（コスト）</td>
+                    <td>1日あたり／1ジョブあたり／のドル予算の上限を決めておく</td>
+                  </tr>
+                  <tr>
+                    <td>無進捗検知</td>
+                    <td>
+                      直近N回のイテレーションで差分（diff）がほぼゼロ、または同じエラーメッセージが繰り返されている場合に停止する
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              「停止条件を決めずにループを回す」ことは、根本的な設計ミスとされています。無人のループが検証の甘いまま走り続けると、失敗は静かに起こり、気づいたときには夜通しトークン代だけが積み上がっている、という指摘があります
+              <sup>
+                <a href="#ref12">[12]</a>
+              </sup>
+              。
+            </p>
+
+            <h3>Step 3：Verifierを設計する</h3>
+            <p>7章で述べたGenerator / Verifier分離の原則を実装レベルで反映します。</p>
+            <ol>
+              <li>
+                <strong>既存の自動テストを土台にする</strong>：ユニットテスト → 統合テスト →
+                E2Eテストの順に、実行が速く数が多いものを優先します（テストピラミッドの考え方）
+                <sup>
+                  <a href="#ref21">[21]</a>
+                </sup>
+                。
+              </li>
+              <li>
+                <strong>レビュー役のサブエージェントを別途用意する</strong>
+                ：コードを書くエージェントとは別のモデル・別のプロンプトで、プロジェクトのルール（コーディング規約やAGENTS.mdなど）に照らしてレビューさせます
+                <sup>
+                  <a href="#ref19">[19]</a>
+                </sup>
+                。
+              </li>
+              <li>
+                <strong>人間が確認すべき境界線を明文化する</strong>
+                ：「テストが通れば自動マージしてよい変更」と「必ず人間の承認が必要な変更（例：認証まわり、課金まわり、削除操作）」を事前に切り分けます。
+              </li>
+            </ol>
+
+            <h3>Step 4：状態（Memory）をループの外に置く</h3>
+            <p>
+              AIモデルは実行と実行の間の記憶を持ちません。前回何をしたか、今何が終わっていて何が残っているかは、
+              <strong>会話の外側にある永続的な場所</strong>に書き出す必要があります
+              <sup>
+                <a href="#ref17">[17]</a>
+              </sup>
+              。
+            </p>
+            <div className={styles.tableScroll}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>保存先</th>
+                    <th>向いている用途</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <code>TODO.md</code> / <code>PROGRESS.md</code> などのMarkdownファイル
+                    </td>
+                    <td>小規模〜中規模のプロジェクト、個人利用</td>
+                  </tr>
+                  <tr>
+                    <td>Linear / Jira などのチケット管理ツール</td>
+                    <td>チームで共有する必要がある場合</td>
+                  </tr>
+                  <tr>
+                    <td>SQLite / 軽量DB</td>
+                    <td>構造化されたログを蓄積・検索したい場合</td>
+                  </tr>
+                  <tr>
+                    <td>Git のコミット履歴そのもの</td>
+                    <td>「何がいつ変わったか」を追いたい場合</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              ここで重要なのは、
+              <strong>
+                「今日提案する記事は何か」のような判断材料を、システムプロンプトに固定でハードコードしないこと
+              </strong>
+              です。前述のブログ提案ループの失敗例のように、状態がプロンプトに埋め込まれていると更新が反映されず、重複や矛盾が発生します。エージェントに毎回外部の記憶を実際に読みに行かせる（例：ファイルを
+              <code>ls</code>して<code>grep</code>する）ことで、この種の事故を防げます
+              <sup>
+                <a href="#ref17">[17]</a>
+              </sup>
+              。
+            </p>
+
+            <h3>Step 5：並列化のためのSandbox / Worktreeを用意する</h3>
+            <p>
+              複数のタスクを同時に処理したい場合、それぞれのエージェントが互いのファイルを壊さないよう、
+              <strong>独立した作業環境</strong>を用意します。
+            </p>
+            <ul>
+              <li>
+                <strong>Git Worktree</strong>
+                ：1つのリポジトリに対して複数の独立した作業ディレクトリを作れるGitの標準機能です。並行して動くエージェントが同じファイルを同時に触って壊す事故を防ぎます
+                <sup>
+                  <a href="#ref15">[15]</a>
+                </sup>
+                。
+              </li>
+              <li>
+                <strong>サンドボックス環境</strong>
+                ：ファイルシステムやネットワークへのアクセスを制限した隔離環境で実行し、意図しないコマンド実行の被害範囲を限定します。
+              </li>
+            </ul>
+
+            <figure className={styles.diagram}>
+              <div id="diag-11" className={styles.mermaidContainer}>
+                <MermaidDiagram chart={DIAGRAMS.diag11} id="diag-11" />
+              </div>
+              <figcaption>図11：Worktreeによる並列実行のイメージ</figcaption>
+            </figure>
+
+            <h3>Step 6：スケジューリングで自動化する</h3>
+            <p>
+              ここまでの部品が揃って初めて、「一度きりの実行」が本当の意味での「ループ」になります。トリガーの方法はいくつかあります。
+            </p>
+            <div className={styles.tableScroll}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>方式</th>
+                    <th>特徴</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ローカルのcronジョブ</td>
+                    <td>シンプルだが、マシンの電源が入っている間しか動かない</td>
+                  </tr>
+                  <tr>
+                    <td>クラウド上のスケジュールタスク</td>
+                    <td>マシンを閉じても実行され、再起動をまたいで継続できる</td>
+                  </tr>
+                  <tr>
+                    <td>CI/CD（GitHub Actionsなど）のスケジュールトリガー</td>
+                    <td>既存のCI基盤に統合しやすく、チームで共有しやすい</td>
+                  </tr>
+                  <tr>
+                    <td>ツール内蔵のスケジューリング機能</td>
+                    <td>
+                      Claude Codeの <code>/loop</code>（セッション内の一定間隔実行）や{" "}
+                      <code>/schedule</code>（クラウド常駐のcronタスク）など（11章で詳述）
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>Step 7：観察・チューニング・コスト管理をする</h3>
+            <p>
+              ループを起動したら終わりではありません。運用しながら次の観点で継続的に見直します。
+            </p>
+            <ul>
+              <li>
+                <strong>失敗パターンの記録</strong>
+                ：エージェントが同じ間違いを繰り返す箇所があれば、プロンプトやAGENTS.md／CLAUDE.mdに「注意書き」として追記します（8.2節「ギターの調律」の教訓）。
+              </li>
+              <li>
+                <strong>トークン・コストの監視</strong>
+                ：想定外にコストが跳ね上がっていないか、1日単位・1ジョブ単位で確認します（12章のリスクも参照）。
+              </li>
+              <li>
+                <strong>人間へのエスカレーション経路の確認</strong>
+                ：ループが自力で解決できなかった項目が、きちんと人間の受信箱（Triage
+                Inbox）に届いているかを確認します
+                <sup>
+                  <a href="#ref14">[14]</a>
+                </sup>
+                。
+              </li>
+            </ul>
+          </section>
+
+          {/* ============ 10 ============ */}
+          <section className="chapter block" id="s10">
+            <div className={styles.kicker}>10 / Worked Example</div>
+            <h2>具体例で理解する：朝のCIトリアージ・ループ</h2>
+            <p>
+              Addy
+              Osmani氏が紹介している「朝のトリアージ・ループ」の例を、これまでの用語と対応させて整理します
+              <sup>
+                <a href="#ref14">[14]</a>
+              </sup>
+              。
+            </p>
+
+            <figure className={styles.diagram}>
+              <div id="diag-12" className={styles.mermaidContainer}>
+                <MermaidDiagram chart={DIAGRAMS.diag12} id="diag-12" />
+              </div>
+              <figcaption>図12：朝のCIトリアージ・ループの全体シーケンス</figcaption>
+            </figure>
+
+            <p>
+              この例からわかる重要なポイントは、
+              <strong>「何も見つからなかった実行はそのまま自己完結して終わる」</strong>
+              ことです。対応が必要な項目が見つかったときだけ人間の元に届き、それ以外は静かに完了します。人間はループの中に張り付いている必要はありませんが、
+              <strong>必要な場所ではきちんと立ち止まって人間を待つ</strong>設計になっています
+              <sup>
+                <a href="#ref14">[14]</a>
+              </sup>
+              。
+            </p>
+          </section>
           <section className="chapter block" id="s11" style={{ display: "none" }} />
           <section className="chapter block" id="s12" style={{ display: "none" }} />
           <section className="chapter block" id="s13" style={{ display: "none" }} />

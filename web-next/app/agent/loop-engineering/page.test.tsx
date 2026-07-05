@@ -135,15 +135,7 @@ describe("/agent/loop-engineering - page structure", () => {
     expect(content).toContain("ループ向きなタスク");
     expect(content).toContain("上限条件（回数）");
     expect(content).toContain("外部記憶");
-    expect(content).toContain("自動トリガー");
-  });
-
-  it("renders the practice steps list", () => {
-    const { container } = render(<Page />);
-    const list = container.querySelector("ol[class*='step-list']");
-    expect(list).not.toBeNull();
-    expect(list?.textContent).toContain("タスクを選ぶ");
-    expect(list?.textContent).toContain("上限を必ず設定");
+    expect(content).toContain("ローカルのcronジョブ");
   });
 });
 
