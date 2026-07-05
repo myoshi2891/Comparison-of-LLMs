@@ -138,10 +138,7 @@ describe("Phase A - IDE dropdown shape", () => {
 
   it("uses clean URL paths for all IDE children (no .html extension)", () => {
     const children = ide && "children" in ide ? ide.children : [];
-    const expectedHrefs = [
-      "/cursor/complete-guide",
-      "/cursor/complete-guide-intermediate",
-    ];
+    const expectedHrefs = ["/cursor/complete-guide", "/cursor/complete-guide-intermediate"];
     expect(children.map((c) => c.href)).toEqual(expectedHrefs);
   });
 });
