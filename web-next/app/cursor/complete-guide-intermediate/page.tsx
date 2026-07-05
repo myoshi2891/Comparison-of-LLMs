@@ -130,6 +130,33 @@ const DIAGRAMS = {
     ExternalTool1 --> Result[ツール結果を Agent へ返却]
     ExternalTool2 --> Result
     Result --> AgentLoop[Agent 実行ループへ合流]`,
+  d10_skills_decision: `flowchart TD
+    Q1[常に守らせたい規約か] -->|はい| Rules[Rules を選択]
+    Q1 -->|いいえ| Q2[特定のファイルやチームに絞るか]
+    Q2 -->|はい| Skills[Skills を選択 paths / folder スコープ]
+    Q2 -->|いいえ| Q3[独立した文脈での長時間作業か]
+    Q3 -->|はい| Subagents[Subagents を選択 Explore / Bash / Browser など]
+    Q3 -->|いいえ| Hooks[Hooks を選択 ツール実行前後の検証・ブロックなど]`,
+  d11_subagent_isolation: `flowchart TD
+    subgraph Direct [メインエージェント直接処理]
+      Task1[探索タスク] --> MainContext1[大量の中間出力がメイン文脈に蓄積]
+      MainContext1 --> Slow[動作の遅延や要約による情報の損失]
+    end
+    subgraph Isolated [Subagent 委任]
+      Task2[探索タスク] --> SubAgent[Explore Subagent]
+      SubAgent --> SubContext[独自のコンテキストで探索処理]
+      SubContext --> Result[要約のみが親へ返却]
+      Result --> MainContext2[メイン文脈は最小限で綺麗に維持]
+    end`,
+  d12_hooks_sequence: `flowchart TD
+    Agent[Agent がシェル実行を要求] --> preToolUse{preToolUse Hook}
+    preToolUse -->|allow| beforeShell{beforeShellExecution Hook}
+    preToolUse -->|deny| Block[実行を拒否しメッセージを返す]
+    beforeShell -->|allow| Terminal[ターミナルでコマンド実行]
+    beforeShell -->|deny| Block
+    Terminal --> afterShell[afterShellExecution Hook]
+    afterShell --> postToolUse[postToolUse Hook]
+    postToolUse --> FinalResult[実行結果と監査ログを合成]`,
 };
 
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
@@ -2502,8 +2529,1442 @@ alwaysApply: false
           </div>
         </section>
 
-        {/* ==================== Placeholders for Chapters 10-21 ==================== */}
-        {TOC_ITEMS.slice(9).map((item) => (
+        {/* ==================== Chapter 10 ==================== */}
+        <section className={`${styles.chapter} chapter`} id="ch10">
+          <div className={styles.chapterEyebrow}>Chapter 10</div>
+          <h2>Agent Skills</h2>
+
+          <div className={styles.introCallout}>
+            <span className={styles.icon}>💡</span>
+            <div>
+              この章では、Agent
+              に特定タスク遂行のための専門知識をパッケージ化して渡す「Skills」の設計方法を扱います。Rules
+              との違いを理解することが、コンテキストを無駄なく保つ鍵になります。
+            </div>
+          </div>
+
+          <p>
+            Skill
+            は、エージェントにドメイン固有のタスク遂行方法を教える、ポータブルでバージョン管理可能なパッケージである。スクリプト・テンプレート・参照資料を同梱でき、必要になったときだけ段階的にロードされる（プログレッシブ）ため、コンテキスト消費を抑えられる。
+          </p>
+
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>特性</th>
+                  <th>説明</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>ポータブル</strong>
+                  </td>
+                  <td>
+                    Agent Skills 標準に対応するどのエージェントでも動作する（Cursor / Claude / Codex
+                    間で互換性あり）
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>バージョン管理可能</strong>
+                  </td>
+                  <td>
+                    ファイルとして保存されリポジトリで追跡、または GitHub リンクからインストール可能
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>アクション可能</strong>
+                  </td>
+                  <td>
+                    エージェントがツールを使って実行できるスクリプト・テンプレート・参照資料を含められる
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>プログレッシブ</strong>
+                  </td>
+                  <td>リソースをオンデマンドで読み込み、コンテキスト使用を効率化する</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>1</div>
+            <div className={styles.stepBody}>
+              <h4>Skill が発見される仕組みを理解する</h4>
+              <p>
+                Cursor 起動時に以下のディレクトリからスキルを自動検出し、Agent
+                が利用可能な状態にする。関連性の判断は Agent 自身が行うほか、チャットで{" "}
+                <code>/</code> を入力してスキル名を検索し手動起動もできる。
+              </p>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>配置場所</th>
+                      <th>スコープ</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <code>.agents/skills/</code>
+                      </td>
+                      <td>プロジェクト単位</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>.cursor/skills/</code>
+                      </td>
+                      <td>プロジェクト単位</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>~/.agents/skills/</code>
+                      </td>
+                      <td>ユーザー単位（グローバル）</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>~/.cursor/skills/</code>
+                      </td>
+                      <td>ユーザー単位（グローバル）</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>
+                互換性のため <code>.claude/skills/</code>・<code>.codex/skills/</code>
+                （およびそれぞれの <code>~/</code> 版）も読み込まれる。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>2</div>
+            <div className={styles.stepBody}>
+              <h4>SKILL.md を書く</h4>
+              <p>
+                各スキルは <code>SKILL.md</code> を含むフォルダで構成する。
+              </p>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>ディレクトリ構成</span>
+                </div>
+                <pre>
+                  <code className="language-plaintext">{`.agents/
+└── skills/
+    └── deploy-app/
+        ├── SKILL.md
+        ├── scripts/
+        │   ├── deploy.sh
+        │   └── validate.py
+        ├── references/
+        │   └── REFERENCE.md
+        └── assets/
+            └── config-template.json`}</code>
+                </pre>
+              </div>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>SKILL.md</span>
+                </div>
+                <pre>
+                  <code className="language-markdown">{`---
+name: my-skill
+description: このスキルが何をするか、いつ使うべきかの説明
+---
+
+# My Skill
+
+エージェント向けの詳細な指示。
+
+## When to Use
+- こういうときに使う
+- こういう場面で役立つ
+
+## Instructions
+- 手順を段階的に記述する
+- ドメイン固有の規約を記述する`}</code>
+                </pre>
+              </div>
+              <p>フロントマターの各フィールド：</p>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>フィールド</th>
+                      <th>必須</th>
+                      <th>説明</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <code>name</code>
+                      </td>
+                      <td>✅</td>
+                      <td>
+                        スキル識別子。小文字・数字・ハイフンのみ。親フォルダ名と一致させる必要がある
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>description</code>
+                      </td>
+                      <td>✅</td>
+                      <td>何をするか・いつ使うかの説明。Agent がこれを見て関連性を判断する</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>paths</code>
+                      </td>
+                      <td>–</td>
+                      <td>
+                        スキルを特定ファイルに絞るグロブパターン（カンマ区切り文字列 or 配列）
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>disable-model-invocation</code>
+                      </td>
+                      <td>–</td>
+                      <td>
+                        <code>true</code> にすると <code>/skill-name</code>{" "}
+                        での明示呼び出し専用になる（自動判断されない）
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>metadata</code>
+                      </td>
+                      <td>–</td>
+                      <td>任意のキーバリューメタデータ</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>3</div>
+            <div className={styles.stepBody}>
+              <h4>
+                <code>paths</code> でスキルをファイル種別に絞る
+              </h4>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>paths フィールドの例</span>
+                </div>
+                <pre>
+                  <code className="language-markdown">{`---
+name: react-component-patterns
+description: このコードベースにおける React コンポーネントの規約
+paths:
+  - "**/*.tsx"
+  - "packages/ui/**/*.ts"
+---`}</code>
+                </pre>
+              </div>
+              <p>
+                <code>paths</code> を設定すると、Agent
+                が一致するファイルを読み書きしている時だけスキルが提示される。無関係な作業でファイル固有のガイダンスがコンテキストに混ざるのを防げる。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>4</div>
+            <div className={styles.stepBody}>
+              <h4>ネストしたスキルディレクトリでモノレポを整理する</h4>
+              <p>
+                Cursor
+                はスキルルートを再帰的に走査するため、カテゴリ別・チーム別にサブディレクトリでスキルを整理できる。
+              </p>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>カテゴリ別の整理例</span>
+                </div>
+                <pre>
+                  <code className="language-plaintext">{`.cursor/
+└── skills/
+    ├── shipping/
+    │   ├── land-it/SKILL.md
+    │   └── careful-merge-conflicts/SKILL.md
+    ├── debugging/
+    │   └── using-datadog-mcp/SKILL.md
+    └── workflow/
+        └── tdd/SKILL.md`}</code>
+                </pre>
+              </div>
+              <p>
+                さらに、モノレポ内のネストしたプロジェクトサブディレクトリに置かれた{" "}
+                <code>.cursor/skills/</code>（または <code>.agents/skills/</code>
+                ）も自動検出される。この場合、そのスキルは配置先ディレクトリ配下のファイルにのみ自動的にスコープされる（
+                <code>paths</code> を明示的に設定しなくてよい）。
+              </p>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>モノレポでの自動スコープ例</span>
+                </div>
+                <pre>
+                  <code className="language-plaintext">{`my-monorepo/
+├── .cursor/skills/         # リポジトリ全体で使えるスキル
+│   └── land-it/SKILL.md
+└── apps/
+    └── web/
+        └── .cursor/skills/  # web アプリ専用スキル
+            └── deploy-web/SKILL.md`}</code>
+                </pre>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>5</div>
+            <div className={styles.stepBody}>
+              <h4>Rules・スラッシュコマンドから Skills へ移行する</h4>
+              <p>
+                Cursor 2.4 以降には組み込みの <code>/migrate-to-skills</code>{" "}
+                スキルがあり、既存の動的ルール（<code>alwaysApply: false</code> かつ{" "}
+                <code>globs</code> 未指定＝「Apply
+                Intelligently」設定のルール）とスラッシュコマンドをスキルへ変換できる。
+                <code>alwaysApply: true</code> や特定の <code>globs</code>{" "}
+                を持つルールは、明示的な発火条件を持つため移行対象にならない。
+              </p>
+              <ol>
+                <li>
+                  チャットで <code>/migrate-to-skills</code> と入力する
+                </li>
+                <li>Agent が移行対象のルール・コマンドを特定し変換する</li>
+                <li>
+                  <code>.cursor/skills/</code> に生成されたスキルをレビューする
+                </li>
+              </ol>
+            </div>
+          </div>
+
+          <div className={styles.figure}>
+            <p className={styles.figureLead}>
+              This decision tree helps decide when to use Rules, Skills, Subagents, or Hooks.
+            </p>
+            <div className={styles.figureCanvas}>
+              <MermaidDiagram chart={DIAGRAMS.d10_skills_decision} />
+            </div>
+          </div>
+          <div className={styles.figureLegend}>
+            <div className={styles.legendTitle}>各ノードの意味</div>
+            <dl>
+              <div>
+                <dt>常に守らせたい規約か</dt>
+                <dd>Rules を選ぶかどうかの一次判断</dd>
+              </div>
+              <div>
+                <dt>独立した文脈での長時間作業か</dt>
+                <dd>
+                  コンテキスト分離が必要ならSubagents、そうでなく実行時の許可・拒否制御ならHooksを選ぶ分岐
+                </dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className={`${styles.box} ${styles.glossary}`}>
+            <div className={styles.boxTitle}>📖 用語ノート</div>
+            <dl>
+              <div>
+                <dt>プログレッシブ（progressive）ロード</dt>
+                <dd>必要になった時点でのみリソースを読み込む設計</dd>
+              </div>
+              <div>
+                <dt>SKILL.md</dt>
+                <dd>スキルの振る舞いを定義するフロントマター付き Markdown ファイル</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className={styles.sectionRefs}>
+            <div className={styles.boxTitle}>📎 参照URL</div>
+            <ul className={styles.refs}>
+              <li>
+                <span className={styles.refTag}>01</span>
+                <Ext href="https://cursor.com/docs/skills">cursor.com/docs/skills</Ext>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* ==================== Chapter 11 ==================== */}
+        <section className={`${styles.chapter} chapter`} id="ch11">
+          <div className={styles.chapterEyebrow}>Chapter 11</div>
+          <h2>Subagents（サブエージェント）</h2>
+
+          <div className={styles.introCallout}>
+            <span className={styles.icon}>💡</span>
+            <div>
+              この章では、複雑なタスクを分割し、独立したコンテキストウィンドウで並列に処理させる
+              Subagents の設計と、乱用を避けるためのアンチパターンを扱います。
+            </div>
+          </div>
+
+          <p>
+            Subagent は Agent
+            がタスクを委任できる専門アシスタントである。それぞれが独自のコンテキストウィンドウで動作し、特定の作業を処理し、結果を親エージェントに返す。複雑なタスクの分解・並列作業・メイン会話のコンテキスト温存に使う。エディタ・CLI・Cloud
+            Agents のいずれでも利用できる。
+          </p>
+
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>利点</th>
+                  <th>説明</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>コンテキスト分離</strong>
+                  </td>
+                  <td>長時間の調査・探索タスクがメイン会話の容量を消費しない</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>並列実行</strong>
+                  </td>
+                  <td>
+                    複数の Subagent を同時起動し、コードベースの別部分を待ち時間なく処理できる
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>専門特化</strong>
+                  </td>
+                  <td>カスタムプロンプト・ツールアクセス・モデルをドメイン別に設定できる</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>再利用性</strong>
+                  </td>
+                  <td>カスタム Subagent を定義してプロジェクト横断で使い回せる</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>1</div>
+            <div className={styles.stepBody}>
+              <h4>フォアグラウンドとバックグラウンドを使い分ける</h4>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>モード</th>
+                      <th>挙動</th>
+                      <th>向いている場面</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>Foreground</strong>
+                      </td>
+                      <td>Subagent の完了までブロックし、結果を即座に返す</td>
+                      <td>結果が必要な逐次タスク</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Background</strong>
+                      </td>
+                      <td>即座に制御を返し、Subagent は独立して作業を続ける</td>
+                      <td>長時間タスク・並列ワークストリーム</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>2</div>
+            <div className={styles.stepBody}>
+              <h4>組み込み Subagent の役割を理解する</h4>
+              <p>
+                Cursor
+                には、コンテキストウィンドウ限界に達しやすい会話パターンの分析に基づいて設計された3つの組み込み
+                Subagent がある。設定不要で、必要に応じて Agent が自動的に使う。
+              </p>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Subagent</th>
+                      <th>役割</th>
+                      <th>Subagent 化されている理由</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>Explore</strong>
+                      </td>
+                      <td>コードベースの検索・分析</td>
+                      <td>
+                        探索は大量の中間出力を生むためメインの文脈を圧迫する。より高速なモデルで多数の並列検索を実行する
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Bash</strong>
+                      </td>
+                      <td>一連のシェルコマンド実行</td>
+                      <td>
+                        コマンド出力は冗長になりがちで、隔離することで親エージェントはログではなく判断に集中できる
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Browser</strong>
+                      </td>
+                      <td>MCP ツール経由のブラウザ操作</td>
+                      <td>
+                        ブラウザ操作はノイズの多い DOM
+                        スナップショットやスクリーンショットを生成するため、結果を絞り込む必要がある
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>
+                これら3種が共通して持つ特性は「ノイズの多い中間出力を生む」「専門プロンプト・ツールアクセスの恩恵を受ける」「大量のコンテキストを消費しうる」の3点であり、Subagent
+                化によりコンテキスト分離・モデル柔軟性（探索用途では高速なモデルをデフォルト使用）・コスト効率が得られる。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>3</div>
+            <div className={styles.stepBody}>
+              <h4>カスタム Subagent を作成する</h4>
+              <p>Agent に直接作成を依頼するのが最も簡単な方法である。</p>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>チャットでの依頼例</span>
+                </div>
+                <pre>
+                  <code className="language-plaintext">{`.cursor/agents/verifier.md にYAMLフロントマター（name, description）付きの
+サブエージェントファイルを作成してください。verifier サブエージェントは、
+完了した作業を検証し、実装が実際に機能しているかを確認し、テストを実行し、
+何が合格して何が未完了かを報告するものにしてください。`}</code>
+                </pre>
+              </div>
+              <p>
+                より細かく制御したい場合は、プロジェクトまたはユーザーディレクトリに手動でファイルを作成する。
+              </p>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>種類</th>
+                      <th>配置場所</th>
+                      <th>スコープ</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>プロジェクト Subagent</strong>
+                      </td>
+                      <td>
+                        <code>.cursor/agents/</code>（<code>.claude/agents/</code>・
+                        <code>.codex/agents/</code> も互換）
+                      </td>
+                      <td>現在のプロジェクトのみ</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>ユーザー Subagent</strong>
+                      </td>
+                      <td>
+                        <code>~/.cursor/agents/</code>（<code>~/.claude/agents/</code>・
+                        <code>~/.codex/agents/</code> も互換）
+                      </td>
+                      <td>現在のユーザーの全プロジェクト</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>
+                名前が衝突する場合はプロジェクト Subagent
+                が優先され、複数の互換ディレクトリが存在する場合は <code>.cursor/</code> が{" "}
+                <code>.claude/</code> や <code>.codex/</code> より優先される。
+              </p>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>.cursor/agents/security-auditor.md</span>
+                </div>
+                <pre>
+                  <code className="language-markdown">{`---
+name: security-auditor
+description: セキュリティ専門家。認証・決済・機密データの実装時に使用する。
+model: inherit
+readonly: true
+---
+
+あなたは脆弱性を監査するセキュリティ専門家です。
+
+呼び出されたら：
+1. セキュリティに関わるコードパスを特定する
+2. 一般的な脆弱性（インジェクション、XSS、認証バイパス）を確認する
+3. シークレットがハードコードされていないか検証する
+4. 入力値検証・サニタイズをレビューする
+
+深刻度別に報告する：
+- Critical（デプロイ前に必ず修正）
+- High（早急に修正）
+- Medium（可能なら対応）`}</code>
+                </pre>
+              </div>
+              <p>フロントマターの各フィールド：</p>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>フィールド</th>
+                      <th>型</th>
+                      <th>必須</th>
+                      <th>デフォルト</th>
+                      <th>説明</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <code>name</code>
+                      </td>
+                      <td>string</td>
+                      <td>–</td>
+                      <td>ファイル名から自動導出</td>
+                      <td>表示名・識別子。小文字とハイフンのみ</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>description</code>
+                      </td>
+                      <td>string</td>
+                      <td>–</td>
+                      <td>–</td>
+                      <td>
+                        Task ツールのヒントに表示される短い説明。Agent はこれを読んで委任判断する
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>model</code>
+                      </td>
+                      <td>string</td>
+                      <td>–</td>
+                      <td>
+                        <code>inherit</code>
+                      </td>
+                      <td>
+                        使用モデル。<code>inherit</code> または具体的なモデルID
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>readonly</code>
+                      </td>
+                      <td>boolean</td>
+                      <td>–</td>
+                      <td>
+                        <code>false</code>
+                      </td>
+                      <td>
+                        <code>true</code>{" "}
+                        の場合、書き込み権限が制限される（ファイル編集・状態変更コマンド不可）
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>is_background</code>
+                      </td>
+                      <td>boolean</td>
+                      <td>–</td>
+                      <td>
+                        <code>false</code>
+                      </td>
+                      <td>
+                        <code>true</code> の場合、親をブロックせずバックグラウンドで動作する
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className={`${styles.box} ${styles.warn}`}>
+                <div className={styles.boxTitle}>⚠ 注意</div>
+                <p style={{ marginBottom: 0 }}>
+                  <code>model</code>{" "}
+                  に具体的なモデルIDを指定していても、以下の場合はフォールバックが発生する：
+                  <strong>チーム管理者による当該モデルのブロック</strong>、
+                  <strong>Max Mode が必要だが有効化されていない</strong>、
+                  <strong>現在のプランでそのモデルが利用不可</strong>。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>4</div>
+            <div className={styles.stepBody}>
+              <h4>Subagent を呼び出す</h4>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>呼び出し例</span>
+                </div>
+                <pre>
+                  <code className="language-plaintext">{`> /verifier auth フローが完成しているか確認して
+> Use the verifier subagent to confirm the auth flow is complete
+> API の変更をレビューしつつ、並行してドキュメントも更新して`}</code>
+                </pre>
+              </div>
+              <p>
+                明示的な <code>/名前</code>{" "}
+                構文、自然言語での言及、複数タスクの並列実行のいずれもサポートされる。並列実行時は、Agent
+                が1つのメッセージ内で複数の Task ツール呼び出しを送信し、Subagent が同時に走る。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>5</div>
+            <div className={styles.stepBody}>
+              <h4>長時間タスクを再開する</h4>
+              <p>
+                各 Subagent 実行は Agent ID
+                を返す。このIDを渡すことで、文脈を保持したまま再開できる（
+                <code>Resume agent abc123 and analyze the remaining test failures</code>{" "}
+                のように指示する）。バックグラウンド Subagent
+                は実行中の状態をディスクに書き出すため、完了後も会話を継続できる。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>6</div>
+            <div className={styles.stepBody}>
+              <h4>頻出パターンを押さえる</h4>
+              <ul>
+                <li>
+                  <strong>検証エージェント（Verification agent）</strong>
+                  ：完了したと申告された作業が実際に機能するかを、懐疑的な視点で独立検証させるパターン。テストが実際にパスしているか（テストファイルが存在するだけでないか）の確認や、部分的にしか実装されていない機能の検出に有効
+                </li>
+                <li>
+                  <strong>オーケストレーターパターン</strong>：Planner（要件分析・技術計画）→
+                  Implementer（計画に基づく実装）→
+                  Verifier（要件との一致確認）の3段階を親エージェントが調整する。各引き継ぎで構造化された出力を渡すことで、次のエージェントが明確な文脈を持てるようにする
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <h3>ベストプラクティスとアンチパターン</h3>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>ベストプラクティス</th>
+                  <th>理由</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>焦点を絞った Subagent を書く</td>
+                  <td>「なんでも屋」の汎用ヘルパーは効果が薄い</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>description</code> に投資する
+                  </td>
+                  <td>Agent が委任するかどうかの判断材料になるため、テストしながら磨き込む</td>
+                </tr>
+                <tr>
+                  <td>プロンプトは簡潔に保つ</td>
+                  <td>冗長なプロンプトは焦点をぼかす</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>.cursor/agents/</code> をバージョン管理する
+                  </td>
+                  <td>チーム全体が恩恵を受けられる</td>
+                </tr>
+                <tr>
+                  <td>Agent 生成→カスタマイズの順で始める</td>
+                  <td>ゼロから書くより初期構成が速い</td>
+                </tr>
+                <tr>
+                  <td>構造化出力が必要なら Hooks を使う</td>
+                  <td>Subagent の結果を一貫した形式で処理・保存できる</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>アンチパターン</th>
+                  <th>何が問題か</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>「コーディングを助ける」のような曖昧な汎用 Subagent を50個作る</td>
+                  <td>Agent がいつ使うべきか判断できず、維持コストだけがかかる</td>
+                </tr>
+                <tr>
+                  <td>
+                    曖昧な <code>description</code>（例：「一般的なタスクに使う」）
+                  </td>
+                  <td>
+                    委任のシグナルにならない。「OAuth
+                    プロバイダによる認証フロー実装時に使う」のように具体化する
+                  </td>
+                </tr>
+                <tr>
+                  <td>2,000語の長大なプロンプト</td>
+                  <td>賢くはならず、遅く保守しづらくなるだけ</td>
+                </tr>
+                <tr>
+                  <td>コンテキスト分離が不要な単発タスクを Subagent化する</td>
+                  <td>スラッシュコマンドの重複。第10章の Skills を使うべき</td>
+                </tr>
+                <tr>
+                  <td>明確に異なるユースケースがないまま Subagent を増やす</td>
+                  <td>2〜3個の焦点を絞った Subagent から始め、必要になった時だけ追加する</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={styles.figure}>
+            <p className={styles.figureLead}>
+              This diagram shows how exploring directly vs via Subagent affects main context size.
+            </p>
+            <div className={styles.figureCanvas}>
+              <MermaidDiagram chart={DIAGRAMS.d11_subagent_isolation} />
+            </div>
+          </div>
+          <div className={styles.figureLegend}>
+            <div className={styles.legendTitle}>各ノードの意味</div>
+            <dl>
+              <div>
+                <dt>大量の中間出力がメイン文脈に蓄積</dt>
+                <dd>直接検索した場合に発生するコンテキスト圧迫の問題点</dd>
+              </div>
+              <div>
+                <dt>要約のみが親へ返却</dt>
+                <dd>Subagent 化によって得られるコンテキスト分離のメリット</dd>
+              </div>
+            </dl>
+          </div>
+
+          <h3>コストとパフォーマンスのトレードオフ</h3>
+          <p>
+            Subagent は各自が独立したコンテキストウィンドウとトークン使用量を持つ。5つの Subagent
+            を並列実行すると、単一エージェントのおよそ5倍 of
+            トークンを消費する。単純作業ではメインエージェントの方が速いことも多く、Subagent
+            の利点は速度ではなくコンテキスト分離にある。複雑・長時間・並列的な作業でこそ真価を発揮する。
+          </p>
+
+          <div className={`${styles.box} ${styles.glossary}`}>
+            <div className={styles.boxTitle}>📖 用語ノート</div>
+            <dl>
+              <div>
+                <dt>Task ツール</dt>
+                <dd>親エージェントが Subagent を起動するために内部的に呼び出すツール</dd>
+              </div>
+              <div>
+                <dt>オーケストレーターパターン</dt>
+                <dd>複数の専門 Subagent を段階的に連携させる設計パターン</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className={styles.sectionRefs}>
+            <div className={styles.boxTitle}>📎 参照URL</div>
+            <ul className={styles.refs}>
+              <li>
+                <span className={styles.refTag}>01</span>
+                <Ext href="https://cursor.com/docs/subagents">cursor.com/docs/subagents</Ext>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* ==================== Chapter 12 ==================== */}
+        <section className={`${styles.chapter} chapter`} id="ch12">
+          <div className={styles.chapterEyebrow}>Chapter 12</div>
+          <h2>Hooks（フック）</h2>
+
+          <div className={styles.introCallout}>
+            <span className={styles.icon}>💡</span>
+            <div>
+              この章では、Agent 実行ループの各段階に介入し、承認・拒否・追加情報の注入を行う Hooks
+              の設計方法を扱います。セキュリティ・監査・フォーマット自動化など、チーム運用で最も差が出る機能です。
+            </div>
+          </div>
+
+          <p>
+            Hooks は、カスタムスクリプトを使って Agent
+            ループを観測・制御・拡張する仕組みである。Hooks は標準入出力（stdio）経由で双方向に JSON
+            をやり取りするプロセスとして起動され、Agent
+            ループの定義済みステージの前後で実行され、挙動を観測・ブロック・変更できる。
+          </p>
+          <p>
+            <strong>主な用途</strong>
+            ：編集後のフォーマッタ実行／イベントの分析データ収集／PII・シークレットのスキャン／SQL書き込みなどリスクの高い操作のゲーティング／Subagent（Task
+            ツール）実行の制御／セッション開始時のコンテキスト注入。
+          </p>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>1</div>
+            <div className={styles.stepBody}>
+              <h4>3つのフックカテゴリを理解する</h4>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>カテゴリ</th>
+                      <th>発火タイミング</th>
+                      <th>主なフック</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>Agent hooks</strong>
+                      </td>
+                      <td>Cmd+K / Agent Chat のセッション中</td>
+                      <td>
+                        <code>sessionStart</code>/<code>sessionEnd</code>、<code>preToolUse</code>/
+                        <code>postToolUse</code>/<code>postToolUseFailure</code>、
+                        <code>subagentStart</code>/<code>subagentStop</code>、
+                        <code>beforeShellExecution</code>/<code>afterShellExecution</code>、
+                        <code>beforeMCPExecution</code>/<code>afterMCPExecution</code>、
+                        <code>beforeReadFile</code>/<code>afterFileEdit</code>、
+                        <code>beforeSubmitPrompt</code>、<code>preCompact</code>、<code>stop</code>
+                        、<code>afterAgentResponse</code>/<code>afterAgentThought</code>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Tab hooks</strong>
+                      </td>
+                      <td>自律的な Tab（インライン補完）操作時</td>
+                      <td>
+                        <code>beforeTabFileRead</code>、<code>afterTabFileEdit</code>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>App lifecycle hooks</strong>
+                      </td>
+                      <td>エージェントセッション外</td>
+                      <td>
+                        <code>workspaceOpen</code>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>
+                この分離により、自律的な Tab 操作・ユーザー主導の Agent
+                操作・ワークスペース起動時に、それぞれ異なるポリシーを適用できる。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>2</div>
+            <div className={styles.stepBody}>
+              <h4>クイックスタート（フォーマッタ自動実行の例）</h4>
+              <p>
+                <code>hooks.json</code> はプロジェクトルート（
+                <code>&lt;project&gt;/.cursor/hooks.json</code>）またはホームディレクトリ（
+                <code>~/.cursor/hooks.json</code>
+                ）に置く。プロジェクトレベルは該当プロジェクトのみ、ホームディレクトリレベルは全プロジェクト共通で適用される。
+              </p>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>~/.cursor/hooks.json</span>
+                </div>
+                <pre>
+                  <code className="language-json">{`{
+  "version": 1,
+  "hooks": {
+    "afterFileEdit": [{ "command": "./hooks/format.sh" }]
+  }
+}`}</code>
+                </pre>
+              </div>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>hooks/format.sh</span>
+                </div>
+                <pre>
+                  <code className="language-bash">{`#!/bin/bash
+# 標準入力を受け取り、何かを行い、exit 0 する
+cat > /dev/null
+exit 0`}</code>
+                </pre>
+              </div>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>実行権限の付与</span>
+                </div>
+                <pre>
+                  <code className="language-bash">{`chmod +x ~/.cursor/hooks/format.sh`}</code>
+                </pre>
+              </div>
+              <p>
+                プロジェクト用に配置する場合は、プロジェクトルートから実行される点に注意し、パスを{" "}
+                <code>.cursor/hooks/format.sh</code> のように書く（<code>./hooks/format.sh</code>{" "}
+                ではプロジェクト直下の <code>hooks/</code> を探してしまう）。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>3</div>
+            <div className={styles.stepBody}>
+              <h4>コマンド型フックとプロンプト型フックを使い分ける</h4>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>種類</th>
+                      <th>説明</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>コマンド型（デフォルト）</strong>
+                      </td>
+                      <td>シェルスクリプトが標準入力で JSON を受け取り、標準出力で JSON を返す</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>プロンプト型</strong>
+                      </td>
+                      <td>
+                        自然言語の条件を LLM
+                        で評価する。カスタムスクリプトを書かずにポリシー適用ができる
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>コマンド型</span>
+                </div>
+                <pre>
+                  <code className="language-json">{`{
+  "hooks": {
+    "beforeShellExecution": [
+      { "command": "./scripts/approve-network.sh", "timeout": 30, "matcher": "curl|wget|nc" }
+    ]
+  }
+}`}</code>
+                </pre>
+              </div>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>プロンプト型</span>
+                </div>
+                <pre>
+                  <code className="language-json">{`{
+  "hooks": {
+    "beforeShellExecution": [
+      {
+        "type": "prompt",
+        "prompt": "このコマンドは安全に見えますか？読み取り専用の操作のみ許可してください。",
+        "timeout": 10
+      }
+    ]
+  }
+}`}</code>
+                </pre>
+              </div>
+              <p>
+                <strong>終了コードの意味</strong>：<code>0</code>＝成功（JSON出力を使用）、
+                <code>2</code>＝アクションをブロック（<code>permission: deny</code>{" "}
+                と同義）、それ以外＝フック失敗（デフォルトはフェイルオープンでアクション続行）。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>4</div>
+            <div className={styles.stepBody}>
+              <h4>フックの設定ソースと優先順位</h4>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ソース</th>
+                      <th>配置場所</th>
+                      <th>特徴</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>Enterprise</strong>（MDM管理・全社）
+                      </td>
+                      <td>
+                        macOS: <code>/Library/Application Support/Cursor/hooks.json</code> など
+                      </td>
+                      <td>組織全体で強制</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Team</strong>（クラウド配布・Enterprise限定）
+                      </td>
+                      <td>ダッシュボードで設定</td>
+                      <td>全チームメンバーへ自動同期</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Project</strong>（プロジェクト固有）
+                      </td>
+                      <td>
+                        <code>&lt;project-root&gt;/.cursor/hooks.json</code>
+                      </td>
+                      <td>信頼されたワークスペースで実行、バージョン管理対象</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>User</strong>（ユーザー固有）
+                      </td>
+                      <td>
+                        <code>~/.cursor/hooks.json</code>
+                      </td>
+                      <td>信頼されたワークスペースの外、または全プロジェクトに適用</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className={`${styles.box} ${styles.warn}`}>
+                <div className={styles.boxTitle}>⚠ 注意</div>
+                <p style={{ marginBottom: 0 }}>
+                  <strong>優先順位（高い順）</strong>：
+                  <code>Enterprise → Team → Project → User</code>
+                  。一致するすべてのソースのフックが実行され、応答が競合する場合は優先度の高いソースがマージ時に勝つ。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>5</div>
+            <div className={styles.stepBody}>
+              <h4>Cloud Agents でのフック対応状況</h4>
+              <p>
+                Cloud Agent はリポジトリの <code>.cursor/hooks.json</code>{" "}
+                にあるコマンド型フックを実行する。Enterprise
+                プランでは、チームフック・エンタープライズ管理フックも実行される。
+              </p>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>フック</th>
+                      <th>Cloud Agent 対応</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <code>beforeShellExecution</code> / <code>afterShellExecution</code>
+                      </td>
+                      <td>✅</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>beforeReadFile</code> / <code>afterFileEdit</code>
+                      </td>
+                      <td>✅</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>preToolUse</code> / <code>postToolUse</code> /{" "}
+                        <code>postToolUseFailure</code>
+                      </td>
+                      <td>✅</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>subagentStart</code> / <code>subagentStop</code>
+                      </td>
+                      <td>✅</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>preCompact</code>
+                      </td>
+                      <td>✅</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>sessionStart</code> / <code>sessionEnd</code>
+                      </td>
+                      <td>❌（VMはタスク送信後に起動するため対応する発火点がない）</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>beforeSubmitPrompt</code>
+                      </td>
+                      <td>❌（VM作成前にプロンプトが送信されるため）</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>beforeTabFileRead</code> / <code>afterTabFileEdit</code>
+                      </td>
+                      <td>❌（TabはIDE専用機能）</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>workspaceOpen</code>
+                      </td>
+                      <td>❌（IDEのライフサイクルフックのため）</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>beforeMCPExecution</code> / <code>afterMCPExecution</code>
+                      </td>
+                      <td>❌（未配線）</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>afterAgentResponse</code> / <code>afterAgentThought</code>
+                      </td>
+                      <td>❌（未配線）</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>stop</code>
+                      </td>
+                      <td>❌（未配線）</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className={`${styles.box} ${styles.warn}`}>
+                <div className={styles.boxTitle}>⚠ 注意</div>
+                <p style={{ marginBottom: 0 }}>
+                  <strong>
+                    ユーザーレベルフック（<code>~/.cursor/hooks.json</code>）は Cloud Agent
+                    では利用不可
+                  </strong>
+                  （VMはローカルのホームディレクトリ設定にアクセスできないため）。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>6</div>
+            <div className={styles.stepBody}>
+              <h4>マッチャーでフックの発火条件を絞る</h4>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>matcher の指定例</span>
+                </div>
+                <pre>
+                  <code className="language-json">{`{
+  "hooks": {
+    "preToolUse": [
+      { "command": "./validate-shell.sh", "matcher": "Shell" }
+    ],
+    "beforeShellExecution": [
+      { "command": "./approve-network.sh", "matcher": "curl|wget|nc " }
+    ]
+  }
+}`}</code>
+                </pre>
+              </div>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>フック</th>
+                      <th>マッチャーの対象</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <code>preToolUse</code> / <code>postToolUse</code> /{" "}
+                        <code>postToolUseFailure</code>
+                      </td>
+                      <td>
+                        ツール種別（<code>Shell</code>, <code>Read</code>, <code>Write</code>,{" "}
+                        <code>Grep</code>, <code>Delete</code>, <code>Task</code>, MCP は{" "}
+                        <code>MCP:&lt;tool_name&gt;</code>）
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>subagentStart</code> / <code>subagentStop</code>
+                      </td>
+                      <td>
+                        Subagent 種別（<code>generalPurpose</code>, <code>explore</code>,{" "}
+                        <code>shell</code> など）
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>beforeShellExecution</code> / <code>afterShellExecution</code>
+                      </td>
+                      <td>コマンド文字列全体への正規表現的マッチ</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <h3>実践例：git コマンドをブロックし gh CLI へ誘導する</h3>
+          <div className={styles.codeBlock}>
+            <div className={styles.codeBlockHead}>
+              <span>block-git.sh</span>
+            </div>
+            <pre>
+              <code className="language-bash">{`#!/bin/bash
+input=$(cat)
+command=$(echo "$input" | jq -r '.command // empty')
+
+if [[ "$command" =~ git[[:space:]] ]] || [[ "$command" == "git" ]]; then
+    cat << EOF
+{
+  "continue": true,
+  "permission": "deny",
+  "user_message": "git コマンドはブロックされました。GitHub CLI (gh) を使ってください。",
+  "agent_message": "'$command' はフックによりブロックされました。git clone の代わりに gh repo clone を、git push の代わりに gh の同等コマンドを使用してください。"
+}
+EOF
+else
+    echo '{"continue": true, "permission": "allow"}'
+fi`}</code>
+            </pre>
+          </div>
+          <p>
+            このように <code>beforeShellExecution</code> フックは{" "}
+            <code>permission: allow / deny / ask</code>{" "}
+            を返すことで、危険な操作をブロックしたり、より安全なコマンドへの誘導メッセージを Agent
+            に返したりできる。
+          </p>
+
+          <div className={styles.figure}>
+            <p className={styles.figureLead}>
+              This diagram shows Hook execution order for a shell command.
+            </p>
+            <div className={styles.figureCanvas}>
+              <MermaidDiagram chart={DIAGRAMS.d12_hooks_sequence} />
+            </div>
+          </div>
+          <div className={styles.figureLegend}>
+            <div className={styles.legendTitle}>各ノードの意味</div>
+            <dl>
+              <div>
+                <dt>preToolUse</dt>
+                <dd>あらゆるツール種別に共通する実行前フック。マッチャーで対象を絞り込める</dd>
+              </div>
+              <div>
+                <dt>beforeShellExecution</dt>
+                <dd>
+                  シェルコマンドに特化した実行前フック。危険なコマンドのブロックに使われることが多い
+                </dd>
+              </div>
+              <div>
+                <dt>afterShellExecution / postToolUse</dt>
+                <dd>実行後の監査・追加コンテキスト注入に使う2種類のフック</dd>
+              </div>
+            </dl>
+          </div>
+
+          <h3>パートナー統合（実務で参照する価値がある領域）</h3>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>分野</th>
+                  <th>提供パートナー</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>MCP ガバナンス・可視化</td>
+                  <td>MintMCP, Oasis Security, Runlayer</td>
+                </tr>
+                <tr>
+                  <td>コードセキュリティ</td>
+                  <td>Corridor, Semgrep</td>
+                </tr>
+                <tr>
+                  <td>依存関係セキュリティ</td>
+                  <td>Endor Labs</td>
+                </tr>
+                <tr>
+                  <td>エージェントセキュリティ</td>
+                  <td>Snyk</td>
+                </tr>
+                <tr>
+                  <td>シークレット管理</td>
+                  <td>1Password</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={`${styles.box} ${styles.glossary}`}>
+            <div className={styles.boxTitle}>📖 用語ノート</div>
+            <dl>
+              <div>
+                <dt>フェイルオープン（fail-open）</dt>
+                <dd>
+                  フック自体が失敗した場合にアクションを通過させるデフォルト挙動（
+                  <code>failClosed: true</code> で逆にできる）
+                </dd>
+              </div>
+              <div>
+                <dt>マッチャー（matcher）</dt>
+                <dd>フックがどの条件で発火するかを絞り込む正規表現的フィルタ</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className={styles.sectionRefs}>
+            <div className={styles.boxTitle}>📎 参照URL</div>
+            <ul className={styles.refs}>
+              <li>
+                <span className={styles.refTag}>01</span>
+                <Ext href="https://cursor.com/docs/hooks">cursor.com/docs/hooks</Ext>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* ==================== Placeholders for Chapters 13-21 ==================== */}
+        {TOC_ITEMS.slice(12).map((item) => (
           <section key={item.id} className={`${styles.chapter} chapter`} id={item.id}>
             <div className={styles.chapterEyebrow}>Chapter {item.num}</div>
             <h2>{item.title}</h2>
