@@ -78,6 +78,12 @@ describe("/agent/loop-engineering - page structure", () => {
     expect(container.querySelector("#s10")).not.toBeNull();
   });
 
+  it("renders s11 and s12 sections", () => {
+    const { container } = render(<Page />);
+    expect(container.querySelector("#s11")).not.toBeNull();
+    expect(container.querySelector("#s12")).not.toBeNull();
+  });
+
   it("renders diagrams diag-1 and diag-2", () => {
     const { container } = render(<Page />);
     expect(container.querySelector("#diag-1")).not.toBeNull();
@@ -110,6 +116,11 @@ describe("/agent/loop-engineering - page structure", () => {
     expect(container.querySelector("#diag-12")).not.toBeNull();
   });
 
+  it("renders diagram diag-13", () => {
+    const { container } = render(<Page />);
+    expect(container.querySelector("#diag-13")).not.toBeNull();
+  });
+
   it("renders the terminology hierarchy table", () => {
     const { container } = render(<Page />);
     const table = container.querySelector("table");
@@ -121,8 +132,8 @@ describe("/agent/loop-engineering - page structure", () => {
   it("renders comparison and loops tables", () => {
     const { container } = render(<Page />);
     const tables = container.querySelectorAll("table");
-    // We expect at least 11 tables now (table1 in s2, table2 in s3, table3 in s4, table4 in s5, table5 in s6, table6 in s7, table7 in s8, table8-11 in s9)
-    expect(tables.length).toBeGreaterThanOrEqual(11);
+    // We expect at least 14 tables now (table1 in s2, table2 in s3, table3 in s4, table4 in s5, table5 in s6, table6 in s7, table7 in s8, table8-11 in s9, table12-13 in s11, table14 in s12)
+    expect(tables.length).toBeGreaterThanOrEqual(14);
     const content = Array.from(tables)
       .map((t) => t.textContent)
       .join(" ");
@@ -136,6 +147,16 @@ describe("/agent/loop-engineering - page structure", () => {
     expect(content).toContain("上限条件（回数）");
     expect(content).toContain("外部記憶");
     expect(content).toContain("ローカルのcronジョブ");
+    expect(content).toContain("Claude Codeでの対応機能");
+    expect(content).toContain("認知的な明け渡し");
+  });
+
+  it("renders the practice steps list", () => {
+    const { container } = render(<Page />);
+    const list = container.querySelector("ol[class*='step-list']");
+    expect(list).not.toBeNull();
+    expect(list?.textContent).toContain("小さなリポジトリを1つ用意する");
+    expect(list?.textContent).toContain("上限を必ず設定して観察する");
   });
 });
 
