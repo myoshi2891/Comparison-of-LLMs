@@ -94,6 +94,7 @@ export const navLinks: readonly NavLink[] = [
       { name: "Advanced Guide", href: "/agent/hermes-agent-advanced-guide" },
       { name: "OpenClaw Security Guide", href: "/agent/openclaw-advanced-agent-security-guide" },
       { name: "Loop Engineering Guide", href: "/agent/loop-engineering" },
+      { name: "Agent Skills Guide", href: "/agent/skills" },
       { name: "skills.sh Guide", href: "/claude/skills-sh" },
     ],
   },
