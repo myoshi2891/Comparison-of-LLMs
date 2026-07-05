@@ -84,6 +84,15 @@ describe("/agent/loop-engineering - page structure", () => {
     expect(container.querySelector("#s12")).not.toBeNull();
   });
 
+  it("renders s13, s14, s15, references, and footer", () => {
+    const { container } = render(<Page />);
+    expect(container.querySelector("#s13")).not.toBeNull();
+    expect(container.querySelector("#s14")).not.toBeNull();
+    expect(container.querySelector("#s15")).not.toBeNull();
+    expect(container.querySelector("#references")).not.toBeNull();
+    expect(container.querySelector("footer")).not.toBeNull();
+  });
+
   it("renders diagrams diag-1 and diag-2", () => {
     const { container } = render(<Page />);
     expect(container.querySelector("#diag-1")).not.toBeNull();
@@ -119,6 +128,12 @@ describe("/agent/loop-engineering - page structure", () => {
   it("renders diagram diag-13", () => {
     const { container } = render(<Page />);
     expect(container.querySelector("#diag-13")).not.toBeNull();
+  });
+
+  it("renders diagrams diag-14 and diag-15", () => {
+    const { container } = render(<Page />);
+    expect(container.querySelector("#diag-14")).not.toBeNull();
+    expect(container.querySelector("#diag-15")).not.toBeNull();
   });
 
   it("renders the terminology hierarchy table", () => {
