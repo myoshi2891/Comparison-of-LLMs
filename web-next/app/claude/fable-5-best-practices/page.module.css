@@ -747,10 +747,10 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  html {
+  :global(html) {
     scroll-behavior: auto;
   }
-  * {
+  .pageContainer * {
     transition: none !important;
   }
 }
