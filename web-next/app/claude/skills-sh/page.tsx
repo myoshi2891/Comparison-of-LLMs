@@ -4,7 +4,8 @@ import TocObserver from "./TocObserver";
 
 export const metadata = {
   title: "skills.sh 完全ガイド ― AIエージェントを賢くする「Agent Skills」入門",
-  description: "skills.shの仕組み、CLIの使い方、主要スキルの利用方法を初学者向けにステップバイステップで解説する技術ガイド",
+  description:
+    "skills.shの仕組み、CLIの使い方、主要スキルの利用方法を初学者向けにステップバイステップで解説する技術ガイド",
 };
 
 const DIAGRAMS = {
@@ -132,15 +133,22 @@ const DIAGRAMS = {
   diagramSummarySteps: `flowchart LR
     A["① find-skillsを導入して<br/>ざっくり探してみる"] --> B["② 気になったスキルを<br/>npx skills add で1つ入れてみる"]
     B --> C["③ 実際にエージェントに<br/>関連する依頼をして発火を確認"]
-    C --> D["④ 慣れてきたら<br/>skill-creatorで自作に挑戦"]`
+    C --> D["④ 慣れてきたら<br/>skill-creatorで自作に挑戦"]`,
 };
 
 export default function SkillsShGuidePage() {
   return (
     <div className={styles.pageContainer}>
       <TocObserver />
-      <button className={styles.navToggle} id="navToggle" aria-label="メニューを開閉">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" role="img" aria-label="メニュー開閉アイコン">
+      <button type="button" className={styles.navToggle} id="navToggle" aria-label="メニューを開閉">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          role="img"
+          aria-label="メニュー開閉アイコン"
+        >
           <title>メニュー開閉</title>
           <line x1="3" y1="6" x2="21" y2="6" />
           <line x1="3" y1="12" x2="21" y2="12" />
@@ -210,18 +218,66 @@ export default function SkillsShGuidePage() {
               </li>
             </ul>
             <ul className={styles.tocSub}>
-              <li><a href="#skill-find-skills" className={styles.tocSubLink}>find-skills</a></li>
-              <li><a href="#skill-skill-creator" className={styles.tocSubLink}>skill-creator</a></li>
-              <li><a href="#skill-frontend-design" className={styles.tocSubLink}>frontend-design</a></li>
-              <li><a href="#skill-web-design-guidelines" className={styles.tocSubLink}>web-design-guidelines</a></li>
-              <li><a href="#skill-shadcn" className={styles.tocSubLink}>shadcn</a></li>
-              <li><a href="#skill-vercel-react" className={styles.tocSubLink}>vercel-react-best-practices</a></li>
-              <li><a href="#skill-agent-browser" className={styles.tocSubLink}>agent-browser</a></li>
-              <li><a href="#skill-docs" className={styles.tocSubLink}>pptx / docx / xlsx / pdf</a></li>
-              <li><a href="#skill-webapp-testing" className={styles.tocSubLink}>webapp-testing</a></li>
-              <li><a href="#skill-supabase" className={styles.tocSubLink}>supabase-postgres</a></li>
-              <li><a href="#skill-superpowers" className={styles.tocSubLink}>superpowers系</a></li>
-              <li><a href="#skill-foundry" className={styles.tocSubLink}>microsoft-foundry</a></li>
+              <li>
+                <a href="#skill-find-skills" className={styles.tocSubLink}>
+                  find-skills
+                </a>
+              </li>
+              <li>
+                <a href="#skill-skill-creator" className={styles.tocSubLink}>
+                  skill-creator
+                </a>
+              </li>
+              <li>
+                <a href="#skill-frontend-design" className={styles.tocSubLink}>
+                  frontend-design
+                </a>
+              </li>
+              <li>
+                <a href="#skill-web-design-guidelines" className={styles.tocSubLink}>
+                  web-design-guidelines
+                </a>
+              </li>
+              <li>
+                <a href="#skill-shadcn" className={styles.tocSubLink}>
+                  shadcn
+                </a>
+              </li>
+              <li>
+                <a href="#skill-vercel-react" className={styles.tocSubLink}>
+                  vercel-react-best-practices
+                </a>
+              </li>
+              <li>
+                <a href="#skill-agent-browser" className={styles.tocSubLink}>
+                  agent-browser
+                </a>
+              </li>
+              <li>
+                <a href="#skill-docs" className={styles.tocSubLink}>
+                  pptx / docx / xlsx / pdf
+                </a>
+              </li>
+              <li>
+                <a href="#skill-webapp-testing" className={styles.tocSubLink}>
+                  webapp-testing
+                </a>
+              </li>
+              <li>
+                <a href="#skill-supabase" className={styles.tocSubLink}>
+                  supabase-postgres
+                </a>
+              </li>
+              <li>
+                <a href="#skill-superpowers" className={styles.tocSubLink}>
+                  superpowers系
+                </a>
+              </li>
+              <li>
+                <a href="#skill-foundry" className={styles.tocSubLink}>
+                  microsoft-foundry
+                </a>
+              </li>
             </ul>
 
             <div className={styles.navGroupLabel}>応用と安全性</div>
@@ -259,7 +315,8 @@ export default function SkillsShGuidePage() {
           </nav>
 
           <div className={styles.sidebarFooter}>
-            2026年7月時点の情報を基に作成。最新情報は<br />
+            2026年7月時点の情報を基に作成。最新情報は
+            <br />
             <a href="https://www.skills.sh/" target="_blank" rel="noopener noreferrer">
               skills.sh
             </a>
@@ -273,15 +330,30 @@ export default function SkillsShGuidePage() {
               <span className={styles.heroEyebrow}>
                 <span className={styles.dot}></span>TECHNICAL GUIDE ・ 初学者向け
               </span>
-              <h1>skills.sh 完全ガイド<br />AIエージェントを賢くする「Agent Skills」入門</h1>
+              <h1>
+                skills.sh 完全ガイド
+                <br />
+                AIエージェントを賢くする「Agent Skills」入門
+              </h1>
               <p className={styles.heroLede}>
-                Claude Code や Cursor、Codex CLI などのAIコーディングエージェントに専門知識を追加する仕組み「Agent Skills」と、そのハブである skills.sh の使い方を、実際のCLIコマンド・図解付きでゼロから解説します。
+                Claude Code や Cursor、Codex CLI
+                などのAIコーディングエージェントに専門知識を追加する仕組み「Agent
+                Skills」と、そのハブである skills.sh
+                の使い方を、実際のCLIコマンド・図解付きでゼロから解説します。
               </p>
               <div className={styles.heroMeta}>
-                <div className={styles.heroChip}>📚 <strong>全12章</strong>構成</div>
-                <div className={styles.heroChip}>🧭 対象: <strong>Agent Skills初学者</strong></div>
-                <div className={styles.heroChip}>🔗 参照元: <strong>skills.sh / Anthropic公式</strong></div>
-                <div className={styles.heroChip}>🗓️ <strong>2026年7月</strong>時点の情報</div>
+                <div className={styles.heroChip}>
+                  📚 <strong>全12章</strong>構成
+                </div>
+                <div className={styles.heroChip}>
+                  🧭 対象: <strong>Agent Skills初学者</strong>
+                </div>
+                <div className={styles.heroChip}>
+                  🔗 参照元: <strong>skills.sh / Anthropic公式</strong>
+                </div>
+                <div className={styles.heroChip}>
+                  🗓️ <strong>2026年7月</strong>時点の情報
+                </div>
               </div>
             </header>
 
@@ -290,10 +362,14 @@ export default function SkillsShGuidePage() {
               <h2>skills.sh とは何か</h2>
               <div className={styles.prose}>
                 <p>
-                  <strong>skills.sh</strong> は、AIエージェント(Claude Code、Cursor、Codex CLI、GitHub Copilot など)に「専門知識」を追加で持たせるための拡張パッケージ = <strong>Agent Skills</strong> を検索・比較・インストールできる、GitHubリポジトリ横断型のディレクトリ(登録・検索サイト)です。
+                  <strong>skills.sh</strong> は、AIエージェント(Claude Code、Cursor、Codex
+                  CLI、GitHub Copilot など)に「専門知識」を追加で持たせるための拡張パッケージ ={" "}
+                  <strong>Agent Skills</strong>{" "}
+                  を検索・比較・インストールできる、GitHubリポジトリ横断型のディレクトリ(登録・検索サイト)です。
                 </p>
                 <p>
-                  npm(JavaScriptのパッケージ)における <code>npmjs.com</code> のような立ち位置を、AIエージェント向けの「スキル」というパッケージ種別で提供していると考えるとイメージしやすいです。
+                  npm(JavaScriptのパッケージ)における <code>npmjs.com</code>{" "}
+                  のような立ち位置を、AIエージェント向けの「スキル」というパッケージ種別で提供していると考えるとイメージしやすいです。
                 </p>
               </div>
 
@@ -313,7 +389,8 @@ export default function SkillsShGuidePage() {
                     <tr>
                       <td>CLI配布</td>
                       <td>
-                        <code>npx skills</code> コマンド一発でGitHub上のスキルをローカルにインストールできる
+                        <code>npx skills</code>{" "}
+                        コマンド一発でGitHub上のスキルをローカルにインストールできる
                       </td>
                     </tr>
                     <tr>
@@ -331,7 +408,8 @@ export default function SkillsShGuidePage() {
               <div className={`${styles.callout} ${styles.note}`}>
                 <div className={styles.calloutIcon}>i</div>
                 <p>
-                  <strong>重要:</strong> skills.sh自体がスキルを作っているわけではありません。GitHub上に公開された各社・各個人のスキルリポジトリ(Anthropic公式、Vercel、Supabase、Microsoft、個人開発者など)を横断的に集約・可視化している「ハブ」です。実体(コード)は各GitHubリポジトリ側にあり、インストール時にCLIがそこから直接ファイルを取得します。
+                  <strong>重要:</strong>{" "}
+                  skills.sh自体がスキルを作っているわけではありません。GitHub上に公開された各社・各個人のスキルリポジトリ(Anthropic公式、Vercel、Supabase、Microsoft、個人開発者など)を横断的に集約・可視化している「ハブ」です。実体(コード)は各GitHubリポジトリ側にあり、インストール時にCLIがそこから直接ファイルを取得します。
                 </p>
               </div>
             </section>
@@ -343,10 +421,15 @@ export default function SkillsShGuidePage() {
               <h3>一言で言うと</h3>
               <div className={styles.prose}>
                 <p>
-                  Agent Skills は、<strong>「指示書・スクリプト・参考資料をまとめたフォルダ」</strong>です。中身は基本的に <code>SKILL.md</code> という1つのMarkdownファイルと、必要に応じて付随するスクリプトや資料ファイルです。
+                  Agent Skills は、
+                  <strong>「指示書・スクリプト・参考資料をまとめたフォルダ」</strong>
+                  です。中身は基本的に <code>SKILL.md</code>{" "}
+                  という1つのMarkdownファイルと、必要に応じて付随するスクリプトや資料ファイルです。
                 </p>
                 <p>
-                  Anthropicのエンジニアリングブログでは、スキルを作ることは「新しく入社したベテラン社員に渡すオンボーディング資料を作ること」に例えられています。エージェント自身(モデル)は再学習・ファインチューニングされるわけではなく、汎用的な能力を保ったまま、<strong>特定のタスクに対する「やり方」だけを外部から差し込む</strong>、という考え方です。
+                  Anthropicのエンジニアリングブログでは、スキルを作ることは「新しく入社したベテラン社員に渡すオンボーディング資料を作ること」に例えられています。エージェント自身(モデル)は再学習・ファインチューニングされるわけではなく、汎用的な能力を保ったまま、
+                  <strong>特定のタスクに対する「やり方」だけを外部から差し込む</strong>
+                  、という考え方です。
                 </p>
               </div>
 
@@ -358,23 +441,30 @@ export default function SkillsShGuidePage() {
                     かといって、すべてのツール定義やルールを常にプロンプトに詰め込むとコンテキストウィンドウ(トークン)を圧迫する
                   </li>
                   <li>
-                    そこでAnthropicは「必要になったときだけ、必要な分だけ読み込む」= <strong>段階的開示(Progressive Disclosure)</strong> という設計を採用したスキル形式を考案
+                    そこでAnthropicは「必要になったときだけ、必要な分だけ読み込む」={" "}
+                    <strong>段階的開示(Progressive Disclosure)</strong>{" "}
+                    という設計を採用したスキル形式を考案
                   </li>
                 </ul>
                 <p>
-                  この形式は現在、Anthropicだけでなく OpenAI の Codex CLI や Microsoft の GitHub Copilot などでも採用が進んでいる、いわば<strong>オープンな業界標準</strong>になりつつあります。
+                  この形式は現在、Anthropicだけでなく OpenAI の Codex CLI や Microsoft の GitHub
+                  Copilot などでも採用が進んでいる、いわば<strong>オープンな業界標準</strong>
+                  になりつつあります。
                 </p>
               </div>
 
               <h3>段階的開示(Progressive Disclosure)の仕組み</h3>
               <div className={styles.prose}>
                 <p>
-                  Agent Skillsの最大の特徴は、スキルの中身を<strong>3つの層(Tier)</strong>に分けて、必要な層だけを順番に読み込む点です。
+                  Agent Skillsの最大の特徴は、スキルの中身を<strong>3つの層(Tier)</strong>
+                  に分けて、必要な層だけを順番に読み込む点です。
                 </p>
               </div>
 
               <div className={styles.diagramCard}>
-                <div className={styles.diagramTitle}>図1: 段階的開示(Progressive Disclosure)のフロー</div>
+                <div className={styles.diagramTitle}>
+                  図1: 段階的開示(Progressive Disclosure)のフロー
+                </div>
                 <div className={styles.mermaidDiagram}>
                   <MermaidDiagram chart={DIAGRAMS.diagramProgressive} />
                 </div>
@@ -393,13 +483,17 @@ export default function SkillsShGuidePage() {
                   <tbody>
                     <tr>
                       <td>Tier 1</td>
-                      <td>YAML frontmatterの <code>name</code> と <code>description</code></td>
+                      <td>
+                        YAML frontmatterの <code>name</code> と <code>description</code>
+                      </td>
                       <td>エージェント起動時に常に</td>
                       <td>スキル1つあたり約30トークン</td>
                     </tr>
                     <tr>
                       <td>Tier 2</td>
-                      <td><code>SKILL.md</code> の本文(手順・ルール・注意点)</td>
+                      <td>
+                        <code>SKILL.md</code> の本文(手順・ルール・注意点)
+                      </td>
                       <td>ユーザーの依頼がTier1のdescriptionと一致した時</td>
                       <td>数百〜数千トークン</td>
                     </tr>
@@ -416,7 +510,13 @@ export default function SkillsShGuidePage() {
               <div className={`${styles.callout} ${styles.tip}`}>
                 <div className={styles.calloutIcon}>✓</div>
                 <p>
-                  ポイントは、<strong>エージェントがフォルダの中身をあらかじめ全部覚えているわけではなく</strong>、Linuxのファイルシステムを操作するのと同じ感覚で、必要なファイルだけをその場で <code>cat</code> や <code>bash</code> で読みに行く、という設計になっていることです。これにより、数百個のスキルをインストールしていても、使わないスキルはほぼゼロコストで放置できます。
+                  ポイントは、
+                  <strong>
+                    エージェントがフォルダの中身をあらかじめ全部覚えているわけではなく
+                  </strong>
+                  、Linuxのファイルシステムを操作するのと同じ感覚で、必要なファイルだけをその場で{" "}
+                  <code>cat</code> や <code>bash</code>{" "}
+                  で読みに行く、という設計になっていることです。これにより、数百個のスキルをインストールしていても、使わないスキルはほぼゼロコストで放置できます。
                 </p>
               </div>
             </section>
@@ -431,28 +531,64 @@ export default function SkillsShGuidePage() {
               <div className={styles.codeBlock}>
                 <div className={styles.codeLabel}>
                   <span>SKILL.md</span>
-                  <div className={styles.dots}><span></span><span></span><span></span></div>
+                  <div className={styles.dots}>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
                 </div>
                 <pre>
                   <code className="language-yaml">
-                    <div className={styles.codeLine}><span className={styles.cs}>---</span></div>
-                    <div className={styles.codeLine}><span className={styles.ck}>name</span><span className={styles.cs}>: </span><span className={styles.cv}>my-skill-name</span></div>
-                    <div className={styles.codeLine}><span className={styles.ck}>description</span><span className={styles.cs}>: </span><span className={styles.cv}>このスキルが何をするか、どんな時に使うべきかを明確に書く。</span></div>
-                    <div className={styles.codeLine}><span className={styles.cv}>             エージェントはこの文章だけを見てスキルを使うか判断するため、</span></div>
-                    <div className={styles.codeLine}><span className={styles.cv}>             ここの品質がスキルの「発火率」を左右する最重要項目。</span></div>
-                    <div className={styles.codeLine}><span className={styles.cs}>---</span></div>
+                    <div className={styles.codeLine}>
+                      <span className={styles.cs}>---</span>
+                    </div>
+                    <div className={styles.codeLine}>
+                      <span className={styles.ck}>name</span>
+                      <span className={styles.cs}>: </span>
+                      <span className={styles.cv}>my-skill-name</span>
+                    </div>
+                    <div className={styles.codeLine}>
+                      <span className={styles.ck}>description</span>
+                      <span className={styles.cs}>: </span>
+                      <span className={styles.cv}>
+                        このスキルが何をするか、どんな時に使うべきかを明確に書く。
+                      </span>
+                    </div>
+                    <div className={styles.codeLine}>
+                      <span className={styles.cv}>
+                        {" "}
+                        エージェントはこの文章だけを見てスキルを使うか判断するため、
+                      </span>
+                    </div>
+                    <div className={styles.codeLine}>
+                      <span className={styles.cv}>
+                        {" "}
+                        ここの品質がスキルの「発火率」を左右する最重要項目。
+                      </span>
+                    </div>
+                    <div className={styles.codeLine}>
+                      <span className={styles.cs}>---</span>
+                    </div>
                     <div className={styles.codeLine}></div>
-                    <div className={styles.codeLine}><span className={styles.ch}># My Skill Name</span></div>
+                    <div className={styles.codeLine}>
+                      <span className={styles.ch}># My Skill Name</span>
+                    </div>
                     <div className={styles.codeLine}></div>
-                    <div className={styles.codeLine}><span className={styles.cm}>## 概要</span></div>
+                    <div className={styles.codeLine}>
+                      <span className={styles.cm}>## 概要</span>
+                    </div>
                     <div className={styles.codeLine}>このスキルの目的を1〜2段落で説明する。</div>
                     <div className={styles.codeLine}></div>
-                    <div className={styles.codeLine}><span className={styles.cm}>## 手順</span></div>
+                    <div className={styles.codeLine}>
+                      <span className={styles.cm}>## 手順</span>
+                    </div>
                     <div className={styles.codeLine}>1. まず〇〇を確認する</div>
                     <div className={styles.codeLine}>2. 次に△△を実行する</div>
                     <div className={styles.codeLine}>3. 最後に□□を検証する</div>
                     <div className={styles.codeLine}></div>
-                    <div className={styles.codeLine}><span className={styles.cm}>## 注意点</span></div>
+                    <div className={styles.codeLine}>
+                      <span className={styles.cm}>## 注意点</span>
+                    </div>
                     <div className={styles.codeLine}>- こういうケースでは✕✕をしてはいけない</div>
                   </code>
                 </pre>
@@ -469,15 +605,20 @@ export default function SkillsShGuidePage() {
                   </thead>
                   <tbody>
                     <tr>
-                      <td><code>name</code></td>
+                      <td>
+                        <code>name</code>
+                      </td>
                       <td>
                         スキルの一意な識別子(ケバブケース推奨、例: <code>pdf-form-filler</code>)
                       </td>
                     </tr>
                     <tr>
-                      <td><code>description</code></td>
                       <td>
-                        <strong>最重要。</strong>エージェントがTier1の段階で読む唯一の情報。「何をするか」だけでなく「いつ使うべきか」までトリガーとなる言葉を具体的に書く必要がある
+                        <code>description</code>
+                      </td>
+                      <td>
+                        <strong>最重要。</strong>
+                        エージェントがTier1の段階で読む唯一の情報。「何をするか」だけでなく「いつ使うべきか」までトリガーとなる言葉を具体的に書く必要がある
                       </td>
                     </tr>
                   </tbody>
@@ -489,10 +630,13 @@ export default function SkillsShGuidePage() {
                 <ul>
                   <li>手順は箇条書き・番号付きリストで明確に</li>
                   <li>
-                    SKILL.md自体が長くなりすぎる場合は、別ファイル(例: <code>forms.md</code>, <code>reference.md</code>)に分割し、本文からリンクで参照する(= Tier 3として遅延読み込みされる)
+                    SKILL.md自体が長くなりすぎる場合は、別ファイル(例: <code>forms.md</code>,{" "}
+                    <code>reference.md</code>)に分割し、本文からリンクで参照する(= Tier
+                    3として遅延読み込みされる)
                   </li>
                   <li>
-                    「コードとして実行させたいスクリプト」と「読み込ませて理解させたいドキュメント」を明確に区別して書く(実行 vs 参照)
+                    「コードとして実行させたいスクリプト」と「読み込ませて理解させたいドキュメント」を明確に区別して書く(実行
+                    vs 参照)
                   </li>
                 </ul>
               </div>
@@ -501,17 +645,34 @@ export default function SkillsShGuidePage() {
               <div className={styles.codeBlock}>
                 <div className={styles.codeLabel}>
                   <span>folder structure</span>
-                  <div className={styles.dots}><span></span><span></span><span></span></div>
+                  <div className={styles.dots}>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
                 </div>
                 <pre>
                   <code className="language-plaintext">
                     <div className={styles.codeLine}>my-skill/</div>
-                    <div className={styles.codeLine}>├── SKILL.md          <span className={styles.cc}>← 必須。エントリーポイント</span></div>
-                    <div className={styles.codeLine}>├── reference.md       <span className={styles.cc}>← 任意。詳細な参考資料(Tier 3)</span></div>
+                    <div className={styles.codeLine}>
+                      ├── SKILL.md <span className={styles.cc}>← 必須。エントリーポイント</span>
+                    </div>
+                    <div className={styles.codeLine}>
+                      ├── reference.md{" "}
+                      <span className={styles.cc}>← 任意。詳細な参考資料(Tier 3)</span>
+                    </div>
                     <div className={styles.codeLine}>├── scripts/</div>
-                    <div className={styles.codeLine}>│   └── validate.py    <span className={styles.cc}>← 任意。エージェントがbashで実行するスクリプト</span></div>
+                    <div className={styles.codeLine}>
+                      │ └── validate.py{" "}
+                      <span className={styles.cc}>
+                        ← 任意。エージェントがbashで実行するスクリプト
+                      </span>
+                    </div>
                     <div className={styles.codeLine}>└── templates/</div>
-                    <div className={styles.codeLine}>    └── example.docx   <span className={styles.cc}>← 任意。生成物のひな形など</span></div>
+                    <div className={styles.codeLine}>
+                      {" "}
+                      └── example.docx <span className={styles.cc}>← 任意。生成物のひな形など</span>
+                    </div>
                   </code>
                 </pre>
               </div>
@@ -522,7 +683,8 @@ export default function SkillsShGuidePage() {
               <h2>skills.sh エコシステムの全体像</h2>
               <div className={styles.prose}>
                 <p>
-                  skills.sh を中心に、「どこでスキルが作られ」「どこに集約され」「どこで実行されるか」を図にすると次のようになります。
+                  skills.sh
+                  を中心に、「どこでスキルが作られ」「どこに集約され」「どこで実行されるか」を図にすると次のようになります。
                 </p>
               </div>
 
@@ -536,7 +698,11 @@ export default function SkillsShGuidePage() {
               <div className={`${styles.callout} ${styles.note}`}>
                 <div className={styles.calloutIcon}>i</div>
                 <p>
-                  重要なのは、<strong>skills.sh はあくまで「入口」であり、実体(コード)は各GitHubリポジトリ側にある</strong>という点です。インストール時にCLIがGitHubから直接ファイルを取得します。
+                  重要なのは、
+                  <strong>
+                    skills.sh はあくまで「入口」であり、実体(コード)は各GitHubリポジトリ側にある
+                  </strong>
+                  という点です。インストール時にCLIがGitHubから直接ファイルを取得します。
                 </p>
               </div>
             </section>
@@ -554,7 +720,11 @@ export default function SkillsShGuidePage() {
                   <div className={styles.codeBlock}>
                     <div className={styles.codeLabel}>
                       <span>bash</span>
-                      <div className={styles.dots}><span></span><span></span><span></span></div>
+                      <div className={styles.dots}>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                      </div>
                     </div>
                     <pre>
                       <code className="language-bash">
@@ -568,44 +738,80 @@ export default function SkillsShGuidePage() {
                 <div className={styles.stepItem}>
                   <h4>気になるスキルをインストールする</h4>
                   <p>
-                    skills.sh の各スキル詳細ページには、そのままコピペできるインストールコマンドが表示されています。基本形は次の2パターンです。
+                    skills.sh
+                    の各スキル詳細ページには、そのままコピペできるインストールコマンドが表示されています。基本形は次の2パターンです。
                   </p>
                   <div className={styles.codeBlock}>
                     <div className={styles.codeLabel}>
                       <span>bash</span>
-                      <div className={styles.dots}><span></span><span></span><span></span></div>
+                      <div className={styles.dots}>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                      </div>
                     </div>
                     <pre>
                       <code className="language-bash">
-                        <div className={styles.codeLine}><span className={styles.cc}># パターンA: リポジトリ全体(複数スキルをまとめて配布している場合)をインストール</span></div>
-                        <div className={styles.codeLine}>npx skills add &lt;owner&gt;/&lt;repo&gt;</div>
+                        <div className={styles.codeLine}>
+                          <span className={styles.cc}>
+                            # パターンA:
+                            リポジトリ全体(複数スキルをまとめて配布している場合)をインストール
+                          </span>
+                        </div>
+                        <div className={styles.codeLine}>
+                          npx skills add &lt;owner&gt;/&lt;repo&gt;
+                        </div>
                         <div className={styles.codeLine}></div>
-                        <div className={styles.codeLine}><span className={styles.cc}># パターンB: リポジトリの中から特定の1スキルだけをインストール(最も一般的)</span></div>
-                        <div className={styles.codeLine}>npx skills add &lt;owner&gt;/&lt;repo&gt; --skill &lt;skill-name&gt;</div>
+                        <div className={styles.codeLine}>
+                          <span className={styles.cc}>
+                            # パターンB:
+                            リポジトリの中から特定の1スキルだけをインストール(最も一般的)
+                          </span>
+                        </div>
+                        <div className={styles.codeLine}>
+                          npx skills add &lt;owner&gt;/&lt;repo&gt; --skill &lt;skill-name&gt;
+                        </div>
                       </code>
                     </pre>
                   </div>
-                  <p>具体例(<code>frontend-design</code> スキルの場合):</p>
+                  <p>
+                    具体例(<code>frontend-design</code> スキルの場合):
+                  </p>
                   <div className={styles.codeBlock}>
                     <div className={styles.codeLabel}>
                       <span>bash</span>
-                      <div className={styles.dots}><span></span><span></span><span></span></div>
+                      <div className={styles.dots}>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                      </div>
                     </div>
                     <pre>
                       <code className="language-bash">
-                        <div className={styles.codeLine}>npx skills add anthropics/skills --skill frontend-design</div>
+                        <div className={styles.codeLine}>
+                          npx skills add anthropics/skills --skill frontend-design
+                        </div>
                       </code>
                     </pre>
                   </div>
-                  <p>フルURL形式で指定することもできます(スキル詳細ページに表示される正式な形式):</p>
+                  <p>
+                    フルURL形式で指定することもできます(スキル詳細ページに表示される正式な形式):
+                  </p>
                   <div className={styles.codeBlock}>
                     <div className={styles.codeLabel}>
                       <span>bash</span>
-                      <div className={styles.dots}><span></span><span></span><span></span></div>
+                      <div className={styles.dots}>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                      </div>
                     </div>
                     <pre>
                       <code className="language-bash">
-                        <div className={styles.codeLine}>npx skills add https://github.com/anthropics/skills --skill frontend-design</div>
+                        <div className={styles.codeLine}>
+                          npx skills add https://github.com/anthropics/skills --skill
+                          frontend-design
+                        </div>
                       </code>
                     </pre>
                   </div>
@@ -614,28 +820,43 @@ export default function SkillsShGuidePage() {
                 <div className={styles.stepItem}>
                   <h4>スキルを探す(名前がわからない場合)</h4>
                   <p>
-                    <code>find-skills</code> スキルを導入すると、エージェントに自然文で頼むだけでキーワード検索・インストールまで自動化できます。
+                    <code>find-skills</code>{" "}
+                    スキルを導入すると、エージェントに自然文で頼むだけでキーワード検索・インストールまで自動化できます。
                   </p>
                   <div className={styles.codeBlock}>
                     <div className={styles.codeLabel}>
                       <span>bash</span>
-                      <div className={styles.dots}><span></span><span></span><span></span></div>
+                      <div className={styles.dots}>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                      </div>
                     </div>
                     <pre>
                       <code className="language-bash">
-                        <div className={styles.codeLine}>npx skills add https://github.com/vercel-labs/skills --skill find-skills</div>
+                        <div className={styles.codeLine}>
+                          npx skills add https://github.com/vercel-labs/skills --skill find-skills
+                        </div>
                       </code>
                     </pre>
                   </div>
-                  <p>導入後は、Claude Codeなどのチャットで以下のように話しかけるだけで完結します。</p>
+                  <p>
+                    導入後は、Claude Codeなどのチャットで以下のように話しかけるだけで完結します。
+                  </p>
                   <div className={styles.codeBlock}>
                     <div className={styles.codeLabel}>
                       <span>chat</span>
-                      <div className={styles.dots}><span></span><span></span><span></span></div>
+                      <div className={styles.dots}>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                      </div>
                     </div>
                     <pre>
                       <code className="language-plaintext">
-                        <div className={styles.codeLine}>「Reactのパフォーマンスを改善するスキルを探してインストールして」</div>
+                        <div className={styles.codeLine}>
+                          「Reactのパフォーマンスを改善するスキルを探してインストールして」
+                        </div>
                       </code>
                     </pre>
                   </div>
@@ -644,19 +865,29 @@ export default function SkillsShGuidePage() {
                 <div className={styles.stepItem}>
                   <h4>エージェントに認識させる</h4>
                   <p>
-                    インストールが完了すると、CLIはエージェントが参照するローカルのスキル格納フォルダ(エージェントの種類によって配置場所は異なります)に <code>SKILL.md</code> 一式をコピーします。多くの場合、<strong>エージェントを再起動する、または新しい会話を始めるだけ</strong>で自動的にTier1(name/description)がスキャンされ、以降のリクエストに応じて自動発火するようになります。
+                    インストールが完了すると、CLIはエージェントが参照するローカルのスキル格納フォルダ(エージェントの種類によって配置場所は異なります)に{" "}
+                    <code>SKILL.md</code> 一式をコピーします。多くの場合、
+                    <strong>エージェントを再起動する、または新しい会話を始めるだけ</strong>
+                    で自動的にTier1(name/description)がスキャンされ、以降のリクエストに応じて自動発火するようになります。
                   </p>
                   <p>
-                    Claude Code の場合はプラグイン形式での導入にも対応しており、次のようなコマンドでマーケットプレイス経由の一括インストールも可能です(Anthropic公式スキルの場合)。
+                    Claude Code
+                    の場合はプラグイン形式での導入にも対応しており、次のようなコマンドでマーケットプレイス経由の一括インストールも可能です(Anthropic公式スキルの場合)。
                   </p>
                   <div className={styles.codeBlock}>
                     <div className={styles.codeLabel}>
                       <span>Claude Code</span>
-                      <div className={styles.dots}><span></span><span></span><span></span></div>
+                      <div className={styles.dots}>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                      </div>
                     </div>
                     <pre>
                       <code className="language-bash">
-                        <div className={styles.codeLine}>/plugin install document-skills@anthropic-agent-skills</div>
+                        <div className={styles.codeLine}>
+                          /plugin install document-skills@anthropic-agent-skills
+                        </div>
                       </code>
                     </pre>
                   </div>
@@ -670,11 +901,17 @@ export default function SkillsShGuidePage() {
                   <div className={styles.codeBlock}>
                     <div className={styles.codeLabel}>
                       <span>bash</span>
-                      <div className={styles.dots}><span></span><span></span><span></span></div>
+                      <div className={styles.dots}>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                      </div>
                     </div>
                     <pre>
                       <code className="language-bash">
-                        <div className={styles.codeLine}>DISABLE_TELEMETRY=1 npx skills add anthropics/skills --skill pdf</div>
+                        <div className={styles.codeLine}>
+                          DISABLE_TELEMETRY=1 npx skills add anthropics/skills --skill pdf
+                        </div>
                       </code>
                     </pre>
                   </div>
@@ -683,7 +920,9 @@ export default function SkillsShGuidePage() {
 
               <h3>インストールから実行までの流れ(全体シーケンス)</h3>
               <div className={styles.diagramCard}>
-                <div className={styles.diagramTitle}>図3: CLIインストール〜スキル発火までのシーケンス</div>
+                <div className={styles.diagramTitle}>
+                  図3: CLIインストール〜スキル発火までのシーケンス
+                </div>
                 <div className={styles.mermaidDiagram}>
                   <MermaidDiagram chart={DIAGRAMS.diagramInstallSequence} />
                 </div>
@@ -695,7 +934,8 @@ export default function SkillsShGuidePage() {
               <h2>主要スキル カテゴリ別マップ</h2>
               <div className={styles.prose}>
                 <p>
-                  skills.sh に登録されているスキルは膨大な数がありますが、初学者がまず押さえておくべき代表的なものを7カテゴリに整理しました。
+                  skills.sh
+                  に登録されているスキルは膨大な数がありますが、初学者がまず押さえておくべき代表的なものを7カテゴリに整理しました。
                 </p>
               </div>
 
@@ -720,7 +960,9 @@ export default function SkillsShGuidePage() {
               <h2>主要スキル 徹底解説</h2>
               <div className={styles.prose}>
                 <p>
-                  ここからは、実際にskills.shのランキング上位・代表格となっているスキルを1つずつ、<strong>「何をするか」「いつ使うか」「インストール方法」</strong>の3点セットで解説します。
+                  ここからは、実際にskills.shのランキング上位・代表格となっているスキルを1つずつ、
+                  <strong>「何をするか」「いつ使うか」「インストール方法」</strong>
+                  の3点セットで解説します。
                 </p>
               </div>
 
@@ -753,11 +995,17 @@ export default function SkillsShGuidePage() {
                 <div className={styles.codeBlock}>
                   <div className={styles.codeLabel}>
                     <span>install</span>
-                    <div className={styles.dots}><span></span><span></span><span></span></div>
+                    <div className={styles.dots}>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
                   </div>
                   <pre>
                     <code className="language-bash">
-                      <div className={styles.codeLine}>npx skills add https://github.com/vercel-labs/skills --skill find-skills</div>
+                      <div className={styles.codeLine}>
+                        npx skills add https://github.com/vercel-labs/skills --skill find-skills
+                      </div>
                     </code>
                   </pre>
                 </div>
@@ -783,7 +1031,8 @@ export default function SkillsShGuidePage() {
                       <tr>
                         <td>できること</td>
                         <td>
-                          Anthropicのベストプラクティスに沿った <code>SKILL.md</code> の雛形生成、トリガー精度(description)の評価、反復改善までを支援
+                          Anthropicのベストプラクティスに沿った <code>SKILL.md</code>{" "}
+                          の雛形生成、トリガー精度(description)の評価、反復改善までを支援
                         </td>
                       </tr>
                       <tr>
@@ -798,11 +1047,17 @@ export default function SkillsShGuidePage() {
                 <div className={styles.codeBlock}>
                   <div className={styles.codeLabel}>
                     <span>install</span>
-                    <div className={styles.dots}><span></span><span></span><span></span></div>
+                    <div className={styles.dots}>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
                   </div>
                   <pre>
                     <code className="language-bash">
-                      <div className={styles.codeLine}>npx skills add anthropics/skills --skill skill-creator</div>
+                      <div className={styles.codeLine}>
+                        npx skills add anthropics/skills --skill skill-creator
+                      </div>
                     </code>
                   </pre>
                 </div>
@@ -843,11 +1098,17 @@ export default function SkillsShGuidePage() {
                 <div className={styles.codeBlock}>
                   <div className={styles.codeLabel}>
                     <span>install</span>
-                    <div className={styles.dots}><span></span><span></span><span></span></div>
+                    <div className={styles.dots}>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
                   </div>
                   <pre>
                     <code className="language-bash">
-                      <div className={styles.codeLine}>npx skills add anthropics/skills --skill frontend-design</div>
+                      <div className={styles.codeLine}>
+                        npx skills add anthropics/skills --skill frontend-design
+                      </div>
                     </code>
                   </pre>
                 </div>
@@ -882,11 +1143,18 @@ export default function SkillsShGuidePage() {
                 <div className={styles.codeBlock}>
                   <div className={styles.codeLabel}>
                     <span>install</span>
-                    <div className={styles.dots}><span></span><span></span><span></span></div>
+                    <div className={styles.dots}>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
                   </div>
                   <pre>
                     <code className="language-bash">
-                      <div className={styles.codeLine}>npx skills add https://github.com/vercel-labs/agent-skills --skill web-design-guidelines</div>
+                      <div className={styles.codeLine}>
+                        npx skills add https://github.com/vercel-labs/agent-skills --skill
+                        web-design-guidelines
+                      </div>
                     </code>
                   </pre>
                 </div>
@@ -906,7 +1174,8 @@ export default function SkillsShGuidePage() {
                       <tr>
                         <td>できること</td>
                         <td>
-                          shadcn/ui のコンポーネント(Button, Dialog, Formなど)を正しい作法でエージェントに導入・カスタマイズさせる
+                          shadcn/ui のコンポーネント(Button, Dialog,
+                          Formなど)を正しい作法でエージェントに導入・カスタマイズさせる
                         </td>
                       </tr>
                       <tr>
@@ -919,7 +1188,11 @@ export default function SkillsShGuidePage() {
                 <div className={styles.codeBlock}>
                   <div className={styles.codeLabel}>
                     <span>install</span>
-                    <div className={styles.dots}><span></span><span></span><span></span></div>
+                    <div className={styles.dots}>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
                   </div>
                   <pre>
                     <code className="language-bash">
@@ -943,7 +1216,8 @@ export default function SkillsShGuidePage() {
                       <tr>
                         <td>できること</td>
                         <td>
-                          不要な再レンダリングの回避、Server Components/Client Componentsの適切な使い分け、コンポーネント分割パターンなど、Vercelが推奨するReact設計指針をエージェントに適用させる
+                          不要な再レンダリングの回避、Server Components/Client
+                          Componentsの適切な使い分け、コンポーネント分割パターンなど、Vercelが推奨するReact設計指針をエージェントに適用させる
                         </td>
                       </tr>
                       <tr>
@@ -958,12 +1232,22 @@ export default function SkillsShGuidePage() {
                 <div className={styles.codeBlock}>
                   <div className={styles.codeLabel}>
                     <span>install</span>
-                    <div className={styles.dots}><span></span><span></span><span></span></div>
+                    <div className={styles.dots}>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
                   </div>
                   <pre>
                     <code className="language-bash">
-                      <div className={styles.codeLine}>npx skills add https://github.com/vercel-labs/agent-skills --skill vercel-react-best-practices</div>
-                      <div className={styles.codeLine}>npx skills add https://github.com/vercel-labs/agent-skills --skill vercel-composition-patterns</div>
+                      <div className={styles.codeLine}>
+                        npx skills add https://github.com/vercel-labs/agent-skills --skill
+                        vercel-react-best-practices
+                      </div>
+                      <div className={styles.codeLine}>
+                        npx skills add https://github.com/vercel-labs/agent-skills --skill
+                        vercel-composition-patterns
+                      </div>
                     </code>
                   </pre>
                 </div>
@@ -975,7 +1259,8 @@ export default function SkillsShGuidePage() {
                   <span className={styles.skillBadge}>エージェント運用 / テスト</span>
                 </div>
                 <div className={styles.skillRepo}>
-                  提供元: <code>vercel-labs/agent-browser</code> ・ カテゴリ: エージェント運用 / テスト
+                  提供元: <code>vercel-labs/agent-browser</code> ・ カテゴリ: エージェント運用 /
+                  テスト
                 </div>
                 <div className={styles.tableWrap}>
                   <table>
@@ -998,11 +1283,18 @@ export default function SkillsShGuidePage() {
                 <div className={styles.codeBlock}>
                   <div className={styles.codeLabel}>
                     <span>install</span>
-                    <div className={styles.dots}><span></span><span></span><span></span></div>
+                    <div className={styles.dots}>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
                   </div>
                   <pre>
                     <code className="language-bash">
-                      <div className={styles.codeLine}>npx skills add https://github.com/vercel-labs/agent-browser --skill agent-browser</div>
+                      <div className={styles.codeLine}>
+                        npx skills add https://github.com/vercel-labs/agent-browser --skill
+                        agent-browser
+                      </div>
                     </code>
                   </pre>
                 </div>
@@ -1022,7 +1314,9 @@ export default function SkillsShGuidePage() {
                       <tr>
                         <td>できること</td>
                         <td>
-                          PowerPoint・Word・Excel・PDFファイルの<strong>実際に開けるバイナリファイル</strong>を、テキスト説明ではなく生成物として作成・編集する
+                          PowerPoint・Word・Excel・PDFファイルの
+                          <strong>実際に開けるバイナリファイル</strong>
+                          を、テキスト説明ではなく生成物として作成・編集する
                         </td>
                       </tr>
                       <tr>
@@ -1037,21 +1331,34 @@ export default function SkillsShGuidePage() {
                 <div className={styles.codeBlock}>
                   <div className={styles.codeLabel}>
                     <span>install</span>
-                    <div className={styles.dots}><span></span><span></span><span></span></div>
+                    <div className={styles.dots}>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
                   </div>
                   <pre>
                     <code className="language-bash">
-                      <div className={styles.codeLine}>npx skills add anthropics/skills --skill pptx</div>
-                      <div className={styles.codeLine}>npx skills add anthropics/skills --skill docx</div>
-                      <div className={styles.codeLine}>npx skills add anthropics/skills --skill xlsx</div>
-                      <div className={styles.codeLine}>npx skills add anthropics/skills --skill pdf</div>
+                      <div className={styles.codeLine}>
+                        npx skills add anthropics/skills --skill pptx
+                      </div>
+                      <div className={styles.codeLine}>
+                        npx skills add anthropics/skills --skill docx
+                      </div>
+                      <div className={styles.codeLine}>
+                        npx skills add anthropics/skills --skill xlsx
+                      </div>
+                      <div className={styles.codeLine}>
+                        npx skills add anthropics/skills --skill pdf
+                      </div>
                     </code>
                   </pre>
                 </div>
                 <div className={`${styles.callout} ${styles.note}`}>
                   <div className={styles.calloutIcon}>i</div>
                   <p>
-                    補足: Claude.aiの有料プランでは、これらのドキュメント生成スキルは追加インストールなしで既定で使えるようになっています。
+                    補足:
+                    Claude.aiの有料プランでは、これらのドキュメント生成スキルは追加インストールなしで既定で使えるようになっています。
                   </p>
                 </div>
               </div>
@@ -1085,11 +1392,17 @@ export default function SkillsShGuidePage() {
                 <div className={styles.codeBlock}>
                   <div className={styles.codeLabel}>
                     <span>install</span>
-                    <div className={styles.dots}><span></span><span></span><span></span></div>
+                    <div className={styles.dots}>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
                   </div>
                   <pre>
                     <code className="language-bash">
-                      <div className={styles.codeLine}>npx skills add anthropics/skills --skill webapp-testing</div>
+                      <div className={styles.codeLine}>
+                        npx skills add anthropics/skills --skill webapp-testing
+                      </div>
                     </code>
                   </pre>
                 </div>
@@ -1109,7 +1422,8 @@ export default function SkillsShGuidePage() {
                       <tr>
                         <td>できること</td>
                         <td>
-                          PostgreSQL(Supabase)のスキーマ設計、インデックス設計、Row Level Security(RLS)などのベストプラクティスをエージェントに適用させる
+                          PostgreSQL(Supabase)のスキーマ設計、インデックス設計、Row Level
+                          Security(RLS)などのベストプラクティスをエージェントに適用させる
                         </td>
                       </tr>
                       <tr>
@@ -1124,11 +1438,18 @@ export default function SkillsShGuidePage() {
                 <div className={styles.codeBlock}>
                   <div className={styles.codeLabel}>
                     <span>install</span>
-                    <div className={styles.dots}><span></span><span></span><span></span></div>
+                    <div className={styles.dots}>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
                   </div>
                   <pre>
                     <code className="language-bash">
-                      <div className={styles.codeLine}>npx skills add https://github.com/supabase/agent-skills --skill supabase-postgres-best-practices</div>
+                      <div className={styles.codeLine}>
+                        npx skills add https://github.com/supabase/agent-skills --skill
+                        supabase-postgres-best-practices
+                      </div>
                     </code>
                   </pre>
                 </div>
@@ -1148,7 +1469,9 @@ export default function SkillsShGuidePage() {
                       <tr>
                         <td>できること</td>
                         <td>
-                          <code>brainstorming</code>(発散的思考の型)、<code>systematic-debugging</code>(体系的なデバッグ手順)など、特定の技術領域ではなく「進め方・考え方」そのものをスキル化したもの
+                          <code>brainstorming</code>(発散的思考の型)、
+                          <code>systematic-debugging</code>
+                          (体系的なデバッグ手順)など、特定の技術領域ではなく「進め方・考え方」そのものをスキル化したもの
                         </td>
                       </tr>
                       <tr>
@@ -1163,12 +1486,20 @@ export default function SkillsShGuidePage() {
                 <div className={styles.codeBlock}>
                   <div className={styles.codeLabel}>
                     <span>install</span>
-                    <div className={styles.dots}><span></span><span></span><span></span></div>
+                    <div className={styles.dots}>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
                   </div>
                   <pre>
                     <code className="language-bash">
-                      <div className={styles.codeLine}>npx skills add cobra/superpowers --skill brainstorming</div>
-                      <div className={styles.codeLine}>npx skills add cobra/superpowers --skill systematic-debugging</div>
+                      <div className={styles.codeLine}>
+                        npx skills add cobra/superpowers --skill brainstorming
+                      </div>
+                      <div className={styles.codeLine}>
+                        npx skills add cobra/superpowers --skill systematic-debugging
+                      </div>
                     </code>
                   </pre>
                 </div>
@@ -1188,7 +1519,8 @@ export default function SkillsShGuidePage() {
                       <tr>
                         <td>できること</td>
                         <td>
-                          Microsoft Foundry(Azure上のAnthropicホスティング環境)を利用する際の設定・デプロイ手順をエージェントに適用させる
+                          Microsoft
+                          Foundry(Azure上のAnthropicホスティング環境)を利用する際の設定・デプロイ手順をエージェントに適用させる
                         </td>
                       </tr>
                       <tr>
@@ -1201,11 +1533,17 @@ export default function SkillsShGuidePage() {
                 <div className={styles.codeBlock}>
                   <div className={styles.codeLabel}>
                     <span>install</span>
-                    <div className={styles.dots}><span></span><span></span><span></span></div>
+                    <div className={styles.dots}>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
                   </div>
                   <pre>
                     <code className="language-bash">
-                      <div className={styles.codeLine}>npx skills add microsoft/azure-skills --skill microsoft-foundry</div>
+                      <div className={styles.codeLine}>
+                        npx skills add microsoft/azure-skills --skill microsoft-foundry
+                      </div>
                     </code>
                   </pre>
                 </div>
@@ -1217,7 +1555,9 @@ export default function SkillsShGuidePage() {
               <h2>対応しているAIエージェント</h2>
               <div className={styles.prose}>
                 <p>
-                  Agent Skills はオープンな仕様であるため、Claude系だけでなく複数のエージェント/IDEで利用が広がっています。skills.sh 上では、エージェントごとの対応状況ページも用意されています。
+                  Agent Skills
+                  はオープンな仕様であるため、Claude系だけでなく複数のエージェント/IDEで利用が広がっています。skills.sh
+                  上では、エージェントごとの対応状況ページも用意されています。
                 </p>
               </div>
 
@@ -1269,7 +1609,10 @@ export default function SkillsShGuidePage() {
               <div className={`${styles.callout} ${styles.warn}`}>
                 <div className={styles.calloutIcon}>!</div>
                 <p>
-                  <strong>注意点:</strong> エージェントの種類によって「スキルフォルダの配置場所」や「発見(discovery)の仕組み」に細かな違いがあります。同じ <code>SKILL.md</code> を複数のエージェントで使い回せることが「オープン標準」としての強みですが、導入時は各エージェントの公式ドキュメントで配置パスを確認するのが確実です。
+                  <strong>注意点:</strong>{" "}
+                  エージェントの種類によって「スキルフォルダの配置場所」や「発見(discovery)の仕組み」に細かな違いがあります。同じ{" "}
+                  <code>SKILL.md</code>{" "}
+                  を複数のエージェントで使い回せることが「オープン標準」としての強みですが、導入時は各エージェントの公式ドキュメントで配置パスを確認するのが確実です。
                 </p>
               </div>
             </section>
@@ -1279,14 +1622,17 @@ export default function SkillsShGuidePage() {
               <h2>セキュリティと監査の仕組み</h2>
               <div className={styles.prose}>
                 <p>
-                  スキルは「指示書」であると同時に、<strong>スクリプトを実行する権限をエージェントに与えるもの</strong>でもあります。裏を返せば、悪意あるスキルを不用意にインストールすると、想定外のコマンド実行やデータの持ち出し(exfiltration)につながるリスクがあります。
+                  スキルは「指示書」であると同時に、
+                  <strong>スクリプトを実行する権限をエージェントに与えるもの</strong>
+                  でもあります。裏を返せば、悪意あるスキルを不用意にインストールすると、想定外のコマンド実行やデータの持ち出し(exfiltration)につながるリスクがあります。
                 </p>
               </div>
 
               <h3>skills.sh が提供する監査情報</h3>
               <div className={styles.prose}>
                 <p>
-                  skills.sh には <code>/audits</code> ページがあり、登録されている主要スキルについて、複数の第三者セキュリティ機関による静的スキャン結果(安全度のレーティング)を確認できます。監査は継続的に実施されており、既知の危険パターン(不審なネットワーク呼び出し、認証情報へのアクセスなど)を機械的にチェックしています。
+                  skills.sh には <code>/audits</code>{" "}
+                  ページがあり、登録されている主要スキルについて、複数の第三者セキュリティ機関による静的スキャン結果(安全度のレーティング)を確認できます。監査は継続的に実施されており、既知の危険パターン(不審なネットワーク呼び出し、認証情報へのアクセスなど)を機械的にチェックしています。
                 </p>
               </div>
 
@@ -1297,7 +1643,8 @@ export default function SkillsShGuidePage() {
                     <strong>信頼できる提供元のスキルだけを使う</strong>(自作、またはAnthropic公式)
                   </li>
                   <li>
-                    出所不明のスキルを使う場合は、<code>SKILL.md</code> 本文・同梱スクリプト・画像・参考資料まで<strong>すべて目視で確認</strong>する
+                    出所不明のスキルを使う場合は、<code>SKILL.md</code>{" "}
+                    本文・同梱スクリプト・画像・参考資料まで<strong>すべて目視で確認</strong>する
                   </li>
                   <li>
                     想定外のネットワーク呼び出しや、スキルの説明と矛盾する挙動(ファイルアクセスパターンなど)がないか確認する
@@ -1322,7 +1669,9 @@ export default function SkillsShGuidePage() {
                     </tr>
                     <tr>
                       <td>skills.shの監査結果は良好か</td>
-                      <td><code>/audits</code> ページのレーティングを確認</td>
+                      <td>
+                        <code>/audits</code> ページのレーティングを確認
+                      </td>
                     </tr>
                     <tr>
                       <td>SKILL.md本文を読んだか</td>
@@ -1346,7 +1695,8 @@ export default function SkillsShGuidePage() {
               <h2>自分だけのスキルを作る(skill-creator活用法)</h2>
               <div className={styles.prose}>
                 <p>
-                  既存スキルに満足できない、あるいは社内独自のルールをスキル化したい場合は <code>skill-creator</code> を使います。基本的な進め方は次のループです。
+                  既存スキルに満足できない、あるいは社内独自のルールをスキル化したい場合は{" "}
+                  <code>skill-creator</code> を使います。基本的な進め方は次のループです。
                 </p>
               </div>
 
@@ -1361,11 +1711,17 @@ export default function SkillsShGuidePage() {
               <div className={styles.codeBlock}>
                 <div className={styles.codeLabel}>
                   <span>bash</span>
-                  <div className={styles.dots}><span></span><span></span><span></span></div>
+                  <div className={styles.dots}>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
                 </div>
                 <pre>
                   <code className="language-bash">
-                    <div className={styles.codeLine}>npx skills add anthropics/skills --skill skill-creator</div>
+                    <div className={styles.codeLine}>
+                      npx skills add anthropics/skills --skill skill-creator
+                    </div>
                   </code>
                 </pre>
               </div>
@@ -1375,7 +1731,8 @@ export default function SkillsShGuidePage() {
                 <div className={styles.stepItem}>
                   <h4>評価から始める</h4>
                   <p>
-                    まず既存のエージェントに代表的なタスクをやらせてみて、どこで詰まるか・情報不足になるかを observe する
+                    まず既存のエージェントに代表的なタスクをやらせてみて、どこで詰まるか・情報不足になるかを
+                    observe する
                   </p>
                 </div>
                 <div className={styles.stepItem}>
@@ -1421,17 +1778,35 @@ export default function SkillsShGuidePage() {
               <div className={styles.codeBlock}>
                 <div className={styles.codeLabel}>
                   <span>bash</span>
-                  <div className={styles.dots}><span></span><span></span><span></span></div>
+                  <div className={styles.dots}>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
                 </div>
                 <pre>
                   <code className="language-bash">
-                    <div className={styles.codeLine}><span className={styles.cc}># ステップ1: 検索用スキルを入れる</span></div>
-                    <div className={styles.codeLine}>npx skills add https://github.com/vercel-labs/skills --skill find-skills</div>
+                    <div className={styles.codeLine}>
+                      <span className={styles.cc}># ステップ1: 検索用スキルを入れる</span>
+                    </div>
+                    <div className={styles.codeLine}>
+                      npx skills add https://github.com/vercel-labs/skills --skill find-skills
+                    </div>
                     <div className={styles.codeLine}></div>
-                    <div className={styles.codeLine}><span className={styles.cc}># ステップ2: 興味のあるスキルを1つ入れてみる(例: フロントエンド設計)</span></div>
-                    <div className={styles.codeLine}>npx skills add anthropics/skills --skill frontend-design</div>
+                    <div className={styles.codeLine}>
+                      <span className={styles.cc}>
+                        # ステップ2: 興味のあるスキルを1つ入れてみる(例: フロントエンド設計)
+                      </span>
+                    </div>
+                    <div className={styles.codeLine}>
+                      npx skills add anthropics/skills --skill frontend-design
+                    </div>
                     <div className={styles.codeLine}></div>
-                    <div className={styles.codeLine}><span className={styles.cc}># ステップ3: エージェントに関連の依頼をして、実際に使われるか確認する</span></div>
+                    <div className={styles.codeLine}>
+                      <span className={styles.cc}>
+                        # ステップ3: エージェントに関連の依頼をして、実際に使われるか確認する
+                      </span>
+                    </div>
                   </code>
                 </pre>
               </div>
@@ -1439,7 +1814,9 @@ export default function SkillsShGuidePage() {
               <div className={`${styles.callout} ${styles.tip}`}>
                 <div className={styles.calloutIcon}>✓</div>
                 <p>
-                  Agent Skills は「モデルを賢くする」のではなく、<strong>「エージェントに正しい手順書を渡す」</strong>ための仕組みです。まずは自分の日常業務で繰り返している作業を1つ思い浮かべ、それに近いスキルをskills.shで探すところから始めるのが、最も理解が早い入り口です。
+                  Agent Skills は「モデルを賢くする」のではなく、
+                  <strong>「エージェントに正しい手順書を渡す」</strong>
+                  ための仕組みです。まずは自分の日常業務で繰り返している作業を1つ思い浮かべ、それに近いスキルをskills.shで探すところから始めるのが、最も理解が早い入り口です。
                 </p>
               </div>
             </section>
@@ -1452,31 +1829,56 @@ export default function SkillsShGuidePage() {
               <ul className={styles.refList}>
                 <li>
                   <span className={styles.refLabel}>skills.sh トップページ</span>
-                  <a className={styles.refUrl} href="https://www.skills.sh/" target="_blank" rel="noopener noreferrer">
+                  <a
+                    className={styles.refUrl}
+                    href="https://www.skills.sh/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     https://www.skills.sh/
                   </a>
                 </li>
                 <li>
                   <span className={styles.refLabel}>ドキュメント</span>
-                  <a className={styles.refUrl} href="https://www.skills.sh/docs" target="_blank" rel="noopener noreferrer">
+                  <a
+                    className={styles.refUrl}
+                    href="https://www.skills.sh/docs"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     https://www.skills.sh/docs
                   </a>
                 </li>
                 <li>
                   <span className={styles.refLabel}>CLIリファレンス</span>
-                  <a className={styles.refUrl} href="https://www.skills.sh/docs/cli" target="_blank" rel="noopener noreferrer">
+                  <a
+                    className={styles.refUrl}
+                    href="https://www.skills.sh/docs/cli"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     https://www.skills.sh/docs/cli
                   </a>
                 </li>
                 <li>
                   <span className={styles.refLabel}>FAQ</span>
-                  <a className={styles.refUrl} href="https://www.skills.sh/docs/faq" target="_blank" rel="noopener noreferrer">
+                  <a
+                    className={styles.refUrl}
+                    href="https://www.skills.sh/docs/faq"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     https://www.skills.sh/docs/faq
                   </a>
                 </li>
                 <li>
                   <span className={styles.refLabel}>セキュリティ監査ページ</span>
-                  <a className={styles.refUrl} href="https://www.skills.sh/audits" target="_blank" rel="noopener noreferrer">
+                  <a
+                    className={styles.refUrl}
+                    href="https://www.skills.sh/audits"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     https://www.skills.sh/audits
                   </a>
                 </li>
@@ -1486,43 +1888,78 @@ export default function SkillsShGuidePage() {
               <ul className={styles.refList}>
                 <li>
                   <span className={styles.refLabel}>find-skills</span>
-                  <a className={styles.refUrl} href="https://www.skills.sh/vercel-labs/skills/find-skills" target="_blank" rel="noopener noreferrer">
+                  <a
+                    className={styles.refUrl}
+                    href="https://www.skills.sh/vercel-labs/skills/find-skills"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     https://www.skills.sh/vercel-labs/skills/find-skills
                   </a>
                 </li>
                 <li>
                   <span className={styles.refLabel}>skill-creator</span>
-                  <a className={styles.refUrl} href="https://www.skills.sh/anthropics/skills/skill-creator" target="_blank" rel="noopener noreferrer">
+                  <a
+                    className={styles.refUrl}
+                    href="https://www.skills.sh/anthropics/skills/skill-creator"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     https://www.skills.sh/anthropics/skills/skill-creator
                   </a>
                 </li>
                 <li>
                   <span className={styles.refLabel}>frontend-design</span>
-                  <a className={styles.refUrl} href="https://www.skills.sh/anthropics/skills/frontend-design" target="_blank" rel="noopener noreferrer">
+                  <a
+                    className={styles.refUrl}
+                    href="https://www.skills.sh/anthropics/skills/frontend-design"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     https://www.skills.sh/anthropics/skills/frontend-design
                   </a>
                 </li>
                 <li>
                   <span className={styles.refLabel}>web-design-guidelines</span>
-                  <a className={styles.refUrl} href="https://www.skills.sh/vercel-labs/agent-skills/web-design-guidelines" target="_blank" rel="noopener noreferrer">
+                  <a
+                    className={styles.refUrl}
+                    href="https://www.skills.sh/vercel-labs/agent-skills/web-design-guidelines"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     https://www.skills.sh/vercel-labs/agent-skills/web-design-guidelines
                   </a>
                 </li>
                 <li>
                   <span className={styles.refLabel}>shadcn</span>
-                  <a className={styles.refUrl} href="https://www.skills.sh/shadcn/ui/shadcn" target="_blank" rel="noopener noreferrer">
+                  <a
+                    className={styles.refUrl}
+                    href="https://www.skills.sh/shadcn/ui/shadcn"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     https://www.skills.sh/shadcn/ui/shadcn
                   </a>
                 </li>
                 <li>
                   <span className={styles.refLabel}>agent-browser</span>
-                  <a className={styles.refUrl} href="https://www.skills.sh/vercel-labs/agent-browser/agent-browser" target="_blank" rel="noopener noreferrer">
+                  <a
+                    className={styles.refUrl}
+                    href="https://www.skills.sh/vercel-labs/agent-browser/agent-browser"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     https://www.skills.sh/vercel-labs/agent-browser/agent-browser
                   </a>
                 </li>
                 <li>
                   <span className={styles.refLabel}>supabase-postgres-best-practices</span>
-                  <a className={styles.refUrl} href="https://www.skills.sh/supabase/agent-skills/supabase-postgres-best-practices" target="_blank" rel="noopener noreferrer">
+                  <a
+                    className={styles.refUrl}
+                    href="https://www.skills.sh/supabase/agent-skills/supabase-postgres-best-practices"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     https://www.skills.sh/supabase/agent-skills/supabase-postgres-best-practices
                   </a>
                 </li>
@@ -1532,13 +1969,23 @@ export default function SkillsShGuidePage() {
               <ul className={styles.refList}>
                 <li>
                   <span className={styles.refLabel}>anthropics/skills</span>
-                  <a className={styles.refUrl} href="https://github.com/anthropics/skills" target="_blank" rel="noopener noreferrer">
+                  <a
+                    className={styles.refUrl}
+                    href="https://github.com/anthropics/skills"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     https://github.com/anthropics/skills
                   </a>
                 </li>
                 <li>
                   <span className={styles.refLabel}>vercel-labs/skills</span>
-                  <a className={styles.refUrl} href="https://github.com/vercel-labs/skills" target="_blank" rel="noopener noreferrer">
+                  <a
+                    className={styles.refUrl}
+                    href="https://github.com/vercel-labs/skills"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     https://github.com/vercel-labs/skills
                   </a>
                 </li>
@@ -1547,14 +1994,28 @@ export default function SkillsShGuidePage() {
               <h3>Anthropic公式ドキュメント・エンジニアリングブログ</h3>
               <ul className={styles.refList}>
                 <li>
-                  <span className={styles.refLabel}>Agent Skillsの設計思想(エンジニアリングブログ)</span>
-                  <a className={styles.refUrl} href="https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills" target="_blank" rel="noopener noreferrer">
+                  <span className={styles.refLabel}>
+                    Agent Skillsの設計思想(エンジニアリングブログ)
+                  </span>
+                  <a
+                    className={styles.refUrl}
+                    href="https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills
                   </a>
                 </li>
                 <li>
-                  <span className={styles.refLabel}>Agent Skills 公式ドキュメント(Claude Platform Docs)</span>
-                  <a className={styles.refUrl} href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview" target="_blank" rel="noopener noreferrer">
+                  <span className={styles.refLabel}>
+                    Agent Skills 公式ドキュメント(Claude Platform Docs)
+                  </span>
+                  <a
+                    className={styles.refUrl}
+                    href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview
                   </a>
                 </li>

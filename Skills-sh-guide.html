@@ -19,45 +19,13 @@
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
-      integrity="sha384-IjoEWQzGtqsNLrVC4Tu2cYuwoaTVylP3MnYOE5bP6f7/D4r5EYrSrypO4nKnE9tl"
-      crossorigin="anonymous"
     />
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"
-      integrity="sha384-rCRD2fxHuBxS6V2IthxSJJRThpPtLU402heTvcwh+bYT7cpjFa54x8XxOXdWibBt"
-      crossorigin="anonymous"
-      defer
-    ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"
-      integrity="sha384-aHpymG41uCYoyu/FGJo3bioHn326iCRN7lt6Nl/Kf0Uf9U5oswRgYDU+065KNIdv"
-      crossorigin="anonymous"
-      defer
-    ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"
-      integrity="sha384-N2liw06/AlnqsBiAx/l7lzyswVNnc2wzRNvdTIUsBmjmH9mvO/9NGMt75L02X4NQ"
-      crossorigin="anonymous"
-      defer
-    ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/markdown.min.js"
-      integrity="sha384-+CP9/iEB6oTOqrd0pHXQ9NoD6zvo95ea91voIMFCyPs4YyHCJCW5rLlYxpUvC+Z9"
-      crossorigin="anonymous"
-      defer
-    ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/plaintext.min.js"
-      integrity="sha384-OLBgp1GsljhM2TJ+sbHjaiH9txEUvgdDTAzHv2P24donTt6/529l+9Ua0vFImLlb"
-      crossorigin="anonymous"
-      defer
-    ></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"
-      integrity="sha512-bWeB2tgEo86L1JAd2kj9xbbvyytYUAJivlMSzFwL4Lto/0eMM+dG/Tk24znPJat0NqLZl0/E9QQqqk8B4fO2NQ=="
-      crossorigin="anonymous"
-      defer
-    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/markdown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/plaintext.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 
     <style>
       :root {
@@ -69,8 +37,8 @@
         --border: rgba(148, 178, 214, 0.14);
         --border-strong: rgba(148, 178, 214, 0.3);
         --text-primary: #eaf1fb;
-        --text-secondary: #a6b8d1;
-        --text-muted: #6c7f9c;
+        --text-secondary: #dbe4f1;
+        --text-muted: #c3d2e9;
         --accent: #5eead4;
         --accent-strong: #2dd4bf;
         --accent-soft: rgba(94, 234, 212, 0.12);
@@ -2262,8 +2230,7 @@ npx skills add anthropics/skills --skill frontend-design
     </div>
 
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        const DIAGRAMS = {
+      const DIAGRAMS = {
         'diagram-progressive': `flowchart TD
     A[エージェントが起動する] --> B["Tier 1: 全スキルの<br/>name + description のみ読み込む<br/>(1スキルあたり約30トークン程度)"]
     B --> C{ユーザーの依頼内容が<br/>いずれかのdescriptionと一致する?}
@@ -2516,7 +2483,6 @@ npx skills add anthropics/skills --skill frontend-design
           a.addEventListener('click', () => sidebar.classList.remove('open'));
         });
       }
-      });
     </script>
   </body>
 </html>

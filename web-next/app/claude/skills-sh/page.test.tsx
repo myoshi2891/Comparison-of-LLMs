@@ -88,11 +88,11 @@ describe("/claude/skills-sh - page structure", () => {
 });
 
 describe("/claude/skills-sh - registration", () => {
-  it("is registered in nav-links.ts under Claude category", () => {
-    const claudeGroup = navLinks.find((g) => g.name === "Claude");
-    expect(claudeGroup).toBeDefined();
-    if (claudeGroup && "children" in claudeGroup) {
-      const link = claudeGroup.children.find((c) => c.href === "/claude/skills-sh");
+  it("is registered in nav-links.ts under Agent category", () => {
+    const agentGroup = navLinks.find((g) => g.name === "Agent");
+    expect(agentGroup).toBeDefined();
+    if (agentGroup && "children" in agentGroup) {
+      const link = agentGroup.children.find((c) => c.href === "/claude/skills-sh");
       expect(link).toBeDefined();
       expect(link?.name).toBe("skills.sh Guide");
     }
