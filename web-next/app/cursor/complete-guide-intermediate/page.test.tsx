@@ -12,15 +12,12 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
 
 beforeAll(() => {
   class IntersectionObserverStub {
-    // biome-ignore lint/suspicious/noEmptyBlockStatements: test stub
     observe() {
       /* noop */
     }
-    // biome-ignore lint/suspicious/noEmptyBlockStatements: test stub
     unobserve() {
       /* noop */
     }
-    // biome-ignore lint/suspicious/noEmptyBlockStatements: test stub
     disconnect() {
       /* noop */
     }
@@ -82,8 +79,10 @@ test("Cursor Intermediate Guide Page Contract Tests", () => {
   // 7. TOC Text Content Tests
   const tocLinks = container.querySelectorAll("aside nav a, nav a");
   // We look for navigation links in the sidebar
-  const sidebarLinks = Array.from(tocLinks).filter(link => link.classList.contains(styles.tocLink) || link.className.includes("nav-link"));
-  
+  const sidebarLinks = Array.from(tocLinks).filter(
+    (link) => link.classList.contains(styles.tocLink) || link.className.includes("nav-link")
+  );
+
   const expectedTocTexts = [
     "01アーキテクチャ全体像",
     "02Tab 補完",
@@ -107,7 +106,7 @@ test("Cursor Intermediate Guide Page Contract Tests", () => {
     "20ワークフロー統合",
     "21参考文献一覧",
   ];
-  
+
   expect(sidebarLinks.length).toBe(expectedTocTexts.length);
   sidebarLinks.forEach((link, idx) => {
     expect(link.textContent?.trim().replace(/\s+/g, " ")).toBe(expectedTocTexts[idx]);
