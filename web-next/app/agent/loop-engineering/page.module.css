@@ -1,0 +1,80 @@
+.pageWrap {
+  --paper: #eef1f3;
+  --paper-alt: #e3e8ea;
+  --panel: #ffffff;
+  --ink: #12202b;
+  --ink-soft: #3b4c58;
+  --line: #c9d3d6;
+  --loop: #0b7a75;
+  --loop-dark: #075c58;
+  --amber: #d9860f;
+  --violet: #6c5ce7;
+  --rose: #c4436b;
+  --code-bg: #101a20;
+  --code-ink: #dceae8;
+  --radius: 14px;
+  --maxw: 1180px;
+  --sidebar-w: 290px;
+}
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(160deg, #0f2027 0%, #14313a 46%, #0b7a75 130%);
+  color: #f3f7f6;
+  padding: 76px 24px 96px;
+}
+
+.heroInner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono), monospace;
+  font-size: 12.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #9fe6df;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(159, 230, 223, 0.35);
+  padding: 6px 12px;
+  border-radius: 999px;
+  margin-bottom: 22px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #9fe6df;
+  animation: pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.title {
+  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+  color: #fff;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  font-size: clamp(2.1rem, 4.4vw, 3.4rem);
+  margin: 0 0 20px;
+}
+
+.accent {
+  color: #9fe6df;
+}
