@@ -112,10 +112,32 @@ test("Cursor Intermediate Guide Page Contract Tests", () => {
     expect(link.textContent?.trim().replace(/\s+/g, " ")).toBe(expectedTocTexts[idx]);
   });
 
+  // 7b. TOC scroll-spy: first link is active on mount, rest are not
+  expect(sidebarLinks[0]?.getAttribute("aria-current")).toBe("location");
+  sidebarLinks.slice(1).forEach((link) => {
+    expect(link.getAttribute("aria-current")).toBeNull();
+  });
+
   // 8. Mermaid diagrams assertions for Category 2, 3, 4, 5 & 6 (Ch 4-21)
   const mermaidBlocks = container.querySelectorAll("[data-testid='mermaid']");
   // Total diagrams implemented so far: d01, d03, d04, d05, d06, d07, d08, d09, d10, d11, d12, d15, d16, d18, d19, d20 (16 diagrams)
   const charts = Array.from(mermaidBlocks).map((block) => block.textContent);
+  expect(
+    charts.some(
+      (c) =>
+        c?.includes("d01-architecture") ||
+        c?.includes("d01_architecture") ||
+        c?.includes("MentionsIndex")
+    )
+  ).toBe(true);
+  expect(
+    charts.some(
+      (c) =>
+        c?.includes("d03-inline-vs-agent") ||
+        c?.includes("d03_inline_vs_agent") ||
+        c?.includes("InlineK")
+    )
+  ).toBe(true);
   expect(
     charts.some(
       (c) =>
