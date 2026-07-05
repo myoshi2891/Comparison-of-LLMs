@@ -1,7 +1,7 @@
 # プロジェクト進捗・ステータス (PROGRESS.md)
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
-> - 最終更新日: **Updated 2026-07-04**
+> - 最終更新日: **Updated 2026-07-05**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -14,10 +14,11 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（本作業範囲では新規違反 0 件、既知の既存指摘は本件対象外）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **744 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **763 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **Loop Engineering 完全ガイドの Next.js 移行**: `Loop-engineering-guide.html` から `web-next/app/agent/loop-engineering/page.tsx` への完全移行を完了 🚀。カテゴリ毎に TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策、モノスペースコードブロック、警告バナー、Mermaid遅延ロード、TOCスクロールハイライト追従（Intersection Observer）を実装。ナビゲーションの「Agent -> Loop Engineering Guide」に新規登録。 Vitest 契約テスト 19 件追加（合計 763 テスト合格）。
 - **Cursor 完全ガイド コードブロック・フッターCSS修正**: コードブロック (`.codeBody`・`.codeLine`・`.codeBar`) に `font-family: var(--font-mono)` を追加し、レガシーHTMLと同様の JetBrains Mono 等のモノスペースフォントで表示されるよう修正。フッター (`.pageFooter`) も `font-family: var(--font-mono)` と `font-size: 12.5px` に統一。Intersection Observer によるTOCスクロール追従、モバイル幅でのサイドバー強制非表示、コードハイライト Atom One Dark 配色の修正も含む。全744件テスト合格。
 - **Cursor 完全ガイドの Next.js 移行**: `Cursor-complete-guide.html` から `web-next/app/cursor/complete-guide/page.tsx` への完全移行を完了 🚀。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策、コピー機能付きコードブロック、Mermaid遅延ロードを実装。ナビゲーションに新規カテゴリ「IDE -> Cursor Guide」を追加。さらに、共通ヘッダーによるサイドバー重なり（top/heightオフセット）を修正し、目次テキストを元のHTMLに完全一致するよう補正。フッターをメインコンテンツ内に戻して元の背景色・上境界線を復元。全コードブロックのインデント（スペース数）を忠実に復元修正。全744件のテストがパス。
 - **Vercel Sandbox 完全入門ガイドの Next.js 移行**: `Vercel-sandbox-guide.html` から `web-next/app/vercel/sandbox/page.tsx` への完全移行を完了 🚀。CSS Modules によるレイアウト調整、Mermaid遅延ロード、安全な外部リンク対応、コードコピーボタンを実装。ナビゲーションに「Vercel` -> `Vercel Sandbox`」を新規登録し、テスト期待値の修正や新規の契約テストを含めた 743 件のフロントエンドテストが全合格。
