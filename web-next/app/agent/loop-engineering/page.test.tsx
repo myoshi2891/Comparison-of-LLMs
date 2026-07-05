@@ -2,8 +2,16 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import PageComponent, { metadata as rawMetadata } from "@/app/agent/loop-engineering/page";
+
+beforeAll(() => {
+  global.IntersectionObserver = class {
+    observe = vi.fn();
+    unobserve = vi.fn();
+    disconnect = vi.fn();
+  } as unknown as typeof IntersectionObserver;
+});
 
 const Page = PageComponent as unknown as () => ReactElement;
 type MetadataLike = { title?: unknown; description?: unknown };
@@ -46,10 +54,22 @@ describe("/agent/loop-engineering - page structure", () => {
     expect(container.querySelector("#s2")).not.toBeNull();
   });
 
+  it("renders s3 and s4 sections", () => {
+    const { container } = render(<Page />);
+    expect(container.querySelector("#s3")).not.toBeNull();
+    expect(container.querySelector("#s4")).not.toBeNull();
+  });
+
   it("renders diagrams diag-1 and diag-2", () => {
     const { container } = render(<Page />);
     expect(container.querySelector("#diag-1")).not.toBeNull();
     expect(container.querySelector("#diag-2")).not.toBeNull();
+  });
+
+  it("renders diagrams diag-3 and diag-4", () => {
+    const { container } = render(<Page />);
+    expect(container.querySelector("#diag-3")).not.toBeNull();
+    expect(container.querySelector("#diag-4")).not.toBeNull();
   });
 
   it("renders the terminology hierarchy table", () => {
@@ -58,6 +78,16 @@ describe("/agent/loop-engineering - page structure", () => {
     expect(table).not.toBeNull();
     expect(table?.textContent).toContain("Prompt Engineering");
     expect(table?.textContent).toContain("Loop Engineering");
+  });
+
+  it("renders comparison and loops tables", () => {
+    const { container } = render(<Page />);
+    const tables = container.querySelectorAll("table");
+    // We expect at least 3 tables now (table1 in s2, table2 in s3, table3 in s4)
+    expect(tables.length).toBeGreaterThanOrEqual(3);
+    const content = Array.from(tables).map((t) => t.textContent).join(" ");
+    expect(content).toContain("繰り返しの主体");
+    expect(content).toContain("エージェンティック・コーディングループ");
   });
 });
 
