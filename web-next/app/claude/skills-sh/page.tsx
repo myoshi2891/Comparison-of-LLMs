@@ -978,13 +978,13 @@ export default function SkillsShGuidePage() {
                   <table>
                     <tbody>
                       <tr>
-                        <td>できること</td>
+                        <th scope="row">できること</th>
                         <td>
                           ユーザーの自然文の依頼から必要なスキルをキーワード検索し、その場でインストールまで行う、いわば「メタスキル」
                         </td>
                       </tr>
                       <tr>
-                        <td>こんな時に使う</td>
+                        <th scope="row">こんな時に使う</th>
                         <td>
                           「〇〇をしたいけど、どのスキルを入れればいいかわからない」という入り口の段階
                         </td>
@@ -1029,14 +1029,14 @@ export default function SkillsShGuidePage() {
                   <table>
                     <tbody>
                       <tr>
-                        <td>できること</td>
+                        <th scope="row">できること</th>
                         <td>
                           Anthropicのベストプラクティスに沿った <code>SKILL.md</code>{" "}
                           の雛形生成、トリガー精度(description)の評価、反復改善までを支援
                         </td>
                       </tr>
                       <tr>
-                        <td>こんな時に使う</td>
+                        <th scope="row">こんな時に使う</th>
                         <td>
                           社内ルールや個人のワークフローを、自分専用のスキルとして固定化・再利用したいとき
                         </td>
@@ -1081,13 +1081,13 @@ export default function SkillsShGuidePage() {
                   <table>
                     <tbody>
                       <tr>
-                        <td>できること</td>
+                        <th scope="row">できること</th>
                         <td>
                           新規UIを作る、または既存UIを作り直す際に、「テンプレート感の出ない」意図的なビジュアル方向性・タイポグラフィ・配色などの判断基準をエージェントに与える
                         </td>
                       </tr>
                       <tr>
-                        <td>こんな時に使う</td>
+                        <th scope="row">こんな時に使う</th>
                         <td>
                           「なんとなくAIっぽい/量産型に見えるUI」から脱却し、独自性のあるデザインをコーディングエージェントに作らせたいとき
                         </td>
@@ -1126,13 +1126,13 @@ export default function SkillsShGuidePage() {
                   <table>
                     <tbody>
                       <tr>
-                        <td>できること</td>
+                        <th scope="row">できること</th>
                         <td>
                           余白・階層構造・可読性・アクセシビリティなど、Webデザインの普遍的な原則をチェックリストとしてエージェントに参照させる
                         </td>
                       </tr>
                       <tr>
-                        <td>こんな時に使う</td>
+                        <th scope="row">こんな時に使う</th>
                         <td>
                           frontend-designと組み合わせて、デザインの「独自性」だけでなく「基本品質」も担保したいとき
                         </td>
@@ -1172,14 +1172,14 @@ export default function SkillsShGuidePage() {
                   <table>
                     <tbody>
                       <tr>
-                        <td>できること</td>
+                        <th scope="row">できること</th>
                         <td>
                           shadcn/ui のコンポーネント(Button, Dialog,
                           Formなど)を正しい作法でエージェントに導入・カスタマイズさせる
                         </td>
                       </tr>
                       <tr>
-                        <td>こんな時に使う</td>
+                        <th scope="row">こんな時に使う</th>
                         <td>Reactプロジェクトでshadcn/uiベースのUIを構築・拡張したいとき</td>
                       </tr>
                     </tbody>
@@ -1214,14 +1214,14 @@ export default function SkillsShGuidePage() {
                   <table>
                     <tbody>
                       <tr>
-                        <td>できること</td>
+                        <th scope="row">できること</th>
                         <td>
                           不要な再レンダリングの回避、Server Components/Client
                           Componentsの適切な使い分け、コンポーネント分割パターンなど、Vercelが推奨するReact設計指針をエージェントに適用させる
                         </td>
                       </tr>
                       <tr>
-                        <td>こんな時に使う</td>
+                        <th scope="row">こんな時に使う</th>
                         <td>
                           Next.js/Reactアプリのコードレビューやリファクタリングをエージェントに任せるとき
                         </td>
@@ -1266,13 +1266,13 @@ export default function SkillsShGuidePage() {
                   <table>
                     <tbody>
                       <tr>
-                        <td>できること</td>
+                        <th scope="row">できること</th>
                         <td>
                           エージェントに実ブラウザを操作させ、画面のクリック・入力・スクリーンショット取得・動作確認などを行わせる
                         </td>
                       </tr>
                       <tr>
-                        <td>こんな時に使う</td>
+                        <th scope="row">こんな時に使う</th>
                         <td>
                           作ったWebアプリを実際にブラウザで動かして目視確認・デバッグさせたいとき
                         </td>
@@ -1312,7 +1312,7 @@ export default function SkillsShGuidePage() {
                   <table>
                     <tbody>
                       <tr>
-                        <td>できること</td>
+                        <th scope="row">できること</th>
                         <td>
                           PowerPoint・Word・Excel・PDFファイルの
                           <strong>実際に開けるバイナリファイル</strong>
@@ -1320,7 +1320,7 @@ export default function SkillsShGuidePage() {
                         </td>
                       </tr>
                       <tr>
-                        <td>こんな時に使う</td>
+                        <th scope="row">こんな時に使う</th>
                         <td>
                           「報告書をWordで」「決算資料をExcelで」といった、成果物がオフィス文書そのものであるとき
                         </td>
@@ -1375,13 +1375,13 @@ export default function SkillsShGuidePage() {
                   <table>
                     <tbody>
                       <tr>
-                        <td>できること</td>
+                        <th scope="row">できること</th>
                         <td>
                           実装したWebアプリに対して、実ブラウザ相当の環境で動作確認・回帰テストのシナリオを組み立てて実行させる
                         </td>
                       </tr>
                       <tr>
-                        <td>こんな時に使う</td>
+                        <th scope="row">こんな時に使う</th>
                         <td>
                           実装が完了した機能について、「ちゃんと動くか」をエージェント自身に検証させたいとき
                         </td>
@@ -1420,14 +1420,14 @@ export default function SkillsShGuidePage() {
                   <table>
                     <tbody>
                       <tr>
-                        <td>できること</td>
+                        <th scope="row">できること</th>
                         <td>
                           PostgreSQL(Supabase)のスキーマ設計、インデックス設計、Row Level
                           Security(RLS)などのベストプラクティスをエージェントに適用させる
                         </td>
                       </tr>
                       <tr>
-                        <td>こんな時に使う</td>
+                        <th scope="row">こんな時に使う</th>
                         <td>
                           Supabase/PostgreSQLベースのバックエンド設計・マイグレーションをエージェントにレビューさせたいとき
                         </td>
@@ -1467,7 +1467,7 @@ export default function SkillsShGuidePage() {
                   <table>
                     <tbody>
                       <tr>
-                        <td>できること</td>
+                        <th scope="row">できること</th>
                         <td>
                           <code>brainstorming</code>(発散的思考の型)、
                           <code>systematic-debugging</code>
@@ -1475,7 +1475,7 @@ export default function SkillsShGuidePage() {
                         </td>
                       </tr>
                       <tr>
-                        <td>こんな時に使う</td>
+                        <th scope="row">こんな時に使う</th>
                         <td>
                           個別ツールの使い方ではなく、エージェントの思考プロセス自体をより体系立てたいとき
                         </td>
@@ -1517,14 +1517,14 @@ export default function SkillsShGuidePage() {
                   <table>
                     <tbody>
                       <tr>
-                        <td>できること</td>
+                        <th scope="row">できること</th>
                         <td>
                           Microsoft
                           Foundry(Azure上のAnthropicホスティング環境)を利用する際の設定・デプロイ手順をエージェントに適用させる
                         </td>
                       </tr>
                       <tr>
-                        <td>こんな時に使う</td>
+                        <th scope="row">こんな時に使う</th>
                         <td>Azure環境でClaudeベースのエージェントを構築・運用するとき</td>
                       </tr>
                     </tbody>
