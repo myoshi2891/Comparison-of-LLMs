@@ -89,11 +89,9 @@ describe("/agent/loop-engineering - page structure", () => {
     const s13 = container.querySelector("#s13");
     const s14 = container.querySelector("#s14");
     const s15 = container.querySelector("#s15");
-    const refs = container.querySelector("#references");
     expect(s13).not.toBeNull();
     expect(s14).not.toBeNull();
     expect(s15).not.toBeNull();
-    expect(refs).not.toBeNull();
 
     expect(s13?.querySelector("h2")?.textContent).toBe("成熟度モデルと健全性チェック");
     const h3Elements = s13?.querySelectorAll("h3");
@@ -183,6 +181,18 @@ describe("/agent/loop-engineering - page structure", () => {
     expect(list).not.toBeNull();
     expect(list?.textContent).toContain("小さなリポジトリを1つ用意する");
     expect(list?.textContent).toContain("上限を必ず設定して観察する");
+  });
+
+  it("renders external links with safe rel attributes", () => {
+    const { container } = render(<Page />);
+    const externalLinks = container.querySelectorAll('a[target="_blank"]');
+    expect(externalLinks.length).toBeGreaterThan(0);
+    for (const link of externalLinks) {
+      const rel = link.getAttribute("rel") ?? "";
+      expect(rel).toContain("noopener");
+      expect(rel).toContain("noreferrer");
+      expect(rel).toContain("external");
+    }
   });
 });
 

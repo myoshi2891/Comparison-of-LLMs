@@ -522,3 +522,96 @@
     font-size: 1.32rem;
   }
 }
+
+/* ── local overrides for Mermaid (HTML theme parity) ── */
+.pageWrap :global(.mermaid) :global(.node) rect,
+.pageWrap :global(.mermaid) :global(.node) circle,
+.pageWrap :global(.mermaid) :global(.node) ellipse,
+.pageWrap :global(.mermaid) :global(.node) polygon,
+.pageWrap :global(.mermaid) :global(.node) path {
+  fill: #eaf6f4;
+  stroke: #0b7a75;
+  stroke-width: 1.5px;
+}
+
+.pageWrap :global(.mermaid) :global(.label),
+.pageWrap :global(.mermaid) :global(.label) span,
+.pageWrap :global(.mermaid) :global(.label) text,
+.pageWrap :global(.mermaid) :global(.edgeLabel),
+.pageWrap :global(.mermaid) :global(.edgeLabel) span,
+.pageWrap :global(.mermaid) :global(.edgeLabel) p,
+.pageWrap :global(.mermaid) :global(.messageText),
+.pageWrap :global(.mermaid) :global(.loopText),
+.pageWrap :global(.mermaid) :global(text),
+.pageWrap :global(.mermaid) :global(text.actor) {
+  color: var(--ink) !important;
+  fill: var(--ink) !important;
+}
+
+.pageWrap :global(.mermaid) :global(.edgePath) :global(.path),
+.pageWrap :global(.mermaid) :global(.messageLine0),
+.pageWrap :global(.mermaid) :global(.messageLine1),
+.pageWrap :global(.mermaid) :global(line),
+.pageWrap :global(.mermaid) :global(path) {
+  stroke: var(--ink-soft) !important;
+}
+
+.pageWrap :global(.mermaid) :global(.marker),
+.pageWrap :global(.mermaid) :global(marker) :global(path),
+.pageWrap :global(.mermaid) :global(#arrowhead) :global(path),
+.pageWrap :global(.mermaid) :global([id^="arrowhead"]) :global(path) {
+  fill: var(--ink-soft) !important;
+  stroke: var(--ink-soft) !important;
+}
+
+.pageWrap :global(.mermaid) :global(rect.actor),
+.pageWrap :global(.mermaid) :global(.actor) {
+  fill: #eaf6f4 !important;
+  stroke: #0b7a75 !important;
+}
+
+.pageWrap :global(.mermaid) :global(rect.note) {
+  fill: #fbf0df !important;
+  stroke: #d9860f !important;
+}
+
+.pageWrap :global(.mermaid) :global(.noteText),
+.pageWrap :global(.mermaid) :global(.noteText) span {
+  color: #12202b !important;
+  fill: #12202b !important;
+}
+
+/* ── local overrides for table alignment ── */
+.tableScroll table :global(td):not(:first-child) {
+  text-align: left !important;
+  font-family: inherit !important;
+}
+
+.tableScroll table :global(th):not(:first-child) {
+  text-align: left !important;
+}
+
+.finalNote {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--rose) !important;
+  border-radius: var(--radius);
+  padding: 22px 26px;
+  text-align: left;
+  margin-bottom: 24px;
+  font-family: var(--font-sans), "Noto Sans JP", sans-serif;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  line-height: 1.75;
+}
+
+.backTop {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--loop-dark);
+  text-decoration: none;
+  margin-top: 18px;
+  font-family: var(--font-mono), monospace;
+}

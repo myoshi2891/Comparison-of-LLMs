@@ -212,29 +212,65 @@ const DIAGRAMS = {
   style R4 fill:#e74c3c,color:#fff
   style R5 fill:#e74c3c,color:#fff`,
   diag14: `graph TD
-  LEVELS["📈 Loop Engineering成熟度モデル（LEMM）"]
-  LEVELS --> L0["Level 0: Manual / Ad-hoc<br />人間が毎回手動でエージェントを起動・指示する"]
-  LEVELS --> L1["Level 1: Auto-Triggered<br />cronやCIで定期的・自動的に起動する"]
-  LEVELS --> L2["Level 2: Memory-Enabled<br />前回の状態を外部記憶（Todo.md等）に保存し<br />周回をまたいで継続する"]
-  LEVELS --> L3["Level 3: Multi-Agent / Sandbox<br />Generator/Verifierが分離され<br />worktreeによる並列安全性が確保されている"]
-  LEVELS --> L4["Level 4: Self-Adapting<br />失敗パターンから自動でSkillsを調律し<br />自律的に進化する（理論値）"]
-  style L0 fill:#bdc3c7
-  style L1 fill:#3498db,color:#fff
-  style L2 fill:#f1c40f
-  style L3 fill:#e67e22,color:#fff
-  style L4 fill:#2ecc71,color:#fff`,
-  diag15: `graph TD
-  subgraph GEN["✍️ Generatorの進化"]
-    G_CODER["プロンプトエンジニアリング"] --> G_SWE["自律SWEエージェント"]
-    G_SWE --> G_TEAMS["マルチエージェント協調"]
-  end
-  subgraph VER["🕵️ Verifierの進化"]
-    V_LINT["型・Lint・CI"] --> V_TEST["自動テストピラミッド"]
-    V_TEST --> V_REV["AIピアレビュー・Evals"]
-  end
-  GEN ===|"協調動作する"| VER
-  style G_TEAMS fill:#27ae60,color:#fff
-  style V_REV fill:#27ae60,color:#fff`,
+  LV0["Level 0：手動プロンプト<br />すべてのやり取りを人間が毎回入力する"]
+  LV1["Level 1：単発の自動化<br />1つのタスクをcronで一度だけ自動実行する"]
+  LV2["Level 2：検証つきループ<br />Generator/Verifierを分離し、<br />停止条件を明確に設定する"]
+  LV3["Level 3：状態の永続化<br />会話の外に状態を保存し、<br />複数回の実行をまたいで文脈を維持する"]
+  LV4["Level 4：並列化された複数ループ<br />Worktreeで複数タスクを並行処理し、<br />コストと進捗を継続的に監視する"]
+  LV5["Level 5：ループのエコシステム化<br />複数のループが互いに連携し、<br />人間はアーキテクトとして設計・監督に専念する"]
+  LV0 --> LV1
+  LV1 --> LV2
+  LV2 --> LV3
+  LV3 --> LV4
+  LV4 --> LV5
+  style LV0 fill:#e74c3c,color:#fff
+  style LV1 fill:#e67e22,color:#fff
+  style LV2 fill:#f39c12,color:#fff
+  style LV3 fill:#27ae60,color:#fff
+  style LV4 fill:#3498db,color:#fff
+  style LV5 fill:#8e44ad,color:#fff`,
+  diag15: `flowchart TD
+  CHECK["🔍 ループの健全性チェック"]
+  Q1{"停止条件（成功・上限・無進捗）<br />を3種類とも設定しているか？"}
+  Q2{"作る役と確認する役は<br />別のプロンプト／モデルに<br />分かれているか？"}
+  Q3{"状態は会話の外（ファイル等）に<br />保存されているか？"}
+  Q4{"コストを日次・週次で<br />監視できているか？"}
+  Q5{"人間へのエスカレーション経路が<br />明確に定義されているか？"}
+  FIX1["🔧 max-iterationsと予算上限、<br />無進捗検知を追加する"]
+  FIX2["🔧 レビュー専任のサブエージェントを<br />切り出す"]
+  FIX3["🔧 TODO.md等の外部ファイルに<br />進捗を書き出す仕組みを追加する"]
+  FIX4["🔧 コストダッシュボードを設定し、<br />アラートを仕込む"]
+  FIX5["🔧 『人間が判断すべき境界線』を<br />ドキュメント化する"]
+  HEALTHY["✅ 健全なループ運用"]
+  CHECK --> Q1
+  Q1 -->|"No"| FIX1
+  Q1 -->|"Yes"| Q2
+  Q2 -->|"No"| FIX2
+  Q2 -->|"Yes"| Q3
+  Q3 -->|"No"| FIX3
+  Q3 -->|"Yes"| Q4
+  Q4 -->|"No"| FIX4
+  Q4 -->|"Yes"| Q5
+  Q5 -->|"No"| FIX5
+  Q5 -->|"Yes"| HEALTHY
+  style HEALTHY fill:#27ae60,color:#fff
+  style FIX1 fill:#3498db,color:#fff
+  style FIX2 fill:#3498db,color:#fff
+  style FIX3 fill:#3498db,color:#fff
+  style FIX4 fill:#3498db,color:#fff
+  style FIX5 fill:#3498db,color:#fff`,
+};
+
+/** Mermaid theme variables matching the legacy HTML (theme: "base"). */
+const LOOP_THEME_VARS: Record<string, string> = {
+  fontFamily: "IBM Plex Sans JP, IBM Plex Sans, sans-serif",
+  fontSize: "16px",
+  primaryColor: "#EAF6F4",
+  primaryBorderColor: "#0B7A75",
+  primaryTextColor: "#12202B",
+  lineColor: "#3B4C58",
+  secondaryColor: "#FBF0DF",
+  tertiaryColor: "#F1EEFB",
 };
 
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
@@ -418,7 +454,12 @@ export default function Page() {
             <h3>1.2　何が変わったのか：一言でいうと</h3>
             <figure className={styles.diagram}>
               <div id="diag-1" className={styles.mermaidContainer}>
-                <MermaidDiagram chart={DIAGRAMS.diag1} id="diag-1" />
+                <MermaidDiagram
+                  chart={DIAGRAMS.diag1}
+                  id="diag-1"
+                  theme="base"
+                  themeVariables={LOOP_THEME_VARS}
+                />
               </div>
               <figcaption>
                 図1：人間主導のプロンプトループ vs システム主導 of Loop Engineering
@@ -479,7 +520,12 @@ export default function Page() {
 
             <figure className={styles.diagram}>
               <div id="diag-2" className={styles.mermaidContainer}>
-                <MermaidDiagram chart={DIAGRAMS.diag2} id="diag-2" />
+                <MermaidDiagram
+                  chart={DIAGRAMS.diag2}
+                  id="diag-2"
+                  theme="base"
+                  themeVariables={LOOP_THEME_VARS}
+                />
               </div>
               <figcaption>図2：4層に積み重なるエンジニアリングの系譜</figcaption>
             </figure>
@@ -566,7 +612,12 @@ export default function Page() {
 
             <figure className={styles.diagram}>
               <div id="diag-3" className={styles.mermaidContainer}>
-                <MermaidDiagram chart={DIAGRAMS.diag3} id="diag-3" />
+                <MermaidDiagram
+                  chart={DIAGRAMS.diag3}
+                  id="diag-3"
+                  theme="base"
+                  themeVariables={LOOP_THEME_VARS}
+                />
               </div>
               <figcaption>図3：ループの最小構造 ―「実行→確認→合否判定→停止」</figcaption>
             </figure>
@@ -643,7 +694,12 @@ export default function Page() {
 
             <figure className={styles.diagram}>
               <div id="diag-4" className={styles.mermaidContainer}>
-                <MermaidDiagram chart={DIAGRAMS.diag4} id="diag-4" />
+                <MermaidDiagram
+                  chart={DIAGRAMS.diag4}
+                  id="diag-4"
+                  theme="base"
+                  themeVariables={LOOP_THEME_VARS}
+                />
               </div>
               <figcaption>図4：3つの入れ子ループ（Andrew Ng, The Batch）</figcaption>
             </figure>
@@ -734,7 +790,12 @@ export default function Page() {
 
             <figure className={styles.diagram}>
               <div id="diag-5" className={styles.mermaidContainer}>
-                <MermaidDiagram chart={DIAGRAMS.diag5} id="diag-5" />
+                <MermaidDiagram
+                  chart={DIAGRAMS.diag5}
+                  id="diag-5"
+                  theme="base"
+                  themeVariables={LOOP_THEME_VARS}
+                />
               </div>
               <figcaption>図5：ループの1ターンを構成する5つの動き</figcaption>
             </figure>
@@ -831,7 +892,12 @@ export default function Page() {
 
             <figure className={styles.diagram}>
               <div id="diag-6" className={styles.mermaidContainer}>
-                <MermaidDiagram chart={DIAGRAMS.diag6} id="diag-6" />
+                <MermaidDiagram
+                  chart={DIAGRAMS.diag6}
+                  id="diag-6"
+                  theme="base"
+                  themeVariables={LOOP_THEME_VARS}
+                />
               </div>
               <figcaption>図6：ループを支える6つの部品と5つの動きの対応</figcaption>
             </figure>
@@ -939,7 +1005,12 @@ export default function Page() {
 
             <figure className={styles.diagram}>
               <div id="diag-7" className={styles.mermaidContainer}>
-                <MermaidDiagram chart={DIAGRAMS.diag7} id="diag-7" />
+                <MermaidDiagram
+                  chart={DIAGRAMS.diag7}
+                  id="diag-7"
+                  theme="base"
+                  themeVariables={LOOP_THEME_VARS}
+                />
               </div>
               <figcaption>図7：自己採点の危険性とGenerator/Verifier分離</figcaption>
             </figure>
@@ -1095,7 +1166,12 @@ export default function Page() {
 
             <figure className={styles.diagram}>
               <div id="diag-8" className={styles.mermaidContainer}>
-                <MermaidDiagram chart={DIAGRAMS.diag8} id="diag-8" />
+                <MermaidDiagram
+                  chart={DIAGRAMS.diag8}
+                  id="diag-8"
+                  theme="base"
+                  themeVariables={LOOP_THEME_VARS}
+                />
               </div>
               <figcaption>図8：Ralph Wiggumループの動作フロー</figcaption>
             </figure>
@@ -1184,7 +1260,12 @@ export default function Page() {
 
             <figure className={styles.diagram}>
               <div id="diag-9" className={styles.mermaidContainer}>
-                <MermaidDiagram chart={DIAGRAMS.diag9} id="diag-9" />
+                <MermaidDiagram
+                  chart={DIAGRAMS.diag9}
+                  id="diag-9"
+                  theme="base"
+                  themeVariables={LOOP_THEME_VARS}
+                />
               </div>
               <figcaption>図9：ループ構築の7ステップ</figcaption>
             </figure>
@@ -1236,7 +1317,12 @@ export default function Page() {
 
             <figure className={styles.diagram}>
               <div id="diag-10" className={styles.mermaidContainer}>
-                <MermaidDiagram chart={DIAGRAMS.diag10} id="diag-10" />
+                <MermaidDiagram
+                  chart={DIAGRAMS.diag10}
+                  id="diag-10"
+                  theme="base"
+                  themeVariables={LOOP_THEME_VARS}
+                />
               </div>
               <figcaption>図10：3種類の停止条件</figcaption>
             </figure>
@@ -1383,7 +1469,12 @@ export default function Page() {
 
             <figure className={styles.diagram}>
               <div id="diag-11" className={styles.mermaidContainer}>
-                <MermaidDiagram chart={DIAGRAMS.diag11} id="diag-11" />
+                <MermaidDiagram
+                  chart={DIAGRAMS.diag11}
+                  id="diag-11"
+                  theme="base"
+                  themeVariables={LOOP_THEME_VARS}
+                />
               </div>
               <figcaption>図11：Worktreeによる並列実行のイメージ</figcaption>
             </figure>
@@ -1464,7 +1555,12 @@ export default function Page() {
 
             <figure className={styles.diagram}>
               <div id="diag-12" className={styles.mermaidContainer}>
-                <MermaidDiagram chart={DIAGRAMS.diag12} id="diag-12" />
+                <MermaidDiagram
+                  chart={DIAGRAMS.diag12}
+                  id="diag-12"
+                  theme="base"
+                  themeVariables={LOOP_THEME_VARS}
+                />
               </div>
               <figcaption>図12：朝のCIトリアージ・ループの全体シーケンス</figcaption>
             </figure>
@@ -1735,7 +1831,12 @@ export default function Page() {
 
             <figure className={styles.diagram}>
               <div id="diag-13" className={styles.mermaidContainer}>
-                <MermaidDiagram chart={DIAGRAMS.diag13} id="diag-13" />
+                <MermaidDiagram
+                  chart={DIAGRAMS.diag13}
+                  id="diag-13"
+                  theme="base"
+                  themeVariables={LOOP_THEME_VARS}
+                />
               </div>
               <figcaption>図13：Loop Engineeringの主なリスク5選</figcaption>
             </figure>
@@ -1858,327 +1959,572 @@ export default function Page() {
           </section>
           {/* ============ 13 ============ */}
           <section className="chapter block" id="s13">
-            <div className={styles.kicker}>13 / LEMM</div>
-            <h2>Loop Engineering成熟度モデル（LEMM）</h2>
-            <p>
-              最後に、自分たちのプロジェクトでどの程度Loop
-              Engineeringが活用できているかを評価するための指標として、
-              <strong>Loop Engineering成熟度モデル（LEMM）</strong>を提案します。
-            </p>
+            <div className={styles.kicker}>13 / Maturity</div>
+            <h2>成熟度モデルと健全性チェック</h2>
 
+            <h3>13.1　Loop Engineering成熟度モデル</h3>
             <figure className={styles.diagram}>
               <div id="diag-14" className={styles.mermaidContainer}>
-                <MermaidDiagram chart={DIAGRAMS.diag14} id="diag-14" />
+                <MermaidDiagram
+                  chart={DIAGRAMS.diag14}
+                  id="diag-14"
+                  theme="base"
+                  themeVariables={LOOP_THEME_VARS}
+                />
               </div>
-              <figcaption>図14：LEMM（Loop Engineering Maturity Model）の階層構造</figcaption>
+              <figcaption>図14：Loop Engineering成熟度モデル（Level 0〜5）</figcaption>
             </figure>
 
-            <ul>
-              <li>
-                <strong>Level 0：Manual / Ad-hoc</strong>
-                ：人間が毎回手動でエージェントを起動し、チャット形式で指示を出す段階。
-              </li>
-              <li>
-                <strong>Level 1：Auto-Triggered</strong>：cronやGitHub
-                Actionsなどのスケジュールで、エージェントが定期的または特定のタイミングで自動的に起動する段階。
-              </li>
-              <li>
-                <strong>Level 2：Memory-Enabled</strong>
-                ：前回の実行結果や進捗が外部ファイルに保存されており、起動したエージェントがそれを読み取ることで、前回の続きから自律的に作業を継続できる段階。
-              </li>
-              <li>
-                <strong>Level 3：Multi-Agent / Sandbox</strong>
-                ：Generator（コードを書く役）とVerifier（テスト・検証する役）が分離され、Git
-                Worktreeなどを用いて並列安全性が確保された環境で複数エージェントが強調して動く段階。
-              </li>
-              <li>
-                <strong>Level 4：Self-Adapting</strong>
-                ：エージェント自身がループの失敗履歴を分析し、自らのプロンプトや「Skills」ファイル、CLAUDE.md等を自動調整して進化する段階（2026年現在、一部の研究レベルでのみ実現）。
-              </li>
-            </ul>
+            <h3>13.2　健全性チェックフロー</h3>
+            <p>自分のループが健全かどうか、導入後に振り返るためのチェックリストです。</p>
+
+            <figure className={styles.diagram}>
+              <div id="diag-15" className={styles.mermaidContainer}>
+                <MermaidDiagram
+                  chart={DIAGRAMS.diag15}
+                  id="diag-15"
+                  theme="base"
+                  themeVariables={LOOP_THEME_VARS}
+                />
+              </div>
+              <figcaption>図15：ループの健全性チェックフロー</figcaption>
+            </figure>
           </section>
 
           {/* ============ 14 ============ */}
           <section className="chapter block" id="s14">
-            <div className={styles.kicker}>14 / Conclusion</div>
-            <h2>結論：プログラマブルな開発の未来</h2>
-            <p>
-              本ガイドを通じて見てきたように、エージェンティック・コーディングの真の価値は、「人間がAIとチャットすること」ではなく、「AIが自動で動き続けるループ（自律フィードバックループ）を人間が設計し、その上に座って観察・調律すること」にあります。
-            </p>
-
-            <figure className={styles.diagram}>
-              <div id="diag-15" className={styles.mermaidContainer}>
-                <MermaidDiagram chart={DIAGRAMS.diag15} id="diag-15" />
-              </div>
-              <figcaption>図15：GeneratorとVerifierの双方の進化</figcaption>
-            </figure>
-
-            <p>
-              Generator（生成側）とVerifier（検証側）の双方が進化していくことで、開発のあり方は根本的に変わっていきます。人間がすべきことは、自らコードを書くことから、
-              <strong>
-                「ループが健全に回るための評価基準を整備し、安全なガードレールを構築すること」
-              </strong>
-              へとシフトしていきます
-              <sup>
-                <a href="#ref29">[29]</a>
-              </sup>
-              。
-            </p>
-            <p>
-              まずは身近な「CIの失敗テストを自動でトリアージして修正案を作る」といった、小さく検証可能なループの構築から始めてみてください。
-            </p>
+            <div className={styles.kicker}>14 / Summary</div>
+            <h2>まとめ</h2>
+            <ul>
+              <li>
+                <strong>Loop Engineering</strong>
+                とは、人間がAIエージェントに毎回プロンプトを打つ役目をやめ、その繰り返し処理を担うシステム自体を設計する考え方です
+                <sup>
+                  <a href="#ref4">[4]</a>
+                </sup>
+                。
+              </li>
+              <li>
+                系譜としては、Prompt Engineering → Context Engineering → Harness Engineering
+                に続く4番目の層として位置づけられています
+                <sup>
+                  <a href="#ref9">[9]</a>
+                </sup>
+                。
+              </li>
+              <li>
+                Andrew Ng氏は、この考え方をさらに大きな枠組みで捉え、
+                <strong>
+                  エージェンティック・コーディングループ（分単位）／開発者フィードバックループ（時間単位）／外部フィードバックループ（日〜週単位）
+                </strong>
+                という3つの入れ子のループとして整理しています
+                <sup>
+                  <a href="#ref6">[6]</a>
+                </sup>
+                。
+              </li>
+              <li>
+                1つのループは
+                <strong>Discovery・Handoff・Verification・Persistence・Scheduling</strong>
+                という5つの動きに分解でき、それを
+                <strong>
+                  Automations・Worktrees・Skills・Plugins/Connectors・Sub-agents・Memory
+                </strong>
+                という6つの部品が実現します
+                <sup>
+                  <a href="#ref14">[14]</a>
+                </sup>
+                。
+              </li>
+              <li>
+                成否を分ける最大のポイントは、
+                <strong>「作る役」と「確認する役」を分離すること</strong>
+                、そして
+                <strong>停止条件を必ず明示的に設計すること</strong>
+                です
+                <sup>
+                  <a href="#ref16">[16]</a>
+                </sup>
+                。
+              </li>
+              <li>
+                コストの暴走・認知的な明け渡し・コンテキストの劣化といったリスクが実例つきで報告されており、導入時には十分な注意とガードレールが必要です
+                <sup>
+                  <a href="#ref9">[9]</a>
+                  <a href="#ref30">[30]</a>
+                  <a href="#ref37">[37]</a>
+                </sup>
+                。
+              </li>
+              <li>
+                この分野はまだ生まれたばかりで急速に変化しています。実装の際は必ず各ツールの最新の公式ドキュメントを確認してください。
+              </li>
+            </ul>
           </section>
 
           {/* ============ 15 ============ */}
-          <section className="chapter block" id="s15">
-            <div className={styles.kicker}>15 / Appendix</div>
-            <h2>付録：さらに学びたい人へ</h2>
-            <p>
-              本ガイドで解説したLoop
-              Engineeringやエージェンティック・コーディングの実践について、さらに深く学びたい方には、2026年3月に刊行された次の書籍がお勧めです。
-            </p>
-            <div className={styles.bookCard}>
-              <div className={styles.bookTitle}>実務で使える Claude Code エージェント開発入門</div>
-              <div className={styles.bookMeta}>
-                著者：山田 太郎 / 2026年3月 刊 / 技術書インプレス
-              </div>
-              <div className={styles.bookDesc}>
-                本書は、Claude Codeの実践的な導入から、MCP（Model Context
-                Protocol）による社内データベースやGitHub
-                Actionsとの連携、さらに本ガイドで解説したGenerator/Verifier分離に基づく「自動ループ（/loop,
-                /schedule）」の設計パターンまでを、豊富なコード例とともに体系的に解説しています。特に、コストの暴走やコンテキスト劣化といった実運用上のリスク対策について1章を割いて詳しく述べており、実務でエージェントを本気で動かしたい開発者にとって必読の1冊です。
-              </div>
-            </div>
-          </section>
+          <section className="references block" id="s15">
+            <div className={styles.kicker}>15 / References</div>
+            <h2>参考文献・出典一覧</h2>
 
-          {/* ============ REFERENCES ============ */}
-          <section className="references block" id="references">
-            <h2>参考文献・引用元</h2>
+            <h3>🐦 きっかけとなった発言・ニュースレター</h3>
             <div className={styles.tableScroll}>
-              <ol className={styles.refList}>
-                <li id="ref1">
-                  Swiecki, Z., &amp; Siemens, G. (2025).{" "}
-                  <em>
-                    The Rise of Agentic Coding: Shifts in Software Engineering Education and
-                    Industry
-                  </em>
-                  . Journal of AI in Software Engineering, 12(1), 45-67.
-                </li>
-                <li id="ref2">
-                  Antigravity Team. (2026).{" "}
-                  <em>
-                    From Prompt Engineering to Loop Engineering: Designing Autonomous Feedback Loops
-                    for AI Coding Agents
-                  </em>
-                  . DeepMind Technical Report, 2026-042.
-                </li>
-                <li id="ref3">
-                  Google DeepMind. (2025).{" "}
-                  <em>
-                    Antigravity IDE User Manual: Context Extraction and Multi-Agent Orchestration
-                  </em>
-                  . Google Developer Documentation.
-                </li>
-                <li id="ref4">
-                  Osmani, A. (2026, January 15).{" "}
-                  <em>Loop Engineering: The Next Frontier of Developer Productivity</em>.
-                  AddyOsmani.com.
-                </li>
-                <li id="ref5">
-                  Anthropic Research. (2026).{" "}
-                  <em>Claude Code and the Paradigm of Autonomous Execution Loops</em>. Anthropic
-                  Technical Blog.
-                </li>
-                <li id="ref6">
-                  Ng, A. (2024, May). <em>Agentic Workflows and the Power of Iteration</em>.
-                  DeepLearning.AI Circular.
-                </li>
-                <li id="ref7">
-                  Ng, A. (2024).{" "}
-                  <em>
-                    What&#39;s Next for AI Agentic Workflows: Reflection, Tool Use, Planning, and
-                    Multi-Agent Collaboration
-                  </em>
-                  . Sequoia Capital AI Summit Keynote.
-                </li>
-                <li id="ref8">
-                  Dormehl, L. (2026).{" "}
-                  <em>
-                    The AI Agent Explosion: Evaluating Anthropic&#39;s Claude Code in Enterprise
-                    Teams
-                  </em>
-                  . TechCrunch Enterprise.
-                </li>
-                <li id="ref9">
-                  Osmani, A. (2026, January).{" "}
-                  <em>Loop Engineering: Design Patterns for Autonomous Agents</em>. Medium /
-                  Software Architecture.
-                </li>
-                <li id="ref10">
-                  DeepMind Antigravity Team. (2026).{" "}
-                  <em>The Triad of Loop Engineering: Automations, Sandbox, and Memory</em>.
-                  Antigravity Developer Guide.
-                </li>
-                <li id="ref11">
-                  Amodei, D. (2024).{" "}
-                  <em>Machines of Loving Grace: How AI Will Transform Software and Society</em>.
-                  Anthropic Essays.
-                </li>
-                <li id="ref12">
-                  Karpathy, A. (2025).{" "}
-                  <em>Autonomous Coding Agents: The Quiet Revolution in Developer Tooling</em>.
-                  Andrej Karpathy Blog.
-                </li>
-                <li id="ref13">
-                  Ng, A. (2024).{" "}
-                  <em>
-                    Three Loops of Agentic AI: Reflection, Planning, and Multi-Agent Negotiation
-                  </em>
-                  . DeepLearning.AI Blog.
-                </li>
-                <li id="ref14">
-                  Osmani, A. (2026). <em>Anatomy of an Autonomous Triage Loop</em>.
-                  AddyOsmani.com/blog/anatomy-triage-loop.
-                </li>
-                <li id="ref15">
-                  Git Documentation. (2025). <em>git-worktree: Manage multiple working trees</em>.
-                  Git SCM Documentation.
-                </li>
-                <li id="ref16">
-                  Weng, L. (2024).{" "}
-                  <em>Adversarial Evals: Separating Generator and Verifier in LLM Orchestration</em>
-                  . Lil&#39;Log.
-                </li>
-                <li id="ref17">
-                  Huntley, G. (2025).{" "}
-                  <em>
-                    State Management in Long-Running Coding Loops: Moving Memory Outside the Prompt
-                  </em>
-                  . GeoffreyHuntley.com.
-                </li>
-                <li id="ref18">
-                  Anthropic. (2026). <em>Claude Code CLI Reference: /loop and /schedule</em>. Claude
-                  Code Docs.
-                </li>
-                <li id="ref19">
-                  Anthropic. (2026).{" "}
-                  <em>Building Blocks of Claude Code: Plugins, Subagents, and the Stop Hook</em>.
-                  Anthropic Technical Documentation.
-                </li>
-                <li id="ref20">
-                  Li, Y., &amp; Liang, P. (2025).{" "}
-                  <em>Generator-Verifier Duality in Code Generation</em>. arXiv preprint
-                  arXiv:2502.10234.
-                </li>
-                <li id="ref21">
-                  Fowler, M. (2012). <em>TestPyramid</em>. MartinFowler.com.
-                </li>
-                <li id="ref22">
-                  Cohn, M. (2009). <em>Succeeding with Agile: Software Development Using Scrum</em>.
-                  Addison-Wesley Professional.
-                </li>
-                <li id="ref23">
-                  Beck, K. (2025).{" "}
-                  <em>TDD in the Era of LLMs: Why Fast Feedback Loops Matter More Than Ever</em>.
-                  Kent Beck&#39;s Substack.
-                </li>
-                <li id="ref24">
-                  Fowler, M. (2025).{" "}
-                  <em>LLMs and the Illusion of Green Tests: Guarding Against Evasion</em>.
-                  MartinFowler.com.
-                </li>
-                <li id="ref25">
-                  Huntley, G. (2025, July).{" "}
-                  <em>The Ralph Wiggum Technique for Autonomous Coding</em>. GeoffreyHuntley.com.
-                </li>
-                <li id="ref26">
-                  Huntley, G. (2025, August).{" "}
-                  <em>Ralph: An Automated Agent Loop running in the Terminal</em>. GitHub
-                  Repository.
-                </li>
-                <li id="ref27">
-                  Huntley, G. (2025).{" "}
-                  <em>Ralph Wiggum: Iterative Error Correction and Shell Hooking</em>.
-                  GeoffreyHuntley.com/blog/ralph-wiggum-hooking.
-                </li>
-                <li id="ref28">
-                  Huntley, G. (2025). <em>One Loop, One Task: The Architecture of Ralph</em>.
-                  GeoffreyHuntley.com/blog/one-loop-one-task.
-                </li>
-                <li id="ref29">
-                  Huntley, G. (2025).{" "}
-                  <em>
-                    Sitting on Top of the Loop: How Humans Guide Autonomous Software Generation
-                  </em>
-                  . GeoffreyHuntley.com/blog/top-of-the-loop.
-                </li>
-                <li id="ref30">
-                  Huntley, G. (2025).{" "}
-                  <em>Context Rot and the Pitfalls of Automatic Compaction in Coding Agents</em>.
-                  GeoffreyHuntley.com/blog/context-rot-compaction.
-                </li>
-                <li id="ref31">
-                  Anthropic. (2026).{" "}
-                  <em>Claude Code Plugin: ralph-wiggum for continuous execution</em>. Claude Code
-                  Plugins.
-                </li>
-                <li id="ref32">
-                  Huntley, G. (2026).{" "}
-                  <em>Reflections on Claude Code&#39;s Ralph Plugin: Amplifying Human Agency</em>.
-                  GeoffreyHuntley.com.
-                </li>
-                <li id="ref33">
-                  Anthropic. (2026). <em>Scheduling Tasks and Triggers with Claude Code</em>. Claude
-                  Code Docs.
-                </li>
-                <li id="ref34">
-                  Anthropic. (2026). <em>Running Subagents in the Background with Claude Code</em>.
-                  Claude Code Docs.
-                </li>
-                <li id="ref35">
-                  Anthropic. (2026). <em>Defining Custom Subagents and Roles in Claude Code</em>.
-                  Claude Code Docs.
-                </li>
-                <li id="ref36">
-                  Anthropic. (2026).{" "}
-                  <em>Event-Driven Hooks in Claude Code: PreToolUse, PostToolUse, and Stop</em>.
-                  Claude Code Docs.
-                </li>
-                <li id="ref37">
-                  Uber Engineering. (2026).{" "}
-                  <em>
-                    Managing the Cost of Autonomous Coding at Scale: Monthly Guardrails for AI
-                    Tooling
-                  </em>
-                  . Uber Engineering Blog.
-                </li>
-                <li id="ref38">
-                  Osmani, A. (2026).{" "}
-                  <em>Cognitive Surrender in the Era of Agentic Coding: Staying in the Loop</em>.
-                  AddyOsmani.com/blog/cognitive-surrender.
-                </li>
-                <li id="ref39">
-                  Ronacher, A. (2026).{" "}
-                  <em>
-                    Deterministic Foundations for Non-Deterministic Agents: The Case Against Pure
-                    LLM Workflows
-                  </em>
-                  . Lucumr.pocoo.org.
-                </li>
-              </ol>
+              <table className="ref-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>出典</th>
+                    <th>URL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr id="ref1">
+                    <td>[1]</td>
+                    <td>Boris Cherny氏の発言を報じた記事（BigGo Finance）</td>
+                    <td>
+                      <Ext href="https://finance.biggo.com/news/0be3d022-660e-4c74-9399-1e6f5cf70d24">
+                        finance.biggo.com/news/0be3d022…
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref2">
+                    <td>[2]</td>
+                    <td>Boris Cherny氏「ループを書くのが仕事になった」に関する記事（Medium）</td>
+                    <td>
+                      <Ext href="https://ai-engineering-trend.medium.com/claude-code-creator-boris-i-dont-write-prompts-anymore-i-write-loops-03540f440511">
+                        ai-engineering-trend.medium.com/…
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref3">
+                    <td>[3]</td>
+                    <td>Peter Steinberger氏の発言に関する記事（KuCoin News）</td>
+                    <td>
+                      <Ext href="https://www.kucoin.com/news/flash/prompt-engineering-declines-as-loop-engineering-gains-momentum-in-silicon-valley">
+                        kucoin.com/news/flash/…
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref6">
+                    <td>[6]</td>
+                    <td>Andrew Ng氏のポスト「Loop engineering」（X / The Batch）</td>
+                    <td>
+                      <Ext href="https://x.com/AndrewYNg/status/2071988145667928442">
+                        x.com/AndrewYNg/status/2071988145667928442
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref7">
+                    <td>[7]</td>
+                    <td>Andrew Ngの3つのループに関する解説記事（explainx.ai）</td>
+                    <td>
+                      <Ext href="https://explainx.ai/blog/andrew-ng-three-loops-0-to-1-products-2026">
+                        explainx.ai/blog/andrew-ng-three-loops…
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>—</td>
+                    <td>Boris Cherny氏のポスト（X、ユーザー指定URL）</td>
+                    <td>
+                      <Ext href="https://x.com/bcherny/status/2064426115255730578">
+                        x.com/bcherny/status/2064426115255730578
+                      </Ext>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
+
+            <h3>📖 Loop Engineeringの定義・体系化</h3>
+            <div className={styles.tableScroll}>
+              <table className="ref-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>出典</th>
+                    <th>URL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr id="ref4">
+                    <td>[4]</td>
+                    <td>Addy Osmani「Loop Engineering」（本人ブログ）</td>
+                    <td>
+                      <Ext href="https://addyosmani.com/blog/loop-engineering/">
+                        addyosmani.com/blog/loop-engineering/
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref5">
+                    <td>[5]</td>
+                    <td>同上（Substack転載版）</td>
+                    <td>
+                      <Ext href="https://addyo.substack.com/p/loop-engineering">
+                        addyo.substack.com/p/loop-engineering
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref9">
+                    <td>[9]</td>
+                    <td>同上（O'Reilly Radar転載版）</td>
+                    <td>
+                      <Ext href="https://www.oreilly.com/radar/loop-engineering/">
+                        oreilly.com/radar/loop-engineering/
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref10">
+                    <td>[10]</td>
+                    <td>Loop Engineeringクラッシュコース（Panaversity Agent Factory）</td>
+                    <td>
+                      <Ext href="https://agentfactory.panaversity.org/docs/loop-engineering-crash-course">
+                        agentfactory.panaversity.org/docs/loop-engineering-crash-course
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref13">
+                    <td>[13]</td>
+                    <td>Loop Engineeringガイド2026（AI Builder Club）</td>
+                    <td>
+                      <Ext href="https://www.aibuilderclub.com/blog/loop-engineering-guide-2026">
+                        aibuilderclub.com/blog/loop-engineering-guide-2026
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref14">
+                    <td>[14]</td>
+                    <td>5つの構成要素の実例解説（Google Gate News）</td>
+                    <td>
+                      <Ext href="https://www.gate.com/news/detail/google-engineer-loop-engineerings-five-building-blocks-let-ai-automatically-21751012">
+                        gate.com/news/detail/google-engineer…
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref16">
+                    <td>[16]</td>
+                    <td>Loop EngineeringのIEEE形式サマリー（HyperAI）</td>
+                    <td>
+                      <Ext href="https://hyper.ai/en/papers/Loop-Engineering-IEEE">
+                        hyper.ai/en/papers/Loop-Engineering-IEEE
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref19">
+                    <td>[19]</td>
+                    <td>実践フィールドガイド（DEV Community）</td>
+                    <td>
+                      <Ext href="https://dev.to/truongpx396/the-agentic-loop-a-practical-field-guide-mnc">
+                        dev.to/truongpx396/the-agentic-loop…
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref20">
+                    <td>[20]</td>
+                    <td>Loop Engineeringクラッシュコース（同上、Generator/Verifier分離）</td>
+                    <td>
+                      <Ext href="https://agentfactory.panaversity.org/docs/loop-engineering-crash-course">
+                        agentfactory.panaversity.org/docs/loop-engineering-crash-course
+                      </Ext>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>🔧 Ralph Wiggumテクニック</h3>
+            <div className={styles.tableScroll}>
+              <table className="ref-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>出典</th>
+                    <th>URL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr id="ref25">
+                    <td>[25][26][29]</td>
+                    <td>
+                      Geoffrey Huntley「Ralph Wiggum as a &quot;software engineer&quot;」（原典）
+                    </td>
+                    <td>
+                      <Ext href="https://ghuntley.com/ralph/">ghuntley.com/ralph/</Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref28">
+                    <td>[28]</td>
+                    <td>Dev Interrupted podcast「Inventing the Ralph Wiggum Loop」</td>
+                    <td>
+                      <Ext href="https://linearb.io/dev-interrupted/podcast/inventing-the-ralph-wiggum-loop">
+                        linearb.io/dev-interrupted/podcast/…
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref30">
+                    <td>[30][37]</td>
+                    <td>Ralph Wiggum流コーディングの解説（tessl.io）</td>
+                    <td>
+                      <Ext href="https://tessl.io/blog/unpacking-the-unpossible-logic-of-ralph-wiggumstyle-ai-coding/">
+                        tessl.io/blog/unpacking-the-unpossible-logic…
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref31">
+                    <td>[31]</td>
+                    <td>Ralph Wiggum LoopとClaude Codeプラグイン化の経緯（Shiqi Mei）</td>
+                    <td>
+                      <Ext href="https://shiqimei.github.io/posts/ralph-wiggum-loop-claude-code">
+                        shiqimei.github.io/posts/ralph-wiggum-loop-claude-code
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref32">
+                    <td>[32]</td>
+                    <td>Ralphの歴史（HumanLayer Blog）</td>
+                    <td>
+                      <Ext href="https://www.humanlayer.dev/blog/brief-history-of-ralph">
+                        humanlayer.dev/blog/brief-history-of-ralph
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>—</td>
+                    <td>Ralph実践プレイブック（GitHub）</td>
+                    <td>
+                      <Ext href="https://github.com/ghuntley/how-to-ralph-wiggum">
+                        github.com/ghuntley/how-to-ralph-wiggum
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>—</td>
+                    <td>Ralphループの経済性解説（LinearB Blog）</td>
+                    <td>
+                      <Ext href="https://linearb.io/blog/ralph-loop-agentic-engineering-geoffrey-huntley">
+                        linearb.io/blog/ralph-loop-agentic-engineering…
+                      </Ext>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>🧪 ソフトウェアテスト関連（Verifier設計の参考）</h3>
+            <div className={styles.tableScroll}>
+              <table className="ref-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>出典</th>
+                    <th>URL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr id="ref21">
+                    <td>[21]</td>
+                    <td>Martin Fowler「The Practical Test Pyramid」</td>
+                    <td>
+                      <Ext href="https://martinfowler.com/articles/practical-test-pyramid.html">
+                        martinfowler.com/articles/practical-test-pyramid.html
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref22">
+                    <td>[22]</td>
+                    <td>Martin Fowler「TestPyramid」（Bliki）</td>
+                    <td>
+                      <Ext href="https://martinfowler.com/bliki/TestPyramid.html">
+                        martinfowler.com/bliki/TestPyramid.html
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>—</td>
+                    <td>Ministry of Testing「The Test Pyramid」解説</td>
+                    <td>
+                      <Ext href="https://www.ministryoftesting.com/software-testing-glossary/the-test-pyramid">
+                        ministryoftesting.com/software-testing-glossary/the-test-pyramid
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref23">
+                    <td>[23]</td>
+                    <td>AI時代におけるテストピラミッドの重要性（minware）</td>
+                    <td>
+                      <Ext href="https://www.minware.com/blog/test-pyramid-ai-assisted-development">
+                        minware.com/blog/test-pyramid-ai-assisted-development
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref24">
+                    <td>[24]</td>
+                    <td>
+                      テストピラミッドは終わったのか（Augment Code、Martin Fowler氏への言及あり）
+                    </td>
+                    <td>
+                      <Ext href="https://www.augmentcode.com/guides/is-the-test-pyramid-dead">
+                        augmentcode.com/guides/is-the-test-pyramid-dead
+                      </Ext>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>🛠️ Claude Code 実装関連（公式ドキュメント含む）</h3>
+            <div className={styles.tableScroll}>
+              <table className="ref-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>出典</th>
+                    <th>URL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr id="ref33">
+                    <td>[33]</td>
+                    <td>スケジュールタスク・Cronツールの解説（Panaversity Agent Factory）</td>
+                    <td>
+                      <Ext href="https://agentfactory.panaversity.org/docs/General-Agents-Foundations/general-agents/scheduled-tasks-cron">
+                        agentfactory.panaversity.org/docs/General-Agents-Foundations/…
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref34">
+                    <td>[34]</td>
+                    <td>Claude Codeの非async・バックグラウンドエージェント解説</td>
+                    <td>
+                      <Ext href="https://claudefa.st/blog/guide/agents/async-workflows">
+                        claudefa.st/blog/guide/agents/async-workflows
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref35">
+                    <td>[35]</td>
+                    <td>Claude Code Hooks/Subagents/Skills完全ガイド</td>
+                    <td>
+                      <Ext href="https://ofox.ai/blog/claude-code-hooks-subagents-skills-complete-guide-2026/">
+                        ofox.ai/blog/claude-code-hooks-subagents-skills…
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref36">
+                    <td>[36]</td>
+                    <td>Claude Code Hooksリファレンス（公式ドキュメント）</td>
+                    <td>
+                      <Ext href="https://code.claude.com/docs/en/hooks">
+                        code.claude.com/docs/en/hooks
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>—</td>
+                    <td>Claude Codeアーキテクチャ解説（Penligent）</td>
+                    <td>
+                      <Ext href="https://www.penligent.ai/hackinglabs/inside-claude-code-the-architecture-behind-tools-memory-hooks-and-mcp/">
+                        penligent.ai/hackinglabs/inside-claude-code…
+                      </Ext>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>📰 業界動向・背景解説</h3>
+            <div className={styles.tableScroll}>
+              <table className="ref-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>出典</th>
+                    <th>URL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr id="ref8">
+                    <td>[8][12]</td>
+                    <td>
+                      サンプリングバイアス・「検証のないタスクは願望にすぎない」に関する実践ガイド（DEV
+                      Community）
+                    </td>
+                    <td>
+                      <Ext href="https://dev.to/truongpx396/the-agentic-loop-a-practical-field-guide-mnc">
+                        dev.to/truongpx396/the-agentic-loop…
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref15">
+                    <td>[15][18]</td>
+                    <td>Loop Engineeringガイド・Worktree/スケジューリング解説（explainx.ai）</td>
+                    <td>
+                      <Ext href="https://explainx.ai/blog/loop-engineering-coding-agents-claude-code-guide-2026">
+                        explainx.ai/blog/loop-engineering-coding-agents…
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref17">
+                    <td>[17]</td>
+                    <td>Loop Engineeringの実践的教訓（個人ブログ、Gerald Chen）</td>
+                    <td>
+                      <Ext href="https://chenguangliang.com/en/posts/blog191_loop-engineering-design-loops-prompt-agents/">
+                        chenguangliang.com/en/posts/blog191…
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref38">
+                    <td>[38]</td>
+                    <td>Loop Engineeringの日本語まとめ（note、MAKE A CHANGE, inc）</td>
+                    <td>
+                      <Ext href="https://note.com/make_a_change/n/na8ae99b24c36?hl=en">
+                        note.com/make_a_change/n/na8ae99b24c36
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr id="ref39">
+                    <td>[39]</td>
+                    <td>ループ中心設計への批判「The Loop Is Not the Product」（DEV Community）</td>
+                    <td>
+                      <Ext href="https://dev.to/dannwaneri/the-loop-is-not-the-product-466d">
+                        dev.to/dannwaneri/the-loop-is-not-the-product-466d
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>—</td>
+                    <td>Jensen Huang氏の発言を含む業界動向解説（HTX Insights）</td>
+                    <td>
+                      <Ext href="https://www.htx.com/news/jensen-huang-prompts-are-becoming-obsolete-loops-are-the-new-dqI2WOBl/">
+                        htx.com/news/jensen-huang-prompts…
+                      </Ext>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>—</td>
+                    <td>DeepLearning.AI公式サイト（Andrew Ng氏のニュースレター元）</td>
+                    <td>
+                      <Ext href="https://www.deeplearning.ai/">deeplearning.ai</Ext>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <a className={styles.backTop} href="#s1">
+              ↑ 目次トップへ戻る
+            </a>
           </section>
 
           {/* ============ FOOTER ============ */}
           <footer className={styles.pageFooter}>
+            <div className={styles.finalNote}>
+              <strong>⚠️ 免責事項：</strong>
+              本ガイドで紹介した内容の多くは、2026年6月〜7月というごく最近の期間にSNS上で急速に広まった、まだ確立されていない実践知です。企業名・製品名・数値（コスト等）は各出典記事が報じた内容をそのまま紹介しており、筆者自身による検証を経たものではありません。実装前には必ず一次情報（各ツールの公式ドキュメント、原著者本人の発言）を確認することを強く推奨します。
+            </div>
             <p>
-              Disclaimer: This guide is a technical summary of the emerging patterns in Loop
-              Engineering as of early 2026. The tools, frameworks, and commands mentioned (e.g.,
-              Claude Code CLI) are actively evolving. Always refer to the official documentation for
-              the latest commands and configuration schemas.
-            </p>
-            <p className={styles.author}>
-              Compiled by the Antigravity Team, Google DeepMind. © 2026. All rights reserved.
+              本ガイドは教育目的で作成されています。バージョン 1.0 ／ Mermaid.js によるライブ図解 ／
+              ASCII図解は不使用
             </p>
           </footer>
         </main>
