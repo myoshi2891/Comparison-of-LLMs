@@ -537,28 +537,37 @@
       .step-list li {
         counter-increment: step;
         position: relative;
-        padding: 16px 18px 16px 56px;
+        padding: 14px 18px 14px 80px;
         background: #f7f9f8;
         border: 1px solid var(--paper-alt);
         border-radius: 10px;
         margin-bottom: 10px;
+        min-height: 52px;
       }
       .step-list li::before {
         content: 'Step ' counter(step);
         position: absolute;
-        left: 18px;
-        top: 16px;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
         font-family: 'IBM Plex Mono', monospace;
         font-size: 11px;
+        font-weight: 600;
         color: #fff;
         background: var(--loop);
-        padding: 3px 8px;
+        padding: 4px 8px;
         border-radius: 6px;
-        writing-mode: horizontal-tb;
+        white-space: nowrap;
+        line-height: 1.4;
       }
       .step-list li strong {
         display: block;
         margin-bottom: 4px;
+        font-size: 1rem;
+        line-height: 1.4;
+      }
+      .step-list li > :last-child {
+        margin-bottom: 0;
       }
 
       /* refs */
