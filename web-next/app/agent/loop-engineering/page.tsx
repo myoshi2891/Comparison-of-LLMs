@@ -73,6 +73,42 @@ const DIAGRAMS = {
   style EXT fill:#fef9e7
   style DEV fill:#ebf5fb
   style AGENT fill:#eafaf1`,
+  diag5: `flowchart TD
+  D["① Discovery（発見）<br />価値のあるタスクを自律的に見つける<br />例：CIの失敗ログ、未解決のissueを読む"]
+  H["② Handoff（引き渡し）<br />タスクごとに独立した作業環境（sandbox）を用意し<br />複数のエージェントを並行させる"]
+  V["③ Verification（検証）<br />成果物が基準を満たしているか判定する<br />最も重要かつ最も軽視されがちな工程"]
+  P["④ Persistence（永続化）<br />『何をしたか・次に何をすべきか』を<br />会話の外部（ファイルやDB）に記録する"]
+  S["⑤ Scheduling（スケジューリング）<br />次の周回を自動で起動する仕組み<br />これがあって初めて『一回きりの実行』が『ループ』になる"]
+  D --> H
+  H --> V
+  V --> P
+  P --> S
+  S -->|"次の周回へ"| D
+  style D fill:#3498db,color:#fff
+  style H fill:#8e44ad,color:#fff
+  style V fill:#e74c3c,color:#fff
+  style P fill:#27ae60,color:#fff
+  style S fill:#f39c12,color:#fff`,
+  diag6: `graph TD
+  subgraph PARTS["🧩 ループを構成する6つの部品"]
+    P1["⏰ Automations<br />（自動起動の仕組み）"]
+    P2["🌳 Worktrees<br />（並行作業用の作業ディレクトリ）"]
+    P3["📖 Skills<br />（プロジェクト固有の知識）"]
+    P4["🔌 Plugins / Connectors<br />（既存ツールとの接続）"]
+    P5["🤖 Sub-agents<br />（役割分担された複数のエージェント）"]
+    P6["🧠 Memory（外部記憶）<br />（会話の外にある共有状態）"]
+  end
+  P1 -.->|"実現する"| DISC["Discovery"]
+  P2 -.->|"実現する"| HAND["Handoff"]
+  P5 -.->|"実現する"| VER["Verification"]
+  P6 -.->|"実現する"| PERS["Persistence"]
+  P1 -.->|"実現する"| SCHED["Scheduling"]
+  style P1 fill:#3498db,color:#fff
+  style P2 fill:#8e44ad,color:#fff
+  style P3 fill:#27ae60,color:#fff
+  style P4 fill:#e67e22,color:#fff
+  style P5 fill:#e74c3c,color:#fff
+  style P6 fill:#f39c12,color:#fff`,
 };
 
 function _Ext({ href, children }: { href: string; children: React.ReactNode }) {
@@ -555,8 +591,211 @@ export default function Page() {
               。本ガイドの残りの章では、この①のループをどう設計・実装するかに焦点を当てます。
             </p>
           </section>
-          <section className="chapter block" id="s5" style={{ display: "none" }} />
-          <section className="chapter block" id="s6" style={{ display: "none" }} />
+          {/* ============ 5 ============ */}
+          <section className="chapter block" id="s5">
+            <div className={styles.kicker}>05 / Anatomy</div>
+            <h2>ループの解剖学：1ターンを構成する5つの動き</h2>
+            <p>
+              Addy Osmani氏はループの1回転（1ターン）を、次の<strong>5つの動き（moves）</strong>
+              に分解しています
+              <sup>
+                <a href="#ref4">[4]</a>
+                <a href="#ref5">[5]</a>
+                <a href="#ref14">[14]</a>
+              </sup>
+              。
+            </p>
+
+            <figure className={styles.diagram}>
+              <div id="diag-5" className={styles.mermaidContainer}>
+                <MermaidDiagram chart={DIAGRAMS.diag5} id="diag-5" />
+              </div>
+              <figcaption>図5：ループの1ターンを構成する5つの動き</figcaption>
+            </figure>
+
+            <div className={styles.tableScroll}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>動き</th>
+                    <th>説明</th>
+                    <th>具体例</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Discovery（発見）</td>
+                    <td>「今どのタスクをやるべきか」を人間ではなくシステムが判断する</td>
+                    <td>
+                      昨日のCI失敗ログ、放置されているissue、直近のコミットを読んで優先順位をつける
+                      <sup>
+                        <a href="#ref14">[14]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Handoff（引き渡し）</td>
+                    <td>見つけたタスクを独立した実行環境に渡し、他の作業に干渉させない</td>
+                    <td>
+                      git worktreeで別の作業ディレクトリを切り、複数エージェントを並行実行する
+                      <sup>
+                        <a href="#ref15">[15]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Verification（検証）</td>
+                    <td>成果物が「完了」の基準を満たしているかどうかを判定する</td>
+                    <td>
+                      別のエージェント（レビュー役）やテストスイートが結果を採点する。最も見落とされやすい工程
+                      <sup>
+                        <a href="#ref14">[14]</a>
+                        <a href="#ref16">[16]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Persistence（永続化）</td>
+                    <td>会話（コンテキストウィンドウ）の外側に進捗を書き残す</td>
+                    <td>
+                      Markdownファイル、Linearボード、SQLite、TODO.mdなど
+                      <sup>
+                        <a href="#ref17">[17]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Scheduling（スケジューリング）</td>
+                    <td>一定間隔・条件でループを自動起動する</td>
+                    <td>
+                      cronジョブ、GitHub Actions、Claude Codeの <code>/loop</code> や{" "}
+                      <code>/schedule</code>
+                      <sup>
+                        <a href="#ref18">[18]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              Osmani氏の実例では、朝になると自動でトリアージのタスクが起動し、昨日失敗したCIテストや未解決のissue、最近のコミットを読んで対応すべき項目をMarkdownやLinearボードに書き出し、対応が必要なものごとに独立したworktreeを立て、1体のエージェントが修正案を作り、別のエージェントがプロジェクトのルールとテストに照らしてレビューし、コネクタが自動でプルリクエストを開いてチケットを更新する、という流れが紹介されています。人間の手が必要なものだけ受信箱に残り、翌日はその続きから再開できるよう状態ファイルが保持されます
+              <sup>
+                <a href="#ref14">[14]</a>
+              </sup>
+              。
+            </p>
+          </section>
+
+          {/* ============ 6 ============ */}
+          <section className="chapter block" id="s6">
+            <div className={styles.kicker}>06 / Building Blocks</div>
+            <h2>ループを支える6つの部品</h2>
+            <p>
+              「5つの動き」が<strong>何が起きるか</strong>
+              だとすれば、それを実現するために手元に必要な<strong>6つの部品（parts）</strong>
+              があります
+              <sup>
+                <a href="#ref14">[14]</a>
+                <a href="#ref19">[19]</a>
+              </sup>
+              。
+            </p>
+
+            <figure className={styles.diagram}>
+              <div id="diag-6" className={styles.mermaidContainer}>
+                <MermaidDiagram chart={DIAGRAMS.diag6} id="diag-6" />
+              </div>
+              <figcaption>図6：ループを支える6つの部品と5つの動きの対応</figcaption>
+            </figure>
+
+            <div className={styles.tableScroll}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>部品</th>
+                    <th>役割</th>
+                    <th>もし無かったら</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Automations（自動起動）</td>
+                    <td>決まったスケジュールやトリガーでループを起き上がらせる</td>
+                    <td>
+                      「一度きり実行した記録」であり、ループとは呼べない
+                      <sup>
+                        <a href="#ref14">[14]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Worktrees（作業木）</td>
+                    <td>
+                      Gitの機能を使い、1つのリポジトリに複数の独立した作業ディレクトリを用意する
+                    </td>
+                    <td>
+                      並行して動く複数のエージェントが同じファイルを取り合い、状態が壊れる
+                      <sup>
+                        <a href="#ref14">[14]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Skills（スキル）</td>
+                    <td>プロジェクト固有の知識・手順を、必要なときだけ読み込む形でまとめておく</td>
+                    <td>
+                      エージェントが毎回推測に頼り、判断がぶれる
+                      <sup>
+                        <a href="#ref9">[9]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Plugins / Connectors（連携）</td>
+                    <td>Linear、Slack、GitHubなど既存ツールと繋ぐ</td>
+                    <td>
+                      発見した課題や成果物を人間の使う場所に届けられない
+                      <sup>
+                        <a href="#ref19">[19]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Sub-agents（サブエージェント）</td>
+                    <td>「作る役」と「確認する役」を別のエージェント・別のモデルに分ける</td>
+                    <td>
+                      自分の仕事を自分で採点することになり、自己満足の評価になりやすい
+                      <sup>
+                        <a href="#ref19">[19]</a>
+                        <a href="#ref20">[20]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Memory（外部記憶）</td>
+                    <td>会話の外（ファイル・DB・チケット管理ツールなど）に状態を保存する</td>
+                    <td>
+                      モデルは実行と実行の間の記憶を持たないため、前回何をしたか分からず同じ作業を繰り返したり、逆に必要な作業を見落としたりする
+                      <sup>
+                        <a href="#ref17">[17]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div className={`${styles.callout} ${styles.quote}`}>
+              ある開発者が構築したブログ記事提案の自動ループは、前日に何を提案したか記録していなかったために、3日連続で同じテーマの記事を提案し続けてしまいました。「昨日までの提案一覧」をMarkdownファイルに書き出し、提案前にそれを検索して重複を除く処理を1行加えただけで、問題は即座に解決したと報告されています
+              <sup>
+                <a href="#ref17">[17]</a>
+              </sup>
+              。<strong>状態はプロンプトの中ではなく、ループの外側に置く</strong>
+              というのが得られた教訓です。
+            </div>
+          </section>
           <section className="chapter block" id="s7" style={{ display: "none" }} />
           <section className="chapter block" id="s8" style={{ display: "none" }} />
           <section className="chapter block" id="s9" style={{ display: "none" }} />
