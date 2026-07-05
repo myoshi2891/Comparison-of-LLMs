@@ -72,6 +72,12 @@ describe("/agent/loop-engineering - page structure", () => {
     expect(container.querySelector("#s8")).not.toBeNull();
   });
 
+  it("renders s9 and s10 sections", () => {
+    const { container } = render(<Page />);
+    expect(container.querySelector("#s9")).not.toBeNull();
+    expect(container.querySelector("#s10")).not.toBeNull();
+  });
+
   it("renders diagrams diag-1 and diag-2", () => {
     const { container } = render(<Page />);
     expect(container.querySelector("#diag-1")).not.toBeNull();
@@ -96,6 +102,14 @@ describe("/agent/loop-engineering - page structure", () => {
     expect(container.querySelector("#diag-8")).not.toBeNull();
   });
 
+  it("renders diagrams diag-9, diag-10, diag-11, diag-12", () => {
+    const { container } = render(<Page />);
+    expect(container.querySelector("#diag-9")).not.toBeNull();
+    expect(container.querySelector("#diag-10")).not.toBeNull();
+    expect(container.querySelector("#diag-11")).not.toBeNull();
+    expect(container.querySelector("#diag-12")).not.toBeNull();
+  });
+
   it("renders the terminology hierarchy table", () => {
     const { container } = render(<Page />);
     const table = container.querySelector("table");
@@ -107,8 +121,8 @@ describe("/agent/loop-engineering - page structure", () => {
   it("renders comparison and loops tables", () => {
     const { container } = render(<Page />);
     const tables = container.querySelectorAll("table");
-    // We expect at least 7 tables now (table1 in s2, table2 in s3, table3 in s4, table4 in s5, table5 in s6, table6 in s7, table7 in s8)
-    expect(tables.length).toBeGreaterThanOrEqual(7);
+    // We expect at least 11 tables now (table1 in s2, table2 in s3, table3 in s4, table4 in s5, table5 in s6, table6 in s7, table7 in s8, table8-11 in s9)
+    expect(tables.length).toBeGreaterThanOrEqual(11);
     const content = Array.from(tables)
       .map((t) => t.textContent)
       .join(" ");
@@ -118,6 +132,18 @@ describe("/agent/loop-engineering - page structure", () => {
     expect(content).toContain("Worktrees（作業木）");
     expect(content).toContain("Verifierの種類");
     expect(content).toContain("1ループ1タスク");
+    expect(content).toContain("ループ向きなタスク");
+    expect(content).toContain("上限条件（回数）");
+    expect(content).toContain("外部記憶");
+    expect(content).toContain("自動トリガー");
+  });
+
+  it("renders the practice steps list", () => {
+    const { container } = render(<Page />);
+    const list = container.querySelector("ol[class*='step-list']");
+    expect(list).not.toBeNull();
+    expect(list?.textContent).toContain("タスクを選ぶ");
+    expect(list?.textContent).toContain("上限を必ず設定");
   });
 });
 
