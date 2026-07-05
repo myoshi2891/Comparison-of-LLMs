@@ -153,7 +153,7 @@ describe("/agent/loop-engineering - page structure", () => {
 
   it("renders the practice steps list", () => {
     const { container } = render(<Page />);
-    const list = container.querySelector("ol[class*='step-list']");
+    const list = container.querySelector("ol[class*='stepList']");
     expect(list).not.toBeNull();
     expect(list?.textContent).toContain("小さなリポジトリを1つ用意する");
     expect(list?.textContent).toContain("上限を必ず設定して観察する");

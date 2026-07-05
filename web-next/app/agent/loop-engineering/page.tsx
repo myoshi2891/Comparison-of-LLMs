@@ -198,9 +198,22 @@ const DIAGRAMS = {
     end
   end
   STATE->>STATE: 状態ファイルを更新（翌日に引き継ぐ）`,
+  diag13: `flowchart TD
+  RISK["⚠️ Loop Engineeringの主なリスク"]
+  RISK --> R1["💸 コストの暴走<br />検証が甘いループはトークン代を<br />静かに、しかし際限なく消費し続ける"]
+  RISK --> R2["🧠 認知的な明け渡し<br />『Cognitive Surrender』<br />ループが自動で回るほど、考えるのをやめて<br />結果を鵜呑みにしやすくなる"]
+  RISK --> R3["🌀 コンテキストの劣化<br />『Context Rot』<br />圧縮（compaction）で重要な仕様が失われ<br />目的から少しずつずれていく"]
+  RISK --> R4["🪞 自己採点バイアス<br />生成モデル自身に判定させると<br />甘い評価になりがち"]
+  RISK --> R5["📊 サンプリングバイアス<br />ツールベンダーの成功事例は<br />すでにそのツールを使いこなす人からのデータ"]
+  style RISK fill:#2c3e50,color:#fff
+  style R1 fill:#e74c3c,color:#fff
+  style R2 fill:#e74c3c,color:#fff
+  style R3 fill:#e74c3c,color:#fff
+  style R4 fill:#e74c3c,color:#fff
+  style R5 fill:#e74c3c,color:#fff`,
 };
 
-function _Ext({ href, children }: { href: string; children: React.ReactNode }) {
+function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer external">
       {children}
@@ -1443,8 +1456,382 @@ export default function Page() {
               。
             </p>
           </section>
-          <section className="chapter block" id="s11" style={{ display: "none" }} />
-          <section className="chapter block" id="s12" style={{ display: "none" }} />
+          {/* ============ 11 ============ */}
+          <section className="chapter block" id="s11">
+            <div className={styles.kicker}>11 / Implementation</div>
+            <h2>Claude Codeで実際に組んでみる</h2>
+            <p>
+              Loop Engineeringに必要な部品は、2026年前半にかけてClaude Code（Anthropic）やOpenAI
+              Codexといった主要なコーディングエージェント製品に標準搭載されるようになりました
+              <sup>
+                <a href="#ref4">[4]</a>
+                <a href="#ref19">[19]</a>
+              </sup>
+              。ここではClaude Codeを例に、代表的な機能と対応関係を紹介します。
+            </p>
+
+            <div className={`${styles.callout} ${styles.warn}`}>
+              以下はガイド執筆時点の情報を整理したものです。コマンド名や仕様は更新される可能性が高いため、実装前に必ずClaude
+              Codeの公式ドキュメント（
+              <Ext href="https://code.claude.com/docs/">https://code.claude.com/docs/</Ext>
+              ）を確認してください。
+            </div>
+
+            <h3>11.1　主な機能と5つの動きの対応</h3>
+            <div className={styles.tableScroll}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Loop Engineeringの動き</th>
+                    <th>Claude Codeでの対応機能</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Discovery / Scheduling</td>
+                    <td>
+                      <code>/loop</code>（セッション内で一定間隔ごとに再実行）、
+                      <code>/schedule</code> または <code>claude trigger create</code>
+                      （クラウド上のcronタスクとして永続実行）、Hooks（ライフサイクルの特定タイミングでシェルコマンドを発火）
+                      <sup>
+                        <a href="#ref18">[18]</a>
+                        <a href="#ref33">[33]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Handoff</td>
+                    <td>
+                      Git
+                      Worktreeによる並列作業ディレクトリの分離、バックグラウンド実行（Ctrl+Bでサブエージェントを裏で動かしながら手元の作業を継続）
+                      <sup>
+                        <a href="#ref34">[34]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Verification</td>
+                    <td>
+                      サブエージェント（Subagents）に「コードレビュー専任」など役割を持たせ、実装担当とは別の文脈・別のモデルで検証させる
+                      <sup>
+                        <a href="#ref35">[35]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Persistence</td>
+                    <td>
+                      <code>CLAUDE.md</code> / <code>AGENTS.md</code>
+                      （プロジェクトの前提知識）、進捗ファイル、MCP経由でのLinear連携など
+                      <sup>
+                        <a href="#ref19">[19]</a>
+                        <a href="#ref35">[35]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>（知識の注入）</td>
+                    <td>
+                      Skills（<code>.claude/skills/</code>
+                      以下にまとめた、必要なときだけ読み込む手順書）
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>11.2　スケジューリングの選び方</h3>
+            <div className={styles.tableScroll}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>選択肢</th>
+                    <th>永続性</th>
+                    <th>向いている用途</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <code>/loop &lt;間隔&gt; &lt;コマンド&gt;</code>
+                    </td>
+                    <td>セッションが開いている間だけ</td>
+                    <td>
+                      「15分おきにサブエージェントの完了を確認する」など、今このセッション内で完結する短期の反復
+                      <sup>
+                        <a href="#ref33">[33]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code>/schedule</code> またはクラウドのスケジュールタスク
+                    </td>
+                    <td>マシンの再起動・終了をまたいで継続</td>
+                    <td>
+                      「毎週平日9時にCIダッシュボードを確認して要約する」など、長期的に繰り返す定型業務
+                      <sup>
+                        <a href="#ref33">[33]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      Hooks（<code>PreToolUse</code> / <code>PostToolUse</code> / <code>Stop</code>{" "}
+                      など）
+                    </td>
+                    <td>イベント駆動（時間ではなく出来事に反応）</td>
+                    <td>
+                      「ファイル編集のたびにLintを走らせる」「セッション終了時に必ずテストを走らせてから終わらせる」など、確実に実行させたい処理
+                      <sup>
+                        <a href="#ref36">[36]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>外部のCIツール（GitHub Actionsなど）からヘッドレス起動</td>
+                    <td>CI基盤に依存</td>
+                    <td>チーム共有の定型ワークフローに組み込みたい場合</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>11.3　Subagents（サブエージェント）の実装イメージ</h3>
+            <p>
+              サブエージェントは、それぞれ独自のシステムプロンプト・使用できるツール・独立したコンテキストウィンドウを持つ、専門特化したAIインスタンスです。例えば「コードレビュー専任」のサブエージェントは、次のように定義できます（概念例）
+              <sup>
+                <a href="#ref35">[35]</a>
+              </sup>
+              。
+            </p>
+
+            <div className={styles.codeWrap}>
+              <div className={styles.codeBody}>
+                <div className={styles.codeLine}>
+                  <span className={styles.cs}>---</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.ck}>name</span>:{" "}
+                  <span className={styles.cv}>code-reviewer</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.ck}>description</span>:{" "}
+                  <span className={styles.cv}>
+                    コード品質・セキュリティを専門にレビューする。実装直後に必ず使用する。
+                  </span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.ck}>tools</span>:{" "}
+                  <span className={styles.cv}>Read, Grep, Glob, Bash</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.ck}>model</span>:{" "}
+                  <span className={styles.cv}>sonnet</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cs}>---</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cc}>
+                    あなたはコード品質とセキュリティを厳しくチェックするシニアレビュアーです。
+                  </span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cc}>
+                    実装を書いたエージェントとは独立した視点で、以下を確認してください：
+                  </span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cc}>
+                    - プロジェクトのルール（CLAUDE.md）に沿っているか
+                  </span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cc}>
+                    - テストが実際にバグを検出できる内容になっているか
+                  </span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cc}>
+                    - セキュリティ上の懸念（権限、入力値検証など）がないか
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <h3>11.4　まず動かしてみる最小構成（初学者向け）</h3>
+            <p>
+              複雑な仕組みを一気に組む前に、次のようなごく小さな構成から始めることをお勧めします。
+            </p>
+            <ol className={styles.stepList}>
+              <li>
+                <strong>小さなリポジトリを1つ用意する</strong>
+                ：すでにテストが整備されている、小規模なプロジェクトを選びます
+              </li>
+              <li>
+                <strong>単純な仕様書を用意する</strong>
+                ：「失敗しているテストを1つ選んで直す」など、検証可能なタスクを1つ選びます（Step
+                1・2）
+              </li>
+              <li>
+                <strong>レビュー専用のサブエージェントを1つ定義する</strong>
+                ：実装用のセッションとは別に用意します（Step 3、11.3節）
+              </li>
+              <li>
+                <strong>進捗ファイルを用意する</strong>：進捗を <code>PROGRESS.md</code>{" "}
+                に書き出すようエージェントに指示します（Step 4）
+              </li>
+              <li>
+                <strong>
+                  <code>/loop</code>を試す
+                </strong>
+                ：短い間隔（例：数分おき）で「テストが全部通ったか確認して、通っていなければ続行」という指示を回してみます（Step
+                6）
+              </li>
+              <li>
+                <strong>上限を必ず設定して観察する</strong>
+                ：最大イテレーション回数を必ず設定し、最初は目の前で観察しながら動かします（Step
+                2・7）
+              </li>
+            </ol>
+            <p>
+              慣れてきたら、Worktreeでの並列化やクラウドのスケジュールタスクへと段階的に拡張していきます。
+            </p>
+          </section>
+
+          {/* ============ 12 ============ */}
+          <section className="chapter block" id="s12">
+            <div className={styles.kicker}>12 / Risks</div>
+            <h2>リスクと注意点</h2>
+            <p>
+              Loop
+              Engineeringは強力な一方、複数の実践者・批評家から具体的なリスクが指摘されています。導入前に必ず把握しておきましょう。
+            </p>
+
+            <figure className={styles.diagram}>
+              <div id="diag-13" className={styles.mermaidContainer}>
+                <MermaidDiagram chart={DIAGRAMS.diag13} id="diag-13" />
+              </div>
+              <figcaption>図13：Loop Engineeringの主なリスク5選</figcaption>
+            </figure>
+
+            <h3>12.1　コストの暴走：実例</h3>
+            <p>
+              大手配車サービスUberでは、エンジニア一人あたりのエージェント関連ツール利用に月1,500ドルの上限を設けたと報じられています。これは、年間のAI予算をわずか4か月で使い切ってしまったことを受けた措置とされています
+              <sup>
+                <a href="#ref37">[37]</a>
+              </sup>
+              。
+              <strong>
+                検証（Verifier）が弱いまま放置されたループは、派手に失敗するのではなく、トークン価格という形で一晩中静かに失敗し続ける
+              </strong>
+              という指摘は、コスト管理の重要性を端的に表しています
+              <sup>
+                <a href="#ref37">[37]</a>
+              </sup>
+              。
+            </p>
+
+            <h3>12.2　「認知的な明け渡し」への警戒</h3>
+            <p>
+              Addy
+              Osmani氏自身も、ループ設計が「思考停止への近道」になりうる危険性に言及しています。ループが自分で回り始めると、人間はつい思考を止めて、返ってくる結果をそのまま受け入れがちになる、という懸念です
+              <sup>
+                <a href="#ref9">[9]</a>
+                <a href="#ref38">[38]</a>
+              </sup>
+              。ソフトウェアエンジニアのArmin Ronacher氏も同様の懸念を共有しているとされています
+              <sup>
+                <a href="#ref9">[9]</a>
+              </sup>
+              。ループの設計は、判断力を働かせて行えば効果的な処方箋になり得る一方、考えることを避けるために行えば逆効果になる、というのがOsmani氏の立場です
+              <sup>
+                <a href="#ref9">[9]</a>
+              </sup>
+              。
+            </p>
+
+            <h3>12.3　コンテキストの劣化（Context Rot）とCompaction</h3>
+            <p>
+              長時間動き続けるループでは、コンテキストウィンドウが埋まるたびに古い情報が自動的に圧縮・破棄されます。Geoffrey
+              Huntley氏はこれを「圧縮は悪魔だ」とまで表現しており、重要な仕様がこの過程で失われると、エージェントは自分自身の不完全な要約に頼らざるを得なくなり、当初の目的から少しずつずれていく（ドリフトする）と警告しています
+              <sup>
+                <a href="#ref30">[30]</a>
+              </sup>
+              。これを避けるための工夫が、9章・Step
+              4で述べた「状態を会話の外側（ディスク上のファイルなど）に持たせる」設計です。
+            </p>
+
+            <h3>12.4　このムーブメント自体への健全な懐疑</h3>
+            <p>
+              すべての意見が肯定一色というわけではありません。ある開発者は、Claude
+              Codeのようなツールが「ソフトウェアを書く」という課題を解決していることは事実だとしつつも、それだけで「誰もがどうソフトウェア開発をすべきか」を再定義する根拠にはならないと指摘しています。理由は単純で、ベンダーが示すデータの多くは、すでにそのベンダーの製品を積極的に使っているユーザーから得られたものだからです
+              <sup>
+                <a href="#ref8">[8]</a>
+              </sup>
+              。この2つの見方――「本物の転換点である」ことと「証拠には偏りがある」こと――は両立しうる、という冷静な受け止め方が重要です
+              <sup>
+                <a href="#ref8">[8]</a>
+              </sup>
+              。
+            </p>
+
+            <p>
+              また別の視点として、ループをエージェント中心に設計すること自体への批判もあります。決定論的なロジック（プログラム）こそが土台であり、LLMはあくまでその土台の上で使われる部品にすぎない、という考え方です。ループを設計しただけで満足してしまい、その先に本当のユーザーがいなければ、それは思考停止を先延ばしにしているに過ぎない、という手厳しい指摘もあります
+              <sup>
+                <a href="#ref39">[39]</a>
+              </sup>
+              。ループが何を最適化すべきか、「完了」とは何を意味するのか、どこで処理を止めるべきかを最終的に決めるのは、依然として人間の役割です
+              <sup>
+                <a href="#ref39">[39]</a>
+              </sup>
+              。
+            </p>
+
+            <h3>12.5　リスクと対策のまとめ</h3>
+            <div className={styles.tableScroll}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>リスク</th>
+                    <th>対策</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>コストの暴走</td>
+                    <td>
+                      Step
+                      2で必ず金額・回数の上限を設定する。日次・週次でコストダッシュボードを確認する
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>認知的な明け渡し</td>
+                    <td>
+                      Verifierの判定結果を定期的に人間が抜き打ちで確認する。「なぜ合格としたか」の理由をログに残させる
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>コンテキストの劣化</td>
+                    <td>
+                      重要な仕様は会話の外（ファイル）に保存し、毎ターン読み直させる。圧縮が起きたタイミングをログで把握する
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>自己採点バイアス</td>
+                    <td>
+                      Generator（作る役）とVerifier（確認する役）を必ず別のプロンプト・可能なら別のモデルにする
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>サンプリングバイアスへの過信</td>
+                    <td>自社の環境で小規模に試し、成功事例をそのまま鵜呑みにしない</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
           <section className="chapter block" id="s13" style={{ display: "none" }} />
           <section className="chapter block" id="s14" style={{ display: "none" }} />
           <section className="chapter block" id="s15" style={{ display: "none" }} />

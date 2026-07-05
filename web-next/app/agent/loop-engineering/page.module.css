@@ -302,6 +302,20 @@
   margin-bottom: 6px;
 }
 
+.warn {
+  background: #fbf0df;
+  border-color: #f0d6a3;
+}
+
+.warn::before {
+  content: '⚠️ 警告・注意';
+  display: block;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  color: #b58115;
+  margin-bottom: 6px;
+}
+
 /* Code block styles */
 .codeWrap {
   background: var(--code-bg);
