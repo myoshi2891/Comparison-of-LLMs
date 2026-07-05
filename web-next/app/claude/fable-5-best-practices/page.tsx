@@ -55,6 +55,30 @@ const DIAGRAMS = {
             Worker-->>Dev: ゴール達成としてセッション終了
         end
     end`,
+  diagram6: `flowchart LR
+    subgraph Pre["実装前"]
+        A["① Blindspot Pass<br/>プロンプトの曖昧さ・未定義部分を<br/>Fable自身にスキャンさせる"]
+        B["② Brainstorm / Prototype<br/>正式なプロンプトの前に、複数の切り口を<br/>発散的に検討させる"]
+        C["③ Interview / Reference<br/>Fableに逆質問させる<br/>または既存の実装を参照点として与える"]
+    end
+    subgraph During["実装中"]
+        D["④ Implementation Notes<br/>各ステップに着手する前に<br/>そのステップの前提を書き出させる"]
+    end
+    subgraph Post["実装後"]
+        E["⑤ Quiz / Pitch<br/>成果物について小テストをする<br/>または説明させることで<br/>暗黙の前提を逆照射する"]
+    end
+    A --> B --> C --> D --> E
+    E -.新たなunknownsが発覚.-> A`,
+  diagram7: `flowchart TD
+    Start["新しいタスクが来た"] --> Q1{"曖昧・長時間・高難度か?"}
+    Q1 -- はい --> Q2{"サイバーセキュリティ/生物学に近い内容か?"}
+    Q2 -- はい --> Opus["Opus 4.8を直接使用<br/>(フォールバックを待つより効率的)"]
+    Q2 -- いいえ --> Fable["Fable 5をhigh〜xhigh effortで使用<br/>(オーケストレーター役)"]
+    Q1 -- いいえ --> Q3{"日常的なコーディング・反復作業か?"}
+    Q3 -- はい --> Sonnet["Sonnet 5を使用"]
+    Q3 -- いいえ --> Q4{"検索・棚卸しなど軽量タスクか?"}
+    Q4 -- はい --> Haiku["Haiku 4.5をサブエージェントで使用"]
+    Q4 -- いいえ --> Sonnet`,
 };
 
 export default function Fable5BestPracticesPage() {
@@ -762,6 +786,184 @@ export default function Fable5BestPracticesPage() {
 
             <p>
               評価モデルはトランスクリプトを読むだけで、コマンドを自ら実行したりファイルを直接確認したりはしない。したがって「わかりやすく体裁の整った進捗報告」と「実際に検証された事実」を混同しないよう、Fable 5自身に根拠を明示させる指示(4.2節 of パターンC)と組み合わせることが重要である。また、無条件で朝まで走らせるような使い方は推奨されておらず、ターン数や時間の上限を条件に含めておくことが安全策として案内されている。
+            </p>
+          </section>
+
+          <section className={`${styles.chapter} chapter`} id="ch8">
+            <div className={styles.chapterHead}>
+              <span className={styles.chapterNum}>08</span>
+              <h2>Thariq の「Unknowns フレームワーク」(参照ポスト解説)</h2>
+            </div>
+
+            <p>
+              ご提示いただいた投稿(Thariq Shihipar, &quot;A Field Guide to Fable: Finding Your Unknowns&quot;, 2026年7月3日)は、Fable 5を使う中で著者が繰り返し学んだ教訓として「<b>地図は現地そのものではない</b>」という比喩を掲げている。ここでの「地図」とは、Fableに与えるプロンプトやSkill、コンテキストのことであり、「現地」とは実装時に実際に立ちはだかる制約や現実を指す。この投稿の核心的な主張は、エージェンティックコーディングの成否は<b>実装の前と最中に、自分自身の&quot;unknowns(未知の要素)&quot;をどれだけ明確にできるか</b>にかかっている、というものである。
+            </p>
+
+            <h3>8.1 4つの象限</h3>
+            <p>
+              Thariqは、政治家ドナルド・ラムズフェルドの知識分類(および後にスラヴォイ・ジジェクが加えた4つ目の区分)を借りて、プロンプトに潜む情報の非対称性を次の4象限に整理している。
+            </p>
+
+            <div className={styles.quadrant}>
+              <div className={`${styles.qCell} ${styles.qKnown}`}>
+                <div className={styles.qTitle}><span>QUADRANT 1</span>Known Knowns(既知の既知)</div>
+                <div className={styles.qDesc}>
+                  自分もFable 5も明確に理解している、明示済みの指示。例:「この関数の戻り値の型はstringにする」
+                </div>
+              </div>
+              <div className={`${styles.qCell} ${styles.qPartial}`}>
+                <div className={styles.qTitle}><span>QUADRANT 2</span>Known Unknowns(既知の未知)</div>
+                <div className={styles.qDesc}>
+                  自分が「まだ決まっていない」と認識しているギャップ。例:「エラー時の挙動をどうするかはまだ決めていない」
+                </div>
+              </div>
+              <div className={`${styles.qCell} ${styles.qUnknown}`}>
+                <div className={styles.qTitle}><span>QUADRANT 3</span>Unknown Knowns(未知の既知)</div>
+                <div className={styles.qDesc}>
+                  自分は無意識に分かっている(センス・美意識・業界の慣習など)が、言語化していない暗黙の基準。例:コードの「きれいさ」の基準を説明せずに期待している
+                </div>
+              </div>
+              <div className={`${styles.qCell} ${styles.qPartial}`} style={{ background: 'linear-gradient(135deg, rgba(239, 140, 115, 0.14), var(--bg-card))' }}>
+                <div className={styles.qTitle}><span>QUADRANT 4</span>Unknown Unknowns(未知の未知)</div>
+                <div className={styles.qDesc}>
+                  自分がそもそも結果に影響すると想定していなかった要因。例:想定していなかったレガシーな依存関係の存在
+                </div>
+              </div>
+            </div>
+
+            <p>
+              Thariqの観察によれば、Fable 5の出力品質が頭打ちになる最大の要因は、大抵この第3・第4象限、つまり<b>自分自身がその前提の存在にすら気づいていない領域</b>にある。開発者が「Fable 5は要件を理解していない」と感じる場面の多くは、実際には要件そのものにこうしたunknownsが潜んでいることが原因だ、というのがこの投稿の重要な指摘である。
+            </p>
+
+            <h3>8.2 5つの実践技法</h3>
+            <p>
+              このフレームワークに対応する形で、Thariqは実装前・実装中・実装後の3段階にわたる5つの具体的な技法を提示している。
+            </p>
+
+            <div className={styles.diagramFrame}>
+              <div className={styles.mermaid} id="diagram-6">
+                <MermaidDiagram chart={DIAGRAMS.diagram6} />
+              </div>
+              <div className={styles.diagramCaption}>図6: Unknownsを段階的に可視化する5つの技法</div>
+            </div>
+
+            <p>
+              この5つの技法に共通する狙いは、<b>第3・第4象限(Unknown Knowns / Unknown Unknowns)にある要素を、少しずつ第1・第2象限(Known Knowns / Known Unknowns)へ移していく</b>ことである。特に④のImplementation Notesは、Fable 5が実装の各ステップに入る前に前提を書き出すことで、開発者がリアルタイムでunknownsを検知・介入できるようにする点で、9章で述べるメモリシステムや検証ループの設計とも密接に関連している。また⑤のQuiz &amp; Pitchは、完成後に成果物について小テストをしたり、ステークホルダーへのピッチのような形で設計判断を説明させたりすることで、実装中に無意識に行っていた仮定を逆に暴き出す、という点がユニークな工夫である。
+            </p>
+
+            <div className={styles.callout}>
+              <span className={styles.calloutLabel}>7章との接続</span>
+              <p>
+                このフレームワークは、7章で紹介したLoop Engineeringの考え方(検証条件をどう設計するか)とも補完関係にある。<code className={styles.inlineCode}>/goal</code> の条件を書く作業自体が、実は「Known Unknowns」を「Known Knowns」に変換する作業そのものだと捉えると、両者のつながりが見えてくる。
+              </p>
+            </div>
+          </section>
+
+          <section className={`${styles.chapter} chapter`} id="ch9">
+            <div className={styles.chapterHead}>
+              <span className={styles.chapterNum}>09</span>
+              <h2>検証ループとメモリシステムの設計</h2>
+            </div>
+
+            <h3>9.1 検証はサブエージェントに任せる</h3>
+            <p>
+              Fable 5は自己検証の精度も高いモデルだが、Anthropicの実験・Lance Martinの報告いずれにおいても、<b>独立した文脈を持つ検証専用のサブエージェント</b>が自己批評よりも一貫して優れた結果を出すことが確認されている。長時間タスクでは「[X]間隔で自分の作業を確認する仕組みを確立し、その間隔ごとにサブエージェントで仕様と照らし合わせて検証する」という趣旨の指示を、明示的にプロンプトへ含めることが推奨される。
+            </p>
+
+            <h3>9.2 ファイルベースのメモリシステム</h3>
+            <p>
+              Fable 5は、過去の実行から得た教訓を記録し、それを参照できる状態にしておくと特によいパフォーマンスを発揮する。実装はシンプルなMarkdownファイルで構わない。
+            </p>
+            <ul>
+              <li>1つの教訓につき1ファイル、先頭に一行要約をつける</li>
+              <li>「なぜそれが重要だったか」も含め、修正内容・確認済みの方針の両方を記録する</li>
+              <li>会話履歴やリポジトリの内容としてすでに残っている情報は保存しない</li>
+              <li>既存のメモは重複作成せず更新し、誤りだと判明したメモは削除する</li>
+            </ul>
+
+            <p>
+              過去のセッション群からこの仕組みを立ち上げたい場合は、Fable 5自身にサブエージェントを使って過去のセッションを振り返らせ、テーマや教訓を抽出・保存させ、以後その保存先を参照するよう指示する、という「自己ブートストラップ」的な使い方も有効である。実際にAnthropicの内部テストでは、このような永続的なファイルベースの記憶を与えることで、<i>Slay the Spire</i> のようなゲームをプレイさせた際にOpus 4.8比で成績が大幅に向上したという報告もある。
+            </p>
+
+            <h3>9.3 長時間実行特有の注意点</h3>
+
+            <div className={`${styles.callout} ${styles.warn}`}>
+              <span className={styles.calloutLabel}>早期停止</span>
+              <p>
+                長いセッションの終盤で、Fable 5が「これからXを実行します」という意図表明だけをして実際のツール呼び出しをしなかったり、十分な情報があるのに許可を求めて止まってしまうことがある。「続けて」の一言で再開するが、無人運用のパイプラインでは、ユーザーが見ていないこと・確認が返せないことを明示し、可逆的な操作については確認なしで進めるよう指示しておくと安定する。
+              </p>
+            </div>
+
+            <div className={`${styles.callout} ${styles.warn}`}>
+              <span className={styles.calloutLabel}>コンテキスト予算への過剰反応</span>
+              <p>
+                残りトークン数のカウントダウンをモデルに見せる設計だと、必要以上に「新しいセッションを始めましょうか」といった提案をしてくることがある。可能であればコンテキスト残量を明示的に見せない設計にするか、「コンテキストは十分残っているので気にせず続けてください」という一文を添えるとよい。
+              </p>
+            </div>
+
+            <div className={`${styles.callout} ${styles.warn}`}>
+              <span className={styles.calloutLabel}>クライアント側のタイムアウト調整</span>
+              <p>
+                高いeffort設定での個個のリクエストは数分から数時間に及ぶことがある。API/ハーネスを自作している場合は、タイムアウト・ストリーミング・進捗表示の設計を見直し、ブロッキングではなく非同期的(スケジュールジョブなど)に実行状況を確認する構成に寄せることが推奨されている。
+              </p>
+            </div>
+          </section>
+
+          <section className={`${styles.chapter} chapter`} id="ch10">
+            <div className={styles.chapterHead}>
+              <span className={styles.chapterNum}>10</span>
+              <h2>モデル選定フローとコスト管理</h2>
+            </div>
+
+            <h3>10.1 モデル選定フロー</h3>
+            <div className={styles.diagramFrame}>
+              <div className={styles.mermaid} id="diagram-7">
+                <MermaidDiagram chart={DIAGRAMS.diagram7} />
+              </div>
+              <div className={styles.diagramCaption}>図7: タスク特性に応じたモデル選定の決定木</div>
+            </div>
+
+            <h3>10.2 コスト管理の考え方</h3>
+            <p>
+              Fable 5は入力$10/出力$50(100万トークンあたり)と、Opus 4.8の2倍程度の単価である。すべてのターンをFable 5で処理するのは、想定外に高額な請求につながる最も簡単な方法だとよく指摘される。実務では以下の分散が有効である。
+            </p>
+
+            <div className={styles.tableWrap}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>役割</th>
+                    <th>推奨モデル</th>
+                    <th>理由</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>計画・アーキテクチャ判断・最終レビュー</td>
+                    <td>Fable 5</td>
+                    <td>曖昧さの処理・長時間の一貫性・自己検証能力が活きる領域</td>
+                  </tr>
+                  <tr>
+                    <td>通常の実装作業</td>
+                    <td>Sonnet 5 / Opus 4.8</td>
+                    <td>コストと性能のバランスが良い</td>
+                  </tr>
+                  <tr>
+                    <td>コード検索・棚卸し・単純な反復作業</td>
+                    <td>Haiku 4.5</td>
+                    <td>低コストで十分な精度が出る</td>
+                  </tr>
+                  <tr>
+                    <td>コードレビュー・診断(最終判断)</td>
+                    <td>Fable 5(高effort)</td>
+                    <td>「安全に出荷できるか」という判断そのものが強みを発揮する領域</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              またサブエージェントを増やすとトークン消費は単純に掛け算で増えるため、チームは小さく保ち、起動プロンプトは焦点を絞り、役目を終えたサブエージェントは早めに終了させることが推奨されている。大規模タスクの前には <code className={styles.inlineCode}>/model</code> で現在のモデルを確認し、定型作業は小さいモデルに任せる判断を習慣化すると良い。
             </p>
           </section>
         </div>
