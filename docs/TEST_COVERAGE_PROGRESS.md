@@ -11,8 +11,8 @@
 | 最終スキャン日 | 2026-07-05 |
 | フロントエンドテストランナー | Vitest 4.1 (jsdom 29 + @testing-library/react 16) |
 | バックエンドテストランナー | pytest 9.0 (unittest 互換) |
-| web-next テストファイル数 | 63 |
-| web-next テストケース数 | 761 |
+| web-next テストファイル数 | 67 |
+| web-next テストケース数 | 774 |
 | scraper テストファイル数 | 5 |
 | scraper テストケース数 | 38 |
 | 総合カバレッジスコア (weighted) | 44.2% |
