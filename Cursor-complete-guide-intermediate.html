@@ -6581,7 +6581,7 @@ agent --sandbox enabled        # または disabled
           lineColor: '#5677c9',
           secondaryColor: '#0d1c30',
           tertiaryColor: '#0d1c30',
-          fontSize: '14px',
+          fontSize: '13px',
           edgeLabelBackground: '#0b1a2c',
           clusterBkg: '#0d1c30',
           clusterBorder: '#243554',
@@ -6592,6 +6592,8 @@ agent --sandbox enabled        # または disabled
           signalColor: '#a9b6c9',
           signalTextColor: '#e7edf6',
         },
+        flowchart: { useMaxWidth: true, htmlLabels: false },
+        sequence: { useMaxWidth: true, mirrorActors: true },
       });
 
       // Inject diagram source via textContent only (never innerHTML) before rendering.
