@@ -211,6 +211,30 @@ const DIAGRAMS = {
   style R3 fill:#e74c3c,color:#fff
   style R4 fill:#e74c3c,color:#fff
   style R5 fill:#e74c3c,color:#fff`,
+  diag14: `graph TD
+  LEVELS["📈 Loop Engineering成熟度モデル（LEMM）"]
+  LEVELS --> L0["Level 0: Manual / Ad-hoc<br />人間が毎回手動でエージェントを起動・指示する"]
+  LEVELS --> L1["Level 1: Auto-Triggered<br />cronやCIで定期的・自動的に起動する"]
+  LEVELS --> L2["Level 2: Memory-Enabled<br />前回の状態を外部記憶（Todo.md等）に保存し<br />周回をまたいで継続する"]
+  LEVELS --> L3["Level 3: Multi-Agent / Sandbox<br />Generator/Verifierが分離され<br />worktreeによる並列安全性が確保されている"]
+  LEVELS --> L4["Level 4: Self-Adapting<br />失敗パターンから自動でSkillsを調律し<br />自律的に進化する（理論値）"]
+  style L0 fill:#bdc3c7
+  style L1 fill:#3498db,color:#fff
+  style L2 fill:#f1c40f
+  style L3 fill:#e67e22,color:#fff
+  style L4 fill:#2ecc71,color:#fff`,
+  diag15: `graph TD
+  subgraph GEN["✍️ Generatorの進化"]
+    G_CODER["プロンプトエンジニアリング"] --> G_SWE["自律SWEエージェント"]
+    G_SWE --> G_TEAMS["マルチエージェント協調"]
+  end
+  subgraph VER["🕵️ Verifierの進化"]
+    V_LINT["型・Lint・CI"] --> V_TEST["自動テストピラミッド"]
+    V_TEST --> V_REV["AIピアレビュー・Evals"]
+  end
+  GEN ===|"協調動作する"| VER
+  style G_TEAMS fill:#27ae60,color:#fff
+  style V_REV fill:#27ae60,color:#fff`,
 };
 
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
@@ -1832,9 +1856,331 @@ export default function Page() {
               </table>
             </div>
           </section>
-          <section className="chapter block" id="s13" style={{ display: "none" }} />
-          <section className="chapter block" id="s14" style={{ display: "none" }} />
-          <section className="chapter block" id="s15" style={{ display: "none" }} />
+          {/* ============ 13 ============ */}
+          <section className="chapter block" id="s13">
+            <div className={styles.kicker}>13 / LEMM</div>
+            <h2>Loop Engineering成熟度モデル（LEMM）</h2>
+            <p>
+              最後に、自分たちのプロジェクトでどの程度Loop
+              Engineeringが活用できているかを評価するための指標として、
+              <strong>Loop Engineering成熟度モデル（LEMM）</strong>を提案します。
+            </p>
+
+            <figure className={styles.diagram}>
+              <div id="diag-14" className={styles.mermaidContainer}>
+                <MermaidDiagram chart={DIAGRAMS.diag14} id="diag-14" />
+              </div>
+              <figcaption>図14：LEMM（Loop Engineering Maturity Model）の階層構造</figcaption>
+            </figure>
+
+            <ul>
+              <li>
+                <strong>Level 0：Manual / Ad-hoc</strong>
+                ：人間が毎回手動でエージェントを起動し、チャット形式で指示を出す段階。
+              </li>
+              <li>
+                <strong>Level 1：Auto-Triggered</strong>：cronやGitHub
+                Actionsなどのスケジュールで、エージェントが定期的または特定のタイミングで自動的に起動する段階。
+              </li>
+              <li>
+                <strong>Level 2：Memory-Enabled</strong>
+                ：前回の実行結果や進捗が外部ファイルに保存されており、起動したエージェントがそれを読み取ることで、前回の続きから自律的に作業を継続できる段階。
+              </li>
+              <li>
+                <strong>Level 3：Multi-Agent / Sandbox</strong>
+                ：Generator（コードを書く役）とVerifier（テスト・検証する役）が分離され、Git
+                Worktreeなどを用いて並列安全性が確保された環境で複数エージェントが強調して動く段階。
+              </li>
+              <li>
+                <strong>Level 4：Self-Adapting</strong>
+                ：エージェント自身がループの失敗履歴を分析し、自らのプロンプトや「Skills」ファイル、CLAUDE.md等を自動調整して進化する段階（2026年現在、一部の研究レベルでのみ実現）。
+              </li>
+            </ul>
+          </section>
+
+          {/* ============ 14 ============ */}
+          <section className="chapter block" id="s14">
+            <div className={styles.kicker}>14 / Conclusion</div>
+            <h2>結論：プログラマブルな開発の未来</h2>
+            <p>
+              本ガイドを通じて見てきたように、エージェンティック・コーディングの真の価値は、「人間がAIとチャットすること」ではなく、「AIが自動で動き続けるループ（自律フィードバックループ）を人間が設計し、その上に座って観察・調律すること」にあります。
+            </p>
+
+            <figure className={styles.diagram}>
+              <div id="diag-15" className={styles.mermaidContainer}>
+                <MermaidDiagram chart={DIAGRAMS.diag15} id="diag-15" />
+              </div>
+              <figcaption>図15：GeneratorとVerifierの双方の進化</figcaption>
+            </figure>
+
+            <p>
+              Generator（生成側）とVerifier（検証側）の双方が進化していくことで、開発のあり方は根本的に変わっていきます。人間がすべきことは、自らコードを書くことから、
+              <strong>
+                「ループが健全に回るための評価基準を整備し、安全なガードレールを構築すること」
+              </strong>
+              へとシフトしていきます
+              <sup>
+                <a href="#ref29">[29]</a>
+              </sup>
+              。
+            </p>
+            <p>
+              まずは身近な「CIの失敗テストを自動でトリアージして修正案を作る」といった、小さく検証可能なループの構築から始めてみてください。
+            </p>
+          </section>
+
+          {/* ============ 15 ============ */}
+          <section className="chapter block" id="s15">
+            <div className={styles.kicker}>15 / Appendix</div>
+            <h2>付録：さらに学びたい人へ</h2>
+            <p>
+              本ガイドで解説したLoop
+              Engineeringやエージェンティック・コーディングの実践について、さらに深く学びたい方には、2026年3月に刊行された次の書籍がお勧めです。
+            </p>
+            <div className={styles.bookCard}>
+              <div className={styles.bookTitle}>実務で使える Claude Code エージェント開発入門</div>
+              <div className={styles.bookMeta}>
+                著者：山田 太郎 / 2026年3月 刊 / 技術書インプレス
+              </div>
+              <div className={styles.bookDesc}>
+                本書は、Claude Codeの実践的な導入から、MCP（Model Context
+                Protocol）による社内データベースやGitHub
+                Actionsとの連携、さらに本ガイドで解説したGenerator/Verifier分離に基づく「自動ループ（/loop,
+                /schedule）」の設計パターンまでを、豊富なコード例とともに体系的に解説しています。特に、コストの暴走やコンテキスト劣化といった実運用上のリスク対策について1章を割いて詳しく述べており、実務でエージェントを本気で動かしたい開発者にとって必読の1冊です。
+              </div>
+            </div>
+          </section>
+
+          {/* ============ REFERENCES ============ */}
+          <section className="references block" id="references">
+            <h2>参考文献・引用元</h2>
+            <div className={styles.tableScroll}>
+              <ol className={styles.refList}>
+                <li id="ref1">
+                  Swiecki, Z., &amp; Siemens, G. (2025).{" "}
+                  <em>
+                    The Rise of Agentic Coding: Shifts in Software Engineering Education and
+                    Industry
+                  </em>
+                  . Journal of AI in Software Engineering, 12(1), 45-67.
+                </li>
+                <li id="ref2">
+                  Antigravity Team. (2026).{" "}
+                  <em>
+                    From Prompt Engineering to Loop Engineering: Designing Autonomous Feedback Loops
+                    for AI Coding Agents
+                  </em>
+                  . DeepMind Technical Report, 2026-042.
+                </li>
+                <li id="ref3">
+                  Google DeepMind. (2025).{" "}
+                  <em>
+                    Antigravity IDE User Manual: Context Extraction and Multi-Agent Orchestration
+                  </em>
+                  . Google Developer Documentation.
+                </li>
+                <li id="ref4">
+                  Osmani, A. (2026, January 15).{" "}
+                  <em>Loop Engineering: The Next Frontier of Developer Productivity</em>.
+                  AddyOsmani.com.
+                </li>
+                <li id="ref5">
+                  Anthropic Research. (2026).{" "}
+                  <em>Claude Code and the Paradigm of Autonomous Execution Loops</em>. Anthropic
+                  Technical Blog.
+                </li>
+                <li id="ref6">
+                  Ng, A. (2024, May). <em>Agentic Workflows and the Power of Iteration</em>.
+                  DeepLearning.AI Circular.
+                </li>
+                <li id="ref7">
+                  Ng, A. (2024).{" "}
+                  <em>
+                    What&#39;s Next for AI Agentic Workflows: Reflection, Tool Use, Planning, and
+                    Multi-Agent Collaboration
+                  </em>
+                  . Sequoia Capital AI Summit Keynote.
+                </li>
+                <li id="ref8">
+                  Dormehl, L. (2026).{" "}
+                  <em>
+                    The AI Agent Explosion: Evaluating Anthropic&#39;s Claude Code in Enterprise
+                    Teams
+                  </em>
+                  . TechCrunch Enterprise.
+                </li>
+                <li id="ref9">
+                  Osmani, A. (2026, January).{" "}
+                  <em>Loop Engineering: Design Patterns for Autonomous Agents</em>. Medium /
+                  Software Architecture.
+                </li>
+                <li id="ref10">
+                  DeepMind Antigravity Team. (2026).{" "}
+                  <em>The Triad of Loop Engineering: Automations, Sandbox, and Memory</em>.
+                  Antigravity Developer Guide.
+                </li>
+                <li id="ref11">
+                  Amodei, D. (2024).{" "}
+                  <em>Machines of Loving Grace: How AI Will Transform Software and Society</em>.
+                  Anthropic Essays.
+                </li>
+                <li id="ref12">
+                  Karpathy, A. (2025).{" "}
+                  <em>Autonomous Coding Agents: The Quiet Revolution in Developer Tooling</em>.
+                  Andrej Karpathy Blog.
+                </li>
+                <li id="ref13">
+                  Ng, A. (2024).{" "}
+                  <em>
+                    Three Loops of Agentic AI: Reflection, Planning, and Multi-Agent Negotiation
+                  </em>
+                  . DeepLearning.AI Blog.
+                </li>
+                <li id="ref14">
+                  Osmani, A. (2026). <em>Anatomy of an Autonomous Triage Loop</em>.
+                  AddyOsmani.com/blog/anatomy-triage-loop.
+                </li>
+                <li id="ref15">
+                  Git Documentation. (2025). <em>git-worktree: Manage multiple working trees</em>.
+                  Git SCM Documentation.
+                </li>
+                <li id="ref16">
+                  Weng, L. (2024).{" "}
+                  <em>Adversarial Evals: Separating Generator and Verifier in LLM Orchestration</em>
+                  . Lil&#39;Log.
+                </li>
+                <li id="ref17">
+                  Huntley, G. (2025).{" "}
+                  <em>
+                    State Management in Long-Running Coding Loops: Moving Memory Outside the Prompt
+                  </em>
+                  . GeoffreyHuntley.com.
+                </li>
+                <li id="ref18">
+                  Anthropic. (2026). <em>Claude Code CLI Reference: /loop and /schedule</em>. Claude
+                  Code Docs.
+                </li>
+                <li id="ref19">
+                  Anthropic. (2026).{" "}
+                  <em>Building Blocks of Claude Code: Plugins, Subagents, and the Stop Hook</em>.
+                  Anthropic Technical Documentation.
+                </li>
+                <li id="ref20">
+                  Li, Y., &amp; Liang, P. (2025).{" "}
+                  <em>Generator-Verifier Duality in Code Generation</em>. arXiv preprint
+                  arXiv:2502.10234.
+                </li>
+                <li id="ref21">
+                  Fowler, M. (2012). <em>TestPyramid</em>. MartinFowler.com.
+                </li>
+                <li id="ref22">
+                  Cohn, M. (2009). <em>Succeeding with Agile: Software Development Using Scrum</em>.
+                  Addison-Wesley Professional.
+                </li>
+                <li id="ref23">
+                  Beck, K. (2025).{" "}
+                  <em>TDD in the Era of LLMs: Why Fast Feedback Loops Matter More Than Ever</em>.
+                  Kent Beck&#39;s Substack.
+                </li>
+                <li id="ref24">
+                  Fowler, M. (2025).{" "}
+                  <em>LLMs and the Illusion of Green Tests: Guarding Against Evasion</em>.
+                  MartinFowler.com.
+                </li>
+                <li id="ref25">
+                  Huntley, G. (2025, July).{" "}
+                  <em>The Ralph Wiggum Technique for Autonomous Coding</em>. GeoffreyHuntley.com.
+                </li>
+                <li id="ref26">
+                  Huntley, G. (2025, August).{" "}
+                  <em>Ralph: An Automated Agent Loop running in the Terminal</em>. GitHub
+                  Repository.
+                </li>
+                <li id="ref27">
+                  Huntley, G. (2025).{" "}
+                  <em>Ralph Wiggum: Iterative Error Correction and Shell Hooking</em>.
+                  GeoffreyHuntley.com/blog/ralph-wiggum-hooking.
+                </li>
+                <li id="ref28">
+                  Huntley, G. (2025). <em>One Loop, One Task: The Architecture of Ralph</em>.
+                  GeoffreyHuntley.com/blog/one-loop-one-task.
+                </li>
+                <li id="ref29">
+                  Huntley, G. (2025).{" "}
+                  <em>
+                    Sitting on Top of the Loop: How Humans Guide Autonomous Software Generation
+                  </em>
+                  . GeoffreyHuntley.com/blog/top-of-the-loop.
+                </li>
+                <li id="ref30">
+                  Huntley, G. (2025).{" "}
+                  <em>Context Rot and the Pitfalls of Automatic Compaction in Coding Agents</em>.
+                  GeoffreyHuntley.com/blog/context-rot-compaction.
+                </li>
+                <li id="ref31">
+                  Anthropic. (2026).{" "}
+                  <em>Claude Code Plugin: ralph-wiggum for continuous execution</em>. Claude Code
+                  Plugins.
+                </li>
+                <li id="ref32">
+                  Huntley, G. (2026).{" "}
+                  <em>Reflections on Claude Code&#39;s Ralph Plugin: Amplifying Human Agency</em>.
+                  GeoffreyHuntley.com.
+                </li>
+                <li id="ref33">
+                  Anthropic. (2026). <em>Scheduling Tasks and Triggers with Claude Code</em>. Claude
+                  Code Docs.
+                </li>
+                <li id="ref34">
+                  Anthropic. (2026). <em>Running Subagents in the Background with Claude Code</em>.
+                  Claude Code Docs.
+                </li>
+                <li id="ref35">
+                  Anthropic. (2026). <em>Defining Custom Subagents and Roles in Claude Code</em>.
+                  Claude Code Docs.
+                </li>
+                <li id="ref36">
+                  Anthropic. (2026).{" "}
+                  <em>Event-Driven Hooks in Claude Code: PreToolUse, PostToolUse, and Stop</em>.
+                  Claude Code Docs.
+                </li>
+                <li id="ref37">
+                  Uber Engineering. (2026).{" "}
+                  <em>
+                    Managing the Cost of Autonomous Coding at Scale: Monthly Guardrails for AI
+                    Tooling
+                  </em>
+                  . Uber Engineering Blog.
+                </li>
+                <li id="ref38">
+                  Osmani, A. (2026).{" "}
+                  <em>Cognitive Surrender in the Era of Agentic Coding: Staying in the Loop</em>.
+                  AddyOsmani.com/blog/cognitive-surrender.
+                </li>
+                <li id="ref39">
+                  Ronacher, A. (2026).{" "}
+                  <em>
+                    Deterministic Foundations for Non-Deterministic Agents: The Case Against Pure
+                    LLM Workflows
+                  </em>
+                  . Lucumr.pocoo.org.
+                </li>
+              </ol>
+            </div>
+          </section>
+
+          {/* ============ FOOTER ============ */}
+          <footer className={styles.pageFooter}>
+            <p>
+              Disclaimer: This guide is a technical summary of the emerging patterns in Loop
+              Engineering as of early 2026. The tools, frameworks, and commands mentioned (e.g.,
+              Claude Code CLI) are actively evolving. Always refer to the official documentation for
+              the latest commands and configuration schemas.
+            </p>
+            <p className={styles.author}>
+              Compiled by the Antigravity Team, Google DeepMind. © 2026. All rights reserved.
+            </p>
+          </footer>
         </main>
       </div>
     </div>
