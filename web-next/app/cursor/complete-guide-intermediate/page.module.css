@@ -1,0 +1,19 @@
+/* page.module.css */
+.tocLinkActive {
+  color: red;
+}
+.pageFooter {
+  text-align: center;
+}
+.codeWrap {
+  background: none;
+}
+.codeBar {
+  background: none;
+}
+.codeBody {
+  background: none;
+}
+.codeLine {
+  background: none;
+}
