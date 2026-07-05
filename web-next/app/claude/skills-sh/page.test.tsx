@@ -87,6 +87,25 @@ describe("/claude/skills-sh - page structure", () => {
   });
 });
 
+describe("/claude/skills-sh - accessibility (WCAG S5256)", () => {
+  it("every <table> has at least one header cell (<th>)", () => {
+    const { container } = render(<Page />);
+    const tables = Array.from(container.querySelectorAll("table"));
+    expect(tables.length).toBeGreaterThan(0);
+    for (const table of tables) {
+      expect(table.querySelectorAll("th").length).toBeGreaterThan(0);
+    }
+  });
+
+  it("key-value tables expose row headers via th[scope=row]", () => {
+    const { container } = render(<Page />);
+    const rowHeaders = Array.from(container.querySelectorAll('th[scope="row"]'));
+    const labels = rowHeaders.map((th) => th.textContent);
+    expect(labels).toContain("できること");
+    expect(labels).toContain("こんな時に使う");
+  });
+});
+
 describe("/claude/skills-sh - registration", () => {
   it("is registered in nav-links.ts under Agent category", () => {
     const agentGroup = navLinks.find((g) => g.name === "Agent");
