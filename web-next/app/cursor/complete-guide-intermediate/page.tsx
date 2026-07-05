@@ -174,6 +174,68 @@ const DIAGRAMS = {
     Setup --> Tools[依存インストールと MCP ツールの実行]
     Tools --> Verification[成果物の生成とテストの実行]
     Verification --> PR[ブランチプッシュと PR 作成]`,
+  d18_bugbot_flow: `flowchart TD
+    PR[Pull Request を作成] --> Trigger{自動実行 か 手動コメントか}
+    Trigger -->|PR更新| AutoRun[自動でBugbotが起動]
+    Trigger -->|cursor review とコメント| ManualRun[手動でBugbotが起動]
+    AutoRun --> Analyze[差分とPRコメントを分析]
+    ManualRun --> Analyze
+    Analyze --> Rules[Team Project 学習 User ルールをマージ]
+    Rules --> Findings[検出結果をコメントとして投稿]
+    Findings --> AutofixCheck{Autofix が有効か}
+    AutofixCheck -->|はい| CloudFix[Cloud Agent が修正を試みる]
+    AutofixCheck -->|いいえ| ManualFix[Fix in Cursor または Fix in Web で人手対応]
+    CloudFix --> Push[新規または既存ブランチへプッシュ]
+    Push --> ReReview[再度Bugbotがレビュー]
+    ManualFix --> ReReview`,
+  d19_model_selection: `flowchart TD
+    NewTask[新しいタスク] --> Routine{日常的な小さな変更か}
+    Routine -->|はい| AutoModel[Auto または Composer 2.5]
+    Routine -->|いいえ| Complex{大規模ファイル 複雑な推論が必要か}
+    Complex -->|はい| PremiumOrSpecific[Premium ルーティング または 特定の高性能モデル]
+    Complex -->|いいえ| StandardModel[標準的なモデルを選択]
+
+    PremiumOrSpecific --> ContextSize{既定の約20万トークンを超える文脈が必要か}
+    ContextSize -->|はい| MaxMode[Max Mode を有効化]
+    ContextSize -->|いいえ| DefaultContext[デフォルトのコンテキストウィンドウで実行]
+
+    AutoModel --> CostCheck[利用状況ダッシュボードで消費を確認]
+    StandardModel --> CostCheck
+    MaxMode --> CostCheck
+    DefaultContext --> CostCheck`,
+  d20_e2e_workflow: `flowchart TD
+    Req[要件が届く] --> Scope{スコープは明確か}
+    Scope -->|不明確 かつ 複雑| Plan[Plan Mode で計画作成 第5章]
+    Scope -->|明確 かつ 小規模| DirectAgent[Agent モードへ直接投入 第4章]
+
+    Plan --> PlanReview{計画は妥当か}
+    PlanReview -->|いいえ| PlanRefine[計画を編集し再生成]
+    PlanRefine --> PlanReview
+    PlanReview -->|はい| Build[Build で実装開始]
+
+    DirectAgent --> Context[Rules Skills MCP at メンションから文脈を構成 第7 8 9 10章]
+    Build --> Context
+
+    Context --> ToolExec[端末 ファイル編集 ブラウザ操作を実行 第13 14章]
+    ToolExec --> HooksGate[Hooks が承認 拒否 監査を行う 第12章]
+
+    HooksGate --> BugFound{実行時にバグが発覚}
+    BugFound -->|はい| Debug[Debug Mode で根本原因を分析 第6章]
+    Debug --> ToolExec
+    BugFound -->|いいえ| DiffCheck[差分をレビュー]
+
+    DiffCheck --> LocalReview[Agent Review でローカルレビュー 第18章]
+    LocalReview --> Commit[コミット PR 作成]
+    Commit --> BugbotReview[Bugbot が PR をレビュー 第18章]
+    BugbotReview --> Merge{レビューを通過したか}
+    Merge -->|いいえ| Autofix[Autofix または手動修正]
+    Autofix --> BugbotReview
+    Merge -->|はい| Merged[マージ完了]
+
+    Merged --> Offload{並列化 長時間化したいか}
+    Offload -->|はい| CloudAgent[Cloud Agent へ委任 第16章]
+    Offload -->|いいえ| End[サイクル完了]
+    CloudAgent --> End`,
 };
 
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
@@ -5433,14 +5495,979 @@ agent --sandbox enabled        # または disabled
           </div>
         </section>
 
-        {/* ==================== Placeholders for Chapters 18-21 ==================== */}
-        {TOC_ITEMS.slice(17).map((item) => (
-          <section key={item.id} className={`${styles.chapter} chapter`} id={item.id}>
-            <div className={styles.chapterEyebrow}>Chapter {item.num}</div>
-            <h2>{item.title}</h2>
-            <p>移行中...</p>
-          </section>
-        ))}
+        {/* ==================== Chapter 18 ==================== */}
+        <section className={`${styles.chapter} chapter`} id="ch18">
+          <div className={styles.chapterEyebrow}>Chapter 18</div>
+          <h2>Bugbot / Agent Review</h2>
+
+          <div className={styles.introCallout}>
+            <span className={styles.icon}>💡</span>
+            <div>
+              この章では、Agent
+              が書いたコードを含むあらゆる変更を、マージ前に自動レビューする2つの仕組み（ローカル完結の
+              Agent Review と、GitHub/GitLab 統合の Bugbot）を扱います。
+            </div>
+          </div>
+
+          <h3>18.1 Agent Review（ローカルのコミット前レビュー）</h3>
+          <p>
+            Agent Review は、Cursor の中でローカルの変更に対して専用 of
+            コードレビューを実行する機能である。
+          </p>
+          <p>
+            <strong>設定</strong>：<code>Cursor Settings &gt; Agents &gt; Agent Review</code>{" "}
+            から、Agent タスクの完了ごとに自動実行するか、手動トリガーのままにするかを選べる。
+          </p>
+          <p>
+            <strong>レビューの起動方法</strong>：
+          </p>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>方法</th>
+                  <th>説明</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>自動</strong>
+                  </td>
+                  <td>設定で有効化すると、コミットのたびに実行される</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>スラッシュコマンド</strong>
+                  </td>
+                  <td>
+                    Agent ウィンドウで <code>/agent-review</code> と入力しオンデマンド実行
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Source Control タブ</strong>
+                  </td>
+                  <td>
+                    ローカルの全変更をメインブランチと比較してレビューする。直近の編集だけでなく変更セット全体の問題を洗い出せる
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            <strong>レビューの深さ</strong>：
+          </p>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>深さ</th>
+                  <th>速度</th>
+                  <th>コスト</th>
+                  <th>向いている場面</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>Quick</strong>
+                  </td>
+                  <td>速い</td>
+                  <td>低い</td>
+                  <td>小さな差分・フォーマット変更・簡易な健全性チェック</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Deep</strong>
+                  </td>
+                  <td>遅い</td>
+                  <td>高い</td>
+                  <td>複雑なロジック・セキュリティ関連コード・大規模リファクタリング</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>18.2 Bugbot（PR統合レビュー）</h3>
+          <p>
+            Bugbot は Pull Request
+            をレビューし、バグ・セキュリティ問題・コード品質の問題を特定する。Teams・個人プランでは、ユーザーごとに一定数の無料
+            PR レビューが含まれ、上限に達したら 14 日間の Bugbot Pro トライアルを開始できる。
+          </p>
+          <p>
+            <strong>動作</strong>：PR の差分を分析し、説明と修正提案付きのコメントを残す。PR
+            更新ごとに自動実行されるほか、PR に <code>cursor review</code> または{" "}
+            <code>bugbot run</code> とコメントして手動トリガーもできる。既存の PR
+            コメント（トップレベル・インライン両方）を文脈として読み込み、重複した提案を避けつつ過去のフィードバックを踏まえたレビューを行う。「Fix
+            in Cursor」「Fix in Web」リンクから即座に修正に着手できる。
+          </p>
+          <p>
+            <strong>セットアップ</strong>：ダッシュボードからリポジトリを接続（GitHub Enterprise
+            Server 含む、GitLab Self-Hosted 含む）し、Bugbot
+            ダッシュボードでリポジトリごとに有効化する。
+          </p>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>1</div>
+            <div className={styles.stepBody}>
+              <h4>
+                <code>BUGBOT.md</code> でプロジェクト固有のレビュー基準を定義する
+              </h4>
+              <p>
+                <code>.cursor/BUGBOT.md</code> を作成する。ルートの <code>.cursor/BUGBOT.md</code>{" "}
+                は常に含まれ、変更されたファイルから上へ辿る過程で見つかった追加のファイルも含まれる。
+              </p>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>ネストされたBUGBOT.md構成例</span>
+                </div>
+                <pre>
+                  <code className="language-plaintext">{`project/
+  .cursor/BUGBOT.md          # 常に含まれる（プロジェクト全体のルール）
+  backend/
+    .cursor/BUGBOT.md        # backend 配下をレビューする際に含まれる
+    api/
+      .cursor/BUGBOT.md      # API 配下のファイルをレビューする際に含まれる
+  frontend/
+    .cursor/BUGBOT.md        # frontend 配下をレビューする際に含まれる`}</code>
+                </pre>
+              </div>
+              <p>
+                ルール適用の優先順位は{" "}
+                <strong>
+                  Team Rules → repository rules（学習済み＋手動）→ プロジェクトの{" "}
+                  <code>BUGBOT.md</code>（ネスト含む）→ User Rules
+                </strong>{" "}
+                の順にマージされる。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>2</div>
+            <div className={styles.stepBody}>
+              <h4>学習ルール（Learned rules）を育てる</h4>
+              <p>
+                Bugbot
+                ダッシュボードで学習を有効化すると、GitHubでのチーム活動から自動的にルールが生成される（過去履歴からの一括生成も可能）。PRに{" "}
+                <code>@cursor remember [fact]</code>{" "}
+                とコメントすることで、その場でルールを教えることもでき、Bugbot
+                はそれを学習ルールとして保存し以後のレビューに適用する。チームの活動データが蓄積されるにつれ、ルールは自動で有効化・無効化されていく。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>3</div>
+            <div className={styles.stepBody}>
+              <h4>手動ルールの例（実務でそのまま使える型）</h4>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>危険な動的実行の検出ルール</span>
+                </div>
+                <pre>
+                  <code className="language-plaintext">{`変更されたファイルに /\\beval\\s*\\(|\\bexec\\s*\\(/i にマッチする文字列パターンが含まれる場合：
+- タイトル「危険な動的実行」でブロッキングBugを追加し、本文に
+  「eval/execの使用が検出されました。安全な代替手段に置き換えるか、
+  詳細なコメントとテストで正当化してください。」と記載
+- PR作成者にBugを割り当てる
+- ラベル「security」を付与する`}</code>
+                </pre>
+              </div>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>バックエンド変更のテスト漏れ検出ルール</span>
+                </div>
+                <pre>
+                  <code className="language-plaintext">{`PRが server/**, api/**, backend/** 配下のファイルを変更しており、
+かつ **/*.test.*, **/__tests__/**, tests/** への変更がない場合：
+- タイトル「バックエンド変更にテストがありません」でブロッキングBugを追加
+- 本文「このPRはバックエンドコードを変更していますが、対応するテストが
+  含まれていません。テストの追加・更新をお願いします。」
+- ラベル「quality」を付与する`}</code>
+                </pre>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>4</div>
+            <div className={styles.stepBody}>
+              <h4>ルールの効果を分析する</h4>
+              <p>Bugbot ダッシュボードのルール分析では、以下の指標を確認できる。</p>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>指標</th>
+                      <th>意味</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>Issues found</strong>
+                      </td>
+                      <td>このルールに関連してBugbotが報告した検出数</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>PRs reviewed</strong>
+                      </td>
+                      <td>それらの検出が現れたPRの数</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Accepted issues</strong>
+                      </td>
+                      <td>チームが受け入れた検出の数</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Acceptance rate</strong>
+                      </td>
+                      <td>検出のうち受け入れられた割合</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>5</div>
+            <div className={styles.stepBody}>
+              <h4>Autofix で検出から修正PRまで自動化する</h4>
+              <p>
+                Bugbot がレビューでバグを検出すると、自動的に Cloud Agent
+                を起動して分析・修正し、既存ブランチまたは新規ブランチへプッシュし、元のPRに結果コメントを投稿できる。利用には
+                Usage-based pricing とストレージの有効化（Legacy Privacy Mode でないこと）が必要。
+              </p>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>個人設定</th>
+                      <th>挙動</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Use Installation Default</td>
+                      <td>組織設定に従う</td>
+                    </tr>
+                    <tr>
+                      <td>Off</td>
+                      <td>Autofix無効。「Fix in Cursor」「Fix in Web」の手動リンクを使う</td>
+                    </tr>
+                    <tr>
+                      <td>Create New Branch（推奨）</td>
+                      <td>新規ブランチへプッシュ</td>
+                    </tr>
+                    <tr>
+                      <td>Commit to Existing Branch</td>
+                      <td>自分のブランチへ直接プッシュ（ループ防止のためPRあたり最大3回まで）</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.figure}>
+            <p className={styles.figureLead}>
+              This diagram shows the Bugbot code review and Autofix process.
+            </p>
+            <div className={styles.figureCanvas}>
+              <MermaidDiagram chart={DIAGRAMS.d18_bugbot_flow} />
+            </div>
+          </div>
+          <div className={styles.figureLegend}>
+            <div className={styles.legendTitle}>各ノードの意味</div>
+            <dl>
+              <div>
+                <dt>Team Project 学習 User ルールをマージ</dt>
+                <dd>第8章のRules優先順位と類似する、Bugbot固有のルール合成ステップ</dd>
+              </div>
+              <div>
+                <dt>Autofix が有効か</dt>
+                <dd>検出されたバグを自動修正させるかどうかの分岐点</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className={`${styles.box} ${styles.glossary}`}>
+            <div className={styles.boxTitle}>📖 用語ノート</div>
+            <dl>
+              <div>
+                <dt>Agent Review</dt>
+                <dd>ローカルの変更に対してCursor内で完結する専用レビュー機能</dd>
+              </div>
+              <div>
+                <dt>Bugbot</dt>
+                <dd>PR/MR単位でGitHub・GitLabと統合されるAIコードレビュー</dd>
+              </div>
+              <div>
+                <dt>Autofix</dt>
+                <dd>Bugbotが検出したバグをCloud Agentで自動修正する機能</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className={styles.sectionRefs}>
+            <div className={styles.boxTitle}>📎 参照URL</div>
+            <ul className={styles.refs}>
+              <li>
+                <span className={styles.refTag}>01</span>
+                <Ext href="https://cursor.com/docs/agent/agent-review">
+                  cursor.com/docs/agent/agent-review
+                </Ext>
+              </li>
+              <li>
+                <span className={styles.refTag}>02</span>
+                <Ext href="https://cursor.com/docs/bugbot">cursor.com/docs/bugbot</Ext>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* ==================== Chapter 19 ==================== */}
+        <section className={`${styles.chapter} chapter`} id="ch19">
+          <div className={styles.chapterEyebrow}>Chapter 19</div>
+          <h2>モデル選定とコスト最適化</h2>
+
+          <div className={styles.introCallout}>
+            <span className={styles.icon}>💡</span>
+            <div>
+              この章では、Cursor
+              の課金体系（2つの利用プール）を理解した上で、タスクの性質に応じてどのモデルを選ぶべきかを扱います。コストを意識した運用は中〜上級者ほど差が出る領域です。
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>1</div>
+            <div className={styles.stepBody}>
+              <h4>2つの利用プールを区別する</h4>
+              <p>
+                個人プランには毎月の請求サイクルでリセットされる、独立した2つの利用プールがある。
+              </p>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>プール</th>
+                      <th>説明</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>Auto + Composer</strong>
+                      </td>
+                      <td>
+                        Auto または Composer 2.5
+                        を選択した場合に適用される、低コストで日常的なエージェンティックコーディング向けのプール
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>API</strong>
+                      </td>
+                      <td>
+                        特定モデルを選択（または Premium
+                        ルーティング）した場合、そのモデルのAPI価格で消費されるプール。個人プランには毎月最低
+                        $20 分のAPI利用枠が含まれる（上位ティアはより多い）
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>両プールの利用状況は、エディタ設定と利用状況ダッシュボードの両方で確認できる。</p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>2</div>
+            <div className={styles.stepBody}>
+              <h4>Auto と Premium ルーティングの違いを理解する</h4>
+              <ul>
+                <li>
+                  <strong>Auto</strong>
+                  ：知性・コスト効率・信頼性のバランスを取ってモデルを自動選択する。日常タスクに有効
+                </li>
+                <li>
+                  <strong>Composer 2.5</strong>：Cursor
+                  自身が学習した、エージェンティックコーディング向けの高性能モデル。Auto と Composer
+                  2.5 は同じプールから消費される
+                </li>
+                <li>
+                  <strong>Premium ルーティング</strong>
+                  ：最も複雑なタスク向けに、内部ベンチマーク・評価・ユーザーフィードバックに基づいて
+                  Cursor が最も高性能なモデルを選択する。課金は選択されたモデルのAPI料金に基づく
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>3</div>
+            <div className={styles.stepBody}>
+              <h4>プランごとの利用量の目安を把握する</h4>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>プラン</th>
+                      <th>月額</th>
+                      <th>含まれるAPI利用枠</th>
+                      <th>Auto + Composer</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>Pro</strong>
+                      </td>
+                      <td>$20/mo</td>
+                      <td>$20</td>
+                      <td>潤沢な含有利用量</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Pro Plus</strong>
+                      </td>
+                      <td>$60/mo</td>
+                      <td>$70</td>
+                      <td>潤沢な含有利用量</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Ultra</strong>
+                      </td>
+                      <td>$200/mo</td>
+                      <td>$400</td>
+                      <td>潤沢な含有利用量</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>利用パターンごとの目安：</p>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>利用パターン</th>
+                      <th>目安コスト</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Tab を毎日使うだけ</td>
+                      <td>常に $20 以内に収まる</td>
+                    </tr>
+                    <tr>
+                      <td>Agent利用が限定的</td>
+                      <td>多くの場合 $20 以内に収まる</td>
+                    </tr>
+                    <tr>
+                      <td>Agent を毎日使う</td>
+                      <td>概ね $60〜$100/mo</td>
+                    </tr>
+                    <tr>
+                      <td>複数Agent・自動化を多用するパワーユーザー</td>
+                      <td>しばしば $200+/mo</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>
+                上限に達した場合は、同じAPI料金でオンデマンド利用を追加するか、上位プランへアップグレードする。リクエストの品質・速度が落とされることはない。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>4</div>
+            <div className={styles.stepBody}>
+              <h4>Team プランの選択肢を理解する</h4>
+              <p>
+                Team プランには <strong>Standard（$40/user/mo）</strong> と{" "}
+                <strong>Premium（$120/user/mo、Agentの利用上限がStandardの5倍）</strong>{" "}
+                の2シート種別がある。集中請求・管理、社内ルール/スキル/プラグイン用のチームマーケットプレイス、Bugbotによるエージェンティックコードレビュー、チーム共有文脈付きのCloud
+                Agents・Automations、利用状況分析、チーム全体のプライバシーモード強制、SAML/OIDC SSO
+                などが含まれる。
+              </p>
+              <div className={`${styles.box} ${styles.warn}`}>
+                <div className={styles.boxTitle}>⚠ 注意</div>
+                <p style={{ marginBottom: 0 }}>
+                  <strong>Cursor Token Rate</strong>：Team プランでは、Auto
+                  以外のエージェントリクエストに対して、モデルのAPI料金に加えて $0.25/1M トークンの
+                  Cursor Token Rate
+                  が上乗せされる（含有利用枠・オンデマンド利用枠・BYOK利用枠のいずれにも適用）。Auto
+                  はこの料金の対象外。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>5</div>
+            <div className={styles.stepBody}>
+              <h4>Max Mode を使うタイミングを見極める</h4>
+              <p>
+                Max Mode
+                はモデルが対応する最大までコンテキストウィンドウを拡張する機能で、大規模ファイルや複雑なプロジェクトにまたがる編集で、より深いコードベース理解と精度向上をもたらす。モデルセレクターでトグルをオンにすると、以降の会話全体に適用されるグローバル設定として維持される（一部モデルは
+                Max Mode専用で選択時に自動有効化される）。
+              </p>
+              <ul>
+                <li>
+                  Max Mode
+                  は既定の約20万トークンより大きなコンテキストウィンドウを持つモデルで最も効果を発揮する
+                </li>
+                <li>
+                  Max Mode
+                  はトークンベースの課金となるため、通常のリクエストより大幅に多くの利用枠を消費しうる
+                </li>
+                <li>
+                  個人プランではモデルのAPI料金で課金、Teamプランの非Autoリクエストは Cursor Token
+                  Rate が加算、レガシーなリクエストベースプランでは20%のサーチャージが加算される
+                </li>
+                <li>
+                  利用量を注意深く管理している場合は、大きなコンテキストウィンドウの恩恵を受けるタスクに限定してMax
+                  Modeを使う
+                </li>
+                <li>
+                  ほとんどのコーディングタスクではデフォルトのコンテキストウィンドウで十分機能する
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className={styles.figure}>
+            <p className={styles.figureLead}>
+              This diagram shows the decision process for model and mode selection.
+            </p>
+            <div className={styles.figureCanvas}>
+              <MermaidDiagram chart={DIAGRAMS.d19_model_selection} />
+            </div>
+          </div>
+          <div className={styles.figureLegend}>
+            <div className={styles.legendTitle}>各ノードの意味</div>
+            <dl>
+              <div>
+                <dt>日常的な小さな変更か</dt>
+                <dd>まずコストの低いAuto/Composerで足りるかを判断する一次分岐</dd>
+              </div>
+              <div>
+                <dt>既定の約20万トークンを超える文脈が必要か</dt>
+                <dd>Max Modeを有効化するかどうかの判断基準</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className={`${styles.box} ${styles.glossary}`}>
+            <div className={styles.boxTitle}>📖 用語ノート</div>
+            <dl>
+              <div>
+                <dt>Auto + Composerプール</dt>
+                <dd>日常タスク向けの低コスト利用枠</dd>
+              </div>
+              <div>
+                <dt>Premiumルーティング</dt>
+                <dd>Cursorが最も高性能なモデルを自動選択する課金方式</dd>
+              </div>
+              <div>
+                <dt>Cursor Token Rate</dt>
+                <dd>Teamプランの非Autoリクエストに上乗せされる追加料金</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className={styles.sectionRefs}>
+            <div className={styles.boxTitle}>📎 参照URL</div>
+            <ul className={styles.refs}>
+              <li>
+                <span className={styles.refTag}>01</span>
+                <Ext href="https://cursor.com/docs/models-and-pricing">
+                  cursor.com/docs/models-and-pricing
+                </Ext>
+              </li>
+              <li>
+                <span className={styles.refTag}>02</span>
+                <Ext href="https://cursor.com/help/ai-features/max-mode">
+                  cursor.com/help/ai-features/max-mode
+                </Ext>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* ==================== Chapter 20 ==================== */}
+        <section className={`${styles.chapter} chapter`} id="ch20">
+          <div className={styles.chapterEyebrow}>Chapter 20</div>
+          <h2>エンドツーエンドのワークフロー統合</h2>
+
+          <div className={styles.introCallout}>
+            <span className={styles.icon}>💡</span>
+            <div>
+              この最終章では、これまで解説してきた個々の機能を、実務の1サイクル（要件確認からPRマージまで）に沿って統合し、中〜上級者が明日から使える「型」として提示します。
+            </div>
+          </div>
+
+          <p>
+            これまでの章で扱った機能は独立して使うこともできるが、実務では組み合わせてこそ真価を発揮する。以下に、機能横断の典型的な開発サイクルを示す。
+          </p>
+
+          <div className={styles.figure}>
+            <p className={styles.figureLead}>
+              This diagram shows the integrated end-to-end development workflow with Cursor.
+            </p>
+            <div className={styles.figureCanvas}>
+              <MermaidDiagram chart={DIAGRAMS.d20_e2e_workflow} />
+            </div>
+          </div>
+          <div className={styles.figureLegend}>
+            <div className={styles.legendTitle}>各ノードの意味</div>
+            <dl>
+              <div>
+                <dt>Rules Skills MCP at メンションから文脈を構成</dt>
+                <dd>
+                  第7〜10章で扱ったコンテキスト管理層が実際にどこで効いてくるかを示す統合ポイント
+                </dd>
+              </div>
+              <div>
+                <dt>Hooks が承認 拒否 監査を行う</dt>
+                <dd>ツール実行の前後にセキュリティ・品質ゲートとして介在する箇所</dd>
+              </div>
+              <div>
+                <dt>Cloud Agent へ委任</dt>
+                <dd>ローカルで完結させず、並列実行や長時間タスクをクラウドに逃がす選択肢</dd>
+              </div>
+            </dl>
+          </div>
+
+          <h3>実務での組み合わせパターン集</h3>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>シナリオ</th>
+                  <th>推奨される機能の組み合わせ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>新機能をゼロから実装する</td>
+                  <td>Plan Mode → Rules（規約遵守）→ Agent → Agent Review → Bugbot</td>
+                </tr>
+                <tr>
+                  <td>既存の複雑なバグを追う</td>
+                  <td>Debug Mode → Hooks（ログ監査）→ Agent Review</td>
+                </tr>
+                <tr>
+                  <td>社内API・DBと連携するタスク</td>
+                  <td>MCP（Slack/DB/GitHub連携）→ Agent → Cloud Agent（長時間処理）</td>
+                </tr>
+                <tr>
+                  <td>複数モデルで難問を解かせたい</td>
+                  <td>
+                    <code>/best-of-n</code> による Worktree 並列比較 → Agent Review
+                  </td>
+                </tr>
+                <tr>
+                  <td>チーム全体の品質基準を統一したい</td>
+                  <td>Team Rules → BUGBOT.md → Bugbot 学習ルール</td>
+                </tr>
+                <tr>
+                  <td>デザインをそのままコードに落としたい</td>
+                  <td>Browser ツール（デザインサイドバー）または画像添付 → Agent</td>
+                </tr>
+                <tr>
+                  <td>反復的な定型作業を自動化したい</td>
+                  <td>
+                    Agent Skills（<code>disable-model-invocation: true</code>{" "}
+                    でスラッシュコマンド化）
+                  </td>
+                </tr>
+                <tr>
+                  <td>リスクの高い操作を安全に許可したい</td>
+                  <td>
+                    Hooks（<code>beforeShellExecution</code> / <code>beforeMCPExecution</code>）+
+                    Sandbox 許可リスト
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>最終チェックリスト（中〜上級者向け）</h3>
+          <ul className="checklist">
+            <li>
+              <code>.cursor/rules</code> は 500
+              行を超えていないか、焦点の絞られた複数ファイルに分割されているか
+            </li>
+            <li>
+              <code>.cursorignore</code> に機密ファイル・巨大な生成物が登録されているか
+            </li>
+            <li>チームの繰り返しの指摘は Rules または BUGBOT.md に昇格されているか</li>
+            <li>反復タスクは Skills 化され、コンテキスト消費が最小限に抑えられているか</li>
+            <li>
+              リスクの高い操作（DB書き込み・本番デプロイなど）に Hooks のゲートが設定されているか
+            </li>
+            <li>Auto-Run のネットワーク許可設定はチームのセキュリティポリシーと一致しているか</li>
+            <li>Max Mode は本当に必要な場面だけで使われているか（コスト最適化）</li>
+            <li>
+              Cloud Agent の環境設定（<code>.cursor/environment.json</code>
+              ）は最新のセットアップ手順を反映しているか
+            </li>
+          </ul>
+
+          <div className={`${styles.box} ${styles.glossary}`}>
+            <div className={styles.boxTitle}>📖 用語ノート</div>
+            <dl>
+              <div>
+                <dt>エンドツーエンドワークフロー</dt>
+                <dd>要件確認から実装・レビュー・マージまでを一気通貫で捉えた開発サイクル</dd>
+              </div>
+            </dl>
+          </div>
+        </section>
+
+        {/* ==================== Chapter 21 ==================== */}
+        <section className={`${styles.chapter} chapter`} id="ch21">
+          <div className={styles.chapterEyebrow}>Chapter 21</div>
+          <h2>参考文献一覧</h2>
+
+          <p>本ガイドの各章で参照した Cursor 公式ドキュメントの URL を、章ごとに再掲する。</p>
+
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>章</th>
+                  <th>URL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1. アーキテクチャ全体像</td>
+                  <td>
+                    <Ext href="https://cursor.com/docs">cursor.com/docs</Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>1. アーキテクチャ全体像</td>
+                  <td>
+                    <Ext href="https://cursor.com/docs/agent/overview">
+                      cursor.com/docs/agent/overview
+                    </Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>2. Tab 補完</td>
+                  <td>
+                    <Ext href="https://cursor.com/help/ai-features/tab">
+                      cursor.com/help/ai-features/tab
+                    </Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>3. インライン編集</td>
+                  <td>
+                    <Ext href="https://cursor.com/help/ai-features/inline-edit">
+                      cursor.com/help/ai-features/inline-edit
+                    </Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>4. Agent モード</td>
+                  <td>
+                    <Ext href="https://cursor.com/help/ai-features/agent">
+                      cursor.com/help/ai-features/agent
+                    </Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>4. Agent モード</td>
+                  <td>
+                    <Ext href="https://cursor.com/docs/agent/prompting">
+                      cursor.com/docs/agent/prompting
+                    </Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>4. Agent モード</td>
+                  <td>
+                    <Ext href="https://cursor.com/blog/agent-best-practices">
+                      cursor.com/blog/agent-best-practices
+                    </Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>5. Plan Mode</td>
+                  <td>
+                    <Ext href="https://cursor.com/docs/agent/plan-mode">
+                      cursor.com/docs/agent/plan-mode
+                    </Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>6. Debug Mode</td>
+                  <td>
+                    <Ext href="https://cursor.com/docs/agent/debug-mode">
+                      cursor.com/docs/agent/debug-mode
+                    </Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>7. コンテキスト管理</td>
+                  <td>
+                    <Ext href="https://cursor.com/help/customization/context">
+                      cursor.com/help/customization/context
+                    </Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>7. コンテキスト管理</td>
+                  <td>
+                    <Ext href="https://cursor.com/help/customization/indexing">
+                      cursor.com/help/customization/indexing
+                    </Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>7. コンテキスト管理</td>
+                  <td>
+                    <Ext href="https://cursor.com/help/customization/ignore-files">
+                      cursor.com/help/customization/ignore-files
+                    </Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>8. Rules</td>
+                  <td>
+                    <Ext href="https://cursor.com/docs/rules">cursor.com/docs/rules</Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>9. MCP</td>
+                  <td>
+                    <Ext href="https://cursor.com/docs/mcp">cursor.com/docs/mcp</Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>10. Agent Skills</td>
+                  <td>
+                    <Ext href="https://cursor.com/docs/skills">cursor.com/docs/skills</Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>11. Subagents</td>
+                  <td>
+                    <Ext href="https://cursor.com/docs/subagents">cursor.com/docs/subagents</Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>12. Hooks</td>
+                  <td>
+                    <Ext href="https://cursor.com/docs/hooks">cursor.com/docs/hooks</Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>13. Terminal & Sandbox</td>
+                  <td>
+                    <Ext href="https://cursor.com/docs/agent/tools/terminal">
+                      cursor.com/docs/agent/tools/terminal
+                    </Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>14. Browser ツール</td>
+                  <td>
+                    <Ext href="https://cursor.com/docs/agent/tools/browser">
+                      cursor.com/docs/agent/tools/browser
+                    </Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>15. Worktrees</td>
+                  <td>
+                    <Ext href="https://cursor.com/docs/configuration/worktrees">
+                      cursor.com/docs/configuration/worktrees
+                    </Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>16. Cloud Agents</td>
+                  <td>
+                    <Ext href="https://cursor.com/docs/cloud-agent">
+                      cursor.com/docs/cloud-agent
+                    </Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>17. Cursor CLI</td>
+                  <td>
+                    <Ext href="https://cursor.com/docs/cli/overview">
+                      cursor.com/docs/cli/overview
+                    </Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>17. Cursor CLI</td>
+                  <td>
+                    <Ext href="https://cursor.com/docs/cli/using">cursor.com/docs/cli/using</Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>18. Agent Review / Bugbot</td>
+                  <td>
+                    <Ext href="https://cursor.com/docs/agent/agent-review">
+                      cursor.com/docs/agent/agent-review
+                    </Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>18. Agent Review / Bugbot</td>
+                  <td>
+                    <Ext href="https://cursor.com/docs/bugbot">cursor.com/docs/bugbot</Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>19. モデル選定とコスト最適化</td>
+                  <td>
+                    <Ext href="https://cursor.com/docs/models-and-pricing">
+                      cursor.com/docs/models-and-pricing
+                    </Ext>
+                  </td>
+                </tr>
+                <tr>
+                  <td>19. モデル選定とコスト最適化</td>
+                  <td>
+                    <Ext href="https://cursor.com/help/ai-features/max-mode">
+                      cursor.com/help/ai-features/max-mode
+                    </Ext>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            <strong>ドキュメント全体の索引</strong>：
+            <Ext href="https://cursor.com/llms.txt">cursor.com/llms.txt</Ext>
+            （Cursor公式が提供するドキュメント全体のサイトマップ。日本語版は各URLの先頭に{" "}
+            <code>/ja/</code> を付与することでアクセス可能）
+          </p>
+        </section>
+
+        <footer className={styles.siteFooter}>
+          <p>
+            本ガイドは執筆時点（2026年7月1日）の Cursor 公式ドキュメントに基づいています。Cursor
+            は頻繁にアップデートされる製品のため、UIのラベルや細部の挙動が変わっている可能性があります。重要な意思決定の前には、上表のURLから最新の公式ドキュメントを直接確認することを推奨します。
+          </p>
+        </footer>
 
         <footer className={styles.pageFooter}>
           <div className={styles.footerContainer}>

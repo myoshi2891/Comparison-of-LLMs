@@ -205,9 +205,7 @@ test("Cursor Intermediate Guide Page Contract Tests", () => {
   expect(
     charts.some(
       (c) =>
-        c?.includes("d18-bugbot-flow") ||
-        c?.includes("d18_bugbot_flow") ||
-        c?.includes("Autofix")
+        c?.includes("d18-bugbot-flow") || c?.includes("d18_bugbot_flow") || c?.includes("Autofix")
     )
   ).toBe(true);
   expect(
@@ -221,9 +219,7 @@ test("Cursor Intermediate Guide Page Contract Tests", () => {
   expect(
     charts.some(
       (c) =>
-        c?.includes("d20-e2e-workflow") ||
-        c?.includes("d20_e2e_workflow") ||
-        c?.includes("Merged")
+        c?.includes("d20-e2e-workflow") || c?.includes("d20_e2e_workflow") || c?.includes("Merged")
     )
   ).toBe(true);
 });
