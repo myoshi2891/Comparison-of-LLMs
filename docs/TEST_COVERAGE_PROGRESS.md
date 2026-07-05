@@ -8,11 +8,11 @@
 
 | 項目 | 値 |
 |---|---|
-| 最終スキャン日 | 2026-06-16 |
+| 最終スキャン日 | 2026-07-05 |
 | フロントエンドテストランナー | Vitest 4.1 (jsdom 29 + @testing-library/react 16) |
 | バックエンドテストランナー | pytest 9.0 (unittest 互換) |
-| web-next テストファイル数 | 62 |
-| web-next テストケース数 | 742 |
+| web-next テストファイル数 | 63 |
+| web-next テストケース数 | 761 |
 | scraper テストファイル数 | 5 |
 | scraper テストケース数 | 38 |
 | 総合カバレッジスコア (weighted) | 44.2% |
@@ -49,9 +49,10 @@
 
 ```
 status: done
-count: 289
+count: 308
 files:
   - app/agent/hermes-agent-advanced-guide/page.test.tsx (8)
+  - app/agent/loop-engineering/page.test.tsx (21)
   - app/agent/openclaw-advanced-agent-security-guide/page.test.tsx (8)
   - app/claude/agent/page.test.tsx (8)
   - app/claude/code-slash-commands/page.test.tsx (5)
@@ -85,7 +86,7 @@ files:
   - app/google/skill-guide/page.test.tsx (8)
   - app/google/skill/page.test.tsx (11)
   - app/vercel/sandbox/page.test.tsx (1)
-note: 全 34 page.tsx ルートが契約テスト付き（タイトル・セクション数・rel 属性）
+note: 全 35 page.tsx ルートが契約テスト付き（タイトル・セクション数・rel 属性）
 ```
 
 ### Unit / components
@@ -536,8 +537,9 @@ note: 同上（JS依存関係の監査ゲート）
 
 | 日付 | 変更内容 | スコア |
 |---|---|---|
+| 2026-07-05 | Loop Engineering 完全ガイドの Next.js 移行に伴う契約テスト追加 (+21) | 44.2% |
 | 2026-06-16 | カバレッジダッシュボードの page.tsx 契約テスト数の不整合を修正し、34 件に同期 | 44.2% |
-| 2026-06-16 | InteractiveChecklist 状態再初期化バグの修正とテスト作成 (+2) | 44.2% |
+| 2026-06-16 | InteractiveChecklist 状態再初期化バグ of の修正とテスト作成 (+2) | 44.2% |
 | 2026-06-14 | InteractiveChecklist 導入に伴う claude/self-hosted-sandboxes テスト強化 (+2) | 44.2% |
 | 2026-06-13 | Google 関連コンポーネントテストの堅牢性向上（try-finally 導入） | 44.2% |
 | 2026-06-12 | Google 関連コンポーネント 8 点の Vitest 追加、Biome フォーマット修正 | 44.2% |
