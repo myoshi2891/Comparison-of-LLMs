@@ -489,7 +489,7 @@
         justify-content: center;
         align-items: center;
         width: 100%;
-        max-width: 800px;
+        max-width: 1100px;
         margin: 0 auto;
         overflow: visible;
       }
@@ -2856,6 +2856,7 @@ model: sonnet
         theme: 'base',
         themeVariables: {
           fontFamily: 'IBM Plex Sans JP, IBM Plex Sans, sans-serif',
+          fontSize: '16px',
           primaryColor: '#EAF6F4',
           primaryBorderColor: '#0B7A75',
           primaryTextColor: '#12202B',
@@ -2863,7 +2864,8 @@ model: sonnet
           secondaryColor: '#FBF0DF',
           tertiaryColor: '#F1EEFB',
         },
-        flowchart: { curve: 'basis', htmlLabels: true },
+        flowchart: { curve: 'basis', htmlLabels: true, nodeSpacing: 60, rankSpacing: 60 },
+        sequence: { mirrorActors: true, useMaxWidth: false, noteMargin: 12 },
         securityLevel: 'loose',
       });
 
