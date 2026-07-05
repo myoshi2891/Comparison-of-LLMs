@@ -68,6 +68,44 @@ const DIAGRAMS = {
     Grow -->|はい| AgentL
     Grow -->|いいえ| Done[適用して完了]
     AgentL --> Done2[Agent が探索し複数ファイルを編集]`,
+  d04_agent_mode_decision: `flowchart TD
+    Task[新しいタスク] --> Known{見慣れた小規模な変更か}
+    Known -->|はい| DirectAgent[Agent モードへ直接投入]
+    Known -->|いいえ かつ 複雑| PlanMode[Plan Mode で計画を作成]
+    Known -->|原因不明のバグ| DebugMode[Debug Mode で仮説検証]
+
+    PlanMode --> Review1{計画は妥当か}
+    Review1 -->|はい| Build[計画を Build 実装開始]
+    Review1 -->|いいえ| Refine[計画を編集し再生成]
+    Refine --> Review1
+
+    DirectAgent --> Diff[差分ビューでレビュー]
+    Build --> Diff
+    DebugMode --> Diff
+
+    Diff --> Match{意図と一致するか}
+    Match -->|はい| Merge[変更を確定]
+    Match -->|いいえ かつ Planから来た| Refine
+    Match -->|いいえ かつ 直接投入だった| PlanMode`,
+  d05_plan_mode_flow: `flowchart TD
+    Trigger[Shift Tab または自動提案] --> Ask[確認質問で要件を明確化]
+    Ask --> Research[コードベースを調査]
+    Research --> Draft[実装計画を Markdown で生成]
+    Draft --> Edit[ユーザーがチャットまたはファイルで編集]
+    Edit --> Save{Save to workspace を押したか}
+    Save -->|はい| WorkspacePlan[.cursor slash plans に保存]
+    Save -->|いいえ| HomePlan[ホームディレクトリに保存]
+    WorkspacePlan --> Build[Build で実装開始]
+    HomePlan --> Build`,
+  d06_debug_mode_flow: `flowchart TD
+    S1[1 探索と仮説立案] --> S2[2 ログ計装の挿入]
+    S2 --> S3[3 バグの再現をユーザーに依頼]
+    S3 --> S4[4 収集したログの分析]
+    S4 --> S5[5 的を絞った修正]
+    S5 --> S6[6 検証と計装 of 除去]
+    S6 --> Done{再現手順で修正確認できたか}
+    Done -->|いいえ| S3
+    Done -->|はい| Finish[計装を全削除して完了]`,
 };
 
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
@@ -582,8 +620,552 @@ export default function Page() {
           </div>
         </section>
 
-        {/* ==================== Placeholders for Chapters 4-21 ==================== */}
-        {TOC_ITEMS.slice(3).map((item) => (
+        {/* ==================== Chapter 4 ==================== */}
+        <section className={`${styles.chapter} chapter`} id="ch4">
+          <div className={styles.chapterEyebrow}>Chapter 04</div>
+          <h2>Agent モード</h2>
+
+          <div className={styles.introCallout}>
+            <span className={styles.icon}>💡</span>
+            <div>
+              この章では、Cursor の中核機能である Agent（およびその兄弟モードである Ask / Plan /
+              Debug）の使い分けと、実務で効果が実証されているプロンプト設計・並列実行のプラクティスを扱います。
+            </div>
+          </div>
+
+          <p>
+            Agent
+            はコードベースを探索し、複数ファイルを編集し、端末コマンドを実行し、エラーを自律的に修正するアシスタントである。ゼロからの機能構築、既存コードのリファクタリング、バグ修正、テスト作成、シェルコマンド実行までを一貫して任せられる。
+          </p>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>1</div>
+            <div className={styles.stepBody}>
+              <h4>4つのモードを正しく使い分ける</h4>
+              <p>
+                Cursor のチャット入力は「Agent」「Ask」「Plan」「Debug」の4モードを持ち、
+                <code>Shift+Tab</code> またはモードピッカーで切り替える。
+                <strong>モードを切り替えると新しいコンテキストウィンドウで開始される</strong>
+                ため、タスクが変わったら新しいチャットを始めるのが安全である。
+              </p>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>モード</th>
+                      <th>用途</th>
+                      <th>向いているタスク</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>Agent</strong>
+                      </td>
+                      <td>ほとんどのタスクのデフォルト</td>
+                      <td>機能実装・リファクタリング・バグ修正・テスト作成</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Ask</strong>
+                      </td>
+                      <td>変更を加えずに回答だけ得る</td>
+                      <td>コードの理解・設計に関する質問</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Plan</strong>
+                      </td>
+                      <td>実装前にレビュー可能な計画を作る</td>
+                      <td>複数ファイルにまたがる機能・要件が曖昧なタスク</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Debug</strong>
+                      </td>
+                      <td>再現しにくい／原因不明のバグを扱う</td>
+                      <td>競合状態・パフォーマンス劣化・原因不明の回帰</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>Project Rules・User Rules・Team Rules はすべてのモードで適用される。</p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>2</div>
+            <div className={styles.stepBody}>
+              <h4>タスクを投げて差分をレビューする</h4>
+              <ol>
+                <li>
+                  平易な言葉でタスクを記述する（例：「ホームページにメール・パスワード欄付きのログインフォームを追加して」）
+                </li>
+                <li>
+                  <code>Enter</code> を押す。Agent
+                  がコードベースを探索し、どのファイルを読み変更するかを自律的に判断する
+                </li>
+                <li>編集はリアルタイムで差分ビューに反映される。実行中でも確認できる</li>
+                <li>
+                  意図と違う方向に進み始めたら <strong>Stop ボタン</strong>
+                  で即座に止め、指示を修正して再開できる
+                </li>
+                <li>差分をレビューし、不要な変更は個別に却下できる</li>
+              </ol>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>3</div>
+            <div className={styles.stepBody}>
+              <h4>@メンションで文脈を絞り込む（詳細は第7章）</h4>
+              <p>
+                どのファイルが関係するか分かっている場合は <code>@ファイル名</code>{" "}
+                で明示的に渡すと探索コストを削減できる。不明な場合は指定せず Agent
+                自身の検索に任せる方が良い結果になることが多い。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>4</div>
+            <div className={styles.stepBody}>
+              <h4>（上級）Agent のベストプラクティスを実務に落とし込む</h4>
+              <p>
+                Cursor 公式ブログ「Best practices for coding with
+                agents」で紹介されている実践知は、中〜上級者が特に押さえておくべき内容である。
+              </p>
+              <ul>
+                <li>
+                  <strong>すべてのタスクに詳細な計画が必要なわけではない</strong>
+                  ：見慣れた小さな変更は Plan を経由せず直接 Agent
+                  に投げてよい。計画が有効なのは、複数の妥当なアプローチが存在する複雑な機能や、着手前に承認を得たい設計判断がある場合。
+                </li>
+                <li>
+                  <strong>意図と違う実装になった場合、追加のプロンプトで直そうとしない</strong>
+                  ：Plan に戻り、変更を revert
+                  して計画をより具体的に書き直し、再実行する方が最終的に速く、結果もクリーンになりやすい。
+                </li>
+                <li>
+                  <strong>アーキテクチャ図の生成をレビューの一部に組み込む</strong>：「OAuth
+                  プロバイダ・セッション管理・トークン更新を含む認証システムのデータフローを示す
+                  Mermaid
+                  図を作成して」のようなプロンプトで、実装前後にドキュメント用の図を生成させると、実装の妥当性をレビューしやすくなる。
+                </li>
+                <li>
+                  <strong>複数モデルによる並列試行（best-of-n）で難しい問題の精度を上げる</strong>
+                  ：同じ問題を複数モデルに解かせ、最良の結果を選ぶアプローチは、特に難易度の高いタスクで有効性が確認されている（第15章の{" "}
+                  <code>/best-of-n</code> も参照）。
+                </li>
+                <li>
+                  <strong>画像をそのまま文脈として使う</strong>
+                  ：デザインモックアップのスクリーンショットを貼り付け、「このレイアウト・色・余白を再現して」と指示できる。Figma
+                  MCP サーバーとの併用も可能（第9章）。
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className={styles.figure}>
+            <p className={styles.figureLead}>
+              この図は、モード選択からタスク完了までの意思決定フローを表しています。
+            </p>
+            <div className={styles.figureCanvas}>
+              <MermaidDiagram chart={DIAGRAMS.d04_agent_mode_decision} />
+            </div>
+          </div>
+          <div className={styles.figureLegend}>
+            <div className={styles.legendTitle}>各ノードの意味</div>
+            <dl>
+              <div>
+                <dt>見慣れた小規模な変更か</dt>
+                <dd>まずタスクの複雑さで最初の入口を分岐する判断点</dd>
+              </div>
+              <div>
+                <dt>意図と一致するか</dt>
+                <dd>
+                  差分レビュー後の合否判定。不一致の場合、直接投入だったタスクは Plan Mode
+                  に戻すのが公式推奨のリカバリー経路
+                </dd>
+              </div>
+            </dl>
+          </div>
+
+          <h3>ベストプラクティス早見表</h3>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>状況</th>
+                  <th>推奨アクション</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>何を実装すべきか自体が曖昧</td>
+                  <td>Plan Mode で要件を先に固める</td>
+                </tr>
+                <tr>
+                  <td>再現できるが原因が分からないバグ</td>
+                  <td>Debug Mode でログ計装から始める</td>
+                </tr>
+                <tr>
+                  <td>コードの意味を知りたいだけ</td>
+                  <td>Ask モードで変更を防ぐ</td>
+                </tr>
+                <tr>
+                  <td>Agent の実装が意図とずれた</td>
+                  <td>追加プロンプトで粘らず Plan に戻って再実行</td>
+                </tr>
+                <tr>
+                  <td>大規模で影響範囲の予測が難しい変更</td>
+                  <td>事前にアーキテクチャ図を生成しレビュー材料にする</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={`${styles.box} ${styles.glossary}`}>
+            <div className={styles.boxTitle}>📖 用語ノート</div>
+            <dl>
+              <div>
+                <dt>差分ビュー（diff view）</dt>
+                <dd>Agent が加えた変更を追加・削除行として可視化する画面</dd>
+              </div>
+              <div>
+                <dt>best-of-n</dt>
+                <dd>同一タスクを複数モデルに並列実行させ、最良の結果を採用する手法</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className={styles.sectionRefs}>
+            <div className={styles.boxTitle}>📎 参照URL</div>
+            <ul className={styles.refs}>
+              <li>
+                <span className={styles.refTag}>01</span>
+                <Ext href="https://cursor.com/help/ai-features/agent">
+                  cursor.com/help/ai-features/agent
+                </Ext>
+              </li>
+              <li>
+                <span className={styles.refTag}>02</span>
+                <Ext href="https://cursor.com/docs/agent/overview">
+                  cursor.com/docs/agent/overview
+                </Ext>
+              </li>
+              <li>
+                <span className={styles.refTag}>03</span>
+                <Ext href="https://cursor.com/docs/agent/prompting">
+                  cursor.com/docs/agent/prompting
+                </Ext>
+              </li>
+              <li>
+                <span className={styles.refTag}>04</span>
+                <Ext href="https://cursor.com/blog/agent-best-practices">
+                  cursor.com/blog/agent-best-practices
+                </Ext>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* ==================== Chapter 5 ==================== */}
+        <section className={`${styles.chapter} chapter`} id="ch5">
+          <div className={styles.chapterEyebrow}>Chapter 05</div>
+          <h2>Plan Mode（実装前設計）</h2>
+
+          <div className={styles.introCallout}>
+            <span className={styles.icon}>💡</span>
+            <div>
+              この章では、複雑な機能実装の前段階として計画を作らせる Plan Mode
+              の内部フローと、チームでの再利用方法を扱います。
+            </div>
+          </div>
+
+          <p>
+            Plan Mode はコードを書く前に、Agent
+            がコードベースを調査し、確認質問を投げかけ、レビュー可能な実装計画を生成するモードである。
+            <code>Shift+Tab</code> で切り替えるほか、複雑なタスクを示すキーワードを入力すると Cursor
+            側が自動的に提案することもある。
+          </p>
+
+          <div className={styles.figure}>
+            <p className={styles.figureLead}>
+              この図は、Plan Mode が起動してから実装（Build）に至るまでの内部フローを表しています。
+            </p>
+            <div className={styles.figureCanvas}>
+              <MermaidDiagram chart={DIAGRAMS.d05_plan_mode_flow} />
+            </div>
+          </div>
+          <div className={styles.figureLegend}>
+            <div className={styles.legendTitle}>各ノードの意味</div>
+            <dl>
+              <div>
+                <dt>確認質問で要件を明確化</dt>
+                <dd>Agent が実装前に曖昧な仕様を質問形式で確認するステップ</dd>
+              </div>
+              <div>
+                <dt>Save to workspace</dt>
+                <dd>
+                  チームでの再利用・ドキュメント化のためにプロジェクト内へ計画を保存するボタン
+                </dd>
+              </div>
+            </dl>
+          </div>
+
+          <h3>ステップバイステップ</h3>
+          <div className={styles.step}>
+            <div className={styles.stepNum}>1</div>
+            <div className={styles.stepBody}>
+              <p>
+                <code>Shift+Tab</code> で Plan Mode
+                に切り替える（または複雑なタスクを入力すると自動提案される）
+              </p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNum}>2</div>
+            <div className={styles.stepBody}>
+              <p>Agent からの確認質問に答える</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNum}>3</div>
+            <div className={styles.stepBody}>
+              <p>Agent がコードベースを調査し、包括的な実装計画を作成する</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNum}>4</div>
+            <div className={styles.stepBody}>
+              <p>
+                計画は Markdown
+                ファイルとして開かれるため、チャット上またはファイルを直接編集して不要なステップの削除・アプローチの調整・見落とされた文脈の追加を行う
+              </p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNum}>5</div>
+            <div className={styles.stepBody}>
+              <p>
+                <strong>
+                  「Save to workspace」を押すと <code>.cursor/plans/</code> に保存される
+                </strong>
+                。これによりチームのドキュメントとして残り、中断した作業の再開や、後続の Agent
+                への文脈提供に使える
+              </p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNum}>6</div>
+            <div className={styles.stepBody}>
+              <p>準備ができたら Build をクリックして実装を開始する</p>
+            </div>
+          </div>
+
+          <h3>Plan Mode を使うべき場面</h3>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>使うべき場面</th>
+                  <th>使わなくてよい場面</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>妥当なアプローチが複数存在する複雑な機能</td>
+                  <td>何度も経験した小さな変更</td>
+                </tr>
+                <tr>
+                  <td>多数のファイル・システムにまたがるタスク</td>
+                  <td>変更範囲が最初から明確なタスク</td>
+                </tr>
+                <tr>
+                  <td>要件が不明確でスコープを事前に把握したい</td>
+                  <td>クイックな修正・タイポ修正</td>
+                </tr>
+                <tr>
+                  <td>アーキテクチャ上の意思決定を事前レビューしたい</td>
+                  <td>—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>計画からやり直す（Starting over from a plan）</h3>
+          <p>
+            Agent
+            が意図と異なるものを作ってしまった場合、追加の指示で修正を試みるのではなく、計画に立ち返るのが公式に推奨されるリカバリー手順である。
+          </p>
+          <ol>
+            <li>変更を revert する</li>
+            <li>計画をより具体的に、必要な内容を明記して修正する</li>
+            <li>再度実行する</li>
+          </ol>
+          <div className={`${styles.box} ${styles.tip}`}>
+            <div className={styles.boxTitle}>✓ Best Practice</div>
+            <p style={{ marginBottom: 0 }}>
+              この手順は、実行中の Agent
+              を場当たり的に修正するより高速で、結果もクリーンになりやすい。大規模な変更ほど、精密でスコープの明確な計画作りに時間をかける価値がある。「どんな変更をすべきか」を決める部分こそが難所であり、適切な指示さえあれば実装自体は
+              Agent に委任できる。
+            </p>
+          </div>
+
+          <div className={`${styles.box} ${styles.glossary}`}>
+            <div className={styles.boxTitle}>📖 用語ノート</div>
+            <dl>
+              <div>
+                <dt>Plan Mode</dt>
+                <dd>実装前に Agent が計画を作成し、レビュー・編集を経てから Build に進むモード</dd>
+              </div>
+              <div>
+                <dt>Save to workspace</dt>
+                <dd>
+                  生成された計画をプロジェクトの <code>.cursor/plans/</code> に永続化する操作
+                </dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className={styles.sectionRefs}>
+            <div className={styles.boxTitle}>📎 参照URL</div>
+            <ul className={styles.refs}>
+              <li>
+                <span className={styles.refTag}>01</span>
+                <Ext href="https://cursor.com/docs/agent/plan-mode">
+                  cursor.com/docs/agent/plan-mode
+                </Ext>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* ==================== Chapter 6 ==================== */}
+        <section className={`${styles.chapter} chapter`} id="ch6">
+          <div className={styles.chapterEyebrow}>Chapter 06</div>
+          <h2>Debug Mode（根本原因分析）</h2>
+
+          <div className={styles.introCallout}>
+            <span className={styles.icon}>💡</span>
+            <div>
+              この章では、通常の Agent
+              対話では解決しにくい「再現できるが原因が分からないバグ」に特化した Debug Mode
+              を扱います。
+            </div>
+          </div>
+
+          <p>
+            Debug Mode
+            は、いきなりコードを書くのではなく、仮説を立て、ログ計装を挿入し、実行時の情報を基に問題箇所を特定してから的を絞った修正を行うモードである。競合状態やタイミング依存の問題、パフォーマンス劣化・メモリリーク、過去に動いていたものが壊れた回帰バグに強い。
+          </p>
+
+          <div className={styles.figure}>
+            <p className={styles.figureLead}>
+              この図は、Debug Mode が根本原因を特定するまでの6ステップを表しています。
+            </p>
+            <div className={styles.figureCanvas}>
+              <MermaidDiagram chart={DIAGRAMS.d06_debug_mode_flow} />
+            </div>
+          </div>
+          <div className={styles.figureLegend}>
+            <div className={styles.legendTitle}>各ノードの意味</div>
+            <dl>
+              <div>
+                <dt>1 探索と仮説立案</dt>
+                <dd>関連ファイルを調べ、根本原因についての複数の仮説を立てるステップ</dd>
+              </div>
+              <div>
+                <dt>2 ログ計装の挿入</dt>
+                <dd>
+                  Cursor
+                  拡張機能内で動くローカルのデバッグサーバーへデータを送るログ文を追加するステップ
+                </dd>
+              </div>
+              <div>
+                <dt>3 バグの再現をユーザーに依頼</dt>
+                <dd>
+                  Agent
+                  が具体的な再現手順を提示し、実際の実行時挙動を捕捉するためユーザーの操作を求めるステップ
+                </dd>
+              </div>
+              <div>
+                <dt>6 検証と計装の除去</dt>
+                <dd>修正確認後、挿入したログ計装をすべて取り除くステップ</dd>
+              </div>
+            </dl>
+          </div>
+
+          <h3>Debug Mode を使うべき場面</h3>
+          <ul>
+            <li>再現はできるが、コードを読むだけでは原因が分からないバグ</li>
+            <li>実行順序や非同期処理に依存するタイミング系の不具合</li>
+            <li>実行時のプロファイリングが必要なパフォーマンス問題・メモリリーク</li>
+            <li>「以前は動いていた」機能の回帰調査（何が変わったかを追跡する必要がある場合）</li>
+          </ul>
+
+          <h3>効果を最大化するコツ</h3>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>コツ</th>
+                  <th>理由</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>バグの詳細な文脈を渡す</td>
+                  <td>
+                    エラーメッセージ・スタックトレース・再現手順が具体的なほど、計装の精度が上がる
+                  </td>
+                </tr>
+                <tr>
+                  <td>提示された再現手順を正確に実行する</td>
+                  <td>Agent が実際のランタイム挙動を確実に捕捉できるようにするため</td>
+                </tr>
+                <tr>
+                  <td>必要なら複数回再現する</td>
+                  <td>競合状態のような間欠的な問題の特定に役立つ</td>
+                </tr>
+                <tr>
+                  <td>期待する挙動と実際の挙動を明確に区別して伝える</td>
+                  <td>Agent が「何が正しい状態か」を正確に理解できるようにするため</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={`${styles.box} ${styles.glossary}`}>
+            <div className={styles.boxTitle}>📖 用語ノート</div>
+            <dl>
+              <div>
+                <dt>仮説立案</dt>
+                <dd>原因候補を複数洗い出し、ログで検証していく調査手法</dd>
+              </div>
+              <div>
+                <dt>計装（instrumentation）</dt>
+                <dd>問題箇所を特定するために一時的に挿入するログ出力コード</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className={styles.sectionRefs}>
+            <div className={styles.boxTitle}>📎 参照URL</div>
+            <ul className={styles.refs}>
+              <li>
+                <span className={styles.refTag}>01</span>
+                <Ext href="https://cursor.com/docs/agent/debug-mode">
+                  cursor.com/docs/agent/debug-mode
+                </Ext>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* ==================== Placeholders for Chapters 7-21 ==================== */}
+        {TOC_ITEMS.slice(6).map((item) => (
           <section key={item.id} className={`${styles.chapter} chapter`} id={item.id}>
             <div className={styles.chapterEyebrow}>Chapter {item.num}</div>
             <h2>{item.title}</h2>

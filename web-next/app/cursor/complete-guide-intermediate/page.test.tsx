@@ -115,8 +115,29 @@ test("Cursor Intermediate Guide Page Contract Tests", () => {
   // 8. Mermaid diagrams assertions for Category 2 (Ch 4-6)
   const mermaidBlocks = container.querySelectorAll("[data-testid='mermaid']");
   // Total diagrams implemented so far: d01, d03, d04, d05, d06 (5 diagrams)
-  const charts = Array.from(mermaidBlocks).map(block => block.textContent);
-  expect(charts.some(c => c?.includes("d04-agent-mode-decision") || c?.includes("d04_agent_mode_decision") || c?.includes("DirectAgent"))).toBe(true);
-  expect(charts.some(c => c?.includes("d05-plan-mode-flow") || c?.includes("d05_plan_mode_flow") || c?.includes("WorkspacePlan"))).toBe(true);
-  expect(charts.some(c => c?.includes("d06-debug-mode-flow") || c?.includes("d06_debug_mode_flow") || c?.includes("ログ計装"))).toBe(true);
+  const charts = Array.from(mermaidBlocks).map((block) => block.textContent);
+  expect(
+    charts.some(
+      (c) =>
+        c?.includes("d04-agent-mode-decision") ||
+        c?.includes("d04_agent_mode_decision") ||
+        c?.includes("DirectAgent")
+    )
+  ).toBe(true);
+  expect(
+    charts.some(
+      (c) =>
+        c?.includes("d05-plan-mode-flow") ||
+        c?.includes("d05_plan_mode_flow") ||
+        c?.includes("WorkspacePlan")
+    )
+  ).toBe(true);
+  expect(
+    charts.some(
+      (c) =>
+        c?.includes("d06-debug-mode-flow") ||
+        c?.includes("d06_debug_mode_flow") ||
+        c?.includes("ログ計装")
+    )
+  ).toBe(true);
 });
