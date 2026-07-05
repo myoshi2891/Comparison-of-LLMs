@@ -2,6 +2,7 @@ import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import PageComponent, { metadata as rawMetadata } from "@/app/claude/fable-5-best-practices/page";
+import { navLinks } from "@/components/site/nav-links";
 
 beforeAll(() => {
   global.IntersectionObserver = class {
@@ -71,5 +72,17 @@ describe("/claude/fable-5-best-practices - page structure (Step 1)", () => {
     const footer = container.querySelector("footer");
     expect(footer).not.toBeNull();
     expect(footer?.textContent).toContain("2026年7月4日時点の情報");
+  });
+});
+
+describe("/claude/fable-5-best-practices - registration", () => {
+  it("is registered in nav-links.ts under Claude category", () => {
+    const claudeGroup = navLinks.find(g => g.name === "Claude");
+    expect(claudeGroup).toBeDefined();
+    if (claudeGroup && "children" in claudeGroup) {
+      const link = claudeGroup.children.find(c => c.href === "/claude/fable-5-best-practices");
+      expect(link).toBeDefined();
+      expect(link?.name).toBe("Fable 5 Best Practices");
+    }
   });
 });
