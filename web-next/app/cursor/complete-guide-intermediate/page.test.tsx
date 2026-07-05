@@ -112,9 +112,9 @@ test("Cursor Intermediate Guide Page Contract Tests", () => {
     expect(link.textContent?.trim().replace(/\s+/g, " ")).toBe(expectedTocTexts[idx]);
   });
 
-  // 8. Mermaid diagrams assertions for Category 2, 3, 4 & 5 (Ch 4-17)
+  // 8. Mermaid diagrams assertions for Category 2, 3, 4, 5 & 6 (Ch 4-21)
   const mermaidBlocks = container.querySelectorAll("[data-testid='mermaid']");
-  // Total diagrams implemented so far: d01, d03, d04, d05, d06, d07, d08, d09, d10, d11, d12, d15, d16 (13 diagrams)
+  // Total diagrams implemented so far: d01, d03, d04, d05, d06, d07, d08, d09, d10, d11, d12, d15, d16, d18, d19, d20 (16 diagrams)
   const charts = Array.from(mermaidBlocks).map((block) => block.textContent);
   expect(
     charts.some(
@@ -200,6 +200,30 @@ test("Cursor Intermediate Guide Page Contract Tests", () => {
     charts.some(
       (c) =>
         c?.includes("d16-cloud-handoff") || c?.includes("d16_cloud_handoff") || c?.includes("CLI")
+    )
+  ).toBe(true);
+  expect(
+    charts.some(
+      (c) =>
+        c?.includes("d18-bugbot-flow") ||
+        c?.includes("d18_bugbot_flow") ||
+        c?.includes("Autofix")
+    )
+  ).toBe(true);
+  expect(
+    charts.some(
+      (c) =>
+        c?.includes("d19-model-selection") ||
+        c?.includes("d19_model_selection") ||
+        c?.includes("MaxMode")
+    )
+  ).toBe(true);
+  expect(
+    charts.some(
+      (c) =>
+        c?.includes("d20-e2e-workflow") ||
+        c?.includes("d20_e2e_workflow") ||
+        c?.includes("Merged")
     )
   ).toBe(true);
 });
