@@ -288,6 +288,20 @@
   margin-bottom: 6px;
 }
 
+.quote {
+  background: #f1eefb;
+  border-color: #d9d2f5;
+}
+
+.quote::before {
+  content: '🗣️ 教訓・実例';
+  display: block;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  color: #4b3eae;
+  margin-bottom: 6px;
+}
+
 .tableScroll {
   overflow-x: auto;
   margin: 20px 0;

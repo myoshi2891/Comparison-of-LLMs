@@ -37,6 +37,42 @@ const DIAGRAMS = {
   style B fill:#3498db,color:#fff
   style C fill:#e67e22,color:#fff
   style D fill:#e74c3c,color:#fff`,
+  diag3: `flowchart LR
+  GOAL(["🎯 ゴール／仕様を定義する<br />（人間の仕事）"]) --> LOOP
+  subgraph LOOP["🔁 ループ（自動で回り続ける）"]
+    direction TB
+    DO["実行する"] --> CHECK["結果を確認する"]
+    CHECK --> DECIDE{"合格？"}
+    DECIDE -->|"No：やり直す"| DO
+    DECIDE -->|"Yes：完了"| STOP(["✅ 停止する"])
+  end
+  style GOAL fill:#3498db,color:#fff
+  style STOP fill:#27ae60,color:#fff
+  style DECIDE fill:#f39c12,color:#fff`,
+  diag4: `graph TD
+  subgraph EXT["🌍 外部フィードバックループ（数時間〜数週間）"]
+    direction TB
+    EXT1["友人に見せる・アルファテスター・<br />A/Bテスト・本番投入"]
+  end
+  subgraph DEV["🧑‍💻 開発者フィードバックループ（数分〜数時間）"]
+    direction TB
+    DEV1["人間がプロダクトを確認し<br />エージェントに方向修正を指示する"]
+  end
+  subgraph AGENT["🤖 エージェンティック・コーディングループ（数分単位）"]
+    direction TB
+    AGENT1["仕様書 + 評価基準（evals）を渡す"] --> AGENT2["エージェントがコードを書く"]
+    AGENT2 --> AGENT3["エージェント自身がテストする"]
+    AGENT3 --> AGENT4{"仕様を満たし<br />バグがないか？"}
+    AGENT4 -->|"No"| AGENT2
+    AGENT4 -->|"Yes"| AGENT5["いったん完了として報告"]
+  end
+  AGENT5 --> DEV1
+  DEV1 -->|"仕様を更新して<br />再度エージェントへ"| AGENT1
+  DEV1 --> EXT1
+  EXT1 -->|"データがプロダクトビジョンを<br />更新する"| DEV1
+  style EXT fill:#fef9e7
+  style DEV fill:#ebf5fb
+  style AGENT fill:#eafaf1`,
 };
 
 function _Ext({ href, children }: { href: string; children: React.ReactNode }) {
@@ -341,9 +377,184 @@ export default function Page() {
             </p>
           </section>
 
-          {/* ============ Placeholder sections 3-15 ============ */}
-          <section className="chapter block" id="s3" style={{ display: "none" }} />
-          <section className="chapter block" id="s4" style={{ display: "none" }} />
+          {/* ============ 3 ============ */}
+          <section className="chapter block" id="s3">
+            <div className={styles.kicker}>03 / Definition</div>
+            <h2>Loop Engineeringとは何か（定義）</h2>
+            <p>
+              Addy Osmani氏の定義をそのまま要約すると、Loop Engineeringとは
+              <strong>
+                「あなた自身がエージェントにプロンプトを送る役目をやめ、代わりにその役目を担うシステムを設計すること」
+              </strong>
+              です
+              <sup>
+                <a href="#ref4">[4]</a>
+                <a href="#ref10">[10]</a>
+              </sup>
+              。
+            </p>
+
+            <p>もう少し噛み砕くと：</p>
+            <div className={`${styles.callout} ${styles.quote}`}>
+              <strong>
+                ループ（loop）＝
+                目的（ゴール）を1つ定義し、AIがそれを達成するまで自律的に反復し続ける仕組み
+              </strong>
+            </div>
+
+            <figure className={styles.diagram}>
+              <div id="diag-3" className={styles.mermaidContainer}>
+                <MermaidDiagram chart={DIAGRAMS.diag3} id="diag-3" />
+              </div>
+              <figcaption>図3：ループの最小構造 ―「実行→確認→合否判定→停止」</figcaption>
+            </figure>
+
+            <p>
+              海外の開発者コミュニティでは、この考え方を一言で「
+              <strong>検証（チェック）のないタスクはただの願望にすぎない</strong>
+              」と表現することもあります
+              <sup>
+                <a href="#ref11">[11]</a>
+              </sup>
+              。ループの価値のほぼ半分は「うまく繰り返す設計」にあり、残り半分は「ノーと言える仕組み（検証）」にある、と指摘されています
+              <sup>
+                <a href="#ref12">[12]</a>
+              </sup>
+              。
+            </p>
+
+            <h3>3.1　プロンプトエンジニアリングとの違い</h3>
+            <div className={styles.tableScroll}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>観点</th>
+                    <th>プロンプトエンジニアリング</th>
+                    <th>Loop Engineering</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>人間の役割</td>
+                    <td>毎回プロンプトを打つ実行者</td>
+                    <td>ループを設計するアーキテクト</td>
+                  </tr>
+                  <tr>
+                    <td>繰り返しの主体</td>
+                    <td>人間</td>
+                    <td>システム（自動化）</td>
+                  </tr>
+                  <tr>
+                    <td>対応できる作業時間</td>
+                    <td>人が張り付いている間だけ</td>
+                    <td>24時間365日（人が寝ていても）</td>
+                  </tr>
+                  <tr>
+                    <td>品質保証の方法</td>
+                    <td>人間が目で見て確認</td>
+                    <td>独立した検証ステップ（Verifier）が判定</td>
+                  </tr>
+                  <tr>
+                    <td>典型的な失敗</td>
+                    <td>疲れて雑になる、抜け漏れ</td>
+                    <td>検証が甘いまま暴走し、コストだけ膨らむ</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* ============ 4 ============ */}
+          <section className="chapter block" id="s4">
+            <div className={styles.kicker}>04 / The Three Loops</div>
+            <h2>Andrew Ngの3つの入れ子ループ</h2>
+            <p>
+              Andrew Ng氏は、Loop
+              Engineeringという言葉が指す「1つのループ」だけでなく、それを包み込むもっと大きな2つのループも含めて、
+              <strong>0→1でプロダクトを作るときの3つのループ</strong>として整理しました
+              <sup>
+                <a href="#ref6">[6]</a>
+                <a href="#ref7">[7]</a>
+              </sup>
+              。それぞれ回転速度（サイクルタイム）が異なります。
+            </p>
+
+            <figure className={styles.diagram}>
+              <div id="diag-4" className={styles.mermaidContainer}>
+                <MermaidDiagram chart={DIAGRAMS.diag4} id="diag-4" />
+              </div>
+              <figcaption>図4：3つの入れ子ループ（Andrew Ng, The Batch）</figcaption>
+            </figure>
+
+            <h3>4.1　各ループの詳細</h3>
+            <div className={styles.tableScroll}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>ループ</th>
+                    <th>誰が回すか</th>
+                    <th>周期</th>
+                    <th>何をするか</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>① エージェンティック・コーディングループ</td>
+                    <td>AIエージェント</td>
+                    <td>数分〜数十分ごと</td>
+                    <td>
+                      仕様書と評価データ（evals）をもとに、コードを書く→自分でテストする→仕様を満たすまで繰り返す
+                      <sup>
+                        <a href="#ref6">[6]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>② 開発者フィードバックループ</td>
+                    <td>人間（開発者）</td>
+                    <td>数十分〜数時間</td>
+                    <td>
+                      出来上がったプロダクトを見て、エージェントの向かう方向を調整する。Ng氏はこれを「人間が持つコンテキストの優位性」と表現しています
+                      <sup>
+                        <a href="#ref6">[6]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>③ 外部フィードバックループ</td>
+                    <td>ユーザー・市場</td>
+                    <td>数時間〜数週間</td>
+                    <td>
+                      友人へのヒアリング、アルファテスト、A/Bテスト、本番運用でのフィードバックを集める
+                      <sup>
+                        <a href="#ref6">[6]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              Ng氏が強調しているのは、②の「開発者フィードバックループ」を自動化しきれない理由です。人間がAIの知らない情報（顧客の声、業界の常識、暗黙のセンス）を持っている限り、それをシステムに注入するために人間がループの中に残り続ける必要がある、という論点です
+              <sup>
+                <a href="#ref6">[6]</a>
+              </sup>
+              。俗に「センス（taste）」と呼ばれるこの人間の貢献を、Ng氏は「コンテキストの優位性」と呼び変えることで、AIをどう改善すればよいかの手がかりにできると説明しています。
+            </p>
+
+            <h3>4.2　「Loop Engineering」が指しているのはどのループ？</h3>
+            <p>
+              Boris Cherny氏やPeter Steinberger氏が話題にした「Loop Engineering」は、上記のうち主に
+              <strong>①エージェンティック・コーディングループ</strong>
+              、つまり最も内側の高速なループを自動化する技術を指しています
+              <sup>
+                <a href="#ref10">[10]</a>
+                <a href="#ref13">[13]</a>
+              </sup>
+              。本ガイドの残りの章では、この①のループをどう設計・実装するかに焦点を当てます。
+            </p>
+          </section>
           <section className="chapter block" id="s5" style={{ display: "none" }} />
           <section className="chapter block" id="s6" style={{ display: "none" }} />
           <section className="chapter block" id="s7" style={{ display: "none" }} />
