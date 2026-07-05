@@ -66,6 +66,12 @@ describe("/agent/loop-engineering - page structure", () => {
     expect(container.querySelector("#s6")).not.toBeNull();
   });
 
+  it("renders s7 and s8 sections", () => {
+    const { container } = render(<Page />);
+    expect(container.querySelector("#s7")).not.toBeNull();
+    expect(container.querySelector("#s8")).not.toBeNull();
+  });
+
   it("renders diagrams diag-1 and diag-2", () => {
     const { container } = render(<Page />);
     expect(container.querySelector("#diag-1")).not.toBeNull();
@@ -84,6 +90,12 @@ describe("/agent/loop-engineering - page structure", () => {
     expect(container.querySelector("#diag-6")).not.toBeNull();
   });
 
+  it("renders diagrams diag-7 and diag-8", () => {
+    const { container } = render(<Page />);
+    expect(container.querySelector("#diag-7")).not.toBeNull();
+    expect(container.querySelector("#diag-8")).not.toBeNull();
+  });
+
   it("renders the terminology hierarchy table", () => {
     const { container } = render(<Page />);
     const table = container.querySelector("table");
@@ -95,8 +107,8 @@ describe("/agent/loop-engineering - page structure", () => {
   it("renders comparison and loops tables", () => {
     const { container } = render(<Page />);
     const tables = container.querySelectorAll("table");
-    // We expect at least 5 tables now (table1 in s2, table2 in s3, table3 in s4, table4 in s5, table5 in s6)
-    expect(tables.length).toBeGreaterThanOrEqual(5);
+    // We expect at least 7 tables now (table1 in s2, table2 in s3, table3 in s4, table4 in s5, table5 in s6, table6 in s7, table7 in s8)
+    expect(tables.length).toBeGreaterThanOrEqual(7);
     const content = Array.from(tables)
       .map((t) => t.textContent)
       .join(" ");
@@ -104,6 +116,8 @@ describe("/agent/loop-engineering - page structure", () => {
     expect(content).toContain("エージェンティック・コーディングループ");
     expect(content).toContain("Discovery（発見）");
     expect(content).toContain("Worktrees（作業木）");
+    expect(content).toContain("Verifierの種類");
+    expect(content).toContain("1ループ1タスク");
   });
 });
 
