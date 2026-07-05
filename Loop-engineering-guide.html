@@ -316,6 +316,11 @@
         background: var(--paper-alt);
         color: var(--ink);
       }
+      nav.toc a {
+        word-break: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+      }
       nav.toc a.active {
         background: #e4f3f1;
         color: var(--loop-dark);
@@ -713,7 +718,7 @@
           <h2>Contents</h2>
           <ol>
             <li><a href="#s1">なぜ今「Loop Engineering」なのか</a></li>
-            <li><a href="#s2">用語の系譜：Prompt→Context→Harness→Loop</a></li>
+            <li><a href="#s2">用語の系譜：Prompt<wbr>→Context<wbr>→Harness<wbr>→Loop</a></li>
             <li><a href="#s3">Loop Engineeringとは何か（定義）</a></li>
             <li><a href="#s4">Andrew Ngの3つの入れ子ループ</a></li>
             <li><a href="#s5">ループの解剖学：5つの動き</a></li>
