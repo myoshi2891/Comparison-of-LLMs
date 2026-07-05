@@ -84,13 +84,24 @@ describe("/agent/loop-engineering - page structure", () => {
     expect(container.querySelector("#s12")).not.toBeNull();
   });
 
-  it("renders s13, s14, s15, references, and footer", () => {
+  it("renders s13, s14, s15, references, and footer with correct headings", () => {
     const { container } = render(<Page />);
-    expect(container.querySelector("#s13")).not.toBeNull();
-    expect(container.querySelector("#s14")).not.toBeNull();
-    expect(container.querySelector("#s15")).not.toBeNull();
-    expect(container.querySelector("#references")).not.toBeNull();
-    expect(container.querySelector("footer")).not.toBeNull();
+    const s13 = container.querySelector("#s13");
+    const s14 = container.querySelector("#s14");
+    const s15 = container.querySelector("#s15");
+    const refs = container.querySelector("#references");
+    expect(s13).not.toBeNull();
+    expect(s14).not.toBeNull();
+    expect(s15).not.toBeNull();
+    expect(refs).not.toBeNull();
+
+    expect(s13?.querySelector("h2")?.textContent).toBe("成熟度モデルと健全性チェック");
+    const h3Elements = s13?.querySelectorAll("h3");
+    expect(h3Elements?.[0]?.textContent).toBe("13.1　Loop Engineering成熟度モデル");
+    expect(h3Elements?.[1]?.textContent).toBe("13.2　健全性チェックフロー");
+
+    expect(s14?.querySelector("h2")?.textContent).toBe("まとめ");
+    expect(s15?.querySelector("h2")?.textContent).toBe("参考文献・出典一覧");
   });
 
   it("renders diagrams diag-1 and diag-2", () => {
