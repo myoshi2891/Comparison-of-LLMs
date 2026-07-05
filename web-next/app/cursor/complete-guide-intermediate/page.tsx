@@ -157,6 +157,23 @@ const DIAGRAMS = {
     Terminal --> afterShell[afterShellExecution Hook]
     afterShell --> postToolUse[postToolUse Hook]
     postToolUse --> FinalResult[実行結果と監査ログを合成]`,
+  d15_bestofn_worktree: `flowchart TD
+    Prompt[ユーザーのプロンプト] --> BestOfN[best-of-n 実行]
+    BestOfN --> WorktreeA[Worktree A: Model A]
+    BestOfN --> WorktreeB[Worktree B: Model B]
+    BestOfN --> WorktreeC[Worktree C: Model C]
+    WorktreeA --> Compare[結果の比較]
+    WorktreeB --> Compare
+    WorktreeC --> Compare
+    Compare --> Winner[勝者の選定]
+    Winner --> Apply[apply-worktree でメインへ取り込み]`,
+  d16_cloud_handoff: `flowchart LR
+    Local[ローカルエディタでの指示] --> Handoff[CLI で & 記号を付けて実行]
+    Handoff --> Cloud[Cloud Agent VM 起動]
+    Cloud --> Setup[環境設定 environment.json を読み込み]
+    Setup --> Tools[依存インストールと MCP ツールの実行]
+    Tools --> Verification[成果物の生成とテストの実行]
+    Verification --> PR[ブランチプッシュと PR 作成]`,
 };
 
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
@@ -3963,8 +3980,1461 @@ fi`}</code>
           </div>
         </section>
 
-        {/* ==================== Placeholders for Chapters 13-21 ==================== */}
-        {TOC_ITEMS.slice(12).map((item) => (
+        {/* ==================== Chapter 13 ==================== */}
+        <section className={`${styles.chapter} chapter`} id="ch13">
+          <div className={styles.chapterEyebrow}>Chapter 13</div>
+          <h2>Terminal & Sandbox</h2>
+
+          <div className={styles.introCallout}>
+            <span className={styles.icon}>💡</span>
+            <div>
+              この章では、Agent
+              がローカル環境でシェルコマンドを実行する際の安全機構（サンドボックス）と、その設定方法を扱います。自動実行の範囲をどこまで広げるかは、チームのセキュリティポリシーと直結します。
+            </div>
+          </div>
+
+          <p>
+            Agent はターミナル上で直接シェルコマンドを実行する。macOS・Linux・Windows
+            のいずれでも、デフォルトでは<strong>サンドボックス</strong>
+            という制限環境の中でコマンドが実行され、不正なファイルアクセスやネットワーク活動をブロックしつつ、ワークスペース内に閉じた操作は自動実行される。
+          </p>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>1</div>
+            <div className={styles.stepBody}>
+              <h4>プラットフォーム要件を確認する</h4>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>OS</th>
+                      <th>要件</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>macOS</strong>
+                      </td>
+                      <td>Cursor v2.0 以降であれば追加設定なしで動作する</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Windows</strong>
+                      </td>
+                      <td>
+                        WSL2 のインストールと設定が必須。サンドボックスは WSL2 内で動作し、Linux
+                        と同じ制限が適用される
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Linux</strong>
+                      </td>
+                      <td>
+                        カーネル 6.2 以降＋ Landlock v3 対応（
+                        <code>CONFIG_SECURITY_LANDLOCK=y</code>
+                        ）、非特権ユーザー名前空間の有効化（多くのディストリビューションではデフォルト有効）
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>
+                カーネル要件を満たさない場合、Agent
+                はコマンド実行前に承認を求めるフォールバック動作になる。一部ディストリビューションでは
+                AppArmor がユーザー名前空間を制限しているため、リモート環境や CLI 単体利用では追加の
+                AppArmor プロファイルパッケージのインストールが必要になる場合がある。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>2</div>
+            <div className={styles.stepBody}>
+              <h4>サンドボックスが許可・制限する範囲を理解する</h4>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>アクセス種別</th>
+                      <th>内容</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>ファイルアクセス</strong>
+                      </td>
+                      <td>
+                        ファイルシステム全体は読み取り可能、ワークスペースディレクトリは読み書き可能
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>ネットワークアクセス</strong>
+                      </td>
+                      <td>
+                        デフォルトでブロック（<code>sandbox.json</code> または設定で構成可能）
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>一時ファイル</strong>
+                      </td>
+                      <td>
+                        <code>/tmp/</code> など OS の一時ディレクトリには完全アクセス可能
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>
+                <code>.cursor</code>{" "}
+                設定ディレクトリは許可リストの設定にかかわらず常に保護される。フルシステムアクセスが必要な一部のコマンドはサンドボックスをバイパスし、その場合
+                Agent はサンドボックス外で実行する旨を示した上で承認を求める。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>3</div>
+            <div className={styles.stepBody}>
+              <h4>許可リスト（allowlist）を運用する</h4>
+              <p>サンドボックス化されたコマンドが制限により失敗した場合、以下の3択が提示される。</p>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>選択肢</th>
+                      <th>挙動</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>Skip</strong>
+                      </td>
+                      <td>コマンドをキャンセルし、Agent に別の方法を試させる</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Run</strong>
+                      </td>
+                      <td>サンドボックス制限なしでそのコマンドを一度だけ実行する</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Add to allowlist</strong>
+                      </td>
+                      <td>制限なしで実行し、以降は自動承認する</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>
+                ネットワークアクセスを許可する場合、デフォルトの許可ドメインリストには
+                npm・PyPI・GitHub・Docker・主要言語のツールチェーンなど、一般的な開発ワークフローに必要なドメインが幅広く含まれている（
+                <code>npmjs.com</code>・<code>pypi.org</code>・<code>github.com</code>・
+                <code>docker.io</code>・<code>crates.io</code> など多数）。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>4</div>
+            <div className={styles.stepBody}>
+              <h4>
+                <code>sandbox.json</code> でネットワーク・ファイルシステムを細かく制御する
+              </h4>
+              <p>
+                配置場所は <code>~/.cursor/sandbox.json</code>（ユーザー単位）または{" "}
+                <code>&lt;workspace&gt;/.cursor/sandbox.json</code>
+                （リポジトリ単位）。ネットワークパターンの構文・マージ挙動・保護パスの詳細はリファレンスドキュメントを参照する。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>5</div>
+            <div className={styles.stepBody}>
+              <h4>Linux でのUID再マッピングに注意する（Docker連携時）</h4>
+              <p>
+                Linux 環境では、サンドボックスはユーザー名前空間を作成し、プロセスを名前空間内で UID
+                0（root）として扱う。そのため <code>id -u</code> や <code>$UID</code>{" "}
+                はサンドボックス内では実際のホストユーザーIDではなく <code>0</code>{" "}
+                を返す。ファイル所有権の設定や Docker への <code>--user</code>{" "}
+                引数渡しなど、実ホストユーザーが必要な場面では以下の環境変数を使う。
+              </p>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>変数</th>
+                      <th>説明</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <code>CURSOR_SANDBOX</code>
+                      </td>
+                      <td>
+                        サンドボックス内では <code>"seatbelt"</code>（macOS）または{" "}
+                        <code>"native"</code>（Linux/Windows）
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>CURSOR_ORIG_UID</code> / <code>CURSOR_ORIG_GID</code>
+                      </td>
+                      <td>
+                        サンドボックスによる識別変更前の、Cursor を起動した実ユーザーの UID/GID
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>CURSOR_SANDBOX_LANDLOCK_STATUS</code>
+                      </td>
+                      <td>
+                        有効なサンドボックスバックエンド（<code>fully_enforced</code> または{" "}
+                        <code>bubblewrap</code>）
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>docker実行時のUID解決例</span>
+                </div>
+                <pre>
+                  <code className="language-bash">{`docker run --rm \\
+  --user "\${CURSOR_ORIG_UID:-$(id -u)}:\${CURSOR_ORIG_GID:-$(id -g)}" \\
+  -v "$PWD:/work" -w /work \\
+  my-image build`}</code>
+                </pre>
+              </div>
+              <p>
+                <code>{"$" + "{CURSOR_ORIG_UID:-$(id -u)}"}</code>{" "}
+                というフォールバック構文により、サンドボックス外で実行した場合にも同じコマンドが動作する。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>6</div>
+            <div className={styles.stepBody}>
+              <h4>Auto-Run のモードを理解し、チームで統一する</h4>
+              <p>
+                <code>Settings &gt; Cursor Settings &gt; Agents &gt; Auto-Run</code>{" "}
+                で以下を設定する。
+              </p>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Auto-Run モード</th>
+                      <th>挙動</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>Run in Sandbox</strong>
+                      </td>
+                      <td>
+                        可能な限りサンドボックス内でツール・コマンドを自動実行（macOS/Linux/Windows対応、WSL2経由）
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Ask Every Time</strong>
+                      </td>
+                      <td>すべてのツール・コマンド実行前にユーザー承認が必須</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Run Everything</strong>
+                      </td>
+                      <td>承認なしですべてのツール・コマンドを自動実行</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ネットワークアクセスモード</th>
+                      <th>挙動</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>sandbox.json Only</strong>
+                      </td>
+                      <td>
+                        <code>sandbox.json</code> の許可リストのみに限定。Cursor
+                        のデフォルトは追加しない
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>sandbox.json + Defaults</strong>（デフォルト）
+                      </td>
+                      <td>
+                        自分の許可リスト＋Cursor組み込みのデフォルト（主要パッケージマネージャなど）
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Allow All</strong>
+                      </td>
+                      <td>
+                        <code>sandbox.json</code>{" "}
+                        の内容にかかわらずサンドボックス内の全ネットワークアクセスを許可
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>
+                さらに以下の保護設定を個別にオン/オフできる：<strong>Command Allowlist</strong>
+                （サンドボックス外で自動実行できるコマンド）、<strong>MCP Allowlist</strong>、
+                <strong>Browser Protection</strong>（ブラウザツールの自動実行防止）、
+                <strong>File-Deletion Protection</strong>（ファイル削除の自動実行防止）、
+                <strong>Dotfile Protection</strong>（<code>.gitignore</code>{" "}
+                などドットファイルの自動変更防止）、<strong>External-File Protection</strong>
+                （ワークスペース外のファイル作成・変更防止）。
+              </p>
+              <p>
+                Enterprise プランでは管理者がこれらのエディタ設定をダッシュボードから上書きできる。
+              </p>
+            </div>
+          </div>
+
+          <div className={`${styles.box} ${styles.glossary}`}>
+            <div className={styles.boxTitle}>📖 用語ノート</div>
+            <dl>
+              <div>
+                <dt>サンドボックス（sandbox）</dt>
+                <dd>ファイル・ネットワークアクセスを制限した状態でコマンドを実行する隔離環境</dd>
+              </div>
+              <div>
+                <dt>Landlock</dt>
+                <dd>Linuxカーネルのアクセス制御機構で、サンドボックスの実装基盤の一つ</dd>
+              </div>
+              <div>
+                <dt>ユーザー名前空間</dt>
+                <dd>プロセスのUID/GIDをホストと分離して扱うLinuxカーネルの機能</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className={styles.sectionRefs}>
+            <div className={styles.boxTitle}>📎 参照URL</div>
+            <ul className={styles.refs}>
+              <li>
+                <span className={styles.refTag}>01</span>
+                <Ext href="https://cursor.com/docs/agent/tools/terminal">
+                  cursor.com/docs/agent/tools/terminal
+                </Ext>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* ==================== Chapter 14 ==================== */}
+        <section className={`${styles.chapter} chapter`} id="ch14">
+          <div className={styles.chapterEyebrow}>Chapter 14</div>
+          <h2>Browser ツール</h2>
+
+          <div className={styles.introCallout}>
+            <span className={styles.icon}>💡</span>
+            <div>
+              この章では、Agent
+              がブラウザを直接操作してアプリをテストし、視覚的にレイアウトを編集し、アクセシビリティを監査する
+              Browser ツールを扱います。
+            </div>
+          </div>
+
+          <p>
+            Agent
+            はブラウザを操作して、アプリケーションのテスト・レイアウト/スタイルの視覚的編集・アクセシビリティ監査・デザインからコードへの変換などを行える。コンソールログとネットワークトラフィックへの完全なアクセスにより、問題のデバッグや包括的なテストワークフローの自動化も可能である。追加ツールのインストールや設定なしで利用できる。
+          </p>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>1</div>
+            <div className={styles.stepBody}>
+              <h4>ネイティブ統合の効率化ポイントを理解する</h4>
+              <ul>
+                <li>
+                  <strong>効率的なログ処理</strong>：ブラウザログはファイルに書き出され、Agent
+                  は必要な行だけを <code>grep</code>{" "}
+                  して選択的に読む。毎回の操作後に冗長な出力を要約するのではなく、完全な文脈を保ちながらトークン消費を最小化する
+                </li>
+                <li>
+                  <strong>画像による視覚フィードバック</strong>
+                  ：スクリーンショットはファイル読み取りツールと直接統合されており、Agent
+                  はテキストの説明に頼らず画像として実際のブラウザ状態を「見る」
+                </li>
+                <li>
+                  <strong>開発サーバーの検知</strong>
+                  ：実行中の開発サーバーを検知し、重複起動やポート番号の推測を避け、正しいポートを使う
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>2</div>
+            <div className={styles.stepBody}>
+              <h4>ブラウザの基本操作を把握する</h4>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>機能</th>
+                      <th>説明</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>Navigate</strong>
+                      </td>
+                      <td>URL への移動、リンクのクリック、履歴の前後移動、リロード</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Click</strong>
+                      </td>
+                      <td>
+                        ボタン・リンク・フォーム要素のクリック／ダブルクリック／右クリック／ホバー
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Type</strong>
+                      </td>
+                      <td>フォームへの入力・データ送信・検索ボックスへの入力</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Scroll</strong>
+                      </td>
+                      <td>長いページのスクロール・要素の探索</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Screenshot</strong>
+                      </td>
+                      <td>ページレイアウトの視覚的確認</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Console Output</strong>
+                      </td>
+                      <td>JavaScript エラー・デバッグ出力・ネットワーク警告の監視</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Network Traffic</strong>
+                      </td>
+                      <td>
+                        API 呼び出し・レスポンスステータス・ネットワーク問題の診断（現時点では Agent
+                        パネル限定機能）
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>3</div>
+            <div className={styles.stepBody}>
+              <h4>デザインサイドバーで視覚編集とコードを同期させる</h4>
+              <p>
+                ブラウザにはサイト直接編集用のデザインサイドバーが付属し、リアルタイムの視覚調整とコード編集を同時に行える。
+              </p>
+              <ul>
+                <li>
+                  <strong>位置・レイアウト</strong>：要素の移動・再配置、flex
+                  方向・配置・グリッドレイアウトの変更
+                </li>
+                <li>
+                  <strong>寸法</strong>：幅・高さ・パディング・マージンをピクセル単位で調整
+                </li>
+                <li>
+                  <strong>色</strong>
+                  ：デザインシステムのカラートークンから選択、または新しいグラデーションを追加
+                </li>
+                <li>
+                  <strong>外観</strong>：シャドウ・不透明度・ボーダー半径のビジュアルスライダー調整
+                </li>
+                <li>
+                  <strong>テーマテスト</strong>：ライト/ダークテーマを即座に切り替えて確認
+                </li>
+              </ul>
+              <p>
+                視覚調整が意図通りになったら適用ボタンを押すと、その変更をコードベースへ反映する
+                Agent
+                が起動する。複数要素をまたいで選択しテキストで変更内容を記述することもでき、複数の
+                Agent が並列で起動し、ホットリロード後にページ上へ変更がライブ反映される。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>4</div>
+            <div className={styles.stepBody}>
+              <h4>セッションの永続化を理解する</h4>
+              <p>
+                Cookie・<code>localStorage</code>・IndexedDB
+                のデータは、ワークスペース単位でセッション間を跨いで保持される。ブラウザコンテキストはワークスペースごとに隔離されるため、異なるプロジェクトが
+                Cookie やストレージ状態を共有することはない。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>5</div>
+            <div className={styles.stepBody}>
+              <h4>セキュリティ設定を把握する</h4>
+              <p>
+                ブラウザは MCP サーバーとして拡張機能内で動作するセキュアな Web View
+                として実行される。
+              </p>
+              <ul>
+                <li>
+                  <strong>トークン認証</strong>
+                  ：ブラウザセッションごとにランダムな認証トークンを生成
+                </li>
+                <li>
+                  <strong>タブ分離</strong>：各タブに固有のランダムIDを割り当て、タブ間の干渉を防止
+                </li>
+                <li>
+                  <strong>セッションベースセキュリティ</strong>
+                  ：新規セッションごとにトークンを再生成
+                </li>
+              </ul>
+              <p>ブラウザツールはデフォルトで承認が必要。</p>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>承認モード</th>
+                      <th>挙動</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>Manual approval</strong>（推奨）
+                      </td>
+                      <td>すべてのアクションを個別にレビュー・承認</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Allow-listed actions</strong>
+                      </td>
+                      <td>許可リストに一致するアクションは自動実行、それ以外は承認が必要</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Auto-run</strong>
+                      </td>
+                      <td>すべてのアクションが承認なしで即座に実行（注意して使用）</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className={`${styles.box} ${styles.warn}`}>
+                <div className={styles.boxTitle}>⚠ セキュリティ</div>
+                <p style={{ marginBottom: 0 }}>
+                  <strong>
+                    信頼できないコードや見慣れないサイトでは Auto-run モードを絶対に使わないこと。
+                  </strong>
+                  Agent
+                  が悪意あるスクリプトを実行したり、意図せず機密データを送信したりする可能性がある。
+                </p>
+              </div>
+              <p>
+                Enterprise 向けには、<code>Admin Dashboard &gt; MCP Configuration</code> で{" "}
+                <strong>Browser Origin Allowlist</strong> を設定でき、自動ナビゲーションと MCP
+                ツール実行を許可されたオリジンのみに制限できる。ただし、許可済みオリジンからのリンククリックやリダイレクトによる非許可オリジンへの遷移は成功してしまう点に注意が必要（ベストエフォートの保護であり、完全なナビゲーション経路の遮断ではない）。
+              </p>
+            </div>
+          </div>
+
+          <h3>推奨モデル</h3>
+          <p>Sonnet 4.5・GPT-5・Auto での利用が推奨されている。</p>
+
+          <div className={`${styles.box} ${styles.glossary}`}>
+            <div className={styles.boxTitle}>📖 用語ノート</div>
+            <dl>
+              <div>
+                <dt>デザインサイドバー</dt>
+                <dd>ブラウザ内で視覚編集を行うUIパネル</dd>
+              </div>
+              <div>
+                <dt>セッション永続化</dt>
+                <dd>Cookie・localStorage・IndexedDB がワークスペース単位で保持される仕組み</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className={styles.sectionRefs}>
+            <div className={styles.boxTitle}>📎 参照URL</div>
+            <ul className={styles.refs}>
+              <li>
+                <span className={styles.refTag}>01</span>
+                <Ext href="https://cursor.com/docs/agent/tools/browser">
+                  cursor.com/docs/agent/tools/browser
+                </Ext>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* ==================== Chapter 15 ==================== */}
+        <section className={`${styles.chapter} chapter`} id="ch15">
+          <div className={styles.chapterEyebrow}>Chapter 15</div>
+          <h2>Worktrees（並列実行）</h2>
+
+          <div className={styles.introCallout}>
+            <span className={styles.icon}>💡</span>
+            <div>
+              この章では、Git のワークツリー機能を使って複数の Agent
+              を衝突なく並列実行する方法を扱います。同一リポジトリで複数の実験を同時に走らせたい上級者向けの内容です。
+            </div>
+          </div>
+
+          <p>
+            Worktree は Agent が独立した Git
+            チェックアウトの中で作業できるようにする仕組みである。各タスクは専用のファイル・依存関係・変更セットを持ち、メインのチェックアウトには触れない。同じリポジトリ上で複数の
+            Agent を衝突なく走らせたい場合に使う。
+          </p>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>1</div>
+            <div className={styles.stepBody}>
+              <h4>Agents Window で Worktree を作成する</h4>
+              <p>
+                Agents Window から Agent を起動、または既存の Agent を Worktree
+                へ移動すると、そのタスク専用の独立したチェックアウトが作成される。作業完了後は
+                Agents Window で結果をレビューし、Worktree 内で作業を続ける・コミットや PR
+                を作る・メインワークスペースへ結果を取り込む、のいずれかを選べる。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>2</div>
+            <div className={styles.stepBody}>
+              <h4>
+                <code>.cursor/worktrees.json</code> でセットアップを自動化する
+              </h4>
+              <p>
+                Worktree 作成時、Cursor は以下の順で <code>worktrees.json</code> を探す：①Worktree
+                パス内、②プロジェクトのルートパス内。
+              </p>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>キー</th>
+                      <th>用途</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <code>setup-worktree-unix</code>
+                      </td>
+                      <td>macOS/Linux 用コマンド（Unix系ではこちらが優先）</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>setup-worktree-windows</code>
+                      </td>
+                      <td>Windows 用コマンド（Windowsではこちらが優先）</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>setup-worktree</code>
+                      </td>
+                      <td>全OS共通のフォールバック</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>
+                各キーには<strong>コマンド配列</strong>（順次実行）または
+                <strong>スクリプトファイルへの相対パス</strong>を指定できる。
+              </p>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>Node.js プロジェクト</span>
+                </div>
+                <pre>
+                  <code className="language-json">{`{
+  "setup-worktree": [
+    "npm ci",
+    "cp $ROOT_WORKTREE_PATH/.env .env"
+  ]
+}`}</code>
+                </pre>
+              </div>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>Python プロジェクト（仮想環境）</span>
+                </div>
+                <pre>
+                  <code className="language-json">{`{
+  "setup-worktree": [
+    "python -m venv venv",
+    "source venv/bin/activate && pip install -r requirements.txt",
+    "cp $ROOT_WORKTREE_PATH/.env .env"
+  ]
+}`}</code>
+                </pre>
+              </div>
+              <div className={`${styles.box} ${styles.warn}`}>
+                <div className={styles.boxTitle}>⚠ 注意</div>
+                <p style={{ marginBottom: 0 }}>
+                  <strong>依存関係をシンボリックリンクで共有するのは推奨されない</strong>。メインの
+                  Worktree に問題を引き起こす可能性があるため、<code>bun</code>・<code>pnpm</code>・
+                  <code>uv</code> のような高速パッケージマネージャで各 Worktree
+                  に独立インストールする方が安全である。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>3</div>
+            <div className={styles.stepBody}>
+              <h4>不要な Worktree を自動クリーンアップする</h4>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>settings.json</span>
+                </div>
+                <pre>
+                  <code className="language-json">{`{
+  "cursor.worktreeCleanupIntervalHours": 6,
+  "cursor.worktreeMaxCount": 20
+}`}</code>
+                </pre>
+              </div>
+              <p>
+                <code>worktreeCleanupIntervalHours</code> はクリーンアップの実行間隔、
+                <code>worktreeMaxCount</code>{" "}
+                は保持する最大数（超過分は古いものから削除）を制御する。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>4</div>
+            <div className={styles.stepBody}>
+              <h4>Editor Window でのスラッシュコマンドを使う</h4>
+              <p>
+                Agents Window とは別に、通常の Editor Window でも Worktree
+                を使ったコマンドが利用できる。
+              </p>
+              <ul>
+                <li>
+                  <strong>
+                    <code>/worktree</code>
+                  </strong>
+                  ：以降のチャットを別チェックアウトで実行させたい場合に使う。実験的な編集をメインチェックアウトから隔離し、インストール・ビルド・テストを現在のブランチを乱さずに実行できる
+                </li>
+              </ul>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>/worktree の使用例</span>
+                </div>
+                <pre>
+                  <code className="language-plaintext">{`/worktree 失敗しているauthテストを修正し、ログイン画面の文言も更新して`}</code>
+                </pre>
+              </div>
+              <p>
+                多くの場合、Worktree
+                から直接コミット・プッシュできる（「これらの変更をコミットしてプッシュし、PRを作成して」のように指示する）。メインチェックアウトへ変更を取り込みたい場合は{" "}
+                <code>/apply-worktree</code>、隔離チェックアウトが不要になったら{" "}
+                <code>/delete-worktree</code> を使う。
+              </p>
+              <ul>
+                <li>
+                  <strong>
+                    <code>/best-of-n</code>
+                  </strong>
+                  ：同一タスクを複数モデルで同時実行し、比較するためのコマンド。各実行はそれぞれ独立した
+                  Worktree を持つため、候補同士やメインチェックアウトから隔離される
+                </li>
+              </ul>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>/best-of-n の使用例</span>
+                </div>
+                <pre>
+                  <code className="language-plaintext">{`/best-of-n sonnet,gpt,composer ログアウトの不安定なテストを修正して`}</code>
+                </pre>
+              </div>
+              <p>
+                <code>/best-of-n</code>{" "}
+                は比較のみを行い、変更をメインチェックアウトへ自動マージすることはない。勝者を選んだ後、その
+                Worktree から直接コミット・プッシュするか、<code>/apply-worktree</code>{" "}
+                でメインチェックアウトへ取り込む。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.figure}>
+            <p className={styles.figureLead}>
+              This diagram shows the best-of-n workflow with parallel Worktrees.
+            </p>
+            <div className={styles.figureCanvas}>
+              <MermaidDiagram chart={DIAGRAMS.d15_bestofn_worktree} />
+            </div>
+          </div>
+          <div className={styles.figureLegend}>
+            <div className={styles.legendTitle}>各ノードの意味</div>
+            <dl>
+              <div>
+                <dt>Worktree A/B/C</dt>
+                <dd>各モデルが独立したファイル・依存関係で並列作業する隔離環境</dd>
+              </div>
+              <div>
+                <dt>人間が比較して選定</dt>
+                <dd>
+                  <code>/best-of-n</code> は自動マージしないため、最終判断は人間が行う
+                </dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className={`${styles.box} ${styles.glossary}`}>
+            <div className={styles.boxTitle}>📖 用語ノート</div>
+            <dl>
+              <div>
+                <dt>Worktree（ワークツリー）</dt>
+                <dd>同一リポジトリに対して複数の独立した作業ディレクトリを持てるGitの機能</dd>
+              </div>
+              <div>
+                <dt>
+                  <code>/apply-worktree</code>
+                </dt>
+                <dd>隔離されたWorktreeの変更をメインチェックアウトへ取り込むコマンド</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className={styles.sectionRefs}>
+            <div className={styles.boxTitle}>📎 参照URL</div>
+            <ul className={styles.refs}>
+              <li>
+                <span className={styles.refTag}>01</span>
+                <Ext href="https://cursor.com/docs/configuration/worktrees">
+                  cursor.com/docs/configuration/worktrees
+                </Ext>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* ==================== Chapter 16 ==================== */}
+        <section className={`${styles.chapter} chapter`} id="ch16">
+          <div className={styles.chapterEyebrow}>Chapter 16</div>
+          <h2>Cloud Agents</h2>
+
+          <div className={styles.introCallout}>
+            <span className={styles.icon}>💡</span>
+            <div>
+              この章では、ローカルマシンを離れてクラウドの独立VM上でAgentを走らせる Cloud
+              Agents（旧称 Background
+              Agents）を扱います。並列実行・長時間タスク・チーム共有の運用を大きく変える機能です。
+            </div>
+          </div>
+
+          <p>
+            Cloud Agents は、ローカルマシンの代わりにクラウド上の隔離された VM
+            でフルの開発環境を伴って実行される。クローンされたリポジトリ・インストール済みの依存関係・シークレット・起動コマンド・ネットワークアクセスなど、ラップトップ上のセットアップと同様の環境が用意される。
+          </p>
+          <p>
+            <strong>Cloud Agents を使う理由</strong>
+            ：ローカルマシンをインターネットに接続したままにしておく必要なく、いくつでも並列で Agent
+            を走らせられる。専用の仮想マシンを持つため、変更したソフトウェアをビルド・テスト・実際に操作でき、デスクトップやブラウザを操作する
+            computer use も使える。MCP
+            サーバーにも対応し、データベース・API・サードパーティサービスなど外部ツールへのアクセスも可能。マルチリポジトリ環境にも対応しており、フロントエンド・バックエンド・インフラ・共有ライブラリが別リポジトリに分かれているタスクでも、全体を俯瞰して協調的な変更を加え、変更したリポジトリごとにPRを開ける。
+          </p>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>1</div>
+            <div className={styles.stepBody}>
+              <h4>アクセス経路を選ぶ</h4>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>経路</th>
+                      <th>方法</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>Cursor Web</strong>
+                      </td>
+                      <td>
+                        <Ext href="https://cursor.com/agents">cursor.com/agents</Ext>{" "}
+                        からどのデバイスでも開始・管理
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Cursor Desktop</strong>
+                      </td>
+                      <td>
+                        Agent 入力欄下のドロップダウンで <code>Cloud</code> を選択
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Slack</strong>
+                      </td>
+                      <td>
+                        <code>@cursor</code> コマンドで起動
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>GitHub</strong>
+                      </td>
+                      <td>
+                        PR や Issue に <code>@cursor</code> とコメントして起動
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Linear</strong>
+                      </td>
+                      <td>
+                        <code>@cursor</code> コマンドで起動
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>API</strong>
+                      </td>
+                      <td>API 経由で起動</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>
+                モバイルではネイティブアプリのような体験のため、PWA
+                としてのインストールが推奨される（iOS: Safari でシェア→ホーム画面に追加、Android:
+                Chrome のメニュー→アプリをインストール）。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>2</div>
+            <div className={styles.stepBody}>
+              <h4>GitHub/GitLab 連携の仕組みを理解する</h4>
+              <p>
+                Cloud Agent
+                はリポジトリをクローンし、別ブランチで作業した後、変更をリポジトリへプッシュして引き継ぎを行う。リポジトリおよび依存リポジトリ・サブモジュールへの読み書き権限が必要。GitHub・GitLab
+                のほか、Bitbucket などの対応は今後拡大予定。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>3</div>
+            <div className={styles.stepBody}>
+              <h4>環境をきちんと設定する（最も重要なステップ）</h4>
+              <div className={`${styles.box} ${styles.warn}`}>
+                <div className={styles.boxTitle}>⚠ 重要</div>
+                <p style={{ marginBottom: 0 }}>
+                  Agent
+                  は与えられた環境の中でしか有能になれない。コードは書けてもテストを実行できず、サービスに問い合わせられず、APIに到達できない
+                  Agent は、作業を完結させることができない。
+                  <strong>
+                    Cloud Agent
+                    用の開発環境を用意しないことは、エンジニアにパソコンを与えないのと同じ
+                  </strong>
+                  であり、環境設定は Cloud Agent の有効性を高める最も重要なステップである。
+                </p>
+              </div>
+              <p>環境は以下のいずれかで設定できる。</p>
+              <ul>
+                <li>
+                  <strong>Agent 主導セットアップ</strong>（Agent に環境構築自体を任せる）
+                </li>
+                <li>
+                  <strong>保存済みスナップショット</strong>
+                  （インストール済みパッケージ・システム依存関係を保存）
+                </li>
+                <li>
+                  <strong>
+                    <code>.cursor/environment.json</code> に記述する Dockerfile
+                  </strong>
+                </li>
+              </ul>
+              <p>
+                各 Cloud Agent
+                はリポジトリまたはマルチリポジトリグループに選択された環境から起動する。Cloud Agents
+                ダッシュボードでは、どの環境がどの Agent 実行に使われたかを確認できる。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>4</div>
+            <div className={styles.stepBody}>
+              <h4>モデルは常に Max Mode で動作する</h4>
+              <p>
+                Cloud Agents は厳選されたモデルセットを使用し、
+                <strong>常に Max Mode で動作する</strong>（オフに切り替えるトグルは存在しない）。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>5</div>
+            <div className={styles.stepBody}>
+              <h4>MCP とフックの対応範囲を確認する</h4>
+              <ul>
+                <li>
+                  <strong>MCP</strong>：チーム向けに設定された MCP サーバーを利用できる。HTTP・stdio
+                  両トランスポート対応、OAuth も利用可能。<code>cursor.com/agents</code> の MCP
+                  ドロップダウンから管理する
+                </li>
+                <li>
+                  <strong>Hooks</strong>：リポジトリの <code>.cursor/hooks.json</code>{" "}
+                  にあるコマンド型フックを実行する。Enterprise
+                  プランではチームフック・エンタープライズ管理フックも実行される。ただし
+                  IDE専用のフック（Tab hooks・<code>sessionStart</code>/<code>sessionEnd</code>・
+                  <code>beforeSubmitPrompt</code>・<code>workspaceOpen</code>
+                  ）と、ユーザーレベルフック（<code>~/.cursor/hooks.json</code>
+                  ）は利用できない（第12章参照）
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>6</div>
+            <div className={styles.stepBody}>
+              <h4>成果物とリモートデスクトップ制御を活用する</h4>
+              <ul>
+                <li>
+                  <strong>Artifacts</strong>：Agent
+                  はスクリーンショット・動画・ログを生成し、何が変更されどう検証されたかを確認できる
+                </li>
+                <li>
+                  <strong>リモートデスクトップ制御</strong>
+                  ：ブランチをローカルにチェックアウトせずに、Agent
+                  のデスクトップを直接操作してソフトウェアをテストできる。制御を Agent
+                  に戻せば作業を継続させられる
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <h3>コスト</h3>
+          <p>
+            Cloud Agents は選択したモデルの API 価格で課金される。初回利用時に支出上限（spend
+            limit）の設定が求められる。
+          </p>
+
+          <div className={styles.figure}>
+            <p className={styles.figureLead}>
+              This diagram shows the local-to-cloud agent handoff process.
+            </p>
+            <div className={styles.figureCanvas}>
+              <MermaidDiagram chart={DIAGRAMS.d16_cloud_handoff} />
+            </div>
+          </div>
+          <div className={styles.figureLegend}>
+            <div className={styles.legendTitle}>各ノードの意味</div>
+            <dl>
+              <div>
+                <dt>CLI で & 記号を先頭に付けて送信</dt>
+                <dd>
+                  Cursor CLI では <code>{"&"}</code>{" "}
+                  をメッセージ先頭に付けることで、そのままクラウドに作業を引き継げる（第17章参照）
+                </dd>
+              </div>
+              <div>
+                <dt>環境設定を読み込み</dt>
+                <dd>
+                  <code>.cursor/environment.json</code>{" "}
+                  またはスナップショット・Agent主導セットアップに基づき環境を構築するステップ
+                </dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className={`${styles.box} ${styles.glossary}`}>
+            <div className={styles.boxTitle}>📖 用語ノート</div>
+            <dl>
+              <div>
+                <dt>Cloud Agents</dt>
+                <dd>クラウド上の隔離VMでフル開発環境とともに動くAgent（旧称 Background Agents）</dd>
+              </div>
+              <div>
+                <dt>computer use</dt>
+                <dd>Agentがデスクトップやブラウザを直接操作する機能</dd>
+              </div>
+              <div>
+                <dt>spend limit</dt>
+                <dd>Cloud Agent利用時に設定する支出上限</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className={styles.sectionRefs}>
+            <div className={styles.boxTitle}>📎 参照URL</div>
+            <ul className={styles.refs}>
+              <li>
+                <span className={styles.refTag}>01</span>
+                <Ext href="https://cursor.com/docs/cloud-agent">cursor.com/docs/cloud-agent</Ext>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* ==================== Chapter 17 ==================== */}
+        <section className={`${styles.chapter} chapter`} id="ch17">
+          <div className={styles.chapterEyebrow}>Chapter 17</div>
+          <h2>Cursor CLI</h2>
+
+          <div className={styles.introCallout}>
+            <span className={styles.icon}>💡</span>
+            <div>
+              この章では、GUIを離れてターミナルから Agent を操作する Cursor CLI
+              を扱います。スクリプト・CI
+              パイプラインへの組み込みや、SSH先のサーバー上での作業に有効です。
+            </div>
+          </div>
+
+          <p>
+            Cursor CLI を使うと、ターミナルから直接 AI Agent
+            と対話してコードを書き・レビューし・修正できる。対話的なターミナルインターフェースと、スクリプト・CIパイプライン向けの非対話（print）自動化の両方をサポートする。
+          </p>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>1</div>
+            <div className={styles.stepBody}>
+              <h4>インストールと起動</h4>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>インストール（macOS, Linux, WSL）</span>
+                </div>
+                <pre>
+                  <code className="language-bash">{`curl https://cursor.com/install -fsS | bash`}</code>
+                </pre>
+              </div>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>インストール（Windows PowerShell）</span>
+                </div>
+                <pre>
+                  <code className="language-powershell">{`irm 'https://cursor.com/install?win32=true' | iex`}</code>
+                </pre>
+              </div>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>起動</span>
+                </div>
+                <pre>
+                  <code className="language-bash">{`# 対話セッションの起動
+agent
+
+# 初期プロンプト付きで起動
+agent "auth モジュールを JWT トークン方式にリファクタリングして"`}</code>
+                </pre>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>2</div>
+            <div className={styles.stepBody}>
+              <h4>モードを切り替える</h4>
+              <p>エディタと同じ3モードをサポートする。</p>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>モード</th>
+                      <th>説明</th>
+                      <th>切り替え方法</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>Agent</strong>
+                      </td>
+                      <td>複雑なコーディングタスク向けの全ツールアクセス</td>
+                      <td>
+                        デフォルト（<code>--mode</code> 指定不要）
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Plan</strong>
+                      </td>
+                      <td>実装前に確認質問を交えて設計する</td>
+                      <td>
+                        <code>Shift+Tab</code>, <code>/plan</code>, <code>--plan</code>,{" "}
+                        <code>--mode=plan</code>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Ask</strong>
+                      </td>
+                      <td>変更を加えない読み取り専用の探索</td>
+                      <td>
+                        <code>/ask</code>, <code>--mode=ask</code>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>3</div>
+            <div className={styles.stepBody}>
+              <h4>非対話モードでスクリプト・CIに組み込む</h4>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>非対話実行</span>
+                </div>
+                <pre>
+                  <code className="language-bash">{`# 特定のプロンプトとモデルで実行
+agent -p "パフォーマンス問題を見つけて修正して" --model "gpt-5.2"
+
+# git の変更を含めてレビューさせる
+agent -p "これらの変更をセキュリティの観点でレビューして" --output-format text`}</code>
+                </pre>
+              </div>
+              <p>
+                <code>--output-format json</code>{" "}
+                を指定すると構造化出力が得られ、スクリプトでパースしやすくなる。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>4</div>
+            <div className={styles.stepBody}>
+              <h4>Cloud Agent へタスクを引き継ぐ</h4>
+              <p>
+                対話の途中でメッセージの先頭に <code>&amp;</code>{" "}
+                を付けると、そのままクラウドに送信され、離席中も処理を継続できる。
+              </p>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>クラウドへの引き継ぎ</span>
+                </div>
+                <pre>
+                  <code className="language-bash">{`# 対話の途中で Cloud Agent へタスクを送信
+& auth モジュールをリファクタリングし、包括的なテストを追加して`}</code>
+                </pre>
+              </div>
+              <p>
+                <code>cursor.com/agents</code> の Web またはモバイルで続きを確認できる。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>5</div>
+            <div className={styles.stepBody}>
+              <h4>セッションを管理する</h4>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>セッション管理コマンド</span>
+                </div>
+                <pre>
+                  <code className="language-bash">{`agent ls              # 過去の会話一覧
+agent resume           # 直近の会話を再開
+agent --continue       # 直前のセッションを継続
+agent --resume="chat-id-here"   # 特定の会話を再開`}</code>
+                </pre>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>6</div>
+            <div className={styles.stepBody}>
+              <h4>サンドボックスと Max Mode を制御する</h4>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>制御コマンド</span>
+                </div>
+                <pre>
+                  <code className="language-bash">{`/sandbox                       # インタラクティブメニューでサンドボックス設定
+agent --sandbox enabled        # または disabled
+/max-mode on                   # Max Mode の切り替え
+/max-mode off`}</code>
+                </pre>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>7</div>
+            <div className={styles.stepBody}>
+              <h4>Worktree での並列実行</h4>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>Worktree での実行例</span>
+                </div>
+                <pre>
+                  <code className="language-bash">{`agent -w my-feature "新機能を実装して"`}</code>
+                </pre>
+              </div>
+              <p>
+                <code>-w</code>/<code>--worktree [name]</code>{" "}
+                を渡すと、現在のチェックアウトを直接編集せず、新しい Git Worktree
+                でエージェントを走らせる。チェックアウトは{" "}
+                <code>~/.cursor/worktrees/&lt;reponame&gt;/&lt;name&gt;</code>{" "}
+                以下に作られ、エディタで作成された Worktree
+                と同じ保持ルールでクリーンアップされる。名前を省略すると自動生成される。
+                <code>--workspace &lt;path&gt;</code>{" "}
+                を組み合わせると、明示的なリポジトリルートを指定できる（省略時はカレントディレクトリを使用）。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>8</div>
+            <div className={styles.stepBody}>
+              <h4>ルールと MCP は自動で引き継がれる</h4>
+              <p>
+                CLI エージェントはエディタと同じルールシステムをサポートし、
+                <code>.cursor/rules</code> のルールが自動的に読み込まれ適用される。加えて、
+                <strong>
+                  プロジェクトルートの <code>AGENTS.md</code> と <code>CLAUDE.md</code> も{" "}
+                  <code>.cursor/rules</code> と並んでルールとして適用される
+                </strong>
+                点はエディタにはない CLI 固有の挙動である。<code>mcp.json</code>{" "}
+                も自動検出され、エディタで設定したのと同じ MCP サーバー・ツールが利用できる。
+              </p>
+            </div>
+          </div>
+
+          <h3>便利なキー操作</h3>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>キー</th>
+                  <th>動作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <code>↑</code>（矢印キー上）
+                  </td>
+                  <td>過去のメッセージを遡る</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>Shift+Tab</code>
+                  </td>
+                  <td>モードを順番に切り替え（Agent/Plan/Ask）</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>Shift+Enter</code>
+                  </td>
+                  <td>
+                    改行を挿入（iTerm2/Ghostty/Kitty/Warp/Zed 対応、tmux利用時は <code>Ctrl+J</code>{" "}
+                    を使用）
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>Ctrl+D</code>
+                  </td>
+                  <td>CLI を終了（シェルの慣例に従い2回押しが必要）</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>Ctrl+J</code> または <code>+Enter</code>
+                  </td>
+                  <td>全ターミナル共通の改行挿入代替キー</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>Ctrl+R</code>
+                  </td>
+                  <td>
+                    変更内容をレビュー（続けて <code>i</code>{" "}
+                    で追加指示、矢印キーでスクロール・ファイル切り替え）
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>sudo パスワードの安全な入力</h3>
+          <p>
+            昇格権限が必要なコマンドは、CLI を離れることなく実行できる。<code>sudo</code>{" "}
+            が必要な場面では、マスクされた安全なパスワードプロンプトが表示され、パスワードはセキュアな
+            IPC チャネル経由で <code>sudo</code>{" "}
+            に直接渡される（AIモデル自体はパスワードを一切見ない）。
+          </p>
+
+          <div className={`${styles.box} ${styles.glossary}`}>
+            <div className={styles.boxTitle}>📖 用語ノート</div>
+            <dl>
+              <div>
+                <dt>PWA（Progressive Web App）</dt>
+                <dd>Webサイトをネイティブアプリのようにホーム画面へ追加できる仕組み</dd>
+              </div>
+              <div>
+                <dt>ACP（Agent Client Protocol）</dt>
+                <dd>カスタムクライアント統合向けにJSON-RPCでやり取りするプロトコル</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className={styles.sectionRefs}>
+            <div className={styles.boxTitle}>📎 参照URL</div>
+            <ul className={styles.refs}>
+              <li>
+                <span className={styles.refTag}>01</span>
+                <Ext href="https://cursor.com/docs/cli/overview">cursor.com/docs/cli/overview</Ext>
+              </li>
+              <li>
+                <span className={styles.refTag}>02</span>
+                <Ext href="https://cursor.com/docs/cli/using">cursor.com/docs/cli/using</Ext>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* ==================== Placeholders for Chapters 18-21 ==================== */}
+        {TOC_ITEMS.slice(17).map((item) => (
           <section key={item.id} className={`${styles.chapter} chapter`} id={item.id}>
             <div className={styles.chapterEyebrow}>Chapter {item.num}</div>
             <h2>{item.title}</h2>

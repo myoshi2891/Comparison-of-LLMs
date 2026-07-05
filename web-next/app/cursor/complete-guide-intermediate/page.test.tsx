@@ -199,9 +199,7 @@ test("Cursor Intermediate Guide Page Contract Tests", () => {
   expect(
     charts.some(
       (c) =>
-        c?.includes("d16-cloud-handoff") ||
-        c?.includes("d16_cloud_handoff") ||
-        c?.includes("CLI")
+        c?.includes("d16-cloud-handoff") || c?.includes("d16_cloud_handoff") || c?.includes("CLI")
     )
   ).toBe(true);
 });
