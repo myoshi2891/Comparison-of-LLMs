@@ -576,6 +576,8 @@
   color: var(--text);
   vertical-align: top;
   font-size: 0.82rem;
+  text-align: left;
+  font-family: inherit;
 }
 .table td:first-child {
   font-family: "JetBrains Mono", monospace;

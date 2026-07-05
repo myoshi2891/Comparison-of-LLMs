@@ -355,7 +355,7 @@ cd web-next && bun run build && bun run lint && bun run test
 - **`"use client"` を不必要に使わない** — Server Component デフォルト
 - **生 HTML 注入 prop を使わない** — JSX `<span>` でシンタックスハイライトを表現
 - **`{"\n"}` を `.code-block` 内の改行に使わない** — `<div className={styles.codeLine}>` でラップ
-- **スペース揃えで tabular data を表現しない** — `<table>` 要素へ変換
+- **スペース揃えで tabular data を表現しない** — `<table>` 要素へ変換。また、表の文言およびヘッダー（タイトル）は必ず左寄せ（`text-align: left`）で文章を表示すること。
 - **`bun run lint:fix`（引数なし）を実行しない** — 変更ファイル単位でパス指定（R1 ルール）
 - **外部フォントを `<link>` タグで読み込まない** — `next/font/google` のみ（`layout.tsx`）
 - **`@layer components` を page-specific styles に使わない** — plain CSS で specificity を確保

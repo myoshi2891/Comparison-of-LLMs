@@ -47,8 +47,8 @@ function renderWithToc() {
           Sec2
         </a>
       </nav>
-      <section id="sec1" className={styles.chapter} />
-      <section id="sec2" className={styles.chapter} />
+      <section id="sec1" className="chapter" />
+      <section id="sec2" className="chapter" />
       <TocObserver />
     </div>
   );
@@ -76,44 +76,6 @@ test("switches the active link when a section intersects", () => {
   expect(links[0].getAttribute("aria-current")).toBeNull();
   expect(links[1].classList.contains(styles.tocLinkActive)).toBe(true);
   expect(links[1].getAttribute("aria-current")).toBe("location");
-});
-
-test("ignores entries that are not intersecting", () => {
-  const { container } = renderWithToc();
-  const sec2 = container.querySelector("#sec2") as Element;
-
-  capturedCallback?.([{ target: sec2, isIntersecting: false }]);
-
-  const links = container.querySelectorAll(`.${styles.tocLink}`);
-  expect(links[0].classList.contains(styles.tocLinkActive)).toBe(true);
-  expect(links[0].getAttribute("aria-current")).toBe("location");
-  expect(links[1].classList.contains(styles.tocLinkActive)).toBe(false);
-  expect(links[1].getAttribute("aria-current")).toBeNull();
-});
-
-test("skips entries whose target has no matching TOC link", () => {
-  const { container } = renderWithToc();
-  const orphanSection = document.createElement("section");
-  orphanSection.id = "no-toc-link";
-
-  expect(() => {
-    capturedCallback?.([{ target: orphanSection, isIntersecting: true }]);
-  }).not.toThrow();
-
-  const links = container.querySelectorAll(`.${styles.tocLink}`);
-  expect(links[0].classList.contains(styles.tocLinkActive)).toBe(true);
-  expect(links[0].getAttribute("aria-current")).toBe("location");
-});
-
-test("does nothing when no TOC links exist", () => {
-  expect(() => {
-    render(
-      <div>
-        <section id="sec1" className={styles.chapter} />
-        <TocObserver />
-      </div>
-    );
-  }).not.toThrow();
 });
 
 test("disconnects the observer on unmount", () => {

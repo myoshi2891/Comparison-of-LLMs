@@ -80,17 +80,21 @@ describe("Phase A - nav-links top-level entries", () => {
 describe("Phase A - Agent dropdown shape", () => {
   const agent = navLinks.find((link) => link.name === "Agent");
 
-  it("has 2 child entries (advanced guide / openclaw security guide)", () => {
+  it("has 5 child entries (advanced guide / openclaw security guide / loop engineering / skills-guide / skills-sh)", () => {
     expect(agent && "children" in agent).toBe(true);
     const children = agent && "children" in agent ? agent.children : [];
-    expect(children.length).toBe(2);
+    expect(children.length).toBe(5);
   });
 
   it("uses clean URL paths for all Agent children (no .html extension)", () => {
+    expect(agent && "children" in agent).toBe(true);
     const children = agent && "children" in agent ? agent.children : [];
     const expectedHrefs = [
       "/agent/hermes-agent-advanced-guide",
       "/agent/openclaw-advanced-agent-security-guide",
+      "/agent/loop-engineering",
+      "/agent/skills",
+      "/claude/skills-sh",
     ];
     expect(children.map((c) => c.href)).toEqual(expectedHrefs);
   });
@@ -99,10 +103,10 @@ describe("Phase A - Agent dropdown shape", () => {
 describe("Phase A - Claude dropdown shape", () => {
   const claude = navLinks.find((link) => link.name === "Claude");
 
-  it("has 9 child entries (skill / agent / skill-guide / skill-guide-intermediate / cowork-guide / harness-engineering / managed-agents / self-hosted-sandboxes / code-slash-commands)", () => {
+  it("has 10 child entries (skill / agent / skill-guide / skill-guide-intermediate / cowork-guide / harness-engineering / managed-agents / self-hosted-sandboxes / code-slash-commands / fable-5-best-practices)", () => {
     expect(claude && "children" in claude).toBe(true);
     const children = claude && "children" in claude ? claude.children : [];
-    expect(children.length).toBe(9);
+    expect(children.length).toBe(10);
   });
 
   it("uses clean URL paths for all Claude children (no .html extension)", () => {
@@ -117,7 +121,24 @@ describe("Phase A - Claude dropdown shape", () => {
       "/claude/managed-agents",
       "/claude/self-hosted-sandboxes",
       "/claude/code-slash-commands",
+      "/claude/fable-5-best-practices",
     ];
+    expect(children.map((c) => c.href)).toEqual(expectedHrefs);
+  });
+});
+
+describe("Phase A - IDE dropdown shape", () => {
+  const ide = navLinks.find((link) => link.name === "IDE");
+
+  it("has 2 child entries (cursor guide / cursor guide intermediate)", () => {
+    expect(ide && "children" in ide).toBe(true);
+    const children = ide && "children" in ide ? ide.children : [];
+    expect(children.length).toBe(2);
+  });
+
+  it("uses clean URL paths for all IDE children (no .html extension)", () => {
+    const children = ide && "children" in ide ? ide.children : [];
+    const expectedHrefs = ["/cursor/complete-guide", "/cursor/complete-guide-intermediate"];
     expect(children.map((c) => c.href)).toEqual(expectedHrefs);
   });
 });

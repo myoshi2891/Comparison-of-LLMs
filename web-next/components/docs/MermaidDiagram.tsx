@@ -6,6 +6,14 @@ type Props = {
   id?: string;
   style?: React.CSSProperties;
   className?: string;
+  /** Mermaid theme. Defaults to "dark". Pass "base" for light-mode pages. */
+  theme?: "dark" | "base" | "default" | "forest" | "neutral";
+  /** 
+   * Mermaid themeVariables override (only meaningful when theme="base").
+   * IMPORTANT: themeVariables should be a stable reference (e.g. a module-level constant like LOOP_THEME_VARS or wrapped in useMemo)
+   * to prevent redundant re-initialization and flickering in the useEffect.
+   */
+  themeVariables?: Record<string, string>;
 };
 
 /**
@@ -17,9 +25,18 @@ type Props = {
  * @param id - Optional id attribute applied to the container element
  * @param style - Optional inline styles merged with the component's default width and minimum height
  * @param className - Optional additional CSS classes appended to the container's `"mermaid"` class
+ * @param theme - Mermaid theme ("dark" by default)
+ * @param themeVariables - Mermaid themeVariables override
  * @returns The React element containing the rendered Mermaid diagram
  */
-export default function MermaidDiagram({ chart, id, style, className }: Props) {
+export default function MermaidDiagram({
+  chart,
+  id,
+  style,
+  className,
+  theme = "dark",
+  themeVariables,
+}: Props) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -29,7 +46,8 @@ export default function MermaidDiagram({ chart, id, style, className }: Props) {
         if (!active || !ref.current) return;
         m.default.initialize({
           startOnLoad: false,
-          theme: "dark",
+          theme,
+          ...(themeVariables ? { themeVariables } : {}),
           flowchart: { useMaxWidth: true, htmlLabels: true },
           sequence: { useMaxWidth: true },
           mindmap: { useMaxWidth: true },
@@ -51,7 +69,9 @@ export default function MermaidDiagram({ chart, id, style, className }: Props) {
     return () => {
       active = false;
     };
-  }, [chart]);
+    // themeVariables is in the dependency array. If the caller passes an inline object,
+    // it will re-initialize mermaid and cause flickering.
+  }, [chart, theme, themeVariables]);
 
   return (
     <div

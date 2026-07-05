@@ -647,6 +647,8 @@
   border-bottom: 1px solid rgba(31, 37, 53, 0.7);
   color: var(--text);
   vertical-align: top;
+  text-align: left;
+  font-family: inherit;
 }
 .table td:first-child {
   font-family: "JetBrains Mono", monospace;

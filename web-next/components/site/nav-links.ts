@@ -44,6 +44,7 @@ export const navLinks: readonly NavLink[] = [
       { name: "Managed Agents", href: "/claude/managed-agents" },
       { name: "Self-hosted Sandboxes", href: "/claude/self-hosted-sandboxes" },
       { name: "Code Slash Commands", href: "/claude/code-slash-commands" },
+      { name: "Fable 5 Best Practices", href: "/claude/fable-5-best-practices" },
     ],
   },
   {
@@ -92,6 +93,9 @@ export const navLinks: readonly NavLink[] = [
     children: [
       { name: "Advanced Guide", href: "/agent/hermes-agent-advanced-guide" },
       { name: "OpenClaw Security Guide", href: "/agent/openclaw-advanced-agent-security-guide" },
+      { name: "Loop Engineering Guide", href: "/agent/loop-engineering" },
+      { name: "Agent Skills Guide", href: "/agent/skills" },
+      { name: "skills.sh Guide", href: "/claude/skills-sh" },
     ],
   },
   {
@@ -100,7 +104,10 @@ export const navLinks: readonly NavLink[] = [
   },
   {
     name: "IDE",
-    children: [{ name: "Cursor Guide", href: "/cursor/complete-guide" }],
+    children: [
+      { name: "Cursor Guide", href: "/cursor/complete-guide" },
+      { name: "Cursor Guide (中級)", href: "/cursor/complete-guide-intermediate" },
+    ],
   },
   { name: "Git Worktree", href: "/git-worktree" },
 ];
