@@ -748,7 +748,7 @@ flowchart TD
 | [9] | 同上（O'Reilly Radar転載版） | https://www.oreilly.com/radar/loop-engineering/ |
 | [10] | Loop Engineeringクラッシュコース（Panaversity Agent Factory） | https://agentfactory.panaversity.org/docs/loop-engineering-crash-course |
 | [13] | Loop Engineeringガイド2026（AI Builder Club） | https://www.aibuilderclub.com/blog/loop-engineering-guide-2026 |
-| [14] | 5つの構成要素の実例解説（Google Gate News） | https://www.gate.com/news/detail/google-engineer-loop-engineerings-five-building-blocks-let-ai-automatically-21751012 |
+| \[14\]\[15\] | 5つの構成要素の実例解説（Google Gate News） | https://www.gate.com/news/detail/google-engineer-loop-engineerings-five-building-blocks-let-ai-automatically-21751012 |
 | [16] | Loop EngineeringのIEEE形式サマリー（HyperAI） | https://hyper.ai/en/papers/Loop-Engineering-IEEE |
 | [19] | 実践フィールドガイド（DEV Community） | https://dev.to/truongpx396/the-agentic-loop-a-practical-field-guide-mnc |
 | [20] | Loop Engineeringクラッシュコース（同上、Generator/Verifier分離） | https://agentfactory.panaversity.org/docs/loop-engineering-crash-course |
@@ -757,7 +757,7 @@ flowchart TD
 
 | # | 出典 | URL |
 |---|------|-----|
-| \[25\]\[26\]\[29\] | Geoffrey Huntley「Ralph Wiggum as a "software engineer"」（原典） | https://ghuntley.com/ralph/ |
+| \[25\]\[26\]\[27\]\[29\] | Geoffrey Huntley「Ralph Wiggum as a "software engineer"」（原典） | https://ghuntley.com/ralph/ |
 | [28] | Dev Interrupted podcast「Inventing the Ralph Wiggum Loop」 | https://linearb.io/dev-interrupted/podcast/inventing-the-ralph-wiggum-loop |
 | \[30\]\[37\] | Ralph Wiggum流コーディングの解説（tessl.io） | https://tessl.io/blog/unpacking-the-unpossible-logic-of-ralph-wiggumstyle-ai-coding/ |
 | [31] | Ralph Wiggum LoopとClaude Codeプラグイン化の経緯（Shiqi Mei） | https://shiqimei.github.io/posts/ralph-wiggum-loop-claude-code |
@@ -779,7 +779,7 @@ flowchart TD
 
 | # | 出典 | URL |
 |---|------|-----|
-| [33] | スケジュールタスク・Cronツールの解説（Panaversity Agent Factory） | https://agentfactory.panaversity.org/docs/General-Agents-Foundations/general-agents/scheduled-tasks-cron |
+| \[18\]\[33\] | スケジュールタスク・Cronツールの解説（Panaversity Agent Factory） | https://agentfactory.panaversity.org/docs/General-Agents-Foundations/general-agents/scheduled-tasks-cron |
 | [34] | Claude Codeの非同期・バックグラウンドエージェント解説 | https://claudefa.st/blog/guide/agents/async-workflows |
 | [35] | Claude Code Hooks/Subagents/Skills完全ガイド | https://ofox.ai/blog/claude-code-hooks-subagents-skills-complete-guide-2026/ |
 | [36] | Claude Code Hooksリファレンス（公式ドキュメント） | https://code.claude.com/docs/en/hooks |
@@ -790,7 +790,7 @@ flowchart TD
 | # | 出典 | URL |
 |---|------|-----|
 | [8] | サンプリングバイアスへの指摘を含むフィールドガイド（DEV Community） | https://dev.to/truongpx396/the-agentic-loop-a-practical-field-guide-mnc |
-| [12] | 「検証のないタスクは願望にすぎない」に関する実践ガイド（DEV Community） | https://dev.to/truongpx396/the-agentic-loop-a-practical-field-guide-mnc |
+| \[11\]\[12\] | 「検証のないタスクは願望にすぎない」に関する実践ガイド（DEV Community） | https://dev.to/truongpx396/the-agentic-loop-a-practical-field-guide-mnc |
 | [17] | Loop Engineeringの実践的教訓（個人ブログ、Gerald Chen） | https://chenguangliang.com/en/posts/blog191_loop-engineering-design-loops-prompt-agents/ |
 | [38] | Loop Engineeringの日本語まとめ（note、MAKE A CHANGE, inc） | https://note.com/make_a_change/n/na8ae99b24c36?hl=en |
 | [39] | ループ中心設計への批判「The Loop Is Not the Product」（DEV Community） | https://dev.to/dannwaneri/the-loop-is-not-the-product-466d |
