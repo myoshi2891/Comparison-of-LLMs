@@ -106,6 +106,30 @@ const DIAGRAMS = {
     S6 --> Done{再現手順で修正確認できたか}
     Done -->|いいえ| S3
     Done -->|はい| Finish[計装を全削除して完了]`,
+  d07_context_sources: `flowchart LR
+    Prompt[ユーザーのプロンプト] --> Merge[文脈の合成]
+    Rules[Rules AGENTS.md] --> Merge
+    Mentions[at メンションで指定したファイル] --> Merge
+    SemanticIndex[コードベースの自動検索] --> Merge
+    MCP[MCP サーバーからの情報] --> Merge
+    Skills[関連する Skill] --> Merge
+    Merge --> Model[モデルへの最終入力]`,
+  d08_rules_priority: `flowchart TD
+    TeamRules[Team Rules] --> Merge[コンテキストへの合成]
+    ProjectRules[Project Rules .cursor slash rules] --> Merge
+    UserRules[User Rules グローバル設定] --> Merge
+    AgentsMd[AGENTS.md] --> Merge
+    Merge --> Priority[競合時は先勝ち Team から Project User の順]
+    Priority --> FinalContext[モデルへ渡る最終コンテキスト]`,
+  d09_mcp_architecture: `flowchart LR
+    Cursor[Cursor Host] --> Client[MCP Client 内蔵]
+    Client -->|stdio| LocalServer[ローカル MCP サーバー]
+    Client -->|SSE または HTTP| RemoteServer[リモート MCP サーバー]
+    LocalServer --> ExternalTool1[DB API ファイルシステムなど]
+    RemoteServer --> ExternalTool2[SaaS API GitHub Slack など]
+    ExternalTool1 --> Result[ツール結果を Agent へ返却]
+    ExternalTool2 --> Result
+    Result --> AgentLoop[Agent 実行ループへ合流]`,
 };
 
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
@@ -1164,8 +1188,1322 @@ export default function Page() {
           </div>
         </section>
 
-        {/* ==================== Placeholders for Chapters 7-21 ==================== */}
-        {TOC_ITEMS.slice(6).map((item) => (
+        {/* ==================== Chapter 7 ==================== */}
+        <section className={`${styles.chapter} chapter`} id="ch7">
+          <div className={styles.chapterEyebrow}>Chapter 07</div>
+          <h2>コンテキスト管理（@メンション・インデックス・.cursorignore）</h2>
+
+          <div className={styles.introCallout}>
+            <span className={styles.icon}>💡</span>
+            <div>
+              この章では、Agent
+              が「何を見て」回答を組み立てているかをコントロールする方法を扱います。中〜上級者ほど、この章の内容を理解しているかどうかで
+              Agent の精度に差が出ます。
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>1</div>
+            <div className={styles.stepBody}>
+              <h4>@メンションで明示的に文脈を渡す</h4>
+              <p>
+                <code>@</code> を入力すると、Cursor
+                は候補を表示する。どのファイルが関連するか分かっている場合に使い、不明な場合は省略して
+                Agent 自身の検索に任せる方が良い結果になることが多い。
+              </p>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>メンション</th>
+                      <th>対象</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <code>@ファイル名</code>（例：<code>@auth.ts</code>）
+                      </td>
+                      <td>特定のファイルを含める</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>@フォルダ名</code>（例：<code>@src/components/</code>）
+                      </td>
+                      <td>フォルダ全体を含める</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>@関数名・クラス名</code>（例：<code>@getUserById</code>）
+                      </td>
+                      <td>特定のコードシンボルを参照する</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>@Docs</code>
+                      </td>
+                      <td>
+                        インデックス済みのドキュメントを検索させる（自分のドキュメントも{" "}
+                        <code>@Docs &gt; Add new doc</code> で追加可能）
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>@web</code>
+                      </td>
+                      <td>Web 検索をさせる</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>@codebase</code>
+                      </td>
+                      <td>プロジェクト全体をセマンティック検索する</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>@Past Chats</code>
+                      </td>
+                      <td>過去の会話を文脈として参照する</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>@Terminals</code>
+                      </td>
+                      <td>ターミナル出力を文脈に含める</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>@Commit</code> / <code>@Branch</code>
+                      </td>
+                      <td>Git 差分を文脈に含める（作業中の差分／メインとの差分）</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>@Browser</code>
+                      </td>
+                      <td>組み込みブラウザの状態を文脈に含める</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>
+                <code>@</code> は複数回使って複数ファイルを同時に添付できる。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>2</div>
+            <div className={styles.stepBody}>
+              <h4>コンテキストウィンドウの消費を可視化する</h4>
+              <p>
+                チャット入力欄の横にある「コンテキストリング」をクリックすると、トークン使用量の内訳がカテゴリ別に表示される。
+              </p>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>カテゴリ</th>
+                      <th>内容</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>System prompt</td>
+                      <td>Cursor 組み込みのモデル指示</td>
+                    </tr>
+                    <tr>
+                      <td>Tools</td>
+                      <td>Agent が使えるツールの定義</td>
+                    </tr>
+                    <tr>
+                      <td>Rules</td>
+                      <td>適用中のプロジェクト・ユーザールール</td>
+                    </tr>
+                    <tr>
+                      <td>Skills</td>
+                      <td>注入されたスキルの説明</td>
+                    </tr>
+                    <tr>
+                      <td>MCP</td>
+                      <td>接続中の MCP サーバーの指示・カタログ</td>
+                    </tr>
+                    <tr>
+                      <td>Subagents</td>
+                      <td>Agent が起動できるサブエージェントのドキュメント</td>
+                    </tr>
+                    <tr>
+                      <td>Summarized conversation</td>
+                      <td>圧縮された過去の会話要約</td>
+                    </tr>
+                    <tr>
+                      <td>Conversation</td>
+                      <td>実際のやり取り本文</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className={`${styles.box} ${styles.warn}`}>
+                <div className={styles.boxTitle}>⚠ 注意</div>
+                <p style={{ marginBottom: 0 }}>
+                  コンテキストウィンドウが埋まってくると、Cursor
+                  は古い会話部分を自動で要約に圧縮し、新しい会話のための余地を確保する。
+                  <strong>
+                    Rules・Skills・MCP
+                    を無秩序に増やしすぎると、この内訳が肥大化し、肝心のタスク遂行に使える余地が減る
+                  </strong>
+                  という点は、中〜上級者ほど意識すべきポイントである。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>3</div>
+            <div className={styles.stepBody}>
+              <h4>コードベースインデックスの状態を把握する</h4>
+              <p>
+                Cursor
+                はプロジェクトを開くと自動でスキャンし、セマンティック検索用のインデックスを構築する。インデックスはおよそ5分ごとに同期され、変更を反映する。
+              </p>
+              <ul>
+                <li>
+                  <strong>状態確認</strong>
+                  ：エディタ下部のステータスバーでスキャンの進捗を確認できる
+                </li>
+                <li>
+                  <strong>再インデックス</strong>：コマンドパレット（<code>Cmd/Ctrl+Shift+P</code>
+                  ）で「Reindex」を検索して実行
+                </li>
+                <li>
+                  <strong>大規模リポジトリの高速化</strong>：<code>node_modules</code>・
+                  <code>dist</code> などのビルド成果物は <code>.gitignore</code>{" "}
+                  に含まれていればデフォルトで無視される。それ以外の巨大な生成ファイルは{" "}
+                  <code>.cursorignore</code> に追記する
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>4</div>
+            <div className={styles.stepBody}>
+              <h4>
+                <code>.cursorignore</code> で機密情報とノイズを遮断する
+              </h4>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>.cursorignore</span>
+                </div>
+                <pre>
+                  <code className="language-plaintext">{`node_modules/
+dist/
+*.min.js
+.env*`}</code>
+                </pre>
+              </div>
+              <p>
+                <code>.env</code> ファイル・<code>.git/</code>
+                ・ロックファイルはデフォルトで無視される。<code>.gitignore</code>{" "}
+                のパターンも自動的に尊重されるため、<code>.cursorignore</code> は「Git 管理外だが AI
+                には見せたくない」追加分の除外に使う。
+              </p>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>除外すべき理由</th>
+                      <th>対象例</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>インデックス速度の低下を防ぐ</td>
+                      <td>大きな生成ファイル</td>
+                    </tr>
+                    <tr>
+                      <td>機密情報の漏洩を防ぐ</td>
+                      <td>シークレット・認証情報</td>
+                    </tr>
+                    <tr>
+                      <td>ノイズを減らす</td>
+                      <td>バイナリファイル・アセット</td>
+                    </tr>
+                    <tr>
+                      <td>無駄な文脈消費を防ぐ</td>
+                      <td>
+                        <code>node_modules</code> などのサードパーティコード
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className={`${styles.box} ${styles.warn}`}>
+                <div className={styles.boxTitle}>⚠ 注意</div>
+                <p style={{ marginBottom: 0 }}>
+                  <strong>
+                    ターミナルコマンドや MCP ツールは Cursor
+                    のファイルアクセス制御の外で動作するため、無視設定をしていても読み取れてしまう可能性がある
+                  </strong>
+                  点には注意が必要である。真に機密性の高い情報はそもそもリポジトリに置かない設計が前提になる。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.figure}>
+            <p className={styles.figureLead}>
+              This diagram illustrates the context sources synthesized by the agent.
+            </p>
+            <div className={styles.figureCanvas}>
+              <MermaidDiagram chart={DIAGRAMS.d07_context_sources} />
+            </div>
+          </div>
+          <div className={styles.figureLegend}>
+            <div className={styles.legendTitle}>各ノードの意味</div>
+            <dl>
+              <div>
+                <dt>文脈の合成</dt>
+                <dd>
+                  明示的な指定（Rules・@メンション）と暗黙的な検索（インデックス・MCP・Skills）が1つの入力にまとめられる箇所
+                </dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className={`${styles.box} ${styles.glossary}`}>
+            <div className={styles.boxTitle}>📖 用語ノート</div>
+            <dl>
+              <div>
+                <dt>セマンティック検索</dt>
+                <dd>キーワード一致ではなく意味の近さでコードを検索する仕組み</dd>
+              </div>
+              <div>
+                <dt>コンテキストリング</dt>
+                <dd>現在のトークン使用量を視覚的に示すUI要素</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className={styles.sectionRefs}>
+            <div className={styles.boxTitle}>📎 参照URL</div>
+            <ul className={styles.refs}>
+              <li>
+                <span className={styles.refTag}>01</span>
+                <Ext href="https://cursor.com/docs/agent/prompting">
+                  cursor.com/docs/agent/prompting
+                </Ext>
+              </li>
+              <li>
+                <span className={styles.refTag}>02</span>
+                <Ext href="https://cursor.com/help/customization/context">
+                  cursor.com/help/customization/context
+                </Ext>
+              </li>
+              <li>
+                <span className={styles.refTag}>03</span>
+                <Ext href="https://cursor.com/help/customization/indexing">
+                  cursor.com/help/customization/indexing
+                </Ext>
+              </li>
+              <li>
+                <span className={styles.refTag}>04</span>
+                <Ext href="https://cursor.com/help/customization/ignore-files">
+                  cursor.com/help/customization/ignore-files
+                </Ext>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* ==================== Chapter 8 ==================== */}
+        <section className={`${styles.chapter} chapter`} id="ch8">
+          <div className={styles.chapterEyebrow}>Chapter 08</div>
+          <h2>Rules（ルールによる恒久指示）</h2>
+
+          <div className={styles.introCallout}>
+            <span className={styles.icon}>💡</span>
+            <div>
+              この章では、LLM がリクエスト間で記憶を持たないという前提を踏まえ、Cursor
+              がどのように「恒久的な指示」をコンテキストへ埋め込んでいるかを扱います。Rules
+              の設計品質が、チーム全体の Agent の再現性を左右します。
+            </div>
+          </div>
+
+          <p>
+            大規模言語モデルは呼び出し（completion）間で記憶を保持しない。Rules
+            はプロンプトレベルで永続的かつ再利用可能な文脈を提供する仕組みであり、適用されるとルールの内容がモデルコンテキストの先頭に含まれ、コード生成・編集の解釈・ワークフロー支援に一貫したガイダンスを与える。
+          </p>
+
+          <p>Cursor は4種類のルールをサポートする。</p>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>種類</th>
+                  <th>保存場所</th>
+                  <th>スコープ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>Project Rules</strong>
+                  </td>
+                  <td>
+                    <code>.cursor/rules</code>（バージョン管理対象）
+                  </td>
+                  <td>プロジェクト単位</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>User Rules</strong>
+                  </td>
+                  <td>Cursor 設定内（グローバル）</td>
+                  <td>ユーザー環境全体（Agent Chat のみ）</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Team Rules</strong>
+                  </td>
+                  <td>ダッシュボード管理</td>
+                  <td>チーム全体（Team / Enterprise プラン）</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>AGENTS.md</strong>
+                  </td>
+                  <td>プロジェクトルート／サブディレクトリ</td>
+                  <td>
+                    <code>.cursor/rules</code> のシンプルな代替
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>1</div>
+            <div className={styles.stepBody}>
+              <h4>Project Rules の構造を理解する</h4>
+              <p>
+                ルールは <code>.cursor/rules</code> 以下に配置する Markdown ファイル（
+                <code>.md</code> または <code>.mdc</code>
+                ）で、任意のファイル名を付けられる。フロントマターで <code>description</code> と{" "}
+                <code>globs</code> を細かく制御したい場合は <code>.mdc</code> を使う。
+              </p>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>.cursor/rules/ 構成例</span>
+                </div>
+                <pre>
+                  <code className="language-plaintext">{`.cursor/rules/
+  react-patterns.mdc       # フロントマター付き（description, globs）
+  api-guidelines.md        # シンプルな Markdown ルール
+  frontend/                # フォルダで整理も可能
+    components.md`}</code>
+                </pre>
+              </div>
+              <p>
+                適用タイプは4種類あり、フロントマターの <code>description</code> /{" "}
+                <code>globs</code> / <code>alwaysApply</code> の組み合わせで決まる。
+              </p>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>適用タイプ</th>
+                      <th>説明</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>Always Apply</strong>
+                      </td>
+                      <td>すべてのチャットセッションに適用</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Apply Intelligently</strong>
+                      </td>
+                      <td>
+                        Agent が <code>description</code> を見て関連性があると判断した場合に適用
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Apply to Specific Files</strong>
+                      </td>
+                      <td>ファイルパスが指定パターンに一致した場合に適用</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Apply Manually</strong>
+                      </td>
+                      <td>
+                        チャットで <code>@ルール名</code> と明示的にメンションした場合のみ適用
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>service-rule.mdc</span>
+                </div>
+                <pre>
+                  <code className="language-markdown">{`---
+globs:
+alwaysApply: false
+---
+
+- サービス定義には社内 RPC パターンを使うこと
+- サービス名は必ず snake_case にすること
+
+@service-template.ts`}</code>
+                </pre>
+              </div>
+              <p>グロブパターンの例：</p>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>パターン</th>
+                      <th>マッチ対象</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <code>*</code>
+                      </td>
+                      <td>任意の単一ファイル名セグメント</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>**</code>
+                      </td>
+                      <td>任意階層のディレクトリ（再帰）</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>*.ts</code>
+                      </td>
+                      <td>
+                        ルート直下の全 <code>.ts</code> ファイル
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>{"**/*.ts"}</code>
+                      </td>
+                      <td>
+                        任意のディレクトリ配下の全 <code>.ts</code> ファイル
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>{"src/**"}</code>
+                      </td>
+                      <td>
+                        <code>src/</code> 配下すべて
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>{"src/**/*.tsx"}</code>
+                      </td>
+                      <td>
+                        <code>src/</code> 配下の任意階層の <code>.tsx</code>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>{"docs/**/*.md, docs/**/*.mdx"}</code>
+                      </td>
+                      <td>
+                        <code>docs/</code> 配下の <code>.md</code> と <code>.mdx</code>
+                        （カンマ区切り）
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>tailwind.config.*</code>
+                      </td>
+                      <td>
+                        拡張子を問わない <code>tailwind.config</code>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>2</div>
+            <div className={styles.stepBody}>
+              <h4>ルールを作成する</h4>
+              <ul>
+                <li>
+                  <strong>チャットから</strong>：<code>/create-rule</code>{" "}
+                  と入力し内容を説明すると、Agent が適切なフロントマター付きのルールファイルを生成し{" "}
+                  <code>.cursor/rules</code> に保存する
+                </li>
+                <li>
+                  <strong>設定画面から</strong>：<code>Cursor Settings &gt; Rules, Commands</code>{" "}
+                  で <code>+ Add Rule</code> をクリックする。すべてのルールとその状態を一覧できる
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>3</div>
+            <div className={styles.stepBody}>
+              <h4>（最重要）ベストプラクティスを守る</h4>
+              <p>
+                良いルールは<strong>焦点が絞られ、実行可能で、スコープが明確</strong>である。
+              </p>
+              <div className={`${styles.box} ${styles.tip}`}>
+                <div className={styles.boxTitle}>✓ Best Practice</div>
+                <ul style={{ marginBottom: 0 }}>
+                  <li>ルールは 500 行未満に収める</li>
+                  <li>大きなルールは複数の合成可能なルールに分割する</li>
+                  <li>具体例か参照ファイルを添える</li>
+                  <li>曖昧な指示を避け、社内ドキュメントのように明確に書く</li>
+                  <li>同じプロンプトをチャットで繰り返し打っているならルール化する</li>
+                  <li>
+                    ファイルの内容をそのままコピーせず <code>@ファイル名</code>{" "}
+                    で参照する（内容が古くならず、ルールも短く保てる）
+                  </li>
+                </ul>
+              </div>
+              <p>
+                <strong>避けるべきこと</strong>：
+              </p>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>アンチパターン</th>
+                      <th>理由・代替策</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>スタイルガイドを丸ごとコピーする</td>
+                      <td>リンターに任せる。Agent は一般的な規約をすでに理解している</td>
+                    </tr>
+                    <tr>
+                      <td>すべてのコマンドを網羅的に記載する</td>
+                      <td>npm・git・pytest のような一般的なツールは Agent が既に知っている</td>
+                    </tr>
+                    <tr>
+                      <td>稀にしか起きないエッジケースの指示を大量に書く</td>
+                      <td>頻繁に使うパターンだけに絞る</td>
+                    </tr>
+                    <tr>
+                      <td>コードベースの内容をルールに重複させる</td>
+                      <td>正規の実装例をコピーせず参照する</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>
+                まずはシンプルに始め、
+                <strong>Agent が同じミスを繰り返した時にだけルールを追加する</strong>
+                。過剰最適化する前にまず自分たちのパターンを理解することが優先される。ルールは Git
+                にコミットしてチーム全体で恩恵を受けられるようにし、ミスに気づいたらルールを更新する。GitHub
+                の Issue や PR で <code>@cursor</code> にタグ付けしてルール更新自体を Agent
+                に任せることもできる。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>4</div>
+            <div className={styles.stepBody}>
+              <h4>AGENTS.md というシンプルな代替</h4>
+              <p>
+                <code>AGENTS.md</code> はフロントマターや複雑な設定を持たないプレーンな Markdown
+                で、シンプルな用途に向く。プロジェクトルートおよびサブディレクトリの両方に配置できる。
+              </p>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>AGENTS.md</span>
+                </div>
+                <pre>
+                  <code className="language-markdown">{`# Project Instructions
+
+## Code Style
+- 新規ファイルはすべて TypeScript を使う
+- React は関数コンポーネントを優先する
+- DB カラム名は snake_case にする
+
+## Architecture
+- リポジトリパターンに従う
+- ビジネスロジックはサービス層に置く`}</code>
+                </pre>
+              </div>
+              <p>
+                ネストした <code>AGENTS.md</code>{" "}
+                もサポートされており、より具体的な階層の指示が優先されつつ親ディレクトリの指示とマージされる。
+              </p>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>ディレクトリ構成例</span>
+                </div>
+                <pre>
+                  <code className="language-plaintext">{`project/
+  AGENTS.md              # 全体指示
+  frontend/
+    AGENTS.md            # フロントエンド向け指示
+    components/
+      AGENTS.md          # コンポーネント向け指示
+  backend/
+    AGENTS.md            # バックエンド向け指示`}</code>
+                </pre>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>5</div>
+            <div className={styles.stepBody}>
+              <h4>Team Rules と適用優先順位を理解する</h4>
+              <p>
+                Team / Enterprise
+                プランでは、管理者がダッシュボードから組織全体にルールを強制できる。
+              </p>
+              <ul>
+                <li>
+                  <strong>Enable this rule immediately</strong>
+                  ：チェックすると作成直後から有効化。未チェックの場合はドラフトとして保存され、後で有効化するまで適用されない
+                </li>
+                <li>
+                  <strong>Enforce this rule</strong>
+                  ：有効にするとチームメンバー全員に必須となり、個人設定で無効化できなくなる。無効の場合、非強制の
+                  Team Rule はメンバーが <code>Cursor Settings → Rules</code> の Team Rules
+                  セクションでオフにできる
+                </li>
+              </ul>
+              <div className={`${styles.box} ${styles.warn}`}>
+                <div className={styles.boxTitle}>⚠ 注意</div>
+                <p style={{ marginBottom: 0 }}>
+                  <strong>適用順序</strong>：<code>Team Rules → Project Rules → User Rules</code>{" "}
+                  の順に適用され、すべて合成される。指示が競合した場合は
+                  <strong>先に適用されたソースが優先</strong>
+                  される。強制ルールをコンプライアンス運用の一部として使うことは可能だが、AI
+                  によるガイダンスだけをセキュリティ上の唯一の統制にすべきではない。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.figure}>
+            <p className={styles.figureLead}>
+              This diagram shows rule synthesis and priority ordering.
+            </p>
+            <div className={styles.figureCanvas}>
+              <MermaidDiagram chart={DIAGRAMS.d08_rules_priority} />
+            </div>
+          </div>
+          <div className={styles.figureLegend}>
+            <div className={styles.legendTitle}>各ノードの意味</div>
+            <dl>
+              <div>
+                <dt>コンテキストへの合成</dt>
+                <dd>適用条件を満たすすべてのルールが1つのコンテキストにまとめられる箇所</dd>
+              </div>
+              <div>
+                <dt>先勝ち</dt>
+                <dd>Team Rules → Project Rules → User Rules の順で優先度が決まる原則</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>6</div>
+            <div className={styles.stepBody}>
+              <h4>外部リポジトリからルールをインポートする</h4>
+              <ol>
+                <li>
+                  <code>Cursor Settings → Rules, Commands</code> を開く
+                </li>
+                <li>
+                  <code>Project Rules</code> の <code>+ Add Rule</code> から{" "}
+                  <code>Remote Rule (Github)</code> を選択
+                </li>
+                <li>
+                  ルールを含む GitHub リポジトリの URL を貼り付ける（Cursor が <code>.mdc</code>{" "}
+                  ファイルをすべてスキャンする）
+                </li>
+                <li>
+                  <code>.cursor/rules/imported/&lt;repoName&gt;</code>{" "}
+                  にルールが同期される（相対パスも保持される）
+                </li>
+              </ol>
+            </div>
+          </div>
+
+          <h3>FAQ（つまずきやすいポイント）</h3>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>疑問</th>
+                  <th>回答</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>ルールが適用されない</td>
+                  <td>
+                    <code>Apply Intelligently</code> は <code>description</code> が必須。
+                    <code>Apply to Specific Files</code> は参照ファイルがグロブに一致しているか確認
+                  </td>
+                </tr>
+                <tr>
+                  <td>ルールは他ファイルを参照できるか</td>
+                  <td>
+                    <code>@filename.ts</code> で可能。ルールもチャットから <code>@ルール名</code>{" "}
+                    で手動適用できる
+                  </td>
+                </tr>
+                <tr>
+                  <td>ルールは Tab に影響するか</td>
+                  <td>影響しない。Tab や他の AI 機能には適用されない</td>
+                </tr>
+                <tr>
+                  <td>User Rules は Inline Edit（Cmd+K）に効くか</td>
+                  <td>効かない。User Rules は Agent（Chat）専用</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={`${styles.box} ${styles.glossary}`}>
+            <div className={styles.boxTitle}>📖 用語ノート</div>
+            <dl>
+              <div>
+                <dt>フロントマター（frontmatter）</dt>
+                <dd>Markdown ファイル冒頭に YAML 形式で書くメタデータ</dd>
+              </div>
+              <div>
+                <dt>グロブパターン</dt>
+                <dd>ファイルパスの一致条件を記述するワイルドカード構文</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className={styles.sectionRefs}>
+            <div className={styles.boxTitle}>📎 参照URL</div>
+            <ul className={styles.refs}>
+              <li>
+                <span className={styles.refTag}>01</span>
+                <Ext href="https://cursor.com/docs/rules">cursor.com/docs/rules</Ext>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* ==================== Chapter 9 ==================== */}
+        <section className={`${styles.chapter} chapter`} id="ch9">
+          <div className={styles.chapterEyebrow}>Chapter 09</div>
+          <h2>MCP（Model Context Protocol）</h2>
+
+          <div className={styles.introCallout}>
+            <span className={styles.icon}>💡</span>
+            <div>
+              この章では、Cursor を外部ツール・データソースに接続するオープンプロトコルである MCP
+              の仕組みと、設定・認証・セキュリティのベストプラクティスを扱います。
+            </div>
+          </div>
+
+          <p>
+            MCP（Model Context Protocol）は Cursor
+            を外部のツールやデータソースに接続するための仕組みである。プロジェクト構造を毎回説明する代わりに、ツールと直接統合できる。MCP
+            サーバーは <code>stdout</code> に出力するか HTTP
+            エンドポイントを提供できる言語であれば何でも実装可能（Python・JavaScript・Go
+            など）。公式プラグインは Cursor Marketplace で、コミュニティ製は{" "}
+            <code>cursor.directory</code> で探せる。
+          </p>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>1</div>
+            <div className={styles.stepBody}>
+              <h4>3つのトランスポート方式を理解する</h4>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>トランスポート</th>
+                      <th>実行環境</th>
+                      <th>デプロイ</th>
+                      <th>利用者</th>
+                      <th>入力形式</th>
+                      <th>認証</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>stdio</strong>
+                      </td>
+                      <td>ローカル</td>
+                      <td>Cursor が管理</td>
+                      <td>単一ユーザー</td>
+                      <td>シェルコマンド</td>
+                      <td>手動</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>SSE</strong>
+                      </td>
+                      <td>ローカル／リモート</td>
+                      <td>サーバーとしてデプロイ</td>
+                      <td>複数ユーザー</td>
+                      <td>SSE エンドポイント URL</td>
+                      <td>OAuth</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Streamable HTTP</strong>
+                      </td>
+                      <td>ローカル／リモート</td>
+                      <td>サーバーとしてデプロイ</td>
+                      <td>複数ユーザー</td>
+                      <td>HTTP エンドポイント URL</td>
+                      <td>OAuth</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>
+                Cursor がサポートするプロトコル機能：<strong>Tools</strong>（AI
+                モデルが実行する関数）・<strong>Prompts</strong>
+                （テンプレート化されたワークフロー）・<strong>Resources</strong>（構造化データ）・
+                <strong>Roots</strong>（サーバー起点の URI／ファイルシステム境界の照会）・
+                <strong>Elicitation</strong>（サーバーからユーザーへの追加情報要求）・
+                <strong>Apps</strong>（拡張、ツールが返すインタラクティブ UI）。MCP Apps
+                はプログレッシブエンハンスメント設計であり、ホスト側が UI
+                表示に非対応でも通常のツール応答として機能する。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>2</div>
+            <div className={styles.stepBody}>
+              <h4>MCP サーバーをインストールする</h4>
+              <ol>
+                <li>
+                  <strong>ワンクリックインストール</strong>：Cursor Marketplace
+                  から公式プラグインを「Add to Cursor」でインストールし OAuth 認証する
+                </li>
+                <li>
+                  <strong>
+                    <code>mcp.json</code> による手動設定
+                  </strong>
+                  ：
+                </li>
+              </ol>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>ローカルサーバー（Node.js）</span>
+                </div>
+                <pre>
+                  <code className="language-json">{`{
+  "mcpServers": {
+    "server-name": {
+      "command": "npx",
+      "args": ["-y", "mcp-server"],
+      "env": { "API_KEY": "value" }
+    }
+  }
+}`}</code>
+                </pre>
+              </div>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>リモートサーバー</span>
+                </div>
+                <pre>
+                  <code className="language-json">{`{
+  "mcpServers": {
+    "server-name": {
+      "url": "http://localhost:3000/mcp",
+      "headers": { "API_KEY": "value" }
+    }
+  }
+}`}</code>
+                </pre>
+              </div>
+              <p>
+                <strong>設定ファイルの配置場所</strong>：プロジェクト固有は{" "}
+                <code>.cursor/mcp.json</code>、全プロジェクト共通は <code>~/.cursor/mcp.json</code>
+                。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>3</div>
+            <div className={styles.stepBody}>
+              <h4>STDIO サーバーの設定フィールドを押さえる</h4>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>フィールド</th>
+                      <th>必須</th>
+                      <th>説明</th>
+                      <th>例</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <code>type</code>
+                      </td>
+                      <td>✅</td>
+                      <td>接続種別</td>
+                      <td>
+                        <code>"stdio"</code>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>command</code>
+                      </td>
+                      <td>✅</td>
+                      <td>サーバー実行コマンド（PATH 上、または絶対パス）</td>
+                      <td>
+                        <code>"npx"</code>, <code>"node"</code>, <code>"python"</code>,{" "}
+                        <code>"docker"</code>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>args</code>
+                      </td>
+                      <td>–</td>
+                      <td>コマンドへの引数配列</td>
+                      <td>
+                        <code>["server.py", "--port", "3000"]</code>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>env</code>
+                      </td>
+                      <td>–</td>
+                      <td>サーバーの環境変数</td>
+                      <td>
+                        <code>{`{"API_KEY": "\\\${env:api-key}"}`}</code>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>envFile</code>
+                      </td>
+                      <td>–</td>
+                      <td>
+                        追加で読み込む環境変数ファイルパス（<strong>stdio のみ対応</strong>）
+                      </td>
+                      <td>
+                        <code>".env"</code>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>4</div>
+            <div className={styles.stepBody}>
+              <h4>設定の変数展開（interpolation）を使う</h4>
+              <p>
+                <code>command</code>・<code>args</code>・<code>env</code>・<code>url</code>・
+                <code>headers</code> の値で以下の変数が解決される。
+              </p>
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>構文</th>
+                      <th>意味</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <code>{"$" + "{env:NAME}"}</code>
+                      </td>
+                      <td>環境変数</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>{"$" + "{userHome}"}</code>
+                      </td>
+                      <td>ホームディレクトリのパス</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>{"$" + "{workspaceFolder}"}</code>
+                      </td>
+                      <td>
+                        <code>.cursor/mcp.json</code> を含むプロジェクトルート
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>{"$" + "{workspaceFolderBasename}"}</code>
+                      </td>
+                      <td>プロジェクトルートのフォルダ名</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>{"$" + "{pathSeparator}"}</code> / <code>{"$" + "{/}"}</code>
+                      </td>
+                      <td>OS のパス区切り文字</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>変数展開の例</span>
+                </div>
+                <pre>
+                  <code className="language-json">{`{
+  "mcpServers": {
+    "remote-server": {
+      "url": "https://api.example.com/mcp",
+      "headers": { "Authorization": "Bearer \${env:MY_SERVICE_TOKEN}" }
+    }
+  }
+}`}</code>
+                </pre>
+              </div>
+              <p>APIキーやトークンはハードコードせず、環境変数経由で渡すのが原則である。</p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>5</div>
+            <div className={styles.stepBody}>
+              <h4>OAuth 認証が必要なリモートサーバーの静的認証情報</h4>
+              <p>
+                Dynamic Client Registration に非対応で、固定 of Client ID とリダイレクト URL
+                のホワイトリスト登録が必要なプロバイダ（Figma・Linear など）向けに、
+                <code>auth</code> オブジェクトを指定できる。
+              </p>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>静的 OAuth</span>
+                </div>
+                <pre>
+                  <code className="language-json">{`{
+  "mcpServers": {
+    "oauth-server": {
+      "url": "https://api.example.com/mcp",
+      "auth": {
+        "CLIENT_ID": "your-oauth-client-id",
+        "CLIENT_SECRET": "your-client-secret",
+        "scopes": ["read", "write"]
+      }
+    }
+  }
+}`}</code>
+                </pre>
+              </div>
+              <p>
+                Cursor は全 MCP サーバーに共通の固定リダイレクト URL{" "}
+                <code>cursor://anysphere.cursor-mcp/oauth/callback</code> を使用する。サーバー識別は
+                OAuth の <code>state</code> パラメータで行われるため、1つのリダイレクト URL
+                で全サーバーに対応できる。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>6</div>
+            <div className={styles.stepBody}>
+              <h4>ツール承認と Run Mode</h4>
+              <p>
+                Cursor はデフォルトで MCP
+                ツール使用前に承認を求める。ツール名の横の矢印をクリックすると引数を確認できる。
+              </p>
+              <ul>
+                <li>
+                  <strong>Run Mode（Auto-review、Cursor 3.6 以降のデフォルト）</strong>
+                  ：許可リスト登録済みの MCP
+                  ツールは即座に実行され、それ以外は安全性分類器を経由する
+                </li>
+                <li>
+                  <strong>事前承認の設定</strong>：<code>permissions.json</code>{" "}
+                  に承認済みツールを追加、または <code>autoRun</code>{" "}
+                  指示でサーバー・ツール単位に分類器の挙動を調整できる
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>7</div>
+            <div className={styles.stepBody}>
+              <h4>画像を文脈として受け取る</h4>
+              <p>
+                MCP サーバーはスクリーンショットや図などの画像を base64
+                エンコード文字列として返せる。
+              </p>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeBlockHead}>
+                  <span>画像を返すツールの例</span>
+                </div>
+                <pre>
+                  <code className="language-javascript">{`server.tool("generate_image", async (params) => {
+  return {
+    content: [
+      { type: "image", data: RED_CIRCLE_BASE64, mimeType: "image/jpeg" }
+    ]
+  };
+});`}</code>
+                </pre>
+              </div>
+              <p>
+                モデルが画像入力に対応していれば、返された画像はチャットに添付され解析対象になる。
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNum}>8</div>
+            <div className={styles.stepBody}>
+              <h4>（重要）セキュリティを常に意識する</h4>
+              <p>
+                MCP
+                サーバーは外部サービスへアクセスし、ユーザーに代わってコードを実行できる。以下を必ず守る。
+              </p>
+              <div className={`${styles.box} ${styles.warn}`}>
+                <div className={styles.boxTitle}>⚠ セキュリティ</div>
+                <ul style={{ marginBottom: 0 }}>
+                  <li>
+                    <strong>出所を検証する</strong>
+                    ：信頼できる開発者・リポジトリのサーバーのみをインストールする
+                  </li>
+                  <li>
+                    <strong>権限を確認する</strong>：サーバーがどのデータ・API
+                    にアクセスするかを把握する
+                  </li>
+                  <li>
+                    <strong>APIキーを制限する</strong>：必要最小限の権限に絞った制限付きキーを使う
+                  </li>
+                  <li>
+                    <strong>重要な統合ではコードを監査する</strong>
+                    ：クリティカルな連携ではソースコードをレビューする
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.figure}>
+            <p className={styles.figureLead}>This diagram shows MCP client-server topology.</p>
+            <div className={styles.figureCanvas}>
+              <MermaidDiagram chart={DIAGRAMS.d09_mcp_architecture} />
+            </div>
+          </div>
+          <div className={styles.figureLegend}>
+            <div className={styles.legendTitle}>各ノードの意味</div>
+            <dl>
+              <div>
+                <dt>MCP Client 内蔵</dt>
+                <dd>Cursor 内部でツール呼び出しを仲介するコンポーネント</dd>
+              </div>
+              <div>
+                <dt>Agent 実行ループへ合流</dt>
+                <dd>ツール結果が Agent のコンテキストに戻り、次の判断材料になる箇所</dd>
+              </div>
+            </dl>
+          </div>
+
+          <h3>トラブルシューティング早見表</h3>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>症状</th>
+                  <th>確認手順</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>サーバーの挙動がおかしい</td>
+                  <td>
+                    <code>Output</code> パネル（<code>Cmd/Ctrl+Shift+U</code>）→{" "}
+                    <code>MCP Logs</code> で接続エラー・認証エラー・クラッシュを確認
+                  </td>
+                </tr>
+                <tr>
+                  <td>一時的に切りたい</td>
+                  <td>
+                    <code>Settings &gt; Features &gt; Model Context Protocol</code>{" "}
+                    でトグルをオフ（設定は保持される）
+                  </td>
+                </tr>
+                <tr>
+                  <td>サーバーがクラッシュ／タイムアウトした</td>
+                  <td>
+                    チャットにエラー表示、該当ツール呼び出しは失敗扱い。他のサーバーには影響しない設計
+                  </td>
+                </tr>
+                <tr>
+                  <td>npm 製サーバーを更新したい</td>
+                  <td>
+                    設定から一度削除 → <code>npm cache clean --force</code> → 再追加で最新版取得
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={`${styles.box} ${styles.glossary}`}>
+            <div className={styles.boxTitle}>📖 用語ノート</div>
+            <dl>
+              <div>
+                <dt>MCP（Model Context Protocol）</dt>
+                <dd>AI アプリケーションと外部ツール・データソースを繋ぐオープンな標準規格</dd>
+              </div>
+              <div>
+                <dt>Elicitation</dt>
+                <dd>MCP サーバーがユーザーへ追加情報を能動的に要求する機能</dd>
+              </div>
+              <div>
+                <dt>Dynamic Client Registration</dt>
+                <dd>OAuth クライアントを動的に自動登録する仕組み</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className={styles.sectionRefs}>
+            <div className={styles.boxTitle}>📎 参照URL</div>
+            <ul className={styles.refs}>
+              <li>
+                <span className={styles.refTag}>01</span>
+                <Ext href="https://cursor.com/docs/mcp">cursor.com/docs/mcp</Ext>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* ==================== Placeholders for Chapters 10-21 ==================== */}
+        {TOC_ITEMS.slice(9).map((item) => (
           <section key={item.id} className={`${styles.chapter} chapter`} id={item.id}>
             <div className={styles.chapterEyebrow}>Chapter {item.num}</div>
             <h2>{item.title}</h2>
