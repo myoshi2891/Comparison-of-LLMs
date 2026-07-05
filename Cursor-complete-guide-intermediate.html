@@ -531,12 +531,14 @@
       .figure-canvas {
         background: var(--bg-elevated);
         border-radius: var(--radius-md);
-        padding: 18px 10px;
+        padding: 18px 24px;
         overflow-x: auto;
         border: 1px solid var(--border);
         display: flex;
         justify-content: center;
         align-items: flex-start;
+        max-width: 760px;
+        margin: 0 auto;
       }
       .figure-canvas > pre.mermaid {
         width: 100%;
@@ -546,7 +548,7 @@
       .figure-canvas svg {
         display: block;
         margin: 0 auto;
-        width: auto;
+        width: 100%;
         max-width: 100%;
         height: auto !important;
         overflow: visible;
@@ -6600,21 +6602,24 @@ agent --sandbox enabled        # または disabled
         }
       }
 
-      mermaid.run({ querySelector: '.mermaid' }).then(() => {
-        // SVG size / centering post-processing
-        document.querySelectorAll('.figure-canvas .mermaid svg').forEach((svgEl) => {
-          svgEl.removeAttribute('width');
-          svgEl.removeAttribute('height');
-          svgEl.style.display    = 'block';
-          svgEl.style.margin     = '0 auto';
-          svgEl.style.width      = 'auto';
-          svgEl.style.maxWidth   = '100%';
-          svgEl.style.height     = 'auto';
-          svgEl.style.overflow   = 'visible';
+      mermaid
+        .run({ querySelector: '.mermaid' })
+        .then(() => {
+          // SVG size / centering post-processing
+          document.querySelectorAll('.figure-canvas .mermaid svg').forEach((svgEl) => {
+            svgEl.removeAttribute('width');
+            svgEl.removeAttribute('height');
+            svgEl.style.display = 'block';
+            svgEl.style.margin = '0 auto';
+            svgEl.style.width = 'auto';
+            svgEl.style.maxWidth = '100%';
+            svgEl.style.height = 'auto';
+            svgEl.style.overflow = 'visible';
+          });
+        })
+        .catch((err) => {
+          console.error('Mermaid render error:', err);
         });
-      }).catch((err) => {
-        console.error('Mermaid render error:', err);
-      });
 
       // Syntax highlighting for code blocks
       document.querySelectorAll('pre code').forEach((block) => {
