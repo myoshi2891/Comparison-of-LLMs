@@ -8,13 +8,18 @@
   --loop: #0b7a75;
   --loop-dark: #075c58;
   --amber: #d9860f;
-  --violet: #6c5ce7;
   --rose: #c4436b;
   --code-bg: #101a20;
   --code-ink: #dceae8;
   --radius: 14px;
   --maxw: 1180px;
   --sidebar-w: 290px;
+
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'IBM Plex Sans JP', 'IBM Plex Sans', -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.75;
 }
 
 .hero {
@@ -77,4 +82,318 @@
 
 .accent {
   color: #9fe6df;
+}
+
+.lead {
+  font-size: 1.12rem;
+  color: #d7e6e3;
+  max-width: 56ch;
+  margin: 0 0 28px;
+}
+
+.heroMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 13px;
+  color: #bfd8d4;
+}
+
+.heroMeta span {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  padding: 5px 11px;
+  border-radius: 8px;
+  font-family: var(--font-mono), monospace;
+}
+
+.notice {
+  max-width: var(--maxw);
+  margin: -46px auto 0;
+  position: relative;
+  z-index: 3;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--amber);
+  border-radius: var(--radius);
+  padding: 20px 26px;
+  font-size: 14.5px;
+  color: var(--ink-soft);
+  box-shadow: 0 20px 40px -24px rgba(18, 32, 43, 0.35);
+}
+
+.notice strong {
+  color: var(--ink);
+}
+
+.layout {
+  max-width: var(--maxw);
+  margin: 56px auto 0;
+  padding: 0 24px 80px;
+  display: grid;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+  gap: 48px;
+  align-items: start;
+}
+
+.sidebar {
+  position: sticky;
+  top: 100px; /* offset to avoid header overlap */
+}
+
+.toc {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 22px 20px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+.toc h2 {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--loop-dark);
+  margin: 0 0 14px;
+  font-family: var(--font-mono), monospace;
+}
+
+.toc ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: toc;
+}
+
+.toc li {
+  counter-increment: toc;
+  margin-bottom: 2px;
+}
+
+.tocLink {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  text-decoration: none;
+  color: var(--ink-soft);
+  font-size: 13.6px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  transition: background 0.15s ease, color 0.15s ease;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+.tocLink::before {
+  content: counter(toc, decimal-leading-zero);
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: var(--loop);
+  flex-shrink: 0;
+}
+
+.tocLink:hover {
+  background: var(--paper-alt);
+  color: var(--ink);
+}
+
+.tocLinkActive {
+  background: #e4f3f1;
+  color: var(--loop-dark);
+  font-weight: 600;
+}
+
+.mainContent {
+  min-width: 0;
+}
+
+.block {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 38px 40px;
+  margin-bottom: 28px;
+}
+
+.kicker {
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--loop-dark);
+  margin-bottom: 8px;
+}
+
+.mainContent h2 {
+  font-size: 1.6rem;
+  margin: 0 0 22px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--paper-alt);
+  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+  color: var(--ink);
+  line-height: 1.25;
+}
+
+.mainContent h3 {
+  font-size: 1.18rem;
+  margin: 32px 0 14px;
+  color: var(--loop-dark);
+  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+  line-height: 1.25;
+}
+
+.mainContent p {
+  margin: 0 0 16px;
+  color: var(--ink-soft);
+}
+
+.mainContent strong {
+  color: var(--ink);
+}
+
+.mainContent ul {
+  color: var(--ink-soft);
+  padding-left: 1.3em;
+  margin: 0 0 16px;
+}
+
+.mainContent li {
+  margin-bottom: 6px;
+}
+
+.mainContent li::marker {
+  color: var(--loop);
+}
+
+.callout {
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin: 22px 0;
+  font-size: 15px;
+  border: 1px solid var(--line);
+}
+
+.tip {
+  background: #eaf6f4;
+  border-color: #bfe3dc;
+}
+
+.tip::before {
+  content: '💡 初学者向けの例え';
+  display: block;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  color: var(--loop-dark);
+  margin-bottom: 6px;
+}
+
+.tableScroll {
+  overflow-x: auto;
+  margin: 20px 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.tableScroll table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14.5px;
+  min-width: 520px;
+}
+
+.tableScroll thead th {
+  background: var(--ink);
+  color: #eaf3f1;
+  text-align: left;
+  padding: 12px 16px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+.tableScroll tbody td {
+  padding: 11px 16px;
+  border-top: 1px solid var(--paper-alt);
+  vertical-align: top;
+  color: var(--ink-soft);
+}
+
+.tableScroll tbody tr:nth-child(odd) {
+  background: #f7f9f8;
+}
+
+.tableScroll tbody td:first-child {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.diagram {
+  background: #fafbf9;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 22px 18px;
+  margin: 22px 0;
+  overflow-x: auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.diagram figcaption {
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin-top: 12px;
+  text-align: center;
+}
+
+.mermaidContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  overflow: visible;
+}
+
+.mermaidContainer :global(svg) {
+  display: block;
+  margin: 0 auto;
+  width: 100% !important;
+  height: auto !important;
+  max-content: 100%;
+  overflow: visible;
+}
+
+@media (max-width: 980px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    position: static;
+  }
+  .toc {
+    display: none; /* toggle mobile menu logic can be added later if needed */
+  }
+  .block {
+    padding: 26px 22px;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero {
+    padding: 56px 16px 70px;
+  }
+  .notice {
+    margin: -34px 16px 0;
+    padding: 16px 18px;
+  }
+  .mainContent h2 {
+    font-size: 1.32rem;
+  }
 }
