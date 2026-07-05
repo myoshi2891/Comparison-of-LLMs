@@ -1,10 +1,6 @@
-import dynamic from "next/dynamic";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
-
-const MermaidDiagram = dynamic(() => import("@/components/docs/MermaidDiagram"), {
-  ssr: false,
-});
 
 
 export const metadata = {
