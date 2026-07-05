@@ -101,7 +101,10 @@ export const navLinks: readonly NavLink[] = [
   },
   {
     name: "IDE",
-    children: [{ name: "Cursor Guide", href: "/cursor/complete-guide" }],
+    children: [
+      { name: "Cursor Guide", href: "/cursor/complete-guide" },
+      { name: "Cursor Guide (中級)", href: "/cursor/complete-guide-intermediate" },
+    ],
   },
   { name: "Git Worktree", href: "/git-worktree" },
 ];
