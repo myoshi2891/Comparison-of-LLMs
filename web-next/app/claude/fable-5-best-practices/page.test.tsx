@@ -45,10 +45,10 @@ describe("/claude/fable-5-best-practices - page structure (Step 1)", () => {
     expect(h1?.textContent?.replace(/\s+/g, "")).toContain("ClaudeFable5実践活用ガイド");
   });
 
-  it("renders <h2> headings for ch1 to ch10", () => {
+  it("renders <h2> headings for ch1 to ch15", () => {
     const { container } = render(<Page />);
     const h2s = Array.from(container.querySelectorAll("h2"));
-    expect(h2s).toHaveLength(10);
+    expect(h2s).toHaveLength(15);
     expect(h2s[0].textContent).toContain("Claude Fable 5 とは何か");
     expect(h2s[1].textContent).toContain("タイムライン");
     expect(h2s[2].textContent).toContain("安全分類器");
@@ -59,5 +59,17 @@ describe("/claude/fable-5-best-practices - page structure (Step 1)", () => {
     expect(h2s[7].textContent).toContain("Unknowns");
     expect(h2s[8].textContent).toContain("検証ループとメモリ");
     expect(h2s[9].textContent).toContain("モデル選定フロー");
+    expect(h2s[10].textContent).toContain("よくある落とし穴");
+    expect(h2s[11].textContent).toContain("実力");
+    expect(h2s[12].textContent).toContain("既知の制限事項");
+    expect(h2s[13].textContent).toContain("まとめ");
+    expect(h2s[14].textContent).toContain("参考文献");
+  });
+
+  it("renders footer containing the base date text", () => {
+    const { container } = render(<Page />);
+    const footer = container.querySelector("footer");
+    expect(footer).not.toBeNull();
+    expect(footer?.textContent).toContain("2026年7月4日時点の情報");
   });
 });
