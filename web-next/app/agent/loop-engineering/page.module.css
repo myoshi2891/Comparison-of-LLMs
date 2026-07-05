@@ -12,7 +12,7 @@
   --code-bg: #101a20;
   --code-ink: #dceae8;
   --radius: 14px;
-  --maxw: 1180px;
+  --maxw: 100%;
   --sidebar-w: 290px;
 
   background: var(--paper);
@@ -31,7 +31,8 @@
 }
 
 .heroInner {
-  max-width: var(--maxw);
+  max-width: 100%;
+  padding: 0 40px;
   margin: 0 auto;
   position: relative;
   z-index: 2;
@@ -107,15 +108,15 @@
 }
 
 .notice {
-  max-width: var(--maxw);
+  max-width: 100%;
   margin: -46px auto 0;
+  padding: 20px 40px;
   position: relative;
   z-index: 3;
   background: var(--panel);
   border: 1px solid var(--line);
   border-left: 5px solid var(--amber);
-  border-radius: var(--radius);
-  padding: 20px 26px;
+  border-radius: 0;
   font-size: 14.5px;
   color: var(--ink-soft);
   box-shadow: 0 20px 40px -24px rgba(18, 32, 43, 0.35);
@@ -126,9 +127,9 @@
 }
 
 .layout {
-  max-width: var(--maxw);
+  max-width: 100%;
   margin: 56px auto 0;
-  padding: 0 24px 80px;
+  padding: 0 40px 80px;
   display: grid;
   grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
   gap: 48px;
@@ -508,9 +509,14 @@
   .hero {
     padding: 56px 16px 70px;
   }
+  .heroInner {
+    padding: 0 16px;
+  }
   .notice {
-    margin: -34px 16px 0;
-    padding: 16px 18px;
+    padding: 16px 16px;
+  }
+  .layout {
+    padding: 0 16px 60px;
   }
   .mainContent h2 {
     font-size: 1.32rem;
