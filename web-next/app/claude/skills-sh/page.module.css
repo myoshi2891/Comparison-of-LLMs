@@ -19,24 +19,16 @@
   --violet-soft: rgba(167, 139, 250, 0.12);
   --rose: #fb7185;
   --code-bg: #0a1622;
-  --font-display: 'Space Grotesk', sans-serif;
-  --font-body: 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
   --sidebar-w: 296px;
   --content-max: 100%; /* メインコンテンツの横幅は画面いっぱいに広がるように */
 
   background: var(--bg);
   background-image:
-    radial-gradient(
-      ellipse 900px 500px at 85% -10%,
-      rgba(94, 234, 212, 0.06),
-      transparent 60%
-    ),
-    radial-gradient(
-      ellipse 700px 500px at -10% 40%,
-      rgba(167, 139, 250, 0.05),
-      transparent 60%
-    );
+    radial-gradient(ellipse 900px 500px at 85% -10%, rgba(94, 234, 212, 0.06), transparent 60%),
+    radial-gradient(ellipse 700px 500px at -10% 40%, rgba(167, 139, 250, 0.05), transparent 60%);
   color: var(--text-primary);
   font-family: var(--font-body);
   line-height: 1.7;

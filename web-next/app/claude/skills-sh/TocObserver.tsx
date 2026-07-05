@@ -37,7 +37,9 @@ export default function TocObserver() {
         subLink.setAttribute("aria-current", "location");
         const parentSection = subLink.closest("section");
         if (parentSection) {
-          const parentTocLink = document.querySelector(`.${styles.tocLink}[href="#${parentSection.id}"]`);
+          const parentTocLink = document.querySelector(
+            `.${styles.tocLink}[href="#${parentSection.id}"]`
+          );
           if (parentTocLink) {
             parentTocLink.classList.add(styles.tocLinkActive);
           }
@@ -72,7 +74,7 @@ export default function TocObserver() {
       const scrollTop = window.scrollY;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       const pct = docHeight > 0 ? Math.min(100, (scrollTop / docHeight) * 100) : 0;
-      if (progressFill) progressFill.style.width = pct + "%";
+      if (progressFill) progressFill.style.width = `${pct}%`;
     }
     window.addEventListener("scroll", updateProgress, { passive: true });
     updateProgress();
@@ -80,7 +82,7 @@ export default function TocObserver() {
     // 3. モバイルサイドバー開閉
     const navToggle = document.getElementById("navToggle");
     const sidebar = document.getElementById("sidebar");
-    
+
     const handleToggleClick = () => {
       if (sidebar) sidebar.classList.toggle(styles.sidebarOpen);
     };
@@ -92,7 +94,7 @@ export default function TocObserver() {
     if (navToggle) {
       navToggle.addEventListener("click", handleToggleClick);
     }
-    
+
     let links: HTMLAnchorElement[] = [];
     if (sidebar) {
       links = Array.from(sidebar.querySelectorAll("a"));
