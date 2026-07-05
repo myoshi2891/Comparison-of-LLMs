@@ -11,8 +11,8 @@
 | 最終スキャン日 | 2026-07-05 |
 | フロントエンドテストランナー | Vitest 4.1 (jsdom 29 + @testing-library/react 16) |
 | バックエンドテストランナー | pytest 9.0 (unittest 互換) |
-| web-next テストファイル数 | 67 |
-| web-next テストケース数 | 774 |
+| web-next テストファイル数 | 68 |
+| web-next テストケース数 | 778 |
 | scraper テストファイル数 | 5 |
 | scraper テストケース数 | 38 |
 | 総合カバレッジスコア (weighted) | 44.2% |
@@ -49,10 +49,10 @@
 
 ```
 status: done
-count: 308
+count: 309
 files:
   - app/agent/hermes-agent-advanced-guide/page.test.tsx (8)
-  - app/agent/loop-engineering/page.test.tsx (21)
+  - app/agent/loop-engineering/page.test.tsx (22)
   - app/agent/openclaw-advanced-agent-security-guide/page.test.tsx (8)
   - app/claude/agent/page.test.tsx (8)
   - app/claude/code-slash-commands/page.test.tsx (5)
@@ -537,6 +537,7 @@ note: 同上（JS依存関係の監査ゲート）
 
 | 日付 | 変更内容 | スコア |
 |---|---|---|
+| 2026-07-05 | TOC scroll-spy aria-current 対応と Cursor 中級ガイドの診断テスト追加に伴い件数を実測同期 (774→778) | 44.2% |
 | 2026-07-05 | Loop Engineering 完全ガイドの Next.js 移行に伴う契約テスト追加 (+21) | 44.2% |
 | 2026-06-16 | カバレッジダッシュボードの page.tsx 契約テスト数の不整合を修正し、34 件に同期 | 44.2% |
 | 2026-06-16 | InteractiveChecklist 状態再初期化バグ of の修正とテスト作成 (+2) | 44.2% |
