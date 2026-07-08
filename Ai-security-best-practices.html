@@ -291,8 +291,11 @@
         margin: 20px 0;
         background: var(--color-background-secondary);
         overflow-x: auto;
-        display: flex;
-        justify-content: center;
+        text-align: center;
+      }
+
+      .diagram-wrap > div {
+        width: 100%;
       }
 
       .diagram-wrap svg {
@@ -300,6 +303,7 @@
         height: auto;
         display: block;
         margin: 0 auto;
+        overflow: visible;
       }
 
       ul.plain,
@@ -2023,10 +2027,16 @@
           secondaryColor: '#16302c',
           tertiaryColor: '#1c1c20',
           fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
-          fontSize: '14px',
+          fontSize: '16px',
         },
-        flowchart: { htmlLabels: false, curve: 'linear' },
-        sequence: { htmlLabels: false },
+        flowchart: {
+          htmlLabels: false,
+          curve: 'linear',
+          useMaxWidth: false,
+          nodeSpacing: 40,
+          rankSpacing: 50,
+        },
+        sequence: { htmlLabels: false, useMaxWidth: false },
       });
 
       const diagrams = [
@@ -2112,12 +2122,27 @@
       ];
 
       async function renderAllDiagrams() {
+        if (document.fonts) {
+          try {
+            await document.fonts.ready;
+          } catch (e) {
+            /* ignore */
+          }
+        }
         for (const d of diagrams) {
           const container = document.getElementById(d.id);
           if (!container) continue;
           try {
             const { svg } = await mermaid.render(d.id + '-svg', d.def);
             container.innerHTML = svg;
+            const svgEl = container.querySelector('svg');
+            if (svgEl) {
+              svgEl.style.maxWidth = '100%';
+              svgEl.style.height = 'auto';
+              svgEl.style.display = 'block';
+              svgEl.style.margin = '0 auto';
+              svgEl.style.overflow = 'visible';
+            }
           } catch (err) {
             container.innerHTML =
               '<p style="color:var(--color-text-tertiary);font-size:13px;">図解の読み込みに失敗しました。</p>';
