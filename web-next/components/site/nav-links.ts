@@ -109,5 +109,11 @@ export const navLinks: readonly NavLink[] = [
       { name: "Cursor Guide (中級)", href: "/cursor/complete-guide-intermediate" },
     ],
   },
+  {
+    name: "Security",
+    children: [
+      { name: "AI Security Best Practices", href: "/security/ai-security-best-practices" },
+    ],
+  },
   { name: "Git Worktree", href: "/git-worktree" },
 ];
