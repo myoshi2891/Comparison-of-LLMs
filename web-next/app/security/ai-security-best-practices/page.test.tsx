@@ -18,6 +18,15 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
   },
 }));
 
+// Stub IntersectionObserver for testing in jsdom environment
+class IntersectionObserverStub {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+global.IntersectionObserver = IntersectionObserverStub as unknown as typeof IntersectionObserver;
+
+
 const EXPECTED_SECTION_IDS = [
   "intro",
   "overview",
