@@ -1,0 +1,2397 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI CI/CD 自動化 完全ガイド ― 初学者のためのステップバイステップ実践入門</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.33.0/dist/tabler-icons.min.css"
+    />
+    <style>
+      :root {
+        --color-background-primary: #0a0c10;
+        --color-background-secondary: #12151b;
+        --color-background-tertiary: #1a1e26;
+        --color-background-info: #12202f;
+        --color-background-danger: #2a1416;
+        --color-background-success: #12241a;
+        --color-background-warning: #2a2113;
+
+        --color-text-primary: #e8eaed;
+        --color-text-secondary: #a3aab5;
+        --color-text-tertiary: #6d7480;
+        --color-text-info: #7dd3fc;
+        --color-text-danger: #fca5a5;
+        --color-text-success: #86efac;
+        --color-text-warning: #fcd34d;
+
+        --color-border-tertiary: #1f2430;
+        --color-border-secondary: #2a3040;
+        --color-border-primary: #3a4152;
+
+        --font-sans:
+          -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic', 'Segoe UI', Roboto,
+          sans-serif;
+        --font-serif: Georgia, 'Hiragino Mincho ProN', serif;
+        --font-mono: 'SFMono-Regular', Consolas, 'Menlo', monospace;
+
+        --border-radius-md: 8px;
+        --border-radius-lg: 12px;
+        --border-radius-xl: 16px;
+
+        --c-purple-800: #4c1d95;
+        --c-purple-200: #ddd6fe;
+        --c-purple-100: #ede9fe;
+        --c-teal-800: #115e59;
+        --c-teal-200: #99f6e4;
+        --c-teal-100: #ccfbf1;
+        --c-coral-800: #7c2d12;
+        --c-coral-200: #fed7aa;
+        --c-coral-100: #ffedd5;
+        --c-amber-800: #78350f;
+        --c-amber-200: #fde68a;
+        --c-amber-100: #fef3c7;
+        --c-red-800: #7f1d1d;
+        --c-red-200: #fecaca;
+        --c-red-100: #fee2e2;
+        --c-pink-800: #831843;
+        --c-pink-200: #fbcfe8;
+        --c-pink-100: #fce7f3;
+        --c-blue-800: #1e3a8a;
+        --c-blue-200: #bfdbfe;
+        --c-blue-100: #dbeafe;
+        --c-green-800: #14532d;
+        --c-green-200: #bbf7d0;
+        --c-green-100: #dcfce7;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: var(--font-sans);
+        background: var(--color-background-primary);
+        color: var(--color-text-primary);
+        font-size: 16px;
+        line-height: 1.7;
+        font-weight: 400;
+      }
+
+      .layout {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        width: 292px;
+        flex-shrink: 0;
+        background: var(--color-background-secondary);
+        border-right: 1px solid var(--color-border-tertiary);
+        position: sticky;
+        top: 0;
+        align-self: flex-start;
+        height: 100vh;
+        overflow-y: auto;
+        padding: 28px 16px;
+      }
+
+      .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 4px 12px 20px 12px;
+        border-bottom: 1px solid var(--color-border-tertiary);
+        margin-bottom: 16px;
+      }
+      .sidebar-brand i {
+        font-size: 20px;
+        color: var(--color-text-info);
+      }
+      .sidebar-brand span {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--color-text-primary);
+      }
+
+      .nav-group-label {
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--color-text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        padding: 16px 12px 6px 12px;
+      }
+
+      .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        border-radius: var(--border-radius-md);
+        color: var(--color-text-secondary);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 400;
+      }
+      .nav-link i {
+        font-size: 16px;
+        flex-shrink: 0;
+      }
+      .nav-link:hover {
+        background: var(--color-background-tertiary);
+        color: var(--color-text-primary);
+      }
+      .nav-link.active {
+        background: var(--color-background-tertiary);
+        color: var(--color-text-info);
+        font-weight: 500;
+      }
+
+      .main {
+        flex: 1;
+        min-width: 0;
+        padding: 56px 64px 96px 64px;
+      }
+
+      .doc-header {
+        margin-bottom: 40px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid var(--color-border-tertiary);
+      }
+      .doc-header .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--color-text-info);
+        font-weight: 500;
+        background: var(--color-background-info);
+        padding: 4px 10px;
+        border-radius: var(--border-radius-md);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-size: 22px;
+        font-weight: 500;
+        margin: 0 0 10px 0;
+        color: var(--color-text-primary);
+      }
+      .doc-header p {
+        color: var(--color-text-secondary);
+        font-size: 15px;
+        margin: 4px 0;
+      }
+
+      section {
+        margin-bottom: 56px;
+        scroll-margin-top: 24px;
+      }
+      h2 {
+        font-size: 18px;
+        font-weight: 500;
+        margin: 0 0 16px 0;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--color-border-tertiary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      h2 i {
+        font-size: 18px;
+        color: var(--color-text-info);
+      }
+      h3 {
+        font-size: 16px;
+        font-weight: 500;
+        margin: 28px 0 12px 0;
+        color: var(--color-text-primary);
+      }
+
+      p {
+        margin: 0 0 14px 0;
+        color: var(--color-text-primary);
+      }
+      ul,
+      ol {
+        margin: 0 0 14px 0;
+        padding-left: 22px;
+      }
+      li {
+        margin-bottom: 6px;
+      }
+
+      a {
+        color: var(--color-text-info);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+
+      code {
+        font-family: var(--font-mono);
+        background: var(--color-background-tertiary);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 13px;
+        color: var(--color-text-warning);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 8px 0 20px 0;
+        font-size: 14px;
+      }
+      th,
+      td {
+        border: 1px solid var(--color-border-tertiary);
+        padding: 10px 14px;
+        text-align: left;
+        vertical-align: top;
+      }
+      th {
+        background: var(--color-background-tertiary);
+        font-weight: 500;
+        color: var(--color-text-primary);
+      }
+      td {
+        color: var(--color-text-secondary);
+      }
+      td code {
+        white-space: nowrap;
+      }
+      .table-wrap {
+        overflow-x: auto;
+        border-radius: var(--border-radius-md);
+      }
+
+      .callout {
+        padding: 16px 18px;
+        border-radius: var(--border-radius-md);
+        border: 1px solid var(--color-border-secondary);
+        background: var(--color-background-tertiary);
+        margin: 16px 0 20px 0;
+        font-size: 14px;
+        color: var(--color-text-secondary);
+      }
+      .callout strong {
+        color: var(--color-text-primary);
+      }
+
+      .source-note {
+        font-size: 13px;
+        color: var(--color-text-tertiary);
+        border-top: 1px solid var(--color-border-tertiary);
+        padding-top: 12px;
+        margin-top: 20px;
+      }
+      .source-note a {
+        color: var(--color-text-tertiary);
+      }
+      .source-note a:hover {
+        color: var(--color-text-info);
+      }
+
+      .mermaid-wrap {
+        text-align: center;
+        margin: 20px 0 24px 0;
+      }
+      .mermaid-wrap svg {
+        max-width: 100%;
+        height: auto;
+      }
+      .mermaid-caption {
+        font-size: 13px;
+        color: var(--color-text-tertiary);
+        margin-top: 8px;
+      }
+
+      .checklist {
+        list-style: none;
+        padding-left: 0;
+        margin: 0 0 16px 0;
+      }
+      .checklist li {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 10px 14px;
+        border: 1px solid var(--color-border-tertiary);
+        border-radius: var(--border-radius-md);
+        background: var(--color-background-tertiary);
+        margin-bottom: 8px;
+        font-size: 14px;
+        color: var(--color-text-secondary);
+      }
+      .checklist li i {
+        color: var(--color-text-danger);
+        margin-top: 2px;
+        font-size: 15px;
+        flex-shrink: 0;
+      }
+
+      .roadmap-step {
+        display: flex;
+        gap: 16px;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--color-border-tertiary);
+      }
+      .roadmap-step:last-child {
+        border-bottom: none;
+      }
+      .roadmap-num {
+        flex-shrink: 0;
+        width: 30px;
+        height: 30px;
+        border-radius: var(--border-radius-md);
+        background: var(--color-background-info);
+        color: var(--color-text-info);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 500;
+      }
+      .roadmap-step h3 {
+        margin: 0 0 4px 0;
+      }
+      .roadmap-step p {
+        margin: 0;
+        font-size: 14px;
+        color: var(--color-text-secondary);
+      }
+
+      .ref-group {
+        margin-bottom: 24px;
+      }
+      .ref-group h3 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .ref-group h3 i {
+        font-size: 15px;
+        color: var(--color-text-info);
+      }
+      .ref-list {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+      }
+      .ref-list li {
+        font-size: 13px;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--color-border-tertiary);
+        color: var(--color-text-secondary);
+      }
+      .ref-list li a {
+        color: var(--color-text-info);
+        word-break: break-all;
+      }
+      .ref-list li .ref-title {
+        color: var(--color-text-primary);
+        display: block;
+        margin-bottom: 2px;
+      }
+
+      .toc-progress {
+        height: 3px;
+        background: var(--color-background-tertiary);
+        border-radius: 2px;
+        margin: 0 12px 16px 12px;
+        overflow: hidden;
+      }
+      .toc-progress-bar {
+        height: 100%;
+        width: 0%;
+        background: var(--color-text-info);
+      }
+
+      footer {
+        color: var(--color-text-tertiary);
+        font-size: 13px;
+        padding-top: 24px;
+        border-top: 1px solid var(--color-border-tertiary);
+      }
+
+      @media (max-width: 900px) {
+        .sidebar {
+          display: none;
+        }
+        .main {
+          padding: 32px 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <nav class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+          <i class="ti ti-topology-star-3"></i><span>AI CI/CD 自動化ガイド</span>
+        </div>
+
+        <a class="nav-link" data-target="intro" href="#intro"
+          ><i class="ti ti-bulb"></i>1. はじめに</a
+        >
+        <a class="nav-link" data-target="diff" href="#diff"
+          ><i class="ti ti-git-compare"></i>2. 従来のCI/CDとの違い</a
+        >
+        <a class="nav-link" data-target="maturity" href="#maturity"
+          ><i class="ti ti-stairs-up"></i>3. MLOps成熟度モデル</a
+        >
+
+        <div class="nav-group-label">ステップバイステップ</div>
+        <a class="nav-link" data-target="step1" href="#step1"
+          ><i class="ti ti-database"></i>Step1 データ・モデル管理</a
+        >
+        <a class="nav-link" data-target="step2" href="#step2"
+          ><i class="ti ti-flask"></i>Step2 実験管理／レジストリ</a
+        >
+        <a class="nav-link" data-target="step3" href="#step3"
+          ><i class="ti ti-checklist"></i>Step3 CI（検証）</a
+        >
+        <a class="nav-link" data-target="step4" href="#step4"
+          ><i class="ti ti-truck-delivery"></i>Step4 CD（配信）</a
+        >
+        <a class="nav-link" data-target="step5" href="#step5"
+          ><i class="ti ti-refresh"></i>Step5 CT（再学習）</a
+        >
+        <a class="nav-link" data-target="step6" href="#step6"
+          ><i class="ti ti-git-branch"></i>Step6 デプロイ戦略</a
+        >
+        <a class="nav-link" data-target="step7" href="#step7"
+          ><i class="ti ti-activity"></i>Step7 監視・ドリフト検知</a
+        >
+        <a class="nav-link" data-target="step8" href="#step8"
+          ><i class="ti ti-message-chatbot"></i>Step8 LLMOps</a
+        >
+        <a class="nav-link" data-target="step9" href="#step9"
+          ><i class="ti ti-robot"></i>Step9 AIエージェント自動化</a
+        >
+        <a class="nav-link" data-target="step10" href="#step10"
+          ><i class="ti ti-shield-lock"></i>Step10 セキュリティ</a
+        >
+
+        <div class="nav-group-label">まとめ</div>
+        <a class="nav-link" data-target="tools" href="#tools"
+          ><i class="ti ti-tools"></i>5. 主要ツールマップ</a
+        >
+        <a class="nav-link" data-target="pitfalls" href="#pitfalls"
+          ><i class="ti ti-alert-triangle"></i>6. アンチパターン</a
+        >
+        <a class="nav-link" data-target="roadmap" href="#roadmap"
+          ><i class="ti ti-map"></i>7. 導入ロードマップ</a
+        >
+        <a class="nav-link" data-target="references" href="#references"
+          ><i class="ti ti-books"></i>8. 参考文献一覧</a
+        >
+      </nav>
+
+      <main class="main">
+        <div class="doc-header">
+          <div class="eyebrow"><i class="ti ti-sparkles"></i>AI Engineering Guide</div>
+          <h1>AI CI/CD 自動化 完全ガイド ― 初学者のためのステップバイステップ実践入門</h1>
+          <p>
+            対象読者:
+            ソフトウェアエンジニア／QAエンジニアで、機械学習（ML）・生成AI（LLM）を組み込んだシステムのCI/CD自動化をこれから学ぶ人
+          </p>
+          <p>
+            前提知識: 従来型ソフトウェアのCI/CD（GitHub Actions、GitLab
+            CIなど）の基本を理解していること
+          </p>
+        </div>
+
+        <section id="intro">
+          <h2><i class="ti ti-bulb"></i>1. はじめに：なぜ「AI CI/CD」という言葉が必要なのか</h2>
+          <p>「AI CI/CD」とは、大きく分けて3つの領域を指す言葉として使われている。</p>
+          <ul>
+            <li>
+              <strong>MLOps CI/CD</strong>:
+              機械学習モデルの学習・評価・デプロイを自動化する仕組み（CI/CD/CTの3点セット）
+            </li>
+            <li>
+              <strong>LLMOps CI/CD</strong>:
+              プロンプト・RAG構成・評価データセットなど、生成AIアプリケーション特有の成果物をバージョン管理・評価・デプロイする仕組み
+            </li>
+            <li>
+              <strong>AIエージェントによるCI/CD自動化</strong>: Claude CodeやGitHub
+              Copilot、Codexのようなコーディングエージェントを、コードレビューやテスト生成、CI最適化そのものの自動化に使う取り組み（2026年に入り「Continuous
+              AI」とも呼ばれ始めている）
+            </li>
+          </ul>
+          <p>
+            このガイドでは、この3つすべてをステップバイステップで扱う。全体を貫く原則はシンプルで、「モデルもプロンプトもデータも、コードと同じようにバージョン管理・自動テスト・自動デプロイ・自動監視の対象にする」ということに尽きる。
+          </p>
+        </section>
+
+        <section id="diff">
+          <h2><i class="ti ti-git-compare"></i>2. 従来のCI/CDとAI CI/CDは何が違うのか</h2>
+          <p>
+            Google
+            Cloudの公式アーキテクチャドキュメントは、MLシステムが従来のソフトウェアシステムと異なる理由を、チームスキル・開発プロセス・テスト・デプロイ・本番運用の5つの観点で整理している。ML開発は本質的に実験的であり、どの特徴量やアルゴリズムが最良かを試行錯誤する必要がある一方、モデルの性能はコードの品質だけでなく学習データの分布にも左右されるため、コードのCIだけでは不十分になる。
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>観点</th>
+                  <th>従来のソフトウェアCI/CD</th>
+                  <th>ML CI/CD（MLOps）</th>
+                  <th>LLM CI/CD（LLMOps）</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>デプロイ対象</td>
+                  <td>コード・バイナリ</td>
+                  <td>コード＋データ＋モデルの3点セット</td>
+                  <td>コード＋プロンプト＋評価しきい値＋モデル選択</td>
+                </tr>
+                <tr>
+                  <td>CIでテストする内容</td>
+                  <td>単体テスト・結合テスト</td>
+                  <td>データスキーマ検証、学習収束テスト、モデル品質評価を追加</td>
+                  <td>
+                    プロンプトのリンティング、ゴールデンデータセットに対する評価（Eval）を追加
+                  </td>
+                </tr>
+                <tr>
+                  <td>出力の再現性</td>
+                  <td>決定的（同じ入力なら同じ出力）</td>
+                  <td>非決定的になりうる（データやシードで変動）</td>
+                  <td>非決定的（同じプロンプトでも出力が変わりうる）</td>
+                </tr>
+                <tr>
+                  <td>リリース頻度</td>
+                  <td>コード変更のたびに高頻度</td>
+                  <td>データドリフトや性能劣化に応じて可変（週次〜日次が多い）</td>
+                  <td>プロンプト変更は非常に高頻度（1日に何度も）</td>
+                </tr>
+                <tr>
+                  <td>追加される自動化</td>
+                  <td>なし</td>
+                  <td>CT（継続的トレーニング）が新たに必要</td>
+                  <td>評価ゲート（Eval Gate）とプロンプトの環境昇格が必要</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="source-note">
+            出典: MLOpsとDevOpsの違いについては
+            <a
+              href="https://docs.cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning"
+              target="_blank"
+              rel="noopener"
+              >Google Cloud Architecture Center</a
+            >
+            ／ ML CI/CDの3層テストピラミッドについては
+            <a
+              href="https://mlflow.org/articles/mlops-pipeline-automation-best-practices-in-2026/"
+              target="_blank"
+              rel="noopener"
+              >MLflow公式ブログ</a
+            >
+            ／ LLMOpsとMLOpsの違いについては
+            <a
+              href="https://myengineeringpath.dev/genai-engineer/llmops/"
+              target="_blank"
+              rel="noopener"
+              >MyEngineeringPath</a
+            >
+            を参照。
+          </div>
+        </section>
+
+        <section id="maturity">
+          <h2><i class="ti ti-stairs-up"></i>3. 全体像をつかむ：MLOps成熟度モデル</h2>
+          <p>
+            Google
+            Cloudは、MLOpsの自動化レベルを3段階（レベル0〜2）に分類している。これは非常に有名なフレームワークで、多くの実務ガイドが引用している。自分のチームが今どのレベルにいるかを把握することが、最初の一歩になる。
+          </p>
+
+          <h3>レベル0：手動プロセス</h3>
+          <p>
+            データサイエンティストがノートブック上で試行錯誤し、できあがったモデルをエンジニアに手渡して本番化する。CIもCDも存在せず、モデルの更新頻度は年に数回程度にとどまる。
+          </p>
+
+          <div class="mermaid-wrap">
+            <pre class="mermaid-source" style="display: none">
+flowchart TD
+    A["データ抽出と分析"] --> B["データ準備"]
+    B --> C["モデル学習（手動）"]
+    C --> D["モデル評価（手動）"]
+    D --> E["データサイエンティストが手渡し"]
+    E --> F["エンジニアが手動デプロイ"]
+    F --> G["予測サービス"]
+
+    style A fill:#4c1d95,stroke:#ddd6fe,color:#ede9fe
+    style B fill:#4c1d95,stroke:#ddd6fe,color:#ede9fe
+    style C fill:#115e59,stroke:#99f6e4,color:#ccfbf1
+    style D fill:#115e59,stroke:#99f6e4,color:#ccfbf1
+    style E fill:#78350f,stroke:#fde68a,color:#fef3c7
+    style F fill:#78350f,stroke:#fde68a,color:#fef3c7
+    style G fill:#115e59,stroke:#99f6e4,color:#ccfbf1
+        </pre
+            >
+            <div class="mermaid-caption">レベル0：手動MLワークフロー</div>
+          </div>
+
+          <p>
+            課題:
+            モデルは本番投入後に劣化する。データの分布は時間とともに変化し（データドリフト）、入力と出力の関係自体が変わることもある（コンセプトドリフト）ため、手動運用では性能劣化に気づくのが遅れる。
+          </p>
+
+          <h3>レベル1：MLパイプラインの自動化（CT）</h3>
+          <p>
+            パイプライン全体をオーケストレーションし、新しいデータが来るたびに自動で再学習（Continuous
+            Training）する段階。データ検証・モデル検証のステップが自動化され、特徴量ストア（Feature
+            Store）やメタデータ管理が導入される。
+          </p>
+
+          <div class="mermaid-wrap">
+            <pre class="mermaid-source" style="display: none">
+flowchart LR
+    A["データ取り込み"] --> B["データ検証"]
+    B --> C["特徴量エンジニアリング"]
+    C --> D["モデル学習"]
+    D --> E["モデル評価・検証"]
+    E --> F{"性能基準を満たすか"}
+    F -->|Yes| G["モデルレジストリへ登録"]
+    F -->|No| H["パイプライン停止・通知"]
+    G --> I["予測サービスへ自動デプロイ"]
+    I --> J["本番監視"]
+    J -->|ドリフト検知| A
+
+    style B fill:#115e59,stroke:#99f6e4,color:#ccfbf1
+    style E fill:#115e59,stroke:#99f6e4,color:#ccfbf1
+    style F fill:#78350f,stroke:#fde68a,color:#fef3c7
+    style H fill:#7f1d1d,stroke:#fecaca,color:#fee2e2
+    style G fill:#4c1d95,stroke:#ddd6fe,color:#ede9fe
+    style I fill:#4c1d95,stroke:#ddd6fe,color:#ede9fe
+        </pre
+            >
+            <div class="mermaid-caption">レベル1：継続的トレーニング（CT）パイプライン</div>
+          </div>
+
+          <p>
+            パイプラインの実行トリガーには、オンデマンド実行・スケジュール実行（日次／週次）・新規データ到着時・性能劣化検知時・分布の有意な変化（コンセプトドリフト）検知時などがある。
+          </p>
+
+          <h3>レベル2：CI/CDパイプラインの自動化（完全自動化）</h3>
+          <p>
+            パイプラインの実装コード自体も、ソースリポジトリへのコミットをトリガーにビルド・テスト・デプロイされる段階。ソース管理、テスト・ビルドサービス、デプロイサービス、モデルレジストリ、特徴量ストア、MLメタデータストア、パイプラインオーケストレーターがすべて連携する。
+          </p>
+
+          <div class="mermaid-wrap">
+            <pre class="mermaid-source" style="display: none">
+flowchart TD
+    A["開発・実験"] --> B["ソースリポジトリへpush"]
+    B --> C["パイプラインCI"]
+    C --> D["パイプラインCD"]
+    D --> E["自動トリガー実行"]
+    E --> F["モデルレジストリへ登録"]
+    F --> G["モデルCD"]
+    G --> H["本番監視"]
+    H -->|性能劣化検知| A
+
+    style C fill:#115e59,stroke:#99f6e4,color:#ccfbf1
+    style D fill:#115e59,stroke:#99f6e4,color:#ccfbf1
+    style F fill:#4c1d95,stroke:#ddd6fe,color:#ede9fe
+    style G fill:#4c1d95,stroke:#ddd6fe,color:#ede9fe
+    style H fill:#78350f,stroke:#fde68a,color:#fef3c7
+        </pre
+            >
+            <div class="mermaid-caption">レベル2：完全自動化されたCI/CD/CTパイプライン</div>
+          </div>
+
+          <p>
+            このレベル2の状態こそが、一般に「AI
+            CI/CD」と呼ばれる完成形である。以降のステップでは、レベル0からレベル2へ向かうために必要な個別のプラクティスを、順を追って解説する。
+          </p>
+
+          <div class="source-note">
+            出典:
+            <a
+              href="https://docs.cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning"
+              target="_blank"
+              rel="noopener"
+              >Google Cloud Architecture Center「MLOps: Continuous delivery and automation pipelines
+              in machine learning」</a
+            >。同ドキュメントのMLOps成熟度3段階モデルは業界で広く参照されている一次情報であり、<a
+              href="https://www.glasierinc.com/blog/machine-learning-operations-mlops-guide"
+              target="_blank"
+              rel="noopener"
+              >Glasier社のガイド</a
+            >や<a
+              href="https://medium.com/@flexianadevgroup/mlops-maturity-model-2026-4-stages-to-resilient-risk-free-machine-learning-468c097dc25c"
+              target="_blank"
+              rel="noopener"
+              >Flexiana社の解説</a
+            >でも同様の段階モデルが紹介されている。
+          </div>
+        </section>
+
+        <section id="step1">
+          <h2><i class="ti ti-database"></i>Step 1: データとモデルのバージョン管理</h2>
+          <p>
+            もっとも見落とされがちで、かつもっとも重要な土台がこれである。コードはGitで管理していても、学習データやモデルの重みファイルは「dataset_v2_final.csv」のようなファイル名でごまかされているチームが非常に多い。これでは、ある本番モデルがどのデータで学習されたのか、後から正確に追跡することができなくなる。
+          </p>
+
+          <h3>ベストプラクティス</h3>
+          <ul>
+            <li>
+              <strong>データはコードと同じ扱いにする</strong>: DVC（Data Version
+              Control）は、Gitの仕組みをそのまま使いながら、大容量のデータセットやモデルファイルをクラウドストレージ側に置き、Git側にはポインタとなる小さなメタファイル（<code>.dvc</code>ファイルや<code>dvc.yaml</code>）だけをコミットする方式を取る。これにより、<code
+                >git checkout</code
+              >だけで過去のどの時点のデータ・モデル・パイプラインの組み合わせも再現できる。
+            </li>
+            <li>
+              <strong>content hash（内容ハッシュ）でデータセットにタグ付けする</strong>:
+              ファイル名ではなく中身のハッシュ値で識別することで、同じ名前で中身が違う、という事故を防ぐ。
+            </li>
+            <li>
+              <strong>Dockerイメージのバージョンを固定する</strong>:
+              学習環境のライブラリバージョンが変わると、同じコード・同じデータでも結果が変わりうるため、環境そのものもバージョン管理の対象にする。
+            </li>
+            <li>
+              <strong>学習・検証・テストの分割比率を固定する</strong>:
+              例えば80/10/10の分割比率とシード値を固定し、再現可能なデータ分割を行う。
+            </li>
+          </ul>
+
+          <p>
+            DVC以外の選択肢としては、Git
+            LFS、lakeFS、Pachyderm、Nessie、Doltなどがあり、画像・動画などの大規模データレイクにはlakeFSの方がスケールしやすいとされる。なお2025年11月、lakeFSがDVCを買収したことが公表されている。
+          </p>
+
+          <div class="source-note">
+            出典: <a href="https://dvc.org/" target="_blank" rel="noopener">DVC公式サイト</a> ／
+            <a href="https://doc.dvc.org/user-guide" target="_blank" rel="noopener"
+              >DVC公式ユーザーガイド</a
+            >
+            ／
+            <a
+              href="https://lakefs.io/data-version-control/dvc-tools/"
+              target="_blank"
+              rel="noopener"
+              >lakeFSによるデータバージョニングツール比較</a
+            >
+            ／
+            <a
+              href="https://en.wikipedia.org/wiki/Data_Version_Control_(software)"
+              target="_blank"
+              rel="noopener"
+              >Data Version ControlのWikipedia項目</a
+            >
+            ／
+            <a
+              href="https://labelyourdata.com/articles/machine-learning/data-versioning"
+              target="_blank"
+              rel="noopener"
+              >Label Your Dataによるベストプラクティスまとめ</a
+            >
+            ／
+            <a
+              href="https://mlflow.org/articles/mlops-pipeline-automation-best-practices-in-2026/"
+              target="_blank"
+              rel="noopener"
+              >MLflow公式ブログ</a
+            >。
+          </div>
+        </section>
+
+        <section id="step2">
+          <h2><i class="ti ti-flask"></i>Step 2: 実験管理とモデルレジストリ</h2>
+          <p>
+            データが再現可能になったら、次は「どの実験がどのハイパーパラメータでどんな結果を出したか」を自動記録する仕組みを導入する。
+          </p>
+          <ul>
+            <li>
+              <strong>実験トラッキングツール</strong>（MLflow、Weights &amp; Biases
+              など）は、各学習実行（run）ごとにパラメータ・メトリクス・成果物を自動で記録する。手動でスプレッドシートに記入する運用から脱却することが第一歩になる。
+            </li>
+            <li>
+              <strong>モデルレジストリ</strong
+              >は「モデル版のGit」に相当する中央リポジトリで、モデル成果物のバージョン管理と昇格（development
+              → staging →
+              production）ワークフローを担う。モデルレジストリがあることで、今どのバージョンが本番稼働中かを正確に把握でき、問題発生時に即座に前バージョンへロールバックできる。承認ワークフローを強制することもでき、規制業界における監査証跡の確保にもつながる。
+            </li>
+          </ul>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>機能</th>
+                  <th>実験トラッキング</th>
+                  <th>モデルレジストリ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>主な目的</td>
+                  <td>試行錯誤の記録・比較</td>
+                  <td>本番投入バージョンの管理</td>
+                </tr>
+                <tr>
+                  <td>記録対象</td>
+                  <td>ハイパーパラメータ、メトリクス、成果物</td>
+                  <td>承認状態、デプロイ履歴、学習データへの参照</td>
+                </tr>
+                <tr>
+                  <td>典型ツール</td>
+                  <td>MLflow Tracking, Weights &amp; Biases</td>
+                  <td>
+                    MLflow Model Registry, Vertex AI Model Registry, SageMaker Model Registry,
+                    Hugging Face Hub
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="source-note">
+            出典:
+            <a
+              href="https://mlflow.org/articles/mlops-pipeline-automation-best-practices-in-2026/"
+              target="_blank"
+              rel="noopener"
+              >MLflowブログのモデルレジストリ解説</a
+            >
+            ／
+            <a
+              href="https://prepzee.com/blog/top-15-mlops-tools-to-learn/"
+              target="_blank"
+              rel="noopener"
+              >Prepzeeによる主要MLOpsツール比較</a
+            >
+            ／
+            <a
+              href="https://medium.com/online-inference/top-mlops-tools-in-2026-858fd479acac"
+              target="_blank"
+              rel="noopener"
+              >Online Inference誌によるMLOpsツールまとめ</a
+            >。
+          </div>
+        </section>
+
+        <section id="step3">
+          <h2>
+            <i class="ti ti-checklist"></i>Step 3:
+            CI（継続的インテグレーション）でコード・データ・モデルを検証する
+          </h2>
+          <p>
+            ML
+            CI/CDでは、CIは「コードのテスト」だけでなく「データとモデルの検証」も担う点が従来のCI/CDと決定的に異なる。テストは以下の多層ピラミッドで考えるとよい。
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>レイヤー</th>
+                  <th>テスト内容</th>
+                  <th>主なツール例</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>コードレベル</td>
+                  <td>
+                    特徴量エンジニアリング関数の単体テスト、モデルクラスの各メソッドの単体テスト
+                  </td>
+                  <td>pytest など通常の単体テストフレームワーク</td>
+                </tr>
+                <tr>
+                  <td>データレベル</td>
+                  <td>スキーマの逸脱（想定外の欠損・型不一致）検知、データ分布の逸脱検知</td>
+                  <td>Great Expectations, Evidently AI</td>
+                </tr>
+                <tr>
+                  <td>モデルレベル</td>
+                  <td>学習が収束するか、NaN値が出ないか、評価指標が基準値を超えるか</td>
+                  <td>各フレームワークの評価API、MLflow Evaluate</td>
+                </tr>
+                <tr>
+                  <td>統合レベル</td>
+                  <td>パイプライン各コンポーネントの成果物整合性、結合テスト</td>
+                  <td>パイプラインオーケストレーターのend-to-endテスト</td>
+                </tr>
+                <tr>
+                  <td>セキュリティレベル</td>
+                  <td>依存パッケージの脆弱性スキャン、モデル成果物自体のスキャン、IaCのスキャン</td>
+                  <td>
+                    Checkov（IaCスキャン）, ModelScan（モデル成果物スキャン）,
+                    Fairlearn（バイアステスト）
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            CIで確認すべき具体的な項目としては、モデル学習が収束すること、ゼロ除算などでNaN値が発生しないこと、各パイプラインコンポーネントが期待通りの成果物を生成することなどが挙げられる。
+          </p>
+
+          <div class="source-note">
+            出典:
+            <a
+              href="https://docs.cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning"
+              target="_blank"
+              rel="noopener"
+              >Google Cloud Architecture Center</a
+            >
+            ／
+            <a
+              href="https://www.kernshell.com/best-practices-for-scalable-machine-learning-deployment/"
+              target="_blank"
+              rel="noopener"
+              >Kernshellによる2026年MLOpsベストプラクティス</a
+            >
+            ／
+            <a
+              href="https://mlflow.org/articles/mlops-pipeline-automation-best-practices-in-2026/"
+              target="_blank"
+              rel="noopener"
+              >MLflowブログの多層テストピラミッドの解説</a
+            >。
+          </div>
+        </section>
+
+        <section id="step4">
+          <h2>
+            <i class="ti ti-truck-delivery"></i>Step 4:
+            CD（継続的デリバリー）でパイプラインとモデルを配信する
+          </h2>
+          <p>
+            ML
+            CI/CDにおけるCDは、単一のソフトウェアパッケージをデプロイするのではなく、「別のサービス（モデル予測サービス）を自動的にデプロイするシステム（学習パイプライン）」をデプロイする点が特徴である。CDで確認すべき項目には次のようなものがある。
+          </p>
+          <ul>
+            <li>
+              モデルが対象インフラと互換性を持つか（必要なパッケージ・メモリ・アクセラレータが揃っているか）を事前検証する
+            </li>
+            <li>予測サービスAPIを実際に呼び出し、期待通りのレスポンスが返るかをテストする</li>
+            <li>秒間クエリ数（QPS）やレイテンシなど、負荷テストによる性能検証を行う</li>
+            <li>
+              開発ブランチへのpushで自動的にテスト環境へデプロイし、mainブランチへのマージ（レビュー承認後）でステージング環境へ半自動デプロイし、ステージングでの実績を確認してから本番へ手動承認デプロイする、という段階的な昇格フローを組む
+            </li>
+          </ul>
+          <div class="source-note">
+            出典:
+            <a
+              href="https://docs.cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning"
+              target="_blank"
+              rel="noopener"
+              >Google Cloud Architecture Center</a
+            >。
+          </div>
+        </section>
+
+        <section id="step5">
+          <h2><i class="ti ti-refresh"></i>Step 5: CT（継続的トレーニング）で自動再学習する</h2>
+          <p>
+            CT（Continuous Training）はML
+            CI/CDにのみ存在する、従来のソフトウェアCI/CDにはない新しい概念である。CI/CD/CTの3点セットが揃うことで、本番データが変化し続ける中でもモデルが自律的に改善し続けるループが完成する。
+          </p>
+
+          <h3>再学習をトリガーする条件の代表例</h3>
+          <ul>
+            <li><strong>スケジュールベース</strong>: 週次・日次など、定期的な再学習サイクル</li>
+            <li>
+              <strong>データドリフトベース</strong>: PSI（Population Stability
+              Index）などの指標が閾値を超えたら、通常サイクル外の再学習評価を発火する
+            </li>
+            <li>
+              <strong>性能劣化ベース</strong>: 本番での予測精度が一定基準（例：accuracy
+              0.85）を下回ったら再学習する
+            </li>
+            <li>
+              <strong>新規データ到着ベース</strong>:
+              バッチでラベル付きデータが到着した時点で再学習する
+            </li>
+          </ul>
+
+          <div class="callout">
+            <strong>注意点</strong>:
+            再学習後のモデルは、必ず「新モデルが現行の本番モデルより優れているか」を比較検証してから昇格させるゲートを設ける。データ全体だけでなく、顧客セグメントごとなど、データの部分集合でも性能が一貫しているかを確認することが望ましい。
+          </div>
+
+          <div class="source-note">
+            出典:
+            <a
+              href="https://docs.cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning"
+              target="_blank"
+              rel="noopener"
+              >Google Cloud Architecture Center</a
+            >
+            ／
+            <a
+              href="https://mlflow.org/articles/mlops-pipeline-automation-best-practices-in-2026/"
+              target="_blank"
+              rel="noopener"
+              >MLflowブログにおけるCT運用例</a
+            >
+            ／
+            <a
+              href="https://www.azilen.com/blog/mlops-best-practices/"
+              target="_blank"
+              rel="noopener"
+              >Azilenによる継続的再学習のプラクティス</a
+            >。
+          </div>
+        </section>
+
+        <section id="step6">
+          <h2>
+            <i class="ti ti-git-branch"></i>Step 6:
+            デプロイ戦略を選ぶ（カナリア／ブルーグリーン／シャドウ）
+          </h2>
+          <p>
+            新しいモデルをいきなり全トラフィックへ投入するのはリスクが高い。ソフトウェアのデプロイと同様、モデルにも段階的なロールアウト戦略が必要になる。
+          </p>
+
+          <div class="mermaid-wrap">
+            <pre class="mermaid-source" style="display: none">
+flowchart LR
+    A["新モデルv2をデプロイ"] --> B["トラフィックの1〜5%をv2へ"]
+    B --> C["カナリア分析"]
+    C --> D{"品質基準を満たすか"}
+    D -->|Yes| E["トラフィック割合を増加"]
+    D -->|No| F["自動ロールバック"]
+    E --> G{"100%到達"}
+    G -->|Yes| H["v2へ完全移行"]
+    G -->|No| B
+
+    style A fill:#4c1d95,stroke:#ddd6fe,color:#ede9fe
+    style C fill:#115e59,stroke:#99f6e4,color:#ccfbf1
+    style D fill:#78350f,stroke:#fde68a,color:#fef3c7
+    style F fill:#7f1d1d,stroke:#fecaca,color:#fee2e2
+    style H fill:#115e59,stroke:#99f6e4,color:#ccfbf1
+        </pre
+            >
+            <div class="mermaid-caption">カナリアデプロイの段階的トラフィック移行フロー</div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>戦略</th>
+                  <th>仕組み</th>
+                  <th>向いているケース</th>
+                  <th>必要なインフラ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>ローリングデプロイ</td>
+                  <td>既存インスタンスを順次新バージョンに置き換える</td>
+                  <td>定常的な小規模更新、コストを抑えたい場合</td>
+                  <td>既存キャパシティの再利用のみで最も安価</td>
+                </tr>
+                <tr>
+                  <td>ブルーグリーンデプロイ</td>
+                  <td>新旧2つの環境を用意し、検証後に一気にトラフィックを切り替える</td>
+                  <td>ダウンタイムを許容できない場合、即座のロールバックが必要な場合</td>
+                  <td>二重のインフラが必要（コスト高）</td>
+                </tr>
+                <tr>
+                  <td>カナリアデプロイ</td>
+                  <td>
+                    新バージョンへ少数（1〜5%）のトラフィックのみ流し、問題なければ徐々に拡大する
+                  </td>
+                  <td>アーキテクチャ変更を伴わず段階的にリスクを検証したい場合</td>
+                  <td>Istio, Linkerdなどのサービスメッシュ、Argo Rolloutsなど</td>
+                </tr>
+                <tr>
+                  <td>シャドウデプロイ</td>
+                  <td>
+                    新バージョンにも本番トラフィックを複製して流すが、結果はユーザーに返さず比較のみ行う
+                  </td>
+                  <td>ユーザー体験に影響を与えず新モデルの挙動を検証したい場合</td>
+                  <td>トラフィックミラーリングの仕組み</td>
+                </tr>
+                <tr>
+                  <td>A/Bテスト</td>
+                  <td>複数バージョンに実際にトラフィックを分けて配信し、ビジネス指標で比較する</td>
+                  <td>UX・レコメンドなど統計的な効果検証をしたい場合</td>
+                  <td>実験基盤・統計的有意性の検証基盤</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            なお、特徴量ストアのスキーマ変更や入力前処理そのものを変える大規模なアーキテクチャ変更の場合は、同一APIコントラクト上でのトラフィック分割であるカナリアではなく、完全な切り替えを伴うブルーグリーンデプロイが適している。GPUを大量に使うLLMのような高コストなモデルでは、2バージョンを並行稼働させるカナリア自体のコストが課題になる点にも注意したい。
+          </p>
+
+          <div class="source-note">
+            出典:
+            <a
+              href="https://devops-daily.com/posts/deployment-strategies-guide"
+              target="_blank"
+              rel="noopener"
+              >devops-daily.comによるデプロイ戦略比較</a
+            >
+            ／
+            <a
+              href="https://www.intuz.com/blog/strategies-for-deploying-ml-models"
+              target="_blank"
+              rel="noopener"
+              >Intuzによるモデルデプロイパターンの解説</a
+            >
+            ／
+            <a
+              href="https://123ofai.com/qnalab/system-design/blocks/canary-deploy"
+              target="_blank"
+              rel="noopener"
+              >123ofaiによるMLモデル向けカナリアデプロイの完全ガイド</a
+            >
+            ／
+            <a
+              href="https://circleci.com/blog/deployment-strategies-types-trade-offs-and-how-to-choose/"
+              target="_blank"
+              rel="noopener"
+              >CircleCIによるデプロイ戦略トレードオフ解説</a
+            >
+            ／
+            <a
+              href="https://www.harness.io/blog/blue-green-canary-deployment-strategies"
+              target="_blank"
+              rel="noopener"
+              >Harnessによるブルーグリーン/カナリア解説</a
+            >。
+          </div>
+        </section>
+
+        <section id="step7">
+          <h2><i class="ti ti-activity"></i>Step 7: 本番監視とドリフト検知</h2>
+          <p>
+            モデルは、コードにバグがなくても劣化する。これは従来ソフトウェアにはない、MLシステム特有の重大なリスクである。データの分布そのものが変化する「データドリフト」と、入力と出力の関係性が変化する「コンセプトドリフト」の2種類を区別して理解しておく必要がある。
+          </p>
+          <ul>
+            <li>
+              <strong>データドリフト</strong>:
+              本番環境に入ってくるデータが、学習時のデータと統計的に大きく異なってしまう状態
+            </li>
+            <li>
+              <strong>コンセプトドリフト</strong>:
+              入力データと正解ラベルの関係性そのものが時間とともに変化してしまう状態（例：市場環境の変化により、以前は有効だった与信スコアリングの基準が通用しなくなる）
+            </li>
+          </ul>
+          <p>
+            監視すべき指標としては、モデルの予測精度そのものに加え、レイテンシ、エラー率、そして特徴量ごとの分布の変化などがある。オープンソースのEvidently
+            AIのようなツールを使えば、リファレンスデータと本番データを比較したドリフトレポートを自動生成できる。監視基盤としては、Prometheusでメトリクスを収集し、Grafanaで可視化するという組み合わせも定番になっている。
+          </p>
+          <div class="callout">
+            <strong>重要</strong>: 監視結果は、単なるダッシュボード表示で終わらせず、必ずStep
+            5のCTパイプラインへのトリガーとして接続する。監視して終わりでは意味がなく、監視結果が自動的に再学習や人間へのアラートにつながる設計にして初めて「継続的」という言葉に見合う仕組みになる。
+          </div>
+
+          <div class="source-note">
+            出典:
+            <a
+              href="https://www.gitnexa.com/blogs/mlops-implementation-best-practices"
+              target="_blank"
+              rel="noopener"
+              >GitNexaによるMLOps実装ガイド（Evidently AIによるドリフト検知）</a
+            >
+            ／
+            <a
+              href="https://www.azilen.com/blog/mlops-best-practices/"
+              target="_blank"
+              rel="noopener"
+              >Azilenによるデータドリフト・コンセプトドリフトの定義</a
+            >
+            ／
+            <a
+              href="https://prepzee.com/blog/top-15-mlops-tools-to-learn/"
+              target="_blank"
+              rel="noopener"
+              >Prepzeeによる監視ツールの紹介</a
+            >。
+          </div>
+        </section>
+
+        <section id="step8">
+          <h2>
+            <i class="ti ti-message-chatbot"></i>Step 8: LLMOps特有の考慮点 ―
+            プロンプトはコードである
+          </h2>
+          <p>
+            生成AI・LLMを組み込んだアプリケーションでは、デプロイ対象がモデルのバイナリではなく「プロンプト・検索設定（RAGの取得元）・モデルプロバイダー設定・評価しきい値」に置き換わる。システムプロンプトのたった一言の変更が、モデルの再学習以上に出力品質を左右することもある。プロンプトをアプリケーションコードにハードコードしたまま金曜午後にこっそり変更し、評価も走らせずに月曜の朝に大量のクレームで気づく、というのが典型的な失敗パターンとして紹介されている。
+          </p>
+
+          <h3>LLMOpsのCI/CDパイプラインが従来のML CI/CDに追加する要素</h3>
+          <ul>
+            <li>
+              <strong>プロンプトのバージョン管理</strong>:
+              プロンプトをGitでバージョン管理される独立した資産として扱い、開発（dev）→ステージング（staging）→本番（production）という環境ごとに、どのプロンプトバージョンが割り当てられているかを管理する
+            </li>
+            <li>
+              <strong>プロンプトのリンティング</strong>:
+              必須変数の欠落やフォーマット崩れがないかを機械的にチェックする
+            </li>
+            <li>
+              <strong>評価ゲート（Eval Gate）</strong>: 忠実性（faithfulness）や関連性（answer
+              relevancy）といった指標を、ゴールデンデータセット（正解付きテストケース集）に対して自動計算し、スコアが既定の閾値を下回った場合はデプロイをブロックする。これがLLMOpsにおける品質ゲートであり、従来のCIにおける単体テストに相当する役割を果たす
+            </li>
+            <li>
+              <strong>段階的ロールアウト</strong>:
+              プロンプトのA/Bテストやカナリア配信により、新しいプロンプト・モデル設定を一部トラフィックにのみ適用してから拡大する
+            </li>
+          </ul>
+
+          <div class="mermaid-wrap">
+            <pre class="mermaid-source" style="display: none">
+flowchart TD
+    A["プロンプト・RAG設定を変更"] --> B["Gitへコミット"]
+    B --> C["プロンプトのリンティング"]
+    C --> D["決定的テスト"]
+    D --> E["評価ゲート（Eval Gate）"]
+    E --> F{"しきい値を超えるか"}
+    F -->|No| G["デプロイをブロック"]
+    F -->|Yes| H["ステージングへデプロイ"]
+    H --> I["カナリア配信"]
+    I --> J["本番監視"]
+
+    style E fill:#115e59,stroke:#99f6e4,color:#ccfbf1
+    style F fill:#78350f,stroke:#fde68a,color:#fef3c7
+    style G fill:#7f1d1d,stroke:#fecaca,color:#fee2e2
+    style H fill:#4c1d95,stroke:#ddd6fe,color:#ede9fe
+    style I fill:#4c1d95,stroke:#ddd6fe,color:#ede9fe
+        </pre
+            >
+            <div class="mermaid-caption">LLMOpsにおけるプロンプトCI/CDと評価ゲート</div>
+          </div>
+
+          <p>
+            Google Cloud上でこのパイプラインを組む場合、Cloud
+            BuildがCI/CDのオーケストレーションを担い、Vertex AI
+            Pipelines（Kubeflowベース）が複雑なワークフローを、Vertex AI Evaluation
+            Serviceが忠実性・関連性などの自動評価指標の計算を担う、という役割分担が一つの実例として紹介されている。RAGシステムでは、アプリケーションコード・プロンプトテンプレート・検索対象データという3種類の更新をそれぞれ独立して扱えるパイプライン設計が求められる点も重要である。
+          </p>
+
+          <div class="source-note">
+            出典:
+            <a
+              href="https://myengineeringpath.dev/genai-engineer/llmops/"
+              target="_blank"
+              rel="noopener"
+              >MyEngineeringPathによるLLMOps解説</a
+            >
+            ／
+            <a
+              href="https://jubinsoni.medium.com/engineering-llmops-building-robust-ci-cd-pipelines-for-llm-applications-on-google-cloud-136b1fdbcbb5"
+              target="_blank"
+              rel="noopener"
+              >Jubin Soni氏によるGoogle Cloud上でのLLMOps CI/CD構築記事</a
+            >（<a
+              href="https://dev.to/jubinsoni/engineering-llmops-building-robust-cicd-pipelines-for-llm-applications-on-google-cloud-22hc"
+              target="_blank"
+              rel="noopener"
+              >DEV Community版</a
+            >）／
+            <a
+              href="https://langwatch.ai/blog/what-is-prompt-management-and-how-to-version-control-deploy-prompts-in-productions"
+              target="_blank"
+              rel="noopener"
+              >LangWatchによるプロンプト管理解説</a
+            >
+            ／
+            <a href="https://agenta.ai/blog/cicd-for-llm-prompts" target="_blank" rel="noopener"
+              >Agentaによるプロンプト専用デプロイパイプライン構築ガイド</a
+            >
+            ／
+            <a
+              href="https://apxml.com/courses/mlops-for-large-models-llmops/chapter-6-advanced-llmops-systems-workflows/integrating-llmops-cicd"
+              target="_blank"
+              rel="noopener"
+              >apxmlによるLLMOpsとCI/CD統合の技術解説</a
+            >
+            ／
+            <a
+              href="https://www.examcert.app/blog/llmops-skills-certifications-2026/"
+              target="_blank"
+              rel="noopener"
+              >ExamCertAIによる2026年のLLMOpsスキルマップ</a
+            >
+            ／
+            <a
+              href="https://machinelearningmastery.com/the-roadmap-for-mastering-llmops-in-2026/"
+              target="_blank"
+              rel="noopener"
+              >MachineLearningMasteryによるLLMOpsロードマップ</a
+            >。
+          </div>
+        </section>
+
+        <section id="step9">
+          <h2><i class="ti ti-robot"></i>Step 9: AIエージェントでCI/CDそのものを自動化する</h2>
+          <p>
+            ここまでは「AIシステムをCI/CDでどう扱うか」という話だったが、2026年に入り、逆に「AIエージェントを使ってCI/CDのプロセス自体を自動化する」という潮流が急速に実用化している。GitHubはこれを「Continuous
+            AI」と呼び、CI/CDの実践と同様に、自動化とコラボレーションを強化するAIをソフトウェア開発ライフサイクル（SDLC）へ統合する取り組みと位置づけている。
+          </p>
+
+          <h3>代表的な実装パターン</h3>
+          <ul>
+            <li>
+              <strong>PRメンション型のコードレビュー自動化</strong>: GitHub
+              ActionsのワークフローからClaude
+              Code（<code>anthropics/claude-code-action</code>）やOpenAI
+              Codex（<code>openai/codex-action</code>）、Gemini系のアクションを呼び出し、プルリクエストに<code>@claude</code>のようなメンションを付けるだけで、差分分析・バグ検出・セキュリティ検出・スタイルチェック・フォローアップコミットの作成までを自動実行させる
+            </li>
+            <li>
+              <strong>Issueベースの自律的PR生成</strong>:
+              Issueにラベルを付けるだけでコーディングエージェントが自律的にPRを作成する運用
+            </li>
+            <li>
+              <strong>GitHub Agentic Workflows</strong>: GitHub Next、Microsoft Research、Azure Core
+              Upstreamの協働で開発された技術プレビュー機能で、トリアージやドキュメント作成、コード品質向上など、より主観的で反復的な作業を、GitHub
+              Actionsの信頼性・制御性を保ったまま自動化する。公式ブログは、これを「従来のCI/CD用YAMLワークフローの代替」ではなく、CI/CDと併用してこそ最も効果を発揮するものと明確に位置づけている
+            </li>
+          </ul>
+
+          <div class="mermaid-wrap">
+            <pre class="mermaid-source" style="display: none">
+flowchart LR
+    A["PR作成またはIssueラベル付与"] --> B["GitHub Actions起動"]
+    B --> C["コーディングエージェント呼び出し"]
+    C --> D["差分分析・バグ・セキュリティ検出"]
+    D --> E["PRへレビューコメント投稿"]
+    E --> F["人間レビュアーが確認・承認"]
+    F --> G["マージしCI/CDへ"]
+
+    style C fill:#4c1d95,stroke:#ddd6fe,color:#ede9fe
+    style D fill:#115e59,stroke:#99f6e4,color:#ccfbf1
+    style F fill:#78350f,stroke:#fde68a,color:#fef3c7
+        </pre
+            >
+            <div class="mermaid-caption">AIエージェントによるPRレビュー自動化フロー</div>
+          </div>
+
+          <h3>導入時の注意点</h3>
+          <ul>
+            <li>
+              <strong>権限は最小限に絞る</strong>:
+              エージェントはコードを読み、コマンド実行やファイル出力を行う可能性があるため、<code
+                >contents: read</code
+              >、<code>pull-requests: write</code>のように、通常のCIジョブ以上に権限境界を明確にする
+            </li>
+            <li>
+              <strong>実行環境（ランナー）を選ぶ</strong>:
+              一部のツールはWindows環境で追加のセーフティ設定が必要になる場合があり、まずはLinuxランナーから始めるのが扱いやすい
+            </li>
+            <li>
+              <strong>モデルバージョンを固定するかどうかを検討する</strong>:
+              アップデートによってプロンプトへの反応が変わることがあるため、本番運用では固定し、セキュリティパッチのみ計画的に適用するフローを別途設ける
+            </li>
+            <li>
+              <strong>会話型ではなく自走型の設計にする</strong>:
+              細かく対話しながら進める使い方ではなく、適切な入力・指示を与えてエージェントに自走させることで真価を発揮する。そのためにはタスクごとに特化したプロンプトや実行環境をチームで共有できる仕組みが必要になる
+            </li>
+          </ul>
+
+          <div class="source-note">
+            出典:
+            <a
+              href="https://renue.co.jp/posts/ai-devops-claude-code-github-actions-ci-cd-ai-review-2026"
+              target="_blank"
+              rel="noopener"
+              >renue社によるAI DevOps完全ガイド</a
+            >
+            ／
+            <a
+              href="https://github.blog/jp/2026-02-16-automate-repository-tasks-with-github-agentic-workflows/"
+              target="_blank"
+              rel="noopener"
+              >GitHub公式ブログ「GitHub Agentic Workflowsを発表」</a
+            >
+            ／
+            <a
+              href="https://uravation.com/media/codex-github-action-complete-guide-2026/"
+              target="_blank"
+              rel="noopener"
+              >Uravation社によるCodex GitHub Action完全ガイド</a
+            >
+            ／
+            <a href="https://aizen-ai.co.jp/codex-github-actions/" target="_blank" rel="noopener"
+              >AIzen社によるCodexのGitHub Actions統合手順</a
+            >
+            ／
+            <a
+              href="https://codelabs.developers.google.com/genai-for-dev-github-code-review"
+              target="_blank"
+              rel="noopener"
+              >Google Codelabs「生成AIを使用したコードレビューの自動化」</a
+            >
+            ／
+            <a href="https://fintan.jp/page/19508/" target="_blank" rel="noopener"
+              >FintanによるGitLab環境でのAI駆動開発の実践知見</a
+            >
+            ／
+            <a
+              href="https://blog.potproject.net/2025/04/14/github-pr-automate-ai-agents/"
+              target="_blank"
+              rel="noopener"
+              >potproject氏による自律型GitHub Actions実装記</a
+            >。
+          </div>
+        </section>
+
+        <section id="step10">
+          <h2>
+            <i class="ti ti-shield-lock"></i>Step 10:
+            セキュリティとガバナンスをパイプラインに組み込む
+          </h2>
+          <p>
+            AI
+            CI/CDパイプラインは、従来のCI/CDが抱えるセキュリティリスクに加えて、AI・LLM特有のリスクにも対応する必要がある。両者は別物として管理するのではなく、同じパイプライン内で一貫して統制することが望ましい。
+          </p>
+
+          <h3>CI/CDパイプライン自体のセキュリティ</h3>
+          <p>
+            OWASPはCI/CD特有のセキュリティリスクを整理したチートシートを公開しており、実運用ではまず可視性（ログの一元化）を確保し、次に最小権限化とシークレット管理を徹底し、その後パイプラインの改ざん防止やハードニングへ進み、最後にサプライチェーン対策（依存関係の固定、成果物の署名検証）に着手する、という優先順位づけが推奨されている。CodecovやSolarWindsの事例が示すように、過度な権限を持つサービスアカウントが侵害されると被害が広範囲に及ぶため、CI/CD専用のワークフローファイル（<code>.github/workflows/</code>など）の変更には<code>CODEOWNERS</code>によるレビュー必須化や署名付きコミットの検証を組み込むことが有効である。
+          </p>
+
+          <h3>LLM・AIエージェント特有のセキュリティ</h3>
+          <p>
+            OWASPは「LLMアプリケーションのためのTop
+            10」として、プロンプトインジェクション、機微情報の開示、データ・モデルのポイズニング、不適切な出力処理、過剰なエージェンシー（Excessive
+            Agency）、システムプロンプトの漏洩、ベクトル・埋め込みの脆弱性、過剰消費（Unbounded
+            Consumption）などをカタログ化している。これらのリスクは実行時（ランタイム）の問題であることが多く、アプリケーションコード側だけでは解決できないため、認可チェックや最小権限、出力バリデーションといった制御は、LLM自身に委ねず、決定論的で監査可能な外部システム側で強制することが基本原則とされる。
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>OWASP LLMリスク</th>
+                  <th>CI/CDへの組み込み方</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>プロンプトインジェクション（LLM01）</td>
+                  <td>
+                    インジェクション対策の検証を、本番投入前にCI内の自動テストとして実行する（本番で発見するのではなく）
+                  </td>
+                </tr>
+                <tr>
+                  <td>過剰なエージェンシー</td>
+                  <td>
+                    エージェントが呼び出せるAPI・ツールのスコープを、パイプライン側で検証し、想定より広い権限を持とうとした変更は自動的に拒否する
+                  </td>
+                </tr>
+                <tr>
+                  <td>機微情報の開示</td>
+                  <td>
+                    モデル応答からの機密データ漏洩を検知する自動テスト（カナリートークンの埋め込みとログ監視など）をCIに組み込む
+                  </td>
+                </tr>
+                <tr>
+                  <td>モデル・データのポイズニング</td>
+                  <td>
+                    サードパーティモデル・データセットをソフトウェア依存関係と同様に扱い、SBOMや来歴（provenance）検証を行う
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            自動化されたレッドチーム演習（既知のジェイルブレイクパターンや間接的インジェクションへの耐性テスト）をCI/CDに組み込み、モデルアップデートのたびに安全特性が変化していないかを回帰テストすることも、2025年以降のベストプラクティスとして推奨されている。
+          </p>
+
+          <div class="source-note">
+            出典:
+            <a
+              href="https://cheatsheetseries.owasp.org/cheatsheets/CI_CD_Security_Cheat_Sheet.html"
+              target="_blank"
+              rel="noopener"
+              >OWASP公式「CI/CD Security Cheat Sheet」</a
+            >
+            ／
+            <a
+              href="https://secure-pipelines.com/ci-cd-security/owasp-top-10-ci-cd-risks-explained-real-world-examples/"
+              target="_blank"
+              rel="noopener"
+              >Secure Pipelinesによる「OWASP Top 10 CI/CD Risks」実例解説</a
+            >
+            ／
+            <a
+              href="https://cycode.com/blog/the-2025-owasp-top-10-addressing-software-supply-chain-and-llm-risks-with-cycode/"
+              target="_blank"
+              rel="noopener"
+              >Cycodeによる2025年版OWASP Top 10とLLMリスクの統合解説</a
+            >
+            ／
+            <a
+              href="https://www.gravitee.io/blog/owasp-top-10-for-llm-applications-2025-a-practical-guide"
+              target="_blank"
+              rel="noopener"
+              >Gravitee社によるOWASP LLM Top 10実践ガイド</a
+            >
+            ／
+            <a
+              href="https://securityboulevard.com/2026/03/the-owasp-top-10-for-llm-applications-2025-explained-simply/"
+              target="_blank"
+              rel="noopener"
+              >Security Boulevardによる2025年版OWASP LLM Top 10解説</a
+            >
+            ／
+            <a
+              href="https://medium.com/@aucestovara/from-owasp-top-10-for-llms-to-ci-cd-securing-ai-systems-at-build-time-1dce225cb9c0"
+              target="_blank"
+              rel="noopener"
+              >Alejandro Aucestovar氏によるOWASP LLM Top 10のCI/CDへの落とし込み方</a
+            >
+            ／
+            <a
+              href="https://socfortress.medium.com/owasp-top-10-for-llm-applications-2025-testing-local-models-against-real-attack-scenarios-part-5e453e4015cb"
+              target="_blank"
+              rel="noopener"
+              >SOCFortressによる実攻撃シナリオ検証</a
+            >
+            ／
+            <a
+              href="https://www.siemba.io/owasp-top-10-llm-security-testing"
+              target="_blank"
+              rel="noopener"
+              >Siembaによる OWASP LLM Top 10セキュリティテストガイド</a
+            >。
+          </div>
+        </section>
+
+        <section id="tools">
+          <h2><i class="ti ti-tools"></i>5. 主要ツールマップ</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>カテゴリ</th>
+                  <th>代表的なツール</th>
+                  <th>主な用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>データ・モデルバージョン管理</td>
+                  <td>DVC, Git LFS, lakeFS, Pachyderm</td>
+                  <td>データセット・モデルのGit的バージョン管理</td>
+                </tr>
+                <tr>
+                  <td>実験管理・モデルレジストリ</td>
+                  <td>MLflow, Weights &amp; Biases</td>
+                  <td>実験のトラッキング、モデルの承認・昇格ワークフロー</td>
+                </tr>
+                <tr>
+                  <td>パイプラインオーケストレーション</td>
+                  <td>
+                    Kubeflow, Vertex AI Pipelines, SageMaker Pipelines, Prefect, ZenML, Airflow
+                  </td>
+                  <td>学習・評価・デプロイの一連の流れを自動実行</td>
+                </tr>
+                <tr>
+                  <td>CI/CD基盤</td>
+                  <td>GitHub Actions, GitLab CI, Jenkins, Cloud Build, CircleCI</td>
+                  <td>ビルド・テスト・デプロイの自動化そのもの</td>
+                </tr>
+                <tr>
+                  <td>データ検証・品質管理</td>
+                  <td>Great Expectations, Evidently AI</td>
+                  <td>データスキーマ検証、ドリフトレポート生成</td>
+                </tr>
+                <tr>
+                  <td>モデル・IaCセキュリティスキャン</td>
+                  <td>ModelScan, Checkov, Fairlearn</td>
+                  <td>モデル成果物の安全性チェック、IaCスキャン、バイアス検証</td>
+                </tr>
+                <tr>
+                  <td>監視・可観測性</td>
+                  <td>Prometheus, Grafana, Evidently AI</td>
+                  <td>本番稼働メトリクスの収集・可視化・ドリフト検知</td>
+                </tr>
+                <tr>
+                  <td>コンテナ・実行基盤</td>
+                  <td>Docker, Kubernetes</td>
+                  <td>学習・推論環境の一貫性確保とスケーリング</td>
+                </tr>
+                <tr>
+                  <td>LLMOps・プロンプト管理</td>
+                  <td>LangWatch, Agenta, Vertex AI Evaluation Service</td>
+                  <td>プロンプトのバージョン管理、評価ゲート、A/Bテスト</td>
+                </tr>
+                <tr>
+                  <td>AIエージェントによるCI/CD自動化</td>
+                  <td>
+                    Claude Code Action, OpenAI Codex Action, GitHub Agentic Workflows, GitHub
+                    Copilot
+                  </td>
+                  <td>PRレビュー・Issue対応・テスト生成・ドキュメント同期の自動化</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="source-note">
+            出典:
+            <a
+              href="https://prepzee.com/blog/top-15-mlops-tools-to-learn/"
+              target="_blank"
+              rel="noopener"
+              >Prepzeeによる2026年版主要MLOpsツール15選</a
+            >
+            ／
+            <a
+              href="https://medium.com/online-inference/top-mlops-tools-in-2026-858fd479acac"
+              target="_blank"
+              rel="noopener"
+              >Online Inference誌によるMLOpsツールまとめ</a
+            >
+            ／
+            <a
+              href="https://www.kernshell.com/best-practices-for-scalable-machine-learning-deployment/"
+              target="_blank"
+              rel="noopener"
+              >Kernshellによるツールスタック例</a
+            >
+            ／
+            <a
+              href="https://www.gitnexa.com/blogs/mlops-implementation-best-practices"
+              target="_blank"
+              rel="noopener"
+              >GitNexaによるツール選定ガイド</a
+            >。
+          </div>
+        </section>
+
+        <section id="pitfalls">
+          <h2>
+            <i class="ti ti-alert-triangle"></i>6. よくある落とし穴（アンチパターン）チェックリスト
+          </h2>
+          <ul class="checklist">
+            <li>
+              <i class="ti ti-x"></i
+              >データセットをファイル名だけで管理し、どのモデルがどのデータで学習されたか追跡できない
+            </li>
+            <li>
+              <i class="ti ti-x"></i
+              >モデル評価をオフラインの精度指標のみで行い、ビジネスKPIを評価基準に含めていない
+            </li>
+            <li>
+              <i class="ti ti-x"></i
+              >データサイエンティストとエンジニアが分業しすぎて、モデルの手渡しの過程で「学習時と提供時のスキュー（training-serving
+              skew）」が発生している
+            </li>
+            <li>
+              <i class="ti ti-x"></i>モデルを本番投入したきり、性能劣化を検知する監視の仕組みがない
+            </li>
+            <li>
+              <i class="ti ti-x"></i
+              >再学習を完全手動で行っており、データが変化しても気づいた時にはすでに性能が劣化している
+            </li>
+            <li>
+              <i class="ti ti-x"></i
+              >新モデルをいきなり100%のトラフィックに投入し、問題発生時に即座にロールバックできる体制がない
+            </li>
+            <li>
+              <i class="ti ti-x"></i
+              >プロンプトをアプリケーションコードにハードコードしており、変更のたびにアプリ全体の再デプロイが必要になっている
+            </li>
+            <li>
+              <i class="ti ti-x"></i
+              >プロンプトやモデル設定を変更しても、評価（Eval）を自動実行せずに本番反映してしまっている
+            </li>
+            <li>
+              <i class="ti ti-x"></i
+              >AIエージェントにCIワークフローの実行権限を過剰に付与し、最小権限の原則を守っていない
+            </li>
+            <li>
+              <i class="ti ti-x"></i
+              >規制業界向けのシステムで、独立したチームによるモデル検証や、承認の文書化されたエスカレーションパスを用意していない
+            </li>
+          </ul>
+          <div class="source-note">
+            出典:
+            <a
+              href="https://mlflow.org/articles/mlops-pipeline-automation-best-practices-in-2026/"
+              target="_blank"
+              rel="noopener"
+              >MLflowブログにおけるMLOps成熟度の考え方</a
+            >
+            ／
+            <a href="https://www.n-ix.com/mlops-best-practices/" target="_blank" rel="noopener"
+              >N-iXによる実運用でよく見落とされるプラクティスの指摘</a
+            >
+            ／
+            <a
+              href="https://docs.cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning"
+              target="_blank"
+              rel="noopener"
+              >Google Cloud Architecture Centerにおけるtraining-serving skewの解説</a
+            >。
+          </div>
+        </section>
+
+        <section id="roadmap">
+          <h2><i class="ti ti-map"></i>7. まとめ：導入ロードマップ</h2>
+          <p>すべてを一度に導入する必要はない。以下のような段階的な進め方が現実的である。</p>
+
+          <div class="roadmap-step">
+            <div class="roadmap-num">1</div>
+            <div>
+              <h3>土台づくり（Step 1〜2）</h3>
+              <p>
+                まずデータ・モデルのバージョン管理と実験トラッキングを整備する。ここが崩れていると、この先の自動化はすべて「再現できない自動化」になってしまう。
+              </p>
+            </div>
+          </div>
+          <div class="roadmap-step">
+            <div class="roadmap-num">2</div>
+            <div>
+              <h3>テストとデリバリーの自動化（Step 3〜4）</h3>
+              <p>
+                コード・データ・モデルを対象にした多層テストをCIに組み込み、テスト環境への自動デプロイパイプラインを構築する。
+              </p>
+            </div>
+          </div>
+          <div class="roadmap-step">
+            <div class="roadmap-num">3</div>
+            <div>
+              <h3>継続的トレーニングと段階的ロールアウト（Step 5〜6）</h3>
+              <p>
+                スケジュールまたはドリフトベースの再学習トリガーを設定し、カナリアなど安全なロールアウト戦略を組み込む。
+              </p>
+            </div>
+          </div>
+          <div class="roadmap-step">
+            <div class="roadmap-num">4</div>
+            <div>
+              <h3>監視のループを閉じる（Step 7）</h3>
+              <p>
+                監視結果が自動的に再学習やアラートへつながるようにし、CI/CD/CTのループを完成させる。
+              </p>
+            </div>
+          </div>
+          <div class="roadmap-step">
+            <div class="roadmap-num">5</div>
+            <div>
+              <h3>生成AI固有の layer を足す（Step 8）</h3>
+              <p>プロンプトをコードと同格の資産として扱い、評価ゲートを設ける。</p>
+            </div>
+          </div>
+          <div class="roadmap-step">
+            <div class="roadmap-num">6</div>
+            <div>
+              <h3>AIエージェントで開発プロセス自体を加速する（Step 9）</h3>
+              <p>
+                コードレビューやドキュメント同期など、反復的なタスクからAIエージェントの導入を始める。
+              </p>
+            </div>
+          </div>
+          <div class="roadmap-step">
+            <div class="roadmap-num">7</div>
+            <div>
+              <h3>セキュリティを後付けにしない（Step 10）</h3>
+              <p>
+                最初のパイプライン設計の段階から、最小権限・監査ログ・評価の回帰テストを組み込んでおく。
+              </p>
+            </div>
+          </div>
+
+          <p style="margin-top: 20px">
+            この順番で少しずつ成熟度を上げていくことで、無理なく「AI CI/CD」の実践に到達できる。
+          </p>
+        </section>
+
+        <section id="references">
+          <h2><i class="ti ti-books"></i>8. 参考文献・出典URL一覧</h2>
+
+          <div class="ref-group">
+            <h3><i class="ti ti-stairs-up"></i>MLOps全般・成熟度モデル</h3>
+            <ul class="ref-list">
+              <li>
+                <span class="ref-title"
+                  >Google Cloud Architecture Center「MLOps: Continuous delivery and automation
+                  pipelines in machine learning」</span
+                ><a
+                  href="https://docs.cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning"
+                  target="_blank"
+                  rel="noopener"
+                  >https://docs.cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >MLflow公式ブログ「MLOps Pipeline Automation Best Practices in 2026」</span
+                ><a
+                  href="https://mlflow.org/articles/mlops-pipeline-automation-best-practices-in-2026/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://mlflow.org/articles/mlops-pipeline-automation-best-practices-in-2026/</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >Kernshell「MLOps in 2026: Best Practices for Scalable ML Deployment」</span
+                ><a
+                  href="https://www.kernshell.com/best-practices-for-scalable-machine-learning-deployment/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.kernshell.com/best-practices-for-scalable-machine-learning-deployment/</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >Azilen「8 MLOps Best Practices You Should Implement in 2026」</span
+                ><a
+                  href="https://www.azilen.com/blog/mlops-best-practices/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.azilen.com/blog/mlops-best-practices/</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >Glasier「Ultimate Guide to MLOps Process and Best Practices, 2026」</span
+                ><a
+                  href="https://www.glasierinc.com/blog/machine-learning-operations-mlops-guide"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.glasierinc.com/blog/machine-learning-operations-mlops-guide</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >N-iX「MLOps best practices: A hands-on experience guide」</span
+                ><a href="https://www.n-ix.com/mlops-best-practices/" target="_blank" rel="noopener"
+                  >https://www.n-ix.com/mlops-best-practices/</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >Flexiana「MLOps Maturity Model 2026: 4 Stages to Resilient, Risk-Free Machine
+                  Learning」</span
+                ><a
+                  href="https://medium.com/@flexianadevgroup/mlops-maturity-model-2026-4-stages-to-resilient-risk-free-machine-learning-468c097dc25c"
+                  target="_blank"
+                  rel="noopener"
+                  >https://medium.com/@flexianadevgroup/mlops-maturity-model-2026-4-stages-to-resilient-risk-free-machine-learning-468c097dc25c</a
+                >
+              </li>
+              <li>
+                <span class="ref-title">Prepzee「Top 15 MLOps Tools to Learn in 2026」</span
+                ><a
+                  href="https://prepzee.com/blog/top-15-mlops-tools-to-learn/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://prepzee.com/blog/top-15-mlops-tools-to-learn/</a
+                >
+              </li>
+              <li>
+                <span class="ref-title">Online Inference「Top MLOps tools in 2026」</span
+                ><a
+                  href="https://medium.com/online-inference/top-mlops-tools-in-2026-858fd479acac"
+                  target="_blank"
+                  rel="noopener"
+                  >https://medium.com/online-inference/top-mlops-tools-in-2026-858fd479acac</a
+                >
+              </li>
+              <li>
+                <span class="ref-title">GitNexa「MLOps Implementation Guide for 2026」</span
+                ><a
+                  href="https://www.gitnexa.com/blogs/mlops-implementation-best-practices"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.gitnexa.com/blogs/mlops-implementation-best-practices</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div class="ref-group">
+            <h3><i class="ti ti-database"></i>データ・モデルバージョン管理</h3>
+            <ul class="ref-list">
+              <li>
+                <span class="ref-title">DVC公式サイト</span
+                ><a href="https://dvc.org/" target="_blank" rel="noopener">https://dvc.org/</a>
+              </li>
+              <li>
+                <span class="ref-title">DVC公式ユーザーガイド</span
+                ><a href="https://doc.dvc.org/user-guide" target="_blank" rel="noopener"
+                  >https://doc.dvc.org/user-guide</a
+                >
+              </li>
+              <li>
+                <span class="ref-title">lakeFS「Best Data Version Control Tools in 2026」</span
+                ><a
+                  href="https://lakefs.io/data-version-control/dvc-tools/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://lakefs.io/data-version-control/dvc-tools/</a
+                >
+              </li>
+              <li>
+                <span class="ref-title">Wikipedia「Data Version Control (software)」</span
+                ><a
+                  href="https://en.wikipedia.org/wiki/Data_Version_Control_(software)"
+                  target="_blank"
+                  rel="noopener"
+                  >https://en.wikipedia.org/wiki/Data_Version_Control_(software)</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >Label Your Data「Data Versioning: ML Best Practices Checklist 2026」</span
+                ><a
+                  href="https://labelyourdata.com/articles/machine-learning/data-versioning"
+                  target="_blank"
+                  rel="noopener"
+                  >https://labelyourdata.com/articles/machine-learning/data-versioning</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >DataCamp「The Complete Guide to Data Version Control With DVC」</span
+                ><a
+                  href="https://www.datacamp.com/tutorial/data-version-control-dvc"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.datacamp.com/tutorial/data-version-control-dvc</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div class="ref-group">
+            <h3><i class="ti ti-message-chatbot"></i>LLMOps・プロンプトCI/CD</h3>
+            <ul class="ref-list">
+              <li>
+                <span class="ref-title"
+                  >MyEngineeringPath「LLMOps — CI/CD, Eval Gates &amp; LLM Deployment (2026)」</span
+                ><a
+                  href="https://myengineeringpath.dev/genai-engineer/llmops/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://myengineeringpath.dev/genai-engineer/llmops/</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >Jubin Soni「Engineering LLMOps: Building Robust CI/CD Pipelines for LLM
+                  Applications on Google Cloud」</span
+                ><a
+                  href="https://jubinsoni.medium.com/engineering-llmops-building-robust-ci-cd-pipelines-for-llm-applications-on-google-cloud-136b1fdbcbb5"
+                  target="_blank"
+                  rel="noopener"
+                  >https://jubinsoni.medium.com/engineering-llmops-building-robust-ci-cd-pipelines-for-llm-applications-on-google-cloud-136b1fdbcbb5</a
+                >（<a
+                  href="https://dev.to/jubinsoni/engineering-llmops-building-robust-cicd-pipelines-for-llm-applications-on-google-cloud-22hc"
+                  target="_blank"
+                  rel="noopener"
+                  >DEV Community版</a
+                >）
+              </li>
+              <li>
+                <span class="ref-title">ExamCertAI「LLMOps Skills &amp; Certifications 2026」</span
+                ><a
+                  href="https://www.examcert.app/blog/llmops-skills-certifications-2026/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.examcert.app/blog/llmops-skills-certifications-2026/</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >MachineLearningMastery「The Roadmap for Mastering LLMOps in 2026」</span
+                ><a
+                  href="https://machinelearningmastery.com/the-roadmap-for-mastering-llmops-in-2026/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://machinelearningmastery.com/the-roadmap-for-mastering-llmops-in-2026/</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >LangWatch「Prompt Management: Version &amp; Deploy Prompts in Production」</span
+                ><a
+                  href="https://langwatch.ai/blog/what-is-prompt-management-and-how-to-version-control-deploy-prompts-in-productions"
+                  target="_blank"
+                  rel="noopener"
+                  >https://langwatch.ai/blog/what-is-prompt-management-and-how-to-version-control-deploy-prompts-in-productions</a
+                >
+              </li>
+              <li>
+                <span class="ref-title">apxml「Integrating LLMOps with CI/CD Systems」</span
+                ><a
+                  href="https://apxml.com/courses/mlops-for-large-models-llmops/chapter-6-advanced-llmops-systems-workflows/integrating-llmops-cicd"
+                  target="_blank"
+                  rel="noopener"
+                  >https://apxml.com/courses/mlops-for-large-models-llmops/chapter-6-advanced-llmops-systems-workflows/integrating-llmops-cicd</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >Agenta「CI/CD for LLM Prompts: How to Build a Prompt Deployment Pipeline」</span
+                ><a
+                  href="https://agenta.ai/blog/cicd-for-llm-prompts"
+                  target="_blank"
+                  rel="noopener"
+                  >https://agenta.ai/blog/cicd-for-llm-prompts</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div class="ref-group">
+            <h3><i class="ti ti-robot"></i>AIエージェントによるCI/CD自動化</h3>
+            <ul class="ref-list">
+              <li>
+                <span class="ref-title"
+                  >renue「AI DevOps完全ガイド2026｜Claude Code×GitHub Actions×CI/CD自動化」</span
+                ><a
+                  href="https://renue.co.jp/posts/ai-devops-claude-code-github-actions-ci-cd-ai-review-2026"
+                  target="_blank"
+                  rel="noopener"
+                  >https://renue.co.jp/posts/ai-devops-claude-code-github-actions-ci-cd-ai-review-2026</a
+                >
+              </li>
+              <li>
+                <span class="ref-title">GitHubブログ「GitHub Agentic Workflowsを発表」</span
+                ><a
+                  href="https://github.blog/jp/2026-02-16-automate-repository-tasks-with-github-agentic-workflows/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://github.blog/jp/2026-02-16-automate-repository-tasks-with-github-agentic-workflows/</a
+                >
+              </li>
+              <li>
+                <span class="ref-title">Uravation「Codex GitHub Action 完全ガイド」</span
+                ><a
+                  href="https://uravation.com/media/codex-github-action-complete-guide-2026/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://uravation.com/media/codex-github-action-complete-guide-2026/</a
+                >
+              </li>
+              <li>
+                <span class="ref-title">AIzen「CodexをGitHub Actionsで使う方法」</span
+                ><a
+                  href="https://aizen-ai.co.jp/codex-github-actions/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://aizen-ai.co.jp/codex-github-actions/</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >Google Codelabs「生成AIを使用したコードレビューの自動化」</span
+                ><a
+                  href="https://codelabs.developers.google.com/genai-for-dev-github-code-review"
+                  target="_blank"
+                  rel="noopener"
+                  >https://codelabs.developers.google.com/genai-for-dev-github-code-review</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >Fintan「GitLab環境でGitリポジトリをハブとしたAI駆動開発」</span
+                ><a href="https://fintan.jp/page/19508/" target="_blank" rel="noopener"
+                  >https://fintan.jp/page/19508/</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >potproject「GitHub上で依頼してPR作成する自律型AIエージェントを作った」</span
+                ><a
+                  href="https://blog.potproject.net/2025/04/14/github-pr-automate-ai-agents/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://blog.potproject.net/2025/04/14/github-pr-automate-ai-agents/</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >note.com（mnuma）「GitHub公式actions/ai-inferenceアクションでコード自動レビュー」</span
+                ><a href="https://note.com/mnuma/n/ne5dbb93a340e" target="_blank" rel="noopener"
+                  >https://note.com/mnuma/n/ne5dbb93a340e</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div class="ref-group">
+            <h3><i class="ti ti-git-branch"></i>デプロイ戦略</h3>
+            <ul class="ref-list">
+              <li>
+                <span class="ref-title"
+                  >devops-daily.com「Deployment Strategies: Blue-Green, Canary, and Rolling
+                  Deployments Explained」</span
+                ><a
+                  href="https://devops-daily.com/posts/deployment-strategies-guide"
+                  target="_blank"
+                  rel="noopener"
+                  >https://devops-daily.com/posts/deployment-strategies-guide</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >Intuz「8 Most Reliable Strategies for Secure ML Model Deployment」</span
+                ><a
+                  href="https://www.intuz.com/blog/strategies-for-deploying-ml-models"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.intuz.com/blog/strategies-for-deploying-ml-models</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >123ofai「Canary Deployment for ML Models — Complete Guide (2026)」</span
+                ><a
+                  href="https://123ofai.com/qnalab/system-design/blocks/canary-deploy"
+                  target="_blank"
+                  rel="noopener"
+                  >https://123ofai.com/qnalab/system-design/blocks/canary-deploy</a
+                >
+              </li>
+              <li>
+                <span class="ref-title">CloudBees「Deployment strategies」</span
+                ><a
+                  href="https://docs.cloudbees.com/docs/cloudbees-cd/latest/plan/deployment-strategies"
+                  target="_blank"
+                  rel="noopener"
+                  >https://docs.cloudbees.com/docs/cloudbees-cd/latest/plan/deployment-strategies</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >CircleCI「Deployment strategies: Types, trade-offs, and how to choose」</span
+                ><a
+                  href="https://circleci.com/blog/deployment-strategies-types-trade-offs-and-how-to-choose/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://circleci.com/blog/deployment-strategies-types-trade-offs-and-how-to-choose/</a
+                >
+              </li>
+              <li>
+                <span class="ref-title">Harness「Blue-Green and Canary Deployments Explained」</span
+                ><a
+                  href="https://www.harness.io/blog/blue-green-canary-deployment-strategies"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.harness.io/blog/blue-green-canary-deployment-strategies</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >arXiv「A Multivocal Review of MLOps Practices, Challenges and Open Issues」</span
+                ><a href="https://arxiv.org/pdf/2406.09737" target="_blank" rel="noopener"
+                  >https://arxiv.org/pdf/2406.09737</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div class="ref-group">
+            <h3><i class="ti ti-shield-lock"></i>セキュリティ・ガバナンス</h3>
+            <ul class="ref-list">
+              <li>
+                <span class="ref-title">OWASP「CI/CD Security Cheat Sheet」</span
+                ><a
+                  href="https://cheatsheetseries.owasp.org/cheatsheets/CI_CD_Security_Cheat_Sheet.html"
+                  target="_blank"
+                  rel="noopener"
+                  >https://cheatsheetseries.owasp.org/cheatsheets/CI_CD_Security_Cheat_Sheet.html</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >Secure Pipelines「OWASP Top 10 CI/CD Risks Explained with Real-World
+                  Examples」</span
+                ><a
+                  href="https://secure-pipelines.com/ci-cd-security/owasp-top-10-ci-cd-risks-explained-real-world-examples/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://secure-pipelines.com/ci-cd-security/owasp-top-10-ci-cd-risks-explained-real-world-examples/</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >Cycode「OWASP Top 10 2025: Addressing Software Supply Chain and LLM Risks」</span
+                ><a
+                  href="https://cycode.com/blog/the-2025-owasp-top-10-addressing-software-supply-chain-and-llm-risks-with-cycode/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://cycode.com/blog/the-2025-owasp-top-10-addressing-software-supply-chain-and-llm-risks-with-cycode/</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >Gravitee「OWASP Top 10 for LLM Applications (2025): A Practical Guide」</span
+                ><a
+                  href="https://www.gravitee.io/blog/owasp-top-10-for-llm-applications-2025-a-practical-guide"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.gravitee.io/blog/owasp-top-10-for-llm-applications-2025-a-practical-guide</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >Security Boulevard「The OWASP Top 10 for LLM Applications (2025): Explained
+                  Simply」</span
+                ><a
+                  href="https://securityboulevard.com/2026/03/the-owasp-top-10-for-llm-applications-2025-explained-simply/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://securityboulevard.com/2026/03/the-owasp-top-10-for-llm-applications-2025-explained-simply/</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >Alejandro Aucestovar「From OWASP Top 10 for LLMs to CI/CD: Securing AI Systems at
+                  Build Time」</span
+                ><a
+                  href="https://medium.com/@aucestovara/from-owasp-top-10-for-llms-to-ci-cd-securing-ai-systems-at-build-time-1dce225cb9c0"
+                  target="_blank"
+                  rel="noopener"
+                  >https://medium.com/@aucestovara/from-owasp-top-10-for-llms-to-ci-cd-securing-ai-systems-at-build-time-1dce225cb9c0</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >SOCFortress「OWASP Top 10 for LLM Applications 2025: Testing Local Models Against
+                  Real Attack Scenarios — Part III」</span
+                ><a
+                  href="https://socfortress.medium.com/owasp-top-10-for-llm-applications-2025-testing-local-models-against-real-attack-scenarios-part-5e453e4015cb"
+                  target="_blank"
+                  rel="noopener"
+                  >https://socfortress.medium.com/owasp-top-10-for-llm-applications-2025-testing-local-models-against-real-attack-scenarios-part-5e453e4015cb</a
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >Siemba「OWASP Top 10 for LLMs (2026) Security Testing &amp; Mitigation
+                  Guide」</span
+                ><a
+                  href="https://www.siemba.io/owasp-top-10-llm-security-testing"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.siemba.io/owasp-top-10-llm-security-testing</a
+                >
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <footer>
+          本ガイドは2026年7月時点で参照可能な情報をもとに作成している。CI/CDツールやAIエージェントの機能は変化が速い領域のため、実際の導入にあたっては各ツールの公式ドキュメントで最新の仕様を確認することを推奨する。
+        </footer>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script>
+      (function () {
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'base',
+          themeVariables: {
+            background: '#0a0c10',
+            primaryColor: '#1a1e26',
+            primaryTextColor: '#e8eaed',
+            primaryBorderColor: '#3a4152',
+            lineColor: '#6d7480',
+            secondaryColor: '#1a1e26',
+            tertiaryColor: '#12151b',
+            fontFamily:
+              '-apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif',
+            fontSize: '16px',
+          },
+          htmlLabels: false,
+          flowchart: {
+            curve: 'linear',
+            useMaxWidth: false,
+            nodeSpacing: 45,
+            rankSpacing: 45,
+          },
+          securityLevel: 'loose',
+        });
+
+        async function renderAllDiagrams() {
+          await document.fonts.ready;
+          var sources = document.querySelectorAll('.mermaid-source');
+          for (var i = 0; i < sources.length; i++) {
+            var el = sources[i];
+            var wrap = el.closest('.mermaid-wrap');
+            var code = el.textContent.trim();
+            var id = 'mmd-diagram-' + i;
+            try {
+              var result = await mermaid.render(id, code);
+              var holder = document.createElement('div');
+              holder.innerHTML = result.svg;
+              var svgEl = holder.querySelector('svg');
+              if (svgEl) {
+                svgEl.style.maxWidth = '100%';
+                svgEl.style.height = 'auto';
+                svgEl.style.display = 'block';
+                svgEl.style.margin = '0 auto';
+              }
+              el.replaceWith(holder.firstChild);
+            } catch (err) {
+              console.error('Mermaid render error:', err);
+              var errBox = document.createElement('div');
+              errBox.className = 'callout';
+              errBox.textContent = '図の描画に失敗しました。';
+              el.replaceWith(errBox);
+              if (wrap) {
+                wrap.style.textAlign = 'left';
+              }
+            }
+          }
+        }
+        renderAllDiagrams();
+
+        // sidebar scroll-spy
+        var links = Array.prototype.slice.call(document.querySelectorAll('.nav-link'));
+        var sections = links
+          .map(function (l) {
+            return document.getElementById(l.dataset.target);
+          })
+          .filter(Boolean);
+
+        function onScroll() {
+          var scrollPos = window.scrollY + 120;
+          var current = sections[0];
+          for (var i = 0; i < sections.length; i++) {
+            if (sections[i].offsetTop <= scrollPos) {
+              current = sections[i];
+            }
+          }
+          links.forEach(function (l) {
+            l.classList.toggle('active', current && l.dataset.target === current.id);
+          });
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+
+        links.forEach(function (l) {
+          l.addEventListener('click', function (e) {
+            e.preventDefault();
+            var target = document.getElementById(l.dataset.target);
+            if (target) {
+              window.scrollTo({ top: target.offsetTop - 24, behavior: 'smooth' });
+            }
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>
