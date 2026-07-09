@@ -5,7 +5,7 @@
   background: var(--bg);
   color: var(--txt);
   font-family: var(--font-sans), "Noto Sans JP", sans-serif;
-  font-size: 13.5px;
+  font-size: 1rem;
   line-height: 1.7;
 }
 
@@ -22,7 +22,7 @@
 }
 
 .sidebarTitle {
-  font-size: 11px;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--txt3);
   text-transform: uppercase;
@@ -43,7 +43,7 @@
   padding: 8px 12px;
   border-radius: 6px;
   color: var(--txt2);
-  font-size: 12.5px;
+  font-size: 1rem;
   margin-bottom: 3px;
   transition: all 0.15s ease;
   text-decoration: none;
@@ -64,7 +64,7 @@
 }
 
 .tocIcon {
-  font-size: 14px;
+  font-size: 1rem;
   color: var(--txt3);
   flex-shrink: 0;
 }
@@ -77,8 +77,8 @@
   flex: 1;
   min-width: 0;
   padding: 56px 64px 120px;
-  max-width: 1000px;
-  margin: 0 auto;
+  max-width: 100%;
+  margin: 0;
 }
 
 .hero {
@@ -91,7 +91,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 11px;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--teal);
   text-transform: uppercase;
@@ -112,7 +112,7 @@
 
 .subtitle {
   color: var(--txt2);
-  font-size: 14px;
+  font-size: 1rem;
   max-width: 760px;
   line-height: 1.7;
 }
@@ -123,7 +123,7 @@
   border-radius: 8px;
   padding: 16px 20px;
   margin: 24px 0;
-  font-size: 13px;
+  font-size: 1rem;
   color: var(--txt2);
   display: flex;
   gap: 12px;
@@ -132,7 +132,7 @@
 
 .callout i {
   color: var(--ylw);
-  font-size: 18px;
+  font-size: 1rem;
   flex-shrink: 0;
   margin-top: 2px;
 }
@@ -169,14 +169,14 @@
   border: 1px solid var(--brd);
   border-radius: 6px;
   margin-bottom: 8px;
-  font-size: 13px;
+  font-size: 1rem;
   color: var(--txt2);
   background: var(--bg2);
 }
 
 .checklist i {
   color: var(--teal);
-  font-size: 16px;
+  font-size: 1rem;
   margin-top: 2px;
   flex-shrink: 0;
 }
@@ -187,7 +187,7 @@
 }
 
 .stepLabel {
-  font-size: 10.5px;
+  font-size: 1rem;
   color: var(--txt3);
   margin: 0 0 8px;
   text-transform: uppercase;
@@ -213,7 +213,7 @@
 }
 
 .step h3 {
-  font-size: 14.5px;
+  font-size: 1rem;
   font-weight: 600;
   margin: 28px 0 12px;
   color: var(--txt);
@@ -235,7 +235,7 @@
   width: 100%;
   border-collapse: collapse;
   margin: 24px 0;
-  font-size: 13px;
+  font-size: 1rem;
   border: 1px solid var(--brd);
   border-radius: 6px;
   overflow: hidden;
@@ -254,7 +254,7 @@
   background: var(--srf);
   color: var(--txt);
   font-weight: 600;
-  font-size: 12px;
+  font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -271,7 +271,7 @@
 .content p code,
 .content li code {
   font-family: var(--font-mono), monospace;
-  font-size: 12px;
+  font-size: 1rem;
   color: var(--teal);
   background: var(--srf);
   padding: 2px 6px;
@@ -307,7 +307,7 @@ ul.plain,
 ol.plain {
   padding-left: 20px;
   color: var(--txt2);
-  font-size: 13.5px;
+  font-size: 1rem;
   margin: 0 0 20px;
 }
 
@@ -318,7 +318,7 @@ ol.plain {
 
 .badge {
   display: inline-block;
-  font-size: 10px;
+  font-size: 1rem;
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 12px;
@@ -335,7 +335,7 @@ ol.plain {
 }
 
 .refTitle {
-  font-size: 11px;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--txt3);
   text-transform: uppercase;
@@ -354,7 +354,7 @@ ol.plain {
 }
 
 .refBlock li {
-  font-size: 12.5px;
+  font-size: 1rem;
   margin-bottom: 8px;
   color: var(--txt3);
   word-break: break-all;
@@ -370,7 +370,7 @@ ol.plain {
 }
 
 .refGroup h4 {
-  font-size: 12.5px;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--txt2);
   margin: 24px 0 10px;
@@ -381,7 +381,7 @@ ol.plain {
   margin: 60px auto 0;
   padding: 40px 56px 80px;
   color: var(--txt3);
-  font-size: 12.5px;
+  font-size: 1rem;
   font-family: var(--font-mono), "JetBrains Mono", monospace;
   text-align: center;
   border-top: 1px solid var(--brd);
