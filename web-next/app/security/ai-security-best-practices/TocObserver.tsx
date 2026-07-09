@@ -29,7 +29,7 @@ export default function TocObserver() {
           }
         }
       },
-      { rootMargin: "-10% 0px -70% 0px", threshold: 0 },
+      { rootMargin: "-10% 0px -70% 0px", threshold: 0 }
     );
 
     for (const sec of sections) observer.observe(sec);

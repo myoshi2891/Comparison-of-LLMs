@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
-import TocObserver from "./TocObserver";
 import styles from "./page.module.css";
+import TocObserver from "./TocObserver";
 
 export const metadata: Metadata = {
   title: "AIセキュリティ ベストプラクティスガイド | LLM-Studies",
@@ -191,7 +191,8 @@ export default function AISecurityBestPracticesPage() {
           <p>
             従来のWebアプリケーションセキュリティは、SQLインジェクションやXSSのように、コードと入力データが明確に分離されていることを前提にしていました。ところがLLM(大規模言語モデル)は、
             <strong>指示(instruction)とデータ(data)を同じ自然言語のチャネルで処理する</strong>
-            という根本的な特性を持っています。この結果、次のような新しい攻撃対象領域(attack surface)が生まれます。
+            という根本的な特性を持っています。この結果、次のような新しい攻撃対象領域(attack
+            surface)が生まれます。
           </p>
 
           <table>
@@ -208,9 +209,7 @@ export default function AISecurityBestPracticesPage() {
               </tr>
               <tr>
                 <td>静的なロジックを検証すればよい</td>
-                <td>
-                  確率的(stochastic)にふるまうモデルを検証する必要がある
-                </td>
+                <td>確率的(stochastic)にふるまうモデルを検証する必要がある</td>
               </tr>
               <tr>
                 <td>攻撃対象はネットワーク・OS・DB</td>
@@ -220,15 +219,14 @@ export default function AISecurityBestPracticesPage() {
               </tr>
               <tr>
                 <td>一度パッチを当てれば直る</td>
-                <td>
-                  プロンプトインジェクションのように「完全な解決策が存在しない」リスクがある
-                </td>
+                <td>プロンプトインジェクションのように「完全な解決策が存在しない」リスクがある</td>
               </tr>
             </tbody>
           </table>
 
           <p>
-            さらに2026年時点では、LLMが単に文章を生成するだけでなく、ツールを呼び出し、他のエージェントと通信し、実際の業務システムを操作する「エージェント型AI(Agentic AI)」が急速に普及しており、セキュリティの検討範囲はさらに拡大しています。
+            さらに2026年時点では、LLMが単に文章を生成するだけでなく、ツールを呼び出し、他のエージェントと通信し、実際の業務システムを操作する「エージェント型AI(Agentic
+            AI)」が急速に普及しており、セキュリティの検討範囲はさらに拡大しています。
           </p>
         </section>
 
@@ -298,15 +296,11 @@ export default function AISecurityBestPracticesPage() {
             <ul>
               <li>
                 OWASP GenAI Security Project:{" "}
-                <Ext href="https://genai.owasp.org/">
-                  https://genai.owasp.org/
-                </Ext>
+                <Ext href="https://genai.owasp.org/">https://genai.owasp.org/</Ext>
               </li>
               <li>
                 MITRE ATLAS 公式サイト:{" "}
-                <Ext href="https://atlas.mitre.org/">
-                  https://atlas.mitre.org/
-                </Ext>
+                <Ext href="https://atlas.mitre.org/">https://atlas.mitre.org/</Ext>
               </li>
               <li>
                 NIST AI Risk Management Framework:{" "}
@@ -332,16 +326,15 @@ export default function AISecurityBestPracticesPage() {
             <strong>
               MITRE ATLAS(Adversarial Threat Landscape for Artificial-Intelligence Systems)
             </strong>
-            は、2021年にMITREが公開した、AI/MLシステムを狙う攻撃者の戦術(Tactics)と技術(Techniques)を体系化したナレッジベースです。サイバーセキュリティで広く使われるMITRE ATT&CKと同じ「マトリクス形式」を採用しており、攻撃者の目的(列)と具体的な手口(行)をフカンできます。
+            は、2021年にMITREが公開した、AI/MLシステムを狙う攻撃者の戦術(Tactics)と技術(Techniques)を体系化したナレッジベースです。サイバーセキュリティで広く使われるMITRE
+            ATT&CKと同じ「マトリクス形式」を採用しており、攻撃者の目的(列)と具体的な手口(行)をフカンできます。
           </p>
 
           <p>
             2025年11月時点でATLASは16の戦術・84の技術・56のサブ技術・32の緩和策・42件の実際のケーススタディを収録するまでに拡大しており、2026年2月の更新ではさらにエージェント特有の技術(悪意あるAIエージェントツールの公開など)が追加されました。ATLASは月次リリースサイクルに移行しており、AI攻撃の実態を継続的に反映しています。
           </p>
 
-          <h3>
-            ATLASの基本戦術(ATT&CKから継承・拡張された代表的な13の戦術)
-          </h3>
+          <h3>ATLASの基本戦術(ATT&CKから継承・拡張された代表的な13の戦術)</h3>
           <table>
             <thead>
               <tr>
@@ -354,9 +347,7 @@ export default function AISecurityBestPracticesPage() {
               <tr>
                 <td>準備</td>
                 <td>Reconnaissance(偵察)</td>
-                <td>
-                  対象モデルのAPI仕様・論文・公開ドキュメントなどから情報収集
-                </td>
+                <td>対象モデルのAPI仕様・論文・公開ドキュメントなどから情報収集</td>
               </tr>
               <tr>
                 <td>準備</td>
@@ -406,9 +397,7 @@ export default function AISecurityBestPracticesPage() {
               <tr>
                 <td>AI固有</td>
                 <td>ML Attack Staging(ML攻撃準備)</td>
-                <td>
-                  学習データの汚染やバックドア埋め込みなど攻撃の下準備
-                </td>
+                <td>学習データの汚染やバックドア埋め込みなど攻撃の下準備</td>
               </tr>
               <tr>
                 <td>窃取</td>
@@ -418,9 +407,7 @@ export default function AISecurityBestPracticesPage() {
               <tr>
                 <td>目的達成</td>
                 <td>Impact(影響)</td>
-                <td>
-                  サービス停止・誤動作・信頼失墜などの最終的な被害
-                </td>
+                <td>サービス停止・誤動作・信頼失墜などの最終的な被害</td>
               </tr>
             </tbody>
           </table>
@@ -429,22 +416,20 @@ export default function AISecurityBestPracticesPage() {
             代表的なAI特有の攻撃技術には、
             <strong>Adversarial Examples(敵対的サンプル)</strong>・
             <strong>Model Inversion(モデル逆転攻撃)</strong>・
-            <strong>Data Poisoning(データ汚染)</strong>・
-            <strong>Model Stealing(モデル窃取)</strong>・
-            <strong>Prompt Injection(プロンプトインジェクション)</strong>
+            <strong>Data Poisoning(データ汚染)</strong>・<strong>Model Stealing(モデル窃取)</strong>
+            ・<strong>Prompt Injection(プロンプトインジェクション)</strong>
             などがあり、いずれも従来のATT&CKには存在しない、AI/ML特有の攻撃対象領域を扱います。
           </p>
 
           <h3>実践のはじめ方</h3>
           <ol className={styles.plain}>
-            <li>
-              ATLAS Navigator(atlas.mitre.org)で自社システムに関連する戦術・技術を洗い出す
-            </li>
+            <li>ATLAS Navigator(atlas.mitre.org)で自社システムに関連する戦術・技術を洗い出す</li>
             <li>
               各技術について「検知できているか」「緩和策があるか」をスコアリングし、独自のカバレッジレイヤーを作成する
             </li>
             <li>
-              実際のケーススタディ(EchoLeak、iProovのディープフェイク事例など)を参考に、攻撃の連鎖(kill chain)をイメージした演習を設計する
+              実際のケーススタディ(EchoLeak、iProovのディープフェイク事例など)を参考に、攻撃の連鎖(kill
+              chain)をイメージした演習を設計する
             </li>
           </ol>
 
@@ -456,9 +441,7 @@ export default function AISecurityBestPracticesPage() {
             <ul>
               <li>
                 MITRE ATLAS 公式サイト:{" "}
-                <Ext href="https://atlas.mitre.org/">
-                  https://atlas.mitre.org/
-                </Ext>
+                <Ext href="https://atlas.mitre.org/">https://atlas.mitre.org/</Ext>
               </li>
               <li>
                 MITRE ATLASの成長に関するCTIDブログ(2026年5月):{" "}
@@ -518,22 +501,14 @@ export default function AISecurityBestPracticesPage() {
               <tr>
                 <td>LLM01:2025</td>
                 <td>プロンプトインジェクション</td>
-                <td>
-                  直接・間接の入力によってモデルの指示を上書きし、意図しない挙動を引き起こす
-                </td>
-                <td>
-                  指示とデータのチャネル分離、外部コンテンツの隔離、出力前の人による承認
-                </td>
+                <td>直接・間接の入力によってモデルの指示を上書きし、意図しない挙動を引き起こす</td>
+                <td>指示とデータのチャネル分離、外部コンテンツの隔離、出力前の人による承認</td>
               </tr>
               <tr>
                 <td>LLM02:2025</td>
                 <td>機微情報の開示</td>
-                <td>
-                  学習データの記憶や設定情報の露出により、個人情報・秘密情報が漏洩する
-                </td>
-                <td>
-                  出力フィルタリング、データの最小化、保持ポリシーの明確化
-                </td>
+                <td>学習データの記憶や設定情報の露出により、個人情報・秘密情報が漏洩する</td>
+                <td>出力フィルタリング、データの最小化、保持ポリシーの明確化</td>
               </tr>
               <tr>
                 <td>LLM03:2025</td>
@@ -541,16 +516,12 @@ export default function AISecurityBestPracticesPage() {
                 <td>
                   基盤モデル・データセット・ライブラリ・プラグインなど第三者コンポーネントの脆弱性
                 </td>
-                <td>
-                  コンポーネントの来歴検証、SBOM(部品表)管理、信頼できる供給元の選定
-                </td>
+                <td>コンポーネントの来歴検証、SBOM(部品表)管理、信頼できる供給元の選定</td>
               </tr>
               <tr>
                 <td>LLM04:2025</td>
                 <td>データ・モデルポイズニング</td>
-                <td>
-                  学習データやファインチューニングデータへの汚染によるバックドア埋め込み
-                </td>
+                <td>学習データやファインチューニングデータへの汚染によるバックドア埋め込み</td>
                 <td>データ来歴の検証、バージョン管理、異常検知</td>
               </tr>
               <tr>
@@ -559,54 +530,36 @@ export default function AISecurityBestPracticesPage() {
                 <td>
                   LLM出力を無検証で下流システム(SQL・シェル・HTMLレンダラー)に渡すことによる各種インジェクション
                 </td>
-                <td>
-                  出力のコンテキストに応じたエンコーディング、パラメータ化クエリの使用
-                </td>
+                <td>出力のコンテキストに応じたエンコーディング、パラメータ化クエリの使用</td>
               </tr>
               <tr>
                 <td>LLM06:2025</td>
                 <td>過剰なエージェンシー(自律性)</td>
-                <td>
-                  必要以上の機能・権限・自律性をエージェントに与えることによる誤動作や悪用
-                </td>
-                <td>
-                  最小権限の原則、重要操作への人の承認、機能スコープの制限
-                </td>
+                <td>必要以上の機能・権限・自律性をエージェントに与えることによる誤動作や悪用</td>
+                <td>最小権限の原則、重要操作への人の承認、機能スコープの制限</td>
               </tr>
               <tr>
                 <td>LLM07:2025</td>
                 <td>システムプロンプトの漏洩</td>
-                <td>
-                  システムプロンプトに含めた秘密情報や内部ロジックが露出する
-                </td>
-                <td>
-                  秘密情報をシステムプロンプトに含めない、別レイヤーでのアクセス制御
-                </td>
+                <td>システムプロンプトに含めた秘密情報や内部ロジックが露出する</td>
+                <td>秘密情報をシステムプロンプトに含めない、別レイヤーでのアクセス制御</td>
               </tr>
               <tr>
                 <td>LLM08:2025</td>
                 <td>ベクトル・埋め込みの脆弱性</td>
-                <td>
-                  ベクトルDBへの汚染注入やテナント間のアクセス制御不備
-                </td>
-                <td>
-                  ベクトルストアのアクセス制御、埋め込みモデルの検証
-                </td>
+                <td>ベクトルDBへの汚染注入やテナント間のアクセス制御不備</td>
+                <td>ベクトルストアのアクセス制御、埋め込みモデルの検証</td>
               </tr>
               <tr>
                 <td>LLM09:2025</td>
                 <td>誤情報(旧:過度の依存)</td>
-                <td>
-                  もっともらしい誤った情報(ハルシネーション)を生成・流布する
-                </td>
+                <td>もっともらしい誤った情報(ハルシネーション)を生成・流布する</td>
                 <td>出力の裏取り(grounding)、引用元の明示、利用者教育</td>
               </tr>
               <tr>
                 <td>LLM10:2025</td>
                 <td>制御不能な消費</td>
-                <td>
-                  リソースを浪費させるDoSやコスト急増(Denial of Wallet)を引き起こす
-                </td>
+                <td>リソースを浪費させるDoSやコスト急増(Denial of Wallet)を引き起こす</td>
                 <td>レート制限、タイムアウト設定、使用量の監視とアラート</td>
               </tr>
             </tbody>
@@ -615,9 +568,7 @@ export default function AISecurityBestPracticesPage() {
           <div className={`${styles.callout} ${styles.info}`}>
             <i className="ti ti-info-circle" aria-hidden="true" />
             <div>
-              <strong>
-                なぜプロンプトインジェクションは「解決できない」と言われるのか。
-              </strong>
+              <strong>なぜプロンプトインジェクションは「解決できない」と言われるのか。</strong>
               LLMは指示とデータを同じ自然言語のチャネルで処理するため、モデルは「これは正規の指示なのか、それとも処理すべきデータなのか」を原理的に区別できません。OWASPも「生成AIの性質上、確実な防止策が存在するかは不明」と明記しており、完全な解決ではなく多層防御によるリスク低減が現実的なアプローチとされています(詳細はステップ5)。
             </div>
           </div>
@@ -671,9 +622,11 @@ export default function AISecurityBestPracticesPage() {
           <p>
             チャットボットが「質問に答える」だけの存在だったのに対し、
             <strong>AIエージェントは「実際に行動する」</strong>
-            存在です。ツールを呼び出し、他のエージェントと通信し、記憶を保持し、実世界のワークフローを操作します。この自律性の高まりに対応するため、OWASP GenAI Security Projectは2025年12月、Black Hat Europe 2025に合わせて
+            存在です。ツールを呼び出し、他のエージェントと通信し、記憶を保持し、実世界のワークフローを操作します。この自律性の高まりに対応するため、OWASP
+            GenAI Security Projectは2025年12月、Black Hat Europe 2025に合わせて
             <strong>OWASP Top 10 for Agentic Applications 2026</strong>
-            を公開しました。100名以上の業界専門家によるレビューを経た、agentic AI固有のリスクを扱う初の業界標準リストです。
+            を公開しました。100名以上の業界専門家によるレビューを経た、agentic
+            AI固有のリスクを扱う初の業界標準リストです。
           </p>
 
           <p>
@@ -707,29 +660,19 @@ export default function AISecurityBestPracticesPage() {
                 <td>
                   直接・間接の指示操作によって、エージェントの意思決定プロセスそのものを乗っ取られる
                 </td>
-                <td>
-                  厳格な行動制約とガードレール、異常な逸脱の継続的な監視
-                </td>
+                <td>厳格な行動制約とガードレール、異常な逸脱の継続的な監視</td>
               </tr>
               <tr>
                 <td>ASI02:2026</td>
                 <td>ツールの誤用・悪用</td>
-                <td>
-                  認可された範囲外のパラメータ・順序でツールを呼び出させる
-                </td>
-                <td>
-                  ツール呼び出し時点でのパラメータ検証、呼び出し元ごとのスコープ制御
-                </td>
+                <td>認可された範囲外のパラメータ・順序でツールを呼び出させる</td>
+                <td>ツール呼び出し時点でのパラメータ検証、呼び出し元ごとのスコープ制御</td>
               </tr>
               <tr>
                 <td>ASI03:2026</td>
                 <td>アイデンティティ・権限の悪用</td>
-                <td>
-                  エージェントの権限が過剰・共有されており、昇格や横断的な悪用が発生する
-                </td>
-                <td>
-                  エージェント固有の管理されたアイデンティティ、権限の最小化
-                </td>
+                <td>エージェントの権限が過剰・共有されており、昇格や横断的な悪用が発生する</td>
+                <td>エージェント固有の管理されたアイデンティティ、権限の最小化</td>
               </tr>
               <tr>
                 <td>ASI04:2026</td>
@@ -737,29 +680,19 @@ export default function AISecurityBestPracticesPage() {
                 <td>
                   実行時に動的読み込みされるツール・プロンプト・MCPサーバー・エージェントカードの汚染
                 </td>
-                <td>
-                  ツールマニフェストの署名検証、信頼できるレジストリの利用
-                </td>
+                <td>ツールマニフェストの署名検証、信頼できるレジストリの利用</td>
               </tr>
               <tr>
                 <td>ASI05:2026</td>
                 <td>予期しないコード実行</td>
-                <td>
-                  コード生成・実行系エージェントが悪意ある命令を実行させられる
-                </td>
-                <td>
-                  サンドボックス化、実行権限の分離、危険な操作の承認フロー
-                </td>
+                <td>コード生成・実行系エージェントが悪意ある命令を実行させられる</td>
+                <td>サンドボックス化、実行権限の分離、危険な操作の承認フロー</td>
               </tr>
               <tr>
                 <td>ASI06:2026</td>
                 <td>メモリ・コンテキストの汚染</td>
-                <td>
-                  長期記憶や検索結果への汚染により、以降のセッションの挙動が歪められる
-                </td>
-                <td>
-                  メモリ書き込み前のバリデーション、外部由来コンテンツの明示的タグ付け
-                </td>
+                <td>長期記憶や検索結果への汚染により、以降のセッションの挙動が歪められる</td>
+                <td>メモリ書き込み前のバリデーション、外部由来コンテンツの明示的タグ付け</td>
               </tr>
               <tr>
                 <td>ASI07:2026</td>
@@ -772,9 +705,7 @@ export default function AISecurityBestPracticesPage() {
               <tr>
                 <td>ASI08:2026</td>
                 <td>連鎖的な障害</td>
-                <td>
-                  1つのエージェントの誤動作・侵害がシステム全体に波及する
-                </td>
+                <td>1つのエージェントの誤動作・侵害がシステム全体に波及する</td>
                 <td>サーキットブレーカー, 短命な認証情報, レート制限</td>
               </tr>
               <tr>
@@ -783,9 +714,7 @@ export default function AISecurityBestPracticesPage() {
                 <td>
                   流暢で説得力のあるエージェントの発言を人間が過信し、危険な操作を承認してしまう
                 </td>
-                <td>
-                  同意取得はチャットUIではなく別の検証済みチャネルで行う
-                </td>
+                <td>同意取得はチャットUIではなく別の検証済みチャネルで行う</td>
               </tr>
               <tr>
                 <td>ASI10:2026</td>
@@ -796,9 +725,7 @@ export default function AISecurityBestPracticesPage() {
             </tbody>
           </table>
 
-          <h3>
-            実践への落とし込み ― 「Identity」と「Containment」の2本柱
-          </h3>
+          <h3>実践への落とし込み ― 「Identity」と「Containment」の2本柱</h3>
           <p>
             すべてのリスクを一度に解決する必要はありません。多くの実務家は、次の2つの軸に沿って優先順位をつけています。
           </p>
@@ -809,7 +736,8 @@ export default function AISecurityBestPracticesPage() {
             </li>
             <li>
               <strong>自律性の封じ込め(Containment)</strong>
-              :ASI01・ASI02・ASI07・ASI08に関連。「Least Agency(必要最小限の自律性)」の原則に基づき、高リスクな操作には必ず人間の承認を挟む。
+              :ASI01・ASI02・ASI07・ASI08に関連。「Least
+              Agency(必要最小限の自律性)」の原則に基づき、高リスクな操作には必ず人間の承認を挟む。
             </li>
           </ol>
 
@@ -829,16 +757,12 @@ export default function AISecurityBestPracticesPage() {
               </tr>
               <tr>
                 <td>2</td>
-                <td>
-                  自律性とツールスコープの制限(Least Agency / Least Privilege)
-                </td>
+                <td>自律性とツールスコープの制限(Least Agency / Least Privilege)</td>
                 <td>ASI01, ASI02, ASI05</td>
               </tr>
               <tr>
                 <td>3</td>
-                <td>
-                  入力と記憶の堅牢化(信頼できる指示と外部コンテンツの分離)
-                </td>
+                <td>入力と記憶の堅牢化(信頼できる指示と外部コンテンツの分離)</td>
                 <td>ASI06、ASI01の一部</td>
               </tr>
               <tr>
@@ -848,9 +772,7 @@ export default function AISecurityBestPracticesPage() {
               </tr>
               <tr>
                 <td>5</td>
-                <td>
-                  障害の影響範囲(blast radius)を限定する仕組みの整備
-                </td>
+                <td>障害の影響範囲(blast radius)を限定する仕組みの整備</td>
                 <td>ASI08</td>
               </tr>
             </tbody>
@@ -909,10 +831,9 @@ export default function AISecurityBestPracticesPage() {
             プロンプトインジェクション対策を深掘りする
           </h2>
           <p>
-            プロンプトインジェクションは2025年版・2026年版いずれのOWASPリストでも中心的なリスクとして扱われています。OpenAI・Anthropic・Google DeepMindの各社も「現在のLLMアーキテクチャの範囲内では完全に解決できない」と2025年の論文で認めています。したがって現実的な目標は「攻撃を完全に防ぐこと」ではなく、
-            <strong>
-              多層防御によって被害範囲(blast radius)を許容できる水準まで下げること
-            </strong>
+            プロンプトインジェクションは2025年版・2026年版いずれのOWASPリストでも中心的なリスクとして扱われています。OpenAI・Anthropic・Google
+            DeepMindの各社も「現在のLLMアーキテクチャの範囲内では完全に解決できない」と2025年の論文で認めています。したがって現実的な目標は「攻撃を完全に防ぐこと」ではなく、
+            <strong>多層防御によって被害範囲(blast radius)を許容できる水準まで下げること</strong>
             です。
           </p>
 
@@ -942,9 +863,7 @@ export default function AISecurityBestPracticesPage() {
               <tr>
                 <td>Instruction Hierarchy(命令階層)</td>
                 <td>モデル訓練</td>
-                <td>
-                  システム・開発者・ユーザーなど、指示の発信元ごとに優先順位を学習させる
-                </td>
+                <td>システム・開発者・ユーザーなど、指示の発信元ごとに優先順位を学習させる</td>
               </tr>
               <tr>
                 <td>StruQ / SecAlign</td>
@@ -1029,9 +948,7 @@ export default function AISecurityBestPracticesPage() {
               </li>
               <li>
                 Spotlighting等の防御手法の学術的整理(arXiv):{" "}
-                <Ext href="https://arxiv.org/pdf/2512.00136">
-                  https://arxiv.org/pdf/2512.00136
-                </Ext>
+                <Ext href="https://arxiv.org/pdf/2512.00136">https://arxiv.org/pdf/2512.00136</Ext>
               </li>
               <li>
                 OWASP Foundationによるプロンプトインジェクション防御の推奨事項:{" "}
@@ -1095,9 +1012,7 @@ export default function AISecurityBestPracticesPage() {
               </tr>
               <tr>
                 <td>監視</td>
-                <td>
-                  リアルタイムでの異常検知とアラート、定期的な監査を組み合わせる
-                </td>
+                <td>リアルタイムでの異常検知とアラート、定期的な監査を組み合わせる</td>
               </tr>
             </tbody>
           </table>
@@ -1183,9 +1098,7 @@ export default function AISecurityBestPracticesPage() {
               <tr>
                 <td>2</td>
                 <td>作話(Confabulation)</td>
-                <td>
-                  もっともらしい誤情報を自信満々に生成するリスク(いわゆるハルシネーション)
-                </td>
+                <td>もっともらしい誤情報を自信満々に生成するリスク(いわゆるハルシネーション)</td>
               </tr>
               <tr>
                 <td>3</td>
@@ -1210,9 +1123,7 @@ export default function AISecurityBestPracticesPage() {
               <tr>
                 <td>7</td>
                 <td>人間とAIの構成</td>
-                <td>
-                  人間がAIの出力にどう向き合うか、過信や誤解のリスク
-                </td>
+                <td>人間がAIの出力にどう向き合うか、過信や誤解のリスク</td>
               </tr>
               <tr>
                 <td>8</td>
@@ -1222,16 +1133,12 @@ export default function AISecurityBestPracticesPage() {
               <tr>
                 <td>9</td>
                 <td>情報セキュリティ</td>
-                <td>
-                  プロンプトインジェクションやデータ漏洩などの技術的セキュリティリスク
-                </td>
+                <td>プロンプトインジェクションやデータ漏洩などの技術的セキュリティリスク</td>
               </tr>
               <tr>
                 <td>10</td>
                 <td>知的財産</td>
-                <td>
-                  著作権のある学習データの記憶・再生成に関するリスク
-                </td>
+                <td>著作権のある学習データの記憶・再生成に関するリスク</td>
               </tr>
               <tr>
                 <td>11</td>
@@ -1247,7 +1154,8 @@ export default function AISecurityBestPracticesPage() {
           </table>
 
           <p>
-            NISTはこのフレームワークを「エージェント型AI」の文脈にも拡張する準備を進めており、2026年2月にはNIST CAISI(AI標準化イニシアチブ)がエージェント標準化に関する取り組みを発表し、937件のパブリックコメントを受け付けています。
+            NISTはこのフレームワークを「エージェント型AI」の文脈にも拡張する準備を進めており、2026年2月にはNIST
+            CAISI(AI標準化イニシアチブ)がエージェント標準化に関する取り組みを発表し、937件のパブリックコメントを受け付けています。
           </p>
 
           <h3>実務への落とし込み</h3>
@@ -1335,7 +1243,8 @@ export default function AISecurityBestPracticesPage() {
 
           <h3>EU AI Act:2026年の最新スケジュール</h3>
           <p>
-            EU AI Actは2024年8月に発効した、世界初の包括的なAI規制です。2025年11月、欧州委員会は実装の遅れを踏まえて
+            EU AI
+            Actは2024年8月に発効した、世界初の包括的なAI規制です。2025年11月、欧州委員会は実装の遅れを踏まえて
             <strong>Digital Omnibus on AI</strong>
             という簡素化パッケージを提案し、2026年5月7日に欧州議会と理事会が暫定合意に至りました。2026年7月8日時点での最新の状況は以下の通りです。
           </p>
@@ -1357,7 +1266,8 @@ export default function AISecurityBestPracticesPage() {
               <tr>
                 <td>2026年8月2日</td>
                 <td>
-                  高リスクAIシステム(Annex III)の義務化が本来予定されていた日。Omnibus未成立の場合はこの日から原文通り適用
+                  高リスクAIシステム(Annex
+                  III)の義務化が本来予定されていた日。Omnibus未成立の場合はこの日から原文通り適用
                 </td>
               </tr>
               <tr>
@@ -1369,7 +1279,8 @@ export default function AISecurityBestPracticesPage() {
               <tr>
                 <td>2026年12月2日</td>
                 <td>
-                  生成AI出力の電子透かし・機械可読な表示義務(Article 50(2))。Omnibusにより4か月延期された新しい期限
+                  生成AI出力の電子透かし・機械可読な表示義務(Article
+                  50(2))。Omnibusにより4か月延期された新しい期限
                 </td>
               </tr>
               <tr>
@@ -1380,14 +1291,13 @@ export default function AISecurityBestPracticesPage() {
               </tr>
               <tr>
                 <td>2027年8月2日</td>
-                <td>
-                  Omnibus未成立の場合の、Annex III高リスクAIシステムの本来の義務化期限
-                </td>
+                <td>Omnibus未成立の場合の、Annex III高リスクAIシステムの本来の義務化期限</td>
               </tr>
               <tr>
                 <td>2027年12月2日</td>
                 <td>
-                  Omnibus成立を前提とした、Annex III(単体高リスクAIシステム)の新しい義務化期限(16か月延期)
+                  Omnibus成立を前提とした、Annex
+                  III(単体高リスクAIシステム)の新しい義務化期限(16か月延期)
                 </td>
               </tr>
               <tr>
@@ -1397,7 +1307,8 @@ export default function AISecurityBestPracticesPage() {
               <tr>
                 <td>2028年8月2日</td>
                 <td>
-                  Annex I(医療機器・機械類等、既存の製品規制に組み込まれた高リスクAIシステム)の新しい義務化期限
+                  Annex
+                  I(医療機器・機械類等、既存の製品規制に組み込まれた高リスクAIシステム)の新しい義務化期限
                 </td>
               </tr>
             </tbody>
@@ -1414,7 +1325,9 @@ export default function AISecurityBestPracticesPage() {
           <h3>ISO/IEC 42001:世界初のAIマネジメントシステム認証</h3>
           <p>
             <strong>ISO/IEC 42001:2023</strong>
-            は2023年12月に発行された、世界初のAIマネジメントシステム(AIMS)に関する認証可能な国際規格です。ISO 27001(情報セキュリティ)やISO 9001(品質管理)と同様に、第三者機関による正式な認証取得が可能です。PDCA(Plan-Do-Check-Act)サイクルに基づき、データガバナンス・モデルの透明性・バイアス低減・人による監督といったAI特有の統制を含みます。
+            は2023年12月に発行された、世界初のAIマネジメントシステム(AIMS)に関する認証可能な国際規格です。ISO
+            27001(情報セキュリティ)やISO
+            9001(品質管理)と同様に、第三者機関による正式な認証取得が可能です。PDCA(Plan-Do-Check-Act)サイクルに基づき、データガバナンス・モデルの透明性・バイアス低減・人による監督といったAI特有の統制を含みます。
           </p>
 
           <p>
@@ -1422,7 +1335,8 @@ export default function AISecurityBestPracticesPage() {
             <strong>
               それ自体がEU AI Actなど個別法規制への準拠を自動的に意味するわけではありません
             </strong>
-            。個々のAIシステムがEU AI Actの要求事項を満たしているかどうかは、別途の適合性評価が必要です。
+            。個々のAIシステムがEU AI
+            Actの要求事項を満たしているかどうかは、別途の適合性評価が必要です。
           </p>
 
           <div className={styles.refBlock}>
@@ -1493,11 +1407,13 @@ export default function AISecurityBestPracticesPage() {
           <ol className={styles.plain}>
             <li>
               <strong>フレームワークベース of テスト:</strong>
-              OWASP LLM Top 10 / Agentic Top 10 / MITRE ATLASのカテゴリごとに、実際に攻撃を試みるテストケースを用意する
+              OWASP LLM Top 10 / Agentic Top 10 / MITRE
+              ATLASのカテゴリごとに、実際に攻撃を試みるテストケースを用意する
             </li>
             <li>
               <strong>適応的攻撃を想定する:</strong>
-              静的な防御は、攻撃者が防御手法を知った上で調整してくる「適応的攻撃(adaptive attack)」に対して脆弱になりがちである。研究では、最新の防御手法に対しても適応的攻撃の成功率が85%を超えるケースが報告されている
+              静的な防御は、攻撃者が防御手法を知った上で調整してくる「適応的攻撃(adaptive
+              attack)」に対して脆弱になりがちである。研究では、最新の防御手法に対しても適応的攻撃の成功率が85%を超えるケースが報告されている
             </li>
             <li>
               <strong>継続的な実施:</strong>
@@ -1555,9 +1471,7 @@ export default function AISecurityBestPracticesPage() {
               </li>
               <li>
                 AIレッドチーミングの手法論に関する系統的レビュー(arXiv):{" "}
-                <Ext href="https://arxiv.org/pdf/2602.21267">
-                  https://arxiv.org/pdf/2602.21267
-                </Ext>
+                <Ext href="https://arxiv.org/pdf/2602.21267">https://arxiv.org/pdf/2602.21267</Ext>
               </li>
               <li>
                 MITRE ATLASのレッドチーム活用ガイド:{" "}
@@ -1575,9 +1489,7 @@ export default function AISecurityBestPracticesPage() {
             <i className="ti ti-checklist" aria-hidden="true" />
             今日から使える実践チェックリスト
           </h2>
-          <p>
-            組織の成熟度に応じて、以下のチェックリストを段階的に導入することを推奨します。
-          </p>
+          <p>組織の成熟度に応じて、以下のチェックリストを段階的に導入することを推奨します。</p>
 
           <table>
             <thead>
@@ -1596,37 +1508,33 @@ export default function AISecurityBestPracticesPage() {
               <tr>
                 <td>フェーズ2:基本防御</td>
                 <td>1〜2か月目</td>
-                <td>
-                  OWASP LLM Top 10に沿って、入出力の検証・最小権限・レート制限を実装する
-                </td>
+                <td>OWASP LLM Top 10に沿って、入出力の検証・最小権限・レート制限を実装する</td>
               </tr>
               <tr>
                 <td>フェーズ3:エージェント対応</td>
                 <td>2〜3か月目</td>
                 <td>
-                  OWASP Agentic Top 10(ASI01-10)に基づき、アイデンティティ管理と自律性の封じ込めを行う
+                  OWASP Agentic Top
+                  10(ASI01-10)に基づき、アイデンティティ管理と自律性の封じ込めを行う
                 </td>
               </tr>
               <tr>
                 <td>フェーズ4:ガバナンス整備</td>
                 <td>3〜6か月目</td>
                 <td>
-                  NIST AI RMFのGovern/Map/Measure/Manageサイクルを回す体制を作り、Google SAIFと組み合わせる
+                  NIST AI RMFのGovern/Map/Measure/Manageサイクルを回す体制を作り、Google
+                  SAIFと組み合わせる
                 </td>
               </tr>
               <tr>
                 <td>フェーズ5:法規制対応</td>
                 <td>継続的</td>
-                <td>
-                  EU AI Actの適用対象を確認し、必要に応じてISO/IEC 42001の認証取得を検討する
-                </td>
+                <td>EU AI Actの適用対象を確認し、必要に応じてISO/IEC 42001の認証取得を検討する</td>
               </tr>
               <tr>
                 <td>フェーズ6:継続的検証</td>
                 <td>継続的</td>
-                <td>
-                  MITRE ATLASを参照したレッドチーミングと本番監視を定期的に実施する
-                </td>
+                <td>MITRE ATLASを参照したレッドチーミングと本番監視を定期的に実施する</td>
               </tr>
             </tbody>
           </table>
@@ -1647,15 +1555,11 @@ export default function AISecurityBestPracticesPage() {
             </li>
             <li>
               <i className="ti ti-square-check" aria-hidden="true" />
-              <div>
-                エージェントに与えている権限は、タスク遂行に必要な最小限にとどまっているか
-              </div>
+              <div>エージェントに与えている権限は、タスク遂行に必要な最小限にとどまっているか</div>
             </li>
             <li>
               <i className="ti ti-square-check" aria-hidden="true" />
-              <div>
-                不可逆・高リスクな操作には、必ず人間による承認ステップが入っているか
-              </div>
+              <div>不可逆・高リスクな操作には、必ず人間による承認ステップが入っているか</div>
             </li>
             <li>
               <i className="ti ti-square-check" aria-hidden="true" />
@@ -1665,9 +1569,7 @@ export default function AISecurityBestPracticesPage() {
             </li>
             <li>
               <i className="ti ti-square-check" aria-hidden="true" />
-              <div>
-                プロンプトパターン・ツール呼び出し・トークン消費量を継続的に監視しているか
-              </div>
+              <div>プロンプトパターン・ツール呼び出し・トークン消費量を継続的に監視しているか</div>
             </li>
             <li>
               <i className="ti ti-square-check" aria-hidden="true" />
@@ -1675,9 +1577,7 @@ export default function AISecurityBestPracticesPage() {
             </li>
             <li>
               <i className="ti ti-square-check" aria-hidden="true" />
-              <div>
-                適用対象となる法規制(EU AI Actなど)のスケジュールを把握しているか
-              </div>
+              <div>適用対象となる法規制(EU AI Actなど)のスケジュールを把握しているか</div>
             </li>
           </ul>
         </section>
@@ -1690,7 +1590,10 @@ export default function AISecurityBestPracticesPage() {
           <p>
             AIセキュリティは、単一のツールや一度きりの対策では完結しません。本ガイドで紹介したように、
             <strong>
-              「脅威モデリング(MITRE ATLAS)」「アプリケーションリスクの理解(OWASP)」「開発ライフサイクルへの組み込み(Google SAIF)」「組織的なガバナンス(NIST AI RMF)」「法規制対応(EU AI Act / ISO 42001)」「継続的な検証(レッドチーミング)」
+              「脅威モデリング(MITRE
+              ATLAS)」「アプリケーションリスクの理解(OWASP)」「開発ライフサイクルへの組み込み(Google
+              SAIF)」「組織的なガバナンス(NIST AI RMF)」「法規制対応(EU AI Act / ISO
+              42001)」「継続的な検証(レッドチーミング)」
             </strong>
             という複数のレイヤーを組み合わせることで、初めて実効性のある防御体制が構築できます。
           </p>
@@ -1715,9 +1618,7 @@ export default function AISecurityBestPracticesPage() {
             <ul className={styles.plain}>
               <li>
                 OWASP GenAI Security Project:{" "}
-                <Ext href="https://genai.owasp.org/">
-                  https://genai.owasp.org/
-                </Ext>
+                <Ext href="https://genai.owasp.org/">https://genai.owasp.org/</Ext>
               </li>
               <li>
                 OWASP Top 10 for LLM Applications 2025:{" "}
@@ -1745,9 +1646,7 @@ export default function AISecurityBestPracticesPage() {
               </li>
               <li>
                 MITRE ATLAS 公式サイト:{" "}
-                <Ext href="https://atlas.mitre.org/">
-                  https://atlas.mitre.org/
-                </Ext>
+                <Ext href="https://atlas.mitre.org/">https://atlas.mitre.org/</Ext>
               </li>
               <li>
                 MITRE ATLAS成長に関するCTIDブログ:{" "}
@@ -1851,9 +1750,7 @@ export default function AISecurityBestPracticesPage() {
               </li>
               <li>
                 AIレッドチーミング手法の系統的レビュー(arXiv):{" "}
-                <Ext href="https://arxiv.org/pdf/2602.21267">
-                  https://arxiv.org/pdf/2602.21267
-                </Ext>
+                <Ext href="https://arxiv.org/pdf/2602.21267">https://arxiv.org/pdf/2602.21267</Ext>
               </li>
             </ul>
           </div>
