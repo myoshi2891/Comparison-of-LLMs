@@ -1,6 +1,6 @@
 # GEMINI.md
 
-Updated 2026-07-05
+Updated 2026-07-09
 
 GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、GEMINI.md はその委譲 pointer として機能する。
@@ -22,12 +22,12 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 - **ファイル全体の書き直し禁止**（明示指示がない限り）
 - **依存関係のアップグレード禁止**
 - **設定ファイル（next.config.ts / tsconfig.json / biome.json 等）の勝手な変更禁止**
-- **PII等（個人情報やローカル固有の絶対パス）のコミット禁止**：コミット前に `git diff --cached` や新規追加ファイルに `file:///Users/` やローカルユーザー名などの情報が含まれていないことを確認
+- **PII等（個人情報やローカル固有 of 絶対パス）のコミット禁止**：コミット前に `git diff --cached` や新規追加ファイルに `file:///Users/` やローカルユーザー名などの情報が含まれていないことを確認
 
 ## 検証コマンド
 
 ```bash
-cd web-next && bun run test        # 801 pass（全 Green ✅）
+cd web-next && bun run test        # 811 pass（全 Green ✅）
 cd web-next && bun run typecheck   # OK
 cd web-next && bun run build       # 全ルートが ○ (Static)
 cd web-next && bun run lint        # 0 件（全解消 ✅）

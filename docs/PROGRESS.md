@@ -1,7 +1,7 @@
 # プロジェクト進捗・ステータス (PROGRESS.md)
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
-> - 最終更新日: **Updated 2026-07-05**
+> - 最終更新日: **Updated 2026-07-09**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -14,11 +14,12 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（本作業範囲では新規違反 0 件、既知の既存指摘は本件対象外）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **801 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **811 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
-- **Agent Skills 完全ガイドの Next.js 移行**: `Agent-skills-guide.html` から `web-next/app/agent/skills/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化とメインコンテンツの画面幅100%化、外部リンクのセキュリティ対策、Mermaid遅延ロード、TOCスクロールハイライト追従（Intersection Observer）を実装。ナビゲーションの「Agent -> Agent Skills Guide」に新規登録。 Vitest 契約テスト 7 件追加（合計 801 テスト合格）。
+- **AIセキュリティ ベストプラクティスガイドの Next.js 移行**: `Ai-security-best-practices.html` から `web-next/app/security/ai-security-best-practices/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策、Mermaid遅延ロード、TOCスクロールハイライト追従（Intersection Observer）を実装。ナビゲーションの「Security -> AI Security Best Practices」に新規登録。 Vitest 契約テスト 8 件追加（合計 811 テスト合格）。
+- **Agent Skills 完全ガイド of Next.js 移行**: `Agent-skills-guide.html` から `web-next/app/agent/skills/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化とメインコンテンツの画面幅100%化、外部リンクのセキュリティ対策、Mermaid遅延ロード、TOCスクロールハイライト追従（Intersection Observer）を実装。ナビゲーションの「Agent -> Agent Skills Guide」に新規登録。 Vitest 契約テスト 7 件追加（合計 801 テスト合格）。
 - **skills.sh 完全ガイドの Next.js 移行**: `Skills-sh-guide.html` から `web-next/app/claude/skills-sh/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化とメインコンテンツの画面幅100%化、外部リンクのセキュリティ対策、Mermaid遅延ロード、TOCスクロールハイライト追従（Intersection Observer）、進捗バーおよびモバイル開閉ロジックの TocObserver 移行を実装。ナビゲーションの「Agent -> skills.sh Guide」に新規登録。 Vitest 契約テスト 7 件追加（合計 794 テスト合格）。
 - **Claude Fable 5 実践活用ガイドの Next.js 移行**: `Claude-fable-5-best-practices.html` から `web-next/app/claude/fable-5-best-practices/page.tsx` への完全移行を完了 🚀。カテゴリ毎に TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策、Mermaid遅延ロード、TOCスクロールハイライト追従（Intersection Observer）を実装。ナビゲーションの「Claude -> Fable 5 Best Practices」に新規登録。 Vitest 契約テスト 9 件追加（合計 787 テスト合格）。
 - **Cursor 実践ガイド（中〜上級者向け）の Next.js 移行**: `Cursor-complete-guide-intermediate.html` から `web-next/app/cursor/complete-guide-intermediate/page.tsx` への完全移行を完了 🚀。カテゴリ毎に TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策、Mermaid遅延ロード、TOCスクロールハイライト追従（Intersection Observer）を実装。ナビゲーションの「IDE -> Cursor Guide (中級)」に新規登録。 Vitest 契約テスト 2 件追加（合計 778 テスト合格）。
