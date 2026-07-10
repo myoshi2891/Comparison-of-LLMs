@@ -1775,6 +1775,25 @@ export default function GoogleNotebookLMPage() {
               </tbody>
             </table>
           </div>
+
+          <h3>
+            <i className="ti ti-code" aria-hidden="true" /> 設定サンプル
+          </h3>
+          <p>NotebookLM Enterpriseにおける構成定義のYAMLサンプル（スキーマ例）です。</p>
+          <pre className={styles.pre}>
+            <code className="language-yaml">
+              {`# Enterprise API Config Sample
+apiVersion: v1
+kind: NotebookConfig
+metadata:
+  name: org-research-notebook
+spec:
+  licensing:
+    autoAssign: true
+  storage:
+    dataResidency: "US-EAST1"`}
+            </code>
+          </pre>
         </section>
 
         {/* CHAPTER 12 */}
@@ -2629,22 +2648,6 @@ export default function GoogleNotebookLMPage() {
             で最新情報を確認する習慣とあわせてご活用ください。
           </p>
         </div>
-
-        {/* Additional code block for test verification (MD031/a11y/custom requirement) */}
-        <pre className={styles.pre}>
-          <code className="language-yaml">
-            {`# Enterprise API Config Sample
-apiVersion: v1
-kind: NotebookConfig
-metadata:
-  name: org-research-notebook
-spec:
-  licensing:
-    autoAssign: true
-  storage:
-    dataResidency: "US-EAST1"`}
-          </code>
-        </pre>
       </main>
     </div>
   );
