@@ -226,26 +226,73 @@ const DIAG_12 = `flowchart TD
     class B,C,D,E,F cause
     class B1,C1,D1,E1,F1 effect`;
 
-const DIAG_13 = `timeline
-    title NotebookLM 主要アップデート年表
-    2023 : Google Labsの実験プロダクトとして始動
-    2024 : Audio Overview公開 ポッドキャスト風解説が話題に
-    2025-04 : Discover Sources提供開始
-    2025-11 : Deep Research・画像・CSV等の対応ソース拡大
-         : モバイルアプリにFlashcard・Quiz追加
-    2025-12 : Data Tables追加
-         : Geminiアプリの一方向ソースとしてNotebookLMが利用可能に
-    2026-01 : Chatの会話メモリ6倍・コンテキスト8倍に拡大
-         : カスタムペルソナ・ゴール設定が全ユーザーに開放
-         : チャット履歴の自動保存に対応
-    2026-03 : Cinematic Video Overview追加 Ultra限定
-         : Slide revisions・EPUB取込・PPTX書き出しに対応
-         : Infographic 10スタイル刷新
-    2026-04 : Geminiアプリに双方向同期のNotebooks機能が追加
-    2026-05 : Google I/O 2026・Ultraプランの2段階再編 20TB・30TB
-    2026-06 : Gemini 3.5 + Antigravityへ刷新
-         : ノートブックごとにコード実行環境を付与
-         : チャート・XLSX・PPTX等の直接生成に対応`;
+const DIAG_13 = `flowchart TD
+    subgraph Y2023["2023年"]
+        A1["Google Labsの実験プロダクトとして始動"]
+    end
+    subgraph Y2024["2024年"]
+        B1["Audio Overview公開 ポッドキャスト風解説が話題に"]
+    end
+    subgraph Y2025_04["2025年4月"]
+        C1["Discover Sources提供開始"]
+    end
+    subgraph Y2025_11["2025年11月"]
+        D1["Deep Research・画像・CSV等の対応ソース拡大"]
+        D2["モバイルアプリにFlashcard・Quiz追加"]
+    end
+    subgraph Y2025_12["2025年12月"]
+        E1["Data Tables追加"]
+        E2["Geminiアプリの一方向ソースとしてNotebookLMが利用可能に"]
+    end
+    subgraph Y2026_01["2026年1月"]
+        F1["Chatの会話メモリ6倍・コンテキスト8倍に拡大"]
+        F2["カスタムペルソナ・ゴール設定が全ユーザーに開放"]
+        F3["チャット履歴の自動保存に対応"]
+    end
+    subgraph Y2026_03["2026年3月"]
+        G1["Cinematic Video Overview追加 (Ultra限定)"]
+        G2["Slide revisions・EPUB取込・PPTX書き出しに対応"]
+        G3["Infographic 10スタイル刷新"]
+    end
+    subgraph Y2026_04["2026年4月"]
+        H1["Geminiアプリに双方向同期のNotebooks機能が追加"]
+    end
+    subgraph Y2026_05["2026年5月"]
+        I1["Google I/O 2026・Ultraプランの2段階再編 (20TB・30TB)"]
+    end
+    subgraph Y2026_06["2026年6月 (最新)"]
+        J1["Gemini 3.5 + Antigravityへ刷新"]
+        J2["ノートブックごとにコード実行環境を付与"]
+        J3["チャート・XLSX・PPTX等の直接生成に対応"]
+    end
+
+    Y2023 --> Y2024
+    Y2024 --> Y2025_04
+    Y2025_04 --> Y2025_11
+    Y2025_11 --> Y2025_12
+    Y2025_12 --> Y2026_01
+    Y2026_01 --> Y2026_03
+    Y2026_03 --> Y2026_04
+    Y2026_04 --> Y2026_05
+    Y2026_05 --> Y2026_06
+
+    classDef normal fill:#1c2027,stroke:#3a4150,color:#e8eaed
+    classDef highlight fill:#2a2150,stroke:#c9b8ff,color:#e3d9ff
+    classDef year fill:#103433,stroke:#7fe0d3,color:#cdf5ee
+
+    class A1,B1,C1,D1,D2,E1,E2,F1,F2,F3,G1,G2,G3,H1,I1 normal
+    class J1,J2,J3 highlight
+    
+    style Y2023 fill:transparent,stroke:#2b313b
+    style Y2024 fill:transparent,stroke:#2b313b
+    style Y2025_04 fill:transparent,stroke:#2b313b
+    style Y2025_11 fill:transparent,stroke:#2b313b
+    style Y2025_12 fill:transparent,stroke:#2b313b
+    style Y2026_01 fill:transparent,stroke:#2b313b
+    style Y2026_03 fill:transparent,stroke:#2b313b
+    style Y2026_04 fill:transparent,stroke:#2b313b
+    style Y2026_05 fill:transparent,stroke:#2b313b
+    style Y2026_06 fill:transparent,stroke:#5c4d9a`;
 
 interface ExtProps {
   href: string;
