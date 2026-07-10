@@ -100,6 +100,12 @@ export const navLinks: readonly NavLink[] = [
     ],
   },
   {
+    name: "Local LLM",
+    children: [
+      { name: "Self-hosting Guide", href: "/local-llm/self-hosting" },
+    ],
+  },
+  {
     name: "Sandbox",
     children: [{ name: "Vercel Sandbox", href: "/vercel/sandbox" }],
   },

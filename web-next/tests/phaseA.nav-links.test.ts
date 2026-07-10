@@ -41,8 +41,8 @@ describe("Phase A - nav-links export shape", () => {
 });
 
 describe("Phase A - nav-links top-level entries", () => {
-  it("has exactly 11 top-level entries", () => {
-    expect(navLinks.length).toBe(11);
+  it("has exactly 12 top-level entries", () => {
+    expect(navLinks.length).toBe(12);
   });
 
   it("starts with Home as a flat link", () => {
@@ -58,7 +58,7 @@ describe("Phase A - nav-links top-level entries", () => {
     expect("href" in last && last.href === "/git-worktree").toBe(true);
   });
 
-  it("has Claude/Google/Codex/Copilot/Code Review/Agent/Sandbox/IDE/Security as dropdowns with children", () => {
+  it("has Claude/Google/Codex/Copilot/Code Review/Agent/Sandbox/IDE/Security/Local LLM as dropdowns with children", () => {
     const providers = [
       "Claude",
       "Google",
@@ -69,6 +69,7 @@ describe("Phase A - nav-links top-level entries", () => {
       "Sandbox",
       "IDE",
       "Security",
+      "Local LLM",
     ] as const;
     for (const name of providers) {
       const entry = navLinks.find((link) => link.name === name);
@@ -140,6 +141,22 @@ describe("Phase A - IDE dropdown shape", () => {
   it("uses clean URL paths for all IDE children (no .html extension)", () => {
     const children = ide && "children" in ide ? ide.children : [];
     const expectedHrefs = ["/cursor/complete-guide", "/cursor/complete-guide-intermediate"];
+    expect(children.map((c) => c.href)).toEqual(expectedHrefs);
+  });
+});
+
+describe("Phase A - Local LLM dropdown shape", () => {
+  const localLlm = navLinks.find((link) => link.name === "Local LLM");
+
+  it("has 1 child entry (self-hosting guide)", () => {
+    expect(localLlm && "children" in localLlm).toBe(true);
+    const children = localLlm && "children" in localLlm ? localLlm.children : [];
+    expect(children.length).toBe(1);
+  });
+
+  it("uses clean URL paths for all Local LLM children (no .html extension)", () => {
+    const children = localLlm && "children" in localLlm ? localLlm.children : [];
+    const expectedHrefs = ["/local-llm/self-hosting"];
     expect(children.map((c) => c.href)).toEqual(expectedHrefs);
   });
 });
