@@ -57,7 +57,7 @@ describe("/local-llm/self-hosting - metadata", () => {
       typeof metadata.title === "string"
         ? metadata.title
         : (metadata.title as { default?: string } | undefined)?.default;
-    expect(title).toBe("ローカルLLM/セルフホスティング 完全ガイド | LLM-Studies");
+    expect(title).toBe("ローカルLLM/セルフホスティング 完全ガイド 2026 | LLM-Studies");
   });
 
   it("exports a metadata object with non-empty description", () => {
