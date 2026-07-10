@@ -306,14 +306,16 @@ export default function LocalLlmSelfHostingPage() {
           </div>
 
           <p>
-            この後のステップでは、この図の各要素を下から順番に(ハードウェア &rarr; モデル &rarr; エンジン
-            &rarr; UI &rarr; RAG &rarr; 本番運用 &rarr; セキュリティ)構築していきます。
+            この後のステップでは、この図の各要素を下から順番に(ハードウェア &rarr; モデル &rarr;
+            エンジン &rarr; UI &rarr; RAG &rarr; 本番運用 &rarr; セキュリティ)構築していきます。
           </p>
 
           <h3>学習ロードマップ</h3>
           <div className={styles.diagramWrap}>
             <MermaidDiagram chart={DIAGRAMS.roadmap} />
-            <div className={styles.diagramCaption}>図: 本ガイドの学習ロードマップ(全11ステップ)</div>
+            <div className={styles.diagramCaption}>
+              図: 本ガイドの学習ロードマップ(全11ステップ)
+            </div>
           </div>
         </section>
 
@@ -672,8 +674,10 @@ export default function LocalLlmSelfHostingPage() {
 
           <h3>主要フォーマットの違い</h3>
           <p>
-            重要な区別として、<strong>GGUF/EXL2/MLXは「ファイル形式」</strong>であり、<strong>GPTQ/AWQは「量子化アルゴリズム」</strong>である点があります。GPTQ・AWQで量子化されたモデルは通常のHugging
-            Face safetensors形式で配布されます
+            重要な区別として、<strong>GGUF/EXL2/MLXは「ファイル形式」</strong>であり、
+            <strong>GPTQ/AWQは「量子化アルゴリズム」</strong>
+            である点があります。GPTQ・AWQで量子化されたモデルは通常のHugging Face
+            safetensors形式で配布されます
             <sup className={styles.cite}>
               <a href="#ref-12">[12]</a>
             </sup>
@@ -1019,7 +1023,8 @@ export default function LocalLlmSelfHostingPage() {
               </sup>
             </li>
             <li>
-              必ず<strong>個々のモデルカード</strong>でライセンス条項を確認すること(本ガイドの情報は変動する可能性があります)
+              必ず<strong>個々のモデルカード</strong>
+              でライセンス条項を確認すること(本ガイドの情報は変動する可能性があります)
               <sup className={styles.cite}>
                 <a href="#ref-39">[39]</a>
               </sup>
@@ -1165,9 +1170,7 @@ export default function LocalLlmSelfHostingPage() {
               <div className={styles.codeLine}>
                 <span className={styles.cc}># macOS / Linux</span>
               </div>
-              <div className={styles.codeLine}>
-                curl -fsSL https://ollama.ai/install.sh | bash
-              </div>
+              <div className={styles.codeLine}>curl -fsSL https://ollama.ai/install.sh | bash</div>
               <div className={styles.codeLine} />
               <div className={styles.codeLine}>
                 <span className={styles.cc}>
@@ -1186,8 +1189,7 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.codeBody}>
               <div className={styles.codeLine}>docker pull ollama/ollama</div>
               <div className={styles.codeLine}>
-                docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama
-                ollama/ollama
+                docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama
               </div>
             </div>
           </div>
@@ -1270,7 +1272,8 @@ export default function LocalLlmSelfHostingPage() {
             </div>
           </div>
           <p>
-            チーム利用の場合は<code>OLLAMA_HOST=0.0.0.0</code>で外部からの接続を許可し、<code>OLLAMA_NUM_PARALLEL</code>で同時ユーザー数に応じたスロット数を設定します
+            チーム利用の場合は<code>OLLAMA_HOST=0.0.0.0</code>で外部からの接続を許可し、
+            <code>OLLAMA_NUM_PARALLEL</code>で同時ユーザー数に応じたスロット数を設定します
             <sup className={styles.cite}>
               <a href="#ref-5">[5]</a>
             </sup>
@@ -1317,15 +1320,21 @@ export default function LocalLlmSelfHostingPage() {
               <span className={styles.codeLang}>bash</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}>curl http://localhost:11434/api/generate -d &apos;&#123;</div>
-              <div className={styles.codeLine}>  &quot;model&quot;: &quot;llama3.2&quot;,</div>
-              <div className={styles.codeLine}>  &quot;prompt&quot;: &quot;自己紹介してください&quot;</div>
+              <div className={styles.codeLine}>
+                curl http://localhost:11434/api/generate -d &apos;&#123;
+              </div>
+              <div className={styles.codeLine}> &quot;model&quot;: &quot;llama3.2&quot;,</div>
+              <div className={styles.codeLine}>
+                {" "}
+                &quot;prompt&quot;: &quot;自己紹介してください&quot;
+              </div>
               <div className={styles.codeLine}>&#125;&apos;</div>
             </div>
           </div>
           <p>
-            OllamaはOpenAI互換API(<code>http://localhost:11434/v1</code>)も提供しているため、既存のOpenAI
-            SDKベースのコードを<code>base_url</code>変更だけで流用できます
+            OllamaはOpenAI互換API(<code>http://localhost:11434/v1</code>
+            )も提供しているため、既存のOpenAI SDKベースのコードを<code>base_url</code>
+            変更だけで流用できます
             <sup className={styles.cite}>
               <a href="#ref-1">[1]</a>
             </sup>
@@ -1339,7 +1348,8 @@ export default function LocalLlmSelfHostingPage() {
         <section className={styles.step} id="step7">
           <h2>ステップ7: Web UIを導入する</h2>
           <p>
-            CLIだけでなくChatGPTのようなブラウザUIが欲しい場合、<strong>Open WebUI</strong>が定番の選択肢です
+            CLIだけでなくChatGPTのようなブラウザUIが欲しい場合、<strong>Open WebUI</strong>
+            が定番の選択肢です
             <sup className={styles.cite}>
               <a href="#ref-6">[6]</a>
             </sup>
@@ -1359,15 +1369,17 @@ export default function LocalLlmSelfHostingPage() {
             </div>
             <div className={styles.codeBody}>
               <div className={styles.codeLine}>docker run -d -p 3000:8080 \</div>
-              <div className={styles.codeLine}>  --add-host=host.docker.internal:host-gateway \</div>
-              <div className={styles.codeLine}>  -v open-webui:/app/backend/data \</div>
-              <div className={styles.codeLine}>  --name open-webui \</div>
-              <div className={styles.codeLine}>  ghcr.io/open-webui/open-webui:main</div>
+              <div className={styles.codeLine}> --add-host=host.docker.internal:host-gateway \</div>
+              <div className={styles.codeLine}> -v open-webui:/app/backend/data \</div>
+              <div className={styles.codeLine}> --name open-webui \</div>
+              <div className={styles.codeLine}> ghcr.io/open-webui/open-webui:main</div>
             </div>
           </div>
 
           <p>
-            起動後、ブラウザで<code>http://localhost:3000</code>にアクセスし、Ollamaのエンドポイント(<code>http://host.docker.internal:11434</code>)を管理画面から設定します
+            起動後、ブラウザで<code>http://localhost:3000</code>
+            にアクセスし、Ollamaのエンドポイント(<code>http://host.docker.internal:11434</code>
+            )を管理画面から設定します
             <sup className={styles.cite}>
               <a href="#ref-54">[54]</a>
             </sup>
@@ -1563,7 +1575,8 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.codeBody}>
               <div className={styles.codeLine}>
                 <span className={styles.cc}>
-                  # 必要なライブラリ: pip install langchain langchain-ollama chromadb --break-system-packages
+                  # 必要なライブラリ: pip install langchain langchain-ollama chromadb
+                  --break-system-packages
                 </span>
               </div>
               <div className={styles.codeLine}>
@@ -1572,13 +1585,19 @@ export default function LocalLlmSelfHostingPage() {
               <div className={styles.codeLine}>
                 from langchain.text_splitter import RecursiveCharacterTextSplitter
               </div>
-              <div className={styles.codeLine}>from langchain_community.vectorstores import Chroma</div>
-              <div className={styles.codeLine}>from langchain_ollama import OllamaEmbeddings, ChatOllama</div>
+              <div className={styles.codeLine}>
+                from langchain_community.vectorstores import Chroma
+              </div>
+              <div className={styles.codeLine}>
+                from langchain_ollama import OllamaEmbeddings, ChatOllama
+              </div>
               <div className={styles.codeLine} />
               <div className={styles.codeLine}>
                 <span className={styles.cc}># 1. ドキュメントを読み込み、チャンクに分割する</span>
               </div>
-              <div className={styles.codeLine}>loader = PyPDFLoader(&quot;./docs/manual.pdf&quot;)</div>
+              <div className={styles.codeLine}>
+                loader = PyPDFLoader(&quot;./docs/manual.pdf&quot;)
+              </div>
               <div className={styles.codeLine}>documents = loader.load()</div>
               <div className={styles.codeLine}>
                 splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
@@ -1588,7 +1607,9 @@ export default function LocalLlmSelfHostingPage() {
               <div className={styles.codeLine}>
                 <span className={styles.cc}># 2. 埋め込みを作成しベクトルDBに保存する</span>
               </div>
-              <div className={styles.codeLine}>embeddings = OllamaEmbeddings(model=&quot;nomic-embed-text&quot;)</div>
+              <div className={styles.codeLine}>
+                embeddings = OllamaEmbeddings(model=&quot;nomic-embed-text&quot;)
+              </div>
               <div className={styles.codeLine}>
                 vectorstore = Chroma.from_documents(documents=chunks, embedding=embeddings)
               </div>
@@ -1597,13 +1618,23 @@ export default function LocalLlmSelfHostingPage() {
                 <span className={styles.cc}># 3. ローカルLLMと組み合わせて質問応答を行う</span>
               </div>
               <div className={styles.codeLine}>llm = ChatOllama(model=&quot;llama3.2&quot;)</div>
-              <div className={styles.codeLine}>retriever = vectorstore.as_retriever(search_kwargs=&#123;&quot;k&quot;: 4&#125;)</div>
+              <div className={styles.codeLine}>
+                retriever = vectorstore.as_retriever(search_kwargs=&#123;&quot;k&quot;: 4&#125;)
+              </div>
               <div className={styles.codeLine} />
               <div className={styles.codeLine}>def answer(question: str) -&gt; str:</div>
-              <div className={styles.codeLine}>    relevant_docs = retriever.invoke(question)</div>
-              <div className={styles.codeLine}>    context = &quot;\\n\\n&quot;.join(doc.page_content for doc in relevant_docs)</div>
-              <div className={styles.codeLine}>    prompt = f&quot;以下の文脈だけを根拠に日本語で回答してください。\\n\\n文脈:\\n&#123;context&#125;\\n\\n質問: &#123;question&#125;&quot;</div>
-              <div className={styles.codeLine}>    return llm.invoke(prompt).content</div>
+              <div className={styles.codeLine}> relevant_docs = retriever.invoke(question)</div>
+              <div className={styles.codeLine}>
+                {" "}
+                context = &quot;\\n\\n&quot;.join(doc.page_content for doc in relevant_docs)
+              </div>
+              <div className={styles.codeLine}>
+                {" "}
+                prompt =
+                f&quot;以下の文脈だけを根拠に日本語で回答してください。\\n\\n文脈:\\n&#123;context&#125;\\n\\n質問:
+                &#123;question&#125;&quot;
+              </div>
+              <div className={styles.codeLine}> return llm.invoke(prompt).content</div>
             </div>
           </div>
           <p>
@@ -1677,7 +1708,8 @@ export default function LocalLlmSelfHostingPage() {
         <section className={styles.step} id="step9">
           <h2>ステップ9: 本番運用へのスケールアップ(vLLM)</h2>
           <p>
-            個人利用や小規模チームを超え、複数ユーザーへ同時にサービス提供する場合は、<strong>vLLM</strong>への移行が業界標準です
+            個人利用や小規模チームを超え、複数ユーザーへ同時にサービス提供する場合は、
+            <strong>vLLM</strong>への移行が業界標準です
             <sup className={styles.cite}>
               <a href="#ref-21">[21]</a>
             </sup>
@@ -1712,12 +1744,12 @@ export default function LocalLlmSelfHostingPage() {
               <div className={styles.codeLine}>pip install vllm --break-system-packages</div>
               <div className={styles.codeLine} />
               <div className={styles.codeLine}>python -m vllm.entrypoints.openai.api_server \</div>
-              <div className={styles.codeLine}>  --model meta-llama/Llama-3.1-8B-Instruct \</div>
-              <div className={styles.codeLine}>  --host 0.0.0.0 \</div>
-              <div className={styles.codeLine}>  --port 8000 \</div>
-              <div className={styles.codeLine}>  --max-model-len 8192 \</div>
-              <div className={styles.codeLine}>  --gpu-memory-utilization 0.85 \</div>
-              <div className={styles.codeLine}>  --served-model-name llama3</div>
+              <div className={styles.codeLine}> --model meta-llama/Llama-3.1-8B-Instruct \</div>
+              <div className={styles.codeLine}> --host 0.0.0.0 \</div>
+              <div className={styles.codeLine}> --port 8000 \</div>
+              <div className={styles.codeLine}> --max-model-len 8192 \</div>
+              <div className={styles.codeLine}> --gpu-memory-utilization 0.85 \</div>
+              <div className={styles.codeLine}> --served-model-name llama3</div>
             </div>
           </div>
 
@@ -1757,9 +1789,12 @@ export default function LocalLlmSelfHostingPage() {
               <div className={styles.codeLine}>
                 ExecStart=/home/inference/.local/bin/python -m vllm.entrypoints.openai.api_server \
               </div>
-              <div className={styles.codeLine}>  --model /opt/models/llama3-8b-instruct \</div>
-              <div className={styles.codeLine}>  --host 0.0.0.0 --port 8000 \</div>
-              <div className={styles.codeLine}>  --max-model-len 8192 --gpu-memory-utilization 0.85</div>
+              <div className={styles.codeLine}> --model /opt/models/llama3-8b-instruct \</div>
+              <div className={styles.codeLine}> --host 0.0.0.0 --port 8000 \</div>
+              <div className={styles.codeLine}>
+                {" "}
+                --max-model-len 8192 --gpu-memory-utilization 0.85
+              </div>
               <div className={styles.codeLine}>Restart=always</div>
               <div className={styles.codeLine} />
               <div className={styles.codeLine}>[Install]</div>
@@ -1797,7 +1832,8 @@ export default function LocalLlmSelfHostingPage() {
             <sup className={styles.cite}>
               <a href="#ref-23">[23]</a>
             </sup>
-            。GPU間の分散が必要な場合は、<code>--tensor-parallel-size</code>オプションでテンソル並列を有効化します
+            。GPU間の分散が必要な場合は、<code>--tensor-parallel-size</code>
+            オプションでテンソル並列を有効化します
             <sup className={styles.cite}>
               <a href="#ref-29">[29]</a>
             </sup>
@@ -1808,7 +1844,10 @@ export default function LocalLlmSelfHostingPage() {
         <section className={styles.step} id="step10">
           <h2>ステップ10: セキュリティのベストプラクティス</h2>
           <p>
-            自前ホスティングは「外部にデータを送らない」という利点がある一方、<strong>セキュリティ設定を怠ると自らインフラを危険に晒す</strong>ことになります。実際、Shodan等での調査では、多数 of 自己ホスト型LLMサーバーが認証なし・ネットワーク分離なしのまま公開されている実態が報告されています
+            自前ホスティングは「外部にデータを送らない」という利点がある一方、
+            <strong>セキュリティ設定を怠ると自らインフラを危険に晒す</strong>
+            ことになります。実際、Shodan等での調査では、多数 of
+            自己ホスト型LLMサーバーが認証なし・ネットワーク分離なしのまま公開されている実態が報告されています
             <sup className={styles.cite}>
               <a href="#ref-31">[31]</a>
             </sup>
@@ -2057,7 +2096,9 @@ export default function LocalLlmSelfHostingPage() {
             <sup className={styles.cite}>
               <a href="#ref-29">[29]</a>
             </sup>
-            。Ollamaは2026年時点でネイティブPrometheusメトリクスを持たないため、OpenTelemetryサイドカー経由か、<code>/api/ps</code>エンドポイントを定期的にスクレイピングするカスタムエクスポーターで代替する必要があります
+            。Ollamaは2026年時点でネイティブPrometheusメトリクスを持たないため、OpenTelemetryサイドカー経由か、
+            <code>/api/ps</code>
+            エンドポイントを定期的にスクレイピングするカスタムエクスポーターで代替する必要があります
             <sup className={styles.cite}>
               <a href="#ref-2">[2]</a>
             </sup>
@@ -2087,7 +2128,9 @@ export default function LocalLlmSelfHostingPage() {
                 </tr>
                 <tr>
                   <td>起動時にOOM(メモリ不足)エラー</td>
-                  <td><code>--gpu-memory-utilization</code>が高すぎる、または他プロセスと競合</td>
+                  <td>
+                    <code>--gpu-memory-utilization</code>が高すぎる、または他プロセスと競合
+                  </td>
                   <td>
                     値を下げる、他のGPUプロセスを終了する
                     <sup className={styles.cite}>
@@ -2145,11 +2188,15 @@ export default function LocalLlmSelfHostingPage() {
             </li>
             <li>
               <i className="ti ti-circle-check" aria-hidden="true" />
-              <div>目的モデル&times;量子化レベルでの必要VRAMを計算し、ハードウェアを確保した(ステップ2)</div>
+              <div>
+                目的モデル&times;量子化レベルでの必要VRAMを計算し、ハードウェアを確保した(ステップ2)
+              </div>
             </li>
             <li>
               <i className="ti ti-circle-check" aria-hidden="true" />
-              <div>量子化フォーマット(GGUF/AWQ/GPTQ等)の違いを理解し、自分の環境に合うものを選んだ(ステップ3)</div>
+              <div>
+                量子化フォーマット(GGUF/AWQ/GPTQ等)の違いを理解し、自分の環境に合うものを選んだ(ステップ3)
+              </div>
             </li>
             <li>
               <i className="ti ti-circle-check" aria-hidden="true" />
@@ -2185,15 +2232,18 @@ export default function LocalLlmSelfHostingPage() {
             </li>
           </ul>
           <p>
-            ローカルLLMの世界は月単位で新しいモデルとツールが登場するため、本ガイドの構成(目的定義 &rarr; ハードウェア
-            &rarr; モデル &rarr; ツール &rarr; 運用 &rarr; セキュリティ)という
-            <strong>思考の型</strong>を押さえておけば、個々のツールやモデルが入れ替わっても迷わず対応できます。
+            ローカルLLMの世界は月単位で新しいモデルとツールが登場するため、本ガイドの構成(目的定義
+            &rarr; ハードウェア &rarr; モデル &rarr; ツール &rarr; 運用 &rarr; セキュリティ)という
+            <strong>思考の型</strong>
+            を押さえておけば、個々のツールやモデルが入れ替わっても迷わず対応できます。
           </p>
         </section>
 
         <section className={styles.step} id="references">
           <h2>参考文献一覧</h2>
-          <p style={{ fontSize: "14px", color: "var(--color-text-secondary)", marginBottom: "16px" }}>
+          <p
+            style={{ fontSize: "14px", color: "var(--color-text-secondary)", marginBottom: "16px" }}
+          >
             本ガイドの作成にあたり参照した情報源です。ツールやモデルは更新が速い分野のため、最新情報は各リンク先で直接ご確認ください。
           </p>
 
@@ -2202,7 +2252,8 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.refItem} id="ref-1">
               <span className={styles.refNum}>[1]</span>
               <span>
-                daily.dev, &quot;Running LLMs Locally in 2026: Ollama, llama.cpp, and Self-Hosted AI for Developers&quot; &mdash;{" "}
+                daily.dev, &quot;Running LLMs Locally in 2026: Ollama, llama.cpp, and Self-Hosted AI
+                for Developers&quot; &mdash;{" "}
                 <Ext href="https://daily.dev/blog/running-llms-locally-ollama-llama-cpp-self-hosted-ai-developers/">
                   daily.dev
                 </Ext>
@@ -2211,7 +2262,8 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.refItem} id="ref-2">
               <span className={styles.refNum}>[2]</span>
               <span>
-                DanubeData, &quot;Run Ollama on a VPS: Self-Host Local LLMs in Europe (2026)&quot; &mdash;{" "}
+                DanubeData, &quot;Run Ollama on a VPS: Self-Host Local LLMs in Europe (2026)&quot;
+                &mdash;{" "}
                 <Ext href="https://danubedata.ro/blog/run-ollama-vps-self-host-llm-2026">
                   danubedata.ro
                 </Ext>
@@ -2221,24 +2273,21 @@ export default function LocalLlmSelfHostingPage() {
               <span className={styles.refNum}>[3]</span>
               <span>
                 sanj.dev, &quot;Self-Hosted LLM Guide 2026&quot; &mdash;{" "}
-                <Ext href="https://sanj.dev/post/self-hosted-llm-guide-2026/">
-                  sanj.dev
-                </Ext>
+                <Ext href="https://sanj.dev/post/self-hosted-llm-guide-2026/">sanj.dev</Ext>
               </span>
             </div>
             <div className={styles.refItem} id="ref-4">
               <span className={styles.refNum}>[4]</span>
               <span>
                 Pristren, &quot;Ollama Complete Guide 2026&quot; &mdash;{" "}
-                <Ext href="https://pristren.com/blog/ollama-complete-guide-2026/">
-                  pristren.com
-                </Ext>
+                <Ext href="https://pristren.com/blog/ollama-complete-guide-2026/">pristren.com</Ext>
               </span>
             </div>
             <div className={styles.refItem} id="ref-5">
               <span className={styles.refNum}>[5]</span>
               <span>
-                tech-insider.org, &quot;How to Run LLMs Locally with Ollama in 11 Steps [2026]&quot; &mdash;{" "}
+                tech-insider.org, &quot;How to Run LLMs Locally with Ollama in 11 Steps [2026]&quot;
+                &mdash;{" "}
                 <Ext href="https://tech-insider.org/ollama-tutorial-run-llm-locally-2026/">
                   tech-insider.org
                 </Ext>
@@ -2257,9 +2306,7 @@ export default function LocalLlmSelfHostingPage() {
               <span className={styles.refNum}>[7]</span>
               <span>
                 YUV.AI, &quot;Self-Hosting LLMs with Ollama&quot; &mdash;{" "}
-                <Ext href="https://yuv.ai/blog/self-hosting-llms-with-ollama">
-                  yuv.ai
-                </Ext>
+                <Ext href="https://yuv.ai/blog/self-hosting-llms-with-ollama">yuv.ai</Ext>
               </span>
             </div>
             <div className={styles.refItem} id="ref-8">
@@ -2305,7 +2352,8 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.refItem} id="ref-12">
               <span className={styles.refNum}>[12]</span>
               <span>
-                Digital Applied, &quot;GGUF vs AWQ vs GPTQ vs MLX: LLM Quant Formats 2026&quot; &mdash;{" "}
+                Digital Applied, &quot;GGUF vs AWQ vs GPTQ vs MLX: LLM Quant Formats 2026&quot;
+                &mdash;{" "}
                 <Ext href="https://www.digitalapplied.com/blog/gguf-vs-awq-vs-gptq-vs-mlx-llm-quantization-formats-2026">
                   digitalapplied.com
                 </Ext>
@@ -2323,7 +2371,8 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.refItem} id="ref-14">
               <span className={styles.refNum}>[14]</span>
               <span>
-                dasroot.net, &quot;GGUF vs GPTQ vs AWQ: LLM Quantization Methods Compared&quot; &mdash;{" "}
+                dasroot.net, &quot;GGUF vs GPTQ vs AWQ: LLM Quantization Methods Compared&quot;
+                &mdash;{" "}
                 <Ext href="https://dasroot.net/posts/2026/01/gguf-vs-gptq-vs-awq-llm-quantization-methods-compared/">
                   dasroot.net
                 </Ext>
@@ -2333,9 +2382,7 @@ export default function LocalLlmSelfHostingPage() {
               <span className={styles.refNum}>[15]</span>
               <span>
                 TensorRigs, &quot;LLM Quantization Explained: GGUF vs GPTQ vs AWQ&quot; &mdash;{" "}
-                <Ext href="https://tensorrigs.com/blog/llm-quantization-guide/">
-                  tensorrigs.com
-                </Ext>
+                <Ext href="https://tensorrigs.com/blog/llm-quantization-guide/">tensorrigs.com</Ext>
               </span>
             </div>
             <div className={styles.refItem} id="ref-16">
@@ -2359,7 +2406,8 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.refItem} id="ref-18">
               <span className={styles.refNum}>[18]</span>
               <span>
-                The AI Engineer (Substack), &quot;GPTQ vs AWQ vs GGUF: Which 4-Bit to Pick in 2026&quot; &mdash;{" "}
+                The AI Engineer (Substack), &quot;GPTQ vs AWQ vs GGUF: Which 4-Bit to Pick in
+                2026&quot; &mdash;{" "}
                 <Ext href="https://theaiengineer.substack.com/p/quantization-in-practice-gptq-vs">
                   theaiengineer.substack.com
                 </Ext>
@@ -2368,7 +2416,8 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.refItem} id="ref-19">
               <span className={styles.refNum}>[19]</span>
               <span>
-                VRLA Tech, &quot;LLM Quantization Explained: INT4, INT8, FP8, AWQ, and GPTQ in 2026&quot; &mdash;{" "}
+                VRLA Tech, &quot;LLM Quantization Explained: INT4, INT8, FP8, AWQ, and GPTQ in
+                2026&quot; &mdash;{" "}
                 <Ext href="https://vrlatech.com/llm-quantization-explained-int4-int8-fp8-awq-and-gptq-in-2026/">
                   vrlatech.com
                 </Ext>
@@ -2390,7 +2439,8 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.refItem} id="ref-21">
               <span className={styles.refNum}>[21]</span>
               <span>
-                Spheron, &quot;Build a Self-Hosted OpenAI-Compatible API with vLLM in 2026&quot; &mdash;{" "}
+                Spheron, &quot;Build a Self-Hosted OpenAI-Compatible API with vLLM in 2026&quot;
+                &mdash;{" "}
                 <Ext href="https://www.spheron.network/blog/openai-compatible-api-self-hosted/">
                   spheron.network
                 </Ext>
@@ -2399,7 +2449,8 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.refItem} id="ref-22">
               <span className={styles.refNum}>[22]</span>
               <span>
-                Rost Glukhov, &quot;vLLM Quickstart: High-Performance LLM Serving in 2026&quot; &mdash;{" "}
+                Rost Glukhov, &quot;vLLM Quickstart: High-Performance LLM Serving in 2026&quot;
+                &mdash;{" "}
                 <Ext href="https://www.glukhov.org/llm-hosting/vllm/vllm-quickstart/">
                   glukhov.org
                 </Ext>
@@ -2417,7 +2468,8 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.refItem} id="ref-24">
               <span className={styles.refNum}>[24]</span>
               <span>
-                n1n.ai, &quot;Guide to Self-Hosting Enterprise LLMs with vLLM and Llama 3&quot; &mdash;{" "}
+                n1n.ai, &quot;Guide to Self-Hosting Enterprise LLMs with vLLM and Llama 3&quot;
+                &mdash;{" "}
                 <Ext href="https://explore.n1n.ai/blog/enterprise-llm-self-hosting-vllm-guide-2026-06-17">
                   n1n.ai
                 </Ext>
@@ -2436,9 +2488,7 @@ export default function LocalLlmSelfHostingPage() {
               <span className={styles.refNum}>[26]</span>
               <span>
                 GitHub, &quot;vllm-project/vllm&quot; &mdash;{" "}
-                <Ext href="https://github.com/vllm-project/vllm">
-                  github.com
-                </Ext>
+                <Ext href="https://github.com/vllm-project/vllm">github.com</Ext>
               </span>
             </div>
             <div className={styles.refItem} id="ref-27">
@@ -2453,7 +2503,8 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.refItem} id="ref-28">
               <span className={styles.refNum}>[28]</span>
               <span>
-                Medium, &quot;vLLM in Production: A Security Hardening Guide for Enterprise Deployments&quot; &mdash;{" "}
+                Medium, &quot;vLLM in Production: A Security Hardening Guide for Enterprise
+                Deployments&quot; &mdash;{" "}
                 <Ext href="https://medium.com/@michael.hannecke/vllm-in-production-a-security-hardening-guide-for-enterprise-deployments-56a9c2c213dd">
                   medium.com
                 </Ext>
@@ -2475,7 +2526,8 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.refItem} id="ref-30">
               <span className={styles.refNum}>[30]</span>
               <span>
-                SitePoint, &quot;Local LLM Security Best Practices for Enterprise in 2026&quot; &mdash;{" "}
+                SitePoint, &quot;Local LLM Security Best Practices for Enterprise in 2026&quot;
+                &mdash;{" "}
                 <Ext href="https://www.sitepoint.com/local-llm-security-best-practices-2026/">
                   sitepoint.com
                 </Ext>
@@ -2484,7 +2536,8 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.refItem} id="ref-31">
               <span className={styles.refNum}>[31]</span>
               <span>
-                Cisco Blogs, &quot;Detecting Exposed LLM Servers: A Shodan Case Study on Ollama&quot; &mdash;{" "}
+                Cisco Blogs, &quot;Detecting Exposed LLM Servers: A Shodan Case Study on
+                Ollama&quot; &mdash;{" "}
                 <Ext href="https://blogs.cisco.com/security/detecting-exposed-llm-servers-shodan-case-study-on-ollama">
                   blogs.cisco.com
                 </Ext>
@@ -2493,16 +2546,16 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.refItem} id="ref-32">
               <span className={styles.refNum}>[32]</span>
               <span>
-                Sombra, &quot;LLM Security Risks in 2026: Prompt Injection, RAG, and Shadow AI&quot; &mdash;{" "}
-                <Ext href="https://sombrainc.com/blog/llm-security-risks-2026">
-                  sombrainc.com
-                </Ext>
+                Sombra, &quot;LLM Security Risks in 2026: Prompt Injection, RAG, and Shadow AI&quot;
+                &mdash;{" "}
+                <Ext href="https://sombrainc.com/blog/llm-security-risks-2026">sombrainc.com</Ext>
               </span>
             </div>
             <div className={styles.refItem} id="ref-33">
               <span className={styles.refNum}>[33]</span>
               <span>
-                DatabaseMart, &quot;Securing LLM Hosting Against Prompt Injection Attacks&quot; &mdash;{" "}
+                DatabaseMart, &quot;Securing LLM Hosting Against Prompt Injection Attacks&quot;
+                &mdash;{" "}
                 <Ext href="https://www.databasemart.com/blog/how-to-secure-llm-hosting-environment">
                   databasemart.com
                 </Ext>
@@ -2511,16 +2564,16 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.refItem} id="ref-34">
               <span className={styles.refNum}>[34]</span>
               <span>
-                A10 Networks, &quot;LLM Security: Protecting AI Models &amp; Applications&quot; &mdash;{" "}
-                <Ext href="https://www.a10networks.com/blog/llm-security/">
-                  a10networks.com
-                </Ext>
+                A10 Networks, &quot;LLM Security: Protecting AI Models &amp; Applications&quot;
+                &mdash;{" "}
+                <Ext href="https://www.a10networks.com/blog/llm-security/">a10networks.com</Ext>
               </span>
             </div>
             <div className={styles.refItem} id="ref-35">
               <span className={styles.refNum}>[35]</span>
               <span>
-                Capture The Bug, &quot;Prompt Injection in LLMs: Complete Guide for 2026&quot; &mdash;{" "}
+                Capture The Bug, &quot;Prompt Injection in LLMs: Complete Guide for 2026&quot;
+                &mdash;{" "}
                 <Ext href="https://capturethebug.xyz/blogs/Prompt-Injection-in-LLMs-Complete-Guide-for-2026">
                   capturethebug.xyz
                 </Ext>
@@ -2529,7 +2582,8 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.refItem} id="ref-36">
               <span className={styles.refNum}>[36]</span>
               <span>
-                GetMaxim.ai, &quot;Top 5 LLM Security Tools for Enterprise AI Applications in 2026&quot; &mdash;{" "}
+                GetMaxim.ai, &quot;Top 5 LLM Security Tools for Enterprise AI Applications in
+                2026&quot; &mdash;{" "}
                 <Ext href="https://www.getmaxim.ai/articles/top-5-llm-security-tools-for-enterprise-ai-applications-in-2026/">
                   getmaxim.ai
                 </Ext>
@@ -2570,18 +2624,14 @@ export default function LocalLlmSelfHostingPage() {
               <span className={styles.refNum}>[42]</span>
               <span>
                 AceCloud, &quot;Best Open Source LLMs In 2026&quot; &mdash;{" "}
-                <Ext href="https://acecloud.ai/blog/best-open-source-llms/">
-                  acecloud.ai
-                </Ext>
+                <Ext href="https://acecloud.ai/blog/best-open-source-llms/">acecloud.ai</Ext>
               </span>
             </div>
             <div className={styles.refItem} id="ref-43">
               <span className={styles.refNum}>[43]</span>
               <span>
                 TECHSY, &quot;Best Open-Source LLMs: July 2026 Leaderboard&quot; &mdash;{" "}
-                <Ext href="https://techsy.io/en/blog/best-open-source-llms-2026">
-                  techsy.io
-                </Ext>
+                <Ext href="https://techsy.io/en/blog/best-open-source-llms-2026">techsy.io</Ext>
               </span>
             </div>
             <div className={styles.refItem} id="ref-44">
@@ -2624,9 +2674,7 @@ export default function LocalLlmSelfHostingPage() {
               <span className={styles.refNum}>[48]</span>
               <span>
                 Onyx, &quot;Best Self-Hosted LLM Leaderboard 2026&quot; &mdash;{" "}
-                <Ext href="https://onyx.app/self-hosted-llm-leaderboard">
-                  onyx.app
-                </Ext>
+                <Ext href="https://onyx.app/self-hosted-llm-leaderboard">onyx.app</Ext>
               </span>
             </div>
           </div>
@@ -2637,18 +2685,14 @@ export default function LocalLlmSelfHostingPage() {
               <span className={styles.refNum}>[49]</span>
               <span>
                 LLM Hardware, &quot;RAG with Local LLMs: Complete Guide (2026)&quot; &mdash;{" "}
-                <Ext href="https://llmhardware.io/guides/rag-local-llm-guide">
-                  llmhardware.io
-                </Ext>
+                <Ext href="https://llmhardware.io/guides/rag-local-llm-guide">llmhardware.io</Ext>
               </span>
             </div>
             <div className={styles.refItem} id="ref-50">
               <span className={styles.refNum}>[50]</span>
               <span>
                 Terros, &quot;RAG: Complete 2025 Guide - Python, LangChain, OpenWebUI&quot; &mdash;{" "}
-                <Ext href="https://terros.io/en/blog/rag-guide-complet-2025">
-                  terros.io
-                </Ext>
+                <Ext href="https://terros.io/en/blog/rag-guide-complet-2025">terros.io</Ext>
               </span>
             </div>
             <div className={styles.refItem} id="ref-51">
@@ -2663,7 +2707,8 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.refItem} id="ref-52">
               <span className={styles.refNum}>[52]</span>
               <span>
-                Medium (CodeToDeploy), &quot;Building Your Own RAG: Step-by-Step with LangChain and a Vector Database&quot; &mdash;{" "}
+                Medium (CodeToDeploy), &quot;Building Your Own RAG: Step-by-Step with LangChain and
+                a Vector Database&quot; &mdash;{" "}
                 <Ext href="https://medium.com/codetodeploy/building-your-own-rag-a-step-by-step-guide-using-langchain-and-a-vector-database-21d0566d3c51">
                   medium.com
                 </Ext>
@@ -2681,7 +2726,8 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.refItem} id="ref-54">
               <span className={styles.refNum}>[54]</span>
               <span>
-                Medium (John Wong), &quot;Getting Started with Local AI - Open WebUI Documents and Tools (Part 2)&quot; &mdash;{" "}
+                Medium (John Wong), &quot;Getting Started with Local AI - Open WebUI Documents and
+                Tools (Part 2)&quot; &mdash;{" "}
                 <Ext href="https://medium.com/@able_wong/getting-started-with-local-ai-open-webui-documents-and-tools-part-2-5f8f9c67a414">
                   medium.com
                 </Ext>
@@ -2690,7 +2736,8 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.refItem} id="ref-55">
               <span className={styles.refNum}>[55]</span>
               <span>
-                Microsoft Azure Cosmos DB Blog, &quot;Build a RAG application with LangChain and Local LLMs powered by Ollama&quot; &mdash;{" "}
+                Microsoft Azure Cosmos DB Blog, &quot;Build a RAG application with LangChain and
+                Local LLMs powered by Ollama&quot; &mdash;{" "}
                 <Ext href="https://devblogs.microsoft.com/cosmosdb/build-a-rag-application-with-langchain-and-local-llms-powered-by-ollama/">
                   devblogs.microsoft.com
                 </Ext>
@@ -2699,7 +2746,8 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.refItem} id="ref-56">
               <span className={styles.refNum}>[56]</span>
               <span>
-                DEV Community, &quot;Learn How to Build Reliable RAG Applications in 2026!&quot; &mdash;{" "}
+                DEV Community, &quot;Learn How to Build Reliable RAG Applications in 2026!&quot;
+                &mdash;{" "}
                 <Ext href="https://dev.to/pavanbelagatti/learn-how-to-build-reliable-rag-applications-in-2026-1b7p">
                   dev.to
                 </Ext>
@@ -2709,9 +2757,7 @@ export default function LocalLlmSelfHostingPage() {
               <span className={styles.refNum}>[57]</span>
               <span>
                 Open WebUI Docs, &quot;Features&quot; &mdash;{" "}
-                <Ext href="https://docs.openwebui.com/features/">
-                  docs.openwebui.com
-                </Ext>
+                <Ext href="https://docs.openwebui.com/features/">docs.openwebui.com</Ext>
               </span>
             </div>
           </div>
@@ -2739,7 +2785,8 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.refItem} id="ref-60">
               <span className={styles.refNum}>[60]</span>
               <span>
-                PromptQuorum, &quot;Local LLM Hardware Requirements 2026: Best Models by VRAM&quot; &mdash;{" "}
+                PromptQuorum, &quot;Local LLM Hardware Requirements 2026: Best Models by VRAM&quot;
+                &mdash;{" "}
                 <Ext href="https://www.promptquorum.com/local-llms/local-llm-hardware-guide-2026">
                   promptquorum.com
                 </Ext>
@@ -2748,7 +2795,8 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.refItem} id="ref-61">
               <span className={styles.refNum}>[61]</span>
               <span>
-                Medium (Codex), &quot;Local LLM GPU Guide: RTX 5090, 4090, 3090 Compared&quot; &mdash;{" "}
+                Medium (Codex), &quot;Local LLM GPU Guide: RTX 5090, 4090, 3090 Compared&quot;
+                &mdash;{" "}
                 <Ext href="https://medium.com/codex/best-gpus-for-running-local-llms-in-2026-what-actually-works-292f27a99f04">
                   medium.com
                 </Ext>
@@ -2757,7 +2805,8 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.refItem} id="ref-62">
               <span className={styles.refNum}>[62]</span>
               <span>
-                Local AI Master, &quot;Local AI Hardware Requirements (2026): Complete Guide&quot; &mdash;{" "}
+                Local AI Master, &quot;Local AI Hardware Requirements (2026): Complete Guide&quot;
+                &mdash;{" "}
                 <Ext href="https://localaimaster.com/blog/ai-hardware-requirements-2025-complete-guide">
                   localaimaster.com
                 </Ext>
@@ -2775,19 +2824,16 @@ export default function LocalLlmSelfHostingPage() {
             <div className={styles.refItem} id="ref-64">
               <span className={styles.refNum}>[64]</span>
               <span>
-                RunPod, &quot;RTX 5090 Specs and VRAM: Specifications, AI Benchmarks, and LLM Guide&quot; &mdash;{" "}
-                <Ext href="https://www.runpod.io/articles/guides/nvidia-rtx-5090">
-                  runpod.io
-                </Ext>
+                RunPod, &quot;RTX 5090 Specs and VRAM: Specifications, AI Benchmarks, and LLM
+                Guide&quot; &mdash;{" "}
+                <Ext href="https://www.runpod.io/articles/guides/nvidia-rtx-5090">runpod.io</Ext>
               </span>
             </div>
             <div className={styles.refItem} id="ref-65">
               <span className={styles.refNum}>[65]</span>
               <span>
-                CoreLab, &quot;LLM GPU Buyer&quot;s Guide (April 2026): Best VRAM per Dollar Tier List&quot; &mdash;{" "}
-                <Ext href="https://corelab.tech/llmgpu/">
-                  corelab.tech
-                </Ext>
+                CoreLab, &quot;LLM GPU Buyer&quot;s Guide (April 2026): Best VRAM per Dollar Tier
+                List&quot; &mdash; <Ext href="https://corelab.tech/llmgpu/">corelab.tech</Ext>
               </span>
             </div>
             <div className={styles.refItem} id="ref-66">
@@ -2803,9 +2849,7 @@ export default function LocalLlmSelfHostingPage() {
               <span className={styles.refNum}>[67]</span>
               <span>
                 Fluence, &quot;7 Best GPU for LLM in 2026&quot; &mdash;{" "}
-                <Ext href="https://www.fluence.network/blog/best-gpu-for-llm/">
-                  fluence.network
-                </Ext>
+                <Ext href="https://www.fluence.network/blog/best-gpu-for-llm/">fluence.network</Ext>
               </span>
             </div>
           </div>
