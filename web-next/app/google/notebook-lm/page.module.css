@@ -1,0 +1,25 @@
+.pageWrap {
+  display: flex;
+  min-height: 100vh;
+  align-items: flex-start;
+}
+
+.sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 60px;
+}
+
+.tocLink {
+  display: flex;
+  align-items: center;
+}
+
+.tocLinkActive {
+  font-weight: bold;
+}
+
+.content {
+  flex: 1;
+}

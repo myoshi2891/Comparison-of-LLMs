@@ -59,6 +59,7 @@ export const navLinks: readonly NavLink[] = [
       { name: "Antigravity Slash Commands", href: "/google/antigravity-slash-commands-guide" },
       { name: "Harness Engineering", href: "/google/harness-engineering" },
       { name: "Agent Harness Engineering", href: "/google/agent-harness-engineering" },
+      { name: "NotebookLM Guide", href: "/google/notebook-lm" },
     ],
   },
   {
