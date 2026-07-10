@@ -1,0 +1,16 @@
+/* styles for local-llm self-hosting page */
+.pageWrap {
+  display: flex;
+}
+.sidebar {
+  flex: 0 0 268px;
+}
+.content {
+  flex: 1;
+}
+.tocLink {
+  color: inherit;
+}
+.tocLinkActive {
+  font-weight: bold;
+}
