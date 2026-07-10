@@ -1,9 +1,7 @@
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
-import PageComponent, {
-  metadata as rawMetadata,
-} from "@/app/google/notebook-lm/page";
+import PageComponent, { metadata as rawMetadata } from "@/app/google/notebook-lm/page";
 
 const Page = PageComponent as unknown as () => ReactElement;
 type MetadataLike = { title?: unknown; description?: unknown };
