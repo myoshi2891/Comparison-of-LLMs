@@ -726,7 +726,7 @@ flowchart TD
 - <a id="ref-1"></a>[1] OpenAI Terms of Use — https://openai.com/policies/terms-of-use/
 - <a id="ref-2"></a>[2] 火山エンジン（Volcengine）サービス利用規約 — https://www.volcengine.com/terms
 - <a id="ref-30"></a>[30] Google Terms of Service — https://policies.google.com/terms
-- <a id="ref-60"></a>[60] Qwen2-VL/Qwen-VL License (Alibaba Cloud / GitHub) — https://github.com/QwenLM/Qwen2-VL#license
+- <a id="ref-60"></a>[60] Qwen-Image License (Alibaba Cloud / GitHub) — https://github.com/QwenLM/Qwen-Image/blob/main/LICENSE
 - 画像生成AIの最新モデル６選（爆速開発部）: https://apptime.co.jp/media/%E7%94%BB%E5%83%8F%E7%94%9F%E6%88%90ai%E6%AF%94%E8%BC%832026%EF%BD%9C%E6%9C%80%E6%96%B0%E3%83%A2%E3%83%87%E3%83%AB6%E9%81%B8%E3%82%92%E5%BE%B9%E5%BA%95%E6%AF%94%E8%BC%83
 - 2026年版：AI画像生成APIベストガイド（Atlas Cloud Blog）: https://www.atlascloud.ai/ja/blog/guides/best-ai-image-generation-apis-in-2026-complete-developer-guide
 - 画像生成AI徹底比較（2026年6月最新）: https://genai-ai.co.jp/ai-kanri/blog/cc-image-gen-ai-compare/
