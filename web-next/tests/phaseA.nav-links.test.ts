@@ -83,10 +83,10 @@ describe("Phase A - nav-links top-level entries", () => {
 describe("Phase A - Agent dropdown shape", () => {
   const agent = navLinks.find((link) => link.name === "Agent");
 
-  it("has 5 child entries (advanced guide / openclaw security guide / loop engineering / skills-guide / skills-sh)", () => {
+  it("has 6 child entries (advanced guide / openclaw security guide / loop engineering / skills-guide / skills-sh / context-engineering-best-practices)", () => {
     expect(agent && "children" in agent).toBe(true);
     const children = agent && "children" in agent ? agent.children : [];
-    expect(children.length).toBe(5);
+    expect(children.length).toBe(6);
   });
 
   it("uses clean URL paths for all Agent children (no .html extension)", () => {
@@ -98,6 +98,7 @@ describe("Phase A - Agent dropdown shape", () => {
       "/agent/loop-engineering",
       "/agent/skills",
       "/claude/skills-sh",
+      "/agent/context-engineering-best-practices",
     ];
     expect(children.map((c) => c.href)).toEqual(expectedHrefs);
   });
