@@ -59,7 +59,9 @@ describe("/security/ai-security-best-practices-intermediate - metadata", () => {
       typeof metadata.title === "string"
         ? metadata.title
         : (metadata.title as { default?: string } | undefined)?.default;
-    expect(title).toBe("AIセキュリティ ベストプラクティス完全ガイド（中級〜上級者向け） | LLM-Studies");
+    expect(title).toBe(
+      "AIセキュリティ ベストプラクティス完全ガイド（中級〜上級者向け） | LLM-Studies"
+    );
   });
 
   it("exports a metadata object with non-empty description", () => {
