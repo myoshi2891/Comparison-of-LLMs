@@ -98,6 +98,7 @@ export const navLinks: readonly NavLink[] = [
       { name: "Loop Engineering Guide", href: "/agent/loop-engineering" },
       { name: "Agent Skills Guide", href: "/agent/skills" },
       { name: "skills.sh Guide", href: "/claude/skills-sh" },
+      { name: "Context Engineering", href: "/agent/context-engineering-best-practices" },
     ],
   },
   {
