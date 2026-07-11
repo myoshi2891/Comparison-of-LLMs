@@ -68,9 +68,7 @@ describe("/agent/context-engineering-best-practices - page structure", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
     expect(h1).not.toBeNull();
-    expect(h1?.textContent?.replace(/\s+/g, "")).toContain(
-      "コンテキストエンジニアリング入門"
-    );
+    expect(h1?.textContent?.replace(/\s+/g, "")).toContain("コンテキストエンジニアリング入門");
   });
 
   it("renders all 10 expected sections", () => {
