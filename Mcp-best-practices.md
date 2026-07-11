@@ -13,7 +13,7 @@
 2. [アーキテクチャの基礎：Host / Client / Serverモデル](#2-アーキテクチャの基礎host--client--serverモデル)
 3. [プロトコルのバージョンとライフサイクル管理](#3-プロトコルのバージョンとライフサイクル管理)
 4. [トランスポート選定戦略：stdio vs Streamable HTTP vs SSE](#4-トランスポート選定戦略stdio-vs-streamable-http-vs-sse)
-5. [コアプリミティブ設計：Tools・Resources・Prompts・Sampling・Elicitation・Roots](#5-コアプリミティブ設計tools・resources・prompts・sampling・elicitation・roots)
+5. [コアプリミティブ設計：Tools・Resources・Prompts・Sampling・Elicitation・Roots](#5-コアプリミティブ設計toolsresourcespromptssamplingelicitationroots)
 6. [ツール設計のベストプラクティス（Anthropic公式指針）](#6-ツール設計のベストプラクティスanthropic公式指針)
 7. [コンテキスト管理とスケーラビリティ：ツール肥大化問題への対処](#7-コンテキスト管理とスケーラビリティツール肥大化問題への対処)
 8. [認証・認可：OAuth 2.1によるセキュアなMCPサーバー](#8-認証認可oauth-21によるセキュアなmcpサーバー)
