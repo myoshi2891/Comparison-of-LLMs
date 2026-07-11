@@ -80,6 +80,8 @@ describe("/security/ai-security-best-practices-intermediate - page structure", (
 
   it("renders all 17 expected sections", () => {
     const { container } = render(<Page />);
+    const sections = container.querySelectorAll("section[id]:not(#sec-00)");
+    expect(sections.length).toBe(EXPECTED_SECTION_IDS.length);
     for (const id of EXPECTED_SECTION_IDS) {
       const el = container.querySelector(`#${id}`);
       expect(el, `section id="${id}" must exist`).not.toBeNull();
