@@ -447,11 +447,11 @@
     </style>
   </head>
   <body>
-    <button id="menu-toggle" class="menu-toggle" aria-label="メニューを開く">
+    <button id="menu-toggle" class="menu-toggle" aria-label="メニューを開く" aria-expanded="false" aria-controls="sidebar">
       <i class="ti ti-menu-2"></i>
     </button>
     <div class="layout">
-      <aside class="sidebar">
+      <aside class="sidebar" id="sidebar">
         <p class="sidebar-title">目次</p>
         <nav>
           <ul>
@@ -2167,12 +2167,16 @@
         menuToggle.addEventListener('click', () => {
           const isOpen = sidebar.classList.toggle('open');
           menuToggle.innerHTML = isOpen ? '<i class="ti ti-x"></i>' : '<i class="ti ti-menu-2"></i>';
+          menuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          menuToggle.setAttribute('aria-label', isOpen ? 'メニューを閉じる' : 'メニューを開く');
         });
         // リンクをクリックしたら閉じる
         document.querySelectorAll('.sidebar a').forEach((link) => {
           link.addEventListener('click', () => {
             sidebar.classList.remove('open');
             menuToggle.innerHTML = '<i class="ti ti-menu-2"></i>';
+            menuToggle.setAttribute('aria-expanded', 'false');
+            menuToggle.setAttribute('aria-label', 'メニューを開く');
           });
         });
       }

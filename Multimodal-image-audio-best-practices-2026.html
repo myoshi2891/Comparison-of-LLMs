@@ -354,7 +354,6 @@
         padding: 26px;
         margin: 8px 0 30px 0;
         overflow-x: auto;
-        text-align: center;
       }
       .diagram-cap {
         font-family: var(--font-m);
@@ -364,9 +363,10 @@
         text-align: center;
       }
       pre.mermaid {
-        margin: 0 auto;
-        display: inline-block;
-        text-align: left;
+        margin: 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
       }
       pre.mermaid svg {
         max-width: 100%;
@@ -1784,28 +1784,28 @@
           <h3>画像生成</h3>
           <ul class="checklist">
             <li>
-              <input type="checkbox" /><span
-                >用途(文字入りデザイン／フォトリアル／大量バッチ／自前運用)に応じてモデルを選定したか(3章)</span
+              <input type="checkbox" id="chk-img-1" /><label for="chk-img-1"
+                >用途(文字入りデザイン／フォトリアル／大量バッチ／自前運用)に応じてモデルを選定したか(3章)</label
               >
             </li>
             <li>
-              <input type="checkbox" /><span
-                >単一モデルではなく、タスク分類器によるルーティングアーキテクチャを検討したか(3.3節)</span
+              <input type="checkbox" id="chk-img-2" /><label for="chk-img-2"
+                >単一モデルではなく、タスク分類器によるルーティングアーキテクチャを検討したか(3.3節)</label
               >
             </li>
             <li>
-              <input type="checkbox" /><span
-                >プロンプトを「撮影指示書」として構造化し、Change/Preserve/Constraintsパターンで編集を行っているか(4章)</span
+              <input type="checkbox" id="chk-img-3" /><label for="chk-img-3"
+                >プロンプトを「撮影指示書」として構造化し、Change/Preserve/Constraintsパターンで編集を行っているか(4章)</label
               >
             </li>
             <li>
-              <input type="checkbox" /><span
-                >構図・ポーズ・ブランドスタイルの固定にControlNet/LoRAの活用余地がないか検討したか(5章)</span
+              <input type="checkbox" id="chk-img-4" /><label for="chk-img-4"
+                >構図・ポーズ・ブランドスタイルの固定にControlNet/LoRAの活用余地がないか検討したか(5章)</label
               >
             </li>
             <li>
-              <input type="checkbox" /><span
-                >FID/CLIPScoreのような自動指標だけでなく人間評価・VLM評価を組み合わせたか(6章)</span
+              <input type="checkbox" id="chk-img-5" /><label for="chk-img-5"
+                >FID/CLIPScoreのような自動指標だけでなく人間評価・VLM評価を組み合わせたか(6章)</label
               >
             </li>
           </ul>
@@ -1813,28 +1813,28 @@
           <h3>音声・音楽生成</h3>
           <ul class="checklist">
             <li>
-              <input type="checkbox" /><span
-                >リアルタイム性が必要かどうかでカスケード型／ネイティブAudio-to-Audioを選び分けたか(7章)</span
+              <input type="checkbox" id="chk-audio-1" /><label for="chk-audio-1"
+                >リアルタイム性が必要かどうかでカスケード型／ネイティブAudio-to-Audioを選び分けたか(7章)</label
               >
             </li>
             <li>
-              <input type="checkbox" /><span
-                >用途(感情表現／低遅延／日本語特化／プライバシー)に応じてTTSモデルを選定したか(8章)</span
+              <input type="checkbox" id="chk-audio-2" /><label for="chk-audio-2"
+                >用途(感情表現／低遅延／日本語特化／プライバシー)に応じてTTSモデルを選定したか(8章)</label
               >
             </li>
             <li>
-              <input type="checkbox" /><span
-                >長文生成のチャンク分割によるトーンの揺れ対策を実装したか(9章)</span
+              <input type="checkbox" id="chk-audio-3" /><label for="chk-audio-3"
+                >長文生成のチャンク分割によるトーンの揺れ対策を実装したか(9章)</label
               >
             </li>
             <li>
-              <input type="checkbox" /><span
-                >音声クローンを使う場合、本人同意と認証プロセスを組み込んだか(9.4節)</span
+              <input type="checkbox" id="chk-audio-4" /><label for="chk-audio-4"
+                >音声クローンを使う場合、本人同意と認証プロセスを組み込んだか(9.4節)</label
               >
             </li>
             <li>
-              <input type="checkbox" /><span
-                >音楽生成AIの商用利用条件・著作権訴訟の最新状況を確認したか(11章)</span
+              <input type="checkbox" id="chk-audio-5" /><label for="chk-audio-5"
+                >音楽生成AIの商用利用条件・著作権訴訟の最新状況を確認したか(11章)</label
               >
             </li>
           </ul>
@@ -1842,29 +1842,29 @@
           <h3>全体アーキテクチャ・安全性・運用</h3>
           <ul class="checklist">
             <li>
-              <input type="checkbox" /><span
-                >マルチモーダル統合において、Any-to-Anyネイティブモデルとエージェント/MCP連携のどちらが適するか判断したか(12章)</span
+              <input type="checkbox" id="chk-ops-1" /><label for="chk-ops-1"
+                >マルチモーダル統合において、Any-to-Anyネイティブモデルとエージェント/MCP連携のどちらが適するか判断したか(12章)</label
               >
             </li>
             <li>
-              <input type="checkbox" /><span
-                >C2PA・SynthIDなどのコンテンツ来歴を生成物に付与しているか(13章)</span
+              <input type="checkbox" id="chk-ops-2" /><label for="chk-ops-2"
+                >C2PA・SynthIDなどのコンテンツ来歴を生成物に付与しているか(13章)</label
               >
             </li>
             <li>
-              <input type="checkbox" /><span
+              <input type="checkbox" id="chk-ops-3" /><label for="chk-ops-3"
                 >EU AI
-                Act第50条・日本のAI事業者ガイドラインなど、対象市場の規制要件を満たしているか(13.3節)</span
+                Act第50条・日本のAI事業者ガイドラインなど、対象市場の規制要件を満たしているか(13.3節)</label
               >
             </li>
             <li>
-              <input type="checkbox" /><span
-                >モデレーション・エラーハンドリングを入力/出力段階で明確に区別して実装したか(13.4節)</span
+              <input type="checkbox" id="chk-ops-4" /><label for="chk-ops-4"
+                >モデレーション・エラーハンドリングを入力/出力段階で明確に区別して実装したか(13.4節)</label
               >
             </li>
             <li>
-              <input type="checkbox" /><span
-                >品質・レイテンシ・コストのトレードオフを段階的生成戦略で最適化しているか(14章)</span
+              <input type="checkbox" id="chk-ops-5" /><label for="chk-ops-5"
+                >品質・レイテンシ・コストのトレードオフを段階的生成戦略で最適化しているか(14章)</label
               >
             </li>
           </ul>
@@ -2224,7 +2224,7 @@
               <li>
                 <span class="ref-title">おすすめの音声生成AIツール10選</span
                 ><a
-                  href="http://walker-s.co.jp/ai/voice-generation-tool/"
+                  href="https://walker-s.co.jp/ai/voice-generation-tool/"
                   target="_blank"
                   rel="noopener"
                   >walker-s.co.jp/ai/voice-generation-tool</a
