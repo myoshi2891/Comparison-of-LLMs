@@ -723,6 +723,9 @@ flowchart TD
 
 ### 画像生成モデル・比較
 
+- <a id="ref-1"></a>[1] OpenAI Terms of Use — https://openai.com/policies/terms-of-use/
+- <a id="ref-2"></a>[2] 火山エンジン（Volcengine）サービス利用規約 — https://www.volcengine.com/terms
+- <a id="ref-30"></a>[30] Google Terms of Service — https://policies.google.com/terms
 - 画像生成AIの最新モデル６選（爆速開発部）: https://apptime.co.jp/media/%E7%94%BB%E5%83%8F%E7%94%9F%E6%88%90ai%E6%AF%94%E8%BC%832026%EF%BD%9C%E6%9C%80%E6%96%B0%E3%83%A2%E3%83%87%E3%83%AB6%E9%81%B8%E3%82%92%E5%BE%B9%E5%BA%95%E6%AF%94%E8%BC%83
 - 2026年版：AI画像生成APIベストガイド（Atlas Cloud Blog）: https://www.atlascloud.ai/ja/blog/guides/best-ai-image-generation-apis-in-2026-complete-developer-guide
 - 画像生成AI徹底比較（2026年6月最新）: https://genai-ai.co.jp/ai-kanri/blog/cc-image-gen-ai-compare/
@@ -778,6 +781,8 @@ flowchart TD
 
 ### コンテンツ来歴・電子透かし・規制
 
+- <a id="ref-58"></a>[58] AI Act | Shaping Europe's digital future (European Commission) — https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai
+- <a id="ref-59"></a>[59] Timeline for the Implementation of the EU AI Act (AI Act Service Desk) — https://ai-act-service-desk.ec.europa.eu/en/ai-act/timeline/timeline-implementation-eu-ai-act
 - AIウォーターマークとは？C2PA・SynthIDの仕組み（renue）: https://renue.co.jp/posts/ai-watermark-c2pa-synthid-content-authenticity-guide-2026
 - OpenAI C2PA×SynthID入門（Qiita）: https://qiita.com/kai_kou/items/1e7a5ed2ee470ebed394
 - 電子透かしの技術全解剖（NanToo ブログ）: https://nandemo-tools.com/blog/digital-watermark-c2pa-ai-era
