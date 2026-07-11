@@ -283,7 +283,7 @@
 
 .step {
   margin-bottom: 8px;
-  scroll-margin-top: 24px;
+  scroll-margin-top: calc(24px + var(--ch-height, 0px) + var(--ch-disclaimer-height, 0px));
 }
 
 .step h2 {

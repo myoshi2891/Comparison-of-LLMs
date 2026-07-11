@@ -11,7 +11,10 @@ export default function TocObserver() {
   useEffect(() => {
     const sections = document.querySelectorAll("section.step");
     const links = Array.from(document.querySelectorAll(`.${styles.tocLink}`));
-    if (links.length > 0) links[0].classList.add(styles.tocLinkActive);
+    if (links.length > 0) {
+      links[0].classList.add(styles.tocLinkActive);
+      links[0].setAttribute("aria-current", "true");
+    }
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -22,8 +25,10 @@ export default function TocObserver() {
             for (const l of links) {
               if (l.getAttribute("href") === `#${id}`) {
                 l.classList.add(styles.tocLinkActive);
+                l.setAttribute("aria-current", "true");
               } else {
                 l.classList.remove(styles.tocLinkActive);
+                l.removeAttribute("aria-current");
               }
             }
           }
