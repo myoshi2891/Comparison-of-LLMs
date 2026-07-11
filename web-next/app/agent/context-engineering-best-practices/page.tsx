@@ -41,6 +41,7 @@ export default function Page() {
         className={styles.sidebarToggle}
         id="sidebarToggle"
         aria-label="目次を開閉する"
+        aria-expanded="false"
       >
         ☰
       </button>
