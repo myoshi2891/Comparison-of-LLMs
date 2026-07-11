@@ -4,8 +4,10 @@ import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
 
 export const metadata: Metadata = {
-  title: "コンテキストエンジニアリング実践ガイド — Write / Select / Compress / Isolate | LLM-Studies",
-  description: "プロンプト単体の最適化ではなく、エージェントが推論の瞬間に参照するトークン集合全体—システムプロンプト、ツール定義、履歴、外部データ、メモリ—を設計する実践ガイド。",
+  title:
+    "コンテキストエンジニアリング実践ガイド — Write / Select / Compress / Isolate | LLM-Studies",
+  description:
+    "プロンプト単体の最適化ではなく、エージェントが推論の瞬間に参照するトークン集合全体—システムプロンプト、ツール定義、履歴、外部データ、メモリ—を設計する実践ガイド。",
 };
 
 const DIAGRAMS = {
@@ -128,7 +130,14 @@ export default function Page() {
   return (
     <div className={styles.pageWrap}>
       <TocObserver />
-      <button className={styles.sidebarToggle} id="sidebarToggle" aria-label="目次を開閉する">☰</button>
+      <button
+        type="button"
+        className={styles.sidebarToggle}
+        id="sidebarToggle"
+        aria-label="目次を開閉する"
+      >
+        ☰
+      </button>
 
       <nav className={styles.sidebar} id="sidebar" aria-label="目次">
         <div className={styles.brand}>
@@ -238,7 +247,11 @@ export default function Page() {
         {/* ============ HERO ============ */}
         <header className={styles.hero} id="intro">
           <div className={styles.heroEyebrow}>Context Engineering Field Guide</div>
-          <h1 className={styles.heroTitle}>コンテキストウィンドウは<br /><em>有限のRAM</em>である</h1>
+          <h1 className={styles.heroTitle}>
+            コンテキストウィンドウは
+            <br />
+            <em>有限のRAM</em>である
+          </h1>
           <p className={styles.heroSub}>
             プロンプト単体の最適化ではなく、エージェントが推論の瞬間に参照するトークン集合全体—システムプロンプト、ツール定義、履歴、外部データ、メモリ—を設計する。中級者から上級者向けに、8つのステップで実践知を整理した。
           </p>
@@ -303,10 +316,13 @@ export default function Page() {
 
         {/* ============ 1. 定義 ============ */}
         <section className={styles.chapter} id="sec-1">
-          <div className={styles.eyebrow}><span className={styles.idx}>01</span>Definition</div>
+          <div className={styles.eyebrow}>
+            <span className={styles.idx}>01</span>Definition
+          </div>
           <h2 className={styles.chapterTitle}>コンテキストエンジニアリングとは何か</h2>
           <p className={styles.lede}>
-            プロンプトエンジニアリングは「1回の指示・1回の生成に対して、どのような文言・構造 of 指示を与えれば望む出力が得られるか」を扱う技術である。一方でエージェントが複数ステップにわたりツールを呼び出し、外部情報を取得し、長時間セッションを維持するようになると、単一のプロンプトだけでは制御しきれない領域が広がる。
+            プロンプトエンジニアリングは「1回の指示・1回の生成に対して、どのような文言・構造 of
+            指示を与えれば望む出力が得られるか」を扱う技術である。一方でエージェントが複数ステップにわたりツールを呼び出し、外部情報を取得し、長時間セッションを維持するようになると、単一のプロンプトだけでは制御しきれない領域が広がる。
           </p>
           <p>
             Anthropicのアプライドエンジニアリングチームは、この広がった領域を指して「推論時にモデルへ入力される最適なトークン集合を選定・維持するための一連の戦略」と定義している。これはシステムプロンプトだけでなく、ツール定義、会話履歴、外部から取得したデータ、Few-shot例など、モデルが参照するあらゆる情報を対象とする。
@@ -394,39 +410,62 @@ export default function Page() {
 
         {/* ============ 2. コンテキストロット ============ */}
         <section className={styles.chapter} id="sec-2">
-          <div className={styles.eyebrow}><span className={styles.idx}>02</span>Context Rot</div>
-          <h2 className={styles.chapterTitle}>なぜ今これが重要なのか：コンテキストロットという現象</h2>
+          <div className={styles.eyebrow}>
+            <span className={styles.idx}>02</span>Context Rot
+          </div>
+          <h2 className={styles.chapterTitle}>
+            なぜ今これが重要なのか：コンテキストロットという現象
+          </h2>
           <p className={styles.lede}>
             数百万トークン級のコンテキストウィンドウが普及するにつれ、「大きな窓があるなら全部詰め込めばよい」という発想が広まった。しかし実態はそう単純ではない。
           </p>
           <p>
-            ベクトルデータベース企業Chromaが公開した技術レポートは、GPT-4.1・Claude 4・Gemini 2.5・Qwen3を含む18の主要モデルを対象に、入力トークン数を増やしたときの性能変化を検証した。その結果、単純な「干し草の中の針」タスクでさえ、入力長が1万トークンから10万トークン超に増えるにつれて精度が20〜50%低下すること、さらにクエリと正解箇所の意味的な類似度が高いほど劣化が早まることが確認されている。この現象は<strong>コンテキストロット(Context Rot)</strong>と呼ばれる。
+            ベクトルデータベース企業Chromaが公開した技術レポートは、GPT-4.1・Claude 4・Gemini
+            2.5・Qwen3を含む18の主要モデルを対象に、入力トークン数を増やしたときの性能変化を検証した。その結果、単純な「干し草の中の針」タスクでさえ、入力長が1万トークンから10万トークン超に増えるにつれて精度が20〜50%低下すること、さらにクエリと正解箇所の意味的な類似度が高いほど劣化が早まることが確認されている。この現象は
+            <strong>コンテキストロット(Context Rot)</strong>と呼ばれる。
           </p>
           <p>
             同レポートの興味深い知見として、正解に似ているが誤っている情報(ディストラクター)が1つ混入するだけで性能が大きく落ち込むこと、そして直感に反して、支離滅裂な文の羅列よりも一貫した文章構造を持つ長文の方が、モデルが物語の流れに引きずられてしまい特定の情報を探し出しにくくなる場合があることが挙げられる。行き詰まったときの挙動もモデルにより異なり、幻覚を生成して答えようとする系統と、回答を拒否する系統に分かれる傾向が報告されている。
           </p>
           <p>
-            同様の現象は2024年の研究「Lost in the Middle」でも指摘されており、関連情報がコンテキストの中央付近に位置する場合、モデルの参照性能が両端に位置する場合より低下することが示されている。開発者のDrew Breunigは、この劣化がどのような形で現れるかを4つのパターンに整理した(詳細はStep 6で扱う)。
+            同様の現象は2024年の研究「Lost in the
+            Middle」でも指摘されており、関連情報がコンテキストの中央付近に位置する場合、モデルの参照性能が両端に位置する場合より低下することが示されている。開発者のDrew
+            Breunigは、この劣化がどのような形で現れるかを4つのパターンに整理した(詳細はStep
+            6で扱う)。
           </p>
 
           <div className={styles.refs}>
             <span className={styles.refsLabel}>参考</span>
             <ul>
               <li>
-                Chroma Research, &quot;Context Rot: How Increasing Input Tokens Impacts LLM Performance&quot; —{" "}
-                <a href="https://research.trychroma.com/context-rot" target="_blank" rel="noopener noreferrer">
+                Chroma Research, &quot;Context Rot: How Increasing Input Tokens Impacts LLM
+                Performance&quot; —{" "}
+                <a
+                  href="https://research.trychroma.com/context-rot"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   research.trychroma.com/context-rot
                 </a>
               </li>
               <li>
                 Chroma, GitHub再現用リポジトリ —{" "}
-                <a href="https://github.com/chroma-core/context-rot" target="_blank" rel="noopener noreferrer">
+                <a
+                  href="https://github.com/chroma-core/context-rot"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   github.com/chroma-core/context-rot
                 </a>
               </li>
               <li>
-                Liu et al., &quot;Lost in the Middle: How Language Models Use Long Contexts&quot;, TACL 2024 —{" "}
-                <a href="https://aclanthology.org/2024.tacl-1.9/" target="_blank" rel="noopener noreferrer">
+                Liu et al., &quot;Lost in the Middle: How Language Models Use Long Contexts&quot;,
+                TACL 2024 —{" "}
+                <a
+                  href="https://aclanthology.org/2024.tacl-1.9/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   aclanthology.org/2024.tacl-1.9
                 </a>
               </li>
@@ -456,7 +495,9 @@ export default function Page() {
 
         {/* ============ 3. 構成要素 ============ */}
         <section className={styles.chapter} id="sec-3">
-          <div className={styles.eyebrow}><span className={styles.idx}>03</span>Anatomy</div>
+          <div className={styles.eyebrow}>
+            <span className={styles.idx}>03</span>Anatomy
+          </div>
           <h2 className={styles.chapterTitle}>コンテキストウィンドウを構成する要素</h2>
           <p className={styles.lede}>
             エージェントに渡されるコンテキストは、単一の「プロンプト」ではなく複数のレイヤーから構成される動的なシステムとして捉える必要がある。
@@ -466,7 +507,9 @@ export default function Page() {
             <div className={styles.mermaid}>
               <MermaidDiagram chart={DIAGRAMS.d1} />
             </div>
-            <div className={styles.diagramCaption}>Fig.1 — コンテキストウィンドウを構成する6つのレイヤー</div>
+            <div className={styles.diagramCaption}>
+              Fig.1 — コンテキストウィンドウを構成する6つのレイヤー
+            </div>
           </div>
 
           <p>
@@ -502,7 +545,9 @@ export default function Page() {
 
         {/* ============ 4. 基本4戦略 ============ */}
         <section className={styles.chapter} id="sec-4">
-          <div className={styles.eyebrow}><span className={styles.idx}>04</span>Framework</div>
+          <div className={styles.eyebrow}>
+            <span className={styles.idx}>04</span>Framework
+          </div>
           <h2 className={styles.chapterTitle}>基本戦略：Write / Select / Compress / Isolate</h2>
           <p className={styles.lede}>
             LangChainのエンジニアリングチームは、業界で実践されているコンテキスト管理手法を横断的に調査し、4つのカテゴリーに整理した。現在ではコンテキストエンジニアリングの標準的なメンタルモデルとして広く参照されている。
@@ -512,7 +557,9 @@ export default function Page() {
             <div className={styles.mermaid}>
               <MermaidDiagram chart={DIAGRAMS.d2} />
             </div>
-            <div className={styles.diagramCaption}>Fig.2 — 4つの基本戦略とコンテキストウィンドウの関係</div>
+            <div className={styles.diagramCaption}>
+              Fig.2 — 4つの基本戦略とコンテキストウィンドウの関係
+            </div>
           </div>
 
           <div className={styles.tableWrap}>
@@ -526,22 +573,32 @@ export default function Page() {
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>Write</strong> 書き出す</td>
+                  <td>
+                    <strong>Write</strong> 書き出す
+                  </td>
                   <td>ウィンドウ外部(ファイル・DB・状態)に保存し、必要時に参照する</td>
-                  <td>スクラッチパッド、<code>CLAUDE.md</code>、メモリツールによる永続化</td>
+                  <td>
+                    スクラッチパッド、<code>CLAUDE.md</code>、メモリツールによる永続化
+                  </td>
                 </tr>
                 <tr>
-                  <td><strong>Select</strong> 選び取る</td>
+                  <td>
+                    <strong>Select</strong> 選び取る
+                  </td>
                   <td>今のステップに必要な情報だけをウィンドウに引き込む</td>
                   <td>Embedding検索、Just-in-Timeのファイルパス解決、ツール定義へのRAG適用</td>
                 </tr>
                 <tr>
-                  <td><strong>Compress</strong> 圧縮する</td>
+                  <td>
+                    <strong>Compress</strong> 圧縮する
+                  </td>
                   <td>冗長なトークンを削り、必要な情報密度を保ったまま縮める</td>
                   <td>会話全体の要約(Compaction)、ツール結果の一括クリア、サブエージェント要約</td>
                 </tr>
                 <tr>
-                  <td><strong>Isolate</strong> 分離する</td>
+                  <td>
+                    <strong>Isolate</strong> 分離する
+                  </td>
                   <td>サブタスクごとにクリーンな状態を用意し、干渉を防ぐ</td>
                   <td>サブエージェント構成、サンドボックス実行、状態スキーマによる部分公開</td>
                 </tr>
@@ -603,10 +660,13 @@ export default function Page() {
         {/* ============ STEP 1 ============ */}
         <section className={styles.chapter} id="step-1">
           <div className={styles.stepBadge}>Step 1 / 8</div>
-          <div className={styles.eyebrow}><span className={styles.idx}>05</span>System Prompt</div>
+          <div className={styles.eyebrow}>
+            <span className={styles.idx}>05</span>System Prompt
+          </div>
           <h2 className={styles.chapterTitle}>システムプロンプトを「適切な高度」で書く</h2>
           <p className={styles.lede}>
-            システムプロンプトの設計における最大の落とし穴は両極端である。すべてのエッジケースをif-else的にハードコードした脆いプロンプトは保守性を失い、逆に抽象的すぎる指示はモデルに具体的な指針を与えられない。Anthropicはこれを「適切な高度(right altitude)」という比喩で説明している。
+            システムプロンプトの設計における最大の落とし穴は両極端である。すべてのエッジケースをif-else的にハードコードした脆いプロンプトは保守性を失い、逆に抽象的すぎる指示はモデルに具体的な指針を与えられない。Anthropicはこれを「適切な高度(right
+            altitude)」という比喩で説明している。
           </p>
 
           <div className={styles.tableWrap}>
@@ -644,7 +704,8 @@ export default function Page() {
           </div>
 
           <p>
-            ポイントは「モデルが自分で正しい判断を下せるだけの余地を残しつつ、期待される行動の輪郭を明確にする」ことである。過度に細かいルールの羅列は、後述するContext Confusion(無関係情報による混乱)の温床にもなる。
+            ポイントは「モデルが自分で正しい判断を下せるだけの余地を残しつつ、期待される行動の輪郭を明確にする」ことである。過度に細かいルールの羅列は、後述するContext
+            Confusion(無関係情報による混乱)の温床にもなる。
           </p>
 
           <div className={styles.refs}>
@@ -677,20 +738,25 @@ export default function Page() {
         {/* ============ STEP 2 ============ */}
         <section className={styles.chapter} id="step-2">
           <div className={styles.stepBadge}>Step 2 / 8</div>
-          <div className={styles.eyebrow}><span className={styles.idx}>06</span>Tool Design</div>
+          <div className={styles.eyebrow}>
+            <span className={styles.idx}>06</span>Tool Design
+          </div>
           <h2 className={styles.chapterTitle}>ツールを設計する</h2>
           <p className={styles.lede}>
             ツールはエージェントが外部の情報や実行環境にアクセスするための契約である。Anthropicはツール設計における原則として、明確で非重複な機能、堅牢でスコープの明確な目的、入力パラメータの曖昧さ排除を重視している。
           </p>
           <p>
-            ツールセットが肥大化すると、機能が重複し、モデルがどのツールを選ぶべきか混乱する「Context Confusion」の典型例になる。実務上の目安として、よく使う3〜5個のツールは常時読み込み、10個を超える場合は動的な発見の仕組みを導入することが推奨される。
+            ツールセットが肥大化すると、機能が重複し、モデルがどのツールを選ぶべきか混乱する「Context
+            Confusion」の典型例になる。実務上の目安として、よく使う3〜5個のツールは常時読み込み、10個を超える場合は動的な発見の仕組みを導入することが推奨される。
           </p>
 
           <div className={styles.diagram}>
             <div className={styles.mermaid}>
               <MermaidDiagram chart={DIAGRAMS.d3} />
             </div>
-            <div className={styles.diagramCaption}>Fig.3 — Tool Search Toolによる動的なツール発見フロー</div>
+            <div className={styles.diagramCaption}>
+              Fig.3 — Tool Search Toolによる動的なツール発見フロー
+            </div>
           </div>
 
           <div className={styles.tableWrap}>
@@ -740,7 +806,8 @@ export default function Page() {
                 </a>
               </li>
               <li>
-                Anthropic, &quot;Introducing advanced tool use on the Claude Developer Platform&quot; —{" "}
+                Anthropic, &quot;Introducing advanced tool use on the Claude Developer
+                Platform&quot; —{" "}
                 <a
                   href="https://www.anthropic.com/engineering/advanced-tool-use"
                   target="_blank"
@@ -766,7 +833,9 @@ export default function Page() {
         {/* ============ STEP 3 ============ */}
         <section className={styles.chapter} id="step-3">
           <div className={styles.stepBadge}>Step 3 / 8</div>
-          <div className={styles.eyebrow}><span className={styles.idx}>07</span>Retrieval</div>
+          <div className={styles.eyebrow}>
+            <span className={styles.idx}>07</span>Retrieval
+          </div>
           <h2 className={styles.chapterTitle}>Just-in-Time retrievalとRAGパイプライン設計</h2>
           <p className={styles.lede}>
             コンテキストへの情報投入には大きく2つの流派がある。事前処理型(Embeddingベースの検索を推論前に実行)と、Just-in-Time型(ファイルパスやクエリなど軽量な識別子だけを保持し、必要になった瞬間にツール経由で実データを取得する)である。
@@ -818,7 +887,8 @@ export default function Page() {
           </div>
 
           <p>
-            リランキングは、広く再現率高く候補を集めた後に高精度なモデルで絞り込む工程であり、Cross-Encoder型のリランカーはハイブリッド検索単体と比べて10〜25%の追加精度向上をもたらすとされる。なお「フルコンテキスト(ファイル全体をそのまま渡す)」を推す立場もあり、SWE-bench Verifiedではファイル全体を渡すアプローチが約95%、断片化された検索では約80%程度という分析もある。コストとレイテンシとのトレードオフを踏まえ、タスクの性質に応じた使い分けが必要になる。
+            リランキングは、広く再現率高く候補を集めた後に高精度なモデルで絞り込む工程であり、Cross-Encoder型のリランカーはハイブリッド検索単体と比べて10〜25%の追加精度向上をもたらすとされる。なお「フルコンテキスト(ファイル全体をそのまま渡す)」を推す立場もあり、SWE-bench
+            Verifiedではファイル全体を渡すアプローチが約95%、断片化された検索では約80%程度という分析もある。コストとレイテンシとのトレードオフを踏まえ、タスクの性質に応じた使い分けが必要になる。
           </p>
 
           <div className={styles.refs}>
@@ -891,10 +961,13 @@ export default function Page() {
         {/* ============ STEP 4 ============ */}
         <section className={styles.chapter} id="step-4">
           <div className={styles.stepBadge}>Step 4 / 8</div>
-          <div className={styles.eyebrow}><span className={styles.idx}>08</span>Long-running Agents</div>
+          <div className={styles.eyebrow}>
+            <span className={styles.idx}>08</span>Long-running Agents
+          </div>
           <h2 className={styles.chapterTitle}>長時間実行エージェントのコンテキスト管理</h2>
           <p className={styles.lede}>
-            数十〜数百のツール呼び出しにまたがる長時間セッションでは、コンテキストウィンドウがいずれ上限に達する。Anthropicは3つの機構をClaude Developer Platformに実装しており、それぞれ役割が異なるため使い分けの理解が重要である。
+            数十〜数百のツール呼び出しにまたがる長時間セッションでは、コンテキストウィンドウがいずれ上限に達する。Anthropicは3つの機構をClaude
+            Developer Platformに実装しており、それぞれ役割が異なるため使い分けの理解が重要である。
           </p>
 
           <div className={styles.tableWrap}>
@@ -944,7 +1017,11 @@ export default function Page() {
             <ul>
               <li>
                 Claude by Anthropic, &quot;Managing context on the Claude Developer Platform&quot; —{" "}
-                <a href="https://claude.com/blog/context-management" target="_blank" rel="noopener noreferrer">
+                <a
+                  href="https://claude.com/blog/context-management"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   claude.com/blog/context-management
                 </a>
               </li>
@@ -969,7 +1046,8 @@ export default function Page() {
                 </a>
               </li>
               <li>
-                Claude Cookbook, &quot;Context engineering: memory, compaction, tool clearing&quot; —{" "}
+                Claude Cookbook, &quot;Context engineering: memory, compaction, tool clearing&quot;
+                —{" "}
                 <a
                   href="https://platform.claude.com/cookbook/tool-use-context-engineering-context-engineering-tools"
                   target="_blank"
@@ -1005,7 +1083,9 @@ export default function Page() {
         {/* ============ STEP 5 ============ */}
         <section className={styles.chapter} id="step-5">
           <div className={styles.stepBadge}>Step 5 / 8</div>
-          <div className={styles.eyebrow}><span className={styles.idx}>09</span>Multi-Agent</div>
+          <div className={styles.eyebrow}>
+            <span className={styles.idx}>09</span>Multi-Agent
+          </div>
           <h2 className={styles.chapterTitle}>マルチエージェントによるコンテキスト分離</h2>
           <p className={styles.lede}>
             単一エージェントのコンテキストウィンドウには物理的な上限がある。並列で幅広い探索が必要なタスクでは、複数の専門化されたサブエージェントに作業を分散させ、それぞれが独立したコンテキストウィンドウを持つアーキテクチャが有効になる。
@@ -1021,7 +1101,9 @@ export default function Page() {
           </div>
 
           <p>
-            各サブエージェントは数万トークン規模で自由に探索しつつ、リードエージェントには凝縮された要約だけを返す。Anthropicの内部評価では、Opus 4をリードエージェント・Sonnet 4をサブエージェントとする構成が、単一のOpus 4エージェントを社内リサーチ評価で90.2%上回ったと報告されている。
+            各サブエージェントは数万トークン規模で自由に探索しつつ、リードエージェントには凝縮された要約だけを返す。Anthropicの内部評価では、Opus
+            4をリードエージェント・Sonnet 4をサブエージェントとする構成が、単一のOpus
+            4エージェントを社内リサーチ評価で90.2%上回ったと報告されている。
           </p>
 
           <div className={styles.tableWrap}>
@@ -1087,10 +1169,13 @@ export default function Page() {
         {/* ============ STEP 6 ============ */}
         <section className={styles.chapter} id="step-6">
           <div className={styles.stepBadge}>Step 6 / 8</div>
-          <div className={styles.eyebrow}><span className={styles.idx}>10</span>Failure Modes</div>
+          <div className={styles.eyebrow}>
+            <span className={styles.idx}>10</span>Failure Modes
+          </div>
           <h2 className={styles.chapterTitle}>コンテキスト障害の診断と対処</h2>
           <p className={styles.lede}>
-            コンテキストロットは単一の現象ではなく、複数の異なる失敗モードの総称である。Drew Breunigはこれを4つのパターンに整理しており、現在では業界で広く参照される分類になっている。
+            コンテキストロットは単一の現象ではなく、複数の異なる失敗モードの総称である。Drew
+            Breunigはこれを4つのパターンに整理しており、現在では業界で広く参照される分類になっている。
           </p>
 
           <div className={styles.tableWrap}>
@@ -1105,8 +1190,15 @@ export default function Page() {
               <tbody>
                 <tr>
                   <td>
-                    Context Poisoning<br />
-                    <span style={{ color: "#5f7396", fontFamily: "var(--font-mono), 'JetBrains Mono', monospace", fontSize: "11px" }}>
+                    Context Poisoning
+                    <br />
+                    <span
+                      style={{
+                        color: "#5f7396",
+                        fontFamily: "var(--font-mono), 'JetBrains Mono', monospace",
+                        fontSize: "11px",
+                      }}
+                    >
                       汚染
                     </span>
                   </td>
@@ -1115,8 +1207,15 @@ export default function Page() {
                 </tr>
                 <tr>
                   <td>
-                    Context Distraction<br />
-                    <span style={{ color: "#5f7396", fontFamily: "var(--font-mono), 'JetBrains Mono', monospace", fontSize: "11px" }}>
+                    Context Distraction
+                    <br />
+                    <span
+                      style={{
+                        color: "#5f7396",
+                        fontFamily: "var(--font-mono), 'JetBrains Mono', monospace",
+                        fontSize: "11px",
+                      }}
+                    >
                       注意散漫
                     </span>
                   </td>
@@ -1125,8 +1224,15 @@ export default function Page() {
                 </tr>
                 <tr>
                   <td>
-                    Context Confusion<br />
-                    <span style={{ color: "#5f7396", fontFamily: "var(--font-mono), 'JetBrains Mono', monospace", fontSize: "11px" }}>
+                    Context Confusion
+                    <br />
+                    <span
+                      style={{
+                        color: "#5f7396",
+                        fontFamily: "var(--font-mono), 'JetBrains Mono', monospace",
+                        fontSize: "11px",
+                      }}
+                    >
                       混乱
                     </span>
                   </td>
@@ -1135,8 +1241,15 @@ export default function Page() {
                 </tr>
                 <tr>
                   <td>
-                    Context Clash<br />
-                    <span style={{ color: "#5f7396", fontFamily: "var(--font-mono), 'JetBrains Mono', monospace", fontSize: "11px" }}>
+                    Context Clash
+                    <br />
+                    <span
+                      style={{
+                        color: "#5f7396",
+                        fontFamily: "var(--font-mono), 'JetBrains Mono', monospace",
+                        fontSize: "11px",
+                      }}
+                    >
                       衝突
                     </span>
                   </td>
@@ -1151,11 +1264,14 @@ export default function Page() {
             <div className={styles.mermaid}>
               <MermaidDiagram chart={DIAGRAMS.d7} />
             </div>
-            <div className={styles.diagramCaption}>Fig.7 — 4つの失敗モードを切り分ける診断フロー</div>
+            <div className={styles.diagramCaption}>
+              Fig.7 — 4つの失敗モードを切り分ける診断フロー
+            </div>
           </div>
 
           <p>
-            いずれのケースでも共通する対処の方向性は「まず何が起きているかを名指しできるようにすること」である。原因不明のまま経験則だけで対処し続けず、上記4分類のどれに該当するかを特定できれば、Step 4・5・2で紹介した具体的な手段を的確に適用できる。
+            いずれのケースでも共通する対処の方向性は「まず何が起きているかを名指しできるようにすること」である。原因不明のまま経験則だけで対処し続けず、上記4分類のどれに該当するかを特定できれば、Step
+            4・5・2で紹介した具体的な手段を的確に適用できる。
           </p>
 
           <div className={styles.refs}>
@@ -1208,10 +1324,13 @@ export default function Page() {
         {/* ============ STEP 7 ============ */}
         <section className={styles.chapter} id="step-7">
           <div className={styles.stepBadge}>Step 7 / 8</div>
-          <div className={styles.eyebrow}><span className={styles.idx}>11</span>Cost Optimization</div>
+          <div className={styles.eyebrow}>
+            <span className={styles.idx}>11</span>Cost Optimization
+          </div>
           <h2 className={styles.chapterTitle}>プロンプトキャッシュによるコスト最適化</h2>
           <p className={styles.lede}>
-            コンテキストエンジニアリングは品質だけでなくコストの問題でもある。Claude APIのプロンプトキャッシュは、プロンプトの先頭部分(プレフィックス)を再利用することで、繰り返し送信される固定的なコンテキストの処理コストを大幅に削減する仕組みである。
+            コンテキストエンジニアリングは品質だけでなくコストの問題でもある。Claude
+            APIのプロンプトキャッシュは、プロンプトの先頭部分(プレフィックス)を再利用することで、繰り返し送信される固定的なコンテキストの処理コストを大幅に削減する仕組みである。
           </p>
 
           <div className={styles.diagram}>
@@ -1226,16 +1345,20 @@ export default function Page() {
           <div className={styles.card}>
             <ul className={styles.cardList}>
               <li>
-                <strong>安定した内容を先頭に配置する</strong> — システムプロンプトやツール定義など変化しない部分を前方に、動的なユーザー入力を末尾に置く
+                <strong>安定した内容を先頭に配置する</strong> —
+                システムプロンプトやツール定義など変化しない部分を前方に、動的なユーザー入力を末尾に置く
               </li>
               <li>
-                <strong>プレフィックスの完全一致が必須</strong> — 途中のタイムスタンプや動的な値が1つでも変わると、それより後ろのキャッシュはすべて無効になる
+                <strong>プレフィックスの完全一致が必須</strong> —
+                途中のタイムスタンプや動的な値が1つでも変わると、それより後ろのキャッシュはすべて無効になる
               </li>
               <li>
-                <strong>ツール呼び出しのキー順序を安定させる</strong> — 言語によってはJSONのキー順がランダム化され、意図せずキャッシュが壊れることがある
+                <strong>ツール呼び出しのキー順序を安定させる</strong> —
+                言語によってはJSONのキー順がランダム化され、意図せずキャッシュが壊れることがある
               </li>
               <li>
-                <strong>キャッシュの有効期限(TTL)を意識する</strong> — 標準5分、延長オプションで1時間。セッションの実行間隔に応じて選択する
+                <strong>キャッシュの有効期限(TTL)を意識する</strong> —
+                標準5分、延長オプションで1時間。セッションの実行間隔に応じて選択する
               </li>
             </ul>
           </div>
@@ -1294,7 +1417,9 @@ export default function Page() {
         {/* ============ STEP 8 ============ */}
         <section className={styles.chapter} id="step-8">
           <div className={styles.stepBadge}>Step 8 / 8</div>
-          <div className={styles.eyebrow}><span className={styles.idx}>12</span>Evals</div>
+          <div className={styles.eyebrow}>
+            <span className={styles.idx}>12</span>Evals
+          </div>
           <h2 className={styles.chapterTitle}>観測性と評価(Evals)</h2>
           <p className={styles.lede}>
             コンテキストエンジニアリングの各施策(圧縮、分離、ツール絞り込みなど)は、必ずしも直感通りの効果をもたらすとは限らない。Anthropicのマルチエージェントリサーチシステム開発チームは、評価の重要性について次のような教訓を共有している。
@@ -1303,13 +1428,16 @@ export default function Page() {
           <div className={styles.card}>
             <ul className={styles.cardList}>
               <li>
-                <strong>小規模でもすぐに評価を始める</strong> — 数百件規模の網羅的な評価セットが揃うまで待たず、少数の具体例からでも評価を開始する
+                <strong>小規模でもすぐに評価を始める</strong> —
+                数百件規模の網羅的な評価セットが揃うまで待たず、少数の具体例からでも評価を開始する
               </li>
               <li>
-                <strong>自動評価と人間評価の併用</strong> — LLM-as-a-judgeで事実の正確性・網羅性・ツール使用効率などを採点しつつ、稀なエッジケースは人間のレビューで補う
+                <strong>自動評価と人間評価の併用</strong> —
+                LLM-as-a-judgeで事実の正確性・網羅性・ツール使用効率などを採点しつつ、稀なエッジケースは人間のレビューで補う
               </li>
               <li>
-                <strong>観測性の確保</strong> — エージェントのトークン使用量をトレースし、どこにコンテキストエンジニアリングの効果を投じるべきかを可視化する
+                <strong>観測性の確保</strong> —
+                エージェントのトークン使用量をトレースし、どこにコンテキストエンジニアリングの効果を投じるべきかを可視化する
               </li>
             </ul>
           </div>
@@ -1347,7 +1475,9 @@ export default function Page() {
 
         {/* ============ 6. アンチパターン ============ */}
         <section className={styles.chapter} id="sec-6">
-          <div className={styles.eyebrow}><span className={styles.idx}>13</span>Anti-patterns</div>
+          <div className={styles.eyebrow}>
+            <span className={styles.idx}>13</span>Anti-patterns
+          </div>
           <h2 className={styles.chapterTitle}>アンチパターン集</h2>
 
           <div className={styles.apGrid}>
@@ -1356,7 +1486,9 @@ export default function Page() {
               <div className={styles.apRow}>
                 <b>症状</b>システムプロンプトが数千行に肥大化し、保守不能になる
               </div>
-              <div className={styles.apRow}><b>原因</b>エッジケースを都度ハードコードし続けた結果</div>
+              <div className={styles.apRow}>
+                <b>原因</b>エッジケースを都度ハードコードし続けた結果
+              </div>
               <div className={`${styles.apRow} ${styles.apFix}`}>
                 <b>改善策</b> Step 1: 適切な高度で再設計、Step 4: 動的なコンテキスト構築へ移行
               </div>
@@ -1366,7 +1498,9 @@ export default function Page() {
               <div className={styles.apRow}>
                 <b>症状</b>数十〜数百のツールを常時ロードし、モデルが誤ったツールを選ぶ
               </div>
-              <div className={styles.apRow}><b>原因</b>ツール追加のたびに定義を素朴に積み上げた</div>
+              <div className={styles.apRow}>
+                <b>原因</b>ツール追加のたびに定義を素朴に積み上げた
+              </div>
               <div className={`${styles.apRow} ${styles.apFix}`}>
                 <b>改善策</b> Step 2: Tool Loadoutの絞り込み、Tool Search Toolによる動的発見
               </div>
@@ -1376,13 +1510,21 @@ export default function Page() {
               <div className={styles.apRow}>
                 <b>症状</b>セッションが長くなるほど応答が劣化し、コストも増大する
               </div>
-              <div className={styles.apRow}><b>原因</b>Compaction・Context Editingを導入していない</div>
-              <div className={`${styles.apRow} ${styles.apFix}`}><b>改善策</b> Step 4: 圧縮・メモリ機構の導入</div>
+              <div className={styles.apRow}>
+                <b>原因</b>Compaction・Context Editingを導入していない
+              </div>
+              <div className={`${styles.apRow} ${styles.apFix}`}>
+                <b>改善策</b> Step 4: 圧縮・メモリ機構の導入
+              </div>
             </div>
             <div className={styles.apCard}>
               <div className={styles.apTitle}>RAGの雑なチャンキング</div>
-              <div className={styles.apRow}><b>症状</b>検索結果が的外れで、生成が自信満々に間違える</div>
-              <div className={styles.apRow}><b>原因</b>固定長分割で文や表の途中で切れている</div>
+              <div className={styles.apRow}>
+                <b>症状</b>検索結果が的外れで、生成が自信満々に間違える
+              </div>
+              <div className={styles.apRow}>
+                <b>原因</b>固定長分割で文や表の途中で切れている
+              </div>
               <div className={`${styles.apRow} ${styles.apFix}`}>
                 <b>改善策</b> Step 3: 構造認識・意味的チャンキングへの切り替え
               </div>
@@ -1392,22 +1534,30 @@ export default function Page() {
               <div className={styles.apRow}>
                 <b>症状</b>トークンコストが単一エージェントの15倍に膨らみ、成果が見合わない
               </div>
-              <div className={styles.apRow}><b>原因</b>タスクの性質を吟味せずに複雑な構成へ飛びついた</div>
+              <div className={styles.apRow}>
+                <b>原因</b>タスクの性質を吟味せずに複雑な構成へ飛びついた
+              </div>
               <div className={`${styles.apRow} ${styles.apFix}`}>
                 <b>改善策</b> Step 5: 判断基準表に照らして本当に必要か再検討
               </div>
             </div>
             <div className={styles.apCard}>
               <div className={styles.apTitle}>症状ベースのその場しのぎ対応</div>
-              <div className={styles.apRow}><b>症状</b>「なんか調子が悪い」を経験則だけで対処し続ける</div>
-              <div className={styles.apRow}><b>原因</b>4つの失敗モードを区別せずに対処している</div>
+              <div className={styles.apRow}>
+                <b>症状</b>「なんか調子が悪い」を経験則だけで対処し続ける
+              </div>
+              <div className={styles.apRow}>
+                <b>原因</b>4つの失敗モードを区別せずに対処している
+              </div>
               <div className={`${styles.apRow} ${styles.apFix}`}>
                 <b>改善策</b> Step 6: 診断フローで失敗モードを特定してから対処
               </div>
             </div>
             <div className={styles.apCard}>
               <div className={styles.apTitle}>キャッシュを効かせない構成</div>
-              <div className={styles.apRow}><b>症状</b>毎ターン同じ内容をフルコストで再処理している</div>
+              <div className={styles.apRow}>
+                <b>症状</b>毎ターン同じ内容をフルコストで再処理している
+              </div>
               <div className={styles.apRow}>
                 <b>原因</b>動的な値を先頭付近に置いてしまいプレフィックスが安定しない
               </div>
@@ -1420,7 +1570,9 @@ export default function Page() {
               <div className={styles.apRow}>
                 <b>症状</b>良かれと思った圧縮・分離が実は性能を悪化させている
               </div>
-              <div className={styles.apRow}><b>原因</b>Before/Afterを比較する評価の仕組みがない</div>
+              <div className={styles.apRow}>
+                <b>原因</b>Before/Afterを比較する評価の仕組みがない
+              </div>
               <div className={`${styles.apRow} ${styles.apFix}`}>
                 <b>改善策</b> Step 8: 小規模でもEvalsとトレーシングを先に用意する
               </div>
@@ -1430,48 +1582,63 @@ export default function Page() {
 
         {/* ============ 7. チェックリスト ============ */}
         <section className={styles.chapter} id="sec-7">
-          <div className={styles.eyebrow}><span className={styles.idx}>14</span>Checklist</div>
+          <div className={styles.eyebrow}>
+            <span className={styles.idx}>14</span>Checklist
+          </div>
           <h2 className={styles.chapterTitle}>実践チェックリスト</h2>
           <ul className={styles.checklist}>
             <li>
-              <span className={styles.box}></span>システムプロンプトは「具体的すぎず抽象的すぎない」適切な高度で書かれているか
+              <span className={styles.box}></span>
+              システムプロンプトは「具体的すぎず抽象的すぎない」適切な高度で書かれているか
             </li>
             <li>
-              <span className={styles.box}></span>ツールは3〜5個程度の中核セットに絞られ、10個を超える場合は動的発見の仕組みがあるか
+              <span className={styles.box}></span>
+              ツールは3〜5個程度の中核セットに絞られ、10個を超える場合は動的発見の仕組みがあるか
             </li>
             <li>
-              <span className={styles.box}></span>ツール同士の役割が重複せず、パラメータの意味が曖昧でないか
+              <span className={styles.box}></span>
+              ツール同士の役割が重複せず、パラメータの意味が曖昧でないか
             </li>
             <li>
-              <span className={styles.box}></span>外部知識の取得は「事前処理」と「Just-in-Time取得」を適切に使い分けているか
+              <span className={styles.box}></span>
+              外部知識の取得は「事前処理」と「Just-in-Time取得」を適切に使い分けているか
             </li>
             <li>
-              <span className={styles.box}></span>RAGを使う場合、チャンキング戦略は文書の構造に合っているか
+              <span className={styles.box}></span>
+              RAGを使う場合、チャンキング戦略は文書の構造に合っているか
             </li>
             <li>
-              <span className={styles.box}></span>リランキングを導入し、上位数件に絞り込んでからコンテキストへ渡しているか
+              <span className={styles.box}></span>
+              リランキングを導入し、上位数件に絞り込んでからコンテキストへ渡しているか
             </li>
             <li>
-              <span className={styles.box}></span>長時間セッションに対してCompaction・Context Editing・Memoryのいずれかを導入しているか
+              <span className={styles.box}></span>長時間セッションに対してCompaction・Context
+              Editing・Memoryのいずれかを導入しているか
             </li>
             <li>
-              <span className={styles.box}></span>マルチエージェント構成を採用する前に、単一エージェント＋プロンプト改善で十分でないか検証したか
+              <span className={styles.box}></span>
+              マルチエージェント構成を採用する前に、単一エージェント＋プロンプト改善で十分でないか検証したか
             </li>
             <li>
-              <span className={styles.box}></span>エージェントの不調が発生した際、4つの失敗モードのどれに該当するか診断できる体制があるか
+              <span className={styles.box}></span>
+              エージェントの不調が発生した際、4つの失敗モードのどれに該当するか診断できる体制があるか
             </li>
             <li>
-              <span className={styles.box}></span>プロンプトキャッシュのプレフィックス設計(安定部分を前方に)ができているか
+              <span className={styles.box}></span>
+              プロンプトキャッシュのプレフィックス設計(安定部分を前方に)ができているか
             </li>
             <li>
-              <span className={styles.box}></span>トークン使用量のトレースと、施策のBefore/Afterを比較できる評価の仕組みがあるか
+              <span className={styles.box}></span>
+              トークン使用量のトレースと、施策のBefore/Afterを比較できる評価の仕組みがあるか
             </li>
           </ul>
         </section>
 
         {/* ============ 8. 全体設計フロー ============ */}
         <section className={styles.chapter} id="sec-8">
-          <div className={styles.eyebrow}><span className={styles.idx}>15</span>Decision Flow</div>
+          <div className={styles.eyebrow}>
+            <span className={styles.idx}>15</span>Decision Flow
+          </div>
           <h2 className={styles.chapterTitle}>全体設計フロー(意思決定図)</h2>
           <p className={styles.lede}>
             これまでのステップを踏まえた、エージェント設計時の全体的な意思決定フローである。
@@ -1481,13 +1648,17 @@ export default function Page() {
             <div className={styles.mermaid}>
               <MermaidDiagram chart={DIAGRAMS.d9} />
             </div>
-            <div className={styles.diagramCaption}>Fig.9 — エージェント設計における全体意思決定フロー</div>
+            <div className={styles.diagramCaption}>
+              Fig.9 — エージェント設計における全体意思決定フロー
+            </div>
           </div>
         </section>
 
         {/* ============ 9. 参考文献 ============ */}
         <section className={styles.chapter} id="sec-9">
-          <div className={styles.eyebrow}><span className={styles.idx}>16</span>Bibliography</div>
+          <div className={styles.eyebrow}>
+            <span className={styles.idx}>16</span>Bibliography
+          </div>
           <h2 className={styles.chapterTitle}>参考文献一覧</h2>
 
           <h4>Anthropic公式(一次情報)</h4>
@@ -1535,7 +1706,9 @@ export default function Page() {
                 </tr>
                 <tr>
                   <td>04</td>
-                  <td>&quot;Introducing advanced tool use on the Claude Developer Platform&quot;</td>
+                  <td>
+                    &quot;Introducing advanced tool use on the Claude Developer Platform&quot;
+                  </td>
                   <td>
                     <a
                       href="https://www.anthropic.com/engineering/advanced-tool-use"
@@ -1548,7 +1721,9 @@ export default function Page() {
                 </tr>
                 <tr>
                   <td>05</td>
-                  <td>&quot;Managing context on the Claude Developer Platform&quot; (Claude Blog)</td>
+                  <td>
+                    &quot;Managing context on the Claude Developer Platform&quot; (Claude Blog)
+                  </td>
                   <td>
                     <a
                       href="https://claude.com/blog/context-management"
@@ -1561,7 +1736,9 @@ export default function Page() {
                 </tr>
                 <tr>
                   <td>06</td>
-                  <td>&quot;When to use multi-agent systems (and when not to)&quot; (Claude Blog)</td>
+                  <td>
+                    &quot;When to use multi-agent systems (and when not to)&quot; (Claude Blog)
+                  </td>
                   <td>
                     <a
                       href="https://claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them"
@@ -1613,7 +1790,10 @@ export default function Page() {
                 </tr>
                 <tr>
                   <td>10</td>
-                  <td>Claude Cookbook, &quot;Context engineering: memory, compaction, tool clearing&quot;</td>
+                  <td>
+                    Claude Cookbook, &quot;Context engineering: memory, compaction, tool
+                    clearing&quot;
+                  </td>
                   <td>
                     <a
                       href="https://platform.claude.com/cookbook/tool-use-context-engineering-context-engineering-tools"
@@ -1688,7 +1868,11 @@ export default function Page() {
                   <td>15</td>
                   <td>Liu et al., &quot;Lost in the Middle&quot;, TACL 2024</td>
                   <td>
-                    <a href="https://aclanthology.org/2024.tacl-1.9/" target="_blank" rel="noopener noreferrer">
+                    <a
+                      href="https://aclanthology.org/2024.tacl-1.9/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       aclanthology.org/2024.tacl-1.9
                     </a>
                   </td>
@@ -1716,7 +1900,9 @@ export default function Page() {
                 </tr>
                 <tr>
                   <td>17</td>
-                  <td>LangChain, GitHub <code>context_engineering</code></td>
+                  <td>
+                    LangChain, GitHub <code>context_engineering</code>
+                  </td>
                   <td>
                     <a
                       href="https://github.com/langchain-ai/context_engineering"
@@ -1896,7 +2082,9 @@ export default function Page() {
               <tbody>
                 <tr>
                   <td>29</td>
-                  <td>hidekazu-konishi.com, &quot;Prompt Caching and Token Efficiency Guide&quot;</td>
+                  <td>
+                    hidekazu-konishi.com, &quot;Prompt Caching and Token Efficiency Guide&quot;
+                  </td>
                   <td>
                     <a
                       href="https://hidekazu-konishi.com/entry/anthropic_claude_api_prompt_caching_and_token_efficiency.html"
@@ -1930,7 +2118,9 @@ export default function Page() {
               <tbody>
                 <tr>
                   <td>31</td>
-                  <td>Cronus, &quot;Anthropic&apos;s Approach to Effective Context Engineering&quot;</td>
+                  <td>
+                    Cronus, &quot;Anthropic&apos;s Approach to Effective Context Engineering&quot;
+                  </td>
                   <td>
                     <a
                       href="https://cr0nu3.github.io/posts/Effective_context_engineering_for_AI_Agents/"

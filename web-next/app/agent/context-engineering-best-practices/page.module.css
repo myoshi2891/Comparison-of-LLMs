@@ -6,7 +6,7 @@
   align-items: flex-start;
   background: #07111e; /* --bg-base */
   color: #e9eefb; /* --text-primary */
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 1rem;
   line-height: 1.75;
 }
@@ -52,7 +52,7 @@
 }
 
 .brandTitle {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: "Space Grotesk", sans-serif;
   font-size: 17px;
   font-weight: 600;
   line-height: 1.35;
@@ -111,13 +111,13 @@
 }
 
 .tocLinkActive {
-  color: #5eead4 !important;
-  background: rgba(94, 234, 212, 0.14) !important;
-  border-left-color: #5eead4 !important;
+  color: #5eead4;
+  background: rgba(94, 234, 212, 0.14);
+  border-left-color: #5eead4;
 }
 
 .tocLinkActive .n {
-  color: #5eead4 !important;
+  color: #5eead4;
 }
 
 .content {
@@ -145,14 +145,14 @@
 }
 
 .heroEyebrow::before {
-  content: '';
+  content: "";
   width: 22px;
   height: 1px;
   background: #5eead4;
 }
 
 .heroTitle {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: "Space Grotesk", sans-serif;
   font-size: clamp(34px, 5.2vw, 56px);
   line-height: 1.15;
   margin: 0 0 22px;
@@ -279,7 +279,7 @@
 }
 
 .chapterTitle {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: "Space Grotesk", sans-serif;
   font-size: clamp(26px, 3vw, 34px);
   margin: 0 0 20px;
   font-weight: 600;
@@ -290,7 +290,7 @@
   font-size: 20px;
   margin: 40px 0 14px;
   color: #5eead4;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: "Space Grotesk", sans-serif;
   font-weight: 600;
 }
 
@@ -298,7 +298,7 @@
   font-size: 16px;
   margin: 26px 0 10px;
   color: #e9eefb;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: "Space Grotesk", sans-serif;
   font-weight: 600;
 }
 
@@ -348,8 +348,8 @@
 }
 
 .lede {
-  font-size: 19px !important;
-  color: #e9eefb !important;
+  font-size: 19px;
+  color: #e9eefb;
 }
 
 /* Tables */
@@ -370,7 +370,7 @@
 
 .tableWrap th,
 .tableWrap td {
-  text-align: left !important;
+  text-align: left;
   padding: 14px 16px;
   border-bottom: 1px solid rgba(148, 178, 214, 0.14);
   color: #a9bad9;
@@ -427,7 +427,7 @@
 }
 
 .cardList li::before {
-  content: '→';
+  content: "→";
   position: absolute;
   left: 0;
   color: #5eead4;
@@ -567,7 +567,7 @@
 }
 
 .apTitle {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: "Space Grotesk", sans-serif;
   font-weight: 600;
   color: #f2789a; /* --danger */
   font-size: 15.5px;
@@ -650,7 +650,7 @@
   }
 
   .sidebarOpen {
-    transform: translateX(0) !important;
+    transform: translateX(0);
   }
 
   .sidebarToggle {
