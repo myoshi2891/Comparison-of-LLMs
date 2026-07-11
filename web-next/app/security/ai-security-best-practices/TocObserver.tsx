@@ -18,9 +18,31 @@ export default function TocObserver() {
   });
 
   useEffect(() => {
-    // モバイルサイドバー開閉
     const navToggle = document.getElementById("navToggle");
     const sidebar = document.getElementById("sidebar");
+
+    const mediaQuery =
+      typeof window !== "undefined" && window.matchMedia
+        ? window.matchMedia("(max-width: 900px)")
+        : null;
+
+    const handleMediaChange = (e: { matches: boolean } | MediaQueryListEvent | MediaQueryList) => {
+      if (sidebar) {
+        if (e.matches) {
+          const isOpen = sidebar.classList.contains(styles.sidebarOpen);
+          if (isOpen) {
+            sidebar.removeAttribute("aria-hidden");
+            sidebar.removeAttribute("inert");
+          } else {
+            sidebar.setAttribute("aria-hidden", "true");
+            sidebar.setAttribute("inert", "");
+          }
+        } else {
+          sidebar.removeAttribute("aria-hidden");
+          sidebar.removeAttribute("inert");
+        }
+      }
+    };
 
     const handleToggleClick = () => {
       if (sidebar) {
@@ -29,18 +51,45 @@ export default function TocObserver() {
           navToggle.setAttribute("aria-expanded", String(isOpen));
           navToggle.setAttribute("aria-label", isOpen ? "目次を閉じる" : "目次を開く");
         }
+        if (isOpen) {
+          sidebar.removeAttribute("aria-hidden");
+          sidebar.removeAttribute("inert");
+        } else {
+          if (mediaQuery?.matches) {
+            sidebar.setAttribute("aria-hidden", "true");
+            sidebar.setAttribute("inert", "");
+          }
+          if (navToggle) {
+            navToggle.focus();
+          }
+        }
       }
     };
 
     const handleLinkClick = () => {
       if (sidebar) {
         sidebar.classList.remove(styles.sidebarOpen);
+        if (mediaQuery?.matches) {
+          sidebar.setAttribute("aria-hidden", "true");
+          sidebar.setAttribute("inert", "");
+        }
         if (navToggle) {
           navToggle.setAttribute("aria-expanded", "false");
           navToggle.setAttribute("aria-label", "目次を開く");
+          navToggle.focus();
         }
       }
     };
+
+    // Initialize media query status
+    if (mediaQuery) {
+      handleMediaChange(mediaQuery);
+      if (mediaQuery.addEventListener) {
+        mediaQuery.addEventListener("change", handleMediaChange);
+      } else {
+        mediaQuery.addListener(handleMediaChange);
+      }
+    }
 
     if (navToggle) {
       navToggle.addEventListener("click", handleToggleClick);
@@ -60,6 +109,13 @@ export default function TocObserver() {
       }
       for (const a of links) {
         a.removeEventListener("click", handleLinkClick);
+      }
+      if (mediaQuery) {
+        if (mediaQuery.removeEventListener) {
+          mediaQuery.removeEventListener("change", handleMediaChange);
+        } else {
+          mediaQuery.removeListener(handleMediaChange);
+        }
       }
     };
   }, []);
