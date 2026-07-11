@@ -782,7 +782,7 @@ flowchart TD
 - 【2026年最新比較】AITuber制作に最適な音声合成エンジン11選: https://note.com/aituberonair/n/n096cd23ce3ea
 - Best TTS Model 2026: Top 9 AI Voice Generators Ranked: https://www.befreed.ai/blog/best-tts-model-2026
 - 日本語TTSモデル徹底比較2026（Qiita）: https://qiita.com/0h-n0/items/8f78f7acd31000612d13
-- おすすめの音声生成AIツール10選: http://walker-s.co.jp/ai/voice-generation-tool/
+- おすすめの音声生成AIツール10選: https://walker-s.co.jp/ai/voice-generation-tool/
 - TTS Showdown 2026: ElevenLabs vs. Cartesia vs. OpenAI vs. Sesame: https://www.callmissed.com/en/blog/tts-showdown-2026-elevenlabs-vs-cartesia-vs-openai-vs-sesame-the-ultimate-compar
 - ElevenLabs vs OpenAI Voice vs Google TTS: https://www.solounicorn.club/blog/a-33
 - ElevenLabs/HeyGen/Synthesia比較とビジネス活用10選: https://renue.co.jp/posts/ai-voice-generation-elevenlabs-heygen-synthesia-2026-guide
