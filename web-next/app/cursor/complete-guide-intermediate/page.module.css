@@ -359,8 +359,9 @@
   min-width: 480px;
   margin: 0;
 }
-.chapter thead th {
-  text-align: left !important;
+.chapter thead th,
+.chapter thead th:not(:first-child) {
+  text-align: left;
   background: var(--surface-2);
   color: var(--text);
   font-family: "Space Grotesk", sans-serif;
@@ -369,12 +370,13 @@
   border-bottom: 1px solid var(--border-strong);
   white-space: nowrap;
 }
-.chapter tbody td {
+.chapter tbody td,
+.chapter tbody td:not(:first-child) {
   padding: 10px 14px;
   border-bottom: 1px solid var(--border);
   color: var(--text-dim);
   vertical-align: top;
-  text-align: left !important;
+  text-align: left;
   font-family: inherit;
 }
 .chapter tbody tr:last-child td {
