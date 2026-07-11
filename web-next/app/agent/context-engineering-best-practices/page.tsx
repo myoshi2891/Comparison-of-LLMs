@@ -14,17 +14,13 @@ const DIAGRAMS = {
   relation:
     "flowchart LR\n    A[プロンプトエンジニアリング 指示文の設計] --> B[コンテキストエンジニアリング 情報環境全体の設計]\n    B --> C[システムプロンプト]\n    B --> D[ツール定義]\n    B --> E[会話履歴]\n    B --> F[検索された外部知識]\n    B --> G[長期メモリ]",
 
-  rot:
-    "flowchart LR\n    A[短いコンテキスト 高い精度] --> B[中程度のコンテキスト やや精度が低下]\n    B --> C[長いコンテキスト コンテキストロットが顕在化]\n    C --> D[非常に長いコンテキスト 予測が不安定になる]",
+  rot: "flowchart LR\n    A[短いコンテキスト 高い精度] --> B[中程度のコンテキスト やや精度が低下]\n    B --> C[長いコンテキスト コンテキストロットが顕在化]\n    C --> D[非常に長いコンテキスト 予測が不安定になる]",
 
-  loop:
-    "flowchart TD\n    Sys[システムプロンプト] --> Context[コンテキストウィンドウ]\n    Tools[ツール定義] --> Context\n    Mem[メモリファイル] --> Context\n    User[ユーザーの入力] --> Context\n    Context --> LLM[LLMによる推論]\n    LLM --> Action[ツール呼び出しを実行]\n    Action --> Result[ツールの実行結果]\n    Result --> Context\n    LLM --> Output[エージェントの応答を出力]",
+  loop: "flowchart TD\n    Sys[システムプロンプト] --> Context[コンテキストウィンドウ]\n    Tools[ツール定義] --> Context\n    Mem[メモリファイル] --> Context\n    User[ユーザーの入力] --> Context\n    Context --> LLM[LLMによる推論]\n    LLM --> Action[ツール呼び出しを実行]\n    Action --> Result[ツールの実行結果]\n    Result --> Context\n    LLM --> Output[エージェントの応答を出力]",
 
-  jit:
-    "flowchart TD\n    Q1{データは高頻度で更新されるか}\n    Q1 -->|更新は少なく安定的| Pre[事前取得を選ぶ 埋め込み検索であらかじめ読み込む]\n    Q1 -->|更新が多く流動的| JIT[ジャストインタイム取得を選ぶ ファイルパスやクエリを都度実行する]\n    Pre --> Hybrid[多くの現場ではハイブリッド戦略が最適]\n    JIT --> Hybrid",
+  jit: "flowchart TD\n    Q1{データは高頻度で更新されるか}\n    Q1 -->|更新は少なく安定的| Pre[事前取得を選ぶ 埋め込み検索であらかじめ読み込む]\n    Q1 -->|更新が多く流動的| JIT[ジャストインタイム取得を選ぶ ファイルパスやクエリを都度実行する]\n    Pre --> Hybrid[多くの現場ではハイブリッド戦略が最適]\n    JIT --> Hybrid",
 
-  wsci:
-    "flowchart TB\n    Core[有限のコンテキストウィンドウ]\n    Core --> Write[Write コンテキストウィンドウの外に書き出す]\n    Core --> Select[Select 必要な情報だけを取り込む]\n    Core --> Compress[Compress 要約して圧縮する]\n    Core --> Isolate[Isolate サブエージェントへ分離する]",
+  wsci: "flowchart TB\n    Core[有限のコンテキストウィンドウ]\n    Core --> Write[Write コンテキストウィンドウの外に書き出す]\n    Core --> Select[Select 必要な情報だけを取り込む]\n    Core --> Compress[Compress 要約して圧縮する]\n    Core --> Isolate[Isolate サブエージェントへ分離する]",
 
   compaction:
     "sequenceDiagram\n    participant U as ユーザー\n    participant A as エージェント\n    participant C as コンテキストウィンドウ\n    U->>A: 長時間タスクを依頼する\n    loop 会話が続く限り\n        A->>C: メッセージやツール結果を追加する\n    end\n    C-->>A: トークン上限に近づいたことを検知する\n    A->>A: これまでの内容を要約する\n    A->>C: 要約と直近の重要情報だけを残す\n    A->>U: 作業を継続する",
@@ -90,9 +86,7 @@ export default function Page() {
             {" AI engineering guide"}
           </div>
           <h1>コンテキストエンジニアリング入門</h1>
-          <p className={styles.docLead}>
-            AIエージェントのためのステップバイステップ実践ガイド
-          </p>
+          <p className={styles.docLead}>AIエージェントのためのステップバイステップ実践ガイド</p>
         </header>
 
         <section>
@@ -163,9 +157,7 @@ export default function Page() {
                 <tr>
                   <td>代表的な提唱者</td>
                   <td>各種プロンプトガイド</td>
-                  <td>
-                    Anthropic、LangChain、Cognition AI、Drew Breunig氏など
-                  </td>
+                  <td>Anthropic、LangChain、Cognition AI、Drew Breunig氏など</td>
                 </tr>
               </tbody>
             </table>
@@ -173,11 +165,7 @@ export default function Page() {
 
           <div className={styles.diagramContainer}>
             <div className={styles.diagramTitle}>
-              <i
-                className="ti ti-git-branch"
-                role="img"
-                aria-label="git-branch"
-              ></i>
+              <i className="ti ti-git-branch" role="img" aria-label="git-branch"></i>
               {"図1: プロンプトエンジニアリングとコンテキストエンジニアリングの関係"}
             </div>
             <div className={styles.mermaidDiagram}>
@@ -243,11 +231,7 @@ export default function Page() {
         {/* ============ 2. なぜ重要なのか ============ */}
         <section id="ch2">
           <h2>
-            <i
-              className="ti ti-trending-down"
-              role="img"
-              aria-label="trending-down"
-            ></i>
+            <i className="ti ti-trending-down" role="img" aria-label="trending-down"></i>
             {"2. なぜ重要なのか: コンテキストロットという現象"}
           </h2>
 
@@ -331,7 +315,9 @@ export default function Page() {
             </div>
             <ul>
               <li>
-                {"Chroma Research「Context Rot: How Increasing Input Tokens Impacts LLM Performance」 "}
+                {
+                  "Chroma Research「Context Rot: How Increasing Input Tokens Impacts LLM Performance」 "
+                }
                 <a
                   href="https://research.trychroma.com/context-rot"
                   target="_blank"
@@ -481,11 +467,15 @@ export default function Page() {
             </li>
             <li>
               <i className="ti ti-circle-check" role="img" aria-label="check"></i>
-              {"background_information、instructions、Tool guidance、Output descriptionのようにセクションごとに整理し、タグや見出しで区切る"}
+              {
+                "background_information、instructions、Tool guidance、Output descriptionのようにセクションごとに整理し、タグや見出しで区切る"
+              }
             </li>
             <li>
               <i className="ti ti-circle-check" role="img" aria-label="check"></i>
-              {"まずは最良のモデルを使い、最小限のプロンプトでテストし、失敗パターンを見ながら指示や例を追加していく"}
+              {
+                "まずは最良のモデルを使い、最小限のプロンプトでテストし、失敗パターンを見ながら指示や例を追加していく"
+              }
             </li>
           </ul>
 
@@ -547,38 +537,38 @@ export default function Page() {
               </div>
               <div className={styles.codeLine}>
                 <span>{"  "}</span>
-                <span className={styles.cs}>{"\"name\""}</span>
+                <span className={styles.cs}>{'"name"'}</span>
                 <span>{": "}</span>
-                <span className={styles.cv}>{"\"search_contacts\""}</span>
+                <span className={styles.cv}>{'"search_contacts"'}</span>
                 <span>{","}</span>
               </div>
               <div className={styles.codeLine}>
                 <span>{"  "}</span>
-                <span className={styles.cs}>{"\"description\""}</span>
+                <span className={styles.cs}>{'"description"'}</span>
                 <span>{": "}</span>
                 <span className={styles.cv}>
-                  {"\"名前や会社名で連絡先を検索する。結果は関連度順に返す。\""}
+                  {'"名前や会社名で連絡先を検索する。結果は関連度順に返す。"'}
                 </span>
                 <span>{","}</span>
               </div>
               <div className={styles.codeLine}>
                 <span>{"  "}</span>
-                <span className={styles.cs}>{"\"parameters\""}</span>
+                <span className={styles.cs}>{'"parameters"'}</span>
                 <span>{": "}</span>
                 <span className={styles.ck}>{"{"}</span>
               </div>
               <div className={styles.codeLine}>
                 <span>{"    "}</span>
-                <span className={styles.cs}>{"\"query\""}</span>
+                <span className={styles.cs}>{'"query"'}</span>
                 <span>{": "}</span>
-                <span className={styles.cv}>{"\"検索キーワード\""}</span>
+                <span className={styles.cv}>{'"検索キーワード"'}</span>
                 <span>{","}</span>
               </div>
               <div className={styles.codeLine}>
                 <span>{"    "}</span>
-                <span className={styles.cs}>{"\"response_format\""}</span>
+                <span className={styles.cs}>{'"response_format"'}</span>
                 <span>{": "}</span>
-                <span className={styles.cv}>{"\"concise または detailed\""}</span>
+                <span className={styles.cv}>{'"concise または detailed"'}</span>
               </div>
               <div className={styles.codeLine}>
                 <span>{"  "}</span>
@@ -624,11 +614,7 @@ export default function Page() {
 
           <div className={styles.diagramContainer}>
             <div className={styles.diagramTitle}>
-              <i
-                className="ti ti-git-branch"
-                role="img"
-                aria-label="git-branch"
-              ></i>
+              <i className="ti ti-git-branch" role="img" aria-label="git-branch"></i>
               {"図4: 検索戦略の意思決定フロー"}
             </div>
             <div className={styles.mermaidDiagram}>
@@ -680,9 +666,7 @@ export default function Page() {
                 <tr>
                   <td>Select</td>
                   <td>必要な情報だけをコンテキストに取り込む</td>
-                  <td>
-                    類似度検索、埋め込みベースの検索、ツールのフィルタリング
-                  </td>
+                  <td>類似度検索、埋め込みベースの検索、ツールのフィルタリング</td>
                 </tr>
                 <tr>
                   <td>Compress</td>
@@ -699,7 +683,8 @@ export default function Page() {
           </div>
 
           <p>
-            Anthropicは特に, 長時間タスクのために有効な3つの技法として、コンパクション、構造化されたノートテイキング、サブエージェントアーキテクチャを挙げています。
+            Anthropicは特に,
+            長時間タスクのために有効な3つの技法として、コンパクション、構造化されたノートテイキング、サブエージェントアーキテクチャを挙げています。
           </p>
 
           <h3>5-1 コンパクション</h3>
@@ -710,11 +695,7 @@ export default function Page() {
 
           <div className={styles.diagramContainer}>
             <div className={styles.diagramTitle}>
-              <i
-                className="ti ti-arrows-shuffle"
-                role="img"
-                aria-label="arrows-shuffle"
-              ></i>
+              <i className="ti ti-arrows-shuffle" role="img" aria-label="arrows-shuffle"></i>
               {"図6: コンパクションのプロセス"}
             </div>
             <div className={styles.mermaidDiagram}>
@@ -803,15 +784,12 @@ export default function Page() {
                 <tr>
                   <td>主張</td>
                   <td>並列サブエージェントはコンテキストが分断され、壊れやすい</td>
-                  <td>
-                    隔離されたコンテキストによって並列探索が可能になり、性能が向上する
-                  </td>
+                  <td>隔離されたコンテキストによって並列探索が可能になり、性能が向上する</td>
                 </tr>
                 <tr>
                   <td>象徴的な例</td>
                   <td>
-                    Flappy
-                    Birdのクローン作成でサブエージェント同士のビジュアルスタイルが食い違う例
+                    Flappy Birdのクローン作成でサブエージェント同士のビジュアルスタイルが食い違う例
                   </td>
                   <td>調査タスクでBrowseCompの性能が大幅に向上した例</td>
                 </tr>
@@ -855,7 +833,9 @@ export default function Page() {
             </li>
             <li>
               <i className="ti ti-circle-check" role="img" aria-label="check"></i>
-              {"実際のデータソースやサービスに基づいた、複数ツール呼び出しを要するような現実的な評価タスクを多数用意する"}
+              {
+                "実際のデータソースやサービスに基づいた、複数ツール呼び出しを要するような現実的な評価タスクを多数用意する"
+              }
             </li>
             <li>
               <i className="ti ti-circle-check" role="img" aria-label="check"></i>
@@ -863,11 +843,15 @@ export default function Page() {
             </li>
             <li>
               <i className="ti ti-circle-check" role="img" aria-label="check"></i>
-              {"シンプルなエージェントループでプログラム的に評価を実行し、精度だけでなく、ツール呼び出し回数やトークン消費量、エラー発生状況も計測する"}
+              {
+                "シンプルなエージェントループでプログラム的に評価を実行し、精度だけでなく、ツール呼び出し回数やトークン消費量、エラー発生状況も計測する"
+              }
             </li>
             <li>
               <i className="ti ti-circle-check" role="img" aria-label="check"></i>
-              {"エージェント自身にトランスクリプトを分析させ、ツールの説明文やスキーマの改善案を出してもらう"}
+              {
+                "エージェント自身にトランスクリプトを分析させ、ツールの説明文やスキーマの改善案を出してもらう"
+              }
             </li>
           </ul>
           <p>
@@ -1010,9 +994,7 @@ export default function Page() {
                   <td>
                     ハルシネーションやエラーがコンテキストに入り込み、以降くり返し参照されてしまう
                   </td>
-                  <td>
-                    目標が誤って記録されると、達成不可能な目標のために不合理な戦略を繰り返す
-                  </td>
+                  <td>目標が誤って記録されると、達成不可能な目標のために不合理な戦略を繰り返す</td>
                 </tr>
                 <tr>
                   <td>コンテキスト散漫</td>
@@ -1025,18 +1007,12 @@ export default function Page() {
                 </tr>
                 <tr>
                   <td>コンテキスト混乱</td>
-                  <td>
-                    コンテキスト中の余計な情報が、低品質な応答の生成に使われてしまう
-                  </td>
-                  <td>
-                    ツールを30個以上並べると説明文同士が重なり合い、選択精度が大きく落ちる
-                  </td>
+                  <td>コンテキスト中の余計な情報が、低品質な応答の生成に使われてしまう</td>
+                  <td>ツールを30個以上並べると説明文同士が重なり合い、選択精度が大きく落ちる</td>
                 </tr>
                 <tr>
                   <td>コンテキスト衝突</td>
-                  <td>
-                    新たに蓄積された情報やツールが、プロンプト中の他の情報と矛盾してしまう
-                  </td>
+                  <td>新たに蓄積された情報やツールが、プロンプト中の他の情報と矛盾してしまう</td>
                   <td>
                     自分で作っていないMCPツールを組み込んだ際に、説明文がプロンプトの他の指示と食い違う
                   </td>
@@ -1057,9 +1033,7 @@ export default function Page() {
               <tbody>
                 <tr>
                   <td>RAG</td>
-                  <td>
-                    関連する情報だけを選んでコンテキストに追加し、より良い応答を助ける
-                  </td>
+                  <td>関連する情報だけを選んでコンテキストに追加し、より良い応答を助ける</td>
                 </tr>
                 <tr>
                   <td>Tool Loadout</td>
@@ -1146,11 +1120,15 @@ export default function Page() {
           <ul className={styles.checklist}>
             <li>
               <i className="ti ti-circle-check" role="img" aria-label="check"></i>
-              {"システムプロンプトの高度: 壊れやすいほど具体的すぎず、曖昧すぎて信号を与えられないほど抽象的でもないか"}
+              {
+                "システムプロンプトの高度: 壊れやすいほど具体的すぎず、曖昧すぎて信号を与えられないほど抽象的でもないか"
+              }
             </li>
             <li>
               <i className="ti ti-circle-check" role="img" aria-label="check"></i>
-              {"ツールの数と機能範囲: 人間のエンジニアが「どのツールを使うべきか」を即答できる程度に整理されているか"}
+              {
+                "ツールの数と機能範囲: 人間のエンジニアが「どのツールを使うべきか」を即答できる程度に整理されているか"
+              }
             </li>
             <li>
               <i className="ti ti-circle-check" role="img" aria-label="check"></i>
@@ -1158,7 +1136,9 @@ export default function Page() {
             </li>
             <li>
               <i className="ti ti-circle-check" role="img" aria-label="check"></i>
-              {"ツールのレスポンス: 低レベルなIDではなく、意味のある自然言語の情報を優先して返しているか"}
+              {
+                "ツールのレスポンス: 低レベルなIDではなく、意味のある自然言語の情報を優先して返しているか"
+              }
             </li>
             <li>
               <i className="ti ti-circle-check" role="img" aria-label="check"></i>
@@ -1170,11 +1150,15 @@ export default function Page() {
             </li>
             <li>
               <i className="ti ti-circle-check" role="img" aria-label="check"></i>
-              {"検索戦略: データの更新頻度に応じて、事前取得、ジャストインタイム、ハイブリッドを使い分けているか"}
+              {
+                "検索戦略: データの更新頻度に応じて、事前取得、ジャストインタイム、ハイブリッドを使い分けているか"
+              }
             </li>
             <li>
               <i className="ti ti-circle-check" role="img" aria-label="check"></i>
-              {"長時間タスクへの備え: コンパクション、構造化ノートテイキング、サブエージェントのいずれかを用意しているか"}
+              {
+                "長時間タスクへの備え: コンパクション、構造化ノートテイキング、サブエージェントのいずれかを用意しているか"
+              }
             </li>
             <li>
               <i className="ti ti-circle-check" role="img" aria-label="check"></i>
@@ -1214,30 +1198,22 @@ export default function Page() {
                 </tr>
                 <tr>
                   <td>Claudeのコンテキスト編集機能</td>
-                  <td>
-                    古くなったツール呼び出しや結果を自動でコンテキストから取り除く
-                  </td>
+                  <td>古くなったツール呼び出しや結果を自動でコンテキストから取り除く</td>
                   <td>Compress</td>
                 </tr>
                 <tr>
                   <td>Model Context Protocol</td>
-                  <td>
-                    エージェントに外部ツールやデータソースを接続するための標準規格
-                  </td>
+                  <td>エージェントに外部ツールやデータソースを接続するための標準規格</td>
                   <td>Select</td>
                 </tr>
                 <tr>
                   <td>LangGraph</td>
-                  <td>
-                    状態グラフによってエージェントのメモリや分岐を管理するフレームワーク
-                  </td>
+                  <td>状態グラフによってエージェントのメモリや分岐を管理するフレームワーク</td>
                   <td>Write、Select、Compress、Isolateの全体</td>
                 </tr>
                 <tr>
                   <td>LangGraph Supervisor</td>
-                  <td>
-                    サブエージェントに処理を委任し、隔離されたコンテキストで並列実行する
-                  </td>
+                  <td>サブエージェントに処理を委任し、隔離されたコンテキストで並列実行する</td>
                   <td>Isolate</td>
                 </tr>
                 <tr>
@@ -1313,7 +1289,8 @@ export default function Page() {
           </h2>
           <div className={styles.summaryCard}>
             <p>
-              コンテキストエンジニアリングとは、LLMの限られた「注意の予算」の中に, 望ましい挙動を引き出すために必要な、最小限かつ高シグナルな情報だけを継続的にキュレーションし続ける技術です。プロンプトエンジニアリングが一度きりの指示文設計であるのに対し、コンテキストエンジニアリングはエージェントが動き続ける限り繰り返される作業であるという点が、最大の違いです。
+              コンテキストエンジニアリングとは、LLMの限られた「注意の予算」の中に,
+              望ましい挙動を引き出すために必要な、最小限かつ高シグナルな情報だけを継続的にキュレーションし続ける技術です。プロンプトエンジニアリングが一度きりの指示文設計であるのに対し、コンテキストエンジニアリングはエージェントが動き続ける限り繰り返される作業であるという点が、最大の違いです。
             </p>
             <p>
               コンテキストウィンドウが大きければ大きいほど良いという単純な話ではなく、Chromaの研究が示すように、すべての最先端モデルは入力トークン数が増えるにつれて性能が劣化します。この現実を踏まえ、システムプロンプトの高度を調整すること、ツールを絞り込み設計すること、検索戦略を状況に応じて選ぶこと、そして長時間タスクにはコンパクション、構造化ノートテイキング、サブエージェントアーキテクチャを組み合わせることが、実践的なベストプラクティスとして確立されつつあります。
@@ -1434,9 +1411,7 @@ export default function Page() {
                 <tr>
                   <td>7</td>
                   <td>Chroma Research</td>
-                  <td>
-                    Context Rot: How Increasing Input Tokens Impacts LLM Performance
-                  </td>
+                  <td>Context Rot: How Increasing Input Tokens Impacts LLM Performance</td>
                   <td>2025年</td>
                   <td>
                     <a
