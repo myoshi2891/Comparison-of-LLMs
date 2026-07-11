@@ -64,14 +64,18 @@ The facts the executor needs, inlined — never "as discussed" or "see audit":
 
 ## Commands you will need
 
-| Purpose   | Command                  | Expected on success |
-|-----------|--------------------------|---------------------|
-| Install   | `pnpm install`           | exit 0              |
-| Typecheck | `pnpm typecheck`         | exit 0, no errors   |
-| Tests     | `pnpm test -- <filter>`  | all pass            |
-| Lint      | `pnpm lint`              | exit 0              |
+> [!NOTE]
+> This template and table are intended for Node.js-based projects. For other runtimes/languages, adjust the commands accordingly.
+> In this repository, `bun` is the primary package manager.
 
-(Exact commands from this repo — verified during recon, not guessed.)
+| Purpose   | Command                         | Expected on success |
+|-----------|---------------------------------|---------------------|
+| Install   | `<package-manager> install`     | exit 0              |
+| Typecheck | `<package-manager> run typecheck`| exit 0, no errors   |
+| Tests     | `<package-manager> run test`    | all pass            |
+| Lint      | `<package-manager> run lint`    | exit 0              |
+
+(Exact commands from the target repo — verified during recon, not guessed. For example, in this project: `bun install`, `bun run typecheck`, `bun run test`, `bun run lint`.)
 
 ## Suggested executor toolkit
 
