@@ -23,11 +23,23 @@ export default function TocObserver() {
     const sidebar = document.getElementById("sidebar");
 
     const handleToggleClick = () => {
-      if (sidebar) sidebar.classList.toggle(styles.sidebarOpen);
+      if (sidebar) {
+        const isOpen = sidebar.classList.toggle(styles.sidebarOpen);
+        if (navToggle) {
+          navToggle.setAttribute("aria-expanded", String(isOpen));
+          navToggle.setAttribute("aria-label", isOpen ? "目次を閉じる" : "目次を開く");
+        }
+      }
     };
 
     const handleLinkClick = () => {
-      if (sidebar) sidebar.classList.remove(styles.sidebarOpen);
+      if (sidebar) {
+        sidebar.classList.remove(styles.sidebarOpen);
+        if (navToggle) {
+          navToggle.setAttribute("aria-expanded", "false");
+          navToggle.setAttribute("aria-label", "目次を開く");
+        }
+      }
     };
 
     if (navToggle) {

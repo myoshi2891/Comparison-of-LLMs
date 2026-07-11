@@ -88,6 +88,8 @@ export default function AISecurityBestPracticesPage() {
         id="navToggle"
         className={styles.mobileNavToggle}
         aria-label="目次を開く"
+        aria-expanded={false}
+        aria-controls="sidebar"
       >
         <i className="ti ti-menu-2" />
       </button>
