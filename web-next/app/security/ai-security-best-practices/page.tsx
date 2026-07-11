@@ -1,12 +1,12 @@
-import type { Metadata } from 'next';
-import MermaidDiagram from '@/components/docs/MermaidDiagram';
-import styles from './page.module.css';
-import TocObserver from './TocObserver';
+import type { Metadata } from "next";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import styles from "./page.module.css";
+import TocObserver from "./TocObserver";
 
 export const metadata: Metadata = {
-  title: 'AIセキュリティ ベストプラクティスガイド | LLM-Studies',
+  title: "AIセキュリティ ベストプラクティスガイド | LLM-Studies",
   description:
-    '初学者のためのステップバイステップ解説。OWASP・MITRE ATLAS・NIST・Google SAIF・EU AI Actなど業界標準フレームワークに基づき、LLMアプリケーションとAIエージェントのセキュリティを体系的に解説します。',
+    "初学者のためのステップバイステップ解説。OWASP・MITRE ATLAS・NIST・Google SAIF・EU AI Actなど業界標準フレームワークに基づき、LLMアプリケーションとAIエージェントのセキュリティを体系的に解説します。",
 };
 
 const DIAGRAMS = {
@@ -83,7 +83,16 @@ export default function AISecurityBestPracticesPage() {
     <div className={styles.pageWrap}>
       <TocObserver />
 
-      <aside className={styles.sidebar}>
+      <button
+        type="button"
+        id="navToggle"
+        className={styles.mobileNavToggle}
+        aria-label="目次を開く"
+      >
+        <i className="ti ti-menu-2" />
+      </button>
+
+      <aside id="sidebar" className={styles.sidebar}>
         <p className={styles.sidebarTitle}>目次</p>
         <nav aria-label="ページ内目次">
           <ul>
@@ -198,8 +207,8 @@ export default function AISecurityBestPracticesPage() {
           <table>
             <thead>
               <tr>
-                <th style={{ textAlign: 'left' }}>従来のAppSec</th>
-                <th style={{ textAlign: 'left' }}>AIセキュリティ</th>
+                <th style={{ textAlign: "left" }}>従来のAppSec</th>
+                <th style={{ textAlign: "left" }}>AIセキュリティ</th>
               </tr>
             </thead>
             <tbody>
@@ -249,9 +258,9 @@ export default function AISecurityBestPracticesPage() {
           <table>
             <thead>
               <tr>
-                <th style={{ textAlign: 'left' }}>フレームワーク</th>
-                <th style={{ textAlign: 'left' }}>主な用途</th>
-                <th style={{ textAlign: 'left' }}>対象読者</th>
+                <th style={{ textAlign: "left" }}>フレームワーク</th>
+                <th style={{ textAlign: "left" }}>主な用途</th>
+                <th style={{ textAlign: "left" }}>対象読者</th>
               </tr>
             </thead>
             <tbody>
@@ -295,21 +304,21 @@ export default function AISecurityBestPracticesPage() {
             </p>
             <ul>
               <li>
-                OWASP GenAI Security Project:{' '}
+                OWASP GenAI Security Project:{" "}
                 <Ext href="https://genai.owasp.org/">https://genai.owasp.org/</Ext>
               </li>
               <li>
-                MITRE ATLAS 公式サイト:{' '}
+                MITRE ATLAS 公式サイト:{" "}
                 <Ext href="https://atlas.mitre.org/">https://atlas.mitre.org/</Ext>
               </li>
               <li>
-                NIST AI Risk Management Framework:{' '}
+                NIST AI Risk Management Framework:{" "}
                 <Ext href="https://www.nist.gov/itl/ai-risk-management-framework">
                   https://www.nist.gov/itl/ai-risk-management-framework
                 </Ext>
               </li>
               <li>
-                Google Secure AI Framework (SAIF):{' '}
+                Google Secure AI Framework (SAIF):{" "}
                 <Ext href="https://saif.google/">https://saif.google/</Ext>
               </li>
             </ul>
@@ -338,9 +347,9 @@ export default function AISecurityBestPracticesPage() {
           <table>
             <thead>
               <tr>
-                <th style={{ textAlign: 'left' }}>フェーズ</th>
-                <th style={{ textAlign: 'left' }}>戦術</th>
-                <th style={{ textAlign: 'left' }}>内容</th>
+                <th style={{ textAlign: "left" }}>フェーズ</th>
+                <th style={{ textAlign: "left" }}>戦術</th>
+                <th style={{ textAlign: "left" }}>内容</th>
               </tr>
             </thead>
             <tbody>
@@ -440,29 +449,29 @@ export default function AISecurityBestPracticesPage() {
             </p>
             <ul>
               <li>
-                MITRE ATLAS 公式サイト:{' '}
+                MITRE ATLAS 公式サイト:{" "}
                 <Ext href="https://atlas.mitre.org/">https://atlas.mitre.org/</Ext>
               </li>
               <li>
-                MITRE ATLASの成長に関するCTIDブログ(2026年5月):{' '}
+                MITRE ATLASの成長に関するCTIDブログ(2026年5月):{" "}
                 <Ext href="https://ctid.mitre.org/blog/2026/05/06/secure-ai-v2-release/">
                   https://ctid.mitre.org/blog/2026/05/06/secure-ai-v2-release/
                 </Ext>
               </li>
               <li>
-                MITRE ATLASの戦術リスト解説:{' '}
+                MITRE ATLASの戦術リスト解説:{" "}
                 <Ext href="https://versa-networks.com/blog/mitre-attck-vs-atlas-ai-threat-frameworks/">
                   https://versa-networks.com/blog/mitre-attck-vs-atlas-ai-threat-frameworks/
                 </Ext>
               </li>
               <li>
-                MITRE ATLAS統計データ(16戦術・84技術):{' '}
+                MITRE ATLAS統計データ(16戦術・84技術):{" "}
                 <Ext href="https://www.vectra.ai/topics/mitre-atlas">
                   https://www.vectra.ai/topics/mitre-atlas
                 </Ext>
               </li>
               <li>
-                MITRE ATT&CKとATLASの違い(CrowdStrike):{' '}
+                MITRE ATT&CKとATLASの違い(CrowdStrike):{" "}
                 <Ext href="https://www.crowdstrike.com/en-us/cybersecurity-101/artificial-intelligence/mitre-atlas/">
                   https://www.crowdstrike.com/en-us/cybersecurity-101/artificial-intelligence/mitre-atlas/
                 </Ext>
@@ -491,10 +500,10 @@ export default function AISecurityBestPracticesPage() {
           <table>
             <thead>
               <tr>
-                <th style={{ textAlign: 'left' }}>コード</th>
-                <th style={{ textAlign: 'left' }}>リスク名</th>
-                <th style={{ textAlign: 'left' }}>概要</th>
-                <th style={{ textAlign: 'left' }}>主な緩和策</th>
+                <th style={{ textAlign: "left" }}>コード</th>
+                <th style={{ textAlign: "left" }}>リスク名</th>
+                <th style={{ textAlign: "left" }}>概要</th>
+                <th style={{ textAlign: "left" }}>主な緩和策</th>
               </tr>
             </thead>
             <tbody>
@@ -580,31 +589,31 @@ export default function AISecurityBestPracticesPage() {
             </p>
             <ul>
               <li>
-                OWASP Top 10 for LLM Applications 2025(公式):{' '}
+                OWASP Top 10 for LLM Applications 2025(公式):{" "}
                 <Ext href="https://genai.owasp.org/llm-top-10/">
                   https://genai.owasp.org/llm-top-10/
                 </Ext>
               </li>
               <li>
-                OWASP Top 10 for LLM Applications 2025 PDF:{' '}
+                OWASP Top 10 for LLM Applications 2025 PDF:{" "}
                 <Ext href="https://owasp.org/www-project-top-10-for-large-language-model-applications/assets/PDF/OWASP-Top-10-for-LLMs-v2025.pdf">
                   https://owasp.org/www-project-top-10-for-large-language-model-applications/assets/PDF/OWASP-Top-10-for-LLMs-v2025.pdf
                 </Ext>
               </li>
               <li>
-                OWASPプロジェクトページ:{' '}
+                OWASPプロジェクトページ:{" "}
                 <Ext href="https://owasp.org/www-project-top-10-for-large-language-model-applications/">
                   https://owasp.org/www-project-top-10-for-large-language-model-applications/
                 </Ext>
               </li>
               <li>
-                OWASP Top 10 for LLM 2025 解説記事(Aembit):{' '}
+                OWASP Top 10 for LLM 2025 解説記事(Aembit):{" "}
                 <Ext href="https://aembit.io/blog/owasp-top-10-llm-risks-explained/">
                   https://aembit.io/blog/owasp-top-10-llm-risks-explained/
                 </Ext>
               </li>
               <li>
-                OWASP Top 10 for LLM 2025 実務ガイド(Gravitee):{' '}
+                OWASP Top 10 for LLM 2025 実務ガイド(Gravitee):{" "}
                 <Ext href="https://www.gravitee.io/blog/owasp-top-10-for-llm-applications-2025-a-practical-guide">
                   https://www.gravitee.io/blog/owasp-top-10-for-llm-applications-2025-a-practical-guide
                 </Ext>
@@ -647,10 +656,10 @@ export default function AISecurityBestPracticesPage() {
           <table>
             <thead>
               <tr>
-                <th style={{ textAlign: 'left' }}>コード</th>
-                <th style={{ textAlign: 'left' }}>リスク名</th>
-                <th style={{ textAlign: 'left' }}>概要</th>
-                <th style={{ textAlign: 'left' }}>主な緩和策</th>
+                <th style={{ textAlign: "left" }}>コード</th>
+                <th style={{ textAlign: "left" }}>リスク名</th>
+                <th style={{ textAlign: "left" }}>概要</th>
+                <th style={{ textAlign: "left" }}>主な緩和策</th>
               </tr>
             </thead>
             <tbody>
@@ -744,9 +753,9 @@ export default function AISecurityBestPracticesPage() {
           <table>
             <thead>
               <tr>
-                <th style={{ textAlign: 'left' }}>順序</th>
-                <th style={{ textAlign: 'left' }}>アクション</th>
-                <th style={{ textAlign: 'left' }}>対応するリスク</th>
+                <th style={{ textAlign: "left" }}>順序</th>
+                <th style={{ textAlign: "left" }}>アクション</th>
+                <th style={{ textAlign: "left" }}>対応するリスク</th>
               </tr>
             </thead>
             <tbody>
@@ -785,37 +794,37 @@ export default function AISecurityBestPracticesPage() {
             </p>
             <ul>
               <li>
-                OWASP Top 10 for Agentic Applications 2026(公式リソース):{' '}
+                OWASP Top 10 for Agentic Applications 2026(公式リソース):{" "}
                 <Ext href="https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/">
                   https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/
                 </Ext>
               </li>
               <li>
-                OWASP Top 10 for Agentic Applications 2026 公式PDF:{' '}
+                OWASP Top 10 for Agentic Applications 2026 公式PDF:{" "}
                 <Ext href="https://genai.owasp.org/download/52117">
                   https://genai.owasp.org/download/52117
                 </Ext>
               </li>
               <li>
-                OWASP GenAI Security Project発表記事:{' '}
+                OWASP GenAI Security Project発表記事:{" "}
                 <Ext href="https://genai.owasp.org/2025/12/09/owasp-top-10-for-agentic-applications-the-benchmark-for-agentic-security-in-the-age-of-autonomous-ai/">
                   https://genai.owasp.org/2025/12/09/owasp-top-10-for-agentic-applications-the-benchmark-for-agentic-security-in-the-age-of-autonomous-ai/
                 </Ext>
               </li>
               <li>
-                ASI01-10の実務的な優先順位付け解説:{' '}
+                ASI01-10の実務的な優先順位付け解説:{" "}
                 <Ext href="https://arnav.au/2026/07/02/owasp-top-10-for-agentic-applications/">
                   https://arnav.au/2026/07/02/owasp-top-10-for-agentic-applications/
                 </Ext>
               </li>
               <li>
-                Auth0による解説記事(Least Agencyの概念):{' '}
+                Auth0による解説記事(Least Agencyの概念):{" "}
                 <Ext href="https://auth0.com/blog/owasp-top-10-agentic-applications-lessons/">
                   https://auth0.com/blog/owasp-top-10-agentic-applications-lessons/
                 </Ext>
               </li>
               <li>
-                Modulosガバナンスガイド:{' '}
+                Modulosガバナンスガイド:{" "}
                 <Ext href="https://docs.modulos.ai/frameworks/owasp-top-10-agentic/index">
                   https://docs.modulos.ai/frameworks/owasp-top-10-agentic/index
                 </Ext>
@@ -847,9 +856,9 @@ export default function AISecurityBestPracticesPage() {
           <table>
             <thead>
               <tr>
-                <th style={{ textAlign: 'left' }}>手法</th>
-                <th style={{ textAlign: 'left' }}>種類</th>
-                <th style={{ textAlign: 'left' }}>概要</th>
+                <th style={{ textAlign: "left" }}>手法</th>
+                <th style={{ textAlign: "left" }}>種類</th>
+                <th style={{ textAlign: "left" }}>概要</th>
               </tr>
             </thead>
             <tbody>
@@ -935,23 +944,23 @@ export default function AISecurityBestPracticesPage() {
             </p>
             <ul>
               <li>
-                間接的プロンプトインジェクション:攻撃と防御の2026年最新動向:{' '}
+                間接的プロンプトインジェクション:攻撃と防御の2026年最新動向:{" "}
                 <Ext href="https://zylos.ai/research/2026-04-12-indirect-prompt-injection-defenses-agents-untrusted-content/">
                   https://zylos.ai/research/2026-04-12-indirect-prompt-injection-defenses-agents-untrusted-content/
                 </Ext>
               </li>
               <li>
-                エージェント型コーディングアシスタントへのプロンプトインジェクション調査(arXiv):{' '}
+                エージェント型コーディングアシスタントへのプロンプトインジェクション調査(arXiv):{" "}
                 <Ext href="https://arxiv.org/html/2601.17548v1">
                   https://arxiv.org/html/2601.17548v1
                 </Ext>
               </li>
               <li>
-                Spotlighting等の防御手法の学術的整理(arXiv):{' '}
+                Spotlighting等の防御手法の学術的整理(arXiv):{" "}
                 <Ext href="https://arxiv.org/pdf/2512.00136">https://arxiv.org/pdf/2512.00136</Ext>
               </li>
               <li>
-                OWASP Foundationによるプロンプトインジェクション防御の推奨事項:{' '}
+                OWASP Foundationによるプロンプトインジェクション防御の推奨事項:{" "}
                 <Ext href="https://owasp.org/www-project-top-10-for-large-language-model-applications/assets/PDF/OWASP-Top-10-for-LLMs-v2025.pdf">
                   https://owasp.org/www-project-top-10-for-large-language-model-applications/assets/PDF/OWASP-Top-10-for-LLMs-v2025.pdf
                 </Ext>
@@ -981,8 +990,8 @@ export default function AISecurityBestPracticesPage() {
           <table>
             <thead>
               <tr>
-                <th style={{ textAlign: 'left' }}>領域</th>
-                <th style={{ textAlign: 'left' }}>具体的な統制</th>
+                <th style={{ textAlign: "left" }}>領域</th>
+                <th style={{ textAlign: "left" }}>具体的な統制</th>
               </tr>
             </thead>
             <tbody>
@@ -1030,23 +1039,23 @@ export default function AISecurityBestPracticesPage() {
             </p>
             <ul>
               <li>
-                Google Secure AI Framework 公式サイト:{' '}
+                Google Secure AI Framework 公式サイト:{" "}
                 <Ext href="https://saif.google/">https://saif.google/</Ext>
               </li>
               <li>
-                SAIF発表ブログ(Google公式):{' '}
+                SAIF発表ブログ(Google公式):{" "}
                 <Ext href="https://blog.google/innovation-and-ai/technology/safety-security/introducing-googles-secure-ai-framework/">
                   https://blog.google/innovation-and-ai/technology/safety-security/introducing-googles-secure-ai-framework/
                 </Ext>
               </li>
               <li>
-                Google Safety Centre によるSAIF解説:{' '}
+                Google Safety Centre によるSAIF解説:{" "}
                 <Ext href="https://safety.google/intl/en_in/safety/saif/">
                   https://safety.google/intl/en_in/safety/saif/
                 </Ext>
               </li>
               <li>
-                Google CloudにおけるSAIFの実装ガイド:{' '}
+                Google CloudにおけるSAIFの実装ガイド:{" "}
                 <Ext href="https://cloud.google.com/use-cases/secure-ai-framework">
                   https://cloud.google.com/use-cases/secure-ai-framework
                 </Ext>
@@ -1082,9 +1091,9 @@ export default function AISecurityBestPracticesPage() {
           <table>
             <thead>
               <tr>
-                <th style={{ textAlign: 'left' }}>#</th>
-                <th style={{ textAlign: 'left' }}>リスクカテゴリ</th>
-                <th style={{ textAlign: 'left' }}>概要</th>
+                <th style={{ textAlign: "left" }}>#</th>
+                <th style={{ textAlign: "left" }}>リスクカテゴリ</th>
+                <th style={{ textAlign: "left" }}>概要</th>
               </tr>
             </thead>
             <tbody>
@@ -1162,8 +1171,8 @@ export default function AISecurityBestPracticesPage() {
           <table>
             <thead>
               <tr>
-                <th style={{ textAlign: 'left' }}>機能</th>
-                <th style={{ textAlign: 'left' }}>具体的なアクション例</th>
+                <th style={{ textAlign: "left" }}>機能</th>
+                <th style={{ textAlign: "left" }}>具体的なアクション例</th>
               </tr>
             </thead>
             <tbody>
@@ -1201,31 +1210,31 @@ export default function AISecurityBestPracticesPage() {
             </p>
             <ul>
               <li>
-                NIST AI Risk Management Framework 公式:{' '}
+                NIST AI Risk Management Framework 公式:{" "}
                 <Ext href="https://www.nist.gov/itl/ai-risk-management-framework">
                   https://www.nist.gov/itl/ai-risk-management-framework
                 </Ext>
               </li>
               <li>
-                NIST AI 600-1(Generative AI Profile)公式ページ:{' '}
+                NIST AI 600-1(Generative AI Profile)公式ページ:{" "}
                 <Ext href="https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence">
                   https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence
                 </Ext>
               </li>
               <li>
-                NIST AI 600-1 本文PDF:{' '}
+                NIST AI 600-1 本文PDF:{" "}
                 <Ext href="https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf">
                   https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf
                 </Ext>
               </li>
               <li>
-                NIST AI RMFのエージェント拡張に関する提案:{' '}
+                NIST AI RMFのエージェント拡張に関する提案:{" "}
                 <Ext href="https://labs.cloudsecurityalliance.org/agentic/agentic-nist-ai-rmf-profile-v1/">
                   https://labs.cloudsecurityalliance.org/agentic/agentic-nist-ai-rmf-profile-v1/
                 </Ext>
               </li>
               <li>
-                NIST AI 600-1の12カテゴリ解説:{' '}
+                NIST AI 600-1の12カテゴリ解説:{" "}
                 <Ext href="https://docs.modulos.ai/frameworks/nist-ai-rmf/generative-ai-profile">
                   https://docs.modulos.ai/frameworks/nist-ai-rmf/generative-ai-profile
                 </Ext>
@@ -1252,8 +1261,8 @@ export default function AISecurityBestPracticesPage() {
           <table>
             <thead>
               <tr>
-                <th style={{ textAlign: 'left' }}>時期</th>
-                <th style={{ textAlign: 'left' }}>内容</th>
+                <th style={{ textAlign: "left" }}>時期</th>
+                <th style={{ textAlign: "left" }}>内容</th>
               </tr>
             </thead>
             <tbody>
@@ -1346,37 +1355,37 @@ export default function AISecurityBestPracticesPage() {
             </p>
             <ul>
               <li>
-                EU AI Actオムニバス合意の解説(Gibson Dunn):{' '}
+                EU AI Actオムニバス合意の解説(Gibson Dunn):{" "}
                 <Ext href="https://www.gibsondunn.com/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes/">
                   https://www.gibsondunn.com/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes/
                 </Ext>
               </li>
               <li>
-                EU理事会 プレスリリース(2026年5月7日):{' '}
+                EU理事会 プレスリリース(2026年5月7日):{" "}
                 <Ext href="https://www.consilium.europa.eu/en/press/press-releases/2026/05/07/artificial-intelligence-council-and-parliament-agree-to-simplify-and-streamline-rules/">
                   https://www.consilium.europa.eu/en/press/press-releases/2026/05/07/artificial-intelligence-council-and-parliament-agree-to-simplify-and-streamline-rules/
                 </Ext>
               </li>
               <li>
-                White & Case による解説:{' '}
+                White & Case による解説:{" "}
                 <Ext href="https://www.whitecase.com/insight-alert/eu-agrees-digital-omnibus-deal-simplify-ai-rules">
                   https://www.whitecase.com/insight-alert/eu-agrees-digital-omnibus-deal-simplify-ai-rules
                 </Ext>
               </li>
               <li>
-                EU AI Actの現状まとめ(Travers Smith):{' '}
+                EU AI Actの現状まとめ(Travers Smith):{" "}
                 <Ext href="https://www.traverssmith.com/knowledge/knowledge-container/the-eu-ai-act-the-current-state-of-play/">
                   https://www.traverssmith.com/knowledge/knowledge-container/the-eu-ai-act-the-current-state-of-play/
                 </Ext>
               </li>
               <li>
-                ISO/IEC 42001 公式ページ:{' '}
+                ISO/IEC 42001 公式ページ:{" "}
                 <Ext href="https://www.iso.org/standard/42001">
                   https://www.iso.org/standard/42001
                 </Ext>
               </li>
               <li>
-                ISO/IEC 42001 概要(ISO公式):{' '}
+                ISO/IEC 42001 概要(ISO公式):{" "}
                 <Ext href="https://www.iso.org/artificial-intelligence/ai-management-systems">
                   https://www.iso.org/artificial-intelligence/ai-management-systems
                 </Ext>
@@ -1429,8 +1438,8 @@ export default function AISecurityBestPracticesPage() {
           <table>
             <thead>
               <tr>
-                <th style={{ textAlign: 'left' }}>シグナル</th>
-                <th style={{ textAlign: 'left' }}>検知したい事象</th>
+                <th style={{ textAlign: "left" }}>シグナル</th>
+                <th style={{ textAlign: "left" }}>検知したい事象</th>
               </tr>
             </thead>
             <tbody>
@@ -1464,17 +1473,17 @@ export default function AISecurityBestPracticesPage() {
             </p>
             <ul>
               <li>
-                適応的攻撃に対する防御成功率に関する研究(arXiv):{' '}
+                適応的攻撃に対する防御成功率に関する研究(arXiv):{" "}
                 <Ext href="https://arxiv.org/html/2601.17548v1">
                   https://arxiv.org/html/2601.17548v1
                 </Ext>
               </li>
               <li>
-                AIレッドチーミングの手法論に関する系統的レビュー(arXiv):{' '}
+                AIレッドチーミングの手法論に関する系統的レビュー(arXiv):{" "}
                 <Ext href="https://arxiv.org/pdf/2602.21267">https://arxiv.org/pdf/2602.21267</Ext>
               </li>
               <li>
-                MITRE ATLASのレッドチーム活用ガイド:{' '}
+                MITRE ATLASのレッドチーム活用ガイド:{" "}
                 <Ext href="https://www.getastra.com/blog/security-audit/mitre-atlas/">
                   https://www.getastra.com/blog/security-audit/mitre-atlas/
                 </Ext>
@@ -1494,9 +1503,9 @@ export default function AISecurityBestPracticesPage() {
           <table>
             <thead>
               <tr>
-                <th style={{ textAlign: 'left' }}>フェーズ</th>
-                <th style={{ textAlign: 'left' }}>期間の目安</th>
-                <th style={{ textAlign: 'left' }}>やるべきこと</th>
+                <th style={{ textAlign: "left" }}>フェーズ</th>
+                <th style={{ textAlign: "left" }}>期間の目安</th>
+                <th style={{ textAlign: "left" }}>やるべきこと</th>
               </tr>
             </thead>
             <tbody>
@@ -1617,73 +1626,73 @@ export default function AISecurityBestPracticesPage() {
             <h4>業界フレームワーク・標準</h4>
             <ul className={styles.plain}>
               <li>
-                OWASP GenAI Security Project:{' '}
+                OWASP GenAI Security Project:{" "}
                 <Ext href="https://genai.owasp.org/">https://genai.owasp.org/</Ext>
               </li>
               <li>
-                OWASP Top 10 for LLM Applications 2025:{' '}
+                OWASP Top 10 for LLM Applications 2025:{" "}
                 <Ext href="https://genai.owasp.org/llm-top-10/">
                   https://genai.owasp.org/llm-top-10/
                 </Ext>
               </li>
               <li>
-                OWASP Top 10 for LLM Applications 2025 PDF:{' '}
+                OWASP Top 10 for LLM Applications 2025 PDF:{" "}
                 <Ext href="https://owasp.org/www-project-top-10-for-large-language-model-applications/assets/PDF/OWASP-Top-10-for-LLMs-v2025.pdf">
                   https://owasp.org/www-project-top-10-for-large-language-model-applications/assets/PDF/OWASP-Top-10-for-LLMs-v2025.pdf
                 </Ext>
               </li>
               <li>
-                OWASP Top 10 for Agentic Applications 2026:{' '}
+                OWASP Top 10 for Agentic Applications 2026:{" "}
                 <Ext href="https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/">
                   https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/
                 </Ext>
               </li>
               <li>
-                OWASP Top 10 for Agentic Applications 2026 公式PDF:{' '}
+                OWASP Top 10 for Agentic Applications 2026 公式PDF:{" "}
                 <Ext href="https://genai.owasp.org/download/52117">
                   https://genai.owasp.org/download/52117
                 </Ext>
               </li>
               <li>
-                MITRE ATLAS 公式サイト:{' '}
+                MITRE ATLAS 公式サイト:{" "}
                 <Ext href="https://atlas.mitre.org/">https://atlas.mitre.org/</Ext>
               </li>
               <li>
-                MITRE ATLAS成長に関するCTIDブログ:{' '}
+                MITRE ATLAS成長に関するCTIDブログ:{" "}
                 <Ext href="https://ctid.mitre.org/blog/2026/05/06/secure-ai-v2-release/">
                   https://ctid.mitre.org/blog/2026/05/06/secure-ai-v2-release/
                 </Ext>
               </li>
               <li>
-                NIST AI Risk Management Framework:{' '}
+                NIST AI Risk Management Framework:{" "}
                 <Ext href="https://www.nist.gov/itl/ai-risk-management-framework">
                   https://www.nist.gov/itl/ai-risk-management-framework
                 </Ext>
               </li>
               <li>
-                NIST AI 600-1(生成AIプロファイル):{' '}
+                NIST AI 600-1(生成AIプロファイル):{" "}
                 <Ext href="https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence">
                   https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence
                 </Ext>
               </li>
               <li>
-                NIST AI 600-1 本文PDF:{' '}
+                NIST AI 600-1 本文PDF:{" "}
                 <Ext href="https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf">
                   https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf
                 </Ext>
               </li>
               <li>
-                Google Secure AI Framework(SAIF):{' '}
+                Google Secure AI Framework(SAIF):{" "}
                 <Ext href="https://saif.google/">https://saif.google/</Ext>
               </li>
               <li>
-                SAIF発表ブログ(Google公式):{' '}
+                SAIF発表ブログ(Google公式):{" "}
                 <Ext href="https://blog.google/innovation-and-ai/technology/safety-security/introducing-googles-secure-ai-framework/">
                   https://blog.google/innovation-and-ai/technology/safety-security/introducing-googles-secure-ai-framework/
                 </Ext>
               </li>
               <li>
-                ISO/IEC 42001 公式ページ:{' '}
+                ISO/IEC 42001 公式ページ:{" "}
                 <Ext href="https://www.iso.org/standard/42001">
                   https://www.iso.org/standard/42001
                 </Ext>
@@ -1695,25 +1704,25 @@ export default function AISecurityBestPracticesPage() {
             <h4>法規制</h4>
             <ul className={styles.plain}>
               <li>
-                EU理事会 プレスリリース(2026年5月7日、Digital Omnibus合意):{' '}
+                EU理事会 プレスリリース(2026年5月7日、Digital Omnibus合意):{" "}
                 <Ext href="https://www.consilium.europa.eu/en/press/press-releases/2026/05/07/artificial-intelligence-council-and-parliament-agree-to-simplify-and-streamline-rules/">
                   https://www.consilium.europa.eu/en/press/press-releases/2026/05/07/artificial-intelligence-council-and-parliament-agree-to-simplify-and-streamline-rules/
                 </Ext>
               </li>
               <li>
-                EU AI Actオムニバス解説(Gibson Dunn):{' '}
+                EU AI Actオムニバス解説(Gibson Dunn):{" "}
                 <Ext href="https://www.gibsondunn.com/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes/">
                   https://www.gibsondunn.com/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes/
                 </Ext>
               </li>
               <li>
-                EU AI Actオムニバス解説(White & Case):{' '}
+                EU AI Actオムニバス解説(White & Case):{" "}
                 <Ext href="https://www.whitecase.com/insight-alert/eu-agrees-digital-omnibus-deal-simplify-ai-rules">
                   https://www.whitecase.com/insight-alert/eu-agrees-digital-omnibus-deal-simplify-ai-rules
                 </Ext>
               </li>
               <li>
-                EU AI Actの現状まとめ(Travers Smith):{' '}
+                EU AI Actの現状まとめ(Travers Smith):{" "}
                 <Ext href="https://www.traverssmith.com/knowledge/knowledge-container/the-eu-ai-act-the-current-state-of-play/">
                   https://www.traverssmith.com/knowledge/knowledge-container/the-eu-ai-act-the-current-state-of-play/
                 </Ext>
@@ -1725,31 +1734,31 @@ export default function AISecurityBestPracticesPage() {
             <h4>技術的な深掘り(プロンプトインジェクション・エージェントセキュリティ)</h4>
             <ul className={styles.plain}>
               <li>
-                間接的プロンプトインジェクションの2026年最新動向:{' '}
+                間接的プロンプトインジェクションの2026年最新動向:{" "}
                 <Ext href="https://zylos.ai/research/2026-04-12-indirect-prompt-injection-defenses-agents-untrusted-content/">
                   https://zylos.ai/research/2026-04-12-indirect-prompt-injection-defenses-agents-untrusted-content/
                 </Ext>
               </li>
               <li>
-                エージェント型コーディングアシスタントへの攻撃調査(arXiv):{' '}
+                エージェント型コーディングアシスタントへの攻撃調査(arXiv):{" "}
                 <Ext href="https://arxiv.org/html/2601.17548v1">
                   https://arxiv.org/html/2601.17548v1
                 </Ext>
               </li>
               <li>
-                OWASP Agentic Top 10の実務的優先順位付け:{' '}
+                OWASP Agentic Top 10の実務的優先順位付け:{" "}
                 <Ext href="https://arnav.au/2026/07/02/owasp-top-10-for-agentic-applications/">
                   https://arnav.au/2026/07/02/owasp-top-10-for-agentic-applications/
                 </Ext>
               </li>
               <li>
-                Auth0によるLeast Agency解説:{' '}
+                Auth0によるLeast Agency解説:{" "}
                 <Ext href="https://auth0.com/blog/owasp-top-10-agentic-applications-lessons/">
                   https://auth0.com/blog/owasp-top-10-agentic-applications-lessons/
                 </Ext>
               </li>
               <li>
-                AIレッドチーミング手法の系統的レビュー(arXiv):{' '}
+                AIレッドチーミング手法の系統的レビュー(arXiv):{" "}
                 <Ext href="https://arxiv.org/pdf/2602.21267">https://arxiv.org/pdf/2602.21267</Ext>
               </li>
             </ul>

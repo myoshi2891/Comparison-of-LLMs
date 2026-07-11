@@ -1,39 +1,55 @@
 "use client";
 
 import { useEffect } from "react";
+import { useTocObserver } from "@/lib/useTocObserver";
 import styles from "./page.module.css";
 
 /**
  * Client component that manages the active state of TOC (Table of Contents) links
- * by observing the intersection of step sections as the user scrolls.
+ * by observing the intersection of step sections as the user scrolls,
+ * and handles mobile sidebar collapse interactions.
  */
 export default function TocObserver() {
+  // スクロール連動ハイライトは共有 hook に委譲
+  useTocObserver({
+    chapterSelector: "section[id]",
+    tocLinkSelector: `.${styles.tocLink}`,
+    activeClassName: styles.tocLinkActive,
+  });
+
   useEffect(() => {
-    const sections = document.querySelectorAll("section.step");
-    const links = Array.from(document.querySelectorAll(`.${styles.tocLink}`));
-    if (links.length > 0) links[0].classList.add(styles.tocLinkActive);
+    // モバイルサイドバー開閉
+    const navToggle = document.getElementById("navToggle");
+    const sidebar = document.getElementById("sidebar");
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            const id = entry.target.getAttribute("id");
-            if (!id) continue;
-            for (const l of links) {
-              if (l.getAttribute("href") === `#${id}`) {
-                l.classList.add(styles.tocLinkActive);
-              } else {
-                l.classList.remove(styles.tocLinkActive);
-              }
-            }
-          }
-        }
-      },
-      { rootMargin: "-10% 0px -70% 0px", threshold: 0 }
-    );
+    const handleToggleClick = () => {
+      if (sidebar) sidebar.classList.toggle(styles.sidebarOpen);
+    };
 
-    for (const sec of sections) observer.observe(sec);
-    return () => observer.disconnect();
+    const handleLinkClick = () => {
+      if (sidebar) sidebar.classList.remove(styles.sidebarOpen);
+    };
+
+    if (navToggle) {
+      navToggle.addEventListener("click", handleToggleClick);
+    }
+
+    let links: HTMLAnchorElement[] = [];
+    if (sidebar) {
+      links = Array.from(sidebar.querySelectorAll("a"));
+      for (const a of links) {
+        a.addEventListener("click", handleLinkClick);
+      }
+    }
+
+    return () => {
+      if (navToggle) {
+        navToggle.removeEventListener("click", handleToggleClick);
+      }
+      for (const a of links) {
+        a.removeEventListener("click", handleLinkClick);
+      }
+    };
   }, []);
 
   return null;
