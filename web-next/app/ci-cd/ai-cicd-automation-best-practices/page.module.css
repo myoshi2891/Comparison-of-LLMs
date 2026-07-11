@@ -290,9 +290,9 @@
 }
 
 .checklist {
-  list-style: none !important;
-  padding-left: 0 !important;
-  margin: 24px 0 !important;
+  list-style: none;
+  padding-left: 0;
+  margin: 24px 0;
 }
 
 .checklist li {
@@ -345,11 +345,11 @@
 }
 
 .roadmapStepContent h3 {
-  margin: 0 0 6px 0 !important;
+  margin: 0 0 6px 0;
 }
 
 .roadmapStepContent p {
-  margin: 0 !important;
+  margin: 0;
 }
 
 .refGroup {
@@ -372,9 +372,9 @@
 }
 
 .refList {
-  list-style: none !important;
-  padding-left: 0 !important;
-  margin: 0 !important;
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
 }
 
 .refList li {
