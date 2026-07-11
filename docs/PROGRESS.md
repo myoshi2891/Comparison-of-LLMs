@@ -14,10 +14,11 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（本作業範囲では新規違反 0 件、既知の既存指摘は本件対象外）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **839 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **848 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **Google Agent Development Kit 実践ガイドの Next.js 移行**: `Adk-best-practices-guide.html` から `web-next/app/google/adk-best-practices/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、等幅フォント適用、外部リンクのセキュリティ対策（target/rel）、Mermaid遅延ロードと中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションの「Google -> ADK Best Practices」に新規登録。 Vitest 契約テスト 9 件追加（合計 848 テスト合格）。
 - **ローカルLLM／セルフホスティング ベストプラクティスガイドの Next.js 移行**: `Local-llm-self-hosting-best-practices.html` から `web-next/app/local-llm/best-practices/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策（target/rel）、Mermaid遅延ロード、TOCスクロールハイライト追従（Intersection Observer）を実装。ナビゲーションの「Local LLM -> Self-hosting Best Practices」に新規登録。 Vitest 契約テスト 9 件追加（合計 839 テスト合格）。
 - **ローカルLLM/セルフホスティング 完全ガイドの Next.js 移行**: `Local-llm-self-hosting-guide.html` から `web-next/app/local-llm/self-hosting/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策、Mermaid遅延ロード、TOCスクロールハイライト追従（Intersection Observer）を実装。ナビゲーションの「Local LLM -> Self-hosting Guide」に新規登録。 Vitest 契約テスト 8 件追加（合計 830 テスト合格）。
 - **Google NotebookLM 完全ベストプラクティスガイドの Next.js 移行**: `Google-NotebookLM.html` から `web-next/app/google/notebook-lm/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策、Mermaid遅延ロード、TOCスクロールハイライト追従（Intersection Observer）を実装。ナビゲーションの「Google -> NotebookLM Guide」に新規登録。 Vitest 契約テスト 9 件追加（合計 820 テスト合格）。
@@ -173,7 +174,7 @@ Next.js 移行完了後のリポジトリ `LLM-Studies` にて、テストカバ
 Next.js 移行完了後のリポジトリ `LLM-Studies` の保守・改善作業を再開してください。
 
 - リポジトリ: LLM-Studies (Next.js 移行プロジェクトは dev/main へ完全マージ済み)
-  - 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (839/839 passed) / pytest (38/38 passed) で全 Green
+  - 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (848/848 passed) / pytest (38/38 passed) で全 Green
 - リポジトリ規約: CLAUDE.md (編集上の絶対ルール。※Antigravity環境ではビルドは実行禁止)
 
 作業方針：
