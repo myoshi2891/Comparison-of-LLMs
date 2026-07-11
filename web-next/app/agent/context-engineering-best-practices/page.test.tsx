@@ -34,33 +34,26 @@ global.IntersectionObserver = IntersectionObserverStub as unknown as typeof Inte
 
 const EXPECTED_SECTION_IDS = [
   "intro",
-  "sec-1",
-  "sec-2",
-  "sec-3",
-  "sec-4",
-  "step-1",
-  "step-2",
-  "step-3",
-  "step-4",
-  "step-5",
-  "step-6",
-  "step-7",
-  "step-8",
-  "sec-6",
-  "sec-7",
-  "sec-8",
-  "sec-9",
+  "ch1",
+  "ch2",
+  "ch3",
+  "ch4",
+  "ch5",
+  "ch6",
+  "ch7",
+  "ch8",
+  "ch9",
 ] as const;
 
 describe("/agent/context-engineering-best-practices - metadata", () => {
-  it("exports a metadata object with title containing 'コンテキストエンジニアリング実践ガイド'", () => {
+  it("exports a metadata object with title containing 'コンテキストエンジニアリング入門'", () => {
     expect(metadata).toBeDefined();
     const title =
       typeof metadata.title === "string"
         ? metadata.title
         : (metadata.title as { default?: string } | undefined)?.default;
     expect(title).toBe(
-      "コンテキストエンジニアリング実践ガイド — Write / Select / Compress / Isolate | LLM-Studies"
+      "コンテキストエンジニアリング入門 AIエージェントのためのステップバイステップ実践ガイド | LLM-Studies"
     );
   });
 
@@ -71,16 +64,16 @@ describe("/agent/context-engineering-best-practices - metadata", () => {
 });
 
 describe("/agent/context-engineering-best-practices - page structure", () => {
-  it("renders an <h1> containing 'コンテキストウィンドウは有限のRAMである'", () => {
+  it("renders an <h1> containing 'コンテキストエンジニアリング入門'", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
     expect(h1).not.toBeNull();
     expect(h1?.textContent?.replace(/\s+/g, "")).toContain(
-      "コンテキストウィンドウは有限のRAMである"
+      "コンテキストエンジニアリング入門"
     );
   });
 
-  it("renders all 17 expected sections", () => {
+  it("renders all 10 expected sections", () => {
     const { container } = render(<Page />);
     for (const id of EXPECTED_SECTION_IDS) {
       const el = container.querySelector(`#${id}`);
