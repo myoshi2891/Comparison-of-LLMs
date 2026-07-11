@@ -146,19 +146,7 @@ export default function Page() {
           </li>
         </ul>
 
-        <div
-          className="nav-group-label"
-          style={{
-            fontSize: "11px",
-            fontWeight: 500,
-            color: "var(--txt3)",
-            textTransform: "uppercase",
-            letterSpacing: "0.04em",
-            padding: "16px 12px 6px 8px",
-          }}
-        >
-          ステップバイステップ
-        </div>
+        <div className={styles.navGroupLabel}>ステップバイステップ</div>
         <ul>
           <li>
             <a className={styles.tocLink} href="#step1">
@@ -222,19 +210,7 @@ export default function Page() {
           </li>
         </ul>
 
-        <div
-          className="nav-group-label"
-          style={{
-            fontSize: "11px",
-            fontWeight: 500,
-            color: "var(--txt3)",
-            textTransform: "uppercase",
-            letterSpacing: "0.04em",
-            padding: "16px 12px 6px 8px",
-          }}
-        >
-          まとめ
-        </div>
+        <div className={styles.navGroupLabel}>まとめ</div>
         <ul>
           <li>
             <a className={styles.tocLink} href="#tools">
@@ -941,7 +917,7 @@ export default function Page() {
 
           <p>
             Google Cloud上でこのパイプラインを組む場合、Cloud
-            BuildがCI/CDのオーケストレーションを担工程、Vertex AI
+            BuildがCI/CDのオーケストレーションを担い、Vertex AI
             Pipelines（Kubeflowベース）が複雑なワークフローを、Vertex AI Evaluation
             Serviceが忠実性・関連性などの自動評価指標の計算を担う、という役割分担が一つの実例として紹介されている。RAGシステムでは、アプリケーションコード・プロンプトテンプレート・検索対象データという3種類の更新をそれぞれ独立して扱えるパイプライン設計が求められる点も重要である。
           </p>

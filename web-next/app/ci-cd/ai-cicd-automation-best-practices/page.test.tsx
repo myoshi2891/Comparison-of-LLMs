@@ -82,6 +82,8 @@ describe("/ci-cd/ai-cicd-automation-best-practices - page structure", () => {
 
   it("renders all 17 expected sections", () => {
     const { container } = render(<Page />);
+    const sections = container.querySelectorAll("section[id]");
+    expect(sections.length).toBe(17);
     for (const id of EXPECTED_SECTION_IDS) {
       const el = container.querySelector(`#${id}`);
       expect(el, `section id="${id}" must exist`).not.toBeNull();
