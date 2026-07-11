@@ -301,7 +301,9 @@ export default function LocalLlmSelfHostingPage() {
           </p>
 
           <div className={styles.diagramWrap}>
-            <MermaidDiagram chart={DIAGRAMS.architecture} />
+            <div className={styles.mermaidContainer}>
+              <MermaidDiagram chart={DIAGRAMS.architecture} />
+            </div>
             <div className={styles.diagramCaption}>図: ローカルLLM環境の全体アーキテクチャ</div>
           </div>
 
@@ -312,7 +314,9 @@ export default function LocalLlmSelfHostingPage() {
 
           <h3>学習ロードマップ</h3>
           <div className={styles.diagramWrap}>
-            <MermaidDiagram chart={DIAGRAMS.roadmap} />
+            <div className={styles.mermaidContainer}>
+              <MermaidDiagram chart={DIAGRAMS.roadmap} />
+            </div>
             <div className={styles.diagramCaption}>
               図: 本ガイドの学習ロードマップ(全11ステップ)
             </div>
@@ -1036,7 +1040,9 @@ export default function LocalLlmSelfHostingPage() {
 
           <h3>選定のフローチャート</h3>
           <div className={styles.diagramWrap}>
-            <MermaidDiagram chart={DIAGRAMS.modelSelect} />
+            <div className={styles.mermaidContainer}>
+              <MermaidDiagram chart={DIAGRAMS.modelSelect} />
+            </div>
             <div className={styles.diagramCaption}>図: モデル選定の判断フロー</div>
           </div>
         </section>
@@ -1137,7 +1143,9 @@ export default function LocalLlmSelfHostingPage() {
 
           <h3>選定フローチャート</h3>
           <div className={styles.diagramWrap}>
-            <MermaidDiagram chart={DIAGRAMS.toolSelect} />
+            <div className={styles.mermaidContainer}>
+              <MermaidDiagram chart={DIAGRAMS.toolSelect} />
+            </div>
             <div className={styles.diagramCaption}>図: 実行エンジン/ツールの選定フロー</div>
           </div>
 
@@ -1456,7 +1464,9 @@ export default function LocalLlmSelfHostingPage() {
 
           <h3>RAGパイプラインの全体像</h3>
           <div className={styles.diagramWrap}>
-            <MermaidDiagram chart={DIAGRAMS.rag} />
+            <div className={styles.mermaidContainer}>
+              <MermaidDiagram chart={DIAGRAMS.rag} />
+            </div>
             <div className={styles.diagramCaption}>図: RAGパイプラインの全体像</div>
           </div>
 
@@ -1871,7 +1881,9 @@ export default function LocalLlmSelfHostingPage() {
 
           <h3>実装すべき対策</h3>
           <div className={styles.diagramWrap}>
-            <MermaidDiagram chart={DIAGRAMS.security} />
+            <div className={styles.mermaidContainer}>
+              <MermaidDiagram chart={DIAGRAMS.security} />
+            </div>
             <div className={styles.diagramCaption}>図: セキュリティ多層防御の全体像</div>
           </div>
 
