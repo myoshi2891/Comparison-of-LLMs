@@ -116,7 +116,7 @@ FLUXやStable Diffusion 3系はFlow Matching（整流フロー）という拡散
 | Midjourney V8 / V8.1 | Midjourney | 拡散 | アート性・写真的な質感の表現力 | クローズドソース | Midjourney Terms of Service。無料会員は商用不可、有料会員に商用利用権付与 | 有料プラン契約中の生成画像は商用利用可能。年間売上100万ドル超の企業はEnterpriseプラン必須 | <cite index="9-1">公式APIが提供されておらず、プログラムからの自動生成はできません</cite> |
 | Ideogram V3 | Ideogram | 拡散 | タイポグラフィ・ロゴ・文字入りデザイン | クローズドソース | Ideogram Terms of Service。無料プランは生成物が公開されCC BY-NC 4.0等の制限あり | 有料プラン（Basic以上）の契約中に生成された画像は非公開かつ商用利用可能 | 文字描画精度の高さが差別化要因 |
 | Seedream 5.0 | ByteDance | 拡散 | リアルタイムWeb検索統合、インフォグラフィック | クローズドソース | 火山エンジン（Volcengine）利用規約 | API契約に基づき商用利用可能 [2](#ref-2) | <cite index="2-1">時間的制約のあるニュース関連コンテンツで最新情報を取得して描画できる点が特徴的です</cite> |
-| Qwen-Image 2.0 | Alibaba | 拡散 | 自前運用・完全商用フリー | Apache 2.0ライセンス（オープンウェイト） | モデル自体の改変・再配布が自由。API利用時はAlibaba Cloud利用規約 [1](#ref-1) | 制限なしで完全に商用利用可能 [1](#ref-1) | HuggingFaceで配布、自前GPUでの運用が前提 |
+| Qwen-Image 2.0 | Alibaba | 拡散 | 自前運用・完全商用フリー | モデルにより Apache 2.0 または独自の Qwen License Agreement（商用利用は要申請）と異なり、確認が必要 [60](#ref-60) | API利用時はAlibaba Cloud等の利用規約に準拠 [60](#ref-60) | モデルごとのライセンスおよび規約に準拠（公式根拠で「制限なしで完全に商用利用可能」と確認できないため要確認） [60](#ref-60) | HuggingFaceで配布、自前GPUでの運用が前提 |
 | Adobe Firefly | Adobe | 拡散 | 商用安全性（学習データの権利処理が明示的） | クローズドソース | Adobe Terms of Use および Fireflyユーザー特約 | Creative CloudまたはFirefly個別契約に基づき商用利用可能（他者の権利侵害に対する免責補償制度あり） | 企業のブランドセーフティ要件に強い |
 | Stable Diffusion 3.5 / XL | Stability AI | 拡散 | 完全なカスタマイズ性、ローカル運用 | SD 3.5 LargeはStability AI Community License [1](#ref-1) | 自前運用の場合はコミュニティライセンス等に準拠。API利用時はStability API規約 | 個人および年間売上100万ドル未満の企業は商用無料。それを超える企業はEnterpriseライセンス必須 | LoRA・ControlNetのエコシステムが最も充実 |
 
@@ -726,6 +726,7 @@ flowchart TD
 - <a id="ref-1"></a>[1] OpenAI Terms of Use — https://openai.com/policies/terms-of-use/
 - <a id="ref-2"></a>[2] 火山エンジン（Volcengine）サービス利用規約 — https://www.volcengine.com/terms
 - <a id="ref-30"></a>[30] Google Terms of Service — https://policies.google.com/terms
+- <a id="ref-60"></a>[60] Qwen2-VL/Qwen-VL License (Alibaba Cloud / GitHub) — https://github.com/QwenLM/Qwen2-VL#license
 - 画像生成AIの最新モデル６選（爆速開発部）: https://apptime.co.jp/media/%E7%94%BB%E5%83%8F%E7%94%9F%E6%88%90ai%E6%AF%94%E8%BC%832026%EF%BD%9C%E6%9C%80%E6%96%B0%E3%83%A2%E3%83%87%E3%83%AB6%E9%81%B8%E3%82%92%E5%BE%B9%E5%BA%95%E6%AF%94%E8%BC%83
 - 2026年版：AI画像生成APIベストガイド（Atlas Cloud Blog）: https://www.atlascloud.ai/ja/blog/guides/best-ai-image-generation-apis-in-2026-complete-developer-guide
 - 画像生成AI徹底比較（2026年6月最新）: https://genai-ai.co.jp/ai-kanri/blog/cc-image-gen-ai-compare/
