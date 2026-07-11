@@ -30,9 +30,9 @@
 
 2024〜2025年は「テキスト生成AIにマルチモーダル入出力が追加される」フェーズでしたが、2026年に入り潮目が変わりました。画像・音声はもはや周辺機能ではなく、**推論（reasoning）を内蔵したネイティブ・マルチモーダルモデル**が主流になりつつあります。具体的には次の3つの潮流が同時並行で進んでいます。
 
-- **画像生成の自己回帰化**：GPT Image 2 のように拡散モデルではなく自己回帰（Autoregressive）方式でテキストと同じ仕組みで画像を生成し、複雑な指示理解・世界知識の反映に強いモデルが台頭しています。<cite index="11-1">OpenAIの公開しているプロンプティングガイドでは、gpt-image-2が新規構築の推奨デフォルトとされ、画質・編集性能の向上とプロダクションワークフローへの広い対応が特徴として挙げられています</cite>。
-- **音声のネイティブ音声対話（Audio-to-Audio）化**：音声認識→LLM推論→音声合成という「カスケード型」から、単一モデルが音声を直接理解し直接発話する方式への移行が進んでいます。<cite index="60-1">Gemini 3.1 Flash Liveは、従来の「文字起こし・推論・合成」という段階的スタックを単一のネイティブ音声対話プロセスへ統合し、レイテンシを大幅に削減しつつ、より自然なピッチ・間合いの認識を可能にしています</cite>。
-- **「唯一の最強モデル」の消滅**：<cite index="2-1">2026年の画像生成AIモデル環境は変化が激しく、単一の最強モデルは存在せず、コンテンツの種類に応じて最適なモデルへルーティングするアーキテクチャが実務上の勝ち筋になっています</cite>。
+- **画像生成の自己回帰化**：GPT Image 2 のように拡散モデルではなく自己回帰（Autoregressive）方式でテキストと同じ仕組みで画像を生成し、複雑な指示理解・世界知識の反映に強いモデルが台頭しています。<cite index="743-1">OpenAIの公開しているプロンプティングガイドでは、gpt-image-2が新規構築の推奨デフォルトとされ、画質・編集性能の向上とプロダクションワークフローへの広い対応が特徴として挙げられています</cite>。
+- **音声のネイティブ音声対話（Audio-to-Audio）化**：音声認識→LLM推論→音声合成という「カスケード型」から、単一モデルが音声を直接理解し直接発話する方式への移行が進んでいます。<cite index="811-1">Gemini 3.1 Flash Liveは、従来の「文字起こし・推論・合成」という段階的スタックを単一のネイティブ音声対話プロセスへ統合し、レイテンシを大幅に削減しつつ、より自然なピッチ・間合いの認識を可能にしています</cite>。
+- **「唯一の最強モデル」の消滅**：<cite index="731-1">2026年の画像生成AIモデル環境は変化が激しく、単一の最強モデルは存在せず、コンテンツの種類に応じて最適なモデルへルーティングするアーキテクチャが実務上の勝ち筋になっています</cite>。
 
 本ガイドは、この前提に立ったうえで「どのモデルを、どう組み合わせ、どう安全に、どう運用するか」を実装レベルで解説します。
 
@@ -91,9 +91,9 @@ FLUXやStable Diffusion 3系はFlow Matching（整流フロー）という拡散
 
 ### 2.3 自己回帰型画像生成（Autoregressive Image Generation）
 
-拡散モデルとは根本的に異なるアプローチとして、テキストトークンと同じように画像を「一部分ずつ順番に生成する」自己回帰方式があります。<cite index="16-1">4o Image Generation（image_gen）はChatGPTに組み込まれており、GPT-4oと同じ技術を使って画像を生成する点が特徴で、拡散方式ではなく単語を書くように少しずつ画像を生成していきます</cite>。
+拡散モデルとは根本的に異なるアプローチとして、テキストトークンと同じように画像を「一部分ずつ順番に生成する」自己回帰方式があります。<cite index="746-1">4o Image Generation（image_gen）はChatGPTに組み込まれており、GPT-4oと同じ技術を使って画像を生成する点が特徴で、拡散方式ではなく単語を書くように少しずつ画像を生成していきます</cite>。
 
-<cite index="2-1">注意点として、GPT Image系（自己回帰モデル）は拡散モデルではないため生成速度は遅く、1回のリクエストにつき1枚の出力となる一方で、複雑なシーン構成や指示理解では拡散モデル系を上回る場合があります</cite>。
+<cite index="746-2">注意点として、GPT Image系（自己回帰モデル）は拡散モデルではないため生成速度は遅く、1回のリクエストにつき1枚の出力となる一方で、複雑なシーン構成や指示理解では拡散モデル系を上回る場合があります</cite>。
 
 ### 2.4 3アーキテクチャの比較
 
@@ -113,14 +113,14 @@ FLUXやStable Diffusion 3系はFlow Matching（整流フロー）という拡散
 
 ### 3.1 主要モデル比較表
 
-2026年7月時点で実務上検討対象になる主要モデルを、モデル単位（サービス名ではなく）で整理します。<cite index="1-1">2026年はサービス名と中身のモデル名がねじれて分かりにくくなっており、ChatGPTの中身はGPT Image 2、GeminiはNano Banana 2であるなど、サービス名ではなくモデル単位で実態を把握することが重要です</cite>。
+2026年7月時点で実務上検討対象になる主要モデルを、モデル単位（サービス名ではなく）で整理します。<cite index="734-1">2026年はサービス名と中身のモデル名がねじれて分かりにくくなっており、ChatGPTの中身はGPT Image 2、GeminiはNano Banana 2であるなど、サービス名ではなくモデル単位で実態を把握することが重要です</cite>。
 
 | モデル | 提供元 | アーキテクチャ | 得意分野 | モデルライセンス | API/サービス規約 | 生成物の商用利用条件 | 備考 |
 |---|---|---|---|---|---|---|---|
-| GPT Image 2 | OpenAI | 自己回帰 | 複雑な指示理解、文字描画、編集の一貫性 | クローズドソース（非公開） | OpenAI Terms of Use に準拠 [1](#ref-1) | 出力の所有権はユーザーに帰属（商用利用可能） [1](#ref-1) | <cite index="1-1">最大4K出力に対応し、日本語を含むCJK・ラテン文字で約99%の文字精度に達しています</cite> |
-| Nano Banana 2 / Gemini 3.1 Flash Image | Google | 拡散＋Gemini統合 | 速度と汎用性のバランス、検索・Lens統合 | クローズドソース（非公開） | Google Terms of Service および Gemini API Terms [30](#ref-30) | 生成物の商業利用が明示的に許諾（出力の所有権はユーザー） | <cite index="1-1">2026年2月のアップデートでGemini 3の全モードに標準搭載されました</cite> |
+| GPT Image 2 | OpenAI | 自己回帰 | 複雑な指示理解、文字描画、編集の一貫性 | クローズドソース（非公開） | OpenAI Terms of Use に準拠 [1](#ref-1) | 出力の所有権はユーザーに帰属（商用利用可能） [1](#ref-1) | <cite index="743-2">最大4K出力に対応し、日本語を含むCJK・ラテン文字で約99%の文字精度に達しています</cite> |
+| Nano Banana 2 / Gemini 3.1 Flash Image | Google | 拡散＋Gemini統合 | 速度と汎用性のバランス、検索・Lens統合 | クローズドソース（非公開） | Google Terms of Service および Gemini API Terms [30](#ref-30) | 生成物の商業利用が明示的に許諾（出力の所有権はユーザー） | <cite index="810-1">2026年2月のアップデートでGemini 3の全モードに標準搭載されました</cite> |
 | FLUX.2 | Black Forest Labs | Flow Matching | フォトリアリズム、デザイン寄りの描写 | Schnellは Apache 2.0、Devは非商用、Proはクローズド | API経由時はAPIプロバイダ規約に準拠。モデル自体の商用可否はバージョン依存 | 生成した画像はいずれのバージョン（Dev含む）でも商用利用可能 [1](#ref-1) | バージョンによりモデル自体の商用可否が異なるため要確認 |
-| Midjourney V8 / V8.1 | Midjourney | 拡散 | アート性・写真的な質感の表現力 | クローズドソース | Midjourney Terms of Service。無料会員は商用不可、有料会員に商用利用権付与 | 有料プラン契約中の生成画像は商用利用可能。年間売上100万ドル超の企業はEnterpriseプラン必須 | <cite index="9-1">公式APIが提供されておらず、プログラムからの自動生成はできません</cite> |
+| Midjourney V8 / V8.1 | Midjourney | 拡散 | アート性・写真的な質感の表現力 | クローズドソース | Midjourney Terms of Service。無料会員は商用不可、有料会員に商用利用権付与 | 有料プラン契約中の生成画像は商用利用可能。年間売上100万ドル超の企業はEnterpriseプラン必須 | <cite index="736-1">公式APIが提供されておらず、プログラムからの自動生成はできません</cite> |
 | Ideogram V3 | Ideogram | 拡散 | タイポグラフィ・ロゴ・文字入りデザイン | クローズドソース | Ideogram Terms of Service。無料プランは生成物が公開されCC BY-NC 4.0等の制限あり | 有料プラン（Basic以上）の契約中に生成された画像は非公開かつ商用利用可能 | 文字描画精度の高さが差別化要因 |
 | Seedream 5.0 | ByteDance | 拡散 | リアルタイムWeb検索統合、インフォグラフィック | クローズドソース | 火山エンジン（Volcengine）利用規約 | API契約に基づき商用利用可能 [2](#ref-2) | <cite index="2-1">時間的制約のあるニュース関連コンテンツで最新情報を取得して描画できる点が特徴的です</cite> |
 | Qwen-Image 2.0 | Alibaba | 拡散 | 自前運用・完全商用フリー | モデルにより Apache 2.0 または独自の Qwen License Agreement（商用利用は要申請）と異なり、確認が必要 [60](#ref-60) | API利用時はAlibaba Cloud等の利用規約に準拠 [60](#ref-60) | モデルごとのライセンスおよび規約に準拠（公式根拠で「制限なしで完全に商用利用可能」と確認できないため要確認） [60](#ref-60) | HuggingFaceで配布、自前GPUでの運用が前提 |
@@ -150,7 +150,7 @@ flowchart TD
 
 ### 3.3 「マルチモデル・ルーティング」という実務パターン
 
-<cite index="2-1">2026年にAI製品で成功する開発者は最強のモデルを1つ選ぶ人ではなく、タスクに応じて最適なモデルにルーティングできるモデル非依存のアーキテクチャを構築し、進化に合わせて柔軟に最適化し続ける人です</cite>。実装上は、以下のようなルーティング層を用意するのが定石です。
+<cite index="739-1">2026年にAI製品で成功する開発者は最強のモデルを1つ選ぶ人ではなく、タスクに応じて最適なモデルにルーティングできるモデル非依存のアーキテクチャを構築し、進化に合わせて柔軟に最適化し続ける人です</cite>。実装上は、以下のようなルーティング層を用意するのが定石です。
 
 ```mermaid
 flowchart LR
@@ -735,22 +735,22 @@ flowchart TD
 - <a id="ref-30"></a>[30] Google Terms of Service — https://policies.google.com/terms
 - <a id="ref-60"></a>[60] Qwen-Image License (Alibaba Cloud / GitHub) — https://github.com/QwenLM/Qwen-Image/blob/main/LICENSE
 - 画像生成AIの最新モデル６選（爆速開発部）: https://apptime.co.jp/media/%E7%94%BB%E5%83%8F%E7%94%9F%E6%88%90ai%E6%AF%94%E8%BC%832026%EF%BD%9C%E6%9C%80%E6%96%B0%E3%83%A2%E3%83%87%E3%83%AB6%E9%81%B8%E3%82%92%E5%BE%B9%E5%BA%95%E6%AF%94%E8%BC%83
-- 2026年版：AI画像生成APIベストガイド（Atlas Cloud Blog）: https://www.atlascloud.ai/ja/blog/guides/best-ai-image-generation-apis-in-2026-complete-developer-guide
+- <a id="ref-731"></a>[731] 2026年版：AI画像生成APIベストガイド（Atlas Cloud Blog） — https://www.atlascloud.ai/ja/blog/guides/best-ai-image-generation-apis-in-2026-complete-developer-guide
 - 画像生成AI徹底比較（2026年6月最新）: https://genai-ai.co.jp/ai-kanri/blog/cc-image-gen-ai-compare/
 - 画像生成AI比較｜Claude Codeユーザーが解説: https://genai-ai.co.jp/ai-kanri/blog/cc-image-generation-ai-comparison/
-- 実出力比較：GPT-image-2 / Nano Banana 2 / Midjourney v8.1 / FLUX.2: https://smoothiestudio.co.jp/en/ai-video/column/ai-image-generator-guide
+- <a id="ref-734"></a>[734] 実出力比較：GPT-image-2 / Nano Banana 2 / Midjourney v8.1 / FLUX.2 — https://smoothiestudio.co.jp/en/ai-video/column/ai-image-generator-guide
 - AI画像生成ツール比較（MatrixFlow）: https://www.matrixflow.net/case-study/134/
-- 画像生成AIおすすめランキング2026（romptn Magazine）: https://romptn.com/article/106698
+- <a id="ref-736"></a>[736] 画像生成AIおすすめランキング2026（romptn Magazine） — https://romptn.com/article/106698
 - 画像生成AIツール比較｜主要8選: https://arte.itlibra.com/ja/articles/best-image-generation-ai-tools-2026
 - 画像生成AIおすすめ比較（Claude Codeでの業務活用法）: https://genai-ai.co.jp/ai-kanri/blog/cc-image-gen-ai-comparison-2/
-- 画像生成AIおすすめ比較（業務活用の最適解）: https://genai-ai.co.jp/ai-kanri/blog/cc-image-gen-ai-comparison-3/
+- <a id="ref-739"></a>[739] 画像生成AIおすすめ比較（業務活用の最適解） — https://genai-ai.co.jp/ai-kanri/blog/cc-image-gen-ai-comparison-3/
 
 ### 画像生成プロンプトエンジニアリング（一次情報）
 
-- GPT Image Generation Models Prompting Guide（OpenAI Cookbook）: https://developers.openai.com/cookbook/examples/multimodal/image-gen-models-prompting-guide
+- <a id="ref-743"></a>[743] GPT Image Generation Models Prompting Guide（OpenAI Cookbook） — https://developers.openai.com/cookbook/examples/multimodal/image-gen-models-prompting-guide
 - GPT Image 2 Prompting Guide and Examples（fal）: https://fal.ai/learn/tools/prompting-gpt-image-2
 - Gpt-image-1.5 Prompting Guide（OpenAI Cookbook）: https://developers.openai.com/cookbook/examples/multimodal/image-gen-1.5-prompting_guide
-- Image generation（OpenAI API公式ドキュメント）: https://platform.openai.com/docs/guides/image-generation
+- <a id="ref-746"></a>[746] Image generation（OpenAI API公式ドキュメント） — https://platform.openai.com/docs/guides/image-generation
 - Best practices for prompt engineering with the OpenAI API（OpenAI Help Center）: https://help.openai.com/en/articles/6654000-best-practices-for-prompt-engineering-with-the-openai-api
 - The Ultimate OpenAI (ChatGPT) Image Prompting Guide: https://www.freshtechtips.com/2026/05/openai-chatgpt-image-prompting-guide.html
 - Prompting gpt-image-2 like a pro: https://www.i-scoop.eu/prompting-gpt-image-2-like-a-pro-guide/
@@ -813,9 +813,9 @@ flowchart TD
 
 ### リアルタイム音声対話・ネイティブマルチモーダル
 
-- Build real-time conversational agents with Gemini 3.1 Flash Live（Google公式）: https://blog.google/innovation-and-ai/technology/developers-tools/build-with-gemini-3-1-flash-live/
-- Models | Gemini API（Google公式ドキュメント）: https://ai.google.dev/gemini-api/docs/models
-- Gemini 3.1 Flash Live: Making audio AI more natural and reliable（Google公式）: https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-flash-live/
+- <a id="ref-809"></a>[809] Build real-time conversational agents with Gemini 3.1 Flash Live（Google公式） — https://blog.google/innovation-and-ai/technology/developers-tools/build-with-gemini-3-1-flash-live/
+- <a id="ref-810"></a>[810] Models | Gemini API（Google公式ドキュメント） — https://ai.google.dev/gemini-api/docs/models
+- <a id="ref-811"></a>[811] Gemini 3.1 Flash Live: Making audio AI more natural and reliable（Google公式） — https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-flash-live/
 - How to use Gemini Live API Native Audio in Vertex AI（Google Cloud Blog）: https://cloud.google.com/blog/topics/developers-practitioners/how-to-use-gemini-live-api-native-audio-in-vertex-ai
 - Gemini 3.1 Flash Live vs GPT Realtime 1.5比較: https://flowtivity.ai/blog/gemini-3-1-flash-live-vs-gpt-realtime-1-5-voice-agent-comparison-2026/
 - GPT-Realtime-2 vs Gemini Live API比較: https://webscraft.org/blog/gptrealtime2-vs-gemini-live-api-scho-obrati-dlya-golosovogo-agenta-u-2026-rotsi?lang=en
