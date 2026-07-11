@@ -77,6 +77,7 @@ describe("/local-llm/best-practices - page structure", () => {
 
   it("renders all 15 expected sections", () => {
     const { container } = render(<Page />);
+    expect(EXPECTED_SECTION_IDS.length).toBe(15);
     for (const id of EXPECTED_SECTION_IDS) {
       const el = container.querySelector(`#${id}`);
       expect(el, `section id="${id}" must exist`).not.toBeNull();

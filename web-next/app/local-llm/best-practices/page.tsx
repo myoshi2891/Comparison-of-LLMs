@@ -749,7 +749,7 @@ export default function LocalLlmBestPracticesPage() {
           </p>
           <p>
             vLLMでは、AWQ Marlin/TritonカーネルやGPTQ Marlin/BitBLAS等19種の
-            <strong>レガシー量子化カーネル of 非推奨化提案（RFC）</strong>
+            <strong>レガシー量子化カーネルの非推奨化提案（RFC）</strong>
             が進行中です。本番の量子化スタックを固定する前に、vLLMのGitHub上の関連Issue/RFCを確認することを推奨します。
           </p>
 
