@@ -106,12 +106,12 @@ AIセキュリティには「唯一の標準」は存在せず、複数のフレ
 
 | フレームワーク | 発行元 | 性質 | 主なカバー範囲 | 最新状況（2026年7月時点） |
 |---|---|---|---|---|
-| OWASP Top 10 for LLM Applications | OWASP GenAI Security Project | 優先度付きリスクリスト（チェックリスト型） | プロンプトインジェクション、機密情報漏洩、サプライチェーン、データ/モデルポイズニング等10項目 | 2025年版が最新。LLM01〜LLM10として体系化 [1][3] |
-| OWASP Top 10 for Agentic Applications | OWASP GenAI Security Project | エージェント特化の優先度付きリスクリスト | 目標ハイジャック、ツール誤用、ID/権限乱用、サプライチェーン侵害等 | 2026年版がBlack Hat Europe 2025で発表され、ASI01〜ASI10として整理 [4][7] |
-| MITRE ATLAS | MITRE Corporation | 攻撃者の戦術・手法のナレッジベース（ATT&CK類似） | 偵察からモデル窃取、侵害後の影響まで攻撃チェーン全体 | 2026年2月時点でv5.4.0、16戦術・84手法・56サブ手法・32緩和策・42実事例に拡大 [23] |
-| NIST AI RMF + Generative AI Profile (AI 600-1) | 米国NIST | 任意適用のリスクマネジメントフレームワーク | Govern/Map/Measure/Manageの4機能、生成AI特有の12リスク領域 | 2026年2月にNIST CAISIがAI Agent Standards Initiativeを発表、エージェント向けプロファイルをQ4 2026に予定 [20][21] |
-| ISO/IEC 42001 | ISO/IEC | 認証可能なマネジメントシステム規格（PDCA型） | AI管理システム全体のガバナンス、リスク管理、説明責任 | 世界初の認証可能なAI管理システム規格。Microsoft、Synthesia等が認証取得済み [102][106] |
-| EU AI Act | 欧州連合 | 法的拘束力のある規制 | リスクベースのAI規制、GPAIモデル義務、高リスクAIシステム義務 | 2026年8月2日に大部分が適用開始。高リスク義務は2027年12月/2028年8月へ延期見込み（Omnibus合意） [35][36] |
+| OWASP Top 10 for LLM Applications | OWASP GenAI Security Project | 優先度付きリスクリスト（チェックリスト型） | プロンプトインジェクション、機密情報漏洩、サプライチェーン、データ/モデルポイズニング等10項目 | 2025年版が最新。LLM01〜LLM10として体系化 [1](#ref-1)[3](#ref-3) |
+| OWASP Top 10 for Agentic Applications | OWASP GenAI Security Project | エージェント特化の優先度付きリスクリスト | 目標ハイジャック、ツール誤用、ID/権限乱用、サプライチェーン侵害等 | 2026年版がBlack Hat Europe 2025で発表され、ASI01〜ASI10として整理 [10](#ref-10)[11](#ref-11) |
+| MITRE ATLAS | MITRE Corporation | 攻撃者の戦術・手法のナレッジベース（ATT&CK類似） | 偵察からモデル窃取、侵害後の影響まで攻撃チェーン全体 | 2026年2月時点でv5.4.0、16戦術・84手法・56サブ手法・32緩和策・42実事例に拡大 [40](#ref-40)[41](#ref-41) |
+| NIST AI RMF + Generative AI Profile (AI 600-1) | 米国NIST | 任意適用のリスクマネジメントフレームワーク | Govern/Map/Measure/Manageの4機能、生成AI特有 of 12リスク領域 | 2026年2月にNIST CAISIがAI Agent Standards Initiativeを発表、エージェント向けプロファイルをQ4 2026に予定 [30](#ref-30)[32](#ref-32) |
+| ISO/IEC 42001 | ISO/IEC | 認証可能なマネジメントシステム規格（PDCA型） | AI管理システム全体のガバナンス、リスク管理、説明責任 | 世界初の認証可能なAI管理システム規格。Microsoft、Synthesia等が認証取得済み [102](#ref-102)[106](#ref-106) |
+| EU AI Act | 欧州連合 | 法的拘束力のある規制 | リスクベースのAI規制、GPAIモデル義務、高リスクAIシステム義務 | 2026年8月2日に大部分が適用開始。高リスク義務は2027年12月/2028年8月へ延期見込み（Omnibus合意） [58](#ref-58)[60](#ref-60) |
 
 これらの関係性を図で整理すると、次のようになります。
 
@@ -728,9 +728,9 @@ flowchart LR
 
 ### OWASP Top 10 for LLM Applications（1〜9）
 
-1. LLMRisks Archive - OWASP Gen AI Security Project — https://genai.owasp.org/llm-top-10/
+<a id="ref-1"></a>1. LLMRisks Archive - OWASP Gen AI Security Project — https://genai.owasp.org/llm-top-10/
 2. OWASP Top 10 for Large Language Model Applications | OWASP Foundation — https://owasp.org/www-project-top-10-for-large-language-model-applications/
-3. OWASP Top 10 LLM, Updated 2025: Examples & Mitigation Strategies (Oligo Security) — https://www.oligo.security/academy/owasp-top-10-llm-updated-2025-examples-and-mitigation-strategies
+<a id="ref-3"></a>3. OWASP Top 10 LLM, Updated 2025: Examples & Mitigation Strategies (Oligo Security) — https://www.oligo.security/academy/owasp-top-10-llm-updated-2025-examples-and-mitigation-strategies
 4. Home - OWASP Gen AI Security Project — https://genai.owasp.org/
 5. OWASP Top 10 for LLM Applications 2025 — https://genai.owasp.org/resource/owasp-top-10-for-llm-applications-2025/
 6. OWASP Top 10 for LLM - 2025 (Security Compass / Kontra) — https://application.security/free/llm
@@ -740,8 +740,8 @@ flowchart LR
 
 ### OWASP Top 10 for Agentic Applications 2026（10〜19）
 
-10. OWASP Top 10 for Agentic Applications for 2026 - OWASP Gen AI Security Project — https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/
-11. OWASP Top 10 for Agentic Applications 2026 Is Here (Palo Alto Networks Blog) — https://www.paloaltonetworks.com/blog/cloud-security/owasp-agentic-ai-security/
+<a id="ref-10"></a>10. OWASP Top 10 for Agentic Applications for 2026 - OWASP Gen AI Security Project — https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/
+<a id="ref-11"></a>11. OWASP Top 10 for Agentic Applications 2026 Is Here (Palo Alto Networks Blog) — https://www.paloaltonetworks.com/blog/cloud-security/owasp-agentic-ai-security/
 12. OWASP Top 10 for Agents 2026 | DeepTeam — https://www.trydeepteam.com/docs/frameworks-owasp-top-10-for-agentic-applications
 13. Lessons from OWASP Top 10 for Agentic Applications (Auth0) — https://auth0.com/blog/owasp-top-10-agentic-applications-lessons/
 14. OWASP Top 10 for Agentic Applications for 2026 (Practical DevSecOps) — https://www.practical-devsecops.com/owasp-top-10-agentic-applications/
@@ -766,9 +766,9 @@ flowchart LR
 
 ### NIST AI Risk Management Framework（30〜39）
 
-30. Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile | NIST — https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence
+<a id="ref-30"></a>30. Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile | NIST — https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence
 31. AI Risk Management Framework | NIST — https://www.nist.gov/itl/ai-risk-management-framework
-32. Artificial Intelligence Risk Management Framework (NIST AI 600-1, PDF) — https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf
+<a id="ref-32"></a>32. Artificial Intelligence Risk Management Framework (NIST AI 600-1, PDF) — https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf
 33. NIST AI Risk Management Framework: Agentic Profile (Cloud Security Alliance) — https://labs.cloudsecurityalliance.org/agentic/agentic-nist-ai-rmf-profile-v1/
 34. NIST AI RMF (ModelOp) — https://www.modelop.com/ai-governance/ai-regulations-standards/nist-ai-rmf
 35. NIST Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile (Digital Government Hub) — https://digitalgovernmenthub.org/examples/nist-artificial-intelligence-risk-management-framework-generative-artificial-intelligence-profile/
@@ -779,8 +779,8 @@ flowchart LR
 
 ### MITRE ATLAS（40〜47）
 
-40. MITRE ATLAS AI Security and Agentic Threats 2026 Update (Zenity) — https://zenity.io/blog/current-events/mitre-atlas-ai-security
-41. MITRE ATLAS: AI security framework with 16 tactics and 84 techniques (Vectra AI) — https://www.vectra.ai/topics/mitre-atlas
+<a id="ref-40"></a>40. MITRE ATLAS AI Security and Agentic Threats 2026 Update (Zenity) — https://zenity.io/blog/current-events/mitre-atlas-ai-security
+<a id="ref-41"></a>41. MITRE ATLAS: AI security framework with 16 tactics and 84 techniques (Vectra AI) — https://www.vectra.ai/topics/mitre-atlas
 42. Security Considerations for Multi-agent Systems (arXiv) — https://arxiv.org/pdf/2603.09002
 43. MITRE ATLAS Framework 2026 - Guide to Securing AI Systems (Practical DevSecOps) — https://www.practical-devsecops.com/mitre-atlas-framework-guide-securing-ai-systems/
 44. What is MITRE ATLAS? (CrowdStrike) — https://www.crowdstrike.com/en-us/cybersecurity-101/artificial-intelligence/mitre-atlas/
@@ -803,9 +803,9 @@ flowchart LR
 
 ### EU AI Act（58〜67）
 
-58. AI Act | Shaping Europe's digital future (European Commission) — https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai
+<a id="ref-58"></a>58. AI Act | Shaping Europe's digital future (European Commission) — https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai
 59. Timeline for the Implementation of the EU AI Act (AI Act Service Desk) — https://ai-act-service-desk.ec.europa.eu/en/ai-act/timeline/timeline-implementation-eu-ai-act
-60. EU AI Act Omnibus Agreement — Postponed High-Risk Deadlines and Other Key Changes (Gibson Dunn) — https://www.gibsondunn.com/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes/
+<a id="ref-60"></a>60. EU AI Act Omnibus Agreement — Postponed High-Risk Deadlines and Other Key Changes (Gibson Dunn) — https://www.gibsondunn.com/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes/
 61. AI Act Update: EU Resolves to Change Rules and Extend Deadlines (Latham & Watkins) — https://www.lw.com/en/insights/ai-act-update-eu-resolves-to-change-rules-and-extend-deadlines
 62. Implementation Timeline | EU Artificial Intelligence Act — https://artificialintelligenceact.eu/implementation-timeline/
 63. EU AI Act High-Risk Deadline: Enterprise Readiness Gap (Cloud Security Alliance) — https://labs.cloudsecurityalliance.org/research/csa-research-note-eu-ai-act-high-risk-compliance-deadline-20/
@@ -862,11 +862,11 @@ flowchart LR
 
 ### ISO/IEC 42001（102〜111）
 
-102. ISO/IEC 42001:2023 Artificial Intelligence Management System Standards (Microsoft Learn) — https://learn.microsoft.com/en-us/compliance/regulatory/offering-iso-42001
+<a id="ref-102"></a>102. ISO/IEC 42001:2023 Artificial Intelligence Management System Standards (Microsoft Learn) — https://learn.microsoft.com/en-us/compliance/regulatory/offering-iso-42001
 103. ISO/IEC 42001:2023 - AI management systems (ISO) — https://www.iso.org/standard/42001
 104. ISO/IEC 42001 Artificial Intelligence Management System — Training Courses (PECB) — https://pecb.com/en/education-and-certification-for-individuals/iso-iec-42001
 105. ISO 42001 - AI Management System (BSI) — https://www.bsigroup.com/en-US/products-and-services/standards/iso-42001-ai-management-system/
-106. ISO/IEC 42001 Deep Dive: The AI Management System Standard, Decoded (2026) (Lorikeet Security) — https://lorikeetsecurity.com/blog/iso-42001-ai-management-system-2026
+<a id="ref-106"></a>106. ISO/IEC 42001 Deep Dive: The AI Management System Standard, Decoded (2026) (Lorikeet Security) — https://lorikeetsecurity.com/blog/iso-42001-ai-management-system-2026
 107. ISO/IEC 42001 Certification: AI Management System (DNV) — https://www.dnv.com/services/iso-iec-42001-artificial-intelligence-ai--250876/
 108. ISO - ISO 42001 explained — https://www.iso.org/home/insights-news/resources/iso-42001-explained-what-it-is.html
 109. ISO/IEC 42001: AI Management System for Governance (KPMG) — https://kpmg.com/ch/en/insights/artificial-intelligence/iso-iec-42001.html
