@@ -59,6 +59,7 @@ export const navLinks: readonly NavLink[] = [
       { name: "Antigravity Slash Commands", href: "/google/antigravity-slash-commands-guide" },
       { name: "Harness Engineering", href: "/google/harness-engineering" },
       { name: "Agent Harness Engineering", href: "/google/agent-harness-engineering" },
+      { name: "NotebookLM Guide", href: "/google/notebook-lm" },
     ],
   },
   {
@@ -99,6 +100,12 @@ export const navLinks: readonly NavLink[] = [
     ],
   },
   {
+    name: "Local LLM",
+    children: [
+      { name: "Self-hosting Guide", href: "/local-llm/self-hosting" },
+    ],
+  },
+  {
     name: "Sandbox",
     children: [{ name: "Vercel Sandbox", href: "/vercel/sandbox" }],
   },
@@ -107,6 +114,12 @@ export const navLinks: readonly NavLink[] = [
     children: [
       { name: "Cursor Guide", href: "/cursor/complete-guide" },
       { name: "Cursor Guide (中級)", href: "/cursor/complete-guide-intermediate" },
+    ],
+  },
+  {
+    name: "Security",
+    children: [
+      { name: "AI Security Best Practices", href: "/security/ai-security-best-practices" },
     ],
   },
   { name: "Git Worktree", href: "/git-worktree" },

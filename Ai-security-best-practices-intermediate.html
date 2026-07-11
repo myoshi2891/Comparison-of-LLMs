@@ -1,0 +1,3753 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AIセキュリティ ベストプラクティス完全ガイド</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+    />
+    <style>
+      /* ============ Design Tokens ============ */
+      :root {
+        --bg-base: #07111e;
+        --bg-surface: #0b1729;
+        --bg-card: #0f1f34;
+        --bg-card-hover: #132842;
+        --bg-code: #0a1626;
+        --border: rgba(148, 178, 214, 0.14);
+        --border-strong: rgba(148, 178, 214, 0.3);
+        --text-primary: #eef3fa;
+        --text-secondary: #a9bcd6;
+        --text-muted: #6f84a3;
+        --accent-cyan: #4dd8e6;
+        --accent-cyan-dim: rgba(77, 216, 230, 0.12);
+        --accent-amber: #f5b361;
+        --accent-amber-dim: rgba(245, 179, 97, 0.12);
+        --accent-red: #ef6461;
+        --accent-red-dim: rgba(239, 100, 97, 0.12);
+        --accent-green: #6ee7b7;
+        --accent-green-dim: rgba(110, 231, 183, 0.12);
+        --font-display: 'Space Grotesk', sans-serif;
+        --font-body: 'Inter', sans-serif;
+        --font-mono: 'JetBrains Mono', monospace;
+        --sidebar-w: 300px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--bg-base);
+        color: var(--text-primary);
+        font-family: var(--font-body);
+        font-size: 16px;
+        line-height: 1.75;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* subtle ambient scan-line signature element */
+      .scan-line {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+        opacity: 0.5;
+        z-index: 9999;
+        animation: scan 6s linear infinite;
+        pointer-events: none;
+      }
+      @keyframes scan {
+        0% {
+          transform: translateY(0);
+          opacity: 0;
+        }
+        5% {
+          opacity: 0.6;
+        }
+        50% {
+          transform: translateY(50vh);
+          opacity: 0.35;
+        }
+        95% {
+          opacity: 0.6;
+        }
+        100% {
+          transform: translateY(100vh);
+          opacity: 0;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .scan-line {
+          animation: none;
+          display: none;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+
+      /* ============ Topbar ============ */
+      .topbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+        background: rgba(7, 17, 30, 0.85);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border);
+        z-index: 1000;
+      }
+      .topbar .brand {
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: 15px;
+        letter-spacing: 0.02em;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .topbar .brand .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent-cyan);
+        box-shadow: 0 0 8px var(--accent-cyan);
+      }
+      .topbar .meta {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+      .menu-toggle {
+        display: none;
+        background: none;
+        border: 1px solid var(--border-strong);
+        color: var(--text-primary);
+        border-radius: 6px;
+        width: 36px;
+        height: 36px;
+        cursor: pointer;
+        font-size: 18px;
+      }
+
+      /* ============ Layout ============ */
+      .layout {
+        display: flex;
+        padding-top: 56px;
+        width: 100%;
+      }
+
+      /* ============ Sidebar ============ */
+      .sidebar {
+        position: sticky;
+        top: 56px;
+        width: var(--sidebar-w);
+        flex-shrink: 0;
+        height: calc(100vh - 56px);
+        overflow-y: auto;
+        padding: 28px 16px 40px 28px;
+        border-right: 1px solid var(--border);
+      }
+      .sidebar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .sidebar::-webkit-scrollbar-thumb {
+        background: var(--border-strong);
+        border-radius: 2px;
+      }
+
+      .sidebar .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 14px;
+      }
+      .sidebar ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .sidebar li {
+        margin: 0;
+      }
+      .sidebar a {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        padding: 8px 10px;
+        margin: 1px 0;
+        border-radius: 6px;
+        text-decoration: none;
+        color: var(--text-secondary);
+        font-size: 13.5px;
+        line-height: 1.4;
+        border-left: 2px solid transparent;
+        transition: all 0.15s ease;
+      }
+      .sidebar a .num {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--text-muted);
+        flex-shrink: 0;
+        width: 18px;
+      }
+      .sidebar a:hover {
+        background: var(--bg-card);
+        color: var(--text-primary);
+      }
+      .sidebar a.active {
+        background: var(--accent-cyan-dim);
+        color: var(--accent-cyan);
+        border-left: 2px solid var(--accent-cyan);
+      }
+      .sidebar a.active .num {
+        color: var(--accent-cyan);
+      }
+
+      /* ============ Main Content ============ */
+      .content {
+        flex: 1;
+        min-width: 0;
+        padding: 0 48px 120px 56px;
+      }
+      .content-inner {
+        max-width: none;
+        width: 100%;
+        margin: 0;
+      }
+
+      /* Hero */
+      .hero {
+        padding: 72px 0 56px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 56px;
+      }
+      .hero .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent-cyan);
+        margin-bottom: 18px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .hero .eyebrow::before {
+        content: '';
+        width: 24px;
+        height: 1px;
+        background: var(--accent-cyan);
+      }
+      .hero h1 {
+        font-family: var(--font-display);
+        font-size: clamp(32px, 5vw, 52px);
+        font-weight: 700;
+        line-height: 1.15;
+        margin: 0 0 20px;
+        letter-spacing: -0.01em;
+      }
+      .hero .lead {
+        font-size: 17px;
+        color: var(--text-secondary);
+        margin: 0 0 32px;
+      }
+      .hero .stat-strip {
+        display: flex;
+        gap: 0;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .hero .stat {
+        flex: 1;
+        padding: 18px 20px;
+        border-right: 1px solid var(--border);
+      }
+      .hero .stat:last-child {
+        border-right: none;
+      }
+      .hero .stat .num {
+        font-family: var(--font-display);
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--accent-cyan);
+        display: block;
+      }
+      .hero .stat .label {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+
+      /* Section headings */
+      section.chapter {
+        padding-top: 32px;
+        margin-bottom: 64px;
+        scroll-margin-top: 80px;
+      }
+      .chapter-head {
+        display: flex;
+        align-items: baseline;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      .chapter-head .chapter-num {
+        font-family: var(--font-mono);
+        font-size: 14px;
+        color: var(--accent-cyan);
+        background: var(--accent-cyan-dim);
+        border: 1px solid rgba(77, 216, 230, 0.3);
+        border-radius: 20px;
+        padding: 4px 12px;
+        flex-shrink: 0;
+      }
+      h2 {
+        font-family: var(--font-display);
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: -0.01em;
+      }
+      h3 {
+        font-family: var(--font-display);
+        font-size: 19px;
+        font-weight: 600;
+        margin: 36px 0 14px;
+        color: var(--text-primary);
+      }
+      h4 {
+        font-family: var(--font-body);
+        font-size: 15.5px;
+        font-weight: 600;
+        margin: 24px 0 10px;
+        color: var(--accent-cyan);
+      }
+      p {
+        color: var(--text-secondary);
+        margin: 0 0 16px;
+      }
+      strong {
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+      a {
+        color: var(--accent-cyan);
+      }
+      ul,
+      ol {
+        color: var(--text-secondary);
+        padding-left: 22px;
+      }
+      li {
+        margin-bottom: 6px;
+      }
+      li > ul,
+      li > ol {
+        margin-top: 6px;
+      }
+
+      /* Callouts */
+      .callout {
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin: 20px 0;
+        border: 1px solid var(--border);
+        background: var(--bg-card);
+        font-size: 14.5px;
+        color: var(--text-secondary);
+      }
+      .callout .callout-label {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 600;
+        display: block;
+        margin-bottom: 8px;
+      }
+      .callout.warn {
+        border-color: rgba(245, 179, 97, 0.35);
+        background: var(--accent-amber-dim);
+      }
+      .callout.warn .callout-label {
+        color: var(--accent-amber);
+      }
+      .callout.danger {
+        border-color: rgba(239, 100, 97, 0.35);
+        background: var(--accent-red-dim);
+      }
+      .callout.danger .callout-label {
+        color: var(--accent-red);
+      }
+      .callout.info {
+        border-color: rgba(77, 216, 230, 0.35);
+        background: var(--accent-cyan-dim);
+      }
+      .callout.info .callout-label {
+        color: var(--accent-cyan);
+      }
+      .callout.note {
+        border-color: var(--border-strong);
+      }
+      .callout.note .callout-label {
+        color: var(--text-muted);
+      }
+
+      /* Tables */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 22px 0;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+      }
+      thead th {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        text-align: left;
+        color: var(--text-muted);
+        background: var(--bg-surface);
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--border-strong);
+        white-space: nowrap;
+      }
+      tbody td {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-secondary);
+        vertical-align: top;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:hover {
+        background: var(--bg-card);
+      }
+      td strong,
+      td code {
+        color: var(--text-primary);
+      }
+      th:first-child,
+      td:first-child {
+        color: var(--text-primary);
+        font-weight: 500;
+      }
+
+      /* Badges (severity/id pills) */
+      .badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 5px;
+        white-space: nowrap;
+      }
+      .badge-critical {
+        background: var(--accent-red-dim);
+        color: var(--accent-red);
+        border: 1px solid rgba(239, 100, 97, 0.4);
+      }
+      .badge-high {
+        background: var(--accent-amber-dim);
+        color: var(--accent-amber);
+        border: 1px solid rgba(245, 179, 97, 0.4);
+      }
+      .badge-mid {
+        background: var(--accent-cyan-dim);
+        color: var(--accent-cyan);
+        border: 1px solid rgba(77, 216, 230, 0.4);
+      }
+      .badge-ok {
+        background: var(--accent-green-dim);
+        color: var(--accent-green);
+        border: 1px solid rgba(110, 231, 183, 0.4);
+      }
+
+      /* Mermaid diagram containers */
+      .diagram-wrap {
+        margin: 28px 0;
+        padding: 24px;
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow-x: auto;
+      }
+      .diagram-wrap .diagram-caption {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-bottom: 14px;
+        letter-spacing: 0.03em;
+      }
+      .mermaid {
+        display: flex;
+        justify-content: center;
+      }
+
+      /* Code */
+      code {
+        font-family: var(--font-mono);
+        font-size: 0.88em;
+        background: var(--bg-code);
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: var(--accent-cyan);
+      }
+      pre {
+        background: var(--bg-code) !important;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 18px 20px;
+        overflow-x: auto;
+        margin: 20px 0;
+      }
+      pre code {
+        background: none;
+        padding: 0;
+        color: inherit;
+        font-size: 13px;
+      }
+
+      /* Checklist */
+      .checklist {
+        list-style: none;
+        padding-left: 0;
+      }
+      .checklist li {
+        position: relative;
+        padding-left: 30px;
+        margin-bottom: 10px;
+      }
+      .checklist li::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 3px;
+        width: 16px;
+        height: 16px;
+        border: 1.5px solid var(--border-strong);
+        border-radius: 4px;
+        background: var(--bg-card);
+      }
+
+      /* Framework cards */
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 16px;
+        margin: 24px 0;
+      }
+      .fw-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        transition: border-color 0.15s ease;
+      }
+      .fw-card:hover {
+        border-color: var(--border-strong);
+      }
+      .fw-card .fw-name {
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--text-primary);
+        margin-bottom: 6px;
+      }
+      .fw-card .fw-desc {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin: 0;
+      }
+
+      /* Maturity ladder */
+      .ladder {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 24px 0;
+      }
+      .ladder-item {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 20px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: var(--bg-card);
+      }
+      .ladder-item .level {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 20px;
+        width: 52px;
+        text-align: center;
+        flex-shrink: 0;
+      }
+      .ladder-item .level-info .name {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 14.5px;
+      }
+      .ladder-item .level-info .desc {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin-top: 2px;
+      }
+      .ladder-item.l1 {
+        border-left: 3px solid var(--accent-red);
+      }
+      .ladder-item.l1 .level {
+        color: var(--accent-red);
+      }
+      .ladder-item.l2 {
+        border-left: 3px solid var(--accent-amber);
+      }
+      .ladder-item.l2 .level {
+        color: var(--accent-amber);
+      }
+      .ladder-item.l3 {
+        border-left: 3px solid var(--accent-cyan);
+      }
+      .ladder-item.l3 .level {
+        color: var(--accent-cyan);
+      }
+      .ladder-item.l4 {
+        border-left: 3px solid var(--accent-green);
+      }
+      .ladder-item.l4 .level {
+        color: var(--accent-green);
+      }
+
+      /* References */
+      .ref-group {
+        margin-bottom: 28px;
+      }
+      .ref-group h4 {
+        color: var(--text-primary);
+        margin-bottom: 12px;
+      }
+      .ref-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .ref-list li {
+        font-size: 13px;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        gap: 10px;
+      }
+      .ref-list li:last-child {
+        border-bottom: none;
+      }
+      .ref-list .ref-num {
+        font-family: var(--font-mono);
+        color: var(--text-muted);
+        flex-shrink: 0;
+        width: 28px;
+      }
+      .ref-list a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        word-break: break-all;
+      }
+      .ref-list a:hover {
+        color: var(--accent-cyan);
+        text-decoration: underline;
+      }
+
+      /* Footer disclaimer */
+      .disclaimer {
+        margin-top: 40px;
+        padding: 20px 24px;
+        border: 1px dashed var(--border-strong);
+        border-radius: 10px;
+        font-size: 13px;
+        color: var(--text-muted);
+      }
+
+      hr.divider {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 48px 0;
+      }
+
+      /* Responsive */
+      @media (max-width: 900px) {
+        .menu-toggle {
+          display: block;
+        }
+        .sidebar {
+          position: fixed;
+          left: 0;
+          top: 56px;
+          height: calc(100vh - 56px);
+          background: var(--bg-base);
+          transform: translateX(-100%);
+          transition: transform 0.2s ease;
+          z-index: 900;
+          width: 280px;
+          padding-right: 16px;
+        }
+        .sidebar.open {
+          transform: translateX(0);
+          box-shadow: 8px 0 24px rgba(0, 0, 0, 0.4);
+        }
+        .content {
+          padding: 0 20px 100px;
+        }
+        .hero {
+          padding: 48px 0 40px;
+        }
+        .hero .stat-strip {
+          flex-direction: column;
+        }
+        .hero .stat {
+          border-right: none;
+          border-bottom: 1px solid var(--border);
+        }
+        .hero .stat:last-child {
+          border-bottom: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scan-line" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <div class="brand"><span class="dot"></span>AI Security Best Practices</div>
+      <button class="menu-toggle" id="menuToggle" aria-label="メニュー">☰</button>
+      <div class="meta" id="topbarMeta">2026年7月版</div>
+    </header>
+
+    <div class="layout">
+      <nav class="sidebar" id="sidebar">
+        <div class="eyebrow">目次 / Contents</div>
+        <ul id="navList">
+          <li>
+            <a href="#sec-01"><span class="num">01</span>はじめに</a>
+          </li>
+          <li>
+            <a href="#sec-02"><span class="num">02</span>脅威ランドスケープ</a>
+          </li>
+          <li>
+            <a href="#sec-03"><span class="num">03</span>主要フレームワーク</a>
+          </li>
+          <li>
+            <a href="#sec-04"><span class="num">04</span>プロンプトインジェクション</a>
+          </li>
+          <li>
+            <a href="#sec-05"><span class="num">05</span>機密情報漏洩対策</a>
+          </li>
+          <li>
+            <a href="#sec-06"><span class="num">06</span>データ/モデル汚染</a>
+          </li>
+          <li>
+            <a href="#sec-07"><span class="num">07</span>モデル抽出・窃取</a>
+          </li>
+          <li>
+            <a href="#sec-08"><span class="num">08</span>RAG/ベクトルDB</a>
+          </li>
+          <li>
+            <a href="#sec-09"><span class="num">09</span>エージェント/MCP</a>
+          </li>
+          <li>
+            <a href="#sec-10"><span class="num">10</span>出力検証・ガードレール</a>
+          </li>
+          <li>
+            <a href="#sec-11"><span class="num">11</span>レッドチーミング</a>
+          </li>
+          <li>
+            <a href="#sec-12"><span class="num">12</span>監視・IR</a>
+          </li>
+          <li>
+            <a href="#sec-13"><span class="num">13</span>サプライチェーン/AIBOM</a>
+          </li>
+          <li>
+            <a href="#sec-14"><span class="num">14</span>ガバナンス・法規制</a>
+          </li>
+          <li>
+            <a href="#sec-15"><span class="num">15</span>インシデント事例</a>
+          </li>
+          <li>
+            <a href="#sec-16"><span class="num">16</span>成熟度モデル</a>
+          </li>
+          <li>
+            <a href="#sec-17"><span class="num">17</span>参考文献</a>
+          </li>
+        </ul>
+      </nav>
+
+      <main class="content">
+        <div class="content-inner">
+          <section class="hero" id="sec-00">
+            <div class="eyebrow">中級〜上級者向け実践ガイド</div>
+            <h1>AIセキュリティ<br />ベストプラクティス完全ガイド</h1>
+            <p class="lead">
+              LLM・RAG基盤・AIエージェント・MCP(Model Context
+              Protocol)連携システムを設計/実装/運用するエンジニアのための、2026年7月時点の最新フレームワークと実践的な多層防御の設計指針。
+            </p>
+            <div class="stat-strip">
+              <div class="stat">
+                <span class="num">17</span><span class="label">章立てステップ</span>
+              </div>
+              <div class="stat">
+                <span class="num">11</span><span class="label">Mermaid図解</span>
+              </div>
+              <div class="stat">
+                <span class="num">111</span><span class="label">一次情報ソース</span>
+              </div>
+              <div class="stat">
+                <span class="num">2026.07</span><span class="label">最終更新基準日</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="chapter" id="sec-01">
+            <div class="chapter-head">
+              <span class="chapter-num">01 / 17</span>
+              <h2>なぜ今、AIセキュリティなのか</h2>
+            </div>
+
+            <p>
+              生成AI・LLMアプリケーションは、2024年後半から2026年にかけて「文章を生成するだけの存在」から「ツールを呼び出し、記憶を持ち、自律的に行動するエージェント」へと急速に進化しました。この変化に伴い、セキュリティ上の前提そのものが変わっています。
+            </p>
+
+            <p>
+              従来のアプリケーションセキュリティは「決定論的なコードパス」を前提としていましたが、LLMは非決定論的かつ自然言語駆動であるため、攻撃面もSAST/DASTのような従来型ツールでは捉えきれません。攻撃はコードレベルではなく、プロンプトや会話レベルで発生します。さらに2025〜2026年にかけては、AIエージェントが実運用のワークフローに組み込まれ、平均的な企業ではマシンID対ヒューマンIDの比率が82対1に達しているとの報告もあり、エージェントは「テキストを生成するだけ」の存在から「現実世界のアクションを実行する」存在へと変わりました<sup>[5]</sup>。
+            </p>
+
+            <p>この結果、以下のような新しいリスクカテゴリが実務上の最優先事項になっています。</p>
+            <ul>
+              <li>プロンプトインジェクション（直接・間接）</li>
+              <li>機密情報の漏洩（システムプロンプト、PII、学習データ）</li>
+              <li>データ/モデルポイズニング、サプライチェーン攻撃</li>
+              <li>モデル抽出・窃取</li>
+              <li>RAG・ベクトルDBを経由した攻撃</li>
+              <li>エージェントの目標乗っ取り、ツール誤用、権限昇格</li>
+              <li>MCP（Model Context Protocol）のようなツール連携プロトコル特有の脆弱性</li>
+            </ul>
+
+            <div class="callout info">
+              <span class="callout-label">Guide Scope</span>
+              本ガイドは、これらすべてを中級〜上級者向けに、最新（2026年7月時点）の一次情報に基づいて整理し、実践的な多層防御の設計指針を提供します。
+            </div>
+          </section>
+
+          <section class="chapter" id="sec-02">
+            <div class="chapter-head">
+              <span class="chapter-num">02 / 17</span>
+              <h2>AI脅威ランドスケープの全体像</h2>
+            </div>
+
+            <p>
+              AIシステムは、データ層・モデル層・アプリケーション層・エージェント/ツール層・インフラ層という5つの層それぞれに固有の攻撃面を持ちます。まず全体像を俯瞰します。
+            </p>
+
+            <div class="diagram-wrap">
+              <div class="diagram-caption">Fig.1 — AIシステムの5層構造と主な脅威</div>
+              <div class="mermaid" data-key="threat-landscape"></div>
+            </div>
+
+            <p>
+              この全体像を踏まえたうえで、業界標準のフレームワークがそれぞれの層をどうカバーしているかを次章で整理します。
+            </p>
+          </section>
+
+          <section class="chapter" id="sec-03">
+            <div class="chapter-head">
+              <span class="chapter-num">03 / 17</span>
+              <h2>主要セキュリティフレームワークの理解</h2>
+            </div>
+
+            <p>
+              AIセキュリティには「唯一の標準」は存在せず、複数のフレームワークを組み合わせて使うのが実務上の標準的アプローチです。それぞれの役割分担を理解することが最初のステップです。
+            </p>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>フレームワーク</th>
+                    <th>発行元</th>
+                    <th>性質</th>
+                    <th>主なカバー範囲</th>
+                    <th>最新状況（2026年7月時点）</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>OWASP Top 10 for LLM Applications</td>
+                    <td>OWASP GenAI Security Project</td>
+                    <td>優先度付きリスクリスト</td>
+                    <td>
+                      プロンプトインジェクション、機密情報漏洩、サプライチェーン、データ/モデルポイズニング等10項目
+                    </td>
+                    <td>2025年版が最新。LLM01〜LLM10として体系化<sup>[1][3]</sup></td>
+                  </tr>
+                  <tr>
+                    <td>OWASP Top 10 for Agentic Applications</td>
+                    <td>OWASP GenAI Security Project</td>
+                    <td>エージェント特化のリスクリスト</td>
+                    <td>目標ハイジャック、ツール誤用、ID/権限乱用、サプライチェーン侵害等</td>
+                    <td>
+                      2026年版がBlack Hat Europe 2025で発表、ASI01〜ASI10として整理<sup>[4][7]</sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>MITRE ATLAS</td>
+                    <td>MITRE Corporation</td>
+                    <td>攻撃者の戦術・手法DB</td>
+                    <td>偵察からモデル窃取、侵害後の影響まで攻撃チェーン全体</td>
+                    <td>
+                      2026年2月時点でv5.4.0、16戦術・84手法・56サブ手法・32緩和策・42実事例<sup
+                        >[23]</sup
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>NIST AI RMF + Generative AI Profile</td>
+                    <td>米国NIST</td>
+                    <td>任意適用のリスクマネジメント</td>
+                    <td>Govern/Map/Measure/Manageの4機能、生成AI特有の12リスク領域</td>
+                    <td>
+                      2026年2月にAI Agent Standards Initiative発表、Q4
+                      2026にエージェント向けプロファイル予定<sup>[20][21]</sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>ISO/IEC 42001</td>
+                    <td>ISO/IEC</td>
+                    <td>認証可能なマネジメント規格</td>
+                    <td>AI管理システム全体のガバナンス、リスク管理、説明責任</td>
+                    <td>
+                      世界初の認証可能AI管理システム規格。Microsoft、Synthesia等が認証取得済み<sup
+                        >[102][106]</sup
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>EU AI Act</td>
+                    <td>欧州連合</td>
+                    <td>法的拘束力のある規制</td>
+                    <td>リスクベースのAI規制、GPAIモデル義務、高リスクAIシステム義務</td>
+                    <td>
+                      2026年8月2日に大部分が適用開始。高リスク義務は2027年12月/2028年8月へ延期見込み<sup
+                        >[35][36]</sup
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>これらの関係性を図で整理すると、次のようになります。</p>
+
+            <div class="diagram-wrap">
+              <div class="diagram-caption">Fig.2 — フレームワーク間の関係性</div>
+              <div class="mermaid" data-key="framework-relations"></div>
+            </div>
+
+            <h3>実務上の使い分けの目安</h3>
+            <ul>
+              <li>
+                <strong>ガバナンス・経営層への説明責任</strong>が目的なら → NIST AI RMF / ISO 42001
+              </li>
+              <li>
+                <strong>開発チームの技術的実装チェックリスト</strong>が目的なら → OWASP Top 10 (LLM
+                / Agentic)
+              </li>
+              <li>
+                <strong>レッドチーム演習・脅威モデリングの語彙</strong>が目的なら → MITRE ATLAS
+              </li>
+              <li>
+                <strong>法的コンプライアンス</strong>が目的なら → EU AI Act（および各国のAI関連法）
+              </li>
+            </ul>
+          </section>
+
+          <section class="chapter" id="sec-04">
+            <div class="chapter-head">
+              <span class="chapter-num">04 / 17</span>
+              <h2>ステップ1: プロンプトインジェクション対策</h2>
+            </div>
+
+            <p>
+              OWASP Top 10 for LLM Applications
+              2025において、プロンプトインジェクションは依然として第1位（LLM01:2025）の重大リスクです<sup>[1][3]</sup>。攻撃者がLLMへの入力を操作し、意図した振る舞いを上書きすることで、機密情報の窃取・意思決定の改ざん・不正なツール実行を引き起こします。
+            </p>
+
+            <h3>4.1 直接インジェクションと間接インジェクションの違い</h3>
+
+            <div class="diagram-wrap">
+              <div class="diagram-caption">
+                Fig.3 — 直接インジェクション vs 間接インジェクション
+              </div>
+              <div class="mermaid" data-key="prompt-injection"></div>
+            </div>
+
+            <p>
+              間接インジェクションが特に危険な理由は、コンテンツの出どころ（provenance）をユーザーが検証できない点にあります。エージェントが読み込む文書・メール・ツール出力は「データ」であるはずなのに、LLMの内部ではそれが「指示」として解釈されてしまう構造的な問題です。
+            </p>
+
+            <h3>4.2 防御技術の比較</h3>
+
+            <div class="callout warn">
+              <span class="callout-label">重要な前提</span>
+              OpenAI・Anthropic・Google
+              DeepMindはいずれも2025年の公表資料で「現在のLLMアーキテクチャの範囲内ではプロンプトインジェクションを完全に解決することはできない」と認めています。モデルレベルで表現される防御策は原理的にすべて上書きされうるためです<sup>[48]</sup>。したがって実務上は「多層防御でブラスト半径を縮小する」ことが目標になります。
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>防御技術</th>
+                    <th>概要</th>
+                    <th>効果（研究報告値）</th>
+                    <th>コスト/トレードオフ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Spotlighting<br /><span class="badge badge-ok">低コスト</span></td>
+                    <td>
+                      信頼できない外部コンテンツを特殊なマーカーで囲み、モデルに「これは指示ではなくデータ」と明示する
+                    </td>
+                    <td>攻撃成功率を50%超から2%未満に低減<sup>[53]</sup></td>
+                    <td>実装コストは低いが、適応的攻撃には依然脆弱</td>
+                  </tr>
+                  <tr>
+                    <td>StruQ（構造化クエリ）</td>
+                    <td>
+                      ベースモデルを再学習し、プロンプト部分とデータ部分を分離したチャネルとして扱わせる
+                    </td>
+                    <td>プロンプトインジェクション成功率を大幅に低減</td>
+                    <td>モデルの再学習が必要でコスト高</td>
+                  </tr>
+                  <tr>
+                    <td>SecAlign（選好最適化）</td>
+                    <td>学習時にプロンプトインジェクションへの耐性を最適化する</td>
+                    <td>成功率を10%未満に低減（未知の攻撃にも有効）<sup>[54]</sup></td>
+                    <td>モデル提供側でのみ実施可能</td>
+                  </tr>
+                  <tr>
+                    <td>Self-Reminder</td>
+                    <td>システムプロンプトにユーザークエリを包み込み、責任ある応答を促す</td>
+                    <td>ジェイルブレイク成功率を67.21%→19.34%に低減<sup>[54]</sup></td>
+                    <td>軽量だが万能ではない</td>
+                  </tr>
+                  <tr>
+                    <td>LLMベース前処理フィルタ</td>
+                    <td>専用LLMで入力を検査し、インジェクション内容を検出・除去する</td>
+                    <td>AgentDojoベンチマークで誤検知/見逃し率1%未満<sup>[50]</sup></td>
+                    <td>追加LLM呼び出しで200〜600msのレイテンシ増</td>
+                  </tr>
+                  <tr>
+                    <td>出力スキーマ検証<br /><span class="badge badge-ok">常時導入推奨</span></td>
+                    <td>ツール呼び出しやレスポンスをJSON Schema等で厳格に検証する</td>
+                    <td>明らかな逸脱を機械的に検出</td>
+                    <td>低コストで基礎対策として必須</td>
+                  </tr>
+                  <tr>
+                    <td>行動監視・多モデル投票</td>
+                    <td>複数モデルでの合議、または実行後の振る舞い一貫性チェック</td>
+                    <td>高リスクなアクションに限定して有効</td>
+                    <td>コスト・レイテンシ増（30〜50%程度）</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              実務でのプライオリティは、TokenMixの2026年ベンチマークが示す実装順序が参考になります:
+              ①構造化プロンプトフォーマット（無償・常時導入）→ ②出力スキーマ検証（低コスト）→
+              ③レート制限 → ④LLMフィルタ → ⑤行動監視 →
+              ⑥高リスクアクション限定の多モデル投票、という段階的な積み上げです<sup>[50]</sup>。
+            </p>
+
+            <h3>4.3 実装チェックリスト</h3>
+            <ul class="checklist">
+              <li>
+                すべての外部コンテンツ（RAG検索結果、Web取得結果、ツール出力、添付ファイル）を「信頼できない入力」として扱う
+              </li>
+              <li>
+                システムプロンプトとユーザー/外部データを明確に分離する区切り文字・タグを導入する（例:
+                <code>&lt;user_input&gt;</code>、<code>&lt;untrusted_content&gt;</code>）
+              </li>
+              <li>
+                高リスクなアクション（送金、削除、デプロイ、権限変更等）には人間による再確認（Step-up確認）を要求する
+              </li>
+              <li>
+                単一の防御技術に依存せず、入力検証・出力検証・行動監視を組み合わせた多層防御を構築する
+              </li>
+              <li>
+                プロンプトインジェクションは「防御しきれない前提」でインシデント対応計画を用意する
+              </li>
+            </ul>
+          </section>
+
+          <section class="chapter" id="sec-05">
+            <div class="chapter-head">
+              <span class="chapter-num">05 / 17</span>
+              <h2>ステップ2: 機密情報漏洩・システムプロンプト漏洩対策</h2>
+            </div>
+
+            <p>
+              OWASP Top 10 2025では「Sensitive Information Disclosure」がLLM02、「System Prompt
+              Leakage」がLLM07として独立したカテゴリになっています<sup>[8]</sup>。
+            </p>
+
+            <h3>5.1 何が漏洩しうるか</h3>
+            <ul>
+              <li>
+                システムプロンプトそのもの（内部ロジック、機密ビジネスルール、APIキーの参照方法などが含まれる場合がある）
+              </li>
+              <li>学習データに含まれるPII（個人識別情報）や機密文書の記憶（memorization）</li>
+              <li>RAGパイプラインを通じて取得された、本来アクセス権のない他テナントのデータ</li>
+              <li>ツール呼び出しの引数・レスポンスに含まれる認証情報</li>
+            </ul>
+
+            <h3>5.2 対策</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>対策領域</th>
+                    <th>具体策</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>システムプロンプト設計</td>
+                    <td>
+                      機密情報（APIキー、内部ロジックの詳細、他ユーザーの情報）をシステムプロンプトに含めない。含めざるを得ない場合は別レイヤー（ツール呼び出し経由）で注入し、モデルのコンテキストウィンドウに直接置かない
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>出力フィルタリング</td>
+                    <td>
+                      正規表現・分類器・DLP（データ損失防止）ツールを組み合わせ、APIキーやPIIパターンを含む応答をブロックする
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>アクセス制御</td>
+                    <td>
+                      RAG検索やツール呼び出しは、呼び出し元ユーザーの権限スコープでのみ実行する（Confused
+                      Deputy対策と直結）
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>監査ログ</td>
+                    <td>
+                      すべての入出力をログ化し、異常な質問パターン（システムプロンプトを聞き出そうとする探索的クエリ等）を検知する
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>ネットワーク境界での保護</td>
+                    <td>
+                      AI
+                      Gatewayやプロキシ層でトラフィックを可視化し、ビット単位でのデータ漏洩検知を行う<sup
+                        >[7]</sup
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="chapter" id="sec-06">
+            <div class="chapter-head">
+              <span class="chapter-num">06 / 17</span>
+              <h2>ステップ3: データ/モデルポイズニング対策</h2>
+            </div>
+
+            <p>
+              データポイズニングは学習データを汚染して推論時の振る舞いを操作する攻撃であり、推論時に入力を細工する回避攻撃（evasion
+              attack）とは区別されます<sup>[76]</sup>。攻撃者は「特定の入力に対してのみ攻撃者が望む出力を返し、それ以外では正常に動作する」よう仕込むため、標準的な評価だけでは検出が困難です。
+            </p>
+
+            <h3>6.1 データポイズニングとモデルポイズニングの違い</h3>
+            <ul>
+              <li>
+                <strong>データポイズニング</strong>: 学習データそのものに悪意あるサンプルを注入する
+              </li>
+              <li>
+                <strong>モデルポイズニング</strong>:
+                学習済みモデルのパラメータやファインチューニング過程を操作する（例:
+                手書き文字認識モデルで「3」を「8」と誤認識させ、小切手の金額を改ざんする実例が知られています）<sup
+                  >[77]</sup
+                >
+              </li>
+            </ul>
+
+            <div class="diagram-wrap">
+              <div class="diagram-caption">Fig.4 — データ検証パイプラインと継続監視</div>
+              <div class="mermaid" data-key="data-poisoning"></div>
+            </div>
+
+            <h3>6.2 実践的な防御策（OWASP推奨に基づく8つの戦術）</h3>
+            <ol>
+              <li>
+                <strong>データ来歴の検証</strong>:
+                学習パイプラインを通過するすべてのデータを厳格に検証する。デジタル署名やハッシュ検証で改ざんを検知する
+              </li>
+              <li>
+                <strong>アクセス制御</strong>:
+                学習データセット・パイプラインへのアクセスにRBAC、多要素認証、最小権限原則を適用する<sup
+                  >[77]</sup
+                >
+              </li>
+              <li>
+                <strong>データバージョン管理</strong>:
+                変更履歴を追跡し、いつ・誰が・何を追加したかを監査可能にする
+              </li>
+              <li>
+                <strong>サンドボックス化</strong>:
+                外部データソースの取り込みは隔離環境で行い、影響範囲を限定する
+              </li>
+              <li>
+                <strong>異常検知</strong>:
+                特定の入力グループに対する性能劣化や予測パターンの偏りを継続的にモニタリングする
+              </li>
+              <li>
+                <strong>分布シフト検知</strong>:
+                モデル振る舞いの分布シフトに対する自動アラートを設定する
+              </li>
+              <li>
+                <strong>敵対的トレーニング</strong>:
+                既知の攻撃パターンを意図的に学習に含め、頑健性を高める
+              </li>
+              <li>
+                <strong>EU AI Actへのコンプライアンス</strong>:
+                高リスクAIシステム提供者はデータガバナンス（品質管理・バイアス検出）の実施が義務付けられており、ポイズニング対策はコンプライアンス上の要求でもあります<sup
+                  >[76]</sup
+                >
+              </li>
+            </ol>
+
+            <div class="callout note">
+              <span class="callout-label">参考標準</span>
+              NIST AI 100-2（Adversarial Machine Learning: A Taxonomy and Terminology of Attacks and
+              Mitigations）は、ポイズニング攻撃に関する標準化された語彙と脅威分類を提供しており、リスクアセスメントの共通言語として活用できます<sup>[76]</sup>。
+            </div>
+          </section>
+
+          <section class="chapter" id="sec-07">
+            <div class="chapter-head">
+              <span class="chapter-num">07 / 17</span>
+              <h2>ステップ4: モデル抽出・窃取対策</h2>
+            </div>
+
+            <p>
+              モデル抽出（Model Extraction / Model
+              Stealing）は、公開されている推論API（予測API）に大量のクエリを投げ、その入出力ペアから代理モデル（サロゲートモデル）を再構築する攻撃です。2016年のTramèrらによる研究以降、蓄積が進んでいます<sup>[78][80]</sup>。
+            </p>
+
+            <h3>7.1 関連する攻撃のファミリー</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>攻撃</th>
+                    <th>概要</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>モデル抽出攻撃</td>
+                    <td>予測APIへの大量クエリから、機能的に類似したモデルを再構築する</td>
+                  </tr>
+                  <tr>
+                    <td>メンバーシップ推論攻撃</td>
+                    <td>ある特定のデータが学習データに含まれていたかどうかを推測する</td>
+                  </tr>
+                  <tr>
+                    <td>モデル反転攻撃</td>
+                    <td>モデルの出力から学習データ（機密情報を含む可能性がある）を復元する</td>
+                  </tr>
+                  <tr>
+                    <td>データフリー抽出</td>
+                    <td>実データを用いず、合成データのみでモデルを抽出する高度な手法</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>7.2 防御策</h3>
+            <ul>
+              <li>
+                <strong>レート制限とクエリ監視</strong>:
+                単一アカウント/IPからの異常に高頻度・高ボリュームなクエリを検知し、レート制限やCAPTCHA、一時停止で対応する
+              </li>
+              <li>
+                <strong>出力の丸め・ノイズ付加</strong>:
+                確信度スコアなど詳細すぎる出力情報を制限し、丸め処理やノイズを加えることでモデル内部構造の推測を難しくする
+              </li>
+              <li>
+                <strong>透かし（Watermarking）</strong>:
+                モデルの出力に検出可能な透かしを埋め込み、不正な複製モデルの証拠とする
+              </li>
+              <li>
+                <strong>クエリパターン分析</strong>:
+                決定境界を探るような系統的なクエリパターン（クラス境界の走査等）を検知する異常検知システムを導入する
+              </li>
+              <li>
+                <strong>APIキー・利用規約による法的保護</strong>:
+                技術的対策に加え、利用規約・レート制限・APIキー単位の追跡で法的責任の所在を明確にする
+              </li>
+              <li>
+                <strong>知的財産としてのモデル管理</strong>:
+                モデル自体をAIBOM（13章参照）で資産管理し、不正な複製や再配布を検知する仕組みを整える
+              </li>
+            </ul>
+          </section>
+
+          <section class="chapter" id="sec-08">
+            <div class="chapter-head">
+              <span class="chapter-num">08 / 17</span>
+              <h2>ステップ5: RAG・ベクトルDBセキュリティ</h2>
+            </div>
+
+            <p>
+              RAG（Retrieval-Augmented
+              Generation）は、LLMの知識をリアルタイムの外部データで補強する強力な仕組みですが、OWASP
+              Top 10 2025では新たに「LLM08:2025 Vector and Embedding
+              Weaknesses」というカテゴリが追加されたことが示す通り、独自の攻撃面を持ちます<sup>[97][99]</sup>。
+            </p>
+
+            <h3>8.1 RAGパイプラインの構造と攻撃面</h3>
+            <div class="diagram-wrap">
+              <div class="diagram-caption">Fig.5 — RAGパイプラインの攻撃面</div>
+              <div class="mermaid" data-key="rag-security"></div>
+            </div>
+
+            <h3>8.2 主要な攻撃パターン</h3>
+            <ul>
+              <li>
+                <strong>RAGポイズニング（PoisonedRAG / CorruptRAG）</strong>:
+                わずか数件、場合によっては単一の汚染文書をベクトルDBに混入させるだけで、特定の高価値クエリに対する回答を97%の確率でハイジャックできるという研究結果が報告されています。2026年1月発表のCorruptRAGは単一文書での攻撃を実現し、ボリュームベースの異常検知を回避しやすくなっています<sup
+                  >[97][98]</sup
+                >
+              </li>
+              <li>
+                <strong>埋め込み反転攻撃（Embedding Inversion）</strong>:
+                高次元ベクトルから元のテキスト（機密情報を含む可能性がある）を復元する攻撃
+              </li>
+              <li>
+                <strong>クロステナント意味的漏洩</strong>:
+                マルチテナントのベクトルDBにおいて、あるテナントのクエリの埋め込みが別テナントの機密文書の埋め込みと意味的に近接しているために、意図せず情報が漏洩するケース<sup
+                  >[98]</sup
+                >
+              </li>
+              <li>
+                <strong>未認証エンドポインの露出</strong>:
+                2026年2月のAnythingLLMインシデントでは、未認証のエンドポイントがPinecone
+                APIキーを露出させ、企業の埋め込みデータへの読み書き削除フルアクセスを許してしまいました（詳細は15章の事例を参照）<sup
+                  >[94]</sup
+                >
+              </li>
+            </ul>
+
+            <h3>8.3 対策</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>領域</th>
+                    <th>具体策</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>取り込みパイプラインの保護</td>
+                    <td>
+                      外部ソースからの取り込みには「検疫（quarantine）→レビュー→承認」のワークフローを設ける。隠れたUnicode文字や指示的なフレーズなど既知のポイズニングパターンをスキャンする<sup
+                        >[96]</sup
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>書き込み権限の分離</td>
+                    <td>
+                      取り込み用ロールと検索用ロールを分離し、コレクション/名前空間単位で最小権限を適用する<sup
+                        >[95]</sup
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>アクセス制御</td>
+                    <td>
+                      RBAC/ABACとネットワーク分離を組み合わせたマルチテナントアクセス制御を実装する
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>暗号化</td>
+                    <td>
+                      保存時・転送時の埋め込み暗号化。高リスク用途では準同型暗号による暗号化ベクトル上での類似度検索も検討する<sup
+                        >[98]</sup
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>監視</td>
+                    <td>
+                      特定チャンクへの検索急増、低信頼度マッチの連続、最近更新されたドキュメントからの逸脱パターンなど、異常な検索パターンを監視する<sup
+                        >[96]</sup
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>コンプライアンス基盤</td>
+                    <td>
+                      クエリレベルのアクセスログ、RBACのエビデンス、暗号鍵管理文書、名前空間エスケープテストを整備する。これらの欠如がSOC
+                      2 Type II監査やHIPAA評価の失敗要因になっています<sup>[94]</sup>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="chapter" id="sec-09">
+            <div class="chapter-head">
+              <span class="chapter-num">09 / 17</span>
+              <h2>ステップ6: エージェント型AI・MCPセキュリティ</h2>
+            </div>
+
+            <p>
+              AIエージェントとMCP（Model Context
+              Protocol）は、2026年時点で最も急速にリスクが拡大している領域です。エージェントは「計画し、ツールを呼び出し、記憶を保持し、他のエージェントと通信し、実世界のクレデンシャルで行動する」存在であるため、単なるチャットボットのセキュリティモデルでは対応できません<sup>[16]</sup>。
+            </p>
+
+            <h3>9.1 OWASP Top 10 for Agentic Applications 2026 (ASI01〜ASI10)</h3>
+            <p>
+              2026年版OWASP Top 10 for Agentic Applicationsは、Black Hat Europe 2025でのOWASP
+              Agentic Security
+              Summitと合わせて発表され、100以上の業界専門家によるレビューを経て策定されました<sup>[10]</sup>。
+            </p>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>リスク名</th>
+                    <th>概要</th>
+                    <th>主な緩和策</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="badge badge-critical">ASI01</span></td>
+                    <td>Agent Goal Hijack</td>
+                    <td>
+                      ツール出力・検索結果・メール等に埋め込まれた悪意ある指示によって、エージェントの目的そのものが書き換えられる
+                    </td>
+                    <td>
+                      すべてのエージェント消費コンテンツを信頼できないものとして扱う。指示とデータを構造的に分離し、目標スコープを固定する<sup
+                        >[16]</sup
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge badge-high">ASI02</span></td>
+                    <td>Tool Misuse & Exploitation</td>
+                    <td>過剰な権限を持つツールが、悪意なくとも誤用される</td>
+                    <td>
+                      ツールごとに最小権限のスコープを設計し、実行前に文脈依存の承認を要求する
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge badge-critical">ASI03</span></td>
+                    <td>Agent Identity & Privilege Abuse</td>
+                    <td>
+                      セッション・ユーザー・委任ワークフローをまたいで権限が誤って継承・保持される
+                    </td>
+                    <td>
+                      エージェントに専用の管理されたIDと制限付きスコープを持たせ、ユーザーセッションを「借用」させない<sup
+                        >[17][56]</sup
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge badge-high">ASI04</span></td>
+                    <td>Agentic Supply Chain Compromise</td>
+                    <td>
+                      プロンプト・プラグイン・ツール・エージェントカード・モデルを動的にロードする際、侵害/なりすましコンポーネントが混入する
+                    </td>
+                    <td>署名検証、レジストリのスキャン、バージョン固定、変更のレビュー</td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge badge-critical">ASI05</span></td>
+                    <td>Unexpected Code Execution</td>
+                    <td>
+                      コード生成/実行を行うエージェントが悪意ある指示で任意コードを実行させられる
+                    </td>
+                    <td>
+                      サンドボックス実行環境、実行前の静的解析、ネットワークアウトバウンド制限
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge badge-high">ASI06</span></td>
+                    <td>Memory & Context Poisoning</td>
+                    <td>
+                      将来のセッションで読み取られるメモリに悪意ある内容が書き込まれ、時間差により検出が困難な遅延攻撃となる
+                    </td>
+                    <td>
+                      メモリに書き込む前に構造的分離を適用する。メモリの出所を追跡する<sup
+                        >[48]</sup
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge badge-mid">ASI07</span></td>
+                    <td>Insecure Inter-Agent Communication</td>
+                    <td>
+                      複数エージェントが連携する際の通信チャネルが検証されず、なりすましや改ざんが可能になる
+                    </td>
+                    <td>エージェント間通信の相互認証、メッセージ署名、ゼロトラスト設計</td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge badge-mid">ASI08</span></td>
+                    <td>Cascading Agent Failures</td>
+                    <td>
+                      1つのエージェントの誤動作が、依存する他のエージェント/ワークフローに連鎖的に波及する
+                    </td>
+                    <td>サーキットブレーカーパターン、障害の分離、段階的縮退設計</td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge badge-mid">ASI09</span></td>
+                    <td>Human-Agent Trust Exploitation</td>
+                    <td>
+                      説得力のあるエージェントの出力が人間の承認を「ゴム印」化させ、自動化バイアスを助長する
+                    </td>
+                    <td>
+                      高リスクアクションへのステップアップ認証、信頼度スコアの明示<sup>[17]</sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge badge-critical">ASI10</span></td>
+                    <td>Rogue Agents</td>
+                    <td>エージェントの意思決定プロセスが乗っ取られ、悪意ある主体として振る舞う</td>
+                    <td>厳格な運用上の制約とガードレール、振る舞いの異常に対する継続的監視</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="callout warn">
+              <span class="callout-label">Least Agency の原則</span>
+              自律性は既定値ではなく「勝ち取るべき機能」であり、エージェントに白紙委任を与えることは、単一の悪意あるプロンプトで操作可能な内部脅威を生み出すことに等しい、という指摘が2026年版で強調されています<sup>[17]</sup>。
+            </div>
+
+            <h3>9.2 MCP（Model Context Protocol）特有の攻撃面</h3>
+            <p>
+              MCPは2024年11月にAnthropicが発表したオープン標準で、AIホスト（Claude
+              Desktop、Cursor、VS Code
+              Copilot等）とツール/データソースを標準化されたJSON-RPCベースの仕組みで接続します<sup>[11][21]</sup>。2025年11月の仕様（2025-11-25）ではリモートMCPサーバーの認証方式としてOAuth
+              2.1が正式に組み込まれ、プロトコルのセキュリティ成熟度が一段階進みましたが<sup>[22]</sup>、2026年1〜2月には30件以上のCVEがMCPサーバー・クライアント・インフラコンポーネントに対して報告されています。中でもmcp-remoteプロキシパッケージに関わるCVE-2025-6514はCVSS
+              9.6という高スコアを記録しました<sup>[22]</sup>。
+            </p>
+
+            <div class="diagram-wrap">
+              <div class="diagram-caption">Fig.6 — MCPの信頼境界と攻撃パターン</div>
+              <div class="mermaid" data-key="mcp-trust"></div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>攻撃パターン</th>
+                    <th>概要</th>
+                    <th>対策</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Tool Poisoning<br />（ツール説明文の毒化）</td>
+                    <td>
+                      ユーザーが検査できないツール説明文の部分に悪意ある指示を埋め込み、AIの意思決定に影響を与える
+                    </td>
+                    <td>
+                      ツール説明文を既知の正常なベースラインと照合検証する。セッション間での変化を検知する（mcp-scan等のOSSツール）<sup
+                        >[22]</sup
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Rug Pull攻撃<br />（Bait-and-Switch）</td>
+                    <td>
+                      一度承認されたMCPツール登録が継続的に再検証されないことを悪用し、承認後にツール定義を差し替える
+                    </td>
+                    <td>
+                      ツール定義のハッシュ検証、定期的な再承認フロー、変更検知アラート<sup
+                        >[22]</sup
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Confused Deputy Problem</td>
+                    <td>
+                      MCPサーバーがユーザーより広い権限で動作できる場合、ユーザーが本来許可されていない操作を実行してしまう
+                    </td>
+                    <td>
+                      サーバーは「ユーザーに代わって明示的な同意のもと、最小権限スコープで」動作させる<sup
+                        >[26]</sup
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Token Passthrough</td>
+                    <td>
+                      クライアントトークンを適切な検証なしに下流APIへそのまま渡してしまい、信頼境界とオーディエンス制御が破られる
+                    </td>
+                    <td>
+                      トークンのオーディエンス検証を必須化し、パススルーを許可しない<sup>[26]</sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>サプライチェーン型侵害</td>
+                    <td>
+                      typosquattingされたツール名、リモートで差し替えられたプロンプトテンプレート、署名されていないエージェントカードによる隠し動作の注入
+                    </td>
+                    <td>
+                      パッケージレジストリのアカウント検証、依存関係のスキャンとバージョン固定、公開前レビュー<sup
+                        >[17][26]</sup
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>リポジトリ設定ファイル<br />経由のRCE</td>
+                    <td>
+                      信頼できないプロジェクトをクローンして開くだけで、リポジトリレベルの設定ファイルが実行層の一部として機能し、同意ダイアログの前にRCEやAPIキー流出が起きる（CVE-2025-59536,
+                      CVE-2026-21852）
+                    </td>
+                    <td>
+                      未検証リポジトリを開く前のサンドボックス化、設定ファイルの自動実行を無効化するデフォルト設定<sup
+                        >[18]</sup
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>9.3 「Lethal Trifecta（致死の三要素）」という考え方</h3>
+            <p>
+              Simon WillisonとPalo Alto
+              Networksが2026年に提唱した概念で、以下の3条件が同時に満たされるとエージェントスキル/ツールは特に危険になるとされています<sup>[18]</sup>。
+            </p>
+            <ol>
+              <li>
+                <strong>プライベートデータへのアクセス</strong
+                >（SSHキー、APIクレデンシャル、ウォレットファイル、ブラウザデータ等）
+              </li>
+              <li>
+                <strong>信頼できないコンテンツへの露出</strong
+                >（スキル指示、メモリファイル、メール等）
+              </li>
+              <li><strong>外部通信能力</strong>（ネットワークegress、webhook呼び出し、curl等）</li>
+            </ol>
+            <p>
+              多くの本番エージェントデプロイはこの3条件をすべて満たしているのが実情であり、いずれか1つを断ち切る設計（例:
+              外部通信が必要なツールにはプライベートデータへのアクセスを与えない）がリスク低減の鍵になります。
+            </p>
+
+            <h3>9.4 MCP実装チェックリスト</h3>
+            <ul class="checklist">
+              <li>
+                すべてのツール入力を「LLMから来たものであり、ユーザーから直接来たものではない」信頼できない入力として扱う<sup
+                  >[20]</sup
+                >
+              </li>
+              <li>
+                JSON Schemaで<code>additionalProperties: false</code
+                >を含む厳格なスキーマ検証を行う<sup>[20]</sup>
+              </li>
+              <li>
+                ツール登録は一度きりでなく、定期的な再検証・変更検知の仕組みを持たせる（Rug
+                Pull対策）
+              </li>
+              <li>
+                MCPサーバーはユーザーの同意のもと最小権限スコープで動作させ、包括的なサービスIDを使わない（Confused
+                Deputy対策）
+              </li>
+              <li>リモートMCPサーバーとの通信にはOAuth 2.1ベースの認証を利用する</li>
+              <li>ローカルMCPサーバーはサンドボックス化して実行する<sup>[24]</sup></li>
+              <li>
+                サプライチェーン全体（依存パッケージ、スキル、エージェントカード）に署名検証とスキャンを適用する
+              </li>
+            </ul>
+          </section>
+
+          <section class="chapter" id="sec-10">
+            <div class="chapter-head">
+              <span class="chapter-num">10 / 17</span>
+              <h2>ステップ7: 出力検証・ガードレール設計</h2>
+            </div>
+
+            <p>
+              入力側の防御だけでなく、LLMの出力を実行・表示する前に検証する「出力側のガードレール」が同様に重要です。OWASP
+              LLM05:2025「Improper Output
+              Handling」は、出力の検証・サニタイズ・エスケープが不十分なために、下流システムでのコード実行やXSS等につながるリスクを指摘しています<sup>[1]</sup>。
+            </p>
+
+            <h3>10.1 多層防御としてのガードレール設計</h3>
+            <div class="diagram-wrap">
+              <div class="diagram-caption">Fig.7 — 出力ガードレールの多層構成</div>
+              <div class="mermaid" data-key="guardrails"></div>
+            </div>
+
+            <h3>10.2 具体的な実装ポイント</h3>
+            <ul>
+              <li>
+                <strong>構造化出力の強制</strong>: 自由形式のテキストではなく、JSON
+                Schema等で構造化された出力を要求し、機械的に検証する
+              </li>
+              <li>
+                <strong>コード実行前のサンドボックス</strong>:
+                生成されたコードは、実行前に必ず隔離されたサンドボックス環境を経由させる
+              </li>
+              <li>
+                <strong>エスケープ処理の徹底</strong>:
+                出力をHTML/SQL/シェルコマンド等に埋め込む場合は、必ず適切なエスケープ・パラメータ化を行う
+              </li>
+              <li>
+                <strong>確信度・出典表示</strong>:
+                RAGベースの回答には出典を明示し、ユーザーが検証可能にする
+              </li>
+              <li>
+                <strong>ハルシネーション対策</strong>:
+                重要な事実確認が必要な出力については、複数ソースでのクロスチェックや、モデル自身による自己検証ステップを組み込む
+              </li>
+              <li>
+                <strong>ポリシー違反コンテンツの検知</strong>:
+                差別的表現、機密情報、規制対象コンテンツ等を検知する分類器をパイプラインに組み込む
+              </li>
+            </ul>
+          </section>
+
+          <section class="chapter" id="sec-11">
+            <div class="chapter-head">
+              <span class="chapter-num">11 / 17</span>
+              <h2>ステップ8: AIレッドチーミング・敵対的テスト</h2>
+            </div>
+
+            <p>
+              AIレッドチーミングは、LLMやAIエージェントに対して敵対的手法で組織的にテストを行い、攻撃者より先に脆弱性を発見する実践です。従来のペネトレーションテストとは根本的に異なり、攻撃面が確率的であり、脆弱性はモデルの振る舞いに起因し、パッチは離散的なコード修正ではありません<sup>[71]</sup>。
+            </p>
+
+            <h3>11.1 セーフティ・レッドチーミングとセキュリティ・レッドチーミング</h3>
+            <p>Microsoft AI Red Teamは2つの重複する目的を区別しています<sup>[71]</sup>。</p>
+            <ul>
+              <li>
+                <strong>セーフティ・レッドチーミング</strong>:
+                有害コンテンツ生成やポリシー違反のテスト
+              </li>
+              <li>
+                <strong>セキュリティ・レッドチーミング</strong>:
+                データ漏洩・システム侵害・不正なツール使用のテスト
+              </li>
+            </ul>
+
+            <h3>11.2 レッドチーミングのライフサイクル</h3>
+            <div class="diagram-wrap">
+              <div class="diagram-caption">Fig.8 — 継続的レッドチーミングのライフサイクル</div>
+              <div class="mermaid" data-key="redteam-cycle"></div>
+            </div>
+
+            <p>
+              一度きりのテストでは不十分です。モデルの更新、ファインチューニング、システムプロンプトの変更、接続データソースの変更のいずれもが新たな脆弱性を生む、または既存の修正を後退させる可能性があるため、継続的な回帰テストが必要です<sup>[71]</sup>。
+            </p>
+
+            <h3>11.3 主要なツール・フレームワーク</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ツール/フレームワーク</th>
+                    <th>種別</th>
+                    <th>特徴</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>OWASP Top 10 (LLM/Agentic)</td>
+                    <td>カバレッジフレームワーク</td>
+                    <td>テスト対象リスクの優先順位付けに使用</td>
+                  </tr>
+                  <tr>
+                    <td>MITRE ATLAS</td>
+                    <td>脅威分類・戦術DB</td>
+                    <td>レッドチームのシナリオ設計の語彙として活用</td>
+                  </tr>
+                  <tr>
+                    <td>Garak</td>
+                    <td>OSSツール</td>
+                    <td>LLM脆弱性の自動スキャン</td>
+                  </tr>
+                  <tr>
+                    <td>PyRIT (Microsoft)</td>
+                    <td>OSSフレームワーク</td>
+                    <td>敵対的プロンプトの自動生成・評価</td>
+                  </tr>
+                  <tr>
+                    <td>DeepTeam</td>
+                    <td>OSSフレームワーク</td>
+                    <td>OWASP Top10に基づく自動レッドチーム実行<sup>[8]</sup></td>
+                  </tr>
+                  <tr>
+                    <td>Confident AI / General Analysis 等</td>
+                    <td>商用プラットフォーム</td>
+                    <td>
+                      エージェント・RAG・MCP・マルチステップツール利用を含むシステムレベルの敵対的テスト、CI/CDリリースゲート統合<sup
+                        >[68][69]</sup
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>11.4 コミュニティリソース</h3>
+            <ul>
+              <li>
+                <strong>Humane Intelligence</strong>:
+                公開レッドチーム演習の実施とコミュニティでの知見共有
+              </li>
+              <li>
+                <strong>AI Vulnerability Database</strong>（AI Risk and Vulnerability Alliance）:
+                コミュニティ主導の脆弱性登録データベース
+              </li>
+              <li>
+                <strong>DEF CON GRT / AISI</strong>:
+                レッドチーミング競技会を通じたスキル習得と知見の蓄積<sup>[72]</sup>
+              </li>
+            </ul>
+          </section>
+
+          <section class="chapter" id="sec-12">
+            <div class="chapter-head">
+              <span class="chapter-num">12 / 17</span>
+              <h2>ステップ9: 監視・可観測性・インシデントレスポンス</h2>
+            </div>
+
+            <p>
+              NISTは2026年3月のAI監視に関する報告書で、エージェント型システムの監視は「機能性・運用性・セキュリティ・コンプライアンス・人的要因」の5次元にまたがる必要があり、従来ソフトウェアの稼働率監視だけでは不十分だと明言しています<sup>[20]</sup>。
+            </p>
+
+            <h3>12.1 監視すべき5つの次元</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>次元</th>
+                    <th>監視内容の例</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>機能性</td>
+                    <td>タスク成功率、ハルシネーション率、出力品質の劣化</td>
+                  </tr>
+                  <tr>
+                    <td>運用性</td>
+                    <td>
+                      レイテンシ、コスト（トークン消費）、リソース使用量の異常（Denial of
+                      Wallet対策）
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>セキュリティ</td>
+                    <td>
+                      異常なツール呼び出しパターン、権限外アクセス試行、既知の攻撃シグネチャとの一致
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>コンプライアンス</td>
+                    <td>
+                      データ処理の記録、監査証跡、規制で要求されるロギング（EU AI Act Article 12等）
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>人的要因</td>
+                    <td>
+                      人間の承認プロセスの遵守状況、自動化バイアスの兆候（過剰な「承認」クリック）
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>12.2 インシデントレスポンスフロー</h3>
+            <div class="diagram-wrap">
+              <div class="diagram-caption">Fig.9 — インシデントレスポンスフロー</div>
+              <div class="mermaid" data-key="incident-response"></div>
+            </div>
+
+            <h3>12.3 実装のポイント</h3>
+            <ul>
+              <li>
+                <strong>完全な監査ログ</strong>:
+                すべてのプロンプト、ツール呼び出し、レスポンス、承認/拒否の記録を改ざん耐性のある形で保存する
+              </li>
+              <li>
+                <strong>リプレイ可能なエビデンス</strong>:
+                レッドチーム/インシデント調査の双方で「再現可能なトレース」を残すことが、監査での説得力を左右します<sup
+                  >[68]</sup
+                >
+              </li>
+              <li>
+                <strong>異常検知の自動化</strong>:
+                単なるルールベースだけでなく、ベースラインからの逸脱を検知する統計的/機械学習的手法を組み合わせる
+              </li>
+              <li>
+                <strong>ロールバック可能性</strong>:
+                モデル・プロンプト・ツール構成のバージョン管理を行い、迅速なロールバックを可能にする
+              </li>
+              <li>
+                <strong>開示・通知プロセス</strong>: NIST AI RMF Generative AI
+                Profileが重視する4つの柱の1つが「インシデント開示」であり、組織内外への適切な通知プロセスをあらかじめ設計しておく必要があります<sup
+                  >[32]</sup
+                >
+              </li>
+            </ul>
+          </section>
+
+          <section class="chapter" id="sec-13">
+            <div class="chapter-head">
+              <span class="chapter-num">13 / 17</span>
+              <h2>ステップ10: サプライチェーン・AIBOM・モデル署名</h2>
+            </div>
+
+            <p>
+              2026年、ソフトウェアサプライチェーンセキュリティは「静的SBOM（Software Bill of
+              Materials）」の時代から「AIエージェントをサプライチェーンの主要なアクターとして扱うガバナンスの時代」へ移行しつつあります<sup>[86]</sup>。
+            </p>
+
+            <h3>13.1 AIBOM（AI Bill of Materials）とは</h3>
+            <p>
+              AIBOMは、モデルの来歴・ライセンス・学習データ・意図された用途を記録した検証可能な記録です<sup>[91]</sup>。従来のSBOMがカバーしていた「ソースコードと依存関係」に加え、以下の要素をカバーします。
+            </p>
+            <ul>
+              <li>モデルの重み（weights）とその来歴</li>
+              <li>学習データセットとそのライセンス</li>
+              <li>ハイパーパラメータと推論時の依存関係</li>
+              <li>ファインチューニングの履歴</li>
+              <li>RAGソースとエージェントツールの依存関係</li>
+            </ul>
+
+            <h3>13.2 標準化の動向</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>標準/取り組み</th>
+                    <th>発行元</th>
+                    <th>状況</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>CycloneDX 1.7</td>
+                    <td>OWASP CycloneDX</td>
+                    <td>
+                      2025年10月にAI/ML-BOMカバレッジを拡張。モデル来歴・学習データ・ハイパーパラメータ・推論依存関係の表現に2026年時点で事実上の標準として使われている<sup
+                        >[84]</sup
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>OWASP AIBOMプロジェクト</td>
+                    <td>OWASP</td>
+                    <td>
+                      2025年11月にv0.1マイルストーンに到達。SPDX
+                      3.0と並行してAIシステム特有の要件を拡張中<sup>[84]</sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Sigstore + cosignによるモデル署名</td>
+                    <td>CoSAI / OSS</td>
+                    <td>
+                      「モデル署名はエンタープライズセキュリティに不可欠な、欠けていたプリミティブ」として2025年7月に位置付けられ、2026年のベンダーRFPでは事実上の標準要件<sup
+                        >[84]</sup
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>AI in OTの安全な統合原則</td>
+                    <td>CISA, NSA, FBI, 豪ACSC等</td>
+                    <td>
+                      2025年12月3日に共同署名。重要インフラにおけるAI統合の安全原則を規定<sup
+                        >[84]</sup
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>13.3 実践的な導入ステップ</h3>
+            <div class="diagram-wrap">
+              <div class="diagram-caption">Fig.10 — AIBOM導入と署名検証のフロー</div>
+              <div class="mermaid" data-key="aibom-flow"></div>
+            </div>
+
+            <h3>13.4 セーフシリアライゼーションの重要性</h3>
+            <p>
+              モデルファイルの配布形式にも注意が必要です。Pickle形式でのモデルロードは任意コード実行のリスクを内包するため、Hugging
+              Faceは公式にPickleスキャンのドキュメントを提供しており、Safetensors形式（安全なシリアライゼーション）への移行が推奨されています<sup>[90]</sup>。
+            </p>
+          </section>
+
+          <section class="chapter" id="sec-14">
+            <div class="chapter-head">
+              <span class="chapter-num">14 / 17</span>
+              <h2>ガバナンス・法規制コンプライアンス</h2>
+            </div>
+
+            <p>
+              技術的対策だけでなく、組織的なガバナンス体制の構築が不可欠です。ここでは実務上重要な3つの柱（EU
+              AI Act、NIST AI RMF、ISO/IEC 42001）を整理します。
+            </p>
+
+            <h3>14.1 EU AI Actの適用タイムライン（2026年7月時点の最新状況）</h3>
+            <p>
+              EU AI
+              Actは2024年8月1日に発効し、段階的に適用されています。2025年11月19日に欧州委員会が提案した「Digital
+              Omnibus on
+              AI」により、高リスクAIシステムの義務化時期が延期される見込みで、2026年5月7日に政治合意、6月16日に欧州議会が正式承認、6月29日に理事会が最終承認しました<sup>[64][66]</sup>。
+            </p>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>適用日</th>
+                    <th>内容</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>2025年2月2日</td>
+                    <td>禁止されるAI慣行、AIリテラシー義務が適用開始</td>
+                  </tr>
+                  <tr>
+                    <td>2025年8月2日</td>
+                    <td>ガバナンス規則、汎用AI（GPAI）モデル提供者の義務が適用開始</td>
+                  </tr>
+                  <tr>
+                    <td><strong>2026年8月2日</strong></td>
+                    <td>
+                      大部分の規則が適用開始。透明性義務（第50条、チャットボット等のAI利用開示）もこの日から適用<sup
+                        >[58][59]</sup
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>2026年12月2日</td>
+                    <td>
+                      AI生成コンテンツのラベリング（透かし等）義務の猶予期限。CSAM・非合意的性的画像生成の新たな禁止事項もこの日から<sup
+                        >[61][64]</sup
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>2027年12月2日</strong></td>
+                    <td>
+                      単体の高リスクAIシステム（Annex III:
+                      採用、信用スコアリング、法執行、教育、国境管理等）の義務化（Omnibusにより延期後の日程）<sup
+                        >[60][64]</sup
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>2028年8月2日</strong></td>
+                    <td>
+                      規制対象製品に組み込まれた高リスクAI（Annex I:
+                      医療機器、機械等）の義務化（同上）<sup>[60][64]</sup>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="callout warn">
+              <span class="callout-label">注意</span>
+              2026年8月2日は「現行の拘束力ある期日」として扱うべきです。Omnibusによる延期は政治合意・議会承認を経ていますが、正式にEU官報で公布されるまでは、企業は元のスケジュール（2026年8月2日）に沿った準備を継続すべきとする法律専門家の見解が一般的です<sup>[63][66]</sup>。
+            </div>
+
+            <h3>14.2 NIST AI RMFとGenerative AI Profile</h3>
+            <p>
+              NIST AI RMF（AI
+              100-1）は2023年1月に公開された任意フレームワークで、Govern/Map/Measure/Manageの4機能から構成されます。2024年7月26日には生成AI特有のリスクに対応する「Generative
+              AI Profile（NIST AI
+              600-1）」が追加公開され、以下12のリスク領域を定義しています<sup>[19][30][36]</sup>。
+            </p>
+            <div class="card-grid">
+              <div class="fw-card">
+                <div class="fw-name">CBRN情報</div>
+                <p class="fw-desc">化学・生物・放射性・核兵器に関する有害情報へのアクセス</p>
+              </div>
+              <div class="fw-card">
+                <div class="fw-name">ハルシネーション</div>
+                <p class="fw-desc">confabulation（事実に基づかない出力生成）</p>
+              </div>
+              <div class="fw-card">
+                <div class="fw-name">ヘイトスピーチ・偏見</div>
+                <p class="fw-desc">差別的表現や偏見的な出力</p>
+              </div>
+              <div class="fw-card">
+                <div class="fw-name">データプライバシー</div>
+                <p class="fw-desc">個人情報の不適切な取り扱い</p>
+              </div>
+              <div class="fw-card">
+                <div class="fw-name">情報インテグリティ</div>
+                <p class="fw-desc">誤情報の生成・拡散</p>
+              </div>
+              <div class="fw-card">
+                <div class="fw-name">知的財産権侵害</div>
+                <p class="fw-desc">著作権・商標等の侵害</p>
+              </div>
+              <div class="fw-card">
+                <div class="fw-name">環境影響</div>
+                <p class="fw-desc">計算資源消費による環境負荷</p>
+              </div>
+              <div class="fw-card">
+                <div class="fw-name">有害なバイアス</div>
+                <p class="fw-desc">不公正な意思決定への影響</p>
+              </div>
+              <div class="fw-card">
+                <div class="fw-name">危険行為の助長</div>
+                <p class="fw-desc">違法・倫理に反する行為の助長</p>
+              </div>
+              <div class="fw-card">
+                <div class="fw-name">過度な依存</div>
+                <p class="fw-desc">Overreliance（人間の判断力低下）</p>
+              </div>
+              <div class="fw-card">
+                <div class="fw-name">セキュリティ</div>
+                <p class="fw-desc">従来型・新規のサイバー攻撃対象領域の拡大</p>
+              </div>
+              <div class="fw-card">
+                <div class="fw-name">CSAM/NCIIリスク</div>
+                <p class="fw-desc">児童搾取・非合意的性的画像の生成リスク</p>
+              </div>
+            </div>
+
+            <p>
+              2026年2月には、NIST CAISI（Center for AI Standards and Innovation）が「AI Agent
+              Standards
+              Initiative」を発表し、ID・認可、セキュリティ・リスク管理、監視・ロギングをカバーするエージェント向けガイドラインを2026年第4四半期に予定しています<sup>[20][33]</sup>。
+            </p>
+
+            <h3>14.3 ISO/IEC 42001によるマネジメントシステム認証</h3>
+            <p>
+              ISO/IEC
+              42001:2023は、世界初の「認証可能な」AIマネジメントシステム規格です<sup>[103][108]</sup>。他のフレームワーク（NIST
+              AI RMF等）が任意のガイダンスであるのに対し、ISO/IEC
+              42001はPDCA（Plan-Do-Check-Act）サイクルに基づく認証プロセスを備えており、独立した認証機関による第三者監査を受けられます。
+            </p>
+            <ul>
+              <li>
+                Microsoftは自社AIシステムについて定期的な第三者監査を受け、Service Trust
+                Portalで証明書・監査報告書を公開しています<sup>[102]</sup>
+              </li>
+              <li>
+                SynthesiaはA-LIGNとのパートナーシップでISO/IEC 42001認証を取得し、EU AI
+                Actへの準拠を先取りする形でコンプライアンス姿勢を示しました<sup>[111]</sup>
+              </li>
+              <li>
+                実務上は「NIST AI RMFで内部のリスク管理プロセスを構築し、ISO/IEC
+                42001で第三者認証による対外的な信頼性を担保する」という組み合わせが典型的です
+              </li>
+            </ul>
+
+            <h3>14.4 ガバナンス構築の優先順位（実務ガイド）</h3>
+            <ol>
+              <li>
+                <strong>AIシステムのインベントリ作成</strong>:
+                組織内で使用されているすべてのAIシステム（サードパーティ・生成AIツールを含む）を棚卸しし、目的・データ・影響を受ける集団・市場を文書化する<sup
+                  >[63]</sup
+                >
+              </li>
+              <li>
+                <strong>リスク分類</strong>: 各システムをEU AI
+                Actのリスク階層（禁止/高リスク/限定リスク/最小リスク）にマッピングする
+              </li>
+              <li>
+                <strong>ガバナンス体制の確立</strong>:
+                Map/Measure/Manageを反復可能にするため、まず「Govern」（方針・責任・監督ロール）を整備する。これを飛ばすと多くのAI
+                RMFプログラムがパイロット後に停滞します<sup>[37]</sup>
+              </li>
+              <li>
+                <strong>段階的な適用範囲拡大</strong>:
+                最初は1つの中リスクシステムに絞って実践し、成功パターンを横展開する
+              </li>
+            </ol>
+          </section>
+
+          <section class="chapter" id="sec-15">
+            <div class="chapter-head">
+              <span class="chapter-num">15 / 17</span>
+              <h2>実際のインシデント事例から学ぶ</h2>
+            </div>
+
+            <p>
+              理論だけでなく、2025年後半〜2026年前半に実際に発生した事例を把握しておくことは、レッドチームのシナリオ設計にも直結します。
+            </p>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>時期</th>
+                    <th>事例</th>
+                    <th>概要</th>
+                    <th>教訓</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>2026年2月</td>
+                    <td>AnythingLLMインシデント</td>
+                    <td>
+                      未認証のエンドポイントがPineconeのAPIキーを露出させ、企業の埋め込みデータへの読み書き削除フルアクセスが可能になった<sup
+                        >[94]</sup
+                      >
+                    </td>
+                    <td>
+                      ベクトルDBへのアクセスも「通常のAPIエンドポイント」と同じ厳格さで認証・認可を設計する必要がある
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>2026年1〜2月</td>
+                    <td>MCPエコシステムへの大量CVE報告</td>
+                    <td>
+                      30件以上のCVEがMCPサーバー・クライアント・インフラに報告され、mcp-remoteプロキシのCVE-2025-6514はCVSS
+                      9.6を記録<sup>[22]</sup>
+                    </td>
+                    <td>
+                      普及速度にセキュリティガバナンスが追いつかない典型例。サプライチェーン全体のスキャンが必須
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>2026年Q1</td>
+                    <td>ClawHub（OpenClawスキルレジストリ）の組織的汚染</td>
+                    <td>
+                      主要なAIエージェントスキルレジストリが体系的に汚染された最初の事例。ピーク時、最もダウンロードされたスキル上位7件中5件がマルウェアと確認された<sup
+                        >[9]</sup
+                      >
+                    </td>
+                    <td>
+                      自動スキャンとVirusTotal連携などの防御が事後的に導入されたが、エコシステム全体としては依然無防備な領域が広い
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>継続的観測</td>
+                    <td>
+                      Claude Codeのリポジトリ設定ファイル関連の脆弱性（CVE-2025-59536,
+                      CVE-2026-21852）
+                    </td>
+                    <td>
+                      信頼できないプロジェクトをクローンして開くだけで、ユーザーの同意ダイアログが表示される前にRCEやAPIキー流出が発生しうることが実証された<sup
+                        >[9]</sup
+                      >
+                    </td>
+                    <td>
+                      「開くだけ」の操作が実行層になり得るという前提でのサンドボックス設計が必要
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>2026年1月</td>
+                    <td>Microsoft Copilot「Reprompt」（CVE-2026-24307）</td>
+                    <td>
+                      単一クリックによるデータ流出の脆弱性がVaronis Threat
+                      Labsにより開示され、2026年1月のセキュリティ更新でパッチが適用された<sup
+                        >[51]</sup
+                      >
+                    </td>
+                    <td>
+                      エンタープライズAIアシスタントにおいても、間接プロンプトインジェクション経由の1クリック攻撃が現実的な脅威であることが示された
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>2026年2月</td>
+                    <td>「AIメモリの営利目的汚染」（Microsoft Security Blog）</td>
+                    <td>
+                      AIの推薦・記憶機構を汚染し、利益を得ようとする手法の台頭が報告された<sup
+                        >[51]</sup
+                      >
+                    </td>
+                    <td>長期記憶を持つエージェントは、メモリそのものが新たな攻撃対象領域になる</td>
+                  </tr>
+                  <tr>
+                    <td>継続的観測</td>
+                    <td>SesameOp AIエージェントバックドア（MITRE ATLAS AML.CS0042）</td>
+                    <td>
+                      AIエージェントにバックドアが仕込まれた実例としてMITRE
+                      ATLASのケーススタディに追加された<sup>[23]</sup>
+                    </td>
+                    <td>
+                      エージェントの振る舞いの継続的な異常監視が、バックドアの早期発見に直結する
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="callout info">
+              <span class="callout-label">共通する教訓</span>
+              これらの事例に共通するのは、「攻撃はモデルそのものの脆弱性というより、モデルを取り巻くエコシステム（サプライチェーン、認証・認可、ツール連携）の隙間を突いている」という点です。したがって、AIセキュリティは「モデルを守ること」だけでなく「AIを取り巻くシステム全体を守ること」として捉える必要があります<sup>[4]</sup>。
+            </div>
+          </section>
+
+          <section class="chapter" id="sec-16">
+            <div class="chapter-head">
+              <span class="chapter-num">16 / 17</span>
+              <h2>AIセキュリティ成熟度モデルと実践チェックリスト</h2>
+            </div>
+
+            <h3>16.1 成熟度モデル</h3>
+            <p>組織のAIセキュリティ体制を4段階で自己評価するためのモデルです。</p>
+
+            <div class="ladder">
+              <div class="ladder-item l1">
+                <div class="level">L1</div>
+                <div class="level-info">
+                  <div class="name">場当たり的（Ad Hoc）</div>
+                  <div class="desc">
+                    AIシステムのインベントリが存在しない。プロンプトインジェクション対策やアクセス制御が個別チーム任せで一貫性がない
+                  </div>
+                </div>
+              </div>
+              <div class="ladder-item l2">
+                <div class="level">L2</div>
+                <div class="level-info">
+                  <div class="name">基礎的（Foundational）</div>
+                  <div class="desc">
+                    OWASP Top
+                    10を参照した基本的な入出力検証がある。MCPサーバー等のツール連携には最小権限の意識はあるが、継続的な監視・レッドチームは未実施
+                  </div>
+                </div>
+              </div>
+              <div class="ladder-item l3">
+                <div class="level">L3</div>
+                <div class="level-info">
+                  <div class="name">体系的（Managed）</div>
+                  <div class="desc">
+                    NIST AI RMFまたはISO/IEC
+                    42001に基づくガバナンス体制がある。AIBOM・モデル署名を導入し、定期的なレッドチーム演習とインシデント対応計画がある
+                  </div>
+                </div>
+              </div>
+              <div class="ladder-item l4">
+                <div class="level">L4</div>
+                <div class="level-info">
+                  <div class="name">最適化（Optimized）</div>
+                  <div class="desc">
+                    継続的な自動化レッドチーム、リリースゲートへの統合、エージェント間・MCPサーバー間の相互認証、法規制への体系的対応、成熟したインシデント事後レビューのフィードバックループが機能している
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="diagram-wrap">
+              <div class="diagram-caption">Fig.11 — 成熟度レベルの進行</div>
+              <div class="mermaid" data-key="maturity"></div>
+            </div>
+
+            <h3>16.2 実践チェックリスト（本ガイド全体のまとめ）</h3>
+
+            <h4>フレームワーク・ガバナンス</h4>
+            <ul class="checklist">
+              <li>
+                OWASP Top 10 for LLM Applications / Agentic
+                Applicationsを開発チームの共通言語として導入した
+              </li>
+              <li>NIST AI RMF（またはISO/IEC 42001）に基づくガバナンス体制を整備した</li>
+              <li>MITRE ATLASを参照した脅威モデリングを実施した</li>
+              <li>
+                該当する法規制（EU AI
+                Act等）の適用範囲とタイムラインを把握し、コンプライアンス計画を持っている
+              </li>
+            </ul>
+
+            <h4>入力・出力防御</h4>
+            <ul class="checklist">
+              <li>
+                すべての外部コンテンツを信頼できない入力として扱い、構造的分離（spotlighting等)を導入した
+              </li>
+              <li>出力をJSON Schema等で検証し、高リスクアクションには人間の承認ゲートを設けた</li>
+              <li>システムプロンプトに機密情報を含めない設計にした</li>
+            </ul>
+
+            <h4>データ・モデル</h4>
+            <ul class="checklist">
+              <li>学習データパイプラインにアクセス制御・来歴検証・異常検知を導入した</li>
+              <li>
+                モデル抽出攻撃対策としてレート制限・出力ノイズ・クエリパターン分析を実施している
+              </li>
+              <li>AIBOM（CycloneDX形式等）とモデル署名（Sigstore/cosign等）を導入した</li>
+            </ul>
+
+            <h4>RAG・エージェント・MCP</h4>
+            <ul class="checklist">
+              <li>ベクトルDBへのアクセスを認証・認可し、取り込み/検索ロールを分離した</li>
+              <li>
+                エージェントに専用の管理されたIDと最小権限スコープを与え、ユーザーセッションを借用させない設計にした
+              </li>
+              <li>
+                MCPサーバーのツール定義を継続的に再検証し、Rug Pull攻撃を検知する仕組みを持っている
+              </li>
+              <li>
+                Lethal
+                Trifecta（機密データアクセス・信頼できないコンテンツ・外部通信）の3条件が同時に満たされるツール設計を避けている
+              </li>
+            </ul>
+
+            <h4>継続的な運用</h4>
+            <ul class="checklist">
+              <li>定期的な自動化レッドチーム演習をCI/CDのリリースゲートに統合している</li>
+              <li>
+                機能性・運用性・セキュリティ・コンプライアンス・人的要因の5次元での監視を実施している
+              </li>
+              <li>インシデント対応計画とロールバック手順を文書化し、訓練済みである</li>
+            </ul>
+          </section>
+
+          <section class="chapter" id="sec-17">
+            <div class="chapter-head">
+              <span class="chapter-num">17 / 17</span>
+              <h2>参考文献・引用URL一覧</h2>
+            </div>
+
+            <p>
+              本文中の
+              <code>[番号]</code>
+              は以下のリストに対応しています。番号は検索・収集時の通し番号をそのまま維持しているため欠番がありますが、そのぶん本文で直接引用していない関連情報源も同じ体系で参照できるようにしてあります。すべて2026年7月8日時点でアクセス可能な情報に基づきます。
+            </p>
+
+            <div class="ref-group">
+              <h4>OWASP Top 10 for LLM Applications（1〜9）</h4>
+              <ul class="ref-list">
+                <li>
+                  <span class="ref-num">1</span
+                  ><a href="https://genai.owasp.org/llm-top-10/" target="_blank" rel="noopener"
+                    >LLMRisks Archive - OWASP Gen AI Security Project</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">2</span
+                  ><a
+                    href="https://owasp.org/www-project-top-10-for-large-language-model-applications/"
+                    target="_blank"
+                    rel="noopener"
+                    >OWASP Top 10 for Large Language Model Applications | OWASP Foundation</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">3</span
+                  ><a
+                    href="https://www.oligo.security/academy/owasp-top-10-llm-updated-2025-examples-and-mitigation-strategies"
+                    target="_blank"
+                    rel="noopener"
+                    >OWASP Top 10 LLM, Updated 2025: Examples & Mitigation Strategies (Oligo
+                    Security)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">4</span
+                  ><a href="https://genai.owasp.org/" target="_blank" rel="noopener"
+                    >Home - OWASP Gen AI Security Project</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">5</span
+                  ><a
+                    href="https://genai.owasp.org/resource/owasp-top-10-for-llm-applications-2025/"
+                    target="_blank"
+                    rel="noopener"
+                    >OWASP Top 10 for LLM Applications 2025</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">6</span
+                  ><a href="https://application.security/free/llm" target="_blank" rel="noopener"
+                    >OWASP Top 10 for LLM - 2025 (Security Compass / Kontra)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">7</span
+                  ><a
+                    href="https://www.cloudflare.com/learning/ai/owasp-top-10-risks-for-llms/"
+                    target="_blank"
+                    rel="noopener"
+                    >What are the OWASP Top 10 risks for LLMs? (Cloudflare)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">8</span
+                  ><a
+                    href="https://www.trydeepteam.com/docs/frameworks-owasp-top-10-for-llms"
+                    target="_blank"
+                    rel="noopener"
+                    >OWASP Top 10 for LLMs 2025 | DeepTeam</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">9</span
+                  ><a
+                    href="https://infosecwriteups.com/owasp-top-10-for-llms-in-2025-security-test-cases-you-must-know-ef2cb6d1bbda"
+                    target="_blank"
+                    rel="noopener"
+                    >OWASP Top 10 for LLMs in 2025: Security Test Cases (InfoSec Write-ups)</a
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <div class="ref-group">
+              <h4>OWASP Top 10 for Agentic Applications 2026（10〜19）</h4>
+              <ul class="ref-list">
+                <li>
+                  <span class="ref-num">10</span
+                  ><a
+                    href="https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/"
+                    target="_blank"
+                    rel="noopener"
+                    >OWASP Top 10 for Agentic Applications for 2026 - OWASP Gen AI Security
+                    Project</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">11</span
+                  ><a
+                    href="https://www.paloaltonetworks.com/blog/cloud-security/owasp-agentic-ai-security/"
+                    target="_blank"
+                    rel="noopener"
+                    >OWASP Top 10 for Agentic Applications 2026 Is Here (Palo Alto Networks Blog)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">12</span
+                  ><a
+                    href="https://www.trydeepteam.com/docs/frameworks-owasp-top-10-for-agentic-applications"
+                    target="_blank"
+                    rel="noopener"
+                    >OWASP Top 10 for Agents 2026 | DeepTeam</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">13</span
+                  ><a
+                    href="https://auth0.com/blog/owasp-top-10-agentic-applications-lessons/"
+                    target="_blank"
+                    rel="noopener"
+                    >Lessons from OWASP Top 10 for Agentic Applications (Auth0)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">14</span
+                  ><a
+                    href="https://www.practical-devsecops.com/owasp-top-10-agentic-applications/"
+                    target="_blank"
+                    rel="noopener"
+                    >OWASP Top 10 for Agentic Applications for 2026 (Practical DevSecOps)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">15</span
+                  ><a
+                    href="https://www.microsoft.com/en-us/security/blog/2026/03/30/addressing-the-owasp-top-10-risks-in-agentic-ai-with-microsoft-copilot-studio/"
+                    target="_blank"
+                    rel="noopener"
+                    >Addressing the OWASP Top 10 Risks in Agentic AI with Microsoft Copilot
+                    Studio</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">16</span
+                  ><a
+                    href="https://arnav.au/2026/07/02/owasp-top-10-for-agentic-applications/"
+                    target="_blank"
+                    rel="noopener"
+                    >OWASP Top 10 for Agentic Applications – Where Cloud, Security and AI
+                    Converge</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">17</span
+                  ><a
+                    href="https://blog.nishanc.com/2026/02/owasp-top-10-for-agentic-applications.html"
+                    target="_blank"
+                    rel="noopener"
+                    >OWASP Top 10 for Agentic Applications 2026: A Security Guide</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">18</span
+                  ><a
+                    href="https://owasp.org/www-project-agentic-skills-top-10/"
+                    target="_blank"
+                    rel="noopener"
+                    >OWASP Agentic Skills Top 10 | OWASP Foundation</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">19</span
+                  ><a
+                    href="https://www.gravitee.io/blog/owasp-top-10-for-agentic-applications-2026-a-practical-review-and-how-gravitee-supports-secure-agentic-architecture"
+                    target="_blank"
+                    rel="noopener"
+                    >OWASP Top 10 for Agentic Applications 2026: A Practical Security Guide
+                    (Gravitee)</a
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <div class="ref-group">
+              <h4>MCP（Model Context Protocol）セキュリティ（20〜29）</h4>
+              <ul class="ref-list">
+                <li>
+                  <span class="ref-num">20</span
+                  ><a href="https://www.webfuse.com/mcp-cheat-sheet" target="_blank" rel="noopener"
+                    >MCP Cheat Sheet (2026) - Model Context Protocol Quick Reference</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">21</span
+                  ><a
+                    href="https://www.anthropic.com/news/model-context-protocol"
+                    target="_blank"
+                    rel="noopener"
+                    >Introducing the Model Context Protocol (Anthropic)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">22</span
+                  ><a
+                    href="https://labs.cloudsecurityalliance.org/agentic/agentic-mcp-security-best-practices-v1/"
+                    target="_blank"
+                    rel="noopener"
+                    >Agentic MCP Security Best Practices Guide (Cloud Security Alliance)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">23</span
+                  ><a
+                    href="https://modelcontextprotocol.io/docs/tutorials/security/security_best_practices"
+                    target="_blank"
+                    rel="noopener"
+                    >Security Best Practices - Model Context Protocol（公式ドキュメント）</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">24</span
+                  ><a
+                    href="https://www.aiforanything.io/blog/anthropic-mcp-model-context-protocol-explained-2026"
+                    target="_blank"
+                    rel="noopener"
+                    >Anthropic MCP Explained 2026 (AI for Anything)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">25</span
+                  ><a
+                    href="https://github.com/cosai-oasis/ws4-secure-design-agentic-systems/blob/main/model-context-protocol-security.md"
+                    target="_blank"
+                    rel="noopener"
+                    >Model Context Protocol Security (CoSAI ws4-secure-design-agentic-systems)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">26</span
+                  ><a
+                    href="https://socprime.com/blog/mcp-security-risks-and-mitigations/"
+                    target="_blank"
+                    rel="noopener"
+                    >Model Context Protocol: Security Risks & Mitigations (SOC Prime)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">27</span
+                  ><a
+                    href="https://www.linkedin.com/posts/satveerkhurpa_mcp-anthropic-security-activity-7342308920234823681-acD-"
+                    target="_blank"
+                    rel="noopener"
+                    >Anthropic updates MCP security best practices (LinkedIn告知投稿)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">28</span
+                  ><a
+                    href="https://anthropic.skilljar.com/introduction-to-model-context-protocol"
+                    target="_blank"
+                    rel="noopener"
+                    >Introduction to Model Context Protocol (Anthropic Academy)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">29</span
+                  ><a href="https://arxiv.org/html/2601.17549v1" target="_blank" rel="noopener"
+                    >Breaking the Protocol: Security Analysis of the Model Context Protocol
+                    Specification (arXiv)</a
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <div class="ref-group">
+              <h4>NIST AI Risk Management Framework（30〜39）</h4>
+              <ul class="ref-list">
+                <li>
+                  <span class="ref-num">30</span
+                  ><a
+                    href="https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence"
+                    target="_blank"
+                    rel="noopener"
+                    >Artificial Intelligence Risk Management Framework: Generative AI Profile |
+                    NIST</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">31</span
+                  ><a
+                    href="https://www.nist.gov/itl/ai-risk-management-framework"
+                    target="_blank"
+                    rel="noopener"
+                    >AI Risk Management Framework | NIST</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">32</span
+                  ><a
+                    href="https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf"
+                    target="_blank"
+                    rel="noopener"
+                    >Artificial Intelligence Risk Management Framework (NIST AI 600-1, PDF)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">33</span
+                  ><a
+                    href="https://labs.cloudsecurityalliance.org/agentic/agentic-nist-ai-rmf-profile-v1/"
+                    target="_blank"
+                    rel="noopener"
+                    >NIST AI Risk Management Framework: Agentic Profile (Cloud Security Alliance)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">34</span
+                  ><a
+                    href="https://www.modelop.com/ai-governance/ai-regulations-standards/nist-ai-rmf"
+                    target="_blank"
+                    rel="noopener"
+                    >NIST AI RMF (ModelOp)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">35</span
+                  ><a
+                    href="https://digitalgovernmenthub.org/examples/nist-artificial-intelligence-risk-management-framework-generative-artificial-intelligence-profile/"
+                    target="_blank"
+                    rel="noopener"
+                    >NIST Generative AI Profile (Digital Government Hub)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">36</span
+                  ><a
+                    href="https://casrai.org/news/nist-ai-rmf-generative-ai-profile-ai-600-1-explained/"
+                    target="_blank"
+                    rel="noopener"
+                    >NIST AI RMF & the Generative AI Profile Explained (CASRAI)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">37</span
+                  ><a href="https://www.modulos.ai/nist-ai-rmf/" target="_blank" rel="noopener"
+                    >Implement NIST AI Risk Management Framework (Modulos AI)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">38</span
+                  ><a
+                    href="https://www.ispartnersllc.com/blog/nist-ai-rmf-2025-2026-updates-what-you-need-to-know-about-the-latest-framework-changes/"
+                    target="_blank"
+                    rel="noopener"
+                    >NIST AI RMF 2025–2026 Updates (IS Partners)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">39</span
+                  ><a
+                    href="https://www.nist.gov/programs-projects/concept-note-ai-rmf-profile-trustworthy-ai-critical-infrastructure"
+                    target="_blank"
+                    rel="noopener"
+                    >Concept Note: AI RMF Profile on Trustworthy AI in Critical Infrastructure |
+                    NIST</a
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <div class="ref-group">
+              <h4>MITRE ATLAS（40〜47）</h4>
+              <ul class="ref-list">
+                <li>
+                  <span class="ref-num">40</span
+                  ><a
+                    href="https://zenity.io/blog/current-events/mitre-atlas-ai-security"
+                    target="_blank"
+                    rel="noopener"
+                    >MITRE ATLAS AI Security and Agentic Threats 2026 Update (Zenity)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">41</span
+                  ><a href="https://www.vectra.ai/topics/mitre-atlas" target="_blank" rel="noopener"
+                    >MITRE ATLAS: AI security framework with 16 tactics and 84 techniques (Vectra
+                    AI)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">42</span
+                  ><a href="https://arxiv.org/pdf/2603.09002" target="_blank" rel="noopener"
+                    >Security Considerations for Multi-agent Systems (arXiv)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">43</span
+                  ><a
+                    href="https://www.practical-devsecops.com/mitre-atlas-framework-guide-securing-ai-systems/"
+                    target="_blank"
+                    rel="noopener"
+                    >MITRE ATLAS Framework 2026 - Guide to Securing AI Systems (Practical
+                    DevSecOps)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">44</span
+                  ><a
+                    href="https://www.crowdstrike.com/en-us/cybersecurity-101/artificial-intelligence/mitre-atlas/"
+                    target="_blank"
+                    rel="noopener"
+                    >What is MITRE ATLAS? (CrowdStrike)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">45</span
+                  ><a
+                    href="https://repello.ai/blog/mitre-atlas-framework"
+                    target="_blank"
+                    rel="noopener"
+                    >MITRE ATLAS Framework: AI Attack Techniques (Repello AI)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">46</span
+                  ><a
+                    href="https://www.paloaltonetworks.com/cyberpedia/mitre-sensible-regulatory-framework-atlas-matrix"
+                    target="_blank"
+                    rel="noopener"
+                    >MITRE's Sensible Regulatory Framework for AI Security (Palo Alto Networks)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">47</span
+                  ><a href="https://arxiv.org/pdf/2605.00927" target="_blank" rel="noopener"
+                    >BioVeil MATRIX (arXiv)</a
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <div class="ref-group">
+              <h4>プロンプトインジェクション対策（48〜57）</h4>
+              <ul class="ref-list">
+                <li>
+                  <span class="ref-num">48</span
+                  ><a
+                    href="https://zylos.ai/research/2026-04-12-indirect-prompt-injection-defenses-agents-untrusted-content/"
+                    target="_blank"
+                    rel="noopener"
+                    >Indirect Prompt Injection: Attacks, Defenses, and the 2026 State of the Art
+                    (Zylos Research)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">49</span
+                  ><a
+                    href="https://www.semanticscholar.org/paper/StruQ:-Defending-Against-Prompt-Injection-with-Chen-Piet/f5e7e22036c3fe7d6660eee90642f716c3b303f5"
+                    target="_blank"
+                    rel="noopener"
+                    >StruQ: Defending Against Prompt Injection with Structured Queries</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">50</span
+                  ><a
+                    href="https://tokenmix.ai/blog/prompt-injection-defense-techniques-2026"
+                    target="_blank"
+                    rel="noopener"
+                    >Prompt Injection Defense 2026: 8 Tested Techniques Ranked (TokenMix Blog)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">51</span
+                  ><a
+                    href="https://blog.cyberdesserts.com/prompt-injection-attacks/"
+                    target="_blank"
+                    rel="noopener"
+                    >Prompt Injection Attacks: Examples, Techniques, and Defence (Cyber Desserts)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">52</span
+                  ><a href="https://arxiv.org/pdf/2601.10294" target="_blank" rel="noopener"
+                    >Reasoning Hijacking: The Fragility of Reasoning Alignment in LLMs (arXiv)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">53</span
+                  ><a href="https://ceur-ws.org/Vol-3920/paper03.pdf" target="_blank" rel="noopener"
+                    >Defending Against Indirect Prompt Injection Attacks With Spotlighting (CEUR)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">54</span
+                  ><a
+                    href="https://github.com/tldrsec/prompt-injection-defenses"
+                    target="_blank"
+                    rel="noopener"
+                    >GitHub - tldrsec/prompt-injection-defenses</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">55</span
+                  ><a href="https://arxiv.org/html/2601.17548v1" target="_blank" rel="noopener"
+                    >Prompt Injection Attacks on Agentic Coding Assistants (arXiv)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">56</span
+                  ><a href="https://arxiv.org/pdf/2512.00136" target="_blank" rel="noopener"
+                    >An Empirical Study on the Security Vulnerabilities of GPTs (arXiv)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">57</span
+                  ><a href="https://arxiv.org/pdf/2509.00088" target="_blank" rel="noopener"
+                    >AEGIS: Automated Co-Evolutionary Framework for Guarding Prompt Injections
+                    (arXiv)</a
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <div class="ref-group">
+              <h4>EU AI Act（58〜67）</h4>
+              <ul class="ref-list">
+                <li>
+                  <span class="ref-num">58</span
+                  ><a
+                    href="https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai"
+                    target="_blank"
+                    rel="noopener"
+                    >AI Act | Shaping Europe's digital future (European Commission)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">59</span
+                  ><a
+                    href="https://ai-act-service-desk.ec.europa.eu/en/ai-act/timeline/timeline-implementation-eu-ai-act"
+                    target="_blank"
+                    rel="noopener"
+                    >Timeline for the Implementation of the EU AI Act</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">60</span
+                  ><a
+                    href="https://www.gibsondunn.com/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes/"
+                    target="_blank"
+                    rel="noopener"
+                    >EU AI Act Omnibus Agreement — Postponed High-Risk Deadlines (Gibson Dunn)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">61</span
+                  ><a
+                    href="https://www.lw.com/en/insights/ai-act-update-eu-resolves-to-change-rules-and-extend-deadlines"
+                    target="_blank"
+                    rel="noopener"
+                    >AI Act Update: EU Resolves to Change Rules and Extend Deadlines (Latham &
+                    Watkins)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">62</span
+                  ><a
+                    href="https://artificialintelligenceact.eu/implementation-timeline/"
+                    target="_blank"
+                    rel="noopener"
+                    >Implementation Timeline | EU Artificial Intelligence Act</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">63</span
+                  ><a
+                    href="https://labs.cloudsecurityalliance.org/research/csa-research-note-eu-ai-act-high-risk-compliance-deadline-20/"
+                    target="_blank"
+                    rel="noopener"
+                    >EU AI Act High-Risk Deadline: Enterprise Readiness Gap (Cloud Security
+                    Alliance)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">64</span
+                  ><a
+                    href="https://www.traverssmith.com/knowledge/knowledge-container/eu-agrees-to-delay-key-ai-act-compliance-deadlines/"
+                    target="_blank"
+                    rel="noopener"
+                    >EU agrees to delay key AI Act compliance deadlines (Travers Smith)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">65</span
+                  ><a
+                    href="https://decodethefuture.org/en/eu-ai-act-explained/"
+                    target="_blank"
+                    rel="noopener"
+                    >EU AI Act 2026: Penalties, Risk Tiers & New Deadlines</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">66</span
+                  ><a
+                    href="https://knowledge.dlapiper.com/dlapiperknowledge/globalemploymentlatestdevelopments/2026/The-Digital-AI-Omnibus-Proposed-deferral-of-high-risk-AI-obligations-under-the-AI-Act"
+                    target="_blank"
+                    rel="noopener"
+                    >The Digital AI Omnibus: Proposed deferral of high risk AI obligations (DLA
+                    Piper GENIE)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">67</span
+                  ><a
+                    href="https://www.legalnodes.com/article/eu-ai-act-2026-updates-compliance-requirements-and-business-risks"
+                    target="_blank"
+                    rel="noopener"
+                    >EU AI Act 2026 Updates: Compliance Requirements and Business Risks (Legal
+                    Nodes)</a
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <div class="ref-group">
+              <h4>AIレッドチーミング（68〜75）</h4>
+              <ul class="ref-list">
+                <li>
+                  <span class="ref-num">68</span
+                  ><a
+                    href="https://generalanalysis.com/guides/best-ai-red-teaming-tools"
+                    target="_blank"
+                    rel="noopener"
+                    >Best AI Red Teaming Tools in 2026 (General Analysis)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">69</span
+                  ><a
+                    href="https://www.confident-ai.com/knowledge-base/compare/best-ai-red-teaming-tools-2026"
+                    target="_blank"
+                    rel="noopener"
+                    >5 Best AI Red Teaming Tools to Find AI Security Vulnerabilities in 2026
+                    (Confident AI)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">70</span
+                  ><a
+                    href="https://www.marktechpost.com/2026/04/17/top-ai-red-teaming-tools/"
+                    target="_blank"
+                    rel="noopener"
+                    >Top 19 AI Red Teaming Tools (2026) (MarkTechPost)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">71</span
+                  ><a
+                    href="https://repello.ai/blog/the-essential-guide-to-ai-red-teaming-in-2024"
+                    target="_blank"
+                    rel="noopener"
+                    >AI Red Teaming: The Complete Guide for Security Teams (2026) (Repello AI)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">72</span
+                  ><a
+                    href="https://mindgard.ai/blog/what-is-ai-red-teaming"
+                    target="_blank"
+                    rel="noopener"
+                    >AI Red Teaming in 2026: The Complete Guide (Mindgard)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">73</span
+                  ><a
+                    href="https://github.com/requie/AI-Red-Teaming-Guide"
+                    target="_blank"
+                    rel="noopener"
+                    >GitHub - requie/AI-Red-Teaming-Guide</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">74</span
+                  ><a
+                    href="https://genai.owasp.org/resource/ai-security-solutions-landscape-for-ai-and-agentic-red-teaming-q2-2026/"
+                    target="_blank"
+                    rel="noopener"
+                    >AI Security Solutions Landscape For AI and Agentic Red Teaming Q2 2026
+                    (OWASP)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">75</span
+                  ><a
+                    href="https://www.straiker.ai/blog/top-6-ai-red-teaming-and-adversarial-testing-tools"
+                    target="_blank"
+                    rel="noopener"
+                    >Top 6 AI Red Teaming and Adversarial Testing Tools for 2026 (Straiker)</a
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <div class="ref-group">
+              <h4>データ/モデルポイズニング・モデル抽出（76〜83）</h4>
+              <ul class="ref-list">
+                <li>
+                  <span class="ref-num">76</span
+                  ><a
+                    href="https://aisecurityandsafety.org/en/guides/data-poisoning/"
+                    target="_blank"
+                    rel="noopener"
+                    >Data Poisoning in AI: The Complete Guide (2026) (AI Safety Directory)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">77</span
+                  ><a
+                    href="https://blog.lastpass.com/posts/model-poisoning"
+                    target="_blank"
+                    rel="noopener"
+                    >AI Model Poisoning in 2026 (LastPass Blog)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">78</span
+                  ><a href="https://arxiv.org/pdf/2312.10578" target="_blank" rel="noopener"
+                    >SAME: Sample Reconstruction against Model Extraction Attacks (arXiv)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">79</span
+                  ><a
+                    href="https://medium.com/@nayangoel/securing-ai-from-model-poisoning-to-production-defense-6bc4553ac7e0"
+                    target="_blank"
+                    rel="noopener"
+                    >Securing AI: From Model Poisoning to Production Defense (Medium)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">80</span
+                  ><a href="https://arxiv.org/pdf/2508.21654" target="_blank" rel="noopener"
+                    >I Stolenly Swear That I Am Up to (No) Good: Model Stealing Attacks (arXiv)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">81</span
+                  ><a href="https://arxiv.org/pdf/2303.03592" target="_blank" rel="noopener"
+                    >Exploring the Limits of Model-Targeted Data Poisoning Attacks (arXiv)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">82</span
+                  ><a
+                    href="https://link.springer.com/article/10.1007/s13042-026-03181-7"
+                    target="_blank"
+                    rel="noopener"
+                    >The poisoning attack and defense method for data-driven algorithm in power
+                    systems (Springer)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">83</span
+                  ><a href="https://arxiv.org/pdf/2105.03592" target="_blank" rel="noopener"
+                    >De-Pois: An Attack-Agnostic Defense against Data Poisoning Attacks (arXiv)</a
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <div class="ref-group">
+              <h4>AIサプライチェーン・AIBOM・モデル署名（84〜93）</h4>
+              <ul class="ref-list">
+                <li>
+                  <span class="ref-num">84</span
+                  ><a
+                    href="https://www.glacis.io/guide-ai-supply-chain-security"
+                    target="_blank"
+                    rel="noopener"
+                    >AI Supply Chain Security Guide 2026 (GLACIS)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">85</span
+                  ><a
+                    href="https://creativeminds.dev/blog/top-ai-security-tools-2026-vendor-neutral/"
+                    target="_blank"
+                    rel="noopener"
+                    >Top AI Security Tools 2026: The Vendor-Neutral Comparison</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">86</span
+                  ><a
+                    href="https://cloudsmith.com/blog/the-2026-guide-to-software-supply-chain-security-from-static-sboms-to-agentic-governance"
+                    target="_blank"
+                    rel="noopener"
+                    >The 2026 Guide to Software Supply Chain Security (Cloudsmith)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">87</span
+                  ><a
+                    href="https://checkmarx.com/learn/ai-cybersecurity/what-is-an-aibom/"
+                    target="_blank"
+                    rel="noopener"
+                    >What is an AIBOM? (Checkmarx)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">88</span
+                  ><a href="https://apiiro.com/glossary/aibom/" target="_blank" rel="noopener"
+                    >What Is An AIBOM? (Apiiro)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">89</span
+                  ><a href="https://arxiv.org/pdf/2606.21877" target="_blank" rel="noopener"
+                    >AgentRiskBOM: A Risk-Scoping Security Bill of Materials for Agentic AI Systems
+                    (arXiv)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">90</span
+                  ><a
+                    href="https://qyntar.com/ai-security/threats/ai-supply-chain-attacks/"
+                    target="_blank"
+                    rel="noopener"
+                    >Supply Chain Attacks in AI (Qyntar)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">91</span
+                  ><a href="https://arxiv.org/pdf/2606.21787" target="_blank" rel="noopener"
+                    >Towards Imputation of Pre-Trained Language Model Metadata using Semantic
+                    Fingerprinting (arXiv)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">92</span
+                  ><a href="https://arxiv.org/pdf/2505.10538" target="_blank" rel="noopener"
+                    >S3C2 Summit 2024-09: Industry Secure Software Supply Chain Summit (arXiv)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">93</span
+                  ><a href="https://www.manifestcyber.com/aibom" target="_blank" rel="noopener"
+                    >AI Bill of Materials (AIBOM): Transparency for AI Supply Chains (Manifest
+                    Cyber)</a
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <div class="ref-group">
+              <h4>RAG・ベクトルDBセキュリティ（94〜101）</h4>
+              <ul class="ref-list">
+                <li>
+                  <span class="ref-num">94</span
+                  ><a
+                    href="https://beyondscale.tech/blog/vector-database-security-rag-compliance-monitoring"
+                    target="_blank"
+                    rel="noopener"
+                    >Vector Database Security: RAG Compliance & Monitoring Guide (BeyondScale)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">95</span
+                  ><a
+                    href="https://www.blockchain-council.org/ai/securing-and-governing-vector-databases-privacy-prompt-injection-multi-tenant-access-control/"
+                    target="_blank"
+                    rel="noopener"
+                    >Securing and Governing Vector Databases in 2026 (Blockchain Council)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">96</span
+                  ><a
+                    href="https://codesecai.com/rag-poisoning-prevention-guide/"
+                    target="_blank"
+                    rel="noopener"
+                    >RAG Poisoning: 7 Critical Defenses (2026 Guide) (CodeSecAI)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">97</span
+                  ><a
+                    href="https://themenonlab.blog/blog/poisonedrag-rag-knowledge-corruption-attack"
+                    target="_blank"
+                    rel="noopener"
+                    >PoisonedRAG: 5 Documents Can Hijack Your RAG System 97% of the Time</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">98</span
+                  ><a
+                    href="https://beyondscale.tech/blog/rag-security-data-poisoning-guide"
+                    target="_blank"
+                    rel="noopener"
+                    >RAG Security: How Attackers Poison Your Knowledge Base (BeyondScale)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">99</span
+                  ><a
+                    href="https://advent-of-ai-security.com/doors/08"
+                    target="_blank"
+                    rel="noopener"
+                    >Door 08 - Vector and Embedding Weaknesses (Advent of AI Security)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">100</span
+                  ><a
+                    href="https://www.lasso.security/blog/rag-security"
+                    target="_blank"
+                    rel="noopener"
+                    >RAG Security: Risks and Mitigation Strategies [2026] (Lasso Security)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">101</span
+                  ><a
+                    href="https://christian-schneider.net/blog/rag-security-forgotten-attack-surface/"
+                    target="_blank"
+                    rel="noopener"
+                    >RAG security: the forgotten attack surface (Christian Schneider)</a
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <div class="ref-group">
+              <h4>ISO/IEC 42001（102〜111）</h4>
+              <ul class="ref-list">
+                <li>
+                  <span class="ref-num">102</span
+                  ><a
+                    href="https://learn.microsoft.com/en-us/compliance/regulatory/offering-iso-42001"
+                    target="_blank"
+                    rel="noopener"
+                    >ISO/IEC 42001:2023 Artificial Intelligence Management System Standards
+                    (Microsoft Learn)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">103</span
+                  ><a href="https://www.iso.org/standard/42001" target="_blank" rel="noopener"
+                    >ISO/IEC 42001:2023 - AI management systems (ISO)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">104</span
+                  ><a
+                    href="https://pecb.com/en/education-and-certification-for-individuals/iso-iec-42001"
+                    target="_blank"
+                    rel="noopener"
+                    >ISO/IEC 42001 Artificial Intelligence Management System — Training Courses
+                    (PECB)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">105</span
+                  ><a
+                    href="https://www.bsigroup.com/en-US/products-and-services/standards/iso-42001-ai-management-system/"
+                    target="_blank"
+                    rel="noopener"
+                    >ISO 42001 - AI Management System (BSI)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">106</span
+                  ><a
+                    href="https://lorikeetsecurity.com/blog/iso-42001-ai-management-system-2026"
+                    target="_blank"
+                    rel="noopener"
+                    >ISO/IEC 42001 Deep Dive: The AI Management System Standard, Decoded (2026)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">107</span
+                  ><a
+                    href="https://www.dnv.com/services/iso-iec-42001-artificial-intelligence-ai--250876/"
+                    target="_blank"
+                    rel="noopener"
+                    >ISO/IEC 42001 Certification: AI Management System (DNV)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">108</span
+                  ><a
+                    href="https://www.iso.org/home/insights-news/resources/iso-42001-explained-what-it-is.html"
+                    target="_blank"
+                    rel="noopener"
+                    >ISO - ISO 42001 explained</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">109</span
+                  ><a
+                    href="https://kpmg.com/ch/en/insights/artificial-intelligence/iso-iec-42001.html"
+                    target="_blank"
+                    rel="noopener"
+                    >ISO/IEC 42001: AI Management System for Governance (KPMG)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">110</span
+                  ><a
+                    href="https://standards.iteh.ai/catalog/standards/cen/adc675e8-4669-4965-b4c1-c8f724832217/en-iso-iec-42001-2026"
+                    target="_blank"
+                    rel="noopener"
+                    >EN ISO/IEC 42001:2026 (iTeh Standards)</a
+                  >
+                </li>
+                <li>
+                  <span class="ref-num">111</span
+                  ><a
+                    href="https://www.a-lign.com/articles/understanding-iso-42001"
+                    target="_blank"
+                    rel="noopener"
+                    >Understanding ISO 42001: The World's First AI Management System Standard
+                    (A-LIGN)</a
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <div class="disclaimer">
+              <strong>免責事項:</strong>
+              本ガイドは2026年7月8日時点で公開されていた情報をもとに作成しています。AIセキュリティの分野は極めて変化が速いため、実装前に各フレームワーク・法規制の公式サイト（特に
+              OWASP: genai.owasp.org、NIST: nist.gov、ISO: iso.org、EU AI Act公式ポータル、MITRE
+              ATLAS:
+              atlas.mitre.org）で最新情報を確認することを強く推奨します。本ガイドは一般的なベストプラクティスの解説であり、個別組織の法令遵守を保証するものではありません。法的な適用可否については専門家にご相談ください。
+            </div>
+          </section>
+
+          <hr class="divider" />
+          <p
+            style="
+              text-align: center;
+              color: var(--text-muted);
+              font-size: 12px;
+              font-family: var(--font-mono);
+              padding-bottom: 40px;
+            "
+          >
+            AI Security Best Practices Guide — 2026年7月版
+          </p>
+        </div>
+      </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
+      const diagrams = {
+        'threat-landscape': `flowchart TB
+    subgraph L1["データ層"]
+        A1["学習データ汚染<br/>(Data Poisoning)"]
+        A2["個人情報混入<br/>(PII Leakage)"]
+        A3["著作権/ライセンス違反データ"]
+    end
+    subgraph L2["モデル層"]
+        B1["モデル抽出・窃取<br/>(Model Extraction)"]
+        B2["メンバーシップ推論攻撃"]
+        B3["バックドア/トロイの木馬"]
+    end
+    subgraph L3["アプリケーション層"]
+        C1["直接プロンプトインジェクション"]
+        C2["間接プロンプトインジェクション"]
+        C3["システムプロンプト漏洩"]
+        C4["出力の不適切な処理"]
+    end
+    subgraph L4["エージェント/ツール層"]
+        D1["目標ハイジャック"]
+        D2["ツール誤用・過剰な自律性"]
+        D3["MCPサーバーのなりすまし/Rug Pull"]
+        D4["メモリ・コンテキスト汚染"]
+        D5["エージェント間通信の詐称"]
+    end
+    subgraph L5["インフラ/サプライチェーン層"]
+        E1["依存パッケージの侵害"]
+        E2["モデルレジストリのなりすまし"]
+        E3["ベクトルDB/RAGパイプラインの汚染"]
+        E4["無制限リソース消費(DoW/DoS)"]
+    end
+    L1 --> L2 --> L3 --> L4
+    L5 -.->|供給元を汚染| L1
+    L5 -.->|ツール/サーバーを汚染| L4`,
+
+        'framework-relations': `flowchart LR
+    subgraph Legal["法的拘束力"]
+        EU["EU AI Act"]
+    end
+    subgraph Voluntary["任意フレームワーク"]
+        NIST["NIST AI RMF<br/>+ GenAIプロファイル"]
+        ISO["ISO/IEC 42001<br/>(認証可能)"]
+    end
+    subgraph Technical["技術的チェックリスト・脅威DB"]
+        OWASP1["OWASP LLM Top10"]
+        OWASP2["OWASP Agentic Top10"]
+        ATLAS["MITRE ATLAS"]
+    end
+    NIST -->|コンプライアンス根拠| EU
+    ISO -->|認証が対応の裏付けに| EU
+    OWASP1 -->|技術的指針| NIST
+    OWASP2 -->|技術的指針| NIST
+    ATLAS -->|攻撃手法とテスト項目| OWASP1
+    ATLAS -->|攻撃手法とテスト項目| OWASP2`,
+
+        'prompt-injection': `flowchart TD
+    subgraph Direct["直接プロンプトインジェクション"]
+        U1["攻撃者"] -->|"'指示を無視して...'"| P1["ユーザー入力欄"]
+        P1 --> M1["LLM"]
+        M1 --> R1["システムプロンプトの上書き"]
+    end
+    subgraph Indirect["間接プロンプトインジェクション"]
+        U2["攻撃者"] -->|"悪意ある指示を埋め込む"| D2["外部コンテンツ<br/>(Web/メール/文書/ツール出力)"]
+        AGENT["エージェント/RAG"] -->|"信頼された処理として取り込む"| D2
+        D2 --> M2["LLM"]
+        M2 --> R2["意図しないツール実行・<br/>データ窃取・目標乗っ取り"]
+    end`,
+
+        'data-poisoning': `flowchart LR
+    A["公開データセット/<br/>Webスクレイピング"] --> B{"データ検証<br/>パイプライン"}
+    C["サードパーティ提供データ"] --> B
+    B -->|"検証済み"| D["学習パイプライン"]
+    B -->|"異常検知でブロック"| X["隔離・レビュー"]
+    D --> E["ファインチューニング/<br/>継続学習"]
+    E --> F["デプロイ済みモデル"]
+    F -->|"継続的な振る舞い監視"| G["異常検知アラート"]
+    G -.->|"疑わしい場合ロールバック"| F`,
+
+        'rag-security': `flowchart LR
+    subgraph Ingest["取り込みパイプライン"]
+        S1["社内文書/Wiki"] --> CH["チャンク分割"]
+        S2["Web/外部データ"] --> CH
+        CH --> EMB["埋め込み生成"]
+        EMB --> VDB[("ベクトルDB")]
+    end
+    subgraph Query["検索・生成"]
+        Q["ユーザークエリ"] --> QE["クエリ埋め込み"]
+        QE --> VDB
+        VDB -->|"類似度検索結果"| GEN["LLM生成"]
+        GEN --> RESP["応答"]
+    end
+    ATT["攻撃者"] -.->|"① 汚染文書を混入"| S2
+    ATT -.->|"② 未認証エンドポイント経由で直接書き込み"| VDB
+    ATT -.->|"③ 検索結果に指示を埋め込み"| GEN`,
+
+        'mcp-trust': `flowchart TB
+    subgraph Host["ホスト (Claude Desktop等)"]
+        H["AIアプリケーション"]
+    end
+    subgraph Client["MCPクライアント"]
+        C["サーバーごとに1インスタンス"]
+    end
+    subgraph Servers["MCPサーバー群"]
+        S1["社内データソース<br/>(信頼できるサーバー)"]
+        S2["サードパーティ公開サーバー<br/>(信頼境界の外)"]
+        S3["悪意あるなりすましサーバー"]
+    end
+    H --> C
+    C -->|"信頼境界①"| S1
+    C -->|"信頼境界②(要検証)"| S2
+    C -.->|"③ Rug Pull攻撃"| S3
+    S2 -.->|"④ Confused Deputy"| S1
+    S3 -.->|"⑤ Tool Poisoning"| H`,
+
+        guardrails: `flowchart LR
+    IN["ユーザー入力/外部コンテンツ"] --> L1["レイヤー1<br/>入力サニタイズ・分類器"]
+    L1 --> LLM["LLM推論"]
+    LLM --> L2["レイヤー2<br/>出力スキーマ検証"]
+    L2 --> L3["レイヤー3<br/>コンテンツポリシーフィルタ"]
+    L3 --> L4["レイヤー4<br/>高リスクアクション人間承認"]
+    L4 --> OUT["実行/表示"]
+    L2 -.->|"逸脱検知"| BLOCK1["ブロック・再生成"]
+    L3 -.->|"ポリシー違反"| BLOCK2["ブロック・ログ記録"]
+    L4 -.->|"承認拒否"| BLOCK3["実行キャンセル"]`,
+
+        'redteam-cycle': `flowchart TD
+    A["脅威モデリング<br/>(OWASP/MITRE ATLAS)"] --> B["攻撃シナリオ設計"]
+    B --> C["自動化敵対的テスト実行<br/>(Garak, PyRIT, DeepTeam等)"]
+    C --> D["手動レッドチーム演習"]
+    D --> E["結果の重大度評価・エビデンス収集"]
+    E --> F["修正・ガードレール強化"]
+    F --> G["リリースゲートでの回帰テスト"]
+    G -.->|"変更のたびに"| A`,
+
+        'incident-response': `flowchart TD
+    A["異常検知<br/>(監視アラート/報告)"] --> B{"重大度評価"}
+    B -->|"低"| C["ログ記録・定期レビューへ"]
+    B -->|"中〜高"| D["インシデント対応チーム招集"]
+    D --> E["影響範囲の特定"]
+    E --> F["封じ込め<br/>(一時停止、トークン失効)"]
+    F --> G["根本原因分析"]
+    G --> H["復旧・修正<br/>(ロールバック)"]
+    H --> I["事後レビュー・文書化"]
+    I -.->|"フィードバック"| J["レッドチームシナリオへ追加"]`,
+
+        'aibom-flow': `flowchart LR
+    A["モデル/データセット<br/>取得・開発"] --> B["AIBOM生成<br/>(CycloneDX形式)"]
+    B --> C["Sigstore/cosignで署名"]
+    C --> D["レジストリへ登録"]
+    D --> E["デプロイ時に署名検証"]
+    E --> F["継続的な脆弱性スキャン"]
+    F -.->|"新たな脆弱性発見時"| G["ロールバック/再署名"]`,
+
+        maturity: `flowchart LR
+    L1["Level 1<br/>場当たり的"] --> L2["Level 2<br/>基礎的"]
+    L2 --> L3["Level 3<br/>体系的"]
+    L3 --> L4["Level 4<br/>最適化"]`,
+      };
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        themeVariables: {
+          background: '#0b1729',
+          primaryColor: '#10233a',
+          primaryTextColor: '#eef3fa',
+          primaryBorderColor: '#4dd8e6',
+          lineColor: '#5b7396',
+          secondaryColor: '#132842',
+          tertiaryColor: '#0f1f34',
+          fontFamily: 'Inter, sans-serif',
+          fontSize: '13px',
+          clusterBkg: '#0f1f34',
+          clusterBorder: 'rgba(148,178,214,0.3)',
+          edgeLabelBackground: '#0b1729',
+        },
+        securityLevel: 'strict',
+        flowchart: { curve: 'basis', htmlLabels: true },
+      });
+
+      async function renderDiagrams() {
+        const nodes = document.querySelectorAll('.mermaid[data-key]');
+        for (const el of nodes) {
+          const key = el.dataset.key;
+          const src = diagrams[key];
+          if (!src) continue;
+          // Inject raw mermaid source via textContent only (never innerHTML)
+          el.textContent = src;
+        }
+        await mermaid.run({ querySelector: '.mermaid[data-key]' });
+      }
+      renderDiagrams();
+
+      if (window.hljs) {
+        hljs.highlightAll();
+      }
+    </script>
+
+    <script>
+      // Sidebar active-state scroll spy (IntersectionObserver)
+      (function () {
+        const sections = document.querySelectorAll('section.chapter');
+        const navLinks = Array.from(document.querySelectorAll('#navList a'));
+        const linkMap = new Map(navLinks.map((a) => [a.getAttribute('href').slice(1), a]));
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              const link = linkMap.get(entry.target.id);
+              if (!link) return;
+              if (entry.isIntersecting) {
+                navLinks.forEach((a) => a.classList.remove('active'));
+                link.classList.add('active');
+              }
+            });
+          },
+          { rootMargin: '-15% 0px -70% 0px', threshold: 0 },
+        );
+
+        sections.forEach((sec) => observer.observe(sec));
+
+        // Mobile menu toggle
+        const toggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        if (toggle && sidebar) {
+          toggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+          navLinks.forEach((a) =>
+            a.addEventListener('click', () => sidebar.classList.remove('open')),
+          );
+        }
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,732 @@
+.pageWrap {
+  /*
+   * サイト共通トークン(--bg/--acc等)への薄いエイリアス。
+   * globals.css の :root と同じ値を使い、SiteHeader/DisclaimerBanner
+   * と地続きの配色になるよう揃えている。
+   */
+  --color-background-primary: var(--bg, #05080f);
+  --color-background-secondary: var(--srf, #0c1220);
+  --color-background-tertiary: var(--srf2, #111928);
+  --color-background-info: color-mix(in srgb, var(--acc, #3b82f6) 14%, var(--bg, #05080f));
+  --color-background-success: color-mix(in srgb, var(--grn, #22c55e) 14%, var(--bg, #05080f));
+  --color-background-warning: color-mix(in srgb, var(--ylw, #f59e0b) 14%, var(--bg, #05080f));
+  --color-background-danger: color-mix(in srgb, var(--red, #ef4444) 14%, var(--bg, #05080f));
+
+  --color-text-primary: var(--txt, #eaf0f8);
+  --color-text-secondary: var(--txt2, #aeb8d0);
+  --color-text-tertiary: var(--txt3, #7888a5);
+  --color-text-info: var(--acc2, #60a5fa);
+  --color-text-success: var(--grn2, #4ade80);
+  --color-text-warning: var(--ylw2, #fbbf24);
+  --color-text-danger: var(--red2, #f87171);
+
+  --color-border-primary: var(--brd2, #1e2d48);
+  --color-border-secondary: var(--brd2, #1e2d48);
+  --color-border-tertiary: var(--brd, #182035);
+
+  --border-radius-md: 8px;
+  --border-radius-lg: 14px;
+
+  display: grid;
+  grid-template-columns: 272px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-items: start;
+  min-height: 100vh;
+  background: var(--color-background-primary);
+  color: var(--color-text-primary);
+}
+
+.sidebar {
+  grid-column: 1;
+  grid-row: 1;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--color-background-secondary);
+  border-right: 1px solid var(--color-border-tertiary);
+  padding: 28px 18px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-primary) transparent;
+}
+
+/* SiteHeader が存在する場合のオフセット */
+:global(body.has-common-header) .sidebar {
+  top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px));
+  height: calc(100vh - var(--ch-height, 60px) - var(--ch-disclaimer-height, 0px));
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+  padding: 0 10px 18px;
+  border-bottom: 1px solid var(--color-border-tertiary);
+}
+
+.brand i {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  font-size: 16px;
+  border-radius: var(--border-radius-md);
+  background: var(--color-background-info);
+  color: var(--color-text-info);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--acc, #3b82f6) 30%, transparent);
+}
+
+.brand span {
+  font-family: var(--font-display), Syne, sans-serif;
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navGroupLabel {
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-size: 10.5px;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 20px 0 6px;
+  padding: 0 10px;
+}
+
+.navGroupLabel:first-child {
+  margin-top: 0;
+}
+
+.tocLink {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 10px 7px 13px;
+  border-radius: var(--border-radius-md);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 1.4;
+  text-decoration: none;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.tocLink::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 0;
+  border-radius: 2px;
+  background: var(--color-text-info);
+  transition: height 0.15s;
+}
+
+.tocLink:hover {
+  background: var(--color-background-tertiary);
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+.tocLink i {
+  font-size: 15px;
+  width: 16px;
+  text-align: center;
+  color: var(--color-text-tertiary);
+  flex-shrink: 0;
+}
+
+.tocLinkActive {
+  background: var(--color-background-tertiary);
+  color: var(--color-text-info);
+  font-weight: 500;
+}
+
+.tocLinkActive::before {
+  height: 16px;
+}
+
+.tocLinkActive i {
+  color: var(--color-text-info);
+}
+
+.content {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  padding: 0 clamp(28px, 4vw, 72px) 96px;
+  counter-reset: step-counter;
+}
+
+/* id="step1"〜"step11" のセクションのみ自動採番(overview/architecture/summary/referencesは対象外) */
+.content > section[id^="step"] {
+  counter-increment: step-counter;
+}
+
+.hero {
+  position: relative;
+  margin: 0 calc(-1 * clamp(28px, 4vw, 72px)) 44px;
+  padding: 52px clamp(28px, 4vw, 72px) 36px;
+  background: linear-gradient(
+    160deg,
+    var(--bg, #05080f) 0%,
+    var(--bg2, #080d18) 55%,
+    var(--bg, #05080f) 100%
+  );
+  border-bottom: 1px solid var(--color-border-tertiary);
+  overflow: hidden;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse at 15% 60%,
+      color-mix(in srgb, var(--acc, #3b82f6) 10%, transparent) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse at 85% 5%,
+      color-mix(in srgb, var(--prp, #a78bfa) 8%, transparent) 0%,
+      transparent 45%
+    );
+  pointer-events: none;
+}
+
+.eyebrow {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-info);
+  padding: 0;
+  margin-bottom: 18px;
+}
+
+.eyebrow::before {
+  content: "";
+  width: 28px;
+  height: 1px;
+  background: var(--color-text-info);
+}
+
+.pageTitle {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-display), Syne, sans-serif;
+  font-size: clamp(26px, 3vw, 38px);
+  margin: 0 0 16px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+}
+
+.lead {
+  position: relative;
+  z-index: 1;
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  max-width: 760px;
+  margin-bottom: 0;
+  line-height: 1.75;
+}
+
+.metaRow {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+
+.metaItem {
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border-primary);
+  background: color-mix(in srgb, var(--color-background-secondary) 60%, transparent);
+}
+
+.metaItem i {
+  color: var(--color-text-info);
+  font-size: 13px;
+}
+
+.step {
+  margin-bottom: 8px;
+  scroll-margin-top: calc(24px + var(--ch-height, 0px) + var(--ch-disclaimer-height, 0px));
+}
+
+.step h2 {
+  font-size: 18px;
+  margin: 48px 0 16px;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-border-tertiary);
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--color-text-primary);
+}
+
+/* ステップ番号バッジ(採番は counter-increment 側で定義、ここでは見た目のみ) */
+.content > section[id^="step"] > h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.content > section[id^="step"] > h2::before {
+  content: counter(step-counter, decimal-leading-zero);
+  flex-shrink: 0;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--color-text-info);
+  background: var(--color-background-info);
+  border: 1px solid color-mix(in srgb, var(--acc, #3b82f6) 30%, transparent);
+  border-radius: 6px;
+  padding: 3px 8px;
+}
+
+.step h3 {
+  font-size: 16px;
+  margin: 28px 0 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--color-text-primary);
+}
+
+.step p {
+  margin: 0 0 16px;
+  color: var(--color-text-primary);
+  line-height: 1.7;
+}
+
+.step ul,
+.step ol {
+  margin: 0 0 16px;
+  padding-left: 24px;
+}
+
+.step li {
+  margin-bottom: 8px;
+  color: var(--color-text-primary);
+}
+
+.card {
+  background: var(--color-background-secondary);
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  padding: 20px 24px;
+  margin: 20px 0;
+}
+
+.callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 20px;
+  border-radius: var(--border-radius-lg);
+  margin: 22px 0;
+  background: var(--color-background-secondary);
+  border: 1px solid var(--color-border-tertiary);
+  border-left: 3px solid var(--color-border-tertiary);
+}
+
+.callout i {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  font-size: 14px;
+  border-radius: 8px;
+}
+
+.calloutBody {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  padding-top: 3px;
+}
+
+.calloutBody strong {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.tip {
+  border-left-color: var(--color-text-info);
+}
+
+.tip i {
+  background: var(--color-background-info);
+  color: var(--color-text-info);
+}
+
+.warning {
+  border-left-color: var(--color-text-warning);
+}
+
+.warning i {
+  background: var(--color-background-warning);
+  color: var(--color-text-warning);
+}
+
+.danger {
+  border-left-color: var(--color-text-danger);
+}
+
+.danger i {
+  background: var(--color-background-danger);
+  color: var(--color-text-danger);
+}
+
+.tableScroll {
+  overflow-x: auto;
+  border-radius: var(--border-radius-lg);
+  margin: 20px 0;
+}
+
+.tableScroll table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  background: var(--color-background-secondary);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  min-width: 640px;
+}
+
+.tableScroll thead th {
+  background: var(--color-background-tertiary);
+  color: var(--color-text-primary);
+  font-weight: 600;
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+  text-align: left; /* 左寄せ */
+  padding: 11px 14px;
+  border-bottom: 2px solid var(--color-text-info);
+  white-space: nowrap;
+}
+
+.tableScroll tbody td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-border-tertiary);
+  color: var(--color-text-secondary);
+  vertical-align: top;
+  text-align: left; /* 左寄せ */
+  transition: background 0.15s;
+}
+
+.tableScroll tbody tr:nth-child(even) td {
+  background: color-mix(in srgb, var(--color-background-tertiary) 40%, transparent);
+}
+
+.tableScroll tbody tr:hover td {
+  background: var(--color-background-info);
+}
+
+.tableScroll tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tableScroll tbody td:first-child {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.tableScroll table.compact tbody td,
+.tableScroll table.compact thead th {
+  padding: 8px 12px;
+}
+
+/* code & code-block */
+.inlineCode {
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-size: 13px;
+  background: var(--color-background-tertiary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--color-text-info);
+}
+
+.codeWrap {
+  margin: 16px 0;
+  border: 1px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  background: var(--color-background-tertiary);
+}
+
+.codeBar {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px 8px 58px;
+  background: var(--color-background-secondary);
+  border-bottom: 1px solid var(--color-border-secondary);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-family: var(--font-mono), "JetBrains Mono", monospace; /* monospace 指定 */
+}
+
+/* ターミナルウィンドウ風のトラフィックライト(自前運用=自分の端末、というテーマの象徴) */
+.codeBar::before {
+  content: "";
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-text-danger);
+  box-shadow:
+    16px 0 0 var(--color-text-warning),
+    32px 0 0 var(--color-text-success);
+  transform: translateY(-50%);
+}
+
+.codeLang {
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.codeBody {
+  padding: 16px 18px;
+  overflow-x: auto;
+  font-family: var(--font-mono), "JetBrains Mono", monospace; /* monospace 指定 */
+  font-size: 13px;
+  line-height: 1.65; /* line-height 1.65 指定 */
+}
+
+.codeLine {
+  white-space: pre; /* 改行の正規化防止 */
+  font-family: var(--font-mono), "JetBrains Mono", monospace; /* monospace 指定 */
+}
+
+/* diagram */
+.diagramWrap {
+  position: relative;
+  text-align: center;
+  margin: 24px 0;
+  background: var(--color-background-secondary);
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  padding: 24px 16px;
+  overflow: visible;
+}
+
+/* codeBar/テーブルヘッダーと揃えた「ラベル付きパネル」の視覚言語 */
+.diagramWrap::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 16px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-text-info), transparent);
+  border-radius: 0 0 2px 2px;
+}
+
+/* .diagramWrap内のMermaid divのoverflow（Part 2-3） */
+.diagramWrap :global(.mermaid) {
+  overflow: visible;
+}
+
+/* Mermaid SVG 中央寄せ（SKILL.md Part 4 パターン準拠） */
+.mermaidContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.mermaidContainer :global(svg) {
+  display: block;
+  margin: 0 auto;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  overflow: visible; /* Part 2-3: シーケンス図下部切れ防止 */
+}
+
+.diagramCaption {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  margin-top: 12px;
+}
+
+.diagramError {
+  font-size: 13px;
+  color: var(--color-text-danger);
+}
+
+/* checklist */
+.step ul.checklist {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  background: var(--color-background-secondary);
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  padding: 10px 14px;
+  margin-bottom: 0;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+
+.checklist li:hover {
+  border-color: var(--color-text-success);
+  background: var(--color-background-success);
+}
+
+.checklist li i {
+  color: var(--color-text-success);
+  font-size: 16px;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+/* references */
+.refList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 12px 0 32px;
+}
+
+.refGroupTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin: 20px 0 8px;
+}
+
+.refItem {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  display: flex;
+  gap: 8px;
+  padding: 5px 10px;
+  margin: 0 -10px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.refItem:hover {
+  background: var(--color-background-tertiary);
+}
+
+.refNum {
+  color: var(--color-text-tertiary);
+  flex-shrink: 0;
+  min-width: 26px;
+}
+
+.refItem a {
+  color: var(--color-text-info);
+  word-break: break-all;
+  text-decoration: none;
+}
+
+.refItem a:hover {
+  text-decoration: underline;
+}
+
+.cite a {
+  color: var(--color-text-tertiary);
+  font-size: 11px;
+  text-decoration: none;
+}
+
+.footerNote {
+  margin-top: 56px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border-tertiary);
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+}
+
+.pageFooter {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 40px 56px 80px;
+  color: var(--color-text-tertiary);
+  font-size: 12.5px;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  text-align: center;
+  border-top: 1px solid var(--color-border-tertiary);
+  line-height: 1.8;
+  background: var(--color-background-primary);
+}
+
+@media (max-width: 900px) {
+  .pageWrap {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+  .sidebar {
+    grid-column: 1;
+    grid-row: 1;
+    position: relative;
+    top: auto;
+    left: auto;
+    bottom: auto;
+    height: auto;
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border-tertiary);
+  }
+  .content {
+    grid-column: 1;
+    grid-row: 2;
+    padding: 32px 20px 64px;
+  }
+  .pageFooter {
+    grid-column: 1;
+    grid-row: 3;
+  }
+}
