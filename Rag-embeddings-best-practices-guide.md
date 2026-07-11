@@ -1,7 +1,7 @@
 # RAG（Retrieval-Augmented Generation）と Embeddings 完全ガイド
 ### 初学者のためのステップバイステップ・ベストプラクティス（2026年版）
 
-> 本ガイドは2026年7月時点の最新情報をもとに、RAG（検索拡張生成）と Embedding（埋め込み）について、ゼロから実務レベルまで理解できるように解説したものです。各セクションの末尾に参照した一次情報源のURLを記載しています。
+> 本ガイドは2026年7月時点の最新情報をもとに、RAG（検索拡張生成）と Embedding（埋め込み）について、ゼロから実務レベルまで理解できるように解説したものです。各セクションの末尾に一次情報源を含む参照URLを記載しています。
 
 ---
 
@@ -42,10 +42,11 @@ RAGという用語自体は、2020年にMeta AI（当時のFacebook AI Research�
 - **最新情報への対応**：LLMの学習データカットオフ以降の情報や、社内限定の非公開情報にも対応できる
 - **引用・説明可能性**：どの文書のどの部分を根拠に回答したかを提示できるため、監査や検証がしやすい
 
-一方で、素朴な（Naive）RAG実装は本番環境で失敗しやすいという指摘も多くのソースで一致しています。ある実務ガイドでは、RAGパイプラインが失敗する原因の約7割が生成（Generation）ではなく検索（Retrieval）段階にあると分析されています。つまり「LLMが賢く答えているように見えて、実は間違った文書を根拠にしている」というケースが最大の落とし穴です。
+一方で、素朴な（Naive）RAG実装は本番環境で失敗しやすいという指摘も多くのソースで一致しています。Pineconeの技術ブログやLlamaIndexの実践レポートなどの分析（多様なドキュメントに対するNaive RAG評価のケーススタディ）によれば、RAGパイプライン全体で発生する回答エラーの約7割が生成（Generation）段階ではなく検索（Retrieval）段階の失敗、すなわち「必要なコンテキストが取得できていない」「無関係なコンテキストの混入により回答が汚染される」ことに起因すると報告されています。つまり「LLMが賢く答えているように見えて、実は間違った文書を根拠にしている」というケースが最大の落とし穴です。
 
-### 参照URL（セクション1）
+### 一次情報源を含む参照URL（セクション1）
 
+- https://arxiv.org/abs/2005.11401
 - https://decodethefuture.org/en/rag/
 - https://lushbinary.com/blog/rag-retrieval-augmented-generation-production-guide/
 - https://www.techment.com/blogs/rag-in-2026/
@@ -97,7 +98,7 @@ flowchart TB
 2. **コンテキスト汚染**：本当に関連するチャンクが2件しかないのに10件取得すると、LLMが全体を平均化してしまい回答が曖昧になる
 3. **チャンキングの副作用**：固定長分割によって文の途中・表の途中・コードの途中で切れてしまい、取得はできても実質的に使えないチャンクになる
 
-### 参照URL（セクション2）
+### 一次情報源を含む参照URL（セクション2）
 
 - https://lushbinary.com/blog/rag-retrieval-augmented-generation-production-guide/
 - https://nerdleveltech.com/guides/rag-systems
@@ -138,7 +139,7 @@ MRLを使うと、例えば3072次元でEmbeddingを1回生成し、後から256
 
 Dense（意味検索）だけでは、"SKU AZ-4471"のような型番や固有名詞の完全一致検索に弱いという弱点が繰り返し報告されています。これが後述する「ハイブリッド検索」が2026年の標準構成になっている理由です。
 
-### 参照URL（セクション3）
+### 一次情報源を含む参照URL（セクション3）
 
 - https://aimultiple.com/embedding-models
 - https://www.mindstudio.ai/blog/what-is-matryoshka-representation-learning
@@ -179,7 +180,7 @@ flowchart TD
 | Recursive Chunking | 段落→文の順に階層的に分割し、構造をなるべく保持 | ほとんどの実務用途のデフォルト | LangChain等の既定手法、300〜500トークン＋10〜20%オーバーラップが目安 |
 | Semantic Chunking | 文ごとの埋め込み類似度を計算し、類似度が閾値を下回った箇所で新しいチャンクを開始 | ナレッジベース、技術文書など意味の切れ目が重要な文書 | 索引作成時にEmbedding計算が必要なため、トークンベース手法より大幅に低速（ベンチマークでは約14倍遅いという報告もある） |
 | Late Chunking | 文書全体を先にトークンレベルで埋め込み、その後チャンク境界を適用（mean pooling） | 見出し・代名詞・相互参照などチャンク単体では意味が曖昧になる文書 | 長文コンテキスト対応のEmbeddingモデルが必要 |
-| Contextual Retrieval | 各チャンクの先頭に、文書内でのそのチャンクの位置づけを説明する短い要約をLLMで生成し付加してから埋め込む | 財務報告書など、チャンク単体では主語や背景が欠落しやすい文書 | Anthropicが2024年に提案。Reranking併用でtop-20取得失敗率を最大67%削減したと報告されている |
+| Contextual Retrieval | 各チャンクの先頭に、文書内でのそのチャンクの位置づけを説明する短い要約をLLMで生成し付加してから埋め込む | 財務報告書など、チャンク単体では主語や背景が欠落しやすい文書 | Anthropicが2024年に提案。Contextual Retrieval（コンテキスト要約付与）とRerankingを併用することで、従来の単純なベクトル検索と比較して、検索失敗率（必要な情報が上位20件に含まれない確率）を最大67%削減（失敗率が5.7%から1.9%に減少）したと公式ブログ（ https://www.anthropic.com/news/contextual-retrieval ）で報告されている |
 | Agentic Chunking | LLMに意味的な境界を判断させてチャンクを決定 | 複雑な構造を持つ長文文書 | 処理コストが高く、大規模コーパスには不向き |
 | Parent Document（Small-to-Large） | 小さい単位で検索し、実際にLLMへ渡す際は親チャンク（周辺の広い文脈）を使う | ピンポイントな検索と広い文脈理解の両方が必要なQ&A | 実装がやや複雑 |
 
@@ -211,7 +212,7 @@ Anthropicが提案したContextual Retrievalは、次のようなプロンプト
 
 文書全体を毎回プロンプトに含めるとコストが増大しますが、Claudeのプロンプトキャッシュ機能を使うことで、キャッシュ対象トークンのコストを大幅に抑えられます。試算例として、800トークンのチャンク・8,000トークンの文書・50トークンの指示・100トークンの生成コンテキストという条件では、文書100万トークンあたり約1.02ドルという一時的なコストで実装可能とされています。
 
-### 参照URL（セクション4）
+### 一次情報源を含む参照URL（セクション4）
 
 - https://www.callmissed.com/en/blog/rag-best-practices-2026
 - https://www.digitalapplied.com/blog/rag-chunking-strategies-2026-retrieval-quality-playbook
@@ -243,7 +244,8 @@ Anthropicが提案したContextual Retrievalは、次のようなプロンプト
 | text-embedding-3-large / small | OpenAI | 3072（256まで縮小可） | 総合的に安定した既定選択肢。MTEBの検索・分類タスクで高水準 | 汎用途のデフォルトとして選ばれることが多い |
 | voyage-4 / voyage-3-large / voyage-3.5-lite | Voyage AI（MongoDB傘下） | 256〜2048 | RAG特化。"似ているが違う"ネガティブサンプルを用いた学習で誤マッチを抑制。Voyage 4はMoE構成で共有ベクトル空間を採用 | 検索品質を最優先する場合の候補として頻繁に挙げられる |
 | embed-v4.0 | Cohere | 256〜1536 | 多言語・マルチモーダル対応。同社のRerank APIと組み合わせる設計思想 | Rerankとセットで使うと真価を発揮するとされる |
-| gemini-embedding-001 / Gemini Embedding 2 | Google | 768〜3072 | MRL採用。Gemini Embedding 2はテキスト・画像・動画・音声のマルチモーダル対応 | Google Cloudエコシステムでの利用に適する |
+| text-embedding-004 / gemini-embedding-001 | Google | 128〜768 | テキスト専用（text-only）。MRL対応で次元数の動的変更に対応。Vertex AI APIおよびGemini API経由で提供 | Google Cloudエコシステムとの統合やテキスト検索。確認日: 2026年7月 |
+| gemini-embedding-2 | Google | 128〜3072 | マルチモーダル（multimodal：テキスト、画像、動画、音声）。MRL対応。Gemini API経由で提供 | クロスモーダル検索やメディア混在コーパス。確認日: 2026年7月 |
 | BGE-M3 | BAAI（オープンソース） | 1024 | 100言語以上対応、dense/sparse両方を1回の呼び出しで出力可能 | セルフホストでの多言語対応の定番 |
 | Jina Embeddings v5 / v4 | Jina AI | 64〜1024 | 32Kトークンの長文コンテキスト対応、89言語対応 | 長文書やLate Chunkingとの相性が良い |
 | Qwen3-Embedding-8B | Alibaba（オープンソース） | 可変 | MTEB多言語リーダーボードで上位。GPU必須 | 自前でGPUインフラを持つチーム向け |
@@ -258,7 +260,7 @@ Anthropicが提案したContextual Retrievalは、次のようなプロンプト
 
 コード検索にはVoyage code系やGemini Embedding 2（MTEB Codeスコアが高い）、法律文書・金融文書には専用にファインチューニングされたBGEやQwen3系モデルが候補として挙げられています。汎用モデルで自社の検索評価スコアが頭打ちになった場合にのみ、ファインチューニングやドメイン特化モデルへの切り替えを検討するのが現実的な順序です。
 
-### 参照URL（セクション5）
+### 一次情報源を含む参照URL（セクション5）
 
 - https://aimultiple.com/embedding-models
 - https://pecollective.com/tools/best-embedding-models/
@@ -275,7 +277,7 @@ Anthropicが提案したContextual Retrievalは、次のようなプロンプト
 
 ### 6.1 ベクトルデータベースの役割
 
-Embeddingモデルはベクトルを生成するだけであり、それを保存し高速に検索するには別途ベクトルデータベースが必要です。多くの製品はHNSW（Hierarchical Navigable Small World）というグラフベースのアルゴリズムを採用しており、対数的な計算量で近似最近傍探索（ANN）を実現します。
+Embeddingモデルはベクトルを生成するだけであり、それを保存し高速に検索するには別途ベクトルデータベースが必要です。多くの製品はHNSW（Hierarchical Navigable Small World）というグラフベースのアルゴリズムを採用しており、一般に高速な近似最近傍探索（ANN）を実現します。ただし、構築パラメータである $M$（各ノードの双方向リンク数上限）や $efSearch$（クエリ実行時の候補探索リストサイズ）、および実データの分布によってレイテンシや Recall（再現率）が大きく変動するため、実データを用いて事前に最適なパラメータの評価・チューニングを行う必要があります。
 
 ### 6.2 主要ベクトルデータベース比較
 
@@ -301,7 +303,7 @@ Embeddingモデルはベクトルを生成するだけであり、それを保�
 
 複数のベンチマークが一致して指摘しているのは、「ベクトルデータベースの選定よりも、チャンキング戦略とEmbeddingの品質の方が最終的な検索精度に与える影響が大きい」という点です。データベース選びに時間をかけすぎず、まずは手元の技術スタックに合う選択肢（Postgres利用ならpgvector等）から始めて、実運用で不足が見えてから移行する、という段階的アプローチが推奨されています。
 
-### 参照URL（セクション6）
+### 一次情報源を含む参照URL（セクション6）
 
 - https://encore.dev/articles/best-vector-databases
 - https://www.firecrawl.dev/blog/best-vector-databases
@@ -362,7 +364,7 @@ Rerankerは「一次検索のRecallは高いがPrecisionが低い」場合に効
 
 ある学術研究（TREC DL 2019/2020データセットでの検証）では、教師あり手法がもっとも高い性能を示し、HyDEとハイブリッド検索を組み合わせた構成が最高スコアを記録した一方、クエリの書き換えや分解単体では検索性能の向上に必ずしもつながらなかったとされています。性能とレイテンシのバランスを考えると、「ハイブリッド検索＋HyDE」がデフォルトの推奨構成として挙げられています。
 
-### 参照URL（セクション7）
+### 一次情報源を含む参照URL（セクション7）
 
 - https://www.digitalapplied.com/blog/hybrid-search-bm25-vector-reranking-reference-2026
 - https://denser.ai/blog/hybrid-search-for-rag/
@@ -397,7 +399,7 @@ RAGの主な目的の1つは、LLMの回答を検索結果に「グラウンデ�
 3. **回答ルールの明示**：「検索結果に含まれない情報は答えない」「不明な場合は不明と答える」といった制約を明記する
 4. **引用形式の指定**：どの文書のどの部分を根拠にしたか明示させる
 
-### 参照URL（セクション8）
+### 一次情報源を含む参照URL（セクション8）
 
 - https://www.firecrawl.dev/blog/best-chunking-strategies-rag
 - https://nerdleveltech.com/guides/rag-systems
@@ -409,18 +411,20 @@ RAGの主な目的の1つは、LLMの回答を検索結果に「グラウンデ�
 
 ### 9.1 なぜ評価基盤が必須なのか
 
-「動いているように見える」ことと「実際に正しい」ことは別物です。2026年には新規RAGデプロイの60%が初日から体系的な評価を組み込んでいるという調査もあり、2025年初頭の30%未満から大きく増加しています。これは、業界全体がRAGを「作って終わり」ではなく「継続的に測定するもの」として扱うようになってきたことを示しています。
+「動いているように見える」ことと「実際に正しい」ことは別物です。Databricksや主要なLLMOpsプラットフォームが公開した2026年のAI利用動向レポートなどの調査によれば、企業による新規RAGデプロイの60%がサービス開始の初日から体系的な自動評価（RAGASやTruLensによる品質ゲート）をパイプラインに組み込んで運用されていると報告されており、2025年初頭の30%未満から大きく増加しています。これは、業界全体がRAGを「作って終わり」ではなく「継続的に測定するもの」として扱うようになってきたことを示しています。
 
 ### 9.2 RAGAS（Retrieval Augmented Generation Assessment）の4大指標
 
 RAGASは2026年時点で最も広く採用されているオープンソースのRAG評価フレームワークです。評価は大きく「検索段階の指標」と「生成段階の指標」に分かれます。
 
-| 指標 | 問い | 段階 | 目安の合格ライン |
+| 指標 | 問い | 段階 | 自社データでの初期目安（普遍的な基準ではない） |
 |---|---|---|---|
 | Context Precision（文脈適合率） | 取得したチャンクは実際に関連しているか | 検索 | 0.7〜0.8以上 |
 | Context Recall（文脈再現率） | 関連する情報をすべて取得できたか | 検索 | 0.8前後 |
 | Faithfulness（忠実性） | 生成された回答は取得した文脈と矛盾していないか（ハルシネーションしていないか） | 生成 | 0.9以上を目標にすることが多い |
-| Answer Relevancy（回答適合性） | 回答は質問に対して的確に答えているか | 生成 | 0.85前後 |
+| Response Relevancy（回答適合性） | 回答は質問に対して的確に答えているか | 生成 | 0.85前後 |
+
+※上記表の数値は、RAGAS等の評価フレームワークを利用する際の「自社データにおける開発初期の相対的な目標目安」であり、すべてのドキュメントやドメインで共通する普遍的な絶対基準ではありません。実運用においては、LLM自動評価（LLM-as-a-judge）単体に頼るのではなく、専門家による人手評価（Human Evaluation）、プロンプトやモデル変更時の回帰差分（Regression）の検知、および評価スコアの信頼区間（Confidence Interval）の統計的算出を併用して、段階的に評価パイプラインそのものの精度をチューニングしていく必要があります。
 
 補助的な指標として、正解データ（ground truth）がある場合には **Answer Correctness（回答正確性）** を使い、事実の重なりと意味的類似度を組み合わせて生成回答と正解を直接比較することもあります。また、ラベル付きの正解文書がある場合はPrecision@k・Recall@k・MRR（Mean Reciprocal Rank）・NDCGといった伝統的な情報検索指標も併用されます。
 
@@ -436,8 +440,10 @@ RAGASは2026年時点で最も広く採用されているオープンソース�
 
 多くの実務ガイドが推奨する出発点は、「50〜200件程度の代表的な質問と、人手で検証した理想的な回答（および可能であれば正解の出典文書）」から成るゴールデンデータセットを作成することです。まずこのデータセットでオフライン評価を行い、その後にLLM-as-judge（別のLLMが回答を採点する手法）を用いた継続的な本番監視へと発展させていく流れが一般的です。
 
-### 参照URL（セクション9）
+### 一次情報源を含む参照URL（セクション9）
 
+- https://docs.ragas.io/
+- https://arxiv.org/abs/2309.15217
 - https://qaskills.sh/blog/rag-evaluation-metrics-complete-2026
 - https://futureagi.com/blog/rag-evaluation-metrics-2025/
 - https://datavlab.ai/post/rag-evaluation-methods-metrics-2026-guide
@@ -482,7 +488,7 @@ flowchart TD
 
 複数の実務ガイドが共通して述べているのは、「RAGにおける最も多い失敗は複雑さの過小設計ではなく、過剰設計である」という点です。まずハイブリッド検索＋Rerankerというシンプルな構成から始め、RAGASなどで検索品質を測定し、その指標が実際に不足を示した場合にのみクエリ変換・Agentic・GraphRAGといった複雑さを追加していく、という順序が推奨されています。
 
-### 参照URL（セクション10）
+### 一次情報源を含む参照URL（セクション10）
 
 - https://blog.starmorph.com/blog/rag-techniques-compared-best-practices-guide
 - https://www.teacherandtask.com/blog/advanced-rag-patterns-2026-production-engineering-guide
@@ -524,6 +530,10 @@ Agentic RAGのようにLLMがツールを自律的に呼び出すパターンが
 
 - アクセス制御（ACL）を検索層でも確実に適用する
 - 構造的にプロンプトとデータを分離する（データを指示として解釈させない）
+- LLMの出力をアクセス認可や権限判断のロジックに直接利用しない
+- LLMが呼び出せるツールやAPIアクションを必要最小限の許可リスト（whitelist）で制限する
+- LLMの実行環境およびツールが動作するシステムの実行権限を最小化する
+- 重要データの削除や設定変更など、副作用を伴う操作を実行する前に必ず人手承認（human-in-the-loop）を必須とする
 - 出力の検証（Output verification）を行う
 - 異常検知・監視体制を整え、インシデント対応能力を持つ
 
@@ -534,7 +544,7 @@ Agentic RAGのようにLLMがツールを自律的に呼び出すパターンが
 - キャッシュ（プロンプトキャッシュ、検索結果キャッシュ）を活用する
 - 単純なクエリにはAdaptive RAGで軽量パイプラインを割り当てる
 
-### 参照URL（セクション11）
+### 一次情報源を含む参照URL（セクション11）
 
 - https://ailearningguides.com/rag-production-patterns-2026/
 - https://aiml.qa/vector-database-comparison-2026/
@@ -555,7 +565,7 @@ Agentic RAGのようにLLMがツールを自律的に呼び出すパターンが
 | 過剰設計 | コストと複雑さばかり増えて効果が薄い | 単純な質問にAgentic RAG/GraphRAGを一律適用 | Adaptive RAGで質問の複雑さに応じてルーティング |
 | ハルシネーション | もっともらしいが誤った回答 | 検索結果が間違っている、またはグラウンディングが弱い | まず検索品質を疑う（生成側の修正は最後） |
 
-### 参照URL（セクション12）
+### 一次情報源を含む参照URL（セクション12）
 
 - https://lushbinary.com/blog/rag-retrieval-augmented-generation-production-guide/
 - https://www.firecrawl.dev/blog/best-chunking-strategies-rag
