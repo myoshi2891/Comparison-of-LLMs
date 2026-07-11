@@ -370,11 +370,12 @@
 
 .tableWrap th,
 .tableWrap td {
-  text-align: left;
+  text-align: left !important;
   padding: 14px 16px;
   border-bottom: 1px solid rgba(148, 178, 214, 0.14);
   color: #a9bad9;
   vertical-align: top;
+  font-family: inherit;
 }
 
 .tableWrap th {
@@ -600,7 +601,8 @@
 
 /* Step badge */
 .stepBadge {
-  display: inline-flex;
+  display: flex;
+  width: fit-content;
   align-items: center;
   gap: 10px;
   font-family: var(--font-mono), "JetBrains Mono", monospace;
