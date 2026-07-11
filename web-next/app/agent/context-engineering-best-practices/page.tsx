@@ -5,130 +5,40 @@ import TocObserver from "./TocObserver";
 
 export const metadata: Metadata = {
   title:
-    "コンテキストエンジニアリング実践ガイド — Write / Select / Compress / Isolate | LLM-Studies",
+    "コンテキストエンジニアリング入門 AIエージェントのためのステップバイステップ実践ガイド | LLM-Studies",
   description:
-    "プロンプト単体の最適化ではなく、エージェントが推論の瞬間に参照するトークン集合全体—システムプロンプト、ツール定義、履歴、外部データ、メモリ—を設計する実践ガイド。",
+    "プロンプト単体の最適化ではなく、システムプロンプト、ツール定義、履歴、外部データ、メモリ等を含むコンテキスト全体を設計・キュレーションするコンテキストエンジニアリングの実践ガイド。",
 };
 
 const DIAGRAMS = {
-  d1: `flowchart TB
-    subgraph CTX["コンテキストウィンドウ(有限のリソース)"]
-        SP["システムプロンプト<br/>役割・振る舞い・出力形式の指示"]
-        TL["ツール定義<br/>Function Schema・パラメータ説明"]
-        FX["Few-shotの例<br/>望ましい入出力のサンプル"]
-        MH["メッセージ履歴<br/>ユーザー発話・エージェントの行動記録"]
-        RD["取得データ<br/>RAG検索結果・ツール実行結果"]
-        MEM["メモリ<br/>セッションをまたいで永続化されたノート"]
-    end
-    SP --> LLM["LLMによる推論"]
-    TL --> LLM
-    FX --> LLM
-    MH --> LLM
-    RD --> LLM
-    MEM --> LLM
-    LLM --> OUT["次のアクション or 最終応答"]`,
+  relation:
+    "flowchart LR\n    A[プロンプトエンジニアリング 指示文の設計] --> B[コンテキストエンジニアリング 情報環境全体の設計]\n    B --> C[システムプロンプト]\n    B --> D[ツール定義]\n    B --> E[会話履歴]\n    B --> F[検索された外部知識]\n    B --> G[長期メモリ]",
 
-  d2: `flowchart LR
-    A["エージェントの実行ステップ"] --> W["Write: 書き出す<br/>ウィンドウの外に保存する"]
-    A --> S["Select: 選び取る<br/>必要な情報だけを呼び戻す"]
-    A --> C["Compress: 圧縮する<br/>必要なトークンだけを残す"]
-    A --> I["Isolate: 分離する<br/>サブタスクごとに独立した窓を持つ"]
-    W --> CTX[("コンテキストウィンドウ")]
-    S --> CTX
-    C --> CTX
-    I --> CTX
-    CTX --> LLM["LLM推論"]`,
+  rot:
+    "flowchart LR\n    A[短いコンテキスト 高い精度] --> B[中程度のコンテキスト やや精度が低下]\n    B --> C[長いコンテキスト コンテキストロットが顕在化]\n    C --> D[非常に長いコンテキスト 予測が不安定になる]",
 
-  d3: `sequenceDiagram
-    participant U as ユーザー
-    participant A as エージェント(LLM)
-    participant TS as Tool Search Tool
-    participant T as ツール群(数百〜数千)
-    U->>A: タスクを依頼
-    A->>TS: 必要そうなツールをクエリで検索
-    TS->>T: 該当するツールのみ defer_loading を解除
-    T-->>A: 必要なツール定義のみ注入される
-    A->>T: 選ばれたツールを実行
-    T-->>A: 実行結果(構造化データ)
-    A-->>U: 応答`,
+  loop:
+    "flowchart TD\n    Sys[システムプロンプト] --> Context[コンテキストウィンドウ]\n    Tools[ツール定義] --> Context\n    Mem[メモリファイル] --> Context\n    User[ユーザーの入力] --> Context\n    Context --> LLM[LLMによる推論]\n    LLM --> Action[ツール呼び出しを実行]\n    Action --> Result[ツールの実行結果]\n    Result --> Context\n    LLM --> Output[エージェントの応答を出力]",
 
-  d4: `flowchart LR
-    D["ドキュメント群"] --> CH["チャンキング<br/>構造認識 + 意味的分割"]
-    CH --> EMB["埋め込み生成"]
-    EMB --> IDX[("ベクトルDB / ハイブリッド索引")]
-    Q["ユーザークエリ"] --> QR["クエリ書き換え(任意)"]
-    QR --> RET["ハイブリッド検索<br/>Dense top-50 + BM25 top-50をRRF融合"]
-    IDX --> RET
-    RET --> RR["リランキング<br/>Cross-Encoderで再順位付け"]
-    RR --> TOPK["上位5〜8件を選択"]
-    TOPK --> CTXB["コンテキスト構築<br/>メタデータ付与"]
-    CTXB --> GEN["LLMによる生成"]`,
+  jit:
+    "flowchart TD\n    Q1{データは高頻度で更新されるか}\n    Q1 -->|更新は少なく安定的| Pre[事前取得を選ぶ 埋め込み検索であらかじめ読み込む]\n    Q1 -->|更新が多く流動的| JIT[ジャストインタイム取得を選ぶ ファイルパスやクエリを都度実行する]\n    Pre --> Hybrid[多くの現場ではハイブリッド戦略が最適]\n    JIT --> Hybrid",
 
-  d5: `flowchart TD
-    Start(["エージェントセッション開始"]) --> Loop["ツール呼び出しループを実行"]
-    Loop --> Check{"コンテキスト使用量が<br/>閾値を超えたか?"}
-    Check -- いいえ --> Loop
-    Check -- はい --> Edit["Context Editing<br/>古いツール結果をクリア"]
-    Edit --> Check2{"それでも上限に近いか?"}
-    Check2 -- はい --> Compact["Compaction<br/>会話全体を要約に置換"]
-    Check2 -- いいえ --> Loop
-    Compact --> Loop
-    Loop --> Note["重要な知見をMemoryファイルへ書き出す"]
-    Note --> NextSession(["次のセッションでMemoryを読み込み再開"])`,
+  wsci:
+    "flowchart TB\n    Core[有限のコンテキストウィンドウ]\n    Core --> Write[Write コンテキストウィンドウの外に書き出す]\n    Core --> Select[Select 必要な情報だけを取り込む]\n    Core --> Compress[Compress 要約して圧縮する]\n    Core --> Isolate[Isolate サブエージェントへ分離する]",
 
-  d6: `flowchart TB
-    U["ユーザーのクエリ"] --> Lead["リードエージェント<br/>(計画・タスク分解・統合)"]
-    Lead -->|"サブタスクA"| SA1["サブエージェント1<br/>独立したコンテキスト"]
-    Lead -->|"サブタスクB"| SA2["サブエージェント2<br/>独立したコンテキスト"]
-    Lead -->|"サブタスクC"| SA3["サブエージェント3<br/>独立したコンテキスト"]
-    SA1 -->|"要約(1,000〜2,000トークン)"| Lead
-    SA2 -->|"要約(1,000〜2,000トークン)"| Lead
-    SA3 -->|"要約(1,000〜2,000トークン)"| Lead
-    Lead --> Synth["統合・レポート生成"]
-    Synth --> U`,
+  compaction:
+    "sequenceDiagram\n    participant U as ユーザー\n    participant A as エージェント\n    participant C as コンテキストウィンドウ\n    U->>A: 長時間タスクを依頼する\n    loop 会話が続く限り\n        A->>C: メッセージやツール結果を追加する\n    end\n    C-->>A: トークン上限に近づいたことを検知する\n    A->>A: これまでの内容を要約する\n    A->>C: 要約と直近の重要情報だけを残す\n    A->>U: 作業を継続する",
 
-  d7: `flowchart TD
-    Sym["エージェントの挙動がおかしい"] --> Q1{"存在しない前提や誤った事実を<br/>繰り返し参照している?"}
-    Q1 -- はい --> Poison["Context Poisoning<br/>(汚染)"]
-    Q1 -- いいえ --> Q2{"同じ行動を延々と繰り返し、<br/>新しい計画を立てない?"}
-    Q2 -- はい --> Distract["Context Distraction<br/>(注意散漫)"]
-    Q2 -- いいえ --> Q3{"無関係な情報やツールが多く、<br/>誤った選択をしている?"}
-    Q3 -- はい --> Confuse["Context Confusion<br/>(混乱)"]
-    Q3 -- いいえ --> Q4{"矛盾する指示・情報が<br/>混在していないか?"}
-    Q4 -- はい --> Clash["Context Clash<br/>(衝突)"]`,
+  subagent:
+    "flowchart TD\n    Lead[リードエージェント 計画と統合を担当]\n    Lead --> Sub1[サブエージェント1 調査タスクAを担当]\n    Lead --> Sub2[サブエージェント2 調査タスクBを担当]\n    Lead --> Sub3[サブエージェント3 調査タスクCを担当]\n    Sub1 --> Summary1[凝縮された要約]\n    Sub2 --> Summary2[凝縮された要約]\n    Sub3 --> Summary3[凝縮された要約]\n    Summary1 --> Merge[リードエージェントによる統合結果]\n    Summary2 --> Merge\n    Summary3 --> Merge",
 
-  d8: `sequenceDiagram
-    participant Turn1 as ターン1
-    participant Cache as プロンプトキャッシュ
-    participant Turn2 as ターン2(5分以内)
-    Turn1->>Cache: システムプロンプト+ツール定義を<br/>cache_controlで書き込み
-    Note over Cache: 書き込みコストは通常入力より高い
-    Turn2->>Cache: 同一プレフィックスで問い合わせ
-    Cache-->>Turn2: キャッシュヒット<br/>大幅に安価なコストで再利用
-    Note over Turn2: プレフィックスが1文字でも変わると<br/>キャッシュミスとなり全体が再計算される`,
-
-  d9: `flowchart TD
-    A["エージェント設計を開始"] --> B["システムプロンプトを<br/>適切な高度で書く(Step 1)"]
-    B --> C["ツールを最小集合に絞り、<br/>明確な責務を定義する(Step 2)"]
-    C --> D{"外部知識の取得が必要か?"}
-    D -- はい --> E["RAG / Just-in-Time取得を設計する(Step 3)"]
-    D -- いいえ --> F{"長時間実行・複数セッションが必要か?"}
-    E --> F
-    F -- はい --> G["Compaction / Memory /<br/>Context Editingを組み込む(Step 4)"]
-    F -- いいえ --> H{"並列での幅広い探索が必要か?"}
-    G --> H
-    H -- はい --> I["マルチエージェント<br/>を検討(Step 5)"]
-    H -- いいえ --> J["単一エージェントとして実装"]
-    I --> K["コンテキスト障害の診断体制を整える(Step 6)"]
-    J --> K
-    K --> L["プロンプトキャッシュでコストを最適化する(Step 7)"]
-    L --> M["Evalsとトークン監視を継続的に運用する(Step 8)"]
-    M --> N["本番運用・継続的改善"]`,
+  failure:
+    "flowchart LR\n    subgraph 原因\n        A1[ハルシネーションが記録され続ける]\n        A2[コンテキストが長くなりすぎる]\n        A3[無関係な情報やツールが多すぎる]\n        A4[矛盾する情報や指示が混在する]\n    end\n    subgraph 症状\n        B1[コンテキスト汚染]\n        B2[コンテキスト散漫]\n        B3[コンテキスト混乱]\n        B4[コンテキスト衝突]\n    end\n    A1 --> B1\n    A2 --> B2\n    A3 --> B3\n    A4 --> B4",
 };
 
 export default function Page() {
   return (
-    <div className={styles.pageWrap}>
+    <div className={styles.docWrapper}>
       <TocObserver />
       <button
         type="button"
@@ -140,194 +50,84 @@ export default function Page() {
       </button>
 
       <nav className={styles.sidebar} id="sidebar" aria-label="目次">
-        <div className={styles.brand}>
-          <span className={styles.brandMark}>Context Engineering</span>
-          <span className={styles.brandTitle}>実践ガイド</span>
-          <span className={styles.brandSub}>中級 → 上級 / 2026-07 版</span>
-        </div>
-
-        <ul className={styles.tocList}>
-          <li>
-            <a className={styles.tocLink} href="#intro" data-target="intro">
-              <span className={styles.n}>00</span>はじめに
-            </a>
-          </li>
-          <li>
-            <a className={styles.tocLink} href="#sec-1" data-target="sec-1">
-              <span className={styles.n}>01</span>定義
-            </a>
-          </li>
-          <li>
-            <a className={styles.tocLink} href="#sec-2" data-target="sec-2">
-              <span className={styles.n}>02</span>コンテキストロット
-            </a>
-          </li>
-          <li>
-            <a className={styles.tocLink} href="#sec-3" data-target="sec-3">
-              <span className={styles.n}>03</span>構成要素
-            </a>
-          </li>
-          <li>
-            <a className={styles.tocLink} href="#sec-4" data-target="sec-4">
-              <span className={styles.n}>04</span>基本4戦略
-            </a>
-          </li>
-        </ul>
-
-        <div className={styles.tocLabel}>Step by Step</div>
-        <ul className={styles.tocList}>
-          <li>
-            <a className={styles.tocLink} href="#step-1" data-target="step-1">
-              <span className={styles.n}>05</span>システムプロンプト
-            </a>
-          </li>
-          <li>
-            <a className={styles.tocLink} href="#step-2" data-target="step-2">
-              <span className={styles.n}>06</span>ツール設計
-            </a>
-          </li>
-          <li>
-            <a className={styles.tocLink} href="#step-3" data-target="step-3">
-              <span className={styles.n}>07</span>RAG設計
-            </a>
-          </li>
-          <li>
-            <a className={styles.tocLink} href="#step-4" data-target="step-4">
-              <span className={styles.n}>08</span>長時間実行の管理
-            </a>
-          </li>
-          <li>
-            <a className={styles.tocLink} href="#step-5" data-target="step-5">
-              <span className={styles.n}>09</span>マルチエージェント
-            </a>
-          </li>
-          <li>
-            <a className={styles.tocLink} href="#step-6" data-target="step-6">
-              <span className={styles.n}>10</span>障害の診断
-            </a>
-          </li>
-          <li>
-            <a className={styles.tocLink} href="#step-7" data-target="step-7">
-              <span className={styles.n}>11</span>コスト最適化
-            </a>
-          </li>
-          <li>
-            <a className={styles.tocLink} href="#step-8" data-target="step-8">
-              <span className={styles.n}>12</span>観測性と評価
-            </a>
-          </li>
-        </ul>
-
-        <div className={styles.tocLabel}>Reference</div>
-        <ul className={styles.tocList}>
-          <li>
-            <a className={styles.tocLink} href="#sec-6" data-target="sec-6">
-              <span className={styles.n}>13</span>アンチパターン
-            </a>
-          </li>
-          <li>
-            <a className={styles.tocLink} href="#sec-7" data-target="sec-7">
-              <span className={styles.n}>14</span>チェックリスト
-            </a>
-          </li>
-          <li>
-            <a className={styles.tocLink} href="#sec-8" data-target="sec-8">
-              <span className={styles.n}>15</span>意思決定フロー
-            </a>
-          </li>
-          <li>
-            <a className={styles.tocLink} href="#sec-9" data-target="sec-9">
-              <span className={styles.n}>16</span>参考文献
-            </a>
-          </li>
-        </ul>
+        <div className={styles.sidebarTitle}>目次</div>
+        <a href="#intro" className={styles.tocLink} data-target="intro">
+          はじめに
+        </a>
+        <a href="#ch1" className={styles.tocLink} data-target="ch1">
+          1. コンテキストエンジニアリングとは
+        </a>
+        <a href="#ch2" className={styles.tocLink} data-target="ch2">
+          2. なぜ重要なのか
+        </a>
+        <a href="#ch3" className={styles.tocLink} data-target="ch3">
+          3. コンテキストの解剖学
+        </a>
+        <a href="#ch4" className={styles.tocLink} data-target="ch4">
+          4. ステップバイステップ実践
+        </a>
+        <a href="#ch5" className={styles.tocLink} data-target="ch5">
+          5. よくある落とし穴
+        </a>
+        <a href="#ch6" className={styles.tocLink} data-target="ch6">
+          6. 実践チェックリスト
+        </a>
+        <a href="#ch7" className={styles.tocLink} data-target="ch7">
+          7. ツール早見表
+        </a>
+        <a href="#ch8" className={styles.tocLink} data-target="ch8">
+          8. まとめ
+        </a>
+        <a href="#ch9" className={styles.tocLink} data-target="ch9">
+          9. 参考文献
+        </a>
       </nav>
 
       <main className={styles.content}>
-        {/* ============ HERO ============ */}
-        <header className={styles.hero} id="intro">
-          <div className={styles.heroEyebrow}>Context Engineering Field Guide</div>
-          <h1 className={styles.heroTitle}>
-            コンテキストウィンドウは
-            <br />
-            <em>有限のRAM</em>である
-          </h1>
-          <p className={styles.heroSub}>
-            プロンプト単体の最適化ではなく、エージェントが推論の瞬間に参照するトークン集合全体—システムプロンプト、ツール定義、履歴、外部データ、メモリ—を設計する。中級者から上級者向けに、8つのステップで実践知を整理した。
+        <header className={styles.docHeader} id="intro">
+          <div className={styles.docEyebrow}>
+            <i className="ti ti-brain" role="img" aria-label="brain"></i>
+            {" AI engineering guide"}
+          </div>
+          <h1>コンテキストエンジニアリング入門</h1>
+          <p className={styles.docLead}>
+            AIエージェントのためのステップバイステップ実践ガイド
           </p>
-          <div className={styles.heroMeta}>
-            <span className={styles.chip}>最終更新 2026-07-07</span>
-            <span className={styles.chip}>対象: エージェント開発者</span>
-            <span className={styles.chip}>参照文献 32件</span>
-            <span className={styles.chip}>図解 9点 (Mermaid)</span>
-          </div>
-
-          <div className={styles.capacity}>
-            <div className={styles.capacityHead}>
-              <span className={styles.t}>Context Window Capacity — 未設計の場合</span>
-              <span className={styles.v}>200K tokens</span>
-            </div>
-            <div className={styles.capacityTrack}>
-              <div
-                className={styles.capacitySeg}
-                style={{ width: "12%", background: "#5eead4", animationDelay: "0.05s" }}
-              ></div>
-              <div
-                className={styles.capacitySeg}
-                style={{ width: "22%", background: "#4fb8c9", animationDelay: "0.15s" }}
-              ></div>
-              <div
-                className={styles.capacitySeg}
-                style={{ width: "38%", background: "#f2b465", animationDelay: "0.25s" }}
-              ></div>
-              <div
-                className={styles.capacitySeg}
-                style={{ width: "18%", background: "#e88a5c", animationDelay: "0.35s" }}
-              ></div>
-              <div
-                className={styles.capacitySeg}
-                style={{ width: "10%", background: "#f2789a", animationDelay: "0.45s" }}
-              ></div>
-            </div>
-            <div className={styles.capacityLegend}>
-              <span className={styles.legendItem}>
-                <span className={styles.legendDot} style={{ background: "#5eead4" }}></span>
-                システムプロンプト
-              </span>
-              <span className={styles.legendItem}>
-                <span className={styles.legendDot} style={{ background: "#4fb8c9" }}></span>
-                ツール定義
-              </span>
-              <span className={styles.legendItem}>
-                <span className={styles.legendDot} style={{ background: "#f2b465" }}></span>
-                メッセージ履歴
-              </span>
-              <span className={styles.legendItem}>
-                <span className={styles.legendDot} style={{ background: "#e88a5c" }}></span>
-                RAG / ツール結果
-              </span>
-              <span className={styles.legendItem}>
-                <span className={styles.legendDot} style={{ background: "#f2789a" }}></span>
-                コンテキストロット領域
-              </span>
-            </div>
-          </div>
         </header>
 
-        {/* ============ 1. 定義 ============ */}
-        <section className={styles.chapter} id="sec-1">
-          <div className={styles.eyebrow}>
-            <span className={styles.idx}>01</span>Definition
-          </div>
-          <h2 className={styles.chapterTitle}>コンテキストエンジニアリングとは何か</h2>
-          <p className={styles.lede}>
-            プロンプトエンジニアリングは「1回の指示・1回の生成に対して、どのような文言・構造 of
-            指示を与えれば望む出力が得られるか」を扱う技術である。一方でエージェントが複数ステップにわたりツールを呼び出し、外部情報を取得し、長時間セッションを維持するようになると、単一のプロンプトだけでは制御しきれない領域が広がる。
+        <section>
+          <p>
+            2023年から2024年にかけて、AI活用の中心にあったのは「プロンプトエンジニアリング」でした。しかし2025年後半以降、AIエージェントが複数ターンにわたって自律的にツールを使いこなすようになると、業界の関心は「コンテキストエンジニアリング」という、より広い概念へと移っています。
           </p>
           <p>
-            Anthropicのアプライドエンジニアリングチームは、この広がった領域を指して「推論時にモデルへ入力される最適なトークン集合を選定・維持するための一連の戦略」と定義している。これはシステムプロンプトだけでなく、ツール定義、会話履歴、外部から取得したデータ、Few-shot例など、モデルが参照するあらゆる情報を対象とする。
+            本記事は、この分野に初めて触れるエンジニアやプロダクト担当者を対象に、コンテキストエンジニアリングの基礎から実践的なベストプラクティスまでをステップバイステップで解説するものです。各章の末尾には、その章の内容の根拠となった一次情報源のURLを明記しています。
+          </p>
+          <div className={`${styles.callout} ${styles.calloutInfo}`}>
+            <i className="ti ti-users" role="img" aria-label="users"></i>
+            <div>
+              <strong>対象読者</strong>
+              {": "}
+              LLMを使ったアプリケーションやAIエージェントを開発しているエンジニア、QAエンジニア、プロダクトマネージャー。プロンプトエンジニアリングの基礎知識があるとより理解しやすいですが、必須ではありません。
+            </div>
+          </div>
+        </section>
+
+        {/* ============ 1. コンテキストエンジニアリングとは ============ */}
+        <section id="ch1">
+          <h2>
+            <i className="ti ti-bulb" role="img" aria-label="bulb"></i>1.
+            コンテキストエンジニアリングとは何か
+          </h2>
+
+          <h3>1.1 定義</h3>
+          <p>
+            Anthropicのエンジニアリングチームは、コンテキストエンジニアリングを次のように定義しています。「コンテキスト」とはLLMが推論を行う際に読み込まれるトークンの集合を指し、「エンジニアリング」とは、望ましい挙動を一貫して引き出すために、そのトークン集合の有用性を最大化する作業を意味します。つまりコンテキストエンジニアリングとは、システムプロンプトだけでなく、ツール定義、会話履歴、検索された外部データなど、LLMに渡されるあらゆる情報を、絶えず変化する状況の中で取捨選択し続ける技術です。
+          </p>
+          <p>
+            言い換えると、コンテキストエンジニアリングは単発のタスクである「プロンプトを書く」こととは異なり、エージェントが1ステップ推論するたびに繰り返される、反復的なキュレーション作業です。
           </p>
 
+          <h3>1.2 プロンプトエンジニアリングとの違い</h3>
           <div className={styles.tableWrap}>
             <table>
               <thead>
@@ -340,42 +140,74 @@ export default function Page() {
               <tbody>
                 <tr>
                   <td>対象</td>
-                  <td>1回の指示文・システムプロンプトの文言</td>
-                  <td>推論時にモデルが参照する情報全体(指示・ツール・履歴・外部データ・メモリ)</td>
+                  <td>システムプロンプトや指示文の言い回し</td>
+                  <td>
+                    システムプロンプト、ツール、会話履歴、検索データ、メモリなど全体の情報環境
+                  </td>
                 </tr>
                 <tr>
-                  <td>時間軸</td>
-                  <td>単発〜数ターンの対話</td>
-                  <td>マルチターン・長時間・複数セッションにまたがるエージェント実行</td>
+                  <td>タイミング</td>
+                  <td>主に事前に一度設計する</td>
+                  <td>エージェントの各推論ステップごとに継続的に行う</td>
                 </tr>
                 <tr>
-                  <td>典型的な問い</td>
-                  <td>「どう書けば意図通りの出力になるか」</td>
-                  <td>「今この瞬間、モデルに何を見せるべきか」</td>
+                  <td>想定用途</td>
+                  <td>一問一答の分類や文章生成タスク</td>
+                  <td>複数ターン、長時間にわたり自律的に動くエージェント</td>
                 </tr>
                 <tr>
-                  <td>主なリスク</td>
-                  <td>曖昧な指示、Few-shotの不足</td>
-                  <td>コンテキストロット、ツール過多、情報の汚染・矛盾</td>
+                  <td>主な失敗要因</td>
+                  <td>曖昧な指示、言葉選びのミス</td>
+                  <td>情報過多、古い情報の残留、無関係な情報の混入</td>
                 </tr>
                 <tr>
-                  <td>位置づけ</td>
-                  <td>コンテキストエンジニアリングの一部分</td>
-                  <td>プロンプトエンジニアリングとRAGを内包する上位概念</td>
+                  <td>代表的な提唱者</td>
+                  <td>各種プロンプトガイド</td>
+                  <td>
+                    Anthropic、LangChain、Cognition AI、Drew Breunig氏など
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
 
+          <div className={styles.diagramContainer}>
+            <div className={styles.diagramTitle}>
+              <i
+                className="ti ti-git-branch"
+                role="img"
+                aria-label="git-branch"
+              ></i>
+              {"図1: プロンプトエンジニアリングとコンテキストエンジニアリングの関係"}
+            </div>
+            <div className={styles.mermaidDiagram}>
+              <MermaidDiagram chart={DIAGRAMS.relation} />
+            </div>
+          </div>
+
           <p>
-            AIエンジニアの間では、LLMを新種のOSに、コンテキストウィンドウをそのRAMに例える見方が広く共有されている。RAMと同様に容量は有限であり、OSが何をRAMに載せるかを慎重に管理するように、エンジニアはコンテキストウィンドウに何を載せるかを設計する必要がある。
+            Anthropicは、コンテキストエンジニアリングを「プロンプトエンジニアリングの自然な延長」と位置づけています。LLMを使ったエンジニアリングの初期には、日常的なチャット以外の用途の多くが一発勝負の分類やテキスト生成であったため、プロンプトの書き方がすべてでした。しかし、より高度で長時間動作するエージェントを構築する段階に入ると、システム指示、ツール、Model
+            Context
+            Protocol、外部データ、会話履歴など、コンテキスト全体の状態を管理する戦略が必要になります。
+          </p>
+          <p>
+            著名な研究者Andrej
+            Karpathy氏は、LLMを新しい種類のオペレーティングシステムに例え、LLM自体をCPU、コンテキストウィンドウをRAMになぞらえました。RAMと同様、コンテキストウィンドウにも限られた容量しかなく、OSがRAMに何を載せるかを管理するように、私たちはエージェントのコンテキストウィンドウに何を載せるかを管理する必要がある、という考え方です。
           </p>
 
-          <div className={styles.refs}>
-            <span className={styles.refsLabel}>参考</span>
+          <h3>1.3 なぜウィンドウが重要なのか</h3>
+          <p>
+            エージェントはループの中で動作し続けるため、次のターンで役立つかもしれない情報がどんどん蓄積されていきます。この絶えず膨張する情報の宇宙の中から、限られたコンテキストウィンドウに何を入れるかを選び取る作業こそが、コンテキストエンジニアリングの本質です。
+          </p>
+
+          <div className={styles.sourceNote}>
+            <div className={styles.sourceNoteTitle}>
+              <i className="ti ti-link" role="img" aria-label="link"></i>
+              {"出典"}
+            </div>
             <ul>
               <li>
-                Anthropic, &quot;Effective context engineering for AI agents&quot; —{" "}
+                {"Anthropic「Effective context engineering for AI agents」 "}
                 <a
                   href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
                   target="_blank"
@@ -385,7 +217,7 @@ export default function Page() {
                 </a>
               </li>
               <li>
-                LangChain Blog, &quot;Context Engineering for Agents&quot; —{" "}
+                {"LangChain「Context Engineering for Agents」 "}
                 <a
                   href="https://www.langchain.com/blog/context-engineering-for-agents"
                   target="_blank"
@@ -395,51 +227,111 @@ export default function Page() {
                 </a>
               </li>
               <li>
-                Cronus, &quot;Anthropic&apos;s Approach to Effective Context Engineering&quot; —{" "}
+                {"Drew Breunig「How Long Contexts Fail」 "}
                 <a
-                  href="https://cr0nu3.github.io/posts/Effective_context_engineering_for_AI_Agents/"
+                  href="https://www.dbreunig.com/2025/06/22/how-contexts-fail-and-how-to-fix-them.html"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  cr0nu3.github.io/posts/Effective_context_engineering_for_AI_Agents
+                  dbreunig.com/2025/06/22/how-contexts-fail-and-how-to-fix-them.html
                 </a>
               </li>
             </ul>
           </div>
         </section>
 
-        {/* ============ 2. コンテキストロット ============ */}
-        <section className={styles.chapter} id="sec-2">
-          <div className={styles.eyebrow}>
-            <span className={styles.idx}>02</span>Context Rot
-          </div>
-          <h2 className={styles.chapterTitle}>
-            なぜ今これが重要なのか：コンテキストロットという現象
+        {/* ============ 2. なぜ重要なのか ============ */}
+        <section id="ch2">
+          <h2>
+            <i
+              className="ti ti-trending-down"
+              role="img"
+              aria-label="trending-down"
+            ></i>
+            {"2. なぜ重要なのか: コンテキストロットという現象"}
           </h2>
-          <p className={styles.lede}>
-            数百万トークン級のコンテキストウィンドウが普及するにつれ、「大きな窓があるなら全部詰め込めばよい」という発想が広まった。しかし実態はそう単純ではない。
+
+          <h3>2.1 コンテキストロットとは</h3>
+          <p>
+            コンテキストウィンドウが大きければ大きいほど良い、と考えるのは自然なことですが、実際の研究結果はこれを否定しています。AIベクトルデータベース企業Chromaが2025年に発表した研究「Context
+            Rot」は、GPT-4.1、Claude 4系、Gemini
+            2.5、Qwen3を含む18の最先端モデルを対象に検証を行い、入力トークン数が増えるほど、すべてのモデルで性能が劣化するという結果を示しました。しかもこの劣化は、コンテキストウィンドウの上限にかなり余裕がある段階から始まります。
           </p>
           <p>
-            ベクトルデータベース企業Chromaが公開した技術レポートは、GPT-4.1・Claude 4・Gemini
-            2.5・Qwen3を含む18の主要モデルを対象に、入力トークン数を増やしたときの性能変化を検証した。その結果、単純な「干し草の中の針」タスクでさえ、入力長が1万トークンから10万トークン超に増えるにつれて精度が20〜50%低下すること、さらにクエリと正解箇所の意味的な類似度が高いほど劣化が早まることが確認されている。この現象は
-            <strong>コンテキストロット(Context Rot)</strong>と呼ばれる。
-          </p>
-          <p>
-            同レポートの興味深い知見として、正解に似ているが誤っている情報(ディストラクター)が1つ混入するだけで性能が大きく落ち込むこと、そして直感に反して、支離滅裂な文の羅列よりも一貫した文章構造を持つ長文の方が、モデルが物語の流れに引きずられてしまい特定の情報を探し出しにくくなる場合があることが挙げられる。行き詰まったときの挙動もモデルにより異なり、幻覚を生成して答えようとする系統と、回答を拒否する系統に分かれる傾向が報告されている。
-          </p>
-          <p>
-            同様の現象は2024年の研究「Lost in the
-            Middle」でも指摘されており、関連情報がコンテキストの中央付近に位置する場合、モデルの参照性能が両端に位置する場合より低下することが示されている。開発者のDrew
-            Breunigは、この劣化がどのような形で現れるかを4つのパターンに整理した(詳細はStep
-            6で扱う)。
+            この現象は「コンテキストロット」と呼ばれ、Needle in a
+            Haystackのような単純な検索型ベンチマークでは見えてこなかった、より現実的なタスクにおける性能劣化を明らかにしました。
           </p>
 
-          <div className={styles.refs}>
-            <span className={styles.refsLabel}>参考</span>
+          <h3>2.2 Chromaの研究結果の要点</h3>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>検証項目</th>
+                  <th>結果の概要</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>対象モデル数</td>
+                  <td>GPT-4.1、Claude 4系、Gemini 2.5系、Qwen3など18モデル</td>
+                </tr>
+                <tr>
+                  <td>基本的な傾向</td>
+                  <td>入力トークン数が増えるほど、全モデルで不規則に性能が低下する</td>
+                </tr>
+                <tr>
+                  <td>100万トークン級モデル</td>
+                  <td>
+                    広告される上限よりずっと手前、実務的にはおおむね20万トークン前後から性能劣化が目立ち始める
+                  </td>
+                </tr>
+                <tr>
+                  <td>Lost in the middleの効果</td>
+                  <td>
+                    関連する情報が20件の文書の中央付近、5番目から15番目あたりに置かれると正解率が大きく低下する
+                  </td>
+                </tr>
+                <tr>
+                  <td>誤解されがちな点</td>
+                  <td>
+                    Needle in a
+                    Haystackで高得点でも、要約や複雑な推論を伴う実タスクでは性能が保証されない
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={styles.diagramContainer}>
+            <div className={styles.diagramTitle}>
+              <i className="ti ti-chart-line" role="img" aria-label="chart-line"></i>
+              {"図2: コンテキストが増えるにつれて性能が低下していく概念図"}
+            </div>
+            <div className={styles.mermaidDiagram}>
+              <MermaidDiagram chart={DIAGRAMS.rot} />
+            </div>
+          </div>
+
+          <h3>2.3 なぜ起こるのか: Transformerの構造的な制約</h3>
+          <p>
+            この劣化の背景には、LLMの基盤であるTransformerアーキテクチャの構造的な制約があります。Transformerでは、すべてのトークンが他のすべてのトークンに注意を向けることができる仕組みになっているため、トークン数がnであれば、n対nの組み合わせの関係が発生します。コンテキスト長が伸びるほど、この関係を捉えるモデルの能力は薄く引き伸ばされ、コンテキストサイズと注意の集中度との間に自然な緊張関係が生まれます。
+          </p>
+          <p>
+            さらにモデルは、比較的短い文章が多い訓練データの分布から注意パターンを学習するため、非常に長いコンテキストにまたがる依存関係については、経験や専用パラメータが相対的に少なくなります。位置エンコーディングの補間といった技術によって長いシーケンスを扱えるようにはなっていますが、トークンの位置に関する理解には多少の劣化が伴います。これらの要因が積み重なり、崖のような急激な性能低下ではなく、なだらかな性能勾配が生まれます。
+          </p>
+          <p>
+            こうした事実から、思慮深いコンテキストエンジニアリングは、能力の高いエージェントを構築するうえで不可欠であるとAnthropicは結論づけています。
+          </p>
+
+          <div className={styles.sourceNote}>
+            <div className={styles.sourceNoteTitle}>
+              <i className="ti ti-link" role="img" aria-label="link"></i>
+              {"出典"}
+            </div>
             <ul>
               <li>
-                Chroma Research, &quot;Context Rot: How Increasing Input Tokens Impacts LLM
-                Performance&quot; —{" "}
+                {"Chroma Research「Context Rot: How Increasing Input Tokens Impacts LLM Performance」 "}
                 <a
                   href="https://research.trychroma.com/context-rot"
                   target="_blank"
@@ -449,78 +341,96 @@ export default function Page() {
                 </a>
               </li>
               <li>
-                Chroma, GitHub再現用リポジトリ —{" "}
+                {"Anthropic「Effective context engineering for AI agents」 "}
                 <a
-                  href="https://github.com/chroma-core/context-rot"
+                  href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  github.com/chroma-core/context-rot
-                </a>
-              </li>
-              <li>
-                Liu et al., &quot;Lost in the Middle: How Language Models Use Long Contexts&quot;,
-                TACL 2024 —{" "}
-                <a
-                  href="https://aclanthology.org/2024.tacl-1.9/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  aclanthology.org/2024.tacl-1.9
-                </a>
-              </li>
-              <li>
-                Drew Breunig, &quot;How Long Contexts Fail&quot; —{" "}
-                <a
-                  href="https://www.dbreunig.com/2025/06/22/how-contexts-fail-and-how-to-fix-them.html"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  dbreunig.com/2025/06/22/how-contexts-fail
-                </a>
-              </li>
-              <li>
-                PromptLayer, &quot;Why LLMs Get Distracted and How to Write Shorter Prompts&quot; —{" "}
-                <a
-                  href="https://blog.promptlayer.com/why-llms-get-distracted-and-how-to-write-shorter-prompts/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  blog.promptlayer.com/why-llms-get-distracted
+                  anthropic.com/engineering/effective-context-engineering-for-ai-agents
                 </a>
               </li>
             </ul>
           </div>
         </section>
 
-        {/* ============ 3. 構成要素 ============ */}
-        <section className={styles.chapter} id="sec-3">
-          <div className={styles.eyebrow}>
-            <span className={styles.idx}>03</span>Anatomy
-          </div>
-          <h2 className={styles.chapterTitle}>コンテキストウィンドウを構成する要素</h2>
-          <p className={styles.lede}>
-            エージェントに渡されるコンテキストは、単一の「プロンプト」ではなく複数のレイヤーから構成される動的なシステムとして捉える必要がある。
-          </p>
+        {/* ============ 3. コンテキストの解剖学 ============ */}
+        <section id="ch3">
+          <h2>
+            <i className="ti ti-layout-grid" role="img" aria-label="layout-grid"></i>
+            {"3. コンテキストの解剖学: 何が入っているのか"}
+          </h2>
+          <p>エージェントのコンテキストウィンドウには、主に次のような要素が含まれます。</p>
 
-          <div className={styles.diagram}>
-            <div className={styles.mermaid}>
-              <MermaidDiagram chart={DIAGRAMS.d1} />
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>構成要素</th>
+                  <th>説明</th>
+                  <th>代表例</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>システムプロンプト</td>
+                  <td>エージェントの役割や振る舞いを定義する指示文</td>
+                  <td>背景情報、指示、ツールの使い方、出力形式の説明</td>
+                </tr>
+                <tr>
+                  <td>ツール定義</td>
+                  <td>エージェントが呼び出せる関数のスキーマと説明文</td>
+                  <td>検索ツール、ファイル操作ツール、外部APIとの連携</td>
+                </tr>
+                <tr>
+                  <td>Few-shotの例</td>
+                  <td>期待する挙動を示す具体例</td>
+                  <td>入力と出力のペア</td>
+                </tr>
+                <tr>
+                  <td>会話履歴</td>
+                  <td>これまでのやり取りの記録</td>
+                  <td>ユーザー発言、エージェントの応答、ツールの実行結果</td>
+                </tr>
+                <tr>
+                  <td>検索された知識</td>
+                  <td>実行時に取り込まれる外部データ</td>
+                  <td>RAGによる文書検索結果、ファイルの内容、Web検索結果</td>
+                </tr>
+                <tr>
+                  <td>メモリ</td>
+                  <td>セッションをまたいで保持される情報</td>
+                  <td>ノートファイル、進捗ログ、学習した知見</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={styles.diagramContainer}>
+            <div className={styles.diagramTitle}>
+              <i className="ti ti-refresh" role="img" aria-label="refresh"></i>
+              {"図3: エージェントループの中でのコンテキストの流れ"}
             </div>
-            <div className={styles.diagramCaption}>
-              Fig.1 — コンテキストウィンドウを構成する6つのレイヤー
+            <div className={styles.mermaidDiagram}>
+              <MermaidDiagram chart={DIAGRAMS.loop} />
             </div>
           </div>
 
           <p>
-            それぞれの要素は独立して肥大化しうるため、どれか一つを最適化しても他が膨張すればコンテキストロットは避けられない。次章以降で紹介する4つの戦略は、この6要素すべてに横断的に適用される考え方である。
+            Anthropicによれば、良いコンテキストエンジニアリングとは、望ましい結果が得られる可能性を最大化する、可能な限り小さく高シグナルなトークン集合を見つけることです。ここで言う「最小限」とは「短い」という意味ではありません。エージェントに期待通りの振る舞いをさせるには、十分な情報を最初から与える必要がある、という点には注意が必要です。
+          </p>
+          <p>
+            システムプロンプトについては、複雑で壊れやすいif-elseロジックを詰め込みすぎる失敗と、逆に曖昧で高レベルすぎる指示になり具体的な信号を与えられない失敗の、両極端の間にある「適切な高度」を狙うべきだとされています。
           </p>
 
-          <div className={styles.refs}>
-            <span className={styles.refsLabel}>参考</span>
+          <div className={styles.sourceNote}>
+            <div className={styles.sourceNoteTitle}>
+              <i className="ti ti-link" role="img" aria-label="link"></i>
+              {"出典"}
+            </div>
             <ul>
               <li>
-                Anthropic, &quot;Effective context engineering for AI agents&quot; —{" "}
+                {"Anthropic「Effective context engineering for AI agents」 "}
                 <a
                   href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
                   target="_blank"
@@ -530,35 +440,225 @@ export default function Page() {
                 </a>
               </li>
               <li>
-                Yashwant Deshmukh, &quot;Context Engineering: The Critical AI Skill&quot; —{" "}
+                {"Model Context Protocol公式ドキュメント "}
                 <a
-                  href="https://medium.com/@yashwant.deshmukh23/a-complete-guide-to-context-engineering-for-ai-agents-56b84ff6bc26"
+                  href="https://modelcontextprotocol.io/docs/getting-started/intro"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  medium.com/@yashwant.deshmukh23
+                  modelcontextprotocol.io/docs/getting-started/intro
                 </a>
               </li>
             </ul>
           </div>
         </section>
 
-        {/* ============ 4. 基本4戦略 ============ */}
-        <section className={styles.chapter} id="sec-4">
-          <div className={styles.eyebrow}>
-            <span className={styles.idx}>04</span>Framework
-          </div>
-          <h2 className={styles.chapterTitle}>基本戦略：Write / Select / Compress / Isolate</h2>
-          <p className={styles.lede}>
-            LangChainのエンジニアリングチームは、業界で実践されているコンテキスト管理手法を横断的に調査し、4つのカテゴリーに整理した。現在ではコンテキストエンジニアリングの標準的なメンタルモデルとして広く参照されている。
+        {/* ============ 4. ステップバイステップ実践 ============ */}
+        <section id="ch4">
+          <h2>
+            <i className="ti ti-route" role="img" aria-label="route"></i>
+            {"4. ステップバイステップ ベストプラクティス"}
+          </h2>
+          <p>
+            ここからは、実際にコンテキストエンジニアリングを行う際の具体的な手順を、ステップごとに解説します。
           </p>
 
-          <div className={styles.diagram}>
-            <div className={styles.mermaid}>
-              <MermaidDiagram chart={DIAGRAMS.d2} />
+          <div className={styles.stepHeader}>
+            <div className={styles.stepNumber}>1</div>
+            <div className={styles.stepTitle}>システムプロンプトを適切な高度で書く</div>
+          </div>
+          <p>
+            システムプロンプトは、明確でシンプルかつ直接的な言葉を用い、エージェントにとって「適切な高度」で提示するべきです。
+          </p>
+          <ul className={styles.checklist}>
+            <li>
+              <i className="ti ti-circle-check" role="img" aria-label="check"></i>
+              {"複雑で壊れやすいif-elseロジックをハードコーディングしない"}
+            </li>
+            <li>
+              <i className="ti ti-circle-check" role="img" aria-label="check"></i>
+              {"曖昧で高レベルすぎる、共有された文脈を勝手に前提とするような指示も避ける"}
+            </li>
+            <li>
+              <i className="ti ti-circle-check" role="img" aria-label="check"></i>
+              {"background_information、instructions、Tool guidance、Output descriptionのようにセクションごとに整理し、タグや見出しで区切る"}
+            </li>
+            <li>
+              <i className="ti ti-circle-check" role="img" aria-label="check"></i>
+              {"まずは最良のモデルを使い、最小限のプロンプトでテストし、失敗パターンを見ながら指示や例を追加していく"}
+            </li>
+          </ul>
+
+          <div className={styles.stepHeader}>
+            <div className={styles.stepNumber}>2</div>
+            <div className={styles.stepTitle}>ツールを設計する</div>
+          </div>
+          <p>
+            ツールはエージェントが環境とやり取りし、新しい情報をコンテキストに取り込むための手段です。ツールはエージェントと情報空間との間の契約にあたるため、トークン効率の良い情報を返し、効率的な振る舞いを促すことが極めて重要です。
+          </p>
+
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>原則</th>
+                  <th>悪い例</th>
+                  <th>良い例</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>機能を絞る</td>
+                  <td>list_users、list_events、create_eventの3つを個別に用意する</td>
+                  <td>空き時間を探して予定を登録するschedule_eventを1つ用意する</td>
+                </tr>
+                <tr>
+                  <td>検索指向にする</td>
+                  <td>すべての連絡先を返すlist_contacts</td>
+                  <td>検索条件で絞り込むsearch_contacts</td>
+                </tr>
+                <tr>
+                  <td>名前空間を分ける</td>
+                  <td>chat、get_conversationのような曖昧な名前</td>
+                  <td>asana_search、jira_searchのようにサービス名で前置する</td>
+                </tr>
+                <tr>
+                  <td>レスポンス形式を選べるようにする</td>
+                  <td>常に詳細な情報を返す</td>
+                  <td>concise、detailedのようなresponse_formatを用意する</td>
+                </tr>
+                <tr>
+                  <td>エラーメッセージを親切にする</td>
+                  <td>内部のトレースバックをそのまま返す</td>
+                  <td>何をどう修正すればよいか明確に伝える</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>JSON Schema</span>
+              <span className={styles.codeLang}>JSON</span>
             </div>
-            <div className={styles.diagramCaption}>
-              Fig.2 — 4つの基本戦略とコンテキストウィンドウの関係
+            <div className={styles.codeBody}>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>{"{"}</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span>{"  "}</span>
+                <span className={styles.cs}>{"\"name\""}</span>
+                <span>{": "}</span>
+                <span className={styles.cv}>{"\"search_contacts\""}</span>
+                <span>{","}</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span>{"  "}</span>
+                <span className={styles.cs}>{"\"description\""}</span>
+                <span>{": "}</span>
+                <span className={styles.cv}>
+                  {"\"名前や会社名で連絡先を検索する。結果は関連度順に返す。\""}
+                </span>
+                <span>{","}</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span>{"  "}</span>
+                <span className={styles.cs}>{"\"parameters\""}</span>
+                <span>{": "}</span>
+                <span className={styles.ck}>{"{"}</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span>{"    "}</span>
+                <span className={styles.cs}>{"\"query\""}</span>
+                <span>{": "}</span>
+                <span className={styles.cv}>{"\"検索キーワード\""}</span>
+                <span>{","}</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span>{"    "}</span>
+                <span className={styles.cs}>{"\"response_format\""}</span>
+                <span>{": "}</span>
+                <span className={styles.cv}>{"\"concise または detailed\""}</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span>{"  "}</span>
+                <span className={styles.ck}>{"}"}</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>{"}"}</span>
+              </div>
+            </div>
+          </div>
+
+          <p>
+            ツールが多すぎたり機能が重複していたりすると、エージェントはどのツールを使うべきか判断できなくなります。人間のエンジニアが「どちらのツールを使うべきか」を即答できない状況では、AIエージェントにそれ以上の判断を期待するべきではない、というのがAnthropicの指摘です。
+          </p>
+
+          <div className={styles.stepHeader}>
+            <div className={styles.stepNumber}>3</div>
+            <div className={styles.stepTitle}>Few-shotの例は厳選する</div>
+          </div>
+          <p>
+            Few-shotプロンプティングは有効なベストプラクティスですが、あらゆるエッジケースを網羅しようとして例を詰め込みすぎるのは避けるべきです。代わりに、期待される挙動を的確に示す、多様で代表的な例を厳選して用意することが推奨されています。LLMにとって、こうした例は「百聞は一見に如かず」の一枚の絵に相当します。
+          </p>
+
+          <div className={styles.stepHeader}>
+            <div className={styles.stepNumber}>4</div>
+            <div className={styles.stepTitle}>
+              検索戦略を選ぶ: 事前取得、ジャストインタイム、ハイブリッド
+            </div>
+          </div>
+          <p>
+            多くのAIネイティブなアプリケーションは、埋め込みベースの検索を推論前に行い、重要なコンテキストをあらかじめ用意します。一方でエージェント指向のアプローチが広がるにつれ、こうした事前検索を「ジャストインタイム」戦略で補うチームが増えています。
+          </p>
+          <p>
+            ジャストインタイム戦略では、すべてのデータを事前処理するのではなく、ファイルパスや保存済みクエリ、Webリンクといった軽量な識別子だけを保持し、実行時にツールを使ってその識別子から動的にデータを読み込みます。Claude
+            Codeはこの手法を用いて、巨大なデータベースに対する複雑な分析を行う際に、データ全体をコンテキストに載せることなくBashのheadやtailなどのコマンドで必要な部分だけを読み込みます。この考え方は人間の認知にも似ています。私たちは情報のすべてを記憶するのではなく、ファイルシステムや受信箱、ブックマークのような外部の整理、索引システムを使って、必要なときに情報を引き出しています。
+          </p>
+          <div className={`${styles.callout} ${styles.calloutWarning}`}>
+            <i className="ti ti-alert-triangle" role="img" aria-label="warning"></i>
+            <div>
+              実行時の探索は事前計算済みデータの取得より遅くなるというトレードオフがあります。適切なツールとヒューリスティックがなければ、エージェントはツールの誤用や行き止まりの探索によってコンテキストを浪費してしまいます。
+            </div>
+          </div>
+
+          <div className={styles.diagramContainer}>
+            <div className={styles.diagramTitle}>
+              <i
+                className="ti ti-git-branch"
+                role="img"
+                aria-label="git-branch"
+              ></i>
+              {"図4: 検索戦略の意思決定フロー"}
+            </div>
+            <div className={styles.mermaidDiagram}>
+              <MermaidDiagram chart={DIAGRAMS.jit} />
+            </div>
+          </div>
+
+          <p>
+            法務や財務のように動的な内容が少ない領域ではハイブリッド戦略が適していることが多く、Claude
+            Codeも実際にこのハイブリッドモデルを採用しています。CLAUDE.mdのようなファイルは最初からそのままコンテキストに読み込まれる一方、globやgrepのような仕組みで環境を探索し、必要なファイルをジャストインタイムで取得します。モデルの性能が上がるにつれ、設計は次第に「賢いモデルに賢く動いてもらう」方向へ、つまり人間によるキュレーションを減らす方向へ進むと予想されています。
+          </p>
+
+          <div className={styles.stepHeader}>
+            <div className={styles.stepNumber}>5</div>
+            <div className={styles.stepTitle}>長時間タスクのためのコンテキスト管理: 4つの戦略</div>
+          </div>
+          <p>
+            数十分から数時間に及ぶような長時間タスク、たとえば大規模なコードベースの移行や本格的な調査プロジェクトでは、トークン数がコンテキストウィンドウの上限を超えてしまいます。コンテキストウィンドウが将来さらに大きくなったとしても、最強のエージェント性能を求める限り、コンテキスト汚染や情報関連性の問題は残り続けると考えられています。
+          </p>
+          <p>
+            LangChainはこうした課題への対処法を、Write、Select、Compress、Isolateという4つの戦略に整理しています。
+          </p>
+
+          <div className={styles.diagramContainer}>
+            <div className={styles.diagramTitle}>
+              <i className="ti ti-stack-2" role="img" aria-label="stack"></i>
+              {"図5: Write、Select、Compress、Isolateの4戦略"}
+            </div>
+            <div className={styles.mermaidDiagram}>
+              <MermaidDiagram chart={DIAGRAMS.wsci} />
             </div>
           </div>
 
@@ -567,54 +667,291 @@ export default function Page() {
               <thead>
                 <tr>
                   <th>戦略</th>
-                  <th>何をするか</th>
+                  <th>内容</th>
                   <th>代表的な実装例</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
+                  <td>Write</td>
+                  <td>コンテキストウィンドウの外部に情報を保存する</td>
+                  <td>スクラッチパッド、NOTES.mdのようなメモファイル</td>
+                </tr>
+                <tr>
+                  <td>Select</td>
+                  <td>必要な情報だけをコンテキストに取り込む</td>
                   <td>
-                    <strong>Write</strong> 書き出す
-                  </td>
-                  <td>ウィンドウ外部(ファイル・DB・状態)に保存し、必要時に参照する</td>
-                  <td>
-                    スクラッチパッド、<code>CLAUDE.md</code>、メモリツールによる永続化
+                    類似度検索、埋め込みベースの検索、ツールのフィルタリング
                   </td>
                 </tr>
                 <tr>
-                  <td>
-                    <strong>Select</strong> 選び取る
-                  </td>
-                  <td>今のステップに必要な情報だけをウィンドウに引き込む</td>
-                  <td>Embedding検索、Just-in-Timeのファイルパス解決、ツール定義へのRAG適用</td>
+                  <td>Compress</td>
+                  <td>必要なトークンだけを残す</td>
+                  <td>会話の要約、ツール結果の圧縮、コンパクション</td>
                 </tr>
                 <tr>
-                  <td>
-                    <strong>Compress</strong> 圧縮する
-                  </td>
-                  <td>冗長なトークンを削り、必要な情報密度を保ったまま縮める</td>
-                  <td>会話全体の要約(Compaction)、ツール結果の一括クリア、サブエージェント要約</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>Isolate</strong> 分離する
-                  </td>
-                  <td>サブタスクごとにクリーンな状態を用意し、干渉を防ぐ</td>
-                  <td>サブエージェント構成、サンドボックス実行、状態スキーマによる部分公開</td>
+                  <td>Isolate</td>
+                  <td>複数のエージェントやサンドボックスに分割する</td>
+                  <td>サブエージェントアーキテクチャ、サンドボックス環境</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
           <p>
-            これら4つは互いに排他的ではなく、実務では組み合わせて使うのが一般的である。Anthropicのマルチエージェント・リサーチシステムでは、リードエージェントが計画をメモリに書き出し(Write)、サブエージェントが独立したコンテキストで探索し(Isolate)、結果を1,000〜2,000トークン程度に要約して返し(Compress)、リードエージェントは統合に必要な情報だけを選び取る(Select)という形で4戦略すべてが同時に機能している。
+            Anthropicは特に, 長時間タスクのために有効な3つの技法として、コンパクション、構造化されたノートテイキング、サブエージェントアーキテクチャを挙げています。
           </p>
 
-          <div className={styles.refs}>
-            <span className={styles.refsLabel}>参考</span>
+          <h3>5-1 コンパクション</h3>
+          <p>
+            コンパクションとは、コンテキストウィンドウの上限に近づいた会話の内容を要約し、その要約をもとに新しいコンテキストウィンドウを再構築する手法です。Claude
+            Codeでは、メッセージ履歴をモデルに渡して要約と圧縮を行わせ、アーキテクチャ上の意思決定や未解決のバグ、実装の詳細は保持しつつ、冗長なツール出力やメッセージは破棄します。その後、圧縮されたコンテキストと直近でアクセスした5つのファイルとともに作業を継続します。
+          </p>
+
+          <div className={styles.diagramContainer}>
+            <div className={styles.diagramTitle}>
+              <i
+                className="ti ti-arrows-shuffle"
+                role="img"
+                aria-label="arrows-shuffle"
+              ></i>
+              {"図6: コンパクションのプロセス"}
+            </div>
+            <div className={styles.mermaidDiagram}>
+              <MermaidDiagram chart={DIAGRAMS.compaction} />
+            </div>
+          </div>
+
+          <p>
+            コンパクションの難しさは、何を残し何を捨てるかの見極めにあります。過度に積極的な圧縮は、後になって重要性が判明するような微妙な文脈を失わせるリスクがあります。実装にあたっては、複雑なエージェントのトレースを使ってプロンプトを丁寧にチューニングし、まずは再現率を最大化してあらゆる関連情報を確実に捉え、そのうえで不要な内容を削って精度を高めていくアプローチが推奨されています。もっとも軽量な圧縮手法の一つが「ツール結果のクリア」で、深い履歴の中で一度呼び出されたツールの生の結果を、後から再び見る必要がない場合に消去する、というものです。
+          </p>
+
+          <h3>5-2 構造化されたノートテイキング</h3>
+          <p>
+            構造化されたノートテイキング、いわゆるエージェント的メモリは、エージェントがコンテキストウィンドウの外部にあるメモリに定期的にメモを書き込み、それを後で再びコンテキストに取り込むという技法です。Claude
+            Codeが作成するTo-Doリストや、独自エージェントが保持するNOTES.mdファイルのように、このシンプルなパターンによって、何十回ものツール呼び出しの中で失われてしまいがちな重要な文脈や依存関係を、複雑なタスク全体を通じて追跡できます。
+          </p>
+          <p>
+            Anthropicは2025年9月、Claude Sonnet
+            4.5とともに、コンテキストウィンドウの外にファイルベースでストレージできるメモリツールをパブリックベータとして公開しました。これによりエージェントは、時間をかけて知識ベースを構築し、セッションをまたいでプロジェクトの状態を保持し、すべてをコンテキストに保持しなくても過去の作業を参照できるようになります。この機能はコンテキストの編集機能と組み合わせて使うこともでき、Anthropicの社内評価では、両者を組み合わせることでベースラインに対して39%の性能向上が見られたと報告されています。
+          </p>
+
+          <h3>5-3 サブエージェントアーキテクチャ</h3>
+          <p>
+            サブエージェントアーキテクチャは、コンテキストの制約を回避するもう一つの方法です。1つのエージェントがプロジェクト全体の状態を保持し続けるのではなく、専門化されたサブエージェントがそれぞれクリーンなコンテキストウィンドウで焦点を絞ったタスクを担当します。メインのエージェントは高レベルの計画で調整役を担い、サブエージェントは深い技術的作業やツールを使った情報収集を行います。各サブエージェントは数万トークン規模の探索を行うこともありますが、返すのは1000から2000トークン程度に凝縮された要約だけです。
+          </p>
+
+          <div className={styles.diagramContainer}>
+            <div className={styles.diagramTitle}>
+              <i className="ti ti-sitemap" role="img" aria-label="sitemap"></i>
+              {"図7: サブエージェントアーキテクチャの構成"}
+            </div>
+            <div className={styles.mermaidDiagram}>
+              <MermaidDiagram chart={DIAGRAMS.subagent} />
+            </div>
+          </div>
+
+          <p>
+            この構成では、詳細な探索の文脈はサブエージェントの中に隔離されたまま保たれ、リードエージェントは結果の統合と分析に専念できます。Anthropicの多エージェント研究システムでは、この設計が単一エージェントシステムに対して大幅な性能改善をもたらしたことが報告されています。
+          </p>
+
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>状況</th>
+                  <th>適した技法</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>継続的なやり取りが必要な会話的タスク</td>
+                  <td>コンパクション</td>
+                </tr>
+                <tr>
+                  <td>明確なマイルストーンがある反復的な開発作業</td>
+                  <td>構造化されたノートテイキング</td>
+                </tr>
+                <tr>
+                  <td>並列探索が価値を生む複雑な調査や分析</td>
+                  <td>マルチエージェントアーキテクチャ</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={styles.stepHeader}>
+            <div className={styles.stepNumber}>6</div>
+            <div className={styles.stepTitle}>マルチエージェントを設計すべきか判断する</div>
+          </div>
+          <p>
+            マルチエージェントアーキテクチャについては、業界内で活発な議論があります。Cognition
+            AIは「Don't Build
+            Multi-Agents」と題した記事で、サブエージェント間でコンテキストが共有されないこと、各エージェントの行動が暗黙の意思決定を伴い、それらが衝突するとまずい結果を招くことを理由に、マルチエージェント構成は壊れやすいと主張しました。一方Anthropicは、複雑な調査タスクにおいてリードエージェントと隔離されたサブエージェントを組み合わせる設計が、トークン使用量の増大を通じて性能をスケールさせる有効な手段になると報告しています。
+          </p>
+
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>論点</th>
+                  <th>Cognition AIの立場</th>
+                  <th>Anthropicの立場</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>主張</td>
+                  <td>並列サブエージェントはコンテキストが分断され、壊れやすい</td>
+                  <td>
+                    隔離されたコンテキストによって並列探索が可能になり、性能が向上する
+                  </td>
+                </tr>
+                <tr>
+                  <td>象徴的な例</td>
+                  <td>
+                    Flappy
+                    Birdのクローン作成でサブエージェント同士のビジュアルスタイルが食い違う例
+                  </td>
+                  <td>調査タスクでBrowseCompの性能が大幅に向上した例</td>
+                </tr>
+                <tr>
+                  <td>推奨する設計</td>
+                  <td>単一スレッドで線形に動くエージェントを基本にする</td>
+                  <td>リードエージェントが計画し、サブエージェントに委任する</td>
+                </tr>
+                <tr>
+                  <td>読み取り作業との相性</td>
+                  <td>やや慎重</td>
+                  <td>読み取り中心のタスクは並列化しやすいとされる</td>
+                </tr>
+                <tr>
+                  <td>書き込み作業との相性</td>
+                  <td>特に危険と指摘</td>
+                  <td>書き込みが競合する場合は慎重な設計が必要という点で一致</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={`${styles.callout} ${styles.calloutInfo}`}>
+            <i className="ti ti-bulb" role="img" aria-label="bulb"></i>
+            <div>
+              両者の議論に共通する教訓は、読み取り操作は書き込み操作よりも並列化しやすいということです。複数のエージェントが同時にコードや文章を書き込むと、互いに矛盾する決定が両立できない出力を生み出しやすくなります。
+            </div>
+          </div>
+
+          <div className={styles.stepHeader}>
+            <div className={styles.stepNumber}>7</div>
+            <div className={styles.stepTitle}>評価してイテレーションする</div>
+          </div>
+          <p>
+            ツールやプロンプトの改善効果を正しく測るには、評価の仕組みが欠かせません。Anthropicが提案する手順は次のとおりです。
+          </p>
+          <ul className={styles.checklist}>
+            <li>
+              <i className="ti ti-circle-check" role="img" aria-label="check"></i>
+              {"実際の利用シーンに基づいたプロトタイプを素早く構築し、自分自身でテストする"}
+            </li>
+            <li>
+              <i className="ti ti-circle-check" role="img" aria-label="check"></i>
+              {"実際のデータソースやサービスに基づいた、複数ツール呼び出しを要するような現実的な評価タスクを多数用意する"}
+            </li>
+            <li>
+              <i className="ti ti-circle-check" role="img" aria-label="check"></i>
+              {"評価タスクごとに、検証可能な正解や期待される結果を対応づける"}
+            </li>
+            <li>
+              <i className="ti ti-circle-check" role="img" aria-label="check"></i>
+              {"シンプルなエージェントループでプログラム的に評価を実行し、精度だけでなく、ツール呼び出し回数やトークン消費量、エラー発生状況も計測する"}
+            </li>
+            <li>
+              <i className="ti ti-circle-check" role="img" aria-label="check"></i>
+              {"エージェント自身にトランスクリプトを分析させ、ツールの説明文やスキーマの改善案を出してもらう"}
+            </li>
+          </ul>
+          <p>
+            こうした評価駆動のプロセスを通じて、ツールの説明文をわずかに調整するだけでも劇的な性能向上が得られることがあるとAnthropicは報告しています。
+          </p>
+
+          <div className={styles.sourceNote}>
+            <div className={styles.sourceNoteTitle}>
+              <i className="ti ti-link" role="img" aria-label="link"></i>
+              {"出典"}
+            </div>
             <ul>
               <li>
-                LangChain Blog, &quot;Context Engineering for Agents&quot; —{" "}
+                {"Anthropic「Effective context engineering for AI agents」 "}
+                <a
+                  href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  anthropic.com/engineering/effective-context-engineering-for-ai-agents
+                </a>
+              </li>
+              <li>
+                {"Anthropic「Writing effective tools for AI agents」 "}
+                <a
+                  href="https://www.anthropic.com/engineering/writing-tools-for-agents"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  anthropic.com/engineering/writing-tools-for-agents
+                </a>
+              </li>
+              <li>
+                {"Anthropic「How we built our multi-agent research system」 "}
+                <a
+                  href="https://www.anthropic.com/engineering/multi-agent-research-system"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  anthropic.com/engineering/multi-agent-research-system
+                </a>
+              </li>
+              <li>
+                {"Anthropic「Managing context on the Claude Developer Platform」 "}
+                <a
+                  href="https://www.anthropic.com/news/context-management"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  anthropic.com/news/context-management
+                </a>
+              </li>
+              <li>
+                {"Anthropic Platform Docs「Memory tool」 "}
+                <a
+                  href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool
+                </a>
+              </li>
+              <li>
+                {"Cognition AI「Don't Build Multi-Agents」 "}
+                <a
+                  href="https://cognition.com/blog/dont-build-multi-agents"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  cognition.com/blog/dont-build-multi-agents
+                </a>
+              </li>
+              <li>
+                {"LangChain「How and when to build multi-agent systems」 "}
+                <a
+                  href="https://www.langchain.com/blog/how-and-when-to-build-multi-agent-systems"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  langchain.com/blog/how-and-when-to-build-multi-agent-systems
+                </a>
+              </li>
+              <li>
+                {"LangChain「Context Engineering for Agents」 "}
                 <a
                   href="https://www.langchain.com/blog/context-engineering-for-agents"
                   target="_blank"
@@ -624,7 +961,339 @@ export default function Page() {
                 </a>
               </li>
               <li>
-                LangChain, GitHub <code>context_engineering</code>リポジトリ —{" "}
+                {"HumanLayer「12-Factor Agents」 "}
+                <a
+                  href="https://github.com/humanlayer/12-factor-agents"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  github.com/humanlayer/12-factor-agents
+                </a>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* ============ 5. よくある落とし穴 ============ */}
+        <section id="ch5">
+          <h2>
+            <i className="ti ti-alert-triangle" role="img" aria-label="warning"></i>
+            {"5. よくある落とし穴: 4つの失敗モード"}
+          </h2>
+          <p>
+            リサーチャーのDrew
+            Breunig氏は、長いコンテキストがどのように失敗するかを4つのパターンに整理しました。この分類は業界で広く引用されており、LangChainも独自のリポジトリでこれらの失敗モードへの対処法を実装として公開しています。
+          </p>
+
+          <div className={styles.diagramContainer}>
+            <div className={styles.diagramTitle}>
+              <i className="ti ti-git-merge" role="img" aria-label="git-merge"></i>
+              {"図8: 原因と症状の対応関係"}
+            </div>
+            <div className={styles.mermaidDiagram}>
+              <MermaidDiagram chart={DIAGRAMS.failure} />
+            </div>
+          </div>
+
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>失敗モード</th>
+                  <th>説明</th>
+                  <th>典型的な兆候</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>コンテキスト汚染</td>
+                  <td>
+                    ハルシネーションやエラーがコンテキストに入り込み、以降くり返し参照されてしまう
+                  </td>
+                  <td>
+                    目標が誤って記録されると、達成不可能な目標のために不合理な戦略を繰り返す
+                  </td>
+                </tr>
+                <tr>
+                  <td>コンテキスト散漫</td>
+                  <td>
+                    コンテキストが長くなりすぎて、モデルが訓練で学んだことよりも積み込まれた文脈に過度に依存してしまう
+                  </td>
+                  <td>
+                    Pokemonをプレイするエージェントで、10万トークンを超えたあたりから新しい計画を立てず過去の行動を繰り返す傾向が観測された
+                  </td>
+                </tr>
+                <tr>
+                  <td>コンテキスト混乱</td>
+                  <td>
+                    コンテキスト中の余計な情報が、低品質な応答の生成に使われてしまう
+                  </td>
+                  <td>
+                    ツールを30個以上並べると説明文同士が重なり合い、選択精度が大きく落ちる
+                  </td>
+                </tr>
+                <tr>
+                  <td>コンテキスト衝突</td>
+                  <td>
+                    新たに蓄積された情報やツールが、プロンプト中の他の情報と矛盾してしまう
+                  </td>
+                  <td>
+                    自分で作っていないMCPツールを組み込んだ際に、説明文がプロンプトの他の指示と食い違う
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>これらの問題への対処法として、Breunig氏らは次のような技法を提案しています。</p>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>対処法</th>
+                  <th>内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>RAG</td>
+                  <td>
+                    関連する情報だけを選んでコンテキストに追加し、より良い応答を助ける
+                  </td>
+                </tr>
+                <tr>
+                  <td>Tool Loadout</td>
+                  <td>タスクのフェーズごとに、関連するツール定義だけを絞り込んで有効化する</td>
+                </tr>
+                <tr>
+                  <td>Context Quarantine</td>
+                  <td>
+                    サブタスクごとに専用のスレッドやコンテキストへ隔離し、早期のエラーがプロジェクト全体を汚染するのを防ぐ
+                  </td>
+                </tr>
+                <tr>
+                  <td>Context Pruning</td>
+                  <td>検索結果の中から無関係な内容を取り除いてからモデルに渡す</td>
+                </tr>
+                <tr>
+                  <td>Context Offloading</td>
+                  <td>
+                    スクラッチパッドのような領域にメモを書き出し、コンテキストを圧迫せずに後で参照できるようにする
+                  </td>
+                </tr>
+                <tr>
+                  <td>Context Summarization</td>
+                  <td>蓄積された会話やツール結果を要約し、必要な情報だけを残す</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={`${styles.callout} ${styles.calloutWarning}`}>
+            <i className="ti ti-alert-octagon" role="img" aria-label="danger"></i>
+            <div>
+              ツール数と精度の関係については、あるモデルでは30個を超えたあたりからツールの説明が重なり合い始め、100個を超えるとほぼ確実に失敗するという報告があります。より小さいモデルではその閾値はさらに下がり、19個までは成功していたのに46個のツールを与えると失敗する、という事例も報告されています。ツールは多ければ良いというものではなく、タスクに応じて動的に絞り込む設計が重要です。
+            </div>
+          </div>
+
+          <div className={styles.sourceNote}>
+            <div className={styles.sourceNoteTitle}>
+              <i className="ti ti-link" role="img" aria-label="link"></i>
+              {"出典"}
+            </div>
+            <ul>
+              <li>
+                {"Drew Breunig「How Long Contexts Fail」 "}
+                <a
+                  href="https://www.dbreunig.com/2025/06/22/how-contexts-fail-and-how-to-fix-them.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  dbreunig.com/2025/06/22/how-contexts-fail-and-how-to-fix-them.html
+                </a>
+              </li>
+              <li>
+                {"Drew Breunig「How to Fix Your Context」 "}
+                <a
+                  href="https://www.dbreunig.com/2025/06/26/how-to-fix-your-context.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  dbreunig.com/2025/06/26/how-to-fix-your-context.html
+                </a>
+              </li>
+              <li>
+                {"LangChain「how_to_fix_your_context」リポジトリ "}
+                <a
+                  href="https://github.com/langchain-ai/how_to_fix_your_context"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  github.com/langchain-ai/how_to_fix_your_context
+                </a>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* ============ 6. 実践チェックリスト ============ */}
+        <section id="ch6">
+          <h2>
+            <i className="ti ti-checklist" role="img" aria-label="checklist"></i>
+            {"6. 実践チェックリスト"}
+          </h2>
+          <p>コンテキストエンジニアリングに取り組む際の、簡易チェックリストです。</p>
+          <ul className={styles.checklist}>
+            <li>
+              <i className="ti ti-circle-check" role="img" aria-label="check"></i>
+              {"システムプロンプトの高度: 壊れやすいほど具体的すぎず、曖昧すぎて信号を与えられないほど抽象的でもないか"}
+            </li>
+            <li>
+              <i className="ti ti-circle-check" role="img" aria-label="check"></i>
+              {"ツールの数と機能範囲: 人間のエンジニアが「どのツールを使うべきか」を即答できる程度に整理されているか"}
+            </li>
+            <li>
+              <i className="ti ti-circle-check" role="img" aria-label="check"></i>
+              {"ツールの命名: サービス名やリソース名で名前空間が分けられているか"}
+            </li>
+            <li>
+              <i className="ti ti-circle-check" role="img" aria-label="check"></i>
+              {"ツールのレスポンス: 低レベルなIDではなく、意味のある自然言語の情報を優先して返しているか"}
+            </li>
+            <li>
+              <i className="ti ti-circle-check" role="img" aria-label="check"></i>
+              {"トークン効率: ページネーションやフィルタリング、切り詰めが適切に実装されているか"}
+            </li>
+            <li>
+              <i className="ti ti-circle-check" role="img" aria-label="check"></i>
+              {"Few-shotの例: エッジケースを網羅しようとして例を詰め込みすぎていないか"}
+            </li>
+            <li>
+              <i className="ti ti-circle-check" role="img" aria-label="check"></i>
+              {"検索戦略: データの更新頻度に応じて、事前取得、ジャストインタイム、ハイブリッドを使い分けているか"}
+            </li>
+            <li>
+              <i className="ti ti-circle-check" role="img" aria-label="check"></i>
+              {"長時間タスクへの備え: コンパクション、構造化ノートテイキング、サブエージェントのいずれかを用意しているか"}
+            </li>
+            <li>
+              <i className="ti ti-circle-check" role="img" aria-label="check"></i>
+              {"マルチエージェント設計: 書き込みが競合するタスクを不用意に並列化していないか"}
+            </li>
+            <li>
+              <i className="ti ti-circle-check" role="img" aria-label="check"></i>
+              {"コンテキスト汚染対策: ハルシネーションが繰り返し参照されない仕組みがあるか"}
+            </li>
+            <li>
+              <i className="ti ti-circle-check" role="img" aria-label="check"></i>
+              {"評価の仕組み: 現実的なタスクに基づく評価セットを用意し、継続的に改善しているか"}
+            </li>
+          </ul>
+        </section>
+
+        {/* ============ 7. ツール早見表 ============ */}
+        <section id="ch7">
+          <h2>
+            <i className="ti ti-tools" role="img" aria-label="tools"></i>
+            {"7. ツールとフレームワーク早見表"}
+          </h2>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>ツールやフレームワーク</th>
+                  <th>主な役割</th>
+                  <th>対応する戦略</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Claudeのメモリツール</td>
+                  <td>ファイルベースでコンテキストウィンドウ外にメモリを保持する</td>
+                  <td>Write、長時間タスクの継続</td>
+                </tr>
+                <tr>
+                  <td>Claudeのコンテキスト編集機能</td>
+                  <td>
+                    古くなったツール呼び出しや結果を自動でコンテキストから取り除く
+                  </td>
+                  <td>Compress</td>
+                </tr>
+                <tr>
+                  <td>Model Context Protocol</td>
+                  <td>
+                    エージェントに外部ツールやデータソースを接続するための標準規格
+                  </td>
+                  <td>Select</td>
+                </tr>
+                <tr>
+                  <td>LangGraph</td>
+                  <td>
+                    状態グラフによってエージェントのメモリや分岐を管理するフレームワーク
+                  </td>
+                  <td>Write、Select、Compress、Isolateの全体</td>
+                </tr>
+                <tr>
+                  <td>LangGraph Supervisor</td>
+                  <td>
+                    サブエージェントに処理を委任し、隔離されたコンテキストで並列実行する
+                  </td>
+                  <td>Isolate</td>
+                </tr>
+                <tr>
+                  <td>LangGraph Bigtool</td>
+                  <td>大量のツールの中から意味的に関連するものだけを選択する</td>
+                  <td>Select</td>
+                </tr>
+                <tr>
+                  <td>Claude Code</td>
+                  <td>
+                    CLAUDE.mdの事前読み込みとglob、grepによるジャストインタイム探索を組み合わせるハイブリッド設計
+                  </td>
+                  <td>Select、Write</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={styles.sourceNote}>
+            <div className={styles.sourceNoteTitle}>
+              <i className="ti ti-link" role="img" aria-label="link"></i>
+              {"出典"}
+            </div>
+            <ul>
+              <li>
+                {"Anthropic Platform Docs「Memory tool」 "}
+                <a
+                  href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool
+                </a>
+              </li>
+              <li>
+                {"Anthropic「Managing context on the Claude Developer Platform」 "}
+                <a
+                  href="https://www.anthropic.com/news/context-management"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  anthropic.com/news/context-management
+                </a>
+              </li>
+              <li>
+                {"Model Context Protocol公式ドキュメント "}
+                <a
+                  href="https://modelcontextprotocol.io/docs/getting-started/intro"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  modelcontextprotocol.io/docs/getting-started/intro
+                </a>
+              </li>
+              <li>
+                {"LangChain「context_engineering」リポジトリ "}
                 <a
                   href="https://github.com/langchain-ai/context_engineering"
                   target="_blank"
@@ -633,1525 +1302,294 @@ export default function Page() {
                   github.com/langchain-ai/context_engineering
                 </a>
               </li>
-              <li>
-                DeepWiki, &quot;Isolate Context Strategy&quot; —{" "}
-                <a
-                  href="https://deepwiki.com/langchain-ai/context_engineering/2.4-isolate-context-strategy"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  deepwiki.com/langchain-ai/context_engineering
-                </a>
-              </li>
-              <li>
-                Anthropic, &quot;How we built our multi-agent research system&quot; —{" "}
-                <a
-                  href="https://www.anthropic.com/engineering/multi-agent-research-system"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  anthropic.com/engineering/multi-agent-research-system
-                </a>
-              </li>
             </ul>
           </div>
         </section>
 
-        {/* ============ STEP 1 ============ */}
-        <section className={styles.chapter} id="step-1">
-          <div className={styles.stepBadge}>Step 1 / 8</div>
-          <div className={styles.eyebrow}>
-            <span className={styles.idx}>05</span>System Prompt
-          </div>
-          <h2 className={styles.chapterTitle}>システムプロンプトを「適切な高度」で書く</h2>
-          <p className={styles.lede}>
-            システムプロンプトの設計における最大の落とし穴は両極端である。すべてのエッジケースをif-else的にハードコードした脆いプロンプトは保守性を失い、逆に抽象的すぎる指示はモデルに具体的な指針を与えられない。Anthropicはこれを「適切な高度(right
-            altitude)」という比喩で説明している。
-          </p>
-
-          <div className={styles.tableWrap}>
-            <table>
-              <thead>
-                <tr>
-                  <th>セクション</th>
-                  <th>役割</th>
-                  <th>記述のポイント</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>背景・役割定義</td>
-                  <td>エージェントが何者で、何を達成すべきかを明示する</td>
-                  <td>曖昧な形容詞を避け、期待される振る舞いを具体的に記述する</td>
-                </tr>
-                <tr>
-                  <td>指示の階層</td>
-                  <td>優先度の高い制約から順に並める</td>
-                  <td>矛盾する指示がないか確認する(Context Clashの予防)</td>
-                </tr>
-                <tr>
-                  <td>ツールガイダンス</td>
-                  <td>いつ・どのツールを・どう使うべきかの方針</td>
-                  <td>ツールのdescriptionとプロンプトに書く内容を分離する</td>
-                </tr>
-                <tr>
-                  <td>出力フォーマット</td>
-                  <td>期待する出力の構造</td>
-                  <td>構造化出力(JSON Schema等)は明示的に定義する</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <p>
-            ポイントは「モデルが自分で正しい判断を下せるだけの余地を残しつつ、期待される行動の輪郭を明確にする」ことである。過度に細かいルールの羅列は、後述するContext
-            Confusion(無関係情報による混乱)の温床にもなる。
-          </p>
-
-          <div className={styles.refs}>
-            <span className={styles.refsLabel}>参考</span>
-            <ul>
-              <li>
-                Anthropic, &quot;Effective context engineering for AI agents&quot; —{" "}
-                <a
-                  href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  anthropic.com/engineering/effective-context-engineering-for-ai-agents
-                </a>
-              </li>
-              <li>
-                Anthropic, &quot;Building effective agents&quot; —{" "}
-                <a
-                  href="https://www.anthropic.com/engineering/building-effective-agents"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  anthropic.com/engineering/building-effective-agents
-                </a>
-              </li>
-            </ul>
-          </div>
-        </section>
-
-        {/* ============ STEP 2 ============ */}
-        <section className={styles.chapter} id="step-2">
-          <div className={styles.stepBadge}>Step 2 / 8</div>
-          <div className={styles.eyebrow}>
-            <span className={styles.idx}>06</span>Tool Design
-          </div>
-          <h2 className={styles.chapterTitle}>ツールを設計する</h2>
-          <p className={styles.lede}>
-            ツールはエージェントが外部の情報や実行環境にアクセスするための契約である。Anthropicはツール設計における原則として、明確で非重複な機能、堅牢でスコープの明確な目的、入力パラメータの曖昧さ排除を重視している。
-          </p>
-          <p>
-            ツールセットが肥大化すると、機能が重複し、モデルがどのツールを選ぶべきか混乱する「Context
-            Confusion」の典型例になる。実務上の目安として、よく使う3〜5個のツールは常時読み込み、10個を超える場合は動的な発見の仕組みを導入することが推奨される。
-          </p>
-
-          <div className={styles.diagram}>
-            <div className={styles.mermaid}>
-              <MermaidDiagram chart={DIAGRAMS.d3} />
-            </div>
-            <div className={styles.diagramCaption}>
-              Fig.3 — Tool Search Toolによる動的なツール発見フロー
-            </div>
-          </div>
-
-          <div className={styles.tableWrap}>
-            <table>
-              <thead>
-                <tr>
-                  <th>手法</th>
-                  <th>課題への対処</th>
-                  <th>効果(Anthropic社内評価)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Tool Search Tool</td>
-                  <td>全ツール定義を事前ロードせず、必要なものだけをオンデマンドで発見する</td>
-                  <td>従来比85%のトークン削減、Opus 4での精度が49%→74%に改善</td>
-                </tr>
-                <tr>
-                  <td>Programmatic Tool Calling</td>
-                  <td>コード実行環境内でツールを呼び出し、中間結果をコンテキストに溜め込まない</td>
-                  <td>ループ・条件分岐をコード側に委譲し、全量推論を回避</td>
-                </tr>
-                <tr>
-                  <td>Tool Use Examples</td>
-                  <td>JSONスキーマだけでは伝わらない使い方の慣習を例示で補う</td>
-                  <td>オプションパラメータの使い分けなどスキーマ外の知識を提供</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <p>
-            LangChainの調査では、ツール自体の説明文にもRAGを適用し、関連しそうなツールだけを検索的に絞り込むことでツール選択精度が約3倍向上したという報告もある。
-          </p>
-
-          <div className={styles.refs}>
-            <span className={styles.refsLabel}>参考</span>
-            <ul>
-              <li>
-                Anthropic, &quot;Effective context engineering for AI agents&quot; —{" "}
-                <a
-                  href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  anthropic.com/engineering/effective-context-engineering-for-ai-agents
-                </a>
-              </li>
-              <li>
-                Anthropic, &quot;Introducing advanced tool use on the Claude Developer
-                Platform&quot; —{" "}
-                <a
-                  href="https://www.anthropic.com/engineering/advanced-tool-use"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  anthropic.com/engineering/advanced-tool-use
-                </a>
-              </li>
-              <li>
-                Vorstel, &quot;Effective Context Engineering for AI Agents&quot; —{" "}
-                <a
-                  href="https://vorstel.com/feeds/blog/effective-context-engineering-ai-agents"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  vorstel.com/feeds/blog/effective-context-engineering-ai-agents
-                </a>
-              </li>
-            </ul>
-          </div>
-        </section>
-
-        {/* ============ STEP 3 ============ */}
-        <section className={styles.chapter} id="step-3">
-          <div className={styles.stepBadge}>Step 3 / 8</div>
-          <div className={styles.eyebrow}>
-            <span className={styles.idx}>07</span>Retrieval
-          </div>
-          <h2 className={styles.chapterTitle}>Just-in-Time retrievalとRAGパイプライン設計</h2>
-          <p className={styles.lede}>
-            コンテキストへの情報投入には大きく2つの流派がある。事前処理型(Embeddingベースの検索を推論前に実行)と、Just-in-Time型(ファイルパスやクエリなど軽量な識別子だけを保持し、必要になった瞬間にツール経由で実データを取得する)である。
-          </p>
-          <p>
-            Anthropicは、エージェントがより自律的になるにつれて後者の重要性が増していると指摘している。実務では両者を併用するハイブリッド構成が一般的である。
-          </p>
-
-          <div className={styles.diagram}>
-            <div className={styles.mermaid}>
-              <MermaidDiagram chart={DIAGRAMS.d4} />
-            </div>
-            <div className={styles.diagramCaption}>
-              Fig.4 — 2026年の実務で標準化されたハイブリッドRAGパイプライン
-            </div>
-          </div>
-
-          <p>
-            2026年時点の実務知見としては、「まずチャンキングを直す」がもっとも投資対効果の高い改善だと繰り返し指摘されている。業界分析では、RAGの品質問題の大半が生成部分ではなく検索部分(チャンキング・埋め込み・ランキング)に起因するとされる。
-          </p>
-
-          <div className={styles.tableWrap}>
-            <table>
-              <thead>
-                <tr>
-                  <th>チャンキング戦略</th>
-                  <th>概要</th>
-                  <th>向いているケース</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>固定長分割</td>
-                  <td>一定文字数ごとに機械的に分割</td>
-                  <td>素早いプロトタイピング、構造の薄いテキスト</td>
-                </tr>
-                <tr>
-                  <td>構造認識分割</td>
-                  <td>見出し・関数境界など文書の構造単位で分割</td>
-                  <td>Markdown文書、コードベース、仕様書</td>
-                </tr>
-                <tr>
-                  <td>意味的分割</td>
-                  <td>隣接文の埋め込み類似度が閾値を下回った位置で区切る</td>
-                  <td>構造の乏しい長文プローズ、法務・医療文書</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <p>
-            リランキングは、広く再現率高く候補を集めた後に高精度なモデルで絞り込む工程であり、Cross-Encoder型のリランカーはハイブリッド検索単体と比べて10〜25%の追加精度向上をもたらすとされる。なお「フルコンテキスト(ファイル全体をそのまま渡す)」を推す立場もあり、SWE-bench
-            Verifiedではファイル全体を渡すアプローチが約95%、断片化された検索では約80%程度という分析もある。コストとレイテンシとのトレードオフを踏まえ、タスクの性質に応じた使い分けが必要になる。
-          </p>
-
-          <div className={styles.refs}>
-            <span className={styles.refsLabel}>参考</span>
-            <ul>
-              <li>
-                Anthropic, &quot;Effective context engineering for AI agents&quot; —{" "}
-                <a
-                  href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  anthropic.com/engineering/effective-context-engineering-for-ai-agents
-                </a>
-              </li>
-              <li>
-                Sourcegraph Blog, &quot;Context Engineering: A Practical Guide&quot; —{" "}
-                <a
-                  href="https://sourcegraph.com/blog/context-engineering"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  sourcegraph.com/blog/context-engineering
-                </a>
-              </li>
-              <li>
-                StackAI, &quot;RAG Best Practices for Enterprise AI&quot; —{" "}
-                <a
-                  href="https://www.stackai.com/insights/retrieval-augmented-generation-(rag)-best-practices-for-enterprise-ai-chunking-embeddings-reranking-and-hybrid-search-optimization"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  stackai.com/insights/rag-best-practices
-                </a>
-              </li>
-              <li>
-                Lushbinary, &quot;RAG Production Guide 2026&quot; —{" "}
-                <a
-                  href="https://lushbinary.com/blog/rag-retrieval-augmented-generation-production-guide/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  lushbinary.com/blog/rag-production-guide
-                </a>
-              </li>
-              <li>
-                Starmorph Blog, &quot;RAG Techniques Compared&quot; —{" "}
-                <a
-                  href="https://blog.starmorph.com/blog/rag-techniques-compared-best-practices-guide"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  blog.starmorph.com/blog/rag-techniques-compared
-                </a>
-              </li>
-              <li>
-                Zilliz Blog, &quot;Context Engineering Strategies for AI Agents&quot; —{" "}
-                <a
-                  href="https://zilliz.com/blog/context-engineering-for-ai-agents"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  zilliz.com/blog/context-engineering-for-ai-agents
-                </a>
-              </li>
-            </ul>
-          </div>
-        </section>
-
-        {/* ============ STEP 4 ============ */}
-        <section className={styles.chapter} id="step-4">
-          <div className={styles.stepBadge}>Step 4 / 8</div>
-          <div className={styles.eyebrow}>
-            <span className={styles.idx}>08</span>Long-running Agents
-          </div>
-          <h2 className={styles.chapterTitle}>長時間実行エージェントのコンテキスト管理</h2>
-          <p className={styles.lede}>
-            数十〜数百のツール呼び出しにまたがる長時間セッションでは、コンテキストウィンドウがいずれ上限に達する。Anthropicは3つの機構をClaude
-            Developer Platformに実装しており、それぞれ役割が異なるため使い分けの理解が重要である。
-          </p>
-
-          <div className={styles.tableWrap}>
-            <table>
-              <thead>
-                <tr>
-                  <th>機構</th>
-                  <th>何をするか</th>
-                  <th>適したケース</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Compaction</td>
-                  <td>会話全体をサーバー側で高忠実度の要約に置き換える</td>
-                  <td>長い会話の流れを維持したまま文脈を圧縮したいタスク全般</td>
-                </tr>
-                <tr>
-                  <td>Context Editing</td>
-                  <td>古いツール呼び出し結果をクライアント側で明示的に削除する</td>
-                  <td>深い履歴の中の結果を再度見る必要がない場合の軽量な圧縮</td>
-                </tr>
-                <tr>
-                  <td>Memory Tool</td>
-                  <td>ファイルベースでセッションをまたいだ知識を永続化する</td>
-                  <td>プロジェクト単位で複数セッションにわたり知見を積み上げたい場合</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div className={styles.diagram}>
-            <div className={styles.mermaid}>
-              <MermaidDiagram chart={DIAGRAMS.d5} />
-            </div>
-            <div className={styles.diagramCaption}>
-              Fig.5 — Compaction・Context Editing・Memoryの連携ライフサイクル
-            </div>
-          </div>
-
-          <p>
-            これら3つは併用も可能で、Anthropicの内部評価では、メモリとコンテキスト編集を組み合わせたエージェント検索タスクで39%の性能改善、100ターンのWeb検索評価では84%のトークン削減が報告されている。特に指示せずとも、長時間タスクに取り組むエージェントが探索済み領域の記録を自発的に構築し、コンテキストがリセットされた後も自分のノートを読み返して作業を継続する挙動が観察されている。
-          </p>
-
-          <div className={styles.refs}>
-            <span className={styles.refsLabel}>参考</span>
-            <ul>
-              <li>
-                Claude by Anthropic, &quot;Managing context on the Claude Developer Platform&quot; —{" "}
-                <a
-                  href="https://claude.com/blog/context-management"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  claude.com/blog/context-management
-                </a>
-              </li>
-              <li>
-                Anthropic, &quot;Effective context engineering for AI agents&quot; —{" "}
-                <a
-                  href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  anthropic.com/engineering/effective-context-engineering-for-ai-agents
-                </a>
-              </li>
-              <li>
-                Claude Platform Docs, &quot;Memory tool&quot; —{" "}
-                <a
-                  href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  platform.claude.com/docs/agents-and-tools/tool-use/memory-tool
-                </a>
-              </li>
-              <li>
-                Claude Cookbook, &quot;Context engineering: memory, compaction, tool clearing&quot;
-                —{" "}
-                <a
-                  href="https://platform.claude.com/cookbook/tool-use-context-engineering-context-engineering-tools"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  platform.claude.com/cookbook/context-engineering-tools
-                </a>
-              </li>
-              <li>
-                Claude Cookbook, &quot;Automatic context compaction&quot; —{" "}
-                <a
-                  href="https://platform.claude.com/cookbook/tool-use-automatic-context-compaction"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  platform.claude.com/cookbook/automatic-context-compaction
-                </a>
-              </li>
-              <li>
-                Claude Cookbook, &quot;Memory &amp; context management&quot; —{" "}
-                <a
-                  href="https://platform.claude.com/cookbook/tool-use-memory-cookbook"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  platform.claude.com/cookbook/memory-cookbook
-                </a>
-              </li>
-            </ul>
-          </div>
-        </section>
-
-        {/* ============ STEP 5 ============ */}
-        <section className={styles.chapter} id="step-5">
-          <div className={styles.stepBadge}>Step 5 / 8</div>
-          <div className={styles.eyebrow}>
-            <span className={styles.idx}>09</span>Multi-Agent
-          </div>
-          <h2 className={styles.chapterTitle}>マルチエージェントによるコンテキスト分離</h2>
-          <p className={styles.lede}>
-            単一エージェントのコンテキストウィンドウには物理的な上限がある。並列で幅広い探索が必要なタスクでは、複数の専門化されたサブエージェントに作業を分散させ、それぞれが独立したコンテキストウィンドウを持つアーキテクチャが有効になる。
-          </p>
-
-          <div className={styles.diagram}>
-            <div className={styles.mermaid}>
-              <MermaidDiagram chart={DIAGRAMS.d6} />
-            </div>
-            <div className={styles.diagramCaption}>
-              Fig.6 — オーケストレーター/サブエージェント・アーキテクチャ
-            </div>
-          </div>
-
-          <p>
-            各サブエージェントは数万トークン規模で自由に探索しつつ、リードエージェントには凝縮された要約だけを返す。Anthropicの内部評価では、Opus
-            4をリードエージェント・Sonnet 4をサブエージェントとする構成が、単一のOpus
-            4エージェントを社内リサーチ評価で90.2%上回ったと報告されている。
-          </p>
-
-          <div className={styles.tableWrap}>
-            <table>
-              <thead>
-                <tr>
-                  <th>判断基準</th>
-                  <th>マルチエージェントが有効</th>
-                  <th>単一エージェントで十分</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>コンテキスト分離の必要性</td>
-                  <td>サブタスクが1,000トークン超の文脈を生むが本筋と無関係</td>
-                  <td>サブタスク間で共有すべき情報が多い</td>
-                </tr>
-                <tr>
-                  <td>探索の性質</td>
-                  <td>独立した複数の方向性を並行して深掘りする(幅優先型)</td>
-                  <td>単一の連続した推論の流れが必要(深さ優先型)</td>
-                </tr>
-                <tr>
-                  <td>コスト許容度</td>
-                  <td>タスクの価値がトークンコスト増加に見合う</td>
-                  <td>コストが厳しく制約されている</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <p>
-            マルチエージェントシステムは単純なチャットの約15倍のトークンを消費するとされ、Anthropic自身も「単一エージェントのプロンプト改善で同等の結果が得られたのに、数ヶ月かけて複雑な構成を作ってしまった」事例を報告している。導入前に、本当にコンテキスト分離が必要なタスクかどうかを見極めることが重要である。
-          </p>
-
-          <div className={styles.refs}>
-            <span className={styles.refsLabel}>参考</span>
-            <ul>
-              <li>
-                Anthropic, &quot;How we built our multi-agent research system&quot; —{" "}
-                <a
-                  href="https://www.anthropic.com/engineering/multi-agent-research-system"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  anthropic.com/engineering/multi-agent-research-system
-                </a>
-              </li>
-              <li>
-                Claude by Anthropic, &quot;When to use multi-agent systems (and when not to)&quot; —{" "}
-                <a
-                  href="https://claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  claude.com/blog/building-multi-agent-systems
-                </a>
-              </li>
-            </ul>
-          </div>
-        </section>
-
-        {/* ============ STEP 6 ============ */}
-        <section className={styles.chapter} id="step-6">
-          <div className={styles.stepBadge}>Step 6 / 8</div>
-          <div className={styles.eyebrow}>
-            <span className={styles.idx}>10</span>Failure Modes
-          </div>
-          <h2 className={styles.chapterTitle}>コンテキスト障害の診断と対処</h2>
-          <p className={styles.lede}>
-            コンテキストロットは単一の現象ではなく、複数の異なる失敗モードの総称である。Drew
-            Breunigはこれを4つのパターンに整理しており、現在では業界で広く参照される分類になっている。
-          </p>
-
-          <div className={styles.tableWrap}>
-            <table>
-              <thead>
-                <tr>
-                  <th>失敗モード</th>
-                  <th>定義</th>
-                  <th>主な対策</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    Context Poisoning
-                    <br />
-                    <span
-                      style={{
-                        color: "#5f7396",
-                        fontFamily: "var(--font-mono), 'JetBrains Mono', monospace",
-                        fontSize: "11px",
-                      }}
-                    >
-                      汚染
-                    </span>
-                  </td>
-                  <td>誤った情報や幻覚が一度入り込み、繰り返し参照され続ける</td>
-                  <td>早期の誤情報検出・修正、重要な事実の検証ステップ</td>
-                </tr>
-                <tr>
-                  <td>
-                    Context Distraction
-                    <br />
-                    <span
-                      style={{
-                        color: "#5f7396",
-                        fontFamily: "var(--font-mono), 'JetBrains Mono', monospace",
-                        fontSize: "11px",
-                      }}
-                    >
-                      注意散漫
-                    </span>
-                  </td>
-                  <td>コンテキストが長大化し、学習済み知識より蓄積履歴に過度に依存する</td>
-                  <td>Compaction・サブエージェント分離で実効文脈長を抑える</td>
-                </tr>
-                <tr>
-                  <td>
-                    Context Confusion
-                    <br />
-                    <span
-                      style={{
-                        color: "#5f7396",
-                        fontFamily: "var(--font-mono), 'JetBrains Mono', monospace",
-                        fontSize: "11px",
-                      }}
-                    >
-                      混乱
-                    </span>
-                  </td>
-                  <td>無関係な情報が存在し、それを使うことで応答品質が下がる</td>
-                  <td>ツールの絞り込み(3〜5個常時ロード)、選択的検索によるフィルタリング</td>
-                </tr>
-                <tr>
-                  <td>
-                    Context Clash
-                    <br />
-                    <span
-                      style={{
-                        color: "#5f7396",
-                        fontFamily: "var(--font-mono), 'JetBrains Mono', monospace",
-                        fontSize: "11px",
-                      }}
-                    >
-                      衝突
-                    </span>
-                  </td>
-                  <td>異なる出所の情報・ツールが既存の情報と矛盾する</td>
-                  <td>情報源間の整合性チェック、指示の優先順位を明示</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div className={styles.diagram}>
-            <div className={styles.mermaid}>
-              <MermaidDiagram chart={DIAGRAMS.d7} />
-            </div>
-            <div className={styles.diagramCaption}>
-              Fig.7 — 4つの失敗モードを切り分ける診断フロー
-            </div>
-          </div>
-
-          <p>
-            いずれのケースでも共通する対処の方向性は「まず何が起きているかを名指しできるようにすること」である。原因不明のまま経験則だけで対処し続けず、上記4分類のどれに該当するかを特定できれば、Step
-            4・5・2で紹介した具体的な手段を的確に適用できる。
-          </p>
-
-          <div className={styles.refs}>
-            <span className={styles.refsLabel}>参考</span>
-            <ul>
-              <li>
-                Drew Breunig, &quot;How Long Contexts Fail&quot; —{" "}
-                <a
-                  href="https://www.dbreunig.com/2025/06/22/how-contexts-fail-and-how-to-fix-them.html"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  dbreunig.com/2025/06/22/how-contexts-fail
-                </a>
-              </li>
-              <li>
-                Simon Willison, &quot;How to Fix Your Context&quot; —{" "}
-                <a
-                  href="https://simonwillison.net/2025/Jun/29/how-to-fix-your-context/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  simonwillison.net/2025/Jun/29/how-to-fix-your-context
-                </a>
-              </li>
-              <li>
-                O&apos;Reilly Radar, &quot;Working with Contexts&quot; —{" "}
-                <a
-                  href="https://www.oreilly.com/radar/working-with-contexts/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  oreilly.com/radar/working-with-contexts
-                </a>
-              </li>
-              <li>
-                LambdaTest Blog, &quot;Why AI Agents Forget&quot; —{" "}
-                <a
-                  href="https://www.lambdatest.com/blog/why-ai-agents-forget/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  lambdatest.com/blog/why-ai-agents-forget
-                </a>
-              </li>
-            </ul>
-          </div>
-        </section>
-
-        {/* ============ STEP 7 ============ */}
-        <section className={styles.chapter} id="step-7">
-          <div className={styles.stepBadge}>Step 7 / 8</div>
-          <div className={styles.eyebrow}>
-            <span className={styles.idx}>11</span>Cost Optimization
-          </div>
-          <h2 className={styles.chapterTitle}>プロンプトキャッシュによるコスト最適化</h2>
-          <p className={styles.lede}>
-            コンテキストエンジニアリングは品質だけでなくコストの問題でもある。Claude
-            APIのプロンプトキャッシュは、プロンプトの先頭部分(プレフィックス)を再利用することで、繰り返し送信される固定的なコンテキストの処理コストを大幅に削減する仕組みである。
-          </p>
-
-          <div className={styles.diagram}>
-            <div className={styles.mermaid}>
-              <MermaidDiagram chart={DIAGRAMS.d8} />
-            </div>
-            <div className={styles.diagramCaption}>
-              Fig.8 — プロンプトキャッシュのプレフィックス再利用の仕組み
-            </div>
-          </div>
-
-          <div className={styles.card}>
-            <ul className={styles.cardList}>
-              <li>
-                <strong>安定した内容を先頭に配置する</strong> —
-                システムプロンプトやツール定義など変化しない部分を前方に、動的なユーザー入力を末尾に置く
-              </li>
-              <li>
-                <strong>プレフィックスの完全一致が必須</strong> —
-                途中のタイムスタンプや動的な値が1つでも変わると、それより後ろのキャッシュはすべて無効になる
-              </li>
-              <li>
-                <strong>ツール呼び出しのキー順序を安定させる</strong> —
-                言語によってはJSONのキー順がランダム化され、意図せずキャッシュが壊れることがある
-              </li>
-              <li>
-                <strong>キャッシュの有効期限(TTL)を意識する</strong> —
-                標準5分、延長オプションで1時間。セッションの実行間隔に応じて選択する
-              </li>
-            </ul>
-          </div>
-
-          <p>
-            キャッシュはあくまで「送信する固定コンテキストを安く再利用する」仕組みであり、そもそも送信する必要のないトークンを削るコンテキストエンジニアリングとは補完関係にある。キャッシュを効かせる前に、まず本当に必要な情報だけを渡せているかを見直すことが優先される。
-          </p>
-
-          <div className={styles.refs}>
-            <span className={styles.refsLabel}>参考</span>
-            <ul>
-              <li>
-                Claude Platform Docs, &quot;Prompt caching&quot; —{" "}
-                <a
-                  href="https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  platform.claude.com/docs/build-with-claude/prompt-caching
-                </a>
-              </li>
-              <li>
-                Anthropic, &quot;Prompt caching with Claude&quot; —{" "}
-                <a
-                  href="https://www.anthropic.com/news/prompt-caching"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  anthropic.com/news/prompt-caching
-                </a>
-              </li>
-              <li>
-                hidekazu-konishi.com, &quot;Prompt Caching and Token Efficiency Guide&quot; —{" "}
-                <a
-                  href="https://hidekazu-konishi.com/entry/anthropic_claude_api_prompt_caching_and_token_efficiency.html"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  hidekazu-konishi.com/entry/prompt-caching
-                </a>
-              </li>
-              <li>
-                ProjectDiscovery Blog, &quot;How We Cut LLM Costs by 59% With Prompt Caching&quot; —{" "}
-                <a
-                  href="https://projectdiscovery.io/blog/how-we-cut-llm-cost-with-prompt-caching"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  projectdiscovery.io/blog/prompt-caching
-                </a>
-              </li>
-            </ul>
-          </div>
-        </section>
-
-        {/* ============ STEP 8 ============ */}
-        <section className={styles.chapter} id="step-8">
-          <div className={styles.stepBadge}>Step 8 / 8</div>
-          <div className={styles.eyebrow}>
-            <span className={styles.idx}>12</span>Evals
-          </div>
-          <h2 className={styles.chapterTitle}>観測性と評価(Evals)</h2>
-          <p className={styles.lede}>
-            コンテキストエンジニアリングの各施策(圧縮、分離、ツール絞り込みなど)は、必ずしも直感通りの効果をもたらすとは限らない。Anthropicのマルチエージェントリサーチシステム開発チームは、評価の重要性について次のような教訓を共有している。
-          </p>
-
-          <div className={styles.card}>
-            <ul className={styles.cardList}>
-              <li>
-                <strong>小規模でもすぐに評価を始める</strong> —
-                数百件規模の網羅的な評価セットが揃うまで待たず、少数の具体例からでも評価を開始する
-              </li>
-              <li>
-                <strong>自動評価と人間評価の併用</strong> —
-                LLM-as-a-judgeで事実の正確性・網羅性・ツール使用効率などを採点しつつ、稀なエッジケースは人間のレビューで補う
-              </li>
-              <li>
-                <strong>観測性の確保</strong> —
-                エージェントのトークン使用量をトレースし、どこにコンテキストエンジニアリングの効果を投じるべきかを可視化する
-              </li>
-            </ul>
-          </div>
-
-          <p>
-            LangChainも同様に、施策を導入する前に「そもそも今どこでトークンが消費されているかを追跡する仕組み」と「その施策が実際に性能を改善したか悪化させたかを検証できる簡易な仕組み」の2つを用意することを推奨している。
-          </p>
-
-          <div className={styles.refs}>
-            <span className={styles.refsLabel}>参考</span>
-            <ul>
-              <li>
-                Anthropic, &quot;How we built our multi-agent research system&quot; —{" "}
-                <a
-                  href="https://www.anthropic.com/engineering/multi-agent-research-system"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  anthropic.com/engineering/multi-agent-research-system
-                </a>
-              </li>
-              <li>
-                LangChain Blog, &quot;Context Engineering for Agents&quot; —{" "}
-                <a
-                  href="https://www.langchain.com/blog/context-engineering-for-agents"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  langchain.com/blog/context-engineering-for-agents
-                </a>
-              </li>
-            </ul>
-          </div>
-        </section>
-
-        {/* ============ 6. アンチパターン ============ */}
-        <section className={styles.chapter} id="sec-6">
-          <div className={styles.eyebrow}>
-            <span className={styles.idx}>13</span>Anti-patterns
-          </div>
-          <h2 className={styles.chapterTitle}>アンチパターン集</h2>
-
-          <div className={styles.apGrid}>
-            <div className={styles.apCard}>
-              <div className={styles.apTitle}>全部乗せプロンプト</div>
-              <div className={styles.apRow}>
-                <b>症状</b>システムプロンプトが数千行に肥大化し、保守不能になる
-              </div>
-              <div className={styles.apRow}>
-                <b>原因</b>エッジケースを都度ハードコードし続けた結果
-              </div>
-              <div className={`${styles.apRow} ${styles.apFix}`}>
-                <b>改善策</b> Step 1: 適切な高度で再設計、Step 4: 動的なコンテキスト構築へ移行
-              </div>
-            </div>
-            <div className={styles.apCard}>
-              <div className={styles.apTitle}>ツールの氾濫</div>
-              <div className={styles.apRow}>
-                <b>症状</b>数十〜数百のツールを常時ロードし、モデルが誤ったツールを選ぶ
-              </div>
-              <div className={styles.apRow}>
-                <b>原因</b>ツール追加のたびに定義を素朴に積み上げた
-              </div>
-              <div className={`${styles.apRow} ${styles.apFix}`}>
-                <b>改善策</b> Step 2: Tool Loadoutの絞り込み、Tool Search Toolによる動的発見
-              </div>
-            </div>
-            <div className={styles.apCard}>
-              <div className={styles.apTitle}>会話履歴の無制限蓄積</div>
-              <div className={styles.apRow}>
-                <b>症状</b>セッションが長くなるほど応答が劣化し、コストも増大する
-              </div>
-              <div className={styles.apRow}>
-                <b>原因</b>Compaction・Context Editingを導入していない
-              </div>
-              <div className={`${styles.apRow} ${styles.apFix}`}>
-                <b>改善策</b> Step 4: 圧縮・メモリ機構の導入
-              </div>
-            </div>
-            <div className={styles.apCard}>
-              <div className={styles.apTitle}>RAGの雑なチャンキング</div>
-              <div className={styles.apRow}>
-                <b>症状</b>検索結果が的外れで、生成が自信満々に間違える
-              </div>
-              <div className={styles.apRow}>
-                <b>原因</b>固定長分割で文や表の途中で切れている
-              </div>
-              <div className={`${styles.apRow} ${styles.apFix}`}>
-                <b>改善策</b> Step 3: 構造認識・意味的チャンキングへの切り替え
-              </div>
-            </div>
-            <div className={styles.apCard}>
-              <div className={styles.apTitle}>無条件のマルチエージェント化</div>
-              <div className={styles.apRow}>
-                <b>症状</b>トークンコストが単一エージェントの15倍に膨らみ、成果が見合わない
-              </div>
-              <div className={styles.apRow}>
-                <b>原因</b>タスクの性質を吟味せずに複雑な構成へ飛びついた
-              </div>
-              <div className={`${styles.apRow} ${styles.apFix}`}>
-                <b>改善策</b> Step 5: 判断基準表に照らして本当に必要か再検討
-              </div>
-            </div>
-            <div className={styles.apCard}>
-              <div className={styles.apTitle}>症状ベースのその場しのぎ対応</div>
-              <div className={styles.apRow}>
-                <b>症状</b>「なんか調子が悪い」を経験則だけで対処し続ける
-              </div>
-              <div className={styles.apRow}>
-                <b>原因</b>4つの失敗モードを区別せずに対処している
-              </div>
-              <div className={`${styles.apRow} ${styles.apFix}`}>
-                <b>改善策</b> Step 6: 診断フローで失敗モードを特定してから対処
-              </div>
-            </div>
-            <div className={styles.apCard}>
-              <div className={styles.apTitle}>キャッシュを効かせない構成</div>
-              <div className={styles.apRow}>
-                <b>症状</b>毎ターン同じ内容をフルコストで再処理している
-              </div>
-              <div className={styles.apRow}>
-                <b>原因</b>動的な値を先頭付近に置いてしまいプレフィックスが安定しない
-              </div>
-              <div className={`${styles.apRow} ${styles.apFix}`}>
-                <b>改善策</b> Step 7: 安定部分を前方に、動的部分を末尾に再配置
-              </div>
-            </div>
-            <div className={styles.apCard}>
-              <div className={styles.apTitle}>評価なしでの施策導入</div>
-              <div className={styles.apRow}>
-                <b>症状</b>良かれと思った圧縮・分離が実は性能を悪化させている
-              </div>
-              <div className={styles.apRow}>
-                <b>原因</b>Before/Afterを比較する評価の仕組みがない
-              </div>
-              <div className={`${styles.apRow} ${styles.apFix}`}>
-                <b>改善策</b> Step 8: 小規模でもEvalsとトレーシングを先に用意する
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ============ 7. チェックリスト ============ */}
-        <section className={styles.chapter} id="sec-7">
-          <div className={styles.eyebrow}>
-            <span className={styles.idx}>14</span>Checklist
-          </div>
-          <h2 className={styles.chapterTitle}>実践チェックリスト</h2>
-          <ul className={styles.checklist}>
-            <li>
-              <span className={styles.box}></span>
-              システムプロンプトは「具体的すぎず抽象的すぎない」適切な高度で書かれているか
-            </li>
-            <li>
-              <span className={styles.box}></span>
-              ツールは3〜5個程度の中核セットに絞られ、10個を超える場合は動的発見の仕組みがあるか
-            </li>
-            <li>
-              <span className={styles.box}></span>
-              ツール同士の役割が重複せず、パラメータの意味が曖昧でないか
-            </li>
-            <li>
-              <span className={styles.box}></span>
-              外部知識の取得は「事前処理」と「Just-in-Time取得」を適切に使い分けているか
-            </li>
-            <li>
-              <span className={styles.box}></span>
-              RAGを使う場合、チャンキング戦略は文書の構造に合っているか
-            </li>
-            <li>
-              <span className={styles.box}></span>
-              リランキングを導入し、上位数件に絞り込んでからコンテキストへ渡しているか
-            </li>
-            <li>
-              <span className={styles.box}></span>長時間セッションに対してCompaction・Context
-              Editing・Memoryのいずれかを導入しているか
-            </li>
-            <li>
-              <span className={styles.box}></span>
-              マルチエージェント構成を採用する前に、単一エージェント＋プロンプト改善で十分でないか検証したか
-            </li>
-            <li>
-              <span className={styles.box}></span>
-              エージェントの不調が発生した際、4つの失敗モードのどれに該当するか診断できる体制があるか
-            </li>
-            <li>
-              <span className={styles.box}></span>
-              プロンプトキャッシュのプレフィックス設計(安定部分を前方に)ができているか
-            </li>
-            <li>
-              <span className={styles.box}></span>
-              トークン使用量のトレースと、施策のBefore/Afterを比較できる評価の仕組みがあるか
-            </li>
-          </ul>
-        </section>
-
-        {/* ============ 8. 全体設計フロー ============ */}
-        <section className={styles.chapter} id="sec-8">
-          <div className={styles.eyebrow}>
-            <span className={styles.idx}>15</span>Decision Flow
-          </div>
-          <h2 className={styles.chapterTitle}>全体設計フロー(意思決定図)</h2>
-          <p className={styles.lede}>
-            これまでのステップを踏まえた、エージェント設計時の全体的な意思決定フローである。
-          </p>
-
-          <div className={styles.diagram}>
-            <div className={styles.mermaid}>
-              <MermaidDiagram chart={DIAGRAMS.d9} />
-            </div>
-            <div className={styles.diagramCaption}>
-              Fig.9 — エージェント設計における全体意思決定フロー
-            </div>
+        {/* ============ 8. まとめ ============ */}
+        <section id="ch8">
+          <h2>
+            <i className="ti ti-flag" role="img" aria-label="flag"></i>8. まとめ
+          </h2>
+          <div className={styles.summaryCard}>
+            <p>
+              コンテキストエンジニアリングとは、LLMの限られた「注意の予算」の中に, 望ましい挙動を引き出すために必要な、最小限かつ高シグナルな情報だけを継続的にキュレーションし続ける技術です。プロンプトエンジニアリングが一度きりの指示文設計であるのに対し、コンテキストエンジニアリングはエージェントが動き続ける限り繰り返される作業であるという点が、最大の違いです。
+            </p>
+            <p>
+              コンテキストウィンドウが大きければ大きいほど良いという単純な話ではなく、Chromaの研究が示すように、すべての最先端モデルは入力トークン数が増えるにつれて性能が劣化します。この現実を踏まえ、システムプロンプトの高度を調整すること、ツールを絞り込み設計すること、検索戦略を状況に応じて選ぶこと、そして長時間タスクにはコンパクション、構造化ノートテイキング、サブエージェントアーキテクチャを組み合わせることが、実践的なベストプラクティスとして確立されつつあります。
+            </p>
+            <p>
+              モデルの性能は今後も向上し続けると見られますが、コンテキストを希少で有限な資源として扱うという考え方そのものは、信頼性が高く効果的なエージェントを構築するうえで、引き続き中心的な役割を果たすとAnthropicは結論づけています。
+            </p>
           </div>
         </section>
 
         {/* ============ 9. 参考文献 ============ */}
-        <section className={styles.chapter} id="sec-9">
-          <div className={styles.eyebrow}>
-            <span className={styles.idx}>16</span>Bibliography
-          </div>
-          <h2 className={styles.chapterTitle}>参考文献一覧</h2>
-
-          <h4>Anthropic公式(一次情報)</h4>
+        <section id="ch9">
+          <h2>
+            <i className="ti ti-books" role="img" aria-label="books"></i>9. 参考文献 全リンク一覧
+          </h2>
           <div className={styles.tableWrap}>
             <table>
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>発行元</th>
+                  <th>タイトル</th>
+                  <th>公開時期</th>
+                  <th>URL</th>
+                </tr>
+              </thead>
               <tbody>
                 <tr>
-                  <td>01</td>
-                  <td>&quot;Effective context engineering for AI agents&quot;</td>
+                  <td>1</td>
+                  <td>Anthropic</td>
+                  <td>Effective context engineering for AI agents</td>
+                  <td>2025年9月29日</td>
                   <td>
                     <a
                       href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      anthropic.com/engineering/effective-context-engineering-for-ai-agents
+                      リンク
                     </a>
                   </td>
                 </tr>
                 <tr>
-                  <td>02</td>
-                  <td>&quot;Building effective agents&quot;</td>
+                  <td>2</td>
+                  <td>Anthropic</td>
+                  <td>Writing effective tools for AI agents</td>
+                  <td>2025年9月11日</td>
                   <td>
                     <a
-                      href="https://www.anthropic.com/engineering/building-effective-agents"
+                      href="https://www.anthropic.com/engineering/writing-tools-for-agents"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      anthropic.com/engineering/building-effective-agents
+                      リンク
                     </a>
                   </td>
                 </tr>
                 <tr>
-                  <td>03</td>
-                  <td>&quot;How we built our multi-agent research system&quot;</td>
+                  <td>3</td>
+                  <td>Anthropic</td>
+                  <td>How we built our multi-agent research system</td>
+                  <td>2025年6月13日</td>
                   <td>
                     <a
                       href="https://www.anthropic.com/engineering/multi-agent-research-system"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      anthropic.com/engineering/multi-agent-research-system
+                      リンク
                     </a>
                   </td>
                 </tr>
                 <tr>
-                  <td>04</td>
-                  <td>
-                    &quot;Introducing advanced tool use on the Claude Developer Platform&quot;
-                  </td>
+                  <td>4</td>
+                  <td>Anthropic</td>
+                  <td>Managing context on the Claude Developer Platform</td>
+                  <td>2025年9月29日</td>
                   <td>
                     <a
-                      href="https://www.anthropic.com/engineering/advanced-tool-use"
+                      href="https://www.anthropic.com/news/context-management"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      anthropic.com/engineering/advanced-tool-use
+                      リンク
                     </a>
                   </td>
                 </tr>
                 <tr>
-                  <td>05</td>
-                  <td>
-                    &quot;Managing context on the Claude Developer Platform&quot; (Claude Blog)
-                  </td>
-                  <td>
-                    <a
-                      href="https://claude.com/blog/context-management"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      claude.com/blog/context-management
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>06</td>
-                  <td>
-                    &quot;When to use multi-agent systems (and when not to)&quot; (Claude Blog)
-                  </td>
-                  <td>
-                    <a
-                      href="https://claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      claude.com/blog/building-multi-agent-systems
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>07</td>
-                  <td>&quot;Prompt caching with Claude&quot;</td>
-                  <td>
-                    <a
-                      href="https://www.anthropic.com/news/prompt-caching"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      anthropic.com/news/prompt-caching
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>08</td>
-                  <td>Claude Platform Docs, &quot;Memory tool&quot;</td>
+                  <td>5</td>
+                  <td>Anthropic Platform Docs</td>
+                  <td>Memory tool</td>
+                  <td>随時更新</td>
                   <td>
                     <a
                       href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      platform.claude.com/docs/agents-and-tools/tool-use/memory-tool
+                      リンク
                     </a>
                   </td>
                 </tr>
                 <tr>
-                  <td>09</td>
-                  <td>Claude Platform Docs, &quot;Prompt caching&quot;</td>
+                  <td>6</td>
+                  <td>Anthropic Docs</td>
+                  <td>Prompt engineering overview</td>
+                  <td>随時更新</td>
                   <td>
                     <a
-                      href="https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
+                      href="https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/overview"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      platform.claude.com/docs/build-with-claude/prompt-caching
+                      リンク
                     </a>
                   </td>
                 </tr>
                 <tr>
-                  <td>10</td>
+                  <td>7</td>
+                  <td>Chroma Research</td>
                   <td>
-                    Claude Cookbook, &quot;Context engineering: memory, compaction, tool
-                    clearing&quot;
+                    Context Rot: How Increasing Input Tokens Impacts LLM Performance
                   </td>
-                  <td>
-                    <a
-                      href="https://platform.claude.com/cookbook/tool-use-context-engineering-context-engineering-tools"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      platform.claude.com/cookbook/context-engineering-tools
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>11</td>
-                  <td>Claude Cookbook, &quot;Automatic context compaction&quot;</td>
-                  <td>
-                    <a
-                      href="https://platform.claude.com/cookbook/tool-use-automatic-context-compaction"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      platform.claude.com/cookbook/automatic-context-compaction
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>12</td>
-                  <td>Claude Cookbook, &quot;Memory &amp; context management&quot;</td>
-                  <td>
-                    <a
-                      href="https://platform.claude.com/cookbook/tool-use-memory-cookbook"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      platform.claude.com/cookbook/memory-cookbook
-                    </a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <h4>研究機関・技術レポート</h4>
-          <div className={styles.tableWrap}>
-            <table>
-              <tbody>
-                <tr>
-                  <td>13</td>
-                  <td>Chroma Research, &quot;Context Rot&quot;</td>
+                  <td>2025年</td>
                   <td>
                     <a
                       href="https://research.trychroma.com/context-rot"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      research.trychroma.com/context-rot
+                      リンク
                     </a>
                   </td>
                 </tr>
                 <tr>
-                  <td>14</td>
-                  <td>Chroma, GitHub再現用リポジトリ</td>
-                  <td>
-                    <a
-                      href="https://github.com/chroma-core/context-rot"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      github.com/chroma-core/context-rot
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>15</td>
-                  <td>Liu et al., &quot;Lost in the Middle&quot;, TACL 2024</td>
-                  <td>
-                    <a
-                      href="https://aclanthology.org/2024.tacl-1.9/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      aclanthology.org/2024.tacl-1.9
-                    </a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <h4>フレームワーク・実務ブログ</h4>
-          <div className={styles.tableWrap}>
-            <table>
-              <tbody>
-                <tr>
-                  <td>16</td>
-                  <td>LangChain Blog, &quot;Context Engineering for Agents&quot;</td>
+                  <td>8</td>
+                  <td>LangChain</td>
+                  <td>Context Engineering for Agents</td>
+                  <td>2025年</td>
                   <td>
                     <a
                       href="https://www.langchain.com/blog/context-engineering-for-agents"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      langchain.com/blog/context-engineering-for-agents
+                      リンク
                     </a>
                   </td>
                 </tr>
                 <tr>
-                  <td>17</td>
-                  <td>
-                    LangChain, GitHub <code>context_engineering</code>
-                  </td>
+                  <td>9</td>
+                  <td>LangChain</td>
+                  <td>context_engineeringリポジトリ</td>
+                  <td>2025年</td>
                   <td>
                     <a
                       href="https://github.com/langchain-ai/context_engineering"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      github.com/langchain-ai/context_engineering
+                      リンク
                     </a>
                   </td>
                 </tr>
                 <tr>
-                  <td>18</td>
-                  <td>DeepWiki, &quot;Isolate Context Strategy&quot;</td>
+                  <td>10</td>
+                  <td>LangChain</td>
+                  <td>How and when to build multi-agent systems</td>
+                  <td>2025年6月16日</td>
                   <td>
                     <a
-                      href="https://deepwiki.com/langchain-ai/context_engineering/2.4-isolate-context-strategy"
+                      href="https://www.langchain.com/blog/how-and-when-to-build-multi-agent-systems"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      deepwiki.com/langchain-ai/context_engineering
+                      リンク
                     </a>
                   </td>
                 </tr>
                 <tr>
-                  <td>19</td>
-                  <td>Sourcegraph Blog, &quot;Context Engineering&quot;</td>
+                  <td>11</td>
+                  <td>LangChain</td>
+                  <td>how_to_fix_your_contextリポジトリ</td>
+                  <td>2025年</td>
                   <td>
                     <a
-                      href="https://sourcegraph.com/blog/context-engineering"
+                      href="https://github.com/langchain-ai/how_to_fix_your_context"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      sourcegraph.com/blog/context-engineering
+                      リンク
                     </a>
                   </td>
                 </tr>
                 <tr>
-                  <td>20</td>
-                  <td>Zilliz Blog, &quot;Context Engineering Strategies for AI Agents&quot;</td>
+                  <td>12</td>
+                  <td>Cognition AI</td>
+                  <td>Don't Build Multi-Agents</td>
+                  <td>2025年6月12日</td>
                   <td>
                     <a
-                      href="https://zilliz.com/blog/context-engineering-for-ai-agents"
+                      href="https://cognition.com/blog/dont-build-multi-agents"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      zilliz.com/blog/context-engineering-for-ai-agents
+                      リンク
                     </a>
                   </td>
                 </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <h4>コンテキスト失敗モード・実務家の考察</h4>
-          <div className={styles.tableWrap}>
-            <table>
-              <tbody>
                 <tr>
-                  <td>21</td>
-                  <td>Drew Breunig, &quot;How Long Contexts Fail&quot;</td>
+                  <td>13</td>
+                  <td>Drew Breunig</td>
+                  <td>How Long Contexts Fail</td>
+                  <td>2025年6月22日</td>
                   <td>
                     <a
                       href="https://www.dbreunig.com/2025/06/22/how-contexts-fail-and-how-to-fix-them.html"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      dbreunig.com/2025/06/22/how-contexts-fail
+                      リンク
                     </a>
                   </td>
                 </tr>
                 <tr>
-                  <td>22</td>
-                  <td>Simon Willison, &quot;How to Fix Your Context&quot;</td>
+                  <td>14</td>
+                  <td>Drew Breunig</td>
+                  <td>How to Fix Your Context</td>
+                  <td>2025年6月26日</td>
                   <td>
                     <a
-                      href="https://simonwillison.net/2025/Jun/29/how-to-fix-your-context/"
+                      href="https://www.dbreunig.com/2025/06/26/how-to-fix-your-context.html"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      simonwillison.net/2025/Jun/29/how-to-fix-your-context
+                      リンク
                     </a>
                   </td>
                 </tr>
                 <tr>
-                  <td>23</td>
-                  <td>O&apos;Reilly Radar, &quot;Working with Contexts&quot;</td>
+                  <td>15</td>
+                  <td>HumanLayer</td>
+                  <td>12-Factor Agents, Factor 3: Own your context window</td>
+                  <td>2025年</td>
                   <td>
                     <a
-                      href="https://www.oreilly.com/radar/working-with-contexts/"
+                      href="https://github.com/humanlayer/12-factor-agents"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      oreilly.com/radar/working-with-contexts
+                      リンク
                     </a>
                   </td>
                 </tr>
                 <tr>
-                  <td>24</td>
-                  <td>LambdaTest Blog, &quot;Why AI Agents Forget&quot;</td>
+                  <td>16</td>
+                  <td>Model Context Protocol</td>
+                  <td>公式ドキュメント Introduction</td>
+                  <td>随時更新</td>
                   <td>
                     <a
-                      href="https://www.lambdatest.com/blog/why-ai-agents-forget/"
+                      href="https://modelcontextprotocol.io/docs/getting-started/intro"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      lambdatest.com/blog/why-ai-agents-forget
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>25</td>
-                  <td>PromptLayer, &quot;Why LLMs Get Distracted&quot;</td>
-                  <td>
-                    <a
-                      href="https://blog.promptlayer.com/why-llms-get-distracted-and-how-to-write-shorter-prompts/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      blog.promptlayer.com/why-llms-get-distracted
+                      リンク
                     </a>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-
-          <h4>RAG設計の実務ガイド</h4>
-          <div className={styles.tableWrap}>
-            <table>
-              <tbody>
-                <tr>
-                  <td>26</td>
-                  <td>StackAI, &quot;RAG Best Practices for Enterprise AI&quot;</td>
-                  <td>
-                    <a
-                      href="https://www.stackai.com/insights/retrieval-augmented-generation-(rag)-best-practices-for-enterprise-ai-chunking-embeddings-reranking-and-hybrid-search-optimization"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      stackai.com/insights/rag-best-practices
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>27</td>
-                  <td>Lushbinary, &quot;RAG Production Guide 2026&quot;</td>
-                  <td>
-                    <a
-                      href="https://lushbinary.com/blog/rag-retrieval-augmented-generation-production-guide/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      lushbinary.com/blog/rag-production-guide
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>28</td>
-                  <td>Starmorph Blog, &quot;RAG Techniques Compared&quot;</td>
-                  <td>
-                    <a
-                      href="https://blog.starmorph.com/blog/rag-techniques-compared-best-practices-guide"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      blog.starmorph.com/blog/rag-techniques-compared
-                    </a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <h4>コスト最適化(プロンプトキャッシュ)</h4>
-          <div className={styles.tableWrap}>
-            <table>
-              <tbody>
-                <tr>
-                  <td>29</td>
-                  <td>
-                    hidekazu-konishi.com, &quot;Prompt Caching and Token Efficiency Guide&quot;
-                  </td>
-                  <td>
-                    <a
-                      href="https://hidekazu-konishi.com/entry/anthropic_claude_api_prompt_caching_and_token_efficiency.html"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      hidekazu-konishi.com/entry/prompt-caching
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>30</td>
-                  <td>ProjectDiscovery Blog, &quot;How We Cut LLM Costs by 59%&quot;</td>
-                  <td>
-                    <a
-                      href="https://projectdiscovery.io/blog/how-we-cut-llm-cost-with-prompt-caching"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      projectdiscovery.io/blog/prompt-caching
-                    </a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <h4>総論・入門解説</h4>
-          <div className={styles.tableWrap}>
-            <table>
-              <tbody>
-                <tr>
-                  <td>31</td>
-                  <td>
-                    Cronus, &quot;Anthropic&apos;s Approach to Effective Context Engineering&quot;
-                  </td>
-                  <td>
-                    <a
-                      href="https://cr0nu3.github.io/posts/Effective_context_engineering_for_AI_Agents/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      cr0nu3.github.io/posts/Effective_context_engineering
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>32</td>
-                  <td>Yashwant Deshmukh, &quot;Context Engineering: The Critical AI Skill&quot;</td>
-                  <td>
-                    <a
-                      href="https://medium.com/@yashwant.deshmukh23/a-complete-guide-to-context-engineering-for-ai-agents-56b84ff6bc26"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      medium.com/@yashwant.deshmukh23
-                    </a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <p className={styles.pageFooterDisclaimer}>
+            すべての情報は2026年7月時点での各サイトの公開内容に基づいています。コンテキストエンジニアリングは非常に速いスピードで進化している分野のため、最新の情報については各URLを直接ご確認ください。
+          </p>
         </section>
-
-        <footer className={styles.pageFooter}>
-          本ドキュメントは2026年7月時点で参照可能な情報をもとに作成。コンテキストエンジニアリングは急速に発展している分野であり、Anthropic・LangChain等の公式ドキュメントは随時更新されるため、実装時は各リンク先の最新版を確認すること。
-        </footer>
       </main>
     </div>
   );

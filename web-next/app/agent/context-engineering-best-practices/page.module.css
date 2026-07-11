@@ -676,3 +676,165 @@
     padding: 72px 24px 80px;
   }
 }
+
+/* Callout Styles */
+.callout {
+  display: flex;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  margin: 20px 0 28px;
+  border: 1px solid rgba(148, 178, 214, 0.14);
+  background: #16161a;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: #a9bad9;
+}
+
+.callout i {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.calloutInfo {
+  background: #12203a;
+  border-color: rgba(124, 179, 255, 0.2);
+}
+
+.calloutInfo i {
+  color: #7cb3ff;
+}
+
+.calloutWarning {
+  background: #2b2313;
+  border-color: rgba(240, 198, 116, 0.2);
+}
+
+.calloutWarning i {
+  color: #f0c674;
+}
+
+/* Step Header Styles */
+.stepHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 44px 0 14px;
+}
+
+.stepNumber {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: #1e1e24;
+  border: 1px solid #3d3d48;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: #7cb3ff;
+  flex-shrink: 0;
+}
+
+.stepTitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: #e9e9ee;
+}
+
+/* Code Block Styles (Monospace compliant) */
+.codeWrap {
+  margin: 8px 0 24px;
+  border: 1px solid rgba(148, 178, 214, 0.14);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #1e1e24;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+}
+
+.codeBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background: #16161a;
+  border-bottom: 1px solid rgba(148, 178, 214, 0.14);
+  font-size: 12px;
+  color: #6f6f7d;
+}
+
+.codeLang {
+  text-transform: uppercase;
+}
+
+.codeBody {
+  padding: 16px;
+  font-size: 13px;
+  line-height: 1.65;
+  overflow-x: auto;
+}
+
+.codeLine {
+  white-space: pre;
+}
+
+.ck {
+  color: #ff9797; /* keyword/brackets */
+}
+
+.cs {
+  color: #7cb3ff; /* strings / keys */
+}
+
+.cv {
+  color: #6fd99a; /* values */
+}
+
+/* Doc Header / Hero Section */
+.docHeader {
+  margin-bottom: 40px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid rgba(148, 178, 214, 0.14);
+}
+
+.docEyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: #7cb3ff;
+  margin-bottom: 14px;
+}
+
+.docLead {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #a6a6b3;
+  margin: 0;
+}
+
+/* Summary Card */
+.summaryCard {
+  padding: 22px 24px;
+  background: #16161a;
+  border: 1px solid rgba(148, 178, 214, 0.14);
+  border-radius: 12px;
+  margin: 8px 0 24px;
+}
+
+.summaryCard p:last-child {
+  margin-bottom: 0;
+}
+
+/* Page Footer Disclaimer */
+.pageFooterDisclaimer {
+  font-size: 12px;
+  color: #6f6f7d;
+  margin-top: 24px;
+  line-height: 1.6;
+}
+
