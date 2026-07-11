@@ -122,6 +122,7 @@ export const navLinks: readonly NavLink[] = [
     name: "Security",
     children: [
       { name: "AI Security Best Practices", href: "/security/ai-security-best-practices" },
+      { name: "AI Security Best Practices (中級)", href: "/security/ai-security-best-practices-intermediate" },
     ],
   },
   { name: "Git Worktree", href: "/git-worktree" },
