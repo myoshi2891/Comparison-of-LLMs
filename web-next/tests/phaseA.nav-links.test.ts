@@ -148,15 +148,15 @@ describe("Phase A - IDE dropdown shape", () => {
 describe("Phase A - Local LLM dropdown shape", () => {
   const localLlm = navLinks.find((link) => link.name === "Local LLM");
 
-  it("has 1 child entry (self-hosting guide)", () => {
+  it("has 2 child entries (self-hosting guide / best practices)", () => {
     expect(localLlm && "children" in localLlm).toBe(true);
     const children = localLlm && "children" in localLlm ? localLlm.children : [];
-    expect(children.length).toBe(1);
+    expect(children.length).toBe(2);
   });
 
   it("uses clean URL paths for all Local LLM children (no .html extension)", () => {
     const children = localLlm && "children" in localLlm ? localLlm.children : [];
-    const expectedHrefs = ["/local-llm/self-hosting"];
+    const expectedHrefs = ["/local-llm/self-hosting", "/local-llm/best-practices"];
     expect(children.map((c) => c.href)).toEqual(expectedHrefs);
   });
 });

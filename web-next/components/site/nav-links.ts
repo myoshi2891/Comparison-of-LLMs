@@ -103,6 +103,7 @@ export const navLinks: readonly NavLink[] = [
     name: "Local LLM",
     children: [
       { name: "Self-hosting Guide", href: "/local-llm/self-hosting" },
+      { name: "Self-hosting Best Practices", href: "/local-llm/best-practices" },
     ],
   },
   {
