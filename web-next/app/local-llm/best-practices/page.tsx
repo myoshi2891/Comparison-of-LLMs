@@ -193,27 +193,57 @@ export default function LocalLlmBestPracticesPage() {
 
         <nav aria-label="ガイド目次">
           <div className={styles.navGroupLabel}>基礎</div>
-          <a className={styles.tocLink} href="#intro">はじめに</a>
-          <a className={styles.tocLink} href="#architecture">全体アーキテクチャ</a>
-          <a className={styles.tocLink} href="#model-selection">モデル選定</a>
+          <a className={styles.tocLink} href="#intro">
+            はじめに
+          </a>
+          <a className={styles.tocLink} href="#architecture">
+            全体アーキテクチャ
+          </a>
+          <a className={styles.tocLink} href="#model-selection">
+            モデル選定
+          </a>
 
           <div className={styles.navGroupLabel}>推論スタック</div>
-          <a className={styles.tocLink} href="#quantization">量子化戦略</a>
-          <a className={styles.tocLink} href="#inference-engines">推論エンジン選定</a>
-          <a className={styles.tocLink} href="#hardware">ハードウェア設計</a>
-          <a className={styles.tocLink} href="#performance">パフォーマンスチューニング</a>
+          <a className={styles.tocLink} href="#quantization">
+            量子化戦略
+          </a>
+          <a className={styles.tocLink} href="#inference-engines">
+            推論エンジン選定
+          </a>
+          <a className={styles.tocLink} href="#hardware">
+            ハードウェア設計
+          </a>
+          <a className={styles.tocLink} href="#performance">
+            パフォーマンスチューニング
+          </a>
 
           <div className={styles.navGroupLabel}>セキュリティ &amp; 応用</div>
-          <a className={styles.tocLink} href="#security">セキュリティ</a>
-          <a className={styles.tocLink} href="#rag">RAGパイプライン</a>
-          <a className={styles.tocLink} href="#fine-tuning">ファインチューニング</a>
+          <a className={styles.tocLink} href="#security">
+            セキュリティ
+          </a>
+          <a className={styles.tocLink} href="#rag">
+            RAGパイプライン
+          </a>
+          <a className={styles.tocLink} href="#fine-tuning">
+            ファインチューニング
+          </a>
 
           <div className={styles.navGroupLabel}>運用</div>
-          <a className={styles.tocLink} href="#observability">監視・可観測性</a>
-          <a className={styles.tocLink} href="#deployment">デプロイメント運用</a>
-          <a className={styles.tocLink} href="#checklist">運用チェックリスト</a>
-          <a className={styles.tocLink} href="#summary">まとめ</a>
-          <a className={styles.tocLink} href="#references">参考文献一覧</a>
+          <a className={styles.tocLink} href="#observability">
+            監視・可観測性
+          </a>
+          <a className={styles.tocLink} href="#deployment">
+            デプロイメント運用
+          </a>
+          <a className={styles.tocLink} href="#checklist">
+            運用チェックリスト
+          </a>
+          <a className={styles.tocLink} href="#summary">
+            まとめ
+          </a>
+          <a className={styles.tocLink} href="#references">
+            参考文献一覧
+          </a>
         </nav>
       </aside>
 
@@ -241,7 +271,11 @@ export default function LocalLlmBestPracticesPage() {
           </svg>
           <div className={styles.heroInner}>
             <div className={styles.heroEyebrow}>Local LLM / Self-Hosting</div>
-            <h1 className={styles.pageTitle}>ローカルLLM／セルフホスティング<br />ベストプラクティスガイド</h1>
+            <h1 className={styles.pageTitle}>
+              ローカルLLM／セルフホスティング
+              <br />
+              ベストプラクティスガイド
+            </h1>
             <p className={styles.lead}>
               モデル選定から量子化、推論エンジン、ハードウェア設計、セキュリティ、RAG、ファインチューニング、
               可観測性、デプロイ運用まで——中級〜上級エンジニアが自前のLLM基盤を安全かつ継続可能な形で
@@ -270,13 +304,16 @@ export default function LocalLlmBestPracticesPage() {
           <p>セルフホスティングを検討する動機は主に3つに整理できます。</p>
           <ul>
             <li>
-              <strong>データ主権・コンプライアンス</strong>：機密データや個人情報を外部APIに送らずに処理したい（医療・金融・法務など規制業種、日本国内では薬機法対応が必要なケースも含む）
+              <strong>データ主権・コンプライアンス</strong>
+              ：機密データや個人情報を外部APIに送らずに処理したい（医療・金融・法務など規制業種、日本国内では薬機法対応が必要なケースも含む）
             </li>
             <li>
-              <strong>コスト構造の転換</strong>：クラウドAPIはトークン従量課金のため利用量に比例してコストが増加する一方、セルフホスティングは初期GPU投資後の限界費用が低い。安定した高ボリュームworkloadほど自己ホスト化のメリットが大きい
+              <strong>コスト構造の転換</strong>
+              ：クラウドAPIはトークン従量課金のため利用量に比例してコストが増加する一方、セルフホスティングは初期GPU投資後の限界費用が低い。安定した高ボリュームworkloadほど自己ホスト化のメリットが大きい
             </li>
             <li>
-              <strong>レイテンシとカスタマイズ性</strong>：ネットワーク往復がなくなることによる低遅延、およびLoRA/QLoRAによるドメイン特化
+              <strong>レイテンシとカスタマイズ性</strong>
+              ：ネットワーク往復がなくなることによる低遅延、およびLoRA/QLoRAによるドメイン特化
             </li>
           </ul>
 
@@ -288,7 +325,9 @@ export default function LocalLlmBestPracticesPage() {
             <div className={styles.calloutIcon}>i</div>
             <div className={styles.calloutContent}>
               <p>
-                実務上の指針：多くの組織にとって最適解は「オールインまたはオールアウト」の二択ではなく、<strong>ハイブリッドアーキテクチャ</strong>です。分類・抽出・機密データ処理などの高頻度・低複雑度タスクはローカルLLMに、複雑な多段推論や創造的タスクで品質が事業クリティカルな場合はフロンティアAPIに、という負荷分散が2026年の実践的な設計パターンとして定着しています。
+                実務上の指針：多くの組織にとって最適解は「オールインまたはオールアウト」の二択ではなく、
+                <strong>ハイブリッドアーキテクチャ</strong>
+                です。分類・抽出・機密データ処理などの高頻度・低複雑度タスクはローカルLLMに、複雑な多段推論や創造的タスクで品質が事業クリティカルな場合はフロンティアAPIに、という負荷分散が2026年の実践的な設計パターンとして定着しています。
               </p>
             </div>
           </div>
@@ -341,11 +380,15 @@ export default function LocalLlmBestPracticesPage() {
 
           <h3>3.1 「ローカル級」モデルサイズの基準は毎年変わる</h3>
           <p>
-            2026年時点で重要な認識は、<strong>「ローカルグレード」とされるモデルサイズの基準が年々シフトしている</strong>ことです。適切に量子化された32Bモデルが、2年前に70Bモデルが必要だったタスクをこなせるようになっています。これはMoE（Mixture-of-Experts）アーキテクチャの普及、学習データ・手法の改善、量子化技術の成熟が複合的に効いた結果です。
+            2026年時点で重要な認識は、
+            <strong>「ローカルグレード」とされるモデルサイズの基準が年々シフトしている</strong>
+            ことです。適切に量子化された32Bモデルが、2年前に70Bモデルが必要だったタスクをこなせるようになっています。これはMoE（Mixture-of-Experts）アーキテクチャの普及、学習データ・手法の改善、量子化技術の成熟が複合的に効いた結果です。
           </p>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://alpacked.io/blog/self-hosted-llm-guide/">Self-Hosted LLM Guide: Costs, Architecture &amp; Breakeven Point — Alpacked</Ext>
+            <Ext href="https://alpacked.io/blog/self-hosted-llm-guide/">
+              Self-Hosted LLM Guide: Costs, Architecture &amp; Breakeven Point — Alpacked
+            </Ext>
           </p>
 
           <h3>3.2 VRAM階層別モデル推奨表（2026年中頃時点）</h3>
@@ -480,7 +523,9 @@ export default function LocalLlmBestPracticesPage() {
                 <tr>
                   <td>Run DeepSeek &amp; Qwen 2.5 Locally: The 2026 Self-Hosted Guide</td>
                   <td>
-                    <Ext href="https://createaiagent.net/self-hosted-llm/">createaiagent.net/self-hosted-llm</Ext>
+                    <Ext href="https://createaiagent.net/self-hosted-llm/">
+                      createaiagent.net/self-hosted-llm
+                    </Ext>
                   </td>
                 </tr>
                 <tr>
@@ -492,25 +537,33 @@ export default function LocalLlmBestPracticesPage() {
                 <tr>
                   <td>Self-Hosted LLM Guide: Costs, Architecture &amp; Breakeven Point</td>
                   <td>
-                    <Ext href="https://alpacked.io/blog/self-hosted-llm-guide/">alpacked.io/blog/self-hosted-llm-guide</Ext>
+                    <Ext href="https://alpacked.io/blog/self-hosted-llm-guide/">
+                      alpacked.io/blog/self-hosted-llm-guide
+                    </Ext>
                   </td>
                 </tr>
                 <tr>
                   <td>Build a Home AI Server in 2026: Self-Hosted LLM Guide</td>
                   <td>
-                    <Ext href="https://www.digitalapplied.com/blog/home-ai-server-build-self-hosted-llm-2026-guide">digitalapplied.com/home-ai-server-build-2026</Ext>
+                    <Ext href="https://www.digitalapplied.com/blog/home-ai-server-build-self-hosted-llm-2026-guide">
+                      digitalapplied.com/home-ai-server-build-2026
+                    </Ext>
                   </td>
                 </tr>
                 <tr>
                   <td>Best Open Source Self-Hosted LLMs for Coding in 2026</td>
                   <td>
-                    <Ext href="https://pinggy.io/blog/best_open_source_self_hosted_llms_for_coding/">pinggy.io/best-open-source-llms-coding</Ext>
+                    <Ext href="https://pinggy.io/blog/best_open_source_self_hosted_llms_for_coding/">
+                      pinggy.io/best-open-source-llms-coding
+                    </Ext>
                   </td>
                 </tr>
                 <tr>
                   <td>Best Self-Hosted LLM Leaderboard 2026</td>
                   <td>
-                    <Ext href="https://onyx.app/self-hosted-llm-leaderboard">onyx.app/self-hosted-llm-leaderboard</Ext>
+                    <Ext href="https://onyx.app/self-hosted-llm-leaderboard">
+                      onyx.app/self-hosted-llm-leaderboard
+                    </Ext>
                   </td>
                 </tr>
               </tbody>
@@ -527,8 +580,12 @@ export default function LocalLlmBestPracticesPage() {
 
           <h3>4.1 「フォーマット」と「アルゴリズム」を混同しない</h3>
           <p>
-            量子化を語るうえで最も多い誤解は、<strong>GGUFが自己完結型のファイルフォーマットである一方、GPTQ・AWQは量子化アルゴリズムであり、その出力はHugging
-            Face形式のsafetensorsとして保存される</strong>という区別を曖昧にすることです。EXL2・MLXはそれぞれ単一のランタイムに強く紐づいたフォーマットです。この区別を持たずに「どれが一番いいか」を比較すると、ハードウェアに合わないフォーマットを選んでしまいます。
+            量子化を語るうえで最も多い誤解は、
+            <strong>
+              GGUFが自己完結型のファイルフォーマットである一方、GPTQ・AWQは量子化アルゴリズムであり、その出力はHugging
+              Face形式のsafetensorsとして保存される
+            </strong>
+            という区別を曖昧にすることです。EXL2・MLXはそれぞれ単一のランタイムに強く紐づいたフォーマットです。この区別を持たずに「どれが一番いいか」を比較すると、ハードウェアに合わないフォーマットを選んでしまいます。
           </p>
 
           <div className={styles.tableWrap}>
@@ -583,7 +640,9 @@ export default function LocalLlmBestPracticesPage() {
           </div>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://www.digitalapplied.com/blog/gguf-vs-awq-vs-gptq-vs-mlx-llm-quantization-formats-2026">GGUF vs AWQ vs GPTQ vs MLX: LLM Quant Formats 2026 — Digital Applied</Ext>
+            <Ext href="https://www.digitalapplied.com/blog/gguf-vs-awq-vs-gptq-vs-mlx-llm-quantization-formats-2026">
+              GGUF vs AWQ vs GPTQ vs MLX: LLM Quant Formats 2026 — Digital Applied
+            </Ext>
           </p>
 
           <h3>4.2 ビット幅と品質維持率</h3>
@@ -630,7 +689,10 @@ export default function LocalLlmBestPracticesPage() {
             <div className={styles.calloutIcon}>!</div>
             <div className={styles.calloutContent}>
               <p>
-                <strong>推論の品質劣化はタスクによって非対称</strong>であることに注意してください。パープレキシティ（困惑度）は緩やかに劣化する一方、数学的推論・ツール呼び出しなどのエージェント系タスクはより急峻に劣化する傾向が複数のベンチマークで報告されています。目安として、Q3以下では推論精度の低下がパープレキシティの低下よりも大きくなる報告があり、<strong>エージェント/ツール利用ワークロードではQ4未満に下げない</strong>のが安全側の運用です。
+                <strong>推論の品質劣化はタスクによって非対称</strong>
+                であることに注意してください。パープレキシティ（困惑度）は緩やかに劣化する一方、数学的推論・ツール呼び出しなどのエージェント系タスクはより急峻に劣化する傾向が複数のベンチマークで報告されています。目安として、Q3以下では推論精度の低下がパープレキシティの低下よりも大きくなる報告があり、
+                <strong>エージェント/ツール利用ワークロードではQ4未満に下げない</strong>
+                のが安全側の運用です。
               </p>
             </div>
           </div>
@@ -681,12 +743,14 @@ export default function LocalLlmBestPracticesPage() {
           <h3>4.4 ツールチェーンの現状（2026年）</h3>
           <p>
             <strong>AutoGPTQ</strong>は2025年4月にアーカイブ済みで、後継の
-            <strong>GPTQModel v5.8.0</strong>がGPTQ・AWQ・GGUF・FP8・EXL3を統合的にカバーしています。Hugging Face
+            <strong>GPTQModel v5.8.0</strong>
+            がGPTQ・AWQ・GGUF・FP8・EXL3を統合的にカバーしています。Hugging Face
             TransformersもAutoGPTQ連携を非推奨化しているため、新規プロジェクトはGPTQModelへの移行を前提に設計してください。
           </p>
           <p>
-            vLLMでは、AWQ Marlin/TritonカーネルやGPTQ
-            Marlin/BitBLAS等19種の<strong>レガシー量子化カーネル of 非推奨化提案（RFC）</strong>が進行中です。本番の量子化スタックを固定する前に、vLLMのGitHub上の関連Issue/RFCを確認することを推奨します。
+            vLLMでは、AWQ Marlin/TritonカーネルやGPTQ Marlin/BitBLAS等19種の
+            <strong>レガシー量子化カーネル of 非推奨化提案（RFC）</strong>
+            が進行中です。本番の量子化スタックを固定する前に、vLLMのGitHub上の関連Issue/RFCを確認することを推奨します。
           </p>
 
           <div className={styles.tableWrap}>
@@ -701,37 +765,49 @@ export default function LocalLlmBestPracticesPage() {
                 <tr>
                   <td>LLM Quantization Explained: GGUF vs AWQ vs GPTQ — The Complete 2026 Guide</td>
                   <td>
-                    <Ext href="https://fungies.io/llm-quantization-gguf-awq-gptq-guide-2026/">fungies.io/llm-quantization-guide-2026</Ext>
+                    <Ext href="https://fungies.io/llm-quantization-gguf-awq-gptq-guide-2026/">
+                      fungies.io/llm-quantization-guide-2026
+                    </Ext>
                   </td>
                 </tr>
                 <tr>
                   <td>GGUF vs GPTQ vs AWQ 2026: Which Quantization Should You Use?</td>
                   <td>
-                    <Ext href="https://localaimaster.com/blog/quantization-explained">localaimaster.com/quantization-explained</Ext>
+                    <Ext href="https://localaimaster.com/blog/quantization-explained">
+                      localaimaster.com/quantization-explained
+                    </Ext>
                   </td>
                 </tr>
                 <tr>
                   <td>Quantization Techniques for AI Inference in 2026</td>
                   <td>
-                    <Ext href="https://sesamedisk.com/quantization-techniques-ai-inference-2026/">sesamedisk.com/quantization-techniques-2026</Ext>
+                    <Ext href="https://sesamedisk.com/quantization-techniques-ai-inference-2026/">
+                      sesamedisk.com/quantization-techniques-2026
+                    </Ext>
                   </td>
                 </tr>
                 <tr>
                   <td>Local LLM Quantization Quality Benchmarks 2026</td>
                   <td>
-                    <Ext href="https://presenc.ai/research/local-llm-quantization-quality-benchmarks-2026">presenc.ai/quantization-quality-benchmarks</Ext>
+                    <Ext href="https://presenc.ai/research/local-llm-quantization-quality-benchmarks-2026">
+                      presenc.ai/quantization-quality-benchmarks
+                    </Ext>
                   </td>
                 </tr>
                 <tr>
                   <td>Quantization Methods Compared: GGUF, AWQ, GPTQ, EXL2, NVFP4</td>
                   <td>
-                    <Ext href="https://ai.rs/ai-developer/quantization-methods-compared">ai.rs/quantization-methods-compared</Ext>
+                    <Ext href="https://ai.rs/ai-developer/quantization-methods-compared">
+                      ai.rs/quantization-methods-compared
+                    </Ext>
                   </td>
                 </tr>
                 <tr>
                   <td>GPTQ vs AWQ vs GGUF vs bitsandbytes</td>
                   <td>
-                    <Ext href="https://www.bestaiweb.ai/gptq-vs-awq-vs-gguf-vs-bitsandbytes-quantization-formats-and-their-tradeoffs-explained/">bestaiweb.ai/gptq-awq-gguf-bitsandbytes</Ext>
+                    <Ext href="https://www.bestaiweb.ai/gptq-vs-awq-vs-gguf-vs-bitsandbytes-quantization-formats-and-their-tradeoffs-explained/">
+                      bestaiweb.ai/gptq-awq-gguf-bitsandbytes
+                    </Ext>
                   </td>
                 </tr>
               </tbody>
@@ -768,7 +844,9 @@ export default function LocalLlmBestPracticesPage() {
           </ul>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://theaiengineer.substack.com/p/vllm-vs-ollama-vs-sglang-vs-tensorrt">vLLM vs Ollama vs SGLang vs TensorRT-LLM Serving 2026 — The AI Engineer</Ext>
+            <Ext href="https://theaiengineer.substack.com/p/vllm-vs-ollama-vs-sglang-vs-tensorrt">
+              vLLM vs Ollama vs SGLang vs TensorRT-LLM Serving 2026 — The AI Engineer
+            </Ext>
           </p>
 
           <h3>5.2 比較表</h3>
@@ -825,7 +903,8 @@ export default function LocalLlmBestPracticesPage() {
                   <td>中規模</td>
                   <td>主要フォーマット対応</td>
                   <td>
-                    <strong>2026年3月にHugging Faceがメンテナンスモードへ移行を発表</strong>。新規プロジェクトはvLLM/SGLang/llama.cppへの移行を公式に推奨
+                    <strong>2026年3月にHugging Faceがメンテナンスモードへ移行を発表</strong>
+                    。新規プロジェクトはvLLM/SGLang/llama.cppへの移行を公式に推奨
                   </td>
                 </tr>
                 <tr>
@@ -847,11 +926,17 @@ export default function LocalLlmBestPracticesPage() {
             SpheronのH100 SXM5 80GB環境でのLlama 3.3 70B
             Instruct（FP8）比較では、70Bスケールではエンジン間のスループット差は3〜5%程度に収まる一方、PremAIによるLlama
             3.1 8Bでの計測ではSGLangがvLLM比で約29%高いスループット（16,200 tok/s vs 12,500
-            tok/s）を記録したと報告されています。これは、<strong>SGLangのRadixAttentionは小型モデル・短い出力・prefillの比重が大きいシナリオで特に有利</strong>という構造的な理由によるものです。
+            tok/s）を記録したと報告されています。これは、
+            <strong>
+              SGLangのRadixAttentionは小型モデル・短い出力・prefillの比重が大きいシナリオで特に有利
+            </strong>
+            という構造的な理由によるものです。
           </p>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://techsy.io/en/blog/vllm-vs-sglang">vLLM vs SGLang 2026: H100 Benchmarks Inside — TECHSY</Ext>
+            <Ext href="https://techsy.io/en/blog/vllm-vs-sglang">
+              vLLM vs SGLang 2026: H100 Benchmarks Inside — TECHSY
+            </Ext>
           </p>
 
           <h3>5.4 エンジン選定の意思決定フロー</h3>
@@ -861,7 +946,10 @@ export default function LocalLlmBestPracticesPage() {
           </div>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://sesamedisk.com/llamacpp-vs-vllm-vs-sglang-vs-ollama-2026/">In 2026, the Decision Among Local Inference Engines Comes Down to One Question — Sesame Disk</Ext>
+            <Ext href="https://sesamedisk.com/llamacpp-vs-vllm-vs-sglang-vs-ollama-2026/">
+              In 2026, the Decision Among Local Inference Engines Comes Down to One Question —
+              Sesame Disk
+            </Ext>
           </p>
 
           <div className={styles.tableWrap}>
@@ -876,25 +964,33 @@ export default function LocalLlmBestPracticesPage() {
                 <tr>
                   <td>vLLM vs Ollama vs llama.cpp vs SGLang vs TensorRT-LLM Serving 2026</td>
                   <td>
-                    <Ext href="https://vrlatech.com/llm-inference-engine-comparison-2026/">vrlatech.com/inference-engine-comparison-2026</Ext>
+                    <Ext href="https://vrlatech.com/llm-inference-engine-comparison-2026/">
+                      vrlatech.com/inference-engine-comparison-2026
+                    </Ext>
                   </td>
                 </tr>
                 <tr>
                   <td>Ollama vs llama.cpp vs vLLM vs TGI vs SGLang</td>
                   <td>
-                    <Ext href="https://sesamedisk.com/local-inference-engines-2026-comparison/">sesamedisk.com/local-inference-engines-2026</Ext>
+                    <Ext href="https://sesamedisk.com/local-inference-engines-2026-comparison/">
+                      sesamedisk.com/local-inference-engines-2026
+                    </Ext>
                   </td>
                 </tr>
                 <tr>
                   <td>Best LLM Inference Engines 2026</td>
                   <td>
-                    <Ext href="https://deploybase.ai/articles/best-llm-inference-engine">deploybase.ai/best-llm-inference-engine</Ext>
+                    <Ext href="https://deploybase.ai/articles/best-llm-inference-engine">
+                      deploybase.ai/best-llm-inference-engine
+                    </Ext>
                   </td>
                 </tr>
                 <tr>
                   <td>vLLM vs TensorRT-LLM vs SGLang: H100 Benchmarks (2026)</td>
                   <td>
-                    <Ext href="https://www.spheron.network/blog/vllm-vs-tensorrt-llm-vs-sglang-benchmarks/">spheron.network/vllm-tensorrt-sglang-benchmarks</Ext>
+                    <Ext href="https://www.spheron.network/blog/vllm-vs-tensorrt-llm-vs-sglang-benchmarks/">
+                      spheron.network/vllm-tensorrt-sglang-benchmarks
+                    </Ext>
                   </td>
                 </tr>
               </tbody>
@@ -943,13 +1039,18 @@ export default function LocalLlmBestPracticesPage() {
             <div className={styles.calloutIcon}>!</div>
             <div className={styles.calloutContent}>
               <p>
-                これは<strong>重みのみ</strong>の理論値です。実運用ではKVキャッシュ・アクティベーション・フレームワークオーバーヘッドにより、<strong>実際のVRAM使用量は理論値より10〜20%程度高くなる</strong>のが一般的です。OllamaはデフォルトでINT4量子化を用いるため、実運用感覚としてはINT4の数値に近いところで見積もると安全です。
+                これは<strong>重みのみ</strong>
+                の理論値です。実運用ではKVキャッシュ・アクティベーション・フレームワークオーバーヘッドにより、
+                <strong>実際のVRAM使用量は理論値より10〜20%程度高くなる</strong>
+                のが一般的です。OllamaはデフォルトでINT4量子化を用いるため、実運用感覚としてはINT4の数値に近いところで見積もると安全です。
               </p>
             </div>
           </div>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://onyx.app/self-hosted-llm-leaderboard">Best Self-Hosted LLM Leaderboard 2026 — Onyx</Ext>
+            <Ext href="https://onyx.app/self-hosted-llm-leaderboard">
+              Best Self-Hosted LLM Leaderboard 2026 — Onyx
+            </Ext>
           </p>
 
           <h3>6.2 GPU/マシン選定表</h3>
@@ -1009,23 +1110,28 @@ export default function LocalLlmBestPracticesPage() {
 
           <h3>6.3 総所有コスト(TCO)で見落としがちな要素</h3>
           <p>
-            自己ホスティングのコスト評価で最も多い誤りは、<strong>GPU購入費用しか数えないこと</strong>です。実際のTCOは3要素で構成されます。
+            自己ホスティングのコスト評価で最も多い誤りは、
+            <strong>GPU購入費用しか数えないこと</strong>です。実際のTCOは3要素で構成されます。
           </p>
           <ol>
             <li>
-              <strong>設備投資（CAPEX）</strong>：GPU本体、冷却システム、適切な定格の電源ユニット。マルチGPU構成では電源分配とサーバーシャーシも追加コスト
+              <strong>設備投資（CAPEX）</strong>
+              ：GPU本体、冷却システム、適切な定格の電源ユニット。マルチGPU構成では電源分配とサーバーシャーシも追加コスト
             </li>
             <li>
               <strong>電気代</strong>：最も見落とされがちな項目。例えばRTX
               5090はロード時575Wを消費し、$0.16/kWhの場合、単体GPUだけで月$65以上かかる計算になります
             </li>
             <li>
-              <strong>運用工数</strong>：継続的なパッチ適用、セキュリティ監視、パフォーマンスチューニングの人件費
+              <strong>運用工数</strong>
+              ：継続的なパッチ適用、セキュリティ監視、パフォーマンスチューニングの人件費
             </li>
           </ol>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://alpacked.io/blog/self-hosted-llm-guide/">Self-Hosted LLM Guide: Costs, Architecture &amp; Breakeven Point — Alpacked</Ext>
+            <Ext href="https://alpacked.io/blog/self-hosted-llm-guide/">
+              Self-Hosted LLM Guide: Costs, Architecture &amp; Breakeven Point — Alpacked
+            </Ext>
           </p>
 
           <h3>6.4 GPUパススルーとホームサーバー構成</h3>
@@ -1038,7 +1144,8 @@ export default function LocalLlmBestPracticesPage() {
               VT-dまたはAMD-Vi）を有効化し、GPUをvfio-pciにバインドしてからVMに渡す
             </li>
             <li>
-              <strong>LXCコンテナではなくVMへのフルパススルー</strong>を1GPUにつき1VMで構成する（Proxmoxホスト自体は統合グラフィックスで運用し、ディスクリートGPUは推論専用に確保）
+              <strong>LXCコンテナではなくVMへのフルパススルー</strong>
+              を1GPUにつき1VMで構成する（Proxmoxホスト自体は統合グラフィックスで運用し、ディスクリートGPUは推論専用に確保）
             </li>
             <li>
               電源保護として1500VA相当の正弦波UPSを導入（停電時に安全にシャットダウンするための10〜12分のバッファ）。GPU用電源はActive
@@ -1052,7 +1159,9 @@ export default function LocalLlmBestPracticesPage() {
           </div>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://www.digitalapplied.com/blog/home-ai-server-build-self-hosted-llm-2026-guide">Build a Home AI Server in 2026: Self-Hosted LLM Guide — Digital Applied</Ext>
+            <Ext href="https://www.digitalapplied.com/blog/home-ai-server-build-self-hosted-llm-2026-guide">
+              Build a Home AI Server in 2026: Self-Hosted LLM Guide — Digital Applied
+            </Ext>
           </p>
 
           <h3>6.5 ハードウェア選定の意思決定フロー</h3>
@@ -1071,22 +1180,32 @@ export default function LocalLlmBestPracticesPage() {
 
           <h3>7.1 KVキャッシュとコンテキスト管理</h3>
           <p>
-            長いマルチターンセッションでは、KVキャッシュの断片化が蓄積し、デコードスループットが低下します。llama.cppには<strong>KVキャッシュのデフラグ機能</strong>があり、断片化したキャッシュブロックを統合することでロングコンテキストでのデコード速度を改善できます。この種の設定は公式READMEやチェンジログで目立つ形では告知されないことがあるため、<code>llama-server</code>の開発者向け設定やコミュニティ（例:
+            長いマルチターンセッションでは、KVキャッシュの断片化が蓄積し、デコードスループットが低下します。llama.cppには
+            <strong>KVキャッシュのデフラグ機能</strong>
+            があり、断片化したキャッシュブロックを統合することでロングコンテキストでのデコード速度を改善できます。この種の設定は公式READMEやチェンジログで目立つ形では告知されないことがあるため、
+            <code>llama-server</code>の開発者向け設定やコミュニティ（例:
             r/LocalLLaMA）の議論を定期的に確認することを推奨します。
           </p>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://aiweekly.co/alerts/llamacpp-kv-cache-defrag-boosts-long-context-speed">llama.cpp KV Cache Defrag Boosts Long-Context Speed — AI Weekly</Ext>
+            <Ext href="https://aiweekly.co/alerts/llamacpp-kv-cache-defrag-boosts-long-context-speed">
+              llama.cpp KV Cache Defrag Boosts Long-Context Speed — AI Weekly
+            </Ext>
           </p>
 
           <h3>7.2 投機的デコード（Speculative Decoding）</h3>
           <p>
-            投機的デコードは、小型の「ドラフトモデル」が複数トークンを高速に提案し、大型の「ターゲットモデル」がそれをバッチで一括検証する手法です。提案が採用されればトークンは即座に確定し、棄却されれば再生成されます。バッチ処理はトークンを1つずつ逐次計算するより効率的であるため、ドラフトの的中率が高い場面では<strong>2〜3倍のスループット改善</strong>が報告されています。
+            投機的デコードは、小型の「ドラフトモデル」が複数トークンを高速に提案し、大型の「ターゲットモデル」がそれをバッチで一括検証する手法です。提案が採用されればトークンは即座に確定し、棄却されれば再生成されます。バッチ処理はトークンを1つずつ逐次計算するより効率的であるため、ドラフトの的中率が高い場面では
+            <strong>2〜3倍のスループット改善</strong>が報告されています。
           </p>
           <p>
-            llama.cppでは<code>llama-speculative</code>バイナリ、またはllama-serverの<code>--spec-*</code>系フラグ・<code>-md &lt;draft model&gt;</code>オプションでドラフトモデルを指定します。Apple Silicon上では、Multi-Token
+            llama.cppでは<code>llama-speculative</code>バイナリ、またはllama-serverの
+            <code>--spec-*</code>系フラグ・<code>-md &lt;draft model&gt;</code>
+            オプションでドラフトモデルを指定します。Apple Silicon上では、Multi-Token
             Prediction（MTP）対応モデル（例:
-            Qwen3.5/3.6シリーズ）でネイティブに投機的デコードが有効化でき、<code>--cache-reuse</code>と併用することでデコード側とプレフィル側の双方を圧縮できます（前者はプレフィルを圧縮、後者はデコードを圧縮するため、置き換えではなく併用が前提）。
+            Qwen3.5/3.6シリーズ）でネイティブに投機的デコードが有効化でき、
+            <code>--cache-reuse</code>
+            と併用することでデコード側とプレフィル側の双方を圧縮できます（前者はプレフィルを圧縮、後者はデコードを圧縮するため、置き換えではなく併用が前提）。
           </p>
 
           <div className={`${styles.callout} ${styles.calloutDanger}`}>
@@ -1094,7 +1213,10 @@ export default function LocalLlmBestPracticesPage() {
             <div className={styles.calloutContent}>
               <p>
                 運用上の注意：DeltaNet層とGated
-                Attention層を組み合わせたハイブリッドアーキテクチャ（Qwen3.5/3.6系）では、ドラフトが棄却された際の内部状態のロールバック処理が2026年5月時点でまだ活発に開発中の領域です。本番運用では、<code>master</code>の最新ビルドを追いかけるのではなく、<strong>動作検証済みのコミットハッシュに固定</strong>し、アップグレード前に必ず再検証してください。
+                Attention層を組み合わせたハイブリッドアーキテクチャ（Qwen3.5/3.6系）では、ドラフトが棄却された際の内部状態のロールバック処理が2026年5月時点でまだ活発に開発中の領域です。本番運用では、
+                <code>master</code>の最新ビルドを追いかけるのではなく、
+                <strong>動作検証済みのコミットハッシュに固定</strong>
+                し、アップグレード前に必ず再検証してください。
               </p>
             </div>
           </div>
@@ -1111,19 +1233,25 @@ export default function LocalLlmBestPracticesPage() {
                 <tr>
                   <td>llama.cpp/docs/speculative.md</td>
                   <td>
-                    <Ext href="https://github.com/ggml-org/llama.cpp/blob/master/docs/speculative.md">github.com/ggml-org/llama.cpp/docs/speculative.md</Ext>
+                    <Ext href="https://github.com/ggml-org/llama.cpp/blob/master/docs/speculative.md">
+                      github.com/ggml-org/llama.cpp/docs/speculative.md
+                    </Ext>
                   </td>
                 </tr>
                 <tr>
                   <td>Tuning llama-server on Apple Silicon</td>
                   <td>
-                    <Ext href="https://medium.com/@michael.hannecke/tuning-llama-server-on-apple-silicon-9b3e778ab100">medium.com/tuning-llama-server-apple-silicon</Ext>
+                    <Ext href="https://medium.com/@michael.hannecke/tuning-llama-server-on-apple-silicon-9b3e778ab100">
+                      medium.com/tuning-llama-server-apple-silicon
+                    </Ext>
                   </td>
                 </tr>
                 <tr>
                   <td>Tune llama.cpp on Apple Silicon: 7 Flags</td>
                   <td>
-                    <Ext href="https://medium.com/@michael.hannecke/tuning-llama-cpp-on-apple-silicon-843f37a6c3dc">medium.com/tuning-llama-cpp-apple-silicon</Ext>
+                    <Ext href="https://medium.com/@michael.hannecke/tuning-llama-cpp-on-apple-silicon-843f37a6c3dc">
+                      medium.com/tuning-llama-cpp-apple-silicon
+                    </Ext>
                   </td>
                 </tr>
               </tbody>
@@ -1141,31 +1269,45 @@ export default function LocalLlmBestPracticesPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td><code>--ctx-size</code></td>
+                  <td>
+                    <code>--ctx-size</code>
+                  </td>
                   <td>コンテキストウィンドウの長さ</td>
                 </tr>
                 <tr>
-                  <td><code>--n-gpu-layers</code></td>
+                  <td>
+                    <code>--n-gpu-layers</code>
+                  </td>
                   <td>GPUにオフロードするレイヤー数（VRAMと相談）</td>
                 </tr>
                 <tr>
-                  <td><code>--parallel</code></td>
+                  <td>
+                    <code>--parallel</code>
+                  </td>
                   <td>同時処理するスロット数</td>
                 </tr>
                 <tr>
-                  <td><code>--batch-size</code> / <code>--ubatch-size</code></td>
+                  <td>
+                    <code>--batch-size</code> / <code>--ubatch-size</code>
+                  </td>
                   <td>プロンプト処理・デコードのバッチサイズ</td>
                 </tr>
                 <tr>
-                  <td><code>--spec-*</code> / <code>-md &lt;model&gt;</code></td>
+                  <td>
+                    <code>--spec-*</code> / <code>-md &lt;model&gt;</code>
+                  </td>
                   <td>投機的デコードのドラフトモデル指定</td>
                 </tr>
                 <tr>
-                  <td><code>--cache-reuse</code></td>
+                  <td>
+                    <code>--cache-reuse</code>
+                  </td>
                   <td>プレフィックス共有によるプレフィル圧縮</td>
                 </tr>
                 <tr>
-                  <td><code>--no-mmap</code></td>
+                  <td>
+                    <code>--no-mmap</code>
+                  </td>
                   <td>
                     メモリマップ読み込みを無効化（統合メモリ環境での挙動調整に使用されることがある）
                   </td>
@@ -1176,11 +1318,14 @@ export default function LocalLlmBestPracticesPage() {
 
           <h3>7.4 継続的バッチ処理とアテンション最適化</h3>
           <p>
-            vLLMの<strong>PagedAttention</strong>とSGLangの<strong>RadixAttention</strong>は、いずれもKVキャッシュのメモリ効率を改善する技術ですが、狙いが異なります。PagedAttentionはKVキャッシュをページ単位で管理してメモリ断片化を防ぐことでバッチサイズ（＝同時ユーザー数）を最大化するのに対し、RadixAttentionは同一システムプロンプトや共有コンテキストをトライ木構造でキャッシュし、再計算を避けることでTTFT（初回トークンまでの時間）を短縮します。この違いが、5.4節の意思決定フローで「一般チャット→vLLM」「エージェント/RAG反復プロンプト→SGLang」という切り分けの技術的根拠になっています。
+            vLLMの<strong>PagedAttention</strong>とSGLangの<strong>RadixAttention</strong>
+            は、いずれもKVキャッシュのメモリ効率を改善する技術ですが、狙いが異なります。PagedAttentionはKVキャッシュをページ単位で管理してメモリ断片化を防ぐことでバッチサイズ（＝同時ユーザー数）を最大化するのに対し、RadixAttentionは同一システムプロンプトや共有コンテキストをトライ木構造でキャッシュし、再計算を避けることでTTFT（初回トークンまでの時間）を短縮します。この違いが、5.4節の意思決定フローで「一般チャット→vLLM」「エージェント/RAG反復プロンプト→SGLang」という切り分けの技術的根拠になっています。
           </p>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://deploybase.ai/articles/best-llm-inference-engine">Best LLM Inference Engines 2026 — DeployBase</Ext>
+            <Ext href="https://deploybase.ai/articles/best-llm-inference-engine">
+              Best LLM Inference Engines 2026 — DeployBase
+            </Ext>
           </p>
 
           <h3>7.5 ハードウェア/エンジン別チューニングの使い分け</h3>
@@ -1203,26 +1348,34 @@ export default function LocalLlmBestPracticesPage() {
           </p>
           <ul>
             <li>
-              <strong>推論APIエンドポイントへの不正アクセス</strong>：ネットワーク境界の設計ミスで最も直接的に露出する経路
+              <strong>推論APIエンドポイントへの不正アクセス</strong>
+              ：ネットワーク境界の設計ミスで最も直接的に露出する経路
             </li>
             <li>
-              <strong>プロンプトインジェクション</strong>（直接・間接）：モデルにシステムプロンプトを漏洩させたり、安全フィルタを回避させたりする
+              <strong>プロンプトインジェクション</strong>
+              （直接・間接）：モデルにシステムプロンプトを漏洩させたり、安全フィルタを回避させたりする
             </li>
             <li>
-              <strong>モデル重みの窃取</strong>：ファイルシステムへの不適切なアクセス権限による知的財産の直接的リスク
+              <strong>モデル重みの窃取</strong>
+              ：ファイルシステムへの不適切なアクセス権限による知的財産の直接的リスク
             </li>
             <li>
-              <strong>RAG連携ナレッジベース経由のデータ漏洩</strong>：検索対象データに埋め込まれた悪意ある指示（間接プロンプトインジェクション）
+              <strong>RAG連携ナレッジベース経由のデータ漏洩</strong>
+              ：検索対象データに埋め込まれた悪意ある指示（間接プロンプトインジェクション）
             </li>
           </ul>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://www.sitepoint.com/local-llm-security-best-practices-2026/">Local LLM Security Best Practices for Enterprise in 2026 — SitePoint</Ext>
+            <Ext href="https://www.sitepoint.com/local-llm-security-best-practices-2026/">
+              Local LLM Security Best Practices for Enterprise in 2026 — SitePoint
+            </Ext>
           </p>
 
           <h3>8.2 ネットワーク露出：Ollamaを例にした鉄則</h3>
           <p>
-            多くの「褒めるだけ」のガイドが省略する、しかし実際に侵害の原因となりやすいポイントとして、<strong>Ollamaには組み込みの認証機構がありません</strong>。ポート11434を公衆インターネットに転送したり、Tailscale
+            多くの「褒めるだけ」のガイドが省略する、しかし実際に侵害の原因となりやすいポイントとして、
+            <strong>Ollamaには組み込みの認証機構がありません</strong>
+            。ポート11434を公衆インターネットに転送したり、Tailscale
             Funnel（公開機能）で公開したりすると、発見した第三者はモデル一覧の列挙・推論の実行・ローカル重みの取得までできてしまいます。
           </p>
           <p>安全にリモートアクセスする方法は実質的に3通りに整理できます。</p>
@@ -1238,12 +1391,16 @@ export default function LocalLlmBestPracticesPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>Tailscale <strong>Serve</strong>（プライベート、tailnet内のみ）</td>
+                  <td>
+                    Tailscale <strong>Serve</strong>（プライベート、tailnet内のみ）
+                  </td>
                   <td>◎ 公衆インターネットに攻撃対象面が一切存在しない</td>
                   <td>ホームラボ・個人利用のデフォルト推奨</td>
                 </tr>
                 <tr>
-                  <td>Tailscale <strong>Funnel</strong>（公開）</td>
+                  <td>
+                    Tailscale <strong>Funnel</strong>（公開）
+                  </td>
                   <td>× 未認証エンドポイントには危険</td>
                   <td>認証を別途実装しない限り非推奨</td>
                 </tr>
@@ -1267,17 +1424,21 @@ export default function LocalLlmBestPracticesPage() {
           </div>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://www.digitalapplied.com/blog/home-ai-server-build-self-hosted-llm-2026-guide">Build a Home AI Server in 2026 — Digital Applied</Ext>
+            <Ext href="https://www.digitalapplied.com/blog/home-ai-server-build-self-hosted-llm-2026-guide">
+              Build a Home AI Server in 2026 — Digital Applied
+            </Ext>
           </p>
 
           <h3>8.3 認証・認可・監査ログ</h3>
           <p>安全な構成には、以下を最低ラインとして設計してください。</p>
           <ul>
             <li>
-              推論エンドポイントすべてに<strong>スコープ付きクレームと短い有効期限を持つJWT認証</strong>を実装
+              推論エンドポイントすべてに
+              <strong>スコープ付きクレームと短い有効期限を持つJWT認証</strong>を実装
             </li>
             <li>
-              <strong>RBAC（ロールベースアクセス制御）</strong>で、推論利用者・プロンプトエンジニア・モデル管理者・監査者の役割を分離
+              <strong>RBAC（ロールベースアクセス制御）</strong>
+              で、推論利用者・プロンプトエンジニア・モデル管理者・監査者の役割を分離
             </li>
             <li>
               モデルファイルへのファイルシステムアクセス権限を最小権限化し、重み窃取のリスクを低減
@@ -1285,12 +1446,18 @@ export default function LocalLlmBestPracticesPage() {
           </ul>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://www.sitepoint.com/local-llm-security-best-practices-2026/">Local LLM Security Best Practices for Enterprise in 2026 — SitePoint</Ext>
+            <Ext href="https://www.sitepoint.com/local-llm-security-best-practices-2026/">
+              Local LLM Security Best Practices for Enterprise in 2026 — SitePoint
+            </Ext>
           </p>
 
           <h3>8.4 プロンプトインジェクション：OWASPの最大の課題</h3>
           <p>
-            プロンプトインジェクションは2026年時点でもOWASPのLLMアプリケーション脆弱性ランキングの第1位であり、状況は悪化傾向にあると報告されています。ある調査では本番AIデプロイの73%にプロンプトインジェクション脆弱性が存在するとされ、根本原因は<strong>「LLMは指示とデータを同じチャネル（トークン列）で処理しており、システムプロンプトとユーザー入力の間にアーキテクチャ上の分離がない」</strong>という構造的な問題です。
+            プロンプトインジェクションは2026年時点でもOWASPのLLMアプリケーション脆弱性ランキングの第1位であり、状況は悪化傾向にあると報告されています。ある調査では本番AIデプロイの73%にプロンプトインジェクション脆弱性が存在するとされ、根本原因は
+            <strong>
+              「LLMは指示とデータを同じチャネル（トークン列）で処理しており、システムプロンプトとユーザー入力の間にアーキテクチャ上の分離がない」
+            </strong>
+            という構造的な問題です。
           </p>
 
           <div className={styles.tableWrap}>
@@ -1320,11 +1487,15 @@ export default function LocalLlmBestPracticesPage() {
 
           <p>
             MCP（Model Context
-            Protocol）やエージェント的ワークフロー、ツール使用型LLMの普及により、プロンプトインジェクション成功時の被害範囲は「チャットボットに不適切な発言をさせる」レベルから、<strong>「非公開データの窃取」「未承認アクションの実行」「システム全体の侵害」</strong>まで拡大しています。
+            Protocol）やエージェント的ワークフロー、ツール使用型LLMの普及により、プロンプトインジェクション成功時の被害範囲は「チャットボットに不適切な発言をさせる」レベルから、
+            <strong>「非公開データの窃取」「未承認アクションの実行」「システム全体の侵害」</strong>
+            まで拡大しています。
           </p>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://www.kunalganglani.com/blog/prompt-injection-2026-owasp-llm-vulnerability">Prompt Injection in 2026: Still OWASP's Number One LLM Vulnerability</Ext>
+            <Ext href="https://www.kunalganglani.com/blog/prompt-injection-2026-owasp-llm-vulnerability">
+              Prompt Injection in 2026: Still OWASP's Number One LLM Vulnerability
+            </Ext>
           </p>
 
           <h3>8.5 対策の基本姿勢：「いずれ突破される」前提での封じ込め</h3>
@@ -1333,18 +1504,25 @@ export default function LocalLlmBestPracticesPage() {
           </p>
           <ol>
             <li>
-              <strong>プロンプトインジェクションはいずれ成功すると想定し、まず封じ込め（コンテインメント）を設計する</strong>：最小権限、出力検証、ログ記録、指示とデータの明確な分離
+              <strong>
+                プロンプトインジェクションはいずれ成功すると想定し、まず封じ込め（コンテインメント）を設計する
+              </strong>
+              ：最小権限、出力検証、ログ記録、指示とデータの明確な分離
             </li>
             <li>
-              <strong>モデルレベルのガードレールだけに依存しない</strong>：エージェント・API・データストア・ワークフロー・人間のプロセス全体にわたる多層防御が必要
+              <strong>モデルレベルのガードレールだけに依存しない</strong>
+              ：エージェント・API・データストア・ワークフロー・人間のプロセス全体にわたる多層防御が必要
             </li>
             <li>
-              <strong>LLMの用途をマッピングする</strong>：どのデータを読めるか、どのツールを呼べるか、どんなアクションを起こせるかを棚卸しすることから始める
+              <strong>LLMの用途をマッピングする</strong>
+              ：どのデータを読めるか、どのツールを呼べるか、どんなアクションを起こせるかを棚卸しすることから始める
             </li>
           </ol>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://sombrainc.com/blog/llm-security-risks-2026">LLM Security Risks in 2026: Prompt Injection, RAG, and Shadow AI — Sombra</Ext>
+            <Ext href="https://sombrainc.com/blog/llm-security-risks-2026">
+              LLM Security Risks in 2026: Prompt Injection, RAG, and Shadow AI — Sombra
+            </Ext>
           </p>
 
           <h3>8.6 OWASP LLM Top 10 マッピング（抜粋）</h3>
@@ -1385,13 +1563,17 @@ export default function LocalLlmBestPracticesPage() {
           </div>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://www.getmaxim.ai/articles/top-5-llm-security-tools-for-enterprise-ai-applications-in-2026/">Top 5 LLM Security Tools for Enterprise AI Applications in 2026 — Maxim</Ext>
+            <Ext href="https://www.getmaxim.ai/articles/top-5-llm-security-tools-for-enterprise-ai-applications-in-2026/">
+              Top 5 LLM Security Tools for Enterprise AI Applications in 2026 — Maxim
+            </Ext>
           </p>
 
           <h3>8.7 多層防御アーキテクチャ</h3>
           <div className={styles.mermaidWrap}>
             <MermaidDiagram chart={DIAGRAMS.defenseLayers} />
-            <div className={styles.mermaidCaption}>図7. 多層防御（Defense-in-Depth）アーキテクチャ</div>
+            <div className={styles.mermaidCaption}>
+              図7. 多層防御（Defense-in-Depth）アーキテクチャ
+            </div>
           </div>
 
           <h3>8.8 組織的リスク：シャドーAI</h3>
@@ -1400,7 +1582,9 @@ export default function LocalLlmBestPracticesPage() {
           </p>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://sombrainc.com/blog/llm-security-risks-2026">LLM Security Risks in 2026 — Sombra</Ext>
+            <Ext href="https://sombrainc.com/blog/llm-security-risks-2026">
+              LLM Security Risks in 2026 — Sombra
+            </Ext>
           </p>
 
           <div className={styles.tableWrap}>
@@ -1415,19 +1599,25 @@ export default function LocalLlmBestPracticesPage() {
                 <tr>
                   <td>Open LLM Security Risks and Best Practices</td>
                   <td>
-                    <Ext href="https://solutionshub.epam.com/blog/post/llm-security">solutionshub.epam.com/llm-security</Ext>
+                    <Ext href="https://solutionshub.epam.com/blog/post/llm-security">
+                      solutionshub.epam.com/llm-security
+                    </Ext>
                   </td>
                 </tr>
                 <tr>
                   <td>LLM Security 2026: Top Ultimate Guide to Risks &amp; Protection</td>
                   <td>
-                    <Ext href="https://www.asappstudio.com/llm-security-2026/">asappstudio.com/llm-security-2026</Ext>
+                    <Ext href="https://www.asappstudio.com/llm-security-2026/">
+                      asappstudio.com/llm-security-2026
+                    </Ext>
                   </td>
                 </tr>
                 <tr>
                   <td>Prompt Injection in LLMs: Complete Guide for 2026</td>
                   <td>
-                    <Ext href="https://capturethebug.xyz/blogs/Prompt-Injection-in-LLMs-Complete-Guide-for-2026">capturethebug.xyz/prompt-injection-2026</Ext>
+                    <Ext href="https://capturethebug.xyz/blogs/Prompt-Injection-in-LLMs-Complete-Guide-for-2026">
+                      capturethebug.xyz/prompt-injection-2026
+                    </Ext>
                   </td>
                 </tr>
               </tbody>
@@ -1483,7 +1673,11 @@ export default function LocalLlmBestPracticesPage() {
 
           <p>
             プラットフォームによって既定のベクトルストアが異なる点にも注意してください。AnythingLLMはLanceDB、PrivateGPTはQdrantまたはChroma、Open
-            WebUIはChromaDBを標準採用しており、<strong>埋め込みモデルが同一でもメタデータスキーマが異なるため、プラットフォームの切り替えは実質的な再インデックス作業を伴います</strong>。埋め込みモデルは検索精度で選び、プラットフォームはそれ以外の要件（UI、運用性、統合性）で選ぶのが実務的な切り分けです。
+            WebUIはChromaDBを標準採用しており、
+            <strong>
+              埋め込みモデルが同一でもメタデータスキーマが異なるため、プラットフォームの切り替えは実質的な再インデックス作業を伴います
+            </strong>
+            。埋め込みモデルは検索精度で選び、プラットフォームはそれ以外の要件（UI、運用性、統合性）で選ぶのが実務的な切り分けです。
           </p>
 
           <div className={styles.tableWrap}>
@@ -1498,13 +1692,17 @@ export default function LocalLlmBestPracticesPage() {
                 <tr>
                   <td>Best Embedding Models for Local RAG in 2026 (Tested on Real Documents)</td>
                   <td>
-                    <Ext href="https://www.promptquorum.com/power-local-llm/best-embedding-models-local-rag-2026">promptquorum.com/best-embedding-models-2026</Ext>
+                    <Ext href="https://www.promptquorum.com/power-local-llm/best-embedding-models-local-rag-2026">
+                      promptquorum.com/best-embedding-models-2026
+                    </Ext>
                   </td>
                 </tr>
                 <tr>
                   <td>The Ultimate Guide to Finding the Best Local Models for RAG in 2026</td>
                   <td>
-                    <Ext href="https://lmsa.app/blog/the-ultimate-guide-to-finding-the-best-local-models-for-rag-in-2026/">lmsa.app/best-local-models-for-rag-2026</Ext>
+                    <Ext href="https://lmsa.app/blog/the-ultimate-guide-to-finding-the-best-local-models-for-rag-in-2026/">
+                      lmsa.app/best-local-models-for-rag-2026
+                    </Ext>
                   </td>
                 </tr>
               </tbody>
@@ -1574,13 +1772,17 @@ export default function LocalLlmBestPracticesPage() {
                 <tr>
                   <td>Best Open-Source Vector Databases for LLMs in 2026</td>
                   <td>
-                    <Ext href="https://www.turingpost.com/p/vector-databases-libraries-resources">turingpost.com/vector-databases-resources</Ext>
+                    <Ext href="https://www.turingpost.com/p/vector-databases-libraries-resources">
+                      turingpost.com/vector-databases-resources
+                    </Ext>
                   </td>
                 </tr>
                 <tr>
                   <td>Top 10 Vector Databases for LLM Applications in 2026</td>
                   <td>
-                    <Ext href="https://www.secondtalent.com/resources/top-vector-databases-for-llm-applications/">secondtalent.com/top-vector-databases</Ext>
+                    <Ext href="https://www.secondtalent.com/resources/top-vector-databases-for-llm-applications/">
+                      secondtalent.com/top-vector-databases
+                    </Ext>
                   </td>
                 </tr>
               </tbody>
@@ -1590,11 +1792,15 @@ export default function LocalLlmBestPracticesPage() {
           <h3>9.4 次元削減によるストレージ最適化（MRL）</h3>
           <p>
             Matryoshka Representation
-            Learning（MRL）は、埋め込みベクトルの先頭N次元だけでも単独で意味を保つように学習する手法です。例えば3072次元のベクトルを256次元に切り詰めても意味的な質の大部分を保持でき、<strong>3072→256次元で約12倍のストレージ削減</strong>が可能になります。ベクトルDBのストレージ・メモリコストを大幅に下げられる一方、精度は段階的に低下する（一般的な傾向として3072次元を100%とすると、1024次元で約95%、512次元で約90%、256次元で約85%程度という報告があります）ため、精度要件とコストのトレードオフとして次元数を選定してください。
+            Learning（MRL）は、埋め込みベクトルの先頭N次元だけでも単独で意味を保つように学習する手法です。例えば3072次元のベクトルを256次元に切り詰めても意味的な質の大部分を保持でき、
+            <strong>3072→256次元で約12倍のストレージ削減</strong>
+            が可能になります。ベクトルDBのストレージ・メモリコストを大幅に下げられる一方、精度は段階的に低下する（一般的な傾向として3072次元を100%とすると、1024次元で約95%、512次元で約90%、256次元で約85%程度という報告があります）ため、精度要件とコストのトレードオフとして次元数を選定してください。
           </p>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://milvus.io/blog/choose-embedding-model-rag-2026.md">Best Embedding Model for RAG 2026: 10 Models Compared — Milvus Blog</Ext>
+            <Ext href="https://milvus.io/blog/choose-embedding-model-rag-2026.md">
+              Best Embedding Model for RAG 2026: 10 Models Compared — Milvus Blog
+            </Ext>
           </p>
 
           <h3>9.5 RAG向けローカルLLMの選定</h3>
@@ -1604,7 +1810,9 @@ export default function LocalLlmBestPracticesPage() {
           </p>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://lmsa.app/blog/the-ultimate-guide-to-finding-the-best-local-models-for-rag-in-2026/">The Ultimate Guide to Finding the Best Local Models for RAG in 2026 — LMSA</Ext>
+            <Ext href="https://lmsa.app/blog/the-ultimate-guide-to-finding-the-best-local-models-for-rag-in-2026/">
+              The Ultimate Guide to Finding the Best Local Models for RAG in 2026 — LMSA
+            </Ext>
           </p>
         </section>
 
@@ -1617,7 +1825,11 @@ export default function LocalLlmBestPracticesPage() {
 
           <h3>10.1 まず「本当にファインチューニングが必要か」を判断する</h3>
           <p>
-            2026年時点の実務知識として、<strong>「ファインチューニングが必要」という要望の約80%は、実はより良いRAG・プロンプトエンジニアリングで解決できる</strong>という指摘が複数の実務家から共有されています。ファインチューニングは「モデルにどう応答するかを教える」もの、RAGは「モデルに何を答えるべきかの材料を与える」ものという役割分担で捉えると判断しやすくなります。
+            2026年時点の実務知識として、
+            <strong>
+              「ファインチューニングが必要」という要望の約80%は、実はより良いRAG・プロンプトエンジニアリングで解決できる
+            </strong>
+            という指摘が複数の実務家から共有されています。ファインチューニングは「モデルにどう応答するかを教える」もの、RAGは「モデルに何を答えるべきかの材料を与える」ものという役割分担で捉えると判断しやすくなります。
           </p>
 
           <div className={styles.mermaidWrap}>
@@ -1626,7 +1838,9 @@ export default function LocalLlmBestPracticesPage() {
           </div>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://hjlabs.in/AIML/blog/post/llm-fine-tuning-best-practices.html">LLM Fine-Tuning Best Practices 2026 — hjLabs</Ext>
+            <Ext href="https://hjlabs.in/AIML/blog/post/llm-fine-tuning-best-practices.html">
+              LLM Fine-Tuning Best Practices 2026 — hjLabs
+            </Ext>
           </p>
 
           <h3>10.2 LoRA と QLoRA のVRAM要件</h3>
@@ -1663,7 +1877,9 @@ export default function LocalLlmBestPracticesPage() {
           </p>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://www.sitepoint.com/fine-tune-local-llms-2026/">Fine-Tune Local LLMs 2026 | Practical Guide — SitePoint</Ext>
+            <Ext href="https://www.sitepoint.com/fine-tune-local-llms-2026/">
+              Fine-Tune Local LLMs 2026 | Practical Guide — SitePoint
+            </Ext>
           </p>
 
           <h3>10.3 ハイパーパラメータの実務的デフォルト</h3>
@@ -1695,50 +1911,76 @@ export default function LocalLlmBestPracticesPage() {
             </table>
           </div>
           <p>
-            ランクを不必要に高く設定すると、<strong>rsLoRA（rank-stabilized LoRA）を併用しない限り学習が不安定になりやすい</strong>という指摘があるため、高ランクを使う場合はrsLoRAの利用を検討してください。また2026年に注目されている改良手法として<strong>DoRA（Weight-Decomposed LoRA）</strong>があり、重みの更新を大きさ（magnitude）と方向（direction）に分解することで収束が改善するケースが報告されています。
+            ランクを不必要に高く設定すると、
+            <strong>rsLoRA（rank-stabilized LoRA）を併用しない限り学習が不安定になりやすい</strong>
+            という指摘があるため、高ランクを使う場合はrsLoRAの利用を検討してください。また2026年に注目されている改良手法として
+            <strong>DoRA（Weight-Decomposed LoRA）</strong>
+            があり、重みの更新を大きさ（magnitude）と方向（direction）に分解することで収束が改善するケースが報告されています。
           </p>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://explore.n1n.ai/blog/fine-tune-llm-lora-qlora-guide-2026-2026-04-17">Comprehensive Guide to Fine-Tuning LLMs with LoRA and QLoRA in 2026 — n1n.ai</Ext>
+            <Ext href="https://explore.n1n.ai/blog/fine-tune-llm-lora-qlora-guide-2026-2026-04-17">
+              Comprehensive Guide to Fine-Tuning LLMs with LoRA and QLoRA in 2026 — n1n.ai
+            </Ext>
           </p>
 
           <h3>10.4 データ品質 &gt; データ量</h3>
           <p>
-            LIMA論文の知見は2026年でも通用するとされ、<strong>1,000件の丁寧に精選されたサンプルが、10万件のノイズの多いサンプルを上回る</strong>ことが珍しくありません。ファインチューニングに着手する前に、まずデータセットの品質管理に投資することが費用対効果の高い選択です。
+            LIMA論文の知見は2026年でも通用するとされ、
+            <strong>
+              1,000件の丁寧に精選されたサンプルが、10万件のノイズの多いサンプルを上回る
+            </strong>
+            ことが珍しくありません。ファインチューニングに着手する前に、まずデータセットの品質管理に投資することが費用対効果の高い選択です。
           </p>
 
           <h3>10.5 学習パイプラインと評価</h3>
           <p>
             一般的なパイプラインは「SFT（教師ありファインチューニング）→ DPO（Direct Preference
-            Optimization）」の順で構成され、<strong>DPOは多くの本番チームでRLHFに取って代わりつつあります</strong>（より安価で安定しており、品質面でも遜色ないとされる）。
+            Optimization）」の順で構成され、
+            <strong>DPOは多くの本番チームでRLHFに取って代わりつつあります</strong>
+            （より安価で安定しており、品質面でも遜色ないとされる）。
           </p>
           <p>
             評価は学習ロスだけに頼らないことが重要です。ロスが下がるだけではデータの単純な暗記（過学習）と区別がつきません。以下を組み合わせて評価してください。
           </p>
           <ul>
-            <li><strong>パープレキシティ</strong>：保留データセットに対する予測精度</li>
+            <li>
+              <strong>パープレキシティ</strong>：保留データセットに対する予測精度
+            </li>
             <li>
               <strong>MMLU差分</strong>：一般知識の破滅的忘却（catastrophic
               forgetting）が起きていないか。<strong>3ポイント以上の低下は危険信号</strong>
             </li>
             <li>
-              <strong>ドメイン評価セット</strong>：MMLU、GSM8K、HumanEvalなど汎用ベンチマークに加え、自社ドメイン固有の評価セット
+              <strong>ドメイン評価セット</strong>
+              ：MMLU、GSM8K、HumanEvalなど汎用ベンチマークに加え、自社ドメイン固有の評価セット
             </li>
-            <li><strong>LLM-as-a-Judge</strong>：より強力なモデルにルーブリックで採点させる</li>
+            <li>
+              <strong>LLM-as-a-Judge</strong>：より強力なモデルにルーブリックで採点させる
+            </li>
           </ul>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://explore.n1n.ai/blog/fine-tune-llm-lora-qlora-guide-2026-2026-04-17">Comprehensive Guide to Fine-Tuning LLMs with LoRA and QLoRA in 2026 — n1n.ai</Ext>
+            <Ext href="https://explore.n1n.ai/blog/fine-tune-llm-lora-qlora-guide-2026-2026-04-17">
+              Comprehensive Guide to Fine-Tuning LLMs with LoRA and QLoRA in 2026 — n1n.ai
+            </Ext>
           </p>
 
           <h3>10.6 複数LoRAアダプタの本番サービング</h3>
           <p>
-            vLLMの<code>--enable-lora</code>オプションを使うと、単一のベースモデルロード上で複数のLoRAアダプタを動的にホットスワップでき、A100
-            1台上に多数のファインチューン版を無視できるほどの追加オーバーヘッドで同居させられます。5〜10個程度のアダプタであればvLLM・SGLangどちらでも問題なく動作しますが、<strong>50個以上の異種トラフィックパターンを持つアダプタ群を扱う場合はSGLangのネイティブバッチングの方がスケジューリングが洗練されている</strong>という報告があります。
+            vLLMの<code>--enable-lora</code>
+            オプションを使うと、単一のベースモデルロード上で複数のLoRAアダプタを動的にホットスワップでき、A100
+            1台上に多数のファインチューン版を無視できるほどの追加オーバーヘッドで同居させられます。5〜10個程度のアダプタであればvLLM・SGLangどちらでも問題なく動作しますが、
+            <strong>
+              50個以上の異種トラフィックパターンを持つアダプタ群を扱う場合はSGLangのネイティブバッチングの方がスケジューリングが洗練されている
+            </strong>
+            という報告があります。
           </p>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://hjlabs.in/AIML/blog/post/llm-fine-tuning-best-practices.html">LLM Fine-Tuning Best Practices 2026 — hjLabs</Ext>
+            <Ext href="https://hjlabs.in/AIML/blog/post/llm-fine-tuning-best-practices.html">
+              LLM Fine-Tuning Best Practices 2026 — hjLabs
+            </Ext>
             ／
             <Ext href="https://techsy.io/en/blog/vllm-vs-sglang">vLLM vs SGLang 2026 — TECHSY</Ext>
           </p>
@@ -1776,7 +2018,9 @@ export default function LocalLlmBestPracticesPage() {
           </div>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://effloow.com/articles/llm-fine-tuning-lora-qlora-guide-2026">Fine-Tune LLMs with LoRA and QLoRA: 2026 Guide — Effloow</Ext>
+            <Ext href="https://effloow.com/articles/llm-fine-tuning-lora-qlora-guide-2026">
+              Fine-Tune LLMs with LoRA and QLoRA: 2026 Guide — Effloow
+            </Ext>
           </p>
         </section>
 
@@ -1790,7 +2034,11 @@ export default function LocalLlmBestPracticesPage() {
           <h3>11.1 従来のAPI監視では足りない理由</h3>
           <p>
             LLMサービングは通常のREST
-            APIとは異なる力学で動きます。トークン単位の処理、継続的バッチ処理、KVキャッシュの圧力、キュー動態が支配的な要因になるため、<strong>RPS・p95レイテンシ・エラー率だけの伝統的なAPI監視は必要条件ではあっても十分条件ではありません</strong>。
+            APIとは異なる力学で動きます。トークン単位の処理、継続的バッチ処理、KVキャッシュの圧力、キュー動態が支配的な要因になるため、
+            <strong>
+              RPS・p95レイテンシ・エラー率だけの伝統的なAPI監視は必要条件ではあっても十分条件ではありません
+            </strong>
+            。
           </p>
           <p>LLM推論特有に追加すべき指標は次の通りです。</p>
           <div className={styles.tableWrap}>
@@ -1839,17 +2087,25 @@ export default function LocalLlmBestPracticesPage() {
           </div>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://www.glukhov.org/observability/observability-for-llm-systems/">Observability for LLM Systems: Metrics, Traces, Logs, and Testing in Production — Rost Glukhov</Ext>
+            <Ext href="https://www.glukhov.org/observability/observability-for-llm-systems/">
+              Observability for LLM Systems: Metrics, Traces, Logs, and Testing in Production — Rost
+              Glukhov
+            </Ext>
           </p>
 
           <h3>11.2 監視スタック構成</h3>
           <div className={styles.mermaidWrap}>
             <MermaidDiagram chart={DIAGRAMS.monitoringStack} />
-            <div className={styles.mermaidCaption}>図10. Prometheus / Grafana / DCGM 監視スタック構成</div>
+            <div className={styles.mermaidCaption}>
+              図10. Prometheus / Grafana / DCGM 監視スタック構成
+            </div>
           </div>
 
           <p>
-            vLLMは<code>vllm:</code>プレフィックス付きのPrometheus互換<code>/metrics</code>エンドポイントを公開し、実行中リクエスト数やKVキャッシュ使用率などのゲージを提供します。TGIも<code>/metrics</code>でキューサイズ・リクエスト時間・キュー時間・平均トークン時間等の本番グレードの指標を公開しています。GPU単体の可視性（使用率・VRAM・温度）にはNVIDIA
+            vLLMは<code>vllm:</code>プレフィックス付きのPrometheus互換<code>/metrics</code>
+            エンドポイントを公開し、実行中リクエスト数やKVキャッシュ使用率などのゲージを提供します。TGIも
+            <code>/metrics</code>
+            でキューサイズ・リクエスト時間・キュー時間・平均トークン時間等の本番グレードの指標を公開しています。GPU単体の可視性（使用率・VRAM・温度）にはNVIDIA
             DCGM
             ExporterをPrometheusと組み合わせるのが標準的です。NVIDIAは主要GPU指標を可視化するGrafanaダッシュボードテンプレート（ダッシュボードID:
             12239）を公式に提供しています。
@@ -1870,7 +2126,9 @@ export default function LocalLlmBestPracticesPage() {
                     TGI, llama.cpp
                   </td>
                   <td>
-                    <Ext href="https://www.glukhov.org/observability/monitoring-llm-inference-prometheus-grafana/">glukhov.org/monitoring-llm-inference</Ext>
+                    <Ext href="https://www.glukhov.org/observability/monitoring-llm-inference-prometheus-grafana/">
+                      glukhov.org/monitoring-llm-inference
+                    </Ext>
                   </td>
                 </tr>
                 <tr>
@@ -1878,7 +2136,9 @@ export default function LocalLlmBestPracticesPage() {
                     GPU Monitoring for ML: nvidia-smi, DCGM, and Production Observability Guide
                   </td>
                   <td>
-                    <Ext href="https://www.spheron.network/blog/gpu-monitoring-for-ml/">spheron.network/gpu-monitoring-for-ml</Ext>
+                    <Ext href="https://www.spheron.network/blog/gpu-monitoring-for-ml/">
+                      spheron.network/gpu-monitoring-for-ml
+                    </Ext>
                   </td>
                 </tr>
               </tbody>
@@ -1897,23 +2157,57 @@ export default function LocalLlmBestPracticesPage() {
             </div>
             <pre className={styles.codeBody}>
               <code className="language-yaml">
-                <div className={styles.codeLine}><span className={styles.cm}>- alert</span><span>: </span><span className={styles.cv}>LLMHighP95Latency</span></div>
-                <div className={styles.codeLine}><span className={styles.cm}>  expr</span><span>: </span><span className={styles.cv}>histogram_quantile(0.95, sum by (le) (rate(tgi_request_duration_bucket[5m]))) &gt; 3</span></div>
-                <div className={styles.codeLine}><span className={styles.cm}>  for</span><span>: </span><span className={styles.cv}>10m</span></div>
-                <div className={styles.codeLine}><span className={styles.cm}>  labels</span><span>:</span></div>
-                <div className={styles.codeLine}><span className={styles.cv}>    severity</span><span>: </span><span className={styles.cs}>page</span></div>
-                <div className={styles.codeLine}><span className={styles.cm}>  annotations</span><span>:</span></div>
-                <div className={styles.codeLine}><span className={styles.cv}>    summary</span><span>: </span><span className={styles.cs}>"TGI p95 latency &gt; 3s (10m)"</span></div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cm}>- alert</span>
+                  <span>: </span>
+                  <span className={styles.cv}>LLMHighP95Latency</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cm}> expr</span>
+                  <span>: </span>
+                  <span className={styles.cv}>
+                    histogram_quantile(0.95, sum by (le) (rate(tgi_request_duration_bucket[5m])))
+                    &gt; 3
+                  </span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cm}> for</span>
+                  <span>: </span>
+                  <span className={styles.cv}>10m</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cm}> labels</span>
+                  <span>:</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cv}> severity</span>
+                  <span>: </span>
+                  <span className={styles.cs}>page</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cm}> annotations</span>
+                  <span>:</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cv}> summary</span>
+                  <span>: </span>
+                  <span className={styles.cs}>"TGI p95 latency &gt; 3s (10m)"</span>
+                </div>
               </code>
             </pre>
           </div>
 
           <p>
-            ラベルのカーディナリティは低く保つことが重要です。<code>model</code>、<code>endpoint</code>、<code>method</code>（prefill/decode）、<code>status</code>（success/error）、<code>instance</code>程度に留め、<code>prompt</code>や<code>user_id</code>のような高カーディナリティな値をラベルに含めないようにしてください。
+            ラベルのカーディナリティは低く保つことが重要です。<code>model</code>、
+            <code>endpoint</code>、<code>method</code>（prefill/decode）、<code>status</code>
+            （success/error）、<code>instance</code>程度に留め、<code>prompt</code>や
+            <code>user_id</code>のような高カーディナリティな値をラベルに含めないようにしてください。
           </p>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://www.glukhov.org/observability/monitoring-llm-inference-prometheus-grafana/">Monitor LLM Inference in Production (2026) — Rost Glukhov</Ext>
+            <Ext href="https://www.glukhov.org/observability/monitoring-llm-inference-prometheus-grafana/">
+              Monitor LLM Inference in Production (2026) — Rost Glukhov
+            </Ext>
           </p>
 
           <h3>11.4 GPU監視の成熟度段階</h3>
@@ -1929,7 +2223,9 @@ export default function LocalLlmBestPracticesPage() {
               <tbody>
                 <tr>
                   <td>開発段階</td>
-                  <td><code>nvidia-smi</code>、<code>gpustat</code>での即時確認</td>
+                  <td>
+                    <code>nvidia-smi</code>、<code>gpustat</code>での即時確認
+                  </td>
                   <td>インフラコストゼロ、個人開発</td>
                 </tr>
                 <tr>
@@ -1950,20 +2246,24 @@ export default function LocalLlmBestPracticesPage() {
             <div className={styles.calloutIcon}>!</div>
             <div className={styles.calloutContent}>
               <p>
-                業界調査では、<strong>75%以上の組織がピーク時でもGPU使用率70%未満で運用</strong>しており、85%以上の使用率を達成しているのはわずか7%と報告されています。可視性の欠如は「高価なGPU容量の無駄」と「防げたはずのクラッシュ」を同時に招くため、監視投資はROIが高い領域です。100GPUクラスタで使用率を10%改善するだけで、年間$175,000規模のコスト削減につながるという試算もあります。
+                業界調査では、<strong>75%以上の組織がピーク時でもGPU使用率70%未満で運用</strong>
+                しており、85%以上の使用率を達成しているのはわずか7%と報告されています。可視性の欠如は「高価なGPU容量の無駄」と「防げたはずのクラッシュ」を同時に招くため、監視投資はROIが高い領域です。100GPUクラスタで使用率を10%改善するだけで、年間$175,000規模のコスト削減につながるという試算もあります。
               </p>
             </div>
           </div>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://www.spheron.network/blog/gpu-monitoring-for-ml/">GPU Monitoring for ML — Spheron</Ext>
+            <Ext href="https://www.spheron.network/blog/gpu-monitoring-for-ml/">
+              GPU Monitoring for ML — Spheron
+            </Ext>
           </p>
 
           <h3>11.5 プライバシーに配慮した監視設計</h3>
           <p>監視基盤自体が新たな情報漏洩経路にならないよう、以下を徹底してください。</p>
           <ul>
             <li>
-              <strong>生のプロンプト・応答本文はデフォルトでログに残さない</strong>：トークン数・モデル名・レイテンシ・トレースIDのみを記録
+              <strong>生のプロンプト・応答本文はデフォルトでログに残さない</strong>
+              ：トークン数・モデル名・レイテンシ・トレースIDのみを記録
             </li>
             <li>収集パイプライン（Collector）レベルで機密属性をリダクション/ドロップする</li>
             <li>ログ・トレースへのRBACと保持期間ポリシーを強制する</li>
@@ -1973,7 +2273,9 @@ export default function LocalLlmBestPracticesPage() {
           </ul>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://www.glukhov.org/observability/observability-for-llm-systems/">Observability for LLM Systems — Rost Glukhov</Ext>
+            <Ext href="https://www.glukhov.org/observability/observability-for-llm-systems/">
+              Observability for LLM Systems — Rost Glukhov
+            </Ext>
           </p>
         </section>
 
@@ -1987,11 +2289,15 @@ export default function LocalLlmBestPracticesPage() {
           <h3>12.1 コンテナ化とオーケストレーション</h3>
           <p>
             本番運用では、Dockerイメージにモデル・推論エンジン・依存関係を固定し、GPU数・モデル種別に応じた設定で起動するのが基本です。Kubernetes環境では、vLLMのカスタムPrometheusメトリクス（実行中リクエスト数等）を基にした
-            <strong>カスタムメトリクスオートスケーリング</strong>により、実際の負荷に応じて推論レプリカ数を自動調整し、GPU使用率と可用性のバランスを取ることができます。
+            <strong>カスタムメトリクスオートスケーリング</strong>
+            により、実際の負荷に応じて推論レプリカ数を自動調整し、GPU使用率と可用性のバランスを取ることができます。
           </p>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://blog.ovhcloud.com/reference-architecture-custom-metric-autoscaling-for-llm-inference-with-vllm-on-ovhcloud-ai-deploy-and-observability-using-mks/">Reference Architecture: Custom metric autoscaling for LLM inference with vLLM — OVHcloud Blog</Ext>
+            <Ext href="https://blog.ovhcloud.com/reference-architecture-custom-metric-autoscaling-for-llm-inference-with-vllm-on-ovhcloud-ai-deploy-and-observability-using-mks/">
+              Reference Architecture: Custom metric autoscaling for LLM inference with vLLM —
+              OVHcloud Blog
+            </Ext>
           </p>
 
           <h3>12.2 デプロイパイプライン全体像</h3>
@@ -2005,7 +2311,9 @@ export default function LocalLlmBestPracticesPage() {
           </p>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://www.glukhov.org/observability/observability-for-llm-systems/">Observability for LLM Systems — Rost Glukhov</Ext>
+            <Ext href="https://www.glukhov.org/observability/observability-for-llm-systems/">
+              Observability for LLM Systems — Rost Glukhov
+            </Ext>
           </p>
 
           <h3>12.3 リバースプロキシ構成</h3>
@@ -2015,7 +2323,9 @@ export default function LocalLlmBestPracticesPage() {
           </p>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://www.digitalapplied.com/blog/home-ai-server-build-self-hosted-llm-2026-guide">Build a Home AI Server in 2026 — Digital Applied</Ext>
+            <Ext href="https://www.digitalapplied.com/blog/home-ai-server-build-self-hosted-llm-2026-guide">
+              Build a Home AI Server in 2026 — Digital Applied
+            </Ext>
           </p>
 
           <h3>12.4 フロントエンド/UI層</h3>
@@ -2024,7 +2334,9 @@ export default function LocalLlmBestPracticesPage() {
           </p>
           <p className={styles.refSource}>
             出典:
-            <Ext href="https://www.digitalapplied.com/blog/home-ai-server-build-self-hosted-llm-2026-guide">Build a Home AI Server in 2026 — Digital Applied</Ext>
+            <Ext href="https://www.digitalapplied.com/blog/home-ai-server-build-self-hosted-llm-2026-guide">
+              Build a Home AI Server in 2026 — Digital Applied
+            </Ext>
           </p>
         </section>
 
@@ -2160,29 +2472,38 @@ export default function LocalLlmBestPracticesPage() {
             <li>
               Best Open Source Self-Hosted LLMs for Coding in 2026 — Pinggy
               <span className={styles.refSource}>
-                <Ext href="https://pinggy.io/blog/best_open_source_self_hosted_llms_for_coding/">pinggy.io/best_open_source_self_hosted_llms_for_coding</Ext>
+                <Ext href="https://pinggy.io/blog/best_open_source_self_hosted_llms_for_coding/">
+                  pinggy.io/best_open_source_self_hosted_llms_for_coding
+                </Ext>
               </span>
             </li>
             <li>
               Run DeepSeek &amp; Qwen 2.5 Locally: The 2026 Self-Hosted Guide
               <span className={styles.refSource}>
-                <Ext href="https://createaiagent.net/self-hosted-llm/">createaiagent.net/self-hosted-llm</Ext>
+                <Ext href="https://createaiagent.net/self-hosted-llm/">
+                  createaiagent.net/self-hosted-llm
+                </Ext>
               </span>
             </li>
             <li>
               Build a Home AI Server in 2026: Self-Hosted LLM Guide — Digital Applied
               <span className={styles.refSource}>
-                <Ext href="https://www.digitalapplied.com/blog/home-ai-server-build-self-hosted-llm-2026-guide">digitalapplied.com/home-ai-server-build-self-hosted-llm-2026-guide</Ext>
+                <Ext href="https://www.digitalapplied.com/blog/home-ai-server-build-self-hosted-llm-2026-guide">
+                  digitalapplied.com/home-ai-server-build-self-hosted-llm-2026-guide
+                </Ext>
               </span>
             </li>
             <li>
               Self-Hosted LLM: Run, Train &amp; Deploy (2026) — Solguruz
               <span className={styles.refSource}>
-                <Ext href="https://solguruz.com/blog/how-to-run-llm-locally/">solguruz.com/blog/how-to-run-llm-locally</Ext>
+                <Ext href="https://solguruz.com/blog/how-to-run-llm-locally/">
+                  solguruz.com/blog/how-to-run-llm-locally
+                </Ext>
               </span>
             </li>
             <li>
-              LLM Hosting in 2026: Local, Self-Hosted and Cloud Infrastructure Compared — Rost Glukhov
+              LLM Hosting in 2026: Local, Self-Hosted and Cloud Infrastructure Compared — Rost
+              Glukhov
               <span className={styles.refSource}>
                 <Ext href="https://www.glukhov.org/llm-hosting/">glukhov.org/llm-hosting</Ext>
               </span>
@@ -2190,19 +2511,25 @@ export default function LocalLlmBestPracticesPage() {
             <li>
               Best Self-Hosted LLM Leaderboard 2026 — Onyx
               <span className={styles.refSource}>
-                <Ext href="https://onyx.app/self-hosted-llm-leaderboard">onyx.app/self-hosted-llm-leaderboard</Ext>
+                <Ext href="https://onyx.app/self-hosted-llm-leaderboard">
+                  onyx.app/self-hosted-llm-leaderboard
+                </Ext>
               </span>
             </li>
             <li>
               Self-Hosted LLM Guide: Costs, Architecture &amp; Breakeven Point — Alpacked
               <span className={styles.refSource}>
-                <Ext href="https://alpacked.io/blog/self-hosted-llm-guide/">alpacked.io/blog/self-hosted-llm-guide</Ext>
+                <Ext href="https://alpacked.io/blog/self-hosted-llm-guide/">
+                  alpacked.io/blog/self-hosted-llm-guide
+                </Ext>
               </span>
             </li>
             <li>
               Self-Hosted LLM Guide 2026: Run AI Locally for Privacy &amp; Savings
               <span className={styles.refSource}>
-                <Ext href="https://sanj.dev/post/self-hosted-llm-guide-2026/">sanj.dev/post/self-hosted-llm-guide-2026</Ext>
+                <Ext href="https://sanj.dev/post/self-hosted-llm-guide-2026/">
+                  sanj.dev/post/self-hosted-llm-guide-2026
+                </Ext>
               </span>
             </li>
             <li>
@@ -2218,49 +2545,66 @@ export default function LocalLlmBestPracticesPage() {
             <li>
               vLLM vs SGLang 2026: H100 Benchmarks Inside — TECHSY
               <span className={styles.refSource}>
-                <Ext href="https://techsy.io/en/blog/vllm-vs-sglang">techsy.io/en/blog/vllm-vs-sglang</Ext>
+                <Ext href="https://techsy.io/en/blog/vllm-vs-sglang">
+                  techsy.io/en/blog/vllm-vs-sglang
+                </Ext>
               </span>
             </li>
             <li>
               vLLM vs Ollama vs SGLang vs TensorRT-LLM Serving 2026 Search — The AI Engineer
               <span className={styles.refSource}>
-                <Ext href="https://theaiengineer.substack.com/p/vllm-vs-ollama-vs-sglang-vs-tensorrt">theaiengineer.substack.com/p/vllm-vs-ollama-vs-sglang-vs-tensorrt</Ext>
+                <Ext href="https://theaiengineer.substack.com/p/vllm-vs-ollama-vs-sglang-vs-tensorrt">
+                  theaiengineer.substack.com/p/vllm-vs-ollama-vs-sglang-vs-tensorrt
+                </Ext>
               </span>
             </li>
             <li>
               vLLM vs Ollama vs llama.cpp vs SGLang vs TensorRT-LLM 2026 — VRLA Tech
               <span className={styles.refSource}>
-                <Ext href="https://vrlatech.com/llm-inference-engine-comparison-2026/">vrlatech.com/llm-inference-engine-comparison-2026</Ext>
+                <Ext href="https://vrlatech.com/llm-inference-engine-comparison-2026/">
+                  vrlatech.com/llm-inference-engine-comparison-2026
+                </Ext>
               </span>
             </li>
             <li>
               Ollama vs llama.cpp vs vLLM vs TGI vs SGLang — Sesame Disk
               <span className={styles.refSource}>
-                <Ext href="https://sesamedisk.com/local-inference-engines-2026-comparison/">sesamedisk.com/local-inference-engines-2026-comparison</Ext>
+                <Ext href="https://sesamedisk.com/local-inference-engines-2026-comparison/">
+                  sesamedisk.com/local-inference-engines-2026-comparison
+                </Ext>
               </span>
             </li>
             <li>
               Best LLM Inference Engines 2026 — DeployBase
               <span className={styles.refSource}>
-                <Ext href="https://deploybase.ai/articles/best-llm-inference-engine">deploybase.ai/articles/best-llm-inference-engine</Ext>
+                <Ext href="https://deploybase.ai/articles/best-llm-inference-engine">
+                  deploybase.ai/articles/best-llm-inference-engine
+                </Ext>
               </span>
             </li>
             <li>
               vLLM vs TensorRT-LLM vs SGLang: H100 Benchmarks (2026) — Spheron
               <span className={styles.refSource}>
-                <Ext href="https://www.spheron.network/blog/vllm-vs-tensorrt-llm-vs-sglang-benchmarks/">spheron.network/blog/vllm-vs-tensorrt-llm-vs-sglang-benchmarks</Ext>
+                <Ext href="https://www.spheron.network/blog/vllm-vs-tensorrt-llm-vs-sglang-benchmarks/">
+                  spheron.network/blog/vllm-vs-tensorrt-llm-vs-sglang-benchmarks
+                </Ext>
               </span>
             </li>
             <li>
-              In 2026, the Decision Among Local Inference Engines Comes Down to One Question — Sesame Disk
+              In 2026, the Decision Among Local Inference Engines Comes Down to One Question —
+              Sesame Disk
               <span className={styles.refSource}>
-                <Ext href="https://sesamedisk.com/llamacpp-vs-vllm-vs-sglang-vs-ollama-2026/">sesamedisk.com/llamacpp-vs-vllm-vs-sglang-vs-ollama-2026</Ext>
+                <Ext href="https://sesamedisk.com/llamacpp-vs-vllm-vs-sglang-vs-ollama-2026/">
+                  sesamedisk.com/llamacpp-vs-vllm-vs-sglang-vs-ollama-2026
+                </Ext>
               </span>
             </li>
             <li>
               llama.cpp Tutorial: Run a Local LLM in 12 Steps [2026]
               <span className={styles.refSource}>
-                <Ext href="https://tech-insider.org/llama-cpp-tutorial-2026/">tech-insider.org/llama-cpp-tutorial-2026</Ext>
+                <Ext href="https://tech-insider.org/llama-cpp-tutorial-2026/">
+                  tech-insider.org/llama-cpp-tutorial-2026
+                </Ext>
               </span>
             </li>
           </ul>
@@ -2270,49 +2614,65 @@ export default function LocalLlmBestPracticesPage() {
             <li>
               GGUF vs AWQ vs GPTQ vs MLX: LLM Quant Formats 2026 — Digital Applied
               <span className={styles.refSource}>
-                <Ext href="https://www.digitalapplied.com/blog/gguf-vs-awq-vs-gptq-vs-mlx-llm-quantization-formats-2026">digitalapplied.com/gguf-vs-awq-vs-gptq-vs-mlx-llm-quantization-formats-2026</Ext>
+                <Ext href="https://www.digitalapplied.com/blog/gguf-vs-awq-vs-gptq-vs-mlx-llm-quantization-formats-2026">
+                  digitalapplied.com/gguf-vs-awq-vs-gptq-vs-mlx-llm-quantization-formats-2026
+                </Ext>
               </span>
             </li>
             <li>
               LLM Quantization Explained: GGUF vs AWQ vs GPTQ — The Complete 2026 Guide — Fungies.io
               <span className={styles.refSource}>
-                <Ext href="https://fungies.io/llm-quantization-gguf-awq-gptq-guide-2026/">fungies.io/llm-quantization-gguf-awq-gptq-guide-2026</Ext>
+                <Ext href="https://fungies.io/llm-quantization-gguf-awq-gptq-guide-2026/">
+                  fungies.io/llm-quantization-gguf-awq-gptq-guide-2026
+                </Ext>
               </span>
             </li>
             <li>
               GGUF vs GPTQ vs AWQ 2026 — Local AI Master
               <span className={styles.refSource}>
-                <Ext href="https://localaimaster.com/blog/quantization-explained">localaimaster.com/blog/quantization-explained</Ext>
+                <Ext href="https://localaimaster.com/blog/quantization-explained">
+                  localaimaster.com/blog/quantization-explained
+                </Ext>
               </span>
             </li>
             <li>
               Quantization Techniques for AI Inference in 2026 — Sesame Disk
               <span className={styles.refSource}>
-                <Ext href="https://sesamedisk.com/quantization-techniques-ai-inference-2026/">sesamedisk.com/quantization-techniques-ai-inference-2026</Ext>
+                <Ext href="https://sesamedisk.com/quantization-techniques-ai-inference-2026/">
+                  sesamedisk.com/quantization-techniques-ai-inference-2026
+                </Ext>
               </span>
             </li>
             <li>
               Local LLM Quantization Quality Benchmarks 2026 — Presenc AI
               <span className={styles.refSource}>
-                <Ext href="https://presenc.ai/research/local-llm-quantization-quality-benchmarks-2026">presenc.ai/research/local-llm-quantization-quality-benchmarks-2026</Ext>
+                <Ext href="https://presenc.ai/research/local-llm-quantization-quality-benchmarks-2026">
+                  presenc.ai/research/local-llm-quantization-quality-benchmarks-2026
+                </Ext>
               </span>
             </li>
             <li>
               LLM Quantization Explained: GGUF vs GPTQ vs AWQ (2026 Guide) — TensorRigs
               <span className={styles.refSource}>
-                <Ext href="https://tensorrigs.com/blog/llm-quantization-guide/">tensorrigs.com/blog/llm-quantization-guide</Ext>
+                <Ext href="https://tensorrigs.com/blog/llm-quantization-guide/">
+                  tensorrigs.com/blog/llm-quantization-guide
+                </Ext>
               </span>
             </li>
             <li>
               GPTQ vs AWQ vs GGUF vs bitsandbytes — Best AI Web
               <span className={styles.refSource}>
-                <Ext href="https://www.bestaiweb.ai/gptq-vs-awq-vs-gguf-vs-bitsandbytes-quantization-formats-and-their-tradeoffs-explained/">bestaiweb.ai/gptq-vs-awq-vs-gguf-vs-bitsandbytes</Ext>
+                <Ext href="https://www.bestaiweb.ai/gptq-vs-awq-vs-gguf-vs-bitsandbytes-quantization-formats-and-their-tradeoffs-explained/">
+                  bestaiweb.ai/gptq-vs-awq-vs-gguf-vs-bitsandbytes
+                </Ext>
               </span>
             </li>
             <li>
               Quantization Methods Compared: GGUF, AWQ, GPTQ, EXL2, NVFP4 — ai.rs
               <span className={styles.refSource}>
-                <Ext href="https://ai.rs/ai-developer/quantization-methods-compared">ai.rs/ai-developer/quantization-methods-compared</Ext>
+                <Ext href="https://ai.rs/ai-developer/quantization-methods-compared">
+                  ai.rs/ai-developer/quantization-methods-compared
+                </Ext>
               </span>
             </li>
           </ul>
@@ -2322,43 +2682,57 @@ export default function LocalLlmBestPracticesPage() {
             <li>
               Local LLM Security Best Practices for Enterprise in 2026 — SitePoint
               <span className={styles.refSource}>
-                <Ext href="https://www.sitepoint.com/local-llm-security-best-practices-2026/">sitepoint.com/local-llm-security-best-practices-2026</Ext>
+                <Ext href="https://www.sitepoint.com/local-llm-security-best-practices-2026/">
+                  sitepoint.com/local-llm-security-best-practices-2026
+                </Ext>
               </span>
             </li>
             <li>
               Top 5 LLM Security Tools for Enterprise AI Applications in 2026 — Maxim
               <span className={styles.refSource}>
-                <Ext href="https://www.getmaxim.ai/articles/top-5-llm-security-tools-for-enterprise-ai-applications-in-2026/">getmaxim.ai/top-5-llm-security-tools-2026</Ext>
+                <Ext href="https://www.getmaxim.ai/articles/top-5-llm-security-tools-for-enterprise-ai-applications-in-2026/">
+                  getmaxim.ai/top-5-llm-security-tools-2026
+                </Ext>
               </span>
             </li>
             <li>
               Open LLM Security Risks and Best Practices — EPAM SolutionsHub
               <span className={styles.refSource}>
-                <Ext href="https://solutionshub.epam.com/blog/post/llm-security">solutionshub.epam.com/blog/post/llm-security</Ext>
+                <Ext href="https://solutionshub.epam.com/blog/post/llm-security">
+                  solutionshub.epam.com/blog/post/llm-security
+                </Ext>
               </span>
             </li>
             <li>
               LLM Security Risks in 2026: Prompt Injection, RAG, and Shadow AI — Sombra
               <span className={styles.refSource}>
-                <Ext href="https://sombrainc.com/blog/llm-security-risks-2026">sombrainc.com/blog/llm-security-risks-2026</Ext>
+                <Ext href="https://sombrainc.com/blog/llm-security-risks-2026">
+                  sombrainc.com/blog/llm-security-risks-2026
+                </Ext>
               </span>
             </li>
             <li>
               Prompt Injection in 2026: Still OWASP's Number One LLM Vulnerability
               <span className={styles.refSource}>
-                <Ext href="https://www.kunalganglani.com/blog/prompt-injection-2026-owasp-llm-vulnerability">kunalganglani.com/prompt-injection-2026-owasp-llm-vulnerability</Ext>
+                <Ext href="https://www.kunalganglani.com/blog/prompt-injection-2026-owasp-llm-vulnerability">
+                  kunalganglani.com/prompt-injection-2026-owasp-llm-vulnerability
+                </Ext>
               </span>
             </li>
             <li>
               LLM Security 2026: Top Ultimate Guide to Risks &amp; Protection
               <span className={styles.refSource}>
-                <Ext href="https://www.asappstudio.com/llm-security-2026/">asappstudio.com/llm-security-2026</Ext>
+                <Ext href="https://www.asappstudio.com/llm-security-2026/">
+                  asappstudio.com/llm-security-2026
+                </Ext>
               </span>
             </li>
             <li>
               Prompt Injection in LLMs: Complete Guide for 2026 — Capture The Bug
               <span className={styles.refSource}>
-                <Ext href="https://capturethebug.xyz/blogs/Prompt-Injection-in-LLMs-Complete-Guide-for-2026">capturethebug.xyz/prompt-injection-in-llms-2026</Ext>
+                <Ext href="https://capturethebug.xyz/blogs/Prompt-Injection-in-LLMs-Complete-Guide-for-2026">
+                  capturethebug.xyz/prompt-injection-in-llms-2026
+                </Ext>
               </span>
             </li>
           </ul>
@@ -2368,31 +2742,41 @@ export default function LocalLlmBestPracticesPage() {
             <li>
               Best Embedding Models for Local RAG in 2026 — PromptQuorum
               <span className={styles.refSource}>
-                <Ext href="https://www.promptquorum.com/power-local-llm/best-embedding-models-local-rag-2026">promptquorum.com/best-embedding-models-local-rag-2026</Ext>
+                <Ext href="https://www.promptquorum.com/power-local-llm/best-embedding-models-local-rag-2026">
+                  promptquorum.com/best-embedding-models-local-rag-2026
+                </Ext>
               </span>
             </li>
             <li>
               Best Open-Source Vector Databases for LLMs in 2026 — Turing Post
               <span className={styles.refSource}>
-                <Ext href="https://www.turingpost.com/p/vector-databases-libraries-resources">turingpost.com/p/vector-databases-libraries-resources</Ext>
+                <Ext href="https://www.turingpost.com/p/vector-databases-libraries-resources">
+                  turingpost.com/p/vector-databases-libraries-resources
+                </Ext>
               </span>
             </li>
             <li>
               The Ultimate Guide to Finding the Best Local Models for RAG in 2026 — LMSA
               <span className={styles.refSource}>
-                <Ext href="https://lmsa.app/blog/the-ultimate-guide-to-finding-the-best-local-models-for-rag-in-2026/">lmsa.app/best-local-models-for-rag-2026</Ext>
+                <Ext href="https://lmsa.app/blog/the-ultimate-guide-to-finding-the-best-local-models-for-rag-in-2026/">
+                  lmsa.app/best-local-models-for-rag-2026
+                </Ext>
               </span>
             </li>
             <li>
               Top 10 Vector Databases for LLM Applications in 2026 — Second Talent
               <span className={styles.refSource}>
-                <Ext href="https://www.secondtalent.com/resources/top-vector-databases-for-llm-applications/">secondtalent.com/top-vector-databases-for-llm-applications</Ext>
+                <Ext href="https://www.secondtalent.com/resources/top-vector-databases-for-llm-applications/">
+                  secondtalent.com/top-vector-databases-for-llm-applications
+                </Ext>
               </span>
             </li>
             <li>
               Best Embedding Model for RAG 2026: 10 Models Compared — Milvus Blog
               <span className={styles.refSource}>
-                <Ext href="https://milvus.io/blog/choose-embedding-model-rag-2026.md">milvus.io/blog/choose-embedding-model-rag-2026</Ext>
+                <Ext href="https://milvus.io/blog/choose-embedding-model-rag-2026.md">
+                  milvus.io/blog/choose-embedding-model-rag-2026
+                </Ext>
               </span>
             </li>
           </ul>
@@ -2402,43 +2786,58 @@ export default function LocalLlmBestPracticesPage() {
             <li>
               Fine-Tune Local LLMs 2026 | Practical Guide — SitePoint
               <span className={styles.refSource}>
-                <Ext href="https://www.sitepoint.com/fine-tune-local-llms-2026/">sitepoint.com/fine-tune-local-llms-2026</Ext>
+                <Ext href="https://www.sitepoint.com/fine-tune-local-llms-2026/">
+                  sitepoint.com/fine-tune-local-llms-2026
+                </Ext>
               </span>
             </li>
             <li>
               LLM Fine-Tuning Best Practices 2026 | LoRA, QLoRA, RLHF, DPO — hjLabs
               <span className={styles.refSource}>
-                <Ext href="https://hjlabs.in/AIML/blog/post/llm-fine-tuning-best-practices.html">hjlabs.in/llm-fine-tuning-best-practices</Ext>
+                <Ext href="https://hjlabs.in/AIML/blog/post/llm-fine-tuning-best-practices.html">
+                  hjlabs.in/llm-fine-tuning-best-practices
+                </Ext>
               </span>
             </li>
             <li>
               Comprehensive Guide to Fine-Tuning LLMs with LoRA and QLoRA in 2026 — n1n.ai
               <span className={styles.refSource}>
-                <Ext href="https://explore.n1n.ai/blog/fine-tune-llm-lora-qlora-guide-2026-2026-04-17">explore.n1n.ai/fine-tune-llm-lora-qlora-guide-2026</Ext>
+                <Ext href="https://explore.n1n.ai/blog/fine-tune-llm-lora-qlora-guide-2026-2026-04-17">
+                  explore.n1n.ai/fine-tune-llm-lora-qlora-guide-2026
+                </Ext>
               </span>
             </li>
             <li>
               Master LoRA and QLoRA: Fine-Tuning LLMs on Consumer GPUs — Let's Data Science
               <span className={styles.refSource}>
-                <Ext href="https://letsdatascience.com/blog/fine-tuning-llms-with-lora-and-qlora-complete-guide">letsdatascience.com/fine-tuning-llms-lora-qlora</Ext>
+                <Ext href="https://letsdatascience.com/blog/fine-tuning-llms-with-lora-and-qlora-complete-guide">
+                  letsdatascience.com/fine-tuning-llms-lora-qlora
+                </Ext>
               </span>
             </li>
             <li>
               Fine-Tune LLMs with LoRA and QLoRA: 2026 Guide — Effloow
               <span className={styles.refSource}>
-                <Ext href="https://effloow.com/articles/llm-fine-tuning-lora-qlora-guide-2026">effloow.com/llm-fine-tuning-lora-qlora-guide-2026</Ext>
+                <Ext href="https://effloow.com/articles/llm-fine-tuning-lora-qlora-guide-2026">
+                  effloow.com/llm-fine-tuning-lora-qlora-guide-2026
+                </Ext>
               </span>
             </li>
             <li>
-              LoRA &amp; QLoRA Fine-Tuning: Build Custom LLMs on a Single GPU [2026 Guide] — Meta Intelligence
+              LoRA &amp; QLoRA Fine-Tuning: Build Custom LLMs on a Single GPU [2026 Guide] — Meta
+              Intelligence
               <span className={styles.refSource}>
-                <Ext href="https://www.meta-intelligence.tech/en/insight-lora-finetuning">meta-intelligence.tech/insight-lora-finetuning</Ext>
+                <Ext href="https://www.meta-intelligence.tech/en/insight-lora-finetuning">
+                  meta-intelligence.tech/insight-lora-finetuning
+                </Ext>
               </span>
             </li>
             <li>
               Fine-Tuning LLMs 2026: LORA, QLORA &amp; When to Bother — AI DEV DAY
               <span className={styles.refSource}>
-                <Ext href="https://aidevdayindia.org/blogs/fine-tuning-llms-lora-qlora/fine-tuning-llms-lora-qlora.html">aidevdayindia.org/fine-tuning-llms-lora-qlora</Ext>
+                <Ext href="https://aidevdayindia.org/blogs/fine-tuning-llms-lora-qlora/fine-tuning-llms-lora-qlora.html">
+                  aidevdayindia.org/fine-tuning-llms-lora-qlora
+                </Ext>
               </span>
             </li>
           </ul>
@@ -2448,31 +2847,42 @@ export default function LocalLlmBestPracticesPage() {
             <li>
               llama.cpp KV Cache Defrag Boosts Long-Context Speed — AI Weekly
               <span className={styles.refSource}>
-                <Ext href="https://aiweekly.co/alerts/llamacpp-kv-cache-defrag-boosts-long-context-speed">aiweekly.co/llamacpp-kv-cache-defrag-boosts-long-context-speed</Ext>
+                <Ext href="https://aiweekly.co/alerts/llamacpp-kv-cache-defrag-boosts-long-context-speed">
+                  aiweekly.co/llamacpp-kv-cache-defrag-boosts-long-context-speed
+                </Ext>
               </span>
             </li>
             <li>
               Tuning llama-server on Apple Silicon — Medium
               <span className={styles.refSource}>
-                <Ext href="https://medium.com/@michael.hannecke/tuning-llama-server-on-apple-silicon-9b3e778ab100">medium.com/tuning-llama-server-on-apple-silicon</Ext>
+                <Ext href="https://medium.com/@michael.hannecke/tuning-llama-server-on-apple-silicon-9b3e778ab100">
+                  medium.com/tuning-llama-server-on-apple-silicon
+                </Ext>
               </span>
             </li>
             <li>
               Tune llama.cpp on Apple Silicon: 7 Flags — Medium
               <span className={styles.refSource}>
-                <Ext href="https://medium.com/@michael.hannecke/tuning-llama-cpp-on-apple-silicon-843f37a6c3dc">medium.com/tuning-llama-cpp-on-apple-silicon</Ext>
+                <Ext href="https://medium.com/@michael.hannecke/tuning-llama-cpp-on-apple-silicon-843f37a6c3dc">
+                  medium.com/tuning-llama-cpp-on-apple-silicon
+                </Ext>
               </span>
             </li>
             <li>
-              llama.cpp: A CPU-First Framework for Running LLaMA Models on Local Hardware — Sandgarden
+              llama.cpp: A CPU-First Framework for Running LLaMA Models on Local Hardware —
+              Sandgarden
               <span className={styles.refSource}>
-                <Ext href="https://www.sandgarden.com/learn/llama-cpp">sandgarden.com/learn/llama-cpp</Ext>
+                <Ext href="https://www.sandgarden.com/learn/llama-cpp">
+                  sandgarden.com/learn/llama-cpp
+                </Ext>
               </span>
             </li>
             <li>
               llama.cpp/docs/speculative.md — GitHub
               <span className={styles.refSource}>
-                <Ext href="https://github.com/ggml-org/llama.cpp/blob/master/docs/speculative.md">github.com/ggml-org/llama.cpp/docs/speculative.md</Ext>
+                <Ext href="https://github.com/ggml-org/llama.cpp/blob/master/docs/speculative.md">
+                  github.com/ggml-org/llama.cpp/docs/speculative.md
+                </Ext>
               </span>
             </li>
           </ul>
@@ -2482,17 +2892,23 @@ export default function LocalLlmBestPracticesPage() {
             <li>
               Monitor LLM Inference in Production (2026) — Rost Glukhov
               <span className={styles.refSource}>
-                <Ext href="https://www.glukhov.org/observability/monitoring-llm-inference-prometheus-grafana/">glukhov.org/monitoring-llm-inference-prometheus-grafana</Ext>
+                <Ext href="https://www.glukhov.org/observability/monitoring-llm-inference-prometheus-grafana/">
+                  glukhov.org/monitoring-llm-inference-prometheus-grafana
+                </Ext>
               </span>
             </li>
             <li>
-              Observability for LLM Systems: Metrics, Traces, Logs, and Testing in Production — Rost Glukhov
+              Observability for LLM Systems: Metrics, Traces, Logs, and Testing in Production — Rost
+              Glukhov
               <span className={styles.refSource}>
-                <Ext href="https://www.glukhov.org/observability/observability-for-llm-systems/">glukhov.org/observability-for-llm-systems</Ext>
+                <Ext href="https://www.glukhov.org/observability/observability-for-llm-systems/">
+                  glukhov.org/observability-for-llm-systems
+                </Ext>
               </span>
             </li>
             <li>
-              Observability in Production: Monitoring, Metrics, Prometheus &amp; Grafana Guide (2026) — Rost Glukhov
+              Observability in Production: Monitoring, Metrics, Prometheus &amp; Grafana Guide
+              (2026) — Rost Glukhov
               <span className={styles.refSource}>
                 <Ext href="https://www.glukhov.org/observability/">glukhov.org/observability</Ext>
               </span>
@@ -2500,19 +2916,25 @@ export default function LocalLlmBestPracticesPage() {
             <li>
               GPU Monitoring for ML: nvidia-smi, DCGM, and Production Observability Guide — Spheron
               <span className={styles.refSource}>
-                <Ext href="https://www.spheron.network/blog/gpu-monitoring-for-ml/">spheron.network/gpu-monitoring-for-ml</Ext>
+                <Ext href="https://www.spheron.network/blog/gpu-monitoring-for-ml/">
+                  spheron.network/gpu-monitoring-for-ml
+                </Ext>
               </span>
             </li>
             <li>
               Local GPU Monitoring For LLMs With Prometheus And Grafana — Xebia
               <span className={styles.refSource}>
-                <Ext href="https://xebia.com/blog/local-deployment-of-prometheus-and-grafana/">xebia.com/local-deployment-of-prometheus-and-grafana</Ext>
+                <Ext href="https://xebia.com/blog/local-deployment-of-prometheus-and-grafana/">
+                  xebia.com/local-deployment-of-prometheus-and-grafana
+                </Ext>
               </span>
             </li>
             <li>
               LLM Observability: Monitoring Large Language Models — Cloudraft
               <span className={styles.refSource}>
-                <Ext href="https://www.cloudraft.io/blog/llm-observability">cloudraft.io/blog/llm-observability</Ext>
+                <Ext href="https://www.cloudraft.io/blog/llm-observability">
+                  cloudraft.io/blog/llm-observability
+                </Ext>
               </span>
             </li>
           </ul>
@@ -2520,9 +2942,12 @@ export default function LocalLlmBestPracticesPage() {
           <h3>デプロイ運用</h3>
           <ul className={styles.refList}>
             <li>
-              Reference Architecture: Custom metric autoscaling for LLM inference with vLLM on OVHcloud AI Deploy — OVHcloud Blog
+              Reference Architecture: Custom metric autoscaling for LLM inference with vLLM on
+              OVHcloud AI Deploy — OVHcloud Blog
               <span className={styles.refSource}>
-                <Ext href="https://blog.ovhcloud.com/reference-architecture-custom-metric-autoscaling-for-llm-inference-with-vllm-on-ovhcloud-ai-deploy-and-observability-using-mks/">blog.ovhcloud.com/custom-metric-autoscaling-vllm</Ext>
+                <Ext href="https://blog.ovhcloud.com/reference-architecture-custom-metric-autoscaling-for-llm-inference-with-vllm-on-ovhcloud-ai-deploy-and-observability-using-mks/">
+                  blog.ovhcloud.com/custom-metric-autoscaling-vllm
+                </Ext>
               </span>
             </li>
           </ul>

@@ -75,7 +75,9 @@ describe("/ci-cd/ai-cicd-automation-best-practices - page structure", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
     expect(h1).not.toBeNull();
-    expect(h1?.textContent).toBe("AI CI/CD 自動化 完全ガイド ― 初学者のためのステップバイステップ実践入門");
+    expect(h1?.textContent).toBe(
+      "AI CI/CD 自動化 完全ガイド ― 初学者のためのステップバイステップ実践入門"
+    );
   });
 
   it("renders all 17 expected sections", () => {
