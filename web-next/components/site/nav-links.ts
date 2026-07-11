@@ -60,6 +60,7 @@ export const navLinks: readonly NavLink[] = [
       { name: "Harness Engineering", href: "/google/harness-engineering" },
       { name: "Agent Harness Engineering", href: "/google/agent-harness-engineering" },
       { name: "NotebookLM Guide", href: "/google/notebook-lm" },
+      { name: "ADK Best Practices", href: "/google/adk-best-practices" },
     ],
   },
   {
