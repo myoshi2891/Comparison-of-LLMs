@@ -352,7 +352,9 @@ flowchart LR
 
 ### 6.5 チャット履歴の扱い
 
-2026年1月・3月のアップデートにより、チャット履歴は自動的に保存されるようになり、セッションを閉じても後で再開できます。共有ノートブックであっても、チャット履歴は各利用者ごとに非公開です。履歴はいつでも削除できます。
+2026年1月・3月のアップデートにより、チャット履歴は自動的に保存されるようになり、セッションを閉じても後で再開できます。チャット履歴の公開範囲は以下の通りです。
+- **通常のチャット履歴**: 共有ノートブックであっても、各利用者ごとに非公開です。履歴はいつでも削除できます。
+- **Geminiから追加されたチャット・コンテキスト**: Gemini連携機能を利用してノートブックに追加されたチャットやその関連コンテキストは、例外的に共同編集者に表示され得ます。
 
 > 💡 **Tips**: トピックを大きく切り替える前に履歴を削除すると、過去の文脈に引きずられない新しい回答が得られやすくなります。ただし削除前に残しておきたい内容がないか一度確認しましょう。
 
@@ -454,7 +456,7 @@ flowchart TD
     D -->|Yes| D1["Slide Deck"]
     D -->|No| E{"1枚で要点を<br/>視覚的に見せたい"}
     E -->|Yes| E1["Infographic"]
-    D -->|No| F{"文章形式の<br/>成果物が欲しい"}
+    E -->|No| F{"文章形式の<br/>成果物が欲しい"}
     F -->|Yes| F1["Reports<br/>(Briefing Doc/Study Guide/FAQ/Timeline等)"]
     F -->|No| G{"数値・項目を<br/>比較表にしたい"}
     G -->|Yes| G1["Data Table<br/>(Google Sheetsへ書き出し可)"]
@@ -547,7 +549,14 @@ Audio Overviewに視覚要素（図表・引用・数値のハイライト等）
 
 2026年4月8日、Googleは Gemini アプリに **Notebooks** 機能を追加し、NotebookLMのノートブックと**双方向に自動同期**するようにしました。これにより「ノートブックはNotebookLM、対話はGemini」という使い分けが可能になり、従来の「1ノートブックは孤立している」という制約の一部が解消されます。
 
-### 9.2 同期の仕組み
+### 9.2 同期の仕組みと制限事項
+
+Geminiの「Notebooks」機能は、NotebookLMと連携してノートブックのテキストソースを同期しますが、いくつかの重要な制限事項があります。
+
+- **表示対象の制限**: Geminiアプリに表示されるのは、**自分が所有する（作成した）ノートブックのみ**です。他のユーザーから共有されたノートブックはGemini側には表示されません。
+- **同期されるデータ範囲**:
+  - **同期可能**: テキストソース、アップロードされたドキュメント（PDFやURLなど）のテキスト情報、チャットでの対話コンテキスト。
+  - **同期不可（NotebookLM側でのみ利用可能）**: NotebookLMの「Studio」で生成された Audio Overview、Cinematic Video Overview、Infographic、Slide Deck などのマルチメディア成果物（Studio成果物）。これらはGemini側から参照・再生することはできません。
 
 ```mermaid
 sequenceDiagram
@@ -556,13 +565,14 @@ sequenceDiagram
     participant NLM as NotebookLM
 
     User->>Gemini: 左サイドパネルで「Notebooks」を開く
-    Gemini-->>User: 既存のNotebookLMノートブック一覧を表示
+    Note over Gemini: 自分が所有するNotebookのみ一覧表示<br/>(共有されたNotebookは非表示)
+    Gemini-->>User: マイノートブック一覧を表示
     User->>Gemini: PDFやURLをNotebook内にアップロード
-    Gemini->>NLM: ソースを自動同期
-    NLM-->>Gemini: 同一ノートブックとして反映(数秒〜数分)
-    User->>NLM: NotebookLM側でCinematic Video Overviewを生成
-    NLM-->>Gemini: 生成物はNotebookLM Studio上に残る(Gemini側からも参照可)
-    User->>Gemini: 翌日、同じNotebookを使い続きの質問をする
+    Gemini->>NLM: ソースを自動同期(双方向テキスト同期)
+    NLM-->>Gemini: テキストソース情報を同期
+    User->>NLM: NotebookLM側でAudio/Video Overview等を生成
+    Note over NLM: Studio成果物はNotebookLM内に限定保存<br/>(Geminiからは参照・再生不可)
+    User->>Gemini: Gemini側で同期されたNotebookについて質問
     Gemini-->>User: 保存済みの文脈を踏まえて回答(Web検索の併用も可能)
 ```
 

@@ -109,7 +109,7 @@ AIセキュリティには「唯一の標準」は存在せず、複数のフレ
 | OWASP Top 10 for LLM Applications | OWASP GenAI Security Project | 優先度付きリスクリスト（チェックリスト型） | プロンプトインジェクション、機密情報漏洩、サプライチェーン、データ/モデルポイズニング等10項目 | 2025年版が最新。LLM01〜LLM10として体系化 [1](#ref-1)[3](#ref-3) |
 | OWASP Top 10 for Agentic Applications | OWASP GenAI Security Project | エージェント特化の優先度付きリスクリスト | 目標ハイジャック、ツール誤用、ID/権限乱用、サプライチェーン侵害等 | 2026年版がBlack Hat Europe 2025で発表され、ASI01〜ASI10として整理 [10](#ref-10)[11](#ref-11) |
 | MITRE ATLAS | MITRE Corporation | 攻撃者の戦術・手法のナレッジベース（ATT&CK類似） | 偵察からモデル窃取、侵害後の影響まで攻撃チェーン全体 | 2026年2月時点でv5.4.0、16戦術・84手法・56サブ手法・32緩和策・42実事例に拡大 [40](#ref-40)[41](#ref-41) |
-| NIST AI RMF + Generative AI Profile (AI 600-1) | 米国NIST | 任意適用のリスクマネジメントフレームワーク | Govern/Map/Measure/Manageの4機能、生成AI特有 of 12リスク領域 | 2026年2月にNIST CAISIがAI Agent Standards Initiativeを発表、エージェント向けプロファイルをQ4 2026に予定 [30](#ref-30)[32](#ref-32) |
+| NIST AI RMF + Generative AI Profile | 米国NIST | 任意適用のリスクマネジメントフレームワーク | Govern/Map/Measure/Manageの4機能、生成AI特有の12リスク領域 | 2026年2月にNIST CAISIがAI Agent Standards Initiativeを発表、エージェント向けプロファイルをQ4 2026に予定 [30](#ref-30)[32](#ref-32) |
 | ISO/IEC 42001 | ISO/IEC | 認証可能なマネジメントシステム規格（PDCA型） | AI管理システム全体のガバナンス、リスク管理、説明責任 | 世界初の認証可能なAI管理システム規格。Microsoft、Synthesia等が認証取得済み [102](#ref-102)[106](#ref-106) |
 | EU AI Act | 欧州連合 | 法的拘束力のある規制 | リスクベースのAI規制、GPAIモデル義務、高リスクAIシステム義務 | 2026年8月2日に大部分が適用開始。高リスク義務は2027年12月/2028年8月へ延期見込み（Omnibus合意） [58](#ref-58)[60](#ref-60) |
 
@@ -768,7 +768,7 @@ flowchart LR
 
 <a id="ref-30"></a>30. Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile | NIST — https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence
 31. AI Risk Management Framework | NIST — https://www.nist.gov/itl/ai-risk-management-framework
-<a id="ref-32"></a>32. Artificial Intelligence Risk Management Framework (NIST AI 600-1, PDF) — https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf
+<a id="ref-32"></a>32. NIST Launches AI Agent Standards Initiative (NIST News) — https://www.nist.gov/news-events/news/2026/02/nist-launches-ai-agent-standards-initiative
 33. NIST AI Risk Management Framework: Agentic Profile (Cloud Security Alliance) — https://labs.cloudsecurityalliance.org/agentic/agentic-nist-ai-rmf-profile-v1/
 34. NIST AI RMF (ModelOp) — https://www.modelop.com/ai-governance/ai-regulations-standards/nist-ai-rmf
 35. NIST Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile (Digital Government Hub) — https://digitalgovernmenthub.org/examples/nist-artificial-intelligence-risk-management-framework-generative-artificial-intelligence-profile/
