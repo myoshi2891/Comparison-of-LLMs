@@ -1,7 +1,7 @@
 # プロジェクト進捗・ステータス (PROGRESS.md)
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
-> - 最終更新日: **Updated 2026-07-11**
+> - 最終更新日: **Updated 2026-07-12**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -18,8 +18,8 @@
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
-- **コンテキストエンジニアリング実践ガイドの Next.js 移行**: `Context-engineering-best-practices.html` から `web-next/app/agent/context-engineering-best-practices/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、等幅フォントの適用、外部リンクのセキュリティ対策（target/rel）、Mermaid遅延ロードと中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションの「Agent -> Context Engineering」に新規登録。元の HTML ファイルは `legacy/` 配下に移動。Vitest 契約テスト 8 件追加（合計 872 テスト合格）。
-- **AI CI/CD 自動化 完全ガイドの Next.js 移行**: `Ai-cicd-automation-best-practices.html` から `web-next/app/ci-cd/ai-cicd-automation-best-practices/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、等幅フォント適用、外部リンクのセキュリティ対策、Mermaid遅延ロードと中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションに新規カテゴリ「CI/CD -> AI CI/CD Automation」を追加し、関連統合テストを 11 ドロップダウン対応に更新。Vitest 契約テスト 8 件追加（合計 864 テスト合格）。
+- **コンテキストエンジニアリング入門の Next.js 移行**: ルートの `Context-engineering-guide.html` から `web-next/app/agent/context-engineering-best-practices/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、等幅フォントの適用、外部リンクのセキュリティ対策（target/rel）、Mermaid遅延ロードと中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションの「Agent -> Context Engineering」に新規登録。元の HTML ファイルは `legacy/` 配下に移動。Vitest 契約テスト 8 件がすべて合格。
+- **AI CI/CD 自動化 完全ガイドの Next.js 移行**: `Ai-cicd-automation-best-practices.html` から `web-next/app/ci-cd/ai-cicd-automation-best-practices/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、等幅フォント適用、外部リンクのセキュリティ対策、Mermaid遅延ロードと中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開グルを実装。ナビゲーションに新規カテゴリ「CI/CD -> AI CI/CD Automation」を追加し、関連統合テストを 11 ドロップダウン対応に更新。Vitest 契約テスト 8 件追加（合計 864 テスト合格）。
 - **AIセキュリティ ベストプラクティス完全ガイド（中級〜上級者向け）の Next.js 移行**: `Ai-security-best-practices-intermediate.html` から `web-next/app/security/ai-security-best-practices-intermediate/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、等幅フォント適用、外部リンクのセキュリティ対策（target/rel）、Mermaid遅延ロードと中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションの「Security -> AI Security Best Practices (中級)」に新規登録。 Vitest 契約テスト 8 件追加（合計 856 テスト合格）。
 - **Google Agent Development Kit 実践ガイドの Next.js 移行**: `Adk-best-practices-guide.html` から `web-next/app/google/adk-best-practices/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、等幅フォント適用、外部リンクのセキュリティ対策（target/rel）、Mermaid遅延ロードと中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションの「Google -> ADK Best Practices」に新規登録。 Vitest 契約テスト 9 件追加（合計 848 テスト合格）。
 - **ローカルLLM／セルフホスティング ベストプラクティスガイドの Next.js 移行**: `Local-llm-self-hosting-best-practices.html` から `web-next/app/local-llm/best-practices/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策（target/rel）、Mermaid遅延ロード、TOCスクロールハイライト追従（Intersection Observer）を実装。ナビゲーションの「Local LLM -> Self-hosting Best Practices」に新規登録。 Vitest 契約テスト 9 件追加（合計 839 テスト合格）。
