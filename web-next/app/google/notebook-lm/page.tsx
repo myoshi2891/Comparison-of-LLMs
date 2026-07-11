@@ -787,8 +787,11 @@ export default function GoogleNotebookLMPage() {
             </table>
           </div>
           <p className={styles.subtle}>
-            全プラン共通の制約: ソース1件あたり500,000語 /
+            一般消費者向けプラン（Standard/Plus/Pro/Ultra）共通の制約: ソース1件あたり500,000語 /
             200MBの上限は、Ultraであっても変わりません。上位プランが上げるのは「ソースの数」であり「1つのソースの大きさ」ではない点に注意してください。
+          </p>
+          <p className={styles.subtle}>
+            <em>注記: 組織向けの Enterprise プランでは、VPC-SC対応やデータソース連携などと共に、契約内容やプロジェクト構成に応じてソース1件あたりの上限が緩和される場合があり、上記の制約とは異なります。</em>
           </p>
 
           <h3>
