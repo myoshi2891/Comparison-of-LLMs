@@ -3,7 +3,6 @@ import { join } from "node:path";
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
-// @ts-ignore - page.tsx doesn't exist yet, which is expected in TDD Red phase
 import PageComponent, { metadata as rawMetadata } from "@/app/local-llm/best-practices/page";
 
 const Page = PageComponent as unknown as () => ReactElement;
@@ -56,7 +55,9 @@ describe("/local-llm/best-practices - metadata", () => {
       typeof metadata.title === "string"
         ? metadata.title
         : (metadata.title as { default?: string } | undefined)?.default;
-    expect(title).toBe("ローカルLLM／セルフホスティング ベストプラクティスガイド 2026 | LLM-Studies");
+    expect(title).toBe(
+      "ローカルLLM／セルフホスティング ベストプラクティスガイド 2026 | LLM-Studies"
+    );
   });
 
   it("exports a metadata object with non-empty description", () => {
