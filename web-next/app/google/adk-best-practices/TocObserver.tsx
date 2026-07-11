@@ -7,7 +7,10 @@ export default function TocObserver() {
   useEffect(() => {
     const sections = document.querySelectorAll("section.adkSection");
     const links = Array.from(document.querySelectorAll(`.${styles.tocLink}`));
-    if (links.length > 0) links[0].classList.add(styles.tocLinkActive);
+    if (links.length > 0) {
+      links[0].classList.add(styles.tocLinkActive);
+      links[0].setAttribute("aria-current", "location");
+    }
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -17,8 +20,10 @@ export default function TocObserver() {
             for (const l of links) {
               if (l.getAttribute("href") === `#${id}`) {
                 l.classList.add(styles.tocLinkActive);
+                l.setAttribute("aria-current", "location");
               } else {
                 l.classList.remove(styles.tocLinkActive);
+                l.removeAttribute("aria-current");
               }
             }
           }
@@ -34,14 +39,20 @@ export default function TocObserver() {
     // Mobile nav toggle implementation
     const toggle = document.getElementById("adkNavToggle");
     const list = document.getElementById("adkNavList");
-    
+
     if (toggle && list) {
+      toggle.setAttribute("aria-controls", "adkNavList");
+      const initialOpen = list.classList.contains(styles.navListOpen);
+      toggle.setAttribute("aria-expanded", String(initialOpen));
+
       const handleToggle = () => {
-        list.classList.toggle(styles.navListOpen);
+        const isOpen = list.classList.toggle(styles.navListOpen);
+        toggle.setAttribute("aria-expanded", String(isOpen));
       };
-      
+
       const handleLinkClick = () => {
         list.classList.remove(styles.navListOpen);
+        toggle.setAttribute("aria-expanded", "false");
       };
 
       toggle.addEventListener("click", handleToggle);

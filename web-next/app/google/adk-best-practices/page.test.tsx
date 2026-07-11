@@ -76,6 +76,8 @@ describe("/google/adk-best-practices - page structure", () => {
 
   it("renders all 15 expected sections", () => {
     const { container } = render(<Page />);
+    const sections = container.querySelectorAll("section.adkSection");
+    expect(sections.length).toBe(EXPECTED_SECTION_IDS.length);
     for (const id of EXPECTED_SECTION_IDS) {
       const el = container.querySelector(`#${id}`);
       expect(el, `section id="${id}" must exist`).not.toBeNull();

@@ -4,7 +4,8 @@ import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
 
 export const metadata: Metadata = {
-  title: "Google Agent Development Kit 実践ガイド | 中級者・上級者向けベストプラクティス | LLM-Studies",
+  title:
+    "Google Agent Development Kit 実践ガイド | 中級者・上級者向けベストプラクティス | LLM-Studies",
   description:
     "Google Agent Development Kit (ADK) を用いた、マルチエージェント設計、状態管理、コンテキスト最適化、コールバック、評価、可観測性、デプロイメントのステップバイステップ実践ガイド。",
 };
@@ -53,7 +54,7 @@ L3 --> L1
 L2 -- はい --> L4[終了]`,
 
   d5: `flowchart TD
-A[コーディネーターエージェント] -- 共有state経由 --> B[session dot state]
+A[コーディネーターエージェント] -- 共有state経由 --> B[session.state]
 A -- LLM駆動の委譲 --> C[サブエージェントへ完全に制御を移譲]
 A -- Explicit Invocation --> D[AgentTool として明示的に呼び出す]
 B --> E[サブエージェント群が読み書き]`,
@@ -95,7 +96,7 @@ Tool --> ATC[after_tool_callback で結果をstateへ記録]
 ATC --> Response[最終応答]`,
 
   d10: `flowchart TB
-Case[test dot json 形式のテストケース] --> Runner2[AgentEvaluatorがエージェントを実行]
+Case[test.json 形式のテストケース] --> Runner2[AgentEvaluatorがエージェントを実行]
 Runner2 --> Actual[実際のツール呼び出し順序と最終応答を記録]
 Actual --> TrajEval[TrajectoryEvaluator が期待する経路と比較]
 Actual --> RespEval[ResponseEvaluator が期待する応答と比較]
@@ -135,7 +136,8 @@ export default function AdkBestPracticesPage() {
       <div className={styles.layout}>
         <nav className={styles.sidebar} id="adkSideNav">
           <button className={styles.mobileToggle} id="adkNavToggle" type="button">
-            <i className="ti ti-menu-2" />目次を開く
+            <i className="ti ti-menu-2" />
+            目次を開く
           </button>
           <p className={styles.navTitle}>目次</p>
           <ul className={styles.navList} id="adkNavList">
@@ -220,13 +222,17 @@ export default function AdkBestPracticesPage() {
         <main className={styles.main}>
           <div className={styles.hero}>
             <h1>Google Agent Development Kit 実践ガイド</h1>
-            <p className={styles.subtitle}>中級者・上級者向け ステップバイステップ ベストプラクティス</p>
+            <p className={styles.subtitle}>
+              中級者・上級者向け ステップバイステップ ベストプラクティス
+            </p>
             <div className={styles.meta}>
               <span className={styles.pill}>
-                <i className="ti ti-user-check" />対象: マルチエージェント設計の実務者
+                <i className="ti ti-user-check" />
+                対象: マルチエージェント設計の実務者
               </span>
               <span className={styles.pill}>
-                <i className="ti ti-calendar" />2026年7月時点の公式情報に基づく
+                <i className="ti ti-calendar" />
+                2026年7月時点の公式情報に基づく
               </span>
             </div>
           </div>
@@ -247,11 +253,13 @@ export default function AdkBestPracticesPage() {
                   <strong>Agent Runtime</strong> に統合された。本ガイドでは新名称で統一する。
                 </li>
                 <li>
-                  ADK 2.0以降、固定ワークフローに加え単一エージェントが動的にコーディネーター役を担う{" "}
+                  ADK
+                  2.0以降、固定ワークフローに加え単一エージェントが動的にコーディネーター役を担う{" "}
                   <strong>Collaborative workflows</strong> が追加された。
                 </li>
                 <li>
-                  Context CachingとContext Compactionが <code>App</code> レベルの正式機能として提供され、長時間セッションの最適化が標準化された。
+                  Context CachingとContext Compactionが <code>App</code>{" "}
+                  レベルの正式機能として提供され、長時間セッションの最適化が標準化された。
                 </li>
                 <li>
                   ADKはPython、Java、Go、Kotlin、TypeScriptで同等のAPIを提供するマルチ言語フレームワークになっている。
@@ -266,7 +274,8 @@ export default function AdkBestPracticesPage() {
               1. ADKとは何か - 全体像
             </h2>
             <p>
-              Agent Development Kit（ADK）は、Googleが開発しているオープンソースのコードファーストなエージェント開発フレームワークです。単純な単一ツール利用のアシスタントから、複数の専門エージェントが協調して動く企業レベルのワークフローまで、同じプログラミングモデルの上で段階的に複雑さを積み上げていけるように設計されています。
+              Agent Development
+              Kit（ADK）は、Googleが開発しているオープンソースのコードファーストなエージェント開発フレームワークです。単純な単一ツール利用のアシスタントから、複数の専門エージェントが協調して動く企業レベルのワークフローまで、同じプログラミングモデルの上で段階的に複雑さを積み上げていけるように設計されています。
             </p>
             <p>ADKの中核にある価値提案は次の3点に集約されます。</p>
             <ul>
@@ -276,7 +285,8 @@ export default function AdkBestPracticesPage() {
               </li>
               <li>
                 <strong>モデル非依存かつGemini最適化。</strong>
-                LiteLLM経由で様々なモデルプロバイダーを利用できる一方、Geminiモデルとネイティブに統合されており、Context Cachingなどの機能を最大限活用できる。
+                LiteLLM経由で様々なモデルプロバイダーを利用できる一方、Geminiモデルとネイティブに統合されており、Context
+                Cachingなどの機能を最大限活用できる。
               </li>
               <li>
                 <strong>マルチエージェントをネイティブサポート。</strong>
@@ -284,7 +294,9 @@ export default function AdkBestPracticesPage() {
               </li>
             </ul>
             <p>
-              本ガイドは単体エージェントの作り方ではなく、<strong>中級者から上級者が本番運用を見据えて意思決定すべきポイント</strong>（マルチエージェント設計、状態管理、コンテキスト最適化、ガードレール、評価、可観測性、デプロイ）を中心に解説します。
+              本ガイドは単体エージェントの作り方ではなく、
+              <strong>中級者から上級者が本番運用を見据えて意思決定すべきポイント</strong>
+              （マルチエージェント設計、状態管理、コンテキスト最適化、ガードレール、評価、可観測性、デプロイ）を中心に解説します。
             </p>
           </section>
 
@@ -294,7 +306,9 @@ export default function AdkBestPracticesPage() {
               2. アーキテクチャの全体像
             </h2>
             <p>
-              ADKアプリケーションは、次の主要コンポーネントの組み合わせとして構成されます。<code>Runner</code>が中心となり、Session Service、Memory Service、Artifact Service、エージェント本体、モデル、ツールをつなぎ合わせます。
+              ADKアプリケーションは、次の主要コンポーネントの組み合わせとして構成されます。
+              <code>Runner</code>が中心となり、Session Service、Memory Service、Artifact
+              Service、エージェント本体、モデル、ツールをつなぎ合わせます。
             </p>
             <div className={styles.diagram} id="d1">
               <MermaidDiagram chart={DIAGRAMS.d1} theme="dark" />
@@ -313,7 +327,9 @@ export default function AdkBestPracticesPage() {
                     <td>
                       <strong>Runner</strong>
                     </td>
-                    <td>1回の呼び出しのライフサイクル全体を統括し、EventをSession Serviceに永続化する</td>
+                    <td>
+                      1回の呼び出しのライフサイクル全体を統括し、EventをSession Serviceに永続化する
+                    </td>
                     <td>Runner（同期・非同期実行）</td>
                   </tr>
                   <tr>
@@ -335,7 +351,9 @@ export default function AdkBestPracticesPage() {
                       <strong>Agent</strong>
                     </td>
                     <td>推論・ツール呼び出し・委譲を行う中心的な単位</td>
-                    <td>LlmAgent / SequentialAgent / ParallelAgent / LoopAgent / カスタムBaseAgent</td>
+                    <td>
+                      LlmAgent / SequentialAgent / ParallelAgent / LoopAgent / カスタムBaseAgent
+                    </td>
                   </tr>
                   <tr>
                     <td>
@@ -394,7 +412,11 @@ export default function AdkBestPracticesPage() {
 
             <h3>3.2 プロジェクト構成のベストプラクティス</h3>
             <p>
-              推奨されるディレクトリ構成は次のとおりです。エージェントをPythonパッケージとして扱うことで、<code>adk web</code>や<code>adk run</code>などのCLIツールから自動検出させることができます。<code>__init__.py</code>ではroot_agentをエクスポートし、agent.pyにApp定義、tools.pyにFunction Tool定義、callbacks.pyにCallback定義をそれぞれ分離します。
+              推奨されるディレクトリ構成は次のとおりです。エージェントをPythonパッケージとして扱うことで、
+              <code>adk web</code>や<code>adk run</code>
+              などのCLIツールから自動検出させることができます。<code>__init__.py</code>
+              ではroot_agentをエクスポートし、agent.pyにApp定義、tools.pyにFunction
+              Tool定義、callbacks.pyにCallback定義をそれぞれ分離します。
             </p>
             <div className={styles.codeWrap}>
               <div className={styles.codeBar}>
@@ -406,11 +428,11 @@ export default function AdkBestPracticesPage() {
                   <div className={styles.codeLine}>parent_folder/</div>
                   <div className={styles.codeLine}>├── requirements.txt</div>
                   <div className={styles.codeLine}>└── my_agent/</div>
-                  <div className={styles.codeLine}>    ├── __init__.py</div>
-                  <div className={styles.codeLine}>    ├── agent.py</div>
-                  <div className={styles.codeLine}>    ├── tools.py</div>
-                  <div className={styles.codeLine}>    ├── callbacks.py</div>
-                  <div className={styles.codeLine}>    └── .env</div>
+                  <div className={styles.codeLine}> ├── __init__.py</div>
+                  <div className={styles.codeLine}> ├── agent.py</div>
+                  <div className={styles.codeLine}> ├── tools.py</div>
+                  <div className={styles.codeLine}> ├── callbacks.py</div>
+                  <div className={styles.codeLine}> └── .env</div>
                 </code>
               </pre>
             </div>
@@ -418,19 +440,24 @@ export default function AdkBestPracticesPage() {
             <h3>3.3 開発ループのベストプラクティス</h3>
             <ul>
               <li>
-                ローカル開発では<code>adk web</code>を使い、インタラクティブなWeb UIでエージェントを試しながらセッションとトレースを確認する。
+                ローカル開発では<code>adk web</code>を使い、インタラクティブなWeb
+                UIでエージェントを試しながらセッションとトレースを確認する。
               </li>
               <li>
-                ロジックが固まったら<code>.test.json</code>形式のゴールデンケースを作成し、<code>adk eval</code>で自動回帰テスト化する（詳細はステップ8）。
+                ロジックが固まったら<code>.test.json</code>形式のゴールデンケースを作成し、
+                <code>adk eval</code>で自動回帰テスト化する（詳細はステップ8）。
               </li>
               <li>
-                Pluginを使う場合は、Web UIではPluginが適用されない点に注意し、<code>adk run</code>または<code>adk api_server</code>で最終確認を行う。
+                Pluginを使う場合は、Web UIではPluginが適用されない点に注意し、<code>adk run</code>
+                または<code>adk api_server</code>で最終確認を行う。
               </li>
             </ul>
             <p className={styles.source}>
               <i className="ti ti-link" />
               出典: ADK公式ドキュメント「Deploying Your Agent」{" "}
-              <Ext href="https://google.github.io/adk-docs/deploy/">google.github.io/adk-docs/deploy</Ext>
+              <Ext href="https://google.github.io/adk-docs/deploy/">
+                google.github.io/adk-docs/deploy
+              </Ext>
             </p>
           </section>
 
@@ -440,7 +467,8 @@ export default function AdkBestPracticesPage() {
               4. ステップ2: エージェント設計の基本
             </h2>
             <p>
-              <code>LlmAgent</code>はADKの最も基本的な構成単位で、モデル・指示（instruction）・ツール・サブエージェントを組み合わせて定義します。
+              <code>LlmAgent</code>
+              はADKの最も基本的な構成単位で、モデル・指示（instruction）・ツール・サブエージェントを組み合わせて定義します。
             </p>
             <div className={styles.codeWrap}>
               <div className={styles.codeBar}>
@@ -450,23 +478,25 @@ export default function AdkBestPracticesPage() {
               <pre className={styles.codeBody}>
                 <code className="language-python">
                   <div className={styles.codeLine}>
-                    <span className={styles.ck}>from</span> google.adk.agents <span className={styles.ck}>import</span>{" "}
-                    Agent
+                    <span className={styles.ck}>from</span> google.adk.agents{" "}
+                    <span className={styles.ck}>import</span> Agent
                   </div>
                   <div className={styles.codeLine} />
                   <div className={styles.codeLine}>
-                    <span className={styles.ck}>def</span> <span className={styles.ch}>get_weather</span>
+                    <span className={styles.ck}>def</span>{" "}
+                    <span className={styles.ch}>get_weather</span>
                     (city: str) -&gt; dict:
                   </div>
                   <div className={styles.codeLine}>
-                    {"    "}<span className={styles.ck}>return</span> &#123;
-                    <span className={styles.cs}>"status"</span>: <span className={styles.cs}>"success"</span>,{" "}
-                    <span className={styles.cs}>"report"</span>: <span className={styles.cs}>"晴れ、25度"</span>&#125;
+                    {"    "}
+                    <span className={styles.ck}>return</span> &#123;
+                    <span className={styles.cs}>"status"</span>:{" "}
+                    <span className={styles.cs}>"success"</span>,{" "}
+                    <span className={styles.cs}>"report"</span>:{" "}
+                    <span className={styles.cs}>"晴れ、25度"</span>&#125;
                   </div>
                   <div className={styles.codeLine} />
-                  <div className={styles.codeLine}>
-                    root_agent = Agent(
-                  </div>
+                  <div className={styles.codeLine}>root_agent = Agent(</div>
                   <div className={styles.codeLine}>
                     {"    "}name=<span className={styles.cs}>"weather_agent"</span>,
                   </div>
@@ -480,13 +510,12 @@ export default function AdkBestPracticesPage() {
                   <div className={styles.codeLine}>
                     {"    "}instruction=
                     <span className={styles.cs}>
-                      "ユーザーが指定した都市の天気を get_weather ツールで取得し、簡潔な日本語で回答してください。"
+                      "ユーザーが指定した都市の天気を get_weather
+                      ツールで取得し、簡潔な日本語で回答してください。"
                     </span>
                     ,
                   </div>
-                  <div className={styles.codeLine}>
-                    {"    "}tools=[get_weather],
-                  </div>
+                  <div className={styles.codeLine}>{"    "}tools=[get_weather],</div>
                   <div className={styles.codeLine}>)</div>
                 </code>
               </pre>
@@ -499,7 +528,8 @@ export default function AdkBestPracticesPage() {
               </li>
               <li>
                 <strong>instructionとstatic_instructionを使い分ける。</strong>
-                セッションを通じて変化しない指示はstatic_instructionに分離すると、Context Cachingのキャッシュヒット率が向上する。
+                セッションを通じて変化しない指示はstatic_instructionに分離すると、Context
+                Cachingのキャッシュヒット率が向上する。
               </li>
               <li>
                 <strong>ツールは単一責任にする。</strong>
@@ -573,7 +603,9 @@ export default function AdkBestPracticesPage() {
               <Ext href="https://adk.dev/workflows/">adk.dev/workflows</Ext>
             </p>
             <p>
-              ADK 2.0では、これらの固定構造に加えて、単一のLLMエージェントが実行時に動的にサブエージェントを選ぶCollaborative workflows（コーディネーターパターンの発展形）も利用できます。
+              ADK
+              2.0では、これらの固定構造に加えて、単一のLLMエージェントが実行時に動的にサブエージェントを選ぶCollaborative
+              workflows（コーディネーターパターンの発展形）も利用できます。
             </p>
 
             <h3>5.2 代表的なマルチエージェント設計パターン</h3>
@@ -591,7 +623,9 @@ export default function AdkBestPracticesPage() {
                     <td>
                       <strong>Coordinator / Dispatcher</strong>
                     </td>
-                    <td>中央のLLMエージェントが意図を解釈し、専門サブエージェントにリクエストを振り分ける</td>
+                    <td>
+                      中央のLLMエージェントが意図を解釈し、専門サブエージェントにリクエストを振り分ける
+                    </td>
                     <td>カスタマーサポートの一次受付、意図分類</td>
                   </tr>
                   <tr>
@@ -669,13 +703,17 @@ export default function AdkBestPracticesPage() {
                       <strong>LLM-Driven Delegation</strong>
                     </td>
                     <td>コーディネーターが会話の制御そのものをサブエージェントへ渡す</td>
-                    <td>一度移譲すると親エージェントは会話から外れ、複数ステップにまたがるタスクでは文脈が失われやすい</td>
+                    <td>
+                      一度移譲すると親エージェントは会話から外れ、複数ステップにまたがるタスクでは文脈が失われやすい
+                    </td>
                   </tr>
                   <tr>
                     <td>
                       <strong>Explicit Invocation（AgentTool）</strong>
                     </td>
-                    <td>サブエージェントをツールとしてラップし、親エージェントが結果を受け取ってから次の判断をする</td>
+                    <td>
+                      サブエージェントをツールとしてラップし、親エージェントが結果を受け取ってから次の判断をする
+                    </td>
                     <td>親が「プロジェクトマネージャー」として全体を把握し続けられる</td>
                   </tr>
                 </tbody>
@@ -695,10 +733,19 @@ export default function AdkBestPracticesPage() {
 
             <h3>5.4 設計チェックリスト</h3>
             <ul>
-              <li>サブエージェントのdescriptionは、コーディネーターが誤りなくルーティングできるレベルまで具体的に書く。</li>
-              <li>状態を共有する場合は、キーに app: user: temp: などの適切なプレフィックスを付け、スコープを明示する。</li>
-              <li>単純な線形処理はまずSequentialAgentで実装し、本当に並列化が必要な箇所だけParallelAgentへ切り出す。</li>
-              <li>反復精緻化が必要な箇所にのみLoopAgentを使い、最大イテレーション数を必ず設定する。</li>
+              <li>
+                サブエージェントのdescriptionは、コーディネーターが誤りなくルーティングできるレベルまで具体的に書く。
+              </li>
+              <li>
+                状態を共有する場合は、キーに app: user: temp:
+                などの適切なプレフィックスを付け、スコープを明示する。
+              </li>
+              <li>
+                単純な線形処理はまずSequentialAgentで実装し、本当に並列化が必要な箇所だけParallelAgentへ切り出す。
+              </li>
+              <li>
+                反復精緻化が必要な箇所にのみLoopAgentを使い、最大イテレーション数を必ず設定する。
+              </li>
             </ul>
           </section>
 
@@ -720,29 +767,42 @@ export default function AdkBestPracticesPage() {
               <pre className={styles.codeBody}>
                 <code className="language-python">
                   <div className={styles.codeLine}>
-                    <span className={styles.ck}>def</span> <span className={styles.ch}>get_weather</span>
+                    <span className={styles.ck}>def</span>{" "}
+                    <span className={styles.ch}>get_weather</span>
                     (city: str) -&gt; dict:
                   </div>
                   <div className={styles.codeLine}>
-                    {"    "}<span className={styles.cc}>"""指定した都市の現在の天気情報を取得する。"""</span>
+                    {"    "}
+                    <span className={styles.cc}>
+                      """指定した都市の現在の天気情報を取得する。"""
+                    </span>
                   </div>
                   <div className={styles.codeLine} />
                   <div className={styles.codeLine}>
-                    {"    "}<span className={styles.ck}>return</span> &#123;
-                    <span className={styles.cs}>"status"</span>: <span className={styles.cs}>"success"</span>,{" "}
-                    <span className={styles.cs}>"report"</span>: <span className={styles.cs}>"晴れ、25度"</span>&#125;
+                    {"    "}
+                    <span className={styles.ck}>return</span> &#123;
+                    <span className={styles.cs}>"status"</span>:{" "}
+                    <span className={styles.cs}>"success"</span>,{" "}
+                    <span className={styles.cs}>"report"</span>:{" "}
+                    <span className={styles.cs}>"晴れ、25度"</span>&#125;
                   </div>
                 </code>
               </pre>
             </div>
             <ul>
-              <li>戻り値は構造化された辞書（statusキーを含める等）にし、エラー時とのフォーマットを統一する。</li>
-              <li>副作用のある操作（送金、削除など）は、before_tool_callbackによるガードレールとセットで設計する。</li>
+              <li>
+                戻り値は構造化された辞書（statusキーを含める等）にし、エラー時とのフォーマットを統一する。
+              </li>
+              <li>
+                副作用のある操作（送金、削除など）は、before_tool_callbackによるガードレールとセットで設計する。
+              </li>
             </ul>
             <p className={styles.source}>
               <i className="ti ti-link" />
               出典: ADK公式ドキュメント「Function tools」{" "}
-              <Ext href="https://adk.dev/tools-custom/function-tools/">adk.dev/tools-custom/function-tools</Ext>
+              <Ext href="https://adk.dev/tools-custom/function-tools/">
+                adk.dev/tools-custom/function-tools
+              </Ext>
             </p>
 
             <h3>6.2 MCP Tools（Model Context Protocol）</h3>
@@ -763,12 +823,15 @@ export default function AdkBestPracticesPage() {
             <p className={styles.source}>
               <i className="ti ti-link" />
               出典: ADK公式ドキュメント「MCP tools」{" "}
-              <Ext href="https://adk.dev/tools-custom/mcp-tools/">adk.dev/tools-custom/mcp-tools</Ext>
+              <Ext href="https://adk.dev/tools-custom/mcp-tools/">
+                adk.dev/tools-custom/mcp-tools
+              </Ext>
             </p>
 
             <h3>6.3 OpenAPI Tools</h3>
             <p>
-              既存のREST APIがOpenAPI仕様（Swagger）を持っている場合、ADKはその仕様からツール群を自動生成できます。手作業でラッパー関数を書く必要がなく、大規模な社内APIをまとめてエージェントに公開する際に有効です。
+              既存のREST
+              APIがOpenAPI仕様（Swagger）を持っている場合、ADKはその仕様からツール群を自動生成できます。手作業でラッパー関数を書く必要がなく、大規模な社内APIをまとめてエージェントに公開する際に有効です。
             </p>
 
             <h3>6.4 Agent as a Tool（AgentTool）</h3>
@@ -778,7 +841,8 @@ export default function AdkBestPracticesPage() {
 
             <h3>6.5 In-Tool Guardrails（ツール内ガードレール）</h3>
             <p>
-              ツールは「モデルが設定する引数」と「開発者が決定論的に設定するTool Context」という2種類の入力を受け取ります。この性質を利用し、ツール自身に安全策を組み込む設計が推奨されます。
+              ツールは「モデルが設定する引数」と「開発者が決定論的に設定するTool
+              Context」という2種類の入力を受け取ります。この性質を利用し、ツール自身に安全策を組み込む設計が推奨されます。
             </p>
             <div className={styles.codeWrap}>
               <div className={styles.codeBar}>
@@ -788,7 +852,8 @@ export default function AdkBestPracticesPage() {
               <pre className={styles.codeBody}>
                 <code className="language-python">
                   <div className={styles.codeLine}>
-                    <span className={styles.ck}>def</span> <span className={styles.ch}>query_database</span>
+                    <span className={styles.ck}>def</span>{" "}
+                    <span className={styles.ch}>query_database</span>
                     (sql_query: str, tool_context) -&gt; dict:
                   </div>
                   <div className={styles.codeLine}>
@@ -796,22 +861,29 @@ export default function AdkBestPracticesPage() {
                     <span className={styles.cs}>"policy:allowed_tables"</span>, [])
                   </div>
                   <div className={styles.codeLine}>
-                    {"    "}<span className={styles.ck}>if</span> <span className={styles.ck}>not</span>{" "}
+                    {"    "}
+                    <span className={styles.ck}>if</span> <span className={styles.ck}>not</span>{" "}
                     is_query_within_allowed_tables(sql_query, allowed_tables):
                   </div>
                   <div className={styles.codeLine}>
-                    {"        "}<span className={styles.ck}>return</span> &#123;
-                    <span className={styles.cs}>"status"</span>: <span className={styles.cs}>"error"</span>,{" "}
+                    {"        "}
+                    <span className={styles.ck}>return</span> &#123;
+                    <span className={styles.cs}>"status"</span>:{" "}
+                    <span className={styles.cs}>"error"</span>,{" "}
                     <span className={styles.cs}>"message"</span>:{" "}
-                    <span className={styles.cs}>"許可されていないテーブルへのアクセスです"</span>&#125;
+                    <span className={styles.cs}>"許可されていないテーブルへのアクセスです"</span>
+                    &#125;
                   </div>
                   <div className={styles.codeLine}>
-                    {"    "}<span className={styles.ck}>return</span> run_query(sql_query)
+                    {"    "}
+                    <span className={styles.ck}>return</span> run_query(sql_query)
                   </div>
                 </code>
               </pre>
             </div>
-            <p>こうすることで、モデルの出力が想定外であっても、ツール自体が決定論的なポリシーを強制できます。</p>
+            <p>
+              こうすることで、モデルの出力が想定外であっても、ツール自体が決定論的なポリシーを強制できます。
+            </p>
             <p className={styles.source}>
               <i className="ti ti-link" />
               出典: ADK公式ドキュメント「Safety and Security for AI Agents」{" "}
@@ -837,7 +909,8 @@ export default function AdkBestPracticesPage() {
                 <strong>State。</strong>会話の間だけ有効な作業用のスクラッチパッド。
               </li>
               <li>
-                <strong>Memory。</strong>セッションをまたいで保持される長期的な知識ストア。多くの場合RAG（埋め込みベースの検索）で実装される。
+                <strong>Memory。</strong>
+                セッションをまたいで保持される長期的な知識ストア。多くの場合RAG（埋め込みベースの検索）で実装される。
               </li>
             </ul>
             <p className={styles.source}>
@@ -894,7 +967,8 @@ export default function AdkBestPracticesPage() {
             </p>
             <p className={styles.source}>
               <i className="ti ti-link" />
-              出典: ADK公式ドキュメント「State」 <Ext href="https://adk.dev/sessions/state/">adk.dev/sessions/state</Ext>
+              出典: ADK公式ドキュメント「State」{" "}
+              <Ext href="https://adk.dev/sessions/state/">adk.dev/sessions/state</Ext>
             </p>
 
             <h3>7.3 SessionServiceの実装比較</h3>
@@ -938,13 +1012,15 @@ export default function AdkBestPracticesPage() {
             </p>
             <p className={styles.source}>
               <i className="ti ti-link" />
-              出典: ADK公式ドキュメントおよびコミュニティ記事「Google ADK Session and State Management」{" "}
+              出典: ADK公式ドキュメントおよびコミュニティ記事「Google ADK Session and State
+              Management」{" "}
               <Ext href="https://adk.dev/sessions/session/">adk.dev/sessions/session</Ext>
             </p>
 
             <h3>7.4 Memory Service（長期記憶）</h3>
             <p>
-              RAGベースのMemory Serviceを使うと、過去の会話から抽出した情報を埋め込みベクトルとして保存し、類似度検索で関連情報を呼び出せます。
+              RAGベースのMemory
+              Serviceを使うと、過去の会話から抽出した情報を埋め込みベクトルとして保存し、類似度検索で関連情報を呼び出せます。
             </p>
             <div className={styles.codeWrap}>
               <div className={styles.codeBar}>
@@ -954,13 +1030,11 @@ export default function AdkBestPracticesPage() {
               <pre className={styles.codeBody}>
                 <code className="language-python">
                   <div className={styles.codeLine}>
-                    <span className={styles.ck}>from</span> google.adk.memory <span className={styles.ck}>import</span>{" "}
-                    VertexAiMemoryBankService
+                    <span className={styles.ck}>from</span> google.adk.memory{" "}
+                    <span className={styles.ck}>import</span> VertexAiMemoryBankService
                   </div>
                   <div className={styles.codeLine} />
-                  <div className={styles.codeLine}>
-                    memory_service = VertexAiMemoryBankService(
-                  </div>
+                  <div className={styles.codeLine}>memory_service = VertexAiMemoryBankService(</div>
                   <div className={styles.codeLine}>
                     {"    "}project=<span className={styles.cs}>"PROJECT_ID"</span>,
                   </div>
@@ -1011,12 +1085,12 @@ export default function AdkBestPracticesPage() {
               <pre className={styles.codeBody}>
                 <code className="language-python">
                   <div className={styles.codeLine}>
-                    <span className={styles.ck}>from</span> google.adk.agents <span className={styles.ck}>import</span>{" "}
-                    Agent
+                    <span className={styles.ck}>from</span> google.adk.agents{" "}
+                    <span className={styles.ck}>import</span> Agent
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.ck}>from</span> google.adk.apps.app <span className={styles.ck}>import</span>{" "}
-                    App
+                    <span className={styles.ck}>from</span> google.adk.apps.app{" "}
+                    <span className={styles.ck}>import</span> App
                   </div>
                   <div className={styles.codeLine}>
                     <span className={styles.ck}>from</span> google.adk.agents.context_cache_config{" "}
@@ -1028,15 +1102,11 @@ export default function AdkBestPracticesPage() {
                     <span className={styles.cs}>"gemini-flash-latest"</span>)
                   </div>
                   <div className={styles.codeLine} />
-                  <div className={styles.codeLine}>
-                    app = App(
-                  </div>
+                  <div className={styles.codeLine}>app = App(</div>
                   <div className={styles.codeLine}>
                     {"    "}name=<span className={styles.cs}>"my-caching-agent-app"</span>,
                   </div>
-                  <div className={styles.codeLine}>
-                    {"    "}root_agent=root_agent,
-                  </div>
+                  <div className={styles.codeLine}>{"    "}root_agent=root_agent,</div>
                   <div className={styles.codeLine}>
                     {"    "}context_cache_config=ContextCacheConfig(
                   </div>
@@ -1049,9 +1119,7 @@ export default function AdkBestPracticesPage() {
                   <div className={styles.codeLine}>
                     {"        "}cache_intervals=<span className={styles.cv}>5</span>,
                   </div>
-                  <div className={styles.codeLine}>
-                    {"    "}),
-                  </div>
+                  <div className={styles.codeLine}>{"    "}),</div>
                   <div className={styles.codeLine}>)</div>
                 </code>
               </pre>
@@ -1068,7 +1136,7 @@ export default function AdkBestPracticesPage() {
 
             <h3>8.2 Context Compaction（コンテキスト圧縮）</h3>
             <p>
-              古い会話イベントを要約し、直近のやり取りだけを生の形式で保持するスライディングウィンドウ方式です。イベント数ベースとトークン数ベース of 2種類の設定があります。token_thresholdでこのトークン数を超えたら圧縮を発動し、event_retention_sizeで直近何件のイベントを生のまま残すかを指定します。
+              古い会話イベントを要約し、直近のやり取りだけを生の形式で保持するスライディングウィンドウ方式です。イベント数ベースとトークン数ベースの2種類の設定があります。token_thresholdでこのトークン数を超えたら圧縮を発動し、event_retention_sizeで直近何件のイベントを生のまま残すかを指定します。
             </p>
             <div className={styles.codeWrap}>
               <div className={styles.codeBar}>
@@ -1078,21 +1146,19 @@ export default function AdkBestPracticesPage() {
               <pre className={styles.codeBody}>
                 <code className="language-python">
                   <div className={styles.codeLine}>
-                    <span className={styles.ck}>from</span> google.adk.apps.app <span className={styles.ck}>import</span>{" "}
-                    App, EventsCompactionConfig
+                    <span className={styles.ck}>from</span> google.adk.apps.app{" "}
+                    <span className={styles.ck}>import</span> App, EventsCompactionConfig
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.ck}>from</span> google.adk.agents <span className={styles.ck}>import</span>{" "}
-                    Agent
+                    <span className={styles.ck}>from</span> google.adk.agents{" "}
+                    <span className={styles.ck}>import</span> Agent
                   </div>
                   <div className={styles.codeLine} />
                   <div className={styles.codeLine}>
                     root_agent = Agent(name=<span className={styles.cs}>"my_root_agent"</span>)
                   </div>
                   <div className={styles.codeLine} />
-                  <div className={styles.codeLine}>
-                    compaction_config = EventsCompactionConfig(
-                  </div>
+                  <div className={styles.codeLine}>compaction_config = EventsCompactionConfig(</div>
                   <div className={styles.codeLine}>
                     {"    "}token_threshold=<span className={styles.cv}>4000</span>,
                   </div>
@@ -1101,15 +1167,11 @@ export default function AdkBestPracticesPage() {
                   </div>
                   <div className={styles.codeLine}>)</div>
                   <div className={styles.codeLine} />
-                  <div className={styles.codeLine}>
-                    app = App(
-                  </div>
+                  <div className={styles.codeLine}>app = App(</div>
                   <div className={styles.codeLine}>
                     {"    "}name=<span className={styles.cs}>"my_compacting_agent_app"</span>,
                   </div>
-                  <div className={styles.codeLine}>
-                    {"    "}root_agent=root_agent,
-                  </div>
+                  <div className={styles.codeLine}>{"    "}root_agent=root_agent,</div>
                   <div className={styles.codeLine}>
                     {"    "}events_compaction_config=compaction_config,
                   </div>
@@ -1126,7 +1188,8 @@ export default function AdkBestPracticesPage() {
                 直近の会話の代名詞解決（それ、あれ、など）に支障が出ないよう、event_retention_sizeは文脈が破綻しない程度の余裕を持たせる。
               </li>
               <li>
-                2026年時点でContext Cachingは主にGeminiモデルでのみサポートされている点に留意する（LiteLLM経由の他社モデルは未対応）。
+                2026年時点でContext
+                Cachingは主にGeminiモデルでのみサポートされている点に留意する（LiteLLM経由の他社モデルは未対応）。
               </li>
             </ul>
             <p className={styles.source}>
@@ -1165,7 +1228,9 @@ export default function AdkBestPracticesPage() {
                       <strong>before / after_model_callback</strong>
                     </td>
                     <td>LLM呼び出しの前後</td>
-                    <td>入力ガードレール、プロンプト検閲、キャッシュ利用、出力のPIIフィルタリング</td>
+                    <td>
+                      入力ガードレール、プロンプト検閲、キャッシュ利用、出力のPIIフィルタリング
+                    </td>
                   </tr>
                   <tr>
                     <td>
@@ -1183,7 +1248,9 @@ export default function AdkBestPracticesPage() {
             <p className={styles.source}>
               <i className="ti ti-link" />
               出典: ADK公式ドキュメント「Types of callbacks」「Callback patterns」{" "}
-              <Ext href="https://adk.dev/callbacks/types-of-callbacks/">adk.dev/callbacks/types-of-callbacks</Ext>
+              <Ext href="https://adk.dev/callbacks/types-of-callbacks/">
+                adk.dev/callbacks/types-of-callbacks
+              </Ext>
             </p>
 
             <h3>9.2 代表的なコールバック設計パターン</h3>
@@ -1255,7 +1322,9 @@ export default function AdkBestPracticesPage() {
                       <strong>適用範囲</strong>
                     </td>
                     <td>特定の1つのエージェントやツールに紐づくローカルな設定</td>
-                    <td>Runnerに一度登録すると配下の全エージェント・全ツール・全LLM呼び出しに適用されるグローバルな設定</td>
+                    <td>
+                      Runnerに一度登録すると配下の全エージェント・全ツール・全LLM呼び出しに適用されるグローバルな設定
+                    </td>
                   </tr>
                   <tr>
                     <td>
@@ -1269,7 +1338,9 @@ export default function AdkBestPracticesPage() {
                       <strong>実行順序</strong>
                     </td>
                     <td>Plugin側のコールバックの後に実行される</td>
-                    <td>Agent・Model・Toolレベルのコールバックより先に実行され、値を返すと後続をスキップする</td>
+                    <td>
+                      Agent・Model・Toolレベルのコールバックより先に実行され、値を返すと後続をスキップする
+                    </td>
                   </tr>
                   <tr>
                     <td>
@@ -1287,19 +1358,21 @@ export default function AdkBestPracticesPage() {
             </p>
             <p className={styles.source}>
               <i className="ti ti-link" />
-              出典: ADK公式ドキュメント「Plugins」およびGoogle Cloudコミュニティ記事「Master ADK Callbacks: DOs and DON'Ts」{" "}
-              <Ext href="https://adk.dev/plugins/">adk.dev/plugins</Ext>
+              出典: ADK公式ドキュメント「Plugins」およびGoogle Cloudコミュニティ記事「Master ADK
+              Callbacks: DOs and DON'Ts」 <Ext href="https://adk.dev/plugins/">adk.dev/plugins</Ext>
             </p>
 
             <h3>9.4 セキュリティとガードレールのベストプラクティス</h3>
             <ul>
               <li>
                 <strong>多層防御。</strong>
-                In-Tool Guardrails、Callbackによるモデル呼び出し前後の検証、Gemini自体の組み込み安全機能を組み合わせる。
+                In-Tool
+                Guardrails、Callbackによるモデル呼び出し前後の検証、Gemini自体の組み込み安全機能を組み合わせる。
               </li>
               <li>
                 <strong>安価なモデルによる追加チェック。</strong>
-                高速で安価なモデル（例: Gemini Flash Lite）をコールバック内で呼び出し、入出力の安全性を追加でスクリーニングする構成が有効。
+                高速で安価なモデル（例: Gemini Flash
+                Lite）をコールバック内で呼び出し、入出力の安全性を追加でスクリーニングする構成が有効。
               </li>
               <li>
                 <strong>サンドボックス化。</strong>
@@ -1367,10 +1440,12 @@ export default function AdkBestPracticesPage() {
               </li>
               <li>Web UIのEvalタブから現在のセッションを新しい評価ケースとして保存する。</li>
               <li>
-                生成された <code>.test.json</code> を編集し、期待する中間ツール呼び出しと期待する最終応答を明確化する。
+                生成された <code>.test.json</code>{" "}
+                を編集し、期待する中間ツール呼び出しと期待する最終応答を明確化する。
               </li>
               <li>
-                <code>adk eval</code> コマンド、またはCIパイプライン内でAgentEvaluator.evaluate()を呼び出し自動化する。
+                <code>adk eval</code>{" "}
+                コマンド、またはCIパイプライン内でAgentEvaluator.evaluate()を呼び出し自動化する。
               </li>
             </ol>
             <div className={styles.codeWrap}>
@@ -1388,18 +1463,18 @@ export default function AdkBestPracticesPage() {
                     <span className={styles.ck}>import</span> AgentEvaluator
                   </div>
                   <div className={styles.codeLine} />
-                  <div className={styles.codeLine}>
-                    @pytest.mark.asyncio
-                  </div>
+                  <div className={styles.codeLine}>@pytest.mark.asyncio</div>
                   <div className={styles.codeLine}>
                     <span className={styles.ck}>async</span> <span className={styles.ck}>def</span>{" "}
                     <span className={styles.ch}>test_customer_service_agent_evaluation</span>():
                   </div>
                   <div className={styles.codeLine}>
-                    {"    "}<span className={styles.ck}>await</span> AgentEvaluator.evaluate(
+                    {"    "}
+                    <span className={styles.ck}>await</span> AgentEvaluator.evaluate(
                   </div>
                   <div className={styles.codeLine}>
-                    {"        "}agent_module=<span className={styles.cs}>"customer_service_agent"</span>,
+                    {"        "}agent_module=
+                    <span className={styles.cs}>"customer_service_agent"</span>,
                   </div>
                   <div className={styles.codeLine}>
                     {"        "}agent_name=<span className={styles.cs}>"root_agent"</span>,
@@ -1408,19 +1483,20 @@ export default function AdkBestPracticesPage() {
                     {"        "}eval_dataset_file_path_or_dir=
                     <span className={styles.cs}>"tests/data"</span>,
                   </div>
-                  <div className={styles.codeLine}>
-                    {"    "})
-                  </div>
+                  <div className={styles.codeLine}>{"    "})</div>
                 </code>
               </pre>
             </div>
             <p>
               <strong>ベストプラクティス。</strong>
-              Trajectoryの一致判定はEXACT（完全一致）とIN_ORDER（順序だけ保証し他のツール呼び出しの混在を許容）を使い分けます。規制業務や再現性が重要な処理にはEXACT、柔軟性を残したい探索的なタスクにはIN_ORDERが適しています。新しいCallbackやガードレールを追加した際は、必ずadk evalをエッジケースのプロンプトに対して実行し、意図せぬ回帰がないか確認してください。CI/CDにはPytest統合を利用し、JUnit XML形式のレポートを既存のダッシュボードに接続します。
+              Trajectoryの一致判定はEXACT（完全一致）とIN_ORDER（順序だけ保証し他のツール呼び出しの混在を許容）を使い分けます。規制業務や再現性が重要な処理にはEXACT、柔軟性を残したい探索的なタスクにはIN_ORDERが適しています。新しいCallbackやガードレールを追加した際は、必ずadk
+              evalをエッジケースのプロンプトに対して実行し、意図せぬ回帰がないか確認してください。CI/CDにはPytest統合を利用し、JUnit
+              XML形式のレポートを既存のダッシュボードに接続します。
             </p>
             <p className={styles.source}>
               <i className="ti ti-link" />
-              出典: ADK公式ドキュメント「Why evaluate agents」「Criteria」およびGoogle Codelabs「Evaluating Agents with ADK」{" "}
+              出典: ADK公式ドキュメント「Why evaluate agents」「Criteria」およびGoogle
+              Codelabs「Evaluating Agents with ADK」{" "}
               <Ext href="https://adk.dev/evaluate/">adk.dev/evaluate</Ext> /{" "}
               <Ext href="https://codelabs.developers.google.com/adk-eval/instructions">
                 codelabs.developers.google.com
@@ -1436,22 +1512,27 @@ export default function AdkBestPracticesPage() {
 
             <h3>11.1 ロギング</h3>
             <p>
-              ADKは各言語の標準ロギングライブラリ（Pythonならlogging）上に構築されており、アプリケーション側で自由にフォーマットやハンドラを設定できます。Google Cloudの構造化ログ形式（トレース相関を含む）に合わせたカスタムフォーマッタを使うと、Cloud Loggingとの統合が容易になります。
+              ADKは各言語の標準ロギングライブラリ（Pythonならlogging）上に構築されており、アプリケーション側で自由にフォーマットやハンドラを設定できます。Google
+              Cloudの構造化ログ形式（トレース相関を含む）に合わせたカスタムフォーマッタを使うと、Cloud
+              Loggingとの統合が容易になります。
             </p>
 
             <h3>11.2 トレーシング（OpenTelemetry）</h3>
             <p>
-              ADK 1.17以降は、OpenTelemetryのGenAI向けセマンティックコンベンションに準拠した組み込みトレース計装を持っています。
+              ADK
+              1.17以降は、OpenTelemetryのGenAI向けセマンティックコンベンションに準拠した組み込みトレース計装を持っています。
             </p>
             <div className={styles.diagram} id="d11">
               <MermaidDiagram chart={DIAGRAMS.d11} theme="dark" />
             </div>
             <ul>
               <li>
-                adk webやadk api_server実行時に--otel_to_cloudフラグを付けるだけでCloud Traceへ送信できる。
+                adk webやadk api_server実行時に--otel_to_cloudフラグを付けるだけでCloud
+                Traceへ送信できる。
               </li>
               <li>
-                標準OTel環境変数を設定すれば、Jaeger、Grafana Tempo、Datadogなど任意のOTel互換バックエンドに送信可能。
+                標準OTel環境変数を設定すれば、Jaeger、Grafana
+                Tempo、Datadogなど任意のOTel互換バックエンドに送信可能。
               </li>
               <li>
                 コンテキスト伝播が自動化されており、ツールから呼び出した外部マイクロサービスのスパンも同じトレースに連結される。
@@ -1459,7 +1540,8 @@ export default function AdkBestPracticesPage() {
             </ul>
             <p className={styles.source}>
               <i className="ti ti-link" />
-              出典: ADK公式ドキュメント「Traces」およびGoogle Cloud Documentation「Instrument ADK applications with OpenTelemetry」{" "}
+              出典: ADK公式ドキュメント「Traces」およびGoogle Cloud Documentation「Instrument ADK
+              applications with OpenTelemetry」{" "}
               <Ext href="https://adk.dev/observability/traces/">adk.dev/observability/traces</Ext> /{" "}
               <Ext href="https://docs.cloud.google.com/stackdriver/docs/instrumentation/ai-agent-adk">
                 docs.cloud.google.com
@@ -1480,7 +1562,10 @@ export default function AdkBestPracticesPage() {
                     <td>
                       <strong>Google Cloud Trace</strong>
                     </td>
-                    <td>--otel_to_cloudフラグまたは環境変数で送信、Trace Explorerでウォーターフォール表示</td>
+                    <td>
+                      --otel_to_cloudフラグまたは環境変数で送信、Trace
+                      Explorerでウォーターフォール表示
+                    </td>
                   </tr>
                   <tr>
                     <td>
@@ -1498,7 +1583,9 @@ export default function AdkBestPracticesPage() {
                     <td>
                       <strong>Arize AX</strong>
                     </td>
-                    <td>エージェントの意思決定経路・ツール利用効率・調整品質を評価する専用プラットフォーム</td>
+                    <td>
+                      エージェントの意思決定経路・ツール利用効率・調整品質を評価する専用プラットフォーム
+                    </td>
                   </tr>
                   <tr>
                     <td>
@@ -1511,11 +1598,15 @@ export default function AdkBestPracticesPage() {
             </div>
             <p>
               <strong>ベストプラクティス。</strong>
-              単一クラウドで完結する場合はCloud Traceで十分ですが、マルチクラウド構成やベンダーニュートラルな分析基盤が必要な場合は、Cloud Run上にOTel Collectorを立て、複数のバックエンドへ同時にファンアウトする構成が有効です。
+              単一クラウドで完結する場合はCloud
+              Traceで十分ですが、マルチクラウド構成やベンダーニュートラルな分析基盤が必要な場合は、Cloud
+              Run上にOTel
+              Collectorを立て、複数のバックエンドへ同時にファンアウトする構成が有効です。
             </p>
             <p className={styles.source}>
               <i className="ti ti-link" />
-              出典: Kablamo Engineering Blog「Tracing AI Agents on Google Cloud with OpenTelemetry and Agent Engine」{" "}
+              出典: Kablamo Engineering Blog「Tracing AI Agents on Google Cloud with OpenTelemetry
+              and Agent Engine」{" "}
               <Ext href="https://engineering.kablamo.com.au/posts/gcp-otel-adk-agent">
                 engineering.kablamo.com.au
               </Ext>
@@ -1568,12 +1659,20 @@ export default function AdkBestPracticesPage() {
 
             <h3>12.2 ADKにおけるA2Aの実装ステップ</h3>
             <ol>
-              <li>既存のADKエージェントをA2AServerとして公開する（HTTPサーバーとして待受けさせる）。</li>
-              <li>agent.jsonのようなパスでAgent Card（能力・接続情報を記述したJSON）を公開する。</li>
               <li>
-                別のエージェント側でRemoteA2aAgentを使い、Agent Cardを解決してリモートエージェントをサブエージェントのように扱う。
+                既存のADKエージェントをA2AServerとして公開する（HTTPサーバーとして待受けさせる）。
               </li>
-              <li>ADKのWeb UIで、ローカルエージェントとリモートエージェントの両方が協調して動作することを確認する。</li>
+              <li>
+                agent.jsonのようなパスでAgent Card（能力・接続情報を記述したJSON）を公開する。
+              </li>
+              <li>
+                別のエージェント側でRemoteA2aAgentを使い、Agent
+                Cardを解決してリモートエージェントをサブエージェントのように扱う。
+              </li>
+              <li>
+                ADKのWeb
+                UIで、ローカルエージェントとリモートエージェントの両方が協調して動作することを確認する。
+              </li>
             </ol>
             <p>
               <strong>ベストプラクティス。</strong>
@@ -1581,9 +1680,15 @@ export default function AdkBestPracticesPage() {
             </p>
             <p className={styles.source}>
               <i className="ti ti-link" />
-              出典: ADK公式ドキュメント「Introduction to A2A」およびGoogle Codelabs「Connect to Remote Agents with ADK and the Agent2Agent SDK」{" "}
-              <Ext href="https://google.github.io/adk-docs/a2a/intro/">google.github.io/adk-docs</Ext> /{" "}
-              <Ext href="https://www.skills.google/focuses/132170?parent=catalog">skills.google</Ext>
+              出典: ADK公式ドキュメント「Introduction to A2A」およびGoogle Codelabs「Connect to
+              Remote Agents with ADK and the Agent2Agent SDK」{" "}
+              <Ext href="https://google.github.io/adk-docs/a2a/intro/">
+                google.github.io/adk-docs
+              </Ext>{" "}
+              /{" "}
+              <Ext href="https://www.skills.google/focuses/132170?parent=catalog">
+                skills.google
+              </Ext>
             </p>
           </section>
 
@@ -1612,15 +1717,23 @@ export default function AdkBestPracticesPage() {
                     <td>
                       <strong>Agent Runtime</strong>
                     </td>
-                    <td>Google Cloud Agent Platformが提供するエージェント専用のフルマネージド自動スケーリング環境</td>
+                    <td>
+                      Google Cloud Agent
+                      Platformが提供するエージェント専用のフルマネージド自動スケーリング環境
+                    </td>
                     <td>運用負荷を最小化したいエンタープライズ本番運用</td>
                   </tr>
                   <tr>
                     <td>
                       <strong>Cloud Run</strong>
                     </td>
-                    <td>サーバーレスのコンテナ実行基盤。adk deploy cloud_runコマンドでコンテナビルドからデプロイまで一括実行可能</td>
-                    <td>柔軟なネットワーク設定、独自UI、複雑なA2A構成、スケールゼロによるコスト最適化</td>
+                    <td>
+                      サーバーレスのコンテナ実行基盤。adk deploy
+                      cloud_runコマンドでコンテナビルドからデプロイまで一括実行可能
+                    </td>
+                    <td>
+                      柔軟なネットワーク設定、独自UI、複雑なA2A構成、スケールゼロによるコスト最適化
+                    </td>
                   </tr>
                   <tr>
                     <td>
@@ -1662,24 +1775,36 @@ export default function AdkBestPracticesPage() {
 
             <h3>13.2 Agent Runtimeへのデプロイ</h3>
             <p>
-              標準デプロイパス（Cloud ConsoleとADK CLIによる段階的な手順）と、Agents CLIによる加速デプロイパス（CI/CDパイプラインとTerraformによるInfrastructure as Codeまで自動生成）の2種類が提供されています。組織のセキュリティ・コンプライアンス基準に照らして、自動生成された設定を必ずレビューすることがベストプラクティスとされています。
+              標準デプロイパス（Cloud ConsoleとADK CLIによる段階的な手順）と、Agents
+              CLIによる加速デプロイパス（CI/CDパイプラインとTerraformによるInfrastructure as
+              Codeまで自動生成）の2種類が提供されています。組織のセキュリティ・コンプライアンス基準に照らして、自動生成された設定を必ずレビューすることがベストプラクティスとされています。
             </p>
 
             <h3>13.3 デプロイ前チェックリスト</h3>
             <ul>
-              <li>Session StateとMemoryの永続化バックエンドを、開発用のInMemoryから本番用に切り替えたか。</li>
-              <li>OpenTelemetryのトレースをCloud Traceまたは選択した観測基盤にエクスポートする設定を行ったか。</li>
               <li>
-                Pluginによるグローバルなガードレール・ロギングが有効化されているか（CLI・API Server経由で最終確認したか）。
+                Session
+                StateとMemoryの永続化バックエンドを、開発用のInMemoryから本番用に切り替えたか。
+              </li>
+              <li>
+                OpenTelemetryのトレースをCloud
+                Traceまたは選択した観測基盤にエクスポートする設定を行ったか。
+              </li>
+              <li>
+                Pluginによるグローバルなガードレール・ロギングが有効化されているか（CLI・API
+                Server経由で最終確認したか）。
               </li>
               <li>adk evalによる回帰テストがCI/CDパイプラインに組み込まれているか。</li>
               <li>IAMロールが必要最小限の範囲で付与されているか。</li>
             </ul>
             <p className={styles.source}>
               <i className="ti ti-link" />
-              出典: ADK公式ドキュメント「Deploying Your Agent」「Cloud Run」「Deploy to Agent Runtime」{" "}
-              <Ext href="https://google.github.io/adk-docs/deploy/cloud-run/">google.github.io/adk-docs</Ext> /{" "}
-              <Ext href="https://adk.dev/deploy/agent-runtime/">adk.dev/deploy/agent-runtime</Ext>
+              出典: ADK公式ドキュメント「Deploying Your Agent」「Cloud Run」「Deploy to Agent
+              Runtime」{" "}
+              <Ext href="https://google.github.io/adk-docs/deploy/cloud-run/">
+                google.github.io/adk-docs
+              </Ext>{" "}
+              / <Ext href="https://adk.dev/deploy/agent-runtime/">adk.dev/deploy/agent-runtime</Ext>
             </p>
           </section>
 
@@ -1818,16 +1943,20 @@ export default function AdkBestPracticesPage() {
                 </li>
                 <li>
                   <i className="ti ti-point" />
-                  About ADK: <Ext href="https://adk.dev/get-started/about/">adk.dev/get-started/about</Ext>
+                  About ADK:{" "}
+                  <Ext href="https://adk.dev/get-started/about/">adk.dev/get-started/about</Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
                   Workflow Agents:{" "}
-                  <Ext href="https://adk.dev/agents/workflow-agents/">adk.dev/agents/workflow-agents</Ext>
+                  <Ext href="https://adk.dev/agents/workflow-agents/">
+                    adk.dev/agents/workflow-agents
+                  </Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
-                  Workflow Patterns: <Ext href="https://adk.dev/workflows/patterns/">adk.dev/workflows/patterns</Ext>
+                  Workflow Patterns:{" "}
+                  <Ext href="https://adk.dev/workflows/patterns/">adk.dev/workflows/patterns</Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
@@ -1836,11 +1965,16 @@ export default function AdkBestPracticesPage() {
                 <li>
                   <i className="ti ti-point" />
                   Function Tools:{" "}
-                  <Ext href="https://adk.dev/tools-custom/function-tools/">adk.dev/tools-custom/function-tools</Ext>
+                  <Ext href="https://adk.dev/tools-custom/function-tools/">
+                    adk.dev/tools-custom/function-tools
+                  </Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
-                  MCP Tools: <Ext href="https://adk.dev/tools-custom/mcp-tools/">adk.dev/tools-custom/mcp-tools</Ext>
+                  MCP Tools:{" "}
+                  <Ext href="https://adk.dev/tools-custom/mcp-tools/">
+                    adk.dev/tools-custom/mcp-tools
+                  </Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
@@ -1848,7 +1982,8 @@ export default function AdkBestPracticesPage() {
                 </li>
                 <li>
                   <i className="ti ti-point" />
-                  Session: <Ext href="https://adk.dev/sessions/session/">adk.dev/sessions/session</Ext>
+                  Session:{" "}
+                  <Ext href="https://adk.dev/sessions/session/">adk.dev/sessions/session</Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
@@ -1864,16 +1999,21 @@ export default function AdkBestPracticesPage() {
                 <li>
                   <i className="ti ti-point" />
                   Types of callbacks:{" "}
-                  <Ext href="https://adk.dev/callbacks/types-of-callbacks/">adk.dev/callbacks/types-of-callbacks</Ext>
+                  <Ext href="https://adk.dev/callbacks/types-of-callbacks/">
+                    adk.dev/callbacks/types-of-callbacks
+                  </Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
                   Callbacks overview:{" "}
-                  <Ext href="https://google.github.io/adk-docs/callbacks/">google.github.io/adk-docs/callbacks</Ext>
+                  <Ext href="https://google.github.io/adk-docs/callbacks/">
+                    google.github.io/adk-docs/callbacks
+                  </Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
-                  Safety and Security for AI Agents: <Ext href="https://adk.dev/safety/">adk.dev/safety</Ext>
+                  Safety and Security for AI Agents:{" "}
+                  <Ext href="https://adk.dev/safety/">adk.dev/safety</Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
@@ -1881,15 +2021,18 @@ export default function AdkBestPracticesPage() {
                 </li>
                 <li>
                   <i className="ti ti-point" />
-                  App workflow management class: <Ext href="https://adk.dev/apps/">adk.dev/apps</Ext>
+                  App workflow management class:{" "}
+                  <Ext href="https://adk.dev/apps/">adk.dev/apps</Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
-                  Context caching: <Ext href="https://adk.dev/context/caching/">adk.dev/context/caching</Ext>
+                  Context caching:{" "}
+                  <Ext href="https://adk.dev/context/caching/">adk.dev/context/caching</Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
-                  Context compression: <Ext href="https://adk.dev/context/compaction/">adk.dev/context/compaction</Ext>
+                  Context compression:{" "}
+                  <Ext href="https://adk.dev/context/compaction/">adk.dev/context/compaction</Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
@@ -1904,12 +2047,17 @@ export default function AdkBestPracticesPage() {
                 </li>
                 <li>
                   <i className="ti ti-point" />
-                  Traces: <Ext href="https://adk.dev/observability/traces/">adk.dev/observability/traces</Ext>
+                  Traces:{" "}
+                  <Ext href="https://adk.dev/observability/traces/">
+                    adk.dev/observability/traces
+                  </Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
                   Google Cloud Trace observability for ADK:{" "}
-                  <Ext href="https://adk.dev/integrations/cloud-trace/">adk.dev/integrations/cloud-trace</Ext>
+                  <Ext href="https://adk.dev/integrations/cloud-trace/">
+                    adk.dev/integrations/cloud-trace
+                  </Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
@@ -1921,21 +2069,30 @@ export default function AdkBestPracticesPage() {
                 <li>
                   <i className="ti ti-point" />
                   MLflow observability for ADK:{" "}
-                  <Ext href="https://adk.dev/integrations/mlflow-tracing/">adk.dev/integrations/mlflow-tracing</Ext>
+                  <Ext href="https://adk.dev/integrations/mlflow-tracing/">
+                    adk.dev/integrations/mlflow-tracing
+                  </Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
-                  Introduction to A2A: <Ext href="https://google.github.io/adk-docs/a2a/intro/">google.github.io/adk-docs/a2a/intro</Ext>
+                  Introduction to A2A:{" "}
+                  <Ext href="https://google.github.io/adk-docs/a2a/intro/">
+                    google.github.io/adk-docs/a2a/intro
+                  </Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
                   Quickstart: Consuming a remote agent via A2A:{" "}
-                  <Ext href="https://adk.dev/a2a/quickstart-consuming/">adk.dev/a2a/quickstart-consuming</Ext>
+                  <Ext href="https://adk.dev/a2a/quickstart-consuming/">
+                    adk.dev/a2a/quickstart-consuming
+                  </Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
                   Deploying Your Agent:{" "}
-                  <Ext href="https://google.github.io/adk-docs/deploy/">google.github.io/adk-docs/deploy</Ext>
+                  <Ext href="https://google.github.io/adk-docs/deploy/">
+                    google.github.io/adk-docs/deploy
+                  </Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
@@ -1947,7 +2104,9 @@ export default function AdkBestPracticesPage() {
                 <li>
                   <i className="ti ti-point" />
                   Deploy to Agent Runtime:{" "}
-                  <Ext href="https://adk.dev/deploy/agent-runtime/">adk.dev/deploy/agent-runtime</Ext>
+                  <Ext href="https://adk.dev/deploy/agent-runtime/">
+                    adk.dev/deploy/agent-runtime
+                  </Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
@@ -2006,7 +2165,8 @@ export default function AdkBestPracticesPage() {
                 </li>
                 <li>
                   <i className="ti ti-point" />
-                  「Building Collaborative AI: A Developer's Guide to Multi-Agent Systems with ADK」:{" "}
+                  「Building Collaborative AI: A Developer's Guide to Multi-Agent Systems with
+                  ADK」:{" "}
                   <Ext href="https://cloud.google.com/blog/topics/developers-practitioners/building-collaborative-ai-a-developers-guide-to-multi-agent-systems-with-adk">
                     cloud.google.com/blog
                   </Ext>
@@ -2042,7 +2202,9 @@ export default function AdkBestPracticesPage() {
                 <li>
                   <i className="ti ti-point" />
                   Google Skills「Connect to Remote Agents with ADK and the Agent2Agent SDK」:{" "}
-                  <Ext href="https://www.skills.google/focuses/132170?parent=catalog">skills.google</Ext>
+                  <Ext href="https://www.skills.google/focuses/132170?parent=catalog">
+                    skills.google
+                  </Ext>
                 </li>
               </ul>
             </div>
@@ -2067,12 +2229,16 @@ export default function AdkBestPracticesPage() {
                 <li>
                   <i className="ti ti-point" />
                   Arjun Prabhulal「Google ADK - Session, State and Memory」:{" "}
-                  <Ext href="https://arjunprabhulal.com/adk-sessions-state/">arjunprabhulal.com</Ext>
+                  <Ext href="https://arjunprabhulal.com/adk-sessions-state/">
+                    arjunprabhulal.com
+                  </Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
                   Arjun Prabhulal「Google ADK - Context Management」:{" "}
-                  <Ext href="https://arjunprabhulal.com/adk-context-management/">arjunprabhulal.com</Ext>
+                  <Ext href="https://arjunprabhulal.com/adk-context-management/">
+                    arjunprabhulal.com
+                  </Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
@@ -2136,7 +2302,9 @@ export default function AdkBestPracticesPage() {
                 <li>
                   <i className="ti ti-point" />
                   DeepWiki「Plugin System | google/adk-python」:{" "}
-                  <Ext href="https://deepwiki.com/google/adk-python/4.3-plugin-system">deepwiki.com</Ext>
+                  <Ext href="https://deepwiki.com/google/adk-python/4.3-plugin-system">
+                    deepwiki.com
+                  </Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
@@ -2160,7 +2328,9 @@ export default function AdkBestPracticesPage() {
                 <li>
                   <i className="ti ti-point" />
                   Langfuse「Observability for Google Agent Development Kit」:{" "}
-                  <Ext href="https://langfuse.com/integrations/frameworks/google-adk">langfuse.com</Ext>
+                  <Ext href="https://langfuse.com/integrations/frameworks/google-adk">
+                    langfuse.com
+                  </Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
@@ -2171,7 +2341,8 @@ export default function AdkBestPracticesPage() {
                 </li>
                 <li>
                   <i className="ti ti-point" />
-                  Kablamo Engineering「Tracing AI Agents on Google Cloud with OpenTelemetry and Agent Engine」:{" "}
+                  Kablamo Engineering「Tracing AI Agents on Google Cloud with OpenTelemetry and
+                  Agent Engine」:{" "}
                   <Ext href="https://engineering.kablamo.com.au/posts/gcp-otel-adk-agent">
                     engineering.kablamo.com.au
                   </Ext>
@@ -2225,7 +2396,8 @@ export default function AdkBestPracticesPage() {
               <i className="ti ti-info-circle" />
               <div className={styles.calloutBody}>
                 ADKは開発速度が非常に速いフレームワークです。実装の詳細（クラス名、パラメータ名、CLIコマンドなど）は変更される可能性があるため、実装時は必ず{" "}
-                <Ext href="https://adk.dev/">adk.dev</Ext> の最新ドキュメントで一次情報を確認してください。
+                <Ext href="https://adk.dev/">adk.dev</Ext>{" "}
+                の最新ドキュメントで一次情報を確認してください。
               </div>
             </div>
           </section>
