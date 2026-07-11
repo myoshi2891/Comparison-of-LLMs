@@ -662,8 +662,11 @@ flowchart LR
 
 1つのシステムの中で、あるエージェントがA2Aで別のエージェントにタスクを依頼し、そのエージェントがさらにMCPでデータベースに接続する、という組み合わせも一般的です。
 
-> ⚠️ **A2AプロトコルおよびSDKの各言語サポート状況**:
-> ADKにおけるA2Aプロトコル（`RemoteA2aAgent` を含む実装）は開発段階にあり、サポート状況やAPIの安定性は言語SDKごとに異なります。最新のステータスおよび仕様変更については、各言語SDKの公式GitHubリポジトリやリリースノートを参照してください。
+> ⚠️ **A2AプロトコルおよびSDKの各言語サポート状況（2026年7月11日確認）**:
+> ADKにおけるA2Aプロトコル（`RemoteA2aAgent` を含む実装）は開発段階にあり、サポート状況やAPIの安定性は言語SDKごとに異なります。特に **PythonおよびJavaのA2A quickstartはExperimental（実験的）な位置付け** となっており、破壊的な仕様変更が発生する可能性があります。
+> - Python Quickstart (Experimental): [Python SDK / a2a-python](https://google.github.io/adk-docs/a2a/python/quickstart/)
+> - Java Quickstart (Experimental): [Java SDK / a2a-java](https://google.github.io/adk-docs/a2a/java/quickstart/)
+> 実装の可否や最新のステータスについては、公式ドキュメントの各言語セクションやリリースノートをご確認ください。
 
 ### 12.2 ADKにおけるA2Aの実装ステップ
 
