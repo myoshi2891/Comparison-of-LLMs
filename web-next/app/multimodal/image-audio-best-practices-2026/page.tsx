@@ -224,7 +224,11 @@ export default async function Page() {
           </button>
           <div className={styles.brand}>
             Multimodal AI Guide
-            <p className={styles.brandSub}>画像・音声生成ベストプラクティス<br />2026年7月版</p>
+            <p className={styles.brandSub}>
+              画像・音声生成ベストプラクティス
+              <br />
+              2026年7月版
+            </p>
           </div>
 
           <p className={styles.navTitle}>目次</p>
@@ -232,97 +236,129 @@ export default async function Page() {
             <ul>
               <li>
                 <a href="#s1" className={styles.tocLink}>
-                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>01</span>
+                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>
+                    01
+                  </span>
                   マルチモーダル生成AIの全体像
                 </a>
               </li>
               <li>
                 <a href="#s2" className={styles.tocLink}>
-                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>02</span>
+                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>
+                    02
+                  </span>
                   画像生成モデルの技術基盤
                 </a>
               </li>
               <li>
                 <a href="#s3" className={styles.tocLink}>
-                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>03</span>
+                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>
+                    03
+                  </span>
                   画像生成モデルの選定
                 </a>
               </li>
               <li>
                 <a href="#s4" className={styles.tocLink}>
-                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>04</span>
+                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>
+                    04
+                  </span>
                   プロンプトエンジニアリング
                 </a>
               </li>
               <li>
                 <a href="#s5" className={styles.tocLink}>
-                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>05</span>
+                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>
+                    05
+                  </span>
                   ControlNet・LoRA・FT
                 </a>
               </li>
               <li>
                 <a href="#s6" className={styles.tocLink}>
-                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>06</span>
+                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>
+                    06
+                  </span>
                   評価とQAパイプライン
                 </a>
               </li>
               <li>
                 <a href="#s7" className={styles.tocLink}>
-                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>07</span>
+                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>
+                    07
+                  </span>
                   音声生成の技術基盤
                 </a>
               </li>
               <li>
                 <a href="#s8" className={styles.tocLink}>
-                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>08</span>
+                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>
+                    08
+                  </span>
                   TTSモデルの選定
                 </a>
               </li>
               <li>
                 <a href="#s9" className={styles.tocLink}>
-                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>09</span>
+                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>
+                    09
+                  </span>
                   音声生成のベストプラクティス
                 </a>
               </li>
               <li>
                 <a href="#s10" className={styles.tocLink}>
-                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>10</span>
+                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>
+                    10
+                  </span>
                   リアルタイム音声エージェント
                 </a>
               </li>
               <li>
                 <a href="#s11" className={styles.tocLink}>
-                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>11</span>
+                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>
+                    11
+                  </span>
                   音楽生成AIと著作権
                 </a>
               </li>
               <li>
                 <a href="#s12" className={styles.tocLink}>
-                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>12</span>
+                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>
+                    12
+                  </span>
                   マルチモーダル統合アーキテクチャ
                 </a>
               </li>
               <li>
                 <a href="#s13" className={styles.tocLink}>
-                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>13</span>
+                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>
+                    13
+                  </span>
                   安全性・来歴・法規制
                 </a>
               </li>
               <li>
                 <a href="#s14" className={styles.tocLink}>
-                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>14</span>
+                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>
+                    14
+                  </span>
                   プロダクション運用
                 </a>
               </li>
               <li>
                 <a href="#s15" className={styles.tocLink}>
-                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>15</span>
+                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>
+                    15
+                  </span>
                   意思決定チェックリスト
                 </a>
               </li>
               <li>
                 <a href="#s16" className={styles.tocLink}>
-                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>16</span>
+                  <span className={styles.badge} style={{ marginRight: "8px", padding: "1px 6px" }}>
+                    16
+                  </span>
                   参考文献・URL一覧
                 </a>
               </li>
@@ -334,9 +370,14 @@ export default async function Page() {
         <main className={styles.content}>
           <div className={styles.docHeader}>
             <p className={styles.docSub}>Intermediate &mdash; Advanced Engineering Guide</p>
-            <h1>マルチモーダルAI実践ガイド<br />画像・音声生成のベストプラクティス</h1>
+            <h1>
+              マルチモーダルAI実践ガイド
+              <br />
+              画像・音声生成のベストプラクティス
+            </h1>
             <p className={styles.docMeta}>
-              対象: AI/LLMエンジニア・アーキテクト | 最終更新: 2026-07-10 | 図解: Mermaid 18点 | 出典: 巻末に全URL掲載
+              対象: AI/LLMエンジニア・アーキテクト | 最終更新: 2026-07-10 | 図解: Mermaid 18点 |
+              出典: 巻末に全URL掲載
             </p>
           </div>
 
@@ -344,21 +385,30 @@ export default async function Page() {
 
           <section className="chapter" id="s1">
             <h2>
-              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>01 / 16</span>
+              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>
+                01 / 16
+              </span>
               マルチモーダル生成AIの全体像
             </h2>
             <p>
-              2024〜2025年は「テキスト生成AIにマルチモーダル入出力が追加される」フェーズでしたが、2026年に入り潮目が変わりました。画像・音声はもはや周辺機能ではなく、<strong>推論(reasoning)を内蔵したネイティブ・マルチモーダルモデル</strong>が主流になりつつあります。具体的には次の3つの潮流が同時並行で進んでいます。
+              2024〜2025年は「テキスト生成AIにマルチモーダル入出力が追加される」フェーズでしたが、2026年に入り潮目が変わりました。画像・音声はもはや周辺機能ではなく、
+              <strong>推論(reasoning)を内蔵したネイティブ・マルチモーダルモデル</strong>
+              が主流になりつつあります。具体的には次の3つの潮流が同時並行で進んでいます。
             </p>
             <ul>
               <li>
-                <strong>画像生成の自己回帰化</strong> — GPT Image 2のように拡散モデルではなく自己回帰(Autoregressive)方式でテキストと同じ仕組みで画像を生成し、複雑な指示理解・世界知識の反映に強いモデルが台頭しています。OpenAIの公開しているプロンプティングガイドでは、gpt-image-2が新規構築の推奨デフォルトとされ、画質・編集性能の向上とプロダクションワークフローへの広い対応が特徴として挙げられています。
+                <strong>画像生成の自己回帰化</strong> — GPT Image
+                2のように拡散モデルではなく自己回帰(Autoregressive)方式でテキストと同じ仕組みで画像を生成し、複雑な指示理解・世界知識の反映に強いモデルが台頭しています。OpenAIの公開しているプロンプティングガイドでは、gpt-image-2が新規構築の推奨デフォルトとされ、画質・編集性能の向上とプロダクションワークフローへの広い対応が特徴として挙げられています。
               </li>
               <li>
-                <strong>音声のネイティブ音声対話(Audio-to-Audio)化</strong> — 音声認識→LLM推論→音声合成という「カスケード型」から、単一モデルが音声を直接理解し直接発話する方式への移行が進んでいます。Gemini 3.1 Flash Liveは、従来の「文字起こし・推論・合成」という段階的スタックを単一のネイティブ音声対話プロセスへ統合し、レイテンシを大幅に削減しつつ、より自然なピッチ・間合いの認識を可能にしています。
+                <strong>音声のネイティブ音声対話(Audio-to-Audio)化</strong> —
+                音声認識→LLM推論→音声合成という「カスケード型」から、単一モデルが音声を直接理解し直接発話する方式への移行が進んでいます。Gemini
+                3.1 Flash
+                Liveは、従来の「文字起こし・推論・合成」という段階的スタックを単一のネイティブ音声対話プロセスへ統合し、レイテンシを大幅に削減しつつ、より自然なピッチ・間合いの認識を可能にしています。
               </li>
               <li>
-                <strong>「唯一の最強モデル」の消滅</strong> — 2026年の画像生成AIモデル環境は変化が激しく、単一の最強モデルは存在せず、コンテンツの種類に応じて最適なモデルへルーティングするアーキテクチャが実務上の勝ち筋になっています。
+                <strong>「唯一の最強モデル」の消滅</strong> —
+                2026年の画像生成AIモデル環境は変化が激しく、単一の最強モデルは存在せず、コンテンツの種類に応じて最適なモデルへルーティングするアーキテクチャが実務上の勝ち筋になっています。
               </li>
             </ul>
             <p>
@@ -382,7 +432,9 @@ export default async function Page() {
 
           <section className="chapter" id="s2">
             <h2>
-              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>02 / 16</span>
+              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>
+                02 / 16
+              </span>
               画像生成モデルの技術基盤
             </h2>
             <p>
@@ -391,7 +443,8 @@ export default async function Page() {
 
             <h3>2.1 拡散モデル(Diffusion Model)</h3>
             <p>
-              拡散モデルは画像生成AIの基盤技術で、ランダムなノイズから、テキスト指示に合わせて少しずつノイズを除去(denoising)して画像を作り上げる手法であり、Stable Diffusion・FLUX・Midjourneyなど大半の画像生成ツールがこの仕組みを採用しています。学習時には実画像に段階的にノイズを加える「拡散過程」を学習し、推論時にはランダムノイズから逆方向にノイズを除去していく「逆拡散過程」を繰り返すことで画像を復元します。
+              拡散モデルは画像生成AIの基盤技術で、ランダムなノイズから、テキスト指示に合わせて少しずつノイズを除去(denoising)して画像を作り上げる手法であり、Stable
+              Diffusion・FLUX・Midjourneyなど大半の画像生成ツールがこの仕組みを採用しています。学習時には実画像に段階的にノイズを加える「拡散過程」を学習し、推論時にはランダムノイズから逆方向にノイズを除去していく「逆拡散過程」を繰り返すことで画像を復元します。
             </p>
 
             <div className={styles.diagramWrap}>
@@ -403,7 +456,10 @@ export default async function Page() {
 
             <h3>2.2 Flow Matching / Rectified Flow</h3>
             <p>
-              FLUXやStable Diffusion 3系はFlow Matching(整流フロー)という拡散モデルの発展形を採用しています。ノイズと画像を結ぶ経路を直線(rectified)に近づけることで、少ないステップ数でも高品質な生成が可能になる点が拡散モデルとの実務上の違いです。近年はさらに、生成に必要な関数評価回数(NFE)を1〜数ステップまで削減する蒸留(Distillation)技術の研究が活発です。Consistency Model・Mean Flow Distillationなどの手法は、教師モデルの軌道(trajectory)を学習した生徒モデルが1ステップまたは数ステップで同等の品質を再現することを狙っています。プロダクションでは「SDXL-Lightning」のような蒸留済み高速モデルが、リアルタイム性が求められるUI(インタラクティブなプレビュー生成など)で採用されています。
+              FLUXやStable Diffusion 3系はFlow
+              Matching(整流フロー)という拡散モデルの発展形を採用しています。ノイズと画像を結ぶ経路を直線(rectified)に近づけることで、少ないステップ数でも高品質な生成が可能になる点が拡散モデルとの実務上の違いです。近年はさらに、生成に必要な関数評価回数(NFE)を1〜数ステップまで削減する蒸留(Distillation)技術の研究が活発です。Consistency
+              Model・Mean Flow
+              Distillationなどの手法は、教師モデルの軌道(trajectory)を学習した生徒モデルが1ステップまたは数ステップで同等の品質を再現することを狙っています。プロダクションでは「SDXL-Lightning」のような蒸留済み高速モデルが、リアルタイム性が求められるUI(インタラクティブなプレビュー生成など)で採用されています。
             </p>
 
             <div className={`${styles.callout} ${styles.principle}`}>
@@ -415,10 +471,13 @@ export default async function Page() {
 
             <h3>2.3 自己回帰型画像生成(Autoregressive Image Generation)</h3>
             <p>
-              拡散モデルとは根本的に異なるアプローチとして、テキストトークンと同じように画像を「一部分ずつ順番に生成する」自己回帰方式があります。4o Image Generation(image_gen)はChatGPTに組み込まれており、GPT-4oと同じ技術を使って画像を生成する点が特徴で、拡散方式ではなく単語を書くように少しずつ画像を生成していきます。
+              拡散モデルとは根本的に異なるアプローチとして、テキストトークンと同じように画像を「一部分ずつ順番に生成する」自己回帰方式があります。4o
+              Image
+              Generation(image_gen)はChatGPTに組み込まれており、GPT-4oと同じ技術を使って画像を生成する点が特徴で、拡散方式ではなく単語を書くように少しずつ画像を生成していきます。
             </p>
             <p>
-              注意点として、GPT Image系(自己回帰モデル)は拡散モデルではないため生成速度は遅く、1回のリクエストにつき1枚の出力となる一方で、複雑なシーン構成や指示理解では拡散モデル系を上回る場合があります。
+              注意点として、GPT
+              Image系(自己回帰モデル)は拡散モデルではないため生成速度は遅く、1回のリクエストにつき1枚の出力となる一方で、複雑なシーン構成や指示理解では拡散モデル系を上回る場合があります。
             </p>
 
             <h3>2.4 3アーキテクチャの比較</h3>
@@ -467,19 +526,25 @@ export default async function Page() {
               </table>
             </div>
             <p>
-              技術選定の指針: バッチで大量の画像を高速生成したい(広告バナー量産、ECサイトの商品画像量産など)場合は拡散モデル系＋蒸留モデルの組み合わせが有利です。逆に、複雑な指示理解・文字入りデザイン・対話的な反復編集が必要な場合は自己回帰型(GPT Image系)が有利という傾向が2026年7月時点で確認できます。
+              技術選定の指針:
+              バッチで大量の画像を高速生成したい(広告バナー量産、ECサイトの商品画像量産など)場合は拡散モデル系＋蒸留モデルの組み合わせが有利です。逆に、複雑な指示理解・文字入りデザイン・対話的な反復編集が必要な場合は自己回帰型(GPT
+              Image系)が有利という傾向が2026年7月時点で確認できます。
             </p>
           </section>
 
           <section className="chapter" id="s3">
             <h2>
-              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>03 / 16</span>
+              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>
+                03 / 16
+              </span>
               画像生成モデルの選定(2026年7月版)
             </h2>
 
             <h3>3.1 主要モデル比較表</h3>
             <p>
-              2026年7月時点で実務上検討対象になる主要モデルを、モデル単位(サービス名ではなく)で整理します。2026年はサービス名と中身のモデル名がねじれて分かりにくくなっており、ChatGPTの中身はGPT Image 2、GeminiはNano Banana 2であるなど、サービス名ではなくモデル単位で実態を把握することが重要です。
+              2026年7月時点で実務上検討対象になる主要モデルを、モデル単位(サービス名ではなく)で整理します。2026年はサービス名と中身のモデル名がねじれて分かりにくくなっており、ChatGPTの中身はGPT
+              Image 2、GeminiはNano Banana
+              2であるなど、サービス名ではなくモデル単位で実態を把握することが重要です。
             </p>
 
             <div className={styles.tableWrap}>
@@ -571,13 +636,16 @@ export default async function Page() {
               </table>
             </div>
             <p className={styles.docMeta} style={{ fontSize: "13px", marginTop: "-12px" }}>
-              ※ 料金・仕様は変更が非常に速いため、契約前に必ず各社公式サイトの最新情報を確認してください。
+              ※
+              料金・仕様は変更が非常に速いため、契約前に必ず各社公式サイトの最新情報を確認してください。
             </p>
 
             <h3>3.2 用途別モデル選定フローチャート</h3>
             <div className={styles.diagramWrap}>
               <MermaidDiagram chart={DIAGRAMS.d3} />
-              <div className={styles.diagramCaption}>Fig 3. タスク要件からモデルを絞り込む意思決定フロー</div>
+              <div className={styles.diagramCaption}>
+                Fig 3. タスク要件からモデルを絞り込む意思決定フロー
+              </div>
             </div>
 
             <h3>3.3 「マルチモデル・ルーティング」という実務パターン</h3>
@@ -592,19 +660,26 @@ export default async function Page() {
               </div>
             </div>
             <p>
-              このパターンの利点は、単一ベンダーのAPI仕様変更・値上げ・提供終了(実際に2026年4月にDALL·Eが終了しGPT Image 2へ移行した例がありました)に対する耐性が高くなることです。
+              このパターンの利点は、単一ベンダーのAPI仕様変更・値上げ・提供終了(実際に2026年4月にDALL·Eが終了しGPT
+              Image 2へ移行した例がありました)に対する耐性が高くなることです。
             </p>
           </section>
 
           <section className="chapter" id="s4">
             <h2>
-              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>04 / 16</span>
+              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>
+                04 / 16
+              </span>
               プロンプトエンジニアリング
             </h2>
 
             <h3>4.1 「マーケティングコピー」から「撮影指示書」への発想転換</h3>
             <p>
-              最も重要な心構えの転換は、プロンプトを&quot;魅力的な売り文句&quot;として書くのをやめ、&quot;撮影・編集の仕様書&quot;として書くことです。GPT Image 2は光源・レンズ・素材・何が変わってはいけないかを写真家やアートディレクターのように語ると精度良く応答しますが、「Stunning, cinematic, 8K, ultra-detailed」のような抽象的な誇張語は実質的にノイズとして無視されます。
+              最も重要な心構えの転換は、プロンプトを&quot;魅力的な売り文句&quot;として書くのをやめ、&quot;撮影・編集の仕様書&quot;として書くことです。GPT
+              Image
+              2は光源・レンズ・素材・何が変わってはいけないかを写真家やアートディレクターのように語ると精度良く応答しますが、「Stunning,
+              cinematic, 8K,
+              ultra-detailed」のような抽象的な誇張語は実質的にノイズとして無視されます。
             </p>
             <p>
               具体性を欠いた指示(例:「賑やかな街並み」)は雑然とした背景を生みがちなため、「被写界深度を浅く」「背景を大きくぼかしたソフトボケ」のような写真的な制約語を加えることで、主題と背景を明確に分離できます。
@@ -670,17 +745,22 @@ export default async function Page() {
             </div>
 
             <p>
-              複数回の編集を重ねるワークフローでは、反復のたびに「維持すべき不変条件」を明示的に再掲することが、ドリフト(意図しない変化の蓄積)を防ぐ鍵になります。参照画像を複数渡す場合は、「画像1: 維持すべきベースシーン」「画像2: ジャケットの参照」「画像3: ブーツの参照」のように、各入力画像の役割にラベルを付けて指示の中で参照するとモデルの誤認識を防げます。
+              複数回の編集を重ねるワークフローでは、反復のたびに「維持すべき不変条件」を明示的に再掲することが、ドリフト(意図しない変化の蓄積)を防ぐ鍵になります。参照画像を複数渡す場合は、「画像1:
+              維持すべきベースシーン」「画像2: ジャケットの参照」「画像3:
+              ブーツの参照」のように、各入力画像の役割にラベルを付けて指示の中で参照するとモデルの誤認識を防げます。
             </p>
 
             <h3>4.4 文字・タイポグラフィを正確に描画するコツ</h3>
             <p>
-              GPT Image系はタイポグラフィが得意ですが、注意しないとランダムな文字を追加することがあるため、正確な文言は必ずダブルクォートで囲み、厳密な配置指示と組み合わせるべきです。「ネオンサインを作って」ではなく「窓の上部中央に配置された、&quot;Open&quot;と表示される光るネオンサイン」のように具体化します。
+              GPT
+              Image系はタイポグラフィが得意ですが、注意しないとランダムな文字を追加することがあるため、正確な文言は必ずダブルクォートで囲み、厳密な配置指示と組み合わせるべきです。「ネオンサインを作って」ではなく「窓の上部中央に配置された、&quot;Open&quot;と表示される光るネオンサイン」のように具体化します。
             </p>
 
             <h3>4.5 ネガティブプロンプトが効かないモデルへの対処</h3>
             <p>
-              OpenAIの画像モデルには専用のネガティブプロンプト欄が存在しないため、「〜を含めない」という否定形をConstraints欄に明示的に列挙する必要があります。一方、Stable Diffusion系やMidjourneyでは伝統的なネガティブプロンプト(<code>--no</code>構文や専用パラメータ)が引き続き有効です。モデルごとにネガティブプロンプトの扱いが異なる点はワークフロー設計上の重要な分岐点です。
+              OpenAIの画像モデルには専用のネガティブプロンプト欄が存在しないため、「〜を含めない」という否定形をConstraints欄に明示的に列挙する必要があります。一方、Stable
+              Diffusion系やMidjourneyでは伝統的なネガティブプロンプト(<code>--no</code>
+              構文や専用パラメータ)が引き続き有効です。モデルごとにネガティブプロンプトの扱いが異なる点はワークフロー設計上の重要な分岐点です。
             </p>
 
             <h3>4.6 UIモックアップ・インフォグラフィックなどの構造化ビジュアル</h3>
@@ -690,13 +770,16 @@ export default async function Page() {
 
             <h3>4.7 プロンプト管理のワークフロー</h3>
             <p>
-              プロンプトのバージョン管理には、スプレッドシートやNotionデータベース、Obsidianボールトのような構造化されたドキュメントを用い、何が効いて何が効かなかったかのメモや、改善のたびのプロンプトのバージョンを記録し、蓄積するたびに価値が増すクリエイティブ資産として扱うことが推奨されます。プロダクション環境では、これをプロンプトテンプレート＋変数注入の形でコードベースに落とし込み、A/Bテスト結果と紐づけて管理すると、モデル移行(例: gpt-image-1.5からgpt-image-2への移行)の際にも回帰テストが容易になります。
+              プロンプトのバージョン管理には、スプレッドシートやNotionデータベース、Obsidianボールトのような構造化されたドキュメントを用い、何が効いて何が効かなかったかのメモや、改善のたびのプロンプトのバージョンを記録し、蓄積するたびに価値が増すクリエイティブ資産として扱うことが推奨されます。プロダクション環境では、これをプロンプトテンプレート＋変数注入の形でコードベースに落とし込み、A/Bテスト結果と紐づけて管理すると、モデル移行(例:
+              gpt-image-1.5からgpt-image-2への移行)の際にも回帰テストが容易になります。
             </p>
           </section>
 
           <section className="chapter" id="s5">
             <h2>
-              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>05 / 16</span>
+              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>
+                05 / 16
+              </span>
               ControlNet・LoRA・ファインチューニング
             </h2>
             <p>
@@ -705,12 +788,15 @@ export default async function Page() {
 
             <h3>5.1 ControlNetの仕組み</h3>
             <p>
-              ControlNetは条件付き画像生成を実現する技術であり、既存のStable Diffusionなどのモデルに追加のネットワークとして接続し、参照画像から抽出した制御情報(エッジ・深度・ポーズなど)を基に画像生成を誘導することで、テキストプロンプトだけでは困難な構図・ポーズ・形状・エッジの具体的な制御を可能にします。
+              ControlNetは条件付き画像生成を実現する技術であり、既存のStable
+              Diffusionなどのモデルに追加のネットワークとして接続し、参照画像から抽出した制御情報(エッジ・深度・ポーズなど)を基に画像生成を誘導することで、テキストプロンプトだけでは困難な構図・ポーズ・形状・エッジの具体的な制御を可能にします。
             </p>
 
             <div className={styles.diagramWrap}>
               <MermaidDiagram chart={DIAGRAMS.d6} />
-              <div className={styles.diagramCaption}>Fig 6. ControlNetによる条件付き画像生成の流れ</div>
+              <div className={styles.diagramCaption}>
+                Fig 6. ControlNetによる条件付き画像生成の流れ
+              </div>
             </div>
 
             <div className={styles.tableWrap}>
@@ -754,30 +840,47 @@ export default async function Page() {
 
             <h3>5.2 LoRA(Low-Rank Adaptation)によるスタイル固定</h3>
             <p>
-              LoRAは既存 of AIモデルに小さな部品(アダプター)だけを足して新しいスタイルやキャラクターを覚えさせる手法で、元のモデルはそのまま残し、その横に薄い「メモ帳」を挟むイメージであり、学習するパラメータ量が少なくGPU負荷も小さく、生成されるファイルも数MB〜数百MBと軽量です。フルのファインチューニングの10%のコストで95%相当の性能を達成できるというデータも公開されています。
+              LoRAは既存 of
+              AIモデルに小さな部品(アダプター)だけを足して新しいスタイルやキャラクターを覚えさせる手法で、元のモデルはそのまま残し、その横に薄い「メモ帳」を挟むイメージであり、学習するパラメータ量が少なくGPU負荷も小さく、生成されるファイルも数MB〜数百MBと軽量です。フルのファインチューニングの10%のコストで95%相当の性能を達成できるというデータも公開されています。
             </p>
 
             <div className={styles.diagramWrap}>
               <MermaidDiagram chart={DIAGRAMS.d7} />
-              <div className={styles.diagramCaption}>Fig 7. 制御ニーズに応じた手法選択の意思決定フロー</div>
+              <div className={styles.diagramCaption}>
+                Fig 7. 制御ニーズに応じた手法選択の意思決定フロー
+              </div>
             </div>
 
             <h3>5.3 QLoRAと量子化によるコスト最適化</h3>
             <p>
-              画像モデルに限らずLLM/マルチモーダルモデル全般で、2026年時点では「QLoRA + Unsloth + DoRA」の組み合わせがコンシューマGPUでのファインチューニング実務標準になっています。自社データでのスタイル学習を検討する際は、フルパラメータ更新ではなくLoRA/QLoRAから着手し、効果が不十分な場合にのみフルファインチューニングを検討するのが費用対効果の高い進め方です。
+              画像モデルに限らずLLM/マルチモーダルモデル全般で、2026年時点では「QLoRA + Unsloth +
+              DoRA」の組み合わせがコンシューマGPUでのファインチューニング実務標準になっています。自社データでのスタイル学習を検討する際は、フルパラメータ更新ではなくLoRA/QLoRAから着手し、効果が不十分な場合にのみフルファインチューニングを検討するのが費用対効果の高い進め方です。
             </p>
 
-            <div className={`${styles.callout} ${styles.principle}`} style={{ borderLeftColor: "var(--color-text-danger, #ef4444)" }}>
-              <span className={styles.calloutTitle} style={{ color: "var(--color-text-danger, #ef4444)" }}>実務上の注意:</span>
+            <div
+              className={`${styles.callout} ${styles.principle}`}
+              style={{ borderLeftColor: "var(--color-text-danger, #ef4444)" }}
+            >
+              <span
+                className={styles.calloutTitle}
+                style={{ color: "var(--color-text-danger, #ef4444)" }}
+              >
+                実務上の注意:
+              </span>
               <p>
-                LoRAで学習した画風・キャラクターは、ベースモデルがバージョンアップされた際に互換性が失われることがあります。ベースモデルの更新頻度が高いクラウドAPI系(GPT Image、Nano Banana等)ではLoRAのような形の追加学習は提供されないことが多く、LoRAエコシステムは主にオープンウェイトモデル(Stable Diffusion、FLUX等)を自前運用する場合に有効な選択肢です。
+                LoRAで学習した画風・キャラクターは、ベースモデルがバージョンアップされた際に互換性が失われることがあります。ベースモデルの更新頻度が高いクラウドAPI系(GPT
+                Image、Nano
+                Banana等)ではLoRAのような形の追加学習は提供されないことが多く、LoRAエコシステムは主にオープンウェイトモデル(Stable
+                Diffusion、FLUX等)を自前運用する場合に有効な選択肢です。
               </p>
             </div>
           </section>
 
           <section className="chapter" id="s6">
             <h2>
-              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>06 / 16</span>
+              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>
+                06 / 16
+              </span>
               画像生成の評価とQAパイプライン
             </h2>
             <p>
@@ -832,35 +935,44 @@ export default async function Page() {
               </table>
             </div>
             <p>
-              実際に確認された例では、あるモデルが別のモデルより高いCLIP Scoreを達成したにもかかわらず、人間評価では明らかに後者が優秀と判定されるケースがあり、これは前者がCLIP空間での最適化を行っているためで、スコアと実際の品質が乖離する典型例です。
+              実際に確認された例では、あるモデルが別のモデルより高いCLIP
+              Scoreを達成したにもかかわらず、人間評価では明らかに後者が優秀と判定されるケースがあり、これは前者がCLIP空間での最適化を行っているためで、スコアと実際の品質が乖離する典型例です。
             </p>
 
             <h3>6.2 評価パイプラインの設計</h3>
             <div className={styles.diagramWrap}>
               <MermaidDiagram chart={DIAGRAMS.d8} />
-              <div className={styles.diagramCaption}>Fig 8. 自動評価と人間評価を組み合わせたQAパイプライン</div>
+              <div className={styles.diagramCaption}>
+                Fig 8. 自動評価と人間評価を組み合わせたQAパイプライン
+              </div>
             </div>
 
             <h3>6.3 実務指針</h3>
             <ul>
               <li>
-                <strong>単一指標に依存しない</strong> — 定量指標の効率性と人間評価の感性を適切にバランスさせ、商用サービス・研究開発・アート制作など用途に最適化された指標の組み合わせを選ぶことが重要です。
+                <strong>単一指標に依存しない</strong> —
+                定量指標の効率性と人間評価の感性を適切にバランスさせ、商用サービス・研究開発・アート制作など用途に最適化された指標の組み合わせを選ぶことが重要です。
               </li>
               <li>
-                <strong>人間評価のコスト最小化</strong> — 全数チェックではなく統計的サンプリング＋自動フィルタの組み合わせで、レビュー工数を現実的な範囲に抑えます。
+                <strong>人間評価のコスト最小化</strong> —
+                全数チェックではなく統計的サンプリング＋自動フィルタの組み合わせで、レビュー工数を現実的な範囲に抑えます。
               </li>
               <li>
-                <strong>プロンプト忠実度と美的品質は別軸で評価する</strong> — CLIPScoreはプロンプト忠実度の代理指標であり、美的品質(構図・ライティング・ディテール)は別途VLMまたは人間評価で補完します。
+                <strong>プロンプト忠実度と美的品質は別軸で評価する</strong> —
+                CLIPScoreはプロンプト忠実度の代理指標であり、美的品質(構図・ライティング・ディテール)は別途VLMまたは人間評価で補完します。
               </li>
               <li>
-                <strong>著作権・商標類似性チェックを評価パイプラインに組み込む</strong> — 特に商用配信前には、既存の著名なキャラクター・ロゴ・アートワークとの類似性を検知するステップを安全性フィルタと並列で走らせることを推奨します。
+                <strong>著作権・商標類似性チェックを評価パイプラインに組み込む</strong> —
+                特に商用配信前には、既存の著名なキャラクター・ロゴ・アートワークとの類似性を検知するステップを安全性フィルタと並列で走らせることを推奨します。
               </li>
             </ul>
           </section>
 
           <section className="chapter" id="s7">
             <h2>
-              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>07 / 16</span>
+              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>
+                07 / 16
+              </span>
               音声生成の技術基盤：TTSからネイティブ音声対話へ
             </h2>
 
@@ -919,7 +1031,10 @@ export default async function Page() {
 
             <h3>7.3 実測レイテンシの目安(2026年4月時点)</h3>
             <p>
-              Time to First Token(発話終了からエージェント発話開始までの時間)は、xAI Grok Voice Agentが約0.78秒で最速、OpenAI gpt-realtime-1.5が約0.82秒、Amazon Nova 2 Sonicが約1.14秒、Gemini 3.1 Flash Liveが約2.98秒(Google自身の「リアルタイム」訴求より実測では遅い)という報告があり、人間の会話における応答レイテンシは平均約200ミリ秒とされています。この数値は測定条件や利用シーンによって変動するため、自社ワークロードでの実測が不可欠です。
+              Time to First Token(発話終了からエージェント発話開始までの時間)は、xAI Grok Voice
+              Agentが約0.78秒で最速、OpenAI gpt-realtime-1.5が約0.82秒、Amazon Nova 2
+              Sonicが約1.14秒、Gemini 3.1 Flash
+              Liveが約2.98秒(Google自身の「リアルタイム」訴求より実測では遅い)という報告があり、人間の会話における応答レイテンシは平均約200ミリ秒とされています。この数値は測定条件や利用シーンによって変動するため、自社ワークロードでの実測が不可欠です。
             </p>
 
             <div className={styles.callout}>
@@ -932,7 +1047,9 @@ export default async function Page() {
 
           <section className="chapter" id="s8">
             <h2>
-              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>08 / 16</span>
+              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>
+                08 / 16
+              </span>
               音声合成(TTS)モデル of 選定(2026年7月版)
             </h2>
 
@@ -968,7 +1085,9 @@ export default async function Page() {
                   <tr>
                     <td>gpt-4o-mini-tts</td>
                     <td>OpenAI</td>
-                    <td>テキストプロンプトで音声のトーン・感情・アクセント・速度を自由に制御可能</td>
+                    <td>
+                      テキストプロンプトで音声のトーン・感情・アクセント・速度を自由に制御可能
+                    </td>
                     <td>低コスト・高速</td>
                     <td>マルチスピーカー非対応</td>
                   </tr>
@@ -1046,7 +1165,9 @@ export default async function Page() {
 
           <section className="chapter" id="s9">
             <h2>
-              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>09 / 16</span>
+              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>
+                09 / 16
+              </span>
               音声生成のベストプラクティス
             </h2>
 
@@ -1056,32 +1177,45 @@ export default async function Page() {
             </p>
             <ul>
               <li>
-                <strong>オーディオタグによる感情制御</strong> — [whispers]、[laughs]、[excited]のようなインラインオーディオタグを台本中に埋め込むことで、長尺コンテンツやドラマチックなボイスオーバーの表現力を制御できます。
+                <strong>オーディオタグによる感情制御</strong> —
+                [whispers]、[laughs]、[excited]のようなインラインオーディオタグを台本中に埋め込むことで、長尺コンテンツやドラマチックなボイスオーバーの表現力を制御できます。
               </li>
               <li>
-                <strong>Voice Direction(演出指示)</strong> — 抽象的な指示(「感情を込めて」)ではなく、「困惑した様子で、語尾を少し伸ばしながら」のような具体的な演出指示を与えることで、意図した抑揚に近づきます。
+                <strong>Voice Direction(演出指示)</strong> —
+                抽象的な指示(「感情を込めて」)ではなく、「困惑した様子で、語尾を少し伸ばしながら」のような具体的な演出指示を与えることで、意図した抑揚に近づきます。
               </li>
               <li>
-                <strong>自然言語によるスタイル制御</strong> — gpt-4o-mini-ttsは、従来のtts-1/tts-1-hdモデルとは異なり、テキストプロンプトで音声のトーン・感情・アクセント・速度を自由に制御できます。
+                <strong>自然言語によるスタイル制御</strong> —
+                gpt-4o-mini-ttsは、従来のtts-1/tts-1-hdモデルとは異なり、テキストプロンプトで音声のトーン・感情・アクセント・速度を自由に制御できます。
               </li>
             </ul>
 
             <h3>9.2 長文音声生成におけるチャンク分割とトーンの一貫性</h3>
             <p>
-              長文をそのまま一括生成すると音質が不安定になりやすいため、実務では文章をチャンク(分割単位)に分けて逐次生成し、後で結合する手法が一般的です。しかし、これには固有の課題があります。チャンク分割後にElevenLabsは声のトーンが一貫していてつなぎ目の違和感がほとんどない一方、Gemini TTSではチャンク間でトーンが揺れる問題が顕著な差として現れることがあります。
+              長文をそのまま一括生成すると音質が不安定になりやすいため、実務では文章をチャンク(分割単位)に分けて逐次生成し、後で結合する手法が一般的です。しかし、これには固有の課題があります。チャンク分割後にElevenLabsは声のトーンが一貫していてつなぎ目の違和感がほとんどない一方、Gemini
+              TTSではチャンク間でトーンが揺れる問題が顕著な差として現れることがあります。
             </p>
 
             <div className={styles.diagramWrap}>
               <MermaidDiagram chart={DIAGRAMS.d11} />
-              <div className={styles.diagramCaption}>Fig 11. 長文音声生成のチャンク分割ワークフロー</div>
+              <div className={styles.diagramCaption}>
+                Fig 11. 長文音声生成のチャンク分割ワークフロー
+              </div>
             </div>
             <p>
-              <strong>実務上の対策</strong>: チャンクの切れ目は文の途中ではなく、句点や段落の境界に合わせる。可能であれば「前のチャンクの音声を参照情報として次のチャンクの生成に渡す」機能を持つAPI(コンテキスト継承対応のモデル)を優先的に選定する。
+              <strong>実務上の対策</strong>:
+              チャンクの切れ目は文の途中ではなく、句点や段落の境界に合わせる。可能であれば「前のチャンクの音声を参照情報として次のチャンクの生成に渡す」機能を持つAPI(コンテキスト継承対応のモデル)を優先的に選定する。
             </p>
 
             <h3>9.3 SSML(Speech Synthesis Markup Language)の活用</h3>
             <p>
-              Google Cloud TTSやAmazon Pollyなど一部のクラウドサービスはSSMLに対応しており、<code>&lt;break time=&quot;500ms&quot;/&gt;</code> による間の制御、<code>&lt;emphasis&gt;</code> による強調、<code>&lt;prosody rate=&quot;slow&quot;&gt;</code> による速度制御など、プレーンテキストでは表現できない細かな演出が可能です。ネイティブ音声対話モデル(Gemini Live、GPT Realtime等)はSSMLではなく自然言語の指示(システムプロンプト)でスタイルを制御する設計思想に移行しつつある点は、実装時に混同しないよう注意が必要です。
+              Google Cloud TTSやAmazon Pollyなど一部のクラウドサービスはSSMLに対応しており、
+              <code>&lt;break time=&quot;500ms&quot;/&gt;</code> による間の制御、
+              <code>&lt;emphasis&gt;</code> による強調、
+              <code>&lt;prosody rate=&quot;slow&quot;&gt;</code>{" "}
+              による速度制御など、プレーンテキストでは表現できない細かな演出が可能です。ネイティブ音声対話モデル(Gemini
+              Live、GPT
+              Realtime等)はSSMLではなく自然言語の指示(システムプロンプト)でスタイルを制御する設計思想に移行しつつある点は、実装時に混同しないよう注意が必要です。
             </p>
 
             <h3>9.4 音声クローンの倫理・同意管理</h3>
@@ -1090,23 +1224,30 @@ export default async function Page() {
             </p>
             <ul>
               <li>
-                <strong>本人の明示的な同意の取得と記録</strong> — クローン対象者から書面または録音による同意を取得し、利用範囲(内部利用のみ／商用公開／広告掲載)を事前に合意する。
+                <strong>本人の明示的な同意の取得と記録</strong> —
+                クローン対象者から書面または録音による同意を取得し、利用範囲(内部利用のみ／商用公開／広告掲載)を事前に合意する。
               </li>
               <li>
-                <strong>認証プロセスを備えたプラットフォームの利用</strong> — ElevenLabsやMicrosoft Custom Neural Voiceは本人認証プロセスを提供しており、これらを活用することが安全とされています。無断でのクローンは肖像権・パブリシティ権の侵害となるため避けるべきとされています。
+                <strong>認証プロセスを備えたプラットフォームの利用</strong> — ElevenLabsやMicrosoft
+                Custom Neural
+                Voiceは本人認証プロセスを提供しており、これらを活用することが安全とされています。無断でのクローンは肖像権・パブリシティ権の侵害となるため避けるべきとされています。
               </li>
               <li>
-                <strong>音声ウォーターマークの付与</strong> — OpenAIはVoice Engineにおいて音声ウォーターマークを導入し、精度と信頼性に関する検証と研究を継続しています。自社で音声クローン機能を提供する場合、生成音声への来歴情報の埋め込みを検討してください。
+                <strong>音声ウォーターマークの付与</strong> — OpenAIはVoice
+                Engineにおいて音声ウォーターマークを導入し、精度と信頼性に関する検証と研究を継続しています。自社で音声クローン機能を提供する場合、生成音声への来歴情報の埋め込みを検討してください。
               </li>
               <li>
-                <strong>なりすまし検知フローの整備</strong> — カスタマーサポート等の重要な意思決定に音声認証を用いている場合、AI音声クローンによる突破を想定した多要素認証の併用を推奨します。
+                <strong>なりすまし検知フローの整備</strong> —
+                カスタマーサポート等の重要な意思決定に音声認証を用いている場合、AI音声クローンによる突破を想定した多要素認証の併用を推奨します。
               </li>
             </ul>
           </section>
 
           <section className="chapter" id="s10">
             <h2>
-              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>10 / 16</span>
+              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>
+                10 / 16
+              </span>
               リアルタイム音声対話エージェントの設計
             </h2>
 
@@ -1129,7 +1270,8 @@ export default async function Page() {
                   <tr>
                     <td>アーキテクチャ</td>
                     <td>
-                      Gemini 3 Proをベースにしたネイティブマルチモーダルモデルで、音声・映像・画像・テキストを同時に受け付ける
+                      Gemini 3
+                      Proをベースにしたネイティブマルチモーダルモデルで、音声・映像・画像・テキストを同時に受け付ける
                     </td>
                     <td>音声専用(Audio-to-Audio)でありながら強力な推論能力を持つ</td>
                   </tr>
@@ -1175,21 +1317,28 @@ export default async function Page() {
             <h3>10.3 レイテンシ予算の設計</h3>
             <div className={styles.diagramWrap}>
               <MermaidDiagram chart={DIAGRAMS.d12} />
-              <div className={styles.diagramCaption}>Fig 12. 発話終了から応答までのレイテンシ予算の内訳</div>
+              <div className={styles.diagramCaption}>
+                Fig 12. 発話終了から応答までのレイテンシ予算の内訳
+              </div>
             </div>
             <p>
-              Word Error Rate(WER)は文字起こしの誤認識率を測る指標であり、Time to First Token(TTFT)は発話終了からエージェント発話開始までの時間を測る指標です。両者を継続的に計測し、SLA違反の兆候を早期検知する体制が重要です。統合TTSの音質は専門TTSモデルに劣ることが多いため、音声品質を最優先する用途では、ネイティブAudio-to-Audioモデルの音声出力部分だけを専門TTS(ElevenLabs Conversational AI等)に差し替えるハイブリッド構成も検討に値します。
+              Word Error Rate(WER)は文字起こしの誤認識率を測る指標であり、Time to First
+              Token(TTFT)は発話終了からエージェント発話開始までの時間を測る指標です。両者を継続的に計測し、SLA違反の兆候を早期検知する体制が重要です。統合TTSの音質は専門TTSモデルに劣ることが多いため、音声品質を最優先する用途では、ネイティブAudio-to-Audioモデルの音声出力部分だけを専門TTS(ElevenLabs
+              Conversational AI等)に差し替えるハイブリッド構成も検討に値します。
             </p>
 
             <h3>10.4 バージイン(割り込み)対応</h3>
             <p>
-              Proactive Audio(能動的な発話判断)は単純な音声区間検出(VAD)を超えた機能で、エージェントがいつ応答すべきか、いつ静かな聞き手であり続けるべきかを賢く判断できるよう設定でき、受動的な傾聴が求められる場面での不要な割り込みを防ぎます。ノイズの多い環境(工事現場・車内・イベント会場など)での運用を想定する場合は、この能動的判断機能の有無をモデル選定の評価軸に加えてください。
+              Proactive
+              Audio(能動的な発話判断)は単純な音声区間検出(VAD)を超えた機能で、エージェントがいつ応答すべきか、いつ静かな聞き手であり続けるべきかを賢く判断できるよう設定でき、受動的な傾聴が求められる場面での不要な割り込みを防ぎます。ノイズの多い環境(工事現場・車内・イベント会場など)での運用を想定する場合は、この能動的判断機能の有無をモデル選定の評価軸に加えてください。
             </p>
           </section>
 
           <section className="chapter" id="s11">
             <h2>
-              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>11 / 16</span>
+              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>
+                11 / 16
+              </span>
               音楽生成AIのベストプラクティスと著作権
             </h2>
 
@@ -1241,7 +1390,9 @@ export default async function Page() {
 
             <h3>11.2 著作権をめぐる2026年時点の状況</h3>
             <p>
-              2024年6月、全米レコード協会(RIAA)がUMG・Sony Music・Warner Music Groupの3大レーベルを代理し、AIモデルの学習データへの無断使用を争点にSunoとUdioを提訴しました。その後「訴訟→和解→ライセンス契約」という流れが生まれ、WMGとSuno・Udioの提携がAI音楽正規化の最初の成功モデルとなっています。一方で、Sony Musicとの訴訟は2026年6月時点でも継続中であり、判決次第でサービス内容・ポリシーが変わる可能性があります。
+              2024年6月、全米レコード協会(RIAA)がUMG・Sony Music・Warner Music
+              Groupの3大レーベルを代理し、AIモデルの学習データへの無断使用を争点にSunoとUdioを提訴しました。その後「訴訟→和解→ライセンス契約」という流れが生まれ、WMGとSuno・Udioの提携がAI音楽正規化の最初の成功モデルとなっています。一方で、Sony
+              Musicとの訴訟は2026年6月時点でも継続中であり、判決次第でサービス内容・ポリシーが変わる可能性があります。
             </p>
             <p>
               日本国内では、JASRACが著作権法30条の4(情報解析目的の利用を適法とする規定)の見直しを文化庁へ要望しており、クリエイターが安心して創作に専念できる環境の確保を前提に、より厳格な要件の導入を求めています。
@@ -1259,7 +1410,9 @@ export default async function Page() {
 
           <section className="chapter" id="s12">
             <h2>
-              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>12 / 16</span>
+              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>
+                12 / 16
+              </span>
               マルチモーダル統合アーキテクチャパターン
             </h2>
 
@@ -1270,7 +1423,9 @@ export default async function Page() {
 
             <div className={styles.diagramWrap}>
               <MermaidDiagram chart={DIAGRAMS.d14} />
-              <div className={styles.diagramCaption}>Fig 14. カスケード型とネイティブAny-to-Anyの構造比較</div>
+              <div className={styles.diagramCaption}>
+                Fig 14. カスケード型とネイティブAny-to-Anyの構造比較
+              </div>
             </div>
 
             <h3>12.2 オーケストレーション設計(テキストLLM主導)</h3>
@@ -1288,7 +1443,9 @@ export default async function Page() {
 
           <section className="chapter" id="s13">
             <h2>
-              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>13 / 16</span>
+              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>
+                13 / 16
+              </span>
               安全性・コンテンツ来歴・法規制
             </h2>
 
@@ -1299,12 +1456,15 @@ export default async function Page() {
 
             <div className={styles.diagramWrap}>
               <MermaidDiagram chart={DIAGRAMS.d16} />
-              <div className={styles.diagramCaption}>Fig 16. C2PAメタデータ署名とSynthID電子透かしの併用スキーム</div>
+              <div className={styles.diagramCaption}>
+                Fig 16. C2PAメタデータ署名とSynthID電子透かしの併用スキーム
+              </div>
             </div>
 
             <h3>13.2 各国のAI規制とコンプライアンス</h3>
             <p>
-              2026年は、欧州AI法(EU AI Act)の全面的な適用開始に伴い、ウォーターマーキングやAI生成コンテンツである旨の明示義務化など、実務上のコンプライアンス対応が必須化される年です。
+              2026年は、欧州AI法(EU AI
+              Act)の全面的な適用開始に伴い、ウォーターマーキングやAI生成コンテンツである旨の明示義務化など、実務上のコンプライアンス対応が必須化される年です。
             </p>
 
             <div className={styles.tableWrap}>
@@ -1345,7 +1505,9 @@ export default async function Page() {
 
           <section className="chapter" id="s14">
             <h2>
-              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>14 / 16</span>
+              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>
+                14 / 16
+              </span>
               プロダクション運用のベストプラクティス
             </h2>
 
@@ -1356,7 +1518,9 @@ export default async function Page() {
 
             <div className={styles.diagramWrap}>
               <MermaidDiagram chart={DIAGRAMS.d17} />
-              <div className={styles.diagramCaption}>Fig 17. コスト最適化のための2段階生成アプローチ</div>
+              <div className={styles.diagramCaption}>
+                Fig 17. コスト最適化のための2段階生成アプローチ
+              </div>
             </div>
 
             <h3>14.2 モニタリングとオブザーバビリティ</h3>
@@ -1366,13 +1530,17 @@ export default async function Page() {
 
             <div className={styles.diagramWrap}>
               <MermaidDiagram chart={DIAGRAMS.d18} />
-              <div className={styles.diagramCaption}>Fig 18. 本番環境におけるモニタリングとフィードバックループ</div>
+              <div className={styles.diagramCaption}>
+                Fig 18. 本番環境におけるモニタリングとフィードバックループ
+              </div>
             </div>
           </section>
 
           <section className="chapter" id="s15">
             <h2>
-              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>15 / 16</span>
+              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>
+                15 / 16
+              </span>
               意思決定チェックリスト
             </h2>
             <p>
@@ -1383,31 +1551,37 @@ export default async function Page() {
               <li>
                 <input id="chk-1" type="checkbox" />
                 <label htmlFor="chk-1">
-                  <strong>ライセンスと商用利用権の確認:</strong> 選択したすべてのモデル(ベース、LoRA、統合TTSなど)が、プロダクトの商用要件および利用地域(特にEU規制地域)に合致しているか確認した。
+                  <strong>ライセンスと商用利用権の確認:</strong>{" "}
+                  選択したすべてのモデル(ベース、LoRA、統合TTSなど)が、プロダクトの商用要件および利用地域(特にEU規制地域)に合致しているか確認した。
                 </label>
               </li>
               <li>
                 <input id="chk-2" type="checkbox" />
                 <label htmlFor="chk-2">
-                  <strong>レイテンシ予算の合致:</strong> リアルタイム対話型エージェントなどの用途で、発話から応答開始までが目標値(例: 800ms以内)に収まる構成であることを実測で検証した。
+                  <strong>レイテンシ予算の合致:</strong>{" "}
+                  リアルタイム対話型エージェントなどの用途で、発話から応答開始までが目標値(例:
+                  800ms以内)に収まる構成であることを実測で検証した。
                 </label>
               </li>
               <li>
                 <input id="chk-3" type="checkbox" />
                 <label htmlFor="chk-3">
-                  <strong>著作権と類似曲のチェック:</strong> 特に音楽生成AIを大規模プロモーションで用いる際、類似曲検索等を用いて既存曲との類似性を排除するチェックフローを設けた。
+                  <strong>著作権と類似曲のチェック:</strong>{" "}
+                  特に音楽生成AIを大規模プロモーションで用いる際、類似曲検索等を用いて既存曲との類似性を排除するチェックフローを設けた。
                 </label>
               </li>
               <li>
                 <input id="chk-4" type="checkbox" />
                 <label htmlFor="chk-4">
-                  <strong>来歴メタデータ/透かしの付与:</strong> EU AI法や各プラットフォームの規制基準に合わせ、C2PAメタデータの付与またはSynthID等の電子透かしの埋め込みを自動化するパイプラインを構築した。
+                  <strong>来歴メタデータ/透かしの付与:</strong> EU
+                  AI法や各プラットフォームの規制基準に合わせ、C2PAメタデータの付与またはSynthID等の電子透かしの埋め込みを自動化するパイプラインを構築した。
                 </label>
               </li>
               <li>
                 <input id="chk-5" type="checkbox" />
                 <label htmlFor="chk-5">
-                  <strong>障害時のフォールバック設計:</strong> 主要モデルのAPIダウン、料金改定、サービス終了に備え、代替モデルへのルーティングをコード変更なしで切り替えられるように設計した。
+                  <strong>障害時のフォールバック設計:</strong>{" "}
+                  主要モデルのAPIダウン、料金改定、サービス終了に備え、代替モデルへのルーティングをコード変更なしで切り替えられるように設計した。
                 </label>
               </li>
             </ul>
@@ -1415,7 +1589,9 @@ export default async function Page() {
 
           <section className="chapter" id="s16">
             <h2>
-              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>16 / 16</span>
+              <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>
+                16 / 16
+              </span>
               参考文献・URL一覧
             </h2>
 
@@ -1424,37 +1600,49 @@ export default async function Page() {
               <ul className={styles.refList}>
                 <li>
                   <Ext href="https://developers.openai.com/cookbook/examples/multimodal/image-gen-models-prompting-guide">
-                    <span className={styles.refTitle}>GPT Image 2 Prompting Guide and Examples (OpenAI Cookbook)</span>
+                    <span className={styles.refTitle}>
+                      GPT Image 2 Prompting Guide and Examples (OpenAI Cookbook)
+                    </span>
                     developers.openai.com/cookbook/.../image-gen-models-prompting-guide
                   </Ext>
                 </li>
                 <li>
                   <Ext href="https://fal.ai/learn/tools/prompting-gpt-image-2">
-                    <span className={styles.refTitle}>GPT Image 2 Prompting Guide and Examples (fal)</span>
+                    <span className={styles.refTitle}>
+                      GPT Image 2 Prompting Guide and Examples (fal)
+                    </span>
                     fal.ai/learn/tools/prompting-gpt-image-2
                   </Ext>
                 </li>
                 <li>
                   <Ext href="https://developers.openai.com/cookbook/examples/multimodal/image-gen-1.5-prompting_guide">
-                    <span className={styles.refTitle}>Gpt-image-1.5 Prompting Guide (OpenAI Cookbook)</span>
+                    <span className={styles.refTitle}>
+                      Gpt-image-1.5 Prompting Guide (OpenAI Cookbook)
+                    </span>
                     developers.openai.com/cookbook/.../image-gen-1.5-prompting_guide
                   </Ext>
                 </li>
                 <li>
                   <Ext href="https://platform.openai.com/docs/guides/image-generation">
-                    <span className={styles.refTitle}>Image generation (OpenAI API公式ドキュメント)</span>
+                    <span className={styles.refTitle}>
+                      Image generation (OpenAI API公式ドキュメント)
+                    </span>
                     platform.openai.com/docs/guides/image-generation
                   </Ext>
                 </li>
                 <li>
                   <Ext href="https://help.openai.com/en/articles/6654000-best-practices-for-prompt-engineering-with-the-openai-api">
-                    <span className={styles.refTitle}>Best practices for prompt engineering with the OpenAI API</span>
+                    <span className={styles.refTitle}>
+                      Best practices for prompt engineering with the OpenAI API
+                    </span>
                     help.openai.com/.../best-practices-for-prompt-engineering
                   </Ext>
                 </li>
                 <li>
                   <Ext href="https://www.freshtechtips.com/2026/05/openai-chatgpt-image-prompting-guide.html">
-                    <span className={styles.refTitle}>The Ultimate OpenAI (ChatGPT) Image Prompting Guide</span>
+                    <span className={styles.refTitle}>
+                      The Ultimate OpenAI (ChatGPT) Image Prompting Guide
+                    </span>
                     freshtechtips.com/2026/05/openai-chatgpt-image-prompting-guide
                   </Ext>
                 </li>
@@ -1466,13 +1654,17 @@ export default async function Page() {
                 </li>
                 <li>
                   <Ext href="https://medium.com/@amrstech/chatgpt-images-2-0-api-prompting-guide-47fbe5aeee3a">
-                    <span className={styles.refTitle}>ChatGPT Images 2.0 API Prompting Guide (Medium)</span>
+                    <span className={styles.refTitle}>
+                      ChatGPT Images 2.0 API Prompting Guide (Medium)
+                    </span>
                     medium.com/@amrstech/chatgpt-images-2-0-api-prompting-guide
                   </Ext>
                 </li>
                 <li>
                   <Ext href="https://gptimg2ai.com/blogs/gpt-image-2-prompt-guide">
-                    <span className={styles.refTitle}>GPT Image 2 Prompt Guide: Examples, Testing and How to Use</span>
+                    <span className={styles.refTitle}>
+                      GPT Image 2 Prompt Guide: Examples, Testing and How to Use
+                    </span>
                     gptimg2ai.com/blogs/gpt-image-2-prompt-guide
                   </Ext>
                 </li>
@@ -1508,7 +1700,9 @@ export default async function Page() {
                 </li>
                 <li>
                   <Ext href="https://aipicks.jp/mag/lora-stable-diffusion-2026">
-                    <span className={styles.refTitle}>LoRAとは？画像生成を変える追加学習を初心者向けに解説</span>
+                    <span className={styles.refTitle}>
+                      LoRAとは？画像生成を変える追加学習を初心者向けに解説
+                    </span>
                     aipicks.jp/mag/lora-stable-diffusion-2026
                   </Ext>
                 </li>
@@ -1520,13 +1714,17 @@ export default async function Page() {
               <ul className={styles.refList}>
                 <li>
                   <Ext href="https://service.ai-prompt.jp/article/ai365-191/">
-                    <span className={styles.refTitle}>【０から学ぶAI】第191回：画像生成の評価指標</span>
+                    <span className={styles.refTitle}>
+                      【０から学ぶAI】第191回：画像生成の評価指標
+                    </span>
                     service.ai-prompt.jp/article/ai365-191
                   </Ext>
                 </li>
                 <li>
                   <Ext href="https://cyberagent.ai/blog/research/computervision/18702/">
-                    <span className={styles.refTitle}>クラウドソーシングを使った画像生成の評価 (CVPR2023紹介)</span>
+                    <span className={styles.refTitle}>
+                      クラウドソーシングを使った画像生成の評価 (CVPR2023紹介)
+                    </span>
                     cyberagent.ai/blog/research/computervision/18702
                   </Ext>
                 </li>
@@ -1538,7 +1736,9 @@ export default async function Page() {
                 </li>
                 <li>
                   <Ext href="https://note.com/te_ftef/n/nd7f2d7547c22">
-                    <span className={styles.refTitle}>CyberAgentより、画像生成タスクにおける新たな評価指標の提案</span>
+                    <span className={styles.refTitle}>
+                      CyberAgentより、画像生成タスクにおける新たな評価指標の提案
+                    </span>
                     note.com/te_ftef/n/nd7f2d7547c22
                   </Ext>
                 </li>
@@ -1550,7 +1750,9 @@ export default async function Page() {
                 </li>
                 <li>
                   <Ext href="https://re-birth-ai.com/image-generation-model-evaluation-methods-complete-guide/">
-                    <span className={styles.refTitle}>画像生成モデル評価手法完全ガイド (Re-BIRTH)</span>
+                    <span className={styles.refTitle}>
+                      画像生成モデル評価手法完全ガイド (Re-BIRTH)
+                    </span>
                     re-birth-ai.com/image-generation-model-evaluation-methods-complete-guide
                   </Ext>
                 </li>
@@ -1562,7 +1764,9 @@ export default async function Page() {
               <ul className={styles.refList}>
                 <li>
                   <Ext href="https://tech.gmogshd.com/ai-tts-comparison/">
-                    <span className={styles.refTitle}>OpenAI・ElevenLabs・Geminiを使い比べてわかった違い</span>
+                    <span className={styles.refTitle}>
+                      OpenAI・ElevenLabs・Geminiを使い比べてわかった違い
+                    </span>
                     tech.gmogshd.com/ai-tts-comparison
                   </Ext>
                 </li>
@@ -1580,13 +1784,17 @@ export default async function Page() {
                 </li>
                 <li>
                   <Ext href="https://note.com/aituberonair/n/n096cd23ce3ea">
-                    <span className={styles.refTitle}>【2026年最新比較】AITuber制作に最適な音声合成エンジン11選</span>
+                    <span className={styles.refTitle}>
+                      【2026年最新比較】AITuber制作に最適な音声合成エンジン11選
+                    </span>
                     note.com/aituberonair/n/n096cd23ce3ea
                   </Ext>
                 </li>
                 <li>
                   <Ext href="https://www.befreed.ai/blog/best-tts-model-2026">
-                    <span className={styles.refTitle}>Best TTS Model 2026: Top 9 AI Voice Generators Ranked</span>
+                    <span className={styles.refTitle}>
+                      Best TTS Model 2026: Top 9 AI Voice Generators Ranked
+                    </span>
                     befreed.ai/blog/best-tts-model-2026
                   </Ext>
                 </li>
@@ -1604,19 +1812,25 @@ export default async function Page() {
                 </li>
                 <li>
                   <Ext href="https://www.callmissed.com/en/blog/tts-showdown-2026-elevenlabs-vs-cartesia-vs-openai-vs-sesame-the-ultimate-compar">
-                    <span className={styles.refTitle}>TTS Showdown 2026: ElevenLabs vs. Cartesia vs. OpenAI vs. Sesame</span>
+                    <span className={styles.refTitle}>
+                      TTS Showdown 2026: ElevenLabs vs. Cartesia vs. OpenAI vs. Sesame
+                    </span>
                     callmissed.com/en/blog/tts-showdown-2026
                   </Ext>
                 </li>
                 <li>
                   <Ext href="https://www.solounicorn.club/blog/a-33">
-                    <span className={styles.refTitle}>ElevenLabs vs OpenAI Voice vs Google TTS</span>
+                    <span className={styles.refTitle}>
+                      ElevenLabs vs OpenAI Voice vs Google TTS
+                    </span>
                     solounicorn.club/blog/a-33
                   </Ext>
                 </li>
                 <li>
                   <Ext href="https://renue.co.jp/posts/ai-voice-generation-elevenlabs-heygen-synthesia-2026-guide">
-                    <span className={styles.refTitle}>ElevenLabs/HeyGen/Synthesia比較とビジネス活用10選</span>
+                    <span className={styles.refTitle}>
+                      ElevenLabs/HeyGen/Synthesia比較とビジネス活用10選
+                    </span>
                     renue.co.jp/posts/ai-voice-generation-elevenlabs-heygen-synthesia-2026-guide
                   </Ext>
                 </li>
@@ -1628,7 +1842,9 @@ export default async function Page() {
               <ul className={styles.refList}>
                 <li>
                   <Ext href="https://renue.co.jp/posts/ai-watermark-c2pa-synthid-content-authenticity-guide-2026">
-                    <span className={styles.refTitle}>AIウォーターマークとは？C2PA・SynthIDの仕組み (renue)</span>
+                    <span className={styles.refTitle}>
+                      AIウォーターマークとは？C2PA・SynthIDの仕組み (renue)
+                    </span>
                     renue.co.jp/posts/ai-watermark-c2pa-synthid-content-authenticity-guide-2026
                   </Ext>
                 </li>
@@ -1646,7 +1862,9 @@ export default async function Page() {
                 </li>
                 <li>
                   <Ext href="https://openai.com/ja-JP/index/advancing-content-provenance/">
-                    <span className={styles.refTitle}>より安全で透明性の高いAIエコシステムに向けて (OpenAI公式)</span>
+                    <span className={styles.refTitle}>
+                      より安全で透明性の高いAIエコシステムに向けて (OpenAI公式)
+                    </span>
                     openai.com/ja-JP/index/advancing-content-provenance
                   </Ext>
                 </li>
@@ -1658,7 +1876,9 @@ export default async function Page() {
                 </li>
                 <li>
                   <Ext href="https://www.auditsocials.com/blog/ai-content-detection-technology-c2pa-watermarking-metadata-2026">
-                    <span className={styles.refTitle}>AI Content Detection Tools 2026: C2PA, SynthID & Forensics</span>
+                    <span className={styles.refTitle}>
+                      AI Content Detection Tools 2026: C2PA, SynthID & Forensics
+                    </span>
                     auditsocials.com/blog/ai-content-detection-technology-2026
                   </Ext>
                 </li>
@@ -1688,7 +1908,9 @@ export default async function Page() {
                 </li>
                 <li>
                   <Ext href="https://tenbin.ai/media/generative_ai/ai-music-voice-2026-commercial-copyright">
-                    <span className={styles.refTitle}>音楽・音声生成AI 目的別おすすめ5選 (天秤AIメディア byGMO)</span>
+                    <span className={styles.refTitle}>
+                      音楽・音声生成AI 目的別おすすめ5選 (天秤AIメディア byGMO)
+                    </span>
                     tenbin.ai/media/generative_ai/ai-music-voice-2026-commercial-copyright
                   </Ext>
                 </li>
@@ -1700,7 +1922,9 @@ export default async function Page() {
                 </li>
                 <li>
                   <Ext href="https://core-ms.net/2026/03/23/dtm-ai-music-tools-2026/">
-                    <span className={styles.refTitle}>AI作曲ツール比較2026 (コアミュージックスクール)</span>
+                    <span className={styles.refTitle}>
+                      AI作曲ツール比較2026 (コアミュージックスクール)
+                    </span>
                     core-ms.net/2026/03/23/dtm-ai-music-tools-2026
                   </Ext>
                 </li>
@@ -1712,7 +1936,9 @@ export default async function Page() {
                 </li>
                 <li>
                   <Ext href="https://ai-revolution.co.jp/media/what-is-suno/">
-                    <span className={styles.refTitle}>Sunoとは？料金・機能・V5.5・著作権問題を完全解説</span>
+                    <span className={styles.refTitle}>
+                      Sunoとは？料金・機能・V5.5・著作権問題を完全解説
+                    </span>
                     ai-revolution.co.jp/media/what-is-suno
                   </Ext>
                 </li>
@@ -1736,31 +1962,41 @@ export default async function Page() {
               <ul className={styles.refList}>
                 <li>
                   <Ext href="https://blog.google/innovation-and-ai/technology/developers-tools/build-with-gemini-3-1-flash-live/">
-                    <span className={styles.refTitle}>Build real-time conversational agents with Gemini 3.1 Flash Live (Google公式)</span>
+                    <span className={styles.refTitle}>
+                      Build real-time conversational agents with Gemini 3.1 Flash Live (Google公式)
+                    </span>
                     blog.google/.../build-with-gemini-3-1-flash-live
                   </Ext>
                 </li>
                 <li>
                   <Ext href="https://ai.google.dev/gemini-api/docs/models">
-                    <span className={styles.refTitle}>Models | Gemini API (Google公式ドキュメント)</span>
+                    <span className={styles.refTitle}>
+                      Models | Gemini API (Google公式ドキュメント)
+                    </span>
                     ai.google.dev/gemini-api/docs/models
                   </Ext>
                 </li>
                 <li>
                   <Ext href="https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-flash-live/">
-                    <span className={styles.refTitle}>Gemini 3.1 Flash Live: Making audio AI more natural and reliable (Google公式)</span>
+                    <span className={styles.refTitle}>
+                      Gemini 3.1 Flash Live: Making audio AI more natural and reliable (Google公式)
+                    </span>
                     blog.google/.../gemini-3-1-flash-live
                   </Ext>
                 </li>
                 <li>
                   <Ext href="https://cloud.google.com/blog/topics/developers-practitioners/how-to-use-gemini-live-api-native-audio-in-vertex-ai">
-                    <span className={styles.refTitle}>How to use Gemini Live API Native Audio in Vertex AI (Google Cloud Blog)</span>
+                    <span className={styles.refTitle}>
+                      How to use Gemini Live API Native Audio in Vertex AI (Google Cloud Blog)
+                    </span>
                     cloud.google.com/blog/.../gemini-live-api-native-audio-in-vertex-ai
                   </Ext>
                 </li>
                 <li>
                   <Ext href="https://flowtivity.ai/blog/gemini-3-1-flash-live-vs-gpt-realtime-1-5-voice-agent-comparison-2026/">
-                    <span className={styles.refTitle}>Gemini 3.1 Flash Live vs GPT Realtime 1.5比較</span>
+                    <span className={styles.refTitle}>
+                      Gemini 3.1 Flash Live vs GPT Realtime 1.5比較
+                    </span>
                     flowtivity.ai/blog/gemini-3-1-flash-live-vs-gpt-realtime-1-5
                   </Ext>
                 </li>
@@ -1772,25 +2008,33 @@ export default async function Page() {
                 </li>
                 <li>
                   <Ext href="https://safina.ai/en/blog/gemini-3-1-flash-live-realtime-voice-ai/">
-                    <span className={styles.refTitle}>Gemini 3.1 Flash Live: Google's Realtime Voice AI (Safina AI)</span>
+                    <span className={styles.refTitle}>
+                      Gemini 3.1 Flash Live: Google's Realtime Voice AI (Safina AI)
+                    </span>
                     safina.ai/en/blog/gemini-3-1-flash-live-realtime-voice-ai
                   </Ext>
                 </li>
                 <li>
                   <Ext href="https://www.marktechpost.com/2026/03/26/google-releases-gemini-3-1-flash-live-a-real-time-multimodal-voice-model-for-low-latency-audio-video-and-tool-use-for-ai-agents/">
-                    <span className={styles.refTitle}>Google Releases Gemini 3.1 Flash Live (MarkTechPost)</span>
+                    <span className={styles.refTitle}>
+                      Google Releases Gemini 3.1 Flash Live (MarkTechPost)
+                    </span>
                     marktechpost.com/2026/03/26/google-releases-gemini-3-1-flash-live
                   </Ext>
                 </li>
                 <li>
                   <Ext href="https://docs.livekit.io/agents/models/realtime/plugins/gemini/">
-                    <span className={styles.refTitle}>Gemini Live API plugin (LiveKit Documentation)</span>
+                    <span className={styles.refTitle}>
+                      Gemini Live API plugin (LiveKit Documentation)
+                    </span>
                     docs.livekit.io/agents/models/realtime/plugins/gemini
                   </Ext>
                 </li>
                 <li>
                   <Ext href="https://softcery.com/lab/ai-voice-agents-real-time-vs-turn-based-tts-stt-architecture">
-                    <span className={styles.refTitle}>Real-Time vs Turn-Based Voice Agents in 2026</span>
+                    <span className={styles.refTitle}>
+                      Real-Time vs Turn-Based Voice Agents in 2026
+                    </span>
                     softcery.com/lab/ai-voice-agents-real-time-vs-turn-based
                   </Ext>
                 </li>

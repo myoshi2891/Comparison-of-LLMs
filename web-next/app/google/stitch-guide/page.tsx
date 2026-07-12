@@ -253,24 +253,24 @@ export default function GoogleStitchGuidePage() {
             </div>
           </div>
 
-          <section id="s1" className={styles.stitchSection}>
+          <section id="s1" className={`${styles.stitchSection} stitchSection`}>
             <h2>
               <span className={styles.stepNum}>1</span>Stitchとは何か
             </h2>
             <p className={styles.lead}>
-              Google Stitchは、Google Labsが提供する無料のAIデザインツールで、自然言語のプロンプトやスケッチ画像からモバイル向け・Web向けのUIデザインを生成する。公式サイトの説明では、モバイルアプリとWebアプリケーション向けのUIを生成し、デザインの発案（ideation）を高速かつ簡単にすることを目的としたツールだと位置づけられている。
+              Google Stitchは、Google
+              Labsが提供する無料のAIデザインツールで、自然言語のプロンプトやスケッチ画像からモバイル向け・Web向けのUIデザインを生成する。公式サイトの説明では、モバイルアプリとWebアプリケーション向けのUIを生成し、デザインの発案（ideation）を高速かつ簡単にすることを目的としたツールだと位置づけられている。
               <span className={`${styles.badge} ${styles.badgeOfficial}`}>
                 <i className="ti ti-brand-google" />
                 公式
-              </span>
-              {" "}
+              </span>{" "}
               <Ext href="https://stitch.withgoogle.com/">stitch.withgoogle.com</Ext>
             </p>
 
             <p>
-              2026年3月の大型アップデート以降、Stitchは単なる「1画面を生成する実験」から、テキストのみならず画像やコードもコンテキストとして扱える「AIネイティブな無限キャンバス」へと進化した。Googleはこの新しい体験を「vibe design（バイブデザイン）」と呼んでおり、ワイヤーフレームから始めるのではなく、実現したいビジネス目標やユーザーに与えたい感情を言葉で説明するところから設計を始められる点が特徴だとしている。
-              <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span>
-              {" "}
+              2026年3月の大型アップデート以降、Stitchは単なる「1画面を生成する実験」から、テキストのみならず画像やコードもコンテキストとして扱える「AIネイティブな無限キャンバス」へと進化した。Googleはこの新しい体験を「vibe
+              design（バイブデザイン）」と呼んでおり、ワイヤーフレームから始めるのではなく、実現したいビジネス目標やユーザーに与えたい感情を言葉で説明するところから設計を始められる点が特徴だとしている。
+              <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span>{" "}
               <Ext href="https://blog.google/innovation-and-ai/models-and-research/google-labs/stitch-ai-ui-design/">
                 Google公式ブログ
               </Ext>
@@ -308,8 +308,7 @@ export default function GoogleStitchGuidePage() {
                       ピクセル単位の精密な編集、要素単位の細かい選択・修正、ローディングアニメーションなどのマイクロインタラクション設計
                     </td>
                     <td className={styles.srcLink}>
-                      <Ext href="https://moda.app/blog/google-stitch-review">Moda</Ext>
-                      ,{" "}
+                      <Ext href="https://moda.app/blog/google-stitch-review">Moda</Ext>,{" "}
                       <Ext href="https://www.nxcode.io/resources/news/google-stitch-complete-guide-vibe-design-2026">
                         NxCode
                       </Ext>
@@ -340,12 +339,15 @@ export default function GoogleStitchGuidePage() {
             </div>
           </section>
 
-          <section id="s2" className={styles.stitchSection}>
+          <section id="s2" className={`${styles.stitchSection} stitchSection`}>
             <h2>
               <span className={styles.stepNum}>2</span>開発の背景と沿革
             </h2>
             <p>
-              Stitchの前身は、2022年に登場したプロンプトからUIモックアップを生成するツール「Galileo AI」である。Googleは2025年初頭にGalileo AIを買収し、Gemini系モデルと統合したうえで「Stitch」としてGoogle Labsからリブランド発表した。
+              Stitchの前身は、2022年に登場したプロンプトからUIモックアップを生成するツール「Galileo
+              AI」である。Googleは2025年初頭にGalileo
+              AIを買収し、Gemini系モデルと統合したうえで「Stitch」としてGoogle
+              Labsからリブランド発表した。
               <Ext href="https://gozade.com/blog/google-stitch-review-2026-a-gozade-verdict-on-the-ai-ui-design-tool-everyone-is-talking-about">
                 Gozade
               </Ext>
@@ -364,7 +366,8 @@ export default function GoogleStitchGuidePage() {
 
             <ul>
               <li>
-                <strong>2025年5月20日</strong> - Google I/Oにて、単一画面をテキストプロンプトまたは画像アップロードから生成するシンプルな実験としてスタート。
+                <strong>2025年5月20日</strong> - Google
+                I/Oにて、単一画面をテキストプロンプトまたは画像アップロードから生成するシンプルな実験としてスタート。
                 <span className={styles.srcLink}>
                   <Ext href="https://tech-insider.org/google-stitch-ai-design-tool-march-2026-update/">
                     Tech Insider
@@ -372,7 +375,9 @@ export default function GoogleStitchGuidePage() {
                 </span>
               </li>
               <li>
-                <strong>2025年12月</strong> - 複数画面を接続してインタラクティブなプロトタイプとして体験できる「Prototypes」機能が追加され、Gemini 3がStitchに導入された。
+                <strong>2025年12月</strong> -
+                複数画面を接続してインタラクティブなプロトタイプとして体験できる「Prototypes」機能が追加され、Gemini
+                3がStitchに導入された。
                 <span className={styles.srcLink}>
                   <Ext href="https://almcorp.com/blog/google-stitch-complete-guide-ai-ui-design-tool-2026/">
                     ALM Corp
@@ -384,9 +389,10 @@ export default function GoogleStitchGuidePage() {
                 </span>
               </li>
               <li>
-                <strong>2026年3月18〜19日</strong> - 「vibe design」と名付けられた大型アップデートが発表され、AIネイティブな無限キャンバス、Voice Canvas、Agent Manager、DESIGN.mdが同時に導入された。
-                <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span>
-                {" "}
+                <strong>2026年3月18〜19日</strong> - 「vibe
+                design」と名付けられた大型アップデートが発表され、AIネイティブな無限キャンバス、Voice
+                Canvas、Agent Manager、DESIGN.mdが同時に導入された。
+                <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span>{" "}
                 <span className={styles.srcLink}>
                   <Ext href="https://blog.google/innovation-and-ai/models-and-research/google-labs/stitch-ai-ui-design/">
                     Google公式ブログ
@@ -404,9 +410,9 @@ export default function GoogleStitchGuidePage() {
                 </span>
               </li>
               <li>
-                <strong>2026年4月21〜23日</strong> - DESIGN.mdの草案仕様がApache 2.0ライセンスでオープンソース化され、Stitch以外のツールでも利用可能になった。
-                <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span>
-                {" "}
+                <strong>2026年4月21〜23日</strong> - DESIGN.mdの草案仕様がApache
+                2.0ライセンスでオープンソース化され、Stitch以外のツールでも利用可能になった。
+                <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span>{" "}
                 <span className={styles.srcLink}>
                   <Ext href="https://blog.google/innovation-and-ai/models-and-research/google-labs/stitch-design-md/">
                     Google公式ブログ
@@ -414,7 +420,9 @@ export default function GoogleStitchGuidePage() {
                 </span>
               </li>
               <li>
-                <strong>2026年5月20日</strong> - Google I/O 2026にて、画面を生成しながらリアルタイムに描画するストリーミング型design agentが発表された。
+                <strong>2026年5月20日</strong> - Google I/O
+                2026にて、画面を生成しながらリアルタイムに描画するストリーミング型design
+                agentが発表された。
                 <span className={styles.srcLink}>
                   <Ext href="https://techlogstack.com/explore/google-stitch-ai-design-tool-2026/">
                     TechLogStack
@@ -426,7 +434,8 @@ export default function GoogleStitchGuidePage() {
             <div className={`${styles.callout} ${styles.calloutInfo}`}>
               <i className="ti ti-info-circle" />
               <div className={styles.calloutBody}>
-                Stitchは現在もGoogle Labsの実験的プロダクトという位置づけであり、正式な稼働保証（SLA）やエンタープライズ向けの長期コミットメントは公表されていない点には留意したい。
+                Stitchは現在もGoogle
+                Labsの実験的プロダクトという位置づけであり、正式な稼働保証（SLA）やエンタープライズ向けの長期コミットメントは公表されていない点には留意したい。
                 <span className={styles.srcLink}>
                   <Ext href="https://moda.app/blog/google-stitch-review">Moda</Ext>
                   {" / "}
@@ -436,14 +445,13 @@ export default function GoogleStitchGuidePage() {
             </div>
           </section>
 
-          <section id="s3" className={styles.stitchSection}>
+          <section id="s3" className={`${styles.stitchSection} stitchSection`}>
             <h2>
               <span className={styles.stepNum}>3</span>主要機能の全体像
             </h2>
             <p>
               2026年3月のアップデート以降、Stitchが提供する主な機能は次のとおりである。
-              <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span>
-              {" "}
+              <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span>{" "}
               <Ext href="https://blog.google/innovation-and-ai/models-and-research/google-labs/stitch-ai-ui-design/">
                 Google公式ブログ
               </Ext>
@@ -535,7 +543,8 @@ export default function GoogleStitchGuidePage() {
                   <tr>
                     <td>MCPサーバー・SDK・Skills</td>
                     <td>
-                      Stitchの機能をAIコーディングエージェント（Claude Code、Cursor、Gemini CLIなど）から呼び出せるようにする開発者向けの仕組み
+                      Stitchの機能をAIコーディングエージェント（Claude Code、Cursor、Gemini
+                      CLIなど）から呼び出せるようにする開発者向けの仕組み
                     </td>
                     <td className={styles.srcLink}>
                       <Ext href="https://github.com/google-labs-code/stitch-sdk">GitHub</Ext>
@@ -544,7 +553,8 @@ export default function GoogleStitchGuidePage() {
                   <tr>
                     <td>Figma / AI Studio / Antigravityへのエクスポート</td>
                     <td>
-                      編集可能なレイヤーとAuto Layout付きでFigmaへ、あるいは開発ツールへデザインを渡せる
+                      編集可能なレイヤーとAuto
+                      Layout付きでFigmaへ、あるいは開発ツールへデザインを渡せる
                     </td>
                     <td className={styles.srcLink}>
                       <Ext href="https://blog.google/innovation-and-ai/models-and-research/google-labs/stitch-ai-ui-design/">
@@ -564,12 +574,13 @@ export default function GoogleStitchGuidePage() {
             </div>
           </section>
 
-          <section id="s4" className={styles.stitchSection}>
+          <section id="s4" className={`${styles.stitchSection} stitchSection`}>
             <h2>
               <span className={styles.stepNum}>4</span>料金体系と利用制限
             </h2>
             <p>
-              Stitchは2026年7月時点でも引き続きGoogle Labsの実験プロダクトとして無料で提供されており、クレジットカード登録なしでGoogleアカウントのみでサインインできる。
+              Stitchは2026年7月時点でも引き続きGoogle
+              Labsの実験プロダクトとして無料で提供されており、クレジットカード登録なしでGoogleアカウントのみでサインインできる。
               <Ext href="https://www.nxcode.io/resources/news/google-stitch-pricing-plans-complete-guide-2026">
                 NxCode
               </Ext>
@@ -618,7 +629,9 @@ export default function GoogleStitchGuidePage() {
                       1日あたり設計クレジット400・redesignクレジット15の日次制へ移行との報告あり
                     </td>
                     <td className={styles.srcLink}>
-                      <Ext href="https://www.banani.co/blog/google-stitch-pricing-and-credits">Banani</Ext>
+                      <Ext href="https://www.banani.co/blog/google-stitch-pricing-and-credits">
+                        Banani
+                      </Ext>
                     </td>
                   </tr>
                 </tbody>
@@ -628,7 +641,8 @@ export default function GoogleStitchGuidePage() {
             <div className={`${styles.callout} ${styles.calloutWarning}`}>
               <i className="ti ti-alert-triangle" />
               <div className={styles.calloutBody}>
-                <strong>実務上のポイント</strong>：数値は変動するため、本ガイドの数字を鵜呑みにせず、実際にサインインした際のアカウント設定画面や利用状況表示で最新の上限を確認することを強く推奨する。現時点でも有料プランや追加クレジットの購入手段は公式に案内されていない。
+                <strong>実務上のポイント</strong>
+                ：数値は変動するため、本ガイドの数字を鵜呑みにせず、実際にサインインした際のアカウント設定画面や利用状況表示で最新の上限を確認することを強く推奨する。現時点でも有料プランや追加クレジットの購入手段は公式に案内されていない。
                 <span className={styles.srcLink}>
                   <Ext href="https://computertech.co/google-stitch-review/">ComputerTech</Ext>
                 </span>
@@ -636,7 +650,7 @@ export default function GoogleStitchGuidePage() {
             </div>
           </section>
 
-          <section id="s5" className={styles.stitchSection}>
+          <section id="s5" className={`${styles.stitchSection} stitchSection`}>
             <h2>
               <span className={styles.stepNum}>5</span>セットアップと基本操作
             </h2>
@@ -652,7 +666,9 @@ export default function GoogleStitchGuidePage() {
             <div className={styles.diagram}>
               <div style={{ width: "100%" }}>
                 <MermaidDiagram chart={DIAGRAMS.setup} />
-                <p className={styles.diagramCaption}>セットアップ〜初回デザイン生成のステップフロー</p>
+                <p className={styles.diagramCaption}>
+                  セットアップ〜初回デザイン生成のステップフロー
+                </p>
               </div>
             </div>
 
@@ -660,7 +676,9 @@ export default function GoogleStitchGuidePage() {
               <li>
                 <strong>サインイン</strong>：
                 <Ext href="https://stitch.withgoogle.com/">stitch.withgoogle.com</Ext>
-                にアクセスし、個人のGoogleアカウントでサインインすればよい。ウェイトリストやクレジットカード登録は不要である。なお、Google Workspaceアカウントを利用する場合は、管理者側で「Google Workspace Experiments」を有効化しておく必要があるとの報告があるため、組織アカウントで表示されない場合はまずこの設定を確認するとよい（この点は公式ドキュメント未確認の情報である点に留意）。
+                にアクセスし、個人のGoogleアカウントでサインインすればよい。ウェイトリストやクレジットカード登録は不要である。なお、Google
+                Workspaceアカウントを利用する場合は、管理者側で「Google Workspace
+                Experiments」を有効化しておく必要があるとの報告があるため、組織アカウントで表示されない場合はまずこの設定を確認するとよい（この点は公式ドキュメント未確認の情報である点に留意）。
                 <span className={styles.srcLink}>
                   <Ext href="https://marketingagent.blog/2026/03/26/tutorial-build-app-prototypes-with-google-stitch/">
                     Marketing Agent Blog
@@ -668,13 +686,16 @@ export default function GoogleStitchGuidePage() {
                 </span>
               </li>
               <li>
-                <strong>新規プロジェクト作成</strong>：ダッシュボードから新規プロジェクトを開始すると、中央に無限キャンバス、左下にチャット入力欄、上部にモード切り替えが表示される。
+                <strong>新規プロジェクト作成</strong>
+                ：ダッシュボードから新規プロジェクトを開始すると、中央に無限キャンバス、左下にチャット入力欄、上部にモード切り替えが表示される。
               </li>
               <li>
-                <strong>モード選択</strong>：探索段階の速さを優先するか、画像入力や高精浅な仕上がりを優先するかで、StandardモードとExperimentalモードを使い分ける。
+                <strong>モード選択</strong>
+                ：探索段階の速さを優先するか、画像入力や高精浅な仕上がりを優先するかで、StandardモードとExperimentalモードを使い分ける。
               </li>
               <li>
-                <strong>プラットフォーム選択</strong>：モバイルアプリを想定するか、Webサイト・Webアプリを想定するかをトグルで指定する。
+                <strong>プラットフォーム選択</strong>
+                ：モバイルアプリを想定するか、Webサイト・Webアプリを想定するかをトグルで指定する。
               </li>
               <li>
                 <strong>プロンプト入力</strong>：具体性が高いほど良い結果につながる（詳細は第6章）。
@@ -683,7 +704,8 @@ export default function GoogleStitchGuidePage() {
                 <strong>反復修正</strong>：生成後は会話形式で追加指示を出し、微調整を重ねる。
               </li>
               <li>
-                <strong>マルチセレクト一括編集</strong>：Shiftキーを押しながら複数画面を選択し、1つのプロンプトやテーマ変更を一括適用することで、画面間の一貫性を保ちやすくなる。
+                <strong>マルチセレクト一括編集</strong>
+                ：Shiftキーを押しながら複数画面を選択し、1つのプロンプトやテーマ変更を一括適用することで、画面間の一貫性を保ちやすくなる。
               </li>
               <li>
                 <strong>エクスポート</strong>：詳細は第10章で扱う。
@@ -729,9 +751,7 @@ export default function GoogleStitchGuidePage() {
               <Ext href="https://almcorp.com/blog/google-stitch-complete-guide-ai-ui-design-tool-2026/">
                 ALM Corp
               </Ext>
-              ,{" "}
-              <Ext href="https://uxpilot.ai/blogs/google-stitch-ai">UX Pilot</Ext>
-              ,{" "}
+              , <Ext href="https://uxpilot.ai/blogs/google-stitch-ai">UX Pilot</Ext>,{" "}
               <Ext href="https://uithings.com/what-is-google-stitch">UIThings</Ext>
             </p>
 
@@ -746,7 +766,7 @@ export default function GoogleStitchGuidePage() {
             </div>
           </section>
 
-          <section id="s6" className={styles.stitchSection}>
+          <section id="s6" className={`${styles.stitchSection} stitchSection`}>
             <h2>
               <span className={styles.stepNum}>6</span>プロンプト設計のベストプラクティス
             </h2>
@@ -817,11 +837,14 @@ export default function GoogleStitchGuidePage() {
             <h3>6.2 プロンプトを構成する5つの要素</h3>
             <p>
               別の実践記事では、出力品質を大きく左右する要素として次の5点を挙げている。
-              <Ext href="https://www.allaboutai.com/ai-how-to/use-google-stitch-for-ui-design/">All About AI</Ext>
+              <Ext href="https://www.allaboutai.com/ai-how-to/use-google-stitch-for-ui-design/">
+                All About AI
+              </Ext>
             </p>
             <ol>
               <li>
-                <strong>プラットフォーム指定</strong>：「モバイルアプリを作って」「Webダッシュボードをデザインして」など
+                <strong>プラットフォーム指定</strong>
+                ：「モバイルアプリを作って」「Webダッシュボードをデザインして」など
               </li>
               <li>
                 <strong>目的・機能の明示</strong>：何のためのアプリ・画面かを明確にする
@@ -830,18 +853,20 @@ export default function GoogleStitchGuidePage() {
                 <strong>レイアウトスタイル</strong>：カード形式か、リスト形式か、といった構造の指定
               </li>
               <li>
-                <strong>カラーテーマ</strong>：具体的な色味や雰囲気（例：スカイブルーのテーマ、ダークネイビーのヒーローセクションなど）
+                <strong>カラーテーマ</strong>
+                ：具体的な色味や雰囲気（例：スカイブルーのテーマ、ダークネイビーのヒーローセクションなど）
               </li>
               <li>
-                <strong>主要な操作要素</strong>：検索バー、お気に入りボタンなど、含めたいUI部品を具体的に列挙する
+                <strong>主要な操作要素</strong>
+                ：検索バー、お気に入りボタンなど、含めたいUI部品を具体的に列挙する
               </li>
             </ol>
 
             <h3>6.3 Skillsリポジトリが推奨するプロンプト構造</h3>
             <p>
-              Google Labsが公開しているStitch Skillsのenhance-promptスキルでは、次のような構造化テンプレートを推奨している。
-              <span className={`${styles.badge} ${styles.badgeCommunity}`}>コミュニティ</span>
-              {" "}
+              Google Labsが公開しているStitch
+              Skillsのenhance-promptスキルでは、次のような構造化テンプレートを推奨している。
+              <span className={`${styles.badge} ${styles.badgeCommunity}`}>コミュニティ</span>{" "}
               <Ext href="https://agentskills.so/skills/google-labs-code-stitch-skills-enhance-prompt">
                 Agent Skills
               </Ext>
@@ -882,14 +907,14 @@ export default function GoogleStitchGuidePage() {
             </ul>
           </section>
 
-          <section id="s7" className={styles.stitchSection}>
+          <section id="s7" className={`${styles.stitchSection} stitchSection`}>
             <h2>
               <span className={styles.stepNum}>7</span>DESIGN.mdによるデザインシステムの一貫性管理
             </h2>
             <p>
-              DESIGN.mdは、Stitchで生まれた「デザインシステムのルールをプロジェクト間で持ち運ぶ」ためのMarkdown形式のファイルであり、2026年4月にApache 2.0ライセンスでオープンソース化された。
-              <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span>
-              {" "}
+              DESIGN.mdは、Stitchで生まれた「デザインシステムのルールをプロジェクト間で持ち運ぶ」ためのMarkdown形式のファイルであり、2026年4月にApache
+              2.0ライセンスでオープンソース化された。
+              <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span>{" "}
               <Ext href="https://blog.google/innovation-and-ai/models-and-research/google-labs/stitch-design-md/">
                 Google公式ブログ
               </Ext>
@@ -995,7 +1020,8 @@ export default function GoogleStitchGuidePage() {
               <span className={styles.srcLink}>
                 <Ext href="https://notes.nicolasdeville.com/ai/design-md/">Nic&apos;s Notes</Ext>
               </span>
-              また、トークンはW3C Design Token Format（DTCG）と互換性を持たせる設計になっており、Tailwind設定ファイルなどへのエクスポートも想定されている。
+              また、トークンはW3C Design Token
+              Format（DTCG）と互換性を持たせる設計になっており、Tailwind設定ファイルなどへのエクスポートも想定されている。
               <span className={styles.srcLink}>
                 <Ext href="https://medium.com/design-bootcamp/google-makes-design-md-open-source-on-its-way-to-become-a-industry-standard-16119f2368dd">
                   Medium
@@ -1006,11 +1032,14 @@ export default function GoogleStitchGuidePage() {
             <div className={`${styles.callout} ${styles.calloutWarning}`}>
               <i className="ti ti-alert-triangle" />
               <div className={styles.calloutBody}>
-                <strong>注意点</strong>：2026年7月時点でDESIGN.mdの仕様はまだ「alpha」段階であり、破壊的変更が入る可能性がある。金融・医療など規制対象のプロジェクトでの本番利用は時期尚早との指摘もある。
+                <strong>注意点</strong>
+                ：2026年7月時点でDESIGN.mdの仕様はまだ「alpha」段階であり、破壊的変更が入る可能性がある。金融・医療など規制対象のプロジェクトでの本番利用は時期尚早との指摘もある。
                 <span className={styles.srcLink}>
                   <Ext href="https://vibecoding.app/blog/design-md-review">Vibecoding</Ext>
                 </span>
-                またガバナンス面では、Apache 2.0ライセンスではあるものの、現状は主にGoogle Labsが仕様策定を主導しており、W3CやOpenAPI Initiativeのような独立した標準化団体はまだ存在しない。
+                またガバナンス面では、Apache 2.0ライセンスではあるものの、現状は主にGoogle
+                Labsが仕様策定を主導しており、W3CやOpenAPI
+                Initiativeのような独立した標準化団体はまだ存在しない。
                 <span className={styles.srcLink}>
                   <Ext href="https://pasqualepillitteri.it/en/news/1251/google-stitch-design-md-open-source-spec-2026">
                     Pasquale Pillitteri
@@ -1020,7 +1049,7 @@ export default function GoogleStitchGuidePage() {
             </div>
           </section>
 
-          <section id="s8" className={styles.stitchSection}>
+          <section id="s8" className={`${styles.stitchSection} stitchSection`}>
             <h2>
               <span className={styles.stepNum}>8</span>マルチスクリーン生成とプロトタイピング
             </h2>
@@ -1033,8 +1062,7 @@ export default function GoogleStitchGuidePage() {
 
             <p>
               Prototypes機能を使うと、生成済みの画面同士を数秒で接続し、Playボタンを押すだけでアプリ内遷移を体験できる。さらに、あるボタンをクリックした際に遷移すべき「論理的に妥当な次の画面」をStitch自身が自動生成することも可能である。
-              <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span>
-              {" "}
+              <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span>{" "}
               <Ext href="https://blog.google/innovation-and-ai/models-and-research/google-labs/stitch-ai-ui-design/">
                 Google公式ブログ
               </Ext>
@@ -1052,7 +1080,8 @@ export default function GoogleStitchGuidePage() {
             <div className={`${styles.callout} ${styles.calloutSuccess}`}>
               <i className="ti ti-bulb" />
               <div className={styles.calloutBody}>
-                <strong>実務Tips</strong>：複数画面の一貫性を担保したい場合は、次の順序で進めると良い。
+                <strong>実務Tips</strong>
+                ：複数画面の一貫性を担保したい場合は、次の順序で進めると良い。
                 <span className={styles.srcLink}>
                   <Ext href="https://www.sotaaz.com/post/stitch-mcp-guide-en">SOTAAZ Blog</Ext>
                 </span>
@@ -1068,40 +1097,43 @@ export default function GoogleStitchGuidePage() {
             </div>
           </section>
 
-          <section id="s9" className={styles.stitchSection}>
+          <section id="s9" className={`${styles.stitchSection} stitchSection`}>
             <h2>
               <span className={styles.stepNum}>9</span>Voice CanvasとAgent Managerの活用
             </h2>
             <p>
-              Voice Canvasは、キャンバスに直接話しかけることでデザインを操作できる機能である。エージェントは会話をリアルタイムに解析し、「メニュー案を3パターン出して」「この画面を別のカラーパレットで見せて」といった発話に応じてキャンバスをその場で更新する。エージェントはランディングページの設計時にヒアリング形式で質問を投げかけたり、リアルタイムでデザイン批評を行ったりすることもできるとされている。
-              <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span>
-              {" "}
+              Voice
+              Canvasは、キャンバスに直接話しかけることでデザインを操作できる機能である。エージェントは会話をリアルタイムに解析し、「メニュー案を3パターン出して」「この画面を別のカラーパレットで見せて」といった発話に応じてキャンバスをその場で更新する。エージェントはランディングページの設計時にヒアリング形式で質問を投げかけたり、リアルタイムでデザイン批評を行ったりすることもできるとされている。
+              <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span>{" "}
               <Ext href="https://blog.google/innovation-and-ai/models-and-research/google-labs/stitch-ai-ui-design/">
                 Google公式ブログ
               </Ext>
             </p>
 
             <p>
-              Agent Managerは、複数の方向性を並行して探索する際に進捗を管理するための機能である。デザインの発散と収束を繰り返すプロセスにおいて、どの案がどこまで進んでいるかを俯瞰しやすくする役割を持つ。
+              Agent
+              Managerは、複数の方向性を並行して探索する際に進捗を管理するための機能である。デザインの発散と収束を繰り返すプロセスにおいて、どの案がどこまで進んでいるかを俯瞰しやすくする役割を持つ。
             </p>
 
             <h3>初学者向けの活用手順</h3>
             <ol>
               <li>まずテキストプロンプトで大枠のレイアウトを生成する</li>
               <li>
-                Voice Canvasを使い、口頭で「もっとミニマルに」「アクセントカラーをコーラルに」など細かい調整を重ねる
+                Voice
+                Canvasを使い、口頭で「もっとミニマルに」「アクセントカラーをコーラルに」など細かい調整を重ねる
               </li>
               <li>気に入った方向性が複数出てきたら、Agent Managerで並行管理しながら比較検討する</li>
               <li>最終的な1案に絞り込んだら、第10章のエクスポート手順に進む</li>
             </ol>
           </section>
 
-          <section id="s10" className={styles.stitchSection}>
+          <section id="s10" className={`${styles.stitchSection} stitchSection`}>
             <h2>
               <span className={styles.stepNum}>10</span>エクスポートとハンドオフワークフロー
             </h2>
             <p>
-              Stitchのエクスポート経路は、大きく分けて「デザイナー向け（Figma）」「開発者向け（コード）」「Google生態系向け（AI Studio / Antigravity / Firebase Studio）」の3方向を想定して設計されている。
+              Stitchのエクスポート経路は、大きく分けて「デザイナー向け（Figma）」「開発者向け（コード）」「Google生態系向け（AI
+              Studio / Antigravity / Firebase Studio）」の3方向を想定して設計されている。
               <Ext href="https://techlogstack.com/explore/google-stitch-ai-design-tool-2026/">
                 TechLogStack
               </Ext>
@@ -1120,7 +1152,8 @@ export default function GoogleStitchGuidePage() {
                   <tr>
                     <td>Figma</td>
                     <td>
-                      編集可能なレイヤーとAuto Layout付きでデザインを渡し、デザインチームでのレビュー・仕上げに使う
+                      編集可能なレイヤーとAuto
+                      Layout付きでデザインを渡し、デザインチームでのレビュー・仕上げに使う
                     </td>
                     <td className={styles.srcLink}>
                       <Ext href="https://blog.google/innovation-and-ai/models-and-research/google-labs/stitch-ai-ui-design/">
@@ -1132,7 +1165,9 @@ export default function GoogleStitchGuidePage() {
                     <td>HTML / CSS・Tailwind CSS</td>
                     <td>そのまま実装のたたき台として使えるフロントエンドコードを出力する</td>
                     <td className={styles.srcLink}>
-                      <Ext href="https://blog.openreplay.com/prompt-ui-google-stitch/">OpenReplay</Ext>
+                      <Ext href="https://blog.openreplay.com/prompt-ui-google-stitch/">
+                        OpenReplay
+                      </Ext>
                     </td>
                   </tr>
                   <tr>
@@ -1181,7 +1216,9 @@ export default function GoogleStitchGuidePage() {
                   </tr>
                   <tr>
                     <td>MCPサーバー / 共有リンク</td>
-                    <td>開発エージェントからの直接呼び出し、または閲覧用の共有プレビューURLの発行</td>
+                    <td>
+                      開発エージェントからの直接呼び出し、または閲覧用の共有プレビューURLの発行
+                    </td>
                     <td className={styles.srcLink}>
                       <Ext href="https://marketingagent.blog/2026/03/26/tutorial-build-app-prototypes-with-google-stitch/">
                         Marketing Agent Blog
@@ -1195,18 +1232,22 @@ export default function GoogleStitchGuidePage() {
             <div className={styles.diagram}>
               <div style={{ width: "100%" }}>
                 <MermaidDiagram chart={DIAGRAMS.export} />
-                <p className={styles.diagramCaption}>パワーユーザーが採用する統合的なハンドオフの流れ</p>
+                <p className={styles.diagramCaption}>
+                  パワーユーザーが採用する統合的なハンドオフの流れ
+                </p>
               </div>
             </div>
 
             <div className={`${styles.callout} ${styles.calloutWarning}`}>
               <i className="ti ti-alert-triangle" />
               <div className={styles.calloutBody}>
-                <strong>注意点</strong>：画像入力を使うExperimentalモードで作成したデザインは、Figmaへのエクスポートに対応していない、または制限があるとの報告がある。
+                <strong>注意点</strong>
+                ：画像入力を使うExperimentalモードで作成したデザインは、Figmaへのエクスポートに対応していない、または制限があるとの報告がある。
                 <span className={styles.srcLink}>
                   <Ext href="https://uithings.com/what-is-google-stitch">UIThings</Ext>
                 </span>
-                Figma連携を業務フローの前提にする場合は、テキストプロンプトから生成する経路を基本とするか、事前に自分のアカウントで挙動を確認しておくとよい。また、AI Studioへのエクスポートでは一部のStitch固有機能が引き継がれない場合があるとの指摘もある。
+                Figma連携を業務フローの前提にする場合は、テキストプロンプトから生成する経路を基本とするか、事前に自分のアカウントで挙動を確認しておくとよい。また、AI
+                Studioへのエクスポートでは一部のStitch固有機能が引き継がれない場合があるとの指摘もある。
                 <span className={styles.srcLink}>
                   <Ext href="https://marketingagent.blog/2026/03/26/tutorial-build-app-prototypes-with-google-stitch/">
                     Marketing Agent Blog
@@ -1216,20 +1257,27 @@ export default function GoogleStitchGuidePage() {
             </div>
           </section>
 
-          <section id="s11" className={styles.stitchSection}>
+          <section id="s11" className={`${styles.stitchSection} stitchSection`}>
             <h2>
               <span className={styles.stepNum}>11</span>MCP・SDKによる開発者向け統合
             </h2>
             <p>
-              Stitchは、Model Context Protocol（MCP）を通じてIDEやCLIから呼び出せる公式のMCPサーバーと、Node.js向けの公式SDK（<code>@google/stitch-sdk</code>）を提供している。あわせて、Claude Code・Cursor・Gemini CLI・Antigravityなど、Agent Skillsのオープン標準に対応したコーディングエージェント向けの「Stitch Skills」ライブラリも公開されている。
-              <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span>
-              {" "}
+              Stitchは、Model Context
+              Protocol（MCP）を通じてIDEやCLIから呼び出せる公式のMCPサーバーと、Node.js向けの公式SDK（
+              <code>@google/stitch-sdk</code>）を提供している。あわせて、Claude Code・Cursor・Gemini
+              CLI・Antigravityなど、Agent
+              Skillsのオープン標準に対応したコーディングエージェント向けの「Stitch
+              Skills」ライブラリも公開されている。
+              <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span>{" "}
               <Ext href="https://github.com/google-labs-code/stitch-sdk">GitHub: stitch-sdk</Ext>
             </p>
 
             <h3>11.1 公式SDKの基本的な使い方</h3>
             <p>
-              公式SDKには、低レベルのツールクライアント、Vercel AI SDK向けのツール定義、環境変数から自動初期化される簡易インスタンスなど複数のレイヤーが用意されている。認証には<code>STITCH_API_KEY</code>（APIキー）または<code>STITCH_ACCESS_TOKEN</code>（OAuthアクセストークン）のいずれかを使用する。
+              公式SDKには、低レベルのツールクライアント、Vercel AI
+              SDK向けのツール定義、環境変数から自動初期化される簡易インスタンスなど複数のレイヤーが用意されている。認証には
+              <code>STITCH_API_KEY</code>（APIキー）または<code>STITCH_ACCESS_TOKEN</code>
+              （OAuthアクセストークン）のいずれかを使用する。
             </p>
 
             <div className={styles.codeWrap}>
@@ -1258,19 +1306,22 @@ export default function GoogleStitchGuidePage() {
                     <span>{"({"}</span>
                   </div>
                   <div className={styles.codeLine}>
-                    <span>  apiKey</span>
+                    <span> apiKey</span>
                     <span className={styles.ck}>:</span>
                     <span className={styles.cs}> &quot;your-api-key&quot;</span>
                     <span>,</span>
                   </div>
                   <div className={styles.codeLine}>
-                    <span>  baseUrl</span>
+                    <span> baseUrl</span>
                     <span className={styles.ck}>:</span>
-                    <span className={styles.cs}> &quot;https://stitch.googleapis.com/mcp&quot;</span>
+                    <span className={styles.cs}>
+                      {" "}
+                      &quot;https://stitch.googleapis.com/mcp&quot;
+                    </span>
                     <span>,</span>
                   </div>
                   <div className={styles.codeLine}>
-                    <span>  timeout</span>
+                    <span> timeout</span>
                     <span className={styles.ck}>:</span>
                     <span className={styles.cv}> 300005</span>
                     <span>,</span>
@@ -1292,7 +1343,7 @@ export default function GoogleStitchGuidePage() {
                     <span>{", {"}</span>
                   </div>
                   <div className={styles.codeLine}>
-                    <span>  prompt</span>
+                    <span> prompt</span>
                     <span className={styles.ck}>:</span>
                     <span className={styles.cs}>
                       &quot;dark mode dashboard, card layout, top summary stats&quot;
@@ -1400,7 +1451,9 @@ export default function GoogleStitchGuidePage() {
 
             <h3>11.4 Stitch Skillsで代表的にできること</h3>
             <p>
-              Stitch Skillsライブラリでは、既存のフロントエンドコード（React、Vueなど）をHTML抽出とデザインシステム化を経てStitchプロジェクトへ取り込む、生成済み画面をReactやReact Nativeのコンポーネントへ変換する、複数画面のデザイン一貫性を検証する、といったワークフローがスキルとして提供されている。
+              Stitch
+              Skillsライブラリでは、既存のフロントエンドコード（React、Vueなど）をHTML抽出とデザインシステム化を経てStitchプロジェクトへ取り込む、生成済み画面をReactやReact
+              Nativeのコンポーネントへ変換する、複数画面のデザイン一貫性を検証する、といったワークフローがスキルとして提供されている。
               <span className={styles.srcLink}>
                 <Ext href="https://github.com/google-labs-code/stitch-skills">
                   GitHub: stitch-skills
@@ -1409,7 +1462,7 @@ export default function GoogleStitchGuidePage() {
             </p>
           </section>
 
-          <section id="s12" className={styles.stitchSection}>
+          <section id="s12" className={`${styles.stitchSection} stitchSection`}>
             <h2>
               <span className={styles.stepNum}>12</span>Do / Don&apos;t 早見表
             </h2>
@@ -1447,7 +1500,9 @@ export default function GoogleStitchGuidePage() {
                   <li>画面ごとに毎回ゼロから配色やフォントを指定する</li>
                   <li>些細な修正のたびにAI再生成を行い、クレジットを浪費する</li>
                   <li>各画面を独立したプロンプトでバラバラに生成し、後から統一しようとする</li>
-                  <li>画像入力（Experimentalモード）由来のデザインでFigmaエクスポートを前提にする</li>
+                  <li>
+                    画像入力（Experimentalモード）由来のデザインでFigmaエクスポートを前提にする
+                  </li>
                   <li>生成されたコードをそのまま無検証で本番環境にデプロイする</li>
                   <li>プロンプトのたびに口頭でブランドルールを説明し直す</li>
                   <li>過去に読んだ数値（生成回数の上限など）を恒久的な仕様だと思い込む</li>
@@ -1456,7 +1511,7 @@ export default function GoogleStitchGuidePage() {
             </div>
           </section>
 
-          <section id="s13" className={styles.stitchSection}>
+          <section id="s13" className={`${styles.stitchSection} stitchSection`}>
             <h2>
               <span className={styles.stepNum}>13</span>既知の制限事項と注意点
             </h2>
@@ -1483,7 +1538,8 @@ export default function GoogleStitchGuidePage() {
                   <tr>
                     <td>実験プロダクトゆえの継続性リスク</td>
                     <td>
-                      SLAや長期運用の保証がなく、Google Labsの過去の実績を踏まえると打ち切りの可能性もゼロではない
+                      SLAや長期運用の保証がなく、Google
+                      Labsの過去の実績を踏まえると打ち切りの可能性もゼロではない
                     </td>
                     <td className={styles.srcLink}>
                       <Ext href="https://computertech.co/google-stitch-review/">ComputerTech</Ext>
@@ -1546,7 +1602,9 @@ export default function GoogleStitchGuidePage() {
                     <td>利用上限に達すると新規生成が停止</td>
                     <td>上限に達すると翌月（または翌日）までAI生成そのものは待つ必要がある</td>
                     <td className={styles.srcLink}>
-                      <Ext href="https://www.banani.co/blog/google-stitch-pricing-and-credits">Banani</Ext>
+                      <Ext href="https://www.banani.co/blog/google-stitch-pricing-and-credits">
+                        Banani
+                      </Ext>
                     </td>
                   </tr>
                 </tbody>
@@ -1554,7 +1612,7 @@ export default function GoogleStitchGuidePage() {
             </div>
           </section>
 
-          <section id="s14" className={styles.stitchSection}>
+          <section id="s14" className={`${styles.stitchSection} stitchSection`}>
             <h2>
               <span className={styles.stepNum}>14</span>他ツールとの比較
             </h2>
@@ -1613,7 +1671,8 @@ export default function GoogleStitchGuidePage() {
             </p>
 
             <p>
-              複数のレビュー記事が共通して勧める現実的なワークフローは、「Stitchで探索し、Figmaで仕上げ、開発ツール（Antigravity・AI Studio・Claude Codeなど）でビルドする」というハイブリッド構成である。
+              複数のレビュー記事が共通して勧める現実的なワークフローは、「Stitchで探索し、Figmaで仕上げ、開発ツール（Antigravity・AI
+              Studio・Claude Codeなど）でビルドする」というハイブリッド構成である。
               <span className={styles.srcLink}>
                 <Ext href="https://www.nxcode.io/resources/news/google-stitch-complete-guide-vibe-design-2026">
                   NxCode
@@ -1622,22 +1681,27 @@ export default function GoogleStitchGuidePage() {
             </p>
           </section>
 
-          <section id="s15" className={styles.stitchSection}>
+          <section id="s15" className={`${styles.stitchSection} stitchSection`}>
             <h2>
               <span className={styles.stepNum}>15</span>まとめと次のステップ
             </h2>
             <p>
-              Google Stitchは、2025年5月の単一画面生成という小さな実験から、2026年3月のvibe designアップデートを経て、無限キャンバス・Voice Canvas・DESIGN.md・MCP統合までを備えたAIネイティブなデザインキャンバスへと急速に進化してきた。初学者がまず押さえるべきポイントは次の3つに集約できる。
+              Google Stitchは、2025年5月の単一画面生成という小さな実験から、2026年3月のvibe
+              designアップデートを経て、無限キャンバス・Voice
+              Canvas・DESIGN.md・MCP統合までを備えたAIネイティブなデザインキャンバスへと急速に進化してきた。初学者がまず押さえるべきポイントは次の3つに集約できる。
             </p>
             <ol>
               <li>
-                <strong>プロンプトは構造化する</strong>：Zoom-Out-Zoom-Inフレームワークのように、背景・目的・構造・見た目・制約の順で言語化する。
+                <strong>プロンプトは構造化する</strong>
+                ：Zoom-Out-Zoom-Inフレームワークのように、背景・目的・構造・見た目・制約の順で言語化する。
               </li>
               <li>
-                <strong>一貫性はDESIGN.mdで担保する</strong>：複数画面・複数プロジェクトにまたがる場合は、デザインシステムをMarkdownファイルとして持ち運ぶ。
+                <strong>一貫性はDESIGN.mdで担保する</strong>
+                ：複数画面・複数プロジェクトにまたがる場合は、デザインシステムをMarkdownファイルとして持ち運ぶ。
               </li>
               <li>
-                <strong>Stitchはゴールではなくスタート地点と捉える</strong>：生成された画面やコードは「たたき台」であり、Figmaでの仕上げや開発者によるレビューを経て初めて本番品質に近づく。
+                <strong>Stitchはゴールではなくスタート地点と捉える</strong>
+                ：生成された画面やコードは「たたき台」であり、Figmaでの仕上げや開発者によるレビューを経て初めて本番品質に近づく。
               </li>
             </ol>
             <p>
@@ -1645,7 +1709,7 @@ export default function GoogleStitchGuidePage() {
             </p>
           </section>
 
-          <section id="s16" className={styles.stitchSection}>
+          <section id="s16" className={`${styles.stitchSection} stitchSection`}>
             <h2>
               <span className={styles.stepNum}>16</span>参考文献（URL一覧）
             </h2>
@@ -1658,7 +1722,8 @@ export default function GoogleStitchGuidePage() {
             </p>
             <ol className={styles.refList}>
               <li>
-                <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span> Stitch 公式サイト -{" "}
+                <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span> Stitch
+                公式サイト -{" "}
                 <Ext href="https://stitch.withgoogle.com/">https://stitch.withgoogle.com/</Ext>
               </li>
               <li>
@@ -1669,39 +1734,43 @@ export default function GoogleStitchGuidePage() {
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
-                Tech Insider「Google Stitch AI: Vibe Design and 5-Screen Canvas」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> Tech
+                Insider「Google Stitch AI: Vibe Design and 5-Screen Canvas」 -{" "}
                 <Ext href="https://tech-insider.org/google-stitch-ai-design-tool-march-2026-update/">
                   https://tech-insider.org/google-stitch-ai-design-tool-march-2026-update/
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> Moda「Google Stitch Review」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
+                Moda「Google Stitch Review」 -{" "}
                 <Ext href="https://moda.app/blog/google-stitch-review">
                   https://moda.app/blog/google-stitch-review
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> NxCode「Google Stitch Complete Guide」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
+                NxCode「Google Stitch Complete Guide」 -{" "}
                 <Ext href="https://www.nxcode.io/resources/news/google-stitch-complete-guide-vibe-design-2026">
                   https://www.nxcode.io/resources/news/google-stitch-complete-guide-vibe-design-2026
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> Gozade「Google Stitch Review 2026」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
+                Gozade「Google Stitch Review 2026」 -{" "}
                 <Ext href="https://gozade.com/blog/google-stitch-review-2026-a-gozade-verdict-on-the-ai-ui-design-tool-everyone-is-talking-about">
                   https://gozade.com/blog/google-stitch-review-2026-a-gozade-verdict-on-the-ai-ui-design-tool-everyone-is-talking-about
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> ALM Corp「Google Stitch: The Complete Guide」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> ALM
+                Corp「Google Stitch: The Complete Guide」 -{" "}
                 <Ext href="https://almcorp.com/blog/google-stitch-complete-guide-ai-ui-design-tool-2026/">
                   https://almcorp.com/blog/google-stitch-complete-guide-ai-ui-design-tool-2026/
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
-                The AI Corner「Google Stitch: The Free AI Design Tool Killing Figma」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> The AI
+                Corner「Google Stitch: The Free AI Design Tool Killing Figma」 -{" "}
                 <Ext href="https://www.the-ai-corner.com/p/google-stitch-ai-design-tool-guide-2026">
                   https://www.the-ai-corner.com/p/google-stitch-ai-design-tool-guide-2026
                 </Ext>
@@ -1714,7 +1783,8 @@ export default function GoogleStitchGuidePage() {
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> TechLogStack「Google Stitch 2026」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
+                TechLogStack「Google Stitch 2026」 -{" "}
                 <Ext href="https://techlogstack.com/explore/google-stitch-ai-design-tool-2026/">
                   https://techlogstack.com/explore/google-stitch-ai-design-tool-2026/
                 </Ext>
@@ -1727,19 +1797,22 @@ export default function GoogleStitchGuidePage() {
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span> GitHub「google-labs-code/stitch-sdk」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span>{" "}
+                GitHub「google-labs-code/stitch-sdk」 -{" "}
                 <Ext href="https://github.com/google-labs-code/stitch-sdk">
                   https://github.com/google-labs-code/stitch-sdk
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> NxCode「Google Stitch Pricing 2026」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
+                NxCode「Google Stitch Pricing 2026」 -{" "}
                 <Ext href="https://www.nxcode.io/resources/news/google-stitch-pricing-plans-complete-guide-2026">
                   https://www.nxcode.io/resources/news/google-stitch-pricing-plans-complete-guide-2026
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> Toolworthy「Stitch by Google」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
+                Toolworthy「Stitch by Google」 -{" "}
                 <Ext href="https://www.toolworthy.ai/tool/stitch-by-google">
                   https://www.toolworthy.ai/tool/stitch-by-google
                 </Ext>
@@ -1752,139 +1825,155 @@ export default function GoogleStitchGuidePage() {
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> Banani「Google Stitch Pricing」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
+                Banani「Google Stitch Pricing」 -{" "}
                 <Ext href="https://www.banani.co/blog/google-stitch-pricing-and-credits">
                   https://www.banani.co/blog/google-stitch-pricing-and-credits
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
-                Justin McKelvey「How to Use Google Stitch」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> Justin
+                McKelvey「How to Use Google Stitch」 -{" "}
                 <Ext href="https://justinmckelvey.com/blog/how-to-use-google-stitch">
                   https://justinmckelvey.com/blog/how-to-use-google-stitch
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> NxCode「Google Stitch Tutorial」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
+                NxCode「Google Stitch Tutorial」 -{" "}
                 <Ext href="https://www.nxcode.io/resources/news/google-stitch-tutorial-design-first-app-2026">
                   https://www.nxcode.io/resources/news/google-stitch-tutorial-design-first-app-2026
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> UIThings「What Is Google Stitch?」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
+                UIThings「What Is Google Stitch?」 -{" "}
                 <Ext href="https://uithings.com/what-is-google-stitch">
                   https://uithings.com/what-is-google-stitch
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
-                Marketing Agent Blog「Tutorial: Build App Prototypes with Google Stitch」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> Marketing
+                Agent Blog「Tutorial: Build App Prototypes with Google Stitch」 -{" "}
                 <Ext href="https://marketingagent.blog/2026/03/26/tutorial-build-app-prototypes-with-google-stitch/">
                   https://marketingagent.blog/2026/03/26/tutorial-build-app-prototypes-with-google-stitch/
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> UX Pilot「Google Stitch AI Walkthrough」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> UX
+                Pilot「Google Stitch AI Walkthrough」 -{" "}
                 <Ext href="https://uxpilot.ai/blogs/google-stitch-ai">
                   https://uxpilot.ai/blogs/google-stitch-ai
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> OpenReplay「From Prompt to UI with Google Stitch」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
+                OpenReplay「From Prompt to UI with Google Stitch」 -{" "}
                 <Ext href="https://blog.openreplay.com/prompt-ui-google-stitch/">
                   https://blog.openreplay.com/prompt-ui-google-stitch/
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
-                All About AI「How to Use Google Stitch for UI Design」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> All About
+                AI「How to Use Google Stitch for UI Design」 -{" "}
                 <Ext href="https://www.allaboutai.com/ai-how-to/use-google-stitch-for-ui-design/">
                   https://www.allaboutai.com/ai-how-to/use-google-stitch-for-ui-design/
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> Agent Skills「enhance-prompt skill」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> Agent
+                Skills「enhance-prompt skill」 -{" "}
                 <Ext href="https://agentskills.so/skills/google-labs-code-stitch-skills-enhance-prompt">
                   https://agentskills.so/skills/google-labs-code-stitch-skills-enhance-prompt
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> Creative AI News「Google DESIGN.md」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> Creative
+                AI News「Google DESIGN.md」 -{" "}
                 <Ext href="https://www.creativeainews.com/blog/google-design-md-open-source-ai-brand-design-stitch/">
                   https://www.creativeainews.com/blog/google-design-md-open-source-ai-brand-design-stitch/
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
-                News Defused「Google&apos;s Stitch open-sources DESIGN.md」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> News
+                Defused「Google&apos;s Stitch open-sources DESIGN.md」 -{" "}
                 <Ext href="https://www.newsdefused.com/googles-stitch-open-sources-design-md-specification-to-make-brand-rules-portable-for-ai-agents/">
                   https://www.newsdefused.com/googles-stitch-open-sources-design-md-specification-to-make-brand-rules-portable-for-ai-agents/
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
-                Pasquale Pillitteri「Google Stitch Open-Sources DESIGN.md」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> Pasquale
+                Pillitteri「Google Stitch Open-Sources DESIGN.md」 -{" "}
                 <Ext href="https://pasqualepillitteri.it/en/news/1251/google-stitch-design-md-open-source-spec-2026">
                   https://pasqualepillitteri.it/en/news/1251/google-stitch-design-md-open-source-spec-2026
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> Nic&apos;s Notes「DESIGN.md」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
+                Nic&apos;s Notes「DESIGN.md」 -{" "}
                 <Ext href="https://notes.nicolasdeville.com/ai/design-md/">
                   https://notes.nicolasdeville.com/ai/design-md/
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
-                Medium (fernandocomet) 「Google makes DESIGN.md open source」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> Medium
+                (fernandocomet) 「Google makes DESIGN.md open source」 -{" "}
                 <Ext href="https://medium.com/design-bootcamp/google-makes-design-md-open-source-on-its-way-to-become-a-industry-standard-16119f2368dd">
                   https://medium.com/design-bootcamp/google-makes-design-md-open-source-on-its-way-to-become-a-industry-standard-16119f2368dd
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> Vibecoding「DESIGN.md Review 2026」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
+                Vibecoding「DESIGN.md Review 2026」 -{" "}
                 <Ext href="https://vibecoding.app/blog/design-md-review">
                   https://vibecoding.app/blog/design-md-review
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> SOTAAZ Blog「Google Stitch MCP Setup Guide」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> SOTAAZ
+                Blog「Google Stitch MCP Setup Guide」 -{" "}
                 <Ext href="https://www.sotaaz.com/post/stitch-mcp-guide-en">
                   https://www.sotaaz.com/post/stitch-mcp-guide-en
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> UXPin「Google Stitch AI Design Tool」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
+                UXPin「Google Stitch AI Design Tool」 -{" "}
                 <Ext href="https://www.uxpin.com/studio/blog/google-stitch-ai-design-tool-updates-ui-ux/">
                   https://www.uxpin.com/studio/blog/google-stitch-ai-design-tool-updates-ui-ux/
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span> GitHub「google-labs-code/stitch-skills」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span>{" "}
+                GitHub「google-labs-code/stitch-skills」 -{" "}
                 <Ext href="https://github.com/google-labs-code/stitch-skills">
                   https://github.com/google-labs-code/stitch-skills
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> GitHub「davideast/stitch-mcp」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
+                GitHub「davideast/stitch-mcp」 -{" "}
                 <Ext href="https://github.com/davideast/stitch-mcp">
                   https://github.com/davideast/stitch-mcp
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> GitHub「Kargatharaakash/stitch-mcp」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
+                GitHub「Kargatharaakash/stitch-mcp」 -{" "}
                 <Ext href="https://github.com/Kargatharaakash/stitch-mcp">
                   https://github.com/Kargatharaakash/stitch-mcp
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> GitHub「piyushcreates/stitch-mcp」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
+                GitHub「piyushcreates/stitch-mcp」 -{" "}
                 <Ext href="https://github.com/piyushcreates/stitch-mcp">
                   https://github.com/piyushcreates/stitch-mcp
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span> GitHub「oogleyskr/stitch-mcp-server」 -{" "}
+                <span className={`${styles.badge} ${styles.badgeCommunity}`}>非公式</span>{" "}
+                GitHub「oogleyskr/stitch-mcp-server」 -{" "}
                 <Ext href="https://github.com/oogleyskr/stitch-mcp-server">
                   https://github.com/oogleyskr/stitch-mcp-server
                 </Ext>
@@ -1894,25 +1983,29 @@ export default function GoogleStitchGuidePage() {
             <h3>公式ドキュメント（内容取得はJavaScriptレンダリングのため一部制限あり）</h3>
             <ul className={styles.refList}>
               <li>
-                <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span> Stitch MCPセットアップ -{" "}
+                <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span> Stitch
+                MCPセットアップ -{" "}
                 <Ext href="https://stitch.withgoogle.com/docs/mcp/setup/">
                   https://stitch.withgoogle.com/docs/mcp/setup/
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span> DESIGN.md概要 -{" "}
+                <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span>{" "}
+                DESIGN.md概要 -{" "}
                 <Ext href="https://stitch.withgoogle.com/docs/design-md/overview/">
                   https://stitch.withgoogle.com/docs/design-md/overview/
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span> Stitch Effective Prompting Guide -{" "}
+                <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span> Stitch
+                Effective Prompting Guide -{" "}
                 <Ext href="https://stitch.withgoogle.com/docs/learn/prompting/">
                   https://stitch.withgoogle.com/docs/learn/prompting/
                 </Ext>
               </li>
               <li>
-                <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span> DESIGN.md 公式リポジトリ -{" "}
+                <span className={`${styles.badge} ${styles.badgeOfficial}`}>公式</span> DESIGN.md
+                公式リポジトリ -{" "}
                 <Ext href="https://github.com/google-labs-code/design.md">
                   https://github.com/google-labs-code/design.md
                 </Ext>
@@ -1924,7 +2017,8 @@ export default function GoogleStitchGuidePage() {
             <p>
               <i className="ti ti-shield-exclamation" />
               <strong>免責事項</strong>
-              ：本ガイドは2026年7月11日時点でWeb検索により収集した二次情報を基に作成している。Google Stitchは実験段階のプロダクトであり、機能・料金・利用上限・対応フレームワークなどは予告なく変更される可能性が高い。重要な意思決定を行う前には、必ず
+              ：本ガイドは2026年7月11日時点でWeb検索により収集した二次情報を基に作成している。Google
+              Stitchは実験段階のプロダクトであり、機能・料金・利用上限・対応フレームワークなどは予告なく変更される可能性が高い。重要な意思決定を行う前には、必ず
               <Ext href="https://stitch.withgoogle.com/">stitch.withgoogle.com</Ext>
               および公式ドキュメントで最新情報を確認すること。
             </p>

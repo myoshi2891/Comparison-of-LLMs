@@ -77,8 +77,8 @@ describe("/google/stitch-guide - page structure", () => {
 
   it("renders all 16 expected sections", () => {
     const { container } = render(<Page />);
-    const sections = container.querySelectorAll("section");
-    // 他の共通レイアウトに section があるかもしれないので、IDが一致するものを確認
+    const sections = container.querySelectorAll("section.stitchSection");
+    expect(sections.length).toBe(EXPECTED_SECTION_IDS.length);
     for (const id of EXPECTED_SECTION_IDS) {
       const el = container.querySelector(`#${id}`);
       expect(el, `section id="${id}" must exist`).not.toBeNull();

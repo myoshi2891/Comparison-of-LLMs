@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
-import MermaidDiagram from "@/components/docs/MermaidDiagram";
-import styles from "./page.module.css";
-import TocObserver from "./TocObserver";
+import type { Metadata } from 'next';
+import MermaidDiagram from '@/components/docs/MermaidDiagram';
+import styles from './page.module.css';
+import TocObserver from './TocObserver';
 
 export const metadata: Metadata = {
-  title: "MCP実践ベストプラクティス | Model Context Protocol 完全ガイド | LLM-Studies",
+  title: 'MCP実践ベストプラクティス | Model Context Protocol 完全ガイド | LLM-Studies',
   description:
-    "Model Context Protocol (MCP) の詳細なアーキテクチャ、バージョン管理、トランスポート、セキュリティ、認証・認可から運用プラクティスまで網羅的に解説するベストプラクティスガイド。",
+    'Model Context Protocol (MCP) の詳細なアーキテクチャ、バージョン管理、トランスポート、セキュリティ、認証・認可から運用プラクティスまで網羅的に解説するベストプラクティスガイド。',
 };
 
 const DIAGRAMS = {
@@ -336,7 +336,7 @@ export default function McpBestPracticesIntermediatePage() {
               <svg
                 viewBox="0 0 760 160"
                 width="100%"
-                style={{ maxHeight: "120px", display: "block" }}
+                style={{ maxHeight: '180px', display: 'block' }}
                 height="auto"
                 xmlns="http://www.w3.org/2000/svg"
                 role="img"
@@ -552,10 +552,10 @@ export default function McpBestPracticesIntermediatePage() {
               <div
                 className={styles.codeBar}
                 style={{
-                  borderBottom: "none",
-                  background: "none",
-                  padding: "10px 0 0 0",
-                  justifyContent: "center",
+                  borderBottom: 'none',
+                  background: 'none',
+                  padding: '10px 0 0 0',
+                  justifyContent: 'center',
                 }}
               >
                 MCP = Host / Client / Server 間を JSON-RPC 2.0 で接続する共通コネクタ
@@ -569,11 +569,11 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.chapterNumber}
                 style={{
-                  border: "1px solid rgba(79, 216, 196, 0.35)",
-                  background: "rgba(79, 216, 196, 0.12)",
-                  padding: "4px 10px",
-                  borderRadius: "8px",
-                  marginRight: "12px",
+                  border: '1px solid rgba(79, 216, 196, 0.35)',
+                  background: 'rgba(79, 216, 196, 0.12)',
+                  padding: '4px 10px',
+                  borderRadius: '8px',
+                  marginRight: '12px',
                 }}
               >
                 01
@@ -610,134 +610,134 @@ export default function McpBestPracticesIntermediatePage() {
             <div
               className={styles.cardGrid}
               style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
-                gap: "14px",
-                margin: "28px 0",
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+                gap: '14px',
+                margin: '28px 0',
               }}
             >
               <div
-                className={styles["mini-card"]}
+                className={styles['mini-card']}
                 style={{
-                  border: "1px solid var(--color-border-primary, #2c313c)",
-                  borderRadius: "10px",
-                  background: "var(--color-background-secondary, #14171d)",
-                  padding: "16px 18px",
+                  border: '1px solid var(--color-border-primary, #2c313c)',
+                  borderRadius: '10px',
+                  background: 'var(--color-background-secondary, #14171d)',
+                  padding: '16px 18px',
                 }}
               >
                 <div
                   style={{
-                    fontFamily: "var(--font-mono)",
-                    color: "var(--color-text-info, #7bb8ea)",
-                    fontSize: "12px",
+                    fontFamily: 'var(--font-mono)',
+                    color: 'var(--color-text-info, #7bb8ea)',
+                    fontSize: '12px',
                   }}
                 >
                   02–03
                 </div>
-                <h4 style={{ margin: "6px 0 4px 0", color: "#e9eaee", fontSize: "14.5px" }}>
+                <h4 style={{ margin: '6px 0 4px 0', color: '#e9eaee', fontSize: '14.5px' }}>
                   基礎
                 </h4>
-                <p style={{ fontSize: "12.5px", color: "#757a87", margin: 0 }}>
+                <p style={{ fontSize: '12.5px', color: '#757a87', margin: 0 }}>
                   アーキテクチャとプロトコルバージョン
                 </p>
               </div>
               <div
-                className={styles["mini-card"]}
+                className={styles['mini-card']}
                 style={{
-                  border: "1px solid var(--color-border-primary, #2c313c)",
-                  borderRadius: "10px",
-                  background: "var(--color-background-secondary, #14171d)",
-                  padding: "16px 18px",
+                  border: '1px solid var(--color-border-primary, #2c313c)',
+                  borderRadius: '10px',
+                  background: 'var(--color-background-secondary, #14171d)',
+                  padding: '16px 18px',
                 }}
               >
                 <div
                   style={{
-                    fontFamily: "var(--font-mono)",
-                    color: "var(--color-text-info, #7bb8ea)",
-                    fontSize: "12px",
+                    fontFamily: 'var(--font-mono)',
+                    color: 'var(--color-text-info, #7bb8ea)',
+                    fontSize: '12px',
                   }}
                 >
                   04–07
                 </div>
-                <h4 style={{ margin: "6px 0 4px 0", color: "#e9eaee", fontSize: "14.5px" }}>
+                <h4 style={{ margin: '6px 0 4px 0', color: '#e9eaee', fontSize: '14.5px' }}>
                   設計
                 </h4>
-                <p style={{ fontSize: "12.5px", color: "#757a87", margin: 0 }}>
+                <p style={{ fontSize: '12.5px', color: '#757a87', margin: 0 }}>
                   トランスポート・プリミティブ・ツール・コンテキスト
                 </p>
               </div>
               <div
-                className={styles["mini-card"]}
+                className={styles['mini-card']}
                 style={{
-                  border: "1px solid var(--color-border-primary, #2c313c)",
-                  borderRadius: "10px",
-                  background: "var(--color-background-secondary, #14171d)",
-                  padding: "16px 18px",
+                  border: '1px solid var(--color-border-primary, #2c313c)',
+                  borderRadius: '10px',
+                  background: 'var(--color-background-secondary, #14171d)',
+                  padding: '16px 18px',
                 }}
               >
                 <div
                   style={{
-                    fontFamily: "var(--font-mono)",
-                    color: "var(--color-text-info, #7bb8ea)",
-                    fontSize: "12px",
+                    fontFamily: 'var(--font-mono)',
+                    color: 'var(--color-text-info, #7bb8ea)',
+                    fontSize: '12px',
                   }}
                 >
                   08–09
                 </div>
-                <h4 style={{ margin: "6px 0 4px 0", color: "#e9eaee", fontSize: "14.5px" }}>
+                <h4 style={{ margin: '6px 0 4px 0', color: '#e9eaee', fontSize: '14.5px' }}>
                   セキュリティ
                 </h4>
-                <p style={{ fontSize: "12.5px", color: "#757a87", margin: 0 }}>
+                <p style={{ fontSize: '12.5px', color: '#757a87', margin: 0 }}>
                   OAuth 2.1認可と脅威モデル
                 </p>
               </div>
               <div
-                className={styles["mini-card"]}
+                className={styles['mini-card']}
                 style={{
-                  border: "1px solid var(--color-border-primary, #2c313c)",
-                  borderRadius: "10px",
-                  background: "var(--color-background-secondary, #14171d)",
-                  padding: "16px 18px",
+                  border: '1px solid var(--color-border-primary, #2c313c)',
+                  borderRadius: '10px',
+                  background: 'var(--color-background-secondary, #14171d)',
+                  padding: '16px 18px',
                 }}
               >
                 <div
                   style={{
-                    fontFamily: "var(--font-mono)",
-                    color: "var(--color-text-info, #7bb8ea)",
-                    fontSize: "12px",
+                    fontFamily: 'var(--font-mono)',
+                    color: 'var(--color-text-info, #7bb8ea)',
+                    fontSize: '12px',
                   }}
                 >
                   10–11
                 </div>
-                <h4 style={{ margin: "6px 0 4px 0", color: "#e9eaee", fontSize: "14.5px" }}>
+                <h4 style={{ margin: '6px 0 4px 0', color: '#e9eaee', fontSize: '14.5px' }}>
                   運用
                 </h4>
-                <p style={{ fontSize: "12.5px", color: "#757a87", margin: 0 }}>
+                <p style={{ fontSize: '12.5px', color: '#757a87', margin: 0 }}>
                   テスト・デバッグ・Gateway構成
                 </p>
               </div>
               <div
-                className={styles["mini-card"]}
+                className={styles['mini-card']}
                 style={{
-                  border: "1px solid var(--color-border-primary, #2c313c)",
-                  borderRadius: "10px",
-                  background: "var(--color-background-secondary, #14171d)",
-                  padding: "16px 18px",
+                  border: '1px solid var(--color-border-primary, #2c313c)',
+                  borderRadius: '10px',
+                  background: 'var(--color-background-secondary, #14171d)',
+                  padding: '16px 18px',
                 }}
               >
                 <div
                   style={{
-                    fontFamily: "var(--font-mono)",
-                    color: "var(--color-text-info, #7bb8ea)",
-                    fontSize: "12px",
+                    fontFamily: 'var(--font-mono)',
+                    color: 'var(--color-text-info, #7bb8ea)',
+                    fontSize: '12px',
                   }}
                 >
                   12–14
                 </div>
-                <h4 style={{ margin: "6px 0 4px 0", color: "#e9eaee", fontSize: "14.5px" }}>
+                <h4 style={{ margin: '6px 0 4px 0', color: '#e9eaee', fontSize: '14.5px' }}>
                   展望
                 </h4>
-                <p style={{ fontSize: "12.5px", color: "#757a87", margin: 0 }}>
+                <p style={{ fontSize: '12.5px', color: '#757a87', margin: 0 }}>
                   ロードマップ・チェックリスト・参照元
                 </p>
               </div>
@@ -747,7 +747,7 @@ export default function McpBestPracticesIntermediatePage() {
               <summary>参考資料（3件）</summary>
               <ul>
                 <li>
-                  MCP公式サイト（仕様トップ）:{" "}
+                  MCP公式サイト（仕様トップ）:{' '}
                   <a
                     href="https://modelcontextprotocol.io/specification/2025-11-25"
                     target="_blank"
@@ -757,7 +757,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  Model Context Protocol - Wikipedia:{" "}
+                  Model Context Protocol - Wikipedia:{' '}
                   <a
                     href="https://en.wikipedia.org/wiki/Model_Context_Protocol"
                     target="_blank"
@@ -768,7 +768,7 @@ export default function McpBestPracticesIntermediatePage() {
                 </li>
                 <li>
                   Model Context Protocol (MCP): The Standard That&apos;s Changing AI Integration in
-                  2026:{" "}
+                  2026:{' '}
                   <a
                     href="https://devstarsj.github.io/2026/03/18/model-context-protocol-mcp-complete-guide-2026/"
                     target="_blank"
@@ -787,11 +787,11 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.chapterNumber}
                 style={{
-                  border: "1px solid rgba(79, 216, 196, 0.35)",
-                  background: "rgba(79, 216, 196, 0.12)",
-                  padding: "4px 10px",
-                  borderRadius: "8px",
-                  marginRight: "12px",
+                  border: '1px solid rgba(79, 216, 196, 0.35)',
+                  background: 'rgba(79, 216, 196, 0.12)',
+                  padding: '4px 10px',
+                  borderRadius: '8px',
+                  marginRight: '12px',
                 }}
               >
                 02
@@ -800,7 +800,7 @@ export default function McpBestPracticesIntermediatePage() {
             </div>
 
             <p>
-              MCPは <b>Host（ホスト）・Client（クライアント）・Server（サーバー）</b>{" "}
+              MCPは <b>Host（ホスト）・Client（クライアント）・Server（サーバー）</b>{' '}
               の3層構造を取ります。
             </p>
 
@@ -854,7 +854,7 @@ export default function McpBestPracticesIntermediatePage() {
             <div className={styles.diagramFrame}>
               <div
                 className={styles.codeBar}
-                style={{ borderBottom: "none", background: "none", padding: "0 0 10px 0" }}
+                style={{ borderBottom: 'none', background: 'none', padding: '0 0 10px 0' }}
               >
                 Fig. 2-1 — Host / Client / Server 全体構成
               </div>
@@ -867,10 +867,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 2.1
@@ -888,7 +888,7 @@ export default function McpBestPracticesIntermediatePage() {
             <div className={styles.diagramFrame}>
               <div
                 className={styles.codeBar}
-                style={{ borderBottom: "none", background: "none", padding: "0 0 10px 0" }}
+                style={{ borderBottom: 'none', background: 'none', padding: '0 0 10px 0' }}
               >
                 Fig. 2-2 — ツール呼び出しのシーケンス
               </div>
@@ -901,10 +901,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 2.2
@@ -913,21 +913,21 @@ export default function McpBestPracticesIntermediatePage() {
             </h3>
             <ul
               style={{
-                listStyleType: "disc",
-                paddingLeft: "20px",
-                color: "var(--color-text-secondary, #aeb2bd)",
-                margin: "0 0 16px",
+                listStyleType: 'disc',
+                paddingLeft: '20px',
+                color: 'var(--color-text-secondary, #aeb2bd)',
+                margin: '0 0 16px',
               }}
             >
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>サーバーは「信頼できない入力」を扱う前提で設計する：</b>
                 サーバーが返すツールの説明文（description）やアノテーションは、たとえ正規のサーバーからのものであっても、クライアント側では「未検証の情報」として扱うべきとMCP仕様は明記しています。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>1つのClientは1つのServerとのみ対話する：</b>
                 複数サーバーを束ねる場合はHost側で複数Clientインスタンスを管理するか、後述のGatewayパターンを採用します。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>Toolsは「任意のコード実行」を意味する：</b>
                 ツールはLLMの単なる関数呼び出しではなく、実際のシステム操作（ファイル削除、API呼び出し、DB更新など）に直結するため、相応の慎重さが求められます。
               </li>
@@ -937,7 +937,7 @@ export default function McpBestPracticesIntermediatePage() {
               <summary>参考資料（3件）</summary>
               <ul>
                 <li>
-                  MCP Specification（アーキテクチャ全般）:{" "}
+                  MCP Specification（アーキテクチャ全般）:{' '}
                   <a
                     href="https://modelcontextprotocol.io/specification/2025-11-25"
                     target="_blank"
@@ -947,7 +947,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  Model Context Protocol (MCP) explained: A practical technical overview:{" "}
+                  Model Context Protocol (MCP) explained: A practical technical overview:{' '}
                   <a
                     href="https://codilime.com/blog/model-context-protocol-explained/"
                     target="_blank"
@@ -957,7 +957,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  The Hitchhiker&apos;s Guide to Agentic AI:{" "}
+                  The Hitchhiker&apos;s Guide to Agentic AI:{' '}
                   <a
                     href="https://arxiv.org/pdf/2606.24937"
                     target="_blank"
@@ -976,11 +976,11 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.chapterNumber}
                 style={{
-                  border: "1px solid rgba(79, 216, 196, 0.35)",
-                  background: "rgba(79, 216, 196, 0.12)",
-                  padding: "4px 10px",
-                  borderRadius: "8px",
-                  marginRight: "12px",
+                  border: '1px solid rgba(79, 216, 196, 0.35)',
+                  background: 'rgba(79, 216, 196, 0.12)',
+                  padding: '4px 10px',
+                  borderRadius: '8px',
+                  marginRight: '12px',
                 }}
               >
                 03
@@ -1000,10 +1000,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 3.1
@@ -1042,7 +1042,7 @@ export default function McpBestPracticesIntermediatePage() {
                     </td>
                     <td>2025年6月</td>
                     <td>
-                      <b>OAuth 2.1</b>{" "}
+                      <b>OAuth 2.1</b>{' '}
                       ベースの認可仕様を正式化（MCPサーバー＝リソースサーバー、外部認可サーバーへの分離を明確化）
                     </td>
                   </tr>
@@ -1072,105 +1072,107 @@ export default function McpBestPracticesIntermediatePage() {
             <div className={styles.diagramFrame}>
               <div
                 className={styles.codeBar}
-                style={{ borderBottom: "none", background: "none", padding: "0 0 14px 0" }}
+                style={{ borderBottom: 'none', background: 'none', padding: '0 0 14px 0' }}
               >
                 Fig. 3-1 — 仕様リリース履歴タイムライン
               </div>
               {/* ── Custom horizontal timeline ── */}
-              <div style={{ position: "relative", padding: "8px 0 0" }}>
+              <div style={{ position: 'relative', padding: '8px 0 0' }}>
                 {/* 横軸ライン */}
                 <div
                   style={{
-                    position: "absolute",
-                    top: "28px",
-                    left: "0",
-                    right: "0",
-                    height: "2px",
+                    position: 'absolute',
+                    top: '28px',
+                    left: '0',
+                    right: '0',
+                    height: '2px',
                     background:
-                      "linear-gradient(90deg, rgba(79,216,196,0.15) 0%, rgba(79,216,196,0.5) 50%, rgba(245,113,107,0.4) 100%)",
+                      'linear-gradient(90deg, rgba(79,216,196,0.15) 0%, rgba(79,216,196,0.5) 50%, rgba(245,113,107,0.4) 100%)',
                   }}
                 />
                 {/* バージョンノード列 */}
                 <div
                   style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(5, 1fr)",
-                    gap: "8px",
-                    position: "relative",
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(5, 1fr)',
+                    gap: '8px',
+                    position: 'relative',
                   }}
                 >
-                  {([
-                    {
-                      date: "2024-11-05",
-                      color: "#4fd8c4",
-                      bg: "rgba(79,216,196,0.12)",
-                      border: "rgba(79,216,196,0.4)",
-                      label: "初版仕様",
-                      desc: "stdio / HTTP+SSE",
-                    },
-                    {
-                      date: "2025-03-26",
-                      color: "#7bb8ea",
-                      bg: "rgba(123,184,234,0.12)",
-                      border: "rgba(123,184,234,0.4)",
-                      label: "Streamable HTTP",
-                      desc: "HTTP+SSEを非推奨化",
-                    },
-                    {
-                      date: "2025-06-18",
-                      color: "#be97f5",
-                      bg: "rgba(190,151,245,0.14)",
-                      border: "rgba(190,151,245,0.4)",
-                      label: "OAuth 2.1",
-                      desc: "認可仕様を正式化",
-                    },
-                    {
-                      date: "2025-11-25",
-                      color: "#7fd6a3",
-                      bg: "rgba(127,214,163,0.12)",
-                      border: "rgba(127,214,163,0.4)",
-                      label: "現行安定版",
-                      desc: "Tasks 実験導入",
-                    },
-                    {
-                      date: "2026-07-28",
-                      color: "#f5b84f",
-                      bg: "rgba(245,184,79,0.12)",
-                      border: "rgba(245,184,79,0.4)",
-                      label: "ステートレス化",
-                      desc: "Extensions 導入 (RC)",
-                    },
-                  ] as const).map((v) => (
+                  {(
+                    [
+                      {
+                        date: '2024-11-05',
+                        color: '#4fd8c4',
+                        bg: 'rgba(79,216,196,0.12)',
+                        border: 'rgba(79,216,196,0.4)',
+                        label: '初版仕様',
+                        desc: 'stdio / HTTP+SSE',
+                      },
+                      {
+                        date: '2025-03-26',
+                        color: '#7bb8ea',
+                        bg: 'rgba(123,184,234,0.12)',
+                        border: 'rgba(123,184,234,0.4)',
+                        label: 'Streamable HTTP',
+                        desc: 'HTTP+SSEを非推奨化',
+                      },
+                      {
+                        date: '2025-06-18',
+                        color: '#be97f5',
+                        bg: 'rgba(190,151,245,0.14)',
+                        border: 'rgba(190,151,245,0.4)',
+                        label: 'OAuth 2.1',
+                        desc: '認可仕様を正式化',
+                      },
+                      {
+                        date: '2025-11-25',
+                        color: '#7fd6a3',
+                        bg: 'rgba(127,214,163,0.12)',
+                        border: 'rgba(127,214,163,0.4)',
+                        label: '現行安定版',
+                        desc: 'Tasks 実験導入',
+                      },
+                      {
+                        date: '2026-07-28',
+                        color: '#f5b84f',
+                        bg: 'rgba(245,184,79,0.12)',
+                        border: 'rgba(245,184,79,0.4)',
+                        label: 'ステートレス化',
+                        desc: 'Extensions 導入 (RC)',
+                      },
+                    ] as const
+                  ).map((v) => (
                     <div
                       key={v.date}
                       style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        gap: "6px",
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '6px',
                       }}
                     >
                       {/* ノード */}
                       <div
                         style={{
-                          width: "12px",
-                          height: "12px",
-                          borderRadius: "50%",
+                          width: '12px',
+                          height: '12px',
+                          borderRadius: '50%',
                           background: v.color,
                           border: `2px solid ${v.border}`,
                           boxShadow: `0 0 6px ${v.color}55`,
                           zIndex: 1,
-                          marginTop: "22px",
+                          marginTop: '22px',
                         }}
                       />
                       {/* 日付 */}
                       <span
                         style={{
-                          fontFamily: "var(--font-mono)",
-                          fontSize: "10px",
+                          fontFamily: 'var(--font-mono)',
+                          fontSize: '10px',
                           color: v.color,
-                          letterSpacing: "0.02em",
-                          whiteSpace: "nowrap",
+                          letterSpacing: '0.02em',
+                          whiteSpace: 'nowrap',
                         }}
                       >
                         {v.date}
@@ -1180,18 +1182,18 @@ export default function McpBestPracticesIntermediatePage() {
                         style={{
                           background: v.bg,
                           border: `1px solid ${v.border}`,
-                          borderRadius: "8px",
-                          padding: "8px 10px",
-                          width: "100%",
-                          textAlign: "center",
+                          borderRadius: '8px',
+                          padding: '8px 10px',
+                          width: '100%',
+                          textAlign: 'center',
                         }}
                       >
                         <div
                           style={{
-                            fontSize: "12px",
+                            fontSize: '12px',
                             fontWeight: 600,
                             color: v.color,
-                            marginBottom: "3px",
+                            marginBottom: '3px',
                             lineHeight: 1.3,
                           }}
                         >
@@ -1199,8 +1201,8 @@ export default function McpBestPracticesIntermediatePage() {
                         </div>
                         <div
                           style={{
-                            fontSize: "10.5px",
-                            color: "var(--color-text-secondary, #aeb2bd)",
+                            fontSize: '10.5px',
+                            color: 'var(--color-text-secondary, #aeb2bd)',
                             lineHeight: 1.4,
                           }}
                         >
@@ -1217,10 +1219,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 3.2
@@ -1230,24 +1232,24 @@ export default function McpBestPracticesIntermediatePage() {
             <p>2026-07-28のリリース候補は、これまでの中で最大級の破壊的変更を含みます。</p>
             <ul
               style={{
-                listStyleType: "disc",
-                paddingLeft: "20px",
-                color: "var(--color-text-secondary, #aeb2bd)",
-                margin: "0 0 16px",
+                listStyleType: 'disc',
+                paddingLeft: '20px',
+                color: 'var(--color-text-secondary, #aeb2bd)',
+                margin: '0 0 16px',
               }}
             >
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>ステートレス化：</b>プロトコルバージョンやクライアント情報を毎回
                 <code>_meta</code>に載せる方式に変更され、<code>Mcp-Session-Id</code>
                 ヘッダーとセッション概念そのものが廃止されます。これにより、どのリクエストもどのサーバーインスタンスでも処理できるようになり、単純なラウンドロビン型ロードバランサーでスケールできるようになります。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>Extensionsフレームワーク：</b>
                 逆引きDNS形式のIDで識別される拡張機能が、コア仕様とは独立したライフサイクルでリリースできるようになります。
                 <code>MCP Apps</code>
                 （サーバーがサンドボックス化されたiframe内でインタラクティブなUIを提供できる仕様）が最初の公式拡張として提供されます。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>アプリ側の状態管理：</b>
                 プロトコルレベルのセッションがなくなっても、アプリケーション側で
                 <code>basket_id</code>
@@ -1259,10 +1261,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 3.3
@@ -1271,21 +1273,21 @@ export default function McpBestPracticesIntermediatePage() {
             </h3>
             <ol
               style={{
-                paddingLeft: "20px",
-                color: "var(--color-text-secondary, #aeb2bd)",
-                margin: "0 0 16px",
+                paddingLeft: '20px',
+                color: 'var(--color-text-secondary, #aeb2bd)',
+                margin: '0 0 16px',
               }}
             >
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>サーバーは複数のプロトコルバージョンをサポートする設計にする：</b>
                 少なくとも現行の安定版（<code>2025-11-25</code>
                 ）と、必要であれば1つ前のバージョンとの互換性を維持します。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>バージョン互換性マトリクスを文書化する：</b>
                 どの機能がどのバージョンで動くかを一覧化しておくと、クライアント側の挙動差異によるバグ調査が格段に楽になります。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>SEP（Spec Enhancement Proposal）の動向を追う：</b>MCPは現在、Working
                 Group主導の開発体制に移行しており、優先領域（トランスポートのスケーラビリティ、エージェント間通信、ガバナンス、エンタープライズ対応）に沿ったSEPほどレビューが早く進みます。
               </li>
@@ -1295,7 +1297,7 @@ export default function McpBestPracticesIntermediatePage() {
               <summary>参考資料（5件）</summary>
               <ul>
                 <li>
-                  The 2026 MCP Roadmap:{" "}
+                  The 2026 MCP Roadmap:{' '}
                   <a
                     href="https://blog.modelcontextprotocol.io/posts/2026-mcp-roadmap/"
                     target="_blank"
@@ -1305,7 +1307,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  The 2026-07-28 MCP Specification Release Candidate:{" "}
+                  The 2026-07-28 MCP Specification Release Candidate:{' '}
                   <a
                     href="https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate/"
                     target="_blank"
@@ -1315,7 +1317,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  Model Context Protocol Blog（トップページ）:{" "}
+                  Model Context Protocol Blog（トップページ）:{' '}
                   <a
                     href="https://blog.modelcontextprotocol.io/"
                     target="_blank"
@@ -1325,7 +1327,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  GitHub Releases:{" "}
+                  GitHub Releases:{' '}
                   <a
                     href="https://github.com/modelcontextprotocol/modelcontextprotocol/releases"
                     target="_blank"
@@ -1335,7 +1337,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  MCP Cheat Sheet (2026) - Webfuse:{" "}
+                  MCP Cheat Sheet (2026) - Webfuse:{' '}
                   <a
                     href="https://www.webfuse.com/mcp-cheat-sheet"
                     target="_blank"
@@ -1354,11 +1356,11 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.chapterNumber}
                 style={{
-                  border: "1px solid rgba(79, 216, 196, 0.35)",
-                  background: "rgba(79, 216, 196, 0.12)",
-                  padding: "4px 10px",
-                  borderRadius: "8px",
-                  marginRight: "12px",
+                  border: '1px solid rgba(79, 216, 196, 0.35)',
+                  background: 'rgba(79, 216, 196, 0.12)',
+                  padding: '4px 10px',
+                  borderRadius: '8px',
+                  marginRight: '12px',
                 }}
               >
                 04
@@ -1367,7 +1369,7 @@ export default function McpBestPracticesIntermediatePage() {
             </div>
 
             <p>
-              MCPのトランスポート層は「データ層（tools/resources/promptsの定義）」とは独立したレイヤーです。2026年7月時点で現行かつ推奨されるトランスポートは{" "}
+              MCPのトランスポート層は「データ層（tools/resources/promptsの定義）」とは独立したレイヤーです。2026年7月時点で現行かつ推奨されるトランスポートは{' '}
               <b>stdio</b> と <b>Streamable HTTP</b> の2つのみです。
               <b>HTTP+SSE（2024-11-05仕様）は2025-03-26で正式に非推奨化</b>
               されており、新規実装での採用は避けるべきです。
@@ -1377,10 +1379,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 4.1
@@ -1437,7 +1439,7 @@ export default function McpBestPracticesIntermediatePage() {
             <div className={styles.diagramFrame}>
               <div
                 className={styles.codeBar}
-                style={{ borderBottom: "none", background: "none", padding: "0 0 10px 0" }}
+                style={{ borderBottom: 'none', background: 'none', padding: '0 0 10px 0' }}
               >
                 Fig. 4-1 — トランスポート選定の意思決定フロー
               </div>
@@ -1450,10 +1452,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 4.2
@@ -1464,13 +1466,13 @@ export default function McpBestPracticesIntermediatePage() {
             <div
               className={styles.notice}
               style={{
-                borderLeftColor: "var(--color-text-warning, #f5716b)",
-                background: "rgba(245, 113, 107, 0.08)",
+                borderLeftColor: 'var(--color-text-warning, #f5716b)',
+                background: 'rgba(245, 113, 107, 0.08)',
               }}
             >
               <i
                 className="ti ti-alert-triangle"
-                style={{ color: "var(--color-text-warning, #f5716b)" }}
+                style={{ color: 'var(--color-text-warning, #f5716b)' }}
               />
               <div>
                 <b>鉄則：</b>
@@ -1485,10 +1487,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 4.3
@@ -1497,26 +1499,26 @@ export default function McpBestPracticesIntermediatePage() {
             </h3>
             <ul
               style={{
-                listStyleType: "disc",
-                paddingLeft: "20px",
-                color: "var(--color-text-secondary, #aeb2bd)",
-                margin: "0 0 16px",
+                listStyleType: 'disc',
+                paddingLeft: '20px',
+                color: 'var(--color-text-secondary, #aeb2bd)',
+                margin: '0 0 16px',
               }}
             >
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 サーバーは単一のMCPエンドポイント（例: <code>https://example.com/mcp</code>
                 ）でPOSTとGETの両方をサポートする必要があります。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 レスポンスは通常のJSON、またはSSEストリームへのアップグレードのいずれかを選択できます。「Streamable」という名称は、この段階的なレスポンス配信能力を指しており、HTTP/2を必須とするものではありません（HTTP/1.1のchunked
                 transfer encodingでも動作します）。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>DNSリバインディング攻撃対策</b>として、受信するすべての接続で<code>Origin</code>
                 ヘッダーを検証すること、ローカル実行時は<code>0.0.0.0</code>ではなく
                 <code>127.0.0.1</code>にバインドすることが仕様上強く推奨されています。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 ローカル開発とリモート本番を1つのコードベースで両立させる場合、環境変数やCLIフラグでトランスポートを切り替える設計（ツールロジックは共通化し、トランスポート初期化のみ分岐）が一般的です。
               </li>
             </ul>
@@ -1525,10 +1527,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 4.4
@@ -1547,7 +1549,7 @@ export default function McpBestPracticesIntermediatePage() {
               <summary>参考資料（9件）</summary>
               <ul>
                 <li>
-                  MCP Specification - Transports（2025-03-26版）:{" "}
+                  MCP Specification - Transports（2025-03-26版）:{' '}
                   <a
                     href="https://modelcontextprotocol.io/specification/2025-03-26/basic/transports"
                     target="_blank"
@@ -1557,7 +1559,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  MCP Server Transports - Roo Code Documentation:{" "}
+                  MCP Server Transports - Roo Code Documentation:{' '}
                   <a
                     href="https://docs.roocode.com/features/mcp/server-transports"
                     target="_blank"
@@ -1567,7 +1569,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  MCP Transport: Stdio vs Streamable HTTP — TrueFoundry:{" "}
+                  MCP Transport: Stdio vs Streamable HTTP — TrueFoundry:{' '}
                   <a
                     href="https://www.truefoundry.com/blog/mcp-stdio-vs-streamable-http-enterprise"
                     target="_blank"
@@ -1577,7 +1579,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  MCP Transport Protocols: stdio vs SSE vs StreamableHTTP — MCPcat:{" "}
+                  MCP Transport Protocols: stdio vs SSE vs StreamableHTTP — MCPcat:{' '}
                   <a
                     href="https://mcpcat.io/guides/comparing-stdio-sse-streamablehttp/"
                     target="_blank"
@@ -1587,7 +1589,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  MCP stdio vs HTTP vs SSE Transport: Which Should You Choose in 2026?:{" "}
+                  MCP stdio vs HTTP vs SSE Transport: Which Should You Choose in 2026?:{' '}
                   <a
                     href="https://startdebugging.net/2026/07/mcp-stdio-vs-http-vs-sse-transport-which-to-choose/"
                     target="_blank"
@@ -1597,7 +1599,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  MCP Transports Explained — ChatForest:{" "}
+                  MCP Transports Explained — ChatForest:{' '}
                   <a
                     href="https://chatforest.com/guides/mcp-transports-explained/"
                     target="_blank"
@@ -1607,7 +1609,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  MCP SSE vs Stdio: Transport Options Explained (2026) — Apigene:{" "}
+                  MCP SSE vs Stdio: Transport Options Explained (2026) — Apigene:{' '}
                   <a
                     href="https://apigene.ai/blog/mcp-sse-vs-stdio"
                     target="_blank"
@@ -1617,7 +1619,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  MCP Transports: stdio vs SSE vs HTTP — RapidDev:{" "}
+                  MCP Transports: stdio vs SSE vs HTTP — RapidDev:{' '}
                   <a
                     href="https://www.rapidevelopers.com/mcp-tutorial/mcp-transport-stdio-vs-sse-vs-http"
                     target="_blank"
@@ -1627,7 +1629,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  MCP Transport Mechanisms: STDIO vs Streamable HTTP — AWS Builder Center:{" "}
+                  MCP Transport Mechanisms: STDIO vs Streamable HTTP — AWS Builder Center:{' '}
                   <a
                     href="https://builder.aws.com/content/35A0IphCeLvYzly9Sw40G1dVNzc/mcp-transport-mechanisms-stdio-vs-streamable-http"
                     target="_blank"
@@ -1646,11 +1648,11 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.chapterNumber}
                 style={{
-                  border: "1px solid rgba(79, 216, 196, 0.35)",
-                  background: "rgba(79, 216, 196, 0.12)",
-                  padding: "4px 10px",
-                  borderRadius: "8px",
-                  marginRight: "12px",
+                  border: '1px solid rgba(79, 216, 196, 0.35)',
+                  background: 'rgba(79, 216, 196, 0.12)',
+                  padding: '4px 10px',
+                  borderRadius: '8px',
+                  marginRight: '12px',
                 }}
               >
                 05
@@ -1669,10 +1671,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 5.1
@@ -1753,10 +1755,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 5.2
@@ -1770,7 +1772,7 @@ export default function McpBestPracticesIntermediatePage() {
             <div className={styles.diagramFrame}>
               <div
                 className={styles.codeBar}
-                style={{ borderBottom: "none", background: "none", padding: "0 0 10px 0" }}
+                style={{ borderBottom: 'none', background: 'none', padding: '0 0 10px 0' }}
               >
                 Fig. 5-1 — 6プリミティブの連携シーケンス
               </div>
@@ -1783,10 +1785,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 5.3
@@ -1795,33 +1797,33 @@ export default function McpBestPracticesIntermediatePage() {
             </h3>
             <ul
               style={{
-                listStyleType: "disc",
-                paddingLeft: "20px",
-                color: "var(--color-text-secondary, #aeb2bd)",
-                margin: "0 0 16px",
+                listStyleType: 'disc',
+                paddingLeft: '20px',
+                color: 'var(--color-text-secondary, #aeb2bd)',
+                margin: '0 0 16px',
               }}
             >
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>Tools：</b>
                 副作用（書き込み・削除・送信など）を伴う操作は必ずToolsとして実装し、ユーザーの明示的な承認フローに乗せます。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>Resources：</b>
                 「一覧を返すだけ」の読み取り専用データはResourcesとして実装し、Toolsと混同しないようにします。境界を曖昧にすると、後述するコンテキスト肥大化の原因にもなります。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>Prompts：</b>
                 ドメイン知識をテンプレート化して配布したい場合（例:「インシデント報告書生成」テンプレート）に活用します。あくまで「ユーザーが明示的に選ぶ」体験を想定した設計にします。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>Sampling：</b>サーバー自身がLLM
                 APIキーを持たずに、クライアント側のモデルを間接的に借用できる仕組みです。APIキーがサーバー側に漏れる心配がなく、ユーザーはどのモデル利用にも同意フローを経由します。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>Elicitation：</b>
                 「危険な操作の前に必ず人に確認する」設計の中核です。ボタン選択式（accept/decline/cancel）などクライアントが解釈しやすい形式で要求するのが望ましく、機微な情報を求める設計は避けます。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>Roots：</b>
                 ホスト側がサーバーに公開してよいディレクトリやリソース範囲を制限する仕組みで、最小権限の原則を実装レベルで担保します。
               </li>
@@ -1832,7 +1834,7 @@ export default function McpBestPracticesIntermediatePage() {
               <ul>
                 <li>
                   Understanding MCP features: Tools, Resources, Prompts, Sampling, Roots, and
-                  Elicitation — WorkOS:{" "}
+                  Elicitation — WorkOS:{' '}
                   <a
                     href="https://workos.com/blog/mcp-features-guide"
                     target="_blank"
@@ -1842,7 +1844,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  What is MCP elicitation and sampling? — Stacktree:{" "}
+                  What is MCP elicitation and sampling? — Stacktree:{' '}
                   <a
                     href="https://stacktr.ee/blog/what-is-mcp-elicitation"
                     target="_blank"
@@ -1852,7 +1854,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  MCP Concepts: Sampling and Elicitation — Medium:{" "}
+                  MCP Concepts: Sampling and Elicitation — Medium:{' '}
                   <a
                     href="https://medium.com/@__nagarajan__/mcp-concepts-sampling-and-elicitation-95c5c0c4df71"
                     target="_blank"
@@ -1862,7 +1864,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  Memgraph MCP Experimental Server: Elicitation and Sampling Explained:{" "}
+                  Memgraph MCP Experimental Server: Elicitation and Sampling Explained:{' '}
                   <a
                     href="https://memgraph.com/blog/memgraph-mcp-elicitation-and-sampling"
                     target="_blank"
@@ -1873,7 +1875,7 @@ export default function McpBestPracticesIntermediatePage() {
                 </li>
                 <li>
                   MCP Client Concepts: How Elicitation, Sampling, and Roots Make AI Agents
-                  Responsible:{" "}
+                  Responsible:{' '}
                   <a
                     href="https://medium.com/@puneetsharma41/mcp-client-concepts-how-elicitation-sampling-and-roots-make-ai-agents-responsible-5f02a0666d9a"
                     target="_blank"
@@ -1883,7 +1885,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  The Model Context Protocol (MCP): Deep dive into structure and concepts — HMS:{" "}
+                  The Model Context Protocol (MCP): Deep dive into structure and concepts — HMS:{' '}
                   <a
                     href="https://www.analytical-software.de/en/the-model-context-protocol-mcp-deep-dive-into-structure-and-concepts/"
                     target="_blank"
@@ -1902,11 +1904,11 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.chapterNumber}
                 style={{
-                  border: "1px solid rgba(79, 216, 196, 0.35)",
-                  background: "rgba(79, 216, 196, 0.12)",
-                  padding: "4px 10px",
-                  borderRadius: "8px",
-                  marginRight: "12px",
+                  border: '1px solid rgba(79, 216, 196, 0.35)',
+                  background: 'rgba(79, 216, 196, 0.12)',
+                  padding: '4px 10px',
+                  borderRadius: '8px',
+                  marginRight: '12px',
                 }}
               >
                 06
@@ -1926,10 +1928,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 6.1
@@ -2047,10 +2049,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 6.2
@@ -2068,7 +2070,7 @@ export default function McpBestPracticesIntermediatePage() {
             <div className={styles.diagramFrame}>
               <div
                 className={styles.codeBar}
-                style={{ borderBottom: "none", background: "none", padding: "0 0 10px 0" }}
+                style={{ borderBottom: 'none', background: 'none', padding: '0 0 10px 0' }}
               >
                 Fig. 6-1 — 評価駆動によるツール改善サイクル
               </div>
@@ -2081,10 +2083,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 6.3
@@ -2100,34 +2102,34 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 6.4
               </span>
               実装レベルのチェックリスト
             </h3>
-            <ul style={{ listStyleType: "none", paddingLeft: "0px", margin: "20px 0" }}>
+            <ul style={{ listStyleType: 'none', paddingLeft: '0px', margin: '20px 0' }}>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>
@@ -2137,21 +2139,21 @@ export default function McpBestPracticesIntermediatePage() {
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>
@@ -2161,84 +2163,84 @@ export default function McpBestPracticesIntermediatePage() {
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>レスポンスに生のIDだけでなく人間が読めるフィールドを含めているか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>ページネーション・フィルタ・詳細度パラメータを用意しているか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>エラーレスポンスは「次に取るべき行動」を明示しているか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>
@@ -2248,21 +2250,21 @@ export default function McpBestPracticesIntermediatePage() {
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>評価セットを用意し、変更のたびに定量的な回帰確認をしているか</span>
@@ -2273,7 +2275,7 @@ export default function McpBestPracticesIntermediatePage() {
               <summary>参考資料（4件）</summary>
               <ul>
                 <li>
-                  Writing effective tools for AI agents—using AI agents（Anthropic公式）:{" "}
+                  Writing effective tools for AI agents—using AI agents（Anthropic公式）:{' '}
                   <a
                     href="https://www.anthropic.com/engineering/writing-tools-for-agents"
                     target="_blank"
@@ -2283,7 +2285,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  Writing Effective Tools for AI Agents: Lessons from Anthropic — Medium:{" "}
+                  Writing Effective Tools for AI Agents: Lessons from Anthropic — Medium:{' '}
                   <a
                     href="https://laxmikumars.medium.com/writing-effective-tools-for-ai-agents-lessons-from-anthropic-25b85bf74f5d"
                     target="_blank"
@@ -2293,7 +2295,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  Writing Effective Tools for AI Agents: Production Lessons from Anthropic — Medium:{" "}
+                  Writing Effective Tools for AI Agents: Production Lessons from Anthropic — Medium:{' '}
                   <a
                     href="https://techwithibrahim.medium.com/writing-effective-tools-for-ai-agents-production-lessons-from-anthropic-99ea76a7fcf0"
                     target="_blank"
@@ -2303,7 +2305,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  ADR-0023: Anthropic Tool Design Best Practices（実装事例）:{" "}
+                  ADR-0023: Anthropic Tool Design Best Practices（実装事例）:{' '}
                   <a
                     href="https://github.com/vishnu2kmohan/mcp-server-langgraph/blob/main/adr/adr-0023-anthropic-tool-design-best-practices.md"
                     target="_blank"
@@ -2322,11 +2324,11 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.chapterNumber}
                 style={{
-                  border: "1px solid rgba(79, 216, 196, 0.35)",
-                  background: "rgba(79, 216, 196, 0.12)",
-                  padding: "4px 10px",
-                  borderRadius: "8px",
-                  marginRight: "12px",
+                  border: '1px solid rgba(79, 216, 196, 0.35)',
+                  background: 'rgba(79, 216, 196, 0.12)',
+                  padding: '4px 10px',
+                  borderRadius: '8px',
+                  marginRight: '12px',
                 }}
               >
                 07
@@ -2344,10 +2346,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 7.1
@@ -2405,10 +2407,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 7.2
@@ -2420,7 +2422,7 @@ export default function McpBestPracticesIntermediatePage() {
             <div className={styles.diagramFrame}>
               <div
                 className={styles.codeBar}
-                style={{ borderBottom: "none", background: "none", padding: "0 0 10px 0" }}
+                style={{ borderBottom: 'none', background: 'none', padding: '0 0 10px 0' }}
               >
                 Fig. 7-1 — 旧方式 vs 段階的開示（Progressive Disclosure）
               </div>
@@ -2433,10 +2435,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 7.3
@@ -2509,10 +2511,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 7.4
@@ -2521,24 +2523,24 @@ export default function McpBestPracticesIntermediatePage() {
             </h3>
             <ol
               style={{
-                paddingLeft: "20px",
-                color: "var(--color-text-secondary, #aeb2bd)",
-                margin: "0 0 16px",
+                paddingLeft: '20px',
+                color: 'var(--color-text-secondary, #aeb2bd)',
+                margin: '0 0 16px',
               }}
             >
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 接続するMCPサーバー数を<b>「必要最小限」に絞る</b>運用ルールをチーム内で明文化する。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 サーバー実装者側は、<b>既存APIをそのまま1対1でツール化しない</b>
                 。前章のツール設計原則（検索指向、意味のある単位）を徹底することが、肥大化対策の第一歩になる。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 クライアント/フレームワーク側がTool SearchやCode
                 Executionパターンをサポートしている場合は、積極的に有効化する（Claude Codeでは
                 <code>ENABLE_TOOL_SEARCH</code>環境変数などで制御可能）。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 ツール出力自体の肥大化（生HTML・base64画像・巨大JSONをそのまま返す）にも注意し、サーバー側で出力の切り詰めやアノテーション化（大きな結果を外部に保存し参照IDのみ返す）を検討する。
               </li>
             </ol>
@@ -2547,7 +2549,7 @@ export default function McpBestPracticesIntermediatePage() {
               <summary>参考資料（8件）</summary>
               <ul>
                 <li>
-                  Code execution with MCP: building more efficient AI agents（Anthropic公式）:{" "}
+                  Code execution with MCP: building more efficient AI agents（Anthropic公式）:{' '}
                   <a
                     href="https://www.anthropic.com/engineering/code-execution-with-mcp"
                     target="_blank"
@@ -2557,7 +2559,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  When too many tools become too much context — WRITER:{" "}
+                  When too many tools become too much context — WRITER:{' '}
                   <a
                     href="https://writer.com/engineering/rag-mcp/"
                     target="_blank"
@@ -2567,7 +2569,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  How to Prevent MCP Tool Overload and Build Faster, Safer AI Agents — Lunar.dev:{" "}
+                  How to Prevent MCP Tool Overload and Build Faster, Safer AI Agents — Lunar.dev:{' '}
                   <a
                     href="https://www.lunar.dev/post/why-is-there-mcp-tool-overload-and-how-to-solve-it-for-your-ai-agents"
                     target="_blank"
@@ -2577,7 +2579,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  MCP&apos;s Context Bloat Crisis — AgentMarketCap:{" "}
+                  MCP&apos;s Context Bloat Crisis — AgentMarketCap:{' '}
                   <a
                     href="https://agentmarketcap.ai/blog/2026/04/08/mcp-context-bloat-enterprise-scale-tool-definitions-agent-context-budget"
                     target="_blank"
@@ -2587,7 +2589,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  MCP Context Bloat Fix 2026 (Tool Search) — MCP.Directory:{" "}
+                  MCP Context Bloat Fix 2026 (Tool Search) — MCP.Directory:{' '}
                   <a
                     href="https://mcp.directory/blog/mcp-context-bloat-fix-2026-tool-search-code-mode-progressive-disclosure"
                     target="_blank"
@@ -2597,7 +2599,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  How to Reduce the Number of MCP Tools Claude Loads — Start Debugging:{" "}
+                  How to Reduce the Number of MCP Tools Claude Loads — Start Debugging:{' '}
                   <a
                     href="https://startdebugging.net/2026/05/how-to-reduce-the-number-of-mcp-tools-claude-loads/"
                     target="_blank"
@@ -2607,7 +2609,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  10 strategies to reduce MCP token bloat — The New Stack:{" "}
+                  10 strategies to reduce MCP token bloat — The New Stack:{' '}
                   <a
                     href="https://thenewstack.io/how-to-reduce-mcp-token-bloat/"
                     target="_blank"
@@ -2617,7 +2619,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  Thousands of MCP Tools, Zero Context Left — AgentPMT:{" "}
+                  Thousands of MCP Tools, Zero Context Left — AgentPMT:{' '}
                   <a
                     href="https://www.agentpmt.com/articles/thousands-of-mcp-tools-zero-context-left-the-bloat-tax-breaking-ai-agents"
                     target="_blank"
@@ -2636,11 +2638,11 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.chapterNumber}
                 style={{
-                  border: "1px solid rgba(79, 216, 196, 0.35)",
-                  background: "rgba(79, 216, 196, 0.12)",
-                  padding: "4px 10px",
-                  borderRadius: "8px",
-                  marginRight: "12px",
+                  border: '1px solid rgba(79, 216, 196, 0.35)',
+                  background: 'rgba(79, 216, 196, 0.12)',
+                  padding: '4px 10px',
+                  borderRadius: '8px',
+                  marginRight: '12px',
                 }}
               >
                 08
@@ -2667,10 +2669,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 8.1
@@ -2734,10 +2736,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 8.2
@@ -2747,7 +2749,7 @@ export default function McpBestPracticesIntermediatePage() {
             <div className={styles.diagramFrame}>
               <div
                 className={styles.codeBar}
-                style={{ borderBottom: "none", background: "none", padding: "0 0 10px 0" }}
+                style={{ borderBottom: 'none', background: 'none', padding: '0 0 10px 0' }}
               >
                 Fig. 8-1 — OAuth 2.1認可コードフロー（PKCE）
               </div>
@@ -2760,10 +2762,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 8.3
@@ -2841,10 +2843,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 8.4
@@ -2853,41 +2855,41 @@ export default function McpBestPracticesIntermediatePage() {
             </h3>
             <ol
               style={{
-                paddingLeft: "20px",
-                color: "var(--color-text-secondary, #aeb2bd)",
-                margin: "0 0 16px",
+                paddingLeft: '20px',
+                color: 'var(--color-text-secondary, #aeb2bd)',
+                margin: '0 0 16px',
               }}
             >
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>トークン検証は自作しない：</b>
                 署名検証・スコープ判定などのロジックは、成熟した検証済みライブラリに任せる。MCP公式ドキュメントも「専門家でない限り自作するな」と明記しています。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>短命なアクセストークンを使う：</b>
                 長命トークンは、盗まれた場合の被害期間が長くなります。リフレッシュトークンと組み合わせ、短寿命を基本とします。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>audience（対象者）を必ず検証する：</b>
                 自分のサーバー宛てに発行されたトークンかどうかをResource
                 Indicatorsで確認し、他サーバー用トークンの使い回しを拒否します。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>realm/テナントを分離する：</b>
                 マルチテナント運用でない限り、1つの認可レルムに固定し、同一の認可サーバー内であっても他レルムのトークンは拒否します。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>DCRを有効にする場合は統制をかける：</b>
                 無制限の匿名登録を許可せず、信頼できるホストの許可リストや審査プロセスを設ける。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>機微情報をログに残さない：</b>
                 アクセストークン・認可コード・シークレット・Authorizationヘッダーの内容はログに出力しない。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>JWTのローカル検証とトークンイントロスペクションを使い分ける：</b>
                 通常の読み取り系ツールは署名検証+短いTTLのJWKSキャッシュで十分ですが、書き込み・PII・金銭取引を伴う高セキュリティなツールでは、即時失効が反映できるイントロスペクション方式を検討します。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>ローカル（stdio）サーバーの認証：</b>
                 stdioはOSレベルの信頼境界内で動作するため、環境変数や外部ライブラリが提供する資格情報を使うのが一般的です。OAuthはリモートのHTTPベーストランスポート向けの設計であることを理解しておきます。
               </li>
@@ -2897,10 +2899,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 8.5
@@ -2916,7 +2918,7 @@ export default function McpBestPracticesIntermediatePage() {
               <summary>参考資料（10件）</summary>
               <ul>
                 <li>
-                  Understanding Authorization in MCP（MCP公式）:{" "}
+                  Understanding Authorization in MCP（MCP公式）:{' '}
                   <a
                     href="https://modelcontextprotocol.io/docs/tutorials/security/authorization"
                     target="_blank"
@@ -2926,7 +2928,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  MCP security: Implementing robust authentication and authorization — Red Hat:{" "}
+                  MCP security: Implementing robust authentication and authorization — Red Hat:{' '}
                   <a
                     href="https://www.redhat.com/en/blog/mcp-security-implementing-robust-authentication-and-authorization"
                     target="_blank"
@@ -2936,7 +2938,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  MCP Server Security: Auth Best Practices 2026:{" "}
+                  MCP Server Security: Auth Best Practices 2026:{' '}
                   <a
                     href="https://medium.com/data-science-collective/why-your-mcp-server-is-a-security-disaster-waiting-to-happen-660577d8077c"
                     target="_blank"
@@ -2946,7 +2948,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  MCP OAuth 2.1 Authentication: Complete Developer Guide 2026 — RockB:{" "}
+                  MCP OAuth 2.1 Authentication: Complete Developer Guide 2026 — RockB:{' '}
                   <a
                     href="https://baeseokjae.github.io/posts/mcp-oauth-authentication-guide-2026/"
                     target="_blank"
@@ -2956,7 +2958,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  How MCP Authentication Works: Authorization, OAuth & Security — Obot:{" "}
+                  How MCP Authentication Works: Authorization, OAuth & Security — Obot:{' '}
                   <a
                     href="https://obot.ai/resources/learning-center/mcp-authentication/"
                     target="_blank"
@@ -2966,7 +2968,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  How to Secure MCP Servers (2026 Guide):{" "}
+                  How to Secure MCP Servers (2026 Guide):{' '}
                   <a
                     href="https://codersera.com/blog/how-to-secure-mcp-servers-2026/"
                     target="_blank"
@@ -2976,7 +2978,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  The New MCP Authorization Specification:{" "}
+                  The New MCP Authorization Specification:{' '}
                   <a
                     href="https://dasroot.net/posts/2026/04/mcp-authorization-specification-oauth-2-1-resource-indicators/"
                     target="_blank"
@@ -2986,7 +2988,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  MCP Server Security Best Practices to Prevent Risk — Descope:{" "}
+                  MCP Server Security Best Practices to Prevent Risk — Descope:{' '}
                   <a
                     href="https://www.descope.com/blog/post/mcp-server-security-best-practices"
                     target="_blank"
@@ -2996,7 +2998,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  MCP server authentication in 2026: what practitioners need to know:{" "}
+                  MCP server authentication in 2026: what practitioners need to know:{' '}
                   <a
                     href="https://nhimg.org/articles/mcp-server-authentication-in-2026-what-practitioners-need-to-know/"
                     target="_blank"
@@ -3006,7 +3008,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  The best providers for MCP server authentication in 2026 — WorkOS:{" "}
+                  The best providers for MCP server authentication in 2026 — WorkOS:{' '}
                   <a
                     href="https://workos.com/blog/best-mcp-server-authentication-providers"
                     target="_blank"
@@ -3025,11 +3027,11 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.chapterNumber}
                 style={{
-                  border: "1px solid rgba(79, 216, 196, 0.35)",
-                  background: "rgba(79, 216, 196, 0.12)",
-                  padding: "4px 10px",
-                  borderRadius: "8px",
-                  marginRight: "12px",
+                  border: '1px solid rgba(79, 216, 196, 0.35)',
+                  background: 'rgba(79, 216, 196, 0.12)',
+                  padding: '4px 10px',
+                  borderRadius: '8px',
+                  marginRight: '12px',
                 }}
               >
                 09
@@ -3049,10 +3051,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 9.1
@@ -3067,7 +3069,7 @@ export default function McpBestPracticesIntermediatePage() {
             <div className={styles.diagramFrame}>
               <div
                 className={styles.codeBar}
-                style={{ borderBottom: "none", background: "none", padding: "0 0 10px 0" }}
+                style={{ borderBottom: 'none', background: 'none', padding: '0 0 10px 0' }}
               >
                 Fig. 9-1 — Tool Poisoning攻撃の仕組み
               </div>
@@ -3093,10 +3095,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 9.2
@@ -3180,10 +3182,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 9.3
@@ -3192,32 +3194,32 @@ export default function McpBestPracticesIntermediatePage() {
             </h3>
             <ol
               style={{
-                paddingLeft: "20px",
-                color: "var(--color-text-secondary, #aeb2bd)",
-                margin: "0 0 16px",
+                paddingLeft: '20px',
+                color: 'var(--color-text-secondary, #aeb2bd)',
+                margin: '0 0 16px',
               }}
             >
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>信頼境界を明示的に設計する：</b>
                 「内部ツール」と「外部・未検証サーバーのツール」を同一の権限レベルで扱わない。外部サーバーからの応答が、内部の高権限ツール呼び出しを誘発できないようにアーキテクチャで分離します。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>許可リスト運用を徹底する：</b>
                 ユーザーが任意のMCPサーバーへ自由に接続できる状態を避け、事前に審査・承認したサーバーのみ接続可能にします。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>破壊的操作の前には必ず人間の確認を挟む：</b>
                 Elicitationプリミティブや明示的な承認ダイアログを使い、LLMコンテキスト外で（=プロンプトインジェクションで迂回できない経路で）承認を得ます。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>構造化出力を要求する：</b>
                 可能な限り、ツールの応答は自由形式テキストではなく固定スキーマのJSONを要求し、想定と異なる形状の応答は拒否します。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>ランタイム監査を行う：</b>
                 すべてのツール呼び出しをログに記録し、「機密データへの予期しないアクセス」「エラー直後に発生する不審な連続ツール呼び出し」などの異常パターンを監視します。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>供給網（サプライチェーン）セキュリティ：</b>
                 サードパーティ製MCPサーバーは、依存関係の透明性やコード署名の有無を確認し、信頼できる供給元からのみ導入します。
               </li>
@@ -3226,7 +3228,7 @@ export default function McpBestPracticesIntermediatePage() {
             <div className={styles.diagramFrame}>
               <div
                 className={styles.codeBar}
-                style={{ borderBottom: "none", background: "none", padding: "0 0 10px 0" }}
+                style={{ borderBottom: 'none', background: 'none', padding: '0 0 10px 0' }}
               >
                 Fig. 9-2 — 外部サーバー応答に対する防御フロー
               </div>
@@ -3239,160 +3241,160 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 9.4
               </span>
               実務チェックリスト
             </h3>
-            <ul style={{ listStyleType: "none", paddingLeft: "0px", margin: "20px 0" }}>
+            <ul style={{ listStyleType: 'none', paddingLeft: '0px', margin: '20px 0' }}>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>接続可能なMCPサーバーの許可リストを運用しているか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>ツール定義のバージョン変更（Rug Pull）を検知する仕組みがあるか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>ツール応答を「信頼できないデータ」として扱い、構造検証をしているか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>破壊的操作にはLLMコンテキスト外の承認フローを設けているか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>SSRF対策としてプライベートIPレンジへのアウトバウンド制御をしているか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>すべてのツール呼び出しを監査ログに記録し、異常検知の仕組みがあるか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>
@@ -3405,7 +3407,7 @@ export default function McpBestPracticesIntermediatePage() {
               <summary>参考資料（10件）</summary>
               <ul>
                 <li>
-                  MCP Tool Poisoning — OWASP Foundation:{" "}
+                  MCP Tool Poisoning — OWASP Foundation:{' '}
                   <a
                     href="https://owasp.org/www-community/attacks/MCP_Tool_Poisoning"
                     target="_blank"
@@ -3416,7 +3418,7 @@ export default function McpBestPracticesIntermediatePage() {
                 </li>
                 <li>
                   MCP Security Vulnerabilities: How to Prevent Prompt Injection and Tool Poisoning
-                  Attacks in 2026 — Practical DevSecOps:{" "}
+                  Attacks in 2026 — Practical DevSecOps:{' '}
                   <a
                     href="https://www.practical-devsecops.com/mcp-security-vulnerabilities/"
                     target="_blank"
@@ -3426,7 +3428,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  Understanding MCP Tool Poisoning Attacks — Descope:{" "}
+                  Understanding MCP Tool Poisoning Attacks — Descope:{' '}
                   <a
                     href="https://www.descope.com/learn/post/mcp-tool-poisoning"
                     target="_blank"
@@ -3437,7 +3439,7 @@ export default function McpBestPracticesIntermediatePage() {
                 </li>
                 <li>
                   Protecting against indirect prompt injection attacks in MCP — Microsoft for
-                  Developers:{" "}
+                  Developers:{' '}
                   <a
                     href="https://developer.microsoft.com/blog/protecting-against-indirect-injection-attacks-mcp"
                     target="_blank"
@@ -3447,7 +3449,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  Prompt injection in MCP: how tool poisoning works — Aptible:{" "}
+                  Prompt injection in MCP: how tool poisoning works — Aptible:{' '}
                   <a
                     href="https://www.aptible.com/mcp-security/mcp-prompt-injection"
                     target="_blank"
@@ -3457,7 +3459,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  MCP Tool Poisoning - How It Works & How To Fight It — MCP Manager:{" "}
+                  MCP Tool Poisoning - How It Works & How To Fight It — MCP Manager:{' '}
                   <a
                     href="https://mcpmanager.ai/blog/tool-poisoning/"
                     target="_blank"
@@ -3467,7 +3469,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  Model Context Protocol Threat Modeling（MCPTox学術研究）:{" "}
+                  Model Context Protocol Threat Modeling（MCPTox学術研究）:{' '}
                   <a
                     href="https://arxiv.org/html/2603.22489v1"
                     target="_blank"
@@ -3477,7 +3479,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  Poison everywhere: No output from your MCP server is safe — CyberArk:{" "}
+                  Poison everywhere: No output from your MCP server is safe — CyberArk:{' '}
                   <a
                     href="https://www.cyberark.com/resources/threat-research-blog/poison-everywhere-no-output-from-your-mcp-server-is-safe"
                     target="_blank"
@@ -3488,7 +3490,7 @@ export default function McpBestPracticesIntermediatePage() {
                 </li>
                 <li>
                   MCP security: How to prevent prompt injection and tool poisoning attacks —
-                  Security Boulevard:{" "}
+                  Security Boulevard:{' '}
                   <a
                     href="https://securityboulevard.com/2026/01/mcp-security-how-to-prevent-prompt-injection-and-tool-poisoning-attacks/"
                     target="_blank"
@@ -3498,7 +3500,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  MCP Security: How to Stop Prompt Injection Attacks — Datadome:{" "}
+                  MCP Security: How to Stop Prompt Injection Attacks — Datadome:{' '}
                   <a
                     href="https://datadome.co/agent-trust-management/mcp-security-prompt-injection-prevention/"
                     target="_blank"
@@ -3517,11 +3519,11 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.chapterNumber}
                 style={{
-                  border: "1px solid rgba(79, 216, 196, 0.35)",
-                  background: "rgba(79, 216, 196, 0.12)",
-                  padding: "4px 10px",
-                  borderRadius: "8px",
-                  marginRight: "12px",
+                  border: '1px solid rgba(79, 216, 196, 0.35)',
+                  background: 'rgba(79, 216, 196, 0.12)',
+                  padding: '4px 10px',
+                  borderRadius: '8px',
+                  marginRight: '12px',
                 }}
               >
                 10
@@ -3530,7 +3532,7 @@ export default function McpBestPracticesIntermediatePage() {
             </div>
 
             <p>
-              MCPサーバーの開発では、標準的なprintデバッグやインタラクティブデバッガがそのままでは使いにくいという特有の課題があります。stdioトランスポートでは標準出力がプロトコルメッセージ専用のため、通常のログ出力すら破壊的な影響を及ぼしうるからです。この課題を解決するのが公式ツール{" "}
+              MCPサーバーの開発では、標準的なprintデバッグやインタラクティブデバッガがそのままでは使いにくいという特有の課題があります。stdioトランスポートでは標準出力がプロトコルメッセージ専用のため、通常のログ出力すら破壊的な影響を及ぼしうるからです。この課題を解決するのが公式ツール{' '}
               <b>MCP Inspector</b> です。
             </p>
 
@@ -3538,10 +3540,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 10.1
@@ -3607,7 +3609,7 @@ export default function McpBestPracticesIntermediatePage() {
             </div>
 
             <p>
-              起動すると、既定で <code>http://localhost:6274</code> にWeb UIが立ち上がり、プロキシは{" "}
+              起動すると、既定で <code>http://localhost:6274</code> にWeb UIが立ち上がり、プロキシは{' '}
               <code>http://localhost:6277</code> で待ち受けます。両者は既定で<code>localhost</code>
               のみにバインドされ、ネットワーク外部からのアクセスは遮断されます（開発目的で全インターフェースにバインドする場合は
               <code>HOST</code>
@@ -3618,10 +3620,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 10.2
@@ -3631,7 +3633,7 @@ export default function McpBestPracticesIntermediatePage() {
             <div className={styles.diagramFrame}>
               <div
                 className={styles.codeBar}
-                style={{ borderBottom: "none", background: "none", padding: "0 0 10px 0" }}
+                style={{ borderBottom: 'none', background: 'none', padding: '0 0 10px 0' }}
               >
                 Fig. 10-1 — MCP Inspectorを用いた開発ループ
               </div>
@@ -3644,10 +3646,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 10.3
@@ -3659,21 +3661,21 @@ export default function McpBestPracticesIntermediatePage() {
             </p>
             <ol
               style={{
-                paddingLeft: "20px",
-                color: "var(--color-text-secondary, #aeb2bd)",
-                margin: "0 0 16px",
+                paddingLeft: '20px',
+                color: 'var(--color-text-secondary, #aeb2bd)',
+                margin: '0 0 16px',
               }}
             >
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>インタラクティブテスト（MCP Inspector）：</b>
                 開発中の即時フィードバックに使う。ホストアプリケーション（Claude
                 Desktopなど）を介さずに、プロトコルの生の挙動を直接確認できる。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>自動化された単体・結合テスト：</b>
                 SDKが提供するインメモリトランスポートを使い、CI環境でも実行できるクライアント・サーバーのペアを構築する。stdioをサブプロセスとして起動しメッセージをやり取りする方式でもよい。テストフレームワークはpytestやJest/Vitestなど通常のものを利用できる。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>本番相当環境での結合テスト：</b>
                 Inspector上で動いてもホストアプリ経由の実運用で失敗するケースの大半は、トランスポートや認証まわりに起因します。ロードバランサーやプロキシを経由する本番同等の経路まで含めて検証することが重要です。
               </li>
@@ -3683,10 +3685,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 10.4
@@ -3740,7 +3742,7 @@ export default function McpBestPracticesIntermediatePage() {
               <summary>参考資料（7件）</summary>
               <ul>
                 <li>
-                  MCP Inspector（MCP公式ドキュメント）:{" "}
+                  MCP Inspector（MCP公式ドキュメント）:{' '}
                   <a
                     href="https://modelcontextprotocol.io/docs/tools/inspector"
                     target="_blank"
@@ -3750,7 +3752,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  GitHub - modelcontextprotocol/inspector:{" "}
+                  GitHub - modelcontextprotocol/inspector:{' '}
                   <a
                     href="https://github.com/modelcontextprotocol/inspector"
                     target="_blank"
@@ -3760,7 +3762,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  MCP Inspector – Testing and Debugging for MCP Servers — Stainless:{" "}
+                  MCP Inspector – Testing and Debugging for MCP Servers — Stainless:{' '}
                   <a
                     href="https://www.stainless.com/mcp/mcp-inspector-testing-and-debugging-mcp-servers/"
                     target="_blank"
@@ -3770,7 +3772,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  Error Handling And Debugging MCP Servers — Stainless:{" "}
+                  Error Handling And Debugging MCP Servers — Stainless:{' '}
                   <a
                     href="https://www.stainless.com/mcp/error-handling-and-debugging-mcp-servers/"
                     target="_blank"
@@ -3780,7 +3782,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  Testing & Debugging MCP Servers (Inspector Tools Guide) — MCP Server Spot:{" "}
+                  Testing & Debugging MCP Servers (Inspector Tools Guide) — MCP Server Spot:{' '}
                   <a
                     href="https://www.mcpserverspot.com/learn/building/testing-debugging-mcp"
                     target="_blank"
@@ -3790,7 +3792,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  Debugging | MCP Framework:{" "}
+                  Debugging | MCP Framework:{' '}
                   <a
                     href="https://www.mcp-framework.com/docs/debugging"
                     target="_blank"
@@ -3801,7 +3803,7 @@ export default function McpBestPracticesIntermediatePage() {
                 </li>
                 <li>
                   Debugging Model Context Protocol (MCP) Servers: Tips and Best Practices —
-                  mcpevals.io:{" "}
+                  mcpevals.io:{' '}
                   <a
                     href="https://www.mcpevals.io/blog/debugging-mcp-servers-tips-and-best-practices"
                     target="_blank"
@@ -3820,11 +3822,11 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.chapterNumber}
                 style={{
-                  border: "1px solid rgba(79, 216, 196, 0.35)",
-                  background: "rgba(79, 216, 196, 0.12)",
-                  padding: "4px 10px",
-                  borderRadius: "8px",
-                  marginRight: "12px",
+                  border: '1px solid rgba(79, 216, 196, 0.35)',
+                  background: 'rgba(79, 216, 196, 0.12)',
+                  padding: '4px 10px',
+                  borderRadius: '8px',
+                  marginRight: '12px',
                 }}
               >
                 11
@@ -3841,10 +3843,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 11.1
@@ -3909,7 +3911,7 @@ export default function McpBestPracticesIntermediatePage() {
             <div className={styles.diagramFrame}>
               <div
                 className={styles.codeBar}
-                style={{ borderBottom: "none", background: "none", padding: "0 0 10px 0" }}
+                style={{ borderBottom: 'none', background: 'none', padding: '0 0 10px 0' }}
               >
                 Fig. 11-1 — MCP Gateway アーキテクチャ
               </div>
@@ -3922,10 +3924,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 11.2
@@ -3977,13 +3979,13 @@ export default function McpBestPracticesIntermediatePage() {
             <div
               className={styles.notice}
               style={{
-                borderLeftColor: "var(--color-text-info, #7bb8ea)",
-                background: "rgba(123, 184, 234, 0.08)",
+                borderLeftColor: 'var(--color-text-info, #7bb8ea)',
+                background: 'rgba(123, 184, 234, 0.08)',
               }}
             >
               <i
                 className="ti ti-info-circle"
-                style={{ color: "var(--color-text-info, #7bb8ea)" }}
+                style={{ color: 'var(--color-text-info, #7bb8ea)' }}
               />
               <div>
                 セキュリティの観点からは、クライアントのトークンをそのまま下流へ転送する「Token
@@ -3996,10 +3998,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 11.3
@@ -4011,16 +4013,16 @@ export default function McpBestPracticesIntermediatePage() {
             </p>
             <ul
               style={{
-                listStyleType: "disc",
-                paddingLeft: "20px",
-                color: "var(--color-text-secondary, #aeb2bd)",
-                margin: "0 0 16px",
+                listStyleType: 'disc',
+                paddingLeft: '20px',
+                color: 'var(--color-text-secondary, #aeb2bd)',
+                margin: '0 0 16px',
               }}
             >
-              <li style={{ marginBottom: "8px" }}>どのエージェント（身元）が</li>
-              <li style={{ marginBottom: "8px" }}>どのツールを</li>
-              <li style={{ marginBottom: "8px" }}>どのパラメータで呼び出し</li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>どのエージェント（身元）が</li>
+              <li style={{ marginBottom: '8px' }}>どのツールを</li>
+              <li style={{ marginBottom: '8px' }}>どのパラメータで呼び出し</li>
+              <li style={{ marginBottom: '8px' }}>
                 いつ、どのような結果（成功/失敗、レイテンシ）になったか
               </li>
             </ul>
@@ -4032,10 +4034,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 11.4
@@ -4044,24 +4046,24 @@ export default function McpBestPracticesIntermediatePage() {
             </h3>
             <ol
               style={{
-                paddingLeft: "20px",
-                color: "var(--color-text-secondary, #aeb2bd)",
-                margin: "0 0 16px",
+                paddingLeft: '20px',
+                color: 'var(--color-text-secondary, #aeb2bd)',
+                margin: '0 0 16px',
               }}
             >
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>アクセス制御の粒度：</b>
                 サーバー単位だけでなく、ツール単位・パラメータ単位でのポリシー適用ができるか
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>監査証跡の完全性：</b>改ざん不能な監査ログがあるか、コンプライアンス要件（SOC
                 2等）を満たせるか
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>エコシステム統合：</b>
                 既存のIdP、既存の可観測性基盤（OpenTelemetry対応等）とスムーズに連携できるか
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>オープンソース vs マネージドサービス：</b>
                 完全なデータ主権を求めるなら自己ホスト型（例: IBM ContextForge, Docker MCP
                 Gateway）、迅速な導入を求めるならマネージドSaaS（例: MintMCP, WorkOS）を検討する
@@ -4072,7 +4074,7 @@ export default function McpBestPracticesIntermediatePage() {
               <summary>参考資料（10件）</summary>
               <ul>
                 <li>
-                  MCP Gateway: What It Is, Top Options — OpenObserve:{" "}
+                  MCP Gateway: What It Is, Top Options — OpenObserve:{' '}
                   <a
                     href="https://openobserve.ai/blog/mcp-gateway-guide/"
                     target="_blank"
@@ -4082,7 +4084,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  7 top MCP gateways for enterprise AI infrastructure – 2026 — MintMCP:{" "}
+                  7 top MCP gateways for enterprise AI infrastructure – 2026 — MintMCP:{' '}
                   <a
                     href="https://www.mintmcp.com/blog/enterprise-ai-infrastructure-mcp"
                     target="_blank"
@@ -4092,7 +4094,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  12 Best MCP Gateways for Engineering Teams (2026) — MCP Manager:{" "}
+                  12 Best MCP Gateways for Engineering Teams (2026) — MCP Manager:{' '}
                   <a
                     href="https://mcpmanager.ai/blog/best-mcp-gateway-for-engineering/"
                     target="_blank"
@@ -4102,7 +4104,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  10 Best MCP Gateways In 2026 — TrueFoundry:{" "}
+                  10 Best MCP Gateways In 2026 — TrueFoundry:{' '}
                   <a
                     href="https://www.truefoundry.com/blog/best-mcp-gateways"
                     target="_blank"
@@ -4112,7 +4114,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  Best MCP Gateways and AI Agent Security Tools (2026) — Integrate.io:{" "}
+                  Best MCP Gateways and AI Agent Security Tools (2026) — Integrate.io:{' '}
                   <a
                     href="https://www.integrate.io/blog/best-mcp-gateways-and-ai-agent-security-tools/"
                     target="_blank"
@@ -4122,7 +4124,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  10 Best MCP Gateways for Developers in 2026 — Composio:{" "}
+                  10 Best MCP Gateways for Developers in 2026 — Composio:{' '}
                   <a
                     href="https://composio.dev/content/best-mcp-gateway-for-developers"
                     target="_blank"
@@ -4132,7 +4134,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  Best Open Source MCP Gateways 2026 — Lunar.dev:{" "}
+                  Best Open Source MCP Gateways 2026 — Lunar.dev:{' '}
                   <a
                     href="https://www.lunar.dev/post/the-best-open-source-mcp-gateways-in-2026"
                     target="_blank"
@@ -4142,7 +4144,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  What Is an MCP Gateway? Why Every Enterprise AI Deployment Needs One:{" "}
+                  What Is an MCP Gateway? Why Every Enterprise AI Deployment Needs One:{' '}
                   <a
                     href="https://silentinfotech.com/blog/ai-9/mcp-gateway-every-enterprise-ai-deployment-needs-536"
                     target="_blank"
@@ -4152,7 +4154,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  MCP Gateway: The Control Plane for Enterprise AI Agents — Tyk:{" "}
+                  MCP Gateway: The Control Plane for Enterprise AI Agents — Tyk:{' '}
                   <a
                     href="https://tyk.io/learning-center/mcp-gateway-architecture-technical-guide/"
                     target="_blank"
@@ -4162,7 +4164,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  Best MCP Gateways for SOC 2 Compliant Organizations 2026 — MintMCP:{" "}
+                  Best MCP Gateways for SOC 2 Compliant Organizations 2026 — MintMCP:{' '}
                   <a
                     href="https://www.mintmcp.com/blog/mcp-gateways-soc2-compliant-organizations"
                     target="_blank"
@@ -4181,11 +4183,11 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.chapterNumber}
                 style={{
-                  border: "1px solid rgba(79, 216, 196, 0.35)",
-                  background: "rgba(79, 216, 196, 0.12)",
-                  padding: "4px 10px",
-                  borderRadius: "8px",
-                  marginRight: "12px",
+                  border: '1px solid rgba(79, 216, 196, 0.35)',
+                  background: 'rgba(79, 216, 196, 0.12)',
+                  padding: '4px 10px',
+                  borderRadius: '8px',
+                  marginRight: '12px',
                 }}
               >
                 12
@@ -4203,10 +4205,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 12.1
@@ -4267,10 +4269,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 12.2
@@ -4279,27 +4281,27 @@ export default function McpBestPracticesIntermediatePage() {
             </h3>
             <ul
               style={{
-                listStyleType: "disc",
-                paddingLeft: "20px",
-                color: "var(--color-text-secondary, #aeb2bd)",
-                margin: "0 0 16px",
+                listStyleType: 'disc',
+                paddingLeft: '20px',
+                color: 'var(--color-text-secondary, #aeb2bd)',
+                margin: '0 0 16px',
               }}
             >
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>Feature Lifecycle Policy：</b>すべての機能に Active → Deprecated → Removed
                 の3段階のライフサイクルが定義され、廃止（Deprecated）から削除（Removed）までに最低12か月の猶予期間が設けられます。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>Extensions Framework：</b>新機能は逆引きDNS形式 of
                 IDを持つ拡張として、コア仕様とは独立したリポジトリ・独立したバージョニングでリリースされます。実験的機能から公式ステータスへ進むための「Extensions
                 Track」が新設されました。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>Conformance Suite：</b>Standard Track
                 SEPは、対応するシナリオが適合性スイートに実装されるまでFinalステータスに到達できなくなり、SDK
                 Tierシステムとも連動します。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>SEPレビューの委任モデル：</b>
                 これまで全てのSEPがコアメンテナーの全面レビューを必要としていたボトルネックを解消するため、信頼されたWorking
                 Groupが自領域のSEPを承認できる委任モデルの導入が計画されています。
@@ -4310,10 +4312,10 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.h3Num}
                 style={{
-                  color: "var(--color-text-info, #7bb8ea)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "15px",
-                  marginRight: "8px",
+                  color: 'var(--color-text-info, #7bb8ea)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  marginRight: '8px',
                 }}
               >
                 12.3
@@ -4322,21 +4324,21 @@ export default function McpBestPracticesIntermediatePage() {
             </h3>
             <ol
               style={{
-                paddingLeft: "20px",
-                color: "var(--color-text-secondary, #aeb2bd)",
-                margin: "0 0 16px",
+                paddingLeft: '20px',
+                color: 'var(--color-text-secondary, #aeb2bd)',
+                margin: '0 0 16px',
               }}
             >
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>ステートレス化を見越したサーバー設計にしておく：</b>
                 セッションIDに依存したステートフルな実装は、今後アプリケーションレベルでの明示的なハンドル管理（
                 <code>basket_id</code>等）へ置き換えていく方針を検討する。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>MCP Apps拡張の動向を注視する：</b>サーバーがインタラクティブなHTML
                 UIをサンドボックス化されたiframe内で提供できるようになるため、UIを伴うツール体験を計画している場合は仕様策定を追う。
               </li>
-              <li style={{ marginBottom: "8px" }}>
+              <li style={{ marginBottom: '8px' }}>
                 <b>Deprecatedタグが付いた機能は計画的に移行する：</b>
                 最低12か月の猶予があるとはいえ、削除が確定してから移行に着手するのではなく、Deprecated化された時点で移行計画を立てる。
               </li>
@@ -4346,7 +4348,7 @@ export default function McpBestPracticesIntermediatePage() {
               <summary>参考資料（4件）</summary>
               <ul>
                 <li>
-                  The 2026 MCP Roadmap（MCP公式ブログ）:{" "}
+                  The 2026 MCP Roadmap（MCP公式ブログ）:{' '}
                   <a
                     href="https://blog.modelcontextprotocol.io/posts/2026-mcp-roadmap/"
                     target="_blank"
@@ -4356,7 +4358,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  The 2026-07-28 MCP Specification Release Candidate:{" "}
+                  The 2026-07-28 MCP Specification Release Candidate:{' '}
                   <a
                     href="https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate/"
                     target="_blank"
@@ -4366,7 +4368,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  Model Context Protocol Blog:{" "}
+                  Model Context Protocol Blog:{' '}
                   <a
                     href="https://blog.modelcontextprotocol.io/"
                     target="_blank"
@@ -4376,7 +4378,7 @@ export default function McpBestPracticesIntermediatePage() {
                   </a>
                 </li>
                 <li>
-                  Model Context Protocol - Wikipedia（ガバナンス・普及動向）:{" "}
+                  Model Context Protocol - Wikipedia（ガバナンス・普及動向）:{' '}
                   <a
                     href="https://en.wikipedia.org/wiki/Model_Context_Protocol"
                     target="_blank"
@@ -4395,11 +4397,11 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.chapterNumber}
                 style={{
-                  border: "1px solid rgba(79, 216, 196, 0.35)",
-                  background: "rgba(79, 216, 196, 0.12)",
-                  padding: "4px 10px",
-                  borderRadius: "8px",
-                  marginRight: "12px",
+                  border: '1px solid rgba(79, 216, 196, 0.35)',
+                  background: 'rgba(79, 216, 196, 0.12)',
+                  padding: '4px 10px',
+                  borderRadius: '8px',
+                  marginRight: '12px',
                 }}
               >
                 13
@@ -4412,81 +4414,81 @@ export default function McpBestPracticesIntermediatePage() {
             <h3>
               <span
                 style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "10.5px",
-                  background: "rgba(79,184,234,0.12)",
-                  border: "1px solid rgba(79,184,234,0.3)",
-                  color: "#7bb8ea",
-                  padding: "2px 10px",
-                  borderRadius: "5px",
-                  marginRight: "10px",
-                  verticalAlign: "middle",
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '10.5px',
+                  background: 'rgba(79,184,234,0.12)',
+                  border: '1px solid rgba(79,184,234,0.3)',
+                  color: '#7bb8ea',
+                  padding: '2px 10px',
+                  borderRadius: '5px',
+                  marginRight: '10px',
+                  verticalAlign: 'middle',
                   fontWeight: 500,
                 }}
               >
                 設計
               </span>
             </h3>
-            <ul style={{ listStyleType: "none", paddingLeft: "0px", margin: "20px 0" }}>
+            <ul style={{ listStyleType: 'none', paddingLeft: '0px', margin: '20px 0' }}>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>Host/Client/Serverの責務が明確に分離されているか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>プロトコルバージョンの互換性マトリクスを文書化しているか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>
@@ -4495,21 +4497,21 @@ export default function McpBestPracticesIntermediatePage() {
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>Tools/Resources/Promptsの境界を正しく使い分けているか</span>
@@ -4519,60 +4521,60 @@ export default function McpBestPracticesIntermediatePage() {
             <h3>
               <span
                 style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "10.5px",
-                  background: "rgba(79,184,234,0.12)",
-                  border: "1px solid rgba(79,184,234,0.3)",
-                  color: "#7bb8ea",
-                  padding: "2px 10px",
-                  borderRadius: "5px",
-                  marginRight: "10px",
-                  verticalAlign: "middle",
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '10.5px',
+                  background: 'rgba(79,184,234,0.12)',
+                  border: '1px solid rgba(79,184,234,0.3)',
+                  color: '#7bb8ea',
+                  padding: '2px 10px',
+                  borderRadius: '5px',
+                  marginRight: '10px',
+                  verticalAlign: 'middle',
                   fontWeight: 500,
                 }}
               >
                 ツール実装
               </span>
             </h3>
-            <ul style={{ listStyleType: "none", paddingLeft: "0px", margin: "20px 0" }}>
+            <ul style={{ listStyleType: 'none', paddingLeft: '0px', margin: '20px 0' }}>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>ツール名にドメインの名前空間プレフィックスを付けているか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>
@@ -4581,84 +4583,84 @@ export default function McpBestPracticesIntermediatePage() {
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>レスポンスに人間が読める文脈を含めているか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>ページネーション・フィルタ・詳細度指定でトークン消費を抑えているか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>エラーメッセージが次の行動を具体的に示しているか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>評価セット（Evaluation）を用意し定量的に改善しているか</span>
@@ -4668,60 +4670,60 @@ export default function McpBestPracticesIntermediatePage() {
             <h3>
               <span
                 style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "10.5px",
-                  background: "rgba(79,184,234,0.12)",
-                  border: "1px solid rgba(79,184,234,0.3)",
-                  color: "#7bb8ea",
-                  padding: "2px 10px",
-                  borderRadius: "5px",
-                  marginRight: "10px",
-                  verticalAlign: "middle",
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '10.5px',
+                  background: 'rgba(79,184,234,0.12)',
+                  border: '1px solid rgba(79,184,234,0.3)',
+                  color: '#7bb8ea',
+                  padding: '2px 10px',
+                  borderRadius: '5px',
+                  marginRight: '10px',
+                  verticalAlign: 'middle',
                   fontWeight: 500,
                 }}
               >
                 スケーラビリティ
               </span>
             </h3>
-            <ul style={{ listStyleType: "none", paddingLeft: "0px", margin: "20px 0" }}>
+            <ul style={{ listStyleType: 'none', paddingLeft: '0px', margin: '20px 0' }}>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>接続するMCPサーバー数を必要最小限に絞っているか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>Tool Search / Code Executionなど遅延ロードの仕組みを活用しているか</span>
@@ -4731,81 +4733,81 @@ export default function McpBestPracticesIntermediatePage() {
             <h3>
               <span
                 style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "10.5px",
-                  background: "rgba(79,184,234,0.12)",
-                  border: "1px solid rgba(79,184,234,0.3)",
-                  color: "#7bb8ea",
-                  padding: "2px 10px",
-                  borderRadius: "5px",
-                  marginRight: "10px",
-                  verticalAlign: "middle",
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '10.5px',
+                  background: 'rgba(79,184,234,0.12)',
+                  border: '1px solid rgba(79,184,234,0.3)',
+                  color: '#7bb8ea',
+                  padding: '2px 10px',
+                  borderRadius: '5px',
+                  marginRight: '10px',
+                  verticalAlign: 'middle',
                   fontWeight: 500,
                 }}
               >
                 認証・認可
               </span>
             </h3>
-            <ul style={{ listStyleType: "none", paddingLeft: "0px", margin: "20px 0" }}>
+            <ul style={{ listStyleType: 'none', paddingLeft: '0px', margin: '20px 0' }}>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>MCPサーバーをリソースサーバーとして、認可サーバーと責務分離しているか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>PKCE、Resource Indicators、短命トークンを実装しているか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>トークン検証ロジックを自作せず、検証済みライブラリを使っているか</span>
@@ -4815,102 +4817,102 @@ export default function McpBestPracticesIntermediatePage() {
             <h3>
               <span
                 style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "10.5px",
-                  background: "rgba(79,184,234,0.12)",
-                  border: "1px solid rgba(79,184,234,0.3)",
-                  color: "#7bb8ea",
-                  padding: "2px 10px",
-                  borderRadius: "5px",
-                  marginRight: "10px",
-                  verticalAlign: "middle",
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '10.5px',
+                  background: 'rgba(79,184,234,0.12)',
+                  border: '1px solid rgba(79,184,234,0.3)',
+                  color: '#7bb8ea',
+                  padding: '2px 10px',
+                  borderRadius: '5px',
+                  marginRight: '10px',
+                  verticalAlign: 'middle',
                   fontWeight: 500,
                 }}
               >
                 セキュリティ
               </span>
             </h3>
-            <ul style={{ listStyleType: "none", paddingLeft: "0px", margin: "20px 0" }}>
+            <ul style={{ listStyleType: 'none', paddingLeft: '0px', margin: '20px 0' }}>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>接続可能なMCPサーバーの許可リストを運用しているか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>ツール定義の変更（Rug Pull）を検知する仕組みがあるか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>破壊的操作の前にLLMコンテキスト外での人間承認を挟んでいるか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>SSRF・コマンドインジェクション対策を実装しているか</span>
@@ -4920,81 +4922,81 @@ export default function McpBestPracticesIntermediatePage() {
             <h3>
               <span
                 style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "10.5px",
-                  background: "rgba(79,184,234,0.12)",
-                  border: "1px solid rgba(79,184,234,0.3)",
-                  color: "#7bb8ea",
-                  padding: "2px 10px",
-                  borderRadius: "5px",
-                  marginRight: "10px",
-                  verticalAlign: "middle",
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '10.5px',
+                  background: 'rgba(79,184,234,0.12)',
+                  border: '1px solid rgba(79,184,234,0.3)',
+                  color: '#7bb8ea',
+                  padding: '2px 10px',
+                  borderRadius: '5px',
+                  marginRight: '10px',
+                  verticalAlign: 'middle',
                   fontWeight: 500,
                 }}
               >
                 テスト
               </span>
             </h3>
-            <ul style={{ listStyleType: "none", paddingLeft: "0px", margin: "20px 0" }}>
+            <ul style={{ listStyleType: 'none', paddingLeft: '0px', margin: '20px 0' }}>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>MCP Inspectorによるインタラクティブテストを開発フローに組み込んでいるか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>インメモリトランスポート等による自動テストをCIに統合しているか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>stdoutにJSON-RPC以外を出力していないか（ログはstderrのみか）</span>
@@ -5004,81 +5006,81 @@ export default function McpBestPracticesIntermediatePage() {
             <h3>
               <span
                 style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "10.5px",
-                  background: "rgba(79,184,234,0.12)",
-                  border: "1px solid rgba(79,184,234,0.3)",
-                  color: "#7bb8ea",
-                  padding: "2px 10px",
-                  borderRadius: "5px",
-                  marginRight: "10px",
-                  verticalAlign: "middle",
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '10.5px',
+                  background: 'rgba(79,184,234,0.12)',
+                  border: '1px solid rgba(79,184,234,0.3)',
+                  color: '#7bb8ea',
+                  padding: '2px 10px',
+                  borderRadius: '5px',
+                  marginRight: '10px',
+                  verticalAlign: 'middle',
                   fontWeight: 500,
                 }}
               >
                 運用
               </span>
             </h3>
-            <ul style={{ listStyleType: "none", paddingLeft: "0px", margin: "20px 0" }}>
+            <ul style={{ listStyleType: 'none', paddingLeft: '0px', margin: '20px 0' }}>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>すべてのツール呼び出しを監査ログとして記録しているか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>本番規模での接続にはGatewayパターンの採用を検討したか</span>
               </li>
               <li
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-primary, #2c313c)",
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--color-border-primary, #2c313c)',
                 }}
               >
                 <span
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: '16px',
+                    height: '16px',
                     flexShrink: 0,
-                    marginTop: "3px",
-                    border: "1.5px solid var(--color-border-primary, #2c313c)",
-                    borderRadius: "4px",
+                    marginTop: '3px',
+                    border: '1.5px solid var(--color-border-primary, #2c313c)',
+                    borderRadius: '4px',
                   }}
                 ></span>
                 <span>プロトコルの非推奨機能・Deprecatedタグを継続的に監視しているか</span>
@@ -5092,11 +5094,11 @@ export default function McpBestPracticesIntermediatePage() {
               <span
                 className={styles.chapterNumber}
                 style={{
-                  border: "1px solid rgba(79, 216, 196, 0.35)",
-                  background: "rgba(79, 216, 196, 0.12)",
-                  padding: "4px 10px",
-                  borderRadius: "8px",
-                  marginRight: "12px",
+                  border: '1px solid rgba(79, 216, 196, 0.35)',
+                  background: 'rgba(79, 216, 196, 0.12)',
+                  padding: '4px 10px',
+                  borderRadius: '8px',
+                  marginRight: '12px',
                 }}
               >
                 14
@@ -6307,18 +6309,18 @@ export default function McpBestPracticesIntermediatePage() {
           </section>
 
           <footer className={styles.pageFooter}>
-            本ドキュメントはWeb検索により収集した2026年7月時点の情報を基に作成されています。MCP仕様は活発に進化しているため、実装前に必ず{" "}
+            本ドキュメントはWeb検索により収集した2026年7月時点の情報を基に作成されています。MCP仕様は活発に進化しているため、実装前に必ず{' '}
             <a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener noreferrer">
               公式サイト
-            </a>{" "}
-            および{" "}
+            </a>{' '}
+            および{' '}
             <a
               href="https://blog.modelcontextprotocol.io/"
               target="_blank"
               rel="noopener noreferrer"
             >
               公式ブログ
-            </a>{" "}
+            </a>{' '}
             で最新情報をご確認ください。
           </footer>
         </main>
