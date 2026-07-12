@@ -72,7 +72,7 @@ describe("/llm-ops/evaluation-observability - metadata", () => {
 describe("/llm-ops/evaluation-observability - page structure", () => {
   it("renders an <h1> containing 'LLM評価・ベンチマーク & オブザーバビリティ ベストプラクティスガイド(2026年版)'", () => {
     const { container } = render(<Page />);
-    const h1 = container.querySelector("h1");
+    const h1 = container.querySelector("main h1");
     expect(h1).not.toBeNull();
     expect(h1?.textContent).toContain("LLM評価・ベンチマーク & オブザーバビリティ ベストプラクティスガイド(2026年版)");
   });
