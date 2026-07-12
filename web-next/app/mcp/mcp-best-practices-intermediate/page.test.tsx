@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import PageComponent, {
   metadata as rawMetadata,
 } from "@/app/mcp/mcp-best-practices-intermediate/page";
@@ -30,7 +30,14 @@ class IntersectionObserverStub {
     // mock
   }
 }
-global.IntersectionObserver = IntersectionObserverStub as unknown as typeof IntersectionObserver;
+let _originalIntersectionObserver: typeof IntersectionObserver;
+beforeAll(() => {
+  _originalIntersectionObserver = global.IntersectionObserver;
+  global.IntersectionObserver = IntersectionObserverStub as unknown as typeof IntersectionObserver;
+});
+afterAll(() => {
+  global.IntersectionObserver = _originalIntersectionObserver;
+});
 
 const EXPECTED_SECTION_IDS = [
   "sec01",
