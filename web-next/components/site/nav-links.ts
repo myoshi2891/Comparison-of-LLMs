@@ -45,7 +45,6 @@ export const navLinks: readonly NavLink[] = [
       { name: "Self-hosted Sandboxes", href: "/claude/self-hosted-sandboxes" },
       { name: "Code Slash Commands", href: "/claude/code-slash-commands" },
       { name: "Fable 5 Best Practices", href: "/claude/fable-5-best-practices" },
-      { name: "MCP Best Practices", href: "/claude/mcp-best-practices" },
     ],
   },
   {
@@ -101,6 +100,10 @@ export const navLinks: readonly NavLink[] = [
       { name: "skills.sh Guide", href: "/claude/skills-sh" },
       { name: "Context Engineering", href: "/agent/context-engineering-best-practices" },
     ],
+  },
+  {
+    name: "MCP",
+    children: [{ name: "MCP Best Practices", href: "/mcp/mcp-best-practices" }],
   },
   {
     name: "Local LLM",
