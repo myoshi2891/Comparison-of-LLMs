@@ -312,8 +312,8 @@ export default async function Page() {
           <div className={styles.docHeader}>
             <h1>マルチモーダルAI(画像・音声生成)ベストプラクティスガイド</h1>
             <p className={styles.docSub}>
-              初学者向け・ステップバイステップ解説 / Multimodal AI (Image &amp; Audio Generation) Best
-              Practices Guide
+              初学者向け・ステップバイステップ解説 / Multimodal AI (Image &amp; Audio Generation)
+              Best Practices Guide
             </p>
             <p className={styles.docMeta}>最終更新: 2026年7月</p>
           </div>
@@ -329,8 +329,8 @@ export default async function Page() {
             <p>
               生成AI (Generative AI)
               は、2023年頃までの「テキスト生成中心」の時代から、画像・音声・動画を統合的に扱う「マルチモーダル
-              (Multimodal)」の時代へと移行しました。2026年現在、画像生成では GPT Image 2、Nano Banana
-              Pro (Gemini系)、FLUX.2、Seedream 4.5/5、Midjourney v7
+              (Multimodal)」の時代へと移行しました。2026年現在、画像生成では GPT Image 2、Nano
+              Banana Pro (Gemini系)、FLUX.2、Seedream 4.5/5、Midjourney v7
               などが実務レベルの品質に到達し、音声生成では ElevenLabs、Suno、Udio
               といったツールがナレーション・音楽制作の現場で標準的に使われるようになっています。
             </p>
@@ -343,8 +343,8 @@ export default async function Page() {
                 「なんとなく上手くいった」ではなく、次も同じ品質を出せる手順を示す
               </li>
               <li>
-                <strong>モデル横断の普遍原則 + モデル固有のコツ</strong>:
-                プロンプト設計 of 共通原則と、主要ツールごとの違いを分けて説明
+                <strong>モデル横断の普遍原則 + モデル固有のコツ</strong>: プロンプト設計 of
+                共通原則と、主要ツールごとの違いを分けて説明
               </li>
               <li>
                 <strong>安全性と法令遵守</strong>:
@@ -371,7 +371,9 @@ export default async function Page() {
               データ種別)」を単一のモデルまたはパイプラインで処理・生成できるAIシステムを指します。大きく分けて2つの潮流があります。
             </p>
 
-            <h3 id="s2-1">2.1 ネイティブ・マルチモーダル基盤モデル (Native Multimodal Foundation Models)</h3>
+            <h3 id="s2-1">
+              2.1 ネイティブ・マルチモーダル基盤モデル (Native Multimodal Foundation Models)
+            </h3>
             <p>
               GPT-4o
               のように、画像・音声・テキストを最初から単一のアーキテクチャで学習し、モダリティ変換用の別モデル(アダプタ)を介さずに理解・生成まで行うタイプです。GPT-4oはOpenAIの主力オムニモーダルモデルで、テキスト・画像・音声・動画を統一されたアーキテクチャの中で処理・推論できます。従来モデルと異なり、モダリティ固有のアダプタに頼らずネイティブなマルチモーダル理解を実現し、視覚・言語・音声を横断したシームレスな統合を可能にしています。Google
@@ -395,7 +397,9 @@ export default async function Page() {
               <MermaidDiagram chart={DIAGRAMS.understandingVsGeneration} />
             </div>
 
-            <p>本ガイドが扱うのは主に <strong>C. 生成系モデル</strong> の実践的な使い方です。</p>
+            <p>
+              本ガイドが扱うのは主に <strong>C. 生成系モデル</strong> の実践的な使い方です。
+            </p>
           </section>
 
           <hr className={styles.divider} />
@@ -417,7 +421,9 @@ export default async function Page() {
             <p>このサイクルにおける重要な原則は次の3つです。</p>
             <ol className={styles.plainList}>
               <li>
-                <strong>安いモデルで試作し、高いモデルで仕上げる (Draft cheap, finish expensive)</strong>
+                <strong>
+                  安いモデルで試作し、高いモデルで仕上げる (Draft cheap, finish expensive)
+                </strong>
                 : 構図やアイデアの検討は低コストなモデル(例: Z-Image TurboやFlux 2
                 Flash)で行い、方向性が固まった段階で高品質・高コストなモデルに切り替えるという原則は、コストと品質のバランスを取る上で有効です。
               </li>
@@ -608,7 +614,9 @@ export default async function Page() {
                   <tr>
                     <td>Aspect Ratio(アスペクト比)</td>
                     <td>出力の縦横比</td>
-                    <td>生成前にアスペクト比(正方形、16:9、4:5など)を決めておくことが推奨されます。</td>
+                    <td>
+                      生成前にアスペクト比(正方形、16:9、4:5など)を決めておくことが推奨されます。
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -674,8 +682,8 @@ export default async function Page() {
             </div>
 
             <p>
-              初学者はまず ComfyUI
-              や各種WebUIの<strong>テンプレート</strong>から始めるのが近道です。初心者はまずシンプルなText-to-ImageやImg2Img、Inpaint、Outpaint、LoRAのテンプレートから始めるのが良く、本番運用ではControlNet・IPAdapter・アップスケール・動画生成を組み合わせたより大規模なワークフローが使われます。
+              初学者はまず ComfyUI や各種WebUIの<strong>テンプレート</strong>
+              から始めるのが近道です。初心者はまずシンプルなText-to-ImageやImg2Img、Inpaint、Outpaint、LoRAのテンプレートから始めるのが良く、本番運用ではControlNet・IPAdapter・アップスケール・動画生成を組み合わせたより大規模なワークフローが使われます。
             </p>
 
             <h3 id="s4-6">4.6 反復ワークフロー(実践フロー)</h3>
@@ -777,8 +785,8 @@ export default async function Page() {
               5. 音声生成 (Audio Generation) のベストプラクティス
             </h2>
             <p>
-              音声生成は大きく「音声合成 (Text-to-Speech / TTS)・音声クローニング」と「音楽生成 (Music
-              Generation)」の2系統に分かれます。
+              音声生成は大きく「音声合成 (Text-to-Speech / TTS)・音声クローニング」と「音楽生成
+              (Music Generation)」の2系統に分かれます。
             </p>
 
             <h3 id="s5-1">5.1 TTS (Text-to-Speech) の基本ステップ</h3>
@@ -852,7 +860,8 @@ export default async function Page() {
             </p>
             <p>
               間(ま)の制御にも注意が必要です。breakタグを使いすぎると不安定化を招き、AIが早口になったり余計なノイズが混入したりすることがあります。短い間の代替としてダッシュ(-
-              や —)、ためらいを表す間の代替として省略記号(…)を使う方法もありますが、一貫性はbreakタグほど高くありません。
+              や
+              —)、ためらいを表す間の代替として省略記号(…)を使う方法もありますが、一貫性はbreakタグほど高くありません。
             </p>
 
             <h3 id="s5-4">5.4 発音制御(音声記号)</h3>
@@ -893,8 +902,8 @@ export default async function Page() {
             </div>
 
             <p>
-              <strong>Style欄の作り方</strong>: 具体例として「lo-fi hip hop, melancholic, dusty vinyl
-              texture, soft piano, muted trumpet, gentle rain ambience, 75 BPM, no
+              <strong>Style欄の作り方</strong>: 具体例として「lo-fi hip hop, melancholic, dusty
+              vinyl texture, soft piano, muted trumpet, gentle rain ambience, 75 BPM, no
               vocals」のように、ジャンル・感情・質感・楽器・BPM(テンポ)・ボーカル有無を明示する構成が効果的です。
             </p>
             <p>
@@ -915,8 +924,7 @@ export default async function Page() {
                 コーラス(サビ)の行数が多すぎるとメロディが平板になりやすいため、2〜3行程度に絞ると強いフックが生まれやすくなります。また、最も伝えたい歌詞は各セクションの最初の行に置くのが効果的です。
               </li>
               <li>
-                ボーカルの感情演出をしたい場合は、<code>(whispered)</code>{" "}
-                <code>(belted)</code>
+                ボーカルの感情演出をしたい場合は、<code>(whispered)</code> <code>(belted)</code>
                 のようなボーカルキューを、該当セクションの直前に単独の行として配置します。インラインで歌詞に埋め込むと無視されやすくなります。
               </li>
               <li>
@@ -935,7 +943,8 @@ export default async function Page() {
             </p>
             <ul className={styles.plainList}>
               <li>
-                クローンする音声の<strong>本人からの明示的な同意</strong>を得る(自分の声、または権利者が許諾した声のみを使用する)
+                クローンする音声の<strong>本人からの明示的な同意</strong>
+                を得る(自分の声、または権利者が許諾した声のみを使用する)
               </li>
               <li>実在の公人・有名人の声を無断で模倣・生成しない</li>
               <li>生成した音声が実在人物の発言であるかのように誤認させる使い方をしない</li>
@@ -976,7 +985,9 @@ export default async function Page() {
                   <tr>
                     <td>Amazon Polly</td>
                     <td>低コスト・大量処理</td>
-                    <td>表現力はElevenLabsに劣るが、大量のテキストを低コストで安定的に処理できる</td>
+                    <td>
+                      表現力はElevenLabsに劣るが、大量のテキストを低コストで安定的に処理できる
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -1000,7 +1011,8 @@ export default async function Page() {
             </div>
 
             <p>
-              統合時のポイントは「<strong>トーンの一貫性</strong>」です。画像のmood(雰囲気)と音声のstyle(表現)、音楽のmood(ジャンル・感情)がバラバラだと、視聴者に違和感を与えます。プロンプト設計の段階で、共通のキーワード(例:「ノスタルジック」「シネマティック」「ミニマル」)を画像・音声・音楽すべてのプロンプトに含めておくと一貫性を保ちやすくなります。
+              統合時のポイントは「<strong>トーンの一貫性</strong>
+              」です。画像のmood(雰囲気)と音声のstyle(表現)、音楽のmood(ジャンル・感情)がバラバラだと、視聴者に違和感を与えます。プロンプト設計の段階で、共通のキーワード(例:「ノスタルジック」「シネマティック」「ミニマル」)を画像・音声・音楽すべてのプロンプトに含めておくと一貫性を保ちやすくなります。
             </p>
           </section>
 
@@ -1077,7 +1089,9 @@ export default async function Page() {
                   </tr>
                   <tr>
                     <td>C2PA(コンテンツ来歴マニフェスト)</td>
-                    <td>暗号署名付きのメタデータとして「いつ・どのモデルで・誰が生成したか」を記録する</td>
+                    <td>
+                      暗号署名付きのメタデータとして「いつ・どのモデルで・誰が生成したか」を記録する
+                    </td>
                     <td>
                       ファイル形式を問わず適用できる利点があるが、メタデータが失われると検証情報も失われる(耐性がSynthIDより低い)。
                     </td>
@@ -1122,7 +1136,9 @@ export default async function Page() {
                   <tr>
                     <td>California SB 942</td>
                     <td>米国カリフォルニア州</td>
-                    <td>2026年1月1日に施行済み。AI生成の画像・音声・動画を提供する製品には開示が義務付けられている。</td>
+                    <td>
+                      2026年1月1日に施行済み。AI生成の画像・音声・動画を提供する製品には開示が義務付けられている。
+                    </td>
                   </tr>
                   <tr>
                     <td>プラットフォーム独自ポリシー</td>
@@ -1191,7 +1207,9 @@ export default async function Page() {
                     <td>
                       <span className={`${styles.badge} ${styles.purple}`}>画像編集</span>
                     </td>
-                    <td>部分修正はInpainting、拡張はOutpainting、構図固定はControlNetを使い分けたか</td>
+                    <td>
+                      部分修正はInpainting、拡張はOutpainting、構図固定はControlNetを使い分けたか
+                    </td>
                   </tr>
                   <tr>
                     <td>
@@ -1271,8 +1289,10 @@ export default async function Page() {
                   <Ext href="https://letsenhance.io/blog/article/ai-text-prompt-guide/">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>How to write AI image prompts like a pro [2026]</span> —
-                      letsenhance.io
+                      <span className={styles.refTitle}>
+                        How to write AI image prompts like a pro [2026]
+                      </span>{" "}
+                      — letsenhance.io
                     </span>
                   </Ext>
                 </li>
@@ -1280,7 +1300,10 @@ export default async function Page() {
                   <Ext href="https://aimlinsights.com/prompts-for-image-generation/">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Best Prompts for Image Generation in 2026</span> — AIML Insights
+                      <span className={styles.refTitle}>
+                        Best Prompts for Image Generation in 2026
+                      </span>{" "}
+                      — AIML Insights
                     </span>
                   </Ext>
                 </li>
@@ -1298,7 +1321,9 @@ export default async function Page() {
                   <Ext href="https://www.improveprompt.ai/learn/how-to-improve-image-generation-prompts">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Mastering Image Generation AI Prompts: The Complete 2026 Guide</span>{" "}
+                      <span className={styles.refTitle}>
+                        Mastering Image Generation AI Prompts: The Complete 2026 Guide
+                      </span>{" "}
                       — ImprovePrompt
                     </span>
                   </Ext>
@@ -1307,7 +1332,10 @@ export default async function Page() {
                   <Ext href="https://www.cliprise.app/learn/guides/best-practices/ai-prompt-engineering-complete-guide-2026">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>AI Prompt Engineering for Images &amp; Video (2026)</span> — Cliprise
+                      <span className={styles.refTitle}>
+                        AI Prompt Engineering for Images &amp; Video (2026)
+                      </span>{" "}
+                      — Cliprise
                     </span>
                   </Ext>
                 </li>
@@ -1326,8 +1354,8 @@ export default async function Page() {
                   <Ext href="https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/gpt-4-v-prompt-engineering">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Image prompt engineering techniques</span> — Microsoft Foundry /
-                      Microsoft Learn
+                      <span className={styles.refTitle}>Image prompt engineering techniques</span> —
+                      Microsoft Foundry / Microsoft Learn
                     </span>
                   </Ext>
                 </li>
@@ -1335,7 +1363,10 @@ export default async function Page() {
                   <Ext href="https://www.lakera.ai/blog/prompt-engineering-guide">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>The Ultimate Guide to Prompt Engineering in 2026</span> — Lakera
+                      <span className={styles.refTitle}>
+                        The Ultimate Guide to Prompt Engineering in 2026
+                      </span>{" "}
+                      — Lakera
                     </span>
                   </Ext>
                 </li>
@@ -1343,7 +1374,10 @@ export default async function Page() {
                   <Ext href="https://orq.ai/blog/what-is-the-best-way-to-think-of-prompt-engineering">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Prompt Engineering in 2026: Tips + Best Practices</span> — orq.ai
+                      <span className={styles.refTitle}>
+                        Prompt Engineering in 2026: Tips + Best Practices
+                      </span>{" "}
+                      — orq.ai
                     </span>
                   </Ext>
                 </li>
@@ -1351,7 +1385,8 @@ export default async function Page() {
                   <Ext href="https://www.ibm.com/think/prompt-engineering">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>The 2026 Guide to Prompt Engineering</span> — IBM
+                      <span className={styles.refTitle}>The 2026 Guide to Prompt Engineering</span>{" "}
+                      — IBM
                     </span>
                   </Ext>
                 </li>
@@ -1368,7 +1403,10 @@ export default async function Page() {
                   <Ext href="https://morphed.app/blog/best-ai-image-generation-models">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>AI Image Generation Models: The Complete 2026 Guide</span> — Morphed
+                      <span className={styles.refTitle}>
+                        AI Image Generation Models: The Complete 2026 Guide
+                      </span>{" "}
+                      — Morphed
                     </span>
                   </Ext>
                 </li>
@@ -1384,7 +1422,8 @@ export default async function Page() {
                   <Ext href="https://www.teamday.ai/blog/best-ai-image-models-2026">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Best AI Image Models 2026</span> — TeamDay.ai
+                      <span className={styles.refTitle}>Best AI Image Models 2026</span> —
+                      TeamDay.ai
                     </span>
                   </Ext>
                 </li>
@@ -1392,8 +1431,10 @@ export default async function Page() {
                   <Ext href="https://medium.com/@social_18794/best-ai-image-generators-in-2026-complete-comparison-guide-e5399ba7eae5">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Best AI Image Generators in 2026: Complete Comparison Guide</span> —
-                      WaveSpeedAI (Medium)
+                      <span className={styles.refTitle}>
+                        Best AI Image Generators in 2026: Complete Comparison Guide
+                      </span>{" "}
+                      — WaveSpeedAI (Medium)
                     </span>
                   </Ext>
                 </li>
@@ -1401,7 +1442,10 @@ export default async function Page() {
                   <Ext href="https://www.xainflow.com/blog/best-ai-image-generators-2026-comparison">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>8 Best AI Image Generators in 2026 (Tested)</span> — XainFlow
+                      <span className={styles.refTitle}>
+                        8 Best AI Image Generators in 2026 (Tested)
+                      </span>{" "}
+                      — XainFlow
                     </span>
                   </Ext>
                 </li>
@@ -1409,7 +1453,9 @@ export default async function Page() {
                   <Ext href="https://llm-stats.com/leaderboards/best-ai-for-image-generation">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Best AI for Image Generation in 2026 — Ranked by Blind Human Votes</span>{" "}
+                      <span className={styles.refTitle}>
+                        Best AI for Image Generation in 2026 — Ranked by Blind Human Votes
+                      </span>{" "}
                       — llm-stats.com
                     </span>
                   </Ext>
@@ -1418,7 +1464,9 @@ export default async function Page() {
                   <Ext href="https://www.gradually.ai/en/ai-image-models/">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>The 9 Best AI Image Generation Models in 2026</span>
+                      <span className={styles.refTitle}>
+                        The 9 Best AI Image Generation Models in 2026
+                      </span>
                     </span>
                   </Ext>
                 </li>
@@ -1427,7 +1475,8 @@ export default async function Page() {
                     <i className="ti ti-external-link" />
                     <span>
                       <span className={styles.refTitle}>
-                        Best AI Image Generators in 2026: Grok Imagine, Midjourney, FLUX and DALL-E Compared
+                        Best AI Image Generators in 2026: Grok Imagine, Midjourney, FLUX and DALL-E
+                        Compared
                       </span>{" "}
                       — DIY AI
                     </span>
@@ -1437,8 +1486,10 @@ export default async function Page() {
                   <Ext href="https://getimg.ai/blog/best-ai-image-generator">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Best AI Image Generators (2026): A Honest Test &amp; Review</span> —
-                      getimg.ai
+                      <span className={styles.refTitle}>
+                        Best AI Image Generators (2026): A Honest Test &amp; Review
+                      </span>{" "}
+                      — getimg.ai
                     </span>
                   </Ext>
                 </li>
@@ -1446,8 +1497,10 @@ export default async function Page() {
                   <Ext href="https://alici.ai/blog/best-ai-image-generators-2026">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Best AI Image Generator 2026: I Tested 10 Tools to Find Out</span> —
-                      Alici.AI
+                      <span className={styles.refTitle}>
+                        Best AI Image Generator 2026: I Tested 10 Tools to Find Out
+                      </span>{" "}
+                      — Alici.AI
                     </span>
                   </Ext>
                 </li>
@@ -1465,8 +1518,8 @@ export default async function Page() {
                     <i className="ti ti-external-link" />
                     <span>
                       <span className={styles.refTitle}>
-                        High-Quality Image Generation with HuggingFace Diffusers: ControlNet, LoRA, and Inpainting
-                        Explained
+                        High-Quality Image Generation with HuggingFace Diffusers: ControlNet, LoRA,
+                        and Inpainting Explained
                       </span>{" "}
                       — UBOS
                     </span>
@@ -1477,7 +1530,8 @@ export default async function Page() {
                     <i className="ti ti-external-link" />
                     <span>
                       <span className={styles.refTitle}>
-                        A Coding Guide to High-Quality Image Generation, Control, and Editing Using HuggingFace Diffusers
+                        A Coding Guide to High-Quality Image Generation, Control, and Editing Using
+                        HuggingFace Diffusers
                       </span>{" "}
                       — MarkTechPost
                     </span>
@@ -1487,7 +1541,8 @@ export default async function Page() {
                   <Ext href="https://stable-diffusion-art.com/inpainting/">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Inpainting: A complete guide</span> — Stable Diffusion Art
+                      <span className={styles.refTitle}>Inpainting: A complete guide</span> — Stable
+                      Diffusion Art
                     </span>
                   </Ext>
                 </li>
@@ -1495,8 +1550,10 @@ export default async function Page() {
                   <Ext href="https://neuraplus-ai.github.io/blog/how-to-create-ai-art.html">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>How to Create AI Art: Complete Style &amp; Workflow 2026</span> —
-                      NeuraPulse
+                      <span className={styles.refTitle}>
+                        How to Create AI Art: Complete Style &amp; Workflow 2026
+                      </span>{" "}
+                      — NeuraPulse
                     </span>
                   </Ext>
                 </li>
@@ -1504,7 +1561,9 @@ export default async function Page() {
                   <Ext href="https://www.neura.market/directories/stable-diffusion/guides/sdxl-inpainting-workflow-lora-controlnet-ip-adapter">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>SDXL Inpainting Workflow with LoRA, ControlNet and IP-Adapter</span>{" "}
+                      <span className={styles.refTitle}>
+                        SDXL Inpainting Workflow with LoRA, ControlNet and IP-Adapter
+                      </span>{" "}
                       — Neura Market
                     </span>
                   </Ext>
@@ -1513,7 +1572,9 @@ export default async function Page() {
                   <Ext href="https://openart.ai/workflows/terrier_delectable_76/sdxl-inpainting-workflow-with-lora-controlnet-and-ipadapter/Jhj7nRJwi5c8UuWguhvD">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>SDXL Inpainting Workflow with Lora, ControlNet, and IPAdapter</span>{" "}
+                      <span className={styles.refTitle}>
+                        SDXL Inpainting Workflow with Lora, ControlNet, and IPAdapter
+                      </span>{" "}
                       — OpenArt
                     </span>
                   </Ext>
@@ -1522,7 +1583,8 @@ export default async function Page() {
                   <Ext href="https://huggingface.co/blog/OzzyGT/outpainting-controlnet">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Outpainting I - Controlnet version</span> — Hugging Face Blog (OzzyGT)
+                      <span className={styles.refTitle}>Outpainting I - Controlnet version</span> —
+                      Hugging Face Blog (OzzyGT)
                     </span>
                   </Ext>
                 </li>
@@ -1530,8 +1592,10 @@ export default async function Page() {
                   <Ext href="https://www.beam.cloud/blog/top-comfyui-workflows">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Best ComfyUI Workflows: Templates, Examples, and Downloads</span> —
-                      Beam
+                      <span className={styles.refTitle}>
+                        Best ComfyUI Workflows: Templates, Examples, and Downloads
+                      </span>{" "}
+                      — Beam
                     </span>
                   </Ext>
                 </li>
@@ -1539,7 +1603,10 @@ export default async function Page() {
                   <Ext href="https://huggingface.co/destitech/controlnet-inpaint-dreamer-sdxl">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>destitech/controlnet-inpaint-dreamer-sdxl</span> — Hugging Face
+                      <span className={styles.refTitle}>
+                        destitech/controlnet-inpaint-dreamer-sdxl
+                      </span>{" "}
+                      — Hugging Face
                     </span>
                   </Ext>
                 </li>
@@ -1547,7 +1614,8 @@ export default async function Page() {
                   <Ext href="https://www.runcomfy.com/comfyui-workflows/comfyui-image-outpainting-workflow">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>ComfyUI Outpainting Workflow</span> — RunComfy
+                      <span className={styles.refTitle}>ComfyUI Outpainting Workflow</span> —
+                      RunComfy
                     </span>
                   </Ext>
                 </li>
@@ -1564,7 +1632,8 @@ export default async function Page() {
                   <Ext href="https://elevenlabs.io/docs/eleven-creative/playground/text-to-speech">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Text to Speech (product guide)</span> — ElevenLabs Documentation
+                      <span className={styles.refTitle}>Text to Speech (product guide)</span> —
+                      ElevenLabs Documentation
                     </span>
                   </Ext>
                 </li>
@@ -1572,7 +1641,8 @@ export default async function Page() {
                   <Ext href="https://elevenlabs.io/docs/overview/capabilities/text-to-speech/best-practices">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Best practices</span> — ElevenLabs Documentation
+                      <span className={styles.refTitle}>Best practices</span> — ElevenLabs
+                      Documentation
                     </span>
                   </Ext>
                 </li>
@@ -1580,7 +1650,8 @@ export default async function Page() {
                   <Ext href="https://elevenlabs.io/docs/overview/capabilities/text-to-speech">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Text to Speech</span> — ElevenLabs Documentation
+                      <span className={styles.refTitle}>Text to Speech</span> — ElevenLabs
+                      Documentation
                     </span>
                   </Ext>
                 </li>
@@ -1588,7 +1659,8 @@ export default async function Page() {
                   <Ext href="https://www.webfuse.com/elevenlabs-cheat-sheet">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>ElevenLabs Cheat Sheet (2026)</span> — Webfuse
+                      <span className={styles.refTitle}>ElevenLabs Cheat Sheet (2026)</span> —
+                      Webfuse
                     </span>
                   </Ext>
                 </li>
@@ -1596,7 +1668,10 @@ export default async function Page() {
                   <Ext href="https://elevenlabs.io/">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Free AI Voice Generator &amp; Voice Agents Platform</span> — ElevenLabs
+                      <span className={styles.refTitle}>
+                        Free AI Voice Generator &amp; Voice Agents Platform
+                      </span>{" "}
+                      — ElevenLabs
                     </span>
                   </Ext>
                 </li>
@@ -1604,7 +1679,8 @@ export default async function Page() {
                   <Ext href="https://aitoolsdevpro.com/ai-tools/elevenlabs-guide/">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>ElevenLabs Complete Guide 2026</span> — AI Tools DevPro
+                      <span className={styles.refTitle}>ElevenLabs Complete Guide 2026</span> — AI
+                      Tools DevPro
                     </span>
                   </Ext>
                 </li>
@@ -1612,7 +1688,8 @@ export default async function Page() {
                   <Ext href="https://elevenlabs.io/docs/eleven-creative/voices/voice-design">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Voice Design</span> — ElevenLabs Documentation
+                      <span className={styles.refTitle}>Voice Design</span> — ElevenLabs
+                      Documentation
                     </span>
                   </Ext>
                 </li>
@@ -1631,7 +1708,8 @@ export default async function Page() {
                   <Ext href="https://www.fahimai.com/how-to-use-elevenlabs">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>How to Use ElevenLabs in 2026</span> — fahimai.com
+                      <span className={styles.refTitle}>How to Use ElevenLabs in 2026</span> —
+                      fahimai.com
                     </span>
                   </Ext>
                 </li>
@@ -1656,7 +1734,9 @@ export default async function Page() {
                   <Ext href="https://travisnicholson.medium.com/complete-list-of-prompts-styles-for-suno-ai-music-2024-33ecee85f180">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Complete List of Prompts &amp; Styles for Suno AI Music (2026)</span>{" "}
+                      <span className={styles.refTitle}>
+                        Complete List of Prompts &amp; Styles for Suno AI Music (2026)
+                      </span>{" "}
                       — Medium (Travis Nicholson)
                     </span>
                   </Ext>
@@ -1676,8 +1756,10 @@ export default async function Page() {
                   <Ext href="https://jackrighteous.com/en-us/blogs/guides-using-suno-ai-music-creation/best-prompts-for-suno-ai-2026-guide-to-better-results">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Best Suno AI Prompts 2026: What Actually Works and Why</span> — Jack
-                      Righteous
+                      <span className={styles.refTitle}>
+                        Best Suno AI Prompts 2026: What Actually Works and Why
+                      </span>{" "}
+                      — Jack Righteous
                     </span>
                   </Ext>
                 </li>
@@ -1685,7 +1767,9 @@ export default async function Page() {
                   <Ext href="https://roo.beehiiv.com/p/complete-list-of-prompts-styles-for-suno-ai-music-2026">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Complete List of Prompts &amp; Styles for Suno AI Music (2026)</span>{" "}
+                      <span className={styles.refTitle}>
+                        Complete List of Prompts &amp; Styles for Suno AI Music (2026)
+                      </span>{" "}
                       — Roo (beehiiv)
                     </span>
                   </Ext>
@@ -1694,8 +1778,10 @@ export default async function Page() {
                   <Ext href="https://suno.com/hub/create-music-with-ai">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>The Best Ways To Create Music With AI Using Suno [2026]</span> — Suno
-                      Hub
+                      <span className={styles.refTitle}>
+                        The Best Ways To Create Music With AI Using Suno [2026]
+                      </span>{" "}
+                      — Suno Hub
                     </span>
                   </Ext>
                 </li>
@@ -1714,8 +1800,10 @@ export default async function Page() {
                   <Ext href="https://suno.bi/en/blog/suno-prompt-tips-guide">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Suno AI Prompt Guide 2026: 10 Tips + Copy-Paste Templates</span> — SunoMV
-                      Blog
+                      <span className={styles.refTitle}>
+                        Suno AI Prompt Guide 2026: 10 Tips + Copy-Paste Templates
+                      </span>{" "}
+                      — SunoMV Blog
                     </span>
                   </Ext>
                 </li>
@@ -1723,7 +1811,10 @@ export default async function Page() {
                   <Ext href="https://www.soundverse.ai/blog/article/how-to-structure-prompts-for-suno-ai-music-generation-0402">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>How to Structure Prompts for Suno AI Music Generation</span> — Soundverse
+                      <span className={styles.refTitle}>
+                        How to Structure Prompts for Suno AI Music Generation
+                      </span>{" "}
+                      — Soundverse
                     </span>
                   </Ext>
                 </li>
@@ -1731,8 +1822,10 @@ export default async function Page() {
                   <Ext href="https://medium.com/write-your-world/100-best-suno-ai-prompts-list-download-2026-guide-11195b1dc6b5">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>100+ Best Suno AI Prompts List Download (2026 Guide)</span> — Medium (Seven
-                      Sky Writes)
+                      <span className={styles.refTitle}>
+                        100+ Best Suno AI Prompts List Download (2026 Guide)
+                      </span>{" "}
+                      — Medium (Seven Sky Writes)
                     </span>
                   </Ext>
                 </li>
@@ -1740,7 +1833,9 @@ export default async function Page() {
                   <Ext href="https://www.songaifarm.com/blog/ai-music-generator-comparison-2026-suno-vs-udio-vs-stable-audio-414">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>AI Music Generator Comparison 2026: Suno vs Udio vs Stable Audio</span>{" "}
+                      <span className={styles.refTitle}>
+                        AI Music Generator Comparison 2026: Suno vs Udio vs Stable Audio
+                      </span>{" "}
                       — Song AI Farm
                     </span>
                   </Ext>
@@ -1758,8 +1853,10 @@ export default async function Page() {
                   <Ext href="https://claude5.com/news/multimodal-ai-2026-vision-documents-real-world-applications">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Multimodal AI 2026: Claude vs GPT-4V vs Gemini Vision Compared</span> —
-                      Claude 5 Hub
+                      <span className={styles.refTitle}>
+                        Multimodal AI 2026: Claude vs GPT-4V vs Gemini Vision Compared
+                      </span>{" "}
+                      — Claude 5 Hub
                     </span>
                   </Ext>
                 </li>
@@ -1767,8 +1864,10 @@ export default async function Page() {
                   <Ext href="https://claude5.com/news/multimodal-ai-face-off-claude-gpt-4v-and-gemini-in-2026">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Multimodal AI Face-Off: Claude, GPT-4V, and Gemini in 2026</span> —
-                      Claude 5 Hub
+                      <span className={styles.refTitle}>
+                        Multimodal AI Face-Off: Claude, GPT-4V, and Gemini in 2026
+                      </span>{" "}
+                      — Claude 5 Hub
                     </span>
                   </Ext>
                 </li>
@@ -1776,7 +1875,9 @@ export default async function Page() {
                   <Ext href="https://ofox.ai/blog/claude-vs-gpt-vs-gemini-model-comparison-guide-2026/">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Claude 4 vs GPT-5 vs Gemini 3: Pick the Right AI Model (2026)</span>
+                      <span className={styles.refTitle}>
+                        Claude 4 vs GPT-5 vs Gemini 3: Pick the Right AI Model (2026)
+                      </span>
                     </span>
                   </Ext>
                 </li>
@@ -1784,8 +1885,10 @@ export default async function Page() {
                   <Ext href="https://arxiv.org/pdf/2510.08759">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Dissecting Embodied Abilities in Multimodal Language Models</span> —
-                      arXiv
+                      <span className={styles.refTitle}>
+                        Dissecting Embodied Abilities in Multimodal Language Models
+                      </span>{" "}
+                      — arXiv
                     </span>
                   </Ext>
                 </li>
@@ -1793,7 +1896,9 @@ export default async function Page() {
                   <Ext href="https://aimodelbenchmarks.com/blog/2026-02-13-multimodal-ai-models/">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Best Multimodal AI Models 2026: Vision, Audio, Video, and Agents</span>
+                      <span className={styles.refTitle}>
+                        Best Multimodal AI Models 2026: Vision, Audio, Video, and Agents
+                      </span>
                     </span>
                   </Ext>
                 </li>
@@ -1801,7 +1906,9 @@ export default async function Page() {
                   <Ext href="https://www.digitalapplied.com/blog/multimodal-ai-benchmarks-2026-vision-audio-code">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>Multimodal AI Benchmarks 2026: Vision, Audio, Code</span>
+                      <span className={styles.refTitle}>
+                        Multimodal AI Benchmarks 2026: Vision, Audio, Code
+                      </span>
                     </span>
                   </Ext>
                 </li>
@@ -1809,7 +1916,10 @@ export default async function Page() {
                   <Ext href="https://encord.com/blog/gpt-4o-vs-gemini-vs-claude-3-opus/">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>GPT-4o vs. Gemini 1.5 Pro vs. Claude 3 Opus</span> — Encord
+                      <span className={styles.refTitle}>
+                        GPT-4o vs. Gemini 1.5 Pro vs. Claude 3 Opus
+                      </span>{" "}
+                      — Encord
                     </span>
                   </Ext>
                 </li>
@@ -1870,7 +1980,10 @@ export default async function Page() {
                   <Ext href="https://www.eyesift.com/faq/ai-watermark-detection-2026-c2pa-content-credentials-google-synthid-meta-watermarking-policy-comparison/">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>AI Watermark Detection 2026: C2PA vs SynthID vs Metadata</span> — Eyesift
+                      <span className={styles.refTitle}>
+                        AI Watermark Detection 2026: C2PA vs SynthID vs Metadata
+                      </span>{" "}
+                      — Eyesift
                     </span>
                   </Ext>
                 </li>
@@ -1878,8 +1991,10 @@ export default async function Page() {
                   <Ext href="https://magiclight.ai/news/c2pa-and-global-watermarking-mandates-for-ai-video-in-2026/">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>C2PA and Global Watermarking mandates for AI video in 2026</span> —
-                      Magiclight.AI
+                      <span className={styles.refTitle}>
+                        C2PA and Global Watermarking mandates for AI video in 2026
+                      </span>{" "}
+                      — Magiclight.AI
                     </span>
                   </Ext>
                 </li>
@@ -1887,7 +2002,10 @@ export default async function Page() {
                   <Ext href="https://aibuzz.blog/ai-watermarking-vs-metadata-vs-fingerprinting/">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>AI Watermarking 2026: C2PA, Metadata and Fingerprinting</span> — AI Buzz
+                      <span className={styles.refTitle}>
+                        AI Watermarking 2026: C2PA, Metadata and Fingerprinting
+                      </span>{" "}
+                      — AI Buzz
                     </span>
                   </Ext>
                 </li>
@@ -1895,8 +2013,10 @@ export default async function Page() {
                   <Ext href="https://aivideobootcamp.com/blog/ai-disclosure-compliance-2026-c2pa-eu-ai-act/">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>AI Disclosure Compliance 2026: C2PA &amp; EU AI Act Guide</span> — AI Video
-                      Bootcamp
+                      <span className={styles.refTitle}>
+                        AI Disclosure Compliance 2026: C2PA &amp; EU AI Act Guide
+                      </span>{" "}
+                      — AI Video Bootcamp
                     </span>
                   </Ext>
                 </li>
@@ -1904,8 +2024,10 @@ export default async function Page() {
                   <Ext href="https://ppl.studio/blog/ai-generated-content-disclosure-ftc-guidelines">
                     <i className="ti ti-external-link" />
                     <span>
-                      <span className={styles.refTitle}>FTC AI Content Disclosure Rules (2026): What Brands Must Say</span> —
-                      ppl.studio
+                      <span className={styles.refTitle}>
+                        FTC AI Content Disclosure Rules (2026): What Brands Must Say
+                      </span>{" "}
+                      — ppl.studio
                     </span>
                   </Ext>
                 </li>

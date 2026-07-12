@@ -41,8 +41,8 @@ describe("Phase A - nav-links export shape", () => {
 });
 
 describe("Phase A - nav-links top-level entries", () => {
-  it("has exactly 15 top-level entries", () => {
-    expect(navLinks.length).toBe(15);
+  it("has exactly 16 top-level entries", () => {
+    expect(navLinks.length).toBe(16);
   });
 
   it("starts with Home as a flat link", () => {
@@ -58,7 +58,7 @@ describe("Phase A - nav-links top-level entries", () => {
     expect("href" in last && last.href === "/git-worktree").toBe(true);
   });
 
-  it("has Claude/Google/Codex/Copilot/Code Review/Agent/MCP/Sandbox/IDE/Security/Local LLM/CI/CD/RAG as dropdowns with children", () => {
+  it("has Claude/Google/Codex/Copilot/Code Review/Agent/MCP/Sandbox/IDE/Security/Local LLM/CI/CD/RAG/Multimodal as dropdowns with children", () => {
     const providers = [
       "Claude",
       "Google",
@@ -73,6 +73,7 @@ describe("Phase A - nav-links top-level entries", () => {
       "Local LLM",
       "CI/CD",
       "RAG",
+      "Multimodal",
     ] as const;
     for (const name of providers) {
       const entry = navLinks.find((link) => link.name === name);
@@ -144,10 +145,7 @@ describe("Phase A - MCP dropdown shape", () => {
 
   it("uses clean URL paths for all MCP children (no .html extension)", () => {
     const children = mcp && "children" in mcp ? mcp.children : [];
-    const expectedHrefs = [
-      "/mcp/mcp-best-practices",
-      "/mcp/mcp-best-practices-intermediate",
-    ];
+    const expectedHrefs = ["/mcp/mcp-best-practices", "/mcp/mcp-best-practices-intermediate"];
     expect(children.map((c) => c.href)).toEqual(expectedHrefs);
   });
 });
@@ -196,6 +194,22 @@ describe("Phase A - RAG dropdown shape", () => {
   it("uses clean URL paths for all RAG children (no .html extension)", () => {
     const children = rag && "children" in rag ? rag.children : [];
     const expectedHrefs = ["/rag/embeddings-best-practices"];
+    expect(children.map((c) => c.href)).toEqual(expectedHrefs);
+  });
+});
+
+describe("Phase A - Multimodal dropdown shape", () => {
+  const multimodal = navLinks.find((link) => link.name === "Multimodal");
+
+  it("has 1 child entry (generation-best-practices)", () => {
+    expect(multimodal && "children" in multimodal).toBe(true);
+    const children = multimodal && "children" in multimodal ? multimodal.children : [];
+    expect(children.length).toBe(1);
+  });
+
+  it("uses clean URL paths for all Multimodal children (no .html extension)", () => {
+    const children = multimodal && "children" in multimodal ? multimodal.children : [];
+    const expectedHrefs = ["/multimodal/generation-best-practices"];
     expect(children.map((c) => c.href)).toEqual(expectedHrefs);
   });
 });

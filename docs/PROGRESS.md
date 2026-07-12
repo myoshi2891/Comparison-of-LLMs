@@ -14,10 +14,11 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（本作業範囲では新規違反 0 件、既知の既存指摘は本件対象外）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **899 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **905 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **マルチモーダルAI(画像・音声生成)ベストプラクティスガイド 2026の Next.js 移行**: ルートの `Multimodal-ai-image-audio-generation-best-practices.html` を `web-next/app/multimodal/generation-best-practices/page.tsx` に完全移行 🚀。TDD サイクル（Red/Green/Refactor）に沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策（target/rel）、8つの Mermaid 図の中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションに新規カテゴリ「Multimodal -> Generation Best Practices」を追加。元のHTML・MDファイルはアーカイブディレクトリに退避。Vitest 契約テスト 6 件追加（合計 905 テスト合格）。
 - **RAG & Embeddings 完全ベストプラクティスガイドの Next.js 移行**: ルートの `Rag-embeddings-best-practices-guide.html` を `web-next/app/rag/embeddings-best-practices/page.tsx` に完全移行 🚀。TDD サイクル（Red/Green/Refactor）に沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、等幅フォント適用、外部リンクのセキュリティ対策（target/rel）、4つの Mermaid 図の中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションに新規カテゴリ「RAG -> RAG & Embeddings Best Practices」を追加。元のHTML・MDファイルはアーカイブディレクトリに退避。Vitest 契約テスト 5 件追加（合計 899 テスト合格）。
 - **MCP実践ベストプラクティスガイド（中級〜上級者向け）の Next.js 新設移行**: 既存の `/mcp/mcp-best-practices` はそのまま残し、ルートの `Mcp-best-practices.html` を `web-next/app/mcp/mcp-best-practices-intermediate/page.tsx` に新設移行。TDD サイクル（Red/Green/Refactor）に沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、等幅フォント適用、外部リンクのセキュリティ対策（target/rel）、12点の Mermaid 図の中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションの「MCP -> MCP Best Practices (中級)」に新規登録。元の HTML ファイルはアーカイブディレクトリに退避。Vitest 契約テスト 9 件追加（合計 892 テスト合格）。
 - **MCP実践ガイドの Next.js 移行**: `Mcp-best-practices-guide.html` から `web-next/app/mcp/mcp-best-practices/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、等幅フォント適用、外部リンクのセキュリティ対策（target/rel）、Mermaid遅延ロードと中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションの「MCP -> MCP Best Practices」に新規登録。 Vitest 契約テスト 9 件追加（合計 883 テスト合格）。
