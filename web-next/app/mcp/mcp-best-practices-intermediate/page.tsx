@@ -1082,7 +1082,9 @@ export default function McpBestPracticesIntermediatePage() {
               >
                 Fig. 3-1 — 仕様リリース履歴タイムライン
               </div>
-              <MermaidDiagram chart={DIAGRAMS.timeline} />
+              <div className={styles.mermaidDiagram}>
+                <MermaidDiagram chart={DIAGRAMS.timeline} />
+              </div>
             </div>
 
             <h3>
