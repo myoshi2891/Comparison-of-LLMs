@@ -147,5 +147,14 @@ export const navLinks: readonly NavLink[] = [
     name: "RAG",
     children: [{ name: "RAG & Embeddings", href: "/rag/embeddings-best-practices" }],
   },
+  {
+    name: "Multimodal",
+    children: [
+      {
+        name: "Generation Best Practices",
+        href: "/multimodal/generation-best-practices",
+      },
+    ],
+  },
   { name: "Git Worktree", href: "/git-worktree" },
 ];

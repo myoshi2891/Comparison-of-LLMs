@@ -1,7 +1,19 @@
 .pageWrap {
   background: var(--color-background-primary, #0b0b0d);
   color: var(--color-text-primary, #f2f2f4);
-  font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", "Noto Sans JP", Meiryo, sans-serif);
+  font-family: var(
+    --font-sans,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Hiragino Kaku Gothic ProN",
+    "Hiragino Sans",
+    "Yu Gothic",
+    "Noto Sans JP",
+    Meiryo,
+    sans-serif
+  );
   font-size: 16px;
   line-height: 1.7;
   min-height: 100vh;
@@ -35,7 +47,6 @@
   flex-shrink: 0;
   max-height: calc(100vh - 80px);
   overflow-y: auto;
-  padding-right: 12px;
   background: var(--color-background-secondary, #131317);
   border-right: 1px solid var(--color-border-tertiary, #212126);
   border-radius: var(--border-radius-lg, 12px);
@@ -112,7 +123,9 @@
   text-decoration: none !important;
   font-size: 13px;
   border-bottom: none !important;
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 
 .tocLink:hover {
