@@ -51,7 +51,6 @@ const DIAGRAMS = {
     H-->>U: 最終応答を生成`,
 
   timeline: `timeline
-    title MCPプロトコル仕様のリリース履歴
     2024-11-05 : 初版仕様（stdio / HTTP+SSE）
     2025-03-26 : Streamable HTTP追加、HTTP+SSEを非推奨化
     2025-06-18 : OAuth 2.1認可仕様を正式化
@@ -4279,15 +4278,17 @@ export default function McpBestPracticesIntermediatePage() {
 
             <h3>
               <span
-                className={styles.cm}
                 style={{
                   fontFamily: "var(--font-mono)",
                   fontSize: "10.5px",
-                  background: "var(--color-text-info, #7bb8ea)",
-                  padding: "2px 8px",
+                  background: "rgba(79,184,234,0.12)",
+                  border: "1px solid rgba(79,184,234,0.3)",
+                  color: "#7bb8ea",
+                  padding: "2px 10px",
                   borderRadius: "5px",
                   marginRight: "10px",
                   verticalAlign: "middle",
+                  fontWeight: 500,
                 }}
               >
                 設計
@@ -4384,15 +4385,17 @@ export default function McpBestPracticesIntermediatePage() {
 
             <h3>
               <span
-                className={styles.cm}
                 style={{
                   fontFamily: "var(--font-mono)",
                   fontSize: "10.5px",
-                  background: "var(--color-text-info, #7bb8ea)",
-                  padding: "2px 8px",
+                  background: "rgba(79,184,234,0.12)",
+                  border: "1px solid rgba(79,184,234,0.3)",
+                  color: "#7bb8ea",
+                  padding: "2px 10px",
                   borderRadius: "5px",
                   marginRight: "10px",
                   verticalAlign: "middle",
+                  fontWeight: 500,
                 }}
               >
                 ツール実装
@@ -4531,15 +4534,17 @@ export default function McpBestPracticesIntermediatePage() {
 
             <h3>
               <span
-                className={styles.cm}
                 style={{
                   fontFamily: "var(--font-mono)",
                   fontSize: "10.5px",
-                  background: "var(--color-text-info, #7bb8ea)",
-                  padding: "2px 8px",
+                  background: "rgba(79,184,234,0.12)",
+                  border: "1px solid rgba(79,184,234,0.3)",
+                  color: "#7bb8ea",
+                  padding: "2px 10px",
                   borderRadius: "5px",
                   marginRight: "10px",
                   verticalAlign: "middle",
+                  fontWeight: 500,
                 }}
               >
                 スケーラビリティ
@@ -4592,15 +4597,17 @@ export default function McpBestPracticesIntermediatePage() {
 
             <h3>
               <span
-                className={styles.cm}
                 style={{
                   fontFamily: "var(--font-mono)",
                   fontSize: "10.5px",
-                  background: "var(--color-text-info, #7bb8ea)",
-                  padding: "2px 8px",
+                  background: "rgba(79,184,234,0.12)",
+                  border: "1px solid rgba(79,184,234,0.3)",
+                  color: "#7bb8ea",
+                  padding: "2px 10px",
                   borderRadius: "5px",
                   marginRight: "10px",
                   verticalAlign: "middle",
+                  fontWeight: 500,
                 }}
               >
                 認証・認可
@@ -4674,15 +4681,17 @@ export default function McpBestPracticesIntermediatePage() {
 
             <h3>
               <span
-                className={styles.cm}
                 style={{
                   fontFamily: "var(--font-mono)",
                   fontSize: "10.5px",
-                  background: "var(--color-text-info, #7bb8ea)",
-                  padding: "2px 8px",
+                  background: "rgba(79,184,234,0.12)",
+                  border: "1px solid rgba(79,184,234,0.3)",
+                  color: "#7bb8ea",
+                  padding: "2px 10px",
                   borderRadius: "5px",
                   marginRight: "10px",
                   verticalAlign: "middle",
+                  fontWeight: 500,
                 }}
               >
                 セキュリティ
@@ -4777,15 +4786,17 @@ export default function McpBestPracticesIntermediatePage() {
 
             <h3>
               <span
-                className={styles.cm}
                 style={{
                   fontFamily: "var(--font-mono)",
                   fontSize: "10.5px",
-                  background: "var(--color-text-info, #7bb8ea)",
-                  padding: "2px 8px",
+                  background: "rgba(79,184,234,0.12)",
+                  border: "1px solid rgba(79,184,234,0.3)",
+                  color: "#7bb8ea",
+                  padding: "2px 10px",
                   borderRadius: "5px",
                   marginRight: "10px",
                   verticalAlign: "middle",
+                  fontWeight: 500,
                 }}
               >
                 テスト
@@ -4859,15 +4870,17 @@ export default function McpBestPracticesIntermediatePage() {
 
             <h3>
               <span
-                className={styles.cm}
                 style={{
                   fontFamily: "var(--font-mono)",
                   fontSize: "10.5px",
-                  background: "var(--color-text-info, #7bb8ea)",
-                  padding: "2px 8px",
+                  background: "rgba(79,184,234,0.12)",
+                  border: "1px solid rgba(79,184,234,0.3)",
+                  color: "#7bb8ea",
+                  padding: "2px 10px",
                   borderRadius: "5px",
                   marginRight: "10px",
                   verticalAlign: "middle",
+                  fontWeight: 500,
                 }}
               >
                 運用
