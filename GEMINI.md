@@ -19,6 +19,7 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 
 - **R1（Biome scope）**: `bun run lint:fix` / `bunx biome check --write`（パス引数なし）は **禁止**。必ずファイル単位でパス指定
 - **legacy/ 配下の編集禁止**（移行完了・凍結済み）
+- **元のHTML/Markdownオリジナルファイルの完全削除は厳禁**：移行元のファイルは絶対に削除してはならず、必ず `legacy/` ディレクトリ配下に移動（`git mv` または `mv`）して退避保存すること
 - **ファイル全体の書き直し禁止**（明示指示がない限り）
 - **依存関係のアップグレード禁止**
 - **設定ファイル（next.config.ts / tsconfig.json / biome.json 等）の勝手な変更禁止**
