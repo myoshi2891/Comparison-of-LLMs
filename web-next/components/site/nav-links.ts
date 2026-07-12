@@ -154,6 +154,10 @@ export const navLinks: readonly NavLink[] = [
         name: "Generation Best Practices",
         href: "/multimodal/generation-best-practices",
       },
+      {
+        name: "Image & Audio (2026)",
+        href: "/multimodal/image-audio-best-practices-2026",
+      },
     ],
   },
   { name: "Git Worktree", href: "/git-worktree" },
