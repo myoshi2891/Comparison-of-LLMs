@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
-import PageComponent, { metadata as rawMetadata } from "@/app/claude/mcp-best-practices/page";
+import PageComponent, { metadata as rawMetadata } from "@/app/mcp/mcp-best-practices/page";
 
 const Page = PageComponent as unknown as () => ReactElement;
 type MetadataLike = { title?: unknown; description?: unknown };
@@ -46,7 +46,7 @@ const EXPECTED_SECTION_IDS = [
   "references",
 ] as const;
 
-describe("/claude/mcp-best-practices - metadata", () => {
+describe("/mcp/mcp-best-practices - metadata", () => {
   it("exports a metadata object with title containing 'MCP実践ガイド'", () => {
     expect(metadata).toBeDefined();
     const title =
@@ -62,7 +62,7 @@ describe("/claude/mcp-best-practices - metadata", () => {
   });
 });
 
-describe("/claude/mcp-best-practices - page structure", () => {
+describe("/mcp/mcp-best-practices - page structure", () => {
   it("renders an <h1> containing 'MCP実践ガイド'", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
@@ -90,7 +90,7 @@ describe("/claude/mcp-best-practices - page structure", () => {
   });
 });
 
-describe("/claude/mcp-best-practices - external link safety", () => {
+describe("/mcp/mcp-best-practices - external link safety", () => {
   it("all external http(s) links have correct target and rel attributes", () => {
     const { container } = render(<Page />);
     const externals = Array.from(container.querySelectorAll("a")).filter((a) => {
@@ -118,7 +118,7 @@ describe("/claude/mcp-best-practices - external link safety", () => {
   });
 });
 
-describe("/claude/mcp-best-practices - code block validation", () => {
+describe("/mcp/mcp-best-practices - code block validation", () => {
   it("renders code blocks with correct language classes", () => {
     const { container } = render(<Page />);
     const codeBlock = container.querySelector("pre code");
@@ -127,7 +127,7 @@ describe("/claude/mcp-best-practices - code block validation", () => {
   });
 });
 
-describe("/claude/mcp-best-practices - static source safety", () => {
+describe("/mcp/mcp-best-practices - static source safety", () => {
   it("does not use the React raw-HTML injection prop", () => {
     const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
     const needle = ["danger", "ously", "Set", "Inner", "HTML"].join("");
