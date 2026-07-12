@@ -204,7 +204,7 @@ export default function McpBestPracticesIntermediatePage() {
       <div className={styles.layout}>
         {/* ================= SIDEBAR ================= */}
         <nav className={styles.sidebar} id="mcpSideNav">
-          <button className={styles.mobileToggle} id="mcpInterNavToggle" type="button">
+          <button className={styles.mobileToggle} id="mcpInterNavToggle" type="button" aria-controls="mcpInterNavList" aria-expanded="false">
             <i className="ti ti-menu-2" />
             目次を開く
           </button>
@@ -314,8 +314,7 @@ export default function McpBestPracticesIntermediatePage() {
             <h1>MCP実践ベストプラクティスガイド</h1>
             <p className={styles.subtitle}>
               Model Context
-              Protocolを本番環境で安全・スケーラブルに運用するための、アーキテクチャ・トランスポート・認可・セキュリティ・スケーラビリティ
-              of 設計判断を、ステップバイステップで解説します。
+              Protocolを本番環境で安全・スケーラブルに運用するための、アーキテクチャ・トランスポート・認可・セキュリティ・スケーラビリティなどの設計判断を、ステップバイステップで解説します。
             </p>
             <div className={styles.meta}>
               <span className={styles.pill}>
@@ -828,8 +827,7 @@ export default function McpBestPracticesIntermediatePage() {
                       <b>Client</b>
                     </td>
                     <td>
-                      1つのMCP Serverと1対1で通信するプロトコルレベル of
-                      コンポーネント。Hostによってサーバーごとにインスタンス化される
+                      1つのMCP Serverと1対1で通信するプロトコルレベルのコンポーネント。Hostによってサーバーごとにインスタンス化される
                     </td>
                     <td>Host内部のクライアントインスタンス</td>
                   </tr>
@@ -1661,7 +1659,7 @@ export default function McpBestPracticesIntermediatePage() {
             </div>
 
             <p>
-              MCPは6つの主要なプリミティブ（構成要素）を定义しています。サーバー側が提供するのが
+              MCPは6つの主要なプリミティブ（構成要素）を定義しています。サーバー側が提供するのが
               <b>Tools・Resources・Prompts</b>、クライアント側が提供するのが
               <b>Sampling・Elicitation・Roots</b>
               です。この非対称な設計こそが、MCPを単なる「関数呼び出しAPI」ではなく「双方向のプロトコル」たらしめている核心部分です。
@@ -2057,7 +2055,7 @@ export default function McpBestPracticesIntermediatePage() {
               >
                 6.2
               </span>
-              評価駆動の反回改善
+              評価駆動の反復改善
             </h3>
             <p>
               Anthropicが強調するもう1つの要点は、
@@ -2685,7 +2683,7 @@ export default function McpBestPracticesIntermediatePage() {
                 MCPサーバーはOAuthの「リソースサーバー」として、認可サーバー（Authorization
                 Server）とは明確に分離
               </b>
-              されることが公式に規定されました。以前のバージョンではMCPサーバーがリソースサーバーと認可サーバーを兼務する設計も許容されており、これが実装の複雑さの一一になっていました。
+              されることが公式に規定されました。以前のバージョンではMCPサーバーがリソースサーバーと認可サーバーを兼務する設計も許容されており、これが実装の複雑さの一因になっていました。
             </p>
 
             <div className={styles.tableWrap}>
@@ -3587,23 +3585,23 @@ export default function McpBestPracticesIntermediatePage() {
               </div>
               <pre className={styles.codeBody}>
                 <code className="language-bash">
-                  <div className={styles.codeLine}>
+                  <span className={styles.codeLine}>
                     <span className={styles.cc}># ローカルのMCPサーバー（stdio）をテスト</span>
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     <span className={styles.cv}>
                       npx @modelcontextprotocol/inspector node build/index.js
                     </span>
-                  </div>
-                  <div className={styles.codeLine}></div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}></span>
+                  <span className={styles.codeLine}>
                     <span className={styles.cc}># CLIモード（スクリプト・CI統合向け）</span>
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     <span className={styles.cv}>
                       npx @modelcontextprotocol/inspector --cli node build/index.js
                     </span>
-                  </div>
+                  </span>
                 </code>
               </pre>
             </div>
@@ -4292,8 +4290,8 @@ export default function McpBestPracticesIntermediatePage() {
                 の3段階のライフサイクルが定義され、廃止（Deprecated）から削除（Removed）までに最低12か月の猶予期間が設けられます。
               </li>
               <li style={{ marginBottom: '8px' }}>
-                <b>Extensions Framework：</b>新機能は逆引きDNS形式 of
-                IDを持つ拡張として、コア仕様とは独立したリポジトリ・独立したバージョニングでリリースされます。実験的機能から公式ステータスへ進むための「Extensions
+                <b>Extensions Framework：</b>新機能は逆引きDNS形式のID
+                を持つ拡張として、コア仕様とは独立したリポジトリ・独立したバージョニングでリリースされます。実験的機能から公式ステータスへ進むための「Extensions
                 Track」が新設されました。
               </li>
               <li style={{ marginBottom: '8px' }}>
