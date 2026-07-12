@@ -96,7 +96,7 @@ export default function Page() {
       <div className={styles.layout}>
         {/* ================= SIDEBAR ================= */}
         <nav className={styles.sidebar} id="ragSideNav">
-          <button className={styles.mobileToggle} id="ragNavToggle" type="button">
+          <button className={styles.mobileToggle} id="ragNavToggle" type="button" aria-controls="ragNavList" aria-expanded="false">
             <i className="ti ti-menu-2" />
             目次を開く
           </button>
@@ -165,7 +165,7 @@ export default function Page() {
             <li>
               <a href="#sec-10" className={styles.tocLink}>
                 <i className="ti ti-topology-star" />
-                10. 発発展的アーキテクチャ
+                10. 発展的アーキテクチャ
               </a>
             </li>
             <li>
