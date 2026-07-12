@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-07-10
+Updated 2026-07-12
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -25,7 +25,7 @@ update.sh  ← オーケストレーター (scrape → copy)
 │   │   ├── layout.tsx           ルートレイアウト (SiteHeader/DisclaimerBanner マウント済み)
 │   │   ├── page.tsx             コスト計算機ホーム (Server Component + Zod 検証 → HomePage へ委譲)
 │   │   ├── globals.css          Tailwind v4 + legacy design tokens (227 行)
-│   │   └── {claude,google,codex,copilot}/{skill,agent}/ および /google/agent-harness-engineering/、/google/notebook-lm/、/google/adk-best-practices/、/claude/managed-agents/、/claude/self-hosted-sandboxes/、/claude/code-slash-commands/、/claude/fable-5-best-practices/、/claude/skills-sh/、/code-review/coderabbit-guide/、/code-review/copilot-code-review/、/code-review/sonar-qube/、/code-review/tool-pricing/、/agent/hermes-agent-advanced-guide/、/agent/loop-engineering/、/agent/skills/、/vercel/sandbox/、/cursor/complete-guide/、/cursor/complete-guide-intermediate/、/security/ai-security-best-practices/、/security/ai-security-best-practices-intermediate/、/local-llm/self-hosting/、/local-llm/best-practices/、/ci-cd/ai-cicd-automation-best-practices/、/agent/context-engineering-best-practices/   Phase B–C および追加移行済みルート（詳細は [`docs/archive/MIGRATION_PROGRESS.md`](docs/archive/MIGRATION_PROGRESS.md)）
+│   │   └── {claude,google,codex,copilot}/{skill,agent}/ および /google/agent-harness-engineering/、/google/notebook-lm/、/google/adk-best-practices/、/claude/managed-agents/、/claude/self-hosted-sandboxes/、/claude/code-slash-commands/、/claude/fable-5-best-practices/、/claude/skills-sh/、/claude/mcp-best-practices/、/code-review/coderabbit-guide/、/code-review/copilot-code-review/、/code-review/sonar-qube/、/code-review/tool-pricing/、/agent/hermes-agent-advanced-guide/、/agent/loop-engineering/、/agent/skills/、/vercel/sandbox/、/cursor/complete-guide/、/cursor/complete-guide-intermediate/、/security/ai-security-best-practices/、/security/ai-security-best-practices-intermediate/、/local-llm/self-hosting/、/local-llm/best-practices/、/ci-cd/ai-cicd-automation-best-practices/、/agent/context-engineering-best-practices/   Phase B–C および追加移行済みルート（詳細は [`docs/archive/MIGRATION_PROGRESS.md`](docs/archive/MIGRATION_PROGRESS.md)）
 │   ├── components/
 │   │   ├── HomePage.tsx         Client Component (Phase 10)
 │   │   ├── ApiTable.tsx / SubTable.tsx / Hero.tsx / ...   (Phase 8-10 成果物)
