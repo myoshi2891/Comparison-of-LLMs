@@ -201,15 +201,18 @@ describe("Phase A - RAG dropdown shape", () => {
 describe("Phase A - Multimodal dropdown shape", () => {
   const multimodal = navLinks.find((link) => link.name === "Multimodal");
 
-  it("has 1 child entry (generation-best-practices)", () => {
+  it("has 2 child entries (generation-best-practices / image-audio-best-practices-2026)", () => {
     expect(multimodal && "children" in multimodal).toBe(true);
     const children = multimodal && "children" in multimodal ? multimodal.children : [];
-    expect(children.length).toBe(1);
+    expect(children.length).toBe(2);
   });
 
   it("uses clean URL paths for all Multimodal children (no .html extension)", () => {
     const children = multimodal && "children" in multimodal ? multimodal.children : [];
-    const expectedHrefs = ["/multimodal/generation-best-practices"];
+    const expectedHrefs = [
+      "/multimodal/generation-best-practices",
+      "/multimodal/image-audio-best-practices-2026",
+    ];
     expect(children.map((c) => c.href)).toEqual(expectedHrefs);
   });
 });
