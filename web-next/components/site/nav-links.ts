@@ -143,5 +143,9 @@ export const navLinks: readonly NavLink[] = [
     name: "CI/CD",
     children: [{ name: "AI CI/CD Automation", href: "/ci-cd/ai-cicd-automation-best-practices" }],
   },
+  {
+    name: "RAG",
+    children: [{ name: "RAG & Embeddings", href: "/rag/embeddings-best-practices" }],
+  },
   { name: "Git Worktree", href: "/git-worktree" },
 ];

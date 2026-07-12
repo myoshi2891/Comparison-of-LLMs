@@ -41,8 +41,8 @@ describe("Phase A - nav-links export shape", () => {
 });
 
 describe("Phase A - nav-links top-level entries", () => {
-  it("has exactly 14 top-level entries", () => {
-    expect(navLinks.length).toBe(14);
+  it("has exactly 15 top-level entries", () => {
+    expect(navLinks.length).toBe(15);
   });
 
   it("starts with Home as a flat link", () => {
@@ -58,7 +58,7 @@ describe("Phase A - nav-links top-level entries", () => {
     expect("href" in last && last.href === "/git-worktree").toBe(true);
   });
 
-  it("has Claude/Google/Codex/Copilot/Code Review/Agent/MCP/Sandbox/IDE/Security/Local LLM/CI/CD as dropdowns with children", () => {
+  it("has Claude/Google/Codex/Copilot/Code Review/Agent/MCP/Sandbox/IDE/Security/Local LLM/CI/CD/RAG as dropdowns with children", () => {
     const providers = [
       "Claude",
       "Google",
@@ -72,6 +72,7 @@ describe("Phase A - nav-links top-level entries", () => {
       "Security",
       "Local LLM",
       "CI/CD",
+      "RAG",
     ] as const;
     for (const name of providers) {
       const entry = navLinks.find((link) => link.name === name);
@@ -179,6 +180,22 @@ describe("Phase A - Local LLM dropdown shape", () => {
   it("uses clean URL paths for all Local LLM children (no .html extension)", () => {
     const children = localLlm && "children" in localLlm ? localLlm.children : [];
     const expectedHrefs = ["/local-llm/self-hosting", "/local-llm/best-practices"];
+    expect(children.map((c) => c.href)).toEqual(expectedHrefs);
+  });
+});
+
+describe("Phase A - RAG dropdown shape", () => {
+  const rag = navLinks.find((link) => link.name === "RAG");
+
+  it("has 1 child entry (embeddings-best-practices)", () => {
+    expect(rag && "children" in rag).toBe(true);
+    const children = rag && "children" in rag ? rag.children : [];
+    expect(children.length).toBe(1);
+  });
+
+  it("uses clean URL paths for all RAG children (no .html extension)", () => {
+    const children = rag && "children" in rag ? rag.children : [];
+    const expectedHrefs = ["/rag/embeddings-best-practices"];
     expect(children.map((c) => c.href)).toEqual(expectedHrefs);
   });
 });
