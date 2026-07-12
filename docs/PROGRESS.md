@@ -14,11 +14,11 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（本作業範囲では新規違反 0 件、既知の既存指摘は本件対象外）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **881 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **883 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
-- **MCP実践ガイドの Next.js 移行**: `Mcp-best-practices-guide.html` から `web-next/app/claude/mcp-best-practices/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、等幅フォント適用、外部リンクのセキュリティ対策（target/rel）、Mermaid遅延ロードと中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションの「Claude -> MCP Best Practices」に新規登録。 Vitest 契約テスト 9 件追加（合計 881 テスト合格）。
+- **MCP実践ガイドの Next.js 移行**: `Mcp-best-practices-guide.html` から `web-next/app/mcp/mcp-best-practices/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、等幅フォント適用、外部リンクのセキュリティ対策（target/rel）、Mermaid遅延ロードと中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションの「MCP -> MCP Best Practices」に新規登録。 Vitest 契約テスト 9 件追加（合計 883 テスト合格）。
 - **コンテキストエンジニアリング入門の Next.js 移行**: ルートの `Context-engineering-guide.html` から `web-next/app/agent/context-engineering-best-practices/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、等幅フォントの適用、外部リンクのセキュリティ対策（target/rel）、Mermaid遅延ロードと中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションの「Agent -> Context Engineering」に新規登録。元の HTML ファイルは `legacy/` 配下に移動。Vitest 契約テスト 8 件がすべて合格。
 - **AI CI/CD 自動化 完全ガイドの Next.js 移行**: `Ai-cicd-automation-best-practices.html` から `web-next/app/ci-cd/ai-cicd-automation-best-practices/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、等幅フォント適用、外部リンクのセキュリティ対策、Mermaid遅延ロードと中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開グルを実装。ナビゲーションに新規カテゴリ「CI/CD -> AI CI/CD Automation」を追加し、関連統合テストを 11 ドロップダウン対応に更新。Vitest 契約テスト 8 件追加（合計 864 テスト合格）。
 - **AIセキュリティ ベストプラクティス完全ガイド（中級〜上級者向け）の Next.js 移行**: `Ai-security-best-practices-intermediate.html` から `web-next/app/security/ai-security-best-practices-intermediate/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、等幅フォント適用、外部リンクのセキュリティ対策（target/rel）、Mermaid遅延ロードと中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションの「Security -> AI Security Best Practices (中級)」に新規登録。 Vitest 契約テスト 8 件追加（合計 856 テスト合格）。
