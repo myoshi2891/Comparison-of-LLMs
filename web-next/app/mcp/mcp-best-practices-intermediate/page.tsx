@@ -327,7 +327,7 @@ export default function McpBestPracticesIntermediatePage() {
                 セクション数: <b>14</b>
               </span>
               <span className={styles.pill}>
-                図解: <b>Mermaid 12点</b>
+                図解: <b>Mermaid 11点</b>
               </span>
             </div>
 
@@ -1663,6 +1663,11 @@ export default function McpBestPracticesIntermediatePage() {
               <b>Tools・Resources・Prompts</b>、クライアント側が提供するのが
               <b>Sampling・Elicitation・Roots</b>
               です。この非対称な設計こそが、MCPを単なる「関数呼び出しAPI」ではなく「双方向のプロトコル」たらしめている核心部分です。
+            </p>
+            <p style={{ fontSize: '0.875em', color: 'var(--color-text-muted, #8b98a7)', marginTop: '4px' }}>
+              ※ 上記の6プリミティブ分類は現行安定版（<code>2025-11-25</code>）仕様に基づきます。
+              2026-07-28 RC では <b>Roots</b> と <b>Sampling</b> が非推奨（deprecated）となり、
+              Extensions 機構による新設計への移行が予定されています。詳細は下記「バージョニングと後方互換性」セクションを参照してください。
             </p>
 
             <h3>
