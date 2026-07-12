@@ -4179,7 +4179,8 @@ npx @modelcontextprotocol/inspector --cli node build/index.js</code></pre>
       });
 
       // ---------- Mermaid: inject via textContent (never innerHTML) ----------
-      (function initMermaidDiagrams() {
+      (async function initMermaidDiagrams() {
+        await document.fonts.ready;
         mermaid.initialize({
           startOnLoad: false,
           theme: 'base',
@@ -4227,7 +4228,9 @@ npx @modelcontextprotocol/inspector --cli node build/index.js</code></pre>
           targetEl.textContent = srcEl.textContent.trim();
         });
 
-        mermaid.run({ querySelector: '.mermaid' });
+        mermaid.run({ querySelector: '.mermaid' }).catch((err) => {
+          console.error('[Mermaid] diagram render error:', err);
+        });
       })();
 
       // ---------- Sidebar scrollspy (IntersectionObserver) ----------
