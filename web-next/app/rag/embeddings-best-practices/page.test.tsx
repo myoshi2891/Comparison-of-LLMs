@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import Page from "./page";
 
 // Mermaid component mock to avoid rendering library issues in JSDOM
@@ -14,9 +14,15 @@ class IntersectionObserverStub {
   readonly root: Element | null = null;
   readonly rootMargin: string = "";
   readonly thresholds: ReadonlyArray<number> = [];
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+  observe() {
+    // no-op
+  }
+  unobserve() {
+    // no-op
+  }
+  disconnect() {
+    // no-op
+  }
 }
 global.IntersectionObserver = IntersectionObserverStub as unknown as typeof IntersectionObserver;
 
@@ -38,7 +44,7 @@ describe("RAG and Embeddings Best Practices Guide Contract Tests", () => {
     const links = Array.from(container.querySelectorAll("a"));
     const externalLinks = links.filter((a) => {
       const href = a.getAttribute("href");
-      return href && href.startsWith("http");
+      return href?.startsWith("http");
     });
 
     expect(externalLinks.length).toBeGreaterThan(0);
