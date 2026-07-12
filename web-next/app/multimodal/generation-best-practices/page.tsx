@@ -140,7 +140,13 @@ export default async function Page() {
       <div className={styles.layout}>
         {/* ================= SIDEBAR ================= */}
         <aside className={styles.sidebar}>
-          <button className={styles.mobileToggle} id="multimodalNavToggle" type="button" aria-controls="multimodalNavList" aria-expanded="false">
+          <button
+            className={styles.mobileToggle}
+            id="multimodalNavToggle"
+            type="button"
+            aria-controls="multimodalNavList"
+            aria-expanded="false"
+          >
             <i className="ti ti-menu-2" />
             目次を開く
           </button>
@@ -343,7 +349,8 @@ export default async function Page() {
                 「なんとなく上手くいった」ではなく、次も同じ品質を出せる手順を示す
               </li>
               <li>
-                <strong>モデル横断の普遍原則 + モデル固有のコツ</strong>: プロンプト設計の共通原則と、主要ツールごとの違いを分けて説明
+                <strong>モデル横断の普遍原則 + モデル固有のコツ</strong>:
+                プロンプト設計の共通原則と、主要ツールごとの違いを分けて説明
               </li>
               <li>
                 <strong>安全性と法令遵守</strong>:
@@ -1136,7 +1143,7 @@ export default async function Page() {
                     <td>California SB 942</td>
                     <td>米国カリフォルニア州</td>
                     <td>
-                      2026年1月1日に施行済み。AI生成の画像・音声・動画を提供する製品には開示が義務付けられている。
+                      2026年8月2日施行。月間アクティブユーザー数が100万人を超える一般公開の生成AIプロバイダーに対して、AI生成コンテンツ（画像・音声・動画等）への開示・マーク付与が義務付けられている。
                     </td>
                   </tr>
                   <tr>
