@@ -135,7 +135,13 @@ export default function AdkBestPracticesPage() {
       <TocObserver />
       <div className={styles.layout}>
         <nav className={styles.sidebar} id="adkSideNav">
-          <button className={styles.mobileToggle} id="adkNavToggle" type="button">
+          <button
+            className={styles.mobileToggle}
+            id="adkNavToggle"
+            type="button"
+            aria-controls="adkNavList"
+            aria-expanded="false"
+          >
             <i className="ti ti-menu-2" />
             目次を開く
           </button>
@@ -438,7 +444,12 @@ export default function AdkBestPracticesPage() {
               </pre>
             </div>
             <p>
-              <strong>セキュリティ上の注意:</strong> <code>.env</code> ファイルにはAPIキーなどの機密情報を保存しますが、このファイルを誤ってリポジトリにコミット（Git管理）しないよう、必ず <code>.gitignore</code> に登録して除外してください。代わりに、環境変数のキー名のみを記述し、値は空にした <code>.env.example</code> を共有用テンプレートとしてコミットし、チーム内で共有することがベストプラクティスです。
+              <strong>セキュリティ上の注意:</strong> <code>.env</code>{" "}
+              ファイルにはAPIキーなどの機密情報を保存しますが、このファイルを誤ってリポジトリにコミット（Git管理）しないよう、必ず{" "}
+              <code>.gitignore</code>{" "}
+              に登録して除外してください。代わりに、環境変数のキー名のみを記述し、値は空にした{" "}
+              <code>.env.example</code>{" "}
+              を共有用テンプレートとしてコミットし、チーム内で共有することがベストプラクティスです。
             </p>
 
             <h3>3.3 開発ループのベストプラクティス</h3>
@@ -878,14 +889,19 @@ export default function AdkBestPracticesPage() {
                   </span>
                   <span className={styles.codeLine} />
                   <span className={styles.codeLine}>
-                    {"    "}<span className={styles.co}># ASTバリデーションにより読み取り専用（SELECT）のみを許可</span>
+                    {"    "}
+                    <span className={styles.co}>
+                      # ASTバリデーションにより読み取り専用（SELECT）のみを許可
+                    </span>
                   </span>
                   <span className={styles.codeLine}>
-                    {"    "}<span className={styles.ck}>if</span> <span className={styles.ck}>not</span>{" "}
+                    {"    "}
+                    <span className={styles.ck}>if</span> <span className={styles.ck}>not</span>{" "}
                     validate_select_only_ast(sql_query):
                   </span>
                   <span className={styles.codeLine}>
-                    {"        "}<span className={styles.ck}>return</span> &#123;
+                    {"        "}
+                    <span className={styles.ck}>return</span> &#123;
                     <span className={styles.cs}>"status"</span>:{" "}
                     <span className={styles.cs}>"error"</span>,{" "}
                     <span className={styles.cs}>"message"</span>:{" "}
@@ -894,10 +910,15 @@ export default function AdkBestPracticesPage() {
                   </span>
                   <span className={styles.codeLine} />
                   <span className={styles.codeLine}>
-                    {"    "}<span className={styles.co}># パラメータ化クエリを読み取り専用接続で安全に実行</span>
+                    {"    "}
+                    <span className={styles.co}>
+                      # パラメータ化クエリを読み取り専用接続で安全に実行
+                    </span>
                   </span>
                   <span className={styles.codeLine}>
-                    {"    "}<span className={styles.ck}>return</span> run_query_readonly(sql_query, query_params)
+                    {"    "}
+                    <span className={styles.ck}>return</span> run_query_readonly(sql_query,
+                    query_params)
                   </span>
                 </code>
               </pre>
@@ -1707,10 +1728,7 @@ export default function AdkBestPracticesPage() {
               <i className="ti ti-link" />
               出典: ADK公式ドキュメント「Introduction to A2A」およびGoogle Codelabs「Connect to
               Remote Agents with ADK and the Agent2Agent SDK」{" "}
-              <Ext href="https://adk.dev/a2a/intro/">
-                adk.dev
-              </Ext>{" "}
-              /{" "}
+              <Ext href="https://adk.dev/a2a/intro/">adk.dev</Ext> /{" "}
               <Ext href="https://www.skills.google/focuses/132170?parent=catalog">
                 skills.google
               </Ext>
@@ -1824,11 +1842,8 @@ export default function AdkBestPracticesPage() {
             <p className={styles.source}>
               <i className="ti ti-link" />
               出典: ADK公式ドキュメント「Deploying Your Agent」「Cloud Run」「Deploy to Agent
-              Runtime」{" "}
-              <Ext href="https://adk.dev/deploy/cloud-run/">
-                adk.dev
-              </Ext>{" "}
-              / <Ext href="https://adk.dev/deploy/agent-runtime/">adk.dev/deploy/agent-runtime</Ext>
+              Runtime」 <Ext href="https://adk.dev/deploy/cloud-run/">adk.dev</Ext> /{" "}
+              <Ext href="https://adk.dev/deploy/agent-runtime/">adk.dev/deploy/agent-runtime</Ext>
             </p>
           </section>
 
@@ -2029,10 +2044,7 @@ export default function AdkBestPracticesPage() {
                 </li>
                 <li>
                   <i className="ti ti-point" />
-                  Callbacks overview:{" "}
-                  <Ext href="https://adk.dev/callbacks/">
-                    adk.dev/callbacks
-                  </Ext>
+                  Callbacks overview: <Ext href="https://adk.dev/callbacks/">adk.dev/callbacks</Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
@@ -2065,9 +2077,7 @@ export default function AdkBestPracticesPage() {
                 <li>
                   <i className="ti ti-point" />
                   Criteria:{" "}
-                  <Ext href="https://adk.dev/evaluate/criteria/">
-                    adk.dev/evaluate/criteria
-                  </Ext>
+                  <Ext href="https://adk.dev/evaluate/criteria/">adk.dev/evaluate/criteria</Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
@@ -2100,9 +2110,7 @@ export default function AdkBestPracticesPage() {
                 <li>
                   <i className="ti ti-point" />
                   Introduction to A2A:{" "}
-                  <Ext href="https://adk.dev/a2a/intro/">
-                    adk.dev/a2a/intro
-                  </Ext>
+                  <Ext href="https://adk.dev/a2a/intro/">adk.dev/a2a/intro</Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
@@ -2113,17 +2121,12 @@ export default function AdkBestPracticesPage() {
                 </li>
                 <li>
                   <i className="ti ti-point" />
-                  Deploying Your Agent:{" "}
-                  <Ext href="https://adk.dev/deploy/">
-                    adk.dev/deploy
-                  </Ext>
+                  Deploying Your Agent: <Ext href="https://adk.dev/deploy/">adk.dev/deploy</Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
                   Cloud Run（デプロイ）:{" "}
-                  <Ext href="https://adk.dev/deploy/cloud-run/">
-                    adk.dev/deploy/cloud-run
-                  </Ext>
+                  <Ext href="https://adk.dev/deploy/cloud-run/">adk.dev/deploy/cloud-run</Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
