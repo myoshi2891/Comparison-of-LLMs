@@ -73,6 +73,10 @@ describe("/agent/context-engineering-best-practices - page structure", () => {
 
   it("renders all 10 expected sections", () => {
     const { container } = render(<Page />);
+    const headerAnchors = container.querySelectorAll("header[id]");
+    const sectionAnchors = container.querySelectorAll("section[id]");
+    expect(headerAnchors.length + sectionAnchors.length).toBe(EXPECTED_SECTION_IDS.length);
+
     for (const id of EXPECTED_SECTION_IDS) {
       const el = container.querySelector(`#${id}`);
       expect(el, `section id="${id}" must exist`).not.toBeNull();
