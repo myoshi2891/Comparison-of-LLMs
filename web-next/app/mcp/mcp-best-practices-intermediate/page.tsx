@@ -336,6 +336,7 @@ export default function McpBestPracticesIntermediatePage() {
               <svg
                 viewBox="0 0 760 160"
                 width="100%"
+                style={{ maxHeight: "120px", display: "block" }}
                 height="auto"
                 xmlns="http://www.w3.org/2000/svg"
                 role="img"
@@ -1071,12 +1072,144 @@ export default function McpBestPracticesIntermediatePage() {
             <div className={styles.diagramFrame}>
               <div
                 className={styles.codeBar}
-                style={{ borderBottom: "none", background: "none", padding: "0 0 10px 0" }}
+                style={{ borderBottom: "none", background: "none", padding: "0 0 14px 0" }}
               >
                 Fig. 3-1 — 仕様リリース履歴タイムライン
               </div>
-              <div className={styles.mermaidDiagram}>
-                <MermaidDiagram chart={DIAGRAMS.timeline} />
+              {/* ── Custom horizontal timeline ── */}
+              <div style={{ position: "relative", padding: "8px 0 0" }}>
+                {/* 横軸ライン */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "28px",
+                    left: "0",
+                    right: "0",
+                    height: "2px",
+                    background:
+                      "linear-gradient(90deg, rgba(79,216,196,0.15) 0%, rgba(79,216,196,0.5) 50%, rgba(245,113,107,0.4) 100%)",
+                  }}
+                />
+                {/* バージョンノード列 */}
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(5, 1fr)",
+                    gap: "8px",
+                    position: "relative",
+                  }}
+                >
+                  {([
+                    {
+                      date: "2024-11-05",
+                      color: "#4fd8c4",
+                      bg: "rgba(79,216,196,0.12)",
+                      border: "rgba(79,216,196,0.4)",
+                      label: "初版仕様",
+                      desc: "stdio / HTTP+SSE",
+                    },
+                    {
+                      date: "2025-03-26",
+                      color: "#7bb8ea",
+                      bg: "rgba(123,184,234,0.12)",
+                      border: "rgba(123,184,234,0.4)",
+                      label: "Streamable HTTP",
+                      desc: "HTTP+SSEを非推奨化",
+                    },
+                    {
+                      date: "2025-06-18",
+                      color: "#be97f5",
+                      bg: "rgba(190,151,245,0.14)",
+                      border: "rgba(190,151,245,0.4)",
+                      label: "OAuth 2.1",
+                      desc: "認可仕様を正式化",
+                    },
+                    {
+                      date: "2025-11-25",
+                      color: "#7fd6a3",
+                      bg: "rgba(127,214,163,0.12)",
+                      border: "rgba(127,214,163,0.4)",
+                      label: "現行安定版",
+                      desc: "Tasks 実験導入",
+                    },
+                    {
+                      date: "2026-07-28",
+                      color: "#f5b84f",
+                      bg: "rgba(245,184,79,0.12)",
+                      border: "rgba(245,184,79,0.4)",
+                      label: "ステートレス化",
+                      desc: "Extensions 導入 (RC)",
+                    },
+                  ] as const).map((v) => (
+                    <div
+                      key={v.date}
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: "6px",
+                      }}
+                    >
+                      {/* ノード */}
+                      <div
+                        style={{
+                          width: "12px",
+                          height: "12px",
+                          borderRadius: "50%",
+                          background: v.color,
+                          border: `2px solid ${v.border}`,
+                          boxShadow: `0 0 6px ${v.color}55`,
+                          zIndex: 1,
+                          marginTop: "22px",
+                        }}
+                      />
+                      {/* 日付 */}
+                      <span
+                        style={{
+                          fontFamily: "var(--font-mono)",
+                          fontSize: "10px",
+                          color: v.color,
+                          letterSpacing: "0.02em",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {v.date}
+                      </span>
+                      {/* カード */}
+                      <div
+                        style={{
+                          background: v.bg,
+                          border: `1px solid ${v.border}`,
+                          borderRadius: "8px",
+                          padding: "8px 10px",
+                          width: "100%",
+                          textAlign: "center",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            fontWeight: 600,
+                            color: v.color,
+                            marginBottom: "3px",
+                            lineHeight: 1.3,
+                          }}
+                        >
+                          {v.label}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "10.5px",
+                            color: "var(--color-text-secondary, #aeb2bd)",
+                            lineHeight: 1.4,
+                          }}
+                        >
+                          {v.desc}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
