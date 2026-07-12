@@ -2558,139 +2558,132 @@ const result = await client.callTool("generate_screen_from_text", {
       const diagrams = [
         {
           id: 'diagram-timeline',
-          code:
-            'flowchart LR\n' +
-            'n1["2025年5月 GoogleIOで単一画面生成として公開"]\n' +
-            'n2["2025年12月 Prototypes機能追加とGemini3導入"]\n' +
-            'n3["2026年3月 vibe design発表 無限キャンバスとDESIGN.md追加"]\n' +
-            'n4["2026年4月 DESIGN.mdをApache2.0でオープンソース化"]\n' +
-            'n5["2026年5月 GoogleIOでストリーミング型design agent発表"]\n' +
-            'n1 --> n2 --> n3 --> n4 --> n5\n' +
-            'classDef purple fill:#2a2140,stroke:#a78bfa,color:#eef0f2\n' +
-            'classDef teal fill:#123b38,stroke:#2dd4bf,color:#eef0f2\n' +
-            'classDef coral fill:#3a1f1c,stroke:#f2836b,color:#eef0f2\n' +
-            'classDef pink fill:#3a1f30,stroke:#f472b6,color:#eef0f2\n' +
-            'class n1 purple\n' +
-            'class n2 teal\n' +
-            'class n3 coral\n' +
-            'class n4,n5 pink',
+          code: `flowchart LR
+n1["2025年5月 GoogleIOで単一画面生成として公開"]
+n2["2025年12月 Prototypes機能追加とGemini3導入"]
+n3["2026年3月 vibe design発表 無限キャンバスとDESIGN.md追加"]
+n4["2026年4月 DESIGN.mdをApache2.0でオープンソース化"]
+n5["2026年5月 GoogleIOでストリーミング型design agent発表"]
+n1 --> n2 --> n3 --> n4 --> n5
+classDef purple fill:#2a2140,stroke:#a78bfa,color:#eef0f2
+classDef teal fill:#123b38,stroke:#2dd4bf,color:#eef0f2
+classDef coral fill:#3a1f1c,stroke:#f2836b,color:#eef0f2
+classDef pink fill:#3a1f30,stroke:#f472b6,color:#eef0f2
+class n1 purple
+class n2 teal
+class n3 coral
+class n4,n5 pink`,
         },
         {
           id: 'diagram-overview',
-          code:
-            'flowchart TD\n' +
-            'idea["アイデアとビジネス目標を言葉で説明"]\n' +
-            'vibe["Vibe Designでキャンバス上に生成"]\n' +
-            'iterate["テキスト 音声 注釈で反復修正"]\n' +
-            'multi["マルチスクリーン生成で関連画面を追加"]\n' +
-            'proto["Prototypesで画面を接続しユーザージャーニーを検証"]\n' +
-            'expo["Figma コード AI Studio MCPへエクスポート"]\n' +
-            'build["Figmaで仕上げ または開発チームへハンドオフ"]\n' +
-            'idea --> vibe --> iterate --> multi --> proto --> expo --> build\n' +
-            'classDef purple fill:#2a2140,stroke:#a78bfa,color:#eef0f2\n' +
-            'classDef teal fill:#123b38,stroke:#2dd4bf,color:#eef0f2\n' +
-            'classDef coral fill:#3a1f1c,stroke:#f2836b,color:#eef0f2\n' +
-            'classDef pink fill:#3a1f30,stroke:#f472b6,color:#eef0f2\n' +
-            'class idea,vibe purple\n' +
-            'class iterate,multi teal\n' +
-            'class proto,expo coral\n' +
-            'class build pink',
+          code: `flowchart TD
+idea["アイデアとビジネス目標を言葉で説明"]
+vibe["Vibe Designでキャンバス上に生成"]
+iterate["テキスト 音声 注釈で反復修正"]
+multi["マルチスクリーン生成で関連画面を追加"]
+proto["Prototypesで画面を接続しユーザージャーニーを検証"]
+expo["Figma コード AI Studio MCPへエクスポート"]
+build["Figmaで仕上げ または開発チームへハンドオフ"]
+idea --> vibe --> iterate --> multi --> proto --> expo --> build
+classDef purple fill:#2a2140,stroke:#a78bfa,color:#eef0f2
+classDef teal fill:#123b38,stroke:#2dd4bf,color:#eef0f2
+classDef coral fill:#3a1f1c,stroke:#f2836b,color:#eef0f2
+classDef pink fill:#3a1f30,stroke:#f472b6,color:#eef0f2
+class idea,vibe purple
+class iterate,multi teal
+class proto,expo coral
+class build pink`,
         },
         {
           id: 'diagram-setup',
-          code:
-            'flowchart TD\n' +
-            's1["1 stitch withgoogle com へアクセスしGoogleアカウントでサインイン"]\n' +
-            's2["2 New Projectをクリックして新規キャンバスを作成"]\n' +
-            's3["3 StandardモードかExperimentalモードかを選択"]\n' +
-            's4["4 WebかAppかのプラットフォームを選択"]\n' +
-            's5["5 構造化されたプロンプトを入力して生成"]\n' +
-            's6["6 生成結果をレビューし追加プロンプトで反復修正"]\n' +
-            's7["7 必要に応じてマルチセレクトで複数画面へ一括適用"]\n' +
-            's8["8 Figma コード MCPなどへエクスポート"]\n' +
-            's1 --> s2 --> s3 --> s4 --> s5 --> s6 --> s7 --> s8\n' +
-            'classDef purple fill:#2a2140,stroke:#a78bfa,color:#eef0f2\n' +
-            'classDef teal fill:#123b38,stroke:#2dd4bf,color:#eef0f2\n' +
-            'classDef coral fill:#3a1f1c,stroke:#f2836b,color:#eef0f2\n' +
-            'classDef pink fill:#3a1f30,stroke:#f472b6,color:#eef0f2\n' +
-            'class s1,s2 purple\n' +
-            'class s3,s4,s5 teal\n' +
-            'class s6,s7 coral\n' +
-            'class s8 pink',
+          code: `flowchart TD
+s1["1 stitch withgoogle com へアクセスしGoogleアカウントでサインイン"]
+s2["2 New Projectをクリックして新規キャンバスを作成"]
+s3["3 StandardモードかExperimentalモードかを選択"]
+s4["4 WebかAppかのプラットフォームを選択"]
+s5["5 構造化されたプロンプトを入力して生成"]
+s6["6 生成結果をレビューし追加プロンプトで反復修正"]
+s7["7 必要に応じてマルチセレクトで複数画面へ一括適用"]
+s8["8 Figma コード MCPなどへエクスポート"]
+s1 --> s2 --> s3 --> s4 --> s5 --> s6 --> s7 --> s8
+classDef purple fill:#2a2140,stroke:#a78bfa,color:#eef0f2
+classDef teal fill:#123b38,stroke:#2dd4bf,color:#eef0f2
+classDef coral fill:#3a1f1c,stroke:#f2836b,color:#eef0f2
+classDef pink fill:#3a1f30,stroke:#f472b6,color:#eef0f2
+class s1,s2 purple
+class s3,s4,s5 teal
+class s6,s7 coral
+class s8 pink`,
         },
         {
           id: 'diagram-zoom',
-          code:
-            'flowchart TD\n' +
-            'zo["Zoom Out 想定ユーザー プラットフォームなど大枠のコンテキストを設定"]\n' +
-            'zi["Zoom In 画面のゴール レイアウト階層 主要コンポーネントを定義"]\n' +
-            'gen["Stitchが具体的なレイアウト判断を行い生成"]\n' +
-            'zo --> zi --> gen\n' +
-            'classDef purple fill:#2a2140,stroke:#a78bfa,color:#eef0f2\n' +
-            'classDef teal fill:#123b38,stroke:#2dd4bf,color:#eef0f2\n' +
-            'classDef coral fill:#3a1f1c,stroke:#f2836b,color:#eef0f2\n' +
-            'class zo purple\n' +
-            'class zi teal\n' +
-            'class gen coral',
+          code: `flowchart TD
+zo["Zoom Out 想定ユーザー プラットフォームなど大枠のコンテキストを設定"]
+zi["Zoom In 画面のゴール レイアウト階層 主要コンポーネントを定義"]
+gen["Stitchが具体的なレイアウト判断を行い生成"]
+zo --> zi --> gen
+classDef purple fill:#2a2140,stroke:#a78bfa,color:#eef0f2
+classDef teal fill:#123b38,stroke:#2dd4bf,color:#eef0f2
+classDef coral fill:#3a1f1c,stroke:#f2836b,color:#eef0f2
+class zo purple
+class zi teal
+class gen coral`,
         },
         {
           id: 'diagram-designmd',
-          code:
-            'flowchart LR\n' +
-            'brand["ブランド資産 または参考URL"]\n' +
-            'extract["Stitchでデザインシステムを抽出生成"]\n' +
-            'file["DESIGN.mdファイルとして出力"]\n' +
-            'repo["Gitリポジトリへコミットしバージョン管理"]\n' +
-            'reuse["別のStitchプロジェクトへ再インポート"]\n' +
-            'agents["Claude Code Cursor Gemini CLIなどが読み込み適用"]\n' +
-            'brand --> extract --> file --> repo\n' +
-            'repo --> reuse\n' +
-            'repo --> agents\n' +
-            'classDef purple fill:#2a2140,stroke:#a78bfa,color:#eef0f2\n' +
-            'classDef teal fill:#123b38,stroke:#2dd4bf,color:#eef0f2\n' +
-            'classDef coral fill:#3a1f1c,stroke:#f2836b,color:#eef0f2\n' +
-            'classDef pink fill:#3a1f30,stroke:#f472b6,color:#eef0f2\n' +
-            'class brand purple\n' +
-            'class extract,file teal\n' +
-            'class repo coral\n' +
-            'class reuse,agents pink',
+          code: `flowchart LR
+brand["ブランド資産 または参考URL"]
+extract["Stitchでデザインシステムを抽出生成"]
+file["DESIGN.mdファイルとして出力"]
+repo["Gitリポジトリへコミットしバージョン管理"]
+reuse["別のStitchプロジェクトへ再インポート"]
+agents["Claude Code Cursor Gemini CLIなどが読み込み適用"]
+brand --> extract --> file --> repo
+repo --> reuse
+repo --> agents
+classDef purple fill:#2a2140,stroke:#a78bfa,color:#eef0f2
+classDef teal fill:#123b38,stroke:#2dd4bf,color:#eef0f2
+classDef coral fill:#3a1f1c,stroke:#f2836b,color:#eef0f2
+classDef pink fill:#3a1f30,stroke:#f472b6,color:#eef0f2
+class brand purple
+class extract,file teal
+class repo coral
+class reuse,agents pink`,
         },
         {
           id: 'diagram-export',
-          code:
-            'flowchart TD\n' +
-            'gen2["Stitchで高速に方向性を探索生成"]\n' +
-            'figma["Figmaへエクスポートしチームでレビュー"]\n' +
-            'code["コードエクスポートで開発ハンドオフ"]\n' +
-            'studio["AI Studioでバックエンド連携を実験"]\n' +
-            'gen2 --> figma\n' +
-            'gen2 --> code\n' +
-            'gen2 --> studio\n' +
-            'classDef purple fill:#2a2140,stroke:#a78bfa,color:#eef0f2\n' +
-            'classDef teal fill:#123b38,stroke:#2dd4bf,color:#eef0f2\n' +
-            'classDef coral fill:#3a1f1c,stroke:#f2836b,color:#eef0f2\n' +
-            'class gen2 purple\n' +
-            'class figma,code,studio teal',
+          code: `flowchart TD
+gen2["Stitchで高速に方向性を探索生成"]
+figma["Figmaへエクスポートしチームでレビュー"]
+code["コードエクスポートで開発ハンドオフ"]
+studio["AI Studioでバックエンド連携を実験"]
+gen2 --> figma
+gen2 --> code
+gen2 --> studio
+classDef purple fill:#2a2140,stroke:#a78bfa,color:#eef0f2
+classDef teal fill:#123b38,stroke:#2dd4bf,color:#eef0f2
+classDef coral fill:#3a1f1c,stroke:#f2836b,color:#eef0f2
+class gen2 purple
+class figma,code,studio teal`,
         },
         {
           id: 'diagram-mcp',
-          code:
-            'flowchart TD\n' +
-            'dev["開発者がIDE上でエージェントに指示 例 Claude CodeやCursor"]\n' +
-            'mcpclient["MCPクライアント設定を通じてStitch MCPサーバーへ接続"]\n' +
-            'mcpserver["Stitch MCPサーバー 公式またはコミュニティ製プロキシ"]\n' +
-            'api["Stitch API generate screen from text等のツール群"]\n' +
-            'result["生成されたHTMLとデザインメタデータを取得"]\n' +
-            'integrate["エージェントが自分のコードベースへ統合"]\n' +
-            'dev --> mcpclient --> mcpserver --> api --> result --> integrate\n' +
-            'classDef purple fill:#2a2140,stroke:#a78bfa,color:#eef0f2\n' +
-            'classDef teal fill:#123b38,stroke:#2dd4bf,color:#eef0f2\n' +
-            'classDef coral fill:#3a1f1c,stroke:#f2836b,color:#eef0f2\n' +
-            'classDef pink fill:#3a1f30,stroke:#f472b6,color:#eef0f2\n' +
-            'class dev purple\n' +
-            'class mcpclient,mcpserver teal\n' +
-            'class api,result coral\n' +
-            'class integrate pink',
+          code: `flowchart TD
+dev["開発者がIDE上でエージェントに指示 例 Claude CodeやCursor"]
+mcpclient["MCPクライアント設定を通じてStitch MCPサーバーへ接続"]
+mcpserver["Stitch MCPサーバー 公式またはコミュニティ製プロキシ"]
+api["Stitch API generate screen from text等のツール群"]
+result["生成されたHTMLとデザインメタデータを取得"]
+integrate["エージェントが自分のコードベースへ統合"]
+dev --> mcpclient --> mcpserver --> api --> result --> integrate
+classDef purple fill:#2a2140,stroke:#a78bfa,color:#eef0f2
+classDef teal fill:#123b38,stroke:#2dd4bf,color:#eef0f2
+classDef coral fill:#3a1f1c,stroke:#f2836b,color:#eef0f2
+classDef pink fill:#3a1f30,stroke:#f472b6,color:#eef0f2
+class dev purple
+class mcpclient,mcpserver teal
+class api,result coral
+class integrate pink`,
         },
       ];
 
