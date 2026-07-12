@@ -90,6 +90,21 @@ describe("/mcp/mcp-best-practices - page structure", () => {
   });
 });
 
+describe("/mcp/mcp-best-practices - table accessibility (S5256)", () => {
+  it("every table exposes column headers via <thead> <th>", () => {
+    const { container } = render(<Page />);
+    const tables = Array.from(container.querySelectorAll("table"));
+    expect(tables.length).toBeGreaterThan(0);
+    for (const table of tables) {
+      const headerCells = table.querySelectorAll("thead th");
+      expect(
+        headerCells.length,
+        "each <table> must declare at least one <th> header for accessibility"
+      ).toBeGreaterThan(0);
+    }
+  });
+});
+
 describe("/mcp/mcp-best-practices - external link safety", () => {
   it("all external http(s) links have correct target and rel attributes", () => {
     const { container } = render(<Page />);
