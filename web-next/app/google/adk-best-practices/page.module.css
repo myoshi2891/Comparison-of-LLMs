@@ -394,6 +394,7 @@
 }
 
 .codeLine {
+  display: block;
   white-space: pre;
 }
 

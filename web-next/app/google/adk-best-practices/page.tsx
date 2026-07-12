@@ -96,7 +96,7 @@ Tool --> ATC[after_tool_callback で結果をstateへ記録]
 ATC --> Response[最終応答]`,
 
   d10: `flowchart TB
-Case[test.json 形式のテストケース] --> Runner2[AgentEvaluatorがエージェントを実行]
+Case[test.test.json 形式のテストケース] --> Runner2[AgentEvaluatorがエージェントを実行]
 Runner2 --> Actual[実際のツール呼び出し順序と最終応答を記録]
 Actual --> TrajEval[TrajectoryEvaluator が期待する経路と比較]
 Actual --> RespEval[ResponseEvaluator が期待する応答と比較]
@@ -394,15 +394,15 @@ export default function AdkBestPracticesPage() {
               </div>
               <pre className={styles.codeBody}>
                 <code className="language-bash">
-                  <div className={styles.codeLine}>python3 -m venv .venv</div>
-                  <div className={styles.codeLine}>source .venv/bin/activate</div>
-                  <div className={styles.codeLine}>
+                  <span className={styles.codeLine}>python3 -m venv .venv</span>
+                  <span className={styles.codeLine}>source .venv/bin/activate</span>
+                  <span className={styles.codeLine}>
                     pip install <span className={styles.cs}>google-adk python-dotenv</span>
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     export <span className={styles.cv}>GOOGLE_API_KEY</span>=
                     <span className={styles.cs}>"your_api_key_here"</span>
-                  </div>
+                  </span>
                 </code>
               </pre>
             </div>
@@ -425,14 +425,14 @@ export default function AdkBestPracticesPage() {
               </div>
               <pre className={styles.codeBody}>
                 <code className="language-text">
-                  <div className={styles.codeLine}>parent_folder/</div>
-                  <div className={styles.codeLine}>├── requirements.txt</div>
-                  <div className={styles.codeLine}>└── my_agent/</div>
-                  <div className={styles.codeLine}> ├── __init__.py</div>
-                  <div className={styles.codeLine}> ├── agent.py</div>
-                  <div className={styles.codeLine}> ├── tools.py</div>
-                  <div className={styles.codeLine}> ├── callbacks.py</div>
-                  <div className={styles.codeLine}> └── .env</div>
+                  <span className={styles.codeLine}>parent_folder/</span>
+                  <span className={styles.codeLine}>├── requirements.txt</span>
+                  <span className={styles.codeLine}>└── my_agent/</span>
+                  <span className={styles.codeLine}> ├── __init__.py</span>
+                  <span className={styles.codeLine}> ├── agent.py</span>
+                  <span className={styles.codeLine}> ├── tools.py</span>
+                  <span className={styles.codeLine}> ├── callbacks.py</span>
+                  <span className={styles.codeLine}> └── .env</span>
                 </code>
               </pre>
             </div>
@@ -455,8 +455,8 @@ export default function AdkBestPracticesPage() {
             <p className={styles.source}>
               <i className="ti ti-link" />
               出典: ADK公式ドキュメント「Deploying Your Agent」{" "}
-              <Ext href="https://google.github.io/adk-docs/deploy/">
-                google.github.io/adk-docs/deploy
+              <Ext href="https://adk.dev/deploy/">
+                adk.dev/deploy
               </Ext>
             </p>
           </section>
@@ -477,46 +477,46 @@ export default function AdkBestPracticesPage() {
               </div>
               <pre className={styles.codeBody}>
                 <code className="language-python">
-                  <div className={styles.codeLine}>
+                  <span className={styles.codeLine}>
                     <span className={styles.ck}>from</span> google.adk.agents{" "}
                     <span className={styles.ck}>import</span> Agent
-                  </div>
-                  <div className={styles.codeLine} />
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine} />
+                  <span className={styles.codeLine}>
                     <span className={styles.ck}>def</span>{" "}
                     <span className={styles.ch}>get_weather</span>
                     (city: str) -&gt; dict:
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     {"    "}
                     <span className={styles.ck}>return</span> &#123;
                     <span className={styles.cs}>"status"</span>:{" "}
                     <span className={styles.cs}>"success"</span>,{" "}
                     <span className={styles.cs}>"report"</span>:{" "}
                     <span className={styles.cs}>"晴れ、25度"</span>&#125;
-                  </div>
-                  <div className={styles.codeLine} />
-                  <div className={styles.codeLine}>root_agent = Agent(</div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine} />
+                  <span className={styles.codeLine}>root_agent = Agent(</span>
+                  <span className={styles.codeLine}>
                     {"    "}name=<span className={styles.cs}>"weather_agent"</span>,
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     {"    "}model=<span className={styles.cs}>"gemini-flash-latest"</span>,
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     {"    "}description=
                     <span className={styles.cs}>"指定された都市の天気情報を返すエージェント"</span>,
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     {"    "}instruction=
                     <span className={styles.cs}>
                       "ユーザーが指定した都市の天気を get_weather
                       ツールで取得し、簡潔な日本語で回答してください。"
                     </span>
                     ,
-                  </div>
-                  <div className={styles.codeLine}>{"    "}tools=[get_weather],</div>
-                  <div className={styles.codeLine}>)</div>
+                  </span>
+                  <span className={styles.codeLine}>{"    "}tools=[get_weather],</span>
+                  <span className={styles.codeLine}>)</span>
                 </code>
               </pre>
             </div>
@@ -766,26 +766,26 @@ export default function AdkBestPracticesPage() {
               </div>
               <pre className={styles.codeBody}>
                 <code className="language-python">
-                  <div className={styles.codeLine}>
+                  <span className={styles.codeLine}>
                     <span className={styles.ck}>def</span>{" "}
                     <span className={styles.ch}>get_weather</span>
                     (city: str) -&gt; dict:
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     {"    "}
                     <span className={styles.cc}>
                       """指定した都市の現在の天気情報を取得する。"""
                     </span>
-                  </div>
-                  <div className={styles.codeLine} />
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine} />
+                  <span className={styles.codeLine}>
                     {"    "}
                     <span className={styles.ck}>return</span> &#123;
                     <span className={styles.cs}>"status"</span>:{" "}
                     <span className={styles.cs}>"success"</span>,{" "}
                     <span className={styles.cs}>"report"</span>:{" "}
                     <span className={styles.cs}>"晴れ、25度"</span>&#125;
-                  </div>
+                  </span>
                 </code>
               </pre>
             </div>
@@ -851,21 +851,21 @@ export default function AdkBestPracticesPage() {
               </div>
               <pre className={styles.codeBody}>
                 <code className="language-python">
-                  <div className={styles.codeLine}>
+                  <span className={styles.codeLine}>
                     <span className={styles.ck}>def</span>{" "}
                     <span className={styles.ch}>query_database</span>
                     (sql_query: str, tool_context) -&gt; dict:
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     {"    "}allowed_tables = tool_context.state.get(
                     <span className={styles.cs}>"policy:allowed_tables"</span>, [])
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     {"    "}
                     <span className={styles.ck}>if</span> <span className={styles.ck}>not</span>{" "}
                     is_query_within_allowed_tables(sql_query, allowed_tables):
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     {"        "}
                     <span className={styles.ck}>return</span> &#123;
                     <span className={styles.cs}>"status"</span>:{" "}
@@ -873,11 +873,11 @@ export default function AdkBestPracticesPage() {
                     <span className={styles.cs}>"message"</span>:{" "}
                     <span className={styles.cs}>"許可されていないテーブルへのアクセスです"</span>
                     &#125;
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     {"    "}
                     <span className={styles.ck}>return</span> run_query(sql_query)
-                  </div>
+                  </span>
                 </code>
               </pre>
             </div>
@@ -1029,22 +1029,22 @@ export default function AdkBestPracticesPage() {
               </div>
               <pre className={styles.codeBody}>
                 <code className="language-python">
-                  <div className={styles.codeLine}>
+                  <span className={styles.codeLine}>
                     <span className={styles.ck}>from</span> google.adk.memory{" "}
                     <span className={styles.ck}>import</span> VertexAiMemoryBankService
-                  </div>
-                  <div className={styles.codeLine} />
-                  <div className={styles.codeLine}>memory_service = VertexAiMemoryBankService(</div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine} />
+                  <span className={styles.codeLine}>memory_service = VertexAiMemoryBankService(</span>
+                  <span className={styles.codeLine}>
                     {"    "}project=<span className={styles.cs}>"PROJECT_ID"</span>,
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     {"    "}location=<span className={styles.cs}>"LOCATION"</span>,
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     {"    "}agent_engine_id=<span className={styles.cs}>"AGENT_ENGINE_ID"</span>,
-                  </div>
-                  <div className={styles.codeLine}>)</div>
+                  </span>
+                  <span className={styles.codeLine}>)</span>
                 </code>
               </pre>
             </div>
@@ -1084,43 +1084,43 @@ export default function AdkBestPracticesPage() {
               </div>
               <pre className={styles.codeBody}>
                 <code className="language-python">
-                  <div className={styles.codeLine}>
+                  <span className={styles.codeLine}>
                     <span className={styles.ck}>from</span> google.adk.agents{" "}
                     <span className={styles.ck}>import</span> Agent
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     <span className={styles.ck}>from</span> google.adk.apps.app{" "}
                     <span className={styles.ck}>import</span> App
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     <span className={styles.ck}>from</span> google.adk.agents.context_cache_config{" "}
                     <span className={styles.ck}>import</span> ContextCacheConfig
-                  </div>
-                  <div className={styles.codeLine} />
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine} />
+                  <span className={styles.codeLine}>
                     root_agent = Agent(name=<span className={styles.cs}>"my_agent"</span>, model=
                     <span className={styles.cs}>"gemini-flash-latest"</span>)
-                  </div>
-                  <div className={styles.codeLine} />
-                  <div className={styles.codeLine}>app = App(</div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine} />
+                  <span className={styles.codeLine}>app = App(</span>
+                  <span className={styles.codeLine}>
                     {"    "}name=<span className={styles.cs}>"my-caching-agent-app"</span>,
-                  </div>
-                  <div className={styles.codeLine}>{"    "}root_agent=root_agent,</div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>{"    "}root_agent=root_agent,</span>
+                  <span className={styles.codeLine}>
                     {"    "}context_cache_config=ContextCacheConfig(
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     {"        "}min_tokens=<span className={styles.cv}>2048</span>,
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     {"        "}ttl_seconds=<span className={styles.cv}>600</span>,
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     {"        "}cache_intervals=<span className={styles.cv}>5</span>,
-                  </div>
-                  <div className={styles.codeLine}>{"    "}),</div>
-                  <div className={styles.codeLine}>)</div>
+                  </span>
+                  <span className={styles.codeLine}>{"    "}),</span>
+                  <span className={styles.codeLine}>)</span>
                 </code>
               </pre>
             </div>
@@ -1145,37 +1145,37 @@ export default function AdkBestPracticesPage() {
               </div>
               <pre className={styles.codeBody}>
                 <code className="language-python">
-                  <div className={styles.codeLine}>
+                  <span className={styles.codeLine}>
                     <span className={styles.ck}>from</span> google.adk.apps.app{" "}
                     <span className={styles.ck}>import</span> App, EventsCompactionConfig
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     <span className={styles.ck}>from</span> google.adk.agents{" "}
                     <span className={styles.ck}>import</span> Agent
-                  </div>
-                  <div className={styles.codeLine} />
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine} />
+                  <span className={styles.codeLine}>
                     root_agent = Agent(name=<span className={styles.cs}>"my_root_agent"</span>)
-                  </div>
-                  <div className={styles.codeLine} />
-                  <div className={styles.codeLine}>compaction_config = EventsCompactionConfig(</div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine} />
+                  <span className={styles.codeLine}>compaction_config = EventsCompactionConfig(</span>
+                  <span className={styles.codeLine}>
                     {"    "}token_threshold=<span className={styles.cv}>4000</span>,
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     {"    "}event_retention_size=<span className={styles.cv}>5</span>,
-                  </div>
-                  <div className={styles.codeLine}>)</div>
-                  <div className={styles.codeLine} />
-                  <div className={styles.codeLine}>app = App(</div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>)</span>
+                  <span className={styles.codeLine} />
+                  <span className={styles.codeLine}>app = App(</span>
+                  <span className={styles.codeLine}>
                     {"    "}name=<span className={styles.cs}>"my_compacting_agent_app"</span>,
-                  </div>
-                  <div className={styles.codeLine}>{"    "}root_agent=root_agent,</div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>{"    "}root_agent=root_agent,</span>
+                  <span className={styles.codeLine}>
                     {"    "}events_compaction_config=compaction_config,
-                  </div>
-                  <div className={styles.codeLine}>)</div>
+                  </span>
+                  <span className={styles.codeLine}>)</span>
                 </code>
               </pre>
             </div>
@@ -1455,35 +1455,35 @@ export default function AdkBestPracticesPage() {
               </div>
               <pre className={styles.codeBody}>
                 <code className="language-python">
-                  <div className={styles.codeLine}>
+                  <span className={styles.codeLine}>
                     <span className={styles.ck}>import</span> pytest
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     <span className={styles.ck}>from</span> google.adk.evaluation.agent_evaluator{" "}
                     <span className={styles.ck}>import</span> AgentEvaluator
-                  </div>
-                  <div className={styles.codeLine} />
-                  <div className={styles.codeLine}>@pytest.mark.asyncio</div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine} />
+                  <span className={styles.codeLine}>@pytest.mark.asyncio</span>
+                  <span className={styles.codeLine}>
                     <span className={styles.ck}>async</span> <span className={styles.ck}>def</span>{" "}
                     <span className={styles.ch}>test_customer_service_agent_evaluation</span>():
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     {"    "}
                     <span className={styles.ck}>await</span> AgentEvaluator.evaluate(
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     {"        "}agent_module=
                     <span className={styles.cs}>"customer_service_agent"</span>,
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     {"        "}agent_name=<span className={styles.cs}>"root_agent"</span>,
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     {"        "}eval_dataset_file_path_or_dir=
                     <span className={styles.cs}>"tests/data"</span>,
-                  </div>
-                  <div className={styles.codeLine}>{"    "})</div>
+                  </span>
+                  <span className={styles.codeLine}>{"    "})</span>
                 </code>
               </pre>
             </div>
@@ -1754,18 +1754,18 @@ export default function AdkBestPracticesPage() {
               </div>
               <pre className={styles.codeBody}>
                 <code className="language-bash">
-                  <div className={styles.codeLine}>adk deploy cloud_run \</div>
-                  <div className={styles.codeLine}>
+                  <span className={styles.codeLine}>adk deploy cloud_run \</span>
+                  <span className={styles.codeLine}>
                     {"  "}--project=<span className={styles.cs}>YOUR_PROJECT_ID</span> \
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     {"  "}--region=<span className={styles.cs}>YOUR_REGION</span> \
-                  </div>
-                  <div className={styles.codeLine}>
+                  </span>
+                  <span className={styles.codeLine}>
                     {"  "}--service_name=<span className={styles.cs}>weather-agent</span> \
-                  </div>
-                  <div className={styles.codeLine}>{"  "}--with_ui \</div>
-                  <div className={styles.codeLine}>{"  "}./my_agent</div>
+                  </span>
+                  <span className={styles.codeLine}>{"  "}--with_ui \</span>
+                  <span className={styles.codeLine}>{"  "}./my_agent</span>
                 </code>
               </pre>
             </div>
