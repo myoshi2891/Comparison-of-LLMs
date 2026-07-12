@@ -1303,8 +1303,8 @@ export default function AdkBestPracticesPage() {
             <p className={styles.source}>
               <i className="ti ti-link" />
               出典: ADK公式ドキュメント「Callback design patterns and best practices」{" "}
-              <Ext href="https://google.github.io/adk-docs/callbacks/design-patterns-and-best-practices/">
-                google.github.io/adk-docs
+              <Ext href="https://adk.dev/callbacks/design-patterns-and-best-practices/">
+                adk.dev
               </Ext>
             </p>
 
@@ -1684,8 +1684,8 @@ export default function AdkBestPracticesPage() {
               <i className="ti ti-link" />
               出典: ADK公式ドキュメント「Introduction to A2A」およびGoogle Codelabs「Connect to
               Remote Agents with ADK and the Agent2Agent SDK」{" "}
-              <Ext href="https://google.github.io/adk-docs/a2a/intro/">
-                google.github.io/adk-docs
+              <Ext href="https://adk.dev/a2a/intro/">
+                adk.dev
               </Ext>{" "}
               /{" "}
               <Ext href="https://www.skills.google/focuses/132170?parent=catalog">
@@ -1803,8 +1803,8 @@ export default function AdkBestPracticesPage() {
               <i className="ti ti-link" />
               出典: ADK公式ドキュメント「Deploying Your Agent」「Cloud Run」「Deploy to Agent
               Runtime」{" "}
-              <Ext href="https://google.github.io/adk-docs/deploy/cloud-run/">
-                google.github.io/adk-docs
+              <Ext href="https://adk.dev/deploy/cloud-run/">
+                adk.dev
               </Ext>{" "}
               / <Ext href="https://adk.dev/deploy/agent-runtime/">adk.dev/deploy/agent-runtime</Ext>
             </p>
@@ -1994,8 +1994,8 @@ export default function AdkBestPracticesPage() {
                 <li>
                   <i className="ti ti-point" />
                   Callback design patterns and best practices:{" "}
-                  <Ext href="https://google.github.io/adk-docs/callbacks/design-patterns-and-best-practices/">
-                    google.github.io/adk-docs/callbacks
+                  <Ext href="https://adk.dev/callbacks/design-patterns-and-best-practices/">
+                    adk.dev/callbacks
                   </Ext>
                 </li>
                 <li>
@@ -2008,8 +2008,8 @@ export default function AdkBestPracticesPage() {
                 <li>
                   <i className="ti ti-point" />
                   Callbacks overview:{" "}
-                  <Ext href="https://google.github.io/adk-docs/callbacks/">
-                    google.github.io/adk-docs/callbacks
+                  <Ext href="https://adk.dev/callbacks/">
+                    adk.dev/callbacks
                   </Ext>
                 </li>
                 <li>
@@ -2043,8 +2043,8 @@ export default function AdkBestPracticesPage() {
                 <li>
                   <i className="ti ti-point" />
                   Criteria:{" "}
-                  <Ext href="https://google.github.io/adk-docs/evaluate/criteria/">
-                    google.github.io/adk-docs/evaluate/criteria
+                  <Ext href="https://adk.dev/evaluate/criteria/">
+                    adk.dev/evaluate/criteria
                   </Ext>
                 </li>
                 <li>
@@ -2078,8 +2078,8 @@ export default function AdkBestPracticesPage() {
                 <li>
                   <i className="ti ti-point" />
                   Introduction to A2A:{" "}
-                  <Ext href="https://google.github.io/adk-docs/a2a/intro/">
-                    google.github.io/adk-docs/a2a/intro
+                  <Ext href="https://adk.dev/a2a/intro/">
+                    adk.dev/a2a/intro
                   </Ext>
                 </li>
                 <li>
@@ -2092,15 +2092,15 @@ export default function AdkBestPracticesPage() {
                 <li>
                   <i className="ti ti-point" />
                   Deploying Your Agent:{" "}
-                  <Ext href="https://google.github.io/adk-docs/deploy/">
-                    google.github.io/adk-docs/deploy
+                  <Ext href="https://adk.dev/deploy/">
+                    adk.dev/deploy
                   </Ext>
                 </li>
                 <li>
                   <i className="ti ti-point" />
                   Cloud Run（デプロイ）:{" "}
-                  <Ext href="https://google.github.io/adk-docs/deploy/cloud-run/">
-                    google.github.io/adk-docs/deploy/cloud-run
+                  <Ext href="https://adk.dev/deploy/cloud-run/">
+                    adk.dev/deploy/cloud-run
                   </Ext>
                 </li>
                 <li>
