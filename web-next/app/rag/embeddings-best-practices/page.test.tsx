@@ -9,6 +9,17 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
   },
 }));
 
+// Stub IntersectionObserver for testing in jsdom environment
+class IntersectionObserverStub {
+  readonly root: Element | null = null;
+  readonly rootMargin: string = "";
+  readonly thresholds: ReadonlyArray<number> = [];
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+global.IntersectionObserver = IntersectionObserverStub as unknown as typeof IntersectionObserver;
+
 describe("RAG and Embeddings Best Practices Guide Contract Tests", () => {
   it("renders the page with correct H1 title", async () => {
     render(await Page());
