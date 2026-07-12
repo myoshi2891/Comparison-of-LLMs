@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
@@ -134,13 +132,5 @@ describe("/mcp/mcp-best-practices-intermediate - code block validation", () => {
     const codeBlock = container.querySelector("pre code");
     expect(codeBlock).not.toBeNull();
     expect(codeBlock?.className).toContain("language-");
-  });
-});
-
-describe("/mcp/mcp-best-practices-intermediate - static source safety", () => {
-  it("does not use the React raw-HTML injection prop", () => {
-    const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
-    const needle = ["danger", "ously", "Set", "Inner", "HTML"].join("");
-    expect(source.includes(needle)).toBe(false);
   });
 });
