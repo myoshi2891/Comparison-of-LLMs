@@ -1312,6 +1312,12 @@ export default function McpBestPracticesPage() {
             <h3>やってはいけないことチェックリスト</h3>
             <div className={styles.tableWrap}>
               <table>
+                <thead>
+                  <tr>
+                    <th>判定</th>
+                    <th>やってはいけないこと</th>
+                  </tr>
+                </thead>
                 <tbody>
                   <tr>
                     <td style={{ width: "40px" }}>
@@ -1740,6 +1746,12 @@ export default function McpBestPracticesPage() {
 
             <div className={styles.tableWrap}>
               <table className={styles.checkTable}>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>チェック項目</th>
+                  </tr>
+                </thead>
                 <tbody>
                   <tr>
                     <td>01</td>
