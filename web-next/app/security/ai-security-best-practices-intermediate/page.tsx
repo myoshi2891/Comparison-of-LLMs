@@ -11,224 +11,224 @@ export const metadata: Metadata = {
 
 const DIAGRAMS = {
   threatLandscape: `flowchart TB
-    subgraph L1["データ層"]
-        A1["学習データ汚染<br/>(Data Poisoning)"]
-        A2["個人情報混入<br/>(PII Leakage)"]
-        A3["著作権/ライセンス違反データ"]
-    end
+subgraph L1["データ層"]
+A1["学習データ汚染<br/>(Data Poisoning)"]
+A2["個人情報混入<br/>(PII Leakage)"]
+A3["著作権/ライセンス違反データ"]
+end
 
-    subgraph L2["モデル層"]
-        B1["モデル抽出・窃取<br/>(Model Extraction)"]
-        B2["メンバーシップ推論攻撃"]
-        B3["バックドア/トロイの木馬"]
-    end
+subgraph L2["モデル層"]
+B1["モデル抽出・窃取<br/>(Model Extraction)"]
+B2["メンバーシップ推論攻撃"]
+B3["バックドア/トロイの木馬"]
+end
 
-    subgraph L3["アプリケーション層"]
-        C1["直接プロンプトインジェクション"]
-        C2["間接プロンプトインジェクション"]
-        C3["システムプロンプト漏洩"]
-        C4["出力の不適切な処理"]
-    end
+subgraph L3["アプリケーション層"]
+C1["直接プロンプトインジェクション"]
+C2["間接プロンプトインジェクション"]
+C3["システムプロンプト漏洩"]
+C4["出力の不適切な処理"]
+end
 
-    subgraph L4["エージェント/ツール層"]
-        D1["目標ハイジャック<br/>(Goal Hijack)"]
-        D2["ツール誤用・過剰な自律性"]
-        D3["MCPサーバーのなりすまし/Rug Pull"]
-        D4["メモリ・コンテキスト汚染"]
-        D5["エージェント間通信の詐称"]
-    end
+subgraph L4["エージェント/ツール層"]
+D1["目標ハイジャック<br/>(Goal Hijack)"]
+D2["ツール誤用・過剰な自律性"]
+D3["MCPサーバーのなりすまし/Rug Pull"]
+D4["メモリ・コンテキスト汚染"]
+D5["エージェント間通信の詐称"]
+end
 
-    subgraph L5["インフラ/サプライチェーン層"]
-        E1["依存パッケージの侵害"]
-        E2["モデルレジストリのなりすまし"]
-        E3["ベクトルDB/RAGパイプラインの汚染"]
-        E4["無制限リソース消費(DoW/DoS)"]
-    end
+subgraph L5["インフラ/サプライチェーン層"]
+E1["依存パッケージの侵害"]
+E2["モデルレジストリのなりすまし"]
+E3["ベクトルDB/RAGパイプラインの汚染"]
+E4["無制限リソース消費(DoW/DoS)"]
+end
 
-    L1 --> L2 --> L3 --> L4
-    L5 -.->|供給元を汚染| L1
-    L5 -.->|ツール/サーバーを汚染| L4
+L1 --> L2 --> L3 --> L4
+L5 -.->|供給元を汚染| L1
+L5 -.->|ツール/サーバーを汚染| L4
 
-    style L1 fill:#1a2f4a,color:#fff
-    style L2 fill:#1a2f4a,color:#fff
-    style L3 fill:#1a2f4a,color:#fff
-    style L4 fill:#1a2f4a,color:#fff
-    style L5 fill:#1a2f4a,color:#fff`,
+style L1 fill:#1a2f4a,color:#fff
+style L2 fill:#1a2f4a,color:#fff
+style L3 fill:#1a2f4a,color:#fff
+style L4 fill:#1a2f4a,color:#fff
+style L5 fill:#1a2f4a,color:#fff`,
 
   frameworkRelations: `flowchart LR
-    subgraph Legal["法的拘束力"]
-        EU["EU AI Act"]
-    end
-    subgraph Voluntary["任意フレームワーク（ガバナンス）"]
-        NIST["NIST AI RMF<br/>+ GenAIプロファイル"]
-        ISO["ISO/IEC 42001<br/>(認証可能)"]
-    end
-    subgraph Technical["技術的チェックリスト・脅威DB"]
-        OWASP1["OWASP LLM Top10"]
-        OWASP2["OWASP Agentic Top10"]
-        ATLAS["MITRE ATLAS<br/>(攻撃手法DB)"]
-    end
+subgraph Legal["法的拘束力"]
+EU["EU AI Act"]
+end
+subgraph Voluntary["任意フレームワーク（ガバナンス）"]
+NIST["NIST AI RMF<br/>+ GenAIプロファイル"]
+ISO["ISO/IEC 42001<br/>(認証可能)"]
+end
+subgraph Technical["技術的チェックリスト・脅威DB"]
+OWASP1["OWASP LLM Top10"]
+OWASP2["OWASP Agentic Top10"]
+ATLAS["MITRE ATLAS<br/>(攻撃手法DB)"]
+end
 
-    NIST -->|コンプライアンス根拠として引用| EU
-    ISO -->|認証がEU AI Act対応の裏付けに| EU
-    OWASP1 -->|技術的な実装指針を提供| NIST
-    OWASP2 -->|技術的な実装指針を提供| NIST
-    ATLAS -->|具体的な攻撃手法とレッドチーム項目を提供| OWASP1
-    ATLAS -->|具体的な攻撃手法とレッドチーム項目を提供| OWASP2
+NIST -->|コンプライアンス根拠として引用| EU
+ISO -->|認証がEU AI Act対応の裏付けに| EU
+OWASP1 -->|技術的な実装指針を提供| NIST
+OWASP2 -->|技術的な実装指針を提供| NIST
+ATLAS -->|具体的な攻撃手法とレッドチーム項目を提供| OWASP1
+ATLAS -->|具体的な攻撃手法とレッドチーム項目を提供| OWASP2
 
-    style Legal fill:#4a1a1a,color:#fff
-    style Voluntary fill:#1a3a1a,color:#fff
-    style Technical fill:#1a2f4a,color:#fff`,
+style Legal fill:#4a1a1a,color:#fff
+style Voluntary fill:#1a3a1a,color:#fff
+style Technical fill:#1a2f4a,color:#fff`,
 
   promptInjection: `flowchart TD
-    subgraph Direct["直接プロンプトインジェクション"]
-        U1["攻撃者"] -->|"'これまでの指示を無視して...'"| P1["ユーザー入力欄"]
-        P1 --> M1["LLM"]
-        M1 --> R1["システムプロンプトの上書き・<br/>安全策の迂回"]
-    end
+subgraph Direct["直接プロンプトインジェクション"]
+U1["攻撃者"] -->|"'これまでの指示を無視して...'"| P1["ユーザー入力欄"]
+P1 --> M1["LLM"]
+M1 --> R1["システムプロンプトの上書き・<br/>安全策の迂回"]
+end
 
-    subgraph Indirect["間接プロンプトインジェクション"]
-        U2["攻撃者"] -->|"悪意ある指示を埋め込む"| D2["外部コンテンツ<br/>(Webページ/メール/文書/<br/>ツール出力/RAG検索結果)"]
-        AGENT["エージェント/RAGパイプライン"] -->|"信頼された処理として取り込む"| D2
-        D2 --> M2["LLM"]
-        M2 --> R2["意図しないツール実行・<br/>データ窃取・目標乗っ取り"]
-    end
+subgraph Indirect["間接プロンプトインジェクション"]
+U2["攻撃者"] -->|"悪意ある指示を埋め込む"| D2["外部コンテンツ<br/>(Webページ/メール/文書/<br/>ツール出力/RAG検索結果)"]
+AGENT["エージェント/RAGパイプライン"] -->|"信頼された処理として取り込む"| D2
+D2 --> M2["LLM"]
+M2 --> R2["意図しないツール実行・<br/>データ窃取・目標乗っ取り"]
+end
 
-    style Direct fill:#3a1a1a,color:#fff
-    style Indirect fill:#1a2f4a,color:#fff`,
+style Direct fill:#3a1a1a,color:#fff
+style Indirect fill:#1a2f4a,color:#fff`,
 
   dataPoisoning: `flowchart LR
-    A["公開データセット/<br/>Webスクレイピング"] --> B{"データ検証<br/>パイプライン"}
-    C["サードパーティ提供データ"] --> B
-    B -->|"検証済み"| D["学習パイプライン"]
-    B -->|"異常検知でブロック"| X["隔離・レビュー"]
-    D --> E["ファインチューニング/<br/>継続学習"]
-    E --> F["デプロイ済みモデル"]
-    F -->|"継続的な振る舞い監視"| G["異常検知アラート"]
-    G -.->|"疑わしい場合ロールバック"| F
+A["公開データセット/<br/>Webスクレイピング"] --> B{"データ検証<br/>パイプライン"}
+C["サードパーティ提供データ"] --> B
+B -->|"検証済み"| D["学習パイプライン"]
+B -->|"異常検知でブロック"| X["隔離・レビュー"]
+D --> E["ファインチューニング/<br/>継続学習"]
+E --> F["デプロイ済みモデル"]
+F -->|"継続的な振る舞い監視"| G["異常検知アラート"]
+G -.->|"疑わしい場合ロールバック"| F
 
-    style B fill:#1a3a1a,color:#fff
-    style X fill:#4a1a1a,color:#fff
-    style G fill:#4a3a1a,color:#fff`,
+style B fill:#1a3a1a,color:#fff
+style X fill:#4a1a1a,color:#fff
+style G fill:#4a3a1a,color:#fff`,
 
   ragSecurity: `flowchart LR
-    subgraph Ingest["取り込みパイプライン"]
-        S1["社内文書/Wiki"] --> CH["チャンク分割"]
-        S2["Web/外部データ"] --> CH
-        CH --> EMB["埋め込み生成<br/>(Embedding)"]
-        EMB --> VDB[("ベクトルDB")]
-    end
+subgraph Ingest["取り込みパイプライン"]
+S1["社内文書/Wiki"] --> CH["チャンク分割"]
+S2["Web/外部データ"] --> CH
+CH --> EMB["埋め込み生成<br/>(Embedding)"]
+EMB --> VDB[("ベクトルDB")]
+end
 
-    subgraph Query["検索・生成"]
-        Q["ユーザークエリ"] --> QE["クエリ埋め込み"]
-        QE --> VDB
-        VDB -->|"類似度検索結果"| GEN["LLM生成"]
-        GEN --> RESP["応答"]
-    end
+subgraph Query["検索・生成"]
+Q["ユーザークエリ"] --> QE["クエリ埋め込み"]
+QE --> VDB
+VDB -->|"類似度検索結果"| GEN["LLM生成"]
+GEN --> RESP["応答"]
+end
 
-    ATT["攻撃者"] -.->|"① 汚染文書を混入<br/>(RAGポイズニング)"| S2
-    ATT -.->|"② 未認証エンドポイント経由で<br/>ベクトルDBに直接書き込み"| VDB
-    ATT -.->|"③ 検索結果に指示を<br/>埋め込み間接インジェクション"| GEN
+ATT["攻撃者"] -.->|"① 汚染文書を混入<br/>(RAGポイズニング)"| S2
+ATT -.->|"② 未認証エンドポイント経由で<br/>ベクトルDBに直接書き込み"| VDB
+ATT -.->|"③ 検索結果に指示を<br/>埋め込み間接インジェクション"| GEN
 
-    style Ingest fill:#1a2f4a,color:#fff
-    style Query fill:#1a3a1a,color:#fff
-    style ATT fill:#4a1a1a,color:#fff`,
+style Ingest fill:#1a2f4a,color:#fff
+style Query fill:#1a3a1a,color:#fff
+style ATT fill:#4a1a1a,color:#fff`,
 
   mcpTrust: `flowchart TB
-    subgraph Host["ホスト (Claude Desktop等)"]
-        H["AIアプリケーション"]
-    end
-    subgraph Client["MCPクライアント"]
-        C["サーバーごとに1インスタンス"]
-    end
-    subgraph Servers["MCPサーバー群"]
-        S1["社内データソース<br/>(信頼できるサーバー)"]
-        S2["サードパーティ公開サーバー<br/>(信頼境界の外)"]
-        S3["悪意あるなりすましサーバー"]
-    end
+subgraph Host["ホスト (Claude Desktop等)"]
+H["AIアプリケーション"]
+end
+subgraph Client["MCPクライアント"]
+C["サーバーごとに1インスタンス"]
+end
+subgraph Servers["MCPサーバー群"]
+S1["社内データソース<br/>(信頼できるサーバー)"]
+S2["サードパーティ公開サーバー<br/>(信頼境界の外)"]
+S3["悪意あるなりすましサーバー"]
+end
 
-    H --> C
-    C -->|"信頼境界①"| S1
-    C -->|"信頼境界②<br/>(要検証)"| S2
-    C -.->|"③ Rug Pull攻撃:<br/>承認後にツール定義を変更"| S3
-    S2 -.->|"④ Confused Deputy:<br/>ユーザー権限を超えて実行"| S1
-    S3 -.->|"⑤ Tool Poisoning:<br/>ツール説明文に隠し指示"| H
+H --> C
+C -->|"信頼境界①"| S1
+C -->|"信頼境界②<br/>(要検証)"| S2
+C -.->|"③ Rug Pull攻撃:<br/>承認後にツール定義を変更"| S3
+S2 -.->|"④ Confused Deputy:<br/>ユーザー権限を超えて実行"| S1
+S3 -.->|"⑤ Tool Poisoning:<br/>ツール説明文に隠し指示"| H
 
-    style Host fill:#1a2f4a,color:#fff
-    style Client fill:#1a3a1a,color:#fff
-    style S3 fill:#4a1a1a,color:#fff`,
+style Host fill:#1a2f4a,color:#fff
+style Client fill:#1a3a1a,color:#fff
+style S3 fill:#4a1a1a,color:#fff`,
 
   guardrailArchitecture: `flowchart LR
-    IN["ユーザー入力/<br/>外部コンテンツ"] --> L1["レイヤー1<br/>入力サニタイズ・分類器"]
-    L1 --> LLM["LLM推論"]
-    LLM --> L2["レイヤー2<br/>出力スキーマ検証"]
-    L2 --> L3["レイヤー3<br/>コンテンツポリシー<br/>フィルタ"]
-    L3 --> L4["レイヤー4<br/>高リスクアクション<br/>人間承認ゲート"]
-    L4 --> OUT["実行/表示"]
+IN["ユーザー入力/<br/>外部コンテンツ"] --> L1["レイヤー1<br/>入力サニタイズ・分類器"]
+L1 --> LLM["LLM推論"]
+LLM --> L2["レイヤー2<br/>出力スキーマ検証"]
+L2 --> L3["レイヤー3<br/>コンテンツポリシー<br/>フィルタ"]
+L3 --> L4["レイヤー4<br/>高リスクアクション<br/>人間承認ゲート"]
+L4 --> OUT["実行/表示"]
 
-    L2 -.->|"逸脱検知"| BLOCK1["ブロック・再生成"]
-    L3 -.->|"ポリシー違反"| BLOCK2["ブロック・ログ記録"]
-    L4 -.->|"承認拒否"| BLOCK3["実行キャンセル"]
+L2 -.->|"逸脱検知"| BLOCK1["ブロック・再生成"]
+L3 -.->|"ポリシー違反"| BLOCK2["ブロック・ログ記録"]
+L4 -.->|"承認拒否"| BLOCK3["実行キャンセル"]
 
-    style L1 fill:#1a2f4a,color:#fff
-    style L2 fill:#1a2f4a,color:#fff
-    style L3 fill:#1a2f4a,color:#fff
-    style L4 fill:#4a3a1a,color:#fff`,
+style L1 fill:#1a2f4a,color:#fff
+style L2 fill:#1a2f4a,color:#fff
+style L3 fill:#1a2f4a,color:#fff
+style L4 fill:#4a3a1a,color:#fff`,
 
   redteamLifecycle: `flowchart TD
-    A["脅威モデリング<br/>(OWASP/MITRE ATLASを参照)"] --> B["攻撃シナリオ設計<br/>(直接/間接インジェクション、<br/>ツール誤用、多ターン攻撃等)"]
-    B --> C["自動化敵対的テスト実行<br/>(Garak, PyRIT, DeepTeam等)"]
-    C --> D["手動レッドチーム演習<br/>(高度な適応的攻撃)"]
-    D --> E["結果の重大度評価・<br/>再現可能なエビデンス収集"]
-    E --> F["修正・ガードレール強化"]
-    F --> G["リリースゲートでの<br/>回帰テスト"]
-    G -->|"モデル/プロンプト/<br/>接続データソースの変更ごと"| A
+A["脅威モデリング<br/>(OWASP/MITRE ATLASを参照)"] --> B["攻撃シナリオ設計<br/>(直接/間接インジェクション、<br/>ツール誤用、多ターン攻撃等)"]
+B --> C["自動化敵対的テスト実行<br/>(Garak, PyRIT, DeepTeam等)"]
+C --> D["手動レッドチーム演習<br/>(高度な適応的攻撃)"]
+D --> E["結果の重大度評価・<br/>再現可能なエビデンス収集"]
+E --> F["修正・ガードレール強化"]
+F --> G["リリースゲートでの<br/>回帰テスト"]
+G -->|"モデル/プロンプト/<br/>接続データソースの変更ごと"| A
 
-    style A fill:#1a2f4a,color:#fff
-    style C fill:#1a3a1a,color:#fff
-    style E fill:#4a3a1a,color:#fff`,
+style A fill:#1a2f4a,color:#fff
+style C fill:#1a3a1a,color:#fff
+style E fill:#4a3a1a,color:#fff`,
 
   incidentResponse: `flowchart TD
-    A["異常検知<br/>(監視アラート/ユーザー報告)"] --> B{"重大度評価"}
-    B -->|"低"| C["ログ記録・定期レビューへ"]
-    B -->|"中〜高"| D["インシデント対応チーム招集"]
-    D --> E["影響範囲の特定<br/>(侵害されたツール/データ/<br/>エージェントの特定)"]
-    E --> F["封じ込め<br/>(該当エージェント/ツールの<br/>一時停止、トークン失効)"]
-    F --> G["根本原因分析<br/>(プロンプト/データ/<br/>サプライチェーンのどこが起点か)"]
-    G --> H["復旧・修正<br/>(ガードレール強化、<br/>ロールバック)"]
-    H --> I["事後レビュー・<br/>再発防止策の文書化"]
-    I -.->|"フィードバック"| J["レッドチームシナリオへ追加"]
+A["異常検知<br/>(監視アラート/ユーザー報告)"] --> B{"重大度評価"}
+B -->|"低"| C["ログ記録・定期レビューへ"]
+B -->|"中〜高"| D["インシデント対応チーム招集"]
+D --> E["影響範囲の特定<br/>(侵害されたツール/データ/<br/>エージェントの特定)"]
+E --> F["封じ込め<br/>(該当エージェント/ツールの<br/>一時停止、トークン失効)"]
+F --> G["根本原因分析<br/>(プロンプト/データ/<br/>サプライチェーンのどこが起点か)"]
+G --> H["復旧・修正<br/>(ガードレール強化、<br/>ロールバック)"]
+H --> I["事後レビュー・<br/>再発防止策の文書化"]
+I -.->|"フィードバック"| J["レッドチームシナリオへ追加"]
 
-    style D fill:#4a1a1a,color:#fff
-    style F fill:#4a3a1a,color:#fff
-    style I fill:#1a3a1a,color:#fff`,
+style D fill:#4a1a1a,color:#fff
+style F fill:#4a3a1a,color:#fff
+style I fill:#1a3a1a,color:#fff`,
 
   supplyChain: `flowchart LR
-    A["モデル/データセット<br/>取得・開発"] --> B["AIBOM生成<br/>(CycloneDX形式)"]
-    B --> C["Sigstore/cosignで<br/>署名"]
-    C --> D["レジストリへ登録<br/>(検証可能な形で)"]
-    D --> E["デプロイ時に<br/>署名検証"]
-    E --> F["継続的な脆弱性<br/>スキャン(依存関係含む)"]
-    F -.->|"新たな脆弱性発見時"| G["ロールバック/<br/>再署名フロー"]
+A["モデル/データセット<br/>取得・開発"] --> B["AIBOM生成<br/>(CycloneDX形式)"]
+B --> C["Sigstore/cosignで<br/>署名"]
+C --> D["レジストリへ登録<br/>(検証可能な形で)"]
+D --> E["デプロイ時に<br/>署名検証"]
+E --> F["継続的な脆弱性<br/>スキャン(依存関係含む)"]
+F -.->|"新たな脆弱性発見時"| G["ロールバック/<br/>再署名フロー"]
 
-    style B fill:#1a2f4a,color:#fff
-    style C fill:#1a3a1a,color:#fff
-    style E fill:#1a3a1a,color:#fff`,
+style B fill:#1a2f4a,color:#fff
+style C fill:#1a3a1a,color:#fff
+style E fill:#1a3a1a,color:#fff`,
 
   maturityModel: `flowchart LR
-    L1["Level 1<br/>場当たり的"] --> L2["Level 2<br/>基礎的"]
-    L2 --> L3["Level 3<br/>体系的"]
-    L3 --> L4["Level 4<br/>最適化"]
+L1["Level 1<br/>場当たり的"] --> L2["Level 2<br/>基礎的"]
+L2 --> L3["Level 3<br/>体系的"]
+L3 --> L4["Level 4<br/>最適化"]
 
-    L1 -.- N1["インベントリなし"]
-    L2 -.- N2["OWASP準拠の<br/>基本対策"]
-    L3 -.- N3["NIST/ISO準拠の<br/>ガバナンス+AIBOM"]
-    L4 -.- N4["継続的自動化+<br/>法規制対応完了"]
+L1 -.- N1["インベントリなし"]
+L2 -.- N2["OWASP準拠の<br/>基本対策"]
+L3 -.- N3["NIST/ISO準拠の<br/>ガバナンス+AIBOM"]
+L4 -.- N4["継続的自動化+<br/>法規制対応完了"]
 
-    style L1 fill:#4a1a1a,color:#fff
-    style L2 fill:#4a3a1a,color:#fff
-    style L3 fill:#1a3a3a,color:#fff
-    style L4 fill:#1a3a1a,color:#fff`,
+style L1 fill:#4a1a1a,color:#fff
+style L2 fill:#4a3a1a,color:#fff
+style L3 fill:#1a3a3a,color:#fff
+style L4 fill:#1a3a1a,color:#fff`,
 };
 
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
@@ -375,16 +375,7 @@ export default function AISecurityBestPracticesIntermediatePage() {
             LLM・RAG基盤・AIエージェント・MCP(Model Context
             Protocol)連携システムを設計/実装/運用するエンジニアのための、2026年7月時点の最新フレームワークと実践的な多層防御の設計指針。
           </p>
-          <div
-            className={styles.pageFooter}
-            style={{
-              borderTop: "none",
-              padding: "16px 0",
-              marginTop: "24px",
-              background: "none",
-              textAlign: "left",
-            }}
-          >
+          <div className={styles.heroFooter}>
             <span>最終更新基準日: 2026年7月8日</span>
           </div>
         </section>
@@ -512,7 +503,7 @@ export default function AISecurityBestPracticesIntermediatePage() {
                 <td>法的拘束力のある規制</td>
                 <td>リスクベースのAI規制、GPAIモデル義務、高リスクAIシステム義務</td>
                 <td>
-                  2026年8月2日に大部分が適用開始。高リスク義務は2027年12月/2028年8月へ延期見込み（Omnibus合意）
+                  2026年8月2日（現行法）に大部分が適用開始。高リスク義務は2027年12月/2028年8月（延期案、官報公布待ち）へ延期見込み（Omnibus合意）
                   <sup>[58][60]</sup>
                 </td>
               </tr>
@@ -2830,17 +2821,8 @@ export default function AISecurityBestPracticesIntermediatePage() {
             </div>
           </div>
 
-          <div
-            className={styles.disclaimer}
-            style={{
-              marginTop: "40px",
-              border: "1px dashed var(--brd)",
-              padding: "20px 24px",
-              borderRadius: "10px",
-              color: "var(--txt3)",
-            }}
-          >
-            <p style={{ margin: 0, fontSize: "13px" }}>
+          <div className={styles.disclaimer}>
+            <p className={styles.disclaimerText}>
               <strong>免責事項:</strong>{" "}
               本ガイドは2026年7月8日時点で公開されていた情報をもとに作成しています。AIセキュリティの分野は極めて変化が速いため、実装前に各フレームワーク・法規制の公式サイト（特に
               OWASP: genai.owasp.org、NIST: nist.gov、ISO: iso.org、EU AI Act公式ポータル、MITRE

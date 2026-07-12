@@ -648,3 +648,25 @@ ol.plain {
     display: none;
   }
 }
+
+.heroFooter {
+  border-top: none !important;
+  padding: 16px 0 !important;
+  margin-top: 24px !important;
+  background: none !important;
+  text-align: left !important;
+  color: var(--txt3);
+}
+
+.disclaimer {
+  margin-top: 40px;
+  border: 1px dashed var(--brd);
+  padding: 20px 24px;
+  border-radius: 10px;
+  color: var(--txt3);
+}
+
+.disclaimerText {
+  margin: 0;
+  font-size: 13px;
+}
