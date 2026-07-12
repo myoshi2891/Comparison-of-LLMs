@@ -141,6 +141,7 @@ build-time ハイライトとして `shiki` を採用する。
 - `components/docs/MermaidDiagram.tsx` を直接インポートして通常通り使用する（内部で動的インポート済み）
 - テーマは **`theme: "dark"`** を設定する
 - 記述は **左端揃え必須**（インデントが混じると構文エラー）
+- **表示レイアウト**: ダイアグラムは必ず中央寄せに配置すること（CSS Module 内で `:global(.mermaid)` やコンテナに対して `display: flex; justify-content: center;` を適用する）。
 - `globals.css` に Mermaid 補正 CSS 適用済み。新規図解で読みにくい場合のみ追記する
 
 ### Step 5: [Refactor] 共通化判断
@@ -355,7 +356,8 @@ cd web-next && bun run build && bun run lint && bun run test
 - **`"use client"` を不必要に使わない** — Server Component デフォルト
 - **生 HTML 注入 prop を使わない** — JSX `<span>` でシンタックスハイライトを表現
 - **`{"\n"}` を `.code-block` 内の改行に使わない** — `<div className={styles.codeLine}>` でラップ
-- **スペース揃えで tabular data を表現しない** — `<table>` 要素へ変換。また、表の文言およびヘッダー（タイトル）は必ず左寄せ（`text-align: left`）で文章を表示すること。
+- **スペース揃えで tabular data を表現しない** — `<table>` 要素へ変換。また、表の文字はすべてのヘッダー（`th`）およびセル（`td`）で必ず左寄せ（`text-align: left !important`）にして表示すること。
+- **Mermaidの図解を左寄せにしない** — 必ず `:global(.mermaid)` やコンテナのフレックスボックス等を利用して中央寄せ（`display: flex; justify-content: center;`）にすること。
 - **`bun run lint:fix`（引数なし）を実行しない** — 変更ファイル単位でパス指定（R1 ルール）
 - **外部フォントを `<link>` タグで読み込まない** — `next/font/google` のみ（`layout.tsx`）
 - **`@layer components` を page-specific styles に使わない** — plain CSS で specificity を確保

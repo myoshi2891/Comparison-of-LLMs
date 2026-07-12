@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Updated 2026-07-01
+Updated 2026-07-12
 
 AGENTS.md は Codex / Cursor / Cline など AGENTS.md 規約を読む AI ツール向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、AGENTS.md はその委譲 pointer として機能する。
@@ -17,6 +17,7 @@ AGENTS.md は Codex / Cursor / Cline など AGENTS.md 規約を読む AI ツー�
 - **R2（faithful 必須）**: legacy HTML の移植では **要約・省略・縮約禁止**。全リスト項目・全コードブロック・全 SVG・全 alert・全 table を JSX に転写
 - **R3（スキル優先）**: 新規ガイドページ移行を始める前に `.claude/skills/nextjs-page-migration/SKILL.md` を必ず読む
 - **legacy/ 配下の編集禁止**（Phase A–F 中は凍結）
+- **元のHTML/Markdownオリジナルファイルの完全削除は厳禁**：移行元のファイルは絶対に削除してはならず、必ず `archive/` ディレクトリ配下に移動（`git mv` または `mv`）して退避保存すること
 - **ファイル全体の書き直し禁止**（明示指示がない限り）
 - **依存関係のアップグレード禁止**
 - **設定ファイル（next.config.ts / tsconfig.json / biome.json 等）の勝手な変更禁止**
@@ -25,7 +26,7 @@ AGENTS.md は Codex / Cursor / Cline など AGENTS.md 規約を読む AI ツー�
 ## 検証コマンド
 
 ```bash
-cd web-next && bun run test        # 743 pass（全 Green ✅）
+cd web-next && bun run test        # 931 pass（全 Green ✅）
 cd web-next && bun run typecheck   # OK
 cd web-next && bun run build       # 全ルートが ○ (Static)
 cd web-next && bun run lint        # 0 件（全解消 ✅）

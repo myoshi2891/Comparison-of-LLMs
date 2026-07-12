@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-07-10
+Updated 2026-07-12
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -25,7 +25,7 @@ update.sh  ← オーケストレーター (scrape → copy)
 │   │   ├── layout.tsx           ルートレイアウト (SiteHeader/DisclaimerBanner マウント済み)
 │   │   ├── page.tsx             コスト計算機ホーム (Server Component + Zod 検証 → HomePage へ委譲)
 │   │   ├── globals.css          Tailwind v4 + legacy design tokens (227 行)
-│   │   └── {claude,google,codex,copilot}/{skill,agent}/ および /google/agent-harness-engineering/、/google/notebook-lm/、/claude/managed-agents/、/claude/self-hosted-sandboxes/、/claude/code-slash-commands/、/claude/fable-5-best-practices/、/claude/skills-sh/、/code-review/coderabbit-guide/、/code-review/copilot-code-review/、/code-review/sonar-qube/、/code-review/tool-pricing/、/agent/hermes-agent-advanced-guide/、/agent/loop-engineering/、/agent/skills/、/vercel/sandbox/、/cursor/complete-guide/、/cursor/complete-guide-intermediate/、/security/ai-security-best-practices/、/local-llm/self-hosting/   Phase B–C および追加移行済みルート（詳細は [`docs/archive/MIGRATION_PROGRESS.md`](docs/archive/MIGRATION_PROGRESS.md)）
+│   │   └── {claude,google,codex,copilot}/{skill,agent}/ および /google/agent-harness-engineering/、/google/notebook-lm/、/google/adk-best-practices/、/google/stitch-guide/、/claude/managed-agents/、/claude/self-hosted-sandboxes/、/claude/code-slash-commands/、/claude/fable-5-best-practices/、/claude/skills-sh/、/mcp/mcp-best-practices/、/mcp/mcp-best-practices-intermediate/、/code-review/coderabbit-guide/、/code-review/copilot-code-review/、/code-review/sonar-qube/、/code-review/tool-pricing/、/agent/hermes-agent-advanced-guide/、/agent/loop-engineering/、/agent/skills/、/vercel/sandbox/、/cursor/complete-guide/、/cursor/complete-guide-intermediate/、/security/ai-security-best-practices/、/security/ai-security-best-practices-intermediate/、/local-llm/self-hosting/、/local-llm/best-practices/、/ci-cd/ai-cicd-automation-best-practices/、/agent/context-engineering-best-practices/、/rag/embeddings-best-practices/、/multimodal/generation-best-practices/、/multimodal/image-audio-best-practices-2026/、/llm-ops/evaluation-observability/   Phase B–C および追加移行済みルート（詳細は [`docs/archive/MIGRATION_PROGRESS.md`](docs/archive/MIGRATION_PROGRESS.md)）
 │   ├── components/
 │   │   ├── HomePage.tsx         Client Component (Phase 10)
 │   │   ├── ApiTable.tsx / SubTable.tsx / Hero.tsx / ...   (Phase 8-10 成果物)
@@ -182,7 +182,7 @@ Playwright ブラウザバイナリ（`/root/.cache/ms-playwright/`）はバイ�
 
 ## 重要な設計判断
 
-- **Next.js 16 App Router + SSG**: `output: 'export'` で pure 静的エクスポート → Netlify CDN 配信。`@netlify/plugin-nextjs` 不要。Phase 1–14 でコスト計算機ホームが移行済、Phase A–F で残 18 ガイドページも全移行完了（計画書は `docs/archive/` に保存）。さらに `/google/agent-harness-engineering` や `/claude/managed-agents`、`/claude/self-hosted-sandboxes`、`/claude/code-slash-commands`、`/claude/fable-5-best-practices`、`/claude/skills-sh`、`/code-review/coderabbit-guide`、`/code-review/copilot-code-review`、`/code-review/sonar-qube`、`/code-review/tool-pricing`、`/agent/hermes-agent-advanced-guide`、`/agent/skills`、`/security/ai-security-best-practices` ページを追加
+- **Next.js 16 App Router + SSG**: `output: 'export'` で pure 静的エクスポート → Netlify CDN 配信。`@netlify/plugin-nextjs` 不要。Phase 1–14 でコスト計算機ホームが移行済、Phase A–F で残 18 ガイドページも全移行完了（計画書は `docs/archive/` に保存）。さらに `/google/agent-harness-engineering` や `/google/adk-best-practices`、`/google/stitch-guide`、`/claude/managed-agents`、`/claude/self-hosted-sandboxes`、`/claude/code-slash-commands`、`/claude/fable-5-best-practices`、`/claude/skills-sh`、`/code-review/coderabbit-guide`、`/code-review/copilot-code-review`、`/code-review/sonar-qube`、`/code-review/tool-pricing`、`/agent/hermes-agent-advanced-guide`、`/agent/skills`、`/security/ai-security-best-practices`、/local-llm/best-practices、/ci-cd/ai-cicd-automation-best-practices、/agent/context-engineering-best-practices、/multimodal/image-audio-best-practices-2026、/llm-ops/evaluation-observability ページを追加
 - **3層フォールバック**: スクレイパーは「スクレイプ成功 → 既存 JSON の値 → ハードコードフォールバック」の順で価格を決定。`scrape_status` フィールド (`success` | `fallback` | `manual`) で出自を追跡
 - **型の同期**: `scraper/src/scraper/models.py` (Pydantic) が SSoT、`web-next/types/pricing.ts` (TypeScript) が手動ミラー、`web-next/lib/pricing.ts` の `_AssertParity` でコンパイル時検証。**片方を変更したら必ずもう片方も更新すること**
 - **JA/EN バイリンガル**: `web-next/lib/i18n.tsx` で全テキストを管理（`T` オブジェクト + `t()` / `tRich()` の React 要素ファクトリ）。各スクレイパーも `sub_ja` / `sub_en` や `note_ja` / `note_en` のペアで日英テキストを持つ。ガイドページ（Phase B–E）は当面 JA 固定
@@ -227,6 +227,7 @@ Playwright ブラウザバイナリ（`/root/.cache/ms-playwright/`）はバイ�
 - 環境変数・Netlify 設定の変更
 - スタイル目的のリライト
 - **`legacy/` 配下の編集**（Phase A–F 遂行中は凍結。`.gitignore` により事故的な push は防止されているが、編集自体を避ける）
+- **元のHTML/Markdownオリジナルファイルの完全削除は厳禁**: 移行元のファイルは絶対に削除してはならず、必ず `archive/` ディレクトリ配下に移動（`git mv` または `mv`）して退避保存すること
 
 ### 許可される変更
 
@@ -260,7 +261,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が成功（実測 778 件合格を確認）
+2. `cd web-next && bun run test` が成功（実測 931 件合格を確認）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功（既知の違反件数は CI または進捗ドキュメントを参照、新規違反がないこと）
 5. `cd scraper && uv run pytest` が成功
@@ -296,6 +297,7 @@ Phase A–F 遂行中、新規ガイドページ (`claude/`, `gemini/`, `codex/`
 `legacy/` 配下の **18 HTML** は `.gitignore` により remote から隔離済。Phase A–F で `web-next/app/*` の page.tsx への置換が**全完了**。
 移行計画詳細は **[`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md)** を参照（アーカイブ）。
 現在の進捗は **[`docs/PROGRESS.md`](docs/PROGRESS.md)** を、過去の移行進捗詳細は **[`docs/archive/MIGRATION_PROGRESS.md`](docs/archive/MIGRATION_PROGRESS.md)** を参照。
+- **オリジナルファイルの保存**: 移行元の HTML / Markdown オリジナルファイルは勝手に削除せず、必ず `archive/` ディレクトリ配下に退避させて保存すること。
 
 #### AI モデルバージョンの扱い
 

@@ -41,8 +41,8 @@ describe("Phase A - nav-links export shape", () => {
 });
 
 describe("Phase A - nav-links top-level entries", () => {
-  it("has exactly 12 top-level entries", () => {
-    expect(navLinks.length).toBe(12);
+  it("has exactly 17 top-level entries", () => {
+    expect(navLinks.length).toBe(17);
   });
 
   it("starts with Home as a flat link", () => {
@@ -58,7 +58,7 @@ describe("Phase A - nav-links top-level entries", () => {
     expect("href" in last && last.href === "/git-worktree").toBe(true);
   });
 
-  it("has Claude/Google/Codex/Copilot/Code Review/Agent/Sandbox/IDE/Security/Local LLM as dropdowns with children", () => {
+  it("has Claude/Google/Codex/Copilot/Code Review/Agent/MCP/Sandbox/IDE/Security/Local LLM/CI/CD/RAG/Multimodal/LLMOps as dropdowns with children", () => {
     const providers = [
       "Claude",
       "Google",
@@ -66,10 +66,15 @@ describe("Phase A - nav-links top-level entries", () => {
       "Copilot",
       "Code Review",
       "Agent",
+      "MCP",
       "Sandbox",
       "IDE",
       "Security",
       "Local LLM",
+      "CI/CD",
+      "RAG",
+      "Multimodal",
+      "LLMOps",
     ] as const;
     for (const name of providers) {
       const entry = navLinks.find((link) => link.name === name);
@@ -82,10 +87,10 @@ describe("Phase A - nav-links top-level entries", () => {
 describe("Phase A - Agent dropdown shape", () => {
   const agent = navLinks.find((link) => link.name === "Agent");
 
-  it("has 5 child entries (advanced guide / openclaw security guide / loop engineering / skills-guide / skills-sh)", () => {
+  it("has 6 child entries (advanced guide / openclaw security guide / loop engineering / skills-guide / skills-sh / context-engineering-best-practices)", () => {
     expect(agent && "children" in agent).toBe(true);
     const children = agent && "children" in agent ? agent.children : [];
-    expect(children.length).toBe(5);
+    expect(children.length).toBe(6);
   });
 
   it("uses clean URL paths for all Agent children (no .html extension)", () => {
@@ -97,6 +102,7 @@ describe("Phase A - Agent dropdown shape", () => {
       "/agent/loop-engineering",
       "/agent/skills",
       "/claude/skills-sh",
+      "/agent/context-engineering-best-practices",
     ];
     expect(children.map((c) => c.href)).toEqual(expectedHrefs);
   });
@@ -129,6 +135,22 @@ describe("Phase A - Claude dropdown shape", () => {
   });
 });
 
+describe("Phase A - MCP dropdown shape", () => {
+  const mcp = navLinks.find((link) => link.name === "MCP");
+
+  it("has 2 child entries (mcp-best-practices / mcp-best-practices-intermediate)", () => {
+    expect(mcp && "children" in mcp).toBe(true);
+    const children = mcp && "children" in mcp ? mcp.children : [];
+    expect(children.length).toBe(2);
+  });
+
+  it("uses clean URL paths for all MCP children (no .html extension)", () => {
+    const children = mcp && "children" in mcp ? mcp.children : [];
+    const expectedHrefs = ["/mcp/mcp-best-practices", "/mcp/mcp-best-practices-intermediate"];
+    expect(children.map((c) => c.href)).toEqual(expectedHrefs);
+  });
+});
+
 describe("Phase A - IDE dropdown shape", () => {
   const ide = navLinks.find((link) => link.name === "IDE");
 
@@ -148,15 +170,50 @@ describe("Phase A - IDE dropdown shape", () => {
 describe("Phase A - Local LLM dropdown shape", () => {
   const localLlm = navLinks.find((link) => link.name === "Local LLM");
 
-  it("has 1 child entry (self-hosting guide)", () => {
+  it("has 2 child entries (self-hosting guide / best practices)", () => {
     expect(localLlm && "children" in localLlm).toBe(true);
     const children = localLlm && "children" in localLlm ? localLlm.children : [];
-    expect(children.length).toBe(1);
+    expect(children.length).toBe(2);
   });
 
   it("uses clean URL paths for all Local LLM children (no .html extension)", () => {
     const children = localLlm && "children" in localLlm ? localLlm.children : [];
-    const expectedHrefs = ["/local-llm/self-hosting"];
+    const expectedHrefs = ["/local-llm/self-hosting", "/local-llm/best-practices"];
+    expect(children.map((c) => c.href)).toEqual(expectedHrefs);
+  });
+});
+
+describe("Phase A - RAG dropdown shape", () => {
+  const rag = navLinks.find((link) => link.name === "RAG");
+
+  it("has 1 child entry (embeddings-best-practices)", () => {
+    expect(rag && "children" in rag).toBe(true);
+    const children = rag && "children" in rag ? rag.children : [];
+    expect(children.length).toBe(1);
+  });
+
+  it("uses clean URL paths for all RAG children (no .html extension)", () => {
+    const children = rag && "children" in rag ? rag.children : [];
+    const expectedHrefs = ["/rag/embeddings-best-practices"];
+    expect(children.map((c) => c.href)).toEqual(expectedHrefs);
+  });
+});
+
+describe("Phase A - Multimodal dropdown shape", () => {
+  const multimodal = navLinks.find((link) => link.name === "Multimodal");
+
+  it("has 2 child entries (generation-best-practices / image-audio-best-practices-2026)", () => {
+    expect(multimodal && "children" in multimodal).toBe(true);
+    const children = multimodal && "children" in multimodal ? multimodal.children : [];
+    expect(children.length).toBe(2);
+  });
+
+  it("uses clean URL paths for all Multimodal children (no .html extension)", () => {
+    const children = multimodal && "children" in multimodal ? multimodal.children : [];
+    const expectedHrefs = [
+      "/multimodal/generation-best-practices",
+      "/multimodal/image-audio-best-practices-2026",
+    ];
     expect(children.map((c) => c.href)).toEqual(expectedHrefs);
   });
 });

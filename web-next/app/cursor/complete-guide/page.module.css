@@ -451,7 +451,8 @@
   font-size: 14px;
 }
 
-.thead th {
+.thead th,
+.thead th:not(:first-child) {
   background: var(--bg-surface-2);
   color: var(--text-primary);
   text-align: left;
@@ -462,11 +463,14 @@
   white-space: nowrap;
 }
 
-.tbody td {
+.tbody td,
+.tbody td:not(:first-child) {
   padding: 11px 14px;
   border-bottom: 1px solid var(--border);
   color: var(--text-secondary);
   vertical-align: top;
+  text-align: left;
+  font-family: inherit;
 }
 
 .tbody tr:last-child td {

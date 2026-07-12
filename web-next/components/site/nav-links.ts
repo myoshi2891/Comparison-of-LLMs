@@ -60,6 +60,8 @@ export const navLinks: readonly NavLink[] = [
       { name: "Harness Engineering", href: "/google/harness-engineering" },
       { name: "Agent Harness Engineering", href: "/google/agent-harness-engineering" },
       { name: "NotebookLM Guide", href: "/google/notebook-lm" },
+      { name: "ADK Best Practices", href: "/google/adk-best-practices" },
+      { name: "Stitch Guide", href: "/google/stitch-guide" },
     ],
   },
   {
@@ -97,12 +99,24 @@ export const navLinks: readonly NavLink[] = [
       { name: "Loop Engineering Guide", href: "/agent/loop-engineering" },
       { name: "Agent Skills Guide", href: "/agent/skills" },
       { name: "skills.sh Guide", href: "/claude/skills-sh" },
+      { name: "Context Engineering", href: "/agent/context-engineering-best-practices" },
+    ],
+  },
+  {
+    name: "MCP",
+    children: [
+      { name: "MCP Best Practices", href: "/mcp/mcp-best-practices" },
+      {
+        name: "MCP Best Practices (中級)",
+        href: "/mcp/mcp-best-practices-intermediate",
+      },
     ],
   },
   {
     name: "Local LLM",
     children: [
       { name: "Self-hosting Guide", href: "/local-llm/self-hosting" },
+      { name: "Self-hosting Best Practices", href: "/local-llm/best-practices" },
     ],
   },
   {
@@ -120,7 +134,36 @@ export const navLinks: readonly NavLink[] = [
     name: "Security",
     children: [
       { name: "AI Security Best Practices", href: "/security/ai-security-best-practices" },
+      {
+        name: "AI Security Best Practices (中級)",
+        href: "/security/ai-security-best-practices-intermediate",
+      },
     ],
+  },
+  {
+    name: "CI/CD",
+    children: [{ name: "AI CI/CD Automation", href: "/ci-cd/ai-cicd-automation-best-practices" }],
+  },
+  {
+    name: "RAG",
+    children: [{ name: "RAG & Embeddings", href: "/rag/embeddings-best-practices" }],
+  },
+  {
+    name: "Multimodal",
+    children: [
+      {
+        name: "Generation Best Practices",
+        href: "/multimodal/generation-best-practices",
+      },
+      {
+        name: "Image & Audio (2026)",
+        href: "/multimodal/image-audio-best-practices-2026",
+      },
+    ],
+  },
+  {
+    name: "LLMOps",
+    children: [{ name: "Evaluation & Observability", href: "/llm-ops/evaluation-observability" }],
   },
   { name: "Git Worktree", href: "/git-worktree" },
 ];

@@ -359,7 +359,8 @@
   min-width: 480px;
   margin: 0;
 }
-.chapter thead th {
+.chapter thead th,
+.chapter thead th:not(:first-child) {
   text-align: left;
   background: var(--surface-2);
   color: var(--text);
@@ -369,11 +370,14 @@
   border-bottom: 1px solid var(--border-strong);
   white-space: nowrap;
 }
-.chapter tbody td {
+.chapter tbody td,
+.chapter tbody td:not(:first-child) {
   padding: 10px 14px;
   border-bottom: 1px solid var(--border);
   color: var(--text-dim);
   vertical-align: top;
+  text-align: left;
+  font-family: inherit;
 }
 .chapter tbody tr:last-child td {
   border-bottom: none;
