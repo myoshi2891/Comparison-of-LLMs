@@ -161,5 +161,9 @@ export const navLinks: readonly NavLink[] = [
       },
     ],
   },
+  {
+    name: "LLMOps",
+    children: [{ name: "Evaluation & Observability", href: "/llm-ops/evaluation-observability" }],
+  },
   { name: "Git Worktree", href: "/git-worktree" },
 ];

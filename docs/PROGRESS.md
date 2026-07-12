@@ -14,10 +14,11 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（本作業範囲では新規違反 0 件、既知の既存指摘は本件対象外）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **922 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **931 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **LLM評価・ベンチマーク & オブザーバビリティ ガイドの Next.js 移行**: ルートの `Llm-evaluation-observability-best-practices.html` を `web-next/app/llm-ops/evaluation-observability/page.tsx` に完全移行 🚀。TDD サイクル（Red/Green/Refactor）に沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策（target/rel）、10個の Mermaid 図の中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションに新規カテゴリ「LLMOps -> Evaluation & Observability」を追加し、関連統合テストを 15 ドロップダウン対応に更新。元のHTML・MDファイルはアーカイブディレクトリに退避。Vitest 契約テスト 9 件追加（合計 931 テスト合格）。
 - **Google Stitch 実践ガイドの Next.js 移行**: ルートの `Google-stitch-guide.html` を `web-next/app/google/stitch-guide/page.tsx` に完全移行 🚀。TDD サイクル（Red/Green/Refactor）に沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策（target/rel）、等幅フォント適用、7つの Mermaid 図の中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションの「Google -> Stitch Guide」に新規登録。元のHTML・MDファイルはアーカイブディレクトリに退避。Vitest 契約テスト 9 件追加（合計 922 テスト合格）。
 - **マルチモーダルAI実践ガイド：画像・音声生成のベストプラクティス 2026の Next.js 移行**: ルートの `Multimodal-image-audio-best-practices-2026.html` を `web-next/app/multimodal/image-audio-best-practices-2026/page.tsx` に完全移行 🚀。TDD サイクル（Red/Green/Refactor）に沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策（target/rel）、18個の Mermaid 図の中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションの「Multimodal -> Image & Audio (2026)」に新規登録。元のHTML・MDファイルはアーカイブディレクトリに退避。Vitest 契約テスト 6 件追加（合計 911 テスト合格）。
 - **マルチモーダルAI(画像・音声生成)ベストプラクティスガイド 2026の Next.js 移行**: ルートの `Multimodal-ai-image-audio-generation-best-practices.html` を `web-next/app/multimodal/generation-best-practices/page.tsx` に完全移行 🚀。TDD サイクル（Red/Green/Refactor）に沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策（target/rel）、8つの Mermaid 図の中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションに新規カテゴリ「Multimodal -> Generation Best Practices」を追加。元のHTML・MDファイルはアーカイブディレクトリに退避。Vitest 契約テスト 6 件追加（合計 905 テスト合格）。
