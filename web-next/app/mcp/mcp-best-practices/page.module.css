@@ -286,6 +286,24 @@ tr:last-child td {
   justify-content: center;
 }
 
+.mermaidDiagram :global(.mermaid) {
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.mermaidDiagram :global(svg) {
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
 /* Code block structures styled in mono font */
 .codeWrap {
   margin: 0 0 24px;
@@ -338,14 +356,33 @@ tr:last-child td {
 }
 
 /* Token styling matching Atom One Dark style variables */
-.ck { color: #ff7b72; } /* Keywords */
-.cs { color: #a5d6ff; } /* Strings, punctuations */
-.cv { color: #79c0ff; } /* Values / variables */
-.cc { color: #8b949e; font-style: italic; } /* Comments */
-.cm { color: #7ee787; font-weight: bold; } /* Markers / sections */
-.cw { color: #d29922; font-weight: bold; } /* Warnings */
-.ce { color: #bc8cff; } /* Special */
-.cg { color: #3fb950; } /* Success */
+.ck {
+  color: #ff7b72;
+} /* Keywords */
+.cs {
+  color: #a5d6ff;
+} /* Strings, punctuations */
+.cv {
+  color: #79c0ff;
+} /* Values / variables */
+.cc {
+  color: #8b949e;
+  font-style: italic;
+} /* Comments */
+.cm {
+  color: #7ee787;
+  font-weight: bold;
+} /* Markers / sections */
+.cw {
+  color: #d29922;
+  font-weight: bold;
+} /* Warnings */
+.ce {
+  color: #bc8cff;
+} /* Special */
+.cg {
+  color: #3fb950;
+} /* Success */
 
 .chapterRefs {
   background: var(--color-background-secondary, #14171d);
