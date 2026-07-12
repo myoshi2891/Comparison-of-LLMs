@@ -103,7 +103,13 @@ export const navLinks: readonly NavLink[] = [
   },
   {
     name: "MCP",
-    children: [{ name: "MCP Best Practices", href: "/mcp/mcp-best-practices" }],
+    children: [
+      { name: "MCP Best Practices", href: "/mcp/mcp-best-practices" },
+      {
+        name: "MCP Best Practices (中級)",
+        href: "/mcp/mcp-best-practices-intermediate",
+      },
+    ],
   },
   {
     name: "Local LLM",

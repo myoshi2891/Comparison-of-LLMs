@@ -135,15 +135,18 @@ describe("Phase A - Claude dropdown shape", () => {
 describe("Phase A - MCP dropdown shape", () => {
   const mcp = navLinks.find((link) => link.name === "MCP");
 
-  it("has 1 child entry (mcp-best-practices)", () => {
+  it("has 2 child entries (mcp-best-practices / mcp-best-practices-intermediate)", () => {
     expect(mcp && "children" in mcp).toBe(true);
     const children = mcp && "children" in mcp ? mcp.children : [];
-    expect(children.length).toBe(1);
+    expect(children.length).toBe(2);
   });
 
   it("uses clean URL paths for all MCP children (no .html extension)", () => {
     const children = mcp && "children" in mcp ? mcp.children : [];
-    const expectedHrefs = ["/mcp/mcp-best-practices"];
+    const expectedHrefs = [
+      "/mcp/mcp-best-practices",
+      "/mcp/mcp-best-practices-intermediate",
+    ];
     expect(children.map((c) => c.href)).toEqual(expectedHrefs);
   });
 });
