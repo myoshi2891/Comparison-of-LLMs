@@ -4,7 +4,8 @@ import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
 
 export const metadata: Metadata = {
-  title: "LLM評価・ベンチマーク & オブザーバビリティ ベストプラクティスガイド(2026年版) | LLM-Studies",
+  title:
+    "LLM評価・ベンチマーク & オブザーバビリティ ベストプラクティスガイド(2026年版) | LLM-Studies",
   description:
     "LLMアプリケーションの品質評価(Evaluation)、公開ベンチマーク(Benchmarking)の読み方、そして本番環境でのオブザーバビリティ(Observability)を体系的に学びたいエンジニア向けのベストプラクティスガイド。",
 };
@@ -124,7 +125,7 @@ E --> F["ゴールデンデータセットへ追加"]
 E --> G["CI Gate評価で継続的に再テスト"]
 E --> H["プロンプト/モデル/リトリーバル設定を改善"]
 H --> A
-C -- "問題なし" --> A`
+C -- "問題なし" --> A`,
 };
 
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
@@ -230,7 +231,9 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
         <main className={styles.content}>
           <div className={styles.contentHeader}>
             <div className={styles.eyebrow}>Step-by-step guide</div>
-            <h1>LLM評価・ベンチマーク &amp; オブザーバビリティ ベストプラクティスガイド(2026年版)</h1>
+            <h1>
+              LLM評価・ベンチマーク &amp; オブザーバビリティ ベストプラクティスガイド(2026年版)
+            </h1>
             <p>
               対象読者:AI/MLエンジニア、ソフトウェアアーキテクト、QAエンジニアで、LLMアプリケーションの品質評価(Evaluation)、公開ベンチマーク(Benchmarking)の読み方、そして本番環境でのオブザーバビリティ(Observability)を体系的に学びたい初学者〜中級者。本ガイドは2026年7月時点で参照可能な一次情報・業界レポートに基づいています。LLMエコシステムは変化が非常に速い領域のため、ツールのバージョンや料金体系は必ず公式サイトで最新情報を確認してください。
             </p>
@@ -238,14 +241,16 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
 
           <section id="section1">
             <h2>
-              <i className="ti ti-info-circle" />1. はじめに:なぜ評価とオブザーバビリティが必要なのか
+              <i className="ti ti-info-circle" />
+              1. はじめに:なぜ評価とオブザーバビリティが必要なのか
             </h2>
             <p>
               LLMを使ったアプリケーションには、従来のソフトウェアテストが前提としてきた「同じ入力には同じ出力が返る」という決定論的な性質がありません。プロンプトを1単語変えただけでも出力の質が大きく変わり、ある不具合を直しても別の不具合が静かに生まれることがあります。さらに深刻なのは、LLMが失敗しても例外は発生せず、HTTPステータスコードは200のまま、もっともらしい誤った回答(ハルシネーション)を返す点です。この「静かな失敗」こそが、評価(Evaluation)とオブザーバビリティ(Observability)という2つの規律が2026年のLLMOpsにおいて中核的な実践になっている理由です。
             </p>
             <p>
               実務上のリスクも具体化しています。大手メディアがAI生成記事の誤りで訂正を余儀なくされたり、大手テック企業がAIニュース要約機能を一時停止した事例が報告されており、評価を怠ることは「シートベルトなしで運転する」ことに例えられています。さらにEU
-              AI Actのような規制は2026年8月2日から本格施行され、リスクベースでの評価証跡の保存が義務化される領域が拡大しています。
+              AI
+              Actのような規制は2026年8月2日から本格施行され、リスクベースでの評価証跡の保存が義務化される領域が拡大しています。
             </p>
 
             <div className={styles.calloutGrid}>
@@ -277,7 +282,10 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
             </p>
 
             <div className={styles.refBlock}>
-              <h4><i className="ti ti-link" />参考資料</h4>
+              <h4>
+                <i className="ti ti-link" />
+                参考資料
+              </h4>
               <ul>
                 <li>
                   <i className="ti ti-external-link" />
@@ -303,21 +311,27 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
 
           <section id="section2">
             <h2>
-              <i className="ti ti-hierarchy-3" />2. 全体像:Evaluation・Benchmarking・Observabilityの関係
+              <i className="ti ti-hierarchy-3" />
+              2. 全体像:Evaluation・Benchmarking・Observabilityの関係
             </h2>
             <p>
-              2026年時点のベストプラクティスでは、評価は「開発が終わった後の後付け作業」ではなく、プロンプト・データセット・ポリシーをコードと同様にバージョン管理された一級市民(first-class, versioned assets)として扱う考え方が定着しています。評価とトレースをモデルバージョンに紐付けることで、すべての出力に明確な系譜(lineage)を持たせられます。
+              2026年時点のベストプラクティスでは、評価は「開発が終わった後の後付け作業」ではなく、プロンプト・データセット・ポリシーをコードと同様にバージョン管理された一級市民(first-class,
+              versioned
+              assets)として扱う考え方が定着しています。評価とトレースをモデルバージョンに紐付けることで、すべての出力に明確な系譜(lineage)を持たせられます。
             </p>
             <p>評価は開発ライフサイクルの3つの地点で実行されます。</p>
             <ol>
               <li>
-                <strong>オフライン評価</strong>:キュレーションされたデータセットに対して実行(開発中・リリース前)
+                <strong>オフライン評価</strong>
+                :キュレーションされたデータセットに対して実行(開発中・リリース前)
               </li>
               <li>
-                <strong>CI Gate評価</strong>:プロンプトやモデルを変更するたびにCI上で自動実行(マージ前)
+                <strong>CI Gate評価</strong>
+                :プロンプトやモデルを変更するたびにCI上で自動実行(マージ前)
               </li>
               <li>
-                <strong>オンライン評価</strong>:実際の本番トラフィックに対して継続的に実行(リリース後)
+                <strong>オンライン評価</strong>
+                :実際の本番トラフィックに対して継続的に実行(リリース後)
               </li>
             </ol>
             <p>これら3層をどうつなげるかを示したのが以下の図です。</p>
@@ -326,7 +340,9 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
               <div className={styles.mermaidWrap}>
                 <MermaidDiagram chart={DIAGRAMS.lifecycle} />
               </div>
-              <div className={styles.diagramCaption}>評価とオブザーバビリティの全体ライフサイクル</div>
+              <div className={styles.diagramCaption}>
+                評価とオブザーバビリティの全体ライフサイクル
+              </div>
             </div>
 
             <p>
@@ -334,7 +350,10 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
             </p>
 
             <div className={styles.refBlock}>
-              <h4><i className="ti ti-link" />参考資料</h4>
+              <h4>
+                <i className="ti ti-link" />
+                参考資料
+              </h4>
               <ul>
                 <li>
                   <i className="ti ti-external-link" />
@@ -361,16 +380,20 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
             </p>
             <ol>
               <li>
-                <strong>本番を代表するデータセットを使う</strong>:ベンチマーク用の綺麗な質問だけでなく、実際のユーザーの入力(表記揺れ、不完全な質問、業界固有の用語など)を反映させる。
+                <strong>本番を代表するデータセットを使う</strong>
+                :ベンチマーク用の綺麗な質問だけでなく、実際のユーザーの入力(表記揺れ、不完全な質問、業界固有の用語など)を反映させる。
               </li>
               <li>
-                <strong>自動評価と人手評価を組み合わせる</strong>:単一の評価手法だけでは不十分であるため、決定論的メトリクス・統計的メトリクス・LLM-as-a-Judgeを併用します。
+                <strong>自動評価と人手評価を組み合わせる</strong>
+                :単一の評価手法だけでは不十分であるため、決定論的メトリクス・統計的メトリクス・LLM-as-a-Judgeを併用します。
               </li>
               <li>
-                <strong>継続的に評価する</strong>:一度きりの品質チェックではなく、CIとオンライン監視の両方で継続的に実行する。
+                <strong>継続的に評価する</strong>
+                :一度きりの品質チェックではなく、CIとオンライン監視の両方で継続的に実行する。
               </li>
               <li>
-                <strong>失敗を定期的にレビューする</strong>:失敗事例を単なるバグ修正で終わらせず、評価データセットへ組み込むプロセスを設計する。
+                <strong>失敗を定期的にレビューする</strong>
+                :失敗事例を単なるバグ修正で終わらせず、評価データセットへ組み込むプロセスを設計する。
               </li>
             </ol>
             <p>
@@ -378,7 +401,10 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
             </p>
 
             <div className={styles.refBlock}>
-              <h4><i className="ti ti-link" />参考資料</h4>
+              <h4>
+                <i className="ti ti-link" />
+                参考資料
+              </h4>
               <ul>
                 <li>
                   <i className="ti ti-external-link" />
@@ -404,7 +430,8 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
 
           <section id="section4">
             <h2>
-              <span className={styles.stepBadge}>STEP 2</span>4. 評価指標(メトリクス)の分類を理解する
+              <span className={styles.stepBadge}>STEP 2</span>4.
+              評価指標(メトリクス)の分類を理解する
             </h2>
             <p>
               評価指標は大きく3種類に分類できます。それぞれ得意なことと苦手なことが異なるため、単独ではなく組み合わせて使うのが2026年の標準的なアプローチです。
@@ -422,14 +449,22 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>決定論的<br />(Deterministic)</td>
+                  <td>
+                    決定論的
+                    <br />
+                    (Deterministic)
+                  </td>
                   <td>ルールベースの厳密一致・正規表現・スキーマ検証</td>
                   <td>完全一致、JSON/XMLスキーマ検証、正規表現チェック</td>
                   <td>高速・低コスト・再現性が高い</td>
                   <td>意味的な誤りを検出できない</td>
                 </tr>
                 <tr>
-                  <td>統計的<br />(Statistical)</td>
+                  <td>
+                    統計的
+                    <br />
+                    (Statistical)
+                  </td>
                   <td>単語やベクトルの類似度に基づくスコア</td>
                   <td>BLEU、ROUGE、埋め込みコサイン類似度</td>
                   <td>計算コストが低い</td>
@@ -452,16 +487,20 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
             <h3>実務でよく使われるLLM-as-a-Judgeの実装パターン</h3>
             <ul>
               <li>
-                <strong>criteria(基準)ベース</strong>:新しいメトリクスを試作する初期段階で使う、自然言語による大まかな評価基準。
+                <strong>criteria(基準)ベース</strong>
+                :新しいメトリクスを試作する初期段階で使う、自然言語による大まかな評価基準。
               </li>
               <li>
-                <strong>evaluation_steps(手順)ベース</strong>:メトリクスがCI/CDや本番監視で重要になった段階で、採点手順を明示的なステップに分解する。
+                <strong>evaluation_steps(手順)ベース</strong>
+                :メトリクスがCI/CDや本番監視で重要になった段階で、採点手順を明示的なステップに分解する。
               </li>
               <li>
-                <strong>GEval(参照ベース)</strong>:正解(reference)を含めることで、正解との比較を伴う採点に発展させる。
+                <strong>GEval(参照ベース)</strong>
+                :正解(reference)を含めることで、正解との比較を伴う採点に発展させる。
               </li>
               <li>
-                <strong>DAGMetric</strong>:複数ステップの厳密な採点ロジックを有向非巡回グラフ(DAG)としてモデル化する手法。
+                <strong>DAGMetric</strong>
+                :複数ステップの厳密な採点ロジックを有向非巡回グラフ(DAG)としてモデル化する手法。
               </li>
               <li>
                 <strong>ArenaGEval</strong>:プロンプトやモデルのバージョン同士をペアで比較する手法。
@@ -476,7 +515,10 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
             </div>
 
             <div className={styles.refBlock}>
-              <h4><i className="ti ti-link" />参考資料</h4>
+              <h4>
+                <i className="ti ti-link" />
+                参考資料
+              </h4>
               <ul>
                 <li>
                   <i className="ti ti-external-link" />
@@ -502,7 +544,8 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
 
           <section id="section5">
             <h2>
-              <span className={styles.stepBadge}>STEP 3</span>5. 公開ベンチマーク/リーダーボードの正しい読み方
+              <span className={styles.stepBadge}>STEP 3</span>5.
+              公開ベンチマーク/リーダーボードの正しい読み方
             </h2>
             <p>
               公開ベンチマークは「業界全体でモデルを比較するための共通言語」として重要ですが、2026年時点では多くの伝統的ベンチマークが飽和(Saturation)しており、単独のスコアだけで判断するのは危険です。
@@ -564,10 +607,12 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
             </p>
             <ul>
               <li>
-                <strong>データ汚染(Data Contamination)</strong>:モデルが学習データの中に、ベンチマークの問題そのもの(またはよく似た問題)を含んでいる可能性がある。
+                <strong>データ汚染(Data Contamination)</strong>
+                :モデルが学習データの中に、ベンチマークの問題そのもの(またはよく似た問題)を含んでいる可能性がある。
               </li>
               <li>
-                <strong>自社ユースケースを代表しない</strong>:公開リーダーボードは、あなた自身のプロンプト形式・ツールスキーマ・言語・レイテンシ予算での挙動を予測できない。
+                <strong>自社ユースケースを代表しない</strong>
+                :公開リーダーボードは、あなた自身のプロンプト形式・ツールスキーマ・言語・レイテンシ予算での挙動を予測できない。
               </li>
             </ul>
             <p>
@@ -582,7 +627,10 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
             </div>
 
             <div className={styles.refBlock}>
-              <h4><i className="ti ti-link" />参考資料</h4>
+              <h4>
+                <i className="ti ti-link" />
+                参考資料
+              </h4>
               <ul>
                 <li>
                   <i className="ti ti-external-link" />
@@ -620,10 +668,12 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
 
           <section id="section6">
             <h2>
-              <span className={styles.stepBadge}>STEP 4</span>6. RAGシステムの評価(Ragas 4大メトリクス)
+              <span className={styles.stepBadge}>STEP 4</span>6. RAGシステムの評価(Ragas
+              4大メトリクス)
             </h2>
             <p>
-              RAG(Retrieval-Augmented Generation)は2026年時点で本番LLMシステムの主流パターンとなっており、専用の評価アプローチが確立されています。RAGの評価は「検索(Retrieval)の質」と「生成(Generation)の質」という2つの独立した失敗モードに分解して考えるのが鉄則です。
+              RAG(Retrieval-Augmented
+              Generation)は2026年時点で本番LLMシステムの主流パターンとなっており、専用の評価アプローチが確立されています。RAGの評価は「検索(Retrieval)の質」と「生成(Generation)の質」という2つの独立した失敗モードに分解して考えるのが鉄則です。
             </p>
             <p>
               Ragas(オープンソースのRAG評価フレームワーク)を軸に、業界で最も広く使われている4つのコアメトリクスは以下の通りです。
@@ -641,7 +691,9 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
                 <tr>
                   <td>Faithfulness(忠実性)</td>
                   <td>生成</td>
-                  <td>回答が検索コンテキストに基づいているか(根拠のないハルシネーションがないか)</td>
+                  <td>
+                    回答が検索コンテキストに基づいているか(根拠のないハルシネーションがないか)
+                  </td>
                 </tr>
                 <tr>
                   <td>Answer Relevancy(回答の関連性)</td>
@@ -662,12 +714,16 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
             </table>
 
             <p>
-              このほか、Context Entity Recall、Answer Correctness、Answer Similarity、Aspect Critiqueといった拡張メトリクスも用意されています。
+              このほか、Context Entity Recall、Answer Correctness、Answer Similarity、Aspect
+              Critiqueといった拡張メトリクスも用意されています。
             </p>
 
             <div className={styles.leadNote}>
               <p>
-                <strong>教訓となる事例</strong>:ある法律系RAGシステムでは、オフライン評価でFaithfulness 0.91という高スコアを記録していたにもかかわらず、本番稼働後に「複数ホップの質問で重要な条文が回答から漏れる」不具合が報告されました。調査するとContext Recallはわずか0.62しかなく、検索側が2つ目の条文を取得できていなかったことが判明しました。生成モデルは取得できた部分的なコンテキストに忠実に(Faithfulness高く)回答していたため、生成品質だけを見るダッシュボードでは検知できなかったのです。
+                <strong>教訓となる事例</strong>
+                :ある法律系RAGシステムでは、オフライン評価でFaithfulness
+                0.91という高スコアを記録していたにもかかわらず、本番稼働後に「複数ホップの質問で重要な条文が回答から漏れる」不具合が報告されました。調査するとContext
+                Recallはわずか0.62しかなく、検索側が2つ目の条文を取得できていなかったことが判明しました。生成モデルは取得できた部分的なコンテキストに忠実に(Faithfulness高く)回答していたため、生成品質だけを見るダッシュボードでは検知できなかったのです。
               </p>
             </div>
 
@@ -675,21 +731,28 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
               <div className={styles.mermaidWrap}>
                 <MermaidDiagram chart={DIAGRAMS.ragEval} />
               </div>
-              <div className={styles.diagramCaption}>検索と生成を分けて測定するRAG評価パイプライン</div>
+              <div className={styles.diagramCaption}>
+                検索と生成を分けて測定するRAG評価パイプライン
+              </div>
             </div>
 
             <p>
-              Ragasの実装は、LLM-as-a-Judgeの考え方を使い、回答を原子的な主張(atomic claim)に分解し、それぞれの主張を検索されたコンテキストと突き合わせて0〜1の連続値スコアを返します。文字列の完全一致を求める従来のユニットテストとは異なり、このスコアは時系列で追跡したり、CIでゲートしたり、質問の種類ごとにスライスして分析することができます。
+              Ragasの実装は、LLM-as-a-Judgeの考え方を使い、回答を原子的な主張(atomic
+              claim)に分解し、それぞれの主張を検索されたコンテキストと突き合わせて0〜1の連続値スコアを返します。文字列の完全一致を求める従来のユニットテストとは異なり、このスコアは時系列で追跡したり、CIでゲートしたり、質問の種類ごとにスライスして分析することができます。
             </p>
             <p>
-              実践フローとしては、まず50〜200件程度の代表的なクエリからなる「ゴールデンデータセット」を用意し、可能であれば手動で検証した理想的な回答と情報源の文書を紐づけます。最初はFaithfulnessとContext Recallの2つから計測を始め、CIに組み込んで閾値を設定し、その後アプリケーションの進化に合わせてメトリクスとデータセットを拡張していくアプローチが推奨されています。
+              実践フローとしては、まず50〜200件程度の代表的なクエリからなる「ゴールデンデータセット」を用意し、可能であれば手動で検証した理想的な回答と情報源の文書を紐づけます。最初はFaithfulnessとContext
+              Recallの2つから計測を始め、CIに組み込んで閾値を設定し、その後アプリケーションの進化に合わせてメトリクスとデータセットを拡張していくアプローチが推奨されています。
             </p>
             <p>
               なお、標準的な4メトリクスは「検索インデックス自体が信頼できる」ことを前提にしている点に注意が必要です。検索対象のドキュメントが古い、所有者が不明、正規のソースと食い違っているといった場合、Faithfulnessスコアが高くてもビジネス上誤った回答を返すことがあります。これは「コンテキストの信頼性」という第5の評価軸として指摘されており、データのリネージ管理と合わせて考える必要があります。
             </p>
 
             <div className={styles.refBlock}>
-              <h4><i className="ti ti-link" />参考資料</h4>
+              <h4>
+                <i className="ti ti-link" />
+                参考資料
+              </h4>
               <ul>
                 <li>
                   <i className="ti ti-external-link" />
@@ -728,13 +791,16 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
             </p>
             <ol>
               <li>
-                <strong>Final-answer評価(最終出力評価)</strong>:最後のメッセージを期待される結果と比較する。ほとんどのベンチマークが対象とする層。
+                <strong>Final-answer評価(最終出力評価)</strong>
+                :最後のメッセージを期待される結果と比較する。ほとんどのベンチマークが対象とする層。
               </li>
               <li>
-                <strong>Trajectory評価(実行軌跡評価)</strong>:ステップの並びとツール呼び出しの系列を評価する。正しい手順を踏んだか、無駄なループがなかったかを見る。
+                <strong>Trajectory評価(実行軌跡評価)</strong>
+                :ステップの並びとツール呼び出しの系列を評価する。正しい手順を踏んだか、無駄なループがなかったかを見る。
               </li>
               <li>
-                <strong>Per-turn評価(ターンごとの評価)</strong>:本番環境の各ターンの意味を評価する。オフラインでは再現できない、実際のやり取りの品質を捉える。
+                <strong>Per-turn評価(ターンごとの評価)</strong>
+                :本番環境の各ターンの意味を評価する。オフラインでは再現できない、実際のやり取りの品質を捉える。
               </li>
             </ol>
             <p>
@@ -784,7 +850,9 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
               <div className={styles.mermaidWrap}>
                 <MermaidDiagram chart={DIAGRAMS.agentEval} />
               </div>
-              <div className={styles.diagramCaption}>Final-answer / Trajectory / Per-turn の3層評価モデル</div>
+              <div className={styles.diagramCaption}>
+                Final-answer / Trajectory / Per-turn の3層評価モデル
+              </div>
             </div>
 
             <p>
@@ -792,7 +860,10 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
             </p>
 
             <div className={styles.refBlock}>
-              <h4><i className="ti ti-link" />参考資料</h4>
+              <h4>
+                <i className="ti ti-link" />
+                参考資料
+              </h4>
               <ul>
                 <li>
                   <i className="ti ti-external-link" />
@@ -831,19 +902,24 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
             </p>
             <ul>
               <li>
-                <strong>temperatureを0に固定する</strong>:自動パイプラインでLLM-as-a-Judgeを実行する際は、再現性のあるスコアリングのためにtemperatureを0に設定するのが推奨されています。
+                <strong>temperatureを0に固定する</strong>
+                :自動パイプラインでLLM-as-a-Judgeを実行する際は、再現性のあるスコアリングのためにtemperatureを0に設定するのが推奨されています。
               </li>
               <li>
-                <strong>pairwise比較を活用する</strong>:単一応答への絶対スコアよりも、2つの応答を比較させる方が、判定の一貫性が高くなる傾向があります。
+                <strong>pairwise比較を活用する</strong>
+                :単一応答への絶対スコアよりも、2つの応答を比較させる方が、判定の一貫性が高くなる傾向があります。
               </li>
               <li>
-                <strong>判定プロンプトのバージョン管理</strong>:判定プロンプトを変更した場合、過去のスコアとの比較は無効になります。変更時点でベースラインを再計測し、境界としてタグ付けする必要があります。
+                <strong>判定プロンプトのバージョン管理</strong>
+                :判定プロンプトを変更した場合、過去のスコアとの比較は無効になります。変更時点でベースラインを再計測し、境界としてタグ付けする必要があります。
               </li>
               <li>
-                <strong>人間によるキャリブレーション</strong>:定期的に人間のレビューとの一致率を確認し、判定プロンプトを調整します。
+                <strong>人間によるキャリブレーション</strong>
+                :定期的に人間のレビューとの一致率を確認し、判定プロンプトを調整します。
               </li>
               <li>
-                <strong>バイアスと一貫性の分析</strong>:同じ入力を複数回判定させて分散を見る、判定順序を入れ替えて位置バイアスがないか確認するといった手法で信頼性を検証します。
+                <strong>バイアスと一貫性の分析</strong>
+                :同じ入力を複数回判定させて分散を見る、判定順序を入れ替えて位置バイアスがないか確認するといった手法で信頼性を検証します。
               </li>
             </ul>
             <p>
@@ -851,7 +927,10 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
             </p>
 
             <div className={styles.refBlock}>
-              <h4><i className="ti ti-link" />参考資料</h4>
+              <h4>
+                <i className="ti ti-link" />
+                参考資料
+              </h4>
               <ul>
                 <li>
                   <i className="ti ti-external-link" />
@@ -862,7 +941,8 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
                 <li>
                   <i className="ti ti-external-link" />
                   <Ext href="https://galtea.ai/blog/automated-llm-evaluation-building-a-ci-cd-quality-gate-that-actually-runs">
-                    Automated LLM Evaluation: Building a CI/CD quality gate that actually runs | Galtea
+                    Automated LLM Evaluation: Building a CI/CD quality gate that actually runs |
+                    Galtea
                   </Ext>
                 </li>
                 <li>
@@ -880,23 +960,29 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
               <span className={styles.stepBadge}>STEP 7</span>9. Human-in-the-Loop評価ワークフロー
             </h2>
             <p>
-              自動評価だけでは捉えきれない品質次元(トーン、ポリシー遵守、ドメイン固有の妥当性など)を扱うために、人間によるレビュー(Human-in-the-Loop, HITL)は依然として不可欠です。効果的なHITLワークフローを構築するための実践ポイントは以下の通りです。
+              自動評価だけでは捉えきれない品質次元(トーン、ポリシー遵守、ドメイン固有の妥当性など)を扱うために、人間によるレビュー(Human-in-the-Loop,
+              HITL)は依然として不可欠です。効果的なHITLワークフローを構築するための実践ポイントは以下の通りです。
             </p>
             <ol>
               <li>
-                <strong>明確な採点基準を先に定義する</strong>:「5点」が何を意味するのか(事実の正確性か、トーンか、タスク完了か、ポリシー遵守か)を、レビューを始める前に定義します。
+                <strong>明確な採点基準を先に定義する</strong>
+                :「5点」が何を意味するのか(事実の正確性か、トーンか、タスク完了か、ポリシー遵守か)を、レビューを始める前に定義します。
               </li>
               <li>
-                <strong>単純な尺度から始め、キャリブレーションセッションを行う</strong>:1〜5点の有用性評価のようなシンプルな尺度から始め、複数のレビュアーが解釈をすり合わせるセッションを実施します。
+                <strong>単純な尺度から始め、キャリブレーションセッションを行う</strong>
+                :1〜5点の有用性評価のようなシンプルな尺度から始め、複数のレビュアーが解釈をすり合わせるセッションを実施します。
               </li>
               <li>
-                <strong>エンドユーザーとレビュアーの役割を分ける</strong>:エンドユーザーには可視化された結果についてフィードバックを求め、検索・ツール呼び出し・ガードレールといった内部の仕組みはドメインエキスパートやQAレビュアーが評価します。
+                <strong>エンドユーザーとレビュアーの役割を分ける</strong>
+                :エンドユーザーには可視化された結果についてフィードバックを求め、検索・ツール呼び出し・ガードレールといった内部の仕組みはドメインエキスパートやQAレビュアーが評価します。
               </li>
               <li>
-                <strong>信頼度ベースの選択的レビュー</strong>:LLMがすべての項目にラベルを付け、信頼度スコアが低いものだけを人間の再レビューに回すことで、コストを50〜96%程度削減できたという報告があります。ただし自動化バイアスのリスクに注意が必要です。
+                <strong>信頼度ベースの選択的レビュー</strong>
+                :LLMがすべての項目にラベルを付け、信頼度スコアが低いものだけを人間の再レビューに回すことで、コストを50〜96%程度削減できたという報告があります。ただし自動化バイアスのリスクに注意が必要です。
               </li>
               <li>
-                <strong>失敗を評価データセットに還元する</strong>:レビュアーが発見したツール呼び出しの誤りや微妙な推論エラーを、テストスイートに追加し将来の更新で自動採点されるようにします。
+                <strong>失敗を評価データセットに還元する</strong>
+                :レビュアーが発見したツール呼び出しの誤りや微妙な推論エラーを、テストスイートに追加し将来の更新で自動採点されるようにします。
               </li>
             </ol>
             <p>
@@ -907,11 +993,16 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
               <div className={styles.mermaidWrap}>
                 <MermaidDiagram chart={DIAGRAMS.hitl} />
               </div>
-              <div className={styles.diagramCaption}>Human-in-the-Loopのレビューフィードバックループ</div>
+              <div className={styles.diagramCaption}>
+                Human-in-the-Loopのレビューフィードバックループ
+              </div>
             </div>
 
             <div className={styles.refBlock}>
-              <h4><i className="ti ti-link" />参考資料</h4>
+              <h4>
+                <i className="ti ti-link" />
+                参考資料
+              </h4>
               <ul>
                 <li>
                   <i className="ti ti-external-link" />
@@ -934,7 +1025,8 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
                 <li>
                   <i className="ti ti-external-link" />
                   <Ext href="https://kili-technology.com/blog/human-in-the-loop-human-on-the-loop-and-llm-as-a-judge-for-validating-ai-outputs">
-                    Human-in-the-Loop, Human-on-the-Loop, and LLM-as-a-Judge for Validating AI Outputs | Kili Technology
+                    Human-in-the-Loop, Human-on-the-Loop, and LLM-as-a-Judge for Validating AI
+                    Outputs | Kili Technology
                   </Ext>
                 </li>
               </ul>
@@ -943,7 +1035,8 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
 
           <section id="section10">
             <h2>
-              <span className={styles.stepBadge}>STEP 8</span>10. CI/CDへの評価組み込み(Evaluation Gate)
+              <span className={styles.stepBadge}>STEP 8</span>10. CI/CDへの評価組み込み(Evaluation
+              Gate)
             </h2>
             <p>
               プロンプトはコードではありませんが、デプロイ対象の成果物のように振る舞います。本番のプロンプトを変更することは、アプリケーションの挙動そのものを変えることであり、コードの変更と同じレベルの厳格さが必要です。
@@ -953,26 +1046,34 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
             </p>
             <ol>
               <li>
-                <strong>モデルバージョン/モデル設定の変更</strong>:モデルプロバイダーがモデル名を変えずに内部モデルを更新することがあるため、切り替え時は必ず全量評価を実行する。
+                <strong>モデルバージョン/モデル設定の変更</strong>
+                :モデルプロバイダーがモデル名を変えずに内部モデルを更新することがあるため、切り替え時は必ず全量評価を実行する。
               </li>
-              <li><strong>プロンプトの変更</strong>:システムプロンプトやテンプレートの変更。</li>
               <li>
-                <strong>リトリーバル設定の変更</strong>:チャンク分割戦略や埋め込みモデルの変更など、RAGの検索側の設定変更。
+                <strong>プロンプトの変更</strong>:システムプロンプトやテンプレートの変更。
+              </li>
+              <li>
+                <strong>リトリーバル設定の変更</strong>
+                :チャンク分割戦略や埋め込みモデルの変更など、RAGの検索側の設定変更。
               </li>
             </ol>
             <p>CI/CDゲートの評価パイプラインは、以下の要素で構成されます。</p>
             <ul>
               <li>
-                <strong>Batch Evaluation Engine</strong>:新しいプロンプトバージョンをテストデータセットに対して実行し、各出力をLLM-as-a-Judgeに送ってスコアリングする。
+                <strong>Batch Evaluation Engine</strong>
+                :新しいプロンプトバージョンをテストデータセットに対して実行し、各出力をLLM-as-a-Judgeに送ってスコアリングする。
               </li>
               <li>
-                <strong>品質だけでなく性能も見る</strong>:レイテンシスパイクやコスト超過を検知し、閾値を超えたらビルドを失敗させる。
+                <strong>品質だけでなく性能も見る</strong>
+                :レイテンシスパイクやコスト超過を検知し、閾値を超えたらビルドを失敗させる。
               </li>
               <li>
-                <strong>スコアの傾向を追跡する</strong>:単一のポイントスコアではなくトレンドとして追跡し、集団としてのリグレッションを検知する。
+                <strong>スコアの傾向を追跡する</strong>
+                :単一のポイントスコアではなくトレンドとして追跡し、集団としてのリグレッションを検知する。
               </li>
               <li>
-                <strong>境界線上のケースは人間レビューへ</strong>:自動判定で白黒つけがたいケースは、ハードブロックにせず人間レビューへルーティングする。
+                <strong>境界線上のケースは人間レビューへ</strong>
+                :自動判定で白黒つけがたいケースは、ハードブロックにせず人間レビューへルーティングする。
               </li>
             </ul>
 
@@ -988,7 +1089,10 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
             </p>
 
             <div className={styles.refBlock}>
-              <h4><i className="ti ti-link" />参考資料</h4>
+              <h4>
+                <i className="ti ti-link" />
+                参考資料
+              </h4>
               <ul>
                 <li>
                   <i className="ti ti-external-link" />
@@ -999,7 +1103,8 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
                 <li>
                   <i className="ti ti-external-link" />
                   <Ext href="https://galtea.ai/blog/automated-llm-evaluation-building-a-ci-cd-quality-gate-that-actually-runs">
-                    Automated LLM Evaluation: Building a CI/CD quality gate that actually runs | Galtea
+                    Automated LLM Evaluation: Building a CI/CD quality gate that actually runs |
+                    Galtea
                   </Ext>
                 </li>
                 <li>
@@ -1026,13 +1131,18 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
 
           <section id="section11">
             <h2>
-              <span className={styles.stepBadge}>STEP 9</span>11. オブザーバビリティ基盤 — OpenTelemetry GenAI Semantic Conventions
+              <span className={styles.stepBadge}>STEP 9</span>11. オブザーバビリティ基盤 —
+              OpenTelemetry GenAI Semantic Conventions
             </h2>
             <p>
               従来のマイクロサービス向けオブザーバビリティは、LLMアプリケーションにはそのまま使えません。LLM呼び出しは通常のHTTPリクエストよりもはるかに多くのテレメトリを生成し、プロンプトや補完結果は巨大なテキストの塊であり、ツール呼び出しのパラメータは毎回異なる構造を取り、エージェントの多段階推論は固定スキーマに収まりません。
             </p>
             <p>
-              こうした課題に対応するため、2024年4月にOpenTelemetryの中にGenAI Special Interest Group(GenAI SIG)が発足し、LLM/エージェント向けのテレメトリを標準化する意味論的規約(Semantic Conventions)の策定を進めています。CNCFがバックアップするこの規約は、Google Cloud、AWS、Azure、Datadogなど主要な観測プラットフォームに採用されつつあります。
+              こうした課題に対応するため、2024年4月にOpenTelemetryの中にGenAI Special Interest
+              Group(GenAI
+              SIG)が発足し、LLM/エージェント向けのテレメトリを標準化する意味論的規約(Semantic
+              Conventions)の策定を進めています。CNCFがバックアップするこの規約は、Google
+              Cloud、AWS、Azure、Datadogなど主要な観測プラットフォームに採用されつつあります。
             </p>
 
             <h3>主要な属性(gen_ai.*)</h3>
@@ -1045,38 +1155,56 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
               </thead>
               <tbody>
                 <tr>
-                  <td><code>gen_ai.provider.name</code></td>
+                  <td>
+                    <code>gen_ai.provider.name</code>
+                  </td>
                   <td>プロバイダー識別子(例:openai、anthropic、aws.bedrock)</td>
                 </tr>
                 <tr>
-                  <td><code>gen_ai.request.model</code></td>
+                  <td>
+                    <code>gen_ai.request.model</code>
+                  </td>
                   <td>リクエスト先のモデル名</td>
                 </tr>
                 <tr>
-                  <td><code>gen_ai.response.model</code></td>
+                  <td>
+                    <code>gen_ai.response.model</code>
+                  </td>
                   <td>実際に応答を生成したモデル名</td>
                 </tr>
                 <tr>
-                  <td><code>gen_ai.usage.input_tokens</code> / <code>gen_ai.usage.output_tokens</code></td>
+                  <td>
+                    <code>gen_ai.usage.input_tokens</code> / <code>gen_ai.usage.output_tokens</code>
+                  </td>
                   <td>入力/出力トークン数</td>
                 </tr>
                 <tr>
-                  <td><code>gen_ai.response.finish_reasons</code></td>
+                  <td>
+                    <code>gen_ai.response.finish_reasons</code>
+                  </td>
                   <td>生成が終了した理由(例:stop、tool_calls)</td>
                 </tr>
                 <tr>
-                  <td><code>gen_ai.operation.name</code></td>
+                  <td>
+                    <code>gen_ai.operation.name</code>
+                  </td>
                   <td>操作の種別(例:chat、text_completion、execute_tool)</td>
                 </tr>
                 <tr>
-                  <td><code>gen_ai.input.messages</code> / <code>gen_ai.output.messages</code></td>
+                  <td>
+                    <code>gen_ai.input.messages</code> / <code>gen_ai.output.messages</code>
+                  </td>
                   <td>プロンプト・応答の内容(コンテンツ記録がオプトインされた場合のみ)</td>
                 </tr>
               </tbody>
             </table>
 
             <p>
-              規約は「クライアントスパン」「エージェントスパン」「MCP(Model Context Protocol)ツール呼び出し」「イベント」「メトリクス」「プロバイダー固有の規約」という6つの層をカバーしています。エージェントがLLMを呼び出す際は、トップレベルの<code>invoke_agent</code>スパンの下に、各LLM呼び出しに対応する<code>chat</code>スパンと、各ツール呼び出しに対応する<code>execute_tool</code>スパンが子として連なるスパンツリーが形成されます。
+              規約は「クライアントスパン」「エージェントスパン」「MCP(Model Context
+              Protocol)ツール呼び出し」「イベント」「メトリクス」「プロバイダー固有の規約」という6つの層をカバーしています。エージェントがLLMを呼び出す際は、トップレベルの
+              <code>invoke_agent</code>スパンの下に、各LLM呼び出しに対応する<code>chat</code>
+              スパンと、各ツール呼び出しに対応する<code>execute_tool</code>
+              スパンが子として連なるスパンツリーが形成されます。
             </p>
 
             <div className={styles.diagramBlock}>
@@ -1088,12 +1216,22 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
 
             <h3>メトリクス</h3>
             <p>
-              <code>gen_ai.client.operation.duration</code>(LLM呼び出しのレイテンシのヒストグラム)や<code>gen_ai.client.token.usage</code>(トークン消費量のヒストグラム、<code>gen_ai.token.type</code>で入力/出力を区別)といったメトリクスにより、モデルごとのコスト推定、レイテンシ回帰の検知、モデル横断的な利用パターンの監視が可能になります。
+              <code>gen_ai.client.operation.duration</code>(LLM呼び出しのレイテンシのヒストグラム)や
+              <code>gen_ai.client.token.usage</code>(トークン消費量のヒストグラム、
+              <code>gen_ai.token.type</code>
+              で入力/出力を区別)といったメトリクスにより、モデルごとのコスト推定、レイテンシ回帰の検知、モデル横断的な利用パターンの監視が可能になります。
             </p>
 
             <h3>現状の成熟度と注意点</h3>
             <p>
-              2026年前半時点で、規約は正式には「Development(開発中)」ステータスにあり、多くの<code>gen_ai.*</code>属性は依然として実験的(Experimental)扱いです。属性名は将来的に変更される可能性があるため、既存のインストルメンテーションを使うチームは<code>OTEL_SEMCONV_STABILITY_OPT_IN</code>環境変数によって、旧バージョンと最新実験版のどちらを出力するか制御できます。OpenAI Python SDKのインストルメンテーションが最も成熟しており、Anthropic・Cohere・AWS Bedrockなどはコミュニティライブラリ(OpenLLMetryなど)経由でカバーされています。Datadog・Honeycomb・New Relicといった主要ベンダーは既にこの規約をネイティブサポートしています。
+              2026年前半時点で、規約は正式には「Development(開発中)」ステータスにあり、多くの
+              <code>gen_ai.*</code>
+              属性は依然として実験的(Experimental)扱いです。属性名は将来的に変更される可能性があるため、既存のインストルメンテーションを使うチームは
+              <code>OTEL_SEMCONV_STABILITY_OPT_IN</code>
+              環境変数によって、旧バージョンと最新実験版のどちらを出力するか制御できます。OpenAI
+              Python SDKのインストルメンテーションが最も成熟しており、Anthropic・Cohere・AWS
+              Bedrockなどはコミュニティライブラリ(OpenLLMetryなど)経由でカバーされています。Datadog・Honeycomb・New
+              Relicといった主要ベンダーは既にこの規約をネイティブサポートしています。
             </p>
 
             <h3>プライバシーと3段階のコンテンツ記録モデル</h3>
@@ -1108,19 +1246,38 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
               </div>
               <pre className={styles.codeBody}>
                 <code className="language-bash">
-                  <div className={styles.codeLine}><span className={styles.cc}># 環境変数の例(コンテンツ記録を有効化する場合の設定イメージ)</span></div>
-                  <div className={styles.codeLine}><span className={styles.cv}>OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT</span><span>=</span><span className={styles.cs}>true</span></div>
-                  <div className={styles.codeLine}><span className={styles.cc}># 推奨: 機微情報をエクスポート前にレダクションするコレクタープロセッサーと併用する</span></div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.cc}>
+                      # 環境変数の例(コンテンツ記録を有効化する場合の設定イメージ)
+                    </span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.cv}>
+                      OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT
+                    </span>
+                    <span>=</span>
+                    <span className={styles.cs}>true</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.cc}>
+                      # 推奨:
+                      機微情報をエクスポート前にレダクションするコレクタープロセッサーと併用する
+                    </span>
+                  </div>
                 </code>
               </pre>
             </div>
 
             <p>
-              OpenTelemetryはあくまで「何が起きたか」を記録するテレメトリの土台であり、「その結果が良かったかどうか」の評価(忠実性・毒性・ポリシー遵守など)は担いません。実務では両者を組み合わせたアーキテクチャ(OTelをデータプレーンとし、専用 of 評価レイヤーをその上に重ねる構成)が推奨されています。
+              OpenTelemetryはあくまで「何が起きたか」を記録するテレメトリの土台であり、「その結果が良かったかどうか」の評価(忠実性・毒性・ポリシー遵守など)は担いません。実務では両者を組み合わせたアーキテクチャ(OTelをデータプレーンとし、専用
+              of 評価レイヤーをその上に重ねる構成)が推奨されています。
             </p>
 
             <div className={styles.refBlock}>
-              <h4><i className="ti ti-link" />参考資料</h4>
+              <h4>
+                <i className="ti ti-link" />
+                参考資料
+              </h4>
               <ul>
                 <li>
                   <i className="ti ti-external-link" />
@@ -1149,7 +1306,8 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
                 <li>
                   <i className="ti ti-external-link" />
                   <Ext href="https://www.fiddler.ai/blog/opentelemetry-ai-observability-guide">
-                    OpenTelemetry for AI Observability: What It Covers and Where It Stops | Fiddler AI
+                    OpenTelemetry for AI Observability: What It Covers and Where It Stops | Fiddler
+                    AI
                   </Ext>
                 </li>
                 <li>
@@ -1164,7 +1322,8 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
 
           <section id="section12">
             <h2>
-              <span className={styles.stepBadge}>STEP 10</span>12. 本番監視 — ドリフト検知とハルシネーション検知
+              <span className={styles.stepBadge}>STEP 10</span>12. 本番監視 —
+              ドリフト検知とハルシネーション検知
             </h2>
             <p>
               本番のLLMシステムは、ローンチ時にうまく機能していても、数ヶ月かけて静かに劣化していくことがあります。これを引き起こすメカニズムが「ドリフト(Drift)」です。
@@ -1173,10 +1332,12 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
             <h3>モデルドリフトとデータドリフトの違い</h3>
             <ul>
               <li>
-                <strong>モデルドリフト</strong>:デプロイされたモデルの性能が、学習/評価時点の前提条件から世界が変化したことで劣化する現象。LLM/エージェントシステムでは忠実性、グラウンデッドネス、タスク成功率、ツール呼び出し精度、下流のコンバージョン率が代表的な指標になります。
+                <strong>モデルドリフト</strong>
+                :デプロイされたモデルの性能が、学習/評価時点の前提条件から世界が変化したことで劣化する現象。LLM/エージェントシステムでは忠実性、グラウンデッドネス、タスク成功率、ツール呼び出し精度、下流のコンバージョン率が代表的な指標になります。
               </li>
               <li>
-                <strong>データドリフト(プロンプト分布ドリフト)</strong>:実際のユーザーが送る入力の分布が時間とともに変化する現象。平均プロンプト長、語彙、話題の分布の変化を監視します。
+                <strong>データドリフト(プロンプト分布ドリフト)</strong>
+                :実際のユーザーが送る入力の分布が時間とともに変化する現象。平均プロンプト長、語彙、話題の分布の変化を監視します。
               </li>
             </ul>
             <p>
@@ -1217,13 +1378,16 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
             <h3>ハルシネーション検知の3つのアプローチ</h3>
             <ol>
               <li>
-                <strong>検索グラウンディングチェック(RAG向け)</strong>:応答を検索コンテキストと照合し、根拠のない主張がないかを採点する。Faithfulnessスコアが0.7を下回った場合にアラートを出す運用も報告されています。
+                <strong>検索グラウンディングチェック(RAG向け)</strong>
+                :応答を検索コンテキストと照合し、根拠のない主張がないかを採点する。Faithfulnessスコアが0.7を下回った場合にアラートを出す運用も報告されています。
               </li>
               <li>
-                <strong>自動LLM-as-a-Judge評価</strong>:本番トレースの5〜10%程度をサンプリングし、評価用モデルに通してハルシネーションリスクスコアを追跡し、統計的に有意な増加が見られた場合にアラートを出す。
+                <strong>自動LLM-as-a-Judge評価</strong>
+                :本番トレースの5〜10%程度をサンプリングし、評価用モデルに通してハルシネーションリスクスコアを追跡し、統計的に有意な増加が見られた場合にアラートを出す。
               </li>
               <li>
-                <strong>グラウンデッドネスチェック(ルールベース)</strong>:事実・価格・日付を引用する応答について、既知の商品名や価格帯・日付といった正規表現ベースのチェックを行う。
+                <strong>グラウンデッドネスチェック(ルールベース)</strong>
+                :事実・価格・日付を引用する応答について、既知の商品名や価格帯・日付といった正規表現ベースのチェックを行う。
               </li>
             </ol>
             <p>
@@ -1234,11 +1398,16 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
               <div className={styles.mermaidWrap}>
                 <MermaidDiagram chart={DIAGRAMS.drift} />
               </div>
-              <div className={styles.diagramCaption}>ドリフト検知とハルシネーション検知のアラートフロー</div>
+              <div className={styles.diagramCaption}>
+                ドリフト検知とハルシネーション検知のアラートフロー
+              </div>
             </div>
 
             <div className={styles.refBlock}>
-              <h4><i className="ti ti-link" />参考資料</h4>
+              <h4>
+                <i className="ti ti-link" />
+                参考資料
+              </h4>
               <ul>
                 <li>
                   <i className="ti ti-external-link" />
@@ -1279,23 +1448,29 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
               <span className={styles.stepBadge}>STEP 11</span>13. コスト・レイテンシ監視
             </h2>
             <p>
-              LLM APIはトークン単位で課金されるため、コストは容易に制御不能な規模に膨らみます。コストを一級の監視対象として扱うためのポイントは以下の通りです。
+              LLM
+              APIはトークン単位で課金されるため、コストは容易に制御不能な規模に膨らみます。コストを一級の監視対象として扱うためのポイントは以下の通りです。
             </p>
             <ul>
               <li>
-                <strong>ユーザー単位・テナント単位・機能単位で予算を設定する</strong>:ハードリミット(強制停止)とソフトアラート(警告通知)の両方を設定する。
+                <strong>ユーザー単位・テナント単位・機能単位で予算を設定する</strong>
+                :ハードリミット(強制停止)とソフトアラート(警告通知)の両方を設定する。
               </li>
               <li>
-                <strong>会話単位・タスク成功単位のコストを追跡する</strong>:単純なAPIコール数ではなく、タスクを1件成功させるのに何円かかったかを追う。
+                <strong>会話単位・タスク成功単位のコストを追跡する</strong>
+                :単純なAPIコール数ではなく、タスクを1件成功させるのに何円かかったかを追う。
               </li>
               <li>
-                <strong>プロンプト長のトレンドを監視する</strong>:プロンプトの肥大化(prompt bloat)はコスト超過の典型的な原因です。
+                <strong>プロンプト長のトレンドを監視する</strong>:プロンプトの肥大化(prompt
+                bloat)はコスト超過の典型的な原因です。
               </li>
               <li>
-                <strong>タスクに応じて安価なモデルにA/Bテストする</strong>:品質要件が許す範囲でモデルをダウングレードし、コストを最適化する。
+                <strong>タスクに応じて安価なモデルにA/Bテストする</strong>
+                :品質要件が許す範囲でモデルをダウングレードし、コストを最適化する。
               </li>
               <li>
-                <strong>キャッシュを活用する</strong>:FAQ的な繰り返し質問に対しては、共通する応答をキャッシュして冗長なAPI呼び出しを削減する。
+                <strong>キャッシュを活用する</strong>
+                :FAQ的な繰り返し質問に対しては、共通する応答をキャッシュして冗長なAPI呼び出しを削減する。
               </li>
             </ul>
             <p>
@@ -1303,7 +1478,10 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
             </p>
 
             <div className={styles.refBlock}>
-              <h4><i className="ti ti-link" />参考資料</h4>
+              <h4>
+                <i className="ti ti-link" />
+                参考資料
+              </h4>
               <ul>
                 <li>
                   <i className="ti ti-external-link" />
@@ -1320,7 +1498,8 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
                 <li>
                   <i className="ti ti-external-link" />
                   <Ext href="https://opentelemetry.io/blog/2026/genai-observability/">
-                    Inside the LLM Call: GenAI Observability with OpenTelemetry(テールレイテンシの重要性)
+                    Inside the LLM Call: GenAI Observability with
+                    OpenTelemetry(テールレイテンシの重要性)
                   </Ext>
                 </li>
               </ul>
@@ -1411,13 +1590,16 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
             <h3>よく紹介される組み合わせパターン</h3>
             <ul>
               <li>
-                <strong>Langfuse + Arize Phoenix</strong>:Langfuseが運用テレメトリ(トークンコスト・レイテンシ・プロンプト・リクエストトレース)を担当し、PhoenixがRAG観測(忠実性スコアリング・ハルシネーション検知・検索評価)を担当する構成。
+                <strong>Langfuse + Arize Phoenix</strong>
+                :Langfuseが運用テレメトリ(トークンコスト・レイテンシ・プロンプト・リクエストトレース)を担当し、PhoenixがRAG観測(忠実性スコアリング・ハルシネーション検知・検索評価)を担当する構成。
               </li>
               <li>
-                <strong>LangSmith + W&amp;B Weave</strong>:LangChainに深く依存し、実験重視のワークフローを持つチーム向け。LangSmithがLangGraphの詳細なトレーシングとプロンプトデバッグを担当し、Weaveが実験管理・データセットバージョニング・評価管理を追加する構成。
+                <strong>LangSmith + W&amp;B Weave</strong>
+                :LangChainに深く依存し、実験重視のワークフローを持つチーム向け。LangSmithがLangGraphの詳細なトレーシングとプロンプトデバッグを担当し、Weaveが実験管理・データセットバージョニング・評価管理を追加する構成。
               </li>
               <li>
-                <strong>ゲートウェイ + 評価ツール</strong>:Helicone/Portkeyのようなプロキシゲートウェイでコストトラッキングとルーティングを行い、Phoenix/TruLensのような評価ツールで品質メトリクスを測定する構成。
+                <strong>ゲートウェイ + 評価ツール</strong>
+                :Helicone/Portkeyのようなプロキシゲートウェイでコストトラッキングとルーティングを行い、Phoenix/TruLensのような評価ツールで品質メトリクスを測定する構成。
               </li>
             </ul>
             <p>
@@ -1425,7 +1607,10 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
             </p>
 
             <div className={styles.refBlock}>
-              <h4><i className="ti ti-link" />参考資料</h4>
+              <h4>
+                <i className="ti ti-link" />
+                参考資料
+              </h4>
               <ul>
                 <li>
                   <i className="ti ti-external-link" />
@@ -1463,7 +1648,8 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
 
           <section id="section15">
             <h2>
-              <span className={styles.stepBadge}>STEP 13</span>15. 継続的改善のフィードバックループ(Data Flywheel)
+              <span className={styles.stepBadge}>STEP 13</span>15.
+              継続的改善のフィードバックループ(Data Flywheel)
             </h2>
             <p>
               評価とオブザーバビリティの最終的な価値は、「本番で起きた失敗が、次の評価データセットを強化する」という循環(データフライホイール)を作り出すことにあります。開発データをログに残すことで、エッジケースを特定し、より一貫したLLM-as-a-Judgeスコアリングのためのペアワイズ比較を用い、失敗したトレースを価値ある新しいテストデータセットに変えるフィードバックループを構築できます。この「データフライホイール」が、評価を単発の作業から継続的な改善サイクルへと変えます。
@@ -1482,12 +1668,16 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
             </div>
 
             <div className={styles.refBlock}>
-              <h4><i className="ti ti-link" />参考資料</h4>
+              <h4>
+                <i className="ti ti-link" />
+                参考資料
+              </h4>
               <ul>
                 <li>
                   <i className="ti ti-external-link" />
                   <Ext href="https://medium.com/@future_agi/llm-evaluation-frameworks-metrics-and-best-practices-2026-edition-162790f831f4">
-                    LLM Evaluation: Frameworks, Metrics, and Best Practices (2026 Edition) | Future AGI
+                    LLM Evaluation: Frameworks, Metrics, and Best Practices (2026 Edition) | Future
+                    AGI
                   </Ext>
                 </li>
                 <li>
@@ -1502,7 +1692,8 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
 
           <section id="section16">
             <h2>
-              <i className="ti ti-checklist" />16. 実践チェックリスト
+              <i className="ti ti-checklist" />
+              16. 実践チェックリスト
             </h2>
             <p>
               導入の優先順位に迷った場合は、以下の順序で着手することが推奨されています:ログとレイテンシの記録から始め、品質評価(Evaluation)を追加し、システムが成熟するにつれて安全性評価とドリフト監視を段階的に重ねていく。目標は「すべてを一度に監視すること」ではなく、「常に何が起きていて、なぜ起きているかを把握し続けること」です。
@@ -1519,7 +1710,8 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
               </li>
               <li>
                 <i className="ti ti-square" />
-                RAGを使う場合、Faithfulness/Answer Relevancy/Context Precision/Context Recallの4指標を計測している
+                RAGを使う場合、Faithfulness/Answer Relevancy/Context Precision/Context
+                Recallの4指標を計測している
               </li>
               <li>
                 <i className="ti ti-square" />
@@ -1539,7 +1731,8 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
               </li>
               <li>
                 <i className="ti ti-square" />
-                OpenTelemetry GenAI Semantic Conventions(またはOTel準拠の規約)でトレースを収集している
+                OpenTelemetry GenAI Semantic
+                Conventions(またはOTel準拠の規約)でトレースを収集している
               </li>
               <li>
                 <i className="ti ti-square" />
@@ -1562,16 +1755,20 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
 
           <section id="section17">
             <h2>
-              <i className="ti ti-flag-2" />17. まとめ
+              <i className="ti ti-flag-2" />
+              17. まとめ
             </h2>
             <p>
-              LLM評価・ベンチマーク・オブザーバビリティは、2026年時点でLLMOpsの中核をなす一体の規律です。ベンチマークは業界横断でモデルを比較するための一次スクリーニングとして使い、最終判断は自社データに基づくオフライン評価で行います。評価は決定論的・統計的・LLM-as-a-Judgeを組み合わせ、境界線上のケースは人間レビューにエスカレーションします。RAGでは検索と生成を分けて測定し、エージェントでは最終出力・実行軌跡・ターンごとの3層で評価します。CI/CDへの評価ゲート組み込みによってリグレッションをリリース前に検知し、OpenTelemetry GenAI Semantic Conventionsを基盤としたオブザーバビリティによって本番の挙動を可視化し、ドリフトとハルシネーションを継続的に監視します。そして最も重要なのは、本番で見つかった失敗を次の評価データセットへ還元し続けるフィードバックループ(データフライホイール)を組織として維持することです。
+              LLM評価・ベンチマーク・オブザーバビリティは、2026年時点でLLMOpsの中核をなす一体の規律です。ベンチマークは業界横断でモデルを比較するための一次スクリーニングとして使い、最終判断は自社データに基づくオフライン評価で行います。評価は決定論的・統計的・LLM-as-a-Judgeを組み合わせ、境界線上のケースは人間レビューにエスカレーションします。RAGでは検索と生成を分けて測定し、エージェントでは最終出力・実行軌跡・ターンごとの3層で評価します。CI/CDへの評価ゲート組み込みによってリグレッションをリリース前に検知し、OpenTelemetry
+              GenAI Semantic
+              Conventionsを基盤としたオブザーバビリティによって本番の挙動を可視化し、ドリフトとハルシネーションを継続的に監視します。そして最も重要なのは、本番で見つかった失敗を次の評価データセットへ還元し続けるフィードバックループ(データフライホイール)を組織として維持することです。
             </p>
           </section>
 
           <section id="section18">
             <h2>
-              <i className="ti ti-books" />18. 総合参考資料一覧
+              <i className="ti ti-books" />
+              18. 総合参考資料一覧
             </h2>
 
             <div className={styles.refGroups}>
@@ -1587,7 +1784,8 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
                   <li>
                     <i className="ti ti-external-link" />
                     <Ext href="https://gogloby.com/insights/llm-evaluation/">
-                      What is LLM Evaluation: Best Frameworks, Metrics, Tools &amp; Practices in 2026 | GoGloby
+                      What is LLM Evaluation: Best Frameworks, Metrics, Tools &amp; Practices in
+                      2026 | GoGloby
                     </Ext>
                   </li>
                   <li>
@@ -1599,7 +1797,8 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
                   <li>
                     <i className="ti ti-external-link" />
                     <Ext href="https://medium.com/@future_agi/llm-evaluation-frameworks-metrics-and-best-practices-2026-edition-162790f831f4">
-                      LLM Evaluation: Frameworks, Metrics, and Best Practices (2026 Edition) | Future AGI
+                      LLM Evaluation: Frameworks, Metrics, and Best Practices (2026 Edition) |
+                      Future AGI
                     </Ext>
                   </li>
                   <li>
@@ -1617,7 +1816,8 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
                   <li>
                     <i className="ti ti-external-link" />
                     <Ext href="https://deepeval.com/blog/llm-as-a-judge">
-                      LLM-as-a-Judge in 2026: Top evaluation techniques and best practices | DeepEval
+                      LLM-as-a-Judge in 2026: Top evaluation techniques and best practices |
+                      DeepEval
                     </Ext>
                   </li>
                 </ul>
@@ -1653,7 +1853,8 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
                   <li>
                     <i className="ti ti-external-link" />
                     <Ext href="https://www.fiddler.ai/blog/opentelemetry-ai-observability-guide">
-                      OpenTelemetry for AI Observability: What It Covers and Where It Stops | Fiddler AI
+                      OpenTelemetry for AI Observability: What It Covers and Where It Stops |
+                      Fiddler AI
                     </Ext>
                   </li>
                   <li>
@@ -1671,7 +1872,8 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
                   <li>
                     <i className="ti ti-external-link" />
                     <Ext href="https://zylos.ai/research/2026-02-28-opentelemetry-ai-agent-observability">
-                      OpenTelemetry for AI Agents: Observability, Tracing, and the GenAI Semantic Conventions | Zylos Research
+                      OpenTelemetry for AI Agents: Observability, Tracing, and the GenAI Semantic
+                      Conventions | Zylos Research
                     </Ext>
                   </li>
                 </ul>
@@ -1713,7 +1915,8 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
                   <li>
                     <i className="ti ti-external-link" />
                     <Ext href="https://mysummit.school/blog/en/how-llm-benchmarks-work-2026/">
-                      LLM Benchmarks Explained: MMLU, Chatbot Arena &amp; SWE-bench Leaderboard (2026)
+                      LLM Benchmarks Explained: MMLU, Chatbot Arena &amp; SWE-bench Leaderboard
+                      (2026)
                     </Ext>
                   </li>
                   <li>
@@ -1785,7 +1988,8 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
                   <li>
                     <i className="ti ti-external-link" />
                     <Ext href="https://www.automationanywhere.com/company/blog/product-insights/ai-agent-benchmark">
-                      AI Agent Benchmarks: The 2026 Enterprise Evaluation Guide | Automation Anywhere
+                      AI Agent Benchmarks: The 2026 Enterprise Evaluation Guide | Automation
+                      Anywhere
                     </Ext>
                   </li>
                   <li>
@@ -1803,7 +2007,8 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
                   <li>
                     <i className="ti ti-external-link" />
                     <Ext href="https://www.randalolson.com/2026/03/06/top-tools-to-evaluate-and-benchmark-ai-agent-performance-2026/">
-                      Top Tools to Evaluate and Benchmark AI Agent Performance in 2026 | Dr. Randal S. Olson
+                      Top Tools to Evaluate and Benchmark AI Agent Performance in 2026 | Dr. Randal
+                      S. Olson
                     </Ext>
                   </li>
                 </ul>
@@ -1839,7 +2044,8 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
                   <li>
                     <i className="ti ti-external-link" />
                     <Ext href="https://kili-technology.com/blog/human-in-the-loop-human-on-the-loop-and-llm-as-a-judge-for-validating-ai-outputs">
-                      Human-in-the-Loop, Human-on-the-Loop, and LLM-as-a-Judge for Validating AI Outputs | Kili Technology
+                      Human-in-the-Loop, Human-on-the-Loop, and LLM-as-a-Judge for Validating AI
+                      Outputs | Kili Technology
                     </Ext>
                   </li>
                 </ul>
@@ -1863,7 +2069,8 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
                   <li>
                     <i className="ti ti-external-link" />
                     <Ext href="https://galtea.ai/blog/automated-llm-evaluation-building-a-ci-cd-quality-gate-that-actually-runs">
-                      Automated LLM Evaluation: Building a CI/CD quality gate that actually runs | Galtea
+                      Automated LLM Evaluation: Building a CI/CD quality gate that actually runs |
+                      Galtea
                     </Ext>
                   </li>
                   <li>
@@ -1905,7 +2112,8 @@ export default function LLMOpsEvaluationObservabilityGuidePage() {
                   <li>
                     <i className="ti ti-external-link" />
                     <Ext href="https://futureagi.com/blog/model-vs-data-drift-how-to-identify-and-handle-it/">
-                      Model Drift vs Data Drift in 2026: Detection &amp; Mitigation Guide | Future AGI
+                      Model Drift vs Data Drift in 2026: Detection &amp; Mitigation Guide | Future
+                      AGI
                     </Ext>
                   </li>
                   <li>

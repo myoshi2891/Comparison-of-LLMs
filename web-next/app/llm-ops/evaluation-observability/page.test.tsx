@@ -3,7 +3,9 @@ import { join } from "node:path";
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
-import PageComponent, { metadata as rawMetadata } from "@/app/llm-ops/evaluation-observability/page";
+import PageComponent, {
+  metadata as rawMetadata,
+} from "@/app/llm-ops/evaluation-observability/page";
 
 const Page = PageComponent as unknown as () => ReactElement;
 type MetadataLike = { title?: unknown; description?: unknown };
@@ -74,12 +76,15 @@ describe("/llm-ops/evaluation-observability - page structure", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("main h1");
     expect(h1).not.toBeNull();
-    expect(h1?.textContent).toContain("LLM評価・ベンチマーク & オブザーバビリティ ベストプラクティスガイド(2026年版)");
+    expect(h1?.textContent).toContain(
+      "LLM評価・ベンチマーク & オブザーバビリティ ベストプラクティスガイド(2026年版)"
+    );
   });
 
   it("renders all 18 expected sections", () => {
     const { container } = render(<Page />);
     const sections = container.querySelectorAll("section");
+    expect(sections.length).toBe(EXPECTED_SECTION_IDS.length);
     // We check for sections with expected IDs
     for (const id of EXPECTED_SECTION_IDS) {
       const el = container.querySelector(`#${id}`);
