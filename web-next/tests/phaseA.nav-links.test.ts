@@ -41,8 +41,8 @@ describe("Phase A - nav-links export shape", () => {
 });
 
 describe("Phase A - nav-links top-level entries", () => {
-  it("has exactly 13 top-level entries", () => {
-    expect(navLinks.length).toBe(13);
+  it("has exactly 14 top-level entries", () => {
+    expect(navLinks.length).toBe(14);
   });
 
   it("starts with Home as a flat link", () => {
@@ -58,7 +58,7 @@ describe("Phase A - nav-links top-level entries", () => {
     expect("href" in last && last.href === "/git-worktree").toBe(true);
   });
 
-  it("has Claude/Google/Codex/Copilot/Code Review/Agent/Sandbox/IDE/Security/Local LLM/CI/CD as dropdowns with children", () => {
+  it("has Claude/Google/Codex/Copilot/Code Review/Agent/MCP/Sandbox/IDE/Security/Local LLM/CI/CD as dropdowns with children", () => {
     const providers = [
       "Claude",
       "Google",
@@ -66,6 +66,7 @@ describe("Phase A - nav-links top-level entries", () => {
       "Copilot",
       "Code Review",
       "Agent",
+      "MCP",
       "Sandbox",
       "IDE",
       "Security",
@@ -107,10 +108,10 @@ describe("Phase A - Agent dropdown shape", () => {
 describe("Phase A - Claude dropdown shape", () => {
   const claude = navLinks.find((link) => link.name === "Claude");
 
-  it("has 11 child entries (skill / agent / skill-guide / skill-guide-intermediate / cowork-guide / harness-engineering / managed-agents / self-hosted-sandboxes / code-slash-commands / fable-5-best-practices / mcp-best-practices)", () => {
+  it("has 10 child entries (skill / agent / skill-guide / skill-guide-intermediate / cowork-guide / harness-engineering / managed-agents / self-hosted-sandboxes / code-slash-commands / fable-5-best-practices)", () => {
     expect(claude && "children" in claude).toBe(true);
     const children = claude && "children" in claude ? claude.children : [];
-    expect(children.length).toBe(11);
+    expect(children.length).toBe(10);
   });
 
   it("uses clean URL paths for all Claude children (no .html extension)", () => {
@@ -126,8 +127,23 @@ describe("Phase A - Claude dropdown shape", () => {
       "/claude/self-hosted-sandboxes",
       "/claude/code-slash-commands",
       "/claude/fable-5-best-practices",
-      "/claude/mcp-best-practices",
     ];
+    expect(children.map((c) => c.href)).toEqual(expectedHrefs);
+  });
+});
+
+describe("Phase A - MCP dropdown shape", () => {
+  const mcp = navLinks.find((link) => link.name === "MCP");
+
+  it("has 1 child entry (mcp-best-practices)", () => {
+    expect(mcp && "children" in mcp).toBe(true);
+    const children = mcp && "children" in mcp ? mcp.children : [];
+    expect(children.length).toBe(1);
+  });
+
+  it("uses clean URL paths for all MCP children (no .html extension)", () => {
+    const children = mcp && "children" in mcp ? mcp.children : [];
+    const expectedHrefs = ["/mcp/mcp-best-practices"];
     expect(children.map((c) => c.href)).toEqual(expectedHrefs);
   });
 });
