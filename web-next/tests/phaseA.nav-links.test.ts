@@ -107,10 +107,10 @@ describe("Phase A - Agent dropdown shape", () => {
 describe("Phase A - Claude dropdown shape", () => {
   const claude = navLinks.find((link) => link.name === "Claude");
 
-  it("has 10 child entries (skill / agent / skill-guide / skill-guide-intermediate / cowork-guide / harness-engineering / managed-agents / self-hosted-sandboxes / code-slash-commands / fable-5-best-practices)", () => {
+  it("has 11 child entries (skill / agent / skill-guide / skill-guide-intermediate / cowork-guide / harness-engineering / managed-agents / self-hosted-sandboxes / code-slash-commands / fable-5-best-practices / mcp-best-practices)", () => {
     expect(claude && "children" in claude).toBe(true);
     const children = claude && "children" in claude ? claude.children : [];
-    expect(children.length).toBe(10);
+    expect(children.length).toBe(11);
   });
 
   it("uses clean URL paths for all Claude children (no .html extension)", () => {
@@ -126,6 +126,7 @@ describe("Phase A - Claude dropdown shape", () => {
       "/claude/self-hosted-sandboxes",
       "/claude/code-slash-commands",
       "/claude/fable-5-best-practices",
+      "/claude/mcp-best-practices",
     ];
     expect(children.map((c) => c.href)).toEqual(expectedHrefs);
   });
