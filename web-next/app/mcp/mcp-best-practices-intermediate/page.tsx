@@ -1049,7 +1049,7 @@ export default function McpBestPracticesIntermediatePage() {
                     <td>2025年6月</td>
                     <td>
                       <b>OAuth 2.1</b>{" "}
-                      ベースの認可仕様を正式化（MCPサーバー＝リソースサーバー、外部認可サーバーへの分離を明確化）
+                      ベースの認可仕様を正式化（MCPサーバー＝リソースサーバー、認可サーバーとの役割・責務の分離を明確化。物理的な分離強制ではない）
                     </td>
                   </tr>
                   <tr>
