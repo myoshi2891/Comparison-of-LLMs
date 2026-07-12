@@ -455,9 +455,7 @@ export default function AdkBestPracticesPage() {
             <p className={styles.source}>
               <i className="ti ti-link" />
               出典: ADK公式ドキュメント「Deploying Your Agent」{" "}
-              <Ext href="https://adk.dev/deploy/">
-                adk.dev/deploy
-              </Ext>
+              <Ext href="https://adk.dev/deploy/">adk.dev/deploy</Ext>
             </p>
           </section>
 
@@ -1034,7 +1032,9 @@ export default function AdkBestPracticesPage() {
                     <span className={styles.ck}>import</span> VertexAiMemoryBankService
                   </span>
                   <span className={styles.codeLine} />
-                  <span className={styles.codeLine}>memory_service = VertexAiMemoryBankService(</span>
+                  <span className={styles.codeLine}>
+                    memory_service = VertexAiMemoryBankService(
+                  </span>
                   <span className={styles.codeLine}>
                     {"    "}project=<span className={styles.cs}>"PROJECT_ID"</span>,
                   </span>
@@ -1158,7 +1158,9 @@ export default function AdkBestPracticesPage() {
                     root_agent = Agent(name=<span className={styles.cs}>"my_root_agent"</span>)
                   </span>
                   <span className={styles.codeLine} />
-                  <span className={styles.codeLine}>compaction_config = EventsCompactionConfig(</span>
+                  <span className={styles.codeLine}>
+                    compaction_config = EventsCompactionConfig(
+                  </span>
                   <span className={styles.codeLine}>
                     {"    "}token_threshold=<span className={styles.cv}>4000</span>,
                   </span>
