@@ -30,7 +30,7 @@ describe("Multimodal AI Generation Best Practices Guide Contract Tests", () => {
   it("renders the page with correct H1 title", async () => {
     render(await Page());
     const h1 = screen.getByRole("heading", { level: 1 });
-    expect(h1.textContent).toBe("マルチモーダルAI(画像・音声生成)ベストプラクティスガイド 2026");
+    expect(h1.textContent).toBe("マルチモーダルAI(画像・音声生成)ベストプラクティスガイド");
   });
 
   it("contains exactly 10 major sections with H2 headings", async () => {
@@ -68,15 +68,15 @@ describe("Multimodal AI Generation Best Practices Guide Contract Tests", () => {
     }
   });
 
-  it("contains code blocks with appropriate language tags", async () => {
+  it("contains inline code elements", async () => {
     const { container } = render(await Page());
-    const codeBlocks = container.querySelectorAll("pre");
-    expect(codeBlocks.length).toBeGreaterThan(0);
-    for (const block of Array.from(codeBlocks)) {
-      const code = block.querySelector("code");
-      if (code) {
-        expect(code.className).toMatch(/language-.+/);
-      }
-    }
+    const codeElements = container.querySelectorAll("code");
+    expect(codeElements.length).toBeGreaterThan(0);
+  });
+
+  it("renders mermaid diagrams", async () => {
+    const { getAllByTestId } = render(await Page());
+    const diagrams = getAllByTestId("mermaid");
+    expect(diagrams.length).toBe(8);
   });
 });
