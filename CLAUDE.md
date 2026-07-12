@@ -227,7 +227,7 @@ Playwright ブラウザバイナリ（`/root/.cache/ms-playwright/`）はバイ�
 - 環境変数・Netlify 設定の変更
 - スタイル目的のリライト
 - **`legacy/` 配下の編集**（Phase A–F 遂行中は凍結。`.gitignore` により事故的な push は防止されているが、編集自体を避ける）
-- **元のHTML/Markdownオリジナルファイルの完全削除は厳禁**: 移行元のファイルは絶対に削除してはならず、必ず `legacy/` ディレクトリ配下に移動（`git mv` または `mv`）して退避保存すること
+- **元のHTML/Markdownオリジナルファイルの完全削除は厳禁**: 移行元のファイルは絶対に削除してはならず、必ず `archive/` ディレクトリ配下に移動（`git mv` または `mv`）して退避保存すること
 
 ### 許可される変更
 
@@ -297,7 +297,7 @@ Phase A–F 遂行中、新規ガイドページ (`claude/`, `gemini/`, `codex/`
 `legacy/` 配下の **18 HTML** は `.gitignore` により remote から隔離済。Phase A–F で `web-next/app/*` の page.tsx への置換が**全完了**。
 移行計画詳細は **[`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md)** を参照（アーカイブ）。
 現在の進捗は **[`docs/PROGRESS.md`](docs/PROGRESS.md)** を、過去の移行進捗詳細は **[`docs/archive/MIGRATION_PROGRESS.md`](docs/archive/MIGRATION_PROGRESS.md)** を参照。
-- **オリジナルファイルの保存**: 移行元の HTML / Markdown オリジナルファイルは勝手に削除せず、必ず `legacy/` ディレクトリ配下に退避させて保存すること。
+- **オリジナルファイルの保存**: 移行元の HTML / Markdown オリジナルファイルは勝手に削除せず、必ず `archive/` ディレクトリ配下に退避させて保存すること。
 
 #### AI モデルバージョンの扱い
 
