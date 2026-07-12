@@ -226,7 +226,7 @@ export default async function Page() {
       <div className={styles.layout}>
         {/* ================= SIDEBAR ================= */}
         <aside className={styles.sidebar}>
-          <button className={styles.mobileToggle} id="multimodalNavToggle" type="button">
+          <button className={styles.mobileToggle} id="multimodalNavToggle" type="button" aria-controls="multimodalNavList" aria-expanded="false">
             目次を開く
           </button>
           <div className={styles.brand}>
@@ -1056,7 +1056,7 @@ export default async function Page() {
               <span className={styles.badge} style={{ fontSize: "14px", padding: "4px 8px" }}>
                 08 / 16
               </span>
-              音声合成(TTS)モデル of 選定(2026年7月版)
+              音声合成(TTS)モデルの選定(2026年7月版)
             </h2>
 
             <h3>8.1 クラウドAPI主要モデル比較</h3>

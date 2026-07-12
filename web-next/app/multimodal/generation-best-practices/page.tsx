@@ -140,7 +140,7 @@ export default async function Page() {
       <div className={styles.layout}>
         {/* ================= SIDEBAR ================= */}
         <aside className={styles.sidebar}>
-          <button className={styles.mobileToggle} id="multimodalNavToggle" type="button">
+          <button className={styles.mobileToggle} id="multimodalNavToggle" type="button" aria-controls="multimodalNavList" aria-expanded="false">
             <i className="ti ti-menu-2" />
             目次を開く
           </button>

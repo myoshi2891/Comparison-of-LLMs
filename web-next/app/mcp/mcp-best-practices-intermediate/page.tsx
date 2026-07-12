@@ -50,13 +50,6 @@ const DIAGRAMS = {
     C-->>H: 結果をコンテキストへ追加
     H-->>U: 最終応答を生成`,
 
-  timeline: `timeline
-    2024-11-05 : 初版仕様（stdio / HTTP+SSE）
-    2025-03-26 : Streamable HTTP追加、HTTP+SSEを非推奨化
-    2025-06-18 : OAuth 2.1認可仕様を正式化
-    2025-11-25 : 現行安定版、Tasksを実験導入
-    2026-07-28 : RC版、ステートレス化とExtensions導入`,
-
   transport: `flowchart TD
     A["MCPサーバーを実装する"] --> B{"クライアントは同一マシン上で<br/>子プロセスとして起動される？"}
     B -->|"Yes（ローカルCLI/IDE統合）"| C["stdioトランスポートを選択"]

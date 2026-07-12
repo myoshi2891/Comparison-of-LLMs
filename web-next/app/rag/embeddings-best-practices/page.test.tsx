@@ -81,19 +81,17 @@ describe("RAG and Embeddings Best Practices Guide Contract Tests", () => {
   it("contains code blocks with appropriate language tags", async () => {
     const { container } = render(await Page());
     // Use the page's actual codeWrap/codeLang structure instead of generic pre/code iteration
-    const codeWraps = container.querySelectorAll("." + "codeWrap");
-    // Fallback: check via data attributes from CSS modules (class names are hashed in test env)
-    // Re-check with data-testid or rely on semantic structure
-    const preTags = container.querySelectorAll("pre");
-    const mermaidPres = container.querySelectorAll('[data-testid="mermaid"]');
-    const nonMermaidPres = Array.from(preTags).filter(
-      (pre) => !pre.hasAttribute("data-testid")
-    );
-    expect(nonMermaidPres.length).toBeGreaterThan(0);
-    // Each non-mermaid pre should have a code child or codeLang sibling
-    for (const pre of nonMermaidPres) {
-      const code = pre.querySelector("code");
-      expect(code).not.toBeNull();
+    // Use partial class selector to support CSS Modules in test environment
+    const codeWraps = container.querySelectorAll("[class*='codeWrap']");
+    expect(codeWraps.length).toBeGreaterThan(0);
+    for (const wrap of Array.from(codeWraps)) {
+      const langLabel = wrap.querySelector("[class*='codeLang']");
+      expect(langLabel).not.toBeNull();
+      expect(langLabel?.textContent).not.toBe("");
     }
+
+    // Separate handling for Mermaid blocks
+    const mermaidPres = container.querySelectorAll('[data-testid="mermaid"]');
+    expect(mermaidPres.length).toBeGreaterThan(0);
   });
 });

@@ -432,10 +432,14 @@ export default function AdkBestPracticesPage() {
                   <span className={styles.codeLine}> ├── agent.py</span>
                   <span className={styles.codeLine}> ├── tools.py</span>
                   <span className={styles.codeLine}> ├── callbacks.py</span>
+                  <span className={styles.codeLine}> ├── .env.example</span>
                   <span className={styles.codeLine}> └── .env</span>
                 </code>
               </pre>
             </div>
+            <p>
+              <strong>セキュリティ上の注意:</strong> <code>.env</code> ファイルにはAPIキーなどの機密情報を保存しますが、このファイルを誤ってリポジトリにコミット（Git管理）しないよう、必ず <code>.gitignore</code> に登録して除外してください。代わりに、環境変数のキー名のみを記述し、値は空にした <code>.env.example</code> を共有用テンプレートとしてコミットし、チーム内で共有することがベストプラクティスです。
+            </p>
 
             <h3>3.3 開発ループのベストプラクティス</h3>
             <ul>
@@ -852,7 +856,7 @@ export default function AdkBestPracticesPage() {
                   <span className={styles.codeLine}>
                     <span className={styles.ck}>def</span>{" "}
                     <span className={styles.ch}>query_database</span>
-                    (sql_query: str, tool_context) -&gt; dict:
+                    (sql_query: str, query_params: dict, tool_context) -&gt; dict:
                   </span>
                   <span className={styles.codeLine}>
                     {"    "}allowed_tables = tool_context.state.get(
@@ -872,9 +876,28 @@ export default function AdkBestPracticesPage() {
                     <span className={styles.cs}>"許可されていないテーブルへのアクセスです"</span>
                     &#125;
                   </span>
+                  <span className={styles.codeLine} />
                   <span className={styles.codeLine}>
-                    {"    "}
-                    <span className={styles.ck}>return</span> run_query(sql_query)
+                    {"    "}<span className={styles.co}># ASTバリデーションにより読み取り専用（SELECT）のみを許可</span>
+                  </span>
+                  <span className={styles.codeLine}>
+                    {"    "}<span className={styles.ck}>if</span> <span className={styles.ck}>not</span>{" "}
+                    validate_select_only_ast(sql_query):
+                  </span>
+                  <span className={styles.codeLine}>
+                    {"        "}<span className={styles.ck}>return</span> &#123;
+                    <span className={styles.cs}>"status"</span>:{" "}
+                    <span className={styles.cs}>"error"</span>,{" "}
+                    <span className={styles.cs}>"message"</span>:{" "}
+                    <span className={styles.cs}>"SELECTクエリのみ実行可能です"</span>
+                    &#125;
+                  </span>
+                  <span className={styles.codeLine} />
+                  <span className={styles.codeLine}>
+                    {"    "}<span className={styles.co}># パラメータ化クエリを読み取り専用接続で安全に実行</span>
+                  </span>
+                  <span className={styles.codeLine}>
+                    {"    "}<span className={styles.ck}>return</span> run_query_readonly(sql_query, query_params)
                   </span>
                 </code>
               </pre>
@@ -1766,7 +1789,6 @@ export default function AdkBestPracticesPage() {
                   <span className={styles.codeLine}>
                     {"  "}--service_name=<span className={styles.cs}>weather-agent</span> \
                   </span>
-                  <span className={styles.codeLine}>{"  "}--with_ui \</span>
                   <span className={styles.codeLine}>{"  "}./my_agent</span>
                 </code>
               </pre>
