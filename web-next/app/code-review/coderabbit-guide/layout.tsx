@@ -10,6 +10,12 @@ export const metadata: Metadata = {
   description: "AI コードレビューツール CodeRabbit の導入・設定・運用を解説する実践ガイド。",
 };
 
+/**
+ * Renders the content provided to the route layout.
+ *
+ * @param children - The content to render within the layout
+ * @returns The provided content
+ */
 export default function Layout({ children }: { children: React.ReactNode }) {
   return children;
 }

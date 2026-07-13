@@ -655,10 +655,10 @@ export const pageRegistry: readonly PageEntry[] = entries.map((e) => PageEntrySc
 const bySlug = new Map(pageRegistry.map((e) => [e.slug, e]));
 
 /**
- * slug（ルートパス）からエントリを引く。末尾スラッシュは正規化する。
+ * Finds a page entry by its slug, ignoring trailing slashes.
  *
- * @param slug - 検索対象のルートパス（例: "/claude/skill"）
- * @returns 一致するエントリ。未登録なら undefined
+ * @param slug - The slug to search for, such as `/claude/skill`
+ * @returns The matching page entry, or `undefined` if none is registered
  */
 export function findBySlug(slug: string): PageEntry | undefined {
   let normalized = slug;
@@ -669,9 +669,10 @@ export function findBySlug(slug: string): PageEntry | undefined {
 }
 
 /**
- * 公開日（addedAt）の降順に並べる。What's New の「新着」セクション用。
+ * Lists page entries from newest to oldest by addition date.
  *
- * @param limit - 返す最大件数。省略時は全件
+ * @param limit - Maximum number of entries to return; when omitted, returns all entries.
+ * @returns Page entries ordered by descending `addedAt` date.
  */
 export function byAddedAtDesc(limit?: number): PageEntry[] {
   const sorted = [...pageRegistry].sort((a, b) => b.addedAt.localeCompare(a.addedAt));
@@ -679,9 +680,10 @@ export function byAddedAtDesc(limit?: number): PageEntry[] {
 }
 
 /**
- * 最終確認日（lastReviewed）の降順に並べる。What's New の「最近更新」セクション用。
+ * Lists pages ordered by most recent review date.
  *
- * @param limit - 返す最大件数。省略時は全件
+ * @param limit - Maximum number of pages to return; returns all pages when omitted.
+ * @returns Pages sorted by `lastReviewed` in descending order.
  */
 export function byLastReviewedDesc(limit?: number): PageEntry[] {
   const sorted = [...pageRegistry].sort((a, b) => b.lastReviewed.localeCompare(a.lastReviewed));
