@@ -1,5 +1,13 @@
+import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
+
+/** description は lib/page-registry.ts の summary と同一文言に揃えている。 */
+export const metadata: Metadata = {
+  title: "ハーネスエンジニアリング完全ガイド — OpenAI Codex | LLM-Studies",
+  description:
+    "OpenAI Codex のハーネスエンジニアリング完全ガイド。エージェント実行環境の設計と運用。",
+};
 
 const DIAGRAM_0 = `flowchart LR
 A["評価目標の定義\\nWhat to measure"]

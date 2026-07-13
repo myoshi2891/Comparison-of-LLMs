@@ -1,7 +1,9 @@
 import { render } from "@testing-library/react";
 import type { Metadata } from "next";
 import { beforeAll, describe, expect, it, vi } from "vitest";
-import Page, { metadata } from "./page";
+// page.tsx は "use client" のため metadata を持てない。Next.js の規約どおり layout.tsx から export する。
+import { metadata } from "./layout";
+import Page from "./page";
 
 beforeAll(() => {
   global.IntersectionObserver = class {
