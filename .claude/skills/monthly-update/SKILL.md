@@ -9,7 +9,7 @@ Trigger: 月次更新, 価格アップデート, monthly update, 価格改定の
 
 # 月次更新・メンテナンススキル
 
-(最終更新日: 2026-07-01)
+(最終更新日: 2026-07-13)
 
 ## Goal
 
@@ -84,6 +84,24 @@ AIモデル価格と為替レートを一括更新します。
   2. **JSX の半角スペース消失**: テキストと `<strong>` / `<Ext>` が改行で隣接すると空白が消える。直前/直後に `{" "}` を明示挿入する。
   3. **契約テストの完全一致**: `page.test.tsx` は `toBe`（完全一致）と `toContain/toMatch` が混在。metadata description 等を変えたら同一コミットでテストも同期。編集前に `grep -nE 'toBe\(|toContain|toMatch' app/<path>/page.test.tsx`。
   4. **コミット前の最終スイープ**: 前月表記（例: `2026年5月` / `May 2026`）が残っていないか grep して空になるまで潰す。
+
+### 4.5. ページレジストリの `lastReviewed` 書き戻し（必須・F-2'）
+
+**1 ページの内容確認が終わるたびに**、`web-next/lib/page-registry.ts` の該当エントリの
+`lastReviewed` を**確認を行った当日の日付（YYYY-MM-DD）**へ更新する。
+
+```bash
+cd web-next
+grep -n -A3 'slug: "/claude/agent"' lib/page-registry.ts   # 該当エントリを特定
+# lastReviewed: "2026-06-30" → lastReviewed: "2026-07-13" に書き換える
+```
+
+- この値がサイト上部の鮮度バッジ（`PageFreshness`）と `/whats-new`、`sitemap.xml` の `lastmod` に
+  そのまま出る。**月次確認の完了 = registry 更新 = 鮮度表示の更新** が 1 コミットで閉じる設計
+  （plans/006 §4）
+- 内容に変更がなくても「確認した」事実として `lastReviewed` は更新する。
+  `addedAt`（公開日）は**絶対に変更しない**
+- 確認しなかったページの `lastReviewed` は触らない（古いまま表示されるのが正しい振る舞い）
 
 ### 5. ローカル静的検証 & テスト
 
