@@ -1,58 +1,28 @@
 import type { MetadataRoute } from "next";
 
+import { pageRegistry } from "@/lib/page-registry";
 import { resolveSiteUrl } from "@/lib/site-url";
 
 export const dynamic = "force-static";
 
 const SITE_URL = resolveSiteUrl("sitemap.ts");
 
-const ROUTES = [
-  "/",
-  // Phase B: skill.html × 4
-  "/claude/skill",
-  "/google/skill",
-  "/codex/skill",
-  "/copilot/skill",
-  // Phase C: agent.html × 4
-  "/claude/agent",
-  "/google/agent",
-  "/codex/agent",
-  "/copilot/agent",
-  // Phase D: long-form guides × 9
-  "/claude/skill-guide",
-  "/claude/skill-guide-intermediate",
-  "/claude/cowork-guide",
-  "/google/skill-guide",
-  "/google/skill-guide-intermediate",
-  "/google/antigravity-guide",
-  "/google/sandbox-best-practices",
-  "/codex/openai-codex-guide",
-  "/copilot/markdown-file-guide",
-  "/copilot/github-copilot",
-  // Phase E: git_worktree.html
-  "/git-worktree",
-  "/google/harness-engineering",
-  "/google/agent-harness-engineering",
-  "/google/antigravity-slash-commands-guide",
-] as const;
-
 /**
- * Generate sitemap entries from the predefined route list.
+ * Generates sitemap entries for all pages in the page registry.
  *
- * Each sitemap item uses `SITE_URL` combined with the route path, sets `lastModified` to the current date (same value for all entries), and applies different `changeFrequency` and `priority` for the root route versus other routes.
+ * Uses each page's last review date and assigns higher priority and weekly updates
+ * to the site root.
  *
- * @returns An array of sitemap items where each item has:
- * - `url`: `SITE_URL` concatenated with the route path
- * - `lastModified`: the current date (same for all items)
- * - `changeFrequency`: `"weekly"` for `/`, `"monthly"` for all other routes
- * - `priority`: `1.0` for `/`, `0.8` for all other routes
+ * @returns Sitemap entries containing each page's URL, review date, update frequency, and priority.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date();
-  return ROUTES.map((route) => ({
-    url: `${SITE_URL}${route}`,
-    lastModified,
-    changeFrequency: route === "/" ? ("weekly" as const) : ("monthly" as const),
-    priority: route === "/" ? 1.0 : 0.8,
-  }));
+  return pageRegistry.map((page) => {
+    const isRoot = page.slug === "/";
+    return {
+      url: isRoot ? `${SITE_URL}/` : `${SITE_URL}${page.slug}`,
+      lastModified: page.lastReviewed,
+      changeFrequency: isRoot ? ("weekly" as const) : ("monthly" as const),
+      priority: isRoot ? 1.0 : 0.8,
+    };
+  });
 }

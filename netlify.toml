@@ -4,6 +4,11 @@
   base    = "web-next"
   command = "bun install && bun run build"
   publish = "out"
+  # base 配下に差分がない場合に Netlify がビルドを自動スキップする既定挙動を無効化する。
+  # 理由: base 外にある netlify.toml（リダイレクト定義）や pricing.json の変更が
+  #       反映されず、docs のみのコミットが "Deploy failed" として表示されるため。
+  # ignore は終了コード 0 でスキップ・非 0 でビルド実行。/bin/false は常に 1 を返す。
+  ignore  = "/bin/false"
 
 [build.environment]
   # Netlify でのランタイム指定

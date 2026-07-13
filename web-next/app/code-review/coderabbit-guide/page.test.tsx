@@ -1,5 +1,8 @@
 import { render } from "@testing-library/react";
+import type { Metadata } from "next";
 import { beforeAll, describe, expect, it, vi } from "vitest";
+// page.tsx は "use client" のため metadata を持てない。Next.js の規約どおり layout.tsx から export する。
+import { metadata } from "./layout";
 import Page from "./page";
 
 beforeAll(() => {
@@ -49,5 +52,19 @@ describe("/code-review/coderabbit-guide", () => {
     const { container } = render(<Page />);
     const codeBlocks = container.querySelectorAll("pre, code");
     expect(codeBlocks.length).toBeGreaterThan(0);
+  });
+});
+
+describe("/code-review/coderabbit-guide metadata", () => {
+  it("metadata が export されている", () => {
+    const meta = metadata as Metadata;
+    expect(typeof meta.title).toBe("string");
+    expect(meta.title).toContain("CodeRabbit");
+  });
+
+  it("description が設定されている", () => {
+    const meta = metadata as Metadata;
+    expect(typeof meta.description).toBe("string");
+    expect((meta.description ?? "").length).toBeGreaterThan(20);
   });
 });
