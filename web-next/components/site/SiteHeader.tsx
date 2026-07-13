@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { type NavLink, navLinks } from "./nav-links";
+import { isNavLeaf, type NavLink, type NavNode, type NavSubGroup, navLinks } from "./nav-links";
 import { SiteHeaderClient } from "./SiteHeaderClient";
 
 const GITHUB_URL = "https://github.com/myoshi2891/AI-Model-Cost-Calculator";
@@ -16,9 +16,57 @@ function isActivePath(href: string, pathname: string): boolean {
   return href === pathname;
 }
 
+/**
+ * F-4' 以降ナビは最大 3 段（グループ → カテゴリ → ページ）になったため、
+ * active 判定も再帰させる。祖先まで波及させないと、現在地が畳まれたメニューの
+ * 中に埋もれてどのグループにいるのか分からなくなる。
+ */
+function isNodeActive(node: NavNode, pathname: string): boolean {
+  if (isNavLeaf(node)) return isActivePath(node.href, pathname);
+  return node.children.some((leaf) => isActivePath(leaf.href, pathname));
+}
+
 function isParentActive(link: NavLink, pathname: string): boolean {
-  if (!("children" in link)) return false;
-  return link.children.some((c) => isActivePath(c.href, pathname));
+  if (isNavLeaf(link)) return false;
+  return link.children.some((child) => isNodeActive(child, pathname));
+}
+
+/** リーフ 1 件分の <li><Link>。1 段目・2 段目・3 段目で共通。 */
+function NavLeafItem({ href, name, pathname }: { href: string; name: string; pathname: string }) {
+  const active = isActivePath(href, pathname);
+  return (
+    <li key={href}>
+      <Link
+        href={href}
+        className={active ? "ch-active" : undefined}
+        aria-current={active ? "page" : undefined}
+      >
+        {name}
+      </Link>
+    </li>
+  );
+}
+
+/** 2 段目のサブドロップダウン（Providers ▸ Claude など）。 */
+function NavSubDropdown({ group, pathname }: { group: NavSubGroup; pathname: string }) {
+  const active = isNodeActive(group, pathname);
+  return (
+    <li className="ch-subdropdown">
+      <button
+        type="button"
+        className={`ch-subdropdown-toggle${active ? " ch-active" : ""}`}
+        aria-expanded="false"
+        aria-haspopup="true"
+      >
+        <span>{group.name}</span>
+      </button>
+      <ul className="ch-subsubmenu">
+        {group.children.map((leaf) => (
+          <NavLeafItem key={leaf.href} href={leaf.href} name={leaf.name} pathname={pathname} />
+        ))}
+      </ul>
+    </li>
+  );
 }
 
 /**
@@ -52,47 +100,42 @@ export function SiteHeader({ pathname: pathnameProp }: { pathname?: string } = {
         </button>
         <ul id="ch-menu" className="ch-links">
           {navLinks.map((link) => {
-            if ("children" in link) {
-              const parentActive = isParentActive(link, pathname);
+            if (isNavLeaf(link)) {
               return (
-                <li key={link.name} className="ch-dropdown">
-                  <button
-                    type="button"
-                    className={`ch-dropdown-toggle${parentActive ? " ch-active" : ""}`}
-                    aria-expanded="false"
-                    aria-haspopup="true"
-                  >
-                    <span>{link.name}</span>
-                  </button>
-                  <ul className="ch-submenu">
-                    {link.children.map((c) => {
-                      const active = isActivePath(c.href, pathname);
-                      return (
-                        <li key={c.href}>
-                          <Link
-                            href={c.href}
-                            className={active ? "ch-active" : undefined}
-                            aria-current={active ? "page" : undefined}
-                          >
-                            {c.name}
-                          </Link>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </li>
+                <NavLeafItem
+                  key={link.href}
+                  href={link.href}
+                  name={link.name}
+                  pathname={pathname}
+                />
               );
             }
-            const active = isActivePath(link.href, pathname);
+
+            const parentActive = isParentActive(link, pathname);
             return (
-              <li key={link.name}>
-                <Link
-                  href={link.href}
-                  className={active ? "ch-active" : undefined}
-                  aria-current={active ? "page" : undefined}
+              <li key={link.name} className="ch-dropdown">
+                <button
+                  type="button"
+                  className={`ch-dropdown-toggle${parentActive ? " ch-active" : ""}`}
+                  aria-expanded="false"
+                  aria-haspopup="true"
                 >
-                  {link.name}
-                </Link>
+                  <span>{link.name}</span>
+                </button>
+                <ul className="ch-submenu">
+                  {link.children.map((child) =>
+                    isNavLeaf(child) ? (
+                      <NavLeafItem
+                        key={child.href}
+                        href={child.href}
+                        name={child.name}
+                        pathname={pathname}
+                      />
+                    ) : (
+                      <NavSubDropdown key={child.name} group={child} pathname={pathname} />
+                    )
+                  )}
+                </ul>
               </li>
             );
           })}

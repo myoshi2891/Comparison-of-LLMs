@@ -12,6 +12,8 @@ describe("PageEntrySchema", () => {
     slug: "/claude/skill",
     title: "Skill",
     group: "Providers",
+    // F-4'（plans/008）: Providers はナビで 2 段ネストするため category が必須。
+    category: "Claude",
     provider: "claude",
     topics: ["skill"],
     summary: "テスト用の要約。",
@@ -26,6 +28,20 @@ describe("PageEntrySchema", () => {
   it("provider は省略可能", () => {
     const { provider: _provider, ...rest } = valid;
     expect(() => PageEntrySchema.parse(rest)).not.toThrow();
+  });
+
+  it("ネストしないグループでは category を省略できる", () => {
+    const { category: _category, provider: _provider, ...rest } = valid;
+    expect(() => PageEntrySchema.parse({ ...rest, group: "Agent 開発" })).not.toThrow();
+  });
+
+  it("Providers エントリの category 欠落を拒否する（ナビ 2 段目が作れない）", () => {
+    const { category: _category, ...rest } = valid;
+    expect(() => PageEntrySchema.parse(rest)).toThrow();
+  });
+
+  it("NAV_GROUPS に無い group を拒否する（typo 検知）", () => {
+    expect(() => PageEntrySchema.parse({ ...valid, group: "存在しないグループ" })).toThrow();
   });
 
   it("空 slug を拒否する", () => {

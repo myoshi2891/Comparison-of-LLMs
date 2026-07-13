@@ -24,7 +24,17 @@ export function SiteHeaderClient({ children }: { children: ReactNode }) {
     const hamburger = nav.querySelector<HTMLElement>(".ch-hamburger");
     const linksList = nav.querySelector<HTMLElement>(".ch-links");
     const toggles = Array.from(nav.querySelectorAll<HTMLElement>(".ch-dropdown-toggle"));
+    // F-4': Providers のみ 2 段ネストする。サブトグルはトップレベルとクラスを分ける
+    // （同じ .ch-dropdown を共有すると closeAllDropdowns が親ごと閉じてしまう）。
+    const subToggles = Array.from(nav.querySelectorAll<HTMLElement>(".ch-subdropdown-toggle"));
     if (!hamburger || !linksList) return;
+
+    const closeSubDropdowns = (scope: ParentNode = nav) => {
+      for (const t of scope.querySelectorAll<HTMLElement>(".ch-subdropdown-toggle")) {
+        t.closest<HTMLElement>("li.ch-subdropdown")?.classList.remove("ch-subdropdown-open");
+        t.setAttribute("aria-expanded", "false");
+      }
+    };
 
     const closeAllDropdowns = () => {
       for (const t of toggles) {
@@ -32,6 +42,7 @@ export function SiteHeaderClient({ children }: { children: ReactNode }) {
         li?.classList.remove("ch-dropdown-open");
         t.setAttribute("aria-expanded", "false");
       }
+      closeSubDropdowns();
     };
 
     const closeMenu = () => {
@@ -67,6 +78,24 @@ export function SiteHeaderClient({ children }: { children: ReactNode }) {
       }
     };
 
+    /**
+     * サブトグルは closeAllDropdowns() を呼んではならない — 呼ぶと自分が属する
+     * 親ドロップダウンまで閉じ、開いた直後にメニューごと消える。閉じるのは
+     * 同じサブメニュー内の兄弟だけに限定する。
+     */
+    const makeSubToggleHandler = (toggle: HTMLElement) => (e: MouseEvent) => {
+      e.stopPropagation();
+      const li = toggle.closest<HTMLElement>("li.ch-subdropdown");
+      const submenu = li?.parentElement;
+      if (!li || !submenu) return;
+      const wasOpen = li.classList.contains("ch-subdropdown-open");
+      closeSubDropdowns(submenu);
+      if (!wasOpen) {
+        li.classList.add("ch-subdropdown-open");
+        toggle.setAttribute("aria-expanded", "true");
+      }
+    };
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         closeAllDropdowns();
@@ -88,12 +117,18 @@ export function SiteHeaderClient({ children }: { children: ReactNode }) {
       t.addEventListener("click", h);
       return { t, h };
     });
+    const subToggleHandlers = subToggles.map((t) => {
+      const h = makeSubToggleHandler(t);
+      t.addEventListener("click", h);
+      return { t, h };
+    });
     document.addEventListener("keydown", handleKeyDown);
     document.addEventListener("click", handleOutsideClick);
 
     return () => {
       hamburger.removeEventListener("click", handleHamburger);
       for (const { t, h } of toggleHandlers) t.removeEventListener("click", h);
+      for (const { t, h } of subToggleHandlers) t.removeEventListener("click", h);
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("click", handleOutsideClick);
     };

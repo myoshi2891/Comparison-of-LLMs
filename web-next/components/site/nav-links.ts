@@ -1,4 +1,23 @@
 import { z } from "zod";
+import {
+  CATEGORY_ORDER,
+  isFlatGroup,
+  isNestedGroup,
+  NAV_GROUPS,
+  type NavGroup,
+} from "@/lib/nav-taxonomy";
+import { type PageEntry, pageRegistry } from "@/lib/page-registry";
+
+/**
+ * ナビゲーションデータ — page-registry.ts から導出する（plans/008 / F-4'）。
+ *
+ * 以前は 18 項目・170 行の手書きデータだったが、registry と二重管理になり、
+ * ページを足してもナビに載らない事故が検知できなかった。現在はナビを registry の
+ * 導出結果とし、tests/nav-derivation.test.ts が両者の全単射を機械検証する。
+ *
+ * 木の深さは最大 3 段（グループ → カテゴリ → ページ）。カテゴリ層を持つのは
+ * Providers だけで、他グループはリーフを直接ぶら下げる（lib/nav-taxonomy.ts 参照）。
+ */
 
 /**
  * href バリデーション: clean URL のみ許可、javascript: やプロトコル相対 URL を拒否。
@@ -19,152 +38,124 @@ const LeafSchema = z.object({
   href: hrefSchema,
 });
 
-const DropdownSchema = z.object({
+/** ドロップダウン内の 2 段目（Providers ▸ Claude など）。リーフのみを持つ。 */
+const SubGroupSchema = z.object({
   name: z.string().min(1),
   children: z.array(LeafSchema).min(1),
+});
+
+/** トップレベルのドロップダウン。子はリーフとサブグループの混在を許す。 */
+const DropdownSchema = z.object({
+  name: z.string().min(1),
+  children: z.array(z.union([LeafSchema, SubGroupSchema])).min(1),
 });
 
 export const NavLinkSchema = z.union([LeafSchema, DropdownSchema]);
 
 export type NavLeaf = z.infer<typeof LeafSchema>;
+export type NavSubGroup = z.infer<typeof SubGroupSchema>;
 export type NavDropdown = z.infer<typeof DropdownSchema>;
-export type NavLink = z.infer<typeof NavLinkSchema>;
+/** ドロップダウンの子になれるもの。 */
+export type NavNode = NavLeaf | NavSubGroup;
+export type NavLink = NavLeaf | NavDropdown;
 
-export const navLinks: readonly NavLink[] = [
-  { name: "Home", href: "/" },
-  {
-    name: "Claude",
-    children: [
-      { name: "Skill", href: "/claude/skill" },
-      { name: "Agent", href: "/claude/agent" },
-      { name: "Skill Guide", href: "/claude/skill-guide" },
-      { name: "Skill Guide (中級)", href: "/claude/skill-guide-intermediate" },
-      { name: "Cowork Guide", href: "/claude/cowork-guide" },
-      { name: "Harness Engineering", href: "/claude/harness-engineering" },
-      { name: "Managed Agents", href: "/claude/managed-agents" },
-      { name: "Self-hosted Sandboxes", href: "/claude/self-hosted-sandboxes" },
-      { name: "Code Slash Commands", href: "/claude/code-slash-commands" },
-      { name: "Fable 5 Best Practices", href: "/claude/fable-5-best-practices" },
-    ],
-  },
-  {
-    name: "Google",
-    children: [
-      { name: "Google Sandbox", href: "/google/sandbox-best-practices" },
-      { name: "Skill", href: "/google/skill" },
-      { name: "Agent", href: "/google/agent" },
-      { name: "Skill Guide", href: "/google/skill-guide" },
-      { name: "Skill Guide (中級)", href: "/google/skill-guide-intermediate" },
-      { name: "Antigravity", href: "/google/antigravity-guide" },
-      { name: "Antigravity Slash Commands", href: "/google/antigravity-slash-commands-guide" },
-      { name: "Harness Engineering", href: "/google/harness-engineering" },
-      { name: "Agent Harness Engineering", href: "/google/agent-harness-engineering" },
-      { name: "NotebookLM Guide", href: "/google/notebook-lm" },
-      { name: "ADK Best Practices", href: "/google/adk-best-practices" },
-      { name: "Stitch Guide", href: "/google/stitch-guide" },
-    ],
-  },
-  {
-    name: "Codex",
-    children: [
-      { name: "Skill", href: "/codex/skill" },
-      { name: "Agent", href: "/codex/agent" },
-      { name: "Codex Guide", href: "/codex/openai-codex-guide" },
-      { name: "Harness Engineering", href: "/codex/harness-engineering" },
-    ],
-  },
-  {
-    name: "Copilot",
-    children: [
-      { name: "Skill", href: "/copilot/skill" },
-      { name: "Agent", href: "/copilot/agent" },
-      { name: "Markdown Guide", href: "/copilot/markdown-file-guide" },
-      { name: "GitHub Copilot", href: "/copilot/github-copilot" },
-    ],
-  },
-  {
-    name: "Code Review",
-    children: [
-      { name: "Tool Pricing", href: "/code-review/tool-pricing" },
-      { name: "CodeRabbit Guide", href: "/code-review/coderabbit-guide" },
-      { name: "Copilot Code Review", href: "/code-review/copilot-code-review" },
-      { name: "SonarQube Guide", href: "/code-review/sonar-qube" },
-    ],
-  },
-  {
-    name: "Agent",
-    children: [
-      { name: "Advanced Guide", href: "/agent/hermes-agent-advanced-guide" },
-      { name: "OpenClaw Security Guide", href: "/agent/openclaw-advanced-agent-security-guide" },
-      { name: "Loop Engineering Guide", href: "/agent/loop-engineering" },
-      { name: "Agent Skills Guide", href: "/agent/skills" },
-      { name: "skills.sh Guide", href: "/claude/skills-sh" },
-      { name: "Context Engineering", href: "/agent/context-engineering-best-practices" },
-    ],
-  },
-  {
-    name: "MCP",
-    children: [
-      { name: "MCP Best Practices", href: "/mcp/mcp-best-practices" },
-      {
-        name: "MCP Best Practices (中級)",
-        href: "/mcp/mcp-best-practices-intermediate",
-      },
-    ],
-  },
-  {
-    name: "Local LLM",
-    children: [
-      { name: "Self-hosting Guide", href: "/local-llm/self-hosting" },
-      { name: "Self-hosting Best Practices", href: "/local-llm/best-practices" },
-    ],
-  },
-  {
-    name: "Sandbox",
-    children: [{ name: "Vercel Sandbox", href: "/vercel/sandbox" }],
-  },
-  {
-    name: "IDE",
-    children: [
-      { name: "Cursor Guide", href: "/cursor/complete-guide" },
-      { name: "Cursor Guide (中級)", href: "/cursor/complete-guide-intermediate" },
-    ],
-  },
-  {
-    name: "Security",
-    children: [
-      { name: "AI Security Best Practices", href: "/security/ai-security-best-practices" },
-      {
-        name: "AI Security Best Practices (中級)",
-        href: "/security/ai-security-best-practices-intermediate",
-      },
-    ],
-  },
-  {
-    name: "CI/CD",
-    children: [{ name: "AI CI/CD Automation", href: "/ci-cd/ai-cicd-automation-best-practices" }],
-  },
-  {
-    name: "RAG",
-    children: [{ name: "RAG & Embeddings", href: "/rag/embeddings-best-practices" }],
-  },
-  {
-    name: "Multimodal",
-    children: [
-      {
-        name: "Generation Best Practices",
-        href: "/multimodal/generation-best-practices",
-      },
-      {
-        name: "Image & Audio (2026)",
-        href: "/multimodal/image-audio-best-practices-2026",
-      },
-    ],
-  },
-  {
-    name: "LLMOps",
-    children: [{ name: "Evaluation & Observability", href: "/llm-ops/evaluation-observability" }],
-  },
-  { name: "Git Worktree", href: "/git-worktree" },
-  { name: "What's New", href: "/whats-new" },
-];
+export function isNavLeaf<T extends { name: string }>(node: T): node is T & NavLeaf {
+  return "href" in node;
+}
+
+export function isNavSubGroup<T extends { name: string }>(node: T): node is T & NavSubGroup {
+  return "children" in node;
+}
+
+/** 表示順のキー: addedAt 昇順 → slug 昇順。辞書順ソートが成立する形に組む。 */
+function sortKey(entry: PageEntry): string {
+  return `${entry.addedAt} ${entry.slug}`;
+}
+
+function toLeaf(entry: PageEntry): NavLeaf {
+  return { name: entry.title, href: entry.slug };
+}
+
+function sortedLeaves(entries: readonly PageEntry[]): NavLeaf[] {
+  return [...entries].sort((a, b) => sortKey(a).localeCompare(sortKey(b))).map(toLeaf);
+}
+
+/** Providers のようなネストするグループを「カテゴリ → ページ」の 2 段に組む。 */
+function buildSubGroups(group: NavGroup, entries: readonly PageEntry[]): NavSubGroup[] {
+  const order = CATEGORY_ORDER[group];
+  if (!order) {
+    throw new Error(`nav: group "${group}" はネスト対象だが CATEGORY_ORDER が未定義`);
+  }
+
+  const byCategory = new Map<string, PageEntry[]>();
+  for (const entry of entries) {
+    // registry の Zod refine が category 必須を保証するが、buildNavLinks は
+    // 任意の配列を受け取れるため（テスト・将来の呼び出し）ここでも防御する。
+    if (!entry.category) {
+      throw new Error(`nav: ${entry.slug} は ${group} 配下だが category が無い`);
+    }
+    if (!order.includes(entry.category)) {
+      throw new Error(
+        `nav: ${entry.slug} の category "${entry.category}" が CATEGORY_ORDER.${group} に無い`
+      );
+    }
+    const bucket = byCategory.get(entry.category) ?? [];
+    bucket.push(entry);
+    byCategory.set(entry.category, bucket);
+  }
+
+  return order
+    .filter((category) => byCategory.has(category))
+    .map((category) => ({
+      name: category,
+      children: sortedLeaves(byCategory.get(category) ?? []),
+    }));
+}
+
+/**
+ * pageRegistry からナビ木を組む純粋関数。
+ *
+ * 未知の group や category 欠落は silent drop せず throw する。黙って落とすと
+ * ページがナビから消えたまま気付けないため（registry の Zod parse と同じ思想）。
+ */
+export function buildNavLinks(entries: readonly PageEntry[] = pageRegistry): NavLink[] {
+  const byGroup = new Map<NavGroup, PageEntry[]>();
+
+  for (const entry of entries) {
+    if (!(NAV_GROUPS as readonly string[]).includes(entry.group)) {
+      throw new Error(`nav: ${entry.slug} の group "${entry.group}" は NAV_GROUPS に無い`);
+    }
+    const bucket = byGroup.get(entry.group) ?? [];
+    bucket.push(entry);
+    byGroup.set(entry.group, bucket);
+  }
+
+  const links: NavLink[] = [];
+
+  for (const group of NAV_GROUPS) {
+    const groupEntries = byGroup.get(group);
+    if (!groupEntries || groupEntries.length === 0) continue;
+
+    if (isFlatGroup(group)) {
+      if (groupEntries.length > 1) {
+        throw new Error(
+          `nav: フラットグループ "${group}" に ${groupEntries.length} ページある（1 ページのみ想定）`
+        );
+      }
+      links.push(toLeaf(groupEntries[0]));
+      continue;
+    }
+
+    const children: NavNode[] = isNestedGroup(group)
+      ? buildSubGroups(group, groupEntries)
+      : sortedLeaves(groupEntries);
+
+    links.push({ name: group, children });
+  }
+
+  return links;
+}
+
+export const navLinks: readonly NavLink[] = buildNavLinks().map(
+  (link) => NavLinkSchema.parse(link) as NavLink
+);
