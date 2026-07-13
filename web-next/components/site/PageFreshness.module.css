@@ -1,0 +1,42 @@
+/**
+ * 鮮度バッジ。DisclaimerBanner (position: fixed) の直下、コンテンツの先頭に
+ * 通常フローで積む。--ch-disclaimer-height の計算には影響しない。
+ */
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.5rem 1.25rem 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--muted, #89abde);
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  white-space: nowrap;
+}
+
+.value {
+  font-family: var(--font-jetbrains-mono, monospace);
+  color: var(--dim, #b6caea);
+  font-variant-numeric: tabular-nums;
+}
+
+.sep {
+  opacity: 0.45;
+}
+
+@media (max-width: 480px) {
+  .bar {
+    justify-content: flex-start;
+    padding: 0.4rem 1rem 0;
+    font-size: 0.7rem;
+  }
+}
