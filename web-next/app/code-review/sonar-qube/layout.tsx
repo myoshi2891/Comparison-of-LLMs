@@ -11,6 +11,11 @@ export const metadata: Metadata = {
     "SonarQube による静的解析とコード品質ゲートの実践ガイド。CI 連携とカバレッジ計測を解説。",
 };
 
+/**
+ * Renders the route content as provided.
+ *
+ * @returns The supplied route content
+ */
 export default function Layout({ children }: { children: React.ReactNode }) {
   return children;
 }

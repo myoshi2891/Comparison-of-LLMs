@@ -12,6 +12,13 @@ export const metadata: Metadata = {
 /** 一覧に出す件数。全 56 ページを並べても読者は読まないため上位のみ。 */
 const LIST_LIMIT = 12;
 
+/**
+ * Renders a page registry entry as a navigational card with its relevant date and summary.
+ *
+ * @param entry - The page registry entry to display
+ * @param date - The date associated with the card
+ * @param dateLabel - The label describing the date
+ */
 function PageCard({
   entry,
   date,
@@ -41,10 +48,9 @@ function PageCard({
 }
 
 /**
- * What's New — 新着・更新情報ページ（plans/006 §3 Phase 1 の F-2）。
+ * Renders the “What’s New” page with newly published and recently reviewed guides.
  *
- * 内容は lib/page-registry.ts から静的生成する。docs/PROGRESS.md（開発者向け）とは
- * 役割を分離し、本ページは読者向けの鮮度導線に徹する（006 §4）。
+ * Each section displays up to 12 entries using dates from the page registry.
  */
 export default function WhatsNewPage() {
   const newest = byAddedAtDesc(LIST_LIMIT);
