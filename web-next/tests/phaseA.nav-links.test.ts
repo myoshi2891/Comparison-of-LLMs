@@ -41,8 +41,9 @@ describe("Phase A - nav-links export shape", () => {
 });
 
 describe("Phase A - nav-links top-level entries", () => {
-  it("has exactly 17 top-level entries", () => {
-    expect(navLinks.length).toBe(17);
+  // F-2 で What's New（フラットリンク）を追加したため 17 → 18。
+  it("has exactly 18 top-level entries", () => {
+    expect(navLinks.length).toBe(18);
   });
 
   it("starts with Home as a flat link", () => {
@@ -52,10 +53,17 @@ describe("Phase A - nav-links top-level entries", () => {
     expect("children" in home).toBe(false);
   });
 
-  it("ends with Git Worktree as a flat link", () => {
+  it("includes Git Worktree as a flat link", () => {
+    const worktree = navLinks.find((link) => link.name === "Git Worktree");
+    expect(worktree).toBeDefined();
+    expect(worktree && "href" in worktree && worktree.href === "/git-worktree").toBe(true);
+  });
+
+  it("ends with What's New as a flat link", () => {
     const last = navLinks[navLinks.length - 1];
-    expect(last.name).toBe("Git Worktree");
-    expect("href" in last && last.href === "/git-worktree").toBe(true);
+    expect(last.name).toBe("What's New");
+    expect("href" in last && last.href === "/whats-new").toBe(true);
+    expect("children" in last).toBe(false);
   });
 
   it("has Claude/Google/Codex/Copilot/Code Review/Agent/MCP/Sandbox/IDE/Security/Local LLM/CI/CD/RAG/Multimodal/LLMOps as dropdowns with children", () => {
