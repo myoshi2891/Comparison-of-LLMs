@@ -49,13 +49,13 @@
 
 ## 2. 外部トレンド検証（2026-07-12 時点、WebSearch 実施済み）
 
-- **マルチエージェントオーケストレーション**: 導入は前年比 1,445% 増、組織の 57% が本番でマルチステップ
-  エージェントワークフローを運用。fan-out / pipeline / debate / supervisor / swarm の 5 パターンが
-  本番システムの定石として確立。コーディングセッションは平均 4 分 → 23 分に伸び、78% がマルチファイル編集
+- **マルチエージェントオーケストレーション**: エージェント関連の関心・言及量が急伸中（Firecrawl は
+  前年比 1,445% の伸びを報告。ただしこれは「導入率」ではなくトレンド指標である点に注意）。
+  fan-out / pipeline / debate / supervisor / swarm の 5 パターンが本番システムの定石として
+  整理されつつある（Digital Applied / Codebridge）
 - **仕様駆動開発（SDD）**: 2026 年時点で主要 AI コーディングツール（GitHub Spec Kit, AWS Kiro,
-  Claude Code, Cursor, OpenSpec, Google Antigravity 等）がすべて SDD ワークフローを搭載。
-  Spec Kit は v0.11.0（2026-06）で 30+ エージェント対応。早期導入報告では非自明タスクの
-  first-pass 成功率が約 3〜10 倍
+  Claude Code, Cursor, OpenSpec, Google Antigravity 等）が SDD ワークフローを搭載。
+  Spec Kit は複数エージェントへの対応を進めている（版数は流動的なため明記しない）
 
 参照元（確認日 2026-07-12）:
 [Firecrawl: Top 13 Agentic AI Trends 2026](https://www.firecrawl.dev/blog/agentic-ai-trends) /
@@ -75,7 +75,7 @@
 - **Evidence（repo）**: 「サブエージェント/エージェントチーム」言及 **27 ページ**、「マルチエージェント」14 ページ、
   「オーケストレーション」9 ページ — **主題ページは 0**。002 で MCP をカテゴリ化する根拠となった
   「26 ページ言及・主題 0」と同規模のシグナル
-- **Evidence（外部）**: §2 — 導入 1,445% 増、5 パターンの定石化
+- **Evidence（外部）**: §2 — エージェント関連トレンドの急伸、5 パターンの定石化
 - **既存カテゴリとの関係**: Agent 配下が自然（`/agent/loop-engineering` や harness-engineering 群の上位概念）。
   A2A / Agent2Agent プロトコル（言及 2 ページ）はこの中の 1 セクションで扱う
 - **Confidence**: HIGH ／ **想定ページ数**: 2（設計パターン編・運用編）

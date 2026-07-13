@@ -86,7 +86,7 @@ STATE-01 と同型の歪みを再生産する」がそのまま現実化した�
 ### [STATE-06] ナビトップレベルの過密（16 項目）
 
 - **Evidence**: `nav-links.ts:33-169` — Home + プロバイダー 4 + トピック 10 + Git Worktree の 16 項目。
-  うち 1 リンクのみのカテゴリが 3 つ（Sandbox / CI/CD / RAG）、2 リンクが 5 つ（MCP / Local LLM / IDE / Security / Multimodal）
+  うち 1 リンクのみのカテゴリが 4 つ（Sandbox / CI/CD / RAG / LLMOps）、2 リンクが 5 つ（MCP / Local LLM / IDE / Security / Multimodal）
 - **Impact**: 001 STATE-03 の「ドロップダウン破綻」がトップレベル自体で発生。モバイル開閉トグルの一覧性も限界
 - **Confidence**: HIGH（実測）
 
@@ -102,7 +102,8 @@ STATE-01 と同型の歪みを再生産する」がそのまま現実化した�
 ### [STATE-08] 鮮度表示の欠如が 56 ページ規模に拡大（STATE-02 の深刻化）
 
 - **Evidence**: 各 page.tsx に最終確認日フィールドなし（変わらず）。monthly-update スキルの 2026-06 実績は
-  14/35 完了で停止しており、残 21 ページ + 新規 21 ページの鮮度が読者からもメンテナーからも見えない
+  14/35 完了で停止しており、残 21 ページ + 新規 15 ページ（現在 56 ルート − 001 時点 41 ルート）の
+  鮮度が読者からもメンテナーからも見えない
 - **Confidence**: HIGH
 
 ## 6. 001〜003 の処遇

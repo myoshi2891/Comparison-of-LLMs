@@ -93,7 +93,7 @@ AIモデル価格と為替レートを一括更新します。
 ```bash
 cd web-next
 grep -n -A3 'slug: "/claude/agent"' lib/page-registry.ts   # 該当エントリを特定
-# lastReviewed: "2026-06-30" → lastReviewed: "2026-07-13" に書き換える
+# lastReviewed: "<旧確認日>" → lastReviewed: "<確認日 YYYY-MM-DD>" に書き換える
 ```
 
 - この値がサイト上部の鮮度バッジ（`PageFreshness`）と `/whats-new`、`sitemap.xml` の `lastmod` に

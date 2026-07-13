@@ -32,7 +32,7 @@ Status 値: TODO / IN PROGRESS / DONE / BLOCKED（理由 1 行） / REJECTED（�
 - `web-next/components/site/PageFreshness.tsx` — `app/layout.tsx` に 1 箇所マウントし全ページに
   「最終確認日 / 公開日」を表示（55 個の page.tsx は未編集）
 - `web-next/app/whats-new/page.tsx` — 新着 / 最近更新を registry から静的生成
-- `web-next/app/sitemap.ts` — registry 駆動へ置換（24 → 57 ルート。欠落 31 ルートを解消）
+- `web-next/app/sitemap.ts` — registry 駆動へ置換（24 → 57 ルート。欠落 33 ルートを解消）
 - `.claude/skills/monthly-update/SKILL.md` §4.5 — F-2'：月次確認で `lastReviewed` を書き戻す運用を確立
 - テスト 1040 件 全 Green（契約テスト 44 件追加）
 
