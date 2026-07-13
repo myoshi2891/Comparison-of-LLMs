@@ -7,11 +7,10 @@
  */
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { pageRegistry } from "@/lib/page-registry";
 
-const APP_DIR = fileURLToPath(new URL("../app", import.meta.url));
+const APP_DIR = join(__dirname, "../app");
 
 function collectPageSlugs(dir: string, base = ""): string[] {
   const slugs: string[] = [];
