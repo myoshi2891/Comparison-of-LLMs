@@ -45,22 +45,34 @@ netlify.toml 変更（AI 変更ルールで原則禁止・要ユーザー承認�
 
 ### 2.2 ナビトップレベルの再グルーピング（STATE-06 対応）
 
-現行 16 項目を **8 項目**へ集約する案（個別プラン時に確定。リンク数は 2026-07-12 実測）:
+> **実装済み（2026-07-14 / [008](008-nav-regrouping-f4.md)）。以下は実装で確定した内容へ訂正済み。**
+> 起票時の記述（「現行 16 項目を 8 項目へ」「openclaw 移設」「topics から導出」）は
+> 実測・実装と食い違っていたため、下記のとおり修正した。
+
+現行 **18 項目**を **7 項目**へ集約する（リンク数は 2026-07-12 実測 / 全 57 ページ）:
 
 ```text
 Home（電卓）
 Providers ▾        … Claude 10 / Google 12 / Codex 4 / Copilot 4 の 2 段ネスト（計 30）
-Agent 開発 ▾       … Agent 6 + MCP 2 + Sandbox 3（分散解消） + オーケストレーション/SDD（GAP-10/11 受け皿）
-開発プロセス ▾     … Code Review 4 + CI/CD 1 + IDE 2 + Git Worktree 1
-運用・品質 ▾       … Security 2+1（openclaw 移設） + LLMOps 1 + ガバナンス（GAP-12 受け皿）
-モデル・データ ▾   … Local LLM 2 + RAG 1 + Multimodal 2 + ファインチューニング（GAP-13 受け皿）
+Agent 開発 ▾       … Agent 6（openclaw 含む） + MCP 2 + Vercel Sandbox 1（分散解消）= 9
+                     ＋ オーケストレーション / SDD（GAP-10/11 の受け皿）
+開発プロセス ▾     … Code Review 4 + IDE 2 + CI/CD 1 + Git Worktree 1 = 8
+運用・品質 ▾       … Security 2 + LLMOps 1 = 3 ＋ ガバナンス（GAP-12 の受け皿）
+モデル・データ ▾   … Local LLM 2 + RAG 1 + Multimodal 2 = 5 ＋ ファインチューニング（GAP-13 の受け皿）
 What's New         … Phase 1 の F-2（新設）
 ```
 
-- 2 段ネスト（グループ → カテゴリ → ページ）は現行 `DropdownSchema`（`nav-links.ts:22-25`）が
-  1 段しか表現できないため、スキーマ拡張が必要 — これは F-4' の実装論点（契約テスト更新を含む）
-- グルーピングは**レジストリの topics から導出**する構造にし、nav-links.ts への直書きを段階的に廃止する
-- ラベルは案であり、個別プラン時に読者導線（どの語で探すか）を基準に確定する
+- 2 段ネスト（グループ → カテゴリ → ページ）は旧 `DropdownSchema`（当時の `nav-links.ts:22-25`）が
+  1 段しか表現できなかったため、スキーマを `children: (Leaf | SubGroup)[]` の union へ拡張した
+- **2 段ネストは Providers のみ**に適用する。全グループを 2 段にすると CI/CD・Git Worktree・RAG のような
+  1 ページのカテゴリで 3 段ホバーが生まれ、STATE-06 が指摘した「1 リンクのみのカテゴリ」問題が
+  階層を変えて再発するため（008 設計判断 2）
+- グルーピングは**レジストリの `group` / `category` から導出**する（起票時は「topics から導出」と
+  書いたが、topics は多対多かつ表記ゆれがありメニューの並び順を決められない）。
+  `nav-links.ts` への直書きは **008 で全廃**した
+- **openclaw の Security への移設は不採用**（008 設計判断 3）。エージェントを安全に「作る」ための
+  ガイドであり読者は Agent 開発から探す。横断性は `topics: ["agent","security","guide"]` が既に
+  表現しており、その活用は F-5 / F-7（横断検索・関連リンク）の担当
 
 ### 2.3 メタデータ SSoT: ページレジストリ（F-1、v1 から変更なし・最優先を再宣言）
 
@@ -86,9 +98,11 @@ Phase 1: 鮮度基盤（最優先・他のすべての前提）
   F-2' monthly-update スキルとの接続 — 確認結果を lastReviewed へ書き戻す運用の確立
        （2026-06 実績 14/35 の残 21 ページ + 新規 21 ページの棚卸しを初回データ投入と兼ねる）
 
-Phase 2: IA 再編（STATE-06/07 対応）
+Phase 2: IA 再編（STATE-06/07 対応）  ← 実装済み（2026-07-14 / plans/008）
   F-4' ナビ再グルーピング（§2.2）+ スキーマ 2 段ネスト化   Impact High / Effort M / Risk MED
-       （nav-links 契約テスト・全ページの page.test.tsx への影響を個別プランで精査）
+       ナビを page-registry からの導出に変更し、トップレベル 18 → 7 項目へ集約。
+       2 段ネストは Providers のみ。URL は不変（§2.1 C 案）。
+       registry ⇔ ナビの全単射を契約テストで固定し、ページ追加時のナビ登録漏れを機械検知
 
 Phase 3: 横断導線
   F-3' RSS フィード（registry から生成。sitemap.ts は既存）  Impact Mid / Effort S / Risk LOW

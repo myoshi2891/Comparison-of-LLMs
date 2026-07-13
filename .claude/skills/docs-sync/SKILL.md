@@ -11,10 +11,14 @@ description: >
   各仕様書の更新漏れがないか, docs sync, 仕様書同期, spec sync, test追加,
   テスト追加, 依存関係の更新, CIワークフロー変更, 設定ファイル追加,
   セッション終了, 再開プロンプト, PROGRESS.md, CLAUDE.md, GEMINI.md,
-  README.md, docs-sync, spec-sync, 最終更新日, Last Updated.
+  README.md, docs-sync, spec-sync, 最終更新日, Last Updated,
+  ナビゲーション変更, ナビ再編, nav, nav-links, page-registry,
+  ページレジストリ, plans, プラン更新, スキーマ変更.
 ---
 
 # 仕様書同期スキル
+
+(最終更新日: 2026-07-14)
 
 ## Goal
 
@@ -37,6 +41,8 @@ description: >
 | `README.md` | `最終更新日: YYYY-MM-DD` | ファイル冒頭付近（見出しの直下） |
 | `docs/PROGRESS.md` | `Updated YYYY-MM-DD`（現在地テーブル内） | 現在地テーブル内、または「最終 HEAD」欄 |
 | 各個別 `SKILL.md` / `*.md` | `(最終更新日: YYYY-MM-DD)` または未移行HTMLリスト等の日付 | タイトル下、または進捗管理の日付欄 |
+| `.claude/rules/*.md` | `(最終更新日: YYYY-MM-DD)` | タイトル直下 |
+| `plans/README.md` | 各プランの Status 欄に完了日を併記 | 「実行順・ステータス」テーブル |
 
 ---
 
@@ -54,8 +60,10 @@ graph TD
   Event2[B. テスト追加] -->|即時更新| DocC[CLAUDE.md]
   Event2 -->|即時更新| DocM[PROGRESS.md]
 
-  Event3[C. ナビゲーション変更] -->|即時更新| DocC[CLAUDE.md]
+  Event3[C. ナビゲーション / レジストリ変更] -->|即時更新| DocC[CLAUDE.md]
   Event3 -->|即時更新| DocG[GEMINI.md]
+  Event3 -->|即時更新| DocM[PROGRESS.md]
+  Event3 -->|即時更新| DocP[plans/README.md]
 
   Event4[D. 手順・構成の変更] -->|即時更新| DocR[README.md]
   Event4 -->|即時更新| DocC[CLAUDE.md]
@@ -63,16 +71,27 @@ graph TD
   Event5[E. セッション終了] -->|ゲート条件| DocM[PROGRESS.md]
 ```
 
+> **イベント C の範囲（2026-07-14 拡張）**: ナビ (`components/site/nav-links.ts` / `nav-taxonomy.ts` /
+> `SiteHeader*`) だけでなく、**ページレジストリ (`lib/page-registry.ts`) のスキーマ・エントリ変更**も
+> 含む。F-4'（plans/008）以降、ナビ・鮮度表示・What's New・sitemap はすべて registry から導出されるため、
+> registry の変更はサイト全体に波及する。従来 C の更新先は CLAUDE.md / GEMINI.md のみだったが、
+> テスト数（PROGRESS.md）とプラン進捗（plans/README.md）が同期から漏れていたため追加した。
+
 ### イベント別更新マトリクス（チェックリスト）
 
-| 更新対象ドキュメント | A. 新規ページ追加時 | B. テスト追加時 | C. ナビゲーション変更時 | D. 手順・構成変更時 | E. セッション終了時 |
+| 更新対象ドキュメント | A. 新規ページ追加時 | B. テスト追加時 | C. ナビ / レジストリ変更時 | D. 手順・構成変更時 | E. セッション終了時 |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| `CLAUDE.md` | **`Update`**<br>(アーキテクチャ追記) | **`Update`**<br>(テスト数更新) | **`Update`**<br>(NavBarパスの同期) | **`Update`**<br>(コマンド更新) | — |
+| `CLAUDE.md` | **`Update`**<br>(アーキテクチャ追記) | **`Update`**<br>(テスト数更新) | **`Update`**<br>(設計判断・ナビ構造) | **`Update`**<br>(コマンド更新) | — |
 | `GEMINI.md` | **`Update`**<br>(Migrated Pages) | — | **`Update`**<br>(NavBar有無) | — | — |
 | `README.md` | — | — | — | **`Update`**<br>(Dockerや定義) | — |
-| `docs/PROGRESS.md` | **`Update`**<br>(進捗テーブル) | **`Update`**<br>(テスト数実測) | — | — | **`Update`**<br>(HEAD/ビルド/再開) |
+| `docs/PROGRESS.md` | **`Update`**<br>(進捗テーブル) | **`Update`**<br>(テスト数実測) | **`Update`**<br>(テスト数・HEAD) | — | **`Update`**<br>(HEAD/ビルド/再開) |
+| `plans/README.md` | — | — | **`Update`**<br>(該当プランの Status) | — | — |
 | 個別 `SKILL.md` / `*.md` | **`Update`**<br>(未移行HTML等) | — | — | — | — |
 | **最終更新日の更新** | **必須** | **必須** | **必須** | **必須** | **必須** |
+
+> **新規ページ追加時（イベント A）の必須事項**: `web-next/lib/page-registry.ts` への登録を忘れないこと。
+> 登録すればナビ・鮮度表示・What's New・sitemap にすべて自動で載る。`nav-links.ts` は registry からの
+> 導出なので**手書きしてはならない**。
 
 ---
 
@@ -98,7 +117,17 @@ find web-next/tests/ web-next/app/ web-next/components/ -name "*.test.ts" -o -na
 # D. テスト実行結果の取得
 cd web-next && bun run test 2>&1 | tail -5
 cd web-next && bun run lint 2>&1 | tail -5
+
+# E. ルート / レジストリの件数突合（両者は一致していなければならない）
+#    F-4' 以降ナビも registry から導出されるため、ここがズレると
+#    ナビ・sitemap・What's New から同時にページが欠落する
+ls web-next/app/**/page.tsx | wc -l
+grep -c '^    slug: "' web-next/lib/page-registry.ts
 ```
+
+> 件数が一致しない場合、`cd web-next && bun run test` の
+> `tests/page-registry-coverage.test.ts` と `tests/nav-derivation.test.ts` が
+> 具体的にどのページが漏れているかを示す。
 
 ### 2. 監査チェックリスト
 
@@ -119,6 +148,11 @@ cd web-next && bun run lint 2>&1 | tail -5
   - [ ] ビルド・lint・typecheck の状態が正しく反映されているか。
   - [ ] `## 次回セッションでの再開・実行依頼プロンプト` のテスト件数が上記と同期しているか。
   - [ ] 最終更新日（タイムスタンプ）が更新されているか。
+- [ ] **`plans/README.md` 監査**
+  - [ ] 「実行順・ステータス」テーブルの Status 列が実装の実態と一致しているか
+        （実装済みなのに TODO / IN PROGRESS のまま残っていないか）。
+  - [ ] 「次のアクション」欄が最新か（完了済み項目が残っていないか）。
+  - [ ] 不採用にした案が「検討済み・不採用」に記録されているか（再監査の防止）。
 - [ ] **個別 `SKILL.md` / `*.md` 監査**
   - [ ] 完了したタスクや使用が禁止された古いコマンド（例: npm や pnpm）の記述が残っていないか。
   - [ ] 最終更新日のタイムスタンプが最新化されているか。
@@ -133,9 +167,17 @@ cd web-next && bun run lint 2>&1 | tail -5
 
 仕様書のみの同期更新のコミットには**ソースコードの変更を一切含めない**でください（TDD コミット分割ルール）。
 
+`plans/` は 2026-07-12 に Git 追跡へ復帰済みのため、**コミット対象に含める**こと。
+
 ```bash
-git add CLAUDE.md GEMINI.md README.md docs/PROGRESS.md .claude/skills/ .agent/skills/
+git add CLAUDE.md GEMINI.md README.md docs/PROGRESS.md .claude/skills/ .claude/rules/ .agent/skills/ plans/
 git commit -m "chore(docs): sync spec files — <具体的な更新理由や同期内容>"
+```
+
+コミット前に PII チェック（`.claude/rules/no-absolute-paths.md`）を実行すること:
+
+```bash
+git diff --cached | grep -E '^\+[^+]' | grep -E '(/Users/|/home/|C:\\Users\\)' | grep -vE 'johndoe'
 ```
 
 ---

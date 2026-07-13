@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-07-13
+Updated 2026-07-14
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -32,8 +32,10 @@ update.sh  ← オーケストレーター (scrape → copy)
 │   │   ├── HomePage.tsx         Client Component (Phase 10)
 │   │   ├── ApiTable.tsx / SubTable.tsx / Hero.tsx / ...   (Phase 8-10 成果物)
 │   │   └── site/                Phase A 共通インフラ（追加済み） (SiteHeader, DisclaimerBanner, PageFreshness, nav-links)
+│   │       └── nav-links.ts     page-registry からナビ木を導出 (buildNavLinks / 手書き禁止)
 │   ├── lib/
-│   │   ├── page-registry.ts     全ページのメタデータ SSoT (Zod / 鮮度表示・What's New・sitemap の導出元)
+│   │   ├── page-registry.ts     全ページのメタデータ SSoT (Zod / 鮮度表示・What's New・sitemap・ナビ の導出元)
+│   │   ├── nav-taxonomy.ts      ナビのグループ順・ネスト対象の SSoT (NAV_GROUPS / CATEGORY_ORDER)
 │   │   ├── cost.ts              純粋関数 (calcApiCost / calcSubCost / colorIndex / fmtUSD / fmtJPY)
 │   │   ├── pricing.ts           Zod スキーマ + コンパイル時パリティアサート
 │   │   ├── i18n.tsx             T オブジェクト + t() + tRich() (React 要素ファクトリ)
@@ -186,7 +188,8 @@ Playwright ブラウザバイナリ（`/root/.cache/ms-playwright/`）はバイ�
 ## 重要な設計判断
 
 - **Next.js 16 App Router + SSG**: `output: 'export'` で pure 静的エクスポート → Netlify CDN 配信。`@netlify/plugin-nextjs` 不要。Phase 1–14 でコスト計算機ホームが移行済、Phase A–F で残 18 ガイドページも全移行完了（計画書は `docs/archive/` に保存）。さらに `/google/agent-harness-engineering` や `/google/adk-best-practices`、`/google/stitch-guide`、`/claude/managed-agents`、`/claude/self-hosted-sandboxes`、`/claude/code-slash-commands`、`/claude/fable-5-best-practices`、`/claude/skills-sh`、`/code-review/coderabbit-guide`、`/code-review/copilot-code-review`、`/code-review/sonar-qube`、`/code-review/tool-pricing`、`/agent/hermes-agent-advanced-guide`、`/agent/skills`、`/security/ai-security-best-practices`、/local-llm/best-practices、/ci-cd/ai-cicd-automation-best-practices、/agent/context-engineering-best-practices、/multimodal/image-audio-best-practices-2026、/llm-ops/evaluation-observability ページを追加
-- **ページレジストリ（`web-next/lib/page-registry.ts`）が全ページメタデータの SSoT**: 鮮度表示（`PageFreshness`）・What's New（`/whats-new`）・`sitemap.ts` はすべて registry から導出する。属性を nav-links や各 page.tsx に複製しない（複製した結果 sitemap が 24/55 ルートで腐った経緯がある）。**新規ページを追加したら registry への登録が必須** — `web-next/tests/page-registry-coverage.test.ts` が登録漏れ・幽霊エントリを機械検知する。`lastReviewed`（最終確認日）は月次更新で当日日付へ書き戻す（`.claude/skills/monthly-update/`）
+- **ページレジストリ（`web-next/lib/page-registry.ts`）が全ページメタデータの SSoT**: 鮮度表示（`PageFreshness`）・What's New（`/whats-new`）・`sitemap.ts`・**ナビゲーション** はすべて registry から導出する。属性を各 page.tsx に複製しない（複製した結果 sitemap が 24/55 ルートで腐った経緯がある）。**新規ページを追加したら registry への登録が必須** — 登録すればナビにも自動的に載る。`web-next/tests/page-registry-coverage.test.ts` が登録漏れ・幽霊エントリを、`web-next/tests/nav-derivation.test.ts` が registry ⇔ ナビの全単射を機械検知する。`lastReviewed`（最終確認日）は月次更新で当日日付へ書き戻す（`.claude/skills/monthly-update/`）
+- **ナビは registry からの導出。`nav-links.ts` への直書きは禁止**（F-4' / `plans/008-nav-regrouping-f4.md`, 2026-07-14）: `web-next/components/site/nav-links.ts` は `buildNavLinks(pageRegistry)` の結果であり、手書きのリンクデータを持たない（以前は 170 行の手書きデータで registry と二重管理になっていた）。トップレベルは 7 グループ（Home / Providers / Agent 開発 / 開発プロセス / 運用・品質 / モデル・データ / What's New）で、**2 段ネストするのは Providers のみ**。グループの並び順とネスト対象は `web-next/lib/nav-taxonomy.ts` が持つ（registry のエントリは slug 昇順のため表示順を表現できない）。ドロップダウン内のリーフは `addedAt` 昇順 → `slug` 昇順。未知の `group` や Providers の `category` 欠落はビルド時に throw する（silent drop でページがナビから消えるのを防ぐため）
 - **page.tsx は Server Component に保つ（metadata の前提）**: Next.js の規約により `"use client"` なファイルは `export const metadata` を持てない。スクロール監視等のクライアント処理は `TocObserver.tsx` 等へ切り出し、page.tsx 自体は Server Component に保つこと。已に全体が `"use client"` になっている `/code-review/coderabbit-guide` と `/code-review/sonar-qube` は、例外的にルート単位の `layout.tsx` から metadata を供給している
 - **3層フォールバック**: スクレイパーは「スクレイプ成功 → 既存 JSON の値 → ハードコードフォールバック」の順で価格を決定。`scrape_status` フィールド (`success` | `fallback` | `manual`) で出自を追跡
 - **型の同期**: `scraper/src/scraper/models.py` (Pydantic) が SSoT、`web-next/types/pricing.ts` (TypeScript) が手動ミラー、`web-next/lib/pricing.ts` の `_AssertParity` でコンパイル時検証。**片方を変更したら必ずもう片方も更新すること**
@@ -266,7 +269,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が成功（実測 1046 件合格を確認）
+2. `cd web-next && bun run test` が成功（実測 1064 件合格を確認）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功（既知の違反件数は CI または進捗ドキュメントを参照、新規違反がないこと）
 5. `cd scraper && uv run pytest` が成功

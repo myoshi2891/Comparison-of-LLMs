@@ -21,7 +21,7 @@
 | [005](005-category-gap-analysis-v2.md) | カテゴリギャップ分析 v2（56 ルート） | direction | 004 | DONE（分析完了） |
 | [006](006-platform-roadmap-v2.md) | プラットフォーム拡張ロードマップ v2 | direction | 004, 005 | DONE（方向性定義完了） |
 | 007 | Phase 1 鮮度基盤（F-1 ページレジストリ + F-2 What's New） | build | 006 | **DONE**（2026-07-13 実装完了。下記「Phase 1 実装結果」参照） |
-| [008](008-nav-regrouping-f4.md) | Phase 2 F-4' ナビ再グルーピング（18 → 7 項目・registry からの導出） | build | 006, 007 | **IN PROGRESS**（2026-07-14 着手。グルーピング案はユーザー承認済み） |
+| [008](008-nav-regrouping-f4.md) | Phase 2 F-4' ナビ再グルーピング（18 → 7 項目・registry からの導出） | build | 006, 007 | **DONE**（2026-07-14 実装完了。下記「Phase 2 実装結果」参照） |
 
 Status 値: TODO / IN PROGRESS / DONE / BLOCKED（理由 1 行） / REJECTED（理由 1 行） / STALE（置換先を明記）
 
@@ -37,9 +37,25 @@ Status 値: TODO / IN PROGRESS / DONE / BLOCKED（理由 1 行） / REJECTED（�
 - `.claude/skills/monthly-update/SKILL.md` §4.5 — F-2'：月次確認で `lastReviewed` を書き戻す運用を確立
 - テスト 1040 件 全 Green（契約テスト 44 件追加）
 
-**次は Phase 2（F-4' ナビ再グルーピング）** → [008](008-nav-regrouping-f4.md) として起票済み（2026-07-14 着手）。
-registry の `group` フィールドにはグルーピング体系を先行投入済みのため、ナビ側の差し替えのみで済む
-（`group` 値の変更は不要。2 段目ラベル用の `category` 追加のみ）。
+## Phase 2 実装結果（2026-07-14）
+
+006 §3 の Phase 2（F-4'）を [008](008-nav-regrouping-f4.md) として実装済み。**ナビのトップレベルを 18 → 7 項目へ集約**し、
+`nav-links.ts` の 170 行の手書きデータを廃止して page-registry からの導出に置き換えた。
+
+- `web-next/lib/nav-taxonomy.ts`（新規）— グループの並び順とネスト対象の SSoT
+- `web-next/lib/page-registry.ts` — `category`（ナビ 2 段目ラベル）を追加、`group` を Zod enum 化。
+  **`group` の値そのものは 1 件も変更していない**（Phase 1 の投入時点で正しかった）
+- `web-next/components/site/nav-links.ts` — `buildNavLinks(pageRegistry)` による導出。
+  未知 group / category 欠落は silent drop せず throw（ページがナビから消えるのを防ぐ）
+- `SiteHeader` / `SiteHeaderClient` / `globals.css` — Providers のみ 2 段ネスト
+  （デスクトップは右フライアウト、モバイルはアコーディオン）
+- **registry ⇔ ナビの全単射を契約テストで固定**（`tests/nav-derivation.test.ts`）。
+  以後、ページを追加したのにナビへ載せ忘れる事故が機械検知される
+- URL は不変（006 §2.1 の C 案）。`app/**/page.tsx` と `netlify.toml` は未編集
+- テスト 1064 件 全 Green
+
+**次は Phase 3（横断導線: F-3' RSS / F-5 タグ・横断検索 / F-7 関連ページリンク）**、
+または Phase 4 コンテンツ（C-10 オーケストレーション / C-11 SDD）。
 
 ## 依存関係
 
@@ -52,8 +68,10 @@ registry の `group` フィールドにはグルーピング体系を先行投�
 
 1. ~~`plan F-1 ページレジストリと最終確認日表示の導入`~~ → **DONE**（2026-07-13）
 2. ~~`plan F-2 What's New ページの静的生成 + monthly-update との lastReviewed 接続`~~ → **DONE**（2026-07-13）
-3. ~~`plan F-4' ナビ再グルーピングの design spike`~~ → **[008](008-nav-regrouping-f4.md) として起票・着手**（2026-07-14。グルーピング案はユーザー承認済み。実測は 18 → 7 項目）
-4. Phase 4 コンテンツ（C-10 オーケストレーション / C-11 SDD）は Phase 1 完了済みのため着手可能
+3. ~~`plan F-4' ナビ再グルーピング`~~ → **DONE**（2026-07-14 / [008](008-nav-regrouping-f4.md)。実測 18 → 7 項目）
+4. `plan F-3' RSS フィード（registry から生成）` — Phase 3。Effort S / Risk LOW で着手しやすい
+5. `plan F-7 関連ページリンク（registry の topics 近接から導出）` — Phase 3。openclaw のような横断的ページの発見性はここで解決する
+6. Phase 4 コンテンツ（C-10 オーケストレーション / C-11 SDD）は Phase 1 完了済みのため着手可能
 
 ## 検討済み・不採用（re-audit 防止）
 
