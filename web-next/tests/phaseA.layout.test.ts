@@ -38,6 +38,13 @@ describe("Phase A - layout imports", () => {
       /import\s*\{\s*DisclaimerBanner\s*\}\s*from\s*["']@\/components\/site\/DisclaimerBanner["']/
     );
   });
+
+  // F-1b: 鮮度バッジ（plans/006 §2.3）
+  it("imports PageFreshness from @/components/site/PageFreshness", () => {
+    expect(layoutSrc).toMatch(
+      /import\s*\{\s*PageFreshness\s*\}\s*from\s*["']@\/components\/site\/PageFreshness["']/
+    );
+  });
 });
 
 describe("Phase A - body composition", () => {
@@ -54,6 +61,13 @@ describe("Phase A - body composition", () => {
     const childrenIdx = layoutSrc.indexOf("{children}");
     expect(bannerIdx).toBeGreaterThan(-1);
     expect(bannerIdx).toBeLessThan(childrenIdx);
+  });
+
+  it("renders <PageFreshness /> before {children}", () => {
+    const freshnessIdx = layoutSrc.indexOf("<PageFreshness");
+    const childrenIdx = layoutSrc.indexOf("{children}");
+    expect(freshnessIdx).toBeGreaterThan(-1);
+    expect(freshnessIdx).toBeLessThan(childrenIdx);
   });
 
   it("assigns has-common-header class to <body>", () => {
