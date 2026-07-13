@@ -1,6 +1,7 @@
 import { render } from "@testing-library/react";
+import type { Metadata } from "next";
 import { describe, expect, it, vi } from "vitest";
-import Page from "./page";
+import Page, { metadata } from "./page";
 
 vi.mock("@/components/docs/MermaidDiagram", () => ({
   default: function DummyMermaidDiagram({ chart }: { chart: string }) {
@@ -74,5 +75,19 @@ describe("OpenAI Harness Engineering Guide", () => {
       el.className?.includes("codeWrap")
     );
     expect(codeBlocks.length).toBeGreaterThan(0);
+  });
+});
+
+describe("/codex/harness-engineering metadata", () => {
+  it("metadata が export されている", () => {
+    const meta = metadata as Metadata;
+    expect(typeof meta.title).toBe("string");
+    expect(meta.title).toContain("ハーネスエンジニアリング");
+  });
+
+  it("description が設定されている", () => {
+    const meta = metadata as Metadata;
+    expect(typeof meta.description).toBe("string");
+    expect((meta.description ?? "").length).toBeGreaterThan(20);
   });
 });

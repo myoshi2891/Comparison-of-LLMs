@@ -1,6 +1,7 @@
 import { render } from "@testing-library/react";
+import type { Metadata } from "next";
 import { beforeAll, describe, expect, it, vi } from "vitest";
-import Page from "./page";
+import Page, { metadata } from "./page";
 
 beforeAll(() => {
   global.IntersectionObserver = class {
@@ -47,5 +48,19 @@ describe("/code-review/sonar-qube", () => {
     const { container } = render(<Page />);
     const codeBlocks = container.querySelectorAll("pre, code");
     expect(codeBlocks.length).toBeGreaterThan(0);
+  });
+});
+
+describe("/code-review/sonar-qube metadata", () => {
+  it("metadata が export されている", () => {
+    const meta = metadata as Metadata;
+    expect(typeof meta.title).toBe("string");
+    expect(meta.title).toContain("SonarQube");
+  });
+
+  it("description が設定されている", () => {
+    const meta = metadata as Metadata;
+    expect(typeof meta.description).toBe("string");
+    expect((meta.description ?? "").length).toBeGreaterThan(20);
   });
 });
