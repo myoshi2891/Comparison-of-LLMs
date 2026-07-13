@@ -456,7 +456,8 @@ const entries: PageEntry[] = [
     group: "Providers",
     provider: "google",
     topics: ["harness"],
-    summary: "Googleが実践するテストハーネス設計の技術とベストプラクティスを解説する完全ガイドです。",
+    summary:
+      "Googleが実践するテストハーネス設計の技術とベストプラクティスを解説する完全ガイドです。",
     addedAt: "2026-05-28",
     lastReviewed: "2026-07-01",
   },
@@ -627,6 +628,16 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-12",
   },
   {
+    slug: "/whats-new",
+    title: "What's New",
+    group: "What's New",
+    topics: [],
+    summary:
+      "新しく公開したガイドと、直近で内容を確認したガイドの一覧。ページレジストリから静的生成。",
+    addedAt: "2026-07-13",
+    lastReviewed: "2026-07-13",
+  },
+  {
     slug: "/vercel/sandbox",
     title: "Vercel Sandbox",
     group: "Agent 開発",
@@ -650,7 +661,10 @@ const bySlug = new Map(pageRegistry.map((e) => [e.slug, e]));
  * @returns 一致するエントリ。未登録なら undefined
  */
 export function findBySlug(slug: string): PageEntry | undefined {
-  const normalized = slug.length > 1 ? slug.replace(/\/+$/, "") : slug;
+  let normalized = slug;
+  while (normalized.length > 1 && normalized.endsWith("/")) {
+    normalized = normalized.slice(0, -1);
+  }
   return bySlug.get(normalized);
 }
 

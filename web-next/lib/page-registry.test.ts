@@ -106,7 +106,7 @@ describe("byAddedAtDesc / byLastReviewedDesc", () => {
     expect(sorted).toHaveLength(pageRegistry.length);
     for (let i = 1; i < sorted.length; i++) {
       expect(
-        sorted[i - 1].lastReviewed.localeCompare(sorted[i].lastReviewed),
+        sorted[i - 1].lastReviewed.localeCompare(sorted[i].lastReviewed)
       ).toBeGreaterThanOrEqual(0);
     }
   });
