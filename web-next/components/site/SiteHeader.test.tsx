@@ -58,17 +58,20 @@ describe("Phase A - SiteHeader root structure", () => {
   });
 });
 
-describe("Phase A - SiteHeader dropdown rendering", () => {
-  it("renders 15 dropdowns (Claude/Google/Codex/Copilot/Code Review/Agent/MCP/Sandbox/IDE/Security/Local LLM/CI/CD/RAG/Multimodal/LLMOps) as .ch-dropdown <li>", () => {
+// F-4'（plans/008）: ナビは page-registry からの導出になり、トップレベルは
+// 5 ドロップダウン（Providers / Agent 開発 / 開発プロセス / 運用・品質 / モデル・データ）
+// + Home / What's New のフラットリンクへ集約された。Providers のみ 2 段ネストする。
+describe("SiteHeader dropdown rendering", () => {
+  it("renders 5 dropdowns (Providers / Agent 開発 / 開発プロセス / 運用・品質 / モデル・データ)", () => {
     const { container } = render(<SiteHeader pathname="/" />);
     const dropdowns = container.querySelectorAll("li.ch-dropdown");
-    expect(dropdowns.length).toBe(15);
+    expect(dropdowns.length).toBe(5);
   });
 
   it("each dropdown has a .ch-dropdown-toggle button with aria-haspopup=true", () => {
     const { container } = render(<SiteHeader pathname="/" />);
-    const toggles = container.querySelectorAll("li.ch-dropdown .ch-dropdown-toggle");
-    expect(toggles.length).toBe(15);
+    const toggles = container.querySelectorAll("li.ch-dropdown > .ch-dropdown-toggle");
+    expect(toggles.length).toBe(5);
     toggles.forEach((btn) => {
       expect(btn.getAttribute("aria-haspopup")).toBe("true");
     });
@@ -76,11 +79,45 @@ describe("Phase A - SiteHeader dropdown rendering", () => {
 
   it("each dropdown has a .ch-submenu <ul> with at least one child", () => {
     const { container } = render(<SiteHeader pathname="/" />);
-    const submenus = container.querySelectorAll("li.ch-dropdown ul.ch-submenu");
-    expect(submenus.length).toBe(15);
+    const submenus = container.querySelectorAll("li.ch-dropdown > ul.ch-submenu");
+    expect(submenus.length).toBe(5);
     submenus.forEach((ul) => {
       expect(ul.querySelectorAll("li").length).toBeGreaterThan(0);
     });
+  });
+});
+
+describe("SiteHeader nested sub-dropdown rendering (Providers only)", () => {
+  it("renders 4 sub-dropdowns (Claude / Google / Codex / Copilot) under Providers", () => {
+    const { container } = render(<SiteHeader pathname="/" />);
+    const subs = container.querySelectorAll("li.ch-subdropdown");
+    expect(subs.length).toBe(4);
+    expect(Array.from(subs).map((li) => li.querySelector("button")?.textContent)).toEqual([
+      "Claude",
+      "Google",
+      "Codex",
+      "Copilot",
+    ]);
+  });
+
+  it("each sub-dropdown has a toggle with aria-haspopup and a .ch-subsubmenu <ul>", () => {
+    const { container } = render(<SiteHeader pathname="/" />);
+    const toggles = container.querySelectorAll("li.ch-subdropdown > .ch-subdropdown-toggle");
+    expect(toggles.length).toBe(4);
+    toggles.forEach((btn) => {
+      expect(btn.getAttribute("aria-haspopup")).toBe("true");
+    });
+    const subsubmenus = container.querySelectorAll("li.ch-subdropdown > ul.ch-subsubmenu");
+    expect(subsubmenus.length).toBe(4);
+    subsubmenus.forEach((ul) => {
+      expect(ul.querySelectorAll("li").length).toBeGreaterThan(0);
+    });
+  });
+
+  it("nests sub-dropdowns inside the Providers submenu (not at top level)", () => {
+    const { container } = render(<SiteHeader pathname="/" />);
+    const stray = container.querySelectorAll("ul.ch-links > li.ch-subdropdown");
+    expect(stray.length).toBe(0);
   });
 });
 
@@ -93,12 +130,36 @@ describe("Phase A - SiteHeader active-path handling", () => {
     expect(active?.getAttribute("aria-current")).toBe("page");
   });
 
-  it("propagates ch-active to the parent dropdown toggle when a child is active", () => {
+  // F-4': /claude/skill は Providers ▸ Claude ▸ Skill の 3 階層下にある。
+  // 祖先の Providers トグルまで active が波及しないと、現在地が畳まれたメニューの
+  // 中に埋もれて見えなくなる（isParentActive の再帰化がこれを担保する）。
+  it("propagates ch-active to the top-level dropdown toggle when a nested leaf is active", () => {
     const { container } = render(<SiteHeader pathname="/claude/skill" />);
-    const toggles = container.querySelectorAll("li.ch-dropdown .ch-dropdown-toggle");
+    const toggles = container.querySelectorAll("li.ch-dropdown > .ch-dropdown-toggle");
     const activeToggles = Array.from(toggles).filter((t) => t.className.includes("ch-active"));
     expect(activeToggles.length).toBe(1);
-    expect(activeToggles[0].textContent).toContain("Claude");
+    expect(activeToggles[0].textContent).toContain("Providers");
+  });
+
+  it("propagates ch-active to the sub-dropdown toggle when a nested leaf is active", () => {
+    const { container } = render(<SiteHeader pathname="/claude/skill" />);
+    const subToggles = container.querySelectorAll("li.ch-subdropdown > .ch-subdropdown-toggle");
+    const active = Array.from(subToggles).filter((t) => t.className.includes("ch-active"));
+    expect(active.length).toBe(1);
+    expect(active[0].textContent).toContain("Claude");
+  });
+
+  // 非ネストのグループ（Agent 開発）は 1 段のまま。サブトグルは active にならない。
+  it("propagates ch-active to a flat group's toggle without touching sub-dropdowns", () => {
+    const { container } = render(<SiteHeader pathname="/agent/loop-engineering" />);
+    const toggles = container.querySelectorAll("li.ch-dropdown > .ch-dropdown-toggle");
+    const activeToggles = Array.from(toggles).filter((t) => t.className.includes("ch-active"));
+    expect(activeToggles.length).toBe(1);
+    expect(activeToggles[0].textContent).toContain("Agent 開発");
+
+    const subToggles = container.querySelectorAll("li.ch-subdropdown > .ch-subdropdown-toggle");
+    const activeSubs = Array.from(subToggles).filter((t) => t.className.includes("ch-active"));
+    expect(activeSubs.length).toBe(0);
   });
 
   it("does not add ch-active to any link when pathname is unrecognized", () => {

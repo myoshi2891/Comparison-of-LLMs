@@ -8,6 +8,7 @@
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { NAV_GROUPS } from "@/lib/nav-taxonomy";
 import { pageRegistry } from "@/lib/page-registry";
 
 const APP_DIR = join(__dirname, "../app");
@@ -48,5 +49,30 @@ describe("page-registry coverage", () => {
       const file = slug === "/" ? join(APP_DIR, "page.tsx") : join(APP_DIR, slug, "page.tsx");
       expect(existsSync(file), `missing page.tsx for ${slug}`).toBe(true);
     }
+  });
+});
+
+// F-4'（plans/008）: ナビは registry から導出されるため、group / category の
+// 不備はそのままナビの欠落になる。ビルドを待たずにここで検知する。
+describe("page-registry nav metadata", () => {
+  it("全エントリの group が NAV_GROUPS のいずれか", () => {
+    const invalid = pageRegistry
+      .filter((e) => !NAV_GROUPS.includes(e.group))
+      .map((e) => `${e.slug}: ${e.group}`);
+    expect(invalid).toEqual([]);
+  });
+
+  it("Providers 配下の全エントリが category を持つ（2 段目ラベル）", () => {
+    const missing = pageRegistry
+      .filter((e) => e.group === "Providers" && !e.category)
+      .map((e) => e.slug);
+    expect(missing).toEqual([]);
+  });
+
+  it("Providers 以外は category を持たない（未使用フィールドの混入防止）", () => {
+    const stray = pageRegistry
+      .filter((e) => e.group !== "Providers" && e.category)
+      .map((e) => e.slug);
+    expect(stray).toEqual([]);
   });
 });

@@ -3,6 +3,7 @@ import type { ReactElement } from "react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import PageComponent, { metadata as rawMetadata } from "@/app/claude/fable-5-best-practices/page";
 import { navLinks } from "@/components/site/nav-links";
+import { findNavLeaf } from "@/tests/helpers/nav";
 
 beforeAll(() => {
   global.IntersectionObserver = class {
@@ -76,13 +77,11 @@ describe("/claude/fable-5-best-practices - page structure (Step 1)", () => {
 });
 
 describe("/claude/fable-5-best-practices - registration", () => {
-  it("is registered in nav-links.ts under Claude category", () => {
-    const claudeGroup = navLinks.find(g => g.name === "Claude");
-    expect(claudeGroup).toBeDefined();
-    if (claudeGroup && "children" in claudeGroup) {
-      const link = claudeGroup.children.find(c => c.href === "/claude/fable-5-best-practices");
-      expect(link).toBeDefined();
-      expect(link?.name).toBe("Fable 5 Best Practices");
-    }
+  // F-4'（plans/008）: ナビは page-registry からの導出になったため、グループ名で
+  // 辿らず href で探す（グループ再編でテストが壊れないようにする）。
+  it("is reachable from the site navigation", () => {
+    const link = findNavLeaf(navLinks, "/claude/fable-5-best-practices");
+    expect(link).toBeDefined();
+    expect(link?.name).toBe("Fable 5 Best Practices");
   });
 });

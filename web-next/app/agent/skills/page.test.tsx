@@ -3,6 +3,7 @@ import type { ReactElement } from "react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import PageComponent, { metadata as rawMetadata } from "@/app/agent/skills/page";
 import { navLinks } from "@/components/site/nav-links";
+import { findNavLeaf } from "@/tests/helpers/nav";
 
 beforeAll(() => {
   global.IntersectionObserver = class {
@@ -91,13 +92,11 @@ describe("/agent/skills - page structure", () => {
 });
 
 describe("/agent/skills - registration", () => {
-  it("is registered in nav-links.ts under Agent category", () => {
-    const agentGroup = navLinks.find((g) => g.name === "Agent");
-    expect(agentGroup).toBeDefined();
-    if (agentGroup && "children" in agentGroup) {
-      const link = agentGroup.children.find((c) => c.href === "/agent/skills");
-      expect(link).toBeDefined();
-      expect(link?.name).toBe("Agent Skills Guide");
-    }
+  // F-4'（plans/008）: ナビは page-registry からの導出になったため、グループ名で
+  // 辿らず href で探す（グループ再編でテストが壊れないようにする）。
+  it("is reachable from the site navigation", () => {
+    const link = findNavLeaf(navLinks, "/agent/skills");
+    expect(link).toBeDefined();
+    expect(link?.name).toBe("Agent Skills Guide");
   });
 });

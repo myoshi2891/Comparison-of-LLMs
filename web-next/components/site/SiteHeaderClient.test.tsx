@@ -68,6 +68,71 @@ const minimalNavDom = (
   </nav>
 );
 
+/**
+ * F-4'（plans/008）: Providers のみ 2 段ネストする。サブトグルは
+ * `.ch-subdropdown-toggle` / `li.ch-subdropdown` / `ul.ch-subsubmenu` を使い、
+ * トップレベルの `.ch-dropdown-*` とはクラスを分ける。
+ */
+const nestedNavDom = (
+  <nav id="common-header" className="ch-nav" aria-label="Main Navigation">
+    <button
+      type="button"
+      className="ch-hamburger"
+      aria-controls="ch-menu"
+      aria-expanded="false"
+      aria-label="Toggle menu"
+    >
+      <span className="ch-bar" />
+      <span className="ch-bar" />
+      <span className="ch-bar" />
+    </button>
+    <ul id="ch-menu" className="ch-links">
+      <li className="ch-dropdown">
+        <button
+          type="button"
+          className="ch-dropdown-toggle"
+          aria-expanded="false"
+          aria-haspopup="true"
+        >
+          <span>Providers</span>
+        </button>
+        <ul className="ch-submenu">
+          <li className="ch-subdropdown">
+            <button
+              type="button"
+              className="ch-subdropdown-toggle"
+              aria-expanded="false"
+              aria-haspopup="true"
+            >
+              <span>Claude</span>
+            </button>
+            <ul className="ch-subsubmenu">
+              <li>
+                <a href="/claude/skill">Skill</a>
+              </li>
+            </ul>
+          </li>
+          <li className="ch-subdropdown">
+            <button
+              type="button"
+              className="ch-subdropdown-toggle"
+              aria-expanded="false"
+              aria-haspopup="true"
+            >
+              <span>Google</span>
+            </button>
+            <ul className="ch-subsubmenu">
+              <li>
+                <a href="/google/skill">Skill</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+);
+
 describe("Phase A - SiteHeaderClient directive", () => {
   it("declares 'use client' on the first effective line", () => {
     const source = readFileSync(join(__dirname, "SiteHeaderClient.tsx"), "utf8");
@@ -118,6 +183,77 @@ describe("Phase A - SiteHeaderClient dropdown toggle", () => {
     expect(toggle.getAttribute("aria-expanded")).toBe("true");
     fireEvent.keyDown(document, { key: "Escape" });
     expect(toggle.getAttribute("aria-expanded")).toBe("false");
+  });
+});
+
+describe("F-4' - SiteHeaderClient nested sub-dropdown", () => {
+  const openProviders = (container: HTMLElement) => {
+    const parent = container.querySelector(".ch-dropdown-toggle") as HTMLElement;
+    fireEvent.click(parent);
+    return parent;
+  };
+
+  it("flips sub-dropdown aria-expanded false -> true on click", () => {
+    const { container } = render(<SiteHeaderClient>{nestedNavDom}</SiteHeaderClient>);
+    openProviders(container);
+    const sub = container.querySelector(".ch-subdropdown-toggle") as HTMLElement;
+    expect(sub.getAttribute("aria-expanded")).toBe("false");
+    fireEvent.click(sub);
+    expect(sub.getAttribute("aria-expanded")).toBe("true");
+  });
+
+  // リグレッション防止: 親トグルの makeToggleHandler は closeAllDropdowns() を呼ぶため、
+  // サブトグルが li.ch-dropdown を共有すると自分の親ごと閉じてしまう。
+  // サブトグル専用ハンドラは closeAllDropdowns() を呼んではならない。
+  it("does NOT close the parent dropdown when a sub-dropdown is opened", () => {
+    const { container } = render(<SiteHeaderClient>{nestedNavDom}</SiteHeaderClient>);
+    const parent = openProviders(container);
+    expect(parent.getAttribute("aria-expanded")).toBe("true");
+
+    const sub = container.querySelector(".ch-subdropdown-toggle") as HTMLElement;
+    fireEvent.click(sub);
+
+    expect(parent.getAttribute("aria-expanded")).toBe("true");
+    expect(
+      container.querySelector("li.ch-dropdown")?.className.includes("ch-dropdown-open")
+    ).toBe(true);
+  });
+
+  it("closes sibling sub-dropdowns when another sub-dropdown opens", () => {
+    const { container } = render(<SiteHeaderClient>{nestedNavDom}</SiteHeaderClient>);
+    openProviders(container);
+    const [claude, google] = Array.from(
+      container.querySelectorAll<HTMLElement>(".ch-subdropdown-toggle")
+    );
+
+    fireEvent.click(claude);
+    expect(claude.getAttribute("aria-expanded")).toBe("true");
+
+    fireEvent.click(google);
+    expect(google.getAttribute("aria-expanded")).toBe("true");
+    expect(claude.getAttribute("aria-expanded")).toBe("false");
+  });
+
+  it("closes every level on Escape", () => {
+    const { container } = render(<SiteHeaderClient>{nestedNavDom}</SiteHeaderClient>);
+    const parent = openProviders(container);
+    const sub = container.querySelector(".ch-subdropdown-toggle") as HTMLElement;
+    fireEvent.click(sub);
+
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(parent.getAttribute("aria-expanded")).toBe("false");
+    expect(sub.getAttribute("aria-expanded")).toBe("false");
+  });
+
+  it("closes every level on outside click", () => {
+    const { container } = render(<SiteHeaderClient>{nestedNavDom}</SiteHeaderClient>);
+    const parent = openProviders(container);
+    const sub = container.querySelector(".ch-subdropdown-toggle") as HTMLElement;
+    fireEvent.click(sub);
+
+    fireEvent.click(document.body);
+    expect(parent.getAttribute("aria-expanded")).toBe("false");
+    expect(sub.getAttribute("aria-expanded")).toBe("false");
   });
 });
 

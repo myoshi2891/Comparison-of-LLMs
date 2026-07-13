@@ -1,36 +1,27 @@
-// Phase A [Red] contract test. Expected to FAIL until Green phase
-// implements components/site/nav-links.ts with the NavLinkSchema Zod schema
-// and navLinks data (6 top-level entries: Home + 4 dropdowns + Git Worktree).
-
 /**
- * Phase A 契約テスト (ナビデータ / nav-links.ts)。
+ * 契約テスト (ナビデータ / nav-links.ts)。
  *
- * 固定する契約:
- * - `components/site/nav-links.ts` から `navLinks` と `NavLinkSchema` が
- *   型付き export されている。
- * - `navLinks` は Zod スキーマで parse 成功する。
- * - トップレベル 6 エントリ: Home + Claude/Gemini/Codex/Copilot (dropdown) + Git Worktree。
- * - Claude dropdown は 5 子エントリ (Skill / Agent / Skill Guide /
- *   Skill Guide 中級 / Cowork Guide)。
- * - すべての href は `/` 始まりで `.html` 拡張子を含まない (clean URL)。
- * - 外部 GitHub URL は `navLinks` に含まれない (layout 側が責務を持つ)。
- * - Zod スキーマが `javascript:` や `//` プロトコル相対 URL を弾く
- *   (legacy/shared/common-header.js:94-104 の isSafeHref 相当)。
+ * Phase A で導入し、F-4'（plans/008）でナビが page-registry からの導出に変わったのに合わせて改訂。
+ * 個別グループの構成・件数・並び順は tests/nav-derivation.test.ts が導出契約として固定するため、
+ * ここでは **データ構造とセキュリティ境界** に責務を絞る:
+ *
+ * - `navLinks` / `NavLinkSchema` が型付き export されている
+ * - `navLinks` は Zod スキーマで parse 成功する
+ * - Home 先頭 / What's New 末尾
+ * - すべての href は `/` 始まりの clean URL（`.html` 拡張子なし）
+ * - 外部 URL は `navLinks` に含まれない（GitHub リンクは layout 側の責務）
+ * - Zod スキーマが `javascript:` / プロトコル相対 `//` を弾く
+ *   (legacy/shared/common-header.js:94-104 の isSafeHref 相当)
  */
 
 import { describe, expect, it } from "vitest";
-import { NavLinkSchema as RawSchema, navLinks as rawNavLinks } from "@/components/site/nav-links";
+import { isNavLeaf, NavLinkSchema, navLinks } from "@/components/site/nav-links";
+import { collectNavHrefs } from "./helpers/nav";
 
-// Phase A Green が確定する契約のローカル型 (tsc の implicit-any を抑制するため)。
-type NavLeaf = { name: string; href: string };
-type NavDropdown = { name: string; children: NavLeaf[] };
-type NavEntry = NavLeaf | NavDropdown;
-type SchemaLike = { parse: (input: unknown) => NavEntry };
-const navLinks = rawNavLinks as unknown as readonly NavEntry[];
-const NavLinkSchema = RawSchema as unknown as SchemaLike;
+const allHrefs = collectNavHrefs(navLinks);
 
-describe("Phase A - nav-links export shape", () => {
-  it("exports navLinks as a readonly array", () => {
+describe("nav-links export shape", () => {
+  it("exports navLinks as a non-empty array", () => {
     expect(Array.isArray(navLinks)).toBe(true);
     expect(navLinks.length).toBeGreaterThan(0);
   });
@@ -40,193 +31,37 @@ describe("Phase A - nav-links export shape", () => {
   });
 });
 
-describe("Phase A - nav-links top-level entries", () => {
-  // F-2 で What's New（フラットリンク）を追加したため 17 → 18。
-  it("has exactly 18 top-level entries", () => {
-    expect(navLinks.length).toBe(18);
-  });
-
+describe("nav-links top-level entries", () => {
   it("starts with Home as a flat link", () => {
     const home = navLinks[0];
     expect(home.name).toBe("Home");
-    expect("href" in home && home.href === "/").toBe(true);
-    expect("children" in home).toBe(false);
-  });
-
-  it("includes Git Worktree as a flat link", () => {
-    const worktree = navLinks.find((link) => link.name === "Git Worktree");
-    expect(worktree).toBeDefined();
-    expect(worktree && "href" in worktree && worktree.href === "/git-worktree").toBe(true);
+    expect(isNavLeaf(home) && home.href === "/").toBe(true);
   });
 
   it("ends with What's New as a flat link", () => {
     const last = navLinks[navLinks.length - 1];
     expect(last.name).toBe("What's New");
-    expect("href" in last && last.href === "/whats-new").toBe(true);
-    expect("children" in last).toBe(false);
+    expect(isNavLeaf(last) && last.href === "/whats-new").toBe(true);
+  });
+});
+
+describe("nav-links href hygiene", () => {
+  it("uses clean URLs everywhere (absolute path, no .html extension)", () => {
+    expect(allHrefs.length).toBeGreaterThan(0);
+    for (const href of allHrefs) {
+      expect(href.startsWith("/"), href).toBe(true);
+      expect(href.endsWith(".html"), href).toBe(false);
+    }
   });
 
-  it("has Claude/Google/Codex/Copilot/Code Review/Agent/MCP/Sandbox/IDE/Security/Local LLM/CI/CD/RAG/Multimodal/LLMOps as dropdowns with children", () => {
-    const providers = [
-      "Claude",
-      "Google",
-      "Codex",
-      "Copilot",
-      "Code Review",
-      "Agent",
-      "MCP",
-      "Sandbox",
-      "IDE",
-      "Security",
-      "Local LLM",
-      "CI/CD",
-      "RAG",
-      "Multimodal",
-      "LLMOps",
-    ] as const;
-    for (const name of providers) {
-      const entry = navLinks.find((link) => link.name === name);
-      expect(entry, `${name} must exist`).toBeDefined();
-      expect(entry && "children" in entry && Array.isArray(entry.children)).toBe(true);
+  it("does not include an external URL anywhere in the tree", () => {
+    for (const href of allHrefs) {
+      expect(href.startsWith("http"), href).toBe(false);
     }
   });
 });
 
-describe("Phase A - Agent dropdown shape", () => {
-  const agent = navLinks.find((link) => link.name === "Agent");
-
-  it("has 6 child entries (advanced guide / openclaw security guide / loop engineering / skills-guide / skills-sh / context-engineering-best-practices)", () => {
-    expect(agent && "children" in agent).toBe(true);
-    const children = agent && "children" in agent ? agent.children : [];
-    expect(children.length).toBe(6);
-  });
-
-  it("uses clean URL paths for all Agent children (no .html extension)", () => {
-    expect(agent && "children" in agent).toBe(true);
-    const children = agent && "children" in agent ? agent.children : [];
-    const expectedHrefs = [
-      "/agent/hermes-agent-advanced-guide",
-      "/agent/openclaw-advanced-agent-security-guide",
-      "/agent/loop-engineering",
-      "/agent/skills",
-      "/claude/skills-sh",
-      "/agent/context-engineering-best-practices",
-    ];
-    expect(children.map((c) => c.href)).toEqual(expectedHrefs);
-  });
-});
-
-describe("Phase A - Claude dropdown shape", () => {
-  const claude = navLinks.find((link) => link.name === "Claude");
-
-  it("has 10 child entries (skill / agent / skill-guide / skill-guide-intermediate / cowork-guide / harness-engineering / managed-agents / self-hosted-sandboxes / code-slash-commands / fable-5-best-practices)", () => {
-    expect(claude && "children" in claude).toBe(true);
-    const children = claude && "children" in claude ? claude.children : [];
-    expect(children.length).toBe(10);
-  });
-
-  it("uses clean URL paths for all Claude children (no .html extension)", () => {
-    const children = claude && "children" in claude ? claude.children : [];
-    const expectedHrefs = [
-      "/claude/skill",
-      "/claude/agent",
-      "/claude/skill-guide",
-      "/claude/skill-guide-intermediate",
-      "/claude/cowork-guide",
-      "/claude/harness-engineering",
-      "/claude/managed-agents",
-      "/claude/self-hosted-sandboxes",
-      "/claude/code-slash-commands",
-      "/claude/fable-5-best-practices",
-    ];
-    expect(children.map((c) => c.href)).toEqual(expectedHrefs);
-  });
-});
-
-describe("Phase A - MCP dropdown shape", () => {
-  const mcp = navLinks.find((link) => link.name === "MCP");
-
-  it("has 2 child entries (mcp-best-practices / mcp-best-practices-intermediate)", () => {
-    expect(mcp && "children" in mcp).toBe(true);
-    const children = mcp && "children" in mcp ? mcp.children : [];
-    expect(children.length).toBe(2);
-  });
-
-  it("uses clean URL paths for all MCP children (no .html extension)", () => {
-    const children = mcp && "children" in mcp ? mcp.children : [];
-    const expectedHrefs = ["/mcp/mcp-best-practices", "/mcp/mcp-best-practices-intermediate"];
-    expect(children.map((c) => c.href)).toEqual(expectedHrefs);
-  });
-});
-
-describe("Phase A - IDE dropdown shape", () => {
-  const ide = navLinks.find((link) => link.name === "IDE");
-
-  it("has 2 child entries (cursor guide / cursor guide intermediate)", () => {
-    expect(ide && "children" in ide).toBe(true);
-    const children = ide && "children" in ide ? ide.children : [];
-    expect(children.length).toBe(2);
-  });
-
-  it("uses clean URL paths for all IDE children (no .html extension)", () => {
-    const children = ide && "children" in ide ? ide.children : [];
-    const expectedHrefs = ["/cursor/complete-guide", "/cursor/complete-guide-intermediate"];
-    expect(children.map((c) => c.href)).toEqual(expectedHrefs);
-  });
-});
-
-describe("Phase A - Local LLM dropdown shape", () => {
-  const localLlm = navLinks.find((link) => link.name === "Local LLM");
-
-  it("has 2 child entries (self-hosting guide / best practices)", () => {
-    expect(localLlm && "children" in localLlm).toBe(true);
-    const children = localLlm && "children" in localLlm ? localLlm.children : [];
-    expect(children.length).toBe(2);
-  });
-
-  it("uses clean URL paths for all Local LLM children (no .html extension)", () => {
-    const children = localLlm && "children" in localLlm ? localLlm.children : [];
-    const expectedHrefs = ["/local-llm/self-hosting", "/local-llm/best-practices"];
-    expect(children.map((c) => c.href)).toEqual(expectedHrefs);
-  });
-});
-
-describe("Phase A - RAG dropdown shape", () => {
-  const rag = navLinks.find((link) => link.name === "RAG");
-
-  it("has 1 child entry (embeddings-best-practices)", () => {
-    expect(rag && "children" in rag).toBe(true);
-    const children = rag && "children" in rag ? rag.children : [];
-    expect(children.length).toBe(1);
-  });
-
-  it("uses clean URL paths for all RAG children (no .html extension)", () => {
-    const children = rag && "children" in rag ? rag.children : [];
-    const expectedHrefs = ["/rag/embeddings-best-practices"];
-    expect(children.map((c) => c.href)).toEqual(expectedHrefs);
-  });
-});
-
-describe("Phase A - Multimodal dropdown shape", () => {
-  const multimodal = navLinks.find((link) => link.name === "Multimodal");
-
-  it("has 2 child entries (generation-best-practices / image-audio-best-practices-2026)", () => {
-    expect(multimodal && "children" in multimodal).toBe(true);
-    const children = multimodal && "children" in multimodal ? multimodal.children : [];
-    expect(children.length).toBe(2);
-  });
-
-  it("uses clean URL paths for all Multimodal children (no .html extension)", () => {
-    const children = multimodal && "children" in multimodal ? multimodal.children : [];
-    const expectedHrefs = [
-      "/multimodal/generation-best-practices",
-      "/multimodal/image-audio-best-practices-2026",
-    ];
-    expect(children.map((c) => c.href)).toEqual(expectedHrefs);
-  });
-});
-
-describe("Phase A - Zod schema validation", () => {
+describe("nav-links Zod schema validation", () => {
   it("accepts every navLinks entry", () => {
     for (const link of navLinks) {
       expect(() => NavLinkSchema.parse(link)).not.toThrow();
@@ -245,12 +80,12 @@ describe("Phase A - Zod schema validation", () => {
     expect(() => NavLinkSchema.parse({ name: "Orphan" })).toThrow();
   });
 
-  it("does not include an external GitHub URL as a top-level navLinks entry", () => {
-    const flat = navLinks.flatMap((link) =>
-      "children" in link ? link.children.map((c) => c.href) : [link.href]
-    );
-    for (const href of flat) {
-      expect(href.startsWith("http")).toBe(false);
-    }
+  it("rejects a nested subgroup whose leaf has an unsafe href", () => {
+    expect(() =>
+      NavLinkSchema.parse({
+        name: "Providers",
+        children: [{ name: "Evil", children: [{ name: "X", href: "javascript:alert(1)" }] }],
+      })
+    ).toThrow();
   });
 });
