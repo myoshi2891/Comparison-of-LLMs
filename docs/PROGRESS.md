@@ -14,10 +14,11 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（本作業範囲では新規違反 0 件、既知の既存指摘は本件対象外）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **1040 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **1046 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **metadata 欠落 3 ページの SEO 修正**: F-1 のレジストリ初期値採取中に、`/code-review/coderabbit-guide`・`/code-review/sonar-qube`・`/codex/harness-engineering` の 3 ページだけ `export const metadata` を持たず、SEO タイトル・説明が出力されていないことが判明。根因は書き忘れではなく **Client Component 境界の設計差**で、前 2 ページはページ全体が `"use client"` のため Next.js の規約上 page.tsx から metadata を export できない状態だった（他 53 ページは Server Component）。TDD（Red→Green）で対応し、`"use client"` の 2 ページはルート単位の `layout.tsx`（Server Component）から metadata を供給（本体の大規模リファクタは行わない最小差分）、`codex/harness-engineering` は page.tsx へ直接追加。description は `lib/page-registry.ts` の summary と同一文言に統一。Vitest 契約テスト 6 件追加（合計 **1046 テスト合格**）。
 - **鮮度基盤（ページレジストリ + What's New）の導入 — plans/006 Phase 1（F-1 / F-2）**: `web-next/lib/page-registry.ts` を新設し、全 57 ルート（Home + 55 ガイド + What's New）のメタデータ（title / group / provider / topics / summary / addedAt / lastReviewed）を Zod 検証付きの SSoT として集約 🚀。初期値は全フィールドを機械採取（title/group は nav-links、summary は各 page.tsx の metadata.description、日付は git log）。TDD サイクル（Red/Green/Refactor）でコミット分割。派生実装として ① `components/site/PageFreshness.tsx` を `app/layout.tsx` に 1 箇所マウントし、55 個の page.tsx を編集せずに全ページへ「最終確認日 / 公開日」バッジを表示（SiteHeader と同じ `usePathname()` パターン。SSG プリレンダで静的 HTML に焼き込まれることをビルド出力で確認済み）、② `app/whats-new/page.tsx` を registry から静的生成（新着 = addedAt 降順 / 最近更新 = lastReviewed 降順、各上位 12 件）、③ `app/sitemap.ts` のハードコード ROUTES（24 件で実ルート 55 と乖離＝stale）を registry 駆動へ置換し欠落 31 ルートを解消、`lastmod` にビルド日時ではなく `lastReviewed` を出力。ナビはトップレベル 17 → 18 項目（末尾に What's New）。Vitest 契約テスト 44 件追加（合計 **1040 テスト合格**）。
 - **LLM評価・ベンチマーク & オブザーバビリティ ガイドの Next.js 移行**: ルートの `Llm-evaluation-observability-best-practices.html` を `web-next/app/llm-ops/evaluation-observability/page.tsx` に完全移行 🚀。TDD サイクル（Red/Green/Refactor）に沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策（target/rel）、10個の Mermaid 図の中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションに新規カテゴリ「LLMOps -> Evaluation & Observability」を追加し、関連統合テストを 15 ドロップダウン対応に更新。元のHTML・MDファイルはアーカイブディレクトリに退避。Vitest 契約テスト 9 件追加（合計 931 テスト合格）。
 - **Google Stitch 実践ガイドの Next.js 移行**: ルートの `Google-stitch-guide.html` を `web-next/app/google/stitch-guide/page.tsx` に完全移行 🚀。TDD サイクル（Red/Green/Refactor）に沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策（target/rel）、等幅フォント適用、7つの Mermaid 図の中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションの「Google -> Stitch Guide」に新規登録。元のHTML・MDファイルはアーカイブディレクトリに退避。Vitest 契約テスト 9 件追加（合計 922 テスト合格）。
@@ -185,7 +186,7 @@ Next.js 移行完了後のリポジトリ `LLM-Studies` にて、テストカバ
 Next.js 移行完了後のリポジトリ `LLM-Studies` の保守・改善作業を再開してください。
 
 - リポジトリ: LLM-Studies (Next.js 移行プロジェクトは dev/main へ完全マージ済み)
-  - 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (1040/1040 passed) / pytest (38/38 passed) で全 Green
+  - 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (1046/1046 passed) / pytest (38/38 passed) で全 Green
 - リポジトリ規約: CLAUDE.md (編集上の絶対ルール。※Antigravity環境ではビルドは実行禁止)
 
 作業方針：

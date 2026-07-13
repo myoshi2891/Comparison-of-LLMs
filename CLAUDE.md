@@ -187,6 +187,7 @@ Playwright ブラウザバイナリ（`/root/.cache/ms-playwright/`）はバイ�
 
 - **Next.js 16 App Router + SSG**: `output: 'export'` で pure 静的エクスポート → Netlify CDN 配信。`@netlify/plugin-nextjs` 不要。Phase 1–14 でコスト計算機ホームが移行済、Phase A–F で残 18 ガイドページも全移行完了（計画書は `docs/archive/` に保存）。さらに `/google/agent-harness-engineering` や `/google/adk-best-practices`、`/google/stitch-guide`、`/claude/managed-agents`、`/claude/self-hosted-sandboxes`、`/claude/code-slash-commands`、`/claude/fable-5-best-practices`、`/claude/skills-sh`、`/code-review/coderabbit-guide`、`/code-review/copilot-code-review`、`/code-review/sonar-qube`、`/code-review/tool-pricing`、`/agent/hermes-agent-advanced-guide`、`/agent/skills`、`/security/ai-security-best-practices`、/local-llm/best-practices、/ci-cd/ai-cicd-automation-best-practices、/agent/context-engineering-best-practices、/multimodal/image-audio-best-practices-2026、/llm-ops/evaluation-observability ページを追加
 - **ページレジストリ（`web-next/lib/page-registry.ts`）が全ページメタデータの SSoT**: 鮮度表示（`PageFreshness`）・What's New（`/whats-new`）・`sitemap.ts` はすべて registry から導出する。属性を nav-links や各 page.tsx に複製しない（複製した結果 sitemap が 24/55 ルートで腐った経緯がある）。**新規ページを追加したら registry への登録が必須** — `web-next/tests/page-registry-coverage.test.ts` が登録漏れ・幽霊エントリを機械検知する。`lastReviewed`（最終確認日）は月次更新で当日日付へ書き戻す（`.claude/skills/monthly-update/`）
+- **page.tsx は Server Component に保つ（metadata の前提）**: Next.js の規約により `"use client"` なファイルは `export const metadata` を持てない。スクロール監視等のクライアント処理は `TocObserver.tsx` 等へ切り出し、page.tsx 自体は Server Component に保つこと。已に全体が `"use client"` になっている `/code-review/coderabbit-guide` と `/code-review/sonar-qube` は、例外的にルート単位の `layout.tsx` から metadata を供給している
 - **3層フォールバック**: スクレイパーは「スクレイプ成功 → 既存 JSON の値 → ハードコードフォールバック」の順で価格を決定。`scrape_status` フィールド (`success` | `fallback` | `manual`) で出自を追跡
 - **型の同期**: `scraper/src/scraper/models.py` (Pydantic) が SSoT、`web-next/types/pricing.ts` (TypeScript) が手動ミラー、`web-next/lib/pricing.ts` の `_AssertParity` でコンパイル時検証。**片方を変更したら必ずもう片方も更新すること**
 - **JA/EN バイリンガル**: `web-next/lib/i18n.tsx` で全テキストを管理（`T` オブジェクト + `t()` / `tRich()` の React 要素ファクトリ）。各スクレイパーも `sub_ja` / `sub_en` や `note_ja` / `note_en` のペアで日英テキストを持つ。ガイドページ（Phase B–E）は当面 JA 固定
@@ -265,7 +266,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が成功（実測 1040 件合格を確認）
+2. `cd web-next && bun run test` が成功（実測 1046 件合格を確認）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功（既知の違反件数は CI または進捗ドキュメントを参照、新規違反がないこと）
 5. `cd scraper && uv run pytest` が成功
