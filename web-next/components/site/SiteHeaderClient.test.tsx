@@ -214,9 +214,9 @@ describe("F-4' - SiteHeaderClient nested sub-dropdown", () => {
     fireEvent.click(sub);
 
     expect(parent.getAttribute("aria-expanded")).toBe("true");
-    expect(
-      container.querySelector("li.ch-dropdown")?.className.includes("ch-dropdown-open")
-    ).toBe(true);
+    expect(container.querySelector("li.ch-dropdown")?.className.includes("ch-dropdown-open")).toBe(
+      true
+    );
   });
 
   it("closes sibling sub-dropdowns when another sub-dropdown opens", () => {
