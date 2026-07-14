@@ -22,6 +22,7 @@
 | [006](006-platform-roadmap-v2.md) | プラットフォーム拡張ロードマップ v2 | direction | 004, 005 | DONE（方向性定義完了） |
 | 007 | Phase 1 鮮度基盤（F-1 ページレジストリ + F-2 What's New） | build | 006 | **DONE**（2026-07-13 実装完了。下記「Phase 1 実装結果」参照） |
 | [008](008-nav-regrouping-f4.md) | Phase 2 F-4' ナビ再グルーピング（18 → 7 項目・registry からの導出） | build | 006, 007 | **DONE**（2026-07-14 実装完了。下記「Phase 2 実装結果」参照） |
+| [009](009-phase3-cross-navigation.md) | Phase 3 横断導線（F-3' RSS / F-7 関連リンク / F-5 タグ・横断検索） | build | 006, 008 | **IN PROGRESS**（2026-07-14 着手） |
 
 Status 値: TODO / IN PROGRESS / DONE / BLOCKED（理由 1 行） / REJECTED（理由 1 行） / STALE（置換先を明記）
 
