@@ -22,7 +22,7 @@
 | [006](006-platform-roadmap-v2.md) | プラットフォーム拡張ロードマップ v2 | direction | 004, 005 | DONE（方向性定義完了） |
 | 007 | Phase 1 鮮度基盤（F-1 ページレジストリ + F-2 What's New） | build | 006 | **DONE**（2026-07-13 実装完了。下記「Phase 1 実装結果」参照） |
 | [008](008-nav-regrouping-f4.md) | Phase 2 F-4' ナビ再グルーピング（18 → 7 項目・registry からの導出） | build | 006, 007 | **DONE**（2026-07-14 実装完了。下記「Phase 2 実装結果」参照） |
-| [009](009-phase3-cross-navigation.md) | Phase 3 横断導線（F-3' RSS / F-7 関連リンク / F-5 タグ・横断検索） | build | 006, 008 | **IN PROGRESS**（2026-07-14 着手） |
+| [009](009-phase3-cross-navigation.md) | Phase 3 横断導線（F-3' RSS / F-7 関連リンク / F-5 タグ・横断検索） | build | 006, 008 | **DONE**（2026-07-14 実装完了。下記「Phase 3 実装結果」参照） |
 
 Status 値: TODO / IN PROGRESS / DONE / BLOCKED（理由 1 行） / REJECTED（理由 1 行） / STALE（置換先を明記）
 
@@ -55,8 +55,24 @@ Status 値: TODO / IN PROGRESS / DONE / BLOCKED（理由 1 行） / REJECTED（�
 - URL は不変（006 §2.1 の C 案）。`app/**/page.tsx` と `netlify.toml` は未編集
 - テスト 1064 件 全 Green
 
-**次は Phase 3（横断導線: F-3' RSS / F-5 タグ・横断検索 / F-7 関連ページリンク）**、
-または Phase 4 コンテンツ（C-10 オーケストレーション / C-11 SDD）。
+## Phase 3 実装結果（2026-07-14）
+
+006 §3 の Phase 3（F-3' / F-7 / F-5）を [009](009-phase3-cross-navigation.md) として実装済み。
+003 §1 が挙げた 3 差分のうち最後まで残っていた「横断導線がない」を解消し、
+**RSS（購読）・関連リンク（回遊）・検索（直接到達）** の 3 導線をすべて page-registry からの導出で追加した。
+
+- `web-next/app/rss.xml/route.ts`（新規）— Route Handler + `force-static` で `out/rss.xml` を静的生成。
+  addedAt 降順 20 件。`escapeXml` は純粋関数として export しユニットテスト
+- `web-next/lib/related-pages.ts` + `components/site/RelatedPages.tsx`（新規）— topics の共有数でスコアし、
+  同一 group → addedAt 降順 → slug 昇順の 4 段タイブレークで順序を一意化。共有 0 件は除外（無関係なリンクを出さない）。
+  `layout.tsx` に 1 箇所マウントし 55 ページの page.tsx は未編集
+- `web-next/lib/search.ts` + `app/search/`（新規）— **外部依存を追加しない自前検索**。NFKC 正規化 + 全トークン AND。
+  タグは `/tags/[tag]` を作らず `/search` に集約し、`?q=` / `?tag=` で状態を共有
+- `web-next/lib/nav-taxonomy.ts` — 「検索」をフラットリンクとして What's New の直前に追加（トップレベル 7 → 8）
+- registry は 58 エントリ。全単射テストが 58 件で Green
+- テスト 1106 件 全 Green（契約テスト 42 件追加）
+
+**次は Phase 4 コンテンツ（C-10 オーケストレーション / C-11 SDD）**、または F-6（EN 展開）の要否判断。
 
 ## 依存関係
 
@@ -70,8 +86,8 @@ Status 値: TODO / IN PROGRESS / DONE / BLOCKED（理由 1 行） / REJECTED（�
 1. ~~`plan F-1 ページレジストリと最終確認日表示の導入`~~ → **DONE**（2026-07-13）
 2. ~~`plan F-2 What's New ページの静的生成 + monthly-update との lastReviewed 接続`~~ → **DONE**（2026-07-13）
 3. ~~`plan F-4' ナビ再グルーピング`~~ → **DONE**（2026-07-14 / [008](008-nav-regrouping-f4.md)。実測 18 → 7 項目）
-4. `plan F-3' RSS フィード（registry から生成）` — Phase 3。Effort S / Risk LOW で着手しやすい
-5. `plan F-7 関連ページリンク（registry の topics 近接から導出）` — Phase 3。openclaw のような横断的ページの発見性はここで解決する
+4. ~~`plan F-3' RSS フィード（registry から生成）`~~ → **DONE**（2026-07-14 / [009](009-phase3-cross-navigation.md)）
+5. ~~`plan F-7 関連ページリンク（registry の topics 近接から導出）`~~ → **DONE**（2026-07-14 / [009](009-phase3-cross-navigation.md)。F-5 横断検索も同プランで完了）
 6. Phase 4 コンテンツ（C-10 オーケストレーション / C-11 SDD）は Phase 1 完了済みのため着手可能
 
 ## 検討済み・不採用（re-audit 防止）

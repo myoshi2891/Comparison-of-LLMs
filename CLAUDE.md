@@ -25,17 +25,21 @@ update.sh  ← オーケストレーター (scrape → copy)
 │   │   ├── layout.tsx           ルートレイアウト (SiteHeader/DisclaimerBanner/PageFreshness マウント済み)
 │   │   ├── page.tsx             コスト計算機ホーム (Server Component + Zod 検証 → HomePage へ委譲)
 │   │   ├── sitemap.ts           page-registry から全ルートを導出 (lastmod = lastReviewed)
+│   │   ├── rss.xml/route.ts     RSS 2.0 フィード (F-3'。force-static で out/rss.xml を静的生成)
+│   │   ├── search/              横断検索 (F-5。自前実装。?q= / ?tag= で状態共有)
 │   │   ├── whats-new/           What's New (新着 / 最近更新を page-registry から静的生成)
 │   │   ├── globals.css          Tailwind v4 + legacy design tokens (227 行)
 │   │   └── {claude,google,codex,copilot}/{skill,agent}/ および /google/agent-harness-engineering/、/google/notebook-lm/、/google/adk-best-practices/、/google/stitch-guide/、/claude/managed-agents/、/claude/self-hosted-sandboxes/、/claude/code-slash-commands/、/claude/fable-5-best-practices/、/claude/skills-sh/、/mcp/mcp-best-practices/、/mcp/mcp-best-practices-intermediate/、/code-review/coderabbit-guide/、/code-review/copilot-code-review/、/code-review/sonar-qube/、/code-review/tool-pricing/、/agent/hermes-agent-advanced-guide/、/agent/loop-engineering/、/agent/skills/、/vercel/sandbox/、/cursor/complete-guide/、/cursor/complete-guide-intermediate/、/security/ai-security-best-practices/、/security/ai-security-best-practices-intermediate/、/local-llm/self-hosting/、/local-llm/best-practices/、/ci-cd/ai-cicd-automation-best-practices/、/agent/context-engineering-best-practices/、/rag/embeddings-best-practices/、/multimodal/generation-best-practices/、/multimodal/image-audio-best-practices-2026/、/llm-ops/evaluation-observability/   Phase B–C および追加移行済みルート（詳細は [`docs/archive/MIGRATION_PROGRESS.md`](docs/archive/MIGRATION_PROGRESS.md)）
 │   ├── components/
 │   │   ├── HomePage.tsx         Client Component (Phase 10)
 │   │   ├── ApiTable.tsx / SubTable.tsx / Hero.tsx / ...   (Phase 8-10 成果物)
-│   │   └── site/                Phase A 共通インフラ（追加済み） (SiteHeader, DisclaimerBanner, PageFreshness, nav-links)
+│   │   └── site/                Phase A 共通インフラ（追加済み） (SiteHeader, DisclaimerBanner, PageFreshness, RelatedPages, nav-links)
 │   │       └── nav-links.ts     page-registry からナビ木を導出 (buildNavLinks / 手書き禁止)
 │   ├── lib/
-│   │   ├── page-registry.ts     全ページのメタデータ SSoT (Zod / 鮮度表示・What's New・sitemap・ナビ の導出元)
+│   │   ├── page-registry.ts     全ページのメタデータ SSoT (Zod / 鮮度表示・What's New・sitemap・ナビ・RSS・検索・関連リンク の導出元)
 │   │   ├── nav-taxonomy.ts      ナビのグループ順・ネスト対象の SSoT (NAV_GROUPS / CATEGORY_ORDER)
+│   │   ├── search.ts            横断検索の純粋関数 (F-5。searchEntries / allTopics)
+│   │   ├── related-pages.ts     関連ページの導出 (F-7。topics 共有数 + 決定論的タイブレーク)
 │   │   ├── cost.ts              純粋関数 (calcApiCost / calcSubCost / colorIndex / fmtUSD / fmtJPY)
 │   │   ├── pricing.ts           Zod スキーマ + コンパイル時パリティアサート
 │   │   ├── i18n.tsx             T オブジェクト + t() + tRich() (React 要素ファクトリ)
@@ -188,8 +192,9 @@ Playwright ブラウザバイナリ（`/root/.cache/ms-playwright/`）はバイ�
 ## 重要な設計判断
 
 - **Next.js 16 App Router + SSG**: `output: 'export'` で pure 静的エクスポート → Netlify CDN 配信。`@netlify/plugin-nextjs` 不要。Phase 1–14 でコスト計算機ホームが移行済、Phase A–F で残 18 ガイドページも全移行完了（計画書は `docs/archive/` に保存）。さらに `/google/agent-harness-engineering` や `/google/adk-best-practices`、`/google/stitch-guide`、`/claude/managed-agents`、`/claude/self-hosted-sandboxes`、`/claude/code-slash-commands`、`/claude/fable-5-best-practices`、`/claude/skills-sh`、`/code-review/coderabbit-guide`、`/code-review/copilot-code-review`、`/code-review/sonar-qube`、`/code-review/tool-pricing`、`/agent/hermes-agent-advanced-guide`、`/agent/skills`、`/security/ai-security-best-practices`、/local-llm/best-practices、/ci-cd/ai-cicd-automation-best-practices、/agent/context-engineering-best-practices、/multimodal/image-audio-best-practices-2026、/llm-ops/evaluation-observability ページを追加
-- **ページレジストリ（`web-next/lib/page-registry.ts`）が全ページメタデータの SSoT**: 鮮度表示（`PageFreshness`）・What's New（`/whats-new`）・`sitemap.ts`・**ナビゲーション** はすべて registry から導出する。属性を各 page.tsx に複製しない（複製した結果 sitemap が 24/55 ルートで腐った経緯がある）。**新規ページを追加したら registry への登録が必須** — 登録すればナビにも自動的に載る。`web-next/tests/page-registry-coverage.test.ts` が登録漏れ・幽霊エントリを、`web-next/tests/nav-derivation.test.ts` が registry ⇔ ナビの全単射を機械検知する。`lastReviewed`（最終確認日）は月次更新で当日日付へ書き戻す（`.claude/skills/monthly-update/`）
-- **ナビは registry からの導出。`nav-links.ts` への直書きは禁止**（F-4' / `plans/008-nav-regrouping-f4.md`, 2026-07-14）: `web-next/components/site/nav-links.ts` は `buildNavLinks(pageRegistry)` の結果であり、手書きのリンクデータを持たない（以前は 170 行の手書きデータで registry と二重管理になっていた）。トップレベルは 7 グループ（Home / Providers / Agent 開発 / 開発プロセス / 運用・品質 / モデル・データ / What's New）で、**2 段ネストするのは Providers のみ**。グループの並び順とネスト対象は `web-next/lib/nav-taxonomy.ts` が持つ（registry のエントリは slug 昇順のため表示順を表現できない）。ドロップダウン内のリーフは `addedAt` 昇順 → `slug` 昇順。未知の `group` や Providers の `category` 欠落はビルド時に throw する（silent drop でページがナビから消えるのを防ぐため）
+- **ページレジストリ（`web-next/lib/page-registry.ts`）が全ページメタデータの SSoT**: 鮮度表示（`PageFreshness`）・What's New（`/whats-new`）・`sitemap.ts`・**ナビゲーション**・**RSS（`/rss.xml`）**・**横断検索（`/search`）**・**関連ページリンク（`RelatedPages`）** はすべて registry から導出する。属性を各 page.tsx に複製しない（複製した結果 sitemap が 24/55 ルートで腐った経緯がある）。**新規ページを追加したら registry への登録が必須** — 登録すればナビにも自動的に載る。`web-next/tests/page-registry-coverage.test.ts` が登録漏れ・幽霊エントリを、`web-next/tests/nav-derivation.test.ts` が registry ⇔ ナビの全単射を機械検知する。`lastReviewed`（最終確認日）は月次更新で当日日付へ書き戻す（`.claude/skills/monthly-update/`）
+- **ナビは registry からの導出。`nav-links.ts` への直書きは禁止**（F-4' / `plans/008-nav-regrouping-f4.md`, 2026-07-14）: `web-next/components/site/nav-links.ts` は `buildNavLinks(pageRegistry)` の結果であり、手書きのリンクデータを持たない（以前は 170 行の手書きデータで registry と二重管理になっていた）。トップレベルは 8 グループ（Home / Providers / Agent 開発 / 開発プロセス / 運用・品質 / モデル・データ / 検索 / What's New。F-5 で「検索」を追加）で、**2 段ネストするのは Providers のみ**。グループの並び順とネスト対象は `web-next/lib/nav-taxonomy.ts` が持つ（registry のエントリは slug 昇順のため表示順を表現できない）。ドロップダウン内のリーフは `addedAt` 昇順 → `slug` 昇順。未知の `group` や Providers の `category` 欠落はビルド時に throw する（silent drop でページがナビから消えるのを防ぐため）
+- **横断導線（RSS / 検索 / 関連リンク）は registry からの導出**（F-3' / F-5 / F-7 / `plans/009-phase3-cross-navigation.md`, 2026-07-14）: ① **検索は自前実装で外部ライブラリを追加しない**（`web-next/lib/search.ts`）。58 ページの title/summary/topics は数十 KB であり全件走査の部分一致で十分。NFKC 正規化 + 空白区切り全トークンの AND 一致。② **タグ導線は `/search` 1 ページに集約**し `/tags/[tag]` の静的ページ群は作らない（1〜2 ページしか持たないタグで薄いページが量産されるため）。状態は `?q=` / `?tag=` の URL クエリで共有する。③ **関連リンクのスコアは決定論的**（`web-next/lib/related-pages.ts`）— 共有 topics 数 降順 → 同一 group 優先 → `addedAt` 降順 → `slug` 昇順。順序が一意でないと無関係なページ追加で全ページの関連リンクが揺れ、SSG 出力が不安定になる。④ RSS は Route Handler + `dynamic = "force-static"` で `output: 'export'` 下でも `out/rss.xml` として静的生成される
 - **page.tsx は Server Component に保つ（metadata の前提）**: Next.js の規約により `"use client"` なファイルは `export const metadata` を持てない。スクロール監視等のクライアント処理は `TocObserver.tsx` 等へ切り出し、page.tsx 自体は Server Component に保つこと。已に全体が `"use client"` になっている `/code-review/coderabbit-guide` と `/code-review/sonar-qube` は、例外的にルート単位の `layout.tsx` から metadata を供給している
 - **3層フォールバック**: スクレイパーは「スクレイプ成功 → 既存 JSON の値 → ハードコードフォールバック」の順で価格を決定。`scrape_status` フィールド (`success` | `fallback` | `manual`) で出自を追跡
 - **型の同期**: `scraper/src/scraper/models.py` (Pydantic) が SSoT、`web-next/types/pricing.ts` (TypeScript) が手動ミラー、`web-next/lib/pricing.ts` の `_AssertParity` でコンパイル時検証。**片方を変更したら必ずもう片方も更新すること**
@@ -269,7 +274,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が成功（実測 1064 件合格を確認）
+2. `cd web-next && bun run test` が成功（実測 1106 件合格を確認）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功（既知の違反件数は CI または進捗ドキュメントを参照、新規違反がないこと）
 5. `cd scraper && uv run pytest` が成功
