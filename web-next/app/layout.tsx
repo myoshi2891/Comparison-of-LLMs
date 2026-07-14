@@ -1,5 +1,6 @@
 import { DisclaimerBanner } from "@/components/site/DisclaimerBanner";
 import { PageFreshness } from "@/components/site/PageFreshness";
+import { RelatedPages } from "@/components/site/RelatedPages";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { jetbrainsMono, notoSansJp, syne } from "@/lib/fonts";
 import "./globals.css";
@@ -24,6 +25,7 @@ export default function RootLayout({
         <DisclaimerBanner />
         <PageFreshness />
         {children}
+        <RelatedPages />
       </body>
     </html>
   );
