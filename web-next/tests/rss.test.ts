@@ -5,14 +5,12 @@
  * ここでは XML の構造・件数上限・エスケープ・並び順（addedAt 降順）を固定する。
  */
 import { describe, expect, it } from "vitest";
-import { GET, MAX_ITEMS, escapeXml } from "@/app/rss.xml/route";
+import { escapeXml, GET, MAX_ITEMS } from "@/app/rss.xml/route";
 import { byAddedAtDesc } from "@/lib/page-registry";
 
 describe("F-3' - escapeXml", () => {
   it("XML の予約 5 文字をすべてエスケープする", () => {
-    expect(escapeXml(`a & b < c > d " e ' f`)).toBe(
-      "a &amp; b &lt; c &gt; d &quot; e &apos; f"
-    );
+    expect(escapeXml(`a & b < c > d " e ' f`)).toBe("a &amp; b &lt; c &gt; d &quot; e &apos; f");
   });
 
   it("& を二重エスケープしない（先に & を置換する順序であること）", () => {
