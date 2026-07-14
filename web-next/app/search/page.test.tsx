@@ -5,10 +5,18 @@
  * ここでは検索の意味論（AND・大小無視・NFKC・タグ絞り込み）とページ契約を固定する。
  */
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { type PageEntry, pageRegistry } from "@/lib/page-registry";
 import { allTopics, searchEntries } from "@/lib/search";
 import SearchPage, { metadata } from "./page";
+
+// App Router のフックは jsdom にルーターが無いと invariant で落ちるため最小モックを与える。
+// 検証対象は「registry からの導出」であってルーターの実挙動ではない。
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ replace: vi.fn() }),
+  usePathname: () => "/search",
+  useSearchParams: () => new URLSearchParams(),
+}));
 
 const entry = (over: Partial<PageEntry>): PageEntry => ({
   slug: "/x",

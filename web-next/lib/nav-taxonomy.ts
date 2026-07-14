@@ -20,13 +20,14 @@ export const NAV_GROUPS = [
   "開発プロセス",
   "運用・品質",
   "モデル・データ",
+  "検索",
   "What's New",
 ] as const;
 
 export type NavGroup = (typeof NAV_GROUPS)[number];
 
 /** ドロップダウンを作らず単独リンクにするグループ（それぞれ 1 ページしか持たない）。 */
-export const FLAT_GROUPS = ["Home", "What's New"] as const satisfies readonly NavGroup[];
+export const FLAT_GROUPS = ["Home", "検索", "What's New"] as const satisfies readonly NavGroup[];
 
 /** 2 段ネスト（グループ → カテゴリ → ページ）するグループ。 */
 export const NESTED_GROUPS = ["Providers"] as const satisfies readonly NavGroup[];

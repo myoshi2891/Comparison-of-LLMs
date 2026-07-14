@@ -648,6 +648,17 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-12",
   },
   {
+    slug: "/search",
+    title: "検索",
+    group: "検索",
+    // topics を空にするのは意図的。検索ページ自身が検索結果や関連リンクに出ると導線が濁る。
+    topics: [],
+    summary:
+      "全ガイドをキーワードとトピックタグで横断検索するページ。検索インデックスはページレジストリからビルド時に生成する。",
+    addedAt: "2026-07-14",
+    lastReviewed: "2026-07-14",
+  },
+  {
     slug: "/security/ai-security-best-practices",
     title: "AI Security Best Practices",
     group: "運用・品質",
