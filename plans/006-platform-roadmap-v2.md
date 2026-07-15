@@ -114,7 +114,7 @@ Phase 4: コンテンツ拡張（005 の採用分 — Phase 1 完了後に着手
   C-10 マルチエージェントオーケストレーション 2 ページ（GAP-10, High）
   C-11 仕様駆動開発 SDD 1〜2 ページ（GAP-11, High）
   C-12 AI ガバナンス 1 ページ — Security 深化（GAP-12, Mid）
-  C-13 ファインチューニング 1 ページ — Local LLM 深化（GAP-13, Low〜Mid）
+  C-13 ファインチューニング 1 ページ — Local LLM 深化（GAP-13, Low〜Mid） **DONE**（2026-07-16、`/local-llm/finetuning-best-practices`）
   （GAP-14 音声・リアルタイムは新ページなし — Multimodal 既存ページへの追記で対応）
 
 Phase 5（任意・ユーザー判断待ち）:

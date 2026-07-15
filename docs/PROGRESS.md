@@ -1,7 +1,7 @@
 # プロジェクト進捗・ステータス (PROGRESS.md)
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
-> - 最終更新日: **Updated 2026-07-14**
+> - 最終更新日: **Updated 2026-07-16**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -14,10 +14,11 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（本作業範囲では新規違反 0 件、既知の既存指摘は本件対象外）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **1106 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **1112 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **LLMファインチューニング ベストプラクティスガイドの Next.js 移行**: `Finetuning-best-practices-guide.html` を `/local-llm/finetuning-best-practices` へ移行。原文の全17セクション・12表・5コードブロック・9 Mermaid図・99外部リンクを React 要素として faithful に保持し、TOC のスクロール追従、外部リンクの安全属性、ページレジストリ登録を追加。原本は `archive/` に退避。TDD の Red / Green / Refactor を分割し、契約テスト6件を追加（合計 **1112 テスト合格**）。
 - **横断導線（RSS / 関連ページリンク / 横断検索）— plans/006 Phase 3（F-3' / F-7 / F-5、[plans/009](../plans/009-phase3-cross-navigation.md)）**: 58 ルートに達し「読者が目的のガイドへナビのドロップダウン経由でしか到達できない」状態を解消 🚀。3 導線すべてを `page-registry.ts` からの導出で追加した（手書きのフィード・関連リンク表・検索インデックスを一切持たない）。ナビは `nav-taxonomy.ts` の `NAV_GROUPS` に「検索」をフラットリンクとして What's New の直前へ挿入し、トップレベル 7 → 8 グループへ。TDD サイクル（Red/Green/Refactor/Docs Sync）でコミット分割。Vitest 契約テスト 42 件追加（合計 **1106 テスト合格**）。
   - **F-3' RSS**: `app/rss.xml/route.ts` を Route Handler + `dynamic = "force-static"` で実装し、`output: 'export'` 下でも `out/rss.xml` として静的生成（addedAt 降順 20 件）。XML 予約 5 文字のエスケープは純粋関数 `escapeXml` に切り出してユニットテスト。`lib/metadata.ts` の `alternates.types` に自動発見リンクを追加。
   - **F-7 関連ページリンク**: `lib/related-pages.ts` が topics の共有数からスコアし、「共有 topics 数 降順 → 同一 group 優先 → addedAt 降順 → slug 昇順」の 4 段タイブレークで順序を一意に決める（決定論的でないと無関係なページ追加で全ページの関連リンクが揺れ SSG 出力が不安定になる）。共有 0 件は除外し、無関係なリンクを出さない。`RelatedPages.tsx` は PageFreshness と同じく `app/layout.tsx` に 1 箇所マウントし、55 個の page.tsx を未編集のまま全ページへ関連 3 件を表示。
@@ -191,7 +192,7 @@ Next.js 移行完了後のリポジトリ `LLM-Studies` にて、テストカバ
 Next.js 移行完了後のリポジトリ `LLM-Studies` の保守・改善作業を再開してください。
 
 - リポジトリ: LLM-Studies (Next.js 移行プロジェクトは dev/main へ完全マージ済み)
-  - 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (1106/1106 passed) / pytest (38/38 passed) で全 Green
+  - 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (1112/1112 passed) / pytest (38/38 passed) で全 Green
 - リポジトリ規約: CLAUDE.md (編集上の絶対ルール。※Antigravity環境ではビルドは実行禁止)
 
 作業方針：

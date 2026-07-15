@@ -69,10 +69,10 @@ Status 値: TODO / IN PROGRESS / DONE / BLOCKED（理由 1 行） / REJECTED（�
 - `web-next/lib/search.ts` + `app/search/`（新規）— **外部依存を追加しない自前検索**。NFKC 正規化 + 全トークン AND。
   タグは `/tags/[tag]` を作らず `/search` に集約し、`?q=` / `?tag=` で状態を共有
 - `web-next/lib/nav-taxonomy.ts` — 「検索」をフラットリンクとして What's New の直前に追加（トップレベル 7 → 8）
-- registry は 58 エントリ。全単射テストが 58 件で Green
-- テスト 1106 件 全 Green（契約テスト 42 件追加）
+- registry は 59 エントリ。全単射テストが 59 件で Green
+- テスト 1112 件 全 Green（ファインチューニングガイドの契約テスト6件を追加）
 
-**次は Phase 4 コンテンツ（C-10 オーケストレーション / C-11 SDD）**、または F-6（EN 展開）の要否判断。
+**次は Phase 4 コンテンツ（C-10 オーケストレーション / C-11 SDD / C-12 AIガバナンス）**、または F-6（EN 展開）の要否判断。
 
 ## 依存関係
 
@@ -88,7 +88,7 @@ Status 値: TODO / IN PROGRESS / DONE / BLOCKED（理由 1 行） / REJECTED（�
 3. ~~`plan F-4' ナビ再グルーピング`~~ → **DONE**（2026-07-14 / [008](008-nav-regrouping-f4.md)。実測 18 → 7 項目）
 4. ~~`plan F-3' RSS フィード（registry から生成）`~~ → **DONE**（2026-07-14 / [009](009-phase3-cross-navigation.md)）
 5. ~~`plan F-7 関連ページリンク（registry の topics 近接から導出）`~~ → **DONE**（2026-07-14 / [009](009-phase3-cross-navigation.md)。F-5 横断検索も同プランで完了）
-6. Phase 4 コンテンツ（C-10 オーケストレーション / C-11 SDD）は Phase 1 完了済みのため着手可能
+6. Phase 4 コンテンツ（C-10 オーケストレーション / C-11 SDD / C-12 AIガバナンス）は Phase 1 完了済みのため着手可能。C-13 ファインチューニングは **DONE**（2026-07-16）
 
 ## 検討済み・不採用（re-audit 防止）
 
