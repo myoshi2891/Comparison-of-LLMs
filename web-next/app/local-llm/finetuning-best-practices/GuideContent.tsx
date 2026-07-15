@@ -18,6 +18,14 @@ const $ = load(sourceHtml);
 const layout = $(".layout").first().get(0) as unknown as HtmlNode;
 const sourceCss = $("style").first().text().replaceAll(":root", ".fineTuningGuide");
 const VOID_ELEMENTS = new Set(["br", "hr", "img", "input", "meta", "link"]);
+const TABLE_CONTENT_ELEMENTS = new Set(["table", "thead", "tbody", "tfoot", "tr"]);
+
+function isMermaidNode(node: HtmlNode, className: string): boolean {
+  return (
+    (node.name === "pre" && className.includes("mermaid-source")) ||
+    (node.name === "div" && className.split(" ").includes("mermaid"))
+  );
+}
 
 function textContent(node: HtmlNode): string {
   if (node.type === "text") return node.data ?? "";
@@ -46,10 +54,7 @@ function propsFor(node: HtmlNode): Record<string, string> {
 
 function renderNode(node: HtmlNode, key: string, parentName?: string): ReactNode {
   if (node.type === "text") {
-    if (
-      ["table", "thead", "tbody", "tfoot", "tr"].includes(parentName ?? "") &&
-      !node.data?.trim()
-    ) {
+    if (TABLE_CONTENT_ELEMENTS.has(parentName ?? "") && !node.data?.trim()) {
       return null;
     }
     return node.data;
@@ -58,10 +63,7 @@ function renderNode(node: HtmlNode, key: string, parentName?: string): ReactNode
   if (["script", "style"].includes(node.name)) return null;
 
   const className = node.attribs?.class ?? "";
-  if (
-    (node.name === "pre" && className.includes("mermaid-source")) ||
-    (node.name === "div" && className.split(" ").includes("mermaid"))
-  ) {
+  if (isMermaidNode(node, className)) {
     return <MermaidDiagram chart={textContent(node).trim()} key={key} theme="dark" />;
   }
 
