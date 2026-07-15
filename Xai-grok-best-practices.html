@@ -153,6 +153,27 @@
         padding: 56px 64px 120px 64px;
       }
 
+      @media (max-width: 720px) {
+        body {
+          display: block;
+        }
+        .sidebar {
+          width: 100%;
+          height: auto;
+          position: static;
+          border-right: none;
+          border-bottom: 1px solid var(--color-border-tertiary);
+        }
+        .main {
+          padding: 32px 20px 64px;
+        }
+        .main table {
+          display: block;
+          max-width: 100%;
+          overflow-x: auto;
+        }
+      }
+
       .page-header {
         padding-bottom: 32px;
         margin-bottom: 40px;
@@ -666,25 +687,25 @@
         </p>
 
         <div class="mermaid-wrap">
-          <pre class="mermaid">
+          <div class="mermaid">
 flowchart TD
-    A["xAIアカウント作成<br/>accounts.x.ai"] --> B["APIキー発行<br/>console.x.ai"]
-    B --> C["クレジットのチャージ"]
-    C --> D["SDKのインストール<br/>xai-sdk / openai"]
-    D --> E["最初のリクエスト送信"]
-    E --> F{"用途に応じて<br/>機能を追加"}
-    F --> G["Reasoning<br/>推論効果の調整"]
-    F --> H["Function Calling<br/>外部ツール連携"]
-    F --> I["Structured Outputs<br/>構造化データ抽出"]
-    F --> J["Web/X Search<br/>リアルタイム情報取得"]
-    G --> K["本番運用の最適化"]
-    H --> K
-    I --> K
-    J --> K
-    K --> L["Prompt Caching<br/>コスト・遅延の削減"]
-    K --> M["Rate Limit 対策<br/>リトライ設計"]
-    K --> N["セキュリティ設定<br/>鍵管理・ZDR"]
-      </pre>
+A["xAIアカウント作成<br/>accounts.x.ai"] --> B["APIキー発行<br/>console.x.ai"]
+B --> C["クレジットのチャージ"]
+C --> D["SDKのインストール<br/>xai-sdk / openai"]
+D --> E["最初のリクエスト送信"]
+E --> F{"用途に応じて<br/>機能を追加"}
+F --> G["Reasoning<br/>推論効果の調整"]
+F --> H["Function Calling<br/>外部ツール連携"]
+F --> I["Structured Outputs<br/>構造化データ抽出"]
+F --> J["Web/X Search<br/>リアルタイム情報取得"]
+G --> K["本番運用の最適化"]
+H --> K
+I --> K
+J --> K
+K --> L["Prompt Caching<br/>コスト・遅延の削減"]
+K --> M["Rate Limit 対策<br/>リトライ設計"]
+K --> N["セキュリティ設定<br/>鍵管理・ZDR"]
+</div>
         </div>
         <div class="source-note">
           <i class="ti ti-external-link"></i>出典:
@@ -1001,17 +1022,16 @@ print(response.output_text)</code></pre>
 
         <h3>4.2 選択フローチャート</h3>
         <div class="mermaid-wrap">
-          <pre class="mermaid">
+          <div class="mermaid">
 flowchart TD
-    Start["タスクの性質を確認"] --> Q1{"レイテンシが最優先か"}
-    Q1 -- はい --> Low["reasoning_effort = low"]
-    Q1 -- いいえ --> Q2{"複雑なデータ分析\n長文コンテキストか"}
-    Q2 -- はい --> Med["reasoning_effort = medium"]
-    Q2 -- いいえ --> Q3{"数学の証明\n多段階ロジック\n競技レベルの難問か"}
-    Q3 -- はい --> High["reasoning_effort = high（デフォルト）"]
-    Q3 -- いいえ --> Med
-      </pre
-          >
+Start["タスクの性質を確認"] --> Q1{"レイテンシが最優先か"}
+Q1 -- はい --> Low["reasoning_effort = low"]
+Q1 -- いいえ --> Q2{"複雑なデータ分析\n長文コンテキストか"}
+Q2 -- はい --> Med["reasoning_effort = medium"]
+Q2 -- いいえ --> Q3{"数学の証明\n多段階ロジック\n競技レベルの難問か"}
+Q3 -- はい --> High["reasoning_effort = high（デフォルト）"]
+Q3 -- いいえ --> Med
+</div>
         </div>
 
         <h3>4.3 コード例</h3>
@@ -1081,17 +1101,16 @@ print(response.content)</code></pre>
 
         <h3>5.1 動作の流れ</h3>
         <div class="mermaid-wrap">
-          <pre class="mermaid">
+          <div class="mermaid">
 sequenceDiagram
-    participant Dev as 開発者アプリ
-    participant Grok as Grokモデル
-    Dev->>Grok: ツール定義付きのユーザークエリを送信
-    Grok-->>Dev: tool_call を返す
-    Dev->>Dev: 関数をローカルで実行
-    Dev->>Grok: 実行結果を返送
-    Grok-->>Dev: 最終的な自然言語の回答
-      </pre
-          >
+participant Dev as 開発者アプリ
+participant Grok as Grokモデル
+Dev->>Grok: ツール定義付きのユーザークエリを送信
+Grok-->>Dev: tool_call を返す
+Dev->>Dev: 関数をローカルで実行
+Dev->>Grok: 実行結果を返送
+Grok-->>Dev: 最終的な自然言語の回答
+</div>
         </div>
 
         <h3>5.2 ツール定義の基本パターン</h3>
@@ -1309,9 +1328,12 @@ print(response.content)</code></pre>
 
         <h3>6.4 実装例：請求書（Invoice）データの抽出</h3>
         <div class="code-label">python</div>
-        <pre><code>from datetime import date
+        <pre><code>import os
+from datetime import date
 from enum import Enum
 from pydantic import BaseModel, Field
+from xai_sdk import Client
+from xai_sdk.chat import system, user
 
 class Currency(str, Enum):
     USD = "USD"
@@ -1330,6 +1352,11 @@ class Invoice(BaseModel):
     line_items: list[LineItem]
     total_amount: float = Field(ge=0)
     currency: Currency
+
+client = Client(api_key=os.getenv("XAI_API_KEY"))
+chat = client.chat.create(model="grok-4.5")
+chat.append(system("Given a raw invoice, extract the invoice data into JSON format."))
+chat.append(user("Vendor: Acme Corp | Invoice: INV-1042 | Date: 2026-07-01 | Service: Consulting, 8 hours at $10.00 | Total: $80.00 USD"))
 
 response, invoice = chat.parse(Invoice)
 print(invoice.vendor_name, invoice.total_amount, invoice.currency)</code></pre>
@@ -1679,21 +1706,20 @@ def request_with_backoff(messages, max_retries=5):
         except RateLimitError:
             wait = 2 ** attempt
             time.sleep(wait)
-    raise RateLimitError("Max retries exceeded")</code></pre>
+    raise</code></pre>
 
         <h3>10.4 エラーハンドリングのフロー</h3>
         <div class="mermaid-wrap">
-          <pre class="mermaid">
+          <div class="mermaid">
 flowchart TD
-    A["APIリクエスト送信"] --> B{"HTTPステータス"}
-    B -- 200 OK --> C["正常にレスポンス処理"]
-    B -- 429 Too Many Requests --> D{"リトライ回数が上限未満か"}
-    D -- はい --> E["指数バックオフで待機（2の attempt 乗 秒）"]
-    E --> A
-    D -- いいえ --> F["エラーとしてアプリ側で処理"]
-    B -- 400 Bad Request --> G["スキーマ・パラメータを見直して修正"]
-      </pre
-          >
+A["APIリクエスト送信"] --> B{"HTTPステータス"}
+B -- 200 OK --> C["正常にレスポンス処理"]
+B -- 429 Too Many Requests --> D{"リトライ回数が上限未満か"}
+D -- はい --> E["指数バックオフで待機（2の attempt 乗 秒）"]
+E --> A
+D -- いいえ --> F["エラーとしてアプリ側で処理"]
+B -- 400 Bad Request --> G["スキーマ・パラメータを見直して修正"]
+</div>
         </div>
 
         <h3>10.5 制限を引き上げる方法</h3>
@@ -1985,15 +2011,15 @@ flowchart TD
         </p>
 
         <div class="mermaid-wrap">
-          <pre class="mermaid">
+          <div class="mermaid">
 flowchart LR
-    A["曖昧な指示"] --> B["タスクを明確に定義"]
-    B --> C["制約・出力形式を明示"]
-    C --> D["構造化されたマークアップで区切る"]
-    D --> E["ツール利用の判断基準を<br/>システムプロンプトで指定"]
-    E --> F["まず小さく試し、<br/>結果を見て反復改善"]
-    F --> G["高品質な出力"]
-      </pre>
+A["曖昧な指示"] --> B["タスクを明確に定義"]
+B --> C["制約・出力形式を明示"]
+C --> D["構造化されたマークアップで区切る"]
+D --> E["ツール利用の判断基準を<br/>システムプロンプトで指定"]
+E --> F["まず小さく試し、<br/>結果を見て反復改善"]
+F --> G["高品質な出力"]
+</div>
         </div>
 
         <h3>13.1 5つの原則</h3>

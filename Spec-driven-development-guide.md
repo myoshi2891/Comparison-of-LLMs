@@ -1,4 +1,5 @@
 # 仕様駆動開発（Spec-Driven Development, SDD）実践ガイド
+
 ### 中級〜上級エンジニア向け ベストプラクティス徹底解説（2026年版）
 
 > 本ガイドは2026年7月時点で公開されている一次情報（公式ドキュメント、GitHub リポジトリ、AWS/Microsoft公式ブログ、arXiv論文、Thoughtworks Technology Radar等）に基づいて作成しています。各章末に参照URLを明記していますので、実装前に必ず一次情報も確認してください。
@@ -14,8 +15,9 @@
 5. [標準ワークフロー全体像](#5-標準ワークフロー全体像)
 6. [要求定義のベストプラクティス：EARS記法](#6-要求定義のベストプラクティスears記法)
 7. [主要ツールの選定基準と比較](#7-主要ツールの選定基準と比較)
-8. [実践編①：GitHub Spec Kit ワークフロー](#8-実践編githubspec-kit-ワークフロー)
-9. [実践編②：AWS Kiro ワークフロー](#9-実践編aws-kiro-ワークフロー)
+<!-- markdownlint-disable-next-line MD051 -->
+8. [実践編①：GitHub Spec Kit ワークフロー](#8-実践編①githubspec-kit-ワークフロー)
+9. [実践編②：AWS Kiro ワークフロー](#9-実践編②aws-kiro-ワークフロー)
 10. [マルチエージェント検証パターン（Verifier Pattern）](#10-マルチエージェント検証パターンverifier-pattern)
 11. [ベストプラクティス集（12項目）](#11-ベストプラクティス集12項目)
 12. [アンチパターンと落とし穴](#12-アンチパターンと落とし穴)
@@ -99,7 +101,7 @@ Augment Code社のガイドおよびarXiv論文（Piskala, 2026）が指摘す�
 
 ## 3. 成熟度モデル：Spec-First / Spec-Anchored / Spec-as-Source
 
-Thoughtworksのテクノロジーコンサルタント Birgitta Böckeler が提唱し、Piskalaのfarއ論文（arXiv, 2026）でも採用されている3段階の成熟度モデルが、実務上もっとも参照される分類です。
+Thoughtworksのテクノロジーコンサルタント Birgitta Böckeler が提唱し、Piskalaの論文（arXiv, 2026）でも採用されている3段階の成熟度モデルが、実務上もっとも参照される分類です。
 
 ```mermaid
 flowchart LR
@@ -336,7 +338,7 @@ GitHub Spec Kitは、GitHubがOSS（MITライセンス）として提供する`s
 
 ### 8.1 インストールと初期化
 
-`uv`パッケージマネージャーを使い、`uv tool install specify-cli --from git+https://github.com/github/spec-kit.git`のようにインストールし、`specify init <project> --ai claude`（あるいは`copilot`/`gemini`/`cursor`など）でプロジェクトを初期化します。Claude CodeやCodex CLIなどではスラッシュコマンドではなく、`.claude/skills/`配下に配置されるスキルベースの統合形式が使われる点に注意してください。
+`uv`パッケージマネージャーを使い、`uv tool install specify-cli --from git+https://github.com/github/spec-kit.git`のようにインストールし、`specify init <project> --integration claude`（あるいは`--integration copilot`/`--integration gemini`/`--integration cursor`など）でプロジェクトを初期化します。Claude CodeやCodex CLIなどではスラッシュコマンドではなく、`.claude/skills/`配下に配置されるスキルベースの統合形式が使われる点に注意してください。
 
 ### 8.2 コマンドの実行シーケンス
 

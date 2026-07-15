@@ -1979,7 +1979,7 @@
                         return client.chat.completions.create(model="grok-4.5", messages=messages)
                     except RateLimitError:
                         time.sleep(2 ** attempt)
-                raise RateLimitError("Max retries exceeded")
+                raise
           </script>
 
           <p class="dim">

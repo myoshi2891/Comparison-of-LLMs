@@ -1,6 +1,6 @@
 # Codex 作業規約
 
-Updated 2026-07-15
+Updated 2026-07-16
 
 このファイルは Codex が `.claude/` 配下の既存ルールとスキルを見落とさずに適用するための
 ルーティング層である。実装上の正本は `CLAUDE.md`、作業状況の正本は
@@ -9,7 +9,7 @@ Updated 2026-07-15
 
 ## 開始時の必須手順
 
-1. ルートの `AGENTS.md`、`CLAUDE.md`、本ファイル、`docs/PROGRESS.md`、
+1. ルートの `AGENTS.md`、本ファイル、`CLAUDE.md`、`docs/PROGRESS.md`、
    `docs/archive/NEXTJS_PHASE_A_F_PLAN.md` をこの順で読む。ページ移行・その保守では
    `docs/archive/NEXTJS_PHASE_C_DETAILED_DESIGN.md` も読む。
 2. 下の「作業別ルーティング」で該当するスキルとルールを、変更・調査を始める**前**に

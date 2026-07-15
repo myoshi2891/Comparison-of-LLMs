@@ -497,7 +497,7 @@
           <li>
             <a href="#sec-3"><i class="ti ti-sitemap"></i>3. 全体ワークフロー</a>
           </li>
-          <div class="nav-divider"></div>
+          <li class="nav-divider" aria-hidden="true"></li>
           <li>
             <a href="#step-1"><i class="ti ti-target"></i>Step 1. 目的の明確化</a>
           </li>
@@ -531,7 +531,7 @@
           <li>
             <a href="#step-11"><i class="ti ti-rocket"></i>Step 11. デプロイ</a>
           </li>
-          <div class="nav-divider"></div>
+          <li class="nav-divider" aria-hidden="true"></li>
           <li>
             <a href="#pitfalls"><i class="ti ti-alert-triangle"></i>落とし穴チェックリスト</a>
           </li>
@@ -653,23 +653,22 @@
           </p>
 
           <div class="mermaid-container">
-            <pre class="mermaid-source">
+            <div class="mermaid">
 flowchart TD
-    A["LLMの出力を改善したい"] --> B{"モデルが知らない知識\n最新情報が必要か"}
-    B -- "Yes 知識不足" --> C["RAGで外部知識を検索して注入する"]
-    B -- "No 知識は十分にある" --> D{"出力のフォーマット トーン\n振る舞いに問題があるか"}
-    D -- "No 問題なし" --> E["プロンプトエンジニアリングで十分"]
-    D -- "Yes 振る舞いに問題" --> F{"プロンプト調整だけで改善できるか"}
-    F -- "Yes" --> E
-    F -- "No 恒久的な変化が必要" --> G["ファインチューニングを検討する"]
-    C --> H{"それでも振る舞いが不安定か"}
-    H -- "Yes" --> G
-    H -- "No" --> I["RAG プラス プロンプトエンジニアリングで運用"]
-    classDef decision fill:#0f2e2b,stroke:#2dd4bf,color:#ccfbf1,stroke-width:1px;
-    classDef action fill:#241f38,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
-    class B,D,F,H decision
-    class A,C,E,G,I action</pre
-            >
+A["LLMの出力を改善したい"] --> B{"モデルが知らない知識\n最新情報が必要か"}
+B -- "Yes 知識不足" --> C["RAGで外部知識を検索して注入する"]
+B -- "No 知識は十分にある" --> D{"出力のフォーマット トーン\n振る舞いに問題があるか"}
+D -- "No 問題なし" --> E["プロンプトエンジニアリングで十分"]
+D -- "Yes 振る舞いに問題" --> F{"プロンプト調整だけで改善できるか"}
+F -- "Yes" --> E
+F -- "No 恒久的な変化が必要" --> G["ファインチューニングを検討する"]
+C --> H{"それでも振る舞いが不安定か"}
+H -- "Yes" --> G
+H -- "No" --> I["RAG プラス プロンプトエンジニアリングで運用"]
+classDef decision fill:#0f2e2b,stroke:#2dd4bf,color:#ccfbf1,stroke-width:1px;
+classDef action fill:#241f38,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+class B,D,F,H decision
+class A,C,E,G,I action</div>
           </div>
 
           <div class="ref-block">
@@ -1327,7 +1326,8 @@ flowchart TD
           <h3>5.2 最小構成のセットアップ例（Hugging Face + PEFT + QLoRA）</h3>
           <pre><code class="language-bash">pip install --break-system-packages transformers peft trl bitsandbytes accelerate datasets</code></pre>
 
-          <pre><code class="language-python">from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+          <pre><code class="language-python">from datasets import load_dataset
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from peft import LoraConfig
 from trl import SFTTrainer, SFTConfig
 
@@ -1340,6 +1340,7 @@ bnb_config = BitsAndBytesConfig(
 model_id = "meta-llama/Llama-3.1-8B-Instruct"
 tokenizer = AutoTokenizer.from_pretrained(model_id)
 model = AutoModelForCausalLM.from_pretrained(model_id, quantization_config=bnb_config)
+dataset = load_dataset("json", data_files="train.jsonl", split="train")
 
 lora_config = LoraConfig(
     r=16,
@@ -2604,17 +2605,19 @@ flowchart LR
           await document.fonts.ready;
         }
 
-        const sources = document.querySelectorAll('.mermaid-source');
+        const sources = document.querySelectorAll('.mermaid-source, .mermaid');
         let idx = 0;
         for (const el of sources) {
           const id = 'mermaid-diagram-' + idx++;
           const definition = el.textContent;
           try {
             const { svg } = await mermaid.render(id, definition);
-            el.parentElement.innerHTML = svg;
+            const container = el.classList.contains('mermaid') ? el : el.parentElement;
+            container.innerHTML = svg;
           } catch (err) {
             console.error('Mermaid render error:', err);
-            el.parentElement.innerHTML =
+            const container = el.classList.contains('mermaid') ? el : el.parentElement;
+            container.innerHTML =
               '<p style="color:#e2908f;font-size:13px;">図の描画に失敗しました。</p>';
           }
         }

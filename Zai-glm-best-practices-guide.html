@@ -105,6 +105,10 @@
         background: var(--color-background-tertiary);
         color: var(--color-text-primary);
       }
+      .sidebar nav a.active {
+        background: var(--color-background-info);
+        color: var(--color-text-info);
+      }
       .sidebar nav a i {
         font-size: 16px;
         color: var(--color-text-tertiary);
@@ -381,7 +385,7 @@
   </head>
   <body>
     <div class="layout">
-      <nav class="sidebar">
+      <nav class="sidebar toc">
         <div class="sidebar-brand">
           <i class="ti ti-brand-databricks"></i>
           <span>Z.ai GLM ガイド</span>
@@ -483,12 +487,19 @@
 
         <div class="diagram-wrap">
           <div class="mermaid">
-            flowchart TD A["Z.AI Open Platformにアクセス"] --> B["アカウント登録・ログイン"] B -->
-            C["Billingページで残高をチャージ"] C --> D["API Keyを発行"] D -->
-            E["タスクに合うモデルを選択"] E --> F["呼び出し方法を選択"] F --> G["パラメータを設計"]
-            G --> H["最初のAPIコールを実行"] H --> I{"成功したか"} I -->|"Yes"| J["Streaming
-            Function Callingを追加"] I -->|"No"| K["エラーコードを確認して対処"] K --> H J -->
-            L["本番運用へ"]
+flowchart TD
+A["Z.AI Open Platformにアクセス"] --> B["アカウント登録・ログイン"]
+B --> C["Billingページで残高をチャージ"]
+C --> D["API Keyを発行"]
+D --> E["タスクに合うモデルを選択"]
+E --> F["呼び出し方法を選択"]
+F --> G["パラメータを設計"]
+G --> H["最初のAPIコールを実行"]
+H --> I{"成功したか"}
+I -->|"Yes"| J["Streaming Function Callingを追加"]
+I -->|"No"| K["エラーコードを確認して対処"]
+K --> H
+J --> L["本番運用へ"]
           </div>
         </div>
 
@@ -505,8 +516,10 @@
         <h2 id="step1"><i class="ti ti-key"></i>ステップ1: アカウント作成とAPIキー発行</h2>
         <div class="diagram-wrap">
           <div class="mermaid">
-            flowchart LR A["1. 登録 / ログイン"] --> B["2. Billingで残高チャージ"] B --> C["3. API
-            Keyを作成"] C --> D["4. 安全な場所に保管"]
+flowchart LR
+A["1. 登録 / ログイン"] --> B["2. Billingで残高チャージ"]
+B --> C["3. API Keyを作成"]
+C --> D["4. 安全な場所に保管"]
           </div>
         </div>
         <ol>
@@ -553,11 +566,14 @@
         <h2 id="step2"><i class="ti ti-cpu"></i>ステップ2: モデルを選ぶ</h2>
         <div class="diagram-wrap">
           <div class="mermaid">
-            flowchart TD A["タスクの性質を確認"] --> B{"複雑な推論や長時間タスクか"} B -->|"Yes"|
-            C["GLM-5.2 reasoning_effort=max"] B -->|"No"| D{"コストを最優先したいか"} D -->|"Yes"|
-            E["GLM-4.5-Flash / GLM-4.7-Flash 無料枠"] D -->|"No"| F{"画像や動画の理解が必要か"} F
-            -->|"Yes"| G["GLM-5V-Turbo / GLM-4.6V"] F -->|"No"| H["GLM-5.1 / GLM-4.6 / GLM-4.7
-            汎用"]
+flowchart TD
+A["タスクの性質を確認"] --> B{"複雑な推論や長時間タスクか"}
+B -->|"Yes"| C["GLM-5.2 reasoning_effort=max"]
+B -->|"No"| D{"コストを最優先したいか"}
+D -->|"Yes"| E["GLM-4.5-Flash / GLM-4.7-Flash 無料枠"]
+D -->|"No"| F{"画像や動画の理解が必要か"}
+F -->|"Yes"| G["GLM-5V-Turbo / GLM-4.6V"]
+F -->|"No"| H["GLM-5.1 / GLM-4.6 / GLM-4.7 汎用"]
           </div>
         </div>
         <p>
@@ -854,10 +870,13 @@ print(completion.choices[0].message.content)</code></pre>
         </table>
         <div class="diagram-wrap">
           <div class="mermaid">
-            flowchart LR A["リクエスト受信"] --> B{"thinking.type"} B -->|"enabled"|
-            C{"reasoning_effort"} B -->|"disabled"| D["即時応答 CoTなし"] C -->|"max または xhigh"|
-            E["最大推論 高精度・高コスト"] C -->|"high medium low"| F["拡張推論 highに正規化"] C
-            -->|"minimal または none"| D
+flowchart LR
+A["リクエスト受信"] --> B{"thinking.type"}
+B -->|"enabled"| C{"reasoning_effort"}
+B -->|"disabled"| D["即時応答 CoTなし"]
+C -->|"max または xhigh"| E["最大推論 高精度・高コスト"]
+C -->|"high medium low"| F["拡張推論 highに正規化"]
+C -->|"minimal または none"| D
           </div>
         </div>
         <div class="callout tip">
@@ -946,11 +965,19 @@ for chunk in response:
         </p>
         <div class="diagram-wrap">
           <div class="mermaid">
-            sequenceDiagram participant U as "ユーザー" participant App as "アプリケーション"
-            participant API as "Z.AI Chat Completions API" participant Fn as "外部関数" U->>App:
-            "質問を送信" App->>API: "messages + tools を送信" API-->>App: "tool_calls を返却"
-            App->>Fn: "関数を実行" Fn-->>App: "実行結果を返却" App->>API: "role tool
-            で結果を追加送信" API-->>App: "最終応答を生成" App-->>U: "回答を表示"
+sequenceDiagram
+participant U as ユーザー
+participant App as アプリケーション
+participant API as Z.AI Chat Completions API
+participant Fn as 外部関数
+U->>App: 質問を送信
+App->>API: messages + tools を送信
+API-->>App: tool_calls を返却
+App->>Fn: 関数を実行
+Fn-->>App: 実行結果を返却
+App->>API: role tool で結果を追加送信
+API-->>App: 最終応答を生成
+App-->>U: 回答を表示
           </div>
         </div>
         <pre><code>import json
@@ -1102,10 +1129,14 @@ validate(instance=result, schema=schema)</code></pre>
         </p>
         <div class="diagram-wrap">
           <div class="mermaid">
-            flowchart LR A["安定したSystem Promptを先頭に配置"] --> B["可変部分を末尾に配置"] B -->
-            C["リクエスト送信"] C --> D{"先頭部分が過去と一致"} D -->|"Yes"|
-            E["cached_tokensとして低単価課金"] D -->|"No"| F["通常価格で処理し新規キャッシュ登録"] E
-            --> G["usageフィールドで確認"] F --> G
+flowchart LR
+A["安定したSystem Promptを先頭に配置"] --> B["可変部分を末尾に配置"]
+B --> C["リクエスト送信"]
+C --> D{"先頭部分が過去と一致"}
+D -->|"Yes"| E["cached_tokensとして低単価課金"]
+D -->|"No"| F["通常価格で処理し新規キャッシュ登録"]
+E --> G["usageフィールドで確認"]
+F --> G
           </div>
         </div>
         <div class="callout tip">
@@ -1268,12 +1299,18 @@ validate(instance=result, schema=schema)</code></pre>
         </table>
         <div class="diagram-wrap">
           <div class="mermaid">
-            flowchart TD A["APIリクエスト送信"] --> B{"HTTPステータス"} B -->|"200"|
-            C["正常応答を処理"] B -->|"401"| D["認証情報を確認 1000 1001 1003"] B -->|"400"|
-            E["パラメータを確認 1210 1215"] B -->|"429"| F{"エラーコードで分岐"} F -->|"1113
-            残高不足"| G["Billingでチャージ"] F -->|"1302 レート制限"| H["Exponential
-            Backoffで再試行"] F -->|"1308 1310 利用上限"| I["reset時刻まで待機 または プラン変更"] B
-            -->|"500"| J["一時的エラーとして再試行 1234 1305"] H --> A J --> A
+flowchart TD
+A["APIリクエスト送信"] --> B{"HTTPステータス"}
+B -->|"200"| C["正常応答を処理"]
+B -->|"401"| D["認証情報を確認 1000 1001 1003"]
+B -->|"400"| E["パラメータを確認 1210 1215"]
+B -->|"429"| F{"エラーコードで分岐"}
+F -->|"1113 残高不足"| G["Billingでチャージ"]
+F -->|"1302 レート制限"| H["Exponential Backoffで再試行"]
+F -->|"1308 1310 利用上限"| I["reset時刻まで待機 または プラン変更"]
+B -->|"500"| J["一時的エラーとして再試行 1234 1305"]
+H --> A
+J --> A
           </div>
         </div>
         <div class="callout tip">
@@ -1438,10 +1475,14 @@ validate(instance=result, schema=schema)</code></pre>
         </p>
         <div class="diagram-wrap">
           <div class="mermaid">
-            flowchart TD A["タスクを定義 目的 範囲 検証方法"] --> B["関連コンテキストをMCP等で取得"]
-            B --> C["エージェントに実行を委任"] C --> D["ビルド Lint テストを実行させる"] D -->
-            E{"検証結果はOKか"} E -->|"Yes"| F["結果をレビューしてマージ"] E -->|"No"|
-            G["失敗内容をフィードバックし再実行"] G --> C
+flowchart TD
+A["タスクを定義 目的 範囲 検証方法"] --> B["関連コンテキストをMCP等で取得"]
+B --> C["エージェントに実行を委任"]
+C --> D["ビルド Lint テストを実行させる"]
+D --> E{"検証結果はOKか"}
+E -->|"Yes"| F["結果をレビューしてマージ"]
+E -->|"No"| G["失敗内容をフィードバックし再実行"]
+G --> C
           </div>
         </div>
         <div class="callout tip">
@@ -1793,7 +1834,37 @@ validate(instance=result, schema=schema)</code></pre>
           svg.style.margin = '0 auto';
         });
       }
-      window.addEventListener('DOMContentLoaded', renderDiagrams);
+      window.addEventListener('DOMContentLoaded', async () => {
+        await renderDiagrams();
+
+        document.querySelectorAll('main > h2[id]').forEach((heading) => {
+          const section = document.createElement('section');
+          section.className = 'section';
+          section.id = heading.id;
+          heading.removeAttribute('id');
+          heading.parentNode.insertBefore(section, heading);
+          section.append(heading);
+          while (section.nextElementSibling?.tagName !== 'H2' && section.nextElementSibling) {
+            section.append(section.nextElementSibling);
+          }
+        });
+
+        const navLinks = document.querySelectorAll('nav.toc a[href^="#"]');
+        const linkById = new Map(
+          Array.from(navLinks, (link) => [link.getAttribute('href').slice(1), link]),
+        );
+        const sections = document.querySelectorAll('section.section');
+        const observer = new IntersectionObserver(
+          (entries) => {
+            const visible = entries.find((entry) => entry.isIntersecting);
+            if (!visible) return;
+            navLinks.forEach((link) => link.classList.remove('active'));
+            linkById.get(visible.target.id)?.classList.add('active');
+          },
+          { rootMargin: '-15% 0px -70% 0px', threshold: 0 },
+        );
+        sections.forEach((section) => observer.observe(section));
+      });
     </script>
   </body>
 </html>
