@@ -17,6 +17,16 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
   },
 }));
 
+class IntersectionObserverStub {
+  observe() {
+    // mock
+  }
+  disconnect() {
+    // mock
+  }
+}
+global.IntersectionObserver = IntersectionObserverStub as unknown as typeof IntersectionObserver;
+
 const EXPECTED_ANCHOR_IDS = [
   "intro",
   "sec-1",
@@ -55,7 +65,7 @@ describe("/local-llm/finetuning-best-practices - page structure", () => {
   it("renders the h1 and every source anchor", () => {
     const { container } = render(<Page />);
     expect(container.querySelector("h1")?.textContent).toContain(
-      "LLMファインチューニング ベストプラクティスガイド"
+      "LLMファインチューニングベストプラクティスガイド"
     );
     for (const id of EXPECTED_ANCHOR_IDS) {
       expect(container.querySelector(`#${id}`), `anchor #${id} must exist`).not.toBeNull();
@@ -64,7 +74,7 @@ describe("/local-llm/finetuning-best-practices - page structure", () => {
 
   it("renders TOC links for every source anchor", () => {
     const { container } = render(<Page />);
-    const hrefs = Array.from(container.querySelectorAll("nav a[href^='#']")).map((link) =>
+    const hrefs = Array.from(container.querySelectorAll(".nav-list a[href^='#']")).map((link) =>
       link.getAttribute("href")
     );
     for (const id of EXPECTED_ANCHOR_IDS) {
@@ -77,7 +87,7 @@ describe("/local-llm/finetuning-best-practices - faithful content safeguards", (
   it("renders all external links safely", () => {
     const { container } = render(<Page />);
     const externalLinks = Array.from(container.querySelectorAll("a[href^='http']"));
-    expect(externalLinks).toHaveLength(29);
+    expect(externalLinks).toHaveLength(99);
     for (const link of externalLinks) {
       expect(link).toHaveAttribute("target", "_blank");
       expect(link.getAttribute("rel")).toMatch(/\bnoopener\b/);

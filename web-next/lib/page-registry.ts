@@ -588,6 +588,16 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-12",
   },
   {
+    slug: "/local-llm/finetuning-best-practices",
+    title: "Fine-tuning Best Practices",
+    group: "モデル・データ",
+    topics: ["local-llm", "fine-tuning"],
+    summary:
+      "LLMファインチューニングの目的設定、モデル・手法・データの選定、学習、評価、破局的忘却対策、RLHF/DPO、デプロイまでを体系的に解説する実践ガイド。",
+    addedAt: "2026-07-16",
+    lastReviewed: "2026-07-16",
+  },
+  {
     slug: "/local-llm/self-hosting",
     title: "Self-hosting Guide",
     group: "モデル・データ",
