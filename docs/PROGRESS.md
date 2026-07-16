@@ -14,10 +14,11 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（本作業範囲では新規違反 0 件、既知の既存指摘は本件対象外）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **1112 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **1113 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **LLMファインチューニング ベストプラクティスガイドのデザイン刷新**: `/local-llm/finetuning-best-practices` をアンバー×ブルーのダーク技術ドキュメントとして再設計。本文・リンク・12表・5コードブロック・9 Mermaid図・99外部リンクは維持したまま、旧インラインスタイルをページ専用CSSへ集約し、表の左寄せとコード5件の依存追加なしのシンタックスハイライトを追加。契約テストを1件追加（合計 **1113 テスト合格**）。
 - **LLMファインチューニング ベストプラクティスガイドの Next.js 移行**: `Finetuning-best-practices-guide.html` を `/local-llm/finetuning-best-practices` へ移行。原文の全17セクション・12表・5コードブロック・9 Mermaid図・99外部リンクを React 要素として faithful に保持し、TOC のスクロール追従、外部リンクの安全属性、ページレジストリ登録を追加。原本は `archive/` に退避。TDD の Red / Green / Refactor を分割し、契約テスト6件を追加（合計 **1112 テスト合格**）。
 - **横断導線（RSS / 関連ページリンク / 横断検索）— plans/006 Phase 3（F-3' / F-7 / F-5、[plans/009](../plans/009-phase3-cross-navigation.md)）**: 58 ルートに達し「読者が目的のガイドへナビのドロップダウン経由でしか到達できない」状態を解消 🚀。3 導線すべてを `page-registry.ts` からの導出で追加した（手書きのフィード・関連リンク表・検索インデックスを一切持たない）。ナビは `nav-taxonomy.ts` の `NAV_GROUPS` に「検索」をフラットリンクとして What's New の直前へ挿入し、トップレベル 7 → 8 グループへ。TDD サイクル（Red/Green/Refactor/Docs Sync）でコミット分割。Vitest 契約テスト 42 件追加（合計 **1106 テスト合格**）。
   - **F-3' RSS**: `app/rss.xml/route.ts` を Route Handler + `dynamic = "force-static"` で実装し、`output: 'export'` 下でも `out/rss.xml` として静的生成（addedAt 降順 20 件）。XML 予約 5 文字のエスケープは純粋関数 `escapeXml` に切り出してユニットテスト。`lib/metadata.ts` の `alternates.types` に自動発見リンクを追加。
@@ -192,7 +193,7 @@ Next.js 移行完了後のリポジトリ `LLM-Studies` にて、テストカバ
 Next.js 移行完了後のリポジトリ `LLM-Studies` の保守・改善作業を再開してください。
 
 - リポジトリ: LLM-Studies (Next.js 移行プロジェクトは dev/main へ完全マージ済み)
-  - 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (1112/1112 passed) / pytest (38/38 passed) で全 Green
+  - 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (1113/1113 passed) / pytest (38/38 passed) で全 Green
 - リポジトリ規約: CLAUDE.md (編集上の絶対ルール。※Antigravity環境ではビルドは実行禁止)
 
 作業方針：
