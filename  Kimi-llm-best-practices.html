@@ -1,0 +1,2628 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kimi(Moonshot AI)LLM 徹底ガイド ― 初学者のためのベストプラクティス</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+    />
+    <style>
+      :root {
+        --bg: #07111e;
+        --bg-elevated: #0b1729;
+        --card-bg: rgba(255, 255, 255, 0.03);
+        --card-border: rgba(255, 255, 255, 0.08);
+        --accent: #7c9eff;
+        --accent-soft: rgba(124, 158, 255, 0.14);
+        --accent-strong: #b3c7ff;
+        --text: #e8edf7;
+        --text-dim: #a9b4c9;
+        --text-faint: #6c7893;
+        --code-bg: #0d1826;
+        --warn: #ffb37c;
+        --ok: #7cffb3;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          'Noto Sans JP',
+          'Segoe UI',
+          Hiragino Sans,
+          sans-serif;
+        line-height: 1.85;
+        font-size: 16px;
+      }
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      code,
+      pre,
+      .mono {
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+      }
+
+      /* ---- layout: block, NOT grid, to avoid fixed-sidebar width collapse ---- */
+      .layout {
+        display: block;
+        max-width: none;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 300px;
+        height: 100vh;
+        overflow-y: auto;
+        background: rgba(7, 17, 30, 0.97);
+        border-right: 1px solid var(--card-border);
+        padding: 28px 20px 40px;
+        z-index: 50;
+      }
+      .sidebar .brand {
+        font-weight: 900;
+        font-size: 1.05rem;
+        color: var(--text);
+        margin-bottom: 4px;
+      }
+      .sidebar .brand span {
+        color: var(--accent);
+      }
+      .sidebar .subbrand {
+        font-size: 0.78rem;
+        color: var(--text-faint);
+        margin-bottom: 24px;
+      }
+      .sidebar nav a {
+        display: block;
+        padding: 8px 12px;
+        margin-bottom: 2px;
+        border-radius: 8px;
+        font-size: 0.88rem;
+        color: var(--text-dim);
+        border-left: 2px solid transparent;
+      }
+      .sidebar nav a:hover {
+        background: var(--accent-soft);
+        color: var(--text);
+        text-decoration: none;
+      }
+      .sidebar nav a.active {
+        background: var(--accent-soft);
+        color: var(--accent-strong);
+        border-left: 2px solid var(--accent);
+        font-weight: 500;
+      }
+      .sidebar .num {
+        display: inline-block;
+        width: 1.6em;
+        color: var(--text-faint);
+      }
+
+      .menu-toggle {
+        display: none;
+        position: fixed;
+        top: 16px;
+        left: 16px;
+        z-index: 60;
+        background: var(--accent);
+        color: #07111e;
+        border: none;
+        border-radius: 8px;
+        width: 42px;
+        height: 42px;
+        font-size: 1.2rem;
+        cursor: pointer;
+      }
+
+      .main {
+        margin-left: 300px;
+        padding: 56px 64px 120px;
+      }
+
+      /* ---- full-width prose rule: no narrow max-width anywhere ---- */
+      .section,
+      .prose,
+      .hero,
+      .footer {
+        max-width: none;
+      }
+
+      .hero {
+        padding-bottom: 40px;
+        border-bottom: 1px solid var(--card-border);
+        margin-bottom: 48px;
+      }
+      .hero .eyebrow {
+        display: inline-block;
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        color: var(--accent);
+        background: var(--accent-soft);
+        padding: 6px 14px;
+        border-radius: 999px;
+        margin-bottom: 20px;
+      }
+      .hero h1 {
+        font-size: 2.4rem;
+        font-weight: 900;
+        margin: 0 0 16px;
+        line-height: 1.4;
+        background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+      }
+      .hero p.lead {
+        font-size: 1.08rem;
+        color: var(--text-dim);
+        max-width: 860px;
+      }
+      .hero .updated {
+        margin-top: 20px;
+        font-size: 0.85rem;
+        color: var(--text-faint);
+      }
+
+      .section {
+        margin-bottom: 64px;
+        scroll-margin-top: 24px;
+      }
+      .section h2 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+      .section h2 .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: var(--accent-soft);
+        color: var(--accent-strong);
+        font-size: 0.95rem;
+        font-weight: 700;
+      }
+      .section h3 {
+        font-size: 1.18rem;
+        font-weight: 700;
+        color: var(--accent-strong);
+        margin: 32px 0 12px;
+      }
+      .section p {
+        color: var(--text-dim);
+      }
+      .section ul,
+      .section ol {
+        color: var(--text-dim);
+        padding-left: 1.4em;
+      }
+      .section li {
+        margin-bottom: 6px;
+      }
+      .section strong {
+        color: var(--text);
+      }
+
+      .callout {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-left: 3px solid var(--accent);
+        border-radius: 10px;
+        padding: 18px 22px;
+        margin: 20px 0;
+        color: var(--text-dim);
+      }
+      .callout.warn {
+        border-left-color: var(--warn);
+      }
+      .callout strong {
+        color: var(--text);
+      }
+
+      /* ---- tables ---- */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 20px 0;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 10px;
+        overflow: hidden;
+        font-size: 0.92rem;
+      }
+      thead th {
+        background: rgba(124, 158, 255, 0.12);
+        color: var(--text);
+        text-align: left;
+        padding: 12px 16px;
+        font-weight: 700;
+        border-bottom: 1px solid var(--card-border);
+        white-space: nowrap;
+      }
+      tbody td {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--card-border);
+        color: var(--text-dim);
+        vertical-align: top;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:hover {
+        background: rgba(255, 255, 255, 0.02);
+      }
+      code.inline {
+        background: var(--code-bg);
+        color: var(--accent-strong);
+        padding: 2px 6px;
+        border-radius: 5px;
+        font-size: 0.88em;
+      }
+
+      /* ---- code blocks ---- */
+      pre.codeblock {
+        background: var(--code-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 10px;
+        padding: 18px 20px;
+        overflow-x: auto;
+        margin: 18px 0;
+        font-size: 0.88rem;
+      }
+      pre.codeblock code {
+        background: none;
+        padding: 0;
+      }
+
+      /* ---- mermaid centering: the ONLY width rule lives on pre.mermaid ---- */
+      pre.mermaid {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 12px;
+        padding: 28px 12px;
+        margin: 22px 0;
+      }
+      pre.mermaid svg {
+        max-width: 100%;
+        height: auto;
+      }
+      .diagram-caption {
+        text-align: center;
+        color: var(--text-faint);
+        font-size: 0.82rem;
+        margin-top: -8px;
+        margin-bottom: 24px;
+      }
+
+      .checklist-table td:first-child {
+        width: 48px;
+        color: var(--accent-strong);
+        font-weight: 700;
+      }
+
+      .footer {
+        border-top: 1px solid var(--card-border);
+        padding-top: 32px;
+        margin-top: 64px;
+        color: var(--text-faint);
+        font-size: 0.85rem;
+      }
+
+      .ref-group h3 {
+        margin-top: 28px;
+      }
+      .ref-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .ref-list li {
+        padding: 10px 0;
+        border-bottom: 1px solid var(--card-border);
+        font-size: 0.92rem;
+        color: var(--text-dim);
+      }
+      .ref-list li a {
+        color: var(--accent-strong);
+        word-break: break-all;
+      }
+
+      @media (max-width: 960px) {
+        .sidebar {
+          transform: translateX(-100%);
+          transition: transform 0.25s ease;
+          box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .main {
+          margin-left: 0;
+          padding: 80px 24px 100px;
+        }
+        .menu-toggle {
+          display: block;
+        }
+        .hero h1 {
+          font-size: 1.8rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <button class="menu-toggle" id="menuToggle" aria-label="メニュー">&#9776;</button>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="brand">Kimi LLM <span>徹底ガイド</span></div>
+        <div class="subbrand">初学者のためのベストプラクティス</div>
+        <nav>
+          <a href="#intro"><span class="num">01</span>はじめに</a>
+          <a href="#ecosystem"><span class="num">02</span>エコシステム全体像</a>
+          <a href="#models"><span class="num">03</span>モデルファミリー</a>
+          <a href="#setup"><span class="num">04</span>セットアップ</a>
+          <a href="#params"><span class="num">05</span>基本パラメータ</a>
+          <a href="#system-prompt"><span class="num">06</span>システムプロンプト</a>
+          <a href="#tool-calling"><span class="num">07</span>Tool Calling</a>
+          <a href="#thinking"><span class="num">08</span>Thinkingモード</a>
+          <a href="#partial-mode"><span class="num">09</span>Partial Mode</a>
+          <a href="#caching"><span class="num">10</span>コンテキストキャッシュ</a>
+          <a href="#multimodal"><span class="num">11</span>マルチモーダル</a>
+          <a href="#pricing"><span class="num">12</span>料金体系</a>
+          <a href="#rate-limits"><span class="num">13</span>レート制限</a>
+          <a href="#practice"><span class="num">14</span>実践例</a>
+          <a href="#security"><span class="num">15</span>セキュリティ</a>
+          <a href="#errors"><span class="num">16</span>エラー対処</a>
+          <a href="#checklist"><span class="num">17</span>チェックリスト</a>
+          <a href="#references"><span class="num">18</span>参考文献</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <header class="hero">
+          <span class="eyebrow">AI ENGINEERING GUIDE ・ 2026年7月版</span>
+          <h1>Kimi(Moonshot AI)LLM 徹底ガイド<br />初学者のためのベストプラクティス</h1>
+          <p class="lead">
+            中国Moonshot
+            AI社が開発する大規模言語モデル「Kimi」シリーズについて、モデルの選び方からプロンプト設計、
+            Tool
+            Calling、Thinkingモード、コスト最適化まで、公式ドキュメントと一次情報にもとづきステップバイステップで解説します。
+          </p>
+          <div class="updated">
+            最終更新:
+            2026年7月16日時点の公開情報にもとづく。仕様は頻繁に更新されるため、本番導入前は必ず公式ドキュメントを確認してください。
+          </div>
+        </header>
+
+        <!-- ============ 1. はじめに ============ -->
+        <section class="section" id="intro">
+          <h2><span class="badge">01</span>はじめに：KimiとMoonshot AIとは</h2>
+          <p>
+            <strong>Kimi</strong> は中国のAI企業
+            <strong>Moonshot AI(月之暗面)</strong> が開発する大規模言語モデル(LLM)シリーズ、
+            およびそれを使った製品群の総称です。2023年10月に一般公開されたチャットボット「Kimi」は、当時としては業界最大級となる
+            12.8万トークンのコンテキスト長をサポートしたことで注目を集めました。その後モデルは急速に進化し、2025年7月には
+            1兆パラメータのMoE(Mixture-of-Experts)モデル
+            <strong>Kimi K2</strong> をオープンウェイトで公開し、
+            コーディングとエージェント(自律実行)性能で高い評価を得ています。
+          </p>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a href="https://en.wikipedia.org/wiki/Kimi_(chatbot)" target="_blank" rel="noopener"
+              >Kimi (chatbot) - Wikipedia</a
+            >
+          </p>
+
+          <div class="callout">
+            <strong>初学者向けポイント</strong>
+            <ul>
+              <li>
+                <strong>Kimiは「製品」と「モデル」の2つの顔を持つ</strong
+                >：一般ユーザー向けのチャットアプリ(kimi.com)と、開発者向けのAPIプラットフォーム(platform.moonshot.ai
+                / platform.kimi.ai)は別物です。
+              </li>
+              <li>
+                <strong>KimiのAPIはOpenAI互換</strong>です。既存のOpenAI SDKの
+                <code class="inline">base_url</code> を書き換えるだけで移行できます。
+              </li>
+              <li>
+                <strong>オープンウェイト戦略</strong>：Kimi K2系列のモデル重みはHugging
+                Faceで公開されており、Modified MIT Licenseのもとで自己ホスティングも可能です。
+              </li>
+            </ul>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a href="https://platform.kimi.ai/docs/overview" target="_blank" rel="noopener"
+              >Quickstart - Kimi API Platform</a
+            >,
+            <a href="https://github.com/moonshotai/kimi-k2" target="_blank" rel="noopener"
+              >GitHub - MoonshotAI/Kimi-K2</a
+            >
+          </p>
+        </section>
+
+        <!-- ============ 2. エコシステム ============ -->
+        <section class="section" id="ecosystem">
+          <h2><span class="badge">02</span>Kimiのエコシステム全体像</h2>
+          <p>
+            Kimiというブランドの下には、消費者向けアプリからAPIプラットフォーム、開発者ツールまで複数の製品が存在します。
+            まず全体像を図で把握しましょう。
+          </p>
+
+          <script type="text/plain" id="mmd-1">
+            flowchart TB
+                A["Moonshot AI"] --> B["Kimi (統合エージェントワークスペース)"]
+                A --> C["Kimi Platform (開発者向けAPI)"]
+                A --> D["Kimi Code (ターミナル/IDE向けコーディングエージェント)"]
+                A --> E["Kimi Work (デスクトップAIエージェント)"]
+                A --> F["Kimi WebBridge (ブラウザ拡張エージェント)"]
+                B --> G["Docs (文書生成・変換)"]
+                B --> H["Sheets (表計算エージェント)"]
+                B --> I["Slides (スライド自動生成)"]
+                B --> J["Websites (Webサイト自動生成)"]
+                B --> K["Deep Research (多段階リサーチ)"]
+                C --> L["kimi-k2.6 / kimi-k2.7-code / kimi-k2.5 等のモデル"]
+          </script>
+          <pre class="mermaid" id="mermaid-1"></pre>
+          <div class="diagram-caption">図1: Kimiエコシステムの全体構成</div>
+
+          <ul>
+            <li>
+              <strong>Kimi(kimi.com)</strong
+              >：チャット・エージェント・文書生成・表計算・スライド作成などを一つにまとめた統合ワークスペースです。
+            </li>
+            <li>
+              <strong>Kimi Platform</strong>：本ガイドの中心となる開発者向けAPIで、<code
+                class="inline"
+                >platform.moonshot.ai</code
+              >
+              と
+              <code class="inline">platform.kimi.ai</code>
+              の2つのドメインから同じドキュメントにアクセスできます。
+            </li>
+            <li>
+              <strong>Kimi Work</strong
+              >：ローカルファイルへのアクセス、ブラウザ自動操作(WebBridge)、Cronベースのスケジュール実行など「24時間稼働するデスクトップの部下」のような製品です。
+            </li>
+            <li>
+              <strong>Kimi Docs</strong
+              >：Word/PDFの生成・変換・レビューに特化したドキュメントエージェントで、LaTeX数式や学術引用形式、10,000語超の長文書生成にも対応します。
+            </li>
+          </ul>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a href="https://www.kimi.com/products/kimi-work" target="_blank" rel="noopener"
+              >Kimi Work: Next-Gen Desktop AI Agent for Knowledge Workers</a
+            >,
+            <a href="https://www.kimi.com/features/docs" target="_blank" rel="noopener"
+              >AI Document Agent for Automating Knowledge Work | Kimi Docs</a
+            >
+          </p>
+
+          <div class="callout">
+            <strong>注意</strong
+            >：「Kimiでチャットができるから、APIも同じ挙動になるはず」と思い込まないことが大切です。Web版のKimiは裏側で複数のツールやエージェントを自動的に組み合わせていますが、API単体を呼び出す場合は、ツール定義・システムプロンプト・エージェントループなどを自分で設計する必要があります。
+          </div>
+        </section>
+
+        <!-- ============ 3. モデルファミリー ============ -->
+        <section class="section" id="models">
+          <h2><span class="badge">03</span>Kimiモデルファミリーを理解する</h2>
+
+          <h3>3.1 モデルの進化タイムライン</h3>
+          <script type="text/plain" id="mmd-2">
+            flowchart TB
+                A["Kimi K2 (2025年7月)<br/>1T総パラメータ / 32B活性化パラメータのMoE"] --> B["Kimi K2 Thinking (2025年11月)<br/>常時思考モード・200-300ステップの連続ツール呼び出し"]
+                B --> C["Kimi K2.5 (2026年1月)<br/>マルチモーダル対応・Agent Swarm導入"]
+                C --> D["Kimi K2.6 (2026年4月)<br/>コーディング・UI生成・300エージェント群"]
+                D --> E["Kimi K2.7 Code (2026年6月)<br/>コーディング特化・常時思考・思考トークン30%削減"]
+          </script>
+          <pre class="mermaid" id="mermaid-2"></pre>
+          <div class="diagram-caption">図2: Kimiモデルの進化タイムライン</div>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a href="https://en.wikipedia.org/wiki/Kimi_(chatbot)" target="_blank" rel="noopener"
+              >Kimi (chatbot) - Wikipedia</a
+            >,
+            <a href="https://github.com/MoonshotAI/Kimi-K2.5" target="_blank" rel="noopener"
+              >GitHub - MoonshotAI/Kimi-K2.5</a
+            >,
+            <a
+              href="https://codersera.com/blog/kimi-k2-7-complete-guide-2026/"
+              target="_blank"
+              rel="noopener"
+              >Kimi K2.7 Code: The Complete Guide</a
+            >
+          </p>
+
+          <h3>3.2 主要モデル比較表</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>モデルID</th>
+                  <th>位置づけ</th>
+                  <th>パラメータ規模</th>
+                  <th>コンテキスト長</th>
+                  <th>思考モード</th>
+                  <th>主な用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code class="inline">kimi-k2</code>(legacy)</td>
+                  <td>汎用チャット・エージェント(非思考)</td>
+                  <td>1T総/32B活性化</td>
+                  <td>128K〜256K</td>
+                  <td>オプション</td>
+                  <td>汎用対話・コーディング(現在はEOL間近)</td>
+                </tr>
+                <tr>
+                  <td><code class="inline">kimi-k2-thinking</code>(legacy)</td>
+                  <td>推論特化</td>
+                  <td>1T総/32B活性化・INT4量子化</td>
+                  <td>256K</td>
+                  <td>常時ON</td>
+                  <td>長時間・多段階の自律リサーチ</td>
+                </tr>
+                <tr>
+                  <td><code class="inline">kimi-k2.5</code></td>
+                  <td>マルチモーダル汎用</td>
+                  <td>1T総/32B活性化</td>
+                  <td>256K(262,144)</td>
+                  <td>選択可</td>
+                  <td>コスト重視の汎用・視覚理解・Agent Swarm</td>
+                </tr>
+                <tr>
+                  <td><code class="inline">kimi-k2.6</code></td>
+                  <td>フラッグシップ汎用</td>
+                  <td>1T総/32B活性化・384エキスパート</td>
+                  <td>256K(262,144)</td>
+                  <td>選択可</td>
+                  <td>長時間コーディング・UI生成・マルチエージェント</td>
+                </tr>
+                <tr>
+                  <td><code class="inline">kimi-k2.7-code</code></td>
+                  <td>コーディング特化最新版</td>
+                  <td>1T総/32B活性化・384エキスパート</td>
+                  <td>256K(262,144)</td>
+                  <td>常時ON</td>
+                  <td>長時間の自律的ソフトウェア開発・MCPツール利用</td>
+                </tr>
+                <tr>
+                  <td><code class="inline">kimi-k2.7-code-highspeed</code></td>
+                  <td>上記の高速版</td>
+                  <td>同上(同一重み)</td>
+                  <td>256K</td>
+                  <td>常時ON</td>
+                  <td>レイテンシ最優先のコーディングエージェント</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a
+              href="https://www.remoteopenclaw.com/blog/best-kimi-models-2026"
+              target="_blank"
+              rel="noopener"
+              >Best Kimi Models in 2026 — Moonshot AI's Ultra-Long Context Play</a
+            >,
+            <a
+              href="https://developers.cloudflare.com/workers-ai/models/kimi-k2.7-code/"
+              target="_blank"
+              rel="noopener"
+              >Kimi K2.7 Code (Moonshot AI) - Cloudflare Workers AI docs</a
+            >,
+            <a
+              href="https://medium.com/@tentenco/kimi-k2-6-kimi-code-review-saving-88-coding-costs-b7e8c5eaf5f1"
+              target="_blank"
+              rel="noopener"
+              >Kimi K2.6 & Kimi Code Review - Medium</a
+            >
+          </p>
+
+          <div class="callout warn">
+            <strong>注意</strong>：<code class="inline">kimi-k2-0711-preview</code>、<code
+              class="inline"
+              >kimi-k2-0905-preview</code
+            >、 <code class="inline">kimi-k2-turbo-preview</code>、<code class="inline"
+              >kimi-k2-thinking</code
+            >、<code class="inline">kimi-k2-thinking-turbo</code>
+            などの旧世代モデルは、2026年5月25日にEOL(提供終了)が予告されており、本ガイド執筆時点(2026年7月)ではすでに移行期限を過ぎています。
+            新規開発では <code class="inline">kimi-k2.5</code> /
+            <code class="inline">kimi-k2.6</code> /
+            <code class="inline">kimi-k2.7-code</code> の利用を前提にしてください。
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a href="https://costgoat.com/pricing/kimi-api" target="_blank" rel="noopener"
+              >Kimi API Pricing Calculator & Cost Guide</a
+            >
+          </p>
+
+          <h3>3.3 アーキテクチャの基礎知識(MoE)</h3>
+          <p>
+            Kimi K2系列はすべて
+            <strong>Mixture-of-Experts(MoE)</strong>
+            アーキテクチャを採用しています。初学者向けに簡単に言うと、
+            「1兆パラメータぶんの知識を持つ巨大な専門家集団の中から、1回の推論ごとに約320億パラメータ相当の専門家だけを選んで働かせる」仕組みです。
+            これにより、モデル全体の能力(1Tパラメータ相当)を保ちながら、実際の計算コストは32B級モデルに近い水準に抑えられています。
+          </p>
+          <ul>
+            <li>総パラメータ：約1兆(1T)、活性化パラメータ：約320億(32B)</li>
+            <li>384エキスパート(K2.6/K2.7 Codeでは8ルーティング+1共有エキスパート構成)</li>
+            <li>Multi-head Latent Attention(MLA)によるKVキャッシュ圧縮</li>
+            <li>MuonClipオプティマイザによる大規模学習時の安定化(15.5兆トークンで事前学習)</li>
+            <li>ネイティブINT4量子化(K2 Thinking以降)により、推論速度とGPUメモリ効率が向上</li>
+          </ul>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a href="https://github.com/moonshotai/kimi-k2" target="_blank" rel="noopener"
+              >GitHub - MoonshotAI/Kimi-K2</a
+            >,
+            <a
+              href="https://huggingface.co/moonshotai/Kimi-K2-Thinking"
+              target="_blank"
+              rel="noopener"
+              >moonshotai/Kimi-K2-Thinking - Hugging Face</a
+            >
+          </p>
+
+          <h3>3.4 モデル選定フローチャート</h3>
+          <script type="text/plain" id="mmd-3">
+            flowchart TB
+                Start["解きたいタスクは？"] --> Q1{"コーディング/自律的な開発作業が中心か？"}
+                Q1 -- はい --> Q2{"長時間の自律実行やMCPツール連携が必要か？"}
+                Q2 -- はい --> R1["kimi-k2.7-code を推奨"]
+                Q2 -- いいえ --> R2["kimi-k2.6 を推奨"]
+                Q1 -- いいえ --> Q3{"画像・動画を含むマルチモーダル入力があるか？"}
+                Q3 -- はい --> Q4{"コストを最優先するか？"}
+                Q4 -- はい --> R3["kimi-k2.5 を推奨"]
+                Q4 -- いいえ --> R2
+                Q3 -- いいえ --> Q5{"コストを最優先するか？"}
+                Q5 -- はい --> R3
+                Q5 -- いいえ --> R2
+          </script>
+          <pre class="mermaid" id="mermaid-3"></pre>
+          <div class="diagram-caption">図3: タスク種別によるモデル選定フロー</div>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a href="https://costgoat.com/pricing/kimi-api" target="_blank" rel="noopener"
+              >Kimi API Pricing Calculator & Cost Guide</a
+            >,
+            <a
+              href="https://codersera.com/blog/kimi-k2-7-complete-guide-2026/"
+              target="_blank"
+              rel="noopener"
+              >Kimi K2.7 Code: The Complete Guide</a
+            >
+          </p>
+        </section>
+
+        <!-- ============ 4. セットアップ ============ -->
+        <section class="section" id="setup">
+          <h2><span class="badge">04</span>開発を始める：ステップバイステップ・セットアップ</h2>
+
+          <script type="text/plain" id="mmd-4">
+            flowchart TB
+                A["1. platform.moonshot.ai でアカウント作成"] --> B["2. 最低1ドル(または相当額)をチャージして口座を有効化"]
+                B --> C["3. コンソールの API Keys ページでキーを発行"]
+                C --> D["4. MOONSHOT_API_KEY を環境変数として設定"]
+                D --> E["5. OpenAI SDK (>=1.0) を pip / npm でインストール"]
+                E --> F["6. base_url を https://api.moonshot.ai/v1 に設定"]
+                F --> G["7. GET /v1/models で利用可能モデルを確認"]
+                G --> H["8. 最初のチャット補完リクエストを送信"]
+          </script>
+          <pre class="mermaid" id="mermaid-4"></pre>
+          <div class="diagram-caption">図4: API利用開始までのステップ</div>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a href="https://platform.kimi.ai/docs/overview" target="_blank" rel="noopener"
+              >Quickstart - Kimi API Platform</a
+            >,
+            <a href="https://www.datacamp.com/tutorial/kimi-k2" target="_blank" rel="noopener"
+              >Kimi K2: A Guide With 6 Practical Examples | DataCamp</a
+            >
+          </p>
+
+          <h3>4.1 Python環境のセットアップ</h3>
+          <pre class="codeblock"><code class="language-bash">pip3 install --upgrade 'openai&gt;=1.0'
+python3 -c 'import openai; print("version =", openai.__version__)'
+
+export MOONSHOT_BASE_URL="https://api.moonshot.ai/v1"
+export MOONSHOT_API_KEY="sk-xxxxxxxxxxxxxxxxxxxxxxxx"</code></pre>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a
+              href="https://platform.kimi.ai/docs/guide/use-kimi-k2-to-setup-agent"
+              target="_blank"
+              rel="noopener"
+              >Use Kimi K2.6 Model to Setup Agent - Kimi API Platform</a
+            >
+          </p>
+
+          <h3>4.2 最初の呼び出し(Python / OpenAI SDK互換)</h3>
+          <pre class="codeblock"><code class="language-python">import os
+from openai import OpenAI
+
+client = OpenAI(
+    api_key=os.environ["MOONSHOT_API_KEY"],
+    base_url="https://api.moonshot.ai/v1",
+)
+
+completion = client.chat.completions.create(
+    model="kimi-k2.6",
+    messages=[
+        {
+            "role": "system",
+            "content": (
+                "You are Kimi, an AI assistant provided by Moonshot AI. "
+                "You are especially good at conversations in Chinese and English. "
+                "You provide users with safe, helpful, and accurate answers."
+            ),
+        },
+        {"role": "user", "content": "自己紹介を簡潔にしてください。"},
+    ],
+    max_tokens=256,
+)
+
+print(completion.choices[0].message.content)</code></pre>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a href="https://platform.kimi.ai/docs/overview" target="_blank" rel="noopener"
+              >Quickstart - Kimi API Platform</a
+            >,
+            <a
+              href="https://huggingface.co/moonshotai/Kimi-K2-Instruct"
+              target="_blank"
+              rel="noopener"
+              >moonshotai/Kimi-K2-Instruct - Hugging Face</a
+            >
+          </p>
+
+          <div class="callout">
+            <strong>重要</strong>：国際向けエンドポイントは
+            <code class="inline">api.moonshot.ai/v1</code>、中国本土向けは
+            <code class="inline">api.moonshot.cn/v1</code> です。 ドキュメントも
+            <code class="inline">platform.moonshot.ai</code> と
+            <code class="inline">platform.kimi.ai</code>
+            の2ドメインで公開されているため、リンク切れに見えても慌てず両方を確認してください。
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a href="https://kimik2ai.com/api/" target="_blank" rel="noopener"
+              >Kimi API: Kimi K2 API vs Kimi K2.5 API</a
+            >
+          </p>
+        </section>
+
+        <!-- ============ 5. 基本パラメータ ============ -->
+        <section class="section" id="params">
+          <h2><span class="badge">05</span>基本パラメータのベストプラクティス</h2>
+
+          <h3>5.1 推奨temperature早見表</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>モデル</th>
+                  <th>推奨temperature</th>
+                  <th>備考</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code class="inline">kimi-k2</code>(Instruct, legacy)</td>
+                  <td>0.6</td>
+                  <td>特別な指示がなければこの値がデフォルトの良い出発点</td>
+                </tr>
+                <tr>
+                  <td><code class="inline">kimi-k2-thinking</code>(legacy)</td>
+                  <td>1.0</td>
+                  <td>思考連鎖の多様性を確保するため高め</td>
+                </tr>
+                <tr>
+                  <td><code class="inline">kimi-k2.5</code></td>
+                  <td>用途に応じて調整可</td>
+                  <td>Instant/Thinkingモードで挙動が変わるため要検証</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code class="inline">kimi-k2.6</code> /
+                    <code class="inline">kimi-k2.7-code</code>
+                  </td>
+                  <td>固定(変更不可)</td>
+                  <td>常時思考モードのためtemperature等のサンプリング設定は無視される</td>
+                </tr>
+                <tr>
+                  <td>Anthropic互換API経由</td>
+                  <td><code class="inline">real_temperature = request_temperature * 0.6</code></td>
+                  <td>既存Anthropicアプリとの互換性のための独自マッピング</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a href="https://github.com/moonshotai/kimi-k2" target="_blank" rel="noopener"
+              >GitHub - MoonshotAI/Kimi-K2</a
+            >,
+            <a
+              href="https://huggingface.co/moonshotai/Kimi-K2-Thinking"
+              target="_blank"
+              rel="noopener"
+              >moonshotai/Kimi-K2-Thinking - Hugging Face</a
+            >,
+            <a href="https://empiriolabs.ai/models/kimi-k2-7-code" target="_blank" rel="noopener"
+              >Kimi K2.7 Code API: Pricing, Playground & Docs</a
+            >
+          </p>
+
+          <h3>5.2 max_tokens / max_completion_tokens</h3>
+          <ul>
+            <li>
+              <code class="inline">max_completion_tokens</code>(または
+              <code class="inline">max_tokens</code
+              >)は「返答として期待する長さ」であり、入力+出力の合計長ではありません。入力と出力の合計がモデルのコンテキスト長を超えると
+              <code class="inline">invalid_request_error</code> が返されます。
+            </li>
+            <li>
+              応答が途中で切れた場合、<code class="inline">finish_reason</code> は
+              <code class="inline">"length"</code> になります。この場合は
+              <a href="#partial-mode">9. Partial Mode</a> を使って続きを生成させます。
+            </li>
+            <li>
+              ベンチマークなど再現性が重要な用途では、公式ガイドが用途別の目安値を示しています。推論系ベンチマークは128k、コーディング系は256k、複数ホップの検索を伴うエージェントタスクは256k+コンテキスト管理、それ以外は16k〜64k程度が目安です。
+            </li>
+          </ul>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a href="https://platform.kimi.ai/docs/api/chat" target="_blank" rel="noopener"
+              >Create Chat Completion - Kimi API Platform</a
+            >,
+            <a
+              href="https://platform.moonshot.ai/docs/guide/benchmark-best-practice"
+              target="_blank"
+              rel="noopener"
+              >Best Practices for Benchmarking - Moonshot AI Open Platform</a
+            >
+          </p>
+
+          <h3>5.3 stream=True を基本にする</h3>
+          <p>
+            長い出力は生成に数分かかることがあり、アイドル状態のTCP接続はファイアウォールやロードバランサ、NATゲートウェイによって切断される場合があります。
+            ストリーミングを有効にすると接続が生かされ続け、信頼性が大きく向上します。<code
+              class="inline"
+              >stream=false</code
+            >
+            の場合、
+            <code class="inline">api.moonshot.ai</code>
+            側のタイムアウトは2時間に設定されていますが、経由するISP側で早めに切断されることもある点に注意してください。
+          </p>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a
+              href="https://platform.moonshot.ai/docs/guide/benchmark-best-practice"
+              target="_blank"
+              rel="noopener"
+              >Best Practices for Benchmarking - Moonshot AI Open Platform</a
+            >
+          </p>
+        </section>
+
+        <!-- ============ 6. システムプロンプト ============ -->
+        <section class="section" id="system-prompt">
+          <h2><span class="badge">06</span>システムプロンプト設計のベストプラクティス</h2>
+          <p>
+            システムプロンプトは、モデルが応答を生成する前に受け取る「初期指示」であり、出力の形式・内容・スタイルを決定づける最も重要な準備工程です。
+            公式ドキュメントの核心的な考え方は「モデルはあなたの心を読めない」という一文に集約されます。指示が曖昧であるほどモデルは推測に頼らざるを得ず、
+            期待した出力から外れやすくなります。
+          </p>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a
+              href="https://platform.kimi.ai/docs/guide/prompt-best-practice"
+              target="_blank"
+              rel="noopener"
+              >Best Practices for Prompts - Kimi API Platform</a
+            >
+          </p>
+
+          <h3>6.1 デフォルトのシステムプロンプト</h3>
+          <p>
+            特別な指示が不要な場合、公式が推奨する安全性重視のシステムプロンプトは次の通りです。
+          </p>
+          <pre
+            class="codeblock"
+          ><code class="language-text">You are Kimi, an artificial intelligence assistant provided by Moonshot AI.
+You are more proficient in Chinese and English conversations. You provide
+users with safe, helpful, and accurate answers. At the same time, you will
+refuse to answer any questions involving terrorism, racism, or explicit
+violence. Moonshot AI is a proper noun and should not be translated into
+other languages.</code></pre>
+          <p>
+            より簡潔な
+            <code class="inline">"You are Kimi, an AI assistant created by Moonshot AI."</code>
+            でも多くの場面で十分に機能しますが、
+            API経由で本番運用する場合は安全性の観点から公式の長い版が推奨されています。
+          </p>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a
+              href="https://platform.kimi.ai/docs/guide/prompt-best-practice"
+              target="_blank"
+              rel="noopener"
+              >Best Practices for Prompts - Kimi API Platform</a
+            >,
+            <a
+              href="https://huggingface.co/moonshotai/Kimi-K2-Instruct/discussions/28"
+              target="_blank"
+              rel="noopener"
+              >moonshotai/Kimi-K2-Instruct · Correct system prompt? - Hugging Face</a
+            >
+          </p>
+
+          <h3>6.2 明確さの原則(4つのチェック)</h3>
+          <ol>
+            <li>
+              <strong>役割を与える</strong>：<code class="inline">messages</code> の
+              <code class="inline">system</code>
+              フィールドで、モデルに期待する役割・専門性を明示する。
+            </li>
+            <li>
+              <strong>区切り文字を使う</strong
+              >：三重引用符・XMLタグ・見出しなどで、処理内容が異なるテキスト部分を分離する。
+            </li>
+            <li>
+              <strong>少数の具体例(few-shot)を示す</strong
+              >：あらゆる場合分けを網羅するより、一般的な指針の例を示す方が効率的。
+            </li>
+            <li>
+              <strong>出力の長さ・形式を指定する</strong
+              >：単語数指定は精度が低いため、段落数・箇条書き数での指定を優先する。
+            </li>
+          </ol>
+          <pre class="codeblock"><code class="language-json">{
+  "messages": [
+    {
+      "role": "system",
+      "content": "あなたは2つの同じジャンルの記事を受け取ります。&lt;article&gt;タグで区切られています。まず各記事の論点を要約し、次にどちらがより説得力があるかを理由とともに述べてください。"
+    },
+    {
+      "role": "user",
+      "content": "&lt;article&gt;ここに記事1&lt;/article&gt;&lt;article&gt;ここに記事2&lt;/article&gt;"
+    }
+  ]
+}</code></pre>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a
+              href="https://platform.kimi.ai/docs/guide/prompt-best-practice"
+              target="_blank"
+              rel="noopener"
+              >Best Practices for Prompts - Kimi API Platform</a
+            >
+          </p>
+
+          <h3>6.3 実務レベルのシステムプロンプト設計プロセス</h3>
+          <p>
+            Moonshot公式の「業界リサーチAIエージェント」構築ガイドでは、システムプロンプトの作成手順を次の4段階に整理しています。
+          </p>
+          <script type="text/plain" id="mmd-5">
+            flowchart TB
+                A["1. 業務とユーザー像を明確化する<br/>(専門性/許容される専門用語/期待フォーマット)"] --> B["2. 制約とスタイルを定義する<br/>(言語統一/客観性/捏造禁止/引用ルール)"]
+                B --> C["3. 出力構造とテンプレートを与える<br/>(固定フォーマット/許可・禁止行動の明示)"]
+                C --> D["4. 特殊シナリオ・エッジケースの扱いを定義する<br/>(曖昧な質問/対応不可な依頼への振る舞い)"]
+          </script>
+          <pre class="mermaid" id="mermaid-5"></pre>
+          <div class="diagram-caption">図5: システムプロンプト設計の4段階プロセス</div>
+          <p>
+            このガイドで公開されている実例では、「言語統一(質問と同じ言語で回答する)」「グラフの配色を優先順位付きで固定する」
+            「データ出典を必ず明記し、確定情報と推定情報を区別する」「複数ソースでのクロスチェックを義務付ける」といった具体的なルールを、
+            そのままコピーして使えるテンプレートとして提供しています。
+          </p>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a
+              href="https://platform.kimi.ai/docs/guide/use-kimi-k2-to-setup-agent"
+              target="_blank"
+              rel="noopener"
+              >Use Kimi K2.6 Model to Setup Agent - Kimi API Platform</a
+            >
+          </p>
+
+          <h3>6.4 ツール利用時はシステムプロンプトで指図しすぎない</h3>
+          <p>
+            <code class="inline">tools</code>
+            パラメータで公式ツール(後述)を渡した場合、Kimiは自律的に「使うべきか・いつ使うか」を判断します。
+            システムプロンプト側でツールの使い方を細かく指定すると、かえってこの自律的な意思決定を妨げる可能性があるため、
+            <strong>ツールの使用方法そのものはシステムプロンプトに書かない</strong
+            >というのが公式の推奨です。
+          </p>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a
+              href="https://platform.kimi.ai/docs/guide/use-kimi-k2-to-setup-agent"
+              target="_blank"
+              rel="noopener"
+              >Use Kimi K2.6 Model to Setup Agent - Kimi API Platform</a
+            >
+          </p>
+        </section>
+
+        <!-- ============ 7. Tool Calling ============ -->
+        <section class="section" id="tool-calling">
+          <h2><span class="badge">07</span>Tool Calling(関数呼び出し)のベストプラクティス</h2>
+          <p>
+            Kimi
+            K2系列は強力なツール呼び出し能力を持っています。会話(「話す」能力)に加えて、ツール呼び出しによって検索・データベース照会・コード実行などの
+            「行動する」能力を獲得します。
+          </p>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a
+              href="https://platform.kimi.ai/docs/guide/use-kimi-k2-to-setup-agent"
+              target="_blank"
+              rel="noopener"
+              >Use Kimi K2.6 Model to Setup Agent - Kimi API Platform</a
+            >
+          </p>
+
+          <h3>7.1 基本のツール呼び出しループ</h3>
+          <script type="text/plain" id="mmd-6">
+            flowchart TB
+                A["ユーザーの質問を messages に追加"] --> B["tools 一覧とともに /v1/chat/completions へリクエスト"]
+                B --> C{"finish_reason は tool_calls か？"}
+                C -- はい --> D["各 tool_call の function.name / arguments を取得"]
+                D --> E["自前の実装でツールを実行する"]
+                E --> F["role=tool, tool_call_id 付きで結果を messages に追加"]
+                F --> B
+                C -- いいえ --> G["message.content を最終回答として表示"]
+          </script>
+          <pre class="mermaid" id="mermaid-6"></pre>
+          <div class="diagram-caption">図6: 基本のツール呼び出しループ</div>
+
+          <pre class="codeblock"><code class="language-python">tools = [{
+    "type": "function",
+    "function": {
+        "name": "get_weather",
+        "description": "Call this when the user asks about the weather.",
+        "parameters": {
+            "type": "object",
+            "required": ["city"],
+            "properties": {
+                "city": {"type": "string", "description": "Name of the city"}
+            },
+        },
+    },
+}]
+
+def get_weather(city: str) -&gt; dict:
+    return {"weather": "Sunny"}
+
+tool_map = {"get_weather": get_weather}
+
+messages = [
+    {"role": "system", "content": "You are Kimi, an AI assistant created by Moonshot AI."},
+    {"role": "user", "content": "北京の今日の天気を教えて。ツールを使って確認して。"},
+]
+
+finish_reason = None
+while finish_reason is None or finish_reason == "tool_calls":
+    completion = client.chat.completions.create(
+        model="kimi-k2.6",
+        messages=messages,
+        tools=tools,
+        tool_choice="auto",
+    )
+    choice = completion.choices[0]
+    finish_reason = choice.finish_reason
+    if finish_reason == "tool_calls":
+        messages.append(choice.message)
+        for call in choice.message.tool_calls:
+            result = tool_map[call.function.name](**json.loads(call.function.arguments))
+            messages.append({
+                "role": "tool",
+                "tool_call_id": call.id,
+                "content": json.dumps(result),
+            })</code></pre>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a href="https://github.com/moonshotai/kimi-k2" target="_blank" rel="noopener"
+              >GitHub - MoonshotAI/Kimi-K2</a
+            >,
+            <a
+              href="https://huggingface.co/moonshotai/Kimi-K2-Instruct"
+              target="_blank"
+              rel="noopener"
+              >moonshotai/Kimi-K2-Instruct - Hugging Face</a
+            >
+          </p>
+
+          <h3>7.2 公式ツール一覧</h3>
+          <p>
+            Kimi K2.6以降では、以下の公式ツールがプラットフォーム側で提供されており、<code
+              class="inline"
+              >tools</code
+            >
+            に登録するだけで自由に組み合わせられます。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ツール名</th>
+                  <th>説明</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code class="inline">web-search</code></td>
+                  <td>リアルタイム情報・インターネット検索(呼び出し課金あり)</td>
+                </tr>
+                <tr>
+                  <td><code class="inline">rethink</code></td>
+                  <td>インテリジェント推論ツール</td>
+                </tr>
+                <tr>
+                  <td><code class="inline">random-choice</code></td>
+                  <td>ランダム選択ツール</td>
+                </tr>
+                <tr>
+                  <td><code class="inline">memory</code></td>
+                  <td>会話履歴・ユーザー嗜好の永続的な記憶ストレージ</td>
+                </tr>
+                <tr>
+                  <td><code class="inline">excel</code></td>
+                  <td>Excel/CSVファイル解析ツール</td>
+                </tr>
+                <tr>
+                  <td><code class="inline">code_runner</code></td>
+                  <td>Pythonコード実行ツール</td>
+                </tr>
+                <tr>
+                  <td><code class="inline">quickjs</code></td>
+                  <td>安全なJavaScript実行エンジン</td>
+                </tr>
+                <tr>
+                  <td><code class="inline">date</code></td>
+                  <td>日付・時刻処理ツール</td>
+                </tr>
+                <tr>
+                  <td><code class="inline">fetch</code></td>
+                  <td>URLコンテンツ抽出・Markdown整形ツール</td>
+                </tr>
+                <tr>
+                  <td><code class="inline">convert</code></td>
+                  <td>長さ・質量・体積・温度・通貨などの単位変換ツール</td>
+                </tr>
+                <tr>
+                  <td><code class="inline">base64</code></td>
+                  <td>base64エンコード/デコードツール</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a
+              href="https://platform.kimi.ai/docs/guide/use-kimi-k2-to-setup-agent"
+              target="_blank"
+              rel="noopener"
+              >Use Kimi K2.6 Model to Setup Agent - Kimi API Platform</a
+            >
+          </p>
+
+          <h3>7.3 ベストプラクティスまとめ(実運用)</h3>
+          <ul>
+            <li>
+              ツールは<strong>単機能・小さく</strong>設計する(検索・取得・更新など役割を分離)。
+            </li>
+            <li>ツールの出力フォーマットは<strong>一貫したJSON</strong>にする。</li>
+            <li>ツール実行には<strong>タイムアウトとリトライ</strong>を必ず設定する。</li>
+            <li>すべてのツール呼び出しを<strong>ログに記録</strong>し、デバッグと監査に備える。</li>
+            <li>
+              モデルが「習慣的に」ツールを呼びすぎないよう、プランナー的な指示を加えて必要なときだけ呼び出させる。
+            </li>
+            <li>
+              <code class="inline">tool_choice</code> は基本的に
+              <code class="inline">"auto"</code> を使い、純粋なテキスト生成のみが目的の場合に限り
+              <code class="inline">"none"</code> を使う。
+            </li>
+          </ul>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a href="https://agentsapis.com/kimi-api/" target="_blank" rel="noopener"
+              >Kimi API (Moonshot AI) - Complete Developer Guide</a
+            >
+          </p>
+        </section>
+
+        <!-- ============ 8. Thinkingモード ============ -->
+        <section class="section" id="thinking">
+          <h2><span class="badge">08</span>Thinkingモード(推論モデル)を使う際の注意点</h2>
+          <p>
+            <code class="inline">kimi-k2.7-code</code> や
+            <code class="inline">kimi-k2.6</code>(思考有効時)のような「思考モデル」では、
+            応答の中に最終回答(<code class="inline">content</code
+            >)とは別に、モデルの推論過程を保持する
+            <strong><code class="inline">reasoning_content</code></strong>
+            フィールドが返されます。この節のルールを守らないと、
+            マルチターンやツール呼び出しを伴う長時間タスクでエラーになったり、精度が大きく低下したりします。
+          </p>
+
+          <script type="text/plain" id="mmd-7">
+            flowchart TB
+                A["1ターン目: thinking.enabled でリクエスト送信"] --> B["応答に reasoning_content と content が返る"]
+                B --> C["assistant メッセージとして reasoning_content をそのまま保持し messages に追加"]
+                C --> D["ユーザーの次の質問(または続きの指示)を追加"]
+                D --> E["同じ messages 全体で再度リクエスト"]
+                E --> F{"tool_choice は auto か none か？"}
+                F -- はい --> G["リクエスト成功・推論の連続性を維持"]
+                F -- いいえ(他の値を指定) --> H["エラーになるため auto または none に修正する"]
+          </script>
+          <pre class="mermaid" id="mermaid-7"></pre>
+          <div class="diagram-caption">図7: Thinkingモードでのreasoning_content保持フロー</div>
+
+          <h3>8.1 reasoning_contentを必ず保持する</h3>
+          <p>
+            思考が常時有効なモデルでは、過去のassistantメッセージの
+            <code class="inline">reasoning_content</code> を<strong>そのままの形で</strong>
+            メッセージ履歴に残さなければなりません。これは、モデルが多段階の推論やツール呼び出しにおいて論理的一貫性を保つために必要な情報だからです。
+            省略すると、後続ターンで文脈を見失ったり、不完全な回答を生成したりする原因になります。なお
+            <code class="inline">reasoning_content</code> も トークン課金(入出力)の対象になります。
+          </p>
+          <pre
+            class="codeblock"
+          ><code class="language-python">stream = client.chat.completions.create(
+    model="kimi-k2.7-code",
+    messages=[
+        {"role": "system", "content": "You are Kimi."},
+        {"role": "user", "content": "First question..."},
+        {
+            "role": "assistant",
+            "reasoning_content": "&lt;前回のAPI応答で返された reasoning_content&gt;",
+            "content": "&lt;前回のAPI応答で返された最終回答&gt;",
+        },
+        {"role": "user", "content": "続きの分析をお願いします。"},
+    ],
+    extra_body={"thinking": {"type": "enabled", "keep": "all"}},
+)</code></pre>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a
+              href="https://platform.kimi.ai/docs/guide/use-kimi-k2-thinking-model"
+              target="_blank"
+              rel="noopener"
+              >Set Parameters for Thinking Mode - Kimi API Platform</a
+            >,
+            <a
+              href="https://platform.moonshot.ai/docs/guide/benchmark-best-practice"
+              target="_blank"
+              rel="noopener"
+              >Best Practices for Benchmarking - Moonshot AI Open Platform</a
+            >
+          </p>
+
+          <h3>8.2 tool_choiceの制約</h3>
+          <p>
+            <code class="inline">thinking</code> パラメータが
+            <code class="inline">{"type": "enabled"}</code> の場合、
+            <code class="inline">tool_choice</code> は <code class="inline">"auto"</code> または
+            <code class="inline">"none"</code>(デフォルトは<code class="inline">"auto"</code>)
+            しか指定できません。それ以外の値を指定すると、推論内容と強制されたツール選択が競合するためエラーになります。
+          </p>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a
+              href="https://platform.moonshot.ai/docs/guide/benchmark-best-practice"
+              target="_blank"
+              rel="noopener"
+              >Best Practices for Benchmarking - Moonshot AI Open Platform</a
+            >
+          </p>
+
+          <h3>8.3 その他の実務ポイント</h3>
+          <ul>
+            <li>
+              OpenAI SDKの型定義には
+              <code class="inline">reasoning_content</code> 属性が直接提供されていないため、<code
+                class="inline"
+                >hasattr(obj, "reasoning_content")</code
+              >
+              で存在確認してから <code class="inline">getattr</code> で値を取得する必要があります。
+            </li>
+            <li>
+              ストリーミング時は必ず <code class="inline">reasoning_content</code> が
+              <code class="inline">content</code> より先に出力されるため、<code class="inline"
+                >content</code
+              >
+              が出力され始めた時点を「推論終了」の合図として使えます。
+            </li>
+            <li>
+              <code class="inline">kimi-k2.5</code> の組み込み
+              <code class="inline">$web_search</code>
+              ツールは、思考モードと一時的に非互換なため、必要であれば思考モードを無効化してから使用してください。
+            </li>
+            <li>
+              <code class="inline">kimi-k2.7-code</code> は常時思考モードが強制されており、<code
+                class="inline"
+                >temperature</code
+              >
+              などのサンプリングパラメータは指定しても無視されます。
+            </li>
+          </ul>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a
+              href="https://platform.kimi.ai/docs/guide/use-kimi-k2-thinking-model"
+              target="_blank"
+              rel="noopener"
+              >Set Parameters for Thinking Mode - Kimi API Platform</a
+            >,
+            <a href="https://empiriolabs.ai/models/kimi-k2-7-code" target="_blank" rel="noopener"
+              >Kimi K2.7 Code API: Pricing, Playground & Docs</a
+            >
+          </p>
+        </section>
+
+        <!-- ============ 9. Partial Mode ============ -->
+        <section class="section" id="partial-mode">
+          <h2><span class="badge">09</span>Partial Mode(プリフィル)の活用</h2>
+          <p>
+            Partial
+            Mode(プリフィル)は、応答の一部をあらかじめ与えて、モデルにその続きを生成させる機能です。出力フォーマットの固定、
+            ロールプレイの一貫性維持、切り詰められた出力の継続などに使えます。
+          </p>
+          <p>
+            有効化するには、<code class="inline">messages</code> の末尾に
+            <code class="inline">role: "assistant"</code> のメッセージを追加し、
+            <code class="inline">"partial": true</code> を設定します。
+          </p>
+          <pre
+            class="codeblock"
+          ><code class="language-python">completion = client.chat.completions.create(
+    model="kimi-k2.6",
+    messages=[
+        {"role": "user", "content": "クイックソートをPythonで実装して。"},
+        {"role": "assistant", "content": "```python\n", "partial": True},
+    ],
+)</code></pre>
+          <p>
+            この例では、モデルは説明文から書き始めるのではなく、<code class="inline"
+              >```python</code
+            >
+            の続きからコードを生成します。
+            応答には先頭に与えたプレフィックス自体は含まれないため、呼び出し側で手動で連結する必要があります。
+          </p>
+
+          <h3>9.1 主な利用シーン</h3>
+          <ul>
+            <li>
+              JSONなど特定フォーマットで開始させる(例：<code class="inline">{</code> から始める)
+            </li>
+            <li>
+              ロールプレイでキャラクター名の一貫性を保つ(<code class="inline">name</code>
+              フィールドと組み合わせる)
+            </li>
+            <li>
+              <code class="inline">finish_reason == "length"</code>
+              で応答が切れた際に、同じプレフィックスを使って続きを生成する
+            </li>
+          </ul>
+          <pre
+            class="codeblock"
+          ><code class="language-python">completion = client.chat.completions.create(
+    model="kimi-k2.5",
+    messages=[
+        {"role": "system", "content": "製品説明から名称・サイズ・価格・色を抽出し、1つのJSONオブジェクトで出力してください。"},
+        {"role": "user", "content": "スマートホームMiniは..."},
+        {"role": "assistant", "content": "{", "partial": True},
+    ],
+)
+print("{" + completion.choices[0].message.content)</code></pre>
+
+          <div class="callout warn">
+            <strong>注意</strong>：Partial Modeと
+            <code class="inline">response_format=json_object</code>
+            は併用しないでください。予期しない応答になる可能性があります。
+            また、思考モデルで途中から継続する場合は、前回の
+            <code class="inline">reasoning_content</code> も一緒に渡す必要があります。
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a href="https://platform.kimi.ai/docs/api/partial" target="_blank" rel="noopener"
+              >Partial Mode - Kimi API Platform</a
+            >,
+            <a
+              href="https://platform.moonshot.ai/docs/guide/use-partial-mode-feature-of-kimi-api"
+              target="_blank"
+              rel="noopener"
+              >Use Partial Mode with Kimi API</a
+            >
+          </p>
+        </section>
+
+        <!-- ============ 10. コンテキストキャッシュ ============ -->
+        <section class="section" id="caching">
+          <h2><span class="badge">10</span>コンテキストキャッシュとコスト最適化</h2>
+          <p>
+            Kimiの<strong>自動コンテキストキャッシュ</strong>は、直近のリクエストと共通する接頭辞(システムプロンプトや参照ドキュメントなど)を検出し、
+            その部分を通常より大幅に安い「キャッシュヒット料金」で課金する仕組みです。特別な設定は不要で、同じ内容を繰り返し送るだけで自動的に適用されます。
+          </p>
+
+          <script type="text/plain" id="mmd-8">
+            flowchart TB
+                A["同一のシステムプロンプト/ドキュメント接頭辞を送信"] --> B{"直近のリクエストと接頭辞が一致するか？"}
+                B -- 一致する --> C["一致した部分は cached_tokens として割引価格で課金"]
+                B -- 一致しない --> D["通常の入力価格 (cache miss) で課金"]
+                C --> E["レスポンスの usage.cached_tokens で確認できる"]
+                D --> E
+          </script>
+          <pre class="mermaid" id="mermaid-8"></pre>
+          <div class="diagram-caption">図8: コンテキストキャッシュの仕組み</div>
+
+          <ul>
+            <li>
+              キャッシュヒット時の入力コストは、モデルによって通常価格の80〜85%程度の割引になります(詳細は次章の料金表を参照)。
+            </li>
+            <li>
+              <code class="inline">prompt_cache_key</code>
+              フィールドを使うと、セッションIDやタスクIDを指定してキャッシュヒット率を最適化できます。特にコーディングエージェントやマルチターンのエージェント処理で有効です。
+            </li>
+            <li>
+              コンテキストキャッシュは「Kimiがユーザーを記憶する仕組み」ではなく、<strong>あくまで似た/繰り返しのプロンプトに対するAPI最適化</strong>である点を混同しないようにしましょう。
+            </li>
+          </ul>
+
+          <h3>10.1 長いコンテキストを使いこなすコツ</h3>
+          <ul>
+            <li>
+              巨大なドキュメントをそのまま毎回送るのではなく、関連する章・セクションだけを抽出して渡す(RAG的アプローチ)。
+            </li>
+            <li>
+              出力に必要なトークン数(引用・要約・結論など)をあらかじめ見積もり、<code class="inline"
+                >max_completion_tokens</code
+              >
+              に余裕を持たせる。
+            </li>
+            <li>
+              会話が長くなったら、古いターンを要約してから渡す。すべての生の会話履歴を毎回送り続けない。
+            </li>
+            <li>
+              「とりあえず全部詰め込む(コンテキストの詰め込みすぎ)」は、無関係な情報がノイズとなり回答品質を下げるため避ける。
+            </li>
+          </ul>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a
+              href="https://kimi-ai.chat/guide/manages-context-windows/"
+              target="_blank"
+              rel="noopener"
+              >How Kimi AI Manages Context Windows</a
+            >,
+            <a href="https://costgoat.com/pricing/kimi-api" target="_blank" rel="noopener"
+              >Kimi API Pricing Calculator & Cost Guide</a
+            >
+          </p>
+        </section>
+
+        <!-- ============ 11. マルチモーダル ============ -->
+        <section class="section" id="multimodal">
+          <h2><span class="badge">11</span>マルチモーダル入力(画像・動画)</h2>
+          <p>
+            <code class="inline">kimi-k2.5</code>
+            以降は、テキストに加えて画像・動画をネイティブに理解できるマルチモーダルモデルです。
+            <code class="inline">kimi-k2.7-code</code>
+            も画像・動画入力に対応しています。スクリーンショットの解析、UIモックからのコード生成、
+            グラフや化学構造式の読み取りなど幅広い用途に使えます。
+          </p>
+          <pre class="codeblock"><code class="language-python">messages = [
+    {
+        "role": "user",
+        "content": [
+            {"type": "text", "text": "この画面キャプチャで何が起きているか説明して"},
+            {"type": "image_url", "image_url": {"url": "https://example.com/screenshot.png"}},
+        ],
+    }
+]</code></pre>
+          <ul>
+            <li>
+              画像・動画トークンも、テキストと同じ1Mトークンあたりの料金体系でカウントされます。
+            </li>
+            <li>
+              大きな画像を本番投入する前に、トークン見積もりAPIでコストを事前に把握しておくと安心です。
+            </li>
+            <li>
+              「この画像について説明して」のような曖昧な指示ではなく、「何を・どのフォーマットで知りたいか」を具体的に書くと精度が上がります。
+            </li>
+          </ul>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a href="https://kimi-app.com/api/" target="_blank" rel="noopener"
+              >Kimi API Overview: Scale With 256K Context Language Models</a
+            >,
+            <a href="https://agentsapis.com/kimi-api/" target="_blank" rel="noopener"
+              >Kimi API (Moonshot AI) - Complete Developer Guide</a
+            >
+          </p>
+        </section>
+
+        <!-- ============ 12. 料金体系 ============ -->
+        <section class="section" id="pricing">
+          <h2><span class="badge">12</span>料金体系を理解する</h2>
+          <p>
+            料金は変更されやすいため、契約・予算設計の前に必ず
+            <a href="https://platform.kimi.ai/docs/pricing/chat" target="_blank" rel="noopener"
+              >Kimi API Platformの料金ページ</a
+            >
+            で最新の値を確認してください。以下は2026年7月時点で複数の一次情報が一致して報告している目安です(単位：USD
+            / 100万トークン)。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>モデル</th>
+                  <th>入力(キャッシュミス)</th>
+                  <th>入力(キャッシュヒット)</th>
+                  <th>出力</th>
+                  <th>コンテキスト長</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code class="inline">kimi-k2.5</code></td>
+                  <td>$0.60</td>
+                  <td>$0.10</td>
+                  <td>$3.00</td>
+                  <td>256K</td>
+                </tr>
+                <tr>
+                  <td><code class="inline">kimi-k2.6</code></td>
+                  <td>$0.95</td>
+                  <td>$0.16</td>
+                  <td>$4.00</td>
+                  <td>256K</td>
+                </tr>
+                <tr>
+                  <td><code class="inline">kimi-k2.7-code</code></td>
+                  <td>$0.95</td>
+                  <td>$0.19</td>
+                  <td>$4.00</td>
+                  <td>256K</td>
+                </tr>
+                <tr>
+                  <td><code class="inline">kimi-k2.7-code-highspeed</code></td>
+                  <td>$1.90</td>
+                  <td>$0.38</td>
+                  <td>$8.00</td>
+                  <td>256K</td>
+                </tr>
+                <tr>
+                  <td>旧世代K2ファミリー(EOL)</td>
+                  <td>$0.60</td>
+                  <td>$0.15</td>
+                  <td>$2.50</td>
+                  <td>128K〜256K</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a href="https://costgoat.com/pricing/kimi-api" target="_blank" rel="noopener"
+              >Kimi API Pricing Calculator & Cost Guide</a
+            >,
+            <a
+              href="https://tokencost.app/blog/kimi-k2-7-code-pricing"
+              target="_blank"
+              rel="noopener"
+              >Kimi K2.7 Code Pricing: $0.95/$4 per Million Tokens | TokenCost</a
+            >,
+            <a
+              href="https://developer.puter.com/tutorials/kimi-api-pricing/"
+              target="_blank"
+              rel="noopener"
+              >Kimi API Pricing: Full Breakdown of Costs</a
+            >
+          </p>
+
+          <h3>12.1 その他の課金要素</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>目安</th>
+                  <th>備考</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Batch API</td>
+                  <td>リアルタイム料金の約60%(≒40%割引)</td>
+                  <td>即時応答が不要な非同期処理向け</td>
+                </tr>
+                <tr>
+                  <td><code class="inline">$web_search</code> 組み込みツール</td>
+                  <td>1呼び出しあたり数ミリドル程度(要最新確認)</td>
+                  <td>呼び出しごとの固定費+検索結果分のトークン課金</td>
+                </tr>
+                <tr>
+                  <td>Kimiメンバーシップ(コンシューマー向け)</td>
+                  <td>月額プランは別課金体系</td>
+                  <td>API利用とは完全に別の請求(混同しないこと)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a href="https://www.cometapi.com/kimi-k2-api-pricing/" target="_blank" rel="noopener"
+              >Kimi K2 API Pricing 2026: K2.7, Batch and WebSearch Costs - CometAPI</a
+            >,
+            <a href="https://kimik2ai.com/pricing/" target="_blank" rel="noopener"
+              >Kimi AI Pricing 2026: Plans, Membership Cost & API Token Rates</a
+            >
+          </p>
+
+          <h3>12.2 コスト削減の実務チェックリスト</h3>
+          <ul>
+            <li>
+              モデルは「最新=最適」ではなく、タスクに応じて
+              <code class="inline">k2.5</code>(コスト重視)/<code class="inline">k2.6</code
+              >(汎用)/<code class="inline">k2.7-code</code>(コーディング特化)を使い分ける。
+            </li>
+            <li>
+              システムプロンプトや検索結果など、繰り返し送る接頭辞を一定に保ちキャッシュヒット率を高める。
+            </li>
+            <li>
+              出力コストは入力の約4倍になることが多いため、<code class="inline"
+                >max_completion_tokens</code
+              >
+              を適切に絞り、不要な思考トークンを発生させない設計にする。
+            </li>
+            <li>即時性が不要なバッチ処理はBatch APIに回す。</li>
+            <li>
+              <code class="inline">$web_search</code>
+              は本当に最新情報が必要なときだけ有効化する(結果は次ターンの入力トークンとしても課金される)。
+            </li>
+          </ul>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a
+              href="https://developer.puter.com/tutorials/kimi-api-pricing/"
+              target="_blank"
+              rel="noopener"
+              >Kimi API Pricing: Full Breakdown of Costs</a
+            >
+          </p>
+        </section>
+
+        <!-- ============ 13. レート制限 ============ -->
+        <section class="section" id="rate-limits">
+          <h2><span class="badge">13</span>レート制限と信頼性</h2>
+          <p>
+            Kimi
+            APIのレート制限は、固定のプラン(Free/Pro/Enterpriseなど)ではなく、<strong>アカウントへの累計チャージ額に応じたティア制</strong>で決まります。
+            以下は複数の非公式ガイドが報告している目安値です(必ず自分のコンソールの制限ページで確認してください)。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ティア(累計チャージ額の目安)</th>
+                  <th>同時実行数</th>
+                  <th>RPM(1分あたりリクエスト数)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Tier 0(¥0)</td>
+                  <td>1</td>
+                  <td>3</td>
+                </tr>
+                <tr>
+                  <td>Tier 1(約$10)</td>
+                  <td>50</td>
+                  <td>200</td>
+                </tr>
+                <tr>
+                  <td>上位ティア(約$100)</td>
+                  <td>200</td>
+                  <td>5,000</td>
+                </tr>
+                <tr>
+                  <td>最上位ティア(約$3,000)</td>
+                  <td>1,000</td>
+                  <td>10,000</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a href="https://costgoat.com/pricing/kimi-api" target="_blank" rel="noopener"
+              >Kimi API Pricing Calculator & Cost Guide</a
+            >,
+            <a href="https://kimi-k25.com/blog/kimi-k2-5-api" target="_blank" rel="noopener"
+              >Kimi K2.5 API: Complete Developer Guide</a
+            >
+          </p>
+
+          <h3>13.1 信頼性を高める実装のコツ</h3>
+          <ul>
+            <li>
+              <code class="inline">stream=True</code> を基本にし、長時間リクエストの接続断を防ぐ。
+            </li>
+            <li>429(レート制限超過)エラーに対して、指数バックオフ付きのリトライを実装する。</li>
+            <li>
+              サードパーティ経由でKimiモデルを利用する場合は、公式が提供する<strong
+                >Kimi Vendor Verifier(KVV)</strong
+              >を参考に、精度の高いホスティング先を選定する。
+            </li>
+            <li>
+              モデルIDをハードコードせず、<code class="inline">GET /v1/models</code>
+              で利用可能なモデル一覧を都度(またはキャッシュして定期的に)取得する運用にする。
+            </li>
+          </ul>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a
+              href="https://platform.moonshot.ai/docs/guide/benchmark-best-practice"
+              target="_blank"
+              rel="noopener"
+              >Best Practices for Benchmarking - Moonshot AI Open Platform</a
+            >,
+            <a href="https://agentsapis.com/kimi-api/" target="_blank" rel="noopener"
+              >Kimi API (Moonshot AI) - Complete Developer Guide</a
+            >
+          </p>
+        </section>
+
+        <!-- ============ 14. 実践例 ============ -->
+        <section class="section" id="practice">
+          <h2><span class="badge">14</span>実践例：業界リサーチAIエージェントの構築フロー</h2>
+          <p>
+            ここでは公式ガイドで紹介されている「業界情報を検索・分析・レポート化するエージェント」の構築手順を、初学者向けに整理します。
+          </p>
+
+          <script type="text/plain" id="mmd-9">
+            flowchart TB
+                A["1. タスクを分解する<br/>(検索/分析/統合出力の3段階)"] --> B["2. 必要なツールを選定する<br/>(web-search / code_runner / rethink など)"]
+                B --> C["3. システムプロンプトを設計する<br/>(役割・言語統一・出典明記ルール)"]
+                C --> D["4. 出力テンプレートを固定する<br/>(要約/データ分析/レポートの章立て)"]
+                D --> E["5. 特殊シナリオの扱いを定義する<br/>(データ欠落/矛盾/機微な話題への対応)"]
+                E --> F["6. 小規模なタスクでテストし反復改善する"]
+          </script>
+          <pre class="mermaid" id="mermaid-9"></pre>
+          <div class="diagram-caption">図9: 業界リサーチAIエージェントの構築ワークフロー</div>
+
+          <p>このワークフローの要点は次の通りです。</p>
+          <ol>
+            <li>
+              <strong>タスク分解</strong
+              >：検索(企業情報・最新データ・ニュース収集)→分析(大量情報のフィルタリング・分類)→統合出力(csv/png/pdf生成、グラフ作成)という3段階に分ける。
+            </li>
+            <li>
+              <strong>ツール選定</strong>：<code class="inline">web-search</code>(検索)・<code
+                class="inline"
+                >code_runner</code
+              >(グラフ描画やPDF生成)・<code class="inline">rethink</code
+              >(情報の統合・分析)のように役割ごとにツールを割り当てる。
+            </li>
+            <li>
+              <strong>システムプロンプト設計</strong
+              >：言語統一、配色などのビジュアル規約、データ出典の明記義務、確定情報/推定情報の区別、複数ソースでのクロスチェックといった具体的なルールをテンプレート化する。
+            </li>
+            <li>
+              <strong>特殊シナリオ対応</strong
+              >：「データが見つからない場合は検索範囲を明記した上でその旨を述べる」「情報源が矛盾する場合は両論を併記し理由を推測する」「機微な話題では主観を避け客観的なデータに徹する」など、あらかじめ振る舞いを定義しておく。
+            </li>
+          </ol>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a
+              href="https://platform.kimi.ai/docs/guide/use-kimi-k2-to-setup-agent"
+              target="_blank"
+              rel="noopener"
+              >Use Kimi K2.6 Model to Setup Agent - Kimi API Platform</a
+            >
+          </p>
+        </section>
+
+        <!-- ============ 15. セキュリティ ============ -->
+        <section class="section" id="security">
+          <h2><span class="badge">15</span>セキュリティと運用のベストプラクティス</h2>
+          <ul>
+            <li>
+              <strong>APIキーはサーバーサイドの秘密情報として扱う</strong
+              >：クライアントサイドのコード、公開リポジトリ、ログに絶対に含めない。環境変数で管理する。
+            </li>
+            <li>
+              <strong>ブラウザから直接APIを呼び出さない</strong
+              >：APIキーの露出を避けるため、必ずバックエンド経由で呼び出す。
+            </li>
+            <li>
+              <strong>入力内容・出力結果はKimiモデルの学習に使われない</strong
+              >とAPIセキュリティガイドラインで説明されていますが、機密情報・個人情報・医療/金融データなどを送る前には、必ず
+              <a href="https://platform.moonshot.ai/" target="_blank" rel="noopener"
+                >Kimi Open Platformのプライバシー・セキュリティ・契約条件</a
+              >を確認してください。
+            </li>
+            <li>
+              <strong>モデルIDと機能はconfigに外出しする</strong
+              >：新モデルのリリースや旧モデルのEOLに柔軟に対応できるようにする。
+            </li>
+          </ul>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a href="https://kimi-ai.chat/docs/api/" target="_blank" rel="noopener"
+              >Kimi AI API: Complete Guide to the Kimi API Platform</a
+            >
+          </p>
+        </section>
+
+        <!-- ============ 16. エラー対処 ============ -->
+        <section class="section" id="errors">
+          <h2><span class="badge">16</span>よくあるエラーと対処法</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>症状</th>
+                  <th>主な原因</th>
+                  <th>対処法</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code class="inline">invalid_request_error</code></td>
+                  <td>
+                    入力+<code class="inline">max_completion_tokens</code>がコンテキスト長を超過
+                  </td>
+                  <td>
+                    入力を要約・分割するか、<code class="inline">max_completion_tokens</code
+                    >を調整する
+                  </td>
+                </tr>
+                <tr>
+                  <td><code class="inline">finish_reason: "length"</code></td>
+                  <td>出力が<code class="inline">max_tokens</code>に達し途中で切れた</td>
+                  <td>Partial Modeで同じプレフィックスから継続生成する</td>
+                </tr>
+                <tr>
+                  <td>ツール呼び出し時にエラー</td>
+                  <td>
+                    思考モードで<code class="inline">tool_choice</code>に<code class="inline"
+                      >auto</code
+                    >/<code class="inline">none</code>以外を指定した
+                  </td>
+                  <td>
+                    <code class="inline">tool_choice</code>を<code class="inline">"auto"</code
+                    >または<code class="inline">"none"</code>に修正する
+                  </td>
+                </tr>
+                <tr>
+                  <td>マルチターンのツール呼び出しでエラー</td>
+                  <td>
+                    直前ターンの<code class="inline">reasoning_content</code>を保持せずに送信した
+                  </td>
+                  <td>
+                    直前のassistantメッセージの<code class="inline">reasoning_content</code
+                    >をそのまま含めて送信する
+                  </td>
+                </tr>
+                <tr>
+                  <td>非ストリーミングで接続が途切れる</td>
+                  <td>長時間のアイドル接続がネットワーク経路で切断された</td>
+                  <td><code class="inline">stream=True</code>に切り替える</td>
+                </tr>
+                <tr>
+                  <td><code class="inline">code_runner</code>などのループ処理が終わらない</td>
+                  <td>1ターンあたりの<code class="inline">max_tokens</code>が小さすぎる</td>
+                  <td>
+                    <code class="inline">response.json</code>を保存し<code class="inline"
+                      >finish_reason</code
+                    >を確認、必要なら<code class="inline">max_tokens</code>を引き上げる
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-faint)">
+            出典:
+            <a
+              href="https://platform.kimi.ai/docs/guide/use-kimi-k2-to-setup-agent"
+              target="_blank"
+              rel="noopener"
+              >Use Kimi K2.6 Model to Setup Agent - Kimi API Platform</a
+            >,
+            <a
+              href="https://platform.moonshot.ai/docs/guide/benchmark-best-practice"
+              target="_blank"
+              rel="noopener"
+              >Best Practices for Benchmarking - Moonshot AI Open Platform</a
+            >
+          </p>
+        </section>
+
+        <!-- ============ 17. チェックリスト ============ -->
+        <section class="section" id="checklist">
+          <h2><span class="badge">17</span>ベストプラクティス・チェックリスト(まとめ)</h2>
+          <div class="table-wrap">
+            <table class="checklist-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>チェック項目</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>
+                    タスクの性質(コーディング/汎用/マルチモーダル/コスト重視)に応じてモデルを選定したか
+                  </td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>旧世代K2ファミリー(EOL)を使い続けていないか確認したか</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>
+                    システムプロンプトで役割・制約・出力テンプレート・エッジケースを具体的に定義したか
+                  </td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>ツール利用時に使い方をシステムプロンプトで指図しすぎていないか</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>
+                    思考モデル利用時に<code class="inline">reasoning_content</code
+                    >を毎ターン保持しているか
+                  </td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>
+                    思考モデル利用時に<code class="inline">tool_choice</code>を<code class="inline"
+                      >auto</code
+                    >/<code class="inline">none</code>に限定しているか
+                  </td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>長い出力には<code class="inline">stream=True</code>を使っているか</td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>繰り返し送る接頭辞を固定してキャッシュヒット率を上げているか</td>
+                </tr>
+                <tr>
+                  <td>9</td>
+                  <td>
+                    <code class="inline">max_completion_tokens</code
+                    >を用途に応じて適切に設定しているか
+                  </td>
+                </tr>
+                <tr>
+                  <td>10</td>
+                  <td>APIキーをサーバーサイドで安全に管理しているか</td>
+                </tr>
+                <tr>
+                  <td>11</td>
+                  <td>429エラーに対するリトライ・バックオフを実装しているか</td>
+                </tr>
+                <tr>
+                  <td>12</td>
+                  <td>
+                    本番投入前に公式ドキュメントで最新のモデルID・料金・レート制限を確認したか
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ============ 18. 参考文献 ============ -->
+        <section class="section ref-group" id="references">
+          <h2><span class="badge">18</span>参考文献(参照URL一覧)</h2>
+
+          <h3>Kimi製品・エコシステム</h3>
+          <ul class="ref-list">
+            <li>
+              Kimi Work: Next-Gen Desktop AI Agent for Knowledge Workers —
+              <a href="https://www.kimi.com/products/kimi-work" target="_blank" rel="noopener"
+                >https://www.kimi.com/products/kimi-work</a
+              >
+            </li>
+            <li>
+              AI Document Agent for Automating Knowledge Work | Kimi Docs —
+              <a href="https://www.kimi.com/features/docs" target="_blank" rel="noopener"
+                >https://www.kimi.com/features/docs</a
+              >
+            </li>
+            <li>
+              Kimi (chatbot) - Wikipedia —
+              <a href="https://en.wikipedia.org/wiki/Kimi_(chatbot)" target="_blank" rel="noopener"
+                >https://en.wikipedia.org/wiki/Kimi_(chatbot)</a
+              >
+            </li>
+          </ul>
+
+          <h3>モデル・アーキテクチャ</h3>
+          <ul class="ref-list">
+            <li>
+              GitHub - MoonshotAI/Kimi-K2 —
+              <a href="https://github.com/moonshotai/kimi-k2" target="_blank" rel="noopener"
+                >https://github.com/moonshotai/kimi-k2</a
+              >
+            </li>
+            <li>
+              moonshotai/Kimi-K2-Instruct - Hugging Face —
+              <a
+                href="https://huggingface.co/moonshotai/Kimi-K2-Instruct"
+                target="_blank"
+                rel="noopener"
+                >https://huggingface.co/moonshotai/Kimi-K2-Instruct</a
+              >
+            </li>
+            <li>
+              moonshotai/Kimi-K2-Thinking - Hugging Face —
+              <a
+                href="https://huggingface.co/moonshotai/Kimi-K2-Thinking"
+                target="_blank"
+                rel="noopener"
+                >https://huggingface.co/moonshotai/Kimi-K2-Thinking</a
+              >
+            </li>
+            <li>
+              GitHub - MoonshotAI/Kimi-K2.5 —
+              <a href="https://github.com/MoonshotAI/Kimi-K2.5" target="_blank" rel="noopener"
+                >https://github.com/MoonshotAI/Kimi-K2.5</a
+              >
+            </li>
+            <li>
+              Moonshot AI · GitHub(組織ページ) —
+              <a href="https://github.com/moonshotai" target="_blank" rel="noopener"
+                >https://github.com/moonshotai</a
+              >
+            </li>
+            <li>
+              moonshotai/Kimi-K2-Instruct · Correct system prompt? (Hugging Face Discussion) —
+              <a
+                href="https://huggingface.co/moonshotai/Kimi-K2-Instruct/discussions/28"
+                target="_blank"
+                rel="noopener"
+                >https://huggingface.co/moonshotai/Kimi-K2-Instruct/discussions/28</a
+              >
+            </li>
+          </ul>
+
+          <h3>公式APIドキュメント(Kimi API Platform / Moonshot AI Open Platform)</h3>
+          <ul class="ref-list">
+            <li>
+              Quickstart - Kimi API Platform —
+              <a href="https://platform.kimi.ai/docs/overview" target="_blank" rel="noopener"
+                >https://platform.kimi.ai/docs/overview</a
+              >
+            </li>
+            <li>
+              API Overview - Kimi API Platform —
+              <a href="https://platform.kimi.ai/docs/api/overview" target="_blank" rel="noopener"
+                >https://platform.kimi.ai/docs/api/overview</a
+              >
+            </li>
+            <li>
+              Create Chat Completion - Kimi API Platform —
+              <a href="https://platform.kimi.ai/docs/api/chat" target="_blank" rel="noopener"
+                >https://platform.kimi.ai/docs/api/chat</a
+              >
+            </li>
+            <li>
+              Best Practices for Prompts - Kimi API Platform —
+              <a
+                href="https://platform.kimi.ai/docs/guide/prompt-best-practice"
+                target="_blank"
+                rel="noopener"
+                >https://platform.kimi.ai/docs/guide/prompt-best-practice</a
+              >
+            </li>
+            <li>
+              Use Kimi K2.6 Model to Setup Agent - Kimi API Platform —
+              <a
+                href="https://platform.kimi.ai/docs/guide/use-kimi-k2-to-setup-agent"
+                target="_blank"
+                rel="noopener"
+                >https://platform.kimi.ai/docs/guide/use-kimi-k2-to-setup-agent</a
+              >
+            </li>
+            <li>
+              Set Parameters for Thinking Mode - Kimi API Platform —
+              <a
+                href="https://platform.kimi.ai/docs/guide/use-kimi-k2-thinking-model"
+                target="_blank"
+                rel="noopener"
+                >https://platform.kimi.ai/docs/guide/use-kimi-k2-thinking-model</a
+              >
+            </li>
+            <li>
+              Best Practices for Benchmarking - Moonshot AI Open Platform —
+              <a
+                href="https://platform.moonshot.ai/docs/guide/benchmark-best-practice"
+                target="_blank"
+                rel="noopener"
+                >https://platform.moonshot.ai/docs/guide/benchmark-best-practice</a
+              >
+            </li>
+            <li>
+              Partial Mode - Kimi API Platform —
+              <a href="https://platform.kimi.ai/docs/api/partial" target="_blank" rel="noopener"
+                >https://platform.kimi.ai/docs/api/partial</a
+              >
+            </li>
+            <li>
+              Use Partial Mode with Kimi API - Moonshot AI Open Platform —
+              <a
+                href="https://platform.moonshot.ai/docs/guide/use-partial-mode-feature-of-kimi-api"
+                target="_blank"
+                rel="noopener"
+                >https://platform.moonshot.ai/docs/guide/use-partial-mode-feature-of-kimi-api</a
+              >
+            </li>
+            <li>
+              Coding Model Kimi K2.7 Code Pricing - Kimi API Platform —
+              <a
+                href="https://platform.kimi.ai/docs/pricing/chat-k27-code"
+                target="_blank"
+                rel="noopener"
+                >https://platform.kimi.ai/docs/pricing/chat-k27-code</a
+              >
+            </li>
+            <li>
+              Model Inference Pricing Explanation - Kimi API Platform —
+              <a href="https://platform.kimi.ai/docs/pricing/chat" target="_blank" rel="noopener"
+                >https://platform.kimi.ai/docs/pricing/chat</a
+              >
+            </li>
+            <li>
+              Kimi API Platform(トップページ) —
+              <a href="https://platform.moonshot.ai/" target="_blank" rel="noopener"
+                >https://platform.moonshot.ai/</a
+              >
+            </li>
+            <li>
+              API pricing - Kimi Help Center —
+              <a
+                href="https://www.kimi.com/help/kimi-api/api-pricing"
+                target="_blank"
+                rel="noopener"
+                >https://www.kimi.com/help/kimi-api/api-pricing</a
+              >
+            </li>
+          </ul>
+
+          <h3>モデル解説・比較(第三者メディア)</h3>
+          <ul class="ref-list">
+            <li>
+              Kimi K2: A Guide With 6 Practical Examples | DataCamp —
+              <a href="https://www.datacamp.com/tutorial/kimi-k2" target="_blank" rel="noopener"
+                >https://www.datacamp.com/tutorial/kimi-k2</a
+              >
+            </li>
+            <li>
+              Kimi K2 Thinking: Open-Source LLM Guide, Benchmarks, and Tools | DataCamp —
+              <a
+                href="https://www.datacamp.com/tutorial/kimi-k2-thinking-guide"
+                target="_blank"
+                rel="noopener"
+                >https://www.datacamp.com/tutorial/kimi-k2-thinking-guide</a
+              >
+            </li>
+            <li>
+              Best Kimi Models in 2026 — Moonshot AI's Ultra-Long Context Play | Remote OpenClaw —
+              <a
+                href="https://www.remoteopenclaw.com/blog/best-kimi-models-2026"
+                target="_blank"
+                rel="noopener"
+                >https://www.remoteopenclaw.com/blog/best-kimi-models-2026</a
+              >
+            </li>
+            <li>
+              Kimi K2.7 Code: The Complete Guide — Benchmarks, Pricing & How to Use (2026) —
+              <a
+                href="https://codersera.com/blog/kimi-k2-7-complete-guide-2026/"
+                target="_blank"
+                rel="noopener"
+                >https://codersera.com/blog/kimi-k2-7-complete-guide-2026/</a
+              >
+            </li>
+            <li>
+              Moonshot AI's Kimi K2.7-Code Targets Token Efficiency in Agentic Coding - DevOps.com —
+              <a
+                href="https://devops.com/moonshot-ais-kimi-k2-7-code-targets-token-efficiency-in-agentic-coding/"
+                target="_blank"
+                rel="noopener"
+                >https://devops.com/moonshot-ais-kimi-k2-7-code-targets-token-efficiency-in-agentic-coding/</a
+              >
+            </li>
+            <li>
+              Kimi K2.6 & Kimi Code Review: Saving 88% Coding Costs? | Medium —
+              <a
+                href="https://medium.com/@tentenco/kimi-k2-6-kimi-code-review-saving-88-coding-costs-b7e8c5eaf5f1"
+                target="_blank"
+                rel="noopener"
+                >https://medium.com/@tentenco/kimi-k2-6-kimi-code-review-saving-88-coding-costs-b7e8c5eaf5f1</a
+              >
+            </li>
+            <li>
+              Kimi K2 Thinking API Guide for Multi-Step Agents (2026) —
+              <a
+                href="https://evolink.ai/blog/kimi-k2-thinking-api-multi-step-agents"
+                target="_blank"
+                rel="noopener"
+                >https://evolink.ai/blog/kimi-k2-thinking-api-multi-step-agents</a
+              >
+            </li>
+            <li>
+              How to Use Kimi K2 Thinking API — a practical guide - CometAPI —
+              <a
+                href="https://www.cometapi.com/how-to-use-kimi-k2-thinking-api-a-practical-guide/"
+                target="_blank"
+                rel="noopener"
+                >https://www.cometapi.com/how-to-use-kimi-k2-thinking-api-a-practical-guide/</a
+              >
+            </li>
+          </ul>
+
+          <h3>プラットフォーム・SDK連携</h3>
+          <ul class="ref-list">
+            <li>
+              Kimi K2 quickstart - Together AI docs —
+              <a
+                href="https://docs.together.ai/docs/kimi-k2-quickstart"
+                target="_blank"
+                rel="noopener"
+                >https://docs.together.ai/docs/kimi-k2-quickstart</a
+              >
+            </li>
+            <li>
+              Using Moonshot AI (Kimi) with Kilo Code —
+              <a href="https://kilo.ai/docs/ai-providers/moonshot" target="_blank" rel="noopener"
+                >https://kilo.ai/docs/ai-providers/moonshot</a
+              >
+            </li>
+            <li>
+              kimi-k2.7-code (Moonshot AI) · Cloudflare Workers AI docs —
+              <a
+                href="https://developers.cloudflare.com/workers-ai/models/kimi-k2.7-code/"
+                target="_blank"
+                rel="noopener"
+                >https://developers.cloudflare.com/workers-ai/models/kimi-k2.7-code/</a
+              >
+            </li>
+            <li>
+              kimi-k2-preview | AI/ML API Documentation —
+              <a
+                href="https://docs.aimlapi.com/api-references/text-models-llm/moonshot/kimi-k2-preview"
+                target="_blank"
+                rel="noopener"
+                >https://docs.aimlapi.com/api-references/text-models-llm/moonshot/kimi-k2-preview</a
+              >
+            </li>
+            <li>
+              Kimi K2.5 - API Pricing & Benchmarks | OpenRouter —
+              <a href="https://openrouter.ai/moonshotai/kimi-k2.5" target="_blank" rel="noopener"
+                >https://openrouter.ai/moonshotai/kimi-k2.5</a
+              >
+            </li>
+            <li>
+              Kimi K2.6 - API Pricing & Benchmarks | OpenRouter —
+              <a href="https://openrouter.ai/moonshotai/kimi-k2.6" target="_blank" rel="noopener"
+                >https://openrouter.ai/moonshotai/kimi-k2.6</a
+              >
+            </li>
+            <li>
+              Kimi K2.7 Code - API Pricing & Benchmarks | OpenRouter —
+              <a
+                href="https://openrouter.ai/moonshotai/kimi-k2.7-code"
+                target="_blank"
+                rel="noopener"
+                >https://openrouter.ai/moonshotai/kimi-k2.7-code</a
+              >
+            </li>
+            <li>
+              Kimi K2.7 Code API: Pricing, Playground & Docs | EmpirioLabs AI —
+              <a href="https://empiriolabs.ai/models/kimi-k2-7-code" target="_blank" rel="noopener"
+                >https://empiriolabs.ai/models/kimi-k2-7-code</a
+              >
+            </li>
+            <li>
+              Moonshot AI: API Pricing, Performance & Model Catalog | LLM Stats —
+              <a href="https://llm-stats.com/providers/moonshot" target="_blank" rel="noopener"
+                >https://llm-stats.com/providers/moonshot</a
+              >
+            </li>
+            <li>
+              AWS Marketplace: Kimi API Platform —
+              <a
+                href="https://aws.amazon.com/marketplace/pp/prodview-rfjb2elzc5jp4"
+                target="_blank"
+                rel="noopener"
+                >https://aws.amazon.com/marketplace/pp/prodview-rfjb2elzc5jp4</a
+              >
+            </li>
+          </ul>
+
+          <h3>料金・コスト最適化</h3>
+          <ul class="ref-list">
+            <li>
+              Kimi API Pricing Calculator & Cost Guide (Jul 2026) —
+              <a href="https://costgoat.com/pricing/kimi-api" target="_blank" rel="noopener"
+                >https://costgoat.com/pricing/kimi-api</a
+              >
+            </li>
+            <li>
+              Kimi K2.7 Code Pricing: $0.95/$4 per Million Tokens | TokenCost —
+              <a
+                href="https://tokencost.app/blog/kimi-k2-7-code-pricing"
+                target="_blank"
+                rel="noopener"
+                >https://tokencost.app/blog/kimi-k2-7-code-pricing</a
+              >
+            </li>
+            <li>
+              Kimi K2 API Pricing 2026: K2.7, Batch and WebSearch Costs - CometAPI —
+              <a href="https://www.cometapi.com/kimi-k2-api-pricing/" target="_blank" rel="noopener"
+                >https://www.cometapi.com/kimi-k2-api-pricing/</a
+              >
+            </li>
+            <li>
+              Kimi API Pricing: Full Breakdown of Costs (Jun 2026) —
+              <a
+                href="https://developer.puter.com/tutorials/kimi-api-pricing/"
+                target="_blank"
+                rel="noopener"
+                >https://developer.puter.com/tutorials/kimi-api-pricing/</a
+              >
+            </li>
+            <li>
+              Kimi AI Pricing 2026: Plans, Membership Cost & API Token Rates —
+              <a href="https://kimik2ai.com/pricing/" target="_blank" rel="noopener"
+                >https://kimik2ai.com/pricing/</a
+              >
+            </li>
+            <li>
+              Kimi Code Pricing July 2026: K2.7 Code, API Costs and… | NxCode —
+              <a
+                href="https://www.nxcode.io/resources/news/kimi-code-2026-plans-pricing-developer-guide"
+                target="_blank"
+                rel="noopener"
+                >https://www.nxcode.io/resources/news/kimi-code-2026-plans-pricing-developer-guide</a
+              >
+            </li>
+            <li>
+              Kimi K2.6 Pricing Guide 2026: Compare Costs & Deployment Strategies | DeepInfra —
+              <a
+                href="https://deepinfra.com/blog/kimi-k2-6-pricing-guide-deployment-tradeoffs"
+                target="_blank"
+                rel="noopener"
+                >https://deepinfra.com/blog/kimi-k2-6-pricing-guide-deployment-tradeoffs</a
+              >
+            </li>
+          </ul>
+
+          <h3>総合ガイド・開発者向けリファレンス</h3>
+          <ul class="ref-list">
+            <li>
+              Kimi API: Kimi K2 API vs Kimi K2.5 API —
+              <a href="https://kimik2ai.com/api/" target="_blank" rel="noopener"
+                >https://kimik2ai.com/api/</a
+              >
+            </li>
+            <li>
+              Kimi API (Moonshot AI) - Complete Developer Guide —
+              <a href="https://agentsapis.com/kimi-api/" target="_blank" rel="noopener"
+                >https://agentsapis.com/kimi-api/</a
+              >
+            </li>
+            <li>
+              Kimi AI API: Complete Guide to the Kimi API Platform —
+              <a href="https://kimi-ai.chat/docs/api/" target="_blank" rel="noopener"
+                >https://kimi-ai.chat/docs/api/</a
+              >
+            </li>
+            <li>
+              How Kimi AI Manages Context Windows: Memory, Tokens, and Long-Context Workflows - Kimi
+              —
+              <a
+                href="https://kimi-ai.chat/guide/manages-context-windows/"
+                target="_blank"
+                rel="noopener"
+                >https://kimi-ai.chat/guide/manages-context-windows/</a
+              >
+            </li>
+            <li>
+              Kimi API Overview: Scale With 256K Context Language Models —
+              <a href="https://kimi-app.com/api/" target="_blank" rel="noopener"
+                >https://kimi-app.com/api/</a
+              >
+            </li>
+            <li>
+              Kimi K2.5 API: Complete Developer Guide with Code Examples —
+              <a href="https://kimi-k25.com/blog/kimi-k2-5-api" target="_blank" rel="noopener"
+                >https://kimi-k25.com/blog/kimi-k2-5-api</a
+              >
+            </li>
+            <li>
+              Kimi AI: Complete Guide to Features, Pricing & How It Works | NxCode —
+              <a
+                href="https://www.nxcode.io/resources/news/kimi-ai-complete-guide-features-pricing-2026"
+                target="_blank"
+                rel="noopener"
+                >https://www.nxcode.io/resources/news/kimi-ai-complete-guide-features-pricing-2026</a
+              >
+            </li>
+          </ul>
+        </section>
+
+        <footer class="footer">
+          <strong>免責事項</strong
+          >：本ガイドに記載したモデルID・料金・レート制限・仕様は、複数の一次情報・二次情報を横断的に確認した2026年7月16日時点のスナップショットです。
+          Moonshot
+          AIはモデルと料金体系を頻繁に更新しているため、契約・請求・アーキテクチャ設計に関わる意思決定を行う前には、必ず
+          <a href="https://platform.moonshot.ai/" target="_blank" rel="noopener"
+            >platform.moonshot.ai</a
+          >
+          および
+          <a href="https://platform.kimi.ai/" target="_blank" rel="noopener">platform.kimi.ai</a>
+          の公式ドキュメント・料金ページで最新情報を確認してください。
+        </footer>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11.12.0/dist/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+    <script>
+      // dedent(): 埋め込んだ <script type="text/plain"> 由来のテキストから
+      // 共通の先頭インデントを取り除き、エディタの自動インデントによる
+      // 見た目のズレを防ぐ。
+      function dedent(str) {
+        const lines = str
+          .replace(/^\n/, '')
+          .replace(/\n[ \t]*$/, '')
+          .split('\n');
+        const indents = lines
+          .filter(function (l) {
+            return l.trim().length > 0;
+          })
+          .map(function (l) {
+            return (l.match(/^[ \t]*/) || [''])[0].length;
+          });
+        const min = indents.length ? Math.min.apply(null, indents) : 0;
+        return lines
+          .map(function (l) {
+            return l.slice(min);
+          })
+          .join('\n');
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        // 1) すべての mermaid ソース (<script type="text/plain" id="mmd-N">) を
+        //    dedent() してから対応する <pre class="mermaid" id="mermaid-N"> へ書き込む
+        const mmdScripts = document.querySelectorAll('script[type="text/plain"][id^="mmd-"]');
+        mmdScripts.forEach(function (s) {
+          const targetId = s.id.replace('mmd-', 'mermaid-');
+          const target = document.getElementById(targetId);
+          if (target) {
+            target.textContent = dedent(s.textContent);
+          }
+        });
+
+        // 2) Mermaid初期化(ダークテーマ・useMaxWidth:falseで縮小を防止)
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'dark',
+          securityLevel: 'loose',
+          flowchart: { useMaxWidth: false, curve: 'basis' },
+          themeVariables: {
+            background: '#0b1729',
+            primaryColor: '#13223a',
+            primaryTextColor: '#e8edf7',
+            primaryBorderColor: '#7c9eff',
+            lineColor: '#7c9eff',
+            secondaryColor: '#0d1826',
+            tertiaryColor: '#0d1826',
+            fontFamily: 'Noto Sans JP, sans-serif',
+          },
+        });
+
+        mermaid.run({ querySelector: '.mermaid' }).then(function () {
+          // 3) シンタックスハイライト(コードブロックは静的にエスケープ済みのため
+          //    innerHTML再代入は行わず highlightAll のみ実行)
+          hljs.highlightAll();
+        });
+
+        // 4) サイドバーのアクティブリンクをIntersectionObserverで追従
+        const sections = document.querySelectorAll('.section[id]');
+        const navLinks = document.querySelectorAll('.sidebar nav a');
+        const observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                navLinks.forEach(function (l) {
+                  l.classList.remove('active');
+                });
+                const link = document.querySelector(
+                  '.sidebar nav a[href="#' + entry.target.id + '"]',
+                );
+                if (link) link.classList.add('active');
+              }
+            });
+          },
+          { rootMargin: '-20% 0px -70% 0px' },
+        );
+        sections.forEach(function (s) {
+          observer.observe(s);
+        });
+
+        // 5) モバイル用サイドバートグル
+        const toggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        if (toggle && sidebar) {
+          toggle.addEventListener('click', function () {
+            sidebar.classList.toggle('open');
+          });
+          navLinks.forEach(function (l) {
+            l.addEventListener('click', function () {
+              sidebar.classList.remove('open');
+            });
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
