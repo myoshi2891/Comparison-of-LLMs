@@ -138,9 +138,10 @@
 }
 
 .root :global(.main-content) {
-  width: min(100%, 1160px);
+  width: 100%;
+  max-width: none;
   min-width: 0;
-  margin: 0 auto;
+  margin: 0;
   padding: 0 clamp(28px, 5vw, 82px) 112px;
 }
 
@@ -409,6 +410,17 @@
 .root :global(.mermaid-container svg) {
   max-width: 100%;
   height: auto;
+}
+
+.root :global(.mermaid-container .mermaid) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.root :global(.mermaid-container .mermaid svg) {
+  display: block;
+  margin: 0 auto;
 }
 
 .root :global(.mermaid-source) {
