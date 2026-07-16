@@ -107,7 +107,10 @@ describe("/local-llm/finetuning-best-practices - faithful content safeguards", (
 
   it("syntax-highlights every source code block without changing its text", () => {
     const source = load(
-      readFileSync(join(process.cwd(), "..", "archive", "Finetuning-best-practices-guide.html"), "utf8")
+      readFileSync(
+        join(process.cwd(), "..", "archive", "Finetuning-best-practices-guide.html"),
+        "utf8"
+      )
     );
     const sourceBlocks = source("pre code")
       .toArray()
