@@ -16,9 +16,52 @@ const SOURCE_PATH = join(process.cwd(), "..", "archive", "Finetuning-best-practi
 const sourceHtml = readFileSync(SOURCE_PATH, "utf8");
 const $ = load(sourceHtml);
 const layout = $(".layout").first().get(0) as unknown as HtmlNode;
-const sourceCss = $("style").first().text().replaceAll(":root", ".fineTuningGuide");
 const VOID_ELEMENTS = new Set(["br", "hr", "img", "input", "meta", "link"]);
 const TABLE_CONTENT_ELEMENTS = new Set(["table", "thead", "tbody", "tfoot", "tr"]);
+
+type SyntaxToken = "comment" | "key" | "keyword" | "number" | "string" | "value";
+
+function tokenType(token: string, language: string): SyntaxToken {
+  if (token.startsWith("#")) return "comment";
+  if (/^-?\d/.test(token)) return "number";
+  if (/^(true|false|null)$/i.test(token)) return "value";
+  if (language === "json" && /"\s*:$/.test(token)) return "key";
+  if (/^["']/.test(token)) return "string";
+  if (/^(from|import|as|for|in|if|else|return|True|False|None|pip|install)$/.test(token)) {
+    return "keyword";
+  }
+  return "key";
+}
+
+function tokenPattern(language: string): RegExp {
+  if (language === "json") {
+    return /"(?:\\.|[^"\\])*"\s*:|"(?:\\.|[^"\\])*"|\b(?:true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?/g;
+  }
+  if (language === "bash") {
+    return /#[^\n]*|--[\w-]+|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\b(?:pip|install)\b|\b\d+(?:\.\d+)?\b/g;
+  }
+  return /#[^\n]*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\b(?:from|import|as|for|in|if|else|return|True|False|None)\b|\b\d+(?:\.\d+)?\b/g;
+}
+
+function highlightCode(source: string, language: string): ReactNode[] {
+  const pattern = tokenPattern(language);
+  const output: ReactNode[] = [];
+  let lastIndex = 0;
+  let match = pattern.exec(source);
+
+  while (match) {
+    if (match.index > lastIndex) output.push(source.slice(lastIndex, match.index));
+    output.push(
+      <span data-syntax-token={tokenType(match[0], language)} key={`${match.index}-${match[0]}`}>
+        {match[0]}
+      </span>
+    );
+    lastIndex = match.index + match[0].length;
+    match = pattern.exec(source);
+  }
+  if (lastIndex < source.length) output.push(source.slice(lastIndex));
+  return output;
+}
 
 function isMermaidNode(node: HtmlNode, className: string): boolean {
   return (
@@ -69,6 +112,13 @@ function renderNode(node: HtmlNode, key: string, parentName?: string): ReactNode
 
   const props = { ...propsFor(node), key };
   if (VOID_ELEMENTS.has(node.name)) return createElement(node.name, props);
+  if (node.name === "code" && parentName === "pre" && className.startsWith("language-")) {
+    return createElement(
+      node.name,
+      props,
+      ...highlightCode(textContent(node), className.slice("language-".length))
+    );
+  }
   return createElement(
     node.name,
     props,
@@ -77,10 +127,5 @@ function renderNode(node: HtmlNode, key: string, parentName?: string): ReactNode
 }
 
 export default function GuideContent() {
-  return (
-    <div className="fineTuningGuide">
-      <style>{`@scope (.fineTuningGuide) {${sourceCss}}`}</style>
-      {renderNode(layout, "layout")}
-    </div>
-  );
+  return <div className="fineTuningGuide">{renderNode(layout, "layout")}</div>;
 }
