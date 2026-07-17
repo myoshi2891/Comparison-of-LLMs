@@ -32,6 +32,30 @@ function inline(text: string): React.ReactNode[] {
   });
 }
 
+function highlightCode(code: string) {
+  const tokenPattern = /(#.*$|\/\/.*$|"[^"\n]*"|'[^'\n]*'|\b(?:from|import|print|client|response|model|reasoning|input|curl|python|bash|const|let|true|false|null)\b|\b\d+(?:\.\d+)?\b)/gm;
+  return code.split("\n").flatMap((line, lineIndex) => {
+    const tokens: React.ReactNode[] = [];
+    let cursor = 0;
+    for (const match of line.matchAll(tokenPattern)) {
+      const token = match[0];
+      const start = match.index ?? 0;
+      if (start > cursor) tokens.push(line.slice(cursor, start));
+      const className = token.startsWith("#") || token.startsWith("//")
+        ? styles.codeComment
+        : token.startsWith('"') || token.startsWith("'")
+          ? styles.codeString
+          : /^\d/.test(token)
+            ? styles.codeNumber
+            : styles.codeKeyword;
+      tokens.push(<span className={className} key={`${lineIndex}-${start}`}>{token}</span>);
+      cursor = start + token.length;
+    }
+    if (cursor < line.length) tokens.push(line.slice(cursor));
+    return [...tokens, ...(lineIndex < code.split("\n").length - 1 ? ["\n"] : [])];
+  });
+}
+
 function MarkdownBody() {
   const lines = GUIDE.split("\n");
   const blocks: React.ReactNode[] = [];
@@ -63,7 +87,7 @@ function MarkdownBody() {
         diagram += 1;
         blocks.push(<div className={styles.mermaidWrap} key={`mermaid-${diagram}`}><MermaidDiagram chart={code.join("\n")} theme="dark" /></div>);
       } else {
-        blocks.push(<pre className={styles.codeBlock} key={`code-${line}`}><code className={`language-${language}`}>{code.join("\n")}</code></pre>);
+        blocks.push(<pre className={styles.codeBlock} key={`code-${line}`}><code className={`language-${language}`}>{highlightCode(code.join("\n"))}</code></pre>);
       }
       continue;
     }

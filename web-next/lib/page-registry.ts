@@ -640,7 +640,9 @@ const entries: PageEntry[] = [
   {
     slug: "/model-data/gpt-5-6-best-practices",
     title: "GPT-5.6 Best Practices",
-    group: "モデル・データ",
+    group: "Providers",
+    category: "Codex",
+    provider: "codex",
     topics: ["openai", "gpt-5-6", "best-practices"],
     summary:
       "OpenAI GPT-5.6 Sol / Terra / Luna のモデル選定、Reasoning、Programmatic Tool Calling、移行、コスト最適化を体系的に解説する実践ガイド。",
