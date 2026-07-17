@@ -14,10 +14,11 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（本作業範囲では新規違反 0 件、既知の既存指摘は本件対象外）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **1119 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **1126 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **OpenAI GPT-5.6 完全ガイドの Next.js 移行**: `Gpt-5.6-best-practices-guide.html` の対応Markdown原本をビルド時に安全なReact要素へ変換し、`/model-data/gpt-5-6-best-practices` に追加。18セクション、7表、8 Mermaid図、コードブロック、目次スクロール追従、外部リンクの安全属性、ページレジストリ登録を実装。TDDのRed / Greenを分割し、契約テスト7件を追加（合計 **1126 テスト合格**）。
 - **AIガバナンス実践ガイドの Next.js 移行**: `Ai-governance-guide.html` を `/governance/ai-governance` へ移行。原文の全22セクション・表4件・Mermaid図5件・外部リンク84件をReact要素としてfaithfulに保持し、TOCスクロール追従、外部リンクの安全属性、ページレジストリ登録を追加。HTMLと対応Markdown原本は `archive/` に退避。TDDのRed / Green / Refactorを分割し、契約テスト6件を追加（合計 **1119 テスト合格**）。
 - **LLMファインチューニング ベストプラクティスガイドのデザイン刷新**: `/local-llm/finetuning-best-practices` をアンバー×ブルーのダーク技術ドキュメントとして再設計。本文・リンク・12表・5コードブロック・9 Mermaid図・99外部リンクは維持したまま、旧インラインスタイルをページ専用CSSへ集約し、表の左寄せとコード5件の依存追加なしのシンタックスハイライトを追加。契約テストを1件追加（合計 **1113 テスト合格**）。
 - **LLMファインチューニング ベストプラクティスガイドの Next.js 移行**: `Finetuning-best-practices-guide.html` を `/local-llm/finetuning-best-practices` へ移行。原文の全17セクション・12表・5コードブロック・9 Mermaid図・99外部リンクを React 要素として faithful に保持し、TOC のスクロール追従、外部リンクの安全属性、ページレジストリ登録を追加。原本は `archive/` に退避。TDD の Red / Green / Refactor を分割し、契約テスト6件を追加（合計 **1112 テスト合格**）。
