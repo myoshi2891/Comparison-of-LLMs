@@ -91,7 +91,7 @@ describe("/governance/ai-governance - faithful content safeguards", () => {
   });
 
   it("does not use the React raw-HTML injection prop", () => {
-    const source = readFileSync(new URL("./page.tsx", import.meta.url), "utf8");
+    const source = readFileSync(`${__dirname}/page.tsx`, "utf8");
     const needle = ["danger", "ously", "Set", "Inner", "HTML"].join("");
     expect(source.includes(needle)).toBe(false);
   });

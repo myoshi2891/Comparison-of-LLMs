@@ -568,6 +568,16 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-12",
   },
   {
+    slug: "/governance/ai-governance",
+    title: "AI Governance Guide",
+    group: "運用・品質",
+    topics: ["ai-governance", "risk-management", "compliance", "security"],
+    summary:
+      "AIガバナンスの基礎、国際フレームワーク、組織での構築手順、RACIマトリクスを初学者向けに解説する実践ガイド。",
+    addedAt: "2026-07-17",
+    lastReviewed: "2026-07-17",
+  },
+  {
     slug: "/llm-ops/evaluation-observability",
     title: "Evaluation & Observability",
     group: "運用・品質",
