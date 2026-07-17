@@ -1,0 +1,2476 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DeepSeek LLM ベストプラクティスガイド — 初学者向けステップバイステップ解説</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/atom-one-dark.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
+
+    <style>
+      :root {
+        --bg: #07111e;
+        --bg-elevated: #0d1c30;
+        --bg-elevated-2: #101f36;
+        --border: rgba(148, 167, 196, 0.16);
+        --border-strong: rgba(148, 167, 196, 0.28);
+        --text: #dce6f5;
+        --text-dim: #b7cae7;
+        --text-faint: #aac1ea;
+        --accent: #6f9dff;
+        --accent-soft: rgba(111, 157, 255, 0.14);
+        --accent-2: #57d9c9;
+        --accent-2-soft: rgba(87, 217, 201, 0.14);
+        --warn: #ffb454;
+        --warn-soft: rgba(255, 180, 84, 0.12);
+        --code-bg: #0a1626;
+        --sidebar-w: 308px;
+        --radius: 14px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background:
+          radial-gradient(
+            ellipse 1200px 600px at 15% -10%,
+            rgba(111, 157, 255, 0.1),
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 900px 500px at 100% 10%,
+            rgba(87, 217, 201, 0.06),
+            transparent 55%
+          ),
+          var(--bg);
+        color: var(--text);
+        font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif;
+        font-size: 16px;
+        line-height: 1.85;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: 'Space Grotesk', 'Noto Sans JP', sans-serif;
+        color: #f2f6fd;
+        line-height: 1.35;
+        letter-spacing: 0.01em;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+
+      code,
+      pre,
+      .mono {
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      /* ---------- layout (block, NOT grid — avoids fixed-sidebar shrink trap) ---------- */
+      .layout {
+        display: block;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: var(--sidebar-w);
+        height: 100vh;
+        overflow-y: auto;
+        background: linear-gradient(180deg, var(--bg-elevated), #091220);
+        border-right: 1px solid var(--border);
+        padding: 28px 22px 80px;
+        z-index: 50;
+        transition: transform 0.25s ease;
+      }
+      .sidebar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .sidebar::-webkit-scrollbar-thumb {
+        background: var(--border-strong);
+        border-radius: 4px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 6px;
+      }
+      .brand-mark {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        color: #04101f;
+        font-size: 15px;
+        flex: none;
+      }
+      .brand-text {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600;
+        font-size: 15px;
+        color: #f2f6fd;
+      }
+      .brand-sub {
+        font-size: 11.5px;
+        color: var(--text-faint);
+        margin: 2px 0 22px;
+        letter-spacing: 0.04em;
+      }
+
+      .nav-group {
+        margin-bottom: 4px;
+      }
+      .nav-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        color: var(--text-faint);
+        margin: 20px 0 8px;
+        font-weight: 600;
+      }
+      .nav-link {
+        display: block;
+        font-size: 13.5px;
+        color: var(--text-dim);
+        padding: 7px 10px;
+        border-radius: 8px;
+        margin-bottom: 1px;
+        border-left: 2px solid transparent;
+        transition:
+          background 0.15s,
+          color 0.15s,
+          border-color 0.15s;
+      }
+      .nav-link:hover {
+        color: var(--text);
+        text-decoration: none;
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .nav-link.active {
+        color: #f2f6fd;
+        background: var(--accent-soft);
+        border-left: 2px solid var(--accent);
+        font-weight: 500;
+      }
+
+      .sidebar-toggle {
+        display: none;
+        position: fixed;
+        top: 16px;
+        left: 16px;
+        z-index: 60;
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border-strong);
+        color: var(--text);
+        font-size: 18px;
+        cursor: pointer;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* ---------- main content: full width beside fixed sidebar (no narrow max-width) ---------- */
+      .main {
+        margin-left: var(--sidebar-w);
+        padding: 0 0 140px;
+      }
+
+      .section,
+      .prose,
+      .hero,
+      .footer {
+        max-width: none;
+      }
+
+      .hero {
+        padding: 76px 72px 56px;
+        border-bottom: 1px solid var(--border);
+        position: relative;
+        overflow: hidden;
+      }
+      .hero::after {
+        content: '';
+        position: absolute;
+        right: -120px;
+        top: -160px;
+        width: 520px;
+        height: 520px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(111, 157, 255, 0.16), transparent 70%);
+        pointer-events: none;
+      }
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 12.5px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent-2);
+        font-weight: 600;
+        padding: 6px 14px;
+        border: 1px solid var(--accent-2-soft);
+        border-radius: 999px;
+        background: var(--accent-2-soft);
+        margin-bottom: 22px;
+      }
+      .hero h1 {
+        font-size: 40px;
+        font-weight: 700;
+        margin: 0 0 18px;
+        max-width: 920px;
+      }
+      .hero .lead {
+        font-size: 16.5px;
+        color: var(--text-dim);
+        max-width: 760px;
+        margin: 0 0 26px;
+      }
+      .hero-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 26px;
+        font-size: 13px;
+        color: var(--text-faint);
+      }
+      .hero-meta strong {
+        color: var(--text-dim);
+        font-weight: 500;
+      }
+
+      .callout {
+        margin: 28px 72px 0;
+        padding: 20px 24px;
+        border-radius: var(--radius);
+        border: 1px solid rgba(255, 180, 84, 0.35);
+        background: var(--warn-soft);
+        display: flex;
+        gap: 16px;
+      }
+      .callout .icon {
+        font-size: 22px;
+        flex: none;
+        line-height: 1;
+        margin-top: 2px;
+      }
+      .callout h3 {
+        font-size: 15px;
+        margin: 0 0 6px;
+        color: #ffcf8a;
+        font-weight: 700;
+      }
+      .callout p {
+        margin: 0;
+        font-size: 14.5px;
+        color: var(--text-dim);
+      }
+      .callout a {
+        color: #ffcf8a;
+      }
+
+      .section {
+        padding: 64px 72px;
+        border-bottom: 1px solid var(--border);
+      }
+      .section:last-of-type {
+        border-bottom: none;
+      }
+
+      .section-kicker {
+        display: flex;
+        align-items: baseline;
+        gap: 14px;
+        margin-bottom: 8px;
+      }
+      .step-num {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--accent);
+        letter-spacing: 0.06em;
+      }
+      .section h2 {
+        font-size: 27px;
+        font-weight: 700;
+        margin: 0 0 20px;
+        scroll-margin-top: 24px;
+      }
+      .section h3 {
+        font-size: 18.5px;
+        font-weight: 600;
+        margin: 36px 0 14px;
+        scroll-margin-top: 24px;
+      }
+      .section h3:first-of-type {
+        margin-top: 28px;
+      }
+
+      .section p {
+        color: var(--text-dim);
+        margin: 0 0 16px;
+        max-width: 900px;
+      }
+      .section p.narrow {
+        max-width: 760px;
+      }
+      .section ul,
+      .section ol {
+        color: var(--text-dim);
+        max-width: 860px;
+        padding-left: 22px;
+      }
+      .section li {
+        margin-bottom: 8px;
+      }
+      .section strong {
+        color: #eef3fb;
+        font-weight: 600;
+      }
+
+      /* ---------- tables ---------- */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 20px 0 28px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 13.8px;
+        min-width: 560px;
+      }
+      thead th {
+        text-align: left;
+        padding: 12px 16px;
+        background: var(--bg-elevated-2);
+        color: var(--accent-2);
+        font-weight: 600;
+        font-family: 'Space Grotesk', sans-serif;
+        letter-spacing: 0.01em;
+        border-bottom: 1px solid var(--border-strong);
+        white-space: nowrap;
+      }
+      tbody td {
+        padding: 11px 16px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-dim);
+        vertical-align: top;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:hover td {
+        background: rgba(255, 255, 255, 0.015);
+      }
+      code.inline {
+        background: rgba(111, 157, 255, 0.12);
+        color: #a9c3ff;
+        padding: 1.5px 6px;
+        border-radius: 5px;
+        font-size: 0.88em;
+      }
+
+      /* ---------- code blocks ---------- */
+      .code-block {
+        margin: 18px 0 26px;
+        border-radius: var(--radius);
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        overflow: hidden;
+      }
+      .code-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 9px 16px;
+        background: rgba(255, 255, 255, 0.02);
+        border-bottom: 1px solid var(--border);
+        font-size: 11.5px;
+        color: var(--text-faint);
+        letter-spacing: 0.04em;
+        font-family: 'JetBrains Mono', monospace;
+      }
+      .code-block pre {
+        margin: 0;
+        padding: 18px 20px;
+        overflow-x: auto;
+      }
+      .code-block code {
+        font-size: 13px;
+        line-height: 1.7;
+        background: transparent !important;
+      }
+
+      /* ---------- mermaid diagrams ---------- */
+      .diagram-card {
+        margin: 22px 0 30px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--bg-elevated-2);
+        padding: 26px 18px 14px;
+      }
+      .diagram-caption {
+        text-align: center;
+        font-size: 12.5px;
+        color: var(--text-faint);
+        margin-top: 10px;
+        letter-spacing: 0.02em;
+      }
+      pre.mermaid {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        margin: 0;
+        overflow-x: auto;
+      }
+
+      /* ---------- ref list ---------- */
+      .ref-list {
+        list-style: none;
+        padding: 0;
+        margin: 16px 0 0;
+        max-width: 900px;
+      }
+      .ref-list li {
+        padding: 10px 0 10px 26px;
+        border-bottom: 1px solid var(--border);
+        font-size: 14px;
+        position: relative;
+        color: var(--text-dim);
+      }
+      .ref-list li::before {
+        content: '→';
+        position: absolute;
+        left: 0;
+        color: var(--accent);
+      }
+      .ref-list a {
+        color: #c3d4f5;
+        word-break: break-all;
+      }
+      .ref-list li:last-child {
+        border-bottom: none;
+      }
+
+      .refbox {
+        margin-top: 22px;
+        padding: 16px 20px;
+        background: var(--bg-elevated-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+      }
+      .refbox-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent-2);
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+      .refbox ul {
+        margin: 0;
+        padding-left: 18px;
+      }
+      .refbox li {
+        font-size: 13.2px;
+        margin-bottom: 6px;
+        color: var(--text-dim);
+      }
+      .refbox a {
+        color: #b9cdf5;
+      }
+
+      /* ---------- decision / summary chips ---------- */
+      .best-practice {
+        margin: 18px 0;
+        padding: 16px 20px;
+        border-left: 3px solid var(--accent-2);
+        background: var(--accent-2-soft);
+        border-radius: 0 10px 10px 0;
+        font-size: 14.3px;
+        color: var(--text-dim);
+        max-width: 860px;
+      }
+      .best-practice strong {
+        color: #d7fbf4;
+      }
+
+      .checklist {
+        list-style: none;
+        padding: 0;
+        max-width: 860px;
+      }
+      .checklist li {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 14.3px;
+        color: var(--text-dim);
+      }
+      .checklist li:last-child {
+        border-bottom: none;
+      }
+      .checklist .box {
+        flex: none;
+        width: 18px;
+        height: 18px;
+        margin-top: 2px;
+        border: 1.5px solid var(--border-strong);
+        border-radius: 5px;
+      }
+
+      .toc-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px 28px;
+        max-width: 900px;
+        margin-top: 8px;
+      }
+      .toc-grid a {
+        font-size: 14px;
+        color: var(--text-dim);
+      }
+      .toc-grid a:hover {
+        color: var(--accent);
+      }
+      .toc-grid .n {
+        color: var(--accent);
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600;
+        margin-right: 6px;
+      }
+
+      .footer {
+        padding: 48px 72px 90px;
+        color: var(--text-faint);
+        font-size: 13px;
+      }
+      .footer a {
+        color: var(--text-dim);
+      }
+
+      ::selection {
+        background: rgba(111, 157, 255, 0.35);
+      }
+
+      @media (max-width: 980px) {
+        .sidebar {
+          transform: translateX(-100%);
+          box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .sidebar-toggle {
+          display: flex;
+        }
+        .main {
+          margin-left: 0;
+        }
+        .hero,
+        .section,
+        .callout,
+        .footer {
+          padding-left: 24px;
+          padding-right: 24px;
+        }
+        .callout {
+          margin-left: 24px;
+          margin-right: 24px;
+        }
+        .toc-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="メニューを開く">☰</button>
+
+    <div class="layout">
+      <nav class="sidebar" id="sidebar">
+        <div class="brand">
+          <div class="brand-mark">DS</div>
+          <div class="brand-text">DeepSeek Guide</div>
+        </div>
+        <div class="brand-sub">LLM ベストプラクティス — JP Edition</div>
+
+        <div class="nav-group">
+          <a class="nav-link" data-nav href="#overview">ガイドの全体像</a>
+          <a class="nav-link" data-nav href="#what-is-deepseek">1. DeepSeekとは何か</a>
+          <a class="nav-link" data-nav href="#model-lineup">2. モデルラインナップ全体像</a>
+        </div>
+
+        <div class="nav-label">ステップバイステップ</div>
+        <div class="nav-group">
+          <a class="nav-link" data-nav href="#step1">Step 1 — アカウント作成</a>
+          <a class="nav-link" data-nav href="#step2">Step 2 — 初めてのAPI呼び出し</a>
+          <a class="nav-link" data-nav href="#step3">Step 3 — モデル選定</a>
+          <a class="nav-link" data-nav href="#step4">Step 4 — Thinking Mode</a>
+          <a class="nav-link" data-nav href="#step5">Step 5 — マルチターン会話</a>
+          <a class="nav-link" data-nav href="#step6">Step 6 — Function Calling</a>
+          <a class="nav-link" data-nav href="#step7">Step 7 — 構造化出力</a>
+          <a class="nav-link" data-nav href="#step8">Step 8 — Context Caching</a>
+          <a class="nav-link" data-nav href="#step9">Step 9 — レート制限/エラー</a>
+          <a class="nav-link" data-nav href="#step10">Step 10 — Anthropic API互換</a>
+        </div>
+
+        <div class="nav-label">まとめ・参考資料</div>
+        <div class="nav-group">
+          <a class="nav-link" data-nav href="#cost">料金とトークン管理</a>
+          <a class="nav-link" data-nav href="#summary">ベストプラクティス総まとめ</a>
+          <a class="nav-link" data-nav href="#migration">移行チェックリスト</a>
+          <a class="nav-link" data-nav href="#faq">トラブルシューティングFAQ</a>
+          <a class="nav-link" data-nav href="#references">参考文献一覧</a>
+        </div>
+      </nav>
+
+      <div class="main">
+        <header class="hero" id="overview">
+          <div class="eyebrow">● 最終更新確認: 2026年7月16日</div>
+          <h1>DeepSeek LLM ベストプラクティスガイド<br />〜初学者向けステップバイステップ解説〜</h1>
+          <p class="lead">
+            <a href="https://www.deepseek.com/en/" target="_blank" rel="noopener"
+              >DeepSeek公式サイト</a
+            >
+            と
+            <a href="https://api-docs.deepseek.com/" target="_blank" rel="noopener"
+              >DeepSeek API公式ドキュメント</a
+            >
+            を実際に参照し、2026年7月時点の最新情報に基づいて作成しています。DeepSeekは更新頻度が高いサービスのため、
+            実装前には必ず本文中の一次情報源URLで最新状況を確認してください。
+          </p>
+          <div class="hero-meta">
+            <span><strong>対象読者:</strong> DeepSeek API初学者〜実装担当エンジニア</span>
+            <span><strong>形式:</strong> 全10ステップ + 参考資料</span>
+            <span><strong>図解:</strong> Mermaid（フローチャート/シーケンス図）9点</span>
+          </div>
+
+          <div class="toc-grid" style="margin-top: 34px">
+            <a href="#what-is-deepseek"><span class="n">01</span>DeepSeekとは何か</a>
+            <a href="#model-lineup"><span class="n">02</span>モデルラインナップ全体像</a>
+            <a href="#step1"><span class="n">03</span>アカウント作成とAPIキー</a>
+            <a href="#step2"><span class="n">04</span>初めてのAPI呼び出し</a>
+            <a href="#step3"><span class="n">05</span>モデル選定</a>
+            <a href="#step4"><span class="n">06</span>Thinking Mode</a>
+            <a href="#step5"><span class="n">07</span>マルチターン会話</a>
+            <a href="#step6"><span class="n">08</span>Function Calling</a>
+            <a href="#step7"><span class="n">09</span>構造化出力</a>
+            <a href="#step8"><span class="n">10</span>Context Caching</a>
+            <a href="#step9"><span class="n">11</span>レート制限・エラー処理</a>
+            <a href="#step10"><span class="n">12</span>Anthropic API互換</a>
+            <a href="#summary"><span class="n">13</span>ベストプラクティス総まとめ</a>
+            <a href="#references"><span class="n">14</span>参考文献一覧</a>
+          </div>
+        </header>
+
+        <div class="callout">
+          <div class="icon">⚠️</div>
+          <div>
+            <h3>まず最初に押さえるべき重要事項</h3>
+            <p>
+              2026年7月24日 15:59 (UTC) をもって、旧モデル名
+              <code class="inline">deepseek-chat</code> と
+              <code class="inline">deepseek-reasoner</code>
+              は完全に廃止されます。現在この2つの名前は自動的に新モデル
+              <code class="inline">deepseek-v4-flash</code>
+              の非思考モード／思考モードにマッピングされていますが、
+              廃止後はAPIが応答を返さなくなります。本ガイド執筆時点で残り1週間程度のため、既存プロジェクトを運用している方は
+              <a href="#migration">「移行チェックリスト」</a>を最優先で確認してください。 参照:
+              <a href="https://api-docs.deepseek.com/updates" target="_blank" rel="noopener"
+                >Change Log</a
+              >
+              /
+              <a href="https://api-docs.deepseek.com/news/news260424" target="_blank" rel="noopener"
+                >DeepSeek-V4 Preview Release</a
+              >
+            </p>
+          </div>
+        </div>
+
+        <!-- ============ 1. DeepSeekとは何か ============ -->
+        <section class="section" id="what-is-deepseek">
+          <h2>1. DeepSeekとは何か</h2>
+          <p>
+            DeepSeek（深度求索）は、AGI（汎用人工知能）の本質解明を掲げる中国のAI研究組織で、大規模言語モデル（LLM）を独自に開発し、
+            モデルの重みや技術レポートをオープンに公開していることで知られています。公式サイトでは「Into
+            the unknown」という コンセプトのもと、チャットサービス（DeepSeek
+            Chat）、開発者向けAPIプラットフォーム（DeepSeek Platform）、
+            およびモバイル・デスクトップアプリを提供しています。
+          </p>
+          <ul>
+            <li>
+              研究成果（DeepSeek-V2 / V3 / R1 / Coder / Math / VL 等）は GitHub で公開されています。
+            </li>
+            <li>サービスステータスは status.deepseek.com で確認できます。</li>
+            <li>API料金は公式の Models &amp; Pricing ページで随時更新されます。</li>
+          </ul>
+
+          <div class="refbox">
+            <div class="refbox-title">参照URL</div>
+            <ul>
+              <li>
+                <a href="https://www.deepseek.com/en/" target="_blank" rel="noopener"
+                  >https://www.deepseek.com/en/</a
+                >
+              </li>
+              <li>
+                <a href="https://api-docs.deepseek.com/" target="_blank" rel="noopener"
+                  >https://api-docs.deepseek.com/</a
+                >
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ============ 2. モデルラインナップ ============ -->
+        <section class="section" id="model-lineup">
+          <h2>2. 2026年7月時点のモデルラインナップ全体像</h2>
+          <p>
+            2026年4月24日、DeepSeekは最新世代モデル
+            <strong>DeepSeek-V4</strong> をプレビュー公開しました。
+            V4は「1Mコンテキストのコスト効率時代」を掲げ、新しいSparse Attention構造（DSA: DeepSeek
+            Sparse Attention）と
+            トークン単位の圧縮技術により、超長文コンテキストを低コストで扱えるようにしたことが最大の特徴です。
+          </p>
+
+          <h3>モデル進化の歴史（タイムライン図）</h3>
+          <div class="diagram-card">
+            <script type="text/plain" class="mmd-src">
+              flowchart TB
+                  subgraph Y2024["2024年"]
+                      direction TB
+                      A1["DeepSeek-V2 / Coder-V2 系列"]
+                      A2["deepseek-chat が DeepSeek-V3 に更新 (12/26)"]
+                      A1 --> A2
+                  end
+
+                  subgraph Y2025["2025年"]
+                      direction TB
+                      B1["DeepSeek-R1 公開、reasoner登場 (1/20)"]
+                      B2["V3-0324 / R1-0528 で性能向上"]
+                      B3["DeepSeek-V3.1: ハイブリッド推論モデル登場 (8/21)"]
+                      B4["V3.1-Terminus (9/22) から V3.2-Exp (9/29)"]
+                      B5["DeepSeek-V3.2 正式版 (12/1)"]
+                      B1 --> B2 --> B3 --> B4 --> B5
+                  end
+
+                  subgraph Y2026["2026年"]
+                      direction TB
+                      C1["DeepSeek-V4 Preview 公開 (4/24)"]
+                      C2["deepseek-v4-pro / deepseek-v4-flash 提供開始"]
+                      C3["旧モデル名 deepseek-chat/reasoner 廃止予定 (7/24)"]
+                      C1 --> C2 --> C3
+                  end
+
+                  Y2024 --> Y2025 --> Y2026
+            </script>
+            <pre class="mermaid"></pre>
+            <div class="diagram-caption">
+              図1: DeepSeekモデル進化のタイムライン（2024年〜2026年）
+            </div>
+          </div>
+
+          <h3>現行モデル比較表（2026年7月16日時点）</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>deepseek-v4-flash</th>
+                  <th>deepseek-v4-pro</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>モデル実体</td>
+                  <td>DeepSeek-V4-Flash（284B総/13B活性化）</td>
+                  <td>DeepSeek-V4-Pro（1.6T総/49B活性化）</td>
+                </tr>
+                <tr>
+                  <td>位置づけ</td>
+                  <td>高速・低コストな汎用モデル</td>
+                  <td>最高性能・トップクラスの推論力</td>
+                </tr>
+                <tr>
+                  <td>コンテキスト長</td>
+                  <td>1M トークン</td>
+                  <td>1M トークン</td>
+                </tr>
+                <tr>
+                  <td>最大出力</td>
+                  <td>384K トークン</td>
+                  <td>384K トークン</td>
+                </tr>
+                <tr>
+                  <td>思考モード</td>
+                  <td>対応（デフォルトON、切替可）</td>
+                  <td>対応（デフォルトON、切替可）</td>
+                </tr>
+                <tr>
+                  <td>同時実行数上限</td>
+                  <td>2500</td>
+                  <td>500</td>
+                </tr>
+                <tr>
+                  <td>入力（キャッシュヒット）/ 1Mトークン</td>
+                  <td>$0.0028</td>
+                  <td>$0.003625</td>
+                </tr>
+                <tr>
+                  <td>入力（キャッシュミス）/ 1Mトークン</td>
+                  <td>$0.14</td>
+                  <td>$0.435</td>
+                </tr>
+                <tr>
+                  <td>出力 / 1Mトークン</td>
+                  <td>$0.28</td>
+                  <td>$0.87</td>
+                </tr>
+                <tr>
+                  <td>旧名との対応</td>
+                  <td>
+                    <code class="inline">deepseek-chat</code>(非思考)/<code class="inline"
+                      >deepseek-reasoner</code
+                    >(思考)の後継
+                  </td>
+                  <td>新規</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="narrow">
+            価格は変更される可能性があるため、実装前に必ず最新の Models &amp; Pricing
+            ページを確認してください。
+          </p>
+
+          <div class="refbox">
+            <div class="refbox-title">参照URL</div>
+            <ul>
+              <li>
+                <a
+                  href="https://api-docs.deepseek.com/news/news260424"
+                  target="_blank"
+                  rel="noopener"
+                  >https://api-docs.deepseek.com/news/news260424</a
+                >（V4 Preview発表）
+              </li>
+              <li>
+                <a
+                  href="https://api-docs.deepseek.com/quick_start/pricing"
+                  target="_blank"
+                  rel="noopener"
+                  >https://api-docs.deepseek.com/quick_start/pricing</a
+                >
+              </li>
+              <li>
+                <a href="https://api-docs.deepseek.com/updates" target="_blank" rel="noopener"
+                  >https://api-docs.deepseek.com/updates</a
+                >（更新履歴全体）
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ============ Step 1 ============ -->
+        <section class="section" id="step1">
+          <div class="section-kicker"><span class="step-num">STEP 01</span></div>
+          <h2>アカウント作成とAPIキー取得</h2>
+          <ol>
+            <li>
+              DeepSeek Platform にアクセスし、メールアドレス（Gmail / Outlook / Hotmail /
+              Yahoo等の主要プロバイダ推奨）でサインアップします。国内メールドメインは登録不可の場合があるため、うまく登録できない場合は主要プロバイダのメールを使いましょう。
+            </li>
+            <li>ログイン後、API Keysページで新しいAPIキーを発行します。</li>
+            <li>
+              Top upページから残高をチャージします（PayPal・銀行カード・Alipay・WeChat
+              Payに対応）。トップアップ残高に有効期限はありませんが、付与（無料）残高には期限がある場合があるのでBillingページで確認してください。
+            </li>
+            <li>APIキーは環境変数に格納し、コードに直書きしないことがベストプラクティスです。</li>
+          </ol>
+
+          <div class="code-block">
+            <div class="code-head"><span>bash</span><span>環境変数の設定例</span></div>
+            <pre><code class="language-bash" data-src></code></pre>
+            <script type="text/plain" class="code-src">
+              export DEEPSEEK_API_KEY="sk-xxxxxxxxxxxxxxxxxxxxxxxx"
+            </script>
+          </div>
+
+          <div class="refbox">
+            <div class="refbox-title">参照URL</div>
+            <ul>
+              <li>
+                <a href="https://api-docs.deepseek.com/faq" target="_blank" rel="noopener"
+                  >https://api-docs.deepseek.com/faq</a
+                >（アカウント登録・課金に関するFAQ）
+              </li>
+              <li>
+                <a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener"
+                  >https://platform.deepseek.com/api_keys</a
+                >
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ============ Step 2 ============ -->
+        <section class="section" id="step2">
+          <div class="section-kicker"><span class="step-num">STEP 02</span></div>
+          <h2>はじめてのAPI呼び出し</h2>
+          <p>
+            DeepSeek APIは <strong>OpenAI互換フォーマット</strong> と
+            <strong>Anthropic互換フォーマット</strong> の両方をサポートしており、 既存のOpenAI
+            SDK／Anthropic SDKや、それらの形式に対応したソフトウェアをそのまま流用できます。
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>値</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Base URL（OpenAI形式）</td>
+                  <td><code class="inline">https://api.deepseek.com</code></td>
+                </tr>
+                <tr>
+                  <td>Base URL（Anthropic形式）</td>
+                  <td><code class="inline">https://api.deepseek.com/anthropic</code></td>
+                </tr>
+                <tr>
+                  <td>認証方式</td>
+                  <td>
+                    <code class="inline">Authorization: Bearer &lt;APIキー&gt;</code
+                    >（OpenAI形式）／ <code class="inline">x-api-key</code>（Anthropic形式）
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>呼び出しの全体フロー</h3>
+          <div class="diagram-card">
+            <script type="text/plain" class="mmd-src">
+              flowchart LR
+                  U["利用者のコード"] -->|"1. リクエスト送信"| E["Base URL: api.deepseek.com"]
+                  E -->|"2. 認証チェック"| K["APIキー検証"]
+                  K -->|"3. モデル推論"| M["deepseek-v4-pro / deepseek-v4-flash"]
+                  M -->|"4. トークン生成"| R["レスポンス生成"]
+                  R -->|"5. JSON返却"| U
+            </script>
+            <pre class="mermaid"></pre>
+            <div class="diagram-caption">図2: DeepSeek APIリクエストの全体フロー</div>
+          </div>
+
+          <h3>実装例（Python / OpenAI SDK形式）</h3>
+          <div class="code-block">
+            <div class="code-head"><span>python</span><span>first_call.py</span></div>
+            <pre><code class="language-python" data-src></code></pre>
+            <script type="text/plain" class="code-src">
+              from openai import OpenAI
+
+              client = OpenAI(
+                  api_key="<あなたのDeepSeek APIキー>",
+                  base_url="https://api.deepseek.com",
+              )
+
+              response = client.chat.completions.create(
+                  model="deepseek-v4-pro",
+                  messages=[
+                      {"role": "system", "content": "あなたは親切なアシスタントです。"},
+                      {"role": "user", "content": "こんにちは！"},
+                  ],
+                  stream=False,
+              )
+
+              print(response.choices[0].message.content)
+            </script>
+          </div>
+
+          <h3>実装例（curl）</h3>
+          <div class="code-block">
+            <div class="code-head"><span>bash</span><span>curl</span></div>
+            <pre><code class="language-bash" data-src></code></pre>
+            <script type="text/plain" class="code-src">
+              curl https://api.deepseek.com/chat/completions \
+                -H "Content-Type: application/json" \
+                -H "Authorization: Bearer ${DEEPSEEK_API_KEY}" \
+                -d '{
+                      "model": "deepseek-v4-pro",
+                      "messages": [
+                        {"role": "system", "content": "あなたは親切なアシスタントです。"},
+                        {"role": "user", "content": "こんにちは！"}
+                      ],
+                      "stream": false
+                    }'
+            </script>
+          </div>
+
+          <div class="best-practice">
+            <strong>ベストプラクティス:</strong>
+            WebのチャットUIはストリーミング表示ですが、APIはデフォルトで非ストリーミング (<code
+              class="inline"
+              >stream=false</code
+            >)です。ユーザー体験を高めたい対話型アプリでは
+            <code class="inline">stream=true</code> を明示的に指定しましょう。
+          </div>
+
+          <div class="refbox">
+            <div class="refbox-title">参照URL</div>
+            <ul>
+              <li>
+                <a href="https://api-docs.deepseek.com/" target="_blank" rel="noopener"
+                  >https://api-docs.deepseek.com/</a
+                >（Your First API Call）
+              </li>
+              <li>
+                <a href="https://api-docs.deepseek.com/faq" target="_blank" rel="noopener"
+                  >https://api-docs.deepseek.com/faq</a
+                >（APIの速度に関するFAQ）
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ============ Step 3 ============ -->
+        <section class="section" id="step3">
+          <div class="section-kicker"><span class="step-num">STEP 03</span></div>
+          <h2>モデル選定のベストプラクティス</h2>
+
+          <h3>選定ディシジョンツリー</h3>
+          <div class="diagram-card">
+            <script type="text/plain" class="mmd-src">
+              flowchart TD
+                  Start["タスクの性質は？"] --> Q1{"複雑な推論・数学・SWE-bench級の
+              コーディングが必要？"}
+                  Q1 -- はい --> Q2{"レイテンシ・コストより
+              精度を最優先？"}
+                  Q2 -- はい --> Pro["deepseek-v4-pro を選択"]
+                  Q2 -- いいえ --> Flash1["deepseek-v4-flash（思考モード）で試す"]
+                  Q1 -- いいえ --> Q3{"シンプルなAgentタスク・
+              チャット・要約？"}
+                  Q3 -- はい --> Flash2["deepseek-v4-flash を選択（高速・低コスト）"]
+                  Q3 -- いいえ --> Custom["ユースケースごとにベンチマークして比較"]
+            </script>
+            <pre class="mermaid"></pre>
+            <div class="diagram-caption">図3: モデル選定ディシジョンツリー</div>
+          </div>
+
+          <h3>選定の基準まとめ</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ユースケース</th>
+                  <th>推奨モデル</th>
+                  <th>理由</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>コーディングエージェント、複雑な多段階Agentタスク</td>
+                  <td><code class="inline">deepseek-v4-pro</code></td>
+                  <td>
+                    オープンモデルでSOTA級のAgentic Coding性能、Gemini-3.1-Proに次ぐ世界知識量
+                  </td>
+                </tr>
+                <tr>
+                  <td>シンプルなAgentタスク・チャットボット・要約</td>
+                  <td><code class="inline">deepseek-v4-flash</code></td>
+                  <td>Pro同等の性能をシンプルタスクで発揮しつつ、応答速度とコストで優位</td>
+                </tr>
+                <tr>
+                  <td>大量並列処理（高スループットが必要なバッチ処理）</td>
+                  <td><code class="inline">deepseek-v4-flash</code></td>
+                  <td>同時実行数上限が2500（Proは500）と5倍</td>
+                </tr>
+                <tr>
+                  <td>数学・STEM・高度なコーディング精度が最優先</td>
+                  <td><code class="inline">deepseek-v4-pro</code></td>
+                  <td>Math/STEM/Codingでトップクラスのclosed-sourceモデルに匹敵</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="best-practice">
+            <strong>ベストプラクティス:</strong> まずコストの低い
+            <code class="inline">deepseek-v4-flash</code> で試作・評価を行い、
+            精度が不足する場合のみ
+            <code class="inline">deepseek-v4-pro</code>
+            に切り替える、という段階的な検証が推奨されます。
+          </div>
+
+          <div class="refbox">
+            <div class="refbox-title">参照URL</div>
+            <ul>
+              <li>
+                <a
+                  href="https://api-docs.deepseek.com/news/news260424"
+                  target="_blank"
+                  rel="noopener"
+                  >https://api-docs.deepseek.com/news/news260424</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://api-docs.deepseek.com/quick_start/pricing"
+                  target="_blank"
+                  rel="noopener"
+                  >https://api-docs.deepseek.com/quick_start/pricing</a
+                >
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ============ Step 4 ============ -->
+        <section class="section" id="step4">
+          <div class="section-kicker"><span class="step-num">STEP 04</span></div>
+          <h2>Thinking Mode（思考モード）の使い方</h2>
+          <p>
+            DeepSeekモデルは、最終回答を出す前に思考の連鎖（Chain of Thought）を出力する「Thinking
+            Mode」をサポートしています。 思考内容は
+            <code class="inline">reasoning_content</code> フィールドに、最終回答は
+            <code class="inline">content</code> フィールドに、 それぞれ別々に返却されます。
+          </p>
+
+          <h3>制御パラメータ</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>OpenAI形式</th>
+                  <th>Anthropic形式</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>思考モードのON/OFF</td>
+                  <td><code class="inline">{"thinking":{"type":"enabled/disabled"}}</code></td>
+                  <td>—</td>
+                </tr>
+                <tr>
+                  <td>思考の強度（Effort）</td>
+                  <td><code class="inline">{"reasoning_effort":"high/max"}</code></td>
+                  <td><code class="inline">{"output_config":{"effort":"high/max"}}</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <ul>
+            <li>思考モードのデフォルトは<strong>有効(enabled)</strong></li>
+            <li>
+              通常リクエストのデフォルトEffortは <code class="inline">high</code>。Claude
+              CodeやOpenCodeのような複雑なAgentリクエストでは自動的に
+              <code class="inline">max</code> になります
+            </li>
+            <li>
+              互換性のため <code class="inline">low</code>/<code class="inline">medium</code> は
+              <code class="inline">high</code> に、<code class="inline">xhigh</code> は
+              <code class="inline">max</code> に自動マッピングされます
+            </li>
+            <li>
+              思考モードでは <code class="inline">temperature</code> /
+              <code class="inline">top_p</code> / <code class="inline">presence_penalty</code> /
+              <code class="inline">frequency_penalty</code> は無効（エラーにはならないが効果なし）
+            </li>
+          </ul>
+
+          <h3>マルチターンにおける reasoning_content の扱い（重要）</h3>
+          <div class="diagram-card">
+            <script type="text/plain" class="mmd-src">
+              flowchart TB
+                  A["ユーザー発話1"] --> B["モデルが reasoning_content と content を生成"]
+                  B --> C{"このターンで
+              ツール呼び出しをしたか？"}
+                  C -- していない --> D["次ターンの送信時、
+              reasoning_content は無視してよい"]
+                  C -- した --> E["次ターンの送信時、
+              reasoning_content を必ず含めて再送する
+              （省略すると400エラー）"]
+            </script>
+            <pre class="mermaid"></pre>
+            <div class="diagram-caption">
+              図4: マルチターンにおける reasoning_content 引き継ぎのルール
+            </div>
+          </div>
+
+          <h3>Python実装例</h3>
+          <div class="code-block">
+            <div class="code-head"><span>python</span><span>thinking_mode.py</span></div>
+            <pre><code class="language-python" data-src></code></pre>
+            <script type="text/plain" class="code-src">
+              messages = [{"role": "user", "content": "9.11 と 9.8 はどちらが大きい？"}]
+
+              response = client.chat.completions.create(
+                  model="deepseek-v4-pro",
+                  messages=messages,
+                  reasoning_effort="high",
+                  extra_body={"thinking": {"type": "enabled"}},
+              )
+
+              reasoning = response.choices[0].message.reasoning_content
+              answer = response.choices[0].message.content
+
+              # 次のターンへ引き継ぐ（ツール呼び出しがなければ reasoning_content は無視される）
+              messages.append(response.choices[0].message)
+              messages.append({"role": "user", "content": "では『strawberry』にRはいくつある？"})
+            </script>
+          </div>
+
+          <div class="best-practice">
+            <strong>ベストプラクティス:</strong> Tool Calls（Function
+            Calling）を伴う思考モードの会話では、
+            <code class="inline">reasoning_content</code> を省略すると400エラーになります。
+            <code class="inline">response.choices[0].message</code> をそのまま
+            <code class="inline">messages</code> に
+            追記する実装にしておくと、フィールドの欠落を防げます。
+          </div>
+
+          <div class="refbox">
+            <div class="refbox-title">参照URL</div>
+            <ul>
+              <li>
+                <a
+                  href="https://api-docs.deepseek.com/guides/thinking_mode"
+                  target="_blank"
+                  rel="noopener"
+                  >https://api-docs.deepseek.com/guides/thinking_mode</a
+                >
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ============ Step 5 ============ -->
+        <section class="section" id="step5">
+          <div class="section-kicker"><span class="step-num">STEP 05</span></div>
+          <h2>マルチターン会話の実装</h2>
+          <p>
+            DeepSeekの <code class="inline">/chat/completions</code> API は<strong
+              >ステートレス</strong
+            >
+            （サーバー側で会話履歴を保持しない）です。そのため、過去の会話履歴をすべて
+            <code class="inline">messages</code> 配列に 含めて毎回送信する必要があります。
+          </p>
+
+          <div class="diagram-card">
+            <script type="text/plain" class="mmd-src">
+              sequenceDiagram
+                  participant User as ユーザー
+                  participant App as アプリケーション
+                  participant API as DeepSeek API
+
+                  User->>App: 「世界一高い山は？」
+                  App->>API: messages=[user1]
+                  API-->>App: assistant1「エベレストです」
+                  App->>App: messages に assistant1 を追記
+                  User->>App: 「では2番目に高いのは？」
+                  App->>API: messages=[user1, assistant1, user2]
+                  API-->>App: assistant2「K2です」
+            </script>
+            <pre class="mermaid"></pre>
+            <div class="diagram-caption">図5: マルチターン会話のコンテキスト連結</div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-head"><span>python</span><span>multi_turn.py</span></div>
+            <pre><code class="language-python" data-src></code></pre>
+            <script type="text/plain" class="code-src">
+              messages = [{"role": "user", "content": "世界一高い山は？"}]
+              response = client.chat.completions.create(model="deepseek-v4-pro", messages=messages)
+              messages.append(response.choices[0].message)
+
+              messages.append({"role": "user", "content": "では2番目に高いのは？"})
+              response = client.chat.completions.create(model="deepseek-v4-pro", messages=messages)
+              messages.append(response.choices[0].message)
+            </script>
+          </div>
+
+          <div class="best-practice">
+            <strong>ベストプラクティス:</strong>
+            会話履歴が長くなるほどトークン消費が増えるため、Step 8のContext Cachingと
+            組み合わせて、履歴の「共通接頭辞」を維持する設計（システムプロンプトを変えない、履歴を編集しない）にすると
+            キャッシュヒット率が向上します。
+          </div>
+
+          <div class="refbox">
+            <div class="refbox-title">参照URL</div>
+            <ul>
+              <li>
+                <a
+                  href="https://api-docs.deepseek.com/guides/multi_round_chat"
+                  target="_blank"
+                  rel="noopener"
+                  >https://api-docs.deepseek.com/guides/multi_round_chat</a
+                >
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ============ Step 6 ============ -->
+        <section class="section" id="step6">
+          <div class="section-kicker"><span class="step-num">STEP 06</span></div>
+          <h2>Function Calling（Tool Calls）の活用</h2>
+          <p>
+            Tool
+            Callsは、モデルが外部関数（天気取得API、DB検索など）を呼び出して能力を拡張する仕組みです。
+            <strong>モデル自身は関数を実行しません。</strong
+            >関数を呼ぶ「意図」と「引数」を返すだけで、
+            実際の実行と結果の返却はアプリケーション側の責務です。
+          </p>
+
+          <h3>非思考モードでの基本フロー</h3>
+          <div class="diagram-card">
+            <script type="text/plain" class="mmd-src">
+              sequenceDiagram
+                  participant U as ユーザー
+                  participant App as アプリケーション
+                  participant M as DeepSeekモデル
+                  participant T as 外部関数(get_weather)
+
+                  U->>App: 「杭州の天気は？」
+                  App->>M: messages + tools定義
+                  M-->>App: tool_calls=[get_weather(location=杭州)]
+                  App->>T: get_weather(location=杭州) を実行
+                  T-->>App: 24℃
+                  App->>M: role=tool で結果を返却
+                  M-->>App: 「杭州の現在の気温は24℃です」
+                  App-->>U: 最終回答を表示
+            </script>
+            <pre class="mermaid"></pre>
+            <div class="diagram-caption">図6: Tool Calls（Function Calling）の基本シーケンス</div>
+          </div>
+
+          <h3>実装例</h3>
+          <div class="code-block">
+            <div class="code-head"><span>python</span><span>tool_calls.py</span></div>
+            <pre><code class="language-python" data-src></code></pre>
+            <script type="text/plain" class="code-src">
+              tools = [{
+                  "type": "function",
+                  "function": {
+                      "name": "get_weather",
+                      "description": "指定した場所の天気を取得する",
+                      "parameters": {
+                          "type": "object",
+                          "properties": {
+                              "location": {"type": "string", "description": "都市名"}
+                          },
+                          "required": ["location"],
+                      },
+                  },
+              }]
+
+              messages = [{"role": "user", "content": "杭州の天気は？"}]
+              response = client.chat.completions.create(model="deepseek-v4-pro", messages=messages, tools=tools)
+
+              tool_call = response.choices[0].message.tool_calls[0]
+              messages.append(response.choices[0].message)
+              messages.append({"role": "tool", "tool_call_id": tool_call.id, "content": "24℃"})
+
+              final = client.chat.completions.create(model="deepseek-v4-pro", messages=messages, tools=tools)
+              print(final.choices[0].message.content)
+            </script>
+          </div>
+
+          <h3>思考モードでのTool Calls</h3>
+          <p class="narrow">
+            DeepSeek-V3.2以降、思考モードでもTool
+            Callsが利用できます。思考→ツール呼び出し→思考→最終回答、という
+            複数ラウンドの推論が可能になります。この場合、前述のとおり<strong
+              >各サブターンの reasoning_content を 必ずAPIへ送り返す</strong
+            >必要があります。
+          </p>
+
+          <h3>strict モード（Beta）でスキーマ準拠を保証する</h3>
+          <p class="narrow">
+            <code class="inline">strict: true</code> を関数定義に設定すると、モデルの出力がJSON
+            Schemaに厳密に従うことが 保証されます。利用するには
+            <code class="inline">base_url="https://api.deepseek.com/beta"</code> を
+            指定する必要があります。
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>対応するJSON Schema型</th>
+                  <th>備考</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>object</td>
+                  <td>
+                    全プロパティを<code class="inline">required</code>にし、<code class="inline"
+                      >additionalProperties: false</code
+                    >を設定する必要がある
+                  </td>
+                </tr>
+                <tr>
+                  <td>string</td>
+                  <td>
+                    <code class="inline">pattern</code>・<code class="inline">format</code
+                    >（email/hostname/ipv4/ipv6/uuid）対応。<code class="inline">minLength</code
+                    >/<code class="inline">maxLength</code>は非対応
+                  </td>
+                </tr>
+                <tr>
+                  <td>number / integer</td>
+                  <td>
+                    <code class="inline">minimum</code>/<code class="inline">maximum</code>/<code
+                      class="inline"
+                      >multipleOf</code
+                    >等は対応
+                  </td>
+                </tr>
+                <tr>
+                  <td>array</td>
+                  <td>
+                    <code class="inline">items</code>対応。<code class="inline">minItems</code
+                    >/<code class="inline">maxItems</code>は非対応
+                  </td>
+                </tr>
+                <tr>
+                  <td>enum</td>
+                  <td>対応</td>
+                </tr>
+                <tr>
+                  <td>anyOf</td>
+                  <td>対応（複数形式の許容に利用）</td>
+                </tr>
+                <tr>
+                  <td>$ref / $def</td>
+                  <td>再利用可能なサブスキーマ定義・再帰構造に利用可能</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="best-practice">
+            <strong>ベストプラクティス:</strong>
+            構造化データを外部システムに連携する用途（受注ステータス管理、フォーム入力の
+            抽出等）では、通常モードよりも<code class="inline">strict</code
+            >モードを使う方がパースエラーによる後続処理の 失敗を防げます。
+          </div>
+
+          <div class="refbox">
+            <div class="refbox-title">参照URL</div>
+            <ul>
+              <li>
+                <a
+                  href="https://api-docs.deepseek.com/guides/tool_calls"
+                  target="_blank"
+                  rel="noopener"
+                  >https://api-docs.deepseek.com/guides/tool_calls</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://api-docs.deepseek.com/guides/thinking_mode#tool-calls"
+                  target="_blank"
+                  rel="noopener"
+                  >https://api-docs.deepseek.com/guides/thinking_mode#tool-calls</a
+                >
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ============ Step 7 ============ -->
+        <section class="section" id="step7">
+          <div class="section-kicker"><span class="step-num">STEP 07</span></div>
+          <h2>構造化出力（JSON Mode / strictモード）</h2>
+          <p>
+            厳密なJSON文字列で応答させたい場合は
+            <code class="inline">response_format={"type":"json_object"}</code> を 指定するJSON
+            Outputモードを使います。
+          </p>
+
+          <h3>利用時の注意点（公式ドキュメントより）</h3>
+          <ol>
+            <li>
+              <code class="inline">response_format</code> を
+              <code class="inline">{'type': 'json_object'}</code> に設定する
+            </li>
+            <li>
+              システムプロンプトまたはユーザープロンプトに「json」という単語を含め、期待するJSON形式の例を提示してモデルを誘導する
+            </li>
+            <li>
+              <code class="inline">max_tokens</code>
+              を適切に設定し、JSON文字列が途中で切れないようにする
+            </li>
+            <li>
+              まれに空のコンテンツが返る場合がある（公式も認識・改善中の既知の挙動）。プロンプトの調整で緩和できる場合がある
+            </li>
+          </ol>
+
+          <div class="code-block">
+            <div class="code-head"><span>python</span><span>json_mode.py</span></div>
+            <pre><code class="language-python" data-src></code></pre>
+            <script type="text/plain" class="code-src">
+              system_prompt = """
+              ユーザーは試験問題のテキストを提供します。「question」と「answer」を抽出し、JSON形式で出力してください。
+
+              出力例:
+              {"question": "世界一高い山はどこですか？", "answer": "エベレスト"}
+              """
+
+              response = client.chat.completions.create(
+                  model="deepseek-v4-pro",
+                  messages=[
+                      {"role": "system", "content": system_prompt},
+                      {"role": "user", "content": "世界一長い川はどこですか？ナイル川です。"},
+                  ],
+                  response_format={"type": "json_object"},
+              )
+            </script>
+          </div>
+
+          <div class="best-practice">
+            <strong>ベストプラクティス:</strong>
+            外部との連携で厳密なスキーマ順守が必要な場合は、JSON ModeよりもStep 6で 紹介した「Tool
+            Calls + strictモード」の方が構造の保証度が高く、より確実です。JSON
+            Modeは「JSON形式であること」は 保証しますが、フィールド構造そのものは保証しません。
+          </div>
+
+          <div class="refbox">
+            <div class="refbox-title">参照URL</div>
+            <ul>
+              <li>
+                <a
+                  href="https://api-docs.deepseek.com/guides/json_mode"
+                  target="_blank"
+                  rel="noopener"
+                  >https://api-docs.deepseek.com/guides/json_mode</a
+                >
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ============ Step 8 ============ -->
+        <section class="section" id="step8">
+          <div class="section-kicker"><span class="step-num">STEP 08</span></div>
+          <h2>Context Caching でコストを最大95%削減する</h2>
+          <p>
+            DeepSeek
+            APIには「ディスクベースのコンテキストキャッシュ」がデフォルトで有効になっており、コード変更なしに
+            恩恵を受けられます。同一のプレフィックス（接頭辞）を持つリクエストを繰り返し送ると、重複部分がキャッシュヒットとして
+            扱われ、大幅に安価に処理されます（Step
+            2の比較表の通り、キャッシュヒット時の入力コストはキャッシュミス時の 約1/50〜1/120）。
+          </p>
+
+          <h3>キャッシュが持続化される3つのタイミング</h3>
+          <div class="diagram-card">
+            <script type="text/plain" class="mmd-src">
+              flowchart TB
+                  A["1. リクエスト境界での持続化
+              （各リクエストのユーザー入力末尾／モデル出力末尾）"]
+                  B["2. 共通接頭辞の検出による持続化
+              （複数リクエストで共通する接頭辞を検出）"]
+                  C["3. 固定トークン間隔での持続化
+              （長文の入出力を一定間隔でユニット化）"]
+                  A --> D["後続リクエストが完全一致すればキャッシュヒット"]
+                  B --> D
+                  C --> D
+            </script>
+            <pre class="mermaid"></pre>
+            <div class="diagram-caption">
+              図7: Context Cachingにおけるキャッシュ持続化の3パターン
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>フィールド</th>
+                  <th>内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code class="inline">prompt_cache_hit_tokens</code></td>
+                  <td>入力のうちキャッシュヒットしたトークン数</td>
+                </tr>
+                <tr>
+                  <td><code class="inline">prompt_cache_miss_tokens</code></td>
+                  <td>入力のうちキャッシュミスしたトークン数</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="best-practice">
+            <strong>ベストプラクティス:</strong>
+            <ul style="margin: 10px 0 0; max-width: none">
+              <li>
+                システムプロンプトや長文コンテキスト（財務資料、ドキュメント全文など）を<strong>常に会話の先頭に固定して配置</strong>し、後半にだけ質問を変えて送ると、共通接頭辞がキャッシュされてコストが大幅に下がります。
+              </li>
+              <li>
+                キャッシュは「ベストエフォート」であり100%のヒットを保証しません。また未使用のキャッシュは数時間〜数日で自動的にクリアされます。
+              </li>
+              <li>
+                キャッシュはあくまで入力プレフィックスの一致にのみ作用し、出力の再現性（ランダム性）には影響しません。
+              </li>
+            </ul>
+          </div>
+
+          <div class="refbox">
+            <div class="refbox-title">参照URL</div>
+            <ul>
+              <li>
+                <a
+                  href="https://api-docs.deepseek.com/guides/kv_cache"
+                  target="_blank"
+                  rel="noopener"
+                  >https://api-docs.deepseek.com/guides/kv_cache</a
+                >
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ============ Step 9 ============ -->
+        <section class="section" id="step9">
+          <div class="section-kicker"><span class="step-num">STEP 09</span></div>
+          <h2>レート制限・同時実行数・エラーハンドリング</h2>
+
+          <h3>同時実行数（Concurrency Limit）</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>モデル</th>
+                  <th>同時実行数上限</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>deepseek-v4-pro</td>
+                  <td>500</td>
+                </tr>
+                <tr>
+                  <td>deepseek-v4-flash</td>
+                  <td>2500</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <ul>
+            <li>上限はAPIキー単位ではなく<strong>アカウント単位</strong>で計算されます</li>
+            <li>上限を超えると HTTP 429 が返却されます</li>
+            <li>
+              より高い同時実行数が必要な場合は、公式フォームから容量拡張をリクエストできます（追加費用なし）
+            </li>
+          </ul>
+
+          <h3>user_id によるアイソレーション</h3>
+          <p class="narrow">
+            <code class="inline">user_id</code>
+            パラメータを渡すことで、自社サービス内のエンドユーザー単位で
+            「コンテンツ安全性」「KVCacheの分離（プライバシー保護）」「スケジューリング」を分離管理できます。
+            <code class="inline">user_id</code>
+            はハイフン・アンダースコア・英数字のみ、最大512文字で、 個人情報を含めてはいけません。
+          </p>
+
+          <div class="code-block">
+            <div class="code-head"><span>python</span><span>user_id.py</span></div>
+            <pre><code class="language-python" data-src></code></pre>
+            <script type="text/plain" class="code-src">
+              response = client.chat.completions.create(
+                  model="deepseek-v4-pro",
+                  messages=[{"role": "user", "content": "Hello!"}],
+                  extra_body={"user_id": "your_user_id"},
+              )
+            </script>
+          </div>
+
+          <h3>エラーコード一覧</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>コード</th>
+                  <th>原因</th>
+                  <th>対処法</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>400 Invalid Format</td>
+                  <td>リクエストボディの形式が不正</td>
+                  <td>エラーメッセージのヒントに従い修正</td>
+                </tr>
+                <tr>
+                  <td>401 Authentication Fails</td>
+                  <td>APIキーが誤っている</td>
+                  <td>APIキーを確認、未発行なら新規作成</td>
+                </tr>
+                <tr>
+                  <td>402 Insufficient Balance</td>
+                  <td>残高不足</td>
+                  <td>Top upページでチャージ</td>
+                </tr>
+                <tr>
+                  <td>422 Invalid Parameters</td>
+                  <td>パラメータが不正</td>
+                  <td>エラーメッセージに従い修正</td>
+                </tr>
+                <tr>
+                  <td>429 Rate Limit Reached</td>
+                  <td>リクエスト過多</td>
+                  <td>リクエスト頻度を調整</td>
+                </tr>
+                <tr>
+                  <td>500 Server Error</td>
+                  <td>サーバー側の問題</td>
+                  <td>少し待って再試行</td>
+                </tr>
+                <tr>
+                  <td>503 Server Overloaded</td>
+                  <td>高負荷によるサーバー過負荷</td>
+                  <td>少し待って再試行</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>エラーハンドリングのベストプラクティスフロー</h3>
+          <div class="diagram-card">
+            <script type="text/plain" class="mmd-src">
+              flowchart TD
+                  Send["APIリクエスト送信"] --> Resp{"レスポンスコード"}
+                  Resp -- 200 --> OK["正常処理"]
+                  Resp -- 429 --> Wait["指数バックオフで再試行
+              （Retry-Afterがあれば尊重）"]
+                  Resp -- "500 / 503" --> Retry["短い待機後にリトライ
+              （最大リトライ回数を設定）"]
+                  Resp -- "401 / 402 / 422 / 400" --> Fix["コード側の設定・残高・
+              リクエスト内容を修正"]
+                  Wait --> Send
+                  Retry --> Send
+            </script>
+            <pre class="mermaid"></pre>
+            <div class="diagram-caption">図8: エラーハンドリングのベストプラクティスフロー</div>
+          </div>
+
+          <p class="narrow">
+            リクエスト送信後、推論のスケジューリング待ちの間、非ストリーミングでは空行、ストリーミングでは
+            <code class="inline">: keep-alive</code>
+            というSSEコメントが継続的に返却されます。自前でHTTPレスポンスを
+            パースする場合は、これらを無視できるよう実装してください。なお、10分間推論が開始されない場合はサーバー側から
+            接続が切断されます。
+          </p>
+
+          <div class="refbox">
+            <div class="refbox-title">参照URL</div>
+            <ul>
+              <li>
+                <a
+                  href="https://api-docs.deepseek.com/quick_start/rate_limit"
+                  target="_blank"
+                  rel="noopener"
+                  >https://api-docs.deepseek.com/quick_start/rate_limit</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://api-docs.deepseek.com/quick_start/error_codes"
+                  target="_blank"
+                  rel="noopener"
+                  >https://api-docs.deepseek.com/quick_start/error_codes</a
+                >
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ============ Step 10 ============ -->
+        <section class="section" id="step10">
+          <div class="section-kicker"><span class="step-num">STEP 10</span></div>
+          <h2>Anthropic API互換とコーディングエージェント連携</h2>
+          <p>
+            DeepSeekはAnthropic APIエコシステム向けに互換フォーマットを提供しており、<code
+              class="inline"
+              >base_url</code
+            >
+            を
+            <code class="inline">https://api.deepseek.com/anthropic</code>
+            に変更するだけで、Anthropic SDKや、 Claude
+            Codeのような対応済みツールをそのまま利用できます。
+          </p>
+
+          <h3>モデルマッピングの仕組み</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>渡したモデル名の接頭辞</th>
+                  <th>マッピング先</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>claude-opus-*</td>
+                  <td>deepseek-v4-pro</td>
+                </tr>
+                <tr>
+                  <td>claude-sonnet-* / claude-haiku-*</td>
+                  <td>deepseek-v4-flash</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Claude Code連携の設定例（Linux/Mac）</h3>
+          <div class="code-block">
+            <div class="code-head"><span>bash</span><span>claude_code_env.sh</span></div>
+            <pre><code class="language-bash" data-src></code></pre>
+            <script type="text/plain" class="code-src">
+              export ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic
+              export ANTHROPIC_AUTH_TOKEN=<あなたのDeepSeek APIキー>
+              export ANTHROPIC_MODEL=deepseek-v4-pro[1m]
+              export ANTHROPIC_DEFAULT_OPUS_MODEL=deepseek-v4-pro[1m]
+              export ANTHROPIC_DEFAULT_SONNET_MODEL=deepseek-v4-pro[1m]
+              export ANTHROPIC_DEFAULT_HAIKU_MODEL=deepseek-v4-flash
+              export CLAUDE_CODE_SUBAGENT_MODEL=deepseek-v4-flash
+              export CLAUDE_CODE_EFFORT_LEVEL=max
+            </script>
+          </div>
+
+          <p class="narrow">
+            設定後、プロジェクトディレクトリで
+            <code class="inline">claude</code> コマンドを実行するだけで、 Claude
+            CodeのバックエンドとしてDeepSeekモデルが動作します。Claude
+            Code内のWeb検索機能もDeepSeek側で
+            ネイティブにサポートされていますが、検索結果の要約のために追加のAPIリクエスト（追加コスト）が発生する点に
+            注意してください。
+          </p>
+          <p class="narrow">
+            DeepSeekはClaude Code以外にも、GitHub Copilot／GitHub Copilot CLI／Kilo
+            Code／OpenCode／OpenClaw／AstrBot等、
+            多数のエージェントツールとの連携ガイドを公開しています。
+          </p>
+
+          <h3>Anthropic API互換における主な非対応・制限事項</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>分野</th>
+                  <th>状況</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>anthropic-beta / anthropic-version ヘッダー</td>
+                  <td>無視される</td>
+                </tr>
+                <tr>
+                  <td>thinking.budget_tokens</td>
+                  <td>無視される（effortのみ有効）</td>
+                </tr>
+                <tr>
+                  <td>画像・ドキュメント・検索結果のcontentタイプ</td>
+                  <td>非対応</td>
+                </tr>
+                <tr>
+                  <td>cache_control（Anthropic側のプロンプトキャッシュ指定）</td>
+                  <td>無視される（DeepSeek独自のContext Cachingが常時作動）</td>
+                </tr>
+                <tr>
+                  <td>tool_choice（none/auto/any/tool）</td>
+                  <td>対応（ただしdisable_parallel_tool_useは無視）</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="best-practice">
+            <strong>ベストプラクティス:</strong> 既にAnthropic SDKやClaude
+            Code運用のワークフローを持っているチームは、 コードをほぼ変更せずに
+            <code class="inline">base_url</code> と <code class="inline">api_key</code> の
+            切替のみでDeepSeekモデルを試せます。ただし画像入力等、非対応の機能に依存した既存実装がある場合は移行前に
+            対応表を確認してください。
+          </div>
+
+          <div class="refbox">
+            <div class="refbox-title">参照URL</div>
+            <ul>
+              <li>
+                <a
+                  href="https://api-docs.deepseek.com/guides/anthropic_api"
+                  target="_blank"
+                  rel="noopener"
+                  >https://api-docs.deepseek.com/guides/anthropic_api</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://api-docs.deepseek.com/quick_start/agent_integrations/claude_code"
+                  target="_blank"
+                  rel="noopener"
+                  >https://api-docs.deepseek.com/quick_start/agent_integrations/claude_code</a
+                >
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ============ コスト管理 ============ -->
+        <section class="section" id="cost">
+          <h2>料金とトークン管理のベストプラクティス</h2>
+
+          <h3>トークンの基本</h3>
+          <ul>
+            <li>英語1文字 ≈ 0.3トークン</li>
+            <li>中国語1文字 ≈ 0.6トークン</li>
+            <li>
+              日本語を含め、実際のトークン数はモデルのトークナイザに依存するため、正確な値はAPIレスポンスの
+              <code class="inline">usage</code> を確認するのが確実です
+            </li>
+            <li>オフラインでのトークン数計算用に、公式がトークナイザーZIPを配布しています</li>
+          </ul>
+
+          <h3>コスト最適化の実践ポイント</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>施策</th>
+                  <th>効果</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>システムプロンプト・長文コンテキストを固定し会話の先頭に配置</td>
+                  <td>Context Cachingのヒット率向上 → 入力コストを最大1/100程度まで削減</td>
+                </tr>
+                <tr>
+                  <td>タスクの難易度に応じてFlash/Proを使い分け</td>
+                  <td>単純タスクの過剰コストを回避</td>
+                </tr>
+                <tr>
+                  <td>max_tokensを適切に設定</td>
+                  <td>出力の暴走・不要な生成コストを防止</td>
+                </tr>
+                <tr>
+                  <td>思考モードのEffortを用途に応じて調整</td>
+                  <td>過剰な思考トークン消費を抑制</td>
+                </tr>
+                <tr>
+                  <td>バッチ処理は同時実行数上限を踏まえて設計</td>
+                  <td>429エラーの防止とスループット最大化</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="refbox">
+            <div class="refbox-title">参照URL</div>
+            <ul>
+              <li>
+                <a
+                  href="https://api-docs.deepseek.com/quick_start/token_usage"
+                  target="_blank"
+                  rel="noopener"
+                  >https://api-docs.deepseek.com/quick_start/token_usage</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://api-docs.deepseek.com/quick_start/pricing"
+                  target="_blank"
+                  rel="noopener"
+                  >https://api-docs.deepseek.com/quick_start/pricing</a
+                >
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ============ 総まとめ ============ -->
+        <section class="section" id="summary">
+          <h2>ベストプラクティス総まとめ表</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>カテゴリ</th>
+                  <th>ベストプラクティス</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>モデル選定</td>
+                  <td>まずdeepseek-v4-flashで検証し、精度不足時のみdeepseek-v4-proへ</td>
+                </tr>
+                <tr>
+                  <td>APIキー管理</td>
+                  <td>環境変数で管理し、コードに直書きしない</td>
+                </tr>
+                <tr>
+                  <td>会話設計</td>
+                  <td>ステートレスAPIのため全履歴をmessagesに含めて送信する</td>
+                </tr>
+                <tr>
+                  <td>思考モード</td>
+                  <td>ツール呼び出しを伴う場合はreasoning_contentを必ず再送する</td>
+                </tr>
+                <tr>
+                  <td>Function Calling</td>
+                  <td>外部連携が必要な構造化出力はstrictモードを優先検討</td>
+                </tr>
+                <tr>
+                  <td>コスト管理</td>
+                  <td>システムプロンプト・長文コンテキストを固定してキャッシュヒット率を上げる</td>
+                </tr>
+                <tr>
+                  <td>エラー処理</td>
+                  <td>
+                    429/500/503は指数バックオフで再試行、400/401/402/422はリクエスト内容を修正
+                  </td>
+                </tr>
+                <tr>
+                  <td>同時実行制御</td>
+                  <td>Flash:2500 / Pro:500の上限を踏まえてキューイング設計</td>
+                </tr>
+                <tr>
+                  <td>エコシステム連携</td>
+                  <td>既存のOpenAI/Anthropic SDK資産をbase_url変更のみで再利用</td>
+                </tr>
+                <tr>
+                  <td>情報の鮮度管理</td>
+                  <td>更新頻度が高いため、実装前に必ず公式Change Logを確認</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ============ 移行チェックリスト ============ -->
+        <section class="section" id="migration">
+          <h2>移行チェックリスト（旧モデル廃止対応）</h2>
+          <p class="narrow">
+            <code class="inline">deepseek-chat</code> /
+            <code class="inline">deepseek-reasoner</code> を利用中のプロジェクトは、
+            2026年7月24日15:59(UTC)までに以下を完了してください。
+          </p>
+          <ul class="checklist">
+            <li>
+              <span class="box"></span>コード内のモデル名指定を deepseek-chat →
+              deepseek-v4-flash（非思考モード）に置き換える
+            </li>
+            <li>
+              <span class="box"></span>コード内のモデル名指定を deepseek-reasoner →
+              deepseek-v4-flash（思考モード、thinking.type=enabled）に置き換える
+            </li>
+            <li>
+              <span class="box"></span>より高い精度が必要な処理は deepseek-v4-pro への切替も検討する
+            </li>
+            <li>
+              <span class="box"></span>思考モードでTool
+              Callsを使っている場合、reasoning_contentの再送処理が正しく実装されているか確認する
+            </li>
+            <li>
+              <span class="box"></span>strictモードを使う場合はbase_urlを
+              https://api.deepseek.com/beta に切り替えているか確認する
+            </li>
+            <li>
+              <span class="box"></span
+              >同時実行数の見積もりをFlash(2500)/Pro(500)の新しい上限で再計算する
+            </li>
+            <li>
+              <span class="box"></span
+              >ステージング環境で新モデル名での動作確認を行ってから本番反映する
+            </li>
+          </ul>
+
+          <div class="refbox">
+            <div class="refbox-title">参照URL</div>
+            <ul>
+              <li>
+                <a href="https://api-docs.deepseek.com/updates" target="_blank" rel="noopener"
+                  >https://api-docs.deepseek.com/updates</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://api-docs.deepseek.com/news/news260424"
+                  target="_blank"
+                  rel="noopener"
+                  >https://api-docs.deepseek.com/news/news260424</a
+                >
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ============ FAQ ============ -->
+        <section class="section" id="faq">
+          <h2>トラブルシューティングFAQ</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>症状</th>
+                  <th>原因・対処</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>ログインできない（アカウント停止表示）</td>
+                  <td>
+                    利用ガイドライン違反の疑いで停止された可能性。異議申立フォームから申請（審査は通常3営業日以内）
+                  </td>
+                </tr>
+                <tr>
+                  <td>メール登録ができない</td>
+                  <td>対応外のメールドメインの可能性。Gmail/Outlook/Hotmail/Yahoo等を推奨</td>
+                </tr>
+                <tr>
+                  <td>APIがWeb版より遅く感じる</td>
+                  <td>
+                    APIはデフォルトで非ストリーミング。stream=trueでインタラクティブ性を改善できる
+                  </td>
+                </tr>
+                <tr>
+                  <td>空行が延々と返ってくる</td>
+                  <td>タイムアウト防止のKeep-Alive機構によるもの。パース時に無視してよい</td>
+                </tr>
+                <tr>
+                  <td>LangChainで使えるか</td>
+                  <td>対応済み。公式がサンプルコードを配布</td>
+                </tr>
+                <tr>
+                  <td>JSON Modeで空のコンテンツが返る</td>
+                  <td>
+                    既知の挙動として公式も改善中。プロンプトに具体例を追加すると緩和されることがある
+                  </td>
+                </tr>
+                <tr>
+                  <td>Tool Calls利用時に400エラー</td>
+                  <td>思考モードでreasoning_contentを正しく再送できていない可能性が高い</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="refbox">
+            <div class="refbox-title">参照URL</div>
+            <ul>
+              <li>
+                <a href="https://api-docs.deepseek.com/faq" target="_blank" rel="noopener"
+                  >https://api-docs.deepseek.com/faq</a
+                >
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ============ 参考文献 ============ -->
+        <section class="section" id="references">
+          <h2>参考文献一覧（全URL）</h2>
+          <p class="narrow">
+            本ガイド作成にあたり参照した一次情報源は以下の通りです（すべて2026年7月16日時点でアクセス確認済み）。
+          </p>
+          <ul class="ref-list">
+            <li>
+              DeepSeek公式サイト:
+              <a href="https://www.deepseek.com/en/" target="_blank" rel="noopener"
+                >https://www.deepseek.com/en/</a
+              >
+            </li>
+            <li>
+              DeepSeek API公式ドキュメント トップ:
+              <a href="https://api-docs.deepseek.com/" target="_blank" rel="noopener"
+                >https://api-docs.deepseek.com/</a
+              >
+            </li>
+            <li>
+              Models &amp; Pricing:
+              <a
+                href="https://api-docs.deepseek.com/quick_start/pricing"
+                target="_blank"
+                rel="noopener"
+                >https://api-docs.deepseek.com/quick_start/pricing</a
+              >
+            </li>
+            <li>
+              Token &amp; Token Usage:
+              <a
+                href="https://api-docs.deepseek.com/quick_start/token_usage"
+                target="_blank"
+                rel="noopener"
+                >https://api-docs.deepseek.com/quick_start/token_usage</a
+              >
+            </li>
+            <li>
+              Rate Limit &amp; Isolation:
+              <a
+                href="https://api-docs.deepseek.com/quick_start/rate_limit"
+                target="_blank"
+                rel="noopener"
+                >https://api-docs.deepseek.com/quick_start/rate_limit</a
+              >
+            </li>
+            <li>
+              Error Codes:
+              <a
+                href="https://api-docs.deepseek.com/quick_start/error_codes"
+                target="_blank"
+                rel="noopener"
+                >https://api-docs.deepseek.com/quick_start/error_codes</a
+              >
+            </li>
+            <li>
+              Agent Integrations - Claude Code:
+              <a
+                href="https://api-docs.deepseek.com/quick_start/agent_integrations/claude_code"
+                target="_blank"
+                rel="noopener"
+                >https://api-docs.deepseek.com/quick_start/agent_integrations/claude_code</a
+              >
+            </li>
+            <li>
+              Thinking Mode:
+              <a
+                href="https://api-docs.deepseek.com/guides/thinking_mode"
+                target="_blank"
+                rel="noopener"
+                >https://api-docs.deepseek.com/guides/thinking_mode</a
+              >
+            </li>
+            <li>
+              Multi-round Conversation:
+              <a
+                href="https://api-docs.deepseek.com/guides/multi_round_chat"
+                target="_blank"
+                rel="noopener"
+                >https://api-docs.deepseek.com/guides/multi_round_chat</a
+              >
+            </li>
+            <li>
+              Chat Prefix Completion (Beta):
+              <a
+                href="https://api-docs.deepseek.com/guides/chat_prefix_completion"
+                target="_blank"
+                rel="noopener"
+                >https://api-docs.deepseek.com/guides/chat_prefix_completion</a
+              >
+            </li>
+            <li>
+              JSON Output:
+              <a
+                href="https://api-docs.deepseek.com/guides/json_mode"
+                target="_blank"
+                rel="noopener"
+                >https://api-docs.deepseek.com/guides/json_mode</a
+              >
+            </li>
+            <li>
+              Tool Calls:
+              <a
+                href="https://api-docs.deepseek.com/guides/tool_calls"
+                target="_blank"
+                rel="noopener"
+                >https://api-docs.deepseek.com/guides/tool_calls</a
+              >
+            </li>
+            <li>
+              Context Caching:
+              <a href="https://api-docs.deepseek.com/guides/kv_cache" target="_blank" rel="noopener"
+                >https://api-docs.deepseek.com/guides/kv_cache</a
+              >
+            </li>
+            <li>
+              Anthropic API:
+              <a
+                href="https://api-docs.deepseek.com/guides/anthropic_api"
+                target="_blank"
+                rel="noopener"
+                >https://api-docs.deepseek.com/guides/anthropic_api</a
+              >
+            </li>
+            <li>
+              FAQ:
+              <a href="https://api-docs.deepseek.com/faq" target="_blank" rel="noopener"
+                >https://api-docs.deepseek.com/faq</a
+              >
+            </li>
+            <li>
+              Change Log:
+              <a href="https://api-docs.deepseek.com/updates" target="_blank" rel="noopener"
+                >https://api-docs.deepseek.com/updates</a
+              >
+            </li>
+            <li>
+              News - DeepSeek-V4 Preview Release (2026/04/24):
+              <a href="https://api-docs.deepseek.com/news/news260424" target="_blank" rel="noopener"
+                >https://api-docs.deepseek.com/news/news260424</a
+              >
+            </li>
+            <li>
+              DeepSeek Platform（コンソール）:
+              <a href="https://platform.deepseek.com" target="_blank" rel="noopener"
+                >https://platform.deepseek.com</a
+              >
+            </li>
+            <li>
+              Service Status:
+              <a href="https://status.deepseek.com" target="_blank" rel="noopener"
+                >https://status.deepseek.com</a
+              >
+            </li>
+            <li>
+              GitHub（研究成果一覧）:
+              <a href="https://github.com/deepseek-ai" target="_blank" rel="noopener"
+                >https://github.com/deepseek-ai</a
+              >
+            </li>
+          </ul>
+        </section>
+
+        <footer class="footer">
+          免責事項:
+          本ガイドはガイド作成時点（2026年7月16日）の公式情報に基づく解説であり、DeepSeekの仕様・料金・
+          モデルラインナップは今後変更される可能性があります。本番導入前には必ず上記の一次情報源で最新情報を
+          確認してください。
+        </footer>
+      </div>
+    </div>
+
+    <script>
+      // ---------- dedent: strips common leading indent from <script type="text/plain"> blocks ----------
+      function dedent(text) {
+        const lines = text
+          .replace(/^\n/, '')
+          .replace(/\n\s*$/, '')
+          .split('\n');
+        const nonEmpty = lines.filter((l) => l.trim().length > 0);
+        if (nonEmpty.length === 0) return text.trim();
+        const indents = nonEmpty.map((l) => (l.match(/^(\s*)/) || ['', ''])[1].length);
+        const minIndent = Math.min(...indents);
+        return lines.map((l) => l.slice(minIndent)).join('\n');
+      }
+
+      // ---------- inject code blocks safely via textContent (auto-escapes HTML) ----------
+      document.querySelectorAll('.code-block').forEach((block) => {
+        const src = block.querySelector('script.code-src');
+        const codeEl = block.querySelector('code[data-src]');
+        if (src && codeEl) {
+          codeEl.textContent = dedent(src.textContent);
+          hljs.highlightElement(codeEl);
+        }
+      });
+
+      // ---------- inject mermaid sources safely, then render ----------
+      document.querySelectorAll('.mmd-src').forEach((src) => {
+        const pre = src.parentElement.querySelector('pre.mermaid');
+        if (pre) pre.textContent = dedent(src.textContent);
+      });
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        securityLevel: 'strict',
+        themeVariables: {
+          background: '#0d1c30',
+          primaryColor: '#152944',
+          primaryTextColor: '#dce6f5',
+          primaryBorderColor: '#3d5a8a',
+          lineColor: '#6f9dff',
+          secondaryColor: '#101f36',
+          tertiaryColor: '#0d1c30',
+          fontFamily: 'Noto Sans JP, sans-serif',
+          fontSize: '14px',
+        },
+        flowchart: { useMaxWidth: false, htmlLabels: true, curve: 'basis' },
+        sequence: { useMaxWidth: false, actorMargin: 60, boxMargin: 10 },
+      });
+      mermaid.run({ querySelector: '.mermaid' });
+
+      // ---------- sidebar active-link highlighting ----------
+      const navLinks = Array.from(document.querySelectorAll('.nav-link'));
+      const targets = navLinks
+        .map((l) => document.getElementById(l.getAttribute('href').slice(1)))
+        .filter(Boolean);
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const id = entry.target.id;
+              navLinks.forEach((l) =>
+                l.classList.toggle('active', l.getAttribute('href') === '#' + id),
+              );
+            }
+          });
+        },
+        { rootMargin: '-20% 0px -70% 0px' },
+      );
+
+      targets.forEach((t) => observer.observe(t));
+
+      // ---------- mobile sidebar toggle ----------
+      const sidebar = document.getElementById('sidebar');
+      const toggleBtn = document.getElementById('sidebarToggle');
+      toggleBtn.addEventListener('click', () => sidebar.classList.toggle('open'));
+      navLinks.forEach((l) => l.addEventListener('click', () => sidebar.classList.remove('open')));
+    </script>
+  </body>
+</html>
