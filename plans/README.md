@@ -72,7 +72,7 @@ Status 値: TODO / IN PROGRESS / DONE / BLOCKED（理由 1 行） / REJECTED（�
 - registry は 59 エントリ。全単射テストが 59 件で Green
 - テスト 1112 件 全 Green（ファインチューニングガイドの契約テスト6件を追加）
 
-**次は Phase 4 コンテンツ（C-10 オーケストレーション / C-11 SDD / C-12 AIガバナンス）**、または F-6（EN 展開）の要否判断。
+**C-12 AIガバナンスは完了**（2026-07-17、`/governance/ai-governance`）。次は Phase 4 コンテンツ（C-10 オーケストレーション / C-11 SDD）、または F-6（EN 展開）の要否判断。
 
 ## 依存関係
 
@@ -88,7 +88,7 @@ Status 値: TODO / IN PROGRESS / DONE / BLOCKED（理由 1 行） / REJECTED（�
 3. ~~`plan F-4' ナビ再グルーピング`~~ → **DONE**（2026-07-14 / [008](008-nav-regrouping-f4.md)。実測 18 → 7 項目）
 4. ~~`plan F-3' RSS フィード（registry から生成）`~~ → **DONE**（2026-07-14 / [009](009-phase3-cross-navigation.md)）
 5. ~~`plan F-7 関連ページリンク（registry の topics 近接から導出）`~~ → **DONE**（2026-07-14 / [009](009-phase3-cross-navigation.md)。F-5 横断検索も同プランで完了）
-6. Phase 4 コンテンツ（C-10 オーケストレーション / C-11 SDD / C-12 AIガバナンス）は Phase 1 完了済みのため着手可能。C-13 ファインチューニングは **DONE**（2026-07-16）
+6. Phase 4 コンテンツの C-10 オーケストレーション / C-11 SDD は Phase 1 完了済みのため着手可能。C-12 AIガバナンスは **DONE**（2026-07-17、`/governance/ai-governance`）。C-13 ファインチューニングは **DONE**（2026-07-16）
 
 ## 検討済み・不採用（re-audit 防止）
 
