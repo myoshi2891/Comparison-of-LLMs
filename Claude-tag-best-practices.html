@@ -1,0 +1,1616 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Claude Tag 活用ガイド ― 中級者〜上級者向けベストプラクティス</title>
+    <style>
+      :root {
+        --bg: #07111e;
+        --bg-elevated: #0d1b2e;
+        --bg-card: #0f2038;
+        --accent: #7c9eff;
+        --accent-soft: rgba(124, 158, 255, 0.14);
+        --accent-2: #f0b86e;
+        --accent-2-soft: rgba(240, 184, 110, 0.14);
+        --text: #e6ecf5;
+        --text-dim: #9fb0c9;
+        --text-faint: #6d7f9c;
+        --border: rgba(255, 255, 255, 0.09);
+        --danger: #ff9d8a;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          'Hiragino Kaku Gothic ProN',
+          'Noto Sans JP',
+          'Yu Gothic UI',
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+        line-height: 1.85;
+        font-size: 16px;
+      }
+
+      code,
+      .mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.92em;
+      }
+
+      code {
+        background: var(--accent-soft);
+        color: var(--accent);
+        padding: 0.1em 0.4em;
+        border-radius: 4px;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+
+      /* ---------- Layout: fixed sidebar + full-width main ---------- */
+      .layout {
+        display: block;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 296px;
+        height: 100vh;
+        overflow-y: auto;
+        background: var(--bg-elevated);
+        border-right: 1px solid var(--border);
+        padding: 2rem 1.4rem 3rem;
+        z-index: 50;
+      }
+
+      .sidebar .brand {
+        font-size: 0.78rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-faint);
+        margin-bottom: 0.3rem;
+      }
+
+      .sidebar .brand-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 1.6rem;
+        line-height: 1.5;
+      }
+
+      .sidebar nav ol {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        counter-reset: toc;
+      }
+
+      .sidebar nav li {
+        margin-bottom: 0.15rem;
+      }
+
+      .sidebar nav a {
+        display: block;
+        counter-increment: toc;
+        color: var(--text-dim);
+        font-size: 0.88rem;
+        padding: 0.45rem 0.6rem 0.45rem 0.7rem;
+        border-left: 2px solid transparent;
+        border-radius: 0 6px 6px 0;
+        transition: all 0.15s ease;
+      }
+
+      .sidebar nav a:hover {
+        background: var(--accent-soft);
+        color: var(--text);
+        text-decoration: none;
+      }
+
+      .sidebar nav a.active {
+        color: var(--accent);
+        font-weight: 600;
+        border-left: 2px solid var(--accent);
+        background: var(--accent-soft);
+      }
+
+      .sidebar-toggle {
+        display: none;
+      }
+
+      .main {
+        margin-left: 296px;
+        padding: 3.5rem 4.5rem 6rem;
+        max-width: none;
+      }
+
+      .section,
+      .prose,
+      .hero,
+      .footer {
+        max-width: none;
+      }
+
+      @media (max-width: 960px) {
+        .sidebar {
+          transform: translateX(-100%);
+          transition: transform 0.25s ease;
+          box-shadow: 20px 0 40px rgba(0, 0, 0, 0.4);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .main {
+          margin-left: 0;
+          padding: 2rem 1.3rem 4rem;
+        }
+        .sidebar-toggle {
+          display: flex;
+          position: fixed;
+          top: 1rem;
+          left: 1rem;
+          z-index: 60;
+          align-items: center;
+          gap: 0.5rem;
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          color: var(--text);
+          padding: 0.55rem 0.9rem;
+          border-radius: 8px;
+          font-size: 0.85rem;
+          cursor: pointer;
+        }
+      }
+
+      /* ---------- Hero ---------- */
+      .hero {
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 2.6rem;
+      }
+
+      .badge-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1.4rem;
+      }
+
+      .badge {
+        display: inline-block;
+        font-size: 0.76rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        padding: 0.3rem 0.75rem;
+        border-radius: 999px;
+        background: var(--accent-2-soft);
+        color: var(--accent-2);
+        border: 1px solid rgba(240, 184, 110, 0.3);
+      }
+
+      .badge.blue {
+        background: var(--accent-soft);
+        color: var(--accent);
+        border: 1px solid rgba(124, 158, 255, 0.3);
+      }
+
+      .hero h1 {
+        font-size: 2.5rem;
+        line-height: 1.35;
+        margin: 0 0 0.9rem;
+        background: linear-gradient(90deg, #a9c0ff 0%, #7c9eff 45%, #f0b86e 100%);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        font-weight: 800;
+      }
+
+      .hero .subtitle {
+        font-size: 1.15rem;
+        color: var(--text-dim);
+        max-width: 56em;
+      }
+
+      .callout {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: 8px;
+        padding: 1.1rem 1.4rem;
+        margin: 1.6rem 0;
+        color: var(--text-dim);
+        font-size: 0.95rem;
+      }
+
+      .callout strong {
+        color: var(--text);
+      }
+
+      .callout.warn {
+        border-left-color: var(--accent-2);
+      }
+
+      /* ---------- Sections ---------- */
+      section {
+        margin-bottom: 3.6rem;
+        scroll-margin-top: 2rem;
+      }
+
+      h2 {
+        font-size: 1.6rem;
+        color: var(--text);
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 0.7rem;
+        margin: 0 0 1.3rem;
+        display: flex;
+        align-items: baseline;
+        gap: 0.6rem;
+      }
+
+      h2 .num {
+        color: var(--accent);
+        font-size: 1.05rem;
+        font-weight: 700;
+        font-family: ui-monospace, monospace;
+      }
+
+      h3 {
+        font-size: 1.15rem;
+        color: var(--accent);
+        margin: 2rem 0 0.8rem;
+      }
+
+      p {
+        color: var(--text);
+        margin: 0 0 1rem;
+      }
+      .prose p {
+        color: var(--text-dim);
+      }
+
+      ul,
+      ol {
+        color: var(--text-dim);
+        padding-left: 1.4rem;
+      }
+      li {
+        margin-bottom: 0.5rem;
+      }
+      li strong {
+        color: var(--text);
+      }
+
+      /* ---------- Tables ---------- */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 1.4rem 0 2rem;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.92rem;
+        background: var(--bg-card);
+      }
+
+      thead th {
+        background: var(--accent-soft);
+        color: var(--accent);
+        text-align: left;
+        font-weight: 700;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+
+      tbody td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-dim);
+        vertical-align: top;
+      }
+
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      /* ---------- Mermaid diagrams ---------- */
+      .diagram-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.6rem;
+        margin: 1.6rem 0 2.2rem;
+      }
+
+      .diagram-card .diagram-label {
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-faint);
+        margin-bottom: 0.8rem;
+      }
+
+      pre.mermaid {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin: 0;
+        background: transparent;
+        overflow-x: auto;
+      }
+
+      /* ---------- Checklist ---------- */
+      .checklist {
+        list-style: none;
+        padding-left: 0;
+      }
+      .checklist li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.7rem;
+        padding: 0.55rem 0;
+        border-bottom: 1px dashed var(--border);
+      }
+      .checklist li:last-child {
+        border-bottom: none;
+      }
+      .checklist input[type='checkbox'] {
+        margin-top: 0.25rem;
+        width: 16px;
+        height: 16px;
+        accent-color: var(--accent);
+        flex-shrink: 0;
+      }
+
+      /* ---------- Pull quote ---------- */
+      blockquote {
+        margin: 1.4rem 0;
+        padding: 1rem 1.4rem;
+        border-left: 3px solid var(--accent-2);
+        background: var(--accent-2-soft);
+        color: var(--text);
+        font-size: 0.98rem;
+        border-radius: 0 8px 8px 0;
+      }
+      blockquote cite {
+        display: block;
+        margin-top: 0.5rem;
+        color: var(--text-faint);
+        font-size: 0.85rem;
+        font-style: normal;
+      }
+
+      .footer {
+        border-top: 1px solid var(--border);
+        padding-top: 2rem;
+        color: var(--text-faint);
+        font-size: 0.85rem;
+      }
+
+      .step-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+        margin: 1.4rem 0 2rem;
+      }
+
+      .step-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.1rem 1.2rem;
+      }
+
+      .step-card .step-no {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-weight: 700;
+        font-size: 0.85rem;
+        margin-bottom: 0.6rem;
+      }
+
+      .step-card p {
+        color: var(--text-dim);
+        font-size: 0.9rem;
+        margin: 0;
+      }
+      .step-card h4 {
+        margin: 0 0 0.4rem;
+        font-size: 0.98rem;
+        color: var(--text);
+      }
+    </style>
+  </head>
+  <body>
+    <button class="sidebar-toggle" id="navToggle" aria-label="目次を開く">☰ 目次</button>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="brand">CLAUDE TAG GUIDE</div>
+        <div class="brand-title">中級者〜上級者向け<br />ベストプラクティス</div>
+        <nav>
+          <ol>
+            <li><a href="#overview">1. Claude Tagとは何か</a></li>
+            <li><a href="#vs-cowork-code">2. Claude Code / Cowork との違い</a></li>
+            <li><a href="#architecture">3. 全体アーキテクチャ</a></li>
+            <li><a href="#identity-access">4. Identity と Access モデル</a></li>
+            <li><a href="#memory-model">5. メモリモデル</a></li>
+            <li><a href="#admin-setup">6. 管理者向けセットアップ</a></li>
+            <li><a href="#getting-started">7. 使い始めのステップ</a></li>
+            <li><a href="#task-lifecycle">8. タスク委任の4ステップ</a></li>
+            <li><a href="#proactivity-ladder">9. 自律性を段階的に引き上げる</a></li>
+            <li><a href="#advanced-tips">10. 上級者向けTips</a></li>
+            <li><a href="#security">11. セキュリティとガバナンス</a></li>
+            <li><a href="#known-issues">12. 既知の課題・注意点</a></li>
+            <li><a href="#vs-other-products">13. 他製品との比較</a></li>
+            <li><a href="#checklist">14. 導入前チェックリスト</a></li>
+            <li><a href="#references">15. 参考文献・出典</a></li>
+          </ol>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <div class="hero">
+          <div class="badge-row">
+            <span class="badge blue">Public Beta</span>
+            <span class="badge">Claude Team / Enterprise 限定</span>
+            <span class="badge">情報基準日: 2026年7月17日</span>
+          </div>
+          <h1>Claude Tag 活用ガイド<br />中級者〜上級者向けベストプラクティス</h1>
+          <p class="subtitle">
+            Slack上でチームがClaudeをタグ付けして仕事を委任できる新機能「Claude
+            Tag」について、公式ドキュメント・公式チュートリアル、そして著名な開発者やコミュニティの発信をもとにまとめた実践ガイドです。
+          </p>
+          <div class="callout">
+            <strong>本ガイドについて</strong> ― Claude Tag
+            は現在パブリックベータであり、UIや仕様は今後変更される可能性があります。最新情報は必ず公式ドキュメント(<a
+              href="https://claude.com/docs/claude-tag/overview"
+              target="_blank"
+              rel="noopener"
+              >claude.com/docs/claude-tag</a
+            >)を確認してください。出典は各セクションおよび第15章「参考文献・出典」に記載しています。
+          </div>
+        </div>
+
+        <!-- 1 -->
+        <section id="overview">
+          <h2><span class="num">01</span> Claude Tagとは何か</h2>
+          <div class="prose">
+            <p>
+              Claude Tag
+              は、2026年6月23日にAnthropicが発表した、Slack上でClaudeをチームメンバーとして参加させる新しい機能です。管理者が特定のチャンネルにClaudeへのアクセス権を付与すると、そのチャンネルにいる誰もが
+              <code>@Claude</code> とタグ付けするだけでタスクを委任できるようになります。
+            </p>
+            <p>
+              Anthropicはこれを「Claude
+              Codeの延長線上にある進化」と位置づけており、社内では製品チームのコードの65%がClaude
+              Tagの内部版によって生成されているとされています。
+            </p>
+            <blockquote>
+              「LLMのUI/UXにおける3度目の大きな再設計」
+              <cite>― Andrej Karpathy氏(著名AI研究者、Tesla・OpenAIでの経験で知られる)</cite>
+            </blockquote>
+            <p>
+              チャットボックス型の対話から、「作業がすでに行われている場所にAIが常駐する」形への転換点として注目されています。
+            </p>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>提供状況</td>
+                  <td>パブリックベータ</td>
+                </tr>
+                <tr>
+                  <td>対応プラン</td>
+                  <td>Claude Team / Claude Enterprise のみ(Free・Pro・Maxの個人プランは対象外)</td>
+                </tr>
+                <tr>
+                  <td>稼働モデル</td>
+                  <td>Claude Opus 4.8</td>
+                </tr>
+                <tr>
+                  <td>提供チャネル</td>
+                  <td>まずSlack。今後他のワークプレイスツールへの拡張を予告</td>
+                </tr>
+                <tr>
+                  <td>旧製品との関係</td>
+                  <td>
+                    旧「Claude in
+                    Slack」アプリを置き換え。既存ユーザーは30日以内に移行選択可能で、<strong>2026年8月3日に自動移行</strong>が予定されている
+                  </td>
+                </tr>
+                <tr>
+                  <td>課金モデル</td>
+                  <td>座席課金なし。組織の「利用残高(usage balance)」からの従量課金</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 2 -->
+        <section id="vs-cowork-code">
+          <h2><span class="num">02</span> Claude Code / Cowork との違い</h2>
+          <div class="prose">
+            <p>
+              Claude Tag・Claude Cowork・Claude
+              Codeはいずれも「Claudeにタスクを委任する」という点で似ていますが、想定シーンが異なります。公式ドキュメントは「チームで共有チャンネルの仕事をするならClaude
+              Tag、個人のファイルで作業するならCoworkかClaude Code」と整理しています。
+            </p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>観点</th>
+                  <th>Claude Tag</th>
+                  <th>Claude Cowork</th>
+                  <th>Claude Code</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>主な利用場所</td>
+                  <td>Slackチャンネル・スレッド・DM</td>
+                  <td>デスクトップアプリ(個人のワークスペース)</td>
+                  <td>ターミナル・IDE・デスクトップアプリ</td>
+                </tr>
+                <tr>
+                  <td>誰と共有するか</td>
+                  <td>チャンネル参加者全員が同じClaudeとやり取り(マルチプレイヤー)</td>
+                  <td>基本的に個人利用</td>
+                  <td>基本的に個人利用</td>
+                </tr>
+                <tr>
+                  <td>コンテキストの蓄積</td>
+                  <td>チャンネル履歴・ワークスペース横断の記憶を自動蓄積</td>
+                  <td>セッション・プロジェクト単位</td>
+                  <td>リポジトリ単位(CLAUDE.md等)</td>
+                </tr>
+                <tr>
+                  <td>実行環境</td>
+                  <td>Anthropicホストの使い捨てサンドボックス</td>
+                  <td>ローカル/クラウドの作業環境</td>
+                  <td>ローカル環境、または<code>--sandbox</code>によるOSレベルの分離</td>
+                </tr>
+                <tr>
+                  <td>自発的な行動</td>
+                  <td>アンビエント(能動)モードで停滞スレッドの検知・定期実行が可能</td>
+                  <td>スケジュールタスクの委任が可能</td>
+                  <td>基本は同期的なセッション実行</td>
+                </tr>
+                <tr>
+                  <td>課金主体</td>
+                  <td>組織(チャンネル作業)/個人(DM)</td>
+                  <td>個人・組織</td>
+                  <td>個人・組織</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 3 -->
+        <section id="architecture">
+          <h2><span class="num">03</span> 全体アーキテクチャを理解する</h2>
+          <div class="prose">
+            <p>
+              <code>@Claude</code>
+              がタグ付けされてから結果がスレッドに返ってくるまでの流れは、次のようになっています。Claudeはユーザーのローカルマシンやネットワーク内では動作せず、Anthropicがホストする使い捨てサンドボックス上でセッションごとに起動します。
+            </p>
+          </div>
+
+          <div class="diagram-card">
+            <div class="diagram-label">Diagram 01 ― タスク実行の全体フロー</div>
+            <pre class="mermaid" id="dg-architecture"></pre>
+            <script type="text/plain" id="src-architecture">
+              flowchart TB
+                  A["Slackチャンネルで @Claude をタスク付きでメンション"] --> B["Claude Tag がスレッドを検知しセッション開始"]
+                  B --> C["使い捨てサンドボックスを起動<br/>Anthropicがホスト・会話が途絶えると破棄"]
+                  C --> D["Agent Proxy経由でのみ外部通信が可能"]
+                  D --> E["許可済みの接続先にアクセス<br/>GitHub / Drive / Datadog / データウェアハウス等"]
+                  E --> F["チェックリストをスレッドに逐次更新しながら作業"]
+                  F --> G["結果をスレッドに投稿<br/>返信・PR作成・チケット起票・ダッシュボード更新など"]
+                  G --> H["チャンネル参加者全員が結果を閲覧し追加指示や修正が可能"]
+            </script>
+          </div>
+
+          <div class="prose">
+            <p>ポイントは次の3つです。</p>
+            <ul>
+              <li>
+                <strong>セッションはスレッド単位</strong
+                >:新しいトップレベルメッセージは新しいタスクとして扱われるため、続きの作業をしたい場合は同じスレッド内で返信する必要があります。
+              </li>
+              <li>
+                <strong>既存メッセージの編集は無効</strong
+                >:送信済みメッセージを編集してもClaudeには反映されません。新しい返信を送る必要があります。
+              </li>
+              <li>
+                <strong>サンドボックスは使い捨て</strong
+                >:インストールした依存関係や未コミットのファイルはセッション終了時に失われるため、保持すべき変更は必ずコミット・プッシュする必要があります。
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- 4 -->
+        <section id="identity-access">
+          <h2><span class="num">04</span> Identity(身元)と Access(権限)モデル</h2>
+          <div class="prose">
+            <p>
+              Claude Tagの安全性を支えているのが「Agent
+              Identity(エージェント身元)」というモデルです。Claudeはタグ付けしたユーザー個人の権限を借りるのではなく、<strong>Claude自身の専用アカウント</strong>でSlackに投稿し、GitHub
+              App
+              としてPRを開き、データウェアハウスには管理者が発行したサービスアカウントで接続します。これにより、共有チャンネルが誰かの個人ドキュメントへの抜け道になることはありません。
+            </p>
+            <p>アクセス権は次の3階層で管理され、上位階層の設定を下位が継承します。</p>
+          </div>
+
+          <div class="diagram-card">
+            <div class="diagram-label">Diagram 02 ― Identity / Access 階層モデル</div>
+            <pre class="mermaid" id="dg-identity"></pre>
+            <script type="text/plain" id="src-identity">
+              flowchart TB
+                  subgraph ORG["組織全体レベル"]
+                      O1["組織共通の認証情報・リポジトリアクセス"]
+                  end
+                  subgraph WS["ワークスペースレベル 公開チャンネル共通"]
+                      W1["組織設定を継承"]
+                      W2["ワークスペース共有メモリを保持"]
+                  end
+                  subgraph PC["プライベートチャンネルレベル"]
+                      P1["ワークスペース設定を継承した上で追加の認証情報を付与可能"]
+                      P2["そのチャンネル専用のメモリを保持"]
+                  end
+                  ORG --> WS
+                  WS --> PC
+            </script>
+          </div>
+
+          <div class="prose">
+            <ul>
+              <li>
+                <strong>組織全体</strong
+                >:どこにインストールされていても適用される共通の認証情報・リポジトリ。
+              </li>
+              <li>
+                <strong>ワークスペース</strong
+                >:あるSlackワークスペース内のすべての公開チャンネルに適用され、組織設定を継承する。
+              </li>
+              <li>
+                <strong>プライベートチャンネル</strong
+                >:ワークスペース設定に加えて、そのチャンネルだけの追加権限(例:法務チャンネルだけにCRMアクセスを許可)を持たせられる。プライベートチャンネルごとに個別のIdentityが作成され、公開チャンネルはワークスペース単位のIdentityを共有する。
+              </li>
+            </ul>
+            <p>
+              Enterprise
+              プランでは、ロールベースアクセス制御(RBAC)により「誰がClaudeを呼び出せるか」自体も制御できます。つまり1つのチャンネルが「Claudeが何にアクセスできるか」と「誰がそれを依頼できるか」の両方を規定する単位になります。
+            </p>
+          </div>
+        </section>
+
+        <!-- 5 -->
+        <section id="memory-model">
+          <h2><span class="num">05</span> メモリモデル ― チャンネル・ワークスペース・DM</h2>
+          <div class="prose">
+            <p>
+              Claude
+              Tagは「必要な作業のためにコンテキストを構築する」ことを前提に設計されており、タスク終了ごとに記憶を破棄するのではなく、チャンネル・ワークスペース単位でメモリを保持し続けます。管理者はこの記憶を閲覧・編集・削除できます。
+            </p>
+          </div>
+
+          <div class="diagram-card">
+            <div class="diagram-label">Diagram 03 ― メモリのスコープ</div>
+            <pre class="mermaid" id="dg-memory"></pre>
+            <script type="text/plain" id="src-memory">
+              flowchart TB
+                  A["公開チャンネルでの学習内容<br/>決定事項・訂正・好み"] --> B["ワークスペース共有メモリに保存"]
+                  B --> C["同じワークスペースの別の公開チャンネルからも参照可能"]
+                  D["プライベートチャンネルでの学習内容"] --> E["そのチャンネル専用ストアにのみ保存"]
+                  E --> F["ワークスペース全体には共有されない<br/>ただし作業中はワークスペース記憶を読み取り可能"]
+                  G["DMでのやり取り"] --> H["送信者個人のClaudeアカウント上で完結"]
+                  H --> I["チームのメモリ・権限とは完全に分離"]
+            </script>
+          </div>
+
+          <div class="prose">
+            <p>重要な運用ポイント:</p>
+            <ul>
+              <li>
+                <code>#launch-week</code> のような公開チャンネルで記録された決定事項は、後から
+                <code>#gtm-west</code>
+                のような別チャンネルで尋ねたときにも参照される。Claudeがあるチャンネルの情報を引用した場合、それは「ワークスペース記憶を読んでいる」だけであり、個人についての記録ではない。
+              </li>
+              <li>
+                チャンネル内で「<code>@Claude このチャンネルについて何を覚えている?</code
+                >」と尋ねると、蓄積された記憶を確認できる。誤った記憶は誰でも訂正・削除を依頼できる。
+              </li>
+              <li>
+                Slack上でのやり取りは、通常のclaude.aiでの会話履歴とは別管理であり、互いに表示されない。
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- 6 -->
+        <section id="admin-setup">
+          <h2><span class="num">06</span> 管理者向け:セットアップ手順ステップバイステップ</h2>
+          <div class="prose">
+            <p>
+              Claude Tagのセットアップは
+              <code>claude.ai/admin-settings/claude-tag</code> から行い、組織のPrimary
+              OwnerまたはOwner権限が必要です(Admin権限では実行不可)。設定は一度行えば、対象チャンネルの全員がすぐに利用を開始できます。
+            </p>
+          </div>
+
+          <div class="diagram-card">
+            <div class="diagram-label">Diagram 04 ― 管理者向けセットアップフロー</div>
+            <pre class="mermaid" id="dg-setup"></pre>
+            <script type="text/plain" id="src-setup">
+              flowchart TB
+                  S1["Step 1: Slackワークスペースをペアリング<br/>Slackアプリをインストールし @Claude connect でペアリングコードを発行"] --> S2["Step 2: Claudeが最初にアクセスするツールを選択"]
+                  S2 --> S3["Step 3: GitHub連携<br/>Claude GitHub Appをインストール、または既存連携にリポジトリを追加"]
+                  S3 --> S4["Step 4: その他ツール用のアカウントを作成し認証情報を接続"]
+                  S4 --> S5["支出上限(組織全体・チャンネル別)を設定"]
+                  S5 --> S6["非公開チャンネルでテストし動作を確認してから展開"]
+            </script>
+          </div>
+
+          <div class="prose">
+            <p><strong>注意点:</strong></p>
+            <ul>
+              <li>
+                Slackワークスペースのペアリングコマンドは、スレッド内の返信としてではなく、新規のトップレベルメッセージとして送信する必要があります(スレッド内では通常のリクエストとして処理されてしまいます)。
+              </li>
+              <li>ペアリングコードの有効期限は15分。</li>
+              <li>
+                ペアリング自体はSlackワークスペースの管理者権限があれば誰でも実行可能ですが、それ以降のIdentity・接続先・チャンネルごとのアクセス権設定はClaude組織のOwner権限が必要です。
+              </li>
+              <li>
+                「Access
+                bundle(アクセスバンドル)」という単位で、認証情報とリポジトリのセットをまとめて管理し、それをどのワークスペース・チャンネルに適用するか指定します。
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- 7 -->
+        <section id="getting-started">
+          <h2><span class="num">07</span> エンドユーザー向け:使い始めのステップ</h2>
+          <div class="prose">
+            <p>
+              チャンネルにClaude
+              Tagが既に導入されている場合、エンドユーザー側で追加のセットアップは不要です。
+            </p>
+          </div>
+
+          <div class="step-grid">
+            <div class="step-card">
+              <div class="step-no">1</div>
+              <h4>アクセス範囲を確認する</h4>
+              <p>
+                作業を依頼する前に「<code>@Claude このチャンネルから何にアクセスできる?</code
+                >」と尋ねる、またはClaudeの返信フッターにある「Configure」をクリックして接続状況を確認する。
+              </p>
+            </div>
+            <div class="step-card">
+              <div class="step-no">2</div>
+              <h4>公開チャンネルで作業する</h4>
+              <p>
+                DMよりも公開チャンネルでの作業を優先することで、Claudeがチャンネルの履歴全体を文脈として活用でき、チームメイトも成果を再利用できる。
+              </p>
+            </div>
+            <div class="step-card">
+              <div class="step-no">3</div>
+              <h4>DMは個人の領域</h4>
+              <p>
+                DMでは自分のclaude.aiアカウントに紐づく個人の接続(カレンダー・メール等)が使え、チームの権限やメモリとは分離される。管理者はDM自体を組織全体で無効化することもできる。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 8 -->
+        <section id="task-lifecycle">
+          <h2><span class="num">08</span> ベストプラクティス:タスク委任の4ステップ</h2>
+          <div class="prose">
+            <p>
+              公式チュートリアル「Best practices for using
+              @Claude」は、良いタスクの条件を「Claudeが到達可能な入力」「明確に述べられたゴール」「誰かが検証できる結果」の3つとしています。この考え方をもとにした委任のライフサイクルが次の図です。
+            </p>
+          </div>
+
+          <div class="diagram-card">
+            <div class="diagram-label">Diagram 05 ― タスク委任のライフサイクル</div>
+            <pre class="mermaid" id="dg-lifecycle"></pre>
+            <script type="text/plain" id="src-lifecycle">
+              flowchart TB
+                  T1["Step 1: タスクを選ぶ<br/>到達可能な入力・明確なゴール・検証可能な結果があるか"] --> T2["Step 2: リクエストを書く<br/>目的・重要性・参照先を伝える"]
+                  T2 --> T3["Step 3: Claudeに作業させる<br/>チェックリストがスレッドに逐次更新される"]
+                  T3 --> T4["Step 4: 結果をレビューする<br/>影響度に応じて精査の深さを変える"]
+                  T4 -->|"修正が必要"| T5["具体的に何が違うかを伝えて再依頼"]
+                  T5 --> T3
+                  T4 -->|"問題なし"| T6["チャンネルメモリとして学習を蓄積し次回はより的確に"]
+            </script>
+          </div>
+
+          <div class="prose">
+            <p><strong>各ステップの実践ポイント:</strong></p>
+            <ul>
+              <li>
+                <strong>Step 1(タスクを選ぶ)</strong
+                >:初めての依頼には、すでにチャンネル内にある情報だけで完結するタスク(例:月曜日以降の要約、未対応スレッドの棚卸し)を選ぶと、結果をすぐ自分で検証できる。
+              </li>
+              <li>
+                <strong>Step 2(リクエストを書く)</strong
+                >:優秀な新人に説明するように、ゴール・背景・参照先を伝える。手順そのものはClaudeに任せてよい。出典を明示するよう依頼すると検証しやすくなる。
+              </li>
+              <li>
+                <strong>Step 3(作業させる)</strong
+                >:Claudeは着手した旨を短く報告し、チェックリストを更新し続ける。チャンネル内の誰でも途中で文脈を追加したり方向修正したりできる。
+              </li>
+              <li>
+                <strong>Step 4(レビューする)</strong
+                >:リスクに比例した精査を行う。顧客向けやシステム変更を伴う成果物は入念に確認し、分析系のタスクには「自分の一次回答の誤りを探すセカンドパスをして」と依頼するのも有効。同じ間違いが繰り返される場合は、セッションの実行内容を開いて確認し、訂正内容を伝える。訂正はチャンネルの記憶として蓄積される。
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- 9 -->
+        <section id="proactivity-ladder">
+          <h2><span class="num">09</span> プロアクティブ性と自律性を段階的に引き上げる</h2>
+          <div class="prose">
+            <p>
+              Claude
+              Tagは既定では「タグ付けされた時だけ応答する」設定になっています。信頼できると分かった範囲から、段階的に自律性を引き上げていくのが推奨される進め方です。
+            </p>
+          </div>
+
+          <div class="diagram-card">
+            <div class="diagram-label">Diagram 06 ― 自律性のエスカレーションラダー</div>
+            <pre class="mermaid" id="dg-ladder"></pre>
+            <script type="text/plain" id="src-ladder">
+              flowchart TB
+                  L1["レベル1: メンション時のみ応答<br/>まずはここから始める"] --> L2["レベル2: プロアクティブ応答を許可<br/>忙しいフィードバックチャンネルでは全質問に自動回答"]
+                  L2 --> L3["レベル3: 定期タスクをスケジュール化<br/>毎週月曜9時にダイジェスト投稿 など"]
+                  L3 --> L4["レベル4: 自発的フォローアップ<br/>停滞スレッドの検知・完了時の自動報告"]
+                  L4 --> L5["レベル5: 責務そのものを委譲<br/>領域のオーナーとして日々の判断を任せる"]
+            </script>
+          </div>
+
+          <div class="prose">
+            <ul>
+              <li>
+                <strong>レベル2の切り替え方</strong
+                >:「このチャンネルではタグ付けされた時だけ返信して」「ここでは答えられる質問には全部答えて」など、平易な言葉で指示するだけで挙動が変わる。誤答よりも無回答の方が困る忙しいチャンネルではプロアクティブ設定が有効。プロアクティブ応答自体を有効化できるかは管理者側の設定に依存する。
+              </li>
+              <li>
+                <strong>レベル3のスケジューリング</strong
+                >:毎週同じ内容を依頼していることに気づいたら、「これを定期実行にして」と伝えるだけでスケジュールタスク化できる。
+              </li>
+              <li>
+                <strong>レベル4の自発的フォロー</strong
+                >:「3日後に修正が定着しているか確認して」「このスレッドが停滞したら教えて」といった依頼も可能。
+              </li>
+              <li>
+                <strong>レベル5の権限委譲</strong
+                >:「月曜にダイジェストを投稿して」ではなく「このチャンネルの未解決の質問に責任を持って。毎日確認し、答えられるものは答え、適切な人にタグ付けして」という形で、判断そのものを委ねる。加えて、1日の終わりにチャンネルの振り返りをさせて改善点を書き出させる、複数チャンネルを横断して「繰り返し提起されているのに誰も答えていない話題」を洗い出させる、といった使い方も紹介されています。
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- 10 -->
+        <section id="advanced-tips">
+          <h2><span class="num">10</span> 上級者向けTips ― コミュニティ発の運用ノウハウ</h2>
+          <div class="prose">
+            <p>
+              ここからは公式ドキュメントに加えて、Anthropic社員や著名な開発者がSNS上で共有した運用ノウハウをまとめます(出典は各項目末尾および第15章を参照)。
+            </p>
+          </div>
+
+          <h3>10.1 Thariq Shihipar氏(Anthropic Claude Codeチーム)による実践Tips</h3>
+          <div class="prose">
+            <p>
+              AnthropicのClaude Codeチームに所属するThariq Shihipar氏(X:
+              <code>@trq212</code
+              >)が公開直後に投稿したベストプラクティス・スレッドは、Slackの公式アカウントから「ステートフルなエージェントワークフローの構築法についての実例」と評されました。要点は次の通りです。
+            </p>
+            <ul>
+              <li>
+                <strong>チャンネルごとにClaudeの個性が異なる前提で「自己紹介」する</strong
+                >:新しいチャンネルに導入したら、ピン留めメッセージでペルソナ・応答方針・記憶してほしい前提を伝える。これはリポジトリの
+                <code>CLAUDE.md</code> に相当する役割を果たす。
+              </li>
+              <li>
+                <strong>個人用チャンネルを作る</strong>:<code>#自分の名前-claude</code>
+                のような専用チャンネルを作り、自分向けのタスクや好みの指示をそこに集約する。バグ報告などを転送しておけば、自分の好みに沿った形で処理させられる。
+              </li>
+              <li>
+                <strong>ピン留めのステータスメッセージを維持させる</strong
+                >:「常に最新化されたステータスをピン留めメッセージに反映して」と指示しておくと、スレッドの海に埋もれずに全体像を把握できる。
+              </li>
+              <li>
+                <strong>絵文字リアクションで状態を可視化する</strong>:トップレベルのスレッドに
+                ⏳(進行中)✅(完了)❓(要確認)🛑(停止)のような絵文字でリアクションさせることで、一目で状態が分かるようにする。
+              </li>
+              <li>
+                <strong>用途特化チャンネルで独創的に使う</strong
+                >:例えば「予定調整」専用チャンネルを作り、参加者がClaudeにタグ付けするだけでカレンダーの空き時間を探させる、といった使い方も紹介されている。
+              </li>
+            </ul>
+          </div>
+
+          <h3>10.2 Cat Wu氏(Anthropic プロダクトマネージャー)によるIdentity/権限の解説</h3>
+          <div class="prose">
+            <p>
+              Anthropicのプロダクトマネージャーであるcatwu氏(X: <code>@_catwu</code>)は、Agent
+              Identityと権限設定の考え方について解説するスレッドを公開しています。要旨は本ガイド第4章の内容と一致しており、「アクセス権は多めに与えてから組織のポリシーに応じて絞り込む方が、実運用では機能しやすい」という知見が共有されています。
+            </p>
+          </div>
+
+          <h3>10.3 Jason Zhou氏・Matt Pocock氏による「ループエンジニアリング」の視点</h3>
+          <div class="prose">
+            <p>
+              AI活用のコンテンツで知られるJason Zhou氏(<code>@jasonzhou1993</code>)は、Claude
+              Tagの登場を「委任すべき定型業務をエージェントの常設ループに任せ、共有ナレッジ層・ログ・検証を組み合わせる」という、いわゆる<strong
+                >ループエンジニアリング(loop engineering)</strong
+              >の潮流の一部として位置づけたテンプレートを公開しました。TypeScript教育者として著名なMatt
+              Pocock氏(<code>@mattpocockuk</code>)も同時期に、「委任できそうな業務を見つけ出す」ための
+              <code>/loop-me</code> スキルを公開しており、Claude
+              Tagのような常設エージェントをどう業務に組み込むかという設計思想の広がりを示しています。
+            </p>
+          </div>
+
+          <h3>10.4 社内活用パターン(Anthropic自身の事例)</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ユースケース</th>
+                  <th>動き方</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>インシデント対応</td>
+                  <td>
+                    インシデントスレッドでタグ付けすると、グラフ取得・デプロイ差分の確認まで行い、原因と担当者候補を提示。承認後は修正の実装・反映・メトリクス回復の確認・クローズまで一気通貫で対応
+                  </td>
+                </tr>
+                <tr>
+                  <td>バグトリアージ</td>
+                  <td>
+                    フィードバックチャンネルに常駐し、報告を自動的に拾って該当コードを特定・再現・<code
+                      >git blame</code
+                    >・修正実装・担当者へのタグ付けまで実施。残る作業はコードレビューのみ
+                  </td>
+                </tr>
+                <tr>
+                  <td>依存タスクの待機</td>
+                  <td>
+                    「バックエンドが完成したらフロントエンドを配線して」のように、前提条件待ちのタスクを渡しておくと、完了を検知してから数日後にPRを提示
+                  </td>
+                </tr>
+                <tr>
+                  <td>バックグラウンド監視</td>
+                  <td>
+                    ダッシュボードの代わりに閾値を渡す(例:「CIが赤のまま長く続いたら教えて」)。閾値を超えたときだけ、原因コミットとともに報告
+                  </td>
+                </tr>
+                <tr>
+                  <td>リリース・指標監視</td>
+                  <td>
+                    A/Bテストの指標とガードレールを渡しておくと、ガードレール逸脱時に警告、有意差が出たタイミングでロールアウト用PRとともに報告
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 11 -->
+        <section id="security">
+          <h2><span class="num">11</span> セキュリティとガバナンス</h2>
+          <div class="prose">
+            <p>
+              Claude Tagにチームの実務を任せられる根拠となっているのが、以下のセキュリティ設計です。
+            </p>
+            <ul>
+              <li>
+                <strong>サンドボックス分離</strong
+                >:すべてのリクエスト(人が入力したものもスケジュール起動のものも)は、Anthropicがホストする隔離済みサンドボックスの中で実行される。既定では外向き通信がすべてブロックされている。
+              </li>
+              <li>
+                <strong>Agent Proxy経由の通信のみ許可</strong>:サンドボックスは「Agent
+                Proxy」を経由してのみ外部と通信でき、許可リストにないホストへのデータ送出はブロックされる。どのホストを許可するかは接続ごと・アクセスバンドルごとに管理者が設定する。
+              </li>
+              <li>
+                <strong>サービスアカウントによる分離</strong
+                >:チャンネル内でのClaudeの行動は、タグ付けした個人のアカウントではなく、管理者が発行した専用のサービスアカウント(Slackアプリ・GitHub
+                App・各種サービスアカウント)で行われる。これにより、個人の認証情報が意図せずチャンネルに流出することを防いでいる。
+              </li>
+              <li>
+                <strong>監査ログ</strong>:管理画面の「Organization settings &gt; Claude Tag &gt;
+                Audit」から、スケジュール・単発タスクを問わずすべてのタスクと、Agent
+                Identityによるすべてのネットワーク呼び出しを確認できる。GitHubのコミット・PRにはClaude
+                GitHub Appが作者として記録され、起点となったSlackスレッドへのリンクも付与される。
+              </li>
+              <li>
+                <strong>支出上限</strong
+                >:組織全体の上限とチャンネル単位の上限の両方を設定でき、利用状況は管理画面の使用量ページでチャンネル別に確認できる。DMでの利用は組織の上限を消費せず、依頼した本人のアカウントの利用枠が使われる。
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- 12 -->
+        <section id="known-issues">
+          <h2><span class="num">12</span> 既知の課題・注意点</h2>
+          <div class="prose">
+            <p>
+              コミュニティやHacker
+              Newsでの議論、第三者メディアの分析からは、導入前に把握しておくべき論点がいくつか指摘されています。
+            </p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>論点</th>
+                  <th>内容</th>
+                  <th>想定される対処</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>セッションの競合</td>
+                  <td>
+                    同じチャンネルの複数人が同時に別方向の指示を出すと、進行中のタスクが混乱する可能性がある
+                  </td>
+                  <td>用途別にチャンネルを分ける、専用のスレッドで作業を継続する</td>
+                </tr>
+                <tr>
+                  <td>共有コンテキストのプライバシー</td>
+                  <td>チャンネル共有のエージェントに情報を渡すことへの懸念</td>
+                  <td>
+                    チャンネルごとのアクセス権設定・プライベートチャンネル単位のメモリ分離を活用する
+                  </td>
+                </tr>
+                <tr>
+                  <td>機械アイデンティティの帰属</td>
+                  <td>
+                    GitHub連携などが単一のアプリIdentityで動くため、監査ログ上でどのチャンネルのClaudeが操作したかの区別が難しい場合がある
+                  </td>
+                  <td>監査ログとSlackスレッドへのリンクを併用して追跡する</td>
+                </tr>
+                <tr>
+                  <td>「ただのSlack Bot」という懐疑論</td>
+                  <td>
+                    Anthropicの矢継ぎ早な製品発表を踏まえ、「タグ付けにブランド名を付けただけ」という懐疑的な見方も存在する
+                  </td>
+                  <td>
+                    実際のマルチプレイヤー性・記憶の持続性・自律実行を試した上で評価するのが妥当
+                  </td>
+                </tr>
+                <tr>
+                  <td>規制業界でのデータ取り扱い</td>
+                  <td>
+                    医療・金融・法務など機微データを扱う業界では、データ処理契約の確認や、機微チャンネルを対象外にする判断が必要
+                  </td>
+                  <td>
+                    低感度なチャンネル(社内広報・マーケティング等)から段階的に展開し、評価してから拡大する
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout warn">
+            なお、旧「Claude in Slack」アプリは<strong>2026年8月3日</strong>に自動的にClaude
+            Tagへ移行される予定であるため、既存導入企業はそれまでに設定内容(権限・チャンネル・利用ポリシー)を確認しておくことが推奨されます。
+          </div>
+        </section>
+
+        <!-- 13 -->
+        <section id="vs-other-products">
+          <h2><span class="num">13</span> 他製品との比較</h2>
+          <div class="prose">
+            <p>
+              Claude
+              Tagは「Slackネイティブのチーム協働エージェント」という立ち位置で語られることが多く、Microsoft
+              365 Copilot(強みは配布力・Identity・コンプライアンスの統合)やChatGPT Workspace
+              Agents(OpenAIのクラウド上で動くチーム中心の自動化)との比較がしばしば話題になります。
+            </p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>観点</th>
+                  <th>Claude Tag</th>
+                  <th>ChatGPT Workspace Agents</th>
+                  <th>Microsoft 365 Copilot</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>主戦場</td>
+                  <td>Slack</td>
+                  <td>主にOpenAIのクラウド上のワークスペース</td>
+                  <td>Microsoft 365全体(Teams・Office・SharePoint等)</td>
+                </tr>
+                <tr>
+                  <td>権限設定の粒度</td>
+                  <td>チャンネル単位でIdentity・接続先を細かく設定</td>
+                  <td>ワークスペース中心の設定</td>
+                  <td>Microsoft 365のID基盤・コンプライアンス機能と統合</td>
+                </tr>
+                <tr>
+                  <td>強み</td>
+                  <td>共有チャンネルでのマルチプレイヤー協働、コード関連タスクとの親和性</td>
+                  <td>チーム中心の自動化ワークフロー</td>
+                  <td>配布力・Microsoftエコシステムとの深い統合</td>
+                </tr>
+                <tr>
+                  <td>監査・ガバナンス</td>
+                  <td>Slack内監査ログ+接続先ごとの許可リスト</td>
+                  <td>Compliance APIによるワークスペース単位の監査</td>
+                  <td>Microsoft 365のコンプライアンス基盤</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="prose">
+            <p>
+              複数のAIエージェント基盤を横断して統一的なガバナンス(ロールベースアクセス制御・ポリシー適用・監査ログの一元化)が必要になる場合は、MCP対応の第三者ガバナンスレイヤーを組み合わせて運用するアプローチも紹介されています。
+            </p>
+          </div>
+        </section>
+
+        <!-- 14 -->
+        <section id="checklist">
+          <h2><span class="num">14</span> 導入前チェックリスト</h2>
+          <ul class="checklist">
+            <li>
+              <input type="checkbox" disabled /> 対象プランがClaude
+              TeamまたはEnterpriseであることを確認した
+            </li>
+            <li>
+              <input type="checkbox" disabled /> Primary
+              OwnerまたはOwner権限を持つ担当者がセットアップを行う体制になっている
+            </li>
+            <li>
+              <input type="checkbox" disabled />
+              最初に接続するチャンネルとツールの範囲を「低感度な範囲」から決めた
+            </li>
+            <li>
+              <input type="checkbox" disabled /> 組織全体および主要チャンネルの支出上限を設定した
+            </li>
+            <li><input type="checkbox" disabled /> 監査ログの確認担当者・確認頻度を決めた</li>
+            <li>
+              <input type="checkbox" disabled />
+              各チャンネルの応答ポリシー(メンション時のみ/プロアクティブ)を用途に応じて設定した
+            </li>
+            <li>
+              <input type="checkbox" disabled />
+              重要なチャンネルには「自己紹介」ピン留めメッセージでペルソナ・応答方針を伝えた
+            </li>
+            <li>
+              <input type="checkbox" disabled />
+              レビュー体制(誰が・どの重要度の成果物を・どこまで精査するか)を決めた
+            </li>
+            <li>
+              <input type="checkbox" disabled /> 旧「Claude in
+              Slack」利用企業は、2026年8月3日の自動移行前に設定を棚卸しした
+            </li>
+            <li>
+              <input type="checkbox" disabled />
+              機微データを扱うチャンネルについて、データ処理契約・保持設定を確認した
+            </li>
+          </ul>
+        </section>
+
+        <!-- 15 -->
+        <section id="references">
+          <h2><span class="num">15</span> 参考文献・出典</h2>
+
+          <h3>公式ドキュメント・公式発信(Anthropic / Claude)</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ソース</th>
+                  <th>URL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>公式アナウンス「Introducing Claude Tag」</td>
+                  <td>
+                    <a
+                      href="https://www.anthropic.com/news/introducing-claude-tag"
+                      target="_blank"
+                      rel="noopener"
+                      >anthropic.com/news/introducing-claude-tag</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>公式ドキュメント トップ</td>
+                  <td>
+                    <a
+                      href="https://claude.com/docs/claude-tag/overview"
+                      target="_blank"
+                      rel="noopener"
+                      >claude.com/docs/claude-tag/overview</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>How Claude Tag works(アーキテクチャ・メモリ・Identity解説)</td>
+                  <td>
+                    <a
+                      href="https://claude.com/docs/claude-tag/concepts/how-it-works"
+                      target="_blank"
+                      rel="noopener"
+                      >claude.com/docs/claude-tag/concepts/how-it-works</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Security and data handling(セキュリティ・サンドボックス解説)</td>
+                  <td>
+                    <a
+                      href="https://claude.com/docs/claude-tag/concepts/security-and-data"
+                      target="_blank"
+                      rel="noopener"
+                      >claude.com/docs/claude-tag/concepts/security-and-data</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Set up Claude Tag(管理者向けセットアップ手順)</td>
+                  <td>
+                    <a
+                      href="https://claude.com/docs/claude-tag/admins/setup-overview"
+                      target="_blank"
+                      rel="noopener"
+                      >claude.com/docs/claude-tag/admins/setup-overview</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Agent identity: a new access model(Identity/権限モデル解説ブログ)</td>
+                  <td>
+                    <a
+                      href="https://claude.com/blog/agent-identity-access-model"
+                      target="_blank"
+                      rel="noopener"
+                      >claude.com/blog/agent-identity-access-model</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Best practices for using @Claude(公式チュートリアル)</td>
+                  <td>
+                    <a
+                      href="https://claude.com/resources/tutorials/best-practices-using-claude-tag"
+                      target="_blank"
+                      rel="noopener"
+                      >claude.com/resources/tutorials/best-practices-using-claude-tag</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Tasks to try with @Claude(ユースケース集)</td>
+                  <td>
+                    <a
+                      href="https://claude.com/resources/tutorials/tasks-to-try-with-claude-tag-in-your-workspace"
+                      target="_blank"
+                      rel="noopener"
+                      >claude.com/resources/tutorials/tasks-to-try...</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>What is Claude Tag?(ヘルプセンター、プラン・課金・移行日程)</td>
+                  <td>
+                    <a
+                      href="https://support.claude.com/en/articles/15594475-what-is-claude-tag"
+                      target="_blank"
+                      rel="noopener"
+                      >support.claude.com/.../what-is-claude-tag</a
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>著名な開発者・Anthropic社員によるコミュニティ発信</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>発信者</th>
+                  <th>内容</th>
+                  <th>ソース</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Andrej Karpathy氏(著名AI研究者、Tesla・OpenAI在籍歴)</td>
+                  <td>Claude Tagを「LLMのUI/UXにおける3度目の大きな再設計」と評価</td>
+                  <td>
+                    <a
+                      href="https://www.therundown.ai/p/meet-your-new-slack-coworker-claude"
+                      target="_blank"
+                      rel="noopener"
+                      >therundown.ai記事</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Thariq Shihipar氏(Anthropic Claude Codeチーム)</td>
+                  <td>チャンネル導入・個人チャンネル・ピン留めステータス等の実践Tips</td>
+                  <td>
+                    <a
+                      href="https://x.com/trq212/status/2069474335656694003"
+                      target="_blank"
+                      rel="noopener"
+                      >x.com/trq212</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Cat Wu氏(Anthropic プロダクトマネージャー)</td>
+                  <td>Agent Identity・権限設計の考え方</td>
+                  <td>
+                    <a
+                      href="https://x.com/_catwu/status/2069484330938998993"
+                      target="_blank"
+                      rel="noopener"
+                      >x.com/_catwu</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>ClaudeDevs(Anthropic公式開発者アカウント)</td>
+                  <td>社内利用事例スレッド</td>
+                  <td>
+                    <a
+                      href="https://x.com/ClaudeDevs/status/2069468900216234010"
+                      target="_blank"
+                      rel="noopener"
+                      >x.com/ClaudeDevs</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Jason Zhou氏</td>
+                  <td>「ループエンジニアリング」テンプレート</td>
+                  <td>
+                    <a
+                      href="https://x.com/jasonzhou1993/status/2069002271216787464"
+                      target="_blank"
+                      rel="noopener"
+                      >x.com/jasonzhou1993</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Matt Pocock氏(著名TypeScript/AI教育者)</td>
+                  <td>委任機会発見用の <code>/loop-me</code> スキル</td>
+                  <td>
+                    <a
+                      href="https://x.com/mattpocockuk/status/2069729160600203595"
+                      target="_blank"
+                      rel="noopener"
+                      >x.com/mattpocockuk</a
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>議論・分析(コミュニティ・第三者メディア)</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ソース</th>
+                  <th>URL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Hacker News上の議論(マルチプレイヤー性への評価・懸念点)</td>
+                  <td>
+                    <a
+                      href="https://news.ycombinator.com/item?id=48648039"
+                      target="_blank"
+                      rel="noopener"
+                      >news.ycombinator.com/item?id=48648039</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Sébastien Dubois氏によるまとめノート(コミュニティ発信・懸念点の整理)</td>
+                  <td>
+                    <a href="https://www.dsebastien.net/claude-tag/" target="_blank" rel="noopener"
+                      >dsebastien.net/claude-tag</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>TechCrunch記事</td>
+                  <td>
+                    <a
+                      href="https://techcrunch.com/2026/06/23/anthropics-claude-tag-is-learning-your-company-one-slack-message-at-a-time/"
+                      target="_blank"
+                      rel="noopener"
+                      >techcrunch.com記事</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>DataCamp分析記事(移行スケジュール・監査ログ詳細)</td>
+                  <td>
+                    <a
+                      href="https://www.datacamp.com/blog/claude-tag"
+                      target="_blank"
+                      rel="noopener"
+                      >datacamp.com/blog/claude-tag</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>TechTimesディープダイブ記事(プロアクティブ性・非同期実行の分析)</td>
+                  <td>
+                    <a
+                      href="https://www.techtimes.com/articles/319668/20260703/claude-tag-deep-dive-proactive-triggers-async-execution-are-what-make-it-agent-not-chatbot.htm"
+                      target="_blank"
+                      rel="noopener"
+                      >techtimes.com記事</a
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <div class="footer">
+          本ガイドはパブリックベータ時点の情報に基づいています。仕様は今後変更される可能性があるため、実装前には必ず公式ドキュメントの最新版をご確認ください。
+        </div>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11.12.0/dist/mermaid.min.js"></script>
+    <script>
+      function dedent(str) {
+        const lines = str.replace(/^\n/, '').replace(/\s+$/, '').split('\n');
+        const nonEmpty = lines.filter((l) => l.trim().length > 0);
+        const indents = nonEmpty.map((l) => (l.match(/^\s*/) || [''])[0].length);
+        const min = indents.length ? Math.min(...indents) : 0;
+        return lines.map((l) => l.slice(min)).join('\n');
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        // Inject dedented Mermaid source into each pre.mermaid target
+        document.querySelectorAll('script[id^="src-"]').forEach(function (src) {
+          const targetId = 'dg-' + src.id.replace('src-', '');
+          const target = document.getElementById(targetId);
+          if (target) {
+            target.textContent = dedent(src.textContent);
+          }
+        });
+
+        if (window.mermaid) {
+          mermaid.initialize({
+            startOnLoad: false,
+            theme: 'base',
+            themeVariables: {
+              background: '#07111e',
+              primaryColor: '#12233c',
+              primaryTextColor: '#e6ecf5',
+              primaryBorderColor: '#7c9eff',
+              lineColor: '#7c9eff',
+              secondaryColor: '#0d1b2e',
+              tertiaryColor: '#0d1b2e',
+              fontFamily: 'inherit',
+              fontSize: '15px',
+            },
+            flowchart: {
+              useMaxWidth: false,
+              htmlLabels: true,
+              curve: 'basis',
+            },
+          });
+          mermaid.run({ querySelector: '.mermaid' });
+        }
+
+        // Sidebar active-link tracking
+        const sections = document.querySelectorAll('main section[id]');
+        const navLinks = document.querySelectorAll('.sidebar nav a');
+        const observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                navLinks.forEach(function (l) {
+                  l.classList.remove('active');
+                });
+                const link = document.querySelector(
+                  '.sidebar nav a[href="#' + entry.target.id + '"]',
+                );
+                if (link) link.classList.add('active');
+              }
+            });
+          },
+          { rootMargin: '-20% 0px -70% 0px' },
+        );
+        sections.forEach(function (s) {
+          observer.observe(s);
+        });
+
+        // Mobile sidebar toggle
+        const toggle = document.getElementById('navToggle');
+        const sidebar = document.getElementById('sidebar');
+        if (toggle && sidebar) {
+          toggle.addEventListener('click', function () {
+            sidebar.classList.toggle('open');
+          });
+          navLinks.forEach(function (l) {
+            l.addEventListener('click', function () {
+              sidebar.classList.remove('open');
+            });
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

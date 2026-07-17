@@ -40,15 +40,19 @@
         --border-radius-xl: 16px;
 
         --c-purple-800: #4c1d95;
+        --c-purple-400: #8b5cf6;
         --c-purple-200: #ddd6fe;
         --c-purple-100: #ede9fe;
         --c-teal-800: #115e59;
+        --c-teal-400: #2dd4bf;
         --c-teal-200: #99f6e4;
         --c-teal-100: #ccfbf1;
         --c-coral-800: #9a3412;
+        --c-coral-400: #fb7185;
         --c-coral-200: #fecaca;
         --c-coral-100: #ffe4de;
         --c-pink-800: #9d174d;
+        --c-pink-400: #f472b6;
         --c-pink-200: #fbcfe8;
         --c-pink-100: #fce7f3;
         --c-blue-800: #1e3a8a;
@@ -160,8 +164,9 @@
       }
 
       .main {
-        padding: 56px 72px 120px;
+        padding: 56px 64px 120px;
         min-width: 0;
+        width: 100%;
       }
 
       .page-header {
@@ -208,11 +213,11 @@
       }
       h2 .step-no {
         font-size: 12px;
-        color: var(--color-text-tertiary);
+        color: var(--color-text-info);
         font-weight: 500;
-        border: 1px solid var(--color-border-secondary);
+        background: color-mix(in srgb, var(--color-text-info) 14%, transparent);
         border-radius: var(--border-radius-md);
-        padding: 2px 8px;
+        padding: 3px 9px;
         margin-right: 2px;
       }
 
@@ -226,7 +231,6 @@
       p {
         margin: 0 0 16px;
         color: var(--color-text-secondary);
-        max-width: 860px;
       }
       p strong,
       li strong,
@@ -240,7 +244,6 @@
         margin: 0 0 16px;
         padding-left: 22px;
         color: var(--color-text-secondary);
-        max-width: 820px;
       }
       li {
         margin-bottom: 8px;
@@ -252,15 +255,17 @@
 
       table {
         width: 100%;
-        max-width: 980px;
         border-collapse: collapse;
         margin: 8px 0 28px;
         font-size: 13.5px;
+        border: 1px solid var(--color-border-secondary);
+        border-radius: var(--border-radius-lg);
+        overflow: hidden;
       }
       th,
       td {
         text-align: left;
-        padding: 11px 14px;
+        padding: 12px 16px;
         border-bottom: 1px solid var(--color-border-secondary);
         vertical-align: top;
       }
@@ -268,15 +273,17 @@
         color: var(--color-text-primary);
         font-weight: 500;
         background: var(--color-background-tertiary);
-      }
-      th:first-child {
-        border-top-left-radius: var(--border-radius-md);
-      }
-      th:last-child {
-        border-top-right-radius: var(--border-radius-md);
+        font-size: 12.5px;
+        letter-spacing: 0.02em;
       }
       td {
         color: var(--color-text-secondary);
+      }
+      tbody tr:nth-child(even) td {
+        background: color-mix(in srgb, var(--color-background-secondary) 55%, transparent);
+      }
+      tbody tr:hover td {
+        background: var(--color-background-tertiary);
       }
       tr:last-child td {
         border-bottom: none;
@@ -298,7 +305,6 @@
         padding: 18px 22px;
         overflow-x: auto;
         margin: 8px 0 24px;
-        max-width: 980px;
       }
       pre code {
         background: none;
@@ -306,6 +312,66 @@
         color: var(--color-text-primary);
         font-size: 13px;
         line-height: 1.65;
+        white-space: pre;
+      }
+
+      .hljs {
+        background: none;
+        color: var(--color-text-primary);
+      }
+      .hljs-comment,
+      .hljs-quote {
+        color: var(--color-text-tertiary);
+        font-style: normal;
+      }
+      .hljs-keyword,
+      .hljs-selector-tag,
+      .hljs-literal,
+      .hljs-subst,
+      .hljs-type {
+        color: var(--color-text-info);
+      }
+      .hljs-string,
+      .hljs-doctag,
+      .hljs-regexp {
+        color: var(--color-text-success);
+      }
+      .hljs-number,
+      .hljs-meta,
+      .hljs-builtin-name,
+      .hljs-selector-class {
+        color: var(--color-text-warning);
+      }
+      .hljs-title,
+      .hljs-section,
+      .hljs-selector-id,
+      .hljs-title.function_,
+      .hljs-title.class_ {
+        color: var(--c-purple-400);
+      }
+      .hljs-attr,
+      .hljs-variable,
+      .hljs-template-variable,
+      .hljs-attribute,
+      .hljs-params {
+        color: var(--c-teal-400);
+      }
+      .hljs-symbol,
+      .hljs-bullet,
+      .hljs-link,
+      .hljs-deletion {
+        color: var(--color-text-danger);
+      }
+      .hljs-name,
+      .hljs-tag,
+      .hljs-built_in {
+        color: var(--color-text-info);
+      }
+      .hljs-emphasis {
+        font-style: italic;
+      }
+      .hljs-strong {
+        font-weight: 500;
       }
 
       .code-label {
@@ -325,7 +391,6 @@
         margin: 8px 0 26px;
         font-size: 14px;
         color: var(--color-text-secondary);
-        max-width: 860px;
         display: flex;
         gap: 12px;
       }
@@ -361,14 +426,14 @@
         background: var(--color-background-tertiary);
         border: 1px solid var(--color-border-secondary);
         border-radius: var(--border-radius-lg);
-        padding: 28px 20px;
-        max-width: 980px;
+        padding: 32px 28px;
       }
       .diagram .mermaid {
-        display: inline-block;
+        display: block;
+        width: 100%;
       }
       .diagram svg {
-        max-width: 100%;
+        width: 100%;
         height: auto;
         display: block;
         margin: 0 auto;
@@ -377,28 +442,30 @@
       .diagram-caption {
         font-size: 12px;
         color: var(--color-text-tertiary);
-        margin-top: 12px;
+        margin-top: 14px;
+        text-align: center;
       }
 
       .chip-row {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
-        margin: 0 0 24px;
+        margin: 0 0 32px;
       }
       .chip {
         display: inline-flex;
         align-items: center;
         gap: 6px;
         font-size: 12.5px;
-        padding: 6px 12px;
+        padding: 7px 14px;
         border-radius: var(--border-radius-xl);
-        border: 1px solid var(--color-border-primary);
+        border: 1px solid color-mix(in srgb, var(--c-purple-400) 35%, var(--color-border-primary));
+        background: color-mix(in srgb, var(--c-purple-400) 10%, transparent);
         color: var(--color-text-secondary);
       }
       .chip i {
         font-size: 13px;
-        color: var(--color-text-tertiary);
+        color: var(--c-purple-400);
       }
 
       .model-grid {
@@ -406,13 +473,22 @@
         grid-template-columns: repeat(3, 1fr);
         gap: 16px;
         margin: 8px 0 28px;
-        max-width: 980px;
       }
       .model-card {
         border: 1px solid var(--color-border-primary);
+        border-top: 3px solid var(--color-border-primary);
         border-radius: var(--border-radius-lg);
-        padding: 18px 20px;
+        padding: 20px 22px;
         background: var(--color-background-secondary);
+      }
+      .model-card.accent-purple {
+        border-top-color: var(--c-purple-400);
+      }
+      .model-card.accent-teal {
+        border-top-color: var(--c-teal-400);
+      }
+      .model-card.accent-coral {
+        border-top-color: var(--c-coral-400);
       }
       .model-card .model-name {
         font-size: 15px;
@@ -425,7 +501,15 @@
       }
       .model-card .model-name i {
         font-size: 15px;
-        color: var(--color-text-info);
+      }
+      .model-card.accent-purple .model-name i {
+        color: var(--c-purple-400);
+      }
+      .model-card.accent-teal .model-name i {
+        color: var(--c-teal-400);
+      }
+      .model-card.accent-coral .model-name i {
+        color: var(--c-coral-400);
       }
       .model-card .model-id {
         font-family: var(--font-mono);
@@ -446,7 +530,6 @@
         border-bottom: 1px solid var(--color-border-tertiary);
         font-size: 14px;
         color: var(--color-text-secondary);
-        max-width: 860px;
       }
       .checklist-item:last-child {
         border-bottom: none;
@@ -460,10 +543,6 @@
       .checklist-item strong {
         color: var(--color-text-primary);
         font-weight: 500;
-      }
-
-      .source-list {
-        max-width: 980px;
       }
 
       footer {
@@ -594,21 +673,21 @@
           </p>
 
           <div class="model-grid">
-            <div class="model-card">
+            <div class="model-card accent-purple">
               <div class="model-name"><i class="ti ti-sparkles"></i>Sol</div>
               <div class="model-id">gpt-5.6-sol（alias: gpt-5.6）</div>
               <div class="model-desc">
                 フラッグシップモデル。最高難度の推論・コーディング・サイバーセキュリティ・科学タスク向け。
               </div>
             </div>
-            <div class="model-card">
+            <div class="model-card accent-teal">
               <div class="model-name"><i class="ti ti-scale"></i>Terra</div>
               <div class="model-id">gpt-5.6-terra</div>
               <div class="model-desc">
                 日常業務向けのバランス型モデル。GPT-5.5相当の品質を約半額で提供。
               </div>
             </div>
-            <div class="model-card">
+            <div class="model-card accent-coral">
               <div class="model-name"><i class="ti ti-bolt"></i>Luna</div>
               <div class="model-id">gpt-5.6-luna</div>
               <div class="model-desc">
@@ -698,8 +777,15 @@ flowchart TD
     E --> G
     F --> G
     G --> H["代表的なタスクで品質とコストを検証"]
+
+    class B,D decision
+    class C,E,F outcome
+    classDef default fill:#2a1b47,stroke:#8b5cf6,color:#ede9fe
+    classDef decision fill:#0f3d38,stroke:#2dd4bf,color:#ccfbf1
+    classDef outcome fill:#3a2062,stroke:#a78bfa,color:#ede9fe
       </pre
             >
+            <div class="diagram-caption">図1 — タスク特性に応じたモデル選定の判断フロー</div>
           </div>
 
           <div class="callout warning">
@@ -734,8 +820,21 @@ flowchart LR
     end
     M -.組み合わせ自在.-> Dial2
     M -.組み合わせ自在.-> Dial3
+
+    style Dial1 fill:#1c1c22,stroke:#3a3a42,color:#f2f2f4
+    style Dial2 fill:#1c1c22,stroke:#3a3a42,color:#f2f2f4
+    style Dial3 fill:#1c1c22,stroke:#3a3a42,color:#f2f2f4
+    class M default
+    class E1,E2,E3,E4,E5,E6 effort
+    class R1,R2 mode
+    classDef default fill:#2a1b47,stroke:#8b5cf6,color:#ede9fe
+    classDef effort fill:#0f3d38,stroke:#2dd4bf,color:#ccfbf1
+    classDef mode fill:#4a2415,stroke:#fb7185,color:#ffe4de
       </pre
             >
+            <div class="diagram-caption">
+              図2 — モデル選択・reasoning.effort・reasoning.modeは互いに独立したダイヤル
+            </div>
           </div>
 
           <h3>4.1 reasoning.effortの選定基準</h3>
@@ -801,7 +900,7 @@ flowchart LR
           </p>
 
           <span class="code-label">python — reasoning.mode: pro の指定例</span>
-          <pre><code>from openai import OpenAI
+          <pre><code class="language-python">from openai import OpenAI
 
 client = OpenAI()
 
@@ -885,8 +984,15 @@ flowchart TD
     C -->|"current_turn"| E["reasoning itemsを破棄"]
     D --> F["Turn 2: previous_response_id で継続"]
     E --> G["Turn 2: ゼロから推論"]
+
+    class C decision
+    classDef default fill:#2a1b47,stroke:#8b5cf6,color:#ede9fe
+    classDef decision fill:#0f3d38,stroke:#2dd4bf,color:#ccfbf1
       </pre
             >
+            <div class="diagram-caption">
+              図3 — reasoning.contextによるターン間の推論再利用の分岐
+            </div>
           </div>
         </section>
 
@@ -917,6 +1023,9 @@ sequenceDiagram
     Model-->>App: "最終回答メッセージ"
       </pre
             >
+            <div class="diagram-caption">
+              図4 — Programmatic Tool Callingにおけるホスト型ランタイムの処理シーケンス
+            </div>
           </div>
 
           <h3>6.1 PTCが適するタスク形状</h3>
@@ -984,8 +1093,17 @@ flowchart TD
     C2 --> D
     C3 --> D
     D --> E["単一の最終回答"]
+
+    class C1,C2,C3 worker
+    class D outcome
+    classDef default fill:#2a1b47,stroke:#8b5cf6,color:#ede9fe
+    classDef worker fill:#0f3d38,stroke:#2dd4bf,color:#ccfbf1
+    classDef outcome fill:#4a2415,stroke:#fb7185,color:#ffe4de
       </pre
             >
+            <div class="diagram-caption">
+              図5 — 独立したワークストリームを並列処理し結果を統合するMulti-agent構成
+            </div>
           </div>
 
           <div class="callout">
@@ -1068,8 +1186,17 @@ flowchart TD
     D -->|"No"| F["その指示は製品要件を反映しているため復元"]
     E --> B
     F --> G["最小構成のプロンプトが完成"]
+
+    class D decision
+    class G outcome
+    classDef default fill:#2a1b47,stroke:#8b5cf6,color:#ede9fe
+    classDef decision fill:#0f3d38,stroke:#2dd4bf,color:#ccfbf1
+    classDef outcome fill:#3a2062,stroke:#a78bfa,color:#ede9fe
       </pre
             >
+            <div class="diagram-caption">
+              図6 — evalで検証しながらプロンプトを最小構成に近づける反復手順
+            </div>
           </div>
 
           <p>具体的な指針：</p>
@@ -1117,7 +1244,7 @@ flowchart TD
             単に「短くして」と指示するのではなく、保持すべき情報と省略してよい情報を明示します。
           </p>
           <span class="code-label">プロンプト例</span>
-          <pre><code>結論を先に述べる。それを裏付ける根拠、重要な留意点、次のアクションを含める。
+          <pre><code class="nohighlight">結論を先に述べる。それを裏付ける根拠、重要な留意点、次のアクションを含める。
 副次的な詳細や重複は省略する。
 
 必ず残す：事実、判断、留意点、次のアクション。
@@ -1138,7 +1265,7 @@ flowchart TD
           </p>
 
           <span class="code-label">承認境界ポリシーの例</span>
-          <pre><code>【回答・説明・レビュー・診断・計画のリクエストの場合】
+          <pre><code class="nohighlight">【回答・説明・レビュー・診断・計画のリクエストの場合】
 関連資料を調査し、結果を報告する。変更の実施も求められていない限り、
 実際の変更は行わない。
 
@@ -1175,8 +1302,19 @@ flowchart LR
     C -->|"要レビュー"| E["生成を数秒一時停止しレビュー"]
     E --> D
     E -->|"ポリシー違反"| F["ブロック・拒否"]
+
+    class D safe
+    class E review
+    class F danger
+    classDef default fill:#2a1b47,stroke:#8b5cf6,color:#ede9fe
+    classDef safe fill:#0b3a26,stroke:#34d399,color:#a7f3d0
+    classDef review fill:#4a3510,stroke:#fbbf24,color:#fde68a
+    classDef danger fill:#4a1414,stroke:#f87171,color:#fecaca
       </pre
             >
+            <div class="diagram-caption">
+              図7 — リアルタイム分類器による生成継続・一時停止・ブロックの判断
+            </div>
           </div>
 
           <ul>
@@ -1209,15 +1347,22 @@ flowchart TD
     H --> I
     I --> J["PTC/Multi-agentの適用可否をタスク形状で判断"]
     J --> K["本番投入・継続的なeval監視"]
+
+    class F decision
+    class G outcome
+    classDef default fill:#2a1b47,stroke:#8b5cf6,color:#ede9fe
+    classDef decision fill:#0f3d38,stroke:#2dd4bf,color:#ccfbf1
+    classDef outcome fill:#0b3a26,stroke:#34d399,color:#a7f3d0
       </pre
             >
+            <div class="diagram-caption">図8 — GPT-5.5/5.4からGPT-5.6への段階的な移行フロー</div>
           </div>
 
           <h3>13.1 コーディングエージェントでの自動移行</h3>
           <p>
             Codexを利用している場合、公式の<code>openai-docs</code>スキルを用いて自動的に本ガイドの推奨変更を適用できます。
           </p>
-          <pre><code>openai-docs migrate this project to the GPT-5.6 model family</code></pre>
+          <pre><code class="language-bash">openai-docs migrate this project to the GPT-5.6 model family</code></pre>
           <p>
             このスキルは<code>openai/skills</code>リポジトリの<code>.curated/openai-docs</code>から他のコーディングエージェントにも導入可能です。
           </p>
@@ -1228,7 +1373,7 @@ flowchart TD
 
           <h3>14.1 基本的なResponses API呼び出し</h3>
           <span class="code-label">python</span>
-          <pre><code>from openai import OpenAI
+          <pre><code class="language-python">from openai import OpenAI
 
 client = OpenAI()
 
@@ -1249,7 +1394,7 @@ print(response.output_text)</code></pre>
 
           <h3>14.2 curlでのリクエスト例（max reasoning effort）</h3>
           <span class="code-label">bash</span>
-          <pre><code>curl https://api.openai.com/v1/responses \
+          <pre><code class="language-bash">curl https://api.openai.com/v1/responses \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $OPENAI_API_KEY" \
   -d '{
@@ -1263,7 +1408,7 @@ print(response.output_text)</code></pre>
 
           <h3>14.3 Persisted Reasoningを使ったマルチターン継続</h3>
           <span class="code-label">python</span>
-          <pre><code>first = client.responses.create(
+          <pre><code class="language-python">first = client.responses.create(
     model="gpt-5.6-sol",
     reasoning={"effort": "high", "context": "all_turns"},
     input=[{"role": "user", "content": "このリファクタリング計画をレビューして"}],
@@ -1569,10 +1714,17 @@ second = client.responses.create(
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
     <script>
       (async function () {
         if (document.fonts && document.fonts.ready) {
           await document.fonts.ready;
+        }
+
+        if (window.hljs) {
+          hljs.highlightAll();
         }
 
         mermaid.initialize({
@@ -1582,46 +1734,40 @@ second = client.responses.create(
           fontFamily:
             '-apple-system, BlinkMacSystemFont, Segoe UI, Hiragino Kaku Gothic ProN, Noto Sans JP, sans-serif',
           themeVariables: {
-            background: 'transparent',
-            fontSize: '15px',
-            primaryColor: '#4c1d95',
+            primaryColor: '#2a1b47',
             primaryTextColor: '#ede9fe',
-            primaryBorderColor: '#ddd6fe',
-            secondaryColor: '#115e59',
-            secondaryTextColor: '#ccfbf1',
-            secondaryBorderColor: '#99f6e4',
-            tertiaryColor: '#9a3412',
-            tertiaryTextColor: '#ffe4de',
-            tertiaryBorderColor: '#fecaca',
-            lineColor: '#7a7a84',
+            primaryBorderColor: '#8b5cf6',
+            lineColor: '#8a8a94',
             textColor: '#f2f2f4',
-            mainBkg: '#4c1d95',
-            nodeTextColor: '#ede9fe',
-            clusterBkg: '#1b1b1f',
-            clusterBorder: '#2c2c32',
-            titleColor: '#f2f2f4',
-            edgeLabelBackground: '#1b1b1f',
-            actorBkg: '#4c1d95',
-            actorBorder: '#ddd6fe',
+            clusterBkg: '#1c1c22',
+            clusterBorder: '#3a3a42',
+            edgeLabelBackground: '#1c1c22',
+            actorBkg: '#2a1b47',
+            actorBorder: '#8b5cf6',
             actorTextColor: '#ede9fe',
-            signalColor: '#b0b0b8',
+            actorLineColor: '#6b6b76',
+            signalColor: '#e4e4e8',
             signalTextColor: '#f2f2f4',
-            labelBoxBkgColor: '#115e59',
-            labelBoxBorderColor: '#99f6e4',
+            labelBoxBkgColor: '#0f3d38',
+            labelBoxBorderColor: '#2dd4bf',
             labelTextColor: '#ccfbf1',
-            noteBkgColor: '#1b1b1f',
-            noteBorderColor: '#2c2c32',
-            noteTextColor: '#b0b0b8',
+            loopTextColor: '#c8c8d0',
+            noteBkgColor: '#1c1c22',
+            noteBorderColor: '#3a3a42',
+            noteTextColor: '#c8c8d0',
+            activationBkgColor: '#2a1b47',
+            activationBorderColor: '#8b5cf6',
+            sequenceNumberColor: '#0a0a0c',
           },
           flowchart: {
-            useMaxWidth: false,
+            useMaxWidth: true,
             htmlLabels: true,
             nodeSpacing: 45,
             rankSpacing: 50,
             curve: 'basis',
           },
           sequence: {
-            useMaxWidth: false,
+            useMaxWidth: true,
             diagramMarginX: 20,
             diagramMarginY: 10,
           },
