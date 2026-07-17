@@ -4,6 +4,7 @@ import type { ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { navLinks } from "@/components/site/nav-links";
 import { findNavLeaf } from "@/tests/helpers/nav";
+import { pageRegistry } from "@/lib/page-registry";
 import PageComponent, { metadata as rawMetadata } from "@/app/model-data/gpt-5-6-best-practices/page";
 
 vi.mock("@/components/docs/MermaidDiagram", () => ({
@@ -93,5 +94,21 @@ describe("/model-data/gpt-5-6-best-practices - contract", () => {
     const link = findNavLeaf(navLinks, "/model-data/gpt-5-6-best-practices");
     expect(link).toBeDefined();
     expect(link?.name).toBe("GPT-5.6 Best Practices");
+  });
+
+  it("is registered below the Codex provider navigation", () => {
+    const entry = pageRegistry.find((item) => item.slug === "/model-data/gpt-5-6-best-practices");
+    expect(entry).toMatchObject({ group: "Providers", category: "Codex", provider: "codex" });
+  });
+
+  it("renders syntax-token spans in fenced code blocks", () => {
+    const { container } = render(<Page />);
+    expect(container.querySelectorAll("pre code span").length).toBeGreaterThan(0);
+  });
+
+  it("uses full-width content and centers Mermaid output", () => {
+    const css = readFileSync(`${__dirname}/page.module.css`, "utf8");
+    expect(css).not.toContain("max-width:1200px");
+    expect(css).toMatch(/\.mermaidWrap :global\(\.mermaid\) \{ display:flex; justify-content:center;/);
   });
 });
