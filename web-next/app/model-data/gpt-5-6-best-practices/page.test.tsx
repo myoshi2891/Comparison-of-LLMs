@@ -2,10 +2,12 @@ import { readFileSync } from "node:fs";
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
+import PageComponent, {
+  metadata as rawMetadata,
+} from "@/app/model-data/gpt-5-6-best-practices/page";
 import { navLinks } from "@/components/site/nav-links";
-import { findNavLeaf } from "@/tests/helpers/nav";
 import { pageRegistry } from "@/lib/page-registry";
-import PageComponent, { metadata as rawMetadata } from "@/app/model-data/gpt-5-6-best-practices/page";
+import { findNavLeaf } from "@/tests/helpers/nav";
 
 vi.mock("@/components/docs/MermaidDiagram", () => ({
   default: function DummyMermaidDiagram({ chart }: { chart: string }) {
@@ -109,11 +111,13 @@ describe("/model-data/gpt-5-6-best-practices - contract", () => {
   it("uses full-width content and centers Mermaid output", () => {
     const css = readFileSync(`${__dirname}/page.module.css`, "utf8");
     expect(css).not.toContain("max-width:1200px");
-    expect(css).toMatch(/\.mermaidWrap :global\(\.mermaid\) \{ display:flex; justify-content:center;/);
+    expect(css).toMatch(
+      /\.mermaidWrap :global\(\.mermaid\)\s*\{\s*display: flex;\s*justify-content: center;/
+    );
   });
 
   it("left-aligns every Markdown table header", () => {
     const css = readFileSync(`${__dirname}/page.module.css`, "utf8");
-    expect(css).toContain(".tableWrap th { text-align:left !important;");
+    expect(css).toMatch(/\.tableWrap th\s*\{\s*text-align: left !important;/);
   });
 });
