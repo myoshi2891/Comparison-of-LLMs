@@ -111,4 +111,9 @@ describe("/model-data/gpt-5-6-best-practices - contract", () => {
     expect(css).not.toContain("max-width:1200px");
     expect(css).toMatch(/\.mermaidWrap :global\(\.mermaid\) \{ display:flex; justify-content:center;/);
   });
+
+  it("left-aligns every Markdown table header", () => {
+    const css = readFileSync(`${__dirname}/page.module.css`, "utf8");
+    expect(css).toContain(".tableWrap th { text-align:left !important;");
+  });
 });
