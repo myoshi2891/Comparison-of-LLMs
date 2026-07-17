@@ -12,6 +12,10 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
   },
 }));
 
+vi.mock("@/app/model-data/gpt-5-6-best-practices/TocObserver", () => ({
+  default: () => null,
+}));
+
 const Page = PageComponent as unknown as () => ReactElement;
 type MetadataLike = { title?: unknown; description?: unknown };
 const metadata = rawMetadata as unknown as MetadataLike;
@@ -63,10 +67,10 @@ describe("/model-data/gpt-5-6-best-practices - contract", () => {
     }
   });
 
-  it("faithfully renders the six source tables and nine Mermaid diagrams", () => {
+  it("faithfully renders the seven source tables and eight Mermaid diagrams", () => {
     const { container } = render(<Page />);
-    expect(container.querySelectorAll("table")).toHaveLength(6);
-    expect(container.querySelectorAll("[data-testid='mermaid']")).toHaveLength(9);
+    expect(container.querySelectorAll("table")).toHaveLength(7);
+    expect(container.querySelectorAll("[data-testid='mermaid']")).toHaveLength(8);
   });
 
   it("marks every external link as a safe new-tab link", () => {

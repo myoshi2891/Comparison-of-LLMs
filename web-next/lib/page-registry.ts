@@ -638,6 +638,16 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-13",
   },
   {
+    slug: "/model-data/gpt-5-6-best-practices",
+    title: "GPT-5.6 Best Practices",
+    group: "モデル・データ",
+    topics: ["openai", "gpt-5-6", "best-practices"],
+    summary:
+      "OpenAI GPT-5.6 Sol / Terra / Luna のモデル選定、Reasoning、Programmatic Tool Calling、移行、コスト最適化を体系的に解説する実践ガイド。",
+    addedAt: "2026-07-16",
+    lastReviewed: "2026-07-16",
+  },
+  {
     slug: "/multimodal/generation-best-practices",
     title: "Generation Best Practices",
     group: "モデル・データ",
