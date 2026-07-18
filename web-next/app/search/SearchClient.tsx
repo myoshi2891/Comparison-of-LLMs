@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { allTopics, searchEntries } from "@/lib/search";
 import styles from "./page.module.css";
 
@@ -22,6 +22,10 @@ export function SearchClient() {
 
   const [query, setQuery] = useState(params.get("q") ?? "");
   const tag = params.get("tag");
+
+  useEffect(() => {
+    setQuery(params.get("q") ?? "");
+  }, [params]);
 
   const topics = useMemo(() => allTopics(), []);
   const results = useMemo(() => searchEntries(query, tag), [query, tag]);
