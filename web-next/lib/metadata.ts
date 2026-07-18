@@ -64,6 +64,10 @@ export const metadata: Metadata = {
       "ja-JP": "/",
       "en-US": "/",
     },
+    // F-3'（plans/009）: フィードリーダーの自動発見用 <link rel="alternate">。
+    types: {
+      "application/rss+xml": "/rss.xml",
+    },
   },
   openGraph: {
     type: "website",

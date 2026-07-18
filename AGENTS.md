@@ -1,15 +1,20 @@
 # AGENTS.md
 
-Updated 2026-07-12
+Updated 2026-07-16
 
 AGENTS.md は Codex / Cursor / Cline など AGENTS.md 規約を読む AI ツール向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、AGENTS.md はその委譲 pointer として機能する。
 
-## 必読（順序固定、作業開始前に 3 点すべて読むこと）
+**Codex を含むすべてのエージェントは、このファイルを読んだ直後に
+[`CODEX.md`](CODEX.md) を、次に [`CLAUDE.md`](CLAUDE.md) を必ず読むこと。** `CODEX.md` は `.claude/skills/` と
+`.claude/rules/` を作業種別ごとに選択・適用するためのルーティング規約である。
 
-1. [`CLAUDE.md`](CLAUDE.md) — リポジトリ全体の AI 編集ルール・アーキテクチャ・禁止事項
-2. [`docs/PROGRESS.md`](docs/PROGRESS.md) — 現在地・テスト実行・ネクストアクションと再開プロンプト（移行時の詳細は [`docs/archive/MIGRATION_PROGRESS.md`](docs/archive/MIGRATION_PROGRESS.md)）
-3. [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md) — Phase A–F の全体計画。Phase C 以降は [`docs/archive/NEXTJS_PHASE_C_DETAILED_DESIGN.md`](docs/archive/NEXTJS_PHASE_C_DETAILED_DESIGN.md) も併読
+## 必読（順序固定、作業開始前に 4 点すべてを読むこと）
+
+1. [`CODEX.md`](CODEX.md) — 作業種別に対応する `.claude` スキル・ルールの必読表
+2. [`CLAUDE.md`](CLAUDE.md) — リポジトリ全体の AI 編集ルール・アーキテクチャ・禁止事項
+3. [`docs/PROGRESS.md`](docs/PROGRESS.md) — 現在地・テスト実行・ネクストアクションと再開プロンプト（移行時の詳細は [`docs/archive/MIGRATION_PROGRESS.md`](docs/archive/MIGRATION_PROGRESS.md)）
+4. [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md) — Phase A–F の全体計画。Phase C 以降は [`docs/archive/NEXTJS_PHASE_C_DETAILED_DESIGN.md`](docs/archive/NEXTJS_PHASE_C_DETAILED_DESIGN.md) も併読
 
 ## 絶対に守るべきルール（CLAUDE.md と docs/PROGRESS.md のサマリ）
 

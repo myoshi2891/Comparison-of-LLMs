@@ -1,0 +1,77 @@
+/**
+ * F-3' RSS フィード（plans/009）— page-registry から導出する更新購読用フィード。
+ *
+ * 設計判断:
+ * - Route Handler + `dynamic = "force-static"` により `output: 'export'` でもビルド時に
+ *   1 回だけ評価され、`out/rss.xml` として静的配信される（sitemap.ts と同じ静的化戦略）。
+ * - registry が SSoT。新規ページを registry に登録すれば自動でフィードに載る（追加作業なし）。
+ * - XML エスケープは自前の純粋関数。summary に `&` 等が入るとフィードが壊れるため必須。
+ */
+
+import { byAddedAtDesc } from "@/lib/page-registry";
+import { escapeXml, MAX_ITEMS } from "@/lib/rss-utils";
+import { resolveSiteUrl } from "@/lib/site-url";
+
+export const dynamic = "force-static";
+
+const SITE_URL = resolveSiteUrl("rss.xml/route.ts");
+
+/**
+ * Converts a `YYYY-MM-DD` date to the RFC 822 form required by RSS 2.0.
+ *
+ * @param isoDate - Date in `YYYY-MM-DD` form (registry guarantees this shape)
+ * @returns e.g. `Sat, 11 Jul 2026 00:00:00 GMT`
+ */
+function toRfc822(isoDate: string): string {
+  return new Date(`${isoDate}T00:00:00Z`).toUTCString();
+}
+
+/**
+ * Builds an absolute site URL for a registry slug.
+ *
+ * @param slug - The registry path to append to the site URL
+ * @returns The absolute URL for the slug
+ */
+function absoluteUrl(slug: string): string {
+  return slug === "/" ? `${SITE_URL}/` : `${SITE_URL}${slug}`;
+}
+
+/**
+ * Generates the site’s RSS 2.0 feed from the newest registry pages.
+ *
+ * @returns A response containing the RSS XML document.
+ */
+export function GET(): Response {
+  const items = byAddedAtDesc(MAX_ITEMS)
+    .map((entry) => {
+      const url = absoluteUrl(entry.slug);
+      return [
+        "    <item>",
+        `      <title>${escapeXml(entry.title)}</title>`,
+        `      <link>${escapeXml(url)}</link>`,
+        `      <description>${escapeXml(entry.summary)}</description>`,
+        `      <pubDate>${toRfc822(entry.addedAt)}</pubDate>`,
+        `      <guid isPermaLink="true">${escapeXml(url)}</guid>`,
+        "    </item>",
+      ].join("\n");
+    })
+    .join("\n");
+
+  const xml = [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<rss version="2.0">',
+    "  <channel>",
+    `    <title>${escapeXml("AI Cost Simulator — 更新情報")}</title>`,
+    `    <link>${escapeXml(`${SITE_URL}/`)}</link>`,
+    `    <description>${escapeXml("AI ツール導入ガイドとコスト計算機の新着・更新フィード。")}</description>`,
+    "    <language>ja</language>",
+    items,
+    "  </channel>",
+    "</rss>",
+    "",
+  ].join("\n");
+
+  return new Response(xml, {
+    headers: { "Content-Type": "application/rss+xml; charset=utf-8" },
+  });
+}

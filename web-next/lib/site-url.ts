@@ -1,17 +1,15 @@
 export const DEFAULT_SITE_URL = "https://comparison-of-llms.netlify.app";
 
 /**
- * Resolve the site URL from environment variables or use a default fallback.
+ * Resolves the site origin from the configured environment variable or a default fallback.
  *
- * Prefers `NEXT_PUBLIC_SITE_URL` and validates it using the URL constructor.
- * If parsing fails or the variable is unset, falls back to `DEFAULT_SITE_URL`.
- * Invalid `NEXT_PUBLIC_SITE_URL` values will be ignored (no exception thrown).
- * Emits a warning for non-`NETLIFY` deployments when the environment variable is missing.
+ * Invalid or missing `NEXT_PUBLIC_SITE_URL` values are ignored. On non-Netlify deployments,
+ * a warning is emitted when the variable is unavailable or invalid.
  *
- * @param caller - The name of the calling module (allowed values: "robots.ts" | "sitemap.ts"). Used only for contextual warning messages.
- * @returns The resolved site origin string (scheme + host + port).
+ * @param caller - The calling module name used in the warning message.
+ * @returns The resolved site origin, including its scheme, host, and optional port.
  */
-export function resolveSiteUrl(caller: "robots.ts" | "sitemap.ts"): string {
+export function resolveSiteUrl(caller: "robots.ts" | "sitemap.ts" | "rss.xml/route.ts"): string {
   const envVal = process.env.NEXT_PUBLIC_SITE_URL;
   if (envVal) {
     try {

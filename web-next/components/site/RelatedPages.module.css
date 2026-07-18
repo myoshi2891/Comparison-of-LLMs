@@ -1,0 +1,82 @@
+/**
+ * 関連ページカード（F-7）。layout.tsx で {children} の直後に置かれるため、
+ * 各ページのフッター相当の位置に通常フローで積まれる。
+ */
+.wrap {
+  max-width: 1200px;
+  margin: 3rem auto 0;
+  padding: 2rem 1.25rem 3rem;
+  border-top: 1px solid var(--line, #1c2b45);
+}
+
+.heading {
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted, #89abde);
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid var(--line, #1c2b45);
+  border-radius: 10px;
+  background: var(--card, #0b1220);
+  text-decoration: none;
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.card:hover,
+.card:focus-visible {
+  border-color: var(--accent, #4c9aff);
+  transform: translateY(-2px);
+}
+
+.group {
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: var(--accent, #4c9aff);
+}
+
+.title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--fg, #e8f0ff);
+}
+
+.summary {
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: var(--muted, #89abde);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (max-width: 480px) {
+  .wrap {
+    padding: 1.5rem 1rem 2rem;
+  }
+}

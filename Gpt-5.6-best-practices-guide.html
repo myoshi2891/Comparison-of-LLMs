@@ -1,0 +1,1807 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OpenAI GPT-5.6 完全ガイド — Sol / Terra / Luna 実践ベストプラクティス</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css"
+    />
+    <style>
+      :root {
+        --color-background-primary: #0a0a0c;
+        --color-background-secondary: #131316;
+        --color-background-tertiary: #1b1b1f;
+        --color-background-info: #12203a;
+        --color-background-danger: #3a1414;
+        --color-background-success: #12301f;
+        --color-background-warning: #3a2c10;
+
+        --color-text-primary: #f2f2f4;
+        --color-text-secondary: #b0b0b8;
+        --color-text-tertiary: #7a7a84;
+        --color-text-info: #7fb3f5;
+        --color-text-danger: #f18c8c;
+        --color-text-success: #7fd9a8;
+        --color-text-warning: #f0c674;
+
+        --color-border-primary: #2c2c32;
+        --color-border-secondary: #232328;
+        --color-border-tertiary: #1c1c20;
+
+        --font-sans:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Kaku Gothic ProN',
+          'Noto Sans JP', sans-serif;
+        --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+
+        --border-radius-md: 8px;
+        --border-radius-lg: 12px;
+        --border-radius-xl: 16px;
+
+        --c-purple-800: #4c1d95;
+        --c-purple-400: #8b5cf6;
+        --c-purple-200: #ddd6fe;
+        --c-purple-100: #ede9fe;
+        --c-teal-800: #115e59;
+        --c-teal-400: #2dd4bf;
+        --c-teal-200: #99f6e4;
+        --c-teal-100: #ccfbf1;
+        --c-coral-800: #9a3412;
+        --c-coral-400: #fb7185;
+        --c-coral-200: #fecaca;
+        --c-coral-100: #ffe4de;
+        --c-pink-800: #9d174d;
+        --c-pink-400: #f472b6;
+        --c-pink-200: #fbcfe8;
+        --c-pink-100: #fce7f3;
+        --c-blue-800: #1e3a8a;
+        --c-blue-200: #bfdbfe;
+        --c-green-800: #065f46;
+        --c-green-200: #a7f3d0;
+        --c-amber-800: #92400e;
+        --c-amber-200: #fde68a;
+        --c-red-800: #7f1d1d;
+        --c-red-200: #fecaca;
+        --c-gray-800: #27272a;
+        --c-gray-200: #d4d4d8;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--color-background-primary);
+        color: var(--color-text-primary);
+        font-family: var(--font-sans);
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 1.7;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 288px 1fr;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 0;
+        align-self: start;
+        height: 100vh;
+        overflow-y: auto;
+        background: var(--color-background-secondary);
+        border-right: 1px solid var(--color-border-primary);
+        padding: 28px 16px 40px;
+      }
+
+      .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 4px 12px 20px;
+        border-bottom: 1px solid var(--color-border-primary);
+        margin-bottom: 16px;
+      }
+
+      .sidebar-brand i {
+        font-size: 20px;
+        color: var(--color-text-info);
+      }
+      .sidebar-brand-text {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--color-text-primary);
+      }
+      .sidebar-brand-sub {
+        font-size: 11px;
+        color: var(--color-text-tertiary);
+      }
+
+      .nav-group {
+        margin-bottom: 22px;
+      }
+      .nav-group-label {
+        font-size: 11px;
+        color: var(--color-text-tertiary);
+        padding: 0 12px 8px;
+        letter-spacing: 0.03em;
+      }
+
+      .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        border-radius: var(--border-radius-md);
+        color: var(--color-text-secondary);
+        text-decoration: none;
+        font-size: 14px;
+        margin-bottom: 2px;
+      }
+      .nav-link i {
+        font-size: 16px;
+        width: 16px;
+        text-align: center;
+        color: var(--color-text-tertiary);
+      }
+      .nav-link:hover {
+        background: var(--color-background-tertiary);
+        color: var(--color-text-primary);
+      }
+      .nav-link.active {
+        background: var(--color-background-tertiary);
+        color: var(--color-text-primary);
+      }
+      .nav-link.active i {
+        color: var(--color-text-info);
+      }
+
+      .main {
+        padding: 56px 64px 120px;
+        min-width: 0;
+        width: 100%;
+      }
+
+      .page-header {
+        margin-bottom: 12px;
+      }
+      .page-header .eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--color-text-info);
+        margin-bottom: 12px;
+      }
+      h1 {
+        font-size: 22px;
+        font-weight: 500;
+        margin: 0 0 10px;
+      }
+      .subtitle {
+        font-size: 14px;
+        color: var(--color-text-secondary);
+        margin: 0 0 40px;
+        max-width: 760px;
+      }
+
+      section {
+        margin-bottom: 60px;
+        scroll-margin-top: 24px;
+      }
+
+      h2 {
+        font-size: 18px;
+        font-weight: 500;
+        margin: 0 0 18px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--color-border-primary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      h2 i {
+        font-size: 17px;
+        color: var(--color-text-info);
+      }
+      h2 .step-no {
+        font-size: 12px;
+        color: var(--color-text-info);
+        font-weight: 500;
+        background: color-mix(in srgb, var(--color-text-info) 14%, transparent);
+        border-radius: var(--border-radius-md);
+        padding: 3px 9px;
+        margin-right: 2px;
+      }
+
+      h3 {
+        font-size: 16px;
+        font-weight: 500;
+        margin: 28px 0 12px;
+        color: var(--color-text-primary);
+      }
+
+      p {
+        margin: 0 0 16px;
+        color: var(--color-text-secondary);
+      }
+      p strong,
+      li strong,
+      td strong {
+        color: var(--color-text-primary);
+        font-weight: 500;
+      }
+
+      ul,
+      ol {
+        margin: 0 0 16px;
+        padding-left: 22px;
+        color: var(--color-text-secondary);
+      }
+      li {
+        margin-bottom: 8px;
+      }
+
+      a {
+        color: var(--color-text-info);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 8px 0 28px;
+        font-size: 13.5px;
+        border: 1px solid var(--color-border-secondary);
+        border-radius: var(--border-radius-lg);
+        overflow: hidden;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--color-border-secondary);
+        vertical-align: top;
+      }
+      th {
+        color: var(--color-text-primary);
+        font-weight: 500;
+        background: var(--color-background-tertiary);
+        font-size: 12.5px;
+        letter-spacing: 0.02em;
+      }
+      td {
+        color: var(--color-text-secondary);
+      }
+      tbody tr:nth-child(even) td {
+        background: color-mix(in srgb, var(--color-background-secondary) 55%, transparent);
+      }
+      tbody tr:hover td {
+        background: var(--color-background-tertiary);
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+
+      code {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        background: var(--color-background-tertiary);
+        padding: 2px 6px;
+        border-radius: var(--border-radius-md);
+        color: var(--color-text-info);
+      }
+
+      pre {
+        background: var(--color-background-tertiary);
+        border: 1px solid var(--color-border-secondary);
+        border-radius: var(--border-radius-lg);
+        padding: 18px 22px;
+        overflow-x: auto;
+        margin: 8px 0 24px;
+      }
+      pre code {
+        background: none;
+        padding: 0;
+        color: var(--color-text-primary);
+        font-size: 13px;
+        line-height: 1.65;
+        white-space: pre;
+      }
+
+      .hljs {
+        background: none;
+        color: var(--color-text-primary);
+      }
+      .hljs-comment,
+      .hljs-quote {
+        color: var(--color-text-tertiary);
+        font-style: normal;
+      }
+      .hljs-keyword,
+      .hljs-selector-tag,
+      .hljs-literal,
+      .hljs-subst,
+      .hljs-type {
+        color: var(--color-text-info);
+      }
+      .hljs-string,
+      .hljs-doctag,
+      .hljs-regexp {
+        color: var(--color-text-success);
+      }
+      .hljs-number,
+      .hljs-meta,
+      .hljs-builtin-name,
+      .hljs-selector-class {
+        color: var(--color-text-warning);
+      }
+      .hljs-title,
+      .hljs-section,
+      .hljs-selector-id,
+      .hljs-title.function_,
+      .hljs-title.class_ {
+        color: var(--c-purple-400);
+      }
+      .hljs-attr,
+      .hljs-variable,
+      .hljs-template-variable,
+      .hljs-attribute,
+      .hljs-params {
+        color: var(--c-teal-400);
+      }
+      .hljs-symbol,
+      .hljs-bullet,
+      .hljs-link,
+      .hljs-deletion {
+        color: var(--color-text-danger);
+      }
+      .hljs-name,
+      .hljs-tag,
+      .hljs-built_in {
+        color: var(--color-text-info);
+      }
+      .hljs-emphasis {
+        font-style: italic;
+      }
+      .hljs-strong {
+        font-weight: 500;
+      }
+
+      .code-label {
+        display: inline-block;
+        font-size: 11px;
+        color: var(--color-text-tertiary);
+        margin-bottom: 6px;
+        font-family: var(--font-mono);
+      }
+
+      .callout {
+        border: 1px solid var(--color-border-primary);
+        border-left: 3px solid var(--color-text-info);
+        background: var(--color-background-tertiary);
+        border-radius: var(--border-radius-md);
+        padding: 16px 20px;
+        margin: 8px 0 26px;
+        font-size: 14px;
+        color: var(--color-text-secondary);
+        display: flex;
+        gap: 12px;
+      }
+      .callout i {
+        color: var(--color-text-info);
+        font-size: 16px;
+        margin-top: 2px;
+        flex-shrink: 0;
+      }
+      .callout.warning {
+        border-left-color: var(--color-text-warning);
+      }
+      .callout.warning i {
+        color: var(--color-text-warning);
+      }
+      .callout.success {
+        border-left-color: var(--color-text-success);
+      }
+      .callout.success i {
+        color: var(--color-text-success);
+      }
+      .callout p {
+        margin: 0;
+        color: var(--color-text-secondary);
+      }
+      .callout p:not(:last-child) {
+        margin-bottom: 8px;
+      }
+
+      .diagram {
+        margin: 20px 0 30px;
+        text-align: center;
+        background: var(--color-background-tertiary);
+        border: 1px solid var(--color-border-secondary);
+        border-radius: var(--border-radius-lg);
+        padding: 32px 28px;
+      }
+      .diagram .mermaid {
+        display: block;
+        width: 100%;
+      }
+      .diagram svg {
+        width: 100%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+        overflow: visible;
+      }
+      .diagram-caption {
+        font-size: 12px;
+        color: var(--color-text-tertiary);
+        margin-top: 14px;
+        text-align: center;
+      }
+
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 0 0 32px;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12.5px;
+        padding: 7px 14px;
+        border-radius: var(--border-radius-xl);
+        border: 1px solid color-mix(in srgb, var(--c-purple-400) 35%, var(--color-border-primary));
+        background: color-mix(in srgb, var(--c-purple-400) 10%, transparent);
+        color: var(--color-text-secondary);
+      }
+      .chip i {
+        font-size: 13px;
+        color: var(--c-purple-400);
+      }
+
+      .model-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin: 8px 0 28px;
+      }
+      .model-card {
+        border: 1px solid var(--color-border-primary);
+        border-top: 3px solid var(--color-border-primary);
+        border-radius: var(--border-radius-lg);
+        padding: 20px 22px;
+        background: var(--color-background-secondary);
+      }
+      .model-card.accent-purple {
+        border-top-color: var(--c-purple-400);
+      }
+      .model-card.accent-teal {
+        border-top-color: var(--c-teal-400);
+      }
+      .model-card.accent-coral {
+        border-top-color: var(--c-coral-400);
+      }
+      .model-card .model-name {
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--color-text-primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
+      }
+      .model-card .model-name i {
+        font-size: 15px;
+      }
+      .model-card.accent-purple .model-name i {
+        color: var(--c-purple-400);
+      }
+      .model-card.accent-teal .model-name i {
+        color: var(--c-teal-400);
+      }
+      .model-card.accent-coral .model-name i {
+        color: var(--c-coral-400);
+      }
+      .model-card .model-id {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--color-text-tertiary);
+        margin-bottom: 12px;
+      }
+      .model-card .model-desc {
+        font-size: 13px;
+        color: var(--color-text-secondary);
+      }
+
+      .checklist-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--color-border-tertiary);
+        font-size: 14px;
+        color: var(--color-text-secondary);
+      }
+      .checklist-item:last-child {
+        border-bottom: none;
+      }
+      .checklist-item i {
+        color: var(--color-text-success);
+        font-size: 16px;
+        margin-top: 2px;
+        flex-shrink: 0;
+      }
+      .checklist-item strong {
+        color: var(--color-text-primary);
+        font-weight: 500;
+      }
+
+      footer {
+        border-top: 1px solid var(--color-border-primary);
+        padding-top: 24px;
+        margin-top: 24px;
+        font-size: 12px;
+        color: var(--color-text-tertiary);
+      }
+
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+        .sidebar {
+          position: relative;
+          height: auto;
+        }
+        .main {
+          padding: 32px 20px 80px;
+        }
+        .model-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <i class="ti ti-brain"></i>
+          <div>
+            <div class="sidebar-brand-text">GPT-5.6 ガイド</div>
+            <div class="sidebar-brand-sub">Sol / Terra / Luna</div>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-group-label">はじめに</div>
+          <a class="nav-link" href="#overview"><i class="ti ti-info-circle"></i>GPT-5.6とは</a>
+          <a class="nav-link" href="#lineup"><i class="ti ti-stack-2"></i>モデル比較</a>
+          <a class="nav-link" href="#selection-flow"><i class="ti ti-route"></i>モデル選定フロー</a>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-group-label">Reasoningシステム</div>
+          <a class="nav-link" href="#effort-mode"
+            ><i class="ti ti-adjustments"></i>Effort と Mode</a
+          >
+          <a class="nav-link" href="#persisted-reasoning"
+            ><i class="ti ti-history"></i>Persisted Reasoning</a
+          >
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-group-label">高度な機能</div>
+          <a class="nav-link" href="#ptc"
+            ><i class="ti ti-terminal-2"></i>Programmatic Tool Calling</a
+          >
+          <a class="nav-link" href="#multi-agent"><i class="ti ti-affiliate"></i>Multi-agent</a>
+          <a class="nav-link" href="#prompt-caching"
+            ><i class="ti ti-database"></i>Prompt Caching</a
+          >
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-group-label">プロンプト設計</div>
+          <a class="nav-link" href="#prompt-design"><i class="ti ti-pencil"></i>設計の原則</a>
+          <a class="nav-link" href="#verbosity"
+            ><i class="ti ti-align-left"></i>応答の長さ・スタイル</a
+          >
+          <a class="nav-link" href="#autonomy"
+            ><i class="ti ti-shield-check"></i>自律性と承認境界</a
+          >
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-group-label">安全性と運用</div>
+          <a class="nav-link" href="#safety"><i class="ti ti-shield-lock"></i>セーフガード</a>
+          <a class="nav-link" href="#migration"><i class="ti ti-arrows-shuffle"></i>移行ステップ</a>
+          <a class="nav-link" href="#cost"><i class="ti ti-coin"></i>コスト最適化</a>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-group-label">実装・参考</div>
+          <a class="nav-link" href="#code"><i class="ti ti-code"></i>コード例</a>
+          <a class="nav-link" href="#availability"><i class="ti ti-apps"></i>ChatGPT / Codex</a>
+          <a class="nav-link" href="#summary"><i class="ti ti-list-check"></i>まとめ</a>
+          <a class="nav-link" href="#sources"><i class="ti ti-link"></i>参考ソース</a>
+        </div>
+      </aside>
+
+      <main class="main">
+        <div class="page-header">
+          <div class="eyebrow">
+            <i class="ti ti-rocket"></i>実践ガイド &middot; 中級〜上級者向け
+          </div>
+          <h1>OpenAI GPT-5.6 完全ガイド</h1>
+          <p class="subtitle">
+            Sol / Terra / Luna 実践ベストプラクティス —
+            ステップバイステップで理解する新しいモデル運用の設計思想。前提日：2026年7月16日（GPT-5.6は同年7月9日にGeneral
+            Availability開始）。
+          </p>
+        </div>
+
+        <div class="chip-row">
+          <span class="chip"><i class="ti ti-cube"></i>3モデル構成</span>
+          <span class="chip"><i class="ti ti-brain"></i>Reasoning Effort / Mode</span>
+          <span class="chip"><i class="ti ti-terminal-2"></i>Programmatic Tool Calling</span>
+          <span class="chip"><i class="ti ti-affiliate"></i>Multi-agent（ベータ）</span>
+          <span class="chip"><i class="ti ti-shield-lock"></i>リアルタイム分類器</span>
+        </div>
+
+        <section id="overview">
+          <h2>
+            <span class="step-no">01</span><i class="ti ti-info-circle"></i>GPT-5.6とは何か —
+            ファミリー概要
+          </h2>
+          <p>
+            GPT-5.6は2026年6月26日に限定プレビューとして提供が開始され、米政府によるフロンティアモデルの事前評価プロセス（AI関連大統領令に基づく枠組み）を経て、2026年7月9日に一般提供（GA）となりました。これはAnthropicのClaude
+            Fable 5 / Mythos
+            5が同様の輸出管理措置を受けた経緯とも重なる、2026年のフロンティアモデル業界全体に共通する流れです。
+          </p>
+          <p>
+            GPT-5.6は「mini」「nano」という接尾辞を廃止し、3つの命名されたモデルで構成されます。いずれもテキスト・画像入力とテキスト出力に対応し、Responses
+            APIを通じて推論・ツール呼び出し・マルチターンのワークフローを扱います。
+          </p>
+
+          <div class="model-grid">
+            <div class="model-card accent-purple">
+              <div class="model-name"><i class="ti ti-sparkles"></i>Sol</div>
+              <div class="model-id">gpt-5.6-sol（alias: gpt-5.6）</div>
+              <div class="model-desc">
+                フラッグシップモデル。最高難度の推論・コーディング・サイバーセキュリティ・科学タスク向け。
+              </div>
+            </div>
+            <div class="model-card accent-teal">
+              <div class="model-name"><i class="ti ti-scale"></i>Terra</div>
+              <div class="model-id">gpt-5.6-terra</div>
+              <div class="model-desc">
+                日常業務向けのバランス型モデル。GPT-5.5相当の品質を約半額で提供。
+              </div>
+            </div>
+            <div class="model-card accent-coral">
+              <div class="model-name"><i class="ti ti-bolt"></i>Luna</div>
+              <div class="model-id">gpt-5.6-luna</div>
+              <div class="model-desc">
+                高ボリューム・低コスト向けの効率モデル。バッチ処理や単純作業に最適。
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="lineup">
+          <h2>
+            <span class="step-no">02</span><i class="ti ti-stack-2"></i>モデルラインナップ比較
+          </h2>
+          <table>
+            <thead>
+              <tr>
+                <th>モデル</th>
+                <th>Model ID / Alias</th>
+                <th>Context Window</th>
+                <th>Max Output</th>
+                <th>Input ($/1M)</th>
+                <th>Output ($/1M)</th>
+                <th>主な用途</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Sol</strong></td>
+                <td><code>gpt-5.6-sol</code></td>
+                <td>1,050,000</td>
+                <td>128,000</td>
+                <td>$5.00</td>
+                <td>$30.00</td>
+                <td>複雑な推論、エージェント型コーディング、サイバーセキュリティ</td>
+              </tr>
+              <tr>
+                <td><strong>Terra</strong></td>
+                <td><code>gpt-5.6-terra</code></td>
+                <td>1,050,000</td>
+                <td>128,000</td>
+                <td>$2.50</td>
+                <td>$15.00</td>
+                <td>一般業務、カスタマーサポート、社内ツール</td>
+              </tr>
+              <tr>
+                <td><strong>Luna</strong></td>
+                <td><code>gpt-5.6-luna</code></td>
+                <td>1,050,000</td>
+                <td>128,000</td>
+                <td>$1.00</td>
+                <td>$6.00</td>
+                <td>高頻度・低コストのバッチ処理、単純作業</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <ul>
+            <li>
+              入力トークンが272,000を超えるリクエストは、そのリクエスト全体に対して<strong
+                >Input 2倍 / Output 1.5倍</strong
+              >の長文コンテキスト料金が適用されます。
+            </li>
+            <li>
+              Batch / Flex Processingではさらに割引料金が適用されます（例：Terraのバッチ処理は概ね
+              $1.25 / $7.50）。
+            </li>
+            <li>
+              <code>gpt-5.6</code
+              >エイリアスは常に<code>gpt-5.6-sol</code>にルーティングされます。明示的にコストを制御したい場合は、エイリアスではなくモデルIDを直接指定することを推奨します。
+            </li>
+          </ul>
+        </section>
+
+        <section id="selection-flow">
+          <h2><span class="step-no">03</span><i class="ti ti-route"></i>モデル選定フロー</h2>
+          <p>タスクの複雑さとコスト制約に応じて、以下の判断フローでモデルを選定します。</p>
+
+          <div class="diagram">
+            <pre class="mermaid">
+flowchart TD
+    A["タスクを受信"] --> B{"深い推論や高精度コーディングが必要か"}
+    B -->|"Yes"| C["gpt-5.6-sol を選択"]
+    B -->|"No"| D{"高頻度かつコスト最優先か"}
+    D -->|"Yes"| E["gpt-5.6-luna を選択"]
+    D -->|"No"| F["gpt-5.6-terra を選択"]
+    C --> G["reasoning effort と mode を選定"]
+    E --> G
+    F --> G
+    G --> H["代表的なタスクで品質とコストを検証"]
+
+    class B,D decision
+    class C,E,F outcome
+    classDef default fill:#2a1b47,stroke:#8b5cf6,color:#ede9fe
+    classDef decision fill:#0f3d38,stroke:#2dd4bf,color:#ccfbf1
+    classDef outcome fill:#3a2062,stroke:#a78bfa,color:#ede9fe
+      </pre
+            >
+            <div class="diagram-caption">図1 — タスク特性に応じたモデル選定の判断フロー</div>
+          </div>
+
+          <div class="callout warning">
+            <i class="ti ti-alert-triangle"></i>
+            <p>
+              OpenAIのベンダー公表値ではSolが最上位ベンチマークで優位性を示していますが、これは自社評価であり独立した再現性はまだ限定的です。<strong>Terra/Lunaで要件を満たせるかを先に検証し、満たせない場合のみSolへエスカレーションする</strong>運用が推奨されます。
+            </p>
+          </div>
+        </section>
+
+        <section id="effort-mode">
+          <h2>
+            <span class="step-no">04</span><i class="ti ti-adjustments"></i>Reasoning Effort と
+            Reasoning Mode
+          </h2>
+          <p>
+            GPT-5.6を理解する上で最も重要な概念は、「モデルの選択」「reasoning.effort」「reasoning.mode」という<strong>3つの独立したダイヤル</strong>が存在することです。
+          </p>
+
+          <div class="diagram">
+            <pre class="mermaid">
+flowchart LR
+    subgraph Dial1["ダイヤル1: モデル選択"]
+        M["gpt-5.6-sol / terra / luna"]
+    end
+    subgraph Dial2["ダイヤル2: reasoning.effort"]
+        E1["none"] --- E2["low"] --- E3["medium"] --- E4["high"] --- E5["xhigh"] --- E6["max"]
+    end
+    subgraph Dial3["ダイヤル3: reasoning.mode"]
+        R1["standard（既定）"]
+        R2["pro"]
+    end
+    M -.組み合わせ自在.-> Dial2
+    M -.組み合わせ自在.-> Dial3
+
+    style Dial1 fill:#1c1c22,stroke:#3a3a42,color:#f2f2f4
+    style Dial2 fill:#1c1c22,stroke:#3a3a42,color:#f2f2f4
+    style Dial3 fill:#1c1c22,stroke:#3a3a42,color:#f2f2f4
+    class M default
+    class E1,E2,E3,E4,E5,E6 effort
+    class R1,R2 mode
+    classDef default fill:#2a1b47,stroke:#8b5cf6,color:#ede9fe
+    classDef effort fill:#0f3d38,stroke:#2dd4bf,color:#ccfbf1
+    classDef mode fill:#4a2415,stroke:#fb7185,color:#ffe4de
+      </pre
+            >
+            <div class="diagram-caption">
+              図2 — モデル選択・reasoning.effort・reasoning.modeは互いに独立したダイヤル
+            </div>
+          </div>
+
+          <h3>4.1 reasoning.effortの選定基準</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>値</th>
+                <th>特性</th>
+                <th>推奨される使用場面</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>none</code></td>
+                <td>推論なし。レイテンシ最優先</td>
+                <td>単純なタスクのベースライン</td>
+              </tr>
+              <tr>
+                <td><code>low</code></td>
+                <td>軽量な推論</td>
+                <td>レイテンシに敏感なワークロード</td>
+              </tr>
+              <tr>
+                <td><code>medium</code></td>
+                <td>バランス型（デフォルト）</td>
+                <td>ほとんどのタスクの出発点</td>
+              </tr>
+              <tr>
+                <td><code>high</code></td>
+                <td>より深い推論</td>
+                <td>計測して明確な品質向上が確認できた場合</td>
+              </tr>
+              <tr>
+                <td><code>xhigh</code></td>
+                <td>さらに深い推論</td>
+                <td>旧世代の最上位設定からの移行先</td>
+              </tr>
+              <tr>
+                <td><code>max</code>（新設）</td>
+                <td>最大限の探索・検証</td>
+                <td>最難関の品質最優先タスクに限定</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout">
+            <i class="ti ti-bulb"></i>
+            <p>
+              <strong>移行時の鉄則：</strong>GPT-5.5/5.4から移行する場合は、まず現行のreasoning
+              effortをベースラインとして維持し、その上で「同じ設定」と「1段階下げた設定」の両方を代表的なタスクで比較してください。GPT-5.6はより少ないトークンで同等以上の品質を達成できるケースが多く、コスト削減の余地があります。
+            </p>
+          </div>
+
+          <h3>4.2 reasoning.mode: standard と pro</h3>
+          <p>
+            <code>reasoning.mode: "pro"</code
+            >は、より多くのモデル計算をリクエスト前に投入し、単一の最終回答を返す実行モードです。レイテンシとトークン使用量は増加しますが、複雑な最適化問題、高付加価値なコードレビュー、明確な評価基準を持つ深い分析などの高難度タスクで信頼性向上が期待できます。
+          </p>
+          <p>
+            重要な注意点として、Pro
+            modeは「別モデル」ではなく、既存のSol/Terra/Lunaのいずれにも重ねて適用できる実行モードです。プロンプト側で「Pro
+            modeを使って」と指示する必要もなく、通常のoutcome-focusedなプロンプト（目標・制約・根拠・成功基準・出力形式）をそのまま使えます。
+          </p>
+
+          <span class="code-label">python — reasoning.mode: pro の指定例</span>
+          <pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI()
+
+response = client.responses.create(
+    model="gpt-5.6-sol",
+    reasoning={"effort": "high", "mode": "pro"},
+    input=[
+        {
+            "role": "user",
+            "content": (
+                "このデータベース移行計画を精査し、データ損失や"
+                "長時間ダウンタイムにつながる失敗モードを洗い出してください。"
+                "各指摘には該当ステップの引用、影響度と発生可能性の見積もり、"
+                "具体的な緩和策を含め、重大度順に上位5件を返してください。"
+            ),
+        }
+    ],
+)
+
+print(response.output_text)</code></pre>
+
+          <div class="callout warning">
+            <i class="ti ti-alert-triangle"></i>
+            <p>
+              Pro
+              modeはデフォルトでオンにせず、標準モードとの比較評価（成功率・完全性・トークン数・レイテンシ・コスト）を行った上で、明確な品質向上が確認できたワークロードにのみ選択的に適用してください。
+            </p>
+          </div>
+        </section>
+
+        <section id="persisted-reasoning">
+          <h2>
+            <span class="step-no">05</span><i class="ti ti-history"></i>Persisted
+            Reasoning（推論の永続化）
+          </h2>
+          <p>
+            マルチターンの会話やエージェント的なワークフローでは、過去のreasoning
+            itemsを再利用できる<code>reasoning.context</code>パラメータが導入されました。
+          </p>
+
+          <table>
+            <thead>
+              <tr>
+                <th>値</th>
+                <th>動作</th>
+                <th>使用場面</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>auto</code>（デフォルト）</td>
+                <td>モデルが状況に応じた既定動作を選択</td>
+                <td>特別な要件がない場合</td>
+              </tr>
+              <tr>
+                <td><code>all_turns</code></td>
+                <td>過去ターンのreasoning itemsを利用可能にする</td>
+                <td>タスクのゴール・前提が全ターンを通じて安定している場合</td>
+              </tr>
+              <tr>
+                <td><code>current_turn</code></td>
+                <td>過去の推論を破棄し現在のターンのみで推論</td>
+                <td>前のターンの推論がもはや関係ない場合</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>
+            <code>all_turns</code
+            >を使う場合は<code>previous_response_id</code>で過去のレスポンスを連結します。会話履歴を自前管理する場合（Zero
+            Data Retention環境など）は、APIが返す暗号化されたreasoning
+            itemsをそのまま再送する必要があります。
+          </p>
+
+          <div class="diagram">
+            <pre class="mermaid">
+flowchart TD
+    A["Turn 1: ユーザー入力"] --> B["GPT-5.6が推論して応答"]
+    B --> C{"reasoning.context"}
+    C -->|"all_turns"| D["reasoning itemsを保持しTurn2で再利用"]
+    C -->|"current_turn"| E["reasoning itemsを破棄"]
+    D --> F["Turn 2: previous_response_id で継続"]
+    E --> G["Turn 2: ゼロから推論"]
+
+    class C decision
+    classDef default fill:#2a1b47,stroke:#8b5cf6,color:#ede9fe
+    classDef decision fill:#0f3d38,stroke:#2dd4bf,color:#ccfbf1
+      </pre
+            >
+            <div class="diagram-caption">
+              図3 — reasoning.contextによるターン間の推論再利用の分岐
+            </div>
+          </div>
+        </section>
+
+        <section id="ptc">
+          <h2>
+            <span class="step-no">06</span><i class="ti ti-terminal-2"></i>Programmatic Tool
+            Calling（PTC）
+          </h2>
+          <p>
+            PTCは、GPT-5.6がホスト型ランタイム上でJavaScriptプログラムを書き、複数ツールを呼び出し・中間結果を処理してから、コンパクトな結果だけをモデルに返す仕組みです。Zero
+            Data Retention互換で、追加のコンテナ課金は発生しません。
+          </p>
+
+          <div class="diagram">
+            <pre class="mermaid">
+sequenceDiagram
+    participant App as "アプリケーション"
+    participant Model as "GPT-5.6"
+    participant Runtime as "Hosted JS Runtime"
+    participant Tools as "許可済みツール群"
+
+    App->>Model: "リクエスト送信"
+    Model->>Runtime: "処理プログラムを生成"
+    Runtime->>Tools: "複数ツールを並列/逐次呼び出し"
+    Tools-->>Runtime: "個々の結果を返却"
+    Runtime->>Runtime: "フィルタ・集約・重複排除"
+    Runtime-->>Model: "program_output（縮約済み結果）"
+    Model-->>App: "最終回答メッセージ"
+      </pre
+            >
+            <div class="diagram-caption">
+              図4 — Programmatic Tool Callingにおけるホスト型ランタイムの処理シーケンス
+            </div>
+          </div>
+
+          <h3>6.1 PTCが適するタスク形状</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>適している</th>
+                <th>適していない</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>大量ツール結果のフィルタ・結合・ランキング・重複排除・集約・検証</td>
+                <td>1回の呼び出しで完結するタスク</td>
+              </tr>
+              <tr>
+                <td>中間出力が大きく、モデルに逐一渡すのが非効率な場合</td>
+                <td>各結果が次の判断に影響を与える対話的なタスク</td>
+              </tr>
+              <tr>
+                <td>判断の余地が少ない機械的な処理</td>
+                <td>承認が必要なアクション</td>
+              </tr>
+              <tr>
+                <td>&nbsp;</td>
+                <td>最終出力に引用やネイティブな成果物の保持が必要な場合</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>6.2 実装時の注意点</h3>
+          <ul>
+            <li>
+              <code>programmatic_tool_calling</code
+              >ツールを追加し、対象ツールを<code>allowed_callers</code>で明示的にオプトインします。
+            </li>
+            <li>
+              どの段階でPTCを使うか、どのツールを呼べるか、出力スキーマ、並行数・リトライ・停止条件を<strong>タスク固有に明示</strong>してください。曖昧な指示では期待した経路選択になりません。
+            </li>
+            <li>
+              <code>program_output</code
+              >と最終的なassistantメッセージは別物です。プログラムが正しいレコードを返していても、メッセージ側で必須フィールドや引用が欠落する場合があるため、<strong>両方を検証</strong>してください。
+            </li>
+          </ul>
+        </section>
+
+        <section id="multi-agent">
+          <h2>
+            <span class="step-no">07</span
+            ><i class="ti ti-affiliate"></i>Multi-agent（ベータ）とUltra Mode
+          </h2>
+          <p>
+            GPT-5.6は単一インスタンスが複数のサブエージェントを並列に調整し、結果を統合する<strong>Multi-agent</strong>機能をResponses
+            APIのベータ機能として提供します（ChatGPT/Codexの「ultra」モードと同様の考え方）。独立したワークストリームに分割できる複雑なタスクにおいて、ウォールクロック時間の短縮に有効です。
+          </p>
+
+          <div class="diagram">
+            <pre class="mermaid">
+flowchart TD
+    A["複雑なタスク"] --> B["独立可能なワークストリームに分解"]
+    B --> C1["サブエージェント1"]
+    B --> C2["サブエージェント2"]
+    B --> C3["サブエージェント3"]
+    C1 --> D["結果を統合"]
+    C2 --> D
+    C3 --> D
+    D --> E["単一の最終回答"]
+
+    class C1,C2,C3 worker
+    class D outcome
+    classDef default fill:#2a1b47,stroke:#8b5cf6,color:#ede9fe
+    classDef worker fill:#0f3d38,stroke:#2dd4bf,color:#ccfbf1
+    classDef outcome fill:#4a2415,stroke:#fb7185,color:#ffe4de
+      </pre
+            >
+            <div class="diagram-caption">
+              図5 — 独立したワークストリームを並列処理し結果を統合するMulti-agent構成
+            </div>
+          </div>
+
+          <div class="callout">
+            <i class="ti ti-bulb"></i>
+            <p>
+              ワークストリーム間の依存関係が強いタスクでは並列化の恩恵が薄く、統合コストが増える場合があります。分割可能性を事前に評価してから導入してください。
+            </p>
+          </div>
+        </section>
+
+        <section id="prompt-caching">
+          <h2>
+            <span class="step-no">08</span><i class="ti ti-database"></i>Prompt Cachingの変更点
+          </h2>
+          <p>
+            GPT-5.6では、キャッシュされるプロンプト接頭辞を明示的に指定できる<strong
+              >Explicit Cache Breakpoints</strong
+            >が導入されました。暗黙のキャッシュ（Implicit caching）も引き続き利用できます。
+          </p>
+
+          <table>
+            <thead>
+              <tr>
+                <th>項目</th>
+                <th>内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Cache write（新規書き込み）</td>
+                <td>非キャッシュ時のInput単価の<strong>1.25倍</strong>で課金</td>
+              </tr>
+              <tr>
+                <td>Cache read（再利用）</td>
+                <td>従来通り約90%割引</td>
+              </tr>
+              <tr>
+                <td>最小キャッシュ保持期間</td>
+                <td>30分</td>
+              </tr>
+              <tr>
+                <td>設定方法</td>
+                <td><code>prompt_cache_options.mode: "explicit"</code></td>
+              </tr>
+              <tr>
+                <td>TTL指定</td>
+                <td>
+                  <code>prompt_cache_retention</code
+                  >は廃止、<code>prompt_cache_options.ttl</code>を使用
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout warning">
+            <i class="ti ti-alert-triangle"></i>
+            <p>
+              キャッシュ書き込みが有償化されたため、頻繁に変化するプロンプト接頭辞に対して不要なキャッシュ書き込みが発生しないよう、<code>cached_tokens</code>と<code>cache_write_tokens</code>の両方をモニタリングし、実質コストを把握することが重要です。
+            </p>
+          </div>
+        </section>
+
+        <section id="prompt-design">
+          <h2>
+            <span class="step-no">09</span
+            ><i class="ti ti-pencil"></i>プロンプト設計のベストプラクティス
+          </h2>
+          <p>
+            公式ドキュメントが明示する最重要原則は「<strong>プロンプトを簡潔にする</strong>」ことです。内部の評価では、冗長な指示を削ぎ落とした「リーンな」システムプロンプトにより、評価スコアが約10〜15%向上し、総トークン数が41〜66%、コストが33〜67%削減された事例が報告されています（数値はワークロードに依存するため、自社タスクでの検証が前提です）。
+          </p>
+
+          <h3>9.1 プロンプト簡素化の手順</h3>
+          <div class="diagram">
+            <pre class="mermaid">
+flowchart TD
+    A["現状動作しているプロンプトとツールセットから開始"] --> B["1グループの指示/例/ツールを削除"]
+    B --> C["同一evalセットを再実行"]
+    C --> D{"スコアが維持されるか"}
+    D -->|"Yes"| E["削除を確定し次のグループへ"]
+    D -->|"No"| F["その指示は製品要件を反映しているため復元"]
+    E --> B
+    F --> G["最小構成のプロンプトが完成"]
+
+    class D decision
+    class G outcome
+    classDef default fill:#2a1b47,stroke:#8b5cf6,color:#ede9fe
+    classDef decision fill:#0f3d38,stroke:#2dd4bf,color:#ccfbf1
+    classDef outcome fill:#3a2062,stroke:#a78bfa,color:#ede9fe
+      </pre
+            >
+            <div class="diagram-caption">
+              図6 — evalで検証しながらプロンプトを最小構成に近づける反復手順
+            </div>
+          </div>
+
+          <p>具体的な指針：</p>
+          <ul>
+            <li><strong>各指示は一度だけ記述する</strong>（重複ルールは削除）</li>
+            <li><strong>タスクに関連するツールだけを公開</strong>し、説明文を簡潔かつ正確にする</li>
+            <li>
+              例やスタイルガイドは、製品要件をエンコードしている場合や、計測されたギャップを補正する場合のみ残す
+            </li>
+            <li>
+              セッション開始時と会話が長くなった時の両方でコンテキスト量を追跡する（長時間セッションは重複プロンプト/ツール内容の影響を増幅させる）
+            </li>
+          </ul>
+
+          <h3>9.2 意図理解の向上を活かす</h3>
+          <p>
+            GPT-5.6はユーザーの根本的な目的と適切な作業レベルを、より少ない指示から推測できるようになりました。ただし、以下は引き続き明示する必要があります。
+          </p>
+          <ul>
+            <li>ドメイン固有のコンテキスト</li>
+            <li>明確な制約（ハード制約）</li>
+            <li>承認境界（何をして良いか／悪いか）</li>
+            <li>成功基準</li>
+            <li>「このあいまいさが生じたら質問すべき」というトリガー条件</li>
+          </ul>
+        </section>
+
+        <section id="verbosity">
+          <h2>
+            <span class="step-no">10</span><i class="ti ti-align-left"></i>応答の長さとスタイル制御
+          </h2>
+          <p>
+            GPT-5.6はGPT-5.5よりデフォルトで簡潔な応答を返す傾向があります。そのため、従来の「簡潔にして」という広範な指示が不要、あるいは逆に応答を短くしすぎる場合があります。
+          </p>
+
+          <h3>10.1 text.verbosityによるデフォルト制御</h3>
+          <p>
+            <code>text.verbosity</code>に<code>low</code> / <code>medium</code> /
+            <code>high</code
+            >を指定することで、リクエストのデフォルトの詳細度を設定し、タスク固有の要件はプロンプト側に記述する、という役割分担が推奨されます。
+          </p>
+
+          <h3>10.2 短い回答で「何を残すか」を明示する</h3>
+          <p>
+            単に「短くして」と指示するのではなく、保持すべき情報と省略してよい情報を明示します。
+          </p>
+          <span class="code-label">プロンプト例</span>
+          <pre><code class="nohighlight">結論を先に述べる。それを裏付ける根拠、重要な留意点、次のアクションを含める。
+副次的な詳細や重複は省略する。
+
+必ず残す：事実、判断、留意点、次のアクション。
+優先的に削る：導入文、繰り返し、一般的な安心づけ、任意の背景情報。</code></pre>
+
+          <h3>10.3 トーンの定義</h3>
+          <p>
+            「フレンドリーに」「共感的に」といった抽象的なラベルは曖昧になりがちです。どの程度直接的に答えるか、問題発生時にどう言及するか、いつ安心づけを行うかなど、<strong>具体的な書き方のルール</strong>として定義してください。
+          </p>
+        </section>
+
+        <section id="autonomy">
+          <h2>
+            <span class="step-no">11</span><i class="ti ti-shield-check"></i>自律性と承認境界の定義
+          </h2>
+          <p>
+            GPT-5.6はマルチステップタスクにおいてより能動的・持続的に振る舞うため、<strong>各リクエストがどこまでの行動を許可しているか</strong>を明示することが不可欠です。以下は公式ガイドが示す方針を日本語で再構成したポリシー例です。
+          </p>
+
+          <span class="code-label">承認境界ポリシーの例</span>
+          <pre><code class="nohighlight">【回答・説明・レビュー・診断・計画のリクエストの場合】
+関連資料を調査し、結果を報告する。変更の実施も求められていない限り、
+実際の変更は行わない。
+
+【変更・構築・修正のリクエストの場合】
+スコープ内のローカルな変更を実施し、破壊的でない検証（テスト実行など）を
+確認なしに行ってよい。
+
+【外部への書き込み、破壊的操作、購入、スコープの大幅な拡張を伴う場合】
+必ず事前確認を求める。</code></pre>
+
+          <div class="callout warning">
+            <i class="ti ti-alert-triangle"></i>
+            <p>
+              「まず確認して」「変更しないで」「承認を待って」といった指示をポリシー内で重複して記述すると、安全な想定内の操作にまで不要な承認要求が発生することがあります。ルールは一箇所にまとめ、各規則は一度だけ記述してください。
+            </p>
+          </div>
+        </section>
+
+        <section id="safety">
+          <h2>
+            <span class="step-no">12</span
+            ><i class="ti ti-shield-lock"></i>セーフガードとsafety_identifier
+          </h2>
+          <p>
+            GPT-5.6には、生成中にリアルタイムで動作するサイバー・生物学関連の誤用検知分類器が組み込まれています。
+          </p>
+
+          <div class="diagram">
+            <pre class="mermaid">
+flowchart LR
+    A["ユーザー入力"] --> B["GPT-5.6 生成開始"]
+    B --> C["リアルタイム分類器（サイバー・バイオ領域）"]
+    C -->|"問題なし"| D["生成継続・出力"]
+    C -->|"要レビュー"| E["生成を数秒一時停止しレビュー"]
+    E --> D
+    E -->|"ポリシー違反"| F["ブロック・拒否"]
+
+    class D safe
+    class E review
+    class F danger
+    classDef default fill:#2a1b47,stroke:#8b5cf6,color:#ede9fe
+    classDef safe fill:#0b3a26,stroke:#34d399,color:#a7f3d0
+    classDef review fill:#4a3510,stroke:#fbbf24,color:#fde68a
+    classDef danger fill:#4a1414,stroke:#f87171,color:#fecaca
+      </pre
+            >
+            <div class="diagram-caption">
+              図7 — リアルタイム分類器による生成継続・一時停止・ブロックの判断
+            </div>
+          </div>
+
+          <ul>
+            <li>
+              これらの分類器は、脆弱性調査・パッチ開発・デバッグ・セキュリティ教育・防御的テストなど、正当な業務に介入してしまう場合があります（デュアルユース領域では攻撃的活動と防御的活動が初期段階で似て見えるため）。
+            </li>
+            <li>
+              エンドユーザー向けアプリケーションを運用する場合は、リクエストごとに安定した匿名化済みの<code>safety_identifier</code>を送信することが推奨されます。これにより誤用パターンの検知精度向上に寄与します。
+            </li>
+          </ul>
+        </section>
+
+        <section id="migration">
+          <h2>
+            <span class="step-no">13</span
+            ><i class="ti ti-arrows-shuffle"></i>GPT-5.5/5.4からの移行ステップ
+          </h2>
+
+          <div class="diagram">
+            <pre class="mermaid">
+flowchart TD
+    A["現行のモデル・reasoning effort・プロンプトを棚卸し"] --> B["ワークロードに応じてsol/terra/lunaを選定"]
+    B --> C["Responses APIへ統一"]
+    C --> D["reasoning.effortを現行値のまま設定"]
+    D --> E["同一設定と1段階下の設定を代表タスクで比較評価"]
+    E --> F{"品質が維持されるか"}
+    F -->|"Yes"| G["低いeffortを採用しコスト削減"]
+    F -->|"No"| H["現行effortを維持、もしくはpro modeを検討"]
+    G --> I["prompt cachingの設定を見直し"]
+    H --> I
+    I --> J["PTC/Multi-agentの適用可否をタスク形状で判断"]
+    J --> K["本番投入・継続的なeval監視"]
+
+    class F decision
+    class G outcome
+    classDef default fill:#2a1b47,stroke:#8b5cf6,color:#ede9fe
+    classDef decision fill:#0f3d38,stroke:#2dd4bf,color:#ccfbf1
+    classDef outcome fill:#0b3a26,stroke:#34d399,color:#a7f3d0
+      </pre
+            >
+            <div class="diagram-caption">図8 — GPT-5.5/5.4からGPT-5.6への段階的な移行フロー</div>
+          </div>
+
+          <h3>13.1 コーディングエージェントでの自動移行</h3>
+          <p>
+            Codexを利用している場合、公式の<code>openai-docs</code>スキルを用いて自動的に本ガイドの推奨変更を適用できます。
+          </p>
+          <pre><code class="language-bash">openai-docs migrate this project to the GPT-5.6 model family</code></pre>
+          <p>
+            このスキルは<code>openai/skills</code>リポジトリの<code>.curated/openai-docs</code>から他のコーディングエージェントにも導入可能です。
+          </p>
+        </section>
+
+        <section id="code">
+          <h2><span class="step-no">14</span><i class="ti ti-code"></i>コード実践例</h2>
+
+          <h3>14.1 基本的なResponses API呼び出し</h3>
+          <span class="code-label">python</span>
+          <pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI()
+
+response = client.responses.create(
+    model="gpt-5.6-terra",
+    reasoning={"effort": "medium"},
+    text={"verbosity": "low"},
+    input=[
+        {
+            "role": "user",
+            "content": "matrixを文字列'[1,2],[3,4],[5,6]'として受け取り、"
+                        "同形式で転置行列を出力するbashスクリプトを書いてください。",
+        }
+    ],
+)
+
+print(response.output_text)</code></pre>
+
+          <h3>14.2 curlでのリクエスト例（max reasoning effort）</h3>
+          <span class="code-label">bash</span>
+          <pre><code class="language-bash">curl https://api.openai.com/v1/responses \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -d '{
+    "model": "gpt-5.6-sol",
+    "reasoning": {"effort": "max"},
+    "safety_identifier": "hashed-user-id-xxxx",
+    "input": [
+      {"role": "user", "content": "本番障害の根本原因を特定するための調査計画を立ててください。"}
+    ]
+  }'</code></pre>
+
+          <h3>14.3 Persisted Reasoningを使ったマルチターン継続</h3>
+          <span class="code-label">python</span>
+          <pre><code class="language-python">first = client.responses.create(
+    model="gpt-5.6-sol",
+    reasoning={"effort": "high", "context": "all_turns"},
+    input=[{"role": "user", "content": "このリファクタリング計画をレビューして"}],
+)
+
+second = client.responses.create(
+    model="gpt-5.6-sol",
+    reasoning={"effort": "high", "context": "all_turns"},
+    previous_response_id=first.id,
+    input=[{"role": "user", "content": "先ほどの指摘のうち、優先度が最も高いものを実装して"}],
+)</code></pre>
+        </section>
+
+        <section id="availability">
+          <h2>
+            <span class="step-no">15</span><i class="ti ti-apps"></i>ChatGPT / Codex / ChatGPT
+            Workでの利用可能性
+          </h2>
+
+          <table>
+            <thead>
+              <tr>
+                <th>プラン</th>
+                <th>標準ChatGPT会話</th>
+                <th>Work / Codex</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Free / Go</td>
+                <td>GPT-5.5 Instantがデフォルト。Solは利用不可</td>
+                <td>一部機能のみ</td>
+              </tr>
+              <tr>
+                <td>Plus</td>
+                <td>Medium / High reasoningでSolを利用可</td>
+                <td>Terra/Lunaを含め利用可（段階的展開）</td>
+              </tr>
+              <tr>
+                <td>Pro</td>
+                <td>Medium / High / Extra High / Proまで利用可</td>
+                <td>フルアクセス</td>
+              </tr>
+              <tr>
+                <td>Business / Enterprise</td>
+                <td>全reasoningレベル + 管理者によるモデル制御</td>
+                <td>フルアクセス、ワークスペースポリシーで制御可能</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>
+            標準のChatGPT会話では、日常応答のデフォルトは引き続きGPT-5.5 Instantであり、GPT-5.6
+            SolはMedium以上のreasoningオプションを選択した場合にのみ使用されます。Terra/Lunaは標準チャットでは選択できず、ChatGPT
+            Work・Codex・APIから利用します。
+          </p>
+          <p>
+            ChatGPT
+            Workは、GPT-5.6を基盤としたエージェント型ワークスペース製品で、ローカルファイル・アプリ・ブラウザを横断したマルチステップタスクの自動実行を目的としています。
+          </p>
+        </section>
+
+        <section id="cost">
+          <h2>
+            <span class="step-no">16</span><i class="ti ti-coin"></i>コスト最適化チェックリスト
+          </h2>
+
+          <div class="checklist-item">
+            <i class="ti ti-square-rounded-check"></i
+            ><span
+              ><strong>モデル階層の見直し</strong> —
+              まずLuna/Terraで要件を満たせるか検証してからSolへエスカレーション</span
+            >
+          </div>
+          <div class="checklist-item">
+            <i class="ti ti-square-rounded-check"></i
+            ><span
+              ><strong>reasoning effortの再検証</strong> —
+              旧設定をそのまま引き継がず、1段階下げて品質を比較</span
+            >
+          </div>
+          <div class="checklist-item">
+            <i class="ti ti-square-rounded-check"></i
+            ><span
+              ><strong>Pro modeの適用範囲</strong> —
+              高付加価値タスクに限定し、全リクエストへの一律適用を避ける</span
+            >
+          </div>
+          <div class="checklist-item">
+            <i class="ti ti-square-rounded-check"></i
+            ><span
+              ><strong>キャッシュ戦略</strong> — 再利用可能な接頭辞を安定させ、explicit
+              breakpointsで不要な書き込みを抑制</span
+            >
+          </div>
+          <div class="checklist-item">
+            <i class="ti ti-square-rounded-check"></i
+            ><span
+              ><strong>272K超過リクエストの分離</strong> —
+              長文コンテキスト料金（2×/1.5×）が適用される処理を別クラスとして管理</span
+            >
+          </div>
+          <div class="checklist-item">
+            <i class="ti ti-square-rounded-check"></i
+            ><span
+              ><strong>PTCの適用判断</strong> — 1回の呼び出しで済むタスクにPTCを乱用しない</span
+            >
+          </div>
+          <div class="checklist-item">
+            <i class="ti ti-square-rounded-check"></i
+            ><span
+              ><strong>プロンプトの継続的な簡素化</strong> —
+              評価結果を見ながら重複指示・不要な例を削減</span
+            >
+          </div>
+        </section>
+
+        <section id="summary">
+          <h2><span class="step-no">17</span><i class="ti ti-list-check"></i>まとめ</h2>
+          <p>
+            GPT-5.6の本質は「モデルが賢くなった」ことよりも、<strong
+              >運用側が持つダイヤル（モデル階層・reasoning effort・reasoning mode・persisted
+              reasoning・prompt caching戦略）が独立して細分化された</strong
+            >ことにあります。ベストプラクティスの核心は一貫しています。
+          </p>
+          <ul>
+            <li>プロンプトは最小構成から始め、evalで検証しながら足す</li>
+            <li>各ダイヤルは独立して比較評価する（思い込みで最大設定を選ばない）</li>
+            <li>自律性の境界と成功基準を明示し、細かい手順は指示しすぎない</li>
+            <li>コストに影響する変更（キャッシュ書き込み、272K超過、Pro mode）は必ず計測する</li>
+          </ul>
+        </section>
+
+        <section id="sources">
+          <h2><span class="step-no">18</span><i class="ti ti-link"></i>参考ソース</h2>
+          <table class="source-list">
+            <thead>
+              <tr>
+                <th>ソース</th>
+                <th>内容</th>
+                <th>URL</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>OpenAI公式リリース</td>
+                <td>GPT-5.6ファミリー正式発表</td>
+                <td>
+                  <a href="https://openai.com/index/gpt-5-6/" target="_blank" rel="noopener"
+                    >openai.com/index/gpt-5-6</a
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>OpenAI公式プレビュー発表</td>
+                <td>限定プレビュー時の告知（政府審査の経緯を含む）</td>
+                <td>
+                  <a
+                    href="https://openai.com/index/previewing-gpt-5-6-sol/"
+                    target="_blank"
+                    rel="noopener"
+                    >openai.com/index/previewing-gpt-5-6-sol</a
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>OpenAI Developers</td>
+                <td>モデル比較・移行ガイド・プロンプトベストプラクティスの一次情報</td>
+                <td>
+                  <a
+                    href="https://developers.openai.com/api/docs/guides/latest-model"
+                    target="_blank"
+                    rel="noopener"
+                    >developers.openai.com/.../latest-model</a
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>OpenAI Developers</td>
+                <td>reasoning.effort / reasoning.mode の技術仕様</td>
+                <td>
+                  <a
+                    href="https://developers.openai.com/api/docs/guides/reasoning"
+                    target="_blank"
+                    rel="noopener"
+                    >developers.openai.com/.../reasoning</a
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>OpenAI Developers</td>
+                <td>GPT-5.6 Solのプロンプト設計の詳細ガイダンス</td>
+                <td>
+                  <a
+                    href="https://developers.openai.com/api/docs/guides/prompt-guidance-gpt-5p6"
+                    target="_blank"
+                    rel="noopener"
+                    >developers.openai.com/.../prompt-guidance-gpt-5p6</a
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>OpenAI Developers</td>
+                <td>Programmatic Tool Callingの実装ガイド</td>
+                <td>
+                  <a
+                    href="https://developers.openai.com/api/docs/guides/tools-programmatic-tool-calling"
+                    target="_blank"
+                    rel="noopener"
+                    >developers.openai.com/.../tools-programmatic-tool-calling</a
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>OpenAI Developers</td>
+                <td>Prompt Cachingの課金体系の詳細</td>
+                <td>
+                  <a
+                    href="https://developers.openai.com/api/docs/guides/prompt-caching"
+                    target="_blank"
+                    rel="noopener"
+                    >developers.openai.com/.../prompt-caching</a
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>OpenAI Developers</td>
+                <td>Multi-agent（ベータ）の技術詳細</td>
+                <td>
+                  <a
+                    href="https://developers.openai.com/api/docs/guides/responses-multi-agent"
+                    target="_blank"
+                    rel="noopener"
+                    >developers.openai.com/.../responses-multi-agent</a
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>OpenAI Developers</td>
+                <td>safety_identifierの実装方法</td>
+                <td>
+                  <a
+                    href="https://developers.openai.com/api/docs/guides/safety-best-practices"
+                    target="_blank"
+                    rel="noopener"
+                    >developers.openai.com/.../safety-best-practices</a
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>Wikipedia</td>
+                <td>GPT-5.6の背景情報・Preparedness Framework上の分類</td>
+                <td>
+                  <a href="https://en.wikipedia.org/wiki/GPT-5.6" target="_blank" rel="noopener"
+                    >en.wikipedia.org/wiki/GPT-5.6</a
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>TechCrunch</td>
+                <td>一般提供開始時の報道、価格体系の確認</td>
+                <td>
+                  <a
+                    href="https://techcrunch.com/2026/07/09/openai-launches-its-new-family-of-models-with-gpt-5-6/"
+                    target="_blank"
+                    rel="noopener"
+                    >techcrunch.com/2026/07/09/...</a
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>Axios</td>
+                <td>GA発表の経緯・政府対応の背景</td>
+                <td>
+                  <a
+                    href="https://www.axios.com/2026/07/09/ai-openai-gpt-release"
+                    target="_blank"
+                    rel="noopener"
+                    >axios.com/2026/07/09/...</a
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>MacRumors</td>
+                <td>ChatGPT Work / プラン別利用可能性</td>
+                <td>
+                  <a
+                    href="https://www.macrumors.com/2026/07/09/openai-chatgpt-work/"
+                    target="_blank"
+                    rel="noopener"
+                    >macrumors.com/2026/07/09/...</a
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <footer>
+            価格・提供プラン・ベータ機能の可用性は変更される可能性があるため、本番導入前に必ず一次ソース（developers.openai.com）で最新情報を確認してください。
+          </footer>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js" integrity="sha512-6a80OTZVmEJhqYJUmYd5z8yHUCDlYnj6q9XwB/gKOEyNQV/Q8u+XeSG59a2ZKFEHGTYzgfOQKYEBtrZV7vBr+Q==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+    <script>
+      (async function () {
+        if (document.fonts && document.fonts.ready) {
+          await document.fonts.ready;
+        }
+
+        if (window.hljs) {
+          hljs.highlightAll();
+        }
+
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'base',
+          securityLevel: 'loose',
+          fontFamily:
+            '-apple-system, BlinkMacSystemFont, Segoe UI, Hiragino Kaku Gothic ProN, Noto Sans JP, sans-serif',
+          themeVariables: {
+            primaryColor: '#2a1b47',
+            primaryTextColor: '#ede9fe',
+            primaryBorderColor: '#8b5cf6',
+            lineColor: '#8a8a94',
+            textColor: '#f2f2f4',
+            clusterBkg: '#1c1c22',
+            clusterBorder: '#3a3a42',
+            edgeLabelBackground: '#1c1c22',
+            actorBkg: '#2a1b47',
+            actorBorder: '#8b5cf6',
+            actorTextColor: '#ede9fe',
+            actorLineColor: '#6b6b76',
+            signalColor: '#e4e4e8',
+            signalTextColor: '#f2f2f4',
+            labelBoxBkgColor: '#0f3d38',
+            labelBoxBorderColor: '#2dd4bf',
+            labelTextColor: '#ccfbf1',
+            loopTextColor: '#c8c8d0',
+            noteBkgColor: '#1c1c22',
+            noteBorderColor: '#3a3a42',
+            noteTextColor: '#c8c8d0',
+            activationBkgColor: '#2a1b47',
+            activationBorderColor: '#8b5cf6',
+            sequenceNumberColor: '#0a0a0c',
+          },
+          flowchart: {
+            useMaxWidth: true,
+            htmlLabels: true,
+            nodeSpacing: 45,
+            rankSpacing: 50,
+            curve: 'basis',
+          },
+          sequence: {
+            useMaxWidth: true,
+            diagramMarginX: 20,
+            diagramMarginY: 10,
+          },
+        });
+
+        try {
+          await mermaid.run({ querySelector: '.mermaid' });
+        } catch (e) {
+          console.error('Mermaid render failed:', e);
+        }
+
+        var sections = document.querySelectorAll('main section[id]');
+        var navLinks = document.querySelectorAll('.nav-link');
+
+        var observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                navLinks.forEach(function (link) {
+                  link.classList.toggle(
+                    'active',
+                    link.getAttribute('href') === '#' + entry.target.id,
+                  );
+                });
+              }
+            });
+          },
+          { rootMargin: '-10% 0px -70% 0px', threshold: 0 },
+        );
+
+        sections.forEach(function (s) {
+          observer.observe(s);
+        });
+      })();
+    </script>
+  </body>
+</html>

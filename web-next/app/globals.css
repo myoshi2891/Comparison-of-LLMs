@@ -1216,6 +1216,92 @@ body.has-common-header {
   }
 }
 
+/* ── 2 段目のサブドロップダウン (F-4' / Providers のみ) ── */
+.ch-subdropdown {
+  position: relative;
+  width: 100%;
+}
+
+/* トグルはサブメニューの <a> と同じ見た目にし、階層の切り替わりを目立たせない。 */
+.ch-subdropdown-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: none;
+  color: var(--ch-text);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.ch-subdropdown-toggle:hover,
+.ch-subdropdown-toggle.ch-active {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--ch-text-hover);
+}
+
+/* 右向きの三角。フライアウトの方向を示す。 */
+.ch-subdropdown-toggle::after {
+  content: "";
+  border-left: 4px solid currentColor;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  opacity: 0.6;
+}
+
+.ch-subsubmenu {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 100%;
+  background-color: var(--ch-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--ch-border);
+  border-radius: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 0;
+  min-width: 200px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 100001;
+}
+
+.ch-subsubmenu li {
+  width: 100%;
+}
+
+.ch-subsubmenu a {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: var(--ch-text);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.ch-subsubmenu a:hover,
+.ch-subsubmenu a.ch-active {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--ch-text-hover);
+}
+
+@media (min-width: 769px) {
+  .ch-subdropdown:hover > .ch-subsubmenu,
+  .ch-subdropdown-open > .ch-subsubmenu {
+    display: block;
+  }
+}
+
 .ch-hamburger {
   display: none;
   background: transparent;
@@ -1327,6 +1413,36 @@ body.has-common-header {
   .ch-submenu a {
     padding: 0.75rem 2rem;
     font-size: 0.95rem;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  }
+
+  /* モバイルはフライアウトせずアコーディオンで開く (F-4')。 */
+  .ch-subdropdown-toggle {
+    justify-content: center;
+    padding: 0.75rem 2rem;
+    font-size: 0.95rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  }
+
+  .ch-subsubmenu {
+    position: static;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    background-color: rgba(0, 0, 0, 0.25);
+    margin: 0;
+    padding: 0;
+    min-width: unset;
+  }
+
+  .ch-subdropdown-open > .ch-subsubmenu {
+    display: block;
+  }
+
+  .ch-subsubmenu a {
+    padding: 0.7rem 2rem;
+    font-size: 0.9rem;
     text-align: center;
     border-bottom: 1px solid rgba(255, 255, 255, 0.03);
   }

@@ -21,6 +21,8 @@
 | [005](005-category-gap-analysis-v2.md) | カテゴリギャップ分析 v2（56 ルート） | direction | 004 | DONE（分析完了） |
 | [006](006-platform-roadmap-v2.md) | プラットフォーム拡張ロードマップ v2 | direction | 004, 005 | DONE（方向性定義完了） |
 | 007 | Phase 1 鮮度基盤（F-1 ページレジストリ + F-2 What's New） | build | 006 | **DONE**（2026-07-13 実装完了。下記「Phase 1 実装結果」参照） |
+| [008](008-nav-regrouping-f4.md) | Phase 2 F-4' ナビ再グルーピング（18 → 7 項目・registry からの導出） | build | 006, 007 | **DONE**（2026-07-14 実装完了。下記「Phase 2 実装結果」参照） |
+| [009](009-phase3-cross-navigation.md) | Phase 3 横断導線（F-3' RSS / F-7 関連リンク / F-5 タグ・横断検索） | build | 006, 008 | **DONE**（2026-07-14 実装完了。下記「Phase 3 実装結果」参照） |
 
 Status 値: TODO / IN PROGRESS / DONE / BLOCKED（理由 1 行） / REJECTED（理由 1 行） / STALE（置換先を明記）
 
@@ -36,8 +38,41 @@ Status 値: TODO / IN PROGRESS / DONE / BLOCKED（理由 1 行） / REJECTED（�
 - `.claude/skills/monthly-update/SKILL.md` §4.5 — F-2'：月次確認で `lastReviewed` を書き戻す運用を確立
 - テスト 1040 件 全 Green（契約テスト 44 件追加）
 
-**次は Phase 2（F-4' ナビ再グルーピング）**。着手前に 006 §2.2 のグルーピング案のユーザー承認が必要。
-registry の `group` フィールドには 8 グループ体系を先行投入済みのため、ナビ側の差し替えのみで済む。
+## Phase 2 実装結果（2026-07-14）
+
+006 §3 の Phase 2（F-4'）を [008](008-nav-regrouping-f4.md) として実装済み。**ナビのトップレベルを 18 → 7 項目へ集約**し、
+`nav-links.ts` の 170 行の手書きデータを廃止して page-registry からの導出に置き換えた。
+
+- `web-next/lib/nav-taxonomy.ts`（新規）— グループの並び順とネスト対象の SSoT
+- `web-next/lib/page-registry.ts` — `category`（ナビ 2 段目ラベル）を追加、`group` を Zod enum 化。
+  **`group` の値そのものは 1 件も変更していない**（Phase 1 の投入時点で正しかった）
+- `web-next/components/site/nav-links.ts` — `buildNavLinks(pageRegistry)` による導出。
+  未知 group / category 欠落は silent drop せず throw（ページがナビから消えるのを防ぐ）
+- `SiteHeader` / `SiteHeaderClient` / `globals.css` — Providers のみ 2 段ネスト
+  （デスクトップは右フライアウト、モバイルはアコーディオン）
+- **registry ⇔ ナビの全単射を契約テストで固定**（`tests/nav-derivation.test.ts`）。
+  以後、ページを追加したのにナビへ載せ忘れる事故が機械検知される
+- URL は不変（006 §2.1 の C 案）。`app/**/page.tsx` と `netlify.toml` は未編集
+- テスト 1064 件 全 Green
+
+## Phase 3 実装結果（2026-07-14）
+
+006 §3 の Phase 3（F-3' / F-7 / F-5）を [009](009-phase3-cross-navigation.md) として実装済み。
+003 §1 が挙げた 3 差分のうち最後まで残っていた「横断導線がない」を解消し、
+**RSS（購読）・関連リンク（回遊）・検索（直接到達）** の 3 導線をすべて page-registry からの導出で追加した。
+
+- `web-next/app/rss.xml/route.ts`（新規）— Route Handler + `force-static` で `out/rss.xml` を静的生成。
+  addedAt 降順 20 件。`escapeXml` は純粋関数として export しユニットテスト
+- `web-next/lib/related-pages.ts` + `components/site/RelatedPages.tsx`（新規）— topics の共有数でスコアし、
+  同一 group → addedAt 降順 → slug 昇順の 4 段タイブレークで順序を一意化。共有 0 件は除外（無関係なリンクを出さない）。
+  `layout.tsx` に 1 箇所マウントし 55 ページの page.tsx は未編集
+- `web-next/lib/search.ts` + `app/search/`（新規）— **外部依存を追加しない自前検索**。NFKC 正規化 + 全トークン AND。
+  タグは `/tags/[tag]` を作らず `/search` に集約し、`?q=` / `?tag=` で状態を共有
+- `web-next/lib/nav-taxonomy.ts` — 「検索」をフラットリンクとして What's New の直前に追加（トップレベル 7 → 8）
+- registry は 59 エントリ。全単射テストが 59 件で Green
+- テスト 1112 件 全 Green（ファインチューニングガイドの契約テスト6件を追加）
+
+**C-12 AIガバナンスは完了**（2026-07-17、`/governance/ai-governance`）。次は Phase 4 コンテンツ（C-10 オーケストレーション / C-11 SDD）、または F-6（EN 展開）の要否判断。
 
 ## 依存関係
 
@@ -50,8 +85,10 @@ registry の `group` フィールドには 8 グループ体系を先行投入�
 
 1. ~~`plan F-1 ページレジストリと最終確認日表示の導入`~~ → **DONE**（2026-07-13）
 2. ~~`plan F-2 What's New ページの静的生成 + monthly-update との lastReviewed 接続`~~ → **DONE**（2026-07-13）
-3. `plan F-4' ナビ再グルーピング（17 → 8 項目・2 段ネスト化）の design spike`（着手前にグルーピング案のユーザー承認必須）
-4. Phase 4 コンテンツ（C-10 オーケストレーション / C-11 SDD）は Phase 1 完了済みのため着手可能
+3. ~~`plan F-4' ナビ再グルーピング`~~ → **DONE**（2026-07-14 / [008](008-nav-regrouping-f4.md)。実測 18 → 7 項目）
+4. ~~`plan F-3' RSS フィード（registry から生成）`~~ → **DONE**（2026-07-14 / [009](009-phase3-cross-navigation.md)）
+5. ~~`plan F-7 関連ページリンク（registry の topics 近接から導出）`~~ → **DONE**（2026-07-14 / [009](009-phase3-cross-navigation.md)。F-5 横断検索も同プランで完了）
+6. Phase 4 コンテンツの C-10 オーケストレーション / C-11 SDD は Phase 1 完了済みのため着手可能。C-12 AIガバナンスは **DONE**（2026-07-17、`/governance/ai-governance`）。C-13 ファインチューニングは **DONE**（2026-07-16）
 
 ## 検討済み・不採用（re-audit 防止）
 
@@ -59,6 +96,8 @@ registry の `group` フィールドには 8 グループ体系を先行投入�
 - **CMS / DB 導入**: pure SSG + Git 管理の強みを放棄する理由がない（006 §6）
 - **音声・リアルタイムエージェントの新カテゴリ**: Multimodal 既存ページへの追記で対応（005 GAP-14）
 - **1 ページ規模の新カテゴリ新設**: 005 §4 の判断基準 D-1〜D-3 を満たす場合のみ許可
+- **openclaw を Security（運用・品質）へ移設**（006 §2.2 の案）: **不採用**（2026-07-14, 008 設計判断 3）。エージェントを安全に「作る」ためのガイドであり読者は Agent 開発から探す。横断性は `topics: ["agent","security","guide"]` が既に表現しており、その活用は F-5 / F-7 の担当
+- **全グループの 2 段ネスト化**: **不採用**（2026-07-14, 008 設計判断 2）。CI/CD・Git Worktree・RAG など 1 ページのカテゴリで 3 段ホバーが生じ、STATE-06 の「1 リンクのみのカテゴリ」問題が階層を変えて再発する。2 段ネストは Providers（30 リンク）のみ
 - ~~マルチモーダル / RAG 独立カテゴリの不採用~~ → **2026-07-08 前後のユーザー判断で採用・実装済みへ決定変更**（004 §3）
 
 ## 制約メモ（全プラン共通）

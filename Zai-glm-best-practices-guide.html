@@ -1,0 +1,2121 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Z.ai (GLM) LLM ベストプラクティスガイド</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css"
+    />
+    <style>
+      :root {
+        --color-background-primary: #0b0b0f;
+        --color-background-secondary: #131318;
+        --color-background-tertiary: #1b1b22;
+        --color-background-info: #10182a;
+        --color-background-danger: #211014;
+        --color-background-success: #0e1a16;
+        --color-background-warning: #211a0d;
+        --color-text-primary: #e8e8ee;
+        --color-text-secondary: #c0c0d0;
+        --color-text-tertiary: #aeaec1;
+        --color-text-info: #7aa2f7;
+        --color-text-danger: #f7768e;
+        --color-text-success: #9ece6a;
+        --color-text-warning: #e0af68;
+        --color-border-primary: #2b2b34;
+        --color-border-secondary: #232329;
+        --color-border-tertiary: #1c1c23;
+        --font-sans:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Kaku Gothic ProN',
+          'Noto Sans JP', 'Yu Gothic', sans-serif;
+        --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+        --border-radius-md: 8px;
+        --border-radius-lg: 12px;
+        --border-radius-xl: 16px;
+        --c-purple-400: #a48cf0;
+        --c-purple-500: #8b6cf0;
+        --c-purple-600: #7350d6;
+        --c-teal-400: #3ecfc0;
+        --c-teal-500: #22b8a8;
+        --c-coral-400: #f0916a;
+        --c-pink-400: #e888b3;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--color-background-primary);
+        color: var(--color-text-primary);
+        font-family: var(--font-sans);
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 1.7;
+      }
+      a {
+        color: var(--c-teal-400);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      code {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        background: var(--color-background-tertiary);
+        border: 1px solid var(--color-border-tertiary);
+        border-radius: 4px;
+        padding: 2px 6px;
+        color: var(--c-teal-400);
+      }
+      pre {
+        background: var(--color-background-secondary);
+        border: 1px solid var(--color-border-primary);
+        border-radius: var(--border-radius-md);
+        padding: 16px 18px;
+        overflow-x: auto;
+        font-size: 13px;
+        line-height: 1.6;
+      }
+      pre code {
+        background: none;
+        border: none;
+        padding: 0;
+        color: var(--color-text-primary);
+      }
+      .layout {
+        display: flex;
+        min-height: 100vh;
+      }
+      .sidebar {
+        width: 280px;
+        flex-shrink: 0;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+        background: var(--color-background-secondary);
+        border-right: 1px solid var(--color-border-primary);
+        padding: 24px 16px 40px;
+      }
+      .sidebar .brand {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--color-text-tertiary);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        padding: 0 8px 16px;
+        border-bottom: 1px solid var(--color-border-tertiary);
+        margin-bottom: 12px;
+      }
+      .sidebar nav a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 8px;
+        border-radius: var(--border-radius-md);
+        color: var(--color-text-secondary);
+        font-size: 13.5px;
+        font-weight: 400;
+      }
+      .sidebar nav a:hover {
+        background: var(--color-background-tertiary);
+        text-decoration: none;
+        color: var(--color-text-primary);
+      }
+      .sidebar nav a i {
+        font-size: 16px;
+        color: var(--c-purple-400);
+        width: 18px;
+        text-align: center;
+      }
+      .sidebar nav .num {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--color-text-tertiary);
+        width: 18px;
+      }
+      .content {
+        flex: 1;
+        min-width: 0;
+        padding: 48px 56px 120px;
+      }
+      .hero {
+        border-bottom: 1px solid var(--color-border-primary);
+        padding-bottom: 32px;
+        margin-bottom: 40px;
+      }
+      .hero .eyebrow {
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--c-teal-400);
+        margin-bottom: 10px;
+      }
+      h1 {
+        font-size: 22px;
+        font-weight: 500;
+        margin: 0 0 12px;
+        color: var(--color-text-primary);
+      }
+      h2 {
+        font-size: 18px;
+        font-weight: 500;
+        margin: 56px 0 16px;
+        padding-top: 24px;
+        border-top: 1px solid var(--color-border-tertiary);
+        color: var(--color-text-primary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      h2 .sec-num {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        color: var(--c-purple-400);
+        font-weight: 500;
+      }
+      h3 {
+        font-size: 16px;
+        font-weight: 500;
+        margin: 28px 0 12px;
+        color: var(--color-text-primary);
+      }
+      h4 {
+        font-size: 14px;
+        font-weight: 500;
+        margin: 20px 0 8px;
+        color: var(--color-text-secondary);
+      }
+      p {
+        margin: 0 0 14px;
+        color: var(--color-text-primary);
+      }
+      ul,
+      ol {
+        margin: 0 0 14px;
+        padding-left: 22px;
+      }
+      li {
+        margin-bottom: 6px;
+      }
+      .lead {
+        font-size: 16px;
+        color: var(--color-text-secondary);
+        max-width: 760px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 16px 0 24px;
+        font-size: 13.5px;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 9px 12px;
+        border-bottom: 1px solid var(--color-border-tertiary);
+        vertical-align: top;
+      }
+      th {
+        color: var(--color-text-secondary);
+        font-weight: 500;
+        font-size: 12px;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        background: var(--color-background-secondary);
+        border-bottom: 1px solid var(--color-border-primary);
+      }
+      tr:hover td {
+        background: var(--color-background-secondary);
+      }
+      .callout {
+        display: flex;
+        gap: 12px;
+        padding: 14px 16px;
+        border-radius: var(--border-radius-md);
+        border: 1px solid var(--color-border-primary);
+        margin: 18px 0;
+        font-size: 14px;
+      }
+      .callout i {
+        font-size: 17px;
+        margin-top: 1px;
+      }
+      .callout.tip {
+        background: var(--color-background-success);
+        border-color: #1e3a2c;
+      }
+      .callout.tip i {
+        color: var(--color-text-success);
+      }
+      .callout.warn {
+        background: var(--color-background-warning);
+        border-color: #3a2e14;
+      }
+      .callout.warn i {
+        color: var(--color-text-warning);
+      }
+      .callout.info {
+        background: var(--color-background-info);
+        border-color: #1f2f4d;
+      }
+      .callout.info i {
+        color: var(--color-text-info);
+      }
+      .callout.danger {
+        background: var(--color-background-danger);
+        border-color: #3a1c22;
+      }
+      .callout.danger i {
+        color: var(--color-text-danger);
+      }
+      .callout div {
+        flex: 1;
+      }
+      .callout strong {
+        font-weight: 500;
+      }
+      .practice-box {
+        background: var(--color-background-secondary);
+        border: 1px solid var(--color-border-primary);
+        border-left: 3px solid var(--c-purple-500);
+        border-radius: var(--border-radius-md);
+        padding: 16px 18px;
+        margin: 18px 0;
+      }
+      .practice-box h4 {
+        margin-top: 0;
+        color: var(--c-purple-400);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .practice-box h4 i {
+        font-size: 15px;
+      }
+      .practice-box ul {
+        margin-bottom: 0;
+      }
+      .mermaid-wrap {
+        text-align: center;
+        margin: 22px 0;
+        padding: 18px;
+        background: var(--color-background-secondary);
+        border: 1px solid var(--color-border-primary);
+        border-radius: var(--border-radius-lg);
+        overflow-x: auto;
+      }
+      .mermaid-wrap svg {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+        overflow: visible;
+      }
+      .ref-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .ref-links li {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--color-border-tertiary);
+        font-size: 13.5px;
+      }
+      .ref-links .label {
+        color: var(--color-text-primary);
+        font-weight: 500;
+        min-width: 220px;
+      }
+      .ref-links .url {
+        color: var(--color-text-tertiary);
+        word-break: break-all;
+        text-align: right;
+      }
+      .ref-links a.url {
+        color: var(--c-teal-400);
+      }
+      .chip {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 11.5px;
+        background: var(--color-background-tertiary);
+        border: 1px solid var(--color-border-secondary);
+        border-radius: 4px;
+        padding: 2px 8px;
+        margin: 2px 4px 2px 0;
+        color: var(--color-text-secondary);
+      }
+      .chip.ok {
+        color: var(--color-text-success);
+        border-color: #1e3a2c;
+      }
+      .chip.rate {
+        color: var(--color-text-warning);
+        border-color: #3a2e14;
+      }
+      .chip.err {
+        color: var(--color-text-danger);
+        border-color: #3a1c22;
+      }
+      .verified {
+        font-size: 11.5px;
+        color: var(--color-text-tertiary);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin: 6px 0 22px;
+      }
+      .verified i {
+        color: var(--color-text-success);
+        font-size: 13px;
+      }
+      footer {
+        margin-top: 64px;
+        padding-top: 24px;
+        border-top: 1px solid var(--color-border-primary);
+        font-size: 12.5px;
+        color: var(--color-text-tertiary);
+      }
+      @media (max-width: 900px) {
+        .layout {
+          flex-direction: column;
+        }
+        .sidebar {
+          width: 100%;
+          height: auto;
+          position: relative;
+        }
+        .content {
+          padding: 32px 20px 80px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <nav class="sidebar">
+        <div class="brand">Z.ai GLM ガイド</div>
+        <nav>
+          <a href="#intro"><i class="ti ti-info-circle"></i><span>はじめに</span></a>
+          <a href="#s1"><span class="num">01</span><span>GLMモデルファミリー概要</span></a>
+          <a href="#s2"><span class="num">02</span><span>アカウント作成とAPIキー</span></a>
+          <a href="#s3"><span class="num">03</span><span>モデルを選ぶ</span></a>
+          <a href="#s4"><span class="num">04</span><span>呼び出し方法を選ぶ</span></a>
+          <a href="#s5"><span class="num">05</span><span>最初のAPIコール</span></a>
+          <a href="#s6"><span class="num">06</span><span>コアパラメータ</span></a>
+          <a href="#s7"><span class="num">07</span><span>推論モードの使い分け</span></a>
+          <a href="#s8"><span class="num">08</span><span>Streaming</span></a>
+          <a href="#s9"><span class="num">09</span><span>Function Calling</span></a>
+          <a href="#s10"><span class="num">10</span><span>Structured Output</span></a>
+          <a href="#s11"><span class="num">11</span><span>Context Caching</span></a>
+          <a href="#s12"><span class="num">12</span><span>エラーハンドリング</span></a>
+          <a href="#s13"><span class="num">13</span><span>料金体系とコスト最適化</span></a>
+          <a href="#s14"><span class="num">14</span><span>GLM Coding Plan</span></a>
+          <a href="#s15"><span class="num">15</span><span>セキュリティ</span></a>
+          <a href="#s16"><span class="num">16</span><span>チェックリスト</span></a>
+          <a href="#s17"><span class="num">17</span><span>参考URLまとめ</span></a>
+        </nav>
+      </nav>
+
+      <main class="content">
+        <div class="hero" id="intro">
+          <div class="eyebrow">Z.ai (GLM) LLM ベストプラクティスガイド</div>
+          <h1>初学者向けステップバイステップ解説</h1>
+          <p class="lead">
+            これから Z.ai の GLM モデル API
+            を触り始めるエンジニア向けに、アカウント作成から本番運用のエラーハンドリング・コスト最適化までを順を追って解説する。全項目は
+            2026年7月16日時点で docs.z.ai / z.ai
+            の公式ドキュメントを直接確認し、内容を検証済みである。
+          </p>
+          <div class="verified">
+            <i class="ti ti-circle-check"></i>公式ドキュメント docs.z.ai / z.ai
+            を直接確認して作成(2026年7月16日時点)
+          </div>
+        </div>
+        <section id="s1">
+          <h2><span class="sec-num">01</span>Z.aiとGLMモデルファミリーの概要</h2>
+          <p>
+            Z.ai(旧 Zhipu AI)は GLM(General Language Model)シリーズを開発する AI
+            企業で、コンシューマー向けの Z Chat と、開発者向けの API 基盤である
+            <strong>Z.AI Open Platform</strong> の両方を提供している。2026年7月時点の旗艦モデルは
+            <strong>GLM-5.2</strong>
+            であり、1M(100万)トークンという実用レベルのコンテキスト長と、長時間タスク(long-horizon
+            task)を安定して遂行できる点を最大の特徴として打ち出している。GLM-5.2
+            は要件定義からデプロイ可能な成果物までの開発ワークフロー全体を、単一タスクの中で完結させることを狙って設計されたモデルである。
+          </p>
+
+          <table>
+            <tr>
+              <th>モデル</th>
+              <th>位置づけ</th>
+              <th>コンテキスト長</th>
+              <th>最大出力</th>
+            </tr>
+            <tr>
+              <td><code>glm-5.2</code></td>
+              <td>最新の旗艦モデル。長時間タスク・エージェント型コーディングに最適化</td>
+              <td>1M トークン</td>
+              <td>128K(=131,072)トークン</td>
+            </tr>
+            <tr>
+              <td><code>glm-5.1</code> / <code>glm-5</code> / <code>glm-5-turbo</code></td>
+              <td>汎用の上位モデル群</td>
+              <td>〜128K程度</td>
+              <td>最大131,072</td>
+            </tr>
+            <tr>
+              <td><code>glm-4.7</code> / <code>glm-4.6</code></td>
+              <td>バランス型の実用モデル。GLM-4.7は既定でthinkingが有効</td>
+              <td>〜128K</td>
+              <td>最大131,072</td>
+            </tr>
+            <tr>
+              <td><code>glm-4.5</code> 系(Air/X/AirX含む)</td>
+              <td>コスト効率重視のバランス型</td>
+              <td>〜128K</td>
+              <td>最大98,304</td>
+            </tr>
+            <tr>
+              <td><code>glm-4.5-flash</code> / <code>glm-4.7-flash</code></td>
+              <td>無料枠モデル。軽量タスク・プロトタイピング向け</td>
+              <td>-</td>
+              <td>65,536〜98,304</td>
+            </tr>
+            <tr>
+              <td><code>glm-5v-turbo</code> / <code>glm-4.6v</code> / <code>glm-4.5v</code></td>
+              <td>ビジョン(画像・動画理解)モデル</td>
+              <td>-</td>
+              <td>16,384〜131,072</td>
+            </tr>
+            <tr>
+              <td><code>glm-ocr</code></td>
+              <td>文書レイアウト解析・OCR特化</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+          </table>
+
+          <div class="callout info">
+            <i class="ti ti-clock"></i>
+            <div>
+              <strong>公式ベンチマーク上の位置づけ:</strong> GLM-5.2 は Terminal-Bench 2.1 で
+              81.0(GLM-5.1 の 62.0 から大幅向上)、SWE-bench Pro で 62.1
+              を記録し、オープンソースモデルの中で最上位、Claude Opus 4.8
+              とも僅差の水準にあると公式モデルガイドで報告されている。数値は自社ベンチマークであり、実運用での体感とは異なりうる点に留意する。
+            </div>
+          </div>
+
+          <p>以下は、これから解説する開発フロー全体を俯瞰したフローチャートである。</p>
+
+          <div class="mermaid-wrap">
+            <pre class="mermaid">
+flowchart TD
+    A["Z.AI Open Platformにアクセス"] --> B["アカウント登録・ログイン"]
+    B --> C["Billingページで残高をチャージ"]
+    C --> D["API Keyを発行"]
+    D --> E["タスクに合うモデルを選択"]
+    E --> F["呼び出し方法を選択(HTTP / SDK)"]
+    F --> G["パラメータを設計(thinking, max_tokens等)"]
+    G --> H["最初のAPIコールを実行"]
+    H --> I{"成功したか?"}
+    I -->|"Yes"| J["Streaming・Function Calling等を追加"]
+    I -->|"No"| K["エラーコードを確認して対処"]
+    K --> H
+    J --> L["本番運用: キャッシュ・レート制限対策"]
+  </pre
+            >
+          </div>
+
+          <p class="lead" style="font-size: 13px">
+            参考:
+            <a href="https://z.ai/model-api" target="_blank" rel="noopener noreferrer">Z.AI Open Platform トップページ</a> /
+            <a href="https://docs.z.ai/guides/llm/glm-5.2" target="_blank" rel="noopener noreferrer">GLM-5.2 モデルガイド</a>
+            /
+            <a href="https://docs.z.ai/guides/overview/quick-start" target="_blank" rel="noopener noreferrer"
+              >クイックスタート</a
+            >
+          </p>
+        </section>
+        <section id="s2">
+          <h2><span class="sec-num">02</span>アカウント作成とAPIキー発行</h2>
+          <p>Z.ai公式クイックスタートに沿った手順は次の4段階である。</p>
+
+          <div class="mermaid-wrap">
+            <pre class="mermaid">
+flowchart LR
+    A["1. Z.AI Open Platformで登録/ログイン"] --> B["2. Billingページで残高をチャージ"]
+    B --> C["3. API Keys管理画面でキーを作成"]
+    C --> D["4. キーをコピーして安全に保管"]
+  </pre
+            >
+          </div>
+
+          <ol>
+            <li>
+              <strong
+                ><a href="https://z.ai/model-api" target="_blank" rel="noopener noreferrer">Z.AI Open Platform</a></strong
+              >
+              にアクセスし、登録またはログインする。
+            </li>
+            <li>
+              必要に応じて
+              <strong
+                ><a href="https://z.ai/manage-apikey/billing" target="_blank" rel="noopener noreferrer"
+                  >Billingページ</a
+                ></strong
+              >
+              で残高をチャージする(従量課金のため、事前チャージが必要な場合がある)。
+            </li>
+            <li>
+              <strong
+                ><a href="https://z.ai/manage-apikey/apikey-list" target="_blank" rel="noopener noreferrer"
+                  >API Keys管理ページ</a
+                ></strong
+              >
+              で新しいAPIキーを作成する。
+            </li>
+            <li>
+              発行されたキーをコピーし、環境変数やシークレット管理サービスに保存する(コードに直書きしない)。
+            </li>
+          </ol>
+
+          <div class="practice-box">
+            <h4><i class="ti ti-bulb"></i>ベストプラクティス</h4>
+            <ul>
+              <li>
+                APIキーはリポジトリにコミットせず、<code>.env</code> ファイルや
+                <code>ZAI_API_KEY</code> のような環境変数として管理する。
+              </li>
+              <li>
+                ブラウザなどクライアントサイドのコードにキーを埋め込まない。呼び出しは必ずサーバー側で行う。
+              </li>
+              <li>
+                キーはいつでも無効化・再発行できるため、漏えいの疑いがある場合は速やかに管理画面から失効させる。
+              </li>
+            </ul>
+          </div>
+
+          <p class="lead" style="font-size: 13px">
+            参考:
+            <a href="https://docs.z.ai/guides/overview/quick-start" target="_blank" rel="noopener noreferrer"
+              >クイックスタート: Get API Key</a
+            >
+          </p>
+        </section>
+
+        <section id="s3">
+          <h2><span class="sec-num">03</span>モデルを選ぶ</h2>
+          <p>タスクの性質によって最適なモデルは異なる。以下の判断フローを目安にするとよい。</p>
+
+          <div class="mermaid-wrap">
+            <pre class="mermaid">
+flowchart TD
+    A["タスクの性質を確認"] --> B{"複雑な推論や長時間の\nエージェント型タスクか?"}
+    B -->|"Yes"| C["GLM-5.2\n(1Mコンテキスト, reasoning_effort=max)"]
+    B -->|"No"| D{"コストを最優先したいか?"}
+    D -->|"Yes"| E["GLM-4.5-Flash / GLM-4.7-Flash\n(無料枠)"]
+    D -->|"No"| F{"画像や動画の理解が必要か?"}
+    F -->|"Yes"| G["GLM-5V-Turbo / GLM-4.6V"]
+    F -->|"No"| H["GLM-5.1 / GLM-4.6 / GLM-4.7\n(汎用バランス型)"]
+  </pre
+            >
+          </div>
+
+          <p>
+            GLM-5.2
+            は、プロジェクト全体のコードベース理解、長期リファクタリング、実機デバッグ、研究論文の再現実装など、複数ステップにわたる開発ワークフローを1タスクで完結させることを想定して設計されている。一方、軽量なQ&Aや定型処理では、無料枠のFlash系モデルや廉価なGLM-4.5-Airのほうがコスト効率がよい。
+          </p>
+
+          <div class="practice-box">
+            <h4><i class="ti ti-bulb"></i>ベストプラクティス</h4>
+            <ul>
+              <li>
+                まず廉価モデルで動作検証し、精度が不足する場合のみ上位モデルへ切り替える「段階的アップグレード」が費用対効果に優れる。
+              </li>
+              <li>
+                ビジョン系タスク(画像・動画・OCR)は専用のVLM(Vision-Language
+                Model)を使う。テキスト専用モデルに画像を渡しても処理できない。
+              </li>
+              <li>
+                モデルコードは大文字小文字を区別しないが、公式ドキュメントの表記(例:
+                <code>glm-5.2</code>)にそろえておくと混乱がない。
+              </li>
+            </ul>
+          </div>
+
+          <p class="lead" style="font-size: 13px">
+            参考:
+            <a href="https://docs.z.ai/guides/llm/glm-5.2" target="_blank" rel="noopener noreferrer">GLM-5.2 モデルガイド</a>
+            /
+            <a href="https://docs.z.ai/guides/overview/pricing" target="_blank" rel="noopener noreferrer"
+              >Pricing(モデル一覧)</a
+            >
+            /
+            <a href="https://docs.z.ai/guides/overview/migrate-to-glm-new" target="_blank" rel="noopener noreferrer"
+              >Migrate to GLM-5.2</a
+            >
+          </p>
+        </section>
+
+        <section id="s4">
+          <h2><span class="sec-num">04</span>呼び出し方法(SDK/HTTP)を選ぶ</h2>
+          <p>Z.ai は複数の統合方法を公式に提供している。既存のスタックに合わせて選択する。</p>
+
+          <table>
+            <tr>
+              <th>方式</th>
+              <th>特徴</th>
+              <th>向いているケース</th>
+            </tr>
+            <tr>
+              <td>HTTP API(REST)</td>
+              <td>言語非依存。<code>curl</code>や任意のHTTPクライアントから利用可能</td>
+              <td>言語を問わない汎用統合、簡易検証</td>
+            </tr>
+            <tr>
+              <td>公式 Python SDK(<code>zai-sdk</code>)</td>
+              <td>型ヒント完備、async対応</td>
+              <td>Pythonでの本格開発</td>
+            </tr>
+            <tr>
+              <td>公式 Java SDK(<code>zai-sdk</code>)</td>
+              <td>高並列・高可用性設計</td>
+              <td>Javaでの本格開発</td>
+            </tr>
+            <tr>
+              <td>OpenAI互換 SDK(Python/Node.js)</td>
+              <td>既存のOpenAI用コードを<code>base_url</code>変更のみで移行可能</td>
+              <td>OpenAI SDKから移行したい場合</td>
+            </tr>
+          </table>
+
+          <h3>エンドポイントの使い分け</h3>
+          <p>Z.aiには契約プランに応じて複数のベースURLが存在する点に注意が必要である。</p>
+
+          <table>
+            <tr>
+              <th>API種別</th>
+              <th>ベースURL</th>
+              <th>用途</th>
+            </tr>
+            <tr>
+              <td>一般API(Pay-as-you-go)</td>
+              <td><code>https://api.z.ai/api/paas/v4/</code></td>
+              <td>通常のアプリケーション開発(Chat Completions等)</td>
+            </tr>
+            <tr>
+              <td>GLM Coding Plan(OpenAI互換)</td>
+              <td><code>https://api.z.ai/api/coding/paas/v4/</code></td>
+              <td>Cline / OpenCode / Kilo Code などOpenAI互換ツール連携</td>
+            </tr>
+            <tr>
+              <td>GLM Coding Plan(Anthropic互換)</td>
+              <td><code>https://api.z.ai/api/anthropic</code></td>
+              <td>Claude Code 専用。<code>ANTHROPIC_BASE_URL</code>にこのURLを設定して利用</td>
+            </tr>
+          </table>
+
+          <div class="callout warn">
+            <i class="ti ti-alert-triangle"></i>
+            <div>
+              一般APIのキーをCoding
+              Plan用エンドポイントに向けてしまう、あるいはその逆といった設定ミスは、実運用でよく見られる接続エラーの原因である。契約しているプラン・利用ツールに応じて正しいベースURLを選ぶこと。
+            </div>
+          </div>
+
+          <p class="lead" style="font-size: 13px">
+            参考:
+            <a href="https://docs.z.ai/guides/overview/quick-start" target="_blank" rel="noopener noreferrer"
+              >クイックスタート: Choose the Calling Method</a
+            >
+            /
+            <a href="https://github.com/zai-org/z-ai-sdk-python" target="_blank" rel="noopener noreferrer"
+              >Python SDK (GitHub)</a
+            >
+            /
+            <a href="https://docs.z.ai/guides/develop/openai/python" target="_blank" rel="noopener noreferrer"
+              >OpenAI互換SDK連携ガイド</a
+            >
+            /
+            <a href="https://docs.z.ai/devpack/quick-start" target="_blank" rel="noopener noreferrer"
+              >Coding Plan Quick Start</a
+            >
+          </p>
+        </section>
+        <section id="s5">
+          <h2><span class="sec-num">05</span>最初のAPIコール</h2>
+          <p>以下は Python の公式SDK(<code>zai-sdk</code>)を使った最小構成の例である。</p>
+
+          <pre><code>pip install zai-sdk</code></pre>
+
+          <pre><code>from zai import ZaiClient
+
+client = ZaiClient(api_key="YOUR_API_KEY")
+
+response = client.chat.completions.create(
+    model="glm-5.2",
+    messages=[
+        {"role": "system", "content": "あなたは有能なアシスタントです。"},
+        {"role": "user", "content": "自己紹介をしてください。"},
+    ],
+)
+
+print(response.choices[0].message.content)</code></pre>
+
+          <p>
+            OpenAI
+            SDKからの移行を考えているなら、<code>base_url</code>を変更するだけで既存コードをほぼ流用できる。
+          </p>
+
+          <pre><code>from openai import OpenAI
+
+client = OpenAI(
+    api_key="YOUR_ZAI_API_KEY",
+    base_url="https://api.z.ai/api/paas/v4/",
+)
+
+completion = client.chat.completions.create(
+    model="glm-5.2",
+    messages=[{"role": "user", "content": "こんにちは"}],
+)
+print(completion.choices[0].message.content)</code></pre>
+
+          <p>
+            GLM-5.2で複雑な推論を行わせる場合は、<code>thinking</code>と<code>reasoning_effort</code>を明示的に指定する構成が公式ガイドでも例示されている(詳細は第7章)。
+          </p>
+
+          <pre><code>response = client.chat.completions.create(
+    model="glm-5.2",
+    messages=[{"role": "user", "content": "この設計案のトレードオフを整理して"}],
+    thinking={"type": "enabled"},
+    reasoning_effort="max",
+    max_tokens=32000,
+)</code></pre>
+
+          <div class="practice-box">
+            <h4><i class="ti ti-bulb"></i>ベストプラクティス</h4>
+            <ul>
+              <li>
+                本番運用ではタイムアウトとリトライ回数を明示的に設定する(<code>timeout</code>,
+                <code>max_retries</code
+                >など)。デフォルト値のまま長時間ジョブを投げると、ネットワーク瞬断で処理全体が失敗するリスクがある。
+              </li>
+              <li>
+                例外処理では、SDKが提供する<code>APIStatusError</code> /
+                <code>APITimeoutError</code
+                >を個別にキャッチし、第12章のエラーコード表と対応させてハンドリングする。
+              </li>
+            </ul>
+          </div>
+
+          <p class="lead" style="font-size: 13px">
+            参考:
+            <a href="https://docs.z.ai/guides/overview/quick-start" target="_blank" rel="noopener noreferrer"
+              >クイックスタート: Make API Call</a
+            >
+            /
+            <a href="https://docs.z.ai/guides/llm/glm-5.2" target="_blank" rel="noopener noreferrer">GLM-5.2 Quick Start</a> /
+            <a href="https://github.com/zai-org/z-ai-sdk-python" target="_blank" rel="noopener noreferrer"
+              >Python SDK (GitHub)</a
+            >
+          </p>
+        </section>
+
+        <section id="s6">
+          <h2><span class="sec-num">06</span>コアパラメータのベストプラクティス</h2>
+          <p>GLMモデルの出力品質・コスト・速度は、以下のパラメータの組み合わせで大きく変わる。</p>
+
+          <table>
+            <tr>
+              <th>パラメータ</th>
+              <th>型</th>
+              <th>デフォルト</th>
+              <th>役割</th>
+            </tr>
+            <tr>
+              <td><code>do_sample</code></td>
+              <td>Boolean</td>
+              <td><code>true</code></td>
+              <td>サンプリングの有無。<code>false</code>で決定論的出力</td>
+            </tr>
+            <tr>
+              <td><code>temperature</code></td>
+              <td>Float</td>
+              <td>モデル依存</td>
+              <td>出力のランダム性。低いほど堅実、高いほど多様</td>
+            </tr>
+            <tr>
+              <td><code>top_p</code></td>
+              <td>Float</td>
+              <td>モデル依存</td>
+              <td>Nucleus samplingによる多様性制御</td>
+            </tr>
+            <tr>
+              <td><code>max_tokens</code></td>
+              <td>Integer</td>
+              <td>モデル依存</td>
+              <td>1回の応答で生成する最大トークン数</td>
+            </tr>
+            <tr>
+              <td><code>stream</code></td>
+              <td>Boolean</td>
+              <td><code>false</code></td>
+              <td>ストリーミング出力の有効化</td>
+            </tr>
+            <tr>
+              <td><code>thinking</code></td>
+              <td>Object</td>
+              <td>モデル・エンドポイントにより異なる</td>
+              <td>Chain-of-Thought(深い推論)の有効/無効</td>
+            </tr>
+            <tr>
+              <td><code>reasoning_effort</code></td>
+              <td>String</td>
+              <td><code>max</code></td>
+              <td>GLM-5.2以降で推論の深さを段階制御</td>
+            </tr>
+          </table>
+
+          <div class="practice-box">
+            <h4><i class="ti ti-bulb"></i>ベストプラクティス</h4>
+            <ul>
+              <li>
+                事実確認や厳密な回答が必要な場面(要約・抽出・コード生成など)では<code>temperature</code>を低め(0.2前後)に設定する。創作・ブレインストーミングでは高め(0.8前後)にする。
+              </li>
+              <li>
+                <code>temperature</code
+                >と<code>top_p</code>は同時に調整しない。片方だけを動かすほうが挙動を予測しやすい。
+              </li>
+              <li>
+                チャットボットやコード生成のようなインタラクティブ用途では<code>stream=true</code>を強く推奨する。体感レイテンシが大幅に改善される。
+              </li>
+              <li>
+                <code>max_tokens</code
+                >は用途に応じて最小限に設定する。短い応答で十分な場合に大きすぎる値を設定すると、応答が冗長になりコストも増える。
+              </li>
+            </ul>
+          </div>
+
+          <h3>モデル別 max_tokens の目安(公式ドキュメント確認済み)</h3>
+          <table>
+            <tr>
+              <th>モデルコード</th>
+              <th>デフォルト max_tokens</th>
+              <th>最大 max_tokens</th>
+            </tr>
+            <tr>
+              <td>
+                <code>glm-5.2</code> / <code>glm-5.1</code> / <code>glm-5-turbo</code> /
+                <code>glm-5</code>
+              </td>
+              <td>65,536</td>
+              <td>131,072</td>
+            </tr>
+            <tr>
+              <td><code>glm-4.7</code> / <code>glm-4.6</code></td>
+              <td>65,536</td>
+              <td>131,072</td>
+            </tr>
+            <tr>
+              <td>
+                <code>glm-4.5</code> / <code>glm-4.5-air</code> / <code>glm-4.5-x</code> /
+                <code>glm-4.5-airx</code> / <code>glm-4.5-flash</code>
+              </td>
+              <td>65,536</td>
+              <td>98,304</td>
+            </tr>
+            <tr>
+              <td><code>glm-5v-turbo</code></td>
+              <td>16,384</td>
+              <td>131,072</td>
+            </tr>
+            <tr>
+              <td>
+                <code>glm-4.6v</code> / <code>glm-4.6v-flash</code> / <code>glm-4.6v-flashx</code>
+              </td>
+              <td>16,384</td>
+              <td>32,768</td>
+            </tr>
+            <tr>
+              <td><code>glm-4.5v</code></td>
+              <td>16,384</td>
+              <td>16,384</td>
+            </tr>
+            <tr>
+              <td><code>glm-4-32b-0414-128k</code></td>
+              <td>16,384</td>
+              <td>16,384</td>
+            </tr>
+          </table>
+
+          <p class="lead" style="font-size: 13px">
+            参考:
+            <a href="https://docs.z.ai/guides/overview/concept-param" target="_blank" rel="noopener noreferrer"
+              >Core Parameters</a
+            >
+          </p>
+        </section>
+        <section id="s7">
+          <h2><span class="sec-num">07</span>Deep Thinking(推論モード)の使い分け</h2>
+          <p>
+            GLM-4.5以降のモデルは、回答前に内部で段階的な思考(Chain-of-Thought)を行う「Deep
+            Thinking」機能を備えている。<code>thinking.type</code>で有効/無効を切り替え、GLM-5.2以降ではさらに<code>reasoning_effort</code>で思考の深さを段階的に制御できる。GLM-5.2/5.1/5/4.7系ではthinkingが既定で有効(モデルがタスクの難易度を見て思考の要否を自動判断)であるのに対し、GLM-4.6のようなハイブリッドモデルは既定で無効という違いがある点に注意する。
+          </p>
+
+          <table>
+            <tr>
+              <th><code>reasoning_effort</code>の値</th>
+              <th>挙動</th>
+            </tr>
+            <tr>
+              <td><code>max</code>(デフォルト・推奨)</td>
+              <td>最も深い推論。精度重視、コストと遅延は最大</td>
+            </tr>
+            <tr>
+              <td><code>xhigh</code></td>
+              <td>内部的に<code>max</code>として扱われる</td>
+            </tr>
+            <tr>
+              <td><code>high</code></td>
+              <td>拡張推論。精度とコストのバランス型</td>
+            </tr>
+            <tr>
+              <td><code>medium</code> / <code>low</code></td>
+              <td>内部的に<code>high</code>として扱われる</td>
+            </tr>
+            <tr>
+              <td><code>minimal</code> / <code>none</code></td>
+              <td>思考をスキップし、即座に応答を生成</td>
+            </tr>
+          </table>
+
+          <div class="mermaid-wrap">
+            <pre class="mermaid">
+flowchart LR
+    A["リクエスト受信"] --> B{"thinking.type"}
+    B -->|"enabled"| C{"reasoning_effort"}
+    B -->|"disabled"| D["即時応答(CoTなし)"]
+    C -->|"max または xhigh"| E["最大推論(高精度・高コスト)"]
+    C -->|"high, medium, low"| F["拡張推論(高相当にマップ)"]
+    C -->|"minimal または none"| D
+  </pre
+            >
+          </div>
+
+          <h3>マルチターンでの思考の扱い(Interleaved / Preserved Thinking)</h3>
+          <p>
+            公式ドキュメントでは、会話が複数ターンにわたる場合の思考内容の扱いについて2つの概念が説明されている。
+          </p>
+          <ul>
+            <li>
+              <strong>Interleaved thinking(会話間思考)</strong>:
+              前のターンの思考内容を後続ターンの入力コンテキストに含めるかどうかの制御。既定では前ターンの<code>reasoning_content</code>は次ターンへ引き継がれない。
+            </li>
+            <li>
+              <strong>Preserved thinking(思考の保持)</strong>:
+              <code>clear_thinking: false</code
+              >を指定すると、直前ターンの思考過程を保持したまま次のリクエストを送れる。一般API(Pay-as-you-goエンドポイント)では既定で無効、GLM
+              Coding Plan専用エンドポイントでは既定で有効という違いがある。
+            </li>
+          </ul>
+
+          <div class="practice-box">
+            <h4><i class="ti ti-bulb"></i>ベストプラクティス</h4>
+            <ul>
+              <li>
+                複雑な設計判断・数学的推論・長期のコーディングタスクには<code
+                  >thinking: {"type": "enabled"}</code
+                >と<code>reasoning_effort: "max"</code>を組み合わせる。
+              </li>
+              <li>
+                単純なFAQ応答や定型フォーマット変換のような軽量タスクでは<code
+                  >thinking: {"type": "disabled"}</code
+                >にして応答速度とコストを最適化する。
+              </li>
+              <li>
+                ストリーミング時は<code>delta.reasoning_content</code>と<code>delta.content</code>が別フィールドとして返るため、UI側で「思考中」と「回答」を分けて表示すると体験が向上する。
+              </li>
+              <li>
+                マルチターンのエージェント的なやり取りでは、Context
+                Cachingのヒット率を高めるために<code>clear_thinking</code>の設定を意図的にそろえるとよい(第11章参照)。
+              </li>
+              <li>
+                深い思考ほど出力トークン数(=課金対象)が増える。<code>max</code>は<code>high</code>に比べて出力トークンが大幅に増える傾向があるため、精度が本当に必要な場面に限定して使うとコストを抑えられる。
+              </li>
+            </ul>
+          </div>
+
+          <p class="lead" style="font-size: 13px">
+            参考:
+            <a href="https://docs.z.ai/guides/capabilities/thinking-mode" target="_blank" rel="noopener noreferrer"
+              >Deep Thinking / Thinking Mode</a
+            >
+            /
+            <a href="https://docs.z.ai/guides/overview/concept-param" target="_blank" rel="noopener noreferrer"
+              >Core Parameters</a
+            >
+          </p>
+        </section>
+
+        <section id="s8">
+          <h2><span class="sec-num">08</span>Streaming(ストリーミング応答)</h2>
+          <p>
+            ストリーミングは、生成が完了するのを待たずに逐次コンテンツを受け取る仕組みで、Server-Sent
+            Events(SSE)形式で送信される。チャットボットやコード生成のようなリアルタイム性が求められるUXでは必須の機能である。
+          </p>
+
+          <pre><code>response = client.chat.completions.create(
+    model="glm-5.2",
+    messages=[{"role": "user", "content": "春をテーマにした短い文章を書いて"}],
+    stream=True,
+)
+
+collected = ""
+for chunk in response:
+    if not chunk.choices:
+        continue
+    delta = chunk.choices[0].delta
+    if getattr(delta, "content", None):
+        collected += delta.content
+        print(delta.content, end="", flush=True)
+    if chunk.choices[0].finish_reason:
+        print(f"\n完了理由: {chunk.choices[0].finish_reason}")</code></pre>
+
+          <div class="practice-box">
+            <h4><i class="ti ti-bulb"></i>ベストプラクティス</h4>
+            <ul>
+              <li>
+                各チャンクの<code>choices[0].delta.content</code>を都度連結してUIに反映する。最後のチャンクにのみ<code>finish_reason</code>と<code>usage</code>(トークン使用量)が含まれる点に注意する。
+              </li>
+              <li>
+                ストリーミング中にAPIが異常終了した場合、通常のエラーコードではなく<code>finish_reason</code>フィールドに理由が格納される。ストリーミング処理では<code>finish_reason</code>の監視を必ず実装する。
+              </li>
+              <li>
+                Deep
+                Thinkingと併用する場合は<code>delta.reasoning_content</code>も同時に監視し、UIで思考過程と最終回答を区別する。
+              </li>
+              <li>
+                Function
+                Callingと組み合わせる場合、ツール呼び出し引数もストリーミングで分割配信されるため、JSON断片を正しく連結してからパースする。
+              </li>
+            </ul>
+          </div>
+
+          <p class="lead" style="font-size: 13px">
+            参考:
+            <a href="https://docs.z.ai/guides/capabilities/streaming" target="_blank" rel="noopener noreferrer"
+              >Streaming Messages</a
+            >
+          </p>
+        </section>
+        <section id="s9">
+          <h2><span class="sec-num">09</span>Function Calling(関数呼び出し)</h2>
+          <p>
+            Function
+            CallingはAIモデルが外部関数・APIを呼び出せるようにする仕組みで、天気取得・DB検索・計算・外部サービス連携などエージェント的な振る舞いを実現する基盤になる。
+          </p>
+
+          <div class="mermaid-wrap">
+            <pre class="mermaid">
+sequenceDiagram
+    participant U as "ユーザー"
+    participant App as "アプリケーション"
+    participant API as "Z.AI Chat Completions API"
+    participant Fn as "外部関数"
+
+    U->>App: "質問を送信"
+    App->>API: "messages + tools を送信"
+    API-->>App: "tool_calls を返却"
+    App->>Fn: "関数を実行(引数はJSON文字列)"
+    Fn-->>App: "実行結果を返却"
+    App->>API: "role='tool' で結果を追加送信"
+    API-->>App: "最終応答を生成"
+    App-->>U: "回答を表示"
+  </pre
+            >
+          </div>
+
+          <p>基本的な実装パターンは以下の通り。</p>
+
+          <pre><code>import json
+from zai import ZaiClient
+
+client = ZaiClient(api_key="YOUR_API_KEY")
+
+tools = [{
+    "type": "function",
+    "function": {
+        "name": "get_weather",
+        "description": "指定した都市の現在の天気情報を取得する",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "city": {"type": "string", "description": "都市名。例: 東京、大阪"}
+            },
+            "required": ["city"],
+        },
+    },
+}]
+
+messages = [{"role": "user", "content": "東京の天気は?"}]
+response = client.chat.completions.create(
+    model="glm-5.2", messages=messages, tools=tools, tool_choice="auto"
+)
+
+message = response.choices[0].message
+messages.append(message.model_dump())
+
+if message.tool_calls:
+    for call in message.tool_calls:
+        args = json.loads(call.function.arguments)
+        weather = {"city": args["city"], "temperature": "22C", "condition": "晴れ"}
+        messages.append({
+            "role": "tool",
+            "content": json.dumps(weather, ensure_ascii=False),
+            "tool_call_id": call.id,
+        })
+    final = client.chat.completions.create(model="glm-5.2", messages=messages, tools=tools)
+    print(final.choices[0].message.content)</code></pre>
+
+          <div class="practice-box">
+            <h4><i class="ti ti-bulb"></i>ベストプラクティス</h4>
+            <ul>
+              <li><strong>単一責任の原則</strong>: 1つの関数には1つの役割のみを持たせる。</li>
+              <li>
+                <strong>明確な命名と詳細な説明</strong>:
+                関数名・パラメータ名・descriptionは、モデルが誤解なく解釈できるよう具体的に書く(都市名の記入例を挙げるなど)。
+              </li>
+              <li>
+                <strong>入力検証を必ず行う</strong>:
+                関数呼び出しはコード実行を伴うため、SQLインジェクションや危険な文字列のフィルタリングなど、通常のバックエンド開発と同等のセキュリティ対策を実施する。
+              </li>
+              <li>
+                <strong>権限制御</strong>:
+                関数がDB操作やファイル操作を行う場合、呼び出し元ユーザーの権限チェックを関数内部で行う。
+              </li>
+              <li>
+                <strong>エラーを構造化して返す</strong>: 関数内部で例外が起きた場合も<code
+                  >{"success": false, "error": "...", "error_code": "..."}</code
+                >のような一貫した形式で返すと、モデルが後続の応答生成でエラー内容を適切に扱える。
+              </li>
+              <li>
+                <code>tool_choice</code>は現状<code>auto</code>のみのサポートである点に留意する。
+              </li>
+            </ul>
+          </div>
+
+          <p class="lead" style="font-size: 13px">
+            参考:
+            <a href="https://docs.z.ai/guides/capabilities/function-calling" target="_blank" rel="noopener noreferrer"
+              >Function Calling</a
+            >
+          </p>
+        </section>
+
+        <section id="s10">
+          <h2><span class="sec-num">10</span>Structured Output(構造化出力/JSONモード)</h2>
+          <p>
+            <code>response_format: {"type": "json_object"}</code
+            >を指定すると、モデルは自由文ではなく事前定義した構造に沿ったJSONを返すようになる。感情分析、情報抽出、レポート整形など、後続システムでパースする前提の処理に向いている。
+          </p>
+
+          <pre><code>import json
+from zai import ZaiClient
+
+client = ZaiClient(api_key="YOUR_API_KEY")
+
+schema_prompt = """
+以下のJSON形式で感情分析結果を返してください:
+{
+  "sentiment": "positive/negative/neutral",
+  "confidence": 0.95,
+  "keywords": ["キーワード1", "キーワード2"]
+}
+"""
+
+response = client.chat.completions.create(
+    model="glm-5.2",
+    messages=[
+        {"role": "system", "content": schema_prompt},
+        {"role": "user", "content": "今日は天気が良くて気分がいい!"},
+    ],
+    response_format={"type": "json_object"},
+)
+
+result = json.loads(response.choices[0].message.content)
+print(result["sentiment"], result["confidence"])</code></pre>
+
+          <p>
+            より厳密な検証が必要な場合は、<code>jsonschema</code>ライブラリでスキーマバリデーションを組み合わせるとよい。
+          </p>
+
+          <pre><code>from jsonschema import validate
+
+schema = {
+    "type": "object",
+    "properties": {
+        "sentiment": {"type": "string", "enum": ["positive", "negative", "neutral"]},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    },
+    "required": ["sentiment", "confidence"],
+}
+
+validate(instance=result, schema=schema)</code></pre>
+
+          <div class="practice-box">
+            <h4><i class="ti ti-bulb"></i>ベストプラクティス</h4>
+            <ul>
+              <li>スキーマは最初はシンプルに設計し、必要に応じて段階的に複雑化する。</li>
+              <li>
+                各フィールドに具体例(examples)や制約(enum,
+                minimum/maximumなど)を明記すると、モデルの出力精度が上がる。
+              </li>
+              <li>
+                モデル出力を必ず<code>json.loads</code>等でパースし、失敗時・スキーマ不一致時のフォールバック処理(簡易スキーマへの切り替え、再試行など)を用意する。
+              </li>
+              <li>
+                情報量が多すぎるJSON構造を一度に要求すると、モデルの追従性が落ちる場合がある。抽出対象が多い場合は複数回のリクエストに分割することも検討する。
+              </li>
+            </ul>
+          </div>
+
+          <p class="lead" style="font-size: 13px">
+            参考:
+            <a href="https://docs.z.ai/guides/capabilities/struct-output" target="_blank" rel="noopener noreferrer"
+              >Structured Output</a
+            >
+          </p>
+        </section>
+        <section id="s11">
+          <h2><span class="sec-num">11</span>Context Caching(コンテキストキャッシュ)</h2>
+          <p>
+            Context
+            Cachingは、システムプロンプトや会話履歴など繰り返し送信される内容を自動的に検知し、再計算を省略することでレイテンシとコストを削減する機能である。Z.aiでは<strong
+              >追加設定なしの暗黙的キャッシュ(Implicit Caching)</strong
+            >として実装されており、キャッシュヒット状況は応答の<code>usage.prompt_tokens_details.cached_tokens</code>フィールドで確認できる。
+          </p>
+
+          <div class="mermaid-wrap">
+            <pre class="mermaid">
+flowchart LR
+    A["安定したSystem Promptを先頭に配置"] --> B["可変部分(ユーザー入力)を末尾に配置"]
+    B --> C["リクエスト送信"]
+    C --> D{"先頭部分が\n過去のリクエストと一致?"}
+    D -->|"Yes"| E["cached_tokensとして低単価で課金"]
+    D -->|"No"| F["通常価格で処理し、新規キャッシュとして記録"]
+    E --> G["usage.prompt_tokens_details.cached_tokensで確認"]
+    F --> G
+  </pre
+            >
+          </div>
+
+          <pre><code>response = client.chat.completions.create(
+    model="glm-5.2",
+    messages=[...],
+)
+usage = response.usage
+print("total prompt tokens:", usage.prompt_tokens)
+print("cached tokens:", usage.prompt_tokens_details.cached_tokens)</code></pre>
+
+          <div class="practice-box">
+            <h4><i class="ti ti-bulb"></i>ベストプラクティス</h4>
+            <ul>
+              <li>
+                <strong>安定したプレフィックスを先頭に置く</strong>:
+                システムプロンプトや長文ドキュメントなど変化しない部分をメッセージの先頭に、ユーザーごとに変わる質問文を末尾に配置する。キャッシュは先頭からの一致度で判定されるため、この順序が極めて重要である。
+              </li>
+              <li>
+                <strong>同一システムプロンプトの使い回し</strong>:
+                マルチターン会話や、同じ指示文で複数タスクを処理するバッチ処理では、システムプロンプトを変更せず固定することでキャッシュ効率が最大化する。
+              </li>
+              <li>
+                <strong>長文ドキュメントをシステムメッセージ化</strong>:
+                同じ文書に対して複数の質問を行う場合、文書内容をシステムメッセージとして固定し、質問部分だけをユーザーメッセージとして変える設計にすると、文書部分がキャッシュされ大幅なコスト削減になる。
+              </li>
+              <li>
+                キャッシュされたトークンは通常価格より大幅に安い単価で課金される(第13章の料金表を参照)。GLM
+                Coding Planのようなエージェント型の連続呼び出しでは特に効果が大きい。
+              </li>
+            </ul>
+          </div>
+
+          <p class="lead" style="font-size: 13px">
+            参考:
+            <a href="https://docs.z.ai/guides/capabilities/cache" target="_blank" rel="noopener noreferrer"
+              >Context Caching</a
+            >
+          </p>
+        </section>
+
+        <section id="s12">
+          <h2><span class="sec-num">12</span>エラーハンドリングとレート制限対応</h2>
+          <p>
+            Z.aiのAPIエラーは「外側のHTTPステータスコード」と「内側のビジネスエラーコード」の二層構造になっている。
+          </p>
+
+          <pre><code>{
+  "error": {
+    "code": "1214",
+    "message": "Parameter `${field}` is invalid. Please check the documentation."
+  }
+}</code></pre>
+
+          <h3>主要なエラーコード一覧(公式APIリファレンス確認済み)</h3>
+          <table>
+            <tr>
+              <th>コード</th>
+              <th>HTTPステータス</th>
+              <th>内容</th>
+            </tr>
+            <tr>
+              <td>-</td>
+              <td><span class="chip err">500</span></td>
+              <td>Internal Error(内部エラー)</td>
+            </tr>
+            <tr>
+              <td>1000</td>
+              <td><span class="chip err">401</span></td>
+              <td>認証失敗</td>
+            </tr>
+            <tr>
+              <td>1001</td>
+              <td><span class="chip err">401</span></td>
+              <td>Header内に認証パラメータがなく認証不可</td>
+            </tr>
+            <tr>
+              <td>1003</td>
+              <td><span class="chip err">401</span></td>
+              <td>認証トークンの期限切れ。再発行が必要</td>
+            </tr>
+            <tr>
+              <td>1005</td>
+              <td><span class="chip err">401</span></td>
+              <td>二要素認証が必要</td>
+            </tr>
+            <tr>
+              <td>1113</td>
+              <td><span class="chip rate">429</span></td>
+              <td>残高不足またはリソースパッケージ未購入</td>
+            </tr>
+            <tr>
+              <td>1200</td>
+              <td><span class="chip err">400</span></td>
+              <td>リクエストパラメータの形式が不正</td>
+            </tr>
+            <tr>
+              <td>1210</td>
+              <td><span class="chip err">400</span></td>
+              <td>APIパラメータが不正</td>
+            </tr>
+            <tr>
+              <td>1211</td>
+              <td><span class="chip err">400</span></td>
+              <td>不明なモデル(モデルコードを要確認)</td>
+            </tr>
+            <tr>
+              <td>1212</td>
+              <td><span class="chip err">400</span></td>
+              <td>現在のモデルはこの呼び出し方法に非対応</td>
+            </tr>
+            <tr>
+              <td>1213</td>
+              <td><span class="chip err">400</span></td>
+              <td>必須パラメータが未指定</td>
+            </tr>
+            <tr>
+              <td>1214</td>
+              <td><span class="chip err">400</span></td>
+              <td>パラメータの値が不正</td>
+            </tr>
+            <tr>
+              <td>1215</td>
+              <td><span class="chip err">400</span></td>
+              <td>同時指定できないパラメータの組み合わせ</td>
+            </tr>
+            <tr>
+              <td>1220</td>
+              <td><span class="chip err">403</span></td>
+              <td>該当APIへのアクセス権限なし</td>
+            </tr>
+            <tr>
+              <td>1221 / 1222</td>
+              <td><span class="chip err">400</span></td>
+              <td>APIが廃止済み/存在しない</td>
+            </tr>
+            <tr>
+              <td>1230</td>
+              <td><span class="chip err">400</span></td>
+              <td>コンテンツがプラットフォームの利用規約に抵触</td>
+            </tr>
+            <tr>
+              <td>1234</td>
+              <td><span class="chip err">500</span></td>
+              <td>ネットワークエラー(一時的なもの)</td>
+            </tr>
+            <tr>
+              <td>1261</td>
+              <td><span class="chip err">400</span></td>
+              <td>プロンプトが長すぎる</td>
+            </tr>
+            <tr>
+              <td>1301</td>
+              <td><span class="chip err">400</span></td>
+              <td>入力または生成内容に安全性上の懸念を検知</td>
+            </tr>
+            <tr>
+              <td>1302</td>
+              <td><span class="chip rate">429</span></td>
+              <td>リクエストのレート制限に到達</td>
+            </tr>
+            <tr>
+              <td>1305</td>
+              <td><span class="chip rate">429</span></td>
+              <td>サービス側が一時的に過負荷状態</td>
+            </tr>
+            <tr>
+              <td>1308 / 1310</td>
+              <td><span class="chip rate">429</span></td>
+              <td>利用上限到達(リセット時刻まで待機が必要)</td>
+            </tr>
+            <tr>
+              <td>1309</td>
+              <td><span class="chip rate">429</span></td>
+              <td>GLM Coding Planの契約期限切れ</td>
+            </tr>
+            <tr>
+              <td>1311</td>
+              <td><span class="chip rate">429</span></td>
+              <td>現在のプランでは当該モデルに未対応</td>
+            </tr>
+            <tr>
+              <td>1313</td>
+              <td><span class="chip rate">429</span></td>
+              <td>Fair Usage Policy違反によるレート制限</td>
+            </tr>
+            <tr>
+              <td>1314〜1321</td>
+              <td><span class="chip rate">429</span> / <span class="chip err">400</span></td>
+              <td>
+                プラン別の詳細な利用制限(モデル別クォータ、同時実行数上限など)。詳細は公式一覧を参照
+              </td>
+            </tr>
+          </table>
+
+          <div class="mermaid-wrap">
+            <pre class="mermaid">
+flowchart TD
+    A["APIリクエスト送信"] --> B{"HTTPステータス"}
+    B -->|"200"| C["正常応答を処理"]
+    B -->|"401"| D["APIキー・認証情報を確認(1000/1001/1003)"]
+    B -->|"400"| E["パラメータを確認(1210〜1215)"]
+    B -->|"429"| F{"エラーコードで分岐"}
+    F -->|"1113 残高不足"| G["Billingページでチャージ"]
+    F -->|"1302 レート制限"| H["Exponential Backoffで再試行"]
+    F -->|"1308/1310 利用上限"| I["reset時刻まで待機 or 上位プランへ変更"]
+    B -->|"500"| J["一時的エラーとして再試行(1234/1305)"]
+    H --> A
+    J --> A
+  </pre
+            >
+          </div>
+
+          <div class="practice-box">
+            <h4><i class="ti ti-bulb"></i>ベストプラクティス</h4>
+            <ul>
+              <li>
+                <strong>Exponential Backoff(指数バックオフ)を実装する</strong>:
+                429(レート制限)や500系エラーに対しては、即座に再試行せず待機時間を段階的に延ばしながらリトライする。Pythonでは<code>tenacity</code>ライブラリなどが利用しやすい。
+              </li>
+              <li>
+                <strong>エラーコードごとに分岐処理を実装する</strong>:
+                401系は認証情報の再確認、400系はリクエスト内容の見直し、429系は待機またはプラン変更、500系は一時的リトライ、というように対応を分ける。
+              </li>
+              <li>
+                <strong>ストリーミング時は<code>finish_reason</code>を監視する</strong>:
+                SSE接続中に異常終了した場合は通常のエラーオブジェクトが返らず、<code>finish_reason</code>に理由が入る点を再確認する。
+              </li>
+              <li>
+                <strong>一般APIとCoding Plan APIのエンドポイント取り違えに注意</strong>:
+                契約プランと異なるベースURLにリクエストすると、認証エラーや接続エラー(タイムアウト・切断)が発生しやすい。
+              </li>
+            </ul>
+          </div>
+
+          <p class="lead" style="font-size: 13px">
+            参考:
+            <a href="https://docs.z.ai/api-reference/api-code" target="_blank" rel="noopener noreferrer"
+              >Errors(エラーコード一覧)</a
+            >
+          </p>
+        </section>
+        <section id="s13">
+          <h2><span class="sec-num">13</span>料金体系とコスト最適化</h2>
+          <p>
+            Z.aiの料金は100万トークンあたりの単価で設定されており、入力・キャッシュ入力・出力でそれぞれ異なる単価が設定されている。以下は公式Pricingページに掲載されている主要テキストモデルの料金(2026年7月16日時点、単位:
+            USD/1Mトークン)である。
+          </p>
+
+          <table>
+            <tr>
+              <th>モデル</th>
+              <th>入力</th>
+              <th>キャッシュ入力</th>
+              <th>出力</th>
+            </tr>
+            <tr>
+              <td><strong>GLM-5.2</strong></td>
+              <td>$1.4</td>
+              <td>$0.26</td>
+              <td>$4.4</td>
+            </tr>
+            <tr>
+              <td>GLM-5.1</td>
+              <td>$1.4</td>
+              <td>$0.26</td>
+              <td>$4.4</td>
+            </tr>
+            <tr>
+              <td>GLM-5</td>
+              <td>$1.0</td>
+              <td>$0.2</td>
+              <td>$3.2</td>
+            </tr>
+            <tr>
+              <td>GLM-5-Turbo</td>
+              <td>$1.2</td>
+              <td>$0.24</td>
+              <td>$4.0</td>
+            </tr>
+            <tr>
+              <td>GLM-4.7</td>
+              <td>$0.6</td>
+              <td>$0.11</td>
+              <td>$2.2</td>
+            </tr>
+            <tr>
+              <td>GLM-4.7-FlashX</td>
+              <td>$0.07</td>
+              <td>$0.01</td>
+              <td>$0.4</td>
+            </tr>
+            <tr>
+              <td>GLM-4.6</td>
+              <td>$0.6</td>
+              <td>$0.11</td>
+              <td>$2.2</td>
+            </tr>
+            <tr>
+              <td>GLM-4.5</td>
+              <td>$0.6</td>
+              <td>$0.11</td>
+              <td>$2.2</td>
+            </tr>
+            <tr>
+              <td>GLM-4.5-X</td>
+              <td>$2.2</td>
+              <td>$0.45</td>
+              <td>$8.9</td>
+            </tr>
+            <tr>
+              <td>GLM-4.5-Air</td>
+              <td>$0.2</td>
+              <td>$0.03</td>
+              <td>$1.1</td>
+            </tr>
+            <tr>
+              <td>GLM-4.5-AirX</td>
+              <td>$1.1</td>
+              <td>$0.22</td>
+              <td>$4.5</td>
+            </tr>
+            <tr>
+              <td>GLM-4-32B-0414-128K</td>
+              <td>$0.1</td>
+              <td>-</td>
+              <td>$0.1</td>
+            </tr>
+            <tr>
+              <td>GLM-4.7-Flash / GLM-4.5-Flash</td>
+              <td>無料</td>
+              <td>無料</td>
+              <td>無料</td>
+            </tr>
+          </table>
+
+          <div class="callout tip">
+            <i class="ti ti-circle-check"></i>
+            <div>
+              <strong>検証済み更新:</strong>
+              GLM-5.2は公式Pricingページに正式掲載されており、単価はGLM-5.1と同水準(入力$1.4 /
+              キャッシュ入力$0.26 /
+              出力$4.4、100万トークンあたり)であることを直接確認した。ビジョンモデル・画像/動画生成モデル・組み込みツール(Web
+              Search等)にもそれぞれ料金が設定されているため、詳細は公式ページを参照のこと。
+            </div>
+          </div>
+
+          <div class="practice-box">
+            <h4><i class="ti ti-bulb"></i>コスト最適化のベストプラクティス</h4>
+            <ul>
+              <li>
+                <strong>タスクの複雑さに応じたモデル選定</strong>:
+                すべてのリクエストに旗艦モデルを使うのではなく、軽量タスクにはFlash系無料モデルやGLM-4.5-Airのような廉価モデルを割り当てる「モデルルーティング」を行う。
+              </li>
+              <li>
+                <strong>出力トークンの単価は入力の3〜4倍程度高い</strong
+                >ため、<code>max_tokens</code>を適切に絞り、不要に長い応答を避ける。
+              </li>
+              <li>
+                <strong>Context Cachingを活用する</strong>(第11章参照):
+                固定プロンプト部分をキャッシュヒットさせることで入力コストを大幅に下げられる。
+              </li>
+              <li>
+                <strong>reasoning_effortを用途に応じて下げる</strong>(第7章参照):
+                <code>max</code
+                >は精度が高い分、出力トークン数が大きく増えるため課金額も増える。要求精度に見合った設定にする。
+              </li>
+              <li>
+                <strong
+                  >無料枠モデル(Flash系)でプロトタイピングし、精度検証後に有料モデルへ移行する</strong
+                >段階的な検証フローがコスト面で有利である。
+              </li>
+            </ul>
+          </div>
+
+          <p class="lead" style="font-size: 13px">
+            参考: <a href="https://docs.z.ai/guides/overview/pricing" target="_blank" rel="noopener noreferrer">Pricing</a>
+          </p>
+        </section>
+
+        <section id="s14">
+          <h2><span class="sec-num">14</span>GLM Coding Plan とコーディングエージェント運用</h2>
+          <p>
+            Z.aiは、Claude Code・Cline・OpenCode・Kilo
+            Codeなど主要なコーディングエージェントツールと連携できる<strong>GLM Coding Plan</strong
+            >というサブスクリプション型プランを提供している。通常のPay-as-you-go
+            APIとは別のエンドポイントを使用する点は第4章で述べた通りである。
+          </p>
+
+          <h3>プラン階層の概要</h3>
+          <table>
+            <tr>
+              <th>プラン</th>
+              <th>位置づけ</th>
+              <th>特徴</th>
+            </tr>
+            <tr>
+              <td>Lite</td>
+              <td>個人・軽量利用向けの入門プラン</td>
+              <td>月額固定料金でプロンプト送信数に上限あり</td>
+            </tr>
+            <tr>
+              <td>Pro</td>
+              <td>個人開発者の日常利用向け</td>
+              <td>Liteより高いプロンプト上限、ピーク時倍率の緩和</td>
+            </tr>
+            <tr>
+              <td>Max</td>
+              <td>チーム・重量級エージェントタスク向け</td>
+              <td>最上位のプロンプト上限、複数エージェントの並行実行に対応</td>
+            </tr>
+          </table>
+
+          <div class="callout info">
+            <i class="ti ti-info-circle"></i>
+            <div>
+              公式ドキュメントでは、ピーク時間帯・オフピーク時間帯でプロンプト消費倍率が変動する仕組み(ピーク時は消費倍率が上がる)が説明されている。加えて、Vision・Web
+              Search・Web
+              Reader・Zreadといった補助機能をMCP経由で呼び出せる専用クォータが、契約プランごとに月次で付与される。正確な上限値・倍率・期間限定キャンペーンの有無は変動するため、契約前に必ず公式ページの最新表を確認すること。
+            </div>
+          </div>
+
+          <h3>Claude Codeとの接続設定</h3>
+          <p>
+            Claude CodeはAnthropic互換のAPI形状を要求するため、OpenAI互換のCoding
+            Planエンドポイントではなく、専用のAnthropic互換エンドポイントを環境変数で指定する。
+          </p>
+
+          <pre><code>export ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic"
+export ANTHROPIC_AUTH_TOKEN="YOUR_ZAI_API_KEY"</code></pre>
+
+          <h3>コーディングエージェント運用の考え方</h3>
+          <p>
+            Z.ai公式のBest
+            Practiceガイドでは、エージェントの成果物の質を安定させるための実践として、おおむね次のような観点が挙げられている。
+          </p>
+
+          <ul>
+            <li>
+              <strong>タスクコンテキストを丁寧に設計する</strong>:
+              単発の質問応答として使うのではなく、目的・変更範囲・リスク境界・検証方法を明示したタスク記述を与える。
+            </li>
+            <li>
+              <strong>大きなタスクを検証可能な単位に分割する</strong>:
+              一度に広範囲の変更を依頼せず、レビューやテストがしやすい粒度に区切って進める。
+            </li>
+            <li>
+              <strong>Skill(再利用可能なワークフローテンプレート)を活用する</strong>:
+              繰り返し使う定型作業(コードレビュー観点、デプロイ前チェックなど)は、都度プロンプトで説明するのではなく、構造化されたSkillとして登録し一貫した挙動を得る。
+            </li>
+            <li>
+              <strong>MCP(Model Context Protocol)で外部ツールと接続する</strong>:
+              コードホスティング・データベース・社内ツールなどをMCP経由で接続し、エージェントが常に最新のコンテキストを取得できるようにする。
+            </li>
+            <li>
+              <strong>ビルド・Lint・テストを実行環境に組み込む</strong>:
+              エージェントが自分の変更を検証できる仕組みを用意し、フィードバックループを短くする。
+            </li>
+            <li>
+              <strong>セッションを目的ごとに分離する</strong>:
+              無関係なタスクを同一セッションに詰め込むと、コンテキストが肥大化し精度が落ちる。タスクの単位でセッションを区切る。
+            </li>
+            <li>
+              <strong>長期記憶の仕組みを活用する</strong>:
+              プロジェクト固有の規約や過去の意思決定を、セッションをまたいで参照できる仕組み(メモリ機構)に記録しておく。
+            </li>
+          </ul>
+
+          <div class="mermaid-wrap">
+            <pre class="mermaid">
+flowchart TD
+    A["タスクを定義(目的・範囲・検証方法)"] --> B["関連コンテキストをMCP等で取得"]
+    B --> C["エージェントに実行を委任"]
+    C --> D["ビルド・Lint・テストを実行させる"]
+    D --> E{"検証結果はOKか?"}
+    E -->|"Yes"| F["結果をレビューしてマージ"]
+    E -->|"No"| G["失敗内容をフィードバックし再実行"]
+    G --> C
+  </pre
+            >
+          </div>
+
+          <p class="lead" style="font-size: 13px">
+            参考:
+            <a href="https://docs.z.ai/devpack/overview" target="_blank" rel="noopener noreferrer"
+              >GLM Coding Plan Overview</a
+            >
+            /
+            <a href="https://docs.z.ai/devpack/resources/best-practice" target="_blank" rel="noopener noreferrer"
+              >Best Practice(コーディングエージェント運用)</a
+            >
+            /
+            <a href="https://docs.z.ai/devpack/quick-start" target="_blank" rel="noopener noreferrer"
+              >Coding Plan Quick Start</a
+            >
+            /
+            <a href="https://docs.z.ai/devpack/resources/memory-mechanism" target="_blank" rel="noopener noreferrer"
+              >Memory Mechanism</a
+            >
+          </p>
+        </section>
+        <section id="s15">
+          <h2><span class="sec-num">15</span>セキュリティ上の注意点</h2>
+          <ul>
+            <li>
+              <strong>APIキーの管理</strong>:
+              キーはソースコードに直書きせず、環境変数やシークレットマネージャーで管理する。クライアントサイド(ブラウザ)にキーを露出させない。
+            </li>
+            <li>
+              <strong>Function Callingの安全性</strong>:
+              外部関数がDB操作・ファイル操作・シェルコマンド実行などを行う場合、入力バリデーション・権限チェック・実行ログの記録を必ず実装する(第9章参照)。
+            </li>
+            <li>
+              <strong>入力コンテンツの安全性</strong>:
+              機微・有害となりうるコンテンツを扱うプロンプトは、エラーコード1301(安全性検知によるブロック)の対象となりうる。想定される入力パターンを事前にテストしておく。
+            </li>
+            <li>
+              <strong>プロンプトインジェクション対策</strong>:
+              外部から取得したドキュメントやWeb検索結果をそのままシステムプロンプトに混入させず、ユーザー入力と信頼できる指示を明確に分離する設計を心がける。
+            </li>
+            <li>
+              <strong>コーディングエージェントの実行権限</strong>: Claude
+              Code等の連携時にファイル書き込みやシェル実行を許可する場合、実行範囲をリポジトリ内に限定し、破壊的操作の前に確認ステップを挟む。
+            </li>
+          </ul>
+
+          <p class="lead" style="font-size: 13px">
+            参考:
+            <a href="https://docs.z.ai/guides/capabilities/function-calling" target="_blank" rel="noopener noreferrer"
+              >Function Calling: Security Considerations</a
+            >
+            / <a href="https://docs.z.ai/api-reference/api-code" target="_blank" rel="noopener noreferrer">Errors</a>
+          </p>
+        </section>
+
+        <section id="s16">
+          <h2><span class="sec-num">16</span>ベストプラクティス チェックリスト</h2>
+          <table>
+            <tr>
+              <th>チェック項目</th>
+              <th>対応章</th>
+            </tr>
+            <tr>
+              <td>APIキーを環境変数で管理し、コードに直書きしていないか</td>
+              <td>2, 15</td>
+            </tr>
+            <tr>
+              <td>
+                タスクの複雑さに応じてモデルを使い分けているか(旗艦モデルの乱用を避けているか)
+              </td>
+              <td>3, 13</td>
+            </tr>
+            <tr>
+              <td>
+                契約プラン・利用ツールに合ったベースURL(一般API / Coding Plan API /
+                Anthropic互換API)を使用しているか
+              </td>
+              <td>4, 12, 14</td>
+            </tr>
+            <tr>
+              <td>チャット・生成系UXで<code>stream=true</code>を活用しているか</td>
+              <td>8</td>
+            </tr>
+            <tr>
+              <td>
+                複雑な推論タスクでのみ<code>reasoning_effort=max</code>を使い、軽量タスクではthinkingを無効化しているか
+              </td>
+              <td>7, 13</td>
+            </tr>
+            <tr>
+              <td>Function Callingで入力検証・権限制御・エラーの構造化を行っているか</td>
+              <td>9, 15</td>
+            </tr>
+            <tr>
+              <td>JSONモード利用時にスキーマバリデーションとフォールバックを用意しているか</td>
+              <td>10</td>
+            </tr>
+            <tr>
+              <td>システムプロンプトを先頭固定にしてContext Cachingを活用しているか</td>
+              <td>11</td>
+            </tr>
+            <tr>
+              <td>429/500系エラーに対してExponential Backoffを実装しているか</td>
+              <td>12</td>
+            </tr>
+            <tr>
+              <td>ストリーミング時に<code>finish_reason</code>を監視しているか</td>
+              <td>8, 12</td>
+            </tr>
+            <tr>
+              <td>
+                GLM Coding Plan利用時、プロンプト消費量とピーク/オフピーク倍率を把握しているか
+              </td>
+              <td>14</td>
+            </tr>
+          </table>
+        </section>
+
+        <section id="s17">
+          <h2><span class="sec-num">17</span>参考URLまとめ</h2>
+          <p>本ガイド作成にあたり、以下のURLを2026年7月16日時点で直接確認した。</p>
+          <ul class="ref-links">
+            <li>
+              <span class="label">Z.AI Open Platform(API起点)</span
+              ><a class="url" href="https://z.ai/model-api" target="_blank" rel="noopener noreferrer"
+                >https://z.ai/model-api</a
+              >
+            </li>
+            <li>
+              <span class="label">クイックスタート</span
+              ><a class="url" href="https://docs.z.ai/guides/overview/quick-start" target="_blank" rel="noopener noreferrer"
+                >https://docs.z.ai/guides/overview/quick-start</a
+              >
+            </li>
+            <li>
+              <span class="label">ドキュメント総合インデックス</span
+              ><a class="url" href="https://docs.z.ai/llms.txt" target="_blank" rel="noopener noreferrer"
+                >https://docs.z.ai/llms.txt</a
+              >
+            </li>
+            <li>
+              <span class="label">GLM-5.2 モデルガイド</span
+              ><a class="url" href="https://docs.z.ai/guides/llm/glm-5.2" target="_blank" rel="noopener noreferrer"
+                >https://docs.z.ai/guides/llm/glm-5.2</a
+              >
+            </li>
+            <li>
+              <span class="label">Migrate to GLM-5.2</span
+              ><a
+                class="url"
+                href="https://docs.z.ai/guides/overview/migrate-to-glm-new"
+                target="_blank" rel="noopener noreferrer"
+                >https://docs.z.ai/guides/overview/migrate-to-glm-new</a
+              >
+            </li>
+            <li>
+              <span class="label">Core Parameters</span
+              ><a class="url" href="https://docs.z.ai/guides/overview/concept-param" target="_blank" rel="noopener noreferrer"
+                >https://docs.z.ai/guides/overview/concept-param</a
+              >
+            </li>
+            <li>
+              <span class="label">Deep Thinking / Thinking Mode</span
+              ><a
+                class="url"
+                href="https://docs.z.ai/guides/capabilities/thinking-mode"
+                target="_blank" rel="noopener noreferrer"
+                >https://docs.z.ai/guides/capabilities/thinking-mode</a
+              >
+            </li>
+            <li>
+              <span class="label">Streaming Messages</span
+              ><a class="url" href="https://docs.z.ai/guides/capabilities/streaming" target="_blank" rel="noopener noreferrer"
+                >https://docs.z.ai/guides/capabilities/streaming</a
+              >
+            </li>
+            <li>
+              <span class="label">Function Calling</span
+              ><a
+                class="url"
+                href="https://docs.z.ai/guides/capabilities/function-calling"
+                target="_blank" rel="noopener noreferrer"
+                >https://docs.z.ai/guides/capabilities/function-calling</a
+              >
+            </li>
+            <li>
+              <span class="label">Structured Output</span
+              ><a
+                class="url"
+                href="https://docs.z.ai/guides/capabilities/struct-output"
+                target="_blank" rel="noopener noreferrer"
+                >https://docs.z.ai/guides/capabilities/struct-output</a
+              >
+            </li>
+            <li>
+              <span class="label">Context Caching</span
+              ><a class="url" href="https://docs.z.ai/guides/capabilities/cache" target="_blank" rel="noopener noreferrer"
+                >https://docs.z.ai/guides/capabilities/cache</a
+              >
+            </li>
+            <li>
+              <span class="label">Errors(エラーコード一覧)</span
+              ><a class="url" href="https://docs.z.ai/api-reference/api-code" target="_blank" rel="noopener noreferrer"
+                >https://docs.z.ai/api-reference/api-code</a
+              >
+            </li>
+            <li>
+              <span class="label">API Reference(全体)</span
+              ><a class="url" href="https://docs.z.ai/api-reference/introduction" target="_blank" rel="noopener noreferrer"
+                >https://docs.z.ai/api-reference/introduction</a
+              >
+            </li>
+            <li>
+              <span class="label">Pricing(料金表)</span
+              ><a class="url" href="https://docs.z.ai/guides/overview/pricing" target="_blank" rel="noopener noreferrer"
+                >https://docs.z.ai/guides/overview/pricing</a
+              >
+            </li>
+            <li>
+              <span class="label">GLM Coding Plan Overview</span
+              ><a class="url" href="https://docs.z.ai/devpack/overview" target="_blank" rel="noopener noreferrer"
+                >https://docs.z.ai/devpack/overview</a
+              >
+            </li>
+            <li>
+              <span class="label">Coding Plan Quick Start</span
+              ><a class="url" href="https://docs.z.ai/devpack/quick-start" target="_blank" rel="noopener noreferrer"
+                >https://docs.z.ai/devpack/quick-start</a
+              >
+            </li>
+            <li>
+              <span class="label">Best Practice(コーディングエージェント運用)</span
+              ><a
+                class="url"
+                href="https://docs.z.ai/devpack/resources/best-practice"
+                target="_blank" rel="noopener noreferrer"
+                >https://docs.z.ai/devpack/resources/best-practice</a
+              >
+            </li>
+            <li>
+              <span class="label">Memory Mechanism</span
+              ><a
+                class="url"
+                href="https://docs.z.ai/devpack/resources/memory-mechanism"
+                target="_blank" rel="noopener noreferrer"
+                >https://docs.z.ai/devpack/resources/memory-mechanism</a
+              >
+            </li>
+            <li>
+              <span class="label">Python SDK(GitHub)</span
+              ><a class="url" href="https://github.com/zai-org/z-ai-sdk-python" target="_blank" rel="noopener noreferrer"
+                >https://github.com/zai-org/z-ai-sdk-python</a
+              >
+            </li>
+            <li>
+              <span class="label">Java SDK(GitHub)</span
+              ><a class="url" href="https://github.com/zai-org/z-ai-sdk-java" target="_blank" rel="noopener noreferrer"
+                >https://github.com/zai-org/z-ai-sdk-java</a
+              >
+            </li>
+            <li>
+              <span class="label">OpenAI互換 Python SDK連携ガイド</span
+              ><a class="url" href="https://docs.z.ai/guides/develop/openai/python" target="_blank" rel="noopener noreferrer"
+                >https://docs.z.ai/guides/develop/openai/python</a
+              >
+            </li>
+            <li>
+              <span class="label">Billingページ</span
+              ><a class="url" href="https://z.ai/manage-apikey/billing" target="_blank" rel="noopener noreferrer"
+                >https://z.ai/manage-apikey/billing</a
+              >
+            </li>
+            <li>
+              <span class="label">API Keys管理ページ</span
+              ><a class="url" href="https://z.ai/manage-apikey/apikey-list" target="_blank" rel="noopener noreferrer"
+                >https://z.ai/manage-apikey/apikey-list</a
+              >
+            </li>
+            <li>
+              <span class="label">FAQ</span
+              ><a class="url" href="https://docs.z.ai/help/faq" target="_blank" rel="noopener noreferrer"
+                >https://docs.z.ai/help/faq</a
+              >
+            </li>
+          </ul>
+        </section>
+
+        <footer>
+          本ガイドはZ.ai公式ドキュメント(docs.z.ai /
+          z.ai)を一次情報源とし、2026年7月16日時点ですべての参照先に直接アクセスして内容を検証したうえで作成している。API仕様・料金・モデルラインナップ・プラン内容は頻繁に更新されるため、実装前に必ず公式ドキュメントの最新版を確認すること。
+        </footer>
+      </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        themeVariables: {
+          background: '#131318',
+          primaryColor: '#1b1b22',
+          primaryTextColor: '#e8e8ee',
+          primaryBorderColor: '#a48cf0',
+          lineColor: '#3ecfc0',
+          secondaryColor: '#1b1b22',
+          tertiaryColor: '#131318',
+          fontFamily:
+            '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif',
+          fontSize: '16px',
+        },
+        flowchart: { useMaxWidth: false, htmlLabels: true, nodeSpacing: 45, rankSpacing: 50 },
+        sequence: { useMaxWidth: false, actorMargin: 60, messageFontSize: 14 },
+      });
+
+      document.fonts.ready.then(function () {
+        mermaid.run({ querySelector: '.mermaid' });
+      });
+    </script>
+  </body>
+</html>

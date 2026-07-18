@@ -2,22 +2,25 @@
  * ページレジストリ — 全ページのメタデータの Single Source of Truth。
  *
  * plans/006-platform-roadmap-v2.md §2.3 (F-1) に基づく。鮮度表示 (PageFreshness)・
- * What's New・sitemap はすべて本ファイルから導出し、属性の複製先を増やさない。
+ * What's New・sitemap・**ナビゲーション** はすべて本ファイルから導出し、属性の複製先を増やさない。
  *
  * 設計判断:
  * - nav-links.ts の Zod 検証パターンを踏襲し、モジュール評価時に parse して
  *   不正データをビルド時に落とす（実行時に壊れたページを配信しない）。
  * - `lastReviewed` は「人間が内容を確認した日」。初期値は各 page.tsx の最終コミット日を
  *   機械採取した値で、以降は monthly-update スキルの月次確認が当日日付へ書き戻す。
- * - `group` は 006 §2.2 の 8 グループ体系。ナビの再グルーピング (F-4') で参照するが、
- *   現時点では表示に影響しない。
- * - `addedAt` は git の初回追加日（`--diff-filter=A --follow`）。What's New の「新着」順に使う。
+ * - `group` / `category` はナビの 1 段目 / 2 段目。F-4'（plans/008）以降、
+ *   nav-links.ts はこれらから **導出** される（手書きのナビデータは廃止）。
+ *   グループの並び順と「どのグループをネストするか」は lib/nav-taxonomy.ts が持つ。
+ * - `addedAt` は git の初回追加日（`--diff-filter=A --follow`）。What's New の「新着」順、
+ *   およびナビのリーフ並び順（古い順）に使う。
  *
- * 新規ページを追加したら必ず本レジストリにも登録すること。
+ * 新規ページを追加したら必ず本レジストリにも登録すること。登録すればナビにも自動的に載る。
  * tests/page-registry-coverage.test.ts が登録漏れを機械検知する。
  */
 
 import { z } from "zod";
+import { isNestedGroup, NAV_GROUPS } from "./nav-taxonomy";
 
 /** YYYY-MM-DD 形式のみ許可（localeCompare による日付比較が成立する前提を守る） */
 const isoDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "date must be YYYY-MM-DD");
@@ -27,24 +30,31 @@ const slugSchema = z
   .min(1)
   .refine((s) => s.startsWith("/"), "slug must start with /");
 
-export const PageEntrySchema = z.object({
-  /** ルートパス。Home は "/"。末尾スラッシュなし。 */
-  slug: slugSchema,
-  /** ナビ表示名（nav-links.ts と同じ短いラベル） */
-  title: z.string().min(1),
-  /** 006 §2.2 の再グルーピング体系 */
-  group: z.string().min(1),
-  /** プロバイダー系ページのみ */
-  provider: z.enum(["claude", "google", "codex", "copilot"]).optional(),
-  /** 横断検索・関連リンク (F-5 / F-7) 用のトピックタグ */
-  topics: z.array(z.string()),
-  /** 一覧・What's New に出す 1〜2 文の要約 */
-  summary: z.string().min(1),
-  /** 公開日（git の初回追加日） */
-  addedAt: isoDateSchema,
-  /** 最終確認日（人間が内容を確認した日） */
-  lastReviewed: isoDateSchema,
-});
+export const PageEntrySchema = z
+  .object({
+    /** ルートパス。Home は "/"。末尾スラッシュなし。 */
+    slug: slugSchema,
+    /** ナビ表示名 */
+    title: z.string().min(1),
+    /** ナビのトップレベル分類。順序は lib/nav-taxonomy.ts の NAV_GROUPS が持つ。 */
+    group: z.enum(NAV_GROUPS),
+    /** ナビ 2 段目の表示ラベル。2 段ネストするグループ（= Providers）でのみ必須。 */
+    category: z.string().min(1).optional(),
+    /** プロバイダー系ページのみ。識別子であり表示ラベルではない（表示は category）。 */
+    provider: z.enum(["claude", "google", "codex", "copilot"]).optional(),
+    /** 横断検索・関連リンク (F-5 / F-7) 用のトピックタグ */
+    topics: z.array(z.string()),
+    /** 一覧・What's New に出す 1〜2 文の要約 */
+    summary: z.string().min(1),
+    /** 公開日（git の初回追加日） */
+    addedAt: isoDateSchema,
+    /** 最終確認日（人間が内容を確認した日） */
+    lastReviewed: isoDateSchema,
+  })
+  .refine((e) => !isNestedGroup(e.group) || Boolean(e.category), {
+    message: "2 段ネストするグループのエントリには category が必須",
+    path: ["category"],
+  });
 
 export type PageEntry = z.infer<typeof PageEntrySchema>;
 
@@ -122,6 +132,7 @@ const entries: PageEntry[] = [
     slug: "/claude/agent",
     title: "Agent",
     group: "Providers",
+    category: "Claude",
     provider: "claude",
     topics: ["agent"],
     summary:
@@ -133,6 +144,7 @@ const entries: PageEntry[] = [
     slug: "/claude/code-slash-commands",
     title: "Code Slash Commands",
     group: "Providers",
+    category: "Claude",
     provider: "claude",
     topics: ["claude"],
     summary:
@@ -144,6 +156,7 @@ const entries: PageEntry[] = [
     slug: "/claude/cowork-guide",
     title: "Cowork Guide",
     group: "Providers",
+    category: "Claude",
     provider: "claude",
     topics: ["guide"],
     summary:
@@ -155,6 +168,7 @@ const entries: PageEntry[] = [
     slug: "/claude/fable-5-best-practices",
     title: "Fable 5 Best Practices",
     group: "Providers",
+    category: "Claude",
     provider: "claude",
     topics: ["claude"],
     summary:
@@ -166,6 +180,7 @@ const entries: PageEntry[] = [
     slug: "/claude/harness-engineering",
     title: "Harness Engineering",
     group: "Providers",
+    category: "Claude",
     provider: "claude",
     topics: ["harness"],
     summary: "AIエージェントが安定して動作するための「環境設計（ハーネス）」完全ガイド。",
@@ -176,6 +191,7 @@ const entries: PageEntry[] = [
     slug: "/claude/managed-agents",
     title: "Managed Agents",
     group: "Providers",
+    category: "Claude",
     provider: "claude",
     topics: ["agent"],
     summary:
@@ -187,6 +203,7 @@ const entries: PageEntry[] = [
     slug: "/claude/self-hosted-sandboxes",
     title: "Self-hosted Sandboxes",
     group: "Providers",
+    category: "Claude",
     provider: "claude",
     topics: ["sandbox"],
     summary:
@@ -198,6 +215,7 @@ const entries: PageEntry[] = [
     slug: "/claude/skill",
     title: "Skill",
     group: "Providers",
+    category: "Claude",
     provider: "claude",
     topics: ["skill"],
     summary:
@@ -209,6 +227,7 @@ const entries: PageEntry[] = [
     slug: "/claude/skill-guide",
     title: "Skill Guide",
     group: "Providers",
+    category: "Claude",
     provider: "claude",
     topics: ["skill", "guide"],
     summary:
@@ -220,6 +239,7 @@ const entries: PageEntry[] = [
     slug: "/claude/skill-guide-intermediate",
     title: "Skill Guide (中級)",
     group: "Providers",
+    category: "Claude",
     provider: "claude",
     topics: ["skill", "guide"],
     summary:
@@ -281,6 +301,7 @@ const entries: PageEntry[] = [
     slug: "/codex/agent",
     title: "Agent",
     group: "Providers",
+    category: "Codex",
     provider: "codex",
     topics: ["agent"],
     summary:
@@ -292,6 +313,7 @@ const entries: PageEntry[] = [
     slug: "/codex/harness-engineering",
     title: "Harness Engineering",
     group: "Providers",
+    category: "Codex",
     provider: "codex",
     topics: ["harness"],
     summary:
@@ -303,6 +325,7 @@ const entries: PageEntry[] = [
     slug: "/codex/openai-codex-guide",
     title: "Codex Guide",
     group: "Providers",
+    category: "Codex",
     provider: "codex",
     topics: ["guide"],
     summary:
@@ -314,6 +337,7 @@ const entries: PageEntry[] = [
     slug: "/codex/skill",
     title: "Skill",
     group: "Providers",
+    category: "Codex",
     provider: "codex",
     topics: ["skill"],
     summary:
@@ -325,6 +349,7 @@ const entries: PageEntry[] = [
     slug: "/copilot/agent",
     title: "Agent",
     group: "Providers",
+    category: "Copilot",
     provider: "copilot",
     topics: ["agent"],
     summary:
@@ -336,6 +361,7 @@ const entries: PageEntry[] = [
     slug: "/copilot/github-copilot",
     title: "GitHub Copilot",
     group: "Providers",
+    category: "Copilot",
     provider: "copilot",
     topics: ["copilot"],
     summary:
@@ -347,6 +373,7 @@ const entries: PageEntry[] = [
     slug: "/copilot/markdown-file-guide",
     title: "Markdown Guide",
     group: "Providers",
+    category: "Copilot",
     provider: "copilot",
     topics: ["guide"],
     summary:
@@ -358,6 +385,7 @@ const entries: PageEntry[] = [
     slug: "/copilot/skill",
     title: "Skill",
     group: "Providers",
+    category: "Copilot",
     provider: "copilot",
     topics: ["skill"],
     summary:
@@ -399,6 +427,7 @@ const entries: PageEntry[] = [
     slug: "/google/adk-best-practices",
     title: "ADK Best Practices",
     group: "Providers",
+    category: "Google",
     provider: "google",
     topics: ["google"],
     summary:
@@ -410,6 +439,7 @@ const entries: PageEntry[] = [
     slug: "/google/agent",
     title: "Agent",
     group: "Providers",
+    category: "Google",
     provider: "google",
     topics: ["agent"],
     summary:
@@ -421,6 +451,7 @@ const entries: PageEntry[] = [
     slug: "/google/agent-harness-engineering",
     title: "Agent Harness Engineering",
     group: "Providers",
+    category: "Google",
     provider: "google",
     topics: ["agent", "harness"],
     summary:
@@ -432,6 +463,7 @@ const entries: PageEntry[] = [
     slug: "/google/antigravity-guide",
     title: "Antigravity",
     group: "Providers",
+    category: "Google",
     provider: "google",
     topics: ["guide"],
     summary:
@@ -443,6 +475,7 @@ const entries: PageEntry[] = [
     slug: "/google/antigravity-slash-commands-guide",
     title: "Antigravity Slash Commands",
     group: "Providers",
+    category: "Google",
     provider: "google",
     topics: ["guide"],
     summary:
@@ -454,6 +487,7 @@ const entries: PageEntry[] = [
     slug: "/google/harness-engineering",
     title: "Harness Engineering",
     group: "Providers",
+    category: "Google",
     provider: "google",
     topics: ["harness"],
     summary:
@@ -465,6 +499,7 @@ const entries: PageEntry[] = [
     slug: "/google/notebook-lm",
     title: "NotebookLM Guide",
     group: "Providers",
+    category: "Google",
     provider: "google",
     topics: ["google"],
     summary:
@@ -476,6 +511,7 @@ const entries: PageEntry[] = [
     slug: "/google/sandbox-best-practices",
     title: "Google Sandbox",
     group: "Providers",
+    category: "Google",
     provider: "google",
     topics: ["sandbox"],
     summary:
@@ -487,6 +523,7 @@ const entries: PageEntry[] = [
     slug: "/google/skill",
     title: "Skill",
     group: "Providers",
+    category: "Google",
     provider: "google",
     topics: ["skill"],
     summary:
@@ -498,6 +535,7 @@ const entries: PageEntry[] = [
     slug: "/google/skill-guide",
     title: "Skill Guide",
     group: "Providers",
+    category: "Google",
     provider: "google",
     topics: ["skill", "guide"],
     summary:
@@ -509,6 +547,7 @@ const entries: PageEntry[] = [
     slug: "/google/skill-guide-intermediate",
     title: "Skill Guide (中級)",
     group: "Providers",
+    category: "Google",
     provider: "google",
     topics: ["skill", "guide"],
     summary:
@@ -520,12 +559,23 @@ const entries: PageEntry[] = [
     slug: "/google/stitch-guide",
     title: "Stitch Guide",
     group: "Providers",
+    category: "Google",
     provider: "google",
     topics: ["guide"],
     summary:
       "Google Labsが提供する無料のAIデザインツール「Google Stitch」の実践ガイド。Vibe Design、無限キャンバス、DESIGN.mdによるデザインシステム管理、MCP・SDK統合、プロンプト設計などのベストプラクティスを解説。",
     addedAt: "2026-07-12",
     lastReviewed: "2026-07-12",
+  },
+  {
+    slug: "/governance/ai-governance",
+    title: "AI Governance Guide",
+    group: "運用・品質",
+    topics: ["ai-governance", "risk-management", "compliance", "security"],
+    summary:
+      "AIガバナンスの基礎、国際フレームワーク、組織での構築手順、RACIマトリクスを初学者向けに解説する実践ガイド。",
+    addedAt: "2026-07-17",
+    lastReviewed: "2026-07-17",
   },
   {
     slug: "/llm-ops/evaluation-observability",
@@ -546,6 +596,16 @@ const entries: PageEntry[] = [
       "モデル選定から量子化、推論エンジン、ハードウェア設計、セキュリティ、RAG、ファインチューニング、可観測性、デプロイ運用まで——中級〜上級エンジニアが自前のLLM基盤を安全かつ継続可能な形で運用するための、一気通貫の実践リファレンス。",
     addedAt: "2026-07-11",
     lastReviewed: "2026-07-12",
+  },
+  {
+    slug: "/local-llm/finetuning-best-practices",
+    title: "LLMファインチューニング ベストプラクティスガイド",
+    group: "モデル・データ",
+    topics: ["local-llm", "fine-tuning"],
+    summary:
+      "LLMファインチューニングの目的設定、モデル・手法・データの選定、学習、評価、破局的忘却対策、RLHF/DPO、デプロイまでを体系的に解説する実践ガイド。",
+    addedAt: "2026-07-16",
+    lastReviewed: "2026-07-16",
   },
   {
     slug: "/local-llm/self-hosting",
@@ -578,6 +638,18 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-13",
   },
   {
+    slug: "/model-data/gpt-5-6-best-practices",
+    title: "GPT-5.6 Best Practices",
+    group: "Providers",
+    category: "Codex",
+    provider: "codex",
+    topics: ["openai", "gpt-5-6", "best-practices"],
+    summary:
+      "OpenAI GPT-5.6 Sol / Terra / Luna のモデル選定、Reasoning、Programmatic Tool Calling、移行、コスト最適化を体系的に解説する実践ガイド。",
+    addedAt: "2026-07-16",
+    lastReviewed: "2026-07-16",
+  },
+  {
     slug: "/multimodal/generation-best-practices",
     title: "Generation Best Practices",
     group: "モデル・データ",
@@ -606,6 +678,17 @@ const entries: PageEntry[] = [
       "RAG (検索拡張生成) と Embedding (埋め込み) についてゼロから実務レベルまで理解できるように、チャンキング、モデル選定、ベクトルDB、検索最適化、本番運用、評価方法などを体系的に解説する完全ガイド。",
     addedAt: "2026-07-12",
     lastReviewed: "2026-07-12",
+  },
+  {
+    slug: "/search",
+    title: "検索",
+    group: "検索",
+    // topics を空にするのは意図的。検索ページ自身が検索結果や関連リンクに出ると導線が濁る。
+    topics: [],
+    summary:
+      "全ガイドをキーワードとトピックタグで横断検索するページ。検索インデックスはページレジストリからビルド時に生成する。",
+    addedAt: "2026-07-14",
+    lastReviewed: "2026-07-14",
   },
   {
     slug: "/security/ai-security-best-practices",

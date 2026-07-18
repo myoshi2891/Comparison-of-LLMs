@@ -1,0 +1,16 @@
+"use client";
+
+import { useTocObserver } from "@/lib/useTocObserver";
+import styles from "./page.module.css";
+
+/**
+ * Tracks the visible guide section and highlights its corresponding table-of-contents link.
+ */
+export default function TocObserver() {
+  useTocObserver({
+    chapterSelector: "section[data-guide-section]",
+    tocLinkSelector: `.${styles.tocLink}`,
+    activeClassName: styles.tocLinkActive,
+  });
+  return null;
+}

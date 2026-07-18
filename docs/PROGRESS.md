@@ -1,7 +1,7 @@
 # プロジェクト進捗・ステータス (PROGRESS.md)
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
-> - 最終更新日: **Updated 2026-07-13**
+> - 最終更新日: **Updated 2026-07-17**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -14,10 +14,20 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（本作業範囲では新規違反 0 件、既知の既存指摘は本件対象外）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **1046 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **1129 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **GPT-5.6 ガイドのナビ・表示改善**: `/model-data/gpt-5-6-best-practices` を Providers の Codex 配下へ移動。メインコンテンツを全幅化し、Mermaid SVGを中央寄せ、Python/Bashコードブロックに依存追加なしのトークンハイライトを追加（合計 **1129 テスト合格**）。
+- **OpenAI GPT-5.6 完全ガイドの Next.js 移行**: `Gpt-5.6-best-practices-guide.html` の対応Markdown原本をビルド時に安全なReact要素へ変換し、`/model-data/gpt-5-6-best-practices` に追加。18セクション、7表、8 Mermaid図、コードブロック、目次スクロール追従、外部リンクの安全属性、ページレジストリ登録を実装。TDDのRed / Greenを分割し、契約テスト7件を追加（合計 **1126 テスト合格**）。
+- **AIガバナンス実践ガイドの Next.js 移行**: `Ai-governance-guide.html` を `/governance/ai-governance` へ移行。原文の全22セクション・表4件・Mermaid図5件・外部リンク84件をReact要素としてfaithfulに保持し、TOCスクロール追従、外部リンクの安全属性、ページレジストリ登録を追加。HTMLと対応Markdown原本は `archive/` に退避。TDDのRed / Green / Refactorを分割し、契約テスト6件を追加（合計 **1119 テスト合格**）。
+- **LLMファインチューニング ベストプラクティスガイドのデザイン刷新**: `/local-llm/finetuning-best-practices` をアンバー×ブルーのダーク技術ドキュメントとして再設計。本文・リンク・12表・5コードブロック・9 Mermaid図・99外部リンクは維持したまま、旧インラインスタイルをページ専用CSSへ集約し、表の左寄せとコード5件の依存追加なしのシンタックスハイライトを追加。契約テストを1件追加（合計 **1113 テスト合格**）。
+- **LLMファインチューニング ベストプラクティスガイドの Next.js 移行**: `Finetuning-best-practices-guide.html` を `/local-llm/finetuning-best-practices` へ移行。原文の全17セクション・12表・5コードブロック・9 Mermaid図・99外部リンクを React 要素として faithful に保持し、TOC のスクロール追従、外部リンクの安全属性、ページレジストリ登録を追加。原本は `archive/` に退避。TDD の Red / Green / Refactor を分割し、契約テスト6件を追加（合計 **1112 テスト合格**）。
+- **横断導線（RSS / 関連ページリンク / 横断検索）— plans/006 Phase 3（F-3' / F-7 / F-5、[plans/009](../plans/009-phase3-cross-navigation.md)）**: 58 ルートに達し「読者が目的のガイドへナビのドロップダウン経由でしか到達できない」状態を解消 🚀。3 導線すべてを `page-registry.ts` からの導出で追加した（手書きのフィード・関連リンク表・検索インデックスを一切持たない）。ナビは `nav-taxonomy.ts` の `NAV_GROUPS` に「検索」をフラットリンクとして What's New の直前へ挿入し、トップレベル 7 → 8 グループへ。TDD サイクル（Red/Green/Refactor/Docs Sync）でコミット分割。Vitest 契約テスト 42 件追加（合計 **1106 テスト合格**）。
+  - **F-3' RSS**: `app/rss.xml/route.ts` を Route Handler + `dynamic = "force-static"` で実装し、`output: 'export'` 下でも `out/rss.xml` として静的生成（addedAt 降順 20 件）。XML 予約 5 文字のエスケープは純粋関数 `escapeXml` に切り出してユニットテスト。`lib/metadata.ts` の `alternates.types` に自動発見リンクを追加。
+  - **F-7 関連ページリンク**: `lib/related-pages.ts` が topics の共有数からスコアし、「共有 topics 数 降順 → 同一 group 優先 → addedAt 降順 → slug 昇順」の 4 段タイブレークで順序を一意に決める（決定論的でないと無関係なページ追加で全ページの関連リンクが揺れ SSG 出力が不安定になる）。共有 0 件は除外し、無関係なリンクを出さない。`RelatedPages.tsx` は PageFreshness と同じく `app/layout.tsx` に 1 箇所マウントし、55 個の page.tsx を未編集のまま全ページへ関連 3 件を表示。
+  - **F-5 横断検索**: `/search` を新設。**外部ライブラリを追加せず自前実装**（57 ページの title/summary/topics は数十 KB で全件走査の部分一致で十分）。NFKC + 小文字化で正規化し、空白区切りの全トークンが title/summary/topics/group/category のいずれかに一致（AND）。**タグは `/tags/[tag]` の静的ページ群を作らず `/search` に集約**し（1〜2 ページしか持たないタグで薄いページが量産されるため）、`?q=` / `?tag=` の URL クエリで検索状態を共有可能にした。page.tsx は metadata のため Server Component に保ち、`useSearchParams` を使う `SearchClient` を `<Suspense>` 境界に置く（`output: 'export'` の要件）。
+- **ナビ再グルーピング（18 → 7 項目）— plans/006 Phase 2（F-4' / STATE-06 対応、[plans/008](../plans/008-nav-regrouping-f4.md)）**: サイトヘッダーのトップレベルが 18 項目に膨張し（うち 4 つは子リンク 1 件のみのドロップダウン）、かつ `nav-links.ts` が 170 行の手書きデータで `page-registry.ts` と二重管理になっていた問題を解消 🚀。**ナビを registry からの導出に変更**し、手書きリンクデータを全廃。トップレベルは 7 グループ（Home / Providers / Agent 開発 / 開発プロセス / 運用・品質 / モデル・データ / What's New）へ集約。新規 `lib/nav-taxonomy.ts` がグループの並び順とネスト対象の SSoT（registry のエントリは slug 昇順のため表示順を表現できない）。`page-registry.ts` に `category`（ナビ 2 段目ラベル）を追加し `group` を Zod enum 化（**`group` の値自体は 1 件も変更なし** — Phase 1 の投入時点で正しかった）。**2 段ネストは Providers（30 リンク）のみ**に適用（全グループを 2 段にすると CI/CD・Git Worktree・RAG のような 1 ページのカテゴリで 3 段ホバーが生まれ、STATE-06 の問題が階層を変えて再発するため）。`SiteHeaderClient` はサブトグル専用ハンドラを追加（既存の `closeAllDropdowns()` を呼ぶと親ドロップダウンごと閉じてしまうため、閉じるのは同一サブメニュー内の兄弟のみ）。**registry ⇔ ナビの全単射を契約テストで固定**し、以後ページ追加時のナビ登録漏れを機械検知。URL は不変（`app/**/page.tsx` と `netlify.toml` は未編集）。TDD サイクル（Red/Green/Refactor/Docs Sync）でコミット分割。Vitest 契約テスト 18 件追加（合計 **1064 テスト合格**）。
 - **metadata 欠落 3 ページの SEO 修正**: F-1 のレジストリ初期値採取中に、`/code-review/coderabbit-guide`・`/code-review/sonar-qube`・`/codex/harness-engineering` の 3 ページだけ `export const metadata` を持たず、SEO タイトル・説明が出力されていないことが判明。根因は書き忘れではなく **Client Component 境界の設計差**で、前 2 ページはページ全体が `"use client"` のため Next.js の規約上 page.tsx から metadata を export できない状態だった（他 53 ページは Server Component）。TDD（Red→Green）で対応し、`"use client"` の 2 ページはルート単位の `layout.tsx`（Server Component）から metadata を供給（本体の大規模リファクタは行わない最小差分）、`codex/harness-engineering` は page.tsx へ直接追加。description は `lib/page-registry.ts` の summary と同一文言に統一。Vitest 契約テスト 6 件追加（合計 **1046 テスト合格**）。
 - **鮮度基盤（ページレジストリ + What's New）の導入 — plans/006 Phase 1（F-1 / F-2）**: `web-next/lib/page-registry.ts` を新設し、全 57 ルート（Home + 55 ガイド + What's New）のメタデータ（title / group / provider / topics / summary / addedAt / lastReviewed）を Zod 検証付きの SSoT として集約 🚀。初期値は全フィールドを機械採取（title/group は nav-links、summary は各 page.tsx の metadata.description、日付は git log）。TDD サイクル（Red/Green/Refactor）でコミット分割。派生実装として ① `components/site/PageFreshness.tsx` を `app/layout.tsx` に 1 箇所マウントし、55 個の page.tsx を編集せずに全ページへ「最終確認日 / 公開日」バッジを表示（SiteHeader と同じ `usePathname()` パターン。SSG プリレンダで静的 HTML に焼き込まれることをビルド出力で確認済み）、② `app/whats-new/page.tsx` を registry から静的生成（新着 = addedAt 降順 / 最近更新 = lastReviewed 降順、各上位 12 件）、③ `app/sitemap.ts` のハードコード ROUTES（24 件で実ルート 55 と乖離＝stale）を registry 駆動へ置換し欠落 31 ルートを解消、`lastmod` にビルド日時ではなく `lastReviewed` を出力。ナビはトップレベル 17 → 18 項目（末尾に What's New）。Vitest 契約テスト 44 件追加（合計 **1040 テスト合格**）。
 - **LLM評価・ベンチマーク & オブザーバビリティ ガイドの Next.js 移行**: ルートの `Llm-evaluation-observability-best-practices.html` を `web-next/app/llm-ops/evaluation-observability/page.tsx` に完全移行 🚀。TDD サイクル（Red/Green/Refactor）に沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策（target/rel）、10個の Mermaid 図の中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションに新規カテゴリ「LLMOps -> Evaluation & Observability」を追加し、関連統合テストを 15 ドロップダウン対応に更新。元のHTML・MDファイルはアーカイブディレクトリに退避。Vitest 契約テスト 9 件追加（合計 931 テスト合格）。
@@ -186,7 +196,7 @@ Next.js 移行完了後のリポジトリ `LLM-Studies` にて、テストカバ
 Next.js 移行完了後のリポジトリ `LLM-Studies` の保守・改善作業を再開してください。
 
 - リポジトリ: LLM-Studies (Next.js 移行プロジェクトは dev/main へ完全マージ済み)
-  - 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (1046/1046 passed) / pytest (38/38 passed) で全 Green
+  - 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (1119/1119 passed) / pytest (38/38 passed) で全 Green
 - リポジトリ規約: CLAUDE.md (編集上の絶対ルール。※Antigravity環境ではビルドは実行禁止)
 
 作業方針：
