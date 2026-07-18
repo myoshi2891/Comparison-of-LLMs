@@ -396,7 +396,7 @@ cd web-next && bun run build
 
      ```bash
      # E. ルート / レジストリの件数突合
-     ls web-next/app/**/page.tsx | wc -l
+     find web-next/app -type f -name page.tsx | wc -l
      grep -c '^    slug:' web-next/lib/page-registry.ts
      ```
 
@@ -423,7 +423,7 @@ Markdown を編集したら `markdown-formatter` スキルの手順でリント�
 
 ```bash
 # PII チェック（no-absolute-paths.md）— 出力が空であること
-git diff --cached | grep -E '^\+[^+]' | grep -E '(/Users/|/home/|C:\\Users\\)' | grep -vE 'johndoe'
+git diff --cached | grep -E '^\+[^+]' | grep -E '(/Users/|/home/|C:\\Users\\)'
 ```
 
 **Commit**: `chore(docs): sync spec files — nav regrouping (F-4') + docs-sync/TDD rule coverage`
@@ -452,7 +452,7 @@ ALL が満たされること:
 - [ ] `cd web-next && bun run lint` — exit 0（新規違反ゼロ）
 - [ ] `cd web-next && bun run build` — exit 0
 - [ ] `cd scraper && uv run pytest` — all pass（無変更の確認）
-- [ ] `grep -n 'href: "/' web-next/components/site/nav-links.ts` — **マッチ 0 件**
+- [ ] `grep -E -n 'href:\s*"/' web-next/components/site/nav-links.ts` — **マッチ 0 件**
       （手書きの href が全廃され、導出のみになっている）
 - [ ] `git diff --name-only 29d929d..HEAD -- 'web-next/app/**/page.tsx'` — **空**（URL / ページ本体は不変）
 - [ ] `netlify.toml` が未変更
@@ -494,3 +494,5 @@ ALL が満たされること:
   - Providers 以外のグループの 2 段ネスト化 — 1 ページのカテゴリで 3 段ホバーが発生するため不採用（設計判断 2）
   - `topics` を使った横断導線（F-5 タグ・横断検索 / F-7 関連ページリンク）— 006 Phase 3 の担当。
     openclaw のような横断的ページの発見性はそちらで解決する
+
+(最終更新日: 2026-07-18)

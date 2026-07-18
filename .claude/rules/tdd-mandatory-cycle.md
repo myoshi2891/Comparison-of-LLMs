@@ -11,7 +11,7 @@ paths:
 
 # TDD 必須サイクル & コミット分割ルール
 
-(最終更新日: 2026-07-14)
+(最終更新日: 2026-07-18)
 
 プロジェクトの品質とトレーサビリティを担保するため、以下の TDD サイクルおよびコミット分割を**絶対的な強制ルール**として適用する。
 
@@ -85,7 +85,7 @@ HTML → Next.js ページ移行（`web-next/app/` 下のページ新規作成�
 
 これらは「どのページからも見える」変更であり、`docs/PROGRESS.md` だけでは追跡できない。
 
-- **更新対象**: `docs/PROGRESS.md`（テスト数・HEAD）+ `plans/README.md`（該当プランの Status 行）+ `CLAUDE.md`（設計判断・アーキテクチャ）
+- **更新対象**: `docs/PROGRESS.md`（テスト数・HEAD）+ `plans/README.md`（該当プランの Status 行）+ `CLAUDE.md`（設計判断・アーキテクチャ）+ `GEMINI.md`（CLAUDE.mdへの委譲ポインタ・ルール同期）
 - **コミット**: `chore(docs): sync spec files — <変更内容の要約>`
 
 > 詳細な監査手順は `.claude/skills/docs-sync/SKILL.md` を参照（イベント C = ナビゲーション / レジストリ変更）。

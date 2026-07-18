@@ -18,7 +18,7 @@ description: >
 
 # 仕様書同期スキル
 
-(最終更新日: 2026-07-14)
+(最終更新日: 2026-07-18)
 
 ## Goal
 
@@ -115,13 +115,13 @@ ls web-next/app/*/page.tsx web-next/app/*/*/page.tsx 2>/dev/null | sed 's|web-ne
 find web-next/tests/ web-next/app/ web-next/components/ -name "*.test.ts" -o -name "*.test.tsx" 2>/dev/null | sort
 
 # D. テスト実行結果の取得
-cd web-next && bun run test 2>&1 | tail -5
-cd web-next && bun run lint 2>&1 | tail -5
+(cd web-next && bun run test 2>&1 | tail -5)
+(cd web-next && bun run lint 2>&1 | tail -5)
 
 # E. ルート / レジストリの件数突合（両者は一致していなければならない）
 #    F-4' 以降ナビも registry から導出されるため、ここがズレると
 #    ナビ・sitemap・What's New から同時にページが欠落する
-ls web-next/app/**/page.tsx | wc -l
+find web-next/app -type f -name page.tsx | wc -l
 grep -c '^    slug: "' web-next/lib/page-registry.ts
 ```
 
@@ -177,7 +177,7 @@ git commit -m "chore(docs): sync spec files — <具体的な更新理由や同�
 コミット前に PII チェック（`.claude/rules/no-absolute-paths.md`）を実行すること:
 
 ```bash
-git diff --cached | grep -E '^\+[^+]' | grep -E '(/Users/|/home/|C:\\Users\\)' | grep -vE 'johndoe'
+git diff --cached | grep -E '^\+[^+]' | grep -E '(/Users/|/home/|C:\\Users\\)'
 ```
 
 ---
