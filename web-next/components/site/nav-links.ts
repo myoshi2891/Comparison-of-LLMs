@@ -59,28 +59,63 @@ export type NavDropdown = z.infer<typeof DropdownSchema>;
 export type NavNode = NavLeaf | NavSubGroup;
 export type NavLink = NavLeaf | NavDropdown;
 
+/**
+ * Determines whether a navigation node represents a leaf link.
+ *
+ * @param node - The navigation node to inspect
+ * @returns `true` if the node has an `href` property, `false` otherwise.
+ */
 export function isNavLeaf<T extends { name: string }>(node: T): node is T & NavLeaf {
   return "href" in node;
 }
 
+/**
+ * Determines whether a navigation node is a subgroup with child links.
+ *
+ * @param node - The navigation node to inspect
+ * @returns `true` if the node has child links, `false` otherwise.
+ */
 export function isNavSubGroup<T extends { name: string }>(node: T): node is T & NavSubGroup {
   return "children" in node;
 }
 
-/** 表示順のキー: addedAt 昇順 → slug 昇順。辞書順ソートが成立する形に組む。 */
+/**
+ * Builds a lexicographic sorting key from a page's creation date and slug.
+ *
+ * @param entry - The page entry used to construct the sorting key.
+ * @returns A string containing the entry's `addedAt` value followed by its slug.
+ */
 function sortKey(entry: PageEntry): string {
   return `${entry.addedAt} ${entry.slug}`;
 }
 
+/**
+ * Converts a page entry into a navigation leaf.
+ *
+ * @param entry - The page entry to convert
+ * @returns A navigation leaf using the entry's title and slug
+ */
 function toLeaf(entry: PageEntry): NavLeaf {
   return { name: entry.title, href: entry.slug };
 }
 
+/**
+ * Converts page entries into navigation leaves ordered by their sort keys.
+ *
+ * @param entries - The page entries to convert
+ * @returns The sorted navigation leaves
+ */
 function sortedLeaves(entries: readonly PageEntry[]): NavLeaf[] {
   return [...entries].sort((a, b) => sortKey(a).localeCompare(sortKey(b))).map(toLeaf);
 }
 
-/** Providers のようなネストするグループを「カテゴリ → ページ」の 2 段に組む。 */
+/**
+ * Groups entries by their configured category order and converts each category into a navigation subgroup.
+ *
+ * @param group - The navigation group whose category order defines the subgroup order
+ * @param entries - The page entries to group
+ * @returns The populated navigation subgroups in category order
+ */
 function buildSubGroups(group: NavGroup, entries: readonly PageEntry[]): NavSubGroup[] {
   const order = CATEGORY_ORDER[group];
   if (!order) {
@@ -113,10 +148,11 @@ function buildSubGroups(group: NavGroup, entries: readonly PageEntry[]): NavSubG
 }
 
 /**
- * pageRegistry からナビ木を組む純粋関数。
+ * Builds the navigation tree from page registry entries.
  *
- * 未知の group や category 欠落は silent drop せず throw する。黙って落とすと
- * ページがナビから消えたまま気付けないため（registry の Zod parse と同じ思想）。
+ * @param entries - The page entries to organize into navigation links
+ * @returns Navigation links ordered by the configured group and category order
+ * @throws If an entry has an unknown group, or contains invalid group-specific metadata
  */
 export function buildNavLinks(entries: readonly PageEntry[] = pageRegistry): NavLink[] {
   const byGroup = new Map<NavGroup, PageEntry[]>();

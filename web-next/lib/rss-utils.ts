@@ -6,13 +6,10 @@
 export const MAX_ITEMS = 20;
 
 /**
- * Escapes the five characters reserved in XML.
- *
- * `&` must be replaced first, otherwise the ampersands introduced by the other
- * replacements would be escaped twice.
+ * Escapes XML-reserved characters in text.
  *
  * @param value - Raw text that may contain XML-reserved characters
- * @returns The text with `& < > " '` replaced by their entity references
+ * @returns The text with `&`, `<`, `>`, `"`, and `'` replaced by their XML entity references
  */
 export function escapeXml(value: string): string {
   return value

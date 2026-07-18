@@ -15,15 +15,15 @@ import { findBySlug, type PageEntry, pageRegistry } from "./page-registry";
 export const DEFAULT_LIMIT = 3;
 
 /**
- * Finds the pages most closely related to a given page by shared topics.
+ * Finds pages most closely related to the page identified by `slug`, based on shared topics.
  *
- * Ranking: shared-topic count (desc) → same group first → `addedAt` (desc) → `slug` (asc).
- * Pages sharing no topic are excluded, so a page with empty `topics` gets no results.
+ * Results prioritize shared topic count, matching groups, newer entries, and then ascending slugs.
+ * Pages with no shared topics are excluded.
  *
- * @param slug - Route path of the source page
+ * @param slug - Slug identifying the source page
  * @param limit - Maximum number of related pages to return
- * @param pool - Entries to rank against; defaults to the full registry (injectable for tests)
- * @returns Related entries, best match first; empty when the page is unregistered or has no overlap
+ * @param pool - Entries to search and rank
+ * @returns Related entries in ranked order, or an empty array when the source page is unavailable or has no related entries
  */
 export function relatedEntries(
   slug: string,

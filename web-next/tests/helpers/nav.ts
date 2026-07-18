@@ -7,12 +7,20 @@
  */
 import { isNavLeaf, type NavLeaf, type NavLink } from "@/components/site/nav-links";
 
-/** ナビ木のすべてのリーフ href を出現順（＝表示順）に集める。 */
+/**
+ * Collects the `href` values of all navigation leaves in display order.
+ *
+ * @returns The leaf `href` values in occurrence order
+ */
 export function collectNavHrefs(links: readonly NavLink[]): string[] {
   return collectNavLeaves(links).map((leaf) => leaf.href);
 }
 
-/** ナビ木のすべてのリーフを出現順に集める。 */
+/**
+ * Collects all navigation leaves in their occurrence order.
+ *
+ * @returns The navigation leaves found in display order
+ */
 export function collectNavLeaves(links: readonly NavLink[]): NavLeaf[] {
   const leaves: NavLeaf[] = [];
   for (const link of links) {
@@ -31,7 +39,12 @@ export function collectNavLeaves(links: readonly NavLink[]): NavLeaf[] {
   return leaves;
 }
 
-/** 指定 href のリーフを深さに関係なく探す。 */
+/**
+ * Finds the first navigation leaf with the specified `href`.
+ *
+ * @param href - The `href` to search for
+ * @returns The matching navigation leaf, or `undefined` if none is found
+ */
 export function findNavLeaf(links: readonly NavLink[], href: string): NavLeaf | undefined {
   return collectNavLeaves(links).find((leaf) => leaf.href === href);
 }

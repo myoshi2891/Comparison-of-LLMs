@@ -9,6 +9,9 @@ export const metadata: Metadata = {
     "OpenAI GPT-5.6 Sol / Terra / Luna のモデル選定、Reasoning、PTC、プロンプト設計、移行とコスト最適化を解説する実践ガイド。",
 };
 
+/**
+ * Renders the GPT-5.6 best practices guide page.
+ */
 export default function Gpt56BestPracticesPage() {
   return (
     <div className={styles.root}>

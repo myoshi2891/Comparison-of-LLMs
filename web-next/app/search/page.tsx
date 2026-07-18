@@ -10,11 +10,9 @@ export const metadata: Metadata = {
 };
 
 /**
- * Renders the `/search` page shell.
+ * Renders the search page shell and interactive search interface.
  *
- * Kept a Server Component so it can export `metadata`; the interactive part reads
- * `?q=` / `?tag=` via `useSearchParams`, which needs the Suspense boundary below
- * to build under `output: 'export'`.
+ * @returns The rendered search page.
  */
 export default function SearchPage() {
   return (

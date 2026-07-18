@@ -9,6 +9,9 @@ export const metadata: Metadata = {
     "AIガバナンスの基礎、NIST AI RMF・EU AI Act・ISO/IEC 42001などの国際フレームワーク、組織での構築手順を初学者向けに解説する実践ガイド。",
 };
 
+/**
+ * Renders the AI governance practical guide page.
+ */
 export default function AiGovernancePage() {
   return (
     <div className={styles.root}>

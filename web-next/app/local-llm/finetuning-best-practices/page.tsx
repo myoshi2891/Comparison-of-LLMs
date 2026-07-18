@@ -4,6 +4,11 @@ import GuideContent from "./GuideContent";
 import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
 
+/**
+ * Generates metadata for the fine-tuning best practices guide page.
+ *
+ * @returns Metadata containing the page title and description
+ */
 export function generateMetadata(): Metadata {
   const entry = findBySlug("/local-llm/finetuning-best-practices");
   return {
@@ -14,6 +19,9 @@ export function generateMetadata(): Metadata {
   };
 }
 
+/**
+ * Renders the fine-tuning best practices guide page.
+ */
 export default function FineTuningBestPracticesPage() {
   return (
     <div className={styles.root}>

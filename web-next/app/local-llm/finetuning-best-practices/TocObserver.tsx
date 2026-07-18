@@ -2,6 +2,9 @@
 
 import { useEffect } from "react";
 
+/**
+ * Synchronizes the table of contents with the currently visible guide section.
+ */
 export default function TocObserver() {
   useEffect(() => {
     const root = document.querySelector(".fineTuningGuide");

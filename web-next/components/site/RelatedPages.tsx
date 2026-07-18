@@ -6,13 +6,10 @@ import { relatedEntries } from "@/lib/related-pages";
 import styles from "./RelatedPages.module.css";
 
 /**
- * Renders links to the pages most related to the current one (F-7 / plans/009).
+ * Renders navigation links to pages related to the current route.
  *
- * Mounted once in `app/layout.tsx` after `{children}`, so every page gets related
- * links without editing 55 page.tsx files — the same strategy as `PageFreshness`.
- *
- * @param pathname - Optional route override used to select the source page.
- * @returns A related-pages nav, or `null` when the page is unregistered or has no overlap.
+ * @param pathname - Optional route used instead of the current route.
+ * @returns A related-pages navigation element, or `null` when no related pages are available.
  */
 export function RelatedPages({ pathname: pathnameProp }: { pathname?: string } = {}) {
   const fromHook = usePathname();
