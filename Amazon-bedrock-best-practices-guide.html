@@ -1417,26 +1417,7 @@ print(response["action"])  # GUARDRAIL_INTERVENED または NONE</code></pre>
         </p>
 
         <div class="mermaid-block">
-          <pre class="mermaid">
-flowchart TB
-    Agent["エージェントコード&lt;br/&gt;LangGraph / Strands Agents 等"] --> RT["AgentCore Runtime&lt;br/&gt;セッション分離実行環境"]
-    subgraph "Amazon Bedrock AgentCore"
-        RT
-        MEM["Memory&lt;br/&gt;短期・長期記憶"]
-        GW["Gateway&lt;br/&gt;ツール接続 / MCP対応"]
-        ID["Identity&lt;br/&gt;認証・認可"]
-        OBS["Observability&lt;br/&gt;OpenTelemetry連携"]
-        EVAL["Evaluations&lt;br/&gt;LLM-as-a-Judge"]
-    end
-    RT --> MEM
-    RT --> GW
-    GW --> Tools["外部API / Lambda / MCPサーバー"]
-    ID --> RT
-    RT --> OBS
-    OBS --> CW["Amazon CloudWatch"]
-    OBS --> EVAL
-    </pre
-          >
+          <div id="diag-agentcore" class="mermaid"></div>
           <div class="mermaid-caption">図5：AgentCoreのコンポーネント構成</div>
         </div>
 
@@ -1575,17 +1556,7 @@ flowchart TB
         </table>
 
         <div class="mermaid-block">
-          <pre class="mermaid">
-flowchart TD
-    Start["ワークロードの特性を確認"] --> Q1{"トラフィックは&lt;br/&gt;予測可能か？"}
-    Q1 -->|"不規則・低頻度"| OD["オンデマンド&lt;br/&gt;従量課金"]
-    Q1 -->|"安定・高頻度"| Q2{"リアルタイム応答が&lt;br/&gt;必要か？"}
-    Q2 -->|"不要（非同期でよい）"| Batch["バッチ推論&lt;br/&gt;約50%割引"]
-    Q2 -->|"必要"| Q3{"利用率が損益分岐点を&lt;br/&gt;継続的に超えるか？"}
-    Q3 -->|"Yes"| PT["プロビジョンドスループット&lt;br/&gt;予約容量・低レイテンシ保証"]
-    Q3 -->|"No"| OD
-    </pre
-          >
+          <div id="diag-billing" class="mermaid"></div>
           <div class="mermaid-caption">図6：課金モードの選択フロー</div>
         </div>
 
@@ -2647,29 +2618,29 @@ flowchart TD
         G --> Ans[" 根拠付きの回答を生成 "]
     end`,
         'diag-agentcore': `flowchart TB
-    Agent["エージェントコード<br/>LangGraph / Strands Agents 等"] --> RT["AgentCore Runtime<br/>セッション分離実行環境"]
+    Agent[" エージェントコード<br/>LangGraph / Strands Agents 等 "] --> RT[" AgentCore Runtime<br/>セッション分離実行環境 "]
     subgraph "Amazon Bedrock AgentCore"
         RT
-        MEM["Memory<br/>短期・長期記憶"]
-        GW["Gateway<br/>ツール接続 / MCP対応"]
-        ID["Identity<br/>認証・認可"]
-        OBS["Observability<br/>OpenTelemetry連携"]
-        EVAL["Evaluations<br/>LLM-as-a-Judge"]
+        MEM[" Memory<br/>短期・長期記憶 "]
+        GW[" Gateway<br/>ツール接続 / MCP対応 "]
+        ID[" Identity<br/>認証・認可 "]
+        OBS[" Observability<br/>OpenTelemetry連携 "]
+        EVAL[" Evaluations<br/>LLM-as-a-Judge "]
     end
     RT --> MEM
     RT --> GW
-    GW --> Tools["外部API / Lambda / MCPサーバー"]
+    GW --> Tools[" 外部API / Lambda / MCPサーバー "]
     ID --> RT
     RT --> OBS
-    OBS --> CW["Amazon CloudWatch"]
+    OBS --> CW[" Amazon CloudWatch "]
     OBS --> EVAL`,
         'diag-billing': `flowchart TD
-    Start["ワークロードの特性を確認"] --> Q1{"トラフィックは<br/>予測可能か？"}
-    Q1 -->|"不規則・低頻度"| OD["オンデマンド<br/>従量課金"]
-    Q1 -->|"安定・高頻度"| Q2{"リアルタイム応答が<br/>必要か？"}
-    Q2 -->|"不要（非同期でよい）"| Batch["バッチ推論<br/>約50%割引"]
-    Q2 -->|"必要"| Q3{"利用率が損益分岐点を<br/>継続的に超えるか？"}
-    Q3 -->|"Yes"| PT["プロビジョンドスループット<br/>予約容量・低レイテンシ保証"]
+    Start[" ワークロードの特性を確認 "] --> Q1{" トラフィックは<br/>予測可能か？ "}
+    Q1 -->|"不規則・低頻度"| OD[" オンデマンド<br/>従量課金 "]
+    Q1 -->|"安定・高頻度"| Q2{" リアルタイム応答が<br/>必要か？ "}
+    Q2 -->|"不要（非同期でよい）"| Batch[" バッチ推論<br/>約50%割引 "]
+    Q2 -->|"必要"| Q3{" 利用率が損益分岐点を<br/>継続的に超えるか？ "}
+    Q3 -->|"Yes"| PT[" プロビジョンドスループット<br/>予約容量・低レイテンシ保証 "]
     Q3 -->|"No"| OD`
       };
 
