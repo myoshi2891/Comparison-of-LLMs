@@ -37,10 +37,22 @@ export const CATEGORY_ORDER: Partial<Record<NavGroup, readonly string[]>> = {
   Providers: ["Claude", "Google", "Codex", "Copilot"],
 };
 
+/**
+ * Determines whether a navigation group is rendered as a single independent link.
+ *
+ * @param group - The navigation group to classify
+ * @returns `true` if the group is flat, `false` otherwise
+ */
 export function isFlatGroup(group: NavGroup): boolean {
   return (FLAT_GROUPS as readonly NavGroup[]).includes(group);
 }
 
+/**
+ * Determines whether a navigation group uses two-level nesting.
+ *
+ * @param group - The navigation group to classify
+ * @returns `true` if the group uses nested navigation, `false` otherwise.
+ */
 export function isNestedGroup(group: NavGroup): boolean {
   return (NESTED_GROUPS as readonly NavGroup[]).includes(group);
 }

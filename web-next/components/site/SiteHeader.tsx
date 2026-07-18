@@ -8,30 +8,45 @@ import { SiteHeaderClient } from "./SiteHeaderClient";
 const GITHUB_URL = "https://github.com/myoshi2891/AI-Model-Cost-Calculator";
 
 /**
- * Next.js App Router + output: 'export' では RSC から pathname を参照できない
- * (usePathname は Client 専用)。Phase A では SiteHeader を Client にし、
- * usePathname() で現在地を取得する。テストは pathname プロップで上書き可能。
+ * Determines whether a navigation link matches the current pathname.
+ *
+ * @param href - The navigation link pathname
+ * @param pathname - The current pathname
+ * @returns `true` if the pathnames match exactly, `false` otherwise.
  */
 function isActivePath(href: string, pathname: string): boolean {
   return href === pathname;
 }
 
 /**
- * F-4' 以降ナビは最大 3 段（グループ → カテゴリ → ページ）になったため、
- * active 判定も再帰させる。祖先まで波及させないと、現在地が畳まれたメニューの
- * 中に埋もれてどのグループにいるのか分からなくなる。
+ * Determines whether a navigation node or one of its child routes matches the current pathname.
+ *
+ * @param node - The navigation node to evaluate
+ * @param pathname - The current route pathname
+ * @returns `true` if the node or a child route matches `pathname`, `false` otherwise.
  */
 function isNodeActive(node: NavNode, pathname: string): boolean {
   if (isNavLeaf(node)) return isActivePath(node.href, pathname);
   return node.children.some((leaf) => isActivePath(leaf.href, pathname));
 }
 
+/**
+ * Determines whether a navigation link should display an active state based on its descendants.
+ *
+ * @param link - The navigation link to evaluate.
+ * @param pathname - The current route pathname.
+ * @returns `true` if a descendant matches the pathname, `false` otherwise.
+ */
 function isParentActive(link: NavLink, pathname: string): boolean {
   if (isNavLeaf(link)) return false;
   return link.children.some((child) => isNodeActive(child, pathname));
 }
 
-/** リーフ 1 件分の <li><Link>。1 段目・2 段目・3 段目で共通。 */
+/**
+ * Renders a navigation link for a leaf route.
+ *
+ * @returns A list item containing the navigation link, marked as the current page when its route is active.
+ */
 function NavLeafItem({ href, name, pathname }: { href: string; name: string; pathname: string }) {
   const active = isActivePath(href, pathname);
   return (
@@ -47,7 +62,13 @@ function NavLeafItem({ href, name, pathname }: { href: string; name: string; pat
   );
 }
 
-/** 2 段目のサブドロップダウン（Providers ▸ Claude など）。 */
+/**
+ * Renders a nested navigation group and its page links.
+ *
+ * @param group - The navigation group to display.
+ * @param pathname - The current route path used to determine the active state.
+ * @returns The rendered navigation group.
+ */
 function NavSubDropdown({ group, pathname }: { group: NavSubGroup; pathname: string }) {
   const active = isNodeActive(group, pathname);
   return (

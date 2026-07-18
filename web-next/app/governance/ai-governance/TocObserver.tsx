@@ -2,6 +2,9 @@
 
 import { useEffect } from "react";
 
+/**
+ * Tracks visible guide sections and updates the corresponding table-of-contents link.
+ */
 export default function TocObserver() {
   useEffect(() => {
     if (!("IntersectionObserver" in window)) return;

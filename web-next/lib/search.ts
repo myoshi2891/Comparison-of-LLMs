@@ -14,12 +14,21 @@
 import { NAV_GROUPS } from "./nav-taxonomy";
 import { type PageEntry, pageRegistry } from "./page-registry";
 
-/** 検索・タグの照合用に文字列を正規化する（全角吸収 + 大小無視）。 */
+/**
+ * Normalizes text for case-insensitive matching.
+ *
+ * @param value - The text to normalize
+ * @returns The NFKC-normalized, lowercase text
+ */
 function normalize(value: string): string {
   return value.normalize("NFKC").toLowerCase();
 }
 
-/** エントリの検索対象テキスト（title / summary / topics / group / category）を 1 本に連結する。 */
+/**
+ * Provides normalized searchable text for a page entry.
+ *
+ * @returns The normalized text derived from the entry's title, summary, topics, group, and category.
+ */
 function haystack(entry: PageEntry): string {
   return normalize(
     [entry.title, entry.summary, entry.topics.join(" "), entry.group, entry.category ?? ""].join(
@@ -28,6 +37,13 @@ function haystack(entry: PageEntry): string {
   );
 }
 
+/**
+ * Compares page entries by navigation group, newest addition date, and slug.
+ *
+ * @param a - The first page entry
+ * @param b - The second page entry
+ * @returns A negative number, zero, or a positive number according to the ordering of `a` and `b`
+ */
 function byGroupThenDate(a: PageEntry, b: PageEntry): number {
   const groupDelta = NAV_GROUPS.indexOf(a.group) - NAV_GROUPS.indexOf(b.group);
   return groupDelta || b.addedAt.localeCompare(a.addedAt) || a.slug.localeCompare(b.slug);

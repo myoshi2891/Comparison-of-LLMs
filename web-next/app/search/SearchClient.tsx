@@ -7,13 +7,11 @@ import { allTopics, searchEntries } from "@/lib/search";
 import styles from "./page.module.css";
 
 /**
- * Interactive search UI for `/search` (F-5 / plans/009).
+ * Provides an interactive search interface for filtering and browsing pages.
  *
- * The query and tag live in the URL (`?q=` / `?tag=`) so a result view can be shared.
- * `useSearchParams` requires a Suspense boundary under `output: 'export'`, which the
- * server component in `page.tsx` provides.
+ * Search keywords and topic filters are stored in the URL so filtered results can be shared.
  *
- * @returns The search box, topic chips, and the matching result cards.
+ * @returns The search controls and matching result cards.
  */
 export function SearchClient() {
   const router = useRouter();

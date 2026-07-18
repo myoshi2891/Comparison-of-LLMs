@@ -26,14 +26,20 @@ function toRfc822(isoDate: string): string {
   return new Date(`${isoDate}T00:00:00Z`).toUTCString();
 }
 
+/**
+ * Builds an absolute site URL for a registry slug.
+ *
+ * @param slug - The registry path to append to the site URL
+ * @returns The absolute URL for the slug
+ */
 function absoluteUrl(slug: string): string {
   return slug === "/" ? `${SITE_URL}/` : `${SITE_URL}${slug}`;
 }
 
 /**
- * Serves the site feed as RSS 2.0, listing the newest registry pages first.
+ * Generates the site’s RSS 2.0 feed from the newest registry pages.
  *
- * @returns A static `Response` containing the RSS document
+ * @returns A response containing the RSS XML document.
  */
 export function GET(): Response {
   const items = byAddedAtDesc(MAX_ITEMS)

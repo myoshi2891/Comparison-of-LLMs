@@ -35,6 +35,16 @@ const ICON_TEXT: Record<string, string> = {
   "ti ti-world": "◎",
 };
 
+/**
+ * Converts HTML attributes into React-compatible props.
+ *
+ * Maps `class` and `for` to their React equivalents, omits inline styles, and
+ * configures external links to open in a separate tab with safe relationship
+ * attributes.
+ *
+ * @param node - The parsed HTML node whose attributes are converted
+ * @returns The React-compatible props
+ */
 function propsFor(node: HtmlNode): Record<string, string> {
   const props: Record<string, string> = {};
   for (const [name, value] of Object.entries(node.attribs ?? {})) {
@@ -53,6 +63,14 @@ function propsFor(node: HtmlNode): Record<string, string> {
   return props;
 }
 
+/**
+ * Converts a parsed HTML node into a React element or text value.
+ *
+ * @param node - The HTML node to render
+ * @param key - The React key assigned to the rendered node
+ * @param parentName - The parent tag name used when handling text nodes
+ * @returns The rendered React content, or `null` for unsupported or filtered nodes
+ */
 function renderNode(node: HtmlNode, key: string, parentName?: string): ReactNode {
   if (node.type === "text") {
     if (TABLE_CONTENT_ELEMENTS.has(parentName ?? "") && !node.data?.trim()) return null;
@@ -83,6 +101,11 @@ function renderNode(node: HtmlNode, key: string, parentName?: string): ReactNode
   );
 }
 
+/**
+ * Renders the AI governance guide content.
+ *
+ * @returns The guide content wrapped in the AI governance guide container.
+ */
 export default function GuideContent() {
   return <div className="aiGovernanceGuide">{renderNode(layout, "layout")}</div>;
 }
