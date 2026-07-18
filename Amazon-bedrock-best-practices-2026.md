@@ -46,7 +46,7 @@ flowchart TB
     F -.-> L
 ```
 
-この図の各ブロックが、以降の「Step 1〜11」に対応します。
+この図の各ブロックが、以降の「Step 1〜12」に対応します。
 
 ---
 
@@ -182,7 +182,7 @@ flowchart TB
 - **AgentCore Memory**: セッションをまたいだ文脈の永続化と、ストリーミング通知による状態共有
 - **AgentCore Observability**: OpenTelemetry準拠のトレースをCloudWatchに集約
 - **AgentCore Evaluations**: 継続的な品質評価（Step 10で詳述）
-- **Policy控制（CEDAR言語）**: エージェントがツール呼び出しを実行する前に、推論ループの外側で許可判定を行う。これにより「エージェントが暴走しないか」という懸念に対し、決定論的な制御層を提供する
+- **Policy制御（CEDAR言語）**: エージェントがツール呼び出しを実行する前に、推論ループの外側で許可判定を行う。これにより「エージェントが暴走しないか」という懸念に対し、決定論的な制御層を提供する
 
 ### 4-4. PoCから本番への「谷」を越えるための実践知
 
@@ -213,13 +213,15 @@ flowchart TB
 | Automated Reasoning checks | 数学的検証（形式手法）によりハルシネーションや前提の誤りを検出 |
 | 画像コンテンツフィルタ | マルチモーダル入出力に含まれる有害な画像を検出 |
 
-### 5-2. Automated Reasoning checksは「確率」ではなく「証明」
+### 5-2. Automated Reasoning checksは形式論理に基づく検証
 
-Automated Reasoning checksは、他のGuardrailsの機能が確率的な分類モデルであるのに対し、SAT/SMTソルバーに基づく形式手法（Formal Verification）でモデル出力を検証するという点で本質的に異なります。HRポリシーや金融商品の約款など、自然言語で書かれたルール文書からポリシーを生成し、モデルの回答がそのルールと論理的に矛盾していないかを数学的に検証します。GA時点でAWSは正答検出において最大99%の精度を報告しており、規制業界（金融・保険・製薬）でのハルシネーション対策として採用が進んでいます。ただし、ポリシー化できるのは明確な論理ルールに落とし込める領域に限られるため、既存のコンテンツフィルタやRAGと併用するのが現実的です。
+Automated Reasoning checksは、他のGuardrailsの機能が確率的な分類モデルであるのに対し、SAT/SMTソルバーに基づく形式手法（Formal Verification）で形式論理に則ってモデル出力を検証するという点で本質的に異なります。HRポリシーや金融商品の約款など、自然言語で書かれたルール文書からポリシーを生成し、モデルの回答がそのルールと論理的に矛盾していないかを検証します。GA時点でAWSは正答検出において最大99%の精度を報告しており、規制業界（金融・保険・製薬）でのハルシネーション対策として採用が進んでいます。ただし、自然言語からポリシーへの変換誤りの可能性や、出力されるfindingsが設定されたconfidence threshold（確信度の閾値）に依存する点に留意する必要があります。絶対的な「証明」ではなく、ルール記述の不備や検証モデルの限界によるすり抜けもあり得るため、既存 of コンテンツフィルタやRAGと併用するのが現実的です。
 
 ### 5-3. GuardrailsはIAMで「必須化」する
 
 Guardrailsをアプリケーションコード側で「呼び出す・呼び出さない」を選べる状態にしておくと、実装漏れによって保護されないパスが生まれます。IAMポリシーの条件キー `bedrock:GuardrailIdentifier` を用いて、承認されたGuardrailを指定しないInvokeModel呼び出しそのものを拒否する設定にすることで、Guardrailsを「ベストエフォートの規約」ではなく「強制されたコントロール」に変えられます。
+
+なお、`bedrock:GuardrailIdentifier` 条件キーを用いたIAMポリシーによる制限は、直接の `InvokeModel` 推論ロールにのみ適用され、`RetrieveAndGenerate` や `InvokeAgent` などのハイレベルAPIが内部的に使用するロールには適用されません。そのため、直接推論用ロールとハイレベルAPI用ロールを明確に分離し、ハイレベルAPI経由の内部モデル呼び出しが意図せず拒否されないように設計する必要があります。
 
 ```json
 {
@@ -280,7 +282,7 @@ import boto3
 client = boto3.client("bedrock-runtime", region_name="us-east-1")
 
 response = client.converse(
-    modelId="arn:aws:bedrock:us-east-1:123456789012:prompt-router/my-custom-router",
+    modelId="arn:aws:bedrock:us-east-1:123456789012:default-prompt-router/my-custom-router",
     messages=[{"role": "user", "content": [{"text": "この契約書の第3条を要約してください"}]}],
 )
 ```
@@ -369,7 +371,7 @@ flowchart TB
 
 ### 8-6. エージェント特有のセキュリティ考慮事項
 
-エージェントがツールを実行できるようになると、単なるモデル呼び出しよりもリスクの質が変わります。AgentCore Runtimeでは、`bedrock-agentcore:subnets` や `bedrock-agentcore:securityGroups` といったIAM条件キーで、承認されたVPC内でのみランタイムが起動することを強制できます。また、JWTによるユーザー識別が常に利用可能なワークロードでは、`GetWorkloadAccessTokenForUserId` のような代替の識別パスを明示的に拒否し、暗号学的に検証されたJWT経路のみを許可する設計が推奨されます。
+エージェントがツールを実行できるようになると、単なるモデル呼び出しよりもリスクの質が変わります。AgentCore Runtimeでは、`bedrock-agentcore:subnets` や `bedrock-agentcore:securityGroups` といったIAM条件キーで、承認されたVPC内でのみランタイムが起動することを強制できます。また、JWTによるユーザー識別が常に利用可能なワークロードでは、ユーザーIDの委譲経路が残らないよう、`bedrock-agentcore:GetWorkloadAccessTokenForUserId` と `bedrock-agentcore:InvokeAgentRuntimeForUser` の両方のアクションを明示的に拒否し、暗号学的に検証されたJWT経路のみを強制する設計が推奨されます。
 
 ---
 
