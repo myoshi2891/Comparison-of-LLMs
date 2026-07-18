@@ -599,7 +599,7 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/local-llm/finetuning-best-practices",
-    title: "Fine-tuning Best Practices",
+    title: "LLMファインチューニング ベストプラクティスガイド",
     group: "モデル・データ",
     topics: ["local-llm", "fine-tuning"],
     summary:

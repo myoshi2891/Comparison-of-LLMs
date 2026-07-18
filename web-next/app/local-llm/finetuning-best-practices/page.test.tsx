@@ -5,12 +5,10 @@ import { load } from "cheerio";
 import type { ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
 import PageComponent, {
-  metadata as rawMetadata,
+  generateMetadata,
 } from "@/app/local-llm/finetuning-best-practices/page";
 
 const Page = PageComponent as unknown as () => ReactElement;
-type MetadataLike = { title?: unknown; description?: unknown };
-const metadata = rawMetadata as unknown as MetadataLike;
 
 vi.mock("@/components/docs/MermaidDiagram", () => ({
   default: function DummyMermaidDiagram({ chart }: { chart: string }) {
@@ -50,7 +48,8 @@ const EXPECTED_ANCHOR_IDS = [
 ] as const;
 
 describe("/local-llm/finetuning-best-practices - metadata", () => {
-  it("exports the guide metadata", () => {
+  it("generates the guide metadata", () => {
+    const metadata = generateMetadata();
     expect(metadata).toBeDefined();
     const title =
       typeof metadata.title === "string"
@@ -126,8 +125,10 @@ describe("/local-llm/finetuning-best-practices - faithful content safeguards", (
   });
 
   it("does not use the React raw-HTML injection prop", () => {
-    const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
+    const pageSource = readFileSync(join(__dirname, "page.tsx"), "utf8");
+    const guideSource = readFileSync(join(__dirname, "GuideContent.tsx"), "utf8");
     const needle = ["danger", "ously", "Set", "Inner", "HTML"].join("");
-    expect(source.includes(needle)).toBe(false);
+    expect(pageSource.includes(needle)).toBe(false);
+    expect(guideSource.includes(needle)).toBe(false);
   });
 });
