@@ -400,7 +400,9 @@ sequenceDiagram
     O-->>O: 最終結果を統合
 ```
 
-Gemini Enterprise Agent Platform の **Agent Runtime** は A2A を標準サポートしており、ADK でデプロイしたエージェントは自動的に A2A の Agent Card として発見可能になります。
+Gemini Enterprise Agent Platform の **Agent Runtime** への ADK デプロイと、A2A 経由でのエージェント公開は独立したプロセスです。
+ADK によるデプロイで自動的に登録・管理されるのは **Agent Registry** のみです。
+他のエージェントから A2A の Agent Card として発見可能にするには、単に ADK でデプロイするだけでなく、A2A プロトコルの仕様を満たすように実装した上で、`AgentCard` および `AgentExecutor` を明示的に提供する必要があります（デプロイするだけで自動的に skills や inference URL が取得されるわけではありません）。
 
 ### ベストプラクティス
 

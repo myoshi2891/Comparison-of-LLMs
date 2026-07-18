@@ -439,4 +439,4 @@ flowchart LR
 - CloudZero, "Google Vertex AI Pricing: Complete Enterprise Guide (2026)": https://www.cloudzero.com/blog/google-vertex-ai-pricing/
 - Wikipedia, "Gemini Enterprise Agent Platform"(背景・沿革の一次確認用途): https://en.wikipedia.org/wiki/Gemini_Enterprise_Agent_Platform
 
-> **注記**: Gemini Enterprise Agent Platformは発表から日が浅く(2026年4月22日発表)、Semantic Governance PoliciesをはじめプレビューM段階の機能や価格体系は今後変更される可能性があります。実装前に必ず上記の公式ドキュメントで最新のステータスを確認してください。
+> **注記**: Gemini Enterprise Agent Platformは発表から日が浅く(2026年4月22日発表)、Semantic Governance Policiesをはじめプレビュー段階の機能や価格体系は今後変更される可能性があります。実装前に必ず上記の公式ドキュメントで最新のステータスを確認してください。

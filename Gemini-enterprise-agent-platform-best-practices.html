@@ -1738,13 +1738,13 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@11.12.0/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
     <script>
       (function () {
         // ---- dedent: strips common leading whitespace introduced by editor auto-indent ----
         function dedent(str) {
-          let s = str.replace(/^<br>/, '').replace(/\s+$/, '');
-          const lines = s.split('<br>');
+          let s = str.replace(/^\n/, '').replace(/\s+$/, '');
+          const lines = s.split('\n');
           let minIndent = Infinity;
           lines.forEach(function (line) {
             if (line.trim().length === 0) return;
@@ -1756,7 +1756,7 @@
             .map(function (line) {
               return line.slice(minIndent);
             })
-            .join('<br>');
+            .join('\n');
         }
 
         // ---- Inject Mermaid diagrams from <script type="text/plain" data-diagram> ----
