@@ -2616,14 +2616,37 @@ print("{" + completion.choices[0].message.content)</code></pre>
         const toggle = document.getElementById('menuToggle');
         const sidebar = document.getElementById('sidebar');
         if (toggle && sidebar) {
+          function updateSidebarA11y() {
+            const isMobile = window.innerWidth <= 960;
+            const isOpen = sidebar.classList.contains('open');
+            if (isMobile) {
+              if (isOpen) {
+                sidebar.removeAttribute('inert');
+                toggle.setAttribute('aria-expanded', 'true');
+              } else {
+                sidebar.setAttribute('inert', '');
+                toggle.setAttribute('aria-expanded', 'false');
+              }
+            } else {
+              sidebar.removeAttribute('inert');
+              toggle.removeAttribute('aria-expanded');
+            }
+          }
+
           toggle.addEventListener('click', function () {
             sidebar.classList.toggle('open');
+            updateSidebarA11y();
           });
+
           navLinks.forEach(function (l) {
             l.addEventListener('click', function () {
               sidebar.classList.remove('open');
+              updateSidebarA11y();
             });
           });
+
+          window.addEventListener('resize', updateSidebarA11y);
+          updateSidebarA11y();
         }
       });
     </script>

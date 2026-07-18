@@ -2466,10 +2466,39 @@
         // 5. Mobile sidebar toggle
         const sidebar = document.getElementById('sidebar');
         const menuToggle = document.getElementById('menuToggle');
-        menuToggle?.addEventListener('click', () => sidebar.classList.toggle('open'));
-        sidebar?.querySelectorAll('a').forEach((a) => {
-          a.addEventListener('click', () => sidebar.classList.remove('open'));
-        });
+        if (sidebar && menuToggle) {
+          const updateSidebarA11y = () => {
+            const isMobile = window.innerWidth <= 920;
+            const isOpen = sidebar.classList.contains('open');
+            if (isMobile) {
+              if (isOpen) {
+                sidebar.removeAttribute('inert');
+                menuToggle.setAttribute('aria-expanded', 'true');
+              } else {
+                sidebar.setAttribute('inert', '');
+                menuToggle.setAttribute('aria-expanded', 'false');
+              }
+            } else {
+              sidebar.removeAttribute('inert');
+              menuToggle.removeAttribute('aria-expanded');
+            }
+          };
+
+          menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            updateSidebarA11y();
+          });
+
+          sidebar.querySelectorAll('a').forEach((a) => {
+            a.addEventListener('click', () => {
+              sidebar.classList.remove('open');
+              updateSidebarA11y();
+            });
+          });
+
+          window.addEventListener('resize', updateSidebarA11y);
+          updateSidebarA11y();
+        }
 
         // 6. Active-section highlighting in the sidebar TOC
         const tocLinks = Array.from(document.querySelectorAll('.toc a'));
