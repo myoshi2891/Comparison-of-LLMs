@@ -338,7 +338,7 @@ GitHub Spec Kitは、GitHubがOSS（MITライセンス）として提供する`s
 
 ### 8.1 インストールと初期化
 
-`uv`パッケージマネージャーを使い、`uv tool install specify-cli --from git+https://github.com/github/spec-kit.git`のようにインストールし、`specify init <project> --integration claude`（あるいは`--integration copilot`/`--integration gemini`/`--integration cursor`など）でプロジェクトを初期化します。Claude CodeやCodex CLIなどではスラッシュコマンドではなく、`.claude/skills/`配下に配置されるスキルベースの統合形式が使われる点に注意してください。
+`uv`パッケージマネージャーを使い、`uv tool install specify-cli --from git+https://github.com/github/spec-kit.git`のようにインストールし、`specify init <project> --integration claude`（あるいは`--integration copilot`/`--integration gemini`/`--integration cursor-agent`など）でプロジェクトを初期化します。Claude Codeでは`.claude/skills/`配下、Codex CLIでは`.agents/skills/`配下に`speckit-*`スキルを配置する形式が使われる点に注意してください。
 
 ### 8.2 コマンドの実行シーケンス
 
@@ -375,7 +375,7 @@ constitutionは、そのプロジェクトにおいて**AIエージェントが�
 - 公式のガイダンスでは、`/speckit.specify`の段階では技術スタックにできるだけ触れず、「何を」「なぜ」作るのかを先に明確にすることが推奨されています。
 - `/speckit.analyze`は実装前の最後の防衛線であり、要件が複数箇所に異なる表現で重複していないか、要件同士が矛盾していないかを検出します。
 - 実務者のブログ（Den Delimarsky氏）は、30タスクのリストをいきなり無人で`/speckit.implement`させず、まず3〜5タスクから始めてレビューし、constitutionを調整してからスケールアップすることを推奨しています。
-- Spec Kitは頻繁にCLIの仕様が変更されており（例えばv0.10.0で`--ai`フラグ体系が`--integration`方式に置き換えられた）、2026年6月以前のチュートリアルのコマンドが動作しない場合があるため、常に公式ドキュメントを確認する必要があります。
+- Spec Kitは頻繁にCLIの仕様が変更されており（例えば`--ai`フラグ体系がv0.7.1で非推奨化され、v0.10.0で完全削除されて`--integration`方式に置き換えられた）、2026年6月以前のチュートリアルのコマンドが動作しない場合があるため、常に公式ドキュメントを確認する必要があります。
 - Spec Kit自体が「実験的（experimental）」と位置づけられており、グリーンフィールドの新規開発や大規模な機能追加に最も適しており、小さなバグ修正には仕様のオーバーヘッドが見合わないとされています。
 
 ### 出典（第8章）

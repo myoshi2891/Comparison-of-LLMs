@@ -1367,8 +1367,8 @@
           <p>
             <code>uv</code>
             パッケージマネージャーを使い、次のようにインストールし、プロジェクトを初期化します。Claude
-            CodeやCodex CLIなどではスラッシュコマンドではなく、<code>.claude/skills/</code>
-            配下に配置されるスキルベースの統合形式が使われる点に注意してください。
+            Codeでは<code>.claude/skills/</code>配下、Codex CLIでは<code>.agents/skills/</code>
+            配下に<code>speckit-*</code>スキルを配置する形式が使われる点に注意してください。
           </p>
           <div>
             <script
@@ -1438,8 +1438,8 @@
               させず、まず3〜5タスクから始めてレビューし、constitutionを調整してからスケールアップすることを推奨しています。
             </li>
             <li>
-              Spec Kitは頻繁にCLIの仕様が変更されており（例えばv0.10.0で
-              <code>--ai</code> フラグ体系が
+              Spec Kitは頻繁にCLIの仕様が変更されており（例えば
+              <code>--ai</code> フラグ体系がv0.7.1で非推奨化され、v0.10.0で完全削除されて
               <code>--integration</code>
               方式に置き換えられた）、2026年6月以前のチュートリアルのコマンドが動作しない場合があるため、常に公式ドキュメントを確認する必要があります。
             </li>
@@ -2578,8 +2578,8 @@
       </main>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js" integrity="sha512-5TKaYvhenABhlGIKSxAWLFJBZCSQw7HTV7aL1dJcBokM/+3PNtfgJFlv8E6Us/B1VMlQ4u8sPzjudL9TEQ06ww==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin="anonymous"></script>
     <script>
       // VS Codeなどのエディタによる自動インデントで script[type="text/plain"] の内容が
       // 右にずれてしまう問題を吸収するための dedent 関数。
