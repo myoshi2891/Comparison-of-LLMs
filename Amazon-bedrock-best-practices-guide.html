@@ -1221,21 +1221,7 @@ print(response["output"]["message"]["content"][0]["text"])</code></pre>
         </table>
 
         <div class="mermaid-block">
-          <pre class="mermaid">
-flowchart TD
-    In["ユーザー入力"] --> L1{"コンテンツフィルタ&lt;br/&gt;有害カテゴリ検出"}
-    L1 -->|"通過"| L2{"トピックフィルタ&lt;br/&gt;禁止トピック判定"}
-    L1 -->|"違反"| Blocked["ブロック / 代替応答"]
-    L2 -->|"通過"| L3{"機密情報フィルタ&lt;br/&gt;PII検出"}
-    L2 -->|"違反"| Blocked
-    L3 -->|"マスキング後"| L4["基盤モデル呼び出し"]
-    L4 --> L5{"コンテキスト根拠確認&lt;br/&gt;ハルシネーション検出"}
-    L5 -->|"通過"| L6{"Automated Reasoning&lt;br/&gt;事実検証"}
-    L5 -->|"違反"| Blocked
-    L6 -->|"通過"| Out["ユーザーへ応答"]
-    L6 -->|"違反"| Blocked
-    </pre
-          >
+          <div id="diag-guardrails" class="mermaid"></div>
           <div class="mermaid-caption">図3：Guardrailsの多層防御フロー</div>
         </div>
 
@@ -1292,23 +1278,7 @@ print(response["action"])  # GUARDRAIL_INTERVENED または NONE</code></pre>
         </p>
 
         <div class="mermaid-block">
-          <pre class="mermaid">
-flowchart LR
-    subgraph "データ取り込み（非同期・事前処理）"
-        D1["S3上のドキュメント"] --> D2["パース・チャンキング"]
-        D2 --> D3["埋め込みモデルでベクトル化"]
-        D3 --> D4["ベクトルストアに格納"]
-    end
-    subgraph "実行時（同期・リアルタイム）"
-        Q["ユーザーの質問"] --> QE["質問文をベクトル化"]
-        QE --> R["ベクトル検索・ハイブリッド検索"]
-        D4 --> R
-        R --> CH["関連チャンクを抽出"]
-        CH --> G["基盤モデルにコンテキストとして注入"]
-        G --> Ans["根拠付きの回答を生成"]
-    end
-    </pre
-          >
+          <div id="diag-rag" class="mermaid"></div>
           <div class="mermaid-caption">図4：RAGパイプラインの全体像</div>
         </div>
 
@@ -2651,30 +2621,30 @@ flowchart TD
     S8 --> S9[" Step9<br/>コスト最適化 "]
     S9 --> S10[" Step10<br/>本番運用・ガバナンス "]`,
         'diag-guardrails': `flowchart TD
-    In["ユーザー入力"] --> L1{"コンテンツフィルタ<br/>有害カテゴリ検出"}
-    L1 -->|"通過"| L2{"トピックフィルタ<br/>禁止トピック判定"}
-    L1 -->|"違反"| Blocked["ブロック / 代替応答"]
-    L2 -->|"通過"| L3{"機密情報フィルタ<br/>PII検出"}
+    In[" ユーザー入力 "] --> L1{" コンテンツフィルタ<br/>有害カテゴリ検出 "}
+    L1 -->|"通過"| L2{" トピックフィルタ<br/>禁止トピック判定 "}
+    L1 -->|"違反"| Blocked[" ブロック / 代替応答 "]
+    L2 -->|"通過"| L3{" 機密情報フィルタ<br/>PII検出 "}
     L2 -->|"違反"| Blocked
-    L3 -->|"マスキング後"| L4["基盤モデル呼び出し"]
-    L4 --> L5{"コンテキスト根拠確認<br/>ハルシネーション検出"}
-    L5 -->|"通過"| L6{"Automated Reasoning<br/>事実検証"}
+    L3 -->|"マスキング後"| L4[" 基盤モデル呼び出し "]
+    L4 --> L5{" コンテキスト根拠確認<br/>ハルシネーション検出 "}
+    L5 -->|"通過"| L6{" Automated Reasoning<br/>事実検証 "}
     L5 -->|"違反"| Blocked
-    L6 -->|"通過"| Out["ユーザーへ応答"]
+    L6 -->|"通過"| Out[" ユーザーへ応答 "]
     L6 -->|"違反"| Blocked`,
         'diag-rag': `flowchart LR
     subgraph "データ取り込み（非同期・事前処理）"
-        D1["S3上のドキュメント"] --> D2["パース・チャンキング"]
-        D2 --> D3["埋め込みモデルでベクトル化"]
-        D3 --> D4["ベクトルストアに格納"]
+        D1[" S3上のドキュメント "] --> D2[" パース・チャンキング "]
+        D2 --> D3[" 埋め込みモデルでベクトル化 "]
+        D3 --> D4[" ベクトルストアに格納 "]
     end
     subgraph "実行時（同期・リアルタイム）"
-        Q["ユーザーの質問"] --> QE["質問文をベクトル化"]
-        QE --> R["ベクトル検索・ハイブリッド検索"]
+        Q[" ユーザーの質問 "] --> QE[" 質問文をベクトル化 "]
+        QE --> R[" ベクトル検索・ハイブリッド検索 "]
         D4 --> R
-        R --> CH["関連チャンクを抽出"]
-        CH --> G["基盤モデルにコンテキストとして注入"]
-        G --> Ans["根拠付きの回答を生成"]
+        R --> CH[" 関連チャンクを抽出 "]
+        CH --> G[" 基盤モデルにコンテキストとして注入 "]
+        G --> Ans[" 根拠付きの回答を生成 "]
     end`,
         'diag-agentcore': `flowchart TB
     Agent["エージェントコード<br/>LangGraph / Strands Agents 等"] --> RT["AgentCore Runtime<br/>セッション分離実行環境"]
