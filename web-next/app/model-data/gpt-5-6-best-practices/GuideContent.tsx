@@ -56,68 +56,191 @@ function highlightCode(code: string) {
   });
 }
 
+interface ParseState {
+  lines: string[];
+  line: number;
+  section: number;
+  diagram: number;
+}
+
+function parseHeading2(state: ParseState): React.ReactNode {
+  const current = state.lines[state.line];
+  state.section += 1;
+  if (state.section === 0) {
+    state.line += 1;
+    return null;
+  }
+  const index = state.section - 1;
+  const node = (
+    <section data-guide-section id={SECTION_IDS[index]} className={styles.section} key={`s-${index}`}>
+      <h2>
+        <span>{String(index + 1).padStart(2, "0")}</span>
+        {current.slice(3)}
+      </h2>
+    </section>
+  );
+  state.line += 1;
+  return node;
+}
+
+function parseHeading3(state: ParseState): React.ReactNode {
+  const current = state.lines[state.line];
+  const node = <h3 key={`h3-${state.line}`}>{current.slice(4)}</h3>;
+  state.line += 1;
+  return node;
+}
+
+function parseCodeBlock(state: ParseState): React.ReactNode {
+  const current = state.lines[state.line];
+  const language = current.slice(3);
+  const code: string[] = [];
+  state.line += 1;
+  while (state.line < state.lines.length && !state.lines[state.line].startsWith("```")) {
+    code.push(state.lines[state.line++]);
+  }
+  state.line += 1;
+  if (language === "mermaid") {
+    state.diagram += 1;
+    return (
+      <div className={styles.mermaidWrap} key={`mermaid-${state.diagram}`}>
+        <MermaidDiagram chart={code.join("\n")} theme="dark" />
+      </div>
+    );
+  }
+  return (
+    <pre className={styles.codeBlock} key={`code-${state.line}`}>
+      <code className={`language-${language}`}>{highlightCode(code.join("\n"))}</code>
+    </pre>
+  );
+}
+
+function parseTable(state: ParseState): React.ReactNode {
+  const rows: string[][] = [];
+  while (state.line < state.lines.length && state.lines[state.line].startsWith("|")) {
+    if (!/^\|[- :|]+\|$/.test(state.lines[state.line])) {
+      rows.push(state.lines[state.line].split("|").slice(1, -1).map((cell) => cell.trim()));
+    }
+    state.line += 1;
+  }
+  const [head, ...body] = rows;
+  if (SECTION_IDS[state.section - 1] === "cost") {
+    return (
+      <ul key={`checklist-${state.line}`}>
+        {body.map((row, rowIndex) => (
+          <li key={rowIndex}>
+            <strong>{inline(row[0])}</strong> — {inline(row[1])}
+          </li>
+        ))}
+      </ul>
+    );
+  }
+  return (
+    <div className={styles.tableWrap} key={`table-${state.line}`}>
+      <table>
+        <thead>
+          <tr>
+            {head.map((cell, i) => (
+              <th key={i}>{inline(cell)}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {body.map((row, rowIndex) => (
+            <tr key={rowIndex}>
+              {row.map((cell, cellIndex) => (
+                <td key={cellIndex}>{inline(cell)}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function parseList(state: ParseState): React.ReactNode {
+  const current = state.lines[state.line];
+  const ordered = /^\d+\. /.test(current);
+  const items: string[] = [];
+  while (
+    state.line < state.lines.length &&
+    (ordered ? /^\d+\. /.test(state.lines[state.line]) : /^[-*] /.test(state.lines[state.line]))
+  ) {
+    items.push(state.lines[state.line++].replace(ordered ? /^\d+\. / : /^[-*] /, ""));
+  }
+  const List = ordered ? "ol" : "ul";
+  return (
+    <List key={`list-${state.line}`}>
+      {items.map((item, i) => (
+        <li key={i}>{inline(item)}</li>
+      ))}
+    </List>
+  );
+}
+
+function parseQuote(state: ParseState): React.ReactNode {
+  const current = state.lines[state.line];
+  const node = <blockquote key={`quote-${state.line}`}>{inline(current.slice(2))}</blockquote>;
+  state.line += 1;
+  return node;
+}
+
+function parseParagraph(state: ParseState): React.ReactNode {
+  const current = state.lines[state.line];
+  const paragraph: string[] = [current];
+  state.line += 1;
+  while (
+    state.line < state.lines.length &&
+    state.lines[state.line].trim() &&
+    !/^(## |### |```|\||[-*] |\d+\. |> )/.test(state.lines[state.line])
+  ) {
+    paragraph.push(state.lines[state.line++]);
+  }
+  return <p key={`p-${state.line}`}>{inline(paragraph.join(" "))}</p>;
+}
+
 function MarkdownBody() {
   const lines = GUIDE.split("\n");
   const blocks: React.ReactNode[] = [];
-  let line = 0;
-  let section = -1;
-  let diagram = 0;
+  const state: ParseState = {
+    lines,
+    line: 0,
+    section: -1,
+    diagram: 0,
+  };
 
-  while (line < lines.length) {
-    const current = lines[line];
-    if (current === "---" || current.trim() === "") { line += 1; continue; }
+  while (state.line < state.lines.length) {
+    const current = state.lines[state.line];
+    if (current === "---" || current.trim() === "") {
+      state.line += 1;
+      continue;
+    }
     if (current.startsWith("## ")) {
-      section += 1;
-      if (section === 0) { line += 1; continue; }
-      const index = section - 1;
-      blocks.push(<section data-guide-section id={SECTION_IDS[index]} className={styles.section} key={`s-${index}`}><h2><span>{String(index + 1).padStart(2, "0")}</span>{current.slice(3)}</h2></section>);
-      line += 1;
+      const node = parseHeading2(state);
+      if (node) blocks.push(node);
       continue;
     }
     if (current.startsWith("### ")) {
-      blocks.push(<h3 key={`h3-${line}`}>{current.slice(4)}</h3>); line += 1; continue;
+      blocks.push(parseHeading3(state));
+      continue;
     }
     if (current.startsWith("```")) {
-      const language = current.slice(3);
-      const code: string[] = [];
-      line += 1;
-      while (line < lines.length && !lines[line].startsWith("```")) code.push(lines[line++]);
-      line += 1;
-      if (language === "mermaid") {
-        diagram += 1;
-        blocks.push(<div className={styles.mermaidWrap} key={`mermaid-${diagram}`}><MermaidDiagram chart={code.join("\n")} theme="dark" /></div>);
-      } else {
-        blocks.push(<pre className={styles.codeBlock} key={`code-${line}`}><code className={`language-${language}`}>{highlightCode(code.join("\n"))}</code></pre>);
-      }
+      blocks.push(parseCodeBlock(state));
       continue;
     }
     if (current.startsWith("|")) {
-      const rows: string[][] = [];
-      while (line < lines.length && lines[line].startsWith("|")) {
-        if (!/^\|[- :|]+\|$/.test(lines[line])) rows.push(lines[line].split("|").slice(1, -1).map((cell) => cell.trim()));
-        line += 1;
-      }
-      const [head, ...body] = rows;
-      if (SECTION_IDS[section - 1] === "cost") {
-        blocks.push(<ul key={`checklist-${line}`}>{body.map((row, rowIndex) => <li key={rowIndex}><strong>{inline(row[0])}</strong> — {inline(row[1])}</li>)}</ul>);
-        continue;
-      }
-      blocks.push(<div className={styles.tableWrap} key={`table-${line}`}><table><thead><tr>{head.map((cell, i) => <th key={i}>{inline(cell)}</th>)}</tr></thead><tbody>{body.map((row, rowIndex) => <tr key={rowIndex}>{row.map((cell, cellIndex) => <td key={cellIndex}>{inline(cell)}</td>)}</tr>)}</tbody></table></div>);
+      blocks.push(parseTable(state));
       continue;
     }
     if (/^[-*] /.test(current) || /^\d+\. /.test(current)) {
-      const ordered = /^\d+\. /.test(current);
-      const items: string[] = [];
-      while (line < lines.length && (ordered ? /^\d+\. /.test(lines[line]) : /^[-*] /.test(lines[line]))) items.push(lines[line++].replace(ordered ? /^\d+\. / : /^[-*] /, ""));
-      const List = ordered ? "ol" : "ul";
-      blocks.push(<List key={`list-${line}`}>{items.map((item, i) => <li key={i}>{inline(item)}</li>)}</List>);
+      blocks.push(parseList(state));
       continue;
     }
-    if (current.startsWith("> ")) { blocks.push(<blockquote key={`quote-${line}`}>{inline(current.slice(2))}</blockquote>); line += 1; continue; }
-    const paragraph: string[] = [current];
-    line += 1;
-    while (line < lines.length && lines[line].trim() && !/^(## |### |```|\||[-*] |\d+\. |> )/.test(lines[line])) paragraph.push(lines[line++]);
-    blocks.push(<p key={`p-${line}`}>{inline(paragraph.join(" "))}</p>);
+    if (current.startsWith("> ")) {
+      blocks.push(parseQuote(state));
+      continue;
+    }
+    blocks.push(parseParagraph(state));
   }
   return <>{blocks}</>;
 }
