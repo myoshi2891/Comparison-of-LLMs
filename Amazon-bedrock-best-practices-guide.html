@@ -945,35 +945,7 @@
         <p class="step-sub">Bedrockを中核としたジェネレーティブAIアプリケーションの典型構成</p>
 
         <div class="mermaid-block">
-          <pre class="mermaid">
-flowchart TB
-    subgraph "クライアント層"
-        A["Webアプリ / モバイルアプリ / 業務システム"]
-    end
-    subgraph "Amazon Bedrock"
-        B["統一API&lt;br/&gt;Converse API / InvokeModel API"]
-        C["基盤モデル&lt;br/&gt;Nova・Claude・Llama・Mistral 等"]
-        D["Guardrails&lt;br/&gt;安全性フィルタ"]
-        E["Knowledge Bases&lt;br/&gt;マネージドRAG"]
-        F["Agents / AgentCore&lt;br/&gt;自律型タスク実行"]
-        G["Model Evaluation&lt;br/&gt;品質評価"]
-    end
-    subgraph "データ層"
-        H["Amazon S3&lt;br/&gt;ドキュメント"]
-        I["ベクトルストア&lt;br/&gt;OpenSearch Serverless 等"]
-    end
-    A --> B
-    B --> D
-    D --> C
-    B --> E
-    E --> H
-    E --> I
-    B --> F
-    F --> E
-    F --> D
-    C --> G
-    </pre
-          >
+          <div id="diag-architecture" class="mermaid"></div>
           <div class="mermaid-caption">図1：Amazon Bedrock 全体アーキテクチャ</div>
         </div>
 
@@ -1002,19 +974,7 @@ flowchart TB
         <p class="step-sub">本ガイド全体の流れ</p>
 
         <div class="mermaid-block">
-          <pre class="mermaid">
-flowchart LR
-    S1["Step1&lt;br/&gt;IAM設計・最小権限"] --> S2["Step2&lt;br/&gt;モデルアクセス有効化"]
-    S2 --> S3["Step3&lt;br/&gt;初回API呼び出し"]
-    S3 --> S4["Step4&lt;br/&gt;プロンプト設計"]
-    S4 --> S5["Step5&lt;br/&gt;Guardrails設定"]
-    S5 --> S6["Step6&lt;br/&gt;Knowledge Bases構築"]
-    S6 --> S7["Step7&lt;br/&gt;Agents / AgentCore構築"]
-    S7 --> S8["Step8&lt;br/&gt;評価とオブザーバビリティ"]
-    S8 --> S9["Step9&lt;br/&gt;コスト最適化"]
-    S9 --> S10["Step10&lt;br/&gt;本番運用・ガバナンス"]
-    </pre
-          >
+          <div id="diag-roadmap" class="mermaid"></div>
           <div class="mermaid-caption">図2：導入ロードマップ</div>
         </div>
       </section>
@@ -2656,19 +2616,19 @@ flowchart TD
       const DIAGRAMS = {
         'diag-architecture': `flowchart TB
     subgraph "クライアント層"
-        A["Webアプリ / モバイルアプリ / 業務システム"]
+        A[" Webアプリ / モバイルアプリ / 業務システム "]
     end
     subgraph "Amazon Bedrock"
-        B["統一API<br/>Converse API / InvokeModel API"]
-        C["基盤モデル<br/>Nova・Claude・Llama・Mistral 等"]
-        D["Guardrails<br/>安全性フィルタ"]
-        E["Knowledge Bases<br/>マネージドRAG"]
-        F["Agents / AgentCore<br/>自律型タスク実行"]
-        G["Model Evaluation<br/>品質評価"]
+        B[" 統一API<br/>Converse API / InvokeModel API "]
+        C[" 基盤モデル<br/>Nova・Claude・Llama・Mistral 等 "]
+        D[" Guardrails<br/>安全性フィルタ "]
+        E[" Knowledge Bases<br/>マネージドRAG "]
+        F[" Agents / AgentCore<br/>自律型タスク実行 "]
+        G[" Model Evaluation<br/>品質評価 "]
     end
     subgraph "データ層"
-        H["Amazon S3<br/>ドキュメント"]
-        I["ベクトルストア<br/>OpenSearch Serverless 等"]
+        H[" Amazon S3<br/>ドキュメント "]
+        I[" ベクトルストア<br/>OpenSearch Serverless 等 "]
     end
     A --> B
     B --> D
@@ -2681,15 +2641,15 @@ flowchart TD
     F --> D
     C --> G`,
         'diag-roadmap': `flowchart LR
-    S1["Step1<br/>IAM設計・最小権限"] --> S2["Step2<br/>モデルアクセス有効化"]
-    S2 --> S3["Step3<br/>初回API呼び出し"]
-    S3 --> S4["Step4<br/>プロンプト設計"]
-    S4 --> S5["Step5<br/>Guardrails設定"]
-    S5 --> S6["Step6<br/>Knowledge Bases構築"]
-    S6 --> S7["Step7<br/>Agents / AgentCore構築"]
-    S7 --> S8["Step8<br/>評価とオブザーバビリティ"]
-    S8 --> S9["Step9<br/>コスト最適化"]
-    S9 --> S10["Step10<br/>本番運用・ガバナンス"]`,
+    S1[" Step1<br/>IAM設計・最小権限 "] --> S2[" Step2<br/>モデルアクセス有効化 "]
+    S2 --> S3[" Step3<br/>初回API呼び出し "]
+    S3 --> S4[" Step4<br/>プロンプト設計 "]
+    S4 --> S5[" Step5<br/>Guardrails設定 "]
+    S5 --> S6[" Step6<br/>Knowledge Bases構築 "]
+    S6 --> S7[" Step7<br/>Agents / AgentCore構築 "]
+    S7 --> S8[" Step8<br/>評価とオブザーバビリティ "]
+    S8 --> S9[" Step9<br/>コスト最適化 "]
+    S9 --> S10[" Step10<br/>本番運用・ガバナンス "]`,
         'diag-guardrails': `flowchart TD
     In["ユーザー入力"] --> L1{"コンテンツフィルタ<br/>有害カテゴリ検出"}
     L1 -->|"通過"| L2{"トピックフィルタ<br/>禁止トピック判定"}
