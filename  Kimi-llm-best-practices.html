@@ -866,8 +866,8 @@ print(completion.choices[0].message.content)</code></pre>
                     <code class="inline">kimi-k2.6</code> /
                     <code class="inline">kimi-k2.7-code</code>
                   </td>
-                  <td>固定(変更不可)</td>
-                  <td>常時思考モードのためtemperature等のサンプリング設定は無視される</td>
+                  <td>Thinking有効時: 1.0 / 無効時: 0.6</td>
+                  <td>Thinkingは無効化可能。モードごとにtemperatureは固定（変更不可）される</td>
                 </tr>
                 <tr>
                   <td>Anthropic互換API経由</td>
@@ -1117,7 +1117,9 @@ other languages.</code></pre>
           <pre class="mermaid" id="mermaid-6"></pre>
           <div class="diagram-caption">図6: 基本のツール呼び出しループ</div>
 
-          <pre class="codeblock"><code class="language-python">tools = [{
+          <pre class="codeblock"><code class="language-python">import json
+
+tools = [{
     "type": "function",
     "function": {
         "name": "get_weather",
@@ -1160,7 +1162,10 @@ while finish_reason is None or finish_reason == "tool_calls":
                 "role": "tool",
                 "tool_call_id": call.id,
                 "content": json.dumps(result),
-            })</code></pre>
+            })
+
+# 最終的な回答を表示
+print(choice.message.content)</code></pre>
           <p style="font-size: 0.85rem; color: var(--text-faint)">
             出典:
             <a href="https://github.com/moonshotai/kimi-k2" target="_blank" rel="noopener"
@@ -1299,13 +1304,11 @@ while finish_reason is None or finish_reason == "tool_calls":
           <pre class="mermaid" id="mermaid-7"></pre>
           <div class="diagram-caption">図7: Thinkingモードでのreasoning_content保持フロー</div>
 
-          <h3>8.1 reasoning_contentを必ず保持する</h3>
+          <h3>8.1 reasoning_contentの取り扱いと保存ルール</h3>
           <p>
-            思考が常時有効なモデルでは、過去のassistantメッセージの
-            <code class="inline">reasoning_content</code> を<strong>そのままの形で</strong>
-            メッセージ履歴に残さなければなりません。これは、モデルが多段階の推論やツール呼び出しにおいて論理的一貫性を保つために必要な情報だからです。
-            省略すると、後続ターンで文脈を見失ったり、不完全な回答を生成したりする原因になります。なお
-            <code class="inline">reasoning_content</code> も トークン課金(入出力)の対象になります。
+            複数ターンのツール呼び出し（Tool Calling）を行う場合、中間のアシスタントメッセージやツール応答を履歴に含めることは必須ですが、会話の次のターンに過去の
+            <code class="inline">reasoning_content</code> を履歴に含めて送信（保存）するかどうかは、設定によって異なります。
+            過去の <code class="inline">reasoning_content</code> を履歴に含めて送信することが必須となるのは、APIリクエストの <code class="inline">extra_body</code> 内で <code class="inline">thinking.keep</code> が <code class="inline">"all"</code>（または <code class="inline">"last"</code>）に設定されている場合のみです。デフォルトの <code class="inline">"none"</code> など、それ以外の設定では過去の <code class="inline">reasoning_content</code> を送信する必要はありません。なお、履歴に含めて送信した <code class="inline">reasoning_content</code> はトークン課金（入力トークン）の対象になります。
           </p>
           <pre
             class="codeblock"

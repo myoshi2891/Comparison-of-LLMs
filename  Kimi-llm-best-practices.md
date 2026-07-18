@@ -213,7 +213,7 @@ print(completion.choices[0].message.content)
 | `kimi-k2` (Instruct, legacy) | 0.6 | 特別な指示がなければこの値がデフォルトの良い出発点 |
 | `kimi-k2-thinking` (legacy) | 1.0 | 思考連鎖の多様性を確保するため高め |
 | `kimi-k2.5` | 用途に応じて調整可 | Instant/Thinkingモードで挙動が変わるため要検証 |
-| `kimi-k2.6` / `kimi-k2.7-code` | 固定(変更不可) | 常時思考モードのためtemperature等のサンプリング設定は無視される |
+| `kimi-k2.6` / `kimi-k2.7-code` | Thinking有効時: 1.0 / 無効時: 0.6 | Thinkingは無効化可能。モードごとにtemperatureは固定（変更不可）される |
 | Anthropic互換API経由 | `real_temperature = request_temperature * 0.6` | 既存Anthropicアプリとの互換性のための独自マッピング |
 
 (出典: [GitHub - MoonshotAI/Kimi-K2](https://github.com/moonshotai/kimi-k2), [moonshotai/Kimi-K2-Thinking - Hugging Face](https://huggingface.co/moonshotai/Kimi-K2-Thinking), [Kimi K2.7 Code API: Pricing, Playground & Docs](https://empiriolabs.ai/models/kimi-k2-7-code))
@@ -324,6 +324,8 @@ flowchart TB
 ```
 
 ```python
+import json
+
 tools = [{
     "type": "function",
     "function": {
@@ -368,6 +370,9 @@ while finish_reason is None or finish_reason == "tool_calls":
                 "tool_call_id": call.id,
                 "content": json.dumps(result),
             })
+
+# 最終的な回答を表示
+print(choice.message.content)
 ```
 
 (出典: [GitHub - MoonshotAI/Kimi-K2](https://github.com/moonshotai/kimi-k2), [moonshotai/Kimi-K2-Instruct - Hugging Face](https://huggingface.co/moonshotai/Kimi-K2-Instruct))
@@ -420,9 +425,11 @@ flowchart TB
     F -- いいえ(他の値を指定) --> H["エラーになるため auto または none に修正する"]
 ```
 
-### 8.1 reasoning_contentを必ず保持する
+### 8.1 reasoning_contentの取り扱いと保存ルール
 
-思考が常時有効なモデルでは、過去のassistantメッセージの `reasoning_content` を**そのままの形で**メッセージ履歴に残さなければなりません。これは、モデルが多段階の推論やツール呼び出しにおいて論理的一貫性を保つために必要な情報だからです。省略すると、後続ターンで文脈を見失ったり、不完全な回答を生成したりする原因になります。なお `reasoning_content` もトークン課金(入出力)の対象になります。
+複数ターンのツール呼び出し（Tool Calling）を行う場合、中間のアシスタントメッセージやツール応答を履歴に含めることは必須ですが、会話の次のターンに過去の `reasoning_content` を履歴に含めて送信（保存）するかどうかは、設定によって異なります。
+
+過去の `reasoning_content` を履歴に含めて送信することが必須となるのは、APIリクエストの `extra_body` 内で `thinking.keep` が `"all"`（または `"last"`）に設定されている場合のみです。デフォルトの `"none"` など、それ以外の設定では過去の `reasoning_content` を送信する必要はありません。なお、履歴に含めて送信した `reasoning_content` はトークン課金（入力トークン）の対象になります。
 
 ```python
 stream = client.chat.completions.create(
