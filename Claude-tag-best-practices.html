@@ -357,7 +357,7 @@
         margin-bottom: 0.8rem;
       }
 
-      pre.mermaid {
+      .mermaid {
         width: 100%;
         display: flex;
         justify-content: center;
@@ -455,7 +455,7 @@
     </style>
   </head>
   <body>
-    <button class="sidebar-toggle" id="navToggle" aria-label="目次を開く">☰ 目次</button>
+    <button type="button" class="sidebar-toggle" id="navToggle" aria-label="目次を開く">☰ 目次</button>
 
     <div class="layout">
       <aside class="sidebar" id="sidebar">
@@ -643,8 +643,7 @@
 
           <div class="diagram-card">
             <div class="diagram-label">Diagram 01 ― タスク実行の全体フロー</div>
-            <pre class="mermaid" id="dg-architecture"></pre>
-            <script type="text/plain" id="src-architecture">
+            <div class="mermaid" id="dg-architecture">
               flowchart TB
                   A["Slackチャンネルで @Claude をタスク付きでメンション"] --> B["Claude Tag がスレッドを検知しセッション開始"]
                   B --> C["使い捨てサンドボックスを起動<br/>Anthropicがホスト・会話が途絶えると破棄"]
@@ -653,7 +652,7 @@
                   E --> F["チェックリストをスレッドに逐次更新しながら作業"]
                   F --> G["結果をスレッドに投稿<br/>返信・PR作成・チケット起票・ダッシュボード更新など"]
                   G --> H["チャンネル参加者全員が結果を閲覧し追加指示や修正が可能"]
-            </script>
+            </div>
           </div>
 
           <div class="prose">
@@ -690,8 +689,7 @@
 
           <div class="diagram-card">
             <div class="diagram-label">Diagram 02 ― Identity / Access 階層モデル</div>
-            <pre class="mermaid" id="dg-identity"></pre>
-            <script type="text/plain" id="src-identity">
+            <div class="mermaid" id="dg-identity">
               flowchart TB
                   subgraph ORG["組織全体レベル"]
                       O1["組織共通の認証情報・リポジトリアクセス"]
@@ -706,7 +704,7 @@
                   end
                   ORG --> WS
                   WS --> PC
-            </script>
+            </div>
           </div>
 
           <div class="prose">
@@ -743,8 +741,7 @@
 
           <div class="diagram-card">
             <div class="diagram-label">Diagram 03 ― メモリのスコープ</div>
-            <pre class="mermaid" id="dg-memory"></pre>
-            <script type="text/plain" id="src-memory">
+            <div class="mermaid" id="dg-memory">
               flowchart TB
                   A["公開チャンネルでの学習内容<br/>決定事項・訂正・好み"] --> B["ワークスペース共有メモリに保存"]
                   B --> C["同じワークスペースの別の公開チャンネルからも参照可能"]
@@ -752,7 +749,7 @@
                   E --> F["ワークスペース全体には共有されない<br/>ただし作業中はワークスペース記憶を読み取り可能"]
                   G["DMでのやり取り"] --> H["送信者個人のClaudeアカウント上で完結"]
                   H --> I["チームのメモリ・権限とは完全に分離"]
-            </script>
+            </div>
           </div>
 
           <div class="prose">
@@ -787,15 +784,14 @@
 
           <div class="diagram-card">
             <div class="diagram-label">Diagram 04 ― 管理者向けセットアップフロー</div>
-            <pre class="mermaid" id="dg-setup"></pre>
-            <script type="text/plain" id="src-setup">
+            <div class="mermaid" id="dg-setup">
               flowchart TB
                   S1["Step 1: Slackワークスペースをペアリング<br/>Slackアプリをインストールし @Claude connect でペアリングコードを発行"] --> S2["Step 2: Claudeが最初にアクセスするツールを選択"]
                   S2 --> S3["Step 3: GitHub連携<br/>Claude GitHub Appをインストール、または既存連携にリポジトリを追加"]
                   S3 --> S4["Step 4: その他ツール用のアカウントを作成し認証情報を接続"]
                   S4 --> S5["支出上限(組織全体・チャンネル別)を設定"]
                   S5 --> S6["非公開チャンネルでテストし動作を確認してから展開"]
-            </script>
+            </div>
           </div>
 
           <div class="prose">
@@ -864,8 +860,7 @@
 
           <div class="diagram-card">
             <div class="diagram-label">Diagram 05 ― タスク委任のライフサイクル</div>
-            <pre class="mermaid" id="dg-lifecycle"></pre>
-            <script type="text/plain" id="src-lifecycle">
+            <div class="mermaid" id="dg-lifecycle">
               flowchart TB
                   T1["Step 1: タスクを選ぶ<br/>到達可能な入力・明確なゴール・検証可能な結果があるか"] --> T2["Step 2: リクエストを書く<br/>目的・重要性・参照先を伝える"]
                   T2 --> T3["Step 3: Claudeに作業させる<br/>チェックリストがスレッドに逐次更新される"]
@@ -873,7 +868,7 @@
                   T4 -->|"修正が必要"| T5["具体的に何が違うかを伝えて再依頼"]
                   T5 --> T3
                   T4 -->|"問題なし"| T6["チャンネルメモリとして学習を蓄積し次回はより的確に"]
-            </script>
+            </div>
           </div>
 
           <div class="prose">
@@ -911,14 +906,13 @@
 
           <div class="diagram-card">
             <div class="diagram-label">Diagram 06 ― 自律性のエスカレーションラダー</div>
-            <pre class="mermaid" id="dg-ladder"></pre>
-            <script type="text/plain" id="src-ladder">
+            <div class="mermaid" id="dg-ladder">
               flowchart TB
                   L1["レベル1: メンション時のみ応答<br/>まずはここから始める"] --> L2["レベル2: プロアクティブ応答を許可<br/>忙しいフィードバックチャンネルでは全質問に自動回答"]
                   L2 --> L3["レベル3: 定期タスクをスケジュール化<br/>毎週月曜9時にダイジェスト投稿 など"]
                   L3 --> L4["レベル4: 自発的フォローアップ<br/>停滞スレッドの検知・完了時の自動報告"]
                   L4 --> L5["レベル5: 責務そのものを委譲<br/>領域のオーナーとして日々の判断を任せる"]
-            </script>
+            </div>
           </div>
 
           <div class="prose">
@@ -1215,40 +1209,44 @@
           <h2><span class="num">14</span> 導入前チェックリスト</h2>
           <ul class="checklist">
             <li>
-              <input type="checkbox" disabled /> 対象プランがClaude
-              TeamまたはEnterpriseであることを確認した
+              <input type="checkbox" id="checklist-1" disabled />
+              <label for="checklist-1">対象プランがClaude TeamまたはEnterpriseであることを確認した</label>
             </li>
             <li>
-              <input type="checkbox" disabled /> Primary
-              OwnerまたはOwner権限を持つ担当者がセットアップを行う体制になっている
+              <input type="checkbox" id="checklist-2" disabled />
+              <label for="checklist-2">Primary OwnerまたはOwner権限を持つ担当者がセットアップを行う体制になっている</label>
             </li>
             <li>
-              <input type="checkbox" disabled />
-              最初に接続するチャンネルとツールの範囲を「低感度な範囲」から決めた
+              <input type="checkbox" id="checklist-3" disabled />
+              <label for="checklist-3">最初に接続するチャンネルとツールの範囲を「低感度な範囲」から決めた</label>
             </li>
             <li>
-              <input type="checkbox" disabled /> 組織全体および主要チャンネルの支出上限を設定した
-            </li>
-            <li><input type="checkbox" disabled /> 監査ログの確認担当者・確認頻度を決めた</li>
-            <li>
-              <input type="checkbox" disabled />
-              各チャンネルの応答ポリシー(メンション時のみ/プロアクティブ)を用途に応じて設定した
+              <input type="checkbox" id="checklist-4" disabled />
+              <label for="checklist-4">組織全体および主要チャンネルの支出上限を設定した</label>
             </li>
             <li>
-              <input type="checkbox" disabled />
-              重要なチャンネルには「自己紹介」ピン留めメッセージでペルソナ・応答方針を伝えた
+              <input type="checkbox" id="checklist-5" disabled />
+              <label for="checklist-5">監査ログの確認担当者・確認頻度を決めた</label>
             </li>
             <li>
-              <input type="checkbox" disabled />
-              レビュー体制(誰が・どの重要度の成果物を・どこまで精査するか)を決めた
+              <input type="checkbox" id="checklist-6" disabled />
+              <label for="checklist-6">各チャンネルの応答ポリシー(メンション時のみ/プロアクティブ)を用途に応じて設定した</label>
             </li>
             <li>
-              <input type="checkbox" disabled /> 旧「Claude in
-              Slack」利用企業は、2026年8月3日の自動移行前に設定を棚卸しした
+              <input type="checkbox" id="checklist-7" disabled />
+              <label for="checklist-7">重要なチャンネルには「自己紹介」ピン留めメッセージでペルソナ・応答方針を伝えた</label>
             </li>
             <li>
-              <input type="checkbox" disabled />
-              機微データを扱うチャンネルについて、データ処理契約・保持設定を確認した
+              <input type="checkbox" id="checklist-8" disabled />
+              <label for="checklist-8">レビュー体制(誰が・どの重要度の成果物を・どこまで精査するか)を決めた</label>
+            </li>
+            <li>
+              <input type="checkbox" id="checklist-9" disabled />
+              <label for="checklist-9">旧「Claude in Slack」利用企業は、2026年8月3日の自動移行前に設定を棚卸しした</label>
+            </li>
+            <li>
+              <input type="checkbox" id="checklist-10" disabled />
+              <label for="checklist-10">機微データを扱うチャンネルについて、データ処理契約・保持設定を確認した</label>
             </li>
           </ul>
         </section>
@@ -1530,26 +1528,9 @@
       </main>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@11.12.0/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
     <script>
-      function dedent(str) {
-        const lines = str.replace(/^\n/, '').replace(/\s+$/, '').split('\n');
-        const nonEmpty = lines.filter((l) => l.trim().length > 0);
-        const indents = nonEmpty.map((l) => (l.match(/^\s*/) || [''])[0].length);
-        const min = indents.length ? Math.min(...indents) : 0;
-        return lines.map((l) => l.slice(min)).join('\n');
-      }
-
       document.addEventListener('DOMContentLoaded', function () {
-        // Inject dedented Mermaid source into each pre.mermaid target
-        document.querySelectorAll('script[id^="src-"]').forEach(function (src) {
-          const targetId = 'dg-' + src.id.replace('src-', '');
-          const target = document.getElementById(targetId);
-          if (target) {
-            target.textContent = dedent(src.textContent);
-          }
-        });
-
         if (window.mermaid) {
           mermaid.initialize({
             startOnLoad: false,
