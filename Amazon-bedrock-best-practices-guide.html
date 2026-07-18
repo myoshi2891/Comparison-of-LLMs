@@ -2669,6 +2669,7 @@ print(response["action"])  # GUARDRAIL_INTERVENED または NONE</code></pre>
             }
           } catch (e) {
             console.error('Failed to render diagram ' + id, e);
+            target.innerHTML = `<pre class="mermaid-error" style="color: #ff9a92; background: #2a1416; padding: 14px; font-size: 12px; border: 1px dashed #ff9a92; border-radius: 8px; text-align: left; overflow-x: auto;">Error rendering diagram "${id}":\n${e.message || e}</pre>`;
           }
         }
       })();
