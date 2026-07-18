@@ -592,9 +592,29 @@
         border-radius: var(--border-radius-xl);
         padding: 28px;
         margin: 20px auto 28px auto;
-        max-width: 900px;
+        max-width: 1000px;
         text-align: center;
         overflow-x: auto;
+      }
+
+      .mermaid-block.size-s {
+        max-width: 540px;
+      }
+      .mermaid-block.size-sm {
+        max-width: 700px;
+      }
+      .mermaid-block.size-l {
+        max-width: 1200px;
+      }
+      .mermaid-block.size-xl {
+        max-width: 1400px;
+      }
+      .mermaid-block.scroll-x {
+        text-align: left;
+      }
+      .mermaid-block.scroll-x svg {
+        max-width: none !important;
+        margin: 0 !important;
       }
 
       .mermaid-block svg {
@@ -944,8 +964,36 @@
         </h2>
         <p class="step-sub">Bedrockを中核としたジェネレーティブAIアプリケーションの典型構成</p>
 
-        <div class="mermaid-block">
-          <div id="diag-architecture" class="mermaid"></div>
+        <div class="mermaid-block size-l">
+          <pre class="mermaid">
+flowchart TB
+    subgraph "クライアント層"
+        A["Webアプリ / モバイルアプリ / 業務システム"]
+    end
+    subgraph "Amazon Bedrock"
+        B["統一API&lt;br/&gt;Converse API / InvokeModel API"]
+        C["基盤モデル&lt;br/&gt;Nova・Claude・Llama・Mistral 等"]
+        D["Guardrails&lt;br/&gt;安全性フィルタ"]
+        E["Knowledge Bases&lt;br/&gt;マネージドRAG"]
+        F["Agents / AgentCore&lt;br/&gt;自律型タスク実行"]
+        G["Model Evaluation&lt;br/&gt;品質評価"]
+    end
+    subgraph "データ層"
+        H["Amazon S3&lt;br/&gt;ドキュメント"]
+        I["ベクトルストア&lt;br/&gt;OpenSearch Serverless 等"]
+    end
+    A --> B
+    B --> D
+    D --> C
+    B --> E
+    E --> H
+    E --> I
+    B --> F
+    F --> E
+    F --> D
+    C --> G
+    </pre
+          >
           <div class="mermaid-caption">図1：Amazon Bedrock 全体アーキテクチャ</div>
         </div>
 
@@ -973,8 +1021,21 @@
         </h2>
         <p class="step-sub">本ガイド全体の流れ</p>
 
-        <div class="mermaid-block">
-          <div id="diag-roadmap" class="mermaid"></div>
+        <div class="mermaid-block scroll-x size-xl">
+          <pre class="mermaid">
+%%{init: {"flowchart": {"useMaxWidth": false}}}%%
+flowchart LR
+    S1["Step1&lt;br/&gt;IAM設計・最小権限"] --> S2["Step2&lt;br/&gt;モデルアクセス有効化"]
+    S2 --> S3["Step3&lt;br/&gt;初回API呼び出し"]
+    S3 --> S4["Step4&lt;br/&gt;プロンプト設計"]
+    S4 --> S5["Step5&lt;br/&gt;Guardrails設定"]
+    S5 --> S6["Step6&lt;br/&gt;Knowledge Bases構築"]
+    S6 --> S7["Step7&lt;br/&gt;Agents / AgentCore構築"]
+    S7 --> S8["Step8&lt;br/&gt;評価とオブザーバビリティ"]
+    S8 --> S9["Step9&lt;br/&gt;コスト最適化"]
+    S9 --> S10["Step10&lt;br/&gt;本番運用・ガバナンス"]
+    </pre
+          >
           <div class="mermaid-caption">図2：導入ロードマップ</div>
         </div>
       </section>
@@ -1220,8 +1281,23 @@ print(response["output"]["message"]["content"][0]["text"])</code></pre>
           </tbody>
         </table>
 
-        <div class="mermaid-block">
-          <div id="diag-guardrails" class="mermaid"></div>
+        <div class="mermaid-block size-sm">
+          <pre class="mermaid">
+%%{init: {"flowchart": {"rankSpacing": 24, "nodeSpacing": 20}}}%%
+flowchart TD
+    In["ユーザー入力"] --> L1{"コンテンツフィルタ&lt;br/&gt;有害カテゴリ検出"}
+    L1 -->|"通過"| L2{"トピックフィルタ&lt;br/&gt;禁止トピック判定"}
+    L1 -->|"違反"| Blocked["ブロック / 代替応答"]
+    L2 -->|"通過"| L3{"機密情報フィルタ&lt;br/&gt;PII検出"}
+    L2 -->|"違反"| Blocked
+    L3 -->|"マスキング後"| L4["基盤モデル呼び出し"]
+    L4 --> L5{"コンテキスト根拠確認&lt;br/&gt;ハルシネーション検出"}
+    L5 -->|"通過"| L6{"Automated Reasoning&lt;br/&gt;事実検証"}
+    L5 -->|"違反"| Blocked
+    L6 -->|"通過"| Out["ユーザーへ応答"]
+    L6 -->|"違反"| Blocked
+    </pre
+          >
           <div class="mermaid-caption">図3：Guardrailsの多層防御フロー</div>
         </div>
 
@@ -1277,8 +1353,25 @@ print(response["action"])  # GUARDRAIL_INTERVENED または NONE</code></pre>
           Bedrockは、S3上のドキュメントを自動的にチャンク分割・ベクトル化し、ベクトルストアへ格納・同期する、マネージドRAGパイプラインです。S3バケットからのデータ同期、チャンク分割、ベクトル埋め込みの生成、ベクトルインデックスへの格納を管理し、インテリジェントな差分検出・スループット管理・障害管理が組み込まれています。
         </p>
 
-        <div class="mermaid-block">
-          <div id="diag-rag" class="mermaid"></div>
+        <div class="mermaid-block scroll-x size-xl">
+          <pre class="mermaid">
+%%{init: {"flowchart": {"useMaxWidth": false}}}%%
+flowchart LR
+    subgraph "データ取り込み（非同期・事前処理）"
+        D1["S3上のドキュメント"] --> D2["パース・チャンキング"]
+        D2 --> D3["埋め込みモデルでベクトル化"]
+        D3 --> D4["ベクトルストアに格納"]
+    end
+    subgraph "実行時（同期・リアルタイム）"
+        Q["ユーザーの質問"] --> QE["質問文をベクトル化"]
+        QE --> R["ベクトル検索・ハイブリッド検索"]
+        D4 --> R
+        R --> CH["関連チャンクを抽出"]
+        CH --> G["基盤モデルにコンテキストとして注入"]
+        G --> Ans["根拠付きの回答を生成"]
+    end
+    </pre
+          >
           <div class="mermaid-caption">図4：RAGパイプラインの全体像</div>
         </div>
 
@@ -1416,8 +1509,27 @@ print(response["action"])  # GUARDRAIL_INTERVENED または NONE</code></pre>
           Sivasubramanian氏がAgentCoreの本番化における中心的役割について時間を割いて説明しました。
         </p>
 
-        <div class="mermaid-block">
-          <div id="diag-agentcore" class="mermaid"></div>
+        <div class="mermaid-block size-l">
+          <pre class="mermaid">
+flowchart TB
+    Agent["エージェントコード&lt;br/&gt;LangGraph / Strands Agents 等"] --> RT["AgentCore Runtime&lt;br/&gt;セッション分離実行環境"]
+    subgraph "Amazon Bedrock AgentCore"
+        RT
+        MEM["Memory&lt;br/&gt;短期・長期記憶"]
+        GW["Gateway&lt;br/&gt;ツール接続 / MCP対応"]
+        ID["Identity&lt;br/&gt;認証・認可"]
+        OBS["Observability&lt;br/&gt;OpenTelemetry連携"]
+        EVAL["Evaluations&lt;br/&gt;LLM-as-a-Judge"]
+    end
+    RT --> MEM
+    RT --> GW
+    GW --> Tools["外部API / Lambda / MCPサーバー"]
+    ID --> RT
+    RT --> OBS
+    OBS --> CW["Amazon CloudWatch"]
+    OBS --> EVAL
+    </pre
+          >
           <div class="mermaid-caption">図5：AgentCoreのコンポーネント構成</div>
         </div>
 
@@ -1555,8 +1667,19 @@ print(response["action"])  # GUARDRAIL_INTERVENED または NONE</code></pre>
           </tbody>
         </table>
 
-        <div class="mermaid-block">
-          <div id="diag-billing" class="mermaid"></div>
+        <div class="mermaid-block size-sm">
+          <pre class="mermaid">
+%%{init: {"flowchart": {"rankSpacing": 24, "nodeSpacing": 20}}}%%
+flowchart TD
+    Start["ワークロードの特性を確認"] --> Q1{"トラフィックは&lt;br/&gt;予測可能か？"}
+    Q1 -->|"不規則・低頻度"| OD["オンデマンド&lt;br/&gt;従量課金"]
+    Q1 -->|"安定・高頻度"| Q2{"リアルタイム応答が&lt;br/&gt;必要か？"}
+    Q2 -->|"不要（非同期でよい）"| Batch["バッチ推論&lt;br/&gt;約50%割引"]
+    Q2 -->|"必要"| Q3{"利用率が損益分岐点を&lt;br/&gt;継続的に超えるか？"}
+    Q3 -->|"Yes"| PT["プロビジョンドスループット&lt;br/&gt;予約容量・低レイテンシ保証"]
+    Q3 -->|"No"| OD
+    </pre
+          >
           <div class="mermaid-caption">図6：課金モードの選択フロー</div>
         </div>
 
@@ -2514,7 +2637,7 @@ print(response["action"])  # GUARDRAIL_INTERVENED または NONE</code></pre>
       });
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@9.4.3/dist/mermaid.min.js" integrity="sha512-lr1gBg9uLeq7cCfTulxEDXATlfDzLRLMMY0T0GxHv27+XsKytKuJwIQvSZRNw2C4fZWSMf9C+SPnT10ArLI8Cw==" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
     <script>
       mermaid.initialize({
         startOnLoad: false,
@@ -2545,7 +2668,7 @@ print(response["action"])  # GUARDRAIL_INTERVENED または NONE</code></pre>
           fontSize: '13px',
         },
         flowchart: {
-          useMaxWidth: false,
+          useMaxWidth: true,
           htmlLabels: true,
           nodeSpacing: 28,
           rankSpacing: 34,
@@ -2554,125 +2677,17 @@ print(response["action"])  # GUARDRAIL_INTERVENED または NONE</code></pre>
         },
       });
 
-      const DIAGRAMS = {
-        'diag-architecture': `flowchart TB
-    subgraph "クライアント層"
-        A[" Webアプリ / モバイルアプリ / 業務システム "]
-    end
-    subgraph "Amazon Bedrock"
-        B[" 統一API<br/>Converse API / InvokeModel API "]
-        C[" 基盤モデル<br/>Nova・Claude・Llama・Mistral 等 "]
-        D[" Guardrails<br/>安全性フィルタ "]
-        E[" Knowledge Bases<br/>マネージドRAG "]
-        F[" Agents / AgentCore<br/>自律型タスク実行 "]
-        G[" Model Evaluation<br/>品質評価 "]
-    end
-    subgraph "データ層"
-        H[" Amazon S3<br/>ドキュメント "]
-        I[" ベクトルストア<br/>OpenSearch Serverless 等 "]
-    end
-    A --> B
-    B --> D
-    D --> C
-    B --> E
-    E --> H
-    E --> I
-    B --> F
-    F --> E
-    F --> D
-    C --> G`,
-        'diag-roadmap': `flowchart LR
-    S1[" Step1<br/>IAM設計・最小権限 "] --> S2[" Step2<br/>モデルアクセス有効化 "]
-    S2 --> S3[" Step3<br/>初回API呼び出し "]
-    S3 --> S4[" Step4<br/>プロンプト設計 "]
-    S4 --> S5[" Step5<br/>Guardrails設定 "]
-    S5 --> S6[" Step6<br/>Knowledge Bases構築 "]
-    S6 --> S7[" Step7<br/>Agents / AgentCore構築 "]
-    S7 --> S8[" Step8<br/>評価とオブザーバビリティ "]
-    S8 --> S9[" Step9<br/>コスト最適化 "]
-    S9 --> S10[" Step10<br/>本番運用・ガバナンス "]`,
-        'diag-guardrails': `flowchart TD
-    In[" ユーザー入力 "] --> L1{" コンテンツフィルタ<br/>有害カテゴリ検出 "}
-    L1 -->|"通過"| L2{" トピックフィルタ<br/>禁止トピック判定 "}
-    L1 -->|"違反"| Blocked[" ブロック / 代替応答 "]
-    L2 -->|"通過"| L3{" 機密情報フィルタ<br/>PII検出 "}
-    L2 -->|"違反"| Blocked
-    L3 -->|"マスキング後"| L4[" 基盤モデル呼び出し "]
-    L4 --> L5{" コンテキスト根拠確認<br/>ハルシネーション検出 "}
-    L5 -->|"通過"| L6{" Automated Reasoning<br/>事実検証 "}
-    L5 -->|"違反"| Blocked
-    L6 -->|"通過"| Out[" ユーザーへ応答 "]
-    L6 -->|"違反"| Blocked`,
-        'diag-rag': `flowchart LR
-    subgraph "データ取り込み（非同期・事前処理）"
-        D1[" S3上のドキュメント "] --> D2[" パース・チャンキング "]
-        D2 --> D3[" 埋め込みモデルでベクトル化 "]
-        D3 --> D4[" ベクトルストアに格納 "]
-    end
-    subgraph "実行時（同期・リアルタイム）"
-        Q[" ユーザーの質問 "] --> QE[" 質問文をベクトル化 "]
-        QE --> R[" ベクトル検索・ハイブリッド検索 "]
-        D4 --> R
-        R --> CH[" 関連チャンクを抽出 "]
-        CH --> G[" 基盤モデルにコンテキストとして注入 "]
-        G --> Ans[" 根拠付きの回答を生成 "]
-    end`,
-        'diag-agentcore': `flowchart TB
-    Agent[" エージェントコード<br/>LangGraph / Strands Agents 等 "] --> RT[" AgentCore Runtime<br/>セッション分離実行環境 "]
-    subgraph "Amazon Bedrock AgentCore"
-        RT
-        MEM[" Memory<br/>短期・長期記憶 "]
-        GW[" Gateway<br/>ツール接続 / MCP対応 "]
-        ID[" Identity<br/>認証・認可 "]
-        OBS[" Observability<br/>OpenTelemetry連携 "]
-        EVAL[" Evaluations<br/>LLM-as-a-Judge "]
-    end
-    RT --> MEM
-    RT --> GW
-    GW --> Tools[" 外部API / Lambda / MCPサーバー "]
-    ID --> RT
-    RT --> OBS
-    OBS --> CW[" Amazon CloudWatch "]
-    OBS --> EVAL`,
-        'diag-billing': `flowchart TD
-    Start[" ワークロードの特性を確認 "] --> Q1{" トラフィックは<br/>予測可能か？ "}
-    Q1 -->|"不規則・低頻度"| OD[" オンデマンド<br/>従量課金 "]
-    Q1 -->|"安定・高頻度"| Q2{" リアルタイム応答が<br/>必要か？ "}
-    Q2 -->|"不要（非同期でよい）"| Batch[" バッチ推論<br/>約50%割引 "]
-    Q2 -->|"必要"| Q3{" 利用率が損益分岐点を<br/>継続的に超えるか？ "}
-    Q3 -->|"Yes"| PT[" プロビジョンドスループット<br/>予約容量・低レイテンシ保証 "]
-    Q3 -->|"No"| OD`
-      };
-
-      (async () => {
-        if (document.fonts) {
-          await document.fonts.ready;
-        }
-        for (const [id, src] of Object.entries(DIAGRAMS)) {
-          const target = document.getElementById(id);
-          if (!target) continue;
-          try {
-            const result = await mermaid.render('svg-' + id, src);
-            const svg = typeof result === 'string' ? result : result.svg;
-            target.innerHTML = svg;
-            
-            const svgEl = target.querySelector('svg');
-            if (svgEl) {
-              svgEl.removeAttribute('width');
-              svgEl.removeAttribute('height');
-              svgEl.style.width = '100%';
-              svgEl.style.maxWidth = '100%';
-              svgEl.style.height = 'auto';
-              svgEl.style.overflow = 'visible';
-              svgEl.style.display = 'block';
-              svgEl.style.margin = '0 auto';
-            }
-          } catch (e) {
-            console.error('Failed to render diagram ' + id, e);
-            target.innerHTML = `<pre class="mermaid-error" style="color: #ff9a92; background: #2a1416; padding: 14px; font-size: 12px; border: 1px dashed #ff9a92; border-radius: 8px; text-align: left; overflow-x: auto;">Error rendering diagram "${id}":\n${e.message || e}</pre>`;
-          }
-        }
-      })();
+      document.fonts.ready.then(function () {
+        mermaid.run({ querySelector: '.mermaid' }).then(function () {
+          document.querySelectorAll('.mermaid-block svg').forEach(function (svg) {
+            svg.style.maxWidth = '100%';
+            svg.style.height = 'auto';
+            svg.style.display = 'block';
+            svg.style.margin = '0 auto';
+            svg.style.overflow = 'visible';
+          });
+        });
+      });
     </script>
   </body>
 </html>

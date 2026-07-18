@@ -3,6 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+    />
     <title>
       Microsoft Foundry 活用ガイド — 初学者のためのステップバイステップ・ベストプラクティス
     </title>
@@ -69,7 +73,7 @@
         z-index: 10;
       }
       .sidebar .brand {
-        font-size: 12px;
+        font-size: 1rem;
         letter-spacing: 0.14em;
         text-transform: uppercase;
         color: var(--text-faint);
@@ -92,7 +96,7 @@
         padding: 8px 10px;
         border-radius: 8px;
         color: var(--text-dim);
-        font-size: 13.5px;
+        font-size: 1rem;
         border-left: 2px solid transparent;
         transition:
           background 0.15s,
@@ -123,7 +127,7 @@
       }
       .hero .eyebrow {
         color: var(--text-faint);
-        font-size: 13px;
+        font-size: 1rem;
         letter-spacing: 0.12em;
         text-transform: uppercase;
         margin-bottom: 14px;
@@ -150,7 +154,7 @@
         border-radius: 10px;
         padding: 16px 20px;
         color: var(--text-dim);
-        font-size: 14.5px;
+        font-size: 1rem;
         margin: 24px 0 40px;
         max-width: none;
       }
@@ -171,7 +175,7 @@
       }
       .section h2 .num {
         color: var(--accent);
-        font-size: 15px;
+        font-size: 1rem;
         font-weight: 700;
         letter-spacing: 0.05em;
       }
@@ -205,7 +209,7 @@
       table {
         border-collapse: collapse;
         width: 100%;
-        font-size: 14.5px;
+        font-size: 1rem;
       }
       thead th {
         background: var(--bg-elev);
@@ -243,14 +247,18 @@
       .code-block pre {
         margin: 0;
         font-family: 'Cascadia Code', 'Consolas', monospace;
-        font-size: 13.5px;
+        font-size: 1rem;
         line-height: 1.7;
         color: #c9d6f0;
         white-space: pre;
       }
+      .code-block .hljs {
+        background: transparent !important;
+        padding: 0 !important;
+      }
       .code-block .lang {
         display: block;
-        font-size: 11px;
+        font-size: 1rem;
         color: var(--text-faint);
         letter-spacing: 0.08em;
         text-transform: uppercase;
@@ -259,7 +267,8 @@
 
       .diagram-slot {
         width: 100%;
-        margin: 28px 0 40px;
+        max-width: 900px;
+        margin: 28px auto 40px;
       }
       pre.mermaid {
         width: 100%;
@@ -268,9 +277,9 @@
         background: transparent;
       }
       pre.mermaid svg {
-        width: 100%;
+        width: auto;
         height: auto;
-        max-width: 960px;
+        max-width: 100%;
       }
 
       .checklist {
@@ -289,7 +298,7 @@
         border-radius: 8px;
         padding: 12px 16px;
         color: var(--text-dim);
-        font-size: 14.5px;
+        font-size: 1rem;
       }
       .checklist li::before {
         content: '\2713';
@@ -308,12 +317,12 @@
       .dev-quote .name {
         color: var(--accent-2);
         font-weight: 600;
-        font-size: 14.5px;
+        font-size: 1rem;
         margin-bottom: 6px;
       }
       .dev-quote p {
         color: var(--text-dim);
-        font-size: 14.5px;
+        font-size: 1rem;
         margin: 0;
       }
 
@@ -323,7 +332,7 @@
         padding-top: 28px;
         border-top: 1px solid var(--border);
         color: var(--text-faint);
-        font-size: 13px;
+        font-size: 1rem;
       }
 
       @media (max-width: 900px) {
@@ -551,7 +560,7 @@
             </p>
             <div class="code-block">
               <span class="lang">bash</span>
-              <pre><code class="code-target" id="code-01"></code></pre>
+              <pre><code class="code-target language-bash" id="code-01"></code></pre>
             </div>
             <script type="text/plain" class="code-source" data-target="code-01">
               az login
@@ -672,7 +681,7 @@
             </p>
             <div class="code-block">
               <span class="lang">python</span>
-              <pre><code class="code-target" id="code-02"></code></pre>
+              <pre><code class="code-target language-python" id="code-02"></code></pre>
             </div>
             <script type="text/plain" class="code-source" data-target="code-02">
               from azure.identity import DefaultAzureCredential
@@ -1754,6 +1763,9 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
     <script>
       function dedent(str) {
         const lines = str.replace(/\r\n/g, '\n').split('\n');
@@ -1766,7 +1778,7 @@
         return lines.map((l) => l.slice(minIndent)).join('\n');
       }
 
-      // コードブロックの注入（scriptタグ -> dedent -> textContent）
+      // コードブロックの注入（scriptタグ -> dedent -> textContent -> highlight.js）
       document.querySelectorAll('script.code-source').forEach(function (scriptEl) {
         const raw = scriptEl.textContent;
         const code = dedent(raw);
@@ -1774,6 +1786,9 @@
         const codeEl = document.getElementById(targetId);
         if (codeEl) {
           codeEl.textContent = code;
+          if (window.hljs) {
+            hljs.highlightElement(codeEl);
+          }
         }
       });
 
