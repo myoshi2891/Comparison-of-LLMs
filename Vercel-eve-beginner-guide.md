@@ -147,7 +147,7 @@ npx eve@latest init support-agent
 既存のアプリにeveを組み込みたい場合は、パッケージを追加するだけです。
 
 ```bash
-npm install eve@latest
+npm install eve@0.1.2
 ```
 
 ### Step 2. 最小構成を理解する
@@ -280,7 +280,7 @@ export default defineTool({
     orderId: z.string(),
     amountJpy: z.number(),
   }),
-  needsApproval: ({ toolInput }) => toolInput.amountJpy > 50000,
+  needsApproval: ({ toolInput }) => (toolInput?.amountJpy ?? 0) > 50000,
   async execute({ orderId, amountJpy }) {
     // 実際の返金処理
     return { orderId, refunded: amountJpy };
@@ -318,7 +318,7 @@ import { defineAgent } from 'eve';
 
 export default defineAgent({
   description: '問い合わせ内容の背景調査に特化し、親エージェントに要約を返す',
-  model: 'anthropic/claude-opus-4-8',
+  model: 'anthropic/claude-opus-4.8',
 });
 ```
 

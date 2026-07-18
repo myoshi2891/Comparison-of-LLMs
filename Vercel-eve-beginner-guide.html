@@ -413,15 +413,14 @@
         color: var(--muted);
         margin-top: 0.6rem;
       }
-      pre.mermaid {
+      .mermaid {
         width: 100%;
         display: flex;
         justify-content: center;
         margin: 0;
         background: transparent;
-      }
-
-      /* ---------- Tables ---------- */
+        overflow-x: auto;
+      }/* ---------- Tables ---------- */
       .table-wrap {
         overflow-x: auto;
         margin: 1.4rem 0;
@@ -703,8 +702,7 @@
 
           <h3><span class="sub-num">1-3</span>全体アーキテクチャ</h3>
           <div class="diagram-wrap">
-            <pre class="mermaid" id="diagram-arch"></pre>
-            <script type="text/plain" class="mermaid-src" data-target="diagram-arch">
+            <div class="mermaid" id="diagram-arch">
               flowchart TD
                   A["開発者が書くファイル群<br/>agent/ ディレクトリ"] --> B["eve コンパイラ"]
                   B --> C["Vercel Functions上で動くアプリ"]
@@ -714,7 +712,7 @@
                   C --> G["Vercel Connect<br/>(OAuth・APIキー管理)"]
                   C --> H["Vercel Observability<br/>(Agent Runsダッシュボード)"]
                   F --> I["任意のLLMプロバイダ<br/>(Anthropic / OpenAIなど)"]
-            </script>
+            </div>
           </div>
           <p class="diagram-caption">
             図1：eveのランタイムはVercelの各プロダクト（Workflows / Sandbox / AI Gateway / Connect /
@@ -802,8 +800,7 @@
 
           <h3><span class="sub-num">2-2</span>ファイル配置がそのまま機能になる仕組み</h3>
           <div class="diagram-wrap">
-            <pre class="mermaid" id="diagram-mapping"></pre>
-            <script type="text/plain" class="mermaid-src" data-target="diagram-mapping">
+            <div class="mermaid" id="diagram-mapping">
               flowchart LR
                   subgraph Files["agentディレクトリ内のファイル"]
                       F1["instructions.md"]
@@ -826,7 +823,7 @@
                   F3 --> R3
                   F4 --> R4
                   F5 --> R5
-            </script>
+            </div>
           </div>
           <p class="diagram-caption">
             図2：ファイルの配置場所がそのままeveランタイムへの配線になる
@@ -998,8 +995,7 @@
             </script>
             <p>セッション・ターン・ストリームの関係を図解すると次のようになります。</p>
             <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-session"></pre>
-              <script type="text/plain" class="mermaid-src" data-target="diagram-session">
+              <div class="mermaid" id="diagram-session">
                 sequenceDiagram
                     participant U as ユーザー
                     participant C as チャネル(HTTP/Slack等)
@@ -1016,7 +1012,7 @@
                     S-->>C: NDJSONで逐次イベントをストリーム
                     C-->>U: 回答を表示
                     Note over S: 各ステップはチェックポイントされ、<br/>クラッシュ・再デプロイをまたいで再開可能
-              </script>
+              </div>
             </div>
             <p class="diagram-caption">
               図3：セッション内の1ターンが処理される流れ。各ステップがチェックポイントされる
@@ -1090,8 +1086,7 @@
             </script>
             <p>承認フローの状態遷移は次のとおりです。</p>
             <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-approval"></pre>
-              <script type="text/plain" class="mermaid-src" data-target="diagram-approval">
+              <div class="mermaid" id="diagram-approval">
                 stateDiagram-v2
                     [*] --> 実行中
                     実行中 --> 承認待ち: needsApprovalの条件を満たす
@@ -1104,7 +1099,7 @@
                         待機中は計算リソースを消費しない
                         Slackのボタン等から承認可能
                     end note
-              </script>
+              </div>
             </div>
             <p class="diagram-caption">図4：承認ゲートを持つツールの状態遷移</p>
             <div class="quote-block">
@@ -1155,14 +1150,13 @@
               Sandbox（マイクロVM）、ローカルではDockerなどが使われます。
             </p>
             <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-sandbox"></pre>
-              <script type="text/plain" class="mermaid-src" data-target="diagram-sandbox">
+              <div class="mermaid" id="diagram-sandbox">
                 flowchart TD
                     A["エージェントがコードを書く必要があるか?"] -->|"Yes: 未知の分析・変換処理がある"| B["サンドボックスを使う<br/>(bash, write_file, read_file)"]
                     A -->|"No: 定型のAPI呼び出しだけで完結"| C["サンドボックスなしで運用する"]
                     B --> D["モデル生成コードは信頼しない前提で<br/>アプリ本体と隔離実行"]
                     C --> E["余計な複雑性を持ち込まない"]
-              </script>
+              </div>
             </div>
             <p class="diagram-caption">図5：サンドボックス採用の判断フロー</p>
             <p>
@@ -1232,14 +1226,13 @@
               </p>
             </div>
             <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-channel"></pre>
-              <script type="text/plain" class="mermaid-src" data-target="diagram-channel">
+              <div class="mermaid" id="diagram-channel">
                 flowchart LR
                     Slack["Slackイベント"] --> Connect["Vercel Connect<br/>(Webhook検証)"]
                     Connect -->|"--trigger-path /eve/v1/slack を<br/>指定した場合のみ正しく到達"| Route["/eve/v1/slack ルート"]
                     Route --> Agent["デプロイ済みeveエージェント"]
                     Agent --> Slack
-              </script>
+              </div>
             </div>
             <p class="diagram-caption">図6：Slack連携時のイベント到達経路</p>
             <p>
@@ -1344,15 +1337,14 @@
               Instant Rollback で即座に前バージョンへ戻せます。
             </p>
             <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-cicd"></pre>
-              <script type="text/plain" class="mermaid-src" data-target="diagram-cicd">
+              <div class="mermaid" id="diagram-cicd">
                 flowchart LR
                     A["コミット"] --> B["プレビューデプロイ<br/>(チャネルも含めて再現)"]
                     B --> C["npx eve eval<br/>(デプロイゲート)"]
                     C -->|Pass| D["本番デプロイ<br/>vercel deploy"]
                     C -->|Fail| E["CIで停止・修正"]
                     D --> F["問題発生時はInstant Rollback"]
-              </script>
+              </div>
             </div>
             <p class="diagram-caption">図7：コミットから本番反映までのCI/CDパイプライン</p>
           </div>
@@ -1428,8 +1420,7 @@
 
           <h3><span class="sub-num">5-3</span>マルチエージェント構成図</h3>
           <div class="diagram-wrap">
-            <pre class="mermaid" id="diagram-fleet"></pre>
-            <script type="text/plain" class="mermaid-src" data-target="diagram-fleet">
+            <div class="mermaid" id="diagram-fleet">
               flowchart TD
                   Human["人間(承認・監督)"]
                   Content["コンテンツ担当エージェント"]
@@ -1443,7 +1434,7 @@
                   Ops -.->|状態を通知・承認依頼| Slack
                   Growth -.->|状態を通知・承認依頼| Slack
                   Human -->|Slackから承認/却下| Slack
-            </script>
+            </div>
           </div>
           <p class="diagram-caption">
             図8：3体編成のマルチエージェント構成。機械同士のハンドオフ(実線)と人間の監督(点線+Slack)が分離されている
@@ -2014,7 +2005,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
     <script>
       function dedent(str) {
         if (!str) return '';
@@ -2041,13 +2032,6 @@
           if (window.hljs) {
             hljs.highlightElement(target);
           }
-        });
-
-        // 2. Mermaid図のソース復元
-        document.querySelectorAll('script.mermaid-src').forEach(function (src) {
-          const target = document.getElementById(src.dataset.target);
-          if (!target) return;
-          target.textContent = dedent(src.textContent);
         });
 
         // 3. Mermaidの初期化とレンダリング
