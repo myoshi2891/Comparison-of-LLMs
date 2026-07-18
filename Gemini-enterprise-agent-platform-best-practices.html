@@ -1,0 +1,1842 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gemini Enterprise Agent Platform 実践ベストプラクティスガイド</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+    />
+    <style>
+      :root {
+        --bg: #07111e;
+        --bg-elevated: #0d1b2f;
+        --bg-card: #101f36;
+        --border: rgba(255, 255, 255, 0.09);
+        --text: #e7edf7;
+        --text-dim: #93a3bd;
+        --text-dimmer: #6b7c99;
+        --accent: #7c9eff;
+        --accent-soft: rgba(124, 158, 255, 0.14);
+        --accent-2: #59d8c6;
+        --warn: #ffb454;
+        --danger: #ff7a8a;
+        --radius: 10px;
+        --sidebar-w: 288px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          'Hiragino Kaku Gothic ProN',
+          'Noto Sans JP',
+          'Segoe UI',
+          system-ui,
+          -apple-system,
+          sans-serif;
+        line-height: 1.85;
+        font-size: 16px;
+        -webkit-font-smoothing: antialiased;
+      }
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      code {
+        font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+        font-size: 0.9em;
+      }
+
+      /* ---------- Sidebar ---------- */
+      #sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: var(--sidebar-w);
+        background: var(--bg-elevated);
+        border-right: 1px solid var(--border);
+        overflow-y: auto;
+        padding: 28px 0 40px;
+        z-index: 50;
+      }
+      #sidebar .brand {
+        padding: 0 24px 20px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 12px;
+      }
+      #sidebar .brand .tag {
+        display: inline-block;
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        color: var(--accent);
+        background: var(--accent-soft);
+        padding: 3px 9px;
+        border-radius: 999px;
+        margin-bottom: 10px;
+      }
+      #sidebar .brand h1 {
+        font-size: 15px;
+        line-height: 1.5;
+        margin: 0 0 6px;
+        color: var(--text);
+        font-weight: 700;
+      }
+      #sidebar .brand p {
+        font-size: 12px;
+        color: var(--text-dimmer);
+        margin: 0;
+      }
+      #sidebar nav {
+        padding: 8px 12px;
+      }
+      #sidebar nav a {
+        display: block;
+        padding: 9px 12px;
+        font-size: 13.5px;
+        color: var(--text-dim);
+        border-radius: 8px;
+        margin-bottom: 2px;
+        transition:
+          background 0.15s,
+          color 0.15s;
+        white-space: normal;
+      }
+      #sidebar nav a:hover {
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        text-decoration: none;
+      }
+      #sidebar nav a.active {
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-weight: 600;
+      }
+      #sidebar nav .num {
+        display: inline-block;
+        width: 20px;
+        color: var(--text-dimmer);
+        font-variant-numeric: tabular-nums;
+        font-size: 12px;
+      }
+
+      /* ---------- Main ---------- */
+      #main {
+        margin-left: var(--sidebar-w);
+        min-height: 100vh;
+      }
+      .hero {
+        padding: 64px 56px 44px;
+        border-bottom: 1px solid var(--border);
+        background:
+          radial-gradient(900px 400px at 85% -10%, rgba(124, 158, 255, 0.14), transparent 60%),
+          var(--bg);
+      }
+      .hero .eyebrow {
+        font-size: 12.5px;
+        letter-spacing: 0.08em;
+        color: var(--accent-2);
+        text-transform: uppercase;
+        margin-bottom: 14px;
+        font-weight: 700;
+      }
+      .hero h1 {
+        font-size: 34px;
+        line-height: 1.35;
+        margin: 0 0 16px;
+        max-width: 900px;
+      }
+      .hero p.lead {
+        color: var(--text-dim);
+        font-size: 16px;
+        max-width: 820px;
+        margin: 0 0 20px;
+      }
+      .hero .meta-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .pill {
+        font-size: 12px;
+        color: var(--text-dim);
+        border: 1px solid var(--border);
+        background: var(--bg-card);
+        padding: 6px 12px;
+        border-radius: 999px;
+      }
+      .pill.strong {
+        color: var(--accent);
+        border-color: rgba(124, 158, 255, 0.35);
+      }
+
+      section.content {
+        padding: 52px 56px;
+        border-bottom: 1px solid var(--border);
+      }
+      section.content:last-of-type {
+        border-bottom: none;
+      }
+      section.content h2 {
+        font-size: 24px;
+        margin: 0 0 6px;
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+      }
+      section.content h2 .idx {
+        color: var(--accent);
+        font-size: 15px;
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+      }
+      section.content h3 {
+        font-size: 18px;
+        margin: 34px 0 14px;
+        color: var(--text);
+        border-left: 3px solid var(--accent);
+        padding-left: 12px;
+      }
+      section.content > .section-lead {
+        color: var(--text-dim);
+        font-size: 14.5px;
+        margin: 0 0 28px;
+      }
+      section.content p {
+        margin: 0 0 16px;
+        color: var(--text);
+      }
+      section.content ul,
+      section.content ol {
+        margin: 0 0 16px;
+        padding-left: 22px;
+        color: var(--text);
+      }
+      section.content li {
+        margin-bottom: 8px;
+      }
+
+      .callout {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: var(--radius);
+        padding: 16px 20px;
+        margin: 20px 0;
+        font-size: 14.5px;
+      }
+      .callout.warn {
+        border-left-color: var(--warn);
+      }
+      .callout.danger {
+        border-left-color: var(--danger);
+      }
+      .callout .callout-title {
+        font-weight: 700;
+        color: var(--accent);
+        margin-bottom: 6px;
+        font-size: 13.5px;
+        letter-spacing: 0.02em;
+      }
+      .callout.warn .callout-title {
+        color: var(--warn);
+      }
+      .callout.danger .callout-title {
+        color: var(--danger);
+      }
+
+      /* ---------- Tables ---------- */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 18px 0 26px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+        background: var(--bg-card);
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+      thead th {
+        text-align: left;
+        background: rgba(124, 158, 255, 0.1);
+        color: var(--accent);
+        padding: 11px 14px;
+        font-weight: 700;
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+      tbody td {
+        padding: 11px 14px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-dim);
+        vertical-align: top;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:hover {
+        background: rgba(255, 255, 255, 0.02);
+      }
+      tbody td:first-child {
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      /* ---------- Code ---------- */
+      .code-block {
+        position: relative;
+        margin: 18px 0 26px;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        overflow: hidden;
+        background: #0b1626;
+      }
+      .code-block .code-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 14px;
+        font-size: 12px;
+        color: var(--text-dimmer);
+        background: rgba(255, 255, 255, 0.03);
+        border-bottom: 1px solid var(--border);
+      }
+      .code-block pre {
+        margin: 0;
+        padding: 16px 18px;
+        overflow-x: auto;
+      }
+      .code-block code.hljs {
+        background: transparent !important;
+        padding: 0;
+        font-size: 13px;
+      }
+
+      /* ---------- Mermaid ---------- */
+      .diagram-wrap {
+        margin: 22px 0 30px;
+      }
+      .diagram-wrap .diagram-caption {
+        font-size: 12.5px;
+        color: var(--text-dimmer);
+        margin-top: 10px;
+        text-align: center;
+      }
+      pre.mermaid {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 22px 14px;
+      }
+
+      /* ---------- Checklist ---------- */
+      .checklist {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 16px;
+      }
+      .checklist li {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        padding: 9px 0;
+        border-bottom: 1px solid var(--border);
+        color: var(--text);
+      }
+      .checklist li:last-child {
+        border-bottom: none;
+      }
+      .checklist li::before {
+        content: '';
+        flex: 0 0 16px;
+        width: 16px;
+        height: 16px;
+        margin-top: 3px;
+        border-radius: 4px;
+        border: 1.5px solid var(--accent);
+      }
+
+      /* ---------- Refs ---------- */
+      .ref-group h4 {
+        font-size: 13px;
+        color: var(--accent-2);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin: 26px 0 10px;
+      }
+      .ref-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .ref-list li {
+        font-size: 13.5px;
+        color: var(--text-dim);
+        padding: 8px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .ref-list li:last-child {
+        border-bottom: none;
+      }
+      .ref-list .ref-title {
+        color: var(--text);
+        display: block;
+        margin-bottom: 2px;
+      }
+      .ref-list a {
+        word-break: break-all;
+      }
+
+      footer {
+        padding: 36px 56px 60px;
+        color: var(--text-dimmer);
+        font-size: 12.5px;
+      }
+
+      @media (max-width: 980px) {
+        #sidebar {
+          position: static;
+          width: 100%;
+          height: auto;
+          border-right: none;
+          border-bottom: 1px solid var(--border);
+        }
+        #main {
+          margin-left: 0;
+        }
+        .hero,
+        section.content,
+        footer {
+          padding-left: 24px;
+          padding-right: 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <aside id="sidebar">
+      <div class="brand">
+        <span class="tag">2026-07-17 時点</span>
+        <h1>Gemini Enterprise<br />Agent Platform</h1>
+        <p>実践ベストプラクティスガイド</p>
+      </div>
+      <nav id="sidebar-nav">
+        <a href="#intro"><span class="num">00</span>Vertex AI → GEAP</a>
+        <a href="#architecture"><span class="num">01</span>全体アーキテクチャ</a>
+        <a href="#adk"><span class="num">02</span>ADKの基本設計</a>
+        <a href="#models"><span class="num">03</span>モデル選定戦略</a>
+        <a href="#runtime"><span class="num">04</span>Agent Runtime</a>
+        <a href="#memory"><span class="num">05</span>Memory Bank</a>
+        <a href="#rag"><span class="num">06</span>RAG / Vector Search</a>
+        <a href="#a2a-mcp"><span class="num">07</span>A2A と MCP</a>
+        <a href="#security"><span class="num">08</span>セキュリティ・ガバナンス</a>
+        <a href="#quality"><span class="num">09</span>品質保証</a>
+        <a href="#migration"><span class="num">10</span>移行チェックリスト</a>
+        <a href="#antipatterns"><span class="num">11</span>アンチパターン</a>
+        <a href="#checklist"><span class="num">12</span>最終チェックリスト</a>
+        <a href="#references"><span class="num">13</span>参考文献</a>
+      </nav>
+    </aside>
+
+    <div id="main">
+      <div class="hero">
+        <div class="eyebrow">Google Cloud &middot; Agentic AI Platform</div>
+        <h1>Gemini Enterprise Agent Platform<br />実践ベストプラクティスガイド</h1>
+        <p class="lead">
+          中級〜上級エンジニア向け。ADK・Agent Runtime・Memory
+          Bank・A2A/MCP・ガバナンス機能を実務レベルで使いこなすための設計指針を、ステップバイステップで解説します。
+        </p>
+        <div class="meta-row">
+          <span class="pill strong">2026年7月17日時点の情報に基づく</span>
+          <span class="pill">Vertex AI からの刷新版</span>
+          <span class="pill">Mermaid 図解 7点</span>
+          <span class="pill">一次情報源・URL付き</span>
+        </div>
+      </div>
+
+      <section class="content" id="intro">
+        <h2>
+          <span class="idx">00</span>このガイドの前提 ― 「Vertex AI」から「Gemini Enterprise Agent
+          Platform」へ
+        </h2>
+        <p class="section-lead">まず押さえておくべき最重要事実から始めます。</p>
+
+        <p>
+          <strong
+            >2026年4月22日、Google Cloud Next 2026 において、Google は Vertex AI を「Gemini
+            Enterprise Agent Platform(以下 GEAP)」として刷新・拡張することを発表しました。</strong
+          >
+          これは名称変更にとどまらず、次の3製品を1つに統合する再編です。
+        </p>
+        <ul>
+          <li><strong>Vertex AI</strong> ― モデル訓練・チューニング・デプロイのMLOps基盤</li>
+          <li><strong>Agentspace</strong> ― エンタープライズ向けエージェント検索・チャット体験</li>
+          <li><strong>Gemini API</strong> ― モデルアクセスそのもの</li>
+        </ul>
+
+        <div class="diagram-wrap">
+          <script type="text/plain" data-diagram="1">
+            flowchart LR
+                A["Vertex AI<br>(モデル訓練・MLOps)"] --> D["Gemini Enterprise<br>Agent Platform"]
+                B["Agentspace<br>(検索・チャットUX)"] --> D
+                C["Gemini API<br>(モデルアクセス)"] --> D
+                D --> E["単一の開発者体験<br>aiplatform.googleapis.com"]
+          </script>
+          <p class="diagram-caption">
+            図0-1: 3製品がGemini Enterprise Agent Platformへ統合される全体像
+          </p>
+        </div>
+
+        <p>
+          2026年5月21日以降、Google Cloud コンソール上から「Vertex
+          AI」という名称は姿を消し、検索してもAgent Platformにリダイレクトされます。一方で
+          <strong
+            >APIエンドポイントは
+            <code>aiplatform.googleapis.com</code> のまま変更されていません。</strong
+          >既存のコードやSDK呼び出しは無停止で動作を継続するため緊急移行の必要はありませんが、IAMロール名・コンソールUI・課金明細の項目名(2026年5〜6月に「Vertex
+          AI」から「Gemini Enterprise」表記へ移行)は確認が必要です。
+        </p>
+
+        <div class="callout">
+          <div class="callout-title">用語について</div>
+          以降このガイドでは新名称「Agent Platform」または「GEAP」で統一して解説します。
+        </div>
+      </section>
+
+      <section class="content" id="architecture">
+        <h2><span class="idx">01</span>全体アーキテクチャ ― 4つの柱</h2>
+        <p class="section-lead">
+          Build / Scale / Govern / Optimize
+          の4本柱でエージェントのライフサイクル全体を捉えるのがGEAPの設計思想です。
+        </p>
+
+        <p>個別機能を迷わず選択するための最短ルートは、まずこの全体像を掴むことです。</p>
+
+        <div class="diagram-wrap">
+          <script type="text/plain" data-diagram="2">
+            flowchart TB
+                subgraph BUILD["🔨 Build"]
+                    B1["Agent Studio<br>(ローコード)"]
+                    B2["Agent Development Kit / ADK<br>(プロコード)"]
+                    B3["Model Garden<br>(200+ 基盤モデル)"]
+                    B4["MCPツール接続"]
+                end
+                subgraph SCALE["📈 Scale"]
+                    S1["Agent Runtime<br>(サーバーレス実行基盤)"]
+                    S2["Memory Bank / Memory Profiles"]
+                    S3["Sessions<br>(会話状態管理)"]
+                    S4["双方向ストリーミング"]
+                end
+                subgraph GOVERN["🛡️ Govern"]
+                    G1["Agent Identity<br>(暗号学的ID)"]
+                    G2["Agent Registry"]
+                    G3["Agent Gateway"]
+                    G4["Model Armor / SGP"]
+                end
+                subgraph OPTIMIZE["📊 Optimize"]
+                    O1["Agent Simulation"]
+                    O2["Agent Evaluation"]
+                    O3["Agent Observability"]
+                    O4["Agent Optimizer"]
+                end
+                BUILD --> SCALE --> GOVERN --> OPTIMIZE
+                OPTIMIZE -.フィードバックループ.-> BUILD
+          </script>
+          <p class="diagram-caption">
+            図1-1: Build / Scale / Govern / Optimize の循環的なライフサイクル
+          </p>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>柱</th>
+                <th>目的</th>
+                <th>主要コンポーネント</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Build</td>
+                <td>エージェントロジックとツール接続を作る</td>
+                <td>Agent Studio、ADK、Model Garden、MCP</td>
+              </tr>
+              <tr>
+                <td>Scale</td>
+                <td>本番トラフィックに耐える実行基盤を提供する</td>
+                <td>Agent Runtime、Memory Bank、Sessions、双方向ストリーミング</td>
+              </tr>
+              <tr>
+                <td>Govern</td>
+                <td>誰が・何に・どうアクセスできるかを統制する</td>
+                <td>
+                  Agent Identity、Agent Registry、Agent Gateway、Model Armor、Semantic Governance
+                  Policies
+                </td>
+              </tr>
+              <tr>
+                <td>Optimize</td>
+                <td>品質を継続的に計測・改善する</td>
+                <td>Agent Simulation、Agent Evaluation、Agent Observability、Agent Optimizer</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout">
+          <div class="callout-title">ベストプラクティス①</div>
+          新規プロジェクトでは「まずBuildだけ作り込んで、後からGovernとOptimizeを足す」という順序は避けてください。ガバナンス設定を後回しにすることは、エンタープライズがエージェント展開で犯す最も高くつく失敗としてしばしば指摘されています。小規模なプロトタイプの段階からAgent
+          IdentityとAgent Registryへの登録だけは最初に組み込んでおくことを推奨します。
+        </div>
+      </section>
+
+      <section class="content" id="adk">
+        <h2><span class="idx">02</span>Agent Development Kit(ADK)の基本設計</h2>
+        <p class="section-lead">
+          OSSのコードファースト・エージェントフレームワーク。単一の万能エージェントではなく、役割を分割した複数の専門エージェントを協調させる「マイクロサービス的発想」が核にあります。
+        </p>
+
+        <h3>なぜ単一巨大エージェントを避けるべきか</h3>
+        <p>
+          1つのエージェントに指示を詰め込みすぎると、指示追従性が低下し、エラー率が複合的に増加し、結果としてハルシネーションが増えるという経験則が広く共有されています。責務を「パーサー」「クリティック」「ディスパッチャー」のように分割することで、モジュール性・テスト容易性・信頼性が向上します。
+        </p>
+
+        <h3>コア概念の関係</h3>
+        <div class="diagram-wrap">
+          <script type="text/plain" data-diagram="3">
+            flowchart LR
+                U["ユーザー入力"] --> Agent["LlmAgent<br>(instruction / tools / model)"]
+                Agent -->|"output_key で書き込み"| State["session.state<br>(共有ホワイトボード)"]
+                State --> NextAgent["次のエージェントが参照"]
+                Agent --> Tools["Tools<br>(関数呼び出し / MCP / AgentTool)"]
+                Agent --> Memory["Memory Bank<br>(長期記憶の読み書き)"]
+          </script>
+          <p class="diagram-caption">図2-1: ADKにおけるエージェント・状態・ツールの関係</p>
+        </div>
+
+        <p>
+          <code>session.state</code>
+          は複数エージェント間の「共有ホワイトボード」です。<code>output_key</code>を使って明示的にキーへ書き込み、後続エージェントの<code>instruction</code>内で<code>{key名}</code>として参照します。<code>AgentTool</code>を使うと、サブエージェント全体を「1つの関数呼び出し」として親エージェントから呼び出せます。
+        </p>
+
+        <div class="callout">
+          <div class="callout-title">ベストプラクティス②</div>
+          <code>output_key</code
+          >には必ず意味のある名前を付けてください(<code>raw_text</code>、<code>structured_data</code>のように)。これはダウンストリームのエージェントにとっての「API仕様書」そのものであり、曖昧な命名はルーティング精度を直接下げます。同様に、ルーティングに使う<code>description</code>フィールドはLLMへ向けた説明文であるため、精密に書く必要があります。
+        </div>
+
+        <h3>マルチエージェント設計パターン8選</h3>
+        <p>
+          Google Developers
+          Blogが2025年12月に公開した設計ガイドでは、8つの基本パターンが整理されています。実務ではこれらを組み合わせて使うのが一般的です。
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>パターン名</th>
+                <th>別名</th>
+                <th>適したユースケース</th>
+                <th>ADKのプリミティブ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Sequential Pipeline</td>
+                <td>組立ライン</td>
+                <td>文書処理パイプライン(解析→抽出→要約)</td>
+                <td><code>SequentialAgent</code></td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Coordinator/Dispatcher</td>
+                <td>コンシェルジュ</td>
+                <td>問い合わせを専門エージェントへ振り分けるサポート</td>
+                <td><code>LlmAgent</code> + <code>sub_agents</code></td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>Parallel Fan-Out/Gather</td>
+                <td>タコ足</td>
+                <td>コードレビューの並列チェック</td>
+                <td><code>ParallelAgent</code> + 集約エージェント</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>Hierarchical Decomposition</td>
+                <td>マトリョーシカ</td>
+                <td>大きな目標をサブタスクに分解するリサーチ</td>
+                <td><code>AgentTool</code>でラップ</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>Generator &amp; Critic</td>
+                <td>編集者の机</td>
+                <td>SQL生成の構文検証、コンプライアンスレビュー</td>
+                <td><code>LoopAgent</code>(合否判定)</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>Iterative Refinement</td>
+                <td>彫刻家</td>
+                <td>文章・コード品質の段階的な磨き上げ</td>
+                <td><code>LoopAgent</code> + <code>max_iterations</code></td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td>Human-in-the-loop</td>
+                <td>人間の安全網</td>
+                <td>金融取引・本番デプロイなど不可逆な高リスク操作</td>
+                <td>カスタムツール(承認待ち)</td>
+              </tr>
+              <tr>
+                <td>8</td>
+                <td>Composite</td>
+                <td>ミックス&amp;マッチ</td>
+                <td>実運用の複合ワークフロー全般</td>
+                <td>上記の組み合わせ</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          以下、実務で頻出する3パターンをADK風の疑似コードで示します(クラス名は実際のADK
+          APIに準拠しています)。
+        </p>
+
+        <div class="code-block">
+          <div class="code-label">
+            <span>パターン1: Sequential Pipeline</span><span>Python</span>
+          </div>
+          <pre><code class="language-python" data-code="1"></code></pre>
+        </div>
+        <script type="text/plain" data-code-src="1">
+          parser = LlmAgent(
+              name="ParserAgent",
+              instruction="受け取ったPDFのテキストを抽出する。",
+              tools=[pdf_parser_tool],
+              output_key="raw_text",
+          )
+          extractor = LlmAgent(
+              name="ExtractorAgent",
+              instruction="{raw_text} から構造化データを抽出する。",
+              output_key="structured_data",
+          )
+          summarizer = LlmAgent(
+              name="SummarizerAgent",
+              instruction="{structured_data} を基に要約を生成する。",
+          )
+
+          pipeline = SequentialAgent(
+              name="DocumentPipeline",
+              sub_agents=[parser, extractor, summarizer],
+          )
+        </script>
+
+        <p>
+          パターン3(Parallel
+          Fan-Out/Gather)では、<code>ParallelAgent</code>配下のサブエージェントは同一の<code>session.state</code>を共有しつつ別スレッドで並行実行されるため、<strong
+            >各エージェントが必ず異なる<code>output_key</code>に書き込むよう設計し、競合状態(race
+            condition)を防ぐ</strong
+          >ことが重要です。
+        </p>
+
+        <div class="code-block">
+          <div class="code-label">
+            <span>パターン3: Parallel Fan-Out/Gather</span><span>Python</span>
+          </div>
+          <pre><code class="language-python" data-code="2"></code></pre>
+        </div>
+        <script type="text/plain" data-code-src="2">
+          security_auditor = LlmAgent(name="SecurityAuditor", output_key="security_report")
+          style_enforcer   = LlmAgent(name="StyleEnforcer",  output_key="style_report")
+          perf_analyst     = LlmAgent(name="PerformanceAnalyst", output_key="performance_report")
+
+          review_swarm = ParallelAgent(
+              name="CodeReviewSwarm",
+              sub_agents=[security_auditor, style_enforcer, perf_analyst],
+          )
+          synthesizer = LlmAgent(
+              name="PRSummarizer",
+              instruction="{security_report}, {style_report}, {performance_report} を統合したレビューを作成する。",
+          )
+          workflow = SequentialAgent(sub_agents=[review_swarm, synthesizer])
+        </script>
+
+        <p>パターン5(Generator &amp; Critic)は品質ゲート付きループの代表例です。</p>
+
+        <div class="code-block">
+          <div class="code-label">
+            <span>パターン5: Generator &amp; Critic</span><span>Python</span>
+          </div>
+          <pre><code class="language-python" data-code="3"></code></pre>
+        </div>
+        <script type="text/plain" data-code-src="3">
+          generator = LlmAgent(
+              name="Generator",
+              instruction="SQLクエリを生成する。{feedback} があれば修正して再生成する。",
+              output_key="draft",
+          )
+          critic = LlmAgent(
+              name="Critic",
+              instruction="{draft} の妥当性を検証し、問題なければ 'PASS' を、そうでなければ具体的な指摘を出力する。",
+              output_key="feedback",
+          )
+          validation_loop = LoopAgent(
+              name="ValidationLoop",
+              sub_agents=[generator, critic],
+              condition_key="feedback",
+              exit_condition="PASS",
+          )
+        </script>
+
+        <p>
+          <code>LoopAgent</code
+          >の終了条件には<code>max_iterations</code>によるハードリミットに加え、<code>EventActions</code>内で<code>escalate=True</code>を発火させることで、閾値到達前でも早期終了させる仕組みが用意されています。
+        </p>
+
+        <div class="callout">
+          <div class="callout-title">ベストプラクティス③(段階的導入)</div>
+          初日からネストしたループ構造を組むのは避け、まず単純な<code>SequentialAgent</code>チェーンでデバッグしてから複雑さを積み増してください。
+        </div>
+      </section>
+
+      <section class="content" id="models">
+        <h2><span class="idx">03</span>モデル選定戦略 ― コストと性能のトレードオフ</h2>
+        <p class="section-lead">
+          2026年7月時点のModel Gardenには、Gemini
+          3系・2.5系に加え、サードパーティやオープンウェイトまで200以上のモデルが並びます。
+        </p>
+
+        <p>
+          エージェント設計において<strong>モデル選定はコスト最適化における最もレバレッジの効く意思決定</strong>です。
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>モデル</th>
+                <th>特性</th>
+                <th>推奨ユースケース</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Gemini 3.1 Flash-Lite</td>
+                <td>最安・低レイテンシ、thinkingレベル(minimal/low/medium/high)を選択可</td>
+                <td>高頻度・低複雑度なルーティングや分類タスク</td>
+              </tr>
+              <tr>
+                <td>Gemini 3 Flash</td>
+                <td>3 Proの推論力をFlashのコスト感で提供</td>
+                <td>複雑なエージェントワークフローの主力モデル</td>
+              </tr>
+              <tr>
+                <td>Gemini 3.5 Flash</td>
+                <td>Proに迫る知性をFlash価格帯で提供、コーディングと並列エージェント実行に強み</td>
+                <td>マルチエージェントのオーケストレーション層</td>
+              </tr>
+              <tr>
+                <td>Gemini 2.5 Pro / 3.1 Pro</td>
+                <td>高度な推論・100万トークン級コンテキスト</td>
+                <td>複雑な推論・コーディング、最終品質チェック</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout warn">
+          <div class="callout-title">ベストプラクティス④(コスト最適化)</div>
+          一部の分析では、Flash-Liteの入力単価がPro系モデルの約20分の1という報告もあります(価格は変動するため必ず<a
+            href="https://cloud.google.com/gemini-enterprise-agent-platform/generative-ai/pricing"
+            target="_blank"
+            rel="noopener"
+            >公式料金ページ</a
+          >を確認してください)。また、Pro系モデルは<strong>入力コンテキストが約20万トークンを超えると単価が段階的に上昇する「コストの崖」</strong>が存在するとされています。RAGパイプラインで長文コンテキストをそのまま流し込むと、意図せずこの閾値を超えて課金が跳ね上がることがあるため注意が必要です。すべてのタスクにPro系を使うのではなく、タスクの複雑度に応じてモデルを動的に振り分ける設計(自前のルーターエージェントでも可)を検討してください。
+        </div>
+      </section>
+
+      <section class="content" id="runtime">
+        <h2><span class="idx">04</span>Agent Runtime ― デプロイとスケーリングの実践</h2>
+        <p class="section-lead">
+          Agent
+          RuntimeはADKエージェントをホストするフルマネージドのサーバーレス実行基盤です。パフォーマンスチューニングの鍵は「コールドスタート」の理解にあります。
+        </p>
+
+        <h3>コールドスタートの実測データ</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>条件</th>
+                <th>平均レイテンシ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <code>min_instances=1</code>(デフォルト)、300同時リクエスト、コールドスタート時
+                </td>
+                <td>約4.7秒</td>
+              </tr>
+              <tr>
+                <td>同条件、ウォームスタート時(直後の再実行)</td>
+                <td>約0.4秒</td>
+              </tr>
+              <tr>
+                <td><code>min_instances=10</code>に変更した場合のコールドスタート</td>
+                <td>約1.4秒</td>
+              </tr>
+              <tr>
+                <td>
+                  <code>min_instances=10</code>・デフォルト同時実行数(9)で1,500クエリ/分(25
+                  QPS)を60秒間持続
+                </td>
+                <td>約1.6秒で安定</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>つまり、4秒以上のオーバーヘッドのほとんどは新規インスタンスの起動待ちに起因します。</p>
+
+        <h3>デプロイパラメータの設計指針</h3>
+        <div class="code-block">
+          <div class="code-label"><span>Agent Runtime デプロイ設定</span><span>Python</span></div>
+          <pre><code class="language-python" data-code="4"></code></pre>
+        </div>
+        <script type="text/plain" data-code-src="4">
+          remote_agent = client.agent_engines.create(
+              agent=local_agent,
+              config={
+                  "min_instances": 10,        # 範囲: [0, 10](VPC-SC/PSC-I有効時は[1, 100])
+                  "max_instances": 10,
+                  "resource_limits": {"cpu": "4", "memory": "8Gi"},
+                  "container_concurrency": 9,  # デフォルト値
+              },
+          )
+        </script>
+
+        <div class="callout">
+          <div class="callout-title">ベストプラクティス⑤</div>
+          バーストしやすい、あるいは常時アクセスされる本番ワークロードでは<code>min_instances</code>をベースライントラフィックを捌ける水準まで引き上げてください。逆に、断続的にしかアクセスされない社内ツールなどでは<code>min_instances=0〜1</code>のままにしてコストを抑える判断も合理的です。安定した継続トラフィックを流すことでインスタンスを「温めておく」ことも、スパイクへの耐性を上げる手段になります。依存パッケージについては、<code>requirements.txt</code>でバージョンを固定(pin)し、再現可能なビルドを保証してください。
+        </div>
+      </section>
+
+      <section class="content" id="memory">
+        <h2><span class="idx">05</span>Memory Bank ― 長期記憶の設計と落とし穴</h2>
+        <p class="section-lead">
+          ユーザーとエージェントの会話履歴から長期記憶を自動生成・自己組織化するマネージドサービス。設計を誤ると、プライバシー漏洩やレイテンシ問題に直結します。
+        </p>
+
+        <h3>スコープと抽出・統合の流れ</h3>
+        <div class="diagram-wrap">
+          <script type="text/plain" data-diagram="4">
+            sequenceDiagram
+                participant U as ユーザー
+                participant S as Sessions
+                participant M as Memory Bank
+                U->>S: 会話イベントを蓄積(AppendEvent)
+                S->>M: GenerateMemories を呼び出し
+                M->>M: 抽出: memory_topicsに合致する情報のみ保持
+                M->>M: 統合: 同一scope内の既存記憶と重複/矛盾を解消
+                M-->>U: 次回セッション開始時に記憶を注入
+          </script>
+          <p class="diagram-caption">図5-1: Memory Bankにおける記憶の抽出・統合フロー</p>
+        </div>
+
+        <ul>
+          <li>
+            記憶は必ず<code>scope</code>(通常は<code>user_id</code>)に紐づけて隔離されます。これにより、あるユーザーの記憶が別のユーザーに漏れることはありません。
+          </li>
+          <li>
+            抽出対象は<code>memory_topics</code>で制御し、マネージド済みトピックを使うか、few-shot例を与えて挙動をカスタマイズできます。
+          </li>
+          <li>
+            生成は既定では同期的(呼び出し元がポーリングして完了を待つ)ですが、<strong>本番環境ではバックグラウンドの非同期処理として実行することが推奨</strong>されています。
+          </li>
+        </ul>
+
+        <h3>よくある誤用パターン(アンチパターン)</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>誤用</th>
+                <th>リスク</th>
+                <th>対策</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>メモリポイズニング</td>
+                <td>誤情報が書き込まれ、エージェントが事実として利用し続ける</td>
+                <td>IAM Conditionsでスコープ単位の読み書き権限を制限</td>
+              </tr>
+              <tr>
+                <td>ホットパスでの誤用</td>
+                <td>検索精度優先の設計でありサブ10msの応答を保証しない</td>
+                <td>セッション開始時の事前ロード用途に限定</td>
+              </tr>
+              <tr>
+                <td>スコープ設計の甘さ</td>
+                <td><code>scope_keys</code>が粗いと記憶が意図せず混在</td>
+                <td>ユーザー単位・セッション単位など粒度を明確化</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          なお、2026年7月時点でMemory Bankのデフォルトの生成モデルはGemini 2.5 FlashからGemini 3.5
+          Flashに更新されています。
+        </p>
+      </section>
+
+      <section class="content" id="rag">
+        <h2><span class="idx">06</span>RAG Engine と Vector Search</h2>
+        <p class="section-lead">
+          プライベートデータをLLMに安全に接続し、ハルシネーションを低減するためのマネージド基盤。
+        </p>
+
+        <p>
+          RAG Engineは検索と生成を接続するパイプラインを、Vector
+          Searchはストレージと検索を一体化したAIネイティブな検索エンジンとして提供します。
+        </p>
+
+        <div class="callout">
+          <div class="callout-title">ベストプラクティス⑥</div>
+          Vector
+          Searchのインデックス設計では、フィルタリング条件(restricts)の数がシャード数、ひいてはメモリ使用量に直結します。フィルタ条件を絞り込みすぎるとインデックスコストが跳ね上がる点に注意してください。また、RAGで取得したチャンクをそのままPro系モデルへ渡す設計は、前述の「コンテキスト長のコストの崖」を誘発しやすいため、リランキングや要約による事前圧縮を検討してください。
+        </div>
+      </section>
+
+      <section class="content" id="a2a-mcp">
+        <h2><span class="idx">07</span>エージェント間通信 ― A2AプロトコルとMCPの使い分け</h2>
+        <p class="section-lead">
+          実務で最も混同されやすいポイントです。A2Aはエージェント間の委任・協調、MCPはエージェントとツール/データの接続を扱います。
+        </p>
+
+        <div class="diagram-wrap">
+          <script type="text/plain" data-diagram="5">
+            flowchart TD
+                Q{"何を接続したいか?"}
+                Q -->|"データベース・API・社内システムへの<br>単発の関数呼び出し"| MCP["MCPを使う<br>(ステートレスなツール接続)"]
+                Q -->|"別の専門エージェントへ<br>タスクを委任・交渉したい"| A2A["A2Aを使う<br>(ステートフルな多段階委任)"]
+                MCP --> Reg["Agent Registry に<br>MCPサーバーとして登録"]
+                A2A --> Card["Agent Cardを発行し<br>Agent Registryで発見可能にする"]
+          </script>
+          <p class="diagram-caption">図7-1: A2AとMCPの使い分け判断フロー</p>
+        </div>
+
+        <p>この2つは競合するものではなく、実システムでは両方を併用するのが一般的です。</p>
+        <ul>
+          <li>
+            <strong>A2A</strong>は2026年3月にv1.2がリリースされ、Linux Foundation傘下のAgentic AI
+            Foundationによって管理される、ベンダー非依存のオープン標準です。150以上の組織が本番運用しているとされ、Microsoft・AWS・Salesforce・SAP・ServiceNowなど主要ベンダーも対応を進めています。
+          </li>
+          <li>
+            <strong>Agent Card</strong
+            >は、エージェントの能力(skills)・認証方式・エンドポイントを記述するJSON文書で、他のエージェントがこれを取得して発見・連携します。
+          </li>
+          <li>
+            ADKでは<code>RemoteA2aAgent</code>を使ってリモートのA2Aエージェントを、あたかもローカルのサブエージェントであるかのように呼び出せます。
+          </li>
+          <li>
+            <strong>Agent Gateway</strong
+            >はMCP/A2A双方のトラフィックを仲介し、MCPリクエストについては属性を解析して「特定ツールへのアクセスのみ許可する」といったきめ細かい認可ポリシーを設定できます。
+          </li>
+        </ul>
+
+        <div class="callout">
+          <div class="callout-title">ベストプラクティス⑦</div>
+          本番投入前に、構築したエージェントを必ず<strong>Agent Registryに登録</strong
+          >してください。開発段階では登録は任意ですが、登録されていないエージェントは他のエージェントメッシュから発見されず、組織横断での再利用や監査ができない「孤立したエージェント」のままになってしまいます。
+        </div>
+      </section>
+
+      <section class="content" id="security">
+        <h2><span class="idx">08</span>セキュリティとガバナンス</h2>
+        <p class="section-lead">
+          エージェントが自律的に行動する以上、「誰が」「何に」アクセスできるかを事前に設計することが不可欠です。
+        </p>
+
+        <div class="diagram-wrap">
+          <script type="text/plain" data-diagram="6">
+            flowchart TB
+                Identity["① Agent Identity<br>暗号学的な一意ID(mTLS / DPoP)"]
+                Registry["② Agent Registry<br>エージェント・ツール・MCPサーバーの中央カタログ"]
+                Gateway["③ Agent Gateway<br>全トラフィックの認可・可観測性の集約点"]
+                Armor["④ Model Armor / Semantic Governance Policies<br>プロンプトインジェクション・データ漏洩・意図逸脱の防御"]
+                Identity --> Gateway
+                Registry --> Gateway
+                Gateway --> Armor
+                Armor --> Result["監査可能な安全なエージェント実行"]
+          </script>
+          <p class="diagram-caption">図8-1: GEAPの4層ガバナンスアーキテクチャ</p>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>コンポーネント</th>
+                <th>役割</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Agent Identity</td>
+                <td>
+                  すべてのエージェントに一意の暗号学的IDを付与し、mTLSとDPoPで保護されたコンテキストアウェアアクセスを既定で強制。すべての行動がこのIDと権限に紐づいて記録され監査を可能にする
+                </td>
+              </tr>
+              <tr>
+                <td>Agent Registry</td>
+                <td>
+                  組織内のすべてのエージェント・ツール・MCPサーバーの中央カタログ。誰が何を利用できるかを制御し、ガバナンスなきエージェントの乱立を防ぐ
+                </td>
+              </tr>
+              <tr>
+                <td>Agent Gateway</td>
+                <td>
+                  Client-to-Agent と Agent-to-Anywhere
+                  の2モードで動作し、mTLSハンドシェイクを自動処理しつつIAM・SGP・Model
+                  Armorへの委任認可を実施。ネットワーク層のオブザーバビリティテレメトリも出力
+                </td>
+              </tr>
+              <tr>
+                <td>Model Armor</td>
+                <td>
+                  プロンプトインジェクション、ツールポイズニング、機密データ漏洩を防ぐガードレール。MCP特有の攻撃にも対応
+                </td>
+              </tr>
+              <tr>
+                <td>Semantic Governance Policies(SGP)</td>
+                <td>
+                  2026年7月時点プレビュー。ツール呼び出しをユーザー意図・組織ルールに照らして実行時に評価。Natural
+                  Language Constraints(NLC)により平易な英語でルールを宣言可能
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout danger">
+          <div class="callout-title">ベストプラクティス⑧(最重要)</div>
+          複数の実務者が共通して指摘しているのは、「組織展開の前にガバナンスを整備しないこと」がエンタープライズのエージェント導入における最も高くつく失敗だという点です。Agent
+          Identity・Agent Gateway・Model
+          Armorの設定は、スケールしてから追加するものではなく、最初の1エージェントを作る段階から組み込むべき土台です。
+        </div>
+      </section>
+
+      <section class="content" id="quality">
+        <h2><span class="idx">09</span>品質保証 ― Evaluation・Simulation・Observability</h2>
+        <p class="section-lead">3段階のサイクルで品質を継続的に計測・改善します。</p>
+
+        <div class="diagram-wrap">
+          <script type="text/plain" data-diagram="7">
+            flowchart LR
+                Sim["Agent Simulation<br>合成ユーザー・仮想ツールで<br>多段階会話をストレステスト"]
+                Eval["Agent Evaluation<br>マルチターン自動評価者で<br>本番トラフィックを継続採点"]
+                Obs["Agent Observability<br>Unified Trace Viewerで<br>推論経路を可視化"]
+                Opt["Agent Optimizer<br>失敗パターンを自動クラスタリングし<br>システム指示を改善提案"]
+                Sim --> Eval --> Obs --> Opt --> Sim
+          </script>
+          <p class="diagram-caption">図9-1: 品質保証の継続的フィードバックループ</p>
+        </div>
+
+        <ul>
+          <li>
+            <strong>Agent Simulation</strong>:
+            人間らしい合成ユーザーと仮想化されたツールを使い、タスク成功率と安全性をスコアリング
+          </li>
+          <li>
+            <strong>Agent Evaluation</strong>:
+            マルチターンの自動評価者(autorater)が会話全体の論理を評価。「環境シミュレーション」機能でHTTP
+            503エラーやレイテンシスパイクを注入し、耐障害性を検証可能
+          </li>
+          <li>
+            <strong>Agent Observability</strong>:
+            OpenTelemetry準拠でトレース・ログ・メトリクス(p50/p95/p99レイテンシ、トークン使用量、エラー率)を収集し、Unified
+            Trace Viewerで可視化
+          </li>
+          <li>
+            <strong>Agent Optimizer</strong>:
+            実運用の失敗を自動でクラスタリングし、精度向上のためのシステム指示の改訂案を提示
+          </li>
+        </ul>
+
+        <div class="callout">
+          <div class="callout-title">ベストプラクティス⑨</div>
+          手動テストは初期プロトタイピングには有効ですが、スケールしません。数千人規模の従業員に展開する前に、ADK
+          Evaluation
+          Frameworkを使った決定論的なEvalSetを用意し、意味的等価性の判定・ハルシネーション検知・CIパイプラインからのテストスイート実行を組み込んでください。
+        </div>
+      </section>
+
+      <section class="content" id="migration">
+        <h2><span class="idx">10</span>移行時のチェックリスト(Vertex AIからの移行)</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>確認項目</th>
+                <th>内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>APIエンドポイント</td>
+                <td>
+                  <code>aiplatform.googleapis.com</code>は変更なし。既存コードは無停止で動作継続
+                </td>
+              </tr>
+              <tr>
+                <td>コンソール表示</td>
+                <td>「Vertex AI」表記は廃止済み。ブックマークやドキュメントのリンク先を更新推奨</td>
+              </tr>
+              <tr>
+                <td>IAMロール名</td>
+                <td>
+                  一部のロール名称が変更されている場合があるため、サービスアカウントの権限を再確認
+                </td>
+              </tr>
+              <tr>
+                <td>課金明細</td>
+                <td>
+                  2026年5〜6月の請求書で「Vertex AI」から「Gemini Enterprise」への項目移行を確認
+                </td>
+              </tr>
+              <tr>
+                <td>Agentspace資産</td>
+                <td>既存のAgentspaceエージェントは自動移行されるが、統合UX上で挙動を必ず確認</td>
+              </tr>
+              <tr>
+                <td>名称変更表</td>
+                <td>
+                  個別機能名の新旧対応は公式の<a
+                    href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/vertex-ai-name-changes"
+                    target="_blank"
+                    rel="noopener"
+                    >name changesページ</a
+                  >を参照
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="content" id="antipatterns">
+        <h2><span class="idx">11</span>アンチパターン早見表</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>アンチパターン</th>
+                <th>なぜ問題か</th>
+                <th>対策</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>A2AとMCPを混同する</td>
+                <td>ツール接続と委任の設計が破綻する</td>
+                <td>「データ/ツール接続=MCP」「エージェント間委任=A2A」で判断</td>
+              </tr>
+              <tr>
+                <td>Memory Bankをホットパスキャッシュとして使う</td>
+                <td>検索精度優先の設計でレイテンシが安定しない</td>
+                <td>セッション開始時のコンテキスト事前ロード用途に限定</td>
+              </tr>
+              <tr>
+                <td>Agent Registryに登録しない</td>
+                <td>組織内で発見・再利用・監査ができない孤立エージェントになる</td>
+                <td>開発段階から登録を習慣化する</td>
+              </tr>
+              <tr>
+                <td>ガバナンス設定を後回しにする</td>
+                <td>展開後の是正コストが跳ね上がる</td>
+                <td>Identity/Gateway/Model Armorを最初の1体から組み込む</td>
+              </tr>
+              <tr>
+                <td>すべてのタスクにPro系モデルを使う</td>
+                <td>コストが不必要に膨張する</td>
+                <td>タスク複雑度に応じてFlash-Lite/Flash/Proを使い分ける</td>
+              </tr>
+              <tr>
+                <td><code>min_instances=1</code>のまま高トラフィックを受ける</td>
+                <td>コールドスタートで数秒級の遅延が発生する</td>
+                <td>ベースライントラフィックに応じて調整する</td>
+              </tr>
+              <tr>
+                <td>RAGで長文コンテキストをそのまま投入する</td>
+                <td>コンテキスト長の閾値超過でコストが急増する</td>
+                <td>リランキング・要約による事前圧縮を行う</td>
+              </tr>
+              <tr>
+                <td>ネストしたループ構造をいきなり実装する</td>
+                <td>デバッグが困難になる</td>
+                <td>Sequentialパターンから始め段階的に複雑化する</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="content" id="checklist">
+        <h2><span class="idx">12</span>まとめ ― 実装前の最終チェックリスト</h2>
+        <ul class="checklist">
+          <li>単一の万能エージェントではなく、役割分担された複数エージェント構成を検討したか</li>
+          <li><code>output_key</code>と<code>description</code>を明確に命名したか</li>
+          <li>タスクの複雑度に応じたモデル選定(Flash-Lite / Flash / Pro)を行ったか</li>
+          <li>
+            <code>min_instances</code> /
+            <code>container_concurrency</code>をトラフィックパターンに合わせて設定したか
+          </li>
+          <li>Memory Bankの<code>scope</code>設計とIAM Conditionsによるアクセス制御を行ったか</li>
+          <li>MCP(ツール接続)とA2A(エージェント間委任)を正しく使い分けたか</li>
+          <li>Agent Identity・Agent Gateway・Model Armorを最初から組み込んだか</li>
+          <li>Agent Registryへの登録を行ったか</li>
+          <li>Agent Evaluation / Simulationによる継続的な品質評価パイプラインを構築したか</li>
+          <li>Vertex AIからの移行チェックリスト(IAM・課金・コンソールリンク)を確認したか</li>
+        </ul>
+      </section>
+
+      <section class="content" id="references">
+        <h2><span class="idx">13</span>参考文献・一次情報源</h2>
+        <p class="section-lead">
+          本ガイドの内容は、以下の公式ドキュメント・Google公式ブログ・Google Developer
+          Experts等の技術記事を根拠としています(2026年7月17日時点で確認)。
+        </p>
+
+        <div class="ref-group">
+          <h4>Google公式ドキュメント・ブログ</h4>
+          <ul class="ref-list">
+            <li>
+              <span class="ref-title">Gemini Enterprise Agent Platform 公式トップページ</span
+              ><a
+                href="https://cloud.google.com/products/gemini-enterprise-agent-platform"
+                target="_blank"
+                rel="noopener"
+                >cloud.google.com/products/gemini-enterprise-agent-platform</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">Agent Platform 概要ドキュメント</span
+              ><a
+                href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/overview"
+                target="_blank"
+                rel="noopener"
+                >docs.cloud.google.com/gemini-enterprise-agent-platform/overview</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">Vertex AIからの名称変更一覧</span
+              ><a
+                href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/vertex-ai-name-changes"
+                target="_blank"
+                rel="noopener"
+                >.../vertex-ai-name-changes</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">Agent Development Kit(ADK)公式解説</span
+              ><a
+                href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/adk"
+                target="_blank"
+                rel="noopener"
+                >.../build/adk</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">ADKエージェント開発ガイド</span
+              ><a
+                href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/runtime/create-an-adk-agent"
+                target="_blank"
+                rel="noopener"
+                >.../build/runtime/create-an-adk-agent</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">Agent Runtimeのスケーリング最適化</span
+              ><a
+                href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/runtime/optimize-and-scale"
+                target="_blank"
+                rel="noopener"
+                >.../scale/runtime/optimize-and-scale</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">エージェントのデプロイ手順</span
+              ><a
+                href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/runtime/deploy-an-agent"
+                target="_blank"
+                rel="noopener"
+                >.../scale/runtime/deploy-an-agent</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">Agent Platform Memory Bank</span
+              ><a
+                href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/memory-bank"
+                target="_blank"
+                rel="noopener"
+                >.../scale/memory-bank</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">Memory Bankのセットアップ</span
+              ><a
+                href="https://cloud.google.com/vertex-ai/generative-ai/docs/agent-engine/memory-bank/set-up"
+                target="_blank"
+                rel="noopener"
+                >cloud.google.com/.../memory-bank/set-up</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">Memory Bankの記憶生成</span
+              ><a
+                href="https://cloud.google.com/vertex-ai/generative-ai/docs/agent-engine/memory-bank/generate-memories"
+                target="_blank"
+                rel="noopener"
+                >cloud.google.com/.../generate-memories</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">Vertex AI Memory Bank プレビュー発表記事</span
+              ><a
+                href="https://cloud.google.com/blog/products/ai-machine-learning/vertex-ai-memory-bank-in-public-preview"
+                target="_blank"
+                rel="noopener"
+                >cloud.google.com/blog/.../memory-bank-in-public-preview</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">Agent Gateway概要</span
+              ><a
+                href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/govern/gateways/agent-gateway-overview"
+                target="_blank"
+                rel="noopener"
+                >.../govern/gateways/agent-gateway-overview</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">Agent Gatewayによるガバナンス実践(Codelab)</span
+              ><a
+                href="https://codelabs.developers.google.com/cloudnet-agent-gateway"
+                target="_blank"
+                rel="noopener"
+                >codelabs.developers.google.com/cloudnet-agent-gateway</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">A2Aエージェントのインポートとガバナンス</span
+              ><a
+                href="https://docs.cloud.google.com/gemini/enterprise/docs/import-govern-agent-registry"
+                target="_blank"
+                rel="noopener"
+                >.../import-govern-agent-registry</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">A2A・Agent Runtime連携Codelab</span
+              ><a
+                href="https://codelabs.developers.google.com/adk-a2a-agent-runtime"
+                target="_blank"
+                rel="noopener"
+                >codelabs.developers.google.com/adk-a2a-agent-runtime</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">Agent Platformの最適化(評価・観測性)概要</span
+              ><a
+                href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/optimize"
+                target="_blank"
+                rel="noopener"
+                >.../optimize</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">Agent Observability概要</span
+              ><a
+                href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/optimize/observability/overview"
+                target="_blank"
+                rel="noopener"
+                >.../optimize/observability/overview</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">Agent Evaluation詳細</span
+              ><a
+                href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/optimize/evaluation/agent-evaluation"
+                target="_blank"
+                rel="noopener"
+                >.../optimize/evaluation/agent-evaluation</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">リリースノート(Semantic Governance Policies等)</span
+              ><a
+                href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/release-notes"
+                target="_blank"
+                rel="noopener"
+                >.../release-notes</a
+              >
+            </li>
+            <li>
+              <span class="ref-title"
+                >「Gemini Enterprise Agent Platform」発表ブログ(2026/4/22)</span
+              ><a
+                href="https://cloud.google.com/blog/products/ai-machine-learning/introducing-gemini-enterprise-agent-platform"
+                target="_blank"
+                rel="noopener"
+                >cloud.google.com/blog/.../introducing-gemini-enterprise-agent-platform</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">「新Gemini Enterprise」プラットフォーム解説ブログ</span
+              ><a
+                href="https://cloud.google.com/blog/products/ai-machine-learning/the-new-gemini-enterprise-one-platform-for-agent-development"
+                target="_blank"
+                rel="noopener"
+                >cloud.google.com/blog/.../one-platform-for-agent-development</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">パートナー向けエージェント公開ガイド(A2A準拠要件)</span
+              ><a
+                href="https://cloud.google.com/blog/topics/developers-practitioners/publish-agents-in-gemini-enterprise-and-google-cloud-marketplace"
+                target="_blank"
+                rel="noopener"
+                >cloud.google.com/blog/topics/.../publish-agents-in-gemini-enterprise</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">本番エージェント構築のための5つのガイド</span
+              ><a
+                href="https://cloud.google.com/blog/topics/developers-practitioners/five-guides-to-building-and-scaling-production-ready-ai-agents"
+                target="_blank"
+                rel="noopener"
+                >cloud.google.com/blog/topics/.../five-guides-to-building-and-scaling</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">Cloud Runのコールドスタート対策ガイド</span
+              ><a
+                href="https://cloud.google.com/blog/topics/developers-practitioners/a-guide-to-ai-cold-starts-on-cloud-run"
+                target="_blank"
+                rel="noopener"
+                >cloud.google.com/blog/topics/.../ai-cold-starts-on-cloud-run</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">RAG Engine 課金モデル</span
+              ><a
+                href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/rag-engine/rag-engine-billing"
+                target="_blank"
+                rel="noopener"
+                >.../build/rag-engine/rag-engine-billing</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">Vector Search概要</span
+              ><a
+                href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/vector-search/overview"
+                target="_blank"
+                rel="noopener"
+                >.../build/vector-search/overview</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">Gemini 3.1 Flash-Liteモデルページ</span
+              ><a
+                href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/3-1-flash-lite"
+                target="_blank"
+                rel="noopener"
+                >.../models/gemini/3-1-flash-lite</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">Gemini 3 Flashモデルページ</span
+              ><a
+                href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/3-flash"
+                target="_blank"
+                rel="noopener"
+                >.../models/gemini/3-flash</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div class="ref-group">
+          <h4>著名な開発者・Google Developer Experts等による技術記事</h4>
+          <ul class="ref-list">
+            <li>
+              <span class="ref-title"
+                >Shubham Saboo (Google, Senior AI Product Manager)「Developer's guide to multi-agent
+                patterns in ADK」Google Developers Blog(2025/12/16)</span
+              ><a
+                href="https://developers.googleblog.com/developers-guide-to-multi-agent-patterns-in-adk/"
+                target="_blank"
+                rel="noopener"
+                >developers.googleblog.com/developers-guide-to-multi-agent-patterns-in-adk</a
+              >
+            </li>
+            <li>
+              <span class="ref-title"
+                >「Agent Development Kit: Making it easy to build multi-agent applications」Google
+                Developers Blog</span
+              ><a
+                href="https://developers.googleblog.com/en/agent-development-kit-easy-to-build-multi-agent-applications/"
+                target="_blank"
+                rel="noopener"
+                >developers.googleblog.com/en/agent-development-kit-easy-to-build...</a
+              >
+            </li>
+            <li>
+              <span class="ref-title"
+                >「Introducing Agent Development Kit for TypeScript」Google Developers Blog</span
+              ><a
+                href="https://developers.googleblog.com/introducing-agent-development-kit-for-typescript-build-ai-agents-with-the-power-of-a-code-first-approach/"
+                target="_blank"
+                rel="noopener"
+                >developers.googleblog.com/introducing-agent-development-kit-for-typescript...</a
+              >
+            </li>
+            <li>
+              <span class="ref-title"
+                >Gabriel Preda (Google Developer Expert)「From Vertex AI to Gemini Enterprise Agent
+                Platform」Medium(2026/5)</span
+              ><a
+                href="https://medium.com/google-developer-experts/from-vertex-ai-to-gemini-enterprise-agent-platform-57244e686b7a"
+                target="_blank"
+                rel="noopener"
+                >medium.com/google-developer-experts/from-vertex-ai-to-gemini-enterprise...</a
+              >
+            </li>
+            <li>
+              <span class="ref-title"
+                >Romin Irani「Tutorial Series: Gemini Enterprise Agent Platform」Part 3・Part 5,
+                Google Cloud Community</span
+              ><a
+                href="https://medium.com/google-cloud/tutorial-series-gemini-enterprise-agent-platform-part-3-scaling-with-agent-runtime-memory-1fe9fe48d829"
+                target="_blank"
+                rel="noopener"
+                >medium.com/google-cloud/.../part-3-scaling-with-agent-runtime-memory</a
+              >
+            </li>
+            <li>
+              <span class="ref-title">同上 Part 5(Observability and Evaluation)</span
+              ><a
+                href="https://medium.com/google-cloud/tutorial-series-gemini-enterprise-agent-platform-part-5-observability-and-evaluation-79c110c38028"
+                target="_blank"
+                rel="noopener"
+                >medium.com/google-cloud/.../part-5-observability-and-evaluation</a
+              >
+            </li>
+            <li>
+              <span class="ref-title"
+                >Vishal Bulbule「Using Long term Memory in Agent (ADK): Vertex AI Memory
+                bank」Google Cloud Community</span
+              ><a
+                href="https://medium.com/google-cloud/using-long-term-memory-in-agent-adk-vertex-ai-memory-bank-2d1e979b6197"
+                target="_blank"
+                rel="noopener"
+                >medium.com/google-cloud/using-long-term-memory-in-agent-adk...</a
+              >
+            </li>
+            <li>
+              <span class="ref-title"
+                >「Google Gemini Enterprise Agent Platform: Build and Deploy A2A Agents」DEV
+                Community</span
+              ><a
+                href="https://dev.to/jangwook_kim_e31e7291ad98/google-gemini-enterprise-agent-platform-build-and-deploy-a2a-agents-11ck"
+                target="_blank"
+                rel="noopener"
+                >dev.to/jangwook_kim_e31e7291ad98/google-gemini-enterprise-agent-platform...</a
+              >
+            </li>
+            <li>
+              <span class="ref-title"
+                >David Regalado「What is Gemini Enterprise Agent Platform?」Google Cloud
+                Community</span
+              ><a
+                href="https://medium.com/google-cloud/what-is-gemini-enterprise-agent-platform-ff621edcbe3d"
+                target="_blank"
+                rel="noopener"
+                >medium.com/google-cloud/what-is-gemini-enterprise-agent-platform</a
+              >
+            </li>
+            <li>
+              <span class="ref-title"
+                >AIPractitioner「Google ADK Explained: Building Multi-Agent Systems With Google's
+                Agent Development Kit」Substack</span
+              ><a
+                href="https://aipractitioner.substack.com/p/google-adk-explained-building-multi"
+                target="_blank"
+                rel="noopener"
+                >aipractitioner.substack.com/p/google-adk-explained-building-multi</a
+              >
+            </li>
+            <li>
+              <span class="ref-title"
+                >CloudZero「Google Vertex AI Pricing: Complete Enterprise Guide (2026)」</span
+              ><a
+                href="https://www.cloudzero.com/blog/google-vertex-ai-pricing/"
+                target="_blank"
+                rel="noopener"
+                >cloudzero.com/blog/google-vertex-ai-pricing</a
+              >
+            </li>
+            <li>
+              <span class="ref-title"
+                >Wikipedia「Gemini Enterprise Agent Platform」(背景・沿革の一次確認用途)</span
+              ><a
+                href="https://en.wikipedia.org/wiki/Gemini_Enterprise_Agent_Platform"
+                target="_blank"
+                rel="noopener"
+                >en.wikipedia.org/wiki/Gemini_Enterprise_Agent_Platform</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div class="callout warn" style="margin-top: 28px">
+          <div class="callout-title">注記</div>
+          Gemini Enterprise Agent Platformは発表から日が浅く(2026年4月22日発表)、Semantic Governance
+          Policiesをはじめプレビュー段階の機能や価格体系は今後変更される可能性があります。実装前に必ず上記の公式ドキュメントで最新のステータスを確認してください。
+        </div>
+      </section>
+
+      <footer>
+        Gemini Enterprise Agent Platform 実践ベストプラクティスガイド &middot; 作成日: 2026年7月17日
+      </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11.12.0/dist/mermaid.min.js"></script>
+    <script>
+      (function () {
+        // ---- dedent: strips common leading whitespace introduced by editor auto-indent ----
+        function dedent(str) {
+          let s = str.replace(/^<br>/, '').replace(/\s+$/, '');
+          const lines = s.split('<br>');
+          let minIndent = Infinity;
+          lines.forEach(function (line) {
+            if (line.trim().length === 0) return;
+            const m = line.match(/^[ \t]*/);
+            minIndent = Math.min(minIndent, m[0].length);
+          });
+          if (!isFinite(minIndent)) minIndent = 0;
+          return lines
+            .map(function (line) {
+              return line.slice(minIndent);
+            })
+            .join('<br>');
+        }
+
+        // ---- Inject Mermaid diagrams from <script type="text/plain" data-diagram> ----
+        document.querySelectorAll('script[data-diagram]').forEach(function (el) {
+          const code = dedent(el.textContent);
+          const pre = document.createElement('pre');
+          pre.className = 'mermaid';
+          pre.textContent = code;
+          el.replaceWith(pre);
+        });
+
+        // ---- Inject code blocks from <script type="text/plain" data-code-src> ----
+        document.querySelectorAll('script[data-code-src]').forEach(function (el) {
+          const id = el.getAttribute('data-code-src');
+          const target = document.querySelector('code[data-code="' + id + '"]');
+          if (target) {
+            target.textContent = dedent(el.textContent);
+          }
+          el.remove();
+        });
+
+        // ---- Highlight.js ----
+        if (window.hljs) {
+          document.querySelectorAll('code.language-python').forEach(function (block) {
+            hljs.highlightElement(block);
+          });
+        }
+
+        // ---- Mermaid ----
+        if (window.mermaid) {
+          mermaid.initialize({
+            startOnLoad: false,
+            theme: 'dark',
+            themeVariables: {
+              background: '#101f36',
+              primaryColor: '#16283f',
+              primaryTextColor: '#e7edf7',
+              primaryBorderColor: '#7c9eff',
+              lineColor: '#7c9eff',
+              secondaryColor: '#0d1b2f',
+              tertiaryColor: '#0d1b2f',
+              fontFamily: 'Hiragino Kaku Gothic ProN, Noto Sans JP, sans-serif',
+            },
+            securityLevel: 'loose',
+            flowchart: { useMaxWidth: true, htmlLabels: true },
+            sequence: { useMaxWidth: true },
+          });
+          mermaid.run({ querySelector: '.mermaid' });
+        }
+
+        // ---- Sidebar active-state via IntersectionObserver ----
+        const navLinks = Array.from(document.querySelectorAll('#sidebar-nav a'));
+        const sections = navLinks
+          .map(function (a) {
+            return document.querySelector(a.getAttribute('href'));
+          })
+          .filter(Boolean);
+
+        const observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              const link = navLinks.find(function (a) {
+                return a.getAttribute('href') === '#' + entry.target.id;
+              });
+              if (!link) return;
+              if (entry.isIntersecting) {
+                navLinks.forEach(function (a) {
+                  a.classList.remove('active');
+                });
+                link.classList.add('active');
+              }
+            });
+          },
+          { rootMargin: '-15% 0px -70% 0px', threshold: 0 },
+        );
+
+        sections.forEach(function (sec) {
+          observer.observe(sec);
+        });
+      })();
+    </script>
+  </body>
+</html>
