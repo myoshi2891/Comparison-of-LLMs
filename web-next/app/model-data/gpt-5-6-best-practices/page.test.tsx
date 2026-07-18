@@ -87,9 +87,11 @@ describe("/model-data/gpt-5-6-best-practices - contract", () => {
   });
 
   it("does not use the React raw-HTML injection prop", () => {
-    const source = readFileSync(`${__dirname}/page.tsx`, "utf8");
+    const pageSource = readFileSync(`${__dirname}/page.tsx`, "utf8");
+    const guideSource = readFileSync(`${__dirname}/GuideContent.tsx`, "utf8");
     const needle = ["danger", "ously", "Set", "Inner", "HTML"].join("");
-    expect(source.includes(needle)).toBe(false);
+    expect(pageSource.includes(needle)).toBe(false);
+    expect(guideSource.includes(needle)).toBe(false);
   });
 
   it("is reachable from the site navigation", () => {
