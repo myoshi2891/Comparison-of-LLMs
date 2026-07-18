@@ -132,10 +132,6 @@ export default function GuideContent() {
     const $ = load(sourceHtml);
     layout = $(".layout").first().get(0) as unknown as HtmlNode;
     sourceCss = $("style").first().html() || "";
-    // Avoid TS6133 by referencing sourceCss
-    if (sourceCss && process.env.NODE_ENV === "development") {
-      console.debug("Loaded CSS length:", sourceCss.length);
-    }
   } catch (error) {
     console.error("Failed to load guide content:", error);
   }
@@ -144,5 +140,10 @@ export default function GuideContent() {
     return <div className="fineTuningGuide">Guide content not found.</div>;
   }
 
-  return <div className="fineTuningGuide">{renderNode(layout, "layout")}</div>;
+  return (
+    <div className="fineTuningGuide">
+      <style>{sourceCss}</style>
+      {renderNode(layout, "layout")}
+    </div>
+  );
 }
