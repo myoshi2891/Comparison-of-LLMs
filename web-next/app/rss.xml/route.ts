@@ -9,32 +9,12 @@
  */
 
 import { byAddedAtDesc } from "@/lib/page-registry";
+import { escapeXml, MAX_ITEMS } from "@/lib/rss-utils";
 import { resolveSiteUrl } from "@/lib/site-url";
 
 export const dynamic = "force-static";
 
-/** フィードに載せる最大件数（新着 20 件）。 */
-export const MAX_ITEMS = 20;
-
 const SITE_URL = resolveSiteUrl("rss.xml/route.ts");
-
-/**
- * Escapes the five characters reserved in XML.
- *
- * `&` must be replaced first, otherwise the ampersands introduced by the other
- * replacements would be escaped twice.
- *
- * @param value - Raw text that may contain XML-reserved characters
- * @returns The text with `& < > " '` replaced by their entity references
- */
-export function escapeXml(value: string): string {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&apos;");
-}
 
 /**
  * Converts a `YYYY-MM-DD` date to the RFC 822 form required by RSS 2.0.

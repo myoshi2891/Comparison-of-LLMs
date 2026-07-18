@@ -5,8 +5,9 @@
  * ここでは XML の構造・件数上限・エスケープ・並び順（addedAt 降順）を固定する。
  */
 import { describe, expect, it } from "vitest";
-import { escapeXml, GET, MAX_ITEMS } from "@/app/rss.xml/route";
+import { GET } from "@/app/rss.xml/route";
 import { byAddedAtDesc } from "@/lib/page-registry";
+import { escapeXml, MAX_ITEMS } from "@/lib/rss-utils";
 
 describe("F-3' - escapeXml", () => {
   it("XML の予約 5 文字をすべてエスケープする", () => {
