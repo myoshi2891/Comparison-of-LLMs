@@ -122,12 +122,90 @@ function renderNode(node: HtmlNode, key: string, parentName?: string): ReactNode
   );
 }
 
+function scopeSelector(selector: string, prefix: string): string {
+  return selector
+    .split(",")
+    .map((part) => {
+      const trimmed = part.trim();
+      if (!trimmed) return "";
+      if (trimmed === ":root") return prefix;
+      if (trimmed === "html" || trimmed === "body" || trimmed === "html, body") return prefix;
+
+      let result = trimmed;
+      if (result.startsWith("html ")) {
+        result = result.replace(/^html /, `${prefix} `);
+      } else if (result.startsWith("body ")) {
+        result = result.replace(/^body /, `${prefix} `);
+      } else if (result.startsWith(":root ")) {
+        result = result.replace(/^:root /, `${prefix} `);
+      } else {
+        result = `${prefix} ${result}`;
+      }
+      return result;
+    })
+    .join(", ");
+}
+
+function scopeCss(css: string, prefix: string): string {
+  const cleanCss = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  const result: string[] = [];
+  let buffer = "";
+  let depth = 0;
+  let currentAtRule = false;
+
+  for (let i = 0; i < cleanCss.length; i++) {
+    const char = cleanCss[i];
+    if (char === "{") {
+      depth++;
+      if (depth === 1) {
+        const selector = buffer.trim();
+        if (selector.startsWith("@")) {
+          result.push(`${selector} {`);
+          currentAtRule = true;
+        } else {
+          result.push(`${scopeSelector(selector, prefix)} {`);
+        }
+        buffer = "";
+      } else {
+        if (currentAtRule && depth === 2) {
+          const selector = buffer.trim();
+          result.push(`${scopeSelector(selector, prefix)} {`);
+          buffer = "";
+        } else {
+          buffer += char;
+        }
+      }
+    } else if (char === "}") {
+      depth--;
+      if (depth === 0) {
+        result.push(`${buffer.trim()}\n}`);
+        buffer = "";
+        currentAtRule = false;
+      } else if (depth === 1 && currentAtRule) {
+        result.push(`${buffer.trim()}\n}`);
+        buffer = "";
+      } else {
+        buffer += char;
+      }
+    } else {
+      buffer += char;
+    }
+  }
+
+  return result.join(" ");
+}
+
 export default function GuideContent() {
   let layout: HtmlNode | null = null;
   let sourceCss = "";
 
   try {
-    const SOURCE_PATH = join(process.cwd(), "..", "archive", "Finetuning-best-practices-guide.html");
+    const SOURCE_PATH = join(
+      process.cwd(),
+      "..",
+      "archive",
+      "Finetuning-best-practices-guide.html"
+    );
     const sourceHtml = readFileSync(SOURCE_PATH, "utf8");
     const $ = load(sourceHtml);
     layout = $(".layout").first().get(0) as unknown as HtmlNode;
@@ -142,7 +220,7 @@ export default function GuideContent() {
 
   return (
     <div className="fineTuningGuide">
-      <style>{sourceCss}</style>
+      <style>{scopeCss(sourceCss, ".fineTuningGuide")}</style>
       {renderNode(layout, "layout")}
     </div>
   );
