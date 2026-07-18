@@ -12,10 +12,6 @@ type HtmlNode = {
   type?: string;
 };
 
-const SOURCE_PATH = join(process.cwd(), "..", "archive", "Finetuning-best-practices-guide.html");
-const sourceHtml = readFileSync(SOURCE_PATH, "utf8");
-const $ = load(sourceHtml);
-const layout = $(".layout").first().get(0) as unknown as HtmlNode;
 const VOID_ELEMENTS = new Set(["br", "hr", "img", "input", "meta", "link"]);
 const TABLE_CONTENT_ELEMENTS = new Set(["table", "thead", "tbody", "tfoot", "tr"]);
 
@@ -127,5 +123,22 @@ function renderNode(node: HtmlNode, key: string, parentName?: string): ReactNode
 }
 
 export default function GuideContent() {
+  let layout: HtmlNode | null = null;
+  let sourceCss = "";
+
+  try {
+    const SOURCE_PATH = join(process.cwd(), "..", "archive", "Finetuning-best-practices-guide.html");
+    const sourceHtml = readFileSync(SOURCE_PATH, "utf8");
+    const $ = load(sourceHtml);
+    layout = $(".layout").first().get(0) as unknown as HtmlNode;
+    sourceCss = $("style").first().html() || "";
+  } catch (error) {
+    console.error("Failed to load guide content:", error);
+  }
+
+  if (!layout) {
+    return <div className="fineTuningGuide">Guide content not found.</div>;
+  }
+
   return <div className="fineTuningGuide">{renderNode(layout, "layout")}</div>;
 }
