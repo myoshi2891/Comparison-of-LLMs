@@ -379,7 +379,7 @@ mermaid.initialize({ startOnLoad: false });
 .mermaidCard { background: var(--bg-card); border: 1px solid var(--accent-soft); }
 ```
 
-詳細は `.agent/skills/nextjs-page-migration/SKILL.md` §「CSS Module 地雷チェックリスト」を参照。
+詳細は `.claude/skills/nextjs-page-migration/SKILL.md` §「CSS Module 地雷チェックリスト」を参照。
 
 ### テスト環境（Vitest）でのモック化
 
