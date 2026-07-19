@@ -361,6 +361,26 @@ mermaid.initialize({ startOnLoad: false });
 }
 ```
 
+### ⚠️ CSS変数は `globals.css` に存在しないものを `var()` で参照しない
+
+`globals.css` には `--accent`, `--bg-card`, `--accent-soft`, `--text-dim` 等の
+ページ固有変数が**定義されていない**。Mermaid ラッパーや図解カードに色を指定するとき、
+これらを `var()` で参照すると `bun run build` は通るが**実行時に透明・崩壊**する。
+
+```css
+/* ❌ NG: globals.css に存在しない変数を参照 */
+.mermaidCard { background: var(--bg-card); border: 1px solid var(--accent-soft); }
+
+/* ✅ OK: .layout スコープで変数を自己定義してから参照 */
+.layout {
+  --bg-card: #0f2038;
+  --accent-soft: rgba(124, 158, 255, 0.14);
+}
+.mermaidCard { background: var(--bg-card); border: 1px solid var(--accent-soft); }
+```
+
+詳細は `.agent/skills/nextjs-page-migration/SKILL.md` §「CSS Module 地雷チェックリスト」を参照。
+
 ### テスト環境（Vitest）でのモック化
 
 ```typescript
@@ -370,6 +390,7 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
   },
 }));
 ```
+
 
 ---
 
