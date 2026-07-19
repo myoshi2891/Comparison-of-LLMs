@@ -165,8 +165,14 @@ Phase A–F で 18 枚のガイドページが `web-next/` App Router に**全�
 
 **確認コマンド（var() 参照の棚卸し）**:
 ```bash
-# page.module.css で参照している変数のうち globals.css に定義されていない未定義変数だけを出力
-for var in $(grep -oE 'var\(--[^)]+\)' web-next/app/path/to/page.module.css | sed -E 's/var\((--[^)]+)\)/\1/' | sort -u); do
+# page.module.css 内で定義されているローカル変数を抽出
+local_vars=$(grep -oE '^\s*--[a-zA-Z0-9_-]+\s*:' web-next/app/path/to/page.module.css | sed -E 's/^\s*(--[a-zA-Z0-9_-]+)\s*:/\1/' | sort -u)
+
+# page.module.css で参照している変数のうち、ローカル変数でも globals.css に定義されている変数でもない未定義変数だけを出力
+for var in $(grep -oE 'var\(\s*--[a-zA-Z0-9_-]+' web-next/app/path/to/page.module.css | sed -E 's/var\(\s*(--[a-zA-Z0-9_-]+)/\1/' | sort -u); do
+  # ローカル変数として定義されている場合は除外
+  echo "$local_vars" | grep -qWx "$var" && continue
+  # globals.css に定義されているか確認
   grep -q "$var:" web-next/app/globals.css || echo "未定義の変数: $var"
 done
 ```
