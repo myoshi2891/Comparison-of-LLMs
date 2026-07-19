@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import Ext from "@/components/docs/Ext";
 import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
 
@@ -8,14 +9,6 @@ export const metadata: Metadata = {
   description:
     "中級〜上級エンジニア向け。ADK・Agent Runtime・Memory Bank・A2A/MCP・ガバナンス機能を実務レベルで使いこなすための設計指針を、ステップバイステップで解説します。",
 };
-
-function Ext({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <a href={href} target="_blank" rel="noopener noreferrer">
-      {children}
-    </a>
-  );
-}
 
 const DIAGRAMS = {
   evolution: `flowchart LR

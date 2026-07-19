@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import Ext from "@/components/docs/Ext";
 import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
 
@@ -9,14 +10,6 @@ export const metadata: Metadata = {
   description:
     "Google Cloud の Gemini Enterprise Agent Platform を初めて触るエンジニア向けに、概念の理解から最初のエージェント構築、マルチエージェント設計、セキュリティ・ガバナンス、そして本番運用までをステップバイステップで解説します。",
 };
-
-function Ext({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <a href={href} target="_blank" rel="noopener noreferrer">
-      {children}
-    </a>
-  );
-}
 
 const DIAGRAMS = {
   evolution: `flowchart LR
@@ -416,11 +409,13 @@ export default function Page() {
           <div className={styles.codeBlockWrap}>
             <div className={styles.codeBlockLabel}>bash</div>
             <pre className={styles.codeBody}>
-              <div className={styles.codeLine}><span className={styles.ck}>gcloud</span><span className={styles.cv}> services enable</span> \</div>
-              <div className={styles.codeLine}>  aiplatform.googleapis.com \</div>
-              <div className={styles.codeLine}>  discoveryengine.googleapis.com \</div>
-              <div className={styles.codeLine}>  cloudbuild.googleapis.com \</div>
-              <div className={styles.codeLine}>  run.googleapis.com</div>
+              <code>
+                <div className={styles.codeLine}><span className={styles.ck}>gcloud</span><span className={styles.cv}> services enable</span> \</div>
+                <div className={styles.codeLine}>  aiplatform.googleapis.com \</div>
+                <div className={styles.codeLine}>  discoveryengine.googleapis.com \</div>
+                <div className={styles.codeLine}>  cloudbuild.googleapis.com \</div>
+                <div className={styles.codeLine}>  run.googleapis.com</div>
+              </code>
             </pre>
           </div>
 
@@ -606,27 +601,31 @@ export default function Page() {
           <div className={styles.codeBlockWrap}>
             <div className={styles.codeBlockLabel}>my_search_agent/agent.py</div>
             <pre className={styles.codeBody}>
-              <div className={styles.codeLine}><span className={styles.ck}>from</span> google.adk.agents <span className={styles.ck}>import</span> Agent</div>
-              <div className={styles.codeLine}><span className={styles.ck}>from</span> google.adk.tools <span className={styles.ck}>import</span> google_search</div>
-              <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}>root_agent = Agent(</div>
-              <div className={styles.codeLine}>    name=<span className={styles.cs}>"my_search_agent"</span>,</div>
-              <div className={styles.codeLine}>    model=<span className={styles.cs}>"gemini-2.5-flash"</span>,</div>
-              <div className={styles.codeLine}>    description=<span className={styles.cs}>"ウェブ検索を使ってユーザーの質問に答えるエージェント"</span>,</div>
-              <div className={styles.codeLine}>    instruction=(</div>
-              <div className={styles.codeLine}>        <span className={styles.cs}>"ユーザーの質問に対して、必要であれば google_search ツールを使い、"</span></div>
-              <div className={styles.codeLine}>        <span className={styles.cs}>"根拠を明示した簡潔な日本語で回答してください。"</span></div>
-              <div className={styles.codeLine}>        <span className={styles.cs}>"分からない場合は推測せず、その旨を伝えてください。"</span></div>
-              <div className={styles.codeLine}>    ),</div>
-              <div className={styles.codeLine}>    tools=[google_search],</div>
-              <div className={styles.codeLine}>)</div>
+              <code>
+                <div className={styles.codeLine}><span className={styles.ck}>from</span> google.adk.agents <span className={styles.ck}>import</span> Agent</div>
+                <div className={styles.codeLine}><span className={styles.ck}>from</span> google.adk.tools <span className={styles.ck}>import</span> google_search</div>
+                <div className={styles.codeLine}></div>
+                <div className={styles.codeLine}>root_agent = Agent(</div>
+                <div className={styles.codeLine}>    name=<span className={styles.cs}>"my_search_agent"</span>,</div>
+                <div className={styles.codeLine}>    model=<span className={styles.cs}>"gemini-2.5-flash"</span>,</div>
+                <div className={styles.codeLine}>    description=<span className={styles.cs}>"ウェブ検索を使ってユーザーの質問に答えるエージェント"</span>,</div>
+                <div className={styles.codeLine}>    instruction=(</div>
+                <div className={styles.codeLine}>        <span className={styles.cs}>"ユーザーの質問に対して、必要であれば google_search ツールを使い、"</span></div>
+                <div className={styles.codeLine}>        <span className={styles.cs}>"根拠を明示した簡潔な日本語で回答してください。"</span></div>
+                <div className={styles.codeLine}>        <span className={styles.cs}>"分からない場合は推測せず、その旨を伝えてください。"</span></div>
+                <div className={styles.codeLine}>    ),</div>
+                <div className={styles.codeLine}>    tools=[google_search],</div>
+                <div className={styles.codeLine}>)</div>
+              </code>
             </pre>
           </div>
 
           <div className={styles.codeBlockWrap}>
             <div className={styles.codeBlockLabel}>requirements.txt</div>
             <pre className={styles.codeBody}>
-              <div className={styles.codeLine}>google-adk</div>
+              <code>
+                <div className={styles.codeLine}>google-adk</div>
+              </code>
             </pre>
           </div>
 
@@ -697,8 +696,10 @@ export default function Page() {
           <div className={styles.codeBlockWrap}>
             <div className={styles.codeBlockLabel}>bash</div>
             <pre className={styles.codeBody}>
-              <div className={styles.codeLine}><span className={styles.cc}># プロジェクトのルートディレクトリで実行</span></div>
-              <div className={styles.codeLine}>adk web</div>
+              <code>
+                <div className={styles.codeLine}><span className={styles.cc}># プロジェクトのルートディレクトリで実行</span></div>
+                <div className={styles.codeLine}>adk web</div>
+              </code>
             </pre>
           </div>
 
@@ -964,8 +965,10 @@ export default function Page() {
           <div className={styles.codeBlockWrap}>
             <div className={styles.codeBlockLabel}>bash</div>
             <pre className={styles.codeBody}>
-              <div className={styles.codeLine}><span className={styles.cc}># ReAct/RAG/マルチエージェントなどのテンプレートから選択して新規プロジェクトを作成</span></div>
-              <div className={styles.codeLine}>uvx agent-starter-pack create my-agent-project -a adk@rag</div>
+              <code>
+                <div className={styles.codeLine}><span className={styles.cc}># ReAct/RAG/マルチエージェントなどのテンプレートから選択して新規プロジェクトを作成</span></div>
+                <div className={styles.codeLine}>uvx agent-starter-pack create my-agent-project -a adk@rag</div>
+              </code>
             </pre>
           </div>
 
