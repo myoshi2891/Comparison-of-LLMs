@@ -28,7 +28,9 @@
 
 ## 1. Amazon Bedrockとは何か
 
-Amazon Bedrockは、AnthropicのClaude、Meta Llama、Mistral AI、Amazon Nova、OpenAIのオープンウェイトモデルなど、複数のAIプロバイダーが提供する100以上の基盤モデル（Foundation Models, FM）を**単一の統一API**経由で呼び出せる、フルマネージドのサーバーレスサービスです。インフラの構築・管理が不要で、モデルの切り替えは基本的にモデルIDを変更するだけで済みますAmazon Bedrockは、リーディングAI企業から高性能な基盤モデルへの安全でエンタープライズグレードのアクセスを提供するフルマネージドサービスで、生成AIアプリケーションの構築とスケーリングを可能にし、100以上の基盤モデルをAmazon、Anthropic、DeepSeek、Moonshot AI、MiniMax、OpenAIを含む複数のプロバイダーから利用できます。
+Amazon Bedrockは、AnthropicのClaude、Meta Llama、Mistral AI、Amazon Nova、OpenAIのオープンウェイトモデルなど、複数のAIプロバイダーが提供する100以上の基盤モデル（Foundation Models, FM）を**単一の統一API**経由で呼び出せる、フルマネージドのサーバーレスサービスです。インフラの構築・管理が不要で、モデルの切り替えは基本的にモデルIDを変更するだけで済みます。
+
+> Amazon Bedrockは、リーディングAI企業から高性能な基盤モデルへの安全でエンタープライズグレードのアクセスを提供するフルマネージドサービスで、生成AIアプリケーションの構築とスケーリングを可能にし、100以上の基盤モデルをAmazon、Anthropic、DeepSeek、Moonshot AI、MiniMax、OpenAIを含む複数のプロバイダーから利用できます。
 
 Bedrockが単なる「モデルAPI」ではなく**プラットフォーム**である理由は、以下の高レベルなビルディングブロックを標準で備えている点にあります。
 
