@@ -1,13 +1,19 @@
 import { render } from "@testing-library/react";
 import { expect, test, vi } from "vitest";
-import Page from "./page";
 import { findBySlug } from "../../../lib/page-registry";
+import Page from "./page";
 
 // Stub IntersectionObserver for testing in jsdom environment
 global.IntersectionObserver = class {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+  observe() {
+    // stub
+  }
+  unobserve() {
+    // stub
+  }
+  disconnect() {
+    // stub
+  }
 } as unknown as typeof IntersectionObserver;
 
 // Mermaidコンポーネントをモック
@@ -42,7 +48,12 @@ test("Claude Tag Best Practices page contract tests", () => {
   // 4. 内部リンクの検証 (.html なし)
   links.forEach((link) => {
     const href = link.getAttribute("href");
-    if (href && !href.startsWith("http://") && !href.startsWith("https://") && !href.startsWith("#")) {
+    if (
+      href &&
+      !href.startsWith("http://") &&
+      !href.startsWith("https://") &&
+      !href.startsWith("#")
+    ) {
       expect(href.endsWith(".html")).toBe(false);
     }
   });
