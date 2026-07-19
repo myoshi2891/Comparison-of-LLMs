@@ -1,12 +1,20 @@
 "use client";
-import { useEffect } from "react";
-import styles from "./page.module.css";
 
-export default function TocObserver() {
+import { useEffect } from "react";
+
+interface TocObserverProps {
+  navLinkClassName: string;
+  activeClassName: string;
+}
+
+export default function TocObserver({
+  navLinkClassName,
+  activeClassName,
+}: TocObserverProps) {
   useEffect(() => {
     const sections = document.querySelectorAll("section");
-    const links = Array.from(document.querySelectorAll(`.${styles.navLink}`));
-    if (links.length > 0) links[0].classList.add(styles.active);
+    const links = Array.from(document.querySelectorAll(`.${navLinkClassName}`));
+    if (links.length > 0) links[0].classList.add(activeClassName);
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -15,9 +23,9 @@ export default function TocObserver() {
             const id = entry.target.id;
             for (const l of links) {
               if (l.getAttribute("href") === `#${id}`) {
-                l.classList.add(styles.active);
+                l.classList.add(activeClassName);
               } else {
-                l.classList.remove(styles.active);
+                l.classList.remove(activeClassName);
               }
             }
           }
@@ -28,6 +36,7 @@ export default function TocObserver() {
 
     for (const sec of sections) observer.observe(sec);
     return () => observer.disconnect();
-  }, []);
+  }, [navLinkClassName, activeClassName]);
+
   return null;
 }

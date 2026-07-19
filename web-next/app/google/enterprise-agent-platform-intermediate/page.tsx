@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import Ext from "@/components/docs/Ext";
 import styles from "./page.module.css";
-import TocObserver from "./TocObserver";
+import TocObserver from "@/components/docs/TocObserver";
 
 export const metadata: Metadata = {
   title: "Gemini Enterprise Agent Platform 実践ベストプラクティスガイド | LLM コスト計算機",
@@ -90,7 +90,7 @@ const DIAGRAMS = {
 export default function Page() {
   return (
     <div className={styles.layout}>
-      <TocObserver />
+      <TocObserver navLinkClassName={styles.navLink} activeClassName={styles.navLinkActive} />
       <aside className={styles.sidebar}>
         <div className={styles.sidebarBrand}>
           <span className={styles.brandTag}>2026-07-17 時点</span>

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import Ext from "@/components/docs/Ext";
 import styles from "./page.module.css";
-import TocObserver from "./TocObserver";
+import TocObserver from "@/components/docs/TocObserver";
 
 export const metadata: Metadata = {
   title:
@@ -164,7 +164,7 @@ const DIAGRAMS = {
 export default function Page() {
   return (
     <div className={styles.layout}>
-      <TocObserver />
+      <TocObserver navLinkClassName={styles.navLink} activeClassName={styles.active} />
       <nav className={styles.sidebar}>
         <div className={styles.sidebarBrand}>Gemini Enterprise Agent Platform</div>
         <div className={styles.sidebarSub}>初学者向け完全ガイド</div>
