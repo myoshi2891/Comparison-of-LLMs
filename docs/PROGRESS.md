@@ -14,10 +14,11 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（本作業範囲では新規違反 0 件、既知の既存指摘は本件対象外）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **1130 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **1138 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **Gemini Enterprise Agent Platform ガイドの Next.js 移行**: `Gemini-enterprise-agent-platform-guide.html` を `web-next/app/google/enterprise-agent-platform/page.tsx` に移行。原文の全20セクション・チェックリスト・アンチパターン・外部リンク・15 Mermaid図を React 要素として faithful に保持し、TOC のスクロール追従、外部リンクの安全属性、ページレジストリ登録、テーブル左寄せ強制、CSS modules 化による CSS 変数定義のスコープ化、フッター等幅フォント設定を追加。原本は `archive/html/Google` および `archive/md/Google` 配下に退避。契約テスト7件を追加（合計 **1138 テスト合格**）。
 - **Claude Tag ガイド CSS 移行修正**: `web-next/app/claude/tag-best-practices/page.module.css` の3件の CSS 不具合を修正。① `--bg-elevated` / `--bg-card` / `--accent` 等の CSS 変数が `globals.css` に存在しないため全配色が崩壊していた問題を、`.layout` スコープ内に元 HTML の `:root` 定義を移植して解決。② `.sidebar` に `position: sticky; top: 0; height: 100vh; overflow-y: auto` を追加してスクロール時のサイドバー固定を実現。③ `.sidebarToggle { display: none }` をメディアクエリ外に追加してデスクトップでのハンバーガーボタン非表示を修正。また `.pageFooter` で未定義だった `--text-tertiary` を `--text-faint` に修正（合計 **1130 テスト合格、変化なし**）。
 - **Claude Tag 活用ガイドの Next.js 移行**: `Claude-tag-best-practices.html` を `web-next/app/claude/tag-best-practices/page.tsx` に移行。原文の全15セクション・10チェックリスト・全表・6 Mermaid図を React 要素として faithful に保持し、TOC のスクロール追従、モバイル開閉トグル、外部リンクの安全属性、ページレジストリ登録を追加。原本は `archive/html/Anthropic` および `archive/md/Anthropic` 配下に退避。契約テスト1件を追加（合計 **1130 テスト合格**）。
 - **GPT-5.6 ガイドのナビ・表示改善**: `/model-data/gpt-5-6-best-practices` を Providers の Codex 配下へ移動。メインコンテンツを全幅化し、Mermaid SVGを中央寄せ、Python/Bashコードブロックに依存追加なしのトークンハイライトを追加（合計 **1129 テスト合格**）。
