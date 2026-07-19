@@ -73,7 +73,6 @@ describe("/google/enterprise-agent-platform - page structure", () => {
 
   it("renders all 20 expected sections", () => {
     const { container } = render(<Page />);
-    const sections = container.querySelectorAll("section");
     // We expect at least the specified section IDs
     for (const id of EXPECTED_SECTION_IDS) {
       const el = container.querySelector(`#${id}`);

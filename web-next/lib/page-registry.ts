@@ -436,6 +436,18 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-13",
   },
   {
+    slug: "/google/enterprise-agent-platform",
+    title: "Gemini Enterprise Agent Platform",
+    group: "Providers",
+    category: "Google",
+    provider: "google",
+    topics: ["google", "agent", "platform"],
+    summary:
+      "Google Cloud の Gemini Enterprise Agent Platform を初めて触るエンジニア向けに、概念の理解から最初のエージェント構築、マルチエージェント設計、セキュリティ・ガバナンス、そして本番運用までをステップバイステップで解説します。",
+    addedAt: "2026-07-18",
+    lastReviewed: "2026-07-19",
+  },
+  {
     slug: "/google/agent",
     title: "Agent",
     group: "Providers",

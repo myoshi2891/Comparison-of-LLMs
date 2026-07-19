@@ -1,0 +1,432 @@
+.layout {
+  /* globals.css にないすべての CSS 変数をここに定義 */
+  --bg-primary: #07111e;
+  --bg-secondary: #0d1b2e;
+  --bg-elevated: #12233d;
+  --bg-code: #0a1628;
+  --text-primary: #e6edf5;
+  --text-secondary: #9fb0c3;
+  --text-muted: #6b7d94;
+  --accent: #7c9eff;
+  --accent-soft: rgba(124, 158, 255, 0.14);
+  --border: #1d2d44;
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --sidebar-width: 300px;
+  --font-sans: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic UI', system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-mono), 'SF Mono', 'Fira Code', Consolas, Menlo, monospace;
+
+  display: flex;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  line-height: 1.85;
+  font-size: 16px;
+  min-height: 100vh;
+}
+
+.layout * {
+  box-sizing: border-box;
+}
+
+/* ===== サイドバー ===== */
+.sidebar {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border);
+  padding: 1.75rem 1.25rem 3rem;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.sidebarBrand {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.02em;
+}
+
+.sidebarSub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 1.75rem;
+}
+
+.navGroupTitle {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin: 1.4rem 0 0.5rem;
+  padding-left: 0.6rem;
+}
+
+.navGroupTitle:first-of-type {
+  margin-top: 0;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.88rem;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.navLink:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.navLink.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.navDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.navLink.active .navDot {
+  background: var(--accent);
+}
+
+/* デスクトップのデフォルトサイドバートグル非表示 */
+.sidebarToggle {
+  display: none;
+}
+
+/* ===== メインコンテンツ（全幅ルール適用） ===== */
+.mainContent {
+  flex-grow: 1;
+  padding: 4rem 4.5rem 6rem;
+  max-width: calc(100% - var(--sidebar-width));
+}
+
+.hero {
+  padding-bottom: 2.5rem;
+  margin-bottom: 3rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.heroBadge {
+  display: inline-block;
+  font-size: 0.78rem;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.hero h1 {
+  font-size: 2.4rem;
+  line-height: 1.4;
+  margin: 0 0 0.75rem;
+  color: var(--text-primary);
+}
+
+.hero p.lead {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  max-width: none;
+  margin-bottom: 0;
+}
+
+.meta {
+  margin-top: 1.25rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.mainContent section {
+  margin-bottom: 4rem;
+  scroll-margin-top: 2rem;
+}
+
+.mainContent h2 {
+  font-size: 1.7rem;
+  color: var(--text-primary);
+  border-left: 4px solid var(--accent);
+  padding-left: 0.9rem;
+  margin: 0 0 1.5rem;
+}
+
+.mainContent h3 {
+  font-size: 1.25rem;
+  color: var(--accent);
+  margin: 2rem 0 1rem;
+}
+
+.mainContent h4 {
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  margin: 1.5rem 0 0.75rem;
+}
+
+.mainContent p {
+  color: var(--text-primary);
+  margin: 0 0 1.1rem;
+}
+
+.mainContent p.note {
+  color: var(--text-secondary);
+}
+
+.mainContent ul,
+.mainContent ol {
+  padding-left: 1.4rem;
+  margin: 0 0 1.2rem;
+}
+
+.mainContent li {
+  margin-bottom: 0.45rem;
+}
+
+.mainContent a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.mainContent a:hover {
+  opacity: 0.8;
+}
+
+.stepBadge {
+  display: inline-block;
+  background: var(--accent-soft);
+  color: var(--accent);
+  padding: 0.3rem 0.9rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.02em;
+}
+
+/* ===== コールアウト ===== */
+.callout {
+  border-left: 4px solid var(--accent);
+  background: var(--bg-secondary);
+  padding: 1.1rem 1.5rem;
+  border-radius: 8px;
+  margin: 1.75rem 0;
+}
+
+.callout strong {
+  color: var(--accent);
+}
+
+.callout.warning {
+  border-left-color: var(--warning);
+}
+
+.callout.warning strong {
+  color: var(--warning);
+}
+
+/* ===== テーブル ===== */
+.tableWrap {
+  overflow-x: auto;
+  margin: 1.75rem 0;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.mainContent table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.mainContent th,
+.mainContent td {
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 1.1rem;
+  text-align: left !important; /* 左寄せ強制 */
+  vertical-align: top;
+}
+
+.mainContent th {
+  background: var(--bg-elevated);
+  color: var(--accent);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mainContent tr:last-child td {
+  border-bottom: none;
+}
+
+.mainContent tbody tr:hover {
+  background: rgba(124, 158, 255, 0.05);
+}
+
+/* ===== 図解フレーム（Mermaid） ===== */
+.diagramFrame {
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  padding: 1.75rem;
+  margin: 1.75rem 0;
+  overflow-x: auto;
+}
+
+.diagramCaption {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 0.75rem;
+}
+
+/* Mermaid diagram centering and responsive sizing */
+.diagramFrame :global(.mermaid) {
+  display: flex !important;
+  justify-content: center !important;
+  width: 100% !important;
+}
+
+/* ===== コードブロック ===== */
+.codeBlockWrap {
+  margin: 1.5rem 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.codeBlockLabel {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  padding: 0.45rem 1rem;
+  font-family: var(--font-mono);
+  border-bottom: 1px solid var(--border);
+}
+
+.codeBody {
+  margin: 0;
+  background: var(--bg-code) !important;
+  padding: 1.1rem 1.4rem;
+  overflow-x: auto;
+  font-size: 0.86rem;
+  font-family: var(--font-mono);
+  white-space: pre;
+  color: #e2e8f0;
+}
+
+.codeLine {
+  white-space: pre;
+  font-family: var(--font-mono);
+}
+
+/* Syntax Highlighting */
+.ck { color: #ff7b72; } /* keyword */
+.cs { color: #a5d6ff; } /* string/symbol */
+.cv { color: #79c0ff; } /* value/var */
+.cc { color: #8b949e; font-style: italic; } /* comment */
+.ch { color: #f0883e; font-weight: bold; } /* heading */
+.cm { color: #7ee787; font-weight: bold; } /* method/marker */
+.cw { color: #d29922; } /* warning */
+.ce { color: #bc8cff; } /* entity/special */
+
+.mainContent code {
+  font-family: var(--font-mono);
+  background: var(--bg-secondary);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+/* ===== チェックリスト ===== */
+ul.checklist {
+  list-style: none;
+  padding-left: 0;
+}
+
+ul.checklist li {
+  position: relative;
+  padding-left: 2rem;
+  margin-bottom: 0.7rem;
+  color: var(--text-primary);
+}
+
+ul.checklist li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.15rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  border: 2px solid var(--accent);
+  border-radius: 4px;
+}
+
+/* ===== 参考文献リスト ===== */
+.refList {
+  list-style: none;
+  padding-left: 0;
+}
+
+.refList li {
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.refList li:last-child {
+  border-bottom: none;
+}
+
+.refList .refTitle {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.refList a {
+  word-break: break-all;
+}
+
+.pageFooter {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  border-top: 1px solid var(--border);
+  padding-top: 2rem;
+  margin-top: 3rem;
+  font-family: var(--font-mono); /* 等幅フォントの指定 */
+}
+
+@media (max-width: 960px) {
+  .sidebar {
+    display: none;
+  }
+  .mainContent {
+    max-width: 100%;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+}
