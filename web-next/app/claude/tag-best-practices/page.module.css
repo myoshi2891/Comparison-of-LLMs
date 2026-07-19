@@ -1,7 +1,22 @@
 /* Layout & Grid styles */
 .layout {
+  /* ページ固有CSS変数（元HTMLの:root定義を移植）*/
+  --bg: #07111e;
+  --bg-elevated: #0d1b2e;
+  --bg-card: #0f2038;
+  --accent: #7c9eff;
+  --accent-soft: rgba(124, 158, 255, 0.14);
+  --accent-2: #f0b86e;
+  --accent-2-soft: rgba(240, 184, 110, 0.14);
+  --text: #e6ecf5;
+  --text-dim: #9fb0c9;
+  --text-faint: #6d7f9c;
+  --border: rgba(255, 255, 255, 0.09);
+
   display: flex;
   min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
 }
 
 .sidebar {
@@ -10,6 +25,11 @@
   border-right: 1px solid var(--border);
   padding: 2rem 1.4rem 3rem;
   flex-shrink: 0;
+  /* デスクトップ: スクロール時にサイドバーを固定 */
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
 }
 
 .brand {
@@ -354,7 +374,7 @@
   max-width: 100%;
   margin: 0 auto;
   padding: 40px 56px 80px;
-  color: var(--text-tertiary);
+  color: var(--text-faint);
   font-size: 12.5px;
   font-family: var(--font-mono), "JetBrains Mono", monospace;
   text-align: center;
@@ -407,6 +427,11 @@
   border-radius: 4px;
 }
 
+/* デスクトップ: ハンバーガーボタンを非表示 */
+.sidebarToggle {
+  display: none;
+}
+
 /* Media Query for Responsive layout */
 @media (max-width: 960px) {
   .layout {
@@ -421,6 +446,7 @@
     transition: transform 0.25s ease;
     box-shadow: 20px 0 40px rgba(0, 0, 0, 0.4);
     z-index: 50;
+    overflow-y: auto;
   }
   .sidebarOpen {
     transform: translateX(0);
