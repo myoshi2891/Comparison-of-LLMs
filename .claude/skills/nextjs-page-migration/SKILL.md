@@ -126,19 +126,28 @@ Phase A–F で 18 枚のガイドページが `web-next/` App Router に**全�
 `--bg`, `--bg2`, `--srf`, `--srf2`, `--brd`, `--brd2`, `--txt`, `--txt2`, `--txt3`,
 `--acc`, `--acc2`, `--grn`, `--ylw`, `--red`, `--prp`, `--teal`, `--orng`
 
-**② サイドバーの固定は `position: sticky` を使う**
+**② デスクトップサイドバーの固定には `position: sticky` を使い、モバイルには `position: fixed` を許可する**
 
 ```css
-/* ✅ flex レイアウト対応の sticky パターン */
+/* ✅ デスクトップ用: sticky パターン（SiteHeader を考慮した top と height） */
 .sidebar {
   flex-shrink: 0;
   position: sticky;
-  top: 0;
-  height: 100vh;
+  top: var(--header-height, 60px); /* SiteHeader の高さを考慮したオフセット */
+  height: calc(100vh - var(--header-height, 60px)); /* ヘッダー分を引いた高さ */
   overflow-y: auto;
 }
 
-/* ❌ NG: position: fixed は SiteHeader と z-index 競合する */
+/* ✅ モバイル用: オフキャンバス開閉動作には position: fixed の使用を明示的に許可 */
+@media (max-width: 960px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    /* ...モバイル開閉アニメーションなど... */
+  }
+}
 ```
 
 **③ サイドバートグルのデフォルト `display: none` を必ず書く**
@@ -156,8 +165,10 @@ Phase A–F で 18 枚のガイドページが `web-next/` App Router に**全�
 
 **確認コマンド（var() 参照の棚卸し）**:
 ```bash
-# page.module.css で参照している変数のうち globals.css に存在しないものを発見
-grep -oE 'var\(--[^)]+\)' web-next/app/path/to/page.module.css | sort -u
+# page.module.css で参照している変数のうち globals.css に定義されていない未定義変数だけを出力
+for var in $(grep -oE 'var\(--[^)]+\)' web-next/app/path/to/page.module.css | sed -E 's/var\((--[^)]+)\)/\1/' | sort -u); do
+  grep -q "$var:" web-next/app/globals.css || echo "未定義の変数: $var"
+done
 ```
 
 #### コードブロック内の行区切りパターン
@@ -443,6 +454,6 @@ cd web-next && bun run build && bun run lint && bun run test
 - **コードブロックやフッターの monospace フォント指定を省略しない** — `.codeBody`, `.codeLine`, `.codeBar`, `.pageFooter` には必ず等幅フォント（`font-family: var(--font-mono), ...`）を明示的に指定すること。
 - **RSC の `page.tsx` を直接クライアントコンポーネント化（'use client'）しない** — Intersection Observer 等が必要な場合は、軽量な `<TocObserver />` などに分割し、`page.tsx` 自体は Server Component のままで `metadata` 静的エクスポートができる状態を維持する。
 - **`globals.css` に存在しない CSS 変数を `var()` で参照しない** — 元 HTML の `:root` 定義は `page.module.css` の `.layout` / `.root` スコープ内に転写する（上記 CSS Module 地雷チェックリスト参照）。
-- **サイドバーの固定に `position: fixed` を使わない** — `display: flex` レイアウトでは `position: sticky; top: 0; height: 100vh; overflow-y: auto` を使用する（`fixed` は SiteHeader と競合）。
+- **サイドバーの固定に `position: fixed` を無条件で使わない** — デスクトップでは `SiteHeader` の高さを考慮した `position: sticky; top: var(--header-height, 60px); height: calc(100vh - var(--header-height, 60px)); overflow-y: auto` を使用し、モバイルのオフキャンバス開閉動作に対してのみ `position: fixed` を明示的に許可する。
 - **`.sidebarToggle` のデフォルト `display: none` を省略しない** — メディアクエリ外でデフォルト非表示にし、`@media (max-width: 960px)` 内でのみ `display: flex` に上書きする。
 
