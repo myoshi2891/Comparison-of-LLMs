@@ -730,6 +730,18 @@ const entries: PageEntry[] = [
     addedAt: "2026-06-16",
     lastReviewed: "2026-07-01",
   },
+  {
+    slug: "/claude/tag-best-practices",
+    title: "Tag Best Practices",
+    group: "Providers",
+    category: "Claude",
+    provider: "claude",
+    topics: ["claude", "slack", "agent"],
+    summary:
+      "Slack上でチームがClaudeをタグ付けして仕事を委任できる新機能「Claude Tag」について、公式ドキュメントやコミュニティ発信をもとにまとめた中級者〜上級者向け実践ガイド。",
+    addedAt: "2026-07-19",
+    lastReviewed: "2026-07-19",
+  },
 ];
 
 /** ビルド時検証: 不正なエントリはここで例外になり、壊れたデータのまま配信されない。 */

@@ -3,6 +3,13 @@ import { expect, test, vi } from "vitest";
 import Page from "./page";
 import { findBySlug } from "../../../lib/page-registry";
 
+// Stub IntersectionObserver for testing in jsdom environment
+global.IntersectionObserver = class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+} as unknown as typeof IntersectionObserver;
+
 // Mermaidコンポーネントをモック
 vi.mock("@/components/docs/MermaidDiagram", () => ({
   default: function DummyMermaidDiagram({ chart }: { chart: string }) {
