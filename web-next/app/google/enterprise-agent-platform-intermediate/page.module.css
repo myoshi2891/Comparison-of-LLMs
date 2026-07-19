@@ -30,7 +30,7 @@
   box-sizing: border-box;
 }
 
-.layout html {
+:global(html) {
   scroll-behavior: smooth;
 }
 
@@ -109,7 +109,7 @@
   font-weight: 600;
 }
 
-.navLinkActive :global(.num) {
+.navLinkActive .num {
   color: var(--accent);
 }
 
