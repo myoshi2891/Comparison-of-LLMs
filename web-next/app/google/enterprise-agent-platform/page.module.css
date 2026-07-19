@@ -15,7 +15,7 @@
   --danger: #f87171;
   --sidebar-width: 300px;
   --font-sans: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic UI', system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-mono), 'SF Mono', 'Fira Code', Consolas, Menlo, monospace;
+  --font-mono: 'SF Mono', 'Fira Code', Consolas, Menlo, monospace;
 
   display: flex;
   background: var(--bg-primary);
