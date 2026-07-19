@@ -1,7 +1,7 @@
 # プロジェクト進捗・ステータス (PROGRESS.md)
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
-> - 最終更新日: **Updated 2026-07-17**
+> - 最終更新日: **Updated 2026-07-19**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -14,10 +14,11 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（本作業範囲では新規違反 0 件、既知の既存指摘は本件対象外）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **1129 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **1130 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **Claude Tag 活用ガイドの Next.js 移行**: `Claude-tag-best-practices.html` を `web-next/app/claude/tag-best-practices/page.tsx` に移行。原文の全15セクション・10チェックリスト・全表・6 Mermaid図を React 要素として faithful に保持し、TOC のスクロール追従、モバイル開閉トグル、外部リンクの安全属性、ページレジストリ登録を追加。原本は `archive/html/Anthropic` および `archive/md/Anthropic` 配下に退避。契約テスト1件を追加（合計 **1130 テスト合格**）。
 - **GPT-5.6 ガイドのナビ・表示改善**: `/model-data/gpt-5-6-best-practices` を Providers の Codex 配下へ移動。メインコンテンツを全幅化し、Mermaid SVGを中央寄せ、Python/Bashコードブロックに依存追加なしのトークンハイライトを追加（合計 **1129 テスト合格**）。
 - **OpenAI GPT-5.6 完全ガイドの Next.js 移行**: `Gpt-5.6-best-practices-guide.html` の対応Markdown原本をビルド時に安全なReact要素へ変換し、`/model-data/gpt-5-6-best-practices` に追加。18セクション、7表、8 Mermaid図、コードブロック、目次スクロール追従、外部リンクの安全属性、ページレジストリ登録を実装。TDDのRed / Greenを分割し、契約テスト7件を追加（合計 **1126 テスト合格**）。
 - **AIガバナンス実践ガイドの Next.js 移行**: `Ai-governance-guide.html` を `/governance/ai-governance` へ移行。原文の全22セクション・表4件・Mermaid図5件・外部リンク84件をReact要素としてfaithfulに保持し、TOCスクロール追従、外部リンクの安全属性、ページレジストリ登録を追加。HTMLと対応Markdown原本は `archive/` に退避。TDDのRed / Green / Refactorを分割し、契約テスト6件を追加（合計 **1119 テスト合格**）。
