@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import Ext from "@/components/docs/Ext";
+import { findBySlug } from "@/lib/page-registry";
 import styles from "./page.module.css";
 import TocObserver from "@/components/docs/TocObserver";
 
+const pageEntry = findBySlug("/google/enterprise-agent-platform");
+
 export const metadata: Metadata = {
-  title:
-    "Gemini Enterprise Agent Platform 完全ガイド | 初学者向けステップバイステップ・ベストプラクティス | LLM コスト計算機",
+  title: pageEntry ? `${pageEntry.title} 完全ガイド | 初学者向けステップバイステップ・ベストプラクティス | LLM コスト計算機` : "Gemini Enterprise Agent Platform 完全ガイド | 初学者向けステップバイステップ・ベストプラクティス | LLM コスト計算機",
   description:
     "Google Cloud の Gemini Enterprise Agent Platform を初めて触るエンジニア向けに、概念の理解から最初のエージェント構築、マルチエージェント設計、セキュリティ・ガバナンス、そして本番運用までをステップバイステップで解説します。",
 };
