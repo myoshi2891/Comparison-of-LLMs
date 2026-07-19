@@ -754,6 +754,18 @@ const entries: PageEntry[] = [
     addedAt: "2026-07-19",
     lastReviewed: "2026-07-19",
   },
+  {
+    slug: "/google/enterprise-agent-platform-intermediate",
+    title: "Gemini Enterprise Agent Platform (中級)",
+    group: "Providers",
+    category: "Google",
+    provider: "google",
+    topics: ["google", "agent", "platform", "best-practices"],
+    summary:
+      "Gemini Enterprise Agent Platform を実務レベルで使いこなすため、ADK・Agent Runtime・Memory Bank・A2A/MCP・ガバナンス機能などの設計指針を解説する中級〜上級者向け実践ガイド。",
+    addedAt: "2026-07-19",
+    lastReviewed: "2026-07-19",
+  },
 ];
 
 /** ビルド時検証: 不正なエントリはここで例外になり、壊れたデータのまま配信されない。 */
