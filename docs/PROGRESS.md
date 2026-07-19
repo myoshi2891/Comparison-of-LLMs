@@ -18,6 +18,7 @@
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **Claude Tag ガイド CSS 移行修正**: `web-next/app/claude/tag-best-practices/page.module.css` の3件の CSS 不具合を修正。① `--bg-elevated` / `--bg-card` / `--accent` 等の CSS 変数が `globals.css` に存在しないため全配色が崩壊していた問題を、`.layout` スコープ内に元 HTML の `:root` 定義を移植して解決。② `.sidebar` に `position: sticky; top: 0; height: 100vh; overflow-y: auto` を追加してスクロール時のサイドバー固定を実現。③ `.sidebarToggle { display: none }` をメディアクエリ外に追加してデスクトップでのハンバーガーボタン非表示を修正。また `.pageFooter` で未定義だった `--text-tertiary` を `--text-faint` に修正（合計 **1130 テスト合格、変化なし**）。
 - **Claude Tag 活用ガイドの Next.js 移行**: `Claude-tag-best-practices.html` を `web-next/app/claude/tag-best-practices/page.tsx` に移行。原文の全15セクション・10チェックリスト・全表・6 Mermaid図を React 要素として faithful に保持し、TOC のスクロール追従、モバイル開閉トグル、外部リンクの安全属性、ページレジストリ登録を追加。原本は `archive/html/Anthropic` および `archive/md/Anthropic` 配下に退避。契約テスト1件を追加（合計 **1130 テスト合格**）。
 - **GPT-5.6 ガイドのナビ・表示改善**: `/model-data/gpt-5-6-best-practices` を Providers の Codex 配下へ移動。メインコンテンツを全幅化し、Mermaid SVGを中央寄せ、Python/Bashコードブロックに依存追加なしのトークンハイライトを追加（合計 **1129 テスト合格**）。
 - **OpenAI GPT-5.6 完全ガイドの Next.js 移行**: `Gpt-5.6-best-practices-guide.html` の対応Markdown原本をビルド時に安全なReact要素へ変換し、`/model-data/gpt-5-6-best-practices` に追加。18セクション、7表、8 Mermaid図、コードブロック、目次スクロール追従、外部リンクの安全属性、ページレジストリ登録を実装。TDDのRed / Greenを分割し、契約テスト7件を追加（合計 **1126 テスト合格**）。
