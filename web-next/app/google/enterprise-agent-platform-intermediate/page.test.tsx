@@ -1,13 +1,31 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
-import Page from "./page";
+import type { ReactElement } from "react";
+import { describe, expect, it, vi } from "vitest";
+import PageComponent from "./page";
 import { findBySlug } from "@/lib/page-registry";
+
+const Page = PageComponent as unknown as () => ReactElement;
+
+// Mock the MermaidDiagram component
+vi.mock("@/components/docs/MermaidDiagram", () => ({
+  default: function DummyMermaidDiagram({ chart }: { chart: string }) {
+    return <pre data-testid="mermaid">{chart}</pre>;
+  },
+}));
+
+// Stub IntersectionObserver
+class IntersectionObserverStub {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+global.IntersectionObserver = IntersectionObserverStub as unknown as typeof IntersectionObserver;
 
 describe("Gemini Enterprise Agent Platform (Intermediate) Page Contract", () => {
   it("should have correct page title", () => {
     render(<Page />);
     const title = screen.getByRole("heading", { level: 1 });
-    expect(title.textContent).toBe("Gemini Enterprise Agent Platform 実践ベストプラクティスガイド");
+    expect(title.textContent).toBe("Gemini Enterprise Agent Platform実践ベストプラクティスガイド");
   });
 
   it("should have 14 major sections (h2)", () => {
