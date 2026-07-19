@@ -116,7 +116,7 @@ Bedrockのベストプラクティスの中で**最初かつ最重要**なのが
 **初学者向けの実践手順：**
 
 1. Bedrock専用のIAMロールをタスクごとに分離する（プロンプトエンジニア用ロール、エージェント実行用ロール、監視用ロールなど）
-2. `bedrock:InvokeModel` を許可する際は、`Resource` を `*` にせず、利用するモデルARN・Guardrail ID・Knowledge Base IDまで絞り込む
+2. `bedrock:InvokeModel` を許可する際は、`Resource` に利用するモデルARNのみを指定して絞り込みます（Guardrail IDはConditionキー `bedrock:GuardrailIdentifier` で制限し、Knowledge Base IDは `InvokeModel` とは分離して `bedrock:Retrieve` などの対応アクションの `Resource` に指定する構成にします）
 3. Amazon Bedrock API keys（サービス固有認証情報）よりも、可能な限り**AWS STSによる一時的なセキュリティ認証情報**を優先する。
 
 > 可能な限り優先的な認証方法としてAWS Security Token Service（AWS STS）が提供する一時的なセキュリティ認証情報を使用することが推奨されます。
