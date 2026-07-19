@@ -1,22 +1,18 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import Ext from "@/components/docs/Ext";
+import { findBySlug } from "@/lib/page-registry";
 import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
+
+const pageEntry = findBySlug("/claude/tag-best-practices");
 
 export const metadata: Metadata = {
   title: "Claude Tag 活用ガイド ― 中級者〜上級者向けベストプラクティス",
   description:
+    pageEntry?.summary ??
     "Slack上でチームがClaudeをタグ付けして仕事を委任できる新機能「Claude Tag」について、公式ドキュメントやコミュニティ発信をもとにまとめた中級者〜上級者向け実践ガイド。",
 };
-
-// 外部リンク用ヘルパー
-function Ext({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <a href={href} target="_blank" rel="noopener noreferrer">
-      {children}
-    </a>
-  );
-}
 
 // Mermaidチャートの定義（カラム0配置厳守）
 const DIAGRAM_ARCHITECTURE = `flowchart TB
