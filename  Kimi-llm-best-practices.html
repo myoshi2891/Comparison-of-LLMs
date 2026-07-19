@@ -2713,7 +2713,9 @@ print(completion.choices[0].message.content)</code></pre>
           },
         });
 
-        mermaid.run({ querySelector: '.mermaid' }).then(function () {
+        mermaid.run({ querySelector: '.mermaid' }).catch(function (err) {
+          console.error('Mermaid render failed:', err);
+        }).finally(function () {
           hljs.highlightAll();
         });
 
@@ -2742,12 +2744,31 @@ print(completion.choices[0].message.content)</code></pre>
         const toggle = document.getElementById('menuToggle');
         const sidebar = document.getElementById('sidebar');
         if (toggle && sidebar) {
+          function updateSidebar(isOpen) {
+            if (isOpen) {
+              sidebar.classList.add('open');
+              sidebar.removeAttribute('inert');
+              sidebar.removeAttribute('aria-hidden');
+              toggle.setAttribute('aria-expanded', 'true');
+            } else {
+              sidebar.classList.remove('open');
+              sidebar.setAttribute('inert', '');
+              sidebar.setAttribute('aria-hidden', 'true');
+              toggle.setAttribute('aria-expanded', 'false');
+            }
+          }
+
+          // 初期状態（閉じ状態）の同期
+          updateSidebar(sidebar.classList.contains('open'));
+
           toggle.addEventListener('click', function () {
-            sidebar.classList.toggle('open');
+            const isOpen = sidebar.classList.contains('open');
+            updateSidebar(!isOpen);
           });
+
           navLinks.forEach(function (l) {
             l.addEventListener('click', function () {
-              sidebar.classList.remove('open');
+              updateSidebar(false);
             });
           });
         }
