@@ -5,7 +5,8 @@ import TocObserver from "./TocObserver";
 
 export const metadata: Metadata = {
   title: "Gemini Enterprise Agent Platform 実践ベストプラクティスガイド | LLM コスト計算機",
-  description: "中級〜上級エンジニア向け。ADK・Agent Runtime・Memory Bank・A2A/MCP・ガバナンス機能を実務レベルで使いこなすための設計指針を、ステップバイステップで解説します。",
+  description:
+    "中級〜上級エンジニア向け。ADK・Agent Runtime・Memory Bank・A2A/MCP・ガバナンス機能を実務レベルで使いこなすための設計指針を、ステップバイステップで解説します。",
 };
 
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
@@ -90,7 +91,7 @@ const DIAGRAMS = {
     Eval["Agent Evaluation<br>マルチターン自動評価者で<br>本番トラフィックを継続採点"]
     Obs["Agent Observability<br>Unified Trace Viewerで<br>推論経路を可視化"]
     Opt["Agent Optimizer<br>失敗パターンを自動クラスタリングし<br>システム指示を改善提案"]
-    Sim --> Eval --> Obs --> Opt --> Sim`
+    Sim --> Eval --> Obs --> Opt --> Sim`,
 };
 
 export default function Page() {
@@ -100,37 +101,75 @@ export default function Page() {
       <aside className={styles.sidebar}>
         <div className={styles.sidebarBrand}>
           <span className={styles.brandTag}>2026-07-17 時点</span>
-          <div className={styles.brandTitle}>Gemini Enterprise<br />Agent Platform</div>
+          <div className={styles.brandTitle}>
+            Gemini Enterprise
+            <br />
+            Agent Platform
+          </div>
           <p>実践ベストプラクティスガイド</p>
         </div>
         <nav className={styles.sidebarNav}>
-          <a href="#intro" className={styles.navLink}><span className={styles.num}>00</span>Vertex AI → GEAP</a>
-          <a href="#architecture" className={styles.navLink}><span className={styles.num}>01</span>全体アーキテクチャ</a>
-          <a href="#adk" className={styles.navLink}><span className={styles.num}>02</span>ADKの基本設計</a>
-          <a href="#models" className={styles.navLink}><span className={styles.num}>03</span>モデル選定戦略</a>
-          <a href="#runtime" className={styles.navLink}><span className={styles.num}>04</span>Agent Runtime</a>
-          <a href="#memory" className={styles.navLink}><span className={styles.num}>05</span>Memory Bank</a>
-          <a href="#rag" className={styles.navLink}><span className={styles.num}>06</span>RAG / Vector Search</a>
-          <a href="#a2a-mcp" className={styles.navLink}><span className={styles.num}>07</span>A2A と MCP</a>
-          <a href="#security" className={styles.navLink}><span className={styles.num}>08</span>セキュリティ・ガバナンス</a>
-          <a href="#quality" className={styles.navLink}><span className={styles.num}>09</span>品質保証</a>
-          <a href="#migration" className={styles.navLink}><span className={styles.num}>10</span>移行チェックリスト</a>
-          <a href="#antipatterns" className={styles.navLink}><span className={styles.num}>11</span>アンチパターン</a>
-          <a href="#checklist" className={styles.navLink}><span className={styles.num}>12</span>最終チェックリスト</a>
-          <a href="#references" className={styles.navLink}><span className={styles.num}>13</span>参考文献</a>
+          <a href="#intro" className={styles.navLink}>
+            <span className={styles.num}>00</span>Vertex AI → GEAP
+          </a>
+          <a href="#architecture" className={styles.navLink}>
+            <span className={styles.num}>01</span>全体アーキテクチャ
+          </a>
+          <a href="#adk" className={styles.navLink}>
+            <span className={styles.num}>02</span>ADKの基本設計
+          </a>
+          <a href="#models" className={styles.navLink}>
+            <span className={styles.num}>03</span>モデル選定戦略
+          </a>
+          <a href="#runtime" className={styles.navLink}>
+            <span className={styles.num}>04</span>Agent Runtime
+          </a>
+          <a href="#memory" className={styles.navLink}>
+            <span className={styles.num}>05</span>Memory Bank
+          </a>
+          <a href="#rag" className={styles.navLink}>
+            <span className={styles.num}>06</span>RAG / Vector Search
+          </a>
+          <a href="#a2a-mcp" className={styles.navLink}>
+            <span className={styles.num}>07</span>A2A と MCP
+          </a>
+          <a href="#security" className={styles.navLink}>
+            <span className={styles.num}>08</span>セキュリティ・ガバナンス
+          </a>
+          <a href="#quality" className={styles.navLink}>
+            <span className={styles.num}>09</span>品質保証
+          </a>
+          <a href="#migration" className={styles.navLink}>
+            <span className={styles.num}>10</span>移行チェックリスト
+          </a>
+          <a href="#antipatterns" className={styles.navLink}>
+            <span className={styles.num}>11</span>アンチパターン
+          </a>
+          <a href="#checklist" className={styles.navLink}>
+            <span className={styles.num}>12</span>最終チェックリスト
+          </a>
+          <a href="#references" className={styles.navLink}>
+            <span className={styles.num}>13</span>参考文献
+          </a>
         </nav>
       </aside>
 
       <div className={styles.mainContent}>
         <div className={styles.hero}>
           <div className={styles.eyebrow}>Google Cloud · Agentic AI Platform</div>
-          <h1>Gemini Enterprise Agent Platform<br />実践ベストプラクティスガイド</h1>
+          <h1>
+            Gemini Enterprise Agent Platform
+            <br />
+            実践ベストプラクティスガイド
+          </h1>
           <p className={styles.lead}>
             中級〜上級エンジニア向け。ADK・Agent Runtime・Memory
             Bank・A2A/MCP・ガバナンス機能を実務レベルで使いこなすための設計指針を、ステップバイステップで解説します。
           </p>
           <div className={styles.metaRow}>
-            <span className={`${styles.pill} ${styles.pillStrong}`}>2026年7月17日時点の情報に基づく</span>
+            <span className={`${styles.pill} ${styles.pillStrong}`}>
+              2026年7月17日時点の情報に基づく
+            </span>
             <span className={styles.pill}>Vertex AI からの刷新版</span>
             <span className={styles.pill}>Mermaid 図解 7点</span>
             <span className={styles.pill}>一次情報源・URL付き</span>
@@ -139,18 +178,28 @@ export default function Page() {
 
         <section className={styles.contentSection} id="intro">
           <h2>
-            <span className="idx">00</span>このガイドの前提 ― 「Vertex AI」から「Gemini Enterprise Agent Platform」へ
+            <span className="idx">00</span>このガイドの前提 ― 「Vertex AI」から「Gemini Enterprise
+            Agent Platform」へ
           </h2>
           <p className={styles.sectionLead}>まず押さえておくべき最重要事実から始めます。</p>
 
           <p>
-            <strong>2026年4月22日、Google Cloud Next 2026 において、Google は Vertex AI を「Gemini Enterprise Agent Platform(以下 GEAP)」として刷新・拡張することを発表しました。</strong>
+            <strong>
+              2026年4月22日、Google Cloud Next 2026 において、Google は Vertex AI を「Gemini
+              Enterprise Agent Platform(以下 GEAP)」として刷新・拡張することを発表しました。
+            </strong>
             これは名称変更にとどまらず、次の3製品を1つに統合する再編です。
           </p>
           <ul>
-            <li><strong>Vertex AI</strong> ― モデル訓練・チューニング・デプロイのMLOps基盤</li>
-            <li><strong>Agentspace</strong> ― エンタープライズ向けエージェント検索・チャット体験</li>
-            <li><strong>Gemini API</strong> ― モデルアクセスそのもの</li>
+            <li>
+              <strong>Vertex AI</strong> ― モデル訓練・チューニング・デプロイのMLOps基盤
+            </li>
+            <li>
+              <strong>Agentspace</strong> ― エンタープライズ向けエージェント検索・チャット体験
+            </li>
+            <li>
+              <strong>Gemini API</strong> ― モデルアクセスそのもの
+            </li>
           </ul>
 
           <div className={styles.diagramWrap}>
@@ -161,8 +210,13 @@ export default function Page() {
           </div>
 
           <p>
-            2026年5月21日以降、Google Cloud コンソール上から「Vertex AI」という名称は姿を消し、検索してもAgent Platformにリダイレクトされます。一方で
-            <strong>APIエンドポイントは <code>aiplatform.googleapis.com</code> のまま変更されていません。</strong>既存のコードやSDK呼び出しは無停止で動作を継続するため緊急移行の必要はありませんが、IAMロール名・コンソールUI・課金明細の項目名(2026年5〜6月に「Vertex AI」から「Gemini Enterprise」表記へ移行)は確認が必要です。
+            2026年5月21日以降、Google Cloud コンソール上から「Vertex
+            AI」という名称は姿を消し、検索してもAgent Platformにリダイレクトされます。一方で
+            <strong>
+              APIエンドポイントは <code>aiplatform.googleapis.com</code> のまま変更されていません。
+            </strong>
+            既存のコードやSDK呼び出しは無停止で動作を継続するため緊急移行の必要はありませんが、IAMロール名・コンソールUI・課金明細の項目名(2026年5〜6月に「Vertex
+            AI」から「Gemini Enterprise」表記へ移行)は確認が必要です。
           </p>
 
           <div className={styles.callout}>
@@ -172,9 +226,12 @@ export default function Page() {
         </section>
 
         <section className={styles.contentSection} id="architecture">
-          <h2><span className="idx">01</span>全体アーキテクチャ ― 4つの柱</h2>
+          <h2>
+            <span className="idx">01</span>全体アーキテクチャ ― 4つの柱
+          </h2>
           <p className={styles.sectionLead}>
-            Build / Scale / Govern / Optimize の4本柱でエージェントのライフサイクル全体を捉えるのがGEAPの設計思想です。
+            Build / Scale / Govern / Optimize
+            の4本柱でエージェントのライフサイクル全体を捉えるのがGEAPの設計思想です。
           </p>
 
           <p>個別機能を迷わず選択するための最短ルートは、まずこの全体像を掴むことです。</p>
@@ -210,7 +267,8 @@ export default function Page() {
                   <td>Govern</td>
                   <td>誰が・何に・どうアクセスできるかを統制する</td>
                   <td>
-                    Agent Identity、Agent Registry、Agent Gateway、Model Armor、Semantic Governance Policies
+                    Agent Identity、Agent Registry、Agent Gateway、Model Armor、Semantic Governance
+                    Policies
                   </td>
                 </tr>
                 <tr>
@@ -224,12 +282,15 @@ export default function Page() {
 
           <div className={styles.callout}>
             <div className={styles.calloutTitle}>ベストプラクティス①</div>
-            新規プロジェクトでは「まずBuildだけ作り込んで、後からGovernとOptimizeを足す」という順序は避けてください。ガバナンス設定を後回しにすることは、エンタープライズがエージェント展開で犯す最も高くつく失敗としてしばしば指摘されています。小規模なプロトタイプの段階からAgent IdentityとAgent Registryへの登録だけは最初に組み込んでおくことを推奨します。
+            新規プロジェクトでは「まずBuildだけ作り込んで、後からGovernとOptimizeを足す」という順序は避けてください。ガバナンス設定を後回しにすることは、エンタープライズがエージェント展開で犯す最も高くつく失敗としてしばしば指摘されています。小規模なプロトタイプの段階からAgent
+            IdentityとAgent Registryへの登録だけは最初に組み込んでおくことを推奨します。
           </div>
         </section>
 
         <section className={styles.contentSection} id="adk">
-          <h2><span className="idx">02</span>Agent Development Kit(ADK)の基本設計</h2>
+          <h2>
+            <span className="idx">02</span>Agent Development Kit(ADK)の基本設計
+          </h2>
           <p className={styles.sectionLead}>
             OSSのコードファースト・エージェントフレームワーク。単一の万能エージェントではなく、役割を分割した複数の専門エージェントを協調させる「マイクロサービス的発想」が核にあります。
           </p>
@@ -242,21 +303,32 @@ export default function Page() {
           <h3>コア概念の関係</h3>
           <div className={styles.diagramWrap}>
             <MermaidDiagram chart={DIAGRAMS.coreConcept} />
-            <p className={styles.diagramCaption}>図2-1: ADKにおけるエージェント・状態・ツールの関係</p>
+            <p className={styles.diagramCaption}>
+              図2-1: ADKにおけるエージェント・状態・ツールの関係
+            </p>
           </div>
 
           <p>
-            <code>session.state</code> は複数エージェント間の「共有ホワイトボード」です。<code>output_key</code>を使って明示的にキーへ書き込み、後続エージェントの<code>instruction</code>内で<code>{"{key名}"}</code>として参照します。<code>AgentTool</code>を使うと、サブエージェント全体を「1つの関数呼び出し」として親エージェントから呼び出せます。
+            <code>session.state</code> は複数エージェント間の「共有ホワイトボード」です。
+            <code>output_key</code>を使って明示的にキーへ書き込み、後続エージェントの
+            <code>instruction</code>内で<code>{"{key名}"}</code>として参照します。
+            <code>AgentTool</code>
+            を使うと、サブエージェント全体を「1つの関数呼び出し」として親エージェントから呼び出せます。
           </p>
 
           <div className={styles.callout}>
             <div className={styles.calloutTitle}>ベストプラクティス②</div>
-            <code>output_key</code> にer意味のある名前を付けてください(<code>raw_text</code>、<code>structured_data</code>のように)。これはダウンストリームのエージェントにとっての「API仕様書」そのものであり、曖昧な命名はルーティング精度を直接下げます。同様に、ルーティングに使う<code>description</code>フィールドはLLMへ向けた説明文であるため、精密に書く必要があります。
+            <code>output_key</code> には必ず意味のある名前を付けてください(<code>raw_text</code>、
+            <code>structured_data</code>
+            のように)。これはダウンストリームのエージェントにとっての「API仕様書」そのものであり、曖昧な命名はルーティング精度を直接下げます。同様に、ルーティングに使う
+            <code>description</code>
+            フィールドはLLMへ向けた説明文であるため、精密に書く必要があります。
           </div>
 
           <h3>マルチエージェント設計パターン8選</h3>
           <p>
-            Google Developers Blogが2025年12月に公開した設計ガイドでは、8つの基本パターンが整理されています。実務ではこれらを組み合わせて使うのが一般的です。
+            Google Developers
+            Blogが2025年12月に公開した設計ガイドでは、8つの基本パターンが整理されています。実務ではこれらを組み合わせて使うのが一般的です。
           </p>
 
           <div className={styles.tableWrap}>
@@ -276,42 +348,54 @@ export default function Page() {
                   <td>Sequential Pipeline</td>
                   <td>組立ライン</td>
                   <td>文書処理パイプライン(解析→抽出→要約)</td>
-                  <td><code>SequentialAgent</code></td>
+                  <td>
+                    <code>SequentialAgent</code>
+                  </td>
                 </tr>
                 <tr>
                   <td>2</td>
                   <td>Coordinator/Dispatcher</td>
                   <td>コンシェルジュ</td>
                   <td>問い合わせを専門エージェントへ振り分けるサポート</td>
-                  <td><code>LlmAgent</code> + <code>sub_agents</code></td>
+                  <td>
+                    <code>LlmAgent</code> + <code>sub_agents</code>
+                  </td>
                 </tr>
                 <tr>
                   <td>3</td>
                   <td>Parallel Fan-Out/Gather</td>
                   <td>タコ足</td>
                   <td>コードレビューの並列チェック</td>
-                  <td><code>ParallelAgent</code> + 集約エージェント</td>
+                  <td>
+                    <code>ParallelAgent</code> + 集約エージェント
+                  </td>
                 </tr>
                 <tr>
                   <td>4</td>
                   <td>Hierarchical Decomposition</td>
                   <td>マトリョーシカ</td>
                   <td>大きな目標をサブタスクに分解するリサーチ</td>
-                  <td><code>AgentTool</code>でラップ</td>
+                  <td>
+                    <code>AgentTool</code>でラップ
+                  </td>
                 </tr>
                 <tr>
                   <td>5</td>
                   <td>Generator &amp; Critic</td>
                   <td>編集者の机</td>
                   <td>SQL生成の構文検証、コンプライアンスレビュー</td>
-                  <td><code>LoopAgent</code>(合否判定)</td>
+                  <td>
+                    <code>LoopAgent</code>(合否判定)
+                  </td>
                 </tr>
                 <tr>
                   <td>6</td>
                   <td>Iterative Refinement</td>
                   <td>彫刻家</td>
                   <td>文章・コード品質の段階的な磨き上げ</td>
-                  <td><code>LoopAgent</code> + <code>max_iterations</code></td>
+                  <td>
+                    <code>LoopAgent</code> + <code>max_iterations</code>
+                  </td>
                 </tr>
                 <tr>
                   <td>7</td>
@@ -332,106 +416,349 @@ export default function Page() {
           </div>
 
           <p>
-            以下、実務で頻出する3パターンをADK風の疑似コードで示します(クラス名は実際のADK APIに準拠しています)。
+            以下, 実務で頻出する3パターンをADK風の疑似コードで示します(クラス名は実際のADK
+            APIに準拠しています)。
           </p>
 
           <div className={styles.codeBlock}>
             <div className={styles.codeLabel}>
-              <span>パターン1: Sequential Pipeline</span><span>Python</span>
+              <span>パターン1: Sequential Pipeline</span>
+              <span>Python</span>
             </div>
-            <pre><code className={`${styles.codeBody} language-python`}>
-              <div className={styles.codeLine}><span className={styles.cv}>parser</span><span> = </span><span className={styles.cm}>LlmAgent</span><span>(</span></div>
-              <div className={styles.codeLine}>    <span>name=</span><span className={styles.cs}>"ParserAgent"</span><span>,</span></div>
-              <div className={styles.codeLine}>    <span>instruction=</span><span className={styles.cs}>"受け取ったPDFのテキストを抽出する。"</span><span>,</span></div>
-              <div className={styles.codeLine}>    <span>tools=[pdf_parser_tool],</span></div>
-              <div className={styles.codeLine}>    <span>output_key=</span><span className={styles.cs}>"raw_text"</span><span>,</span></div>
-              <div className={styles.codeLine}><span>)</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>extractor</span><span> = </span><span className={styles.cm}>LlmAgent</span><span>(</span></div>
-              <div className={styles.codeLine}>    <span>name=</span><span className={styles.cs}>"ExtractorAgent"</span><span>,</span></div>
-              <div className={styles.codeLine}>    <span>instruction=</span><span className={styles.cs}>"{"{raw_text}"} から構造化データを抽出する。"</span><span>,</span></div>
-              <div className={styles.codeLine}>    <span>output_key=</span><span className={styles.cs}>"structured_data"</span><span>,</span></div>
-              <div className={styles.codeLine}><span>)</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>summarizer</span><span> = </span><span className={styles.cm}>LlmAgent</span><span>(</span></div>
-              <div className={styles.codeLine}>    <span>name=</span><span className={styles.cs}>"SummarizerAgent"</span><span>,</span></div>
-              <div className={styles.codeLine}>    <span>instruction=</span><span className={styles.cs}>"{"{structured_data}"} を基に要約を生成する。"</span><span>,</span></div>
-              <div className={styles.codeLine}><span>)</span></div>
-              <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}><span className={styles.cv}>pipeline</span><span> = </span><span className={styles.cm}>SequentialAgent</span><span>(</span></div>
-              <div className={styles.codeLine}>    <span>name=</span><span className={styles.cs}>"DocumentPipeline"</span><span>,</span></div>
-              <div className={styles.codeLine}>    <span>sub_agents=[parser, extractor, summarizer],</span></div>
-              <div className={styles.codeLine}><span>)</span></div>
-            </code></pre>
+            <pre>
+              <code className={`${styles.codeBody} language-python`}>
+                <div className={styles.codeLine}>
+                  <span className={styles.cv}>parser</span>
+                  <span> = </span>
+                  <span className={styles.cm}>LlmAgent</span>
+                  <span>(</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>name=</span>
+                  <span className={styles.cs}>"ParserAgent"</span>
+                  <span>,</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>instruction=</span>
+                  <span className={styles.cs}>"受け取ったPDFのテキストを抽出する。"</span>
+                  <span>,</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>tools=[pdf_parser_tool],</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>output_key=</span>
+                  <span className={styles.cs}>"raw_text"</span>
+                  <span>,</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span>)</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cv}>extractor</span>
+                  <span> = </span>
+                  <span className={styles.cm}>LlmAgent</span>
+                  <span>(</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>name=</span>
+                  <span className={styles.cs}>"ExtractorAgent"</span>
+                  <span>,</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>instruction=</span>
+                  <span className={styles.cs}>"{"{raw_text}"} から構造化データを抽出する。"</span>
+                  <span>,</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>output_key=</span>
+                  <span className={styles.cs}>"structured_data"</span>
+                  <span>,</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span>)</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cv}>summarizer</span>
+                  <span> = </span>
+                  <span className={styles.cm}>LlmAgent</span>
+                  <span>(</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>name=</span>
+                  <span className={styles.cs}>"SummarizerAgent"</span>
+                  <span>,</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>instruction=</span>
+                  <span className={styles.cs}>"{"{structured_data}"} を基に要約を生成する。"</span>
+                  <span>,</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span>)</span>
+                </div>
+                <div className={styles.codeLine}></div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cv}>pipeline</span>
+                  <span> = </span>
+                  <span className={styles.cm}>SequentialAgent</span>
+                  <span>(</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>name=</span>
+                  <span className={styles.cs}>"DocumentPipeline"</span>
+                  <span>,</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>sub_agents=[parser, extractor, summarizer],</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span>)</span>
+                </div>
+              </code>
+            </pre>
           </div>
 
           <p>
-            パターン3(Parallel Fan-Out/Gather)では、<code>ParallelAgent</code>配下のサブエージェントは同一 of <code>session.state</code>を共有しつつ別スレッドで並行実行されるため、<strong>各エージェントが必ず異なる<code>output_key</code>に書き込むよう設計し、競合状態(race condition)を防ぐ</strong>ことが重要です。
+            パターン3(Parallel Fan-Out/Gather)では、<code>ParallelAgent</code>
+            配下のサブエージェントは同一の<code>session.state</code>
+            を共有しつつ別スレッドで並行実行されるため、
+            <strong>
+              各エージェントが必ず異なる<code>output_key</code>に書き込むよう設計し、競合状態(race
+              condition)を防ぐ
+            </strong>
+            ことが重要です。
           </p>
 
           <div className={styles.codeBlock}>
             <div className={styles.codeLabel}>
-              <span>パターン3: Parallel Fan-Out/Gather</span><span>Python</span>
+              <span>パターン3: Parallel Fan-Out/Gather</span>
+              <span>Python</span>
             </div>
-            <pre><code className={`${styles.codeBody} language-python`}>
-              <div className={styles.codeLine}><span className={styles.cv}>security_auditor</span><span> = </span><span className={styles.cm}>LlmAgent</span><span>(name=</span><span className={styles.cs}>"SecurityAuditor"</span><span>, output_key=</span><span className={styles.cs}>"security_report"</span><span>)</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>style_enforcer</span><span>   = </span><span className={styles.cm}>LlmAgent</span><span>(name=</span><span className={styles.cs}>"StyleEnforcer"</span><span>,  output_key=</span><span className={styles.cs}>"style_report"</span><span>)</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>perf_analyst</span>     <span>= </span><span className={styles.cm}>LlmAgent</span><span>(name=</span><span className={styles.cs}>"PerformanceAnalyst"</span><span>, output_key=</span><span className={styles.cs}>"performance_report"</span><span>)</span></div>
-              <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}><span className={styles.cv}>review_swarm</span><span> = </span><span className={styles.cm}>ParallelAgent</span><span>(</span></div>
-              <div className={styles.codeLine}>    <span>name=</span><span className={styles.cs}>"CodeReviewSwarm"</span><span>,</span></div>
-              <div className={styles.codeLine}>    <span>sub_agents=[security_auditor, style_enforcer, perf_analyst],</span></div>
-              <div className={styles.codeLine}><span>)</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>synthesizer</span><span> = </span><span className={styles.cm}>LlmAgent</span><span>(</span></div>
-              <div className={styles.codeLine}>    <span>name=</span><span className={styles.cs}>"PRSummarizer"</span><span>,</span></div>
-              <div className={styles.codeLine}>    <span>instruction=</span><span className={styles.cs}>"{"{security_report}"}, {"{style_report}"}, {"{performance_report}"} を統合したレビューを作成する。"</span><span>,</span></div>
-              <div className={styles.codeLine}><span>)</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>workflow</span><span> = </span><span className={styles.cm}>SequentialAgent</span><span>(sub_agents=[review_swarm, synthesizer])</span></div>
-            </code></pre>
+            <pre>
+              <code className={`${styles.codeBody} language-python`}>
+                <div className={styles.codeLine}>
+                  <span className={styles.cv}>security_auditor</span>
+                  <span> = </span>
+                  <span className={styles.cm}>LlmAgent</span>
+                  <span>(name=</span>
+                  <span className={styles.cs}>"SecurityAuditor"</span>
+                  <span>, output_key=</span>
+                  <span className={styles.cs}>"security_report"</span>
+                  <span>)</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cv}>style_enforcer</span>
+                  <span> = </span>
+                  <span className={styles.cm}>LlmAgent</span>
+                  <span>(name=</span>
+                  <span className={styles.cs}>"StyleEnforcer"</span>
+                  <span>, output_key=</span>
+                  <span className={styles.cs}>"style_report"</span>
+                  <span>)</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cv}>perf_analyst</span> <span>= </span>
+                  <span className={styles.cm}>LlmAgent</span>
+                  <span>(name=</span>
+                  <span className={styles.cs}>"PerformanceAnalyst"</span>
+                  <span>, output_key=</span>
+                  <span className={styles.cs}>"performance_report"</span>
+                  <span>)</span>
+                </div>
+                <div className={styles.codeLine}></div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cv}>review_swarm</span>
+                  <span> = </span>
+                  <span className={styles.cm}>ParallelAgent</span>
+                  <span>(</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>name=</span>
+                  <span className={styles.cs}>"CodeReviewSwarm"</span>
+                  <span>,</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>sub_agents=[security_auditor, style_enforcer, perf_analyst],</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span>)</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cv}>synthesizer</span>
+                  <span> = </span>
+                  <span className={styles.cm}>LlmAgent</span>
+                  <span>(</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>name=</span>
+                  <span className={styles.cs}>"PRSummarizer"</span>
+                  <span>,</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>instruction=</span>
+                  <span className={styles.cs}>
+                    "{"{security_report}"}, {"{style_report}"}, {"{performance_report}"}{" "}
+                    を統合したレビューを作成する。"
+                  </span>
+                  <span>,</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span>)</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cv}>workflow</span>
+                  <span> = </span>
+                  <span className={styles.cm}>SequentialAgent</span>
+                  <span>(sub_agents=[review_swarm, synthesizer])</span>
+                </div>
+              </code>
+            </pre>
           </div>
 
           <p>パターン5(Generator &amp; Critic)は品質ゲート付きループの代表例です。</p>
 
           <div className={styles.codeBlock}>
             <div className={styles.codeLabel}>
-              <span>パターン5: Generator &amp; Critic</span><span>Python</span>
+              <span>パターン5: Generator &amp; Critic</span>
+              <span>Python</span>
             </div>
-            <pre><code className={`${styles.codeBody} language-python`}>
-              <div className={styles.codeLine}><span className={styles.cv}>generator</span><span> = </span><span className={styles.cm}>LlmAgent</span><span>(</span></div>
-              <div className={styles.codeLine}>    <span>name=</span><span className={styles.cs}>"Generator"</span><span>,</span></div>
-              <div className={styles.codeLine}>    <span>instruction=</span><span className={styles.cs}>"SQLクエリを生成する。{"{feedback}"} があれば修正して再生成する。"</span><span>,</span></div>
-              <div className={styles.codeLine}>    <span>output_key=</span><span className={styles.cs}>"draft"</span><span>,</span></div>
-              <div className={styles.codeLine}><span>)</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>critic</span><span> = </span><span className={styles.cm}>LlmAgent</span><span>(</span></div>
-              <div className={styles.codeLine}>    <span>name=</span><span className={styles.cs}>"Critic"</span><span>,</span></div>
-              <div className={styles.codeLine}>    <span>instruction=</span><span className={styles.cs}>"{"{draft}"} の妥当性を検証し、問題なければ 'PASS' を、そうでなければ具体的な指摘を出力する。"</span><span>,</span></div>
-              <div className={styles.codeLine}>    <span>output_key=</span><span className={styles.cs}>"feedback"</span><span>,</span></div>
-              <div className={styles.codeLine}><span>)</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>validation_loop</span><span> = </span><span className={styles.cm}>LoopAgent</span><span>(</span></div>
-              <div className={styles.codeLine}>    <span>name=</span><span className={styles.cs}>"ValidationLoop"</span><span>,</span></div>
-              <div className={styles.codeLine}>    <span>sub_agents=[generator, critic],</span></div>
-              <div className={styles.codeLine}>    <span>condition_key=</span><span className={styles.cs}>"feedback"</span><span>,</span></div>
-              <div className={styles.codeLine}>    <span>exit_condition=</span><span className={styles.cs}>"PASS"</span><span>,</span></div>
-              <div className={styles.codeLine}><span>)</span></div>
-            </code></pre>
+            <pre>
+              <code className={`${styles.codeBody} language-python`}>
+                <div className={styles.codeLine}>
+                  <span className={styles.cv}>generator</span>
+                  <span> = </span>
+                  <span className={styles.cm}>LlmAgent</span>
+                  <span>(</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>name=</span>
+                  <span className={styles.cs}>"Generator"</span>
+                  <span>,</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>instruction=</span>
+                  <span className={styles.cs}>
+                    "SQLクエリを生成する。{"{feedback}"} があれば修正して再生成する。"
+                  </span>
+                  <span>,</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>output_key=</span>
+                  <span className={styles.cs}>"draft"</span>
+                  <span>,</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span>)</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cv}>critic</span>
+                  <span> = </span>
+                  <span className={styles.cm}>LlmAgent</span>
+                  <span>(</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>name=</span>
+                  <span className={styles.cs}>"Critic"</span>
+                  <span>,</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>instruction=</span>
+                  <span className={styles.cs}>
+                    "{"{draft}"} の妥当性を検証し、問題なければ 'PASS'
+                    を、そうでなければ具体的な指摘を出力する。"
+                  </span>
+                  <span>,</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>output_key=</span>
+                  <span className={styles.cs}>"feedback"</span>
+                  <span>,</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span>)</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cv}>validation_loop</span>
+                  <span> = </span>
+                  <span className={styles.cm}>LoopAgent</span>
+                  <span>(</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>name=</span>
+                  <span className={styles.cs}>"ValidationLoop"</span>
+                  <span>,</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>sub_agents=[generator, critic],</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>condition_key=</span>
+                  <span className={styles.cs}>"feedback"</span>
+                  <span>,</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>exit_condition=</span>
+                  <span className={styles.cs}>"PASS"</span>
+                  <span>,</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span>)</span>
+                </div>
+              </code>
+            </pre>
           </div>
 
           <p>
-            <code>LoopAgent</code>の終了条件には<code>max_iterations</code>によるハードリミットに加え、<code>EventActions</code>内で<code>escalate=True</code>を発火させることで、閾値到達前でも早期終了させる仕組みが用意されています。
+            <code>LoopAgent</code>の終了条件には<code>max_iterations</code>
+            によるハードリミットに加え、<code>EventActions</code>内で<code>escalate=True</code>
+            を発火させることで、閾値到達前でも早期終了させる仕組みが用意されています。
           </p>
 
           <div className={styles.callout}>
             <div className={styles.calloutTitle}>ベストプラクティス③(段階的導入)</div>
-            初日からネストしたループ構造を組むのは避け、まず単純な<code>SequentialAgent</code>チェーンでデバッグしてから複雑さを積み増してください。
+            初日からネストしたループ構造を組むのは避け、まず単純な<code>SequentialAgent</code>
+            チェーンでデバッグしてから複雑さを積み増してください。
           </div>
         </section>
 
         <section className={styles.contentSection} id="models">
-          <h2><span class="idx">03</span>モデル選定戦略 ― コストと性能のトレードオフ</h2>
+          <h2>
+            <span className="idx">03</span>モデル選定戦略 ― コストと性能のトレードオフ
+          </h2>
           <p className={styles.sectionLead}>
-            2026年7月時点のModel Gardenには、Gemini 3系・2.5系に加え、サードパーティやオープンウェイトまで200以上のモデルが並びます。
+            2026年7月時点のModel Gardenには、Gemini
+            3系・2.5系に加え、サードパーティやオープンウェイトまで200以上のモデルが並びます。
           </p>
 
           <p>
-            エージェント設計において<strong>モデル選定はコスト最適化における最もレバレッジの効く意思決定</strong>です。
+            エージェント設計において
+            <strong>モデル選定はコスト最適化における最もレバレッジの効く意思決定</strong>です。
           </p>
 
           <div className={styles.tableWrap}>
@@ -456,7 +783,9 @@ export default function Page() {
                 </tr>
                 <tr>
                   <td>Gemini 3.5 Flash</td>
-                  <td>Proに迫る知性をFlash価格帯で提供、コーディングと並列エージェント実行に強み</td>
+                  <td>
+                    Proに迫る知性をFlash価格帯で提供、コーディングと並列エージェント実行に強み
+                  </td>
                   <td>マルチエージェントのオーケストレーション層</td>
                 </tr>
                 <tr>
@@ -470,14 +799,25 @@ export default function Page() {
 
           <div className={`${styles.callout} ${styles.calloutWarn}`}>
             <div className={styles.calloutTitle}>ベストプラクティス④(コスト最適化)</div>
-            一部の分析では、Flash-Liteの入力単価がPro系モデルの約20分の1という報告もあります(価格は変動するため必ず<Ext href="https://cloud.google.com/gemini-enterprise-agent-platform/generative-ai/pricing">公式料金ページ</Ext>を確認してください)。また、Pro系モデルは<strong>入力コンテキストが約20万トークンを超えると単価が段階的に上昇する「コストの崖」</strong>が存在するとされています。RAGパイプラインで長文コンテキストをそのまま流し込むと、意図せずこの閾値を超えて課金が跳ね上がることがあるため注意が必要です。すべてのタスクにPro系を使うのではなく、タスクの複雑度に応じてモデルを動的に振り分ける設計(自前のルーターエージェントでも可)を検討してください。
+            一部の分析では、Flash-Liteの入力単価がPro系モデルの約20分の1という報告もあります(価格は変動するため必ず
+            <Ext href="https://cloud.google.com/gemini-enterprise-agent-platform/generative-ai/pricing">
+              公式料金ページ
+            </Ext>
+            を確認してください)。また、Pro系モデルは
+            <strong>
+              入力コンテキストが約20万トークンを超えると単価が段階的に上昇する「コストの崖」
+            </strong>
+            が存在するとされています。RAGパイプラインで長文コンテキストをそのまま流し込むと、意図せずこの閾値を超えて課金が跳ね上がることがあるため注意が必要です。すべてのタスクにPro系を使うのではなく、タスクの複雑度に応じてモデルを動的に振り分ける設計(自前のルーターエージェントでも可)を検討してください。
           </div>
         </section>
 
         <section className={styles.contentSection} id="runtime">
-          <h2><span class="idx">04</span>Agent Runtime ― デプロイとスケーリングの実践</h2>
+          <h2>
+            <span className="idx">04</span>Agent Runtime ― デプロイとスケーリングの実践
+          </h2>
           <p className={styles.sectionLead}>
-            Agent RuntimeはADKエージェントをホストするフルマネージドのサーバーレス実行基盤です。パフォーマンスチューニングの鍵は「コールドスタート」の理解にあります。
+            Agent
+            RuntimeはADKエージェントをホストするフルマネージドのサーバーレス実行基盤です。パフォーマンスチューニングの鍵は「コールドスタート」の理解にあります。
           </p>
 
           <h3>コールドスタートの実測データ</h3>
@@ -501,12 +841,15 @@ export default function Page() {
                   <td>約0.4秒</td>
                 </tr>
                 <tr>
-                  <td><code>min_instances=10</code>に変更した場合のコールドスタート</td>
+                  <td>
+                    <code>min_instances=10</code>に変更した場合のコールドスタート
+                  </td>
                   <td>約1.4秒</td>
                 </tr>
                 <tr>
                   <td>
-                    <code>min_instances=10</code>・デフォルト同時実行数(9)で1,500クエリ/分(25 QPS)を60秒間持続
+                    <code>min_instances=10</code>・デフォルト同時実行数(9)で1,500クエリ/分(25
+                    QPS)を60秒間持続
                   </td>
                   <td>約1.6秒で安定</td>
                 </tr>
@@ -517,28 +860,83 @@ export default function Page() {
 
           <h3>デプロイパラメータの設計指針</h3>
           <div className={styles.codeBlock}>
-            <div className={styles.codeLabel}><span>Agent Runtime デプロイ設定</span><span>Python</span></div>
-            <pre><code className={`${styles.codeBody} language-python`}>
-              <div className={styles.codeLine}><span className={styles.cv}>remote_agent</span><span> = </span><span className={styles.cv}>client</span><span>.agent_engines.create(</span></div>
-              <div className={styles.codeLine}>    <span>agent=local_agent,</span></div>
-              <div className={styles.codeLine}>    <span>config={"{"}</span></div>
-              <div className={styles.codeLine}>        <span className={styles.cs}>"min_instances"</span><span>: 10,        </span><span className={styles.cc}># 範囲: [0, 10](VPC-SC/PSC-I有効時は[1, 100])</span></div>
-              <div className={styles.codeLine}>        <span className={styles.cs}>"max_instances"</span><span>: 10,</span></div>
-              <div className={styles.codeLine}>        <span className={styles.cs}>"resource_limits"</span><span>: {"{"}</span><span className={styles.cs}>"cpu"</span><span>: </span><span className={styles.cs}>"4"</span><span>, </span><span className={styles.cs}>"memory"</span><span>: </span><span className={styles.cs}>"8Gi"</span><span>{"}"},</span></div>
-              <div className={styles.codeLine}>        <span className={styles.cs}>"container_concurrency"</span><span>: 9,  </span><span className={styles.cc}># デフォルト値</span></div>
-              <div className={styles.codeLine}>    <span>{"}"},</span></div>
-              <div className={styles.codeLine}><span>)</span></div>
-            </code></pre>
+            <div className={styles.codeLabel}>
+              <span>Agent Runtime デプロイ設定</span>
+              <span>Python</span>
+            </div>
+            <pre>
+              <code className={`${styles.codeBody} language-python`}>
+                <div className={styles.codeLine}>
+                  <span className={styles.cv}>remote_agent</span>
+                  <span> = </span>
+                  <span className={styles.cv}>client</span>
+                  <span>.agent_engines.create(</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>agent=local_agent,</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>config={"{"}</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span className={styles.cs}>"min_instances"</span>
+                  <span>: 10, </span>
+                  <span className={styles.cc}># 範囲: [0, 10](VPC-SC/PSC-I有効時は[1, 100])</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span className={styles.cs}>"max_instances"</span>
+                  <span>: 10,</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span className={styles.cs}>"resource_limits"</span>
+                  <span>: {"{"}</span>
+                  <span className={styles.cs}>"cpu"</span>
+                  <span>: </span>
+                  <span className={styles.cs}>"4"</span>
+                  <span>, </span>
+                  <span className={styles.cs}>"memory"</span>
+                  <span>: </span>
+                  <span className={styles.cs}>"8Gi"</span>
+                  <span>{"}"},</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span className={styles.cs}>"container_concurrency"</span>
+                  <span>: 9, </span>
+                  <span className={styles.cc}># デフォルト値</span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span>{"}"},</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span>)</span>
+                </div>
+              </code>
+            </pre>
           </div>
 
           <div className={styles.callout}>
             <div className={styles.calloutTitle}>ベストプラクティス⑤</div>
-            バーストしやすい、あるいは常時アクセスされる本番ワークロードでは<code>min_instances</code>をベースライントラフィックを捌ける水準まで引き上げてください。逆に、断続的にしかアクセスされない社内ツールなどでは<code>min_instances=0〜1</code>のままにしてコストを抑える判断も合理的です。安定した継続トラフィックを流すことでインスタンスを「温めておく」ことも、スパイクへの耐性を上げる手段になります。依存パッケージについては、<code>requirements.txt</code>でバージョンを固定(pin)し、再現可能なビルドを保証してください。
+            バーストしやすい、あるいは常時アクセスされる本番ワークロードでは
+            <code>min_instances</code>
+            をベースライントラフィックを捌ける水準まで引き上げてください。逆に、断続的にしかアクセスされない社内ツールなどでは
+            <code>min_instances=0〜1</code>
+            のままにしてコストを抑える判断も合理的です。安定した継続トラフィックを流すことでインスタンスを「温めておく」ことも、スパイクへの耐性を上げる手段になります。依存パッケージについては、
+            <code>requirements.txt</code>
+            でバージョンを固定(pin)し、再現可能なビルドを保証してください。
           </div>
         </section>
 
         <section className={styles.contentSection} id="memory">
-          <h2><span class="idx">05</span>Memory Bank ― 長期記憶の設計と落とし穴</h2>
+          <h2>
+            <span className="idx">05</span>Memory Bank ― 長期記憶の設計と落とし穴
+          </h2>
           <p className={styles.sectionLead}>
             ユーザーとエージェントの会話履歴から長期記憶を自動生成・自己組織化するマネージドサービス。設計を誤ると、プライバシー漏洩やレイテンシ問題に直結します。
           </p>
@@ -546,18 +944,24 @@ export default function Page() {
           <h3>スコープと抽出・統合の流れ</h3>
           <div className={styles.diagramWrap}>
             <MermaidDiagram chart={DIAGRAMS.memoryFlow} />
-            <p className={styles.diagramCaption}>図5-1: Memory Bankにおける記憶の抽出・統合フロー</p>
+            <p className={styles.diagramCaption}>
+              図5-1: Memory Bankにおける記憶の抽出・統合フロー
+            </p>
           </div>
 
           <ul>
             <li>
-              記憶は必ず<code>scope</code>(通常は<code>user_id</code>)に紐づけて隔離されます。これにより、あるユーザーの記憶が別のユーザーに漏れることはありません。
+              記憶は必ず<code>scope</code>(通常は<code>user_id</code>
+              )に紐づけて隔離されます。これにより、あるユーザーの記憶が別のユーザーに漏れることはありません。
             </li>
             <li>
-              抽出対象は<code>memory_topics</code>で制御し、マネージド済みトピックを使うか、few-shot例を与えて挙動をカスタマイズできます。
+              抽出対象は<code>memory_topics</code>
+              で制御し、マネージド済みトピックを使うか、few-shot例を与えて挙動をカスタマイズできます。
             </li>
             <li>
-              生成は既定では同期的(呼び出し元がポーリングして完了を待つ)ですが、<strong>本番環境ではバックグラウンドの非同期処理として実行することが推奨</strong>されています。
+              生成は既定では同期的(呼び出し元がポーリングして完了を待つ)ですが、
+              <strong>本番環境ではバックグラウンドの非同期処理として実行することが推奨</strong>
+              されています。
             </li>
           </ul>
 
@@ -584,7 +988,9 @@ export default function Page() {
                 </tr>
                 <tr>
                   <td>スコープ設計の甘さ</td>
-                  <td><code>scope_keys</code>が粗いと記憶が意図せず混在</td>
+                  <td>
+                    <code>scope_keys</code>が粗いと記憶が意図せず混在
+                  </td>
                   <td>ユーザー単位・セッション単位など粒度を明確化</td>
                 </tr>
               </tbody>
@@ -592,28 +998,35 @@ export default function Page() {
           </div>
 
           <p>
-            なお、2026年7月時点でMemory Bankのデフォルトの生成モデルはGemini 2.5 FlashからGemini 3.5 Flashに更新されています。
+            なお、2026年7月時点でMemory Bankのデフォルトの生成モデルはGemini 2.5 FlashからGemini 3.5
+            Flashに更新されています。
           </p>
         </section>
 
         <section className={styles.contentSection} id="rag">
-          <h2><span class="idx">06</span>RAG Engine と Vector Search</h2>
+          <h2>
+            <span className="idx">06</span>RAG Engine と Vector Search
+          </h2>
           <p className={styles.sectionLead}>
             プライベートデータをLLMに安全に接続し、ハルシネーションを低減するためのマネージド基盤。
           </p>
 
           <p>
-            RAG Engineは検索と生成を接続するパイプラインを、Vector Searchはストレージと検索を一体化したAIネイティブな検索エンジンとして提供します。
+            RAG Engineは検索と生成を接続するパイプラインを、Vector
+            Searchはストレージと検索を一体化したAIネイティブな検索エンジンとして提供します。
           </p>
 
           <div className={styles.callout}>
             <div className={styles.calloutTitle}>ベストプラクティス⑥</div>
-            Vector Searchのインデックス設計では、フィルタリング条件(restricts)の数がシャード数、ひいてはメモリ使用量に直結します。フィルタ条件を絞り込みすぎるとインデックスコストが跳ね上がる点に注意してください。また、RAGで取得したチャンクをそのままPro系モデルへ渡す設計は、前述の「コンテキスト長のコストの崖」を誘発しやすいため、リランキングや要約による事前圧縮を検討してください。
+            Vector
+            Searchのインデックス設計では、フィルタリング条件(restricts)の数がシャード数、ひいてはメモリ使用量に直結します。フィルタ条件を絞り込みすぎるとインデックスコストが跳ね上がる点に注意してください。また、RAGで取得したチャンクをそのままPro系モデルへ渡す設計は、前述の「コンテキスト長のコストの崖」を誘発しやすいため、リランキングや要約による事前圧縮を検討してください。
           </div>
         </section>
 
         <section className={styles.contentSection} id="a2a-mcp">
-          <h2><span class="idx">07</span>エージェント間通信 ― A2AプロトコルとMCPの使い分け</h2>
+          <h2>
+            <span className="idx">07</span>エージェント間通信 ― A2AプロトコルとMCPの使い分け
+          </h2>
           <p className={styles.sectionLead}>
             実務で最も混同されやすいポイントです。A2Aはエージェント間の委任・協調、MCPはエージェントとツール/データの接続を扱います。
           </p>
@@ -626,27 +1039,34 @@ export default function Page() {
           <p>この2つは競合するものではなく、実システムでは両方を併用するのが一般的です。</p>
           <ul>
             <li>
-              <strong>A2A</strong>は2026年3月にv1.2がリリースされ、Linux Foundation傘下のAgentic AI Foundationによって管理される、ベンダー非依存のオープン標準です。150以上の組織が本番運用しているとされ、Microsoft・AWS・Salesforce・SAP・ServiceNowなど主要ベンダーも対応を進めています。
+              <strong>A2A</strong>は2026年3月にv1.2がリリースされ、Linux Foundation傘下のAgentic AI
+              Foundationによって管理される、ベンダー非依存のオープン標準です。150以上の組織が本番運用しているとされ、Microsoft・AWS・Salesforce・SAP・ServiceNowなど主要ベンダーも対応を進めています。
             </li>
             <li>
-              <strong>Agent Card</strong>は、エージェントの能力(skills)・認証方式・エンドポイントを記述するJSON文書で、物理的な位置(エンドポイント)を他のエージェントがこれを取得して発見・連携します。
+              <strong>Agent Card</strong>
+              は、エージェントの能力(skills)・認証方式・エンドポイントを記述するJSON文書で、他のエージェントがこれを取得して発見・連携します。
             </li>
             <li>
-              ADKでは<code>RemoteA2aAgent</code>を使ってリモートのA2Aエージェントを、あたかもローカルのサブエージェントであるかのように呼び出せます。
+              ADKでは<code>RemoteA2aAgent</code>
+              を使ってリモートのA2Aエージェントを、あたかもローカルのサブエージェントであるかのように呼び出せます。
             </li>
             <li>
-              <strong>Agent Gateway</strong>はMCP/A2A双方のトラフィックを仲介し、MCPリクエストについては属性を解析して「特定ツールへのアクセスのみ許可する」といったきめ細かい認可ポリシーを設定できます。
+              <strong>Agent Gateway</strong>
+              はMCP/A2A双方のトラフィックを仲介し、MCPリクエストについては属性を解析して「特定ツールへのアクセスのみ許可する」といったきめ細かい認可ポリシーを設定できます。
             </li>
           </ul>
 
           <div className={styles.callout}>
             <div className={styles.calloutTitle}>ベストプラクティス⑦</div>
-            本番投入前に、構築したエージェントを必ず<strong>Agent Registryに登録</strong>してください。開発段階では登録は任意ですが、登録されていないエージェントは他のエージェントメッシュから発見されず、組織横断での再利用や監査ができない「孤立したエージェント」のままになってしまいます。
+            本番投入前に、構築したエージェントを必ず<strong>Agent Registryに登録</strong>
+            してください。開発段階では登録は任意ですが、登録されていないエージェントは他のエージェントメッシュから発見されず、組織横断での再利用や監査ができない「孤立したエージェント」のままになってしまいます。
           </div>
         </section>
 
         <section className={styles.contentSection} id="security">
-          <h2><span class="idx">08</span>セキュリティとガバナンス</h2>
+          <h2>
+            <span className="idx">08</span>セキュリティとガバナンス
+          </h2>
           <p className={styles.sectionLead}>
             エージェントが自律的に行動する以上、「誰が」「何に」アクセスできるかを事前に設計することが不可欠です。
           </p>
@@ -680,7 +1100,9 @@ export default function Page() {
                 <tr>
                   <td>Agent Gateway</td>
                   <td>
-                    Client-to-Agent と Agent-to-Anywhere の2モードで動作し、mTLSハンドシェイクを自動処理しつつIAM・SGP・Model Armorへの委任認可を実施。ネットワーク層のオブザーバビリティテレメトリも出力
+                    Client-to-Agent と Agent-to-Anywhere
+                    の2モードで動作し、mTLSハンドシェイクを自動処理しつつIAM・SGP・Model
+                    Armorへの委任認可を実施。ネットワーク層のオブザーバビリティテレメトリも出力
                   </td>
                 </tr>
                 <tr>
@@ -692,7 +1114,8 @@ export default function Page() {
                 <tr>
                   <td>Semantic Governance Policies(SGP)</td>
                   <td>
-                    2026年7月時点プレビュー。ツール呼び出しをユーザー意図・組織ルールに照らして実行時に評価。Natural Language Constraints(NLC)により平易な英語でルールを宣言可能
+                    2026年7月時点プレビュー。ツール呼び出しをユーザー意図・組織ルールに照らして実行時に評価。Natural
+                    Language Constraints(NLC)により平易な英語でルールを宣言可能
                   </td>
                 </tr>
               </tbody>
@@ -701,12 +1124,16 @@ export default function Page() {
 
           <div className={`${styles.callout} ${styles.calloutDanger}`}>
             <div className={styles.calloutTitle}>ベストプラクティス⑧(最重要)</div>
-            複数の実務者が共通して指摘しているのは、「組織展開の前にガバナンスを整備しないこと」がエンタープライズのエージェント導入における最も高くつく失敗だという点です。Agent Identity・Agent Gateway・Model Armorの設定は、スケールしてから追加するものではなく、最初の1エージェントを作る段階から組み込むべき土台です。
+            複数の実務者が共通して指摘しているのは、「組織展開の前にガバナンスを整備しないこと」がエンタープライズのエージェント導入における最も高くつく失敗だという点です。Agent
+            Identity・Agent Gateway・Model
+            Armorの設定は、スケールしてから追加するものではなく、最初の1エージェントを作る段階から組み込むべき土台です。
           </div>
         </section>
 
         <section className={styles.contentSection} id="quality">
-          <h2><span class="idx">09</span>品質保証 ― Evaluation・Simulation・Observability</h2>
+          <h2>
+            <span className="idx">09</span>品質保証 ― Evaluation・Simulation・Observability
+          </h2>
           <p className={styles.sectionLead}>3段階のサイクルで品質を継続的に計測・改善します。</p>
 
           <div className={styles.diagramWrap}>
@@ -716,27 +1143,37 @@ export default function Page() {
 
           <ul>
             <li>
-              <strong>Agent Simulation</strong>: 人間らしい合成ユーザーと仮想化されたツールを使い、タスク成功率と安全性をスコアリング
+              <strong>Agent Simulation</strong>:
+              人間らしい合成ユーザーと仮想化されたツールを使い、タスク成功率と安全性をスコアリング
             </li>
             <li>
-              <strong>Agent Evaluation</strong>: マルチターンの自動評価者(autorater)が会話全体の論理を評価。「環境シミュレーション」機能でHTTP 503エラーやレイテンシスパイクを注入し、耐障害性を検証可能
+              <strong>Agent Evaluation</strong>:
+              マルチターンの自動評価者(autorater)が会話全体の論理を評価。「環境シミュレーション」機能でHTTP
+              503エラーやレイテンシスパイクを注入し、耐障害性を検証可能
             </li>
             <li>
-              <strong>Agent Observability</strong>: OpenTelemetry準拠でトレース・ログ・メトリクス(p50/p95/p99レイテンシ、トークン使用量、エラー率)を収集し、Unified Trace Viewerで可視化
+              <strong>Agent Observability</strong>:
+              OpenTelemetry準拠でトレース・ログ・メトリクス(p50/p95/p99レイテンシ、トークン使用量、エラー率)を収集し、Unified
+              Trace Viewerで可視化
             </li>
             <li>
-              <strong>Agent Optimizer</strong>: 実運用の失敗を自動でクラスタリングし、精度向上のためのシステム指示の改訂案を提示
+              <strong>Agent Optimizer</strong>:
+              実運用の失敗を自動でクラスタリングし、精度向上のためのシステム指示の改訂案を提示
             </li>
           </ul>
 
           <div className={styles.callout}>
             <div className={styles.calloutTitle}>ベストプラクティス⑨</div>
-            手動テストは初期プロトタイピングには有効ですが、スケールしません。数千人規模の従業員に展開する前に、ADK Evaluation Frameworkを使った決定論的なEvalSetを用意し、意味的等価性の判定・ハルシネーション検知・CIパイプラインからのテストスイート実行を組み込んでください。
+            手動テストは初期プロトタイピングには有効ですが、スケールしません。数千人規模の従業員に展開する前に、ADK
+            Evaluation
+            Frameworkを使った決定論的なEvalSetを用意し、意味的等価性の判定・ハルシネーション検知・CIパイプラインからのテストスイート実行を組み込んでください。
           </div>
         </section>
 
         <section className={styles.contentSection} id="migration">
-          <h2><span class="idx">10</span>移行時のチェックリスト(Vertex AIからの移行)</h2>
+          <h2>
+            <span className="idx">10</span>移行時のチェックリスト(Vertex AIからの移行)
+          </h2>
           <div className={styles.tableWrap}>
             <table>
               <thead>
@@ -754,7 +1191,9 @@ export default function Page() {
                 </tr>
                 <tr>
                   <td>コンソール表示</td>
-                  <td>「Vertex AI」表記は廃止済み。ブックマークやドキュメントのリンク先を更新推奨</td>
+                  <td>
+                    「Vertex AI」表記は廃止済み。ブックマークやドキュメントのリンク先を更新推奨
+                  </td>
                 </tr>
                 <tr>
                   <td>IAMロール名</td>
@@ -775,7 +1214,11 @@ export default function Page() {
                 <tr>
                   <td>名称変更表</td>
                   <td>
-                    個別機能名の新旧対応は公式の<Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/vertex-ai-name-changes">name changesページ</Ext>を参照
+                    個別機能名の新旧対応は公式の
+                    <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/vertex-ai-name-changes">
+                      name changesページ
+                    </Ext>
+                    を参照
                   </td>
                 </tr>
               </tbody>
@@ -784,7 +1227,9 @@ export default function Page() {
         </section>
 
         <section className={styles.contentSection} id="antipatterns">
-          <h2><span class="idx">11</span>アンチパターン早見表</h2>
+          <h2>
+            <span className="idx">11</span>アンチパターン早見表
+          </h2>
           <div className={styles.tableWrap}>
             <table>
               <thead>
@@ -821,7 +1266,9 @@ export default function Page() {
                   <td>タスク複雑度に応じてFlash-Lite/Flash/Proを使い分ける</td>
                 </tr>
                 <tr>
-                  <td><code>min_instances=1</code>のまま高トラフィックを受ける</td>
+                  <td>
+                    <code>min_instances=1</code>のまま高トラフィックを受ける
+                  </td>
                   <td>コールドスタートで数秒級の遅延が発生する</td>
                   <td>ベースライントラフィックに応じて調整する</td>
                 </tr>
@@ -841,15 +1288,22 @@ export default function Page() {
         </section>
 
         <section className={styles.contentSection} id="checklist">
-          <h2><span class="idx">12</span>まとめ ― 実装前の最終チェックリスト</h2>
+          <h2>
+            <span className="idx">12</span>まとめ ― 実装前の最終チェックリスト
+          </h2>
           <ul className={styles.checklist}>
             <li>単一の万能エージェントではなく、役割分担された複数エージェント構成を検討したか</li>
-            <li><code>output_key</code>と<code>description</code>を明確に命名したか</li>
+            <li>
+              <code>output_key</code>と<code>description</code>を明確に命名したか
+            </li>
             <li>タスクの複雑度に応じたモデル選定(Flash-Lite / Flash / Pro)を行ったか</li>
             <li>
-              <code>min_instances</code> / <code>container_concurrency</code>をトラフィックパターンに合わせて設定したか
+              <code>min_instances</code> / <code>container_concurrency</code>
+              をトラフィックパターンに合わせて設定したか
             </li>
-            <li>Memory Bankの<code>scope</code>設計とIAM Conditionsによるアクセス制御を行ったか</li>
+            <li>
+              Memory Bankの<code>scope</code>設計とIAM Conditionsによるアクセス制御を行ったか
+            </li>
             <li>MCP(ツール接続)とA2A(エージェント間委任)を正しく使い分けたか</li>
             <li>Agent Identity・Agent Gateway・Model Armorを最初から組み込んだか</li>
             <li>Agent Registryへの登録を行ったか</li>
@@ -859,9 +1313,12 @@ export default function Page() {
         </section>
 
         <section className={styles.contentSection} id="references">
-          <h2><span class="idx">13</span>参考文献・一次情報源</h2>
+          <h2>
+            <span className="idx">13</span>参考文献・一次情報源
+          </h2>
           <p className={styles.sectionLead}>
-            本ガイドの内容は、以下の公式ドキュメント・Google公式ブログ・Google Developer Experts等の技術記事を根拠としています(2026年7月17日時点で確認)。
+            本ガイドの内容は、以下の公式ドキュメント・Google公式ブログ・Google Developer
+            Experts等の技術記事を根拠としています(2026年7月17日時点で確認)。
           </p>
 
           <div className={styles.refGroup}>
@@ -982,7 +1439,9 @@ export default function Page() {
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">「Gemini Enterprise Agent Platform」発表ブログ(2026/4/22)</span>
+                <span className="ref-title">
+                  「Gemini Enterprise Agent Platform」発表ブログ(2026/4/22)
+                </span>
                 <Ext href="https://cloud.google.com/blog/products/ai-machine-learning/introducing-gemini-enterprise-agent-platform">
                   cloud.google.com/blog/products/ai-machine-learning/introducing-gemini-enterprise-agent-platform
                 </Ext>
@@ -1043,7 +1502,8 @@ export default function Page() {
             <ul className={styles.refList}>
               <li>
                 <span className="ref-title">
-                  Shubham Saboo (Google, Senior AI Product Manager)「Developer&apos;s guide to multi-agent patterns in ADK」Google Developers Blog(2025/12/16)
+                  Shubham Saboo (Google, Senior AI Product Manager)「Developer&apos;s guide to
+                  multi-agent patterns in ADK」Google Developers Blog(2025/12/16)
                 </span>
                 <Ext href="https://developers.googleblog.com/developers-guide-to-multi-agent-patterns-in-adk/">
                   developers.googleblog.com/developers-guide-to-multi-agent-patterns-in-adk
@@ -1051,7 +1511,8 @@ export default function Page() {
               </li>
               <li>
                 <span className="ref-title">
-                  「Agent Development Kit: Making it easy to build multi-agent applications」Google Developers Blog
+                  「Agent Development Kit: Making it easy to build multi-agent applications」Google
+                  Developers Blog
                 </span>
                 <Ext href="https://developers.googleblog.com/en/agent-development-kit-easy-to-build-multi-agent-applications/">
                   developers.googleblog.com/en/agent-development-kit-easy-to-build-multi-agent-applications
@@ -1067,7 +1528,8 @@ export default function Page() {
               </li>
               <li>
                 <span className="ref-title">
-                  Gabriel Preda (Google Developer Expert)「From Vertex AI to Gemini Enterprise Agent Platform」Medium(2026/5)
+                  Gabriel Preda (Google Developer Expert)「From Vertex AI to Gemini Enterprise Agent
+                  Platform」Medium(2026/5)
                 </span>
                 <Ext href="https://medium.com/google-developer-experts/from-vertex-ai-to-gemini-enterprise-agent-platform-57244e686b7a">
                   medium.com/google-developer-experts/from-vertex-ai-to-gemini-enterprise-agent-platform
@@ -1075,7 +1537,8 @@ export default function Page() {
               </li>
               <li>
                 <span className="ref-title">
-                  Romin Irani「Tutorial Series: Gemini Enterprise Agent Platform」Part 3・Part 5, Google Cloud Community
+                  Romin Irani「Tutorial Series: Gemini Enterprise Agent Platform」Part 3・Part 5,
+                  Google Cloud Community
                 </span>
                 <Ext href="https://medium.com/google-cloud/tutorial-series-gemini-enterprise-agent-platform-part-3-scaling-with-agent-runtime-memory-1fe9fe48d829">
                   medium.com/google-cloud/tutorial-series-gemini-enterprise-agent-platform-part-3-scaling-with-agent-runtime-memory-1fe9fe48d829
@@ -1089,7 +1552,8 @@ export default function Page() {
               </li>
               <li>
                 <span className="ref-title">
-                  Vishal Bulbule「Using Long term Memory in Agent (ADK): Vertex AI Memory bank」Google Cloud Community
+                  Vishal Bulbule「Using Long term Memory in Agent (ADK): Vertex AI Memory
+                  bank」Google Cloud Community
                 </span>
                 <Ext href="https://medium.com/google-cloud/using-long-term-memory-in-agent-adk-vertex-ai-memory-bank-2d1e979b6197">
                   medium.com/google-cloud/using-long-term-memory-in-agent-adk-vertex-ai-memory-bank-2d1e979b6197
@@ -1097,7 +1561,8 @@ export default function Page() {
               </li>
               <li>
                 <span className="ref-title">
-                  「Google Gemini Enterprise Agent Platform: Build and Deploy A2A Agents」DEV Community
+                  「Google Gemini Enterprise Agent Platform: Build and Deploy A2A Agents」DEV
+                  Community
                 </span>
                 <Ext href="https://dev.to/jangwook_kim_e31e7291ad98/google-gemini-enterprise-agent-platform-build-and-deploy-a2a-agents-11ck">
                   dev.to/jangwook_kim_e31e7291ad98/google-gemini-enterprise-agent-platform-build-and-deploy-a2a-agents-11ck
@@ -1113,7 +1578,8 @@ export default function Page() {
               </li>
               <li>
                 <span className="ref-title">
-                  AIPractitioner「Google ADK Explained: Building Multi-Agent Systems With Google&apos;s Agent Development Kit」Substack
+                  AIPractitioner「Google ADK Explained: Building Multi-Agent Systems With
+                  Google&apos;s Agent Development Kit」Substack
                 </span>
                 <Ext href="https://aipractitioner.substack.com/p/google-adk-explained-building-multi">
                   aipractitioner.substack.com/p/google-adk-explained-building-multi
@@ -1140,7 +1606,9 @@ export default function Page() {
 
           <div className={`${styles.callout} ${styles.calloutWarn}`} style={{ marginTop: "28px" }}>
             <div className={styles.calloutTitle}>注記</div>
-            Gemini Enterprise Agent Platformは発表から日が浅く(2026年4月22日発表)、Semantic Governance Policiesをはじめプレビュー段階の機能や価格体系は今後変更される可能性があります。実装前に必ず上記の公式ドキュメントで最新のステータスを確認してください。
+            Gemini Enterprise Agent Platformは発表から日が浅く(2026年4月22日発表)、Semantic
+            Governance
+            Policiesをはじめプレビュー段階の機能や価格体系は今後変更される可能性があります。実装前に必ず上記の公式ドキュメントで最新のステータスを確認してください。
           </div>
         </section>
 

@@ -1,8 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
-import PageComponent from "./page";
 import { findBySlug } from "@/lib/page-registry";
+import PageComponent from "./page";
 
 const Page = PageComponent as unknown as () => ReactElement;
 
@@ -15,9 +15,15 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
 
 // Stub IntersectionObserver
 class IntersectionObserverStub {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+  observe() {
+    // stub
+  }
+  unobserve() {
+    // stub
+  }
+  disconnect() {
+    // stub
+  }
 }
 global.IntersectionObserver = IntersectionObserverStub as unknown as typeof IntersectionObserver;
 
@@ -64,7 +70,7 @@ describe("Gemini Enterprise Agent Platform (Intermediate) Page Contract", () => 
   it("should have correct language class on code elements", () => {
     const { container } = render(<Page />);
     const codeBlocks = container.querySelectorAll("pre code");
-    
+
     // もしコードブロックがあれば、クラス名に language- が含まれていること
     if (codeBlocks.length > 0) {
       for (const code of Array.from(codeBlocks)) {
