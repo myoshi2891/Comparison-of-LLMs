@@ -443,7 +443,7 @@ const entries: PageEntry[] = [
     provider: "google",
     topics: ["google", "agent", "platform"],
     summary:
-      "Google Cloud の Gemini Enterprise Agent Platform におけるエージェント構築の基本概念から、マルチエージェント設計、セキュリティ、本番運用までの主要ステップを網羅的に解説した実践ガイド。",
+      "Google Cloud の Gemini Enterprise Agent Platform の全体像を理解し、エージェント構築からマルチエージェント設計、セキュリティ、本番運用までを網羅した初学者向け実践ガイド。",
     addedAt: "2026-07-18",
     lastReviewed: "2026-07-19",
   },
