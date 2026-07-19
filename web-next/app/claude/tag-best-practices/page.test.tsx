@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { expect, test, vi } from "vitest";
 import { findBySlug } from "../../../lib/page-registry";
-import Page from "./page";
+import Page, { metadata } from "./page";
 
 // Stub IntersectionObserver for testing in jsdom environment
 global.IntersectionObserver = class {
@@ -64,4 +64,11 @@ test("Claude Tag Best Practices page contract tests", () => {
   expect(registryEntry?.title).toBe("Tag Best Practices");
   expect(registryEntry?.group).toBe("Providers");
   expect(registryEntry?.category).toBe("Claude");
+
+  // 6. メタデータの検証
+  expect(metadata).toBeDefined();
+  expect(metadata.title).toBe("Claude Tag 活用ガイド ― 中級者〜上級者向けベストプラクティス");
+  expect(metadata.description).toBe(
+    "Slack上でチームがClaudeをタグ付けして仕事を委任できる新機能「Claude Tag」について、公式ドキュメントやコミュニティ発信をもとにまとめた中級者〜上級者向け実践ガイド。",
+  );
 });
