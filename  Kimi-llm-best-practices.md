@@ -64,11 +64,11 @@ Moonshot自身の発表に加え、独立系ベンチマーク機関Artificial A
 
 - Artificial Analysisの長期知識労働評価(private long-horizon knowledge work evaluation)でElo 1547を記録し、Kimi K2.6から+732ポイントの大幅向上。Claude Fable 5に次ぐ第2位。
 - Arena.aiの「Frontend Code」アリーナでは首位(Claude Fable 5を上回る)。
-- GDPval-AA v2ベンチマークでは1687点で、Claude Fable 5 Max・GPT-5.6 Sol Maxに次ぐ位置、Claude Opus 4.8 Max(1600点)を上回る。
+- GDPval-AA v2ベンチマークでは1668点で、Claude Fable 5 Max・GPT-5.6 Sol Maxに次ぐ位置、Claude Opus 4.8 Max(1600点)を上回る。
 - タスクあたりのコストは$0.94で、GPT-5.6 Sol($1.04)と近く、Claude Opus 4.8($1.80)の約半分。
 - 一方で、K2.6と比較して出力トークン数(思考トークン込み)は21%減少しており、「同程度の性能をより少ないトークンで達成」という改善も見られます。
 
-(出典: [Kimi K3, and what we can still learn from the pelican benchmark - Simon Willison](https://simonwillison.net/2026/Jul/16/kimi-k3/), [Moonshot AI Releases Kimi K3 | MLQ News](https://mlq.ai/news/moonshot-ai-releases-kimi-k3-a-28-trillion-parameter-open-weight-model-rivaling-top-us-systems/))
+(出典: [Kimi K3, and what we can still learn from the pelican benchmark - Simon Willison](https://simonwillison.net/2026/Jul/16/kimi-k3/), [Moonshot AI Releases Kimi K3 | MLQ News](https://mlq.ai/news/moonshot-ai-releases-kimi-k3-a-28-trillion-parameter-open-weight-model-rivaling-top-us-systems/), [Artificial Analysis](https://artificialanalysis.ai/))
 
 > **注意**:上記のベンチマーク数値の多くはMoonshot自身の発表またはArtificial Analysisなど特定機関の私的評価にもとづくものです。7月17日時点では、SWE-Bench・Terminal-Bench・HLEなど従来からの独立系公開ベンチマークでの検証結果はまだ出揃っていません。実運用への採用判断は、自分のタスクでの実地検証を必ず行ってください。
 
@@ -327,6 +327,8 @@ flowchart TB
 ```
 
 ```python
+import json
+
 tools = [{
     "type": "function",
     "function": {
@@ -426,7 +428,7 @@ K3では公式ツールが **Formula** という仕組みを通じて提供さ�
 - ツールは**単機能・小さく**設計する(検索・取得・更新など役割を分離)。
 - ツールの出力フォーマットは**一貫したJSON**にする。
 - ツール実行には**タイムアウトとリトライ**を必ず設定する。
-- すべてのツール呼び出しを**ログに記録**し、デバッグと監査に備える。
+- すべてのツール呼び出しについて、監査に必要な最小限のメタデータのみをログに記録し、生のツール引数や実行結果は保存しない（機密フィールドのマスク、保持期間の定義、アクセス制御の実施を徹底する）。
 - ツール数が多いエージェントは、7.2の動的ロードパターンでコンテキストとキャッシュ効率を両立させる。
 
 (出典: [Kimi API (Moonshot AI) - Complete Developer Guide](https://agentsapis.com/kimi-api/))
@@ -577,7 +579,7 @@ Simon Willison氏は「この価格設定はAnthropicのClaude Sonnetシリー�
 | 項目 | 目安 | 備考 |
 |---|---|---|
 | Batch API | リアルタイム料金の約60%(≒40%割引) | 即時応答が不要な非同期処理向け |
-| `$web_search` 公式ツール | 1呼び出しあたり約$0.004 | K3では「近い将来の本番利用は非推奨」と公式が明記 |
+| `$web_search` 公式ツール | 1呼び出しあたり約$0.005（公式料金確認日: 2026年7月19日） | K3では「近い将来の本番利用は非推奨」と公式が明記 |
 | Kimiメンバーシップ(コンシューマー向け) | 無料プランのほか月額$19〜$199の複数プラン | API利用とは完全に別の請求(混同しないこと) |
 
 (出典: [Kimi K3 Pricing: API Cost and Whether It's Worth It](https://aireiter.com/blog/kimi-k3-pricing), [Kimi Pricing 2026: Plans, API Costs & Free Tier](https://felloai.com/kimi-pricing/))
