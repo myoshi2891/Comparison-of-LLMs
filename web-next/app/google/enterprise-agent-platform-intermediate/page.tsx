@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import Ext from "@/components/docs/Ext";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import TocObserver from "@/components/docs/TocObserver";
 import { findBySlug } from "@/lib/page-registry";
 import styles from "./page.module.css";
-import TocObserver from "@/components/docs/TocObserver";
 
 const pageEntry = findBySlug("/google/enterprise-agent-platform-intermediate");
 
 export const metadata: Metadata = {
-  title: pageEntry ? `${pageEntry.title.replace(" (中級)", "")} 実践ベストプラクティスガイド | LLM コスト計算機` : "Gemini Enterprise Agent Platform 実践ベストプラクティスガイド | LLM コスト計算機",
+  title: `${pageEntry?.title?.replace(" (中級)", "") ?? "Gemini Enterprise Agent Platform"} 実践ベストプラクティスガイド | LLM コスト計算機`,
   description:
-    pageEntry?.summary ??
+    pageEntry?.summary ||
     "中級〜上級エンジニア向け。ADK・Agent Runtime・Memory Bank・A2A/MCP・ガバナンス機能を実務レベルで使いこなすための設計指針を、ステップバイステップで解説します。",
 };
 

@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import Ext from "@/components/docs/Ext";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import TocObserver from "@/components/docs/TocObserver";
 import { findBySlug } from "@/lib/page-registry";
 import styles from "./page.module.css";
-import TocObserver from "@/components/docs/TocObserver";
 
 const pageEntry = findBySlug("/claude/tag-best-practices");
 
 export const metadata: Metadata = {
-  title: pageEntry ? `${pageEntry.title} ― 中級者〜上級者向けベストプラクティス` : "Claude Tag 活用ガイド ― 中級者〜上級者向けベストプラクティス",
+  title: `${pageEntry?.title ?? "Claude Tag 活用ガイド"} ― 中級者〜上級者向けベストプラクティス`,
   description:
-    pageEntry?.summary ??
+    pageEntry?.summary ||
     "Slack上でチームがClaudeをタグ付けして仕事を委任できる新機能「Claude Tag」について、公式ドキュメントやコミュニティ発信をもとにまとめた中級者〜上級者向け実践ガイド。",
 };
 
@@ -210,7 +210,8 @@ export default function Page() {
               </p>
               <p>
                 Anthropicはこれを「Claude
-                Codeの延長線上にある進化」と位置づけており、社内では製品チームのコードの65%がClaude Tagの内部版によって生成されているとされています。
+                Codeの延長線上にある進化」と位置づけており、社内では製品チームのコードの65%がClaude
+                Tagの内部版によって生成されているとされています。
               </p>
               <blockquote className={styles.blockquote}>
                 「LLMのUI/UXにおける3度目の大きな再設計」
@@ -746,7 +747,8 @@ export default function Page() {
                 </li>
                 <li>
                   <strong>サービスアカウントによる分離</strong>:
-                  チャンネル内でのClaudeの行動は、タグ付けした個人のアカウントではなく、管理者が発行した専用のサービスアカウント(Slackアプリ・GitHub App・各種サービスアカウント)で行われる。これにより、個人の認証情報が意図せずチャンネルに流出することを防いでいる。
+                  チャンネル内でのClaudeの行動は、タグ付けした個人のアカウントではなく、管理者が発行した専用のサービスアカウント(Slackアプリ・GitHub
+                  App・各種サービスアカウント)で行われる。これにより、個人の認証情報が意図せずチャンネルに流出することを防いでいる。
                 </li>
                 <li>
                   <strong>監査ログ</strong>: 管理画面の「Organization settings &gt; Claude Tag &gt;

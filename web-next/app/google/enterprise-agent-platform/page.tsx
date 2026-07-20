@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import Ext from "@/components/docs/Ext";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import TocObserver from "@/components/docs/TocObserver";
 import { findBySlug } from "@/lib/page-registry";
 import styles from "./page.module.css";
-import TocObserver from "@/components/docs/TocObserver";
 
 const pageEntry = findBySlug("/google/enterprise-agent-platform");
 
 export const metadata: Metadata = {
-  title: pageEntry ? `${pageEntry.title} 完全ガイド | 初学者向けステップバイステップ・ベストプラクティス | LLM コスト計算機` : "Gemini Enterprise Agent Platform 完全ガイド | 初学者向けステップバイステップ・ベストプラクティス | LLM コスト計算機",
+  title: `${pageEntry?.title ?? "Gemini Enterprise Agent Platform"} 完全ガイド | 初学者向けステップバイステップ・ベストプラクティス | LLM コスト計算機`,
   description:
-    pageEntry?.summary ??
+    pageEntry?.summary ||
     "Google Cloud の Gemini Enterprise Agent Platform を初めて触るエンジニア向けに、概念の理解から最初のエージェント構築、マルチエージェント設計、セキュリティ・ガバナンス、そして本番運用までをステップバイステップで解説します。",
 };
 
@@ -161,7 +161,7 @@ const DIAGRAMS = {
     AG-->>GW: レスポンス
     GW->>MA: レスポンス内容を検査
     MA-->>GW: 安全性判定
-    GW-->>U: 最終レスポンス`
+    GW-->>U: 最終レスポンス`,
 };
 
 export default function Page() {
@@ -173,34 +173,74 @@ export default function Page() {
         <div className={styles.sidebarSub}>初学者向け完全ガイド</div>
 
         <div className={styles.navGroupTitle}>基礎編</div>
-        <a className={styles.navLink} href="#overview"><span className={styles.navDot}></span>1. とは何か</a>
-        <a className={styles.navLink} href="#architecture"><span className={styles.navDot}></span>2. 4つの柱</a>
-        <a className={styles.navLink} href="#components"><span className={styles.navDot}></span>3. 主要コンポーネント</a>
+        <a className={styles.navLink} href="#overview">
+          <span className={styles.navDot}></span>1. とは何か
+        </a>
+        <a className={styles.navLink} href="#architecture">
+          <span className={styles.navDot}></span>2. 4つの柱
+        </a>
+        <a className={styles.navLink} href="#components">
+          <span className={styles.navDot}></span>3. 主要コンポーネント
+        </a>
 
         <div className={styles.navGroupTitle}>実践編：構築</div>
-        <a className={styles.navLink} href="#step0"><span className={styles.navDot}></span>Step 0. 事前準備</a>
-        <a className={styles.navLink} href="#step1"><span className={styles.navDot}></span>Step 1. 開発パスの選択</a>
-        <a className={styles.navLink} href="#step2"><span className={styles.navDot}></span>Step 2. Agent Studio</a>
-        <a className={styles.navLink} href="#step3"><span className={styles.navDot}></span>Step 3. ADK</a>
-        <a className={styles.navLink} href="#step4"><span className={styles.navDot}></span>Step 4. ツール追加</a>
-        <a className={styles.navLink} href="#step5"><span className={styles.navDot}></span>Step 5. ローカルテスト</a>
+        <a className={styles.navLink} href="#step0">
+          <span className={styles.navDot}></span>Step 0. 事前準備
+        </a>
+        <a className={styles.navLink} href="#step1">
+          <span className={styles.navDot}></span>Step 1. 開発パスの選択
+        </a>
+        <a className={styles.navLink} href="#step2">
+          <span className={styles.navDot}></span>Step 2. Agent Studio
+        </a>
+        <a className={styles.navLink} href="#step3">
+          <span className={styles.navDot}></span>Step 3. ADK
+        </a>
+        <a className={styles.navLink} href="#step4">
+          <span className={styles.navDot}></span>Step 4. ツール追加
+        </a>
+        <a className={styles.navLink} href="#step5">
+          <span className={styles.navDot}></span>Step 5. ローカルテスト
+        </a>
 
         <div className={styles.navGroupTitle}>応用編：拡張</div>
-        <a className={styles.navLink} href="#step6"><span className={styles.navDot}></span>Step 6. マルチエージェント</a>
-        <a className={styles.navLink} href="#step7"><span className={styles.navDot}></span>Step 7. A2Aプロトコル</a>
-        <a className={styles.navLink} href="#step8"><span className={styles.navDot}></span>Step 8. 評価</a>
-        <a className={styles.navLink} href="#step9"><span className={styles.navDot}></span>Step 9. デプロイ</a>
+        <a className={styles.navLink} href="#step6">
+          <span className={styles.navDot}></span>Step 6. マルチエージェント
+        </a>
+        <a className={styles.navLink} href="#step7">
+          <span className={styles.navDot}></span>Step 7. A2Aプロトコル
+        </a>
+        <a className={styles.navLink} href="#step8">
+          <span className={styles.navDot}></span>Step 8. 評価
+        </a>
+        <a className={styles.navLink} href="#step9">
+          <span className={styles.navDot}></span>Step 9. デプロイ
+        </a>
 
         <div className={styles.navGroupTitle}>運用編：統制と最適化</div>
-        <a className={styles.navLink} href="#step10"><span className={styles.navDot}></span>Step 10. セキュリティ</a>
-        <a className={styles.navLink} href="#step11"><span className={styles.navDot}></span>Step 11. 可観測性</a>
-        <a className={styles.navLink} href="#step12"><span className={styles.navDot}></span>Step 12. コスト最適化</a>
+        <a className={styles.navLink} href="#step10">
+          <span className={styles.navDot}></span>Step 10. セキュリティ
+        </a>
+        <a className={styles.navLink} href="#step11">
+          <span className={styles.navDot}></span>Step 11. 可観測性
+        </a>
+        <a className={styles.navLink} href="#step12">
+          <span className={styles.navDot}></span>Step 12. コスト最適化
+        </a>
 
         <div className={styles.navGroupTitle}>付録</div>
-        <a className={styles.navLink} href="#checklist"><span className={styles.navDot}></span>チェックリスト</a>
-        <a className={styles.navLink} href="#antipatterns"><span className={styles.navDot}></span>アンチパターン</a>
-        <a className={styles.navLink} href="#trends"><span className={styles.navDot}></span>最新動向</a>
-        <a className={styles.navLink} href="#references"><span className={styles.navDot}></span>参考文献・出典</a>
+        <a className={styles.navLink} href="#checklist">
+          <span className={styles.navDot}></span>チェックリスト
+        </a>
+        <a className={styles.navLink} href="#antipatterns">
+          <span className={styles.navDot}></span>アンチパターン
+        </a>
+        <a className={styles.navLink} href="#trends">
+          <span className={styles.navDot}></span>最新動向
+        </a>
+        <a className={styles.navLink} href="#references">
+          <span className={styles.navDot}></span>参考文献・出典
+        </a>
       </nav>
 
       <main className={styles.mainContent}>
@@ -266,11 +306,15 @@ export default function Page() {
 
           <div className={styles.diagramFrame}>
             <MermaidDiagram chart={DIAGRAMS.pillars} />
-            <div className={styles.diagramCaption}>図2: Build → Scale → Govern → Optimize の循環ループ</div>
+            <div className={styles.diagramCaption}>
+              図2: Build → Scale → Govern → Optimize の循環ループ
+            </div>
           </div>
 
           <p>
-            初学者にとって重要なのは、この4つが<strong>一直線のパイプラインではなく循環するループ</strong>であるという点です。評価（Optimize）で得た知見が、再びエージェントの設計（Build）にフィードバックされることで、エージェントの品質が継続的に改善されていきます。
+            初学者にとって重要なのは、この4つが
+            <strong>一直線のパイプラインではなく循環するループ</strong>
+            であるという点です。評価（Optimize）で得た知見が、再びエージェントの設計（Build）にフィードバックされることで、エージェントの品質が継続的に改善されていきます。
           </p>
         </section>
 
@@ -405,7 +449,8 @@ export default function Page() {
               $300）を利用できる場合があります。
             </li>
             <li>
-              <strong>必要な API の有効化</strong>：以下のように <code>gcloud</code> コマンドで有効化します。
+              <strong>必要な API の有効化</strong>：以下のように <code>gcloud</code>{" "}
+              コマンドで有効化します。
             </li>
           </ol>
 
@@ -413,11 +458,14 @@ export default function Page() {
             <div className={styles.codeBlockLabel}>bash</div>
             <pre className={styles.codeBody}>
               <code>
-                <div className={styles.codeLine}><span className={styles.ck}>gcloud</span><span className={styles.cv}> services enable</span> \</div>
-                <div className={styles.codeLine}>  aiplatform.googleapis.com \</div>
-                <div className={styles.codeLine}>  discoveryengine.googleapis.com \</div>
-                <div className={styles.codeLine}>  cloudbuild.googleapis.com \</div>
-                <div className={styles.codeLine}>  run.googleapis.com</div>
+                <div className={styles.codeLine}>
+                  <span className={styles.ck}>gcloud</span>
+                  <span className={styles.cv}> services enable</span> \
+                </div>
+                <div className={styles.codeLine}> aiplatform.googleapis.com \</div>
+                <div className={styles.codeLine}> discoveryengine.googleapis.com \</div>
+                <div className={styles.codeLine}> cloudbuild.googleapis.com \</div>
+                <div className={styles.codeLine}> run.googleapis.com</div>
               </code>
             </pre>
           </div>
@@ -488,8 +536,11 @@ export default function Page() {
 
           <p className={styles.note}>
             初学者への推奨は、まず
-            <strong>Agent Studio で最小限のプロトタイプを作り、要件が複雑化したら ADK
-            にエクスポートして本格開発に移行する</strong>という順路です。
+            <strong>
+              Agent Studio で最小限のプロトタイプを作り、要件が複雑化したら ADK
+              にエクスポートして本格開発に移行する
+            </strong>
+            という順路です。
           </p>
         </section>
 
@@ -500,20 +551,31 @@ export default function Page() {
 
           <h3>手順</h3>
           <ol>
-            <li>Google Cloud コンソールの <strong>Agents</strong> ページを開く</li>
-            <li><strong>Create agent</strong> をクリックし、Agent Studio のキャンバスを開く</li>
+            <li>
+              Google Cloud コンソールの <strong>Agents</strong> ページを開く
+            </li>
+            <li>
+              <strong>Create agent</strong> をクリックし、Agent Studio のキャンバスを開く
+            </li>
             <li>
               <strong>Flow タブ</strong>で、メインエージェントとサブエージェントを視覚的に配置する
             </li>
             <li>
               各エージェントをクリックし、<strong>Details パネル</strong>で以下を設定する
               <ul>
-                <li><strong>Name</strong>：識別しやすい名前</li>
-                <li><strong>Description</strong>：エージェントの目的の要約</li>
                 <li>
-                  <strong>Instructions</strong>：エージェントの振る舞いを導く指示（システムプロンプトに相当）
+                  <strong>Name</strong>：識別しやすい名前
                 </li>
-                <li><strong>Model</strong>：Gemini など、動かすモデルを選択</li>
+                <li>
+                  <strong>Description</strong>：エージェントの目的の要約
+                </li>
+                <li>
+                  <strong>Instructions</strong>
+                  ：エージェントの振る舞いを導く指示（システムプロンプトに相当）
+                </li>
+                <li>
+                  <strong>Model</strong>：Gemini など、動かすモデルを選択
+                </li>
                 <li>
                   <strong>Tools</strong>：エージェントがタスクを遂行するために使うツールを追加
                 </li>
@@ -605,19 +667,53 @@ export default function Page() {
             <div className={styles.codeBlockLabel}>my_search_agent/agent.py</div>
             <pre className={styles.codeBody}>
               <code>
-                <div className={styles.codeLine}><span className={styles.ck}>from</span> google.adk.agents <span className={styles.ck}>import</span> Agent</div>
-                <div className={styles.codeLine}><span className={styles.ck}>from</span> google.adk.tools <span className={styles.ck}>import</span> google_search</div>
+                <div className={styles.codeLine}>
+                  <span className={styles.ck}>from</span> google.adk.agents{" "}
+                  <span className={styles.ck}>import</span> Agent
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.ck}>from</span> google.adk.tools{" "}
+                  <span className={styles.ck}>import</span> google_search
+                </div>
                 <div className={styles.codeLine}></div>
                 <div className={styles.codeLine}>root_agent = Agent(</div>
-                <div className={styles.codeLine}>    name=<span className={styles.cs}>"my_search_agent"</span>,</div>
-                <div className={styles.codeLine}>    model=<span className={styles.cs}>"gemini-2.5-flash"</span>,</div>
-                <div className={styles.codeLine}>    description=<span className={styles.cs}>"ウェブ検索を使ってユーザーの質問に答えるエージェント"</span>,</div>
-                <div className={styles.codeLine}>    instruction=(</div>
-                <div className={styles.codeLine}>        <span className={styles.cs}>"ユーザーの質問に対して、必要であれば google_search ツールを使い、"</span></div>
-                <div className={styles.codeLine}>        <span className={styles.cs}>"根拠を明示した簡潔な日本語で回答してください。"</span></div>
-                <div className={styles.codeLine}>        <span className={styles.cs}>"分からない場合は推測せず、その旨を伝えてください。"</span></div>
-                <div className={styles.codeLine}>    ),</div>
-                <div className={styles.codeLine}>    tools=[google_search],</div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  name=<span className={styles.cs}>"my_search_agent"</span>,
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  model=<span className={styles.cs}>"gemini-2.5-flash"</span>,
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  description=
+                  <span className={styles.cs}>
+                    "ウェブ検索を使ってユーザーの質問に答えるエージェント"
+                  </span>
+                  ,
+                </div>
+                <div className={styles.codeLine}> instruction=(</div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span className={styles.cs}>
+                    "ユーザーの質問に対して、必要であれば google_search ツールを使い、"
+                  </span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span className={styles.cs}>
+                    "根拠を明示した簡潔な日本語で回答してください。"
+                  </span>
+                </div>
+                <div className={styles.codeLine}>
+                  {" "}
+                  <span className={styles.cs}>
+                    "分からない場合は推測せず、その旨を伝えてください。"
+                  </span>
+                </div>
+                <div className={styles.codeLine}> ),</div>
+                <div className={styles.codeLine}> tools=[google_search],</div>
                 <div className={styles.codeLine}>)</div>
               </code>
             </pre>
@@ -665,7 +761,8 @@ export default function Page() {
               関数などとして自作するツール。入出力を明確な型で定義する
             </li>
             <li>
-              <strong>MCP (Model Context Protocol) 経由のツール</strong>：外部システム（データベース、SaaS、社内API）に接続するための標準プロトコル
+              <strong>MCP (Model Context Protocol) 経由のツール</strong>
+              ：外部システム（データベース、SaaS、社内API）に接続するための標準プロトコル
             </li>
           </ol>
 
@@ -700,7 +797,9 @@ export default function Page() {
             <div className={styles.codeBlockLabel}>bash</div>
             <pre className={styles.codeBody}>
               <code>
-                <div className={styles.codeLine}><span className={styles.cc}># プロジェクトのルートディレクトリで実行</span></div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cc}># プロジェクトのルートディレクトリで実行</span>
+                </div>
                 <div className={styles.codeLine}>adk web</div>
               </code>
             </pre>
@@ -802,9 +901,9 @@ export default function Page() {
           <h3>ベストプラクティス</h3>
           <ul>
             <li>
-              Workflow
-              Agent（Sequential/Parallel/Loop）は<strong>決定的</strong>な制御が必要な場面で使い、LLM
-              駆動の動的委譲は<strong>柔軟な判断</strong>が必要な場面で使い分ける
+              Workflow Agent（Sequential/Parallel/Loop）は<strong>決定的</strong>
+              な制御が必要な場面で使い、LLM 駆動の動的委譲は<strong>柔軟な判断</strong>
+              が必要な場面で使い分ける
             </li>
             <li>
               すべてのサブエージェントは同じ <code>InvocationContext</code> を共有できるため、
@@ -827,13 +926,16 @@ export default function Page() {
             形式のメッセージで連携できるようにするものです。
           </p>
           <p>
-            <strong>MCP（Model Context Protocol）</strong>が「エージェント対ツール」の垂直統合を担うのに対し、<strong>A2A</strong>
+            <strong>MCP（Model Context Protocol）</strong>
+            が「エージェント対ツール」の垂直統合を担うのに対し、<strong>A2A</strong>
             は「エージェント対エージェント」の水平的な連携を担います。両者は競合するものではなく、併用するのがベストプラクティスとされています。
           </p>
 
           <div className={styles.diagramFrame}>
             <MermaidDiagram chart={DIAGRAMS.a2aProtocol} />
-            <div className={styles.diagramCaption}>図11: A2A プロトコルによるクロスフレームワーク連携</div>
+            <div className={styles.diagramCaption}>
+              図11: A2A プロトコルによるクロスフレームワーク連携
+            </div>
           </div>
 
           <p>
@@ -845,8 +947,8 @@ export default function Page() {
           <h3>ベストプラクティス</h3>
           <ul>
             <li>
-              エージェント間のハンドオフは、API
-              契約と同様に<strong>明示的・構造化・バージョン管理</strong>された形で設計する
+              エージェント間のハンドオフは、API 契約と同様に
+              <strong>明示的・構造化・バージョン管理</strong>された形で設計する
             </li>
             <li>
               組織をまたぐ連携では、A2A のセキュリティカード署名機能を活用し、なりすましを防止する
@@ -969,15 +1071,24 @@ export default function Page() {
             <div className={styles.codeBlockLabel}>bash</div>
             <pre className={styles.codeBody}>
               <code>
-                <div className={styles.codeLine}><span className={styles.cc}># ReAct/RAG/マルチエージェントなどのテンプレートから選択して新規プロジェクトを作成</span></div>
-                <div className={styles.codeLine}>uvx agent-starter-pack create my-agent-project -a adk@rag</div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cc}>
+                    #
+                    ReAct/RAG/マルチエージェントなどのテンプレートから選択して新規プロジェクトを作成
+                  </span>
+                </div>
+                <div className={styles.codeLine}>
+                  uvx agent-starter-pack create my-agent-project -a adk@rag
+                </div>
               </code>
             </pre>
           </div>
 
           <div className={styles.diagramFrame}>
             <MermaidDiagram chart={DIAGRAMS.cicdFlow} />
-            <div className={styles.diagramCaption}>図13: Agent Starter Pack による CI/CD デプロイフロー</div>
+            <div className={styles.diagramCaption}>
+              図13: Agent Starter Pack による CI/CD デプロイフロー
+            </div>
           </div>
 
           <h3>ベストプラクティス</h3>
@@ -1072,7 +1183,8 @@ export default function Page() {
                 <tr>
                   <td>ツールのフィルタ設計</td>
                   <td>
-                    ユーザーが指定した条件をエージェントが直接クエリに埋め込める設計を避け、専用の安全な関数（例：<code>lookup_active_order</code>）を用意する
+                    ユーザーが指定した条件をエージェントが直接クエリに埋め込める設計を避け、専用の安全な関数（例：
+                    <code>lookup_active_order</code>）を用意する
                   </td>
                 </tr>
                 <tr>
@@ -1300,7 +1412,8 @@ export default function Page() {
             </li>
           </ul>
           <div className={styles.callout + " " + styles.warning}>
-            <strong>注意：</strong>これらは変化の速い領域のため、実装前には必ず公式ドキュメントで最新状況を確認してください。
+            <strong>注意：</strong>
+            これらは変化の速い領域のため、実装前には必ず公式ドキュメントで最新状況を確認してください。
           </div>
         </section>
 
@@ -1310,157 +1423,191 @@ export default function Page() {
           <h3>公式ドキュメント・公式ブログ</h3>
           <ul className={styles.refList}>
             <li>
-              <span className={styles.refTitle}>Gemini Enterprise Agent Platform 製品ページ</span><br />
+              <span className={styles.refTitle}>Gemini Enterprise Agent Platform 製品ページ</span>
+              <br />
               <Ext href="https://cloud.google.com/products/gemini-enterprise-agent-platform">
                 https://cloud.google.com/products/gemini-enterprise-agent-platform
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>プラットフォーム概要ドキュメント</span><br />
+              <span className={styles.refTitle}>プラットフォーム概要ドキュメント</span>
+              <br />
               <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/overview">
                 https://docs.cloud.google.com/gemini-enterprise-agent-platform/overview
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>発表ブログ「The new Gemini Enterprise」</span><br />
+              <span className={styles.refTitle}>発表ブログ「The new Gemini Enterprise」</span>
+              <br />
               <Ext href="https://cloud.google.com/blog/products/ai-machine-learning/the-new-gemini-enterprise-one-platform-for-agent-development">
                 https://cloud.google.com/blog/products/ai-machine-learning/the-new-gemini-enterprise-one-platform-for-agent-development
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>発表ブログ「Introducing Gemini Enterprise Agent Platform」</span><br />
+              <span className={styles.refTitle}>
+                発表ブログ「Introducing Gemini Enterprise Agent Platform」
+              </span>
+              <br />
               <Ext href="https://cloud.google.com/blog/products/ai-machine-learning/introducing-gemini-enterprise-agent-platform">
                 https://cloud.google.com/blog/products/ai-machine-learning/introducing-gemini-enterprise-agent-platform
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>Agents 概要ドキュメント</span><br />
+              <span className={styles.refTitle}>Agents 概要ドキュメント</span>
+              <br />
               <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/agents">
                 https://docs.cloud.google.com/gemini-enterprise-agent-platform/agents
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>Build ドキュメント</span><br />
+              <span className={styles.refTitle}>Build ドキュメント</span>
+              <br />
               <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build">
                 https://docs.cloud.google.com/gemini-enterprise-agent-platform/build
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>ADK ドキュメント</span><br />
+              <span className={styles.refTitle}>ADK ドキュメント</span>
+              <br />
               <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/adk">
                 https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/adk
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>ADK Google Cloud連携ガイド</span><br />
+              <span className={styles.refTitle}>ADK Google Cloud連携ガイド</span>
+              <br />
               <Ext href="https://adk.dev/get-started/google-cloud/">
                 https://adk.dev/get-started/google-cloud/
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>ADKビルド用コードラボ</span><br />
+              <span className={styles.refTitle}>ADKビルド用コードラボ</span>
+              <br />
               <Ext href="https://codelabs.developers.google.com/build-ai-agent-google-adk">
                 https://codelabs.developers.google.com/build-ai-agent-google-adk
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>Agent Gateway 概要</span><br />
+              <span className={styles.refTitle}>Agent Gateway 概要</span>
+              <br />
               <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/govern/gateways/agent-gateway-overview">
                 https://docs.cloud.google.com/gemini-enterprise-agent-platform/govern/gateways/agent-gateway-overview
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>Agent Gateway セットアップガイド</span><br />
+              <span className={styles.refTitle}>Agent Gateway セットアップガイド</span>
+              <br />
               <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/govern/gateways/set-up-agent-gateway">
                 https://docs.cloud.google.com/gemini-enterprise-agent-platform/govern/gateways/set-up-agent-gateway
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>Model Armor と Agent Gateway の統合</span><br />
+              <span className={styles.refTitle}>Model Armor と Agent Gateway の統合</span>
+              <br />
               <Ext href="https://docs.cloud.google.com/model-armor/model-armor-agent-gateway-integration">
                 https://docs.cloud.google.com/model-armor/model-armor-agent-gateway-integration
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>Agent Identity 概要</span><br />
+              <span className={styles.refTitle}>Agent Identity 概要</span>
+              <br />
               <Ext href="https://docs.cloud.google.com/iam/docs/agent-identity-overview">
                 https://docs.cloud.google.com/iam/docs/agent-identity-overview
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>MCP連携のセキュリティベストプラクティス（Spanner向け）</span><br />
+              <span className={styles.refTitle}>
+                MCP連携のセキュリティベストプラクティス（Spanner向け）
+              </span>
+              <br />
               <Ext href="https://docs.cloud.google.com/spanner/docs/secure-agent-interactions-mcp">
                 https://docs.cloud.google.com/spanner/docs/secure-agent-interactions-mcp
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>IAMの新機能まとめブログ</span><br />
+              <span className={styles.refTitle}>IAMの新機能まとめブログ</span>
+              <br />
               <Ext href="https://cloud.google.com/blog/products/identity-security/whats-new-in-iam-security-governance-and-runtime-defense">
                 https://cloud.google.com/blog/products/identity-security/whats-new-in-iam-security-governance-and-runtime-defense
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>Agent Gatewayガバナンスのコードラボ</span><br />
+              <span className={styles.refTitle}>Agent Gatewayガバナンスのコードラボ</span>
+              <br />
               <Ext href="https://codelabs.developers.google.com/cloudnet-agent-gateway">
                 https://codelabs.developers.google.com/cloudnet-agent-gateway
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>A2Aプロトコル発表ブログ</span><br />
+              <span className={styles.refTitle}>A2Aプロトコル発表ブログ</span>
+              <br />
               <Ext href="https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/">
                 https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>A2A + Agent Runtimeのコードラボ</span><br />
+              <span className={styles.refTitle}>A2A + Agent Runtimeのコードラボ</span>
+              <br />
               <Ext href="https://codelabs.developers.google.com/adk-a2a-agent-runtime">
                 https://codelabs.developers.google.com/adk-a2a-agent-runtime
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>Vertex AI Agent Engine（Agent Runtime）概要</span><br />
+              <span className={styles.refTitle}>Vertex AI Agent Engine（Agent Runtime）概要</span>
+              <br />
               <Ext href="https://cloud.google.com/agent-builder/agent-engine/overview">
                 https://cloud.google.com/agent-builder/agent-engine/overview
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>Agent Builder拡張ブログ</span><br />
+              <span className={styles.refTitle}>Agent Builder拡張ブログ</span>
+              <br />
               <Ext href="https://cloud.google.com/blog/products/ai-machine-learning/more-ways-to-build-and-scale-ai-agents-with-vertex-ai-agent-builder">
                 https://cloud.google.com/blog/products/ai-machine-learning/more-ways-to-build-and-scale-ai-agents-with-vertex-ai-agent-builder
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>エージェント設計パターンの選び方（Architecture Center）</span><br />
+              <span className={styles.refTitle}>
+                エージェント設計パターンの選び方（Architecture Center）
+              </span>
+              <br />
               <Ext href="https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system">
                 https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>エージェントアーキテクチャ構成要素の選び方</span><br />
+              <span className={styles.refTitle}>エージェントアーキテクチャ構成要素の選び方</span>
+              <br />
               <Ext href="https://docs.cloud.google.com/architecture/choose-agentic-ai-architecture-components">
                 https://docs.cloud.google.com/architecture/choose-agentic-ai-architecture-components
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>マルチエージェントAIシステムのリファレンスアーキテクチャ</span><br />
+              <span className={styles.refTitle}>
+                マルチエージェントAIシステムのリファレンスアーキテクチャ
+              </span>
+              <br />
               <Ext href="https://docs.cloud.google.com/architecture/multiagent-ai-system">
                 https://docs.cloud.google.com/architecture/multiagent-ai-system
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>Well-Architected Framework: AI/ML の視点</span><br />
+              <span className={styles.refTitle}>Well-Architected Framework: AI/ML の視点</span>
+              <br />
               <Ext href="https://docs.cloud.google.com/architecture/framework/perspectives/ai-ml">
                 https://docs.cloud.google.com/architecture/framework/perspectives/ai-ml
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>Agent Starter Pack 公式サイト</span><br />
+              <span className={styles.refTitle}>Agent Starter Pack 公式サイト</span>
+              <br />
               <Ext href="https://googlecloudplatform.github.io/agent-starter-pack/">
                 https://googlecloudplatform.github.io/agent-starter-pack/
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>Agent Starter Pack GitHubリポジトリ</span><br />
+              <span className={styles.refTitle}>Agent Starter Pack GitHubリポジトリ</span>
+              <br />
               <Ext href="https://github.com/googlecloudplatform/agent-starter-pack">
                 https://github.com/googlecloudplatform/agent-starter-pack
               </Ext>
@@ -1471,8 +1618,10 @@ export default function Page() {
           <ul className={styles.refList}>
             <li>
               <span className={styles.refTitle}>
-                Vishal Bulbule「Build Powerful AI Agents with Google ADK Tools and Best Practices」(Google Cloud Community, Medium)
-              </span><br />
+                Vishal Bulbule「Build Powerful AI Agents with Google ADK Tools and Best
+                Practices」(Google Cloud Community, Medium)
+              </span>
+              <br />
               <Ext href="https://medium.com/google-cloud/build-powerful-ai-agents-with-google-adk-tools-and-best-practices-adk-blo-bb9af140662f">
                 https://medium.com/google-cloud/build-powerful-ai-agents-with-google-adk-tools-and-best-practices-adk-blo-bb9af140662f
               </Ext>
@@ -1480,15 +1629,18 @@ export default function Page() {
             <li>
               <span className={styles.refTitle}>
                 Vishal Bulbule「Agent Development Kit (ADK) Deployment Guide」(Medium, 2026年7月)
-              </span><br />
+              </span>
+              <br />
               <Ext href="https://medium.com/google-cloud/agent-development-kit-adk-deployment-guide-0a927ccc6e69">
                 https://medium.com/google-cloud/agent-development-kit-adk-deployment-guide-0a927ccc6e69
               </Ext>
             </li>
             <li>
               <span className={styles.refTitle}>
-                Yusuf Baykaloğlu「Multi-Agent Systems: Orchestrating AI Agents with A2A Protocol」(Medium)
-              </span><br />
+                Yusuf Baykaloğlu「Multi-Agent Systems: Orchestrating AI Agents with A2A
+                Protocol」(Medium)
+              </span>
+              <br />
               <Ext href="https://medium.com/@yusufbaykaloglu/multi-agent-systems-orchestrating-ai-agents-with-a2a-protocol-19a27077aed8">
                 https://medium.com/@yusufbaykaloglu/multi-agent-systems-orchestrating-ai-agents-with-a2a-protocol-19a27077aed8
               </Ext>
@@ -1496,47 +1648,58 @@ export default function Page() {
             <li>
               <span className={styles.refTitle}>
                 「AI Agent Observability with ADK on Google Cloud」(Google Cloud Community, Medium)
-              </span><br />
+              </span>
+              <br />
               <Ext href="https://medium.com/google-cloud/ai-agent-observability-based-on-agent-development-kit-adk-approach-565c82cb8c80">
                 https://medium.com/google-cloud/ai-agent-observability-based-on-agent-development-kit-adk-approach-565c82cb8c80
               </Ext>
             </li>
             <li>
               <span className={styles.refTitle}>
-                Yash Kavaiya「Getting Started with CX Agent Studio」(Google Cloud Community, Medium, 2026年5月)
-              </span><br />
+                Yash Kavaiya「Getting Started with CX Agent Studio」(Google Cloud Community, Medium,
+                2026年5月)
+              </span>
+              <br />
               <Ext href="https://medium.com/google-cloud/getting-started-with-cx-agent-studio-setting-up-and-building-your-first-agent-step-by-step-849d2a0aa5c5">
                 https://medium.com/google-cloud/getting-started-with-cx-agent-studio-setting-up-and-building-your-first-agent-step-by-step-849d2a0aa5c5
               </Ext>
             </li>
             <li>
               <span className={styles.refTitle}>
-                sk_firdous_ali「Gemini Enterprise Agent Platform: A Developer&apos;s First Look (And Honest Critique)」(DEV Community)
-              </span><br />
+                sk_firdous_ali「Gemini Enterprise Agent Platform: A Developer&apos;s First Look (And
+                Honest Critique)」(DEV Community)
+              </span>
+              <br />
               <Ext href="https://dev.to/sk_firdous_ali/gemini-enterprise-agent-platform-a-developers-first-look-and-honest-critique-5f8m">
                 https://dev.to/sk_firdous_ali/gemini-enterprise-agent-platform-a-developers-first-look-and-honest-critique-5f8m
               </Ext>
             </li>
             <li>
               <span className={styles.refTitle}>
-                njericodecraft「Building Smart in 2026: A Hands-On First Look at Google&apos;s Agent Development Kit (ADK)」(DEV Community)
-              </span><br />
+                njericodecraft「Building Smart in 2026: A Hands-On First Look at Google&apos;s Agent
+                Development Kit (ADK)」(DEV Community)
+              </span>
+              <br />
               <Ext href="https://dev.to/njericodecraft/building-smart-in-2026-a-hands-on-first-look-at-googles-agent-development-kit-adk-3n0">
                 https://dev.to/njericodecraft/building-smart-in-2026-a-hands-on-first-look-at-googles-agent-development-kit-adk-3n0
               </Ext>
             </li>
             <li>
               <span className={styles.refTitle}>
-                「Google I/O &apos;26 Fills Out Enterprise Agent Stack with Managed Agents, ADK 2.0」(Virtualization Review)
-              </span><br />
+                「Google I/O &apos;26 Fills Out Enterprise Agent Stack with Managed Agents, ADK
+                2.0」(Virtualization Review)
+              </span>
+              <br />
               <Ext href="https://virtualizationreview.com/articles/2026/05/19/google-io-26-fills-out-enterprise-agent-stack-with-managed-agents-adk-2,-d-,0.aspx">
                 https://virtualizationreview.com/articles/2026/05/19/google-io-26-fills-out-enterprise-agent-stack-with-managed-agents-adk-2,-d-,0.aspx
               </Ext>
             </li>
             <li>
               <span className={styles.refTitle}>
-                「Google boosts Vertex AI Agent Builder with new observability and deployment tools」(InfoWorld)
-              </span><br />
+                「Google boosts Vertex AI Agent Builder with new observability and deployment
+                tools」(InfoWorld)
+              </span>
+              <br />
               <Ext href="https://www.infoworld.com/article/4085736/google-boosts-vertex-ai-agent-builder-with-new-observability-and-deployment-tools.html">
                 https://www.infoworld.com/article/4085736/google-boosts-vertex-ai-agent-builder-with-new-observability-and-deployment-tools.html
               </Ext>
@@ -1544,7 +1707,8 @@ export default function Page() {
             <li>
               <span className={styles.refTitle}>
                 「Vertex AI Agent Builder: 2026 guide」(UI Bakery Blog、料金体系の第三者解説)
-              </span><br />
+              </span>
+              <br />
               <Ext href="https://uibakery.io/blog/vertex-ai-agent-builder">
                 https://uibakery.io/blog/vertex-ai-agent-builder
               </Ext>
