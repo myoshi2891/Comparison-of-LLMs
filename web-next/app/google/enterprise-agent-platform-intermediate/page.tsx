@@ -10,6 +10,7 @@ const pageEntry = findBySlug("/google/enterprise-agent-platform-intermediate");
 export const metadata: Metadata = {
   title: pageEntry ? `${pageEntry.title.replace(" (中級)", "")} 実践ベストプラクティスガイド | LLM コスト計算機` : "Gemini Enterprise Agent Platform 実践ベストプラクティスガイド | LLM コスト計算機",
   description:
+    pageEntry?.summary ??
     "中級〜上級エンジニア向け。ADK・Agent Runtime・Memory Bank・A2A/MCP・ガバナンス機能を実務レベルで使いこなすための設計指針を、ステップバイステップで解説します。",
 };
 
