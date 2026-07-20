@@ -2744,31 +2744,54 @@ print(completion.choices[0].message.content)</code></pre>
         const toggle = document.getElementById('menuToggle');
         const sidebar = document.getElementById('sidebar');
         if (toggle && sidebar) {
-          function updateSidebar(isOpen) {
-            if (isOpen) {
-              sidebar.classList.add('open');
+          const mediaQuery = window.matchMedia('(max-width: 960px)');
+
+          function updateSidebar() {
+            const isMobile = mediaQuery.matches;
+            if (isMobile) {
+              const isOpen = sidebar.classList.contains('open');
+              if (isOpen) {
+                sidebar.removeAttribute('inert');
+                sidebar.removeAttribute('aria-hidden');
+                toggle.setAttribute('aria-expanded', 'true');
+              } else {
+                sidebar.setAttribute('inert', '');
+                sidebar.setAttribute('aria-hidden', 'true');
+                toggle.setAttribute('aria-expanded', 'false');
+              }
+            } else {
+              // デスクトップレイアウトでは常に表示し、支援技術やキーボードでアクセス可能にする
               sidebar.removeAttribute('inert');
               sidebar.removeAttribute('aria-hidden');
-              toggle.setAttribute('aria-expanded', 'true');
-            } else {
-              sidebar.classList.remove('open');
-              sidebar.setAttribute('inert', '');
-              sidebar.setAttribute('aria-hidden', 'true');
               toggle.setAttribute('aria-expanded', 'false');
             }
           }
 
-          // 初期状態（閉じ状態）の同期
-          updateSidebar(sidebar.classList.contains('open'));
+          // 初期状態およびメディアクエリ変化時の同期
+          updateSidebar();
+          if (typeof mediaQuery.addEventListener === 'function') {
+            mediaQuery.addEventListener('change', updateSidebar);
+          } else {
+            mediaQuery.addListener(updateSidebar);
+          }
 
           toggle.addEventListener('click', function () {
             const isOpen = sidebar.classList.contains('open');
-            updateSidebar(!isOpen);
+            if (isOpen) {
+              sidebar.classList.remove('open');
+            } else {
+              sidebar.classList.add('open');
+            }
+            updateSidebar();
           });
 
           navLinks.forEach(function (l) {
             l.addEventListener('click', function () {
-              updateSidebar(false);
+              const isMobile = mediaQuery.matches;
+              if (isMobile) {
+                sidebar.classList.remove('open');
+                updateSidebar();
+              }
             });
           });
         }
