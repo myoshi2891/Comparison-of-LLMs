@@ -173,7 +173,7 @@ import boto3
 client = boto3.client("bedrock-runtime", region_name="us-east-1")
 
 response = client.converse(
-    modelId="anthropic.claude-opus-4-7",
+    modelId="<MODEL_ID>",  # 例: "anthropic.claude-3-5-sonnet-20241022-v2:0" などを指定
     messages=[
         {
             "role": "user",
@@ -181,13 +181,16 @@ response = client.converse(
         }
     ],
     inferenceConfig={
-        "maxTokens": 1024,
-        "temperature": 0.3
+        "maxTokens": 1024
     }
 )
 
 print(response["output"]["message"]["content"][0]["text"])
 ```
+
+> [!NOTE]
+> 例として `anthropic.claude-opus-4-7` などの具体的なモデルIDを指定できます。なお、Claude 4.7 Opus など一部のモデルでは、Converse API呼び出しの `inferenceConfig` から `temperature` パラメータを除外する必要がある場合があります（その場合は上記のように `maxTokens` のみを指定します）。
+
 
 **初学者がつまずきやすいポイント：**
 
@@ -249,7 +252,10 @@ flowchart TD
     L5 -->|"通過"| L6{"Automated Reasoning<br/>事実検証"}
     L5 -->|"違反"| Blocked
     L6 -->|"通過"| Out["ユーザーへ応答"]
-    L6 -->|"違反"| Blocked
+    L6 -->|"違反"| AppDecision{"アプリ側で処理判定"}
+    AppDecision -->|"再生成"| L4
+    AppDecision -->|"代替応答"| AltOut["代替の固定応答を出力"]
+    AppDecision -->|"拒否"| Blocked
 ```
 
 **導入のベストプラクティス（段階的ロールアウト）：**
@@ -267,6 +273,10 @@ flowchart TD
 5. Amazon Bedrock以外でホストされたモデルにも `ApplyGuardrail` APIで同じ安全基準を適用でき、マルチモデル環境でも一貫した保護が可能
 
 ```python
+import boto3
+
+bedrock_runtime = boto3.client("bedrock-runtime", region_name="us-east-1")
+
 response = bedrock_runtime.apply_guardrail(
     guardrailIdentifier="my-guardrail-id",
     guardrailVersion="1",
