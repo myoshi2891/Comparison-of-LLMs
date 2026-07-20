@@ -238,7 +238,7 @@ Amazon Bedrock Guardrailsは、**6つの安全対策（Safeguard）**を組み�
 | **単語フィルタ** | 特定の単語・フレーズを入出力からブロック |
 | **機密情報フィルタ（PII）** | 氏名・住所・電話番号・クレジットカード番号などを検出しマスキング／ブロック |
 | **コンテキスト根拠確認** | 参照ソースとユーザー質問が存在する場合にのみ実行され、応答が根拠データに基づいているか、質問と関連しているかを評価しハルシネーションを検出 |
-| **Automated Reasoning checks** | コンテキスト根拠確認の検出後に実行され、数理論理検証によりファクトの正確性を検証・説明 |
+| **Automated Reasoning checks** | モデルの応答に対して、数理的・論理的推論を用いてファクトの正確性を検証・評価する独立したポリシー。検出結果はアプリケーションに返され、最終的な処理判断（AppDecision）に利用される |
 
 ```mermaid
 flowchart TD
@@ -250,14 +250,14 @@ L2 -->|"違反"| Blocked
 L3 -->|"マスキング後"| L4["基盤モデル呼び出し"]
 L4 --> HasContext{"参照ソースと<br/>ユーザー質問が存在する？"}
 HasContext -->|"Yes"| L5{"コンテキスト根拠確認<br/>ハルシネーション検出"}
-HasContext -->|"No"| L6{"Automated Reasoning<br/>事実検証"}
-L5 -->|"通過"| L6
-L5 -->|"違反"| Blocked
-L6 -->|"通過"| Out["ユーザーへ応答"]
-L6 -->|"違反"| AppDecision{"アプリ側で処理判定"}
+HasContext -->|"No"| L6["コンテキスト根拠確認をスキップ"]
+L5 --> L7{"Automated Reasoning<br/>事実検証（独立）"}
+L6 --> L7
+L7 -->|"検出結果を返す"| AppDecision{"AppDecision<br/>（アプリ側で最終判断）"}
 AppDecision -->|"再生成"| L4
 AppDecision -->|"代替応答"| AltOut["代替の固定応答を出力"]
 AppDecision -->|"拒否"| Blocked
+AppDecision -->|"通過"| Out["ユーザーへ応答"]
 ```
 
 **導入のベストプラクティス（段階的ロールアウト）：**
