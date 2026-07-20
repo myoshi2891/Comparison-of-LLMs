@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-07-19
+Updated 2026-07-20
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -274,7 +274,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が成功（実測 1144 件合格を確認）
+2. `cd web-next && bun run test` が成功（実測 1147 件合格を確認）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功（既知の違反件数は CI または進捗ドキュメントを参照、新規違反がないこと）
 5. `cd scraper && uv run pytest` が成功
