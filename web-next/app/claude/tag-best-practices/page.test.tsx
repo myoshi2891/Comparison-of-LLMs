@@ -67,7 +67,7 @@ test("Claude Tag Best Practices page contract tests", () => {
 
   // 6. メタデータの検証
   expect(metadata).toBeDefined();
-  expect(metadata.title).toBe("Claude Tag 活用ガイド ― 中級者〜上級者向けベストプラクティス");
+  expect(metadata.title).toBe(registryEntry ? `${registryEntry.title} ― 中級者〜上級者向けベストプラクティス` : "Claude Tag 活用ガイド ― 中級者〜上級者向けベストプラクティス");
   expect(metadata.description).toBe(
     "Slack上でチームがClaudeをタグ付けして仕事を委任できる新機能「Claude Tag」について、公式ドキュメントやコミュニティ発信をもとにまとめた中級者〜上級者向け実践ガイド。",
   );
