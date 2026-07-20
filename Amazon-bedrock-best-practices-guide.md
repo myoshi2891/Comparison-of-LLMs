@@ -267,9 +267,9 @@ AppDecision -->|"通過"| Out["ユーザーへ応答"]
 > コンテンツフィルタと禁止トピックのみを持つ単一のGuardrailを非本番ワークロードで開始し、1週間CloudWatchメトリクスを監視してブロック率と誤検知率を把握したうえで、PIIフィルタとコンテキスト根拠確認を段階的に追加することが推奨されます。
 2. Amazon BedrockにおけるGuardrailの指定方法はAPIによって異なり、いずれも適用できるのは**単一のGuardrail（1つのID）のみ**です。複数のポリシーを適用したい場合は、あらかじめそれらの安全基準を1つのGuardrailに集約しておくか、またはモデル呼び出しとは別に `ApplyGuardrail` APIを呼び出すステップを組み合わせる必要があります。
    - **Converse / ConverseStream API**: リクエスト本文の `guardrailConfig` パラメータで Guardrail ID とバージョンを指定します。
-   - **InvokeModel / InvokeModelWithResponseStream API**: HTTPヘッダー（`x-amzn-bedrock-guardrailIdentifier` および `x-amzn-bedrock-guardrailVersion`）を使用して指定します。※一部モデル（Anthropic Claudeなど）の `InvokeModel` リクエスト本文に含めることができる `amazon-bedrock-guardrailConfig` は、ブロック時のタグサフィックス（`tagSuffix`）などの動作制御用であり、Guardrailの適用有無やID/Versionの指定そのものではないため、両者を混同しないよう注意が必要です。
+   - **InvokeModel / InvokeModelWithResponseStream API**: HTTPヘッダー（`x-amzn-bedrock-guardrailIdentifier` および `x-amzn-bedrock-guardrailVersion`）を使用して指定します。※一部モデル（Anthropic Claudeなど）の `InvokeModel` リクエスト本文に含めることができる `amazon-bedrock-guardrailConfig` は、入力タグ（`guardContent`、`groundingSource`、`query` など）のサフィックス（`tagSuffix`）を指定し、Guardrails が選択的に評価するスコープを制御するためのものであり、Guardrailの適用有無やID/Versionの指定そのものではないため、両者を混同しないよう注意が必要です。
 
-> Converse/ConverseStream APIではリクエスト本文の `guardrailConfig` を使用し、InvokeModel/InvokeModelWithResponseStream APIではHTTPヘッダーでGuardrail IDとバージョンを指定します。いずれも動作するのは単一のGuardrailのみであり、異なるポリシーを併用する場合は単一のGuardrailに集約するか、`ApplyGuardrail` APIを独立して組み合わせます。また、InvokeModelリクエスト本文の `amazon-bedrock-guardrailConfig` はtagSuffix用途であり、Guardrail適用そのものの指定とは混同しないようにしてください。
+> Converse/ConverseStream APIではリクエスト本文の `guardrailConfig` を使用し、InvokeModel/InvokeModelWithResponseStream APIではHTTPヘッダーでGuardrail IDとバージョンを指定します。いずれも動作するのは単一のGuardrailのみであり、異なるポリシーを併用する場合は単一のGuardrailに集約するか、`ApplyGuardrail` APIを独立して組み合わせます。また、InvokeModelリクエスト本文の `amazon-bedrock-guardrailConfig` は入力タグのサフィックス（`tagSuffix`）を指定して Guardrails の評価対象スコープを選択的に制御するためのものであり、Guardrail適用そのものの指定とは混同しないようにしてください。
 3. モデル呼び出しを行わずにテキストのみを検査したい場合は `ApplyGuardrail` API を使う（例：ユーザー投稿の事前スクリーニング）
 4. コンテキスト根拠確認のしきい値を低く設定しすぎると、関連性の薄い情報を応答に混入させるリスクが増す点に注意する。
 
