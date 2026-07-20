@@ -3,12 +3,12 @@ import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import Ext from "@/components/docs/Ext";
 import { findBySlug } from "@/lib/page-registry";
 import styles from "./page.module.css";
-import TocObserver from "./TocObserver";
+import TocObserver from "@/components/docs/TocObserver";
 
 const pageEntry = findBySlug("/claude/tag-best-practices");
 
 export const metadata: Metadata = {
-  title: "Claude Tag 活用ガイド ― 中級者〜上級者向けベストプラクティス",
+  title: pageEntry ? `${pageEntry.title} ― 中級者〜上級者向けベストプラクティス` : "Claude Tag 活用ガイド ― 中級者〜上級者向けベストプラクティス",
   description:
     pageEntry?.summary ??
     "Slack上でチームがClaudeをタグ付けして仕事を委任できる新機能「Claude Tag」について、公式ドキュメントやコミュニティ発信をもとにまとめた中級者〜上級者向け実践ガイド。",
@@ -71,7 +71,13 @@ L4 --> L5["レベル5: 責務そのものを委譲<br/>領域のオーナーと�
 export default function Page() {
   return (
     <>
-      <TocObserver />
+      <TocObserver
+        navLinkClassName={styles.tocLink}
+        activeClassName={styles.tocLinkActive}
+        toggleId="navToggle"
+        sidebarId="sidebar"
+        sidebarOpenClassName={styles.sidebarOpen}
+      />
       <button type="button" className={styles.sidebarToggle} id="navToggle" aria-label="目次を開く">
         ☰ 目次
       </button>
