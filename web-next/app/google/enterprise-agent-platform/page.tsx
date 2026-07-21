@@ -164,6 +164,9 @@ const DIAGRAMS = {
     GW-->>U: 最終レスポンス`,
 };
 
+/**
+ * Renders the complete Gemini Enterprise Agent Platform guide with navigation, diagrams, examples, and best practices.
+ */
 export default function Page() {
   return (
     <div className={styles.layout}>

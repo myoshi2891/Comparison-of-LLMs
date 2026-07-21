@@ -4,6 +4,11 @@ import { useEffect } from "react";
 import { useTocObserver } from "@/lib/useTocObserver";
 import styles from "./page.module.css";
 
+/**
+ * Synchronizes table-of-contents navigation, mobile sidebar state, and scroll progress with page scrolling.
+ *
+ * @returns `null`, because the component renders no content
+ */
 export default function TocObserver() {
   // 1. スクロール連動ハイライト & モバイルサイドバー開閉を共有フックに委譲
   useTocObserver({

@@ -91,6 +91,9 @@ const DIAGRAMS = {
     Sim --> Eval --> Obs --> Opt --> Sim`,
 };
 
+/**
+ * Renders the Gemini Enterprise Agent Platform best practices guide.
+ */
 export default function Page() {
   return (
     <div className={styles.layout}>

@@ -69,6 +69,9 @@ L2 --> L3["レベル3: 定期タスクをスケジュール化<br>毎週月曜9�
 L3 --> L4["レベル4: 自発的フォローアップ<br>停滞スレッドの検知・完了時の自動報告"]
 L4 --> L5["レベル5: 責務そのものを委譲<br>領域のオーナーとして日々の判断を任せる"]`;
 
+/**
+ * Renders the Claude Tag best-practices guide with chapter navigation and reference content.
+ */
 export default function Page() {
   return (
     <>
