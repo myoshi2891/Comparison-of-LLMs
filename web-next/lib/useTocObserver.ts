@@ -13,11 +13,15 @@ interface UseTocObserverOptions {
 }
 
 /**
- * IntersectionObserver ベースの TOC スクロールスパイ。
- * 交差中のセクションに対応する TOC リンクへ activeClassName と
- * aria-current="location" を付与し、他のリンクからは取り除く。
- * toggleId, sidebarId, sidebarOpenClassName が指定された場合は、
- * モバイル用のサイドバーのトグル開閉およびリンククリックによる閉じる動作も同時に管理する。
+ * Tracks visible content sections and updates the table of contents to reflect the active section.
+ *
+ * @param chapterSelector - Selector for the content sections to observe
+ * @param tocLinkSelector - Selector for top-level table-of-contents links
+ * @param activeClassName - Class applied to active table-of-contents links
+ * @param tocSubLinkSelector - Optional selector for nested table-of-contents links
+ * @param toggleId - Optional ID of the mobile sidebar toggle
+ * @param sidebarId - Optional ID of the mobile sidebar
+ * @param sidebarOpenClassName - Optional class indicating that the mobile sidebar is open
  */
 export function useTocObserver({
   chapterSelector,
