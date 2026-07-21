@@ -61,14 +61,12 @@ test("Claude Tag Best Practices page contract tests", () => {
   // 5. ページレジストリ登録の検証
   const registryEntry = findBySlug("/claude/tag-best-practices");
   expect(registryEntry).toBeDefined();
-  expect(registryEntry?.title).toBe("Tag Best Practices");
+  expect(registryEntry?.title).toBe("Claude Tag 活用ガイド ― 中級者〜上級者向けベストプラクティス");
   expect(registryEntry?.group).toBe("Providers");
   expect(registryEntry?.category).toBe("Claude");
 
   // 6. メタデータの検証
   expect(metadata).toBeDefined();
-  expect(metadata.title).toBe(registryEntry ? `${registryEntry.title} ― 中級者〜上級者向けベストプラクティス` : "Claude Tag 活用ガイド ― 中級者〜上級者向けベストプラクティス");
-  expect(metadata.description).toBe(
-    "Slack上でチームがClaudeをタグ付けして仕事を委任できる新機能「Claude Tag」について、公式ドキュメントやコミュニティ発信をもとにまとめた中級者〜上級者向け実践ガイド。",
-  );
+  expect(metadata.title).toBe(registryEntry?.title);
+  expect(metadata.description).toBe(registryEntry?.description);
 });

@@ -6,22 +6,23 @@ import { findBySlug } from "@/lib/page-registry";
 import styles from "./page.module.css";
 
 const pageEntry = findBySlug("/claude/tag-best-practices");
+if (!pageEntry || !pageEntry.description) {
+  throw new Error("Required page registry metadata (title/description) missing for /claude/tag-best-practices");
+}
 
 export const metadata: Metadata = {
-  title: `${pageEntry?.title ?? "Claude Tag 活用ガイド"} ― 中級者〜上級者向けベストプラクティス`,
-  description:
-    pageEntry?.summary ||
-    "Slack上でチームがClaudeをタグ付けして仕事を委任できる新機能「Claude Tag」について、公式ドキュメントやコミュニティ発信をもとにまとめた中級者〜上級者向け実践ガイド。",
+  title: pageEntry.title,
+  description: pageEntry.description,
 };
 
 // Mermaidチャートの定義（カラム0配置厳守）
 const DIAGRAM_ARCHITECTURE = `flowchart TB
 A["Slackチャンネルで @Claude をタスク付きでメンション"] --> B["Claude Tag がスレッドを検知しセッション開始"]
-B --> C["使い捨てサンドボックスを起動<br/>Anthropicがホスト・会話が途絶えると破棄"]
+B --> C["使い捨てサンドボックスを起動<br>Anthropicがホスト・会話が途絶えると破棄"]
 C --> D["Agent Proxy経由でのみ外部通信が可能"]
-D --> E["許可済みの接続先にアクセス<br/>GitHub / Drive / Datadog / データウェアハウス等"]
+D --> E["許可済みの接続先にアクセス<br>GitHub / Drive / Datadog / データウェアハウス等"]
 E --> F["チェックリストをスレッドに逐次更新しながら作業"]
-F --> G["結果をスレッドに投稿<br/>返信・PR作成・チケット起票・ダッシュボード更新など"]
+F --> G["結果をスレッドに投稿<br>返信・PR作成・チケット起票・ダッシュボード更新など"]
 G --> H["チャンネル参加者全員が結果を閲覧し追加指示や修正が可能"]`;
 
 const DIAGRAM_IDENTITY = `flowchart TB
@@ -40,33 +41,33 @@ ORG --> WS
 WS --> PC`;
 
 const DIAGRAM_MEMORY = `flowchart TB
-A["公開チャンネルでの学習内容<br/>決定事項・訂正・好み"] --> B["ワークスペース共有メモリに保存"]
+A["公開チャンネルでの学習内容<br>決定事項・訂正・好み"] --> B["ワークスペース共有メモリに保存"]
 B --> C["同じワークスペースの別の公開チャンネルからも参照可能"]
 D["プライベートチャンネルでの学習内容"] --> E["そのチャンネル専用ストアにのみ保存"]
-E --> F["ワークスペース全体には共有されない<br/>ただし作業中はワークスペース記憶を読み取り可能"]
+E --> F["ワークスペース全体には共有されない<br>ただし作業中はワークスペース記憶を読み取り可能"]
 G["DMでのやり取り"] --> H["送信者個人のClaudeアカウント上で完結"]
 H --> I["チームのメモリ・権限とは完全に分離"]`;
 
 const DIAGRAM_SETUP = `flowchart TB
-S1["Step 1: Slackワークスペースをペアリング<br/>Slackアプリをインストールし @Claude connect でペアリングコードを発行"] --> S2["Step 2: Claudeが最初にアクセスするツールを選択"]
-S2 --> S3["Step 3: GitHub連携<br/>Claude GitHub Appをインストール、または既存連携にリポジトリを追加"]
+S1["Step 1: Slackワークスペースをペアリング<br>Slackアプリをインストールし @Claude connect でペアリングコードを発行"] --> S2["Step 2: Claudeが最初にアクセスするツールを選択"]
+S2 --> S3["Step 3: GitHub連携<br>Claude GitHub Appをインストール、または既存連携にリポジトリを追加"]
 S3 --> S4["Step 4: その他ツール用のアカウントを作成し認証情報を接続"]
 S4 --> S5["支出上限(組織全体・チャンネル別)を設定"]
 S5 --> S6["非公開チャンネルでテストし動作を確認してから展開"]`;
 
 const DIAGRAM_LIFECYCLE = `flowchart TB
-T1["Step 1: タスクを選ぶ<br/>到達可能な入力・明確なゴール・検証可能な結果があるか"] --> T2["Step 2: リクエストを書く<br/>目的・重要性・参照先(ドキュメント名/スレッド/期間)を伝える"]
-T2 --> T3["Step 3: Claudeに作業させる<br/>チェックリストがスレッドに逐次更新される"]
-T3 --> T4["Step 4: 結果をレビューする<br/>影響度に応じて精査の深さを変える"]
+T1["Step 1: タスクを選ぶ<br>到達可能な入力・明確なゴール・検証可能な結果があるか"] --> T2["Step 2: リクエストを書く<br>目的・重要性・参照先(ドキュメント名/スレッド/期間)を伝える"]
+T2 --> T3["Step 3: Claudeに作業させる<br>チェックリストがスレッドに逐次更新される"]
+T3 --> T4["Step 4: 結果をレビューする<br>影響度に応じて精査の深さを変える"]
 T4 -->|"修正が必要"| T5["具体的に何が違うかを伝えて再依頼"]
 T5 --> T3
 T4 -->|"問題なし"| T6["チャンネルメモリとして学習を蓄積し次回はより的確に"]`;
 
 const DIAGRAM_LADDER = `flowchart TB
-L1["レベル1: メンション時のみ応答<br/>まずはここから始める"] --> L2["レベル2: プロアクティブ応答を許可<br/>忙しいフィードバックチャンネルでは全質問に自動回答"]
-L2 --> L3["レベル3: 定期タスクをスケジュール化<br/>毎週月曜9時にダイジェスト投稿 など"]
-L3 --> L4["レベル4: 自発的フォローアップ<br/>停滞スレッドの検知・完了時の自動報告"]
-L4 --> L5["レベル5: 責務そのものを委譲<br/>領域のオーナーとして日々の判断を任せる"]`;
+L1["レベル1: メンション時のみ応答<br>まずはここから始める"] --> L2["レベル2: プロアクティブ応答を許可<br>忙しいフィードバックチャンネルでは全質問に自動回答"]
+L2 --> L3["レベル3: 定期タスクをスケジュール化<br>毎週月曜9時にダイジェスト投稿 など"]
+L3 --> L4["レベル4: 自発的フォローアップ<br>停滞スレッドの検知・完了時の自動報告"]
+L4 --> L5["レベル5: 責務そのものを委譲<br>領域のオーナーとして日々の判断を任せる"]`;
 
 export default function Page() {
   return (
@@ -901,7 +902,6 @@ export default function Page() {
                 <input
                   type="checkbox"
                   id="checklist-1"
-                  disabled
                   className={styles.checklistCheckbox}
                 />
                 <label htmlFor="checklist-1">

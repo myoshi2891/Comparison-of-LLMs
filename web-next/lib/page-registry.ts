@@ -36,6 +36,8 @@ export const PageEntrySchema = z
     slug: slugSchema,
     /** ナビ表示名 */
     title: z.string().min(1),
+    /** SEO用 description */
+    description: z.string().min(1).optional(),
     /** ナビのトップレベル分類。順序は lib/nav-taxonomy.ts の NAV_GROUPS が持つ。 */
     group: z.enum(NAV_GROUPS),
     /** ナビ 2 段目の表示ラベル。2 段ネストするグループ（= Providers）でのみ必須。 */
@@ -744,7 +746,8 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/claude/tag-best-practices",
-    title: "Tag Best Practices",
+    title: "Claude Tag 活用ガイド ― 中級者〜上級者向けベストプラクティス",
+    description: "Slack上でチームがClaudeをタグ付けして仕事を委任できる新機能「Claude Tag」について、公式ドキュメントやコミュニティ発信をもとにまとめた中級者〜上級者向け実践ガイド。",
     group: "Providers",
     category: "Claude",
     provider: "claude",
