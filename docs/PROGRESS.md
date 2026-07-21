@@ -1,7 +1,7 @@
 # プロジェクト進捗・ステータス (PROGRESS.md)
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
-> - 最終更新日: **Updated 2026-07-20**
+> - 最終更新日: **Updated 2026-07-21**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -14,10 +14,11 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（本作業範囲では新規違反 0 件、既知の既存指摘は本件対象外）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **1147 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest 実行で **1161 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **共有フック `useTocObserver` のカバレッジ拡充とサブリンク親章連動バグの修正**: PR #124 の SonarCloud Quality Gate が `new_coverage 64.3% < 80%` で失敗していた原因（`web-next/lib/useTocObserver.ts` の 18 行・17 分岐が未カバー）を解消。`web-next/lib/useTocObserver.test.tsx` を新設し、サブリンク経路・モバイルサイドバー開閉・複数 entry の最上位選択・クリーンアップを直接検証（行 65/65・分岐 36/37）。テスト作成の過程で、サブリンク交差時に親章の TOC リンクを点灯させる処理が `subLink.closest("section")` を使っており、TOC リンクはサイドバー内にあって `<section>` の子孫にならないため本番で一度も実行されない死んだコードだったことが判明 → 交差した対象要素側から `closest("section")` する形に修正。併せて、リスナ登録ブロック内でしか呼ばれないハンドラの到達不能な null ガードを `const` クロージャ化して除去。TDD の Red / Green / Refactor を分割コミット。契約テスト 14 件を追加（合計 **1161 テスト合格**）。
 - **AWS Bedrock ガイドの表記および Mermaid 修正**: `Amazon-bedrock-best-practices-guide.md` 内の Mermaid フローチャートのインデントをカラム 0 に揃え、Contextual Grounding（コンテキスト根拠確認）の実行条件と、その後の Automated Reasoning 事実検証およびアプリ側による再生成・拒否・代替応答判断の評価フローを明示（Mermaid 図と表の両方に反映）。また、Converse API 説明での複数 Guardrail 同時適用（重ね合わせ）の記述を `guardrailConfig` で指定できる単一の Guardrail の適用に修正。（合計 **1147 テスト合格**）。
 - **Gemini Enterprise Agent Platform (中級) ガイドの Next.js 新設移行**: `Gemini-enterprise-agent-platform-best-practices.html` (実践ベストプラクティスガイド、中級向け) を `web-next/app/google/enterprise-agent-platform-intermediate/page.tsx` に新設移行。既存の完全ガイドはそのまま残し、原文の全14セクション・7 Mermaid図・コードブロックを React 要素として faithful に保持。SEO Heading 構造の適合（単一 h1 化）、TOC のスクロール追従、外部リンクの安全属性、ページレジストリ登録、CSS modules 化による CSS 変数定義 of スコープ化、フッター等幅フォント設定を追加。原本は `archive/html/google/` 配下に退避。契約テスト6件を追加（合計 **1144 テスト合格**）。
 - **Gemini Enterprise Agent Platform ガイドの Next.js 移行**: `Gemini-enterprise-agent-platform-guide.html` を `web-next/app/google/enterprise-agent-platform/page.tsx` に移行。原文の全20セクション・チェックリスト・アンチパターン・外部リンク・15 Mermaid図を React 要素として faithful に保持し、TOC のスクロール追従、外部リンクの安全属性、ページレジストリ登録、テーブル左寄せ強制、CSS modules 化による CSS 変数定義のスコープ化、フッター等幅フォント設定を追加。原本は `archive/html/google` および `archive/md/google` 配下に退避。契約テスト7件を追加（合計 **1138 テスト合格**）。
