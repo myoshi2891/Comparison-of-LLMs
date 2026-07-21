@@ -175,7 +175,7 @@ export default function Page() {
 
         <section className={styles.contentSection} id="intro">
           <h2>
-            <span className="idx">00</span>このガイドの前提 ― 「Vertex AI」から「Gemini Enterprise
+            <span className={styles.idx}>00</span>このガイドの前提 ― 「Vertex AI」から「Gemini Enterprise
             Agent Platform」へ
           </h2>
           <p className={styles.sectionLead}>まず押さえておくべき最重要事実から始めます。</p>
@@ -224,7 +224,7 @@ export default function Page() {
 
         <section className={styles.contentSection} id="architecture">
           <h2>
-            <span className="idx">01</span>全体アーキテクチャ ― 4つの柱
+            <span className={styles.idx}>01</span>全体アーキテクチャ ― 4つの柱
           </h2>
           <p className={styles.sectionLead}>
             Build / Scale / Govern / Optimize
@@ -286,7 +286,7 @@ export default function Page() {
 
         <section className={styles.contentSection} id="adk">
           <h2>
-            <span className="idx">02</span>Agent Development Kit(ADK)の基本設計
+            <span className={styles.idx}>02</span>Agent Development Kit(ADK)の基本設計
           </h2>
           <p className={styles.sectionLead}>
             OSSのコードファースト・エージェントフレームワーク。単一の万能エージェントではなく、役割を分割した複数の専門エージェントを協調させる「マイクロサービス的発想」が核にあります。
@@ -746,7 +746,7 @@ export default function Page() {
 
         <section className={styles.contentSection} id="models">
           <h2>
-            <span className="idx">03</span>モデル選定戦略 ― コストと性能のトレードオフ
+            <span className={styles.idx}>03</span>モデル選定戦略 ― コストと性能のトレードオフ
           </h2>
           <p className={styles.sectionLead}>
             2026年7月時点のModel Gardenには、Gemini
@@ -810,7 +810,7 @@ export default function Page() {
 
         <section className={styles.contentSection} id="runtime">
           <h2>
-            <span className="idx">04</span>Agent Runtime ― デプロイとスケーリングの実践
+            <span className={styles.idx}>04</span>Agent Runtime ― デプロイとスケーリングの実践
           </h2>
           <p className={styles.sectionLead}>
             Agent
@@ -932,7 +932,7 @@ export default function Page() {
 
         <section className={styles.contentSection} id="memory">
           <h2>
-            <span className="idx">05</span>Memory Bank ― 長期記憶の設計と落とし穴
+            <span className={styles.idx}>05</span>Memory Bank ― 長期記憶の設計と落とし穴
           </h2>
           <p className={styles.sectionLead}>
             ユーザーとエージェントの会話履歴から長期記憶を自動生成・自己組織化するマネージドサービス。設計を誤ると、プライバシー漏洩やレイテンシ問題に直結します。
@@ -1002,7 +1002,7 @@ export default function Page() {
 
         <section className={styles.contentSection} id="rag">
           <h2>
-            <span className="idx">06</span>RAG Engine と Vector Search
+            <span className={styles.idx}>06</span>RAG Engine と Vector Search
           </h2>
           <p className={styles.sectionLead}>
             プライベートデータをLLMに安全に接続し、ハルシネーションを低減するためのマネージド基盤。
@@ -1022,7 +1022,7 @@ export default function Page() {
 
         <section className={styles.contentSection} id="a2a-mcp">
           <h2>
-            <span className="idx">07</span>エージェント間通信 ― A2AプロトコルとMCPの使い分け
+            <span className={styles.idx}>07</span>エージェント間通信 ― A2AプロトコルとMCPの使い分け
           </h2>
           <p className={styles.sectionLead}>
             実務で最も混同されやすいポイントです。A2Aはエージェント間の委任・協調、MCPはエージェントとツール/データの接続を扱います。
@@ -1062,7 +1062,7 @@ export default function Page() {
 
         <section className={styles.contentSection} id="security">
           <h2>
-            <span className="idx">08</span>セキュリティとガバナンス
+            <span className={styles.idx}>08</span>セキュリティとガバナンス
           </h2>
           <p className={styles.sectionLead}>
             エージェントが自律的に行動する以上、「誰が」「何に」アクセスできるかを事前に設計することが不可欠です。
@@ -1129,7 +1129,7 @@ export default function Page() {
 
         <section className={styles.contentSection} id="quality">
           <h2>
-            <span className="idx">09</span>品質保証 ― Evaluation・Simulation・Observability
+            <span className={styles.idx}>09</span>品質保証 ― Evaluation・Simulation・Observability
           </h2>
           <p className={styles.sectionLead}>3段階のサイクルで品質を継続的に計測・改善します。</p>
 
@@ -1169,7 +1169,7 @@ export default function Page() {
 
         <section className={styles.contentSection} id="migration">
           <h2>
-            <span className="idx">10</span>移行時のチェックリスト(Vertex AIからの移行)
+            <span className={styles.idx}>10</span>移行時のチェックリスト(Vertex AIからの移行)
           </h2>
           <div className={styles.tableWrap}>
             <table>
@@ -1225,7 +1225,7 @@ export default function Page() {
 
         <section className={styles.contentSection} id="antipatterns">
           <h2>
-            <span className="idx">11</span>アンチパターン早見表
+            <span className={styles.idx}>11</span>アンチパターン早見表
           </h2>
           <div className={styles.tableWrap}>
             <table>
@@ -1286,7 +1286,7 @@ export default function Page() {
 
         <section className={styles.contentSection} id="checklist">
           <h2>
-            <span className="idx">12</span>まとめ ― 実装前の最終チェックリスト
+            <span className={styles.idx}>12</span>まとめ ― 実装前の最終チェックリスト
           </h2>
           <ul className={styles.checklist}>
             <li>単一の万能エージェントではなく、役割分担された複数エージェント構成を検討したか</li>
@@ -1311,7 +1311,7 @@ export default function Page() {
 
         <section className={styles.contentSection} id="references">
           <h2>
-            <span className="idx">13</span>参考文献・一次情報源
+            <span className={styles.idx}>13</span>参考文献・一次情報源
           </h2>
           <p className={styles.sectionLead}>
             本ガイドの内容は、以下の公式ドキュメント・Google公式ブログ・Google Developer
@@ -1322,121 +1322,121 @@ export default function Page() {
             <h4>Google公式ドキュメント・ブログ</h4>
             <ul className={styles.refList}>
               <li>
-                <span className="ref-title">Gemini Enterprise Agent Platform 公式トップページ</span>
+                <span className={styles.refTitle}>Gemini Enterprise Agent Platform 公式トップページ</span>
                 <Ext href="https://cloud.google.com/products/gemini-enterprise-agent-platform">
                   cloud.google.com/products/gemini-enterprise-agent-platform
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">Agent Platform 概要ドキュメント</span>
+                <span className={styles.refTitle}>Agent Platform 概要ドキュメント</span>
                 <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/overview">
                   docs.cloud.google.com/gemini-enterprise-agent-platform/overview
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">Vertex AIからの名称変更一覧</span>
+                <span className={styles.refTitle}>Vertex AIからの名称変更一覧</span>
                 <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/vertex-ai-name-changes">
                   docs.cloud.google.com/gemini-enterprise-agent-platform/vertex-ai-name-changes
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">Agent Development Kit(ADK)公式解説</span>
+                <span className={styles.refTitle}>Agent Development Kit(ADK)公式解説</span>
                 <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/adk">
                   docs.cloud.google.com/gemini-enterprise-agent-platform/build/adk
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">ADKエージェント開発ガイド</span>
+                <span className={styles.refTitle}>ADKエージェント開発ガイド</span>
                 <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/runtime/create-an-adk-agent">
                   docs.cloud.google.com/gemini-enterprise-agent-platform/build/runtime/create-an-adk-agent
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">Agent Runtimeのスケーリング最適化</span>
+                <span className={styles.refTitle}>Agent Runtimeのスケーリング最適化</span>
                 <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/runtime/optimize-and-scale">
                   docs.cloud.google.com/gemini-enterprise-agent-platform/scale/runtime/optimize-and-scale
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">エージェントのデプロイ手順</span>
+                <span className={styles.refTitle}>エージェントのデプロイ手順</span>
                 <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/runtime/deploy-an-agent">
                   docs.cloud.google.com/gemini-enterprise-agent-platform/scale/runtime/deploy-an-agent
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">Agent Platform Memory Bank</span>
+                <span className={styles.refTitle}>Agent Platform Memory Bank</span>
                 <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/memory-bank">
                   docs.cloud.google.com/gemini-enterprise-agent-platform/scale/memory-bank
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">Memory Bankのセットアップ</span>
+                <span className={styles.refTitle}>Memory Bankのセットアップ</span>
                 <Ext href="https://cloud.google.com/vertex-ai/generative-ai/docs/agent-engine/memory-bank/set-up">
                   cloud.google.com/vertex-ai/generative-ai/docs/agent-engine/memory-bank/set-up
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">Memory Bankの記憶生成</span>
+                <span className={styles.refTitle}>Memory Bankの記憶生成</span>
                 <Ext href="https://cloud.google.com/vertex-ai/generative-ai/docs/agent-engine/memory-bank/generate-memories">
                   cloud.google.com/vertex-ai/generative-ai/docs/agent-engine/memory-bank/generate-memories
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">Vertex AI Memory Bank プレビュー発表記事</span>
+                <span className={styles.refTitle}>Vertex AI Memory Bank プレビュー発表記事</span>
                 <Ext href="https://cloud.google.com/blog/products/ai-machine-learning/vertex-ai-memory-bank-in-public-preview">
                   cloud.google.com/blog/products/ai-machine-learning/vertex-ai-memory-bank-in-public-preview
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">Agent Gateway概要</span>
+                <span className={styles.refTitle}>Agent Gateway概要</span>
                 <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/govern/gateways/agent-gateway-overview">
                   docs.cloud.google.com/gemini-enterprise-agent-platform/govern/gateways/agent-gateway-overview
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">Agent Gatewayによるガバナンス実践(Codelab)</span>
+                <span className={styles.refTitle}>Agent Gatewayによるガバナンス実践(Codelab)</span>
                 <Ext href="https://codelabs.developers.google.com/cloudnet-agent-gateway">
                   codelabs.developers.google.com/cloudnet-agent-gateway
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">A2Aエージェントのインポートとガバナンス</span>
+                <span className={styles.refTitle}>A2Aエージェントのインポートとガバナンス</span>
                 <Ext href="https://docs.cloud.google.com/gemini/enterprise/docs/import-govern-agent-registry">
                   docs.cloud.google.com/gemini/enterprise/docs/import-govern-agent-registry
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">A2A・Agent Runtime連携Codelab</span>
+                <span className={styles.refTitle}>A2A・Agent Runtime連携Codelab</span>
                 <Ext href="https://codelabs.developers.google.com/adk-a2a-agent-runtime">
                   codelabs.developers.google.com/adk-a2a-agent-runtime
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">Agent Platformの最適化(評価・観測性)概要</span>
+                <span className={styles.refTitle}>Agent Platformの最適化(評価・観測性)概要</span>
                 <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/optimize">
                   docs.cloud.google.com/gemini-enterprise-agent-platform/optimize
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">Agent Observability概要</span>
+                <span className={styles.refTitle}>Agent Observability概要</span>
                 <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/optimize/observability/overview">
                   docs.cloud.google.com/gemini-enterprise-agent-platform/optimize/observability/overview
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">Agent Evaluation詳細</span>
+                <span className={styles.refTitle}>Agent Evaluation詳細</span>
                 <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/optimize/evaluation/agent-evaluation">
                   docs.cloud.google.com/gemini-enterprise-agent-platform/optimize/evaluation/agent-evaluation
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">リリースノート(Semantic Governance Policies等)</span>
+                <span className={styles.refTitle}>リリースノート(Semantic Governance Policies等)</span>
                 <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/release-notes">
                   docs.cloud.google.com/gemini-enterprise-agent-platform/release-notes
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">
+                <span className={styles.refTitle}>
                   「Gemini Enterprise Agent Platform」発表ブログ(2026/4/22)
                 </span>
                 <Ext href="https://cloud.google.com/blog/products/ai-machine-learning/introducing-gemini-enterprise-agent-platform">
@@ -1444,49 +1444,49 @@ export default function Page() {
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">「新Gemini Enterprise」プラットフォーム解説ブログ</span>
+                <span className={styles.refTitle}>「新Gemini Enterprise」プラットフォーム解説ブログ</span>
                 <Ext href="https://cloud.google.com/blog/products/ai-machine-learning/the-new-gemini-enterprise-one-platform-for-agent-development">
                   cloud.google.com/blog/products/ai-machine-learning/the-new-gemini-enterprise-one-platform-for-agent-development
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">パートナー向けエージェント公開ガイド(A2A準拠要件)</span>
+                <span className={styles.refTitle}>パートナー向けエージェント公開ガイド(A2A準拠要件)</span>
                 <Ext href="https://cloud.google.com/blog/topics/developers-practitioners/publish-agents-in-gemini-enterprise-and-google-cloud-marketplace">
                   cloud.google.com/blog/topics/developers-practitioners/publish-agents-in-gemini-enterprise-and-google-cloud-marketplace
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">本番エージェント構築のための5つのガイド</span>
+                <span className={styles.refTitle}>本番エージェント構築のための5つのガイド</span>
                 <Ext href="https://cloud.google.com/blog/topics/developers-practitioners/five-guides-to-building-and-scaling-production-ready-ai-agents">
                   cloud.google.com/blog/topics/developers-practitioners/five-guides-to-building-and-scaling-production-ready-ai-agents
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">Cloud Runのコールドスタート対策ガイド</span>
+                <span className={styles.refTitle}>Cloud Runのコールドスタート対策ガイド</span>
                 <Ext href="https://cloud.google.com/blog/topics/developers-practitioners/a-guide-to-ai-cold-starts-on-cloud-run">
                   cloud.google.com/blog/topics/developers-practitioners/a-guide-to-ai-cold-starts-on-cloud-run
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">RAG Engine 課金モデル</span>
+                <span className={styles.refTitle}>RAG Engine 課金モデル</span>
                 <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/rag-engine/rag-engine-billing">
                   docs.cloud.google.com/gemini-enterprise-agent-platform/build/rag-engine/rag-engine-billing
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">Vector Search概要</span>
+                <span className={styles.refTitle}>Vector Search概要</span>
                 <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/vector-search/overview">
                   docs.cloud.google.com/gemini-enterprise-agent-platform/build/vector-search/overview
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">Gemini 3.1 Flash-Liteモデルページ</span>
+                <span className={styles.refTitle}>Gemini 3.1 Flash-Liteモデルページ</span>
                 <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/3-1-flash-lite">
                   docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/3-1-flash-lite
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">Gemini 3 Flashモデルページ</span>
+                <span className={styles.refTitle}>Gemini 3 Flashモデルページ</span>
                 <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/3-flash">
                   docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/3-flash
                 </Ext>
@@ -1498,7 +1498,7 @@ export default function Page() {
             <h4>著名な開発者・Google Developer Experts等による技術記事</h4>
             <ul className={styles.refList}>
               <li>
-                <span className="ref-title">
+                <span className={styles.refTitle}>
                   Shubham Saboo (Google, Senior AI Product Manager)「Developer&apos;s guide to
                   multi-agent patterns in ADK」Google Developers Blog(2025/12/16)
                 </span>
@@ -1507,7 +1507,7 @@ export default function Page() {
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">
+                <span className={styles.refTitle}>
                   「Agent Development Kit: Making it easy to build multi-agent applications」Google
                   Developers Blog
                 </span>
@@ -1516,7 +1516,7 @@ export default function Page() {
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">
+                <span className={styles.refTitle}>
                   「Introducing Agent Development Kit for TypeScript」Google Developers Blog
                 </span>
                 <Ext href="https://developers.googleblog.com/introducing-agent-development-kit-for-typescript-build-ai-agents-with-the-power-of-a-code-first-approach/">
@@ -1524,7 +1524,7 @@ export default function Page() {
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">
+                <span className={styles.refTitle}>
                   Gabriel Preda (Google Developer Expert)「From Vertex AI to Gemini Enterprise Agent
                   Platform」Medium(2026/5)
                 </span>
@@ -1533,7 +1533,7 @@ export default function Page() {
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">
+                <span className={styles.refTitle}>
                   Romin Irani「Tutorial Series: Gemini Enterprise Agent Platform」Part 3・Part 5,
                   Google Cloud Community
                 </span>
@@ -1542,13 +1542,13 @@ export default function Page() {
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">同上 Part 5(Observability and Evaluation)</span>
+                <span className={styles.refTitle}>同上 Part 5(Observability and Evaluation)</span>
                 <Ext href="https://medium.com/google-cloud/tutorial-series-gemini-enterprise-agent-platform-part-5-observability-and-evaluation-79c110c38028">
                   medium.com/google-cloud/tutorial-series-gemini-enterprise-agent-platform-part-5-observability-and-evaluation-79c110c38028
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">
+                <span className={styles.refTitle}>
                   Vishal Bulbule「Using Long term Memory in Agent (ADK): Vertex AI Memory
                   bank」Google Cloud Community
                 </span>
@@ -1557,7 +1557,7 @@ export default function Page() {
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">
+                <span className={styles.refTitle}>
                   「Google Gemini Enterprise Agent Platform: Build and Deploy A2A Agents」DEV
                   Community
                 </span>
@@ -1566,7 +1566,7 @@ export default function Page() {
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">
+                <span className={styles.refTitle}>
                   David Regalado「What is Gemini Enterprise Agent Platform?」Google Cloud Community
                 </span>
                 <Ext href="https://medium.com/google-cloud/what-is-gemini-enterprise-agent-platform-ff621edcbe3d">
@@ -1574,7 +1574,7 @@ export default function Page() {
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">
+                <span className={styles.refTitle}>
                   AIPractitioner「Google ADK Explained: Building Multi-Agent Systems With
                   Google&apos;s Agent Development Kit」Substack
                 </span>
@@ -1583,7 +1583,7 @@ export default function Page() {
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">
+                <span className={styles.refTitle}>
                   CloudZero「Google Vertex AI Pricing: Complete Enterprise Guide (2026)」
                 </span>
                 <Ext href="https://www.cloudzero.com/blog/google-vertex-ai-pricing/">
@@ -1591,7 +1591,7 @@ export default function Page() {
                 </Ext>
               </li>
               <li>
-                <span className="ref-title">
+                <span className={styles.refTitle}>
                   Wikipedia「Gemini Enterprise Agent Platform」(背景・沿革の一次確認用途)
                 </span>
                 <Ext href="https://en.wikipedia.org/wiki/Gemini_Enterprise_Agent_Platform">
