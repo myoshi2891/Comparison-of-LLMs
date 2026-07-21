@@ -77,7 +77,9 @@ export function useTocObserver({
             if (subLink) {
               subLink.classList.add(activeClassName);
               subLink.setAttribute("aria-current", "location");
-              const parentSection = subLink.closest("section");
+              // 親章は「交差した対象要素」から辿る。TOC 側のリンクはサイドバー内にあり
+              // <section> の子孫ではないため、リンク側から closest しても必ず null になる。
+              const parentSection = bestEntry.target.closest("section");
               if (parentSection) {
                 const parentTocLink = links.find((l) => l.getAttribute("href") === `#${parentSection.id}`);
                 if (parentTocLink) {
