@@ -31,7 +31,9 @@ export function useTocObserver({
   useEffect(() => {
     const sections = document.querySelectorAll(chapterSelector);
     const links = Array.from(document.querySelectorAll(tocLinkSelector));
-    const subLinks = tocSubLinkSelector ? Array.from(document.querySelectorAll(tocSubLinkSelector)) : [];
+    const subLinks = tocSubLinkSelector
+      ? Array.from(document.querySelectorAll(tocSubLinkSelector))
+      : [];
 
     if (links.length > 0) {
       links[0].classList.add(activeClassName);
@@ -44,8 +46,9 @@ export function useTocObserver({
         for (const entry of entries) {
           if (entry.isIntersecting) {
             const id = entry.target.id;
-            const hasLink = links.some((l) => l.getAttribute("href") === `#${id}`) ||
-                            subLinks.some((l) => l.getAttribute("href") === `#${id}`);
+            const hasLink =
+              links.some((l) => l.getAttribute("href") === `#${id}`) ||
+              subLinks.some((l) => l.getAttribute("href") === `#${id}`);
             if (!hasLink) continue;
 
             if (!bestEntry || entry.boundingClientRect.top < bestEntry.boundingClientRect.top) {
@@ -81,7 +84,9 @@ export function useTocObserver({
               // <section> の子孫ではないため、リンク側から closest しても必ず null になる。
               const parentSection = bestEntry.target.closest("section");
               if (parentSection) {
-                const parentTocLink = links.find((l) => l.getAttribute("href") === `#${parentSection.id}`);
+                const parentTocLink = links.find(
+                  (l) => l.getAttribute("href") === `#${parentSection.id}`
+                );
                 if (parentTocLink) {
                   parentTocLink.classList.add(activeClassName);
                 }
@@ -98,53 +103,48 @@ export function useTocObserver({
     }
 
     // 2. モバイルサイドバートグル
-    let handleToggle: (() => void) | undefined;
-    let handleLinkClick: (() => void) | undefined;
-    let toggle: HTMLElement | null = null;
-    let sidebar: HTMLElement | null = null;
+    // ハンドラはリスナ登録ブロック内の const に閉じ込める。外側の let で保持すると
+    // クロージャ内で null 絞り込みが効かず、到達不能な null ガードが必要になるため。
+    let cleanupSidebar: (() => void) | undefined;
 
     if (toggleId && sidebarId && sidebarOpenClassName) {
-      toggle = document.getElementById(toggleId);
-      sidebar = document.getElementById(sidebarId);
+      const toggle = document.getElementById(toggleId);
+      const sidebar = document.getElementById(sidebarId);
+      const openClassName = sidebarOpenClassName;
 
       if (toggle) {
         toggle.setAttribute("aria-expanded", "false");
       }
 
-      handleToggle = () => {
-        if (sidebar) {
-          const isOpen = sidebar.classList.toggle(sidebarOpenClassName);
-          toggle?.setAttribute("aria-expanded", isOpen ? "true" : "false");
-        }
-      };
-
-      handleLinkClick = () => {
-        if (sidebar) {
-          sidebar.classList.remove(sidebarOpenClassName);
-          toggle?.setAttribute("aria-expanded", "false");
-        }
-      };
-
       if (toggle && sidebar) {
-        toggle.addEventListener("click", handleToggle);
+        const handleToggle = () => {
+          const isOpen = sidebar.classList.toggle(openClassName);
+          toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        };
+
+        const handleLinkClick = () => {
+          sidebar.classList.remove(openClassName);
+          toggle.setAttribute("aria-expanded", "false");
+        };
+
         const allLinks = [...links, ...subLinks];
+        toggle.addEventListener("click", handleToggle);
         for (const l of allLinks) {
           l.addEventListener("click", handleLinkClick);
         }
+
+        cleanupSidebar = () => {
+          toggle.removeEventListener("click", handleToggle);
+          for (const l of allLinks) {
+            l.removeEventListener("click", handleLinkClick);
+          }
+        };
       }
     }
 
     return () => {
       observer.disconnect();
-      if (toggle && handleToggle) {
-        toggle.removeEventListener("click", handleToggle);
-      }
-      if (handleLinkClick) {
-        const allLinks = [...links, ...subLinks];
-        for (const l of allLinks) {
-          l.removeEventListener("click", handleLinkClick);
-        }
-      }
+      cleanupSidebar?.();
     };
   }, [
     chapterSelector,

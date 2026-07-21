@@ -12,11 +12,11 @@
 
 import { fireEvent, render } from "@testing-library/react";
 import { beforeEach, describe, expect, test } from "vitest";
+import { useTocObserver } from "@/lib/useTocObserver";
 import {
   type IntersectionObserverController,
   installIntersectionObserverStub,
 } from "@/tests/tocTestUtils";
-import { useTocObserver } from "@/lib/useTocObserver";
 
 type Options = Parameters<typeof useTocObserver>[0];
 
