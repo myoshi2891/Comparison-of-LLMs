@@ -7,7 +7,9 @@ import styles from "./page.module.css";
 
 const pageEntry = findBySlug("/claude/tag-best-practices");
 if (!pageEntry || !pageEntry.description) {
-  throw new Error("Required page registry metadata (title/description) missing for /claude/tag-best-practices");
+  throw new Error(
+    "Required page registry metadata (title/description) missing for /claude/tag-best-practices"
+  );
 }
 
 export const metadata: Metadata = {
@@ -905,6 +907,7 @@ export default function Page() {
                 <input
                   type="checkbox"
                   id="checklist-1"
+                  disabled
                   className={styles.checklistCheckbox}
                 />
                 <label htmlFor="checklist-1">
