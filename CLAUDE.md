@@ -276,8 +276,11 @@ Build:     cd web-next && bun run build
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
 2. `cd web-next && bun run test` が成功（1195 pass 全 Green ✅）
-3. 設定ファイルが意図せず変更されていない
-4. コミット対象の差分（`git diff --cached`）および新規ファイルに、個人情報（PII）やローカル環境固有の絶対パス（例: `file:///Users/` やローカルユーザー名など）が含まれていないことを確認
+3. `cd web-next && bun run typecheck` が成功
+4. `cd web-next && bun run lint` が成功
+5. `cd scraper && uv run pytest` が成功
+6. 設定ファイルが意図せず変更されていない
+7. コミット対象の差分（`git diff --cached`）および新規ファイルに、個人情報（PII）やローカル環境固有の絶対パス（例: `file:///Users/` やローカルユーザー名など）が含まれていないことを確認
 
 いずれか失敗 → **停止してユーザーに確認**。
 

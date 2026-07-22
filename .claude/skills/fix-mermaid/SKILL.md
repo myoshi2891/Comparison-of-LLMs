@@ -381,17 +381,30 @@ mermaid.initialize({ startOnLoad: false });
 
 ```tsx
 // MermaidDiagramコンポーネントの実装パターン（正解）
-export default function MermaidDiagram({ chart, theme = "dark" }) {
-  return (
-    <div
-      className={`mermaid ${className || ""}`}
-      ref={ref}
-      // ✅ width: fit-content で SVG 実寸に合わせる
-      // ❌ width: "100%" は「小さな図も全幅に引き伸ばす」ため禁止
-      style={{ width: "fit-content", maxWidth: "100%", minHeight: "4rem" }}
-    />
-  );
+import { forwardRef } from "react";
+
+interface MermaidDiagramProps {
+  chart: string;
+  className?: string;
+  theme?: string;
 }
+
+const MermaidDiagram = forwardRef<HTMLDivElement, MermaidDiagramProps>(
+  ({ chart, className, theme = "dark" }, ref) => {
+    return (
+      <div
+        className={`mermaid ${className || ""}`}
+        ref={ref}
+        data-theme={theme}
+        // ✅ width: fit-content で SVG 実寸に合わせる
+        // ❌ width: "100%" は「小さな図も全幅に引き伸ばす」ため禁止
+        style={{ width: "fit-content", maxWidth: "100%", minHeight: "4rem" }}
+      />
+    );
+  }
+);
+MermaidDiagram.displayName = "MermaidDiagram";
+export default MermaidDiagram;
 ```
 
 ```tsx
