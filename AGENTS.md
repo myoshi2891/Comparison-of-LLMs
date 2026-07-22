@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Updated 2026-07-20
+Updated 2026-07-22
 
 AGENTS.md は Codex / Cursor / Cline など AGENTS.md 規約を読む AI ツール向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、AGENTS.md はその委譲 pointer として機能する。
@@ -31,7 +31,7 @@ AGENTS.md は Codex / Cursor / Cline など AGENTS.md 規約を読む AI ツー�
 ## 検証コマンド
 
 ```bash
-cd web-next && bun run test        # 1147 pass（全 Green ✅）
+cd web-next && bun run test        # 1183 pass（全 Green ✅）
 cd web-next && bun run typecheck   # OK
 cd web-next && bun run build       # 全ルートが ○ (Static)
 cd web-next && bun run lint        # 0 件（全解消 ✅）
