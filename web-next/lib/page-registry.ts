@@ -592,6 +592,16 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-17",
   },
   {
+    slug: "/infra/amazon-bedrock-best-practices-2026-intermediate",
+    title: "Amazon Bedrock 完全ガイド",
+    group: "運用・品質",
+    topics: ["bedrock", "aws", "infra", "rag", "agent", "guardrails"],
+    summary:
+      "Amazon Bedrockのアーキテクチャ、モデル選定、Prompt Management、RAG、エージェント、Guardrails、コスト最適化、セキュリティ、可観測性を網羅した実践ガイド。",
+    addedAt: "2026-07-22",
+    lastReviewed: "2026-07-22",
+  },
+  {
     slug: "/llm-ops/evaluation-observability",
     title: "Evaluation & Observability",
     group: "運用・品質",
