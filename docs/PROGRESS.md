@@ -18,6 +18,7 @@
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **Google Gemma 実践ガイド 2026 の Next.js 移行**: `Gemma-best-practices-guide.html` を `web-next/app/google/gemma-best-practices-guide/page.tsx` に移行 🚀。原文の全14セクション・全表・全コードブロック・7 Mermaid図を React 要素として faithful に保持し、TOCのスクロール追従、外部リンクの安全属性、ページレジストリ登録、CSS Modules化によるCSS変数定義のスコープ化、フッター等幅フォント設定を追加。原本は `archive/html/google/` および `archive/md/google/` 配下に退避。契約テスト6件を追加（合計 **1167 テスト合格**）。
 - **Biome 指摘 224 件を全て解消（lint がクリーンに）**: `bun run lint` の 36 errors / 186 warnings / 2 infos をゼロにした。テストは **1161 件合格（変化なし）**、build / typecheck / pytest 38 件も全て Green。
   - **CSS 警告 179 件**（`noImportantStyles` 169 + `noDescendingSpecificity` 10）: `biome.json` の `overrides` で `app/**/page.module.css` に限定して無効化。これらは `globals.css` の素の要素セレクタを打ち消すための意図的な `!important` であり、除去するとガイドページ 24 枚の表示が壊れる。**理由は `biome.json` 内に書けない** — 厳密 JSON のためコメントを入れると設定がパース不能になり、Biome がデフォルト設定へフォールバックして `node_modules` まで走査する（実際に一度踏んで 154,586 件の診断が出た）。よって理由は CLAUDE.md に記載。これに伴い不要化した `biome-ignore` コメント 48 件を 11 ファイルから削除。
   - **format 22 + organizeImports 2**: 該当ファイルのみ個別に `biome check --write`（リポジトリ全体走査は禁止ルール）。CSS 20 ファイルは「コメント・引用符・空白を正規化すると変更前後が完全一致」することを機械的に検証済み＝**意味的変更ゼロ・視覚回帰リスクなし**（実変更は `'` → `"` の統一と複数値プロパティの改行のみ）。
