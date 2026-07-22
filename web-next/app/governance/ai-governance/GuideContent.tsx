@@ -13,7 +13,7 @@ type HtmlNode = {
   type?: string;
 };
 
-const SOURCE_PATH = join(process.cwd(), "..", "archive", "Ai-governance-guide.html");
+const SOURCE_PATH = join(process.cwd(), "..", "archive", "html", "security", "Ai-governance-guide.html");
 const sourceHtml = readFileSync(SOURCE_PATH, "utf8");
 const $ = load(sourceHtml);
 const layout = $(".layout").first().get(0) as unknown as HtmlNode;
