@@ -400,15 +400,36 @@
 }
 
 /* Syntax highlight token classes */
-.ck { color: #ff7b72; }
-.cm { color: #7ee787; font-weight: bold; }
-.cs { color: #a5d6ff; }
-.cw { color: #d29922; }
-.cv { color: #79c0ff; }
-.ce { color: #bc8cff; }
-.cc { color: #6c7893; font-style: italic; }
-.ch { color: #f0883e; font-weight: bold; }
-.cg { color: #3fb950; }
+.ck {
+  color: #ff7b72;
+}
+.cm {
+  color: #7ee787;
+  font-weight: bold;
+}
+.cs {
+  color: #a5d6ff;
+}
+.cw {
+  color: #d29922;
+}
+.cv {
+  color: #79c0ff;
+}
+.ce {
+  color: #bc8cff;
+}
+.cc {
+  color: #6c7893;
+  font-style: italic;
+}
+.ch {
+  color: #f0883e;
+  font-weight: bold;
+}
+.cg {
+  color: #3fb950;
+}
 
 @media (max-width: 960px) {
   .layout {

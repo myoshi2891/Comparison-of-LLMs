@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import React from "react";
+import type React from "react";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
-import TocObserver from "./TocObserver";
 import styles from "./page.module.css";
+import TocObserver from "./TocObserver";
 
 export const metadata: Metadata = {
   title: "Amazon Bedrock ベストプラクティス完全ガイド | AI Model Cost Calculator",
@@ -245,14 +245,17 @@ export default function AmazonBedrockBestPracticesPage() {
             中級〜上級者向け。すでにBedrockでPoCやプロトタイプを構築した経験があり、本番運用・スケール・ガバナンスの段階に進みたいAIエンジニア／ソフトウェアアーキテクト／QAエンジニアを対象にしています。
           </p>
           <div className={styles.metaRow}>
-            <span className={styles.metaItem}>🖥️ 対象: モデル選定〜運用ガバナンスまで12ステップ</span>
+            <span className={styles.metaItem}>
+              🖥️ 対象: モデル選定〜運用ガバナンスまで12ステップ
+            </span>
             <span className={styles.metaItem}>📊 図解: Mermaidフローチャート6種</span>
             <span className={styles.metaItem}>📚 参考情報源: AWS公式＋著名コミュニティ記事</span>
           </div>
         </div>
 
         <p>
-          Amazon Bedrockは、Anthropic・Meta・Mistral・Google・NVIDIA・OpenAI・MiniMax・Moonshot・Qwen・Amazonなど複数プロバイダーの基盤モデル（FM）を単一APIで利用できるフルマネージド型の生成AIサービスです。2026年時点でモデルカタログは約100モデルまで拡大し、テキストだけでなく画像・音声・コードを含むマルチモーダルなワークロードをカバーしています。
+          Amazon
+          Bedrockは、Anthropic・Meta・Mistral・Google・NVIDIA・OpenAI・MiniMax・Moonshot・Qwen・Amazonなど複数プロバイダーの基盤モデル（FM）を単一APIで利用できるフルマネージド型の生成AIサービスです。2026年時点でモデルカタログは約100モデルまで拡大し、テキストだけでなく画像・音声・コードを含むマルチモーダルなワークロードをカバーしています。
         </p>
         <p>
           本ガイドは「動くものを作る」段階から一歩進み、本番環境で安全に・安く・速く・監査可能にBedrockを運用するためのベストプラクティスを、ステップバイステップで解説します。
@@ -263,11 +266,15 @@ export default function AmazonBedrockBestPracticesPage() {
             <div className={styles.chapterNumber}>0</div>
             <h2>全体アーキテクチャ像</h2>
           </div>
-          <p>これから解説するベストプラクティスがBedrockのどの部分に対応するのかを、まず俯瞰します。</p>
+          <p>
+            これから解説するベストプラクティスがBedrockのどの部分に対応するのかを、まず俯瞰します。
+          </p>
           <div className={styles.mermaidContainer} data-testid="mermaid-diagram">
             <div style={{ width: "100%" }}>
               <MermaidDiagram chart={DIAGRAM_1} />
-              <div className={styles.mermaidCaption}>図1: Bedrock全体アーキテクチャとリクエストの流れ</div>
+              <div className={styles.mermaidCaption}>
+                図1: Bedrock全体アーキテクチャとリクエストの流れ
+              </div>
             </div>
           </div>
         </section>
@@ -283,7 +290,9 @@ export default function AmazonBedrockBestPracticesPage() {
           </p>
 
           <h3>タスクの難易度でモデルを階層化する</h3>
-          <p>すべてのリクエストに最も高性能（＝最も高価）なモデルを使うのはアンチパターンです。以下のような階層化が実務的です。</p>
+          <p>
+            すべてのリクエストに最も高性能（＝最も高価）なモデルを使うのはアンチパターンです。以下のような階層化が実務的です。
+          </p>
 
           <div className={styles.tableWrap}>
             <table className={styles.table}>
@@ -321,13 +330,18 @@ export default function AmazonBedrockBestPracticesPage() {
           <div className={`${styles.alert} ${styles.alertInfo}`}>
             <span className={styles.alertIcon}>💡</span>
             <div className={styles.alertContent}>
-              <p>この階層化を手動で行うのではなく、Step 6で解説する Intelligent Prompt Routing を使うと、リクエストごとに自動でモデルを振り分けられます。</p>
+              <p>
+                この階層化を手動で行うのではなく、Step 6で解説する Intelligent Prompt Routing
+                を使うと、リクエストごとに自動でモデルを振り分けられます。
+              </p>
             </div>
           </div>
 
           <h3>モデル選定はBedrock Evaluationsで定量的に行う</h3>
           <p>
-            「どのモデルが良さそうか」を主観で決めず、Bedrock Model Evaluationの自動メトリクス・LLM-as-a-Judge・人手レビューの3手法を組み合わせて、自社のタスク・データセットに対して定量的に比較します（詳細はStep 10）。
+            「どのモデルが良さそうか」を主観で決めず、Bedrock Model
+            Evaluationの自動メトリクス・LLM-as-a-Judge・人手レビューの3手法を組み合わせて、自社のタスク・データセットに対して定量的に比較します（詳細はStep
+            10）。
           </p>
         </section>
 
@@ -338,7 +352,9 @@ export default function AmazonBedrockBestPracticesPage() {
           </div>
           <h3>Prompt Managementでプロンプトをコードから分離する</h3>
           <p>
-            プロンプトをアプリケーションコードにハードコーディングすると、変更のたびにデプロイが必要になり、A/Bテストも困難になります。Bedrockの Prompt Management機能を使い、プロンプトをバージョン管理された独立したリソースとして管理し、エイリアス（本番用・検証用など）で切り替えられるようにします。
+            プロンプトをアプリケーションコードにハードコーディングすると、変更のたびにデプロイが必要になり、A/Bテストも困難になります。Bedrockの
+            Prompt
+            Management機能を使い、プロンプトをバージョン管理された独立したリソースとして管理し、エイリアス（本番用・検証用など）で切り替えられるようにします。
           </p>
 
           <div className={styles.codeWrap}>
@@ -347,47 +363,120 @@ export default function AmazonBedrockBestPracticesPage() {
               <span className={styles.codeLang}>Python</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}><span style={{ color: "#ff7b72" }}>import</span><span style={{ color: "#79c0ff" }}> boto3</span></div>
-              <div className={styles.codeLine}>{" "}</div>
-              <div className={styles.codeLine}><span>bedrock_agent = boto3.client(</span><span style={{ color: "#a5d6ff" }}>&quot;bedrock-agent&quot;</span><span>, region_name=</span><span style={{ color: "#a5d6ff" }}>&quot;ap-northeast-1&quot;</span><span>)</span></div>
-              <div className={styles.codeLine}><span>bedrock_runtime = boto3.client(</span><span style={{ color: "#a5d6ff" }}>&quot;bedrock-runtime&quot;</span><span>, region_name=</span><span style={{ color: "#a5d6ff" }}>&quot;ap-northeast-1&quot;</span><span>)</span></div>
-              <div className={styles.codeLine}>{" "}</div>
-              <div className={styles.codeLine}><span>prompt = bedrock_agent.get_prompt(</span></div>
-              <div className={styles.codeLine}><span>    promptIdentifier=</span><span style={{ color: "#a5d6ff" }}>&quot;my-prompt-id&quot;</span><span>,</span></div>
-              <div className={styles.codeLine}><span>    promptVersion=</span><span style={{ color: "#a5d6ff" }}>&quot;PROD&quot;</span></div>
-              <div className={styles.codeLine}><span>)</span></div>
-              <div className={styles.codeLine}>{" "}</div>
-              <div className={styles.codeLine}><span>variant = prompt[</span><span style={{ color: "#a5d6ff" }}>&quot;variants&quot;</span><span>][0]</span></div>
-              <div className={styles.codeLine}><span>model_id = variant[</span><span style={{ color: "#a5d6ff" }}>&quot;modelId&quot;</span><span>]</span></div>
-              <div className={styles.codeLine}><span>template = variant[</span><span style={{ color: "#a5d6ff" }}>&quot;templateConfiguration&quot;</span><span>][</span><span style={{ color: "#a5d6ff" }}>&quot;text&quot;</span><span>][</span><span style={{ color: "#a5d6ff" }}>&quot;text&quot;</span><span>]</span></div>
-              <div className={styles.codeLine}>{" "}</div>
-              <div className={styles.codeLine}><span>response = bedrock_runtime.converse(</span></div>
-              <div className={styles.codeLine}><span>    modelId=model_id,</span></div>
-              <div className={styles.codeLine}><span>    messages=[</span></div>
-              <div className={styles.codeLine}><span>        &#123;</span><span style={{ color: "#a5d6ff" }}>&quot;role&quot;</span><span>: </span><span style={{ color: "#a5d6ff" }}>&quot;user&quot;</span><span>, </span><span style={{ color: "#a5d6ff" }}>&quot;content&quot;</span><span>: [&#123;</span><span style={{ color: "#a5d6ff" }}>&quot;text&quot;</span><span>: template.format(question=</span><span style={{ color: "#a5d6ff" }}>&quot;返品ポリシーを教えてください&quot;</span><span>)&#125;]&#125;</span></div>
-              <div className={styles.codeLine}><span>    ]</span></div>
-              <div className={styles.codeLine}><span>)</span></div>
+              <div className={styles.codeLine}>
+                <span style={{ color: "#ff7b72" }}>import</span>
+                <span style={{ color: "#79c0ff" }}> boto3</span>
+              </div>
+              <div className={styles.codeLine}> </div>
+              <div className={styles.codeLine}>
+                <span>bedrock_agent = boto3.client(</span>
+                <span style={{ color: "#a5d6ff" }}>&quot;bedrock-agent&quot;</span>
+                <span>, region_name=</span>
+                <span style={{ color: "#a5d6ff" }}>&quot;ap-northeast-1&quot;</span>
+                <span>)</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span>bedrock_runtime = boto3.client(</span>
+                <span style={{ color: "#a5d6ff" }}>&quot;bedrock-runtime&quot;</span>
+                <span>, region_name=</span>
+                <span style={{ color: "#a5d6ff" }}>&quot;ap-northeast-1&quot;</span>
+                <span>)</span>
+              </div>
+              <div className={styles.codeLine}> </div>
+              <div className={styles.codeLine}>
+                <span>prompt = bedrock_agent.get_prompt(</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span> promptIdentifier=</span>
+                <span style={{ color: "#a5d6ff" }}>&quot;my-prompt-id&quot;</span>
+                <span>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span> promptVersion=</span>
+                <span style={{ color: "#a5d6ff" }}>&quot;PROD&quot;</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span>)</span>
+              </div>
+              <div className={styles.codeLine}> </div>
+              <div className={styles.codeLine}>
+                <span>variant = prompt[</span>
+                <span style={{ color: "#a5d6ff" }}>&quot;variants&quot;</span>
+                <span>][0]</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span>model_id = variant[</span>
+                <span style={{ color: "#a5d6ff" }}>&quot;modelId&quot;</span>
+                <span>]</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span>template = variant[</span>
+                <span style={{ color: "#a5d6ff" }}>&quot;templateConfiguration&quot;</span>
+                <span>][</span>
+                <span style={{ color: "#a5d6ff" }}>&quot;text&quot;</span>
+                <span>][</span>
+                <span style={{ color: "#a5d6ff" }}>&quot;text&quot;</span>
+                <span>]</span>
+              </div>
+              <div className={styles.codeLine}> </div>
+              <div className={styles.codeLine}>
+                <span>response = bedrock_runtime.converse(</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span> modelId=model_id,</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span> messages=[</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span> &#123;</span>
+                <span style={{ color: "#a5d6ff" }}>&quot;role&quot;</span>
+                <span>: </span>
+                <span style={{ color: "#a5d6ff" }}>&quot;user&quot;</span>
+                <span>, </span>
+                <span style={{ color: "#a5d6ff" }}>&quot;content&quot;</span>
+                <span>: [&#123;</span>
+                <span style={{ color: "#a5d6ff" }}>&quot;text&quot;</span>
+                <span>: template.format(question=</span>
+                <span style={{ color: "#a5d6ff" }}>&quot;返品ポリシーを教えてください&quot;</span>
+                <span>)&#125;]&#125;</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span> ]</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span>)</span>
+              </div>
             </div>
           </div>
 
           <h3>Prompt Optimizationを活用する</h3>
           <p>
-            Prompt ManagementのPrompt Optimization機能は、モデルに応じてプロンプトを自動的に書き換え、精度向上や応答の簡潔化を図ります。特にモデルを切り替えた直後（例: Claude系からNova系へ）は、プロンプトの「クセ」がモデルごとに異なるため、この機能で再最適化するのが効率的です。
+            Prompt ManagementのPrompt
+            Optimization機能は、モデルに応じてプロンプトを自動的に書き換え、精度向上や応答の簡潔化を図ります。特にモデルを切り替えた直後（例:
+            Claude系からNova系へ）は、プロンプトの「クセ」がモデルごとに異なるため、この機能で再最適化するのが効率的です。
           </p>
 
           <h3>長い共通コンテキストは先頭に固定する</h3>
-          <p>システムプロンプトやFew-shot例、長大なドキュメントなど「毎回同じ内容」は、プロンプトの先頭にまとめて配置します。</p>
+          <p>
+            システムプロンプトやFew-shot例、長大なドキュメントなど「毎回同じ内容」は、プロンプトの先頭にまとめて配置します。
+          </p>
 
           <div className={`${styles.alert} ${styles.alertInfo}`}>
             <span className={styles.alertIcon}>💡</span>
             <div className={styles.alertContent}>
-              <p>これはStep 6で解説するPrompt Cachingの効果を最大化するための設計上の前提条件です。ユーザー固有の質問文は末尾に配置してください。</p>
+              <p>
+                これはStep 6で解説するPrompt
+                Cachingの効果を最大化するための設計上の前提条件です。ユーザー固有の質問文は末尾に配置してください。
+              </p>
             </div>
           </div>
 
           <h3>構造化出力とTool Useを前提に設計する</h3>
           <p>
-            後続処理（他システムへの連携、UIへの描画など）が必要な場合、自由文ではなくJSON Schemaに準拠した構造化出力やTool Use（Function Calling）を前提にプロンプトを設計します。これによりパース失敗によるエラーハンドリングの複雑化を防げます。
+            後続処理（他システムへの連携、UIへの描画など）が必要な場合、自由文ではなくJSON
+            Schemaに準拠した構造化出力やTool Use（Function
+            Calling）を前提にプロンプトを設計します。これによりパース失敗によるエラーハンドリングの複雑化を防げます。
           </p>
         </section>
 
@@ -400,7 +489,9 @@ export default function AmazonBedrockBestPracticesPage() {
           <div className={styles.mermaidContainer} data-testid="mermaid-diagram">
             <div style={{ width: "100%" }}>
               <MermaidDiagram chart={DIAGRAM_2} />
-              <div className={styles.mermaidCaption}>図2: Knowledge Bases for Amazon BedrockによるRAGパイプライン</div>
+              <div className={styles.mermaidCaption}>
+                図2: Knowledge Bases for Amazon BedrockによるRAGパイプライン
+              </div>
             </div>
           </div>
 
@@ -411,7 +502,8 @@ export default function AmazonBedrockBestPracticesPage() {
 
           <h3>ベクトルストアの選定</h3>
           <p>
-            2026年時点では、Amazon S3 Vectorsがネイティブのベクトルインデックスをオブジェクトストレージ上に直接提供するようになり、専用のベクトルデータベースを別途運用する必要性が大幅に下がりました。
+            2026年時点では、Amazon S3
+            Vectorsがネイティブのベクトルインデックスをオブジェクトストレージ上に直接提供するようになり、専用のベクトルデータベースを別途運用する必要性が大幅に下がりました。
           </p>
 
           <div className={styles.tableWrap}>
@@ -450,32 +542,106 @@ export default function AmazonBedrockBestPracticesPage() {
               <span className={styles.codeLang}>Python</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}><span style={{ color: "#ff7b72" }}>import</span><span style={{ color: "#79c0ff" }}> boto3</span></div>
-              <div className={styles.codeLine}>{" "}</div>
-              <div className={styles.codeLine}><span>client = boto3.client(</span><span style={{ color: "#a5d6ff" }}>&quot;bedrock-agent-runtime&quot;</span><span>, region_name=</span><span style={{ color: "#a5d6ff" }}>&quot;ap-northeast-1&quot;</span><span>)</span></div>
-              <div className={styles.codeLine}>{" "}</div>
-              <div className={styles.codeLine}><span>response = client.retrieve_and_generate(</span></div>
-              <div className={styles.codeLine}><span>    input=&#123;</span><span style={{ color: "#a5d6ff" }}>&quot;text&quot;</span><span>: </span><span style={{ color: "#a5d6ff" }}>&quot;解約時の違約金について教えてください&quot;</span><span>&#125;,</span></div>
-              <div className={styles.codeLine}><span>    retrieveAndGenerateConfiguration=&#123;</span></div>
-              <div className={styles.codeLine}><span>        </span><span style={{ color: "#a5d6ff" }}>&quot;type&quot;</span><span>: </span><span style={{ color: "#a5d6ff" }}>&quot;KNOWLEDGE_BASE&quot;</span><span>,</span></div>
-              <div className={styles.codeLine}><span>        </span><span style={{ color: "#a5d6ff" }}>&quot;knowledgeBaseConfiguration&quot;</span><span>: &#123;</span></div>
-              <div className={styles.codeLine}><span>            </span><span style={{ color: "#a5d6ff" }}>&quot;knowledgeBaseId&quot;</span><span>: </span><span style={{ color: "#a5d6ff" }}>&quot;MY_KB_ID&quot;</span><span>,</span></div>
-              <div className={styles.codeLine}><span>            </span><span style={{ color: "#a5d6ff" }}>&quot;modelArn&quot;</span><span>: </span><span style={{ color: "#a5d6ff" }}>&quot;arn:aws:bedrock:ap-northeast-1::foundation-model/anthropic.claude-3-5-sonnet-20241022-v2:0&quot;</span><span>,</span></div>
-              <div className={styles.codeLine}><span>            </span><span style={{ color: "#a5d6ff" }}>&quot;retrievalConfiguration&quot;</span><span>: &#123;</span></div>
-              <div className={styles.codeLine}><span>                </span><span style={{ color: "#a5d6ff" }}>&quot;vectorSearchConfiguration&quot;</span><span>: &#123;</span><span style={{ color: "#a5d6ff" }}>&quot;numberOfResults&quot;</span><span>: 5&#125;</span></div>
-              <div className={styles.codeLine}><span>            &#125;</span></div>
-              <div className={styles.codeLine}><span>        &#125;</span></div>
-              <div className={styles.codeLine}><span>    &#125;</span></div>
-              <div className={styles.codeLine}><span>)</span></div>
-              <div className={styles.codeLine}>{" "}</div>
-              <div className={styles.codeLine}><span>print(response[</span><span style={{ color: "#a5d6ff" }}>&quot;output&quot;</span><span>][</span><span style={{ color: "#a5d6ff" }}>&quot;text&quot;</span><span>])</span></div>
-              <div className={styles.codeLine}><span>print(response[</span><span style={{ color: "#a5d6ff" }}>&quot;citations&quot;</span><span>])</span></div>
+              <div className={styles.codeLine}>
+                <span style={{ color: "#ff7b72" }}>import</span>
+                <span style={{ color: "#79c0ff" }}> boto3</span>
+              </div>
+              <div className={styles.codeLine}> </div>
+              <div className={styles.codeLine}>
+                <span>client = boto3.client(</span>
+                <span style={{ color: "#a5d6ff" }}>&quot;bedrock-agent-runtime&quot;</span>
+                <span>, region_name=</span>
+                <span style={{ color: "#a5d6ff" }}>&quot;ap-northeast-1&quot;</span>
+                <span>)</span>
+              </div>
+              <div className={styles.codeLine}> </div>
+              <div className={styles.codeLine}>
+                <span>response = client.retrieve_and_generate(</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span> input=&#123;</span>
+                <span style={{ color: "#a5d6ff" }}>&quot;text&quot;</span>
+                <span>: </span>
+                <span style={{ color: "#a5d6ff" }}>
+                  &quot;解約時の違約金について教えてください&quot;
+                </span>
+                <span>&#125;,</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span> retrieveAndGenerateConfiguration=&#123;</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span> </span>
+                <span style={{ color: "#a5d6ff" }}>&quot;type&quot;</span>
+                <span>: </span>
+                <span style={{ color: "#a5d6ff" }}>&quot;KNOWLEDGE_BASE&quot;</span>
+                <span>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span> </span>
+                <span style={{ color: "#a5d6ff" }}>&quot;knowledgeBaseConfiguration&quot;</span>
+                <span>: &#123;</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span> </span>
+                <span style={{ color: "#a5d6ff" }}>&quot;knowledgeBaseId&quot;</span>
+                <span>: </span>
+                <span style={{ color: "#a5d6ff" }}>&quot;MY_KB_ID&quot;</span>
+                <span>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span> </span>
+                <span style={{ color: "#a5d6ff" }}>&quot;modelArn&quot;</span>
+                <span>: </span>
+                <span style={{ color: "#a5d6ff" }}>
+                  &quot;arn:aws:bedrock:ap-northeast-1::foundation-model/anthropic.claude-3-5-sonnet-20241022-v2:0&quot;
+                </span>
+                <span>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span> </span>
+                <span style={{ color: "#a5d6ff" }}>&quot;retrievalConfiguration&quot;</span>
+                <span>: &#123;</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span> </span>
+                <span style={{ color: "#a5d6ff" }}>&quot;vectorSearchConfiguration&quot;</span>
+                <span>: &#123;</span>
+                <span style={{ color: "#a5d6ff" }}>&quot;numberOfResults&quot;</span>
+                <span>: 5&#125;</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span> &#125;</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span> &#125;</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span> &#125;</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span>)</span>
+              </div>
+              <div className={styles.codeLine}> </div>
+              <div className={styles.codeLine}>
+                <span>print(response[</span>
+                <span style={{ color: "#a5d6ff" }}>&quot;output&quot;</span>
+                <span>][</span>
+                <span style={{ color: "#a5d6ff" }}>&quot;text&quot;</span>
+                <span>])</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span>print(response[</span>
+                <span style={{ color: "#a5d6ff" }}>&quot;citations&quot;</span>
+                <span>])</span>
+              </div>
             </div>
           </div>
 
           <h3>RAG専用の評価を別立てで行う</h3>
           <p>
-            RAGはモデル単体の評価だけでは不十分です。Bedrock Knowledge Basesの評価機能では、Context Relevance（検索文脈の関連性）、Faithfulness（生成内容が検索結果に忠実か）、Correctness（正解との一致度）などRAG特有の指標を分離して評価できます。検索コンポーネントと生成コンポーネントのどちらに問題があるかを切り分けることが、改善の第一歩です。
+            RAGはモデル単体の評価だけでは不十分です。Bedrock Knowledge Basesの評価機能では、Context
+            Relevance（検索文脈の関連性）、Faithfulness（生成内容が検索結果に忠実か）、Correctness（正解との一致度）などRAG特有の指標を分離して評価できます。検索コンポーネントと生成コンポーネントのどちらに問題があるかを切り分けることが、改善の第一歩です。
           </p>
         </section>
 
@@ -485,7 +651,9 @@ export default function AmazonBedrockBestPracticesPage() {
             <h2>エージェント構築とマルチエージェント・オーケストレーション（AgentCore）</h2>
           </div>
           <h3>1エージェントに詰め込みすぎない</h3>
-          <p>単一のエージェントにツールや指示を詰め込みすぎると、システムプロンプトが肥大化し、モデルのツール選択精度が急激に低下します。</p>
+          <p>
+            単一のエージェントにツールや指示を詰め込みすぎると、システムプロンプトが肥大化し、モデルのツール選択精度が急激に低下します。
+          </p>
 
           <div className={`${styles.alert} ${styles.alertWarning}`}>
             <span className={styles.alertIcon}>⚠️</span>
@@ -500,7 +668,9 @@ export default function AmazonBedrockBestPracticesPage() {
           <div className={styles.mermaidContainer} data-testid="mermaid-diagram">
             <div style={{ width: "100%" }}>
               <MermaidDiagram chart={DIAGRAM_3} />
-              <div className={styles.mermaidCaption}>図3: Supervisor型マルチエージェント・オーケストレーション</div>
+              <div className={styles.mermaidCaption}>
+                図3: Supervisor型マルチエージェント・オーケストレーション
+              </div>
             </div>
           </div>
 
@@ -544,23 +714,44 @@ export default function AmazonBedrockBestPracticesPage() {
           </div>
 
           <p>
-            規制業界など「同じ入力に対して常に同じ実行パスを説明できる必要がある」場合は、LLMによる動的判断よりもStep Functionsのようなルールベースのワークフローエンジンでエージェントを制御するほうが、監査要件に適合しやすいという実務上の知見も報告されています。
+            規制業界など「同じ入力に対して常に同じ実行パスを説明できる必要がある」場合は、LLMによる動的判断よりもStep
+            Functionsのようなルールベースのワークフローエンジンでエージェントを制御するほうが、監査要件に適合しやすいという実務上の知見も報告されています。
           </p>
 
           <h3>AgentCoreによる本番運用のための主要コンポーネント</h3>
           <ul>
-            <li><b>AgentCore Runtime</b>: エージェントをセッションごとに隔離されたマイクロVM環境でホストし、ライフサイクル管理・ガードレール適用・ストリーミング応答を担う</li>
-            <li><b>AgentCore Gateway</b>: 既存のREST API（OpenAPI仕様）をコード変更なしにMCPツールとして公開する</li>
-            <li><b>AgentCore Identity</b>: OAuthクレデンシャルやAPIキーを安全に管理し、エージェントコード内へのクレデンシャル露出を防ぐ</li>
-            <li><b>AgentCore Memory</b>: セッションをまたいだ文脈の永続化と、ストリーミング通知による状態共有</li>
-            <li><b>AgentCore Observability</b>: OpenTelemetry準拠のトレースをCloudWatchに集約</li>
-            <li><b>AgentCore Evaluations</b>: 継続的な品質評価（Step 10で詳述）</li>
-            <li><b>Policy制御（Cedar言語）</b>: エージェントがツール呼び出しを実行する前に、推論ループの外側で許可判定を行う決定論的な制御層</li>
+            <li>
+              <b>AgentCore Runtime</b>:
+              エージェントをセッションごとに隔離されたマイクロVM環境でホストし、ライフサイクル管理・ガードレール適用・ストリーミング応答を担う
+            </li>
+            <li>
+              <b>AgentCore Gateway</b>: 既存のREST
+              API（OpenAPI仕様）をコード変更なしにMCPツールとして公開する
+            </li>
+            <li>
+              <b>AgentCore Identity</b>:
+              OAuthクレデンシャルやAPIキーを安全に管理し、エージェントコード内へのクレデンシャル露出を防ぐ
+            </li>
+            <li>
+              <b>AgentCore Memory</b>:
+              セッションをまたいだ文脈の永続化と、ストリーミング通知による状態共有
+            </li>
+            <li>
+              <b>AgentCore Observability</b>: OpenTelemetry準拠のトレースをCloudWatchに集約
+            </li>
+            <li>
+              <b>AgentCore Evaluations</b>: 継続的な品質評価（Step 10で詳述）
+            </li>
+            <li>
+              <b>Policy制御（Cedar言語）</b>:
+              エージェントがツール呼び出しを実行する前に、推論ループの外側で許可判定を行う決定論的な制御層
+            </li>
           </ul>
 
           <h3>PoCから本番への「谷」を越えるための実践知</h3>
           <p>
-            re:Invent 2025のセッションで語られた知見として、PoCと本番運用の間には「PoC to production chasm」と呼ばれる大きなギャップが存在します。これを越えるための実践的な指針は次の通りです。
+            re:Invent 2025のセッションで語られた知見として、PoCと本番運用の間には「PoC to production
+            chasm」と呼ばれる大きなギャップが存在します。これを越えるための実践的な指針は次の通りです。
           </p>
           <ol>
             <li>小さく始める（Start small） — 1つのユースケースに絞ってエンドツーエンドで動かす</li>
@@ -626,7 +817,9 @@ export default function AmazonBedrockBestPracticesPage() {
             <span className={styles.alertIcon}>ℹ️</span>
             <div className={styles.alertContent}>
               <p>
-                Automated Reasoning checksは、他のGuardrailsの機能が確率的な分類モデルであるのに対し、SAT/SMTソルバーに基づく形式手法（Formal Verification）で形式論理に則ってモデル出力を検証するという点で本質的に異なります。
+                Automated Reasoning
+                checksは、他のGuardrailsの機能が確率的な分類モデルであるのに対し、SAT/SMTソルバーに基づく形式手法（Formal
+                Verification）で形式論理に則ってモデル出力を検証するという点で本質的に異なります。
               </p>
             </div>
           </div>
@@ -636,7 +829,9 @@ export default function AmazonBedrockBestPracticesPage() {
 
           <h3>GuardrailsはIAMで「必須化」する</h3>
           <p>
-            Guardrailsをアプリケーションコード側で「呼び出す・呼び出さない」を選べる状態にしておくと、実装漏れによって保護されないパスが生まれます。IAMポリシーの条件キー <code>bedrock:GuardrailIdentifier</code> を用いて、承認されたGuardrailを指定しないInvokeModel呼び出しそのものを拒否する設定にします。
+            Guardrailsをアプリケーションコード側で「呼び出す・呼び出さない」を選べる状態にしておくと、実装漏れによって保護されないパスが生まれます。IAMポリシーの条件キー{" "}
+            <code>bedrock:GuardrailIdentifier</code>{" "}
+            を用いて、承認されたGuardrailを指定しないInvokeModel呼び出しそのものを拒否する設定にします。
           </p>
         </section>
 
@@ -734,11 +929,16 @@ export default function AmazonBedrockBestPracticesPage() {
           <div className={styles.mermaidContainer} data-testid="mermaid-diagram">
             <div style={{ width: "100%" }}>
               <MermaidDiagram chart={DIAGRAM_5} />
-              <div className={styles.mermaidCaption}>図5: リクエストが通過するセキュリティ保護層</div>
+              <div className={styles.mermaidCaption}>
+                図5: リクエストが通過するセキュリティ保護層
+              </div>
             </div>
           </div>
           <h3>IAM最小権限の徹底</h3>
-          <p>承認済みのモデルARNのみを明示的に許可し、Permissions BoundaryやIAM Access Analyzerで定期的に検証します。</p>
+          <p>
+            承認済みのモデルARNのみを明示的に許可し、Permissions BoundaryやIAM Access
+            Analyzerで定期的に検証します。
+          </p>
         </section>
 
         <section className={styles.chapter} id="step-9">
@@ -850,19 +1050,33 @@ export default function AmazonBedrockBestPracticesPage() {
             <h2>本番展開前チェックリスト</h2>
           </div>
           <ul>
-            <li>✅ モデルは単一プロバイダーに固定されず、切り替え可能な抽象化レイヤーの背後にあるか</li>
-            <li>✅ Prompt ManagementでプロンプトがGitやCI/CDと同様のライフサイクルで管理されているか</li>
-            <li>✅ RAGを使う場合、検索コンポーネントと生成コンポーネントを別々に評価できているか</li>
-            <li>✅ エージェントの場合、1エージェントあたりのツール数は絞り込まれているか（目安5〜10個）</li>
+            <li>
+              ✅ モデルは単一プロバイダーに固定されず、切り替え可能な抽象化レイヤーの背後にあるか
+            </li>
+            <li>
+              ✅ Prompt ManagementでプロンプトがGitやCI/CDと同様のライフサイクルで管理されているか
+            </li>
+            <li>
+              ✅ RAGを使う場合、検索コンポーネントと生成コンポーネントを別々に評価できているか
+            </li>
+            <li>
+              ✅
+              エージェントの場合、1エージェントあたりのツール数は絞り込まれているか（目安5〜10個）
+            </li>
             <li>✅ Guardrailsが bedrock:GuardrailIdentifier のIAM条件キーで強制されているか</li>
             <li>✅ Model Invocation LoggingとCloudTrailの両方が有効化されているか</li>
             <li>✅ VPCインターフェースエンドポイント経由でプライベートに呼び出しているか</li>
-            <li>✅ カスタムモデル・Guardrails・エージェントセッションはKMS CMKで暗号化されているか</li>
+            <li>
+              ✅ カスタムモデル・Guardrails・エージェントセッションはKMS CMKで暗号化されているか
+            </li>
             <li>✅ Prompt CachingとIntelligent Prompt Routingを適用余地の観点で検討済みか</li>
             <li>✅ Cross-Region Inference / Provisioned Throughputの使い分けを決めているか</li>
             <li>✅ LLM-as-a-Judgeによる継続評価がCI/CDの回帰テストとして組み込まれているか</li>
             <li>✅ AgentCore ObservabilityまたはCloudWatchで異常検知アラートが設定されているか</li>
-            <li>✅ マルチアカウント運用の場合、SCP・IAM・VPCエンドポイントポリシーがStackSetsなどで統一配布されているか</li>
+            <li>
+              ✅
+              マルチアカウント運用の場合、SCP・IAM・VPCエンドポイントポリシーがStackSetsなどで統一配布されているか
+            </li>
           </ul>
         </section>
 
@@ -871,7 +1085,9 @@ export default function AmazonBedrockBestPracticesPage() {
             <div className={styles.chapterNumber}>📚</div>
             <h2>補足: その他のベストプラクティスと参考情報源</h2>
           </div>
-          <p>以下は、本ガイド作成にあたって参照した主な一次情報源および参考ドキュメント一覧です。</p>
+          <p>
+            以下は、本ガイド作成にあたって参照した主な一次情報源および参考ドキュメント一覧です。
+          </p>
 
           <div className={styles.tableWrap}>
             <table className={styles.table}>
@@ -886,22 +1102,36 @@ export default function AmazonBedrockBestPracticesPage() {
                 <tr>
                   <td>Amazon Bedrock 製品ページ</td>
                   <td>サービス概要</td>
-                  <td><Ext href="https://aws.amazon.com/bedrock/">aws.amazon.com/bedrock</Ext></td>
+                  <td>
+                    <Ext href="https://aws.amazon.com/bedrock/">aws.amazon.com/bedrock</Ext>
+                  </td>
                 </tr>
                 <tr>
                   <td>Amazon Bedrock ユーザーガイド</td>
                   <td>公式ドキュメントポータル</td>
-                  <td><Ext href="https://docs.aws.amazon.com/bedrock/">docs.aws.amazon.com/bedrock</Ext></td>
+                  <td>
+                    <Ext href="https://docs.aws.amazon.com/bedrock/">
+                      docs.aws.amazon.com/bedrock
+                    </Ext>
+                  </td>
                 </tr>
                 <tr>
                   <td>Guardrails公式ガイド</td>
                   <td>フィルタ種別の詳細</td>
-                  <td><Ext href="https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html">guardrails.html</Ext></td>
+                  <td>
+                    <Ext href="https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html">
+                      guardrails.html
+                    </Ext>
+                  </td>
                 </tr>
                 <tr>
                   <td>AWS Well-Architected Generative AI Lens</td>
                   <td>6つの柱によるアセスメント</td>
-                  <td><Ext href="https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/generative-ai-lens.html">generative-ai-lens.html</Ext></td>
+                  <td>
+                    <Ext href="https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/generative-ai-lens.html">
+                      generative-ai-lens.html
+                    </Ext>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -914,7 +1144,10 @@ export default function AmazonBedrockBestPracticesPage() {
             <h2>まとめ</h2>
           </div>
           <p>
-            Amazon Bedrockのベストプラクティスは、単発の「Tips集」ではなく、モデル選定 → プロンプト設計 → RAG/エージェント構築 → 安全性制御 → コスト最適化 → 性能・可用性 → セキュリティ・ガバナンス → 可観測性 → 継続的評価という一連のライフサイクルとして捉えることが重要です。
+            Amazon Bedrockのベストプラクティスは、単発の「Tips集」ではなく、モデル選定 →
+            プロンプト設計 → RAG/エージェント構築 → 安全性制御 → コスト最適化 → 性能・可用性 →
+            セキュリティ・ガバナンス → 可観測性 →
+            継続的評価という一連のライフサイクルとして捉えることが重要です。
           </p>
         </section>
 

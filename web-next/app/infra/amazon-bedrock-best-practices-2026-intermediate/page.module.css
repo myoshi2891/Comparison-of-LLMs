@@ -130,7 +130,9 @@
   font-size: 13px;
   cursor: pointer;
   border-left: 2px solid transparent;
-  transition: background 0.12s ease, border-color 0.12s ease;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease;
   text-decoration: none;
 }
 
@@ -248,7 +250,9 @@
   border: 1px solid var(--color-border-tertiary);
   border-radius: 12px;
   padding: 20px;
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease;
 }
 
 .card:hover {

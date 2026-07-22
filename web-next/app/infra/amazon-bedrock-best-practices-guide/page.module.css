@@ -207,7 +207,9 @@
   font-size: 13px;
   line-height: 1.4;
   text-decoration: none;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .navItem:hover {
@@ -490,12 +492,35 @@
 }
 
 /* Syntax highlight colors */
-.ck { color: #ff7b72; font-weight: 600; }
-.cs { color: #a5d6ff; }
-.cv { color: #79c0ff; }
-.cm { color: #7ee787; font-weight: 600; }
-.cw { color: #d29922; font-weight: 600; }
-.ce { color: #bc8cff; }
-.cc { color: #6e7681; font-style: italic; }
-.cg { color: #3fb950; }
-.ch { color: #f0883e; font-weight: 600; }
+.ck {
+  color: #ff7b72;
+  font-weight: 600;
+}
+.cs {
+  color: #a5d6ff;
+}
+.cv {
+  color: #79c0ff;
+}
+.cm {
+  color: #7ee787;
+  font-weight: 600;
+}
+.cw {
+  color: #d29922;
+  font-weight: 600;
+}
+.ce {
+  color: #bc8cff;
+}
+.cc {
+  color: #6e7681;
+  font-style: italic;
+}
+.cg {
+  color: #3fb950;
+}
+.ch {
+  color: #f0883e;
+  font-weight: 600;
+}

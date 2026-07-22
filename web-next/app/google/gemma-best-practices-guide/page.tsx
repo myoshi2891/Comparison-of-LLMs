@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
-import TocObserver from "./TocObserver";
 import styles from "./page.module.css";
+import TocObserver from "./TocObserver";
 
 export const metadata: Metadata = {
   title: "Gemma 4 実践ガイド 2026 — 中級〜上級エンジニア向けベストプラクティス",
@@ -128,17 +128,27 @@ export default function GemmaBestPracticesGuidePage() {
             Calling・量子化戦略のすべてが刷新されました。本ガイドは公式ドキュメントとモデルカードを一次情報として、選定からファインチューニング、デプロイ、安全性まで一気通貫でステップバイステップに解説します。
           </p>
           <div className={styles.heroMeta}>
-            <span className={styles.pill}>対象: Transformer/LoRA/量子化を理解しているエンジニア</span>
+            <span className={styles.pill}>
+              対象: Transformer/LoRA/量子化を理解しているエンジニア
+            </span>
             <span className={styles.pill}>ベース: Gemma 4 (E2B/E4B/12B/26B A4B/31B)</span>
             <span className={styles.pill}>形式: Markdown表 + Mermaid図解</span>
           </div>
         </header>
 
-        <section className={styles.section} id="reading-flow" style={{ paddingTop: "2.6rem", paddingBottom: "2.6rem" }}>
+        <section
+          className={styles.section}
+          id="reading-flow"
+          style={{ paddingTop: "2.6rem", paddingBottom: "2.6rem" }}
+        >
           <div className={styles.sectionEyebrow}>Roadmap</div>
           <h2>このガイドの読み方</h2>
           <p>
-            2026年4月2日、Google DeepMindは新世代モデル<strong>Gemma 4</strong>を発表しました。Gemma 3系列と比べてアーキテクチャそのものが刷新されており、プロンプトの制御トークン体系、Thinking(推論)モード、Function Calling、量子化戦略のすべてが変更されています。本ガイドは、旧世代(Gemma 1〜3)の情報と混同しやすいポイントを明示しながら、Gemma 4を中心にステップバイステップで解説します。
+            2026年4月2日、Google DeepMindは新世代モデル<strong>Gemma 4</strong>を発表しました。Gemma
+            3系列と比べてアーキテクチャそのものが刷新されており、プロンプトの制御トークン体系、Thinking(推論)モード、Function
+            Calling、量子化戦略のすべてが変更されています。本ガイドは、旧世代(Gemma
+            1〜3)の情報と混同しやすいポイントを明示しながら、Gemma
+            4を中心にステップバイステップで解説します。
           </p>
 
           <div className={styles.mermaidContainer}>
@@ -165,7 +175,9 @@ export default function GemmaBestPracticesGuidePage() {
 
           <h3>1.1 Gemmaのポジショニング</h3>
           <p>
-            GemmaはGemini系列と同じ研究基盤から派生した<strong>オープンウェイト</strong>モデル群です。Gemma 4はGemini 3の研究を土台にしており、Apache 2.0ライセンス(Gemma利用規約に準拠)のもとで商用利用が可能です。コアのテキスト/マルチモーダルモデル以外にも、用途特化の派生モデル(Gemmaverse)が多数存在します。
+            GemmaはGemini系列と同じ研究基盤から派生した<strong>オープンウェイト</strong>
+            モデル群です。Gemma 4はGemini 3の研究を土台にしており、Apache
+            2.0ライセンス(Gemma利用規約に準拠)のもとで商用利用が可能です。コアのテキスト/マルチモーダルモデル以外にも、用途特化の派生モデル(Gemmaverse)が多数存在します。
           </p>
 
           <div className={styles.tableWrap}>
@@ -217,11 +229,7 @@ export default function GemmaBestPracticesGuidePage() {
             </table>
           </div>
           <p className={styles.sourceNote}>
-            出典:{" "}
-            <Ext href="https://deepmind.google/models/gemma/">
-              Gemma — Google DeepMind
-            </Ext>{" "}
-            ／{" "}
+            出典: <Ext href="https://deepmind.google/models/gemma/">Gemma — Google DeepMind</Ext> ／{" "}
             <Ext href="https://ai.google.dev/gemma/docs">
               Gemma models overview | Google AI for Developers
             </Ext>
@@ -300,24 +308,22 @@ export default function GemmaBestPracticesGuidePage() {
           <div className={styles.callout}>
             <span className={styles.calloutTitle}>用語補足</span>
             <p style={{ margin: "0 0 0.6rem" }}>
-              <strong>E2B/E4Bの「E」= Effective(実効)</strong>：Per-Layer Embeddings(PLE)により各デコーダ層が独自の軽量埋め込みテーブルを持つ。巨大だがルックアップのみに使われるため、実ロードメモリは実効パラメータ数より多くなる。
+              <strong>E2B/E4Bの「E」= Effective(実効)</strong>：Per-Layer
+              Embeddings(PLE)により各デコーダ層が独自の軽量埋め込みテーブルを持つ。巨大だがルックアップのみに使われるため、実ロードメモリは実効パラメータ数より多くなる。
             </p>
             <p style={{ margin: "0 0 0.6rem" }}>
-              <strong>26B A4Bの「A」= Active(アクティブ)</strong>：全128エキスパート＋共有1個のうちトークンごとに8エキスパートのみ活性化。推論速度は4Bモデル並みだが、ルーティング維持のため全26Bぶんをメモリに常駐させる必要がある。
+              <strong>26B A4Bの「A」= Active(アクティブ)</strong>
+              ：全128エキスパート＋共有1個のうちトークンごとに8エキスパートのみ活性化。推論速度は4Bモデル並みだが、ルーティング維持のため全26Bぶんをメモリに常駐させる必要がある。
             </p>
             <p style={{ margin: 0 }}>
-              <strong>12B「Unified」</strong>：画像・音声用の専用エンコーダを持たず、生の画像パッチ/音声波形を線形射影で直接LLMの埋め込み空間に投影する、初のエンコーダフリー中規模モデル。
+              <strong>12B「Unified」</strong>
+              ：画像・音声用の専用エンコーダを持たず、生の画像パッチ/音声波形を線形射影で直接LLMの埋め込み空間に投影する、初のエンコーダフリー中規模モデル。
             </p>
           </div>
           <p className={styles.sourceNote}>
             出典:{" "}
-            <Ext href="https://ai.google.dev/gemma/docs/core/model_card_4">
-              Gemma 4 model card
-            </Ext>{" "}
-            ／{" "}
-            <Ext href="https://ai.google.dev/gemma/docs/core">
-              Gemma 4 model overview
-            </Ext>
+            <Ext href="https://ai.google.dev/gemma/docs/core/model_card_4">Gemma 4 model card</Ext>{" "}
+            ／ <Ext href="https://ai.google.dev/gemma/docs/core">Gemma 4 model overview</Ext>
           </p>
 
           <h3>1.3 選定フローチャート</h3>
@@ -420,7 +426,8 @@ export default function GemmaBestPracticesGuidePage() {
             </table>
           </div>
           <p>
-            数学・コーディング・エージェント系タスクでGemma 3からの伸び幅が特に大きい点が特徴です。長文脈(MRCR)と高難度推論(AIME/GPQA)ではモデルサイズによる差が非常に大きく出るため、「小型モデルで十分」と判断する前に該当タスクでの実測評価を推奨します。
+            数学・コーディング・エージェント系タスクでGemma
+            3からの伸び幅が特に大きい点が特徴です。長文脈(MRCR)と高難度推論(AIME/GPQA)ではモデルサイズによる差が非常に大きく出るため、「小型モデルで十分」と判断する前に該当タスクでの実測評価を推奨します。
           </p>
           <p className={styles.sourceNote}>
             出典:{" "}
@@ -495,10 +502,12 @@ export default function GemmaBestPracticesGuidePage() {
           <div className={styles.calloutWarn}>
             <span className={styles.calloutTitle}>実務で見落としやすい注意点</span>
             <p style={{ margin: "0 0 0.6rem" }}>
-              上表は<strong>静的な重みのロードのみ</strong>の数値で、KVキャッシュ(コンテキスト長に比例して増大)や推論エンジンのオーバーヘッドは含まれません。ロングコンテキスト運用時は追加でVRAMを確保してください。
+              上表は<strong>静的な重みのロードのみ</strong>
+              の数値で、KVキャッシュ(コンテキスト長に比例して増大)や推論エンジンのオーバーヘッドは含まれません。ロングコンテキスト運用時は追加でVRAMを確保してください。
             </p>
             <p style={{ margin: "0 0 0.6rem" }}>
-              26B A4B(MoE)は「アクティブパラメータ4B」でも、ルーティングのため<strong>全26Bを常駐</strong>させる必要があり、メモリ効率は見た目ほど良くありません。
+              26B A4B(MoE)は「アクティブパラメータ4B」でも、ルーティングのため
+              <strong>全26Bを常駐</strong>させる必要があり、メモリ効率は見た目ほど良くありません。
             </p>
             <p style={{ margin: 0 }}>
               ファインチューニング時のメモリ要件は推論より大幅に高くなります。フルファインチューニングかLoRA/QLoRAかで必要メモリが桁違いに変わります(第7章参照)。
@@ -513,7 +522,10 @@ export default function GemmaBestPracticesGuidePage() {
 
           <h3>2.2 Quantization-Aware Training(QAT)を優先する</h3>
           <p>
-            Gemma 4では公式のQATチェックポイントが提供されています。通常のPost-Training Quantization(PTQ)は学習済みモデルを事後圧縮するため精度劣化が起きやすいのに対し、QATは<strong>量子化を学習プロセスに組み込む</strong>ことで、低ビット化しても高精度を維持します。ローカル実行では「同じ4bitでも」PTQよりQATを優先することが推奨されます。
+            Gemma 4では公式のQATチェックポイントが提供されています。通常のPost-Training
+            Quantization(PTQ)は学習済みモデルを事後圧縮するため精度劣化が起きやすいのに対し、QATは
+            <strong>量子化を学習プロセスに組み込む</strong>
+            ことで、低ビット化しても高精度を維持します。ローカル実行では「同じ4bitでも」PTQよりQATを優先することが推奨されます。
           </p>
 
           <div className={styles.mermaidContainer}>
@@ -572,7 +584,8 @@ export default function GemmaBestPracticesGuidePage() {
                 <tr>
                   <td>投機的デコーディング</td>
                   <td>
-                    <code className={styles.inlineCode}>-qat-q4_0-unquantized</code> + <code className={styles.inlineCode}>-assistant</code>
+                    <code className={styles.inlineCode}>-qat-q4_0-unquantized</code> +{" "}
+                    <code className={styles.inlineCode}>-assistant</code>
                   </td>
                   <td>MTPドラフトモデルと組み合わせた高速化</td>
                 </tr>
@@ -587,14 +600,13 @@ export default function GemmaBestPracticesGuidePage() {
             </table>
           </div>
           <p>
-            公式QATコレクションは Hugging Face の <code className={styles.inlineCode}>google/gemma-4-qat-q4-0</code> および
-            <code className={styles.inlineCode}>google/gemma-4-qat-mobile</code> コレクション、または Kaggle から取得できます。
+            公式QATコレクションは Hugging Face の{" "}
+            <code className={styles.inlineCode}>google/gemma-4-qat-q4-0</code> および
+            <code className={styles.inlineCode}>google/gemma-4-qat-mobile</code>{" "}
+            コレクション、または Kaggle から取得できます。
           </p>
           <p className={styles.sourceNote}>
-            出典:{" "}
-            <Ext href="https://ai.google.dev/gemma/docs/core">
-              Gemma 4 model overview
-            </Ext>
+            出典: <Ext href="https://ai.google.dev/gemma/docs/core">Gemma 4 model overview</Ext>
           </p>
         </section>
 
@@ -605,7 +617,9 @@ export default function GemmaBestPracticesGuidePage() {
           <div className={styles.calloutWarn}>
             <span className={styles.calloutTitle}>重要</span>
             <p style={{ margin: 0 }}>
-              Gemma 4はGemma 1〜3の <code className={styles.inlineCode}>&lt;start_of_turn&gt;</code> / <code className={styles.inlineCode}>&lt;end_of_turn&gt;</code> 形式から刷新され、新しい制御トークン体系を採用しています。旧形式のコードやプロンプトテンプレートをそのまま流用すると正しく動作しません。
+              Gemma 4はGemma 1〜3の <code className={styles.inlineCode}>&lt;start_of_turn&gt;</code>{" "}
+              / <code className={styles.inlineCode}>&lt;end_of_turn&gt;</code>{" "}
+              形式から刷新され、新しい制御トークン体系を採用しています。旧形式のコードやプロンプトテンプレートをそのまま流用すると正しく動作しません。
             </p>
           </div>
 
@@ -620,23 +634,33 @@ export default function GemmaBestPracticesGuidePage() {
               </thead>
               <tbody>
                 <tr>
-                  <td><code className={styles.inlineCode}>system</code></td>
+                  <td>
+                    <code className={styles.inlineCode}>system</code>
+                  </td>
                   <td>システム指示のロールを示す</td>
                 </tr>
                 <tr>
-                  <td><code className={styles.inlineCode}>user</code></td>
+                  <td>
+                    <code className={styles.inlineCode}>user</code>
+                  </td>
                   <td>ユーザーターンを示す</td>
                 </tr>
                 <tr>
-                  <td><code className={styles.inlineCode}>model</code></td>
+                  <td>
+                    <code className={styles.inlineCode}>model</code>
+                  </td>
                   <td>モデルターンを示す</td>
                 </tr>
                 <tr>
-                  <td><code className={styles.inlineCode}>&lt;|turn&gt;</code></td>
+                  <td>
+                    <code className={styles.inlineCode}>&lt;|turn&gt;</code>
+                  </td>
                   <td>対話ターンの開始</td>
                 </tr>
                 <tr>
-                  <td><code className={styles.inlineCode}>&lt;turn|&gt;</code></td>
+                  <td>
+                    <code className={styles.inlineCode}>&lt;turn|&gt;</code>
+                  </td>
                   <td>対話ターンの終了</td>
                 </tr>
               </tbody>
@@ -650,15 +674,30 @@ export default function GemmaBestPracticesGuidePage() {
               <span className={styles.codeLang}>TEXT</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}><span className={styles.ch}>{"<|turn>"}</span><span className={styles.ck}>system</span></div>
-              <div className={styles.codeLine}>{"You are a helpful assistant."}<span className={styles.ch}>{"<turn|>"}</span></div>
-              <div className={styles.codeLine}><span className={styles.ch}>{"<|turn>"}</span><span className={styles.ck}>user</span></div>
-              <div className={styles.codeLine}>{"Hello."}<span className={styles.ch}>{"<turn|>"}</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.ch}>{"<|turn>"}</span>
+                <span className={styles.ck}>system</span>
+              </div>
+              <div className={styles.codeLine}>
+                {"You are a helpful assistant."}
+                <span className={styles.ch}>{"<turn|>"}</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ch}>{"<|turn>"}</span>
+                <span className={styles.ck}>user</span>
+              </div>
+              <div className={styles.codeLine}>
+                {"Hello."}
+                <span className={styles.ch}>{"<turn|>"}</span>
+              </div>
             </div>
           </div>
 
           <p>
-            多くのライブラリ(Transformers、llama.cppなど)は <code className={styles.inlineCode}>apply_chat_template()</code> 等のchat templateがこの複雑さを吸収してくれるため、手書きする機会は少ないものの、<strong>デバッグ時にトークンの意味を理解しておくことが重要</strong>です。
+            多くのライブラリ(Transformers、llama.cppなど)は{" "}
+            <code className={styles.inlineCode}>apply_chat_template()</code> 等のchat
+            templateがこの複雑さを吸収してくれるため、手書きする機会は少ないものの、
+            <strong>デバッグ時にトークンの意味を理解しておくことが重要</strong>です。
           </p>
           <p className={styles.sourceNote}>
             出典:{" "}
@@ -678,11 +717,17 @@ export default function GemmaBestPracticesGuidePage() {
               </thead>
               <tbody>
                 <tr>
-                  <td><code className={styles.inlineCode}>&lt;|image&gt;</code> ... <code className={styles.inlineCode}>&lt;image|&gt;</code></td>
+                  <td>
+                    <code className={styles.inlineCode}>&lt;|image&gt;</code> ...{" "}
+                    <code className={styles.inlineCode}>&lt;image|&gt;</code>
+                  </td>
                   <td>画像埋め込みを示す</td>
                 </tr>
                 <tr>
-                  <td><code className={styles.inlineCode}>&lt;|audio&gt;</code> ... <code className={styles.inlineCode}>&lt;audio|&gt;</code></td>
+                  <td>
+                    <code className={styles.inlineCode}>&lt;|audio&gt;</code> ...{" "}
+                    <code className={styles.inlineCode}>&lt;audio|&gt;</code>
+                  </td>
                   <td>音声埋め込みを示す</td>
                 </tr>
                 <tr>
@@ -695,14 +740,19 @@ export default function GemmaBestPracticesGuidePage() {
           <div className={styles.callout}>
             <span className={styles.calloutTitle}>ベストプラクティス(モダリティの並び順)</span>
             <ul style={{ margin: 0 }}>
-              <li>画像コンテンツは<strong>テキストより前</strong>に配置する</li>
-              <li>音声コンテンツは<strong>テキストより後</strong>に配置する</li>
+              <li>
+                画像コンテンツは<strong>テキストより前</strong>に配置する
+              </li>
+              <li>
+                音声コンテンツは<strong>テキストより後</strong>に配置する
+              </li>
             </ul>
           </div>
 
           <h3>3.3 画像の可変解像度(トークン予算)</h3>
           <p>
-            Gemma 4は画像ごとに「視覚トークン予算」を選べます。予算が大きいほど細部が保持されますが計算コストも増えます。
+            Gemma
+            4は画像ごとに「視覚トークン予算」を選べます。予算が大きいほど細部が保持されますが計算コストも増えます。
           </p>
           <div className={styles.tableWrap}>
             <table>
@@ -763,15 +813,21 @@ export default function GemmaBestPracticesGuidePage() {
               </thead>
               <tbody>
                 <tr>
-                  <td><code className={styles.inlineCode}>temperature</code></td>
+                  <td>
+                    <code className={styles.inlineCode}>temperature</code>
+                  </td>
                   <td>1.0</td>
                 </tr>
                 <tr>
-                  <td><code className={styles.inlineCode}>top_p</code></td>
+                  <td>
+                    <code className={styles.inlineCode}>top_p</code>
+                  </td>
                   <td>0.95</td>
                 </tr>
                 <tr>
-                  <td><code className={styles.inlineCode}>top_k</code></td>
+                  <td>
+                    <code className={styles.inlineCode}>top_k</code>
+                  </td>
                   <td>64</td>
                 </tr>
               </tbody>
@@ -792,7 +848,9 @@ export default function GemmaBestPracticesGuidePage() {
 
           <h3>4.1 有効化と構造</h3>
           <p>
-            Thinking(内部推論)はシステムプロンプトの先頭に <code className={styles.inlineCode}>&lt;|think|&gt;</code> トークンを含めることで有効化します。無効化する場合はこのトークンを取り除くだけです。
+            Thinking(内部推論)はシステムプロンプトの先頭に{" "}
+            <code className={styles.inlineCode}>&lt;|think|&gt;</code>{" "}
+            トークンを含めることで有効化します。無効化する場合はこのトークンを取り除くだけです。
           </p>
           <div className={styles.tableWrap}>
             <table>
@@ -804,12 +862,20 @@ export default function GemmaBestPracticesGuidePage() {
               </thead>
               <tbody>
                 <tr>
-                  <td><code className={styles.inlineCode}>&lt;|think|&gt;</code></td>
+                  <td>
+                    <code className={styles.inlineCode}>&lt;|think|&gt;</code>
+                  </td>
                   <td>Thinkingモードを有効化</td>
                 </tr>
                 <tr>
-                  <td><code className={styles.inlineCode}>&lt;|channel&gt;</code> ... <code className={styles.inlineCode}>&lt;channel|&gt;</code></td>
-                  <td>モデルの内部思考プロセスを示す(常に<code className={styles.inlineCode}>thought</code>という語を伴う)</td>
+                  <td>
+                    <code className={styles.inlineCode}>&lt;|channel&gt;</code> ...{" "}
+                    <code className={styles.inlineCode}>&lt;channel|&gt;</code>
+                  </td>
+                  <td>
+                    モデルの内部思考プロセスを示す(常に
+                    <code className={styles.inlineCode}>thought</code>という語を伴う)
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -822,16 +888,26 @@ export default function GemmaBestPracticesGuidePage() {
               <span className={styles.codeLang}>TEXT</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}><span className={styles.ch}>{"<|channel>"}</span><span className={styles.cm}>thought</span></div>
-              <div className={styles.codeLine}><span className={styles.cc}>{"...(内部推論)..."}</span></div>
-              <div className={styles.codeLine}><span className={styles.ch}>{"<channel|>"}</span><span className={styles.cv}>{"...(最終回答)..."}</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.ch}>{"<|channel>"}</span>
+                <span className={styles.cm}>thought</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}>{"...(内部推論)..."}</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ch}>{"<channel|>"}</span>
+                <span className={styles.cv}>{"...(最終回答)..."}</span>
+              </div>
             </div>
           </div>
 
           <div className={styles.calloutWarn}>
             <span className={styles.calloutTitle}>注意</span>
             <p style={{ margin: 0 }}>
-              E2B/E4B以外のモデルでThinkingを無効化しても、空のチャンネルタグ(<code className={styles.inlineCode}>&lt;|channel&gt;thought &lt;channel|&gt;</code>)自体は出力される仕様です。
+              E2B/E4B以外のモデルでThinkingを無効化しても、空のチャンネルタグ(
+              <code className={styles.inlineCode}>&lt;|channel&gt;thought &lt;channel|&gt;</code>
+              )自体は出力される仕様です。
             </p>
           </div>
           <p className={styles.sourceNote}>
@@ -844,14 +920,20 @@ export default function GemmaBestPracticesGuidePage() {
           <h3>4.2 マルチターンでの思考履歴管理(重要な落とし穴)</h3>
           <ul>
             <li>
-              <strong>通常の複数ターン会話</strong>：前ターンの内部思考(thought)は次のユーザーターンに渡す前に<strong>必ず履歴から除去</strong>します。これを怠ると文脈が肥大化し、モデルが循環的な推論ループに陥るリスクがあります。
+              <strong>通常の複数ターン会話</strong>
+              ：前ターンの内部思考(thought)は次のユーザーターンに渡す前に
+              <strong>必ず履歴から除去</strong>
+              します。これを怠ると文脈が肥大化し、モデルが循環的な推論ループに陥るリスクがあります。
             </li>
             <li>
-              <strong>Function Calling時の例外</strong>：1回のモデルターン内でツール呼び出しが発生した場合、その思考は除去してはいけません。
+              <strong>Function Calling時の例外</strong>
+              ：1回のモデルターン内でツール呼び出しが発生した場合、その思考は除去してはいけません。
             </li>
           </ul>
           <p>
-            長時間稼働するエージェントでは、生の思考を毎ターン破棄しつつも、<strong>要約した思考をテキストとして文脈に再注入する</strong>ことで、推論の一貫性を保つテクニックが推奨されています。この要約に厳密なフォーマットは定められていないため、アーキテクチャに合わせて自由に設計できます。
+            長時間稼働するエージェントでは、生の思考を毎ターン破棄しつつも、
+            <strong>要約した思考をテキストとして文脈に再注入する</strong>
+            ことで、推論の一貫性を保つテクニックが推奨されています。この要約に厳密なフォーマットは定められていないため、アーキテクチャに合わせて自由に設計できます。
           </p>
 
           <div className={styles.mermaidContainer}>
@@ -868,7 +950,8 @@ export default function GemmaBestPracticesGuidePage() {
 
           <h3>4.3 Adaptive Thought Efficiency(思考量の調整)</h3>
           <p>
-            Gemma 4のThinkingはON/OFFの二値仕様ですが、指示追従性の高さを利用して、システム指示で「浅く・効率的に考えて」と明示的に誘導することで、思考トークン数を約20%削減できることが確認されています。これは公式にトレーニングされた機能ではなく、指示追従能力の副産物であるため、プロンプトの文言はチームごとにチューニングすることが推奨されます。
+            Gemma
+            4のThinkingはON/OFFの二値仕様ですが、指示追従性の高さを利用して、システム指示で「浅く・効率的に考えて」と明示的に誘導することで、思考トークン数を約20%削減できることが確認されています。これは公式にトレーニングされた機能ではなく、指示追従能力の副産物であるため、プロンプトの文言はチームごとにチューニングすることが推奨されます。
           </p>
           <p className={styles.sourceNote}>
             出典:{" "}
@@ -879,7 +962,9 @@ export default function GemmaBestPracticesGuidePage() {
 
           <h3>4.4 大規模モデルのファインチューニング時の注意</h3>
           <p>
-            <code className={styles.inlineCode}>gemma-4-26B-A4B-it</code> や <code className={styles.inlineCode}>gemma-4-31B-it</code> を「thinkingを含まないデータセット」でファインチューニングする場合、訓練プロンプトに空のチャンネルを追加すると結果が改善します。
+            <code className={styles.inlineCode}>gemma-4-26B-A4B-it</code> や{" "}
+            <code className={styles.inlineCode}>gemma-4-31B-it</code>{" "}
+            を「thinkingを含まないデータセット」でファインチューニングする場合、訓練プロンプトに空のチャンネルを追加すると結果が改善します。
           </p>
           <div className={styles.codeWrap}>
             <div className={styles.codeBar}>
@@ -887,9 +972,17 @@ export default function GemmaBestPracticesGuidePage() {
               <span className={styles.codeLang}>TEXT</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}><span className={styles.ch}>{"<|turn>"}</span><span className={styles.ck}>model</span></div>
-              <div className={styles.codeLine}><span className={styles.ch}>{"<|channel>"}</span><span className={styles.cm}>thought</span></div>
-              <div className={styles.codeLine}><span className={styles.ch}>{"<channel|>"}</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.ch}>{"<|turn>"}</span>
+                <span className={styles.ck}>model</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ch}>{"<|channel>"}</span>
+                <span className={styles.cm}>thought</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ch}>{"<channel|>"}</span>
+              </div>
             </div>
           </div>
         </section>
@@ -900,7 +993,8 @@ export default function GemmaBestPracticesGuidePage() {
 
           <h3>5.1 ツール呼び出し専用トークン</h3>
           <p>
-            Gemma 4は「ツール利用ライフサイクル」を管理するため、専用の特殊トークンで学習されています。
+            Gemma
+            4は「ツール利用ライフサイクル」を管理するため、専用の特殊トークンで学習されています。
           </p>
           <div className={styles.tableWrap}>
             <table>
@@ -912,26 +1006,38 @@ export default function GemmaBestPracticesGuidePage() {
               </thead>
               <tbody>
                 <tr>
-                  <td><code className={styles.inlineCode}>&lt;|tool&gt;</code> ... <code className={styles.inlineCode}>&lt;tool|&gt;</code></td>
+                  <td>
+                    <code className={styles.inlineCode}>&lt;|tool&gt;</code> ...{" "}
+                    <code className={styles.inlineCode}>&lt;tool|&gt;</code>
+                  </td>
                   <td>ツール定義</td>
                 </tr>
                 <tr>
-                  <td><code className={styles.inlineCode}>&lt;|tool_call&gt;</code> ... <code className={styles.inlineCode}>&lt;tool_call|&gt;</code></td>
+                  <td>
+                    <code className={styles.inlineCode}>&lt;|tool_call&gt;</code> ...{" "}
+                    <code className={styles.inlineCode}>&lt;tool_call|&gt;</code>
+                  </td>
                   <td>モデルによるツール利用要求</td>
                 </tr>
                 <tr>
-                  <td><code className={styles.inlineCode}>&lt;|tool_response&gt;</code> ... <code className={styles.inlineCode}>&lt;tool_response|&gt;</code></td>
+                  <td>
+                    <code className={styles.inlineCode}>&lt;|tool_response&gt;</code> ...{" "}
+                    <code className={styles.inlineCode}>&lt;tool_response|&gt;</code>
+                  </td>
                   <td>ツール実行結果をモデルに返却</td>
                 </tr>
                 <tr>
-                  <td><code className={styles.inlineCode}>&lt;|"|&gt;</code></td>
+                  <td>
+                    <code className={styles.inlineCode}>&lt;|"|&gt;</code>
+                  </td>
                   <td>構造化データ内の文字列値の区切り文字(特殊文字を無害化)</td>
                 </tr>
               </tbody>
             </table>
           </div>
           <p>
-            <code className={styles.inlineCode}>&lt;|tool_response&gt;</code> は推論エンジンにとって追加の停止シーケンスとしても機能します。
+            <code className={styles.inlineCode}>&lt;|tool_response&gt;</code>{" "}
+            は推論エンジンにとって追加の停止シーケンスとしても機能します。
           </p>
           <p className={styles.sourceNote}>
             出典:{" "}
@@ -958,10 +1064,22 @@ export default function GemmaBestPracticesGuidePage() {
           </div>
 
           <ol>
-            <li><strong>ツール定義</strong>：関数名・引数・説明を含むツールをモデルに提示する</li>
-            <li><strong>モデルのターン</strong>：ユーザープロンプトとツール一覧を受け取り、テキストではなく構造化された関数呼び出しオブジェクトを返す</li>
-            <li><strong>開発者のターン</strong>：レスポンスをパースし、関数名と引数を抽出、実際のコードを実行し、その結果を<code className={styles.inlineCode}>tool</code>ロールとして履歴に追加する</li>
-            <li><strong>最終応答</strong>：モデルがツールの実行結果を読み取り、自然文で最終回答を生成する</li>
+            <li>
+              <strong>ツール定義</strong>：関数名・引数・説明を含むツールをモデルに提示する
+            </li>
+            <li>
+              <strong>モデルのターン</strong>
+              ：ユーザープロンプトとツール一覧を受け取り、テキストではなく構造化された関数呼び出しオブジェクトを返す
+            </li>
+            <li>
+              <strong>開発者のターン</strong>
+              ：レスポンスをパースし、関数名と引数を抽出、実際のコードを実行し、その結果を
+              <code className={styles.inlineCode}>tool</code>ロールとして履歴に追加する
+            </li>
+            <li>
+              <strong>最終応答</strong>
+              ：モデルがツールの実行結果を読み取り、自然文で最終回答を生成する
+            </li>
           </ol>
 
           <div className={styles.calloutWarn}>
@@ -990,19 +1108,28 @@ export default function GemmaBestPracticesGuidePage() {
                 <tr>
                   <td>Hugging Face Transformers</td>
                   <td>
-                    <code className={styles.inlineCode}>apply_chat_template()</code>の<code className={styles.inlineCode}>tools</code>引数にJSON schemaまたは生のPython関数を渡す。型ヒント・docstringから自動でスキーマ生成
+                    <code className={styles.inlineCode}>apply_chat_template()</code>の
+                    <code className={styles.inlineCode}>tools</code>引数にJSON
+                    schemaまたは生のPython関数を渡す。型ヒント・docstringから自動でスキーマ生成
                   </td>
                 </tr>
                 <tr>
                   <td>Gemini API経由</td>
                   <td>
-                    <code className={styles.inlineCode}>google-genai</code> SDKの<code className={styles.inlineCode}>types.Tool(function_declarations=[...])</code>で定義
+                    <code className={styles.inlineCode}>google-genai</code> SDKの
+                    <code className={styles.inlineCode}>
+                      types.Tool(function_declarations=[...])
+                    </code>
+                    で定義
                   </td>
                 </tr>
                 <tr>
                   <td>vLLM(本番運用)</td>
                   <td>
-                    <code className={styles.inlineCode}>--enable-auto-tool-choice --tool-call-parser gemma4 --reasoning-parser gemma4</code> でOpenAI互換API対応
+                    <code className={styles.inlineCode}>
+                      --enable-auto-tool-choice --tool-call-parser gemma4 --reasoning-parser gemma4
+                    </code>{" "}
+                    でOpenAI互換API対応
                   </td>
                 </tr>
               </tbody>
@@ -1016,27 +1143,137 @@ export default function GemmaBestPracticesGuidePage() {
               <span className={styles.codeLang}>PYTHON</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}><span className={styles.ck}>from</span> <span className={styles.cv}>google</span> <span className={styles.ck}>import</span> <span className={styles.cv}>genai</span></div>
-              <div className={styles.codeLine}><span className={styles.ck}>from</span> <span className={styles.cv}>google.genai</span> <span className={styles.ck}>import</span> <span className={styles.cv}>types</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>from</span> <span className={styles.cv}>google</span>{" "}
+                <span className={styles.ck}>import</span> <span className={styles.cv}>genai</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>from</span>{" "}
+                <span className={styles.cv}>google.genai</span>{" "}
+                <span className={styles.ck}>import</span> <span className={styles.cv}>types</span>
+              </div>
               <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}><span className={styles.cv}>get_weather</span> <span className={styles.ce}>=</span> <span className={styles.ce}>&#123;</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.cs}>&quot;name&quot;</span><span className={styles.ce}>:</span> <span className={styles.cs}>&quot;get_weather&quot;</span><span className={styles.ce}>,</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.cs}>&quot;description&quot;</span><span className={styles.ce}>:</span> <span className={styles.cs}>&quot;Get current weather for a given location.&quot;</span><span className={styles.ce}>,</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.cs}>&quot;parameters&quot;</span><span className={styles.ce}>:</span> <span className={styles.ce}>&#123;</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cs}>&quot;type&quot;</span><span className={styles.ce}>:</span> <span className={styles.cs}>&quot;object&quot;</span><span className={styles.ce}>,</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cs}>&quot;properties&quot;</span><span className={styles.ce}>:</span> <span className={styles.ce}>&#123;</span><span className={styles.cs}>&quot;location&quot;</span><span className={styles.ce}>:</span> <span className={styles.ce}>&#123;</span><span className={styles.cs}>&quot;type&quot;</span><span className={styles.ce}>:</span> <span className={styles.cs}>&quot;string&quot;</span><span className={styles.ce}>&#125;</span><span className={styles.ce}>&#125;</span><span className={styles.ce}>,</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cs}>&quot;required&quot;</span><span className={styles.ce}>:</span> <span className={styles.ce}>[</span><span className={styles.cs}>&quot;location&quot;</span><span className={styles.ce}>]</span><span className={styles.ce}>,</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.ce}>&#125;</span><span className={styles.ce}>,</span></div>
-              <div className={styles.codeLine}><span className={styles.ce}>&#125;</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>get_weather</span> <span className={styles.ce}>=</span>{" "}
+                <span className={styles.ce}>&#123;</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.cs}>&quot;name&quot;</span>
+                <span className={styles.ce}>:</span>{" "}
+                <span className={styles.cs}>&quot;get_weather&quot;</span>
+                <span className={styles.ce}>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.cs}>&quot;description&quot;</span>
+                <span className={styles.ce}>:</span>{" "}
+                <span className={styles.cs}>
+                  &quot;Get current weather for a given location.&quot;
+                </span>
+                <span className={styles.ce}>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.cs}>&quot;parameters&quot;</span>
+                <span className={styles.ce}>:</span> <span className={styles.ce}>&#123;</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cs}>&quot;type&quot;</span>
+                <span className={styles.ce}>:</span>{" "}
+                <span className={styles.cs}>&quot;object&quot;</span>
+                <span className={styles.ce}>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cs}>&quot;properties&quot;</span>
+                <span className={styles.ce}>:</span> <span className={styles.ce}>&#123;</span>
+                <span className={styles.cs}>&quot;location&quot;</span>
+                <span className={styles.ce}>:</span> <span className={styles.ce}>&#123;</span>
+                <span className={styles.cs}>&quot;type&quot;</span>
+                <span className={styles.ce}>:</span>{" "}
+                <span className={styles.cs}>&quot;string&quot;</span>
+                <span className={styles.ce}>&#125;</span>
+                <span className={styles.ce}>&#125;</span>
+                <span className={styles.ce}>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cs}>&quot;required&quot;</span>
+                <span className={styles.ce}>:</span> <span className={styles.ce}>[</span>
+                <span className={styles.cs}>&quot;location&quot;</span>
+                <span className={styles.ce}>]</span>
+                <span className={styles.ce}>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.ce}>&#125;</span>
+                <span className={styles.ce}>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ce}>&#125;</span>
+              </div>
               <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}><span className={styles.cv}>client</span> <span className={styles.ce}>=</span> <span className={styles.cv}>genai</span><span className={styles.ce}>.</span><span className={styles.cm}>Client</span><span className={styles.ce}>(</span><span className={styles.ce}>)</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>tools</span> <span className={styles.ce}>=</span> <span className={styles.cv}>types</span><span className={styles.ce}>.</span><span className={styles.cm}>Tool</span><span className={styles.ce}>(</span><span className={styles.cv}>function_declarations</span><span className={styles.ce}>=</span><span className={styles.ce}>[</span><span className={styles.cv}>get_weather</span><span className={styles.ce}>]</span><span className={styles.ce}>)</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>config</span> <span className={styles.ce}>=</span> <span className={styles.cv}>types</span><span className={styles.ce}>.</span><span className={styles.cm}>GenerateContentConfig</span><span className={styles.ce}>(</span><span className={styles.cv}>tools</span><span className={styles.ce}>=</span><span className={styles.ce}>[</span><span className={styles.cv}>tools</span><span className={styles.ce}>]</span><span className={styles.ce}>)</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>response</span> <span className={styles.ce}>=</span> <span className={styles.cv}>client</span><span className={styles.ce}>.</span><span className={styles.cv}>models</span><span className={styles.ce}>.</span><span className={styles.cm}>generate_content</span><span className={styles.ce}>(</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.cv}>model</span><span className={styles.ce}>=</span><span className={styles.cs}>&quot;gemma-4-26b-a4b-it&quot;</span><span className={styles.ce}>,</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.cv}>contents</span><span className={styles.ce}>=</span><span className={styles.cs}>&quot;Should I bring an umbrella to Kyoto today?&quot;</span><span className={styles.ce}>,</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.cv}>config</span><span className={styles.ce}>=</span><span className={styles.cv}>config</span><span className={styles.ce}>,</span></div>
-              <div className={styles.codeLine}><span className={styles.ce}>)</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>client</span> <span className={styles.ce}>=</span>{" "}
+                <span className={styles.cv}>genai</span>
+                <span className={styles.ce}>.</span>
+                <span className={styles.cm}>Client</span>
+                <span className={styles.ce}>(</span>
+                <span className={styles.ce}>)</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>tools</span> <span className={styles.ce}>=</span>{" "}
+                <span className={styles.cv}>types</span>
+                <span className={styles.ce}>.</span>
+                <span className={styles.cm}>Tool</span>
+                <span className={styles.ce}>(</span>
+                <span className={styles.cv}>function_declarations</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.ce}>[</span>
+                <span className={styles.cv}>get_weather</span>
+                <span className={styles.ce}>]</span>
+                <span className={styles.ce}>)</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>config</span> <span className={styles.ce}>=</span>{" "}
+                <span className={styles.cv}>types</span>
+                <span className={styles.ce}>.</span>
+                <span className={styles.cm}>GenerateContentConfig</span>
+                <span className={styles.ce}>(</span>
+                <span className={styles.cv}>tools</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.ce}>[</span>
+                <span className={styles.cv}>tools</span>
+                <span className={styles.ce}>]</span>
+                <span className={styles.ce}>)</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>response</span> <span className={styles.ce}>=</span>{" "}
+                <span className={styles.cv}>client</span>
+                <span className={styles.ce}>.</span>
+                <span className={styles.cv}>models</span>
+                <span className={styles.ce}>.</span>
+                <span className={styles.cm}>generate_content</span>
+                <span className={styles.ce}>(</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.cv}>model</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cs}>&quot;gemma-4-26b-a4b-it&quot;</span>
+                <span className={styles.ce}>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.cv}>contents</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cs}>
+                  &quot;Should I bring an umbrella to Kyoto today?&quot;
+                </span>
+                <span className={styles.ce}>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.cv}>config</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cv}>config</span>
+                <span className={styles.ce}>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ce}>)</span>
+              </div>
             </div>
           </div>
           <p className={styles.sourceNote}>
@@ -1057,10 +1294,14 @@ export default function GemmaBestPracticesGuidePage() {
 
           <h3>6.1 仕組み</h3>
           <p>
-            MTPはGemma 4における投機的デコーディング(Speculative Decoding)専用のアーキテクチャです。小さく高速な「ドラフトモデル」が数トークン先を予測し、本体(ターゲット)モデルがそれを並列に検証します。ドラフトが却下された場合でも、その位置の正しいトークンはターゲットモデルが即座に生成するため、無駄になりません。
+            MTPはGemma 4における投機的デコーディング(Speculative
+            Decoding)専用のアーキテクチャです。小さく高速な「ドラフトモデル」が数トークン先を予測し、本体(ターゲット)モデルがそれを並列に検証します。ドラフトが却下された場合でも、その位置の正しいトークンはターゲットモデルが即座に生成するため、無駄になりません。
           </p>
           <p>
-            ドラフトモデルはターゲットモデルと<strong>入力埋め込みテーブルを共有</strong>し、ターゲットの最終層のアクティベーションを直接利用するため、独立した別モデルではありません。これにより、<strong>通常の自己回帰生成と完全に同一の出力品質を保証しながら</strong>、デコーディングを高速化できます。
+            ドラフトモデルはターゲットモデルと<strong>入力埋め込みテーブルを共有</strong>
+            し、ターゲットの最終層のアクティベーションを直接利用するため、独立した別モデルではありません。これにより、
+            <strong>通常の自己回帰生成と完全に同一の出力品質を保証しながら</strong>
+            、デコーディングを高速化できます。
           </p>
 
           <div className={styles.mermaidContainer}>
@@ -1084,10 +1325,13 @@ export default function GemmaBestPracticesGuidePage() {
           <h3>6.2 Dense vs MoEでの挙動の違い</h3>
           <ul>
             <li>
-              <strong>Denseモデル</strong>：全トークンで同じ重みを使うため、複数ドラフトトークンの検証オーバーヘッドは最小限
+              <strong>Denseモデル</strong>
+              ：全トークンで同じ重みを使うため、複数ドラフトトークンの検証オーバーヘッドは最小限
             </li>
             <li>
-              <strong>26B A4B(MoE)</strong>：トークンごとに異なるエキスパートが活性化するため、複数ドラフトの検証で追加のエキスパート重みロードが必要になる場合がある。バッチサイズが大きいほどエキスパートの重複利用が進み高速化しやすいが、<strong>バッチサイズ1では並列性の低いハードウェアで速度向上が出にくい</strong>点に注意
+              <strong>26B A4B(MoE)</strong>
+              ：トークンごとに異なるエキスパートが活性化するため、複数ドラフトの検証で追加のエキスパート重みロードが必要になる場合がある。バッチサイズが大きいほどエキスパートの重複利用が進み高速化しやすいが、
+              <strong>バッチサイズ1では並列性の低いハードウェアで速度向上が出にくい</strong>点に注意
             </li>
           </ul>
           <p className={styles.sourceNote}>
@@ -1144,14 +1388,27 @@ export default function GemmaBestPracticesGuidePage() {
               <span className={styles.codeLang}>BASH</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}><span className={styles.ck}>pip install</span> <span className={styles.cv}>torch tensorboard</span></div>
-              <div className={styles.codeLine}><span className={styles.ck}>pip install</span> <span className={styles.cs}>&quot;transformers&gt;=5.10.1&quot;</span></div>
-              <div className={styles.codeLine}><span className={styles.ck}>pip install</span> <span className={styles.cv}>datasets accelerate evaluate bitsandbytes trl peft protobuf sentencepiece</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>pip install</span>{" "}
+                <span className={styles.cv}>torch tensorboard</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>pip install</span>{" "}
+                <span className={styles.cs}>&quot;transformers&gt;=5.10.1&quot;</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>pip install</span>{" "}
+                <span className={styles.cv}>
+                  datasets accelerate evaluate bitsandbytes trl peft protobuf sentencepiece
+                </span>
+              </div>
             </div>
           </div>
 
           <p>
-            データセットは会話形式(<code className={styles.inlineCode}>messages</code>)のJSONで用意します。TRLの<code className={styles.inlineCode}>SFTTrainer</code>が自動的にchat templateを適用します。
+            データセットは会話形式(<code className={styles.inlineCode}>messages</code>
+            )のJSONで用意します。TRLの<code className={styles.inlineCode}>SFTTrainer</code>
+            が自動的にchat templateを適用します。
           </p>
           <div className={styles.codeWrap}>
             <div className={styles.codeBar}>
@@ -1159,7 +1416,40 @@ export default function GemmaBestPracticesGuidePage() {
               <span className={styles.codeLang}>JSON</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}><span className={styles.ce}>&#123;</span><span className={styles.ck}>&quot;messages&quot;</span><span className={styles.ce}>:</span> <span className={styles.ce}>[</span><span className={styles.ce}>&#123;</span><span className={styles.ck}>&quot;role&quot;</span><span className={styles.ce}>:</span> <span className={styles.cs}>&quot;system&quot;</span><span className={styles.ce}>,</span> <span className={styles.ck}>&quot;content&quot;</span><span className={styles.ce}>:</span> <span className={styles.cs}>&quot;...&quot;</span><span className={styles.ce}>&#125;</span><span className={styles.ce}>,</span> <span className={styles.ce}>&#123;</span><span className={styles.ck}>&quot;role&quot;</span><span className={styles.ce}>:</span> <span className={styles.cs}>&quot;user&quot;</span><span className={styles.ce}>,</span> <span className={styles.ck}>&quot;content&quot;</span><span className={styles.ce}>:</span> <span className={styles.cs}>&quot;...&quot;</span><span className={styles.ce}>&#125;</span><span className={styles.ce}>,</span> <span className={styles.ce}>&#123;</span><span className={styles.ck}>&quot;role&quot;</span><span className={styles.ce}>:</span> <span className={styles.cs}>&quot;assistant&quot;</span><span className={styles.ce}>,</span> <span className={styles.ck}>&quot;content&quot;</span><span className={styles.ce}>:</span> <span className={styles.cs}>&quot;...&quot;</span><span className={styles.ce}>&#125;</span><span className={styles.ce}>]</span><span className={styles.ce}>&#125;</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.ce}>&#123;</span>
+                <span className={styles.ck}>&quot;messages&quot;</span>
+                <span className={styles.ce}>:</span> <span className={styles.ce}>[</span>
+                <span className={styles.ce}>&#123;</span>
+                <span className={styles.ck}>&quot;role&quot;</span>
+                <span className={styles.ce}>:</span>{" "}
+                <span className={styles.cs}>&quot;system&quot;</span>
+                <span className={styles.ce}>,</span>{" "}
+                <span className={styles.ck}>&quot;content&quot;</span>
+                <span className={styles.ce}>:</span>{" "}
+                <span className={styles.cs}>&quot;...&quot;</span>
+                <span className={styles.ce}>&#125;</span>
+                <span className={styles.ce}>,</span> <span className={styles.ce}>&#123;</span>
+                <span className={styles.ck}>&quot;role&quot;</span>
+                <span className={styles.ce}>:</span>{" "}
+                <span className={styles.cs}>&quot;user&quot;</span>
+                <span className={styles.ce}>,</span>{" "}
+                <span className={styles.ck}>&quot;content&quot;</span>
+                <span className={styles.ce}>:</span>{" "}
+                <span className={styles.cs}>&quot;...&quot;</span>
+                <span className={styles.ce}>&#125;</span>
+                <span className={styles.ce}>,</span> <span className={styles.ce}>&#123;</span>
+                <span className={styles.ck}>&quot;role&quot;</span>
+                <span className={styles.ce}>:</span>{" "}
+                <span className={styles.cs}>&quot;assistant&quot;</span>
+                <span className={styles.ce}>,</span>{" "}
+                <span className={styles.ck}>&quot;content&quot;</span>
+                <span className={styles.ce}>:</span>{" "}
+                <span className={styles.cs}>&quot;...&quot;</span>
+                <span className={styles.ce}>&#125;</span>
+                <span className={styles.ce}>]</span>
+                <span className={styles.ce}>&#125;</span>
+              </div>
             </div>
           </div>
 
@@ -1170,26 +1460,133 @@ export default function GemmaBestPracticesGuidePage() {
               <span className={styles.codeLang}>PYTHON</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}><span className={styles.ck}>import</span> <span className={styles.cv}>torch</span></div>
-              <div className={styles.codeLine}><span className={styles.ck}>from</span> <span className={styles.cv}>transformers</span> <span className={styles.ck}>import</span> <span className={styles.cm}>AutoTokenizer</span><span className={styles.ce}>,</span> <span className={styles.cm}>AutoModelForImageTextToText</span><span className={styles.ce}>,</span> <span className={styles.cm}>BitsAndBytesConfig</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>import</span> <span className={styles.cv}>torch</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>from</span>{" "}
+                <span className={styles.cv}>transformers</span>{" "}
+                <span className={styles.ck}>import</span>{" "}
+                <span className={styles.cm}>AutoTokenizer</span>
+                <span className={styles.ce}>,</span>{" "}
+                <span className={styles.cm}>AutoModelForImageTextToText</span>
+                <span className={styles.ce}>,</span>{" "}
+                <span className={styles.cm}>BitsAndBytesConfig</span>
+              </div>
               <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}><span className={styles.cv}>model_id</span> <span className={styles.ce}>=</span> <span className={styles.cs}>&quot;google/gemma-4-E2B&quot;</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>torch_dtype</span> <span className={styles.ce}>=</span> <span className={styles.cv}>torch</span><span className={styles.ce}>.</span><span className={styles.cv}>bfloat16</span> <span className={styles.ck}>if</span> <span className={styles.cv}>torch</span><span className={styles.ce}>.</span><span className={styles.cv}>cuda</span><span className={styles.ce}>.</span><span className={styles.cm}>get_device_capability</span><span className={styles.ce}>(</span><span className={styles.ce}>)</span><span className={styles.ce}>[</span><span className={styles.cm}>0</span><span className={styles.ce}>]</span> <span className={styles.ce}>&gt;=</span> <span className={styles.cm}>8</span> <span className={styles.ck}>else</span> <span className={styles.cv}>torch</span><span className={styles.ce}>.</span><span className={styles.cv}>float16</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>model_kwargs</span> <span className={styles.ce}>=</span> <span className={styles.cm}>dict</span><span className={styles.ce}>(</span><span className={styles.cv}>dtype</span><span className={styles.ce}>=</span><span className={styles.cv}>torch_dtype</span><span className={styles.ce}>,</span> <span className={styles.cv}>device_map</span><span className={styles.ce}>=</span><span className={styles.cs}>&quot;auto&quot;</span><span className={styles.ce}>)</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>model_kwargs</span><span className={styles.ce}>[</span><span className={styles.cs}>&quot;quantization_config&quot;</span><span className={styles.ce}>]</span> <span className={styles.ce}>=</span> <span className={styles.cm}>BitsAndBytesConfig</span><span className={styles.ce}>(</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.cv}>load_in_4bit</span><span className={styles.ce}>=</span><span className={styles.ck}>True</span><span className={styles.ce}>,</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.cv}>bnb_4bit_use_double_quant</span><span className={styles.ce}>=</span><span className={styles.ck}>True</span><span className={styles.ce}>,</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.cv}>bnb_4bit_quant_type</span><span className={styles.ce}>=</span><span className={styles.cs}>&quot;nf4&quot;</span><span className={styles.ce}>,</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.cv}>bnb_4bit_compute_dtype</span><span className={styles.ce}>=</span><span className={styles.cv}>model_kwargs</span><span className={styles.ce}>[</span><span className={styles.cs}>&quot;dtype&quot;</span><span className={styles.ce}>]</span><span className={styles.ce}>,</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.cv}>bnb_4bit_quant_storage</span><span className={styles.ce}>=</span><span className={styles.cv}>model_kwargs</span><span className={styles.ce}>[</span><span className={styles.cs}>&quot;dtype&quot;</span><span className={styles.ce}>]</span><span className={styles.ce}>,</span></div>
-              <div className={styles.codeLine}><span className={styles.ce}>)</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>model</span> <span className={styles.ce}>=</span> <span className={styles.cm}>AutoModelForImageTextToText</span><span className={styles.ce}>.</span><span className={styles.cm}>from_pretrained</span><span className={styles.ce}>(</span><span className={styles.cv}>model_id</span><span className={styles.ce}>,</span> <span className={styles.ce}>**</span><span className={styles.cv}>model_kwargs</span><span className={styles.ce}>)</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>tokenizer</span> <span className={styles.ce}>=</span> <span className={styles.cm}>AutoTokenizer</span><span className={styles.ce}>.</span><span className={styles.cm}>from_pretrained</span><span className={styles.ce}>(</span><span className={styles.cs}>&quot;google/gemma-4-E2B-it&quot;</span><span className={styles.ce}>)</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>model_id</span> <span className={styles.ce}>=</span>{" "}
+                <span className={styles.cs}>&quot;google/gemma-4-E2B&quot;</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>torch_dtype</span> <span className={styles.ce}>=</span>{" "}
+                <span className={styles.cv}>torch</span>
+                <span className={styles.ce}>.</span>
+                <span className={styles.cv}>bfloat16</span> <span className={styles.ck}>if</span>{" "}
+                <span className={styles.cv}>torch</span>
+                <span className={styles.ce}>.</span>
+                <span className={styles.cv}>cuda</span>
+                <span className={styles.ce}>.</span>
+                <span className={styles.cm}>get_device_capability</span>
+                <span className={styles.ce}>(</span>
+                <span className={styles.ce}>)</span>
+                <span className={styles.ce}>[</span>
+                <span className={styles.cm}>0</span>
+                <span className={styles.ce}>]</span> <span className={styles.ce}>&gt;=</span>{" "}
+                <span className={styles.cm}>8</span> <span className={styles.ck}>else</span>{" "}
+                <span className={styles.cv}>torch</span>
+                <span className={styles.ce}>.</span>
+                <span className={styles.cv}>float16</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>model_kwargs</span> <span className={styles.ce}>=</span>{" "}
+                <span className={styles.cm}>dict</span>
+                <span className={styles.ce}>(</span>
+                <span className={styles.cv}>dtype</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cv}>torch_dtype</span>
+                <span className={styles.ce}>,</span> <span className={styles.cv}>device_map</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cs}>&quot;auto&quot;</span>
+                <span className={styles.ce}>)</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>model_kwargs</span>
+                <span className={styles.ce}>[</span>
+                <span className={styles.cs}>&quot;quantization_config&quot;</span>
+                <span className={styles.ce}>]</span> <span className={styles.ce}>=</span>{" "}
+                <span className={styles.cm}>BitsAndBytesConfig</span>
+                <span className={styles.ce}>(</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.cv}>load_in_4bit</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.ck}>True</span>
+                <span className={styles.ce}>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.cv}>bnb_4bit_use_double_quant</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.ck}>True</span>
+                <span className={styles.ce}>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.cv}>bnb_4bit_quant_type</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cs}>&quot;nf4&quot;</span>
+                <span className={styles.ce}>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.cv}>bnb_4bit_compute_dtype</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cv}>model_kwargs</span>
+                <span className={styles.ce}>[</span>
+                <span className={styles.cs}>&quot;dtype&quot;</span>
+                <span className={styles.ce}>]</span>
+                <span className={styles.ce}>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.cv}>bnb_4bit_quant_storage</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cv}>model_kwargs</span>
+                <span className={styles.ce}>[</span>
+                <span className={styles.cs}>&quot;dtype&quot;</span>
+                <span className={styles.ce}>]</span>
+                <span className={styles.ce}>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ce}>)</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>model</span> <span className={styles.ce}>=</span>{" "}
+                <span className={styles.cm}>AutoModelForImageTextToText</span>
+                <span className={styles.ce}>.</span>
+                <span className={styles.cm}>from_pretrained</span>
+                <span className={styles.ce}>(</span>
+                <span className={styles.cv}>model_id</span>
+                <span className={styles.ce}>,</span> <span className={styles.ce}>**</span>
+                <span className={styles.cv}>model_kwargs</span>
+                <span className={styles.ce}>)</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>tokenizer</span> <span className={styles.ce}>=</span>{" "}
+                <span className={styles.cm}>AutoTokenizer</span>
+                <span className={styles.ce}>.</span>
+                <span className={styles.cm}>from_pretrained</span>
+                <span className={styles.ce}>(</span>
+                <span className={styles.cs}>&quot;google/gemma-4-E2B-it&quot;</span>
+                <span className={styles.ce}>)</span>
+              </div>
             </div>
           </div>
 
           <p>
-            LoRA設定(<strong>特殊トークンを学習するため<code className={styles.inlineCode}>lm_head</code>と<code className={styles.inlineCode}>embed_tokens</code>の保存を忘れない</strong>点が重要):
+            LoRA設定(
+            <strong>
+              特殊トークンを学習するため<code className={styles.inlineCode}>lm_head</code>と
+              <code className={styles.inlineCode}>embed_tokens</code>の保存を忘れない
+            </strong>
+            点が重要):
           </p>
           <div className={styles.codeWrap}>
             <div className={styles.codeBar}>
@@ -1197,12 +1594,57 @@ export default function GemmaBestPracticesGuidePage() {
               <span className={styles.codeLang}>PYTHON</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}><span className={styles.ck}>from</span> <span className={styles.cv}>peft</span> <span className={styles.ck}>import</span> <span className={styles.cm}>LoraConfig</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>peft_config</span> <span className={styles.ce}>=</span> <span className={styles.cm}>LoraConfig</span><span className={styles.ce}>(</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.cv}>lora_alpha</span><span className={styles.ce}>=</span><span className={styles.cm}>16</span><span className={styles.ce}>,</span> <span className={styles.cv}>lora_dropout</span><span className={styles.ce}>=</span><span className={styles.cm}>0.05</span><span className={styles.ce}>,</span> <span className={styles.cv}>r</span><span className={styles.ce}>=</span><span className={styles.cm}>16</span><span className={styles.ce}>,</span> <span className={styles.cv}>bias</span><span className={styles.ce}>=</span><span className={styles.cs}>&quot;none&quot;</span><span className={styles.ce}>,</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.cv}>target_modules</span><span className={styles.ce}>=</span><span className={styles.cs}>&quot;all-linear&quot;</span><span className={styles.ce}>,</span> <span className={styles.cv}>task_type</span><span className={styles.ce}>=</span><span className={styles.cs}>&quot;CAUSAL_LM&quot;</span><span className={styles.ce}>,</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.cv}>modules_to_save</span><span className={styles.ce}>=</span><span className={styles.ce}>[</span><span className={styles.cs}>&quot;lm_head&quot;</span><span className={styles.ce}>,</span> <span className={styles.cs}>&quot;embed_tokens&quot;</span><span className={styles.ce}>]</span><span className={styles.ce}>,</span> <span className={styles.cv}>ensure_weight_tying</span><span className={styles.ce}>=</span><span className={styles.ck}>True</span><span className={styles.ce}>,</span></div>
-              <div className={styles.codeLine}><span className={styles.ce}>)</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>from</span> <span className={styles.cv}>peft</span>{" "}
+                <span className={styles.ck}>import</span>{" "}
+                <span className={styles.cm}>LoraConfig</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>peft_config</span> <span className={styles.ce}>=</span>{" "}
+                <span className={styles.cm}>LoraConfig</span>
+                <span className={styles.ce}>(</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.cv}>lora_alpha</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cm}>16</span>
+                <span className={styles.ce}>,</span> <span className={styles.cv}>lora_dropout</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cm}>0.05</span>
+                <span className={styles.ce}>,</span> <span className={styles.cv}>r</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cm}>16</span>
+                <span className={styles.ce}>,</span> <span className={styles.cv}>bias</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cs}>&quot;none&quot;</span>
+                <span className={styles.ce}>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.cv}>target_modules</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cs}>&quot;all-linear&quot;</span>
+                <span className={styles.ce}>,</span> <span className={styles.cv}>task_type</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cs}>&quot;CAUSAL_LM&quot;</span>
+                <span className={styles.ce}>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.cv}>modules_to_save</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.ce}>[</span>
+                <span className={styles.cs}>&quot;lm_head&quot;</span>
+                <span className={styles.ce}>,</span>{" "}
+                <span className={styles.cs}>&quot;embed_tokens&quot;</span>
+                <span className={styles.ce}>]</span>
+                <span className={styles.ce}>,</span>{" "}
+                <span className={styles.cv}>ensure_weight_tying</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.ck}>True</span>
+                <span className={styles.ce}>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ce}>)</span>
+              </div>
             </div>
           </div>
 
@@ -1213,18 +1655,115 @@ export default function GemmaBestPracticesGuidePage() {
               <span className={styles.codeLang}>PYTHON</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}><span className={styles.ck}>from</span> <span className={styles.cv}>trl</span> <span className={styles.ck}>import</span> <span className={styles.cm}>SFTConfig</span><span className={styles.ce}>,</span> <span className={styles.cm}>SFTTrainer</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>args</span> <span className={styles.ce}>=</span> <span className={styles.cm}>SFTConfig</span><span className={styles.ce}>(</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.cv}>output_dir</span><span className={styles.ce}>=</span><span className={styles.cs}>&quot;gemma-text-to-sql&quot;</span><span className={styles.ce}>,</span> <span className={styles.cv}>max_length</span><span className={styles.ce}>=</span><span className={styles.cm}>512</span><span className={styles.ce}>,</span> <span className={styles.cv}>num_train_epochs</span><span className={styles.ce}>=</span><span className={styles.cm}>3</span><span className={styles.ce}>,</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.cv}>per_device_train_batch_size</span><span className={styles.ce}>=</span><span className={styles.cm}>1</span><span className={styles.ce}>,</span> <span className={styles.cv}>optim</span><span className={styles.ce}>=</span><span className={styles.cs}>&quot;adamw_torch_fused&quot;</span><span className={styles.ce}>,</span> <span className={styles.cv}>learning_rate</span><span className={styles.ce}>=</span><span className={styles.cm}>5e-5</span><span className={styles.ce}>,</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.cv}>max_grad_norm</span><span className={styles.ce}>=</span><span className={styles.cm}>0.3</span><span className={styles.ce}>,</span> <span className={styles.cv}>lr_scheduler_type</span><span className={styles.ce}>=</span><span className={styles.cs}>&quot;constant&quot;</span><span className={styles.ce}>,</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.cv}>dataset_kwargs</span><span className={styles.ce}>=</span><span className={styles.ce}>&#123;</span><span className={styles.cs}>&quot;add_special_tokens&quot;</span><span className={styles.ce}>:</span> <span className={styles.ck}>False</span><span className={styles.ce}>,</span> <span className={styles.cs}>&quot;append_concat_token&quot;</span><span className={styles.ce}>:</span> <span className={styles.ck}>True</span><span className={styles.ce}>&#125;</span><span className={styles.ce}>,</span></div>
-              <div className={styles.codeLine}><span className={styles.ce}>)</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>trainer</span> <span className={styles.ce}>=</span> <span className={styles.cm}>SFTTrainer</span><span className={styles.ce}>(</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.cv}>model</span><span className={styles.ce}>=</span><span className={styles.cv}>model</span><span className={styles.ce}>,</span> <span className={styles.cv}>args</span><span className={styles.ce}>=</span><span className={styles.cv}>args</span><span className={styles.ce}>,</span> <span className={styles.cv}>train_dataset</span><span className={styles.ce}>=</span><span className={styles.cv}>dataset</span><span className={styles.ce}>[</span><span className={styles.cs}>&quot;train&quot;</span><span className={styles.ce}>]</span><span className={styles.ce}>,</span> <span className={styles.cv}>eval_dataset</span><span className={styles.ce}>=</span><span className={styles.cv}>dataset</span><span className={styles.ce}>[</span><span className={styles.cs}>&quot;test&quot;</span><span className={styles.ce}>]</span><span className={styles.ce}>,</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.cv}>peft_config</span><span className={styles.ce}>=</span><span className={styles.cv}>peft_config</span><span className={styles.ce}>,</span> <span className={styles.cv}>processing_class</span><span className={styles.ce}>=</span><span className={styles.cv}>tokenizer</span><span className={styles.ce}>,</span></div>
-              <div className={styles.codeLine}><span className={styles.ce}>)</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>trainer</span><span className={styles.ce}>.</span><span className={styles.cm}>train</span><span className={styles.ce}>(</span><span className={styles.ce}>)</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>from</span> <span className={styles.cv}>trl</span>{" "}
+                <span className={styles.ck}>import</span>{" "}
+                <span className={styles.cm}>SFTConfig</span>
+                <span className={styles.ce}>,</span> <span className={styles.cm}>SFTTrainer</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>args</span> <span className={styles.ce}>=</span>{" "}
+                <span className={styles.cm}>SFTConfig</span>
+                <span className={styles.ce}>(</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.cv}>output_dir</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cs}>&quot;gemma-text-to-sql&quot;</span>
+                <span className={styles.ce}>,</span> <span className={styles.cv}>max_length</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cm}>512</span>
+                <span className={styles.ce}>,</span>{" "}
+                <span className={styles.cv}>num_train_epochs</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cm}>3</span>
+                <span className={styles.ce}>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.cv}>per_device_train_batch_size</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cm}>1</span>
+                <span className={styles.ce}>,</span> <span className={styles.cv}>optim</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cs}>&quot;adamw_torch_fused&quot;</span>
+                <span className={styles.ce}>,</span>{" "}
+                <span className={styles.cv}>learning_rate</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cm}>5e-5</span>
+                <span className={styles.ce}>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.cv}>max_grad_norm</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cm}>0.3</span>
+                <span className={styles.ce}>,</span>{" "}
+                <span className={styles.cv}>lr_scheduler_type</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cs}>&quot;constant&quot;</span>
+                <span className={styles.ce}>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.cv}>dataset_kwargs</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.ce}>&#123;</span>
+                <span className={styles.cs}>&quot;add_special_tokens&quot;</span>
+                <span className={styles.ce}>:</span> <span className={styles.ck}>False</span>
+                <span className={styles.ce}>,</span>{" "}
+                <span className={styles.cs}>&quot;append_concat_token&quot;</span>
+                <span className={styles.ce}>:</span> <span className={styles.ck}>True</span>
+                <span className={styles.ce}>&#125;</span>
+                <span className={styles.ce}>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ce}>)</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>trainer</span> <span className={styles.ce}>=</span>{" "}
+                <span className={styles.cm}>SFTTrainer</span>
+                <span className={styles.ce}>(</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.cv}>model</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cv}>model</span>
+                <span className={styles.ce}>,</span> <span className={styles.cv}>args</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cv}>args</span>
+                <span className={styles.ce}>,</span>{" "}
+                <span className={styles.cv}>train_dataset</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cv}>dataset</span>
+                <span className={styles.ce}>[</span>
+                <span className={styles.cs}>&quot;train&quot;</span>
+                <span className={styles.ce}>]</span>
+                <span className={styles.ce}>,</span> <span className={styles.cv}>eval_dataset</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cv}>dataset</span>
+                <span className={styles.ce}>[</span>
+                <span className={styles.cs}>&quot;test&quot;</span>
+                <span className={styles.ce}>]</span>
+                <span className={styles.ce}>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.cv}>peft_config</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cv}>peft_config</span>
+                <span className={styles.ce}>,</span>{" "}
+                <span className={styles.cv}>processing_class</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cv}>tokenizer</span>
+                <span className={styles.ce}>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ce}>)</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>trainer</span>
+                <span className={styles.ce}>.</span>
+                <span className={styles.cm}>train</span>
+                <span className={styles.ce}>(</span>
+                <span className={styles.ce}>)</span>
+              </div>
             </div>
           </div>
 
@@ -1235,11 +1774,60 @@ export default function GemmaBestPracticesGuidePage() {
               <span className={styles.codeLang}>PYTHON</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}><span className={styles.ck}>from</span> <span className={styles.cv}>peft</span> <span className={styles.ck}>import</span> <span className={styles.cm}>PeftModel</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>model</span> <span className={styles.ce}>=</span> <span className={styles.cm}>AutoModelForImageTextToText</span><span className={styles.ce}>.</span><span className={styles.cm}>from_pretrained</span><span className={styles.ce}>(</span><span className={styles.cv}>model_id</span><span className={styles.ce}>,</span> <span className={styles.cv}>low_cpu_mem_usage</span><span className={styles.ce}>=</span><span className={styles.ck}>True</span><span className={styles.ce}>)</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>peft_model</span> <span className={styles.ce}>=</span> <span className={styles.cm}>PeftModel</span><span className={styles.ce}>.</span><span className={styles.cm}>from_pretrained</span><span className={styles.ce}>(</span><span className={styles.cv}>model</span><span className={styles.ce}>,</span> <span className={styles.cv}>args</span><span className={styles.ce}>.</span><span className={styles.cv}>output_dir</span><span className={styles.ce}>)</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>merged_model</span> <span className={styles.ce}>=</span> <span className={styles.cv}>peft_model</span><span className={styles.ce}>.</span><span className={styles.cm}>merge_and_unload</span><span className={styles.ce}>(</span><span className={styles.ce}>)</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>merged_model</span><span className={styles.ce}>.</span><span className={styles.cm}>save_pretrained</span><span className={styles.ce}>(</span><span className={styles.cs}>&quot;merged_model&quot;</span><span className={styles.ce}>,</span> <span className={styles.cv}>safe_serialization</span><span className={styles.ce}>=</span><span className={styles.ck}>True</span><span className={styles.ce}>,</span> <span className={styles.cv}>max_shard_size</span><span className={styles.ce}>=</span><span className={styles.cs}>&quot;2GB&quot;</span><span className={styles.ce}>)</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>from</span> <span className={styles.cv}>peft</span>{" "}
+                <span className={styles.ck}>import</span>{" "}
+                <span className={styles.cm}>PeftModel</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>model</span> <span className={styles.ce}>=</span>{" "}
+                <span className={styles.cm}>AutoModelForImageTextToText</span>
+                <span className={styles.ce}>.</span>
+                <span className={styles.cm}>from_pretrained</span>
+                <span className={styles.ce}>(</span>
+                <span className={styles.cv}>model_id</span>
+                <span className={styles.ce}>,</span>{" "}
+                <span className={styles.cv}>low_cpu_mem_usage</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.ck}>True</span>
+                <span className={styles.ce}>)</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>peft_model</span> <span className={styles.ce}>=</span>{" "}
+                <span className={styles.cm}>PeftModel</span>
+                <span className={styles.ce}>.</span>
+                <span className={styles.cm}>from_pretrained</span>
+                <span className={styles.ce}>(</span>
+                <span className={styles.cv}>model</span>
+                <span className={styles.ce}>,</span> <span className={styles.cv}>args</span>
+                <span className={styles.ce}>.</span>
+                <span className={styles.cv}>output_dir</span>
+                <span className={styles.ce}>)</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>merged_model</span> <span className={styles.ce}>=</span>{" "}
+                <span className={styles.cv}>peft_model</span>
+                <span className={styles.ce}>.</span>
+                <span className={styles.cm}>merge_and_unload</span>
+                <span className={styles.ce}>(</span>
+                <span className={styles.ce}>)</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>merged_model</span>
+                <span className={styles.ce}>.</span>
+                <span className={styles.cm}>save_pretrained</span>
+                <span className={styles.ce}>(</span>
+                <span className={styles.cs}>&quot;merged_model&quot;</span>
+                <span className={styles.ce}>,</span>{" "}
+                <span className={styles.cv}>safe_serialization</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.ck}>True</span>
+                <span className={styles.ce}>,</span>{" "}
+                <span className={styles.cv}>max_shard_size</span>
+                <span className={styles.ce}>=</span>
+                <span className={styles.cs}>&quot;2GB&quot;</span>
+                <span className={styles.ce}>)</span>
+              </div>
             </div>
           </div>
 
@@ -1247,11 +1835,13 @@ export default function GemmaBestPracticesGuidePage() {
             <span className={styles.calloutTitle}>実務上の注意点</span>
             <ul style={{ margin: 0 }}>
               <li>
-                Ampere以降のGPU(NVIDIA L4/A100など)では Flash Attention を併用すると学習が最大3倍高速化
+                Ampere以降のGPU(NVIDIA L4/A100など)では Flash Attention
+                を併用すると学習が最大3倍高速化
               </li>
               <li>アダプタのマージには30GB以上のCPUメモリが必要な場合がある</li>
               <li>
-                生成AIモデルの評価は「1入力に対し複数の正解がありうる」ため、まずは手動評価(vibe check)から始め、段階的に自動評価パイプラインを整備する
+                生成AIモデルの評価は「1入力に対し複数の正解がありうる」ため、まずは手動評価(vibe
+                check)から始め、段階的に自動評価パイプラインを整備する
               </li>
             </ul>
           </div>
@@ -1281,14 +1871,17 @@ export default function GemmaBestPracticesGuidePage() {
                 <tr>
                   <td>Ollama</td>
                   <td>
-                    <code className={styles.inlineCode}>ollama pull</code>/<code className={styles.inlineCode}>run</code>だけで即実行。GGUFを自動管理しOpenAI互換API(localhost:11434)を提供
+                    <code className={styles.inlineCode}>ollama pull</code>/
+                    <code className={styles.inlineCode}>run</code>
+                    だけで即実行。GGUFを自動管理しOpenAI互換API(localhost:11434)を提供
                   </td>
                   <td>個人開発・プロトタイピング</td>
                 </tr>
                 <tr>
                   <td>llama.cpp</td>
                   <td>
-                    GGUF量子化モデルをCPU/Metal/CUDAで実行。<code className={styles.inlineCode}>llama-server</code>でOpenAI互換API(/v1)
+                    GGUF量子化モデルをCPU/Metal/CUDAで実行。
+                    <code className={styles.inlineCode}>llama-server</code>でOpenAI互換API(/v1)
                   </td>
                   <td>GPUなし環境、Apple Silicon</td>
                 </tr>
@@ -1328,24 +1921,67 @@ export default function GemmaBestPracticesGuidePage() {
               <span className={styles.codeLang}>BASH</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}><span className={styles.cc}># インストール確認</span></div>
-              <div className={styles.codeLine}><span className={styles.ck}>ollama</span> <span className={styles.ch}>--version</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}># インストール確認</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>ollama</span>{" "}
+                <span className={styles.ch}>--version</span>
+              </div>
               <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}><span className={styles.cc}># Gemma 4 のデフォルト(E4B相当)をpull</span></div>
-              <div className={styles.codeLine}><span className={styles.ck}>ollama pull</span> <span className={styles.cv}>gemma4</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}># Gemma 4 のデフォルト(E4B相当)をpull</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>ollama pull</span>{" "}
+                <span className={styles.cv}>gemma4</span>
+              </div>
               <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}><span className={styles.cc}># サイズを指定する場合</span></div>
-              <div className={styles.codeLine}><span className={styles.ck}>ollama pull</span> <span className={styles.cv}>gemma4:e2b</span>     <span className={styles.cc}># 最軽量</span></div>
-              <div className={styles.codeLine}><span className={styles.ck}>ollama pull</span> <span className={styles.cv}>gemma4:e4b</span></div>
-              <div className={styles.codeLine}><span className={styles.ck}>ollama pull</span> <span className={styles.cv}>gemma4:12b</span>     <span className={styles.cc}># Unified</span></div>
-              <div className={styles.codeLine}><span className={styles.ck}>ollama pull</span> <span className={styles.cv}>gemma4:26b</span>     <span className={styles.cc}># MoE</span></div>
-              <div className={styles.codeLine}><span className={styles.ck}>ollama pull</span> <span className={styles.cv}>gemma4:31b</span>     <span className={styles.cc}># Dense最上位</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}># サイズを指定する場合</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>ollama pull</span>{" "}
+                <span className={styles.cv}>gemma4:e2b</span>{" "}
+                <span className={styles.cc}># 最軽量</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>ollama pull</span>{" "}
+                <span className={styles.cv}>gemma4:e4b</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>ollama pull</span>{" "}
+                <span className={styles.cv}>gemma4:12b</span>{" "}
+                <span className={styles.cc}># Unified</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>ollama pull</span>{" "}
+                <span className={styles.cv}>gemma4:26b</span>{" "}
+                <span className={styles.cc}># MoE</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>ollama pull</span>{" "}
+                <span className={styles.cv}>gemma4:31b</span>{" "}
+                <span className={styles.cc}># Dense最上位</span>
+              </div>
               <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}><span className={styles.cc}># 対話実行</span></div>
-              <div className={styles.codeLine}><span className={styles.ck}>ollama run</span> <span className={styles.cv}>gemma4</span> <span className={styles.cs}>&quot;roses are red&quot;</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}># 対話実行</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>ollama run</span>{" "}
+                <span className={styles.cv}>gemma4</span>{" "}
+                <span className={styles.cs}>&quot;roses are red&quot;</span>
+              </div>
               <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}><span className={styles.cc}># 画像入力</span></div>
-              <div className={styles.codeLine}><span className={styles.ck}>ollama run</span> <span className={styles.cv}>gemma4</span> <span className={styles.cs}>&quot;caption this image /path/to/image.png&quot;</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}># 画像入力</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>ollama run</span>{" "}
+                <span className={styles.cv}>gemma4</span>{" "}
+                <span className={styles.cs}>&quot;caption this image /path/to/image.png&quot;</span>
+              </div>
             </div>
           </div>
 
@@ -1356,10 +1992,25 @@ export default function GemmaBestPracticesGuidePage() {
               <span className={styles.codeLang}>BASH</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}><span className={styles.ck}>curl</span> <span className={styles.cs}>http://localhost:11434/api/generate</span> <span className={styles.ch}>-d</span> <span className={styles.ce}>&#123;</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.ck}>&quot;model&quot;</span><span className={styles.ce}>:</span> <span className={styles.cs}>&quot;gemma4&quot;</span><span className={styles.ce}>,</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.ck}>&quot;prompt&quot;</span><span className={styles.ce}>:</span> <span className={styles.cs}>&quot;roses are red&quot;</span></div>
-              <div className={styles.codeLine}><span className={styles.ce}>&#125;</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>curl</span>{" "}
+                <span className={styles.cs}>http://localhost:11434/api/generate</span>{" "}
+                <span className={styles.ch}>-d</span> <span className={styles.ce}>&#123;</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.ck}>&quot;model&quot;</span>
+                <span className={styles.ce}>:</span>{" "}
+                <span className={styles.cs}>&quot;gemma4&quot;</span>
+                <span className={styles.ce}>,</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.ck}>&quot;prompt&quot;</span>
+                <span className={styles.ce}>:</span>{" "}
+                <span className={styles.cs}>&quot;roses are red&quot;</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ce}>&#125;</span>
+              </div>
             </div>
           </div>
 
@@ -1370,19 +2021,45 @@ export default function GemmaBestPracticesGuidePage() {
               <span className={styles.codeLang}>BASH</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}><span className={styles.cc}># Hugging Faceから直接ダウンロードして実行</span></div>
-              <div className={styles.codeLine}><span className={styles.ck}>llama-cli</span> <span className={styles.ch}>-hf</span> <span className={styles.cs}>ggml-org/gemma-4-E2B-it-GGUF</span> <span className={styles.ch}>--prompt</span> <span className={styles.cs}>&quot;Write a poem about the Kraken.&quot;</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}># Hugging Faceから直接ダウンロードして実行</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>llama-cli</span> <span className={styles.ch}>-hf</span>{" "}
+                <span className={styles.cs}>ggml-org/gemma-4-E2B-it-GGUF</span>{" "}
+                <span className={styles.ch}>--prompt</span>{" "}
+                <span className={styles.cs}>&quot;Write a poem about the Kraken.&quot;</span>
+              </div>
               <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}><span className={styles.cc}># システムプロンプト付き</span></div>
-              <div className={styles.codeLine}><span className={styles.ck}>llama-cli</span> <span className={styles.ch}>-hf</span> <span className={styles.cs}>ggml-org/gemma-4-E2B-it-GGUF</span> <span className={styles.ch}>-sys</span> <span className={styles.cs}>&quot;You are a helpful assistant.&quot;</span> <span className={styles.ch}>-p</span> <span className={styles.cs}>&quot;Who are you?&quot;</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}># システムプロンプト付き</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>llama-cli</span> <span className={styles.ch}>-hf</span>{" "}
+                <span className={styles.cs}>ggml-org/gemma-4-E2B-it-GGUF</span>{" "}
+                <span className={styles.ch}>-sys</span>{" "}
+                <span className={styles.cs}>&quot;You are a helpful assistant.&quot;</span>{" "}
+                <span className={styles.ch}>-p</span>{" "}
+                <span className={styles.cs}>&quot;Who are you?&quot;</span>
+              </div>
               <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}><span className={styles.cc}># サーバ起動(OpenAI互換API: http://localhost:8080/v1)</span></div>
-              <div className={styles.codeLine}><span className={styles.ck}>llama-server</span> <span className={styles.ch}>-hf</span> <span className={styles.cs}>ggml-org/gemma-4-E2B-it-GGUF</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}>
+                  # サーバ起動(OpenAI互換API: http://localhost:8080/v1)
+                </span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>llama-server</span>{" "}
+                <span className={styles.ch}>-hf</span>{" "}
+                <span className={styles.cs}>ggml-org/gemma-4-E2B-it-GGUF</span>
+              </div>
             </div>
           </div>
 
           <p>
-            マルチモーダル(画像・音声)を使う場合は、対応する<code className={styles.inlineCode}>mmproj</code>(マルチモーダル射影)ファイルを別途指定する必要があります。
+            マルチモーダル(画像・音声)を使う場合は、対応する
+            <code className={styles.inlineCode}>mmproj</code>
+            (マルチモーダル射影)ファイルを別途指定する必要があります。
           </p>
           <div className={styles.codeWrap}>
             <div className={styles.codeBar}>
@@ -1390,10 +2067,23 @@ export default function GemmaBestPracticesGuidePage() {
               <span className={styles.codeLang}>BASH</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}><span className={styles.ck}>llama-server</span> <span className={styles.ch}>\</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.ch}>-m</span> <span className={styles.cs}>gemma-4-12b-it-Q4_K_M.gguf</span> <span className={styles.ch}>\</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.ch}>--mmproj</span> <span className={styles.cs}>mmproj-gemma-4-12b.gguf</span> <span className={styles.ch}>\</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.ch}>--ctx-size</span> <span className={styles.cm}>8192</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>llama-server</span> <span className={styles.ch}>\</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.ch}>-m</span>{" "}
+                <span className={styles.cs}>gemma-4-12b-it-Q4_K_M.gguf</span>{" "}
+                <span className={styles.ch}>\</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.ch}>--mmproj</span>{" "}
+                <span className={styles.cs}>mmproj-gemma-4-12b.gguf</span>{" "}
+                <span className={styles.ch}>\</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.ch}>--ctx-size</span>{" "}
+                <span className={styles.cm}>8192</span>
+              </div>
             </div>
           </div>
           <p className={styles.sourceNote}>
@@ -1447,13 +2137,15 @@ export default function GemmaBestPracticesGuidePage() {
                 <tr>
                   <td>Gemini API / Google AI Studio</td>
                   <td>
-                    Gemma 4をGemini APIと同じSDK/I/Fで利用可能。関数呼び出し・構造化出力・システム指示をモデルレベルでサポート
+                    Gemma 4をGemini
+                    APIと同じSDK/I/Fで利用可能。関数呼び出し・構造化出力・システム指示をモデルレベルでサポート
                   </td>
                 </tr>
                 <tr>
                   <td>Google Cloud(Model Garden)</td>
                   <td>
-                    Vertex AI Model Garden上でGemma 4をテスト・デプロイ。Training Clustersでファインチューニングも可能
+                    Vertex AI Model Garden上でGemma 4をテスト・デプロイ。Training
+                    Clustersでファインチューニングも可能
                   </td>
                 </tr>
                 <tr>
@@ -1493,20 +2185,60 @@ export default function GemmaBestPracticesGuidePage() {
               <span className={styles.codeLang}>BASH</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}><span className={styles.ck}>vllm serve</span> <span className={styles.cs}>google/gemma-4-31B-it</span> <span className={styles.ch}>\</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.ch}>--tensor-parallel-size</span> <span className={styles.cm}>2</span> <span className={styles.ch}>\</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.ch}>--max-model-len</span> <span className={styles.cm}>16384</span> <span className={styles.ch}>\</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.ch}>--gpu-memory-utilization</span> <span className={styles.cm}>0.90</span> <span className={styles.ch}>\</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.ch}>--enable-auto-tool-choice</span> <span className={styles.ch}>\</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.ch}>--reasoning-parser</span> <span className={styles.cv}>gemma4</span> <span className={styles.ch}>\</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.ch}>--tool-call-parser</span> <span className={styles.cv}>gemma4</span> <span className={styles.ch}>\</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.ch}>--chat-template</span> <span className={styles.cs}>examples/tool_chat_template_gemma4.jinja</span> <span className={styles.ch}>\</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.ch}>--limit-mm-per-prompt</span> <span className={styles.cs}>&#123;&apos;image&apos;: 4, &apos;audio&apos;: 1&#125;</span> <span className={styles.ch}>\</span></div>
-              <div className={styles.codeLine}>&nbsp;&nbsp;<span className={styles.ch}>--host</span> <span className={styles.cs}>0.0.0.0</span> <span className={styles.ch}>--port</span> <span className={styles.cm}>8000</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>vllm serve</span>{" "}
+                <span className={styles.cs}>google/gemma-4-31B-it</span>{" "}
+                <span className={styles.ch}>\</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.ch}>--tensor-parallel-size</span>{" "}
+                <span className={styles.cm}>2</span> <span className={styles.ch}>\</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.ch}>--max-model-len</span>{" "}
+                <span className={styles.cm}>16384</span> <span className={styles.ch}>\</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.ch}>--gpu-memory-utilization</span>{" "}
+                <span className={styles.cm}>0.90</span> <span className={styles.ch}>\</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.ch}>--enable-auto-tool-choice</span>{" "}
+                <span className={styles.ch}>\</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.ch}>--reasoning-parser</span>{" "}
+                <span className={styles.cv}>gemma4</span> <span className={styles.ch}>\</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.ch}>--tool-call-parser</span>{" "}
+                <span className={styles.cv}>gemma4</span> <span className={styles.ch}>\</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.ch}>--chat-template</span>{" "}
+                <span className={styles.cs}>examples/tool_chat_template_gemma4.jinja</span>{" "}
+                <span className={styles.ch}>\</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.ch}>--limit-mm-per-prompt</span>{" "}
+                <span className={styles.cs}>
+                  &#123;&apos;image&apos;: 4, &apos;audio&apos;: 1&#125;
+                </span>{" "}
+                <span className={styles.ch}>\</span>
+              </div>
+              <div className={styles.codeLine}>
+                &nbsp;&nbsp;<span className={styles.ch}>--host</span>{" "}
+                <span className={styles.cs}>0.0.0.0</span> <span className={styles.ch}>--port</span>{" "}
+                <span className={styles.cm}>8000</span>
+              </div>
             </div>
           </div>
           <p>
-            <code className={styles.inlineCode}>--reasoning-parser gemma4</code> と <code className={styles.inlineCode}>--tool-call-parser gemma4</code> を指定することで、ThinkingモードとFunction CallingをOpenAI互換API経由で透過的に扱えます。TPU向けにはvLLM TPUを用いた専用イメージも提供されています。
+            <code className={styles.inlineCode}>--reasoning-parser gemma4</code> と{" "}
+            <code className={styles.inlineCode}>--tool-call-parser gemma4</code>{" "}
+            を指定することで、ThinkingモードとFunction
+            CallingをOpenAI互換API経由で透過的に扱えます。TPU向けにはvLLM
+            TPUを用いた専用イメージも提供されています。
           </p>
           <p className={styles.sourceNote}>
             出典:{" "}
@@ -1580,10 +2312,12 @@ export default function GemmaBestPracticesGuidePage() {
           </div>
           <ul>
             <li>
-              ShieldGemma 2は「VLMの入力フィルタ」または「画像生成システムの出力フィルタ」として使うことが推奨されています。
+              ShieldGemma
+              2は「VLMの入力フィルタ」または「画像生成システムの出力フィルタ」として使うことが推奨されています。
             </li>
             <li>
-              ShieldGemma 1は2B(低レイテンシなオンライン分類向け)〜27B(レイテンシより性能を優先するオフライン用途向け)まで選べます。
+              ShieldGemma
+              1は2B(低レイテンシなオンライン分類向け)〜27B(レイテンシより性能を優先するオフライン用途向け)まで選べます。
             </li>
             <li>
               いずれもオープンウェイトで、独自の安全基準に合わせて追加ファインチューニングが可能です。
@@ -1610,7 +2344,10 @@ export default function GemmaBestPracticesGuidePage() {
             <span className={styles.chip}>ハラスメント</span>
           </div>
           <p>
-            公式の安全性評価では、Gemma 3/3n世代と比較して全カテゴリで「不当な拒否(over-refusal)を低く抑えながら」安全性が大幅に改善したと報告されています。ただし、これは<strong>モデル単体の傾向</strong>であり、実運用ではアプリケーション固有のコンテンツポリシーに応じてShieldGemma等の追加フィルタを組み合わせることが推奨されます。
+            公式の安全性評価では、Gemma
+            3/3n世代と比較して全カテゴリで「不当な拒否(over-refusal)を低く抑えながら」安全性が大幅に改善したと報告されています。ただし、これは
+            <strong>モデル単体の傾向</strong>
+            であり、実運用ではアプリケーション固有のコンテンツポリシーに応じてShieldGemma等の追加フィルタを組み合わせることが推奨されます。
           </p>
           <p className={styles.sourceNote}>
             出典:{" "}
@@ -1625,7 +2362,11 @@ export default function GemmaBestPracticesGuidePage() {
               事前学習データにはCSAMフィルタリングおよび個人情報などの機微データの自動フィルタリングが多段階で適用されています。
             </li>
             <li>
-              Gemma 4はApache 2.0ライセンス(<Ext href="https://ai.google.dev/gemma/terms">Gemma利用規約</Ext>に準拠)で提供され、商用利用・改変・再配布が可能です。ただし<Ext href="https://ai.google.dev/gemma/prohibited_use_policy">禁止利用ポリシー</Ext>は遵守する必要があります。
+              Gemma 4はApache 2.0ライセンス(
+              <Ext href="https://ai.google.dev/gemma/terms">Gemma利用規約</Ext>
+              に準拠)で提供され、商用利用・改変・再配布が可能です。ただし
+              <Ext href="https://ai.google.dev/gemma/prohibited_use_policy">禁止利用ポリシー</Ext>
+              は遵守する必要があります。
             </li>
           </ul>
           <p className={styles.sourceNote}>
@@ -1660,13 +2401,15 @@ export default function GemmaBestPracticesGuidePage() {
           <div className={styles.sectionEyebrow}>12 / Summary</div>
           <h2>まとめ</h2>
           <p>
-            Gemma 4は、Gemma 3世代からアーキテクチャ・制御トークン体系・エージェント機能が刷新された大型アップデートです。実務でGemmaを扱う際の勘所は以下の3点に集約されます。
+            Gemma 4は、Gemma
+            3世代からアーキテクチャ・制御トークン体系・エージェント機能が刷新された大型アップデートです。実務でGemmaを扱う際の勘所は以下の3点に集約されます。
           </p>
           <div className={styles.gridCards}>
             <div className={styles.card}>
               <h4>1. サイズ選定はハードウェア起点</h4>
               <p>
-                E2B/E4Bはエッジ、12B Unifiedは単一GPU/ラップトップでの音声・動画対応、26B A4Bは速度重視のサーバー、31Bは精度最優先のワークステーション/サーバー、という住み分けを踏まえる。
+                E2B/E4Bはエッジ、12B Unifiedは単一GPU/ラップトップでの音声・動画対応、26B
+                A4Bは速度重視のサーバー、31Bは精度最優先のワークステーション/サーバー、という住み分けを踏まえる。
               </p>
             </div>
             <div className={styles.card}>
@@ -1689,9 +2432,7 @@ export default function GemmaBestPracticesGuidePage() {
           <h3>モデル概要・アーキテクチャ</h3>
           <ul>
             <li>
-              <Ext href="https://deepmind.google/models/gemma/">
-                Gemma — Google DeepMind
-              </Ext>
+              <Ext href="https://deepmind.google/models/gemma/">Gemma — Google DeepMind</Ext>
             </li>
             <li>
               <Ext href="https://ai.google.dev/gemma/docs/core">

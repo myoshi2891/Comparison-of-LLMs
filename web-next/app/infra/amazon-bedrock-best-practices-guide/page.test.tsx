@@ -9,11 +9,18 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
 }));
 
 class IntersectionObserverStub {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+  observe() {
+    /* stub */
+  }
+  unobserve() {
+    /* stub */
+  }
+  disconnect() {
+    /* stub */
+  }
 }
-globalThis.IntersectionObserver = IntersectionObserverStub as unknown as typeof IntersectionObserver;
+globalThis.IntersectionObserver =
+  IntersectionObserverStub as unknown as typeof IntersectionObserver;
 
 describe("Amazon Bedrock Best Practices Guide Page", () => {
   it("renders h1 title correctly", () => {
