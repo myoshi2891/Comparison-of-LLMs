@@ -428,7 +428,7 @@
 .cg { color: #3fb950; }
 .ch { color: #f0883e; font-weight: bold; }
 
-/* mermaid centering */
+/* mermaid centering & sizing */
 .mermaidContainer {
   width: 100%;
   display: flex !important;
@@ -444,16 +444,19 @@
 }
 
 .mermaidContainer :global(.mermaid) {
-  width: 100%;
   display: flex !important;
   justify-content: center !important;
+  width: 100%;
 }
 
 .mermaidContainer :global(svg) {
   max-width: 100% !important;
+  max-height: 480px !important;
+  width: auto !important;
   height: auto !important;
   display: block !important;
   margin: 0 auto !important;
+  overflow: visible !important;
 }
 
 .sourceNote {
