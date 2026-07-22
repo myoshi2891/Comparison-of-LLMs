@@ -1,0 +1,2693 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Amazon Bedrock 活用ベストプラクティスガイド</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css"
+    />
+    <style>
+      :root {
+        --color-background-primary: #0b0c0f;
+        --color-background-secondary: #15171c;
+        --color-background-tertiary: #1c1f26;
+        --color-background-info: #12233a;
+        --color-background-danger: #2a1416;
+        --color-background-success: #0f2418;
+        --color-background-warning: #2a2010;
+
+        --color-text-primary: #e8e9ec;
+        --color-text-secondary: #a8adb8;
+        --color-text-tertiary: #6b7280;
+        --color-text-info: #7ab8ff;
+        --color-text-danger: #ff9a92;
+        --color-text-success: #6fdd9a;
+        --color-text-warning: #f0c264;
+
+        --color-border-tertiary: #21242b;
+        --color-border-secondary: #2c2f38;
+        --color-border-primary: #3a3e4a;
+
+        --font-sans:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Kaku Gothic ProN',
+          'Noto Sans JP', sans-serif;
+        --font-serif: Georgia, serif;
+        --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+
+        --border-radius-md: 8px;
+        --border-radius-lg: 12px;
+        --border-radius-xl: 16px;
+
+        --c-purple-50: #f5f3ff;
+        --c-purple-100: #ede9fe;
+        --c-purple-200: #ddd6fe;
+        --c-purple-300: #c4b5fd;
+        --c-purple-400: #a78bfa;
+        --c-purple-500: #8b5cf6;
+        --c-purple-600: #7c3aed;
+        --c-purple-700: #6d28d9;
+        --c-purple-800: #5b21b6;
+        --c-purple-900: #4c1d95;
+        --c-teal-50: #f0fdfa;
+        --c-teal-100: #ccfbf1;
+        --c-teal-200: #99f6e4;
+        --c-teal-300: #5eead4;
+        --c-teal-400: #2dd4bf;
+        --c-teal-500: #14b8a6;
+        --c-teal-600: #0d9488;
+        --c-teal-700: #0f766e;
+        --c-teal-800: #115e59;
+        --c-teal-900: #134e4a;
+        --c-coral-50: #fff1f0;
+        --c-coral-100: #ffe0dd;
+        --c-coral-200: #ffc2ba;
+        --c-coral-300: #ff9c8f;
+        --c-coral-400: #ff7a66;
+        --c-coral-500: #ff5c3d;
+        --c-coral-600: #e2432a;
+        --c-coral-700: #bd3520;
+        --c-coral-800: #97291a;
+        --c-coral-900: #7a2116;
+        --c-pink-50: #fdf2f8;
+        --c-pink-100: #fce7f3;
+        --c-pink-200: #fbcfe8;
+        --c-pink-300: #f9a8d4;
+        --c-pink-400: #f472b6;
+        --c-pink-500: #ec4899;
+        --c-pink-600: #db2777;
+        --c-pink-700: #be185d;
+        --c-pink-800: #9d174d;
+        --c-pink-900: #831843;
+        --c-gray-50: #f8f9fa;
+        --c-gray-100: #eceef1;
+        --c-gray-200: #d9dce2;
+        --c-gray-300: #b8bdc7;
+        --c-gray-400: #8b919d;
+        --c-gray-500: #6b7280;
+        --c-gray-600: #545a66;
+        --c-gray-700: #3f4450;
+        --c-gray-800: #2a2e37;
+        --c-gray-900: #1a1d23;
+        --c-blue-50: #eff6ff;
+        --c-blue-100: #dbeafe;
+        --c-blue-200: #bfdbfe;
+        --c-blue-300: #93c5fd;
+        --c-blue-400: #60a5fa;
+        --c-blue-500: #3b82f6;
+        --c-blue-600: #2563eb;
+        --c-blue-700: #1d4ed8;
+        --c-blue-800: #1e40af;
+        --c-blue-900: #1e3a8a;
+        --c-green-50: #ecfdf5;
+        --c-green-100: #d1fae5;
+        --c-green-200: #a7f3d0;
+        --c-green-300: #6ee7b7;
+        --c-green-400: #34d399;
+        --c-green-500: #10b981;
+        --c-green-600: #059669;
+        --c-green-700: #047857;
+        --c-green-800: #065f46;
+        --c-green-900: #064e3b;
+        --c-amber-50: #fffbeb;
+        --c-amber-100: #fef3c7;
+        --c-amber-200: #fde68a;
+        --c-amber-300: #fcd34d;
+        --c-amber-400: #fbbf24;
+        --c-amber-500: #f59e0b;
+        --c-amber-600: #d97706;
+        --c-amber-700: #b45309;
+        --c-amber-800: #92400e;
+        --c-amber-900: #78350f;
+        --c-red-50: #fef2f2;
+        --c-red-100: #fee2e2;
+        --c-red-200: #fecaca;
+        --c-red-300: #fca5a5;
+        --c-red-400: #f87171;
+        --c-red-500: #ef4444;
+        --c-red-600: #dc2626;
+        --c-red-700: #b91c1c;
+        --c-red-800: #991b1b;
+        --c-red-900: #7f1d1d;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--color-background-primary);
+        color: var(--color-text-primary);
+        font-family: var(--font-sans);
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 1.7;
+      }
+
+      body {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        min-height: 100vh;
+      }
+
+      a {
+        color: var(--color-text-info);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+        background: var(--color-background-secondary);
+        border-right: 1px solid var(--color-border-tertiary);
+        padding: 24px 16px 40px 16px;
+      }
+
+      .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px 20px 12px;
+        border-bottom: 1px solid var(--color-border-tertiary);
+        margin-bottom: 16px;
+      }
+
+      .sidebar-brand i {
+        font-size: 22px;
+        color: var(--c-purple-400);
+      }
+      .sidebar-brand span {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--color-text-primary);
+        line-height: 1.4;
+      }
+
+      .nav-group-title {
+        font-size: 11px;
+        color: var(--color-text-tertiary);
+        padding: 16px 12px 6px 12px;
+        font-weight: 500;
+      }
+
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        border-radius: var(--border-radius-md);
+        color: var(--color-text-secondary);
+        font-size: 13px;
+        line-height: 1.4;
+      }
+
+      .nav-item:hover {
+        background: var(--color-background-tertiary);
+        color: var(--color-text-primary);
+        text-decoration: none;
+      }
+
+      .nav-item i {
+        font-size: 16px;
+        width: 18px;
+        text-align: center;
+        color: var(--c-teal-400);
+        flex-shrink: 0;
+      }
+
+      main {
+        padding: 48px 56px 96px 56px;
+        max-width: none;
+        width: 100%;
+      }
+
+      .page-header {
+        border-bottom: 1px solid var(--color-border-tertiary);
+        padding-bottom: 28px;
+        margin-bottom: 36px;
+      }
+
+      .page-header .eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--color-text-tertiary);
+        margin-bottom: 12px;
+      }
+
+      .page-header .eyebrow i {
+        color: var(--c-coral-400);
+        font-size: 14px;
+      }
+
+      .page-header h1 {
+        font-size: 28px;
+        font-weight: 500;
+        margin: 0 0 10px 0;
+        color: var(--color-text-primary);
+        line-height: 1.3;
+      }
+
+      .page-header p.lede {
+        font-size: 16px;
+        color: var(--color-text-secondary);
+        max-width: 900px;
+        margin: 0;
+      }
+
+      .callout {
+        display: flex;
+        gap: 14px;
+        padding: 16px 18px;
+        border-radius: var(--border-radius-lg);
+        border: 1px solid var(--color-border-secondary);
+        border-left: 3px solid var(--color-border-primary);
+        background: var(--color-background-secondary);
+        margin: 20px 0;
+        font-size: 14px;
+        color: var(--color-text-secondary);
+      }
+
+      .callout i {
+        font-size: 18px;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+      .callout.info {
+        border-left-color: var(--c-blue-500);
+        background: var(--color-background-info);
+      }
+      .callout.info i {
+        color: var(--color-text-info);
+      }
+      .callout.warning {
+        border-left-color: var(--c-amber-500);
+        background: var(--color-background-warning);
+      }
+      .callout.warning i {
+        color: var(--color-text-warning);
+      }
+      .callout.success {
+        border-left-color: var(--c-green-500);
+        background: var(--color-background-success);
+      }
+      .callout.success i {
+        color: var(--color-text-success);
+      }
+      .callout.danger {
+        border-left-color: var(--c-coral-500);
+        background: var(--color-background-danger);
+      }
+      .callout.danger i {
+        color: var(--color-text-danger);
+      }
+      .callout strong {
+        color: var(--color-text-primary);
+        font-weight: 500;
+      }
+
+      section.step {
+        margin: 56px 0;
+        padding-top: 8px;
+        scroll-margin-top: 24px;
+        border-top: 1px solid var(--color-border-tertiary);
+        padding-top: 40px;
+      }
+
+      section.step:first-of-type {
+        border-top: none;
+        padding-top: 8px;
+      }
+
+      section.step h2 {
+        font-size: 20px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--color-text-primary);
+        margin: 0 0 6px 0;
+        letter-spacing: 0.2px;
+      }
+
+      .step-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        height: 32px;
+        padding: 0 9px;
+        border-radius: var(--border-radius-md);
+        background: var(--c-purple-900);
+        color: var(--c-purple-200);
+        font-size: 13.5px;
+        font-weight: 500;
+        border: 1px solid var(--c-purple-700);
+      }
+
+      .step-badge.c-coral {
+        background: var(--c-coral-900);
+        color: var(--c-coral-200);
+        border-color: var(--c-coral-700);
+      }
+      .step-badge.c-blue {
+        background: var(--c-blue-900);
+        color: var(--c-blue-200);
+        border-color: var(--c-blue-700);
+      }
+      .step-badge.c-teal {
+        background: var(--c-teal-900);
+        color: var(--c-teal-200);
+        border-color: var(--c-teal-700);
+      }
+      .step-badge.c-purple {
+        background: var(--c-purple-900);
+        color: var(--c-purple-200);
+        border-color: var(--c-purple-700);
+      }
+      .step-badge.c-red {
+        background: var(--c-red-900);
+        color: var(--c-red-200);
+        border-color: var(--c-red-700);
+      }
+      .step-badge.c-green {
+        background: var(--c-green-900);
+        color: var(--c-green-200);
+        border-color: var(--c-green-700);
+      }
+      .step-badge.c-pink {
+        background: var(--c-pink-900);
+        color: var(--c-pink-200);
+        border-color: var(--c-pink-700);
+      }
+      .step-badge.c-amber {
+        background: var(--c-amber-900);
+        color: var(--c-amber-200);
+        border-color: var(--c-amber-700);
+      }
+
+      section.step .step-sub {
+        font-size: 13px;
+        color: var(--color-text-tertiary);
+        margin: 0 0 18px 46px;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-weight: 500;
+      }
+      h3 {
+        font-size: 17px;
+        color: var(--color-text-primary);
+        margin: 28px 0 12px 0;
+        padding-left: 10px;
+        border-left: 3px solid var(--c-teal-600);
+      }
+      h4 {
+        font-size: 15px;
+        color: var(--color-text-primary);
+        margin: 20px 0 10px 0;
+      }
+
+      p {
+        color: var(--color-text-secondary);
+        margin: 0 0 14px 0;
+      }
+      strong {
+        color: var(--color-text-primary);
+        font-weight: 500;
+      }
+
+      ul,
+      ol {
+        color: var(--color-text-secondary);
+        padding-left: 22px;
+        margin: 0 0 16px 0;
+      }
+      li {
+        margin-bottom: 8px;
+      }
+      li::marker {
+        color: var(--color-text-tertiary);
+      }
+
+      code {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        background: var(--color-background-tertiary);
+        color: var(--c-teal-300);
+        padding: 2px 6px;
+        border-radius: 4px;
+        border: 1px solid var(--color-border-tertiary);
+      }
+
+      .code-block {
+        border: 1px solid var(--color-border-secondary);
+        border-radius: var(--border-radius-lg);
+        margin: 16px 0 24px 0;
+        overflow: hidden;
+      }
+
+      .code-block-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 9px 16px;
+        background: var(--color-background-tertiary);
+        border-bottom: 1px solid var(--color-border-secondary);
+        font-size: 11.5px;
+        color: var(--color-text-tertiary);
+      }
+
+      .code-block-header .lang-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--c-teal-300);
+        font-weight: 500;
+      }
+      .code-block-header .lang-tag i {
+        font-size: 13px;
+      }
+
+      pre {
+        background: var(--color-background-secondary);
+        border: none;
+        border-radius: 0;
+        padding: 18px 20px;
+        overflow-x: auto;
+        margin: 0;
+      }
+
+      pre code {
+        background: none;
+        border: none;
+        padding: 0;
+        color: var(--color-text-primary);
+        font-size: 13px;
+        line-height: 1.6;
+        font-weight: 400;
+      }
+
+      .hljs-keyword,
+      .hljs-literal,
+      .hljs-selector-tag {
+        color: var(--c-purple-300);
+      }
+      .hljs-string,
+      .hljs-attr {
+        color: var(--c-teal-300);
+      }
+      .hljs-title,
+      .hljs-function,
+      .hljs-title.function_ {
+        color: var(--c-pink-300);
+      }
+      .hljs-number {
+        color: var(--c-coral-300);
+      }
+      .hljs-comment {
+        color: var(--color-text-tertiary);
+      }
+      .hljs-property,
+      .hljs-attribute {
+        color: var(--c-blue-300);
+      }
+      .hljs-punctuation,
+      .hljs-operator {
+        color: var(--color-text-secondary);
+      }
+      .hljs-built_in,
+      .hljs-type {
+        color: var(--c-amber-300);
+      }
+      .hljs-params {
+        color: var(--color-text-primary);
+      }
+
+      .code-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
+        color: var(--color-text-tertiary);
+        margin: -8px 0 8px 0;
+      }
+      .code-label i {
+        font-size: 13px;
+        color: var(--c-teal-400);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 16px 0 26px 0;
+        font-size: 13.5px;
+        border: 1px solid var(--color-border-secondary);
+        border-radius: var(--border-radius-lg);
+        overflow: hidden;
+      }
+
+      thead th {
+        background: var(--color-background-tertiary);
+        color: var(--color-text-primary);
+        text-align: left;
+        padding: 11px 14px;
+        font-weight: 500;
+        border-bottom: 2px solid var(--c-teal-700);
+      }
+
+      tbody td {
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--color-border-tertiary);
+        color: var(--color-text-secondary);
+        vertical-align: top;
+      }
+
+      tbody tr:nth-child(even) {
+        background: var(--color-background-secondary);
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:hover {
+        background: var(--color-background-tertiary);
+      }
+
+      .mermaid-block {
+        background: var(--color-background-secondary);
+        border: 1px solid var(--color-border-secondary);
+        border-radius: var(--border-radius-xl);
+        padding: 28px;
+        margin: 20px auto 28px auto;
+        max-width: 1000px;
+        text-align: center;
+        overflow-x: auto;
+      }
+
+      .mermaid-block.size-s {
+        max-width: 540px;
+      }
+      .mermaid-block.size-sm {
+        max-width: 700px;
+      }
+      .mermaid-block.size-l {
+        max-width: 1200px;
+      }
+      .mermaid-block.size-xl {
+        max-width: 1400px;
+      }
+      .mermaid-block.scroll-x {
+        text-align: left;
+      }
+      .mermaid-block.scroll-x svg {
+        max-width: none !important;
+        margin: 0 !important;
+      }
+
+      .mermaid-block svg {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+        overflow: visible;
+      }
+
+      .mermaid-caption {
+        font-size: 12px;
+        color: var(--color-text-tertiary);
+        margin-top: 12px;
+      }
+
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+        margin: 20px 0 28px 0;
+      }
+
+      .mini-card {
+        background: var(--color-background-secondary);
+        border: 1px solid var(--color-border-secondary);
+        border-radius: var(--border-radius-lg);
+        padding: 16px 18px;
+      }
+
+      .mini-card .icon-chip {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: var(--border-radius-md);
+        margin-bottom: 10px;
+      }
+      .mini-card .icon-chip i {
+        font-size: 16px;
+        margin: 0;
+        display: block;
+      }
+      .mini-card .mini-card-title {
+        font-size: 13.5px;
+        color: var(--color-text-primary);
+        font-weight: 500;
+        margin-bottom: 4px;
+      }
+      .mini-card .mini-card-body {
+        font-size: 12.5px;
+        color: var(--color-text-tertiary);
+        line-height: 1.6;
+      }
+
+      .icon-chip.bg-teal {
+        background: var(--color-background-success);
+      }
+      .icon-chip.bg-teal i {
+        color: var(--c-teal-300);
+      }
+      .icon-chip.bg-coral {
+        background: var(--color-background-danger);
+      }
+      .icon-chip.bg-coral i {
+        color: var(--c-coral-300);
+      }
+      .icon-chip.bg-purple {
+        background: var(--c-purple-900);
+      }
+      .icon-chip.bg-purple i {
+        color: var(--c-purple-300);
+      }
+      .icon-chip.bg-blue {
+        background: var(--color-background-info);
+      }
+      .icon-chip.bg-blue i {
+        color: var(--c-blue-300);
+      }
+      .icon-chip.bg-pink {
+        background: var(--c-pink-900);
+      }
+      .icon-chip.bg-pink i {
+        color: var(--c-pink-300);
+      }
+      .icon-chip.bg-amber {
+        background: var(--color-background-warning);
+      }
+      .icon-chip.bg-amber i {
+        color: var(--c-amber-300);
+      }
+
+      .source-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--color-text-tertiary);
+        background: var(--color-background-tertiary);
+        border: 1px solid var(--color-border-tertiary);
+        border-radius: var(--border-radius-md);
+        padding: 8px 12px;
+        margin: 4px 0;
+      }
+      .source-tag i {
+        font-size: 13px;
+        color: var(--c-coral-400);
+      }
+
+      .ref-group {
+        margin: 18px 0 32px 0;
+      }
+      .ref-group h4 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: var(--color-text-primary);
+      }
+      .ref-group h4 i {
+        color: var(--c-purple-400);
+        font-size: 15px;
+      }
+
+      .ref-list {
+        list-style: none;
+        padding-left: 0;
+        margin: 10px 0 0 0;
+      }
+      .ref-list li {
+        display: flex;
+        gap: 10px;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--color-border-tertiary);
+        font-size: 13px;
+      }
+      .ref-list li:last-child {
+        border-bottom: none;
+      }
+      .ref-list i {
+        color: var(--color-text-tertiary);
+        font-size: 13px;
+        margin-top: 3px;
+        flex-shrink: 0;
+      }
+      .ref-list .ref-title {
+        color: var(--color-text-primary);
+      }
+      .ref-list .ref-desc {
+        color: var(--color-text-tertiary);
+        display: block;
+        font-size: 12px;
+        margin-top: 2px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11px;
+        padding: 3px 9px;
+        border-radius: 999px;
+        border: 1px solid;
+        font-weight: 500;
+      }
+      .badge.danger {
+        color: var(--color-text-danger);
+        border-color: var(--c-coral-800);
+        background: var(--color-background-danger);
+      }
+      .badge.success {
+        color: var(--color-text-success);
+        border-color: var(--c-green-800);
+        background: var(--color-background-success);
+      }
+      .badge.info {
+        color: var(--color-text-info);
+        border-color: var(--c-blue-800);
+        background: var(--color-background-info);
+      }
+      .badge.warning {
+        color: var(--color-text-warning);
+        border-color: var(--c-amber-800);
+        background: var(--color-background-warning);
+      }
+
+      .divider {
+        height: 1px;
+        background: var(--color-border-tertiary);
+        margin: 48px 0;
+        border: none;
+      }
+
+      .summary-box {
+        background: var(--color-background-secondary);
+        border: 1px solid var(--color-border-secondary);
+        border-radius: var(--border-radius-xl);
+        padding: 28px 30px;
+        margin: 24px 0;
+      }
+
+      .summary-box ol {
+        margin: 12px 0 0 0;
+      }
+      .summary-box li {
+        color: var(--color-text-secondary);
+        font-size: 14.5px;
+      }
+
+      footer.page-footer {
+        border-top: 1px solid var(--color-border-tertiary);
+        padding-top: 24px;
+        margin-top: 60px;
+        font-size: 12px;
+        color: var(--color-text-tertiary);
+      }
+
+      @media (max-width: 900px) {
+        body {
+          grid-template-columns: 1fr;
+        }
+        .sidebar {
+          position: relative;
+          height: auto;
+        }
+        main {
+          padding: 32px 20px 60px 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="sidebar">
+      <div class="sidebar-brand">
+        <i class="ti ti-cube-3d-sphere"></i>
+        <span>Amazon Bedrock<br />ベストプラクティスガイド</span>
+      </div>
+
+      <div class="nav-group-title">はじめに</div>
+      <a class="nav-item" href="#overview"><i class="ti ti-info-circle"></i>Bedrockとは</a>
+      <a class="nav-item" href="#architecture"
+        ><i class="ti ti-topology-star-3"></i>全体アーキテクチャ</a
+      >
+      <a class="nav-item" href="#roadmap"><i class="ti ti-route"></i>導入ロードマップ</a>
+
+      <div class="nav-group-title">ステップバイステップ</div>
+      <a class="nav-item" href="#step1"><i class="ti ti-lock"></i>Step1 IAM設計</a>
+      <a class="nav-item" href="#step2"><i class="ti ti-key"></i>Step2 モデルアクセス</a>
+      <a class="nav-item" href="#step3"><i class="ti ti-plug"></i>Step3 初回API呼び出し</a>
+      <a class="nav-item" href="#step4"><i class="ti ti-message-2"></i>Step4 プロンプト設計</a>
+      <a class="nav-item" href="#step5"><i class="ti ti-shield-check"></i>Step5 Guardrails</a>
+      <a class="nav-item" href="#step6"
+        ><i class="ti ti-database-search"></i>Step6 Knowledge Bases</a
+      >
+      <a class="nav-item" href="#step7"><i class="ti ti-robot"></i>Step7 Agents/AgentCore</a>
+      <a class="nav-item" href="#step8"><i class="ti ti-chart-line"></i>Step8 評価・監視</a>
+      <a class="nav-item" href="#step9"><i class="ti ti-coin"></i>Step9 コスト最適化</a>
+      <a class="nav-item" href="#step10"><i class="ti ti-server-2"></i>Step10 本番運用</a>
+
+      <div class="nav-group-title">まとめ</div>
+      <a class="nav-item" href="#best-practices"
+        ><i class="ti ti-list-check"></i>ベストプラクティス総覧</a
+      >
+      <a class="nav-item" href="#pitfalls"><i class="ti ti-alert-triangle"></i>よくある落とし穴</a>
+      <a class="nav-item" href="#references"><i class="ti ti-link"></i>参考情報源</a>
+      <a class="nav-item" href="#summary"><i class="ti ti-flag-3"></i>まとめ</a>
+    </nav>
+
+    <main>
+      <div class="page-header">
+        <div class="eyebrow">
+          <i class="ti ti-calendar-event"></i>2026年7月17日時点の情報に基づく
+        </div>
+        <h1>Amazon Bedrock 活用ベストプラクティスガイド</h1>
+        <p class="lede">
+          世界トップクラスのAIエンジニア・AWSスペシャリストの視点から、Amazon
+          Bedrockを使ったジェネレーティブAIアプリケーション構築のベストプラクティスを、初学者でも迷わず実践できるようステップバイステップで解説します。AWS公式ドキュメント・公式ブログに加え、AWS
+          re:Invent
+          2025のセッションや著名な実務者・コミュニティの知見を横断的に調査し、根拠となる情報源（URL）とともに整理しています。
+        </p>
+      </div>
+
+      <section id="overview" class="step">
+        <h2>
+          <span class="step-badge c-teal"><i class="ti ti-info-circle"></i></span>Amazon
+          Bedrockとは何か
+        </h2>
+        <p class="step-sub">まずBedrockの立ち位置を正しく理解する</p>
+
+        <p>
+          Amazon Bedrockは、Anthropic Claude・Meta Llama・Mistral AI・Amazon
+          Novaなど複数のAIプロバイダーが提供する100以上の基盤モデル（Foundation Models,
+          FM）を<strong>単一の統一API</strong>経由で呼び出せる、フルマネージドのサーバーレスサービスです。インフラの構築・管理は不要で、モデルの切り替えは基本的にモデルIDを変更するだけで済みます。Amazonの説明によれば、Bedrockはリーディングなプロバイダーから高性能な基盤モデルへの安全でエンタープライズグレードのアクセスを提供し、Amazon・Anthropic・DeepSeek・Moonshot
+          AI・MiniMax・OpenAIを含む複数のプロバイダーから100以上のモデルを利用できるフルマネージドサービスです。
+        </p>
+
+        <p>
+          Bedrockが単なる「モデルAPI」ではなく<strong>プラットフォーム</strong>である理由は、以下の高レベルなビルディングブロックを標準で備えている点にあります。
+        </p>
+
+        <div class="card-grid">
+          <div class="mini-card">
+            <div class="icon-chip bg-teal"><i class="ti ti-plug"></i></div>
+            <div class="mini-card-title">Converse API</div>
+            <div class="mini-card-body">モデル横断で共通化された推論呼び出しインターフェース</div>
+          </div>
+          <div class="mini-card">
+            <div class="icon-chip bg-coral"><i class="ti ti-shield-check"></i></div>
+            <div class="mini-card-title">Guardrails</div>
+            <div class="mini-card-body">
+              有害コンテンツ・PII・ハルシネーションを防ぐ安全性レイヤー
+            </div>
+          </div>
+          <div class="mini-card">
+            <div class="icon-chip bg-blue"><i class="ti ti-database-search"></i></div>
+            <div class="mini-card-title">Knowledge Bases</div>
+            <div class="mini-card-body">マネージドRAG（検索拡張生成）パイプライン</div>
+          </div>
+          <div class="mini-card">
+            <div class="icon-chip bg-pink"><i class="ti ti-robot"></i></div>
+            <div class="mini-card-title">Agents / AgentCore</div>
+            <div class="mini-card-body">複数ステップのタスクを自律実行するエージェント基盤</div>
+          </div>
+          <div class="mini-card">
+            <div class="icon-chip bg-amber"><i class="ti ti-chart-line"></i></div>
+            <div class="mini-card-title">Model Evaluation</div>
+            <div class="mini-card-body">自動評価・人手評価・LLM-as-a-Judgeによる品質検証</div>
+          </div>
+          <div class="mini-card">
+            <div class="icon-chip bg-purple"><i class="ti ti-git-branch"></i></div>
+            <div class="mini-card-title">Prompt Management / Flows</div>
+            <div class="mini-card-body">プロンプトのバージョン管理とワークフロー編成</div>
+          </div>
+        </div>
+
+        <div class="source-tag">
+          <i class="ti ti-external-link"></i>出典：AWS公式ユーザーガイド「What is Amazon
+          Bedrock?」／aws.amazon.com/bedrock/
+        </div>
+      </section>
+
+      <section id="architecture" class="step">
+        <h2>
+          <span class="step-badge c-blue"><i class="ti ti-topology-star-3"></i></span
+          >全体アーキテクチャを理解する
+        </h2>
+        <p class="step-sub">Bedrockを中核としたジェネレーティブAIアプリケーションの典型構成</p>
+
+        <div class="mermaid-block size-l">
+          <pre class="mermaid">
+flowchart TB
+    subgraph "クライアント層"
+        A["Webアプリ / モバイルアプリ / 業務システム"]
+    end
+    subgraph "Amazon Bedrock"
+        B["統一API&lt;br/&gt;Converse API / InvokeModel API"]
+        C["基盤モデル&lt;br/&gt;Nova・Claude・Llama・Mistral 等"]
+        D["Guardrails&lt;br/&gt;安全性フィルタ"]
+        E["Knowledge Bases&lt;br/&gt;マネージドRAG"]
+        F["Agents / AgentCore&lt;br/&gt;自律型タスク実行"]
+        G["Model Evaluation&lt;br/&gt;品質評価"]
+    end
+    subgraph "データ層"
+        H["Amazon S3&lt;br/&gt;ドキュメント"]
+        I["ベクトルストア&lt;br/&gt;OpenSearch Serverless 等"]
+    end
+    A --> B
+    B --> D
+    D --> C
+    B --> E
+    E --> H
+    E --> I
+    B --> F
+    F --> E
+    F --> D
+    C --> G
+    </pre
+          >
+          <div class="mermaid-caption">図1：Amazon Bedrock 全体アーキテクチャ</div>
+        </div>
+
+        <p>初学者がまず押さえるべきポイントは次の3つです。</p>
+        <ol>
+          <li>
+            <strong>モデルはあくまで「差し替え可能な部品」</strong
+            >であり、アプリケーションのロジックはモデルIDを変えるだけで別モデルに切り替えられるよう設計する
+          </li>
+          <li>
+            <strong>Guardrailsは基盤モデルの前後に必ず挟む</strong
+            >安全性レイヤーであり、後付けではなく設計初期から組み込む
+          </li>
+          <li>
+            <strong>RAG（Knowledge Bases）とAgents（AgentCore）は別レイヤー</strong
+            >であり、「知識を与えるRAG」と「行動させるAgent」を混同しない
+          </li>
+        </ol>
+      </section>
+
+      <section id="roadmap" class="step">
+        <h2>
+          <span class="step-badge c-purple"><i class="ti ti-route"></i></span
+          >導入ロードマップ（10ステップ概観）
+        </h2>
+        <p class="step-sub">本ガイド全体の流れ</p>
+
+        <div class="mermaid-block scroll-x size-xl">
+          <pre class="mermaid">
+%%{init: {"flowchart": {"useMaxWidth": false}}}%%
+flowchart LR
+    S1["Step1&lt;br/&gt;IAM設計・最小権限"] --> S2["Step2&lt;br/&gt;モデルアクセス有効化"]
+    S2 --> S3["Step3&lt;br/&gt;初回API呼び出し"]
+    S3 --> S4["Step4&lt;br/&gt;プロンプト設計"]
+    S4 --> S5["Step5&lt;br/&gt;Guardrails設定"]
+    S5 --> S6["Step6&lt;br/&gt;Knowledge Bases構築"]
+    S6 --> S7["Step7&lt;br/&gt;Agents / AgentCore構築"]
+    S7 --> S8["Step8&lt;br/&gt;評価とオブザーバビリティ"]
+    S8 --> S9["Step9&lt;br/&gt;コスト最適化"]
+    S9 --> S10["Step10&lt;br/&gt;本番運用・ガバナンス"]
+    </pre
+          >
+          <div class="mermaid-caption">図2：導入ロードマップ</div>
+        </div>
+      </section>
+
+      <section id="step1" class="step">
+        <h2><span class="step-badge c-coral">1</span>IAM設計と最小権限の原則</h2>
+        <p class="step-sub">Bedrockのベストプラクティスで最初かつ最重要な土台</p>
+
+        <p>
+          AWS Well-Architected Generative AI
+          Lensでは、基盤モデルエンドポイントへのアクセスは最小権限で許可することが明示的なベストプラクティス（<code>GENSEC01-BP01</code>）として定義されています。最小権限アクセスは生成AIワークロードにIDベースのセキュリティレイヤーを確立し、認可されたIDのみがモデルエンドポイントにアクセスできることを保証するために重要です。
+        </p>
+
+        <h3>初学者向けの実践手順</h3>
+        <ol>
+          <li>
+            Bedrock専用のIAMロールをタスクごとに分離する（プロンプトエンジニア用ロール、エージェント実行用ロール、監視用ロールなど）
+          </li>
+          <li>
+            <code>bedrock:InvokeModel</code> を許可する際は <code>Resource</code> を
+            <code>*</code> にせず、利用するモデルARN・Guardrail ID・Knowledge Base IDまで絞り込む
+          </li>
+          <li>
+            Bedrock API keys（サービス固有認証情報）よりも、可能な限り<strong
+              >AWS STSによる一時的な認証情報</strong
+            >を優先する
+          </li>
+          <li>
+            エージェントのワークフローでは、実行ロールとプロンプトエンジニア用ロールを分離し、権限境界（Permissions
+            Boundary）を設定する
+          </li>
+        </ol>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="lang-tag"><i class="ti ti-brackets"></i>JSON</span
+            ><span>IAMポリシー例（最小権限の考え方）</span>
+          </div>
+          <pre><code class="language-json">{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "bedrock:InvokeModel",
+      "Resource": [
+        "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-*"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "bedrock:GuardrailIdentifier": "my-production-guardrail"
+        }
+      }
+    }
+  ]
+}</code></pre>
+        </div>
+
+        <div class="callout info">
+          <i class="ti ti-info-circle"></i>
+          <div>
+            エージェントを作成するプロンプトエンジニアと、IAMサービスロールを作成するセキュリティエンジニアには<strong>別々のIAMロール</strong>を用意し、職務分離によってリソースへの過剰な権限付与を防ぐことが推奨されます。
+          </div>
+        </div>
+
+        <div class="source-tag">
+          <i class="ti ti-external-link"></i>出典：AWS Security Blog「Implementing least privilege
+          access for Amazon Bedrock」／AWS Well-Architected Generative AI Lens GENSEC01-BP01,
+          GENSEC05-BP01
+        </div>
+      </section>
+
+      <section id="step2" class="step">
+        <h2><span class="step-badge c-blue">2</span>モデルアクセスの有効化</h2>
+        <p class="step-sub">コンソールから利用モデルを選定する</p>
+
+        <p>
+          AWSマネジメントコンソールの「Model
+          access」画面から、利用したいモデルへのアクセスをリクエスト・有効化します。多くのモデルは即時利用可能ですが、一部は利用規約への同意やユースケース申請が必要です。
+        </p>
+
+        <h3>ベストプラクティス</h3>
+        <ul>
+          <li>
+            本番運用前に、複数モデル（コスト重視の軽量モデルと高精度モデル）へのアクセスを事前に有効化し、後述の<strong>モデルルーティング</strong>に備える
+          </li>
+          <li>
+            Bedrockのモデルカタログは18以上のプロバイダーから100以上のモデルを提供し、ほぼ毎月更新されているため、定期的にカタログを見直すプロセスを運用に組み込む
+          </li>
+          <li>
+            組織全体でモデルアクセスを一元管理する場合は、AWS
+            Organizationsのサービスコントロールポリシー（SCP）と組み合わせて、利用可能なモデルを組織単位で制御する
+          </li>
+        </ul>
+      </section>
+
+      <section id="step3" class="step">
+        <h2><span class="step-badge c-teal">3</span>初めてのAPI呼び出し（Converse API）</h2>
+        <p class="step-sub">モデル横断で共通化された呼び出し方式から始める</p>
+
+        <p>
+          Bedrockでは、モデルプロバイダーごとに異なっていたリクエスト形式を統一する<strong
+            >Converse API</strong
+          >の使用が推奨されます。これにより、モデルを切り替えてもアプリケーションコードの変更を最小限にできます。
+        </p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="lang-tag"><i class="ti ti-brand-python"></i>Python</span
+            ><span>boto3実装例</span>
+          </div>
+          <pre><code class="language-python">import boto3
+
+client = boto3.client("bedrock-runtime", region_name="us-east-1")
+
+response = client.converse(
+    modelId="anthropic.claude-opus-4-7",
+    messages=[
+        {
+            "role": "user",
+            "content": [{"text": "Amazon Bedrockの特徴を教えてください"}]
+        }
+    ],
+    inferenceConfig={
+        "maxTokens": 1024,
+        "temperature": 0.3
+    }
+)
+
+print(response["output"]["message"]["content"][0]["text"])</code></pre>
+        </div>
+
+        <h3>初学者がつまずきやすいポイント</h3>
+        <ul>
+          <li>
+            モデルによって最大トークン数・対応言語・レイテンシ特性が異なるため、必ず対象モデルのドキュメントを確認する
+          </li>
+          <li>
+            同期呼び出し（<code>invoke_model</code> /
+            <code>converse</code>）とストリーミング呼び出し（<code
+              >invoke_model_with_response_stream</code
+            >
+            /
+            <code>converse_stream</code
+            >）を用途に応じて使い分ける（チャットUIではストリーミングが体感速度を大きく改善する）
+          </li>
+        </ul>
+
+        <div class="source-tag">
+          <i class="ti ti-external-link"></i>出典：AWS公式ドキュメント「Amazon Bedrock
+          Documentation」／docs.aws.amazon.com/bedrock/
+        </div>
+      </section>
+
+      <section id="step4" class="step">
+        <h2><span class="step-badge c-purple">4</span>プロンプトエンジニアリングの基礎</h2>
+        <p class="step-sub">出力品質はプロンプト設計で大きく変わる</p>
+
+        <p>
+          AWSの公式ガイダンスでは、ハルシネーションを減らすにはプロンプト最適化の手法でプロンプトを改善するか、RAGを使ってモデルにより関連性の高いデータへのアクセスを与えるか、あるいは別のモデルを使用することが有効とされています。
+        </p>
+
+        <h3>初学者向けベストプラクティス</h3>
+        <ol>
+          <li>
+            <strong>タスクを明確に分解する</strong
+            >：曖昧な依頼ではなく、対象・観点・出力形式を具体的に指定する。「Amazon
+            S3について」ではなく「ソリューションアーキテクトアソシエイト試験のためのAmazon
+            S3とAmazon
+            EBSの3つの主な違い」のように依頼することで、適切にスコープされた回答が得られます。
+          </li>
+          <li>
+            <strong>モデルごとのプロンプト作法に従う</strong>：例えばAnthropic
+            Claudeでは、少数ショット例の最後の回答を意図的に省略し
+            <code>Assistant:</code> で終えることでモデルに続きを生成させる手法が有効です。
+          </li>
+          <li>
+            <strong>Prompt Optimizationを活用する</strong
+            >：Bedrockのプロンプト最適化機能は、Claude・Llama・Mistral・Titanなど複数モデル向けにプロンプトを自動的に書き直し、応答品質を改善できます。
+          </li>
+          <li>
+            <strong>Prompt Cachingで反復コンテキストを再利用する</strong
+            >：システムプロンプトや長いドキュメントを繰り返し送る場合、プロンプトキャッシュによって入力トークンコストとレイテンシを大幅に削減できます。
+          </li>
+          <li>
+            <strong>Tool Use（Function Calling）で構造化出力を安定させる</strong
+            >：自由記述よりも、JSON Schemaに基づくTool
+            Useを使う方が構造化データの抽出精度が安定します。
+          </li>
+        </ol>
+
+        <div class="source-tag">
+          <i class="ti ti-external-link"></i>出典：AWS ML Blog「Prompt engineering techniques and
+          best practices」／AWS公式「Prompt engineering guidelines」／AWS ML Blog「Supercharge your
+          development with Claude Code and Amazon Bedrock prompt caching」
+        </div>
+      </section>
+
+      <section id="step5" class="step">
+        <h2><span class="step-badge c-red">5</span>Guardrailsによる安全性の確保</h2>
+        <p class="step-sub">モデル非依存の防御レイヤーを最初から組み込む</p>
+
+        <p>
+          Amazon Bedrock
+          Guardrailsは、ユースケースと責任あるAIポリシーに基づいて設定できる<strong>6つの安全対策（Safeguard）</strong>を提供します。
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>安全対策</th>
+              <th>機能概要</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>コンテンツフィルタ</td>
+              <td>
+                ヘイト・侮辱・性的表現・暴力・違法行為・プロンプト攻撃を検知（感度をLow〜Highで調整可）
+              </td>
+            </tr>
+            <tr>
+              <td>禁止トピック（Denied Topics）</td>
+              <td>特定の話題（例：法律相談、競合他社の話題）への言及を拒否</td>
+            </tr>
+            <tr>
+              <td>単語フィルタ</td>
+              <td>特定の単語・フレーズを入出力からブロック</td>
+            </tr>
+            <tr>
+              <td>機密情報フィルタ（PII）</td>
+              <td>氏名・住所・電話番号・クレジットカード番号などを検出しマスキング／ブロック</td>
+            </tr>
+            <tr>
+              <td>コンテキスト根拠確認</td>
+              <td>
+                応答が根拠データに基づいているか、質問と関連しているかを評価しハルシネーションを検出
+              </td>
+            </tr>
+            <tr>
+              <td>Automated Reasoning checks</td>
+              <td>数理論理検証によりファクトの正確性を検証・説明</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="mermaid-block size-sm">
+          <pre class="mermaid">
+%%{init: {"flowchart": {"rankSpacing": 24, "nodeSpacing": 20}}}%%
+flowchart TD
+    In["ユーザー入力"] --> L1{"コンテンツフィルタ&lt;br/&gt;有害カテゴリ検出"}
+    L1 -->|"通過"| L2{"トピックフィルタ&lt;br/&gt;禁止トピック判定"}
+    L1 -->|"違反"| Blocked["ブロック / 代替応答"]
+    L2 -->|"通過"| L3{"機密情報フィルタ&lt;br/&gt;PII検出"}
+    L2 -->|"違反"| Blocked
+    L3 -->|"マスキング後"| L4["基盤モデル呼び出し"]
+    L4 --> L5{"コンテキスト根拠確認&lt;br/&gt;ハルシネーション検出"}
+    L5 -->|"通過"| L6{"Automated Reasoning&lt;br/&gt;事実検証"}
+    L5 -->|"違反"| Blocked
+    L6 -->|"通過"| Out["ユーザーへ応答"]
+    L6 -->|"違反"| Blocked
+    </pre
+          >
+          <div class="mermaid-caption">図3：Guardrailsの多層防御フロー</div>
+        </div>
+
+        <h3>導入のベストプラクティス（段階的ロールアウト）</h3>
+        <ol>
+          <li>
+            まずは非本番環境で「コンテンツフィルタ」と「禁止トピック」のみを持つ単一のGuardrailから始め、CloudWatchメトリクスでブロック率・誤検知率を1週間程度観測してから、PIIフィルタとコンテキスト根拠確認を段階的に追加する
+          </li>
+          <li>
+            複数のGuardrail（組織全体・部門別・アプリケーション別）を<strong>レイヤーとして重ねて</strong>適用できる
+          </li>
+          <li>
+            モデル呼び出しを行わずにテキストのみを検査したい場合は
+            <code>ApplyGuardrail</code> APIを使う（例：ユーザー投稿の事前スクリーニング）
+          </li>
+          <li>
+            コンテキスト根拠確認のしきい値を低く設定しすぎると、関連性の薄い情報を応答に混入させるリスクが増す点に注意する
+          </li>
+          <li>
+            Amazon Bedrock以外でホストされたモデルにも
+            <code>ApplyGuardrail</code>
+            APIで同じ安全基準を適用でき、マルチモデル環境でも一貫した保護が可能
+          </li>
+        </ol>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="lang-tag"><i class="ti ti-brand-python"></i>Python</span
+            ><span>boto3実装例</span>
+          </div>
+          <pre><code class="language-python">response = bedrock_runtime.apply_guardrail(
+    guardrailIdentifier="my-guardrail-id",
+    guardrailVersion="1",
+    source="INPUT",
+    content=[{"text": {"text": "私のSSNは123-45-6789です。口座について教えて"}}]
+)
+print(response["action"])  # GUARDRAIL_INTERVENED または NONE</code></pre>
+        </div>
+
+        <div class="source-tag">
+          <i class="ti ti-external-link"></i>出典：AWS製品ページ「Amazon Bedrock Guardrails」／AWS
+          Blog「Amazon Bedrock Guardrails enhances generative AI application safety with new
+          capabilities」／AWS公式「Remove PII from conversations」
+        </div>
+      </section>
+
+      <section id="step6" class="step">
+        <h2><span class="step-badge c-green">6</span>Knowledge Basesを使ったRAGの構築</h2>
+        <p class="step-sub">マネージドRAGパイプラインで知識を与える</p>
+
+        <p>
+          Knowledge Bases for Amazon
+          Bedrockは、S3上のドキュメントを自動的にチャンク分割・ベクトル化し、ベクトルストアへ格納・同期する、マネージドRAGパイプラインです。S3バケットからのデータ同期、チャンク分割、ベクトル埋め込みの生成、ベクトルインデックスへの格納を管理し、インテリジェントな差分検出・スループット管理・障害管理が組み込まれています。
+        </p>
+
+        <div class="mermaid-block scroll-x size-xl">
+          <pre class="mermaid">
+%%{init: {"flowchart": {"useMaxWidth": false}}}%%
+flowchart LR
+    subgraph "データ取り込み（非同期・事前処理）"
+        D1["S3上のドキュメント"] --> D2["パース・チャンキング"]
+        D2 --> D3["埋め込みモデルでベクトル化"]
+        D3 --> D4["ベクトルストアに格納"]
+    end
+    subgraph "実行時（同期・リアルタイム）"
+        Q["ユーザーの質問"] --> QE["質問文をベクトル化"]
+        QE --> R["ベクトル検索・ハイブリッド検索"]
+        D4 --> R
+        R --> CH["関連チャンクを抽出"]
+        CH --> G["基盤モデルにコンテキストとして注入"]
+        G --> Ans["根拠付きの回答を生成"]
+    end
+    </pre
+          >
+          <div class="mermaid-caption">図4：RAGパイプラインの全体像</div>
+        </div>
+
+        <h3>チャンキング戦略の選び方</h3>
+        <p>
+          RAGの品質は<strong>チャンキング設定</strong>に大きく左右されます。以下は主要な戦略の比較です。
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>戦略</th>
+              <th>特徴</th>
+              <th>推奨用途</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>固定サイズ（Fixed-size）</td>
+              <td>トークン数とオーバーラップ率を指定して機械的に分割。最もシンプルで高速</td>
+              <td>開発初期の高速なイテレーション</td>
+            </tr>
+            <tr>
+              <td>階層的（Hierarchical）</td>
+              <td>親子関係を持つチャンクを生成し、粗い検索と詳細な文脈の両方を確保</td>
+              <td>本番環境のデフォルトとして堅牢性が高い</td>
+            </tr>
+            <tr>
+              <td>セマンティック（Semantic）</td>
+              <td>意味的なまとまりで分割し文脈の一貫性を保持</td>
+              <td>均質で密度の高い文章（論文・記事等）</td>
+            </tr>
+            <tr>
+              <td>構文木ベース（Syntax-aware）</td>
+              <td>Markdown見出しやコード構造など文書構造を保持して分割</td>
+              <td>技術文書・API仕様書など構造化文書</td>
+            </tr>
+            <tr>
+              <td>チャンクなし（No chunking）</td>
+              <td>文書全体を1チャンクとして扱う</td>
+              <td>小規模・事前分割済みの文書のみ（本番非推奨）</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout success">
+          <i class="ti ti-bulb"></i>
+          <div>
+            実務者による検証では、<strong>階層的チャンキング＋ハイブリッド検索＋リランキング</strong>の組み合わせが本番環境で最も堅牢なデフォルトとされています。文書が一様に密な散文の場合のみセマンティックへの切り替えを検討し、開発時の素早いイテレーションにはFixed-sizeを使うのが実践的です。
+          </div>
+        </div>
+
+        <div class="callout warning">
+          <i class="ti ti-alert-triangle"></i>
+          <div>
+            複数戦略を実際のコーパスでベンチマークした検証では、5種類のチャンキング戦略のうち実際に本番の技術文書コーパスを処理できたのは3種類のみだったと報告されています。「机上の比較」ではなく<strong>自組織のデータで実測すること</strong>が強く推奨されます。
+          </div>
+        </div>
+
+        <h3>その他のRAGベストプラクティス</h3>
+        <ul>
+          <li>オーバーラップ率は10〜15%を目安に、文脈の連続性と検索精度のバランスを取る</li>
+          <li>
+            パース設定（表・グラフなど複雑なレイアウトの扱い）はデフォルト設定のままにせず、実データで調整する
+          </li>
+          <li>小規模なドキュメントセットから始め、検索品質をテストしながら段階的に拡張する</li>
+          <li>
+            RAG評価機能を使い、チャンキング戦略やベクトル長、生成モデルの違いによる性能差を定量的に比較する
+          </li>
+        </ul>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="lang-tag"><i class="ti ti-brand-python"></i>Python</span
+            ><span>boto3実装例</span>
+          </div>
+          <pre><code class="language-python">response = bedrock_agent_runtime.retrieve_and_generate(
+    input={"text": "返品ポリシーについて教えてください"},
+    retrieveAndGenerateConfiguration={
+        "type": "KNOWLEDGE_BASE",
+        "knowledgeBaseConfiguration": {
+            "knowledgeBaseId": "XXXXXXXXXX",
+            "modelArn": "anthropic.claude-opus-4-7",
+            "generationConfiguration": {
+                "guardrailConfiguration": {
+                    "guardrailId": "my-guardrail-id",
+                    "guardrailVersion": "1"
+                }
+            }
+        }
+    }
+)</code></pre>
+        </div>
+
+        <div class="source-tag">
+          <i class="ti ti-external-link"></i>出典：AWS ML Blog「Use RAG for drug discovery with
+          Amazon Bedrock Knowledge Bases」／AWS Builder Center「Amazon Bedrock's Knowledge Base:
+          Parsing and Chunking」／Suhas Mallesh（Medium）／Gerardo Arroyo's Blog「Real Benchmark: 5
+          Chunking Strategies」／tutorialsdojo.com
+        </div>
+      </section>
+
+      <section id="step7" class="step">
+        <h2><span class="step-badge c-pink">7</span>Agents / AgentCoreによる自律型AI</h2>
+        <p class="step-sub">「知識を与えるRAG」に対し「行動させる」レイヤー</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>種類</th>
+              <th>特徴</th>
+              <th>向いているチーム</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Bedrock Agents（クラシック）</td>
+              <td>アクショングループとKnowledge Basesを宣言的に設定。ノーコード／ローコード</td>
+              <td>素早く始めたいチーム</td>
+            </tr>
+            <tr>
+              <td>Bedrock AgentCore</td>
+              <td>
+                LangGraphやStrands
+                Agentsなど任意のフレームワーク・独自コードで構築するサーバーレスコンテナランタイム
+              </td>
+              <td>本番グレードで細かい制御が必要なチーム</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>
+          AgentCoreは2025年10月13日にGA（一般提供開始）となり、AWSは「あらゆるフレームワーク、モデル、プロトコルを用いて安全かつスケーラブルにエージェントを構築・デプロイ・運用するためのプラットフォーム」と説明しています。AWS
+          re:Invent 2025では、AWS CEOのMatt Garman氏とAI担当VPのSwami
+          Sivasubramanian氏がAgentCoreの本番化における中心的役割について時間を割いて説明しました。
+        </p>
+
+        <div class="mermaid-block size-l">
+          <pre class="mermaid">
+flowchart TB
+    Agent["エージェントコード&lt;br/&gt;LangGraph / Strands Agents 等"] --> RT["AgentCore Runtime&lt;br/&gt;セッション分離実行環境"]
+    subgraph "Amazon Bedrock AgentCore"
+        RT
+        MEM["Memory&lt;br/&gt;短期・長期記憶"]
+        GW["Gateway&lt;br/&gt;ツール接続 / MCP対応"]
+        ID["Identity&lt;br/&gt;認証・認可"]
+        OBS["Observability&lt;br/&gt;OpenTelemetry連携"]
+        EVAL["Evaluations&lt;br/&gt;LLM-as-a-Judge"]
+    end
+    RT --> MEM
+    RT --> GW
+    GW --> Tools["外部API / Lambda / MCPサーバー"]
+    ID --> RT
+    RT --> OBS
+    OBS --> CW["Amazon CloudWatch"]
+    OBS --> EVAL
+    </pre
+          >
+          <div class="mermaid-caption">図5：AgentCoreのコンポーネント構成</div>
+        </div>
+
+        <h3>本番投入前のベストプラクティス</h3>
+        <ol>
+          <li>
+            <strong>セッション分離を確認する</strong>：AgentCore
+            Runtimeでは各セッションが独立したmicroVMで実行され、ファイルシステムとシェルアクセスを持ちます
+          </li>
+          <li>
+            <strong>自然言語でツール境界を定義する</strong
+            >：AgentCoreは「営業時間内のみ顧客データにアクセスできる」といったルールを、カスタム認可ロジックを書かずに自然言語ポリシーからオープンソースの認可ポリシー言語Cedarへ自動的に変換できます
+          </li>
+          <li>
+            <strong>デプロイ前に必ず評価を実行する</strong
+            >：ビルトイン評価フレームワークにより、精度・安全性のリグレッションを自動検出できます（AIエージェント向けのユニットテストに相当）
+          </li>
+          <li>
+            <strong>Gatewayでツールアクセスを一元化する</strong>：Lambda関数・REST
+            API・MCPサーバーをGateway経由で標準化することで、個別のツール統合コードを削減しつつ、認証・リトライ・監査ログを一元管理できます
+          </li>
+          <li>
+            <strong>本番運用にはVPCとPrivateLinkを組み込む</strong>：GAと同時にVPCサポート・AWS
+            PrivateLink・CloudFormation・リソースタグ付けが追加され、エンタープライズのネットワーク境界にエージェントを統合しやすくなりました
+          </li>
+        </ol>
+
+        <div class="source-tag">
+          <i class="ti ti-external-link"></i>出典：AWS re:Invent 2025 セッション AIM3310（登壇：AWS
+          Principal PM Kosti Vasilakakis氏、Tech Lead Maira Ladeira Tanke氏）／AWS What's
+          New「AgentCore adds new features」／goml.io「The 2026 Guide to Amazon Bedrock AgentCore」
+        </div>
+      </section>
+
+      <section id="step8" class="step">
+        <h2><span class="step-badge c-amber">8</span>モデル評価とオブザーバビリティ</h2>
+        <p class="step-sub">「動くAIアプリ」と「信頼できるAIアプリ」の違い</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>評価方式</th>
+              <th>特徴</th>
+              <th>向いている場面</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>自動評価（Automatic）</td>
+              <td>完全一致・ROUGE等の伝統的NLP指標で高速に評価</td>
+              <td>分類・要約タスクの一次スクリーニング</td>
+            </tr>
+            <tr>
+              <td>人手評価（Human review）</td>
+              <td>人間のレビュアーがスコアリング。最も高精度だが低速・高コスト</td>
+              <td>最終品質保証、判断が難しいケース</td>
+            </tr>
+            <tr>
+              <td>LLM-as-a-Judge</td>
+              <td>別のLLMが応答を採点し、根拠となる説明も出力</td>
+              <td>主観的な品質（トーン・共感等）を人手評価に近いコストで評価</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>
+          Bedrock Model
+          Evaluationでは、正確性・完全性・文体・トーンといった品質指標に加え、有害性や回答拒否率などの責任あるAI指標もLLM-as-a-Judgeで評価でき、複数の評価ジョブにわたる結果を比較して迅速な意思決定が可能になります。
+        </p>
+
+        <h3>評価運用のベストプラクティス</h3>
+        <ol>
+          <li>
+            RAGアプリケーションでは、モデル単体でなく<strong>パイプライン全体</strong>（検索品質・コンテキスト関連性・回答の根拠性・引用網羅性）を評価対象に含める
+          </li>
+          <li>
+            AgentCore
+            Evaluationsのビルトイン評価者（13種類）を使い、目標達成率・有用性・安全性・ツール選択精度をCloudWatch上で継続的にモニタリングする
+          </li>
+          <li>
+            評価をCI/CDパイプラインに組み込み、しきい値ベースのPass/Failゲートとしてリグレッションを検出する
+          </li>
+          <li>
+            OpenTelemetry（OTel）ベースの計装を統一し、CloudWatch Transaction
+            Searchを有効化しておく（これを怠るとスパンクエリが機能しない）
+          </li>
+          <li>
+            本番投入後もモデルや利用者行動の変化により品質は静かに劣化していくため、定期的な再評価とA/Bテストを運用サイクルに組み込む
+          </li>
+        </ol>
+
+        <div class="source-tag">
+          <i class="ti ti-external-link"></i>出典：AWS ML Blog「LLM-as-a-judge on Amazon Bedrock
+          Model Evaluation」／AWS ML Blog「Build reliable AI agents with Amazon Bedrock AgentCore
+          Evaluations」／hidekazu-konishi.com「AgentCore Evaluations Practical Guide」／Shawn
+          Jiang（Medium）
+        </div>
+      </section>
+
+      <section id="step9" class="step">
+        <h2><span class="step-badge c-green">9</span>コスト最適化</h2>
+        <p class="step-sub">推論の課金モード選択がコストの大部分を左右する</p>
+
+        <div class="callout success">
+          <i class="ti ti-coin"></i>
+          <div>
+            実務者のコスト最適化事例では、バッチ推論（非同期ワークロードで約50%割引）・プロンプトキャッシング（キャッシュされた入力トークンで最大90%安価）・モデルルーティング（簡単なタスクには安価なモデル、40〜70%のコスト削減）を組み合わせたプレイブックにより、ある顧客が月額4万ドルから1万8千ドルへコストを削減した事例が報告されています。
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>モード</th>
+              <th>課金方式</th>
+              <th>向いている用途</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>オンデマンド（On-Demand）</td>
+              <td>入出力トークン数に応じた従量課金</td>
+              <td>不規則・低頻度・PoC段階のワークロード</td>
+            </tr>
+            <tr>
+              <td>バッチ推論（Batch）</td>
+              <td>オンデマンドの約50%割引で非同期実行</td>
+              <td>リアルタイム性が不要な大量処理（要約・分類・抽出）</td>
+            </tr>
+            <tr>
+              <td>プロビジョンドスループット（Provisioned Throughput）</td>
+              <td>モデルユニットを時間単位で予約し定額課金</td>
+              <td>安定的かつ高頻度で、低レイテンシ保証が必要な本番ワークロード</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="mermaid-block size-sm">
+          <pre class="mermaid">
+%%{init: {"flowchart": {"rankSpacing": 24, "nodeSpacing": 20}}}%%
+flowchart TD
+    Start["ワークロードの特性を確認"] --> Q1{"トラフィックは&lt;br/&gt;予測可能か？"}
+    Q1 -->|"不規則・低頻度"| OD["オンデマンド&lt;br/&gt;従量課金"]
+    Q1 -->|"安定・高頻度"| Q2{"リアルタイム応答が&lt;br/&gt;必要か？"}
+    Q2 -->|"不要（非同期でよい）"| Batch["バッチ推論&lt;br/&gt;約50%割引"]
+    Q2 -->|"必要"| Q3{"利用率が損益分岐点を&lt;br/&gt;継続的に超えるか？"}
+    Q3 -->|"Yes"| PT["プロビジョンドスループット&lt;br/&gt;予約容量・低レイテンシ保証"]
+    Q3 -->|"No"| OD
+    </pre
+          >
+          <div class="mermaid-caption">図6：課金モードの選択フロー</div>
+        </div>
+
+        <h3>コスト最適化のベストプラクティス</h3>
+        <ol>
+          <li>
+            <strong>プロビジョンドスループットは「利用率」を必ず監視する</strong
+            >：ある事例では、負荷テスト時に設定したプロビジョンドスループットをオンデマンドへ戻し忘れ、利用率15%のまま3か月間コストが垂れ流された事例が報告されています
+          </li>
+          <li>
+            <strong>モデルルーティングを設計する</strong
+            >：単純なタスク（分類・簡単な抽出）には軽量・低コストモデルを、複雑なタスク（多段推論・複雑な文書分析）には高性能モデルを割り当てる
+          </li>
+          <li>
+            <strong>LLM-as-a-Judgeでモデルダウングレードの妥当性を検証する</strong
+            >：安価なモデルへの切り替えが品質を損なわないかをベンチマークで確認してから本番反映する
+          </li>
+          <li>
+            <strong>オブザーバビリティでコストドリフトを検知する</strong
+            >：OpenTelemetryベースの計測とダッシュボードにより、想定外のコスト増加を早期に検知する
+          </li>
+          <li>
+            <strong>ストレージ・データ転送コストも見落とさない</strong>：Knowledge
+            Basesの埋め込み保存やログ出力先（S3/CloudWatch Logs）のコストも積算する
+          </li>
+        </ol>
+
+        <div class="source-tag">
+          <i class="ti ti-external-link"></i>出典：DoiT International
+          APACエンジニアリングリードによる実践ガイド「The Engineering Guide to Amazon Bedrock Cost
+          Optimization」／nOps「Amazon Bedrock Pricing Explained」／Caylent「Amazon Bedrock Pricing
+          Explained」
+        </div>
+      </section>
+
+      <section id="step10" class="step">
+        <h2><span class="step-badge c-blue">10</span>本番運用・信頼性・データレジデンシー</h2>
+        <p class="step-sub">可用性・スループット・データ所在の設計</p>
+
+        <h3>クロスリージョン推論（Cross-Region Inference, CRIS）の活用</h3>
+        <p>
+          Bedrockのクロスリージョン推論は、単一リージョンの容量では吸収しきれないバーストトラフィックを、複数リージョンの容量へ自動的に分散させる仕組みです。可用性・レイテンシ・現在の需要といったリアルタイムの要因に基づいてリクエストを最適な宛先リージョンへ自動ルーティングし、ピーク利用時のトラフィックバーストや、AWSリージョンのサービスクォータがインファレンスに与える影響を低減します。
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>方式</th>
+              <th>特徴</th>
+              <th>選択基準</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Geographic CRIS</td>
+              <td>地理的境界内でのみルーティング</td>
+              <td>データレジデンシー要件がある場合</td>
+            </tr>
+            <tr>
+              <td>Global CRIS</td>
+              <td>地理的制約なくグローバルにルーティング</td>
+              <td>最大スループットとコスト削減を優先する場合</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>データレジデンシー設計のベストプラクティス</h3>
+        <ul>
+          <li>
+            ルーティングされる処理内容は推論計算そのもの（一時的なフォワードパス）であり、AWSのグローバルネットワーク上で暗号化されて転送される
+          </li>
+          <li>
+            顧客データとログはソースリージョンに保存されたまま、推論リクエストのみが宛先リージョンへルーティングされる
+          </li>
+          <li>
+            RAGシステムでは実際のドキュメントを保存するため、Knowledge
+            Basesとベクトルストアのリージョン設計も含めてレジデンシー要件を満たす必要がある
+          </li>
+        </ul>
+
+        <h3>その他の信頼性パターン</h3>
+        <ul>
+          <li>
+            LLMゲートウェイによるマルチモデル・オーケストレーションを組み合わせ、クォータ枯渇時のフェイルオーバーやマルチテナント環境でのノイジーネイバー問題に備える
+          </li>
+          <li>
+            レイテンシがクリティカルな用途では、Latency-optimized
+            inferenceの対応モデル・リージョンを確認し、通常モードへのフォールバック条件（トークン数上限等）も把握しておく
+          </li>
+          <li>
+            本番投入前にAWS Well-Architected Generative AI
+            Lensでレビューを実施し、セキュリティ・信頼性・パフォーマンス・コスト最適化・運用上の優秀性・持続可能性の6つの観点で評価する
+          </li>
+        </ul>
+
+        <div class="source-tag">
+          <i class="ti ti-external-link"></i>出典：AWS ML Blog「Implementing resilience patterns
+          with Amazon Bedrock and LLM gateway」／AWS公式「Increase throughput with cross-Region
+          inference」／hidekazu-konishi.com「Cross-Region Inference and Data Residency Design」／AWS
+          Well-Architected Generative AI Lens
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <section id="best-practices" class="step">
+        <h2>
+          <span class="step-badge c-teal"><i class="ti ti-list-check"></i></span
+          >ベストプラクティス総まとめ表
+        </h2>
+        <p class="step-sub">各ステップの要点を横断的に一覧化</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>カテゴリ</th>
+              <th>ベストプラクティス</th>
+              <th>主な根拠</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>セキュリティ・IAM</td>
+              <td>タスク別に最小権限ロールを分離し、STSの一時認証情報を優先</td>
+              <td>AWS Security Blog</td>
+            </tr>
+            <tr>
+              <td>セキュリティ・IAM</td>
+              <td>エージェントの実行ロールとプロンプトエンジニア用ロールを分離</td>
+              <td>Well-Architected Gen AI Lens</td>
+            </tr>
+            <tr>
+              <td>安全性</td>
+              <td>Guardrailsは段階的にロールアウトし、CloudWatchで誤検知率を監視</td>
+              <td>techjacksolutions.com</td>
+            </tr>
+            <tr>
+              <td>安全性</td>
+              <td>複数Guardrailを組織／部門／アプリ単位でレイヤー化</td>
+              <td>AWS製品ページ</td>
+            </tr>
+            <tr>
+              <td>RAG設計</td>
+              <td>本番は階層的チャンキング＋ハイブリッド検索＋リランキングから開始</td>
+              <td>Suhas Mallesh（Medium）</td>
+            </tr>
+            <tr>
+              <td>RAG設計</td>
+              <td>チャンキング戦略は自組織データで実測してから採用</td>
+              <td>Gerardo Arroyo's Blog</td>
+            </tr>
+            <tr>
+              <td>エージェント</td>
+              <td>本番デプロイ前に必ず評価（agentcore eval等）を実行</td>
+              <td>Pingax／AWS re:Invent 2025</td>
+            </tr>
+            <tr>
+              <td>エージェント</td>
+              <td>VPC・PrivateLinkでエンタープライズのネットワーク境界に統合</td>
+              <td>Chaos and Order</td>
+            </tr>
+            <tr>
+              <td>評価</td>
+              <td>RAGはパイプライン全体（検索＋生成）を評価対象にする</td>
+              <td>Shawn Jiang（Medium）</td>
+            </tr>
+            <tr>
+              <td>評価</td>
+              <td>評価をCI/CDに組み込みしきい値ベースでゲートする</td>
+              <td>hidekazu-konishi.com</td>
+            </tr>
+            <tr>
+              <td>コスト</td>
+              <td>プロビジョンドスループットの利用率を継続監視</td>
+              <td>DoiT International</td>
+            </tr>
+            <tr>
+              <td>コスト</td>
+              <td>単純タスクは軽量モデルへルーティングしコストを最適化</td>
+              <td>DoiT International</td>
+            </tr>
+            <tr>
+              <td>信頼性</td>
+              <td>クロスリージョン推論でバーストトラフィックと可用性を確保</td>
+              <td>AWS ML Blog</td>
+            </tr>
+            <tr>
+              <td>信頼性</td>
+              <td>データレジデンシー要件に応じGeographic／Global CRISを選択</td>
+              <td>AWS公式ドキュメント</td>
+            </tr>
+            <tr>
+              <td>ガバナンス</td>
+              <td>AWS Well-Architected Generative AI Lensで定期レビュー</td>
+              <td>AWS Well-Architected</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="pitfalls" class="step">
+        <h2>
+          <span class="step-badge c-red"><i class="ti ti-alert-triangle"></i></span
+          >よくある落とし穴（アンチパターン）
+        </h2>
+        <p class="step-sub">初学者・チームが陥りやすい失敗パターンと対策</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>アンチパターン</th>
+              <th>何が起きるか</th>
+              <th>対策</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Guardrailsを本番直前に後付けする</td>
+              <td>チューニング不足で誤検知が多発し、ユーザー体験を損なう</td>
+              <td>開発初期からGuardrailsを組み込み、非本番環境で継続チューニングする</td>
+            </tr>
+            <tr>
+              <td>デフォルトのチャンキング設定をそのまま使う</td>
+              <td>検索精度が低く、モデルが的外れな回答を生成する</td>
+              <td>実データでチャンキング戦略をベンチマークする</td>
+            </tr>
+            <tr>
+              <td>プロビジョンドスループットを設定したまま放置する</td>
+              <td>利用率が低いままコストだけが積み上がる</td>
+              <td>CloudWatchで利用率を継続監視し、不要になったら即座にオンデマンドへ戻す</td>
+            </tr>
+            <tr>
+              <td>すべてのタスクに最上位モデルを使う</td>
+              <td>コストが不必要に膨張する</td>
+              <td>モデルルーティングとLLM-as-a-Judgeによる検証で軽量モデルの適用範囲を広げる</td>
+            </tr>
+            <tr>
+              <td>IAMポリシーの <code>Resource</code> を <code>*</code> にする</td>
+              <td>想定外のモデル・リソースへのアクセスが発生しうる</td>
+              <td>モデルARN・Guardrail ID・Knowledge Base IDまで絞り込む</td>
+            </tr>
+            <tr>
+              <td>エージェントに評価なしでツールアクセスを全開放する</td>
+              <td>意図しない操作やデータ漏洩のリスクが高まる</td>
+              <td>Gatewayとポリシーでツールアクセスを最小化し、評価をデプロイゲートにする</td>
+            </tr>
+            <tr>
+              <td>クロスリージョン推論のデータレジデンシー影響を確認しない</td>
+              <td>規制業種でコンプライアンス違反のリスクが生じる</td>
+              <td>Geographic CRISの範囲とログ保存リージョンを事前に確認する</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="references" class="step">
+        <h2>
+          <span class="step-badge c-purple"><i class="ti ti-link"></i></span
+          >参考情報源（根拠URL一覧）
+        </h2>
+        <p class="step-sub">AWS公式情報源に加え、国際的に知られる実務者の記事も横断的に調査</p>
+
+        <div class="ref-group">
+          <h4><i class="ti ti-brand-aws"></i>AWS公式ドキュメント・製品ページ</h4>
+          <ul class="ref-list">
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://aws.amazon.com/bedrock/"
+                  target="_blank"
+                  rel="noopener"
+                  >Amazon Bedrock 製品ページ</a
+                ><span class="ref-desc">aws.amazon.com/bedrock/</span>
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://docs.aws.amazon.com/bedrock/"
+                  target="_blank"
+                  rel="noopener"
+                  >Amazon Bedrock ドキュメントトップ</a
+                ><span class="ref-desc">docs.aws.amazon.com/bedrock/</span>
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html"
+                  target="_blank"
+                  rel="noopener"
+                  >What is Amazon Bedrock?（ユーザーガイド）</a
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html"
+                  target="_blank"
+                  rel="noopener"
+                  >Prompt engineering guidelines</a
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://docs.aws.amazon.com/bedrock/latest/userguide/evaluation-judge.html"
+                  target="_blank"
+                  rel="noopener"
+                  >Evaluate model performance using another LLM as a judge</a
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails-sensitive-filters.html"
+                  target="_blank"
+                  rel="noopener"
+                  >Remove PII from conversations（sensitive information filters）</a
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://docs.aws.amazon.com/bedrock/latest/userguide/cross-region-inference.html"
+                  target="_blank"
+                  rel="noopener"
+                  >Increase throughput with cross-Region inference</a
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://docs.aws.amazon.com/bedrock/latest/userguide/latency-optimized-inference.html"
+                  target="_blank"
+                  rel="noopener"
+                  >Optimize model inference for latency</a
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://aws.amazon.com/bedrock/guardrails/"
+                  target="_blank"
+                  rel="noopener"
+                  >Amazon Bedrock Guardrails 製品ページ</a
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/conclusion.html"
+                  target="_blank"
+                  rel="noopener"
+                  >AWS Well-Architected Generative AI Lens（結論）</a
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/gensec01-bp01.html"
+                  target="_blank"
+                  rel="noopener"
+                  >GENSEC01-BP01（基盤モデルエンドポイントへの最小権限アクセス）</a
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/gensec05-bp01.html"
+                  target="_blank"
+                  rel="noopener"
+                  >GENSEC05-BP01（エージェントワークフローの最小権限）</a
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://docs.aws.amazon.com/audit-manager/latest/userguide/aws-generative-ai-best-practices.html"
+                  target="_blank"
+                  rel="noopener"
+                  >AWS Generative AI Best Practices Framework v2（Audit Manager）</a
+                >
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="ref-group">
+          <h4>
+            <i class="ti ti-notebook"></i>AWS公式ブログ（Security / Machine Learning / News /
+            Architecture）
+          </h4>
+          <ul class="ref-list">
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://aws.amazon.com/blogs/security/securing-amazon-bedrock-api-keys-best-practices-for-implementation-and-management/"
+                  target="_blank"
+                  rel="noopener"
+                  >Securing Amazon Bedrock API keys: Best practices</a
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://aws.amazon.com/blogs/security/implementing-least-privilege-access-for-amazon-bedrock/"
+                  target="_blank"
+                  rel="noopener"
+                  >Implementing least privilege access for Amazon Bedrock</a
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://aws.amazon.com/blogs/machine-learning/prompt-engineering-techniques-and-best-practices-learn-by-doing-with-anthropics-claude-3-on-amazon-bedrock"
+                  target="_blank"
+                  rel="noopener"
+                  >Prompt engineering techniques and best practices（Claude 3 × Bedrock）</a
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://aws.amazon.com/blogs/machine-learning/supercharge-your-development-with-claude-code-and-amazon-bedrock-prompt-caching/"
+                  target="_blank"
+                  rel="noopener"
+                  >Supercharge your development with Claude Code and prompt caching</a
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://aws.amazon.com/blogs/machine-learning/structured-data-response-with-amazon-bedrock-prompt-engineering-and-tool-use/"
+                  target="_blank"
+                  rel="noopener"
+                  >Structured data response with Amazon Bedrock: Prompt Engineering and Tool Use</a
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://aws.amazon.com/blogs/machine-learning/use-rag-for-drug-discovery-with-knowledge-bases-for-amazon-bedrock"
+                  target="_blank"
+                  rel="noopener"
+                  >Use RAG for drug discovery with Amazon Bedrock Knowledge Bases</a
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://aws.amazon.com/blogs/machine-learning/achieve-operational-excellence-with-well-architected-generative-ai-solutions-using-amazon-bedrock"
+                  target="_blank"
+                  rel="noopener"
+                  >Achieve operational excellence with well-architected generative AI solutions</a
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://aws.amazon.com/blogs/machine-learning/build-reliable-ai-agents-with-amazon-bedrock-agentcore-evaluations/"
+                  target="_blank"
+                  rel="noopener"
+                  >Build reliable AI agents with Amazon Bedrock AgentCore Evaluations</a
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://aws.amazon.com/blogs/machine-learning/llm-as-a-judge-on-amazon-bedrock-model-evaluation"
+                  target="_blank"
+                  rel="noopener"
+                  >LLM-as-a-judge on Amazon Bedrock Model Evaluation</a
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://aws.amazon.com/blogs/machine-learning/amazon-bedrock-guardrails-image-content-filters-provide-industry-leading-safeguards-helping-customer-block-up-to-88-of-harmful-multimodal-content-generally-available-today/"
+                  target="_blank"
+                  rel="noopener"
+                  >Amazon Bedrock Guardrails image content filters（マルチモーダル安全性）</a
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://aws.amazon.com/blogs/aws/amazon-bedrock-guardrails-enhances-generative-ai-application-safety-with-new-capabilities/"
+                  target="_blank"
+                  rel="noopener"
+                  >Amazon Bedrock Guardrails enhances generative AI application safety</a
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://aws.amazon.com/blogs/machine-learning/implementing-resilience-patterns-with-amazon-bedrock-and-llm-gateway/"
+                  target="_blank"
+                  rel="noopener"
+                  >Implementing resilience patterns with Amazon Bedrock and LLM gateway</a
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://aws.amazon.com/blogs/architecture/announcing-the-updated-aws-well-architected-generative-ai-lens"
+                  target="_blank"
+                  rel="noopener"
+                  >Announcing the updated AWS Well-Architected Generative AI Lens</a
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://aws.amazon.com/about-aws/whats-new/2026/04/agentcore-new-features-to-build-agents-faster/"
+                  target="_blank"
+                  rel="noopener"
+                  >AWS What's New：AgentCore adds new features（2026年4月）</a
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://aws.amazon.com/about-aws/whats-new/2025/06/amazon-bedrock-guardrails-tiers-content-filters-denied-topics"
+                  target="_blank"
+                  rel="noopener"
+                  >AWS What's New：Guardrails tiers for content filters and denied topics</a
+                >
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="ref-group">
+          <h4><i class="ti ti-microphone-2"></i>AWS re:Invent 2025 セッション／AWS幹部の発言</h4>
+          <ul class="ref-list">
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://dev.to/kazuya_dev/aws-reinvent-2025-agents-in-the-enterprise-best-practices-with-amazon-bedrock-agentcoreaim3310-2m8a"
+                  target="_blank"
+                  rel="noopener"
+                  >AIM3310「Agents in the enterprise: Best practices with Amazon Bedrock
+                  AgentCore」</a
+                ><span class="ref-desc"
+                  >登壇：AWS Principal PM Kosti Vasilakakis氏、Tech Lead Maira Ladeira Tanke氏</span
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://www.goml.io/blog/amazon-bedrock-agentcore"
+                  target="_blank"
+                  rel="noopener"
+                  >The 2026 Guide to Amazon Bedrock AgentCore</a
+                ><span class="ref-desc"
+                  >Matt Garman氏・Dr. Swami Sivasubramanian氏のre:Invent 2025言及を含む</span
+                >
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="ref-group">
+          <h4><i class="ti ti-user-star"></i>著名な実務者・国際的に知られるエンジニアによる解説</h4>
+          <ul class="ref-list">
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a class="ref-title" href="https://www.julien.org/" target="_blank" rel="noopener"
+                  >Julien Simon（個人サイト）</a
+                ><span class="ref-desc"
+                  >元AWS Global AI/MLエバンジェリスト、元Hugging Face Chief Evangelist</span
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://hidekazu-konishi.com/entry/amazon_bedrock_agentcore_production_guide.html"
+                  target="_blank"
+                  rel="noopener"
+                  >AgentCore Production Guide</a
+                ><span class="ref-desc"
+                  >hidekazu-konishi.com：オブザーバビリティ・コスト・DRを含む本番運用ガイド</span
+                >
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://hidekazu-konishi.com/entry/amazon_bedrock_agentcore_evaluations_practical_guide.html"
+                  target="_blank"
+                  rel="noopener"
+                  >AgentCore Evaluations Practical Guide</a
+                ><span class="ref-desc">hidekazu-konishi.com：Built-in EvaluatorsとCI/CD統合</span>
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://hidekazu-konishi.com/entry/amazon_bedrock_cross_region_inference_and_data_residency.html"
+                  target="_blank"
+                  rel="noopener"
+                  >Cross-Region Inference and Data Residency Design</a
+                ><span class="ref-desc">hidekazu-konishi.com</span>
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://gerardo.dev/en/chunking-benchmark.html"
+                  target="_blank"
+                  rel="noopener"
+                  >Real Benchmark: 5 Chunking Strategies</a
+                ><span class="ref-desc">Gerardo Arroyo's Blog：実測ベンチマーク検証</span>
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://gerardo.dev/en/bedrock-guardrails.html"
+                  target="_blank"
+                  rel="noopener"
+                  >Bedrock Guardrails 実践解説</a
+                ><span class="ref-desc">Gerardo Arroyo's Blog</span>
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://gerardo.dev/en/bedrock-evaluations.html"
+                  target="_blank"
+                  rel="noopener"
+                  >AgentCore Evaluations 実践解説</a
+                ><span class="ref-desc">Gerardo Arroyo's Blog</span>
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://www.doit.com/blog/the-engineering-guide-to-amazon-bedrock-cost-optimization"
+                  target="_blank"
+                  rel="noopener"
+                  >The Engineering Guide to Amazon Bedrock Cost Optimization</a
+                ><span class="ref-desc">DoiT International APACエンジニアリングリード</span>
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://medium.com/@shawn-jiang/evaluating-llms-with-amazon-bedrock-part-1-getting-started-with-aws-bedrock-model-evaluation-535a5feebdd3"
+                  target="_blank"
+                  rel="noopener"
+                  >Evaluating LLMs with Amazon Bedrock（Part 1）</a
+                ><span class="ref-desc">Shawn Jiang（Medium）</span>
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://medium.com/@suhasmallesh/bedrock-knowledge-base-advanced-rag-with-terraform-chunking-hybrid-search-and-reranking-02b15c5bc763"
+                  target="_blank"
+                  rel="noopener"
+                  >Bedrock Knowledge Base: Advanced RAG with Terraform</a
+                ><span class="ref-desc">Suhas Mallesh（Medium）</span>
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://brajens.medium.com/choosing-the-right-chunking-method-for-effective-rag-in-amazon-bedrock-eb4e92108cbe"
+                  target="_blank"
+                  rel="noopener"
+                  >Choosing the Right Chunking Method for Effective RAG</a
+                ><span class="ref-desc">Brajendra Singh（Medium）</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="ref-group">
+          <h4><i class="ti ti-world"></i>実務系ブログ（料金・構築ガイド等）</h4>
+          <ul class="ref-list">
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://www.nops.io/blog/amazon-bedrock-pricing/"
+                  target="_blank"
+                  rel="noopener"
+                  >Amazon Bedrock Pricing Explained 2026</a
+                ><span class="ref-desc">nOps</span>
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://caylent.com/blog/amazon-bedrock-pricing-explained"
+                  target="_blank"
+                  rel="noopener"
+                  >Amazon Bedrock Pricing Explained</a
+                ><span class="ref-desc">Caylent</span>
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://pingax.com/aws-bedrock-agentcore-setup-the-2025-ultimate-guide/"
+                  target="_blank"
+                  rel="noopener"
+                  >AWS Bedrock AgentCore Setup: The 2026 Ultimate Guide</a
+                ><span class="ref-desc">Pingax</span>
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://tutorialsdojo.com/how-content-chunking-works-in-amazon-bedrock-knowledge-bases-how-ai-really-reads-your-documents/"
+                  target="_blank"
+                  rel="noopener"
+                  >How Content Chunking Works in Amazon Bedrock Knowledge Bases</a
+                ><span class="ref-desc">tutorialsdojo.com</span>
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://oneuptime.com/blog/post/2026-02-12-amazon-bedrock-knowledge-bases-rag/view"
+                  target="_blank"
+                  rel="noopener"
+                  >How to Use Amazon Bedrock Knowledge Bases for RAG</a
+                ><span class="ref-desc">oneuptime.com</span>
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://oneuptime.com/blog/post/2026-02-12-amazon-bedrock-guardrails-safe-ai/view"
+                  target="_blank"
+                  rel="noopener"
+                  >How to Use Amazon Bedrock Guardrails for Safe AI</a
+                ><span class="ref-desc">oneuptime.com</span>
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://builder.aws.com/content/2uwHZolSdL63oU5JQxiz7HxVxVb/amazon-bedrocks-knowledge-base-parsing-and-chunking"
+                  target="_blank"
+                  rel="noopener"
+                  >Amazon Bedrock's Knowledge Base: Parsing and Chunking</a
+                ><span class="ref-desc">AWS Builder Center</span>
+              </div>
+            </li>
+            <li>
+              <i class="ti ti-point-filled"></i>
+              <div>
+                <a
+                  class="ref-title"
+                  href="https://techjacksolutions.com/ai-tools/aws/how-to-use-bedrock-guardrails/"
+                  target="_blank"
+                  rel="noopener"
+                  >Amazon Bedrock Guardrails: Essential Setup Guide 2026</a
+                ><span class="ref-desc">techjacksolutions.com</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="summary" class="step">
+        <h2>
+          <span class="step-badge c-amber"><i class="ti ti-flag-3"></i></span>まとめ
+        </h2>
+
+        <div class="summary-box">
+          <p>Amazon Bedrockのベストプラクティスは、突き詰めると次の5原則に集約されます。</p>
+          <ol>
+            <li>
+              <strong>最小権限を起点に設計する</strong
+              >（IAM・Guardrails・エージェント境界のすべてに一貫して適用）
+            </li>
+            <li>
+              <strong>安全性は後付けでなく最初から組み込む</strong
+              >（Guardrailsの段階的ロールアウト）
+            </li>
+            <li>
+              <strong>RAGとAgentsは別レイヤーとして設計し、それぞれを実データで検証する</strong
+              >（チャンキング・評価の実測）
+            </li>
+            <li>
+              <strong>評価とオブザーバビリティを本番運用の一部として継続する</strong
+              >（CI/CDゲート・LLM-as-a-Judge・OpenTelemetry）
+            </li>
+            <li>
+              <strong>コストと信頼性はトレードオフとして可視化し、継続的に最適化する</strong
+              >（課金モード選択・クロスリージョン推論）
+            </li>
+          </ol>
+        </div>
+
+        <div class="callout warning">
+          <i class="ti ti-refresh"></i>
+          <div>
+            Amazon
+            Bedrockは月次で機能・モデルカタログが更新される非常に変化の速いサービスです。本番導入時には必ず<a
+              href="https://docs.aws.amazon.com/bedrock/"
+              target="_blank"
+              rel="noopener"
+              >AWS公式ドキュメント</a
+            >および<a
+              href="https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/conclusion.html"
+              target="_blank"
+              rel="noopener"
+              >AWS Well-Architected Generative AI Lens</a
+            >の最新版を再確認することを強く推奨します。
+          </div>
+        </div>
+      </section>
+
+      <footer class="page-footer">
+        <p>
+          本ガイドは2026年7月17日時点の公開情報に基づき作成されています。AWS公式情報源に加え、AWS
+          re:Invent
+          2025のセッション内容やAWS幹部の発言、国際的に知られるAWS/AI実務者による実践記事を横断的に参照して構成しています。
+        </p>
+      </footer>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+    <script>
+      document.querySelectorAll("pre code[class^='language-']").forEach(function (block) {
+        hljs.highlightElement(block);
+      });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        darkMode: true,
+        securityLevel: 'loose',
+        fontFamily:
+          '-apple-system, BlinkMacSystemFont, Segoe UI, Hiragino Kaku Gothic ProN, Noto Sans JP, sans-serif',
+        themeVariables: {
+          darkMode: true,
+          background: '#15171c',
+          primaryColor: '#5b21b6',
+          primaryTextColor: '#ede9fe',
+          primaryBorderColor: '#c4b5fd',
+          secondaryColor: '#115e59',
+          secondaryTextColor: '#ccfbf1',
+          secondaryBorderColor: '#5eead4',
+          tertiaryColor: '#1c1f26',
+          tertiaryTextColor: '#e8e9ec',
+          tertiaryBorderColor: '#3a3e4a',
+          lineColor: '#8b919d',
+          textColor: '#e8e9ec',
+          mainBkg: '#5b21b6',
+          nodeBorder: '#c4b5fd',
+          clusterBkg: '#20242c',
+          clusterBorder: '#3a3e4a',
+          edgeLabelBackground: '#15171c',
+          fontSize: '13px',
+        },
+        flowchart: {
+          useMaxWidth: true,
+          htmlLabels: true,
+          nodeSpacing: 28,
+          rankSpacing: 34,
+          padding: 10,
+          curve: 'basis',
+        },
+      });
+
+      document.fonts.ready.then(function () {
+        mermaid.run({ querySelector: '.mermaid' }).then(function () {
+          document.querySelectorAll('.mermaid-block svg').forEach(function (svg) {
+            svg.style.maxWidth = '100%';
+            svg.style.height = 'auto';
+            svg.style.display = 'block';
+            svg.style.margin = '0 auto';
+            svg.style.overflow = 'visible';
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
