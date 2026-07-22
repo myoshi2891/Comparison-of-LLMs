@@ -48,5 +48,20 @@
         "organizeImports": "on"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["app/**/page.module.css"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noImportantStyles": "off"
+          },
+          "style": {
+            "noDescendingSpecificity": "off"
+          }
+        }
+      }
+    }
+  ]
 }
