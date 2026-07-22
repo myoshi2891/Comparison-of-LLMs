@@ -97,8 +97,17 @@ const DIAGRAMS = {
 export default function Page() {
   return (
     <div className={styles.layout}>
-      <TocObserver navLinkClassName={styles.navLink} activeClassName={styles.navLinkActive} />
-      <aside className={styles.sidebar}>
+      <TocObserver
+        navLinkClassName={styles.navLink}
+        activeClassName={styles.navLinkActive}
+        toggleId="navToggle"
+        sidebarId="sidebar"
+        sidebarOpenClassName={styles.sidebarOpen}
+      />
+      <button type="button" className={styles.sidebarToggle} id="navToggle" aria-label="目次を開く">
+        ☰ 目次
+      </button>
+      <aside className={styles.sidebar} id="sidebar">
         <div className={styles.sidebarBrand}>
           <span className={styles.brandTag}>2026-07-17 時点</span>
           <div className={styles.brandTitle}>
@@ -178,8 +187,8 @@ export default function Page() {
 
         <section className={styles.contentSection} id="intro">
           <h2>
-            <span className={styles.idx}>00</span>このガイドの前提 ― 「Vertex AI」から「Gemini Enterprise
-            Agent Platform」へ
+            <span className={styles.idx}>00</span>このガイドの前提 ― 「Vertex AI」から「Gemini
+            Enterprise Agent Platform」へ
           </h2>
           <p className={styles.sectionLead}>まず押さえておくべき最重要事実から始めます。</p>
 
@@ -1325,7 +1334,9 @@ export default function Page() {
             <h4>Google公式ドキュメント・ブログ</h4>
             <ul className={styles.refList}>
               <li>
-                <span className={styles.refTitle}>Gemini Enterprise Agent Platform 公式トップページ</span>
+                <span className={styles.refTitle}>
+                  Gemini Enterprise Agent Platform 公式トップページ
+                </span>
                 <Ext href="https://cloud.google.com/products/gemini-enterprise-agent-platform">
                   cloud.google.com/products/gemini-enterprise-agent-platform
                 </Ext>
@@ -1433,7 +1444,9 @@ export default function Page() {
                 </Ext>
               </li>
               <li>
-                <span className={styles.refTitle}>リリースノート(Semantic Governance Policies等)</span>
+                <span className={styles.refTitle}>
+                  リリースノート(Semantic Governance Policies等)
+                </span>
                 <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/release-notes">
                   docs.cloud.google.com/gemini-enterprise-agent-platform/release-notes
                 </Ext>
@@ -1447,13 +1460,17 @@ export default function Page() {
                 </Ext>
               </li>
               <li>
-                <span className={styles.refTitle}>「新Gemini Enterprise」プラットフォーム解説ブログ</span>
+                <span className={styles.refTitle}>
+                  「新Gemini Enterprise」プラットフォーム解説ブログ
+                </span>
                 <Ext href="https://cloud.google.com/blog/products/ai-machine-learning/the-new-gemini-enterprise-one-platform-for-agent-development">
                   cloud.google.com/blog/products/ai-machine-learning/the-new-gemini-enterprise-one-platform-for-agent-development
                 </Ext>
               </li>
               <li>
-                <span className={styles.refTitle}>パートナー向けエージェント公開ガイド(A2A準拠要件)</span>
+                <span className={styles.refTitle}>
+                  パートナー向けエージェント公開ガイド(A2A準拠要件)
+                </span>
                 <Ext href="https://cloud.google.com/blog/topics/developers-practitioners/publish-agents-in-gemini-enterprise-and-google-cloud-marketplace">
                   cloud.google.com/blog/topics/developers-practitioners/publish-agents-in-gemini-enterprise-and-google-cloud-marketplace
                 </Ext>
