@@ -1,6 +1,19 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import Page from "./page";
+
+vi.mock("@/components/docs/MermaidDiagram", () => ({
+  default: function DummyMermaidDiagram({ chart }: { chart: string }) {
+    return <pre data-testid="mermaid">{chart}</pre>;
+  },
+}));
+
+class IntersectionObserverStub {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+globalThis.IntersectionObserver = IntersectionObserverStub as unknown as typeof IntersectionObserver;
 
 describe("Amazon Bedrock Best Practices Guide Page", () => {
   it("renders h1 title correctly", () => {
@@ -9,10 +22,10 @@ describe("Amazon Bedrock Best Practices Guide Page", () => {
     expect(heading.textContent).toBe("Amazon Bedrock 活用ベストプラクティスガイド");
   });
 
-  it("renders exactly 18 h2 section headings", () => {
+  it("renders exactly 17 h2 section headings", () => {
     const { container } = render(<Page />);
     const h2s = container.querySelectorAll("h2");
-    expect(h2s.length).toBe(18);
+    expect(h2s.length).toBe(17);
   });
 
   it("has valid external link security attributes", () => {

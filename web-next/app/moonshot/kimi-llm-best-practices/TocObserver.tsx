@@ -5,7 +5,7 @@ import styles from "./page.module.css";
 
 export default function TocObserver() {
   useEffect(() => {
-    const sections = document.querySelectorAll("section.section, header.hero");
+    const sections = document.querySelectorAll(`.${styles.section}, .${styles.hero}`);
     const links = Array.from(document.querySelectorAll(`.${styles.tocLink}`));
     if (links.length > 0) links[0].classList.add(styles.tocLinkActive);
 

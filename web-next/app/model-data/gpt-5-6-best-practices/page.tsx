@@ -353,7 +353,7 @@ export default function Gpt56BestPracticesPage() {
                   </tr>
                   <tr>
                     <td><code>xhigh</code> / <code>max</code></td>
-                    <td>最高難度の数理証明、広範なリファクタリング、未未知のバグ解析</td>
+                    <td>最高難度の数理証明、広範なリファクタリング、未知のバグ解析</td>
                     <td>極めて多</td>
                   </tr>
                 </tbody>
