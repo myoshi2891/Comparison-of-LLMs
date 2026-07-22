@@ -36,6 +36,8 @@ export const PageEntrySchema = z
     slug: slugSchema,
     /** ナビ表示名 */
     title: z.string().min(1),
+    /** SEO用 description */
+    description: z.string().min(1).optional(),
     /** ナビのトップレベル分類。順序は lib/nav-taxonomy.ts の NAV_GROUPS が持つ。 */
     group: z.enum(NAV_GROUPS),
     /** ナビ 2 段目の表示ラベル。2 段ネストするグループ（= Providers）でのみ必須。 */
@@ -436,6 +438,18 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-13",
   },
   {
+    slug: "/google/enterprise-agent-platform",
+    title: "Gemini Enterprise Agent Platform",
+    group: "Providers",
+    category: "Google",
+    provider: "google",
+    topics: ["google", "agent", "platform"],
+    summary:
+      "Google Cloud の Gemini Enterprise Agent Platform の全体像を理解し、エージェント構築からマルチエージェント設計、セキュリティ、本番運用までを網羅した初学者向け実践ガイド。",
+    addedAt: "2026-07-19",
+    lastReviewed: "2026-07-19",
+  },
+  {
     slug: "/google/agent",
     title: "Agent",
     group: "Providers",
@@ -729,6 +743,32 @@ const entries: PageEntry[] = [
       "信頼できないコードをミリ秒単位で安全に実行できる Linux マイクロVM。初学者でもわかるステップバイステップ解説＋ベストプラクティス付き。",
     addedAt: "2026-06-16",
     lastReviewed: "2026-07-01",
+  },
+  {
+    slug: "/claude/tag-best-practices",
+    title: "Claude Tag 活用ガイド ― 中級者〜上級者向けベストプラクティス",
+    description:
+      "Slack上でチームがClaudeをタグ付けして仕事を委任できる新機能「Claude Tag」について、公式ドキュメントやコミュニティ発信をもとにまとめた中級者〜上級者向け実践ガイド。",
+    group: "Providers",
+    category: "Claude",
+    provider: "claude",
+    topics: ["claude", "slack", "agent"],
+    summary:
+      "Slack上でチームがClaudeをタグ付けして仕事を委任できる新機能「Claude Tag」について、公式ドキュメントやコミュニティ発信をもとにまとめた中級者〜上級者向け実践ガイド。",
+    addedAt: "2026-07-19",
+    lastReviewed: "2026-07-19",
+  },
+  {
+    slug: "/google/enterprise-agent-platform-intermediate",
+    title: "Gemini Enterprise Agent Platform (中級)",
+    group: "Providers",
+    category: "Google",
+    provider: "google",
+    topics: ["google", "agent", "platform", "best-practices"],
+    summary:
+      "Gemini Enterprise Agent Platform を実務レベルで使いこなすため、ADK・Agent Runtime・Memory Bank・A2A/MCP・ガバナンス機能などの設計指針を解説する中級〜上級者向け実践ガイド。",
+    addedAt: "2026-07-19",
+    lastReviewed: "2026-07-19",
   },
 ];
 

@@ -1026,7 +1026,6 @@ h3.subH::before {
 
 /* ─── MERMAID THEME OVERRIDES ─── */
 .mermaid .label {
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   color: #e0e8f4 !important;
 }
 /* mindmap (LLM テスト課題マップ) コントラスト改善 */
@@ -1034,41 +1033,29 @@ h3.subH::before {
 .mermaid g.mindmapNode rect,
 .mermaid g.mindmapNode path,
 .mermaid g.mindmapNode circle {
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   fill: #111520 !important;
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   stroke: #10a37f !important;
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   stroke-width: 1.5px !important;
 }
 .mermaid g.mindmapNode.depth0 rect,
 .mermaid g.mindmapNode.depth0 path,
 .mermaid g.mindmapNode.depth0 circle {
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   fill: #10a37f !important;
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   stroke: #1cd4a4 !important;
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   stroke-width: 2.5px !important;
 }
 .mermaid g.mindmapNode.depth1 rect,
 .mermaid g.mindmapNode.depth1 path,
 .mermaid g.mindmapNode.depth1 circle {
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   fill: #1c2438 !important;
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   stroke: #3b82f6 !important;
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   stroke-width: 2px !important;
 }
 .mermaid g.mindmapNode.depth2 rect,
 .mermaid g.mindmapNode.depth2 path,
 .mermaid g.mindmapNode.depth2 circle {
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   fill: #0b0e18 !important;
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   stroke: #5a6e8c !important;
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   stroke-width: 1.5px !important;
 }
 /* mindmap の文字色 (SVG text要素と htmlLabels 向けのdiv/span両対応) */
@@ -1076,49 +1063,36 @@ h3.subH::before {
 .mermaid g.mindmapNode .nodeLabel,
 .mermaid g.mindmapNode div,
 .mermaid g.mindmapNode span {
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   fill: #ffffff !important;
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   color: #ffffff !important;
 }
 .mermaid g.mindmapNode.depth0 text,
 .mermaid g.mindmapNode.depth0 .nodeLabel,
 .mermaid g.mindmapNode.depth0 div,
 .mermaid g.mindmapNode.depth0 span {
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   fill: #ffffff !important;
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   color: #ffffff !important;
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   font-weight: 800 !important;
 }
 .mermaid g.mindmapNode.depth1 text,
 .mermaid g.mindmapNode.depth1 .nodeLabel,
 .mermaid g.mindmapNode.depth1 div,
 .mermaid g.mindmapNode.depth1 span {
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   fill: #ffffff !important;
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   color: #ffffff !important;
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   font-weight: 700 !important;
 }
 .mermaid g.mindmapNode.depth2 text,
 .mermaid g.mindmapNode.depth2 .nodeLabel,
 .mermaid g.mindmapNode.depth2 div,
 .mermaid g.mindmapNode.depth2 span {
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   fill: #cbd5e1 !important;
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   color: #cbd5e1 !important;
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   font-weight: 500 !important;
 }
 /* mindmap の接続線 (edge) */
 .mermaid path.mindmapEdge,
 .mermaid path.edge {
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   stroke: #5a6e8c !important;
-  /* biome-ignore lint/complexity/noImportantStyles: override Mermaid theme styles */
   stroke-width: 2.5px !important;
 }

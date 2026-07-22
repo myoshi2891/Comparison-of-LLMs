@@ -2,7 +2,6 @@ import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
 
-
 export const metadata = {
   title: "skills.sh 完全ガイド ― AIエージェントを賢くする「Agent Skills」入門",
   description:

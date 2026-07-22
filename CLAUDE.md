@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-07-17
+Updated 2026-07-20
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -29,7 +29,7 @@ update.sh  ← オーケストレーター (scrape → copy)
 │   │   ├── search/              横断検索 (F-5。自前実装。?q= / ?tag= で状態共有)
 │   │   ├── whats-new/           What's New (新着 / 最近更新を page-registry から静的生成)
 │   │   ├── globals.css          Tailwind v4 + legacy design tokens (227 行)
-│   │   └── {claude,google,codex,copilot}/{skill,agent}/ および /google/agent-harness-engineering/、/google/notebook-lm/、/google/adk-best-practices/、/google/stitch-guide/、/claude/managed-agents/、/claude/self-hosted-sandboxes/、/claude/code-slash-commands/、/claude/fable-5-best-practices/、/claude/skills-sh/、/mcp/mcp-best-practices/、/mcp/mcp-best-practices-intermediate/、/code-review/coderabbit-guide/、/code-review/copilot-code-review/、/code-review/sonar-qube/、/code-review/tool-pricing/、/agent/hermes-agent-advanced-guide/、/agent/loop-engineering/、/agent/skills/、/vercel/sandbox/、/cursor/complete-guide/、/cursor/complete-guide-intermediate/、/security/ai-security-best-practices/、/security/ai-security-best-practices-intermediate/、/governance/ai-governance/、/local-llm/self-hosting/、/local-llm/best-practices/、/local-llm/finetuning-best-practices/、/ci-cd/ai-cicd-automation-best-practices/、/agent/context-engineering-best-practices/、/rag/embeddings-best-practices/、/multimodal/generation-best-practices/、/multimodal/image-audio-best-practices-2026/、/llm-ops/evaluation-observability/   Phase B–C および追加移行済みルート（詳細は [`docs/archive/MIGRATION_PROGRESS.md`](docs/archive/MIGRATION_PROGRESS.md)）
+│   │   └── {claude,google,codex,copilot}/{skill,agent}/ および /google/agent-harness-engineering/、/google/notebook-lm/、/google/adk-best-practices/、/google/enterprise-agent-platform/、/google/enterprise-agent-platform-intermediate/、/google/stitch-guide/、/claude/managed-agents/、/claude/self-hosted-sandboxes/、/claude/code-slash-commands/、/claude/fable-5-best-practices/、/claude/skills-sh/、/claude/tag-best-practices/、/mcp/mcp-best-practices/、/mcp/mcp-best-practices-intermediate/、/code-review/coderabbit-guide/、/code-review/copilot-code-review/、/code-review/sonar-qube/、/code-review/tool-pricing/、/agent/hermes-agent-advanced-guide/、/agent/loop-engineering/、/agent/skills/、/vercel/sandbox/、/cursor/complete-guide/、/cursor/complete-guide-intermediate/、/security/ai-security-best-practices/、/security/ai-security-best-practices-intermediate/、/governance/ai-governance/、/local-llm/self-hosting/、/local-llm/best-practices/、/local-llm/finetuning-best-practices/、/ci-cd/ai-cicd-automation-best-practices/、/agent/context-engineering-best-practices/、/rag/embeddings-best-practices/、/multimodal/generation-best-practices/、/multimodal/image-audio-best-practices-2026/、/llm-ops/evaluation-observability/、/model-data/gpt-5-6-best-practices/   Phase B–C および追加移行済みルート（詳細は [`docs/archive/MIGRATION_PROGRESS.md`](docs/archive/MIGRATION_PROGRESS.md)）
 │   ├── components/
 │   │   ├── HomePage.tsx         Client Component (Phase 10)
 │   │   ├── ApiTable.tsx / SubTable.tsx / Hero.tsx / ...   (Phase 8-10 成果物)
@@ -207,6 +207,7 @@ Playwright ブラウザバイナリ（`/root/.cache/ms-playwright/`）はバイ�
 - `strict: true` + `noUnusedLocals` + `noUnusedParameters`
 - `erasableSyntaxOnly: true` — **enum と namespace は使用禁止**（TypeScript 5.8+ の制約）
 - Biome: `web-next/biome.json` で space 2 / 100 col / `noExplicitAny` / `noDoubleEquals` 他を適用
+- **`app/**/page.module.css` では `noImportantStyles` と `noDescendingSpecificity` を `overrides` で無効化している**（`biome.json` は厳密 JSON でコメントを書けないため理由をここに記す。コメントを入れると設定がパース不能になり、Biome がデフォルト設定へフォールバックして `node_modules` まで走査する）。理由: ガイドページの CSS Modules は `globals.css` の**素の要素セレクタ**（例 `thead th:not(:first-child) { text-align: right }`）を打ち消す必要があり、かつ Next.js 本番ビルドは CSS をルート単位でチャンク分割するため `globals.css` と `page.module.css` の読み込み順が保証されない（経緯: `.claude/rules/css-cache-reset.md`）。`!important` と詳細度の逆転は意図的な防御であり、除去すると表・コードブロック・Mermaid 図の表示が壊れる
 - `web-next/AGENTS.md` の注意書き遵守: Next.js 16 は訓練データと挙動が異なる可能性があるため、`web-next/node_modules/next/dist/docs/` を都度参照
 
 ## 新しいプロバイダー/ツールの追加パターン
@@ -274,7 +275,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が成功（実測 1119 件合格を確認）
+2. `cd web-next && bun run test` が成功（実測 1161 件合格を確認）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功（既知の違反件数は CI または進捗ドキュメントを参照、新規違反がないこと）
 5. `cd scraper && uv run pytest` が成功

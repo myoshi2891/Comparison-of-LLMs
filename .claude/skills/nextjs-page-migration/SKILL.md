@@ -86,6 +86,97 @@ Phase A–F で 18 枚のガイドページが `web-next/` App Router に**全�
 | 生 HTML 注入 | `dangerouslySetInnerHTML` | ネストした JSX `<span>` で表現（下記参照） |
 | SVG に title/aria なし | `<svg>…</svg>` | `<svg role="img" aria-label="…"><title>…</title>…</svg>` |
 
+#### ⚠️ CSS Module 地雷チェックリスト（移行時の頻出バグ）
+
+> [!CAUTION]
+> 以下は `bun run build` が通っても **実行時に全配色・レイアウトが崩壊する** 無音バグ。
+> `page.module.css` を作成したら必ず全項目を確認すること。
+
+**① CSS変数は必ず `page.module.css` の最上位セレクタ内に定義する**
+
+`globals.css` には以下の変数が**存在しない**（使用すると `unset` / 透明になる）:
+`--bg-elevated`, `--bg-card`, `--accent`, `--accent-soft`, `--accent-2`, `--accent-2-soft`,
+`--text`, `--text-dim`, `--text-faint`, `--text-tertiary`
+
+元 HTML の `:root { ... }` 定義は必ず `.layout` または `.root` スコープに転写する:
+
+```css
+/* ✅ 正しいパターン: .layout スコープに変数を閉じ込める */
+.layout {
+  --bg: #07111e;
+  --bg-elevated: #0d1b2e;
+  --bg-card: #0f2038;
+  --accent: #7c9eff;
+  --accent-soft: rgba(124, 158, 255, 0.14);
+  --text: #e6ecf5;
+  --text-dim: #9fb0c9;
+  --text-faint: #6d7f9c;
+  --border: rgba(255, 255, 255, 0.09);
+
+  display: flex;
+  background: var(--bg); /* 変数定義と同じセレクタ内ですぐ使える */
+  color: var(--text);
+}
+
+/* ❌ NG: globals.css に存在しない変数をそのまま参照 */
+/* .pageFooter { color: var(--text-tertiary); } → 未定義で透明になる */
+```
+
+`globals.css` に実際に存在する変数（共有デザイントークン）:
+`--bg`, `--bg2`, `--srf`, `--srf2`, `--brd`, `--brd2`, `--txt`, `--txt2`, `--txt3`,
+`--acc`, `--acc2`, `--grn`, `--ylw`, `--red`, `--prp`, `--teal`, `--orng`
+
+**② デスクトップサイドバーの固定には `position: sticky` を使い、モバイルには `position: fixed` を許可する**
+
+```css
+/* ✅ デスクトップ用: sticky パターン（SiteHeader を考慮した top と height） */
+.sidebar {
+  flex-shrink: 0;
+  position: sticky;
+  top: var(--header-height, 60px); /* SiteHeader の高さを考慮したオフセット */
+  height: calc(100vh - var(--header-height, 60px)); /* ヘッダー分を引いた高さ */
+  overflow-y: auto;
+}
+
+/* ✅ モバイル用: オフキャンバス開閉動作には position: fixed の使用を明示的に許可 */
+@media (max-width: 960px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    /* ...モバイル開閉アニメーションなど... */
+  }
+}
+```
+
+**③ サイドバートグルのデフォルト `display: none` を必ず書く**
+
+```css
+/* ✅ デスクトップのデフォルトを先に定義 */
+.sidebarToggle { display: none; }
+
+@media (max-width: 960px) {
+  .sidebarToggle { display: flex; /* ... */ }
+}
+
+/* ❌ NG: @media 内にしか書かない → デスクトップでも表示されてしまう */
+```
+
+**確認コマンド（var() 参照の棚卸し）**:
+```bash
+# page.module.css 内で定義されているローカル変数を抽出
+local_vars=$(grep -oE '^\s*--[a-zA-Z0-9_-]+\s*:' web-next/app/path/to/page.module.css | sed -E 's/^\s*(--[a-zA-Z0-9_-]+)\s*:/\1/' | sort -u)
+
+# page.module.css で参照している変数のうち、ローカル変数でも globals.css に定義されている変数でもない未定義変数だけを出力
+for var in $(grep -oE 'var\(\s*--[a-zA-Z0-9_-]+' web-next/app/path/to/page.module.css | sed -E 's/var\(\s*(--[a-zA-Z0-9_-]+)/\1/' | sort -u); do
+  # ローカル変数として定義されている場合は除外
+  echo "$local_vars" | grep -qWx "$var" && continue
+  # globals.css に定義されているか確認
+  grep -q "$var:" web-next/app/globals.css || echo "未定義の変数: $var"
+done
+```
+
 #### コードブロック内の行区切りパターン
 
 `.code-block` のデフォルト `white-space` は `normal` のため `{"\n"}` はスペースに正規化される。
@@ -368,3 +459,7 @@ cd web-next && bun run build && bun run lint && bun run test
 - **新規ガイドページを `legacy/` 配下に作成しない** — `web-next/app/` 側のみに作成する
 - **コードブロックやフッターの monospace フォント指定を省略しない** — `.codeBody`, `.codeLine`, `.codeBar`, `.pageFooter` には必ず等幅フォント（`font-family: var(--font-mono), ...`）を明示的に指定すること。
 - **RSC の `page.tsx` を直接クライアントコンポーネント化（'use client'）しない** — Intersection Observer 等が必要な場合は、軽量な `<TocObserver />` などに分割し、`page.tsx` 自体は Server Component のままで `metadata` 静的エクスポートができる状態を維持する。
+- **`globals.css` に存在しない CSS 変数を `var()` で参照しない** — 元 HTML の `:root` 定義は `page.module.css` の `.layout` / `.root` スコープ内に転写する（上記 CSS Module 地雷チェックリスト参照）。
+- **サイドバーの固定に `position: fixed` を無条件で使わない** — デスクトップでは `SiteHeader` の高さを考慮した `position: sticky; top: var(--header-height, 60px); height: calc(100vh - var(--header-height, 60px)); overflow-y: auto` を使用し、モバイルのオフキャンバス開閉動作に対してのみ `position: fixed` を明示的に許可する。
+- **`.sidebarToggle` のデフォルト `display: none` を省略しない** — メディアクエリ外でデフォルト非表示にし、`@media (max-width: 960px)` 内でのみ `display: flex` に上書きする。
+

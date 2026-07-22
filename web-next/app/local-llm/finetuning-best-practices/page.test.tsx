@@ -4,9 +4,7 @@ import { render } from "@testing-library/react";
 import { load } from "cheerio";
 import type { ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
-import PageComponent, {
-  generateMetadata,
-} from "@/app/local-llm/finetuning-best-practices/page";
+import PageComponent, { generateMetadata } from "@/app/local-llm/finetuning-best-practices/page";
 
 const Page = PageComponent as unknown as () => ReactElement;
 

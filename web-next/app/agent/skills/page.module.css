@@ -115,7 +115,9 @@
 
 /* TocObserver の querySelectorAll で識別するためのマーカークラス */
 /* 実際のスタイルは .sidebarNav a に付与されている */
-.tocLink {}
+.tocLink {
+  /* マーカー専用。宣言を持たせると .sidebarNav a のカスケードを乱すため空のままにする */
+}
 
 .sidebarNav a:hover {
   background: var(--bg-hover);
