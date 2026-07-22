@@ -417,17 +417,43 @@
   color: var(--accent-2);
 }
 
+/* code syntax highlighting */
+.ck { color: #ff7b72; }
+.cm { color: #7ee787; font-weight: bold; }
+.cs { color: #a5d6ff; }
+.cw { color: #d29922; }
+.cv { color: #79c0ff; }
+.ce { color: #bc8cff; }
+.cc { color: #8b949e; font-style: italic; }
+.cg { color: #3fb950; }
+.ch { color: #f0883e; font-weight: bold; }
+
 /* mermaid centering */
 .mermaidContainer {
   width: 100%;
-  display: flex;
-  justify-content: center;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center;
+  min-height: 60px;
   background: var(--bg-1);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1.6rem;
   margin: 1.6rem 0 2rem;
   overflow-x: auto;
+}
+
+.mermaidContainer :global(.mermaid) {
+  width: 100%;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+.mermaidContainer :global(svg) {
+  max-width: 100% !important;
+  height: auto !important;
+  display: block !important;
+  margin: 0 auto !important;
 }
 
 .sourceNote {
