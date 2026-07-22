@@ -357,10 +357,10 @@ export default function Gpt56BestPracticesPage() {
                     <td>
                       <code>gpt-5.6-sol</code>
                     </td>
-                    <td>$3.00</td>
-                    <td>$12.00</td>
-                    <td>1M tokens (1,048,576)</td>
-                    <td>64,000 tokens</td>
+                    <td>$5.00</td>
+                    <td>$30.00</td>
+                    <td>1,050,000 tokens</td>
+                    <td>128,000 tokens</td>
                   </tr>
                   <tr>
                     <td>
@@ -369,10 +369,10 @@ export default function Gpt56BestPracticesPage() {
                     <td>
                       <code>gpt-5.6-terra</code>
                     </td>
-                    <td>$0.75</td>
-                    <td>$3.00</td>
-                    <td>512K tokens (524,288)</td>
-                    <td>32,000 tokens</td>
+                    <td>$2.50</td>
+                    <td>$15.00</td>
+                    <td>1,050,000 tokens</td>
+                    <td>128,000 tokens</td>
                   </tr>
                   <tr>
                     <td>
@@ -381,18 +381,18 @@ export default function Gpt56BestPracticesPage() {
                     <td>
                       <code>gpt-5.6-luna</code>
                     </td>
-                    <td>$0.15</td>
-                    <td>$0.60</td>
-                    <td>256K tokens (262,144)</td>
-                    <td>16,000 tokens</td>
+                    <td>$1.00</td>
+                    <td>$6.00</td>
+                    <td>1,050,000 tokens</td>
+                    <td>128,000 tokens</td>
                   </tr>
                 </tbody>
               </table>
             </div>
 
             <p>
-              ※
-              長文コンテキスト（272,000トークン超過）を処理する場合、Input/Output単価に長文プレミアム料金（1.5倍〜2.0倍）が適用される点にご留意ください。
+              ※ 入力トークンが272,000を超えるリクエストは、そのリクエスト全体に対してInput 2倍 /
+              Output 1.5倍の長文コンテキスト料金が適用される点にご留意ください。
             </p>
           </section>
 

@@ -683,9 +683,12 @@ export default function KimiLlmBestPracticesPage() {
                     <code className={styles.inlineCode}>reasoning_effort</code>
                   </td>
                   <td>
-                    <code className={styles.inlineCode}>"max"</code>のみ(既定)
+                    <code className={styles.inlineCode}>"low"</code> /{" "}
+                    <code className={styles.inlineCode}>"high"</code> /{" "}
+                    <code className={styles.inlineCode}>"max"</code> (既定:{" "}
+                    <code className={styles.inlineCode}>"max"</code>)
                   </td>
-                  <td>将来的に軽量レベル追加予定と公式が予告</td>
+                  <td>思考レベルの指定が可能（デフォルトは最高レベルの max）</td>
                 </tr>
               </tbody>
             </table>
@@ -1297,9 +1300,12 @@ export default function KimiLlmBestPracticesPage() {
             </li>
             <li>
               <code className={styles.inlineCode}>reasoning_effort</code>
-              は会話開始前に決めておくべきパラメータで、現在は
+              は会話開始前に決めておくべきパラメータで、
+              <code className={styles.inlineCode}>"low"</code>、
+              <code className={styles.inlineCode}>"high"</code>、
               <code className={styles.inlineCode}>"max"</code>
-              のみサポートされています。
+              の各レベルをサポートしています（既定値は
+              <code className={styles.inlineCode}>"max"</code>）。
             </li>
           </ul>
           <p className={styles.sourceNote}>
@@ -1386,7 +1392,7 @@ export default function KimiLlmBestPracticesPage() {
             <MermaidDiagram
               chart={`flowchart TB
     A["使用モデルは何か？"] --> B{"kimi-k3 か？"}
-    B -- はい --> C["reasoning_effort フィールドを使う(現状は max のみ)"]
+    B -- はい --> C["reasoning_effort フィールドを使う(low/high/max, 既定は max)"]
     B -- いいえ(K2.x系列) --> D["thinking パラメータを使う({type: enabled})"]
     C --> E["アシスタントメッセージ全体(content+reasoning_content)をそのまま次のリクエストに含める"]
     D --> E
@@ -1413,10 +1419,11 @@ export default function KimiLlmBestPracticesPage() {
             </Ext>
           </p>
 
-          <h3>8.2 K3の reasoning_effort は「max」固定で、コストに直結する</h3>
+          <h3>8.2 K3の reasoning_effort はデフォルト「max」で、コストに直結する</h3>
           <p>
-            K3は現時点で<code className={styles.inlineCode}>reasoning_effort="max"</code>
-            しかサポートしておらず、軽いタスクでも重い推論を行います。Simon Willison氏の検証では、
+            K3は既定値として<code className={styles.inlineCode}>reasoning_effort="max"</code>
+            が適用されるため、明示的に軽量レベルを指定しない場合、軽いタスクでも重い推論を行います。Simon
+            Willison氏の検証では、
             単純なSVG生成タスクで16,658個の出力トークンのうち13,241個が思考トークンで、コストは25セントに達しました。Hacker
             Newsのコミュニティも 「推論効率(reasoning
             efficiency)はモデルの実質的なコストに直結する」「GPT系モデルは推論効率が高く、Kimi
@@ -1897,8 +1904,9 @@ export default function KimiLlmBestPracticesPage() {
               システムプロンプトや検索結果など、繰り返し送る接頭辞を一定に保ちキャッシュヒット率を高める(K3は90%引きと割引率が特に大きい)。
             </li>
             <li>
-              K3は常時<code className={styles.inlineCode}>reasoning_effort=max</code>
-              であることを踏まえ、軽量なタスクには投げない。
+              K3は既定で<code className={styles.inlineCode}>reasoning_effort="max"</code>
+              であることを踏まえ、軽量なタスクには<code className={styles.inlineCode}>"low"</code>
+              を指定するか適したモデルを選ぶ。
             </li>
             <li>即時性が不要なバッチ処理はBatch APIに回す。</li>
             <li>
@@ -2042,7 +2050,7 @@ export default function KimiLlmBestPracticesPage() {
               </li>
               <li>
                 契約・法務上の判断が必要な場合は、必ず最新の
-                <Ext href="https://platform.moonshot.ai/">
+                <Ext href="https://www.kimi.com/user/agreement/userprivacy?version=v2&utm_source=openai">
                   Moonshot AIのプライバシーポリシー・利用規約
                 </Ext>
                 を自分で確認する(本ガイドは法的助言ではありません)。
@@ -2141,7 +2149,8 @@ export default function KimiLlmBestPracticesPage() {
                     を使う仕様に変更された
                   </td>
                   <td>
-                    <code className={styles.inlineCode}>reasoning_effort="max"</code>を使う
+                    <code className={styles.inlineCode}>reasoning_effort</code>（low / high /
+                    max）を使う
                   </td>
                 </tr>
                 <tr>
