@@ -43,7 +43,7 @@ export const PageEntrySchema = z
     /** ナビ 2 段目の表示ラベル。2 段ネストするグループ（= Providers）でのみ必須。 */
     category: z.string().min(1).optional(),
     /** プロバイダー系ページのみ。識別子であり表示ラベルではない（表示は category）。 */
-    provider: z.enum(["claude", "google", "codex", "copilot"]).optional(),
+    provider: z.enum(["claude", "google", "codex", "copilot", "moonshot"]).optional(),
     /** 横断検索・関連リンク (F-5 / F-7) 用のトピックタグ */
     topics: z.array(z.string()),
     /** 一覧・What's New に出す 1〜2 文の要約 */
@@ -781,6 +781,20 @@ const entries: PageEntry[] = [
     topics: ["google", "gemma", "best-practices"],
     summary:
       "2026年4月に登場した新世代Gemma 4の制御トークン体系、Thinkingモード、Function Calling、量子化(QAT)戦略、ファインチューニング、デプロイ、安全性まで一次情報に基づいて網羅した実践ガイド。",
+    addedAt: "2026-07-22",
+    lastReviewed: "2026-07-22",
+  },
+  {
+    slug: "/moonshot/kimi-llm-best-practices",
+    title: "Kimi LLM 徹底ガイド",
+    description:
+      "Moonshot AI が開発する Kimi K1.5 / K2 / K3 の超長文文脈（Long Context）処理、思考モード（Kimi Thinking）、Function Calling、マルチモーダル等の活用方法とベストプラクティスを解説する完全ガイド。",
+    group: "Providers",
+    category: "Moonshot",
+    provider: "moonshot",
+    topics: ["moonshot", "kimi", "llm", "best-practices"],
+    summary:
+      "Moonshot AI が開発する Kimi K1.5 / K2 / K3 の超長文文脈（Long Context）処理、思考モード（Kimi Thinking）、Function Calling、マルチモーダル等の活用方法とベストプラクティスを解説する完全ガイド。",
     addedAt: "2026-07-22",
     lastReviewed: "2026-07-22",
   },
