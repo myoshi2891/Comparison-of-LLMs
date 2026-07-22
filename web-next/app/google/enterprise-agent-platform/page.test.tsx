@@ -1,7 +1,9 @@
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
-import PageComponent, { metadata as rawMetadata } from "@/app/google/enterprise-agent-platform/page";
+import PageComponent, {
+  metadata as rawMetadata,
+} from "@/app/google/enterprise-agent-platform/page";
 
 const Page = PageComponent as unknown as () => ReactElement;
 type MetadataLike = { title?: unknown; description?: unknown };
@@ -16,9 +18,15 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
 
 // Stub IntersectionObserver
 class IntersectionObserverStub {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+  observe() {
+    // mock
+  }
+  unobserve() {
+    // mock
+  }
+  disconnect() {
+    // mock
+  }
 }
 global.IntersectionObserver = IntersectionObserverStub as unknown as typeof IntersectionObserver;
 

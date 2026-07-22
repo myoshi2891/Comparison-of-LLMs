@@ -6,15 +6,12 @@ import styles from "./page.module.css";
 beforeAll(() => {
   // Minimal stub so `new IntersectionObserver(...)` doesn't throw in jsdom
   class IntersectionObserverStub {
-    // biome-ignore lint/suspicious/noEmptyBlockStatements: test stub
     observe() {
       /* noop */
     }
-    // biome-ignore lint/suspicious/noEmptyBlockStatements: test stub
     unobserve() {
       /* noop */
     }
-    // biome-ignore lint/suspicious/noEmptyBlockStatements: test stub
     disconnect() {
       /* noop */
     }

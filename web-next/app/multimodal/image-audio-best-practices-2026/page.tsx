@@ -226,7 +226,13 @@ export default async function Page() {
       <div className={styles.layout}>
         {/* ================= SIDEBAR ================= */}
         <aside className={styles.sidebar}>
-          <button className={styles.mobileToggle} id="multimodalNavToggle" type="button" aria-controls="multimodalNavList" aria-expanded="false">
+          <button
+            className={styles.mobileToggle}
+            id="multimodalNavToggle"
+            type="button"
+            aria-controls="multimodalNavList"
+            aria-expanded="false"
+          >
             目次を開く
           </button>
           <div className={styles.brand}>

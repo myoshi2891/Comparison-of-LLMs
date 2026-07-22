@@ -7,16 +7,45 @@ const SOURCE_PATH = join(process.cwd(), "..", "Gpt-5.6-best-practices-guide.md")
 const GUIDE = readFileSync(SOURCE_PATH, "utf8").trim();
 
 const SECTION_IDS = [
-  "overview", "lineup", "selection-flow", "effort-mode", "persisted-reasoning", "ptc",
-  "multi-agent", "prompt-caching", "prompt-design", "verbosity", "autonomy", "safety",
-  "migration", "code", "availability", "cost", "summary", "sources",
+  "overview",
+  "lineup",
+  "selection-flow",
+  "effort-mode",
+  "persisted-reasoning",
+  "ptc",
+  "multi-agent",
+  "prompt-caching",
+  "prompt-design",
+  "verbosity",
+  "autonomy",
+  "safety",
+  "migration",
+  "code",
+  "availability",
+  "cost",
+  "summary",
+  "sources",
 ] as const;
 
 const TOC = [
-  "GPT-5.6とは何か", "モデルラインナップ", "モデル選定フロー", "Reasoning Effort と Mode",
-  "Persisted Reasoning", "Programmatic Tool Calling", "Multi-agent", "Prompt Caching",
-  "プロンプト設計", "応答の長さとスタイル", "自律性と承認境界", "セーフガード",
-  "GPT-5.6への移行", "コード実践例", "利用可能性", "コスト最適化", "まとめ", "参考ソース",
+  "GPT-5.6とは何か",
+  "モデルラインナップ",
+  "モデル選定フロー",
+  "Reasoning Effort と Mode",
+  "Persisted Reasoning",
+  "Programmatic Tool Calling",
+  "Multi-agent",
+  "Prompt Caching",
+  "プロンプト設計",
+  "応答の長さとスタイル",
+  "自律性と承認境界",
+  "セーフガード",
+  "GPT-5.6への移行",
+  "コード実践例",
+  "利用可能性",
+  "コスト最適化",
+  "まとめ",
+  "参考ソース",
 ];
 
 /**
@@ -26,7 +55,11 @@ const TOC = [
  * @param children - The content displayed inside the link
  */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
-  return <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>;
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer">
+      {children}
+    </a>
+  );
 }
 
 /**
@@ -37,9 +70,19 @@ function Ext({ href, children }: { href: string; children: React.ReactNode }) {
  */
 function inline(text: string): React.ReactNode[] {
   return text.split(/(`[^`]+`|\*\*[^*]+\*\*|https?:\/\/[^\s|]+)/g).map((part, index) => {
-    if (part.startsWith("`") && part.endsWith("`")) return <code key={index}>{part.slice(1, -1)}</code>;
-    if (part.startsWith("**") && part.endsWith("**")) return <strong key={index}>{part.slice(2, -2)}</strong>;
-    if (part.startsWith("http")) return <Ext key={index} href={part}>{part}</Ext>;
+    if (part.startsWith("`") && part.endsWith("`"))
+      // biome-ignore lint/suspicious/noArrayIndexKey: split() の結果はビルド時に確定し並び替え・挿入が起きない。part を鍵にすると同一語句の重複で衝突する
+      return <code key={index}>{part.slice(1, -1)}</code>;
+    if (part.startsWith("**") && part.endsWith("**"))
+      // biome-ignore lint/suspicious/noArrayIndexKey: 同上（静的 Markdown 由来の固定長配列）
+      return <strong key={index}>{part.slice(2, -2)}</strong>;
+    if (part.startsWith("http"))
+      return (
+        // biome-ignore lint/suspicious/noArrayIndexKey: 同上（静的 Markdown 由来の固定長配列）
+        <Ext key={index} href={part}>
+          {part}
+        </Ext>
+      );
     return part;
   });
 }
@@ -51,7 +94,8 @@ function inline(text: string): React.ReactNode[] {
  * @returns React nodes containing styled syntax tokens and preserved line breaks
  */
 function highlightCode(code: string) {
-  const tokenPattern = /(#.*$|\/\/.*$|"[^"\n]*"|'[^'\n]*'|\b(?:from|import|print|client|response|model|reasoning|input|curl|python|bash|const|let|true|false|null)\b|\b\d+(?:\.\d+)?\b)/gm;
+  const tokenPattern =
+    /(#.*$|\/\/.*$|"[^"\n]*"|'[^'\n]*'|\b(?:from|import|print|client|response|model|reasoning|input|curl|python|bash|const|let|true|false|null)\b|\b\d+(?:\.\d+)?\b)/gm;
   return code.split("\n").flatMap((line, lineIndex) => {
     const tokens: React.ReactNode[] = [];
     let cursor = 0;
@@ -59,14 +103,20 @@ function highlightCode(code: string) {
       const token = match[0];
       const start = match.index ?? 0;
       if (start > cursor) tokens.push(line.slice(cursor, start));
-      const className = token.startsWith("#") || token.startsWith("//")
-        ? styles.codeComment
-        : token.startsWith('"') || token.startsWith("'")
-          ? styles.codeString
-          : /^\d/.test(token)
-            ? styles.codeNumber
-            : styles.codeKeyword;
-      tokens.push(<span className={className} key={`${lineIndex}-${start}`}>{token}</span>);
+      const className =
+        token.startsWith("#") || token.startsWith("//")
+          ? styles.codeComment
+          : token.startsWith('"') || token.startsWith("'")
+            ? styles.codeString
+            : /^\d/.test(token)
+              ? styles.codeNumber
+              : styles.codeKeyword;
+      tokens.push(
+        // biome-ignore lint/suspicious/noArrayIndexKey: 行番号と文字オフセットの組で一意。トークン文字列は同一行内で重複しうる
+        <span className={className} key={`${lineIndex}-${start}`}>
+          {token}
+        </span>
+      );
       cursor = start + token.length;
     }
     if (cursor < line.length) tokens.push(line.slice(cursor));
@@ -96,7 +146,12 @@ function parseHeading2(state: ParseState): React.ReactNode {
   }
   const index = state.section - 1;
   const node = (
-    <section data-guide-section id={SECTION_IDS[index]} className={styles.section} key={`s-${index}`}>
+    <section
+      data-guide-section
+      id={SECTION_IDS[index]}
+      className={styles.section}
+      key={`s-${index}`}
+    >
       <h2>
         <span>{String(index + 1).padStart(2, "0")}</span>
         {current.slice(3)}
@@ -160,7 +215,12 @@ function parseTable(state: ParseState): React.ReactNode {
   const rows: string[][] = [];
   while (state.line < state.lines.length && state.lines[state.line].startsWith("|")) {
     if (!/^\|[- :|]+\|$/.test(state.lines[state.line])) {
-      rows.push(state.lines[state.line].split("|").slice(1, -1).map((cell) => cell.trim()));
+      rows.push(
+        state.lines[state.line]
+          .split("|")
+          .slice(1, -1)
+          .map((cell) => cell.trim())
+      );
     }
     state.line += 1;
   }
@@ -169,6 +229,7 @@ function parseTable(state: ParseState): React.ReactNode {
     return (
       <ul key={`checklist-${state.line}`}>
         {body.map((row, rowIndex) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: 表の行はビルド時に確定し並び替えが起きない。セル文言は重複しうる
           <li key={rowIndex}>
             <strong>{inline(row[0])}</strong> — {inline(row[1])}
           </li>
@@ -182,14 +243,17 @@ function parseTable(state: ParseState): React.ReactNode {
         <thead>
           <tr>
             {head.map((cell, i) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: 見出し行はビルド時に確定。同名の見出しセルが並ぶ表が存在する
               <th key={i}>{inline(cell)}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {body.map((row, rowIndex) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: 表の行はビルド時に確定し並び替えが起きない
             <tr key={rowIndex}>
               {row.map((cell, cellIndex) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: セル文言は「○」「必須」等が頻繁に重複するため内容キーは使えない
                 <td key={cellIndex}>{inline(cell)}</td>
               ))}
             </tr>
@@ -220,6 +284,7 @@ function parseList(state: ParseState): React.ReactNode {
   return (
     <List key={`list-${state.line}`}>
       {items.map((item, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: リスト項目はビルド時に確定し並び替え・挿入が起きない
         <li key={i}>{inline(item)}</li>
       ))}
     </List>
@@ -314,5 +379,35 @@ function MarkdownBody() {
  * Renders the GPT-5.6 best-practices guide with a table of contents, guide content, and update notice.
  */
 export default function GuideContent() {
-  return <div className={styles.guide}><aside className={styles.sidebar}><a className={styles.brand} href="#top">OpenAI <small>GPT-5.6 GUIDE</small></a><nav>{TOC.map((label, i) => <a className={styles.tocLink} href={`#${SECTION_IDS[i]}`} key={SECTION_IDS[i]}><span>{String(i + 1).padStart(2, "0")}</span>{label}</a>)}</nav></aside><main className={styles.main}><header id="top"><p className={styles.eyebrow}>OPENAI · MODEL PLAYBOOK</p><h1>OpenAI GPT-5.6 完全ガイド</h1><p className={styles.subtitle}>Sol / Terra / Luna 実践ベストプラクティス。対象読者：中級〜上級のAIエンジニア・ソフトウェアエンジニア。最終更新の前提日：2026年7月16日。</p></header><MarkdownBody /><footer>本ページは2026年7月16日時点の情報をもとにしています。運用前にOpenAI公式ドキュメントで最新情報を確認してください。</footer></main></div>;
+  return (
+    <div className={styles.guide}>
+      <aside className={styles.sidebar}>
+        <a className={styles.brand} href="#top">
+          OpenAI <small>GPT-5.6 GUIDE</small>
+        </a>
+        <nav>
+          {TOC.map((label, i) => (
+            <a className={styles.tocLink} href={`#${SECTION_IDS[i]}`} key={SECTION_IDS[i]}>
+              <span>{String(i + 1).padStart(2, "0")}</span>
+              {label}
+            </a>
+          ))}
+        </nav>
+      </aside>
+      <main className={styles.main}>
+        <header id="top">
+          <p className={styles.eyebrow}>OPENAI · MODEL PLAYBOOK</p>
+          <h1>OpenAI GPT-5.6 完全ガイド</h1>
+          <p className={styles.subtitle}>
+            Sol / Terra / Luna
+            実践ベストプラクティス。対象読者：中級〜上級のAIエンジニア・ソフトウェアエンジニア。最終更新の前提日：2026年7月16日。
+          </p>
+        </header>
+        <MarkdownBody />
+        <footer>
+          本ページは2026年7月16日時点の情報をもとにしています。運用前にOpenAI公式ドキュメントで最新情報を確認してください。
+        </footer>
+      </main>
+    </div>
+  );
 }

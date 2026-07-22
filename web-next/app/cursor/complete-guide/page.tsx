@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import CodeCopyButton from "@/components/docs/CodeCopyButton";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
-import TocObserver from "./TocObserver";
 import styles from "./page.module.css";
+import TocObserver from "./TocObserver";
 
 export const metadata: Metadata = {
   title: "Cursor 完全ガイド ― 初学者のためのステップバイステップ・ベストプラクティス",

@@ -484,7 +484,7 @@ export default function Page() {
             </li>
           </ol>
 
-          <div className={styles.callout + " " + styles.warning}>
+          <div className={`${styles.callout} ${styles.warning}`}>
             <strong>ベストプラクティス：</strong>ユーザー資格情報・サービスアカウントキー・API
             キーなどの機微情報は、決してコードベースに直接コミットしないでください。環境変数やシークレットマネージャーを利用します。
           </div>
@@ -1414,7 +1414,7 @@ export default function Page() {
               証明書管理などがプレビュー展開されています。
             </li>
           </ul>
-          <div className={styles.callout + " " + styles.warning}>
+          <div className={`${styles.callout} ${styles.warning}`}>
             <strong>注意：</strong>
             これらは変化の速い領域のため、実装前には必ず公式ドキュメントで最新状況を確認してください。
           </div>

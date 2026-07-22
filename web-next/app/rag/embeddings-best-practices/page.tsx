@@ -96,7 +96,13 @@ export default function Page() {
       <div className={styles.layout}>
         {/* ================= SIDEBAR ================= */}
         <nav className={styles.sidebar} id="ragSideNav">
-          <button className={styles.mobileToggle} id="ragNavToggle" type="button" aria-controls="ragNavList" aria-expanded="false">
+          <button
+            className={styles.mobileToggle}
+            id="ragNavToggle"
+            type="button"
+            aria-controls="ragNavList"
+            aria-expanded="false"
+          >
             <i className="ti ti-menu-2" />
             目次を開く
           </button>

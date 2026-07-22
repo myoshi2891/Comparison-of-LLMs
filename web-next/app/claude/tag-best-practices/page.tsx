@@ -6,7 +6,7 @@ import { findBySlug } from "@/lib/page-registry";
 import styles from "./page.module.css";
 
 const pageEntry = findBySlug("/claude/tag-best-practices");
-if (!pageEntry || !pageEntry.description) {
+if (!pageEntry?.description) {
   throw new Error(
     "Required page registry metadata (title/description) missing for /claude/tag-best-practices"
   );
