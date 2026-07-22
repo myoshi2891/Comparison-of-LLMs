@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
-import MermaidDiagram from "@/components/docs/MermaidDiagram";
-import TocObserver from "./TocObserver";
-import styles from "./page.module.css";
+import type { Metadata } from 'next';
+import MermaidDiagram from '@/components/docs/MermaidDiagram';
+import TocObserver from './TocObserver';
+import styles from './page.module.css';
 
 export const metadata: Metadata = {
-  title: "Kimi(Moonshot AI)LLM 徹底ガイド 2026年7月版 ― 初学者のためのベストプラクティス",
+  title: 'Kimi(Moonshot AI)LLM 徹底ガイド 2026年7月版 ― 初学者のためのベストプラクティス',
   description:
-    "Moonshot AIが開発する大規模言語モデル「Kimi」シリーズ（K1.5, K2, K2.6, K2.7-Code, K3）の活用方法、プロンプト設計、Tool Calling、Thinking/reasoning_effort、コンテキストキャッシュ、コスト最適化を解説する完全ガイド。",
+    'Moonshot AIが開発する大規模言語モデル「Kimi」シリーズ（K1.5, K2, K2.6, K2.7-Code, K3）の活用方法、プロンプト設計、Tool Calling、Thinking/reasoning_effort、コンテキストキャッシュ、コスト最適化を解説する完全ガイド。',
 };
 
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
@@ -103,14 +103,15 @@ export default function KimiLlmBestPracticesPage() {
             中国Moonshot
             AI社が開発する大規模言語モデル「Kimi」シリーズについて、モデルの選び方からプロンプト設計、
             Tool Calling、Thinking/reasoning_effort、コスト最適化まで、公式ドキュメントに加えSimon
-            Willison氏や Hacker Newsなど著名な国際的開発者の知見も交えてステップバイステップで解説します。
+            Willison氏や Hacker
+            Newsなど著名な国際的開発者の知見も交えてステップバイステップで解説します。
           </p>
           <div className={styles.updated}>
             本ガイドは2026年7月18日時点のウェブ検索にもとづきます。2026年7月16日に新フラッグシップ「Kimi
-            K3」が発表されたばかりであり、情報は非常に速く更新されています。 本番導入前には必ず{" "}
+            K3」が発表されたばかりであり、情報は非常に速く更新されています。 本番導入前には必ず{' '}
             <Ext href="https://platform.kimi.ai/docs/overview">
               Kimi API Platform公式ドキュメント
-            </Ext>{" "}
+            </Ext>{' '}
             を確認してください。
           </div>
         </header>
@@ -121,18 +122,21 @@ export default function KimiLlmBestPracticesPage() {
             <span className={styles.badge}>01</span>はじめに:KimiとMoonshot AIとは
           </h2>
           <p>
-            <strong>Kimi</strong> は中国のAI企業 <strong>Moonshot AI(月之暗面)</strong>{" "}
+            <strong>Kimi</strong> は中国のAI企業 <strong>Moonshot AI(月之暗面)</strong>{' '}
             が開発する大規模言語モデル(LLM)シリーズ、
             およびそれを使った製品群の総称です。2023年10月に一般公開されたチャットボット「Kimi」は、当時としては業界最大級となる
             12.8万トークンのコンテキスト長をサポートしたことで注目を集めました。その後モデルは急速に進化し、2025年7月には
-            1兆パラメータのMoE(Mixture-of-Experts)モデル <strong>Kimi K2</strong>{" "}
+            1兆パラメータのMoE(Mixture-of-Experts)モデル <strong>Kimi K2</strong>{' '}
             をオープンウェイトで公開し、
             コーディングとエージェント(自律実行)性能で高い評価を得ました。そして
             <strong>2026年7月16日、さらに大規模な後継モデル 「Kimi K3」が発表</strong>
             され、本ガイド執筆時点で最新のフラッグシップとなっています。
           </p>
           <p className={styles.sourceNote}>
-            出典: <Ext href="https://en.wikipedia.org/wiki/Kimi_(chatbot)">Kimi (chatbot) - Wikipedia</Ext>
+            出典:{' '}
+            <Ext href="https://en.wikipedia.org/wiki/Kimi_(chatbot)">
+              Kimi (chatbot) - Wikipedia
+            </Ext>
           </p>
 
           <div className={styles.callout}>
@@ -144,7 +148,7 @@ export default function KimiLlmBestPracticesPage() {
                 / platform.kimi.ai)は別物です。
               </li>
               <li>
-                <strong>KimiのAPIはOpenAI互換</strong>です。既存のOpenAI SDKの{" "}
+                <strong>KimiのAPIはOpenAI互換</strong>です。既存のOpenAI SDKの{' '}
                 <code className={styles.inlineCode}>base_url</code> を書き換えるだけで移行できます。
               </li>
               <li>
@@ -155,8 +159,8 @@ export default function KimiLlmBestPracticesPage() {
             </ul>
           </div>
           <p className={styles.sourceNote}>
-            出典:{" "}
-            <Ext href="https://platform.kimi.ai/docs/overview">Quickstart - Kimi API Platform</Ext>,{" "}
+            出典:{' '}
+            <Ext href="https://platform.kimi.ai/docs/overview">Quickstart - Kimi API Platform</Ext>,{' '}
             <Ext href="https://github.com/moonshotai/kimi-k2">GitHub - MoonshotAI/Kimi-K2</Ext>
           </p>
         </section>
@@ -169,7 +173,7 @@ export default function KimiLlmBestPracticesPage() {
 
           <h3>2.1 Kimi K3とは何か(2026年7月16日発表)</h3>
           <p>
-            Moonshot AIは2026年7月16日、これまでで最も強力なモデル <strong>Kimi K3</strong>{" "}
+            Moonshot AIは2026年7月16日、これまでで最も強力なモデル <strong>Kimi K3</strong>{' '}
             を発表しました。 世界の主要メディア(VentureBeat、Fortune、Reutersなど)やSimon
             Willison氏、Hacker Newsのコミュニティが即日反応した、非常に大きなニュースです。
           </p>
@@ -179,11 +183,11 @@ export default function KimiLlmBestPracticesPage() {
               のMoE(Mixture-of-Experts)モデルで、公開時点で世界最大のオープンウェイトモデルとされています。
             </li>
             <li>
-              新しいアテンション機構 <strong>Kimi Delta Attention(KDA)</strong> と{" "}
+              新しいアテンション機構 <strong>Kimi Delta Attention(KDA)</strong> と{' '}
               <strong>Attention Residuals(AttnRes)</strong> を採用。
             </li>
             <li>
-              <strong>Stable LatentMoE</strong>{" "}
+              <strong>Stable LatentMoE</strong>{' '}
               フレームワークにより、896個のエキスパートのうち16個だけを活性化する、非常にスパースな設計。
             </li>
             <li>
@@ -199,15 +203,15 @@ export default function KimiLlmBestPracticesPage() {
             </li>
           </ul>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://venturebeat.com/technology/chinas-moonshot-ai-releases-kimi-k3-the-largest-open-source-model-ever-rivaling-top-u-s-systems">
               China's Moonshot AI releases Kimi K3 | VentureBeat
             </Ext>
-            ,{" "}
+            ,{' '}
             <Ext href="https://platform.kimi.ai/docs/guide/kimi-k3-quickstart">
               Kimi K3 - Kimi API Platform
             </Ext>
-            ,{" "}
+            ,{' '}
             <Ext href="https://simonwillison.net/2026/Jul/16/kimi-k3/">
               Kimi K3, and what we can still learn from the pelican benchmark - Simon Willison
             </Ext>
@@ -221,8 +225,8 @@ export default function KimiLlmBestPracticesPage() {
             </li>
             <li>Arena.aiの「Frontend Code」アリーナでは首位(Claude Fable 5を上回る)。</li>
             <li>
-              GDPval-AA v2ベンチマークでは1668点で、Claude Fable 5 Max・GPT-5.6 Sol Maxに次ぐ位置、Claude
-              Opus 4.8 Max(1600点)を上回る。
+              GDPval-AA v2ベンチマークでは1668点で、Claude Fable 5 Max・GPT-5.6 Sol
+              Maxに次ぐ位置、Claude Opus 4.8 Max(1600点)を上回る。
             </li>
             <li>
               タスクあたりのコストは$0.94で、GPT-5.6 Sol($1.04)と近く、Claude Opus
@@ -235,11 +239,11 @@ export default function KimiLlmBestPracticesPage() {
             Analysisなど特定機関の私的評価にもとづくものです。7月17日時点では、SWE-Bench・Terminal-Bench・HLEなど従来からの独立系公開ベンチマークでの検証結果はまだ出揃っていません。実運用への採用判断は、自分のタスクでの実地検証を必ず行ってください。
           </div>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://simonwillison.net/2026/Jul/16/kimi-k3/">
               Kimi K3, and what we can still learn from the pelican benchmark - Simon Willison
             </Ext>
-            ,{" "}
+            ,{' '}
             <Ext href="https://mlq.ai/news/moonshot-ai-releases-kimi-k3-a-28-trillion-parameter-open-weight-model-rivaling-top-us-systems/">
               Moonshot AI Releases Kimi K3 | MLQ News
             </Ext>
@@ -295,7 +299,7 @@ export default function KimiLlmBestPracticesPage() {
                 </tr>
                 <tr>
                   <td>
-                    <code className={styles.inlineCode}>kimi-k2.5</code> /{" "}
+                    <code className={styles.inlineCode}>kimi-k2.5</code> /{' '}
                     <code className={styles.inlineCode}>moonshot-v1</code>系列
                   </td>
                   <td>
@@ -338,8 +342,8 @@ export default function KimiLlmBestPracticesPage() {
             </table>
           </div>
           <p className={styles.sourceNote}>
-            出典: <Ext href="https://platform.kimi.ai/docs/models">Model List - Kimi API Platform</Ext>
-            ,{" "}
+            出典:{' '}
+            <Ext href="https://platform.kimi.ai/docs/models">Model List - Kimi API Platform</Ext>,{' '}
             <Ext href="https://www.verdent.ai/guides/agents/kimi-k3-api-guide">
               Kimi K3 API Guide - Verdent Guides
             </Ext>
@@ -354,20 +358,21 @@ export default function KimiLlmBestPracticesPage() {
             <code className={styles.inlineCode}>kimi-k2.5</code>と
             <code className={styles.inlineCode}>moonshot-v1</code>
             系列は新規ユーザーには提供されず2026年8月31日に完全終了予定」と明記されています。現在これらのモデルIDを使っている場合は、
-            <code className={styles.inlineCode}>kimi-k2.6</code> /{" "}
-            <code className={styles.inlineCode}>kimi-k2.7-code</code> /{" "}
+            <code className={styles.inlineCode}>kimi-k2.6</code> /{' '}
+            <code className={styles.inlineCode}>kimi-k2.7-code</code> /{' '}
             <code className={styles.inlineCode}>kimi-k3</code> のいずれかへ
             <strong>早急に移行</strong>してください。
           </div>
           <p className={styles.sourceNote}>
-            出典: <Ext href="https://platform.kimi.ai/docs/models">Model List - Kimi API Platform</Ext>
+            出典:{' '}
+            <Ext href="https://platform.kimi.ai/docs/models">Model List - Kimi API Platform</Ext>
           </p>
 
           <h3>2.4 モデル選定フローチャート(2026年7月版・更新)</h3>
           <div className={styles.mermaidContainer}>
             <MermaidDiagram
               chart={`flowchart TB
-    Start["解きたいタスクは？"] --> Q1{"1Mトークン級の巨大コンテキスト、または高度な視覚推論・長時間自律実行が必要か？"}
+    Start["解きたいタスクは？"] --> Q1{"1Mトークン級の巨大コンテキスト、\nまたは高度な視覚推論・長時間自律実行が必要か？"}
     Q1 -- はい --> R1["kimi-k3 を推奨<br/>(コストは高いが最上位の能力)"]
     Q1 -- いいえ --> Q2{"コーディング/自律的な開発作業が中心か？"}
     Q2 -- はい --> R2["kimi-k2.7-code を推奨<br/>(ルーティンなコーディングに最適な価格性能比)"]
@@ -380,16 +385,19 @@ export default function KimiLlmBestPracticesPage() {
           </div>
           <div className={styles.diagramCaption}>図2: タスク種別によるモデル選定フロー</div>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://www.verdent.ai/guides/agents/kimi-k3-api-guide">
               Kimi K3 API Guide - Verdent Guides
             </Ext>
-            , <Ext href="https://simonwillison.net/2026/Jul/16/kimi-k3/">Simon Willison - Kimi K3</Ext>
+            ,{' '}
+            <Ext href="https://simonwillison.net/2026/Jul/16/kimi-k3/">
+              Simon Willison - Kimi K3
+            </Ext>
           </p>
 
           <h3>2.5 アーキテクチャの基礎知識(MoEとK3の新技術)</h3>
           <p>
-            Kimiシリーズはすべて <strong>Mixture-of-Experts(MoE)</strong>{" "}
+            Kimiシリーズはすべて <strong>Mixture-of-Experts(MoE)</strong>{' '}
             アーキテクチャを採用しています。初学者向けに簡単に言うと、
             「膨大な知識を持つ専門家集団の中から、1回の推論ごとにごく一部の専門家だけを選んで働かせる」仕組みです。K2は1兆パラメータ中
             320億パラメータ相当を活性化していましたが、K3ではさらにスパース性が高まり、896エキスパート中16個
@@ -407,11 +415,11 @@ export default function KimiLlmBestPracticesPage() {
             </li>
           </ul>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://platform.kimi.ai/docs/guide/kimi-k3-quickstart">
               Kimi K3 - Kimi API Platform
             </Ext>
-            ,{" "}
+            ,{' '}
             <Ext href="https://news.ycombinator.com/item?id=48935342">
               Kimi K3 is now live | Hacker News
             </Ext>
@@ -452,8 +460,8 @@ export default function KimiLlmBestPracticesPage() {
             </li>
             <li>
               <strong>Kimi Platform</strong>:本ガイドの中心となる開発者向けAPIで、
-              <code className={styles.inlineCode}>platform.moonshot.ai</code> と{" "}
-              <code className={styles.inlineCode}>platform.kimi.ai</code>{" "}
+              <code className={styles.inlineCode}>platform.moonshot.ai</code> と{' '}
+              <code className={styles.inlineCode}>platform.kimi.ai</code>{' '}
               の2つのドメインから同じドキュメントにアクセスできます。
             </li>
             <li>
@@ -466,18 +474,20 @@ export default function KimiLlmBestPracticesPage() {
             </li>
           </ul>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://www.kimi.com/products/kimi-work">
               Kimi Work: Next-Gen Desktop AI Agent for Knowledge Workers
             </Ext>
-            , <Ext href="https://www.kimi.com/features/docs">AI Document Agent | Kimi Docs</Ext>,{" "}
+            , <Ext href="https://www.kimi.com/features/docs">AI Document Agent | Kimi Docs</Ext>,{' '}
             <Ext href="https://www.kimi.com/code">Kimi Code with Kimi K3</Ext>
           </p>
 
           <div className={styles.callout}>
             <strong>注意</strong>
             :「Kimiでチャットができるから、APIも同じ挙動になるはず」と思い込まないことが大切です。Web版のKimiは裏側で複数のツールやエージェントを自動的に組み合わせていますが、API単体を呼び出す場合は、ツール定義・システムプロンプト・エージェントループなどを自分で設計する必要があります。また、
-            <strong>コンシューマー版(kimi.com)とAPIプラットフォームではデータの取り扱いポリシーが異なる</strong>
+            <strong>
+              コンシューマー版(kimi.com)とAPIプラットフォームではデータの取り扱いポリシーが異なる
+            </strong>
             点に注意してください(詳細は15章)。
           </div>
         </section>
@@ -502,7 +512,7 @@ export default function KimiLlmBestPracticesPage() {
           </div>
           <div className={styles.diagramCaption}>図4: API利用開始までのステップ</div>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://platform.kimi.ai/docs/guide/kimi-k3-quickstart">
               Kimi K3 - Kimi API Platform
             </Ext>
@@ -552,12 +562,12 @@ export default function KimiLlmBestPracticesPage() {
                 <span>client = OpenAI(</span>
               </div>
               <div className={styles.codeLine}>
-                <span> api_key=os.environ[</span>
+                <span>    api_key=os.environ[</span>
                 <span className={styles.cs}>"MOONSHOT_API_KEY"</span>
                 <span>],</span>
               </div>
               <div className={styles.codeLine}>
-                <span> base_url=</span>
+                <span>    base_url=</span>
                 <span className={styles.cs}>"https://api.moonshot.ai/v1"</span>
                 <span>,</span>
               </div>
@@ -569,12 +579,12 @@ export default function KimiLlmBestPracticesPage() {
                 <span>completion = client.chat.completions.create(</span>
               </div>
               <div className={styles.codeLine}>
-                <span> model=</span>
+                <span>    model=</span>
                 <span className={styles.cs}>"kimi-k3"</span>
                 <span>,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> messages=[&#123;</span>
+                <span>    messages=[&#123;</span>
                 <span className={styles.cs}>"role"</span>
                 <span>: </span>
                 <span className={styles.cs}>"user"</span>
@@ -595,18 +605,18 @@ export default function KimiLlmBestPracticesPage() {
             </div>
           </div>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://platform.kimi.ai/docs/guide/kimi-k3-quickstart">
               Kimi K3 - Kimi API Platform
             </Ext>
           </p>
 
           <div className={styles.callout}>
-            <strong>重要</strong>:国際向けエンドポイントは{" "}
-            <code className={styles.inlineCode}>api.moonshot.ai/v1</code>、中国本土向けは{" "}
-            <code className={styles.inlineCode}>api.moonshot.cn/v1</code> です。ドキュメントも{" "}
-            <code className={styles.inlineCode}>platform.moonshot.ai</code> と{" "}
-            <code className={styles.inlineCode}>platform.kimi.ai</code>{" "}
+            <strong>重要</strong>:国際向けエンドポイントは{' '}
+            <code className={styles.inlineCode}>api.moonshot.ai/v1</code>、中国本土向けは{' '}
+            <code className={styles.inlineCode}>api.moonshot.cn/v1</code> です。ドキュメントも{' '}
+            <code className={styles.inlineCode}>platform.moonshot.ai</code> と{' '}
+            <code className={styles.inlineCode}>platform.kimi.ai</code>{' '}
             の2ドメインで公開されているため、リンク切れに見えても慌てず両方を確認してください。
           </div>
         </section>
@@ -620,7 +630,8 @@ export default function KimiLlmBestPracticesPage() {
           <h3>5.1 K3は多くのサンプリングパラメータが「固定」されている</h3>
           <p>
             これは今回の更新で最も重要な変更点の一つです。公式クイックスタートによると、Kimi
-            K3では以下のパラメータが<strong>固定値</strong>であり、リクエストに含めても無視されます(省略が推奨)。
+            K3では以下のパラメータが<strong>固定値</strong>
+            であり、リクエストに含めても無視されます(省略が推奨)。
           </p>
           <div className={styles.tableWrap}>
             <table>
@@ -680,7 +691,7 @@ export default function KimiLlmBestPracticesPage() {
             </table>
           </div>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://platform.kimi.ai/docs/guide/kimi-k3-quickstart">
               Kimi K3 - Kimi API Platform
             </Ext>
@@ -689,11 +700,12 @@ export default function KimiLlmBestPracticesPage() {
           <h3>5.2 max_completion_tokens の既定値と上限(K3)</h3>
           <ul>
             <li>
-              K3では <code className={styles.inlineCode}>max_completion_tokens</code>{" "}
-              の<strong>デフォルトが131,072トークン</strong>で、<strong>最大1,048,576トークンまで</strong>設定可能です。
+              K3では <code className={styles.inlineCode}>max_completion_tokens</code> の
+              <strong>デフォルトが131,072トークン</strong>で、
+              <strong>最大1,048,576トークンまで</strong>設定可能です。
             </li>
             <li>
-              応答が途中で切れた場合、<code className={styles.inlineCode}>finish_reason</code> は{" "}
+              応答が途中で切れた場合、<code className={styles.inlineCode}>finish_reason</code> は{' '}
               <code className={styles.inlineCode}>"length"</code> になります。この場合は
               <a href="#partial-mode">9. Partial Mode</a>を使って続きを生成させます。
             </li>
@@ -703,7 +715,7 @@ export default function KimiLlmBestPracticesPage() {
             </li>
           </ul>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://platform.kimi.ai/docs/guide/kimi-k3-quickstart">
               Kimi K3 - Kimi API Platform
             </Ext>
@@ -712,8 +724,8 @@ export default function KimiLlmBestPracticesPage() {
           <h3>5.3 stream=True を基本にする</h3>
           <p>
             長い出力は生成に数分かかることがあり、アイドル状態のTCP接続はネットワーク経路で切断される場合があります。ストリーミングを有効にすると接続が生かされ続け、信頼性が大きく向上します。
-            K3のストリーミング応答では <code className={styles.inlineCode}>reasoning_content</code>{" "}
-            と最終回答 <code className={styles.inlineCode}>content</code>{" "}
+            K3のストリーミング応答では <code className={styles.inlineCode}>reasoning_content</code>{' '}
+            と最終回答 <code className={styles.inlineCode}>content</code>{' '}
             が別々のデルタとして返されます。
           </p>
           <div className={styles.codeWrap}>
@@ -726,12 +738,12 @@ export default function KimiLlmBestPracticesPage() {
                 <span>stream = client.chat.completions.create(</span>
               </div>
               <div className={styles.codeLine}>
-                <span> model=</span>
+                <span>    model=</span>
                 <span className={styles.cs}>"kimi-k3"</span>
                 <span>,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> messages=[&#123;</span>
+                <span>    messages=[&#123;</span>
                 <span className={styles.cs}>"role"</span>
                 <span>: </span>
                 <span className={styles.cs}>"user"</span>
@@ -742,7 +754,7 @@ export default function KimiLlmBestPracticesPage() {
                 <span>&#125;],</span>
               </div>
               <div className={styles.codeLine}>
-                <span> stream=True,</span>
+                <span>    stream=True,</span>
               </div>
               <div className={styles.codeLine}>
                 <span>)</span>
@@ -755,31 +767,35 @@ export default function KimiLlmBestPracticesPage() {
                 <span> stream:</span>
               </div>
               <div className={styles.codeLine}>
-                <span> delta = chunk.choices[0].delta</span>
+                <span>    delta = chunk.choices[0].delta</span>
               </div>
               <div className={styles.codeLine}>
-                <span> reasoning = </span>
+                <span>    reasoning = </span>
                 <span className={styles.ck}>getattr</span>
                 <span>(delta, </span>
                 <span className={styles.cs}>"reasoning_content"</span>
                 <span>, None)</span>
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.ck}> if</span>
+                <span>    </span>
+                <span className={styles.ck}>if</span>
                 <span> reasoning:</span>
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.ck}> print</span>
+                <span>        </span>
+                <span className={styles.ck}>print</span>
                 <span>(reasoning, end=</span>
                 <span className={styles.cs}>""</span>
                 <span>, flush=True)</span>
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.ck}> if</span>
+                <span>    </span>
+                <span className={styles.ck}>if</span>
                 <span> delta.content:</span>
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.ck}> print</span>
+                <span>        </span>
+                <span className={styles.ck}>print</span>
                 <span>(delta.content, end=</span>
                 <span className={styles.cs}>""</span>
                 <span>, flush=True)</span>
@@ -787,7 +803,7 @@ export default function KimiLlmBestPracticesPage() {
             </div>
           </div>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://platform.kimi.ai/docs/guide/kimi-k3-quickstart">
               Kimi K3 - Kimi API Platform
             </Ext>
@@ -804,7 +820,7 @@ export default function KimiLlmBestPracticesPage() {
             公式ドキュメントの核心的な考え方は「モデルはあなたの心を読めない」という一文に集約されます。
           </p>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://platform.kimi.ai/docs/guide/prompt-best-practice">
               Best Practices for Prompts - Kimi API Platform
             </Ext>
@@ -818,19 +834,27 @@ export default function KimiLlmBestPracticesPage() {
             </div>
             <div className={styles.codeBody}>
               <div className={styles.codeLine}>
-                <span>You are Kimi, an artificial intelligence assistant provided by Moonshot AI.</span>
+                <span>
+                  You are Kimi, an artificial intelligence assistant provided by Moonshot AI.
+                </span>
               </div>
               <div className={styles.codeLine}>
-                <span>You are more proficient in Chinese and English conversations. You provide</span>
+                <span>
+                  You are more proficient in Chinese and English conversations. You provide
+                </span>
               </div>
               <div className={styles.codeLine}>
-                <span>users with safe, helpful, and accurate answers. At the same time, you will</span>
+                <span>
+                  users with safe, helpful, and accurate answers. At the same time, you will
+                </span>
               </div>
               <div className={styles.codeLine}>
                 <span>refuse to answer any questions involving terrorism, racism, or explicit</span>
               </div>
               <div className={styles.codeLine}>
-                <span>violence. Moonshot AI is a proper noun and should not be translated into</span>
+                <span>
+                  violence. Moonshot AI is a proper noun and should not be translated into
+                </span>
               </div>
               <div className={styles.codeLine}>
                 <span>other languages.</span>
@@ -838,7 +862,7 @@ export default function KimiLlmBestPracticesPage() {
             </div>
           </div>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://platform.kimi.ai/docs/guide/prompt-best-practice">
               Best Practices for Prompts - Kimi API Platform
             </Ext>
@@ -851,9 +875,9 @@ export default function KimiLlmBestPracticesPage() {
               "Generate an SVG of a pelican riding a bicycle"
             </code>
             という一見短いプロンプトが <strong>95トークン</strong>
-            とカウントされ、OpenAI/Anthropicの他モデルの同一プロンプト(10〜30トークン程度)より明らかに多いことが分かりました。さらに{" "}
+            とカウントされ、OpenAI/Anthropicの他モデルの同一プロンプト(10〜30トークン程度)より明らかに多いことが分かりました。さらに{' '}
             <code className={styles.inlineCode}>"hi"</code>という1単語のプロンプトだけで
-            <strong>86トークン</strong>とカウントされたことから、モデル側に{" "}
+            <strong>86トークン</strong>とカウントされたことから、モデル側に{' '}
             <strong>約85トークンの隠しシステムプロンプトが存在する可能性</strong>
             が指摘されています。Hacker
             Newsでの検証では、モデルはこの隠しプロンプトの内容を尋ねても開示を拒否したと報告されています。
@@ -863,11 +887,11 @@ export default function KimiLlmBestPracticesPage() {
             :自分で明示的なシステムプロンプトを設定していなくても、見えないところでトークンが消費されている可能性があります。コスト試算や「なぜこんなに入力トークンが多いのか」という疑問が生じた場合は、この点を念頭に置いてください。
           </div>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://simonwillison.net/2026/Jul/16/kimi-k3/">
               Kimi K3, and what we can still learn from the pelican benchmark - Simon Willison
             </Ext>
-            ,{" "}
+            ,{' '}
             <Ext href="https://news.ycombinator.com/item?id=48935342">
               Kimi K3 is now live | Hacker News
             </Ext>
@@ -876,8 +900,8 @@ export default function KimiLlmBestPracticesPage() {
           <h3>6.3 明確さの原則(4つのチェック)</h3>
           <ol>
             <li>
-              <strong>役割を与える</strong>:<code className={styles.inlineCode}>messages</code> の{" "}
-              <code className={styles.inlineCode}>system</code>{" "}
+              <strong>役割を与える</strong>:<code className={styles.inlineCode}>messages</code> の{' '}
+              <code className={styles.inlineCode}>system</code>{' '}
               フィールドで、モデルに期待する役割・専門性を明示する。
             </li>
             <li>
@@ -894,7 +918,7 @@ export default function KimiLlmBestPracticesPage() {
             </li>
           </ol>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://platform.kimi.ai/docs/guide/prompt-best-practice">
               Best Practices for Prompts - Kimi API Platform
             </Ext>
@@ -902,14 +926,14 @@ export default function KimiLlmBestPracticesPage() {
 
           <h3>6.4 ツール利用時はシステムプロンプトで指図しすぎない</h3>
           <p>
-            <code className={styles.inlineCode}>tools</code>{" "}
+            <code className={styles.inlineCode}>tools</code>{' '}
             パラメータで公式ツールを渡した場合、Kimiは自律的に「使うべきか・いつ使うか」を判断します。
             システムプロンプト側でツールの使い方を細かく指定すると、かえってこの自律的な意思決定を妨げる可能性があるため、
             <strong>ツールの使用方法そのものはシステムプロンプトに書かない</strong>
             というのが公式の推奨です。
           </p>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://platform.kimi.ai/docs/guide/use-kimi-k2-to-setup-agent">
               Use Kimi K2.6 Model to Setup Agent - Kimi API Platform
             </Ext>
@@ -952,45 +976,45 @@ export default function KimiLlmBestPracticesPage() {
                 <span>tools = [&#123;</span>
               </div>
               <div className={styles.codeLine}>
-                <span> </span>
+                <span>    </span>
                 <span className={styles.cs}>"type"</span>
                 <span>: </span>
                 <span className={styles.cs}>"function"</span>
                 <span>,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> </span>
+                <span>    </span>
                 <span className={styles.cs}>"function"</span>
                 <span>: &#123;</span>
               </div>
               <div className={styles.codeLine}>
-                <span> </span>
+                <span>        </span>
                 <span className={styles.cs}>"name"</span>
                 <span>: </span>
                 <span className={styles.cs}>"get_weather"</span>
                 <span>,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> </span>
+                <span>        </span>
                 <span className={styles.cs}>"description"</span>
                 <span>: </span>
                 <span className={styles.cs}>"Get the weather for a city"</span>
                 <span>,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> </span>
+                <span>        </span>
                 <span className={styles.cs}>"parameters"</span>
                 <span>: &#123;</span>
               </div>
               <div className={styles.codeLine}>
-                <span> </span>
+                <span>            </span>
                 <span className={styles.cs}>"type"</span>
                 <span>: </span>
                 <span className={styles.cs}>"object"</span>
                 <span>,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> </span>
+                <span>            </span>
                 <span className={styles.cs}>"properties"</span>
                 <span>: &#123;</span>
                 <span className={styles.cs}>"city"</span>
@@ -1001,17 +1025,17 @@ export default function KimiLlmBestPracticesPage() {
                 <span>&#125;&#125;,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> </span>
+                <span>            </span>
                 <span className={styles.cs}>"required"</span>
                 <span>: [</span>
                 <span className={styles.cs}>"city"</span>
                 <span>],</span>
               </div>
               <div className={styles.codeLine}>
-                <span> &#125;,</span>
+                <span>        &#125;,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> &#125;,</span>
+                <span>    &#125;,</span>
               </div>
               <div className={styles.codeLine}>
                 <span>&#125;]</span>
@@ -1033,18 +1057,18 @@ export default function KimiLlmBestPracticesPage() {
                 <span>first = client.chat.completions.create(</span>
               </div>
               <div className={styles.codeLine}>
-                <span> model=</span>
+                <span>    model=</span>
                 <span className={styles.cs}>"kimi-k3"</span>
                 <span>,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> messages=messages,</span>
+                <span>    messages=messages,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> tools=tools,</span>
+                <span>    tools=tools,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> tool_choice=</span>
+                <span>    tool_choice=</span>
                 <span className={styles.cs}>"required"</span>
                 <span>,</span>
               </div>
@@ -1067,10 +1091,10 @@ export default function KimiLlmBestPracticesPage() {
                 <span> []:</span>
               </div>
               <div className={styles.codeLine}>
-                <span> arguments = json.loads(tool_call.function.arguments)</span>
+                <span>    arguments = json.loads(tool_call.function.arguments)</span>
               </div>
               <div className={styles.codeLine}>
-                <span> result = json.dumps(&#123;</span>
+                <span>    result = json.dumps(&#123;</span>
                 <span className={styles.cs}>"city"</span>
                 <span>: arguments[</span>
                 <span className={styles.cs}>"city"</span>
@@ -1083,7 +1107,7 @@ export default function KimiLlmBestPracticesPage() {
                 <span>: 24&#125;)</span>
               </div>
               <div className={styles.codeLine}>
-                <span> messages.append(&#123;</span>
+                <span>    messages.append(&#123;</span>
                 <span className={styles.cs}>"role"</span>
                 <span>: </span>
                 <span className={styles.cs}>"tool"</span>
@@ -1106,14 +1130,15 @@ export default function KimiLlmBestPracticesPage() {
             </div>
           </div>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://platform.kimi.ai/docs/guide/kimi-k3-quickstart">
               Kimi K3 - Kimi API Platform
             </Ext>
           </p>
 
           <div className={`${styles.callout} ${styles.calloutNew}`}>
-            <strong>K3の新機能</strong>:<code className={styles.inlineCode}>tool_choice="required"</code>
+            <strong>K3の新機能</strong>:
+            <code className={styles.inlineCode}>tool_choice="required"</code>
             を使うと、最初のターンで必ず何らかのツールを呼び出させることができます(K2系列にはなかった値)。また、マルチターンやツール呼び出しでは
             <strong>アシスタントメッセージ全体をそのまま次のリクエストに含める</strong>必要があり、
             <code className={styles.inlineCode}>content</code>だけを保持するのは不可です。
@@ -1135,7 +1160,9 @@ export default function KimiLlmBestPracticesPage() {
     D --> E["reasoning_effort は会話開始前に決めておく(会話途中での変更は非推奨)"]`}
             />
           </div>
-          <div className={styles.diagramCaption}>図6: K3公式のツール事前検索+動的ロードパターン</div>
+          <div className={styles.diagramCaption}>
+            図6: K3公式のツール事前検索+動的ロードパターン
+          </div>
 
           <div className={styles.codeWrap}>
             <div className={styles.codeBar}>
@@ -1147,7 +1174,7 @@ export default function KimiLlmBestPracticesPage() {
                 <span>dynamic_messages = [</span>
               </div>
               <div className={styles.codeLine}>
-                <span> &#123;</span>
+                <span>    &#123;</span>
                 <span className={styles.cs}>"role"</span>
                 <span>: </span>
                 <span className={styles.cs}>"user"</span>
@@ -1158,60 +1185,60 @@ export default function KimiLlmBestPracticesPage() {
                 <span>&#125;,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> &#123;</span>
+                <span>    &#123;</span>
               </div>
               <div className={styles.codeLine}>
-                <span> </span>
+                <span>        </span>
                 <span className={styles.cs}>"role"</span>
                 <span>: </span>
                 <span className={styles.cs}>"system"</span>
                 <span>,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> </span>
+                <span>        </span>
                 <span className={styles.cs}>"tools"</span>
                 <span>: [&#123;</span>
               </div>
               <div className={styles.codeLine}>
-                <span> </span>
+                <span>            </span>
                 <span className={styles.cs}>"type"</span>
                 <span>: </span>
                 <span className={styles.cs}>"function"</span>
                 <span>,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> </span>
+                <span>            </span>
                 <span className={styles.cs}>"function"</span>
                 <span>: &#123;</span>
               </div>
               <div className={styles.codeLine}>
-                <span> </span>
+                <span>                </span>
                 <span className={styles.cs}>"name"</span>
                 <span>: </span>
                 <span className={styles.cs}>"calculate"</span>
                 <span>,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> </span>
+                <span>                </span>
                 <span className={styles.cs}>"description"</span>
                 <span>: </span>
                 <span className={styles.cs}>"Evaluate an arithmetic expression"</span>
                 <span>,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> </span>
+                <span>                </span>
                 <span className={styles.cs}>"parameters"</span>
                 <span>: &#123;</span>
               </div>
               <div className={styles.codeLine}>
-                <span> </span>
+                <span>                    </span>
                 <span className={styles.cs}>"type"</span>
                 <span>: </span>
                 <span className={styles.cs}>"object"</span>
                 <span>,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> </span>
+                <span>                    </span>
                 <span className={styles.cs}>"properties"</span>
                 <span>: &#123;</span>
                 <span className={styles.cs}>"expression"</span>
@@ -1222,23 +1249,23 @@ export default function KimiLlmBestPracticesPage() {
                 <span>&#125;&#125;,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> </span>
+                <span>                    </span>
                 <span className={styles.cs}>"required"</span>
                 <span>: [</span>
                 <span className={styles.cs}>"expression"</span>
                 <span>],</span>
               </div>
               <div className={styles.codeLine}>
-                <span> &#125;,</span>
+                <span>                &#125;,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> &#125;,</span>
+                <span>            &#125;,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> &#125;],</span>
+                <span>        &#125;],</span>
               </div>
               <div className={styles.codeLine}>
-                <span> &#125;,</span>
+                <span>    &#125;,</span>
               </div>
               <div className={styles.codeLine}>
                 <span>]</span>
@@ -1264,19 +1291,19 @@ export default function KimiLlmBestPracticesPage() {
             </li>
             <li>
               <code className={styles.inlineCode}>messages</code>の<strong>末尾</strong>
-              にツール宣言を追加する分にはプレフィックスキャッシュに影響しませんが、<strong>途中にある</strong>
+              にツール宣言を追加する分にはプレフィックスキャッシュに影響しませんが、
+              <strong>途中にある</strong>
               ツール宣言を変更・削除すると、それ以降のキャッシュヒットに影響します。
             </li>
             <li>
               <code className={styles.inlineCode}>reasoning_effort</code>
-              は会話開始前に決めておくべきパラメータで、現在は<code className={styles.inlineCode}>
-                "max"
-              </code>
+              は会話開始前に決めておくべきパラメータで、現在は
+              <code className={styles.inlineCode}>"max"</code>
               のみサポートされています。
             </li>
           </ul>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://platform.kimi.ai/docs/guide/kimi-k3-tool-calling-best-practice">
               Kimi K3 API Tool Calling Best Practices - Kimi API Platform
             </Ext>
@@ -1284,23 +1311,25 @@ export default function KimiLlmBestPracticesPage() {
 
           <h3>7.3 公式ツールは「Formula」フレームワーク経由に統合(K3)</h3>
           <p>
-            K3では公式ツールが <strong>Formula</strong> という仕組みを通じて提供されるようになりました。
+            K3では公式ツールが <strong>Formula</strong>{' '}
+            という仕組みを通じて提供されるようになりました。
           </p>
           <ol>
             <li>
-              Formulaの <code className={styles.inlineCode}>/tools</code>{" "}
+              Formulaの <code className={styles.inlineCode}>/tools</code>{' '}
               エンドポイントからツール定義を取得する。
             </li>
             <li>
-              その定義を Chat Completions の <code className={styles.inlineCode}>tools</code>{" "}
+              その定義を Chat Completions の <code className={styles.inlineCode}>tools</code>{' '}
               フィールドに追加する。
             </li>
             <li>
-              モデルが <code className={styles.inlineCode}>tool_calls</code> を返したら、各関数名と引数を
-              Formula の <code className={styles.inlineCode}>/fibers</code> エンドポイントに送信する。
+              モデルが <code className={styles.inlineCode}>tool_calls</code>{' '}
+              を返したら、各関数名と引数を Formula の{' '}
+              <code className={styles.inlineCode}>/fibers</code> エンドポイントに送信する。
             </li>
             <li>
-              完全なアシスタントメッセージと Fiber の出力を、対応する tool{" "}
+              完全なアシスタントメッセージと Fiber の出力を、対応する tool{' '}
               メッセージとして追加する。
             </li>
             <li>モデルが最終回答を返すまで Chat Completions を呼び出し続ける。</li>
@@ -1310,7 +1339,7 @@ export default function KimiLlmBestPracticesPage() {
             :公式ドキュメントには「Web検索は現在更新中であり、近い将来の本番ワークフローでの使用は推奨されない」と明記されています。K3でリアルタイム検索が必要な場合は、この制約を踏まえて自前の検索ツールを実装するか、慎重に検証してから利用してください。
           </div>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://platform.kimi.ai/docs/guide/kimi-k3-quickstart">
               Kimi K3 - Kimi API Platform
             </Ext>
@@ -1321,8 +1350,12 @@ export default function KimiLlmBestPracticesPage() {
             <li>
               ツールは<strong>単機能・小さく</strong>設計する(検索・取得・更新など役割を分離)。
             </li>
-            <li>ツールの出力フォーマットは<strong>一貫したJSON</strong>にする。</li>
-            <li>ツール実行には<strong>タイムアウトとリトライ</strong>を必ず設定する。</li>
+            <li>
+              ツールの出力フォーマットは<strong>一貫したJSON</strong>にする。
+            </li>
+            <li>
+              ツール実行には<strong>タイムアウトとリトライ</strong>を必ず設定する。
+            </li>
             <li>
               すべてのツール呼び出しについて、監査に必要な最小限のメタデータのみを
               <strong>ログに記録</strong>
@@ -1333,7 +1366,7 @@ export default function KimiLlmBestPracticesPage() {
             </li>
           </ul>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://agentsapis.com/kimi-api/">
               Kimi API (Moonshot AI) - Complete Developer Guide
             </Ext>
@@ -1366,15 +1399,15 @@ export default function KimiLlmBestPracticesPage() {
 
           <h3>8.1 reasoning_contentを必ず保持する</h3>
           <p>
-            思考が常時有効なモデル(K2.6思考時・K2.7
-            Code・K3すべて)では、過去のassistantメッセージを<strong>完全な形のまま</strong>
+            思考が常時有効なモデル(K2.6思考時・K2.7 Code・K3すべて)では、過去のassistantメッセージを
+            <strong>完全な形のまま</strong>
             次のリクエストのメッセージ履歴に含めなければなりません。
             K3の公式ドキュメントは「マルチターンの会話やツール呼び出しでは、APIが返した完全なアシスタントメッセージを次のリクエストに追加すること。
             <code className={styles.inlineCode}>content</code>
             だけを保持しないこと」と明記しています。
           </p>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://platform.kimi.ai/docs/guide/kimi-k3-quickstart">
               Kimi K3 - Kimi API Platform
             </Ext>
@@ -1385,7 +1418,8 @@ export default function KimiLlmBestPracticesPage() {
             K3は現時点で<code className={styles.inlineCode}>reasoning_effort="max"</code>
             しかサポートしておらず、軽いタスクでも重い推論を行います。Simon Willison氏の検証では、
             単純なSVG生成タスクで16,658個の出力トークンのうち13,241個が思考トークンで、コストは25セントに達しました。Hacker
-            Newsのコミュニティも 「推論効率(reasoning efficiency)はモデルの実質的なコストに直結する」「GPT系モデルは推論効率が高く、Kimi
+            Newsのコミュニティも 「推論効率(reasoning
+            efficiency)はモデルの実質的なコストに直結する」「GPT系モデルは推論効率が高く、Kimi
             K3が同じタスクにより多くの思考トークンを使うなら、
             見かけの単価が安くてもコスト効率で負ける可能性がある」と指摘しています。
           </p>
@@ -1393,14 +1427,15 @@ export default function KimiLlmBestPracticesPage() {
             <strong>実務上の示唆</strong>
             :簡単なQ&Aやテンプレート的なタスクにK3を使うと、不必要に高コストになる可能性があります。軽量なタスクには
             <code className={styles.inlineCode}>kimi-k2.6</code>や
-            <code className={styles.inlineCode}>kimi-k2.7-code</code>を使い分けることを検討してください。
+            <code className={styles.inlineCode}>kimi-k2.7-code</code>
+            を使い分けることを検討してください。
           </div>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://simonwillison.net/2026/Jul/16/kimi-k3/">
               Kimi K3, and what we can still learn from the pelican benchmark - Simon Willison
             </Ext>
-            ,{" "}
+            ,{' '}
             <Ext href="https://news.ycombinator.com/item?id=48935342">
               Kimi K3 is now live | Hacker News
             </Ext>
@@ -1417,11 +1452,11 @@ export default function KimiLlmBestPracticesPage() {
             いずれのモデルでも公式ドキュメントに明記された許容値の範囲で使うことが重要です。
           </p>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://platform.moonshot.ai/docs/guide/benchmark-best-practice">
               Best Practices for Benchmarking
             </Ext>
-            ,{" "}
+            ,{' '}
             <Ext href="https://platform.kimi.ai/docs/guide/kimi-k3-quickstart">
               Kimi K3 - Kimi API Platform
             </Ext>
@@ -1452,15 +1487,15 @@ export default function KimiLlmBestPracticesPage() {
                 <span>completion = client.chat.completions.create(</span>
               </div>
               <div className={styles.codeLine}>
-                <span> model=</span>
+                <span>    model=</span>
                 <span className={styles.cs}>"kimi-k3"</span>
                 <span>,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> messages=[</span>
+                <span>    messages=[</span>
               </div>
               <div className={styles.codeLine}>
-                <span> &#123;</span>
+                <span>        &#123;</span>
                 <span className={styles.cs}>"role"</span>
                 <span>: </span>
                 <span className={styles.cs}>"user"</span>
@@ -1473,7 +1508,7 @@ export default function KimiLlmBestPracticesPage() {
                 <span>&#125;,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> &#123;</span>
+                <span>        &#123;</span>
                 <span className={styles.cs}>"role"</span>
                 <span>: </span>
                 <span className={styles.cs}>"assistant"</span>
@@ -1484,7 +1519,7 @@ export default function KimiLlmBestPracticesPage() {
                 <span>: True&#125;,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> ],</span>
+                <span>    ],</span>
               </div>
               <div className={styles.codeLine}>
                 <span>)</span>
@@ -1503,19 +1538,18 @@ export default function KimiLlmBestPracticesPage() {
             応答には先頭に与えたプレフィックス自体は含まれないため、呼び出し側で手動で連結する必要があります。
           </p>
           <div className={`${styles.callout} ${styles.calloutWarn}`}>
-            <strong>注意</strong>:Partial Modeと<code className={styles.inlineCode}>
-              response_format=json_object
-            </code>
+            <strong>注意</strong>:Partial Modeと
+            <code className={styles.inlineCode}>response_format=json_object</code>
             (またはK3の<code className={styles.inlineCode}>json_schema</code>
             )は併用しないでください。予期しない応答になる可能性があります。また、思考モデルで途中から継続する場合は、前回の
             <code className={styles.inlineCode}>reasoning_content</code>も一緒に渡す必要があります。
           </div>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://platform.kimi.ai/docs/guide/kimi-k3-quickstart">
               Kimi K3 - Kimi API Platform
             </Ext>
-            ,{" "}
+            ,{' '}
             <Ext href="https://platform.kimi.ai/docs/api/partial">
               Partial Mode - Kimi API Platform
             </Ext>
@@ -1561,7 +1595,7 @@ export default function KimiLlmBestPracticesPage() {
             </li>
           </ul>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://platform.kimi.ai/docs/guide/kimi-k3-quickstart">
               Kimi K3 - Kimi API Platform
             </Ext>
@@ -1611,30 +1645,30 @@ export default function KimiLlmBestPracticesPage() {
                 <span>completion = client.chat.completions.create(</span>
               </div>
               <div className={styles.codeLine}>
-                <span> model=</span>
+                <span>    model=</span>
                 <span className={styles.cs}>"kimi-k3"</span>
                 <span>,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> messages=[</span>
+                <span>    messages=[</span>
               </div>
               <div className={styles.codeLine}>
-                <span> &#123;</span>
+                <span>        &#123;</span>
               </div>
               <div className={styles.codeLine}>
-                <span> </span>
+                <span>            </span>
                 <span className={styles.cs}>"role"</span>
                 <span>: </span>
                 <span className={styles.cs}>"user"</span>
                 <span>,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> </span>
+                <span>            </span>
                 <span className={styles.cs}>"content"</span>
                 <span>: [</span>
               </div>
               <div className={styles.codeLine}>
-                <span> &#123;</span>
+                <span>                &#123;</span>
                 <span className={styles.cs}>"type"</span>
                 <span>: </span>
                 <span className={styles.cs}>"image_url"</span>
@@ -1647,7 +1681,7 @@ export default function KimiLlmBestPracticesPage() {
                 <span>&#125;&#125;,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> &#123;</span>
+                <span>                &#123;</span>
                 <span className={styles.cs}>"type"</span>
                 <span>: </span>
                 <span className={styles.cs}>"text"</span>
@@ -1658,13 +1692,13 @@ export default function KimiLlmBestPracticesPage() {
                 <span>&#125;,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> ],</span>
+                <span>            ],</span>
               </div>
               <div className={styles.codeLine}>
-                <span> &#125;</span>
+                <span>        &#125;</span>
               </div>
               <div className={styles.codeLine}>
-                <span> ],</span>
+                <span>    ],</span>
               </div>
               <div className={styles.codeLine}>
                 <span>)</span>
@@ -1689,11 +1723,11 @@ export default function KimiLlmBestPracticesPage() {
             「白いペリカンが赤いスカーフを巻き、赤い自転車に乗っている」といった非常に精度の高い説明文が得られたと報告されており、視覚理解の質自体は高く評価されています。
           </p>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://platform.kimi.ai/docs/guide/kimi-k3-quickstart">
               Kimi K3 - Kimi API Platform
             </Ext>
-            ,{" "}
+            ,{' '}
             <Ext href="https://simonwillison.net/2026/Jul/16/kimi-k3/">
               Kimi K3, and what we can still learn from the pelican benchmark - Simon Willison
             </Ext>
@@ -1707,7 +1741,7 @@ export default function KimiLlmBestPracticesPage() {
           </h2>
           <p>
             料金は変更されやすいため、契約・予算設計の前に必ず公式の料金ページ(
-            <Ext href="https://platform.kimi.ai/docs/pricing/chat-k3">Kimi K3</Ext> /{" "}
+            <Ext href="https://platform.kimi.ai/docs/pricing/chat-k3">Kimi K3</Ext> /{' '}
             <Ext href="https://platform.kimi.ai/docs/pricing/chat-k26">Kimi K2.6</Ext>
             )で最新の値を確認してください。
             以下は2026年7月17〜18日時点で複数の一次情報・独立系情報が一致して報告している値です(単位:USD
@@ -1769,8 +1803,11 @@ export default function KimiLlmBestPracticesPage() {
             </table>
           </div>
           <p className={styles.sourceNote}>
-            出典: <Ext href="https://simonwillison.net/2026/Jul/16/kimi-k3/">Simon Willison - Kimi K3</Ext>
-            ,{" "}
+            出典:{' '}
+            <Ext href="https://simonwillison.net/2026/Jul/16/kimi-k3/">
+              Simon Willison - Kimi K3
+            </Ext>
+            ,{' '}
             <Ext href="https://www.verdent.ai/guides/agents/kimi-k3-api-guide">
               Kimi K3 API Guide - Verdent Guides
             </Ext>
@@ -1795,8 +1832,11 @@ export default function KimiLlmBestPracticesPage() {
             </li>
           </ul>
           <p className={styles.sourceNote}>
-            出典: <Ext href="https://simonwillison.net/2026/Jul/16/kimi-k3/">Simon Willison - Kimi K3</Ext>
-            ,{" "}
+            出典:{' '}
+            <Ext href="https://simonwillison.net/2026/Jul/16/kimi-k3/">
+              Simon Willison - Kimi K3
+            </Ext>
+            ,{' '}
             <Ext href="https://news.ycombinator.com/item?id=48935342">
               Kimi K3 is now live | Hacker News
             </Ext>
@@ -1834,11 +1874,11 @@ export default function KimiLlmBestPracticesPage() {
             </table>
           </div>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://aireiter.com/blog/kimi-k3-pricing">
               Kimi K3 Pricing: API Cost and Whether It's Worth It
             </Ext>
-            ,{" "}
+            ,{' '}
             <Ext href="https://felloai.com/kimi-pricing/">
               Kimi Pricing 2026: Plans, API Costs & Free Tier
             </Ext>
@@ -1870,7 +1910,8 @@ export default function KimiLlmBestPracticesPage() {
             </li>
           </ul>
           <p className={styles.sourceNote}>
-            出典: <Ext href="https://platform.kimi.ai/docs/models">Model List - Kimi API Platform</Ext>
+            出典:{' '}
+            <Ext href="https://platform.kimi.ai/docs/models">Model List - Kimi API Platform</Ext>
           </p>
         </section>
 
@@ -1880,13 +1921,15 @@ export default function KimiLlmBestPracticesPage() {
             <span className={styles.badge}>13</span>レート制限と信頼性
           </h2>
           <p>
-            Kimi
-            APIのレート制限は、固定のプラン(Free/Pro/Enterpriseなど)ではなく、<strong>アカウントへの累計チャージ額に応じたティア制</strong>で決まります。必ず自分のコンソールの制限ページで最新の値を確認してください。
+            Kimi APIのレート制限は、固定のプラン(Free/Pro/Enterpriseなど)ではなく、
+            <strong>アカウントへの累計チャージ額に応じたティア制</strong>
+            で決まります。必ず自分のコンソールの制限ページで最新の値を確認してください。
           </p>
           <h3>13.1 信頼性を高める実装のコツ</h3>
           <ul>
             <li>
-              <code className={styles.inlineCode}>stream=True</code>を基本にし、長時間リクエストの接続断を防ぐ。
+              <code className={styles.inlineCode}>stream=True</code>
+              を基本にし、長時間リクエストの接続断を防ぐ。
             </li>
             <li>429(レート制限超過)エラーに対して、指数バックオフ付きのリトライを実装する。</li>
             <li>
@@ -1899,7 +1942,10 @@ export default function KimiLlmBestPracticesPage() {
             </li>
           </ul>
           <p className={styles.sourceNote}>
-            出典: <Ext href="https://simonwillison.net/2026/Jul/16/kimi-k3/">Simon Willison - Kimi K3</Ext>
+            出典:{' '}
+            <Ext href="https://simonwillison.net/2026/Jul/16/kimi-k3/">
+              Simon Willison - Kimi K3
+            </Ext>
           </p>
         </section>
 
@@ -1922,7 +1968,9 @@ export default function KimiLlmBestPracticesPage() {
     E --> F["6. 小規模なタスクでテストし反復改善する"]`}
             />
           </div>
-          <div className={styles.diagramCaption}>図9: 業界リサーチAIエージェントの構築ワークフロー</div>
+          <div className={styles.diagramCaption}>
+            図9: 業界リサーチAIエージェントの構築ワークフロー
+          </div>
 
           <ol>
             <li>
@@ -1943,7 +1991,7 @@ export default function KimiLlmBestPracticesPage() {
             </li>
           </ol>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://platform.kimi.ai/docs/guide/use-kimi-k2-to-setup-agent">
               Use Kimi K2.6 Model to Setup Agent - Kimi API Platform
             </Ext>
@@ -1986,20 +2034,23 @@ export default function KimiLlmBestPracticesPage() {
             <strong>実務上の推奨</strong>
             <ul>
               <li>
-                顧客案件・機密情報・NDA対象の内容・個人情報などは、<strong>コンシューマー版のkimi.com上で直接扱わない</strong>。
+                顧客案件・機密情報・NDA対象の内容・個人情報などは、
+                <strong>コンシューマー版のkimi.com上で直接扱わない</strong>。
               </li>
               <li>
                 本番・業務利用では、必ずAPIプラットフォーム(利用規約でデータの扱いが別途定義されている)を経由するか、OpenRouterなどのサードパーティ推論プロバイダ、あるいは自己ホスティングを検討する。
               </li>
               <li>
                 契約・法務上の判断が必要な場合は、必ず最新の
-                <Ext href="https://platform.moonshot.ai/">Moonshot AIのプライバシーポリシー・利用規約</Ext>
+                <Ext href="https://platform.moonshot.ai/">
+                  Moonshot AIのプライバシーポリシー・利用規約
+                </Ext>
                 を自分で確認する(本ガイドは法的助言ではありません)。
               </li>
             </ul>
           </div>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://generativeai.pub/kimi-k2-5-is-brilliant-but-think-twice-about-using-kimi-com-157cbb26f9a3">
               Kimi K2.5 is brilliant, but think twice about using Kimi.com - Medium
             </Ext>
@@ -2015,7 +2066,11 @@ export default function KimiLlmBestPracticesPage() {
           </p>
           <ul>
             <li>
-              エンドユーザー向けに公開するプロダクトでは、<strong>モデル自身の安全策だけに依存せず、独自の入出力モデレーション層を追加する</strong>。
+              エンドユーザー向けに公開するプロダクトでは、
+              <strong>
+                モデル自身の安全策だけに依存せず、独自の入出力モデレーション層を追加する
+              </strong>
+              。
             </li>
             <li>
               本番投入前に、Promptfooのようなレッドチーミングツールで自社のユースケースに即した安全性検証を行う。
@@ -2025,11 +2080,11 @@ export default function KimiLlmBestPracticesPage() {
             </li>
           </ul>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://thezvi.substack.com/p/kimi-k2-thinking">
               Kimi K2 Thinking - Zvi Mowshowitz
             </Ext>
-            ,{" "}
+            ,{' '}
             <Ext href="https://dev.to/ayush7614/the-untold-misadventures-of-red-teaming-kimi-k2-with-promptfoo-3hig">
               The Untold Misadventures of Red Teaming Kimi K2 with Promptfoo - DEV Community
             </Ext>
@@ -2138,11 +2193,11 @@ export default function KimiLlmBestPracticesPage() {
             </table>
           </div>
           <p className={styles.sourceNote}>
-            出典:{" "}
+            出典:{' '}
             <Ext href="https://platform.kimi.ai/docs/guide/kimi-k3-quickstart">
               Kimi K3 - Kimi API Platform
             </Ext>
-            ,{" "}
+            ,{' '}
             <Ext href="https://platform.kimi.ai/docs/guide/kimi-k3-tool-calling-best-practice">
               Kimi K3 API Tool Calling Best Practices
             </Ext>
@@ -2160,7 +2215,9 @@ export default function KimiLlmBestPracticesPage() {
           </p>
 
           <div className={styles.personCard}>
-            <div className={styles.personCardWho}>Simon Willison氏(Django共同開発者、著名AIブロガー)</div>
+            <div className={styles.personCardWho}>
+              Simon Willison氏(Django共同開発者、著名AIブロガー)
+            </div>
             <p>
               新しいLLMがリリースされるたびに「ペリカンが自転車に乗っているSVGを生成させる」という独自の簡易ベンチマークを実施していることで著名です。K3に関する氏の投稿から得られる実務的な知見:
             </p>
@@ -2169,7 +2226,8 @@ export default function KimiLlmBestPracticesPage() {
                 実際にモデルを動かして試すことの重要性:簡単なプロンプトを一つ実行するだけでも「思考トークンの消費量」「隠れた挙動」など多くの実務情報が得られる。
               </li>
               <li>
-                K3は現状思考の強度(reasoning effort)が"max"の1段階しかなく、簡単なタスクでも高コストになりがち。
+                K3は現状思考の強度(reasoning
+                effort)が"max"の1段階しかなく、簡単なタスクでも高コストになりがち。
               </li>
               <li>
                 OpenRouterや<code className={styles.inlineCode}>llm</code>
@@ -2181,11 +2239,11 @@ export default function KimiLlmBestPracticesPage() {
               </li>
             </ul>
             <p className={styles.sourceNote}>
-              出典:{" "}
+              出典:{' '}
               <Ext href="https://simonwillison.net/2026/Jul/16/kimi-k3/">
                 Kimi K3, and what we can still learn from the pelican benchmark
               </Ext>
-              ,{" "}
+              ,{' '}
               <Ext href="https://simonwillison.net/2025/Jul/11/kimi-k2/">
                 moonshotai/Kimi-K2-Instruct (via) - Simon Willison
               </Ext>
@@ -2200,7 +2258,8 @@ export default function KimiLlmBestPracticesPage() {
             </p>
             <ul>
               <li>
-                価格を単純比較する前に、モデルごとの<strong>トークナイザーの違い</strong>(同じテキストでもエンコード後のトークン数が異なる)を考慮すべき。
+                価格を単純比較する前に、モデルごとの<strong>トークナイザーの違い</strong>
+                (同じテキストでもエンコード後のトークン数が異なる)を考慮すべき。
               </li>
               <li>
                 <strong>推論効率(reasoning efficiency)</strong>
@@ -2211,7 +2270,7 @@ export default function KimiLlmBestPracticesPage() {
               </li>
             </ul>
             <p className={styles.sourceNote}>
-              出典:{" "}
+              出典:{' '}
               <Ext href="https://news.ycombinator.com/item?id=48935342">
                 Kimi K3 is now live | Hacker News
               </Ext>
@@ -2219,7 +2278,9 @@ export default function KimiLlmBestPracticesPage() {
           </div>
 
           <div className={styles.personCard}>
-            <div className={styles.personCardWho}>Zvi Mowshowitz氏(著名AI動向アナリスト、thezvi.substack.com)</div>
+            <div className={styles.personCardWho}>
+              Zvi Mowshowitz氏(著名AI動向アナリスト、thezvi.substack.com)
+            </div>
             <p>
               AI業界の動向を毎週まとめる著名なニュースレター執筆者で、Kimiシリーズの主要リリースのたびにコミュニティの反応を集約したレビューを公開しています。
             </p>
@@ -2231,29 +2292,35 @@ export default function KimiLlmBestPracticesPage() {
                 安全性(ジェイルブレイクへの耐性)について、複数のテスターから「比較的軽微な工夫で安全策を回避できた」という報告があったことも率直に記録している。
               </li>
               <li>
-                Kimi K2.5のAgent Swarm機能について、Cline(著名なAIコーディングエージェントツール)の開発者Saoud
+                Kimi K2.5のAgent
+                Swarm機能について、Cline(著名なAIコーディングエージェントツール)の開発者Saoud
                 Rizwan氏が「Opus
                 4.5を8分の1のコストで上回るベンチマークを達成しており、最も重要なのは並列サブエージェントの学習方法(PARL)だ」と技術的に評価したコメントも引用。
               </li>
             </ul>
             <p className={styles.sourceNote}>
-              出典:{" "}
+              出典:{' '}
               <Ext href="https://thezvi.substack.com/p/kimi-k2-thinking">
                 Kimi K2 Thinking - thezvi.substack.com
               </Ext>
-              , <Ext href="https://thezvi.substack.com/p/kimi-k25">Kimi K2.5 - thezvi.substack.com</Ext>
+              ,{' '}
+              <Ext href="https://thezvi.substack.com/p/kimi-k25">
+                Kimi K2.5 - thezvi.substack.com
+              </Ext>
             </p>
           </div>
 
           <div className={styles.personCard}>
-            <div className={styles.personCardWho}>JP Caparas氏(AIライター、Medium/generativeai.pub)</div>
+            <div className={styles.personCardWho}>
+              JP Caparas氏(AIライター、Medium/generativeai.pub)
+            </div>
             <p>
               Moonshot
               AIの公式プライバシーポリシーの原文を引用しながら、コンシューマー向けサービス(kimi.com)のデータ取り扱いを検証した詳細記事を公開しています。
               「モデルの能力自体は本物で優秀。ただしデータの取り扱い方針は別問題」とし、カジュアルな検証・学習用途と、業務・機密情報を扱う用途とを明確に使い分けるべきだと提言しています(詳細は15.1参照)。
             </p>
             <p className={styles.sourceNote}>
-              出典:{" "}
+              出典:{' '}
               <Ext href="https://generativeai.pub/kimi-k2-5-is-brilliant-but-think-twice-about-using-kimi-com-157cbb26f9a3">
                 Kimi K2.5 is brilliant, but think twice about using Kimi.com - Medium
               </Ext>
@@ -2261,7 +2328,9 @@ export default function KimiLlmBestPracticesPage() {
           </div>
 
           <div className={styles.personCard}>
-            <div className={styles.personCardWho}>Awni Hannun氏(Apple機械学習研究者、mlx-lm開発者)</div>
+            <div className={styles.personCardWho}>
+              Awni Hannun氏(Apple機械学習研究者、mlx-lm開発者)
+            </div>
             <p>
               Kimi K2(4bit量子化版)が2台のMac Studio(512GB M3
               Ultra、合計約2万ドル相当)でmlx-lmとmx.distributedを使って実用的な速度で動作することを実証しました。
@@ -2269,7 +2338,7 @@ export default function KimiLlmBestPracticesPage() {
               Willison氏もこれを引用して「個人が動かせる範囲でこれに最も近い選択肢」と評しています。K3は2.8兆パラメータとさらに大規模なため、自己ホスティングにはより大きなハードウェア投資が必要になる点に留意してください(K3の重み自体は2026年7月27日まで未公開です)。
             </p>
             <p className={styles.sourceNote}>
-              出典:{" "}
+              出典:{' '}
               <Ext href="https://x.com/simonw/status/1946961766405263702">
                 Simon Willison on X(Awni Hannun氏引用)
               </Ext>
@@ -2301,10 +2370,12 @@ export default function KimiLlmBestPracticesPage() {
                 <tr>
                   <td>2</td>
                   <td>
-                    廃止済み・廃止予定モデル(<code className={styles.inlineCode}>kimi-k2</code>系列、
+                    廃止済み・廃止予定モデル(<code className={styles.inlineCode}>kimi-k2</code>
+                    系列、
                     <code className={styles.inlineCode}>kimi-latest</code>、
                     <code className={styles.inlineCode}>kimi-k2.5</code>、
-                    <code className={styles.inlineCode}>moonshot-v1</code>系列)を使い続けていないか確認したか
+                    <code className={styles.inlineCode}>moonshot-v1</code>
+                    系列)を使い続けていないか確認したか
                   </td>
                 </tr>
                 <tr>
@@ -2383,23 +2454,23 @@ export default function KimiLlmBestPracticesPage() {
           <h3>Kimi製品・エコシステム</h3>
           <ul className={styles.refList}>
             <li>
-              Kimi Work: Next-Gen Desktop AI Agent for Knowledge Workers —{" "}
+              Kimi Work: Next-Gen Desktop AI Agent for Knowledge Workers —{' '}
               <Ext href="https://www.kimi.com/products/kimi-work">
                 https://www.kimi.com/products/kimi-work
               </Ext>
             </li>
             <li>
-              AI Document Agent for Automating Knowledge Work | Kimi Docs —{" "}
+              AI Document Agent for Automating Knowledge Work | Kimi Docs —{' '}
               <Ext href="https://www.kimi.com/features/docs">
                 https://www.kimi.com/features/docs
               </Ext>
             </li>
             <li>
-              Kimi Code with Kimi K3: Next-Gen AI Code Agent & CLI —{" "}
+              Kimi Code with Kimi K3: Next-Gen AI Code Agent & CLI —{' '}
               <Ext href="https://www.kimi.com/code">https://www.kimi.com/code</Ext>
             </li>
             <li>
-              Kimi (chatbot) - Wikipedia —{" "}
+              Kimi (chatbot) - Wikipedia —{' '}
               <Ext href="https://en.wikipedia.org/wiki/Kimi_(chatbot)">
                 https://en.wikipedia.org/wiki/Kimi_(chatbot)
               </Ext>
@@ -2409,19 +2480,19 @@ export default function KimiLlmBestPracticesPage() {
           <h3>Kimi K3 公式情報</h3>
           <ul className={styles.refList}>
             <li>
-              Kimi K3 Quickstart - Kimi API Platform —{" "}
+              Kimi K3 Quickstart - Kimi API Platform —{' '}
               <Ext href="https://platform.kimi.ai/docs/guide/kimi-k3-quickstart">
                 https://platform.kimi.ai/docs/guide/kimi-k3-quickstart
               </Ext>
             </li>
             <li>
-              Kimi K3 API Tool Calling Best Practices - Kimi API Platform —{" "}
+              Kimi K3 API Tool Calling Best Practices - Kimi API Platform —{' '}
               <Ext href="https://platform.kimi.ai/docs/guide/kimi-k3-tool-calling-best-practice">
                 https://platform.kimi.ai/docs/guide/kimi-k3-tool-calling-best-practice
               </Ext>
             </li>
             <li>
-              Kimi K3 Model Pricing - Kimi API Platform —{" "}
+              Kimi K3 Model Pricing - Kimi API Platform —{' '}
               <Ext href="https://platform.kimi.ai/docs/pricing/chat-k3">
                 https://platform.kimi.ai/docs/pricing/chat-k3
               </Ext>
@@ -2431,25 +2502,25 @@ export default function KimiLlmBestPracticesPage() {
           <h3>Kimi K2.6 / K2.7-Code / エコシステム公式情報</h3>
           <ul className={styles.refList}>
             <li>
-              Model List - Kimi API Platform —{" "}
+              Model List - Kimi API Platform —{' '}
               <Ext href="https://platform.kimi.ai/docs/models">
                 https://platform.kimi.ai/docs/models
               </Ext>
             </li>
             <li>
-              Best Practices for Prompts - Kimi API Platform —{" "}
+              Best Practices for Prompts - Kimi API Platform —{' '}
               <Ext href="https://platform.kimi.ai/docs/guide/prompt-best-practice">
                 https://platform.kimi.ai/docs/guide/prompt-best-practice
               </Ext>
             </li>
             <li>
-              Use Kimi K2.6 Model to Setup Agent - Kimi API Platform —{" "}
+              Use Kimi K2.6 Model to Setup Agent - Kimi API Platform —{' '}
               <Ext href="https://platform.kimi.ai/docs/guide/use-kimi-k2-to-setup-agent">
                 https://platform.kimi.ai/docs/guide/use-kimi-k2-to-setup-agent
               </Ext>
             </li>
             <li>
-              GitHub - MoonshotAI/Kimi-K2 —{" "}
+              GitHub - MoonshotAI/Kimi-K2 —{' '}
               <Ext href="https://github.com/moonshotai/kimi-k2">
                 https://github.com/moonshotai/kimi-k2
               </Ext>
@@ -2459,113 +2530,111 @@ export default function KimiLlmBestPracticesPage() {
           <h3>ニュース・第三者評価・コミュニティの分析</h3>
           <ul className={styles.refList}>
             <li>
-              China's Moonshot AI releases Kimi K3 | VentureBeat —{" "}
+              China's Moonshot AI releases Kimi K3 | VentureBeat —{' '}
               <Ext href="https://venturebeat.com/technology/chinas-moonshot-ai-releases-kimi-k3-the-largest-open-source-model-ever-rivaling-top-u-s-systems">
                 https://venturebeat.com/technology/chinas-moonshot-ai-releases-kimi-k3-the-largest-open-source-model-ever-rivaling-top-u-s-systems
               </Ext>
             </li>
             <li>
-              Kimi K3, and what we can still learn from the pelican benchmark - Simon Willison —{" "}
+              Kimi K3, and what we can still learn from the pelican benchmark - Simon Willison —{' '}
               <Ext href="https://simonwillison.net/2026/Jul/16/kimi-k3/">
                 https://simonwillison.net/2026/Jul/16/kimi-k3/
               </Ext>
             </li>
             <li>
-              Kimi K3 is now live | Hacker News —{" "}
+              Kimi K3 is now live | Hacker News —{' '}
               <Ext href="https://news.ycombinator.com/item?id=48935342">
                 https://news.ycombinator.com/item?id=48935342
               </Ext>
             </li>
             <li>
-              Moonshot AI Releases Kimi K3 | MLQ News —{" "}
+              Moonshot AI Releases Kimi K3 | MLQ News —{' '}
               <Ext href="https://mlq.ai/news/moonshot-ai-releases-kimi-k3-a-28-trillion-parameter-open-weight-model-rivaling-top-us-systems/">
                 https://mlq.ai/news/moonshot-ai-releases-kimi-k3-a-28-trillion-parameter-open-weight-model-rivaling-top-us-systems/
               </Ext>
             </li>
             <li>
-              Kimi K3 API Guide - Verdent Guides —{" "}
+              Kimi K3 API Guide - Verdent Guides —{' '}
               <Ext href="https://www.verdent.ai/guides/agents/kimi-k3-api-guide">
                 https://www.verdent.ai/guides/agents/kimi-k3-api-guide
               </Ext>
             </li>
             <li>
-              Kimi K3 pricing - eesel AI —{" "}
+              Kimi K3 pricing - eesel AI —{' '}
               <Ext href="https://www.eesel.ai/blog/kimi-k3-pricing">
                 https://www.eesel.ai/blog/kimi-k3-pricing
               </Ext>
             </li>
             <li>
-              Kimi K3 Pricing: API Cost and Whether It's Worth It | AI Reiter —{" "}
+              Kimi K3 Pricing: API Cost and Whether It's Worth It | AI Reiter —{' '}
               <Ext href="https://aireiter.com/blog/kimi-k3-pricing">
                 https://aireiter.com/blog/kimi-k3-pricing
               </Ext>
             </li>
             <li>
-              Kimi Pricing 2026: Plans, API Costs & Free Tier | Fello AI —{" "}
-              <Ext href="https://felloai.com/kimi-pricing/">
-                https://felloai.com/kimi-pricing/
-              </Ext>
+              Kimi Pricing 2026: Plans, API Costs & Free Tier | Fello AI —{' '}
+              <Ext href="https://felloai.com/kimi-pricing/">https://felloai.com/kimi-pricing/</Ext>
             </li>
           </ul>
 
           <h3>プライバシー・セキュリティ・知見</h3>
           <ul className={styles.refList}>
             <li>
-              Kimi K2.5 is brilliant, but think twice about using Kimi.com - Medium —{" "}
+              Kimi K2.5 is brilliant, but think twice about using Kimi.com - Medium —{' '}
               <Ext href="https://generativeai.pub/kimi-k2-5-is-brilliant-but-think-twice-about-using-kimi-com-157cbb26f9a3">
                 https://generativeai.pub/kimi-k2-5-is-brilliant-but-think-twice-about-using-kimi-com-157cbb26f9a3
               </Ext>
             </li>
             <li>
-              Kimi K2 Thinking - Zvi Mowshowitz —{" "}
+              Kimi K2 Thinking - Zvi Mowshowitz —{' '}
               <Ext href="https://thezvi.substack.com/p/kimi-k2-thinking">
                 https://thezvi.substack.com/p/kimi-k2-thinking
               </Ext>
             </li>
             <li>
-              Kimi K2.5 - Zvi Mowshowitz —{" "}
+              Kimi K2.5 - Zvi Mowshowitz —{' '}
               <Ext href="https://thezvi.substack.com/p/kimi-k25">
                 https://thezvi.substack.com/p/kimi-k25
               </Ext>
             </li>
             <li>
-              The Untold Misadventures of Red Teaming Kimi K2 with Promptfoo - DEV Community —{" "}
+              The Untold Misadventures of Red Teaming Kimi K2 with Promptfoo - DEV Community —{' '}
               <Ext href="https://dev.to/ayush7614/the-untold-misadventures-of-red-teaming-kimi-k2-with-promptfoo-3hig">
                 https://dev.to/ayush7614/the-untold-misadventures-of-red-teaming-kimi-k2-with-promptfoo-3hig
               </Ext>
             </li>
             <li>
-              Best Practices for Benchmarking - Kimi API Platform —{" "}
+              Best Practices for Benchmarking - Kimi API Platform —{' '}
               <Ext href="https://platform.moonshot.ai/docs/guide/benchmark-best-practice">
                 https://platform.moonshot.ai/docs/guide/benchmark-best-practice
               </Ext>
             </li>
             <li>
-              Partial Mode - Kimi API Platform —{" "}
+              Partial Mode - Kimi API Platform —{' '}
               <Ext href="https://platform.kimi.ai/docs/api/partial">
                 https://platform.kimi.ai/docs/api/partial
               </Ext>
             </li>
             <li>
-              Kimi K2.7 Code API: Pricing, Playground & Docs | EmpirioLabs AI —{" "}
+              Kimi K2.7 Code API: Pricing, Playground & Docs | EmpirioLabs AI —{' '}
               <Ext href="https://empiriolabs.ai/models/kimi-k2-7-code">
                 https://empiriolabs.ai/models/kimi-k2-7-code
               </Ext>
             </li>
             <li>
-              Kimi K2.6 & Kimi Code Review: Saving 88% Coding Costs? | Medium —{" "}
+              Kimi K2.6 & Kimi Code Review: Saving 88% Coding Costs? | Medium —{' '}
               <Ext href="https://medium.com/@tentenco/kimi-k2-6-kimi-code-review-saving-88-coding-costs-b7e8c5eaf5f1">
                 https://medium.com/@tentenco/kimi-k2-6-kimi-code-review-saving-88-coding-costs-b7e8c5eaf5f1
               </Ext>
             </li>
             <li>
-              Kimi by Moonshot in 2026: K2.6, K2.7-Code and Agents for Managers —{" "}
+              Kimi by Moonshot in 2026: K2.6, K2.7-Code and Agents for Managers —{' '}
               <Ext href="https://mysummit.school/blog/en/kimi-k25-moonshot-review-2026/">
                 https://mysummit.school/blog/en/kimi-k25-moonshot-review-2026/
               </Ext>
             </li>
             <li>
-              Kimi API (Moonshot AI) - Complete Developer Guide —{" "}
+              Kimi API (Moonshot AI) - Complete Developer Guide —{' '}
               <Ext href="https://agentsapis.com/kimi-api/">https://agentsapis.com/kimi-api/</Ext>
             </li>
           </ul>
@@ -2575,9 +2644,9 @@ export default function KimiLlmBestPracticesPage() {
           <strong>免責事項</strong>
           :本ガイドに記載したモデルID・料金・レート制限・仕様・ベンチマーク数値は、公式情報および複数の独立系情報を横断的に確認した2026年7月18日時点のスナップショットです。
           Kimi K3は発表から間もないモデルであり、Moonshot
-          AI自身のモデルラインナップと料金体系は今後も頻繁に更新される見込みです。契約・請求・アーキテクチャ設計に関わる意思決定を行う前には、必ず{" "}
-          <Ext href="https://platform.moonshot.ai/">platform.moonshot.ai</Ext> および{" "}
-          <Ext href="https://platform.kimi.ai/">platform.kimi.ai</Ext>{" "}
+          AI自身のモデルラインナップと料金体系は今後も頻繁に更新される見込みです。契約・請求・アーキテクチャ設計に関わる意思決定を行う前には、必ず{' '}
+          <Ext href="https://platform.moonshot.ai/">platform.moonshot.ai</Ext> および{' '}
+          <Ext href="https://platform.kimi.ai/">platform.kimi.ai</Ext>{' '}
           の公式ドキュメント・料金ページで最新情報を確認してください。
           また、著名開発者・コミュニティの投稿として引用した内容は、あくまで個人の見解・検証結果であり、Moonshot
           AIの公式見解ではありません。
