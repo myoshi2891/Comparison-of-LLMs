@@ -14,10 +14,11 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（**0 errors / 0 warnings / 0 infos**。既知の既存指摘も含め全件解消済み）
 - **テストの実行状況**:
-- **フロントエンド (`web-next/`)**: Vitest 実行で **1183 件すべて合格** (全 Green ✅)
+- **フロントエンド (`web-next/`)**: Vitest 実行で **1195 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **PR #126 SonarCloud Quality Gate の新規コードカバレッジを復旧**: Gemma、Kimi、Amazon Bedrock 2ページの `TocObserver.tsx` はページ契約テストで初期化だけが実行され、`IntersectionObserver` コールバックの32条件中26条件が未カバーだったため、新規コードカバレッジが47.7%（基準80%）まで低下していた。クラス選択型と `href` 解決型の共通テストスイートを追加し、4ファイルすべて行・条件カバレッジ100%を実測。テスト12件を追加して合計 **1195 テスト合格**とし、併せて既存ファイルのBiome指摘26 errors / 1 warningもファイル単位で全件解消した。
 - **Amazon Bedrock 活用ベストプラクティスガイドの Next.js 移行とグローバルナビ同期**: `Amazon-bedrock-best-practices-guide.html` を `web-next/app/infra/amazon-bedrock-best-practices-guide/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全18セクション・全表・全コードブロック・6 Mermaid図・TOCスクロール追従・外部リンク安全属性・グローバルナビ（`運用・品質` グループ / `page-registry.ts`）登録を完了。原本 `Amazon-bedrock-best-practices-guide.html` は `archive/` へ `git mv` 退避。契約テスト5件を追加し全クリア（合計 **1183 テスト合格**）。
 - **Amazon Bedrock ベストプラクティス完全ガイドの Next.js 移行とグローバルナビ同期**: `Amazon-bedrock-best-practices-2026-intermediate.html` を `web-next/app/infra/amazon-bedrock-best-practices-2026-intermediate/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全15セクション・全表・全コードブロック・6 Mermaid図・TOCスクロール追従・外部リンク安全属性・グローバルナビ（`運用・品質` グループ）登録を完了。原本 `Amazon-bedrock-best-practices-2026-intermediate.html` は `archive/` へ `git mv` 退避。契約テスト5件を追加し全クリア（合計 **1178 テスト合格**）。
 - **Kimi(Moonshot AI) LLM 徹底ガイドの Pure JSX 移行とグローバルナビ同期**: `Kimi-llm-best-practices.html` を `web-next/app/moonshot/kimi-llm-best-practices/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全19セクション・全表・全コードブロック・9 Mermaid図・TOCスクロール追従・外部リンク安全属性・グローバルナビ登録を完了。原本 `Kimi-llm-best-practices.html` / `.md` は `archive/html/moonshot/` および `archive/md/moonshot/` へ `git mv` 退避。契約テスト5件を追加し全クリア（合計 **1173 テスト合格**）。
@@ -213,7 +214,7 @@ Next.js 移行完了後のリポジトリ `LLM-Studies` にて、テストカバ
 Next.js 移行完了後のリポジトリ `LLM-Studies` の保守・改善作業を再開してください。
 
 - リポジトリ: LLM-Studies (Next.js 移行プロジェクトは dev/main へ完全マージ済み)
-  - 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (1147/1147 passed) / pytest (38/38 passed) で全 Green
+  - 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (1195/1195 passed) / pytest (38/38 passed) で全 Green
 - リポジトリ規約: CLAUDE.md (編集上の絶対ルール。※Antigravity環境ではビルドは実行禁止)
 
 作業方針：

@@ -275,7 +275,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が成功（1183 pass 全 Green ✅）
+2. `cd web-next && bun run test` が成功（1195 pass 全 Green ✅）
 3. 設定ファイルが意図せず変更されていない
 4. コミット対象の差分（`git diff --cached`）および新規ファイルに、個人情報（PII）やローカル環境固有の絶対パス（例: `file:///Users/` やローカルユーザー名など）が含まれていないことを確認
 
