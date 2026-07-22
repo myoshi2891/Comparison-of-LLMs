@@ -48,7 +48,7 @@ Vercel がこのフレームワークを作った背景には、社内で「コ�
 | 主な用途 | 永続実行が必要なバックエンドAIエージェント（チャットボット、SDR、サポート、データ分析、社内自動化など） |
 | デプロイ先 | Vercel Functions（他プラットフォーム向けアダプタは開発中） |
 
-Vercel の CEO である Guillermo Rauch 氏は、eve のローンチにあたり「エージェントは現在、Vercel 上のコミットの過半数（半年前は3%未満だったものが急増）を占めるようになった」と述べており、eve はこの急増するエージェント開発を「使い捨てのプロトタイプ」から「保守可能な本番システム」に引き上げるための基盤という位置づけです。
+Vercel の CEO である Guillermo Rauch 氏は、eve のローンチにあたり「エージェントによるデプロイは現在 Vercel 上の全デプロイの約 29%（1年前は3%未満だったものが急増、将来的に半分に達すると予想）を占めるようになった」と述べており、eve はこの急増するエージェント開発を「使い捨てのプロトタイプ」から「保守可能な本番システム」に引き上げるための基盤という位置づけです。
 
 ### 1-2. eve が標準搭載する6つの本番機能
 
@@ -152,16 +152,16 @@ npm install eve@0.1.2
 
 ### Step 2. 最小構成を理解する
 
-eveのエージェントは、理論上**2ファイルだけ**で動作します。
+eveのエージェントは、必須ファイルである `agent/instructions.md` の**1ファイルだけ**で最小構成として動作します。
 
-`agent/instructions.md`（人格・行動規範）：
+`agent/instructions.md`（必須：人格・行動規範）：
 
 ```markdown
 あなたは丁寧で簡潔なカスタマーサポート担当者です。
 ツールが使える場面では、推測せず必ずツールを使って確認してください。
 ```
 
-`agent/agent.ts`（モデル設定）：
+（任意設定例）`agent/agent.ts`（モデルやツールのカスタム設定）：
 
 ```ts
 import { defineAgent } from 'eve';
@@ -278,12 +278,17 @@ export default defineTool({
   description: '返金を実行する',
   inputSchema: z.object({
     orderId: z.string(),
-    amountJpy: z.number(),
   }),
-  needsApproval: ({ toolInput }) => (toolInput?.amountJpy ?? 0) > 50000,
-  async execute({ orderId, amountJpy }) {
+  needsApproval: () => true,
+  async execute({ orderId }) {
+    // クライアント指定の返金額をそのまま信頼せず、サーバー側で注文IDと返金適格性・金額を再検証
+    const order = await fetchOrderFromDatabase(orderId);
+    if (!order || !order.isEligibleForRefund) {
+      throw new Error('返金対象外の注文です');
+    }
+    const refundAmount = order.eligibleAmountJpy;
     // 実際の返金処理
-    return { orderId, refunded: amountJpy };
+    return { orderId, refunded: refundAmount };
   },
 });
 ```
