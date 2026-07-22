@@ -47,7 +47,7 @@ export default function MermaidDiagram({
         m.default.initialize({
           startOnLoad: false,
           theme,
-          ...(themeVariables ? { themeVariables } : {}),
+          themeVariables: { fontSize: '16px', ...themeVariables },
           flowchart: { useMaxWidth: true, htmlLabels: true },
           sequence: { useMaxWidth: true },
           mindmap: { useMaxWidth: true },

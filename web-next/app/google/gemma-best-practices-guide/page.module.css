@@ -475,23 +475,10 @@
 
 .mermaidContainer :global(svg) {
   max-width: 100% !important;
-  max-height: 680px !important;
-  width: auto !important;
   height: auto !important;
   display: block !important;
   margin: 0 auto !important;
   overflow: visible !important;
-  font-size: 1rem !important;
-}
-
-.mermaidContainer :global(svg text),
-.mermaidContainer :global(svg tspan),
-.mermaidContainer :global(svg .nodeLabel),
-.mermaidContainer :global(svg .edgeLabel),
-.mermaidContainer :global(svg foreignObject),
-.mermaidContainer :global(svg foreignObject *) {
-  font-size: 1rem !important;
-  line-height: 1.4 !important;
 }
 
 .sourceNote {
