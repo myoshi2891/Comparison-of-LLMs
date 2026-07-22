@@ -323,7 +323,6 @@
 
 .tl {
   font-weight: 600;
-  /* biome-ignore lint/complexity/noImportantStyles: legacy */
   color: var(--tp) !important;
 }
 

@@ -600,11 +600,8 @@
 }
 
 .mermaidWrap svg {
-  /* biome-ignore lint/complexity/noImportantStyles: required */
   width: auto !important;
-  /* biome-ignore lint/complexity/noImportantStyles: required */
   max-width: 100% !important;
-  /* biome-ignore lint/complexity/noImportantStyles: required */
   height: auto !important;
 }
 

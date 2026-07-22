@@ -14,8 +14,9 @@
   --danger: #ff7a8a;
   --radius: 10px;
   --sidebar-w: 288px;
-  --font-sans: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  --font-sans:
+    "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 
   display: flex;
   background: var(--bg);
@@ -92,7 +93,9 @@
   color: var(--text-dim);
   border-radius: 8px;
   margin-bottom: 2px;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
   white-space: normal;
   text-decoration: none;
 }
@@ -137,8 +140,7 @@
   padding: 64px 56px 44px;
   border-bottom: 1px solid var(--border);
   background:
-    radial-gradient(900px 400px at 85% -10%, rgba(124, 158, 255, 0.14), transparent 60%),
-    var(--bg);
+    radial-gradient(900px 400px at 85% -10%, rgba(124, 158, 255, 0.14), transparent 60%), var(--bg);
 }
 
 .eyebrow {
@@ -378,14 +380,33 @@
 }
 
 /* Syntax Highlighting */
-.ck { color: #ff7b72; } /* keyword */
-.cs { color: #a5d6ff; } /* string/symbol */
-.cv { color: #79c0ff; } /* value/var */
-.cc { color: #8b949e; font-style: italic; } /* comment */
-.ch { color: #f0883e; font-weight: bold; } /* heading */
-.cm { color: #7ee787; font-weight: bold; } /* method/marker */
-.cw { color: #d29922; } /* warning */
-.ce { color: #bc8cff; } /* entity/special */
+.ck {
+  color: #ff7b72;
+} /* keyword */
+.cs {
+  color: #a5d6ff;
+} /* string/symbol */
+.cv {
+  color: #79c0ff;
+} /* value/var */
+.cc {
+  color: #8b949e;
+  font-style: italic;
+} /* comment */
+.ch {
+  color: #f0883e;
+  font-weight: bold;
+} /* heading */
+.cm {
+  color: #7ee787;
+  font-weight: bold;
+} /* method/marker */
+.cw {
+  color: #d29922;
+} /* warning */
+.ce {
+  color: #bc8cff;
+} /* entity/special */
 
 /* ---------- Mermaid ---------- */
 .diagramWrap {
@@ -431,7 +452,7 @@
 }
 
 .checklist li::before {
-  content: '';
+  content: "";
   flex: 0 0 16px;
   width: 16px;
   height: 16px;

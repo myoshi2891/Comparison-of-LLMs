@@ -1,7 +1,16 @@
 .pageWrap {
   background: var(--color-background-primary, #0d0f12);
   color: var(--color-text-primary, #e8e9ea);
-  font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+  font-family: var(
+    --font-sans,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif
+  );
   font-size: 16px;
   line-height: 1.7;
   min-height: 100vh;
@@ -109,7 +118,9 @@
   text-decoration: none;
   font-size: 13px;
   border-bottom: none !important;
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 
 .tocLink:hover {
@@ -295,15 +306,38 @@
 }
 
 /* Code Highlighting Colors */
-.ck { color: #ff7b72; font-weight: normal; } /* Keyword */
-.cs { color: #a5d6ff; } /* String / Delimiter */
-.cv { color: #79c0ff; } /* Value */
-.cc { color: #8b949e; font-style: italic; } /* Comment */
-.ch { color: #f0883e; font-weight: bold; } /* Header */
-.cm { color: #7ee787; font-weight: bold; } /* Marker */
-.cg { color: #3fb950; } /* Success / Green */
-.cw { color: #d29922; font-weight: bold; } /* Warning */
-.ce { color: #bc8cff; } /* Special */
+.ck {
+  color: #ff7b72;
+  font-weight: normal;
+} /* Keyword */
+.cs {
+  color: #a5d6ff;
+} /* String / Delimiter */
+.cv {
+  color: #79c0ff;
+} /* Value */
+.cc {
+  color: #8b949e;
+  font-style: italic;
+} /* Comment */
+.ch {
+  color: #f0883e;
+  font-weight: bold;
+} /* Header */
+.cm {
+  color: #7ee787;
+  font-weight: bold;
+} /* Marker */
+.cg {
+  color: #3fb950;
+} /* Success / Green */
+.cw {
+  color: #d29922;
+  font-weight: bold;
+} /* Warning */
+.ce {
+  color: #bc8cff;
+} /* Special */
 
 /* ================= CALLOUTS ================= */
 .callout {

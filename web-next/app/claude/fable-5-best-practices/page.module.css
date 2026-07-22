@@ -20,15 +20,14 @@
   --prose-max: 100%;
   --radius: 14px;
   --radius-sm: 8px;
-  
+
   display: flex;
   min-height: 100vh;
   background:
     radial-gradient(1100px 600px at 82% -8%, rgba(224, 176, 96, 0.07), transparent 60%),
-    radial-gradient(900px 500px at -8% 18%, rgba(79, 209, 197, 0.06), transparent 55%),
-    var(--bg);
+    radial-gradient(900px 500px at -8% 18%, rgba(79, 209, 197, 0.06), transparent 55%), var(--bg);
   color: var(--text);
-  font-family: 'Inter', -apple-system, sans-serif;
+  font-family: "Inter", -apple-system, sans-serif;
 }
 
 /* ---------- Sidebar ---------- */
@@ -70,7 +69,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: "Space Grotesk", sans-serif;
   font-weight: 700;
   color: #1a1206;
   font-size: 16px;
@@ -78,7 +77,7 @@
 }
 
 .brandText {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: "Space Grotesk", sans-serif;
   font-weight: 600;
   font-size: 15.5px;
   color: #f2f6fb;
@@ -87,7 +86,7 @@
 
 .brandSub {
   display: block;
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 10.5px;
   color: var(--text-faint);
   letter-spacing: 0.06em;
@@ -96,7 +95,7 @@
 }
 
 .sidebarMeta {
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 11px;
   color: var(--text-faint);
   margin: 18px 0 22px;
@@ -120,12 +119,14 @@
   font-size: 13.2px;
   padding: 7px 10px;
   border-radius: 8px;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
   line-height: 1.4;
 }
 
 .tocLink .num {
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 10.5px;
   color: var(--text-faint);
   min-width: 16px;
@@ -170,7 +171,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 12px;
   letter-spacing: 0.08em;
   color: var(--accent);
@@ -185,7 +186,7 @@
   font-size: 2.6rem;
   line-height: 1.18;
   max-width: 25ch;
-  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-family: "Space Grotesk", "Inter", sans-serif;
   font-weight: 600;
   color: #f2f6fb;
   letter-spacing: -0.01em;
@@ -232,7 +233,7 @@
 }
 
 .chapterNum {
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 14px;
   color: var(--accent);
   border: 1px solid var(--border);
@@ -245,7 +246,7 @@
 .chapterHead h2 {
   font-size: 1.62rem;
   line-height: 1.3;
-  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-family: "Space Grotesk", "Inter", sans-serif;
   font-weight: 600;
   color: #f2f6fb;
   letter-spacing: -0.01em;
@@ -256,7 +257,7 @@
   font-size: 1.2rem;
   margin: 34px 0 14px;
   color: #eef3fa;
-  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-family: "Space Grotesk", "Inter", sans-serif;
   font-weight: 600;
   letter-spacing: -0.01em;
 }
@@ -269,7 +270,7 @@
   font-size: 1.02rem;
   margin: 22px 0 10px;
   color: var(--text);
-  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-family: "Space Grotesk", "Inter", sans-serif;
   font-weight: 600;
   letter-spacing: -0.01em;
 }
@@ -332,7 +333,7 @@
 }
 
 .calloutLabel {
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 10.5px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -362,7 +363,7 @@
 
 .tableWrap thead th {
   text-align: left;
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 11px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -399,7 +400,7 @@
   padding: 2px 6px;
   font-size: 0.88em;
   color: var(--accent-2);
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
 }
 
 /* ---------- Code blocks ---------- */
@@ -412,7 +413,7 @@
 }
 
 .codeBlockLabel {
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 11px;
   color: var(--text-faint);
   padding: 10px 16px;
@@ -429,7 +430,7 @@
 .codeBlock code {
   font-size: 13px;
   line-height: 1.6;
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
 }
 
 /* ---------- Mermaid diagram frame ---------- */
@@ -447,7 +448,7 @@
 }
 
 .diagramCaption {
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 11.5px;
   color: var(--text-faint);
   text-align: center;
@@ -477,7 +478,7 @@
 }
 
 .timeline::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 6px;
   top: 6px;
@@ -496,7 +497,7 @@
 }
 
 .tItem::before {
-  content: '';
+  content: "";
   position: absolute;
   left: -26px;
   top: 4px;
@@ -508,7 +509,7 @@
 }
 
 .tDate {
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 12px;
   color: var(--accent);
   margin-bottom: 4px;
@@ -553,7 +554,7 @@
 }
 
 .qTitle {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: "Space Grotesk", sans-serif;
   font-size: 14.5px;
   font-weight: 600;
   color: #f2f6fb;
@@ -561,7 +562,7 @@
 }
 
 .qTitle span {
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 10.5px;
   color: var(--text-faint);
   display: block;
@@ -599,7 +600,7 @@
 }
 
 .patternTag {
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 10.5px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -637,7 +638,7 @@
 }
 
 .specItem .specLabel {
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 10.5px;
   color: var(--text-faint);
   text-transform: uppercase;
@@ -658,7 +659,7 @@
 
 .refGroup h4 {
   color: var(--accent);
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 12.5px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -693,7 +694,7 @@
 
 .refList a {
   word-break: break-all;
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 12px;
   color: var(--accent-2);
   text-decoration: none;
@@ -714,7 +715,7 @@
 .pageFooter {
   padding: 48px 0 20px;
   text-align: center;
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 11.5px;
   color: var(--text-faint);
 }

@@ -114,7 +114,6 @@
 }
 
 .navLinkActive {
-  /* biome-ignore lint/complexity/noImportantStyles: override base link color */
   color: var(--blue) !important;
   background: var(--blue-dim);
   border-left-color: var(--blue);
@@ -829,8 +828,6 @@
 #diag-best-practices foreignObject div,
 #diag-best-practices foreignObject span,
 #diag-best-practices foreignObject p {
-  /* biome-ignore lint/complexity/noImportantStyles: override inline SVG text colors */
   color: #e2e8f0 !important;
-  /* biome-ignore lint/complexity/noImportantStyles: override WebKit fill color */
   -webkit-text-fill-color: #e2e8f0 !important;
 }

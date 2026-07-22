@@ -14,8 +14,10 @@
   --warning: #fbbf24;
   --danger: #f87171;
   --sidebar-width: 300px;
-  --font-sans: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic UI', system-ui, -apple-system, sans-serif;
-  --font-mono: 'SF Mono', 'Fira Code', Consolas, Menlo, monospace;
+  --font-sans:
+    "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", system-ui,
+    -apple-system, sans-serif;
+  --font-mono: "SF Mono", "Fira Code", Consolas, Menlo, monospace;
 
   display: flex;
   background: var(--bg-primary);
@@ -90,7 +92,9 @@
   color: var(--text-secondary);
   text-decoration: none;
   font-size: 0.88rem;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .navLink:hover {
@@ -346,14 +350,33 @@
 }
 
 /* Syntax Highlighting */
-.ck { color: #ff7b72; } /* keyword */
-.cs { color: #a5d6ff; } /* string/symbol */
-.cv { color: #79c0ff; } /* value/var */
-.cc { color: #8b949e; font-style: italic; } /* comment */
-.ch { color: #f0883e; font-weight: bold; } /* heading */
-.cm { color: #7ee787; font-weight: bold; } /* method/marker */
-.cw { color: #d29922; } /* warning */
-.ce { color: #bc8cff; } /* entity/special */
+.ck {
+  color: #ff7b72;
+} /* keyword */
+.cs {
+  color: #a5d6ff;
+} /* string/symbol */
+.cv {
+  color: #79c0ff;
+} /* value/var */
+.cc {
+  color: #8b949e;
+  font-style: italic;
+} /* comment */
+.ch {
+  color: #f0883e;
+  font-weight: bold;
+} /* heading */
+.cm {
+  color: #7ee787;
+  font-weight: bold;
+} /* method/marker */
+.cw {
+  color: #d29922;
+} /* warning */
+.ce {
+  color: #bc8cff;
+} /* entity/special */
 
 .mainContent code {
   font-family: var(--font-mono);
@@ -377,7 +400,7 @@ ul.checklist li {
 }
 
 ul.checklist li::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   top: 0.15rem;

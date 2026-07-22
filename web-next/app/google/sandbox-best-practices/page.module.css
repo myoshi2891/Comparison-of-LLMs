@@ -323,9 +323,7 @@
 }
 
 .diagramScrollable pre {
-  /* biome-ignore lint/complexity/noImportantStyles: override inline style of Mermaid svg */
   max-width: none !important;
-  /* biome-ignore lint/complexity/noImportantStyles: override inline style of Mermaid svg */
   width: auto !important;
 }
 
