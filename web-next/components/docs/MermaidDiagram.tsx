@@ -48,9 +48,9 @@ export default function MermaidDiagram({
           startOnLoad: false,
           theme,
           themeVariables: { fontSize: '16px', ...themeVariables },
-          flowchart: { useMaxWidth: true, htmlLabels: true },
-          sequence: { useMaxWidth: true },
-          mindmap: { useMaxWidth: true },
+          flowchart: { useMaxWidth: false, htmlLabels: true },
+          sequence: { useMaxWidth: false },
+          mindmap: { useMaxWidth: false },
         });
         ref.current.textContent = chart;
         ref.current.removeAttribute("data-processed");
@@ -78,7 +78,7 @@ export default function MermaidDiagram({
       id={id}
       className={`mermaid ${className || ""}`}
       ref={ref}
-      style={{ width: "100%", minHeight: "4rem", ...style }}
+      style={{ width: "fit-content", maxWidth: "100%", minHeight: "4rem", ...style }}
     />
   );
 }

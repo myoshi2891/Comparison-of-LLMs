@@ -468,15 +468,17 @@
 }
 
 .mermaidContainer :global(.mermaid) {
-  display: flex !important;
-  justify-content: center !important;
-  width: 100%;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
 }
 
 .mermaidContainer :global(svg) {
+  display: block !important;
+  width: auto !important;
   max-width: 100% !important;
   height: auto !important;
-  display: block !important;
   margin: 0 auto !important;
   overflow: visible !important;
 }
