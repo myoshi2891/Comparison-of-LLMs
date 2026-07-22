@@ -115,7 +115,7 @@
   --c-red-900: #7f1d1d;
 
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 280px minmax(0, 1fr);
   min-height: 100vh;
   background: var(--color-background-primary);
   color: var(--color-text-primary);
@@ -224,9 +224,10 @@
 
 .mainContent {
   padding: 48px 56px 96px 56px;
-  max-width: 1000px;
   width: 100%;
-  margin: 0 auto;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
@@ -275,7 +276,7 @@
 
 .step {
   margin-bottom: 48px;
-  scroll-margin-top: 80px;
+  scroll-margin-top: 100px;
 }
 
 .step h2 {
@@ -383,7 +384,8 @@
   border: 1px solid var(--color-border-secondary);
   border-radius: var(--border-radius-md);
   margin: 20px 0;
-  overflow: hidden;
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .codeHeader {
@@ -412,27 +414,48 @@
 
 .mermaidContainer {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
   margin: 24px 0;
-  padding: 16px;
+  padding: 24px 16px;
   background: var(--color-background-secondary);
   border-radius: var(--border-radius-lg);
   border: 1px solid var(--color-border-tertiary);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
+}
+
+.mermaidContainer :global(.mermaid) {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+}
+
+.mermaidContainer :global(.mermaid svg) {
+  max-width: 100%;
+  height: auto !important;
 }
 
 .mermaidCaption {
   text-align: center;
   font-size: 12px;
   color: var(--color-text-tertiary);
-  margin-top: 8px;
+  margin-top: 12px;
   font-family: var(--font-mono), "JetBrains Mono", monospace;
 }
 
 .comparisonTable {
   width: 100%;
+  max-width: 100%;
   border-collapse: collapse;
   margin: 24px 0;
   font-size: 14px;
+  overflow-x: auto;
+  display: block;
 }
 
 .comparisonTable th,
