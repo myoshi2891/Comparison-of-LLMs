@@ -770,6 +770,20 @@ const entries: PageEntry[] = [
     addedAt: "2026-07-19",
     lastReviewed: "2026-07-19",
   },
+  {
+    slug: "/google/gemma-best-practices-guide",
+    title: "Gemma Best Practices Guide",
+    description:
+      "2026年4月に登場した新世代Gemma 4の制御トークン体系、Thinkingモード、Function Calling、量子化(QAT)戦略、ファインチューニング、デプロイ、安全性まで一次情報に基づいて網羅した実践ガイド。",
+    group: "Providers",
+    category: "Google",
+    provider: "google",
+    topics: ["google", "gemma", "best-practices"],
+    summary:
+      "2026年4月に登場した新世代Gemma 4の制御トークン体系、Thinkingモード、Function Calling、量子化(QAT)戦略、ファインチューニング、デプロイ、安全性まで一次情報に基づいて網羅した実践ガイド。",
+    addedAt: "2026-07-22",
+    lastReviewed: "2026-07-22",
+  },
 ];
 
 /** ビルド時検証: 不正なエントリはここで例外になり、壊れたデータのまま配信されない。 */
