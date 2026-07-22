@@ -207,6 +207,7 @@ Playwright ブラウザバイナリ（`/root/.cache/ms-playwright/`）はバイ�
 - `strict: true` + `noUnusedLocals` + `noUnusedParameters`
 - `erasableSyntaxOnly: true` — **enum と namespace は使用禁止**（TypeScript 5.8+ の制約）
 - Biome: `web-next/biome.json` で space 2 / 100 col / `noExplicitAny` / `noDoubleEquals` 他を適用
+- **`app/**/page.module.css` では `noImportantStyles` と `noDescendingSpecificity` を `overrides` で無効化している**（`biome.json` は厳密 JSON でコメントを書けないため理由をここに記す。コメントを入れると設定がパース不能になり、Biome がデフォルト設定へフォールバックして `node_modules` まで走査する）。理由: ガイドページの CSS Modules は `globals.css` の**素の要素セレクタ**（例 `thead th:not(:first-child) { text-align: right }`）を打ち消す必要があり、かつ Next.js 本番ビルドは CSS をルート単位でチャンク分割するため `globals.css` と `page.module.css` の読み込み順が保証されない（経緯: `.claude/rules/css-cache-reset.md`）。`!important` と詳細度の逆転は意図的な防御であり、除去すると表・コードブロック・Mermaid 図の表示が壊れる
 - `web-next/AGENTS.md` の注意書き遵守: Next.js 16 は訓練データと挙動が異なる可能性があるため、`web-next/node_modules/next/dist/docs/` を都度参照
 
 ## 新しいプロバイダー/ツールの追加パターン

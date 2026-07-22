@@ -1,7 +1,7 @@
 # プロジェクト進捗・ステータス (PROGRESS.md)
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
-> - 最終更新日: **Updated 2026-07-21**
+> - 最終更新日: **Updated 2026-07-22**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -12,12 +12,18 @@
 - **動作検証**:
   - `bun run build` ✅（`web-next` の全ルートが Static プリレンダリングされる。※Antigravity環境では実行禁止）
   - `bun run typecheck` ✅
-  - `bun run lint` ✅（本作業範囲では新規違反 0 件、既知の既存指摘は本件対象外）
+  - `bun run lint` ✅（**0 errors / 0 warnings / 0 infos**。既知の既存指摘も含め全件解消済み）
 - **テストの実行状況**:
   - **フロントエンド (`web-next/`)**: Vitest 実行で **1161 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **Biome 指摘 224 件を全て解消（lint がクリーンに）**: `bun run lint` の 36 errors / 186 warnings / 2 infos をゼロにした。テストは **1161 件合格（変化なし）**、build / typecheck / pytest 38 件も全て Green。
+  - **CSS 警告 179 件**（`noImportantStyles` 169 + `noDescendingSpecificity` 10）: `biome.json` の `overrides` で `app/**/page.module.css` に限定して無効化。これらは `globals.css` の素の要素セレクタを打ち消すための意図的な `!important` であり、除去するとガイドページ 24 枚の表示が壊れる。**理由は `biome.json` 内に書けない** — 厳密 JSON のためコメントを入れると設定がパース不能になり、Biome がデフォルト設定へフォールバックして `node_modules` まで走査する（実際に一度踏んで 154,586 件の診断が出た）。よって理由は CLAUDE.md に記載。これに伴い不要化した `biome-ignore` コメント 48 件を 11 ファイルから削除。
+  - **format 22 + organizeImports 2**: 該当ファイルのみ個別に `biome check --write`（リポジトリ全体走査は禁止ルール）。CSS 20 ファイルは「コメント・引用符・空白を正規化すると変更前後が完全一致」することを機械的に検証済み＝**意味的変更ゼロ・視覚回帰リスクなし**（実変更は `'` → `"` の統一と複数値プロパティの改行のみ）。
+  - **`noArrayIndexKey` 9 件**（`app/model-data/gpt-5-6-best-practices/GuideContent.tsx`）: ビルド時に確定する静的 Markdown 由来の表セル・リスト項目。内容ベースのキーにすると「○」「必須」等の重複で**キー衝突という実在のバグを新たに作り込む**ため、index キーのままが正しい。理由付きの局所抑制で対応（抑制コメントは `if` 文ではなく対象の JSX 直前に置かないと効かない）。
+  - **その他**: `noEmptyBlockStatements` 3 件は他 10 数ファイルと同じ `{ /* mock */ }` 形式へ統一。`noNonNullAssertion` 2 件はアクセサ関数経由の読み取りで `!` を除去（`capturedCallback` の代入が `render()` 内のコンストラクタ経由で TS の制御フロー解析から見えず、直接参照すると `never` へ絞り込まれる。型注釈では回避できない）。`useTemplate` 2 件 / `useOptionalChain` 1 件 / 不要な suppression 3 件も解消。
+- **`bun audit` 検出の脆弱性 2 件を解消（CI 復旧）**: CI の `Dependency vulnerability audit` ステップ（`.github/workflows/test.yaml`）が exit 1 で失敗していた問題を修正。① **high**: `next` の optionalDependency である `sharp` が 0.34.5（libvips 1.2.4）で GHSA-f88m-g3jw-g9cj（CVE-2026-33327 / 33328 / 35590 / 35591）に該当 → `overrides` に `"sharp": "^0.35.3"` を追加し libvips 1.3.2 へ更新。`next@16.2.6` の宣言レンジ `^0.34.5` は外れるが、本プロジェクトは `images: { unoptimized: true }` + `output: 'export'` の pure SSG で sharp のコードパスを一切実行しないため実害なし（`engines.node >= 20.9.0` は Netlify `NODE_VERSION=20` / CI Node 22 の双方を満たす）。② **low**: `mermaid` → `dompurify` が 3.4.11 で GHSA-c2j3-45gr-mqc4 に該当 → 既存 override を `^3.4.11` → `^3.4.12` へ引き上げ（脆弱版が範囲に残らないよう下限を更新）。mermaid 10.9.6 の宣言 `^3.2.4` を満たすため **mermaid 本体のアップグレードは不要**。`bun update` の全体実行は行わず overrides による外科的 pin のみ。ロックファイル差分は sharp サブツリー + dompurify + semver に限定。`bun audit` は `No vulnerabilities found`（exit 0）、テストは **1161 件合格（変化なし）**。
 - **共有フック `useTocObserver` のカバレッジ拡充とサブリンク親章連動バグの修正**: PR #124 の SonarCloud Quality Gate が `new_coverage 64.3% < 80%` で失敗していた原因（`web-next/lib/useTocObserver.ts` の 18 行・17 分岐が未カバー）を解消。`web-next/lib/useTocObserver.test.tsx` を新設し、サブリンク経路・モバイルサイドバー開閉・複数 entry の最上位選択・クリーンアップを直接検証（行 65/65・分岐 36/37）。テスト作成の過程で、サブリンク交差時に親章の TOC リンクを点灯させる処理が `subLink.closest("section")` を使っており、TOC リンクはサイドバー内にあって `<section>` の子孫にならないため本番で一度も実行されない死んだコードだったことが判明 → 交差した対象要素側から `closest("section")` する形に修正。併せて、リスナ登録ブロック内でしか呼ばれないハンドラの到達不能な null ガードを `const` クロージャ化して除去。TDD の Red / Green / Refactor を分割コミット。契約テスト 14 件を追加（合計 **1161 テスト合格**）。
 - **AWS Bedrock ガイドの表記および Mermaid 修正**: `Amazon-bedrock-best-practices-guide.md` 内の Mermaid フローチャートのインデントをカラム 0 に揃え、Contextual Grounding（コンテキスト根拠確認）の実行条件と、その後の Automated Reasoning 事実検証およびアプリ側による再生成・拒否・代替応答判断の評価フローを明示（Mermaid 図と表の両方に反映）。また、Converse API 説明での複数 Guardrail 同時適用（重ね合わせ）の記述を `guardrailConfig` で指定できる単一の Guardrail の適用に修正。（合計 **1147 テスト合格**）。
 - **Gemini Enterprise Agent Platform (中級) ガイドの Next.js 新設移行**: `Gemini-enterprise-agent-platform-best-practices.html` (実践ベストプラクティスガイド、中級向け) を `web-next/app/google/enterprise-agent-platform-intermediate/page.tsx` に新設移行。既存の完全ガイドはそのまま残し、原文の全14セクション・7 Mermaid図・コードブロックを React 要素として faithful に保持。SEO Heading 構造の適合（単一 h1 化）、TOC のスクロール追従、外部リンクの安全属性、ページレジストリ登録、CSS modules 化による CSS 変数定義 of スコープ化、フッター等幅フォント設定を追加。原本は `archive/html/google/` 配下に退避。契約テスト6件を追加（合計 **1144 テスト合格**）。
