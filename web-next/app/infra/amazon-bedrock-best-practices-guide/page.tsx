@@ -1,11 +1,7 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
-
-const MermaidDiagram = dynamic(() => import("@/components/docs/MermaidDiagram"), {
-  ssr: false,
-});
 
 export const metadata: Metadata = {
   title: "Amazon Bedrock 活用ベストプラクティスガイド | AI Hub",
