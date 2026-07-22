@@ -602,6 +602,18 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-22",
   },
   {
+    slug: "/infra/amazon-bedrock-best-practices-guide",
+    title: "Amazon Bedrock 活用ガイド",
+    description:
+      "Amazon Bedrockを使ったジェネレーティブAIアプリケーション構築のベストプラクティスを初学者から実務者まで段階的に学べる完全ガイド。",
+    group: "運用・品質",
+    topics: ["bedrock", "aws", "infra", "rag", "agent", "guardrails"],
+    summary:
+      "Amazon Bedrockを使ったジェネレーティブAIアプリケーション構築のベストプラクティスを初学者から実務者まで段階的に学べる完全ガイド。",
+    addedAt: "2026-07-22",
+    lastReviewed: "2026-07-22",
+  },
+  {
     slug: "/llm-ops/evaluation-observability",
     title: "Evaluation & Observability",
     group: "運用・品質",
