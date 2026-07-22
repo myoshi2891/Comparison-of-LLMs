@@ -1,3 +1,4 @@
+import Ext from "@/components/docs/Ext";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
@@ -1351,143 +1352,95 @@ export default function Fable5BestPracticesPage() {
                   <span className={styles.refTitle}>
                     Anthropic「Claude Fable 5 and Claude Mythos 5」(発表記事)
                   </span>
-                  <a
-                    href="https://www.anthropic.com/news/claude-fable-5-mythos-5"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://www.anthropic.com/news/claude-fable-5-mythos-5">
                     https://www.anthropic.com/news/claude-fable-5-mythos-5
-                  </a>
+                  </Ext>
                 </li>
                 <li>
                   <span className={styles.refTitle}>
                     Anthropic「Redeploying Claude Fable 5」(輸出規制解除後の復旧に関する声明)
                   </span>
-                  <a
-                    href="https://www.anthropic.com/news/redeploying-fable-5"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://www.anthropic.com/news/redeploying-fable-5">
                     https://www.anthropic.com/news/redeploying-fable-5
-                  </a>
+                  </Ext>
                 </li>
                 <li>
                   <span className={styles.refTitle}>
                     Claude Platform Docs「Introducing Claude Fable 5 and Claude Mythos 5」
                   </span>
-                  <a
-                    href="https://platform.claude.com/docs/en/about-claude/models/introducing-claude-fable-5-and-claude-mythos-5"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://platform.claude.com/docs/en/about-claude/models/introducing-claude-fable-5-and-claude-mythos-5">
                     https://platform.claude.com/docs/en/about-claude/models/introducing-claude-fable-5-and-claude-mythos-5
-                  </a>
+                  </Ext>
                 </li>
                 <li>
                   <span className={styles.refTitle}>
                     Claude Platform Docs「Prompting Claude Fable
                     5」(公式プロンプトガイド、本ガイド4章・6章の一次情報)
                   </span>
-                  <a
-                    href="https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5">
                     https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5
-                  </a>
+                  </Ext>
                 </li>
                 <li>
                   <span className={styles.refTitle}>
                     Claude Platform Docs「Prompting best practices」
                   </span>
-                  <a
-                    href="https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices">
                     https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices
-                  </a>
+                  </Ext>
                 </li>
                 <li>
                   <span className={styles.refTitle}>
                     Claude Code Docs「Model
                     configuration」(モデル選択・effort設定・自動フォールバックの一次情報)
                   </span>
-                  <a
-                    href="https://code.claude.com/docs/en/model-config"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://code.claude.com/docs/en/model-config">
                     https://code.claude.com/docs/en/model-config
-                  </a>
+                  </Ext>
                 </li>
                 <li>
                   <span className={styles.refTitle}>
                     Claude Code Docs「Orchestrate subagents at scale with dynamic workflows」
                   </span>
-                  <a
-                    href="https://code.claude.com/docs/en/workflows"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://code.claude.com/docs/en/workflows">
                     https://code.claude.com/docs/en/workflows
-                  </a>
+                  </Ext>
                 </li>
                 <li>
                   <span className={styles.refTitle}>
                     Claude Code Docs「Run agents in parallel」
                   </span>
-                  <a
-                    href="https://code.claude.com/docs/en/agents"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://code.claude.com/docs/en/agents">
                     https://code.claude.com/docs/en/agents
-                  </a>
+                  </Ext>
                 </li>
                 <li>
                   <span className={styles.refTitle}>
                     Claude Code Docs「Run parallel sessions with worktrees」
                   </span>
-                  <a
-                    href="https://code.claude.com/docs/en/worktrees"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://code.claude.com/docs/en/worktrees">
                     https://code.claude.com/docs/en/worktrees
-                  </a>
+                  </Ext>
                 </li>
                 <li>
                   <span className={styles.refTitle}>
                     Claude Code Docs「Keep Claude working toward a goal」(/goalコマンドの一次情報)
                   </span>
-                  <a
-                    href="https://code.claude.com/docs/en/goal"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://code.claude.com/docs/en/goal">
                     https://code.claude.com/docs/en/goal
-                  </a>
+                  </Ext>
                 </li>
                 <li>
                   <span className={styles.refTitle}>Claude Code Docs「Glossary」</span>
-                  <a
-                    href="https://code.claude.com/docs/en/glossary"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://code.claude.com/docs/en/glossary">
                     https://code.claude.com/docs/en/glossary
-                  </a>
+                  </Ext>
                 </li>
                 <li>
                   <span className={styles.refTitle}>Claude Code Docs「Subagents in the SDK」</span>
-                  <a
-                    href="https://code.claude.com/docs/en/agent-sdk/subagents"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://code.claude.com/docs/en/agent-sdk/subagents">
                     https://code.claude.com/docs/en/agent-sdk/subagents
-                  </a>
+                  </Ext>
                 </li>
               </ul>
             </div>
@@ -1500,60 +1453,40 @@ export default function Fable5BestPracticesPage() {
                     Thariq Shihipar(Anthropic, Claude Codeチーム)「A Field Guide to Fable: Finding
                     Your Unknowns」― 本ガイドで提示いただいた投稿。8章の一次情報
                   </span>
-                  <a
-                    href="https://x.com/trq212/status/2073100352921215386"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://x.com/trq212/status/2073100352921215386">
                     https://x.com/trq212/status/2073100352921215386
-                  </a>
+                  </Ext>
                 </li>
                 <li>
                   <span className={styles.refTitle}>
                     Thariq Shihipar「Fable is a step-change in models...」― Fable 5導入後のClaude
                     Codeチームの働き方変化に関する投稿。4章で言及
                   </span>
-                  <a
-                    href="https://x.com/trq212/status/2064437561930682672"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://x.com/trq212/status/2064437561930682672">
                     https://x.com/trq212/status/2064437561930682672
-                  </a>
+                  </Ext>
                 </li>
                 <li>
                   <span className={styles.refTitle}>
                     ClaudeDevs(Anthropic公式アカウント)「Claude Fable 5 changed how we work on the
                     Claude Code team day to day」
                   </span>
-                  <a
-                    href="https://x.com/ClaudeDevs/status/2064399512664526853"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://x.com/ClaudeDevs/status/2064399512664526853">
                     https://x.com/ClaudeDevs/status/2064399512664526853
-                  </a>
+                  </Ext>
                 </li>
                 <li>
                   <span className={styles.refTitle}>
                     Andrew Ng「My 3 key loops for building 0-to-1 products」(The Batch,
                     2026年6月26日号。7章の一次情報)
                   </span>
-                  <a
-                    href="https://x.com/AndrewYNg/status/2071988145667928442"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://x.com/AndrewYNg/status/2071988145667928442">
                     https://x.com/AndrewYNg/status/2071988145667928442
-                  </a>
+                  </Ext>
                   {" / "}
-                  <a
-                    href="https://www.deeplearning.ai/the-batch/issue-359"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://www.deeplearning.ai/the-batch/issue-359">
                     https://www.deeplearning.ai/the-batch/issue-359
-                  </a>
+                  </Ext>
                 </li>
               </ul>
             </div>
@@ -1566,129 +1499,89 @@ export default function Fable5BestPracticesPage() {
                     AlphaSignal AI「How to Actually Prompt Claude Fable
                     5」(公式ガイドの実務的な要約)
                   </span>
-                  <a
-                    href="https://alphasignalai.substack.com/p/how-to-actually-prompt-claude-fable"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://alphasignalai.substack.com/p/how-to-actually-prompt-claude-fable">
                     https://alphasignalai.substack.com/p/how-to-actually-prompt-claude-fable
-                  </a>
+                  </Ext>
                 </li>
                 <li>
                   <span className={styles.refTitle}>
                     Ken Huang「Claude Fable 5: What Changed, and How to Stop Prompting It Like
                     Opus」(&quot;Claudish&quot;の噂の裏取りを含む)
                   </span>
-                  <a
-                    href="https://kenhuangus.substack.com/p/claude-fable-5-what-changed-and-how"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://kenhuangus.substack.com/p/claude-fable-5-what-changed-and-how">
                     https://kenhuangus.substack.com/p/claude-fable-5-what-changed-and-how
-                  </a>
+                  </Ext>
                 </li>
                 <li>
                   <span className={styles.refTitle}>
                     Wavect Blog「Fable Is Back. Here's How to Actually Code With It」(Claude
                     Codeでの実践的なモデルルーティング例)
                   </span>
-                  <a
-                    href="https://wavect.io/blog/coding-with-claude-fable-5/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://wavect.io/blog/coding-with-claude-fable-5/">
                     https://wavect.io/blog/coding-with-claude-fable-5/
-                  </a>
+                  </Ext>
                 </li>
                 <li>
                   <span className={styles.refTitle}>
                     MCP.Directory「Fable 5 in Claude Code: Routing &amp;
                     Limits」(サブエージェント設定・フォールバック挙動の実務ガイド)
                   </span>
-                  <a
-                    href="https://mcp.directory/blog/fable-5-claude-code-model-routing-guide-2026"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://mcp.directory/blog/fable-5-claude-code-model-routing-guide-2026">
                     https://mcp.directory/blog/fable-5-claude-code-model-routing-guide-2026
-                  </a>
+                  </Ext>
                 </li>
                 <li>
                   <span className={styles.refTitle}>
                     Product Compass「Claude Fable 5 for PMs: Ultimate Guide」(CLAUDE.md棚卸しの実例)
                   </span>
-                  <a
-                    href="https://www.productcompass.pm/p/claude-fable-5-guide"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://www.productcompass.pm/p/claude-fable-5-guide">
                     https://www.productcompass.pm/p/claude-fable-5-guide
-                  </a>
+                  </Ext>
                 </li>
                 <li>
                   <span className={styles.refTitle}>
                     Artificial Lawyer「Anthropic's 'Dangerous' Fable Is Back! How Does It
                     Do?」(法律分野での実力検証。12章の一次情報)
                   </span>
-                  <a
-                    href="https://www.artificiallawyer.com/2026/07/02/anthropics-dangerous-fable-is-back-how-does-it-do/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://www.artificiallawyer.com/2026/07/02/anthropics-dangerous-fable-is-back-how-does-it-do/">
                     https://www.artificiallawyer.com/2026/07/02/anthropics-dangerous-fable-is-back-how-does-it-do/
-                  </a>
+                  </Ext>
                 </li>
                 <li>
                   <span className={styles.refTitle}>
                     The Rundown AI「Anthropic's Fable returns
                     worldwide」(復旧後の分類器精度に関する報道)
                   </span>
-                  <a
-                    href="https://www.therundown.ai/p/anthropic-fable-returns-worldwide"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://www.therundown.ai/p/anthropic-fable-returns-worldwide">
                     https://www.therundown.ai/p/anthropic-fable-returns-worldwide
-                  </a>
+                  </Ext>
                 </li>
                 <li>
                   <span className={styles.refTitle}>
                     dsebastien.net「Loop Engineering Went Mainstream」(Loop
                     Engineeringを巡る賛否両論のまとめ、Boris Cherny/Peter Steinberger発言の出典)
                   </span>
-                  <a
-                    href="https://www.dsebastien.net/loop-engineering-went-mainstream/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://www.dsebastien.net/loop-engineering-went-mainstream/">
                     https://www.dsebastien.net/loop-engineering-went-mainstream/
-                  </a>
+                  </Ext>
                 </li>
                 <li>
                   <span className={styles.refTitle}>
                     VentureBeat「Claude Code's '/goals' separates the agent that works from the one
                     that decides it's done」
                   </span>
-                  <a
-                    href="https://venturebeat.com/orchestration/claude-codes-goals-separates-the-agent-that-works-from-the-one-that-decides-its-done"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://venturebeat.com/orchestration/claude-codes-goals-separates-the-agent-that-works-from-the-one-that-decides-its-done">
                     https://venturebeat.com/orchestration/claude-codes-goals-separates-the-agent-that-works-from-the-one-that-decides-its-done
-                  </a>
+                  </Ext>
                 </li>
                 <li>
                   <span className={styles.refTitle}>
                     TechTimes「Claude Fable 5 Is Back: Safety Classifiers Now Reroute Security Agent
                     Loops」(輸出規制の経緯とLoop Engineeringの接続)
                   </span>
-                  <a
-                    href="https://www.techtimes.com/articles/319665/20260703/claude-fable-5-back-safety-classifiers-now-reroute-security-agent-loops.htm"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Ext href="https://www.techtimes.com/articles/319665/20260703/claude-fable-5-back-safety-classifiers-now-reroute-security-agent-loops.htm">
                     https://www.techtimes.com/articles/319665/20260703/claude-fable-5-back-safety-classifiers-now-reroute-security-agent-loops.htm
-                  </a>
+                  </Ext>
                 </li>
               </ul>
               <p className={styles.refNote}>
