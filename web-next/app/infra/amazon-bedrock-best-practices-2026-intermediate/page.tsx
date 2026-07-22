@@ -384,65 +384,24 @@ export default function AmazonBedrockBestPracticesPage() {
               </div>
               <div className={styles.codeLine}> </div>
               <div className={styles.codeLine}>
-                <span>prompt = bedrock_agent.get_prompt(</span>
-              </div>
-              <div className={styles.codeLine}>
-                <span> promptIdentifier=</span>
-                <span style={{ color: "#a5d6ff" }}>&quot;my-prompt-id&quot;</span>
-                <span>,</span>
-              </div>
-              <div className={styles.codeLine}>
-                <span> promptVersion=</span>
-                <span style={{ color: "#a5d6ff" }}>&quot;PROD&quot;</span>
-              </div>
-              <div className={styles.codeLine}>
-                <span>)</span>
-              </div>
-              <div className={styles.codeLine}> </div>
-              <div className={styles.codeLine}>
-                <span>variant = prompt[</span>
-                <span style={{ color: "#a5d6ff" }}>&quot;variants&quot;</span>
-                <span>][0]</span>
-              </div>
-              <div className={styles.codeLine}>
-                <span>model_id = variant[</span>
-                <span style={{ color: "#a5d6ff" }}>&quot;modelId&quot;</span>
-                <span>]</span>
-              </div>
-              <div className={styles.codeLine}>
-                <span>template = variant[</span>
-                <span style={{ color: "#a5d6ff" }}>&quot;templateConfiguration&quot;</span>
-                <span>][</span>
-                <span style={{ color: "#a5d6ff" }}>&quot;text&quot;</span>
-                <span>][</span>
-                <span style={{ color: "#a5d6ff" }}>&quot;text&quot;</span>
-                <span>]</span>
+                <span>prompt_arn = </span>
+                <span style={{ color: "#a5d6ff" }}>&quot;arn:aws:bedrock:ap-northeast-1:123456789012:prompt/PROMPT_ID:1&quot;</span>
               </div>
               <div className={styles.codeLine}> </div>
               <div className={styles.codeLine}>
                 <span>response = bedrock_runtime.converse(</span>
               </div>
               <div className={styles.codeLine}>
-                <span> modelId=model_id,</span>
+                <span> modelId=prompt_arn,</span>
               </div>
               <div className={styles.codeLine}>
-                <span> messages=[</span>
+                <span> promptVariables=&#123;</span>
               </div>
               <div className={styles.codeLine}>
-                <span> &#123;</span>
-                <span style={{ color: "#a5d6ff" }}>&quot;role&quot;</span>
-                <span>: </span>
-                <span style={{ color: "#a5d6ff" }}>&quot;user&quot;</span>
-                <span>, </span>
-                <span style={{ color: "#a5d6ff" }}>&quot;content&quot;</span>
-                <span>: [&#123;</span>
-                <span style={{ color: "#a5d6ff" }}>&quot;text&quot;</span>
-                <span>: template.format(question=</span>
-                <span style={{ color: "#a5d6ff" }}>&quot;返品ポリシーを教えてください&quot;</span>
-                <span>)&#125;]&#125;</span>
+                <span> &quot;question&quot;: &#123;&quot;text&quot;: &quot;返品ポリシーを教えてください&quot;&#125;</span>
               </div>
               <div className={styles.codeLine}>
-                <span> ]</span>
+                <span> &#125;</span>
               </div>
               <div className={styles.codeLine}>
                 <span>)</span>

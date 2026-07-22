@@ -1,10 +1,10 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import Page from "./page";
+import Page, { metadata } from "./page";
 
 vi.mock("@/components/docs/MermaidDiagram", () => ({
   default: function DummyMermaidDiagram({ chart }: { chart: string }) {
-    return <pre data-testid="mermaid">{chart}</pre>;
+    return <pre data-testid="mermaid-diagram">{chart}</pre>;
   },
 }));
 
@@ -23,6 +23,13 @@ globalThis.IntersectionObserver =
   IntersectionObserverStub as unknown as typeof IntersectionObserver;
 
 describe("Amazon Bedrock Best Practices Guide Page", () => {
+  it("exports correct page metadata", () => {
+    expect(metadata.title).toBe("Amazon Bedrock 活用ベストプラクティスガイド | AI Hub");
+    expect(metadata.description).toBe(
+      "Amazon Bedrockを使ったジェネレーティブAIアプリケーション構築のベストプラクティスを初学者から実務者まで段階的に学べる完全ガイド。"
+    );
+  });
+
   it("renders h1 title correctly", () => {
     render(<Page />);
     const heading = screen.getByRole("heading", { level: 1 });
@@ -65,6 +72,6 @@ describe("Amazon Bedrock Best Practices Guide Page", () => {
   it("renders mermaid diagram placeholders or components", () => {
     const { container } = render(<Page />);
     const mermaidElements = container.querySelectorAll("[data-testid='mermaid-diagram']");
-    expect(mermaidElements.length).toBe(6);
+    expect(mermaidElements.length).toBe(12);
   });
 });

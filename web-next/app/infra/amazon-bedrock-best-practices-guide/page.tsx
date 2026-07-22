@@ -352,7 +352,7 @@ flowchart LR
             </li>
             <li>
               <code>bedrock:InvokeModel</code> を許可する際は <code>Resource</code> を{" "}
-              <code>*</code> にせず、利用するモデルARN・Guardrail ID・Knowledge Base IDまで絞り込む
+              <code>*</code> にせず、利用するモデル・インフェランスプロファイルARNに絞り込み、Guardrail制限は <code>bedrock:GuardrailIdentifier</code> 条件で制御する（Knowledge Baseアクセス権限は別途 <code>bedrock:Retrieve</code> / <code>bedrock:RetrieveAndGenerate</code> ガイドに切り離す）
             </li>
             <li>
               Bedrock API keys（サービス固有認証情報）よりも、可能な限り
@@ -420,7 +420,9 @@ flowchart LR
               <div className={styles.codeLine}>
                 {" "}
                 <span className={styles.ck}>&quot;bedrock:GuardrailIdentifier&quot;</span>:{" "}
-                <span className={styles.cs}>&quot;my-production-guardrail&quot;</span>
+                <span className={styles.cs}>
+                  &quot;arn:aws:bedrock:us-east-1:123456789012:guardrail/my-production-guardrail&quot;
+                </span>
               </div>
               <div className={styles.codeLine}>
                 {" "}
@@ -549,17 +551,7 @@ flowchart LR
               <div className={styles.codeLine}>
                 {" "}
                 inferenceConfig=<span className={styles.cs}>{"{"}</span>
-              </div>
-              <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.cs}>&quot;maxTokens&quot;</span>: 1024,
-              </div>
-              <div className={styles.codeLine}>
-                {" "}
-                <span className={styles.cs}>&quot;temperature&quot;</span>: 0.3
-              </div>
-              <div className={styles.codeLine}>
-                {" "}
+                <span className={styles.cs}>&quot;maxTokens&quot;</span>: 1024
                 <span className={styles.cs}>{"}"}</span>
               </div>
               <div className={styles.codeLine}>)</div>
