@@ -8,7 +8,7 @@ type Props = {
   className?: string;
   /** Mermaid theme. Defaults to "dark". Pass "base" for light-mode pages. */
   theme?: "dark" | "base" | "default" | "forest" | "neutral";
-  /** 
+  /**
    * Mermaid themeVariables override (only meaningful when theme="base").
    * IMPORTANT: themeVariables should be a stable reference (e.g. a module-level constant like LOOP_THEME_VARS or wrapped in useMemo)
    * to prevent redundant re-initialization and flickering in the useEffect.

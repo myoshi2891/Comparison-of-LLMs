@@ -40,7 +40,10 @@ describe("F-7 - relatedEntries スコアリング", () => {
       entry({ slug: "/other-group", group: "運用・品質", topics: ["agent"] }),
       entry({ slug: "/same-group", group: "Agent 開発", topics: ["agent"] }),
     ];
-    expect(relatedEntries("/a", 2, pool).map((e) => e.slug)).toEqual(["/same-group", "/other-group"]);
+    expect(relatedEntries("/a", 2, pool).map((e) => e.slug)).toEqual([
+      "/same-group",
+      "/other-group",
+    ]);
   });
 
   it("スコア・group が同点なら addedAt 降順 → slug 昇順（決定論的タイブレーク）", () => {
@@ -90,7 +93,9 @@ describe("F-7 - relatedEntries スコアリング", () => {
   it("実 registry: openclaw ガイドは 3 件の関連ページを持つ", () => {
     const results = relatedEntries("/agent/openclaw-advanced-agent-security-guide");
     expect(results).toHaveLength(3);
-    expect(results.map((e) => e.slug)).not.toContain("/agent/openclaw-advanced-agent-security-guide");
+    expect(results.map((e) => e.slug)).not.toContain(
+      "/agent/openclaw-advanced-agent-security-guide"
+    );
   });
 
   it("実 registry: 呼び出しが冪等（同じ入力に同じ順序）", () => {

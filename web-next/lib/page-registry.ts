@@ -747,7 +747,8 @@ const entries: PageEntry[] = [
   {
     slug: "/claude/tag-best-practices",
     title: "Claude Tag 活用ガイド ― 中級者〜上級者向けベストプラクティス",
-    description: "Slack上でチームがClaudeをタグ付けして仕事を委任できる新機能「Claude Tag」について、公式ドキュメントやコミュニティ発信をもとにまとめた中級者〜上級者向け実践ガイド。",
+    description:
+      "Slack上でチームがClaudeをタグ付けして仕事を委任できる新機能「Claude Tag」について、公式ドキュメントやコミュニティ発信をもとにまとめた中級者〜上級者向け実践ガイド。",
     group: "Providers",
     category: "Claude",
     provider: "claude",
