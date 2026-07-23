@@ -14,10 +14,11 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（**0 errors / 0 warnings / 0 infos**。既知の既存指摘も含め全件解消済み）
 - **テストの実行状況**:
-- **フロントエンド (`web-next/`)**: Vitest 実行で **1195 件すべて合格** (全 Green ✅)
+- **フロントエンド (`web-next/`)**: Vitest 実行で **1199 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **Mermaid 図解レイアウトの全サイト統一（中央寄せ・全幅・横スクロール）**: 共有コンポーネント `web-next/components/docs/MermaidDiagram.tsx` を2層構造（外側=全幅・`overflow-x:auto` / 内側=`fit-content`・`margin:0 auto`、`useMaxWidth:false`）に変更し、**図解レイアウトの唯一の真実の源**とした。従来は約50ページの `page.module.css` が個別に `:global(.mermaid)` / `:global(svg)` の幅を強制しており、`svg{width:100%}`（引き伸ばし）／`svg{max-width:100%}`（縮小）／override 無し（左寄せ）の三分裂が起きていた。34 ページの per-page レイアウト強制ルールを削除（配色テーマルールは保持）し、`enterprise-agent-platform-intermediate` はフレーム装飾を `.diagramWrap` へ移設。併せてユーザー要望により 32 ページの本文カラムの固定 `max-width`（1000〜1200px）を撤廃し**流動全幅**に統一（読みやすさ用の狭いキャップ・per-diagram キャップは保持）。`MermaidDiagram.test.tsx` を新設（Red→Green）、`gpt-5-6` 契約テストを新不変条件へ更新。不変条件を `.claude/rules/mermaid-diagram-layout.md` に固定し、`fix-mermaid` / `nextjs-page-migration` スキルをブラッシュアップ（合計 **1199 テスト合格**）。
 - **PR #126 SonarCloud Quality Gate の新規コードカバレッジを復旧**: Gemma、Kimi、Amazon Bedrock 2ページの `TocObserver.tsx` はページ契約テストで初期化だけが実行され、`IntersectionObserver` コールバックの32条件中26条件が未カバーだったため、新規コードカバレッジが47.7%（基準80%）まで低下していた。クラス選択型と `href` 解決型の共通テストスイートを追加し、4ファイルすべて行・条件カバレッジ100%を実測。テスト12件を追加して合計 **1195 テスト合格**とし、併せて既存ファイルのBiome指摘26 errors / 1 warningもファイル単位で全件解消した。
 - **Amazon Bedrock 活用ベストプラクティスガイドの Next.js 移行とグローバルナビ同期**: `Amazon-bedrock-best-practices-guide.html` を `web-next/app/infra/amazon-bedrock-best-practices-guide/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全18セクション・全表・全コードブロック・6 Mermaid図・TOCスクロール追従・外部リンク安全属性・グローバルナビ（`運用・品質` グループ / `page-registry.ts`）登録を完了。原本 `Amazon-bedrock-best-practices-guide.html` は `archive/` へ `git mv` 退避。契約テスト5件を追加し全クリア（合計 **1183 テスト合格**）。
 - **Amazon Bedrock ベストプラクティス完全ガイドの Next.js 移行とグローバルナビ同期**: `Amazon-bedrock-best-practices-2026-intermediate.html` を `web-next/app/infra/amazon-bedrock-best-practices-2026-intermediate/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全15セクション・全表・全コードブロック・6 Mermaid図・TOCスクロール追従・外部リンク安全属性・グローバルナビ（`運用・品質` グループ）登録を完了。原本 `Amazon-bedrock-best-practices-2026-intermediate.html` は `archive/` へ `git mv` 退避。契約テスト5件を追加し全クリア（合計 **1178 テスト合格**）。
