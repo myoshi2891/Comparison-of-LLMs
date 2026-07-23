@@ -19,7 +19,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from scraper.models import ApiModel
-from scraper.providers import anthropic, aws, deepseek, google, moonshot, openai, xai
+from scraper.providers import anthropic, aws, deepseek, google, moonshot, openai, xai, zhipu
 
 
 @pytest.fixture(autouse=True)
@@ -320,3 +320,29 @@ class TestMoonshot:
         with patch("scraper.providers.moonshot.get_page_text", return_value="<html></html>"):
             models = moonshot.scrape()
         _assert_all_fallback(models, moonshot._FALLBACKS, "Moonshot(Kimi)")
+
+
+# --------------------------------------------------------------------------- #
+# Zhipu(GLM)（"GLM-5.2" のみ。key "glm-5\.2" は "GLM-4.6" と衝突しない）
+# --------------------------------------------------------------------------- #
+class TestZhipu:
+    _HTML = (
+        "<html><body>"
+        "<p>GLM-5.2 $7.77</p>"
+        "<p>GLM-5.2 output $22.22</p>"
+        "</body></html>"
+    )
+
+    def test_success_extracts_prices(self):
+        with patch("scraper.providers.zhipu.get_page_text", return_value=self._HTML):
+            models = zhipu.scrape()
+        glm = _find(models, "GLM-5.2")
+        assert glm.price_in == 7.77
+        assert glm.price_out == 22.22
+        assert glm.scrape_status == "success"
+        assert glm.provider == "Zhipu(GLM)"
+
+    def test_fallback_on_empty_html(self):
+        with patch("scraper.providers.zhipu.get_page_text", return_value="<html></html>"):
+            models = zhipu.scrape()
+        _assert_all_fallback(models, zhipu._FALLBACKS, "Zhipu(GLM)")
