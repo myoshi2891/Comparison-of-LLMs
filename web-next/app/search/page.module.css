@@ -1,5 +1,6 @@
 /** F-5 横断検索ページ。whats-new のカードと同トーンで揃える。 */
 .main {
+  max-width: 1440px;
   margin: 0 auto;
   padding: 2rem 1.25rem 4rem;
 }

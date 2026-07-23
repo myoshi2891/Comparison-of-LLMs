@@ -199,6 +199,7 @@
   overflow-x: auto;
 }
 .navInner {
+  max-width: 1440px;
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -230,6 +231,7 @@ nav a:hover,
 
 /* ─── MAIN ─── */
 .main {
+  max-width: 1440px;
   margin: 0 auto;
   padding: 0 24px 100px;
 }

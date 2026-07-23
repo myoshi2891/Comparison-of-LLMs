@@ -18,6 +18,7 @@
   --radius: 12px;
   --code-bg: #091525;
 
+  max-width: 1440px;
   margin: 0 auto;
   padding: 0 24px 80px;
   color: var(--tp);

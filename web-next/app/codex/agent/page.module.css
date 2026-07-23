@@ -91,6 +91,7 @@
 
 /* ── Wrapper ── */
 .root .wrap {
+  max-width: 1440px;
   margin: 0 auto;
   padding: 52px 24px 100px;
 }
