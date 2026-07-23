@@ -2696,28 +2696,41 @@ print(completion.choices[0].message.content)</code></pre>
           }
         });
 
-        mermaid.initialize({
-          startOnLoad: false,
-          theme: 'dark',
-          securityLevel: 'loose',
-          flowchart: { useMaxWidth: false, curve: 'basis' },
-          themeVariables: {
-            background: '#0b1729',
-            primaryColor: '#13223a',
-            primaryTextColor: '#e8edf7',
-            primaryBorderColor: '#7c9eff',
-            lineColor: '#7c9eff',
-            secondaryColor: '#0d1826',
-            tertiaryColor: '#0d1826',
-            fontFamily: 'Noto Sans JP, sans-serif',
-          },
-        });
+        if (typeof window.mermaid !== "undefined" && window.mermaid) {
+          try {
+            mermaid.initialize({
+              startOnLoad: false,
+              theme: 'dark',
+              securityLevel: 'loose',
+              flowchart: { useMaxWidth: false, curve: 'basis' },
+              themeVariables: {
+                background: '#0b1729',
+                primaryColor: '#13223a',
+                primaryTextColor: '#e8edf7',
+                primaryBorderColor: '#7c9eff',
+                lineColor: '#7c9eff',
+                secondaryColor: '#0d1826',
+                tertiaryColor: '#0d1826',
+                fontFamily: 'Noto Sans JP, sans-serif',
+              },
+            });
 
-        mermaid.run({ querySelector: '.mermaid' }).catch(function (err) {
-          console.error('Mermaid render failed:', err);
-        }).finally(function () {
+            mermaid.run({ querySelector: '.mermaid' }).catch(function (err) {
+              console.error('Mermaid render failed:', err);
+            }).finally(function () {
+              if (typeof window.hljs !== "undefined" && window.hljs) {
+                hljs.highlightAll();
+              }
+            });
+          } catch (err) {
+            console.error('Mermaid initialization failed:', err);
+            if (typeof window.hljs !== "undefined" && window.hljs) {
+              hljs.highlightAll();
+            }
+          }
+        } else if (typeof window.hljs !== "undefined" && window.hljs) {
           hljs.highlightAll();
-        });
+        }
 
         const sections = document.querySelectorAll('.section[id]');
         const navLinks = document.querySelectorAll('.sidebar nav a');

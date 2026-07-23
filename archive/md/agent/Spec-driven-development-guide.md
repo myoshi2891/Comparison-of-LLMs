@@ -334,7 +334,7 @@ flowchart TD
 
 ## 8. 実践編①：GitHub Spec Kit ワークフロー
 
-GitHub Spec Kitは、GitHubがOSS（MITライセンス）として提供する`specify`という名前のCLIツールで、2026年時点でもっとも広く採用されているSDDツールの一つです（報告によりスター数の数字に幅がありますが、2026年前半時点でおよそ88,000〜110,000以上のGitHubスターを獲得しています）。Claude Code、GitHub Copilot、Gemini CLI、Cursorなど30以上のAIエージェント統合をサポートしています。
+GitHub Spec Kitは、GitHubがOSS（MITライセンス）として提供する`specify`という名前のCLIツールで、2026年時点でもっとも広く採用されているSDDツールの一つです（2026年7月時点でおよそ123,000以上のGitHubスターを獲得しています）。Claude Code、GitHub Copilot、Gemini CLI、Cursorなど30以上のAIエージェント統合をサポートしています。
 
 ### 8.1 インストールと初期化
 

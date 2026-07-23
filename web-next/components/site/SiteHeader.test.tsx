@@ -88,27 +88,28 @@ describe("SiteHeader dropdown rendering", () => {
 });
 
 describe("SiteHeader nested sub-dropdown rendering (Providers only)", () => {
-  it("renders 4 sub-dropdowns (Claude / Google / Codex / Copilot) under Providers", () => {
+  it("renders 5 sub-dropdowns (Claude / Google / Codex / Copilot / Moonshot) under Providers", () => {
     const { container } = render(<SiteHeader pathname="/" />);
     const subs = container.querySelectorAll("li.ch-subdropdown");
-    expect(subs.length).toBe(4);
+    expect(subs.length).toBe(5);
     expect(Array.from(subs).map((li) => li.querySelector("button")?.textContent)).toEqual([
       "Claude",
       "Google",
       "Codex",
       "Copilot",
+      "Moonshot",
     ]);
   });
 
   it("each sub-dropdown has a toggle with aria-haspopup and a .ch-subsubmenu <ul>", () => {
     const { container } = render(<SiteHeader pathname="/" />);
     const toggles = container.querySelectorAll("li.ch-subdropdown > .ch-subdropdown-toggle");
-    expect(toggles.length).toBe(4);
+    expect(toggles.length).toBe(5);
     toggles.forEach((btn) => {
       expect(btn.getAttribute("aria-haspopup")).toBe("true");
     });
     const subsubmenus = container.querySelectorAll("li.ch-subdropdown > ul.ch-subsubmenu");
-    expect(subsubmenus.length).toBe(4);
+    expect(subsubmenus.length).toBe(5);
     subsubmenus.forEach((ul) => {
       expect(ul.querySelectorAll("li").length).toBeGreaterThan(0);
     });

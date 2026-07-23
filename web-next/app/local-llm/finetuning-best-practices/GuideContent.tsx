@@ -268,6 +268,8 @@ export default function GuideContent() {
       process.cwd(),
       "..",
       "archive",
+      "html",
+      "LLM-OPs",
       "Finetuning-best-practices-guide.html"
     );
     const sourceHtml = readFileSync(SOURCE_PATH, "utf8");

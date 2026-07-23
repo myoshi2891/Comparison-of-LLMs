@@ -105,7 +105,14 @@ describe("/local-llm/finetuning-best-practices - faithful content safeguards", (
   it("syntax-highlights every source code block without changing its text", () => {
     const source = load(
       readFileSync(
-        join(process.cwd(), "..", "archive", "Finetuning-best-practices-guide.html"),
+        join(
+          process.cwd(),
+          "..",
+          "archive",
+          "html",
+          "LLM-OPs",
+          "Finetuning-best-practices-guide.html"
+        ),
         "utf8"
       )
     );

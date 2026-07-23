@@ -80,7 +80,7 @@ NIST AI RMF（正式名称：NIST AI 100-1）は、2023年1月に公開された
 
 EU AI Actは2024年8月1日に発効した、世界初の包括的なAI法規制です。すべてのAIシステムを一律に規制するのではなく、リスクの大きさに応じて4段階に分類し、それぞれ異なる義務を課す「リスクベースアプローチ」を採用している点が最大の特徴です。禁止行為やAIリテラシーに関する義務は2025年2月から、汎用AI（GPAI）モデル提供者に対する義務は2025年8月から、それぞれ適用が開始されています。
 
-2026年に入り、高リスクAIシステムに関する義務の適用時期をめぐって「デジタル・オムニバス（Digital Omnibus on AI）」という簡素化パッケージの交渉が続けられてきました。2026年5月7日に欧州理事会・欧州議会・欧州委員会の間で暫定合意に達し、6月16日に欧州議会が正式承認、6月29日に理事会も最終承認しています。この合意により、単独型（Annex III）の高リスクAIシステムに関する義務は当初予定の2026年8月2日から2027年12月2日へ、機械・医療機器等に組み込まれた製品規制型（Annex I）の高リスクAIシステムは2027年8月2日から2028年8月2日へ、それぞれ延期される見通しです。ただし、この改正は正式に官報（Official Journal）に公布されて初めて法的効力を持つため、公布状況は必ず一次情報で確認してください。あわせて、非同意の性的コンテンツ生成AI（いわゆる「ヌーディファイアー」）や児童性的虐待コンテンツを生成するAIシステムを禁止する新条項が、2026年12月2日から適用される予定です。
+2026年に入り、高リスクAIシステムに関する義務の適用時期をめぐって「デジタル・オムニバス（Digital Omnibus on AI）」という簡素化パッケージの交渉が続けられてきました。2026年5月7日の暫定合意（Provisional Agreement）を経て、EU理事会が2026年6月29日に最終承認（Final Approval）を行いました。この合意により、単独型（Annex III）の高リスクAIシステムに関する義務は当初予定の2026年8月2日から2027年12月2日へ、機械・医療機器等に組み込まれた製品規制型（Annex I）の高リスクAIシステムは2027年8月2日から2028年8月2日へ、それぞれ延期される見通しです。ただし、このスケジュールは確定した法的決定ではなく、最終的な官報（Official Journal）公布状況および法的位置づけを必ず一次情報で確認する必要があります。あわせて、非同意の性的コンテンツ生成AI（いわゆる「ヌーディファイアー」）や児童性的虐待コンテンツを生成するAIシステムを禁止する新条項が、2026年12月2日から適用される予定です。
 
 ### AIシステムのリスク分類
 
@@ -106,7 +106,7 @@ flowchart TD
 - EU公式「AI Act」欧州委員会 Digital Strategy https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai
 - artificialintelligenceact.eu「Implementation Timeline」 https://artificialintelligenceact.eu/implementation-timeline/
 - artificialintelligenceact.eu「High-level summary of the AI Act」 https://artificialintelligenceact.eu/high-level-summary/
-- 欧州理事会（Consilium）プレスリリース https://www.consilium.europa.eu/en/press/press-releases/2026/05/07/artificial-intelligence-council-and-parliament-agree-to-simplify-and-streamline-rules/
+- EU理事会（Consilium）プレスリリース https://www.consilium.europa.eu/en/press/press-releases/2026/06/29/artificial-intelligence-council-gives-final-approval-to-simplify-and-streamline-rules/
 - Gibson Dunn「EU AI Act Omnibus Agreement」 https://www.gibsondunn.com/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes/
 - Scytale「EU AI Act Risk Categories Explained」 https://scytale.ai/resources/eu-ai-act-risk-categories/
 
@@ -355,7 +355,7 @@ AIガバナンスは、NIST AI RMF・EU AI Act・ISO/IEC 42001・OECD AI原則�
 - 欧州委員会 Digital Strategy「AI Act」 https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai
 - artificialintelligenceact.eu「Implementation Timeline」 https://artificialintelligenceact.eu/implementation-timeline/
 - artificialintelligenceact.eu「High-level summary of the AI Act」 https://artificialintelligenceact.eu/high-level-summary/
-- 欧州理事会（Consilium）プレスリリース https://www.consilium.europa.eu/en/press/press-releases/2026/05/07/artificial-intelligence-council-and-parliament-agree-to-simplify-and-streamline-rules/
+- EU理事会（Consilium）プレスリリース https://www.consilium.europa.eu/en/press/press-releases/2026/06/29/artificial-intelligence-council-gives-final-approval-to-simplify-and-streamline-rules/
 - Gibson Dunn「EU AI Act Omnibus Agreement」 https://www.gibsondunn.com/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes/
 - Kennedys Law「The EU AI Act implementation timeline」 https://www.kennedyslaw.com/en/thought-leadership/article/2026/the-eu-ai-act-implementation-timeline-understanding-the-next-deadline-for-compliance/
 - GDPR Local「AI Risk Classification: Guide to EU AI Act Risk Categories」 https://gdprlocal.com/ai-risk-classification/

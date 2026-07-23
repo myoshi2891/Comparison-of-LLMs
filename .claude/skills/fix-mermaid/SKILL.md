@@ -14,7 +14,7 @@ description: >
 
 # Mermaid v10 修正・スタイリングスキル
 
-Updated: 2026-06-15
+Updated: 2026-07-22
 
 ## 対象
 
@@ -143,25 +143,63 @@ mermaid.initialize({
 
 ### 2-3: SVGサイズ後処理（レンダリング後に必ず実行）
 
+> **☠️☠️ 最大の落とし穴： `useMaxWidth: true` は「図を強制で全幅に引き伸ばす」**
+>
+> `mermaid.initialize({ flowchart: { useMaxWidth: true } })` は、
+> Mermaid が SVG を生成する際に `max-width: 100%` を **inline style** で強制的に割り当てる。
+> これが `width: 100%` のコンテナの中に入ると、菱形ノードやシーケンス図が画面全幅に拡大する。
+>
+> **正解は `useMaxWidth: false` を設定し、分類は CSS 側で行う。**
+
 ```js
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'dark',
+  // ✅ すべて false —— Mermaidに SVGサイズを営ませない
+  flowchart: { useMaxWidth: false, htmlLabels: true },
+  sequence: { useMaxWidth: false, mirrorActors: true, noteMargin: 10 },
+  mindmap:  { useMaxWidth: false },
+  // ❌ NG: useMaxWidth: true  ← コンテナ全幅に引き伸ばされて巨大化する
+});
+```
+
+```js
+// SVG 後処理：実寸を維持しつつコンテナ幅で上限
 const svgEl = el.querySelector('svg');
 if (svgEl) {
   svgEl.removeAttribute('width');
   svgEl.removeAttribute('height');
-  svgEl.style.width    = '100%';
-  svgEl.style.maxWidth = svgEl.style.maxWidth || '100%';
-  svgEl.style.height   = 'auto';
-  svgEl.style.overflow = 'visible'; // ← シーケンス図下部切れ防止
+  svgEl.style.display  = 'block';
+  svgEl.style.width    = 'auto';    // ✅ 実寸維持
+  svgEl.style.maxWidth = '100%';    // ✅ コンテナ幅を超えない
+  svgEl.style.height   = 'auto';    // ✅ 縦横比を保つ
+  svgEl.style.margin   = '0 auto';  // ✅ 中央寄せ
+  svgEl.style.overflow = 'visible'; // ✅ シーケンス図下部切れ防止
 }
 ```
+
+> **⚠️ `max-width: N px` の種別別制限はやらない**
+>
+> TDフローチャートに `max-width: 560px` を設定すると、
+> 横方向にノードが広がる図（多岐分岐フロー等）は逆に小さくなって文字が読めなくなる。
+> Mermaidの SVG 実寸はノード内容と横幅に依存し、一恙に制限できない。
+> **種別の `max-width` 制限はおこなわない**。コンテナ幅の CSS 上限 (`max-width: 100%`) のみで十分。
 
 CSSにもフォールバックを追加:
 
 ```css
 .mermaid-wrap .mermaid {
-  overflow: visible;
+  display: block;
+  width: fit-content; /* ✅ SVG実寸に任せる（巨大化しない） */
+  max-width: 100%;    /* ✅ コンテナ幅を超えない */
+  margin: 0 auto;     /* ✅ 中央寄せ */
+  /* ❌ NG: width: 100%  ← 巨大化の原因になる */
 }
 .mermaid-wrap .mermaid svg {
+  display: block;
+  width: auto;     /* ✅ */
+  max-width: 100%; /* ✅ */
+  height: auto;
   overflow: visible;
 }
 ```
@@ -342,24 +380,75 @@ mermaid.initialize({ startOnLoad: false });
 ### CSS Modules 環境下での中央寄せとサイズ制限
 
 ```tsx
-<div id="diag-0" className={styles.mermaid}>
+// MermaidDiagramコンポーネントの実装パターン（正解）
+import { forwardRef } from "react";
+
+interface MermaidDiagramProps {
+  chart: string;
+  className?: string;
+  theme?: string;
+}
+
+const MermaidDiagram = forwardRef<HTMLDivElement, MermaidDiagramProps>(
+  ({ chart, className, theme = "dark" }, ref) => {
+    return (
+      <div
+        className={`mermaid ${className || ""}`}
+        ref={ref}
+        data-theme={theme}
+        // ✅ width: fit-content で SVG 実寸に合わせる
+        // ❌ width: "100%" は「小さな図も全幅に引き伸ばす」ため禁止
+        style={{ width: "fit-content", maxWidth: "100%", minHeight: "4rem" }}
+      />
+    );
+  }
+);
+MermaidDiagram.displayName = "MermaidDiagram";
+export default MermaidDiagram;
+```
+
+```tsx
+<div className={styles.mermaidContainer}>
   <MermaidDiagram chart={DIAGRAM_0} />
 </div>
 ```
 
 ```css
-.mermaid {
+/* ✅ 正解パターン */
+.mermaidContainer {
   display: flex;
   justify-content: center;
+  overflow-x: auto; /* 横幅を超える場合のスクロール */
 }
-.mermaid :global(svg) {
+.mermaidContainer :global(.mermaid) {
   display: block;
+  width: fit-content; /* ✅ SVG 実寸に合わせる */
+  max-width: 100%;    /* ✅ コンテナ幅を超えない */
   margin: 0 auto;
-  width: 100%;
-  max-width: 100%;
-  height: auto;
+  /* ❌ width: 100% ← 巨大化の原因！絶対に書かない */
+}
+.mermaidContainer :global(svg) {
+  display: block !important;
+  width: auto !important;
+  max-width: 100% !important;
+  height: auto !important;
+  overflow: visible !important;
 }
 ```
+
+> **⚠️ `mermaid.initialize` の `useMaxWidth` も必ず `false` にする**
+>
+> `useMaxWidth: true`（デフォルト）は Mermaid が生成する SVG に「inline style で `max-width: 100%`」を注入する。
+> これが `.mermaid` の `width: fit-content` を無視して全幅化する。
+>
+> ```js
+> // ✅ 必ず false にする
+> mermaid.initialize({
+>   flowchart: { useMaxWidth: false, htmlLabels: true },
+>   sequence:  { useMaxWidth: false },
+>   mindmap:   { useMaxWidth: false },
+> });
+> ```
 
 ### ⚠️ CSS変数は `globals.css` に存在しないものを `var()` で参照しない
 
@@ -415,4 +504,6 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
 | マインドマップのテキストが読めない | `foreignObject` CSS非カスケード問題 | Part 2-4の手順に従う |
 | シーケンス図の下部が切れる | `mirrorActors`, `overflow` の設定 | Part 2-5参照 |
 | CSS `!important` が効かない | inline `style` 属性の優先度 | JS `.style.setProperty(..., 'important')` を使う |
-| SVGが縦長に拡大される | `width: 100%` の誤用 | `width: auto; max-width: 100%` に変更 |
+| **SVG全体が巨大化・画面全幅に広がる** | `useMaxWidth: true` かつ `width: 100%` | `useMaxWidth: false` + `width: fit-content`（Part 2-3・Part 4参照） |
+| 図は常識的な大きさだが小さな図も全幅に引き伸ばされる | コンテナまたは `.mermaid` に `width: 100%` | `width: fit-content; max-width: 100%` に変更 |
+| **SVGが縦長に拡大される・縦横比が崩れる** | SVGに `width` 属性が残ったままに `width: 100%` | `removeAttribute('width')` → `width: auto; max-width: 100%` に変更 |

@@ -14,10 +14,16 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（**0 errors / 0 warnings / 0 infos**。既知の既存指摘も含め全件解消済み）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest 実行で **1161 件すべて合格** (全 Green ✅)
+- **フロントエンド (`web-next/`)**: Vitest 実行で **1195 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **PR #126 SonarCloud Quality Gate の新規コードカバレッジを復旧**: Gemma、Kimi、Amazon Bedrock 2ページの `TocObserver.tsx` はページ契約テストで初期化だけが実行され、`IntersectionObserver` コールバックの32条件中26条件が未カバーだったため、新規コードカバレッジが47.7%（基準80%）まで低下していた。クラス選択型と `href` 解決型の共通テストスイートを追加し、4ファイルすべて行・条件カバレッジ100%を実測。テスト12件を追加して合計 **1195 テスト合格**とし、併せて既存ファイルのBiome指摘26 errors / 1 warningもファイル単位で全件解消した。
+- **Amazon Bedrock 活用ベストプラクティスガイドの Next.js 移行とグローバルナビ同期**: `Amazon-bedrock-best-practices-guide.html` を `web-next/app/infra/amazon-bedrock-best-practices-guide/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全18セクション・全表・全コードブロック・6 Mermaid図・TOCスクロール追従・外部リンク安全属性・グローバルナビ（`運用・品質` グループ / `page-registry.ts`）登録を完了。原本 `Amazon-bedrock-best-practices-guide.html` は `archive/` へ `git mv` 退避。契約テスト5件を追加し全クリア（合計 **1183 テスト合格**）。
+- **Amazon Bedrock ベストプラクティス完全ガイドの Next.js 移行とグローバルナビ同期**: `Amazon-bedrock-best-practices-2026-intermediate.html` を `web-next/app/infra/amazon-bedrock-best-practices-2026-intermediate/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全15セクション・全表・全コードブロック・6 Mermaid図・TOCスクロール追従・外部リンク安全属性・グローバルナビ（`運用・品質` グループ）登録を完了。原本 `Amazon-bedrock-best-practices-2026-intermediate.html` は `archive/` へ `git mv` 退避。契約テスト5件を追加し全クリア（合計 **1178 テスト合格**）。
+- **Kimi(Moonshot AI) LLM 徹底ガイドの Pure JSX 移行とグローバルナビ同期**: `Kimi-llm-best-practices.html` を `web-next/app/moonshot/kimi-llm-best-practices/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全19セクション・全表・全コードブロック・9 Mermaid図・TOCスクロール追従・外部リンク安全属性・グローバルナビ登録を完了。原本 `Kimi-llm-best-practices.html` / `.md` は `archive/html/moonshot/` および `archive/md/moonshot/` へ `git mv` 退避。契約テスト5件を追加し全クリア（合計 **1173 テスト合格**）。
+- **OpenAI GPT-5.6 完全ガイドの Pure JSX 移行とグローバルナビ同期**: `Gpt-5.6-best-practices-guide.html` を `web-next/app/model-data/gpt-5-6-best-practices/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全18セクション・全7表・8 Mermaid図・コードブロック・TOCスクロール追従・外部リンク安全属性・グローバルナビ登録を完了。仮の `GuideContent.tsx` 動的読み込みを廃止し、原本 `Gpt-5.6-best-practices-guide.html` / `.md` を `archive/` へ `git mv` 退避。契約テストを増強し全クリア（合計 **1168 テスト合格**）。
+- **Google Gemma 実践ガイド 2026 の Next.js 移行**: `Gemma-best-practices-guide.html` を `web-next/app/google/gemma-best-practices-guide/page.tsx` に移行 🚀。原文の全14セクション・全表・全コードブロック・7 Mermaid図を React 要素として faithful に保持し、TOCのスクロール追従、外部リンクの安全属性、ページレジストリ登録、CSS Modules化によるCSS変数定義のスコープ化、フッター等幅フォント設定を追加。原本は `archive/html/google/` および `archive/md/google/` 配下に退避。契約テスト6件を追加（合計 **1167 テスト合格**）。
 - **Biome 指摘 224 件を全て解消（lint がクリーンに）**: `bun run lint` の 36 errors / 186 warnings / 2 infos をゼロにした。テストは **1161 件合格（変化なし）**、build / typecheck / pytest 38 件も全て Green。
   - **CSS 警告 179 件**（`noImportantStyles` 169 + `noDescendingSpecificity` 10）: `biome.json` の `overrides` で `app/**/page.module.css` に限定して無効化。これらは `globals.css` の素の要素セレクタを打ち消すための意図的な `!important` であり、除去するとガイドページ 24 枚の表示が壊れる。**理由は `biome.json` 内に書けない** — 厳密 JSON のためコメントを入れると設定がパース不能になり、Biome がデフォルト設定へフォールバックして `node_modules` まで走査する（実際に一度踏んで 154,586 件の診断が出た）。よって理由は CLAUDE.md に記載。これに伴い不要化した `biome-ignore` コメント 48 件を 11 ファイルから削除。
   - **format 22 + organizeImports 2**: 該当ファイルのみ個別に `biome check --write`（リポジトリ全体走査は禁止ルール）。CSS 20 ファイルは「コメント・引用符・空白を正規化すると変更前後が完全一致」することを機械的に検証済み＝**意味的変更ゼロ・視覚回帰リスクなし**（実変更は `'` → `"` の統一と複数値プロパティの改行のみ）。
@@ -208,7 +214,7 @@ Next.js 移行完了後のリポジトリ `LLM-Studies` にて、テストカバ
 Next.js 移行完了後のリポジトリ `LLM-Studies` の保守・改善作業を再開してください。
 
 - リポジトリ: LLM-Studies (Next.js 移行プロジェクトは dev/main へ完全マージ済み)
-  - 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (1147/1147 passed) / pytest (38/38 passed) で全 Green
+  - 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (1195/1195 passed) / pytest (38/38 passed) で全 Green
 - リポジトリ規約: CLAUDE.md (編集上の絶対ルール。※Antigravity環境ではビルドは実行禁止)
 
 作業方針：

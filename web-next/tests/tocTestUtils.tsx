@@ -236,8 +236,11 @@ interface ObserverOnlyTocConfig {
 }
 
 /**
- * インライン IntersectionObserver のみ（モバイルナビなし）の TocObserver 向け
- * 共通テストスイートを登録する（Group B2）。
+ * Registers shared tests for a TocObserver that uses IntersectionObserver without mobile navigation.
+ *
+ * @param TocObserver - The TocObserver component under test
+ * @param styles - CSS class names used by the component
+ * @param sectionClassName - Class name applied to observed sections
  */
 export function registerObserverOnlyTocSuite({
   TocObserver,
@@ -292,6 +295,185 @@ export function registerObserverOnlyTocSuite({
     const { unmount } = renderToc();
     unmount();
     expect(io.disconnectCount).toBe(1);
+  });
+}
+
+interface ClassSelectedObserverTocConfig {
+  TocObserver: ComponentType;
+  linkClassName: string;
+  activeClassName: string;
+  sectionClassName: string;
+  heroClassName: string;
+}
+
+/**
+ * Registers shared tests for a `TocObserver` that monitors sections selected by CSS classes, including a hero element.
+ *
+ * @param TocObserver - The `TocObserver` component under test
+ * @param linkClassName - The CSS class applied to TOC links
+ * @param activeClassName - The CSS class applied to the active TOC link
+ * @param sectionClassName - The CSS class used to select section targets
+ * @param heroClassName - The CSS class used to select the hero target
+ */
+export function registerClassSelectedObserverTocSuite({
+  TocObserver,
+  linkClassName,
+  activeClassName,
+  sectionClassName,
+  heroClassName,
+}: ClassSelectedObserverTocConfig): void {
+  let io: IntersectionObserverController;
+
+  beforeEach(() => {
+    io = installIntersectionObserverStub();
+  });
+  afterEach(() => {
+    cleanup();
+  });
+
+  /**
+   * Renders the class-selected observer test fixture with optional TOC links.
+   *
+   * @param includeLinks - Whether to include the navigation links in the fixture
+   * @returns The rendered test fixture
+   */
+  function renderToc(includeLinks = true) {
+    return render(
+      <div>
+        {includeLinks ? (
+          <nav>
+            <a className={linkClassName} href="#hero">
+              Hero
+            </a>
+            <a className={linkClassName} href="#s2">
+              S2
+            </a>
+          </nav>
+        ) : null}
+        <header className={heroClassName} id="hero" />
+        <section className={sectionClassName} id="s2" />
+        <TocObserver />
+      </div>
+    );
+  }
+
+  test("observes class-selected targets, changes the active link, and disconnects", () => {
+    const { container, unmount } = renderToc();
+    const links = container.querySelectorAll(`.${linkClassName}`);
+    expect(io.observedTargets).toHaveLength(2);
+    expect(links[0].classList.contains(activeClassName)).toBe(true);
+
+    io.emit([{ target: container.querySelector("#s2") as Element, isIntersecting: true }]);
+    expect(links[0].classList.contains(activeClassName)).toBe(false);
+    expect(links[1].classList.contains(activeClassName)).toBe(true);
+
+    unmount();
+    expect(io.disconnectCount).toBe(1);
+  });
+
+  test("ignores non-intersecting and id-less entries", () => {
+    const { container } = renderToc();
+    const links = container.querySelectorAll(`.${linkClassName}`);
+    const idlessTarget = document.createElement("section");
+
+    io.emit([{ target: container.querySelector("#s2") as Element, isIntersecting: false }]);
+    io.emit([{ target: idlessTarget, isIntersecting: true }]);
+
+    expect(links[0].classList.contains(activeClassName)).toBe(true);
+    expect(links[1].classList.contains(activeClassName)).toBe(false);
+  });
+
+  test("handles an empty TOC without throwing", () => {
+    const { unmount } = renderToc(false);
+    expect(io.observedTargets).toHaveLength(2);
+    expect(() => unmount()).not.toThrow();
+    expect(io.disconnectCount).toBe(1);
+  });
+}
+
+interface HrefResolvedObserverTocConfig {
+  TocObserver: ComponentType;
+  linkClassName: string;
+  activeClassName: string;
+}
+
+/**
+ * Registers a test suite for TocObserver implementations that resolve observation targets from TOC links' href attributes.
+ *
+ * Verifies that only elements with valid href targets are observed, that non-intersecting entries are ignored, that matching intersecting entries activate the correct link, and that the observer disconnects properly during cleanup. Also tests behavior when no resolvable targets exist.
+ */
+export function registerHrefResolvedObserverTocSuite({
+  TocObserver,
+  linkClassName,
+  activeClassName,
+}: HrefResolvedObserverTocConfig): void {
+  let io: IntersectionObserverController;
+
+  beforeEach(() => {
+    io = installIntersectionObserverStub();
+  });
+  afterEach(() => {
+    cleanup();
+  });
+
+  /**
+   * Renders a TOC fixture with links and optionally matching section targets.
+   *
+   * @param includeTargets - Whether to render the sections referenced by the TOC links.
+   * @returns The rendered test fixture.
+   */
+  function renderToc(includeTargets = true) {
+    return render(
+      <div>
+        <nav>
+          <a className={linkClassName} href="#s1">
+            S1
+          </a>
+          <a className={linkClassName} href="#s2">
+            S2
+          </a>
+          <span className={linkClassName}>No href</span>
+          <a className={linkClassName} href="#missing">
+            Missing target
+          </a>
+        </nav>
+        {includeTargets ? (
+          <>
+            <section id="s1" />
+            <section id="s2" />
+          </>
+        ) : null}
+        <TocObserver />
+      </div>
+    );
+  }
+
+  test("observes only valid href targets and disconnects", () => {
+    const { unmount } = renderToc();
+    expect(io.observedTargets.map((target) => target.id)).toEqual(["s1", "s2"]);
+
+    unmount();
+    expect(io.disconnectCount).toBe(1);
+  });
+
+  test("ignores non-intersecting entries and activates the matching link", () => {
+    const { container } = renderToc();
+    const links = container.querySelectorAll(`.${linkClassName}`);
+    const secondSection = container.querySelector("#s2") as Element;
+
+    io.emit([{ target: secondSection, isIntersecting: false }]);
+    expect(Array.from(links).some((link) => link.classList.contains(activeClassName))).toBe(false);
+
+    io.emit([{ target: secondSection, isIntersecting: true }]);
+    expect(links[0].classList.contains(activeClassName)).toBe(false);
+    expect(links[1].classList.contains(activeClassName)).toBe(true);
+  });
+
+  test("returns safely when no href resolves to a section", () => {
+    const { unmount } = renderToc(false);
+    expect(io.observedTargets).toHaveLength(0);
+    expect(() => unmount()).not.toThrow();
+    expect(io.disconnectCount).toBe(0);
   });
 }
 

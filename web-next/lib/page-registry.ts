@@ -43,7 +43,7 @@ export const PageEntrySchema = z
     /** ナビ 2 段目の表示ラベル。2 段ネストするグループ（= Providers）でのみ必須。 */
     category: z.string().min(1).optional(),
     /** プロバイダー系ページのみ。識別子であり表示ラベルではない（表示は category）。 */
-    provider: z.enum(["claude", "google", "codex", "copilot"]).optional(),
+    provider: z.enum(["claude", "google", "codex", "copilot", "moonshot"]).optional(),
     /** 横断検索・関連リンク (F-5 / F-7) 用のトピックタグ */
     topics: z.array(z.string()),
     /** 一覧・What's New に出す 1〜2 文の要約 */
@@ -592,6 +592,28 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-17",
   },
   {
+    slug: "/infra/amazon-bedrock-best-practices-2026-intermediate",
+    title: "Amazon Bedrock 完全ガイド",
+    group: "運用・品質",
+    topics: ["bedrock", "aws", "infra", "rag", "agent", "guardrails"],
+    summary:
+      "Amazon Bedrockのアーキテクチャ、モデル選定、Prompt Management、RAG、エージェント、Guardrails、コスト最適化、セキュリティ、可観測性を網羅した実践ガイド。",
+    addedAt: "2026-07-22",
+    lastReviewed: "2026-07-22",
+  },
+  {
+    slug: "/infra/amazon-bedrock-best-practices-guide",
+    title: "Amazon Bedrock 活用ガイド",
+    description:
+      "Amazon Bedrockを使ったジェネレーティブAIアプリケーション構築のベストプラクティスを初学者から実務者まで段階的に学べる完全ガイド。",
+    group: "運用・品質",
+    topics: ["bedrock", "aws", "infra", "rag", "agent", "guardrails"],
+    summary:
+      "Amazon Bedrockを使ったジェネレーティブAIアプリケーション構築のベストプラクティスを初学者から実務者まで段階的に学べる完全ガイド。",
+    addedAt: "2026-07-22",
+    lastReviewed: "2026-07-22",
+  },
+  {
     slug: "/llm-ops/evaluation-observability",
     title: "Evaluation & Observability",
     group: "運用・品質",
@@ -769,6 +791,34 @@ const entries: PageEntry[] = [
       "Gemini Enterprise Agent Platform を実務レベルで使いこなすため、ADK・Agent Runtime・Memory Bank・A2A/MCP・ガバナンス機能などの設計指針を解説する中級〜上級者向け実践ガイド。",
     addedAt: "2026-07-19",
     lastReviewed: "2026-07-19",
+  },
+  {
+    slug: "/google/gemma-best-practices-guide",
+    title: "Gemma Best Practices Guide",
+    description:
+      "2026年4月に登場した新世代Gemma 4の制御トークン体系、Thinkingモード、Function Calling、量子化(QAT)戦略、ファインチューニング、デプロイ、安全性まで一次情報に基づいて網羅した実践ガイド。",
+    group: "Providers",
+    category: "Google",
+    provider: "google",
+    topics: ["google", "gemma", "best-practices"],
+    summary:
+      "2026年4月に登場した新世代Gemma 4の制御トークン体系、Thinkingモード、Function Calling、量子化(QAT)戦略、ファインチューニング、デプロイ、安全性まで一次情報に基づいて網羅した実践ガイド。",
+    addedAt: "2026-07-22",
+    lastReviewed: "2026-07-22",
+  },
+  {
+    slug: "/moonshot/kimi-llm-best-practices",
+    title: "Kimi LLM 徹底ガイド",
+    description:
+      "Moonshot AI が開発する Kimi K1.5 / K2 / K3 の超長文文脈（Long Context）処理、思考モード（Kimi Thinking）、Function Calling、マルチモーダル等の活用方法とベストプラクティスを解説する完全ガイド。",
+    group: "Providers",
+    category: "Moonshot",
+    provider: "moonshot",
+    topics: ["moonshot", "kimi", "llm", "best-practices"],
+    summary:
+      "Moonshot AI が開発する Kimi K1.5 / K2 / K3 の超長文文脈（Long Context）処理、思考モード（Kimi Thinking）、Function Calling、マルチモーダル等の活用方法とベストプラクティスを解説する完全ガイド。",
+    addedAt: "2026-07-22",
+    lastReviewed: "2026-07-22",
   },
 ];
 

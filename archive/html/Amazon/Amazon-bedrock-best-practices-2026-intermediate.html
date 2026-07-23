@@ -2541,37 +2541,37 @@ client.create_evaluation_job(
     class BATCH,PT,CACHE,ROUTE,ONDEMAND outcomeNode`,
 
         'diagram-5': `flowchart TB
-    A["IAM Principal（ユーザー / ロール）"]
-    B{"SCPで対象リージョン\nが許可されているか"}
-    C{"IAMポリシーでモデルARN\nGuardrailIdentifier\nが許可されているか"}
-    D["VPCインターフェースエンドポイント（PrivateLink）"]
-    E{"エンドポイントポリシー\nで許可されているか"}
-    F["Guardrails（入力フィルタ）"]
-    G["基盤モデル呼び出し（InvokeModel）"]
-    H["Guardrails（出力フィルタ）"]
-    I["KMSで暗号化されたレスポンス"]
-    J["Model Invocation Logging（CloudWatch / S3）"]
-    K["CloudTrail（監査証跡）"]
-    X1["アクセス拒否"]
+A["IAM Principal（ユーザー / ロール）"]
+B{"SCPで対象リージョン<br/>が許可されているか"}
+C{"IAMポリシーでモデルARN<br/>GuardrailIdentifier<br/>が許可されているか"}
+D["VPCインターフェースエンドポイント（PrivateLink）"]
+E{"エンドポイントポリシー<br/>で許可されているか"}
+F["Guardrails（入力フィルタ）"]
+G["基盤モデル呼び出し（InvokeModel）"]
+H["Guardrails（出力フィルタ）"]
+I["KMSで暗号化されたレスポンス"]
+J["Model Invocation Logging（CloudWatch / S3）"]
+K["CloudTrail（監査証跡）"]
+X1["アクセス拒否"]
 
-    A --> B
-    B -->|"許可"| C
-    B -->|"拒否"| X1
-    C -->|"許可"| D
-    C -->|"拒否"| X1
-    D --> E
-    E -->|"許可"| F
-    E -->|"拒否"| X1
-    F --> G --> H --> I
-    G -.-> J
-    A -.-> K
+A --> B
+B -->|"許可"| C
+B -->|"拒否"| X1
+C -->|"許可"| D
+C -->|"拒否"| X1
+D --> E
+E -->|"許可"| F
+E -->|"拒否"| X1
+F --> G --> H --> I
+G -.-> J
+A -.-> K
 
-    classDef guardNode fill:#3a2416,stroke:#f0925c,color:#f2f3f5
-    classDef denyNode fill:#3a1717,stroke:#f29a9a,color:#f2f3f5
-    classDef modelNode fill:#2a2145,stroke:#8b7ef0,color:#f2f3f5
-    class F,H guardNode
-    class X1 denyNode
-    class G modelNode`,
+classDef guardNode fill:#3a2416,stroke:#f0925c,color:#f2f3f5
+classDef denyNode fill:#3a1717,stroke:#f29a9a,color:#f2f3f5
+classDef modelNode fill:#2a2145,stroke:#8b7ef0,color:#f2f3f5
+class F,H guardNode
+class X1 denyNode
+class G modelNode`,
 
         'diagram-6': `flowchart LR
     A["プロンプト / エージェント変更をコミット"]

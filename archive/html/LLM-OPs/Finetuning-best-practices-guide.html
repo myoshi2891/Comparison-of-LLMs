@@ -2573,53 +2573,57 @@ flowchart LR
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
     <script>
-      mermaid.initialize({
-        startOnLoad: false,
-        theme: 'base',
-        themeVariables: {
-          background: '#14171c',
-          primaryColor: '#1c2129',
-          primaryTextColor: '#e8eaed',
-          primaryBorderColor: '#3d3450',
-          lineColor: '#676e7a',
-          secondaryColor: '#1c2129',
-          tertiaryColor: '#14171c',
-          fontFamily: 'Hiragino Sans, sans-serif',
-          fontSize: '16px',
-          edgeLabelBackground: '#14171c',
-          clusterBkg: '#1c2129',
-          clusterBorder: '#3d3450',
-        },
-        htmlLabels: false,
-        flowchart: {
+      if (typeof mermaid !== 'undefined') {
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'base',
+          themeVariables: {
+            background: '#14171c',
+            primaryColor: '#1c2129',
+            primaryTextColor: '#e8eaed',
+            primaryBorderColor: '#3d3450',
+            lineColor: '#676e7a',
+            secondaryColor: '#1c2129',
+            tertiaryColor: '#14171c',
+            fontFamily: 'Hiragino Sans, sans-serif',
+            fontSize: '16px',
+            edgeLabelBackground: '#14171c',
+            clusterBkg: '#1c2129',
+            clusterBorder: '#3d3450',
+          },
           htmlLabels: false,
-          curve: 'linear',
-          useMaxWidth: false,
-          nodeSpacing: 50,
-          rankSpacing: 50,
-        },
-        fontSize: 16,
-      });
+          flowchart: {
+            htmlLabels: false,
+            curve: 'linear',
+            useMaxWidth: false,
+            nodeSpacing: 50,
+            rankSpacing: 50,
+          },
+          fontSize: 16,
+        });
+      }
 
       document.addEventListener('DOMContentLoaded', async () => {
         if (document.fonts && document.fonts.ready) {
           await document.fonts.ready;
         }
 
-        const sources = document.querySelectorAll('.mermaid-source, .mermaid');
-        let idx = 0;
-        for (const el of sources) {
-          const id = 'mermaid-diagram-' + idx++;
-          const definition = el.textContent;
-          try {
-            const { svg } = await mermaid.render(id, definition);
-            const container = el.classList.contains('mermaid') ? el : el.parentElement;
-            container.innerHTML = svg;
-          } catch (err) {
-            console.error('Mermaid render error:', err);
-            const container = el.classList.contains('mermaid') ? el : el.parentElement;
-            container.innerHTML =
-              '<p style="color:#e2908f;font-size:13px;">図の描画に失敗しました。</p>';
+        if (typeof mermaid !== 'undefined') {
+          const sources = document.querySelectorAll('.mermaid-source, .mermaid');
+          let idx = 0;
+          for (const el of sources) {
+            const id = 'mermaid-diagram-' + idx++;
+            const definition = el.textContent;
+            try {
+              const { svg } = await mermaid.render(id, definition);
+              const container = el.classList.contains('mermaid') ? el : el.parentElement;
+              container.innerHTML = svg;
+            } catch (err) {
+              console.error('Mermaid render error:', err);
+              const container = el.classList.contains('mermaid') ? el : el.parentElement;
+              container.innerHTML =
+                '<p style="color:#e2908f;font-size:13px;">図の描画に失敗しました。</p>';
+            }
           }
         }
 
