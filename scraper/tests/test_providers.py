@@ -19,7 +19,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from scraper.models import ApiModel
-from scraper.providers import anthropic, aws, deepseek, google, openai, xai
+from scraper.providers import anthropic, aws, deepseek, google, moonshot, openai, xai
 
 
 @pytest.fixture(autouse=True)
@@ -294,3 +294,29 @@ class TestAws:
         with patch("scraper.providers.aws.httpx.get", return_value=self._mock_resp({})):
             models = aws.scrape()
         _assert_all_fallback(models, aws._FALLBACKS, "AWS")
+
+
+# --------------------------------------------------------------------------- #
+# Moonshot(Kimi)（"Kimi K3" のみ。key "kimi[-\s]?k3" は "Kimi K2.6" と衝突しない）
+# --------------------------------------------------------------------------- #
+class TestMoonshot:
+    _HTML = (
+        "<html><body>"
+        "<p>Kimi K3 $9.99</p>"
+        "<p>Kimi K3 output $44.44</p>"
+        "</body></html>"
+    )
+
+    def test_success_extracts_prices(self):
+        with patch("scraper.providers.moonshot.get_page_text", return_value=self._HTML):
+            models = moonshot.scrape()
+        k3 = _find(models, "Kimi K3")
+        assert k3.price_in == 9.99
+        assert k3.price_out == 44.44
+        assert k3.scrape_status == "success"
+        assert k3.provider == "Moonshot(Kimi)"
+
+    def test_fallback_on_empty_html(self):
+        with patch("scraper.providers.moonshot.get_page_text", return_value="<html></html>"):
+            models = moonshot.scrape()
+        _assert_all_fallback(models, moonshot._FALLBACKS, "Moonshot(Kimi)")
