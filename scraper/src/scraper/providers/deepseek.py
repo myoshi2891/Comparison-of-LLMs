@@ -20,10 +20,10 @@ _FALLBACKS: dict[str, tuple[float, float]] = {
     "DeepSeek-R1":       (0.550, 2.190),
 }
 _TAG = {
-    "DeepSeek V4 Flash": "Fast",
-    "DeepSeek V4 Pro":   "Reasoning",
-    "DeepSeek-V3.2":     "General",
-    "DeepSeek-R1":       "Reasoning",
+    "DeepSeek V4 Flash": "最新 Flash",
+    "DeepSeek V4 Pro":   "最新 Pro",
+    "DeepSeek-V3.2":     "Legacy OSS",
+    "DeepSeek-R1":       "Legacy 推論",
 }
 _CLS = {
     "DeepSeek V4 Flash": "tag-oss",

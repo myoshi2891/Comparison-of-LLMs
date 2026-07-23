@@ -19,7 +19,9 @@ _URL_VERTEX = "https://cloud.google.com/vertex-ai/generative-ai/pricing"
 _FALLBACKS: dict[str, tuple[float, float, str, str, str, str, str]] = {
     # name: (price_in, price_out, provider, tag, cls, sub_ja, sub_en)
     "Gemini 3.1 Pro Preview": (2.00,  12.00, "Google AI", "Preview",  "tag-flag", "最新世代 / 1M ctx",            "Latest generation / 1M ctx"),
-    "Gemini 3.5 Flash":       (1.50,   9.00, "Google AI", "Fast",     "tag-bal",  "2026年5月 / 1M ctx / 高速推論", "May 2026 / 1M context / fast inference"),
+    "Gemini 3.6 Flash":       (1.50,   7.50, "Google AI", "最新 Flash", "tag-bal", "2026-07-21 最新Flash / 1M ctx / 出力$9→$7.5", "Jul 2026 latest Flash / 1M ctx / output $9→$7.5"),
+    "Gemini 3.5 Flash":       (1.50,   9.00, "Google AI", "Fast",     "tag-bal",  "前Flash / 1M ctx / 高速推論",  "Prev Flash / 1M ctx / fast inference"),
+    "Gemini 3.5 Flash-Lite":  (0.30,   2.50, "Google AI", "Budget",   "tag-mini", "2026-07-21 新バジェット枠 / 1M ctx / 大量処理", "Jul 2026 new budget tier / 1M ctx / high-volume"),
     "Gemini 2.5 Pro":         (1.25,  10.00, "Google AI", "Flagship", "tag-flag", "コーディング最強 / 1M ctx",    "Top coding model / 1M ctx"),
     "Gemini 3 Flash Preview": (0.50,   3.00, "Google AI", "Preview",  "tag-bal",  "次世代Flash / 1M ctx",          "Next-gen Flash / 1M ctx"),
     "Gemini 2.5 Flash":       (0.30,   2.50, "Google AI", "Fast",     "tag-bal",  "バランス高速 / 1M ctx",         "Balanced & fast / 1M ctx"),
