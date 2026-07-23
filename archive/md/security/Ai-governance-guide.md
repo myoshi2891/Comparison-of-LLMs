@@ -106,7 +106,7 @@ flowchart TD
 - EU公式「AI Act」欧州委員会 Digital Strategy https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai
 - artificialintelligenceact.eu「Implementation Timeline」 https://artificialintelligenceact.eu/implementation-timeline/
 - artificialintelligenceact.eu「High-level summary of the AI Act」 https://artificialintelligenceact.eu/high-level-summary/
-- EU理事会（Consilium）プレスリリース https://www.consilium.europa.eu/en/press/press-releases/2026/05/07/artificial-intelligence-council-and-parliament-agree-to-simplify-and-streamline-rules/
+- EU理事会（Consilium）プレスリリース https://www.consilium.europa.eu/en/press/press-releases/2026/06/29/artificial-intelligence-council-gives-final-approval-to-simplify-and-streamline-rules/
 - Gibson Dunn「EU AI Act Omnibus Agreement」 https://www.gibsondunn.com/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes/
 - Scytale「EU AI Act Risk Categories Explained」 https://scytale.ai/resources/eu-ai-act-risk-categories/
 
@@ -355,7 +355,7 @@ AIガバナンスは、NIST AI RMF・EU AI Act・ISO/IEC 42001・OECD AI原則�
 - 欧州委員会 Digital Strategy「AI Act」 https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai
 - artificialintelligenceact.eu「Implementation Timeline」 https://artificialintelligenceact.eu/implementation-timeline/
 - artificialintelligenceact.eu「High-level summary of the AI Act」 https://artificialintelligenceact.eu/high-level-summary/
-- EU理事会（Consilium）プレスリリース https://www.consilium.europa.eu/en/press/press-releases/2026/05/07/artificial-intelligence-council-and-parliament-agree-to-simplify-and-streamline-rules/
+- EU理事会（Consilium）プレスリリース https://www.consilium.europa.eu/en/press/press-releases/2026/06/29/artificial-intelligence-council-gives-final-approval-to-simplify-and-streamline-rules/
 - Gibson Dunn「EU AI Act Omnibus Agreement」 https://www.gibsondunn.com/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes/
 - Kennedys Law「The EU AI Act implementation timeline」 https://www.kennedyslaw.com/en/thought-leadership/article/2026/the-eu-ai-act-implementation-timeline-understanding-the-next-deadline-for-compliance/
 - GDPR Local「AI Risk Classification: Guide to EU AI Act Risk Categories」 https://gdprlocal.com/ai-risk-classification/
