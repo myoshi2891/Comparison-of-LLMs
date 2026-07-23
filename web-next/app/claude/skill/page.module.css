@@ -233,6 +233,9 @@
   gap: 0;
   flex-wrap: nowrap;
   min-width: max-content;
+  /* 収まるときは中央寄せ、はみ出すときは親の overflow-x で横スクロール */
+  width: fit-content;
+  margin-inline: auto;
 }
 .flowStep {
   display: flex;
