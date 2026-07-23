@@ -10,6 +10,12 @@ export const metadata: Metadata = {
     "Amazon Bedrockを使ったジェネレーティブAIアプリケーション構築のベストプラクティスを初学者から実務者まで段階的に学べる完全ガイド。",
 };
 
+/**
+ * Renders content as a link that opens in a new browser tab.
+ *
+ * @param href - The destination URL
+ * @param children - The content displayed inside the link
+ */
 function Ext({ href, children }: { href: string; children: ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -18,6 +24,9 @@ function Ext({ href, children }: { href: string; children: ReactNode }) {
   );
 }
 
+/**
+ * Presents a step-by-step guide to building and operating Amazon Bedrock applications.
+ */
 export default function AmazonBedrockBestPracticesGuidePage() {
   return (
     <div className={styles.container}>

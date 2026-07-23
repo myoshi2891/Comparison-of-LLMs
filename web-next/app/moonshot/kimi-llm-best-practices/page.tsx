@@ -9,6 +9,12 @@ export const metadata: Metadata = {
     "Moonshot AIが開発する大規模言語モデル「Kimi」シリーズ（K1.5, K2, K2.6, K2.7-Code, K3）の活用方法、プロンプト設計、Tool Calling、Thinking/reasoning_effort、コンテキストキャッシュ、コスト最適化を解説する完全ガイド。",
 };
 
+/**
+ * Renders an external link that opens in a new browser tab.
+ *
+ * @param href - The destination URL
+ * @param children - The link content
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -17,6 +23,9 @@ function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   );
 }
 
+/**
+ * Renders a comprehensive guide to Kimi LLM models and API usage.
+ */
 export default function KimiLlmBestPracticesPage() {
   return (
     <div className={styles.layout}>

@@ -9,6 +9,12 @@ export const metadata: Metadata = {
     "2026年4月に登場した新世代Gemma 4の制御トークン体系、Thinkingモード、Function Calling、量子化(QAT)戦略、ファインチューニング、デプロイ、安全性まで一次情報に基づいて網羅した実践ガイド。",
 };
 
+/**
+ * Renders content as a secure external link that opens in a new tab.
+ *
+ * @param href - The destination URL.
+ * @param children - The content displayed inside the link.
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -17,6 +23,9 @@ function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   );
 }
 
+/**
+ * Renders the Gemma 4 best practices guide, including navigation and documentation content.
+ */
 export default function GemmaBestPracticesGuidePage() {
   return (
     <div className={styles.layout}>

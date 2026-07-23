@@ -2,6 +2,9 @@
 import { useEffect, useState } from "react";
 import styles from "./page.module.css";
 
+/**
+ * Provides a mobile table-of-contents toggle and highlights the section currently in view.
+ */
 export default function TocObserver() {
   const [mobileOpen, setMobileOpen] = useState(false);
 

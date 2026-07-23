@@ -236,8 +236,11 @@ interface ObserverOnlyTocConfig {
 }
 
 /**
- * インライン IntersectionObserver のみ（モバイルナビなし）の TocObserver 向け
- * 共通テストスイートを登録する（Group B2）。
+ * Registers shared tests for a TocObserver that uses IntersectionObserver without mobile navigation.
+ *
+ * @param TocObserver - The TocObserver component under test
+ * @param styles - CSS class names used by the component
+ * @param sectionClassName - Class name applied to observed sections
  */
 export function registerObserverOnlyTocSuite({
   TocObserver,
@@ -304,8 +307,13 @@ interface ClassSelectedObserverTocConfig {
 }
 
 /**
- * CSS Module の section / hero クラスを直接監視する TocObserver 向けの共通テスト。
- * 初期リンク、交差コールバック、無視対象、リンクなし、cleanup の全分岐を検証する。
+ * Registers shared tests for a `TocObserver` that monitors sections selected by CSS classes, including a hero element.
+ *
+ * @param TocObserver - The `TocObserver` component under test
+ * @param linkClassName - The CSS class applied to TOC links
+ * @param activeClassName - The CSS class applied to the active TOC link
+ * @param sectionClassName - The CSS class used to select section targets
+ * @param heroClassName - The CSS class used to select the hero target
  */
 export function registerClassSelectedObserverTocSuite({
   TocObserver,
@@ -323,6 +331,12 @@ export function registerClassSelectedObserverTocSuite({
     cleanup();
   });
 
+  /**
+   * Renders the class-selected observer test fixture with optional TOC links.
+   *
+   * @param includeLinks - Whether to include the navigation links in the fixture
+   * @returns The rendered test fixture
+   */
   function renderToc(includeLinks = true) {
     return render(
       <div>
@@ -384,8 +398,9 @@ interface HrefResolvedObserverTocConfig {
 }
 
 /**
- * TOC リンクの href から監視対象を解決する TocObserver 向けの共通テスト。
- * href / 参照先欠落、交差コールバック、監視対象なし、cleanup の全分岐を検証する。
+ * Registers a test suite for TocObserver implementations that resolve observation targets from TOC links' href attributes.
+ *
+ * Verifies that only elements with valid href targets are observed, that non-intersecting entries are ignored, that matching intersecting entries activate the correct link, and that the observer disconnects properly during cleanup. Also tests behavior when no resolvable targets exist.
  */
 export function registerHrefResolvedObserverTocSuite({
   TocObserver,
@@ -401,6 +416,12 @@ export function registerHrefResolvedObserverTocSuite({
     cleanup();
   });
 
+  /**
+   * Renders a TOC fixture with links and optionally matching section targets.
+   *
+   * @param includeTargets - Whether to render the sections referenced by the TOC links.
+   * @returns The rendered test fixture.
+   */
   function renderToc(includeTargets = true) {
     return render(
       <div>

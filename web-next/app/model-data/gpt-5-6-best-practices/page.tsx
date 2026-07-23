@@ -138,6 +138,9 @@ const DIAGRAMS = {
     classDef outcome fill:#0b3a26,stroke:#34d399,color:#a7f3d0`,
 };
 
+/**
+ * Renders the GPT-5.6 practical guide with navigation, reference content, examples, and diagrams.
+ */
 export default function Gpt56BestPracticesPage() {
   return (
     <div className={styles.root}>

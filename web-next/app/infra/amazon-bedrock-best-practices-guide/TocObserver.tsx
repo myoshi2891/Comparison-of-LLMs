@@ -3,6 +3,9 @@
 import { useEffect } from "react";
 import styles from "./page.module.css";
 
+/**
+ * Tracks document sections and highlights the corresponding table-of-contents link as sections enter the viewport.
+ */
 export default function TocObserver() {
   useEffect(() => {
     const links = Array.from(document.querySelectorAll(`.${styles.navItem}`));

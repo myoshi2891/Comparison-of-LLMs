@@ -17,17 +17,15 @@ type Props = {
 };
 
 /**
- * Render a Mermaid diagram from the provided Mermaid source and update it when `chart` changes.
- *
- * Dynamically loads the `mermaid` library, injects `chart` into an internal container, and triggers Mermaid to render the diagram. If the component unmounts before the library finishes loading or rendering, no update is performed.
+ * Renders a Mermaid diagram and updates it when the source or rendering options change.
  *
  * @param chart - Mermaid diagram source text to render
- * @param id - Optional id attribute applied to the container element
- * @param style - Optional inline styles merged with the component's default width and minimum height
- * @param className - Optional additional CSS classes appended to the container's `"mermaid"` class
- * @param theme - Mermaid theme ("dark" by default)
- * @param themeVariables - Mermaid themeVariables override
- * @returns The React element containing the rendered Mermaid diagram
+ * @param id - Optional ID for the diagram container
+ * @param style - Optional inline styles merged with the container's default styles
+ * @param className - Optional additional CSS class names for the container
+ * @param theme - Mermaid theme to use
+ * @param themeVariables - Optional Mermaid theme variable overrides
+ * @returns A container element for the rendered Mermaid diagram
  */
 export default function MermaidDiagram({
   chart,
