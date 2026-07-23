@@ -102,7 +102,6 @@
 
 /* ── Wrapper ── */
 .wrapper {
-  max-width: 1080px;
   margin: 0 auto;
   padding: 48px 24px 96px;
 }

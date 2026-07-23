@@ -30,7 +30,6 @@
 
 .layout {
   display: flex;
-  max-width: 1200px;
   margin: 0 auto;
   padding: 44px 56px 80px;
   gap: 48px;
