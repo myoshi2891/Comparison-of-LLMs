@@ -85,7 +85,7 @@ export default function MermaidDiagram({
   // これにより、列幅に収まる図は自然サイズで中央寄せ、広い図は縮小して中央寄せとなり、
   // 切れ・左寄りが発生しない。ページ側で width/max-width を強制する必要はない。
   return (
-    <div className={`mermaid-scroll ${className || ""}`} style={{ width: "100%", ...style }}>
+    <div className={`mermaid-scroll ${className || ""}`} style={{ ...style, width: "100%" }}>
       <div
         id={id}
         className="mermaid"

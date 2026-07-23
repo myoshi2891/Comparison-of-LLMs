@@ -1,12 +1,17 @@
-import { render } from "@testing-library/react";
+import { render, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import MermaidDiagram from "./MermaidDiagram";
 
-// mermaid の動的 import を無害化（DOM 構造のみを検証するため実描画は不要）
+// mermaid の動的 import を無害化。実描画の代わりに run が対象ノードへ代表 SVG を挿入し、
+// コンポーネントの svg 後処理（max-width:100% / height:auto の付与）を検証できるようにする。
 vi.mock("mermaid", () => ({
   default: {
     initialize: vi.fn(),
-    run: vi.fn().mockResolvedValue(undefined),
+    run: vi.fn(async ({ nodes }: { nodes: Element[] }) => {
+      const target = nodes[0];
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      target.appendChild(svg);
+    }),
   },
 }));
 
@@ -42,5 +47,17 @@ describe("MermaidDiagram レイアウト規約", () => {
 
     expect(inner?.id).toBe("diag-1");
     expect(outer.classList.contains("customFrame")).toBe(true);
+  });
+
+  it("描画後に生成された svg へ max-width:100% / height:auto を後付けする（列幅への縮小フィット）", async () => {
+    const { container } = render(<MermaidDiagram chart="graph TD; A-->B" />);
+
+    // run が挿入した svg にコンポーネントが inline style を付与するまで待つ
+    await waitFor(() => {
+      const svg = container.querySelector("svg");
+      expect(svg).not.toBeNull();
+      expect((svg as SVGElement).style.maxWidth).toBe("100%");
+      expect((svg as SVGElement).style.height).toBe("auto");
+    });
   });
 });

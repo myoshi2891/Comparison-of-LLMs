@@ -370,6 +370,7 @@ mermaid.initialize({ startOnLoad: false });
     if (svgEl) {
       svgEl.removeAttribute('width');
       svgEl.removeAttribute('height');
+      svgEl.style.display = 'block';   // ✅ SVG は既定 inline のため block 化しないと margin:0 auto が効かない
       svgEl.style.width = 'auto';      // ✅ 実寸維持（100% は引き伸ばしになるので不可）
       svgEl.style.maxWidth = '100%';   // ✅ コンテナ幅で上限（広い図は縮小フィット）
       svgEl.style.height = 'auto';

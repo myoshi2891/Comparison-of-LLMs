@@ -30,9 +30,12 @@
 
 ## なぜ inline style で足りるか
 
-コンポーネントの inline style（`width:fit-content` / `margin:0 auto` / `overflow-x:auto`）は
-**非 `!important` の per-page クラスルールより詳細度が高い**。したがってページ側で幅を書かなければ
-中央寄せ・スクロールは自動的に成立する。`!important` を付けたページルールだけが例外的に上書きするため禁止。
+コンポーネントが付与する inline style ——
+外側 `div` の `width:100%`、内側 `.mermaid` の `display:flex; justify-content:center`、
+および `mermaid.run` 後に svg へ付与する `max-width:100%; height:auto` —— は
+**非 `!important` の per-page クラスルールより詳細度が高い**。したがってページ側で幅・配置を書かなければ、
+図は内側 flex により中央寄せされ、列幅より広い図は svg の `max-width:100%` で列幅まで縮小フィットする
+（切れ・左寄り・横スクロールなし）。ページ側の `!important` ルールだけが例外的にこれを上書きしてしまうため禁止。
 
 ## 関連
 
