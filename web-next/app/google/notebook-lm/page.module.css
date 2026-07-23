@@ -391,11 +391,6 @@
   align-items: center;
 }
 
-.diagramWrap :global(svg) {
-  display: block;
-  margin: 0 auto;
-}
-
 .diagramCaption {
   width: 100%;
   text-align: left;

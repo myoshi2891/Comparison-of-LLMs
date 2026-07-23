@@ -463,13 +463,6 @@
   width: 100%;
 }
 
-.mermaid :global(svg) {
-  max-width: 100%;
-  height: auto;
-  margin: 0 auto;
-  overflow: visible;
-}
-
 /* ---------- Timeline ---------- */
 .timeline {
   position: relative;

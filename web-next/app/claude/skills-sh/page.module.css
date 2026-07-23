@@ -563,17 +563,6 @@ section.chapter:first-of-type {
   overflow-x: auto;
   width: 100%;
 }
-.mermaidDiagram :global(.mermaid) {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-.mermaidDiagram :global(svg) {
-  display: block;
-  margin: 0 auto;
-  max-width: 100%;
-  height: auto !important;
-}
 
 /* ===== Feature grid / cards ===== */
 .gridCards {

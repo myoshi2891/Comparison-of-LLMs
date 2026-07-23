@@ -585,14 +585,6 @@ tbody tr:hover td {
   display: flex;
   justify-content: center;
 }
-.mermaid :global(svg),
-.diag :global(svg) {
-  display: block;
-  margin: 0 auto;
-  width: 100%;
-  max-width: 100%;
-  height: auto;
-}
 
 /* 個別サイズ調整 */
 #diag-0 svg {

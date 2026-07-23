@@ -304,21 +304,6 @@
   overflow: visible;
 }
 
-.mermaidWrap :global(.mermaid) {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-.mermaidWrap :global(svg) {
-  display: block;
-  margin: 0 auto;
-  width: 100%;
-  max-width: 100%;
-  height: auto;
-  overflow: visible;
-}
-
 .diagramError {
   color: var(--c-red-500);
   font-size: 13px;

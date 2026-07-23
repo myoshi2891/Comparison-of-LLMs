@@ -394,19 +394,6 @@
   width: 100%;
 }
 
-.mermaidContainer :global(.mermaid) {
-  width: 100%;
-  display: flex !important;
-  justify-content: center !important;
-}
-
-.mermaidContainer :global(svg) {
-  max-width: 100% !important;
-  height: auto !important;
-  display: block !important;
-  margin: 0 auto !important;
-}
-
 .mermaidCaption {
   font-size: 12px;
   color: var(--color-text-tertiary, #6b7178);

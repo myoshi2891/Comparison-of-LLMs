@@ -430,18 +430,6 @@
   overflow-x: auto;
 }
 
-.mermaidContainer :global(.mermaid) {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  max-width: 100%;
-}
-
-.mermaidContainer :global(.mermaid svg) {
-  max-width: 100%;
-  height: auto !important;
-}
-
 .mermaidCaption {
   text-align: center;
   font-size: 12px;

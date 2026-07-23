@@ -502,17 +502,6 @@
   box-sizing: border-box;
 }
 
-.mw :global(.mermaid) {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-.mw :global(.mermaid) svg {
-  max-width: 100%;
-  height: auto;
-}
-
 .mwLg {
   max-width: 100%;
 }

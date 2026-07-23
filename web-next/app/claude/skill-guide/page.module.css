@@ -421,17 +421,6 @@
   text-align: center;
 }
 
-.mermaidWrap :global(.mermaid) {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-.mermaidWrap :global(.mermaid) svg {
-  max-width: 100%;
-  height: auto;
-}
-
 /* ── Table ── */
 .tableWrap {
   overflow-x: auto;

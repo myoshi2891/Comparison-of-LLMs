@@ -411,6 +411,10 @@
 /* ---------- Mermaid ---------- */
 .diagramWrap {
   margin: 22px 0 30px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 14px;
 }
 
 .diagramCaption {
@@ -418,17 +422,6 @@
   color: var(--text-dimmer);
   margin-top: 10px;
   text-align: center;
-}
-
-/* Mermaid centering */
-.diagramWrap :global(.mermaid) {
-  display: flex !important;
-  justify-content: center !important;
-  width: 100% !important;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 22px 14px;
 }
 
 /* ---------- Checklist ---------- */

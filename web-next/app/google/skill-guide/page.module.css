@@ -181,10 +181,6 @@
   margin: 1.5rem 0;
 }
 
-.mermaidWrap :global(svg) {
-  margin: 0 auto;
-}
-
 .mermaidWrap :global(.node) text,
 .mermaidWrap :global(.node) span,
 .mermaidWrap :global(.label) {
