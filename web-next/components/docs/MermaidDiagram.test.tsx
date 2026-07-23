@@ -38,7 +38,7 @@ describe("MermaidDiagram レイアウト規約", () => {
 
   it("id は内側 .mermaid に、className は外側ラッパーに付与される", () => {
     const { container } = render(
-      <MermaidDiagram chart="graph TD; A-->B" id="diag-1" className="customFrame" />,
+      <MermaidDiagram chart="graph TD; A-->B" id="diag-1" className="customFrame" />
     );
     const outer = container.firstElementChild as HTMLElement;
     const inner = container.querySelector<HTMLElement>(".mermaid");
