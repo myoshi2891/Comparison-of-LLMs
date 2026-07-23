@@ -2165,10 +2165,10 @@ export default function KimiLlmBestPracticesPage() {
                 <tr>
                   <td>
                     K3で<code className={styles.inlineCode}>temperature</code>
-                    等を指定しても効果がない
+                    等を指定するとエラーが発生する
                   </td>
-                  <td>K3ではこれらのパラメータが固定値で無視される仕様</td>
-                  <td>リクエストから省略する(公式推奨)</td>
+                  <td>固定値以外の非サポート値を指定するとリクエストエラーが発生する仕様</td>
+                  <td>固定値以外のパラメータはリクエストから省略する(公式推奨)</td>
                 </tr>
                 <tr>
                   <td>
