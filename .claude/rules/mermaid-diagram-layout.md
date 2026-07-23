@@ -8,18 +8,19 @@
 
 ## 不変条件
 
-1. **描画モデルは2層**:
-   - 外側 `div`: `width:100%; overflow-x:auto`（フレーム全幅・横スクロール担当）
-   - 内側 `.mermaid`: `width:fit-content; margin:0 auto`（自然サイズを中央寄せ。`max-width` を付けない）
-2. **`mermaid.initialize` の `useMaxWidth` は `false`**（flowchart / sequence / mindmap すべて）。SVG を自然サイズで描く。
-3. **図 < 列幅 → 中央寄せ、図 > 列幅 → 横スクロール**（縮小させない）。
+1. **描画モデルは2層 + svg 後処理**:
+   - 外側 `div`: `width:100%`（フレーム＝列幅を占める）
+   - 内側 `.mermaid`: `display:flex; justify-content:center`（中央寄せ担当）
+   - 生成された `svg`: `mermaid.run` 後に JS で `style.maxWidth="100%"; style.height="auto"` を付与（列幅に収める）
+2. **`mermaid.initialize` の `useMaxWidth` は `false`**（flowchart / sequence / mindmap すべて）。自然サイズを起点にする。
+3. **図 < 列幅 → 自然サイズで中央寄せ、図 > 列幅 → 列幅まで縮小して中央寄せ**（切れ・左寄り・横スクロールを起こさない）。
 
 ## 禁止事項（ページ側 `page.module.css`）
 
-- `:global(.mermaid) { width: 100% }` / `display:flex; justify-content:center` などの**幅・配置の強制**。
+- `:global(.mermaid) { width: 100% }` / `display:flex; justify-content:center` などの**幅・配置の再指定**（コンポーネントが担当済み）。
 - `:global(svg) { width: 100% }`（**引き伸ばし**）。
-- `:global(svg) { max-width: 100% }`（広い図が**縮小しスクロールしない**）。
-- 上記の `!important` 版（inline style を上書きしてしまうため特に有害）。
+- `:global(svg) { max-width: ... }` / `height: ...`（コンポーネントの svg 後処理と競合する。サイズ調整はコンポーネントに任せる）。
+- 上記の `!important` 版（特に有害）。
 
 ## 許可（ページ側）
 

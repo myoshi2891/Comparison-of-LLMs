@@ -54,6 +54,14 @@ export default function MermaidDiagram({
         ref.current.removeAttribute("data-processed");
         try {
           await m.default.run({ nodes: [ref.current] });
+          // 列幅より広い図は列幅まで縮小して中央に収める（切れ・左寄りを防ぐ）。
+          // mermaid は useMaxWidth:false 時に svg へ自然サイズの inline style を付けるため、
+          // inline を上書きして max-width:100% / height:auto を強制する。
+          const svg = ref.current?.querySelector("svg");
+          if (svg instanceof SVGElement) {
+            svg.style.maxWidth = "100%";
+            svg.style.height = "auto";
+          }
         } catch (err) {
           console.error("[MermaidDiagram] render failed:", err);
           if (active && ref.current) {
@@ -72,20 +80,17 @@ export default function MermaidDiagram({
   }, [chart, theme, themeVariables]);
 
   // 2層構造でレイアウトの真実の源を一元化する:
-  //   外側 = フレーム全幅・横スクロール担当（図がはみ出したら横スクロール）
-  //   内側 = 自然サイズを中央寄せ（引き伸ばし・縮小を禁止し useMaxWidth:false と整合）
-  // inline style は非 !important の per-page CSS より優先されるため、各ページの
-  // 図解ラッパー側で width/max-width を強制しなくても中央寄せ・スクロールが成立する。
+  //   外側 = フレーム全幅（列幅）を占める
+  //   内側 = flex 中央寄せ。svg は max-width:100% で列幅に収まるよう縮小（上の useEffect で付与）
+  // これにより、列幅に収まる図は自然サイズで中央寄せ、広い図は縮小して中央寄せとなり、
+  // 切れ・左寄りが発生しない。ページ側で width/max-width を強制する必要はない。
   return (
-    <div
-      className={`mermaid-scroll ${className || ""}`}
-      style={{ width: "100%", overflowX: "auto", ...style }}
-    >
+    <div className={`mermaid-scroll ${className || ""}`} style={{ width: "100%", ...style }}>
       <div
         id={id}
         className="mermaid"
         ref={ref}
-        style={{ width: "fit-content", margin: "0 auto", minHeight: "4rem" }}
+        style={{ display: "flex", justifyContent: "center", minHeight: "4rem" }}
       />
     </div>
   );

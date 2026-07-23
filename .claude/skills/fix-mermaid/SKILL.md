@@ -384,26 +384,32 @@ mermaid.initialize({ startOnLoad: false });
 > `.mermaid` / `svg` の幅・配置を強制してはならない（引き伸ばし・縮小・左寄せの三分裂を招くため）。
 > 不変条件の詳細は `.claude/rules/mermaid-diagram-layout.md` を参照。
 
-`MermaidDiagram` は **2層構造**でレイアウトを自己完結させる（実物がこの契約）:
+`MermaidDiagram` は **2層構造 + svg 後処理**でレイアウトを自己完結させる（実物がこの契約）:
 
 ```tsx
 // components/docs/MermaidDiagram.tsx（レイアウト部の要点）
+await m.default.run({ nodes: [ref.current] });
+// 列幅より広い図は列幅まで縮小して中央に収める（切れ・左寄りを防ぐ）
+const svg = ref.current?.querySelector("svg");
+if (svg instanceof SVGElement) {
+  svg.style.maxWidth = "100%";   // mermaid が付ける inline max-width を上書き
+  svg.style.height = "auto";     // アスペクト比を保って縮小
+}
 return (
-  // 外側 = フレーム全幅・横スクロール担当
-  <div className={`mermaid-scroll ${className || ""}`} style={{ width: "100%", overflowX: "auto", ...style }}>
-    {/* 内側 = 自然サイズを中央寄せ（引き伸ばし・縮小を禁止） */}
+  // 外側 = フレーム全幅（列幅）
+  <div className={`mermaid-scroll ${className || ""}`} style={{ width: "100%", ...style }}>
+    {/* 内側 = flex 中央寄せ。svg は上で max-width:100% 化され列幅に収まる */}
     <div id={id} className="mermaid" ref={ref}
-      style={{ width: "fit-content", margin: "0 auto", minHeight: "4rem" }} />
+      style={{ display: "flex", justifyContent: "center", minHeight: "4rem" }} />
   </div>
 );
-// initialize: flowchart/sequence/mindmap とも useMaxWidth: false（自然サイズ維持）
+// initialize: flowchart/sequence/mindmap とも useMaxWidth: false（自然サイズを起点に縮小）
 ```
 
-- inline style（`width:fit-content` / `margin:0 auto`）は **非 `!important` の per-page `.mermaid` ルールより優先**されるため、ページ側で幅を指定しなくても中央寄せ・スクロールが成立する。
-- ページ側で `svg { width:100% }`（引き伸ばし）や `svg { max-width:100% }`（広い図の縮小）を書くと不変条件が壊れる。**`!important` 付きの svg ルールは inline を上書きしてしまうので特に禁止**。
+**振る舞い**: 列幅に収まる図は自然サイズで中央寄せ、列幅より広い図は**列幅まで縮小して中央寄せ**（横スクロールも切れも起こさない）。svg への `max-width:100%` は mermaid が付ける inline style を上書きするため、**コンポーネント内で JS 後処理として付与**する（CSS では inline に負ける）。
 
 ```tsx
-{/* ページ側の使い方: フレームは装飾のみ。中央寄せ/スクロールを再実装しない */}
+{/* ページ側の使い方: フレームは装飾のみ。中央寄せ/サイズ調整を再実装しない */}
 <div className={styles.mermaidWrap}>
   <MermaidDiagram chart={DIAGRAM_0} />
 </div>
@@ -417,13 +423,12 @@ return (
   background: var(--color-background-secondary);
   padding: 20px;
   margin: 24px 0;
-  /* overflow-x: auto; ← コンポーネントと二重の保険。付けても良いが必須ではない */
 }
 
 /* ❌ 禁止: レイアウトの再実装。以下は書かない（コンポーネントの責務） */
 /* .mermaidWrap :global(.mermaid) { display:flex; justify-content:center; width:100%; } */
-/* .mermaidWrap :global(svg)      { width:100%; }            ← 引き伸ばし */
-/* .mermaidWrap :global(svg)      { max-width:100% !important; } ← 広い図が縮小しスクロールしない */
+/* .mermaidWrap :global(svg)      { width:100%; }   ← 引き伸ばし */
+/* .mermaidWrap :global(svg)      { max-width:... !important; } ← コンポーネントの後処理と競合 */
 ```
 
 > **⚠️ `mermaid.initialize` の `useMaxWidth` も必ず `false` にする**

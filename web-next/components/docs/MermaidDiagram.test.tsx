@@ -11,7 +11,7 @@ vi.mock("mermaid", () => ({
 }));
 
 describe("MermaidDiagram レイアウト規約", () => {
-  it("外側に全幅・横スクロールのラッパー、内側に中央寄せの .mermaid を持つ2層構造", () => {
+  it("外側に全幅ラッパー、内側に flex 中央寄せの .mermaid を持つ2層構造", () => {
     const { container } = render(<MermaidDiagram chart="graph TD; A-->B" />);
 
     const outer = container.firstElementChild as HTMLElement;
@@ -23,17 +23,14 @@ describe("MermaidDiagram レイアウト規約", () => {
     expect(outer).not.toBe(inner);
     expect(outer.contains(inner as HTMLElement)).toBe(true);
 
-    // 外側 = フレーム全幅・横スクロール担当
+    // 外側 = フレーム全幅（列幅）を占める
     expect(outer.style.width).toBe("100%");
-    expect(outer.style.overflowX).toBe("auto");
     // .mermaid クラスは内側にのみ付与（外側には付けない）
     expect(outer.classList.contains("mermaid")).toBe(false);
 
-    // 内側 = 自然サイズを中央寄せ（引き伸ばし禁止 = width:fit-content）
-    expect((inner as HTMLElement).style.width).toBe("fit-content");
-    expect((inner as HTMLElement).style.margin).toContain("auto");
-    // 縮小の原因になる max-width は内側に設定しない
-    expect((inner as HTMLElement).style.maxWidth).toBe("");
+    // 内側 = flex 中央寄せ（svg を列幅に収めて中央に置く）
+    expect((inner as HTMLElement).style.display).toBe("flex");
+    expect((inner as HTMLElement).style.justifyContent).toBe("center");
   });
 
   it("id は内側 .mermaid に、className は外側ラッパーに付与される", () => {
