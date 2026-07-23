@@ -28,32 +28,34 @@ export default function TocObserver() {
       l.addEventListener("click", handleLinkClick);
     }
 
-    if (sections.length === 0) return;
+    let observer: IntersectionObserver | null = null;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            const id = `#${entry.target.id}`;
-            for (const l of links) {
-              if (l.getAttribute("href") === id) {
-                l.classList.add(styles.active);
-              } else {
-                l.classList.remove(styles.active);
+    if (sections.length > 0) {
+      observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              const id = `#${entry.target.id}`;
+              for (const l of links) {
+                if (l.getAttribute("href") === id) {
+                  l.classList.add(styles.active);
+                } else {
+                  l.classList.remove(styles.active);
+                }
               }
             }
           }
-        }
-      },
-      { rootMargin: "-15% 0px -70% 0px", threshold: 0 }
-    );
+        },
+        { rootMargin: "-15% 0px -70% 0px", threshold: 0 }
+      );
 
-    for (const sec of sections) {
-      observer.observe(sec);
+      for (const sec of sections) {
+        observer.observe(sec);
+      }
     }
 
     return () => {
-      observer.disconnect();
+      observer?.disconnect();
       for (const l of links) {
         l.removeEventListener("click", handleLinkClick);
       }

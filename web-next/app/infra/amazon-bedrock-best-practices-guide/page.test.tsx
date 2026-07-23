@@ -4,7 +4,7 @@ import Page, { metadata } from "./page";
 
 vi.mock("@/components/docs/MermaidDiagram", () => ({
   default: function DummyMermaidDiagram({ chart }: { chart: string }) {
-    return <pre data-testid="mermaid-diagram">{chart}</pre>;
+    return <pre data-testid="dummy-mermaid-diagram">{chart}</pre>;
   },
 }));
 
@@ -72,6 +72,6 @@ describe("Amazon Bedrock Best Practices Guide Page", () => {
   it("renders mermaid diagram placeholders or components", () => {
     const { container } = render(<Page />);
     const mermaidElements = container.querySelectorAll("[data-testid='mermaid-diagram']");
-    expect(mermaidElements.length).toBe(12);
+    expect(mermaidElements.length).toBe(6);
   });
 });

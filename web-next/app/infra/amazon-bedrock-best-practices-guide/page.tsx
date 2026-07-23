@@ -352,7 +352,11 @@ flowchart LR
             </li>
             <li>
               <code>bedrock:InvokeModel</code> を許可する際は <code>Resource</code> を{" "}
-              <code>*</code> にせず、利用するモデル・インフェランスプロファイルARNに絞り込み、Guardrail制限は <code>bedrock:GuardrailIdentifier</code> 条件で制御する（Knowledge Baseアクセス権限は別途 <code>bedrock:Retrieve</code> / <code>bedrock:RetrieveAndGenerate</code> ガイドに切り離す）
+              <code>*</code>{" "}
+              にせず、利用するモデル・インフェランスプロファイルARNに絞り込み、Guardrail制限は{" "}
+              <code>bedrock:GuardrailIdentifier</code> 条件で制御する（Knowledge
+              Baseアクセス権限は別途 <code>bedrock:Retrieve</code> /{" "}
+              <code>bedrock:RetrieveAndGenerate</code> ガイドに切り離す）
             </li>
             <li>
               Bedrock API keys（サービス固有認証情報）よりも、可能な限り
@@ -393,8 +397,19 @@ flowchart LR
               </div>
               <div className={styles.codeLine}>
                 {" "}
-                <span className={styles.ck}>&quot;Action&quot;</span>:{" "}
+                <span className={styles.ck}>&quot;Action&quot;</span>: [
+              </div>
+              <div className={styles.codeLine}>
+                {" "}
                 <span className={styles.cs}>&quot;bedrock:InvokeModel&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {" "}
+                <span className={styles.cs}>&quot;bedrock:ApplyGuardrail&quot;</span>
+              </div>
+              <div className={styles.codeLine}>
+                {" "}
+                ],
               </div>
               <div className={styles.codeLine}>
                 {" "}
@@ -404,6 +419,12 @@ flowchart LR
                 {" "}
                 <span className={styles.cs}>
                   &quot;arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-*&quot;
+                </span>,
+              </div>
+              <div className={styles.codeLine}>
+                {" "}
+                <span className={styles.cs}>
+                  &quot;arn:aws:bedrock:us-east-1:123456789012:guardrail/my-production-guardrail&quot;
                 </span>
               </div>
               <div className={styles.codeLine}> ],</div>
@@ -415,6 +436,56 @@ flowchart LR
               <div className={styles.codeLine}>
                 {" "}
                 <span className={styles.ck}>&quot;StringEquals&quot;</span>:{" "}
+                <span className={styles.cs}>{"{"}</span>
+              </div>
+              <div className={styles.codeLine}>
+                {" "}
+                <span className={styles.ck}>&quot;bedrock:GuardrailIdentifier&quot;</span>:{" "}
+                <span className={styles.cs}>
+                  &quot;arn:aws:bedrock:us-east-1:123456789012:guardrail/my-production-guardrail&quot;
+                </span>
+              </div>
+              <div className={styles.codeLine}>
+                {" "}
+                <span className={styles.cs}>{"}"}</span>
+              </div>
+              <div className={styles.codeLine}>
+                {" "}
+                <span className={styles.cs}>{"}"}</span>
+              </div>
+              <div className={styles.codeLine}>
+                {" "}
+                <span className={styles.cs}>{"}"}</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {" "}
+                <span className={styles.cs}>{"{"}</span>
+              </div>
+              <div className={styles.codeLine}>
+                {" "}
+                <span className={styles.ck}>&quot;Effect&quot;</span>:{" "}
+                <span className={styles.cs}>&quot;Deny&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {" "}
+                <span className={styles.ck}>&quot;Action&quot;</span>:{" "}
+                <span className={styles.cs}>&quot;bedrock:InvokeModel&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {" "}
+                <span className={styles.ck}>&quot;Resource&quot;</span>:{" "}
+                <span className={styles.cs}>
+                  &quot;arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-*&quot;
+                </span>,
+              </div>
+              <div className={styles.codeLine}>
+                {" "}
+                <span className={styles.ck}>&quot;Condition&quot;</span>:{" "}
+                <span className={styles.cs}>{"{"}</span>
+              </div>
+              <div className={styles.codeLine}>
+                {" "}
+                <span className={styles.ck}>&quot;StringNotEquals&quot;</span>:{" "}
                 <span className={styles.cs}>{"{"}</span>
               </div>
               <div className={styles.codeLine}>
