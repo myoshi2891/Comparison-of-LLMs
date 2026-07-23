@@ -455,7 +455,8 @@ flowchart LR
                 <span className={styles.ck}>&quot;Resource&quot;</span>:{" "}
                 <span className={styles.cs}>
                   &quot;arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-*&quot;
-                </span>,
+                </span>
+                ,
               </div>
               <div className={styles.codeLine}>
                 {" "}
