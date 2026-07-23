@@ -404,7 +404,7 @@ flowchart LR
                 {" "}
                 <span className={styles.ck}>&quot;Resource&quot;</span>:{" "}
                 <span className={styles.cs}>
-                  &quot;arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-*&quot;
+                  &quot;arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-5-sonnet-20241022-v2:0&quot;
                 </span>
               </div>
               <div className={styles.codeLine}>
@@ -454,7 +454,7 @@ flowchart LR
                 {" "}
                 <span className={styles.ck}>&quot;Resource&quot;</span>:{" "}
                 <span className={styles.cs}>
-                  &quot;arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-*&quot;
+                  &quot;arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-5-sonnet-20241022-v2:0&quot;
                 </span>
                 ,
               </div>
