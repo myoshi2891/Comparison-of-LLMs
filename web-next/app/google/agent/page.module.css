@@ -799,6 +799,7 @@
 .flowRow {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   margin: 8px 0;
   flex-wrap: wrap;
@@ -1268,6 +1269,7 @@
 .dflowRow {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   margin: 8px 0;
   flex-wrap: wrap;
