@@ -605,7 +605,10 @@
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 28px;
-  margin: 20px 0;
+  /* 決定木はブロックごと中央寄せ（行は左端揃えのまま＝ジグザグを防ぐ） */
+  width: fit-content;
+  max-width: 100%;
+  margin: 20px auto;
   font-size: 13px;
 }
 
@@ -768,6 +771,7 @@
   margin: 16px 0;
   flex-wrap: wrap;
   align-items: flex-start;
+  justify-content: center;
 }
 
 .flowStep {
