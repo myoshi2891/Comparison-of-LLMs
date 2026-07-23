@@ -2235,8 +2235,8 @@ export default function KimiLlmBestPracticesPage() {
                 実際にモデルを動かして試すことの重要性:簡単なプロンプトを一つ実行するだけでも「思考トークンの消費量」「隠れた挙動」など多くの実務情報が得られる。
               </li>
               <li>
-                K3は現状思考の強度(reasoning
-                effort)が"max"の1段階しかなく、簡単なタスクでも高コストになりがち。
+                K3は思考の強度(reasoning
+                effort)を"low"、"high"、"max"から選択でき（既定値は"max"）、指定しないと簡単なタスクでも高コストになりがち。
               </li>
               <li>
                 OpenRouterや<code className={styles.inlineCode}>llm</code>
