@@ -2164,8 +2164,10 @@ export default function KimiLlmBestPracticesPage() {
                 </tr>
                 <tr>
                   <td>
-                    K3で固定値以外の非サポートな<code className={styles.inlineCode}>temperature</code>
-                    等を指定するとエラーが発生する（<code className={styles.inlineCode}>temperature=1.0</code>
+                    K3で固定値以外の非サポートな
+                    <code className={styles.inlineCode}>temperature</code>
+                    等を指定するとエラーが発生する（
+                    <code className={styles.inlineCode}>temperature=1.0</code>
                     などの固定値は許容）
                   </td>
                   <td>固定値以外の非サポート値を指定するとリクエストエラーが発生する仕様</td>

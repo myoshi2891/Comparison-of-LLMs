@@ -394,7 +394,9 @@ export default function AmazonBedrockBestPracticesPage() {
               <div className={styles.codeLine}> </div>
               <div className={styles.codeLine}>
                 <span>prompt_arn = </span>
-                <span style={{ color: "#a5d6ff" }}>&quot;arn:aws:bedrock:ap-northeast-1:123456789012:prompt/PROMPT_ID:1&quot;</span>
+                <span style={{ color: "#a5d6ff" }}>
+                  &quot;arn:aws:bedrock:ap-northeast-1:123456789012:prompt/PROMPT_ID:1&quot;
+                </span>
               </div>
               <div className={styles.codeLine}> </div>
               <div className={styles.codeLine}>
@@ -407,7 +409,11 @@ export default function AmazonBedrockBestPracticesPage() {
                 <span> promptVariables=&#123;</span>
               </div>
               <div className={styles.codeLine}>
-                <span> &quot;question&quot;: &#123;&quot;text&quot;: &quot;返品ポリシーを教えてください&quot;&#125;</span>
+                <span>
+                  {" "}
+                  &quot;question&quot;: &#123;&quot;text&quot;:
+                  &quot;返品ポリシーを教えてください&quot;&#125;
+                </span>
               </div>
               <div className={styles.codeLine}>
                 <span> &#125;</span>

@@ -1001,10 +1001,7 @@ flowchart LR
               <div className={styles.codeLine}>
                 {" "}
                 <span className={styles.cs}>&quot;guardrailId&quot;</span>:{" "}
-                <span className={styles.cs}>
-                  &quot;my-guardrail-id&quot;
-                </span>
-                ,
+                <span className={styles.cs}>&quot;my-guardrail-id&quot;</span>,
               </div>
               <div className={styles.codeLine}>
                 {" "}
