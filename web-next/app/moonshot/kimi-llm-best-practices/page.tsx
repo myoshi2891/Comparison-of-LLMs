@@ -627,12 +627,16 @@ export default function KimiLlmBestPracticesPage() {
             <span className={styles.badge}>05</span>基本パラメータのベストプラクティス
           </h2>
 
-          <h3>5.1 K3は多くのサンプリングパラメータが「固定」されている</h3>
+          <h3>5.1 K3のサンプリングパラメータ固定化と reasoning_effort の仕様</h3>
           <p>
-            これは今回の更新で最も重要な変更点の一つです。公式クイックスタートによると、Kimi
-            K3では以下のパラメータが<strong>固定値</strong>
-            であり、リクエストに含めても無視されます(省略が推奨)。
+            公式クイックスタートによると、Kimi K3では従来の多くのサンプリングパラメータが
+            <strong>固定値</strong>
+            となっており、リクエストに含めても無視されます(省略が推奨)。一方で、思考プロセスの深さを制御する{" "}
+            <code className={styles.inlineCode}>reasoning_effort</code>{" "}
+            パラメータは固定されず選択が可能です。
           </p>
+
+          <h4>K3で固定されているサンプリングパラメータ</h4>
           <div className={styles.tableWrap}>
             <table>
               <thead>
@@ -678,17 +682,35 @@ export default function KimiLlmBestPracticesPage() {
                   <td>0</td>
                   <td>同上</td>
                 </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h4>選択可能な制御パラメータ（思考レベル）</h4>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>パラメータ</th>
+                  <th>選択可能な値</th>
+                  <th>既定値・備考</th>
+                </tr>
+              </thead>
+              <tbody>
                 <tr>
                   <td>
                     <code className={styles.inlineCode}>reasoning_effort</code>
                   </td>
                   <td>
-                    <code className={styles.inlineCode}>"low"</code> /{" "}
-                    <code className={styles.inlineCode}>"high"</code> /{" "}
-                    <code className={styles.inlineCode}>"max"</code> (既定:{" "}
-                    <code className={styles.inlineCode}>"max"</code>)
+                    <code className={styles.inlineCode}>&quot;low&quot;</code> /{" "}
+                    <code className={styles.inlineCode}>&quot;high&quot;</code> /{" "}
+                    <code className={styles.inlineCode}>&quot;max&quot;</code>
                   </td>
-                  <td>思考レベルの指定が可能（デフォルトは最高レベルの max）</td>
+                  <td>
+                    思考レベルの指定が可能（既定:{" "}
+                    <code className={styles.inlineCode}>&quot;max&quot;</code>
+                    、デフォルトは最高レベルの max）
+                  </td>
                 </tr>
               </tbody>
             </table>
