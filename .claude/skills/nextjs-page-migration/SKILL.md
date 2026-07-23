@@ -7,8 +7,12 @@ description: >
   TRIGGER when the user says any of the following (Japanese or English):
   - "新規ガイドページを追加" / "ガイドページを移行" / "ページを保守"
   - "add new guide page" / "migrate guide page" / "nextjs page migration"
+  - guide-page layout/centering maintenance: "図解が左寄せ" / "図解を中央寄せ" /
+    "コンテンツが左寄り" / "本文の幅がバランス悪い" / "diagram not centered" /
+    "content column width" (both Mermaid and hand-coded flex/HTML diagrams)
   Applies project-specific patterns: SiteHeader, DisclaimerBanner, nav-links.ts,
-  CSS Modules, shiki build-time highlighting, Mermaid lazy loading.
+  CSS Modules, shiki build-time highlighting, Mermaid lazy loading, diagram
+  centering (Mermaid + hand-coded), and the 1440px content-width policy.
 invocation: explicit
 allowed-tools:
   - Read
@@ -227,13 +231,49 @@ build-time ハイライトとして `shiki` を採用する。
 | `cc` | グレー斜体 `#3b4750` | コメント | `cg` | 明緑 `#3fb950` | 成功・肯定 |
 | `ch` | オレンジ太字 `#f0883e` | 見出し | | | |
 
-### Step 4: Mermaid ダイアグラム
+### Step 4: 図解の中央寄せ（Mermaid・手書き両方）
+
+> **鉄則**: サイト内の**あらゆる図解は中央寄せ**にする。「Mermaid だけ直す」は不十分 —
+> 過去に手書き（非 Mermaid）の flex/HTML 図解が左寄せのまま放置され、全面的な手戻りが発生した。
+> 図解を含むページを移行・保守したら、**Mermaid と手書き図解の両方**の中央寄せを必ず確認する。
+
+#### (a) Mermaid 図解
 
 - `components/docs/MermaidDiagram.tsx` を直接インポートして通常通り使用する（内部で動的インポート済み）
-- テーマは **`theme: "dark"`** を設定する
-- 記述は **左端揃え必須**（インデントが混じると構文エラー）
-- **表示レイアウト**: 中央寄せ・全幅・横スクロールは **`MermaidDiagram` コンポーネントが自己完結**で担当する（2層構造 + `useMaxWidth:false`）。ページ側のラッパーは**装飾（border / background / padding）のみ**とし、`:global(.mermaid)` や `:global(svg)` に `width` / `max-width` / `display:flex` を書いて中央寄せ・スクロールを**再実装しない**（引き伸ばし・縮小・左寄せの三分裂を招く）。不変条件は `.claude/rules/mermaid-diagram-layout.md` を参照。
-- `globals.css` に Mermaid 補正 CSS（配色のみ）適用済み。新規図解で読みにくい場合のみ追記する
+- テーマは **`theme: "dark"`**。記述は **左端揃え必須**（インデントが混じると構文エラー）
+- **レイアウトはコンポーネントが自己完結で担当**（2層構造 + `useMaxWidth:false` + `mermaid.run` 後に svg へ `max-width:100%; height:auto` を付与＝**列幅への縮小フィット中央寄せ**）。ページ側ラッパーは**装飾（border/background/padding）のみ**。`:global(.mermaid)` / `:global(svg)` に `width`/`max-width`/`display:flex` を書いて中央寄せを**再実装しない**（引き伸ばし・縮小・左寄せの三分裂を招く）。不変条件は `.claude/rules/mermaid-diagram-layout.md`、実装詳細は `fix-mermaid/SKILL.md` Part 4。
+
+#### (b) 手書き（非 Mermaid）の図解 — flex/HTML で組んだフロー図・決定木・ステップ図
+
+命名がバラバラ（`.flow` / `.flowSteps` / `.flowRow` / `.hfFlow` / `.archRow` / `.decisionTree` …）なので**クラス名で探さない**。「色付きボックスが横に並ぶ図」を見つけたら中央寄せする。パターンは2つ:
+
+```css
+/* パターン1: 1行の横並び（min-width:max-content で自然幅＝はみ出し得る）
+   → 収まるとき中央寄せ・はみ出すとき親の overflow-x で横スクロール。
+   親フレームに overflow-x:auto があることを必ず確認する。 */
+.flow {
+  display: flex;
+  min-width: max-content;
+  width: fit-content;      /* ← 追加 */
+  margin-inline: auto;     /* ← 追加（中央寄せ） */
+}
+
+/* パターン2: 折り返す横並び（flex-wrap:wrap）→ justify-content:center で十分 */
+.flowRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* ← 追加 */
+}
+```
+
+- **左寄せが正しい図解もある**: 縦タイムライン（`flex-direction:column`）・積層バー・ファイルツリー・箇条書きは触らない。「横並びのボックス群」だけが対象。
+- 各行を個別に `justify-content:center` すると幅の違う行がジグザグになる図（決定木など）は、**ブロックごと中央寄せ**する（`.decisionTree { width: fit-content; max-width:100%; margin: * auto }`）。
+
+#### (c) 本文カラム幅（バランス）
+
+- **単一カラム**ページ: トップレベルの本文コンテナに `max-width: 1440px; margin: 0 auto`（サイトの `.container` と同値。全幅すぎるとワイド画面で行が伸び読みにくい／狭すぎると窮屈）。
+- **サイドバー**ページ: 本文カラムは `min-width: 0` でトラックいっぱいに満たす（`.main { max-width: 900px }` のような狭い固定は左寄せ・空白の原因になるので付けない。mcp/local-llm に倣う）。
+- 読みやすさ用の狭いキャップ（`.lead` 等のリード文、ヒーローのサブタイトル）は保持してよい。
 
 ### Step 5: [Refactor] 共通化判断
 
@@ -251,6 +291,26 @@ bun run build       # Next.js production build
 ```
 
 **全通過** が必須。部分 pass でコミットしない。
+
+#### レイアウト・中央寄せの実測検証（視覚バグ用・任意だが強く推奨）
+
+中央寄せ・はみ出し・カラム幅は**ユニットテストで検出できない**。CSS 視覚バグを疑うときは
+**静的ビルドを別ポートで配信し、Playwright で描画座標を実測**する（`scraper/` に Playwright 導入済み）。
+dev サーバーは負荷で再コンパイル・クラッシュしやすいので、**必ず `bun run build` 後の `out/` を静的配信**する。
+
+```bash
+# 1) 静的ビルドを配信（クリーンURL → *.html にマップする簡易サーバ）
+cd web-next && bun run build
+python3 -c "import http.server,os;R=os.path.abspath('out');\
+H=type('H',(http.server.SimpleHTTPRequestHandler,),{'translate_path':lambda s,p:(lambda f:f+'.html' if os.path.isfile(f+'.html') else (os.path.join(f,'index.html') if os.path.isdir(f) else f))(os.path.join(R,p.split('?')[0].strip('/')) or R),'log_message':lambda *a:None});\
+http.server.HTTPServer(('127.0.0.1',8099),H).serve_forever()" &
+# 2) scraper の Playwright で各要素の bounding box を測る（左右の余白を比較）
+#    例: el と親の contentBox から leftGap / rightGap を出し、差が大きい＝左寄せ を検出
+cd scraper && uv run python <検証スクリプト>   # 図解の中央寄せ / .mermaid svg のはみ出し / 本文カラム幅
+```
+
+判定の目安: `|leftGap - rightGap| > 16px` で左右非対称（左寄せ疑い）、`svg.right > wrapper.right` で切れ、
+`<p> を直接子に持つ最幅要素 > 1520px`（1920 幅時）で本文が広すぎ。**ヒーローのメタ/バッジ行の左寄せは意図的**なので除外する。
 
 ### Step 7: nav-links.ts / ドキュメント同期
 
@@ -449,13 +509,15 @@ cd web-next && bun run build && bun run lint && bun run test
 - **`{"\n"}` を `.code-block` 内の改行に使わない** — `<div className={styles.codeLine}>` でラップ
 - **スペース揃えで tabular data を表現しない** — `<table>` 要素へ変換。また、表の文字はすべてのヘッダー（`th`）およびセル（`td`）で必ず左寄せ（`text-align: left !important`）にして表示すること。
 - **Mermaidの図解レイアウトをページ CSS で再実装しない** — 中央寄せ・全幅・横スクロールは `MermaidDiagram` コンポーネントが担当する。ページ側の `:global(.mermaid)` / `:global(svg)` に `width` / `max-width` / `display:flex` を書かない（`svg{width:100%}`=引き伸ばし、`svg{max-width:100%}`=縮小の原因）。ラッパーは装飾のみ（`.claude/rules/mermaid-diagram-layout.md`）。
+- **手書き（非 Mermaid）の横並び図解を左寄せのまま放置しない** — flex/HTML で組んだフロー図・決定木は既定で左寄せになる。横並びのボックス群は必ず中央寄せする（Step 4(b)）。「Mermaid だけ直して手書き図解を見落とす」のが過去の典型的な手戻り。縦タイムライン・ファイルツリー・箇条書きは左寄せのままでよい。
+- **サイドバーページの本文カラムに狭い固定 `max-width` を付けない** — `.main { max-width: 900px }` 等はトラックに対して左寄せ・右空白の原因。サイドバーページは `min-width:0` でトラックを満たす。単一カラムページのみ `max-width:1440px; margin:0 auto` で中央寄せ（Step 4(c)）。
 - **`bun run lint:fix`（引数なし）を実行しない** — 変更ファイル単位でパス指定（R1 ルール）
 - **外部フォントを `<link>` タグで読み込まない** — `next/font/google` のみ（`layout.tsx`）
 - **`@layer components` を page-specific styles に使わない** — plain CSS で specificity を確保
 - **`@keyframes` にキャメルケースを使わない** — kebab-case 必須（`fadeUp` → `fade-up`）
 - **z-index を CSS と Tailwind クラスの両方で指定しない** — 単一ソース原則
 - **SVG に `role="img"` + `aria-label` + `<title>` を省略しない** — Biome `noSvgWithoutTitle` 違反
-- **Playwright MCP ツールを使わない** — 視覚確認はユーザーが手動で実施
+- **Playwright MCP ツールを使わない** — トークン多消費のため。ただしレイアウト・中央寄せの回帰を追う場合に限り、**`scraper/` の Playwright で描画座標を実測**する方式は可（Step 6。スクショの大量取得ではなく bounding box の数値比較。ユーザー許可時のみ）。最終的な見た目確認はユーザーが手動で実施
 - **新規ガイドページを `legacy/` 配下に作成しない** — `web-next/app/` 側のみに作成する
 - **コードブロックやフッターの monospace フォント指定を省略しない** — `.codeBody`, `.codeLine`, `.codeBar`, `.pageFooter` には必ず等幅フォント（`font-family: var(--font-mono), ...`）を明示的に指定すること。
 - **RSC の `page.tsx` を直接クライアントコンポーネント化（'use client'）しない** — Intersection Observer 等が必要な場合は、軽量な `<TocObserver />` などに分割し、`page.tsx` 自体は Server Component のままで `metadata` 静的エクスポートができる状態を維持する。
