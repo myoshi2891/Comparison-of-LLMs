@@ -631,7 +631,7 @@ export default function KimiLlmBestPracticesPage() {
           <p>
             公式クイックスタートによると、Kimi K3では従来の多くのサンプリングパラメータが
             <strong>固定値</strong>
-            となっており、リクエストに含めても無視されます(省略が推奨)。一方で、思考プロセスの深さを制御する{" "}
+            となっており、固定値以外の非サポート値を指定するとリクエストエラーが発生します(省略が推奨)。一方で、思考プロセスの深さを制御する{" "}
             <code className={styles.inlineCode}>reasoning_effort</code>{" "}
             パラメータは固定されず選択が可能です。
           </p>
@@ -652,7 +652,7 @@ export default function KimiLlmBestPracticesPage() {
                     <code className={styles.inlineCode}>temperature</code>
                   </td>
                   <td>1.0</td>
-                  <td>指定しても無視される。省略推奨</td>
+                  <td>非サポート値を指定するとリクエストエラーが発生するため省略を推奨</td>
                 </tr>
                 <tr>
                   <td>
