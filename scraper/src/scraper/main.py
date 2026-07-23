@@ -24,6 +24,7 @@ from scraper.providers import (
     scrape_google,
     scrape_aws,
     scrape_deepseek,
+    scrape_moonshot,
     scrape_xai,
 )
 from scraper.tools import (
@@ -85,6 +86,7 @@ def _scrape_all(
         (lambda: scrape_google(existing_api),    "Google AI / Vertex AI"),
         (lambda: scrape_aws(existing_api),       "AWS Bedrock"),
         (lambda: scrape_deepseek(existing_api),  "DeepSeek"),
+        (lambda: scrape_moonshot(existing_api),  "Moonshot(Kimi)"),
         (lambda: scrape_xai(existing_api),       "xAI"),
     ]:
         _run_scraper(fn, label, api_models)

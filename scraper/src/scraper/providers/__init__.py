@@ -9,6 +9,7 @@ from scraper.providers.openai import scrape as scrape_openai
 from scraper.providers.google import scrape as scrape_google
 from scraper.providers.aws import scrape as scrape_aws
 from scraper.providers.deepseek import scrape as scrape_deepseek
+from scraper.providers.moonshot import scrape as scrape_moonshot
 from scraper.providers.xai import scrape as scrape_xai
 
 __all__ = [
@@ -17,5 +18,6 @@ __all__ = [
     "scrape_google",
     "scrape_aws",
     "scrape_deepseek",
+    "scrape_moonshot",
     "scrape_xai",
 ]
