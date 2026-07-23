@@ -1002,7 +1002,7 @@ flowchart LR
                 {" "}
                 <span className={styles.cs}>&quot;guardrailId&quot;</span>:{" "}
                 <span className={styles.cs}>
-                  &quot;arn:aws:bedrock:us-east-1:123456789012:guardrail/my-guardrail-id/1&quot;
+                  &quot;arn:aws:bedrock:us-east-1:123456789012:guardrail/my-guardrail-id&quot;
                 </span>
                 ,
               </div>
