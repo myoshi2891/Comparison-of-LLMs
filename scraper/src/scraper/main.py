@@ -26,6 +26,7 @@ from scraper.providers import (
     scrape_deepseek,
     scrape_moonshot,
     scrape_xai,
+    scrape_zhipu,
 )
 from scraper.tools import (
     scrape_github_copilot,
@@ -87,6 +88,7 @@ def _scrape_all(
         (lambda: scrape_aws(existing_api),       "AWS Bedrock"),
         (lambda: scrape_deepseek(existing_api),  "DeepSeek"),
         (lambda: scrape_moonshot(existing_api),  "Moonshot(Kimi)"),
+        (lambda: scrape_zhipu(existing_api),     "Zhipu(GLM)"),
         (lambda: scrape_xai(existing_api),       "xAI"),
     ]:
         _run_scraper(fn, label, api_models)

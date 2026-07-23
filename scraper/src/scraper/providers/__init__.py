@@ -11,6 +11,7 @@ from scraper.providers.aws import scrape as scrape_aws
 from scraper.providers.deepseek import scrape as scrape_deepseek
 from scraper.providers.moonshot import scrape as scrape_moonshot
 from scraper.providers.xai import scrape as scrape_xai
+from scraper.providers.zhipu import scrape as scrape_zhipu
 
 __all__ = [
     "scrape_anthropic",
@@ -20,4 +21,5 @@ __all__ = [
     "scrape_deepseek",
     "scrape_moonshot",
     "scrape_xai",
+    "scrape_zhipu",
 ]
