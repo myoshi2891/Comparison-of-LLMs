@@ -472,7 +472,7 @@ flowchart LR
                 {" "}
                 <span className={styles.ck}>&quot;bedrock:GuardrailIdentifier&quot;</span>:{" "}
                 <span className={styles.cs}>
-                  &quot;arn:aws:bedrock:us-east-1:123456789012:guardrail/my-production-guardrail&quot;
+                  &quot;arn:aws:bedrock:us-east-1:123456789012:guardrail/my-production-guardrail/1&quot;
                 </span>
               </div>
               <div className={styles.codeLine}>
@@ -992,7 +992,10 @@ flowchart LR
               <div className={styles.codeLine}>
                 {" "}
                 <span className={styles.cs}>&quot;guardrailId&quot;</span>:{" "}
-                <span className={styles.cs}>&quot;my-guardrail-id&quot;</span>,
+                <span className={styles.cs}>
+                  &quot;arn:aws:bedrock:us-east-1:123456789012:guardrail/my-guardrail-id/1&quot;
+                </span>
+                ,
               </div>
               <div className={styles.codeLine}>
                 {" "}
@@ -1287,10 +1290,13 @@ flowchart TD
           <h3>データレジデンシー設計のベストプラクティス</h3>
           <ul>
             <li>
-              ルーティングされる処理内容は推論計算そのもの（一時的なフォワードパス）であり、AWSのグローバルネットワーク上で暗号化されて転送される
+              ルーティングされる処理では入力プロンプトと出力結果が選択された宛先リージョンで処理され、モデルによっては乱用検知（abuse
+              detection）等の目的でデータが宛先リージョンで保持される可能性がある
             </li>
             <li>
-              顧客データとログはソースリージョンに保存されたまま、推論リクエストのみが宛先リージョンへルーティングされる
+              顧客データが常にソースリージョンのみに残るわけではないため、規制用途やデータレジデンシー要件がある場合は、利用する使用プロファイル（Cross-Region
+              Inference
+              Profile）、許容リージョン、データ保持・乱用検知仕様をあらかじめ確認しておく必要がある
             </li>
             <li>
               RAGシステムでは実際のドキュメントを保存するため、Knowledge
