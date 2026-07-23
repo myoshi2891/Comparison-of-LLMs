@@ -508,6 +508,8 @@
   align-items: flex-start;
   gap: 0;
   min-width: max-content;
+  width: fit-content;
+  margin-inline: auto;
 }
 .fst {
   display: flex;

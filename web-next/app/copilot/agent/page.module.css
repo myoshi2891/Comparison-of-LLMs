@@ -1088,6 +1088,7 @@
   align-items: center;
   gap: 0;
   flex-wrap: wrap;
+  justify-content: center;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;

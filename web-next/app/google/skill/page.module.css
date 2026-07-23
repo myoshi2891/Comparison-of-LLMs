@@ -463,6 +463,8 @@
   align-items: center;
   gap: 0;
   min-width: max-content;
+  width: fit-content;
+  margin-inline: auto;
 }
 .fstep {
   display: flex;
