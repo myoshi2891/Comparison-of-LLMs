@@ -10,6 +10,12 @@ export const metadata: Metadata = {
     "Amazon Bedrockのアーキテクチャ、モデル選定、Prompt Management、RAG、エージェント、Guardrails、コスト最適化、セキュリティ、可観測性を網羅した実践ガイド。",
 };
 
+/**
+ * Renders an external link that opens in a new browser tab.
+ *
+ * @param href - The destination URL
+ * @param children - The link content
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -169,6 +175,9 @@ const DIAGRAM_6 = `flowchart LR
     class G passNode
     class H failNode`;
 
+/**
+ * Renders the Amazon Bedrock best practices guide page.
+ */
 export default function AmazonBedrockBestPracticesPage() {
   return (
     <div className={styles.layout}>

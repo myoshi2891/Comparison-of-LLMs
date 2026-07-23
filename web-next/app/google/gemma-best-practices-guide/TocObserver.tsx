@@ -3,6 +3,11 @@
 import { useEffect } from "react";
 import styles from "./page.module.css";
 
+/**
+ * Synchronizes table-of-contents link styling with the section visible in the viewport.
+ *
+ * @returns `null`, because the component renders no content
+ */
 export default function TocObserver() {
   useEffect(() => {
     const sections = document.querySelectorAll(`.${styles.section}, .${styles.hero}`);
