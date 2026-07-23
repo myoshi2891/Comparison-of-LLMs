@@ -385,13 +385,11 @@
   padding: 20px;
 }
 
+/* 中央寄せ・幅は MermaidDiagram コンポーネントが担当（真実の源）。
+   ここは装飾と横スクロールの保険のみを持つ。 */
 .mermaidContainer {
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center;
   min-height: 60px;
   overflow-x: auto;
-  width: 100%;
 }
 
 .mermaidCaption {

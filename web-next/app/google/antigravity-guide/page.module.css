@@ -1052,9 +1052,9 @@
   display: flex;
   align-items: center;
   gap: 0;
-  min-width: max-content;
+  width: 100%;
+  min-width: 0;
   overflow-x: auto;
-  width: fit-content;
   margin-inline: auto;
 }
 
