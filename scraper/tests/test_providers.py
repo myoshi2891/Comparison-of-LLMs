@@ -141,13 +141,21 @@ class TestGoogle:
         "</body></html>"
     )
 
-    def test_success_extracts_google_ai_price(self):
+    def test_ignores_live_page_and_uses_fallback(self):
+        """Google AI はライブ抽出を無効化し、常に _FALLBACKS(SSoT) を使用する。
+
+        料金ページは TOC 重複・ラベル無し価格・1モデル複数価格併記のため正規表現抽出が
+        構造的に不安定（実測で正しく取れるモデルが 0 件）。誤値を静かに混入させるより、
+        WebSearch 確定値の _FALLBACKS を決定論的に採用する（Vertex と同じ扱い）。
+        価格を含むページを渡しても抽出せずフォールバックすることを保証する。
+        """
         with patch("scraper.providers.google.get_page_text", return_value=self._HTML):
             models = google.scrape()
         flash = _find(models, "Gemini 2.5 Flash")
-        assert flash.price_in == 0.99
-        assert flash.price_out == 5.55
-        assert flash.scrape_status == "success"
+        fb = google._FALLBACKS["Gemini 2.5 Flash"]
+        assert flash.price_in == fb[0]  # 0.99 を抽出せずフォールバック
+        assert flash.price_out == fb[1]
+        assert flash.scrape_status == "fallback"
         assert flash.provider == "Google AI"
 
     def test_fallback_on_empty_html(self):
