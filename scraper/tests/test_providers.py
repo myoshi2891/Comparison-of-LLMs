@@ -165,7 +165,7 @@ class TestGoogle:
 
     def test_does_not_fetch_network(self):
         """ライブ抽出無効の回帰防止: スクレイプ時にページ取得（get_page_text）を呼ばない。"""
-        with patch("scraper.browser.get_page_text") as mock_fetch:
+        with patch("scraper.providers.google.get_page_text") as mock_fetch:
             google.scrape()
         mock_fetch.assert_not_called()
 

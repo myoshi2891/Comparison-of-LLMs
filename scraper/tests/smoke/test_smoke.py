@@ -78,8 +78,10 @@ class TestSmoke(unittest.TestCase):
 
         # Google はライブ抽出を無効化しており get_page_text を呼ばない（フォールバック固定）
         with self.subTest(provider=scrape_google.__name__):
-            res = scrape_google()
-            assert isinstance(res, list)
+            with patch("scraper.providers.google.get_page_text") as mock_get:
+                res = scrape_google()
+                mock_get.assert_not_called()
+                assert isinstance(res, list)
 
         # AWS uses httpx
         with self.subTest(provider=scrape_aws.__name__):
