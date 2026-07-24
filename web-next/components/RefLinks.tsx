@@ -7,7 +7,7 @@
  *   合成する。React unsafe HTML 注入プロパティは一切使用しない。
  *
  * Server Component: props はプレーンデータのみで interactive 要素なし。
- * 16 件の reference card (15 プロバイダー + 為替レート情報) を描画する。
+ * 18 件の reference card (17 プロバイダー + 為替レート情報) を描画する。
  */
 
 import type { Lang } from "@/lib/i18n";
@@ -135,6 +135,40 @@ const CARDS: readonly RefCard[] = [
     ],
   },
   {
+    title: "🌙 Moonshot(Kimi)",
+    links: [
+      {
+        href: "https://platform.moonshot.ai/docs/pricing",
+        label: "platform.moonshot.ai/docs/pricing",
+        desc_ja: "Kimi K3 / K2.6 API料金 (2.8T MoE / 1M ctx)",
+        desc_en: "Kimi K3 / K2.6 API pricing (2.8T MoE / 1M ctx)",
+      },
+      {
+        href: "https://platform.moonshot.ai/docs",
+        label: "platform.moonshot.ai/docs",
+        desc_ja: "モデル一覧・API ドキュメント",
+        desc_en: "Model list & API docs",
+      },
+    ],
+  },
+  {
+    title: "💎 Zhipu(GLM)",
+    links: [
+      {
+        href: "https://docs.z.ai/guides/overview/pricing",
+        label: "docs.z.ai/guides/overview/pricing",
+        desc_ja: "GLM-5.2 / GLM-4.6 API料金 (国際版 z.ai)",
+        desc_en: "GLM-5.2 / GLM-4.6 API pricing (global z.ai)",
+      },
+      {
+        href: "https://z.ai/model-api",
+        label: "z.ai/model-api",
+        desc_ja: "GLM モデル一覧・コンテキスト長",
+        desc_en: "GLM model list & context lengths",
+      },
+    ],
+  },
+  {
     title: "🟠 AWS (Bedrock)",
     links: [
       {
@@ -195,8 +229,8 @@ const CARDS: readonly RefCard[] = [
         desc_en: "Free / Pro / Teams plans",
       },
       {
-        href: "https://docs.windsurf.com/windsurf/credits-and-billing",
-        label: "docs.windsurf.com/credits-and-billing",
+        href: "https://docs.windsurf.com/",
+        label: "docs.windsurf.com",
         desc_ja: "クレジット仕様・SWE-1.5詳細",
         desc_en: "Credit system & SWE-1.5 details",
       },
@@ -212,8 +246,8 @@ const CARDS: readonly RefCard[] = [
         desc_en: "Claude Code overview & features",
       },
       {
-        href: "https://docs.anthropic.com/en/docs/claude-code/pricing",
-        label: "docs.anthropic.com/claude-code/pricing",
+        href: "https://docs.claude.com/en/docs/claude-code/costs",
+        label: "docs.claude.com/claude-code/costs",
         desc_ja: "Pro / Max 5x / Max 20x / Team 料金",
         desc_en: "Pro / Max 5x / Max 20x / Team pricing",
       },
@@ -246,8 +280,8 @@ const CARDS: readonly RefCard[] = [
         desc_en: "Junie autonomous coding agent",
       },
       {
-        href: "https://www.jetbrains.com/junie/faq/",
-        label: "jetbrains.com/junie/faq",
+        href: "https://www.jetbrains.com/help/junie/faq.html",
+        label: "jetbrains.com/help/junie/faq",
         desc_ja: "利用条件・AI Pro内包の詳細",
         desc_en: "Requirements & AI Pro inclusion details",
       },
@@ -310,7 +344,7 @@ const CARDS: readonly RefCard[] = [
 /**
  * Renders a localized "reference links" section containing provider cards and an FX rate card.
  *
- * Renders 16 reference cards (15 provider cards plus one FX rate card). Each card displays a title
+ * Renders 18 reference cards (17 provider cards plus one FX rate card). Each card displays a title
  * and two external links with language-specific descriptions; the FX card title is localized based
  * on `lang`. The section also includes a localized rich-text note produced by `tRich("refNote", lang)`.
  *
