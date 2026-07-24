@@ -161,6 +161,27 @@ class TestGoogle:
             assert m.price_out == fb[1]
             assert m.scrape_status == "fallback"
 
+    def test_price_in_ignores_stray_dollar_before_model_name(self):
+        """モデル名の手前にある無関係な `$` 額を price_in として拾わない（逆順マッチ誤爆の回帰防止）。
+
+        Google AI 料金ページはモデルごとに `$X /1M` が並ぶため、モデル名アンカーなしの
+        逆順パターンは近傍の別モデル/プランの価格を誤取得する。price_in はモデル名の直後に
+        `$X /1M` が無ければフォールバック値へ落ちなければならない。
+        """
+        # `$0.15` は別プラン由来。"Gemini 3.6 Flash" の後に `$X /1M` は無い。
+        html = (
+            "<html><body>"
+            "<p>Free plan then $0.15 per request</p>"
+            "<p>Gemini 3.6 Flash: 1M context, latest Flash</p>"
+            "</body></html>"
+        )
+        with patch("scraper.providers.google.get_page_text", return_value=html):
+            models = google.scrape()
+        flash = _find(models, "Gemini 3.6 Flash")
+        fb_in = google._FALLBACKS["Gemini 3.6 Flash"][0]
+        assert flash.price_in == fb_in  # 0.15 を拾わずフォールバック(1.50)
+        assert flash.scrape_status == "fallback"
+
 
 # --------------------------------------------------------------------------- #
 # DeepSeek
