@@ -4,6 +4,7 @@
 """
 
 from __future__ import annotations
+import datetime
 import logging
 
 from scraper.browser import get_page_text, extract_price, sanity_check
@@ -14,14 +15,31 @@ logger = logging.getLogger(__name__)
 _URL = "https://www.anthropic.com/pricing"
 _CLAUDE_SONNET_5 = "Claude Sonnet 5"
 
+# Claude Sonnet 5 促進価格の最終適用日（2026-08-31 まで $2/$10、以降 $3/$15）。
+_SONNET_5_PROMO_UNTIL = datetime.date(2026, 8, 31)
+
+
+def _sonnet_5_fallback(today: datetime.date | None = None) -> tuple[float, float]:
+    """Claude Sonnet 5 のフォールバック価格を適用日で切り替える。
+
+    Sonnet 5 はライブ抽出対象外（フォールバック固定）のため、促進価格の
+    期限をここで表現する。2026-08-31 まで促進価格 $2/$10、2026-09-01 以降は
+    恒久価格 $3/$15 を返す（_SUB_JA / _SUB_EN の説明と一致させる）。
+    """
+    day = today or datetime.date.today()
+    if day <= _SONNET_5_PROMO_UNTIL:
+        return (2.00, 10.00)
+    return (3.00, 15.00)
+
+
 # フォールバック価格（ハードコード最終手段）
 _FALLBACKS: dict[str, tuple[float, float]] = {
     "Claude Fable 5":           (10.00, 50.00),
     "Claude Opus 4.8":          (5.00,  25.00),
     "Claude Opus 4.7":          (5.00,  25.00),
     "Claude Opus 4.6":          (5.00,  25.00),
-    # TODO(2026-09-01): 2026-09-01 以降に適用される恒久価格改定の反映確認
-    _CLAUDE_SONNET_5:           (3.00,  15.00),
+    # 促進価格は _sonnet_5_fallback() が適用日で $2/$10 ↔ $3/$15 を切替
+    _CLAUDE_SONNET_5:           _sonnet_5_fallback(),
     "Claude Sonnet 4.6":        (3.00,  15.00),
     "Claude Haiku 4.5":         (1.00,   5.00),
     "Claude Haiku 3.5":         (0.80,   4.00),
@@ -186,7 +204,7 @@ _SUB_JA = {
     "Claude Opus 4.8":          "2026年5月 / 1M ctx / Adaptive thinking / 最新フラッグシップ",
     "Claude Opus 4.7":          "SWE-bench 87.6% / コーディング特化 / Apr 2026",
     "Claude Opus 4.6":          "旧フラッグシップ / エージェントチーム / 1M ctx",
-    _CLAUDE_SONNET_5:           "最新Sonnet / 8/31まで促進価格 $2/$10（以降 $3/$15）",
+    _CLAUDE_SONNET_5:           "最新Sonnet / 8/31まで促進価格 $2/$10 (以降 $3/$15)",
     "Claude Sonnet 4.6":        "バランス最適 / 200K ctx / 前世代",
     "Claude Haiku 4.5":         "高速・高ボリューム向け",
     "Claude Haiku 3.5":         "コスト効率モデル / 前世代",
