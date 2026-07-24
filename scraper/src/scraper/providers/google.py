@@ -67,9 +67,12 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
 
         if html_to_use:
             model_key = name.lower().replace(" ", "[-\\s]?").replace(".", r"\.")
+            # price_in はモデル名アンカーのパターンのみ使用する。
+            # 逆順パターン（`\$X ... model_key`）は Google AI 料金ページの並んだ `$X /1M`
+            # のうちモデル名手前の無関係な額を誤取得するため使用しない（未マッチ時は
+            # None → sanity_check でフォールバック値へ決定論的に落ちる）。
             in_price = extract_price(html_to_use, [
                 rf"{model_key}[^$]*?\$([\d.]+)\s*/\s*1M",
-                rf"\$([\d.]+)[^$]*?{model_key}",
             ])
             out_price = extract_price(html_to_use, [
                 rf"{model_key}[^$]*?output[^$]*?\$([\d.]+)",
