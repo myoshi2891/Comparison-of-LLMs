@@ -1,4 +1,5 @@
 import { render, waitFor } from "@testing-library/react";
+import mermaid from "mermaid";
 import { describe, expect, it, vi } from "vitest";
 import MermaidDiagram from "./MermaidDiagram";
 
@@ -58,6 +59,19 @@ describe("MermaidDiagram レイアウト規約", () => {
       expect(svg).not.toBeNull();
       expect((svg as SVGElement).style.maxWidth).toBe("100%");
       expect((svg as SVGElement).style.height).toBe("auto");
+    });
+  });
+
+  it("initialize に flowchart・sequence・mindmap の useMaxWidth: false を渡して呼び出す", async () => {
+    render(<MermaidDiagram chart="graph TD; A-->B" />);
+    await waitFor(() => {
+      expect(mermaid.initialize).toHaveBeenCalledWith(
+        expect.objectContaining({
+          flowchart: expect.objectContaining({ useMaxWidth: false }),
+          sequence: expect.objectContaining({ useMaxWidth: false }),
+          mindmap: expect.objectContaining({ useMaxWidth: false }),
+        })
+      );
     });
   });
 });
