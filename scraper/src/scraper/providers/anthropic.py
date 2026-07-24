@@ -15,6 +15,7 @@ _URL = "https://www.anthropic.com/pricing"
 
 # フォールバック価格（ハードコード最終手段）
 _FALLBACKS: dict[str, tuple[float, float]] = {
+    "Claude Fable 5":           (10.00, 50.00),
     "Claude Opus 4.8":          (5.00,  25.00),
     "Claude Opus 4.7":          (5.00,  25.00),
     "Claude Opus 4.6":          (5.00,  25.00),
@@ -157,6 +158,7 @@ def _build_models_from_results(
 
 
 _TAG = {
+    "Claude Fable 5":           "最上位 Flagship",
     "Claude Opus 4.8":          "最新",
     "Claude Opus 4.7":          "Stable",
     "Claude Opus 4.6":          "Stable",
@@ -167,6 +169,7 @@ _TAG = {
     "Claude Opus 4.1 (Legacy)": "Legacy",
 }
 _CLS = {
+    "Claude Fable 5":           "tag-flag",
     "Claude Opus 4.8":          "tag-flag",
     "Claude Opus 4.7":          "tag-flag",
     "Claude Opus 4.6":          "tag-flag",
@@ -177,6 +180,7 @@ _CLS = {
     "Claude Opus 4.1 (Legacy)": "tag-leg",
 }
 _SUB_JA = {
+    "Claude Fable 5":           "最上位モデル / 1M ctx / 長期エージェント最強 / thinking常時ON",
     "Claude Opus 4.8":          "2026年5月 / 1M ctx / Adaptive thinking / 最新フラッグシップ",
     "Claude Opus 4.7":          "SWE-bench 87.6% / コーディング特化 / Apr 2026",
     "Claude Opus 4.6":          "旧フラッグシップ / エージェントチーム / 1M ctx",
@@ -187,6 +191,7 @@ _SUB_JA = {
     "Claude Opus 4.1 (Legacy)": "旧フラッグシップ / 非推奨",
 }
 _SUB_EN = {
+    "Claude Fable 5":           "Most capable / 1M ctx / best long-horizon agent / thinking always on",
     "Claude Opus 4.8":          "May 2026 / 1M ctx / Adaptive thinking / latest flagship",
     "Claude Opus 4.7":          "SWE-bench 87.6% / Coding-focused / Apr 2026",
     "Claude Opus 4.6":          "Prev flagship / Agent teams / 1M ctx",
