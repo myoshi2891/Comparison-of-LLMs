@@ -29,6 +29,8 @@ const PROVIDER_COLORS: Record<string, string> = {
   xAI: "#94a3b8",
   DeepSeek: "#22d3ee",
   AWS: "#facc15",
+  "Moonshot(Kimi)": "#818cf8",
+  "Zhipu(GLM)": "#f472b6",
 };
 
 interface Props {
