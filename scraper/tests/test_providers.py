@@ -104,7 +104,9 @@ class TestAnthropic:
         _assert_all_fallback(models, anthropic._FALLBACKS, "Anthropic")
 
     def test_includes_fable_5(self):
-        """Claude Fable 5（最上位モデル / $10 / $50 per 1M）が料金一覧に含まれる。"""
+        """
+        Verifies that Claude Fable 5 is included with its fallback pricing and metadata.
+        """
         with patch("scraper.providers.anthropic.get_page_text", return_value="<html></html>"):
             models = anthropic.scrape()
         fable = _find(models, "Claude Fable 5")
@@ -164,7 +166,7 @@ class TestGoogle:
             assert m.scrape_status == "fallback"
 
     def test_does_not_fetch_network(self):
-        """ライブ抽出無効の回帰防止: スクレイプ時にページ取得（get_page_text）を呼ばない。"""
+        """Verify that Google scraping does not fetch page content."""
         with patch("scraper.providers.google.get_page_text") as mock_fetch:
             google.scrape()
         mock_fetch.assert_not_called()

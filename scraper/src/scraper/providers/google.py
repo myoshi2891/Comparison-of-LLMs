@@ -38,15 +38,12 @@ _FALLBACKS: dict[str, tuple[float, float, str, str, str, str, str]] = {
 
 
 def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
-    """Google AI / Vertex AI の価格を返す。
-
-    ライブ抽出は行わず、常に _FALLBACKS(WebSearch 確定値) を採用する。
-    Google AI 料金ページ (ai.google.dev/pricing) は ① モデル名が目次(TOC)に複数回
-    先行出現し、② 価格が "/1M" 等のアンカーを伴わない "Input price ... $1.50" ラベル、
-    ③ 1モデルに標準/キャッシュ等の複数価格が併記される、という構造のため正規表現抽出が
-    構造的に不安定（実測で正しく取れるモデルが 0 件、近傍の無関係な額を誤取得する）。
-    誤値を静かに混入させるより、SSoT の _FALLBACKS を決定論的に採用する（Vertex と同じ扱い）。
-    価格改定は月次で _FALLBACKS を更新して反映する。
+    """
+    Builds API model pricing data for Google AI and Vertex AI from maintained fallback values.
+    
+    Returns:
+        list[ApiModel]: One model entry for each configured fallback, with
+        `scrape_status` set to `"fallback"`.
     """
     logger.info("Google AI / Vertex AI: フォールバック値を使用（ライブ抽出は無効）")
 

@@ -39,6 +39,15 @@ _SUB_EN = {
 
 
 def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
+    """
+    Extract Zhipu(GLM) model pricing and build API model records.
+    
+    Parameters:
+    	existing (list[ApiModel] | None): Existing models whose Zhipu(GLM) prices are used as fallbacks.
+    
+    Returns:
+    	list[ApiModel]: Model records with scraped prices, or fallback prices when retrieval or validation fails.
+    """
     logger.info("Zhipu(GLM): スクレイピング開始 %s", _URL)
 
     fallback_map: dict[str, tuple[float, float]] = {}
@@ -78,6 +87,15 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
 
 
 def _build_fallback(fallback_map: dict[str, tuple[float, float]]) -> list[ApiModel]:
+    """
+    Build model records using the supplied fallback prices.
+    
+    Parameters:
+    	fallback_map (dict[str, tuple[float, float]]): Maps each supported model name to its input and output prices.
+    
+    Returns:
+    	list[ApiModel]: Model records populated with fallback pricing and metadata.
+    """
     return [
         ApiModel(
             provider=_PROVIDER,

@@ -25,7 +25,7 @@ function Ext({ href, children }: { href: string; children: ReactNode }) {
 }
 
 /**
- * Presents a step-by-step guide to building and operating Amazon Bedrock applications.
+ * Presents a step-by-step guide to designing, building, evaluating, and operating Amazon Bedrock applications.
  */
 export default function AmazonBedrockBestPracticesGuidePage() {
   return (

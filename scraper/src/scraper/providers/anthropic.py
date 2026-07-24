@@ -24,11 +24,14 @@ _SONNET_5_PROMO_UNTIL = datetime.date(2026, 8, 31)
 
 
 def _sonnet_5_fallback(today: datetime.date | None = None) -> tuple[float, float]:
-    """Claude Sonnet 5 のフォールバック価格を適用日で切り替える。
-
-    Sonnet 5 はライブ抽出対象外(フォールバック固定)のため、促進価格の
-    期限をここで表現する。2026-08-31 まで促進価格 $2/$10、2026-09-01 以降は
-    恒久価格 $3/$15 を返す(_SUB_JA / _SUB_EN の説明と一致させる)。
+    """
+    Determine the fallback pricing for Claude Sonnet 5 based on the applicable date.
+    
+    Parameters:
+        today (datetime.date | None): Date to evaluate; uses the current date in the configured timezone when omitted.
+    
+    Returns:
+        tuple[float, float]: Input and output token prices in dollars. Returns (2.00, 10.00) through August 31, 2026, and (3.00, 15.00) from September 1, 2026.
     """
     day = today or datetime.datetime.now(_SPEC_TZ).date()
     if day <= _SONNET_5_PROMO_UNTIL:

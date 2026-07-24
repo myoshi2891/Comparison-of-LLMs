@@ -78,7 +78,16 @@ def _scrape_all(
     existing_api: list[ApiModel] | None,
     existing_tools: list[SubTool] | None,
 ) -> tuple[list[ApiModel], list[SubTool]]:
-    """全プロバイダーをスクレイピングして (api_models, sub_tools) を返す。"""
+    """
+    Scrape all configured API providers and coding tools.
+    
+    Parameters:
+        existing_api: Previously collected API model data for incremental scraping.
+        existing_tools: Previously collected coding tool data for incremental scraping.
+    
+    Returns:
+        A tuple containing the scraped API models and coding tools.
+    """
     logger.info("=== API プロバイダーのスクレイピング開始 ===")
     api_models: list[ApiModel] = []
     for fn, label in [

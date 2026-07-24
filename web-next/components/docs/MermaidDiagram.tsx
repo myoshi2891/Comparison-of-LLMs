@@ -17,15 +17,15 @@ type Props = {
 };
 
 /**
- * Renders a Mermaid diagram and updates it when the source or rendering options change.
+ * Renders a Mermaid diagram and updates it when its source or rendering options change.
  *
- * @param chart - Mermaid diagram source text to render
- * @param id - Optional ID for the diagram container
- * @param style - Optional inline styles merged with the container's default styles
- * @param className - Optional additional CSS class names for the container
- * @param theme - Mermaid theme to use
- * @param themeVariables - Optional Mermaid theme variable overrides
- * @returns A container element for the rendered Mermaid diagram
+ * @param chart - Mermaid diagram source text.
+ * @param id - Optional ID for the inner diagram container.
+ * @param style - Optional inline styles for the outer wrapper.
+ * @param className - Optional additional CSS classes for the outer wrapper.
+ * @param theme - Mermaid theme to use.
+ * @param themeVariables - Optional Mermaid theme variable overrides.
+ * @returns A wrapper containing the rendered Mermaid diagram.
  */
 export default function MermaidDiagram({
   chart,

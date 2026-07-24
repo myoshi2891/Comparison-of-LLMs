@@ -39,6 +39,15 @@ _SUB_EN = {
 
 
 def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
+    """
+    Builds model pricing data for Moonshot (Kimi) from its pricing page.
+    
+    Parameters:
+    	existing (list[ApiModel] | None): Existing models whose Moonshot pricing is used as a fallback.
+    
+    Returns:
+    	list[ApiModel]: Model pricing records, using fallback prices when the page cannot be retrieved or extracted prices are invalid.
+    """
     logger.info("Moonshot(Kimi): スクレイピング開始 %s", _URL)
 
     fallback_map: dict[str, tuple[float, float]] = {}
@@ -78,6 +87,15 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
 
 
 def _build_fallback(fallback_map: dict[str, tuple[float, float]]) -> list[ApiModel]:
+    """
+    Builds model entries using fallback pricing.
+    
+    Parameters:
+    	fallback_map (dict[str, tuple[float, float]]): A mapping of model names to input and output prices in USD per 1 million tokens.
+    
+    Returns:
+    	list[ApiModel]: Model entries marked with a fallback scrape status.
+    """
     return [
         ApiModel(
             provider=_PROVIDER,
