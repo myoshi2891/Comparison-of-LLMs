@@ -39,11 +39,14 @@ _FALLBACKS: dict[str, tuple[float, float, str, str, str, str, str]] = {
 
 def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
     """
-    Builds API model pricing data for Google AI and Vertex AI from maintained fallback values.
+    Builds API model pricing data for Google AI and Vertex AI from configured fallback values.
+    
+    Parameters:
+        existing: Ignored; retained for interface compatibility.
     
     Returns:
-        list[ApiModel]: One model entry for each configured fallback, with
-        `scrape_status` set to `"fallback"`.
+        list[ApiModel]: One model entry for each configured fallback, each with
+            `scrape_status` set to `"fallback"`.
     """
     logger.info("Google AI / Vertex AI: フォールバック値を使用（ライブ抽出は無効）")
 
