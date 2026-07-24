@@ -8,7 +8,6 @@
 from __future__ import annotations
 import logging
 
-from scraper.browser import get_page_text, extract_price, sanity_check
 from scraper.models import ApiModel
 
 logger = logging.getLogger(__name__)
@@ -38,62 +37,29 @@ _FALLBACKS: dict[str, tuple[float, float, str, str, str, str, str]] = {
 
 
 def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
-    """Google AI / Vertex AI の価格をスクレイピング。"""
-    logger.info("Google AI: スクレイピング開始")
+    """Google AI / Vertex AI の価格を返す。
 
-    fallback_map: dict[str, tuple[float, float]] = {}
-    if existing:
-        for m in existing:
-            if m.provider in ("Google AI", "Vertex AI"):
-                fallback_map[m.name] = (m.price_in, m.price_out)
-    for k, v in _FALLBACKS.items():
-        fallback_map.setdefault(k, (v[0], v[1]))
+    ライブ抽出は行わず、常に _FALLBACKS(WebSearch 確定値) を採用する。
+    Google AI 料金ページ (ai.google.dev/pricing) は ① モデル名が目次(TOC)に複数回
+    先行出現し、② 価格が "/1M" 等のアンカーを伴わない "Input price ... $1.50" ラベル、
+    ③ 1モデルに標準/キャッシュ等の複数価格が併記される、という構造のため正規表現抽出が
+    構造的に不安定（実測で正しく取れるモデルが 0 件、近傍の無関係な額を誤取得する）。
+    誤値を静かに混入させるより、SSoT の _FALLBACKS を決定論的に採用する（Vertex と同じ扱い）。
+    価格改定は月次で _FALLBACKS を更新して反映する。
+    """
+    logger.info("Google AI / Vertex AI: フォールバック値を使用（ライブ抽出は無効）")
 
-    # Google AI Studio ページを取得
-    google_html = ""
-    try:
-        google_html = get_page_text(_URL_GOOGLE_AI, timeout_ms=40_000)
-    except Exception as exc:
-        logger.warning("Google AI: ページ取得失敗 %s", exc)
-
-    models = []
-    for name, fb_data in _FALLBACKS.items():
-        fb_in, fb_out = fb_data[0], fb_data[1]
-        provider, tag, cls, sub_ja, sub_en = fb_data[2], fb_data[3], fb_data[4], fb_data[5], fb_data[6]
-
-        # Gemini Pro は Google AI Studio ページから取得試みる
-        html_to_use = google_html if provider == "Google AI" else ""
-        status = "fallback"
-
-        if html_to_use:
-            model_key = name.lower().replace(" ", "[-\\s]?").replace(".", r"\.")
-            # price_in はモデル名アンカーのパターンのみ使用する。
-            # 逆順パターン（`\$X ... model_key`）は Google AI 料金ページの並んだ `$X /1M`
-            # のうちモデル名手前の無関係な額を誤取得するため使用しない（未マッチ時は
-            # None → sanity_check でフォールバック値へ決定論的に落ちる）。
-            in_price = extract_price(html_to_use, [
-                rf"{model_key}[^$]*?\$([\d.]+)\s*/\s*1M",
-            ])
-            out_price = extract_price(html_to_use, [
-                rf"{model_key}[^$]*?output[^$]*?\$([\d.]+)",
-            ])
-            pi, si = sanity_check(in_price, f"GoogleAI/{name}/in", fb_in)
-            po, so = sanity_check(out_price, f"GoogleAI/{name}/out", fb_out)
-            fb_in, fb_out = pi, po
-            status = si if si == so else "fallback"
-        else:
-            logger.info("%s: フォールバック値を使用", name)
-
-        models.append(ApiModel(
+    return [
+        ApiModel(
             provider=provider,
             name=name,
             tag=tag,
             cls=cls,
-            price_in=fb_in,
-            price_out=fb_out,
+            price_in=price_in,
+            price_out=price_out,
             sub_ja=sub_ja,
             sub_en=sub_en,
-            scrape_status=status,  # type: ignore[arg-type]
-        ))
-
-    return models
+            scrape_status="fallback",
+        )
+        for name, (price_in, price_out, provider, tag, cls, sub_ja, sub_en) in _FALLBACKS.items()
+    ]

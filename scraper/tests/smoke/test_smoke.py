@@ -66,7 +66,6 @@ class TestSmoke(unittest.TestCase):
         providers_browser = [
             (scrape_anthropic, "scraper.providers.anthropic.get_page_text"),
             (scrape_openai, "scraper.providers.openai.get_page_text"),
-            (scrape_google, "scraper.providers.google.get_page_text"),
             (scrape_deepseek, "scraper.providers.deepseek.get_page_text"),
             (scrape_xai, "scraper.providers.xai.get_page_text"),
         ]
@@ -76,6 +75,11 @@ class TestSmoke(unittest.TestCase):
                     mock_get.return_value = "<html>Mock</html>"
                     res = func()
                     assert isinstance(res, list)
+
+        # Google はライブ抽出を無効化しており get_page_text を呼ばない（フォールバック固定）
+        with self.subTest(provider=scrape_google.__name__):
+            res = scrape_google()
+            assert isinstance(res, list)
 
         # AWS uses httpx
         with self.subTest(provider=scrape_aws.__name__):

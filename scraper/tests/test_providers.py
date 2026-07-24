@@ -134,33 +134,15 @@ class TestOpenAI:
 # Google AI（Google AI ページのみ抽出。Vertex は常に fallback）
 # --------------------------------------------------------------------------- #
 class TestGoogle:
-    _HTML = (
-        "<html><body>"
-        "<p>Gemini 2.5 Flash $0.99 / 1M</p>"
-        "<p>Gemini 2.5 Flash output $5.55</p>"
-        "</body></html>"
-    )
-
-    def test_ignores_live_page_and_uses_fallback(self):
-        """Google AI はライブ抽出を無効化し、常に _FALLBACKS(SSoT) を使用する。
+    def test_uses_fallback_for_all_models(self):
+        """Google AI / Vertex AI は常に _FALLBACKS(SSoT) を採用する（ライブ抽出は無効）。
 
         料金ページは TOC 重複・ラベル無し価格・1モデル複数価格併記のため正規表現抽出が
-        構造的に不安定（実測で正しく取れるモデルが 0 件）。誤値を静かに混入させるより、
-        WebSearch 確定値の _FALLBACKS を決定論的に採用する（Vertex と同じ扱い）。
-        価格を含むページを渡しても抽出せずフォールバックすることを保証する。
+        構造的に不安定（実測で正しく取れるモデルが 0 件で、近傍の無関係な額を誤取得する）。
+        誤値を静かに混入させるより、WebSearch 確定値の _FALLBACKS を決定論的に採用する。
+        価格改定は月次で _FALLBACKS を更新して反映する。
         """
-        with patch("scraper.providers.google.get_page_text", return_value=self._HTML):
-            models = google.scrape()
-        flash = _find(models, "Gemini 2.5 Flash")
-        fb = google._FALLBACKS["Gemini 2.5 Flash"]
-        assert flash.price_in == fb[0]  # 0.99 を抽出せずフォールバック
-        assert flash.price_out == fb[1]
-        assert flash.scrape_status == "fallback"
-        assert flash.provider == "Google AI"
-
-    def test_fallback_on_empty_html(self):
-        with patch("scraper.providers.google.get_page_text", return_value="<html></html>"):
-            models = google.scrape()
+        models = google.scrape()
         # _FALLBACKS の値は 7-tuple（[0]=price_in, [1]=price_out）
         assert len(models) == len(google._FALLBACKS)
         for m in models:
@@ -169,26 +151,11 @@ class TestGoogle:
             assert m.price_out == fb[1]
             assert m.scrape_status == "fallback"
 
-    def test_price_in_ignores_stray_dollar_before_model_name(self):
-        """モデル名の手前にある無関係な `$` 額を price_in として拾わない（逆順マッチ誤爆の回帰防止）。
-
-        Google AI 料金ページはモデルごとに `$X /1M` が並ぶため、モデル名アンカーなしの
-        逆順パターンは近傍の別モデル/プランの価格を誤取得する。price_in はモデル名の直後に
-        `$X /1M` が無ければフォールバック値へ落ちなければならない。
-        """
-        # `$0.15` は別プラン由来。"Gemini 3.6 Flash" の後に `$X /1M` は無い。
-        html = (
-            "<html><body>"
-            "<p>Free plan then $0.15 per request</p>"
-            "<p>Gemini 3.6 Flash: 1M context, latest Flash</p>"
-            "</body></html>"
-        )
-        with patch("scraper.providers.google.get_page_text", return_value=html):
-            models = google.scrape()
-        flash = _find(models, "Gemini 3.6 Flash")
-        fb_in = google._FALLBACKS["Gemini 3.6 Flash"][0]
-        assert flash.price_in == fb_in  # 0.15 を拾わずフォールバック(1.50)
-        assert flash.scrape_status == "fallback"
+    def test_does_not_fetch_network(self):
+        """ライブ抽出無効の回帰防止: スクレイプ時にページ取得（get_page_text）を呼ばない。"""
+        with patch("scraper.browser.get_page_text") as mock_fetch:
+            google.scrape()
+        mock_fetch.assert_not_called()
 
 
 # --------------------------------------------------------------------------- #
