@@ -19,7 +19,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from scraper.models import ApiModel
-from scraper.providers import anthropic, aws, deepseek, google, openai, xai
+from scraper.providers import anthropic, aws, deepseek, google, moonshot, openai, xai, zhipu
 
 
 @pytest.fixture(autouse=True)
@@ -103,6 +103,20 @@ class TestAnthropic:
             models = anthropic.scrape()
         _assert_all_fallback(models, anthropic._FALLBACKS, "Anthropic")
 
+    def test_includes_fable_5(self):
+        """
+        Verifies that Claude Fable 5 is included with its fallback pricing and metadata.
+        """
+        with patch("scraper.providers.anthropic.get_page_text", return_value="<html></html>"):
+            models = anthropic.scrape()
+        fable = _find(models, "Claude Fable 5")
+        assert fable.price_in == 10.00
+        assert fable.price_out == 50.00
+        assert fable.provider == "Anthropic"
+        assert fable.scrape_status == "fallback"
+        assert fable.tag  # タグが空でない
+        assert fable.cls == "tag-flag"
+
 
 # --------------------------------------------------------------------------- #
 # OpenAI（パターンは [^$] / .* — $ を挟まないよう in/out を別セグメントに）
@@ -134,25 +148,15 @@ class TestOpenAI:
 # Google AI（Google AI ページのみ抽出。Vertex は常に fallback）
 # --------------------------------------------------------------------------- #
 class TestGoogle:
-    _HTML = (
-        "<html><body>"
-        "<p>Gemini 2.5 Flash $0.99 / 1M</p>"
-        "<p>Gemini 2.5 Flash output $5.55</p>"
-        "</body></html>"
-    )
+    def test_uses_fallback_for_all_models(self):
+        """Google AI / Vertex AI は常に _FALLBACKS(SSoT) を採用する（ライブ抽出は無効）。
 
-    def test_success_extracts_google_ai_price(self):
-        with patch("scraper.providers.google.get_page_text", return_value=self._HTML):
-            models = google.scrape()
-        flash = _find(models, "Gemini 2.5 Flash")
-        assert flash.price_in == 0.99
-        assert flash.price_out == 5.55
-        assert flash.scrape_status == "success"
-        assert flash.provider == "Google AI"
-
-    def test_fallback_on_empty_html(self):
-        with patch("scraper.providers.google.get_page_text", return_value="<html></html>"):
-            models = google.scrape()
+        料金ページは TOC 重複・ラベル無し価格・1モデル複数価格併記のため正規表現抽出が
+        構造的に不安定（実測で正しく取れるモデルが 0 件で、近傍の無関係な額を誤取得する）。
+        誤値を静かに混入させるより、WebSearch 確定値の _FALLBACKS を決定論的に採用する。
+        価格改定は月次で _FALLBACKS を更新して反映する。
+        """
+        models = google.scrape()
         # _FALLBACKS の値は 7-tuple（[0]=price_in, [1]=price_out）
         assert len(models) == len(google._FALLBACKS)
         for m in models:
@@ -160,6 +164,12 @@ class TestGoogle:
             assert m.price_in == fb[0]
             assert m.price_out == fb[1]
             assert m.scrape_status == "fallback"
+
+    def test_does_not_fetch_network(self):
+        """Verify that Google scraping does not fetch page content."""
+        with patch("scraper.providers.google.get_page_text") as mock_fetch:
+            google.scrape()
+        mock_fetch.assert_not_called()
 
 
 # --------------------------------------------------------------------------- #
@@ -294,3 +304,55 @@ class TestAws:
         with patch("scraper.providers.aws.httpx.get", return_value=self._mock_resp({})):
             models = aws.scrape()
         _assert_all_fallback(models, aws._FALLBACKS, "AWS")
+
+
+# --------------------------------------------------------------------------- #
+# Moonshot(Kimi)（"Kimi K3" のみ。key "kimi[-\s]?k3" は "Kimi K2.6" と衝突しない）
+# --------------------------------------------------------------------------- #
+class TestMoonshot:
+    _HTML = (
+        "<html><body>"
+        "<p>Kimi K3 $9.99</p>"
+        "<p>Kimi K3 output $44.44</p>"
+        "</body></html>"
+    )
+
+    def test_success_extracts_prices(self):
+        with patch("scraper.providers.moonshot.get_page_text", return_value=self._HTML):
+            models = moonshot.scrape()
+        k3 = _find(models, "Kimi K3")
+        assert k3.price_in == 9.99
+        assert k3.price_out == 44.44
+        assert k3.scrape_status == "success"
+        assert k3.provider == "Moonshot(Kimi)"
+
+    def test_fallback_on_empty_html(self):
+        with patch("scraper.providers.moonshot.get_page_text", return_value="<html></html>"):
+            models = moonshot.scrape()
+        _assert_all_fallback(models, moonshot._FALLBACKS, "Moonshot(Kimi)")
+
+
+# --------------------------------------------------------------------------- #
+# Zhipu(GLM)（"GLM-5.2" のみ。key "glm-5\.2" は "GLM-4.6" と衝突しない）
+# --------------------------------------------------------------------------- #
+class TestZhipu:
+    _HTML = (
+        "<html><body>"
+        "<p>GLM-5.2 $7.77</p>"
+        "<p>GLM-5.2 output $22.22</p>"
+        "</body></html>"
+    )
+
+    def test_success_extracts_prices(self):
+        with patch("scraper.providers.zhipu.get_page_text", return_value=self._HTML):
+            models = zhipu.scrape()
+        glm = _find(models, "GLM-5.2")
+        assert glm.price_in == 7.77
+        assert glm.price_out == 22.22
+        assert glm.scrape_status == "success"
+        assert glm.provider == "Zhipu(GLM)"
+
+    def test_fallback_on_empty_html(self):
+        with patch("scraper.providers.zhipu.get_page_text", return_value="<html></html>"):
+            models = zhipu.scrape()
+        _assert_all_fallback(models, zhipu._FALLBACKS, "Zhipu(GLM)")

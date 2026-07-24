@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-07-22
+Updated 2026-07-24
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -18,7 +18,7 @@ update.sh  ← オーケストレーター (scrape → copy)
 │       ├── models.py            PricingData / ApiModel / SubTool スキーマ
 │       ├── exchange.py          USD/JPY レート取得 (Frankfurter API)
 │       ├── browser.py           Playwright 共通ユーティリティ
-│       ├── providers/           API プロバイダー別スクレイパー (anthropic, openai, google, aws, deepseek, xai)
+│       ├── providers/           API プロバイダー別スクレイパー (anthropic, openai, google, aws, deepseek, xai, moonshot, zhipu)
 │       └── tools/               コーディングツール別スクレイパー (cursor, github_copilot, windsurf, claude_code, jetbrains, openai_codex, google_one, antigravity)
 ├── web-next/           Next.js 16 + React 19 + TypeScript + Tailwind v4 (bun)
 │   ├── app/
@@ -196,7 +196,9 @@ Playwright ブラウザバイナリ（`/root/.cache/ms-playwright/`）はバイ�
 - **ナビは registry からの導出。`nav-links.ts` への直書きは禁止**（F-4' / `plans/008-nav-regrouping-f4.md`, 2026-07-14）: `web-next/components/site/nav-links.ts` は `buildNavLinks(pageRegistry)` の結果であり、手書きのリンクデータを持たない（以前は 170 行の手書きデータで registry と二重管理になっていた）。トップレベルは 8 グループ（Home / Providers / Agent 開発 / 開発プロセス / 運用・品質 / モデル・データ / 検索 / What's New。F-5 で「検索」を追加）で、**2 段ネストするのは Providers のみ**。グループの並び順とネスト対象は `web-next/lib/nav-taxonomy.ts` が持つ（registry のエントリは slug 昇順のため表示順を表現できない）。ドロップダウン内のリーフは `addedAt` 昇順 → `slug` 昇順。未知の `group` や Providers の `category` 欠落はビルド時に throw する（silent drop でページがナビから消えるのを防ぐため）
 - **横断導線（RSS / 検索 / 関連リンク）は registry からの導出**（F-3' / F-5 / F-7 / `plans/009-phase3-cross-navigation.md`, 2026-07-14）: ① **検索は自前実装で外部ライブラリを追加しない**（`web-next/lib/search.ts`）。58 ページの title/summary/topics は数十 KB であり全件走査の部分一致で十分。NFKC 正規化 + 空白区切り全トークンの AND 一致。② **タグ導線は `/search` 1 ページに集約**し `/tags/[tag]` の静的ページ群は作らない（1〜2 ページしか持たないタグで薄いページが量産されるため）。状態は `?q=` / `?tag=` の URL クエリで共有する。③ **関連リンクのスコアは決定論的**（`web-next/lib/related-pages.ts`）— 共有 topics 数 降順 → 同一 group 優先 → `addedAt` 降順 → `slug` 昇順。順序が一意でないと無関係なページ追加で全ページの関連リンクが揺れ、SSG 出力が不安定になる。④ RSS は Route Handler + `dynamic = "force-static"` で `output: 'export'` 下でも `out/rss.xml` として静的生成される
 - **page.tsx は Server Component に保つ（metadata の前提）**: Next.js の規約により `"use client"` なファイルは `export const metadata` を持てない。スクロール監視等のクライアント処理は `TocObserver.tsx` 等へ切り出し、page.tsx 自体は Server Component に保つこと。已に全体が `"use client"` になっている `/code-review/coderabbit-guide` と `/code-review/sonar-qube` は、例外的にルート単位の `layout.tsx` から metadata を供給している
+- **Mermaid 図解レイアウトは共有コンポーネントが真実の源**（2026-07-23）: 中央寄せ・全幅フレーム・列幅への縮小フィットは `web-next/components/docs/MermaidDiagram.tsx` の2層構造（外側 `width:100%` / 内側 `.mermaid` `display:flex; justify-content:center`、`useMaxWidth:false` + `mermaid.run` 後に svg へ `max-width:100%; height:auto` を付与）が一元的に担当する。列幅に収まる図は自然サイズで中央寄せ、広い図は列幅まで縮小して中央寄せ（切れ・左寄りなし）。**各ページの `page.module.css` で `:global(.mermaid)` / `:global(svg)` の `width` / `max-width` / `display:flex` を書いて中央寄せ・スクロールを再実装しない**（`svg{width:100%}`=引き伸ばし、`svg{max-width:100%}`=縮小、override 無し=左寄せ、の三分裂を招いた経緯がある）。ページ側ラッパーは装飾（border/background/padding）および必要に応じた `overflow-x: auto` のみを担当。本文カラムの幅方針はレイアウト別に分ける: **サイドバー付きページ**（大半）は本文カラム（`.main`）を `min-width: 0` + `width: 100%` の流動幅（固定 `max-width` なし）でサイドバートラックを埋める。**単一カラム（サイドバーなし）ページ**は中央寄せコンテナに `max-width: 1440px` + `margin: 0 auto`（サイトの `.container` と同値）を用いてワイド画面でのバランスを取る。不変条件は `.claude/rules/mermaid-diagram-layout.md`、実装ガイドは `.claude/skills/fix-mermaid/SKILL.md`（Part 4）を参照
 - **3層フォールバック**: スクレイパーは「スクレイプ成功 → 既存 JSON の値 → ハードコードフォールバック」の順で価格を決定。`scrape_status` フィールド (`success` | `fallback` | `manual`) で出自を追跡
+- **Google AI/Vertex はライブ抽出を行わずフォールバック固定**（2026-07-24）: `providers/google.py` の `scrape()` は `get_page_text` を呼ばず、常に `_FALLBACKS`（WebSearch 確定値）を返す。Google AI 料金ページ (`ai.google.dev/pricing`) は ① モデル名が目次(TOC)に複数回先行出現、② 価格が `/1M` 等のアンカーを伴わない `Input price ... $1.50` ラベル、③ 1モデルに標準/キャッシュ等の複数価格が併記される、という構造のため正規表現抽出が構造的に不安定（実測で正しく取れるモデルが 0 件で、近傍の無関係な額を誤取得し `price_in` を汚染していた）。**この挙動を「スクレイプ復活」で戻さないこと**。価格改定は月次で `_FALLBACKS` を更新して反映する
 - **型の同期**: `scraper/src/scraper/models.py` (Pydantic) が SSoT、`web-next/types/pricing.ts` (TypeScript) が手動ミラー、`web-next/lib/pricing.ts` の `_AssertParity` でコンパイル時検証。**片方を変更したら必ずもう片方も更新すること**
 - **JA/EN バイリンガル**: `web-next/lib/i18n.tsx` で全テキストを管理（`T` オブジェクト + `t()` / `tRich()` の React 要素ファクトリ）。各スクレイパーも `sub_ja` / `sub_en` や `note_ja` / `note_en` のペアで日英テキストを持つ。ガイドページ（Phase B–E）は当面 JA 固定
 - **XSS 対策**: 生 HTML 文字列挿入 API は `web-next/` 内で一切使わない。`tRich()` で React 要素として合成し、静的検査テストで CI 毎に確認

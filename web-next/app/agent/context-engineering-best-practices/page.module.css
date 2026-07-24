@@ -502,15 +502,6 @@
   width: 100%;
 }
 
-.mermaid :global(svg) {
-  display: block;
-  margin: 0 auto;
-  width: 100%;
-  max-width: 100%;
-  height: auto;
-  overflow: visible;
-}
-
 /* Checklist */
 .checklist {
   list-style: none;

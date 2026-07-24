@@ -559,24 +559,10 @@
   border-radius: 0 0 2px 2px;
 }
 
-/* .diagramWrap内のMermaid divのoverflow（Part 2-3） */
-.diagramWrap :global(.mermaid) {
-  overflow: visible;
-}
-
 /* Mermaid SVG 中央寄せ（SKILL.md Part 4 パターン準拠） */
 .mermaidContainer {
   display: flex;
   justify-content: center;
-}
-
-.mermaidContainer :global(svg) {
-  display: block;
-  margin: 0 auto;
-  width: auto;
-  max-width: 100%;
-  height: auto;
-  overflow: visible; /* Part 2-3: シーケンス図下部切れ防止 */
 }
 
 .diagramCaption {

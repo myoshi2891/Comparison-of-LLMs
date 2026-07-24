@@ -1,8 +1,19 @@
 {
-  "generated_at": "2026-06-30",
-  "jpy_rate": 161.86,
-  "jpy_rate_date": "2026-06-29",
+  "generated_at": "2026-07-24",
+  "jpy_rate": 163.47,
+  "jpy_rate_date": "2026-07-23",
   "api_models": [
+    {
+      "provider": "Anthropic",
+      "name": "Claude Fable 5",
+      "tag": "最上位 Flagship",
+      "cls": "tag-flag",
+      "price_in": 10.0,
+      "price_out": 50.0,
+      "sub_ja": "最上位モデル / 1M ctx / 長期エージェント最強 / thinking常時ON",
+      "sub_en": "Most capable / 1M ctx / best long-horizon agent / thinking always on",
+      "scrape_status": "fallback"
+    },
     {
       "provider": "Anthropic",
       "name": "Claude Opus 4.8",
@@ -12,7 +23,7 @@
       "price_out": 25.0,
       "sub_ja": "2026年5月 / 1M ctx / Adaptive thinking / 最新フラッグシップ",
       "sub_en": "May 2026 / 1M ctx / Adaptive thinking / latest flagship",
-      "scrape_status": "manual"
+      "scrape_status": "fallback"
     },
     {
       "provider": "Anthropic",
@@ -38,13 +49,24 @@
     },
     {
       "provider": "Anthropic",
+      "name": "Claude Sonnet 5",
+      "tag": "最新 Sonnet",
+      "cls": "tag-flag",
+      "price_in": 2.0,
+      "price_out": 10.0,
+      "sub_ja": "最新Sonnet / 8/31まで促進価格 $2/$10（以降 $3/$15）",
+      "sub_en": "Latest Sonnet / intro $2/$10 until Aug 31 (then $3/$15)",
+      "scrape_status": "fallback"
+    },
+    {
+      "provider": "Anthropic",
       "name": "Claude Sonnet 4.6",
-      "tag": "最新",
+      "tag": "Stable",
       "cls": "tag-flag",
       "price_in": 3.0,
       "price_out": 15.0,
-      "sub_ja": "バランス最適 / 200K ctx",
-      "sub_en": "Optimal balance / 200K ctx",
+      "sub_ja": "バランス最適 / 200K ctx / 前世代",
+      "sub_en": "Optimal balance / 200K ctx / prev-gen",
       "scrape_status": "fallback"
     },
     {
@@ -54,8 +76,8 @@
       "cls": "tag-mini",
       "price_in": 1.0,
       "price_out": 5.0,
-      "sub_ja": "高速・高ボリューム向け / 200K",
-      "sub_en": "Fast / high-volume use cases / 200K",
+      "sub_ja": "高速・高ボリューム向け",
+      "sub_en": "Fast / high-volume use cases",
       "scrape_status": "fallback"
     },
     {
@@ -82,13 +104,46 @@
     },
     {
       "provider": "OpenAI",
-      "name": "GPT-5.5",
+      "name": "GPT-5.6 Sol",
       "tag": "最新 Flagship",
       "cls": "tag-flag",
       "price_in": 5.0,
       "price_out": 30.0,
-      "sub_ja": "現行フラッグシップ / 1M ctx / May 2026",
-      "sub_en": "Current flagship / 1M ctx / May 2026",
+      "sub_ja": "最新フラッグシップ / 1M ctx / 2026-07-09",
+      "sub_en": "Latest flagship / 1M ctx / 2026-07-09",
+      "scrape_status": "fallback"
+    },
+    {
+      "provider": "OpenAI",
+      "name": "GPT-5.6 Terra",
+      "tag": "最新 Balanced",
+      "cls": "tag-flag",
+      "price_in": 2.5,
+      "price_out": 15.0,
+      "sub_ja": "最新バランス型 / 1M ctx / 2026-07-09",
+      "sub_en": "Latest balanced / 1M ctx / 2026-07-09",
+      "scrape_status": "fallback"
+    },
+    {
+      "provider": "OpenAI",
+      "name": "GPT-5.6 Luna",
+      "tag": "最新 Value",
+      "cls": "tag-bal",
+      "price_in": 1.0,
+      "price_out": 6.0,
+      "sub_ja": "最新コスト重視 / 1M ctx / 2026-07-09",
+      "sub_en": "Latest value / 1M ctx / 2026-07-09",
+      "scrape_status": "fallback"
+    },
+    {
+      "provider": "OpenAI",
+      "name": "GPT-5.5",
+      "tag": "Stable",
+      "cls": "tag-flag",
+      "price_in": 5.0,
+      "price_out": 30.0,
+      "sub_ja": "前フラッグシップ / 1M ctx / May 2026",
+      "sub_en": "Prev flagship / 1M ctx / May 2026",
       "scrape_status": "fallback"
     },
     {
@@ -263,8 +318,19 @@
       "cls": "tag-flag",
       "price_in": 2.0,
       "price_out": 12.0,
-      "sub_ja": "現行世代フラッグシップ / 1M ctx / Mar 2026",
-      "sub_en": "Current gen flagship / 1M ctx / Mar 2026",
+      "sub_ja": "最新世代 / 1M ctx",
+      "sub_en": "Latest generation / 1M ctx",
+      "scrape_status": "fallback"
+    },
+    {
+      "provider": "Google AI",
+      "name": "Gemini 3.6 Flash",
+      "tag": "最新 Flash",
+      "cls": "tag-bal",
+      "price_in": 1.5,
+      "price_out": 7.5,
+      "sub_ja": "2026-07-21 最新Flash / 1M ctx / 出力$9→$7.5",
+      "sub_en": "Jul 2026 latest Flash / 1M ctx / output $9→$7.5",
       "scrape_status": "fallback"
     },
     {
@@ -274,9 +340,20 @@
       "cls": "tag-bal",
       "price_in": 1.5,
       "price_out": 9.0,
-      "sub_ja": "2026年5月リリース / 1M コンテキスト / 高速推論",
-      "sub_en": "May 2026 / 1M context / fast inference",
-      "scrape_status": "manual"
+      "sub_ja": "前Flash / 1M ctx / 高速推論",
+      "sub_en": "Prev Flash / 1M ctx / fast inference",
+      "scrape_status": "fallback"
+    },
+    {
+      "provider": "Google AI",
+      "name": "Gemini 3.5 Flash-Lite",
+      "tag": "Budget",
+      "cls": "tag-mini",
+      "price_in": 0.3,
+      "price_out": 2.5,
+      "sub_ja": "2026-07-21 新バジェット枠 / 1M ctx / 大量処理",
+      "sub_en": "Jul 2026 new budget tier / 1M ctx / high-volume",
+      "scrape_status": "fallback"
     },
     {
       "provider": "Google AI",
@@ -368,13 +445,35 @@
     },
     {
       "provider": "AWS",
+      "name": "Amazon Nova Premier",
+      "tag": "最上位 Nova",
+      "cls": "tag-flag",
+      "price_in": 2.5,
+      "price_out": 10.0,
+      "sub_ja": "最上位 Nova / 高精度 / マルチモーダル",
+      "sub_en": "Top-tier Nova / high accuracy / multimodal",
+      "scrape_status": "fallback"
+    },
+    {
+      "provider": "AWS",
       "name": "Amazon Nova Pro",
       "tag": "Nova",
       "cls": "tag-bal",
-      "price_in": 0.88,
-      "price_out": 3.36,
+      "price_in": 0.8,
+      "price_out": 3.2,
       "sub_ja": "マルチモーダル / 300K ctx",
       "sub_en": "Multimodal / 300K ctx",
+      "scrape_status": "success"
+    },
+    {
+      "provider": "AWS",
+      "name": "Amazon Nova Lite",
+      "tag": "Budget",
+      "cls": "tag-mini",
+      "price_in": 0.06,
+      "price_out": 0.24,
+      "sub_ja": "低コスト / マルチモーダル",
+      "sub_en": "Low-cost / multimodal",
       "scrape_status": "success"
     },
     {
@@ -383,7 +482,7 @@
       "tag": "Cheapest",
       "cls": "tag-mini",
       "price_in": 0.035,
-      "price_out": 0.176,
+      "price_out": 0.14,
       "sub_ja": "Bedrock最安モデル",
       "sub_en": "Lowest-cost Bedrock model",
       "scrape_status": "success"
@@ -391,7 +490,7 @@
     {
       "provider": "DeepSeek",
       "name": "DeepSeek V4 Flash",
-      "tag": "General",
+      "tag": "最新 Flash",
       "cls": "tag-oss",
       "price_in": 0.14,
       "price_out": 0.28,
@@ -402,18 +501,18 @@
     {
       "provider": "DeepSeek",
       "name": "DeepSeek V4 Pro",
-      "tag": "Reasoning",
+      "tag": "最新 Pro",
       "cls": "tag-oss",
       "price_in": 0.435,
       "price_out": 0.87,
       "sub_ja": "高度推論 / 1M ctx / 1.6T MoE / MIT / 2026-05-22値下げ",
       "sub_en": "Advanced reasoning / 1M ctx / 1.6T MoE / MIT / price cut May 2026",
-      "scrape_status": "manual"
+      "scrape_status": "fallback"
     },
     {
       "provider": "DeepSeek",
       "name": "DeepSeek-V3.2",
-      "tag": "General",
+      "tag": "Legacy OSS",
       "cls": "tag-oss",
       "price_in": 0.28,
       "price_out": 0.42,
@@ -424,7 +523,7 @@
     {
       "provider": "DeepSeek",
       "name": "DeepSeek-R1",
-      "tag": "Reasoning",
+      "tag": "Legacy 推論",
       "cls": "tag-oss",
       "price_in": 0.55,
       "price_out": 2.19,
@@ -433,36 +532,91 @@
       "scrape_status": "fallback"
     },
     {
+      "provider": "Moonshot(Kimi)",
+      "name": "Kimi K3",
+      "tag": "最新 Flagship",
+      "cls": "tag-oss",
+      "price_in": 3.0,
+      "price_out": 15.0,
+      "sub_ja": "2.8T MoE / 1M ctx / OSS / 2026-07-16 最新旗艦",
+      "sub_en": "2.8T MoE / 1M ctx / OSS / new flagship Jul 2026",
+      "scrape_status": "fallback"
+    },
+    {
+      "provider": "Moonshot(Kimi)",
+      "name": "Kimi K2.6",
+      "tag": "General",
+      "cls": "tag-oss",
+      "price_in": 0.95,
+      "price_out": 4.0,
+      "sub_ja": "前世代フラッグシップ / OSS / 1M ctx",
+      "sub_en": "Prev flagship / OSS / 1M ctx",
+      "scrape_status": "fallback"
+    },
+    {
+      "provider": "Zhipu(GLM)",
+      "name": "GLM-5.2",
+      "tag": "最新 Flagship",
+      "cls": "tag-oss",
+      "price_in": 1.4,
+      "price_out": 4.4,
+      "sub_ja": "最新旗艦 / OSS / 2026-06-16 / 高コスパ",
+      "sub_en": "Latest flagship / OSS / Jun 2026 / cost-efficient",
+      "scrape_status": "fallback"
+    },
+    {
+      "provider": "Zhipu(GLM)",
+      "name": "GLM-4.6",
+      "tag": "Budget",
+      "cls": "tag-oss",
+      "price_in": 0.43,
+      "price_out": 1.74,
+      "sub_ja": "低コスト枠 / OSS / 前世代",
+      "sub_en": "Budget tier / OSS / prev-gen",
+      "scrape_status": "fallback"
+    },
+    {
+      "provider": "xAI",
+      "name": "Grok 4.5",
+      "tag": "最新 Flagship",
+      "cls": "tag-flag",
+      "price_in": 2.0,
+      "price_out": 6.0,
+      "sub_ja": "最新旗艦 / 500K ctx / 2026-07-08",
+      "sub_en": "Latest flagship / 500K ctx / 2026-07-08",
+      "scrape_status": "fallback"
+    },
+    {
       "provider": "xAI",
       "name": "Grok 4.3",
-      "tag": "最新 Flagship",
+      "tag": "Stable",
       "cls": "tag-flag",
       "price_in": 1.25,
       "price_out": 2.5,
-      "sub_ja": "現行フラッグシップ / 1M ctx / May 2026",
-      "sub_en": "Current flagship / 1M ctx / May 2026",
+      "sub_ja": "前世代 / 1M ctx / May 2026",
+      "sub_en": "Prev-gen / 1M ctx / May 2026",
       "scrape_status": "fallback"
     },
     {
       "provider": "xAI",
       "name": "Grok 4.20",
-      "tag": "Long-ctx 2M",
-      "cls": "tag-bal",
+      "tag": "Stable",
+      "cls": "tag-flag",
       "price_in": 2.0,
       "price_out": 6.0,
-      "sub_ja": "長コンテキスト特化 / 2M ctx / マルチエージェント",
-      "sub_en": "Long-context option / 2M ctx / Multi-agent",
+      "sub_ja": "前フラッグシップ / 1M ctx / Mar 2026",
+      "sub_en": "Prev flagship / 1M ctx / Mar 2026",
       "scrape_status": "fallback"
     },
     {
       "provider": "xAI",
       "name": "Grok 4.1 Fast",
-      "tag": "Legacy ⚠退役",
+      "tag": "Fast",
       "cls": "tag-mini",
       "price_in": 0.2,
       "price_out": 0.5,
-      "sub_ja": "⚠2026-05-15退役 / 2Mコンテキスト / 業界最安クラス",
-      "sub_en": "⚠Retiring 2026-05-15 / 2M context / among cheapest",
+      "sub_ja": "2Mコンテキスト / 業界最安クラス",
+      "sub_en": "2M context / among cheapest in class",
       "scrape_status": "fallback"
     }
   ],
@@ -487,7 +641,7 @@
       "cls": "tag-bal",
       "note_ja": "300 Premium req/月 | 学生無料",
       "note_en": "300 Premium req/mo | Free for students",
-      "scrape_status": "fallback"
+      "scrape_status": "success"
     },
     {
       "group": "GitHub Copilot",
@@ -498,7 +652,7 @@
       "cls": "tag-flag",
       "note_ja": "1,500 req/月 | 全モデルアクセス",
       "note_en": "1,500 req/mo | All model access",
-      "scrape_status": "fallback"
+      "scrape_status": "success"
     },
     {
       "group": "GitHub Copilot",
@@ -542,17 +696,6 @@
       "cls": "tag-bal",
       "note_ja": "$20クレジット/月 ≈ 225 Claude req",
       "note_en": "$20 credits/mo ≈ 225 Claude req",
-      "scrape_status": "fallback"
-    },
-    {
-      "group": "Cursor",
-      "name": "Pro+",
-      "monthly": 60.0,
-      "annual": 48.0,
-      "tag": "Power",
-      "cls": "tag-flag",
-      "note_ja": "$60クレジット/月 (Pro×3) | ヘビーユーザー向け",
-      "note_en": "$60 credits/mo (Pro×3) | For heavy users",
       "scrape_status": "fallback"
     },
     {
@@ -602,13 +745,13 @@
     {
       "group": "Windsurf",
       "name": "Teams",
-      "monthly": 30.0,
+      "monthly": 80.0,
       "annual": null,
       "tag": "Team",
       "cls": "tag-bal",
-      "note_ja": "500 credits/user + 管理機能 | /user",
-      "note_en": "500 credits/user + admin features | /user",
-      "scrape_status": "fallback"
+      "note_ja": "500 credits/user + 管理機能",
+      "note_en": "500 credits/user + admin features",
+      "scrape_status": "success"
     },
     {
       "group": "Claude Code",
@@ -652,17 +795,6 @@
       "cls": "tag-bal",
       "note_ja": "SSO + 集中課金 | /user (5席~)",
       "note_en": "SSO + centralized billing | /user (5+ seats)",
-      "scrape_status": "fallback"
-    },
-    {
-      "group": "Claude Code",
-      "name": "Team Premium",
-      "monthly": 125.0,
-      "annual": 100.0,
-      "tag": "Team+",
-      "cls": "tag-flag",
-      "note_ja": "Claude Code含む高機能チームプラン | /user",
-      "note_en": "Includes Claude Code / premium team plan | /user",
       "scrape_status": "fallback"
     },
     {

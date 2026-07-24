@@ -17,15 +17,15 @@ type Props = {
 };
 
 /**
- * Renders a Mermaid diagram and updates it when the source or rendering options change.
+ * Renders a Mermaid diagram and updates it when its source or rendering options change.
  *
- * @param chart - Mermaid diagram source text to render
- * @param id - Optional ID for the diagram container
- * @param style - Optional inline styles merged with the container's default styles
- * @param className - Optional additional CSS class names for the container
- * @param theme - Mermaid theme to use
- * @param themeVariables - Optional Mermaid theme variable overrides
- * @returns A container element for the rendered Mermaid diagram
+ * @param chart - Mermaid diagram source text.
+ * @param id - Optional ID for the inner diagram container.
+ * @param style - Optional inline styles for the outer wrapper.
+ * @param className - Optional additional CSS classes for the outer wrapper.
+ * @param theme - Mermaid theme to use.
+ * @param themeVariables - Optional Mermaid theme variable overrides.
+ * @returns A wrapper containing the rendered Mermaid diagram.
  */
 export default function MermaidDiagram({
   chart,
@@ -54,6 +54,14 @@ export default function MermaidDiagram({
         ref.current.removeAttribute("data-processed");
         try {
           await m.default.run({ nodes: [ref.current] });
+          // 列幅より広い図は列幅まで縮小して中央に収める（切れ・左寄りを防ぐ）。
+          // mermaid は useMaxWidth:false 時に svg へ自然サイズの inline style を付けるため、
+          // inline を上書きして max-width:100% / height:auto を強制する。
+          const svg = ref.current?.querySelector("svg");
+          if (svg instanceof SVGElement) {
+            svg.style.maxWidth = "100%";
+            svg.style.height = "auto";
+          }
         } catch (err) {
           console.error("[MermaidDiagram] render failed:", err);
           if (active && ref.current) {
@@ -71,12 +79,19 @@ export default function MermaidDiagram({
     // it will re-initialize mermaid and cause flickering.
   }, [chart, theme, themeVariables]);
 
+  // 2層構造でレイアウトの真実の源を一元化する:
+  //   外側 = フレーム全幅（列幅）を占める
+  //   内側 = flex 中央寄せ。svg は max-width:100% で列幅に収まるよう縮小（上の useEffect で付与）
+  // これにより、列幅に収まる図は自然サイズで中央寄せ、広い図は縮小して中央寄せとなり、
+  // 切れ・左寄りが発生しない。ページ側で width/max-width を強制する必要はない。
   return (
-    <div
-      id={id}
-      className={`mermaid ${className || ""}`}
-      ref={ref}
-      style={{ width: "fit-content", maxWidth: "100%", minHeight: "4rem", ...style }}
-    />
+    <div className={`mermaid-scroll ${className || ""}`} style={{ ...style, width: "100%" }}>
+      <div
+        id={id}
+        className="mermaid"
+        ref={ref}
+        style={{ display: "flex", justifyContent: "center", minHeight: "4rem" }}
+      />
+    </div>
   );
 }

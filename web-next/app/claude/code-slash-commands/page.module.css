@@ -752,14 +752,6 @@
   color: var(--c-teal-200);
 }
 
-/* Custom settings specifically for this guide's Mermaid Diagrams to avoid oversized renders */
-.mermaidWrap :global(svg) {
-  display: block;
-  margin: 0 auto;
-  width: 100%;
-  height: auto;
-}
-
 /* 各マーメイド図のサイズ微調整用クラス (個別調整が可能です) */
 .diag0,
 .diag1,

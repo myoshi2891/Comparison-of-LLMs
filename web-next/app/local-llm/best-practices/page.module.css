@@ -507,13 +507,6 @@
   justify-content: center;
 }
 
-.mermaidWrap :global(.mermaid) {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
-
 .mermaidCaption {
   font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 11px;

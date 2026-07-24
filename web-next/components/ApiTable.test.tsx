@@ -275,6 +275,74 @@ describe("ApiTable - group header rows", () => {
   });
 });
 
+describe("ApiTable - provider group colors", () => {
+  // 新規2社 (Moonshot(Kimi) / Zhipu(GLM)) を含むモデル配列。
+  // provider ごとに連続ブロックにする（グループ化は配列順の遷移検出のため）。
+  const brandModels: ApiModel[] = [
+    {
+      provider: "Moonshot(Kimi)",
+      name: "Kimi K3",
+      tag: "最新 Flagship",
+      cls: "tag-oss",
+      price_in: 3,
+      price_out: 15,
+      sub_ja: "最新旗艦",
+      sub_en: "Latest flagship",
+      scrape_status: "fallback",
+    },
+    {
+      provider: "Zhipu(GLM)",
+      name: "GLM-5.2",
+      tag: "最新 Flagship",
+      cls: "tag-oss",
+      price_in: 1.4,
+      price_out: 4.4,
+      sub_ja: "最新旗艦",
+      sub_en: "Latest flagship",
+      scrape_status: "fallback",
+    },
+  ];
+
+  const groupHeaderFor = (container: HTMLElement, provider: string): HTMLElement | undefined =>
+    Array.from(container.querySelectorAll<HTMLElement>("tr.group-header td")).find((el) =>
+      el.textContent?.includes(provider)
+    );
+
+  it("renders Moonshot(Kimi) group header in indigo (#818cf8)", () => {
+    const { container } = render(
+      <ApiTable
+        lang="ja"
+        models={brandModels}
+        inputTokens={INPUT_TOKENS}
+        outputTokens={OUTPUT_TOKENS}
+        jpyRate={JPY_RATE}
+      />
+    );
+    const cell = groupHeaderFor(container, "Moonshot(Kimi)");
+    expect(cell).toBeDefined();
+    // #818cf8 → rgb(129, 140, 248)（jsdom が正規化）
+    expect(cell?.style.color).toBe("rgb(129, 140, 248)");
+    expect(cell?.style.borderLeft).toContain("rgb(129, 140, 248)");
+  });
+
+  it("renders Zhipu(GLM) group header in pink (#f472b6)", () => {
+    const { container } = render(
+      <ApiTable
+        lang="ja"
+        models={brandModels}
+        inputTokens={INPUT_TOKENS}
+        outputTokens={OUTPUT_TOKENS}
+        jpyRate={JPY_RATE}
+      />
+    );
+    const cell = groupHeaderFor(container, "Zhipu(GLM)");
+    expect(cell).toBeDefined();
+    // #f472b6 → rgb(244, 114, 182)
+    expect(cell?.style.color).toBe("rgb(244, 114, 182)");
+    expect(cell?.style.borderLeft).toContain("rgb(244, 114, 182)");
+  });
+});
+
 describe("ApiTable - model cell", () => {
   it("displays model name in .model-name", () => {
     const { container } = render(

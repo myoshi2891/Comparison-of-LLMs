@@ -8,7 +8,7 @@
 from __future__ import annotations
 import logging
 
-from scraper.browser import get_page_text, extract_price, sanity_check
+from scraper.browser import get_page_text
 from scraper.models import ApiModel
 
 logger = logging.getLogger(__name__)
@@ -19,7 +19,9 @@ _URL_VERTEX = "https://cloud.google.com/vertex-ai/generative-ai/pricing"
 _FALLBACKS: dict[str, tuple[float, float, str, str, str, str, str]] = {
     # name: (price_in, price_out, provider, tag, cls, sub_ja, sub_en)
     "Gemini 3.1 Pro Preview": (2.00,  12.00, "Google AI", "Preview",  "tag-flag", "最新世代 / 1M ctx",            "Latest generation / 1M ctx"),
-    "Gemini 3.5 Flash":       (1.50,   9.00, "Google AI", "Fast",     "tag-bal",  "2026年5月 / 1M ctx / 高速推論", "May 2026 / 1M context / fast inference"),
+    "Gemini 3.6 Flash":       (1.50,   7.50, "Google AI", "最新 Flash", "tag-bal", "2026-07-21 最新Flash / 1M ctx / 出力$9→$7.5", "Jul 2026 latest Flash / 1M ctx / output $9→$7.5"),
+    "Gemini 3.5 Flash":       (1.50,   9.00, "Google AI", "Fast",     "tag-bal",  "前Flash / 1M ctx / 高速推論",  "Prev Flash / 1M ctx / fast inference"),
+    "Gemini 3.5 Flash-Lite":  (0.30,   2.50, "Google AI", "Budget",   "tag-mini", "2026-07-21 新バジェット枠 / 1M ctx / 大量処理", "Jul 2026 new budget tier / 1M ctx / high-volume"),
     "Gemini 2.5 Pro":         (1.25,  10.00, "Google AI", "Flagship", "tag-flag", "コーディング最強 / 1M ctx",    "Top coding model / 1M ctx"),
     "Gemini 3 Flash Preview": (0.50,   3.00, "Google AI", "Preview",  "tag-bal",  "次世代Flash / 1M ctx",          "Next-gen Flash / 1M ctx"),
     "Gemini 2.5 Flash":       (0.30,   2.50, "Google AI", "Fast",     "tag-bal",  "バランス高速 / 1M ctx",         "Balanced & fast / 1M ctx"),
@@ -36,59 +38,29 @@ _FALLBACKS: dict[str, tuple[float, float, str, str, str, str, str]] = {
 
 
 def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
-    """Google AI / Vertex AI の価格をスクレイピング。"""
-    logger.info("Google AI: スクレイピング開始")
+    """
+    Builds API model pricing data for Google AI and Vertex AI from configured fallback values.
+    
+    Parameters:
+        existing: Ignored; retained for interface compatibility.
+    
+    Returns:
+        list[ApiModel]: One model entry for each configured fallback, each with
+            `scrape_status` set to `"fallback"`.
+    """
+    logger.info("Google AI / Vertex AI: フォールバック値を使用（ライブ抽出は無効）")
 
-    fallback_map: dict[str, tuple[float, float]] = {}
-    if existing:
-        for m in existing:
-            if m.provider in ("Google AI", "Vertex AI"):
-                fallback_map[m.name] = (m.price_in, m.price_out)
-    for k, v in _FALLBACKS.items():
-        fallback_map.setdefault(k, (v[0], v[1]))
-
-    # Google AI Studio ページを取得
-    google_html = ""
-    try:
-        google_html = get_page_text(_URL_GOOGLE_AI, timeout_ms=40_000)
-    except Exception as exc:
-        logger.warning("Google AI: ページ取得失敗 %s", exc)
-
-    models = []
-    for name, fb_data in _FALLBACKS.items():
-        fb_in, fb_out = fb_data[0], fb_data[1]
-        provider, tag, cls, sub_ja, sub_en = fb_data[2], fb_data[3], fb_data[4], fb_data[5], fb_data[6]
-
-        # Gemini Pro は Google AI Studio ページから取得試みる
-        html_to_use = google_html if provider == "Google AI" else ""
-        status = "fallback"
-
-        if html_to_use:
-            model_key = name.lower().replace(" ", "[-\\s]?").replace(".", r"\.")
-            in_price = extract_price(html_to_use, [
-                rf"{model_key}[^$]*?\$([\d.]+)\s*/\s*1M",
-                rf"\$([\d.]+)[^$]*?{model_key}",
-            ])
-            out_price = extract_price(html_to_use, [
-                rf"{model_key}[^$]*?output[^$]*?\$([\d.]+)",
-            ])
-            pi, si = sanity_check(in_price, f"GoogleAI/{name}/in", fb_in)
-            po, so = sanity_check(out_price, f"GoogleAI/{name}/out", fb_out)
-            fb_in, fb_out = pi, po
-            status = si if si == so else "fallback"
-        else:
-            logger.info("%s: フォールバック値を使用", name)
-
-        models.append(ApiModel(
+    return [
+        ApiModel(
             provider=provider,
             name=name,
             tag=tag,
             cls=cls,
-            price_in=fb_in,
-            price_out=fb_out,
+            price_in=price_in,
+            price_out=price_out,
             sub_ja=sub_ja,
             sub_en=sub_en,
-            scrape_status=status,  # type: ignore[arg-type]
-        ))
-
-    return models
+            scrape_status="fallback",
+        )
+        for name, (price_in, price_out, provider, tag, cls, sub_ja, sub_en) in _FALLBACKS.items()
+    ]

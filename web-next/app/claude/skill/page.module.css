@@ -116,7 +116,7 @@
 
 /* ── LAYOUT ── */
 .main {
-  max-width: 1100px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 3rem 1.5rem 6rem;
 }
@@ -234,6 +234,9 @@
   gap: 0;
   flex-wrap: nowrap;
   min-width: max-content;
+  /* 収まるときは中央寄せ、はみ出すときは親の overflow-x で横スクロール */
+  width: fit-content;
+  margin-inline: auto;
 }
 .flowStep {
   display: flex;

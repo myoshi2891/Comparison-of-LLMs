@@ -1,6 +1,6 @@
 /* page.module.css */
 .wrap {
-  max-width: 1140px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 4rem 2rem 8rem;
 }
@@ -451,7 +451,7 @@
   background-size: 48px 48px;
 }
 .heroWrap {
-  max-width: 1140px;
+  max-width: 1440px;
   margin: 0 auto;
   position: relative;
   width: 100%;

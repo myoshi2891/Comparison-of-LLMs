@@ -150,7 +150,7 @@
 
 /* ─── MAIN ─── */
 .main {
-  max-width: 1160px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 3.5rem 1.5rem 7rem;
 }
@@ -589,6 +589,8 @@
   align-items: flex-start;
   gap: 0;
   min-width: max-content;
+  width: fit-content;
+  margin-inline: auto;
 }
 
 .fst {

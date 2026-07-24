@@ -25,7 +25,7 @@ function Ext({ href, children }: { href: string; children: ReactNode }) {
 }
 
 /**
- * Presents a step-by-step guide to building and operating Amazon Bedrock applications.
+ * Presents a step-by-step guide to designing, building, evaluating, and operating Amazon Bedrock applications.
  */
 export default function AmazonBedrockBestPracticesGuidePage() {
   return (
@@ -1001,10 +1001,7 @@ flowchart LR
               <div className={styles.codeLine}>
                 {" "}
                 <span className={styles.cs}>&quot;guardrailId&quot;</span>:{" "}
-                <span className={styles.cs}>
-                  &quot;arn:aws:bedrock:us-east-1:123456789012:guardrail/my-guardrail-id&quot;
-                </span>
-                ,
+                <span className={styles.cs}>&quot;my-guardrail-id&quot;</span>,
               </div>
               <div className={styles.codeLine}>
                 {" "}

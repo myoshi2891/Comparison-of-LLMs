@@ -14,6 +14,9 @@ logger = logging.getLogger(__name__)
 _URL = "https://openai.com/api/pricing/"
 
 _FALLBACKS: dict[str, tuple[float, float]] = {
+    "GPT-5.6 Sol":   (5.00,   30.00),
+    "GPT-5.6 Terra": (2.50,   15.00),
+    "GPT-5.6 Luna":  (1.00,    6.00),
     "GPT-5.5":       (5.00,   30.00),
     "o3-pro":        (20.00,  80.00),
     "o1":            (15.00,  60.00),
@@ -33,7 +36,10 @@ _FALLBACKS: dict[str, tuple[float, float]] = {
 }
 
 _TAG = {
-    "GPT-5.5":       "最新 Flagship",
+    "GPT-5.6 Sol":   "最新 Flagship",
+    "GPT-5.6 Terra": "最新 Balanced",
+    "GPT-5.6 Luna":  "最新 Value",
+    "GPT-5.5":       "Stable",
     "o3-pro":        "Reasoning",
     "o1":            "Legacy",
     "o3":            "Reasoning ↓80%OFF",
@@ -51,6 +57,9 @@ _TAG = {
     "GPT-5 Nano":    "Budget",
 }
 _CLS = {
+    "GPT-5.6 Sol":   "tag-flag",
+    "GPT-5.6 Terra": "tag-flag",
+    "GPT-5.6 Luna":  "tag-bal",
     "GPT-5.5":       "tag-flag",
     "o3-pro":        "tag-rsn",
     "o1":            "tag-leg",
@@ -69,7 +78,10 @@ _CLS = {
     "GPT-5 Nano":    "tag-mini",
 }
 _SUB_JA = {
-    "GPT-5.5":       "現行フラッグシップ / 1M ctx / May 2026",
+    "GPT-5.6 Sol":   "最新フラッグシップ / 1M ctx / 2026-07-09",
+    "GPT-5.6 Terra": "最新バランス型 / 1M ctx / 2026-07-09",
+    "GPT-5.6 Luna":  "最新コスト重視 / 1M ctx / 2026-07-09",
+    "GPT-5.5":       "前フラッグシップ / 1M ctx / May 2026",
     "o3-pro":        "最高品質推論 / Jun 2025",
     "o1":            "旧推論フラッグシップ",
     "o3":            "Jun 2025: $10→$2 値下げ",
@@ -87,7 +99,10 @@ _SUB_JA = {
     "GPT-5 Nano":    "最安クラス / 大量分類向け",
 }
 _SUB_EN = {
-    "GPT-5.5":       "Current flagship / 1M ctx / May 2026",
+    "GPT-5.6 Sol":   "Latest flagship / 1M ctx / 2026-07-09",
+    "GPT-5.6 Terra": "Latest balanced / 1M ctx / 2026-07-09",
+    "GPT-5.6 Luna":  "Latest value / 1M ctx / 2026-07-09",
+    "GPT-5.5":       "Prev flagship / 1M ctx / May 2026",
     "o3-pro":        "Highest quality reasoning / Jun 2025",
     "o1":            "Legacy reasoning flagship",
     "o3":            "Jun 2025: $10→$2 price cut",

@@ -137,7 +137,7 @@
   grid-template-columns: 1fr auto;
   gap: 2rem;
   align-items: end;
-  max-width: 1200px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 3.5rem 2rem;
 }
@@ -230,7 +230,7 @@
 
 /* ─── LAYOUT ─── */
 .wrap {
-  max-width: 1200px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 0 2rem;
 }

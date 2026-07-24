@@ -309,13 +309,6 @@
   margin-top: 0.75rem;
 }
 
-/* Mermaid diagram centering and responsive sizing */
-.diagramFrame :global(.mermaid) {
-  display: flex !important;
-  justify-content: center !important;
-  width: 100% !important;
-}
-
 /* ===== コードブロック ===== */
 .codeBlockWrap {
   margin: 1.5rem 0;

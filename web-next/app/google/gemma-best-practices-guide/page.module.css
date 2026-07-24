@@ -467,22 +467,6 @@
   overflow-x: auto;
 }
 
-.mermaidContainer :global(.mermaid) {
-  display: block;
-  width: fit-content;
-  max-width: 100%;
-  margin: 0 auto;
-}
-
-.mermaidContainer :global(svg) {
-  display: block !important;
-  width: auto !important;
-  max-width: 100% !important;
-  height: auto !important;
-  margin: 0 auto !important;
-  overflow: visible !important;
-}
-
 .sourceNote {
   font-size: 0.82rem;
   color: var(--text-faint);

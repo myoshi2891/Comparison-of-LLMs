@@ -113,12 +113,16 @@ describe("/model-data/gpt-5-6-best-practices - contract", () => {
     expect(container.querySelectorAll("pre code span").length).toBeGreaterThan(0);
   });
 
-  it("uses full-width content and centers Mermaid output", () => {
+  it("uses full-width content and delegates Mermaid centering to the shared component", () => {
     const css = readFileSync(`${__dirname}/page.module.css`, "utf8");
-    expect(css).not.toContain("max-width:1200px");
-    expect(css).toMatch(
-      /\.mermaidWrap :global\(\.mermaid\)\s*\{\s*display: flex;\s*justify-content: center;/
-    );
+    expect(css).not.toMatch(/max-width\s*:\s*1200px/);
+    // 中央寄せ・横スクロールは MermaidDiagram コンポーネントが担当（真実の源）。
+    // ページ側の CSS で :global(.mermaid) / :global(svg) の幅や flex 中央寄せを再実装しないこと
+    // （引き伸ばし・縮小・レイアウト分裂の原因になる）。
+    const globalMermaidBlock = /:global\((?:\.mermaid|svg|\.mermaid svg)\)(?:\s+svg)?\s*\{[^}]*/;
+    expect(css).not.toMatch(new RegExp(`${globalMermaidBlock.source}width`));
+    expect(css).not.toMatch(new RegExp(`${globalMermaidBlock.source}display\s*:\s*flex`));
+    expect(css).not.toMatch(new RegExp(`${globalMermaidBlock.source}justify-content\s*:\s*center`));
   });
 
   it("left-aligns every Markdown table header", () => {

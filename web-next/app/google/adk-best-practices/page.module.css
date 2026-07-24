@@ -282,24 +282,6 @@
   justify-content: center;
 }
 
-.diagram :global(.mermaid) {
-  display: block;
-  margin: 0 auto;
-  width: 100%;
-  max-width: 100%;
-  height: auto;
-  overflow: visible;
-}
-
-.diagram :global(svg) {
-  display: block;
-  margin: 0 auto;
-  width: 100%;
-  max-width: 100%;
-  height: auto;
-  overflow: visible;
-}
-
 .source {
   display: flex;
   align-items: flex-start;

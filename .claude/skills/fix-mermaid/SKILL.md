@@ -2,25 +2,33 @@
 name: fix-mermaid
 description: >
   Use this skill to fix Mermaid diagram syntax errors, rendering issues,
-  and dark-mode styling problems inside HTML files.
+  sizing/centering, and dark-mode styling problems — in static HTML files and
+  in the Next.js shared component (web-next/components/docs/MermaidDiagram.tsx).
   Trigger when the user mentions: "mermaid error", "Syntax error in text",
   "mermaid not rendering", "diagram is broken", "all diagrams crashed",
   "文字が読めない", "はみ出している", "図が醜い", "ダークモードで見にくい",
   "シーケンス図が切れている", "マインドマップの色がおかしい",
+  "図解が左寄せ", "図が中央寄せにならない", "図が切れる/はみ出す",
   or references a Mermaid version error (e.g. "mermaid version 10.9.5").
-  Covers: syntax fixes, SVG sizing, dark-mode coloring (mindmap/sequence),
-  foreignObject CSS limitations, and font-loading timing.
+  Covers: syntax fixes, SVG sizing + shrink-to-fit centering, dark-mode
+  coloring (mindmap/sequence), foreignObject CSS limitations, font-loading
+  timing, and the component-owned layout contract for the Next.js site.
 ---
 
 # Mermaid v10 修正・スタイリングスキル
 
-Updated: 2026-07-22
+Updated: 2026-07-24
 
 ## 対象
 
 - `<div class="mermaid">` ブロック / JS テンプレートリテラル方式の構文エラー
 - ダークモードでの配色崩れ（マインドマップ・シーケンス図）
-- SVGサイズ・クリッピング問題
+- SVGサイズ・クリッピング・**中央寄せ**問題
+- Next.js 共有コンポーネント `web-next/components/docs/MermaidDiagram.tsx` のレイアウト（Part 4）
+
+> **レイアウトの不変条件は `.claude/rules/mermaid-diagram-layout.md` が SSoT**（中央寄せ・列幅への縮小フィット・
+> `useMaxWidth:false`・ページ側で幅を強制しない）。本スキルはその実装ガイド。サイト（web-next）で図解が左寄せ・
+> 切れる場合は Part 4 を、静的 HTML の描画問題は Part 2–3 を参照する。
 
 ---
 
@@ -362,8 +370,11 @@ mermaid.initialize({ startOnLoad: false });
     if (svgEl) {
       svgEl.removeAttribute('width');
       svgEl.removeAttribute('height');
-      svgEl.style.width = '100%';
+      svgEl.style.display = 'block';   // ✅ SVG は既定 inline のため block 化しないと margin:0 auto が効かない
+      svgEl.style.width = 'auto';      // ✅ 実寸維持（100% は引き伸ばしになるので不可）
+      svgEl.style.maxWidth = '100%';   // ✅ コンテナ幅で上限（広い図は縮小フィット）
       svgEl.style.height = 'auto';
+      svgEl.style.margin = '0 auto';   // ✅ 中央寄せ
       svgEl.style.overflow = 'visible';
     }
   }
@@ -377,63 +388,58 @@ mermaid.initialize({ startOnLoad: false });
 
 ## Part 4: React/Next.js (CSS Modules) 移植時の注意点
 
-### CSS Modules 環境下での中央寄せとサイズ制限
+### CSS Modules 環境下での中央寄せとサイズ制限（レイアウトはコンポーネントが真実の源）
+
+> **重要な設計変更（2026-07-23）**: 中央寄せ・全幅・横スクロールは **共有コンポーネント
+> `components/docs/MermaidDiagram.tsx` が一元的に担当**する。各ページの `page.module.css` で
+> `.mermaid` / `svg` の幅・配置を強制してはならない（引き伸ばし・縮小・左寄せの三分裂を招くため）。
+> 不変条件の詳細は `.claude/rules/mermaid-diagram-layout.md` を参照。
+
+`MermaidDiagram` は **2層構造 + svg 後処理**でレイアウトを自己完結させる（実物がこの契約）:
 
 ```tsx
-// MermaidDiagramコンポーネントの実装パターン（正解）
-import { forwardRef } from "react";
-
-interface MermaidDiagramProps {
-  chart: string;
-  className?: string;
-  theme?: string;
+// components/docs/MermaidDiagram.tsx（レイアウト部の要点）
+await m.default.run({ nodes: [ref.current] });
+// 列幅より広い図は列幅まで縮小して中央に収める（切れ・左寄りを防ぐ）
+const svg = ref.current?.querySelector("svg");
+if (svg instanceof SVGElement) {
+  svg.style.maxWidth = "100%";   // mermaid が付ける inline max-width を上書き
+  svg.style.height = "auto";     // アスペクト比を保って縮小
 }
-
-const MermaidDiagram = forwardRef<HTMLDivElement, MermaidDiagramProps>(
-  ({ chart, className, theme = "dark" }, ref) => {
-    return (
-      <div
-        className={`mermaid ${className || ""}`}
-        ref={ref}
-        data-theme={theme}
-        // ✅ width: fit-content で SVG 実寸に合わせる
-        // ❌ width: "100%" は「小さな図も全幅に引き伸ばす」ため禁止
-        style={{ width: "fit-content", maxWidth: "100%", minHeight: "4rem" }}
-      />
-    );
-  }
+return (
+  // 外側 = フレーム全幅（列幅）
+  <div className={`mermaid-scroll ${className || ""}`} style={{ ...style, width: "100%" }}>
+    {/* 内側 = flex 中央寄せ。svg は上で max-width:100% 化され列幅に収まる */}
+    <div id={id} className="mermaid" ref={ref}
+      style={{ display: "flex", justifyContent: "center", minHeight: "4rem" }} />
+  </div>
 );
-MermaidDiagram.displayName = "MermaidDiagram";
-export default MermaidDiagram;
+// initialize: flowchart/sequence/mindmap とも useMaxWidth: false（自然サイズを起点に縮小）
 ```
 
+**振る舞い**: 列幅に収まる図は自然サイズで中央寄せ、列幅より広い図は**列幅まで縮小して中央寄せ**（横スクロールも切れも起こさない）。svg への `max-width:100%` は mermaid が付ける inline style を上書きするため、**コンポーネント内で JS 後処理として付与**する（CSS では inline に負ける）。
+
 ```tsx
-<div className={styles.mermaidContainer}>
+{/* ページ側の使い方: フレームは装飾のみ。中央寄せ/サイズ調整を再実装しない */}
+<div className={styles.mermaidWrap}>
   <MermaidDiagram chart={DIAGRAM_0} />
 </div>
 ```
 
 ```css
-/* ✅ 正解パターン */
-.mermaidContainer {
-  display: flex;
-  justify-content: center;
-  overflow-x: auto; /* 横幅を超える場合のスクロール */
+/* ✅ 正解: フレームは装飾（border / background / padding / margin）だけ */
+.mermaidWrap {
+  border: 1px solid var(--color-border-primary);
+  border-radius: 8px;
+  background: var(--color-background-secondary);
+  padding: 20px;
+  margin: 24px 0;
 }
-.mermaidContainer :global(.mermaid) {
-  display: block;
-  width: fit-content; /* ✅ SVG 実寸に合わせる */
-  max-width: 100%;    /* ✅ コンテナ幅を超えない */
-  margin: 0 auto;
-  /* ❌ width: 100% ← 巨大化の原因！絶対に書かない */
-}
-.mermaidContainer :global(svg) {
-  display: block !important;
-  width: auto !important;
-  max-width: 100% !important;
-  height: auto !important;
-  overflow: visible !important;
-}
+
+/* ❌ 禁止: レイアウトの再実装。以下は書かない（コンポーネントの責務） */
+/* .mermaidWrap :global(.mermaid) { display:flex; justify-content:center; width:100%; } */
+/* .mermaidWrap :global(svg)      { width:100%; }   ← 引き伸ばし */
+/* .mermaidWrap :global(svg)      { max-width:... !important; } ← コンポーネントの後処理と競合 */
 ```
 
 > **⚠️ `mermaid.initialize` の `useMaxWidth` も必ず `false` にする**
@@ -480,7 +486,6 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
 }));
 ```
 
-
 ---
 
 ## Part 5: Mermaidを諦めてHTML/CSSに置き換えるべきケース
@@ -507,3 +512,5 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
 | **SVG全体が巨大化・画面全幅に広がる** | `useMaxWidth: true` かつ `width: 100%` | `useMaxWidth: false` + `width: fit-content`（Part 2-3・Part 4参照） |
 | 図は常識的な大きさだが小さな図も全幅に引き伸ばされる | コンテナまたは `.mermaid` に `width: 100%` | `width: fit-content; max-width: 100%` に変更 |
 | **SVGが縦長に拡大される・縦横比が崩れる** | SVGに `width` 属性が残ったままに `width: 100%` | `removeAttribute('width')` → `width: auto; max-width: 100%` に変更 |
+| **（web-next）図解が左寄せ・右に空白** | ページ側 `:global(.mermaid)` の幅強制、または列幅より広い図 | ページ側の幅指定を削除しコンポーネントに委譲。広い図は svg `max-width:100%` で縮小フィット（Part 4） |
+| **（web-next）図解が切れて右にスクロール** | 旧 `overflow-x` スクロール方式が残存 | svg 後処理で `max-width:100%; height:auto`（縮小フィット＝切れない）に統一（Part 4） |

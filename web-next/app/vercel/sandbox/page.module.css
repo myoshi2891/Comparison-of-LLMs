@@ -561,11 +561,6 @@
   width: 100%;
 }
 
-.mermaidWrap :global(.mermaid) svg {
-  margin: 0 auto;
-  display: block;
-}
-
 .mermaidCaption {
   text-align: center;
   font-size: 12px;

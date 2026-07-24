@@ -199,7 +199,7 @@
   overflow-x: auto;
 }
 .navInner {
-  max-width: 1160px;
+  max-width: 1440px;
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -231,7 +231,7 @@ nav a:hover,
 
 /* ─── MAIN ─── */
 .main {
-  max-width: 1160px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 0 24px 100px;
 }
@@ -584,14 +584,6 @@ tbody tr:hover td {
 .diag {
   display: flex;
   justify-content: center;
-}
-.mermaid :global(svg),
-.diag :global(svg) {
-  display: block;
-  margin: 0 auto;
-  width: 100%;
-  max-width: 100%;
-  height: auto;
 }
 
 /* 個別サイズ調整 */

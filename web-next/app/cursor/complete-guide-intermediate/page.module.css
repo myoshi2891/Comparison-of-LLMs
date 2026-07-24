@@ -441,19 +441,6 @@
   max-width: 900px;
   margin: 0 auto;
 }
-.figureCanvas :global(.mermaid) {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-.figureCanvas :global(svg) {
-  display: block;
-  margin: 0 auto;
-  width: 100%;
-  max-width: 100%;
-  height: auto !important;
-  overflow: visible;
-}
 .figureLegend {
   margin: 16px 0 20px;
   padding: 14px 16px;

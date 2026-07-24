@@ -118,7 +118,6 @@
 .main {
   min-width: 0;
   padding: 0 3rem 6rem;
-  max-width: 900px;
 }
 
 /* ── Hero ── */
@@ -419,17 +418,6 @@
   margin: 1.5rem 0;
   overflow-x: auto;
   text-align: center;
-}
-
-.mermaidWrap :global(.mermaid) {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-.mermaidWrap :global(.mermaid) svg {
-  max-width: 100%;
-  height: auto;
 }
 
 /* ── Table ── */

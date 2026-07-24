@@ -270,19 +270,6 @@
   width: 100%;
 }
 
-.mermaidWrap :global(.mermaid) {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  overflow: visible;
-}
-
-.mermaidWrap :global(.mermaid svg) {
-  max-width: 100%;
-  height: auto;
-  overflow: visible;
-}
-
 /* Checklist */
 .checklist {
   list-style: none;

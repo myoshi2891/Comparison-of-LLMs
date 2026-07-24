@@ -405,12 +405,6 @@
   padding: 24px;
 }
 
-.mermaidContainer :global(.mermaid) {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
 .mermaidCaption {
   text-align: center;
   font-size: 12px;

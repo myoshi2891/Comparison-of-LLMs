@@ -24,7 +24,9 @@ from scraper.providers import (
     scrape_google,
     scrape_aws,
     scrape_deepseek,
+    scrape_moonshot,
     scrape_xai,
+    scrape_zhipu,
 )
 from scraper.tools import (
     scrape_github_copilot,
@@ -76,7 +78,16 @@ def _scrape_all(
     existing_api: list[ApiModel] | None,
     existing_tools: list[SubTool] | None,
 ) -> tuple[list[ApiModel], list[SubTool]]:
-    """全プロバイダーをスクレイピングして (api_models, sub_tools) を返す。"""
+    """
+    Scrape all configured API providers and coding tools.
+    
+    Parameters:
+        existing_api: Previously collected API model data for incremental scraping.
+        existing_tools: Previously collected coding tool data for incremental scraping.
+    
+    Returns:
+        A tuple containing the scraped API models and coding tools.
+    """
     logger.info("=== API プロバイダーのスクレイピング開始 ===")
     api_models: list[ApiModel] = []
     for fn, label in [
@@ -85,6 +96,8 @@ def _scrape_all(
         (lambda: scrape_google(existing_api),    "Google AI / Vertex AI"),
         (lambda: scrape_aws(existing_api),       "AWS Bedrock"),
         (lambda: scrape_deepseek(existing_api),  "DeepSeek"),
+        (lambda: scrape_moonshot(existing_api),  "Moonshot(Kimi)"),
+        (lambda: scrape_zhipu(existing_api),     "Zhipu(GLM)"),
         (lambda: scrape_xai(existing_api),       "xAI"),
     ]:
         _run_scraper(fn, label, api_models)

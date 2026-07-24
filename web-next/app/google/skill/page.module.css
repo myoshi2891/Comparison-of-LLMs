@@ -129,7 +129,7 @@
 
 /* ── LAYOUT ── */
 .main {
-  max-width: 1120px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 3rem 1.5rem 6rem;
 }
@@ -463,6 +463,8 @@
   align-items: center;
   gap: 0;
   min-width: max-content;
+  width: fit-content;
+  margin-inline: auto;
 }
 .fstep {
   display: flex;

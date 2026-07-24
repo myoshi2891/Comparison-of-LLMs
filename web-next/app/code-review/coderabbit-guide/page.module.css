@@ -113,7 +113,7 @@
 .main {
   position: relative;
   z-index: 1;
-  max-width: 940px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 2rem 1.2rem 4rem;
 }

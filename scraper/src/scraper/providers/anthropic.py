@@ -4,7 +4,9 @@
 """
 
 from __future__ import annotations
+import datetime
 import logging
+from zoneinfo import ZoneInfo
 
 from scraper.browser import get_page_text, extract_price, sanity_check
 from scraper.models import ApiModel
@@ -12,12 +14,39 @@ from scraper.models import ApiModel
 logger = logging.getLogger(__name__)
 
 _URL = "https://www.anthropic.com/pricing"
+_CLAUDE_SONNET_5 = "Claude Sonnet 5"
+_CLAUDE_FABLE_5 = "Claude Fable 5"
 
-# フォールバック価格（ハードコード最終手段）
+_SPEC_TZ = ZoneInfo("Asia/Tokyo")
+
+# Claude Sonnet 5 促進価格の最終適用日(2026-08-31 まで $2/$10、以降 $3/$15)。
+_SONNET_5_PROMO_UNTIL = datetime.date(2026, 8, 31)
+
+
+def _sonnet_5_fallback(today: datetime.date | None = None) -> tuple[float, float]:
+    """
+    Determine the fallback pricing for Claude Sonnet 5 based on the applicable date.
+    
+    Parameters:
+        today (datetime.date | None): Date to evaluate; uses the current date in the configured timezone when omitted.
+    
+    Returns:
+        tuple[float, float]: Input and output token prices in dollars. Returns (2.00, 10.00) through August 31, 2026, and (3.00, 15.00) from September 1, 2026.
+    """
+    day = today or datetime.datetime.now(_SPEC_TZ).date()
+    if day <= _SONNET_5_PROMO_UNTIL:
+        return (2.00, 10.00)
+    return (3.00, 15.00)
+
+
+# フォールバック価格(ハードコード最終手段)
 _FALLBACKS: dict[str, tuple[float, float]] = {
+    _CLAUDE_FABLE_5:            (10.00, 50.00),
     "Claude Opus 4.8":          (5.00,  25.00),
     "Claude Opus 4.7":          (5.00,  25.00),
     "Claude Opus 4.6":          (5.00,  25.00),
+    # 促進価格は scrape() 内で _sonnet_5_fallback() により適用日で $2/$10 ↔ $3/$15 に再計算される
+    _CLAUDE_SONNET_5:           (2.00,  10.00),
     "Claude Sonnet 4.6":        (3.00,  15.00),
     "Claude Haiku 4.5":         (1.00,   5.00),
     "Claude Haiku 3.5":         (0.80,   4.00),
@@ -25,19 +54,26 @@ _FALLBACKS: dict[str, tuple[float, float]] = {
 }
 
 
-def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
+def scrape(
+    existing: list[ApiModel] | None = None,
+    today: datetime.date | None = None,
+) -> list[ApiModel]:
     """
-    Scrape Anthropic's pricing page and produce ApiModel entries for supported Claude models.
+    Builds pricing entries for supported Claude models from Anthropic's pricing page.
     
-    Attempts to extract in/out prices for specific Claude models from Anthropic's pricing HTML. If `existing` is provided, its Anthropic model prices seed fallbacks; hardcoded fallback prices are used when extraction fails, when fetch fails, or when extracted in/out sanity checks disagree. Models not found on the page are added from the fallback set with scrape status "fallback".
+    Previously known Anthropic prices are preferred as fallbacks when provided. Models whose prices cannot be extracted or validated, and models absent from the scraped results, use fallback prices. The Claude Sonnet 5 fallback varies according to the specified date.
     
     Parameters:
-        existing (list[ApiModel] | None): Optional previously known ApiModel list whose Anthropic entries provide preferred fallback prices.
+        existing (list[ApiModel] | None): Previously known models whose Anthropic prices should be used as preferred fallbacks.
+        today (datetime.date | None): Date used to determine the Claude Sonnet 5 fallback pricing.
     
     Returns:
-        list[ApiModel]: ApiModel objects for each model with `price_in`/`price_out` populated from extracted values or fallbacks and `scrape_status` set to indicate whether the value came from a successful scrape or a fallback.
+        list[ApiModel]: Model entries containing input and output prices and their scrape status.
     """
     logger.info("Anthropic: スクレイピング開始 %s", _URL)
+
+    current_fallbacks = dict(_FALLBACKS)
+    current_fallbacks[_CLAUDE_SONNET_5] = _sonnet_5_fallback(today)
 
     # 既存値をフォールバックとして使う（既存 JSON があれば）
     fallback_map: dict[str, tuple[float, float]] = {}
@@ -45,7 +81,7 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
         for m in existing:
             if m.provider == "Anthropic":
                 fallback_map[m.name] = (m.price_in, m.price_out)
-    for k, v in _FALLBACKS.items():
+    for k, v in current_fallbacks.items():
         fallback_map.setdefault(k, v)
 
     try:
@@ -156,37 +192,45 @@ def _build_models_from_results(
 
 
 _TAG = {
+    _CLAUDE_FABLE_5:            "最上位 Flagship",
     "Claude Opus 4.8":          "最新",
     "Claude Opus 4.7":          "Stable",
     "Claude Opus 4.6":          "Stable",
-    "Claude Sonnet 4.6":        "最新",
+    _CLAUDE_SONNET_5:           "最新 Sonnet",
+    "Claude Sonnet 4.6":        "Stable",
     "Claude Haiku 4.5":         "Fast",
     "Claude Haiku 3.5":         "Budget",
     "Claude Opus 4.1 (Legacy)": "Legacy",
 }
 _CLS = {
+    _CLAUDE_FABLE_5:            "tag-flag",
     "Claude Opus 4.8":          "tag-flag",
     "Claude Opus 4.7":          "tag-flag",
     "Claude Opus 4.6":          "tag-flag",
+    _CLAUDE_SONNET_5:           "tag-flag",
     "Claude Sonnet 4.6":        "tag-flag",
     "Claude Haiku 4.5":         "tag-mini",
     "Claude Haiku 3.5":         "tag-mini",
     "Claude Opus 4.1 (Legacy)": "tag-leg",
 }
 _SUB_JA = {
+    _CLAUDE_FABLE_5:            "最上位モデル / 1M ctx / 長期エージェント最強 / thinking常時ON",
     "Claude Opus 4.8":          "2026年5月 / 1M ctx / Adaptive thinking / 最新フラッグシップ",
     "Claude Opus 4.7":          "SWE-bench 87.6% / コーディング特化 / Apr 2026",
     "Claude Opus 4.6":          "旧フラッグシップ / エージェントチーム / 1M ctx",
-    "Claude Sonnet 4.6":        "バランス最適 / 200K ctx",
+    _CLAUDE_SONNET_5:           "最新Sonnet / 8/31まで促進価格 $2/$10 (以降 $3/$15)",
+    "Claude Sonnet 4.6":        "バランス最適 / 200K ctx / 前世代",
     "Claude Haiku 4.5":         "高速・高ボリューム向け",
     "Claude Haiku 3.5":         "コスト効率モデル / 前世代",
     "Claude Opus 4.1 (Legacy)": "旧フラッグシップ / 非推奨",
 }
 _SUB_EN = {
+    _CLAUDE_FABLE_5:            "Most capable / 1M ctx / best long-horizon agent / thinking always on",
     "Claude Opus 4.8":          "May 2026 / 1M ctx / Adaptive thinking / latest flagship",
     "Claude Opus 4.7":          "SWE-bench 87.6% / Coding-focused / Apr 2026",
     "Claude Opus 4.6":          "Prev flagship / Agent teams / 1M ctx",
-    "Claude Sonnet 4.6":        "Optimal balance / 200K ctx",
+    _CLAUDE_SONNET_5:           "Latest Sonnet / intro $2/$10 until Aug 31 (then $3/$15)",
+    "Claude Sonnet 4.6":        "Optimal balance / 200K ctx / prev-gen",
     "Claude Haiku 4.5":         "Fast / high-volume use cases",
     "Claude Haiku 3.5":         "Cost-efficient / prev-gen",
     "Claude Opus 4.1 (Legacy)": "Legacy flagship / deprecated",
