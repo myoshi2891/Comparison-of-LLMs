@@ -48,10 +48,19 @@ describe("RefLinks - root structure", () => {
 });
 
 describe("RefLinks - cards", () => {
-  it("renders exactly 16 ref-cards", () => {
+  it("renders exactly 18 ref-cards", () => {
     const { container } = render(<RefLinks lang="ja" />);
     const cards = container.querySelectorAll(".ref-card");
-    expect(cards.length).toBe(16);
+    expect(cards.length).toBe(18);
+  });
+
+  it("includes Moonshot(Kimi) and Zhipu(GLM) provider cards", () => {
+    const { container } = render(<RefLinks lang="ja" />);
+    const text = container.textContent ?? "";
+    expect(text).toContain("Moonshot");
+    expect(text).toContain("platform.moonshot.ai/docs/pricing");
+    expect(text).toContain("Zhipu");
+    expect(text).toContain("docs.z.ai/guides/overview/pricing");
   });
 
   it("each card has h5 heading and .ref-link body", () => {
