@@ -43,10 +43,10 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
     Extract Zhipu(GLM) model pricing and build API model records.
     
     Parameters:
-    	existing (list[ApiModel] | None): Existing models whose Zhipu(GLM) prices are used as fallbacks.
+    	existing (list[ApiModel] | None): Existing Zhipu(GLM) records used to supply prices if page retrieval fails.
     
     Returns:
-    	list[ApiModel]: Model records with scraped prices, or fallback prices when retrieval or validation fails.
+    	list[ApiModel]: Model records with extracted prices or fallback prices.
     """
     logger.info("Zhipu(GLM): スクレイピング開始 %s", _URL)
 

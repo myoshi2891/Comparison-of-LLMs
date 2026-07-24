@@ -40,13 +40,13 @@ _SUB_EN = {
 
 def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
     """
-    Builds model pricing data for Moonshot (Kimi) from its pricing page.
+    Builds Moonshot (Kimi) model pricing records from the pricing page.
     
     Parameters:
-    	existing (list[ApiModel] | None): Existing models whose Moonshot pricing is used as a fallback.
+        existing (list[ApiModel] | None): Existing Moonshot records used to preserve fallback prices when the page cannot be retrieved.
     
     Returns:
-    	list[ApiModel]: Model pricing records, using fallback prices when the page cannot be retrieved or extracted prices are invalid.
+        list[ApiModel]: Pricing records for the configured models, using fallback values when retrieval or price extraction fails.
     """
     logger.info("Moonshot(Kimi): スクレイピング開始 %s", _URL)
 

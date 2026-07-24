@@ -59,16 +59,16 @@ def scrape(
     today: datetime.date | None = None,
 ) -> list[ApiModel]:
     """
-    Scrape Anthropic's pricing page and produce ApiModel entries for supported Claude models.
+    Builds pricing entries for supported Claude models from Anthropic's pricing page.
     
-    Attempts to extract in/out prices for specific Claude models from Anthropic's pricing HTML. If `existing` is provided, its Anthropic model prices seed fallbacks; hardcoded fallback prices are used when extraction fails, when fetch fails, or when extracted in/out sanity checks disagree. Models not found on the page are added from the fallback set with scrape status "fallback".
+    Previously known Anthropic prices are preferred as fallbacks when provided. Models whose prices cannot be extracted or validated, and models absent from the scraped results, use fallback prices. The Claude Sonnet 5 fallback varies according to the specified date.
     
     Parameters:
-        existing (list[ApiModel] | None): Optional previously known ApiModel list whose Anthropic entries provide preferred fallback prices.
-        today (datetime.date | None): Optional target date override for fallback calculation.
+        existing (list[ApiModel] | None): Previously known models whose Anthropic prices should be used as preferred fallbacks.
+        today (datetime.date | None): Date used to determine the Claude Sonnet 5 fallback pricing.
     
     Returns:
-        list[ApiModel]: ApiModel objects for each model with `price_in`/`price_out` populated from extracted values or fallbacks and `scrape_status` set to indicate whether the value came from a successful scrape or a fallback.
+        list[ApiModel]: Model entries containing input and output prices and their scrape status.
     """
     logger.info("Anthropic: スクレイピング開始 %s", _URL)
 
