@@ -6,6 +6,7 @@
 from __future__ import annotations
 import datetime
 import logging
+from zoneinfo import ZoneInfo
 
 from scraper.browser import get_page_text, extract_price, sanity_check
 from scraper.models import ApiModel
@@ -14,27 +15,30 @@ logger = logging.getLogger(__name__)
 
 _URL = "https://www.anthropic.com/pricing"
 _CLAUDE_SONNET_5 = "Claude Sonnet 5"
+_CLAUDE_FABLE_5 = "Claude Fable 5"
 
-# Claude Sonnet 5 促進価格の最終適用日（2026-08-31 まで $2/$10、以降 $3/$15）。
+_SPEC_TZ = ZoneInfo("Asia/Tokyo")
+
+# Claude Sonnet 5 促進価格の最終適用日(2026-08-31 まで $2/$10、以降 $3/$15)。
 _SONNET_5_PROMO_UNTIL = datetime.date(2026, 8, 31)
 
 
 def _sonnet_5_fallback(today: datetime.date | None = None) -> tuple[float, float]:
     """Claude Sonnet 5 のフォールバック価格を適用日で切り替える。
 
-    Sonnet 5 はライブ抽出対象外（フォールバック固定）のため、促進価格の
+    Sonnet 5 はライブ抽出対象外(フォールバック固定)のため、促進価格の
     期限をここで表現する。2026-08-31 まで促進価格 $2/$10、2026-09-01 以降は
-    恒久価格 $3/$15 を返す（_SUB_JA / _SUB_EN の説明と一致させる）。
+    恒久価格 $3/$15 を返す(_SUB_JA / _SUB_EN の説明と一致させる)。
     """
-    day = today or datetime.date.today()
+    day = today or datetime.datetime.now(_SPEC_TZ).date()
     if day <= _SONNET_5_PROMO_UNTIL:
         return (2.00, 10.00)
     return (3.00, 15.00)
 
 
-# フォールバック価格（ハードコード最終手段）
+# フォールバック価格(ハードコード最終手段)
 _FALLBACKS: dict[str, tuple[float, float]] = {
-    "Claude Fable 5":           (10.00, 50.00),
+    _CLAUDE_FABLE_5:            (10.00, 50.00),
     "Claude Opus 4.8":          (5.00,  25.00),
     "Claude Opus 4.7":          (5.00,  25.00),
     "Claude Opus 4.6":          (5.00,  25.00),
@@ -47,7 +51,10 @@ _FALLBACKS: dict[str, tuple[float, float]] = {
 }
 
 
-def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
+def scrape(
+    existing: list[ApiModel] | None = None,
+    today: datetime.date | None = None,
+) -> list[ApiModel]:
     """
     Scrape Anthropic's pricing page and produce ApiModel entries for supported Claude models.
     
@@ -55,11 +62,15 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
     
     Parameters:
         existing (list[ApiModel] | None): Optional previously known ApiModel list whose Anthropic entries provide preferred fallback prices.
+        today (datetime.date | None): Optional target date override for fallback calculation.
     
     Returns:
         list[ApiModel]: ApiModel objects for each model with `price_in`/`price_out` populated from extracted values or fallbacks and `scrape_status` set to indicate whether the value came from a successful scrape or a fallback.
     """
     logger.info("Anthropic: スクレイピング開始 %s", _URL)
+
+    current_fallbacks = dict(_FALLBACKS)
+    current_fallbacks[_CLAUDE_SONNET_5] = _sonnet_5_fallback(today)
 
     # 既存値をフォールバックとして使う（既存 JSON があれば）
     fallback_map: dict[str, tuple[float, float]] = {}
@@ -67,7 +78,7 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
         for m in existing:
             if m.provider == "Anthropic":
                 fallback_map[m.name] = (m.price_in, m.price_out)
-    for k, v in _FALLBACKS.items():
+    for k, v in current_fallbacks.items():
         fallback_map.setdefault(k, v)
 
     try:
@@ -178,7 +189,7 @@ def _build_models_from_results(
 
 
 _TAG = {
-    "Claude Fable 5":           "最上位 Flagship",
+    _CLAUDE_FABLE_5:            "最上位 Flagship",
     "Claude Opus 4.8":          "最新",
     "Claude Opus 4.7":          "Stable",
     "Claude Opus 4.6":          "Stable",
@@ -189,7 +200,7 @@ _TAG = {
     "Claude Opus 4.1 (Legacy)": "Legacy",
 }
 _CLS = {
-    "Claude Fable 5":           "tag-flag",
+    _CLAUDE_FABLE_5:            "tag-flag",
     "Claude Opus 4.8":          "tag-flag",
     "Claude Opus 4.7":          "tag-flag",
     "Claude Opus 4.6":          "tag-flag",
@@ -200,7 +211,7 @@ _CLS = {
     "Claude Opus 4.1 (Legacy)": "tag-leg",
 }
 _SUB_JA = {
-    "Claude Fable 5":           "最上位モデル / 1M ctx / 長期エージェント最強 / thinking常時ON",
+    _CLAUDE_FABLE_5:            "最上位モデル / 1M ctx / 長期エージェント最強 / thinking常時ON",
     "Claude Opus 4.8":          "2026年5月 / 1M ctx / Adaptive thinking / 最新フラッグシップ",
     "Claude Opus 4.7":          "SWE-bench 87.6% / コーディング特化 / Apr 2026",
     "Claude Opus 4.6":          "旧フラッグシップ / エージェントチーム / 1M ctx",
@@ -211,7 +222,7 @@ _SUB_JA = {
     "Claude Opus 4.1 (Legacy)": "旧フラッグシップ / 非推奨",
 }
 _SUB_EN = {
-    "Claude Fable 5":           "Most capable / 1M ctx / best long-horizon agent / thinking always on",
+    _CLAUDE_FABLE_5:            "Most capable / 1M ctx / best long-horizon agent / thinking always on",
     "Claude Opus 4.8":          "May 2026 / 1M ctx / Adaptive thinking / latest flagship",
     "Claude Opus 4.7":          "SWE-bench 87.6% / Coding-focused / Apr 2026",
     "Claude Opus 4.6":          "Prev flagship / Agent teams / 1M ctx",
