@@ -8,6 +8,7 @@
 from __future__ import annotations
 import logging
 
+from scraper.browser import get_page_text
 from scraper.models import ApiModel
 
 logger = logging.getLogger(__name__)

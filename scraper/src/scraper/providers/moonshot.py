@@ -51,8 +51,8 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
 
     try:
         html = get_page_text(_URL, timeout_ms=40_000)
-    except Exception as exc:
-        logger.error("Moonshot(Kimi): ページ取得失敗 %s", exc)
+    except Exception:
+        logger.exception("Moonshot(Kimi): ページ取得失敗")
         return _build_fallback(fallback_map)
 
     models = []
