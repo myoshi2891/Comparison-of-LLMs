@@ -635,7 +635,7 @@
     {
       "group": "GitHub Copilot",
       "name": "Pro",
-      "monthly": 100.0,
+      "monthly": 10.0,
       "annual": 100.0,
       "tag": "Individual",
       "cls": "tag-bal",
@@ -646,7 +646,7 @@
     {
       "group": "GitHub Copilot",
       "name": "Pro+",
-      "monthly": 100.0,
+      "monthly": 39.0,
       "annual": 390.0,
       "tag": "Pro+",
       "cls": "tag-flag",
