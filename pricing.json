@@ -5,6 +5,17 @@
   "api_models": [
     {
       "provider": "Anthropic",
+      "name": "Claude Fable 5",
+      "tag": "最上位 Flagship",
+      "cls": "tag-flag",
+      "price_in": 10.0,
+      "price_out": 50.0,
+      "sub_ja": "最上位モデル / 1M ctx / 長期エージェント最強 / thinking常時ON",
+      "sub_en": "Most capable / 1M ctx / best long-horizon agent / thinking always on",
+      "scrape_status": "fallback"
+    },
+    {
+      "provider": "Anthropic",
       "name": "Claude Opus 4.8",
       "tag": "最新",
       "cls": "tag-flag",
