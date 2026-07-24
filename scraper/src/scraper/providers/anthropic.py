@@ -12,6 +12,7 @@ from scraper.models import ApiModel
 logger = logging.getLogger(__name__)
 
 _URL = "https://www.anthropic.com/pricing"
+_CLAUDE_SONNET_5 = "Claude Sonnet 5"
 
 # フォールバック価格（ハードコード最終手段）
 _FALLBACKS: dict[str, tuple[float, float]] = {
@@ -20,7 +21,7 @@ _FALLBACKS: dict[str, tuple[float, float]] = {
     "Claude Opus 4.7":          (5.00,  25.00),
     "Claude Opus 4.6":          (5.00,  25.00),
     # TODO(2026-09-01): 2026-09-01 以降に適用される恒久価格改定の反映確認
-    "Claude Sonnet 5":          (3.00,  15.00),
+    _CLAUDE_SONNET_5:           (3.00,  15.00),
     "Claude Sonnet 4.6":        (3.00,  15.00),
     "Claude Haiku 4.5":         (1.00,   5.00),
     "Claude Haiku 3.5":         (0.80,   4.00),
@@ -163,7 +164,7 @@ _TAG = {
     "Claude Opus 4.8":          "最新",
     "Claude Opus 4.7":          "Stable",
     "Claude Opus 4.6":          "Stable",
-    "Claude Sonnet 5":          "最新 Sonnet",
+    _CLAUDE_SONNET_5:           "最新 Sonnet",
     "Claude Sonnet 4.6":        "Stable",
     "Claude Haiku 4.5":         "Fast",
     "Claude Haiku 3.5":         "Budget",
@@ -174,7 +175,7 @@ _CLS = {
     "Claude Opus 4.8":          "tag-flag",
     "Claude Opus 4.7":          "tag-flag",
     "Claude Opus 4.6":          "tag-flag",
-    "Claude Sonnet 5":          "tag-flag",
+    _CLAUDE_SONNET_5:           "tag-flag",
     "Claude Sonnet 4.6":        "tag-flag",
     "Claude Haiku 4.5":         "tag-mini",
     "Claude Haiku 3.5":         "tag-mini",
@@ -185,7 +186,7 @@ _SUB_JA = {
     "Claude Opus 4.8":          "2026年5月 / 1M ctx / Adaptive thinking / 最新フラッグシップ",
     "Claude Opus 4.7":          "SWE-bench 87.6% / コーディング特化 / Apr 2026",
     "Claude Opus 4.6":          "旧フラッグシップ / エージェントチーム / 1M ctx",
-    "Claude Sonnet 5":          "最新Sonnet / 8/31まで促進価格 $2/$10（以降 $3/$15）",
+    _CLAUDE_SONNET_5:           "最新Sonnet / 8/31まで促進価格 $2/$10（以降 $3/$15）",
     "Claude Sonnet 4.6":        "バランス最適 / 200K ctx / 前世代",
     "Claude Haiku 4.5":         "高速・高ボリューム向け",
     "Claude Haiku 3.5":         "コスト効率モデル / 前世代",
@@ -196,7 +197,7 @@ _SUB_EN = {
     "Claude Opus 4.8":          "May 2026 / 1M ctx / Adaptive thinking / latest flagship",
     "Claude Opus 4.7":          "SWE-bench 87.6% / Coding-focused / Apr 2026",
     "Claude Opus 4.6":          "Prev flagship / Agent teams / 1M ctx",
-    "Claude Sonnet 5":          "Latest Sonnet / intro $2/$10 until Aug 31 (then $3/$15)",
+    _CLAUDE_SONNET_5:           "Latest Sonnet / intro $2/$10 until Aug 31 (then $3/$15)",
     "Claude Sonnet 4.6":        "Optimal balance / 200K ctx / prev-gen",
     "Claude Haiku 4.5":         "Fast / high-volume use cases",
     "Claude Haiku 3.5":         "Cost-efficient / prev-gen",
