@@ -42,8 +42,8 @@ _FALLBACKS: dict[str, tuple[float, float]] = {
     "Claude Opus 4.8":          (5.00,  25.00),
     "Claude Opus 4.7":          (5.00,  25.00),
     "Claude Opus 4.6":          (5.00,  25.00),
-    # 促進価格は _sonnet_5_fallback() が適用日で $2/$10 ↔ $3/$15 を切替
-    _CLAUDE_SONNET_5:           _sonnet_5_fallback(),
+    # 促進価格は scrape() 内で _sonnet_5_fallback() により適用日で $2/$10 ↔ $3/$15 に再計算される
+    _CLAUDE_SONNET_5:           (2.00,  10.00),
     "Claude Sonnet 4.6":        (3.00,  15.00),
     "Claude Haiku 4.5":         (1.00,   5.00),
     "Claude Haiku 3.5":         (0.80,   4.00),
