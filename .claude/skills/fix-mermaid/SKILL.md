@@ -408,7 +408,7 @@ if (svg instanceof SVGElement) {
 }
 return (
   // 外側 = フレーム全幅（列幅）
-  <div className={`mermaid-scroll ${className || ""}`} style={{ width: "100%", ...style }}>
+  <div className={`mermaid-scroll ${className || ""}`} style={{ ...style, width: "100%" }}>
     {/* 内側 = flex 中央寄せ。svg は上で max-width:100% 化され列幅に収まる */}
     <div id={id} className="mermaid" ref={ref}
       style={{ display: "flex", justifyContent: "center", minHeight: "4rem" }} />
