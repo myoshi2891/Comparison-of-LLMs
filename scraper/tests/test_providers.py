@@ -103,6 +103,18 @@ class TestAnthropic:
             models = anthropic.scrape()
         _assert_all_fallback(models, anthropic._FALLBACKS, "Anthropic")
 
+    def test_includes_fable_5(self):
+        """Claude Fable 5（最上位モデル / $10 / $50 per 1M）が料金一覧に含まれる。"""
+        with patch("scraper.providers.anthropic.get_page_text", return_value="<html></html>"):
+            models = anthropic.scrape()
+        fable = _find(models, "Claude Fable 5")
+        assert fable.price_in == 10.00
+        assert fable.price_out == 50.00
+        assert fable.provider == "Anthropic"
+        assert fable.scrape_status == "fallback"
+        assert fable.tag  # タグが空でない
+        assert fable.cls == "tag-flag"
+
 
 # --------------------------------------------------------------------------- #
 # OpenAI（パターンは [^$] / .* — $ を挟まないよう in/out を別セグメントに）
