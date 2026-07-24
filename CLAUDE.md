@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-07-22
+Updated 2026-07-24
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -18,7 +18,7 @@ update.sh  ← オーケストレーター (scrape → copy)
 │       ├── models.py            PricingData / ApiModel / SubTool スキーマ
 │       ├── exchange.py          USD/JPY レート取得 (Frankfurter API)
 │       ├── browser.py           Playwright 共通ユーティリティ
-│       ├── providers/           API プロバイダー別スクレイパー (anthropic, openai, google, aws, deepseek, xai)
+│       ├── providers/           API プロバイダー別スクレイパー (anthropic, openai, google, aws, deepseek, xai, moonshot, zhipu)
 │       └── tools/               コーディングツール別スクレイパー (cursor, github_copilot, windsurf, claude_code, jetbrains, openai_codex, google_one, antigravity)
 ├── web-next/           Next.js 16 + React 19 + TypeScript + Tailwind v4 (bun)
 │   ├── app/

@@ -1,7 +1,7 @@
 # プロジェクト進捗・ステータス (PROGRESS.md)
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
-> - 最終更新日: **Updated 2026-07-22**
+> - 最終更新日: **Updated 2026-07-24**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -14,10 +14,11 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（**0 errors / 0 warnings / 0 infos**。既知の既存指摘も含め全件解消済み）
 - **テストの実行状況**:
-- **フロントエンド (`web-next/`)**: Vitest 実行で **1199 件すべて合格** (全 Green ✅)
-  - **バックエンド (`scraper/`)**: pytest 実行で **38 件すべて合格** (全 Green ✅)
+- **フロントエンド (`web-next/`)**: Vitest 実行で **1202 件すべて合格** (全 Green ✅)
+  - **バックエンド (`scraper/`)**: pytest 実行で **42 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **2026-07 月次更新: 新規2社(Moonshot(Kimi)/Zhipu(GLM))追加 + 既存6社の 2026-07 モデル刷新**: Moonshot(Kimi)（Kimi K3 / K2.6）と Zhipu(GLM)（GLM-5.2 / GLM-4.6）を新規プロバイダースクレイパーとして追加（`providers/moonshot.py` / `zhipu.py`、`cls="tag-oss"`）。既存6社（Anthropic/OpenAI/Google/AWS/DeepSeek/xAI）の `_FALLBACKS` を GPT-5.6 系・Claude Sonnet 5・Gemini 3.6 Flash / 3.5 Flash-Lite・Grok 4.5・Amazon Nova Premier / Lite 追加で刷新。フロント側は唯一のハードコード `ApiTable.tsx` の `PROVIDER_COLORS` に新2社（Moonshot(Kimi)=`#818cf8` / Zhipu(GLM)=`#f472b6`）を追加（Red→Green、色検証テスト2件）。`pricing.json` を再生成（USD/JPY 163.47）し、Google AI 全モデルの `price_in` ライブ誤スクレイプ（ページ上の無関係な `$` 額を拾う既存の正規表現バグ）と Amazon Nova Premier の `price_out` を SSoT(`_FALLBACKS`) 値へ直接補正。provider ブロックの連続性・型パリティ・build/lint/typecheck を全 Green で確認（合計 **1202 テスト合格**、pytest **42 件合格**）。
 - **Mermaid 図解レイアウトの全サイト統一（中央寄せ・全幅・横スクロール）**: 共有コンポーネント `web-next/components/docs/MermaidDiagram.tsx` を2層構造（外側=`width:100%` / 内側=`display:flex; justify-content:center`、`useMaxWidth:false` + `mermaid.run` 後に svg へ `max-width:100%; height:auto` を付与）に変更し、**図解レイアウトの唯一の真実の源**とした。従来は約50ページの `page.module.css` が個別に `:global(.mermaid)` / `:global(svg)` の幅を強制しており、`svg{width:100%}`（引き伸ばし）／`svg{max-width:100%}`（縮小）／override 無し（左寄せ）の三分裂が起きていた。34 ページの per-page レイアウト強制ルールを削除（配色テーマルールは保持）し、`enterprise-agent-platform-intermediate` はフレーム装飾を `.diagramWrap` へ移設。併せてユーザー要望により 32 ページの本文カラムの固定 `max-width`（1000〜1200px のバラつき）を**統一の 1440px**（サイトの `.container` と同値。旧値より広くしつつワイド画面でのバランスを確保）に揃え、手書き（非 Mermaid）横並び図解の中央寄せも修正（`claude/skill`・`claude/agent`・`google/agent`・`codex/skill`・`copilot/skill`・`copilot/markdown-file-guide`・`copilot/agent`・`google/skill`・`google/antigravity-guide`）、`claude/skill-guide` は 900px 固定を外してサイドバートラックいっぱいに。Mermaid は列幅への縮小フィット＋中央寄せに変更。静的ビルドを別ポートで配信し **Playwright でレンダリング座標を実測**して全図の中央寄せ・全ページのコンテンツ幅を検証（残る左寄せ検出はヒーローのメタ/バッジ行のみで意図的）。`MermaidDiagram.test.tsx` を新設（Red→Green）、`gpt-5-6` 契約テストを新不変条件へ更新。不変条件を `.claude/rules/mermaid-diagram-layout.md` に固定し、`fix-mermaid` / `nextjs-page-migration` スキルをブラッシュアップ（合計 **1199 テスト合格**）。
 - **PR #126 SonarCloud Quality Gate の新規コードカバレッジを復旧**: Gemma、Kimi、Amazon Bedrock 2ページの `TocObserver.tsx` はページ契約テストで初期化だけが実行され、`IntersectionObserver` コールバックの32条件中26条件が未カバーだったため、新規コードカバレッジが47.7%（基準80%）まで低下していた。クラス選択型と `href` 解決型の共通テストスイートを追加し、4ファイルすべて行・条件カバレッジ100%を実測。テスト12件を追加して合計 **1195 テスト合格**とし、併せて既存ファイルのBiome指摘26 errors / 1 warningもファイル単位で全件解消した。
 - **Amazon Bedrock 活用ベストプラクティスガイドの Next.js 移行とグローバルナビ同期**: `Amazon-bedrock-best-practices-guide.html` を `web-next/app/infra/amazon-bedrock-best-practices-guide/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全18セクション・全表・全コードブロック・6 Mermaid図・TOCスクロール追従・外部リンク安全属性・グローバルナビ（`運用・品質` グループ / `page-registry.ts`）登録を完了。原本 `Amazon-bedrock-best-practices-guide.html` は `archive/` へ `git mv` 退避。契約テスト5件を追加し全クリア（合計 **1183 テスト合格**）。
@@ -215,7 +216,7 @@ Next.js 移行完了後のリポジトリ `LLM-Studies` にて、テストカバ
 Next.js 移行完了後のリポジトリ `LLM-Studies` の保守・改善作業を再開してください。
 
 - リポジトリ: LLM-Studies (Next.js 移行プロジェクトは dev/main へ完全マージ済み)
-  - 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (1195/1195 passed) / pytest (38/38 passed) で全 Green
+  - 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (1202/1202 passed) / pytest (42/42 passed) で全 Green
 - リポジトリ規約: CLAUDE.md (編集上の絶対ルール。※Antigravity環境ではビルドは実行禁止)
 
 作業方針：
