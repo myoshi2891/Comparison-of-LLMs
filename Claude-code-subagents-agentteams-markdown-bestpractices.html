@@ -1,0 +1,1730 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>サブエージェント & Agent Teams 開発における Markdown ファイル ベストプラクティス</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+    <style>
+      :root {
+        --ink: #12141c;
+        --ink-soft: #4b5163;
+        --ink-faint: #7a8093;
+        --paper: #eef0f4;
+        --card: #ffffff;
+        --line: #dfe3ea;
+        --accent: #5b4eff;
+        --accent-dark: #3f34cc;
+        --accent-soft: #edeaff;
+        --amber: #c98a1f;
+        --amber-soft: #fbf1de;
+        --teal: #0a9c78;
+        --teal-soft: #e2f6f0;
+        --navy-deep: #0d0f1e;
+        --navy-mid: #171a30;
+        --navy-line: #2a2e4d;
+        --mono: 'JetBrains Mono', ui-monospace, monospace;
+        --sans: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
+        --radius: 16px;
+        --radius-sm: 9px;
+        --maxw: 840px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+
+      body {
+        margin: 0;
+        font-family: var(--sans);
+        background: var(--paper);
+        color: var(--ink);
+        line-height: 1.85;
+        font-size: 16px;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: var(--sans);
+        font-weight: 900;
+        color: var(--ink);
+        line-height: 1.4;
+        letter-spacing: 0.01em;
+      }
+
+      a {
+        color: var(--accent-dark);
+        text-decoration-thickness: 1.5px;
+        text-underline-offset: 2px;
+      }
+      a:hover {
+        color: var(--accent);
+      }
+
+      /* ---------- layout ---------- */
+      .layout {
+        display: grid;
+        grid-template-columns: 272px 1fr;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        background: var(--navy-deep);
+        color: #c9cbe0;
+        position: sticky;
+        top: 0;
+        align-self: start;
+        height: 100vh;
+        overflow-y: auto;
+        padding: 28px 20px 40px;
+        border-right: 1px solid var(--navy-line);
+      }
+      .sidebar-brand {
+        font-family: var(--mono);
+        font-size: 13px;
+        color: #8b90c9;
+        letter-spacing: 0.06em;
+        margin-bottom: 18px;
+      }
+      .file-tree {
+        font-family: var(--mono);
+        font-size: 13.5px;
+      }
+      .file-tree .dir {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #8b90c9;
+        margin: 14px 0 4px;
+        font-weight: 500;
+      }
+      .file-tree .dir svg {
+        flex: none;
+        opacity: 0.8;
+      }
+      .file-tree ul {
+        list-style: none;
+        margin: 0 0 0 18px;
+        padding: 0;
+        border-left: 1px solid var(--navy-line);
+      }
+      .file-tree li {
+        margin: 0;
+      }
+      .file-tree a {
+        display: block;
+        color: #c9cbe0;
+        text-decoration: none;
+        padding: 6px 0 6px 14px;
+        border-left: 2px solid transparent;
+        margin-left: -1px;
+        transition:
+          color 0.15s,
+          border-color 0.15s,
+          background 0.15s;
+        font-size: 13.5px;
+      }
+      .file-tree a:hover {
+        color: #fff;
+        background: rgba(91, 78, 255, 0.12);
+      }
+      .file-tree a.active {
+        color: #fff;
+        border-left-color: var(--accent);
+        background: rgba(91, 78, 255, 0.16);
+      }
+      .file-tree .tag {
+        display: inline-block;
+        font-size: 10px;
+        font-family: var(--mono);
+        background: var(--navy-mid);
+        color: #8b90c9;
+        border: 1px solid var(--navy-line);
+        border-radius: 5px;
+        padding: 1px 5px;
+        margin-left: 6px;
+        vertical-align: 1px;
+      }
+
+      .nav-toggle-checkbox {
+        display: none;
+      }
+      .nav-toggle-btn {
+        display: none;
+      }
+
+      main {
+        min-width: 0;
+        padding: 56px 40px 100px;
+        display: flex;
+        justify-content: center;
+      }
+      .content {
+        width: 100%;
+        max-width: var(--maxw);
+      }
+
+      section {
+        margin-bottom: 76px;
+        scroll-margin-top: 24px;
+      }
+      section > .eyebrow {
+        font-family: var(--mono);
+        font-size: 12.5px;
+        color: var(--accent-dark);
+        letter-spacing: 0.08em;
+        margin: 0 0 10px;
+        font-weight: 700;
+      }
+      section > h2 {
+        font-size: 27px;
+        margin: 0 0 6px;
+      }
+      section > .lede {
+        color: var(--ink-soft);
+        font-size: 16px;
+        margin: 0 0 28px;
+        max-width: 62ch;
+      }
+      h3 {
+        font-size: 19px;
+        margin: 34px 0 12px;
+      }
+      h4 {
+        font-size: 15.5px;
+        margin: 24px 0 8px;
+        color: var(--ink-soft);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      p {
+        margin: 0 0 16px;
+      }
+      ul,
+      ol {
+        padding-left: 1.3em;
+        margin: 0 0 16px;
+      }
+      li {
+        margin-bottom: 6px;
+      }
+      strong {
+        font-weight: 700;
+      }
+      code {
+        font-family: var(--mono);
+        background: var(--accent-soft);
+        color: var(--accent-dark);
+        padding: 1.5px 6px;
+        border-radius: 5px;
+        font-size: 0.88em;
+      }
+
+      /* ---------- hero ---------- */
+      .hero {
+        background: linear-gradient(165deg, var(--navy-deep) 0%, var(--navy-mid) 100%);
+        color: #fff;
+        border-radius: 22px;
+        padding: 52px 44px 40px;
+        margin-bottom: 64px;
+        position: relative;
+        overflow: hidden;
+      }
+      .hero::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          600px 260px at 85% -10%,
+          rgba(91, 78, 255, 0.35),
+          transparent 60%
+        );
+        pointer-events: none;
+      }
+      .hero .kicker {
+        font-family: var(--mono);
+        font-size: 12.5px;
+        color: #a9adf0;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin: 0 0 18px;
+        position: relative;
+      }
+      .hero h1 {
+        color: #fff;
+        font-size: 34px;
+        line-height: 1.5;
+        margin: 0 0 16px;
+        max-width: 22ch;
+        position: relative;
+      }
+      .hero p.sub {
+        color: #c3c6ea;
+        font-size: 16px;
+        max-width: 56ch;
+        margin: 0 0 30px;
+        position: relative;
+      }
+      .hero .meta-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        position: relative;
+        margin-bottom: 36px;
+      }
+      .pill {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: #dfe0ff;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        padding: 5px 12px;
+        border-radius: 99px;
+      }
+
+      /* layer stack visual (signature element) */
+      .stack {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 520px;
+      }
+      .stack .layer {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 12px;
+        padding: 13px 16px;
+      }
+      .stack .layer .idx {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: #0d0f1e;
+        background: #fff;
+        width: 24px;
+        height: 24px;
+        border-radius: 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+        font-weight: 700;
+      }
+      .stack .layer.l1 .idx {
+        background: #ffd88a;
+      }
+      .stack .layer.l2 .idx {
+        background: #8affd0;
+      }
+      .stack .layer.l3 .idx {
+        background: #a9adf0;
+      }
+      .stack .layer.l4 .idx {
+        background: #ff9ec2;
+      }
+      .stack .layer .name {
+        font-family: var(--mono);
+        font-size: 13.5px;
+        color: #fff;
+        font-weight: 500;
+      }
+      .stack .layer .desc {
+        font-size: 12.5px;
+        color: #9b9fd6;
+        margin-left: auto;
+        text-align: right;
+      }
+      .stack .connector {
+        width: 1px;
+        height: 10px;
+        background: rgba(255, 255, 255, 0.2);
+        margin-left: 32px;
+      }
+
+      /* ---------- callouts ---------- */
+      .callout {
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        border-radius: var(--radius-sm);
+        padding: 16px 18px;
+        margin: 20px 0;
+        border: 1px solid var(--line);
+        background: var(--card);
+      }
+      .callout svg {
+        flex: none;
+        margin-top: 2px;
+      }
+      .callout p {
+        margin: 0;
+        font-size: 14.5px;
+        color: var(--ink-soft);
+      }
+      .callout strong {
+        color: var(--ink);
+      }
+      .callout.tip {
+        background: var(--teal-soft);
+        border-color: #c7ecdf;
+      }
+      .callout.warn {
+        background: var(--amber-soft);
+        border-color: #f0dcb1;
+      }
+      .callout.note {
+        background: var(--accent-soft);
+        border-color: #d7d1ff;
+      }
+
+      /* ---------- tables ---------- */
+      .table-wrap {
+        overflow-x: auto;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--line);
+        margin: 20px 0;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        background: var(--card);
+        font-size: 14px;
+        min-width: 520px;
+      }
+      thead th {
+        text-align: left;
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.04em;
+        color: #fff;
+        background: var(--ink);
+        padding: 11px 14px;
+        white-space: nowrap;
+      }
+      tbody td {
+        padding: 11px 14px;
+        border-top: 1px solid var(--line);
+        vertical-align: top;
+        color: var(--ink-soft);
+      }
+      tbody tr:nth-child(even) {
+        background: #fbfbfd;
+      }
+      tbody td:first-child {
+        color: var(--ink);
+        font-weight: 500;
+      }
+      tbody code {
+        white-space: nowrap;
+      }
+
+      /* ---------- code blocks ---------- */
+      .code-card {
+        background: var(--navy-deep);
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+        margin: 20px 0;
+        border: 1px solid var(--navy-line);
+      }
+      .code-card .bar {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 10px 14px;
+        background: var(--navy-mid);
+        border-bottom: 1px solid var(--navy-line);
+      }
+      .code-card .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+      }
+      .code-card .dot.r {
+        background: #ff5f56;
+      }
+      .code-card .dot.a {
+        background: #ffbd2e;
+      }
+      .code-card .dot.g {
+        background: #27c93f;
+      }
+      .code-card .filename {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: #8b90c9;
+        margin-left: 8px;
+      }
+      .code-card pre {
+        margin: 0;
+        padding: 18px 20px;
+        overflow-x: auto;
+      }
+      .code-card code {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.7;
+        background: none;
+        color: #dfe1f5;
+        padding: 0;
+        white-space: pre;
+      }
+      .tok-key {
+        color: #9ecbff;
+      }
+      .tok-str {
+        color: #ffd88a;
+      }
+      .tok-comment {
+        color: #6b7099;
+      }
+      .tok-title {
+        color: #8affd0;
+      }
+
+      /* ---------- mermaid card ---------- */
+      .mermaid-card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 22px;
+        margin: 22px 0;
+        overflow-x: auto;
+      }
+      .mermaid-card .cap {
+        font-size: 12.5px;
+        color: var(--ink-faint);
+        font-family: var(--mono);
+        margin-top: 10px;
+        text-align: center;
+      }
+      .mermaid {
+        display: flex;
+        justify-content: center;
+      }
+
+      /* ---------- checklist ---------- */
+      .checklist {
+        list-style: none;
+        padding: 0;
+        margin: 20px 0;
+        display: grid;
+        gap: 8px;
+      }
+      .checklist li {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-sm);
+        padding: 12px 16px;
+        margin: 0;
+      }
+      .checklist input[type='checkbox'] {
+        margin-top: 3px;
+        width: 16px;
+        height: 16px;
+        accent-color: var(--accent);
+        flex: none;
+      }
+      .checklist .t {
+        font-weight: 500;
+        color: var(--ink);
+      }
+      .checklist .d {
+        font-size: 13px;
+        color: var(--ink-faint);
+        display: block;
+        margin-top: 2px;
+      }
+
+      /* ---------- decision flow legend chips ---------- */
+      .chip-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 18px 0 6px;
+      }
+      .chip {
+        font-family: var(--mono);
+        font-size: 12px;
+        padding: 5px 11px;
+        border-radius: 99px;
+        border: 1px solid var(--line);
+        background: var(--card);
+        color: var(--ink-soft);
+      }
+
+      /* ---------- sources ---------- */
+      .sources {
+        list-style: none;
+        padding: 0;
+        margin: 18px 0 0;
+        display: grid;
+        gap: 10px;
+      }
+      .sources li {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-sm);
+        padding: 14px 16px;
+      }
+      .sources .src-title {
+        font-weight: 700;
+        color: var(--ink);
+        display: block;
+        margin-bottom: 3px;
+        font-size: 14.5px;
+      }
+      .sources a {
+        font-family: var(--mono);
+        font-size: 12.5px;
+        word-break: break-all;
+      }
+      .disclaimer {
+        margin-top: 26px;
+        padding: 16px 18px;
+        border-radius: var(--radius-sm);
+        background: var(--navy-deep);
+        color: #c3c6ea;
+        font-size: 13.5px;
+      }
+      .disclaimer strong {
+        color: #fff;
+      }
+
+      footer {
+        max-width: var(--maxw);
+        margin: 0 auto;
+        padding: 30px 0 0;
+        border-top: 1px solid var(--line);
+        color: var(--ink-faint);
+        font-size: 13px;
+        font-family: var(--mono);
+      }
+
+      /* ---------- responsive ---------- */
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+        .sidebar {
+          position: fixed;
+          inset: 0 30% 0 0;
+          z-index: 40;
+          height: 100vh;
+          transform: translateX(-105%);
+          transition: transform 0.25s ease;
+          box-shadow: 20px 0 40px rgba(0, 0, 0, 0.3);
+        }
+        .nav-toggle-checkbox:checked ~ .sidebar {
+          transform: translateX(0);
+        }
+        .nav-toggle-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: fixed;
+          top: 18px;
+          left: 18px;
+          z-index: 50;
+          width: 42px;
+          height: 42px;
+          border-radius: 12px;
+          background: var(--navy-deep);
+          color: #fff;
+          border: 1px solid var(--navy-line);
+          cursor: pointer;
+        }
+        main {
+          padding: 90px 20px 80px;
+        }
+        .hero {
+          padding: 36px 24px 28px;
+        }
+        .hero h1 {
+          font-size: 26px;
+        }
+        .stack .layer .desc {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <input type="checkbox" id="nav-toggle" class="nav-toggle-checkbox" />
+    <label for="nav-toggle" class="nav-toggle-btn" aria-label="目次を開く">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M4 6h16M4 12h16M4 18h16"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        />
+      </svg>
+    </label>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="sidebar-brand">.claude/ — ガイド目次</div>
+        <nav class="file-tree">
+          <div class="dir">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"
+                stroke="currentColor"
+                stroke-width="1.6"
+              />
+            </svg>
+            guide/
+          </div>
+          <ul>
+            <li><a href="#overview">01. 全体像</a></li>
+            <li><a href="#claude-md">02. CLAUDE.md</a></li>
+            <li><a href="#subagents">03. サブエージェント</a></li>
+            <li><a href="#agent-teams">04. Agent Teams</a></li>
+            <li><a href="#writing-principles">05. 横断的な書き方原則</a></li>
+            <li><a href="#decision-flow">06. 意思決定フロー</a></li>
+            <li><a href="#checklist">07. チェックリスト</a></li>
+            <li><a href="#summary">08. まとめ</a></li>
+            <li>
+              <a href="#sources">09. 参考ソース<span class="tag">URL</span></a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      <main>
+        <div class="content">
+          <header class="hero">
+            <p class="kicker">Claude Code / Markdown 設定ファイル実践ガイド</p>
+            <h1>
+              サブエージェント & Agent Teams 開発における<br />Markdown ファイル ベストプラクティス
+            </h1>
+            <p class="sub">
+              CLAUDE.md・サブエージェント定義・Agent Teams はすべて「YAML frontmatter +
+              Markdown本文」という共通フォーマットの上に成り立っています。この4層の構造を初学者にも分かる順番で解説します。
+            </p>
+            <div class="meta-row">
+              <span class="pill">対象: Claude Code v2.1系</span>
+              <span class="pill">更新: 2026年7月25日時点</span>
+              <span class="pill">Agent Teams: experimental</span>
+            </div>
+
+            <div class="stack">
+              <div class="layer l1">
+                <span class="idx">1</span><span class="name">CLAUDE.md</span>
+                <span class="desc">常時ロードされる長期記憶</span>
+              </div>
+              <div class="connector"></div>
+              <div class="layer l2">
+                <span class="idx">2</span><span class="name">SKILL.md</span>
+                <span class="desc">必要な時だけ読み込む手順書</span>
+              </div>
+              <div class="connector"></div>
+              <div class="layer l3">
+                <span class="idx">3</span><span class="name">.claude/agents/*.md</span>
+                <span class="desc">一方向委譲するサブエージェント</span>
+              </div>
+              <div class="connector"></div>
+              <div class="layer l4">
+                <span class="idx">4</span><span class="name">Agent Teams</span>
+                <span class="desc">相互に会話する複数セッション</span>
+              </div>
+            </div>
+          </header>
+
+          <!-- 01 -->
+          <section id="overview">
+            <p class="eyebrow">Step 00 · Overview</p>
+            <h2>全体像:4つの拡張レイヤーとMarkdownの役割</h2>
+            <p class="lede">
+              どのレイヤーも「Markdownで振る舞いを定義する」という共通点を持ちますが、<strong>ロードされるタイミングと目的</strong>が異なります。まずは地図を頭に入れましょう。
+            </p>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>レイヤー</th>
+                    <th>ファイル</th>
+                    <th>主な置き場所</th>
+                    <th>ロードのタイミング</th>
+                    <th>主な用途</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>プロジェクト記憶</td>
+                    <td><code>CLAUDE.md</code></td>
+                    <td>プロジェクトルート / <code>~/.claude/</code></td>
+                    <td>セッション開始時に常時</td>
+                    <td>常に守ってほしい規約・コマンド集</td>
+                  </tr>
+                  <tr>
+                    <td>再利用可能な手順</td>
+                    <td><code>SKILL.md</code></td>
+                    <td><code>.claude/skills/&lt;name&gt;/</code></td>
+                    <td><code>description</code>一致時のみ本文ロード</td>
+                    <td>ドメイン知識・繰り返す作業手順</td>
+                  </tr>
+                  <tr>
+                    <td>サブエージェント</td>
+                    <td><code>.claude/agents/*.md</code></td>
+                    <td>project / user / plugin / 管理設定</td>
+                    <td>委譲された瞬間に独立起動</td>
+                    <td>一方向委譲・調査/レビューの隔離</td>
+                  </tr>
+                  <tr>
+                    <td>Agent Teams</td>
+                    <td>サブエージェント定義を再利用</td>
+                    <td>専用ファイルなし</td>
+                    <td><code>CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1</code>時</td>
+                    <td>複数セッションが対話しながら協調</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mermaid-card">
+              <div class="mermaid">
+                flowchart TD A["CLAUDE.md<br />常時ロードされる記憶"] --> M["メインセッション"]
+                S["SKILL.md<br />必要な時だけ本文ロード"] -.->|"description一致時に呼び出し"| M M
+                -->|"一方向に委譲・要約が返る"| SA["サブエージェント<br />.claude/agents/*.md"] M
+                -->|"チームを編成"| TL["Team Lead<br />(メインセッション自身)"] TL -->|"タスク割当"|
+                T1["Teammate 1"] TL -->|"タスク割当"| T2["Teammate 2"] T1
+                <-->|"メールボックスで直接会話"| T2 T1
+                -.->|"サブエージェント定義を役割として再利用"| SA
+              </div>
+              <p class="cap">Fig.1 — 4層の関係図</p>
+            </div>
+
+            <div class="callout note">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" />
+                <path
+                  d="M12 8v.01M12 11v5"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                />
+              </svg>
+              <p>
+                <strong>ポイント:</strong>
+                <code>SKILL.md</code
+                >は「同じ会話の中で読み込む知識」、<code>.claude/agents/*.md</code>は「別の独立したコンテキストに投げる仕事」です。この違いを押さえておくと以降が理解しやすくなります。
+              </p>
+            </div>
+          </section>
+
+          <!-- 02 -->
+          <section id="claude-md">
+            <p class="eyebrow">Step 01 · CLAUDE.md</p>
+            <h2>CLAUDE.md を書く — プロジェクトの「長期記憶」</h2>
+            <p class="lede">
+              複数の場所に置くことができ、Claude Codeはそれらをマージして読み込みます。
+            </p>
+
+            <h3>置き場所と階層</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>置き場所</th>
+                    <th>スコープ</th>
+                    <th>用途の例</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>~/.claude/CLAUDE.md</code></td>
+                    <td>全プロジェクト共通(個人)</td>
+                    <td>自分だけのコーディング流儀</td>
+                  </tr>
+                  <tr>
+                    <td><code>&lt;repo&gt;/CLAUDE.md</code></td>
+                    <td>プロジェクト全体</td>
+                    <td>チーム共通の規約・コマンド集</td>
+                  </tr>
+                  <tr>
+                    <td><code>&lt;repo&gt;/&lt;subdir&gt;/CLAUDE.md</code></td>
+                    <td>サブディレクトリ配下</td>
+                    <td>モノレポの各パッケージ固有ルール</td>
+                  </tr>
+                  <tr>
+                    <td><code>CLAUDE.local.md</code></td>
+                    <td>個人用(通常gitignore対象)</td>
+                    <td>ローカル環境固有のメモ</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>書くべき内容</h3>
+            <ul>
+              <li>よく使う bash コマンド(テスト・ビルド・lint など)</li>
+              <li>中核ファイル・ユーティリティ関数の場所</li>
+              <li>コードスタイル・命名規則</li>
+              <li>テストの実行方法と合格基準</li>
+              <li>リポジトリの作法(ブランチ命名、rebase か merge か等)</li>
+              <li>開発環境のセットアップ手順</li>
+            </ul>
+
+            <h3>ベストプラクティス</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>実践</th>
+                    <th>理由</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>短く・箇条書き中心で書く</td>
+                    <td>毎セッション必ずロードされ、肥大化はコンテキストとレイテンシを圧迫する</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      必ず守ってほしいルールは <code>IMPORTANT</code> / <code>YOU MUST</code> で強調
+                    </td>
+                    <td>通常の説明文より強く遵守されやすい</td>
+                  </tr>
+                  <tr>
+                    <td>肥大化したら <code>@path/to/file.md</code> でインポート分割</td>
+                    <td>1ファイル詰め込みを避け、モジュール化できる</td>
+                  </tr>
+                  <tr>
+                    <td>恒久ルールは <code>.claude/rules/*.md</code> へ分離を検討</td>
+                    <td>条件付き読み込みにでき、本体を軽量に保てる</td>
+                  </tr>
+                  <tr>
+                    <td>変更はコードの変更と一緒にコミット</td>
+                    <td>チーム全体の一貫性を保てる</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h4>サンプル</h4>
+            <div class="code-card">
+              <div class="bar">
+                <span class="dot r"></span><span class="dot a"></span><span class="dot g"></span
+                ><span class="filename">CLAUDE.md</span>
+              </div>
+              <pre><code><span class="tok-comment"># CLAUDE.md</span>
+
+<span class="tok-title">## プロジェクト概要</span>
+Node.js + TypeScript のモノレポ。パッケージマネージャは pnpm。
+
+<span class="tok-title">## よく使うコマンド</span>
+- <span class="tok-str">`pnpm test`</span> — 全パッケージのユニットテスト実行
+- <span class="tok-str">`pnpm lint --fix`</span> — ESLint 自動修正
+- <span class="tok-str">`pnpm build`</span> — 全パッケージのビルド
+
+<span class="tok-title">## コーディング規約</span>
+- IMPORTANT: 新規コードに <span class="tok-str">`any`</span> 型を使用しない
+- 関数は原則 30 行以内に収める
+
+<span class="tok-title">## 追加ルール</span>
+<span class="tok-key">@docs/git-instructions.md</span>
+<span class="tok-key">@docs/api-conventions.md</span></code></pre>
+            </div>
+          </section>
+
+          <!-- 03 -->
+          <section id="subagents">
+            <p class="eyebrow">Step 02 · Subagents</p>
+            <h2>サブエージェント定義ファイル(.claude/agents/*.md)</h2>
+            <p class="lede">
+              「YAML frontmatter + Markdown本文(システムプロンプト)」という1ファイルで完結します。
+            </p>
+
+            <h3>基本構造</h3>
+            <div class="code-card">
+              <div class="bar">
+                <span class="dot r"></span><span class="dot a"></span><span class="dot g"></span
+                ><span class="filename">.claude/agents/code-reviewer.md</span>
+              </div>
+              <pre><code>---
+<span class="tok-key">name:</span> code-reviewer
+<span class="tok-key">description:</span> <span class="tok-str">コード品質・セキュリティのレビューに使用する。コード変更後は積極的に使うこと。</span>
+<span class="tok-key">tools:</span> Read, Grep, Glob, Bash
+<span class="tok-key">model:</span> sonnet
+---
+
+あなたはシニアコードレビュアーです。呼び出されたら:
+1. <span class="tok-str">`git diff`</span> で直近の変更を確認する
+2. 変更されたファイルに焦点を当てる
+3. ただちにレビューを開始する
+
+優先度別(Critical / Warning / Suggestion)にフィードバックを整理してください。</code></pre>
+            </div>
+
+            <h3>frontmatter フィールド一覧</h3>
+            <p>必須なのは <code>name</code> と <code>description</code> のみです。</p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>フィールド</th>
+                    <th>必須</th>
+                    <th>役割</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>name</code></td>
+                    <td>✅</td>
+                    <td>一意な識別子(小文字とハイフン)</td>
+                  </tr>
+                  <tr>
+                    <td><code>description</code></td>
+                    <td>✅</td>
+                    <td>Claudeが「いつ委譲するか」を判断する最重要情報</td>
+                  </tr>
+                  <tr>
+                    <td><code>tools</code></td>
+                    <td>–</td>
+                    <td>許可するツールの一覧(省略時は継承)</td>
+                  </tr>
+                  <tr>
+                    <td><code>disallowedTools</code></td>
+                    <td>–</td>
+                    <td>継承したツールから明示的に除外</td>
+                  </tr>
+                  <tr>
+                    <td><code>model</code></td>
+                    <td>–</td>
+                    <td>
+                      <code>sonnet</code> / <code>opus</code> / <code>haiku</code> /
+                      <code>fable</code> / <code>inherit</code>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><code>permissionMode</code></td>
+                    <td>–</td>
+                    <td>
+                      <code>default</code> / <code>acceptEdits</code> / <code>plan</code> /
+                      <code>bypassPermissions</code> など
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><code>maxTurns</code></td>
+                    <td>–</td>
+                    <td>停止するまでの最大ターン数</td>
+                  </tr>
+                  <tr>
+                    <td><code>skills</code></td>
+                    <td>–</td>
+                    <td>起動時にプリロードするスキル名</td>
+                  </tr>
+                  <tr>
+                    <td><code>mcpServers</code></td>
+                    <td>–</td>
+                    <td>このサブエージェント専用のMCPサーバー定義</td>
+                  </tr>
+                  <tr>
+                    <td><code>hooks</code></td>
+                    <td>–</td>
+                    <td>このサブエージェント専用のライフサイクルフック</td>
+                  </tr>
+                  <tr>
+                    <td><code>memory</code></td>
+                    <td>–</td>
+                    <td>
+                      <code>user</code> / <code>project</code> / <code>local</code> の永続メモリ
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><code>background</code></td>
+                    <td>–</td>
+                    <td>常にバックグラウンド実行にするか</td>
+                  </tr>
+                  <tr>
+                    <td><code>isolation</code></td>
+                    <td>–</td>
+                    <td><code>worktree</code>で独立したgit worktree実行</td>
+                  </tr>
+                  <tr>
+                    <td><code>color</code></td>
+                    <td>–</td>
+                    <td>タスク一覧・トランスクリプト上の表示色</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>スコープと優先順位</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>優先度</th>
+                    <th>置き場所</th>
+                    <th>スコープ</th>
+                    <th>用途</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1(最高)</td>
+                    <td>管理設定(managed settings)</td>
+                    <td>組織全体</td>
+                    <td>組織のガバナンス強制</td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td><code>--agents</code> CLIフラグ</td>
+                    <td>そのセッションのみ</td>
+                    <td>一時的テスト・自動化</td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td><code>.claude/agents/</code>(project)</td>
+                    <td>プロジェクト全体</td>
+                    <td>チーム共有・バージョン管理</td>
+                  </tr>
+                  <tr>
+                    <td>4</td>
+                    <td><code>~/.claude/agents/</code>(user)</td>
+                    <td>全プロジェクト共通</td>
+                    <td>個人の持ち歩き用ヘルパー</td>
+                  </tr>
+                  <tr>
+                    <td>5(最低)</td>
+                    <td>プラグインの<code>agents/</code></td>
+                    <td>プラグイン有効化先</td>
+                    <td>配布・共有用</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="callout tip">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M9 12l2 2 4-4"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" />
+              </svg>
+              <p>
+                <strong>初学者への推奨:</strong>
+                まずは<strong>プロジェクトスコープ</strong>(<code>.claude/agents/</code>)から始め、Gitにコミットしてチームで育てていくのが安全です。
+              </p>
+            </div>
+
+            <h3>description の書き方が最も重要</h3>
+            <p>
+              Claudeは会話中のタスクと各サブエージェントの<code>description</code>を照合して自動委譲するかを判断します。曖昧な説明は誤発火・不発火の原因になります。
+            </p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>悪い例</th>
+                    <th>良い例</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>コードを見る</td>
+                    <td>
+                      コード変更後にセキュリティ・品質・保守性の観点でレビューする専門家。書き終えた直後に積極的に(proactively)使うこと。
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>ヘルパー</td>
+                    <td>
+                      読み取り専用でSELECTクエリのみを実行しレポートを作成する。データ分析やレポート依頼で使用する。
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>委譲のフロー</h3>
+            <div class="mermaid-card">
+              <div class="mermaid">
+                sequenceDiagram participant U as ユーザー participant M as メインセッション
+                participant SA as サブエージェント(独立コンテキスト) U->>M: 「コードレビューして」
+                M->>M: descriptionと一致するか判断 M->>SA:
+                タスクを要約して委譲(新規コンテキスト起動) activate SA SA->>SA: git diff / Read /
+                Grep 等を実行 SA-->>M: レビュー結果の要約のみ返却 deactivate SA M-->>U:
+                要約結果を提示(詳細ログはメインに残らない)
+              </div>
+              <p class="cap">Fig.2 — サブエージェントへの委譲フロー</p>
+            </div>
+
+            <div class="callout warn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              <p>
+                <strong>最小権限の原則:</strong>
+                読み取り専用のレビュー系には書き込み系ツールを含めない。危険操作は
+                <code>hooks</code> の
+                <code>PreToolUse</code> でコマンド内容を検証すると、より堅牢になります。
+              </p>
+            </div>
+          </section>
+
+          <!-- 04 -->
+          <section id="agent-teams">
+            <p class="eyebrow">Step 03 · Agent Teams</p>
+            <h2>Agent Teams — 複数セッションの協調開発</h2>
+            <p class="lede">
+              「サブエージェントの延長」ではなく、<strong>別のコーディネーションモデル</strong>です。
+            </p>
+
+            <h3>サブエージェントとの違い</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>観点</th>
+                    <th>サブエージェント</th>
+                    <th>Agent Teams</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>コンテキスト</td>
+                    <td>独自だが結果は呼び出し元に返るのみ</td>
+                    <td>各メンバーが完全に独立</td>
+                  </tr>
+                  <tr>
+                    <td>コミュニケーション</td>
+                    <td>メインにのみ結果を報告</td>
+                    <td>メンバー同士が直接メッセージ</td>
+                  </tr>
+                  <tr>
+                    <td>調整方法</td>
+                    <td>メインエージェントが全管理</td>
+                    <td>共有タスクリストで自己調整</td>
+                  </tr>
+                  <tr>
+                    <td>向いている作業</td>
+                    <td>結果だけが重要な焦点化タスク</td>
+                    <td>議論・協調・相互検証が必要な作業</td>
+                  </tr>
+                  <tr>
+                    <td>トークンコスト</td>
+                    <td>低い(要約のみ返る)</td>
+                    <td>高い(全員が独立インスタンス)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="callout note">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" />
+                <path
+                  d="M12 8v.01M12 11v5"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                />
+              </svg>
+              <p>
+                <strong>判断の目安:</strong>
+                「作業者同士が会話・議論・相互検証する必要があるか?」がYesならAgent
+                Teams、Noなら通常のサブエージェントで十分です。
+              </p>
+            </div>
+
+            <h3>有効化方法</h3>
+            <div class="code-card">
+              <div class="bar">
+                <span class="dot r"></span><span class="dot a"></span><span class="dot g"></span
+                ><span class="filename">settings.json</span>
+              </div>
+              <pre><code>{
+  <span class="tok-key">"env"</span>: {
+    <span class="tok-key">"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"</span>: <span class="tok-str">"1"</span>
+  }
+}</code></pre>
+            </div>
+            <p>
+              有効化後は特別なファイルを作る必要はなく、自然言語で依頼するだけでチームが編成されます。
+            </p>
+
+            <h3>アーキテクチャ</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>コンポーネント</th>
+                    <th>役割</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Team Lead</td>
+                    <td>メインセッション自身。チームメイトを立ち上げ、作業を調整し、結果を統合</td>
+                  </tr>
+                  <tr>
+                    <td>Teammates</td>
+                    <td>それぞれ独立したClaude Codeインスタンス。担当タスクを持つ</td>
+                  </tr>
+                  <tr>
+                    <td>Task List</td>
+                    <td>
+                      共有タスク一覧。pending / in progress / completed の3状態と依存関係を持つ
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Mailbox</td>
+                    <td>チームメイト間の直接メッセージングの仕組み</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mermaid-card">
+              <div class="mermaid">
+                flowchart TB subgraph Team["Agent Team(1セッション内)"] L["Team Lead<br />(メインセッション)"]
+                TL["共有タスクリスト<br />pending/in progress/completed"] T1["Teammate:
+                security-reviewer"] T2["Teammate: perf-reviewer"] T3["Teammate: test-coverage"] end
+                L -->|タスク登録/割当| TL T1 -->|タスクをclaim/完了| TL T2 -->|タスクをclaim/完了|
+                TL T3 -->|タスクをclaim/完了| TL T1 <-->|mailboxで直接会話| T2 T2
+                <-->|mailboxで直接会話| T3 T1 -->|完了通知| L T2 -->|完了通知| L T3 -->|完了通知| L
+              </div>
+              <p class="cap">Fig.3 — Agent Teams アーキテクチャ</p>
+            </div>
+
+            <h3>サブエージェント定義をteammateとして再利用する</h3>
+            <p>
+              <code>.claude/agents/</code
+              >に定義済みのサブエージェントは、そのままチームメイトの役割として再利用できます。定義ファイルの<code>tools</code>と<code>model</code>がそのまま使われ、Markdown本文はチームメイトのシステムプロンプトに追加指示として連結されます。
+            </p>
+            <div class="callout warn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              <p>
+                <code>skills</code> と
+                <code>mcpServers</code>
+                フィールドはこの経路では適用されません。チームメイトはプロジェクト/ユーザー設定から通常どおりスキルとMCPをロードします。
+              </p>
+            </div>
+
+            <h3>チームサイズとタスク粒度</h3>
+            <ul>
+              <li>まずは<strong>3〜5人</strong>のチームメイトから始める</li>
+              <li>1人あたり<strong>5〜6個</strong>のタスクを持たせると手待ちが減る</li>
+              <li>
+                タスクの粒度は「関数1つ・テストファイル1つ・レビュー1件」のように明確な成果物単位に揃える
+              </li>
+            </ul>
+
+            <h3>よくある落とし穴</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>症状</th>
+                    <th>主な原因</th>
+                    <th>対処</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>チームメイトが表示されない</td>
+                    <td>タスクが単純すぎる</td>
+                    <td>明示的に「Agent Teamを使って」と依頼する</td>
+                  </tr>
+                  <tr>
+                    <td>権限プロンプトが多すぎる</td>
+                    <td>許可要求がLeadに集約される</td>
+                    <td>よく使う操作を事前に許可設定しておく</td>
+                  </tr>
+                  <tr>
+                    <td>タスクが完了マークされない</td>
+                    <td>メンバーが更新を忘れる</td>
+                    <td>定期的に進捗を確認・手動更新</td>
+                  </tr>
+                  <tr>
+                    <td>同じファイルを複数人が編集</td>
+                    <td>担当ファイルの分割が曖昧</td>
+                    <td>メンバーごとに担当ファイルを明確化</td>
+                  </tr>
+                  <tr>
+                    <td>Leadが作業完了前に終了</td>
+                    <td>完了判定が早すぎる</td>
+                    <td>「メンバーの完了を待って」と明示的に指示</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- 05 -->
+          <section id="writing-principles">
+            <p class="eyebrow">Step 04 · Cross-cutting principles</p>
+            <h2>Markdownファイル自体の書き方 — 横断的なベストプラクティス</h2>
+            <p class="lede">
+              <code>CLAUDE.md</code> / <code>.claude/agents/*.md</code> /
+              <code>SKILL.md</code> に共通する原則です。
+            </p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>原則</th>
+                    <th>具体例</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>単一責任:1ファイル1目的</td>
+                    <td>レビュー専用・デバッグ専用のように細分化し「何でも屋」を避ける</td>
+                  </tr>
+                  <tr>
+                    <td>descriptionは動詞+条件で書く</td>
+                    <td>「〜する専門家。〜の時に使用/積極的に使用すること」の形式を徹底</td>
+                  </tr>
+                  <tr>
+                    <td>本文は役割→手順→出力形式の順</td>
+                    <td>「あなたは〇〇です」→「呼び出されたら1.2.3…」→「出力は優先度別に整理」</td>
+                  </tr>
+                  <tr>
+                    <td>権限は最小限から始める</td>
+                    <td>まず読み取り専用にし、動作確認後に書き込み権限を足す</td>
+                  </tr>
+                  <tr>
+                    <td>バージョン管理する</td>
+                    <td>プロジェクトスコープはGitにコミットしレビューを通す</td>
+                  </tr>
+                  <tr>
+                    <td>肥大化したら分割する</td>
+                    <td>
+                      <code>@import</code> や
+                      <code>.claude/rules/</code>、Skillなら<code>references/</code>へ切り出す
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>命名は一意にする</td>
+                    <td><code>name</code>は木構造全体で一意に保つ(重複は事故の元)</td>
+                  </tr>
+                  <tr>
+                    <td>強調構文を使い分ける</td>
+                    <td>必ず守ってほしい規則には <code>IMPORTANT</code>/<code>MUST</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- 06 -->
+          <section id="decision-flow">
+            <p class="eyebrow">Step 05 · Decision</p>
+            <h2>意思決定フローチャート:どのMarkdownファイルを使うべきか</h2>
+            <div class="chip-row">
+              <span class="chip">常時有効?</span><span class="chip">再利用手順?</span
+              ><span class="chip">一方向委譲?</span><span class="chip">相互会話?</span>
+            </div>
+            <div class="mermaid-card">
+              <div class="mermaid">
+                flowchart TD Start(["新しいルール・振る舞いを追加したい"]) --> Q1{"毎セッション<br />常に有効にしたいか?"}
+                Q1 -- Yes --> CM["CLAUDE.md に書く"] Q1 -- No --> Q2{"メインの会話の中で<br />再利用したい手順・知識か?"}
+                Q2 -- Yes --> SK["SKILL.md を作る"] Q2 -- No --> Q3{"一方向に委譲して<br />結果の要約だけ欲しいか?"}
+                Q3 -- Yes --> SA[".claude/agents/*.md<br />サブエージェントを作る"] Q3 -- No -->
+                Q4{"複数の作業者が<br />直接会話・相互検証すべきか?"} Q4 -- Yes --> AT["Agent Teams
+                を有効化し<br />サブエージェント定義を役割として使う"] Q4 -- No -->
+                Single["単一セッションのまま<br />メインで対応する"]
+              </div>
+              <p class="cap">Fig.4 — レイヤー選択の判断フロー</p>
+            </div>
+          </section>
+
+          <!-- 07 -->
+          <section id="checklist">
+            <p class="eyebrow">Step 06 · Review</p>
+            <h2>コミット前チェックリスト</h2>
+            <ul class="checklist">
+              <li>
+                <input type="checkbox" /><span
+                  ><span class="t">nameは一意か</span
+                  ><span class="d">同じディレクトリツリー内で重複していないか</span></span
+                >
+              </li>
+              <li>
+                <input type="checkbox" /><span
+                  ><span class="t">descriptionは具体的か</span
+                  ><span class="d">「いつ使うか」が第三者にも明確か</span></span
+                >
+              </li>
+              <li>
+                <input type="checkbox" /><span
+                  ><span class="t">ツール権限は最小か</span
+                  ><span class="d">書き込み不要ならRead/Grep/Globのみか</span></span
+                >
+              </li>
+              <li>
+                <input type="checkbox" /><span
+                  ><span class="t">CLAUDE.mdは肥大化していないか</span
+                  ><span class="d">数百行を超えたら分割を検討したか</span></span
+                >
+              </li>
+              <li>
+                <input type="checkbox" /><span
+                  ><span class="t">危険な操作にhooksを設定したか</span
+                  ><span class="d">破壊的コマンドをPreToolUseで検証しているか</span></span
+                >
+              </li>
+              <li>
+                <input type="checkbox" /><span
+                  ><span class="t">Agent Teamsのタスク粒度は適切か</span
+                  ><span class="d">1人5〜6タスク程度に収まっているか</span></span
+                >
+              </li>
+              <li>
+                <input type="checkbox" /><span
+                  ><span class="t">ファイル担当の重複はないか</span
+                  ><span class="d">チームメイト間でファイル競合が起きない設計か</span></span
+                >
+              </li>
+              <li>
+                <input type="checkbox" /><span
+                  ><span class="t">Gitにコミットしたか</span
+                  ><span class="d">チームで共有すべき定義がバージョン管理されているか</span></span
+                >
+              </li>
+            </ul>
+          </section>
+
+          <!-- 08 -->
+          <section id="summary">
+            <p class="eyebrow">Step 07 · Summary</p>
+            <h2>まとめ</h2>
+            <ul>
+              <li>
+                <strong>CLAUDE.md</strong>
+                はプロジェクトの長期記憶。短く・強調構文を使い・分割しながら育てる。
+              </li>
+              <li>
+                <strong>サブエージェント</strong>は「YAML frontmatter +
+                システムプロンプト」で、<code>description</code>の質が委譲精度を決める。最小権限のツール設計が安全性の鍵。
+              </li>
+              <li>
+                <strong>Agent Teams</strong
+                >はサブエージェントの延長ではなく、共有タスクリストとメールボックスによる協調モデル。3〜5人・5〜6タスク/人からスモールスタートする。
+              </li>
+              <li>
+                どのレイヤーも「1ファイル1目的・最小権限・バージョン管理・肥大化したら分割」という共通原則で運用するとメンテナンスしやすくなる。
+              </li>
+            </ul>
+          </section>
+
+          <!-- 09 -->
+          <section id="sources">
+            <p class="eyebrow">Step 08 · Sources</p>
+            <h2>参考ソース</h2>
+            <p class="lede">
+              本ガイドの作成にあたり、以下の一次情報・著名な開発者/企業ブログを参照しました(2026年7月時点)。
+            </p>
+            <ul class="sources">
+              <li>
+                <span class="src-title">Anthropic公式ドキュメント「Create custom subagents」</span
+                ><a href="https://code.claude.com/docs/en/sub-agents" target="_blank" rel="noopener"
+                  >https://code.claude.com/docs/en/sub-agents</a
+                >
+              </li>
+              <li>
+                <span class="src-title"
+                  >Anthropic公式ドキュメント「Orchestrate teams of Claude Code sessions(Agent
+                  Teams)」</span
+                ><a
+                  href="https://code.claude.com/docs/en/agent-teams"
+                  target="_blank"
+                  rel="noopener"
+                  >https://code.claude.com/docs/en/agent-teams</a
+                >
+              </li>
+              <li>
+                <span class="src-title"
+                  >Anthropic公式ドキュメント「Extend Claude with skills(SKILL.md)」</span
+                ><a href="https://code.claude.com/docs/en/skills" target="_blank" rel="noopener"
+                  >https://code.claude.com/docs/en/skills</a
+                >
+              </li>
+              <li>
+                <span class="src-title"
+                  >Anthropic公式ドキュメント「How Claude remembers your project(Memory /
+                  CLAUDE.md)」</span
+                ><a href="https://code.claude.com/docs/en/memory" target="_blank" rel="noopener"
+                  >https://code.claude.com/docs/en/memory</a
+                >
+              </li>
+              <li>
+                <span class="src-title"
+                  >Anthropic Engineering公式ブログ「Claude Code: Best practices for agentic
+                  coding」(Boris Cherny 他)</span
+                ><a
+                  href="https://www.anthropic.com/engineering/claude-code-best-practices"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.anthropic.com/engineering/claude-code-best-practices</a
+                >
+              </li>
+              <li>
+                <span class="src-title"
+                  >Anthropic公式ニュース「Claude Opus 4.6」(Agent Teams research preview発表)</span
+                ><a
+                  href="https://www.anthropic.com/news/claude-opus-4-6"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.anthropic.com/news/claude-opus-4-6</a
+                >
+              </li>
+              <li>
+                <span class="src-title"
+                  >Anthropic Engineering公式ブログ「Building a C compiler with a team of parallel
+                  Claudes」</span
+                ><a
+                  href="https://www.anthropic.com/engineering/building-c-compiler"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.anthropic.com/engineering/building-c-compiler</a
+                >
+              </li>
+              <li>
+                <span class="src-title"
+                  >Anthropic公式ブログ「Lessons from Anthropic on building effective human-agent
+                  teams」</span
+                ><a
+                  href="https://claude.com/blog/building-effective-human-agent-teams"
+                  target="_blank"
+                  rel="noopener"
+                  >https://claude.com/blog/building-effective-human-agent-teams</a
+                >
+              </li>
+              <li>
+                <span class="src-title"
+                  >Simon Willison氏の知見に言及する解説記事(Skills/Subagentsの位置づけ)</span
+                ><a
+                  href="https://alexop.dev/posts/understanding-claude-code-full-stack/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://alexop.dev/posts/understanding-claude-code-full-stack/</a
+                >
+              </li>
+              <li>
+                <span class="src-title"
+                  >Boris Cherny氏(Claude Code開発者)の設計思想に関する解説記事</span
+                ><a
+                  href="https://mcp.directory/blog/claude-code-best-practices"
+                  target="_blank"
+                  rel="noopener"
+                  >https://mcp.directory/blog/claude-code-best-practices</a
+                >
+              </li>
+              <li>
+                <span class="src-title"
+                  >GitHub anthropics/claude-code 公式リポジトリ内 Skill開発ガイド</span
+                ><a
+                  href="https://github.com/anthropics/claude-code/blob/main/plugins/plugin-dev/skills/skill-development/SKILL.md"
+                  target="_blank"
+                  rel="noopener"
+                  >https://github.com/anthropics/claude-code/blob/main/plugins/plugin-dev/skills/skill-development/SKILL.md</a
+                >
+              </li>
+              <li>
+                <span class="src-title">GitHub anthropics/skills 公式Skillsリポジトリ</span
+                ><a href="https://github.com/anthropics/skills" target="_blank" rel="noopener"
+                  >https://github.com/anthropics/skills</a
+                >
+              </li>
+            </ul>
+            <div class="disclaimer">
+              <strong>注意:</strong> Agent Teams は「experimental / research
+              preview」機能として提供されており、コマンド名・環境変数・挙動は今後変更される可能性があります。実装前に必ず公式ドキュメントで最新仕様を確認してください。
+            </div>
+          </section>
+
+          <footer>claude-code-subagents-agentteams-markdown-guide.html · 2026-07-25</footer>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'base',
+        themeVariables: {
+          primaryColor: '#edeaff',
+          primaryTextColor: '#12141c',
+          primaryBorderColor: '#5b4eff',
+          lineColor: '#7a8093',
+          secondaryColor: '#e2f6f0',
+          tertiaryColor: '#fbf1de',
+          fontFamily: 'JetBrains Mono, monospace',
+          fontSize: '13px',
+        },
+        flowchart: { curve: 'basis', htmlLabels: true },
+        securityLevel: 'loose',
+      });
+
+      // active link highlight on scroll
+      const links = document.querySelectorAll('.file-tree a');
+      const sections = Array.from(links).map((l) => document.querySelector(l.getAttribute('href')));
+      function onScroll() {
+        let idx = 0;
+        const y = window.scrollY + 120;
+        sections.forEach((s, i) => {
+          if (s && s.offsetTop <= y) idx = i;
+        });
+        links.forEach((l, i) => l.classList.toggle('active', i === idx));
+      }
+      document.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('load', onScroll);
+
+      // close mobile nav after clicking a link
+      links.forEach((l) =>
+        l.addEventListener('click', () => {
+          const cb = document.getElementById('nav-toggle');
+          if (cb) cb.checked = false;
+        }),
+      );
+    </script>
+  </body>
+</html>
