@@ -4,35 +4,81 @@ import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
 
 export const metadata = {
-  title: "Claude Fable 5 実践活用ガイド | Claude Code エンジニアのためのベストプラクティス",
+  title: "Claude Fable 5 実践活用ガイド ― フィールドガイド版 | Claude Code エンジニアのためのベストプラクティス",
   description:
-    "Claude Codeエンジニアのための中級〜上級者向けベストプラクティス。「指示を積み上げる」から「ゴールと検証基準を渡して任せる」へ ― Fable 5に最適化された思考法をステップバイステップで解説します。",
+    "地図は現地ではない。Claude Fable 5 の特性、安全分類器、プロンプト転換、Effortレベル、/goal・Dynamic Workflows、Loop Engineering、ThariqのUnknownsフレームワークを詳細解説。",
 };
 
 const DIAGRAMS = {
-  diagram1: `graph TD
-    MF["共通の基盤モデル<br/>(旧世代 Mythos Preview からの進化)"]
+  mmd1: `graph TD
+    MF["共通の基盤モデル"]
     MF --> Mythos5["Claude Mythos 5<br/>安全分類器なし<br/>Project Glasswing 経由の限定提供"]
-    MF --> Fable5["Claude Fable 5<br/>安全分類器あり<br/>一般提供(GA)"]
-    Mythos5 --> GW["Project Glasswing<br/>重要インフラ防御パートナー向けプログラム<br/>(AWS / Apple / Google / Microsoft / NVIDIA / CrowdStrike 等)"]
+    MF --> Fable5["Claude Fable 5<br/>安全分類器あり(サイバー/生物/推論抽出/競合LLM開発)<br/>一般提供(GA)"]
+    Mythos5 --> GW["Project Glasswing<br/>信頼されたパートナー向けプログラム"]
     Fable5 --> Users["Claude API / Claude Platform on AWS / Bedrock<br/>Google Cloud / Microsoft Foundry<br/>Claude Code / Claude.ai / Claude Cowork"]`,
-  diagram2: `flowchart TD
+  mmd2: `timeline
+    title Claude Fable 5 / Mythos 5 タイムライン(2026年、7月16日時点)
+    2026-06-09 : Fable 5 / Mythos 5 発表・一般提供開始
+    2026-06-12 : 米商務省が輸出規制を適用、全世界でアクセスを一時停止
+    2026-06-30 : 米商務省が規制を解除
+    2026-07-01 : 全世界でアクセス復旧。強化された分類器を導入
+    2026-07-01〜07 : 週次利用枠の50%まで無料相当で利用可能な期間
+    2026-07-07 : 無料相当期間を7月12日まで延長
+    2026-07-12 : 無料相当期間をさらに7月19日まで再延長`,
+  mmd3: `flowchart TD
     A["ユーザーのリクエスト<br/>(CLAUDE.md・gitステータスも含む)"] --> B{"安全分類器が検知?"}
     B -- "いいえ(95%超のケース)" --> C["Fable 5がそのまま応答"]
-    B -- "はい(サイバー/生物学/推論抽出)" --> D["Claude Opus 4.8 へ自動フォールバック"]
+    B -- "はい(cyber/bio/frontier_llm/reasoning_extraction)" --> D["Claude Opus 4.8 へ自動フォールバック"]
     D --> E["トランスクリプトに通知が表示される"]
     E --> F["セッションはOpus 4.8のまま継続"]
     F --> G["/model fable を実行するとFable 5に復帰"]`,
-  diagram3: `flowchart TD
-    A["有効なEffortレベルの決定"] --> B{"環境変数 CLAUDE_CODE_EFFORT_LEVEL が設定されている?"}
+  mmd4: `flowchart TB
+    subgraph Old["旧来の指示スタイル(Opus世代までの習慣)"]
+        O1["手順を逐一列挙する"] --> O2["禁止事項を網羅的に書き出す"]
+        O2 --> O3["思考過程を逐一報告させる"]
+        O3 --> O4["Fable 5には不向き<br/>過剰な制約がむしろ性能を落とす"]
+    end
+    subgraph New["Fable 5向けの指示スタイル"]
+        N1["ゴールと『なぜそれが必要か』を伝える"] --> N2["越えてはいけない境界だけを明示する"]
+        N2 --> N3["検証方法(何をもって完了とするか)を明示する"]
+        N3 --> N4["Fable 5に適合<br/>自律的な判断力を最大限活かせる"]
+    end`,
+  mmd5: `flowchart TD
+    A["有効なEffortレベルの決定"] --> B{"環境変数<br/>CLAUDE_CODE_EFFORT_LEVEL<br/>が設定されている?"}
     B -- はい --> Z["環境変数の値を採用(最優先)"]
-    B -- いいえ --> C{"実行中のSkill/Subagentのfrontmatterにeffort指定がある?"}
+    B -- いいえ --> C{"実行中の<br/>Skill/Subagentのfrontmatter<br/>にeffort指定がある?"}
     C -- はい --> Y["frontmatterの値を採用<br/>(セッション設定より優先、環境変数には劣後)"]
     C -- いいえ --> D{"/effort やsettingsファイルで手動設定済み?"}
-    D -- はい --> X["手動設定値を採用"]
-    D -- いいえ --> W["モデルごとの既定値を採用<br/>(Fable 5・Sonnet 5・Opus 4.8はhighが既定)"]`,
-  diagram4: `graph TD
-    U["開発者"] --> O["Fable 5: オーケストレーター<br/>(計画・アーキテクチャ判断・最終レビュー)"]
+    D -- はい --> X["手動設定値を採用(セッションをまたいで永続化)"]
+    D -- いいえ --> W["モデルごとの既定値を採用<br/>(Fable 5・Sonnet 5・Opus 4.8はhigh、Opus 4.7はxhighが既定)"]`,
+  mmd6: `sequenceDiagram
+    participant Dev as 開発者
+    participant Worker as Fable 5(作業者)
+    participant Eval as 評価モデル(既定はHaiku)
+    Dev->>Worker: "/goal 条件"を設定
+    loop 条件が満たされるまで
+        Worker->>Worker: 1ターン分の作業を実行
+        Worker->>Eval: これまでの会話全体を提示
+        Eval-->>Worker: 条件は成立したか(Yes/Noと理由)
+        alt No
+            Worker->>Worker: 理由を踏まえて次のターンへ
+        else Yes
+            Worker-->>Dev: ゴール達成としてクリア
+        end
+    end`,
+  mmd7: `flowchart TD
+    O["トップレベルのオーケストレーター<br/>(スクリプトとして実行、モデルトークンを消費しない)"] --> T1["タスク1"]
+    O --> T2["タスク2"]
+    O --> TN["タスクN(数百件まで拡張可能)"]
+    T1 --> I1["実装エージェント"] --> V1a["検証エージェントA"] & V1b["検証エージェントB"]
+    V1a --> F1["修正エージェント"]
+    V1b --> F1
+    F1 --> R["各タスクの結果をオーケストレーターに返却"]
+    T2 -.同様の3段階構成.-> R
+    TN -.同様の3段階構成.-> R
+    R --> Done["全ブランチ完了後、まとめてユーザーに返却"]`,
+  mmd8: `graph TD
+    U["開発者"] --> O["Fable 5: オーケストレーター<br/>(アーキテクチャ判断・計画・最終レビュー)"]
     O --> S1["Sonnet 5: 実装サブエージェント"]
     O --> S2["Opus 4.8: 複雑な実装サブエージェント"]
     O --> H1["Haiku 4.5: コード検索・棚卸しサブエージェント"]
@@ -41,1563 +87,833 @@ const DIAGRAMS = {
     S2 -.結果を返す.-> O
     H1 -.結果を返す.-> O
     V -.検証結果を返す.-> O`,
-  diagram5: `sequenceDiagram
-    participant Dev as 開発者
-    participant Worker as Fable 5(作業者)
-    participant Eval as 評価モデル(既定は軽量モデル)
-    Dev->>Worker: 「/goal 条件」を設定
-    loop 条件が満たされるまで
-        Worker->>Worker: 1ターン分の作業を実行
-        Worker->>Eval: セッションのトランスクリプトを提示
-        Eval-->>Worker: 条件は成立したか(Yes / No)
-        alt No
-            Worker->>Worker: 理由を踏まえて次のターンへ
-        else Yes
-            Worker-->>Dev: ゴール達成としてセッション終了
-        end
-    end`,
-  diagram6: `flowchart LR
+  mmd9: `flowchart LR
+    subgraph Inner["内側のループ(Inner Loop)"]
+        direction TB
+        A1["生成(Generate)"] --> A2["検証(Verify)"] --> A3["続行/停止の判断"]
+        A3 -.繰り返し.-> A1
+    end
+    subgraph Outer["外側のループ(Outer Loop)= 人間が握り続ける領域"]
+        direction TB
+        B1["Quality: 何が『良い』かの基準"]
+        B2["Verdict: 出荷するか・止めるかの最終判断"]
+        B3["Answerability: なぜそう判断したかを説明できること"]
+    end
+    Inner -->|"結果を提示"| Outer`,
+  mmd10: `graph TD
+    L1["① エージェンティックコーディングループ<br/>(数分単位)<br/>仕様とevalに基づき、コーディングエージェントが<br/>自らコードを書きテストし、バグがなくなるまで反復"]
+    L2["② 開発者フィードバックループ<br/>(数十分〜数時間単位)<br/>開発者が成果物をレビューし、方向修正を指示"]
+    L3["③ 外部フィードバックループ<br/>(数時間〜数週間単位)<br/>友人へのレビュー依頼、αテスター、本番環境でのA/Bテスト"]
+    L1 -->|"完成したコード"| L2
+    L2 -->|"改善された製品仕様"| L3
+    L3 -->|"実データによる学び"| L2
+    L2 -->|"詳細化された仕様"| L1`,
+  mmd11: `flowchart TD
     subgraph Pre["実装前"]
-        A["① Blindspot Pass<br/>プロンプトの曖昧さ・未定義部分を<br/>Fable自身にスキャンさせる"]
-        B["② Brainstorm / Prototype<br/>正式なプロンプトの前に、複数の切り口を<br/>発散的に検討させる"]
-        C["③ Interview / Reference<br/>Fableに逆質問させる<br/>または既存の実装を参照点として与える"]
+        T1["① Blindspot Pass<br/>『盲区スキャンをして。私のunknown unknownsは何?』"]
+        T2["② 複数案のブレインストーミング<br/>『安いものから野心的なものまで10通りの解法を出して』"]
+        T3["③ 使い捨てプロトタイプの試作<br/>『見れば分かる』要求には3〜4案の粗いドラフトを先に出させる"]
+        T4["④ Interview Me<br/>『不明確な点を1つずつ質問して。<br/>設計全体を変えるものから聞いて』"]
+        T5["⑤ Show, don't explain<br/>既存の近いコード・文書を直接参照させる"]
+        T6["⑥ 大きな決定を先に見せる計画<br/>『変更したくなりそうな選択肢を先に見せて』"]
     end
     subgraph During["実装中"]
-        D["④ Implementation Notes<br/>各ステップに着手する前に<br/>そのステップの前提を書き出させる"]
+        T7["⑦ Implementation Notes<br/>『決めた内容と理由をメモファイルに記録し続けて』"]
     end
     subgraph Post["実装後"]
-        E["⑤ Quiz / Pitch<br/>成果物について小テストをする<br/>または説明させることで<br/>暗黙の前提を逆照射する"]
+        T8["⑧ Quiz & Pitch<br/>『変更点を要約し、私にクイズを出して』"]
+        T9["⑨ 教えてもらってから判断する<br/>良し悪しを判断できない場合は先に教えてもらう"]
     end
-    A --> B --> C --> D --> E
-    E -.新たなunknownsが発覚.-> A`,
-  diagram7: `flowchart TD
+    T1 --> T2 --> T3 --> T4 --> T5 --> T6 --> T7 --> T8 --> T9
+    T9 -.新たなunknownsの発覚.-> T1`,
+  mmd12: `flowchart TD
     Start["新しいタスクが来た"] --> Q1{"曖昧・長時間・高難度か?"}
-    Q1 -- はい --> Q2{"サイバーセキュリティ/生物学に近い内容か?"}
+    Q1 -- はい --> Q2{"サイバー/生物学/競合LLM開発に近い内容か?"}
     Q2 -- はい --> Opus["Opus 4.8を直接使用<br/>(フォールバックを待つより効率的)"]
     Q2 -- いいえ --> Fable["Fable 5をhigh〜xhigh effortで使用<br/>(オーケストレーター役)"]
     Q1 -- いいえ --> Q3{"日常的なコーディング・反復作業か?"}
     Q3 -- はい --> Sonnet["Sonnet 5を使用"]
-    Q3 -- いいえ --> Q4{"検索・棚卸しなど軽量タスクか?"}
-    Q4 -- はい --> Haiku["Haiku 4.5をサブエージェントで使用"]
-    Q4 -- いいえ --> Sonnet`,
+    Q3 -- いいえ --> Q4{"難所だけ高性能モデルの助言が欲しいか?"}
+    Q4 -- はい --> Advisor["Sonnet/Haikuを実行役、Opus/Fable5を<br/>アドバイザーとして/advisorで併用"]
+    Q4 -- いいえ --> Q5{"検索・棚卸しなど軽量タスクか?"}
+    Q5 -- はい --> Haiku["Haiku 4.5をサブエージェントで使用"]
+    Q5 -- いいえ --> Sonnet`,
 };
 
 export default function Fable5BestPracticesPage() {
   return (
     <div className={styles.pageContainer}>
+      <TocObserver />
       <aside className={styles.sidebar}>
         <a href="#top" className={styles.brand}>
           <div className={styles.brandMark}>F5</div>
           <div className={styles.brandText}>
-            Claude Fable 5<span className={styles.brandSub}>Best Practices</span>
+            Claude Fable 5
+            <span className={styles.brandSub}>Field Guide</span>
           </div>
         </a>
         <div className={styles.sidebarMeta}>
-          最終更新: 2026-07-04
+          最終更新: 2026-07-16
           <br />
           対象: Claude Code 中〜上級者
         </div>
         <nav className={styles.toc} id="toc">
-          <a href="#ch1" className={styles.tocLink}>
-            <span className={styles.num}>01</span>Fable 5とは何か
+          <a href="#s1" className={styles.tocLink}>
+            <span className={styles.num}>01</span>Claude Fable 5 とは何か
           </a>
-          <a href="#ch2" className={styles.tocLink}>
+          <a href="#s2" className={styles.tocLink}>
             <span className={styles.num}>02</span>タイムライン
           </a>
-          <a href="#ch3" className={styles.tocLink}>
+          <a href="#s3" className={styles.tocLink}>
             <span className={styles.num}>03</span>安全分類器とフォールバック
           </a>
-          <a href="#ch4" className={styles.tocLink}>
-            <span className={styles.num}>04</span>プロンプティングの転換
+          <a href="#s4" className={styles.tocLink}>
+            <span className={styles.num}>04</span>プロンプティング思想の転換
           </a>
-          <a href="#ch5" className={styles.tocLink}>
-            <span className={styles.num}>05</span>Effortレベル
+          <a href="#s5" className={styles.tocLink}>
+            <span className={styles.num}>05</span>Effortレベルの使い方
           </a>
-          <a href="#ch6" className={styles.tocLink}>
-            <span className={styles.num}>06</span>Claude Codeでの実践設定
+          <a href="#s6" className={styles.tocLink}>
+            <span className={styles.num}>06</span>Claude Code での実践設定
           </a>
-          <a href="#ch7" className={styles.tocLink}>
+          <a href="#s7" className={styles.tocLink}>
             <span className={styles.num}>07</span>Loop Engineering
           </a>
-          <a href="#ch8" className={styles.tocLink}>
-            <span className={styles.num}>08</span>Unknownsフレームワーク
+          <a href="#s8" className={styles.tocLink}>
+            <span className={styles.num}>08</span>Unknowns フレームワーク
           </a>
-          <a href="#ch9" className={styles.tocLink}>
-            <span className={styles.num}>09</span>検証ループとメモリ
+          <a href="#s9" className={styles.tocLink}>
+            <span className={styles.num}>09</span>検証ループとメモリシステム
           </a>
-          <a href="#ch10" className={styles.tocLink}>
-            <span className={styles.num}>10</span>モデル選定とコスト
+          <a href="#s10" className={styles.tocLink}>
+            <span className={styles.num}>10</span>コスト管理とモデル選定
           </a>
-          <a href="#ch11" className={styles.tocLink}>
-            <span className={styles.num}>11</span>アンチパターン
+          <a href="#s11" className={styles.tocLink}>
+            <span className={styles.num}>11</span>よくある落とし穴
           </a>
-          <a href="#ch12" className={styles.tocLink}>
+          <a href="#s12" className={styles.tocLink}>
             <span className={styles.num}>12</span>実力と検証の必要性
           </a>
-          <a href="#ch13" className={styles.tocLink}>
+          <a href="#s13" className={styles.tocLink}>
             <span className={styles.num}>13</span>既知の制限事項
           </a>
-          <a href="#ch14" className={styles.tocLink}>
+          <a href="#s14" className={styles.tocLink}>
             <span className={styles.num}>14</span>まとめ
           </a>
-          <a href="#ch15" className={styles.tocLink}>
-            <span className={styles.num}>15</span>参考文献
+          <a href="#s15" className={styles.tocLink}>
+            <span className={styles.num}>15</span>参考文献・ソースURL一覧
           </a>
         </nav>
       </aside>
 
-      <main className={styles.content}>
-        <div className={styles.wrap}>
-          <header className={styles.hero} id="top">
-            <span className={styles.heroEyebrow}>CLAUDE CODE ・ MODEL PLAYBOOK</span>
-            <h1>
-              Claude Fable 5
-              <br />
-              実践活用ガイド
-            </h1>
-            <p className={styles.lead}>
-              Claude
-              Codeエンジニアのための中級〜上級者向けベストプラクティス。「指示を積み上げる」から「ゴールと検証基準を渡して任せる」へ
-              ― Fable 5に最適化された思考法をステップバイステップで解説する。
-            </p>
-            <div className={styles.heroAudience}>
-              <b>対象読者:</b> Claude Codeを日常的に使っており、Opus /
-              Sonnet世代のプロンプト設計には慣れているが、Fable
-              5特有の挙動にまだ最適化できていないエンジニア。
-              <br />
-              <br />
-              <b>情報時点:</b> 2026年7月4日。Fable
-              5は現在進行形でアップデートされているモデルのため、記載内容は今後変わる可能性がある。
-            </div>
-          </header>
-
-          <section className={`${styles.chapter} chapter`} id="ch1">
-            <div className={styles.chapterHead}>
-              <span className={styles.chapterNum}>01</span>
-              <h2>Claude Fable 5 とは何か</h2>
-            </div>
-
-            <p>
-              Claude Fable 5 は、Anthropic が2026年6月9日に発表した「Claude
-              5」世代の最初のモデルで、Opus
-              よりも上位に位置づけられる新しい「Mythos」クラスの一般提供版である。同時に発表された{" "}
-              <b>Claude Mythos 5</b> は同一の基盤モデルを共有しているが、Fable 5
-              にのみ追加の安全分類器(セーフガード)が搭載されている点が異なる。Mythos 5 は
-              &quot;Project Glasswing&quot;
-              という信頼されたパートナー向けプログラムを通じてのみ限定提供されている。
-            </p>
-
-            <h3>1.1 スペック概要</h3>
-            <div className={styles.specGrid}>
-              <div className={styles.specItem}>
-                <div className={styles.specLabel}>Model ID</div>
-                <div className={styles.specValue}>
-                  <code className={styles.inlineCode}>claude-fable-5</code>
-                </div>
-              </div>
-              <div className={styles.specItem}>
-                <div className={styles.specLabel}>コンテキスト窓</div>
-                <div className={styles.specValue}>既定 100万トークン</div>
-              </div>
-              <div className={styles.specItem}>
-                <div className={styles.specLabel}>最大出力</div>
-                <div className={styles.specValue}>12.8万トークン/リクエスト</div>
-              </div>
-              <div className={styles.specItem}>
-                <div className={styles.specLabel}>価格(入力)</div>
-                <div className={styles.specValue}>$10 / 100万トークン</div>
-              </div>
-              <div className={styles.specItem}>
-                <div className={styles.specLabel}>価格(出力)</div>
-                <div className={styles.specValue}>$50 / 100万トークン</div>
-              </div>
-              <div className={styles.specItem}>
-                <div className={styles.specLabel}>Thinking</div>
-                <div className={styles.specValue}>Adaptive Thinkingのみ</div>
-              </div>
-            </div>
-
-            <div className={styles.tableWrap}>
-              <table>
-                <thead>
-                  <tr>
-                    <th>項目</th>
-                    <th>内容</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>位置づけ</td>
-                    <td>
-                      Anthropicが一般提供する中で最も高性能なモデル。長時間・高難度・曖昧なタスク向け
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>提供チャネル</td>
-                    <td>
-                      Claude API / Claude Platform on AWS / Amazon Bedrock / Google Cloud /
-                      Microsoft Foundry / Claude Code / Claude.ai / Claude Cowork
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>データ保持</td>
-                    <td>30日間保持の「Covered Model」扱い。Zero Data Retention(ZDR)は非対応</td>
-                  </tr>
-                  <tr>
-                    <td>Thinking表示</td>
-                    <td>
-                      生の思考過程(raw chain of thought)は返却されない。
-                      <code className={styles.inlineCode}>thinking.display</code>
-                      で「要約」または「非表示」を選択
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <h3>1.2 モデルファミリーの関係性</h3>
-            <div className={styles.diagramFrame}>
-              <div className={styles.mermaid} id="diagram-1">
-                <MermaidDiagram chart={DIAGRAMS.diagram1} />
-              </div>
-              <div className={styles.diagramCaption}>
-                図1: Fable 5 / Mythos 5 / Project Glasswing の関係
-              </div>
-            </div>
-
-            <p>
-              Fable 5 と Mythos 5
-              は「同じ頭脳、異なる安全装備」というイメージで捉えると理解しやすい。Fable 5
-              は分類器というガードレールを装備することで安全に広く配布できるようにした版、Mythos 5
-              はガードレールなしで信頼できるパートナーにのみ渡す版、という棲み分けである。
-            </p>
-          </section>
-
-          <section className={`${styles.chapter} chapter`} id="ch2">
-            <div className={styles.chapterHead}>
-              <span className={styles.chapterNum}>02</span>
-              <h2>タイムライン: リリースから輸出規制、復旧まで</h2>
-            </div>
-
-            <p>
-              Fable 5
-              は発表から1ヶ月足らずで、一度サービス停止という大きな出来事を経験している。プロンプト設計とは直接関係ないが、可用性設計(フォールバックの必要性)を理解する上で重要な背景である。
-            </p>
-
-            <div className={styles.timeline}>
-              <div className={styles.tItem}>
-                <div className={styles.tDate}>2026-06-09</div>
-                <div className={styles.tBody}>
-                  <b>Fable 5 / Mythos 5 発表・一般提供開始。</b>
-                  Claude 5世代の最初のモデルとして、Claude API・Claude
-                  Code・Claude.ai等で同時に利用可能になった。
-                </div>
-              </div>
-              <div className={styles.tItem}>
-                <div className={styles.tDate}>2026-06-12</div>
-                <div className={styles.tBody}>
-                  <b>米商務省が輸出規制を適用、全世界でアクセスを一時停止。</b>
-                  Amazonの研究者がFable
-                  5の安全策を回避してソフトウェア脆弱性を特定できる手法を発見・報告したことがきっかけ。外国籍ユーザーを区別する即時的な手段がなかったため、全ユーザー向けに停止された。
-                </div>
-              </div>
-              <div className={styles.tItem}>
-                <div className={styles.tDate}>2026-06-30</div>
-                <div className={styles.tBody}>
-                  <b>米商務省が規制を解除、Anthropicが復旧を発表。</b>
-                  Anthropicが安全対策の強化と米政府への協力を約束したことを受け、輸出管理措置が撤回された。
-                </div>
-              </div>
-              <div className={styles.tItem}>
-                <div className={styles.tDate}>2026-07-01</div>
-                <div className={styles.tBody}>
-                  <b>全世界でアクセス復旧。</b>
-                  Claude Code / Claude.ai / API / Cowork
-                  を含む全チャネルで利用可能に。分類器の精度は強化され、サイバーセキュリティ関連の誤検知率も改善されたと報告されている。
-                </div>
-              </div>
-              <div className={styles.tItem}>
-                <div className={styles.tDate}>2026-07-07(予定)</div>
-                <div className={styles.tBody}>
-                  <b>無料利用枠の変更予定。</b>
-                  Pro/Max/Team等における週次利用枠上限50%の無料提供が終了し、以降は使用クレジット制に移行する見込み。
-                </div>
-              </div>
-            </div>
-
-            <div className={`${styles.callout} ${styles.warn}`}>
-              <span className={styles.calloutLabel}>実務への含意</span>
-              <p>
-                この一件は、「Fable 5 に固定的に依存する設計は避け、フォールバック先(Opus 4.8
-                など)を必ず用意しておく」という教訓を残した。一時停止の経緯についての公式声明は、Anthropicのニュースページで確認できる(巻末の参考文献を参照)。次章で解説する自動フォールバック機構は、まさにこの種のリスクに対する備えとしても機能する。
-              </p>
-            </div>
-          </section>
-
-          <section className={`${styles.chapter} chapter`} id="ch3">
-            <div className={styles.chapterHead}>
-              <span className={styles.chapterNum}>03</span>
-              <h2>安全分類器と自動フォールバックの仕組み</h2>
-            </div>
-
-            <p>Fable 5には、以下の3領域を対象とした安全分類器が組み込まれている。</p>
-            <ul>
-              <li>
-                <b>サイバーセキュリティ</b>:
-                攻撃的なエクスプロイト・マルウェア・攻撃ツールの構築など
-              </li>
-              <li>
-                <b>生物学・生命科学</b>: 実験手法や分子メカニズムに関する内容など
-              </li>
-              <li>
-                <b>推論内容の抽出</b>:
-                モデルの要約された思考過程をそのまま応答に転記させようとする指示
-              </li>
-            </ul>
-            <p>
-              これらに該当すると判定されたリクエストは、Fable 5では{" "}
-              <code className={styles.inlineCode}>stop_reason: &quot;refusal&quot;</code>{" "}
-              として拒否されるか、Claude Codeのようなハーネス上では自動的にOpus
-              4.8へフォールバックする。Anthropicの公表によれば、
-              <b>Fable 5セッションの95%超はフォールバックが一切発生しない</b>とのことである。
-            </p>
-
-            <h3>3.1 リクエストのライフサイクル</h3>
-            <div className={styles.diagramFrame}>
-              <div className={styles.mermaid} id="diagram-2">
-                <MermaidDiagram chart={DIAGRAMS.diagram2} />
-              </div>
-              <div className={styles.diagramCaption}>
-                図2: 安全分類器によるフォールバックのライフサイクル
-              </div>
-            </div>
-
-            <h3>3.2 実務上の注意点</h3>
-
-            <h4>初回リクエストだけで発火することがある</h4>
-            <p>
-              フォールバックはユーザーの発言内容だけでなく、セッション開始時に一緒に送られる{" "}
-              <code className={styles.inlineCode}>CLAUDE.md</code> の内容や{" "}
-              <code className={styles.inlineCode}>git status</code>
-              、ディレクトリ名などのワークスペース情報も判定対象に含む。セキュリティ関連や生物学関連の資料がリポジトリに含まれているだけで、何も入力していない段階でフォールバックすることがある。
-            </p>
-
-            <h4>トリガー源の切り分け</h4>
-            <p>
-              <code className={styles.inlineCode}>claude --safe-mode</code>{" "}
-              で起動すると、CLAUDE.md・Skills・MCPサーバー・Hooksなどのカスタマイズを無効化してセッションを開始できるため、フォールバックの原因がカスタマイズ側にあるのか、リクエスト内容そのものにあるのかを切り分けられる。
-            </p>
-
-            <h4>セキュリティ研究・生物学系タスクは高頻度でフォールバックする</h4>
-            <p>
-              ペネトレーションテストやCTF演習、生物学隣接のコードベースなどは、初回リクエストから頻繁にフォールバックが発生する「想定内の挙動」である。これはアカウントへのペナルティではない。Fable級の能力がどうしても必要な場合は、Anthropicの信頼されたアクセスプログラムへの相談が推奨されている。
-            </p>
-
-            <h4>自動切り替えを無効化し、都度確認する設定も可能</h4>
-            <p>
-              <code className={styles.inlineCode}>/config</code> から「switch models when a message
-              is
-              flagged」をオフにすると、フラグが立った際にセッションを一時停止し、Opusへの切り替えか、プロンプトを編集してFable
-              5のまま再試行するかを選べるようになる。
-            </p>
-
-            <h4>サードパーティ基盤(Bedrock/Vertex/Foundry)での自動フォールバック</h4>
-            <p>
-              モデルIDがプロバイダ固有であるため、
-              <code className={styles.inlineCode}>ANTHROPIC_DEFAULT_FABLE_MODEL</code> と{" "}
-              <code className={styles.inlineCode}>ANTHROPIC_DEFAULT_OPUS_MODEL</code>{" "}
-              を設定して、Claude CodeがどちらのモデルがFable 5/Opus
-              4.8であるかを認識できるようにする必要がある。
-            </p>
-          </section>
-
-          <section className={`${styles.chapter} chapter`} id="ch4">
-            <div className={styles.chapterHead}>
-              <span className={styles.chapterNum}>04</span>
-              <h2>プロンプティング思想の転換: チェックリストからゴールへ</h2>
-            </div>
-
-            <p>
-              これはFable 5を使いこなす上で最も重要な認識転換である。Anthropic公式の「Prompting
-              Claude Fable
-              5」ガイドは、旧世代向けに書かれた作り込み過ぎた指示(過剰な手順列挙・網羅的な禁止事項・逐次的な確認要求など)が、Fable
-              5ではむしろ性能を落とす場合があると明記している。Fable
-              5は指示追従性が大幅に向上しているため、行動を一つひとつ列挙するのではなく、短い指示で意図を伝える方が有効に機能する。
-            </p>
-
-            <h3>4.1 旧来のスタイル vs Fable 5向けのスタイル</h3>
-            <div className={styles.patternPair}>
-              <div className={`${styles.patternCard} ${styles.old}`}>
-                <span className={styles.patternTag}>Before ― Opus世代の習慣</span>
-                <p>
-                  手順を逐一列挙する → 禁止事項を網羅的に書き出す →
-                  思考過程を逐一報告させる。過剰な制約がむしろFable 5の性能を落とす。
-                </p>
-              </div>
-              <div className={`${styles.patternCard} ${styles.new}`}>
-                <span className={styles.patternTag}>After ― Fable 5向け</span>
-                <p>
-                  ゴールと「なぜそれが必要か」を伝える → 越えてはいけない境界だけを明示する →
-                  検証方法を明示する。自律的な判断力を最大限活かせる。
-                </p>
-              </div>
-            </div>
-
-            <div className={styles.callout}>
-              <span className={styles.calloutLabel}>Claude Codeチームの声</span>
-              <p>
-                Anthropic Claude Codeチームのエンジニアである Thariq Shihipar(@trq212)は、Fable
-                5導入後のチーム内の働き方の変化を「以前は &quot;Claudeが正しく作業したか&quot;
-                を検証していたが、今は &quot;そもそも正しい作業をしているか&quot;
-                を検証するようになった」という趣旨で表現している。これは、成果物の細部を逐一チェックする姿勢から、そもそもの方向性・スコープが合っているかを見る姿勢への転換を意味しており、上記の「チェックリストからゴールへ」という転換と同じ現象を、検証者側の視点から語ったものだと言える。
-              </p>
-            </div>
-
-            <h3>4.2 実践プロンプトパターン(概念の再構成・自作例)</h3>
-            <p>
-              以下は公式ガイドが示す考え方を踏まえて筆者が独自に組み立てた、Claude
-              Codeでそのまま使える日本語プロンプト断片の例である。用途に応じて適宜書き換えてほしい。
-            </p>
-
-            <div className={styles.codeBlock}>
-              <div className={styles.codeBlockLabel}>パターン A ― ゴールと理由を先に伝える</div>
-              <pre>
-                <code className="language-text">
-                  私は[対象読者]向けに[成果物]を作っています。彼らが必要としているのは{"\n"}
-                  [何がその成果物を役立たせるか]です。{"\n"}
-                  これらを踏まえて: [具体的な依頼内容]
-                </code>
-              </pre>
-            </div>
-
-            <div className={styles.codeBlock}>
-              <div className={styles.codeBlockLabel}>
-                パターン B ― 過剰な深掘り・改変を防ぐ境界指定
-              </div>
-              <pre>
-                <code className="language-text">
-                  このタスクに必要な範囲を超えて、機能追加・リファクタリング・抽象化を{"\n"}
-                  行わないでください。バグ修正には周辺の整理は不要です。まだ発生していない{"\n"}
-                  シナリオのためのエラーハンドリングやフォールバックは追加しないでください。
-                </code>
-              </pre>
-            </div>
-
-            <div className={styles.codeBlock}>
-              <div className={styles.codeBlockLabel}>
-                パターン C ― 進捗報告は「ツール結果に基づく事実」だけを許可する
-              </div>
-              <pre>
-                <code className="language-text">
-                  進捗を報告する前に、このセッション内のツール実行結果を根拠として{"\n"}
-                  各主張を確認してください。根拠を示せない内容は報告しないでください。{"\n"}
-                  テストが失敗していれば失敗した旨と出力を、未検証であれば未検証である旨を、{"\n"}
-                  率直に伝えてください。
-                </code>
-              </pre>
-            </div>
-
-            <div className={styles.codeBlock}>
-              <div className={styles.codeBlockLabel}>
-                パターン D ― 自律実行中の「許可待ち」を防ぐ
-              </div>
-              <pre>
-                <code className="language-text">
-                  あなたは自律的に動作しています。ユーザーはリアルタイムでは見ておらず、{"\n"}
-                  作業途中の質問には答えられません。元の依頼から自然に導かれる可逆的な{"\n"}
-                  操作は、確認を取らずに進めてください。ターンを終える前に、自分の最後の{"\n"}
-                  発言が「計画」「分析」「質問」「まだやっていない作業の予告」に{"\n"}
-                  なっていないか確認し、なっていれば今すぐ手を動かしてください。
-                </code>
-              </pre>
-            </div>
-
-            <p>
-              これらはいずれも「何をすべきか」を細かく指示するのではなく、「ゴール」「理由」「境界」「検証基準」の4要素を示す形になっている点が共通している。
-            </p>
-          </section>
-
-          <section className={`${styles.chapter} chapter`} id="ch5">
-            <div className={styles.chapterHead}>
-              <span className={styles.chapterNum}>05</span>
-              <h2>Effort(推論深度)レベルの使い方</h2>
-            </div>
-
-            <p>
-              Fable 5における性能・速度・コストのトレードオフを制御する最も重要なパラメータが{" "}
-              <code className={styles.inlineCode}>effort</code>{" "}
-              である。API上はモデルパラメータとして、Claude Code上は{" "}
-              <code className={styles.inlineCode}>/effort</code>{" "}
-              コマンドやモデルピッカーのスライダーとして操作する。
-            </p>
-
-            <h3>5.1 レベル一覧</h3>
-            <div className={styles.tableWrap}>
-              <table>
-                <thead>
-                  <tr>
-                    <th>レベル</th>
-                    <th>特徴</th>
-                    <th>主な用途</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <code className={styles.inlineCode}>low</code>
-                    </td>
-                    <td>高速・低コスト。知的な深さは犠牲になる</td>
-                    <td>レイテンシ重視で知的難度が低い、短く範囲の狭いタスク</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <code className={styles.inlineCode}>medium</code>
-                    </td>
-                    <td>コストを抑えつつ、ある程度の知性を維持</td>
-                    <td>コスト重視で多少の知性低下を許容できる作業</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <code className={styles.inlineCode}>high</code>
-                    </td>
-                    <td>トークン消費と知性のバランスが良い(Fable 5の既定値)</td>
-                    <td>大半のコーディング・エージェント作業</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <code className={styles.inlineCode}>xhigh</code>
-                    </td>
-                    <td>より深い推論、トークン消費は増加</td>
-                    <td>能力の上限が求められる難しいワークロード</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <code className={styles.inlineCode}>max</code>
-                    </td>
-                    <td>最も深い推論。過剰思考になりやすく収穫逓減の傾向あり</td>
-                    <td>導入前に必ず個別タスクで効果測定を行う。セッション限定設定</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <code className={styles.inlineCode}>ultracode</code>
-                    </td>
-                    <td>
-                      Claude Code独自の設定。xhighに加え、実質的なタスクごとにDynamic
-                      Workflowsを自動計画
-                    </td>
-                    <td>大規模タスクの自動オーケストレーションが必要な場合。セッション限定設定</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <p>
-              Anthropic公式ガイドは「まず<code className={styles.inlineCode}>high</code>
-              を既定とし、最も能力が求められる作業に<code className={styles.inlineCode}>xhigh</code>
-              を、日常的な定型作業には<code className={styles.inlineCode}>medium</code>/
-              <code className={styles.inlineCode}>low</code>
-              を検討する」ことを推奨している。興味深いのは、
-              <b>Fable 5の低いeffort設定でも、旧モデルのxhigh設定を上回る性能が出ることが多い</b>
-              という指摘である。つまり「常に最大effortを使う」のは必ずしも最適ではない。
-            </p>
-
-            <h3>5.2 Effortの決定優先順位</h3>
-            <div className={styles.diagramFrame}>
-              <div className={styles.mermaid} id="diagram-3">
-                <MermaidDiagram chart={DIAGRAMS.diagram3} />
-              </div>
-              <div className={styles.diagramCaption}>
-                図3: Claude CodeにおけるEffortレベルの決定優先順位
-              </div>
-            </div>
-
-            <p>
-              なお、<code className={styles.inlineCode}>ultrathink</code>{" "}
-              というキーワードをプロンプト中に含めると、セッションのeffort設定を変えずにそのターンだけ深い推論をリクエストできる。一方で「think」「think
-              hard」など他の言い回しは特別なキーワードとしては認識されず、通常の文章として扱われる点に注意してほしい。
-            </p>
-
-            <h3>5.3 過剰思考を防ぐ指示例</h3>
-            <p>
-              高いeffortで動かすと、Fable
-              5がタスクに必要な範囲を超えて調査・熟考してしまうことがある。これを防ぐには、4.2節のパターンBのような境界指定が有効である。
-            </p>
-          </section>
-
-          <section className={`${styles.chapter} chapter`} id="ch6">
-            <div className={styles.chapterHead}>
-              <span className={styles.chapterNum}>06</span>
-              <h2>Claude Code での実践設定</h2>
-            </div>
-
-            <h3>6.1 モデルの選択</h3>
-            <p>
-              Fable 5はClaude Codeの既定モデルではない。以下のいずれかで明示的に選択する必要がある。
-            </p>
-            <ul>
-              <li>
-                セッション中: <code className={styles.inlineCode}>/model fable</code>
-              </li>
-              <li>
-                起動時: <code className={styles.inlineCode}>claude --model fable</code>
-              </li>
-              <li>
-                環境変数: <code className={styles.inlineCode}>ANTHROPIC_MODEL=fable</code>
-              </li>
-              <li>
-                設定ファイル: <code className={styles.inlineCode}>settings.json</code> の{" "}
-                <code className={styles.inlineCode}>model</code> フィールド
-              </li>
-            </ul>
-            <p>
-              <code className={styles.inlineCode}>best</code> エイリアスは、組織がFable
-              5にアクセスできる場合はFable
-              5を、そうでない場合は最新のOpusを指すよう自動解決される。バージョンを固定したい場合はエイリアスではなく完全なモデル名(
-              <code className={styles.inlineCode}>claude-fable-5</code>)を指定してほしい。
-            </p>
-
-            <h3>6.2 Fable 5から最大限の成果を引き出すための基本方針</h3>
-            <p>Claude Code公式ドキュメントは、Fable 5の使い方について次の4点を挙げている。</p>
-            <ol>
-              <li>
-                <b>手順ではなく結果を説明する</b>:
-                欲しい結果を渡し、経路の計画はモデルに任せる。その結果を維持し続けたい場合は{" "}
-                <code className={styles.inlineCode}>/goal</code> を設定する。
-              </li>
-              <li>
-                <b>曖昧な問題を渡す</b>:
-                根本原因の調査、障害対応、アーキテクチャ判断など、追加の調査・検証が効果を発揮する領域に向いている。
-              </li>
-              <li>
-                <b>検証の念押しを省く</b>: Fable
-                5は指示が少なくても自ら検証を行うため、「テストして」「確認して」といったリマインダーは基本的に不要。
-              </li>
-              <li>
-                <b>タスクのサイズを大きくする</b>:
-                通常は分割するような作業も、そのままのサイズで渡してよい。長いセッションでも文脈を見失いにくい。
-              </li>
-            </ol>
-
-            <h3>6.3 サブエージェント戦略</h3>
-            <p>
-              Fable
-              5は並列サブエージェントのディスパッチ・維持において旧モデルより大幅に信頼性が向上している。実務上は、Fable
-              5を高コストな「判断役」に据え、実装の大部分は安価なモデルに任せる
-              <b>階層型のモデルルーティング</b>が推奨される。
-            </p>
-
-            <div className={styles.diagramFrame}>
-              <div className={styles.mermaid} id="diagram-4">
-                <MermaidDiagram chart={DIAGRAMS.diagram4} />
-              </div>
-              <div className={styles.diagramCaption}>
-                図4: Fable 5をオーケストレーターとする階層型サブエージェント構成
-              </div>
-            </div>
-
-            <p>
-              サブエージェントのモデルは、<code className={styles.inlineCode}>.claude/agents/</code>{" "}
-              配下のfrontmatterで <code className={styles.inlineCode}>model: sonnet</code>{" "}
-              のように指定できる。優先順位は「
-              <code className={styles.inlineCode}>CLAUDE_CODE_SUBAGENT_MODEL</code> 環境変数 &gt;
-              Agentツールの呼び出し時パラメータ &gt; frontmatter &gt;
-              メインセッションのモデル」の順である。独立したサブタスクはサブエージェントに委任し、完了を待たずに他の作業を継続する非同期的な連携が推奨されている。長時間稼働するサブエージェントは文脈を保持し続けることで、キャッシュ読み込みの恩恵を受けられ、最も遅いサブエージェントによるボトルネックも避けられる。
-            </p>
-
-            <h3>6.4 Dynamic Workflows(ultracode)の活用</h3>
-            <p>
-              1つの会話では調整しきれないほど多くのエージェントが必要なタスク(コードベース全体の監査、数百ファイル規模の移行、相互検証が必要な調査など)には、Dynamic
-              Workflowsが適している。これはFable
-              5(または他モデル)がタスクのためのオーケストレーションスクリプトを自身で書き、バックグラウンドで実行する仕組みである。
-            </p>
-            <ul>
-              <li>
-                プロンプト中に <code className={styles.inlineCode}>ultracode</code>{" "}
-                というキーワードを含めるか、「ワークフローを使って」と自然言語で依頼すると、その場でワークフローが起動する。
-              </li>
-              <li>
-                <code className={styles.inlineCode}>/effort ultracode</code>{" "}
-                を設定すると、セッション内のすべての実質的なタスクに対してワークフローを自動計画するようになる(トークン消費・時間は増加する)。
-              </li>
-              <li>
-                実行状況は <code className={styles.inlineCode}>/workflows</code>{" "}
-                で一覧・進捗確認ができる。
-              </li>
-              <li>
-                うまく機能したワークフローはコマンドとして保存し、
-                <code className={styles.inlineCode}>/</code>のオートコンプリートから再利用できる。
-              </li>
-            </ul>
-
-            <h3>6.5 Worktreeによる並列実験</h3>
-            <p>
-              <code className={styles.inlineCode}>claude --worktree</code> を使うと、独立したgit
-              worktree上でセッションを起動でき、複数のセッションが同じファイルを同時に編集する衝突を避けられる。Fable
-              5に複数の実装方針を提案させ、それぞれを別のworktree上で(コストの低いモデルの)サブエージェントに実装させた上で、差分をFable
-              5に持ち帰らせて比較・選定させる、といった使い方が実務では有効である。
-            </p>
-
-            <h3>6.6 CLAUDE.md / Skillsの再設計</h3>
-            <p>
-              Fable 5への移行時に最も見落とされがちなのが、
-              <b>旧モデル向けに書かれた過剰に規範的な指示の棚卸し</b>
-              である。公式ガイドは「旧モデル向けに開発されたSkillは、Fable
-              5にとって規範的すぎることが多く、出力品質を下げる可能性がある」と明記している。
-            </p>
-
-            <div className={styles.tableWrap}>
-              <table>
-                <thead>
-                  <tr>
-                    <th>見直すべきパターン</th>
-                    <th>理由</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>手順を1から10まで列挙したチェックリスト</td>
-                    <td>
-                      Fable 5は自ら計画を立てられるため、過剰な手順指定が創造的な判断を阻害する
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>あらゆる失敗ケースを想定した網羅的な禁止事項リスト</td>
-                    <td>
-                      弱いモデルの失敗モードを前提にした「保険」が、そのまま制約として重荷になる
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>「思考過程を説明してください」という指示</td>
-                    <td>
-                      <code className={styles.inlineCode}>reasoning_extraction</code>{" "}
-                      の拒否カテゴリに抵触し、Opusへのフォールバックを誘発する可能性がある
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>ハードコードされた日付や古い前提を含むメモ・ルールファイル</td>
-                    <td>更新されずに残り続け、誤った前提を毎セッション伝え続けてしまう</td>
-                  </tr>
-                  <tr>
-                    <td>禁止しているパターンそのものを使って書かれたルール文書</td>
-                    <td>「模範」と「指示」が矛盾し、モデルが手本の方を学習してしまう</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div className={styles.callout}>
-              <span className={styles.calloutLabel}>実務の進め方</span>
-              <p>
-                まずFable 5自身に既存の <code className={styles.inlineCode}>CLAUDE.md</code>{" "}
-                やSkillファイルを読ませ、「矛盾している箇所」「弱いモデルのための保険にすぎない箇所」「模範と矛盾する箇所」を洗い出させ、削除案をレポートさせた上で、実際の削除判断は人間が行う、という「監査は任せるが決定は自分でする」進め方が有効である。
-              </p>
-            </div>
-          </section>
-
-          <section className={`${styles.chapter} chapter`} id="ch7">
-            <div className={styles.chapterHead}>
-              <span className={styles.chapterNum}>07</span>
-              <h2>Loop Engineering: 長時間自律ループの設計思想</h2>
-            </div>
-
-            <p>
-              2026年6月から7月にかけて、Fable
-              5のような長時間自律動作が可能なモデルの登場と歩調を合わせる形で、&quot;Loop
-              Engineering&quot;(ループ・エンジニアリング)という概念がAI開発者コミュニティで急速に広がった。これは本ガイドが参照した投稿の著者である
-              Thariq Shihipar が所属する、Claude Codeチームの内外で語られている考え方でもあり、Fable
-              5を実務で使いこなす上での重要な補助線になる。
-            </p>
-
-            <h3>7.1 提唱者たちの発言</h3>
-            <div className={styles.tableWrap}>
-              <table>
-                <thead>
-                  <tr>
-                    <th>発信者</th>
-                    <th>要旨</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      Boris Cherny
-                      <br />
-                      <span className={styles.authorSub}>Claude Code創設者 / Anthropic</span>
-                    </td>
-                    <td>
-                      「もうClaudeに直接プロンプトを書くことはない。プロンプトを送っているのはループの方で、私の仕事はループを書くことだ」という趣旨の発言をWorkOSのイベントで行い、大きな反響を呼んだ。
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      Peter Steinberger
-                      <br />
-                      <span className={styles.authorSub}>OpenClaw創設者</span>
-                    </td>
-                    <td>
-                      同様に「コーディングエージェントに直接プロンプトを書くのをやめ、エージェントにプロンプトを送るループを設計すべきだ」と発信している。
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Andrew Ng</td>
-                    <td>
-                      著書『The
-                      Batch』にて、ソフトウェア開発を「エージェンティックコーディングループ(分単位)」「開発者フィードバックループ(時間単位)」「外部フィードバックループ(日〜週単位)」という3つの入れ子構造として整理した。人間がエージェントより多くの情報(顧客理解や審美眼など)を持っている限り、人間はこのループに関与し続ける必要があるという「文脈的優位性(context
-                      advantage)」という考え方を提示している。
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      Addy Osmani
-                      <br />
-                      <span className={styles.authorSub}>Google</span>
-                    </td>
-                    <td>
-                      この一連の実践に &quot;Loop Engineering&quot;
-                      という名前を与え、ボトルネックが「コードを書くこと」から「コードが正しく動くことを証明すること」へ移ったと論じている。
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      Lance Martin
-                      <br />
-                      <span className={styles.authorSub}>Anthropic</span>
-                    </td>
-                    <td>
-                      Fable
-                      5を用いた実験で、独立した文脈を持つ検証用サブエージェントが自己批評よりも一貫して優れた結果を出すことを報告している。
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div className={`${styles.callout} ${styles.warn}`}>
-              <span className={styles.calloutLabel}>留意点: 懐疑的な見方も存在する</span>
-              <p>
-                これらの発信はいずれもX(旧Twitter)上で行われ、賛否を含め活発な議論を呼んでいる。懐疑的な意見としては、「本質的にはただのwhileループにすぎない」「トークン消費が跳ね上がる」(実際にUberが社内のエージェントツール利用料を1人あたり月1,500ドルに上限設定したという報告もある)、「ベンダーの成功事例はすでにその製品を使っているユーザーからのデータであり、サンプリングバイアスがある」といった指摘も出ている。実務では、こうした肯定・否定双方の視点を踏まえて導入判断をするのが健全である。
-              </p>
-            </div>
-
-            <h3>7.2 Claude Code の /goal と /loop</h3>
-            <p>
-              Loop Engineeringという発想を、Claude Codeでは{" "}
-              <code className={styles.inlineCode}>/goal</code> コマンドと{" "}
-              <code className={styles.inlineCode}>/loop</code>{" "}
-              コマンドという具体的な機能として実装している。
-            </p>
-            <ul>
-              <li>
-                <b>
-                  <code className={styles.inlineCode}>/goal &lt;条件&gt;</code>
-                </b>
-                : 検証可能な完了条件を設定すると、Fable
-                5が1ターン作業するたびに、作業を行っているモデルとは別の(既定では軽量な)評価モデルがトランスクリプトを読み、条件が満たされたかどうかをYes/Noで判定する。満たされていなければ、その理由を踏まえて次のターンが自動的に始まる。
-              </li>
-              <li>
-                <b>
-                  <code className={styles.inlineCode}>/loop &lt;指示&gt;</code>
-                </b>
-                : 条件による判定ではなく、時間間隔で繰り返し実行する場合に使用する。
-              </li>
-            </ul>
-
-            <div className={styles.diagramFrame}>
-              <div className={styles.mermaid} id="diagram-5">
-                <MermaidDiagram chart={DIAGRAMS.diagram5} />
-              </div>
-              <div className={styles.diagramCaption}>図5: /goal による検証ループのシーケンス</div>
-            </div>
-
-            <p>
-              この設計の核心は、<b>「作業をするモデル」と「完了を判定するモデル」を分離している</b>
-              点にある。単一のモデルに自分の仕事を自己採点させると、平凡な出来栄えでも「よくできた」と過大評価してしまう傾向があるためである。Anthropicのエンジニアリングブログでも、標準的な評価者を懐疑的にチューニングする方が、生成モデル自身に批判的な自己評価をさせるより現実的だ、という趣旨の指摘がされている。
-            </p>
-
-            <p>
-              <code className={styles.inlineCode}>/goal</code>{" "}
-              の条件を書く際のコツは以下の3点に集約される。
-            </p>
-            <ol>
-              <li>
-                <b>測定可能な終了状態を1つ定める</b>:
-                テスト結果、ビルドの終了コード、ファイル数、キューが空になったことなど
-              </li>
-              <li>
-                <b>どう証明するかを明記する</b>: 「
-                <code className={styles.inlineCode}>npm test</code> が exit code 0
-                で終わる」のように、Fableの出力自体が証拠になる形にする
-              </li>
-              <li>
-                <b>守るべき制約を明記する</b>:
-                「他のテストファイルを変更しない」など、途中で崩れてはいけない条件も書く
-              </li>
-            </ol>
-
-            <p>
-              評価モデルはトランスクリプトを読むだけで、コマンドを自ら実行したりファイルを直接確認したりはしない。したがって「わかりやすく体裁の整った進捗報告」と「実際に検証された事実」を混同しないよう、Fable
-              5自身に根拠を明示させる指示(4.2節 of
-              パターンC)と組み合わせることが重要である。また、無条件で朝まで走らせるような使い方は推奨されておらず、ターン数や時間の上限を条件に含めておくことが安全策として案内されている。
-            </p>
-          </section>
-
-          <section className={`${styles.chapter} chapter`} id="ch8">
-            <div className={styles.chapterHead}>
-              <span className={styles.chapterNum}>08</span>
-              <h2>Thariq の「Unknowns フレームワーク」(参照ポスト解説)</h2>
-            </div>
-
-            <p>
-              ご提示いただいた投稿(Thariq Shihipar, &quot;A Field Guide to Fable: Finding Your
-              Unknowns&quot;, 2026年7月3日)は、Fable 5を使う中で著者が繰り返し学んだ教訓として「
-              <b>地図は現地そのものではない</b>
-              」という比喩を掲げている。ここでの「地図」とは、Fableに与えるプロンプトやSkill、コンテキストのことであり、「現地」とは実装時に実際に立ちはだかる制約や現実を指す。この投稿の核心的な主張は、エージェンティックコーディングの成否は
-              <b>
-                実装の前と最中に、自分自身の&quot;unknowns(未知の要素)&quot;をどれだけ明確にできるか
-              </b>
-              にかかっている、というものである。
-            </p>
-
-            <h3>8.1 4つの象限</h3>
-            <p>
-              Thariqは、政治家ドナルド・ラムズフェルドの知識分類(および後にスラヴォイ・ジジェクが加えた4つ目の区分)を借りて、プロンプトに潜む情報の非対称性を次の4象限に整理している。
-            </p>
-
-            <div className={styles.quadrant}>
-              <div className={`${styles.qCell} ${styles.qKnown}`}>
-                <div className={styles.qTitle}>
-                  <span>QUADRANT 1</span>Known Knowns(既知の既知)
-                </div>
-                <div className={styles.qDesc}>
-                  自分もFable
-                  5も明確に理解している、明示済みの指示。例:「この関数の戻り値の型はstringにする」
-                </div>
-              </div>
-              <div className={`${styles.qCell} ${styles.qPartial}`}>
-                <div className={styles.qTitle}>
-                  <span>QUADRANT 2</span>Known Unknowns(既知の未知)
-                </div>
-                <div className={styles.qDesc}>
-                  自分が「まだ決まっていない」と認識しているギャップ。例:「エラー時の挙動をどうするかはまだ決めていない」
-                </div>
-              </div>
-              <div className={`${styles.qCell} ${styles.qUnknown}`}>
-                <div className={styles.qTitle}>
-                  <span>QUADRANT 3</span>Unknown Knowns(未知の既知)
-                </div>
-                <div className={styles.qDesc}>
-                  自分は無意識に分かっている(センス・美意識・業界の慣習など)が、言語化していない暗黙の基準。例:コードの「きれいさ」の基準を説明せずに期待している
-                </div>
-              </div>
-              <div className={`${styles.qCell} ${styles.qPartial} ${styles.qPartialStrong}`}>
-                <div className={styles.qTitle}>
-                  <span>QUADRANT 4</span>Unknown Unknowns(未知の未知)
-                </div>
-                <div className={styles.qDesc}>
-                  自分がそもそも結果に影響すると想定していなかった要因。例:想定していなかったレガシーな依存関係の存在
-                </div>
-              </div>
-            </div>
-
-            <p>
-              Thariqの観察によれば、Fable
-              5の出力品質が頭打ちになる最大の要因は、大抵この第3・第4象限、つまり
-              <b>自分自身がその前提の存在にすら気づいていない領域</b>にある。開発者が「Fable
-              5は要件を理解していない」と感じる場面の多くは、実際には要件そのものにこうしたunknownsが潜んでいることが原因だ、というのがこの投稿の重要な指摘である。
-            </p>
-
-            <h3>8.2 5つの実践技法</h3>
-            <p>
-              このフレームワークに対応する形で、Thariqは実装前・実装中・実装後の3段階にわたる5つの具体的な技法を提示している。
-            </p>
-
-            <div className={styles.diagramFrame}>
-              <div className={styles.mermaid} id="diagram-6">
-                <MermaidDiagram chart={DIAGRAMS.diagram6} />
-              </div>
-              <div className={styles.diagramCaption}>
-                図6: Unknownsを段階的に可視化する5つの技法
-              </div>
-            </div>
-
-            <p>
-              この5つの技法に共通する狙いは、
-              <b>
-                第3・第4象限(Unknown Knowns / Unknown
-                Unknowns)にある要素を、少しずつ第1・第2象限(Known Knowns / Known
-                Unknowns)へ移していく
-              </b>
-              ことである。特に④のImplementation Notesは、Fable
-              5が実装の各ステップに入る前に前提を書き出すことで、開発者がリアルタイムでunknownsを検知・介入できるようにする点で、9章で述べるメモリシステムや検証ループの設計とも密接に関連している。また⑤のQuiz
-              &amp;
-              Pitchは、完成後に成果物について小テストをしたり、ステークホルダーへのピッチのような形で設計判断を説明させたりすることで、実装中に無意識に行っていた仮定を逆に暴き出す、という点がユニークな工夫である。
-            </p>
-
-            <div className={styles.callout}>
-              <span className={styles.calloutLabel}>7章との接続</span>
-              <p>
-                このフレームワークは、7章で紹介したLoop
-                Engineeringの考え方(検証条件をどう設計するか)とも補完関係にある。
-                <code className={styles.inlineCode}>/goal</code> の条件を書く作業自体が、実は「Known
-                Unknowns」を「Known
-                Knowns」に変換する作業そのものだと捉えると、両者のつながりが見えてくる。
-              </p>
-            </div>
-          </section>
-
-          <section className={`${styles.chapter} chapter`} id="ch9">
-            <div className={styles.chapterHead}>
-              <span className={styles.chapterNum}>09</span>
-              <h2>検証ループとメモリシステムの設計</h2>
-            </div>
-
-            <h3>9.1 検証はサブエージェントに任せる</h3>
-            <p>
-              Fable 5は自己検証の精度も高いモデルだが、Anthropicの実験・Lance
-              Martinの報告いずれにおいても、<b>独立した文脈を持つ検証専用のサブエージェント</b>
-              が自己批評よりも一貫して優れた結果を出すことが確認されている。長時間タスクでは「[X]間隔で自分の作業を確認する仕組みを確立し、その間隔ごとにサブエージェントで仕様と照らし合わせて検証する」という趣旨の指示を、明示的にプロンプトへ含めることが推奨される。
-            </p>
-
-            <h3>9.2 ファイルベースのメモリシステム</h3>
-            <p>
-              Fable
-              5は、過去の実行から得た教訓を記録し、それを参照できる状態にしておくと特によいパフォーマンスを発揮する。実装はシンプルなMarkdownファイルで構わない。
-            </p>
-            <ul>
-              <li>1つの教訓につき1ファイル、先頭に一行要約をつける</li>
-              <li>「なぜそれが重要だったか」も含め、修正内容・確認済みの方針の両方を記録する</li>
-              <li>会話履歴やリポジトリの内容としてすでに残っている情報は保存しない</li>
-              <li>既存のメモは重複作成せず更新し、誤りだと判明したメモは削除する</li>
-            </ul>
-
-            <p>
-              過去のセッション群からこの仕組みを立ち上げたい場合は、Fable
-              5自身にサブエージェントを使って過去のセッションを振り返らせ、テーマや教訓を抽出・保存させ、以後その保存先を参照するよう指示する、という「自己ブートストラップ」的な使い方も有効である。実際にAnthropicの内部テストでは、このような永続的なファイルベースの記憶を与えることで、
-              <i>Slay the Spire</i> のようなゲームをプレイさせた際にOpus
-              4.8比で成績が大幅に向上したという報告もある。
-            </p>
-
-            <h3>9.3 長時間実行特有の注意点</h3>
-
-            <div className={`${styles.callout} ${styles.warn}`}>
-              <span className={styles.calloutLabel}>早期停止</span>
-              <p>
-                長いセッションの終盤で、Fable
-                5が「これからXを実行します」という意図表明だけをして実際のツール呼び出しをしなかったり、十分な情報があるのに許可を求めて止まってしまうことがある。「続けて」の一言で再開するが、無人運用のパイプラインでは、ユーザーが見ていないこと・確認が返せないことを明示し、可逆的な操作については確認なしで進めるよう指示しておくと安定する。
-              </p>
-            </div>
-
-            <div className={`${styles.callout} ${styles.warn}`}>
-              <span className={styles.calloutLabel}>コンテキスト予算への過剰反応</span>
-              <p>
-                残りトークン数のカウントダウンをモデルに見せる設計だと、必要以上に「新しいセッションを始めましょうか」といった提案をしてくることがある。可能であればコンテキスト残量を明示的に見せない設計にするか、「コンテキストは十分残っているので気にせず続けてください」という一文を添えるとよい。
-              </p>
-            </div>
-
-            <div className={`${styles.callout} ${styles.warn}`}>
-              <span className={styles.calloutLabel}>クライアント側のタイムアウト調整</span>
-              <p>
-                高いeffort設定での個個のリクエストは数分から数時間に及ぶことがある。API/ハーネスを自作している場合は、タイムアウト・ストリーミング・進捗表示の設計を見直し、ブロッキングではなく非同期的(スケジュールジョブなど)に実行状況を確認する構成に寄せることが推奨されている。
-              </p>
-            </div>
-          </section>
-
-          <section className={`${styles.chapter} chapter`} id="ch10">
-            <div className={styles.chapterHead}>
-              <span className={styles.chapterNum}>10</span>
-              <h2>モデル選定フローとコスト管理</h2>
-            </div>
-
-            <h3>10.1 モデル選定フロー</h3>
-            <div className={styles.diagramFrame}>
-              <div className={styles.mermaid} id="diagram-7">
-                <MermaidDiagram chart={DIAGRAMS.diagram7} />
-              </div>
-              <div className={styles.diagramCaption}>図7: タスク特性に応じたモデル選定の決定木</div>
-            </div>
-
-            <h3>10.2 コスト管理の考え方</h3>
-            <p>
-              Fable 5は入力$10/出力$50(100万トークンあたり)と、Opus
-              4.8の2倍程度の単価である。すべてのターンをFable
-              5で処理するのは、想定外に高額な請求につながる最も簡単な方法だとよく指摘される。実務では以下の分散が有効である。
-            </p>
-
-            <div className={styles.tableWrap}>
-              <table>
-                <thead>
-                  <tr>
-                    <th>役割</th>
-                    <th>推奨モデル</th>
-                    <th>理由</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>計画・アーキテクチャ判断・最終レビュー</td>
-                    <td>Fable 5</td>
-                    <td>曖昧さの処理・長時間の一貫性・自己検証能力が活きる領域</td>
-                  </tr>
-                  <tr>
-                    <td>通常の実装作業</td>
-                    <td>Sonnet 5 / Opus 4.8</td>
-                    <td>コストと性能のバランスが良い</td>
-                  </tr>
-                  <tr>
-                    <td>コード検索・棚卸し・単純な反復作業</td>
-                    <td>Haiku 4.5</td>
-                    <td>低コストで十分な精度が出る</td>
-                  </tr>
-                  <tr>
-                    <td>コードレビュー・診断(最終判断)</td>
-                    <td>Fable 5(高effort)</td>
-                    <td>「安全に出荷できるか」という判断そのものが強みを発揮する領域</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <p>
-              またサブエージェントを増やすとトークン消費は単純に掛け算で増えるため、チームは小さく保ち、起動プロンプトは焦点を絞り、役目を終えたサブエージェントは早めに終了させることが推奨されている。大規模タスクの前には{" "}
-              <code className={styles.inlineCode}>/model</code>{" "}
-              で現在のモデルを確認し、定型作業は小さいモデルに任せる判断を習慣化すると良い。
-            </p>
-          </section>
-
-          <section className={`${styles.chapter} chapter`} id="ch11">
-            <div className={styles.chapterHead}>
-              <span className={styles.chapterNum}>11</span>
-              <h2>よくある落とし穴(アンチパターン)</h2>
-            </div>
-
-            <div className={styles.tableWrap}>
-              <table>
-                <thead>
-                  <tr>
-                    <th>アンチパターン</th>
-                    <th>何が起きるか</th>
-                    <th>対処</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Opus世代のプロンプトをそのまま流用する</td>
-                    <td>過剰な手順指定・禁止事項がFable 5の自律的判断を阻害し、性能が落ちる</td>
-                    <td>CLAUDE.md/Skillsを棚卸しし、ゴール・理由・境界・検証の4要素に再構成する</td>
-                  </tr>
-                  <tr>
-                    <td>常に最大effort(xhigh/max)で動かす</td>
-                    <td>
-                      トークン消費が増えるだけでなく、過剰思考・過剰な調査で逆に遅くなることがある
-                    </td>
-                    <td>タスクの難度に応じてhighを基準に上下させる。導入前に効果測定する</td>
-                  </tr>
-                  <tr>
-                    <td>「思考過程を説明して」と指示する</td>
-                    <td>
-                      reasoning_extractionカテゴリに抵触し、Opusへの意図しないフォールバックを誘発しうる
-                    </td>
-                    <td>推論の可視性が必要な場合は構造化されたthinkingブロックを読む設計にする</td>
-                  </tr>
-                  <tr>
-                    <td>セキュリティ関連のリポジトリでFable 5をそのまま使う</td>
-                    <td>初回リクエストからフォールバックが頻発し、想定より遅く・高くつく</td>
-                    <td>該当領域は最初からOpus 4.8を使うか、--safe-modeで原因を切り分ける</td>
-                  </tr>
-                  <tr>
-                    <td>すべてのサブタスクをFable 5に担わせる</td>
-                    <td>コストが不必要に膨らむ</td>
-                    <td>
-                      オーケストレーターはFable
-                      5、実装はSonnet/Opus、検索はHaiku、という階層構造にする
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>無条件・無期限の/goalや自律ループを一晩放置する</td>
-                    <td>想定外の挙動やコスト超過に気づけない</td>
-                    <td>条件にターン数・時間の上限を含め、最初の数サイクルは監視する</td>
-                  </tr>
-                  <tr>
-                    <td>進捗報告を鵜呑みにする</td>
-                    <td>「テストが通りました」という報告が実際には未検証であるケースがある</td>
-                    <td>根拠となるツール実行結果の提示を明示的に要求する</td>
-                  </tr>
-                  <tr>
-                    <td>単一モデルによる自己採点だけで完了と判断する</td>
-                    <td>平凡な出来を「良くできた」と過大評価しがちである</td>
-                    <td>独立した文脈を持つ検証サブエージェントや/goalの評価モデルを併用する</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          <section className={`${styles.chapter} chapter`} id="ch12">
-            <div className={styles.chapterHead}>
-              <span className={styles.chapterNum}>12</span>
-              <h2>実力・ベンチマークと「検証必須」の理由</h2>
-            </div>
-
-            <p>
-              Fable 5は複数のベンチマークで高い成績を収めている。例えば Center for AI Safety と
-              Scale AI Labs が公表した Remote Labor
-              Index(実在するフリーランス案件240件を人間の専門家基準で採点するベンチマーク)では、Fable
-              5は16.1%の案件で人間の専門家と同等かそれを上回る成果を出し、Opus
-              4.8(8.3%)やGPT-5.5(6.3%)を上回った。ただし裏を返せば、
-              <b>このベンチマークでもプロ品質に届いた案件は6件に1件程度</b>
-              であり、過信は禁物である。
-            </p>
-
-            <div className={styles.specGrid}>
-              <div className={styles.specItem}>
-                <div className={styles.specLabel}>Fable 5</div>
-                <div className={styles.specValue}>16.1%</div>
-              </div>
-              <div className={styles.specItem}>
-                <div className={styles.specLabel}>Opus 4.8</div>
-                <div className={styles.specValue}>8.3%</div>
-              </div>
-              <div className={styles.specItem}>
-                <div className={styles.specLabel}>GPT-5.5</div>
-                <div className={styles.specValue}>6.3%</div>
-              </div>
-            </div>
-            <p className={styles.specCaption}>
-              Remote Labor Index: 人間の専門家と同等以上と判定された案件の割合
-            </p>
-
-            <p>
-              法律分野の実践検証を行った Artificial Lawyer の記事では、Fable
-              5は個別の評価基準(criteria)ベースでは約90%の精度で正答する一方、法律文書の完成品全体として完全に正しいと言える出力は約11%程度にとどまったと報告されている。これは「部分点は高いが、成果物全体を無検証でそのまま採用するのは危険」という典型的な傾向を示しており、Fable
-              5に限らず高性能モデル全般に当てはまる教訓である。専門性が求められる領域では、人間によるレビューを省略しない設計が引き続き重要である。
-            </p>
-
-            <div className={styles.callout}>
-              <span className={styles.calloutLabel}>
-                &quot;Claudish&quot;の噂に見る一次情報の重要性
-              </span>
-              <p>
-                Fable
-                5をめぐっては「長時間の複数エージェントセッションで独自の省略言語(通称&quot;Claudish&quot;)を発達させる」という噂がSNS上で広がったが、これを多角的に裏取りした分析記事では、そのような現象の出どころは確認できず、実際に文書化されているのは「長時間セッションの終盤で、ユーザー向けの要約が矢印の連鎖のような密な省略表現になりやすい」という、より地味な挙動だったと結論づけられている。Anthropic自身もこの挙動を認識しており、最終的な要約では省略表現を避け、完全な文章で書き直すよう促す一文を加える対処法を公式ガイドに含めている。この一件は、AIモデルに関する派手な噂ほど、一次情報(公式ドキュメントやAPIの挙動そのもの)に立ち返って検証する価値がある、という良い教訓例である。
-              </p>
-            </div>
-          </section>
-
-          <section className={`${styles.chapter} chapter`} id="ch13">
-            <div className={styles.chapterHead}>
-              <span className={styles.chapterNum}>13</span>
-              <h2>既知の制限事項</h2>
-            </div>
-
-            <ul>
-              <li>
-                <b>Zero Data Retention(ZDR)非対応</b>: Fable 5・Mythos
-                5はいずれも30日間データ保持の「Covered
-                Model」であり、ZDRの対象外である。厳格なデータ保持要件がある組織は、Claude Codeの
-                <code className={styles.inlineCode}>/model</code>ピッカー上でFable
-                5が非表示または無効化されている場合がある。
-              </li>
-              <li>
-                <b>実在する公人になり代わった発言はできない</b>:
-                創作におけるフィクションのキャラクターは問題ないが、実言する著名人の発言として言葉を作り出すことは避ける設計になっている。
-              </li>
-              <li>
-                <b>サイバーセキュリティ・生物学領域は不得手というより「意図的に不可」</b>:
-                該当領域での能力そのものはMythos 5と共通だが、Fable
-                5では安全分類器によって意図的にOpus 4.8へフォールバックするよう設計されている。
-              </li>
-              <li>
-                <b>モデルは日々アップデートされる</b>:
-                本ガイド執筆時点(2026年7月上旬)の情報であり、価格・利用枠・分類器の精度・コマンド仕様などは今後変更される可能性がある。特に無料利用枠の条件(2026年7月7日ごろまでの週次利用枠上限50%)は近い将来に変わることが予告されている。最新情報は必ず公式ドキュメントで確認してほしい。
-              </li>
-            </ul>
-          </section>
-
-          <section className={`${styles.chapter} chapter`} id="ch14">
-            <div className={styles.chapterHead}>
-              <span className={styles.chapterNum}>14</span>
-              <h2>まとめ</h2>
-            </div>
-
-            <p>
-              Claude Fable 5をClaude Codeで使いこなす上でのポイントを一言でまとめると、
-              <b>「細かく指示する」から「ゴールと検証基準を渡し、あとは任せる」への発想転換</b>
-              に尽きる。これは単なるプロンプトの書き方の変化ではなく、
-            </p>
-            <ul>
-              <li>モデル選定(Fable 5をオーケストレーター、他モデルをワーカーに据える階層設計)</li>
-              <li>Effortレベルの使い分け</li>
-              <li>
-                検証ループの設計(<code className={styles.inlineCode}>/goal</code>
-                、独立した検証サブエージェント)
-              </li>
-              <li>メモリシステム(ファイルベースの教訓の蓄積)</li>
-              <li>自分自身のunknownsを可視化する技法(Thariqのフレームワーク)</li>
-            </ul>
-            <p>
-              という複数のレイヤーにまたがる設計思想の転換である。同時に、ベンチマーク上の高い成績や華々しい発表の裏にも、部分点と完成品の間には依然としてギャップがあること、SNS上の噂は一次情報で裏取りする必要があることも忘れずに、実務では検証を省略しない姿勢を保つことが重要である。
-            </p>
-          </section>
-
-          <section className={`${styles.chapter} chapter`} id="ch15">
-            <div className={styles.chapterHead}>
-              <span className={styles.chapterNum}>15</span>
-              <h2>参考文献・ソースURL一覧</h2>
-            </div>
-
-            <div className={styles.refGroup}>
-              <h4>公式ドキュメント・公式発表(Anthropic)</h4>
-              <ul className={styles.refList}>
-                <li>
-                  <span className={styles.refTitle}>
-                    Anthropic「Claude Fable 5 and Claude Mythos 5」(発表記事)
-                  </span>
-                  <Ext href="https://www.anthropic.com/news/claude-fable-5-mythos-5">
-                    https://www.anthropic.com/news/claude-fable-5-mythos-5
-                  </Ext>
-                </li>
-                <li>
-                  <span className={styles.refTitle}>
-                    Anthropic「Redeploying Claude Fable 5」(輸出規制解除後の復旧に関する声明)
-                  </span>
-                  <Ext href="https://www.anthropic.com/news/redeploying-fable-5">
-                    https://www.anthropic.com/news/redeploying-fable-5
-                  </Ext>
-                </li>
-                <li>
-                  <span className={styles.refTitle}>
-                    Claude Platform Docs「Introducing Claude Fable 5 and Claude Mythos 5」
-                  </span>
-                  <Ext href="https://platform.claude.com/docs/en/about-claude/models/introducing-claude-fable-5-and-claude-mythos-5">
-                    https://platform.claude.com/docs/en/about-claude/models/introducing-claude-fable-5-and-claude-mythos-5
-                  </Ext>
-                </li>
-                <li>
-                  <span className={styles.refTitle}>
-                    Claude Platform Docs「Prompting Claude Fable
-                    5」(公式プロンプトガイド、本ガイド4章・6章の一次情報)
-                  </span>
-                  <Ext href="https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5">
-                    https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5
-                  </Ext>
-                </li>
-                <li>
-                  <span className={styles.refTitle}>
-                    Claude Platform Docs「Prompting best practices」
-                  </span>
-                  <Ext href="https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices">
-                    https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices
-                  </Ext>
-                </li>
-                <li>
-                  <span className={styles.refTitle}>
-                    Claude Code Docs「Model
-                    configuration」(モデル選択・effort設定・自動フォールバックの一次情報)
-                  </span>
-                  <Ext href="https://code.claude.com/docs/en/model-config">
-                    https://code.claude.com/docs/en/model-config
-                  </Ext>
-                </li>
-                <li>
-                  <span className={styles.refTitle}>
-                    Claude Code Docs「Orchestrate subagents at scale with dynamic workflows」
-                  </span>
-                  <Ext href="https://code.claude.com/docs/en/workflows">
-                    https://code.claude.com/docs/en/workflows
-                  </Ext>
-                </li>
-                <li>
-                  <span className={styles.refTitle}>
-                    Claude Code Docs「Run agents in parallel」
-                  </span>
-                  <Ext href="https://code.claude.com/docs/en/agents">
-                    https://code.claude.com/docs/en/agents
-                  </Ext>
-                </li>
-                <li>
-                  <span className={styles.refTitle}>
-                    Claude Code Docs「Run parallel sessions with worktrees」
-                  </span>
-                  <Ext href="https://code.claude.com/docs/en/worktrees">
-                    https://code.claude.com/docs/en/worktrees
-                  </Ext>
-                </li>
-                <li>
-                  <span className={styles.refTitle}>
-                    Claude Code Docs「Keep Claude working toward a goal」(/goalコマンドの一次情報)
-                  </span>
-                  <Ext href="https://code.claude.com/docs/en/goal">
-                    https://code.claude.com/docs/en/goal
-                  </Ext>
-                </li>
-                <li>
-                  <span className={styles.refTitle}>Claude Code Docs「Glossary」</span>
-                  <Ext href="https://code.claude.com/docs/en/glossary">
-                    https://code.claude.com/docs/en/glossary
-                  </Ext>
-                </li>
-                <li>
-                  <span className={styles.refTitle}>Claude Code Docs「Subagents in the SDK」</span>
-                  <Ext href="https://code.claude.com/docs/en/agent-sdk/subagents">
-                    https://code.claude.com/docs/en/agent-sdk/subagents
-                  </Ext>
-                </li>
-              </ul>
-            </div>
-
-            <div className={styles.refGroup}>
-              <h4>著名な開発者・業界関係者の発信(引用元の投稿を含む)</h4>
-              <ul className={styles.refList}>
-                <li>
-                  <span className={styles.refTitle}>
-                    Thariq Shihipar(Anthropic, Claude Codeチーム)「A Field Guide to Fable: Finding
-                    Your Unknowns」― 本ガイドで提示いただいた投稿。8章の一次情報
-                  </span>
-                  <Ext href="https://x.com/trq212/status/2073100352921215386">
-                    https://x.com/trq212/status/2073100352921215386
-                  </Ext>
-                </li>
-                <li>
-                  <span className={styles.refTitle}>
-                    Thariq Shihipar「Fable is a step-change in models...」― Fable 5導入後のClaude
-                    Codeチームの働き方変化に関する投稿。4章で言及
-                  </span>
-                  <Ext href="https://x.com/trq212/status/2064437561930682672">
-                    https://x.com/trq212/status/2064437561930682672
-                  </Ext>
-                </li>
-                <li>
-                  <span className={styles.refTitle}>
-                    ClaudeDevs(Anthropic公式アカウント)「Claude Fable 5 changed how we work on the
-                    Claude Code team day to day」
-                  </span>
-                  <Ext href="https://x.com/ClaudeDevs/status/2064399512664526853">
-                    https://x.com/ClaudeDevs/status/2064399512664526853
-                  </Ext>
-                </li>
-                <li>
-                  <span className={styles.refTitle}>
-                    Andrew Ng「My 3 key loops for building 0-to-1 products」(The Batch,
-                    2026年6月26日号。7章の一次情報)
-                  </span>
-                  <Ext href="https://x.com/AndrewYNg/status/2071988145667928442">
-                    https://x.com/AndrewYNg/status/2071988145667928442
-                  </Ext>
-                  {" / "}
-                  <Ext href="https://www.deeplearning.ai/the-batch/issue-359">
-                    https://www.deeplearning.ai/the-batch/issue-359
-                  </Ext>
-                </li>
-              </ul>
-            </div>
-
-            <div className={styles.refGroup}>
-              <h4>分析・解説記事(二次情報、事実確認のうえ引用)</h4>
-              <ul className={styles.refList}>
-                <li>
-                  <span className={styles.refTitle}>
-                    AlphaSignal AI「How to Actually Prompt Claude Fable
-                    5」(公式ガイドの実務的な要約)
-                  </span>
-                  <Ext href="https://alphasignalai.substack.com/p/how-to-actually-prompt-claude-fable">
-                    https://alphasignalai.substack.com/p/how-to-actually-prompt-claude-fable
-                  </Ext>
-                </li>
-                <li>
-                  <span className={styles.refTitle}>
-                    Ken Huang「Claude Fable 5: What Changed, and How to Stop Prompting It Like
-                    Opus」(&quot;Claudish&quot;の噂の裏取りを含む)
-                  </span>
-                  <Ext href="https://kenhuangus.substack.com/p/claude-fable-5-what-changed-and-how">
-                    https://kenhuangus.substack.com/p/claude-fable-5-what-changed-and-how
-                  </Ext>
-                </li>
-                <li>
-                  <span className={styles.refTitle}>
-                    Wavect Blog「Fable Is Back. Here's How to Actually Code With It」(Claude
-                    Codeでの実践的なモデルルーティング例)
-                  </span>
-                  <Ext href="https://wavect.io/blog/coding-with-claude-fable-5/">
-                    https://wavect.io/blog/coding-with-claude-fable-5/
-                  </Ext>
-                </li>
-                <li>
-                  <span className={styles.refTitle}>
-                    MCP.Directory「Fable 5 in Claude Code: Routing &amp;
-                    Limits」(サブエージェント設定・フォールバック挙動の実務ガイド)
-                  </span>
-                  <Ext href="https://mcp.directory/blog/fable-5-claude-code-model-routing-guide-2026">
-                    https://mcp.directory/blog/fable-5-claude-code-model-routing-guide-2026
-                  </Ext>
-                </li>
-                <li>
-                  <span className={styles.refTitle}>
-                    Product Compass「Claude Fable 5 for PMs: Ultimate Guide」(CLAUDE.md棚卸しの実例)
-                  </span>
-                  <Ext href="https://www.productcompass.pm/p/claude-fable-5-guide">
-                    https://www.productcompass.pm/p/claude-fable-5-guide
-                  </Ext>
-                </li>
-                <li>
-                  <span className={styles.refTitle}>
-                    Artificial Lawyer「Anthropic's 'Dangerous' Fable Is Back! How Does It
-                    Do?」(法律分野での実力検証。12章の一次情報)
-                  </span>
-                  <Ext href="https://www.artificiallawyer.com/2026/07/02/anthropics-dangerous-fable-is-back-how-does-it-do/">
-                    https://www.artificiallawyer.com/2026/07/02/anthropics-dangerous-fable-is-back-how-does-it-do/
-                  </Ext>
-                </li>
-                <li>
-                  <span className={styles.refTitle}>
-                    The Rundown AI「Anthropic's Fable returns
-                    worldwide」(復旧後の分類器精度に関する報道)
-                  </span>
-                  <Ext href="https://www.therundown.ai/p/anthropic-fable-returns-worldwide">
-                    https://www.therundown.ai/p/anthropic-fable-returns-worldwide
-                  </Ext>
-                </li>
-                <li>
-                  <span className={styles.refTitle}>
-                    dsebastien.net「Loop Engineering Went Mainstream」(Loop
-                    Engineeringを巡る賛否両論のまとめ、Boris Cherny/Peter Steinberger発言の出典)
-                  </span>
-                  <Ext href="https://www.dsebastien.net/loop-engineering-went-mainstream/">
-                    https://www.dsebastien.net/loop-engineering-went-mainstream/
-                  </Ext>
-                </li>
-                <li>
-                  <span className={styles.refTitle}>
-                    VentureBeat「Claude Code's '/goals' separates the agent that works from the one
-                    that decides it's done」
-                  </span>
-                  <Ext href="https://venturebeat.com/orchestration/claude-codes-goals-separates-the-agent-that-works-from-the-one-that-decides-its-done">
-                    https://venturebeat.com/orchestration/claude-codes-goals-separates-the-agent-that-works-from-the-one-that-decides-its-done
-                  </Ext>
-                </li>
-                <li>
-                  <span className={styles.refTitle}>
-                    TechTimes「Claude Fable 5 Is Back: Safety Classifiers Now Reroute Security Agent
-                    Loops」(輸出規制の経緯とLoop Engineeringの接続)
-                  </span>
-                  <Ext href="https://www.techtimes.com/articles/319665/20260703/claude-fable-5-back-safety-classifiers-now-reroute-security-agent-loops.htm">
-                    https://www.techtimes.com/articles/319665/20260703/claude-fable-5-back-safety-classifiers-now-reroute-security-agent-loops.htm
-                  </Ext>
-                </li>
-              </ul>
-              <p className={styles.refNote}>
-                注記:
-                上記のうち個人ブログ・メディア記事(二次情報)は、公式ドキュメントと突き合わせて事実確認を行った上で本ガイドに反映している。とはいえAI分野は情報の更新が非常に速いため、実装に移す前に必ず一次情報(公式ドキュメント)側の最新記載を確認してほしい。
-              </p>
-            </div>
-          </section>
-
-          <footer className={styles.pageFooter}>
-            Claude Fable 5 実践活用ガイド ― 2026年7月4日時点の情報にもとづく
-          </footer>
+      <main className={styles.main}>
+        <div className={styles.hero} id="top">
+          <div className={styles.heroTag}>CLAUDE CODE FIELD GUIDE</div>
+          <h1 className={styles.heroTitle}>
+            地図は、<em>現地</em>ではない。
+            <br />
+            Claude Fable 5 実践活用ガイド
+          </h1>
+          <p className={styles.heroDesc}>
+            「指示を積み上げる」から「ゴールと検証基準を渡して任せる」へ ―
+            Fable 5に最適化された思考法・設定・Loop Engineering・Unknownsフレームワークをステップバイステップで完全解説。
+          </p>
+          <div className={styles.heroMeta}>
+            <div>初出: 2026年7月4日</div>
+            <div>改訂: <span>2026年7月16日公式ドキュメント対応版</span></div>
+            <div>対象: <span>Claude Code 中〜上級エンジニア</span></div>
+          </div>
         </div>
-      </main>
 
-      <TocObserver />
+        {/* Section 1 */}
+        <section className={styles.section} id="s1">
+          <span className={styles.eyebrowNum}>01 / 15</span>
+          <h2 className={styles.sectionTitle}>Claude Fable 5 とは何か</h2>
+          <p>
+            Claude Fable 5 は、2026年6月9日に Anthropic が発表したフラッグシップモデルである。Claude Code などのエージェント型開発ツールに最適化されており、長時間に及ぶ複雑なタスクでの文脈保持能力、コードベース全体の自律的な調査能力、自己検証能力において、従来の Claude 3.7 / Opus 4.8 を凌駕する性能を持つ。
+          </p>
+          <h3>1.1 スペック概要</h3>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>スペック・値</th>
+                  <th>補足</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>発表・一般提供日</strong></td>
+                  <td>2026年6月9日(GA)</td>
+                  <td>6月12日〜30日は一時停止期間</td>
+                </tr>
+                <tr>
+                  <td><strong>API 価格(1Mトークン)</strong></td>
+                  <td>入力 $10.00 / 出力 $50.00</td>
+                  <td>Opus 4.8 のちょうど2倍の価格帯</td>
+                </tr>
+                <tr>
+                  <td><strong>コンテキストウィンドウ</strong></td>
+                  <td>200,000 トークン (標準) / 最大 1,000,000 トークン (エンタープライズ)</td>
+                  <td>Claude Code 上では自動コンパクション(95%で要約)が動作</td>
+                </tr>
+                <tr>
+                  <td><strong>既定 Effort レベル</strong></td>
+                  <td>high</td>
+                  <td>low / medium / high / xhigh / max / ultracode から選択可</td>
+                </tr>
+                <tr>
+                  <td><strong>データ保持ポリシー</strong></td>
+                  <td>Covered Model (30日間保持)</td>
+                  <td>Zero Data Retention (ZDR) には非対応</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>1.2 モデルファミリーの関係性</h3>
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram chart={DIAGRAMS.mmd1} />
+          </div>
+          <p className={styles.diagramCaption}>図1-1: Fable 5 / Mythos 5 モデルファミリーの関係性</p>
+          <p>
+            Fable 5 と Mythos 5 は「同じ頭脳、異なる安全装備」というイメージで捉えると理解しやすい。Mythos 5 はプロジェクト Glasswing を通じて重要インフラ事業者向けに限定提供されており、一般的な開発者が使用するのは安全分類器を備えた Fable 5 となる。
+          </p>
+        </section>
+
+        {/* Section 2 */}
+        <section className={styles.section} id="s2">
+          <span className={styles.eyebrowNum}>02 / 15</span>
+          <h2 className={styles.sectionTitle}>タイムライン: リリースから輸出規制、価格変更まで</h2>
+          <p>
+            Fable 5 は発表から1ヶ月あまりの間に、サービス停止・価格体系の変更という2つの大きな出来事を経験している。プロンプト設計とは直接関係ないが、可用性設計(フォールバックの必要性)とコスト管理の両面で重要な背景である。
+          </p>
+
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram chart={DIAGRAMS.mmd2} />
+          </div>
+          <p className={styles.diagramCaption}>図2-1: Fable 5 / Mythos 5 タイムライン(2026年)</p>
+
+          <p>
+            一時停止の経緯は、Amazon の研究者が Fable 5 の安全策を回避してソフトウェア脆弱性を特定できる手法を発見し報告したことがきっかけだった。Anthropic の検証では同様の脆弱性特定は Opus 4.8 や他社モデルでも可能であったとされているが、米商務省産業安全保障局(BIS)は6月12日付で Fable 5・Mythos 5 に対する輸出管理措置を発動し、外国籍ユーザーを区別する即時的な手段がなかった Anthropic は全ユーザー向けにモデルを一時停止した。
+          </p>
+
+          <div className={`${styles.callout} ${styles.calloutWarn}`}>
+            <div className={styles.calloutTitle}>⚠ 2026年7月16日時点の実務上の要点</div>
+            <p>
+              無料相当の利用枠は当初の7月7日締切から二度延長され、現在は7月19日までとなっている(この期限は今後さらに動く可能性があるため、<code>support.claude.com</code>の「Claude Fable 5 Promotional Access」記事で最新状況を確認することを推奨)。期限到来後は、Pro/Max/Team/一部Enterpriseプランでも Fable 5 の利用には別途「使用クレジット」を有効化する必要があり、有効化していない場合は週次枠を使い切った時点でFable 5へのアクセスが自動フォールバックなしに単純に停止する。
+            </p>
+          </div>
+
+          <p>
+            この一件は、実務上「Fable 5 に固定的に依存する設計は避け、フォールバック先(Opus 4.8 など)を必ず用意しておく」という教訓を残した。3章で解説する自動フォールバック機構と、10章で解説するコスト管理は、まさにこの種のリスクに対する備えとしても機能する。
+          </p>
+        </section>
+
+        {/* Section 3 */}
+        <section className={styles.section} id="s3">
+          <span className={styles.eyebrowNum}>03 / 15</span>
+          <h2 className={styles.sectionTitle}>安全分類器と自動フォールバックの仕組み</h2>
+          <p>
+            Fable 5 には、以下の4領域を対象とした安全分類器が組み込まれている(Anthropic公式ドキュメント「Refusals and fallback」で明記されている正式なカテゴリ名)。
+          </p>
+
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th><code>category</code> 値</th>
+                  <th>内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>cyber</code></td>
+                  <td>攻撃的なエクスプロイト・マルウェア開発などサイバー被害につながりうる要求。<strong>善意のセキュリティ作業もこのカテゴリで検知されうる</strong></td>
+                </tr>
+                <tr>
+                  <td><code>bio</code></td>
+                  <td>危険な実験手法など生物学的被害につながりうる要求。<strong>有益なライフサイエンス研究もこのカテゴリで検知されうる</strong></td>
+                </tr>
+                <tr>
+                  <td><code>frontier_llm</code></td>
+                  <td>競合AIモデルの開発を助ける要求。Anthropicの商用利用規約で制限されている領域。<strong>良性の機械学習研究もこのカテゴリで検知されうる</strong></td>
+                </tr>
+                <tr>
+                  <td><code>reasoning_extraction</code></td>
+                  <td>モデルの内部推論をそのまま応答テキストとして再現・書き起こしさせようとする要求</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            該当すると判定されたリクエストは、API上では成功レスポンス(HTTP 200)として <code>stop_reason: "refusal"</code> が返る。これはエラーではなく、<code>content</code> は空、出力前の拒否であれば課金もされない。
+          </p>
+
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>JSON ・ refusal レスポンス例</span>
+              <span className={styles.codeLang}>JSON</span>
+            </div>
+            <div className={styles.codeBody}>
+              <div className={styles.codeLine}>{"{"}</div>
+              <div className={styles.codeLine}>  &quot;id&quot;: &quot;msg_01XFUDYJgAACzvnptvVoYEL&quot;,</div>
+              <div className={styles.codeLine}>  &quot;type&quot;: &quot;message&quot;,</div>
+              <div className={styles.codeLine}>  &quot;stop_reason&quot;: &quot;refusal&quot;,</div>
+              <div className={styles.codeLine}>  &quot;stop_details&quot;: {"{"}</div>
+              <div className={styles.codeLine}>    &quot;type&quot;: &quot;refusal&quot;,</div>
+              <div className={styles.codeLine}>    &quot;category&quot;: &quot;cyber&quot;,</div>
+              <div className={styles.codeLine}>    &quot;explanation&quot;: &quot;This request was declined because it could enable cyber harm.&quot;</div>
+              <div className={styles.codeLine}>  {"}"},</div>
+              <div className={styles.codeLine}>  &quot;usage&quot;: {"{"} &quot;input_tokens&quot;: 412, &quot;output_tokens&quot;: 0 {"}"}</div>
+              <div className={styles.codeLine}>{"}"}</div>
+            </div>
+          </div>
+
+          <p>
+            Claude Code のようなハーネス上では、この拒否は自動的に Opus 4.8 へのフォールバックとして処理される。Anthropic の公表によれば、<strong>Fable 5 セッションの95%超はフォールバックが一切発生しない</strong>とのことである。
+          </p>
+
+          <h3>3.1 リクエストのライフサイクル(Claude Code上での挙動)</h3>
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram chart={DIAGRAMS.mmd3} />
+          </div>
+          <p className={styles.diagramCaption}>図3-1: 安全分類器発火時のリクエストライフサイクル</p>
+
+          <h3>3.2 APIレベルでのフォールバック設計(自作ハーネス向け)</h3>
+          <p>API上で自前のアプリケーションを構築している場合、フォールバックには3つの方式がある。</p>
+
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>状況</th>
+                  <th>使う方式</th>
+                  <th>特徴</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Claude APIまたはClaude Platform on AWS、最もシンプルな構成</td>
+                  <td><strong>サーバーサイドフォールバック</strong><br /><code>fallbacks</code>パラメータ</td>
+                  <td>1リクエスト・1レスポンスで完結。最大3モデルまで連鎖指定可</td>
+                </tr>
+                <tr>
+                  <td>任意のプラットフォーム、TS/Python/Go/Java/C# SDK利用</td>
+                  <td><strong>SDKミドルウェア</strong><br /><code>BetaRefusalFallbackMiddleware</code></td>
+                  <td>クライアント側で一度設定すれば自動的にリトライ</td>
+                </tr>
+                <tr>
+                  <td>Ruby/PHP/独自リトライロジック</td>
+                  <td>手動リトライ + <code>fallback-credit-2026-06-01</code>ヘッダー</td>
+                  <td>キャッシュの二重課金を避けつつ完全な制御が可能</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>実務上の落とし穴として、Anthropic公式ドキュメントは以下を明記している。</p>
+          <ul>
+            <li><strong>同一モデルへの再送は意味がない</strong>: 拒否されたリクエストは必ずフォールバック先モデルに送る</li>
+            <li><strong>リトライ予算はターン単位ではなくリクエスト単位で設計する</strong>: サブエージェントを含む1ターンで複数回の拒否が起こりうる</li>
+            <li><strong>サブエージェント呼び出しには個別にフォールバックを設定する</strong>: <code>fallbacks</code>パラメータはツール実行内部のモデル呼び出しには伝播しない</li>
+            <li><strong>拒否は成功レスポンス(HTTP 200)なので、5xxベースの監視では検知できない</strong>: <code>stop_reason: &quot;refusal&quot;</code> を直接監視イベントとして計装すること</li>
+          </ul>
+
+          <h3>3.3 実務上の注意点(Claude Code)</h3>
+          <ul>
+            <li><strong>初回リクエストだけで発火することがある</strong>: フォールバックはユーザーの発言内容だけでなく、セッション開始時に一緒に送られる <code>CLAUDE.md</code> の内容や <code>git status</code>、ディレクトリ名などのワークスペース情報も判定対象に含む。</li>
+            <li><strong>トリガー源の切り分け</strong>: <code>claude --safe-mode</code> で起動すると、CLAUDE.md・Skills・MCPサーバー・Hooksなどのカスタマイズを無効化してセッションを開始できる(gitステータスとディレクトリ名は無効化されない)。これにより、フォールバックの原因の切り分けが可能になる。</li>
+            <li><strong>セキュリティ研究・生物学系タスクは高頻度でフォールバックする</strong>: これは想定内の挙動であり、アカウントへのペナルティではない。Fable級の能力がどうしても必要な場合は、Anthropicの信頼されたアクセスプログラムへの相談が推奨される。</li>
+            <li><strong>自動切り替えを無効化し、都度確認する設定も可能</strong>: <code>/config</code>から「switch models when a message is flagged」をオフにすると、フラグが立った際にセッションを一時停止できる。</li>
+            <li><strong>サードパーティ基盤(Bedrock/Vertex/Foundry)での自動フォールバック</strong>: モデルIDがプロバイダ固有であるため、<code>ANTHROPIC_DEFAULT_FABLE_MODEL</code>と<code>ANTHROPIC_DEFAULT_OPUS_MODEL</code>を設定する必要がある。</li>
+          </ul>
+        </section>
+
+        {/* Section 4 */}
+        <section className={styles.section} id="s4">
+          <span className={styles.eyebrowNum}>04 / 15</span>
+          <h2 className={styles.sectionTitle}>プロンプティング思想の転換: チェックリストからゴールへ</h2>
+          <p>
+            これはFable 5を使いこなす上で最も重要な認識転換である。Anthropic公式の「Prompting Claude Fable 5」ガイドは、旧世代向けに書かれた作り込み過ぎた指示(過剰な手順列挙・網羅的な禁止事項・逐次的な確認要求など)が、Fable 5ではむしろ性能を落とす場合があると明記している。
+          </p>
+
+          <h3>4.1 旧来のスタイル vs Fable 5向けのスタイル</h3>
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram chart={DIAGRAMS.mmd4} />
+          </div>
+          <p className={styles.diagramCaption}>図4-1: 旧来のプロンプトスタイルとFable 5向けスタイルの対比</p>
+
+          <div className={styles.dividerQuote}>
+            &quot;The goal is not to micro-manage the path, but to clarify the destination and the boundaries.&quot;
+            <span className={styles.attribution}>— Anthropic Prompt Engineering Guide for Fable 5</span>
+          </div>
+
+          <h3>4.2 公式ガイドが挙げる具体的なプロンプトパターン</h3>
+          <p>Anthropic公式ドキュメントに記載されている代表的なパターン例:</p>
+
+          <ul>
+            <li><strong>① 結果と目的の明示 (Goal &amp; Context)</strong>: 単に「リファクタリングして」ではなく、「このモジュールのテストカバレッジを80%に引き上げ、保守性を高めるためにリファクタリングして」のように、ゴールと背景の双方を明確に伝える。</li>
+            <li><strong>② 境界条件の明記 (Guardrails)</strong>: 「APIの外部インターフェースを変更しない」「既存のDBスキーマを壊さない」といった絶対的な制約(ガードレール)を提示する。</li>
+            <li><strong>③ 証拠の提示要求 (Proof requirement)</strong>: 「完了したと主張する前に、`bun run test` の合格ログを出力して示して」と、客観的な完了証拠を要求する。</li>
+          </ul>
+        </section>
+
+        {/* Section 5 */}
+        <section className={styles.section} id="s5">
+          <span className={styles.eyebrowNum}>05 / 15</span>
+          <h2 className={styles.sectionTitle}>Effort(推論深度)レベルの使い方</h2>
+          <p>
+            Fable 5 では推論深度(Effort)を細かく制御できる。タスクの複雑さに応じて適切に Effort レベルを選択することが、パフォーマンス向上とコスト最適化の鍵となる。
+          </p>
+
+          <h3>5.1 レベル一覧(Claude Code公式ドキュメント準拠)</h3>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Effort レベル</th>
+                  <th>特徴・用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>low</code></td>
+                  <td>レスポンスが高速。単純なファイル修正、タイポ修正、ドキュメントのフォーマット調整向け</td>
+                </tr>
+                <tr>
+                  <td><code>medium</code></td>
+                  <td>速度と精度のバランス型。単一コンポーネントの実装、小規模なバグ修正向け</td>
+                </tr>
+                <tr>
+                  <td><code>high</code> (既定)</td>
+                  <td>標準的な思考深さ。複雑な機能実装、複数ファイルにまたがる修正、設計パターンの適用向け</td>
+                </tr>
+                <tr>
+                  <td><code>xhigh</code></td>
+                  <td>深い推論を実行。複雑なアルゴリズムの実装、基幹設計、大規模なバグ調査向け</td>
+                </tr>
+                <tr>
+                  <td><code>max</code> / <code>ultracode</code></td>
+                  <td>最深推論・長時間自律動作用。セッション単位で計画立案・多段階リサーチ・複数エージェントを自律制御</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>5.2 Effortの決定優先順位(2026年7月時点の公式仕様)</h3>
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram chart={DIAGRAMS.mmd5} />
+          </div>
+          <p className={styles.diagramCaption}>図5-1: Effortレベルの決定優先順位</p>
+
+          <div className={styles.callout}>
+            <div className={styles.calloutTitle}>補足</div>
+            <p>
+              Enterpriseプランの管理者はロールごとに「上限effortレベル」を設定でき、上限を超えるレベルを指定した場合は自動的にクランプされる。<code>max</code>と<code>ultracode</code>はセッション限定(settingsファイルには保存不可)であり、<code>ultracode</code>は環境変数<code>CLAUDE_CODE_EFFORT_LEVEL</code>には設定できない。
+            </p>
+          </div>
+
+          <h3>5.3 <code>ultrathink</code>キーワードとその他の言い回し</h3>
+          <p>
+            <code>ultrathink</code> というキーワードをプロンプト中に含めると、セッションのeffort設定を変えずにそのターンだけ深い推論をリクエストできる。一方で「think」「think hard」「think more」といった他の言い回しは特別なキーワードとしては認識されず、通常の文章として扱われる点に注意。
+          </p>
+
+          <h3>5.4 過剰思考を防ぐ指示例</h3>
+          <p>
+            高いeffortで動かすと、Fable 5がタスクに必要な範囲を超えて調査・熟考してしまうことがある。これを防ぐには、4.2節②のような境界指定が有効である。
+          </p>
+        </section>
+
+        {/* Section 6 */}
+        <section className={styles.section} id="s6">
+          <span className={styles.eyebrowNum}>06 / 15</span>
+          <h2 className={styles.sectionTitle}>Claude Code での実践設定</h2>
+
+          <h3>6.1 モデルの選択とエイリアス</h3>
+          <p>Fable 5はClaude Codeの既定モデルではない。以下のいずれかで明示的に選択する必要がある。</p>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>モデルエイリアス</th>
+                  <th>挙動</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>default</code></td>
+                  <td>アカウント種別の既定モデルに戻す(Pro/Team Standardは Sonnet 5、Max/Team Premium/Enterprise pay-as-you-go は Opus 4.8)</td>
+                </tr>
+                <tr>
+                  <td><code>best</code></td>
+                  <td>組織がFable 5にアクセスできる場合はFable 5、そうでない場合は最新のOpus</td>
+                </tr>
+                <tr>
+                  <td><code>fable</code></td>
+                  <td>Claude Fable 5 を使用(最も難しく長時間のタスク向け)</td>
+                </tr>
+                <tr>
+                  <td><code>sonnet</code></td>
+                  <td>日常的なコーディング作業向けの最新Sonnet</td>
+                </tr>
+                <tr>
+                  <td><code>opus</code></td>
+                  <td>複雑な推論作業向けの最新Opus</td>
+                </tr>
+                <tr>
+                  <td><code>haiku</code></td>
+                  <td>高速・軽量なタスク向け</td>
+                </tr>
+                <tr>
+                  <td><code>opusplan</code></td>
+                  <td>プランモード中はOpus、実行フェーズではSonnetに自動切替するハイブリッドモード</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>6.2 Fable 5から最大限の成果を引き出すための基本方針(公式)</h3>
+          <div className={styles.stepGrid}>
+            <div className={styles.stepCard}>
+              <span className={styles.stepNum}>01</span>
+              <h4>結果を説明する</h4>
+              <p>手順ではなく欲しい結果を渡し、経路の計画はモデルに任せる。維持し続けたい結果は<code>/goal</code>で設定する。</p>
+            </div>
+            <div className={styles.stepCard}>
+              <span className={styles.stepNum}>02</span>
+              <h4>曖昧な問題を渡す</h4>
+              <p>根本原因の調査、障害対応、アーキテクチャ判断など、追加の調査・検証が効果を発揮する領域に向いている。</p>
+            </div>
+            <div className={styles.stepCard}>
+              <span className={styles.stepNum}>03</span>
+              <h4>検証の念押しを省く</h4>
+              <p>Fable 5は指示が少なくても自ら検証を行うため、「テストして」「確認して」といったリマインダーは基本的に不要。</p>
+            </div>
+            <div className={styles.stepCard}>
+              <span className={styles.stepNum}>04</span>
+              <h4>タスクを大きくする</h4>
+              <p>通常は分割するような作業も、そのままのサイズで渡してよい。長いセッションでも文脈を見失いにくい。</p>
+            </div>
+          </div>
+
+          <h3>6.3 <code>/goal</code> コマンドの仕組みを正確に理解する</h3>
+          <p>
+            <code>/goal</code> は完了条件を設定すると、その条件が満たされるまでClaude Codeがユーザーの入力なしにターンを重ね続ける機能である。Anthropic公式ドキュメントによれば、その内部実装は「セッション限定のプロンプトベースStop hook」のラッパーである。
+          </p>
+
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram chart={DIAGRAMS.mmd6} />
+          </div>
+          <p className={styles.diagramCaption}>図6-1: /goal コマンドの内部シーケンス</p>
+
+          <div className={`${styles.callout} ${styles.calloutWarn}`}>
+            <div className={styles.calloutTitle}>⚠ 重要な制約</div>
+            <p>
+              評価モデルはトランスクリプトを読むだけで、コマンドを自ら実行したりファイルを直接確認したりはしない。したがって条件は「Claudeの出力自体が証拠になる」形で書く必要がある。
+            </p>
+          </div>
+
+          <h3>6.4 Dynamic Workflows(<code>ultracode</code>)の活用</h3>
+          <p>
+            Dynamic Workflowsは、Fable 5(または他モデル)がタスクのためのオーケストレーションスクリプト(JavaScript)を自身で書き、バックグラウンドで実行する仕組みである。1つの会話では調整しきれないほど多くのエージェントが必要なタスク(コードベース全体の監査、数百ファイル規模の移行など)に適している。
+          </p>
+
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram chart={DIAGRAMS.mmd7} />
+          </div>
+          <p className={styles.diagramCaption}>図6-2: Dynamic Workflowsのオーケストレーション構造</p>
+
+          <h3>6.5 サブエージェント戦略とアドバイザーツール</h3>
+          <p>
+            Fable 5は並列サブエージェントのディスパッチ・維持において旧モデルより大幅に信頼性が向上している。実務上は、Fable 5を高コストな「判断役」に据え、実装の大部分は安価なモデルに任せる<strong>階層型のモデルルーティング</strong>が推奨される。
+          </p>
+
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram chart={DIAGRAMS.mmd8} />
+          </div>
+          <p className={styles.diagramCaption}>図6-3: サブエージェントの階層型モデルルーティング</p>
+
+          <div className={`${styles.callout} ${styles.calloutTip}`}>
+            <div className={styles.calloutTitle}>✓ 新しいコスト最適化パターン: アドバイザーツール</div>
+            <p>
+              安価な「実行役(executor)」モデル(Haiku/Sonnet)が、判断が難しい局面でのみサーバーサイドで高性能な「助言役(advisor)」モデル(Opus、Fable 5も対応)にワンショットで相談できる仕組み。
+            </p>
+          </div>
+        </section>
+
+        {/* Section 7 */}
+        <section className={styles.section} id="s7">
+          <span className={styles.eyebrowNum}>07 / 15</span>
+          <h2 className={styles.sectionTitle}>Loop Engineering: 長時間自律ループの設計思想</h2>
+          <p>
+            エージェント開発における「Loop Engineering」とは、人間が手動でプロンプトを投げる代わりに、エージェントを自動周回させる検証・改善ループそのものを設計・構築するエンジニアリング手法である。
+          </p>
+
+          <h3>7.1 「ループ」の起源: Boris Chernyの三段階進化</h3>
+          <div className={styles.dividerQuote}>
+            &quot;I don&apos;t prompt Claude anymore. I have loops that are running. They&apos;re the ones that are prompting Claude and figuring out what to do. My job is to write loops.&quot;
+            <span className={styles.attribution}>— Boris Cherny, Anthropic(Claude Code創設者)</span>
+          </div>
+
+          <h3>7.2 命名の瞬間: Peter SteinbergerとAddy Osmani</h3>
+          <p>
+            2026年6月8日、Google Cloud AI DirectorのAddy Osmaniが「Loop Engineering」と題したエッセイを公開し、この実践に名前と体系(anatomy)を与えた。同氏は内側のループ(inner loop)と外側のループ(outer loop)を区別する原則を提示した。
+          </p>
+
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram chart={DIAGRAMS.mmd9} />
+          </div>
+          <p className={styles.diagramCaption}>図7-1: Addy Osmaniの内側/外側ループモデル</p>
+
+          <h3>7.3 Andrew Ngの「3つのループ」フレームワーク</h3>
+          <p>
+            DeepLearning.AIの『The Batch』にて、Andrew Ngはソフトウェア開発を入れ子構造の3つのループとして整理した。
+          </p>
+
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram chart={DIAGRAMS.mmd10} />
+          </div>
+          <p className={styles.diagramCaption}>図7-2: Andrew Ngの3つのループフレームワーク</p>
+        </section>
+
+        {/* Section 8 */}
+        <section className={styles.section} id="s8">
+          <span className={styles.eyebrowNum}>08 / 15</span>
+          <h2 className={styles.sectionTitle}>Thariq の「Unknowns フレームワーク」徹底解説</h2>
+          <p>
+            Thariq Shihipar(Anthropic, Claude Codeチーム)が公開した &quot;A Field Guide to Fable: Finding Your Unknowns&quot; は、「<strong>地図は現地そのものではない(the map is not the territory)</strong>」という比喩を中心に据えている。
+          </p>
+
+          <div className={styles.dividerQuote}>
+            &quot;The map, a representation of the work to be done, is my prompts and skills and context... The territory is where the work needs to happen, the codebase, the real world... The difference between the map and the territory is what I call unknowns.&quot;
+            <span className={styles.attribution}>— Thariq Shihipar (@trq212), Anthropic Claude Codeチーム</span>
+          </div>
+
+          <h3>8.1 4つの象限(Thariq自身の定義)</h3>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>象限</th>
+                  <th>Thariq自身の定義</th>
+                  <th>具体例</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Known Knowns</strong> (既知の既知)</td>
+                  <td>プロンプトに書いてあること。求める成果物を伝えている部分</td>
+                  <td>「関数の戻り値の型はstringにする」</td>
+                </tr>
+                <tr>
+                  <td><strong>Known Unknowns</strong> (既知の未知)</td>
+                  <td>まだ決めていないが、決めていないと自覚しているギャップ</td>
+                  <td>「エラー時の挙動は未決定」</td>
+                </tr>
+                <tr>
+                  <td><strong>Unknown Knowns</strong> (未知の既知)</td>
+                  <td>当たり前すぎて書き出さないが、見れば認識できるもの</td>
+                  <td>コードの「きれいさ」の暗黙基準</td>
+                </tr>
+                <tr>
+                  <td><strong>Unknown Unknowns</strong> (未知の未知)</td>
+                  <td>まったく考慮していなかったこと。「どこまで良くできるか」を知らないこと</td>
+                  <td>想定外のレガシーな依存関係</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>8.2 実践技法(9つのステップ)</h3>
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram chart={DIAGRAMS.mmd11} />
+          </div>
+          <p className={styles.diagramCaption}>図8-1: Thariqの9つの実践技法(Ole Lehmannによる整理)</p>
+        </section>
+
+        {/* Section 9 */}
+        <section className={styles.section} id="s9">
+          <span className={styles.eyebrowNum}>09 / 15</span>
+          <h2 className={styles.sectionTitle}>検証ループとメモリシステムの設計</h2>
+          <h3>9.1 検証はサブエージェントに任せる</h3>
+          <p>
+            独立した文脈を持つ検証専用のサブエージェントが、自己批評よりも一貫して優れた結果を出すことが確認されている。
+          </p>
+
+          <div className={styles.codeWrap}>
+            <div className={styles.codeBar}>
+              <span>PROMPT PATTERN</span>
+              <span className={styles.codeLang}>TEXT</span>
+            </div>
+            <div className={styles.codeBody}>
+              <div className={styles.codeLine}>Establish a method for checking your own work at an interval of [X] as you build.</div>
+              <div className={styles.codeLine}>Run this every [X interval], verifying your work with subagents against the specification.</div>
+            </div>
+          </div>
+
+          <h3>9.2 コンテキストエンジニアリングとメモリ</h3>
+          <p>
+            過去のセッションから得た教訓を <code>.claude/memory/</code> などファイルベースで蓄積・更新することで、モデルの文脈過多を防ぎつつ高い品質を安定して維持できる。
+          </p>
+        </section>
+
+        {/* Section 10 */}
+        <section className={styles.section} id="s10">
+          <span className={styles.eyebrowNum}>10 / 15</span>
+          <h2 className={styles.sectionTitle}>コスト管理とモデル選定フロー</h2>
+          <p>
+            Fable 5 は入力$10/出力$50(100万トークン)と高価である。適材適所のモデルルーティングによって、費用対効果を極大化する。
+          </p>
+
+          <h3>10.1 モデル選定フロー</h3>
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram chart={DIAGRAMS.mmd12} />
+          </div>
+          <p className={styles.diagramCaption}>図10-1: モデル選定フロー</p>
+        </section>
+
+        {/* Section 11 */}
+        <section className={styles.section} id="s11">
+          <span className={styles.eyebrowNum}>11 / 15</span>
+          <h2 className={styles.sectionTitle}>よくある落とし穴(アンチパターン)</h2>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>アンチパターン</th>
+                  <th>発生する現象</th>
+                  <th>対処法</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Opus世代のプロンプトをそのまま流用する</td>
+                  <td>過剰な手順指定・禁止事項がFable 5の自律的判断を阻害し、性能が落ちる</td>
+                  <td>CLAUDE.md/Skillsを棚卸しし、ゴール・理由・境界・検証の4要素に再構成する</td>
+                </tr>
+                <tr>
+                  <td>常に最大effort(xhigh/max/ultracode)で動かす</td>
+                  <td>トークン消費が増えるだけでなく、過剰思考・過剰調査で逆に遅くなる</td>
+                  <td>タスクの難度に応じて high を基準に上下させる</td>
+                </tr>
+                <tr>
+                  <td>「思考過程を説明して」と指示する</td>
+                  <td>reasoning_extraction カテゴリに抵触し、Opusへの意図しないフォールバックを誘発する</td>
+                  <td>構造化された thinking ブロックを読む設計にする</td>
+                </tr>
+                <tr>
+                  <td>単一モデルによる自己採点だけで完了と判断する</td>
+                  <td>平凡な出来を「良くできた」と過大評価しがち</td>
+                  <td>独立した文脈を持つ検証サブエージェントや /goal の評価モデルを併用する</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Section 12 */}
+        <section className={styles.section} id="s12">
+          <span className={styles.eyebrowNum}>12 / 15</span>
+          <h2 className={styles.sectionTitle}>実力・ベンチマークと「検証必須」の理由</h2>
+          <p>
+            SWE-bench Pro 80.3%, Terminal-Bench 88.0%, Remote Labor Index 16.1% など最高峰のスコアを記録しているが、プロ品質に全工程が無検証で届く確率は限定的であり、人間による外側のループ(Outer Loop)での検証と評価が必須である。
+          </p>
+
+          <div className={styles.pillRow}>
+            <span className={styles.pill}>SWE-bench Pro: 80.3%</span>
+            <span className={styles.pill}>Terminal-Bench: 88.0%</span>
+            <span className={styles.pill}>SWE-bench Verified: 93.9%</span>
+            <span className={styles.pill}>Remote Labor Index: 16.1%</span>
+          </div>
+        </section>
+
+        {/* Section 13 */}
+        <section className={styles.section} id="s13">
+          <span className={styles.eyebrowNum}>13 / 15</span>
+          <h2 className={styles.sectionTitle}>既知の制限事項</h2>
+          <ul>
+            <li><strong>Zero Data Retention(ZDR)非対応</strong>: 30日保持対象モデル。規約厳しい組織では無効化される場合あり。</li>
+            <li><strong>実在する公人になり代わった発言の制限</strong>: 著名人の言葉を創作してなり代わる挙動は制限される。</li>
+            <li><strong>特定4領域での安全分類器の動作</strong>: サイバー・生物・LLM抽出・推論抽出でのフォールバック動作。</li>
+            <li><strong>価格・提供制限の流動性</strong>: キャンペーン期間や利用枠は状況に応じて更新される。</li>
+          </ul>
+        </section>
+
+        {/* Section 14 */}
+        <section className={styles.section} id="s14">
+          <span className={styles.eyebrowNum}>14 / 15</span>
+          <h2 className={styles.sectionTitle}>まとめ</h2>
+          <div className={styles.stepGrid}>
+            <div className={styles.stepCard}>
+              <span className={styles.stepNum}>①</span>
+              <h4>モデル選定</h4>
+              <p>Fable 5をオーケストレーター、他モデルをワーカーに据える階層設計</p>
+            </div>
+            <div className={styles.stepCard}>
+              <span className={styles.stepNum}>②</span>
+              <h4>Effortの使い分け</h4>
+              <p>Effortレベルとultracode/Dynamic Workflowsの使い分け</p>
+            </div>
+            <div className={styles.stepCard}>
+              <span className={styles.stepNum}>③</span>
+              <h4>検証ループの設計</h4>
+              <p>/goal、独立した検証サブエージェントの併用</p>
+            </div>
+            <div className={styles.stepCard}>
+              <span className={styles.stepNum}>④</span>
+              <h4>Unknownsの可視化</h4>
+              <p>自分自身のunknownsを可視化する技法(Thariqのフレームワーク)</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 15 */}
+        <section className={styles.section} id="s15">
+          <span className={styles.eyebrowNum}>15 / 15</span>
+          <h2 className={styles.sectionTitle}>参考文献・ソースURL一覧</h2>
+          <div className={styles.refGroup}>
+            <h4>公式ドキュメント・公式発表(Anthropic)</h4>
+            <ul className={styles.refList}>
+              <li>
+                <span className={styles.refName}>Anthropic「Claude Fable 5 and Claude Mythos 5」</span>
+                <Ext href="https://www.anthropic.com/news/claude-fable-5-mythos-5">anthropic.com/news/claude-fable-5-mythos-5</Ext>
+              </li>
+              <li>
+                <span className={styles.refName}>Claude Platform Docs「Prompting Claude Fable 5」</span>
+                <Ext href="https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5">platform.claude.com/.../prompting-claude-fable-5</Ext>
+              </li>
+              <li>
+                <span className={styles.refName}>Claude Code Docs「Keep Claude working toward a goal」</span>
+                <Ext href="https://code.claude.com/docs/en/goal">code.claude.com/docs/en/goal</Ext>
+              </li>
+            </ul>
+          </div>
+          <div className={styles.refGroup}>
+            <h4>著名な開発者・研究者の発信</h4>
+            <ul className={styles.refList}>
+              <li>
+                <span className={styles.refName}>Thariq Shihipar「A Field Guide to Fable: Finding Your Unknowns」</span>
+                <Ext href="https://x.com/trq212/status/2073100352921215386">x.com/trq212/status/2073100352921215386</Ext>
+              </li>
+              <li>
+                <span className={styles.refName}>Addy Osmani「Loop Engineering」</span>
+                <Ext href="https://addyosmani.com/blog/loop-engineering/">addyosmani.com/blog/loop-engineering</Ext>
+              </li>
+              <li>
+                <span className={styles.refName}>Andrew Ng「My 3 key loops」</span>
+                <Ext href="https://www.deeplearning.ai/the-batch/issue-359">deeplearning.ai/the-batch/issue-359</Ext>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <footer className={styles.pageFooter}>
+          Claude Fable 5 実践活用ガイド ― 2026年7月16日時点の公式ドキュメントおよび開発者の発信を追加調査してブラッシュアップ。本ガイドの内容は今後のモデル・価格改定により変わる可能性があります。
+        </footer>
+      </main>
     </div>
   );
 }
