@@ -578,7 +578,175 @@
   text-decoration: underline;
 }
 
-/* ---------- Footer ---------- */
+
+/* ---------- Custom Visual Timeline (Section 2) ---------- */
+.timeline {
+  position: relative;
+  margin: 32px 0;
+  padding-left: 0;
+}
+
+.timelineTrack {
+  position: absolute;
+  left: 108px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(124, 158, 255, 0.5) 5%,
+    rgba(124, 158, 255, 0.5) 95%,
+    transparent 100%
+  );
+}
+
+.timelineItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  margin-bottom: 0;
+  position: relative;
+}
+
+.timelineDateCol {
+  flex-shrink: 0;
+  width: 108px;
+  padding-right: 24px;
+  padding-top: 14px;
+  text-align: right;
+}
+
+.timelineDate {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.timelineDotCol {
+  flex-shrink: 0;
+  width: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 16px;
+}
+
+.timelineDot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--bg);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.timelineConnector {
+  width: 2px;
+  flex-grow: 1;
+  min-height: 24px;
+}
+
+.timelineCard {
+  flex: 1;
+  margin: 8px 0 16px 0;
+  padding: 14px 18px;
+  border-radius: 10px;
+  border-left: 3px solid transparent;
+}
+
+.timelineTag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+
+.timelineTitle {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0 0 4px;
+}
+
+.timelineDesc {
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0;
+  color: var(--text-dim);
+}
+
+/* Phase color variants */
+.tlLaunch .timelineDot     { background: #7c9eff; }
+.tlLaunch .timelineConnector { background: rgba(124,158,255,0.3); }
+.tlLaunch .timelineCard    { background: rgba(124,158,255,0.07); border-color: #7c9eff; }
+.tlLaunch .timelineTag     { background: rgba(124,158,255,0.18); color: #a0b8ff; }
+
+.tlDanger .timelineDot     { background: #ff8080; }
+.tlDanger .timelineConnector { background: rgba(255,128,128,0.3); }
+.tlDanger .timelineCard    { background: rgba(255,128,128,0.07); border-color: #ff8080; }
+.tlDanger .timelineTag     { background: rgba(255,128,128,0.18); color: #ffaaaa; }
+
+.tlRecovery .timelineDot   { background: #7ee0b8; }
+.tlRecovery .timelineConnector { background: rgba(126,224,184,0.3); }
+.tlRecovery .timelineCard  { background: rgba(126,224,184,0.07); border-color: #7ee0b8; }
+.tlRecovery .timelineTag   { background: rgba(126,224,184,0.18); color: #a0eecf; }
+
+.tlPromo .timelineDot      { background: #ffb873; }
+.tlPromo .timelineConnector { background: rgba(255,184,115,0.3); }
+.tlPromo .timelineCard     { background: rgba(255,184,115,0.07); border-color: #ffb873; }
+.tlPromo .timelineTag      { background: rgba(255,184,115,0.18); color: #ffd09a; }
+
+.tlNew .timelineDot        { background: #c084fc; }
+.tlNew .timelineConnector  { background: rgba(192,132,252,0.3); }
+.tlNew .timelineCard       { background: rgba(192,132,252,0.07); border-color: #c084fc; }
+.tlNew .timelineTag        { background: rgba(192,132,252,0.18); color: #dbb0fe; }
+
+.timelineLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin: 20px 0 28px;
+  padding: 14px 18px;
+  background: var(--bg-panel-2);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.legendDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+@media (max-width: 960px) {
+  .timelineTrack {
+    left: 80px;
+  }
+  .timelineDateCol {
+    width: 80px;
+    font-size: 10px;
+  }
+}
+
 .pageFooter {
   max-width: 100%;
   margin: 0 auto;
