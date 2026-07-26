@@ -138,9 +138,9 @@ const entries: PageEntry[] = [
     provider: "claude",
     topics: ["agent"],
     summary:
-      "Claude Code v2.1.196 のサブエージェント / Agent Teams 開発で必要な CLAUDE.md・エージェント定義・MEMORY.md・README.md の役割と書き方を体系化したガイド。",
+      "サブエージェント & Agent Teams 開発における CLAUDE.md・エージェント定義・MEMORY.md・README.md の役割と書き方を体系化したベストプラクティスガイド。",
     addedAt: "2026-04-19",
-    lastReviewed: "2026-06-30",
+    lastReviewed: "2026-07-26",
   },
   {
     slug: "/claude/code-slash-commands",
