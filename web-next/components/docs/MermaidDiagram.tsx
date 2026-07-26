@@ -77,6 +77,34 @@ export default function MermaidDiagram({
                 "important",
               );
             });
+
+            // --- sequenceDiagram アクター後処理 ---
+            // sequenceDiagram のアクターボックスは SVG <rect class="actor"> / <text class="actor"> で
+            // 描画される（foreignObject ではない）。themeVariables.actorBkg が SVG 内 CSS に
+            // 反映されない場合のフォールバックとして JS で直接 style を上書きする。
+            const actorBkgColor =
+              themeVariables?.actorBkg ??
+              themeVariables?.primaryColor ??
+              "#ffffff";
+            const actorBorderColor =
+              themeVariables?.actorBorder ??
+              themeVariables?.primaryBorderColor ??
+              "#000000";
+            const actorTxtColor =
+              themeVariables?.actorTextColor ??
+              themeVariables?.primaryTextColor ??
+              "#000000";
+            ref.current
+              .querySelectorAll<SVGRectElement>("rect.actor")
+              .forEach((el) => {
+                el.style.setProperty("fill", actorBkgColor, "important");
+                el.style.setProperty("stroke", actorBorderColor, "important");
+              });
+            ref.current
+              .querySelectorAll<SVGTextElement>("text.actor")
+              .forEach((el) => {
+                el.style.setProperty("fill", actorTxtColor, "important");
+              });
           }
         } catch (err) {
           console.error("[MermaidDiagram] render failed:", err);
