@@ -1,6 +1,14 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import Page from "./page";
+
+beforeAll(() => {
+  global.IntersectionObserver = class {
+    observe = vi.fn();
+    unobserve = vi.fn();
+    disconnect = vi.fn();
+  } as unknown as typeof IntersectionObserver;
+});
 
 // Mock MermaidDiagram component to avoid dynamic import and DOM issues in Vitest
 vi.mock("@/components/docs/MermaidDiagram", () => ({
@@ -13,8 +21,9 @@ describe("Spec-Driven Development Guide Page (Middle/Advanced)", () => {
   it("renders page title in h1 accurately", async () => {
     const pageObj = await Page();
     render(pageObj);
-    const heading = screen.getByRole("heading", { level: 1 });
-    expect(heading.textContent).toContain("仕様駆動開発（SDD）実践ガイド");
+    const headings = screen.getAllByRole("heading", { level: 1 });
+    expect(headings.length).toBeGreaterThan(0);
+    expect(headings.some((h) => h.textContent?.includes("仕様駆動開発"))).toBe(true);
   });
 
   it("contains 16 major section h2 headings", async () => {

@@ -4,8 +4,16 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import ClaudeAgentPage, { metadata as rawMetadata } from "@/app/claude/agent/page";
+
+beforeAll(() => {
+  global.IntersectionObserver = class {
+    observe = vi.fn();
+    unobserve = vi.fn();
+    disconnect = vi.fn();
+  } as unknown as typeof IntersectionObserver;
+});
 
 // Mock MermaidDiagram component to avoid dynamic import / rendering issues in Vitest
 vi.mock("@/components/docs/MermaidDiagram", () => ({

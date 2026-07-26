@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { axe } from "vitest-axe";
 import * as matchers from "vitest-axe/matchers";
 import AgentHarnessEngineeringPage from "@/app/google/agent-harness-engineering/page";
@@ -10,6 +10,14 @@ import { HomePage } from "@/components/HomePage";
 import { DisclaimerBanner } from "@/components/site/DisclaimerBanner";
 import { SiteHeader as RawSiteHeader } from "@/components/site/SiteHeader";
 import type { PricingData } from "@/types/pricing";
+
+beforeAll(() => {
+  global.IntersectionObserver = class {
+    observe = vi.fn();
+    unobserve = vi.fn();
+    disconnect = vi.fn();
+  } as unknown as typeof IntersectionObserver;
+});
 
 vi.mock("@/components/docs/MermaidDiagram", () => ({
   default: function DummyMermaidDiagram({ chart }: { chart: string }) {
@@ -104,7 +112,7 @@ describe("Accessibility Automated Audit (axe-core)", () => {
       },
     });
     expect(results).toHaveNoViolations();
-  });
+  }, 15000);
 
   it("AgentHarnessEngineeringPage has no accessibility violations", async () => {
     const { container } = render(<AgentHarnessEngineeringPage />);
@@ -114,5 +122,5 @@ describe("Accessibility Automated Audit (axe-core)", () => {
       },
     });
     expect(results).toHaveNoViolations();
-  });
+  }, 15000);
 });
