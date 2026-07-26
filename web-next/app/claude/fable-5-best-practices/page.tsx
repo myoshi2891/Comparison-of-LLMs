@@ -226,7 +226,7 @@ export default function Fable5BestPracticesPage() {
         </div>
 
         {/* Section 1 */}
-        <section className={styles.section} id="s1">
+        <section className={`${styles.section} chapter`} id="s1">
           <span className={styles.eyebrowNum}>01 / 15</span>
           <h2 className={styles.sectionTitle}>Claude Fable 5 とは何か</h2>
           <p>
@@ -283,7 +283,7 @@ export default function Fable5BestPracticesPage() {
         </section>
 
         {/* Section 2 */}
-        <section className={styles.section} id="s2">
+        <section className={`${styles.section} chapter`} id="s2">
           <span className={styles.eyebrowNum}>02 / 15</span>
           <h2 className={styles.sectionTitle}>タイムライン: リリースから輸出規制、価格変更まで</h2>
           <p>
@@ -312,7 +312,7 @@ export default function Fable5BestPracticesPage() {
         </section>
 
         {/* Section 3 */}
-        <section className={styles.section} id="s3">
+        <section className={`${styles.section} chapter`} id="s3">
           <span className={styles.eyebrowNum}>03 / 15</span>
           <h2 className={styles.sectionTitle}>安全分類器と自動フォールバックの仕組み</h2>
           <p>
@@ -433,7 +433,7 @@ export default function Fable5BestPracticesPage() {
         </section>
 
         {/* Section 4 */}
-        <section className={styles.section} id="s4">
+        <section className={`${styles.section} chapter`} id="s4">
           <span className={styles.eyebrowNum}>04 / 15</span>
           <h2 className={styles.sectionTitle}>プロンプティング思想の転換: チェックリストからゴールへ</h2>
           <p>
@@ -462,7 +462,7 @@ export default function Fable5BestPracticesPage() {
         </section>
 
         {/* Section 5 */}
-        <section className={styles.section} id="s5">
+        <section className={`${styles.section} chapter`} id="s5">
           <span className={styles.eyebrowNum}>05 / 15</span>
           <h2 className={styles.sectionTitle}>Effort(推論深度)レベルの使い方</h2>
           <p>
@@ -528,7 +528,7 @@ export default function Fable5BestPracticesPage() {
         </section>
 
         {/* Section 6 */}
-        <section className={styles.section} id="s6">
+        <section className={`${styles.section} chapter`} id="s6">
           <span className={styles.eyebrowNum}>06 / 15</span>
           <h2 className={styles.sectionTitle}>Claude Code での実践設定</h2>
 
@@ -645,7 +645,7 @@ export default function Fable5BestPracticesPage() {
         </section>
 
         {/* Section 7 */}
-        <section className={styles.section} id="s7">
+        <section className={`${styles.section} chapter`} id="s7">
           <span className={styles.eyebrowNum}>07 / 15</span>
           <h2 className={styles.sectionTitle}>Loop Engineering: 長時間自律ループの設計思想</h2>
           <p>
@@ -680,7 +680,7 @@ export default function Fable5BestPracticesPage() {
         </section>
 
         {/* Section 8 */}
-        <section className={styles.section} id="s8">
+        <section className={`${styles.section} chapter`} id="s8">
           <span className={styles.eyebrowNum}>08 / 15</span>
           <h2 className={styles.sectionTitle}>Thariq の「Unknowns フレームワーク」徹底解説</h2>
           <p>
@@ -735,7 +735,7 @@ export default function Fable5BestPracticesPage() {
         </section>
 
         {/* Section 9 */}
-        <section className={styles.section} id="s9">
+        <section className={`${styles.section} chapter`} id="s9">
           <span className={styles.eyebrowNum}>09 / 15</span>
           <h2 className={styles.sectionTitle}>検証ループとメモリシステムの設計</h2>
           <h3>9.1 検証はサブエージェントに任せる</h3>
@@ -761,7 +761,7 @@ export default function Fable5BestPracticesPage() {
         </section>
 
         {/* Section 10 */}
-        <section className={styles.section} id="s10">
+        <section className={`${styles.section} chapter`} id="s10">
           <span className={styles.eyebrowNum}>10 / 15</span>
           <h2 className={styles.sectionTitle}>コスト管理とモデル選定フロー</h2>
           <p>
@@ -776,7 +776,7 @@ export default function Fable5BestPracticesPage() {
         </section>
 
         {/* Section 11 */}
-        <section className={styles.section} id="s11">
+        <section className={`${styles.section} chapter`} id="s11">
           <span className={styles.eyebrowNum}>11 / 15</span>
           <h2 className={styles.sectionTitle}>よくある落とし穴(アンチパターン)</h2>
           <div className={styles.tableWrap}>
@@ -815,7 +815,7 @@ export default function Fable5BestPracticesPage() {
         </section>
 
         {/* Section 12 */}
-        <section className={styles.section} id="s12">
+        <section className={`${styles.section} chapter`} id="s12">
           <span className={styles.eyebrowNum}>12 / 15</span>
           <h2 className={styles.sectionTitle}>実力・ベンチマークと「検証必須」の理由</h2>
           <p>
@@ -831,7 +831,7 @@ export default function Fable5BestPracticesPage() {
         </section>
 
         {/* Section 13 */}
-        <section className={styles.section} id="s13">
+        <section className={`${styles.section} chapter`} id="s13">
           <span className={styles.eyebrowNum}>13 / 15</span>
           <h2 className={styles.sectionTitle}>既知の制限事項</h2>
           <ul>
@@ -843,7 +843,7 @@ export default function Fable5BestPracticesPage() {
         </section>
 
         {/* Section 14 */}
-        <section className={styles.section} id="s14">
+        <section className={`${styles.section} chapter`} id="s14">
           <span className={styles.eyebrowNum}>14 / 15</span>
           <h2 className={styles.sectionTitle}>まとめ</h2>
           <div className={styles.stepGrid}>
@@ -871,7 +871,7 @@ export default function Fable5BestPracticesPage() {
         </section>
 
         {/* Section 15 */}
-        <section className={styles.section} id="s15">
+        <section className={`${styles.section} chapter`} id="s15">
           <span className={styles.eyebrowNum}>15 / 15</span>
           <h2 className={styles.sectionTitle}>参考文献・ソースURL一覧</h2>
           <div className={styles.refGroup}>
