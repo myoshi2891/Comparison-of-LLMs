@@ -4,10 +4,8 @@ import Page from "./page";
 
 // Mock MermaidDiagram component to avoid dynamic import and DOM issues in Vitest
 vi.mock("@/components/docs/MermaidDiagram", () => ({
-  default: ({ chart, caption }: { chart: string; caption?: string }) => (
-    <div data-testid="mermaid-diagram" data-chart={chart}>
-      {caption && <span>{caption}</span>}
-    </div>
+  default: ({ chart }: { chart: string }) => (
+    <div data-testid="mermaid-diagram" data-chart={chart} />
   ),
 }));
 

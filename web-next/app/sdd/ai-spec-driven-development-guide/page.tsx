@@ -282,9 +282,9 @@ export default function SpecDrivenDevelopmentGuidePage() {
     classDef c1 fill:#3b2f6b,stroke:#c9bdf5,color:#e4defa
     classDef c2 fill:#134e4a,stroke:#99f0e3,color:#d1faf3
     classDef c3 fill:#5c2a1f,stroke:#ffb199,color:#ffe3d9`}
-              caption="図3-1. SDDの3段階成熟度モデル（Böckeler, 2026）"
             />
           </div>
+          <p className={styles.diagramCaption}>図3-1. SDDの3段階成熟度モデル（Böckeler, 2026）</p>
 
           <div className={styles.tableWrapper}>
             <table>
@@ -666,9 +666,9 @@ export default function SpecDrivenDevelopmentGuidePage() {
     E --> F["Verification（検証）"]:::t
     F -->|"仕様変更・差分"| B
     classDef t fill:#134e4a,stroke:#99f0e3,color:#d1faf3`}
-              caption="図6-1. SDDの一般的なライフサイクル"
             />
           </div>
+          <p className={styles.diagramCaption}>図6-1. SDDの一般的なライフサイクル</p>
 
           <p>
             各フェーズの間には必ず人間によるレビュー（承認ゲート）を挟むことが推奨されています。AWS
@@ -688,9 +688,9 @@ export default function SpecDrivenDevelopmentGuidePage() {
               chart={`flowchart LR
     C0["/speckit.constitution"]:::p --> C1["/speckit.specify"]:::p --> C2["/speckit.plan"]:::p --> C3["/speckit.tasks"]:::p --> C4["/speckit.analyze"]:::p --> C5["/speckit.implement"]:::p
     classDef p fill:#3b2f6b,stroke:#c9bdf5,color:#e4defa`}
-              caption="図6-2. GitHub Spec Kitのコマンドフロー"
             />
           </div>
+          <p className={styles.diagramCaption}>図6-2. GitHub Spec Kitのコマンドフロー</p>
 
           <p>
             <code className={styles.codeInline}>constitution</code>ファイルは
@@ -712,9 +712,9 @@ export default function SpecDrivenDevelopmentGuidePage() {
               chart={`flowchart LR
     K1["自然言語のプロンプト"]:::k --> K2["requirements.md（EARS記法）"]:::k --> K3["design.md（技術設計）"]:::k --> K4["tasks.md（実装タスク）"]:::k --> K5["実装 + Hooks（lint/test/セキュリティ）"]:::k
     classDef k fill:#5c2a1f,stroke:#ffb199,color:#ffe3d9`}
-              caption="図6-3. AWS Kiroの3ドキュメント構成"
             />
           </div>
+          <p className={styles.diagramCaption}>図6-3. AWS Kiroの3ドキュメント構成</p>
 
           <p>
             Kiroでは各タスク完了後に自動でテストを実行し、要件を満たしているかを検証する仕組みが組み込まれています。また「Run
@@ -808,9 +808,9 @@ export default function SpecDrivenDevelopmentGuidePage() {
     classDef ok fill:#0f3d28,stroke:#8be8bd,color:#dbf8e8
     classDef warn fill:#4a3208,stroke:#ffd580,color:#fff2d6
     classDef bad fill:#4a1414,stroke:#ffaaaa,color:#ffe0e0`}
-              caption="図7-1. 3段階の境界線による判断フロー"
             />
           </div>
+          <p className={styles.diagramCaption}>図7-1. 3段階の境界線による判断フロー</p>
 
           <div className={styles.tableWrapper}>
             <table>
@@ -926,9 +926,11 @@ export default function SpecDrivenDevelopmentGuidePage() {
     P4 -->|"ギャップを検出"| P3
     P4 -->|"合格・証拠を提示"| P5["Commit"]:::pk
     classDef pk fill:#5c1f44,stroke:#f7b8dd,color:#fde3f2`}
-              caption="図8-1. Claude CodeにおけるPlan Mode〜Subagentレビューのループ"
             />
           </div>
+          <p className={styles.diagramCaption}>
+            図8-1. Claude CodeにおけるPlan Mode〜Subagentレビューのループ
+          </p>
 
           <p>
             Anthropicの実践では、実装が完了したという「主張」をそのまま信じるのではなく、テスト出力・実行コマンドとその結果・スクリーンショットなど「証拠（evidence）」を提示させることが推奨されています。証拠を確認する方が、検証をゼロからやり直すより速いためです。
