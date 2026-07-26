@@ -3,7 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>サブエージェント & Agent Teams 開発における Markdown ファイル ベストプラクティス</title>
+    <title>
+      サブエージェント &amp; Agent Teams 開発における Markdown ファイル ベストプラクティス
+    </title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -34,6 +36,7 @@
         --radius: 16px;
         --radius-sm: 9px;
         --maxw: 840px;
+        --gutter: 56px;
       }
       * {
         box-sizing: border-box;
@@ -175,14 +178,13 @@
 
       main {
         min-width: 0;
-        padding: 56px 40px 100px;
-        display: flex;
-        justify-content: center;
+        padding: var(--gutter) var(--gutter) 100px;
       }
       .content {
         width: 100%;
-        max-width: var(--maxw);
+        max-width: none;
       }
+      /* every block — text, callouts, code, tables, diagrams — spans the full content width consistently */
 
       section {
         margin-bottom: 76px;
@@ -204,7 +206,6 @@
         color: var(--ink-soft);
         font-size: 16px;
         margin: 0 0 28px;
-        max-width: 62ch;
       }
       h3 {
         font-size: 19px;
@@ -242,11 +243,13 @@
 
       /* ---------- hero ---------- */
       .hero {
-        background: linear-gradient(165deg, var(--navy-deep) 0%, var(--navy-mid) 100%);
-        color: #fff;
-        border-radius: 22px;
-        padding: 52px 44px 40px;
-        margin-bottom: 64px;
+        background: linear-gradient(165deg, #ffffff 0%, var(--accent-soft) 100%);
+        color: var(--ink);
+        padding: 96px var(--gutter) 48px;
+        margin: calc(-1 * var(--gutter)) calc(-1 * var(--gutter)) 64px calc(-1 * var(--gutter));
+        border-radius: 0 0 28px 28px;
+        border-bottom: 1px solid var(--line);
+        box-shadow: 0 24px 48px -36px rgba(20, 20, 45, 0.16);
         position: relative;
         overflow: hidden;
       }
@@ -255,8 +258,8 @@
         position: absolute;
         inset: 0;
         background: radial-gradient(
-          600px 260px at 85% -10%,
-          rgba(91, 78, 255, 0.35),
+          650px 280px at 85% -10%,
+          rgba(91, 78, 255, 0.12),
           transparent 60%
         );
         pointer-events: none;
@@ -264,24 +267,23 @@
       .hero .kicker {
         font-family: var(--mono);
         font-size: 12.5px;
-        color: #a9adf0;
+        color: var(--accent-dark);
         letter-spacing: 0.1em;
         text-transform: uppercase;
         margin: 0 0 18px;
         position: relative;
+        font-weight: 700;
       }
       .hero h1 {
-        color: #fff;
+        color: var(--ink);
         font-size: 34px;
         line-height: 1.5;
         margin: 0 0 16px;
-        max-width: 22ch;
         position: relative;
       }
       .hero p.sub {
-        color: #c3c6ea;
+        color: var(--ink-soft);
         font-size: 16px;
-        max-width: 56ch;
         margin: 0 0 30px;
         position: relative;
       }
@@ -295,9 +297,9 @@
       .pill {
         font-family: var(--mono);
         font-size: 12px;
-        color: #dfe0ff;
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.14);
+        color: var(--accent-dark);
+        background: #fff;
+        border: 1px solid #d7d1ff;
         padding: 5px 12px;
         border-radius: 99px;
       }
@@ -314,10 +316,11 @@
         display: flex;
         align-items: center;
         gap: 14px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: #ffffff;
+        border: 1px solid var(--line);
         border-radius: 12px;
         padding: 13px 16px;
+        box-shadow: 0 1px 2px rgba(20, 20, 45, 0.04);
       }
       .stack .layer .idx {
         font-family: var(--mono);
@@ -332,6 +335,7 @@
         justify-content: center;
         flex: none;
         font-weight: 700;
+        border: 1px solid rgba(0, 0, 0, 0.06);
       }
       .stack .layer.l1 .idx {
         background: #ffd88a;
@@ -348,19 +352,19 @@
       .stack .layer .name {
         font-family: var(--mono);
         font-size: 13.5px;
-        color: #fff;
+        color: var(--ink);
         font-weight: 500;
       }
       .stack .layer .desc {
         font-size: 12.5px;
-        color: #9b9fd6;
+        color: var(--ink-faint);
         margin-left: auto;
         text-align: right;
       }
       .stack .connector {
         width: 1px;
         height: 10px;
-        background: rgba(255, 255, 255, 0.2);
+        background: var(--line);
         margin-left: 32px;
       }
 
@@ -617,8 +621,8 @@
       }
 
       footer {
-        max-width: var(--maxw);
-        margin: 0 auto;
+        max-width: none;
+        margin: 0;
         padding: 30px 0 0;
         border-top: 1px solid var(--line);
         color: var(--ink-faint);
@@ -659,11 +663,14 @@
           border: 1px solid var(--navy-line);
           cursor: pointer;
         }
+        :root {
+          --gutter: 20px;
+        }
         main {
-          padding: 90px 20px 80px;
+          padding: 90px var(--gutter) 80px;
         }
         .hero {
-          padding: 36px 24px 28px;
+          padding: 44px var(--gutter) 32px;
         }
         .hero h1 {
           font-size: 26px;
@@ -722,7 +729,8 @@
           <header class="hero">
             <p class="kicker">Claude Code / Markdown 設定ファイル実践ガイド</p>
             <h1>
-              サブエージェント & Agent Teams 開発における<br />Markdown ファイル ベストプラクティス
+              サブエージェント &amp; Agent Teams 開発における<br />Markdown ファイル
+              ベストプラクティス
             </h1>
             <p class="sub">
               CLAUDE.md・サブエージェント定義・Agent Teams はすべて「YAML frontmatter +
@@ -810,15 +818,7 @@
             </div>
 
             <div class="mermaid-card">
-              <div class="mermaid">
-                flowchart TD A["CLAUDE.md<br />常時ロードされる記憶"] --> M["メインセッション"]
-                S["SKILL.md<br />必要な時だけ本文ロード"] -.->|"description一致時に呼び出し"| M M
-                -->|"一方向に委譲・要約が返る"| SA["サブエージェント<br />.claude/agents/*.md"] M
-                -->|"チームを編成"| TL["Team Lead<br />(メインセッション自身)"] TL -->|"タスク割当"|
-                T1["Teammate 1"] TL -->|"タスク割当"| T2["Teammate 2"] T1
-                <-->|"メールボックスで直接会話"| T2 T1
-                -.->|"サブエージェント定義を役割として再利用"| SA
-              </div>
+              <div class="mermaid" id="diagram-overview">読み込み中…</div>
               <p class="cap">Fig.1 — 4層の関係図</p>
             </div>
 
@@ -1172,14 +1172,7 @@ Node.js + TypeScript のモノレポ。パッケージマネージャは pnpm。
 
             <h3>委譲のフロー</h3>
             <div class="mermaid-card">
-              <div class="mermaid">
-                sequenceDiagram participant U as ユーザー participant M as メインセッション
-                participant SA as サブエージェント(独立コンテキスト) U->>M: 「コードレビューして」
-                M->>M: descriptionと一致するか判断 M->>SA:
-                タスクを要約して委譲(新規コンテキスト起動) activate SA SA->>SA: git diff / Read /
-                Grep 等を実行 SA-->>M: レビュー結果の要約のみ返却 deactivate SA M-->>U:
-                要約結果を提示(詳細ログはメインに残らない)
-              </div>
+              <div class="mermaid" id="diagram-delegation">読み込み中…</div>
               <p class="cap">Fig.2 — サブエージェントへの委譲フロー</p>
             </div>
 
@@ -1315,14 +1308,7 @@ Node.js + TypeScript のモノレポ。パッケージマネージャは pnpm。
             </div>
 
             <div class="mermaid-card">
-              <div class="mermaid">
-                flowchart TB subgraph Team["Agent Team(1セッション内)"] L["Team Lead<br />(メインセッション)"]
-                TL["共有タスクリスト<br />pending/in progress/completed"] T1["Teammate:
-                security-reviewer"] T2["Teammate: perf-reviewer"] T3["Teammate: test-coverage"] end
-                L -->|タスク登録/割当| TL T1 -->|タスクをclaim/完了| TL T2 -->|タスクをclaim/完了|
-                TL T3 -->|タスクをclaim/完了| TL T1 <-->|mailboxで直接会話| T2 T2
-                <-->|mailboxで直接会話| T3 T1 -->|完了通知| L T2 -->|完了通知| L T3 -->|完了通知| L
-              </div>
+              <div class="mermaid" id="diagram-teams">読み込み中…</div>
               <p class="cap">Fig.3 — Agent Teams アーキテクチャ</p>
             </div>
 
@@ -1463,15 +1449,7 @@ Node.js + TypeScript のモノレポ。パッケージマネージャは pnpm。
               ><span class="chip">一方向委譲?</span><span class="chip">相互会話?</span>
             </div>
             <div class="mermaid-card">
-              <div class="mermaid">
-                flowchart TD Start(["新しいルール・振る舞いを追加したい"]) --> Q1{"毎セッション<br />常に有効にしたいか?"}
-                Q1 -- Yes --> CM["CLAUDE.md に書く"] Q1 -- No --> Q2{"メインの会話の中で<br />再利用したい手順・知識か?"}
-                Q2 -- Yes --> SK["SKILL.md を作る"] Q2 -- No --> Q3{"一方向に委譲して<br />結果の要約だけ欲しいか?"}
-                Q3 -- Yes --> SA[".claude/agents/*.md<br />サブエージェントを作る"] Q3 -- No -->
-                Q4{"複数の作業者が<br />直接会話・相互検証すべきか?"} Q4 -- Yes --> AT["Agent Teams
-                を有効化し<br />サブエージェント定義を役割として使う"] Q4 -- No -->
-                Single["単一セッションのまま<br />メインで対応する"]
-              </div>
+              <div class="mermaid" id="diagram-decision">読み込み中…</div>
               <p class="cap">Fig.4 — レイヤー選択の判断フロー</p>
             </div>
           </section>
@@ -1688,7 +1666,7 @@ Node.js + TypeScript のモノレポ。パッケージマネージャは pnpm。
 
     <script>
       mermaid.initialize({
-        startOnLoad: true,
+        startOnLoad: false,
         theme: 'base',
         themeVariables: {
           primaryColor: '#edeaff',
@@ -1697,12 +1675,109 @@ Node.js + TypeScript のモノレポ。パッケージマネージャは pnpm。
           lineColor: '#7a8093',
           secondaryColor: '#e2f6f0',
           tertiaryColor: '#fbf1de',
-          fontFamily: 'JetBrains Mono, monospace',
-          fontSize: '13px',
+          fontFamily: "'Noto Sans JP', sans-serif",
+          fontSize: '14px',
         },
         flowchart: { curve: 'basis', htmlLabels: true },
         securityLevel: 'loose',
       });
+
+      // Diagram sources live here as plain JS strings (not raw HTML) so that
+      // characters like "<-->" or quotes are never round-tripped through the
+      // browser's HTML parser, which previously mangled them into invalid
+      // mermaid syntax and produced "Syntax error in text".
+      const diagramSources = {
+        'diagram-overview': [
+          'flowchart TD',
+          '    A["CLAUDE.md<br/>常時ロードされる記憶"] --> M["メインセッション"]',
+          '    S["SKILL.md<br/>必要な時だけ本文ロード"] -.->|"description一致時に呼び出し"| M',
+          '    M -->|"一方向に委譲・要約が返る"| SA["サブエージェント<br/>.claude/agents 配下のMarkdown"]',
+          '    M -->|"チームを編成"| TL["Team Lead<br/>メインセッション自身"]',
+          '    TL -->|"タスク割当"| T1["Teammate 1"]',
+          '    TL -->|"タスク割当"| T2["Teammate 2"]',
+          '    T1 -->|"メールボックスで会話"| T2',
+          '    T2 -->|"メールボックスで会話"| T1',
+          '    T1 -.->|"サブエージェント定義を役割として再利用"| SA',
+        ].join('\n'),
+
+        'diagram-delegation': [
+          'sequenceDiagram',
+          '    participant U as ユーザー',
+          '    participant M as メインセッション',
+          '    participant SA as サブエージェント(独立コンテキスト)',
+          '    U->>M: コードレビューして',
+          '    M->>M: descriptionと一致するか判断',
+          '    M->>SA: タスクを要約して委譲、新規コンテキスト起動',
+          '    activate SA',
+          '    SA->>SA: git diff / Read / Grep 等を実行',
+          '    SA-->>M: レビュー結果の要約のみ返却',
+          '    deactivate SA',
+          '    M-->>U: 要約結果を提示、詳細ログはメインに残らない',
+        ].join('\n'),
+
+        'diagram-teams': [
+          'flowchart TB',
+          '    subgraph Team["Agent Team 1セッション内"]',
+          '        L["Team Lead<br/>メインセッション"]',
+          '        TL["共有タスクリスト<br/>pending/in progress/completed"]',
+          '        T1["Teammate: security-reviewer"]',
+          '        T2["Teammate: perf-reviewer"]',
+          '        T3["Teammate: test-coverage"]',
+          '    end',
+          '    L -->|タスク登録/割当| TL',
+          '    T1 -->|タスクをclaim/完了| TL',
+          '    T2 -->|タスクをclaim/完了| TL',
+          '    T3 -->|タスクをclaim/完了| TL',
+          '    T1 -->|mailboxで会話| T2',
+          '    T2 -->|mailboxで会話| T1',
+          '    T2 -->|mailboxで会話| T3',
+          '    T3 -->|mailboxで会話| T2',
+          '    T1 -->|完了通知| L',
+          '    T2 -->|完了通知| L',
+          '    T3 -->|完了通知| L',
+        ].join('\n'),
+
+        'diagram-decision': [
+          'flowchart TD',
+          '    Start(["新しいルール・振る舞いを追加したい"]) --> Q1{"毎セッション<br/>常に有効にしたいか?"}',
+          '    Q1 -- Yes --> CM["CLAUDE.md に書く"]',
+          '    Q1 -- No --> Q2{"メインの会話の中で<br/>再利用したい手順・知識か?"}',
+          '    Q2 -- Yes --> SK["SKILL.md を作る"]',
+          '    Q2 -- No --> Q3{"一方向に委譲して<br/>結果の要約だけ欲しいか?"}',
+          '    Q3 -- Yes --> SA[".claude/agents 配下に<br/>サブエージェントを作る"]',
+          '    Q3 -- No --> Q4{"複数の作業者が<br/>直接会話・相互検証すべきか?"}',
+          '    Q4 -- Yes --> AT["Agent Teams を有効化し<br/>サブエージェント定義を役割として使う"]',
+          '    Q4 -- No --> Single["単一セッションのまま<br/>メインで対応する"]',
+        ].join('\n'),
+      };
+
+      async function renderDiagrams() {
+        // Mermaid measures text to size each label's box before drawing it.
+        // If that happens before the webfont has finished loading, the box is
+        // sized using a fallback font's (narrower) metrics, and the real text
+        // gets clipped once the correct font swaps in. Waiting for
+        // document.fonts.ready avoids that.
+        if (document.fonts && document.fonts.ready) {
+          try {
+            await document.fonts.ready;
+          } catch (e) {}
+        }
+        for (const [id, source] of Object.entries(diagramSources)) {
+          const el = document.getElementById(id);
+          if (!el) continue;
+          try {
+            const { svg, bindFunctions } = await mermaid.render(id + '-svg', source);
+            el.innerHTML = svg;
+            if (bindFunctions) bindFunctions(el);
+          } catch (err) {
+            el.innerHTML =
+              '<p style="color:#b23b3b;font-family:var(--mono);font-size:12.5px;">diagram error: ' +
+              (err && err.message ? err.message : err) +
+              '</p>';
+          }
+        }
+      }
+      renderDiagrams();
 
       // active link highlight on scroll
       const links = document.querySelectorAll('.file-tree a');
