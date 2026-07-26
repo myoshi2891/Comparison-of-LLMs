@@ -436,6 +436,16 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-26",
   },
   {
+    slug: "/sdd/spec-driven-development-guide",
+    title: "Spec-Driven Development (中級・上級)",
+    group: "開発プロセス",
+    topics: ["sdd", "spec-driven-development", "ears", "architecture", "multi-agent"],
+    summary:
+      "バイブコーディング脱却からマルチエージェント検証、EARS記法、GitHub Spec Kit・AWS Kiro・BMAD実践まで網羅した、中級・上級エンジニア向け仕様駆動開発の実践ガイド。",
+    addedAt: "2026-07-26",
+    lastReviewed: "2026-07-26",
+  },
+  {
     slug: "/google/adk-best-practices",
     title: "ADK Best Practices",
     group: "Providers",
