@@ -1153,42 +1153,90 @@ export default async function SpecDrivenDevelopmentGuidePage() {
               <span className={styles.chip}>11</span>ベストプラクティス集（12項目）
             </h2>
           </div>
-          <ol>
-            <li>
-              <strong>仕様の粒度は「annoyance test」で判断する</strong>：AIエージェントに意図と違う解釈をされたら困る場合は仕様を書く。ワンショットの追加プロンプトで直せる程度なら仕様のオーバーヘッドは正当化されない、という実務上の判断基準がAugment Code社のガイドで紹介されています。
+          <ol className={styles.bpList}>
+            <li className={styles.bpItem}>
+              <div className={styles.bpNum}>01</div>
+              <div className={styles.bpContent}>
+                <p className={styles.bpTitle}>仕様の粒度は「annoyance test」で判断する</p>
+                <p className={styles.bpDesc}>AIエージェントに意図と違う解釈をされたら困る場合は仕様を書く。ワンショットの追加プロンプトで直せる程度なら仕様のオーバーヘッドは正当化されない、という実務上の判断基準がAugment Code社のガイドで紹介されています。</p>
+              </div>
             </li>
-            <li>
-              <strong>Constitution（原則）を最初に一度だけ固める</strong>：機能ごとの原則ではなく、プロジェクト全体・チーム全体の非交渉的な原則として1回定義し、以降のすべての仕様・計画・タスクをこれに照らしてチェックします。
+            <li className={styles.bpItem}>
+              <div className={styles.bpNum}>02</div>
+              <div className={styles.bpContent}>
+                <p className={styles.bpTitle}>Constitution（原則）を最初に一度だけ固める</p>
+                <p className={styles.bpDesc}>機能ごとの原則ではなく、プロジェクト全体・チーム全体の非交渉的な原則として1回定義し、以降のすべての仕様・計画・タスクをこれに照らしてチェックします。</p>
+              </div>
             </li>
-            <li>
-              <strong>Clarifyフェーズを飛ばさない</strong>：曖昧さが残る本番機能では、必ず対話的な明確化フェーズを設け、権限・エラー処理・永続化要否などの穴を実装前に埋めます。
+            <li className={styles.bpItem}>
+              <div className={styles.bpNum}>03</div>
+              <div className={styles.bpContent}>
+                <p className={styles.bpTitle}>Clarifyフェーズを飛ばさない</p>
+                <p className={styles.bpDesc}>曖昧さが残る本番機能では、必ず対話的な明確化フェーズを設け、権限・エラー処理・永続化要否などの穴を実装前に埋めます。</p>
+              </div>
             </li>
-            <li>
-              <strong>技術スタックの決定は「何を」の後にする</strong>：仕様定義の初期段階では技術スタックに触れず、まず「何を」「なぜ」作るかを明確にしてから、計画フェーズで技術的な意思決定を行います。
+            <li className={styles.bpItem}>
+              <div className={styles.bpNum}>04</div>
+              <div className={styles.bpContent}>
+                <p className={styles.bpTitle}>技術スタックの決定は「何を」の後にする</p>
+                <p className={styles.bpDesc}>仕様定義の初期段階では技術スタックに触れず、まず「何を」「なぜ」作るかを明確にしてから、計画フェーズで技術的な意思決定を行います。</p>
+              </div>
             </li>
-            <li>
-              <strong>成熟度はSpec-Anchoredを目標にする</strong>：Spec-as-Sourceは魅力的に見えますが、2026年時点ではツール・エージェントの成熟度がまだ追いついていないという指摘が複数あり、コードを真実の源として保持しつつ仕様を最重要の成果物として扱うSpec-Anchoredが現実的な落とし所です。
+            <li className={styles.bpItem}>
+              <div className={styles.bpNum}>05</div>
+              <div className={styles.bpContent}>
+                <p className={styles.bpTitle}>成熟度はSpec-Anchoredを目標にする</p>
+                <p className={styles.bpDesc}>Spec-as-Sourceは魅力的に見えますが、2026年時点ではツール・エージェントの成熟度がまだ追いついていないという指摘が複数あり、コードを真実の源として保持しつつ仕様を最重要の成果物として扱うSpec-Anchoredが現実的な落とし所です。</p>
+              </div>
             </li>
-            <li>
-              <strong>タスクは小さく・段階的に実装する</strong>：巨大なタスクリストをいきなり無人実行させず、3〜5タスク程度から始めてレビューし、constitutionや仕様を調整してからスケールさせます。
+            <li className={styles.bpItem}>
+              <div className={styles.bpNum}>06</div>
+              <div className={styles.bpContent}>
+                <p className={styles.bpTitle}>タスクは小さく・段階的に実装する</p>
+                <p className={styles.bpDesc}>巨大なタスクリストをいきなり無人実行させず、3〜5タスク程度から始めてレビューし、constitutionや仕様を調整してからスケールさせます。</p>
+              </div>
             </li>
-            <li>
-              <strong>別エージェントによる検証を組み込む</strong>：実装エージェントの自己申告に頼らず、Coordinator/Implementor/Verifierのように役割を分離し、対立する目標を持つエージェントに相互チェックさせます。
+            <li className={styles.bpItem}>
+              <div className={styles.bpNum}>07</div>
+              <div className={styles.bpContent}>
+                <p className={styles.bpTitle}>別エージェントによる検証を組み込む</p>
+                <p className={styles.bpDesc}>実装エージェントの自己申告に頼らず、Coordinator/Implementor/Verifierのように役割を分離し、対立する目標を持つエージェントに相互チェックさせます。</p>
+              </div>
             </li>
-            <li>
-              <strong>仕様は「生きた文書」として運用する</strong>：バグ修正や仕様変更が発生した際は、コードより先に仕様を更新する習慣を徹底します。実務者の報告では、エージェントが変更と同じ手間で仕様を更新できるため、これは追加の負担にはならないとされています。
+            <li className={styles.bpItem}>
+              <div className={styles.bpNum}>08</div>
+              <div className={styles.bpContent}>
+                <p className={styles.bpTitle}>仕様は「生きた文書」として運用する</p>
+                <p className={styles.bpDesc}>バグ修正や仕様変更が発生した際は、コードより先に仕様を更新する習慣を徹底します。実務者の報告では、エージェントが変更と同じ手間で仕様を更新できるため、これは追加の負担にはならないとされています。</p>
+              </div>
             </li>
-            <li>
-              <strong>仕様のドリフトは「バグ」として同じ運用で扱う</strong>：エージェントが仕様と異なるコードを生成した場合、それは新しい問題ではなく、従来のバグ管理と同じ扱いで直す。レビュー・テストで検出し、ガードレールがなぜ機能しなかったかを分析して再発防止に努めます。
+            <li className={styles.bpItem}>
+              <div className={styles.bpNum}>09</div>
+              <div className={styles.bpContent}>
+                <p className={styles.bpTitle}>仕様のドリフトは「バグ」として同じ運用で扱う</p>
+                <p className={styles.bpDesc}>エージェントが仕様と異なるコードを生成した場合、それは新しい問題ではなく、従来のバグ管理と同じ扱いで直す。レビュー・テストで検出し、ガードレールがなぜ機能しなかったかを分析して再発防止に努めます。</p>
+              </div>
             </li>
-            <li>
-              <strong>ブラウンフィールドとグリーンフィールドでツールを使い分ける</strong>：既存システムの小規模な改修にはOpenSpecのような軽量なデルタ形式を、複雑な新規開発にはBMAD-METHODのような多エージェント・フルライフサイクル型を使うなど、状況に応じてツールを選定・併用します。
+            <li className={styles.bpItem}>
+              <div className={styles.bpNum}>10</div>
+              <div className={styles.bpContent}>
+                <p className={styles.bpTitle}>ブラウンフィールドとグリーンフィールドでツールを使い分ける</p>
+                <p className={styles.bpDesc}>既存システムの小規模な改修にはOpenSpecのような軽量なデルタ形式を、複雑な新規開発にはBMAD-METHODのような多エージェント・フルライフサイクル型を使うなど、状況に応じてツールを選定・併用します。</p>
+              </div>
             </li>
-            <li>
-              <strong>監査証跡・ガバナンスが必要な場合は仕様をバージョン管理する</strong>：規制業界やコンプライアンス要件がある場合、仕様スタックをコードと一緒にバージョン管理へ含めることで、後から「なぜこの変更をしたか」を人間が読める形で追跡できるようにします。
+            <li className={styles.bpItem}>
+              <div className={styles.bpNum}>11</div>
+              <div className={styles.bpContent}>
+                <p className={styles.bpTitle}>監査証跡・ガバナンスが必要な場合は仕様をバージョン管理する</p>
+                <p className={styles.bpDesc}>規制業界やコンプライアンス要件がある場合、仕様スタックをコードと一緒にバージョン管理へ含めることで、後から「なぜこの変更をしたか」を人間が読める形で追跡できるようにします。</p>
+              </div>
             </li>
-            <li>
-              <strong>API呼び出し量の増加を織り込む</strong>：SDDワークフローでは、エージェントが毎ターン仕様・計画・タスクを再読み込みするため、バイブコーディングと比較して概ね20〜40%程度APIコストが増加するという実務上の目安が報告されています。予算計画に織り込んでおきましょう。
+            <li className={styles.bpItem}>
+              <div className={styles.bpNum}>12</div>
+              <div className={styles.bpContent}>
+                <p className={styles.bpTitle}>API呼び出し量の増加を織り込む</p>
+                <p className={styles.bpDesc}>SDDワークフローでは、エージェントが毎ターン仕様・計画・タスクを再読み込みするため、バイブコーディングと比較して概ね20〜40%程度APIコストが増加するという実務上の目安が報告されています。予算計画に織り込んでおきましょう。</p>
+              </div>
             </li>
           </ol>
 
@@ -1418,7 +1466,7 @@ export default async function SpecDrivenDevelopmentGuidePage() {
             <li>タスクは小さく分解され、段階的に実装・レビューされているか</li>
             <li>実装エージェントとは別に <strong>検証（Verifier）</strong> の仕組みがあるか</li>
             <li>仕様は実装より先に更新される「生きた文書」として運用されているか</li>
-            <li>ブラウンフィールド／グリーンフィールドに応じてツール（OpenSpec/BMAD/Spec Kit/Kiro等）を使い分けているか</li>
+            <li>ブラウンフィールド／グリーンフィールドに応じてツール（OpenSpec / BMAD / Spec Kit / Kiro 等）を使い分けているか</li>
             <li>監査証跡が必要な場合、仕様一式がバージョン管理下に置かれているか</li>
             <li>APIコスト増加（目安20〜40%）を予算計画に織り込んでいるか</li>
             <li>過剰仕様・ビッグバンリリース・AI生成コードへの慢心といったアンチパターンを定期的にレビューしているか</li>
@@ -1435,179 +1483,74 @@ export default async function SpecDrivenDevelopmentGuidePage() {
           <p className={styles.sectionLead}>
             本ガイド全体で参照した情報源の一覧です（2026年7月時点でアクセス可能なURLです）。
           </p>
-          <ol className={styles.refs}>
-            <li>
-              <Ext href="https://thebcms.com/blog/spec-driven-development">Spec-Driven Development (SDD): The Definitive 2026 Guide - BCMS</Ext>
-            </li>
-            <li>
-              <Ext href="https://blog.allegro.tech/2026/06/spec-driven-development-best-practices.html">Spec-Driven Development (SDD) — best practices (so far) - Allegro Tech</Ext>
-            </li>
-            <li>
-              <Ext href="https://www.augmentcode.com/guides/what-is-spec-driven-development">What Is Spec-Driven Development? A Complete Guide - Augment Code</Ext>
-            </li>
-            <li>
-              <Ext href="https://www.augmentcode.com/tools/best-spec-driven-development-tools">6 Best Spec-Driven Development Tools for AI Coding in 2026 - Augment Code</Ext>
-            </li>
-            <li>
-              <Ext href="https://medium.com/@tojosphine/spec-driven-development-what-i-wish-i-knew-before-i-started-1213d485a244">Spec-Driven Development, What I Wish I Knew Before I Started - Josphine Job (Medium)</Ext>
-            </li>
-            <li>
-              <Ext href="https://developer.microsoft.com/blog/spec-driven-development-ai-native-engineering">Spec-Driven Development: A Spec-First Approach to AI-Native Engineering - Microsoft for Developers</Ext>
-            </li>
-            <li>
-              <Ext href="https://heeki.medium.com/using-spec-driven-development-with-claude-code-4a1ebe5d9f29">Using spec-driven development with Claude Code - Heeki Park (Medium)</Ext>
-            </li>
-            <li>
-              <Ext href="https://evangelistsoftware.com/blog/spec-driven-development-guide/">Spec Driven Development [2026]: What It Is &amp; How to Use It - Evangelist Software</Ext>
-            </li>
-            <li>
-              <Ext href="https://dev.to/krlz/spec-driven-development-in-2026-what-it-is-the-tooling-and-how-teams-actually-use-it-2fk2">Spec-Driven Development in 2026 - DEV Community</Ext>
-            </li>
-            <li>
-              <Ext href="https://setronica.com/media/blog/what-is-spec-driven-development-implementation-framework-best-practices/">Spec-Driven Development Explained - Setronica</Ext>
-            </li>
-            <li>
-              <Ext href="https://github.github.com/spec-kit/quickstart.html">Quick Start Guide - Spec Kit Documentation</Ext>
-            </li>
-            <li>
-              <Ext href="https://github.com/github/spec-kit">GitHub - github/spec-kit</Ext>
-            </li>
-            <li>
-              <Ext href="https://www.fundesk.io/spec-driven-development-github-spec-kit-guide">GitHub Spec Kit: The 2026 Spec-Driven Development Guide - funDesk</Ext>
-            </li>
-            <li>
-              <Ext href="https://den.dev/blog/github-spec-kit/">What&apos;s The Deal With GitHub Spec Kit - Den Delimarsky</Ext>
-            </li>
-            <li>
-              <Ext href="https://knightli.com/en/2026/05/25/github-spec-kit-spec-driven-development/">What Is GitHub Spec Kit? - knightli.com</Ext>
-            </li>
-            <li>
-              <Ext href="https://www.marktechpost.com/2026/05/08/meet-github-spec-kit-an-open-source-toolkit-for-spec-driven-development-with-ai-coding-agents/">Meet GitHub Spec-Kit - MarkTechPost</Ext>
-            </li>
-            <li>
-              <Ext href="https://blog.logrocket.com/github-spec-kit/">Exploring spec-driven development with the new GitHub Spec Kit - LogRocket Blog</Ext>
-            </li>
-            <li>
-              <Ext href="https://rywalker.com/research/github-spec-kit">GitHub Spec Kit - Ry Walker Research</Ext>
-            </li>
-            <li>
-              <Ext href="https://dev.to/daveu1983/creating-my-portfolio-website-using-githubs-spec-kit-5g40">Creating my portfolio website using GitHub&apos;s Spec-kit - DEV Community</Ext>
-            </li>
-            <li>
-              <Ext href="https://alistairmavin.com/ears/">Alistair Mavin - EARS: Easy Approach to Requirements Syntax</Ext>
-            </li>
-            <li>
-              <Ext href="https://medium.com/paramtech/ears-the-easy-approach-to-requirements-syntax-b09597aae31d">EARS: The Easy Approach to Requirements Syntax - Medium</Ext>
-            </li>
-            <li>
-              <Ext href="https://dev.to/sebastian_dingler/ears-the-easy-approach-to-requirements-syntax-39a5">EARS: The Easy Approach to Requirements Syntax - DEV Community</Ext>
-            </li>
-            <li>
-              <Ext href="https://www.jamasoftware.com/requirements-management-guide/writing-requirements/adopting-the-ears-notation-to-improve-requirements-engineering/">Adopting the EARS Notation to Improve Requirements Engineering - Jama Software</Ext>
-            </li>
-            <li>
-              <Ext href="https://ieeexplore.ieee.org/document/5328509/">Easy Approach to Requirements Syntax (EARS) - IEEE Xplore</Ext>
-            </li>
-            <li>
-              <Ext href="https://www.researchgate.net/publication/224079416_Easy_approach_to_requirements_syntax_EARS">(PDF) Easy approach to requirements syntax (EARS) - ResearchGate</Ext>
-            </li>
-            <li>
-              <Ext href="https://www.iaria.org/conferences2013/filesICCGI13/ICCGI_2013_Tutorial_Terzakis.pdf">EARS: The Easy Approach to Requirements Syntax Version 1.0 - Intel/IARIA Tutorial</Ext>
-            </li>
-            <li>
-              <Ext href="https://www.linkedin.com/pulse/easy-approach-requirements-syntax-ears-chatgpt-rob-black">Easy Approach to Requirements Syntax (EARS) with ChatGPT - Rob Black</Ext>
-            </li>
-            <li>
-              <Ext href="https://engx.theiet.org/f/discussions/27493/easy-approach-to-requirements-syntax-ears-by-alistair-mavin-requirements-specialist-at-rolls-royce-plc">Easy Approach to Requirements Syntax (EARS) - IET EngX</Ext>
-            </li>
-            <li>
-              <Ext href="https://aws.amazon.com/blogs/industries/from-spec-to-production-a-three-week-drug-discovery-agent-using-kiro/">From spec to production: a three-week drug discovery agent using Kiro - AWS for Industries</Ext>
-            </li>
-            <li>
-              <Ext href="https://kiro.dev/docs/specs/">Specs - IDE - Docs - Kiro</Ext>
-            </li>
-            <li>
-              <Ext href="https://builder.aws.com/content/36nn9PbSZuKJiWWoO2UWmFaaCHs/getting-started-with-spec-driven-development-using-kiro">Getting Started with Spec-driven Development Using Kiro - AWS Builder Center</Ext>
-            </li>
-            <li>
-              <Ext href="https://www.softwareseni.com/aws-kiro-amazons-spec-first-bet-on-agentic-development/">AWS Kiro — Amazon&apos;s Spec-First Bet on Agentic Development - SoftwareSeni</Ext>
-            </li>
-            <li>
-              <Ext href="https://aws.amazon.com/startups/prompt-library/kiro-project-init?lang=en-US">Kiro Project Init: Automated Spec-Driven Development Setup - AWS Startups</Ext>
-            </li>
-            <li>
-              <Ext href="https://builder.aws.com/content/3ARqetAlGRTpUYC0R7X24Avy2Wf/experience-with-kiros-spec-driven-development-methodology">Experience with Kiro&apos;s spec driven development methodology - AWS Builder Center</Ext>
-            </li>
-            <li>
-              <Ext href="https://repost.aws/articles/AROjWKtr5RTjy6T2HbFJD_Mw/%F0%9F%91%BB-kiro-agentic-ai-ide-beyond-a-coding-assistant-full-stack-software-development-with-spec-driven-ai">👻 Kiro Agentic AI IDE: Beyond a Coding Assistant - AWS re:Post</Ext>
-            </li>
-            <li>
-              <Ext href="https://dev.to/aws-heroes/getting-started-with-spec-driven-development-using-kiro-400l">Getting Started with Spec-driven Development Using Kiro - DEV Community</Ext>
-            </li>
-            <li>
-              <Ext href="https://aws.plainenglish.io/what-is-spec-driven-development-and-how-to-implement-it-with-kiro-b5846bd55869">What Is Spec-Driven Development and How to Implement It with Kiro - Carlos Biagolini</Ext>
-            </li>
-            <li>
-              <Ext href="https://aws.amazon.com/documentation-overview/kiro/">Kiro Documentation - AWS</Ext>
-            </li>
-            <li>
-              <Ext href="https://www.thoughtworks.com/content/dam/thoughtworks/documents/radar/2025/11/tr_technology_radar_vol_33_en.pdf">Thoughtworks Technology Radar Volume 33 (PDF)</Ext>
-            </li>
-            <li>
-              <Ext href="https://www.thoughtworks.com/radar">Technology Radar | Guide to technology landscape | Thoughtworks</Ext>
-            </li>
-            <li>
-              <Ext href="https://www.thoughtworks.com/en-us/radar/techniques/spec-driven-development">Spec-driven development | Technology Radar | Thoughtworks United States</Ext>
-            </li>
-            <li>
-              <Ext href="https://peterwarnock.com/blog/posts/thoughtworks-tech-radar-33/">Thoughtworks Technology Radar Volume 33 - Peter Warnock</Ext>
-            </li>
-            <li>
-              <Ext href="https://www.thoughtworks.com/insights/podcasts/technology-podcasts/themes-technology-radar-33">Themes from Technology Radar Vol.33 - Thoughtworks (Podcast)</Ext>
-            </li>
-            <li>
-              <Ext href="https://www.thoughtworks.com/about-us/news/2025/thoughtworks-tech-radar-33-rapid-ai">Thoughtworks Technology Radar Highlights The Rapid Evolution of AI Assistance in 2025 - Thoughtworks</Ext>
-            </li>
-            <li>
-              <Ext href="https://www.prnewswire.com/news-releases/thoughtworks-technology-radar-highlights-the-rapid-evolution-of-ai-assistance-in-2025-302600950.html">Thoughtworks Technology Radar Highlights The Rapid Evolution of AI Assistance in 2025 - PR Newswire</Ext>
-            </li>
-            <li>
-              <Ext href="https://github.com/cameronsjo/spec-compare">GitHub - cameronsjo/spec-compare</Ext>
-            </li>
-            <li>
-              <Ext href="https://www.marktechpost.com/2026/05/08/9-best-ai-tools-for-spec-driven-development-in-2026-kiro-bmad-gsd-and-more-compare/">9 Best AI Tools for Spec-Driven Development in 2026 - MarkTechPost</Ext>
-            </li>
-            <li>
-              <Ext href="https://redreamality.com/blog/-sddbmad-vs-spec-kit-vs-openspec-vs-promptx/">What Is SDD? BMAD vs spec-kit vs OpenSpec vs PromptX - redreamality</Ext>
-            </li>
-            <li>
-              <Ext href="https://reenbit.com/bmad-vs-spec-kit-vs-openspec-choosing-your-spec-driven-ai-framework/">BMAD vs Spec Kit vs OpenSpec: Choosing Your Spec-Driven AI Framework - Reenbit</Ext>
-            </li>
-            <li>
-              <Ext href="https://reinvently.co.uk/blog/ai-dev-workflow-frameworks-gsd-bmad-openspec-speckit/">GSD, BMAD, OpenSpec, or GitHub Spec Kit - Reinvently</Ext>
-            </li>
-            <li>
-              <Ext href="https://www.nosam.com/spec-driven-development-openspec-vs-spec-kit-vs-bmad-which-ones-actually-worth-your-time/">Spec-Driven Development: OpenSpec vs Spec-Kit vs BMAD - Nosam</Ext>
-            </li>
-            <li>
-              <Ext href="https://medium.com/@reenbit/bmad-vs-spec-kit-vs-openspec-choosing-your-spec-driven-ai-framework-in-2026-a6996b3ebb8d">BMAD vs Spec Kit vs OpenSpec: Choosing Your Spec-Driven AI Framework in 2026 - Reenbit (Medium)</Ext>
-            </li>
-            <li>
-              <Ext href="https://arxiv.org/html/2603.17399v1">Bootstrapping Coding Agents: The Specification Is the Program (arXiv)</Ext>
-            </li>
-            <li>
-              <Ext href="https://www.researchgate.net/publication/400370399_Spec-Driven_DevelopmentFrom_Code_to_Contract_in_the_Age_of_AI_Coding_Assistants">(PDF) Spec-Driven Development: From Code to Contract - ResearchGate</Ext>
-            </li>
-            <li>
-              <Ext href="https://arxiv.org/abs/2602.00180">[2602.00180] Spec-Driven Development: From Code to Contract - arXiv</Ext>
-            </li>
-            <li>
-              <Ext href="https://arxiv.org/html/2602.00180v1">Spec-Driven Development: From Code to Contract（HTML版）- arXiv</Ext>
-            </li>
-            <li>
-              <Ext href="https://huggingface.co/papers/2602.00180">Paper page - Spec-Driven Development: From Code to Contract - Hugging Face</Ext>
-            </li>
-          </ol>
+          <div className={styles.refGrid}>
+            {[
+              ["https://thebcms.com/blog/spec-driven-development", "Spec-Driven Development (SDD): The Definitive 2026 Guide - BCMS"],
+              ["https://blog.allegro.tech/2026/06/spec-driven-development-best-practices.html", "Spec-Driven Development (SDD) — best practices (so far) - Allegro Tech"],
+              ["https://www.augmentcode.com/guides/what-is-spec-driven-development", "What Is Spec-Driven Development? A Complete Guide - Augment Code"],
+              ["https://www.augmentcode.com/tools/best-spec-driven-development-tools", "6 Best Spec-Driven Development Tools for AI Coding in 2026 - Augment Code"],
+              ["https://medium.com/@tojosphine/spec-driven-development-what-i-wish-i-knew-before-i-started-1213d485a244", "Spec-Driven Development, What I Wish I Knew Before I Started - Josphine Job (Medium)"],
+              ["https://developer.microsoft.com/blog/spec-driven-development-ai-native-engineering", "Spec-Driven Development: A Spec-First Approach to AI-Native Engineering - Microsoft for Developers"],
+              ["https://heeki.medium.com/using-spec-driven-development-with-claude-code-4a1ebe5d9f29", "Using spec-driven development with Claude Code - Heeki Park (Medium)"],
+              ["https://evangelistsoftware.com/blog/spec-driven-development-guide/", "Spec Driven Development [2026]: What It Is & How to Use It - Evangelist Software"],
+              ["https://dev.to/krlz/spec-driven-development-in-2026-what-it-is-the-tooling-and-how-teams-actually-use-it-2fk2", "Spec-Driven Development in 2026 - DEV Community"],
+              ["https://setronica.com/media/blog/what-is-spec-driven-development-implementation-framework-best-practices/", "Spec-Driven Development Explained - Setronica"],
+              ["https://github.github.com/spec-kit/quickstart.html", "Quick Start Guide - Spec Kit Documentation"],
+              ["https://github.com/github/spec-kit", "GitHub - github/spec-kit"],
+              ["https://www.fundesk.io/spec-driven-development-github-spec-kit-guide", "GitHub Spec Kit: The 2026 Spec-Driven Development Guide - funDesk"],
+              ["https://den.dev/blog/github-spec-kit/", "What's The Deal With GitHub Spec Kit - Den Delimarsky"],
+              ["https://knightli.com/en/2026/05/25/github-spec-kit-spec-driven-development/", "What Is GitHub Spec Kit? - knightli.com"],
+              ["https://www.marktechpost.com/2026/05/08/meet-github-spec-kit-an-open-source-toolkit-for-spec-driven-development-with-ai-coding-agents/", "Meet GitHub Spec-Kit - MarkTechPost"],
+              ["https://blog.logrocket.com/github-spec-kit/", "Exploring spec-driven development with the new GitHub Spec Kit - LogRocket Blog"],
+              ["https://rywalker.com/research/github-spec-kit", "GitHub Spec Kit - Ry Walker Research"],
+              ["https://dev.to/daveu1983/creating-my-portfolio-website-using-githubs-spec-kit-5g40", "Creating my portfolio website using GitHub's Spec-kit - DEV Community"],
+              ["https://alistairmavin.com/ears/", "Alistair Mavin - EARS: Easy Approach to Requirements Syntax"],
+              ["https://medium.com/paramtech/ears-the-easy-approach-to-requirements-syntax-b09597aae31d", "EARS: The Easy Approach to Requirements Syntax - Medium"],
+              ["https://dev.to/sebastian_dingler/ears-the-easy-approach-to-requirements-syntax-39a5", "EARS: The Easy Approach to Requirements Syntax - DEV Community"],
+              ["https://www.jamasoftware.com/requirements-management-guide/writing-requirements/adopting-the-ears-notation-to-improve-requirements-engineering/", "Adopting the EARS Notation to Improve Requirements Engineering - Jama Software"],
+              ["https://ieeexplore.ieee.org/document/5328509/", "Easy Approach to Requirements Syntax (EARS) - IEEE Xplore"],
+              ["https://www.researchgate.net/publication/224079416_Easy_approach_to_requirements_syntax_EARS", "(PDF) Easy approach to requirements syntax (EARS) - ResearchGate"],
+              ["https://www.iaria.org/conferences2013/filesICCGI13/ICCGI_2013_Tutorial_Terzakis.pdf", "EARS: The Easy Approach to Requirements Syntax Version 1.0 - Intel/IARIA Tutorial"],
+              ["https://www.linkedin.com/pulse/easy-approach-requirements-syntax-ears-chatgpt-rob-black", "Easy Approach to Requirements Syntax (EARS) with ChatGPT - Rob Black"],
+              ["https://engx.theiet.org/f/discussions/27493/easy-approach-to-requirements-syntax-ears-by-alistair-mavin-requirements-specialist-at-rolls-royce-plc", "Easy Approach to Requirements Syntax (EARS) - IET EngX"],
+              ["https://aws.amazon.com/blogs/industries/from-spec-to-production-a-three-week-drug-discovery-agent-using-kiro/", "From spec to production: a three-week drug discovery agent using Kiro - AWS for Industries"],
+              ["https://kiro.dev/docs/specs/", "Specs - IDE - Docs - Kiro"],
+              ["https://builder.aws.com/content/36nn9PbSZuKJiWWoO2UWmFaaCHs/getting-started-with-spec-driven-development-using-kiro", "Getting Started with Spec-driven Development Using Kiro - AWS Builder Center"],
+              ["https://www.softwareseni.com/aws-kiro-amazons-spec-first-bet-on-agentic-development/", "AWS Kiro — Amazon's Spec-First Bet on Agentic Development - SoftwareSeni"],
+              ["https://aws.amazon.com/startups/prompt-library/kiro-project-init?lang=en-US", "Kiro Project Init: Automated Spec-Driven Development Setup - AWS Startups"],
+              ["https://builder.aws.com/content/3ARqetAlGRTpUYC0R7X24Avy2Wf/experience-with-kiros-spec-driven-development-methodology", "Experience with Kiro's spec driven development methodology - AWS Builder Center"],
+              ["https://repost.aws/articles/AROjWKtr5RTjy6T2HbFJD_Mw/%F0%9F%91%BB-kiro-agentic-ai-ide-beyond-a-coding-assistant-full-stack-software-development-with-spec-driven-ai", "👻 Kiro Agentic AI IDE: Beyond a Coding Assistant - AWS re:Post"],
+              ["https://dev.to/aws-heroes/getting-started-with-spec-driven-development-using-kiro-400l", "Getting Started with Spec-driven Development Using Kiro - DEV Community"],
+              ["https://aws.plainenglish.io/what-is-spec-driven-development-and-how-to-implement-it-with-kiro-b5846bd55869", "What Is Spec-Driven Development and How to Implement It with Kiro - Carlos Biagolini"],
+              ["https://aws.amazon.com/documentation-overview/kiro/", "Kiro Documentation - AWS"],
+              ["https://www.thoughtworks.com/content/dam/thoughtworks/documents/radar/2025/11/tr_technology_radar_vol_33_en.pdf", "Thoughtworks Technology Radar Volume 33 (PDF)"],
+              ["https://www.thoughtworks.com/radar", "Technology Radar | Guide to technology landscape | Thoughtworks"],
+              ["https://www.thoughtworks.com/en-us/radar/techniques/spec-driven-development", "Spec-driven development | Technology Radar | Thoughtworks United States"],
+              ["https://peterwarnock.com/blog/posts/thoughtworks-tech-radar-33/", "Thoughtworks Technology Radar Volume 33 - Peter Warnock"],
+              ["https://www.thoughtworks.com/insights/podcasts/technology-podcasts/themes-technology-radar-33", "Themes from Technology Radar Vol.33 - Thoughtworks (Podcast)"],
+              ["https://www.thoughtworks.com/about-us/news/2025/thoughtworks-tech-radar-33-rapid-ai", "Thoughtworks Technology Radar Highlights The Rapid Evolution of AI Assistance in 2025 - Thoughtworks"],
+              ["https://www.prnewswire.com/news-releases/thoughtworks-technology-radar-highlights-the-rapid-evolution-of-ai-assistance-in-2025-302600950.html", "Thoughtworks Technology Radar Highlights The Rapid Evolution of AI Assistance in 2025 - PR Newswire"],
+              ["https://github.com/cameronsjo/spec-compare", "GitHub - cameronsjo/spec-compare"],
+              ["https://www.marktechpost.com/2026/05/08/9-best-ai-tools-for-spec-driven-development-in-2026-kiro-bmad-gsd-and-more-compare/", "9 Best AI Tools for Spec-Driven Development in 2026 - MarkTechPost"],
+              ["https://redreamality.com/blog/-sddbmad-vs-spec-kit-vs-openspec-vs-promptx/", "What Is SDD? BMAD vs spec-kit vs OpenSpec vs PromptX - redreamality"],
+              ["https://reenbit.com/bmad-vs-spec-kit-vs-openspec-choosing-your-spec-driven-ai-framework/", "BMAD vs Spec Kit vs OpenSpec: Choosing Your Spec-Driven AI Framework - Reenbit"],
+              ["https://reinvently.co.uk/blog/ai-dev-workflow-frameworks-gsd-bmad-openspec-speckit/", "GSD, BMAD, OpenSpec, or GitHub Spec Kit - Reinvently"],
+              ["https://www.nosam.com/spec-driven-development-openspec-vs-spec-kit-vs-bmad-which-ones-actually-worth-your-time/", "Spec-Driven Development: OpenSpec vs Spec-Kit vs BMAD - Nosam"],
+              ["https://medium.com/@reenbit/bmad-vs-spec-kit-vs-openspec-choosing-your-spec-driven-ai-framework-in-2026-a6996b3ebb8d", "BMAD vs Spec Kit vs OpenSpec: Choosing Your Spec-Driven AI Framework in 2026 - Reenbit (Medium)"],
+              ["https://arxiv.org/html/2603.17399v1", "Bootstrapping Coding Agents: The Specification Is the Program (arXiv)"],
+              ["https://www.researchgate.net/publication/400370399_Spec-Driven_DevelopmentFrom_Code_to_Contract_in_the_Age_of_AI_Coding_Assistants", "(PDF) Spec-Driven Development: From Code to Contract - ResearchGate"],
+              ["https://arxiv.org/abs/2602.00180", "[2602.00180] Spec-Driven Development: From Code to Contract - arXiv"],
+              ["https://arxiv.org/html/2602.00180v1", "Spec-Driven Development: From Code to Contract（HTML版）- arXiv"],
+              ["https://huggingface.co/papers/2602.00180", "Paper page - Spec-Driven Development: From Code to Contract - Hugging Face"],
+            ].map(([href, label], i) => (
+              <div key={href} className={styles.refItem}>
+                <span className={styles.refNum}>{String(i + 1).padStart(2, "0")}</span>
+                <a href={href} target="_blank" rel="noopener noreferrer" className={styles.refLink}>
+                  {label}
+                </a>
+              </div>
+            ))}
+          </div>
         </section>
 
         <footer className={styles.pageFooter}>

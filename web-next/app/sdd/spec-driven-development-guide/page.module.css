@@ -475,20 +475,175 @@
 .checklist {
   list-style: none !important;
   padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 10px;
 }
 
 .checklist li {
   position: relative;
-  padding-left: 28px;
-  margin-bottom: 12px;
-  line-height: 1.7;
+  padding: 14px 16px 14px 44px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  line-height: 1.65;
+  font-size: 14.5px;
+  color: var(--text);
+  transition: border-color 0.15s ease;
+}
+
+.checklist li:hover {
+  border-color: var(--green);
 }
 
 .checklist li::before {
-  content: "✅";
+  content: "";
   position: absolute;
-  left: 0;
-  top: 2px;
+  left: 14px;
+  top: 16px;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--green);
+  border-radius: 50%;
+  background: rgba(152, 195, 121, 0.15);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6l3 3 5-5' stroke='%2398c379' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-size: 12px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* ===== Best Practices Cards (sec11) ===== */
+.bpList {
+  list-style: none !important;
+  padding-left: 0 !important;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  counter-reset: bp-counter;
+}
+
+.bpItem {
+  counter-increment: bp-counter;
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 0 20px;
+  position: relative;
+  padding: 0 0 28px 0;
+}
+
+.bpItem:last-child {
+  padding-bottom: 0;
+}
+
+.bpItem::before {
+  content: "";
+  position: absolute;
+  left: 27px;
+  top: 44px;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--accent-soft), transparent);
+}
+
+.bpItem:last-child::before {
+  display: none;
+}
+
+.bpNum {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  border: 2px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+  z-index: 1;
+  position: relative;
+}
+
+.bpContent {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 22px;
+  transition: border-color 0.2s ease, transform 0.15s ease;
+  margin-top: 4px;
+}
+
+.bpContent:hover {
+  border-color: var(--accent);
+  transform: translateX(2px);
+}
+
+.bpTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 8px;
+  line-height: 1.4;
+}
+
+.bpDesc {
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.75;
+  margin: 0;
+}
+
+/* ===== Reference Grid (sec16) ===== */
+.refGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 10px;
+  margin: 24px 0;
+}
+
+.refItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.refItem:hover {
+  border-color: var(--accent);
+  background: var(--bg-card);
+}
+
+.refNum {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  opacity: 0.75;
+  min-width: 28px;
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+
+.refLink {
+  font-size: 13px;
+  color: var(--text-dim);
+  text-decoration: none;
+  line-height: 1.55;
+  word-break: break-all;
+  overflow-wrap: anywhere;
+  transition: color 0.15s ease;
+}
+
+.refLink:hover {
+  color: var(--accent);
+  text-decoration: underline;
 }
 
 .pageFooter {
