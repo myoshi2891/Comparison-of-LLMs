@@ -40,45 +40,44 @@ describe("/claude/fable-5-best-practices - metadata", () => {
 });
 
 describe("/claude/fable-5-best-practices - page structure (Step 1)", () => {
-  it("renders an <h1> containing 'Claude Fable 5 実践活用ガイド'", () => {
+  it("renders an <h1> containing '地図は、現地ではない' and 'Claude Fable 5 実践活用ガイド'", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
     expect(h1).not.toBeNull();
+    expect(h1?.textContent?.replace(/\s+/g, "")).toContain("地図は、現地ではない");
     expect(h1?.textContent?.replace(/\s+/g, "")).toContain("ClaudeFable5実践活用ガイド");
   });
 
-  it("renders <h2> headings for ch1 to ch15", () => {
+  it("renders <h2> headings for ch1 to ch15 with updated field guide titles", () => {
     const { container } = render(<Page />);
     const h2s = Array.from(container.querySelectorAll("h2"));
     expect(h2s).toHaveLength(15);
     expect(h2s[0].textContent).toContain("Claude Fable 5 とは何か");
-    expect(h2s[1].textContent).toContain("タイムライン");
-    expect(h2s[2].textContent).toContain("安全分類器");
-    expect(h2s[3].textContent).toContain("プロンプティング思想");
-    expect(h2s[4].textContent).toContain("Effort");
-    expect(h2s[5].textContent).toContain("Claude Code");
-    expect(h2s[6].textContent).toContain("Loop Engineering");
-    expect(h2s[7].textContent).toContain("Unknowns");
-    expect(h2s[8].textContent).toContain("検証ループとメモリ");
-    expect(h2s[9].textContent).toContain("モデル選定フロー");
-    expect(h2s[10].textContent).toContain("よくある落とし穴");
-    expect(h2s[11].textContent).toContain("実力");
+    expect(h2s[1].textContent).toContain("タイムライン: リリースから輸出規制、価格変更まで");
+    expect(h2s[2].textContent).toContain("安全分類器と自動フォールバックの仕組み");
+    expect(h2s[3].textContent).toContain("プロンプティング思想の転換: チェックリストからゴールへ");
+    expect(h2s[4].textContent).toContain("Effort(推論深度)レベルの使い方");
+    expect(h2s[5].textContent).toContain("Claude Code での実践設定");
+    expect(h2s[6].textContent).toContain("Loop Engineering: 長時間自律ループの設計思想");
+    expect(h2s[7].textContent).toContain("Thariq の「Unknowns フレームワーク」徹底解説");
+    expect(h2s[8].textContent).toContain("検証ループとメモリシステムの設計");
+    expect(h2s[9].textContent).toContain("コスト管理とモデル選定フロー");
+    expect(h2s[10].textContent).toContain("よくある落とし穴(アンチパターン)");
+    expect(h2s[11].textContent).toContain("実力・ベンチマークと「検証必須」の理由");
     expect(h2s[12].textContent).toContain("既知の制限事項");
     expect(h2s[13].textContent).toContain("まとめ");
-    expect(h2s[14].textContent).toContain("参考文献");
+    expect(h2s[14].textContent).toContain("参考文献・ソースURL一覧");
   });
 
-  it("renders footer containing the base date text", () => {
+  it("renders footer containing updated base date text", () => {
     const { container } = render(<Page />);
     const footer = container.querySelector("footer");
     expect(footer).not.toBeNull();
-    expect(footer?.textContent).toContain("2026年7月4日時点の情報");
+    expect(footer?.textContent).toContain("2026年7月16日時点の公式ドキュメント");
   });
 });
 
 describe("/claude/fable-5-best-practices - registration", () => {
-  // F-4'（plans/008）: ナビは page-registry からの導出になったため、グループ名で
-  // 辿らず href で探す（グループ再編でテストが壊れないようにする）。
   it("is reachable from the site navigation", () => {
     const link = findNavLeaf(navLinks, "/claude/fable-5-best-practices");
     expect(link).toBeDefined();
