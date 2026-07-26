@@ -82,6 +82,7 @@ const DIAGRAM_DECISION = `flowchart TD
  * lineColor       : エッジ色
  */
 const AGENT_THEME_VARS: Record<string, string> = {
+  // --- flowchart ノード ---
   primaryColor: "#edeaff",
   primaryTextColor: "#12141c",
   primaryBorderColor: "#5b4eff",
@@ -89,6 +90,19 @@ const AGENT_THEME_VARS: Record<string, string> = {
   secondaryColor: "#e2f6f0",
   tertiaryColor: "#fbf1de",
   fontFamily: "'Noto Sans JP', 'Hiragino Sans', sans-serif",
+  // --- sequenceDiagram アクター ---
+  actorBkg: "#edeaff",
+  actorBorder: "#5b4eff",
+  actorTextColor: "#12141c",
+  actorLineColor: "#7a8093",
+  activationBkgColor: "#e2f6f0",
+  activationBorderColor: "#5b4eff",
+  labelBoxBkgColor: "#fbf1de",
+  labelTextColor: "#12141c",
+  noteBkgColor: "#fbf1de",
+  noteTextColor: "#12141c",
+  signalColor: "#3f34cc",
+  signalTextColor: "#12141c",
 };
 
 export default function ClaudeAgentPage() {

@@ -62,6 +62,22 @@ export default function MermaidDiagram({
             svg.style.maxWidth = "100%";
             svg.style.height = "auto";
           }
+          // --- foreignObject 文字色後処理 ---
+          // htmlLabels:true の場合、flowchart ノードラベルは SVG <foreignObject> 内の HTML として
+          // レンダーされる。この HTML 要素には themeVariables.primaryTextColor が CSS カスケードで
+          // 届かない（SVG 内の <style> は foreignObject 内 HTML に非カスケード）。
+          // dark テーマは mermaid 側が処理するため対象外。base/default 等のライトテーマのみ適用。
+          // ref: fix-mermaid SKILL Part 2-4
+          if (theme !== "dark" && ref.current) {
+            const textColor = themeVariables?.primaryTextColor ?? "#000000";
+            ref.current.querySelectorAll("foreignObject *").forEach((el) => {
+              (el as HTMLElement).style.setProperty(
+                "color",
+                textColor,
+                "important",
+              );
+            });
+          }
         } catch (err) {
           console.error("[MermaidDiagram] render failed:", err);
           if (active && ref.current) {
