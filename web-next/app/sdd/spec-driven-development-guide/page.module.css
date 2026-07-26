@@ -136,7 +136,8 @@
   flex: 1;
   min-width: 0;
   padding: 48px 64px 96px;
-  max-width: 1120px;
+  width: 100%;
+  max-width: 100%;
 }
 
 .hero {
@@ -226,15 +227,58 @@
   flex-shrink: 0;
 }
 
+.sectionLead {
+  font-size: 16.5px;
+  color: var(--text);
+  line-height: 1.8;
+  margin-bottom: 24px;
+  font-weight: 400;
+}
+
+.chapter h3 {
+  font-size: 19px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 36px 0 16px;
+  padding-left: 12px;
+  border-left: 3px solid var(--accent);
+}
+
 .chapter p {
   margin: 0 0 20px;
   color: var(--text);
   line-height: 1.85;
 }
 
-.chapter p lead {
-  font-size: 17px;
-  font-weight: 500;
+.chapter ul, .chapter ol {
+  margin: 0 0 24px;
+  padding-left: 24px;
+  color: var(--text);
+  line-height: 1.8;
+}
+
+.chapter li {
+  margin-bottom: 10px;
+}
+
+.refs {
+  list-style-type: decimal;
+  padding-left: 24px;
+  margin: 20px 0 32px;
+  font-size: 14px;
+}
+
+.refs li {
+  margin-bottom: 8px;
+}
+
+.refs a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.refs a:hover {
+  text-decoration: underline;
 }
 
 .cardGrid {
@@ -273,31 +317,39 @@
   line-height: 1.7;
 }
 
-.alert {
+.callout {
   background: var(--bg-elevated);
   border-left: 4px solid var(--accent);
   border-radius: 0 8px 8px 0;
   padding: 18px 24px;
   margin: 24px 0;
+  font-size: 15px;
+  line-height: 1.75;
 }
 
-.alertWarning {
-  border-left-color: var(--yellow);
-}
-
-.alertDanger {
-  border-left-color: var(--red);
-}
-
-.alertSuccess {
+.calloutTip {
   border-left-color: var(--green);
 }
 
-.alertTitle {
+.calloutWarn {
+  border-left-color: var(--yellow);
+}
+
+.calloutDanger {
+  border-left-color: var(--red);
+}
+
+.calloutLabel {
+  display: inline-block;
   font-weight: 700;
-  color: #ffffff;
-  margin: 0 0 6px;
-  font-size: 15px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 6px;
+  padding: 2px 8px;
+  background: rgba(124, 158, 255, 0.12);
+  border-radius: 4px;
 }
 
 .tableWrap {
@@ -343,6 +395,14 @@
   padding: 24px;
   margin: 28px 0;
   overflow-x: auto;
+}
+
+.diagramCaption {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-faint);
+  margin-top: 12px;
+  font-weight: 500;
 }
 
 /* 手書き図解・フロー図の中央寄せ */
@@ -411,6 +471,25 @@
 .cw { color: #d29922; }
 .ch { color: #f0883e; font-weight: 700; }
 .cm { color: #7ee787; font-weight: 700; }
+
+.checklist {
+  list-style: none !important;
+  padding-left: 0 !important;
+}
+
+.checklist li {
+  position: relative;
+  padding-left: 28px;
+  margin-bottom: 12px;
+  line-height: 1.7;
+}
+
+.checklist li::before {
+  content: "✅";
+  position: absolute;
+  left: 0;
+  top: 2px;
+}
 
 .pageFooter {
   max-width: 100%;
