@@ -375,10 +375,21 @@
   margin: -12px 0 24px;
 }
 
+.checklistTable th:first-child,
 .checklistTable td:first-child {
-  width: 40px;
-  text-align: center !important;
+  width: 50px;
+  text-align: left !important;
   color: var(--color-text-tertiary);
+}
+
+.checklistTable th:nth-child(2),
+.checklistTable td:nth-child(2) {
+  width: 58%;
+}
+
+.checklistTable th:nth-child(3),
+.checklistTable td:nth-child(3) {
+  width: 37%;
 }
 
 .footer {
