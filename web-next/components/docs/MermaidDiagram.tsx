@@ -105,6 +105,25 @@ export default function MermaidDiagram({
               .forEach((el) => {
                 el.style.setProperty("fill", actorTxtColor, "important");
               });
+
+            // --- sequenceDiagram メッセージラベル後処理 ---
+            // 矢印上のラベル（messageText）・ループラベル（loopText）・条件ラベル（labelText）も
+            // SVG <text> 要素。themeVariables.signalTextColor が届かない場合のフォールバック。
+            const signalTxtColor =
+              themeVariables?.signalTextColor ??
+              themeVariables?.primaryTextColor ??
+              "#000000";
+            ref.current
+              .querySelectorAll<SVGTextElement>(
+                "text.messageText, text.loopText, text.labelText, text.noteText",
+              )
+              .forEach((el) => {
+                el.style.setProperty("fill", signalTxtColor, "important");
+                // tspan も明示的に色付け（親の fill が tspan に届かないケースへの保険）
+                el.querySelectorAll<SVGTSpanElement>("tspan").forEach((ts) => {
+                  ts.style.setProperty("fill", signalTxtColor, "important");
+                });
+              });
           }
         } catch (err) {
           console.error("[MermaidDiagram] render failed:", err);
