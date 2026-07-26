@@ -1,7 +1,7 @@
 # プロジェクト進捗・ステータス (PROGRESS.md)
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
-> - 最終更新日: **Updated 2026-07-24**
+> - 最終更新日: **Updated 2026-07-26**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -18,6 +18,7 @@
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+- **Claude サブエージェント & Agent Teams ベストプラクティスガイド（/claude/agent）の刷新**: `Claude-code-subagents-agentteams-markdown-bestpractices.html` を `web-next/app/claude/agent/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全9セクション・全表・全コードブロック・4 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts` 登録を完了。原本 `Claude-code-subagents-agentteams-markdown-bestpractices.html` は `archive/html/` へ `git mv` 退避。契約テスト5件を更新し全クリア（Vitest **1183 件** / pytest **43 件** 全 Green ✅）。
 - **Claude Fable 5 追加 + 参考リンク集の更新（新2社カード・リンク切れ修正）**: コスト計算機の Anthropic 料金一覧に最上位モデル **Claude Fable 5**（$10 / $50 per 1M・1M ctx）を追加（`anthropic.py` の `_FALLBACKS`/`_TAG`/`_CLS`/`_SUB_*` 先頭、TDD）。参考リンク集（`RefLinks.tsx`）へ **Moonshot(Kimi) / Zhipu(GLM)** の公式料金ページカードを追加（16→18枚）し、リンク切れ3件を修正（Claude Code pricing `docs.anthropic.com/.../pricing`→`docs.claude.com/.../costs`、Windsurf `credits-and-billing`→`docs.windsurf.com/`、Junie `junie/faq/`→`help/junie/faq.html`）。Zhipu 料金は `z.ai/pricing` が 404 のため `docs.z.ai/guides/overview/pricing` を採用。全 URL を curl 実測で検証（403 のボット保護3件・FRED の HTTP/2 quirk は切れではないと確認）。`pricing.json` 3ファイルへ Fable を反映。Vitest **1203 件** / pytest **43 件** 全 Green。
 - **Google AI スクレイパーの `price_in` 誤スクレイプバグ修正（ライブ抽出を無効化）**: `providers/google.py` の `price_in` 抽出が、料金ページ上のモデル名手前の無関係な `$` 額を拾う正規表現バグ（逆順パターン `\$X ... model_key`）で全 Google AI モデルの入力価格を汚染していた。原因調査の結果、当該ページは TOC 重複・ラベル無し価格・1モデル複数価格併記のため正規表現抽出が構造的に不安定（実測で正しく取れるモデルが 0 件）と判明。TDD で ① 逆順パターン除去 → ② `input` キーワードアンカー追加を試行するも 2 モデルが残存したため、最終的にユーザー方針で **ライブ抽出を廃止し `_FALLBACKS`(SSoT/WebSearch確定値) を決定論的に採用**（Vertex と同扱い）。`scrape()` を `_FALLBACKS` 生成のみに簡素化（`get_page_text` 不使用）、`TestGoogle` をフォールバック固定・ネット非依存へ更新、smoke で Google を分離。設計判断を CLAUDE.md に固定（スクレイプ復活の禁止）。pytest **42 件合格（据え置き）**。
 - **2026-07 月次更新: 新規2社(Moonshot(Kimi)/Zhipu(GLM))追加 + 既存6社の 2026-07 モデル刷新**: Moonshot(Kimi)（Kimi K3 / K2.6）と Zhipu(GLM)（GLM-5.2 / GLM-4.6）を新規プロバイダースクレイパーとして追加（`providers/moonshot.py` / `zhipu.py`、`cls="tag-oss"`）。既存6社（Anthropic/OpenAI/Google/AWS/DeepSeek/xAI）の `_FALLBACKS` を GPT-5.6 系・Claude Sonnet 5・Gemini 3.6 Flash / 3.5 Flash-Lite・Grok 4.5・Amazon Nova Premier / Lite 追加で刷新。フロント側は唯一のハードコード `ApiTable.tsx` の `PROVIDER_COLORS` に新2社（Moonshot(Kimi)=`#818cf8` / Zhipu(GLM)=`#f472b6`）を追加（Red→Green、色検証テスト2件）。`pricing.json` を再生成（USD/JPY 163.47）し、Google AI 全モデルの `price_in` ライブ誤スクレイプ（ページ上の無関係な `$` 額を拾う既存の正規表現バグ）と Amazon Nova Premier の `price_out` を SSoT(`_FALLBACKS`) 値へ直接補正。provider ブロックの連続性・型パリティ・build/lint/typecheck を全 Green で確認（合計 **1202 テスト合格**、pytest **42 件合格**）。
