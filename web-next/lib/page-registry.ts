@@ -426,6 +426,16 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-01",
   },
   {
+    slug: "/sdd/ai-spec-driven-development-guide",
+    title: "AI Spec-Driven Development",
+    group: "開発プロセス",
+    topics: ["sdd", "spec-driven-development", "agent", "guide"],
+    summary:
+      "初学者のためのステップバイステップ・ベストプラクティス。GitHub Spec Kit、AWS Kiro、Claude Codeなど2026年最新のSDD手法・ツール・EARS記法を網羅解説。",
+    addedAt: "2026-07-26",
+    lastReviewed: "2026-07-26",
+  },
+  {
     slug: "/google/adk-best-practices",
     title: "ADK Best Practices",
     group: "Providers",
