@@ -17,6 +17,7 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 ## 絶対に守るべきルール（CLAUDE.md と docs/PROGRESS.md のサマリ）
 
 - **R1（Biome scope）**: `bun run lint:fix` / `bunx biome check --write`（パス引数なし）は **禁止**。必ずファイル単位でパス指定
+- **R2（100% 完全移植・faithful 必須）**: HTML/Markdown からの移植・更新では **要約・省略・縮約・代表抽出を一切禁止（絶対ルール）**。元ファイルの全セクション、全サブセクション、全段落、全リスト項目、全コードブロック、全 SVG、全 callout/alert、全 table、全参考文献リンクを何一つ落とさずに 100% 漏れなく JSX に転写すること。
 - **legacy/ 配下の編集禁止**（移行完了・凍結済み）
 - **元のHTML/Markdownオリジナルファイルの完全削除は厳禁**：移行元のファイルは絶対に削除してはならず、必ず `archive/` ディレクトリ配下に移動（`git mv` または `mv`）して退避保存すること
 - **ファイル全体の書き直し禁止**（明示指示がない限り）
