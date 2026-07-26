@@ -72,6 +72,25 @@ const DIAGRAM_DECISION = `flowchart TD
     Q4 -- Yes --> AT["Agent Teams を有効化し<br/>サブエージェント定義を役割として使う"]
     Q4 -- No --> Single["単一セッションのまま<br/>メインで対応する"]`;
 
+/**
+ * Mermaid themeVariables — archive HTML配色を正とする（theme: 'base'）
+ * primaryColor    : アクセント薄紫（ノード塗り）
+ * secondaryColor  : ティール薄緑（サブグラフ背景等）
+ * tertiaryColor   : アンバー薄黄（三次ノード）
+ * primaryTextColor: インク黒（文字）
+ * primaryBorderColor: アクセント紫（ボーダー）
+ * lineColor       : エッジ色
+ */
+const AGENT_THEME_VARS: Record<string, string> = {
+  primaryColor: "#edeaff",
+  primaryTextColor: "#12141c",
+  primaryBorderColor: "#5b4eff",
+  lineColor: "#7a8093",
+  secondaryColor: "#e2f6f0",
+  tertiaryColor: "#fbf1de",
+  fontFamily: "'Noto Sans JP', 'Hiragino Sans', sans-serif",
+};
+
 export default function ClaudeAgentPage() {
   return (
     <div className={styles.layout}>
@@ -245,7 +264,11 @@ export default function ClaudeAgentPage() {
             </div>
 
             <div className={styles.mermaidCard}>
-              <MermaidDiagram chart={DIAGRAM_OVERVIEW} />
+              <MermaidDiagram
+                chart={DIAGRAM_OVERVIEW}
+                theme="base"
+                themeVariables={AGENT_THEME_VARS}
+              />
               <p className={styles.cap}>Fig.1 — 4層の関係図</p>
             </div>
 
@@ -693,7 +716,11 @@ export default function ClaudeAgentPage() {
 
             <h3>委譲のフロー</h3>
             <div className={styles.mermaidCard}>
-              <MermaidDiagram chart={DIAGRAM_DELEGATION} />
+              <MermaidDiagram
+                chart={DIAGRAM_DELEGATION}
+                theme="base"
+                themeVariables={AGENT_THEME_VARS}
+              />
               <p className={styles.cap}>Fig.2 — サブエージェントへの委譲フロー</p>
             </div>
 
@@ -853,7 +880,11 @@ export default function ClaudeAgentPage() {
             </div>
 
             <div className={styles.mermaidCard}>
-              <MermaidDiagram chart={DIAGRAM_TEAMS} />
+              <MermaidDiagram
+                chart={DIAGRAM_TEAMS}
+                theme="base"
+                themeVariables={AGENT_THEME_VARS}
+              />
               <p className={styles.cap}>Fig.3 — Agent Teams アーキテクチャ</p>
             </div>
 
@@ -1017,7 +1048,11 @@ export default function ClaudeAgentPage() {
               <span className={styles.chip}>相互会話?</span>
             </div>
             <div className={styles.mermaidCard}>
-              <MermaidDiagram chart={DIAGRAM_DECISION} />
+              <MermaidDiagram
+                chart={DIAGRAM_DECISION}
+                theme="base"
+                themeVariables={AGENT_THEME_VARS}
+              />
               <p className={styles.cap}>Fig.4 — レイヤー選択の判断フロー</p>
             </div>
           </section>
