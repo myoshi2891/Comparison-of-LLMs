@@ -1,0 +1,2524 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gemini マルチエージェント開発 ベストプラクティス完全ガイド</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/atom-one-dark.min.css"
+    />
+    <style>
+      :root {
+        --bg: #07111e;
+        --bg-elevated: #0d1b30;
+        --bg-card: #101f38;
+        --border: #1c2f4e;
+        --accent: #7c9eff;
+        --accent-soft: #7c9eff26;
+        --accent-strong: #a6c1ff;
+        --text: #e7edf7;
+        --text-dim: #9fb0c9;
+        --text-faint: #6c7f9c;
+        --code-bg: #0a1729;
+        --warn: #ffb454;
+        --ok: #7ee787;
+        --shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.55);
+        --maxw: 1180px;
+        --sidebar-w: 300px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background:
+          radial-gradient(1200px 600px at 85% -10%, #12234a55, transparent 60%),
+          radial-gradient(900px 500px at -10% 10%, #0d1e3f55, transparent 55%), var(--bg);
+        color: var(--text);
+        font-family:
+          'Noto Sans JP',
+          'Hiragino Kaku Gothic ProN',
+          'Yu Gothic',
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        line-height: 1.85;
+        font-size: 16px;
+        -webkit-font-smoothing: antialiased;
+      }
+      code,
+      pre,
+      kbd {
+        font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+      a {
+        color: var(--accent-strong);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+
+      /* ---------- Layout: display:block on .layout, NOT grid, to avoid width collapse ---------- */
+      .layout {
+        display: block;
+        min-height: 100vh;
+      }
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: var(--sidebar-w);
+        overflow-y: auto;
+        padding: 28px 20px 40px;
+        border-right: 1px solid var(--border);
+        background: linear-gradient(180deg, #0a1830, #071223 60%, #06101f);
+        z-index: 50;
+      }
+      .sidebar::-webkit-scrollbar {
+        width: 8px;
+      }
+      .sidebar::-webkit-scrollbar-thumb {
+        background: #1c2f4e;
+        border-radius: 8px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 22px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid var(--border);
+      }
+      .brand-badge {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        background: linear-gradient(135deg, var(--accent), #4f6fd1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        color: #04101f;
+        font-size: 15px;
+        box-shadow: var(--shadow);
+        flex-shrink: 0;
+      }
+      .brand-text {
+        font-size: 13.5px;
+        line-height: 1.4;
+        color: var(--text-dim);
+      }
+      .brand-text strong {
+        display: block;
+        color: var(--text);
+        font-size: 14.5px;
+      }
+
+      .side-nav {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .side-nav li {
+        margin: 0;
+      }
+      .side-nav a {
+        display: block;
+        padding: 9px 12px;
+        margin: 2px 0;
+        border-radius: 8px;
+        font-size: 13.5px;
+        color: var(--text-dim);
+        border-left: 2px solid transparent;
+        transition:
+          background 0.15s ease,
+          color 0.15s ease,
+          border-color 0.15s ease;
+      }
+      .side-nav a:hover {
+        background: var(--accent-soft);
+        color: var(--text);
+        text-decoration: none;
+      }
+      .side-nav a.active {
+        color: var(--accent-strong);
+        border-left: 2px solid var(--accent);
+        background: var(--accent-soft);
+        font-weight: 600;
+      }
+      .side-foot {
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border);
+        font-size: 11.5px;
+        color: var(--text-faint);
+        line-height: 1.7;
+      }
+
+      .sidebar-toggle {
+        display: none;
+        position: fixed;
+        top: 14px;
+        right: 14px;
+        z-index: 100;
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        color: var(--text);
+        font-size: 20px;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow);
+      }
+
+      .content {
+        margin-left: var(--sidebar-w);
+        padding: 56px 64px 100px;
+        max-width: none;
+      }
+
+      /* ---------- Hero ---------- */
+      .hero {
+        padding-bottom: 34px;
+        margin-bottom: 40px;
+        border-bottom: 1px solid var(--border);
+      }
+      .hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12.5px;
+        letter-spacing: 0.06em;
+        color: var(--accent-strong);
+        background: var(--accent-soft);
+        border: 1px solid #7c9eff40;
+        padding: 6px 14px;
+        border-radius: 999px;
+        margin-bottom: 20px;
+      }
+      .hero h1 {
+        font-size: clamp(28px, 3.4vw, 42px);
+        line-height: 1.35;
+        margin: 0 0 10px;
+        font-weight: 900;
+        background: linear-gradient(90deg, #ffffff, var(--accent-strong) 85%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .hero .subtitle {
+        font-size: 17px;
+        color: var(--text-dim);
+        margin: 0 0 26px;
+        font-weight: 500;
+      }
+      .hero-meta {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+      }
+      .hero-meta .meta-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px 16px;
+      }
+      .hero-meta .meta-card .label {
+        font-size: 11.5px;
+        color: var(--text-faint);
+        letter-spacing: 0.05em;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+      }
+      .hero-meta .meta-card .value {
+        font-size: 14px;
+        color: var(--text);
+      }
+
+      /* ---------- Prose (full width, no narrow max-width) ---------- */
+      h2 {
+        font-size: 26px;
+        font-weight: 800;
+        color: var(--text);
+        margin: 56px 0 20px;
+        padding-top: 8px;
+        scroll-margin-top: 24px;
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+      }
+      h2::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        border-radius: 2px;
+        background: var(--accent);
+        display: inline-block;
+        transform: translateY(-4px);
+      }
+      h3 {
+        font-size: 19.5px;
+        font-weight: 700;
+        color: var(--accent-strong);
+        margin: 34px 0 14px;
+        scroll-margin-top: 24px;
+      }
+      h2:first-of-type {
+        margin-top: 0;
+      }
+      p {
+        margin: 0 0 18px;
+        color: var(--text);
+        max-width: none;
+      }
+      strong {
+        color: #fff;
+        font-weight: 700;
+      }
+      ul,
+      ol {
+        margin: 0 0 18px;
+        padding-left: 26px;
+        color: var(--text);
+      }
+      li {
+        margin: 0 0 8px;
+      }
+      li::marker {
+        color: var(--accent);
+      }
+      hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 40px 0;
+      }
+
+      blockquote {
+        margin: 20px 0;
+        padding: 16px 20px;
+        background: var(--bg-card);
+        border-left: 3px solid var(--accent);
+        border-radius: 0 10px 10px 0;
+        color: var(--text-dim);
+      }
+      blockquote p {
+        margin: 0 0 6px;
+        color: var(--text-dim);
+      }
+      blockquote p:last-child {
+        margin-bottom: 0;
+      }
+
+      /* inline code */
+      :not(pre) > code {
+        background: #12244533;
+        border: 1px solid #1c2f4e;
+        color: var(--accent-strong);
+        padding: 2px 7px;
+        border-radius: 6px;
+        font-size: 0.86em;
+      }
+
+      /* code blocks */
+      pre {
+        background: var(--code-bg) !important;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 18px 20px;
+        overflow-x: auto;
+        margin: 18px 0 24px;
+        box-shadow: inset 0 0 0 1px #ffffff05;
+      }
+      pre code {
+        background: transparent !important;
+        border: none;
+        padding: 0;
+        font-size: 13.5px;
+        line-height: 1.7;
+        color: var(--text);
+      }
+      pre code.hljs {
+        background: transparent !important;
+      }
+
+      /* tables */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0 28px;
+        font-size: 14.5px;
+        background: var(--bg-card);
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+      thead th {
+        background: #132747;
+        color: var(--accent-strong);
+        text-align: left;
+        padding: 12px 16px;
+        font-weight: 700;
+        font-size: 13.5px;
+        letter-spacing: 0.02em;
+        border-bottom: 1px solid var(--border);
+      }
+      tbody td {
+        padding: 11px 16px;
+        border-top: 1px solid var(--border);
+        color: var(--text-dim);
+        vertical-align: top;
+      }
+      tbody tr:nth-child(odd) {
+        background: #0d1b30;
+      }
+      tbody tr:hover {
+        background: #12244a;
+      }
+      tbody td code,
+      thead th code {
+        background: #12244533;
+        border: 1px solid #1c2f4e;
+        color: var(--accent-strong);
+        padding: 1px 6px;
+        border-radius: 5px;
+        font-size: 0.88em;
+      }
+
+      /* mermaid */
+      pre.mermaid {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 26px 18px;
+        overflow-x: auto;
+      }
+      pre.mermaid svg {
+        display: block;
+      }
+
+      /* reference card grid */
+      .ref-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        margin: 18px 0 28px;
+      }
+      .ref-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 18px 20px;
+      }
+      .ref-card h3 {
+        margin: 0 0 12px;
+        font-size: 15.5px;
+        color: var(--accent-strong);
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border);
+      }
+      .ref-card ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .ref-card li {
+        margin: 0 0 10px;
+      }
+      .ref-card li:last-child {
+        margin-bottom: 0;
+      }
+      .ref-card a {
+        display: block;
+        font-size: 13.5px;
+        color: var(--text-dim);
+        padding-left: 18px;
+        position: relative;
+        line-height: 1.6;
+      }
+      .ref-card a::before {
+        content: '↗';
+        position: absolute;
+        left: 0;
+        top: 0;
+        color: var(--accent);
+        font-size: 12px;
+      }
+      .ref-card a:hover {
+        color: var(--accent-strong);
+        text-decoration: none;
+      }
+
+      /* checklist styling for "- [ ]" pandoc task list output */
+      ul.task-list {
+        list-style: none;
+        padding-left: 4px;
+      }
+      ul.task-list li {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        margin-bottom: 10px;
+      }
+      ul.task-list li::marker {
+        content: '';
+      }
+      ul.task-list input[type='checkbox'] {
+        margin-top: 5px;
+        width: 15px;
+        height: 15px;
+        accent-color: var(--accent);
+        flex-shrink: 0;
+      }
+
+      /* callout wrapper for admonition-like blockquote at very top of hero note */
+      .hero blockquote {
+        margin-top: 18px;
+      }
+
+      @media (max-width: 980px) {
+        .sidebar {
+          transform: translateX(-100%);
+          transition: transform 0.25s ease;
+          box-shadow: var(--shadow);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .sidebar-toggle {
+          display: flex;
+        }
+        .content {
+          margin-left: 0;
+          padding: 80px 22px 80px;
+        }
+        .ref-grid {
+          grid-template-columns: 1fr;
+        }
+        h2 {
+          font-size: 22px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="layout">
+      <div class="sidebar">
+        <div class="brand">
+          <div class="brand-badge">G</div>
+          <div class="brand-text">
+            <strong>Gemini マルチエージェント</strong>ベストプラクティス完全ガイド
+          </div>
+        </div>
+        <ul class="side-nav">
+          <li><a href="#0-はじめに--このガイドを読む前に知っておくべきこと">0. はじめに</a></li>
+          <li>
+            <a href="#1-エコシステム全体像を1枚の図でつかむ"
+              >1. エコシステム全体像を1枚の図でつかむ</a
+            >
+          </li>
+          <li><a href="#2-geminimd--プロジェクトの文脈を教える指示書">2. GEMINI.md</a></li>
+          <li>
+            <a href="#3-geminimd-と-agentsmd--どちらを使うべきか">3. GEMINI.md と AGENTS.md</a>
+          </li>
+          <li>
+            <a href="#4-マルチエージェント向け-geminimd--agentsmd-設計"
+              >4. マルチエージェント向け GEMINI.md / AGENTS.md 設計</a
+            >
+          </li>
+          <li><a href="#5-geminiignore--見せたくないファイルを隠す">5. .geminiignore</a></li>
+          <li><a href="#6-settingsjson--cli-挙動の中枢設定">6. settings.json</a></li>
+          <li>
+            <a href="#7-サブエージェントsubagentsの設計">7. サブエージェント（Subagents）の設計</a>
+          </li>
+          <li>
+            <a href="#8-リモートサブエージェントと-a2a-プロトコル入門"
+              >8. リモートサブエージェントと A2A プロトコル入門</a
+            >
+          </li>
+          <li><a href="#9-agentpy--adk-でのエージェント実装パターン">9. agent.py</a></li>
+          <li>
+            <a href="#10-remotea2aagent-実装パターンの詳細"
+              >10. RemoteA2aAgent 実装パターンの詳細</a
+            >
+          </li>
+          <li>
+            <a href="#11-vertex-ai-agent-engine-へのデプロイ"
+              >11. Vertex AI Agent Engine へのデプロイ</a
+            >
+          </li>
+          <li><a href="#12-adk-20-agent-と-workflow-の使い分け">12. ADK 2.0</a></li>
+          <li>
+            <a href="#13-セキュリティガバナンスのベストプラクティス"
+              >13. セキュリティ・ガバナンスのベストプラクティス</a
+            >
+          </li>
+          <li>
+            <a href="#14-総合ステップバイステップ-ゼロからのマルチエージェント構築フロー"
+              >14. 総合ステップバイステップ</a
+            >
+          </li>
+          <li><a href="#15-参考文献出典">15. 参考文献・出典</a></li>
+        </ul>
+        <div class="side-foot">
+          情報基準日: 2026年7月26日<br />出典は「15. 参考文献・出典」を参照
+        </div>
+      </div>
+      <button class="sidebar-toggle" aria-label="メニューを開く">☰</button>
+      <main class="content">
+        <div class="hero">
+          <span class="hero-eyebrow">GEMINI CLI × ADK × A2A × AGENT ENGINE</span>
+          <h1>Gemini マルチエージェント開発<br />ベストプラクティス完全ガイド</h1>
+          <p class="subtitle">
+            GEMINI.md・AGENTS.md・agent.py・.geminiignore・settings.json・A2A・Agent Engine まで
+          </p>
+          <div class="hero-meta">
+            <div class="meta-card">
+              <div class="label">対象読者</div>
+              <div class="value">
+                Gemini CLI / ADK でマルチエージェントシステムを構築したい初学者〜中級エンジニア
+              </div>
+            </div>
+            <div class="meta-card">
+              <div class="label">前提知識</div>
+              <div class="value">Python の基礎文法、ターミナル操作、JSON/YAML の読み書き</div>
+            </div>
+            <div class="meta-card">
+              <div class="label">情報基準日</div>
+              <div class="value">
+                2026年7月26日時点のウェブ検索結果に基づく（出典は末尾の参考文献を参照）
+              </div>
+            </div>
+          </div>
+        </div>
+        <h2 id="0-はじめに--このガイドを読む前に知っておくべきこと">
+          0. はじめに — このガイドを読む前に知っておくべきこと
+        </h2>
+        <p>
+          このガイドは、Gemini エコシステムでマルチエージェント（複数の AI
+          エージェントが協調して動くシステム）を開発するときに触れることになる、5つの設定ファイル・コードファイルと、それらをつなぐ2つのプロトコル/サービスを、初学者でも迷わないようにステップバイステップで解説します。
+        </p>
+        <table>
+          <thead>
+            <tr class="header">
+              <th>#</th>
+              <th>ファイル/概念</th>
+              <th>役割を一言でいうと</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td>1</td>
+              <td><code>GEMINI.md</code></td>
+              <td>エージェントに「このプロジェクトのルール」を教える指示書</td>
+            </tr>
+            <tr class="even">
+              <td>2</td>
+              <td><code>AGENTS.md</code></td>
+              <td>複数のAIツール共通の「エージェント向けREADME」オープン標準</td>
+            </tr>
+            <tr class="odd">
+              <td>3</td>
+              <td><code>.geminiignore</code></td>
+              <td>エージェントに「見せたくないファイル」を隠す除外リスト</td>
+            </tr>
+            <tr class="even">
+              <td>4</td>
+              <td><code>settings.json</code></td>
+              <td>
+                Gemini CLI
+                自体の挙動（承認モード、サブエージェント、セキュリティ等）を設定する本体設定ファイル
+              </td>
+            </tr>
+            <tr class="odd">
+              <td>5</td>
+              <td><code>agent.py</code></td>
+              <td>
+                ADK
+                でエージェントのロジック・ツール・サブエージェント構成をPythonコードとして定義するファイル
+              </td>
+            </tr>
+            <tr class="even">
+              <td>6</td>
+              <td>A2A プロトコル / <code>agent.json</code>（Agent Card）</td>
+              <td>
+                異なるエージェント同士が「何ができるか」を名刺交換のように開示し合い、通信するための共通規格
+              </td>
+            </tr>
+            <tr class="odd">
+              <td>7</td>
+              <td>Vertex AI Agent Engine</td>
+              <td>
+                作ったエージェントを本番環境（クラウド）にデプロイして自動スケールさせるマネージドサービス
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <h3 id="2026年7月時点の重要な前提必ず先に読んでください">
+          2026年7月時点の重要な前提（必ず先に読んでください）
+        </h3>
+        <p>
+          Gemini CLI
+          を取り巻く状況は2026年に入って大きく動いています。ガイドの内容を実践する前に、以下の2点を押さえておくと迷いません。
+        </p>
+        <ol type="1">
+          <li>
+            <strong
+              >Gemini CLI は個人向け無償/Google One 利用枠では Antigravity CLI
+              に統合されつつあります。</strong
+            >
+            Google は2026年5月19日、Gemini CLI と Antigravity CLI
+            を「マルチエージェント時代に向けた単一プラットフォーム」に統合する方針を発表し、2026年6月18日をもって
+            Google AI Pro/Ultra および無償の Gemini Code Assist 個人利用枠向けの Gemini CLI
+            へのリクエスト提供を終了しました。一方で、<strong
+              >Gemini Code Assist Standard/Enterprise ライセンス、または有償の Gemini / Gemini
+              Enterprise Agent Platform API キーを利用する企業ユーザーには、これまで通り Gemini CLI
+              へのアクセスが提供され続けます</strong
+            >。このガイドで解説する <code>GEMINI.md</code> / <code>.geminiignore</code> /
+            <code>settings.json</code> / サブエージェントの仕組みは、企業向けに存続する Gemini
+            CLI、および後継の Antigravity CLI の両方で（Agent
+            Skills・Hooks・Subagents・拡張機能というかたちで）概ね引き継がれています。
+          </li>
+          <li>
+            <strong
+              >ADK（Agent Development Kit）は 2.0
+              世代に入り、「決定論的ワークフロー」という新しい柱が加わりました。</strong
+            >
+            2026年7月1日に公開された Google の技術ブログによれば、ADK 2.0
+            では自律的なLLMエージェントに加えて、ビジネスロジックをコードで厳密に制御する
+            <code>Workflow</code
+            >（有向グラフ実行エンジン）が導入されています。マルチエージェント設計をする際は「LLMに任せるべき部分」と「コードで固定すべき部分」を切り分ける、という新しい設計判断が必要になります（詳細は第9章）。
+          </li>
+        </ol>
+        <p>これらの背景を踏まえたうえで、以下、各ファイル・概念を順番に見ていきます。</p>
+        <hr />
+        <h2 id="1-エコシステム全体像を1枚の図でつかむ">1. エコシステム全体像を1枚の図でつかむ</h2>
+        <p>個別のファイルに入る前に、これらがどう連携しているかを俯瞰します。</p>
+        <pre class="mermaid">
+flowchart TB
+    subgraph LOCAL["ローカル開発環境"]
+        GM["GEMINI.md / AGENTS.md&lt;br/&gt;（プロジェクト文脈）"]
+        GI[".geminiignore&lt;br/&gt;（除外ファイル）"]
+        ST["settings.json&lt;br/&gt;（CLI挙動設定）"]
+        AG["agent.py&lt;br/&gt;（ADKでのエージェント定義）"]
+    end
+
+    subgraph CLI["Gemini CLI / Antigravity CLI"]
+        CORE["Core: モデル呼び出し・ツール実行・ReActループ"]
+        SUB["ローカル サブエージェント&lt;br/&gt;（.gemini/agents/*.md）"]
+    end
+
+    subgraph REMOTE["リモート/他言語エージェント"]
+        CARD["agent.json（Agent Card）&lt;br/&gt;= .well-known/agent.json"]
+        RAGENT["RemoteA2aAgent&lt;br/&gt;（A2Aクライアント）"]
+        SERVER["A2Aサーバー&lt;br/&gt;（Python/Go/Java等）"]
+    end
+
+    subgraph CLOUD["本番環境"]
+        AE["Vertex AI Agent Engine&lt;br/&gt;（Reasoning Engine）"]
+    end
+
+    GM --&gt; CORE
+    GI --&gt; CORE
+    ST --&gt; CORE
+    CORE --&gt; SUB
+    AG --&gt; RAGENT
+    RAGENT -- "Agent Card取得" --&gt; CARD
+    RAGENT -- "JSON-RPC通信" --&gt; SERVER
+    CARD --- SERVER
+    AG -- "adk deploy agent_engine" --&gt; AE
+    AE -- "A2Aエンドポイント公開" --&gt; RAGENT</pre
+        >
+        <p>
+          読み方: <code>GEMINI.md</code> / <code>.geminiignore</code> /
+          <code>settings.json</code> はいずれも
+          <strong>Gemini CLI 自体を賢く・安全にするための設定</strong>です。一方
+          <code>agent.py</code> と <code>agent.json</code>（Agent Card）は
+          <strong>ADK で作る個々のエージェント（コード側の実体）</strong>
+          を定義するもので、A2Aプロトコルを介してエージェント同士、あるいは Gemini CLI
+          のサブエージェントとして接続されます。最終的に <code>agent.py</code> は Vertex AI Agent
+          Engine にデプロイして本番運用します。
+        </p>
+        <hr />
+        <h2 id="2-geminimd--プロジェクトの文脈を教える指示書">
+          2. GEMINI.md — プロジェクトの「文脈」を教える指示書
+        </h2>
+        <h3 id="21-何をするファイルか">2.1 何をするファイルか</h3>
+        <p>
+          <code>GEMINI.md</code>
+          は、毎回のプロンプトで同じ指示を繰り返す代わりに、プロジェクト固有のルール（コーディング規約、対象読者、テストの実行方法など）を一度だけ書いておくファイルです。Gemini
+          CLI はこれを自動的に読み込み、モデルへのすべてのリクエストに文脈として付加します。
+        </p>
+        <h3 id="22-3段階の階層システム超重要">2.2 3段階の階層システム（超重要）</h3>
+        <p>
+          <code>GEMINI.md</code>
+          は1ファイルだけではなく、以下の3段階で読み込まれ、<strong>すべて連結されて</strong>モデルに渡されます。
+        </p>
+        <pre class="mermaid">
+flowchart TB
+    A["① グローバル文脈ファイル&lt;br/&gt;~/.gemini/GEMINI.md&lt;br/&gt;（全プロジェクト共通のデフォルト指示）"]
+    B["② ワークスペース文脈ファイル&lt;br/&gt;作業ディレクトリとその親ディレクトリを探索&lt;br/&gt;（現在取り組んでいるプロジェクト向け）"]
+    C["③ Just-In-Time (JIT) 文脈ファイル&lt;br/&gt;ツールがファイル/ディレクトリにアクセスした瞬間に&lt;br/&gt;そのディレクトリとその祖先を自動スキャン"]
+    D["すべて連結してモデルへ送信&lt;br/&gt;（CLIフッターに読み込み済みファイル数を表示）"]
+    A --&gt; D
+    B --&gt; D
+    C --&gt; D</pre
+        >
+        <ul>
+          <li>
+            <strong>①グローバル</strong>:
+            <code>~/.gemini/GEMINI.md</code
+            >（ホームディレクトリ）。すべてのプロジェクトに適用したいデフォルトの指示（例:「常に日本語で回答する」等）を置きます。
+          </li>
+          <li>
+            <strong>②ワークスペース</strong>:
+            作業ディレクトリとその親ディレクトリを探索して見つかった
+            <code>GEMINI.md</code>。現在のプロジェクト向けのルールです。
+          </li>
+          <li>
+            <strong>③JIT（Just-In-Time）</strong>:
+            モデルがツールで特定のディレクトリのファイルに触れた瞬間に、そのディレクトリとその祖先ディレクトリの
+            <code>GEMINI.md</code>
+            を都度スキャンして読み込みます。これにより、モノレポの特定コンポーネントだけに関係する詳細ルールを、必要になったときだけ読み込ませることができます（＝第4章のマルチエージェント設計で重要）。
+          </li>
+        </ul>
+        <h3 id="23-書き方のベストプラクティスステップバイステップ">
+          2.3 書き方のベストプラクティス（ステップバイステップ）
+        </h3>
+        <ol type="1">
+          <li>
+            <strong><code>/init</code> コマンドで雛形を作る。</strong> プロジェクトルートで Gemini
+            CLI を起動し <code>/init</code> を実行すると、リポジトリを解析して
+            <code>GEMINI.md</code> の初期版を自動生成してくれます。
+          </li>
+          <li>
+            <strong>簡潔に、目的ベースで書く。</strong>
+            公式のベストプラクティスは「モデルがコードから推測できない情報だけ書け」「最初は50行以内に抑え、実際にギャップが出たときだけ育てる」という考え方です。冗長なドキュメントの全文コピーは避けます。
+          </li>
+          <li>
+            <strong>見出し構造で整理する。</strong> <code># プロジェクト概要</code> →
+            <code>## 全般的な指示</code> →
+            <code>## コーディングスタイル</code>
+            のように、見出しでセクションを区切ります。
+          </li>
+          <li>
+            <strong>500行を超えたら分割する。</strong> 巨大化してきたら
+            <code>@ファイルパス</code> のインポート構文でモジュール化します。
+          </li>
+        </ol>
+        <pre class="markdown"><code class="markdown"># Project: My TypeScript Library
+
+## General Instructions
+- 新しいTypeScriptコードを生成する際は、既存のコーディングスタイルに従うこと。
+- 新しい関数・クラスには必ずJSDocコメントを付けること。
+- 可能な限り関数型プログラミングのパラダイムを優先すること。
+
+## Coding Style
+- インデントはスペース2つ。
+- インターフェース名には `I` プレフィックスを付ける（例: `IUserService`）。
+- 常に厳密等価演算子（`===` と `!==`）を使うこと。</code></pre>
+        <ol start="5" type="1">
+          <li>
+            <strong><code>@file.md</code> 構文でインポートして分割する。</strong>
+          </li>
+        </ol>
+        <pre class="markdown"><code class="markdown"># Main GEMINI.md file
+これはメインの内容です。
+
+@./components/instructions.md
+
+さらに内容が続きます。
+
+@../shared/style-guide.md</code></pre>
+        <ol start="6" type="1">
+          <li>
+            <strong><code>/memory</code> コマンドで検証する。</strong>
+            <ul>
+              <li>
+                <code>/memory show</code> —
+                現在読み込まれている連結後の文脈全文を表示（実際にモデルに渡っている内容を確認できる）
+              </li>
+              <li>
+                <code>/memory reload</code> — すべての
+                <code>GEMINI.md</code> を再スキャンして再読み込み
+              </li>
+            </ul>
+          </li>
+        </ol>
+        <h3 id="24-実践チェックリスト">2.4 実践チェックリスト</h3>
+        <ul class="task-list">
+          <li>
+            <label><input type="checkbox" /><code>/init</code> で下地を作ったか</label>
+          </li>
+          <li>
+            <label
+              ><input
+                type="checkbox"
+              />「コードから読み取れないこと」だけを書いているか（重複情報を削ったか）</label
+            >
+          </li>
+          <li>
+            <label><input type="checkbox" />セクション見出しで整理されているか</label>
+          </li>
+          <li>
+            <label
+              ><input type="checkbox" />500行以内、または
+              <code>@import</code> で分割されているか</label
+            >
+          </li>
+          <li>
+            <label
+              ><input type="checkbox" /><code>/memory show</code>
+              で意図通りの内容が読み込まれているか確認したか</label
+            >
+          </li>
+        </ul>
+        <hr />
+        <h2 id="3-geminimd-と-agentsmd--どちらを使うべきか">
+          3. GEMINI.md と AGENTS.md — どちらを使うべきか
+        </h2>
+        <h3 id="31-agentsmd-とは何か">3.1 AGENTS.md とは何か</h3>
+        <p>
+          <code>AGENTS.md</code>
+          は特定ベンダーに縛られない、<strong>業界横断のオープンフォーマット</strong>です。OpenAI
+          Codex・Amp・Google Jules・Cursor・Factory など複数の企業が協力して策定し、現在では
+          Codex・Cursor・GitHub Copilot・Gemini CLI・Aider・Windsurf・Zed
+          など20を超えるツールがネイティブに読み込みます。「エージェント向けのREADME」と考えると分かりやすく、必須フィールドも決まったスキーマもない、プレーンな
+          Markdown です。
+        </p>
+        <h3 id="32-なぜ2つ存在するのかどう使い分けるか">
+          3.2 なぜ2つ存在するのか、どう使い分けるか
+        </h3>
+        <p>
+          <code>GEMINI.md</code> は Gemini CLI
+          専用の名称・階層読み込みロジック（グローバル/ワークスペース/JIT、<code>@import</code>構文）を持つ
+          <strong>Gemini CLI 固有の仕組み</strong>です。一方 <code>AGENTS.md</code> は
+          <strong>どのツールでも読める共通ファイル</strong>という位置づけです。
+        </p>
+        <table>
+          <thead>
+            <tr class="header">
+              <th>観点</th>
+              <th>GEMINI.md</th>
+              <th>AGENTS.md</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td>標準化団体</td>
+              <td>Google（Gemini CLI固有）</td>
+              <td>複数ベンダー共同策定のオープン標準</td>
+            </tr>
+            <tr class="even">
+              <td>対応ツール</td>
+              <td>Gemini CLI / Antigravity CLI</td>
+              <td>Codex, Cursor, Copilot, Gemini CLI, Aider, Windsurf, Zed 等20以上</td>
+            </tr>
+            <tr class="odd">
+              <td>階層読み込み</td>
+              <td>グローバル→ワークスペース→JIT の3段階</td>
+              <td>最も近いディレクトリのファイルが優先（モノレポの各パッケージに配置可）</td>
+            </tr>
+            <tr class="even">
+              <td>インポート構文</td>
+              <td><code>@file.md</code> をサポート</td>
+              <td>仕様上の特別な構文なし（プレーンMarkdown）</td>
+            </tr>
+            <tr class="odd">
+              <td>チーム内での使い方</td>
+              <td>Gemini CLI 中心のチームに最適</td>
+              <td>複数のAIツールを併用するチーム・OSSリポジトリに最適</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3 id="33-実は共存できる--settingsjson-での統合設定">
+          3.3 実は共存できる — settings.json での統合設定
+        </h3>
+        <p>
+          Gemini CLI は <code>settings.json</code> の
+          <code>context.fileName</code>
+          プロパティで、読み込むファイル名を変更・追加できます。これを使うと、<code>AGENTS.md</code>
+          を正としつつ Gemini CLI にも読ませる、という一石二鳥の運用が可能です。
+        </p>
+        <pre class="json"><code class="json">{
+  "context": {
+    "fileName": ["AGENTS.md", "CONTEXT.md", "GEMINI.md"]
+  }
+}</code></pre>
+        <p>
+          この配列に指定した名前のファイルが、指定した優先順で（複数存在すれば全て連結して）読み込まれます。<strong
+            >複数のAIコーディングツールを併用するチームでは、<code>AGENTS.md</code>
+            を単一の情報源にして
+            <code>GEMINI.md</code>
+            は作らない、という運用が2026年時点でのベストプラクティスとして定着しつつあります。</strong
+          >
+        </p>
+        <h3 id="34-ステップバイステップ-移行手順">3.4 ステップバイステップ: 移行手順</h3>
+        <ol type="1">
+          <li>
+            リポジトリ直下に
+            <code>AGENTS.md</code>
+            を作成し、ビルドコマンド・テストコマンド・コーディング規約・触れてはいけないファイルなどを記述する。
+          </li>
+          <li>
+            <code>.gemini/settings.json</code>（ワークスペース設定）に
+            <code>context.fileName</code> を追加し、<code>AGENTS.md</code> を最優先で読み込ませる。
+          </li>
+          <li>
+            モノレポの場合、各パッケージのルートにもその場限りの
+            <code>AGENTS.md</code>
+            を追加する（最も近いファイルが優先されるため、サブプロジェクトごとの独自ルールを上書き指定できる）。
+          </li>
+          <li>
+            既存の <code>GEMINI.md</code> の内容を <code>AGENTS.md</code> に統合し、重複を避ける。
+          </li>
+        </ol>
+        <hr />
+        <h2 id="4-マルチエージェント向け-geminimd--agentsmd-設計">
+          4. マルチエージェント向け GEMINI.md / AGENTS.md 設計
+        </h2>
+        <p>
+          単一エージェントのプロジェクトと違い、複数のエージェントが協調するプロジェクトでは、文脈ファイルの設計そのものが「誰にどの情報を、いつ見せるか」という設計問題になります。
+        </p>
+        <h3 id="41-モノレポ型階層設計">4.1 モノレポ型階層設計</h3>
+        <pre class="mermaid">
+flowchart TB
+    ROOT["/AGENTS.md（ルート）&lt;br/&gt;全体アーキテクチャ・共通規約・禁止事項"]
+    ROOT --&gt; PY["/agents/python-extractor/AGENTS.md&lt;br/&gt;Python固有: Gemini呼び出し規約・型ヒント方針"]
+    ROOT --&gt; GO["/agents/go-compliance/AGENTS.md&lt;br/&gt;Go固有: エラーハンドリング規約・ビルドコマンド"]
+    ROOT --&gt; ORCH["/orchestrator/GEMINI.md&lt;br/&gt;オーケストレーター固有: サブエージェント呼び出し順序"]</pre
+        >
+        <p>
+          第2章で解説した JIT（Just-In-Time）読み込みの仕組みにより、モデルが
+          <code>agents/go-compliance/</code>
+          配下のファイルを開いた瞬間だけ、その場所の <code>AGENTS.md</code>
+          が自動的に追加読み込みされます。これにより、ルートの
+          <code>AGENTS.md</code>
+          を薄く保ちながら、各サブエージェントの専門知識を必要な時にだけ注入できます。
+        </p>
+        <h3 id="42-マルチエージェント特有の記述内容">4.2 マルチエージェント特有の記述内容</h3>
+        <p>
+          単一エージェントの <code>GEMINI.md</code>／<code>AGENTS.md</code>
+          には書かない、マルチエージェント特有の情報を追加します。
+        </p>
+        <ul>
+          <li>
+            <strong>エージェント間の責務分担の一覧</strong>（例: 「抽出は
+            <code>extractor_agent</code>、コンプライアンス検証は Go 製のリモートエージェント
+            <code>compliance_agent</code>、レポート生成は <code>report_agent</code> が担当」）
+          </li>
+          <li>
+            <strong>共有状態（shared state）のキー名とスキーマ</strong>（後述する
+            <code>ToolContext.state</code> 経由で受け渡すデータの形）
+          </li>
+          <li>
+            <strong>フェイルセーフの挙動</strong
+            >（あるサブエージェントが応答不能な場合、どのステートに遷移すべきか。例:「Goのコンプライアンスエージェントが3回リトライしても応答しない場合は
+            <code>MANUAL_REVIEW</code> 状態へ遷移し、人間のレビューに回す」）
+          </li>
+          <li>
+            <strong>サブエージェントの呼び出し粒度に関する指示</strong
+            >（「どのタスクをメインエージェントが直接処理し、どこからサブエージェントに委譲すべきか」の判断基準）
+          </li>
+        </ul>
+        <h3 id="43-サブエージェント定義ファイルとの役割分担">
+          4.3 サブエージェント定義ファイルとの役割分担
+        </h3>
+        <p>
+          ローカルサブエージェントは <code>.gemini/agents/*.md</code> という
+          <strong>別ファイル</strong
+          >（YAMLフロントマター付きMarkdown）で定義します（詳細は第6章）。<code>GEMINI.md</code>／<code
+            >AGENTS.md</code
+          >
+          は「プロジェクト全体のルール」、サブエージェント定義ファイルは「個々のサブエージェントの人格・権限」という住み分けです。この2つを混同せず、<code
+            >GEMINI.md</code
+          >
+          にサブエージェントの詳細なシステムプロンプトを書き込まないようにするのがコツです。
+        </p>
+        <hr />
+        <h2 id="5-geminiignore--見せたくないファイルを隠す">
+          5. .geminiignore — 見せたくないファイルを隠す
+        </h2>
+        <h3 id="51-仕組み">5.1 仕組み</h3>
+        <p>
+          <code>.geminiignore</code> は Git の <code>.gitignore</code> や Gemini Code Assist の
+          <code>.aiexclude</code> と同じ考え方の除外リストです。ここに書いたパスは、<code>@</code>
+          コマンドでファイルを共有するときなど、この機能に対応したツールから除外されます（ただし Git
+          など他のサービスには引き続き見える点に注意）。
+        </p>
+        <h3 id="52-構文ルール">5.2 構文ルール</h3>
+        <table>
+          <thead>
+            <tr class="header">
+              <th>ルール</th>
+              <th>説明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td>空行・<code>#</code>で始まる行</td>
+              <td>無視される（コメント扱い）</td>
+            </tr>
+            <tr class="even">
+              <td>標準的なglobパターン</td>
+              <td><code>*</code>, <code>?</code>, <code>[]</code> が使用可能</td>
+            </tr>
+            <tr class="odd">
+              <td>末尾の <code>/</code></td>
+              <td>ディレクトリのみにマッチ</td>
+            </tr>
+            <tr class="even">
+              <td>先頭の <code>/</code></td>
+              <td><code>.geminiignore</code> があるディレクトリからの相対パスとして固定</td>
+            </tr>
+            <tr class="odd">
+              <td><code>!</code></td>
+              <td>パターンを否定（除外対象から除外＝再度含める）</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3 id="53-実践例">5.3 実践例</h3>
+        <pre
+          class="gitignore"
+        ><code class="gitignore"># /packages/ ディレクトリとそのサブディレクトリすべてを除外
+/packages/
+
+# apikeys.txt ファイルを除外
+apikeys.txt
+
+# すべての .md ファイルを除外（ワイルドカード）
+*.md
+
+# ただし README.md だけは除外対象から除外して見せる
+*.md
+!README.md</code></pre>
+        <p>
+          <strong>変更を反映するには Gemini CLI セッションの再起動が必要</strong
+          >です。マルチエージェント開発では、各サブエージェント/リモートエージェントのシークレット（<code>.env</code>、認証キー、<code
+            >agent_card_json</code
+          >
+          に埋め込みがちな認証情報）を確実に除外リストへ入れることが、次章のセキュリティ設定と合わせて重要になります。
+        </p>
+        <hr />
+        <h2 id="6-settingsjson--cli-挙動の中枢設定">6. settings.json — CLI 挙動の中枢設定</h2>
+        <h3 id="61-設定ファイルの場所と優先順位">6.1 設定ファイルの場所と優先順位</h3>
+        <table>
+          <thead>
+            <tr class="header">
+              <th>スコープ</th>
+              <th>パス</th>
+              <th>優先順位</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td>ユーザー設定</td>
+              <td><code>~/.gemini/settings.json</code></td>
+              <td>低い（ワークスペース設定に上書きされる）</td>
+            </tr>
+            <tr class="even">
+              <td>ワークスペース設定</td>
+              <td><code>your-project/.gemini/settings.json</code></td>
+              <td>高い（ユーザー設定を上書き）</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          <code>/settings</code>
+          コマンドでダイアログからGUI的に編集することも、ファイルを直接編集することも可能です。
+        </p>
+        <h3 id="62-マルチエージェント開発で特に重要なカテゴリ">
+          6.2 マルチエージェント開発で特に重要なカテゴリ
+        </h3>
+        <p>
+          全設定は10カテゴリ以上ありますが、マルチエージェント開発の文脈で押さえるべきものを抜粋します。
+        </p>
+        <table>
+          <thead>
+            <tr class="header">
+              <th>カテゴリ</th>
+              <th>主な設定キー</th>
+              <th>用途</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td>Context</td>
+              <td><code>context.fileName</code></td>
+              <td>読み込む文脈ファイル名（<code>AGENTS.md</code>併用など）</td>
+            </tr>
+            <tr class="even">
+              <td>Context</td>
+              <td><code>context.fileFiltering.respectGeminiIgnore</code></td>
+              <td><code>.geminiignore</code>を尊重するか（既定 <code>true</code>）</td>
+            </tr>
+            <tr class="odd">
+              <td>Agents</td>
+              <td><code>agents.overrides.&lt;name&gt;</code></td>
+              <td>特定サブエージェントの有効/無効・モデル・実行上限の上書き</td>
+            </tr>
+            <tr class="even">
+              <td>General</td>
+              <td><code>general.defaultApprovalMode</code></td>
+              <td>
+                ツール実行の承認モード（<code>default</code>/<code>auto_edit</code>/<code>plan</code>）
+              </td>
+            </tr>
+            <tr class="odd">
+              <td>Security</td>
+              <td><code>security.folderTrust.enabled</code></td>
+              <td>信頼済みフォルダのみで危険な操作を許可</td>
+            </tr>
+            <tr class="even">
+              <td>Security</td>
+              <td><code>security.enableConseca</code></td>
+              <td>LLMによる動的なセキュリティポリシー生成（コンテキスト対応セキュリティ）</td>
+            </tr>
+            <tr class="odd">
+              <td>Tools</td>
+              <td>
+                <code>tools.sandboxAllowedPaths</code> / <code>tools.sandboxNetworkAccess</code>
+              </td>
+              <td>サンドボックスの許可範囲</td>
+            </tr>
+            <tr class="even">
+              <td>Model</td>
+              <td><code>model.compressionThreshold</code></td>
+              <td>コンテキスト圧縮を発動する使用率のしきい値</td>
+            </tr>
+            <tr class="odd">
+              <td>HooksConfig</td>
+              <td><code>hooksConfig.enabled</code></td>
+              <td>フックシステム全体のON/OFF</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3 id="63-サブエージェント向け設定例">6.3 サブエージェント向け設定例</h3>
+        <p>
+          特定のサブエージェント（例:
+          <code>codebase_investigator</code>）に、モデルや最大ターン数を個別指定する例です。
+        </p>
+        <pre class="json"><code class="json">{
+  "agents": {
+    "overrides": {
+      "codebase_investigator": {
+        "modelConfig": { "model": "gemini-3-flash-preview" },
+        "runConfig": { "maxTurns": 50 }
+      }
+    }
+  }
+}</code></pre>
+        <h3 id="64-mcpサーバー連携の設定例">6.4 MCPサーバー連携の設定例</h3>
+        <p>
+          マルチエージェント開発では、外部ツール（GitHub等）をMCP経由で各エージェントに与えることがよくあります。
+        </p>
+        <pre class="json"><code class="json">{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    }
+  }
+}</code></pre>
+        <p>
+          <code>${GITHUB_TOKEN}</code>
+          のような記法で、実際の値をシェル環境変数から実行時に解決させ、設定ファイル自体にシークレットを平文で書かないのがベストプラクティスです。
+        </p>
+        <h3 id="65-サブエージェントを無効化したい場合">6.5 サブエージェントを無効化したい場合</h3>
+        <pre class="json"><code class="json">{
+  "experimental": { "enableAgents": false }
+}</code></pre>
+        <hr />
+        <h2 id="7-サブエージェントsubagentsの設計">7. サブエージェント（Subagents）の設計</h2>
+        <h3 id="71-サブエージェントとは">7.1 サブエージェントとは</h3>
+        <p>
+          サブエージェントは、メインの Gemini CLI
+          セッションの中で動く「専門家」です。深いコードベース解析やドメイン固有の推論など、特定タスクをメインエージェントの文脈を汚さずに処理します。メインエージェントからは、サブエージェントは同名の<strong>1つのツール</strong>として見えます。呼び出されると処理を委譲し、完了すると結果だけを報告して戻ります。
+        </p>
+        <pre class="mermaid">
+flowchart LR
+    U["ユーザーのプロンプト"] --&gt; MAIN["メインエージェント&lt;br/&gt;（Gemini CLI Core）"]
+    MAIN -- "自動委譲 or @エージェント名で明示指定" --&gt; SUB1["ローカルサブエージェント&lt;br/&gt;（独立したコンテキストウィンドウ）"]
+    MAIN -- "A2Aプロトコル経由" --&gt; SUB2["リモートサブエージェント&lt;br/&gt;（別プロセス/別言語/別クラウド）"]
+    SUB1 -- "結果のみ報告" --&gt; MAIN
+    SUB2 -- "結果のみ報告" --&gt; MAIN
+    MAIN --&gt; ANS["ユーザーへの応答"]</pre
+        >
+        <h3 id="72-組み込みサブエージェント">7.2 組み込みサブエージェント</h3>
+        <table>
+          <thead>
+            <tr class="header">
+              <th>名前</th>
+              <th>役割</th>
+              <th>既定</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td><code>codebase_investigator</code></td>
+              <td>コードベース解析・依存関係の可視化</td>
+              <td>有効</td>
+            </tr>
+            <tr class="even">
+              <td><code>cli_help</code></td>
+              <td>Gemini CLI自体の使い方に関する専門知識</td>
+              <td>有効</td>
+            </tr>
+            <tr class="odd">
+              <td><code>generalist</code></td>
+              <td>
+                メインと同じツールを継承する汎用サブエージェント。マルチファイル改修や大量出力タスクをメインの文脈から隔離するのに使う
+              </td>
+              <td>有効</td>
+            </tr>
+            <tr class="even">
+              <td><code>browser_agent</code></td>
+              <td>ブラウザ操作の自動化（Chrome 144以降必須）</td>
+              <td>無効（要有効化）</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3 id="73-カスタムサブエージェントの作り方ステップバイステップ">
+          7.3 カスタムサブエージェントの作り方（ステップバイステップ）
+        </h3>
+        <ol type="1">
+          <li>
+            <code>.gemini/agents/</code> （プロジェクト共有）または
+            <code>~/.gemini/agents/</code>（個人用）にMarkdownファイルを作成する。
+          </li>
+          <li>
+            ファイル先頭にYAMLフロントマターを書く（このフォーマットは<strong>必須</strong>）。
+          </li>
+          <li>
+            フロントマター以降の本文が、そのままサブエージェントの<strong>システムプロンプト</strong>になる。
+          </li>
+        </ol>
+        <pre class="markdown"><code class="markdown">---
+name: security-auditor
+description: コード内のセキュリティ脆弱性を発見することに特化。
+kind: local
+tools:
+  - read_file
+  - grep_search
+model: gemini-3-flash-preview
+temperature: 0.2
+max_turns: 10
+---
+あなたは容赦のないセキュリティ監査官です。コードを分析し、潜在的な脆弱性を洗い出してください。
+
+重点項目:
+1. SQLインジェクション
+2. XSS（クロスサイトスクリプティング）
+3. ハードコードされた認証情報
+4. 安全でないファイル操作
+
+脆弱性を発見したら明確に説明し、修正案を提示すること。ただし自分で修正はしないこと。</code></pre>
+        <h3 id="74-フロントマター-スキーマ一覧">7.4 フロントマター スキーマ一覧</h3>
+        <table>
+          <thead>
+            <tr class="header">
+              <th>フィールド</th>
+              <th>型</th>
+              <th>必須</th>
+              <th>説明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td><code>name</code></td>
+              <td>string</td>
+              <td>○</td>
+              <td>一意な識別子（小文字・数字・ハイフン・アンダースコアのみ）</td>
+            </tr>
+            <tr class="even">
+              <td><code>description</code></td>
+              <td>string</td>
+              <td>○</td>
+              <td>どんな時に呼ぶべきかをメインエージェントが判断するための説明</td>
+            </tr>
+            <tr class="odd">
+              <td><code>kind</code></td>
+              <td>string</td>
+              <td>-</td>
+              <td><code>local</code>（既定）または <code>remote</code></td>
+            </tr>
+            <tr class="even">
+              <td><code>tools</code></td>
+              <td>array</td>
+              <td>-</td>
+              <td>
+                使用可能なツール一覧。ワイルドカード対応。省略時は親セッションの全ツールを継承
+              </td>
+            </tr>
+            <tr class="odd">
+              <td><code>mcpServers</code></td>
+              <td>object</td>
+              <td>-</td>
+              <td>このサブエージェント専用のインラインMCPサーバー定義</td>
+            </tr>
+            <tr class="even">
+              <td><code>model</code></td>
+              <td>string</td>
+              <td>-</td>
+              <td>使用モデル。既定は親セッションを継承</td>
+            </tr>
+            <tr class="odd">
+              <td><code>temperature</code></td>
+              <td>number</td>
+              <td>-</td>
+              <td>0.0〜2.0、既定 <code>1</code></td>
+            </tr>
+            <tr class="even">
+              <td><code>max_turns</code></td>
+              <td>number</td>
+              <td>-</td>
+              <td>最大ターン数、既定 <code>30</code></td>
+            </tr>
+            <tr class="odd">
+              <td><code>timeout_mins</code></td>
+              <td>number</td>
+              <td>-</td>
+              <td>最大実行時間（分）、既定 <code>10</code></td>
+            </tr>
+          </tbody>
+        </table>
+        <h3 id="75-ツール分離と再帰防止">7.5 ツール分離と再帰防止</h3>
+        <p>
+          各サブエージェントは独立したコンテキストループで動作し、明示的に許可したツールにしかアクセスできません。<strong>重要な安全設計として、サブエージェントは他のサブエージェントを呼び出せません</strong>（<code
+            >*</code
+          >
+          ワイルドカードを与えても他エージェントは見えない）。これにより無限再帰やトークンの爆発的消費を防いでいます。
+        </p>
+        <h3 id="76-サブエージェント単位のポリシー制御">7.6 サブエージェント単位のポリシー制御</h3>
+        <p>ポリシーエンジンのTOML設定で、特定サブエージェントにだけ適用されるルールを書けます。</p>
+        <pre class="toml"><code class="toml">[[rules]]
+name = "Allow pr-creator to push code"
+subagent = "pr-creator"
+description = "pr-creatorによる自動ブランチプッシュを許可する。"
+action = "allow"
+toolName = "run_shell_command"
+commandPrefix = "git push"</code></pre>
+        <h3 id="77-説明文descriptionの最適化がすべてを左右する">
+          7.7 説明文（description）の最適化がすべてを左右する
+        </h3>
+        <p>
+          メインエージェントはサブエージェントの
+          <code>description</code>
+          を見て「これは自分の専門家か」を判断します。呼び出し精度を上げる鉄則は、①専門分野、②いつ使うべきか、③具体的な利用シーン例、の3点を書くことです。
+        </p>
+        <blockquote>
+          <p>Git操作全般（ローカル・リモート双方）に使うべきGitエキスパートエージェント。例:</p>
+          <ul>
+            <li>コミットの作成</li>
+            <li><code>bisect</code>によるリグレッション調査</li>
+            <li>GitHubなどのソース管理・課題管理システムとのやり取り</li>
+          </ul>
+        </blockquote>
+        <hr />
+        <h2 id="8-リモートサブエージェントと-a2a-プロトコル入門">
+          8. リモートサブエージェントと A2A プロトコル入門
+        </h2>
+        <h3 id="81-a2aagent-to-agentプロトコルとは何か">
+          8.1 A2A（Agent-to-Agent）プロトコルとは何か
+        </h3>
+        <p>
+          A2A
+          は、実装言語やフレームワークを問わずエージェント同士が相互運用できるようにするオープン標準です。「エージェント界のHTTP」と表現され、REST
+          APIにおけるOpenAPI仕様のような役割を果たす
+          <strong>Agent Card</strong> を軸に、次の3つの課題を解決します。
+        </p>
+        <ol type="1">
+          <li>
+            <strong>発見（Discovery）</strong>: エージェントは
+            <code>/.well-known/agent.json</code> というJSONメタデータ（Agent
+            Card）を通じて自身の能力を宣言する。呼び出す側は先にこのカードを取得して「相手が何をできるか」を理解する。
+          </li>
+          <li>
+            <strong>通信（Communication）</strong>: すべてのデータ交換は単一エンドポイント経由の
+            JSON-RPC 2.0 で行われる。中心となるメソッドは
+            <code>message/send</code>（同期的な送受信）で、他に <code>tasks/send</code>・<code
+              >tasks/get</code
+            >
+            などがある。データは <code>TextPart</code>（自然言語）や
+            <code>DataPart</code>（構造化JSON）といった型付きの「Message Part」で運ばれる。
+          </li>
+          <li>
+            <strong>タスクのライフサイクル</strong>: すべてのやり取りは
+            <code>Task</code>
+            に包まれ、<code>submitted → working → completed / failed</code>
+            という明確な状態遷移をたどる。この仕組みにより、同期的なワークフロー（今すぐこの契約書を確認）と非同期のワークフロー（48時間かけて文書を検証）を同じプロトコルで扱える。
+          </li>
+        </ol>
+        <pre class="mermaid">
+sequenceDiagram
+    participant L as ローカルエージェント&lt;br/&gt;(RemoteA2aAgent)
+    participant R as リモートエージェント&lt;br/&gt;(A2Aサーバー)
+
+    L-&gt;&gt;R: GET /.well-known/agent.json
+    R--&gt;&gt;L: Agent Card（名前・スキル・対応プロトコル・認証方式）
+    Note over L,R: カードを解析し、呼び出し可能なスキルを把握
+    L-&gt;&gt;R: POST JSON-RPC message/send（タスク送信）
+    R--&gt;&gt;L: Task状態: working
+    R--&gt;&gt;L: Task状態: completed（結果データを含む）
+    alt リモートが応答不能な場合
+        R--xL: タイムアウト / エラー
+        L-&gt;&gt;L: フェイルセーフ状態へ遷移（例: MANUAL_REVIEW）
+    end</pre
+        >
+        <h3 id="82-agent-cardagentjsonの主要フィールド">
+          8.2 Agent Card（<code>agent.json</code>）の主要フィールド
+        </h3>
+        <pre class="json"><code class="json">{
+  "protocolVersion": "0.3.0",
+  "name": "Example Agent Name",
+  "description": "ドキュメント目的のサンプルエージェントの説明。",
+  "version": "1.0.0",
+  "url": "https://example.com/a2a",
+  "preferredTransport": "HTTP+JSON",
+  "capabilities": {
+    "streaming": true,
+    "extendedAgentCard": false
+  },
+  "defaultInputModes": ["text/plain"],
+  "defaultOutputModes": ["application/json"],
+  "skills": [
+    {
+      "id": "ExampleSkill",
+      "name": "Example Skill Assistant",
+      "description": "このスキルが行うことの説明。",
+      "tags": ["example-tag"],
+      "examples": ["ここに例を示してください。"]
+    }
+  ]
+}</code></pre>
+        <table>
+          <thead>
+            <tr class="header">
+              <th>フィールド</th>
+              <th>意味</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td><code>protocolVersion</code></td>
+              <td>準拠するA2A仕様のバージョン</td>
+            </tr>
+            <tr class="even">
+              <td><code>name</code> / <code>description</code> / <code>version</code></td>
+              <td>エージェントの識別情報</td>
+            </tr>
+            <tr class="odd">
+              <td><code>url</code></td>
+              <td>このエージェントのA2Aエンドポイント</td>
+            </tr>
+            <tr class="even">
+              <td><code>capabilities.streaming</code></td>
+              <td>SSEによるストリーミング応答に対応しているか</td>
+            </tr>
+            <tr class="odd">
+              <td><code>defaultInputModes</code> / <code>defaultOutputModes</code></td>
+              <td>受け付ける/返す既定のMIMEタイプ</td>
+            </tr>
+            <tr class="even">
+              <td><code>skills</code></td>
+              <td>提供する能力のリスト。各スキルにID・説明・タグ・利用例を持つ</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3 id="83-gemini-cli-からリモートサブエージェントを定義する">
+          8.3 Gemini CLI からリモートサブエージェントを定義する
+        </h3>
+        <p>
+          Gemini CLI 自体も、<code>.gemini/agents/*.md</code> で
+          <code>kind: remote</code>
+          を指定することで、A2A準拠の外部エージェントをサブエージェントとして直接呼び出せます。
+        </p>
+        <pre class="markdown"><code class="markdown">---
+kind: remote
+name: my-remote-agent
+agent_card_url: https://example.com/agent-card
+---</code></pre>
+        <p>
+          1つのMarkdownファイルに複数のリモートサブエージェントをリスト形式で定義することも可能です（ローカルとリモートの混在や複数ローカルの混在は不可、リモートの複数指定のみサポート）。
+        </p>
+        <pre class="markdown"><code class="markdown">---
+- kind: remote
+  name: remote-1
+  agent_card_url: https://example.com/1
+- kind: remote
+  name: remote-2
+  agent_card_url: https://example.com/2
+---</code></pre>
+        <p>
+          Agent Card を配信するエンドポイントを持たない場合は、<code>agent_card_json</code>
+          にJSON文字列を直接埋め込むこともできます（YAMLのブロックスカラー
+          <code>|</code>
+          を使うと引用符のエスケープが不要になり可読性が上がります）。
+        </p>
+        <h3 id="84-認証方式の比較">8.4 認証方式の比較</h3>
+        <table>
+          <thead>
+            <tr class="header">
+              <th>認証タイプ</th>
+              <th>概要</th>
+              <th>主な用途</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td><code>apiKey</code></td>
+              <td>静的なAPIキーをHTTPヘッダーで送信</td>
+              <td>サードパーティAPI</td>
+            </tr>
+            <tr class="even">
+              <td><code>http</code>（Bearer/Basic/Raw）</td>
+              <td>Bearerトークン、Basic認証、その他IANA登録スキーム</td>
+              <td>汎用HTTP認証</td>
+            </tr>
+            <tr class="odd">
+              <td><code>google-credentials</code></td>
+              <td>
+                Google Application Default
+                Credentials（ADC）を利用。ホスト名から自動でアクセストークン/IDトークンを選択
+              </td>
+              <td>
+                <code>*.googleapis.com</code>（Agent Engine, Vertex
+                AI等）、<code>*.run.app</code>（Cloud Run）
+              </td>
+            </tr>
+            <tr class="even">
+              <td><code>oauth</code></td>
+              <td>PKCE付きOAuth 2.0 認可コードフロー。初回はブラウザでサインイン</td>
+              <td>サードパーティのOAuth対応エージェント</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          <strong>セキュリティ上のポイント</strong>:
+          シークレットはエージェント定義ファイルに直書きせず、<code>$MY_API_KEY</code>（環境変数参照）や
+          <code>!gcloud auth print-token</code
+          >（シェルコマンド実行結果）のような動的値解決を使うことが推奨されます。特にプロジェクト共有の
+          <code>.gemini/agents/*.md</code>
+          はバージョン管理にコミットされる可能性が高いため注意してください。
+        </p>
+        <hr />
+        <h2 id="9-agentpy--adk-でのエージェント実装パターン">
+          9. agent.py — ADK でのエージェント実装パターン
+        </h2>
+        <h3 id="91-基本のエージェント定義">9.1 基本のエージェント定義</h3>
+        <p>
+          ADK（Agent Development Kit）は、Python・Java・Go・TypeScript・Kotlin
+          に対応するオープンソースのマルチエージェント構築フレームワークです。もっとも基本的な
+          <code>agent.py</code> は、ツールと指示文を持つ
+          <code>Agent</code> オブジェクトを1つ定義するだけです。
+        </p>
+        <pre class="python"><code class="python">from google.adk.agents import Agent
+from my_tools import fetch_purchase_history, get_policy, send_email, issue_refund, close_ticket
+
+root_agent = Agent(
+    name="Refund_Processor",
+    tools=[fetch_purchase_history, get_policy, send_email, issue_refund, close_ticket],
+    instruction="""
+    あなたは返金処理を担当するカスタマーサービスエージェントです。
+    以下の5ステップを厳密に守ってください。
+    1. fetch_purchase_historyツールで購入履歴を確認する。
+    2. get_policyツールで返金ポリシーを確認する。
+    3. 対象であればissue_refundツールで返金処理を行う。
+    4. send_emailツールで顧客にメールを送る。
+    5. close_ticketツールで返金対応を完了とする。
+    """
+)</code></pre>
+        <p>
+          このパターンの弱点は、ツールが10〜15個を超えると「モデルがどのツールを呼ぶべきか混乱し始める」「文脈が肥大化して指示を見落とす」といった
+          <strong>コンテキスト劣化（context degradation）</strong>
+          が起きやすくなることです。この課題を解決する2つの方向性が、次節の「マルチエージェント分割」と「ADK
+          2.0 Workflows」です。
+        </p>
+        <h3 id="92-マルチエージェント分割のパターンsequentialagent">
+          9.2 マルチエージェント分割のパターン（SequentialAgent）
+        </h3>
+        <p>
+          1つの巨大なプロンプトに全責務を詰め込む代わりに、責務ごとにエージェントを分割し、<code
+            >SequentialAgent</code
+          >
+          で順に実行させます。以下は、Python製の抽出エージェント →
+          Go製のリモート検証エージェント（A2A経由） →
+          レポート生成エージェント、という3段構成の実例です。
+        </p>
+        <pre class="python"><code class="python"># python-extraction-agent/app/agent.py
+from google.adk.agents import Agent, SequentialAgent
+from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
+from google.adk.models import Gemini
+
+# サブエージェント1: LLM推論でデータを抽出
+extractor_agent = Agent(
+    name="extractor_agent",
+    model=Gemini(model="gemini-3.5-flash"),
+    instruction="あなたは法務データ抽出エージェントです。契約書から金額・契約者・日付・保険条項を抽出してください。",
+    tools=[read_contract_text, save_extracted_fields, classify_risk_level]
+)
+
+# サブエージェント2: Go製のA2Aコンプライアンスサービスをローカルエージェントとしてラップ
+compliance_agent = RemoteA2aAgent(
+    name="compliance_agent",
+    agent_card=GO_AGENT_CARD_URL,
+    description="抽出された契約フィールドを企業のコンプライアンスポリシーに照らして検証する。"
+)
+
+# サブエージェント3: 最終監査レポートを生成
+report_agent = Agent(
+    name="report_agent",
+    model=Gemini(model="gemini-3.5-flash"),
+    instruction="最終的なコンプライアンスレポートとMarkdown要約を生成すること。",
+    tools=[generate_summary_report]
+)
+
+# コーディネーター: 上記3つを順番に連結する
+root_agent = SequentialAgent(
+    name="contract_compliance_coordinator",
+    description="契約解析・A2Aコンプライアンス検証・最終レポート作成を順に実行する。",
+    sub_agents=[extractor_agent, compliance_agent, report_agent],
+)</code></pre>
+        <p>
+          このパターンの利点は、<strong>Pythonのオーケストレーターから見ると、Go製の別言語・別プロセスのサービスが、あたかもローカルのPythonクラスであるかのように呼び出せる</strong>ことです。ADKのSDKが
+          Agent Card
+          の取得、パラメータのシリアライズ、JSON-RPCの通信をすべて裏側で処理してくれます。
+        </p>
+        <h3 id="93-サブエージェント間のデータ受け渡し共有状態">
+          9.3 サブエージェント間のデータ受け渡し（共有状態）
+        </h3>
+        <p>
+          エージェント間で関数の引数や戻り値としてデータを渡す代わりに、ADKの
+          <code>ToolContext.state</code>
+          が提供する共有辞書（セッションステート）を介してやり取りするのが定石です。パイプラインの各ステップを列挙型（Enum）でチェックポイント化しておくと、状態遷移が追跡しやすくなります。
+        </p>
+        <pre class="python"><code class="python">from enum import Enum
+
+class ComplianceStep(str, Enum):
+    INGESTED = "INGESTED"                      # 契約書アップロード、抽出待ち
+    EXTRACTED = "EXTRACTED"                     # Geminiによるフィールド抽出完了
+    COMPLIANCE_PENDING = "COMPLIANCE_PENDING"   # Goエージェントへ送信、結果待ち
+    COMPLIANCE_COMPLETE = "COMPLIANCE_COMPLETE" # Goエージェントの判定を受領
+    MANUAL_REVIEW = "MANUAL_REVIEW"             # タイムアウト/エラー、人間のレビューへ
+    REVIEW_READY = "REVIEW_READY"               # 違反ありのレポート生成済み
+    APPROVED = "APPROVED"                       # 全チェック合格</code></pre>
+        <p>
+          <code>MANUAL_REVIEW</code>
+          の設計が特に重要です。リモートのコンプライアンスエージェントがクラッシュ・ネットワークタイムアウト・未起動などの理由で応答不能になっても、パイプラインは単純に失敗するのではなく、人間のレビュー担当者にケースを引き渡す状態へフェイルセーフに遷移します。<strong>リモート依存先が断続的に利用不能になり得る本番システムでは、このフェイルセーフ設計が必須</strong>です。
+        </p>
+        <h3 id="94-マルチエージェントパイプラインの全体像">
+          9.4 マルチエージェントパイプラインの全体像
+        </h3>
+        <pre class="mermaid">
+flowchart LR
+    IN["契約書入力"] --&gt; EX["extractor_agent&lt;br/&gt;（Python / Gemini）"]
+    EX -- "共有state経由でデータ受け渡し" --&gt; CO["compliance_agent&lt;br/&gt;（RemoteA2aAgent → Go製サーバー）"]
+    CO -- "正常応答" --&gt; RE["report_agent&lt;br/&gt;（Python / Gemini）"]
+    CO -- "タイムアウト/エラー" --&gt; MR["MANUAL_REVIEW&lt;br/&gt;（人間のレビューへ）"]
+    RE --&gt; OUT["最終監査レポート出力"]</pre
+        >
+        <hr />
+        <h2 id="10-remotea2aagent-実装パターンの詳細">10. RemoteA2aAgent 実装パターンの詳細</h2>
+        <h3 id="101-3つの指定方法">10.1 3つの指定方法</h3>
+        <p>
+          <code>RemoteA2aAgent</code>
+          はリモートのA2A準拠エージェントを指し示す方法を3通りサポートします。
+        </p>
+        <pre
+          class="python"
+        ><code class="python">from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
+
+# 方法1: Agent CardのURLを直接指定
+remote_agent = RemoteA2aAgent(
+    name="image_scoring",
+    description="画像について興味深い事実を教えてくれるエージェント。",
+    agent_card="http://localhost:8001/a2a/image_scoring/.well-known/agent.json",
+    timeout=300.0,       # HTTPタイムアウト（秒）
+    httpx_client=None,   # カスタムHTTPクライアント（省略可）
+)
+
+# 方法2: ローカルファイルパスとしてAgent Cardを指定
+remote_agent_from_file = RemoteA2aAgent(
+    name="illustration_agent",
+    description="イラストを生成するエージェント。",
+    agent_card="illustration-agent-card.json",
+)
+
+# 方法3: AgentCardオブジェクトを直接構築して渡す（プログラムから動的に生成する場合）</code></pre>
+        <h3 id="102-サブエージェントとして組み込む">10.2 サブエージェントとして組み込む</h3>
+        <p>
+          <code>RemoteA2aAgent</code> は他の
+          <code>Agent</code> と同じインターフェースを持つため、<code>sub_agents</code>
+          リストにそのまま加えるだけでメインのオーケストレーターから利用できます。
+        </p>
+        <pre
+          class="python"
+        ><code class="python">from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
+from google.adk import Agent
+
+data_analyst = RemoteA2aAgent(
+    name="DataAnalyst",
+    description="データセットを分析する。",
+    agent_card="https://agent-b.run.app/.well-known/agent.json"
+)
+
+orchestrator = Agent(
+    name="Orchestrator",
+    model="gemini-2.0-flash",
+    instruction="データ分析タスクはDataAnalystに委譲すること。",
+    sub_agents=[data_analyst]
+)</code></pre>
+        <p>
+          これだけで、カスタムのHTTP呼び出しコード、独自レスポンス形式のパース、手動の認証処理、非同期結果のポーリングといった定型作業をすべてADKが肩代わりします。ADKがAgent
+          Cardを読み取り、DataAnalystができることを理解した上で、A2Aプロトコルによる通信をすべて処理してくれます。
+        </p>
+        <h3 id="103-逆方向-自分のエージェントをa2a対応で公開するto_a2a">
+          10.3 逆方向: 自分のエージェントをA2A対応で公開する（<code>to_a2a()</code>）
+        </h3>
+        <p>
+          これまでは「他人のリモートエージェントを呼ぶ側」でしたが、逆に<strong>自分のADKエージェントを他のエージェントから呼ばれるように公開する</strong>には
+          <code>to_a2a()</code> ユーティリティを使うのが最も簡単な方法です。
+        </p>
+        <pre class="python"><code class="python"># あなたの既存のエージェント定義
+root_agent = Agent(
+    model='gemini-flash-latest',
+    name='hello_world_agent',
+    # ...ツールや指示...
+)</code></pre>
+        <pre
+          class="python"
+        ><code class="python">from google.adk.a2a.utils.agent_to_a2a import to_a2a
+
+# エージェントをA2A対応にする
+a2a_app = to_a2a(root_agent, port=8001)</code></pre>
+        <pre class="bash"><code class="bash"># uvicornでA2Aサーバーとして起動
+uvicorn agent:a2a_app --host localhost --port 8001</code></pre>
+        <p>
+          <code>to_a2a()</code> はAgent
+          Card（<code>agent.json</code>）を、あなたのADKエージェントのコードから<strong>自動生成</strong>してくれます（<code
+            >agent_card</code
+          >
+          引数に自分で用意した <code>AgentCard</code>
+          オブジェクトやJSONファイルパスを渡して上書きすることも可能）。生成されたカードは
+          <code>http://localhost:8001/.well-known/agent-card.json</code>
+          で確認できます。
+        </p>
+        <p>内部的に <code>to_a2a()</code> は以下を自動セットアップします。</p>
+        <ul>
+          <li>
+            <strong><code>A2aAgentExecutor</code></strong
+            >: A2Aプロトコルとあなたの ADK エージェントを橋渡しする実行エンジン
+          </li>
+          <li>
+            <strong><code>InMemoryTaskStore</code></strong> /
+            <strong><code>InMemoryPushNotificationConfigStore</code></strong
+            >: タスク状態とプッシュ通知の管理
+          </li>
+          <li>
+            <strong><code>DefaultRequestHandler</code></strong
+            >: 受信したA2A HTTPリクエストを適切にルーティング
+          </li>
+          <li>
+            <strong>Starletteアプリ</strong>: 起動時にAgent Cardを自動構築し、必要なA2A
+            APIルートをすべてマウント
+          </li>
+        </ul>
+        <h3 id="104-もう一つの公開方法-adk-api_server---a2a">
+          10.4 もう一つの公開方法: <code>adk api_server --a2a</code>
+        </h3>
+        <p>
+          自前で <code>agent.json</code> を作成し、<code>adk api_server --a2a</code>
+          でホストする方法もあります。この方式のメリットは、<code>adk web</code>
+          と組み合わせてデバッグしやすいこと、また1つのサーバーで複数の独立したエージェントを親フォルダ配下にまとめて配信できることです。
+        </p>
+        <pre class="bash"><code class="bash"># following command runs the ADK agent as a2a agent
+adk api_server --a2a --port 8001 remote_a2a</code></pre>
+        <h3 id="105-開発時のディレクトリ構成例">10.5 開発時のディレクトリ構成例</h3>
+        <ul>
+          <li>
+            <code>a2a_root/</code>
+            <ul>
+              <li>
+                <code>remote_a2a/</code>
+                <ul>
+                  <li>
+                    <code>hello_world/</code>
+                    <ul>
+                      <li><code>__init__.py</code></li>
+                      <li>
+                        <code>agent.py</code> —
+                        公開する側（<code>to_a2a()</code>で<code>a2a_app</code>を定義）
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li><code>README.md</code></li>
+              <li>
+                <code>agent.py</code> —
+                呼び出す側（<code>RemoteA2aAgent</code>で<code>root_agent</code>を定義）
+              </li>
+            </ul>
+          </li>
+        </ul>
+        <pre class="bash"><code class="bash"># 1. リモート（公開）側を起動
+uvicorn contributing.samples.a2a_root.remote_a2a.hello_world.agent:a2a_app --host localhost --port 8001
+
+# 2. 別ターミナルで、呼び出す側（コンシューマー）のadk webを起動
+adk web contributing/samples/</code></pre>
+        <p>
+          <code>adk web</code> の既定ポートは <code>8000</code>
+          なので、公開側は必ず別ポート（例では
+          <code>8001</code>）で立てる必要があります。
+        </p>
+        <hr />
+        <h2 id="11-vertex-ai-agent-engine-へのデプロイ">11. Vertex AI Agent Engine へのデプロイ</h2>
+        <h3 id="111-agent-engine-とは">11.1 Agent Engine とは</h3>
+        <p>
+          Vertex AI Agent Engine は、ADK・LangChain
+          等のフレームワークで作られたエージェントを、インフラ管理・オートスケーリング・APIサービングまで含めてマネージドで実行してくれる
+          Google Cloud のサービスです。<strong
+            >2026年7月時点で、Python版ADKエージェントのみが Agent Engine の対応言語</strong
+          >とされています（Go/Java版ADKはCloud Run等の別ターゲットを利用）。
+        </p>
+        <pre class="mermaid">
+flowchart LR
+    A["ローカルのagent.py&lt;br/&gt;（root_agent定義）"] --&gt; B["adk deploy agent_engine&lt;br/&gt;（CLIコマンド）"]
+    B --&gt; C["コンテナビルド"]
+    C --&gt; D["Vertex AI Agent Engine&lt;br/&gt;（Reasoning Engine リソース）"]
+    D --&gt; E["REST / A2A エンドポイント公開"]
+    E --&gt; F["クライアント&lt;br/&gt;（Vertex AI SDK / REST / RemoteA2aAgent）"]</pre
+        >
+        <h3 id="112-デプロイ手順ステップバイステップ">11.2 デプロイ手順（ステップバイステップ）</h3>
+        <ol type="1">
+          <li>
+            <strong>前提となるIAM権限を確認する。</strong> Agent
+            Engineを使うには、プロジェクトに必要なIAMロールを管理者から付与してもらう必要があります。
+          </li>
+          <li><strong>SDKをインストールする。</strong></li>
+        </ol>
+        <pre
+          class="bash"
+        ><code class="bash">pip install --upgrade --quiet "google-cloud-aiplatform[agent_engines,adk]&gt;=1.112"</code></pre>
+        <ol start="3" type="1">
+          <li><strong>ローカルで認証する。</strong></li>
+        </ol>
+        <pre class="bash"><code class="bash">gcloud auth application-default login</code></pre>
+        <ol start="4" type="1">
+          <li>
+            <strong><code>adk deploy agent_engine</code> コマンドでデプロイする。</strong>
+            このコマンドはコードのパッケージング、コンテナビルド、Agent
+            Engineへのデプロイまでを一括で行います（数分かかります）。
+          </li>
+        </ol>
+        <pre class="bash"><code class="bash">PROJECT_ID=my-project-id
+LOCATION_ID=us-central1
+
+adk deploy agent_engine \
+  --project=$PROJECT_ID \
+  --region=$LOCATION_ID \
+  --display_name="My First Agent" \
+  multi_tool_agent</code></pre>
+        <ol start="5" type="1">
+          <li>
+            <strong>デプロイ完了後に得られる <code>RESOURCE_ID</code> を控える。</strong> このIDと
+            <code>PROJECT_ID</code>・<code>LOCATION_ID</code>
+            を組み合わせて、以降のクエリ用URLを構築します。
+          </li>
+        </ol>
+        <pre
+          class="text"
+        ><code class="text">https://{LOCATION_ID}-aiplatform.googleapis.com/v1/projects/{PROJECT_ID}/locations/{LOCATION_ID}/reasoningEngines/{RESOURCE_ID}:query</code></pre>
+        <h3 id="113-コードから直接デプロイする方法in-memory-object-deployment">
+          11.3 コードから直接デプロイする方法（in-memory object deployment）
+        </h3>
+        <p>
+          CLIコマンド以外に、Python から直接 <code>agent_engines</code>
+          モジュールを使ってデプロイすることもできます。ローカルで動いているエージェントオブジェクトを
+          <code>cloudpickle</code> でシリアライズし、Cloud Storage
+          にアップロードしてからクラウド上で復元する流れです。
+        </p>
+        <pre class="python"><code class="python">import vertexai
+from vertexai.preview import reasoning_engines
+
+vertexai.init(
+    project="your-gcp-project-id",
+    location="us-central1",
+    staging_bucket="gs://my-agent-staging-bucket",  # ステージング用バケットが必須
+)
+
+# ローカルのadk_appオブジェクトをそのままデプロイ
+remote_app = vertexai.agent_engines.create(
+    reasoning_engines.AdkApp(agent=root_agent, enable_tracing=True),
+)</code></pre>
+        <p>
+          Agent Engine にデプロイすると、ADKの
+          <code>InMemorySessionService</code>（ローカル開発用、本番運用には不向き）に代わって、Agent
+          Engine 側のマネージドセッション管理が使われるようになります。
+        </p>
+        <h3 id="114-デプロイしたエージェントをa2a経由で呼び出す">
+          11.4 デプロイしたエージェントをA2A経由で呼び出す
+        </h3>
+        <p>
+          Agent Engine
+          にデプロイしたエージェントは、A2Aエンドポイントとしても公開されるため、第10章の
+          <code>RemoteA2aAgent</code> からそのまま呼び出せます。認証には
+          <code>google-credentials</code>（Application Default Credentials）を使うのが定石です。
+        </p>
+        <pre class="python"><code class="python">import os
+from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
+
+PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT")
+LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION")
+REASONING_ENGINE_ID = os.getenv("REASONING_ENGINE_ID")
+AGENT_ENGINE_RESOURCE = f"projects/{PROJECT_ID}/locations/{LOCATION}/reasoningEngines/{REASONING_ENGINE_ID}"
+a2a_url = f"https://{LOCATION}-aiplatform.googleapis.com/v1beta1/{AGENT_ENGINE_RESOURCE}/a2a"
+
+time_agent = RemoteA2aAgent(
+    name="time_agent",
+    description="Agent Engine上で動くA2Aエージェント。",
+    agent_card=f"{a2a_url}/v1/card",
+)</code></pre>
+        <blockquote>
+          <p>
+            <strong>実務上の注意点</strong>: Google Cloud
+            の認証トークンは有効期限があるため、長時間動作するプロセスでは
+            <code>httpx.Auth</code>
+            を実装してトークンを自動リフレッシュする仕組みを組み込む必要があります。単純に
+            <code>credentials.refresh()</code>
+            を一度呼ぶだけでは、長時間セッションの途中でトークン期限切れによるエラーが発生します。
+          </p>
+        </blockquote>
+        <h3 id="115-デプロイ先の比較">11.5 デプロイ先の比較</h3>
+        <table>
+          <thead>
+            <tr class="header">
+              <th>デプロイ先</th>
+              <th>向いているケース</th>
+              <th>言語対応</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td>Vertex AI Agent Engine</td>
+              <td>マネージドなセッション管理・オートスケール・ADKとの統合を重視する場合</td>
+              <td>Python ADKのみ</td>
+            </tr>
+            <tr class="even">
+              <td>Cloud Run</td>
+              <td>
+                ステートレス、または外部バックエンド（Cloud
+                SQL/GCS）を使うステートフルなWeb向けエージェント
+              </td>
+              <td>全言語（コンテナ化できれば何でも）</td>
+            </tr>
+            <tr class="odd">
+              <td>GKE（Google Kubernetes Engine）</td>
+              <td>既存のKubernetes運用基盤に統合したい、より高い制御が必要な場合</td>
+              <td>全言語</td>
+            </tr>
+          </tbody>
+        </table>
+        <hr />
+        <h2 id="12-adk-20-agent-と-workflow-の使い分け">
+          12. ADK 2.0: Agent と Workflow の使い分け
+        </h2>
+        <h3 id="121-なぜ決定論的ワークフローが必要になったのか">
+          12.1 なぜ「決定論的ワークフロー」が必要になったのか
+        </h3>
+        <p>
+          自律的なLLMエージェントに、手順が固定されたビジネスプロセス（「ステップAの後は必ずステップB」）を丸ごと任せると、コンテキストが混雑してきたときに手順を飛ばしたり、失敗を無視して先に進んでしまったりすることがあります。100回実行して95回は狙い通りでも、残り5回で逸脱するようでは本番システムとして不十分です。ADK
+          2.0 の
+          <code>Workflow</code>
+          は、実行ルーティングを言語モデルの推論から切り離し、コードによる有向グラフとして厳密に制御します。
+        </p>
+        <h3 id="122-使い分けの判断基準">12.2 使い分けの判断基準</h3>
+        <table>
+          <thead>
+            <tr class="header">
+              <th>状況</th>
+              <th>選ぶべきもの</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td>ビジネスロジックや実行順序があらかじめ決まっている</td>
+              <td>Workflow</td>
+            </tr>
+            <tr class="even">
+              <td>決定論的な実行経路・厳格なコンプライアンス・明確な失敗状態が必要</td>
+              <td>Workflow</td>
+            </tr>
+            <tr class="odd">
+              <td>オーケストレーションのトークン消費・レイテンシを最小化したい</td>
+              <td>Workflow</td>
+            </tr>
+            <tr class="even">
+              <td>自然言語・複雑なメール・画像など非構造化/曖昧な入力を処理する</td>
+              <td>Agent</td>
+            </tr>
+            <tr class="odd">
+              <td>要約・分類・文章生成など主観的判断が要求される</td>
+              <td>Agent</td>
+            </tr>
+            <tr class="even">
+              <td>次のアクションが動的な推論に依存し、単純な条件分岐で表現できない</td>
+              <td>Agent</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3 id="123-効果の実例公開されているベンチマーク">
+          12.3 効果の実例（公開されているベンチマーク）
+        </h3>
+        <p>
+          Googleが公開したブログ記事によれば、返金処理という定型業務を例にした場合、LLMループにすべて任せる方式から
+          ADK 2.0 の Workflow 方式に切り替えることで、次のような効率化が確認されています（Gemini 3.5
+          Flash・モックAPIによる参考値）。
+        </p>
+        <table>
+          <thead>
+            <tr class="header">
+              <th>指標</th>
+              <th>従来のLLMエージェント</th>
+              <th>ADK 2.0 Workflow</th>
+              <th>削減率</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td>トークン使用量（1回あたり）</td>
+              <td>5,152</td>
+              <td>2,265</td>
+              <td>約50%</td>
+            </tr>
+            <tr class="even">
+              <td>レイテンシ（1回あたり）</td>
+              <td>7.2秒</td>
+              <td>5.7秒</td>
+              <td>約20%</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3 id="124-workflow-の考え方概念図">12.4 Workflow の考え方（概念図）</h3>
+        <pre class="mermaid">
+flowchart TD
+    START(["開始"]) --&gt; A["Node A（ツール）&lt;br/&gt;購入履歴をDB/API経由で取得"]
+    A --&gt; B["Node B（LLMエージェント）&lt;br/&gt;非構造化のメール内容をポリシー例外と照合"]
+    B --&gt;|"true"| C["Node C（ツール）&lt;br/&gt;Stripe APIで返金を実行"]
+    B --&gt;|"false"| E["Node E（ツール）&lt;br/&gt;CRMのチケットを更新して終了"]
+    C --&gt; D["Node D（LLMエージェント）&lt;br/&gt;確認メールの文面をドラフト"]
+    D --&gt; E</pre
+        >
+        <p>
+          決定論的なノード（A・C・E）はコードとして高速に遷移し、曖昧な判断が必要なノード（B・D）だけをLLMエージェントに任せます。これにより、①コンテキストの肥大化（大量のAPIレスポンスをそのまま会話履歴に積み上げない）、②プロンプトインジェクションへの耐性（ワークフローのグラフ自体が「実行できる経路」を制限する境界になるため、LLMノードが操作されても未承認のアクションへの経路が存在しない）という2つの効果が得られます。
+        </p>
+        <p>
+          マルチエージェント設計においては、「サブエージェント間の受け渡しの多くをWorkflowの決定論的ノードにできないか」を検討する価値があります。
+        </p>
+        <hr />
+        <h2 id="13-セキュリティガバナンスのベストプラクティス">
+          13. セキュリティ・ガバナンスのベストプラクティス
+        </h2>
+        <h3 id="131-チェックリスト">13.1 チェックリスト</h3>
+        <ul class="task-list">
+          <li>
+            <label
+              ><input type="checkbox" />シークレット（APIキー・トークン）は
+              <code>settings.json</code> や
+              <code>.gemini/agents/*.md</code>
+              に直書きせず、環境変数参照（<code>$ENV_VAR</code>）またはシェルコマンド参照（<code>!command</code>）を使っているか</label
+            >
+          </li>
+          <li>
+            <label
+              ><input type="checkbox" /><code>.geminiignore</code> に
+              <code>.env</code
+              >、認証情報ファイル、シークレットを含むディレクトリを登録しているか</label
+            >
+          </li>
+          <li>
+            <label
+              ><input type="checkbox" />リモートエージェントの認証には、可能な限り
+              <code>google-credentials</code
+              >（ADC）を使い、生の長期トークンをファイルに埋め込んでいないか</label
+            >
+          </li>
+          <li>
+            <label
+              ><input
+                type="checkbox"
+              />サブエージェントごとにポリシーエンジン（<code>policy.toml</code>）で権限を絞っているか（特に
+              <code>run_shell_command</code> や
+              <code>write_file</code> を持つサブエージェント）</label
+            >
+          </li>
+          <li>
+            <label
+              ><input type="checkbox" />リモート依存先が落ちた場合のフェイルセーフ状態（<code
+                >MANUAL_REVIEW</code
+              >
+              等）を設計しているか</label
+            >
+          </li>
+          <li>
+            <label
+              ><input type="checkbox" />決定論的に処理できる箇所をADK 2.0
+              Workflowに切り出し、LLMがアクセスできる実行経路を最小化しているか</label
+            >
+          </li>
+          <li>
+            <label
+              ><input type="checkbox" /><code>security.folderTrust.enabled</code>
+              を有効にし、信頼していないディレクトリでの自動承認を防いでいるか</label
+            >
+          </li>
+        </ul>
+        <h3 id="132-認証情報の取り扱いに関する注意">13.2 認証情報の取り扱いに関する注意</h3>
+        <p>
+          第8章・第11章で見た通り、A2Aプロトコルは
+          <code>apiKey</code
+          >・<code>http</code>(Bearer/Basic)・<code>google-credentials</code>・<code>oauth</code>
+          という複数の認証方式をサポートしています。プロジェクト共有される設定ファイル（<code
+            >.gemini/agents/*.md</code
+          >
+          や
+          <code>settings.json</code>
+          のワークスペーススコープ）はバージョン管理にコミットされがちなので、<strong>シークレットの値そのものではなく、参照方法だけを記述する</strong>ことを徹底してください。
+        </p>
+        <hr />
+        <h2 id="14-総合ステップバイステップ-ゼロからのマルチエージェント構築フロー">
+          14. 総合ステップバイステップ: ゼロからのマルチエージェント構築フロー
+        </h2>
+        <p>最後に、ここまでの内容を1つの流れとして統合します。</p>
+        <ol type="1">
+          <li>
+            <strong>リポジトリ設計</strong>: ルートに <code>AGENTS.md</code>（または
+            <code>GEMINI.md</code
+            >）を作成し、全体アーキテクチャと各サブエージェントの責務分担を書く。各サブエージェントのディレクトリにその場限りの
+            <code>AGENTS.md</code> を追加する。
+          </li>
+          <li>
+            <strong>除外設定</strong>:
+            <code>.geminiignore</code> でシークレット・大容量データ・生成物ディレクトリを除外する。
+          </li>
+          <li>
+            <strong>CLI設定</strong>: <code>.gemini/settings.json</code> で
+            <code>context.fileName</code
+            >、<code>agents.overrides</code>、必要なMCPサーバーを設定する。
+          </li>
+          <li>
+            <strong>ローカルサブエージェント定義</strong>:
+            <code>.gemini/agents/*.md</code>
+            にYAMLフロントマター付きでツール・モデル・実行上限を定義する。
+          </li>
+          <li>
+            <strong>ADKでのエージェント実装</strong>: <code>agent.py</code> に <code>Agent</code> /
+            <code>SequentialAgent</code> /
+            <code>Workflow</code>
+            を組み合わせて実装する。決定論的な部分はWorkflowノードに、曖昧な判断はLLMエージェントに割り振る。
+          </li>
+          <li>
+            <strong>他言語・他チームのサービスをA2A化</strong>: 相手チームのサービスには
+            <code>to_a2a()</code>（または <code>adk api_server --a2a</code>）でAgent
+            Cardを自動生成させ、公開する。
+          </li>
+          <li>
+            <strong>リモートエージェントの取り込み</strong>: 自分側では
+            <code>RemoteA2aAgent</code> でAgent Cardを指定し、<code>sub_agents</code>
+            に加えるだけでローカルクラスのように扱う。
+          </li>
+          <li>
+            <strong>ローカルでの動作確認</strong>: <code>uvicorn</code> で公開側を起動し、<code
+              >adk web</code
+            >
+            で呼び出し側を起動して、別ポートで対話的にテストする。
+          </li>
+          <li>
+            <strong>本番デプロイ</strong>: <code>adk deploy agent_engine</code> で Vertex AI Agent
+            Engine にデプロイし、<code>google-credentials</code> 認証でA2Aエンドポイントを保護する。
+          </li>
+          <li>
+            <strong>継続的な運用</strong>:
+            <code>settings.json</code>
+            のポリシーエンジンとサブエージェント別のオーバーライドで、権限とコストを継続的にチューニングする。
+          </li>
+        </ol>
+        <hr />
+        <h2 id="15-参考文献出典">15. 参考文献・出典</h2>
+        <p>
+          本ガイドは以下の一次情報源（公式ドキュメント・Google公式ブログ・実装者による技術記事）に基づいて2026年7月時点の内容をまとめています。
+        </p>
+        <div class="ref-grid">
+          <div class="ref-card">
+            <h3 id="gemini-cli-公式ドキュメント">Gemini CLI 公式ドキュメント</h3>
+            <ul>
+              <li>
+                <a href="https://geminicli.com/docs/cli/gemini-md/">GEMINI.mdによる文脈提供</a>
+              </li>
+              <li>
+                <a href="https://geminicli.com/docs/cli/gemini-ignore/"
+                  >.geminiignore（除外ファイル）</a
+                >
+              </li>
+              <li>
+                <a href="https://geminicli.com/docs/cli/settings/"
+                  >settings.json 設定リファレンス</a
+                >
+              </li>
+              <li><a href="https://geminicli.com/docs/core/subagents/">サブエージェント</a></li>
+              <li>
+                <a href="https://geminicli.com/docs/core/remote-agents/"
+                  >リモートサブエージェント（A2A）</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="ref-card">
+            <h3 id="google-公式ブログアナウンス">Google 公式ブログ・アナウンス</h3>
+            <ul>
+              <li>
+                <a
+                  href="https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli"
+                  >Gemini CLIからAntigravity CLIへの移行について（2026年5月19日）</a
+                >
+              </li>
+              <li>
+                <a href="https://developers.googleblog.com/why-we-built-adk-20/"
+                  >ADK 2.0を構築した理由（2026年7月1日）</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://developers.googleblog.com/build-cross-language-multi-agent-team-with-google-agent-development-kit-and-a2a/"
+                  >Google
+                  ADKとA2Aによるクロス言語マルチエージェントチーム構築（2026年6月22日、Shubham
+                  Saboo・Eric Dong）</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="ref-card">
+            <h3 id="adk-公式ドキュメント--github">ADK 公式ドキュメント / GitHub</h3>
+            <ul>
+              <li>
+                <a href="https://adk.dev/a2a/quickstart-exposing/"
+                  >A2Aクイックスタート（エージェントの公開・to_a2a()）</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://github.com/google/adk-python/blob/main/src/google/adk/agents/remote_a2a_agent.py"
+                  >RemoteA2aAgent 実装（ソースコード）</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://codelabs.developers.google.com/codelabs/create-multi-agents-adk-a2a"
+                  >ADKを使ったマルチエージェント構築・Agent
+                  Runtimeデプロイ・A2Aプロトコル入門codelab</a
+                >
+              </li>
+              <li>
+                <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/agent-engine/use/adk"
+                  >Vertex AI Agent EngineでのADK利用（Google Cloud公式ドキュメント）</a
+                >
+              </li>
+              <li>
+                <a href="https://www.skills.google/focuses/132170?parent=catalog"
+                  >Google Skills: A2A SDKでリモートエージェントに接続する</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="ref-card">
+            <h3 id="agentsmd-オープン標準">AGENTS.md オープン標準</h3>
+            <ul>
+              <li><a href="https://agents.md/">AGENTS.md 公式サイト</a></li>
+              <li>
+                <a href="https://github.com/agentsmd/agents.md">AGENTS.md GitHubリポジトリ</a>
+              </li>
+            </ul>
+          </div>
+          <div class="ref-card">
+            <h3 id="実装者google-developer-expertによる技術記事">
+              実装者・Google Developer Expertによる技術記事
+            </h3>
+            <ul>
+              <li>
+                <a
+                  href="https://medium.com/google-cloud/multi-agent-a2a-with-the-agent-development-kitadk-cloud-run-and-gemini-cli-52f8be838ad6"
+                  >xbill（Google Developer Expert）によるADK・A2A・Gemini
+                  CLIを用いたマルチエージェント実装シリーズ（Cloud Run編）</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://michael-scherding.medium.com/deploying-ai-agents-with-google-adk-and-vertex-ai-agent-engine-62a5c19396ff"
+                  >Michaël Scherding によるADK + Agent Engineデプロイ解説</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://michael-scherding.medium.com/a2a-explained-with-google-adk-140b35ad04ad"
+                  >Michaël Scherding によるA2A + ADK解説</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <blockquote>
+          <p>
+            免責事項: Gemini CLI / ADK / Agent Engine
+            はいずれも活発に開発が続いているプロダクトであり、上記の内容は情報基準日（2026年7月26日）時点のものです。特にGemini
+            CLIとAntigravity
+            CLIの統合方針は今後変更される可能性があるため、実装前に必ず各公式ドキュメントの最新版を確認してください。
+          </p>
+        </blockquote>
+      </main>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+    <script>
+      (function () {
+        try {
+          if (typeof mermaid === 'undefined') {
+            console.error('mermaid failed to load');
+            return;
+          }
+          mermaid.initialize({
+            startOnLoad: false,
+            theme: 'base',
+            securityLevel: 'loose',
+            fontFamily: '"Noto Sans JP", sans-serif',
+            themeVariables: {
+              fontSize: '16px',
+              background: '#101f38',
+              primaryColor: '#132747',
+              primaryTextColor: '#e7edf7',
+              primaryBorderColor: '#7c9eff',
+              lineColor: '#7c9eff',
+              secondaryColor: '#0d1b30',
+              tertiaryColor: '#0a1729',
+              textColor: '#e7edf7',
+              mainBkg: '#132747',
+              nodeBorder: '#7c9eff',
+              clusterBkg: '#0d1b30',
+              clusterBorder: '#2a4270',
+              edgeLabelBackground: '#0d1b30',
+              actorBkg: '#132747',
+              actorBorder: '#7c9eff',
+              actorTextColor: '#e7edf7',
+              signalColor: '#9db4e8',
+              signalTextColor: '#e7edf7',
+              labelBoxBkgColor: '#132747',
+              labelBoxBorderColor: '#7c9eff',
+              labelTextColor: '#e7edf7',
+              loopTextColor: '#e7edf7',
+              noteBkgColor: '#1c2f4e',
+              noteTextColor: '#e7edf7',
+              noteBorderColor: '#7c9eff',
+            },
+            flowchart: { useMaxWidth: false, htmlLabels: true, curve: 'basis' },
+            sequence: { useMaxWidth: false, showSequenceNumbers: false },
+          });
+          mermaid.run({ querySelector: '.mermaid' });
+        } catch (e) {
+          console.error('mermaid init failed', e);
+        }
+      })();
+    </script>
+    <script>
+      (function () {
+        try {
+          if (typeof hljs === 'undefined') {
+            console.error('highlight.js failed to load');
+            return;
+          }
+          document.querySelectorAll('pre code').forEach(function (el) {
+            if (el.closest('pre.mermaid')) return;
+            hljs.highlightElement(el);
+          });
+        } catch (e) {
+          console.error('hljs init failed', e);
+        }
+      })();
+    </script>
+    <script>
+      (function () {
+        try {
+          var toggle = document.querySelector('.sidebar-toggle');
+          var sidebar = document.querySelector('.sidebar');
+          if (!toggle || !sidebar) return;
+          toggle.addEventListener('click', function () {
+            sidebar.classList.toggle('open');
+          });
+          document.querySelectorAll('.side-nav a').forEach(function (a) {
+            a.addEventListener('click', function () {
+              sidebar.classList.remove('open');
+            });
+          });
+        } catch (e) {
+          console.error('sidebar toggle failed', e);
+        }
+      })();
+    </script>
+    <script>
+      (function () {
+        try {
+          var navLinks = Array.prototype.slice.call(document.querySelectorAll('.side-nav a'));
+          if (!navLinks.length) return;
+          var idToLink = {};
+          var sections = [];
+          navLinks.forEach(function (a) {
+            var id = decodeURIComponent(a.getAttribute('href').slice(1));
+            idToLink[id] = a;
+            var el = document.getElementById(id);
+            if (el) sections.push(el);
+          });
+          var highlightObserver = new IntersectionObserver(
+            function (entries) {
+              entries.forEach(function (entry) {
+                var link = idToLink[entry.target.id];
+                if (!link) return;
+                if (entry.isIntersecting) {
+                  navLinks.forEach(function (a) {
+                    a.classList.remove('active');
+                  });
+                  link.classList.add('active');
+                }
+              });
+            },
+            { root: null, rootMargin: '-15% 0px -75% 0px', threshold: 0 },
+          );
+          sections.forEach(function (s) {
+            highlightObserver.observe(s);
+          });
+        } catch (e) {
+          console.error('scroll spy failed', e);
+        }
+      })();
+    </script>
+  </body>
+</html>
