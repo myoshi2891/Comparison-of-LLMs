@@ -1517,7 +1517,14 @@ description: PDFファイルからテキストや表を抽出し、フォーム�
       }
 
       document.addEventListener('DOMContentLoaded', function () {
-        renderDiagrams();
+        renderDiagrams().catch(function (error) {
+          console.error('Mermaid rendering failed', error);
+          document.querySelectorAll('.mermaid').forEach(function (target) {
+            if (!target.querySelector('svg')) {
+              target.textContent = '⚠️ ダイアグラムを描画できませんでした';
+            }
+          });
+        });
         setupActiveNavHighlight();
       });
     </script>

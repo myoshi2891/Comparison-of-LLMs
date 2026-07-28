@@ -1751,17 +1751,28 @@ description: 何をするスキルで、いつ使うべきかを明記する
         var ready =
           document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
 
-        ready.then(function () {
-          var sources = document.querySelectorAll('script[type="text/plain"][data-mermaid-target]');
-          sources.forEach(function (src) {
-            var targetId = src.getAttribute('data-mermaid-target');
-            var target = document.getElementById(targetId);
-            if (target) {
-              target.textContent = dedent(src.textContent);
-            }
+        ready
+          .then(function () {
+            var sources = document.querySelectorAll(
+              'script[type="text/plain"][data-mermaid-target]',
+            );
+            sources.forEach(function (src) {
+              var targetId = src.getAttribute('data-mermaid-target');
+              var target = document.getElementById(targetId);
+              if (target) {
+                target.textContent = dedent(src.textContent);
+              }
+            });
+            return mermaid.run({ querySelector: '.mermaid' });
+          })
+          .catch(function (error) {
+            console.error('Mermaid rendering failed', error);
+            document.querySelectorAll('.mermaid').forEach(function (target) {
+              if (!target.querySelector('svg')) {
+                target.textContent = '⚠️ ダイアグラムを描画できませんでした';
+              }
+            });
           });
-          return mermaid.run({ querySelector: '.mermaid' });
-        });
 
         var sections = document.querySelectorAll('main section[id]');
         var navLinks = document.querySelectorAll('.nav-link');
