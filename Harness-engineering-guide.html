@@ -1275,10 +1275,15 @@ V -->|"失敗した場合"| I
 
           <h4>概念的なフック例（型チェック＋Lintを実行し、失敗時のみエラーを返す）</h4>
           <pre><span class="code-lang-tag">hook.sh</span><code class="language-bash">#!/bin/bash
-set -e
-if ! OUTPUT=$(npm run typecheck 2&gt;&amp;1 &amp;&amp; npm run lint 2&gt;&amp;1); then
-  echo "$OUTPUT" &gt;&amp;2
-  exit 2
+EXIT_CODE=0
+ERRORS=""
+
+TC_OUT=$(npm run typecheck 2&gt;&amp;1) || { EXIT_CODE=$?; ERRORS="${ERRORS}${TC_OUT}\n"; }
+LINT_OUT=$(npm run lint 2&gt;&amp;1) || { [ $EXIT_CODE -eq 0 ] &amp;&amp; EXIT_CODE=$?; ERRORS="${ERRORS}${LINT_OUT}\n"; }
+
+if [ $EXIT_CODE -ne 0 ]; then
+  printf "%b" "$ERRORS" &gt;&amp;2
+  exit $EXIT_CODE
 fi
 # 成功時は何も出力しない（コンテキストを汚さない）</code></pre>
           <p>
