@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import Sidebar from "./Sidebar";
 import TocObserver from "./TocObserver";
 import styles from "./page.module.css";
 
@@ -20,10 +21,8 @@ function ExternalIcon() {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      role="img"
-      aria-label="External link icon"
+      aria-hidden="true"
     >
-      <title>External link icon</title>
       <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
       <path d="M15 3h6v6"></path>
       <path d="M10 14 21 3"></path>
@@ -35,82 +34,7 @@ export default function SpecDrivenDevelopmentGuidePage() {
   return (
     <div className={styles.layout}>
       <TocObserver />
-      <nav className={styles.sidebar}>
-        <p className={styles.brand}>Spec-driven development</p>
-        <p className={styles.brandTitle}>AI仕様駆動開発 実践ガイド</p>
-        <ul className={styles.sidebarNav}>
-          <li>
-            <a href="#top">
-              <span className={styles.dot}></span>はじめに
-            </a>
-          </li>
-          <li>
-            <a href="#ch1">
-              <span className={styles.dot}></span>1. なぜ今SDDなのか
-            </a>
-          </li>
-          <li>
-            <a href="#ch2">
-              <span className={styles.dot}></span>2. SDDとは何か
-            </a>
-          </li>
-          <li>
-            <a href="#ch3">
-              <span className={styles.dot}></span>3. 成熟度モデル
-            </a>
-          </li>
-          <li>
-            <a href="#ch4">
-              <span className={styles.dot}></span>4. 主要ツール比較
-            </a>
-          </li>
-          <li>
-            <a href="#ch5">
-              <span className={styles.dot}></span>5. EARS記法
-            </a>
-          </li>
-          <li>
-            <a href="#ch6">
-              <span className={styles.dot}></span>6. ワークフロー実践
-            </a>
-          </li>
-          <li>
-            <a href="#ch7">
-              <span className={styles.dot}></span>7. 良い仕様の書き方
-            </a>
-          </li>
-          <li>
-            <a href="#ch8">
-              <span className={styles.dot}></span>8. Claude Codeでの実践
-            </a>
-          </li>
-          <li>
-            <a href="#ch9">
-              <span className={styles.dot}></span>9. チェックリスト
-            </a>
-          </li>
-          <li>
-            <a href="#ch10">
-              <span className={styles.dot}></span>10. 批判的視点と限界
-            </a>
-          </li>
-          <li>
-            <a href="#ch11">
-              <span className={styles.dot}></span>11. 最新動向
-            </a>
-          </li>
-          <li>
-            <a href="#ch12">
-              <span className={styles.dot}></span>12. まとめ
-            </a>
-          </li>
-          <li>
-            <a href="#refs">
-              <span className={styles.dot}></span>参考文献
-            </a>
-          </li>
-        </ul>
-      </nav>
+      <Sidebar />
 
       <main className={styles.main}>
         <header className={styles.hero} id="top">
@@ -330,10 +254,8 @@ export default function SpecDrivenDevelopmentGuidePage() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                role="img"
-                aria-label="Tip icon"
+                aria-hidden="true"
               >
-                <title>Tip icon</title>
                 <circle cx="12" cy="12" r="9"></circle>
                 <path d="M12 16v-5"></path>
                 <path d="M12 8h.01"></path>
@@ -476,10 +398,8 @@ export default function SpecDrivenDevelopmentGuidePage() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                role="img"
-                aria-label="Tip icon"
+                aria-hidden="true"
               >
-                <title>Tip icon</title>
                 <circle cx="12" cy="12" r="9"></circle>
                 <path d="M12 16v-5"></path>
                 <path d="M12 8h.01"></path>
@@ -859,10 +779,8 @@ export default function SpecDrivenDevelopmentGuidePage() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                role="img"
-                aria-label="Tip icon"
+                aria-hidden="true"
               >
-                <title>Tip icon</title>
                 <circle cx="12" cy="12" r="9"></circle>
                 <path d="M12 16v-5"></path>
                 <path d="M12 8h.01"></path>
@@ -957,10 +875,8 @@ export default function SpecDrivenDevelopmentGuidePage() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                role="img"
-                aria-label="Warning icon"
+                aria-hidden="true"
               >
-                <title>Warning icon</title>
                 <path d="M12 9v4"></path>
                 <path d="M10.4 3.9 2.7 17.1a1.7 1.7 0 0 0 1.5 2.6h15.6a1.7 1.7 0 0 0 1.5-2.6L13.6 3.9a1.7 1.7 0 0 0-3.2 0Z"></path>
                 <path d="M12 16.2h.01"></path>
@@ -1164,10 +1080,8 @@ export default function SpecDrivenDevelopmentGuidePage() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                role="img"
-                aria-label="Danger icon"
+                aria-hidden="true"
               >
-                <title>Danger icon</title>
                 <circle cx="12" cy="12" r="9"></circle>
                 <path d="M12 8v5"></path>
                 <path d="M12 16h.01"></path>

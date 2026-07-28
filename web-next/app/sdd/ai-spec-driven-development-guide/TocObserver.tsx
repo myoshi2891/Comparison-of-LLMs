@@ -5,8 +5,8 @@ import styles from "./page.module.css";
 
 export default function TocObserver() {
   useEffect(() => {
-    const sections = document.querySelectorAll("section[id]");
-    const links = Array.from(document.querySelectorAll(`.${styles.sidebarNav} a`));
+    const sections = document.querySelectorAll(`.${styles.chapter}, .${styles.hero}`);
+    const links = Array.from(document.querySelectorAll(`.${styles.tocLink}`));
     if (links.length > 0) links[0].classList.add(styles.active);
 
     const observer = new IntersectionObserver(
@@ -14,6 +14,7 @@ export default function TocObserver() {
         for (const entry of entries) {
           if (entry.isIntersecting) {
             const id = entry.target.id;
+            if (!id) continue;
             for (const l of links) {
               if (l.getAttribute("href") === `#${id}`) {
                 l.classList.add(styles.active);

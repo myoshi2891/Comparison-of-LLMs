@@ -82,7 +82,7 @@
   margin: 0;
 }
 
-.sidebarNav a {
+.tocLink {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -96,7 +96,7 @@
   transition: all 0.15s ease;
 }
 
-.sidebarNav a .dot {
+.tocLink .dot {
   width: 6px;
   height: 6px;
   min-width: 6px;
@@ -104,28 +104,27 @@
   background: var(--color-border-primary);
 }
 
-.sidebarNav a:hover {
+.tocLink:hover {
   background: var(--color-background-tertiary);
   color: var(--color-text-primary);
 }
 
-.sidebarNav a.active {
+.tocLink.active {
   background: var(--color-background-tertiary);
   color: var(--color-text-primary);
   border-left: 2px solid var(--accent);
   font-weight: 500;
 }
 
-.sidebarNav a.active .dot {
+.tocLink.active .dot {
   background: var(--accent);
 }
 
 .main {
   flex: 1;
   min-width: 0;
+  width: 100%;
   padding: 56px 72px 96px;
-  max-width: 1440px;
-  margin: 0 auto;
 }
 
 .hero {
@@ -500,13 +499,33 @@
 
 @media (max-width: 900px) {
   .sidebar {
-    display: none;
+    position: fixed;
+    top: var(--header-height, 60px);
+    left: 0;
+    z-index: 40;
+    transform: translateX(-105%);
+    transition: transform 0.25s ease;
+  }
+  .sidebarOpen {
+    transform: translateX(0);
   }
   .sidebarToggle {
     display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 50;
+    width: 48px;
+    height: 48px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--color-background-primary);
+    cursor: pointer;
   }
   .main {
-    margin-left: 0;
     padding: 32px 24px 72px;
   }
   .refsGrid {
