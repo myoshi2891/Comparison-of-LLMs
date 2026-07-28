@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import Page from "./page";
+import styles from "./page.module.css";
 
 beforeAll(() => {
   global.IntersectionObserver = class {
@@ -32,6 +33,26 @@ describe("AI Spec-Driven Development Guide Page", () => {
     expect(h2Elements.length).toBe(13);
   });
 
+  it("renders all six migrated Mermaid diagrams", async () => {
+    const pageObj = await Page();
+    render(pageObj);
+    expect(screen.getAllByTestId("mermaid-diagram")).toHaveLength(6);
+  });
+
+  it("opens and closes the mobile table of contents", async () => {
+    const pageObj = await Page();
+    const { container } = render(pageObj);
+    const sidebar = container.querySelector("nav");
+    const toggle = screen.getByRole("button", { name: "目次を開く" });
+
+    expect(sidebar).not.toHaveClass(styles.sidebarOpen);
+    fireEvent.click(toggle);
+    expect(sidebar).toHaveClass(styles.sidebarOpen);
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    fireEvent.click(toggle);
+    expect(sidebar).not.toHaveClass(styles.sidebarOpen);
+  });
+
   it("ensures all external links have target='_blank' and rel containing 'noopener'", async () => {
     const pageObj = await Page();
     const { container } = render(pageObj);
@@ -46,9 +67,21 @@ describe("AI Spec-Driven Development Guide Page", () => {
   it("ensures internal anchor links do not end with .html", async () => {
     const pageObj = await Page();
     const { container } = render(pageObj);
-    const internalLinks = Array.from(container.querySelectorAll("a[href^='/']"));
+    const internalLinks = Array.from(container.querySelectorAll("a[href^='#']"));
+    expect(internalLinks.length).toBeGreaterThan(0);
     for (const link of internalLinks) {
       expect(link.getAttribute("href")).not.toMatch(/\.html$/);
+    }
+  });
+
+  it("marks inline SVG icons as decorative", async () => {
+    const pageObj = await Page();
+    const { container } = render(pageObj);
+    const icons = container.querySelectorAll("svg");
+    expect(icons.length).toBeGreaterThan(0);
+    for (const icon of icons) {
+      expect(icon).toHaveAttribute("aria-hidden", "true");
+      expect(icon.querySelector("title")).toBeNull();
     }
   });
 
