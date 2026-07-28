@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { render, screen } from "@testing-library/react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import Page from "./page";
@@ -22,8 +24,14 @@ describe("Spec-Driven Development Guide Page (Middle/Advanced)", () => {
     const pageObj = await Page();
     render(pageObj);
     const headings = screen.getAllByRole("heading", { level: 1 });
-    expect(headings.length).toBeGreaterThan(0);
-    expect(headings.some((h) => h.textContent?.includes("仕様駆動開発"))).toBe(true);
+    expect(headings).toHaveLength(1);
+    expect(headings[0].textContent).toContain("仕様駆動開発");
+  });
+
+  it("uses a non-recursive local monospace font token", () => {
+    const css = readFileSync(join(__dirname, "page.module.css"), "utf8");
+    expect(css).toContain("--font-mono-stack:");
+    expect(css).not.toContain("var(--font-mono)");
   });
 
   it("contains 16 major section h2 headings", async () => {
