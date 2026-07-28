@@ -197,12 +197,7 @@
           padding: 32px 18px 70px;
         }
       }
-      /* prose text keeps a comfortable reading width; tables/diagrams/cards use the full column */
-      section > p,
-      section > ul,
-      section > ol {
-        max-width: 900px;
-      }
+      /* prose text; tables/diagrams/cards use the full column too */
       .card {
         max-width: 720px;
       }
@@ -347,6 +342,19 @@
         color: var(--ink-soft);
         margin-top: 10px;
         font-family: 'IBM Plex Mono', monospace;
+      }
+      .mermaid-target {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 60px;
+        width: 100%;
+      }
+      .mermaid-target svg {
+        width: auto;
+        max-width: 100%;
+        height: auto;
+        overflow: visible;
       }
 
       /* tables */
@@ -647,14 +655,18 @@
 
           <h3>三段階のロード</h3>
           <div class="diagram">
-            <div class="mermaid">
-              flowchart LR A["Discovery: 全スキルのdescriptionを事前ロード"] -->
-              B{"タスクと意味的に関連するか"} B -- "関連なし" -->
-              C["休眠状態を維持(コストほぼゼロ)"] B -- "関連あり" --> D["Activation:
-              SKILL.md本文を読み込み"] D --> E{"追加リソースが必要か"} E -- "不要" -->
-              F["第3層はスキップ"] E -- "必要" --> G["Execution: 関連ファイルを必要時のみ読み込み"]
-              F --> H["タスク遂行"] G --> H
-            </div>
+            <div id="diag-1" class="mermaid mermaid-target"></div>
+            <script type="text/plain" data-mermaid-src="diag-1">
+flowchart LR
+A["Discovery: 全スキルのdescriptionを事前ロード"] --> B{"タスクと意味的に関連するか"}
+B -- "関連なし" --> C["休眠状態を維持(コストほぼゼロ)"]
+B -- "関連あり" --> D["Activation: SKILL.md本文を読み込み"]
+D --> E{"追加リソースが必要か"}
+E -- "不要" --> F["第3層はスキップ"]
+E -- "必要" --> G["Execution: 関連ファイルを必要時のみ読み込み"]
+F --> H["タスク遂行"]
+G --> H
+            </script>
             <div class="diagram-caption">図1: 段階的開示（Progressive Disclosure）の3層モデル</div>
           </div>
 
@@ -664,15 +676,23 @@
 
           <h3>コンテキストウィンドウ内での実際の流れ</h3>
           <div class="diagram">
-            <div class="mermaid">
-              sequenceDiagram participant U as ユーザー participant C as コンテキストウィンドウ
-              participant Ag as エージェント participant F as ファイルシステム U->>C:
-              タスクを含むメッセージを送信 Note over C:
-              システムプロンプトと全スキルのメタデータのみ保持 C->>Ag: タスク内容を提示 Ag->>Ag:
-              関連スキルを判定 Ag->>F: SKILL.mdを読み込み F-->>C: SKILL.md本文を追加 Ag->>F:
-              必要に応じ関連ファイルを読み込み F-->>C: 関連ファイルを追加 Ag->>U:
-              タスクを実行して完了
-            </div>
+            <div id="diag-2" class="mermaid mermaid-target"></div>
+            <script type="text/plain" data-mermaid-src="diag-2">
+sequenceDiagram
+participant U as ユーザー
+participant C as コンテキストウィンドウ
+participant Ag as エージェント
+participant F as ファイルシステム
+U->>C: タスクを含むメッセージを送信
+Note over C: システムプロンプトと全スキルのメタデータのみ保持
+C->>Ag: タスク内容を提示
+Ag->>Ag: 関連スキルを判定
+Ag->>F: SKILL.mdを読み込み
+F-->>C: SKILL.md本文を追加
+Ag->>F: 必要に応じ関連ファイルを読み込み
+F-->>C: 関連ファイルを追加
+Ag->>U: タスクを実行して完了
+            </script>
             <div class="diagram-caption">図2: PDFスキルを例にしたコンテキストウィンドウの推移</div>
           </div>
 
@@ -798,10 +818,12 @@
 
           <h3>発見・起動・実行の3フェーズ</h3>
           <div class="diagram">
-            <div class="mermaid">
-              flowchart TD A["Discovery: 全スキルのname/descriptionを提示"] --> B["Activation:
-              関連するSKILL.md本文を読む"] B --> C["Execution: 指示に従いタスクを遂行"]
-            </div>
+            <div id="diag-3" class="mermaid mermaid-target"></div>
+            <script type="text/plain" data-mermaid-src="diag-3">
+flowchart TD
+A["Discovery: 全スキルのname・descriptionを提示"] --> B["Activation: 関連するSKILL.md本文を読む"]
+B --> C["Execution: 指示に従いタスクを遂行"]
+            </script>
             <div class="diagram-caption">図3: スキルのライフサイクル3フェーズ</div>
           </div>
           <p>
@@ -864,13 +886,19 @@
 
           <h3>セマンティックトリガリングの仕組み</h3>
           <div class="diagram">
-            <div class="mermaid">
-              flowchart TD A["ユーザーが自然言語で指示を入力"] --> B["descriptionと意味的に照合"] B
-              --> C{"合致するスキルがあるか"} C -- "あり" --> D["SKILL.mdをロード"] C -- "なし" -->
-              E["スキルなしで応答"] D --> F{"スクリプト実行が必要か"} F -- "はい" -->
-              G{"実行モードの確認"} G -- "Manual" --> H["実行許可を確認"] G -- "Auto/Secure" -->
-              I["サンドボックス内で実行"] F -- "いいえ" --> J["指示のみで対応"]
-            </div>
+            <div id="diag-4" class="mermaid mermaid-target"></div>
+            <script type="text/plain" data-mermaid-src="diag-4">
+flowchart TD
+A["ユーザーが自然言語で指示を入力"] --> B["descriptionと意味的に照合"]
+B --> C{"合致するスキルがあるか"}
+C -- "あり" --> D["SKILL.mdをロード"]
+C -- "なし" --> E["スキルなしで応答"]
+D --> F{"スクリプト実行が必要か"}
+F -- "はい" --> G{"実行モードの確認"}
+G -- "Manual" --> H["実行許可を確認"]
+G -- "Auto・Secure" --> I["サンドボックス内で実行"]
+F -- "いいえ" --> J["指示のみで対応"]
+            </script>
             <div class="diagram-caption">
               図4: Antigravityにおけるセマンティックトリガリングと実行モード分岐
             </div>
@@ -895,13 +923,18 @@
           </p>
 
           <div class="diagram">
-            <div class="mermaid">
-              flowchart TD S1["Step1: スコープを決める"] --> S2["Step2: 単一責務に絞る"] S2 -->
-              S3["Step3: descriptionを磨く"] S3 --> S4["Step4: 段階的に構造化する"] S4 -->
-              S5["Step5: スクリプトをブラックボックス化"] S5 --> S6["Step6: 判断分岐を明示する"] S6
-              --> S7["Step7: Few-shot例を追加"] S7 --> S8["Step8: エラー処理を明文化"] S8 -->
-              S9["Step9: 評価とイテレーション"]
-            </div>
+            <div id="diag-5" class="mermaid mermaid-target"></div>
+            <script type="text/plain" data-mermaid-src="diag-5">
+flowchart TD
+S1["Step1: スコープを決める"] --> S2["Step2: 単一責務に絞る"]
+S2 --> S3["Step3: descriptionを磨く"]
+S3 --> S4["Step4: 段階的に構造化する"]
+S4 --> S5["Step5: スクリプトをブラックボックス化"]
+S5 --> S6["Step6: 判断分岐を明示する"]
+S6 --> S7["Step7: Few-shot例を追加"]
+S7 --> S8["Step8: エラー処理を明文化"]
+S8 --> S9["Step9: 評価とイテレーション"]
+            </script>
             <div class="diagram-caption">図5: SKILL.md 実装ステップ（9段階）</div>
           </div>
 
@@ -1398,33 +1431,103 @@ When reviewing code, follow these steps:
     </footer>
 
     <script>
-      (function () {
-        function renderDiagrams() {
-          mermaid.initialize({
-            startOnLoad: false,
-            theme: 'base',
-            themeVariables: {
-              background: '#FFFFFF',
-              primaryColor: '#ECEEFC',
-              primaryTextColor: '#14161C',
-              primaryBorderColor: '#3648D6',
-              lineColor: '#4A4D57',
-              secondaryColor: '#FBF0DF',
-              tertiaryColor: '#E4F4EE',
-              fontFamily: 'IBM Plex Mono, monospace',
-              fontSize: '14px',
-            },
-            flowchart: { htmlLabels: true, curve: 'basis' },
-            securityLevel: 'loose',
+      function dedent(source) {
+        const lines = source.replace(/^\n/, '').replace(/\n[ \t]*$/, '').split('\n');
+        const indents = lines
+          .filter(function (line) {
+            return line.trim().length > 0;
+          })
+          .map(function (line) {
+            return (line.match(/^[ \t]*/) || [''])[0].length;
           });
-          mermaid.run({ querySelector: '.mermaid' }).catch(function (err) {
-            console.error('Mermaid render error:', err);
-          });
+        const minIndent = indents.length ? Math.min.apply(null, indents) : 0;
+        return lines
+          .map(function (line) {
+            return line.slice(minIndent);
+          })
+          .join('\n');
+      }
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        fontSize: 16,
+        themeVariables: {
+          background: '#FFFFFF',
+          primaryColor: '#ECEEFC',
+          primaryTextColor: '#14161C',
+          primaryBorderColor: '#3648D6',
+          lineColor: '#4A4D57',
+          secondaryColor: '#FBF0DF',
+          tertiaryColor: '#E4F4EE',
+          fontFamily: 'IBM Plex Mono, monospace',
+          fontSize: '16px',
+        },
+        flowchart: { htmlLabels: true, curve: 'basis', useMaxWidth: false },
+        sequence: { useMaxWidth: false, mirrorActors: true, noteMargin: 10 },
+        securityLevel: 'loose',
+      });
+
+      (async function renderAllDiagrams() {
+        if (document.fonts) {
+          try {
+            await document.fonts.ready;
+          } catch (e) {}
         }
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', renderDiagrams);
-        } else {
-          renderDiagrams();
+        const diagramSources = document.querySelectorAll(
+          'script[type="text/plain"][data-mermaid-src]',
+        );
+        for (const source of diagramSources) {
+          const id = source.getAttribute('data-mermaid-src');
+          if (!id) continue;
+          const container = document.getElementById(id);
+          if (!container) continue;
+          container.textContent = dedent(source.textContent || '');
+          try {
+            await mermaid.run({ nodes: [container] });
+            const svgEl = container.querySelector('svg');
+            if (svgEl) {
+              // mermaidの自然な生成サイズはpaddingの取り方次第で意図せず大きくなることがあるため、
+              // 実際に描画されたラベルのフォントサイズを測定し、1rem(16px)相当になるよう
+              // 図全体(ボックス・矢印含む)を比例スケーリングする
+              let naturalWidth = null;
+              try {
+                if (svgEl.viewBox && svgEl.viewBox.baseVal && svgEl.viewBox.baseVal.width) {
+                  naturalWidth = svgEl.viewBox.baseVal.width;
+                }
+              } catch (e) {}
+              if (!naturalWidth) {
+                const wAttr = parseFloat(svgEl.getAttribute('width'));
+                naturalWidth =
+                  isFinite(wAttr) && wAttr > 0 ? wAttr : svgEl.getBoundingClientRect().width;
+              }
+              const textEl = svgEl.querySelector(
+                '.nodeLabel, foreignObject span, foreignObject div, text',
+              );
+              let measuredFontSize = 16;
+              if (textEl) {
+                const fs = parseFloat(getComputedStyle(textEl).fontSize);
+                if (isFinite(fs) && fs > 0) measuredFontSize = fs;
+              }
+              const scale = 16 / measuredFontSize;
+              const targetWidth = Math.max(220, Math.round(naturalWidth * scale));
+
+              svgEl.removeAttribute('width');
+              svgEl.removeAttribute('height');
+              svgEl.style.display = 'block';
+              svgEl.style.width = targetWidth + 'px';
+              svgEl.style.maxWidth = '100%';
+              svgEl.style.height = 'auto';
+              svgEl.style.margin = '0 auto';
+              svgEl.style.overflow = 'visible';
+            }
+          } catch (err) {
+            container.innerHTML =
+              '<p style="color:#C97A1A;font-family:\'IBM Plex Mono\',monospace;font-size:13px;margin:0;">図の描画に失敗しました: ' +
+              String((err && err.message) || err) +
+              '</p>';
+            console.error('Mermaid render error for ' + id, err);
+          }
         }
       })();
     </script>
