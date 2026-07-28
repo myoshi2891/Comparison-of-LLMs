@@ -496,11 +496,16 @@
       @media (max-width: 980px) {
         .sidebar {
           transform: translateX(-100%);
-          transition: transform 0.25s ease;
+          visibility: hidden;
+          pointer-events: none;
+          transition: transform 0.25s ease, visibility 0s 0.25s;
           box-shadow: var(--shadow);
         }
         .sidebar.open {
           transform: translateX(0);
+          visibility: visible;
+          pointer-events: auto;
+          transition-delay: 0s;
         }
         .sidebar-toggle {
           display: flex;
