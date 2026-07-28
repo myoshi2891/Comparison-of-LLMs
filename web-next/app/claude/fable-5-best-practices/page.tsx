@@ -1,5 +1,6 @@
 import Ext from "@/components/docs/Ext";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import Sidebar from "./Sidebar";
 import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
 
@@ -135,67 +136,7 @@ export default function Fable5BestPracticesPage() {
   return (
     <div className={styles.pageContainer}>
       <TocObserver />
-      <aside className={styles.sidebar}>
-        <a href="#top" className={styles.brand}>
-          <div className={styles.brandMark}>F5</div>
-          <div className={styles.brandText}>
-            Claude Fable 5
-            <span className={styles.brandSub}>Field Guide</span>
-          </div>
-        </a>
-        <div className={styles.sidebarMeta}>
-          最終更新: 2026-07-16
-          <br />
-          対象: Claude Code 中〜上級者
-        </div>
-        <nav className={styles.toc} id="toc">
-          <a href="#s1" className={styles.tocLink}>
-            <span className={styles.num}>01</span>Claude Fable 5 とは何か
-          </a>
-          <a href="#s2" className={styles.tocLink}>
-            <span className={styles.num}>02</span>タイムライン
-          </a>
-          <a href="#s3" className={styles.tocLink}>
-            <span className={styles.num}>03</span>安全分類器とフォールバック
-          </a>
-          <a href="#s4" className={styles.tocLink}>
-            <span className={styles.num}>04</span>プロンプティング思想の転換
-          </a>
-          <a href="#s5" className={styles.tocLink}>
-            <span className={styles.num}>05</span>Effortレベルの使い方
-          </a>
-          <a href="#s6" className={styles.tocLink}>
-            <span className={styles.num}>06</span>Claude Code での実践設定
-          </a>
-          <a href="#s7" className={styles.tocLink}>
-            <span className={styles.num}>07</span>Loop Engineering
-          </a>
-          <a href="#s8" className={styles.tocLink}>
-            <span className={styles.num}>08</span>Unknowns フレームワーク
-          </a>
-          <a href="#s9" className={styles.tocLink}>
-            <span className={styles.num}>09</span>検証ループとメモリシステム
-          </a>
-          <a href="#s10" className={styles.tocLink}>
-            <span className={styles.num}>10</span>コスト管理とモデル選定
-          </a>
-          <a href="#s11" className={styles.tocLink}>
-            <span className={styles.num}>11</span>よくある落とし穴
-          </a>
-          <a href="#s12" className={styles.tocLink}>
-            <span className={styles.num}>12</span>実力と検証の必要性
-          </a>
-          <a href="#s13" className={styles.tocLink}>
-            <span className={styles.num}>13</span>既知の制限事項
-          </a>
-          <a href="#s14" className={styles.tocLink}>
-            <span className={styles.num}>14</span>まとめ
-          </a>
-          <a href="#s15" className={styles.tocLink}>
-            <span className={styles.num}>15</span>参考文献・ソースURL一覧
-          </a>
-        </nav>
-      </aside>
+      <Sidebar />
 
       <main className={styles.main}>
         <div className={styles.hero} id="top">
@@ -221,7 +162,7 @@ export default function Fable5BestPracticesPage() {
           <span className={styles.eyebrowNum}>01 / 15</span>
           <h2 className={styles.sectionTitle}>Claude Fable 5 とは何か</h2>
           <p>
-            Claude Fable 5 は、2026年6月9日に Anthropic が発表したフラッグシップモデルである。Claude Code などのエージェント型開発ツールに最適化されており、長時間に及ぶ複雑なタスクでの文脈保持能力、コードベース全体の自律的な調査能力、自己検証能力において、従来の Claude 3.7 / Opus 4.8 を凌駕する性能を持つ。
+            Claude Fable 5 は、2026年6月9日に Anthropic が発表したフラッグシップモデルである。Claude Code などのエージェント型開発ツールに最適化されており、長時間に及ぶ複雑なタスクでの文脈保持能力、コードベース全体の自律的な調査能力、自己検証能力において、従来の Claude Opus 5 / Opus 4.8 を凌駕する性能を持つ。
           </p>
           <h3>1.1 スペック概要</h3>
           <div className={styles.tableWrap}>
@@ -1072,7 +1013,7 @@ export default function Fable5BestPracticesPage() {
         </section>
 
         <footer className={styles.pageFooter}>
-          Claude Fable 5 実践活用ガイド ― 2026年7月16日時点の公式ドキュメントおよび開発者の発信を追加調査してブラッシュアップ。本ガイドの内容は今後のモデル・価格改定により変わる可能性があります。
+          Claude Fable 5 実践活用ガイド ― 2026年7月26日時点の公式ドキュメントおよび開発者の発信を追加調査してブラッシュアップ。本ガイドの内容は今後のモデル・価格改定により変わる可能性があります。
         </footer>
       </main>
     </div>

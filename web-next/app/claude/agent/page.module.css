@@ -552,14 +552,17 @@
 }
 
 .checklist li {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   padding: 12px 16px;
   margin: 0;
+}
+
+.checklist label {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
 }
 
 .checklist input[type="checkbox"] {
@@ -657,6 +660,7 @@
 @media (max-width: 900px) {
   .layout {
     grid-template-columns: 1fr;
+    --gutter: 20px;
   }
 
   .sidebar {
@@ -691,10 +695,6 @@
     color: #fff;
     border: 1px solid var(--navy-line);
     cursor: pointer;
-  }
-
-  .layout {
-    --gutter: 20px;
   }
 
   .main {

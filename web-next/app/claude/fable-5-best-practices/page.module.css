@@ -743,6 +743,8 @@
   }
   .timelineDateCol {
     width: 80px;
+  }
+  .timelineDate {
     font-size: 10px;
   }
 }

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import Ext from "@/components/docs/Ext";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import SidebarToggle from "./SidebarToggle";
 import TocObserver from "./TocObserver";
 import styles from "./page.module.css";
 
@@ -8,14 +10,6 @@ export const metadata: Metadata = {
   description:
     "CLAUDE.md・サブエージェント定義・Agent Teams の全拡張レイヤーにおける Markdown ファイル（.md）の設計原則、パラメータ仕様、ユースケース別使い分けを体系的に解説する実戦ガイド。",
 };
-
-function Ext({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <a href={href} target="_blank" rel="noopener noreferrer">
-      {children}
-    </a>
-  );
-}
 
 const DIAGRAM_OVERVIEW = `flowchart TD
     A["CLAUDE.md<br/>常時ロードされる記憶"] --> M["メインセッション"]
@@ -107,12 +101,12 @@ const AGENT_THEME_VARS: Record<string, string> = {
 
 export default function ClaudeAgentPage() {
   return (
-    <div className={styles.layout}>
+    <SidebarToggle>
       <TocObserver />
-      <aside className={styles.sidebar}>
+      <aside id="claude-agent-sidebar" className={styles.sidebar}>
         <div className={styles.sidebarBrand}>.claude/ — ガイド目次</div>
         <nav className={styles.fileTree}>
-          <div className="dir">
+          <div className={styles.dir}>
             <svg
               width="14"
               height="14"
@@ -157,7 +151,7 @@ export default function ClaudeAgentPage() {
             </li>
             <li>
               <a href="#sources">
-                09. 参考ソース<span className="tag">URL</span>
+                09. 参考ソース<span className={styles.tag}>URL</span>
               </a>
             </li>
           </ul>
@@ -1077,68 +1071,82 @@ export default function ClaudeAgentPage() {
             <h2>コミット前チェックリスト</h2>
             <ul className={styles.checklist}>
               <li>
-                <input type="checkbox" />
-                <span>
-                  <span className={styles.t}>nameは一意か</span>
-                  <span className={styles.d}>同じディレクトリツリー内で重複していないか</span>
-                </span>
-              </li>
-              <li>
-                <input type="checkbox" />
-                <span>
-                  <span className={styles.t}>descriptionは具体的か</span>
-                  <span className={styles.d}>「いつ使うか」が第三者にも明確か</span>
-                </span>
-              </li>
-              <li>
-                <input type="checkbox" />
-                <span>
-                  <span className={styles.t}>ツール権限は最小か</span>
-                  <span className={styles.d}>
-                    書き込み不要ならRead/Grep/Globのみか
+                <label>
+                  <input type="checkbox" />
+                  <span>
+                    <span className={styles.t}>nameは一意か</span>
+                    <span className={styles.d}>同じディレクトリツリー内で重複していないか</span>
                   </span>
-                </span>
+                </label>
               </li>
               <li>
-                <input type="checkbox" />
-                <span>
-                  <span className={styles.t}>CLAUDE.mdは肥大化していないか</span>
-                  <span className={styles.d}>数百行を超えたら分割を検討したか</span>
-                </span>
-              </li>
-              <li>
-                <input type="checkbox" />
-                <span>
-                  <span className={styles.t}>危険な操作にhooksを設定したか</span>
-                  <span className={styles.d}>
-                    破壊的コマンドをPreToolUseで検証しているか
+                <label>
+                  <input type="checkbox" />
+                  <span>
+                    <span className={styles.t}>descriptionは具体的か</span>
+                    <span className={styles.d}>「いつ使うか」が第三者にも明確か</span>
                   </span>
-                </span>
+                </label>
               </li>
               <li>
-                <input type="checkbox" />
-                <span>
-                  <span className={styles.t}>Agent Teamsのタスク粒度は適切か</span>
-                  <span className={styles.d}>1人5〜6タスク程度に収まっているか</span>
-                </span>
-              </li>
-              <li>
-                <input type="checkbox" />
-                <span>
-                  <span className={styles.t}>ファイル担当の重複はないか</span>
-                  <span className={styles.d}>
-                    チームメイト間でファイル競合が起きない設計か
+                <label>
+                  <input type="checkbox" />
+                  <span>
+                    <span className={styles.t}>ツール権限は最小か</span>
+                    <span className={styles.d}>書き込み不要ならRead/Grep/Globのみか</span>
                   </span>
-                </span>
+                </label>
               </li>
               <li>
-                <input type="checkbox" />
-                <span>
-                  <span className={styles.t}>Gitにコミットしたか</span>
-                  <span className={styles.d}>
-                    チームで共有すべき定義がバージョン管理されているか
+                <label>
+                  <input type="checkbox" />
+                  <span>
+                    <span className={styles.t}>CLAUDE.mdは肥大化していないか</span>
+                    <span className={styles.d}>数百行を超えたら分割を検討したか</span>
                   </span>
-                </span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" />
+                  <span>
+                    <span className={styles.t}>危険な操作にhooksを設定したか</span>
+                    <span className={styles.d}>
+                      破壊的コマンドをPreToolUseで検証しているか
+                    </span>
+                  </span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" />
+                  <span>
+                    <span className={styles.t}>Agent Teamsのタスク粒度は適切か</span>
+                    <span className={styles.d}>1人5〜6タスク程度に収まっているか</span>
+                  </span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" />
+                  <span>
+                    <span className={styles.t}>ファイル担当の重複はないか</span>
+                    <span className={styles.d}>
+                      チームメイト間でファイル競合が起きない設計か
+                    </span>
+                  </span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" />
+                  <span>
+                    <span className={styles.t}>Gitにコミットしたか</span>
+                    <span className={styles.d}>
+                      チームで共有すべき定義がバージョン管理されているか
+                    </span>
+                  </span>
+                </label>
               </li>
             </ul>
           </section>
@@ -1288,6 +1296,6 @@ export default function ClaudeAgentPage() {
           </footer>
         </div>
       </main>
-    </div>
+    </SidebarToggle>
   );
 }

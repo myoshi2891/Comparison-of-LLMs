@@ -176,7 +176,7 @@ const entries: PageEntry[] = [
     summary:
       "Claude Codeエンジニアのための中級〜上級者向けベストプラクティス。「指示を積み上げる」から「ゴールと検証基準を渡して任せる」へ ― Fable 5に最適化された思考法をステップバイステップで解説します。",
     addedAt: "2026-07-05",
-    lastReviewed: "2026-07-05",
+    lastReviewed: "2026-07-26",
   },
   {
     slug: "/claude/harness-engineering",
