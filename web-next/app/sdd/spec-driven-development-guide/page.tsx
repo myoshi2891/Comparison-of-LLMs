@@ -183,7 +183,7 @@ export default async function SpecDrivenDevelopmentGuidePage() {
       <nav className={styles.sidebar}>
         <div className={styles.brand}>
           <span className={styles.tag}>PRACTICE GUIDE</span>
-          <h1>仕様駆動開発 (SDD)</h1>
+          <p className={styles.brandTitle}>仕様駆動開発 (SDD)</p>
           <p>中級・上級エンジニア向け実践ベストプラクティス</p>
         </div>
         <ul className={styles.sidebarNav}>
