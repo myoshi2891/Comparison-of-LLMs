@@ -504,10 +504,14 @@
     left: 0;
     z-index: 40;
     transform: translateX(-105%);
+    visibility: hidden;
+    pointer-events: none;
     transition: transform 0.25s ease;
   }
   .sidebarOpen {
     transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
   }
   .sidebarToggle {
     display: flex;

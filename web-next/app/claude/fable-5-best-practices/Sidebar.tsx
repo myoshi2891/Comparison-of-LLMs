@@ -71,7 +71,7 @@ export default function Sidebar() {
       <button
         type="button"
         className={styles.sidebarToggle}
-        aria-label="目次を開く"
+        aria-label={open ? "目次を閉じる" : "目次を開く"}
         aria-expanded={open}
         aria-controls="fable-sidebar"
         onClick={() => setOpen((current) => !current)}

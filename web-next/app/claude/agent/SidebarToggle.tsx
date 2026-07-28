@@ -13,7 +13,7 @@ export default function SidebarToggle({ children }: { children: ReactNode }) {
       <button
         type="button"
         className={styles.navToggleBtn}
-        aria-label="目次を開く"
+        aria-label={open ? "目次を閉じる" : "目次を開く"}
         aria-expanded={open}
         aria-controls="claude-agent-sidebar"
         onClick={() => setOpen((current) => !current)}

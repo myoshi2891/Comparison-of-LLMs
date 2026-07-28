@@ -672,12 +672,16 @@
     z-index: 40;
     height: 100vh;
     transform: translateX(-105%);
+    visibility: hidden;
+    pointer-events: none;
     transition: transform 0.25s ease;
     box-shadow: 20px 0 40px rgba(0, 0, 0, 0.3);
   }
 
   .navToggleCheckbox:checked ~ .layout .sidebar {
     transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
   }
 
   .navToggleBtn {

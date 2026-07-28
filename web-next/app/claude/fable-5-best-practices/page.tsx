@@ -152,7 +152,9 @@ export default function Fable5BestPracticesPage() {
           </p>
           <div className={styles.heroMeta}>
             <div>初出: 2026年7月4日</div>
-            <div>改訂: <span>2026年7月16日公式ドキュメント対応版</span></div>
+            <div>
+              改訂: <span>2026年7月26日公式ドキュメント対応版</span>
+            </div>
             <div>対象: <span>Claude Code 中〜上級エンジニア</span></div>
           </div>
         </div>

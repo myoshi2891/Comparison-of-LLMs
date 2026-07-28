@@ -775,11 +775,15 @@
     width: 280px;
     height: 100vh;
     transform: translateX(-100%);
+    visibility: hidden;
+    pointer-events: none;
     transition: transform 0.3s ease;
   }
 
   .sidebarOpen {
     transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
   }
 
   .sidebarToggle {
