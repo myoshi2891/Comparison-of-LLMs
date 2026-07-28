@@ -2,7 +2,7 @@
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import ClaudeAgentPage, { metadata as rawMetadata } from "@/app/claude/agent/page";
@@ -81,6 +81,25 @@ describe("/claude/agent - page structure", () => {
       expect(tocHrefs, `TOC must link to #${id}`).toContain(`#${id}`);
     }
   });
+
+  it("renders a mobile sidebar toggle without making the page a Client Component", () => {
+    render(<Page />);
+    expect(screen.getByRole("button", { name: "目次を開く" })).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
+  });
+
+  it("associates every interactive checklist checkbox with its item label", () => {
+    const { container } = render(<Page />);
+    const checkboxes = container.querySelectorAll<HTMLInputElement>(
+      '#checklist input[type="checkbox"]',
+    );
+    expect(checkboxes).toHaveLength(8);
+    for (const checkbox of checkboxes) {
+      expect(checkbox.labels?.length).toBeGreaterThan(0);
+    }
+  });
 });
 
 describe("/claude/agent - external link safety", () => {
@@ -114,5 +133,12 @@ describe("/claude/agent - static source safety", () => {
     const needle = ["danger", "ously", "Set", "Inner", "HTML"].join("");
     expect(source.includes(needle)).toBe(false);
   });
-});
 
+  it("uses the shared Ext component and CSS Module classes", () => {
+    const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
+    expect(source).toContain('import Ext from "@/components/docs/Ext"');
+    expect(source).not.toContain("function Ext(");
+    expect(source).toContain("className={styles.dir}");
+    expect(source).toContain("className={styles.tag}");
+  });
+});

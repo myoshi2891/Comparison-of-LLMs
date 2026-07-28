@@ -1,9 +1,11 @@
-import { render } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import PageComponent, { metadata as rawMetadata } from "@/app/claude/fable-5-best-practices/page";
 import { navLinks } from "@/components/site/nav-links";
+import { pageRegistry } from "@/lib/page-registry";
 import { findNavLeaf } from "@/tests/helpers/nav";
+import styles from "./page.module.css";
 
 beforeAll(() => {
   global.IntersectionObserver = class {
@@ -73,7 +75,26 @@ describe("/claude/fable-5-best-practices - page structure (Step 1)", () => {
     const { container } = render(<Page />);
     const footer = container.querySelector("footer");
     expect(footer).not.toBeNull();
-    expect(footer?.textContent).toContain("2026年7月16日時点の公式ドキュメント");
+    expect(footer?.textContent).toContain("2026年7月26日時点の公式ドキュメント");
+  });
+
+  it("uses the latest timeline date and current model comparison", () => {
+    const { container } = render(<Page />);
+    expect(container.querySelector("aside")?.textContent).toContain("最終更新: 2026-07-26");
+    expect(container.textContent).toContain("Claude Opus 5 / Opus 4.8");
+  });
+
+  it("opens and closes the mobile sidebar from an accessible button", () => {
+    const { container } = render(<Page />);
+    const sidebar = container.querySelector("aside");
+    const toggle = screen.getByRole("button", { name: "目次を開く" });
+
+    expect(sidebar).not.toHaveClass(styles.sidebarOpen);
+    fireEvent.click(toggle);
+    expect(sidebar).toHaveClass(styles.sidebarOpen);
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    fireEvent.click(toggle);
+    expect(sidebar).not.toHaveClass(styles.sidebarOpen);
   });
 });
 
@@ -82,5 +103,12 @@ describe("/claude/fable-5-best-practices - registration", () => {
     const link = findNavLeaf(navLinks, "/claude/fable-5-best-practices");
     expect(link).toBeDefined();
     expect(link?.name).toBe("Fable 5 Best Practices");
+  });
+
+  it("uses the latest timeline date in the page registry", () => {
+    const entry = pageRegistry.find(
+      ({ slug }) => slug === "/claude/fable-5-best-practices",
+    );
+    expect(entry?.lastReviewed).toBe("2026-07-26");
   });
 });
