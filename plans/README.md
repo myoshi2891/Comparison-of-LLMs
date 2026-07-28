@@ -10,6 +10,8 @@
 
 基準コミット（drift 検出用）: `45940fd`
 
+保守同期（2026-07-28）: Fable 5 の `lastReviewed` を `2026-07-26` へ統一し、Claude / SDD ガイドのレビュー修正と契約テスト拡充後に Vitest **1232 件**の Green を確認。
+
 ## 実行順・ステータス
 
 | Plan | タイトル | 種別 | Depends on | Status |
