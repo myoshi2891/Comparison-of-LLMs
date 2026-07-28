@@ -16,6 +16,38 @@ type Props = {
   themeVariables?: Record<string, string>;
 };
 
+function applySequenceDiagramColorOverrides(
+  root: HTMLElement,
+  themeVariables?: Record<string, string>
+): void {
+  const actorBkgColor = themeVariables?.actorBkg ?? themeVariables?.primaryColor ?? "#ffffff";
+  const actorBorderColor =
+    themeVariables?.actorBorder ?? themeVariables?.primaryBorderColor ?? "#000000";
+  const actorTxtColor =
+    themeVariables?.actorTextColor ?? themeVariables?.primaryTextColor ?? "#000000";
+
+  root.querySelectorAll<SVGRectElement>("rect.actor").forEach((el) => {
+    el.style.setProperty("fill", actorBkgColor, "important");
+    el.style.setProperty("stroke", actorBorderColor, "important");
+  });
+  root.querySelectorAll<SVGTextElement>("text.actor").forEach((el) => {
+    el.style.setProperty("fill", actorTxtColor, "important");
+  });
+
+  const signalTxtColor =
+    themeVariables?.signalTextColor ?? themeVariables?.primaryTextColor ?? "#000000";
+  root
+    .querySelectorAll<SVGTextElement>(
+      "text.messageText, text.loopText, text.labelText, text.noteText"
+    )
+    .forEach((el) => {
+      el.style.setProperty("fill", signalTxtColor, "important");
+      el.querySelectorAll<SVGTSpanElement>("tspan").forEach((ts) => {
+        ts.style.setProperty("fill", signalTxtColor, "important");
+      });
+    });
+}
+
 /**
  * Renders a Mermaid diagram and updates it when its source or rendering options change.
  *
@@ -66,64 +98,22 @@ export default function MermaidDiagram({
           // htmlLabels:true の場合、flowchart ノードラベルは SVG <foreignObject> 内の HTML として
           // レンダーされる。この HTML 要素には themeVariables.primaryTextColor が CSS カスケードで
           // 届かない（SVG 内の <style> は foreignObject 内 HTML に非カスケード）。
-          // dark テーマは mermaid 側が処理するため対象外。base/default 等のライトテーマのみ適用。
+          // base テーマ、または明示的な themeVariables がある場合のみ補正する。
           // ref: fix-mermaid SKILL Part 2-4
-          if (theme !== "dark" && ref.current) {
+          if ((theme === "base" || themeVariables !== undefined) && ref.current) {
             const textColor = themeVariables?.primaryTextColor ?? "#000000";
             ref.current.querySelectorAll("foreignObject *").forEach((el) => {
-              (el as HTMLElement).style.setProperty(
-                "color",
-                textColor,
-                "important",
-              );
+              (el as HTMLElement).style.setProperty("color", textColor, "important");
             });
 
             // --- sequenceDiagram アクター後処理 ---
             // sequenceDiagram のアクターボックスは SVG <rect class="actor"> / <text class="actor"> で
             // 描画される（foreignObject ではない）。themeVariables.actorBkg が SVG 内 CSS に
             // 反映されない場合のフォールバックとして JS で直接 style を上書きする。
-            const actorBkgColor =
-              themeVariables?.actorBkg ??
-              themeVariables?.primaryColor ??
-              "#ffffff";
-            const actorBorderColor =
-              themeVariables?.actorBorder ??
-              themeVariables?.primaryBorderColor ??
-              "#000000";
-            const actorTxtColor =
-              themeVariables?.actorTextColor ??
-              themeVariables?.primaryTextColor ??
-              "#000000";
-            ref.current
-              .querySelectorAll<SVGRectElement>("rect.actor")
-              .forEach((el) => {
-                el.style.setProperty("fill", actorBkgColor, "important");
-                el.style.setProperty("stroke", actorBorderColor, "important");
-              });
-            ref.current
-              .querySelectorAll<SVGTextElement>("text.actor")
-              .forEach((el) => {
-                el.style.setProperty("fill", actorTxtColor, "important");
-              });
-
             // --- sequenceDiagram メッセージラベル後処理 ---
             // 矢印上のラベル（messageText）・ループラベル（loopText）・条件ラベル（labelText）も
             // SVG <text> 要素。themeVariables.signalTextColor が届かない場合のフォールバック。
-            const signalTxtColor =
-              themeVariables?.signalTextColor ??
-              themeVariables?.primaryTextColor ??
-              "#000000";
-            ref.current
-              .querySelectorAll<SVGTextElement>(
-                "text.messageText, text.loopText, text.labelText, text.noteText",
-              )
-              .forEach((el) => {
-                el.style.setProperty("fill", signalTxtColor, "important");
-                // tspan も明示的に色付け（親の fill が tspan に届かないケースへの保険）
-                el.querySelectorAll<SVGTSpanElement>("tspan").forEach((ts) => {
-                  ts.style.setProperty("fill", signalTxtColor, "important");
-                });
-              });
+            applySequenceDiagramColorOverrides(ref.current, themeVariables);
           }
         } catch (err) {
           console.error("[MermaidDiagram] render failed:", err);
