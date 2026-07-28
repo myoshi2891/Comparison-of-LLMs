@@ -521,7 +521,7 @@
 
   <body>
     <div class="layout">
-      <div class="sidebar">
+      <div class="sidebar" id="gemini-multi-agent-sidebar">
         <div class="brand">
           <div class="brand-badge">G</div>
           <div class="brand-text">
@@ -582,7 +582,15 @@
           情報基準日: 2026年7月26日<br />出典は「15. 参考文献・出典」を参照
         </div>
       </div>
-      <button type="button" class="sidebar-toggle" aria-label="メニューを開く">☰</button>
+      <button
+        type="button"
+        class="sidebar-toggle"
+        aria-label="メニューを開く"
+        aria-expanded="false"
+        aria-controls="gemini-multi-agent-sidebar"
+      >
+        ☰
+      </button>
       <main class="content">
         <div class="hero">
           <span class="hero-eyebrow">GEMINI CLI × ADK × A2A × AGENT ENGINE</span>
@@ -2471,12 +2479,19 @@ flowchart TD
           var toggle = document.querySelector('.sidebar-toggle');
           var sidebar = document.querySelector('.sidebar');
           if (!toggle || !sidebar) return;
+          function syncToggleState() {
+            var open = sidebar.classList.contains('open');
+            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            toggle.setAttribute('aria-label', open ? 'メニューを閉じる' : 'メニューを開く');
+          }
           toggle.addEventListener('click', function () {
             sidebar.classList.toggle('open');
+            syncToggleState();
           });
           document.querySelectorAll('.side-nav a').forEach(function (a) {
             a.addEventListener('click', function () {
               sidebar.classList.remove('open');
+              syncToggleState();
             });
           });
         } catch (e) {
