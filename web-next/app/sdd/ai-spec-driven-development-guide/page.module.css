@@ -506,12 +506,13 @@
     transform: translateX(-105%);
     visibility: hidden;
     pointer-events: none;
-    transition: transform 0.25s ease;
+    transition: transform 0.25s ease, visibility 0s 0.25s;
   }
   .sidebarOpen {
     transform: translateX(0);
     visibility: visible;
     pointer-events: auto;
+    transition-delay: 0s;
   }
   .sidebarToggle {
     display: flex;
