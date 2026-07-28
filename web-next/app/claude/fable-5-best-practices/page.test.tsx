@@ -81,6 +81,7 @@ describe("/claude/fable-5-best-practices - page structure (Step 1)", () => {
   it("uses the latest timeline date and current model comparison", () => {
     const { container } = render(<Page />);
     expect(container.querySelector("aside")?.textContent).toContain("最終更新: 2026-07-26");
+    expect(container.querySelector(`.${styles.heroMeta}`)?.textContent).toContain("2026年7月26日");
     expect(container.textContent).toContain("Claude Opus 5 / Opus 4.8");
   });
 
@@ -92,9 +93,14 @@ describe("/claude/fable-5-best-practices - page structure (Step 1)", () => {
     expect(sidebar).not.toHaveClass(styles.sidebarOpen);
     fireEvent.click(toggle);
     expect(sidebar).toHaveClass(styles.sidebarOpen);
-    expect(toggle).toHaveAttribute("aria-expanded", "true");
-    fireEvent.click(toggle);
+    const closeToggle = screen.getByRole("button", { name: "目次を閉じる" });
+    expect(closeToggle).toHaveAttribute("aria-expanded", "true");
+    fireEvent.click(closeToggle);
     expect(sidebar).not.toHaveClass(styles.sidebarOpen);
+    expect(screen.getByRole("button", { name: "目次を開く" })).toHaveAttribute(
+      "aria-expanded",
+      "false"
+    );
   });
 });
 

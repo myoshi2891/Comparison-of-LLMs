@@ -2,7 +2,7 @@
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import ClaudeAgentPage, { metadata as rawMetadata } from "@/app/claude/agent/page";
@@ -84,9 +84,13 @@ describe("/claude/agent - page structure", () => {
 
   it("renders a mobile sidebar toggle without making the page a Client Component", () => {
     render(<Page />);
-    expect(screen.getByRole("button", { name: "目次を開く" })).toHaveAttribute(
+    const toggle = screen.getByRole("button", { name: "目次を開く" });
+
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(toggle);
+    expect(screen.getByRole("button", { name: "目次を閉じる" })).toHaveAttribute(
       "aria-expanded",
-      "false",
+      "true"
     );
   });
 

@@ -48,9 +48,14 @@ describe("AI Spec-Driven Development Guide Page", () => {
     expect(sidebar).not.toHaveClass(styles.sidebarOpen);
     fireEvent.click(toggle);
     expect(sidebar).toHaveClass(styles.sidebarOpen);
-    expect(toggle).toHaveAttribute("aria-expanded", "true");
-    fireEvent.click(toggle);
+    const closeToggle = screen.getByRole("button", { name: "目次を閉じる" });
+    expect(closeToggle).toHaveAttribute("aria-expanded", "true");
+    fireEvent.click(closeToggle);
     expect(sidebar).not.toHaveClass(styles.sidebarOpen);
+    expect(screen.getByRole("button", { name: "目次を開く" })).toHaveAttribute(
+      "aria-expanded",
+      "false"
+    );
   });
 
   it("ensures all external links have target='_blank' and rel containing 'noopener'", async () => {
