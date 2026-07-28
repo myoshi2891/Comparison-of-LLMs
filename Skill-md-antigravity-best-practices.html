@@ -954,12 +954,12 @@
               </thead>
               <tbody>
                 <tr>
-                  <td><code>&lt;workspace-root&gt;/.agents/skills/&lt;skill-folder&gt;/</code></td>
+                  <td><code>.agents/skills/&lt;skill-folder&gt;/</code></td>
                   <td>ワークスペース(プロジェクト)固有</td>
                   <td>チームのデプロイ手順、テスト規約など、そのリポジトリだけで使う知識</td>
                 </tr>
                 <tr>
-                  <td><code>~/.gemini/antigravity/skills/&lt;skill-folder&gt;/</code></td>
+                  <td><code>~/.gemini/config/skills/&lt;skill-folder&gt;/</code></td>
                   <td>グローバル(全プロジェクト共通)</td>
                   <td>個人的によく使うユーティリティや汎用ツール</td>
                 </tr>
@@ -1090,8 +1090,8 @@ description: 何をするスキルで、いつ使うべきかを明記する
           <h3><span class="step-badge">1</span>配置場所を決める</h3>
           <p>
             まず、そのスキルが「特定のプロジェクトだけのもの」か「あらゆるプロジェクトで使う汎用的なもの」かを判断します。前者なら
-            <code>.agents/skills/</code>、後者なら
-            <code>~/.gemini/antigravity/skills/</code>
+            <code>.agents/skills/&lt;skill-folder&gt;/</code>、後者なら
+            <code>~/.gemini/config/skills/&lt;skill-folder&gt;/</code>
             に置きます。判断に迷ったら、最初はワークスペース側に置き、複数プロジェクトで使い回したくなった時点でグローバル側へ移動するのが安全です。
           </p>
 
@@ -1367,8 +1367,8 @@ description: 何をするスキルで、いつ使うべきかを明記する
                     >(個人用)、<code>.claude/skills/</code>(プロジェクト用)
                   </td>
                   <td>
-                    <code>~/.gemini/antigravity/skills/</code
-                    >(グローバル)、<code>.agents/skills/</code>(ワークスペース)
+                    <code>~/.gemini/config/skills/&lt;skill-folder&gt;/</code
+                    >(グローバル)、<code>.agents/skills/&lt;skill-folder&gt;/</code>(ワークスペース)
                   </td>
                 </tr>
                 <tr>
@@ -1560,37 +1560,67 @@ description: 何をするスキルで、いつ使うべきかを明記する
           <ul class="source-list">
             <li>
               <span class="source-title">Google Antigravity Docs — Skills</span
-              ><span class="source-url">https://antigravity.google/docs/ide/skills</span>
+              ><a
+                class="source-url"
+                href="https://antigravity.google/docs/ide/skills"
+                target="_blank"
+                rel="noopener noreferrer"
+                >https://antigravity.google/docs/ide/skills</a
+              >
             </li>
             <li>
               <span class="source-title"
                 >Anthropic Claude Platform Docs — Agent Skills Overview</span
-              ><span class="source-url"
-                >https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview</span
+              ><a
+                class="source-url"
+                href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview"
+                target="_blank"
+                rel="noopener noreferrer"
+                >https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview</a
               >
             </li>
             <li>
               <span class="source-title"
                 >Anthropic Claude Platform Docs — Skill authoring best practices</span
-              ><span class="source-url"
-                >https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices</span
+              ><a
+                class="source-url"
+                href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices"
+                target="_blank"
+                rel="noopener noreferrer"
+                >https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices</a
               >
             </li>
             <li>
               <span class="source-title"
                 >Anthropic Engineering Blog — Equipping agents for the real world with Agent
                 Skills</span
-              ><span class="source-url"
-                >https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills</span
+              ><a
+                class="source-url"
+                href="https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills"
+                target="_blank"
+                rel="noopener noreferrer"
+                >https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills</a
               >
             </li>
             <li>
               <span class="source-title">Agent Skills オープンスタンダード公式サイト</span
-              ><span class="source-url">https://agentskills.io/home</span>
+              ><a
+                class="source-url"
+                href="https://agentskills.io/home"
+                target="_blank"
+                rel="noopener noreferrer"
+                >https://agentskills.io/home</a
+              >
             </li>
             <li>
               <span class="source-title">Anthropic 公式 Agent Skills リポジトリ(GitHub)</span
-              ><span class="source-url">https://github.com/anthropics/skills</span>
+              ><a
+                class="source-url"
+                href="https://github.com/anthropics/skills"
+                target="_blank"
+                rel="noopener noreferrer"
+                >https://github.com/anthropics/skills</a
+              >
             </li>
           </ul>
 
@@ -1598,23 +1628,35 @@ description: 何をするスキルで、いつ使うべきかを明記する
           <ul class="source-list">
             <li>
               <span class="source-title">Google Codelabs — Authoring Google Antigravity Skills</span
-              ><span class="source-url"
-                >https://codelabs.developers.google.com/getting-started-with-antigravity-skills</span
+              ><a
+                class="source-url"
+                href="https://codelabs.developers.google.com/getting-started-with-antigravity-skills"
+                target="_blank"
+                rel="noopener noreferrer"
+                >https://codelabs.developers.google.com/getting-started-with-antigravity-skills</a
               >
             </li>
             <li>
               <span class="source-title"
                 >Google Codelabs — Getting Started with Google Antigravity</span
-              ><span class="source-url"
-                >https://codelabs.developers.google.com/getting-started-google-antigravity</span
+              ><a
+                class="source-url"
+                href="https://codelabs.developers.google.com/getting-started-google-antigravity"
+                target="_blank"
+                rel="noopener noreferrer"
+                >https://codelabs.developers.google.com/getting-started-google-antigravity</a
               >
             </li>
             <li>
               <span class="source-title"
                 >Google Cloud Community(Medium)— How to Build Custom Skills in Google Antigravity: 5
                 Practical Examples</span
-              ><span class="source-url"
-                >https://medium.com/google-cloud/tutorial-getting-started-with-antigravity-skills-864041811e0d</span
+              ><a
+                class="source-url"
+                href="https://medium.com/google-cloud/tutorial-getting-started-with-antigravity-skills-864041811e0d"
+                target="_blank"
+                rel="noopener noreferrer"
+                >https://medium.com/google-cloud/tutorial-getting-started-with-antigravity-skills-864041811e0d</a
               >
             </li>
           </ul>
@@ -1624,15 +1666,25 @@ description: 何をするスキルで、いつ使うべきかを明記する
             <li>
               <span class="source-title"
                 >Simon Willison(Django共同開発者)によるSkillsに関する一連の考察</span
-              ><span class="source-url">https://simonwillison.net/tags/skills/</span>
+              ><a
+                class="source-url"
+                href="https://simonwillison.net/tags/skills/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >https://simonwillison.net/tags/skills/</a
+              >
             </li>
             <li>
               <span class="source-title"
                 >obra/superpowers —
                 Skills作成のベストプラクティスをまとめたコミュニティリポジトリ(Simon
                 Willisonのブログでも紹介)</span
-              ><span class="source-url"
-                >https://github.com/obra/superpowers/blob/main/skills/writing-skills/anthropic-best-practices.md</span
+              ><a
+                class="source-url"
+                href="https://github.com/obra/superpowers/blob/main/skills/writing-skills/anthropic-best-practices.md"
+                target="_blank"
+                rel="noopener noreferrer"
+                >https://github.com/obra/superpowers/blob/main/skills/writing-skills/anthropic-best-practices.md</a
               >
             </li>
             <li>
@@ -1640,7 +1692,13 @@ description: 何をするスキルで、いつ使うべきかを明記する
                 >rmyndharis/antigravity-skills — Antigravity
                 Skillsのコミュニティ製コレクションと実践的な運用ルール(narrow description、Do not
                 use、Safetyセクション、CI検証など)</span
-              ><span class="source-url">https://github.com/rmyndharis/antigravity-skills</span>
+              ><a
+                class="source-url"
+                href="https://github.com/rmyndharis/antigravity-skills"
+                target="_blank"
+                rel="noopener noreferrer"
+                >https://github.com/rmyndharis/antigravity-skills</a
+              >
             </li>
           </ul>
 

@@ -1276,9 +1276,8 @@
           <h4>概念的なフック例（型チェック＋Lintを実行し、失敗時のみエラーを返す）</h4>
           <pre><span class="code-lang-tag">hook.sh</span><code class="language-bash">#!/bin/bash
 set -e
-OUTPUT=$(npm run typecheck && npm run lint 2>&1)
-if [ $? -ne 0 ]; then
-  echo "$OUTPUT" >&2
+if ! OUTPUT=$(npm run typecheck 2&gt;&amp;1 &amp;&amp; npm run lint 2&gt;&amp;1); then
+  echo "$OUTPUT" &gt;&amp;2
   exit 2
 fi
 # 成功時は何も出力しない（コンテキストを汚さない）</code></pre>

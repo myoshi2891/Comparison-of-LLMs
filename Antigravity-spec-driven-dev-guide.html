@@ -1647,6 +1647,7 @@ description: コードの変更をバグ・スタイル・ベストプラクテ�
             .render(targetId + '-svg', code)
             .then(function (result) {
               target.innerHTML = result.svg;
+              result.bindFunctions?.(target);
             })
             .catch(function (err) {
               target.innerHTML =

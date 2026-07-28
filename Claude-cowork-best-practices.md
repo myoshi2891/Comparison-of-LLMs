@@ -381,28 +381,28 @@ Coworkにタスクを渡す前後で、以下を確認する運用がおすす�
 
 **Anthropic公式**
 
-- [^1]: Get started with Claude Cowork | Claude Help Center — https://support.claude.com/en/articles/13345190-get-started-with-claude-cowork
-- [^2]: Use Claude Cowork safely | Claude Help Center — https://support.claude.com/en/articles/13364135-use-claude-cowork-safely
-- [^3]: Austin Lau（Anthropic Growth Team）, "Best practices for getting started with Claude Cowork" | Claude Blog — https://claude.com/blog/best-practices-for-getting-started-with-claude-cowork
-- [^4]: Assign tasks from anywhere in Claude Cowork | Claude Help Center — https://support.claude.com/en/articles/13947068-assign-tasks-from-anywhere-in-claude-cowork
-- [^6]: "How we built Claude Code auto mode: a safer way to skip permissions" | Anthropic Engineering — https://www.anthropic.com/engineering/claude-code-auto-mode
-- [^7]: "Customize Claude Code with plugins" | Anthropic News — https://anthropic.com/news/claude-code-plugins
-- [^15]: "Anthropic brings agentic plug-ins to Cowork" | TechCrunch（Anthropicの発表を報道） — https://www.techcrunch.com/2026/01/30/anthropic-brings-agentic-plugins-to-cowork/
-- [^30]: Claude in Chrome permissions guide | Claude Help Center（権限モードの解説） — https://support.claude.com/en/articles/12902446-claude-in-chrome-permissions-guide
+[^1]: Get started with Claude Cowork | Claude Help Center — https://support.claude.com/en/articles/13345190-get-started-with-claude-cowork
+[^2]: Use Claude Cowork safely | Claude Help Center — https://support.claude.com/en/articles/13364135-use-claude-cowork-safely
+[^3]: Austin Lau（Anthropic Growth Team）, "Best practices for getting started with Claude Cowork" | Claude Blog — https://claude.com/blog/best-practices-for-getting-started-with-claude-cowork
+[^4]: Assign tasks from anywhere in Claude Cowork | Claude Help Center — https://support.claude.com/en/articles/13947068-assign-tasks-from-anywhere-in-claude-cowork
+[^6]: "How we built Claude Code auto mode: a safer way to skip permissions" | Anthropic Engineering — https://www.anthropic.com/engineering/claude-code-auto-mode
+[^7]: "Customize Claude Code with plugins" | Anthropic News — https://anthropic.com/news/claude-code-plugins
+[^15]: "Anthropic brings agentic plug-ins to Cowork" | TechCrunch（Anthropicの発表を報道） — https://www.techcrunch.com/2026/01/30/anthropic-brings-agentic-plugins-to-cowork/
+[^30]: Claude in Chrome permissions guide | Claude Help Center（権限モードの解説） — https://support.claude.com/en/articles/12902446-claude-in-chrome-permissions-guide
 
 **著名な開発者・パワーユーザーの発信**
 
-- [^8]: Nav Toor氏の"17 Best Practices"を取り上げた解説記事（KiKi, note） — https://note.com/_kihonushi/n/nd726246d467f?hl=en-US
-- [^9]: Nav Toor（@heynavtoor）, "17 Best Practices That Make Claude Cowork 100x More Powerful" | X — https://x.com/heynavtoor/status/2028148844891152554
-- [^10]: Nav Toor（@heynavtoor）, Claude Cowork導入ガイドの投稿 | X — https://x.com/heynavtoor/status/2026717574776631556
-- [^11]: Ruben Hassid, "This is the only Claude Cowork guide you need" | LinkedIn — https://www.linkedin.com/posts/ruben-hassid_this-is-the-only-claude-cowork-guide-you-activity-7435202560703008792-WQm6
-- [^12]: Ruben Hassid, "Cowork." | How to AI (Substack) — https://ruben.substack.com/p/claude-cowork-20
-- [^13]: "Claude Cowork Customize: Global Instructions, Folder Rules, and the New Settings Panel" | Claude Cowork Blog — https://claudecowork.im/blog/customize-panel-guide
-- [^19]: TheCraigHewitt, cowork-starter-pack（global-instructions.md）| GitHub — https://github.com/TheCraigHewitt/cowork-starter-pack/blob/main/global-instructions.md
-- [^25]: "Claude best practices 2026: the complete power user guide" | The AI Corner — https://www.the-ai-corner.com/p/claude-best-practices-power-user-guide-2026
-- [^41]: Alex Banks, "How to run Claude Cowork from your phone" | The Signal (Substack) — https://thesignal.substack.com/p/how-to-run-claude-cowork-from-your
-- [^42]: "Claude Cowork Dispatch 101: Remote Control for Desktop AI" | DataCamp — https://www.datacamp.com/tutorial/claude-cowork-dispatch
-- [^46]: "Claude Dispatch Guide: The AI That Works While You're Away" | The AI Corner — https://www.the-ai-corner.com/p/claude-dispatch-guide
+[^8]: Nav Toor氏の"17 Best Practices"を取り上げた解説記事（KiKi, note） — https://note.com/_kihonushi/n/nd726246d467f?hl=en-US
+[^9]: Nav Toor（@heynavtoor）, "17 Best Practices That Make Claude Cowork 100x More Powerful" | X — https://x.com/heynavtoor/status/2028148844891152554
+[^10]: Nav Toor（@heynavtoor）, Claude Cowork導入ガイドの投稿 | X — https://x.com/heynavtoor/status/2026717574776631556
+[^11]: Ruben Hassid, "This is the only Claude Cowork guide you need" | LinkedIn — https://www.linkedin.com/posts/ruben-hassid_this-is-the-only-claude-cowork-guide-you-activity-7435202560703008792-WQm6
+[^12]: Ruben Hassid, "Cowork." | How to AI (Substack) — https://ruben.substack.com/p/claude-cowork-20
+[^13]: "Claude Cowork Customize: Global Instructions, Folder Rules, and the New Settings Panel" | Claude Cowork Blog — https://claudecowork.im/blog/customize-panel-guide
+[^19]: TheCraigHewitt, cowork-starter-pack（global-instructions.md）| GitHub — https://github.com/TheCraigHewitt/cowork-starter-pack/blob/main/global-instructions.md
+[^25]: "Claude best practices 2026: the complete power user guide" | The AI Corner — https://www.the-ai-corner.com/p/claude-best-practices-power-user-guide-2026
+[^41]: Alex Banks, "How to run Claude Cowork from your phone" | The Signal (Substack) — https://thesignal.substack.com/p/how-to-run-claude-cowork-from-your
+[^42]: "Claude Cowork Dispatch 101: Remote Control for Desktop AI" | DataCamp — https://www.datacamp.com/tutorial/claude-cowork-dispatch
+[^46]: "Claude Dispatch Guide: The AI That Works While You're Away" | The AI Corner — https://www.the-ai-corner.com/p/claude-dispatch-guide
 
 補足として参照した記事（本文中に直接の脚注はないが、内容のクロスチェックに使用）：
 

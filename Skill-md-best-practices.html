@@ -794,8 +794,8 @@
         <section id="step3">
           <h2 class="step-title"><span class="step-badge">3</span> YAMLフロントマターを書く</h2>
           <p>
-            SKILL.md の必須要件は <code>name</code> と
-            <code>description</code> の2フィールドである。バリデーションルールは以下の通り。
+            SKILL.md の <code>name</code> と <code>description</code>
+            は推奨される任意フィールドである。省略時、nameにはディレクトリ名または同等の識別子が使われ、descriptionには本文の最初の段落が使われる。指定する場合のバリデーションルールは以下の通り。
           </p>
           <table>
             <thead>
@@ -808,20 +808,21 @@
               <tr>
                 <td><code>name</code></td>
                 <td>
-                  最大64文字、小文字英数字とハイフンのみ、XMLタグ不可、予約語(anthropic, claude)不可
+                  任意。指定する場合は最大64文字、小文字英数字とハイフンのみ、XMLタグ不可、予約語(anthropic,
+                  claude)不可
                 </td>
               </tr>
               <tr>
                 <td><code>description</code></td>
                 <td>
-                  空文字不可、最大1,024文字(Claude Code上の一覧表示では when_to_use
+                  任意。指定する場合は空文字不可、最大1,024文字(Claude Code上の一覧表示では when_to_use
                   と合算で1,536文字が上限)、XMLタグ不可
                 </td>
               </tr>
             </tbody>
           </table>
 
-          <span class="code-label"><i class="ti ti-code"></i>SKILL.md 例</span>
+          <span class="code-label"><i class="ti ti-code"></i>SKILL.md 推奨例</span>
           <pre><code>---
 name: processing-pdfs
 description: PDFファイルからテキストや表を抽出し、フォーム入力やドキュメント結合を行う。PDF、フォーム、ドキュメント抽出についてユーザーが言及した場合に使用する。

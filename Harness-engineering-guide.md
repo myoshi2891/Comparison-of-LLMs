@@ -275,8 +275,7 @@ flowchart LR
 ```bash
 #!/bin/bash
 set -e
-OUTPUT=$(npm run typecheck && npm run lint 2>&1)
-if [ $? -ne 0 ]; then
+if ! OUTPUT=$(npm run typecheck 2>&1 && npm run lint 2>&1); then
   echo "$OUTPUT" >&2
   exit 2   # 終了コード2でエージェントに再対応を促す
 fi
