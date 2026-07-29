@@ -3,9 +3,9 @@ import { describe, expect, it } from "vitest";
 import Page, { metadata } from "./page";
 
 describe("/claude/skill-guide-intermediate 契約テスト", () => {
-  it("metadata.title が非空文字列である", () => {
+  it("metadata.title が非空文字列で SKILL.md 実践ガイド を含む", () => {
     expect(typeof metadata.title).toBe("string");
-    expect((metadata.title as string).length).toBeGreaterThan(0);
+    expect(metadata.title as string).toContain("SKILL.md 実践ガイド");
   });
 
   it("metadata.description が非空文字列である", () => {
@@ -13,24 +13,20 @@ describe("/claude/skill-guide-intermediate 契約テスト", () => {
     expect((metadata.description as string).length).toBeGreaterThan(0);
   });
 
-  it("h1 に SKILL.md が含まれる", () => {
+  it("h1 に SKILL.md 実践ガイド が含まれる", () => {
     const { container } = render(<Page />);
-    expect(container.querySelector("h1")?.textContent).toContain("SKILL.md");
+    expect(container.querySelector("h1")?.textContent).toContain("SKILL.md 実践ガイド");
   });
 
-  it("h1 に 中級者完全攻略ガイド が含まれる", () => {
+  it("h2 が 17 本（全セクション数と一致）", () => {
     const { container } = render(<Page />);
-    expect(container.querySelector("h1")?.textContent).toContain("中級者完全攻略ガイド");
-  });
-
-  it("h2 が 9 本（セクション数と一致）", () => {
-    const { container } = render(<Page />);
-    expect(container.querySelectorAll("h2").length).toBe(9);
+    expect(container.querySelectorAll("h2").length).toBe(17);
   });
 
   it("外部リンクに target=_blank と rel=noopener noreferrer が付与されている", () => {
     const { container } = render(<Page />);
     const external = Array.from(container.querySelectorAll('a[href^="http"]'));
+    expect(external.length).toBeGreaterThan(0);
     for (const a of external) {
       expect(a.getAttribute("target")).toBe("_blank");
       expect(a.getAttribute("rel")).toBe("noopener noreferrer");
@@ -47,3 +43,4 @@ describe("/claude/skill-guide-intermediate 契約テスト", () => {
     }
   });
 });
+
