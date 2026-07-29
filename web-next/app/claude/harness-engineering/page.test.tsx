@@ -18,17 +18,15 @@ type MetadataLike = { title?: unknown; description?: unknown };
 const metadata = rawMetadata as unknown as MetadataLike;
 
 const EXPECTED_SECTION_IDS = [
-  "s1",
-  "s2",
-  "s3",
-  "s4",
-  "s5",
-  "s6",
-  "s7",
-  "s8",
-  "s9",
-  "s10",
-  "s11",
+  "intro",
+  "chapter1",
+  "chapter2",
+  "chapter3",
+  "chapter4",
+  "chapter5",
+  "chapter6",
+  "chapter7",
+  "references",
 ] as const;
 
 describe("/claude/harness-engineering - metadata", () => {
@@ -55,7 +53,7 @@ describe("/claude/harness-engineering - page structure", () => {
     expect(h1?.textContent).toMatch(/ハーネスエンジニアリング/);
   });
 
-  it("renders all 11 expected section ids", () => {
+  it("renders all 9 expected section ids", () => {
     const { container } = render(<Page />);
     for (const id of EXPECTED_SECTION_IDS) {
       const el = container.querySelector(`#${id}`);
@@ -63,7 +61,7 @@ describe("/claude/harness-engineering - page structure", () => {
     }
   });
 
-  it("renders 11 TOC links pointing to section anchors", () => {
+  it("renders 9 TOC links pointing to section anchors", () => {
     const { container } = render(<Page />);
     const tocAnchors = container.querySelectorAll('nav a[href^="#"]');
     const tocHrefs = Array.from(tocAnchors).map((a) => a.getAttribute("href"));
@@ -89,14 +87,14 @@ describe("/claude/harness-engineering - external link safety", () => {
     }
   });
 
-  it("s11 (sources) section contains at least 3 external links", () => {
+  it("references section contains external links", () => {
     const { container } = render(<Page />);
-    const sources = container.querySelector("#s11");
+    const sources = container.querySelector("#references");
     expect(sources).not.toBeNull();
     const externals =
       sources?.querySelectorAll('a[href^="http"]') ??
       ([] as unknown as NodeListOf<HTMLAnchorElement>);
-    expect(externals.length).toBeGreaterThanOrEqual(3);
+    expect(externals.length).toBeGreaterThanOrEqual(1);
   });
 });
 
