@@ -128,6 +128,18 @@ describe("MermaidDiagram レイアウト規約", () => {
   });
 
   it.each([
+    [320, "320px"],
+    [0, "0px"],
+  ])("数値 maxHeight=%s を CSS 値 %s として適用する", async (maxHeight, expected) => {
+    const { container } = render(
+      <MermaidDiagram chart="stateDiagram-v2" maxHeight={maxHeight} />
+    );
+    await waitFor(() => {
+      expect((container.querySelector("svg") as SVGElement).style.maxHeight).toBe(expected);
+    });
+  });
+
+  it.each([
     "default",
     "forest",
     "neutral",
