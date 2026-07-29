@@ -72,6 +72,7 @@ describe("/claude/skill-guide-intermediate 契約テスト", () => {
     const text = step?.textContent?.replace(/\s+/g, " ") ?? "";
 
     expect(text).toContain("name と description は必須フィールド");
+    expect(text).toContain("ハイフンは先頭・末尾に使用不可、連続使用不可");
     expect(text).not.toContain("任意フィールド");
     expect(text).not.toContain("省略時");
     expect(text).not.toContain("任意。指定する場合");
