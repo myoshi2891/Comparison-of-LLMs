@@ -23,8 +23,8 @@ local_vars=$(grep -oE '^\s*--[a-zA-Z0-9_-]+\s*:' "$css_file" \
 # 未定義変数だけを出力（ローカル定義でも globals.css 定義でもないもの）
 for var in $(grep -oE 'var\(\s*--[a-zA-Z0-9_-]+' "$css_file" \
   | sed -E 's/var\(\s*(--[a-zA-Z0-9_-]+)/\1/' | sort -u); do
-  echo "$local_vars" | grep -qWx "$var" && continue
-  grep -q "$var:" web-next/app/globals.css || echo "未定義の変数: $var"
+  echo "$local_vars" | grep -qWx -- "$var" && continue
+  grep -q -- "$var:" web-next/app/globals.css || echo "未定義の変数: $var"
 done
 ```
 
@@ -39,11 +39,30 @@ Playwright で描画座標を実測する。dev サーバーは負荷でクラ�
 # 1) 静的ビルドを配信（クリーンURL を *.html にマップする簡易サーバ）
 (cd web-next && bun run build)
 (cd web-next && python3 -c "import http.server,os;R=os.path.abspath('out');H=type('H',(http.server.SimpleHTTPRequestHandler,),{'translate_path':lambda s,p:(lambda f:f+'.html' if os.path.isfile(f+'.html') else (os.path.join(f,'index.html') if os.path.isdir(f) else f))(os.path.join(R,p.split('?')[0].strip('/')) or R),'log_message':lambda *a:None});http.server.HTTPServer(('127.0.0.1',8099),H).serve_forever()") &
+server_pid=$!
+cleanup() {
+  kill "$server_pid" 2>/dev/null || true
+  wait "$server_pid" 2>/dev/null || true
+}
+trap cleanup EXIT INT TERM
+
+# サーバーが 8099 番ポートで応答するまで待つ
+attempt=0
+until curl -fsS http://127.0.0.1:8099/ >/dev/null; do
+  attempt=$((attempt + 1))
+  if [ "$attempt" -ge 50 ]; then
+    echo "静的サーバーが起動しませんでした" >&2
+    exit 1
+  fi
+  sleep 0.2
+done
+
 # 2) scraper の Playwright で各要素の bounding box を測る
 (cd scraper && uv run python <検証スクリプト>)
 ```
 
 判定の目安:
+
 - `|leftGap - rightGap| > 16px` → 左右非対称（左寄せ疑い）
 - `svg.right > wrapper.right` → SVG が切れている
 - `<p> を直接子に持つ最幅要素 > 1520px`（1920 幅時）→ 本文が広すぎ
@@ -116,8 +135,16 @@ export default async function Page() {
 ## WAI-ARIA タブ UI 完全実装（Roving tabindex パターン）
 
 ```tsx
+const AUTOMATIC_ACTIVATION: boolean = false; // false: manual、true: automatic
+const [focusedIndex, setFocusedIndex] = useState(() =>
+  Math.max(0, TABS.findIndex((tab) => tab.id === active))
+);
+
 const focusTab = (index: number) => {
-  const next = TABS[(index + TABS.length) % TABS.length];
+  const nextIndex = (index + TABS.length) % TABS.length;
+  const next = TABS[nextIndex];
+  setFocusedIndex(nextIndex);
+  if (AUTOMATIC_ACTIVATION) setActive(next.id);
   document.getElementById(`tab-${next.id}`)?.focus();
 };
 
@@ -148,8 +175,12 @@ const handleTabKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: 
       role="tab"
       aria-selected={active === t.id}
       aria-controls={`panel-${t.id}`}
-      tabIndex={active === t.id ? 0 : -1}
-      onClick={() => setActive(t.id)}
+      tabIndex={focusedIndex === index ? 0 : -1}
+      onFocus={() => setFocusedIndex(index)}
+      onClick={() => {
+        setFocusedIndex(index);
+        setActive(t.id);
+      }}
       onKeyDown={(event) => handleTabKeyDown(event, index)}
     >
       {t.label}
@@ -198,6 +229,7 @@ WAI-ARIA 使い分け早見表:
 ```
 
 判断基準:
+
 - 左寄せが正しい図解: 縦タイムライン・積層バー・ファイルツリー・箇条書き → 触らない
 - ブロックごと中央寄せ（決定木など): `.decisionTree { width: fit-content; max-width: 100%; margin: 0 auto }`
 
