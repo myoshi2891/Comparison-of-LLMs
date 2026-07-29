@@ -10,6 +10,10 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+    />
     <style>
       :root {
         --bg: #07111e;
@@ -49,25 +53,19 @@
       /* ---------- layout ---------- */
       .layout {
         display: block;
-        max-width: var(--maxw);
-        margin: 0 auto;
-        padding: 0 24px;
+        width: 100%;
+        padding: 0;
       }
       .side-nav {
         position: fixed;
         top: 0;
-        left: calc((100% - var(--maxw)) / 2);
+        left: 0;
         width: 280px;
         height: 100vh;
         overflow-y: auto;
         padding: 32px 20px 32px 24px;
         border-right: 1px solid var(--border);
         background: var(--bg);
-      }
-      @media (max-width: 1500px) {
-        .side-nav {
-          left: 0;
-        }
       }
       .side-nav-title {
         font-size: 12px;
@@ -126,31 +124,27 @@
         cursor: pointer;
       }
       .main {
-        margin-left: 328px;
-        padding: 56px 8px 100px;
+        margin-left: 280px;
+        padding: 56px 56px 100px;
         width: auto;
+        max-width: none;
       }
-      @media (max-width: 1500px) {
+      @media (max-width: 900px) {
         .main {
           margin-left: 0;
-          padding-top: 88px;
+          padding: 88px 20px 100px;
         }
         .nav-toggle {
           display: block;
         }
         .side-nav {
           transform: translateX(-100%);
-          visibility: hidden;
-          pointer-events: none;
-          transition: transform 0.25s ease, visibility 0s 0.25s;
+          transition: transform 0.25s ease;
           z-index: 49;
           box-shadow: 20px 0 60px rgba(0, 0, 0, 0.5);
         }
         .side-nav.open {
           transform: translateX(0);
-          visibility: visible;
-          pointer-events: auto;
-          transition-delay: 0s;
         }
       }
 
@@ -256,6 +250,10 @@
         color: var(--text);
         font-size: 14px;
         line-height: 1.7;
+      }
+      pre code.hljs {
+        background: none !important;
+        padding: 0 !important;
       }
 
       /* ---------- tables ---------- */
@@ -382,9 +380,9 @@
     </style>
   </head>
   <body>
-    <button type="button" class="nav-toggle" id="navToggle" aria-label="目次を開く" aria-expanded="false" aria-controls="sideNav">☰</button>
+    <button class="nav-toggle" id="navToggle" aria-label="目次を開く">☰</button>
     <div class="layout">
-      <nav class="side-nav" id="sideNav" aria-label="目次">
+      <nav class="side-nav" aria-label="目次">
         <div class="side-nav-title">目次</div>
         <ul>
           <li>
@@ -594,11 +592,7 @@
         </p>
         <pre class="mermaid">
 flowchart TB
-    subgraph outer["User Harness（ユーザーハーネス）&lt;br/&gt;私たちが自分のユースケース・システム向けに構築する追加の制約"]
-        subgraph inner["Agent Harness（エージェントハーネス／ビルダーハーネス）&lt;br/&gt;コーディングエージェント製品にあらかじめ組み込まれた基盤"]
-            model(("モデル（LLM）&lt;br/&gt;推論そのもの"))
-        end
-    end</pre
+    U["User Harness（ユーザーハーネス）&lt;br/&gt;一番外側の層 ― 自分たちで追加する仕組み"] --&gt; G["Agent Harness（エージェントハーネス）&lt;br/&gt;その内側 ― 製品にあらかじめ内蔵された基盤"] --&gt; M(("モデル（LLM）&lt;br/&gt;中心 ― 推論エンジンそのもの"))</pre
         >
         <ul>
           <li><strong>モデル</strong>：LLM本体。推論エンジンそのもの</li>
@@ -946,9 +940,7 @@ flowchart LR
         <p>
           既存のリポジトリ（READMEが古い、ドキュメントが更新されていないなど、よくある現場の状態）を対象にする場合、最初にやるべきことは「今のコードベースを理解したコンテキスト文書」を作ることです。<code>repo-research</code>のようなSkillを使い、次のように指示します。
         </p>
-        <pre
-          class="text"
-        ><code>このリポジトリを調査して、プロジェクトコンテキスト文書を作成してください</code></pre>
+        <pre><code class="language-plaintext">このリポジトリを調査して、プロジェクトコンテキスト文書を作成してください</code></pre>
         <p>
           これにより、技術スタック・ディレクトリ構成・データモデル・外部連携などをまとめた<code>.agents/rules/project-context.md</code>が生成されます。以後のすべての会話がこの文書を自動的に参照するようになります。
         </p>
@@ -959,7 +951,7 @@ flowchart LR
           次に、「非交渉の原則（non-negotiable
           principles）」を定めた<strong>プロジェクト憲法</strong>を用意します。これは<code>.specify/memory/constitution.md</code>のようなファイルに保存され、後述するSDDサイクルの「計画」フェーズと「分析」フェーズで、この憲法に違反していないかが自動的にチェックされます。
         </p>
-        <pre class="text"><code>/speckit.constitution
+        <pre><code class="language-plaintext">/speckit.constitution
 このプロジェクトは1人の開発者が保守する小規模なエージェントです。
 以下の3原則を設定してください：
 (1) すべてのデータベース操作はツール定義ファイル経由で行い、
@@ -1017,7 +1009,7 @@ flowchart LR
           MCP（Model Context
           Protocol）は、エージェントが外部システムと接続するための標準プロトコルです。BigQueryを例にすると、MCPサーバーに接続することで、エージェントは学習データにある古いスキーマ情報に頼るのではなく、<strong>実際のテーブル定義をその場で確認しながら</strong>仕様書やコードを生成できます。
         </p>
-        <pre class="json"><code>{
+        <pre><code class="language-json">{
   "mcpServers": {
     "bigquery": {
       "serverUrl": "https://bigquery.googleapis.com/mcp",
@@ -1538,61 +1530,83 @@ flowchart LR
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/mermaid@11.12.0/dist/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
     <script>
+      // ---------- syntax highlighting (highlight.js) ----------
+      (function () {
+        try {
+          if (typeof hljs === 'undefined') return;
+          document.querySelectorAll('pre code').forEach(function (block) {
+            hljs.highlightElement(block);
+          });
+        } catch (e) {
+          console.error('highlight.js init failed', e);
+        }
+      })();
+
       // ---------- sidebar toggle (mobile) ----------
       (function () {
         var btn = document.getElementById('navToggle');
         var nav = document.querySelector('.side-nav');
         if (!btn || !nav) return;
         btn.addEventListener('click', function () {
-          var open = nav.classList.toggle('open');
-          btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-          btn.setAttribute('aria-label', open ? '目次を閉じる' : '目次を開く');
+          nav.classList.toggle('open');
         });
         nav.querySelectorAll('a.nav-link').forEach(function (a) {
           a.addEventListener('click', function () {
             nav.classList.remove('open');
-            btn.setAttribute('aria-expanded', 'false');
-            btn.setAttribute('aria-label', '目次を開く');
           });
         });
       })();
 
       // ---------- mermaid init (isolated, guarded) ----------
+      // フォント読み込み完了を待ってから描画する。
+      // (Webフォントの読み込み前にテキスト幅を計測すると、
+      //  ノード/サブグラフの箱がテキストより小さく計算され、文字が重なる原因になる)
       (function () {
-        try {
-          if (typeof mermaid === 'undefined') return;
-          mermaid.initialize({
-            startOnLoad: false,
-            theme: 'base',
-            securityLevel: 'loose',
-            themeVariables: {
-              fontSize: '16px',
-              background: '#0c1930',
-              primaryColor: '#132844',
-              primaryTextColor: '#dbe6f5',
-              primaryBorderColor: '#7c9eff',
-              lineColor: '#7c9eff',
-              secondaryColor: '#0f2038',
-              tertiaryColor: '#0a1626',
-              textColor: '#dbe6f5',
-              mainBkg: '#132844',
-              nodeBorder: '#7c9eff',
-              clusterBkg: '#0f2038',
-              clusterBorder: '#2a4570',
-              edgeLabelBackground: '#0c1930',
-              actorBkg: '#132844',
-              actorBorder: '#7c9eff',
-              actorTextColor: '#dbe6f5',
-              signalColor: '#7c9eff',
-              signalTextColor: '#dbe6f5',
-            },
-            flowchart: { useMaxWidth: false, htmlLabels: true, curve: 'basis' },
-            sequence: { useMaxWidth: false },
-          });
-          mermaid.run({ querySelector: 'pre.mermaid' });
-        } catch (e) {
-          console.error('mermaid init failed', e);
+        function renderMermaid() {
+          try {
+            if (typeof mermaid === 'undefined') return;
+            var fontFamily = '"Noto Sans JP","Hiragino Kaku Gothic ProN",sans-serif';
+            mermaid.initialize({
+              startOnLoad: false,
+              theme: 'base',
+              securityLevel: 'loose',
+              themeVariables: {
+                fontFamily: fontFamily,
+                fontSize: '16px',
+                background: '#0c1930',
+                primaryColor: '#132844',
+                primaryTextColor: '#dbe6f5',
+                primaryBorderColor: '#7c9eff',
+                lineColor: '#7c9eff',
+                secondaryColor: '#0f2038',
+                tertiaryColor: '#0a1626',
+                textColor: '#dbe6f5',
+                mainBkg: '#132844',
+                nodeBorder: '#7c9eff',
+                clusterBkg: '#0f2038',
+                clusterBorder: '#2a4570',
+                edgeLabelBackground: '#0c1930',
+                actorBkg: '#132844',
+                actorBorder: '#7c9eff',
+                actorTextColor: '#dbe6f5',
+                signalColor: '#7c9eff',
+                signalTextColor: '#dbe6f5',
+              },
+              flowchart: { useMaxWidth: false, htmlLabels: true, curve: 'basis' },
+              sequence: { useMaxWidth: false },
+            });
+            mermaid.run({ querySelector: 'pre.mermaid' });
+          } catch (e) {
+            console.error('mermaid init failed', e);
+          }
+        }
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(renderMermaid);
+        } else {
+          renderMermaid();
         }
       })();
 
