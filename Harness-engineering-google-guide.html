@@ -140,12 +140,17 @@
         }
         .side-nav {
           transform: translateX(-100%);
-          transition: transform 0.25s ease;
+          visibility: hidden;
+          pointer-events: none;
+          transition: transform 0.25s ease, visibility 0s 0.25s;
           z-index: 49;
           box-shadow: 20px 0 60px rgba(0, 0, 0, 0.5);
         }
         .side-nav.open {
           transform: translateX(0);
+          visibility: visible;
+          pointer-events: auto;
+          transition-delay: 0s;
         }
       }
 
@@ -377,9 +382,9 @@
     </style>
   </head>
   <body>
-    <button class="nav-toggle" id="navToggle" aria-label="目次を開く">☰</button>
+    <button type="button" class="nav-toggle" id="navToggle" aria-label="目次を開く" aria-expanded="false" aria-controls="sideNav">☰</button>
     <div class="layout">
-      <nav class="side-nav" aria-label="目次">
+      <nav class="side-nav" id="sideNav" aria-label="目次">
         <div class="side-nav-title">目次</div>
         <ul>
           <li>
@@ -1540,11 +1545,15 @@ flowchart LR
         var nav = document.querySelector('.side-nav');
         if (!btn || !nav) return;
         btn.addEventListener('click', function () {
-          nav.classList.toggle('open');
+          var open = nav.classList.toggle('open');
+          btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+          btn.setAttribute('aria-label', open ? '目次を閉じる' : '目次を開く');
         });
         nav.querySelectorAll('a.nav-link').forEach(function (a) {
           a.addEventListener('click', function () {
             nav.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
+            btn.setAttribute('aria-label', '目次を開く');
           });
         });
       })();
