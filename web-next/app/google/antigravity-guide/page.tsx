@@ -287,7 +287,7 @@ export default function AntigravityCliGuidePage() {
 
               <h3>初回認証シーケンス</h3>
               <p>
-                実行時にキーリング (`keychain` / `secret-service`) を参照し、Web 認証または API キー設定を行います。
+                実行時にキーリング (<code>keychain</code> / <code>secret-service</code>) を参照し、Web 認証または API キー設定を行います。
               </p>
 
               <div className={styles.mermaidWrap}>
@@ -301,7 +301,7 @@ export default function AntigravityCliGuidePage() {
                 <span className={styles.idx}>02 /</span> 初回起動 & プロジェクトの基本操作
               </h2>
               <p>
-                プロジェクトディレクトリに移動し、`agy` コマンドで起動します。
+                プロジェクトディレクトリに移動し、<code>agy</code> コマンドで起動します。
               </p>
 
               <div className={styles.codeWrap}>
@@ -430,7 +430,7 @@ export default function AntigravityCliGuidePage() {
                     <tr>
                       <td><code>/review</code></td>
                       <td>コードレビューを実施し潜在的なバグ・設計不備を指摘</td>
-                      <td>`HEAD` や指定コミットに対して実行</td>
+                      <td><code>HEAD</code> や指定コミットに対して実行</td>
                     </tr>
                     <tr>
                       <td><code>/test</code></td>
@@ -440,12 +440,12 @@ export default function AntigravityCliGuidePage() {
                     <tr>
                       <td><code>/mcp</code></td>
                       <td>接続中の MCP (Model Context Protocol) サーバー状態を表示・管理</td>
-                      <td>`list`, `reload`</td>
+                      <td><code>list</code>, <code>reload</code></td>
                     </tr>
                     <tr>
                       <td><code>/skill</code></td>
                       <td>使用可能な Skills 一覧の確認および明示的発動</td>
-                      <td>`list`, `run <name>`</td>
+                      <td><code>list</code>, <code>run &lt;name&gt;</code></td>
                     </tr>
                     <tr>
                       <td><code>/plugin</code></td>
@@ -475,12 +475,12 @@ export default function AntigravityCliGuidePage() {
                     <tr>
                       <td><code>/export</code></td>
                       <td>セッションログを Markdown または HTML として出力</td>
-                      <td>`export.md`</td>
+                      <td><code>export.md</code></td>
                     </tr>
                     <tr>
                       <td><code>/import</code></td>
                       <td>他のセッションやAntigravity GUIからの会話インポート</td>
-                      <td>`<path>`</td>
+                      <td><code>&lt;path&gt;</code></td>
                     </tr>
                     <tr>
                       <td><code>/exit</code> (または <code>/quit</code>)</td>
@@ -500,7 +500,7 @@ export default function AntigravityCliGuidePage() {
 
               <h3>1. `/diff` コマンドビューア</h3>
               <p>
-                <code>/diff</code> を実行すると、TUI 上でインタラクティブな Diff ビューアが開きます。`Tab` キーでビューモードを切り替えられます。
+                <code>/diff</code> を実行すると、TUI 上でインタラクティブな Diff ビューアが開きます。<code>Tab</code> キーでビューモードを切り替えられます。
               </p>
 
               <div className={styles.mermaidWrap}>
@@ -509,7 +509,7 @@ export default function AntigravityCliGuidePage() {
 
               <h3>2. `/compact` とコンテキスト圧縮</h3>
               <p>
-                トークン数が 100k を超えた場合、自動または `/compact` コマンドで重要な決定事項・コード変更要約を残し、会話バッファを削減します。
+                トークン数が 100k を超えた場合、自動または <code>/compact</code> コマンドで重要な決定事項・コード変更要約を残し、会話バッファを削減します。
               </p>
 
               <h3>3. タスクバックグラウンド管理 (Background Tasks)</h3>
