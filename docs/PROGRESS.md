@@ -1,7 +1,7 @@
 # プロジェクト進捗・ステータス (PROGRESS.md)
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
-> - 最終更新日: **Updated 2026-07-28**
+> - 最終更新日: **Updated 2026-07-29**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -19,6 +19,7 @@
 
 ## 最近の追加内容
 
+- **SKILL.md 実践ガイド — Claude Code Agent Skills のベストプラクティス（/claude/skill-guide-intermediate）の Pure JSX 完全置き換え移行**: `Skill-md-best-practices.html` を `web-next/app/claude/skill-guide-intermediate/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全17セクション・全表・全コードブロック・5 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`Claude` カテゴリ）登録を完了。既存の旧 `skill-guide-intermediate` コンテンツと完全入れ替え完了。原本 `Skill-md-best-practices.html` / `Skill-md-best-practices.md` は `archive/html/Anthropic/` および `archive/md/Anthropic/` へ `git mv` 退避保存。契約テストを更新。
 - **レビュー追加指摘のアクセシビリティ・Mermaid・文書整合性修正**: Claude Agent / Fable 5 / AI SDD のモバイル目次で状態依存の `aria-label` と `aria-expanded` を同期し、閉状態を `visibility: hidden` + `pointer-events: none`、開状態を visible + interactive に統一。
   Gemini 静的 HTML の目次にも一意な ID / `aria-controls` / `aria-expanded` と開閉ラベル同期を追加。Harness Mermaid ソースをカラム0へ修正し、2つの Skill HTML では描画 Promise の rejection 時に既存 SVG を保持しつつ fallback 文言を表示。
   Claude Platform の `name` / `description` を任意とする frontmatter 説明と Fable 5 のヒーロー改訂日を基準日に同期。Vitest **1232 件** / typecheck 全 Green、lint は既存ベースラインの **27 errors / 2 warnings**（ビルド・目視確認は依頼により省略）。
