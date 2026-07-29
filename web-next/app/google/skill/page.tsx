@@ -26,6 +26,22 @@ function ExtRef({ href, children }: { href: string; children: React.ReactNode })
   );
 }
 
+const SKILL_THEME_VARS: Record<string, string> = {
+  fontFamily: "'IBM Plex Sans JP', 'IBM Plex Mono', sans-serif",
+  fontSize: "16px",
+  background: "#FFFFFF",
+  primaryColor: "#ECEEFC",
+  primaryTextColor: "#14161C",
+  primaryBorderColor: "#3648D6",
+  lineColor: "#4A4D57",
+  secondaryColor: "#FBF0DF",
+  tertiaryColor: "#E4F4EE",
+  actorBkg: "#14161C",
+  actorBorder: "#3648D6",
+  actorTextColor: "#FFFFFF",
+  signalTextColor: "#14161C",
+};
+
 const DIAG_1 = `flowchart LR
 A["Discovery: 全スキルのdescriptionを事前ロード"] --> B{"タスクと意味的に関連するか"}
 B -- "関連なし" --> C["休眠状態を維持(コストほぼゼロ)"]
@@ -267,7 +283,7 @@ export default function AgentSkillsGuidePage() {
 
             <h3 className={styles.h3}>三段階のロード</h3>
             <div className={styles.diagramWrap}>
-              <MermaidDiagram chart={DIAG_1} />
+              <MermaidDiagram chart={DIAG_1} theme="base" themeVariables={SKILL_THEME_VARS} />
               <div className={styles.diagramCaption}>
                 図1: 段階的開示（Progressive Disclosure）の3層モデル
               </div>
@@ -279,7 +295,7 @@ export default function AgentSkillsGuidePage() {
 
             <h3 className={styles.h3}>コンテキストウィンドウ内での実際の流れ</h3>
             <div className={styles.diagramWrap}>
-              <MermaidDiagram chart={DIAG_2} />
+              <MermaidDiagram chart={DIAG_2} theme="base" themeVariables={SKILL_THEME_VARS} />
               <div className={styles.diagramCaption}>
                 図2: PDFスキルを例にしたコンテキストウィンドウの推移
               </div>
@@ -415,7 +431,7 @@ export default function AgentSkillsGuidePage() {
 
             <h3 className={styles.h3}>発見・起動・実行の3フェーズ</h3>
             <div className={styles.diagramWrap}>
-              <MermaidDiagram chart={DIAG_3} />
+              <MermaidDiagram chart={DIAG_3} theme="base" themeVariables={SKILL_THEME_VARS} />
               <div className={styles.diagramCaption}>図3: スキルのライフサイクル3フェーズ</div>
             </div>
             <p className={styles.p}>
@@ -482,7 +498,7 @@ export default function AgentSkillsGuidePage() {
 
             <h3 className={styles.h3}>セマンティックトリガリングの仕組み</h3>
             <div className={styles.diagramWrap}>
-              <MermaidDiagram chart={DIAG_4} />
+              <MermaidDiagram chart={DIAG_4} theme="base" themeVariables={SKILL_THEME_VARS} />
               <div className={styles.diagramCaption}>
                 図4: Antigravityにおけるセマンティックトリガリングと実行モード分岐
               </div>
@@ -509,7 +525,7 @@ export default function AgentSkillsGuidePage() {
             </p>
 
             <div className={styles.diagramWrap}>
-              <MermaidDiagram chart={DIAG_5} />
+              <MermaidDiagram chart={DIAG_5} theme="base" themeVariables={SKILL_THEME_VARS} />
               <div className={styles.diagramCaption}>図5: SKILL.md 実装ステップ（9段階）</div>
             </div>
 
