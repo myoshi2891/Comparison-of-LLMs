@@ -19,6 +19,8 @@
 
 ## 最近の追加内容
 
+- **Google Antigravity 完全ガイド — エコシステムとベストプラクティス（/google/antigravity-best-practices）の Pure JSX 完全置き換え移行**: `Google-antigravity-best-practices.html` を `web-next/app/google/antigravity-best-practices/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全15セクション（全15H2セクション、全表、全コードブロック、3 Mermaid図、全参考文献等）・TOCスクロール追従（`TocObserver.tsx`）・横幅画面いっぱい（100%）・`page-registry.ts` 登録・更新を完了。旧 `/google/skill-guide-intermediate` を新URLへ完全置き換え完了。原本 `Google-antigravity-best-practices.html` / `Google-antigravity-best-practices.md` は `archive/html/google/` および `archive/md/google/` へ `git mv` 退避保存。契約テストを更新。
+
 - **SKILL.md 実践ベストプラクティスガイド（/google/skill-guide）の Pure JSX 完全置き換え移行**: `Skill-md-antigravity-best-practices.html` を `web-next/app/google/skill-guide/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全12セクション（全12H2セクション、全表、全コードブロック、2 Mermaid図、全参考文献等）・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts` 登録確認を完了。既存の旧 `/google/skill-guide` コンテンツと完全入れ替え完了。原本 `Skill-md-antigravity-best-practices.html` / `Skill-md-antigravity-best-practices.md` は `archive/html/google/` および `archive/md/google/` へ `git mv` 退避保存。契約テスト（全12セクション検証）を更新。
 
 - **Google Antigravity AI仕様駆動開発ガイド（/google/agent）の Pure JSX 完全置き換え移行**: `Antigravity-spec-driven-dev-guide.html` を `web-next/app/google/agent/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全10セクション（イントロ〜参考文献）・全表・全コードブロック・6 Mermaid図 (`diagram-0`〜`diagram-5`)・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`Antigravity AI仕様駆動開発`）登録を完了。既存の旧 `/google/agent`（Gemini マルチエージェント）コンテンツと完全入れ替え完了。原本 `Antigravity-spec-driven-dev-guide.html` および `Antigravity-spec-driven-dev-guide.md` は `archive/` へ `git mv` 退避保存。契約テスト（`section-1`〜`section-10` 検証）を更新。
