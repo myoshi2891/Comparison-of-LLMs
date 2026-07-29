@@ -1065,7 +1065,7 @@ export default function AntigravityBestPracticesPage() {
           <p>公式ドキュメントは両者の違いを次のように整理しています。</p>
           <ul>
             <li>
-              <strong>Rules</strong>:プロンプトレベルで、恒期的かつ再利用可能なコンテキストを与える
+              <strong>Rules</strong>:プロンプトレベルで、恒久的かつ再利用可能なコンテキストを与える
             </li>
             <li>
               <strong>Workflows</strong>
@@ -1225,7 +1225,7 @@ export default function AntigravityBestPracticesPage() {
           <p>
             Artifactsには対応する Review Policy が設定でき、"Always
             Proceed"(常にエージェント任せ)から"Agent Decides to Request
-            Review"(常に人間の確認を求める)まで、リスク許容度に応じて調整できます。
+            Review"(エージェントが必要と判断した場合に人間のレビューを求める)まで、リスク許容度に応じて調整できます。
           </p>
           <div className={styles.tableWrap}>
             <table>

@@ -344,7 +344,7 @@ export default function Page() {
         <p>
           SKILL.md の <code className={styles.codeInline}>name</code> と{" "}
           <code className={styles.codeInline}>description</code>{" "}
-          は推奨される任意フィールドである。省略時、nameにはディレクトリ名または同等の識別子が使われ、descriptionには本文の最初の段落が使われる。指定する場合のバリデーションルールは以下の通り。
+          は必須フィールドである。バリデーションルールは以下の通り。
         </p>
         <div className={styles.tableWrap}>
           <table className={styles.table}>
@@ -360,7 +360,7 @@ export default function Page() {
                   <code className={styles.codeInline}>name</code>
                 </td>
                 <td>
-                  任意。指定する場合は最大64文字、小文字英数字とハイフンのみ、XMLタグ不可、予約語(anthropic,
+                  必須。最大64文字、小文字英数字とハイフンのみ、XMLタグ不可、予約語(anthropic,
                   claude)不可
                 </td>
               </tr>
@@ -369,8 +369,8 @@ export default function Page() {
                   <code className={styles.codeInline}>description</code>
                 </td>
                 <td>
-                  任意。指定する場合は空文字不可、最大1,024文字(Claude Code上の一覧表示では
-                  when_to_use と合算で1,536文字が上限)、XMLタグ不可
+                  必須。空文字不可、最大1,024文字(Claude Code上の一覧表示では when_to_use
+                  と合算で1,536文字が上限)、XMLタグ不可
                 </td>
               </tr>
             </tbody>
