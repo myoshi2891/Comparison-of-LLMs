@@ -1,62 +1,38 @@
-// Phase C-2 [Green] contract test.
-// Validates the successful implementation of app/gemini/agent/page.tsx.
-
-/**
- * Phase C-2 契約テスト (/gemini/agent)。
- *
- * 固定する契約:
- * - `metadata` が export され、title に「Gemini」を含む
- * - `<h1>` が 1 つ存在し、`Gemini` を含む
- * - 18 個の section id が存在する (s01〜s17 + sources)
- *   (legacy は <div class="section"> × 18、id 属性なし → synthetic id 付与)
- * - 18 個の TOC リンクが `#section-id` 形式で存在する
- * - 外部リンク (http/https) には全て `target="_blank"` かつ
- *   `rel="noopener noreferrer"` が付与されている
- * - `sources` セクション内に 25 件以上の外部リンクが存在する
- * - 静的検査: 生 HTML 流し込み API (React の XSS 危険 prop) を使用していない
- */
+// Contract test for /google/agent (Antigravity Spec-Driven Development Guide).
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it } from "vitest";
-import GeminiAgentPage, { metadata as rawMetadata } from "@/app/google/agent/page";
+import AntigravitySpecPage, { metadata as rawMetadata } from "@/app/google/agent/page";
 
-const Page = GeminiAgentPage as unknown as () => ReactElement;
-// Next.js の Metadata 型を避けるための最小ローカル型 (実体は Metadata オブジェクト)。
+const Page = AntigravitySpecPage as unknown as () => ReactElement;
 type MetadataLike = { title?: unknown; description?: unknown };
 const metadata = rawMetadata as unknown as MetadataLike;
 
 const EXPECTED_SECTION_IDS = [
-  "s01",
-  "s02",
-  "s03",
-  "s04",
-  "s05",
-  "s06",
-  "s07",
-  "s08",
-  "s09",
-  "s10",
-  "s11",
-  "s12",
-  "s13",
-  "s14",
-  "s15",
-  "s16",
-  "s17",
-  "sources",
+  "section-1",
+  "section-2",
+  "section-3",
+  "section-4",
+  "section-5",
+  "section-6",
+  "section-7",
+  "section-8",
+  "section-9",
+  "section-10",
 ] as const;
 
 describe("/google/agent - metadata", () => {
-  it("exports a metadata object with title containing Gemini", () => {
+  it("exports a metadata object with title containing Antigravity and Spec-Driven", () => {
     expect(metadata).toBeDefined();
     const title =
       typeof metadata.title === "string"
         ? metadata.title
         : (metadata.title as { default?: string } | undefined)?.default;
-    expect(title).toMatch(/Gemini/);
+    expect(title).toMatch(/Antigravity/);
+    expect(title).toMatch(/仕様駆動開発/);
   });
 
   it("exports a metadata object with non-empty description", () => {
@@ -66,14 +42,14 @@ describe("/google/agent - metadata", () => {
 });
 
 describe("/google/agent - page structure", () => {
-  it("renders an <h1> containing 'Gemini'", () => {
+  it("renders an <h1> containing 'AI仕様駆動開発'", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
     expect(h1).not.toBeNull();
-    expect(h1?.textContent).toMatch(/Gemini/);
+    expect(h1?.textContent).toMatch(/AI仕様駆動開発/);
   });
 
-  it("renders all 18 expected section ids", () => {
+  it("renders all 10 expected section ids", () => {
     const { container } = render(<Page />);
     for (const id of EXPECTED_SECTION_IDS) {
       const el = container.querySelector(`#${id}`);
@@ -81,9 +57,9 @@ describe("/google/agent - page structure", () => {
     }
   });
 
-  it("renders 18 TOC links pointing to all section anchors", () => {
+  it("renders 10 TOC links pointing to all section anchors", () => {
     const { container } = render(<Page />);
-    const tocAnchors = container.querySelectorAll('nav a[href^="#"]');
+    const tocAnchors = container.querySelectorAll('nav a[href^="#section-"]');
     const tocHrefs = Array.from(tocAnchors).map((a) => a.getAttribute("href"));
     const expectedHrefs = EXPECTED_SECTION_IDS.map((id) => `#${id}`);
     expect(tocHrefs).toHaveLength(expectedHrefs.length);
@@ -110,21 +86,21 @@ describe("/google/agent - external link safety", () => {
     }
   });
 
-  it("sources section contains at least 25 external links", () => {
+  it("section-10 contains at least 12 external links", () => {
     const { container } = render(<Page />);
-    const sources = container.querySelector("#sources");
-    expect(sources).not.toBeNull();
-    if (!sources) throw new Error("sources is null");
-    const externals = sources.querySelectorAll('a[href^="http"]');
-    expect(externals.length).toBeGreaterThanOrEqual(25);
+    const section10 = container.querySelector("#section-10");
+    expect(section10).not.toBeNull();
+    if (!section10) throw new Error("section-10 is null");
+    const externals = section10.querySelectorAll('a[href^="http"]');
+    expect(externals.length).toBeGreaterThanOrEqual(12);
   });
 });
 
 describe("/google/agent - static source safety", () => {
   it("does not use the React raw-HTML injection prop", () => {
     const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
-    // オブフスケート (false positive / prompt hook 誤検知回避)。
     const needle = ["danger", "ously", "Set", "Inner", "HTML"].join("");
     expect(source.includes(needle)).toBe(false);
   });
 });
+
