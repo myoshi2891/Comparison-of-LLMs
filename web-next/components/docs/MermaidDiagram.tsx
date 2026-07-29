@@ -55,9 +55,7 @@ function applySequenceDiagramColorOverrides(
   const signalTxtColor =
     themeVariables?.signalTextColor ?? themeVariables?.primaryTextColor ?? "#000000";
   root
-    .querySelectorAll<SVGTextElement>(
-      "text.messageText, text.loopText, text.labelText"
-    )
+    .querySelectorAll<SVGTextElement>("text.messageText, text.loopText, text.labelText")
     .forEach((el) => {
       el.style.setProperty("fill", signalTxtColor, "important");
       el.querySelectorAll<SVGTSpanElement>("tspan").forEach((ts) => {
@@ -112,7 +110,14 @@ export default function MermaidDiagram({
           const svg = ref.current?.querySelector("svg");
           if (svg instanceof SVGElement) {
             svg.style.maxWidth = "100%";
-            if (maxHeight !== undefined) svg.style.maxHeight = String(maxHeight);
+            if (maxHeight !== undefined) {
+              svg.style.maxHeight =
+                typeof maxHeight === "number"
+                  ? maxHeight === 0
+                    ? "0"
+                    : `${maxHeight}px`
+                  : maxHeight;
+            }
             svg.style.height = "auto";
           }
           // --- foreignObject 文字色後処理 ---

@@ -106,9 +106,7 @@ describe("MermaidDiagram レイアウト規約", () => {
   });
 
   it("利用者指定の fontSize より固定 16px を優先する", async () => {
-    render(
-      <MermaidDiagram chart="graph TD; A-->B" themeVariables={{ fontSize: "48px" }} />
-    );
+    render(<MermaidDiagram chart="graph TD; A-->B" themeVariables={{ fontSize: "48px" }} />);
     await waitFor(() => {
       expect(mermaid.initialize).toHaveBeenLastCalledWith(
         expect.objectContaining({
@@ -119,9 +117,7 @@ describe("MermaidDiagram レイアウト規約", () => {
   });
 
   it("maxHeight を描画後の svg に適用する", async () => {
-    const { container } = render(
-      <MermaidDiagram chart="stateDiagram-v2" maxHeight="460px" />
-    );
+    const { container } = render(<MermaidDiagram chart="stateDiagram-v2" maxHeight="460px" />);
     await waitFor(() => {
       expect((container.querySelector("svg") as SVGElement).style.maxHeight).toBe("460px");
     });
@@ -131,9 +127,7 @@ describe("MermaidDiagram レイアウト規約", () => {
     [320, "320px"],
     [0, "0px"],
   ])("数値 maxHeight=%s を CSS 値 %s として適用する", async (maxHeight, expected) => {
-    const { container } = render(
-      <MermaidDiagram chart="stateDiagram-v2" maxHeight={maxHeight} />
-    );
+    const { container } = render(<MermaidDiagram chart="stateDiagram-v2" maxHeight={maxHeight} />);
     await waitFor(() => {
       expect((container.querySelector("svg") as SVGElement).style.maxHeight).toBe(expected);
     });
