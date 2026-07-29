@@ -52,4 +52,15 @@ describe("/google/antigravity-best-practices 契約テスト", () => {
       expect(a.getAttribute("href")).not.toMatch(/\.html$/);
     }
   });
+
+  it("Rules と Agent Decides to Request Review の説明が正確である", () => {
+    const { container } = render(<Page />);
+    const text = container.textContent?.replace(/\s+/g, " ") ?? "";
+
+    expect(text).toContain("恒久的かつ再利用可能なコンテキスト");
+    expect(text).not.toContain("恒期的");
+    expect(text).toContain(
+      '"Agent Decides to Request Review"(エージェントが必要と判断した場合に人間のレビューを求める)'
+    );
+  });
 });

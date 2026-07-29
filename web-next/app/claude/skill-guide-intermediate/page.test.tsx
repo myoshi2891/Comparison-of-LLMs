@@ -65,4 +65,15 @@ describe("/claude/skill-guide-intermediate 契約テスト", () => {
     expect(css).toMatch(/\.sidebarOpen\s*\{[\s\S]*visibility:\s*visible/);
     expect(css).toMatch(/\.sidebarOpen\s*\{[\s\S]*pointer-events:\s*auto/);
   });
+
+  it("SKILL.md の name と description を必須フィールドとして説明する", () => {
+    const { container } = render(<Page />);
+    const step = container.querySelector("#step3");
+    const text = step?.textContent?.replace(/\s+/g, " ") ?? "";
+
+    expect(text).toContain("name と description は必須フィールド");
+    expect(text).not.toContain("任意フィールド");
+    expect(text).not.toContain("省略時");
+    expect(text).not.toContain("任意。指定する場合");
+  });
 });
