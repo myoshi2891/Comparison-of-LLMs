@@ -231,37 +231,20 @@ if (MINDMAP_IDS.includes(id)) {
 
 ---
 
-## stateDiagram-v2 個別制限 CSS（SKILL.md Part 4 詳細）
+## stateDiagram-v2 個別制限 API（SKILL.md Part 4 詳細）
 
 `stateDiagram-v2` はノード数が少ない（3〜5 状態程度）場合、Mermaid が広い `viewBox` を生成するため
 SVG を自然サイズで表示すると文字が巨大化する。**グローバルな `max-height` で全 SVG を一律制限してはならない**。
-問題のある図解 ID だけをピンポイントで制限する。
+問題のある図解だけを共有コンポーネントの API でピンポイント制限する。
 
-```css
-/*
- * ✅ 正解: 問題のある図解 ID だけを個別制限する
- * stateDiagram-v2 でノード数が少ない図解だけに適用。
- */
-:global(#diag-3 svg) {
-  max-height: 260px !important;
-  height: auto !important;
-  width: auto !important;
-  display: block;
-  margin: 0 auto;
-}
-
-:global(#diag-5 svg) {
-  max-height: 300px !important;
-  height: auto !important;
-  width: auto !important;
-  display: block;
-  margin: 0 auto;
-}
+```tsx
+<MermaidDiagram chart={DIAGRAM_3} id="diag-3" maxHeight="260px" />
+<MermaidDiagram chart={DIAGRAM_5} id="diag-5" maxHeight="300px" />
 ```
 
-> **手順**: 全図解をブラウザで目視確認し、巨大化している図の ID（`id` prop）を特定 →
-> その ID だけに `:global(#diag-N svg)` で `max-height` を設定 →
-> 高さが適切になるまで数値を微調整する。
+> **手順**: 全図解をブラウザで目視確認し、巨大化している図を特定 →
+> その図だけに `maxHeight` を指定 → 高さが適切になるまで数値を微調整する。
+> ページ CSS から SVG の幅・高さを直接上書きしない。
 
 ---
 

@@ -417,12 +417,12 @@ themeVariables: { fontSize: "1rem", ...themeVariables }
 
 **グローバルな `max-height` で全 SVG を一律制限してはならない**。コンパクトな図まで縮小されて見づらくなる。
 
-**正解: 問題のある図解 ID だけを個別に `:global(#diag-N svg)` でピンポイント制限する。**
+**正解: 問題のある図解だけに `MermaidDiagram` の `maxHeight` prop を指定する。**
 
-> **CSS 実装例**（`:global(#diag-N svg) { max-height: Xpx !important; ... }` のパターン）:
+> **実装例**（`<MermaidDiagram chart={DIAGRAM} maxHeight="300px" />` のパターン）:
 > `references/mermaid-v10-guide.md` §「stateDiagram-v2 個別制限 CSS」を参照。
 >
-> **手順**: 全図解をブラウザで目視確認し、巨大化している図の ID（`id` prop）を特定 → その ID だけに `:global(#diag-N svg)` で `max-height` を設定 → 高さが適切になるまで数値を微調整する。
+> **手順**: 全図解をブラウザで目視確認し、巨大化している図を特定 → その図だけに `maxHeight` を指定 → 高さが適切になるまで数値を微調整する。ページ CSS で SVG を直接上書きしない。
 
 ### テスト環境（Vitest）でのモック化
 
@@ -462,6 +462,6 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
 | **SVGが縦長に拡大される・縦横比が崩れる** | SVGに `width` 属性が残ったままに `width: 100%` | `removeAttribute('width')` → `width: auto; max-width: 100%` に変更 |
 | **（web-next）図解が左寄せ・右に空白** | ページ側 `:global(.mermaid)` の幅強制、または列幅より広い図 | ページ側の幅指定を削除しコンポーネントに委譲。広い図は svg `max-width:100%` で縮小フィット（Part 4） |
 | **（web-next）図解が切れて右にスクロール** | 旧 `overflow-x` スクロール方式が残存 | svg 後処理で `max-width:100%; height:auto`（縮小フィット＝切れない）に統一（Part 4） |
-| **`stateDiagram-v2` の文字が極端に大きい** | ノード数が少なく Mermaid が広い viewBox を生成している | `themeVariables.fontSize` は `"16px"` 固定のまま変えず、問題の図解 ID だけ `:global(#diag-N svg) { max-height: Xpx !important }` でピンポイント制限（Part 4 追記参照） |
+| **`stateDiagram-v2` の文字が極端に大きい** | ノード数が少なく Mermaid が広い viewBox を生成している | `themeVariables.fontSize` は `"16px"` 固定のまま変えず、問題の図だけ `maxHeight` prop でピンポイント制限（Part 4 追記参照） |
 | **図解ごとにサイズが全然バラバラ** | `themeVariables.fontSize` に `"1rem"` を使っている | `"16px"` 等の固定ピクセル値に変更。CSS `font-size` は SVG `<text>` に継承されないため `.mermaidWrap { font-size }` も無効（Part 4 追記参照） |
-| **全 SVG に `max-height` をかけたら他の図が小さくなりすぎた** | グローバル制限で正常な図まで縮小されている | グローバル `:global(svg)` 制限を削除し、巨大化した図 ID だけに `:global(#diag-N svg)` を個別設定する（Part 4 追記参照） |
+| **全 SVG に `max-height` をかけたら他の図が小さくなりすぎた** | グローバル制限で正常な図まで縮小されている | グローバル `:global(svg)` 制限を削除し、巨大化した図だけに `maxHeight` prop を指定する（Part 4 追記参照） |

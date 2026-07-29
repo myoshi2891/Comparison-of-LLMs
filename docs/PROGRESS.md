@@ -11,13 +11,15 @@
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
 - **動作検証**:
   - `bun run build` ✅（`web-next` の全ルートが Static プリレンダリングされる。※Antigravity環境では実行禁止）
-  - `bun run typecheck` ✅
-  - `npm run lint` ⚠️（**27 errors / 2 warnings**。今回のレビュー範囲外を含む既存の未整形・semantic 診断が残るため、全体自動修正は未実施）
+  - `npm run typecheck` ✅
+  - `npm run lint` ⚠️（**91 errors / 4 warnings**。今回のレビュー範囲外を含む既存の未整形・semantic 診断が残るため、全体自動修正は未実施）
 - **テストの実行状況**:
-- **フロントエンド (`web-next/`)**: Vitest 実行で **1232 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest の **1232 assertions はすべて合格**。ただし `tests/google-components-coverage.test.tsx` が削除済み `app/google/skill-guide/ChecklistApp` を import しており、**1 suite が収集失敗**（今回のレビュー範囲外）
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+
+- **レビュー指摘の現行コード照合とアクセシビリティ・Mermaid・リダイレクト修正**: Google 3ページの TOC を CSS Modules のアクティブクラス、初期ハイライト、複数交差時の最上部判定へ統一し、参考文献 footer も監視対象化。Claude 中級 Skill ガイドと静的 Harness ガイドの閉じた目次を操作不可にした。共有 `MermaidDiagram` に neutral note 色、固定 `fontSize`、図単位の `maxHeight` API を追加し、Antigravity CLI の stateDiagram 2件をページ CSS から移行。旧 `/google/skill-guide-intermediate` へ 301 を追加。ビルド・目視は依頼により省略。Vitest は **1232 assertions pass / 1 suite 収集失敗**、typecheck Green、lint は既存範囲を含む **91 errors / 4 warnings**。
 
 - **Google Antigravity 完全ガイド — エコシステムとベストプラクティス（/google/antigravity-best-practices）の Pure JSX 完全置き換え移行**: `Google-antigravity-best-practices.html` を `web-next/app/google/antigravity-best-practices/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全15セクション（全15H2セクション、全表、全コードブロック、3 Mermaid図、全参考文献等）・TOCスクロール追従（`TocObserver.tsx`）・横幅画面いっぱい（100%）・`page-registry.ts` 登録・更新を完了。旧 `/google/skill-guide-intermediate` を新URLへ完全置き換え完了。原本 `Google-antigravity-best-practices.html` / `Google-antigravity-best-practices.md` は `archive/html/google/` および `archive/md/google/` へ `git mv` 退避保存。契約テストを更新。
 
@@ -239,7 +241,7 @@ Next.js 移行完了後のリポジトリ `LLM-Studies` にて、テストカバ
 Next.js 移行完了後のリポジトリ `LLM-Studies` の保守・改善作業を再開してください。
 
 - リポジトリ: LLM-Studies (Next.js 移行プロジェクトは dev/main へ完全マージ済み)
-  - 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (1203/1203 passed) / pytest (43/43 passed) で全 Green
+  - 現在のステータス: docs/PROGRESS.md を参照。Vitest は 1232 assertions pass / 1 suite 収集失敗、pytest は 43/43 passed
 - リポジトリ規約: CLAUDE.md (編集上の絶対ルール。※Antigravity環境ではビルドは実行禁止)
 
 作業方針：
