@@ -13,8 +13,12 @@ global.IntersectionObserver = class {
   observe(element: Element) {
     observed.push(element);
   }
-  unobserve() {}
-  disconnect() {}
+  unobserve() {
+    // Test stub.
+  }
+  disconnect() {
+    // Test stub.
+  }
 } as unknown as typeof IntersectionObserver;
 
 describe("google skill TocObserver", () => {
@@ -37,9 +41,7 @@ describe("google skill TocObserver", () => {
     const summary = container.querySelector("#summary") as HTMLElement;
     const references = container.querySelector("#references") as HTMLElement;
     const summaryLink = container.querySelector('a[href="#summary"]') as HTMLAnchorElement;
-    const referencesLink = container.querySelector(
-      'a[href="#references"]'
-    ) as HTMLAnchorElement;
+    const referencesLink = container.querySelector('a[href="#references"]') as HTMLAnchorElement;
 
     expect(observed).toContain(references);
     summary.getBoundingClientRect = () => ({ top: 30 }) as DOMRect;

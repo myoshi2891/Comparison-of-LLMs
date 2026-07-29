@@ -9,9 +9,15 @@ global.IntersectionObserver = class {
   constructor(next: IntersectionObserverCallback) {
     callback = next;
   }
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+  observe() {
+    // Test stub.
+  }
+  unobserve() {
+    // Test stub.
+  }
+  disconnect() {
+    // Test stub.
+  }
 } as unknown as typeof IntersectionObserver;
 
 describe("antigravity-best-practices TocObserver", () => {
