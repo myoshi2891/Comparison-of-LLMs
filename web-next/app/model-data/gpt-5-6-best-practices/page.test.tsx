@@ -121,8 +121,10 @@ describe("/model-data/gpt-5-6-best-practices - contract", () => {
     // （引き伸ばし・縮小・レイアウト分裂の原因になる）。
     const globalMermaidBlock = /:global\((?:\.mermaid|svg|\.mermaid svg)\)(?:\s+svg)?\s*\{[^}]*/;
     expect(css).not.toMatch(new RegExp(`${globalMermaidBlock.source}width`));
-    expect(css).not.toMatch(new RegExp(`${globalMermaidBlock.source}displays*:s*flex`));
-    expect(css).not.toMatch(new RegExp(`${globalMermaidBlock.source}justify-contents*:s*center`));
+    expect(css).not.toMatch(new RegExp(`${globalMermaidBlock.source}display\\s*:\\s*flex`));
+    expect(css).not.toMatch(
+      new RegExp(`${globalMermaidBlock.source}justify-content\\s*:\\s*center`)
+    );
   });
 
   it("left-aligns every Markdown table header", () => {
