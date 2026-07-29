@@ -105,8 +105,19 @@ describe("MermaidDiagram レイアウト規約", () => {
     });
   });
 
-  it("利用者指定の fontSize より固定 16px を優先する", async () => {
+  it("利用者指定の fontSize を保持する", async () => {
     render(<MermaidDiagram chart="graph TD; A-->B" themeVariables={{ fontSize: "48px" }} />);
+    await waitFor(() => {
+      expect(mermaid.initialize).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          themeVariables: expect.objectContaining({ fontSize: "48px" }),
+        })
+      );
+    });
+  });
+
+  it("fontSize が未指定なら 16px を使用する", async () => {
+    render(<MermaidDiagram chart="graph TD; A-->B" />);
     await waitFor(() => {
       expect(mermaid.initialize).toHaveBeenLastCalledWith(
         expect.objectContaining({
