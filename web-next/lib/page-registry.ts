@@ -495,15 +495,15 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/google/antigravity-guide",
-    title: "Antigravity",
+    title: "Antigravity CLI 完全ガイド",
     group: "Providers",
     category: "Google",
     provider: "google",
-    topics: ["guide"],
+    topics: ["guide", "cli"],
     summary:
-      "GEMINI.md から SKILL.md・Rules・Workflows・Artifacts まで、Google Antigravity エコシステムの全体を根拠ソース付きで徹底解説。初学者でもステップバイステップで理解できるベストプラクティス完全ガイド。Antigravity 2.0 (2026-05-19, Google I/O 2026) — Antigravity CLI / SDK / Managed Agents / plugins / Gemini 3.5 Flash 対応。",
+      "Antigravity CLI (agy) の全スラッシュコマンド、キーバインド、設定ファイル (settings.json)、自動化・CI/CD連携、セキュリティモデルを包括的に解説した完全ガイド。",
     addedAt: "2026-05-08",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-07-28",
   },
   {
     slug: "/google/antigravity-slash-commands-guide",
