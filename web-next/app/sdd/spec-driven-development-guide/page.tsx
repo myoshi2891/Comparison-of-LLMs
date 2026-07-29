@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Ext from "@/components/docs/Ext";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
@@ -167,14 +168,6 @@ const MMD_10 = `flowchart LR
     style A fill:#3a2a1f,stroke:#e5c07b,color:#fff
     style C fill:#1f2f3a,stroke:#61afef,color:#fff
     style E fill:#1f3a2a,stroke:#98c379,color:#fff`;
-
-function Ext({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <a href={href} target="_blank" rel="noopener noreferrer">
-      {children}
-    </a>
-  );
-}
 
 export default async function SpecDrivenDevelopmentGuidePage() {
   return (

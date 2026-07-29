@@ -10,6 +10,41 @@ interface SkillGuideClientProps {
   children: ReactNode;
 }
 
+const NAV_GROUPS = [
+  {
+    label: "はじめに",
+    items: [
+      { id: "intro", icon: "ti-info-circle", label: "なぜ今 SKILL.md なのか" },
+      { id: "architecture", icon: "ti-stack-2", label: "Progressive Disclosure" },
+    ],
+  },
+  {
+    label: "ステップバイステップ",
+    items: [
+      { id: "step1", icon: "ti-number-1", label: "ギャップの特定" },
+      { id: "step2", icon: "ti-number-2", label: "ディレクトリ設計" },
+      { id: "step3", icon: "ti-number-3", label: "フロントマター" },
+      { id: "step4", icon: "ti-number-4", label: "description設計" },
+      { id: "step5", icon: "ti-number-5", label: "本文を簡潔に書く" },
+      { id: "step6", icon: "ti-number-6", label: "分割パターン" },
+      { id: "step7", icon: "ti-number-7", label: "ワークフロー設計" },
+      { id: "step8", icon: "ti-number-8", label: "Claude Code固有フィールド" },
+      { id: "step9", icon: "ti-number-9", label: "実行コードの設計" },
+      { id: "step10", icon: "ti-number-10", label: "セキュリティ" },
+      { id: "step11", icon: "ti-number-11", label: "評価とイテレーション" },
+    ],
+  },
+  {
+    label: "まとめ",
+    items: [
+      { id: "antipatterns", icon: "ti-alert-triangle", label: "アンチパターン集" },
+      { id: "checklist", icon: "ti-checklist", label: "チェックリスト" },
+      { id: "summary", icon: "ti-flag", label: "まとめ" },
+      { id: "sources", icon: "ti-books", label: "参考文献・ソース" },
+    ],
+  },
+] as const;
+
 export default function SkillGuideClient({ children }: SkillGuideClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -36,85 +71,24 @@ export default function SkillGuideClient({ children }: SkillGuideClientProps) {
           SKILL.md 実践ガイド
         </div>
 
-        <div className={styles.navGroupLabel}>はじめに</div>
-        <nav className={styles.toc}>
-          <a href="#intro" className={styles.tocLink} onClick={() => setSidebarOpen(false)}>
-            <i className="ti ti-info-circle" />
-            なぜ今 SKILL.md なのか
-          </a>
-          <a href="#architecture" className={styles.tocLink} onClick={() => setSidebarOpen(false)}>
-            <i className="ti ti-stack-2" />
-            Progressive Disclosure
-          </a>
-        </nav>
-
-        <div className={styles.navGroupLabel}>ステップバイステップ</div>
-        <nav className={styles.toc}>
-          <a href="#step1" className={styles.tocLink} onClick={() => setSidebarOpen(false)}>
-            <i className="ti ti-number-1" />
-            ギャップの特定
-          </a>
-          <a href="#step2" className={styles.tocLink} onClick={() => setSidebarOpen(false)}>
-            <i className="ti ti-number-2" />
-            ディレクトリ設計
-          </a>
-          <a href="#step3" className={styles.tocLink} onClick={() => setSidebarOpen(false)}>
-            <i className="ti ti-number-3" />
-            フロントマター
-          </a>
-          <a href="#step4" className={styles.tocLink} onClick={() => setSidebarOpen(false)}>
-            <i className="ti ti-number-4" />
-            description設計
-          </a>
-          <a href="#step5" className={styles.tocLink} onClick={() => setSidebarOpen(false)}>
-            <i className="ti ti-number-5" />
-            本文を簡潔に書く
-          </a>
-          <a href="#step6" className={styles.tocLink} onClick={() => setSidebarOpen(false)}>
-            <i className="ti ti-number-6" />
-            分割パターン
-          </a>
-          <a href="#step7" className={styles.tocLink} onClick={() => setSidebarOpen(false)}>
-            <i className="ti ti-number-7" />
-            ワークフロー設計
-          </a>
-          <a href="#step8" className={styles.tocLink} onClick={() => setSidebarOpen(false)}>
-            <i className="ti ti-number-8" />
-            Claude Code固有フィールド
-          </a>
-          <a href="#step9" className={styles.tocLink} onClick={() => setSidebarOpen(false)}>
-            <i className="ti ti-number-9" />
-            実行コードの設計
-          </a>
-          <a href="#step10" className={styles.tocLink} onClick={() => setSidebarOpen(false)}>
-            <i className="ti ti-number-10" />
-            セキュリティ
-          </a>
-          <a href="#step11" className={styles.tocLink} onClick={() => setSidebarOpen(false)}>
-            <i className="ti ti-number-11" />
-            評価とイテレーション
-          </a>
-        </nav>
-
-        <div className={styles.navGroupLabel}>まとめ</div>
-        <nav className={styles.toc}>
-          <a href="#antipatterns" className={styles.tocLink} onClick={() => setSidebarOpen(false)}>
-            <i className="ti ti-alert-triangle" />
-            アンチパターン集
-          </a>
-          <a href="#checklist" className={styles.tocLink} onClick={() => setSidebarOpen(false)}>
-            <i className="ti ti-checklist" />
-            チェックリスト
-          </a>
-          <a href="#summary" className={styles.tocLink} onClick={() => setSidebarOpen(false)}>
-            <i className="ti ti-flag" />
-            まとめ
-          </a>
-          <a href="#sources" className={styles.tocLink} onClick={() => setSidebarOpen(false)}>
-            <i className="ti ti-books" />
-            参考文献・ソース
-          </a>
-        </nav>
+        {NAV_GROUPS.map((group) => (
+          <div key={group.label}>
+            <div className={styles.navGroupLabel}>{group.label}</div>
+            <nav className={styles.toc}>
+              {group.items.map((item) => (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  className={styles.tocLink}
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <i className={`ti ${item.icon}`} />
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+          </div>
+        ))}
       </aside>
 
       <main className={styles.main}>{children}</main>
